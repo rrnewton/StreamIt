@@ -1,21 +1,38 @@
 \section{Related Work}
 \label{sec:related}
-A number of programming languages have included a concept of a stream;
-see \cite{survey97} for a survey.  For example, the SVP data model is
-a formal framework for collections, which are a generalization of
-streams and sets \cite{Par92}.  Kahn presents and analyzes the
-semantics of a simple language, consisting of a set of channel and
-process declarations, for parallel programming\cite{Kah74}.  Another
-popular stream programming language is Occam, which provides channel
-communication primitives and both sequential and parallel composition
-of communicating processes \cite{Jif93}.  A theoretical framework for
-stream processing is $\pi$-calculus.  It formalizes processes, the
-active components of the system, channels, and the communication
-mechanism\cite{Pie97}.
+A large number of programming languages have included a concept of a
+stream; see \cite{survey97} for a survey.  Those that are perhaps most
+related to the static-rate version of StreaMIT are synchronous
+dataflow languages such as LUSTRE~\cite{lustre} and
+ESTEREL~\cite{esterel92} which require a fixed number of inputs to
+arrive simultaneously before firing a stream node.  However, most
+special-purpose stream languages are functional instead of imperative,
+and do not contain features such as messaging and support for modular
+program development that are essential for modern stream applications.
+Also, most of these languages are so abstract and unstructured that
+the compiler cannot perform enough analysis and optimization to result
+in an efficient implementation.
 
-However, most of these languages are functional instead of imperative.
-Further, previous languages are very unstructured, allowing for an
-arbitrary connection of blocks and channels that requires considerable
-effort to just prove that they are deadlock-free, let alone thinking
-about legal stream transformations.
+At an abstract level, the stream graphs of StreaMIT share a number of
+properties with synchronous dataflow (SDF) domain as considered by the
+Ptolemy project~\cite{ptolemyoverview}.  Each node in an SDF graph
+produces and consumes a given number of items, and there can be delays
+along the arcs between nodes (corresponding loosely to items that are
+peeked in StreaMIT).  As in StreaMIT, SDF graphs are guaranteed to
+have a static schedule, testing for deadlock is decidable, and there
+are a number of nice scheduling results incorporating code size and
+execution time~\ref{leesdf}.  However, previous results on SDF
+scheduling do not consider constraints imposed by point-to-point
+messages, and do not include a notion of StreaMIT's information
+wavefronts, re-initialization, and programming language support.
+
+A specification package used in industry bearing some likeness to
+StreaMIT is SDL: Specificacation and Description
+Language~\cite{sdlrec}.  SDL is a formal, object-oriented language for
+describing the structure and behavior of large, real-time systems,
+especially for telecommunications applications.  It includes a notion
+of asynchronous messaging based on queues at the receiver, but does
+not incorporate wavefront semantics as does StreaMIT.  Moreover, its
+focus is on specification and verification whereas StreaMIT aims to
+produce an efficient implementation.
 
