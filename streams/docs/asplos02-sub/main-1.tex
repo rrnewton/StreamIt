@@ -1,0 +1,107 @@
+\documentclass{sig-alternate}
+
+\usepackage{amsmath}
+%\usepackage{fullpage}
+%\usepackage{doublespace}
+\usepackage{epsfig}
+\usepackage{subfigure}
+
+\begin{document}
+
+\conferenceinfo{ASPLOS X}{10/02 San Jose, CA, USA} 
+\CopyrightYear{2002}
+\crdata{1-58113-574-2/02/0010}
+
+\title{A Stream Compiler for \\ Communication-Exposed Architectures}
+
+\numberofauthors{11}
+
+<<<<<<< main.tex
+\author{Michael I. Gordon, William Thies, Michal Karczmarek, Jasper Lin, Ali S. Meli,\\ Andrew A. Lamb, Chris Leger, Jeremy Wong, Henry Hoffmann,\\ David Maze, Saman Amarasinghe \\ ~ \\
+  MIT Laboratory for Computer Science \\
+  200 Technology Square \\
+  Cambridge, MA  02139 \\ ~ \\
+  \sffamily{\{mgordon, thies, karczma,  jasperln, saadat, aalamb, cleger, jwong, saman\}@lcs.mit.edu}}
+
+
+%previous author format
+=======
+\author{Michael I. Gordon, William Thies, Michal Karczmarek, Jasper Lin, Ali S. Meli,\\ Andrew A. Lamb, Chris Leger, Jeremy Wong, Henry Hoffmann,\\ David Maze, and Saman Amarasinghe \\ ~ \\
+  MIT Laboratory for Computer Science \\
+  200 Technology Square \\
+  Cambridge, MA  02139 \\ ~ \\
+  \sffamily{\{mgordon, thies, karczma, jasperln, saadat, aalamb, clleger, jnwong, hank, dmaze, saman\}@lcs.mit.edu}}
+
+%previous author format
+>>>>>>> 1.5
+%only first three authors
+%\author{
+%\alignauthor Michael I. Gordon\\
+%	\affaddr{MIT Laboratory for Computer Science}\\
+%	\affaddr{200 Technology Square} \\
+%	\affaddr{Cambridge, MA 02139}\\
+%	\email{mgordon@cag.lcs.mit.edu}
+%\alignauthor William Thies\\
+%	\affaddr{MIT Laboratory for Computer Science}\\
+%	\affaddr{200 Technology Square} \\
+%	\affaddr{Cambridge, MA 02139}\\
+%	\email{thies@lcs.mit.edu}
+%\alignauthor Michal Karczmarek\\
+%	\affaddr{MIT Laboratory for Computer Science}\\
+%	\affaddr{200 Technology Square} \\
+%	\affaddr{Cambridge, MA 02139}\\
+%	\email{karczma@lcs.mit.edu}
+%}
+
+%\additionalauthors{Additional Authors: Jeremy Wong, Henry Hoffman, David 
+%Maze, and Saman Amarasinghe, email: {\texttt{\{jnwong, hank, dmaze, saman\}@lcs.mit.edu}}}
+
+
+\date{}
+
+% this is the line spacing
+%\setstretch{1.25}
+
+% \sloppy lets Latex be a little less anal about interword spacing.  It is
+% one way to eliminate those annoying Overfull hbox warnings.
+% Another way is to surround each offending paragraph with
+% \begin{sloppypar} ... \end{sloppypar}
+
+%\sloppy
+
+% See page 90 of the Latex book for info about vertical spacing probs.
+
+  \newcommand{\mt}[1]{\mbox{\it #1}}
+  \newcommand{\todo}[1]{\framebox{#1}}
+  \newcommand{\BeamFormer}[0]{BeamFormer}
+
+  %\toappear{\centerline{\Large\bf MIT LCS Technical Memo,}
+  %          \centerline{\Large\bf MIT-LCS-TM-6XX,}
+  %          \centerline{\Large\bf November, 2001.}}
+  
+  \maketitle
+  \input{abstract}
+  
+  %\advance\topmargin by -0.35inn      % Correct for LaTeX gratuitousnes
+  \category{Zah?}{Something else}
+  \terms{Stuff}
+  \keywords{Streams, RAW, Streams}
+
+  \input{intro}
+  \input{streamit}
+  \input{raw}
+  \input{phases}
+  \input{partition}
+  \input{layout}
+  \input{commsched}	
+  \input{codegen}
+  \input{results}
+  \input{related}
+  \input{conclusion}
+  
+  \bibliographystyle{abbrv}
+  \bibliography{references}
+  
+\end{document}
+
+
