@@ -45,32 +45,17 @@ the DynamoRIO\cite{dynamo99} infrastructure. Floating point multiplication instr
 in the IA-32 instruction set are defined to be any of ({\tt fmul fmulp fimulp fdiv fdivp fidivp fdivr fdivrp fidivr}).
 We measure execution time normalized to the number of program outputs generated.
 
-There are no standard benchmarks written yet for StreamIt, so we use
-a set of representative programs which perform computations that 
-are found in actual streaming applications: 
-
-\begin{enumerate}
-\item FIR: A single 256 point rectangularly windowed low pass FIR filter ($\omega_c=\frac{\pi}{3}$).
-\vspace{-6pt}
-
-\item TargetDetect: Four matched filters performing threshold target detection in parallel.
-\vspace{-6pt}
-
-\item FilterBank: A multi-rate signal decomposition processing block common in communications and image processing.
-\vspace{-6pt}
-
-\item RateConvert: An audio signal down sampler that converts the sampling rate by a non-integral factor.
-\vspace{-6pt}
-
-\item FMRadio: An FM software radio with equalizer.
-\vspace{-6pt}
-
-\item Radar: A radar front end with beamformer and target detection.
-\vspace{-6pt}
-\end{enumerate}
-
-
-
+There are no standard benchmarks written yet for StreamIt, so we use a
+set of representative programs which perform computations that are
+found in actual streaming applications: 1) {\bf FIR}, a single 256
+point rectangularly windowed low pass FIR filter
+($\omega_c=\frac{\pi}{3}$); 2) {\bf TargetDetect}, four matched
+filters performing threshold target detection in parallel; 3) {\bf
+FilterBank}, a multi-rate signal decomposition processing block common
+in communications and image processing; 4) {\bf RateConvert}, an audio
+signal down sampler that converts the sampling rate by a non-integral
+factor; 5) {\bf FMRadio}, an FM software radio with equalizer; 6) {\bf
+Radar}, a radar front end with beamformer and target detection.
 
 \subsection{Performance}
 

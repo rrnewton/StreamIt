@@ -242,9 +242,8 @@ weights} arrays from the two filters into a single, equivalent array.
 This reduces the number of multiply operations by a factor of two.  In
 Figure~\ref{fig:example-frequency}, the programmer has done the
 filtering in the frequency domain, using the FFT and IFFT to translate
-between time and frequency.  Some computationally intensive
-convolutional filters and streams are more efficient when done in
-frequency instead of time.
+between time and frequency.  Computationally intensive filters and
+streams are more efficient when done in frequency instead of time.
 
 Our linear analysis can automatically derive both of the
 implementations in Figures~\ref{fig:example-combine}

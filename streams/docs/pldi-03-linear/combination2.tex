@@ -98,8 +98,7 @@ $u'$-element row vector:
 \end{equation}
 \end{transformation}
 
-Despite the bulky notation above, the intuition behind linear
-expansion is straightforward (see
+The intuition behind linear expansion is straightforward (see
 Figure~\ref{fig:expanding-a-matrix}.)  Linear expansion aims to scale
 the push, pop, and peek rates of a linear node while preserving the
 functional relationship between the values pushed and the values
@@ -210,7 +209,7 @@ However, it is the case that some collapsed linear nodes are always
 less efficient than the original pipeline sequence.  The worst case is
 when $A_1^e$ is a column vector and $A_2^e$ is a row vector, which
 requires $O(n)$ operations originally but $O(n^2)$ operations if
-combined (assuming the vectors are of length $n$).  In general, the
+combined (assuming vectors of length $n$).  In general, the
 compiler can identify performance-degrading combinations when the
 number of non-zero elements in $A'$ exceeds the sum of non-zero
 elements in $A_1^e$ and $A_2^e$.
@@ -244,6 +243,15 @@ wrapper completely.  Our technique also assumes that each {\tt
 splitjoin} admits a valid steady-state schedule; this property is
 verified by the StreamIt semantic checker.
 
+\begin{figure}[t]
+\center
+\epsfxsize=3.0in
+\epsfbox{images/splitjoin-combination.eps}
+\caption{Matrix resulting from combining a {\tt splitjoin} of rate matched sub {\tt streams}.
+\protect\label{fig:splitjoin-duplicate-matrix}}
+\vspace{-12pt}
+\end{figure}
+
 Our analysis distinguishes between two cases.  For duplicate
 splitters, we directly construct a linear node from the child streams.
 For roundrobin splitters, we translate the {\tt splitjoin} to use a
@@ -276,15 +284,6 @@ mathematical terms.
 %\caption{Expanding sub {\tt streams} to match their output rates in a linear {\tt SplitJoin}.}
 %\label{fig:splitjoin-duplicate-ratematch}
 %\end{figure}
-
-\begin{figure}
-\center
-\epsfxsize=3.0in
-\epsfbox{images/splitjoin-combination.eps}
-\caption{Matrix resulting from combining a {\tt splitjoin} of rate matched sub {\tt streams}.
-\protect\label{fig:splitjoin-duplicate-matrix}}
-\vspace{-12pt}
-\end{figure}
 
 \begin{transformation} (Duplicate splitjoin combination)
 Given a splitjoin $s$ containing a duplicate splitter, children that

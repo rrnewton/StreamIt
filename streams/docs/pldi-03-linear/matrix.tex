@@ -1,11 +1,11 @@
-\section{Linear Nodes}
+\section{Linear Dataflow Analysis}
 \label{sec:linearrep}
 
 There is no general relationship that must hold between a {\tt
-filter}'s input data and its output data. In actual applications,
-however, the output is typically derived from the input, but the
-relationship is not always clear since a {\tt filter} has state and
-can call external functions.
+filter}'s input data and its output data. In actual applications, the
+output is typically derived from the input, but the relationship is
+not always clear since a {\tt filter} has state and can call external
+functions.
 
 However, we note that a large subset of DSP operations produce outputs
 that are some affine function of their input, and we call {\tt
