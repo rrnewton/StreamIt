@@ -1,25 +1,17 @@
 \mysection{Optimization}
+\label{sec:optimization}
 
-     There are multiple metrics used to analyze performance
-of a computer program - speed (throughput, or outputs per second),
-space, power consumption, etc. We focus on speed and attempt to
-minimize the computation performed to produce each output.
-Obviously, this type of optimization has positive effects on the
-other parameters. However, we are mainly concerned with speed
-because it is simple to track, and due to falling hardware costs,
-is frequently a program's bottleneck.
-
-    There are two types of optimizations we consider.  The first is to
+There are two types of optimizations we consider.  The first is to
 remove extraneous state variables from the linear state-space
-representation. This reduces the memory allocation for a program
-and reduces the number of loads and stores executed, which are
-typically time intensive operations. It also eliminates
-computations that involve the removed states.  The second
-optimization is to reduce the parametrization of a state-space
-representation, by changing the representation to one with more
-zero and one entries in its matrices. This directly eliminates
-computations, since all multiplications by zero or one are not
-processed by the replacement algorithm.
+representation. This reduces the memory allocation for a program and
+reduces the number of loads and stores executed, which are typically
+slow and power-hungry operations. It also eliminates computations that
+involve the removed states.  The second optimization is to reduce the
+parametrization of a state-space representation, by changing the
+representation to one with more zero and one entries in its
+matrices. This directly eliminates computations, since all
+multiplications by zero or one are not processed by the replacement
+algorithm.
 
 \mysubsection{State-Space Transformations}
 
@@ -190,7 +182,7 @@ $1$.
 \vspace{\itemshrink} \item For the $i^{th}$ state, check whether the state has an
 initial value, is updated by the initialization matrices, or
 depends on a state with a higher index. If any of these are true,
-we cannot remove the state. Otherwise, we can remove the state.
+we cannot remove the state; otherwise, we can remove the state.
 \vspace{\itemshrink} \end{enumerate}
 
     Since the unreachable state sub-matrix is in upper-triangular
@@ -229,7 +221,7 @@ matrix applied to $\mathbf{A}$, $\mathbf{B}$, $\mathbf{C}$ is
 $\mathbf{T} = \left [ \begin{array} {cc} \mathbf{Q}^{-1} &
 \mathbf{0} \\ \mathbf{0} & \mathbf{I} \end{array} \right ]$
 
-\mysubsection{Putting Inputs into States}
+\mysubsubsection{Putting Inputs into States}
 
     So far we have considered optimizations that affect $\mathbf{A}$,
 $\mathbf{B}$, and $\mathbf{C}$. Since the optimizations are
@@ -357,7 +349,7 @@ other. Therefore, we perform the above algorithm on $\left [
 ]$ to produce the reachable form, and check which one has fewer
 parameters.
 
-\mysubsection{Staged Execution}
+\mysubsubsection{Staged Execution}
 
     Using input state variables corresponds to executing a state-space
 block in two stages:
