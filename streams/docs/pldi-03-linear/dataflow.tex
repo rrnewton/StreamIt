@@ -51,23 +51,30 @@ automatically.
  
 The data analysis pass that is currently employed is very much like standard constant propagation. 
 Instead of mappings from variables to compile time constants, we keep mappings to linear forms.
-A linear forms is defined as a pair $({\mathbf v}, c)$ of a column vector $\mathbf{v}$ of size $e$ 
+A linear forms $l$ is defined as a pair $({\mathbf v}, c)$ of a column vector $\mathbf{v}$ of size $e$ 
 and a constant $c$. For each program variable, its linear form at a particular program 
 point corresponds to the formula for computing a value from a linear 
 combination of {\tt filter} inputs. The value of a linear form at runtime is 
 ${\mathbf xv} + c$.
-
 
 The analysis must keep track of how many {\tt pop()}s the {\tt work} 
 function has performed at any particular program point so that 
 the position of the data returned by each {\tt pop()} or {\tt peek(i)} 
 encountered is determinable. We define $popcount$ for each program point 
 as the number of {\tt pops} encountered along all possible
-execution paths. If different execution paths could cause $popcount$ to take
-mutiple values at any point, $popcount$ becomes undefined.
+execution paths. 
+$pushcount$ is defined to be the number of push expressions already
+seen at a particular program point.
+If different execution paths could cause $pushcount$ or 
+$popcount$ to take inconsitent values, then the appropriate
+variable becomes undefined.
+At each point in the program, we keep a candidate linear node 
+$\lambda=({\mathbf A}, {\mathbf b}, e,o,u)$ that represents the 
+computations necesary to produce the output generated up to that 
+point.
+
 We define ${\mathbf v} = zerov(k)$ a row vector of size $e$ such that 
 $v[i]=0, i \neq k$, and $v[i]=1,i=k$.
-
 
 A linear form is generated in one of he following three ways:
 \begin{enumerate}
@@ -84,38 +91,35 @@ $(zerov(u-1-popcount),0)$
 \vspace{-6pt}
 \end{enumerate}
 
+Linear forms propagate through the control flow graph much as constants do
+duirng constant propagation. The value of two expressions with linear forms $l_1$ 
+and $l_2$ is a new linear form $l'=l_1+l_2=({\mathbf v}_1+{\mathbf v}_2, c_1+c_2)$.
 
-Linear forms propagate through the dataflow graph much like constants are propagated
-during a standard constant propagation pass. Two linear forms $l_{1}$ and $l_{2}$ can
-be added together by adding their vectors element wise and adding their constants, eg 
-$l_1+l_2=(v_1+v_2, c_1+c_2)$. Linear forms can only be multiplied by constants $r$, 
-the result of which is simply a scaling of all the elements of $v$ and of $c$ by a factor
-$r$. Eg $l*r = (rv,rc)$. If two linear forms are multiplied together 
-then the result is not a linear combination of the {\tt Filter}'s input, rather it is
-some polynomial function in the input.
+The product of a linear form with a constant $r$, is a new linear form 
+$l' (r{\mathbf v},rc)$. The product of two linear forms does not produce a 
+new linear form because it corresponds to multiplying inputs together rather than
+a linear combination. 
 
-{\tt if} statements are handled just like for constant propagation. The confluence operator
-is set intersection, which only propagates variable to linear form mappings that are
-maintained along both branches of control flow. We also have to impose the special restriction that the
-same number of {\tt pops()} occurred along both branches or we don't know what the current offset
-for generating linear forms from {\tt peek(i)} and {\tt pop()} expressions is. 
-We currently only handle loops that can be unrolled in the 
-compiler (eg those loops whose bounds are determinable at compile time). 
-A loop can't be unrolled at compile time only if its termination condition is data 
-dependent, and data dependent loops probably don't compute linear 
-functions of the data anyways.
+Data is propagated through forward control flow as in standard dataflow analysis. 
+The confluence operator is set intersection, so mappings that are retained are the same 
+along all paths of control flow. Since $popcount$ and $pushcount$ must be single
+valued at all possible program points, an inconsistent $popcount$ at the
+confluence point means that any future {\tt pop} and {\tt peek} operations can
+do not generate linear forms, and an inconsistent $pushcount$ results in
+terminating the analysis.
 
+Backwards edges in control flow are handled currently by the symbolic execution
+of loops. We are currently investigating the use of parameterized generator matrices 
+to describe the action of loops without requiring symbolic execution.
 
-The final piece of generating a linear representation from a linear form is to 
-When the {\tt expr} in a {\tt push(expr)} expression is a linear form $l=(v,c)$, 
-we copy $v$ to the appropriate column in the {\tt Filter}'s linear representation matrix $A$ 
-and we copy $c$ to the appropriate column in the linear representation's constant vector $a$.
-The first {\tt push()} expression places the linear form in the last column of $A$. The second
-{\tt push()} the second to last column of $A$, etc. The last column of $A$ represents 
-the calculations necessary for the first output item produced by the filter. The second to last
-column represents the calculations for the second output item of the filter, etc.
-The same positions are chosen for the linear forms' constants in the constant vector $a$.
+If a function call with side effects is encountered, the operation performed
+by the filter is not linear and we discard our candidate node. Otherwise, 
+we can easily propagate the dataflow state through side-effect free function calls. 
 
-If all the {\tt push} expressions in a filter have linear forms as arguments, 
-then we have determined that the filter is linear and remember the mapping from 
-filter to linear representation.
+When a {\tt push(expr)} expression is encountered such that {\tt expr} is a linear form 
+$({\mathbf v},c)$, we modify ${\mathbf A}$ and ${\mathbf b}$ of the candidate linear node $\lambda$.
+${\mathbf v}$ is copied to the $u-1-pushcount$ column in ${\mathbf A}$,
+$c$ is copied to the $u-1-pushcount$ column in $a$, and $pushcount$ is incremented.
+
+If all every {\tt push} expression in a {\tt filter} has a linear form as an argument,
+then candidate linear node $\lambda$ is the linear node for the {\tt filter}.
