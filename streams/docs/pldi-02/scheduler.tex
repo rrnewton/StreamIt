@@ -5,5 +5,75 @@
 \psfig{figure=sched_diag.eps,width=3.4in}
 \caption{Three different scheduling schemes.}
 \label{fig:sched}
+
 \end{figure}
+
+Scheduling the order of the execution of filters has a large impact on 
+the behavior of a StreamIt program.  In this section we introduce three
+different scheduling techniques and analyze their properties.  The analysis
+presented here is quite superficial, as detailed analysis falls outside of
+the scope of this paper.
+
+\subsection{Periodic Schedule}
+A schedule for a StreamIt program needs to satisfy a requirement that
+a repeated execution of the schedule cannot lead to changed data buffering
+between filters.  This is a separate constraint from that in section
+\ref{sec:prog-verif}:  while it is impossible to produce a valid schedule
+for an invalid program, it is quite easy to produce an invalid schedule for
+a valid program.  We call a schedule that satisfies these requirement a
+periodic schedule.  (Here a schedule represents the multiplicity of executions
+of filters, ignoring the ordering of these executions.)
+
+\begin{theorem}
+\label{theo:period-sched}
+For every valid program, there exists a unique, minimal periodic schedule.
+Every other periodic schedule for a StreamIt program is a multiple of the
+underlying periodic schedule [\ref{bhat1994x3}].  (the multiple principle
+is never clearly stated (I don't think) but I don't want to have to prove
+it and I need it)
+\end{theorem}
+
+While computing periodic schedules for StreamIt, we chose to preserve the
+hierarchical structure presented in the program.
+
+A filter has a periodic schedule of a single execution.  This is because
+there are no scheduler-visible buffers inside of a filter.  All other
+components of the program express their periodic schedules in terms of
+number of executions of their subcomponents necessary to construct a valid
+schedule.  This technique relies on Theorem \ref{theo:period-sched} to
+assure that the periodic schedule built is indeed the minimal periodic
+schedule.
+
+\subsection{Initialization Schedule}
+
+Before we can execute any periodic schedule on a program, the program may
+require intialization.  This is because we allow filters with $peek_A$ values
+greater than their $pop_A$ values.  If the program is not initialized, a filter
+that peeks more than it pops would not be able to consume all the input 
+provided for it during the first execution of a periodic schedule.  The
+subsequent executions would force the filter to consume the exact same amount
+of data, eventually causing buffer overflow.
+
+The initialization schedule is computed by ensuring that every filter $A$ has
+at least $peek_A - pop_A$ unread data on its input tape available after 
+initialization has been completed.
+
+\subsection{Single Appearance Schedule}
+
+A single appearance schedule is a schedule in which every filter and every
+structure appears exactly once.  Groups of filters and structures can be
+combined together to form bigger structures.  In our approach, we chose to
+perserve the structuring of the original program when selecting structures
+to be grouped together.  Thus a schedule for a given structure is a list
+of tuples of components included in this structure and corresponding number
+of times each of these components needs to be executed in a given periodic
+schedule. (Better results for buffer size have been presented in 
+\ref{somepaper}, they are however within the same order of magnitude.)
+
+As an example, the pipeline in Figure \ref{fig:sched} has a schedule
+$(4A)(6B)(9C)(3D)$.
+
+\subsection{Minimum Latency Scheduling}
+
+
 
