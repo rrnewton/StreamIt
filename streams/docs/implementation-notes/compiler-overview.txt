@@ -14,11 +14,16 @@ Compiler Flow
 
 Here's the general flow of the compiler as it stands now:
 
-1. The Kopi scanner/parser reads in a source file (see kjc/Main.java)
+0. The StreamIt frontend reads in a source file, and converts it to
+   "old syntax" Java code; the main entry point is
+   src/streamit/frontend/ToJava.java.
+
+1. The Kopi scanner/parser reads in a source file (see
+   src/at/dms/kjc/Main.java)
 
 2. The Kopi system type-checks the code and resolves object references
    to point to actual objects instead of just symbolic names. (see
-   kjc/Main.java)
+   src/at/dms/kjc/Main.java)
 
 3. We translate the Kopi IR into a StreamIt high ir (SIR) consisting
    of a stream graph of filters, pipelines, splitjoins, and
@@ -71,17 +76,12 @@ something like:
 
 s -raw 4 -a FMRadio.java
 
-Here, 4 is the width of the raw machine.  We support widths from 1-8,
-I think.
+Here, 4 is the width of the raw machine.  We support widths from 1-8.
 
 The RAW backend will output a series of tile and switch files that you
-can compile for the raw simulator by typing "make".  For this to work,
-you first need to checkout the "starsearch" package from CVS, and set
-your STARSEARCH_HOME variable to point to the installation directory.
-(We recommend that you do this from /home/bits6/$USER instead of your
-main directory, since starsearch is big and there's more space on
-bits6.)  You can do "make debug" to run the simulator, and "make run"
-to just run it.
+can compile for the raw simulator by typing "make".  You can do "make
+-f Makefile.streamit debug" to run the simulator, and "make -f
+Makefile.streamit run" to just run it.
 
 Uniprocessor Backend
 --------------------
@@ -144,81 +144,43 @@ The Directory Structure
 -----------------------
 
 At this point an explanation of our directory structure is long
-overdue.  From under streams/compiler, it looks like this:
+overdue.  From under streams/src, it looks like this:
 
-|-- frontend		For now this contains an obsolete frontend.	   
-`-- kopi
-    |-- 3rdparty	This came with KOPI and we haven't touched it.
-    |-- JFlex		This came with KOPI and we haven't touched it.
-    |-- bytecode	This came with KOPI and we haven't touched it.
-    |-- compiler	This came with KOPI and we haven't touched it.
-    |-- drivers		This came with KOPI and we haven't touched it.
-    |-- gnu		This came with KOPI and we haven't touched it.
-    |-- java_cup	This came with KOPI and we haven't touched it.
-
-    |-- classes		The "classes" directory is Kopi's target for
-			all of the compilation; it sets up its
-			directory structure in a tree that is
-			DIFFERENT from its package hierarchy, and
-			dumps all of the classes to a "classes"
-			directory.  We found this to be very
-			confusing, so we duplicated the entire package
-			hierarchy with a set of symbolic links from
-			underneath "classes" that points to the actual
-			location of the source file.  Thus, you can
-			start from the "classes" directory and follow
-			the package tree of a given source file, and
-			eventaully arrive at the real directory where
-			the source is stored.  Never mind this
-			discussion if you got confused -- using the
-			"compile" script everything should be okay.
-    
-		
-    |-- docs		The original KOPI documentation.
+|-- streamit            Code that is specific to the StreamIt compiler
+|   |-- frontend        StreamIt-to-Java converter
+|   |-- library         StreamIt Java runtime library
+|   |-- misc            Support classes for the scheduler
+|   |-- scheduler1      Old scheduler (unused)
+|   |-- scheduler2      Current stream scheduler
+|
+`-- at/dms              Parts from Kopi:
     |-- kjc		This is the compiler section of Kopi, that
-			we're using.
-
+    |   |               we're using.
     |   |-- lir		The LIR is the low-ir for the uniprocessor
-	                backend discussed above.
-
+    |   |               backend discussed above.
     |   |-- raw		This is where all the RAW backend stuff lives.
-
     |   `-- sir		This holds our representation of the high IR.
-
     |       `-- lowering  Originally intended for lowering SIR to LIR,
-	                this generally contains anything related to
-	                preparing the SIR for a backend stage.
-		
+    |	        |       this generally contains anything related to
+    |	        |       preparing the SIR for a backend stage.
     |           |-- fission - Contains fission transformations on SIR nodes.
-    
     |           `-- fusion - Contains fusion transformations on SIR nodes.
-
     `-- util - Miscellaneous utilities for use in different packages.
 
-The above directories all belong to what we could strictly call the
-"compiler".  There is another set of streamit classes that derive from
-the "streamit" package instead of the "kopi" package.  Eventually we
-will merge all of these streamit packages into a single directory
-structure, but right now they are in some of their own directories
-(e.g., "misc", "library", "scheduler" off of the main CVS repo.) to
-help facilitate some major changes that are in the works right now.
+The top-level directory structure is as follows:
 
-So this structure is as follows:
-
-|-- streamit
-    |-- library		The Java runtime library for executing
-			StreamIt files under Java.
-
-    |-- scheduler	The scheduler that is used by both the
-			compiler and the library to represent a legal 
-			execution ordering of nodes.
-
-    |-- frontend	(Not currently checked in?)  Will convert a
-			java program in the new syntax to one in the
-			old syntax, so that it can be run through the
-			compiler and/or Java library.
-
-    |-- misc		Shared misc. stuff.
+`-- streamit
+    |-- 3rdparty        Extra parts needed to run Kopi; taken directly
+    |                   from the Kopi distribution.
+    |-- apps            StreamIt benchmarks and applications
+    |-- docs            Documentation for the language and compiler
+    |-- include         Parts included by other parts of the
+    |                   distribution, including Raw bc devices and
+    |                   LaTeX macros
+    |-- library         Uniprocessor C runtime library
+    |-- misc            Scripts and helpers used by various things
+    |-- regtest         Automated test infrastructure
+    `-- src             Java sources for compiler and runtime library
 
 
 The Scheduler
@@ -241,3 +203,42 @@ the work functions of stream containers when the SIR is being lowered
 to the LIR.  And it is used for the work estimation phase of the
 automatic partitioner, to determine how many times a given stream
 segment executes in a steady-state execution of the graph.
+
+The Front-End
+-------------
+
+All of the above assumes code written in legal Java, where StreamIt
+objects are Java classes derived from the classes in the
+streamit.library package ("old syntax").  A front-end package reads in
+files written in the StreamIt language ("new syntax"), does some
+processing, and spits out an old-syntax file that the compiler can
+process.  This includes processing to change between syntaxes for
+language features such as filter I/O rates, and eliminating language
+features not present in Java (most notably, complex numbers).
+
+The main entry point to the front-end is the streamit.frontend.ToJava
+class.  This reads in the input file using an ANTLR grammar, and
+creates a parse tree using the classes in the streamit.frontend.nodes
+package.  This IR is immutable; visitor classes, generally derived
+from streamit.frontend.nodes.FEReplacer, rewrite the IR tree.  Some
+generic passes live in the streamit.frontend.passes package, and are
+used to perform limited semantic checking and would otherwise be
+useful outside of the context of conversion to Java.
+
+Currently, the major task of the front-end is to produce Java code to
+feed to Kopi.  This is done in the streamit.frontend.tojava package.
+A couple of special IR nodes are introduced here to handle concepts
+not otherwise present in the front-end, such as Java constructors for
+the Channel object to "declare" an input or output type.
+streamit.frontend.tojava.NodesToJava is the final class, which takes
+the tattered remnants of the IR tree and spits out the desired Java
+file.
+
+The front-end can also be invoked to produce code for the StreamIt
+Java library.  This is generally identical to what's produced for the
+compiler, but differs on details for things like phased filters.
+There are also plans to change the calling convention for init
+functions for the library path only to avoid needing a valid
+constructor for every possible set of parameters.  The output of the
+front-end in this case would be directly compiled with javac or jikes,
+and run with java.
