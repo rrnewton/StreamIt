@@ -178,7 +178,9 @@ channel $c$, $I(c)$ has type ${\cal V}[A(c)]$.
 \item A work function $W(n, t, p)$ that represents the computation of
 node $n$ in phase $p$ and epoch $t$.  The signature of $W(n, t, p)$ is
 $[{\cal V}[E(\mt{chan\_in}(n)[1], t, p)], \dots, {\cal
-V}[E(\mt{chan\_in}(n)[\mt{num\_in}(n)], t, p)]] {\small \rightarrow} [ {\cal
+V}[E(\mt{chan\_in}(n)[\mt{num\_in}(n)], t, p)]]$
+${\small \rightarrow}$\\
+$[ {\cal
 V}[U(\mt{chan\_out}(n)[1], t, p)], \dots, {\cal
 V}[U(\mt{chan\_out}(n)[\mt{num\_out}(n)], t, p)]]$.  That is, the function
 inputs a list of arrays, each of which corresponds to an incoming
