@@ -87,8 +87,8 @@ Load balancing is the performance focal point of space multiplexing.  Merging
 and splitting filters of the stream graph until the graph is composed
 of $n$ load balanced filters, where $n <=$ \# of processing
 elements, proved difficult, with many factors coming into play.  
-For chip configurations with relatively few processors, merging filters
-can lead to coarse-grained operations in each processing element. 
+Further, constraining ourselves to space multiplexing forced us to
+need to support arbitrarily complex communication patterns.
 
 The technique employed by our new backend for Raw is to merge the
 advantages of space multiplexing and time multiplexing.  This hybrid
