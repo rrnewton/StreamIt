@@ -1,0 +1,86 @@
+class Butterfly extends Stream {
+      void init(int N) {
+         add(new SplitJoin() {
+	    void init() {
+	       weighted_splitter(N, N);
+               add (new Identity());
+	       add (new Filter() {
+	         Complex weights[N];
+		 int curr;
+	         Channel input = new ComplexChannel();
+	         Channel output = new ComplexChannel();
+		 void init() {
+		    for(int i=0; i<N; i++)
+		      weights[i] = ...;
+		    curr = 0;
+		 }
+		 void work() {
+		    output.push(input.pop()*weights[curr++]);
+		    if(curr>= N) curr = 0;
+		}    
+	       })
+	       weighted_joiner(1, 1)      
+	    }});
+	 add(new SplitJoin() {
+	    void init() {
+	       duplicate();
+	       add (new Filter() {   
+	         Channel input = new ComplexChannel();
+	         Channel output = new ComplexChannel();
+		 void work() {
+		    putput.push(input.pop() + input.pop());
+		 }
+               })
+	       add (new Filter() {   
+	         Channel input = new ComplexChannel();
+	         Channel output = new ComplexChannel();
+		 void work() {
+		    putput.push(input.pop() - input.pop());
+		 }
+               })
+	       weighted_joiner(N, N);
+         }})      
+      }
+}
+
+class FFT extends Stream {
+   void init(int N) {
+      for(int i=2; i<=N/2; i *= 2)
+        add(new Butterfly(i));
+   }
+}
+-------------------
+class Butterfly extends Stream {
+         add(new SplitJoin(weighted_round_robin(N,N), round_robin) {
+	       weighted_splitter(N, N);
+               add (new Identity());
+	       add (new Filter() {
+	         Complex weights[N];
+		 int curr;
+		    for(int i=0; i<N; i++)
+		      weights[i] = ...;
+		    curr = 0;
+		 void work() {
+		    output.push(input.pop()*weights[curr++]);
+		    if(curr>= N) curr = 0;
+		}    
+	    }});
+	 add(new SplitJoin(duplicate, weighted_round_robin(N,N)) {
+	       add (new Filter() {   
+		 void work() {
+		    putput.push(input.pop() + input.pop());
+		 }
+	       add (new Filter() {   
+		 void work() {
+		    putput.push(input.pop() - input.pop());
+		 }
+               })
+      }
+}
+
+class FFT extends Stream {
+   void init(int N) {
+      for(int i=2; i<=N/2; i *= 2)
+        add(new Butterfly(i));
+   }
+}
