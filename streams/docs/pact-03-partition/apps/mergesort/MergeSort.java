@@ -1,4 +1,4 @@
-import streamit.*;
+import streamit.library.*;
 class Complex extends Structure {
   public float real;
   public float imag;
