@@ -38,55 +38,57 @@ Here's the general flow of the compiler as it stands now:
    The constant prop. and loop unrolling is used to expand the
    parameterized structure of the IR into a static graph.
 
-   Horizontal Fission	kjc/sir/lowering/fission/StatelessDuplicate.java
-   Horizontal Fusion	kjc/sir/lowering/fusion/FuseSplit.java
-   Vertical Fusion	kjc/sir/lowering/fusion/FusePipe.java
-   Lifting (if pipeline contains just one filter, remove pipeline wrapper)   
-			kjc/sir/lowering/fusion/Lifter.java
+   There are also a set of graph transformations that can re-arrange
+   filters in the graph, convert to and from different canonical
+   forms, and adjust the granularity by fusing many filters into one
+   or fissing one filter into many:
+     kjc/sir/lowering/partition/RefactorSplitJoin.java
+     kjc/sir/lowering/partition/RefactorPipeline.java
+     kjc/sir/lowering/fusion/Lifter.java
+     kjc/sir/lowering/fission/StatelessDuplicate.java
+     kjc/sir/lowering/fission/VerticalFission.java
 
    These phases are used for partitioning and optimization, discussed below.
 
 -----
 
-Then the flow splits up into two parts, one for RAW and one for the
+Then the flow splits up into two parts, one for Raw and one for the
 uniprocessor backend.
 
-RAW Backend
+Raw Backend
 -----------
 
-The RAW side of the project (in kjc/raw) does partitioning, layout,
-and communication scheduling for a RAW backend.  This generally works
+The Raw side of the project (in kjc/raw) does partitioning, layout,
+and communication scheduling for a Raw backend.  This generally works
 by conversion to a flat, unstructured graph, and then simulation of
 the execution according to a legal schedule.  The toplevel controller
 for the raw backend is kjc/raw/RawBackend.java.  You can trace the
 modules that it calls in the backend from there.
 
-The partitioning can be either manual or automatic:
+There are two partitioning algorithms implemented to do automatic
+load-balancing on Raw:
 
-  - manual partitioning in kjc/sir/lowering/AdjustGranularity.java
-  - automatic partitioning in kjc/sir/lowering/Partitioner.java
+ - dynamic programming 
+    - in kjc/sir/lowering/partition/dynamicprogramming
+    - global analysis of large space of partitioning options
+    - can use stream transformations to adjust graph to facilitate
+      partitioning
 
-To use the manual partitioner, you have to pass the name of the
-application to the java VM, like this:
+ - greedy algorithm
+    - in kjc/sir/lowering/partition/GreedyPartitioner.java
+    - locally fuses the filters with the least amount of work
+    - generally performs significantly (~2X) worse than dynamic programming
 
-java -Dapp=fm -Xmx512M at.dms.kjc.Main -s -raw 4 FMRadio.java
-
-To compile for RAW with the automatic partitoiner, you'd type
-something like:
-
-s -raw 4 -a FMRadio.java
-
-Here, 4 is the width of the raw machine.  We support widths from 1-8.
-
-The RAW backend will output a series of tile and switch files that you
+The Raw backend will output a series of tile and switch files that you
 can compile for the raw simulator by typing "make".  You can do "make
 -f Makefile.streamit debug" to run the simulator, and "make -f
-Makefile.streamit run" to just run it.
+Makefile.streamit run" to just run it.  See the StreamIt Cookbook for
+more detailed instructions.
 
 Uniprocessor Backend
 --------------------
 
-The uniprocessor backend differs from the RAW backend in that the
+The uniprocessor backend differs from the Raw backend in that the
 entire filter graph is scheduled to run in serial, and the resulting
 code is linked with a runtime library to do the scheduling at runtime.
 In the long run, we could adjust the model to be more like raw's by
@@ -151,25 +153,36 @@ overdue.  From under streams/src, it looks like this:
 |   |-- library         StreamIt Java runtime library
 |   |-- misc            Support classes for the scheduler
 |   |-- scheduler1      Old scheduler (unused)
-|   |-- scheduler2      Current stream scheduler
+|   `-- scheduler2      Current stream scheduler
 |
 `-- at/dms              Parts from Kopi:
     |-- kjc		This is the compiler section of Kopi, that
     |   |               we're using.
+    |   |-- iterator	Stream iterators, used primarily for interfacing 
+    |   |               with the scheduler.
+    |   |-- linprog	Interface to a linear programming package,
+    |   |               currently unused.
     |   |-- lir		The LIR is the low-ir for the uniprocessor
     |   |               backend discussed above.
-    |   |-- raw		This is where all the RAW backend stuff lives.
+    |   |-- raw		This is where all the Raw backend stuff lives.
     |   `-- sir		This holds our representation of the high IR.
     |       `-- lowering  Originally intended for lowering SIR to LIR,
     |	        |       this generally contains anything related to
     |	        |       preparing the SIR for a backend stage.
+    |           |-- linear - domain-specific optimization of linear filters.
     |           |-- fission - Contains fission transformations on SIR nodes.
-    |           `-- fusion - Contains fusion transformations on SIR nodes.
+    |           |-- reordering - Different re-arrangements of stream graph.
+    |           |-- fusion - Contains fusion transformations on SIR nodes.
+    |           |-- stats - Stub for statistics gathering package.
+    |           `-- partition - Contains partitioners for load balancing.
+    |               |-- dynamicprog - dynamic programming partitioner.
+    |               `-- linear - automatic selection for linear opt.
+    |
     `-- util - Miscellaneous utilities for use in different packages.
 
 The top-level directory structure is as follows:
 
-`-- streamit
+`-- streams
     |-- 3rdparty        Extra parts needed to run Kopi; taken directly
     |                   from the Kopi distribution.
     |-- apps            StreamIt benchmarks and applications
@@ -196,9 +209,9 @@ results in smaller buffer sizes between filters.
 
 The scheduler can be used in several contexts.  It is used by the
 fusion algorithm to statically schedule the components of a pipeline
-or splitjoin. It is used by the RAW backend to simulate the execution
+or splitjoin. It is used by the Raw backend to simulate the execution
 of the stream graph so that the routing instructions can be generated
-for the switches on RAW.  It is used by the uniprocessor path to build
+for the switches on Raw.  It is used by the uniprocessor path to build
 the work functions of stream containers when the SIR is being lowered
 to the LIR.  And it is used for the work estimation phase of the
 automatic partitioner, to determine how many times a given stream
