@@ -1,0 +1,2332 @@
+\documentclass{sig-alternate}
+\usepackage{epsfig}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+
+ \toappear{
+ %\raisebox{2pt}[2pt]{\underline{~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}} \\
+ %$^*$ More information on the StreamIt project is available from
+ %\texttt{http://compiler.lcs.mit.edu/streamit} \\
+   \rule{0cm}{0cm}\\\hrule\rule{0cm}{0cm} ~ \\ \vspace{-6pt} ~ \\
+ \parbox[b]{20pc}{\baselineskip 9pt
+ Permission to make digital or hard copies of all or part of this work
+ for personal or classroom use is granted without fee provided that
+ copies are not made or distributed for profit or commercial advantage
+ and that copies bear this notice and the full citation on the first
+ page.  To copy otherwise, to republish, to post on servers or to
+ redistribute to lists, requires prior specific permission and/or a
+ fee.} \par
+ {\it PLDI'03}, June 9--11, 2003, San Diego, California, USA. \par
+ Copyright 2003 ACM 1-58113-662-5/03/0006 ...\$5.00 \\ ~ \\ ~ \\
+}
+
+ \conferenceinfo{PLDI'03}{June 9---11, 2003, San Diego, California, USA.}
+ \CopyrightYear{2003}
+ \crdata{1-58113-662-5/03/0006}
+
+\title{Linear Analysis and Optimization of Stream Programs}
+\numberofauthors{1}
+\author{
+\alignauthor \vspace{-18pt}
+Andrew A. Lamb,
+William Thies
+and Saman Amarasinghe\\
+	\vspace{8pt}
+	\{aalamb, thies, saman\}@lcs.mit.edu \\
+	\vspace{8pt}
+	Laboratory for Computer Science \\
+	Massachusetts Institute of Technology}
+
+
+\begin{document}
+\newtheorem{definition}{Definition}
+\newtheorem{transformation}{Transformation}
+
+\conferenceinfo{PLDI'03,} {June 9--11, 2003, San Diego, California, USA.} 
+\CopyrightYear{2003} 
+\crdata{1-58113-662-5/03/0006} 
+
+\maketitle
+
+\newcommand{\mt}[1]{\mbox{\it #1}}
+\newcommand{\todo}[1]{\framebox{\bf #1}}
+\newcommand{\naive}[0]{na\"{\i}ve}
+\newcommand{\Naive}[0]{Na\"{\i}ve}
+\newcommand{\makeline}[0]{\rule{0cm}{0cm}\\\hrule\rule{0cm}{0cm}}
+
+\begin{abstract}
+As more complex DSP algorithms are realized in practice, there is an
+increasing need for high-level stream abstractions that can be
+compiled without sacrificing efficiency.  Toward this end, we present
+a set of aggressive optimizations that target linear sections of a
+stream program.  Our input language is StreamIt, which represents
+programs as a hierarchical graph of autonomous filters.  A filter is
+linear if each of its outputs can be represented as an affine
+combination of its inputs.  Linearity is common in DSP components;
+examples include FIR filters, expanders, compressors, FFTs and DCTs.
+
+We demonstrate that several algorithmic transformations, traditionally
+hand-tuned by DSP experts, can be completely automated by the
+compiler.  First, we present a linear extraction analysis that
+automatically detects linear filters based on the C-like code in their
+work function.  Then, we give a procedure for combining adjacent
+linear filters into a single filter, as well as for translating a
+linear filter to operate in the frequency domain.  We also present an
+optimization selection algorithm, which finds the sequence of
+combination and frequency transformations that will give the maximal
+benefit.
+
+We have completed a fully-automatic implementation of the above
+techniques as part of the StreamIt compiler, and we demonstrate
+performance improvements that average 450\% over our benchmark suite.
+\end{abstract}
+
+\category{D.3.4}{Programming Languages}{Processors}
+\category{D.3.2}{Programming Languages}{Language Classifications}
+\category{D.2.2}{Software Engineering}{Software Architectures}
+%\category{D.2.2}{Software Engineering}{Design Tools and Techniques}
+
+\begin{terms}
+Languages, Performance, Design, Algorithms
+\end{terms}
+
+\begin{keywords}
+Stream Programming, Optimization, Embedded, Linear Systems, Algebraic Simplification, FFT
+\end{keywords}
+
+%% Upward of fifty percent of the code that runs the DSP(s) in a modern
+%% cell phone is coded in assembly with the rest written in C. Hand
+%% optimized assembly code typically makes the best use of the available
+%% resources such as power, specialized coprocessors, and specialized
+%% instructions.  The problem with assembly code is that the same
+%% algorithm must be mapped time and time again whenever a new chip comes
+%% out. The life cycle of a typical DSP is much shorter than the life
+%% cycle of a general purpose microprocessor -- each new generation is
+%% separated by months rather than years.
+ 
+%% Therefore frequently reimplementing algorithms by hand is a costly,
+%% arduous process that increases cost and slows the pace of
+%% advances. Engineers must spend time working out details rather than
+%% focusing on solving harder problems. Compilers were invented forty
+%% years ago exactly to let engineers focus on the problem at hand rather
+%% than spend time with machine specific details. Compilers for DSP
+%% architectures have a difficult job, and are not very good at mapping a
+%% program written in a general purpose language like C into the
+%% specialized instructions provided by DSPs. Many of the instructions
+%% provided by a DSP are targeted for a very specific application (like
+%% FIR filtering), but most general purpose languages have no way to
+%% describe higher level behavior other than functionally. If you don't
+%% express your algorithm in the same way that the compiler expects to
+%% encounter it, the resulting program will not take best advantage of
+%% the available DSP resources.
+
+\section{Introduction}
+Digital computation is becoming a ubiquitous element of modern life.
+Everything from cell phones to HDTV systems to satellite radios
+require increasingly sophisticated algorithms for digital signal
+processing.  Optimization is especially important in this domain, as
+embedded devices commonly have high performance requirements and tight
+resource constraints.  Consequently, there are often two stages to the
+development process: first, the algorithm is designed and simulated at
+a high level of abstraction, and second, it is optimized and
+re-implemented at a low level by an expert DSP programmer.  In order
+to achieve high performance, the DSP programmer needs to take
+advantage of architecture-specific features and constraints (usually
+via extensive use of assembly code) as well as global properties of
+the application that could be exploited to obtain algorithmic
+speedups.  Apart from requiring expert knowledge, this effort is
+time-consuming, error-prone, and costly, and must be repeated for
+every change in the target architecture and every adjustment to the
+high-level system design.  As embedded applications continue to grow
+in complexity, these factors will become unmanageable.  There is a
+pressing need for high-level DSP abstractions that can be compiled
+without any performance penalty.
+
+In this paper, we develop a set of optimizations that lower the entry
+barrier for high-performance stream programming.  Our work is done in
+the context of StreamIt~\cite{streamit-asplos,streamitcc}, which is a
+high-level language for signal processing applications.  A program in
+StreamIt is comprised of a set of concurrently executing filters, each
+of which contains its own address space and communicates with its
+neighbors using FIFO queues.  Our analysis focuses on filters which
+are {\it linear}: that is, each of their outputs can be expressed as
+an affine combination of their inputs.  Linear filters are common in
+DSP applications; examples include FIR filters, expanders,
+compressors, FFTs and DCTs.
+
+In practice, there are a host of optimizations that are applied to
+linear portions of a stream graph.  In particular, neighboring linear
+nodes can be combined into one, and large linear nodes can benefit
+from translation into the frequency domain.  However, these
+optimizations require detailed mathematical analysis and are tedious
+and complex to implement.  They are only beneficial under certain
+conditions---conditions that might change with the next version of the
+system, or that might depend on neighboring components that are being
+written by other developers.  To improve the modularity, portability,
+and extensibility of stream programs, the compiler should be
+responsible for identifying linear nodes and performing the
+appropriate optimizations.  Towards this end, we make the following
+contributions:
+\begin{itemize}
+\vspace{-6pt}
+
+\item A linear dataflow analysis that extracts an abstract linear
+representation from imperative C-like code.
+\vspace{-6pt}
+
+\item An automated transformation of neighboring linear nodes into a
+single collapsed representation.
+\vspace{-6pt}
+
+\item An automated translation of linear nodes into the frequency
+domain.
+\vspace{-6pt}
+
+\item An optimization selection algorithm that determines which
+transformations are most beneficial to apply.
+\vspace{-6pt}
+
+\item A fully-automatic implementation of these techniques in the
+StreamIt compiler, demonstrating an average speedup of 450\% and a
+best-case speedup of 800\%.
+\vspace{-6pt}
+
+\end{itemize}
+In the rest of this section, we give a motivating example and
+background information on StreamIt.  Then we present our linear node
+representation (Section~\ref{sec:linearrep}) and our supporting
+dataflow analysis (Section~\ref{sec:dataflow}).  Next we describe
+structural transformations on linear nodes
+(Section~\ref{sec:combine}), a frequency domain optimization
+(Section~\ref{sec:freq}) and an optimization selection algorithm
+(Section~\ref{sec:partitioning}). Finally, we present results
+(Section~\ref{sec:results}), related work (Section~\ref{sec:related})
+and conclusions (Section~\ref{sec:conclusion}).
+
+\subsection{Motivating Example}
+\begin{figure}[t]
+\vspace{-6pt}
+\center
+\epsfxsize=3.0in
+\epsfbox{images/motivating-example.eps}
+\vspace{-5pt}
+\caption{Block diagram of two FIR filters.}
+\vspace{-5pt}
+\makeline
+\vspace{-3pt}
+\label{fig:motivating-fig}
+\scriptsize
+\begin{verbatim}
+/* perform two consecutive FIR filters with weights w1, w2 */
+void two_filters(float* w1, float* w2, int N) {
+  int i;
+  float data[N];         /* input data buffer */
+  float buffer[N];       /* inter-filter buffer */
+  
+  for (i=0; i<N; i++) {  /* initialize the input data buffer */
+    data[i] = get_next_input();
+  }
+  
+  for (i=0; i<N; i++) {  /* initialize inter-filter buffer */
+    buffer[i] = filter(w1, data, i, N);
+    data[i] = get_next_input();
+  }
+  
+  i = 0;
+  while(true) {
+    /* generate next output item */
+    push_output(filter(w2, buffer, i, N));
+    /* generate the next element in the inter-filter buffer */
+    buffer[i] = filter(w1, data, i, N);
+    /* get next data item */
+    data[i] = get_next_input();
+    /* update current start of buffer */
+    i = (i+1)%N;
+  }
+}
+
+/* perform N-element FIR filter with weights and data */
+float filter(float* weights, float* data, int pos, int N) {
+  int i;
+  float sum = 0;
+
+  /* perform weighted sum, starting at index pos */
+  for (i=0; i<N; i++, pos++) {
+    sum += weights[i] * data[pos];
+    pos = (pos+1)%N;
+  }
+  return sum;
+}
+\end{verbatim}
+\vspace{-18pt}
+\caption{Two consecutive FIR filters in C.  Channels are represented
+as circular buffers, and the scheduling is done by hand.
+\protect\label{fig:motivating-example}}
+\makeline
+\vspace{-12pt}
+\end{figure}
+
+\begin{figure}[t]
+\vspace{-6pt}
+\scriptsize
+\begin{verbatim}
+float->float pipeline TwoFilters(float[N] w1, float[N] w2) {
+  add FIRFilter(w1);
+  add FIRFilter(w2);
+}
+
+float->float filter FIRFilter(float[N] weights) {
+  work push 1 pop 1 peek N {
+    float sum = 0;
+    for (int i=0; i<N; i++) {
+      sum += weights[i] * peek(i);
+    }
+    push(sum);
+    pop();
+  }
+}
+\end{verbatim}
+\vspace{-18pt}
+\caption{Two consecutive FIR filters in StreamIt.  Buffer management
+and scheduling are handled by the compiler.\protect\label{fig:example-streamit}}
+\vspace{-8pt}
+\makeline
+\vspace{-3pt}
+\begin{verbatim}
+float->float filter CollapsedTwoFilters(float[N] w1, float[N] w2) {
+  float[N] combined_weights;
+
+  init {  /* calculate combined_weights from w1 and w2 */  }
+
+  work push 1 pop 1 peek N {
+    float sum = 0;
+    for (int i=0; i<N; i++) {
+      sum += combined_weights[i]*peek(i);
+      }
+    push(sum);
+    pop();
+  }
+}
+\end{verbatim}
+\vspace{-18pt}
+\caption{Combined version of the two FIR filters.  Since each FIR
+filter is linear, the weights can be combined into a single {\tt
+combined\_weights} array.\protect\label{fig:example-combine}}
+\vspace{-8pt}
+\makeline
+\vspace{-3pt}
+%% float->float filter FreqTwoFilters() {
+%%   complex[N] H;
+%%   init {
+%%     H = FFT(combined_weights);
+%%   }
+%%   work push L pop L peek N+L {
+%%     float[N] X = FFT(peek(0..N+L-1)); /* input FFT */
+%%     float[N] Y =  X .* H; /* element wise mult */
+%%     float[N] y = IFFT(Y); /* inverse FFT */
+%%     push(y[0..L-1]); /* push first L elts of y */
+%%   }
+%% }
+\begin{verbatim}
+float->float pipeline FreqTwoFilters(float[N] w1, float[N] w2) {
+  float[N] combined_weights = ... ;     // calc. combined weights
+  complex[N] H = fft(combined_weights); // take FFT of weights
+  add FFT();                            // add FFT stage to stream
+  add ElementMultiply(H);               // add multiplication by H
+  add IFFT();                           // add inverse FFT
+}
+\end{verbatim}
+\vspace{-18pt}
+\caption{Combined version of two FIR filters in the frequency domain.
+\protect\label{fig:example-frequency}}
+\vspace{-10pt}
+\makeline
+\vspace{-10pt}
+\end{figure}
+
+To illustrate the program transformations that our technique is
+designed to automate, consider a sequence of finite impulse response
+(FIR) filters as shown in Figure~\ref{fig:motivating-fig}. The
+imperative C style code that implements this simple DSP application is
+shown in Figure~\ref{fig:motivating-example}. 
+The program largely defies many standard compiler analysis
+and optimization techniques because of its use of circular buffers and
+the muddled relationship between {\tt data}, {\tt buffer} and the
+output.
+
+Figure~\ref{fig:example-streamit} shows the same filtering process
+implemented in StreamIt. The StreamIt version is more abstract than
+the C version.  It indicates the communication pattern between
+filters, shows the structure of the original block diagram and leaves
+the complexities of buffer management and scheduling to the compiler.
+
+Two optimized versions of the FIR program are shown in
+Figures~\ref{fig:example-combine} and~\ref{fig:example-frequency}.  In
+Figure~\ref{fig:example-combine}, the programmer has combined the {\tt
+weights} arrays from the two filters into a single, equivalent array.
+This reduces the number of multiply operations by a factor of two.  In
+Figure~\ref{fig:example-frequency}, the programmer has done the
+filtering in the frequency domain, using the FFT and IFFT to translate
+between time and frequency.  Computationally intensive streams are
+more efficient in frequency than in time.
+
+Our linear analysis can automatically derive both of the
+implementations in Figures~\ref{fig:example-combine}
+and~\ref{fig:example-frequency}, starting with the code in
+Figure~\ref{fig:example-streamit}.  These optimizations free the
+programmer from the burden of combining and optimizing linear filters
+by hand.  Instead, the programmer can design modular filters at the
+natural granularity for the algorithm in question and rely on the
+compiler for combination and transformation.
+
+\subsection{StreamIt}
+
+StreamIt is a language and compiler for high-performance signal
+processing~\cite{gordon-thesis,streamit-asplos,streamitcc}.  In a
+streaming application, each data item is in the system for only a
+small amount of time, as opposed to scientific applications where the
+data set is used extensively over the entire execution.  Also, stream
+programs have abundant parallelism and regular communication patterns.
+The StreamIt language aims to expose these properties to the compiler
+while maintaining a high level of abstraction for the programmer.
+
+StreamIt programs are composed of processing blocks called {\it
+filters}.  Each filter has an input tape from which it can read values
+and an output tape to which it can write values.  Each filter also
+contains a {\it work} function which describes the filter's atomic
+execution step in the steady state.  If the first invocation of the
+work function has different behavior than other executions, a
+special {\it prework} function is defined.
+
+The work function contains C-like imperative code, which can
+access filter state, call external routines and produce and consume
+data.  The input and output channels are treated as FIFO queues, which
+can be accessed with three primitive operations: 
+1) {\it pop()}, which returns the first item on the input tape and 
+advances the tape by one item, 
+2) {\it peek(i)}, which returns the value at the $i$th position
+on the input tape, 
+and 3) {\it push$(v)$}, which pushes value $v$ onto the output tape.  
+Each filter must declare the maximum element it
+will peek at, the number of elements it will pop, and the
+number of elements that it will push during an execution of 
+work.  These rates must be resolvable at compile time and constant
+from one invocation of work to the next.
+
+\begin{figure}[t]
+\vspace{-6pt}
+~~
+\begin{minipage}{0.46in}
+\centering
+\psfig{figure=images/pipeline.eps,width=0.46in} \\
+\end{minipage} 
+~
+\begin{minipage}{1.3in}
+\centering
+\psfig{figure=images/splitjoin.eps,width=1.3in} \\
+\end{minipage}
+~
+\begin{minipage}{1.02in}
+\centering
+\psfig{figure=images/feedback.eps,width=1.02in} \\
+\end{minipage} 
+\\ ~ \\ {\bf \protect\small (a) A pipeline. ~~(b) A splitjoin. ~~(c) A feedbackloop.}
+\caption{\protect\small Stream structures supported by StreamIt.
+\protect\label{fig:structures}}
+\vspace{-14pt}
+\makeline
+\vspace{-14pt}
+\end{figure}
+
+A program in StreamIt consists of a hierarchical graph of filters.
+Filters can be connected using one of the three predefined structures
+shown in Figure~\ref{fig:structures}: 1) {\it pipelines} represent the
+serial computation of one filter after another, 2) {\it splitjoins}
+represent explicitly parallel computation, and 3) {\it feedbackloops}
+allow cycles to be introduced into the stream graph.  A {\it stream}
+is defined to be either a filter, pipeline, splitjoin or
+feedbackloop. Every subcomponent of a structure is a stream, and all
+streams have exactly one input tape and exactly one output tape.
+
+It has been our experience that most practical applications can be
+represented using StreamIt's hierarchical structures.  Though
+sometimes a program needs to be reorganized to fit into the structured
+paradigm, there are benefits for both the programmer and the compiler
+in having a structured language~\cite{streamitcc}.  In particular, the
+linear analyses described in this paper rely heavily on the structure
+of StreamIt, as they can focus on each hierarchical primitive rather
+than dealing with the complexity of arbitrary graphs.
+
+\section{Representing Linear Nodes}
+\label{sec:linearrep}
+
+There is no general relationship that must hold between a
+filter's input data and its output data. In actual applications, the
+output is typically derived from the input, but the relationship is
+not always clear since a filter has state and can call external
+functions.
+
+However, we note that a large subset of DSP operations produce outputs
+that are some affine function of their input, and we call filters that
+implement such operations {\it linear}. Examples of such filters are
+finite impulse response (FIR) filters, compressors, expanders and
+signal processing transforms such as the discrete Fourier transform
+(DFT) and discrete cosine transformation (DCT).  Our formal definition
+of a linear node is as follows (refer to
+Figure~\ref{fig:linear-node-example} for an illustration).
+\vspace{-4pt}
+\begin{definition}(Linear node)
+A linear node $\lambda$ $=$ $\{A,$ $\vec{b},$ $e,$ $o,$ $u\}$
+represents an abstract stream block which performs an affine
+transformation $\vec{y} = \vec{x} A + \vec{b}$ from input elements 
+$\vec{x}$ to output elements $\vec{y}$. $A$ is an $e \times u$ matrix, $\vec{b}$ is a
+$u$-element row vector, and $e$, $o$ and $u$ are the peek, pop and
+push rates, respectively. \\ 
+~ \vspace{-6pt} \\
+A ``firing'' of a linear node $\lambda$ corresponds to the following
+series of abstract execution steps.  First, an $e$-element row vector
+$\vec{x}$ is constructed with $\vec{x}[i] = \mbox{peek}(e-1-i)$.  The node
+computes $\vec{y} = \vec{x} A + \vec{b}$, and then pushes the $u$ elements 
+of $\vec{y}$ onto the output tape, starting with $\vec{y}\hspace{1pt}[u-1]$ 
+and proceeding through $\vec{y}\hspace{1pt}[0]$.
+Finally, $o$ items are popped from the input tape.
+\end{definition} \vspace{-2pt}
+
+%% \begin{figure}[t]
+%% \vspace{-6pt}
+%% \center
+%% \epsfxsize=2.5in
+%% \epsfbox{images/general-picture.eps}
+%% \vspace{-12pt}
+%% \caption{Linear filter as a vector-matrix operation}
+%% \label{fig:overview-matrix}
+%% \vspace{-6pt}
+%% \end{figure}
+
+The intuition of the computation represented by a linear node is
+simply that specific columns generate specific outputs and specific
+rows correspond to using specific inputs.  The values found in row
+$e-1-i$ of $A$ ({\it i.e.,} the $i$th row from the bottom) and 
+column $u-1-j$ of $A$ ({\it i.e.,} the $j$th column from the right) 
+represents a term in the formula to compute the $j$th output item using 
+the value of peek($i$). The value in column $u-1-j$ of 
+$\vec{b}$ is a constant offset added to output $j$.
+Figure~\ref{fig:linear-node-example} shows a concrete example
+of a work function and its corresponding linear node.
+
+\begin{figure}
+\center
+\epsfxsize=2.9in
+\epsfbox{images/linear-node-example.eps}
+\vspace{-8pt}
+\caption{Representation of a linear node.}
+\vspace{-4pt}
+\makeline
+\vspace{-16pt}
+\label{fig:linear-node-example}
+\end{figure}
+
+
+\newcommand{\la}{$\leftarrow$}
+\newcommand{\IND}{\begin{ALC@g}}
+\newcommand{\UND}{\end{ALC@g}}
+\newcommand{\tup}[2]{\langle{#1}, {#2}\rangle}
+
+\section{Linear Extraction Algorithm}
+\label{sec:dataflow}
+
+Our linear extraction algorithm can identify a linear filter and
+construct a linear node $\lambda$ that fully captures its behavior.
+The technique, which appears as Algorithm~\ref{alg:dataflow} on the
+next page, is a flow-sensitive, forward dataflow analysis similar to
+constant propagation.  Unlike a standard dataflow analysis, we can
+afford to symbolically execute all loop iterations, since most loops
+within a filter's work function have small bounds that are known at
+compile time (if a bound is statically unresolvable, the filter is
+unlikely to be linear and we disregard it).
+
+During symbolic execution, the algorithm computes the following for
+each point of the program (refer to Figure~\ref{fig:types} for
+notation):
+\begin{itemize}
+
+\vspace{-6pt}
+\item A $\mt{map}$ between each program variable $y$ and a linear form
+$\tup{\vec{v}}{c}$ where $\vec{v}$ is a $Peek$-element column vector
+and $c$ is a scalar constant. In an actual execution, the value of $y$
+would be given by $y = \vec{v} \cdot \vec{x} + c$, where $\vec{x}$
+represents the input items.
+\vspace{-6pt}
+
+\item Matrix $A$ and vector $\vec b$, which will represent the linear node.
+These values are constructed during the operation of the algorithm.
+\vspace{-6pt}
+
+\item $\mt{pushcount}$, which indicates how many items have been
+pushed so far.  This is used to determine which column of $A$ and
+$\vec{b}$ correspond to a given push statement.
+\vspace{-6pt}
+
+\item $\mt{popcount}$, which indicates how many items have been popped
+so far.  This is used to determine the input item that a given peek or
+pop expression refers to.
+\vspace{-6pt}
+
+\end{itemize}
+
+We now briefly discuss the operation of {\bf Extract} at each program
+node.  The algorithm is formulated in terms of a simplified set of
+instructions, which appear in Figure~\ref{fig:types}.  First are the
+nodes that generate fresh linear forms.  A constant assignment $y = c$
+creates a form $\tup{\vec 0}{c}$ for $y$, since $y$ has constant part
+$c$ and does not yet depend on the input.  A pop operation
+creates a form $\tup{\mbox{\bf BuildCoeff}(\mt{popcount})}{0}$, where
+{\bf BuildCoeff} introduces a coefficient of $1$ for the current index
+on the input stream.  A peek$(i)$ operation is similar, but
+offset by the index $i$.
+
+\begin{algorithm}[t]
+\caption{Linear extraction analysis.\protect\label{alg:dataflow}}
+proc {\bf Toplevel}(filter $F$) returns linear node for $F$ \vspace{-4pt}
+\begin{enumerate}
+\item Set globals Peek, Pop, Push to I/O rates of filter $F$. \vspace{-4pt}
+\item Let $A_{0} \leftarrow \mbox{new float[Peek, Push] with each entry =~} \bot$ \vspace{-14pt}
+\item Let ${\vec b_{0}} \leftarrow \mbox{new float[Push] with each entry =~} \bot$ \vspace{-6pt}
+\item $(\mt{map}, A, {\vec b}, \mt{popcount}, \mt{pushcount}) \leftarrow$ \\ 
+\verb+      +{\bf Extract}$(F_{work}, (\lambda x . \bot), A_{0}, {\vec b_{0}}, 0, 0)$ \vspace{-6pt}
+\item {\bf if} $A$ and ${\vec b}$ contain no $\top$ or $\bot$ entries {\bf then} \\
+\verb+ + return linear node $\lambda = \{A, {\vec b}, \mbox{Peek}, \mbox{Pop}, \mbox{Push}\}$ \\
+ {\bf else} \\
+\verb+ + {\it fail} \\
+ {\bf endif}
+\end{enumerate}
+proc {\bf BuildCoeff}(int $pos$) returns $\vec v$ for peek at index $pos$ \\ \vspace{-12pt}
+\begin{algorithmic}
+\STATE $\vec{v} = \vec{0}$
+\STATE $\vec{v}[\mbox{Peek}-1-\mt{pos}] = 1$
+\STATE return $\vec{v}$
+\end{algorithmic}
+\end{algorithm}
+
+\begin{figure}[t]
+\vspace{-12pt}
+\begin{equation} \nonumber
+\begin{array}{rcl}
+y & \in & \mbox{program-variable} \\
+c & \in & \mbox{constant}^{\top} \\
+\vec v, \vec b & \in & \mbox{vector}^{\top} \\
+\tup{\vec v}{c} & \in & \mbox{linear-form}^{\top} \\
+map & \in & \mbox{program-variable} \rightarrow \mbox{linear-form  (a hashtable)} \\
+A & \in & \mbox{matrix}^{\top} \\
+code & \in & \mbox{list of instructions, each of which can be:} \\
+\multicolumn{3}{l}{\parbox{3in}{
+    \vspace{-6pt}
+    \begin{equation} \nonumber
+      \begin{array}{ll}
+	y_1 := \mt{const} & \mbox{{\tt push}}(y_1) \\
+	y_1 := \mbox{\tt pop}() & (\mbox{{\tt loop}} ~N~ \mt{code}) \\
+        y_1 := \mbox{\tt peek}(i) & (\mbox{{\tt branch}} ~\mt{code}_1~ \mt{code}_2) \\
+	y_1 := y_2~\mt{op}~y_3 & ~
+      \end{array}
+\end{equation}}}
+\end{array} 
+\end{equation}
+\vspace{-18pt}
+\caption{Data types for the extraction analysis.\protect\label{fig:types}}
+\vspace{-14pt}
+\makeline
+\vspace{-14pt}
+\end{figure}
+
+\begin{algorithm}
+proc {\bf Extract}($code$, $map$, $A$, $\vec b$, int $\mt{popcount}$, int $\mt{pushcount}$) \\
+\verb+   + returns updated $\mt{map}$, $A$, ${\vec b}$, $\mt{popcount}$, and $\mt{pushcount}$ \\ \vspace{-12pt}
+\begin{algorithmic}
+\FOR {$i \leftarrow 1$ to $\mt{code}$.length}
+\STATE {\bf switch} $\mt{code}$[i]
+\IND
+\STATE $\mbox{\bf case}~y := \mt{const}$
+\IND
+\STATE $\mt{map}.\mt{put}(y, (\vec 0, \mt{const}))$
+\UND
+\STATE \vspace{-6pt}
+\STATE $\mbox{\bf case}~y := \mbox{\tt pop}()$
+\IND
+\STATE $\mt{map}.\mt{put}(y, \tup{\mbox{\bf BuildCoeff}(\mt{popcount})}{0})$
+\STATE $\mt{popcount}$\verb|++|
+\UND
+\STATE \vspace{-6pt}
+\STATE $\mbox{\bf case}~y := \mbox{\tt peek}(i)$
+\IND
+\STATE $\mt{map}.\mt{put}(y, \tup{\mbox{\bf BuildCoeff}(\mt{popcount}+i)}{0})$
+\UND
+\STATE \vspace{-6pt}
+\STATE $\mbox{\bf case}~\mbox{\tt push}(y)$
+\IND
+\STATE $\tup{\vec v}{c} \leftarrow \mt{map}.\mt{get}(y)$
+\STATE {\bf if} $\mt{pushcount} = \top$ {\bf then} $\mt{fail}$
+\STATE $A[*, \mbox{Push} - 1 - \mt{pushcount}] \leftarrow \vec v$
+\STATE $\vec{b}[\mbox{Push} - 1 - \mt{pushcount}] \leftarrow c$
+\STATE $\mt{pushcount}$\verb|++|
+\UND
+\STATE \vspace{-6pt}
+\STATE $\mbox{\bf case}~ y_1 := y_2 \mt{~op~} y_3$, for $\mt{~op~} \in \{+, -\}$
+\IND
+\STATE $\tup{\vec v_2}{c_2} \leftarrow \mt{map}.\mt{get}(y_2)$
+\STATE $\tup{\vec v_3}{c_3} \leftarrow \mt{map}.\mt{get}(y_3)$
+\STATE $\mt{map}.\mt{put}(y_1, \tup{\vec v_2 \mt{~op~} \vec v_3}{c_2 \mt{~op~} c_3})$
+\UND
+\STATE \vspace{-6pt}
+\STATE $\mbox{\bf case}~y_1 := y_2 * y_3$
+\IND
+\STATE $\tup{\vec v_2}{c_2} \leftarrow \mt{map}.\mt{get}(y_2)$
+\STATE $\tup{\vec v_3}{c_3} \leftarrow \mt{map}.\mt{get}(y_3)$
+\STATE {\bf if} $~\vec v_2 = \vec 0$ {\bf then}
+\IND
+\STATE $\mt{map}.\mt{put}(y_1, (c_2*\vec v_3, c_2*c_3))$
+\UND
+\STATE {\bf else if} $~\vec v_3=\vec 0$ {\bf then}
+\IND
+\STATE $\mt{map}.\mt{put}(y_1, (c_3*\vec v_2, c_3*c_2))$
+\UND
+\STATE {\bf else}
+\IND
+\STATE $\mt{map}.\mt{put}(y_1, \top)$
+\UND
+\UND
+\STATE \vspace{-6pt}
+\STATE $\mbox{\bf case}~y_1 := y_2 / y_3$
+\IND
+\STATE $\tup{\vec v_2}{c_2} \leftarrow \mt{map}.\mt{get}(y_2)$
+\STATE $\tup{\vec v_3}{c_3} \leftarrow \mt{map}.\mt{get}(y_3)$
+\STATE {\bf if} $~\vec v_3 = \vec 0 \wedge c_3 \ne 0$ {\bf then}
+\IND
+\STATE $\mt{map}.\mt{put}(y_1, (\frac{1}{c_3}*\vec v_2, c_2/c_3))$
+\UND
+\STATE {\bf else}
+\IND
+\STATE $\mt{map}.\mt{put}(y_1, \top)$
+\UND
+\UND
+\STATE \vspace{-6pt}
+\STATE $\mbox{\bf case}~y_1 := y_2 ~\mt{op}~ y_3$, for $\mt{op} \in \{\&, |, \wedge, \&\&, ||, !, \mt{etc.}\}$
+\IND
+\STATE $\tup{\vec v_2}{c_2} \leftarrow \mt{map}.\mt{get}(y_2)$
+\STATE $\tup{\vec v_3}{c_3} \leftarrow \mt{map}.\mt{get}(y_3)$
+\STATE $\mt{map}.\mt{put}(y_1, (\vec 0 \sqcup \vec v_2 \sqcup \vec v_3, c_2 ~\mt{op}~ c_3))$
+\UND
+\STATE \vspace{-6pt}
+\STATE \mbox{\bf case}~({\tt loop} N $code'$)
+\IND
+\STATE \bf{for} $j \leftarrow 1$ to $N$ {\bf do}
+\IND
+\STATE $(\mt{map}, A, {\vec b}, \mt{popcount}, \mt{pushcount})~\leftarrow~$ \\
+\verb+   +\bf{Extract}$(\mt{code}, \mt{map}, A, {\vec b}, \mt{popcount}, \mt{pushcount})$
+\UND
+\UND
+\STATE \vspace{-6pt}
+\STATE \mbox{\bf case}~({\tt branch} $code_1~code_2)$
+\IND
+\STATE $(\mt{map}_1, A_1, {\vec b_1}, \mt{popcount}_1, \mt{pushcount}_1) \leftarrow$ \\
+\verb+   +${\mbox{\bf Extract}}(\mt{code}_1, \mt{map}, A, {\vec b}, \mt{popcount}, \mt{pushcount})$
+\STATE $(\mt{map}_2, A_2, {\vec b_2}, \mt{popcount}_2, \mt{pushcount}_2) \leftarrow$ \\ 
+\verb+   +${\mbox{\bf Extract}}(\mt{code}_2, \mt{map}, A, {\vec b}, \mt{popcount}, \mt{pushcount})$
+\STATE $\mt{map} \leftarrow \mt{map}_1 \sqcup \mt{map}_2$
+\STATE $A \leftarrow A_1 \sqcup A_2$
+\STATE ${\vec b} \leftarrow {\vec b_1} \sqcup {\vec b_2}$
+\STATE $\mt{popcount} \leftarrow \mt{popcount}_1 \sqcup \mt{popcount}_2$
+\STATE $\mt{pushcount} \leftarrow \mt{pushcount}_1 \sqcup \mt{pushcount}_2$
+\UND
+\UND %end case
+\ENDFOR
+\STATE return ($\mt{map}$, $A$, ${\vec b}$, $\mt{popcount}$, $\mt{pushcount}$)
+\end{algorithmic}
+\end{algorithm}
+
+Next are the instructions which combine linear forms.  In the case of
+addition or subtraction, we simply add the components of the linear
+forms.  In the case of multiplication, the result is still a linear
+form if either of the terms is a known constant ({\it i.e.,} a linear
+form $\tup{\vec 0}{c}$).  For division, the result is linear only if
+the divisor is a non-zero constant\footnote{{\small Note that if the
+dividend is zero and the divisor has a non-zero coefficients vector,
+we cannot conclude that the result is zero, since certain runtime
+inputs might cause a singularity.}} and for non-linear operations
+({\it e.g.,} bit-level and boolean), both operands must be known
+constants.  If any of these conditions are not met, then the LHS is
+assigned a value of $\top$, which will mark the filter as non-linear
+if the value is ever pushed.
+
+The final set of instructions deal with control flow.  For loops, we
+resolve the bounds at compile time and execute the body an appropriate
+number of times.  For branches, we have to ensure that all the linear
+state is modified consistently on both sides of the branch.  For this
+we apply the confluence operator $\sqcup$, which we define for scalar
+constants, vectors, matrices, linear forms, and maps.  $c_1 \sqcup
+c_2$ is defined according to the lattice constant$^{\top}$.  That is,
+$c_1 \sqcup c_2 = c_1$ if and only if $c_1 = c_2$; otherwise, $c_1
+\sqcup c_2 = \top$.  For vectors, matrices, and linear forms, $\sqcup$
+is defined element-wise; for example, $A' = A_1 \sqcup A_2$ is
+equivalent to $A'[i,j] = A_1[i,j] \sqcup A_2[i,j]$.  For maps, the
+join is taken on the values: $\mt{map}_1 \sqcup \mt{map}_2$ $=$
+$\mt{map'}$, where $\mt{map'}.\mt{get}(x) = \mt{map}_1.\mt{get}(x)
+\sqcup \mt{map}_2.\mt{get}(x)$.
+
+Our implementation of linear extraction is also interprocedural.  It
+is straightforward to transfer the linear state across a call site,
+although we omit this from the pseudocode for the sake of
+presentation.  Also implicit in the algorithm description is the fact
+that all variables are local to the work function.  If a filter
+has persistent state, all accesses to that state are marked as $\top$.
+
+%  could replace ``filter'' by ``stream'' in the next few sentences, but 
+% I think it reads better as it is, actually
+\section{Combining Linear Filters}
+\label{sec:combine}
+
+A primary benefit of linear filter analysis is that neighboring
+filters can be collapsed into a single matrix representation if both
+of the filters are linear.  This transformation can automatically
+eliminate redundant computations in linear sections of the stream
+graph, thereby allowing the programmer to write simple, modular
+filters and leaving the combination to the compiler.  In this section,
+we first describe a {\it linear expansion} operation that is needed to
+match the sizes of $A$ and $\vec{b}$ for different linear nodes and is
+therefore an essential building block for the other combination
+techniques.  We then give rules for collapsing pipelines and
+splitjoins into linear nodes; we do not deal with feedbackloops as
+they require a notion of ``linear state'', which we do not describe
+here.
+
+\subsection{Linear Expansion}
+
+In StreamIt programs, the input and output rate of each filter in the
+stream graph is known at compile time.  The StreamIt compiler
+leverages this information to compute a static schedule---that is, an
+ordering of the node executions such that each filter will have enough
+data available to atomically execute its work function, and no
+buffer in the stream graph will grow without bound in the steady
+state.  A general method for scheduling StreamIt programs is given by
+Karczmarek~\cite{karczma-thesis}.
+
+A fundamental aspect of the steady-state schedule is that neighboring
+nodes might need to be fired at different frequencies.  For example,
+if there are two filters $F_1$ and $F_2$ in a pipeline and
+$F_1$ produces $2$ elements during its work function but $F_2$
+consumes $4$ elements, then it is necessary to execute $F_1$ twice for
+every execution of $F_2$.
+
+%% \begin{figure}
+%% \center
+%% \epsfxsize=3.0in
+%% \epsfbox{images/expanding-a-filter.eps}
+%% \caption{Expanding {\tt stream} $S$ by a factor $f$}
+%% \label{fig:expanding-a-filter}
+%% \vspace{-12pt}
+%% \end{figure}
+
+Consequently, when we combine hierarchical structures into a linear
+node, we often need to {\it expand} a matrix representation to
+represent multiple executions of the corresponding stream.  Expansion
+allows us to multiply matrices and interleave columns from matrices
+that originally had mismatching dimensions.  The transformation can be
+done as follows.
+
+% NOT TRUE ANYMORE
+%% If we expand a linear node by a factor of $k$, then one execution of
+%% the new node will be exactly equivalent to $k$ executions of the
+%% original.
+
+\begin{transformation} (Linear expansion)
+% DOUBLE-CHECK whether we're assuming 0-indexed or 1-indexed matrices
+Given a linear node $\lambda = \{A, {\vec b}, e, o, u\}$, the expansion of
+$\lambda$ to a rate of $(e', o', u')$ is given by $\mbox{\bf
+expand}(\lambda, e', o', u') = \{A', {\vec b}', e', o', u'\}$, where
+$\mathbf{A'}$ is a $e' \times u'$ matrix and $\vec{\mathbf{b}}'$ is a
+$u'$-element row vector:
+\vspace{-6pt} \\
+\begin{equation} \nonumber
+\begin{array}{rcl}
+\multicolumn{3}{l}{\mt{shift}(r,c) ~\mt{is a}~ u' \times e' ~\mt{matrix}:} \\
+\multicolumn{3}{l}{\parbox{3in}{
+    \begin{equation} \nonumber
+    \mt{shift}(r,c)[i,j] = \left\{
+      \begin{array}{l}
+	A[i-r,j-c] \\
+	~~~\mt{if}~ i-r \in [0,e-1] \wedge j-c \in [0, u-1] \\
+	~ 0 \mt{~otherwise}
+      \end{array}
+      \right.
+    \end{equation}
+}} \\ ~ \vspace{-6pt} \\
+%
+\mathbf{A'} & = & \sum_{m=0}^{\lceil u' / u \rceil} \mt{shift}(u'- u -m*u, e'-e-m*o) \\ ~ \vspace{-4pt} \\
+%
+\vec{\mathbf{b}}'[j] & = & {\vec b}\hspace{1pt}[u-1-(u'-j-1)~\mt{mod}~u]
+%%
+%% \raisebox{-14pt}{\parbox{3in}{is created by starting with a zero
+%% matrix with $e'$ rows and $u'$ columns.  $A$ is then copied $k$ times
+%% along the diagonal. Starting at the top left, each copy of $A$ is
+%% offset from the previous copy by $u$ columns and $o$ rows.}} \\ ~ \vspace{-8pt} \\
+%% $b'$ & is an row vector containing $k$ adjacent copies of $b$.
+\end{array}
+\end{equation}
+\end{transformation}
+
+\begin{figure}[t]
+\center
+\vspace{-12pt}
+\epsfxsize=3.2in
+\epsfbox{images/filter-expand.eps}
+\vspace{-12pt}
+\caption{Expanding a linear node to rates $(e', o', u')$.  }
+\label{fig:expanding-a-matrix}
+\makeline
+\vspace{-12pt}
+\end{figure}
+
+The intuition behind linear expansion is straightforward (see
+Figure~\ref{fig:expanding-a-matrix}).  Linear expansion aims to scale
+the peek, pop and push rates of a linear node while preserving the
+functional relationship between the values pushed and the values
+peeked on a given execution. To do this, we construct a new matrix
+$A'$ that contains copies of $A$ along the diagonal starting from the 
+bottom right.  To account for items that are popped between invocations, 
+each copy of $A$ is offset by $o$ from the previous copy. 
+The complexity of the definition is
+due to the end cases.  If the new push rate $u'$ is not a multiple of
+the old push rate $u$, then the last copy of $A$ includes only some of
+its columns.  Similarly, if the new peek rate $e'$ exceeds that which
+is needed by the diagonal of $A$s, then $A'$ needs to be padded with
+zeros at the top (since it peeks at some values without using them in
+the computation).
+
+Note that a sequence of executions of an expanded node $\lambda'$
+might not be equivalent to any sequence of executions of the original
+node $\lambda$, because expansion resets the push and pop rates and
+can thereby modify the ratio between them.  However, if $u' = k * u$
+and $o' = k * o$ for some integer $k$, then $\lambda'$ is completely
+interchangeable with $\lambda$.  In the combination rules that follow,
+we utilize linear expansion both in contexts that do and do not
+satisfy this condition.
+
+\subsection{Collapsing Linear Pipelines}
+
+%\begin{figure}
+%\center
+%\epsfxsize=3.0in
+%\epsfbox{images/pipeline-combination.eps}
+%\caption{A pipeline of two linear forms $(A,b)$ and $(C,d)$ (above) and the same pipeline with rate matched forms (below).}
+%\label{fig:combining-pipeline}
+%\vspace{-12pt}
+%\end{figure}
+
+The {pipeline construct is used to compose streams in sequence,
+with the output of stream $i$ connected to the input of stream $i+1$.
+The following transformation describes how to collapse two linear
+nodes in a pipeline; it can be applied repeatedly to collapse
+any number of neighboring linear nodes.
+
+\begin{transformation} (Pipeline combination)
+Given two linear nodes $\lambda_1$ and $\lambda_2$ where the output of
+$\lambda_1$ is connected to the input of $\lambda_2$ in a pipeline
+construct, the combination $\mbox{\bf pipeline}(\lambda_1, \lambda_2)$ $=$
+$\{\mathbf{A}', \vec{\mathbf{b}}', \mathbf{e}', \mathbf{o}', \mathbf{u}'\}$ 
+represents an equivalent node that
+can replace the original two.  Its components are as follows:
+\begin{equation} \nonumber
+\begin{array}{rcl}
+\mt{chanPop} & = & \mt{lcm}(u_1, o_2) \\ ~ \vspace{-8pt} \\
+\mt{chanPeek} & = & \mt{chanPop} + e_2 - o_2 \\ ~ \vspace{-8pt} \\
+\lambda_1^e & = & \mt{expand}(\lambda_1, (\left \lceil \frac{\mt{chanPeek}}{u_1} \right \rceil - 1) * o_1 + e_1, \\
+~ & ~ & ~\hspace{0.32in}~ \mt{chanPop} * \frac{o_1}{u_1}, \mt{chanPeek}) \\ ~ \vspace{-8pt} \\
+\lambda_2^e & = & \mt{expand}(\lambda_2, \mt{chanPeek}, \\
+~ & ~ & ~\hspace{0.32in}~ \mt{chanPop}, \mt{chanPop} * \frac{u_2}{o_2}) \\
+\mathbf{A'} & = & A_1^e A_2^e \\ ~ \vspace{-8pt} \\
+\vec{\mathbf{b}}' & = & {\vec b}_1^e A_2^e + {\vec b}_2^e \\ ~ \vspace{-8pt} \\
+\mathbf{e'} & = & e_1^e \\ ~ \vspace{-8pt} \\
+\mathbf{o'} & = & o_1^e \\ ~ \vspace{-8pt} \\
+\mathbf{u'} & = & u_2^e
+\end{array}
+\end{equation}
+\end{transformation}
+
+The basic forms of the above equations are simple to derive.  Let
+${\vec x}_i$ and ${\vec y}_i$ be the input and output channels, respectively, for
+$\lambda_i$.  Then we have by definition that ${\vec y}_1 = {\vec x}_1 A_1 + {\vec b}_1$
+and ${\vec y}_2 = {\vec x}_2 A_2 + {\vec b}_2$.  But since $\lambda_1$ is connected to
+$\lambda_2$, we have that ${\vec x}_2 = {\vec y}_1$ and thus 
+${\vec y}_2 = {\vec y}_1 A_2 + {\vec b}_2$.
+Substituting the value of ${\vec y}_1$ from our first equation gives ${\vec y}_2 =
+{\vec x}_1 A_1 A_2 + {\vec b}_1 A_2 + {\vec b}_2$.  Thus, the intuition is that the
+two-filter sequence can be represented by matrices $A' = A_1 A_2$
+and ${\vec b}' = {\vec b}_1 A_2 + {\vec b}_2$, with peek and pop rates borrowed from
+$\lambda_1$ and the push rate borrowed from $\lambda_2$.
+
+However, there are two implicit assumptions in the above analysis
+which complicate the equations for the general case.  First, the
+dimensions of $A_1$ and $A_2$ must match for the matrix multiplication
+to be well-defined.  If $u_1 \ne e_2$, this will require constructing
+expanded nodes $\lambda_1^e$ and $\lambda_2^e$ in which the push and
+peek rates match (and thus $A_1^e$ and $A_2^e$ can be multiplied).
+
+The second complication is with regards to peeking.  If the downstream
+node $\lambda_2$ peeks at items which it does not consume ({\it i.e.},
+if $e_2 > o_2$), then there needs to be a buffer to hold items that
+are read during multiple invocations of $\lambda_2$.  However, in our
+current formulation, a linear node has no concept of internal state,
+such that this buffer cannot be incorporated into the collapsed
+representation.  To deal with this issue, we adjust the expanded form
+of $\lambda_1$ to recalculate items that $\lambda_2$ uses more than
+once, thereby trading computation for storage space.  This adjustment
+is evident in the push and pop rates chosen for $\lambda_1^e$: though
+$\lambda_1$ pushes $u_1$ items for every $o_1$ items that it pops,
+$\lambda_1^e$ pushes $\mt{chanPeek}*u_1$ for every $\mt{chanPop}*o_1$
+that it pops.  When $\mt{chanPeek}>\mt{chanPop}$, this means that the
+outputs of $\lambda_1^e$ are overlapping, and
+$\mt{chanPeek}-\mt{chanPop}$ items are being regenerated on every
+firing.
+
+Note that although $\lambda_1^e$ performs duplicate computations in
+the case where $\lambda_2$ is peeking, this computation cost can be
+amortized by increasing the value of $\mt{chanPop}$.  That is, though
+the equations set $\mt{chanPop}$ as the {\it least} common multiple of
+$u_1$ and $o_2$, any common multiple is legal.  As $\mt{chanPop}$
+grows, the regenerated portion $\mt{chanPeek}-\mt{chanPop}$ becomes
+smaller on a percentage basis.
+
+However, it is the case that some collapsed linear nodes are always
+less efficient than the original pipeline sequence.  The worst case is
+when $A_1^e$ is a column vector and $A_2^e$ is a row vector, which
+requires $O(N)$ operations originally but $O(N^2)$ operations if
+combined (assuming vectors of length $N$).  To avoid such
+performance-degrading combinations, we employ an automated selection
+algorithm that only performs beneficial transformations (see
+Section~\ref{sec:partitioning}).
+
+\begin{figure}[t]
+\begin{center}
+\psfig{figure=images/example-pipeline-combination.eps,width=3.1in}
+\vspace{-6pt}
+\caption{Pipeline combination example.}
+\label{fig:example-pipeline-combination}
+\end{center}
+\vspace{-22pt}
+\makeline
+\vspace{-14pt}
+\end{figure}
+
+Figure~\ref{fig:example-pipeline-combination} illustrates the
+combination of back to back FIR filters. Since the push rate of the
+first filter ($u_1=1$) differs from the peek rate of the second
+($e_2=3$), the first filter must be expanded to $\lambda_1^e =
+\mt{expand}(\lambda_1,4,1,3)$.  There is no need to expand the second
+filter, so $\lambda_2^e = \lambda_2$. By construction, we can now form
+the matrix product of $A_1^e$ and $A_2^e$, which corresponds to the
+matrix for the overall linear node.
+
+\subsection{Collapsing Linear SplitJoins}
+
+The splitjoin construct allows the StreamIt programmer to
+express explicitly parallel computations.  Data elements that arrive
+at the splitjoin are directed to the parallel child streams
+using one of two pre-defined splitter constructs: 1) duplicate,
+which sends a copy of each data item to all of the child streams, and
+2) roundrobin, which distributes items cyclically according to an
+array of weights.  The data from the parallel streams are
+combined back into a single stream by means of a roundrobin 
+joiner with an array of weights $w$.  First, $w_0$ items from the
+output tape of the leftmost child are placed onto the overall output
+tape, then $w_1$ elements are taken from the second leftmost child,
+and so on.  The process repeats itself after one complete set of
+$\sum_{i=0}^{N-1} w_i$ elements has been pushed.
+
+In this section, we demonstrate how to collapse a splitjoin into
+a single linear node when all of its children are linear nodes.  Since
+the children of splitjoins in StreamIt can be parameterized, it
+is often the case that all sibling streams are linear if any one of
+them is linear.  However, if a splitjoin contains only a few
+adjacent streams that are linear, then these streams can be combined
+by wrapping them in a hierarchical splitjoin and then collapsing the
+wrapper completely.  Our technique also assumes that each 
+splitjoin admits a valid steady-state schedule; this property is
+verified by the StreamIt semantic checker.
+
+Our analysis distinguishes between two cases. For duplicate splitters,
+we directly construct a linear node from the child streams.  For
+roundrobin splitters, we translate the splitjoin to use a duplicate
+splitter and then rely on the transformation for duplicate splitters.
+We describe these translations below.
+
+\subsubsection{Duplicate Splitter}
+
+Intuitively, there are three main steps to combining a duplicate
+splitjoin into a linear node.  Since the combined node will represent
+a steady-state execution of the splitjoin construct, we first need to
+expand each child node according to its multiplicity in the schedule.
+Secondly, we need to ensure that each child's matrix representation
+has the same number of rows---that is, that each child peeks at the
+same number of items.  Once these conditions are satisfied, we can
+construct a matrix representation for the splitjoin by simply
+arranging the columns from child streams in the order specified by the
+roundrobin joiner (see Figure~\ref{fig:splitjoin-duplicate-matrix}).
+This third step is simplified by the fact that, with a duplicate
+splitter, each row of a child's linear representation refers to the
+same input element of the splitjoin.
+
+The following transformation describes splitjoin combination in
+mathematical terms.
+
+%\begin{figure}
+%\center
+%\epsfxsize=3.0in
+%\epsfbox{images/splitjoin-duplicate-ratematch.eps}
+%\caption{Expanding sub {\tt streams} to match their output rates in a linear {\tt SplitJoin}.}
+%\label{fig:splitjoin-duplicate-ratematch}
+%\end{figure}
+
+\begin{transformation} (Duplicate splitjoin combination)
+Given a splitjoin $s$ containing a duplicate splitter, children that
+are linear nodes $\lambda_0 \dots \lambda_{n-1}$, and a roundrobin
+joiner with weights $w_0 \dots w_{n-1}$, the combination 
+$\mbox{\bf splitjoin}(s)$ $=$ $ \{ \mathbf{A}',$ $\vec{\mathbf{b}}',$ $\mathbf{e}',$
+$\mathbf{o}',$ $\mathbf{u}'\}$ represents an equivalent node that can
+replace the entire stream $s$.  Its components are as follows:
+\begin{equation} \nonumber
+  \begin{array}{rcl}
+    \mt{joinRep} & = & \mt{lcm}(\frac{\mt{lcm}(u_0,w_0)}{w_0}, \dots, \frac{\mt{lcm}(u_{n-1},w_{n-1})}{w_{n-1}}) \\
+    \mt{maxPeek} & = & \mt{max}_i (o_i * \mt{rep}_i + e_i - o_i) \\ ~ \vspace{-2pt} \\
+    \multicolumn{3}{l}{\forall k \in [0, n-1]:} \\ ~ \vspace{-6pt} \\
+    \mt{wSum}_k & = & \sum_{i=0}^{k-1} w_i \\ ~ \vspace{-6pt} \\
+    \mt{rep}_k & = & \frac{w_k * \mt{joinRep}}{u_k} \\ ~ \vspace{-6pt} \\
+    \lambda_k^e & = & \mt{expand}(\lambda_k, \mt{maxPeek}, 
+    o_k * \mt{rep}_k, u_k * \mt{rep}_k) \\ ~ \vspace{-2pt} \\
+    \multicolumn{3}{l}{
+      \forall k \in [0, n-1], 
+      \forall m \in [0, joinRep-1], 
+      \forall p \in [0, u_k-1]:
+    } \\ ~ \vspace{-6pt} \\
+    \multicolumn{3}{l}{\mathbf{A}'[*, u'-1-p - m * \mt{wSum}_{n}-\mt{wSum}_{k}] = % should this be wSum_{k-1}? 
+      A_{k}^e [*,u_k^e-1-p]} \\ ~ \vspace{-6pt} \\
+    \multicolumn{3}{l}{\vec{\mathbf{b}}'[u'-1-p - m * \mt{wSum}_{n}-\mt{wSum}_{k}] = 
+      b_{k}^e [u_k^e-1-p]} \\ ~ \vspace{-2pt} \\
+    \mathbf{e}' & = & e_0^e = \dots = e_{n-1}^e \\
+    \mathbf{o}' & = & o_0^e = \dots = o_{n-1}^e \\
+    \mathbf{u}' & = & \mt{joinRep} * \mt{wSum}_n \\
+  \end{array}
+\end{equation}
+\end{transformation}
+
+The above formulation is derived as follows.  The $\mt{joinRep}$
+variable represents how many cycles the joiner completes in an
+execution of the splitjoin's steady-state schedule; it is
+the minimal number of cycles required for each child node to execute
+an integral number of times and for all of their output to be consumed
+by the joiner. Similarly, $\mt{rep}_k$ gives the execution count for
+child $k$ in the steady state.  Then, in keeping with the procedure
+described above, $\lambda_k^e$ is the expansion of the $k$th node by
+a factor of $\mt{rep}_k$, with the peek value set to the maximum peek
+across all of the expanded children.  Following the expansion, each
+$\lambda_i^e$ has the same number of rows, as the peek uniformization
+causes shorter matrices to be padded with rows of zeros at the top.
+
+\begin{figure}[t]
+\center
+\epsfxsize=3.2in
+\epsfbox{images/splitjoin-combination.eps}
+\vspace{-6pt}
+\caption{Matrix resulting from combining a splitjoin of rate-matched children.
+\protect\label{fig:splitjoin-duplicate-matrix}}
+\vspace{-2pt}
+\makeline
+\vspace{-14pt}
+\end{figure}
+
+The final phase of the transformation is to re-arrange the columns of
+the child matrices into the columns of $A'$ and $\vec{b}'$ such that
+they generate the correct order of outputs.  Though the equations are
+somewhat cumbersome, the concept is simple (see
+Figure~\ref{fig:splitjoin-duplicate-matrix}): for the $k$th child and
+the $m$th cycle of the joiner, the $p$th item that is pushed by child
+$k$ will appear at a certain location on the joiner's output tape.
+This location (relative to the start of the node's execution) is $p +
+m * \mt{wSum}_n + \mt{wSum}_k$, as the reader can verify.  But since
+the right-most column of each array $A$ holds the formula to compute
+the first item pushed, we need to subtract this location from the
+width of $A$ when we are re-arranging the columns. The width of $A$ is
+the total number of items pushed---$u'$ in the case of $A'$ and
+$u_k^e$ in the case of $A_k^e$.  Hence the equation as written above:
+we copy all items in a given column from $A_k^e$ to $A'$, defining
+each location in $A'$ exactly once.  The procedure for $\vec{b}$ is
+analogous.
+
+It remains to calculate the peek, pop and push rates of the combined
+node.  The peek rate $e'$ is simply $maxPeek$, which we defined to be
+equivalent for all the expanded child nodes.  The push rate
+$\mt{joinRep}*\mt{wSum}_n$ is equivalent to the number of items
+processed through the joiner in one steady-state execution.  Finally,
+for the pop rate we rely on the fact that the splitjoin is well-formed
+and admits a schedule in which no buffer grows without bound.  If this
+is the case, then the pop rates must be equivalent for all the
+expanded streams; otherwise, some outputs of the splitter would
+accumulate infinitely on the input channel of some stream.
+
+These input and output rates, in combination with the values of $A'$
+and $\vec{b}'$, define a linear node that exactly represents the
+parallel combination of child nodes that are fed by a duplicate
+splitter. Figure~\ref{fig:example-splitjoin-combination} provides an
+example of splitjoin combination.
+
+%The node on the left pushes four items per work function 
+%whereas the node on the right pushes one item per work function. In order
+%to match the output rates to the rate of the roundrobin joiner
+%the right filter needs to be expanded to 
+%$\lambda_2^e=\mt{expand}(\lambda_2,2,2,2)$. The columns of the
+%two linear nodes are then interleaved into the overall
+%linear node $\lambda'$.
+% I don't know if this is useful or if it is enough information
+% concievably, we could walk though the entire algorithm and the 
+% calculation of the intermediate variables. Somehoe, however, I think 
+% that this is best done in my thesis -- AAL
+
+
+\subsubsection{Roundrobin Splitter}
+
+In the case of a roundrobin splitter, items are directed to each child
+stream $s_i$ according to weight $v_i$: the first $v_0$ items are sent
+to $s_0$, the next $v_1$ items are sent to $s_1$, and so on.  Since a
+child never sees the items that are sent to sibling streams, the items
+that are seen by a given child form a periodic but non-contiguous
+segment of the splitjoin's input tape.  Thus, in collapsing the
+splitjoin, we are unable to directly use the columns of child matrices
+as we did with a duplicate splitter, since with a roundrobin splitter
+these matrices are operating on disjoint sections of the input.
+
+Instead, we collapse linear splitjoins with a roundrobin splitter by
+converting the splitjoin to use a duplicate splitter.  In order to
+maintain correctness, we add a decimator on each branch
+of the splitjoin that eliminates items which were intended for other
+streams.
+
+\begin{transformation} (Roundrobin to duplicate)
+Given a splitjoin $s$ containing a roundrobin splitter with weights
+$v_0 \dots$ $v_{n-1}$, children that are linear nodes $\lambda_0 \dots
+\lambda_{n-1}$, and a round-robin joiner $j$, the transformed
+$\mbox{\bf rr-to-dup}(s)$ is a splitjoin with a duplicate splitter,
+linear child nodes $\mathbf{\lambda_0'} \dots
+\mathbf{\lambda_{n-1}'}$, and roundrobin joiner $j$.  The child nodes
+are computed as follows:
+\begin{equation} \nonumber
+\begin{array}{rcl}
+\mt{vSum}_k & = & \sum_{i=0}^{k-1} v_i \\ ~ \vspace{-6pt} \\
+\mt{vTot} & = & \mt{vSum}_n \\ ~ \vspace{-4pt} \\
+\multicolumn{3}{l}{\forall k \in [0, n-1]:} \\ ~ \vspace{-12pt} \\ 
+\multicolumn{3}{l}{\parbox{3in}{
+    \begin{equation} \nonumber
+      \begin{array}{l}
+      ~~~~\mt{decimate}[k] ~\mt{is a linear node}~ \{A, \vec 0, \mt{vTot}, \mt{vTot}, v_{k}\} \\ \vspace{-8pt} \\
+	~~~~~~~\mt{where}~A[i,j] = \left\{
+	\begin{array}{l}
+	  1 ~\mt{if}~ i=\mt{vTot}-\mt{vSum}_{k+1}+j \\
+	  0 ~\mt{otherwise} \\
+	\end{array}
+	\right.
+      \end{array}
+    \end{equation}}} \\
+\mathbf{\lambda_k'} & = & \mt{pipeline}(\mt{decimate}[k], \lambda_k)
+\end{array}
+\end{equation}
+\end{transformation}
+
+In the above translation, we utilize the linear pipeline combinator
+$\mt{pipeline}$ to construct each new child node $\lambda_i^e$ as a
+composition of a decimator and the original node $\lambda_i$.  The
+$k$th decimator consists of a $\mt{vTot} \times v_k$ matrix that
+consumes $\mt{vTot}$ items, which is the number of items processed in
+one cycle of the roundrobin splitter.  The $v_k$ items that are
+intended for stream $k$ are copied with a coefficient of $1$, while
+all others are eliminated with a coefficient of $0$.
+
+\begin{figure}[t]
+\center
+\epsfxsize=2.089in
+\epsfbox{images/example-splitjoin-combination.eps}
+\vspace{-6pt}
+\caption{Splitjoin combination example.}
+\protect\label{fig:example-splitjoin-combination}
+\vspace{-2pt}
+\makeline
+\vspace{-14pt}
+\end{figure}
+
+%% \begin{figure}
+%% \center
+%% \epsfxsize=3.0in
+%% \epsfbox{images/splitjoin-roundrobin-matrix.eps}
+%% \caption{Corresponding matrix for splitter conversion from roundrobin to duplicate.}
+%% \label{fig:splitjoin-roundrobin-matrix}
+%% \end{figure}
+
+\subsection{Applications of Linear Combination}
+
+%% Linear analysis is valuable because it provides a precise relationship
+%% between input and output that is nearly impossible to extract from
+%% general-purpose imperative programs.  While the combination of linear
+%% structures is analogous to algebraic simplification between loop
+%% bodies in an imperative program, it would be extremely difficult for a
+%% general-purpose compiler to extract the same information.
+
+%% Combining the action of {\tt streams} in a {\tt pipeline} is analogous
+%% to algebraic simplification between the bodies of sequential loops in
+%% an imperative program.  Once an overall linear node for the {\tt
+%% pipeline} has been determined, our compiler can perform this
+%% transformation automatically, leaving the the programmer to express
+%% the computation in the most convenient manner.
+
+There are numerous instances where the linear combination
+transformation could benefit a programmer.  For example, although a
+bandpass filter can be implemented with a low pass filter followed by
+a high pass filter, actual implementations determine the
+coefficients of a single combined filter that performs the same
+computation. While a simple bandpass filter is easy to combine
+manually, in an actual system several different filters might be
+designed and implemented by several different engineers, making 
+overall filter combination infeasible.
+
+Another common operation in discrete time signal processing is
+downsampling to reduce the computational requirements of a system.
+Downsampling is most often implemented as a low pass filter followed
+by an $M$ compressor which passes every $M$th input item to the
+output.  In practice, the filters are combined to avoid computing dead
+items in the low pass filter.  However, the system specification
+contains both elements for the sake of understanding.  Our analysis can
+start with the specification and derive the efficient version automatically.
+
+A final example is a multi-band equalizer, in which $N$ different
+frequency bands are filtered in parallel (see our FMRadio benchmark).
+If these filters are time invariant, then they can be collapsed into a
+single node.  However, designing this single overall filter is
+difficult, and any subsequent changes to any one of the sub filters
+will necessitate a total redesign of the filter.  With our automated
+combination process, any subsequent design changes will necessitate
+only a recompile rather than a manual redesign.
+
+
+\section{Translation to Frequency}
+\label{sec:freq}
+
+In this section, we demonstrate how we can leverage our linear
+representation to automatically perform a common domain-specific
+optimization: translation to the frequency domain.  First, we show
+that a linear node is equivalent to a set of convolution sums, which
+can benefit from algorithmic gains if performed in frequency rather
+than time.  We then present an optimized code generation strategy for
+transforming linear nodes to frequency.
+
+\subsection{Basic Frequency Implementation}
+
+Our first goal is to show that the computation of a linear node can be
+represented as a convolution sum.  Consider executing $m$ iterations
+of a linear node $\lambda = \{A, {\vec 0}, e, 1, 1\}$---that is, a
+node with $\vec{b} = 0$ and $\mbox{push}=\mbox{pop}=1$ (these
+assumptions will be relaxed below).  Let $\vec{out}[i]$ represent the
+$i$th value that is pushed during execution, let $\vec{in}[i]$ hold
+the value of $peek(i)$ as seen before the execution begins, and let
+${\vec y}$ be the convolution of the only column of $A$ with the
+vector $\vec{in}$ (that is, $y = A[*,0] * {\vec{in}}$).
+Note that $\vec{out}$ is an $m$-element vector, $A[*,0]$ is an
+$e$-element vector, ${\vec{in}}$ is an $(m+e-1)$-element vector, and
+${\vec y}$ is an $(m+2e-2)$-element vector.
+
+Then, we make the following claim:
+\begin{equation}
+\label{eq:claim1}
+\forall i \in [0, m-1]:~~{\vec{out}}[i] = {\vec y}\hspace{1pt}[i+e-1]
+\end{equation}
+To see that this is true, recall the definition of convolution:
+\[
+  {\vec y}\hspace{1pt}[i] = A[i,0] * \vec{in}[i] = \sum_{k=-\infty}^{\infty} A[k,0] \vec{in}[i-k]
+\]
+Substituting $\vec{in}$ by its definition, and restricting $k$ to
+range over the valid rows of $A$, we have:
+\[
+  {\vec y}\hspace{1pt}[i] = \sum_{k=0}^{e-1} A[k,0] \mbox{peek}(i-k)
+\]
+Remapping the index $i$ to $i+e-1$ makes the right hand side
+equivalent to ${\vec{out}}[i]$, by Definition 1.
+Claim~\ref{eq:claim1} follows.
+
+In other words, values pushed by a linear node can be calculated by a
+convolution of the input tape with the coefficients $A$.  The
+significance of this fact is that a convolution operation can be
+implemented very efficiently by using the Fast Fourier Transform (FFT)
+to translate into the frequency domain.  To compute the convolution,
+the $N$-point FFTs of $\vec{in}$ and $A[*,0]$ are calculated to obtain
+$\vec{X}$ and $\vec{H}$, respectively, each of which is a
+complex-valued vector of length $N$.  Element-wise multiplication of
+$\vec{X}$ and $\vec{H}$ yields a vector $\vec{Y}$, to which the
+inverse transform (IFFT) is applied to obtain $\vec{y}$.  Convolution
+in the frequency domain requires $O(N \lg(N))$ operations, as each FFT
+and IFFT has a cost of $O(N \lg (N))$ and the vector multiplication is
+$O(N)$.  By contrast, the complexity is $O(N^2)$ in the time domain,
+as each of the $N$ output values requires $O(N)$ operations.  For more
+details, refer to~\cite{oppenheim-discrete}.
+
+We can use the procedure described above to implement a linear node in
+the frequency domain.  We simply calculate ${\vec y} = A[*,0] * {\vec
+in}$, and extract values ${\vec y}\hspace{1pt}[e-1] \dots {\vec y}\hspace{1pt}[m+(e-1)-1]$ as
+the $m$ values pushed by the node.  Note that ${\vec y}\hspace{1pt}[i]$ is also
+defined for $i \in [0, e-2]$ and $i \in [m+e-1,m+2e-2]$; these values
+represent partial sums in which some coefficients were excluded.  Our
+{\naive} implementation simply disregards these values.  However, in the
+next section, we give an optimized implementation that takes advantage
+of them.
+
+The only task remaining for the implementation is to choose $N$, the
+FFT size, and $m$, the number of iterations to execute at once in the
+frequency domain.  According to Fourier's theorem, an $N$-point FFT
+can exactly represent any discrete sequence of $N$ numbers, so the
+only constraint on $N$ and $m$ is that $N \ge m+2e-1$.  For
+performance reasons, $N$ should be a power of two and as large as
+possible.  In our implementation, we set $N$ to the first power of two
+that is greater than or equal to $2e$, and then set $m = N-2e+1$.
+This strikes a reasonable compromise between storage space and
+performance for our uniprocessor benchmarking platform; the choice of
+$N$ should be adjusted for the particular resource constraints of the
+target architecture.
+
+The transformation below gives a {\naive} translation of a linear node
+to the frequency domain.  In addition, it relaxes all of the
+assumptions that we made above.  The algorithm allows for a non-zero
+value of ${\vec b}$ by simply adding $\vec{b}$ after returning from
+the frequency domain.  To accommodate a push rate greater than one,
+the algorithm generates {\it matrices} for $\vec{Y}$ and $\vec{y}$ and
+alternates pushing values from each column of $\vec{y}$ in turn.
+Finally, to accommodate a pop rate greater than one, the algorithm
+proceeds as if the pop rate was one and adds a special decimator node
+that discards the extra outputs.  Though this introduces inefficiency
+by calculating values that are never used, it still leaves room for
+large performance improvements, as the frequency transformation can
+improve performance by a large factor (see Section~\ref{sec:results}).
+
+\begin{transformation} ({\Naive} frequency implementation)
+Given a linear node $\lambda = \{A, {\vec b}, e, o, u\}$, the
+following stream is a {\naive} implementation of $\lambda$ in the
+frequency domain:
+\begin{equation} \nonumber
+{\small
+  \begin{array}{ll}
+    {\tt float \rightarrow float}~{\tt pipeline~naiveFreq~}(A, {\vec b}, e, o, u){\tt ~\{} & \hspace{40pt}\\
+    ~~{\tt add~float \rightarrow float~filter~\{}\\
+    ~~~~N \leftarrow 2^{\lceil \lg(2e) \rceil} \\
+    ~~~~m \leftarrow N-2e+1 \\
+    \\
+    ~~~~{\tt init}~{\tt \{} \\
+    ~~~~~~{\tt for}~j=0~{\tt to}~u-1\\
+    ~~~~~~~~\vec{H}[*,j] \leftarrow \mathbf{FFT}(N,A[*,u-1-j]) \\
+    ~~~~{\tt \}} \\
+    \\
+    ~~~~{\tt work}~{\tt peek}~m+e-1~{\tt pop}~m~{\tt push}~u*m~{\tt \{} \\
+    ~~~~~~\vec{x} \leftarrow {\tt peek}(0 \dots m+e-2 ) \\
+    ~~~~~~\vec{X} \leftarrow \mathbf{FFT} (N, \vec{x}) \\
+    ~~~~~~{\tt for}~j=0~{\tt to}~u-1~{\tt \{}\\
+    ~~~~~~~~\vec{Y}[*,j] \leftarrow \vec{X} .* \vec{H}[*,j] \\
+    ~~~~~~~~\vec{y}\hspace{1pt}[*,j] \leftarrow \mathbf{IFFT}(N, \vec{Y}[*,j]) \\
+    ~~~~~~{\tt \}} \\
+    ~~~~~~{\tt for}~i=0~{\tt to}~m-1~{\tt \{}\\
+    ~~~~~~~~{\tt pop()} \\
+    ~~~~~~~~{\tt for}~j=0~{\tt to}~u-1\\
+    ~~~~~~~~~~{\tt push}(\vec{y}\hspace{1pt}[i+e-1,j] + {\vec b}[j])\\
+    ~~~~~~{\tt \}} \\
+    ~~~~{\tt \}} \\
+    ~~{\tt \}} \\
+    ~~{\tt add~FreqDecimator(o, u)} \\
+    {\tt \}} \\ ~ \\
+    {\tt float \rightarrow float}~{\tt filter~freqDecimator~}(o, u){\tt ~\{} & \hspace{40pt}\\
+    ~~{\tt work~}{\tt peek}~u*o~{\tt pop}~u*o~{\tt push}~u~{\tt \{} \\
+    ~~~~{\tt for}~i=0~{\tt to}~u-1 \\
+    ~~~~~~{\tt push(pop())} \\
+    ~~~~{\tt for}~i=0~{\tt to}~u-1 \\
+    ~~~~~~{\tt for}~j=0~{\tt to}~o-2 \\
+    ~~~~~~~~{\tt pop()} \\
+    ~~{\tt \}} \\
+    {\tt \}}
+  \end{array}}
+\end{equation}
+\vspace{-6pt}
+\end{transformation}
+
+\subsection{Optimized Frequency Implementation}
+
+The {\naive} frequency implementation discards $e-1$ elements from the
+beginning and end of each column of ${\vec y}$ that it computes.
+These values represent partial sums in which some of the coefficients
+of $A$ are excluded. However, for $i \in [0, e-2]$, ${\vec
+y}\hspace{1pt}[i,j]$ in one iteration contains the missing terms from
+${\vec y}\hspace{1pt}[m+e-1+i,j]$ in the previous iteration.  The sum
+of these two elements gives a valid output for the filter.  This
+symmetry arises from the convolution of $A$ ``off the edges'' of the
+input block that we consider in a given iteration. Reusing the partial
+sums---which is exploited in the transformation below---is one of
+several methods that use blocking to efficiently convolve a short
+filter with a large amount of input~\cite{oppenheim-discrete}.
+%% Recall that $A$ is of length $e$ and the input tape is given in blocks
+%% of length $m$.  Then, consider element $m+i$ of the first execution.
+%% Following equation~\ref{eq:linconv}, we have:
+%% \[
+%% {\vec y}\hspace{1pt}[m+i] = \sum_{k=0}^{e-1} A[k] \mbox{\tt peek}(m+i+e-1-k)
+%% \]
+%% Since we are in the first execution, we can only peek at values $0
+%% \dots m-1$, which implies that $m+i+e-1-k \in [0, m-1]$ and thus $k
+%% \in [i+e, m+i+e-1]$.  That is, only coefficients $A[k]$ for these
+%% values of $k$ will be included in the sum.  Now consider the
+%% computation of element $i$ on the second iteration.  Since the second
+%% iteration can peek at values in the range of $[m,2m-1]$, we have (by
+%% the same reasoning as above) that $k \in [$.
+
+\begin{transformation}
+(Optimized frequency implementation)
+Given a linear node $\lambda = \{A, {\vec b}, e, o, u\}$, the
+following stream is an optimized implementation of $\lambda$ in the
+frequency domain:
+\begin{equation} \nonumber
+{\small
+  \begin{array}{ll}
+    {\tt float \rightarrow float}~{\tt pipeline~optimizedFreq~}(A, {\vec b}, e, o, u){\tt ~\{} & \hspace{40pt}\\
+    ~~{\tt add~float \rightarrow float~filter~\{}\\
+    ~~~~N \leftarrow 2^{\lceil \lg(2e) \rceil} \\
+    ~~~~m \leftarrow N-2e+1 \\
+    ~~~~\vec{partials} \leftarrow {\tt new~array}[0 \dots e-2, 0\dots u-1] \\
+    ~~~~r \leftarrow m+e-1 \\
+    \\
+    ~~~~{\tt init}~{\tt \{} \\
+    ~~~~~~{\tt for}~j=0~{\tt to}~u-1\\
+    ~~~~~~~~\vec{H}[*,j] \leftarrow \mathbf{FFT}(N,A[*,u-1-j]) \\
+    ~~~~{\tt \}} \\
+    \\
+    ~~~~{\tt prework}~{\tt peek}~r~{\tt pop}~r~{\tt push}~u*m~{\tt \{}\\
+    ~~~~~~\vec{x} \leftarrow {\tt pop}(0 \dots m+e-2) \\
+    ~~~~~~\vec{X} \leftarrow \mathbf{FFT} (N, \vec{x}) \\
+    ~~~~~~{\tt for}~j=0~{\tt to}~u-1~{\tt \{}\\
+    ~~~~~~~~\vec{Y}[*,j] \leftarrow \vec{X} .* \vec{H}[*,j] \\
+    ~~~~~~~~\vec{y}[*,j] \leftarrow \mathbf{IFFT}(N, \vec{Y}[*,j]) \\
+    ~~~~~~~~\vec{partials}[*,j] \leftarrow \vec{y}\hspace{1pt}[m+e-1 \dots m+2e-3,j] \\
+    ~~~~~~{\tt \}} \\
+    ~~~~~~{\tt for}~i=0~{\tt to}~m-1\\
+    ~~~~~~~~{\tt for}~j=0~{\tt to}~u-1\\
+    ~~~~~~~~~~{\tt push}(\vec{y}\hspace{1pt}[i+e-1,j] + \vec{b}[j]) \\
+    ~~~~{\tt \}} \\
+    \\
+    ~~~~{\tt work}~{\tt peek}~r~{\tt pop}~r~{\tt push}~u*r~{\tt \{} \\
+    ~~~~~~\vec{x} \leftarrow {\tt pop}(0 \dots m+e-2) \\
+    ~~~~~~\vec{X} \leftarrow \mathbf{FFT} (N, \vec{x}) \\
+    ~~~~~~{\tt for}~j=0~{\tt to}~u-1~{\tt \{}\\
+    ~~~~~~~~\vec{Y}[*,j] \leftarrow \vec{X} .* \vec{H}[*,j] \\
+    ~~~~~~~~\vec{y}[*,j] \leftarrow \mathbf{IFFT}(N, \vec{Y}[*,j]) \\
+    ~~~~~~{\tt \}} \\
+    ~~~~~~{\tt for}~i=0~{\tt to}~e-1\\
+    ~~~~~~~~{\tt for}~j=0~{\tt to}~u-1~{\tt \{}\\
+    ~~~~~~~~~~{\tt push}(\vec{y}\hspace{1pt}[i,j] + \vec{partials}[i,j])\\
+    ~~~~~~~~~~\vec{partials}[i,j] \leftarrow \vec{y}\hspace{1pt}[m+e-1+i,j]\\
+    ~~~~~~~~{\tt \}} \\
+    ~~~~~~{\tt for}~i=0~{\tt to}~m-1\\
+    ~~~~~~~~{\tt for}~j=0~{\tt to}~u-1\\
+    ~~~~~~~~~~{\tt push}(\vec{y}\hspace{1pt}[i+e-1,j] + {\vec b}[j])\\
+    ~~~~{\tt \}} \\
+    ~~{\tt \}} \\
+    ~~{\tt add~Decimator}(o, u)~~\mt{// see Transformation 5}\\
+    {\tt \}} \\
+  \end{array}}
+\end{equation}
+\end{transformation}
+
+\subsection{Applications of Frequency Transformation}
+
+The transformation to the frequency domain is straightforward in
+theory and very common in practice. However, the detailed record
+keeping, transform size selection, and state management make an actual
+implementation quite involved.  Further, as the complexity of DSP
+programs continues to grow, manually determining the disparate regions
+across which to apply this optimization is an ever more daunting task.
+For example, several filters individually may not perform sufficiently
+large convolutions to merit a frequency transformation, but after a
+linear combination of multiple filters the transformation could be
+beneficial.  Differing levels of architectural support for various
+convolution and frequency operations further complicates the task of
+choosing the best transform.  Our compiler automatically determines
+all the necessary information and transforms the computation into the
+frequency domain.
+
+%% Then consider that we push u values.  Then n indicates the firing
+%% number of the work function.
+%%
+%%   For all j in [0,u-1]:
+%%
+%%     y[n*u+j] = sum_i (x[n-i]*A[e-1+i,j])
+%%
+%% Consider instead that we pop o items.  Then have:
+%%
+%%   y[n] = sum_i (x[o*n-i]*A[e-1+i])
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% In order to derive a frequency implementation of a linear node, let us
+%% start by formulating the computation that the node performs.  To
+%% simplify the derivation, assume that we are given a node $\lambda$
+%% with $\vec{b} = 0$ and $\mt{push}=\mt{pop}=1$ (we will relax these
+%% restrictions below).  As usual, let $e$ denote the peek rate for
+%% $\lambda$; also let $p_0$ denote the item that is pushed.  Then, by
+%% Definition 1, we have the following:
+%% \begin{equation}
+%%   p_0 = \vec{x} A + {\vec b} = \sum_{k=0}^{e-1} A[k] \mbox{\tt peek}(e-1-k)
+%% \end{equation}
+%% Note that in this case, $p_0$ is a scalar since $\mt{push}=1$ (and
+%% thus $A$ has a single column).  Now let us consider $m$ executions of
+%% the node, with the $i$th output being pushed to location ${\vec
+%% p}[i]$.  This computation is exactly as above, except that the input
+%% and output tapes are offset by $i$:
+%% \begin{equation}
+%%   \protect\label{eq:linconv}
+%%   \forall i \in [0, m-1]:~~\vec{p}[i] = \sum_{k=0}^{e-1} A[k] \mbox{\tt peek}(i+e-1-k)
+%% \end{equation}
+%% At this point, our equation is very similar in form as a convolution
+%% sum from digital signal processing.  Given two vectors $\vec{h}$ and
+%% $\vec{x}$, their convolution is defined as:
+%% \begin{equation}
+%%   {\vec y}\hspace{1pt}[n] = \vec{x} * \vec{h} = \sum_{k=-\infty}^{\infty} \vec{x}[k] \vec{h}[n-k]
+%% \end{equation}
+
+
+%% \begin{figure}[t]
+%%   \psfig{figure=images/part-algorithm3.eps,width=3.5in}
+%%   \caption{Cost functions for optimization selection.}
+%% \end{figure}
+
+\section{Optimization Selection}
+\label{sec:partitioning}
+
+To reap the maximum benefit from the optimizations described in the
+previous two sections, it is important to apply them selectively.
+There are two components of the optimization selection problem: first,
+to determine the sequence of optimizations that will give the highest
+performance for a given arrangement of the stream graph, and second,
+to determine the arrangement of the stream graph that will give the
+highest performance overall.  In this section, we explain the
+relevance of each of these problems, and we present an effective
+selection algorithm that relies on dynamic programming to quickly
+explore a large space of configurations.
+
+\subsection{The Selection Problem}
+
+First, the selection of optimizations for a given stream graph can
+have a large impact on performance.  As alluded to in
+Section~\ref{sec:combine}, linear combination can increase the number
+of arithmetic operations required, {\it e.g.,} if combining a
+two-element pipeline where the second filter pushes more items than it
+peeks.  However, such a combination might be justified if it enables
+further combination with other components and leads to a benefit
+overall.  Another consideration is that as the pop rate grows, the
+benefit of converting to frequency diminishes; thus, it might be
+preferable to transform smaller sections of the graph to frequency, or
+to perform linear combination only.  This occurs in our Vocoder and
+FMRadio benchmarks, in which the selection algorithm improves
+performance by choosing plain linear combination over frequency
+translation.
+
+Second, the arrangement of the stream graph can dictate which
+transformations are possible to apply.  Since our transformations
+operate on an entire pipeline or splitjoin construct, the graph often
+needs to be refactored to put linear nodes in their own hierarchical
+unit.  For example, in our TargetDetect benchmark, we cut a splitjoin
+horizontally and collapse the top piece before converting to the
+frequency domain, thereby amortizing the cost of the FFT on the input
+items.
+% (see Figure~\ref{fig:horizcut}).  
+In our Vocoder benchmark, we cut a splitjoin vertically in order to
+separate the non-linear filters on the left and combine all of the
+filters on the right into a single linear node.
+% (seeFigure~\ref{fig:vertcut}).
+
+\subsection{Dynamic Programming Solution}
+
+Our optimization selection algorithm, shown in
+Figures~\ref{fig:part-decl} and \ref{fig:part-alg}, automatically
+derives the example transformations described above.  Intuitively, the
+algorithm works by estimating the minimum cost for each structure in
+the stream graph. The minimum cost represents the best of three
+configurations: 1) collapsed and implemented in the time domain, 2)
+collapsed and implemented in the frequency domain, and 3) uncollapsed
+and implemented as a hierarchical unit.  The cost functions for the
+collapsed cases are guided by profiler feedback, as described below.
+For the uncollapsed case, the cost is the sum of each child's minimum
+cost.  However, instead of considering the children directly, the
+children are refactored into many different configurations, and the
+cost is taken as the minimum over all configurations.  This allows the
+algorithm to simultaneously solve for the best set of transformations
+and the best arrangement of the stream graph.
+
+The key to the algorithm's efficiency is the manner in which it
+considers refactoring the children of hierarchical nodes.  Instead of
+considering arbitrary arrangements of the stream graph, it considers
+only {\it rectangular} partitions, in which a given splitjoin is
+divided into two child splitjoins by either a horizontal 
+%cut (Figure~\ref{fig:horizcut}) 
+or vertical cut.
+%(Figure~\ref{fig:vertcut}).  
+This approach works well in practice, because splitjoins often have
+symmetrical child streams in which linear components can be separated
+by a straight line.  Moreover, as the child splitjoins are decomposed
+and evaluated, there are overlapping sub-problems that enable us to
+search the space of child configurations in polynomial time, using
+dynamic programming.
+
+\begin{figure}[t]
+\vspace{-12pt}
+\psfig{figure=images/part-algorithm12.eps,width=3.05in}
+  \vspace{-10pt}
+  \caption{Type declarations for code in Figure~\ref{fig:part-alg}.
+  \protect\label{fig:part-decl}}
+  \vspace{-22pt}
+  \makeline
+  \vspace{-12pt}
+\end{figure}
+
+\begin{figure}[t]
+  \vspace{-4pt}
+  \psfig{figure=images/part-algorithm10.eps,width=3.5in}
+  \vspace{-16pt}
+  \caption{Algorithm for optimization selection.
+  \vspace{-22pt}
+  \protect\label{fig:part-alg}}
+\end{figure}
+
+%Pseudocode for our optimization selection algorithm appears in
+%Figures~\ref{fig:part-alg} and~\ref{fig:part-decl}.  
+A subtlety in the pseudocode of Figure~\ref{fig:part-alg} is with
+regards to the translation from a StreamIt graph to a set of
+hierarchical {\it Stream} objects.  In the pseudocode, each {\tt
+Stream} corresponds only to a pipeline; adjacent splitjoin objects are
+wrapped in a pipeline and their children are considered as direct
+children of the pipeline. This enables different parts of neighboring
+splitjoins to be combined.  However, it implies that a {\tt Stream}
+might have a different width at different points (since neighboring
+splitjoins could have differing widths); this necessitates the
+addition of the {\tt width} array to the algorithm.
+
+\subsection{Cost Functions}
+\label{sec:cost}
+
+The pseudocode in Figure~\ref{fig:part-alg} refers to functions {\it
+getDirectCost} and {\it getFrequencyCost} that estimate a node's
+execution time if implemented in the time domain or the frequency
+domain.  These cost functions can be tailored to a specific
+architecture and code generation strategy.  For example, if there is
+architecture-level support for convolution operations (such as the the
+{\tt FIRS} instruction in the TMS320C54x~\cite{ti-dsp-manual}), then
+this would effect the cost for certain dimensions of matrices;
+similarly, if a matrix multiplication algorithm is available that
+exploits symmetry or sparsity in a matrix, then this benefit could be
+accounted for where it applies.  In our implementation, we use the
+following versions of the cost functions (let
+$\lambda=(A,\vec{b},e,o,u)$ be the linear node corresponding to stream
+$s$):
+%% \[
+%% \begin{array}{rcl}
+%% \mt{getDirectCost}(s) \hspace{-6pt} & = \hspace{-6pt} & 1 + 3 * |\{ (i,j)~s.t.~A_{i,j} \ne 0\}| \vspace{3pt} \\ 
+%%  ~ & ~ & \hspace{6.8pt}+~|\{ i~s.t.~{\vec b}_i \ne 0 \}| \\ ~ & ~ & ~ \\
+%% %%\mt{getDirectCost}(s) \hspace{-6pt} & = \hspace{-6pt} & 1 + 3 * (\mt{rows}(A) * \mt{cols}(A) - \mt{numZeros}(A)) \\ ~ & ~ & ~~~+cols({\vec b}) - numZeros({\vec b}) \\
+%% \mt{getFrequencyCost}(s)  \hspace{-6pt} & = \hspace{-6pt} & \frac{1}{50}~(4 * \mt{rows}(A) * \mt{cols}(A) + \mt{rows}(A))
+%% \end{array}
+%% \]
+\[
+\mt{getDirectCost}(s) = \left\{ \begin{array}{l}
+\infty ~~~~~~~~~ \mbox{(if }s\mbox{~is roundrobin splitjoin)} \\ ~ \\ \vspace{-8pt} \\
+185 + 2*u + ~~~~~~~~~~~~~~~~\mbox{(otherwise)} \\ \vspace{-8pt} ~ \\
+~~~|\{ i~s.t.~{\vec b}_i \ne 0 \}|~+ \\ \vspace{-8pt} ~ \\
+~~~3 * |\{ (i,j)~s.t.~A_{i,j} \ne 0\}| \\ 
+\end{array} \right.
+\]
+\[
+% trial and error with the ~, can't get it to move over :(
+\mt{getFrequencyCost}(s) = ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+\vspace{-8pt}
+\]
+\[
+~~~\left[185 + 2*u + u * \mt{ln}\left(\frac{1 + 4*e}{1 + \frac{2^{\lceil lg(2*e) \rceil}}{50}}\right)\right] * \mt{max}(o, 1) + \mt{dec}(s)
+\]
+~ \vspace{-11pt} \\
+\[ 
+% trial and error with the ~, can't get it to move over :(
+\mt{dec}(s) = (o-1) * (185 + 4 * u) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+\]
+\clearpage
+
+\begin{table}[t]
+\begin{minipage}{7in}
+\vspace{-8pt}
+\begin{center}
+{\small
+\begin{tabular}{|l|c|c|c||c||c|c|c|} 
+\hline
+& \multicolumn{3}{|c||}{{\bf Originally}}  &             & \multicolumn{3}{|c|}{{\bf After Optimizations}} \\
+\hline
+{\bf Benchmark}  & {\bf Filters} & {\bf Pipelines} & {\bf SplitJoins} & {\bf Average}     & {\bf Filters}      & {\bf Pipelines}         & {\bf SplitJoins} \\
+           & {\bf (linear)}& {\bf (linear)} & {\bf (linear)}   & {\bf vector size} &              &                   &            \\
+\hline
+FIR        & 3 (1)   & 1(0)     & 0 (0)      & 256         & 3            & 1                 & 0 \\
+\hline
+RateConvert& 5 (3)   & 2 (1)    & 0 (0)      & 102         & 4            & 1                 & 0 \\
+\hline
+TargetDetect& 10 (4) & 6 (0)    & 1 (0)      & 300         & 7            & 1                 & 1 \\
+\hline
+FMRadio    & 26 (22) & 11 (9)   & 2 (2)      & 40          & 5            & 1                 & 0 \\
+\hline
+Radar      & 76 (60) & 17 (0)   & 2 (0)      & 4412        & 38           & 17                & 2 \\
+\hline
+FilterBank & 27 (24) & 17 (9)   & 4 (4)      & 52          & 3            & 1                 & 0 \\
+\hline
+Vocoder    & 17 (13) & 10 (8)   & 2 (1)      & 60          & 6            & 2                 & 1 \\
+\hline
+Oversampler& 10 (8) & 1 (1)     & 0 (0)      & 33          & 3            & 1                 & 0 \\
+\hline
+DToA       & 14 (10) & 3 (1)    & 0 (0)      & 52          & 7            & 2                 & 0 \\
+\hline
+\end{tabular}}
+\vspace{-3pt}
+\caption{Characteristics of benchmarks before and after running optimizations with automatic selection.
+\protect\label{fig:benchmark-statistics}}
+\end{center}
+\vspace{-20pt}
+\makeline
+\vspace{-12pt}
+\end{minipage}
+\end{table}
+
+For the direct cost, we consider the cost to be infinite for
+splitjoins with roundrobin splitters.  This is because the splitjoin
+combination does not eliminate any arithmetic operations, and for the
+roundrobin case it introduces extra overhead (the duplicate case is
+different because the input items are shared between streams).  For
+other streams, we count the number of multiplies and adds required to
+perform the matrix multiplication, giving more weight to the
+multiplies since they are more expensive.  We do not count the zero
+entries of the arrays, since our matrix multiply routines take
+advantage of the sparsity of the matrix.  We add $185+2*u$ to all
+costs as a measure of the overhead of the node's execution.
+
+For the frequency cost, our cost curve is guided by profiler feedback.
+The speedup gained by translating to the frequency domain depends on
+the peek rate of the filter.  To obtain an $n$-fold speedup of the
+frequency code over the direct code, the filter has to peek $64*n$
+items.  Mathematically, this translates to a logarithmic expression
+for the cost of the frequency node in terms of the number of items $e$
+(we actually use the next power of two above $e$, as that is the size
+of the FFT).  We multiply the above cost by the number of items pushed,
+add the constant offset of $185+2*u$ for a node, and then multiply by
+$\mt{max}(o, 1)$ because only one out of $o$ items represents a valid
+output from the frequency domain.  Finally, we add $\mt{dec}(s)$, the
+cost of the decimator for the frequency node.  We estimate an extra
+cost of $2$ per push operation in the decimator, as it must read from
+the input tape.  The other pop operations in the decimator are free,
+because they can be performed as a single adjustment of the tape
+position.
+
+Of course, both cost functions are undefined if $s$ is non-linear
+({\it i.e.}, if there is no corresponding $\lambda_s$). If this is the
+case, then the selection algorithm assigns an infinite cost.
+
+%% OPTIMIZING EXECUTION
+
+%% can identify rectangles of stream graph that are equivalent, and use this to:
+%%  - save on computing linear node representation
+%%  - save on computing partitioning of childre
+%%  - automatically compute closed form for some linear sections
+
+
+\section{Results}
+\label{sec:results}
+
+We have completed a fully automatic implementation of the linear
+combination, frequency replacement, and optimization selection
+algorithms described in the previous sections.  The implementation is
+part of the StreamIt compiler, and works for both the uniprocessor and
+Raw~\cite{raw-micro} backends.  In this section, we evaluate three
+configurations of linear optimizations for the uniprocessor backend:
+\begin{itemize}
+
+\item {\it Linear replacement}, which transforms maximal linear
+sections of the stream graph into a single linear node, which we
+implement as a matrix multiply.  For small nodes (less than 256
+operations), this takes the form of an unrolled arithmetic expression,
+whereas for large nodes we implement an indexed matrix multiply that \\
+% Latex will NOT put a table* where I want it, so I had to make it a plain
+% table.  Sorry if you're the one who has to undo this.
+~ \\
+~ \\
+~ \\
+~ \\
+~ \\
+~ \\
+~ \\
+~ \\
+~ \\
+~ \\
+~ \\
+~ \\
+~ \\
+avoids zero entries at the top and bottom of each column.
+
+\item {\it Frequency replacement}, which transforms maximal linear
+sections of the stream graph into a single node in the frequency
+domain.  To implement the necessary basis conversions, we use
+FFTW~\cite{frigo99fast}, which is an adaptive and high-performance FFT
+library.
+
+\item {\it Automatic selection}, which employs both of the previous
+transformations judiciously in order to obtain the maximal benefit.
+This works according to the algorithm in
+Section~\ref{sec:partitioning}.
+\end{itemize}
+Below we describe experiments and results that demonstrate substantial
+performance improvements due to our methods.  For full results, stream
+graphs, and source code, please visit {\tt
+http://cag.lcs.mit.edu/linear/}.
+
+\subsection{Measurement Methodology}
+%We chose to measure the strength of our optimizations in terms of 
+%floating point instruction reduction. The StreamIt compiler currently
+%has two code generation backends. The uniprocessor backend generates sequential C code
+%that can be compiled and linked against a supporting library. 
+%There is also a backend that generates code for the RAW microprocessor
+%\cite{waingold97baring, raw-micro}, which features
+%a grid of processors interconnected via various communication facilities. 
+%Mapping a StreamIt program on to the RAW architecture is complicated
+%by issues of communication, load balancing and partitioning\cite{streamit-asplos}. 
+%Therefore, the effects of our linear analysis optimizations can not
+%be easily differentiated from differences in placement, routing and fusion that result
+%from modifying the program's stream graph (as is the case for linear replacement). 
+%Therefore we chose to use the uniprocessor backend for our measurements.
+
+%As always, the appropriate metric to measure performance is not totally clear. 
+%Running time is complicated by the multitasking environment offered by 
+%modern operating systems. Also, given that the uniprocessor backend for
+%the StreamIt compiler is meant for prototyping, the supporting 
+%library is anything but optimized. Therefore, measuring running time is
+%probably not an appropriate metric.
+
+%Floating point multiplication instructions 
+%in the IA-32 instruction set are defined to be any of ({\tt fmul fmulp fimulp fdiv fdivp fidivp fdivr fdivrp fidivr}).
+%We measure execution time normalized to the number of program outputs generated. 
+
+%Our measurement platform is a Dual Intel 2.2 GHz P4 Xeon processor
+%system with 2GB of memory running GNU/Linux. 
+Our measurement platform is a Dual Intel P4 Xeon system with 2GB of
+memory running GNU/Linux.  We compile our benchmarks using StreamIt's
+uniprocessor backend and generate executables from the resulting C
+files using {\tt gcc -O2}.  To measure the number of floating point
+operations, we use an instruction counting DynamoRIO\cite{dynamo99}
+client.
+
+Since StreamIt is a new language, there are no external sources of
+benchmarks.  Thus, we have assembled the following set of
+representative streaming components and have rewritten them in
+StreamIt: 1) {\bf FIR}, a single 256 point low pass FIR filter; 2)
+{\bf RateConvert}, an audio down sampler that converts the sampling
+rate by a non-integral factor ($\frac{2}{3}$); 3) {\bf TargetDetect},
+four matched filters in parallel with threshold target detection; 4)
+{\bf FMRadio}, an FM software radio with equalizer; 5) {\bf Radar},
+the core functionality in modern radar signal processors, based on a
+system from the Polymorphic Computing Architecture~\cite{pca}; 6) {\bf
+FilterBank}, a multi-rate signal decomposition processing block common
+in communications and image processing; 7) {\bf Vocoder}, a channel
+voice coder, commonly used for speech analysis and compression; 8)
+{\bf Oversampler}, a $16x$ oversampler, a function found in many CD
+players, 9) {\bf DToA}, an audio post-processing stage prior to a
+1-bit D/A converter with an oversampler and a first order noise
+shaper.
+
+Some statistics on our benchmarks appear in
+Table~\ref{fig:benchmark-statistics}.
+
+\subsection{Performance}
+
+One interesting aspect of our optimizations is that they eliminate
+floating point operations (FLOPS) from the program, as shown in Figure
+Figure~\ref{fig:flops}.  The removal of FLOPS represents fundamental
+computation savings that is independent of the streaming runtime
+system and other (FLOPS-preserving) optimizations in the compiler.  As
+shown in the figure, each optimization leads to a significant
+reduction of FLOPS.  Linear replacement eliminates FLOPS for all
+except for FIR, TargetDetect, and Radar, while frequency replacement
+eliminates FLOPS for all except for Radar.
+
+The automatic selection option eliminates more FLOPS than either of
+the other options for TargetDetect, FMRadio, Radar, and Vocoder.  The
+effect is especially pronounced in Radar, where linear and frequency
+replacement increase the number of FLOPS, but automatic selection
+decreases FLOPS; the selection algorithm chooses to combine only some
+of the filters in Radar, transforming none to the frequency domain.
+Automatic selection always performs at least as well as the other two
+options, which implies that our cost functions have some level of
+accuracy.
+
+Execution speedups are shown in Figure~\ref{fig:execution-speedup}.
+With automatic selection, our benchmarks speed up by an average factor
+of 450\% and by a factor of 800\% in the best case.  While the graph
+suggests that frequency replacement almost always performs better than
+linear replacement, this is not strictly the case; in FMRadio, Radar,
+and Vocoder, the automatic selection algorithm obtains its speedup by
+using linear replacement instead of frequency replacement for part of
+the stream graph.  However, linear replacement does reduce performance
+for FIR, TargetDetect, and DToA despite reducing the number of FLOPS.
+We believe that this is due to inefficiencies in our implementation of
+the matrix multiplication routine, as well as auxiliary effects on the
+runtime overhead in the StreamIt library.  We have experimented with
+using the machine-tuned ATLAS library for the matrix
+multiply~\cite{whaley01automated}, but performance varies widely:
+linear replacement with ATLAS performs anywhere from -36\% (on
+FMRadio) to 58\% (on Oversampler) better than it does with our own
+matrix multiply routine, and average performance with ATLAS is 4.3\%
+lower.  Note that these numbers reflect our overhead in interfacing
+with ATLAS rather than the performance of ATLAS itself.  In the
+future, we plan to further investigate how best to perform the matrix
+multiply.
+
+\begin{figure}[t]
+\vspace{-16pt}
+\psfig{figure=images/flops-removed.eps,width=3.4in}
+\vspace{-16pt}
+\caption{Elimination of floating point operations by maximal linear replacement, maximal frequency replacement, and automatic optimization selection.}
+\label{fig:flops}
+\vspace{-12pt}
+\makeline
+\vspace{-12pt}
+\end{figure}
+
+\begin{figure}[t]
+\vspace{-16pt}
+\psfig{figure=images/execution-speedup.eps,width=3.4in}
+\vspace{-16pt}
+\caption{Execution speedup for maximal linear replacement, maximal frequency replacement, and automatic optimization selection.}
+\label{fig:execution-speedup}
+\vspace{-12pt}
+\makeline
+\vspace{-12pt}
+\end{figure}
+
+Perhaps the most interesting benchmark is Radar\footnote{\small This
+is the same Radar application as in~\cite{streamit-asplos}, with some
+filters adjusted to work at a coarser level of granularity.  This
+eliminates persistent state in exchange for increased I/O rates.
+Also, frequency replacement caused an internal error in gcc for this
+program, so we used egcs 2.91 instead.}.  Maximal linear and frequency
+replacement lead to abysmal performance on Radar, due to a
+vector-vector multiply filter named ``Beamform'' at the top of a pipeline
+construct.  The Beamform filter pushes 2 items, but pops and peeks 24;
+thus, when the replacement algorithms combine it with a downstream FIR
+filter, much of its work is duplicated.  Moreover, the frequency
+replacement option suffers from the large pop rates in the application
+(as high as 128 for some filters), thereby increasing FLOPS and
+execution time by more than a factor of 30.  The automatic selection
+algorithm is essential in this case: it averts the
+performance-degrading combinations and benefits from linear
+combinations elsewhere in the program, resulting in a significant
+reduction in FLOPS and a 5\% performance gain.
+
+%% There are two cases in which the multiplication reduction is not a
+%% good predictor of execution speedup.  For Vocoder, the optimization
+%% selection algorithm achieves the same number of multiplications as
+%% applying both linear and frequency replacement; however, the speedup
+%% is higher with automatic selection because the selection algorithm
+%% refactors and combines a linear splitjoin where the plain
+%% optimizations do not. The refactoring has no effect on the number of
+%% multiplications required, but it increases the execution time because
+%% it increases the runtime overhead in the execution of the stream
+%% graph.  FilterBank illustrates similar behavior --- the selection
+%% algorithm determines a clever refactoring that reduces the number of
+%% multiplications compared to applying both linear and frequency
+%% replacement, but the additional overhead required actually causes the
+%% execution time to increase. A more accurate cost model that takes into
+%% account costs other than multiplications could help the selection
+%% algorithm improve its choice of stream graph arrangements.
+
+
+\section{Related Work}
+\label{sec:related}
+
+Several groups are researching strategies for efficient code
+generation for DSP applications.  SPIRAL is a system that generates
+libraries for signal processing
+algorithms\cite{spiral,johnson01searching,egner01automatic}.  Using a
+feedback-directed search process, DSP transforms are optimized for the
+underlying architecture.  The input language to SPIRAL is
+SPL\cite{xiong01spl,xiong-thesis}, which provides a parameterizable
+way of expressing matrix computations.  Given a matrix representation
+in SPL, SPIRAL generates formulas that correspond to different
+factorizations of the matrix.  It searches for the most efficient
+formula using several techniques, including dynamic programming and
+stochastic evolutionary search.
+
+We consider our work to be complementary to SPIRAL.  While SPIRAL
+starts with a matrix representation in SPL, we start with general
+StreamIt code and use linear dataflow analysis to extract a matrix
+representation where possible.  Our linear combination rules are
+distinct from the factorizations of SPIRAL, as StreamIt nodes can peek
+at items that they do not consume.  In the future, SPIRAL could be
+integrated with StreamIt to optimize a matrix factorization for a
+given architecture.
+
+The ATLAS project \cite{whaley01automated} also aims to produce fast
+libraries for linear algebra manipulations, focusing on adaptive
+library generation for varying architectures.  FFTW~\cite{frigo99fast}
+is a runtime library of highly optimized FFT's that dynamically adapt
+to architectural variations.  StreamIt is again complementary to these
+packages: it allows programmers to interface with them using general
+user-level code.
+
+ADE (A Design Environment) is a system for specifying, analyzing, and
+manipulating DSP algorithms~\cite{covell-ade}.  ADE includes a
+rule-based system that can search for improved arrangements of stream
+algorithms using extensible transformation rules.  However, the system
+uses predefined signal processing blocks that are specified in
+mathematical terms, rather than the user-specified imperative code
+that appears in a StreamIt filter.  Moreover, ADE is intended for
+algorithm exploration, while StreamIt includes support for code
+generation and whole-program development.  In addition to ADE, other
+work on DSP algorithm development is surveyed
+in~\cite{oppenheim-symbolic}.
+
+Karr~\cite{karr76} and Cousot and Halbwachs~\cite{cousot78} describe
+general methods for detecting linear relationships among program
+variables.  Karr maintains an affine representation (similar to ours)
+for each program variable, while Cousot and Halbwachs use a polyhedral
+model in which each dimension corresponds to a program variable.  For
+general programs, the analyses described by these authors is more
+general than ours.  In fact, the novelty of our linear dataflow
+analysis is in its specialization for the streaming domain.  Rather
+than tracking general relationships, we only track relationships to
+items on the input tape.  This restriction---in combination with the
+atomic, fine-grained nature of filter work functions---makes it
+feasible to symbolically execute all loops, thereby obtaining more
+precise linearity information.
+
+A number of other programming languages are oriented around a notion
+of a stream; see \cite{survey97} for a survey.  Also note that the
+``linear data flow analysis'' of Ryan~\cite{ryan92} is completely
+unrelated to our work; it aims to do program analysis in linear time.
+
+%% Synchronous languages such as LUSTRE~\cite{lustre},
+%% Esterel~\cite{esterel92}, and Signal~\cite{signal} target the embedded
+%% domain, while languages such as Occam~\cite{occammanual},
+%% SISAL~\cite{sisal} and StreamC~\cite{Rix98} target parallel and vector
+%% targets.  However, none of the compilers for these languages have
+%% coarse-grained, DSP-specific analyses such as linear filter detection.
+
+% Something should be said about other stream projects and their attempts at optimizations...
+% which I know very little about.
+
+
+\section{Conclusion}
+\label{sec:conclusion}
+
+This paper presents a set of automated analyses for detecting,
+analyzing, and optimizing linear filters in streaming applications.
+Though the mathematical optimization of linear filters has been a
+longtime focus of the DSP community, our techniques are novel in the
+automated application of these techniques to programs that are written
+in a flexible and high-level programming language.  We demonstrate
+that using our linear dataflow analysis, linear combination, frequency
+translation and automated optimization selection we can improve
+execution speed by an average factor of 450\%.
+
+The ominous rift between the design and implementation of signal
+processing applications is growing by the day.  Algorithms are
+designed at a conceptual level utilizing modular processing blocks
+that naturally express the computation.  However, in order to obtain
+good performance, each hand-tuned implementation is forced to
+disregard the abstraction layers and painstakingly consider
+specialized whole-program optimizations. The StreamIt project aims to
+reduce this process to a single stage in which the designers and
+implementors share a set of high-level abstractions that can be
+efficiently handled by the compiler.
+
+The linear analysis described in this paper represents a first step
+toward this goal.  By automatically performing linear combination,
+frequency translation, and optimization selection, it allows
+programmers to write linear stream operations in a natural and modular
+fashion without any performance penalty.
+
+%% \subsection{Future Work}
+
+%% Linear analysis can easily be extended to incorporate a notion of
+%% linear state.  A stateful linear node is characterized by
+%% \begin{equation} \nonumber
+%% \lambda=(({\mathbf A}_x, {\mathbf A}_s), ({\mathbf C}_x, {\mathbf C}_s), 
+%% ({\mathbf b}_x, {\mathbf b}_s))
+%% \end{equation}
+%% Each {\tt filter} in the stream graph contains a state vector
+%% ${\mathbf s}$ such that ${\mathbf y}$ at time $i$ and ${\mathbf s}$ at
+%% time $i+1$ is given by
+%% \begin{equation} \nonumber
+%% y_i={\mathbf A}_o{\mathbf x} + {\mathbf A}_s{\mathbf s}_i + {\mathbf b}_x
+%% \end{equation}
+%% \begin{equation} \nonumber
+%% {\mathbf s}_{i+1}={\mathbf C}_x{\mathbf x} + {\mathbf C}_s{\mathbf s}_i + {\mathbf b}_s
+%% \end{equation}
+%% The additon of stateful nodes allows us to describe a larger class of programs 
+%% using our linear analysis framework.
+%% Using linear state, our structure combination rules can be extended to include {\tt feedbackloops}.
+%% Examples of programs that exhibit stateful linear nodes are control systems
+%% and infinite impulse response (IIR) filters.
+
+%% Another promising avenue of research is to exploit matrix
+%% factorization in order to automatically derive fast implementations of
+%% large compuatations such as DSP transforms.  Matrix representations
+%% will also be useful for generating load-balanced parallel code in the
+%% StreamIt RAW backend~\cite{streamit-asplos}.  Finally, to increase the
+%% class of programs that would fit into our linear framework, the
+%% entries of the ${\mathbf A}$ and ${\mathbf b}$ of linear nodes could
+%% contain symbolic constants that are resolved at runtime.
+
+
+
+\section{Acknowledgements}
+
+We are very grateful to David Maze, Michal Karczmarek, Jasper Lin, and
+Michael Gordon for support with the StreamIt infrastructure.  The
+StreamIt project is supported by DARPA, NSF, and the MIT Oxygen
+Alliance.
+% Bibliography -- whee!
+\clearpage
+{\small
+
+\begin{thebibliography}{10}
+
+\bibitem{dynamo99}
+V.~Bala, E.~Duesterwald, and S.~Banerjia.
+\newblock Dynamo: A transparent dynamic optimization system.
+\newblock In {\em {PLDI}}, 1999.
+
+\bibitem{cousot78}
+P.~Cousot and N.~Halbwachs.
+\newblock Automatic discovery of linear restraints among variables of a
+  program.
+\newblock In {\em POPL}, 1978.
+
+\bibitem{covell-ade}
+M.~M. Covell.
+\newblock {\em An Algorithm Design Environment for Signal Processing}.
+\newblock PhD thesis, MIT, 1989.
+
+\bibitem{egner01automatic}
+S.~Egner, J.~Johnson, D.~Padua, M.~P{\"u}schel, and J.~Xiong.
+\newblock Automatic derivation and implementation of signal processing
+  algorithms.
+\newblock {\em SIGSAM Bulletin}, 35(2):1--19, 2001.
+
+\bibitem{frigo99fast}
+M.~Frigo.
+\newblock {A Fast Fourier Transform Compiler}.
+\newblock In {\em PLDI}, 1999.
+
+\bibitem{gordon-thesis}
+M.~Gordon.
+\newblock A stream-aware compiler for communication-exposed architectures.
+\newblock Master's thesis, MIT Laboratory for Computer Science, August 2002.
+
+\bibitem{streamit-asplos}
+M.~Gordon, W.~Thies, M.~Karczmarek, J.~Lin, A.~S. Meli, A.~A. Lamb, C.~Leger,
+  J.~Wong, H.~Hoffmann, D.~Maze, and S.~Amarasinghe.
+\newblock {A Stream Compiler for Communication-Exposed Architectures}.
+\newblock ASPLOS, 2002.
+
+\bibitem{spiral}
+J.~Johnson, R.~W. Johnson, D.~A. Padua, and J.~Xiong.
+\newblock {SPIRAL Home Page.}
+\newblock \verb+http://www.ece.cmu.edu/~spiral/+.
+
+\bibitem{johnson01searching}
+J.~Johnson, R.~W. Johnson, D.~A. Padua, and J.~Xiong.
+\newblock Searching for the best {FFT} formulas with the {SPL} compiler.
+\newblock {\em LNCS}, 2017, 2001.
+
+\bibitem{karczma-thesis}
+M.~A. Karczmarek.
+\newblock Constrained and phased scheduling of synchronous data flow graphs for
+  the streamit language.
+\newblock Master's thesis, MIT LCS, October 2002.
+
+\bibitem{karr76}
+M.~Karr.
+\newblock Affine relationships among variables of a program.
+\newblock {\em Acta Informatica}, pages 133--155, 1976.
+
+\bibitem{pca}
+J.~Lebak.
+\newblock {Polymorphous Computing Architecture (PCA) Example Applications and
+  Description}.
+\newblock External Report, Lincoln Laboratory, Mass. Inst. of Technology, 2001.
+
+\bibitem{raw-micro}
+{M.B. Taylor et. al }.
+\newblock The raw microprocessor: a computational fabric for software circuits
+  and general-purpose programs.
+\newblock {\em IEEE Micro}, 22(2):25--35, March/April 2002.
+
+\bibitem{oppenheim-symbolic}
+A.~V. Oppenheim and S.~H. Nawab, editors.
+\newblock {\em Symbolic and Knowledge-Based Signal Processing}.
+\newblock Prentice Hall, 1992.
+
+\bibitem{oppenheim-discrete}
+A.~V. Oppenheim, R.~W. Shafer, and J.~R. Buck.
+\newblock {\em Discrete-Time Signal Processing}.
+\newblock Prentice Hall, second edition, 1999.
+
+\bibitem{ryan92}
+S.~Ryan.
+\newblock Linear data flow analysis.
+\newblock {\em ACM SIGPLAN Notices}, 27(4):59--67, 1992.
+
+\bibitem{survey97}
+R.~Stephens.
+\newblock {A Survey of Stream Processing}.
+\newblock {\em Acta Informatica}, 34(7), 1997.
+
+\bibitem{ti-dsp-manual}
+{Texas Instruments}.
+\newblock {\em TMS320C54x DSP Reference Set}, volume 2: Mnemonic Instruction
+  Set.
+\newblock 2001.
+
+\bibitem{streamitcc}
+W.~Thies, M.~Karczmarek, and S.~Amarasinghe.
+\newblock {StreamIt: A Language for Streaming Applications}.
+\newblock In {\em {Proc. of the Int. Conf. on Compiler Construction (CC)}},
+  {2002}.
+
+\bibitem{whaley01automated}
+R.~C. Whaley, A.~Petitet, and J.~J. Dongarra.
+\newblock Automated empirical optimizations of software and the {ATLAS}
+  project.
+\newblock {\em Parallel Computing}, 27(1--2):3--35, 2001.
+
+\bibitem{xiong-thesis}
+J.~Xiong.
+\newblock {\em Automatic Optimization of DSP Algorithms}.
+\newblock PhD thesis, Univ. of Illinois at Urbana-Champaign, 2001.
+
+\bibitem{xiong01spl}
+J.~Xiong, J.~Johnson, R.~W. Johnson, and D.~A. Padua.
+\newblock {SPL}: A language and compiler for {DSP} algorithms.
+\newblock In {\em PLDI}, 2001.
+
+\end{thebibliography}
+}
+
+%\appendix
+\clearpage
+%\input{streamgraphs}
+\clearpage
+%\input{firscaling}
+\end{document}
