@@ -30,7 +30,7 @@ disqualify C as a portable machine language, since it fails to hide
 the architectural details from the programmer and it imposes
 abstractions which are a mismatch for the domain.
 
-In this paper, we describe a compiler for StreamIt: a high level
+In this paper, we describe a compiler for StreamIt, a high level
 stream language that aims to be portable across communication-exposed
 machines \cite{streamitcc}.  StreamIt contains basic constructs that
 expose the parallelism and communication of streaming applications
@@ -45,6 +45,17 @@ graph to a given network topology, and 3) scheduling, which generates
 a fine-grained static communication pattern for each computational
 element.  We consider this work to be a first step towards a portable
 programming model for communication-exposed architectures.
+
+This paper makes the following technical contributions:
+\begin{itemize}
+\item Filter fusion optimizations, horizontal fusion and vertical fusion, with and without peeking.
+\item A filter fission optimization.
+\item A graph reodering optimization.
+\item An algorithm for laying out a filter graph onto a tiled architecture.
+\item A communication scheduling algorithm that manages limited 
+communication and buffer resources.
+\item An implementation of an end-to-end compiler for parallelizing stream applications.
+\end{itemize}
 
 The rest of this paper is organized as follows.  Section
 \ref{sec:streamit} provides an introduction to StreamIt,
