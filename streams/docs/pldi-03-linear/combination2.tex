@@ -27,7 +27,7 @@ not describe here.
 \vspace{-12pt}
 \caption{Expanding a linear node to rates $(e', o', u')$.  }
 \label{fig:expanding-a-matrix}
-\vspace{-18pt}
+\vspace{-12pt}
 \end{figure}
 
 In StreamIt programs, the input and output rate of each filter in the
@@ -90,7 +90,7 @@ $u'$-element row vector:
 %
 \mathbf{A'} & = & \sum_{m=0}^{\lceil u' / u \rceil} \mt{shift}(u'- u -m*u, e'-e-m*o) \\ ~ \vspace{-4pt} \\
 %
-\vec{\mathbf{b}}'[j] & = & {\vec b}[u-1-(u'-j-1)~\mt{mod}~u]
+\vec{\mathbf{b}}'[j] & = & {\vec b}\hspace{1pt}[u-1-(u'-j-1)~\mt{mod}~u]
 %%
 %% \raisebox{-14pt}{\parbox{3in}{is created by starting with a zero
 %% matrix with $e'$ rows and $u'$ columns.  $A$ is then copied $k$ times
@@ -103,12 +103,13 @@ $u'$-element row vector:
 
 The intuition behind linear expansion is straightforward (see
 Figure~\ref{fig:expanding-a-matrix}.)  Linear expansion aims to scale
-the push, pop, and peek rates of a linear node while preserving the
+the peek, pop and push rates of a linear node while preserving the
 functional relationship between the values pushed and the values
-peeked on a given execution.  To do this, we construct a new matrix
-$A'$ that contains copies of $A$ along the diagonal.  To account for
-items that are popped between invocations, each copy of $A$ is offset
-by $o$ from the previous copy.  The complexity of the definition is
+peeked on a given execution. To do this, we construct a new matrix
+$A'$ that contains copies of $A$ along the diagonal starting from the 
+bottom right.  To account for items that are popped between invocations, 
+each copy of $A$ is offset by $o$ from the previous copy. 
+The complexity of the definition is
 due to the end cases.  If the new push rate $u'$ is not a multiple of
 the old push rate $u$, then the last copy of $A$ includes only some of
 its columns.  Similarly, if the new peek rate $e'$ exceeds that which
@@ -136,10 +137,10 @@ satisfy this condition.
 %\vspace{-12pt}
 %\end{figure}
 
-The {\tt pipeline} construct is used to compose streams in sequence,
+The {pipeline construct is used to compose streams in sequence,
 with the output of stream $i$ connected to the input of stream $i+1$.
 The following transformation describes how to collapse two linear
-nodes in a {\tt pipeline}; it can be applied repeatedly to collapse
+nodes in a pipeline; it can be applied repeatedly to collapse
 any number of neighboring linear nodes.
 
 \begin{transformation} (Pipeline combination)
@@ -230,56 +231,56 @@ Section~\ref{sec:partitioning}).
 \end{figure}
 
 Figure~\ref{fig:example-pipeline-combination} illustrates the 
-combination of a serial combination of two FIR filters. Since
+combination of back to back FIR filters. Since
 the push rate of the first filter, ($u_1=1$) is not the same as
-the peek rate of the second ($e_2=3$). Therefore, the first filter
+the peek rate of the second ($e_2=3$, the first filter
 must be expanded to $\lambda_1^e = \mt{expand}(\lambda_1,4,1,3)$.
 There is no need to expand the second filter so 
-$\lambda_2^e = \lambda_2$. By construction, we can form the
+$\lambda_2^e = \lambda_2$. By construction, we can now form the
 matrix product of $A_1^e$ and $A_2^e$ which corresponds to the
 overall linear node matrix.
 
 \subsection{Collapsing Linear SplitJoins}
 
-The {\tt splitjoin} construct allows the StreamIt programmer to
+The splitjoin construct allows the StreamIt programmer to
 express explicitly parallel computations.  Data elements that arrive
-at the {\tt splitjoin} are directed to the parallel child streams
-using one of two pre-defined {\tt splitter} constructs: 1) duplicate,
+at the splitjoin are directed to the parallel child streams
+using one of two pre-defined splitter constructs: 1) duplicate,
 which sends a copy of each data item to all of the child streams, and
 2) roundrobin, which distributes items cyclically according to an
 array of weights.  The data from the parallel streams are
-combined back into a single stream by means of a roundrobin {\tt
-joiner} with an array of weights $w$.  First, $w_0$ items from the
+combined back into a single stream by means of a roundrobin 
+joiner with an array of weights $w$.  First, $w_0$ items from the
 output tape of the leftmost child are placed onto the overall output
 tape, then $w_1$ elements are taken from the second leftmost child,
 and so on.  The process repeats itself after one complete set of
 $\sum_{i=0}^{N-1} w_i$ elements has been pushed.
 
-In this section, we demonstrate how to collapse a {\tt splitjoin} into
+In this section, we demonstrate how to collapse a splitjoin into
 a single linear node when all of its children are linear nodes.  Since
-the children of {\tt splitjoin}s in StreamIt can be parameterized, it
+the children of splitjoins in StreamIt can be parameterized, it
 is often the case that all sibling streams are linear if any one of
-them is linear.  However, if a {\tt splitjoin} contains only a few
+them is linear.  However, if a splitjoin contains only a few
 adjacent streams that are linear, then these streams can be combined
 by wrapping them in a hierarchical splitjoin and then collapsing the
 wrapper completely.  Our technique also assumes that each 
-{\tt splitjoin} admits a valid steady-state schedule; this property is
+splitjoin admits a valid steady-state schedule; this property is
 verified by the StreamIt semantic checker.
 
 \begin{figure}[t]
 \center
 \epsfxsize=3.2in
 \epsfbox{images/splitjoin-combination.eps}
-\caption{Matrix resulting from combining a {\tt splitjoin} of rate matched sub streams.
+\caption{Matrix resulting from combining a splitjoin of rate matched sub streams.
 \protect\label{fig:splitjoin-duplicate-matrix}}
 \vspace{-12pt}
 \end{figure}
 
-Our analysis distinguishes between two cases.  For duplicate
+Our analysis distinguishes between two cases. For duplicate
 splitters, we directly construct a linear node from the child streams.
-For roundrobin splitters, we translate the {\tt splitjoin} to use a
-duplicate splitter and then rely on the first analysis to construct a
-linear node.  We describe these translations below.
+For roundrobin splitters, we translate the splitjoin to use a
+duplicate splitter and then rely on the first transformation to construct 
+the overall linear node.  We describe these translations below.
 
 \subsubsection{Duplicate Splitter}
 
@@ -316,23 +317,27 @@ $\mbox{\bf splitjoin}(s)$ $=$ $ \{ \mathbf{A}',$ $\vec{\mathbf{b}}',$ $\mathbf{e
 $\mathbf{o}',$ $\mathbf{u}'\}$ represents an equivalent node that can
 replace the entire stream $s$.  Its components are as follows:
 \begin{equation} \nonumber
-\begin{array}{rcl}
-\mt{joinRep} & = & \mt{lcm}(\frac{\mt{lcm}(u_0,w_0)}{w_0}, \dots, \frac{\mt{lcm}(u_{n-1},w_{n-1})}{w_{n-1}}) \\
-\mt{maxPeek} & = & \mt{max}_i (o_i * \mt{rep}_i + e_i - o_i) \\ ~ \vspace{-2pt} \\
-\multicolumn{3}{l}{\forall k \in [0, n-1]:} \\ ~ \vspace{-6pt} \\
-\mt{wSum}_k & = & \sum_{i=0}^{k-1} w_i \\ ~ \vspace{-6pt} \\
-\mt{rep}_k & = & \frac{w_k * \mt{joinRep}}{u_k} \\ ~ \vspace{-6pt} \\
-\lambda_k^e & = & \mt{expand}(\lambda_k, \mt{maxPeek}, 
-                              o_k * \mt{rep}_k, u_k * \mt{rep}_k) \\ ~ \vspace{-2pt} \\
-\multicolumn{3}{l}{\forall k \in [0, n-1], \forall m \in [0, joinRep-1], \forall n \in [0, u_k-1]:} \\ ~ \vspace{-6pt} \\
-\multicolumn{3}{l}{\mathbf{A}'[*, u'-1-n - m * \mt{wSum}_{n}-\mt{wSum}_{k}] = 
-  A_{k}^e [*,u_k^e-1-n]} \\ ~ \vspace{-6pt} \\
-\multicolumn{3}{l}{\vec{\mathbf{b}}'[u'-1-n - m * \mt{wSum}_{n}-\mt{wSum}_{k}] = 
-  b_{k}^e [u_k^e-1-n]} \\ ~ \vspace{-2pt} \\
-\mathbf{e}' & = & e_0^e = \dots = e_{n-1}^e \\
-\mathbf{o}' & = & o_0^e = \dots = o_{n-1}^e \\
-\mathbf{u}' & = & \mt{joinRep} * \mt{wSum}_n \\
-\end{array}
+  \begin{array}{rcl}
+    \mt{joinRep} & = & \mt{lcm}(\frac{\mt{lcm}(u_0,w_0)}{w_0}, \dots, \frac{\mt{lcm}(u_{n-1},w_{n-1})}{w_{n-1}}) \\
+    \mt{maxPeek} & = & \mt{max}_i (o_i * \mt{rep}_i + e_i - o_i) \\ ~ \vspace{-2pt} \\
+    \multicolumn{3}{l}{\forall k \in [0, n-1]:} \\ ~ \vspace{-6pt} \\
+    \mt{wSum}_k & = & \sum_{i=0}^{k-1} w_i \\ ~ \vspace{-6pt} \\
+    \mt{rep}_k & = & \frac{w_k * \mt{joinRep}}{u_k} \\ ~ \vspace{-6pt} \\
+    \lambda_k^e & = & \mt{expand}(\lambda_k, \mt{maxPeek}, 
+    o_k * \mt{rep}_k, u_k * \mt{rep}_k) \\ ~ \vspace{-2pt} \\
+    \multicolumn{3}{l}{
+      \forall k \in [0, n-1], 
+      \forall m \in [0, joinRep-1], 
+      \forall p \in [0, u_k-1]:
+    } \\ ~ \vspace{-6pt} \\
+    \multicolumn{3}{l}{\mathbf{A}'[*, u'-1-p - m * \mt{wSum}_{n}-\mt{wSum}_{k}] = % should this be wSum_{k-1}? 
+      A_{k}^e [*,u_k^e-1-p]} \\ ~ \vspace{-6pt} \\
+    \multicolumn{3}{l}{\vec{\mathbf{b}}'[u'-1-p - m * \mt{wSum}_{n}-\mt{wSum}_{k}] = 
+      b_{k}^e [u_k^e-1-p]} \\ ~ \vspace{-2pt} \\
+    \mathbf{e}' & = & e_0^e = \dots = e_{n-1}^e \\
+    \mathbf{o}' & = & o_0^e = \dots = o_{n-1}^e \\
+    \mathbf{u}' & = & \mt{joinRep} * \mt{wSum}_n \\
+  \end{array}
 \end{equation}
 \end{transformation}
 
@@ -355,9 +360,9 @@ the order of the columns of $A$ generates the correct output value
 order.  Though the equation is somewhat cumbersome, the concept is
 simple (see Figure~\ref{fig:splitjoin-duplicate-matrix}).  The
 equation can be understood as follows: for the $k$th child and the
-$m$th cycle of the joiner, the $n$th item that is pushed by child $k$
+$m$th cycle of the joiner, the $p$th item that is pushed by child $k$
 will appear at a certain location on the joiner's output tape.  This
-location (relative to the start of the node's execution) is $n + m *
+location (relative to the start of the node's execution) is $p + m *
 \mt{wSum}_n + \mt{wSum}_k$, as the reader can verify.  But since the
 right-most column of each array $A$ holds the first item to be pushed,
 we need to subtract this location from the width of $A$ when we are
@@ -370,11 +375,11 @@ exactly once.  The procedure for $b$ is analogous.
 Finally, it remains to calculate the peek, pop, and push rates of the
 combined node.  The peek rate $e'$ is simply $maxPeek$, which we
 defined to be equivalent for all the expanded child nodes.  The push
-rate $\mt{joinRep}*\mt{wSum}_m$ is equivalent to the number of items
+rate $\mt{joinRep}*\mt{wSum}_n$ is equivalent to the number of items
 processed through the joiner in one steady-state execution.  Finally,
 for the pop rate we rely on the fact that the splitjoin is well-formed
 and admits a schedule in which no buffer grows without bound.  If this
-is the case, then the $\mt{pop}$ rates must be equivalent for all the
+is the case, then the pop rates must be equivalent for all the
 expanded streams; otherwise, some outputs of the splitter would
 accumulate infinitely on the input channel of some stream.  
 
