@@ -1,0 +1,27 @@
+\begin{figure}
+\centering
+\psfig{figure=beam-graph.eps,width=3.2in}
+\caption{Stream graph of the Radar Application consisting of 12
+channels and 4 beams. The non-linear filters are colored black. 
+\label{fig:beam-graph}}
+\end{figure}
+
+\section{Motivating Example}
+To elucidate the phases of compilation, consider the stream graph
+given in Figure \ref{fig:beam-graph}.  The stream graph represents our
+Radar application which implements a radar array front-end \cite{pca}.
+The stream graph shows how the application was decomposed by the
+programmer into filters and how these filters are connected.  The
+application is composed of two splitjoins.  The top splitjoin gathers
+input from a set of parallel channels, with FIR filters to delay each
+channel by a different amount.  Each pipeline of the top splitjoin is
+linear.  The bottom slipjoin steers the channels into a set of beams
+with a detector to sense if the signal exceeds a given threshold.  
+The Magnitude filter at the bottom stage is non-linear.  
+
+\begin{itemize}
+\item Flattening: all outputs of top stage communicate to all inputs
+of bottom stage.
+\item Show Traces that are extracted.
+\item Show where / when each trace executed
+\end{itemize}

@@ -63,6 +63,8 @@ deliver a value from the ALU of one tile to the ALU of a neighboring
 tile in 3 cycles, or more generally, 2+N cycles for an inter-tile
 distance of N hops.
 
+{\bf Add a description of Raw off-chip I/O.}
+
 The results of this paper were generated using btl, a cycle-accurate
 simulator that models arrays of Raw tiles identical to those in the
 .15 micron 16-tile Raw prototype ASIC chip.  With a target clock rate
@@ -75,9 +77,3 @@ is three cycles, as is the load latency. The compute processor's
 pipelined single-precision FPU operations have a latency of 4 cycles,
 and the integer multiplier has a latency of 2 cycles.
 
-\begin{figure}
-\centering
-\psfig{figure=beam-graph.eps,width=3.2in}
-\caption{Stream graph of the Radar Application consisting of 12
-channels and 4 beams. \label{fig:beam-graph}}
-\end{figure}

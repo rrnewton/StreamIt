@@ -1,2 +1,76 @@
 \section{Code Generation}
 \label{sec:codegen}
+In this section we consider low-level code generation for the Raw
+microprocessor. Each Raw tile is an amalgam of the filters that
+execute on it. As we step through the schedule for each stage of
+execution, we append the communication and computation code to the
+compute and switch processors considering the multiplicity of the
+filter in each stage.
+
+
+* For the initialization and priming stage iteration over the stream
+graph preserving the data-dependencies of the graph.
+
+* For the steady-state: iterate over the schedule as calculated by the trace scheduling
+algorithm of Section \ref{sec:scheduling}.
+
+* static network!
+
+\subsection{Inter-Trace Data Reorganization}
+* * Raw's incredible IO bandwidth!
+* overview of data-reorganization
+* DRAM instructions...
+* DRAM synchronization...
+* Port multiplexing and off-chip I/O
+* prime pump buffer selection
+
+\subsection{Intra-Trace Code Generation}
+When we visit a trace in the schedule for each execution phase, we
+iterate over the filters that compose the trace generating 
+communication and computation code necessary to execute the trace.
+
+\subsubsection{Compute Processor}
+For linear traces, we generate parameterized, template assembly code
+for both computation and communication as described in Section
+\ref{sec:linear}.  As for non-linear traces we generate C code that is
+compiled using Raw's GCC 3.3 port.  Each compute processor begins by
+calling the {\tt init} function of all the filters mapped to it.  Next,
+it executes the {\tt work} of each filter in the sequence determined
+by the traversal of the schedule of each execution phase.
+The translation of the {\tt init} function, {\tt work} functions, and
+any helper function is for the large part straightforward.  Most
+StreamIt expression have direct analogs in C except for the channel
+expressions {\tt push()}, {\tt peek(index)} and {\tt pop()}.
+
+One major benefit of StreamIt over other streaming languages is that
+the StreamIt compiler is responsible for input buffer management.  The
+programmer is free to call {\tt pop()} or {\tt peek(index)} without
+having to worry about the structure of the buffer or updating the
+buffer's index variable after each execution of the work function.
+Currently, we classify filters as one of three types with respect to
+buffer management: 
+\begin{enumerate}
+\item If a filter does not peek and there does not exist
+control-flow dependent channel expressions, then a buffer is not needed
+and {\tt pop()} statements are translated directly into static network
+receives.  Their exists other initialization considerations which are
+beyond the scope of this paper.
+\item If there exists peek statements, but $peek = pop$ then we can
+use a simple linear buffer that is reset after each work function execution.
+\item Otherwise, when $peek > pop$, we use a circular buffer to account for the data
+remaining on the channel after the work function invocation.
+\end{enumerate}
+Each {\tt push()} statement is translated directly into a static
+network send.  
+
+\subsubsection{Switch Processor}
+The intra-trace computation code is rather simple.  As mentioned in
+Section \ref{sec:traces}, individual traces are limited to pipelines,
+thus we do not have to worry about data-reorganization within a trace.
+While executing a trace a tile receives its data from the
+neighboring tile mapped to its upstream filter and sends data to the
+neighboring tile mapped to its downstream filter.  The end-points of a
+trace send or receive their data to or from off-chip.  We route the
+items off the side of the chip and generate the necessary port
+multiplexing and/or DRAM instructions as described above.
+
