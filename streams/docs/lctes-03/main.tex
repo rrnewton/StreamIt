@@ -8,17 +8,38 @@
 %\documentclass[10pt,singlespace,twoside,openany,largemargin]{mitthesis} \pagestyle{drafthead}
 %\pagestyle{drafthead}
 
-\documentclass[runningheads,roman]{sig-alt-full}
+\documentclass{sig-alternate}
 
 %\usepackage{lgrind}
 \usepackage{verbatim}
 \usepackage{epsfig, graphicx}
 \usepackage{enumerate}
-\usepackage{fullpage}
+%\usepackage{fullpage}
 %\usepackage{doublespace}
 %\setstretch{1.05}
 %\usepackage{algorithm}
 %\usepackage{algorithmic}
+
+ \toappear{
+ %\raisebox{2pt}[2pt]{\underline{~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}} \\
+ %$^*$ More information on the StreamIt project is available from
+ %\texttt{http://compiler.lcs.mit.edu/streamit} \\
+   \rule{0cm}{0cm}\\\hrule\rule{0cm}{0cm} ~ \\ \vspace{-6pt} ~ \\
+ \parbox[b]{20pc}{\baselineskip 9pt
+ Permission to make digital or hard copies of all or part of this work
+ for personal or classroom use is granted without fee provided that
+ copies are not made or distributed for profit or commercial advantage
+ and that copies bear this notice and the full citation on the first
+ page.  To copy otherwise, to republish, to post on servers or to
+ redistribute to lists, requires prior specific permission and/or a
+ fee.} \par
+ {\it LCTES'03}, June 11--13, 2003, San Diego, California, USA. \par
+ Copyright 2003 ACM 1-58113-647-1/03/0006 ...\$5.00 \\ ~ \\ ~ \\
+}
+
+\conferenceinfo{LCTES'03,} {June 11--13, 2003, San Diego,California, USA.}
+\CopyrightYear{2003}
+\crdata{1-58113-647-1/03/0006}
 
 %\pagestyle{plain}
 \newtheorem{theorem}{Theorem}
@@ -33,18 +54,19 @@
 %\mainmatter
 
 \title{Phased Scheduling of Stream Programs}
-\author{Michal Karczmarek, William Thies and Saman
-Amarasinghe \\
-Laboratory for Computer Science \\
-Massachusetts Institute of Technology \\
-\texttt{\{karczma, thies, saman\}@lcs.mit.edu} \vspace{-24pt}}
+\numberofauthors{1}
+\author{
+\alignauthor \vspace{-18pt}
+Michal Karczmarek, William Thies and Saman Amarasinghe \\
+	\vspace{8pt}
+	\large\texttt{\{karczma, thies, saman\}@lcs.mit.edu} \\
+	\vspace{8pt}
+	Laboratory for Computer Science \\
+	Massachusetts Institute of Technology}
+
 \date{}
 
 \begin{document}
-\conferenceinfo{LCTES'03,} {June 11--13, 2003, San Diego,California, USA.}
-\CopyrightYear{2003}
-\crdata{1-58113-647-1/03/0006}
-
 \maketitle
 
 \input{commands}
@@ -52,27 +74,10 @@ Massachusetts Institute of Technology \\
 \vspace{0.1in}
 
 \begin{abstract}
-Applications structured around some notion of a ``stream'' are
-becoming increasingly important and widespread. \cite{Rix98}
-provides evidence that streaming media applications are already
-consuming most of the cycles on consumer machines, and their use
-is continuing to grow. The streaming computation model is
-pervasive and ranges from small, embedded systems (ex. cell
-phones) to large, computationally powerful machines (ex. cell base
-stations). In this paper, we describe a novel technique for
-scheduling execution of synchronous data flow streaming
-applications exhibiting hierarchical properties. A vital aspect in
-compiling such programs is finding an efficient schedule. The
-technique presented here focuses on producing schedules that are
-optimized for the amount of space required for buffering and
-storing the schedule. A wide variety of real-life applications and
-a few synthetic applications are surveyed. Applications benefit
-from an average 14.5\% decrease in buffer requirements, with a
-peak of 93\% savings in buffer size. No application requires more
-space than the most popular technique used today (Single
-Appearance Scheduling).
+\input{abstract}
 \end{abstract}
 
+\input{categories}
 %\input{cover}
 %\input{contents}
 \input{intro}

@@ -65,7 +65,7 @@ replaced with references to the one copy.
 
 This optimization lead to improvements in schedule size for two
 reasons. First, operators now had less phases, so their schedules
-took up less space. Second, applications using the phasing
+took up less space. Second, applications using the phased
 schedules could now execute the same phase multiple times in a
 row, which was optimized out using run length encoding.
 
@@ -85,7 +85,7 @@ scheduling, because they do not produce any data. Thus any
 schedule of a sink operator is a minimal latency schedule. This
 leads to the minimal latency schedule of the outer-most
 {\pipeline} becoming a single appearance schedule, thus destroying
-some of the benefit of using phasing scheduling. The technique
+some of the benefit of using phased scheduling. The technique
 used for scheduling {\pipeline} sinks has been discussed in
 \cite{karczma-thesis}.
 
@@ -181,7 +181,7 @@ necessary for execution.  Namely, CD-DAT decreases from 1021 to
 72, a 93\% improvement. \cite{murthy99buffer} reports a buffer
 size of 226 after applying buffer merging techniques. Our
 improvement is due to reducing the combinatorial growth of the
-buffers using phasing scheduling.
+buffers using phased scheduling.
 
 Our synthetic benchmarks decrease from 7168 to 4864 and from 19964
 to 12063, a 32\% and 40\% improvements. The first improvement is
@@ -199,5 +199,5 @@ space.
 
 It is interesting to note that for some applications the schedule
 sizes have decreased between the single appearance and compressed
-minimal latency phasing schedules. This is due to slightly
+minimal latency phased schedules. This is due to slightly
 different encoding technique of single appearance schedules.

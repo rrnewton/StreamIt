@@ -1,5 +1,37 @@
-\section{General {\StreamIt} Scheduling Concepts}
+\section{StreamIt Scheduling Concepts}
 \label{chpt:sched-basic}
+
+This section introduces the general concepts used for scheduling
+{\StreamIt} programs.  Concepts presented here are common with other
+languages \cite{ptolemyoverview} \cite{esterel92} \cite{lustre}.
+
+Section \ref{sec:exec-model} presents the {\StreamIt} execution
+model. Section \ref{sec:steady-state} introduces the concept of a
+steady state and shows how to calculate it. Section
+\ref{sec:init-peeking} explains the need for initialization of
+{\StreamIt} program. Section \ref{sec:general:schedules} introduces
+simple notation for expressing schedules while Section
+\ref{sec:sched-vs-buffer} presents the tradeoff between schedule
+and buffer storage requirements.
+
+\subsection{{\StreamIt} execution model}
+\label{sec:exec-model}
+
+A {\StreamIt} program is represented by a directed graph, $G = (N,
+E)$.  A node in $G$ is either a {\filter}, a {\splitter} or a
+{\joiner}. Edges in $G$ represent data {\Channels}.  Each node in
+$G$ takes data from its {\Input} {\Channel}(s), processes this data,
+and puts the result on the {\Output} {\Channel}(s).  Each data
+{\Channel} is simply a FIFO queue.
+
+In order for a {\filter} $f$ to execute, it must have at least $e_f$
+data on its {\Input} {\Channel}. After its execution it will decrease
+amount of data on its {\Input} {\Channel} by $o_f$ and increase the
+amount of data on its {\Output} {\Channel} by $u_f$. Similarly, a
+{\splitter} will consume $o_s$ data from its {\Input} {\Channel} and
+push $w_{s,i}$ data into each of its {\Output} {\Channels}, while a
+{\joiner} will consume $w_{j,i}$ data from its {\Input} {\Channels} and
+push $u_j$ onto its {\Output} {\Channel}.
 
 \begin{figure}
 \begin{center}
@@ -29,39 +61,6 @@ for clarity; $peek_L = pop_L = 5$ $push_L = 6$, $delay_{fl} = 9$}
 \label{fig:steady-state}
 \end{center}
 \end{figure}
-
-This section introduces the general concepts used for scheduling
-{\StreamIt} programs.  Concepts presented here are common with
-other languages \cite{ptolemyoverview} \cite{esterel92}
-\cite{lustre}.
-
-Section \ref{sec:exec-model} presents the {\StreamIt} execution
-model. Section \ref{sec:steady-state} introduces the concept of a
-steady state and shows how to calculate it. Section
-\ref{sec:init-peeking} explains the need for initialization of
-{\StreamIt} program. Section \ref{sec:general:schedules} introduces
-simple notation for expressing schedules while Section
-\ref{sec:sched-vs-buffer} presents the tradeoff between schedule
-and buffer storage requirements.
-
-\subsection{{\StreamIt} execution model}
-\label{sec:exec-model}
-
-A {\StreamIt} program is represented by a directed graph, $G = (N,
-E)$.  A node in $G$ is either a {\filter}, a {\splitter} or a
-{\joiner}. Edges in $G$ represent data {\Channels}.  Each node in
-$G$ takes data from its {\Input} {\Channel}(s), processes this data,
-and puts the result on the {\Output} {\Channel}(s).  Each data
-{\Channel} is simply a FIFO queue.
-
-In order for a {\filter} $f$ to execute, it must have at least $e_f$
-data on its {\Input} {\Channel}. After its execution it will decrease
-amount of data on its {\Input} {\Channel} by $o_f$ and increase the
-amount of data on its {\Output} {\Channel} by $u_f$. Similarly, a
-{\splitter} will consume $o_s$ data from its {\Input} {\Channel} and
-push $w_{s,i}$ data into each of its {\Output} {\Channels}, while a
-{\joiner} will consume $w_{j,i}$ data from its {\Input} {\Channels} and
-push $u_j$ onto its {\Output} {\Channel}.
 
 \begin{comment}
 Each {\filter} node $n_f$ has exactly one incoming edge and one
@@ -398,104 +397,3 @@ node A once, node B twice, node C two times, node B three times
 and node C twice again, in that order. In order to shorten the
 above schedule we can run-length encode it.  The schedule becomes
 $\{A \{2B\}\{2C\}\{3B\}\{2C\}\}$.
-
-\subsection{Schedule Size vs. Buffer Size}
-\label{sec:sched-vs-buffer}
-
-\begin{comment}
-\begin{figure}
-\begin{center}
-
-\psfig{figure=pipeline-buffers.eps,width=0.6in} \caption[4 {\filter}
-{\pipeline}]{Sample 4 {\filter} {\pipeline}.  This {\pipeline} is
-the same as one in Figure \ref{fig:steady-state} (a), except that
-its children do not peek extra data} \label{fig:pipeline-buffers}
-\end{center}
-\end{figure}
-\end{comment}
-
-When creating a schedule, two very important properties of it are
-schedule size and amount of buffering required.  Schedule size
-depends on encoding the schedule in an efficient way, while amount
-of space required depends only on order of execution of nodes. The
-two are related, however, because order of execution of {\filters}
-affects how efficiently the schedule can be encoded.
-
-For example, execution of {\filters} in {\pipeline} depicted in
-Figure \ref{fig:steady-state} can be ordered in two simple ways,
-one resulting in a large schedule but minimal amount of buffering,
-the other resulting in a small schedule but a large amount of
-buffering.
-
-The steady schedule of the {\pipeline} in Figure
-\ref{fig:steady-state}(a) executes {\filter} $A$ 4 times,
-{\filter} $B$ 6 times, {\filter} $C$ 9 times and {\filter} $D$ 3
-times. Writing out a schedule that requires minimal buffering
-results in schedule $\{AB\{2C\}BCDAB\{2C\}ABCDB\{2C\}ABCD\}$. This
-schedule requires a buffer for 4 data items between {\filters} $A$
-and $B$, 4 items between $B$ and $C$ and 3 items between $C$ and
-$D$, resulting in total buffers size 11, assuming data items in
-all buffers require the same amount of space. The schedule itself
-has 18 entries.
-
-To compare, writing the schedule in the most compact method we get
-$\{4A\}\{6B\}\{9C\}\{3D\}$  This schedule requires a buffer for 12
-data items between {\filters} $A$ and $B$, 18 items between $B$
-and $C$, and 9 data items between $C$ and $D$, resulting in total
-buffers size 39.  The schedule has 4 entries.
-
-Even on such a small example, it is easy to see that the encoding
-scheme for a schedule has an immense influence over the amount of
-space necessary to store the buffered data and the schedule.
-
-\begin{comment}
-We can compare the storage efficiency of these two schedules by
-assuming that one data item in a buffer requires $x$ amount of
-memory and each entry in a schedule requires $y$ amount of memory.
-Thus the two schedules will require the same amount of storage to
-store themselves and execute if $11 x + 18 y = 39 x + 4 y$.
-
-\begin{displaymath}
-\begin{array}{rcl}
-11 x + 18 y & = & 39 x + 4 y \\
-14 y & = & 28 x \\
-y & = & 2x
-\end{array}
-\end{displaymath}
-
-Thus the smaller schedule is more efficient if every data item
-requires less than twice the amount of storage than every entry in
-the schedule.
-
-One of the difficulties in scheduling {\StreamIt} programs lies in
-finding a good set of trade-offs between schedule size and
-buffering requirements.
-\end{comment}
-
-\begin{comment}
-
-\subsection{Minimum Buffer Size between {\filters}}
-
-As illustrated above, the amount of buffering in a {\pipeline} can
-be affected greatly by the order of executions of {\filters} in the
-{\pipeline}.  The following equation calculates the minimal buffer
-size required in order for two {\filters} to be able to push data
-between each other indefinitely in the most buffer-efficient way.
-Buffers this size cannot always be achieved, because some
-components require that data be buffered up for execution (ex.
-{\feedbackloops} require data to exist internally in order to
-execution to advance) or because extra latency constrains require
-additional buffering.
-
-\begin{equation}
-buffer_{A \to B} = \left\lceil {{peek_B} \over {\gcd(push_A,
-pop_B)}} - 1 \right\rceil \gcd (push_A, pop_B) + push_A
-\end{equation}
-
-\emph{I can explain this equation, but I cannot prove it.  what
-should I do with this?  it's not necessary for the thesis, but it
-is a neat result we never published (PLDI submission), nor have I
-seen it in any other papers (nobody does peeking, so it can't be
-anywhere else)}
-
-\end{comment}

@@ -776,7 +776,7 @@
 \def\@category#1#2#3[#4]{%
     \begingroup
         \let\and\relax
-            #1 [\textbf{#2}]%
+            #1 [{\bf #2}]%
             \if!#4!%
                 \if!#3!\else : #3\fi
             \else
