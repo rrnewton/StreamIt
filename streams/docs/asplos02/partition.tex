@@ -125,14 +125,18 @@ value on the partitioning phase of a stream compiler.
 \begin{minipage}{3.1in}
 \psfig{figure=beam-blood-orig.eps,width=3in}
 \vspace{-12pt}
-\caption{\protect\small Blocking diagram for BeamFormer before load balancing.
+\caption{\protect\small Blocking diagram for BeamFormer before load
+balancing.  The dark bands indicate periods where processors are
+blocked waiting to receive an input or send an output.  Light regions
+indicate periods of useful work.
 \protect\label{fig:fmblood1}}
 \end{minipage}
 \hspace{0.3in}
 \vspace{-12pt}
 \begin{minipage}{3.1in}
 \psfig{figure=beam-blood-opt.eps,width=3in}
-\caption{\protect\small Blocking diagram for the load-balanced partitioning of BeamFormer.
+\caption{\protect\small Blocking diagram for the load-balanced
+partitioning of BeamFormer.  Colors have the same meaning as in Figure~\ref{fig:fmblood1}
 \protect\label{fig:fmblood2}}
 \end{minipage}
 \vspace{-6pt}
