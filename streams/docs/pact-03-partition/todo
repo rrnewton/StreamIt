@@ -6,7 +6,8 @@ paper:
 replacing "sum" with a generic operator * and then defining * to be +
 in the case of just summing, but + with a threshold otherwise... also
 modify traceback, e.g., to pick a given cost with the FEWEST number of
-nodes.
+nodes.  (can do this by just repeatedly calling with 1, 2, ... N until
+you get the same cost at the top level).
 
 theoretical:
 
