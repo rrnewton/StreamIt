@@ -53,3 +53,55 @@ solution to this problem is described below.
 
 \subsection{Raw's Communication Scheduler}
 
+The communication scheduling phase of the StreamIt Compiler maps
+StreamIt's channel abstraction to Raw's static network.  As mentioned
+in section 55, Raw's static network provides optimized, nearest
+neighbor communication.  Tiles communicate using buffered, blocking
+sends and receives.  It is the compiler's responsibility to statically
+orchestrate the explicit communication of the stream graph.
+
+To statically orchestrate the communication of the stream graph, the
+communication scheduler simulates the firing of nodes in the stream
+graph, recording the communication as it simulates.  The simulation
+does not model the code of each Filter, instead it assumes that each
+Filter fires instantaneously.  The flow-control of the static network
+allows this relaxation.  Instead the simulator operates on the
+granularity of a data item.  Modeling the path each data item follows.
+
+We simulate the graph for both an initialization schedule and a steady
+state schedule, both are described in section ??.  A push model
+schedule is used for both phases.  We define a push model schedule as
+a schedule that advances computation on the furthest downstream node
+in the stream graph at each step.  The push model schedule allows the
+StreamIt compiler to drop the buffers that connect each neighboring
+node in the stream graph.  This is because data items will not be
+accumulating in the buffers.  Each destination will consume the data
+item as it is produced (modulo the latency of routing).
+
+To generate a push schedule we perform the following.  For each data
+item produced by the firing of a node, we perform the following
+simplified steps: 
+\begin{enumerate}
+\item Find the destination of the data item (non-trivial
+for Splitter Nodes) 
+\item Route the data item to its destination, appending the necessary communication instruction at the source,
+destination, and all intermediate hops 
+\item Check if any downstream node can fire, if so...  
+\end{enumerate}
+A Filter can fire (in the simulation) when its
+incoming buffer has more than pop items.  We describe the execution of
+Joiner nodes shortly.
+
+The simulation generates the communication instructions for the switch
+processor as it executes.
+
+To assure deadlock free execution of Joiner nodes, we must allow the
+Joiner nodes to receive data in the firing order of its upstream
+Filters (figure ??). To implement this abstraction, the Joiner must
+buffer data until it can fire in the order specified by its incoming
+weights.  First, remember that we collapse all neighboring Joiners
+into a single Joiner node.  For each collapsed Joiner node, we create
+a 'virtual' buffer for each incoming channel of the collapsed Joiner.
+During execution we record the order of receives and send from these
+virtual buffers.
+ 
