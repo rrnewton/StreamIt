@@ -192,6 +192,17 @@ interface message numbers and functions to be called.
 typedef message_fn *interface_table;
 @
 
+The file I/O filters provided by the StreamIt library have no external
+state; all of the internal state is kept in the context object.  To
+make the C-printing pass happy, though, there needs to be a container
+object with a [[context]] member.
+
+<<Other Types>>=
+typedef struct ContextContainer {
+  stream_context *context;
+} _ContextContainer, *ContextContainer;
+@
+
 \section{Function-Call Interface}
 
 <<Interface Functions>>=
@@ -387,9 +398,9 @@ context as a parameter.
 
 <<I/O Filters>>=
 stream_context *streamit_filereader_create(char *filename);
-void streamit_filereader_work(stream_context *c);
+void streamit_filereader_work(ContextContainer c);
 stream_context *streamit_filewriter_create(char *filename);
-void streamit_filewriter_work(stream_context *c);
+void streamit_filewriter_work(ContextContainer c);
 @
 
 \subsection{Starting the System}
@@ -639,8 +650,11 @@ ratios, the work function, the parent context, and the input and
 output tapes.  Note that two objects should point to any given tape,
 one reading from it and one writing to it.
 
+<<Forward Declarations>>=
+typedef struct stream_context stream_context;
+@
 <<struct [[stream_context]]>>=
-typedef struct stream_context {
+struct stream_context {
   void *stream_data;
   stream_type type;
   int peek_size, pop_size, push_size;
@@ -649,7 +663,7 @@ typedef struct stream_context {
   tape *input_tape;
   tape *output_tape;
   stream_type_data type_data;
-} stream_context;
+};
 @
 
 Contexts are created by [[create_context]], which takes a pointer to
@@ -687,6 +701,7 @@ typedef struct portal {
 #ifndef STREAMIT_H
 #define STREAMIT_H
 
+<<Forward Declarations>>
 <<Basic Types>>
 <<Opaque Types>>
 <<Interface Functions>>
