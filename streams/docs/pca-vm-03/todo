@@ -1,3 +1,197 @@
+pending
+-------
+
+minor:
+
+- still there is the issue of whether or not multiple kernels can run
+on a resource at the same time
+
+optional:
+- should convert everything to pseudocode and move to appendix
+- Peter will send me some initial stuff for 5
+
+- note that when you call a method with something that's not it's
+type, it finds constructor taking arg
+
+from me
+-------
+
+x think about how to remove the speaker from the final example
+
+from saman
+----------
+x not clear what in order, out of order, random access means
+
+from peter next day
+-------------------
+
+x have blocks, stream buffers
+x still ordered, unorderd, just plain block
+x is aliased = YES, has nonZeroStart = YES
+x poke is gone
+
+from peter
+----------
+
+x "architecture independent" is wrong name for pre-defined kernels
+
+x get rid of one-graph-per kernel restriction
+
+x for the totalLength, length thing, should have length of 0 before
+you run even with random access
+
+x it is fine to include send/receive in same graph, bridging across a
+processor-processor connection
+
+x you can execute as many predefined kernels on a processor as you
+want -- instead of having optional location for copy, etc.
+
+x class hierarchy graph, should make it clear there are three triangles
+
+x on push and pop, move the if statement up above the modifier
+  x bill should check that
+
+x instead of "output tape" say "output stream" in canPush, etc.
+
+x on dynamic rates, add a max value that is ALL by default
+
+x kernel restrictions, need one more restriction: (after the section
+heading) kernels may only call functions that also meet these
+restrictions
+
+x for StreamBuffer.getLength: should be just "Returns the number of
+live items in this buffer" [pseudocode is wrong, and can move to
+appendix]
+
+x reset should not call reset on child streams
+
+x finish(), should be terminate() instead
+
+x can't interact with running kernel!
+  - run() defined suspended, unstarted
+  - finish() defined suspended, unstarted, finished
+  - reset suspended, unstarted, finished
+
+x iters has to be >= 1, and before it calls any work function, it
+guarantees that it calls preWork on that kernel.
+
+x at most one USER-DEFINED kernel can be assigned to a processor 
+
+x concatanate constraints 5 & 6.  addresses and sizes within memory
+nodes ... are also resources.  Say "This includes the addresses and
+size arguments to stream"
+
+x swap the order of 5.2.4 and 5.2.5
+
+x scatter/gather, should have randomaccess ostream
+  x should have numberOfRecords instead of record size
+
+x copy: just does whole stream
+
+x stridedScatter, stridedGather
+
+x indexedScatter, indexedGather
+
+come back to:
+x postwork
+x larger issue: the business of buffering data to/from i/o devices
+  x how to deal with  suspension in the middle of a network operation.
+  x postWork, finished, don't know what's going on
+x simplifying the list of restrictions on stream control
+
+later
+-----
+
+x add special constructors for initializing fields of totalLength,
+end, start... er, how do you deal with reset in this case?  just
+dealing with length, totalLength returning capacity for a copy kernel.
+
+x decide what processor resource copy operations should execute on
+
+x think about graphs that contain kernels spread out across multiple
+processors
+
+----------------
+
+* Kernels are executable as individuals -- a kernel instance is
+analagous to a remote function call on a kernel processor.
+
+* Private kernel members are stored by the kernel processor. They are
+not sent to the kernel when it starts, and are discarded when the kernel
+is finished. For this reason, kernels cannot access private members or
+methods in their constructors nor can the user define new public kernel
+methods.
+
+* kernels have a property status, which can be UNSTARTED, RUNNING,
+SUSPENDED, or FINISHED.
+
+* preWork and postWork return a new status, which can be RUNNING,
+SUSPENDED, or FINISHED.
+
+* kernels have public methods: run(), getStatus(), wait(), and
+terminate()
+
+* run() takes a variable length list of kernels the kernel depends on.
+run(dependencies...) does the following:
+
+As far as the control thread is concerned:
+ Pack up the values of all public properties of the kernel and its
+dependencies, send them to the kernel  Set the status as seen by the
+control thread to RUNNING
+
+As far as the kernel is concerned:
+        Wait until status of every kernel in dependencies is FINISHED
+        Unpack the values of all public properties of the kernel
+        Do the following with the kernel:
+        If (status == UNSTARTED) {
+                status = prework();
+        } else if (status == SUSPENDED) {
+                status = RUNNING;
+        }
+        While (status == RUNNING) {
+                status = work();
+        }
+        If (status == FINISHED) {
+                postwork();
+        }
+        Pack up the "real values" of the kernel properities and status,
+send them to the control thread
+
+Notice that the kernel needs to internally call canPush() and canPop()
+if the HLC has not guaranteed that those will return.
+
+* getStatus() returns status of a kernel as seen by the control thread.
+
+* wait() waits for and then unpacks all public properties and status of
+the kernel produced by the last call to run().
+
+* terminate() is a best-effort way to kill a kernel. No properties are
+updated, nor is there any guarantee about at what point the kernel
+stops. The kernel's status is set to FINISHED.
+
+* A FINISHED kernel cannot be run.
+
+* At any given time, only kernel may be writing or reading a stream
+buffer unless said kernels are part of a graph. The length and
+totalLength of such a buffer is updated when that kernel's properties
+are updated.
+
+* Graphs serve to join kernels which concurrently share stream buffers
+for synchronization of those buffers by the low-level compiler, and have
+no other purpose.
+
+* Graphs have a constructor which takes a list of kernels (as per now),
+but no methods.
+
+* Kernels added to a graph must be UNSTARTED. A kernel can be added to
+at most one graph, and if it is added to a graph on any control path
+then it must be added to that graph along all control paths.
+
+* Within a graph, a stream buffer may have only one writer and one
+reader. The totalLength of such a buffer is updated whenever either the
+writer's or reader's public properties are updated (the length is not
+guaranteed to match reality until both are finished.)
+
 metadata
 --------
 
@@ -7,22 +201,3 @@ metadata
 
 - look at scalar operand networks for network characterization stuff
 
-streaming
-----------
-
-later
------
-
-- think about how to remove the speaker from the final example
-
-- note that when you call a method with something that's not it's
-type, it finds constructor taking arg
-
-- add special constructors for initializing fields of totalLength,
-end, start... er, how do you deal with reset in this case?  just
-dealing with length, totalLength returning capacity for a copy kernel.
-
-x decide what processor resource copy operations should execute on
-
-x think about graphs that contain kernels spread out across multiple
-processors

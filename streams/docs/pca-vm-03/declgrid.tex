@@ -1,34 +1,63 @@
-\newcommand{\lefttab}[1]{\begin{minipage}{0.4in}\begin{center}#1\end{center}\end{minipage}}
+\newcommand{\lefttab}[1]{\begin{minipage}{0.6in}\begin{center}#1\end{center}\end{minipage}}
 \begin{figure}[t]
+\hspace{-24pt}
+\begin{minipage}{6in}
 \begin{tabular}{c|c|c|c}
-~ &
-Out Of Order &
-In Order &
-Random Access
+~ & {\small Input} & {\small Output} & {\small Input and Output}
 \\ \hline
-\lefttab{Input}
+\lefttab{{\small Unordered \\ Stream}}
 &
-\begin{minipage}{2.1in}
+\begin{minipage}{1.95in}
   \scriptsize
   \begin{verbatim}
 
 template <class T>
-class IStreamOutOfOrder {
+class IStreamUnordered {
 public:
-  IStreamOutOfOrder(StreamBuffer<T> &s);
+  IStreamUnordered(StreamBuffer<T> &s);
   T pop();
   boolean canPop(int n);
 }
   \end{verbatim}
 \end{minipage}
 &
-\begin{minipage}{1.6in}
+\begin{minipage}{2.0in}
+  \scriptsize
+  \begin{verbatim}
+
+template <class T>
+class OStreamUnordered {
+public:
+  OStreamUnordered(StreamBuffer<T> &s);
+  void push(T& val);
+  boolean canPush(int n);
+}
+  \end{verbatim}
+\end{minipage}
+&
+\begin{minipage}{1.8in}
+  \scriptsize
+  \begin{verbatim}
+
+template <class T>
+class IOStreamUnordered : 
+       IStreamUnordered<T>, 
+       OStreamUnordered<T> {
+public:
+  IOStreamUnordered(StreamBuffer<T> &s);
+}
+  \end{verbatim}
+\end{minipage}
+\\ \hline
+\lefttab{{\small Ordered \\ Stream}}
+&
+\begin{minipage}{1.95in}
   \scriptsize
   \begin{verbatim}
 
 template <class T>
 class IStream : 
-      IStreamOutOfOrder<T> {
+      IStreamUnordered<T> {
 public:
   IStream(StreamBuffer<T> &s);
   T peek(int index);
@@ -36,81 +65,20 @@ public:
   \end{verbatim}
 \end{minipage}
 &
-\begin{minipage}{1.8in}
-  \scriptsize
-  \begin{verbatim}
-
-template <class T>
-class IStreamRandom {
-  IStreamRandom(StreamBuffer<T> &s);
-  T read(int index);
-}
-
-
-  \end{verbatim}
-\end{minipage}
-\\ \hline
-\lefttab{Output}
-&
-\begin{minipage}{2.1in}
-  \scriptsize
-  \begin{verbatim}
-
-template <class T>
-class OStreamOutOfOrder {
-public:
-  OStreamOutOfOrder(StreamBuffer<T> &s);
-  void push(T& val);
-  boolean canPush(int n);
-}
-  \end{verbatim}
-\end{minipage}
-&
-\begin{minipage}{1.6in}
+\begin{minipage}{2.0in}
   \scriptsize
   \begin{verbatim}
 
 template <class T>
 class OStream : 
-      OStreamOutOfOrder<T> {
+      OStreamUnordered<T> {
 public:
   OStream(StreamBuffer<T> &s);
-  T poke(int index, T &val);
 }
   \end{verbatim}
 \end{minipage}
 &
 \begin{minipage}{1.8in}
-  \scriptsize
-  \begin{verbatim}
-
-template <class T>
-class OStreamRandom {
-public:
-  OStreamRandom(StreamBuffer<T> &s);
-  void write(int index, T &val);
-}
-
-  \end{verbatim}
-\end{minipage}
-\\ \hline
-\lefttab{Input \\ and \\ Output}
-&
-\begin{minipage}{2.1in}
-  \scriptsize
-  \begin{verbatim}
-
-template <class T>
-class IOStreamOutOfOrder : 
-       IStreamOutOfOrder<T>, 
-       OStreamOutOfOrder<T> {
-public:
-  IOStreamOutOfOrder(StreamBuffer<T> &s);
-}
-  \end{verbatim}
-\end{minipage}
-&
-\begin{minipage}{1.6in}
   \scriptsize
   \begin{verbatim}
 
@@ -123,20 +91,7 @@ public:
 }
   \end{verbatim}
 \end{minipage}
-&
-\begin{minipage}{1.8in}
-  \scriptsize
-  \begin{verbatim}
-
-template <class T>
-class IOStreamRandom : 
-       IStreamRandom<T>, 
-       OStreamRandom<T> {
-public:
-  IOStreamRandom(StreamBuffer<T> &s);
-}
-  \end{verbatim}
-\end{minipage}
 \end{tabular}
+\end{minipage}
 \caption{Class declarations for stream objects.\protect\label{fig:declgrid}}
 \end{figure}
