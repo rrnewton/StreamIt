@@ -293,8 +293,10 @@ output/joiner input.
 
 <<Split/Join Initializers>>=
 void create_split_tape(stream_context *container, int slot,
+                       stream_context *dst,
                        int data_size, int tape_length);
-void create_join_tape(stream_context *container, int slot,
+void create_join_tape(stream_context *src,
+                      stream_context *container, int slot,
                       int data_size, int tape_length);
 @
 
