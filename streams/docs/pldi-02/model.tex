@@ -39,19 +39,26 @@ filters of the graph are implicitly running in parallel, with the
 execution order constrained only by the availability of data on
 channels between the filters.  Further, filters communicate only with
 their immediate neighbors, thereby removing any notion of global time
-or non-local dependences of one filter on another.  [add idea that it
-is the specification of the atomic work function that really prevents
-global time] These properties merit the development of a new model of
-computation, in which the notions of timing, scheduling, and
-dependence analysis are in terms that are relative to a given filter
-in the graph, instead of being global characteristics of a program.
+or non-local dependences of one filter on another.  These properties
+merit the development of a new model of computation, in which the
+notions of timing, scheduling, and dependence analysis are in terms
+that are relative to a given filter in the graph, instead of being
+global characteristics of a program.
 
-In Section \ref{sec:minfunc}, we develop a transfer function that
-provides the basis for distributed time in a stream graph... [build
-operational semantics to give a precise meaning to messaging, and
-denotational semantics to validate program transformations].
+We will arrive at this notion of relative timing and dependence via a
+single transfer function, $min$, that is defined for a given stream
+graph. In Section \ref{sec:notation} we provide a definition of $min$
+along with some notation.  We then motivate the $min$ function in
+\ref{sec:informationflow} by deriving a concept of relative time and a
+meaning for StreamIt's messaging system.  Only then, in Section
+\ref{sec:derivemin}, do we turn to deriving expressions for the $min$
+function itself; Sections \ref{sec:prog-verif}, \ref{sec:denotational}
+and \ref{sec:optimization} further employ the function in the
+respective contexts of program verification, denotational semantics,
+and program optimization.
 
 \subsection{Notation}
+\label{sec:notation}
 
 We use the following notation:
 
@@ -78,22 +85,92 @@ We use the following notation:
 
 \end{itemize}
 
-\subsection{Relative Time}
-\label{sec:minfunc}
-
-As outlined above, there is no concept of global time in a stream
-graph since each filter is completely independent and can only
-communicate with its neighbors through input and output channels.
-Thus, if two filters need to synchronize an event, the synchronization
-must be in terms of the data items that are passed over a channel.
-
-In this context, we define a $min$ function between tapes in the
-stream graph that allows disconnected filters to have a common notion
-of time.  The function is defined in terms of data dependence:
+Now, we are ready to give a definition of the $min$ function:
 \begin{definition}
 $\mi{a}{b}(x)$ is the minimum number of items that must appear on tape
-$a$ given that there are $x$ items on tape $b$.
+$a$ given that there are $x$ items on tape $b$, where $b$ is
+downstream of $a$.
 \end{definition}
+Thus, one can think of $min$ as an inter-filter data dependence
+mapping.  Though the actual data references in a stream program appear
+from within the work functions, there is an aggregate dependence that
+restricts a filter from firing until it has enough items on its input
+tape to satisfy all its internal references (we assume that each
+firing is atomic).  The $min$ function generalizes this dependence to
+answer a different question: how many items are needed on {\it
+another} filter's input tape before my filter can fire?  The following
+sections will provide some additional intution as to the meaning and
+applications of the $min$ function.
+
+\subsection{Information Flow}
+\label{sec:informationflow}
+
+Above, the $min$ function is described in terms of data dependences.
+However, we can also think of this function as defining a common
+timing mechanism that asynchronous filters can use to synchronize
+events.  We present this timing mechanism in terms of ``information
+flow'', which we believe is a central concept of the streaming domain.
+Using this concept, we give a precise semantics to message delivery
+timing in StreamIt.
+
+\subsubsection{Information Wavefronts}
+
+When an item enters a stream, it carries with it some new information.
+As execution progresses, this information cascades through the stream,
+affecting the state of filters and the values of new data items which
+are produced.  We refer to an ``information wavefront'' as the set of
+filter executions that first sees the effects of a given input item.
+Thus, although each filter's {\tt work} function is invoked
+asynchronously without any notion of global time, two invocations of a
+work function occur at the same ``information-relative time'' if they
+operate on the same information wavefront.
+
+The $min$ function can be used to give a precise definition to an
+information wavefront.  One interpretation of $y = \mi{a}{b}(x)$ is
+that the item at position $y$ of tape $a$ is the the latest item on
+tape $a$ to {\it affect} the item at position $x$ of tape $b$.  This
+is because item $x$ on tabe $b$ can be produced if and only if tape
+$a$ contains at least $y$ items.  Note that this effect might be via a
+control dependence rather than a data dependence--for instance, if
+item $y$ needs to pass through a round-robin joiner before some data
+from another stream can be routed to tape $b$.  This is why we choose
+``information flow'' instead of ``data flow'' to describe the timing
+concept.
+
+\subsubsection{Message Timing}
+\label{sec:messagesemantics}
+
+We can use the $min$ function to give a precise meaning to the message
+delivery guarantees in StreamIt.  Though we cannot give the details
+here due to space constraints (see \cite{streamittech} for a careful
+treatment), the general idea is as follows.
+
+A filter $A$ can send a message to filter $B$ to communicate
+low-bandwidth, asynchronous data.  To send a message, there needs to
+be an upstream or downstream path from $A$ to $B$ in the stream graph
+(the filters need not be directly connected.)  The message statement
+appears in $A$'s {\tt work} function and includes a specified latency
+$n$ that indicates ``when'' the target filter $B$ should receive the
+message.  Now, the StreamIt language specification measures the
+latency $n$ in terms of information wavefronts: if $A$ is upstream of
+$B$, then $B$ will receive the message immediately preceding the first
+invocation of its own {\tt work} function which reads items that were
+affected by some output of the $n$'th invocation of $A$'s {\tt work}
+function.  That is, $B$ is invoked when it sees the information
+wavefront that $A$ sees in $n$ execution steps.
+
+In some cases, the ability to synchrnoize a message with an
+information wavefront can be very useful.  For instance, if the input
+port of a handheld computer detects a change in the networking
+protocol, it can send a reconfiguration message to all downstream
+filters with latency 0.  This guarantees that each filter will
+reconfigure just in time to understand the new protocol, but will
+still process previous elements in the pipeline according to the old
+protocol.
+
+\subsection{Deriving the Min Function}
+\label{sec:derivemin}
+
 We now turn to deriving $\mi{a}{b}$ for all pairs of tapes $a$ and $b$
 in a filter graph where $a$ is upstream of $b$.
 
@@ -334,194 +411,13 @@ stream $j$ in the SplitJoin for which:
 Both of these cases could be detected by a compiler to verify that no
 buffers will overflow during steady-state execution.
 
-\subsection{Information Flow}
-
-In the above sections, the $min$ function is mostly described in terms
-of data dependences.  However, we can also think of this function as
-defining a common timing mechanism that asynchronous filters can use
-to synchronize events.  We present this timing mechanism in terms of
-``information flow'', which we believe is a central concept of the
-streaming domain.  Using this concept, we give a precise semantics to
-message delivery timing in in StreamIt.
-
-\subsubsection{Information Wavefronts}
-
-When an item enters a stream, it carries with it some new information.
-As execution progresses, this information cascades through the stream,
-effecting the state of filters and the values of new data items which
-are produced.  We refer to an ``information wavefront'' as the set of
-filter executions that first sees the effects of a given input item.
-Thus, although each filter's {\tt work} function is invoked
-asynchronously without any notion of global time, two invocations of a
-work function occur at the same ``information-relative time'' if they
-operate on the same information wavefront.
-
-The $min$ function can be used to give a precise definition to an
-information wavefront.  One interpretation of $y = \mi{a}{b}(x)$ is
-that the item at position $y$ of tape $a$ is the the latest item on
-tape $a$ to {\it effect} the item at position $x$ of tape $b$.  This
-is because item $x$ on tabe $b$ can be produced if and only if tape
-$a$ contains at least $y$ items.  Note that this effect might be via a
-control dependence rather than a data dependence--for instance, if
-item $y$ needs to pass through a round-robin joiner before some data
-from another stream can be routed to tape $b$.  This is why we choose
-``information flow'' instead of ``data flow'' to describe the timing
-concept.  Also, when speaking of the information wavefront, we only
-consider information that is passed through the data streams; if a
-data item effects another via a low-latency downstream message, then
-this effect could jump ahead of the wavefront.
-
-\subsubsection{Message Timing}
-\label{sec:messagesemantics}
-
-We now employ the $min$ function to give a precise meaning to the
-message delivery guarantees in StreamIt.  Suppose that filter $A$
-sends a message to filter $B$ with latency $\lambda$, where $\lambda$
-is any integer.  After $\lambda$ invocations of $A$'s {\tt work}
-function, $A$ will produce (or has produced) one or more data items
-$d$.  Now, the messaging system guarantees that:
-\begin{enumerate}
-
-\item If $B$ is upstream of $A$, then $B$ will receive the message
-immediately following the last invocation of its {\tt work} function
-which produces items that affect $d$.
-
-\item If $B$ is downstream of $A$, then $B$ will receive the message
-immediately preceding the first invocation of its {\tt work} function
-which produces items that are effected by $d$.
-
-\end{enumerate}
-Now let us express these constraints in terms of the $min$ function.
-Letting $s$ be equal to $n(O_A)$ at the time that the message was
-sent, we have that:
-\begin{enumerate}
-
-\item If $B$ is upstream of $A$, the message will be delivered when:
-\begin{align}
-\label{eq:msgup}
-n(O_B) = push_B * \ceil{\mi{O_B}{O_A}(s + push_A * \lambda)}{push_B}
-\end{align}
-That is, $s + push_A * \lambda$ is the number of items on $A$'s output
-tape after producing the data of interest.  Then, $y = \mi{O_B}{O_A}(s
-+ push_A * \lambda)$ is the latest item on $B$'s output tape that
-affects the data of interest.  The message should be delivered
-immediately after the work function producing this item, which occurs
-when the item count $n(O_B)$ equals $push_B * \ceil{y}{push_B}$, as
-specified by the constraint.
-
-\item If $B$ is downstream of $A$, the message will be delivered when:
-\begin{align}
-\label{eq:msgdown}
-n(O_B) = MAX(x~s.t.~\mi{O_A}{O_B}(x) = s + push_A * (\lambda-1))
-\end{align}
-That is, $z = s + push_A * (\lambda - 1)$ is the number of items on
-$A$'s output tape before pushing the data of interest.  The message
-should be delivered when $B$ has executed as far as possible given
-that there are $z$ items on $O_A$.  That is, $B$ should push $x$ items
-on its output tape for the maximum $x$ that still depends on some of
-the $z$ items, which is given by the condition $\mi{O_A}{O_B}(x) = z$
-above.
-
-Thus, when $A$ pushes the next set of data, it could affect the data
-that will be pushed next onto the output tape of $B$.  (Note that the
-next set of data from $A$ might not be sufficient to calculate the
-next set on $B$'s output, but it could affect it nonetheless.)  The
-message must be delivered immediately before this effected data
-appears on $B$'s output, so the number of items $n(O_B)$ is as given
-above.  We do not need a ceiling function as in (1) because we are
-guaranteed to have the maximum $x$ at a multiple of $push_B$.
-
-\end{enumerate}
-
-\subsubsection{Latency Constraints}
-
-The framework describe above can be used to give a semantics to the
-latency constraints in StreamIt.  Each directive MAX\_LATENCY(A, B, n)
-has the same effect as defining a message from filter $B$ to upstream
-filter $A$ with latency $n$.
-
-\subsection{Operational Semantics}
-
-We can fully define the possible sequences of filter executions as a
-set of constraints on the number of items on each tape in the stream
-graph.  This is useful not only from the perspective of semantics, but
-for compiler analysis of the space of valid schedules.  To begin the
-analysis, we formulate the constraints imposed by message delivery
-guarantees on the number of items on each tape.
-
-Suppose that a filter $A$ might send a message to filter $B$ with a
-maximum latency of $\lambda$ during any invocation of its work
-function.  Then we must constrain the execution of $B$ to make sure
-that it is not too far ahead to receive the message with the given
-latency.  That is, we can only execute $B$ so long as $n(O_B)$--the
-item count on its output tape--does not exceed the count when a
-message would be delivered.  Recalling the expression for message
-delivery time (Equations \ref{eq:msgup} and \ref{eq:msgdown}), this
-constraint is as follows if $B$ is upstream of $A$:
-\begin{align}
-\label{eq:mc1}
-n(O_B) \le push_B * \ceil{\mi{O_B}{O_A}(n(O_A) + push_A * \lambda)}{push_B}
-\end{align}
-and as follows if $B$ is downstream of $A$:
-\begin{align}
-\label{eq:mc2}
-n(O_B) \le MAX(x~s.t.~\mi{O_A}{O_B}(x) = n(O_A) + push_A * (\lambda-1))
-\end{align}
-The guarantees for latency are treated identically to message
-guarantees, as fitting with the semantics of latency as described
-above.
-
-{\bf Defining the schedule.}  We now have a set of constraints
-expressing whether or not a given set of tapes respects the latency
-and message delivery guarantees in a program.  We will now
-incorporate these constraints into an operational semantics that
-defines a legal sequences of filter executions.
-
-We represent a stream graph as a configuration $(\langle p(t_1),
-n(t_1) \rangle,$ $\langle p(t_2), n(t_2) \rangle,$ $\dots,$ $\langle
-p(t_k), n(t_k) \rangle)$, where $t_1 \dots t_k$ are the tapes in the
-stream graph, and $p(t)$ represents the number of items that have been
-popped from tape $t$.  Obviously, we have the constraint that $p(t)
-\le n(t)$ for each tape $t$, since a filter can only pop as many items
-as have appeared on its input tape.
-
-When the program begins, no items have been pushed or popped from any
-data channels.  Thus, each tape is empty, and the starting
-configuration $C_0$ is simply the zero vector.  It is possible that
-the initial configuration violates some of the constraints imposed by
-the messaging and latency constructs, in which case the compiler can
-inform the programmer that the delivery constraints requested in the
-program are unsatisfiable.
-
-Let ${\cal P}(C)$ denote whether or not the constraints in
-Equations~\ref{eq:mc1} and~\ref{eq:mc2} are satisfied for all filters
-in a stream graph with configuration $C$.  We can then write the
-transition function between configurations as follows:
-\[
-\begin{scriptsize}
-\begin{array}{c}
-n(I_A) - p(I_A) \ge peek_A; \\ (\dots , \langle p(I_A), n(I_A) \rangle, \dots,
-\langle p(O_A), n(O_A) \rangle, \dots); \\ {\cal P}((\dots , \langle p(I_A)+pop_A, n(I_A) \rangle, \dots,
-\langle p(O_A), n(O_A)+push_A \rangle, \dots)); \\ \hline (\dots , \langle p(I_A)+pop_A,
-n(I_A) \rangle, \dots, \langle p(O_A), n(O_A)+push_A \rangle, \dots)
-\end{array}
-\end{scriptsize}
-\]
-There are two components of this rule.  On the first line, we state
-that, for filter $A$ to fire, there must be at least $peek_A$ items on
-$A$'s input tape that have not yet been popped.  Secondly, we express
-that once $A$ has fired, the new configuration must satisfy the
-messaging and latency constraints ${\cal P}$.  The new configuration differs
-from the original only in that $pop_A$ items have been popped from
-$A$'s input and $push_A$ items have been pushed to $A$'s output.
-
 \subsection{Denotational Semantics}
+\label{sec:denotational}
 
-The operational semantics above defines the space of legal execution
-orderings for the filters in a stream graph, but says nothing about
-the values that are being pushed onto the tapes.  For this we develop
-a denotational semantics, with which we can prove that certain
-transformations preserve the meaning of the entire program.
+In this section, we develop a denotational semantics for obtaining the
+meaning of an entire stream graph.  In Section \ref{sec:optimization},
+this semantics is used to show that a optimizing transformation on the
+stream graph preserves the meaning of the entire program.
 
 Our denotational semantics contains three algebras: one for literal
 StreamIt syntax, one for an intermediate abstract syntax, and one for
