@@ -148,6 +148,7 @@ class FFTKernel2 extends SplitJoin
 		    }
 		});
 	}
+	setJoiner(ROUND_ROBIN(nWay*2));
     }
 }
 
