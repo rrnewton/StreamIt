@@ -1,0 +1,208 @@
+\begin{verbatim}
+
+Consider channel c = (n_a, n_b)
+S(n) indicates the repetitions of node n in the steady state
+U(c) indicates how many items are pushed/popped from channel c in the steady state
+
+                          writer (n_a)                            reader (n_b)
+-----------------------------------------------------------------------------------------
+steady-state iterations:  0 <= j <= N - 1                         0 <= p <= N - 1
+invocations of a filter:  0 <= k <= S(n_a) - 1                    0 <= q <= S(n_b) - 1
+items pushed:             0 <= l <= U(c) - 1                      0 <= r <= O(c) - 1
+
+
+Facts:
+
+1. S(n_a) * U(c) = S(n_b) * O(c)         (items pushed = items popped)
+
+2. S(n_a) = lcm(U(c), O(c)) / U(c)
+
+
+What index is written on the (l+1)'th data item during the (k+1)'th occurence of the (j+1)'th steady state cycle?
+
+  Buf(c)[j*S(n_a)*U(c) + k*U(c) + l]
+
+What index is read on the    (p+1)'th          ...         (r+1)'th      ...         (q+1)'th   ?
+
+  Buf(c)[p*S(n_b)*O(c) + q*O(c) + r]
+
+We are given p, q, and r, and wish to find j, k, and l s.t.:
+
+p*S(n_b)*O(c) + q*O(c) + r = j*S(n_a)*U(c) + k*U(c) + l
+
+That is, for a given reader, find the writer that wrote to that
+location.
+
+Start with:
+
+  p*S(n_b)*O(c) + q*O(c) + r = j*S(n_a)*U(c) + k*U(c) + l
+
+Substitute S(n_a)*U(c) = S(n_b)*O(c):
+
+  p*S(n_b)*O(c) + q*O(c) + r = j*S(n_b)*O(c) + k*U(c) + l
+
+Solve for j:
+
+j = p*S(n_b)*O(c) + q*O(c) + r - (k*U(c) + l)
+    -----------------------------------------
+         S(n_b)*O(c)
+
+Since j must be integral, the division above must come out evenly.  Thus we can split this into two equations:
+
+(1)
+
+  j = p*S(n_b)*O(c) + q*O(c) + r - (k*U(c) + l)            
+      ------------------------------------------ {int div} 
+                  S(n_b)*O(c)
+
+(2) 
+
+    [p*S(n_b)*O(c) + q*O(c) + r - (k*U(c) + l)] MOD [S(n_b)*O(c)] = 0
+
+Consider (1):
+
+ j = p + q/S(n_b) + r/(S(n_b)*O(c)) - (k*U(c)+l)/(S(n_b)O(c))
+
+ Note that q < S(n_b) and r < O(c), thus:
+      
+ j = p - (k*U(c)+l)/(S(n_b)O(c))
+
+ Substitute for S(n_b)*O(c):
+
+ j = p -  k*U(c)+l
+           -----------
+           S(n_a)*U(c)
+
+ but now k<=S(n_a)-1 and l<=U(c)-1, which means numerator <= (S(n_a)-1)*U(c)+U(c)-1 ==> numerator <= S(n_a)*U(c)-1
+
+ so this gives j = p
+
+Consider (2):
+
+ [p*S(n_b)*O(c) + q*O(c) + r - (k*U(c) + l)] MOD [S(n_b)*O(c)] = 0
+
+ [q*O(c) + r - (k*U(c) + l)] MOD [S(n_b)*O(c)] = 0
+
+ Now note that the MOD is a no-op since all expressions less than S(n_b)*O(c):
+
+ q*O(c) + r - (k*U(c) + l) = 0
+
+ q*O(c) + r = k*U(c) + l
+
+So now our problem is looking for k,l s.t.:
+
+ k*U(c) + l = q*O(c) + r
+
+ k = q*O(c) + r - l
+     --------------
+        U(c)
+
+ but since l <= U(c) - 1, we can do integer division:
+ 
+ k = floor [ (q*O(c) + r) / U(c) ]
+
+ or, alternatively, we can substitute the definition of l that we get below:
+
+ k = q*O(c) + r - (q * O(c) + r - s * U(c))   
+     -------------------------------------- = s
+                   U(c)
+
+Now the problem is down to looking for l:
+
+ l = q*O(c) + r - k*U(c)
+
+Slicing gives:
+
+ for all s \in [0 \dots S(n_a) - 1]
+
+ D(s)(q, r) = { q,r s.t. 0 <= q <= S(n_b) - 1
+                         0 <= r <= O(c) - 1
+                         s*U(c) <= q*O(c) + r <= (s+1)*U(c) - 1 }
+
+There are n_b of (p, q, r) reading the value
+          n_a of (p, r, l) = q * O(c) + r - s * U(c)
+
+---
+
+We can reduce the number of equations by scaling back the bound on s to just a pairwise cycle:  
+
+  N(c) = lcm(U(c), O(c)) / U(c)  (number of times writer filter fires in period of c)
+
+  M(c) = S(n_a) / N(c)           (number of periods for channel c in execution of whole graph)
+
+--
+
+So the upshot is that:
+
+j = p
+
+\forall s \in [0, N(c) - 1]
+ k = s
+ l = q * O(c) + r - s * U(c)
+
+------------
+
+Now to deal with peeking
+
+Now have 0 <= r <= E(c) - 1 instead of 0 <= r <= O(c) - 1
+
+so we don't have r < O(c) that we used before
+
+Instead there will be dependences ``across'' values of j.
+
+  j = p*S(n_b)*O(c) + q*O(c) + r - (k*U(c) + l)            
+      ------------------------------------------ {int div} 
+                  S(n_b)*O(c)
+
+
+  j = p + q*O(c) + r - (k*U(c) + l)
+          -------------------------- {int div} 
+                  S(n_b)*O(c)
+
+So now look at upper bound of second term, with r = E(c)-1 and q=S(n_b)-1 and (k*U(c)+1)=0
+
+  UB = (S(n_b)-1)*O(c) + E(c)-1
+       ------------------------
+              S(n_b)*O(c)
+
+  UB = 1 +  E(c)-O(c)-1
+           -------------
+           S(n_b) * O(c)
+
+Intuition for this -- it's just the extra number of steady states (in
+terms of the writer) that you're peeking through.
+
+So now set up a variable u to range through the steady states that you
+peek through:
+
+  u = [0 ... UB]
+
+And now 
+
+  D(u)(q, r) = { q,r s.t. 0 <= q <= S(n_b) - 1
+                          0 <= r <= E(c) - 1
+                          u * S(n_b) * O(c) <= q*O(c) + r <= (u+1) * S(n_b) * O(c) - 1
+
+So the remaining constraint is that
+
+  r * U(c) + l = q * O(c) + r - u * S(n_b) * O(c)
+
+Which we can solve as before, with the s slicing.
+
+------------
+
+Dealing with phases I don't think is interesting -- could even think
+of each pushed item as a distinct phase; this does element-level
+tracking of dependences, not just phase-level tracking.
+
+------------
+
+Now to deal with initialization epoch.
+
+                          writer (n_a)                               reader (n_b)
+-----------------------------------------------------------------------------------------
+initialization:           0 <= m <= I(a) - 1                         0 <= t <= I(b) - 1
+
+Just offset all deps by this amount... very simple.
+
+\end{verbatim}

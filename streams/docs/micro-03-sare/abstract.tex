@@ -1,0 +1,13 @@
+Applications centered around streams of data are becoming increasingly
+important and widespread, especially in the context of embedded
+processors with resource constraints.  In this paper, we present a
+high-level translation scheme that allows a broad class of stream
+programs to be considered under the scheduling framework of the
+polyhedral model.  The input to our analysis is an abstract stream
+graph from StreamIt, a high-level stream programming language.  The
+output of our analysis is a System of Affine Recurrence Equations
+(SARE) that exactly captures the data dependences and exposes all of
+the parallelism in the original graph.  We leverage well-known affine
+scheduling techniques of the scientific community to demonstrate that
+the SARE representation can be used for effective scheduling of stream
+programs onto a parallel target.
