@@ -63,6 +63,60 @@ that $N$ can be incorporated as a symbolic parameter in the schedule.
 
 \input{simplefig}
 
-The procedure for generating the SARE appears in Figure~\ref{fig:sdftosare}.
+The procedure for generating the SARE appears in
+Figure~\ref{fig:sdftosare}.  The basic idea is to introduce a variable
+$\mt{BUF}_c$ for each channel $c$ which keeps track of the entire history
+of values that are transmitted over $c$ (we keep track of the entire
+history since all elements in a SARE must be assigned only once.)  The
+$i$ dimension of $\mt{BUF}$ counts over steady-state periods, while the $j$
+dimension holds elements that were written during a given period.  We
+also introduce variables $\mt{WRITE}_c$ and $\mt{READ}_c$ that write and read
+from channel $c$.  For reasons that become clear below, these
+variables have a $k$ dimension to index the values that are pushed on
+a given firing, while the $j$ dimension counts firings of a node and
+the $i$ dimension counts steady-state periods, as before.
 
-\todo{Describe simple translation (remember what's resolvable at compile time)}
+Equation~\ref{eq:r2w} expresses the computation internal to each node,
+whereas Equations~\ref{eq:w2b} and~\ref{eq:b2r} expresses the
+communication of the nodes with the channels.  In
+Equation~\ref{eq:r2w}, the node's work function is used to calculate
+all of the $\mt{WRITE}$ values from all of the $\mt{READ}$ values,
+during a given firing $(i,j)$. 
+%The $k$ dimension was added to
+%$\mt{READ}$ and $\mt{WRITE}$ so that a given $(i,j)$ index pair would
+%uniquely identify the read and write operations of a given firing.
+
+Equation~\ref{eq:w2b} shows the communication from the $\mt{WRITE}$
+array to the $\mt{BUF}$ array for a given channel.  To understand this
+equation, it might help to consider a simpler version which expresses
+the correct relationship but is not a legal SARE:
+\begin{align*}
+&\forall (i,j,k) \in {\cal D}_{WRITE_c},
+\mt{BUF}_{c}(i,j*U(c)+k) = \mt{WRITE}_{c}(i, j, k) \\ \nonumber
+\end{align*}
+The equation above is simply copying the contents of $\mt{WRITE}$ into
+$\mt{BUF}$ while accounting for the differing array dimensions.
+However, this equation is not valid for a SARE, since there is an
+affine expression indexing the array on the left hand side.
+
+To deal with this issue, we split up the equation into several pieces,
+each of which assigns to a different portion of the $BUF$ array.  In
+Equation~\ref{eq:w2b}, we introduce a variable $q$ that counts up to
+$S(n)$, which is the extent of the $j$ dimension of $\mt{WRITE}_c$.
+For each of these $q$, we copy over $U(c)$ values from the appropriate
+section of the $WRITE$ array; the domain ${\cal D}_{W {\small
+\rightarrow B}}(c,q)$ represents the $q$'th slice of $BUF$ into which
+the section should be written.  This equation is a valid component of
+our SARE, as the boundaries on each equation's domain are fully
+resolvable at compile time.
+
+Equation~\ref{eq:b2r} is similar to Equation~\ref{eq:w2b} regarding
+the slicing technique that is used to parameterize the domain of the
+equation.  However, here the motivation is different: the extent of
+the $k$ dimension of $\mt{READ}$ might exceed the length of the period
+in $BUF$ (this is because nodes are allowed to peek more than they
+pop.)  Thus, the $q$ variable is used to slice the peek amount $E(c)$
+into $\mt{Period}(c)$-sized chunks so as to resolve the proper source
+location in $\mt{BUF}$.  Again, all the variables in the index
+expressions are compile-time constants (except, of course, for the
+index quantifiers $i$, $j$, and $k$.)
