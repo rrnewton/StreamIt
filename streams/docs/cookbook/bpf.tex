@@ -1,23 +1,24 @@
 \clearpage
-\section{A Band-Pass Filter}
+\subsection{A Band-Pass Filter}
 
 \begin{textpic}{\includegraphics{cookbook.3}}
 \begin{lstlisting}{}
-float->float pipeline BandPassFilter
-    (float low, float high) {
-  add BPFCore(low, high);
+float->float pipeline BandPassFilter 
+    (float rate, float low, float high, int taps) {
+  add BPFCore(rate, low, high, taps);
   add Subtracter();
 }
-float->float splitjoin BPFCore
-    (float low, float high) {
+float->float splitjoin BPFCore 
+    (float rate, float low, 
+     float high, int taps) {
   split duplicate;
-  add LowPassFilter(low);
-  add LowPassFilter(high);
+  add LowPassFilter(rate, low, taps, 0);
+  add LowPassFilter(rate, high, taps, 0);
   join roundrobin;
 }
 float->float filter Subtracter {
   work pop 2 push 1 {
-    push(peek(0) - peek(1));
+    push(peek(1) - peek(0));
     pop(); pop();
   }
 }

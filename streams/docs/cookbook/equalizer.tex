@@ -1,9 +1,9 @@
-\section{An Equalizer}
+\subsection{An Equalizer}
 
 \begin{lstlisting}{}
-float->float pipeline Equalizer(int bands, float[bands] cutoffs,
-                                float[bands] gains) {
-  add EqSplit(bands, cutoffs, gains);
+float->float pipeline Equalizer(float rate, int bands, float[bands] cutoffs,
+                                float[bands] gains, int taps) {
+  add EqSplit(rate, bands, cutoffs, gains, taps);
   add float->float filter {
     work pop bands-1 push 1 {
       float sum = 0;
@@ -13,12 +13,12 @@ float->float pipeline Equalizer(int bands, float[bands] cutoffs,
     }
   };
 }
-float->float splitjoin EqSplit(int bands, float[bands] cutoffs,
-                               float[bands] gains) {
+float->float splitjoin EqSplit(float rate, int bands, float[bands] cutoffs,
+                               float[bands] gains, int taps) {
   split duplicate;
   for (int i = 1; i < bands; i++)
     add pipeline {
-      add BandPassFilter(cutoffs[i-1], cutoffs[i]);
+      add BandPassFilter(rate, cutoffs[i-1], cutoffs[i], taps);
       add float->float filter {
         work pop 1 push 1 { push(pop() * gains[i]); }
       };
