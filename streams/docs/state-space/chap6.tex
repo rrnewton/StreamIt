@@ -1,0 +1,29 @@
+\chapter{Related Work}
+
+    This thesis builds directly on the work done to analyze and
+optimize linear components in StreamIt graphs \cite{Lamb}. We have
+extended the theoretical framework for linear analysis to
+state-space analysis in order to apply our optimizations to a
+wider class of applications. We have also changed some parts of
+the underlying representations. Previously, constants were handled
+separately and peeked items beyond the pop rate were considered
+inputs. For our current work we have placed both types of items in
+states.
+
+    Many other groups are researching methods for automated DSP
+application optimizations. SPIRAL \cite{Spiral} is a system
+developed to generate libraries of DSP transforms. These libraries
+are designed for specific architectures, and can be re-optimized
+when hardware is upgraded or replaced. Other such libraries that
+have been designed include a package for linear algebra
+manipulations by the ATLAS project \cite{Atlas} and a set of
+optimized FFTs (Fast Fourier Transforms) \cite{fftw}.
+
+    Aside from StreamIt, other programming languages have been
+designed for streaming data. Synchronous languages which target
+embedded applications include LUSTRE \cite{Lustre}, Esterel
+\cite{Esterel}, and Signal \cite{Signal}. Other stream-based
+languages are Occam \cite{Occam}, SISAL \cite{sisal}, and StreamC
+\cite{streamc}. These are designed to exploit vector and parallel
+processing. However, none of these languages have compilers that
+run state-space or linear analysis.
