@@ -754,12 +754,14 @@
 \def\endabstract{\if@twocolumn\else\endquotation\fi}
 
 \def\keywords{\if@twocolumn
+\vspace{-8pt}
 \section*{Keywords}
 \else \small
 \quotation
 \fi}
 
 \def\terms{\if@twocolumn
+\vspace{-8pt}
 \section*{General Terms}
 \else \small
 \quotation
@@ -771,6 +773,7 @@
 
 \def\category#1#2#3{%
 \ifnum\catcount=1
+\vspace{-8pt}
 \section*{Categories and Subject Descriptors}
 \advance\catcount by 1\else{\unskip; }\fi
     \@ifnextchar [{\@category{#1}{#2}{#3}}{\@category{#1}{#2}{#3}[]}%

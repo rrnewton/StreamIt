@@ -25,7 +25,7 @@
 %% the available DSP resources.
 
 \section{Introduction}
-Digital computation is becoming a ubiquitous element of modern life.
+Digital computation is a ubiquitous element of modern life.
 Everything from cell phones to HDTV systems to satellite radios
 require increasingly sophisticated algorithms for digital signal
 processing.  Optimization is especially important in this domain, as
@@ -51,9 +51,9 @@ barrier for high-performance stream programming.  Our work is done in
 the context of StreamIt~\cite{streamit-asplos,streamitcc}, which is a
 high-level language for signal processing applications.  A program in
 StreamIt is comprised of a set of concurrently executing filters, each
-of which contains its own address space and communicates with its
+with its own address space, and each of which communicates with its
 neighbors using FIFO queues.  Our analysis focuses on filters which
-are {\it linear}: that is, each of their outputs can be expressed as
+are {\it linear}: their outputs can be expressed as
 an affine combination of their inputs.  Linear filters are common in
 DSP applications; examples include FIR filters, expanders,
 compressors, FFTs and DCTs.
@@ -69,7 +69,7 @@ system, or that might depend on neighboring components that are being
 written by other developers.  To improve the modularity, portability,
 and extensibility of stream programs, the compiler should be
 responsible for identifying linear nodes and performing the
-appropriate optimizations.  Towards this end, we make the following
+appropriate optimizations.  Toward this end, we make the following
 contributions:
 \begin{itemize}
 \vspace{-6pt}
@@ -259,8 +259,8 @@ the muddled relationship between {\tt data}, {\tt buffer} and the
 output.
 
 Figure~\ref{fig:example-streamit} shows the same filtering process
-implemented in StreamIt. The StreamIt version is more abstract than
-the C version.  It indicates the communication pattern between
+in StreamIt. The StreamIt version is more abstract.  
+It indicates the communication pattern between
 filters, shows the structure of the original block diagram and leaves
 the complexities of buffer management and scheduling to the compiler.
 
@@ -270,9 +270,11 @@ Figure~\ref{fig:example-combine}, the programmer has combined the {\tt
 weights} arrays from the two filters into a single, equivalent array.
 This reduces the number of multiply operations by a factor of two.  In
 Figure~\ref{fig:example-frequency}, the programmer has done the
-filtering in the frequency domain, using the FFT and IFFT to translate
-between time and frequency.  Computationally intensive streams are
-more efficient in frequency than in time.
+filtering in the frequency domain.
+%using the FFT and IFFT to translate
+%between time and frequency.  
+Computationally intensive streams are more efficient
+in frequency than in time.
 
 Our linear analysis can automatically derive both of the
 implementations in Figures~\ref{fig:example-combine}

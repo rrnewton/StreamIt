@@ -14,7 +14,7 @@ match the sizes of $A$ and $\vec{b}$ for different linear nodes and is
 therefore an essential building block for the other combination
 techniques.  We then give rules for collapsing pipelines and
 splitjoins into linear nodes; we do not deal with feedbackloops as
-they require a notion of ``linear state'', which we do not describe
+they require ``linear state,'' which we do not describe
 here.
 
 \subsection{Linear Expansion}
@@ -47,7 +47,7 @@ every execution of $F_2$.
 Consequently, when we combine hierarchical structures into a linear
 node, we often need to {\it expand} a matrix representation to
 represent multiple executions of the corresponding stream.  Expansion
-allows us to multiply matrices and interleave columns from matrices
+allows us to multiply and interleave columns from matrices
 that originally had mismatching dimensions.  The transformation can be
 done as follows.
 
@@ -185,9 +185,9 @@ $\lambda_1$ and the push rate borrowed from $\lambda_2$.
 However, there are two implicit assumptions in the above analysis
 which complicate the equations for the general case.  First, the
 dimensions of $A_1$ and $A_2$ must match for the matrix multiplication
-to be well-defined.  If $u_1 \ne e_2$, this will require constructing
+to be well-defined.  If $u_1 \ne e_2$, we first construct
 expanded nodes $\lambda_1^e$ and $\lambda_2^e$ in which the push and
-peek rates match (and thus $A_1^e$ and $A_2^e$ can be multiplied).
+peek rates match so $A_1^e$ and $A_2^e$ can be multiplied.
 
 The second complication is with regards to peeking.  If the downstream
 node $\lambda_2$ peeks at items which it does not consume ({\it i.e.},
@@ -249,15 +249,15 @@ matrix for the overall linear node.
 The splitjoin construct allows the StreamIt programmer to
 express explicitly parallel computations.  Data elements that arrive
 at the splitjoin are directed to the parallel child streams
-using one of two pre-defined splitter constructs: 1) duplicate,
+using one of two pre-defined splitter constructs: 1) {\it duplicate},
 which sends a copy of each data item to all of the child streams, and
-2) roundrobin, which distributes items cyclically according to an
+2) {\it roundrobin}, which distributes items cyclically according to an
 array of weights.  The data from the parallel streams are
 combined back into a single stream by means of a roundrobin 
 joiner with an array of weights $w$.  First, $w_0$ items from the
-output tape of the leftmost child are placed onto the overall output
-tape, then $w_1$ elements are taken from the second leftmost child,
-and so on.  The process repeats itself after one complete set of
+leftmost child are placed onto the overall output
+tape, then $w_1$ elements from the second leftmost child are used,
+and so on.  The process repeats itself after
 $\sum_{i=0}^{N-1} w_i$ elements has been pushed.
 
 In this section, we demonstrate how to collapse a splitjoin into
@@ -273,7 +273,7 @@ verified by the StreamIt semantic checker.
 
 Our analysis distinguishes between two cases. For duplicate splitters,
 we directly construct a linear node from the child streams.  For
-roundrobin splitters, we translate the splitjoin to use a duplicate
+roundrobin splitters, we first convert to a duplicate
 splitter and then rely on the transformation for duplicate splitters.
 We describe these translations below.
 
@@ -281,20 +281,17 @@ We describe these translations below.
 
 Intuitively, there are three main steps to combining a duplicate
 splitjoin into a linear node.  Since the combined node will represent
-a steady-state execution of the splitjoin construct, we first need to
+a steady-state execution of the splitjoin construct, we first 
 expand each child node according to its multiplicity in the schedule.
-Secondly, we need to ensure that each child's matrix representation
+Secondly, we ensure that each child's matrix representation
 has the same number of rows---that is, that each child peeks at the
 same number of items.  Once these conditions are satisfied, we can
 construct a matrix representation for the splitjoin by simply
 arranging the columns from child streams in the order specified by the
-roundrobin joiner (see Figure~\ref{fig:splitjoin-duplicate-matrix}).
-This third step is simplified by the fact that, with a duplicate
+joiner. Reordering columns is equivalent because with a duplicate
 splitter, each row of a child's linear representation refers to the
-same input element of the splitjoin.
-
-The following transformation describes splitjoin combination in
-mathematical terms.
+same input element of the splitjoin. The transformation 
+is described in mathematical terms below.
 
 %\begin{figure}
 %\center
@@ -304,6 +301,7 @@ mathematical terms.
 %\label{fig:splitjoin-duplicate-ratematch}
 %\end{figure}
 
+\vspace{-6pt}
 \begin{transformation} (Duplicate splitjoin combination)
 Given a splitjoin $s$ containing a duplicate splitter, children that
 are linear nodes $\lambda_0 \dots \lambda_{n-1}$, and a roundrobin
@@ -390,9 +388,9 @@ is the case, then the pop rates must be equivalent for all the
 expanded streams; otherwise, some outputs of the splitter would
 accumulate infinitely on the input channel of some stream.
 
-These input and output rates, in combination with the values of $A'$
+The new rates, in combination with the values of $A'$
 and $\vec{b}'$, define a linear node that exactly represents the
-parallel combination of child nodes that are fed by a duplicate
+parallel combination of linear child nodes fed with a duplicate
 splitter. Figure~\ref{fig:example-splitjoin-combination} provides an
 example of splitjoin combination.
 
@@ -427,6 +425,7 @@ maintain correctness, we add a decimator on each branch
 of the splitjoin that eliminates items which were intended for other
 streams.
 
+\vspace{-6pt}
 \begin{transformation} (Roundrobin to duplicate)
 Given a splitjoin $s$ containing a roundrobin splitter with weights
 $v_0 \dots$ $v_{n-1}$, children that are linear nodes $\lambda_0 \dots
