@@ -1,46 +1,39 @@
-\section{results}
+\section{Results}
 
 \subsection{Measurement Methodology}
-We chose to measure the strength of our optimizations in terms of 
-floating point instruction reduction. The StreamIt compiler currently
-has two code generation backends. The uniprocessor backend generates sequential C code
-that can be compiled and linked against a supporting library. 
-There is also a backend that generates code for the RAW microprocessor
-\cite{waingold97baring, raw-micro}, which features
-a grid of processors interconnected via various communication facilities. 
-Mapping a StreamIt program on to the RAW architecture is complicated
-by issues of communication, load balancing and partitioning\cite{streamit-asplos}. 
-Therefore, the effects of our linear analysis optimizations can not
-be easily differentiated from differences in placement, routing and fusion that result
-from modifying the program's stream graph (as is the case for linear replacement). 
-Therefore we chose to use the uniprocessor backend for our measurements.
+%We chose to measure the strength of our optimizations in terms of 
+%floating point instruction reduction. The StreamIt compiler currently
+%has two code generation backends. The uniprocessor backend generates sequential C code
+%that can be compiled and linked against a supporting library. 
+%There is also a backend that generates code for the RAW microprocessor
+%\cite{waingold97baring, raw-micro}, which features
+%a grid of processors interconnected via various communication facilities. 
+%Mapping a StreamIt program on to the RAW architecture is complicated
+%by issues of communication, load balancing and partitioning\cite{streamit-asplos}. 
+%Therefore, the effects of our linear analysis optimizations can not
+%be easily differentiated from differences in placement, routing and fusion that result
+%from modifying the program's stream graph (as is the case for linear replacement). 
+%Therefore we chose to use the uniprocessor backend for our measurements.
 
-As always, the appropriate metric to measure performance is not totally clear. 
-Running time is complicated by the multitasking environment offered by 
-modern operating systems. Also, given that the uniprocessor backend for
-the StreamIt compiler is meant for prototyping, the supporting 
-library is anything but optimized. Therefore, measuring running time is
-probably not an appropriate metric.
+%As always, the appropriate metric to measure performance is not totally clear. 
+%Running time is complicated by the multitasking environment offered by 
+%modern operating systems. Also, given that the uniprocessor backend for
+%the StreamIt compiler is meant for prototyping, the supporting 
+%library is anything but optimized. Therefore, measuring running time is
+%probably not an appropriate metric.
 
-The fundamental metric of processing performance is amount of computation, and since
-our optimizations are both aimed at reducing the amount of computation we will focus 
-on that reduction in our results section. Most of the applications that are and will
-be written in StreamIt process floating point data with floating point instructions (FLOPs), 
-and so reducing their number is good for overall performance. 
-Therefore, we chose the reduction in FLOPs as our measurement metric executed.
+The fundamental metric of processing performance that we chose to measure is the 
+amount of computation. Most of the applications that are and will
+be written in StreamIt process floating point data so reducing FLOPs
+is a primary goal. Our measurement platform was a Dual Intel 2.2 GHz P4 Xenon processor system 
+running Linux. We compiled programs using StreamIt's uniprocessor
+and generated executables from the resulting C using {\tt gcc} with {\tt -O2} optimizations.
 
-Our measurement platform was a Dual Intel 2.2 GHz P4 Xenon processor system 
-running Linux. We compiled the benchmark programs using StreamIt's uniprocessor
-and compiled the resulting C code with {\tt gcc}, with {\tt -O2} optimization.
-
-Obviously statically counting the number of FLOPs in a program is not helpful. We 
-need to measure the number of floating point instructions that are executed at runtime.
-To do measure FLOPs dynamically, we utilized the DynamoRIO\cite{rio-webpage}
+To measure the number of FLOPs executed at runtime we used the RIO\cite{rio-webpage}
 runtime introspection and optimization infrastructure. Using a simple DynamoRIO application 
-we instrumented each benchmark program at runtime and counted the number of FLOPs executed.
+we instrumented each benchmark program at runtime to count the number of FLOPs.
 
-
-We define three instruction types of interest for the Intel x86 instruction set:
+We define the following three opcode classes for the Intel x86 instruction set:
 \begin{itemize}
 \item[flops] Any opcode whose name that begins with {\tt f} in the x86 instruction set.
 \item[fadds] Any of ({\tt fadd faddp fiaddp fsub fsubp fisubp fsubr fsubrp fisubr}).
@@ -49,106 +42,101 @@ We define three instruction types of interest for the Intel x86 instruction set:
 
 There are no standard benchmark written for StreamIt, so we had to assemble
 a set of programs which perform computations that are likely to be representative
-real world applications. We settled on a set of six, which we describe below.
+real world applications. We settled on the following set of six.
 
 \begin{enumerate}
-\item FilterBank: Implements a multi-rate signal decomposition processing block which is common in communications and image processing.
-\item FIR: A single 100 point FIR filter which implements a low pass filter with cutoff frequency $\omega_c=\frac{\pi}{3}$
-\item FMRadio: Implements an FM demodulator in software.
-\item RateConverter: Converts a sampling rate $f_{s1}=\frac{1}{T}$ to $f_{s2}=\frac{3}{2T}$.
-\item TargetDetect: Four matched filters perform threshold target detection in parallel.
+\item FilterBank: Implements a multi-rate signal decomposition processing block common in communications and image processing.
+\item FIR: A single 100 point rectangularly windowed low pass FIR filter ($\omega_c=\frac{\pi}{3}$).
+\item FMRadio: Implements an FM software radio.
+\item RateConverter: Downsamples an audio signal by an non integer factor ($\frac{3}{2}$).
+\item TargetDetect: Four matched filters performing threshold target detection in parallel.
 \item Radar: radar frontend, beamformer and target detection.
 \end{enumerate}
 
 
 \subsection{Frequency Replacement Scaling}
+
 \begin{figure}
 \center
 \epsfxsize=3.0in
 \epsfbox{images/frequency-win-theory.eps}
-\caption{Plot showing number of multplications for the frequency transformation over the number of multiplications for direct convolution per output as a function of $M$ and $N$. $N$ and $M$ are the normalized size of the FIR filter and output window size, respectively. Numbers less than one indicate a multiplication reduction, and numbers more than one indicate an increase in multiplication.}
-\label{fig:frequency-win}
+\caption{Plot showing the theoretical multiplication reduction factor as a function of the size of the FIR ($M$) and the number of outputs produced ($N$). The dark regions denote an increase in the required number of multiplications.}
+\label{fig:frequency-win-theory}
+\vspace{-12pt}
 \end{figure}
 
-In this section we describe the results we expect for the frequency transformation. We
-define $M$ as the number of FIR coefficients, and $N$ as the number of outputs produced. Direct 
-convolution requires $O(MN)$ multiplies to generate $N$ output values 
-(eg $M$ multiplies per output). To produce $N$ output values using the frequency transformation 
-requires $O((M+N)lg(M+N))$ multiplications for both the FFT and IFFT and $O(M+N)$ 
-multiplications to implement the complex coefficient multiplication in the frequency domain.
-Therefore, the number of multiplications per output for the frequency transformation
-normalized the the number of multiplications per output with direct convolution is
-$f(M,N)=\frac{O((M+N)lg(M+N))}{O(MN)}$. Figure~\ref{fig:frequency-win} plots this function
-in normalized $M$, $N$ space. It is interesting to note that if $M$ or $N$ is held constant 
-and the other is increased, $F(M,N)$ first decreases and then increases. Given that our compiler
-can choose $N$, we need to choose an $M$ that is roughly the correct size.
+Direct convolution requires $O(MN)$ multiplies to generate $N$ output values. 
+Implementing convolution using an FFT algorithm to calculate the DFT requires 
+$O((M+N)lg(M+N))$ multiplications for both the conversion to and from the frequency domain
+and $O(M+N)$ multiplications in the frequency domain and produces $M+N$ outputs.
+We define the multiplication savings factor as the number of multiplies per output
+using direct convolution over the number of multiplies per output using the 
+frequency transformation. The reduction factor 
+$f(M,N)=\frac{O(M(M+N))}{O(M+N)lg(M+N))+(M+N))}$. 
+Figure~\ref{fig:frequency-win-theory} shows a plot of this function in normalized 
+$M$, $N$ space. 
+
+We also performed experiments to measure the actual multiplication reduction
+as a function of $M$ (filter size) and output size ($N$).
+Figure~\ref{fig:frequency-win-empirical} shows the empirically measured
+multiplication savings factor per output.
 
 \begin{figure}
 \center
 \epsfxsize=3.0in
 \epsfbox{images/frequency-win-empirical.eps}
-\caption{Empirically measured multiplication reduction for the FIR benchmark. $N$ represents the number of samples for the response of the FIR, and target size represents the target size (approximately $M$). The vertical axis represents the multiplication reduction that is achieved by performing the frequency replacement optimization over the original program. Numbers greater than one represent increased computation and numbers less than one represent a reduction in computation. }
+\caption{Plot showing the empirically measured multiplication reduction factor as a function of the size of the FIR ($M$) and the number of outputs produced ($N$). The dark regions denote an increase in the required number of multiplications.}
 \label{fig:frequency-win-empirical}
+\vspace{-12pt}
 \end{figure}
 
 
-We also performed empirical experiments to measure the multiplication reduction
-as a function of both filter size ($N$) and output size ($M$). 
-Figure~\ref{fig:frequency-win-empirical} shows empirically measured normalized 
-multiplication savings per output. The results match those predicted by the 
-above analysis fairly closely.
-
-
+Our experimental results have the same shape, however we don't get the same
+speedup because of constant factors hidden by the assymptotic notation. For instance,
+elementwise multiplication of the complex values in $H[k]$ and $X[k]$ require
+four floating point operations for a straightforward implementation.
 
 \subsection{Algebraic Simplification from Combination}
-Linear analysis is good because it gives us precise relationships between input and output   
-that are hard to discern from normal imperative languages. For example, combining the action
-of {\tt streams} in a {\tt pipeline} is equivalent to doing algebraic simplification across
-sequential loops. 
+Linear analysis is valuable because it provides a precise relationship between input and output   
+that are impossible for normal compilers to discern from imperative programs. By 
+combining the actions of StreamIt structures we can do optimizations that are 
+not feasible for a standard compiler.
 
-One result of combining linear representations in {\tt Pipelines} in the stream graph is that  
-the compiler can perform algebraic simplification {\textbf across} the execution of {\tt Streams}. 
-If the compiler simply replaces the {\tt Pipeline} structure with a {\tt Filter} that 
-directly computes the overall vector matrix product, performance can be significantly improved.
-For instance, instead of implementing a band pass filter as a back to back combination
-of a low pass filter and a high pass filter, a clever programmer could determine the coefficients 
-of a single FIR filter back to back in a pipeline. However, given the ubiquity of high and 
-low pass filters, it is typically more convenient to understand and implement the action
-of a bandpass filter as a the two separate pieces.
+Combining the action of {\tt streams} in a {\tt pipeline} is an equivalent optimization 
+to algebraic simplification across sequential loops in an imperative program.
+Once an overall linear form for the {\tt pipeline} has been determined, our compiler 
+can simply replaces the original {\tt pipeline} with a {\tt filter} that computes the 
+combined linear form. Since the compiler can perform this transformation automatically,
+the the programmer can now express the computation in the most convenient manner. 
 
-Another example of a processing block which is implemented in a different way than
-usually represented is a FIR filter followed by a compressor block 
-(see \cite{oppenheim-discrete}) decimates the input by a factor $M$ (eg only every $M$th 
-input sample is passed on to the output filter). 
-Obviously there is no need to calculate all of the outputs. 
-Instead you should only calculate every $M$th sample.
-Therefore, we end up with an FIR {\tt Filter} that pops $M$ instead of poping one. While
-this is a transformation that is certainly worth doing (it reduces the computational
-requirements by a factor of $\frac{M-1}{M}$ the system is almost always represented
-as a filter followed by the compressor in system design diagrams. The inefficient
-implementation is represented because it is easier to understand the operation of the
-two fundamental processing blocks in cascade than it is to understand the combined system.
-Given the linear representations for both blocks, when such a pipeline is combined into an
-overall representation the efficient implementation is automatically derived. Therefore,
-our compiler with the linear analysis can perform the transformation automatically, 
-letting the programmer express the system in the most natural way (separate filter and compressor).
+For instance, although a bandpass filter can be implemented with a 
+low pass filter followed by a high pass filter, real implementations determine the coefficients 
+of a single filter that computes the same values. While a simple bandpass filter is easy to combine
+manually, in an actual design several different filters might be designed by 
+several different people which would be much harder to integrate into a single design.
+
+A common operation in discrete time signal processing is downsampling
+Downsampling is most often implemented as a low pass filter followed by a 
+an $M$ compressor which passes every $M$th input sample to the output.
+For every output of the downsampler, $M-1$ outputs from the low pass filter
+are ignored, so only every $Mth$ sample needs be computed.
+While this optimization is almost always done in actual system implementations because it reduces 
+the computational requirements by a factor of $\frac{M-1}{M}$, in the system specifications
+very often both the filter and the compressor will appear. The inefficient
+implementation is represented because it is conceptually easier to understand. 
+Our linear analysis covers this case, and thus our compiler can implement the transformation
+automatically.
 
 Another example is a multi band equalizer (such as is found in the FMRadio benchmark). 
-The overall purpose of such an equalizer is to filter $N$ different frequency bands 
-separately (like the graphic equalizer found on stereos). 
-The system diagram that best describes the operation of the multi band equalizer
-passes the input signal though the $N$ different filters, and then combines the $N$
-different outputs into the final output signal.
-This obvious design calls for $N$ filters, but if the filters do not vary with time, 
-a single filter which has the overall response that matches the action of all the 
-different individual filters. However, designing this single combined filter is 
-difficult, and subsequent changes to any of the sub filters will necessitate a
-redesign of the overall filter. Ideally, the designer would specify the system as
-the combination of multiple filters and then let the compiler combine them. 
-This automatic combination can is exactly what happens as a result of combining
-linear representations as described above. Because the linear analysis can
-figure out what is happening across the execution of multiple sub components, 
-it can do implementation optimizations that normally must be done by hand.
+The purpose of such an equalizer is to filter $N$ different frequency bands 
+separately (like the graphic equalizer found on stereos). The intuitive system specification 
+of an equalizer consists of $N$ bandpass filters operating in parallel whose output 
+is combined to produce the equalized signal. However, if the filters do not vary with time, 
+a single filter which performs the equivalent computation can be substituted instead. 
+However, designing this single combined filter is difficult, and any subsequent changes to 
+any one of the sub filters will necessitate a redesign of the overall filter. 
+Out compiler can automatically derive the equivalent filter, and any subsequent design changes
+will only necessitate a recompile rather than a manual redesign.
 
 
 \subsection{Overall optimization performance}
@@ -157,32 +145,66 @@ it can do implementation optimizations that normally must be done by hand.
 \center
 \epsfxsize=3.0in
 \epsfbox{images/linear-freq-both.eps}
-\caption{Results of running the benchmarks with linear replacement, frequency replacement, and both.}
+\caption{Multiplication reduction factors for each of the benchmarks with linear replacement, frequency replacement, and both.}
 \label{fig:linear-freq-both}
 \end{figure}
 
-The FIR scaling investigation is interesting because FIR filtering is a kernel
-operation for most DSP applications. To determine the effects of our linear
-replacement and frequency replacement optimizations on overall programs, we ran
-each benchmark with the linear replacement optimization, the frequency replacement
-optimization, and with linear replacement followed by frequency replacement. 
-Figure~\ref{fig:linear-freq-both} shows the normalized number of 
-multiplications as defined in the last section, required for each 
-benchmarks to execute $10000$ steady state iterations for each optimization choice.
+To determine the effects of our linear replacement and frequency replacement 
+optimizations, we compiled each benchmark with the linear 
+replacement, stupid frequency replacement, smart frequency replacement,
+and with linear replacement followed by smart frequency replacement. 
+Figure~\ref{fig:linear-freq-both} shows the multiplication reduction factor 
+achieved for each set of optimizations.
+
+In all cases, the smart frequency replacement performs much
+better than the naive one.
 
 For the FIR filter, all of the multiplication reduction comes from the frequency
-replacement optimization. As the entire application is comprised of a single
-{\tt Filter} calculating a convolution sum, there is nothing to combine.
-The target detection program experiences a small decrease in multiplications 
-for linear replacement, but it experiences a large boost from frequency replacement.
-The main work of the target detector system occurs in the four FIR filters, whose
+replacement optimization because the entire application is comprised of a single
+{\tt filter} calculating a convolution sum and there is nothing to combine.
+The TargetDetect program experiences a small decrease in multiplications 
+for linear replacement, and a larger boost from frequency replacement alone.
+The main work of the target detector system occurs in the four parallel FIR filters, whose
 results can not be combined.
 
-However, FilterBank gets a huge boost from linear replacement because its
-parallel analysis and synthesis pipelines can be combined into a single filter.
-Our sampling rate converter also benefits greatly from the frequency transformation
-due to the fact that it has contains a large FIR filter. The FMRadioApp
-benefits from linear replacement because its parallel gain stages are collapsed
-into a single filter during linear combination. The number of multiplies in the
-Radar app actually increases because our compiler does not take into account the
-fact that combined linear structures might actually increase computation.
+However, linear replacement reduces the number of multiplies 
+requried for FilterBank by a factor of three because the parallel analysis and 
+synthesis pipelines can be combined. Unfortunately, after
+linear replacement, the frequency translation doesn't reduce computation 
+because our current implementation only works for one column linear filters.
+
+The RateConverter also benefits greatly from the frequency transformation
+due to the fact that it has contains a large FIR filter. Our implementation
+currently doesn't support the full range of pipeline combination rules so
+we miss potential savings from linear combination.
+
+Similairly, FMRadio contains a multiband equalizer whose gain stages are collapsed
+into a single filter during linear combination.
+
+The number of multiplies in the Radar program actually increases because our 
+compiler does not take into account the fact that combined linear structures 
+might actually increase computation. %this is bs, obviously...
+
+
+\begin{table*}[t]
+\begin{tabular}{|l|c|c||c|c||c|c||c|} 
+\hline
+Benchmark & Filters & Linear  & Pipelines & Linear    & SplitJoins & Linear     & Average  \\
+          &         & Filters &           & Pipelines &            & SplitJoins & Vector Size\\
+\hline
+FIRProgram & 3 & 1 & 1 & 0 & 0 & 0 & 100 \\
+\hline
+TargetDetect & 10 & 4 & 1 & 0 & 2 & 1 & 100 \\
+\hline
+FilterBank & 27 & 25 & 17 & 9 & 4 & 3 & 51 \\
+\hline
+SamplingRateConverter & 5 & 3 & 2 & 0 & 0 & 0 & 335 \\
+\hline
+FMRadio & 25 & 22 & 3 & 1 & 2 & 2 & 33 \\
+\hline
+BeamFormer & 65 & 60 & 33 & 14 & 2 & 0 & 46 \\
+\hline
+\end{tabular}
+\caption{Statistics for benchmarks before and after transformations.}
+\label{fig:benchmark-stastics}
+\end{table*}
