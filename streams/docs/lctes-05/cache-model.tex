@@ -1,0 +1,114 @@
+\section{Cache Model for Streaming}
+\label{sec:cache-model}
+
+In this section we describe a simple and intuitve cache model to
+estimate the instruction and data cache behavior given an execution
+ordering of the filters in the stream graph.
+
+The model is based on the notion of a filter reuse distance which is 
+based on LRU stack distance~\cite{mattson-reuse}. We develop the model
+first first the instruction cache, and then subsequently evolve it to
+account for the data cache.
+
+\subsection{Instruction Cache}
+
+A {\it filter execuion trace} is a sequence of executions of
+filter work functions: $T = f_0 f_1 ... f_n$; $f_i$ represents the
+execution of filter $f$ at logical time $i$.
+The filter {\it instruction reuse distance} ($IRD$) is defined as the
+number of unique instructions that are referenced between two
+instances of the same work function. Formally, we define $phase(f_i)$
+as the sequence $f_i ... f_l$ ($i < l$) of work functions occuring in
+$T$ such that $f_i = f_l$ and no where else (i.e., $f_i \neq f_k$
+$\forall{k}~~s.t.~~i < k < l$). The $IRD(f_i) = \sum I(f_j)$ over all
+distinct filters occuring in $phase(f_i)$, and $I(f)$ equals the code
+size of a filter $f$. Based on this reuse metric, we define an
+instruction-cache-miss step function $ICM(f_i)$ such that:
+\begin{equation}
+\label{eq:icm}
+  ICM(f_i) =
+    \begin{cases}
+      0& \text{if $IRD(f_i) \leq C_I$; hit, no cache refill},\\
+      1& \text{otherwise; a miss, (some) cache refill}.\\
+    \end{cases}
+\end{equation}
+Note that if $f_i$ is the last occurence of a filter $f$ in the trace,
+then $ICM(f_i) = 0$. In Equation~\ref{eq:icm}, $C_I$ represents a
+consant proportional to the instruction cache size.
+
+We do not account for the cold start
+effects of an execution trace. This does not effect our model, and can
+be easily remedied if necessary. To see why this is so, consider the
+following two execution traces which represent the executions of work
+functions for two filters \texttt{A} and \texttt{B}:
+$T_1 = \texttt{A}_1\texttt{A}_2\texttt{B}_3\texttt{B}_4$
+and 
+$T_2 = \texttt{A}_1\texttt{B}_2\texttt{A}_3\texttt{B}_4$.
+In both 
+traces, the number of cold starts is the same (i.e., two in all).
+
+What our reuse metric quantifies is the number of misses when a specific work
+function is reinvoked. For example, assume that each filter is of the exact
+size: $I(\texttt{A}) = I(\texttt{B}) = \lfloor{C_I / 2}\rfloor + 1$;
+that is, the combined instruction workingset of both filters exceeds
+the instruction cache, although each filter has a code size that is
+smaller than the cache size. Naturally, we expect the trace $T_1$ to
+suffer one cold start miss and no other misses for filter \texttt{A}
+(and similarly for the other filter). Our model is in accord with
+intuition:  $ICM(\texttt{A}_1) = 0$ since
+the $IRD(\texttt{A}_1) < C_I$.
+
+In the case of trace $T_2$, we know that since the combined
+instruction workingset of the filters exceeds the cache size, when
+filter \texttt{B} is invoked following \texttt{A}, it evicts part of
+filter \texttt{A}'s instruction workingset. Hence when we transition
+back to run filter \texttt{A}, we have to refetch certain
+instructions, but in the process, we replace parts of filter
+\texttt{B}'s workingset. Hence, we have suffered one cold start miss,
+and one capacity miss for filter\texttt{A}, and similarly for
+\texttt{B}. Our model is again in accord with intuition: 
+$ICM(\texttt{A}_1) = 1$ since
+the $IRD(\texttt{A}_1) > C_I$. Note that the
+amount of refill is proportional to the number of cache lines that are
+replaced when swapping filters, and as such, we may wish to adjust
+our cache miss step function. One simple variation is to allow for
+some partial replacement without unduly penalizing the overall value
+of the metric. Namely, we can allow the constant $C_I$ to be some
+fraction greater than the actual cache size. Alternatively, we can use
+a more complicated miss function with a more uniform probablity
+distribution.
+
+Using the metrics above, we can estimate the instruction-cache miss
+rate $(IMR)$ as $\sum ICM(f_i)$ over all $f_i$ in the trace, divided
+by the size of the trace. Note that difference execution orderings for
+the same stream graph lead to traces of the same size and hence the
+comparison are fair. The model allows us to order the quality of an
+execution ordering, with scheduling decisions that boost temporal
+locality yielding miss rates closer to zero (and schedule that do not
+exploit temporal locality yielding traces with miss rates closer to
+one).
+
+Our model predicts that scaling is always beneficial from an
+instruction-cache point of view. As a reminder, by scaling, we mean
+that a filter's work function is run for a greater number of times in
+the steady state before transitioning to the next filter in the
+graph. Hence for example, a program that would generate a trace $T_2$
+might be as follows:
+\begin{verbatim}
+run_steady_state() {
+  for (i = 0; i < 1; i++) A_work();
+  for (i = 0; i < 1; i++) B_work();
+}
+\end{verbatim}
+but a scaled program that increases temporal locality is as follows:
+\begin{verbatim}
+run_steady_state() {
+  for (i = 0; i < M * 1; i++) A_work();
+  for (i = 0; i < M * 1; i++) B_work();
+}
+\end{verbatim}
+where \texttt{M} (the multiplicity factor) is an integer greater than
+one. From our model, it is easy to see that scaling reduces the number
+of misses for a given filter $f$ from $K$ to $K/\texttt{M}- 1$, where $K =
+\sum ICM(f)$ for all occurences of $f$ in  the execution trace.
+
