@@ -86,7 +86,7 @@ system.  These currently include:
 
 <<Basic Types>>=
 <<Enumerations>>
-<<Record Types>>
+<<Latencies>>
 <<Other Types>>
 @
 
@@ -118,17 +118,14 @@ typedef enum splitjoin_type {
 } splitjoin_type;
 @
 
-\subsection{Record Types}
-
-These are simple types that will be manipulated directly by the
-generated code.
+\subsection{Latencies}
 
 Latencies can be expressed as a linked list of discrete values or a
 continuous range of possible values.  There are also special-case
 values that can be used in certain circumstances (for example,
 requesting best-effort delivery).
 
-<<Record Types>>=
+<<Latencies>>=
 typedef struct latency_list {
   int val;
   struct latency_list *next;
@@ -149,8 +146,7 @@ typedef union latency {
   latency_special special;
 } latency;
 
-extern latency _latency_best_effort;
-#define LATENCY_BEST_EFFORT (&_latency_best_effort)
+#define LATENCY_BEST_EFFORT ((latency){ special: _BEST_EFFORT })
 @
 
 \subsection{Other Types}
@@ -183,6 +179,7 @@ typedef streamit_handler *interface_table;
 
 <<Interface Functions>>=
 <<Initialization Functions>>
+<<Split/Join Initializers>>
 <<Messaging Functions>>
 <<Run Function>>
 @
@@ -251,6 +248,65 @@ void set_to_canon(stream_context *c, streamit_handler f);
 void set_from_canon(stream_context *c, streamit_handler f);
 @
 
+\subsection{Splitters and Joiners}
+
+Splitters and joiners are used extensively in StreaMIT.  A split/join
+structure contains a splitter, some number of body nodes, and a
+joiner; a feedback loop contains a joiner, its body, and a splitter,
+with one output from the joiner pointing back into the splitter.
+
+Splitters and joiners are the only structures that do not have exactly
+one input and one output.  Splitters have multiple outputs; joiners
+have multiple inputs.  This requires special support from the runtime
+library.
+
+[[set_splitter]] and [[set_joiner]] create splitter and joiner nodes
+within the stream graph.  Both functions take a [[splitjoin_type]] as
+their first parameter, indicating the type of the splitter or joiner.
+The second parameter is the fan-out/in of the splitter or joiner.  The
+remaining parameters are the number of consecutive items that go to
+each stream, for a [[ROUND_ROBIN]] type.  There are assumed to be
+exactly [[n]] ratio items.
+
+A particular stream structure is assumed to have at most one splitter
+or joiner.  A [[SPLIT_JOIN]] has the splitter at the top of the block,
+and the joiner at the bottom; there should be [[n]] calls to
+[[register_child]], which register child objects in order.  A
+[[FEEDBACK_LOOP]] has the joiner at the top of the block, and the
+splitter at the bottom; [[n]] should be exactly [[2]].  The two
+children added are for the body and the feedback edge, in that order.
+The [[set_joiner]] ratios are for the entry path and the feedback
+edge, in that order; the [[set_splitter]] ratios are for the exit path
+and the feedback edge.
+
+<<Split/Join Initializers>>=
+void set_splitter(stream_context *c, splitjoin_type type, int n, ...);
+void set_joiner(stream_context *c, splitjoin_type type, int n, ...);
+@
+
+Tapes must be explicitly created between splitters, joiners, and other
+nodes.  [[create_split_tape]] and [[create_join_tape]] do this work;
+they are similar to [[create_tape]], but to identify the source and
+destination of the tape, they take parameters for the containing
+context and the slot number (indexed from 0) on the splitter
+output/joiner input.
+
+<<Split/Join Initializers>>=
+void create_split_tape(stream_context *container, int slot,
+                       int data_size, int tape_length);
+void create_join_tape(stream_context *container, int slot,
+                      int data_size, int tape_length);
+@
+
+It is an error to call splitter and joiner functions when they are not
+relevant.  In particular, no splitter or joiner functions may be
+called on [[FILTER]] or [[PIPELINE]] nodes.  [[create_split_tape]] and
+[[create_join_tape]] also may not be called for slots that don't exist
+in the splitter or joiner structures.  The run-time library also does
+consistency checking: the splitter and joiner must have the same
+number of slots, and each input and output tape must have the same
+size.
+
 \subsection{Messaging}
 
 Messages can be sent between filters.  Both senders and receivers must
@@ -289,9 +345,44 @@ void streamit_run(stream_context *c);
 \section{Internal Library Types}
 
 <<Opaque Types>>=
+<<Tapes>>
 <<Stream Context>>
 <<Portal>>
-<<Tapes>>
+@
+
+\subsection{Tapes}
+
+Data is passed between streams on tapes.  The tape structure can be
+manipulated directly by work functions if need be.  The [[data]] is
+allocated by the creator of the tape, and its size is exactly
+[[len * size]] bytes.  [[read_pos]] and [[write_pos]] are both
+integers greater than or equal to [[0]] and strictly less than
+[[len]], and point to [[size]]-byte offsets into [[data]].  In
+particular, they point to the last item read or written to the tape,
+such that [[PUSH]], [[POP]], and [[PEEK(0)]] will all use the
+following item.
+
+<<Tapes>>=
+typedef struct tape {
+  void *data;
+  int read_pos;
+  int write_pos;
+  int data_size;
+  int tape_length;
+} tape;
+@
+
+There are macros defined to manipulate tapes.  [[PUSH]] adds an item
+to the writer end of the tape; [[PEEK]] and [[POP]] both read data
+from the reader end.
+
+<<Tapes>>=
+#define PUSH(c, type, d) { if (++(c)->output_tape->write_pos >= (c)->output_tape->tape_length ) \
+                             (c)->output_tape->write_pos = 0; \
+                           ((type *)(c)->output_tape->data)[(c)->output_tape->write_pos] = (d); }
+#define PEEK(c, type, n) (((type *)c->input_tape->data)[(c->input_tape->read_pos+n)%c->input_tape->tape_length])
+#define POP(c, type) ((((++c->input_tape->read_pos) >= c->input_tape->tape_length) ? (c->input_tape->read_pos = 0) : 0), \
+                      ((type *)c->input_tape->data)[c->input_tape->read_pos])
 @
 
 \subsection{Filter Context}
@@ -311,7 +402,7 @@ typedef struct stream_context_list {
 typedef struct pipeline_type_data {
   stream_context_list *first_child;
   stream_context_list *last_child;
-} stream_context_list;
+} pipeline_type_data;
 
 typedef union stream_type_data {
   pipeline_type_data pipeline_data;
@@ -356,49 +447,14 @@ typedef struct portal {
 } portal;
 @
 
-\subsection{Tapes}
-
-Data is passed between streams on tapes.  The tape structure can be
-manipulated directly by work functions if need be.  The [[data]] is
-allocated by the creator of the tape, and its size is exactly
-[[len * size]] bytes.  [[read_pos]] and [[write_pos]] are both
-integers greater than or equal to [[0]] and strictly less than
-[[len]], and point to [[size]]-byte offsets into [[data]].  In
-particular, they point to the last item read or written to the tape,
-such that [[PUSH]], [[POP]], and [[PEEK(0)]] will all use the
-following item.
-
-<<Tapes>>=
-typedef struct tape {
-  void *data;
-  int read_pos;
-  int write_pos;
-  int data_size;
-  int tape_length;
-} tape;
-@
-
-There are macros defined to manipulate tapes.  [[PUSH]] adds an item
-to the writer end of the tape; [[PEEK]] and [[POP]] both read data
-from the reader end.
-
-<<Tapes>>=
-#define PUSH(c, type, d) { if (++(c)->output_tape->write_pos >= (c)->output_tape->tape_length ) \
-                             (c)->output_tape->write_pos = 0; \
-                           ((type *)(c)->output_tape->data)[(c)->output_tape->write_pos] = (d); }
-#define PEEK(c, type, n) (((type *)c->input_tape->data)[(c->input_tape->read_pos+n)%c->input_tape->tape_length])
-#define POP(c, type) ((((++c->input_tape->read_pos) >= c->input_tape->tape_length) ? (c->input_tape->read_pos = 0) : 0), \
-                      ((type *)c->input_tape->data)[c->input_tape->read_pos])
-@
-
 \section{Header File}
 
 <<streamit.h>>=
 #ifndef STREAMIT_H
 #define STREAMIT_H
 
-<<Opaque Types>>
 <<Basic Types>>
+<<Opaque Types>>
 <<Interface Functions>>
 
 #endif /* STREAMIT_H */
