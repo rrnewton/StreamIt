@@ -40,8 +40,8 @@ instructions.  The Filter must receive all of the data necessary to
 fire before it can execute its work function.  This is an overly
 conservative approach that prevents deadlock for certain situations
 but limits parallelism.  For example, this technique prevents
-FeedbackLoops from deadlocking by serializing the loop and the body,
-see fig ??.  The loop and the body cannot execute in parallel.  We are
+FeedbackLoops from deadlocking by serializing the loop and the body.  
+The loop and the body cannot execute in parallel.  We are
 investigating methods for relaxing the serialization.
 
 Next, we generate code for the collapsed Joiner nodes.  As described
