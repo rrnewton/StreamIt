@@ -392,7 +392,11 @@ node A once, then node B, node B again, C two times, B three times
 and C twice again, in that order.
 
 In order to shorten the above schedule we can run-length encode
-it.  The schedule becomes $\{A \{2B\}\{2C\}\{3B\}\{3C\}\}$.
+it.  The schedule becomes $\{A \{2B\}\{2C\}\{3B\}\{3C\}\}$. The
+schedule can also be expressed as $\{A \{2 \{BC\}\}\{3\{BC\}\}\}$.
+Different levels of loop nests can be used to express the
+schedule. The more loop nests are used, the more hierarchical the
+schedule becomes.
 
 \subsection{Schedule Size vs. Buffer Size}
 \label{sec:sched-vs-buffer}
