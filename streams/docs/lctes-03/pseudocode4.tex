@@ -22,9 +22,11 @@ Phase[] phasedSchedule (Stream s, int maxPhases, int mode) {
   } loop until {each node of s has fired all its init phases    (if mode==INIT)
                 each node of s has completed its steady state   (if mode==STEADY) }
   // combine into <maxPhases> groups, with contents sorted by child stream
-  size = ceil(phases.length / maxPhases)
-  forall i in [0, min(phases.length, maxPhases) - 1] {
-    newChildren = phases[i*size].children o ... o phases[(i+1)*size]
+  numPhases = min(maxPhases, phases.length)
+  forall i in [0, numPhases - 1] {
+    phaseStart = floor(i*phases.length/numPhases)
+    phaseEnd = floor((i+1)*phases.length/numPhases) - 1
+    newChildren = phases[phaseStart].children o ... o phases[phaseEnd].children
     result[i] = Phase(s, sortByStream(newChildren))
   }
   return result
@@ -34,8 +36,7 @@ int phasesForFeedback(FeedbackLoop s, int mode) {
   phaseCount = 0
   do {
     phaseCount++
-    dataAvail = # items on input tape of joiner(s)
-    for i = 1 to floor(dataAvail/joiner(s).pop[1])
+    while (canFire(joiner(s)))
       simulate(joiner(s))
     while (exists c \in s, c != joiner(s) and canFire(c) )
       simulate(c)
