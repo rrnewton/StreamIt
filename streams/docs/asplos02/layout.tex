@@ -64,8 +64,8 @@ architecture.
 
 \subsection{Layout on Raw}
 
-The layout phase of our StreamIt compiler maps nodes in the stream
-graph to the tile processors on Raw.  
+For Raw, the layout phase maps nodes in the stream
+graph to the tile processors.
 %Each tile processor looks very
 %much likes a MIPS R4000.  The tile processor uses a MIPS
 %instruction set with some slight modifications for inter-tile
@@ -92,17 +92,17 @@ annealing algorithm.  After some experimentation, we have arrived at
 the following cost function: 
 \[
 cost(channels) = \sum _{c \in channels} items(c) \cdot \left( hops(c) + \left( 2 \cdot
-assigned(c) \right) ^{3} \right)
+synch(c) \right) ^{3} \right)
 \]
 %%Sum over channels (items(channel) *
 %%(hops(channel) + (num_assigned(channel) * 2)^3) 
 Where \(items(c)\) gives the number of data items that traverse the
 channel \(c\) for each steady state execution.  \(hops(c)\) gives the
 number of intermediate tiles traversed on the route of the channel.
-Finally, \(assigned(c)\) attempts to give a cost to the added
-synchronization imposed by this channel assignment.  \(assigned(c)\)
+Finally, \(synch(c)\) attempts to give a cost to the added
+synchronization imposed by this channel assignment.  \(synch(c)\)
 calculates the number of tiles that are assigned to Filters plus the
-number of tiles involved in routing other channels on the route.
+number of tiles involved in routing \emph{other} channels on the route.
 
 With the above cost function, we heavily weigh the added
 synchronization imposed by the layout.  For Raw, this metric is far

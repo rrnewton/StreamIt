@@ -11,15 +11,15 @@ avoid deadlock and starvation while trying to utilize the parallelism
 explicit in the stream graph.
 
 The exact implementation of the communication scheduler is tied to the
-communication model of the target.  For targets implementing an
-end-to-end, infinite FIFO abstraction [are there any???], the
+communication model of the target.  The simplest mapping would occur
+for targets implementing an end-to-end, infinite FIFO abstraction, the
 scheduler needs only to decide to whom to send an item and from whom
-to receive an item.  As the communication model becomes more
+to receive an item.  Information easily calculated from the weights of
+the Splitters and Joiners.  As the communication model becomes more
 constrained, the communication scheduler becomes more complex,
 requiring analysis of the stream graph. For targets implementing a
 finite, blocking nearest-neighbor communication model, the exact
-ordering of tile execution must be specified.  Raw's communication
-model falls under this category.
+ordering of tile execution must be specified. 
 
 Due to the static nature of StreamIt, the compiler can statically
 orchestrate the communication resources.  We can create an
@@ -74,29 +74,30 @@ state schedule, both are described in section ??.  A push model
 schedule is used for both phases.  We define a push model schedule as
 a schedule that advances computation on the furthest downstream node
 in the stream graph at each step.  The push model schedule allows the
-StreamIt compiler to drop the buffers that connect each neighboring
+implementationto disregard the FIFO buffers that connect each neighboring
 node in the stream graph.  This is because data items will not be
-accumulating in the buffers.  Each destination will consume the data
+accumulating at the source, dest, or intermediate nodes.  
+Each destination will consume the data
 item as it is produced (modulo the latency of routing).
 
 To assure deadlock free execution of Joiner nodes, we must allow the
 Joiner nodes to receive data in the firing order of its upstream
 Filters (figure ??). So, the Joiner must buffer data until it can fire
 in the order specified by its incoming weights.  First, remember that
-we collapse all neighboring Joiners into a single Joiner node.  For
-each collapsed Joiner node, we create a 'virtual' buffer for each
+we collapse all neighboring Joiners into a single Joiner node.
+We create an internal buffer for each
 incoming channel of the collapsed Joiner.  During execution of the
 simulation, we record the order of receives to and send from these
-virtual buffers.
+internal buffers.
 
 To create this Joiner buffer schedule, the simulator must keep track
-of the current buffer to send data.  The order can be
-calculated from the weights of the joiner (as each buffer corresponds
-to an upstream Filter).  When the current buffer in this order has
-more than one item in it, the Joiner can fire.  The simulator can then
-determines the next buffer to send data.  To faciliate code generate
-\ref{sec:codegen}, the maximum buffer size of each virtual buffer is
-recorded.
+which internal buffer can send data.  The order can be calculated from
+the weights of the joiner (as each buffer corresponds to an upstream
+Filter).  When the current buffer in this order has more than one item
+in it, the Joiner can fire.  The simulator can then determines the
+next internal buffer to send data.  To faciliate code generation
+(Section \ref{sec:codegen}), the maximum buffer size of each internal
+buffer is recorded.
 
 Our current implemenation of the communication scheduler is overly
 cautious in its deadlock avoidance.  All Feedbackloops are serialized

@@ -16,25 +16,27 @@ The code generation phase of the Raw backend generates code for both
 the tile processor and the switch processor.  For the switch
 processor, we generate assembly code directly.  For the tile
 processor, we generate C code that is compiled using Raw's GCC port.
-First we will discuss the tile processor code generation.  The
-expressions and statements of StreamIt look much like C code and can
-be generated directly.  Translations for the {\tt push(value)}, {\tt
-peek(i)}, and {\tt pop()} expressions of StreamIt require more care.
+First we will discuss the tile processor code generation.  We can
+directly translate the intermediate representation of most StreamIt
+expressions and Statements into C code.  Translations for the {\tt
+push(value)}, {\tt peek(i)}, and {\tt pop()} expressions of StreamIt
+require more care.
+
 
 In the translation, each Filter collects the data necessary to fire in
 an internal buffer.  Before each Filter is allowed to fire, it must
 receive pop items from its switch processor (peek items for the
 initial firing).  The buffer is managed circularly and the size of the
-buffer is equal to the number of items peeked by this filter.  {\tt
+buffer is equal to the number of items peeked by this Filter.  {\tt
 peek(i)} and {\tt pop()} are translated into accesses of the buffer,
 with {\tt pop()} adjusting the end of the buffer, and {\tt peek(i)}
-accessing the ith element from the end of the buffer.  {\tt
+accessing the $i^{th}$ element from the end of the buffer.  {\tt
 push(value)} is translated directly into a send from the tile
 processor to the switch processor.  The switch processors are then
 responsible for routing the data item.
 
 The Filter code does not interleave send instructions with receive
-instructions.  The filter must receive all of the data necessary to
+instructions.  The Filter must receive all of the data necessary to
 fire before it can execute its work function.  This is an overly
 conservative approach that prevents deadlock for certain situations
 but limits parallelism.  For example, this technique prevents
@@ -43,16 +45,18 @@ see fig ??.  The loop and the body cannot execute in parallel.  We are
 investigating methods for relaxing the serialization.
 
 Next, we generate code for the collapsed Joiner nodes.  As described
-in section ??, the communication scheduler computes a virtual buffer schedule
-for each collapsed Joiner.  This schedule exactly describes the order
-in which to send and receive data items from within the Joiner.  The
-schedule is annotated with the destination buffer of the receive
-instruction and the source buffer of send instruction.  Also, the
-communication scheduler calculates the maximum size of each buffer.
-With this information the code generation phase can produce the code
-necessary to realize the virtual buffer schedule on the tile processor.
+in Section \ref{sec:rawcommunic}, the communication scheduler computes
+a internal buffer schedule for each collapsed Joiner.  This schedule
+exactly describes the order in which to send and receive data items
+from within the Joiner.  The schedule is annotated with the
+destination buffer of the receive instruction and the source buffer of
+send instruction.  Also, the communication scheduler calculates the
+maximum size of each buffer.  With this information the code
+generation phase can produce the code necessary to realize the
+internal buffer schedule on the tile processor.
 
-Lastly, to generate the instructions for the switch processor, we
+Lastly, to generate the in
+structions for the switch processor, we
 directly translate the switch schedules computed by the communication
 scheduler.  The initialization switch schedule is followed by the steady
 state switch schedule, with the steady state schedule looped infinitely.
