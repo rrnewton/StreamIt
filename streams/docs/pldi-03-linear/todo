@@ -1,6 +1,8 @@
 high priority
 -------------
 
+- the paper outline refers to section 2 and 2.1
+
 - bill is confused with definitions of multiplication scaling
 
 - > >- In 5.2, when you talk about generating a new stream that uses more
@@ -21,10 +23,6 @@ we're doing?  It's not really a dataflow analysis.
 
 - make it explicit somewhere that whenever we introduce \lambda_x, we
 also introduce A_x, b_x, e_x, o_x, u_x.
-
-(aal - started) I would recommend adding a vector symbol to b
-everywhere, or putting A and b in bold everywhere, to note that
-they're vectors and distinguish them from constants like e, o, and u.
 
 probably not doing
 ------------------

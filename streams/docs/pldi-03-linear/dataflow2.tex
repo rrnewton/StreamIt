@@ -1,3 +1,8 @@
+\newcommand{\la}{$\leftarrow$}
+\newcommand{\IND}{\begin{ALC@g}}
+\newcommand{\UND}{\end{ALC@g}}
+\newcommand{\tup}[2]{\langle{#1}, {#2}\rangle}
+
 \subsection{Linear Extraction Algorithm}
 \label{sec:dataflow}
 
@@ -8,13 +13,32 @@ next page, is a forward dataflow analysis similar to constant
 propagation.  Unlike a standard dataflow analysis, we can afford to
 symbolically execute all loop iterations, since most loops within a
 filter's work function have small bounds that are known at compile
-time (if a loop has an unknown bound, the filter is unlikely to be
-linear and we disregard it).
+time (if a bound is statically unresolvable, the filter is unlikely to
+be linear and we disregard it.)
 
-During symbolic execution, the algorithm maintains a mapping between
-each program variable $y$ and a linear form $({\vec v}, c)$.  In an
-actual execution, the value of $y$ would be given by $y = v \cdot x +
-c$, where $x$ represents the items at the front of the input tape.
+Figure~\ref{fig:types} contains an overview of our notation for the
+pseudocode.  During symbolic execution, the algorithm maintains a
+$\mt{map}$ between each program variable $y$ and a linear form
+$\tup{{\vec v}}{c}$. In an actual execution, the value of $y$ would be
+given by $y = {\vec v} \cdot {\vec x} + c$, where ${\vec x}$
+represents the input items.  The algorithm also maintains two
+constants $\mt{pushcount}$ and $\mt{popcount}$ that indicate how many
+items have been pushed and popped so far.  As it encounters {\tt push}
+operations, it builds up the matrix $A$ and vector ${\vec b}$ that
+will come to represent the linear node.
+
+We briefly discuss the operation of {\bf Extract} at each program
+node.  The algorithm is formulated in terms of a simplified set of
+instructions, which appear in Figure~\ref{fig:types}.  First are the
+nodes that generate new linear forms.  A constant assignment $y = c$
+creates a form $\tup{\vec 0}{c}$ for $y$, since $y$ has constant part
+$c$ and does not yet depend on the input.  A {\tt pop} operation
+creates a form $\tup{\mbox{\bf BuildCoeff}(\mt{popcount})}{0}$, where
+{\bf BuildCoeff} introduces a coefficient of $1$ for the current index
+on the input stream.  A {\tt peek}$(i)$ operation is similar, but
+offset by the index $i$.
+
+Next are the instructions which combine linear forms.
 
 The algorithm applies the confluence operator $\sqcap$ over scalar
 constants, vectors, matrices, linear forms, and maps.  $c_1 \sqcap
@@ -27,10 +51,7 @@ meet is taken on the values: $\mt{map}_1 \sqcap \mt{map}_2$ $=$
 $\mt{map'}$, where $\mt{map'}.\mt{get}(x) = \mt{map}_1.\mt{get}(x)
 \sqcap \mt{map}_2.\mt{get}(x)$.
 
-\newcommand{\la}{$\leftarrow$}
-\newcommand{\IND}{\begin{ALC@g}}
-\newcommand{\UND}{\end{ALC@g}}
-\newcommand{\tup}[2]{\langle{#1}, {#2}\rangle}
+We deal with function calls.
 
 \begin{figure}[t]
 \begin{equation} \nonumber
@@ -38,9 +59,9 @@ $\mt{map'}$, where $\mt{map'}.\mt{get}(x) = \mt{map}_1.\mt{get}(x)
 y & \in & \mbox{program-variable} \\
 c & \in & \mbox{constant}_{\bot} \\
 \vec v, \vec b & \in & \mbox{vector} \\
-A & \in & \mbox{matrix} \\
 \tup{\vec v}{c} & \in & \mbox{linear-form} \\
 map & \in & \mbox{program-variable} \rightarrow \mbox{linear-form  (a hashtable)} \\
+A & \in & \mbox{matrix} \\
 code & \in & \mbox{list of instructions, each of which can be:} \\
 \multicolumn{3}{l}{\parbox{3in}{
     \vspace{-6pt}
@@ -80,7 +101,7 @@ proc {\bf BuildCoeff}(int $pos$) returns $\vec v$ for peek at index $pos$ \\ \vs
 \STATE return $\vec v$
 \end{algorithmic}
 \vspace{6pt}
-{\bf Global Variables:} int Push, Pop, Peek
+{\bf Global Variables:} int Peek, Pop, Push
 \end{algorithm}
 
 \begin{algorithm}
@@ -137,25 +158,25 @@ proc {\bf Extract}($code$, $map$, $A$, $\vec b$, int $\mt{popcount}$, int $\mt{p
 \STATE $\mt{map}.\mt{put}(y_1, (\vec 0_{Peek} \sqcap \vec v_2 \sqcap \vec v_3, c_2 ~\mt{bitop}~ c_3))$
 \UND
 \STATE \vspace{-6pt}
-\STATE $\mbox{\bf case}~y_1 := \mt{const}$
+\STATE $\mbox{\bf case}~y := \mt{const}$
 \IND
-\STATE $\mt{map}.\mt{put}(y_1, (\vec 0_{Peek}, \mt{const}))$
+\STATE $\mt{map}.\mt{put}(y, (\vec 0_{Peek}, \mt{const}))$
 \UND
 \STATE \vspace{-6pt}
-\STATE $\mbox{\bf case}~y_1 := \mbox{\tt peek}(i)$
+\STATE $\mbox{\bf case}~y := \mbox{\tt peek}(i)$
 \IND
-\STATE $\mt{map}.\mt{put}(y_1, (\mbox{\bf BuildCoeff}(i + \mt{popcount}), 0))$
+\STATE $\mt{map}.\mt{put}(y, \tup{\mbox{\bf BuildCoeff}(\mt{popcount}+i)}{0})$
 \UND
 \STATE \vspace{-6pt}
-\STATE $\mbox{\bf case}~y_1 := \mbox{\tt pop}()$
+\STATE $\mbox{\bf case}~y := \mbox{\tt pop}()$
 \IND
-\STATE $\mt{map}.\mt{put}(y_1, (\mbox{\bf BuildCoeff}(\mt{popcount}), 0))$
+\STATE $\mt{map}.\mt{put}(y, \tup{\mbox{\bf BuildCoeff}(\mt{popcount})}{0})$
 \STATE $\mt{popcount}$\verb|++|
 \UND
 \STATE \vspace{-6pt}
-\STATE $\mbox{\bf case}~\mbox{\tt push}(y_1)$
+\STATE $\mbox{\bf case}~\mbox{\tt push}(y)$
 \IND
-\STATE $\tup{\vec v}{c} \leftarrow \mt{map}.\mt{get}(y_1)$
+\STATE $\tup{\vec v}{c} \leftarrow \mt{map}.\mt{get}(y)$
 \STATE $A[*, \mt{pushcount}] \leftarrow \vec v$
 \STATE $b[\mt{pushcount}] \leftarrow c$
 \STATE $\mt{pushcount}$\verb|--|
