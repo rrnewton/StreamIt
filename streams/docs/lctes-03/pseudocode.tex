@@ -1,867 +1,571 @@
-\section{Initialization for Peeking}
+\begin{comment}
 
-This section will develop a simple algorithm for constructing an
-initialization schedule.  The algorithm developed here will use
-hierarchy in a similar way section \ref{sec:calc-min-steady} used
-hierarchy to compute steady schedules.  Schedules computed here
-are not minimal, but remain reasonably small.
+\begin{figure}
+\begin{center}
 
-The amount of data required for initialization by stream $s$ will
-be denoted by $init^{pop}_s$. The amount of data produced by
-initialization schedule will be denoted by $init^{push}_{s}$. This
-hierarchical technique will simplify calculations, but may be
-unable to compute an initialization schedule for {\feedbackloops}
-that would otherwise be possible to schedule.  An algorithm for
-computing a valid initialization schedule for any stream that can
-be initialized will be presented in Section \ref{sec:min-latency}.
+\begin{minipage}{1.2in}
+\centering \psfig{figure=pipeline-steady-state.eps,width=0.6in} \\
+{\protect\small (a) A sample {\pipeline}}
+\end{minipage}
+~
+\begin{minipage}{1.2in}
+\centering \psfig{figure=splitjoin-steady-state.eps,width=1.2in} \\
+{\protect\small (b) A sample {\splitjoin}}
+\end{minipage}
+~
+\begin{minipage}{1.5in}
+\centering \psfig{figure=feedback-steady-state.eps,width=1.0in} \\
+{\protect\small (c) A sample {\feedbackloop}.  The $L$ {\filter}
+has been flipped upside-down for clarity.\\$peek_L = pop_L = 5,
+push_L = 6$}
+\end{minipage}
 
-\subsubsection{Notation for Initialization Schedules}
+\caption{Sample {\StreamIt} streams} \label{fig:steady-state}
 
-An initialization schedule for a stream $s$ is a set $I_s$ with
-elements $I_s = \{c, u\}$.  The set includes a vector $c$ which
-holds values $[e_s^{init}, o_s^{init}, u_s^{init}]$ for the
-initialization schedule of the stream and a vector $u$ which
-stores how many times each of the direct children of $s$ will
-execute their steady state.  The elements are denoted $I_{s,S}$,
-$I_{s,c}$ and $I_{s,u}$.
+\end{center}
+\end{figure}
 
 \subsubsection{\filter}
 
-Since {\filters} do not buffer any data, they do not require
-initialization schedules.  They may, however, require some data
-for their initialization.  For a {\filter} $f$, this amount of data
-is $e_f - o_f$, as explained above.  {\filters} will not produce any
-data during initialization.
+Since {\filters} do not have any internal buffering, their minimal
+steady state is to execute the {\filter}'s {\work} function once.
+This is the smallest amount of execution a {\filter} can have.
 
-An initialization schedule of a {\filter} is thus $I_f = \{[e_f-o_f,
-0, 0], \{\}\}$.
-
-\subsubsection{\pipeline}
-
-\begin{algorithm}
-\caption{Single Appearance Initialization Counts for a {\pipeline}}
-{\bf }($p$). Given a {\pipeline} $p$, calculate how many times each
-child needs to execute its steady state to initialize the
-{\pipeline} for peeking.
-\begin{algorithmic}
-\STATE compute $S_{p_{n-1}}$; $u_{n-1} = 0$ \FOR{$i=n-2$ downto 0}
-\STATE compute $S_{p_i}$ \STATE $u_i = {I_{p_{i+1}, c_0} + u_{i+1}
-* S_{p_{i+1}, c_1} - I_{p_i, c_2} \over I_{p_i, c_2}}$ \ENDFOR
-\STATE $I_p = \{[I_{p_0, c_0} + (u_0 - 1) * S_{p_0, c_0}, u_0 *
-S_{p_0, c_0}, I_{p_{n-1}, c_2}] ,u\}$
-\end{algorithmic}
-\end{algorithm}
-
-Let $s_i$ denote $i$th child stream of the {\pipeline}.  Also, let
-$m_i$ denote the number of times the $i$th child will execute its
-steady state during execution of {\pipeline}'s initialization
-schedule.
-
-The $i$th stream needs to provide at least $init^{pop}_{s_{i+1}} +
-m_{i+1} * pop_{s_{i+1}}$ data for {\pipeline}'s next child.  For the
-last child $m_{n-1} = 0$, thus it only needs
-$init^{pop}_{s_{n-1}}$ data to initialize.  Knowing the amount of
-data required by the last child, we can compute how much data all
-other children require, and thus compute how many times all other
-children need to execute their steady state schedules.
-
-In order to provide enough data for $s_{i+1}$, $s_{i}$ is going to
-execute its initialization schedule, producing
-$init^{push}_{s_{i}}$ data items, and then it is going to execute
-its steady state schedule $m_i$ times to provide any additional
-required data.  The $i$th child will need to execute its steady
-state schedule $m_i = \left\lceil { init^{pop}_{s_{i+1}} + m_{i+1}
-* pop_{s_{i+1}} - init^{push}_{s_i} \over{push_{s_i}}}
-\right\rceil$ times.
-
-Finally, since the first child of the {\pipeline} is directly
-receiving the data that is meant to enter the {\pipeline}, it
-follows that $init^{pop}_{p} = init^{pop}_{s_0} + m_0 *
-pop_{s_0}$. Similarly, $init^{push}_{pipeline} =
-init^{push}_{s_{i-1}}$.
-
-Once all $m_i$s are known, the initialization schedule is
-constructed according to the following algorithm:
-
-\begin{singlespace}
-\begin{verbatim}
-initialization schedule (p) = empty for i = 0 .. n-1
-    initialization schedule (p) += initialization schedule (s_i)
-    for j = 1 .. m_i
-        initialization schedule (p) += steady schedule (s_i)
-    end for
-end for
-\end{verbatim}
-\end{singlespace}
-
-Notice, that since the children of the {\pipeline} use their steady
-schedules in order to push extra data into the buffers, they may
-be pushing more data than required, thus causing the pipeline to
-consume more data for its initialization schedule than absolutely
-required.  This over-estimation will propagate up with each
-{\StreamIt} stream that contains this {\pipeline}.
-
-We again use the example from Figure \ref{fig:steady-state} (a).
-Since all children of the {\pipeline} are {\filters}, they do not have
-any initialization schedules, and their $init^{push}_{s_i} = 0$.
-By inspection we obtain
+Thus, for a {\filter} $f$,
 
 \begin{displaymath}
-\begin{array}{rl}
-init^{pop}_A = & 1-1=0 \\
-init^{pop}_B = & 3-2 = 1 \\
-init^{pop}_C = & 2 - 2 = 0 \\
-init^{pop}_D = & 5-3=2 \\
-\\
-m_3 = & 0 \\
-m_2 = & \left \lceil 2 + 3 * 0 - 0 \over 1 \right \rceil = 2\\
-m_1 = & \left \lceil 0 + 2 * 2 - 0 \over 3 \right \rceil = 2\\
-m_0 = & \left \lceil 1 + 2 * 2 - 0 \over 3 \right \rceil = 2\\
+S_f = \left\{[1], \{f\}, { \left[
+\begin{array}{c}e_f\\o_f\\u_f
+\end{array}
+\right]}, [] \right\}
+\end{displaymath}
+
+Notice that $S_{f,v}$ is empty, because a {\filter} does not have
+any children.
+
+\subsubsection{\pipeline, \splitjoin and \feedbackloop}
+\begin{figure}\begin{center}
+\begin{minipage}{2in}
+\centering \psfig{figure=splitjoin-illegal.eps,width=2in}
+\end{minipage}
+\end{center}
+\caption{An illegal {\splitjoin}} \label{fig:splitjoin-illegal}
+\end{figure}
+
+
+The computation of a steady state for a \pipeline, \splitjoin or a
+\feedbackloop is divided into three steps. In the first step we
+compute a fractional steady state (a steady state which includes
+fractional executions of internal \streams). In the second step we
+compute an integral steady state from the fractional steady state.
+Finally, we compute a minimal steady state from the integral
+steady state.
+
+In order to calculate a fractional steady state of a \stream, we
+assign a value of 1 execution for an internal \stream, and iterate
+over all the children of the \stream to calculate how many times
+they need to execute to consume or produce enough data to conserve
+amount of data buffered in the \stream. Here we'll present
+specific equations for a \pipeline.
+
+Let the {\pipeline} $p$ have $n$ children and let $p_i$ denote the
+$i$th child of the {\pipeline} (counting from {\Input} to
+{\Output}, starting with 0, the children may be streams, not
+necessarily {\filters}). We must find $S_p$.
+
+We start with calculating all $S_{p_i}, i \in \{0, \dots, n-1\}$.
+This task is achieved recursively.
+
+Next we find a fractional vector $v''$ such that executing each
+$p_i$ $v_i''$ times will not change the amount of data buffered in
+the {\pipeline} and the first child is executed exactly once.
+%\begin{comment}
+Since the children streams are executed fractional amount of
+times, we calculate the amount of data they produce and consume
+during this execution by multiplying $S_{p_i,c_o}$ and
+$S_{p_i,c_u}$ by $v_i''$.
+%\end{comment}
+$v''$ must satisfy $v_0'' = 1, \forall i \in \{0,\dots,n-1\},
+v_i'' * u_{p_i} = v_{i+1}'' * o_{p_{i-1}}$. Thus
+%\begin{comment}
+We compute $v''$ as follows.  The first child executes once, thus
+$v_0'' = 1$.  The second child must execute $v_1'' = {u_{p_0}
+\over {o_{p_1}}}$ times to ensure that all data pushed on the the
+first {{\Channel}} is consumed by the second child.  The third
+child must execute $v_2'' = v_1'' {u_{p_1} \over o_{p_2}} =
+{u_{p_0} \over o_{p_1}} {u_{p_1} \over o_{p_2}}$ times to ensure
+that it consumes all the data produced by the second child. Thus,
+%\end{comment}
+$v_i'' = {\prod_{j = 0}^{i-1} u_{p_j} \over \prod_{j=1}^i
+o_{p_j}}$
+
+Next we will find an integral vector $v'$ such that executing each
+$p_i$ $v_i'$ times will not change the amount of data buffered in
+the {\pipeline}.  $v'$ will be a valid steady state of the
+{\pipeline}. In order to calculate $v'$ we multiply $v''$ by
+$\prod_{j=1}^{n-1} o_{p_j}$.  Thus
+
+\begin{displaymath}
+v'_i = \left({\prod_{j = 0}^{i-1} u_{p_j} \over \prod_{j=1}^i
+o_{p_j}} \right) \left(\prod_{j=1}^{n-1} o_{p_j} \right) = \left(
+\prod_{j=0}^{i-1} u_{p_j} \right) \left( \prod_{j=i+1}^{n-1}
+o_{p_j} \right)
+\end{displaymath}
+
+Now we find an integral vector $v$, such that, for some positive
+integer $g$, $v' = g * v$, and $\sum_i v_i$ is minimal.  In other
+words, we find the greatest integer $g$, such that $v' = g * v$,
+with $v$ consisting of integers.  $v$ represents the minimal
+steady state for pipeline $p$. This is achieved by finding the
+$\gcd$ of all elements in $v'$, and dividing $v'$ by $g$.  Thus $v
+= {v' \over \gcd(v')}$
+
+$v$ represents the number of times each child of $p$ will need to
+execute its steady state in order to execute the minimal steady
+state of $p$, thus $S_{p,v} = v$.  $v$ holds a steady state
+because amount of data buffered in $p$ does not change, and it is
+a minimal steady state, because $\sum_i v_i$ is minimal.
+
+We construct set $S_p$ as follows:\footnote{Here we use symbol
+$\circ$ to denote concatenation of vectors and sets.  Thus $[1\ 2\
+3] \circ [4\ 5\ 6] = [1\ 2\ 3\ 4\ 5\ 6]$ and $\{A\ B\ C\} \circ
+\{D\ E\ F\} = \{A\ B\ C\ D\ E\ F\}$.}
+
+\begin{displaymath}
+S_p = \left\{ \begin{array}{c} v_0 * S_{p_0,m} \circ \dots \circ
+v_{n-1}
+* S_{p_{n-1}, m}, S_{p_0, N} \circ \dots \circ S_{P_{n-1}, N}, \\
+\left[
+\begin{array}{c}
+e_{p_0} + (v_0 - 1) * o_{p_0} \\
+v_0 * o_{p_0} \\
+v_{n-1} * u_{p_{n-1}}
+\end{array}\right], v \end{array} \right\}
+\end{displaymath}
+
+An example is presented in Figure \ref{fig:steady-state} (a). $A$,
+$B$, $C$ and $D$ are \filters.
+%\begin{comment}For this {\pipeline},
+we have the following steady states for all children of the
+{\pipeline}:
+
+\begin{displaymath}
+\begin{array}{lrlr}
+S_A = & \left\{[1], \{A\}, { \left[
+\begin{array}{c} 1 \\ 1 \\ 3
+\end{array}
+\right]}, [] \right\}, &
+
+S_B = & \left\{[1], \{B\}, { \left[
+\begin{array}{c} 3 \\ 2 \\ 3
+\end{array}
+\right]}, [] \right\} \\ \\
+
+S_C = & \left\{[1], \{D\}, { \left[
+\begin{array}{c} 2 \\ 2 \\ 1
+\end{array}
+\right]}, [] \right\}, &
+
+S_D = & \left\{[1], \{D\}, { \left[
+\begin{array}{c} 5 \\ 3 \\ 1
+\end{array}
+\right]}, [] \right\} \\
+
 \end{array}
 \end{displaymath}
 
-Thus the initialization schedule is $(AABBCC)$.  Also,
-$init^{pop}_p = 0 + 2 * 1 = 2$ and $init^{push}_p = 0$.
-
-\subsubsection{\splitjoin}
-
-\begin{algorithm}
-\caption{Single Appearance Initialization Counts for a {\pipeline}}
-{\bf }($p$). Given a {\pipeline} $p$, calculate how many times each
-child needs to execute its steady state to initialize the
-{\pipeline} for peeking.
-
-\begin{algorithmic}
-
-\STATE compute $S_{p_{n-1}}$; $u_{n-1} = 0$
-
-\FOR{$i=n-2$ downto 0}
-
-\STATE compute $S_{p_i}$
-
-\STATE $u_i = {I_{p_{i+1}, c_0} + u_{i+1} * S_{p_{i+1}, c_1} -
-I_{p_i, c_2} \over I_{p_i, c_2}}$
-
-\ENDFOR
-
-\STATE $I_p = \{[I_{p_0, c_0} + (u_0 - 1) * S_{p_0, c_0}, u_0 *
-S_{p_0, c_0}, I_{p_{n-1}, c_2}] ,u\}$
-
-\end{algorithmic}
-\end{algorithm}
-
-Initializing a {\splitjoin} is done by executing the {\splitter}
-enough times to provide enough data for all the children to
-initialize.  The {\joiner} is never run, so there may be some data
-buffered between the children streams and the {\joiner}.
-
-Let $s_i$ denote the $i$th child stream of the {\splitjoin},
-$w_{s,i}$ denote the amount of data pushed by the {\splitter} of the
-{\splitjoin} towards the $i$th child during an execution of the
-{\splitter}, and $w_{j,i}$ denote the amount of data popped by the
-{\joiner} from the $i$th child during its execution.
-
-The {\splitter} must execute enough times to provide every child of
-the {\splitjoin} with enough data to initialize.  For $i$th child,
-the required number of executions is $\left\lceil init^{pop}_{s_i}
-\over w_{s,i} \right\rceil$.  The {\splitter} needs to execute the
-maximum amount of times required by any the children, that is
-$m_{split} = \max \left\lceil init^{pop}_{s_i} \over w_{s,i}
-\right\rceil, \forall i \in \{0,\dots,n-1\}$.  Thus the amount of
-data required for initialization of a {\splitjoin} is
-$init^{pop}_{sj} = pop_{split} * m_{split}$. Since the joiner will
-never get executed, $init^{push}_{sj} = 0$.
-
-Once $m_{\splitter}$ is has been calculated, the initialization
-schedule is constructed according to the following algorithm:
-
-\begin{singlespace}
-\begin{verbatim}
-initialization schedule (sj) = empty
-
-for i = 1 .. m_{splitter}
-  initialization schedule (sj) += {\splitter} execution
-end for
-
-for i = 0 .. n-1
-    initialization schedule (sj) += initialization schedule (s_i)
-end for
-\end{verbatim}
-\end{singlespace}
-
-The following computes an initialization schedule for the example
-{\splitjoin}  from Figure \ref{fig:steady-state} (b). Both children
-of the {\splitjoin} are {\filters}, thus they do not have
-initialization schedules and their $init^{push}_{s_i} = 0$. By
-inspection, we obtain
+Using the steady states above, we get the following vector $v'$:
 
 \begin{displaymath}
-\begin{array}{rl}
-init^{pop}_A = & 2-2=0 \\
-init^{pop}_B = & 3-2 = 1 \\
-\\
-m_{split} = & \max({0 \over 2}, {1 \over 1}) = \max (0, 1) = 1
+v' = \left[
+\begin{array}{c}
+(2 * 2 * 3)\\
+(3) (2 * 3) \\
+(3 * 3) (3) \\
+(3 * 3 * 1)
 \end{array}
+\right] = \left[
+\begin{array}{c}
+12\\ 18\\ 27\\ 9
+\end{array}
+\right]
 \end{displaymath}
 
-Thus the initialization schedule for this {\splitjoin} is simply
-$({\splitter})$.  We also get $init^{pop}_{sj} = 1
-* 3 = 3$ and $init^{push}_{sj} = 0$.
-
-\subsubsection{\feedbackloop}
-
-The final {\StreamIt} component left to initialize is the
-{\feedbackloop}. Let $s_b$ be the body stream of the {\feedbackloop},
-and $s_l$ be the feedback path stream of the {\feedbackloop} (thus
-$push_{s_b}$ is the amount of data pushed by $s_b$ per steady
-state execution, etc).  Let $m_{s_b}$ be the number of times $s_b$
-needs to be executed in order to properly initialize the
-{\feedbackloop} and $m_{s_l}$ be the number of times $s_l$ needs to
-be executed to initialize the {\feedbackloop}.
-
-Initialization for the {\feedbackloop} is calculated in a similar
-way to initialization of a {\pipeline}.  Since the initial data is
-inserted into the buffer between the loop stream and the {\joiner},
-it follows that calculation of initialization requirements should
-start from the loop stream as a "last" element - it will be
-execute last in the initialization schedule. That means that the
-loop stream will execute its initialization schedule, but it will
-not execute its steady schedule, namely $m_{s_l} = 0$.  Thus we
+We now calculate $g = \gcd(v') = \gcd(12,18,27,9) = 3$.  We thus
 have
 
 \begin{displaymath}
-\begin{array}{rl}
-m_{split} & = \left\lceil {init^{pop}_{s_l} \over w_{s,1}} \right\rceil \\
-m_{s_b} & = \left\lceil pop_{split} * m_{split} -
-init^{push}_{s_b} \over push_{s_b} \right\rceil \\
-m_{join} & = \left\lceil init^{pop}_{s_b} + pop_{s_b} * m_{s_b}
-\over { push_{s_b}} \right\rceil
+v = {v' \over 3} = {1 \over 3} \left[
+\begin{array}{c}
+12\\ 18\\ 27\\ 9
 \end{array}
+\right] = \left[
+\begin{array}{c}
+4\\ 6\\ 9\\ 3
+\end{array}
+\right]
 \end{displaymath}
 
-We also calculate the overall consumption and production of data
-during initialization of the {\splitjoin}
+Finally, we construct $S_p$:
+%\end{comment}
+This \pipeline has the following steady state:
+
+\begin{displaymath}
+S_p = \left\{
+\begin{array}{c}
+4 S_{A,m} \circ 6 S_{B,m} \circ 9 S_{C,m} \circ 3
+S_{D,m}, S_{A,N} \circ S_{B,N} \circ S_{C,N} \circ S_{D,N} \\
+\left[
+\begin{array}{c}
+1 + (4-1) * 1 \\
+4 * 1 \\
+3 * 1
+\end{array}\right],
+\left[ \begin{array}{c} 4\\ 6\\ 9\\ 3 \end{array} \right]
+\end{array}
+\right\}
+\end{displaymath}
+
+The steady state for \splitjoins and \feedbackloops is computed in
+a very similar way. It is important to note that not all
+\splitjoins and \feedbackloops have a steady state. It is possible
+that one branch of a \splitjoin will produce data at a rate
+disproportional to the other branch, thus causing data to
+infinitely buffer up inside the \splitjoin. An example of such a
+\splitjoin is presented in Figure \ref{fig:splitjoin-illegal}.
+Similarly it is possible for a \feedbackloop to consume the data
+from the feedback path slower or faster than it is pushed into the
+feedback path, thus causing either deadlock or infinite buffering.
+
+%\begin{comment}
+\subsubsubsection{\splitjoin}
+
+Let the {\splitjoin} have $n$ children and let $sj_i$ denote the
+$i$th child of the {\splitjoin} (counting from left to right,
+starting with 0).  Let $sj_s$ and $sj_j$ denote the {\splitter}
+and the {\joiner} of the {\splitjoin}, respectively. Let $w_{s,i}$
+denote the number of items sent by the {\splitter} to $i$th child
+on {\splitter}'s every execution. Let $w_{j,i}$ denote the number
+of items consumed by the {\joiner} from the $i$th child on
+{\joiner}'s every execution.  We are computing $S_{sj}$.
+
+We start by calculating all $S_{sj_i}, i \in \{0, \dots, n-1\}$.
+
+Next we compute a fraction vector $v''$ and a fraction $a_j''$
+such that executing the {\splitter} exactly once, each child
+$sj_i$ $v_i''$ times and the {\joiner} $a_j''$ times does not
+change the amount of data buffered in the {\splitjoin}. Again,
+since $v''$ and $a_j''$ are fractions, we multiply the
+steady-state pop and push amounts by appropriate fractions to
+obtain the amount of data pushed and popped.  For convenience we
+define $a_s''$ to be the number of executions of the {\splitter}
+and set it to 1.
+
+%\begin{comment}
+\begin{displaymath}
+v'', a_j'', a_s'' \ne 0, \forall i \in \{0,\dots,n-1\}, a_s'' *
+w_{s, i} = v_i'' * o_{sj_i}, v_i'' * u_{sj_i} = a_j'' * w_{j, i}
+\end{displaymath}
+\%end{comment}
+
+We thus have that each child $sj_i$ must execute $v_i'' = {w_{s,i}
+\over o_{sj_i}}$ times. To compute the number of executions of the
+{\joiner}, $a_j''$, we select an arbitrary $k$th child ($0 \le k <
+n$) and have that the {\joiner} executes $a_j'' = {{w_{s,k} \over
+o_{s_k}}{u_{sj_k} \over w_{j,k}}}$ times.
+
+Next we compute integer vector $v'$ and integers $a_s$ and $a_j$
+such that executing the {\splitter} $a_s$ times, each child $sj_i$
+$v_i'$ times and the {\joiner} $a_j$ times still does not change
+the amount of data buffered in the {\splitjoin}. We do this by
+multiplying $a_s''$, $v''$ and $a_j''$ by $w_{j,k}
+\left(\prod_{r=0}^{n-1}o_{sj_r}\right)$. Thus we get
 
 \begin{displaymath}
 \begin{array}{rl}
-init^{pop}_{fl} & = w_{j,0} * m_{join} \\
-init^{push}_{fl} & = w_{s, 0} * m_{split}
-\end{array}
-\end{displaymath}
-
-Now the schedule can be constructed by using the following
-algorithm:
-
-\begin{singlespace}
-\begin{verbatim}
-initialization schedule (fl) = empty for i = 1 .. m_{join}
-  initialization schedule (fl) += {\joiner} execution
-end for initialization schedule (fl) += initialization schedule
-(s_b) for i = 0 .. m_{s_b}
-    initialization schedule (fl) += steady state schedule (s_b)
-end for for i = 1 .. m_{split}
-  initialization schedule (fl) += {\splitter} execution
-end for initialization schedule (fl) += initialization schedule
-(s_l)
-\end{verbatim}
-\end{singlespace}
-
-It is important to note, that this initialization schedule is not
-legal if there isn't enough data in the buffer between the {\joiner}
-and the loop stream, that is if $delay_{fl} < w_{j,1} *
-m_{joiner}$.  This condition being true, does not mean, however,
-that no initialization schedule exists for the particular
-{\feedbackloop}.  The reason for this is that executing entire
-steady state schedules of the body stream may consume more data
-than is actually necessary to provide enough data for the loop
-stream to receive $init^{pop}_{s_l}$ data.  Also the
-$init^{pop}_{s_b}$ and $init^{pop}_{s_l}$ values may be larger
-than necessary, because they also may use their children's steady
-schedules in initialization.
-
-An algorithm for initializing any legal stream structure is
-presented in Section \ref{sec:min-latency}
-
-The following computes an initialization schedule for the example
-{\feedbackloop} from Figure \ref{fig:steady-state} (c). Both
-children of the {\feedbackloop} are {\filters}, thus they do not have
-initialization schedules and their $init^{push}_{s} = 0$. By
-inspection, we obtain
-
-\begin{displaymath}
-\begin{array}{rl}
-init^{pop}_B = & 3-2 = 1 \\
-init^{pop}_L = & 7-5 = 2 \\
+a_s' = & w_{j,k} \left(\prod_{r=0}^{n-1}o_{sj_r}\right) \\
+v_i' = & w_{j,k} \left(\prod_{r=0}^{n-1}o_{sj_r}\right) * {w_{s,i}
+\over o_{sj_i}} = w_{s,i} * w_{j_k} \left( \prod_{r=0}^{i-1}
+o_{s_r} \right) \left( \prod_{r=i+1}^{n-1} o_{s_r} \right)
 \\
-m_{split} = & \left\lceil 2 \over 3 \right\rceil = 1 \\
-m_{B} = & \left\lceil 3 * 1 - 0 \over 1 \right\rceil = 3 \\
-m_{join} = & \left\lceil 1 + 2 * 3 \over 5 \right\rceil = 2 \\
+a_j' = & w_{j,k} \left(\prod_{r=0}^{n-1}o_{sj_r}\right) *
+{{w_{s,k} \over o_{s_k}}{u_{sj_k} \over w_{j,k}}} = w_{s,k} *
+u_{sj_k} * \left( \prod_{r=0}^{k-1} o_{s_r} \right)
+\left( \prod_{r=k+1}^{n-1} o_{s_r} \right) \\
 \end{array}
 \end{displaymath}
 
-Thus the initialization schedule for this {\feedbackloop} is
-$({\joiner}\ {\joiner}\ BBB\ {\splitter})$.  We also get
-$init^{pop}_{fl} = 2 * 2 = 4$ and $init^{push}_{fl} = 3 * 1 = 3$.
-
-\section{Steady Schedules}
-
-\subsection{Filter}
-
-The scheduling of a {\filter} is very simple.  Since a {\filter} has
-no sub-components (it is an atomic unit), a steady schedule for a
-{\filter} is simply an execution of the {\filter}.  Thus, for a
-{\filter} $f$, $P_f = \{f, \{f\}, \{[e_f,o_f,u_f]\}\}$
-
-\subsection{Pipeline}
-
-Scheduling a {\pipeline} $p$ first requires calculating the steady
-state $S_p$ and phasing schedules for all the children of $p$,
-$P_{p_i}$. Once the steady state has been calculated,
-multiplicities of execution of each child are known, and the
-children are simply scheduled to execute an appropriate number of
-times in a row, starting from first child.
-
-\begin{algorithm}
-\label{alg:sa-pipeline} \caption{Single Appearance Schedule for a
-{\pipeline}} {\bf SASPipeline}($p$).  Given a {\pipeline} $p$,
-calculate a phasing Single Appearance Schedule for $p$.
-\begin{algorithmic}
-\STATE compute $S_p$; $phase = \{\}$ \FOR{$i=0$ to $n_p$}
-\FOR{$j=0$ to $S_{p,u,i}$} \FOR{$k=0$ to $|P_{p_i, P}|$} \STATE
-$phase = phase + P_{p_i, P, k}$ \ENDFOR \ENDFOR \ENDFOR \STATE
-$P_p = \{p, \{phase\}, \{S_{p,c}\}\}$
-\end{algorithmic}
-\end{algorithm}
-
-This technique works here, because {\pipelines} do not have any
-cycles between their children (though their children may have
-cycles, ie. {\feedbackloops}), and because a correct initialization
-schedule is assumed to have been executed.  Notice, that it is not
-necessary to know the amount of data buffered between children of
-the {\pipeline} in order to use this algorithm, because once the
-{\pipeline} has been initialized, all the needed data will be
-provided by the steady state schedule.
-
-\subsection{SplitJoin}
-
-Scheduling a {\splitjoin} is essentially identical to scheduling a
-{\pipeline}.  Once steady schedule multiplicities are computed, the
-{\splitter} is executed the appropriate number of times, followed by
-all the immediate children, and finally the {\joiner}.
-
-\begin{algorithm}
-\label{alg:sa-pipeline} \caption{Single Appearance Schedule for a
-{\splitjoin}} {\bf SASSplitJoin}($sj$).  Given a {\splitjoin} $sj$,
-calculate a phasing Single Appearance Schedule for $sj$.
-\begin{algorithmic}
-\STATE compute $S_{sj}$; $phase = \{\}$ \FOR{$j=0$ to
-$S_{sj,u,n_{sj}}$} \STATE $phase = phase + {\splitter}$ \ENDFOR
-\FOR{$i=0$ to $n_p$} \FOR{$j=0$ to $S_{p,u,i}$} \FOR{$k=0$ to
-$|P_{p_i, P}|$} \STATE $phase = phase + P_{p_i, P, k}$ \ENDFOR
-\ENDFOR \ENDFOR \FOR{$j=0$ to $S_{sj,u,n_{sj} + 1}$} \STATE $phase
-= phase + {\joiner}$ \ENDFOR \STATE $P_p = \{p, \{phase\},
-\{S_{p,c}\}\}$
-\end{algorithmic}
-\end{algorithm}
-
-Similarly to {\pipelines}, this technique works because {\splitjoins}
-have no cycles, and because the {\splitjoin} is assumed to have been
-initialized properly.
-
-\section{Min Latency}
-
-\subsection{Pipeline}
-
-In order to create a steady state schedule for a {\pipeline}, an
-initialization schedule must already exist (or at least its
-results must have been computed).  This was not the case with
-single appearance schedule, because just the assumption that the
-{\pipeline} was properly initialized allowed for execution of the
-all the child streams from top to bottom.  With minimal latency
-scheduling, the amount of data buffered up in the {\pipeline} (or
-any other stream, for that matter) makes a big difference in which
-child streams need to produce (and thus possibly consume) data,
-and which do not.
-
-One consequence of this interaction between the initialization and
-steady schedules is that the initialization schedule may affect
-the size of the steady schedule.  The difference comes from the
-fact, that a steady schedule doesn't necessarily process all the
-data buffered up and ready for processing.  This means that it is
-possible that the steady schedule will have an additional phase at
-the end, that will simply push some data around internally to the
-{\pipeline}.  The phase will not produce any data (otherwise, the
-phase would be necessary anyway), but it may consume some data (to
-complete the amounts required to execute a steady schedule) and/or
-push the data in internal buffers lower, in order to return to the
-buffering state from the beginning of the steady schedule.
-
-To simplify the calculation of how many times each child needs to
-get executed during initialization, initialization is computed
-exactly the same way as steady schedule.  Namely, the bottom most
-stream is executed enough (minimal number of) times to produce
-some data, the stream above is executed just enough times to
-provide enough data to the stream below, and so on, until either a
-child stream does not need to fire, or the top most child is
-reached. If the amount of additional data needed by $n+1$ child is
-$m$, and the $n$th child is about to execute $p$th phase of
-$phases_n$, then the number of executions of the $n$th child is
-computed using following algorithm:
-
-\begin{singlespace}
-\begin{verbatim}
-while (m > 0)
-  fired_n = fired_n + 1
-  m = m - push^p_{p_n}
-  p = (p + 1) \% phases_n
-\end{verbatim}
-\end{singlespace}
-
-The result of running this algorithm is that while the
-initialization schedule grows a little larger than necessary, the
-steady schedule remains as small as possible.  The reason for this
-is that all the streams will automatically execute the right
-number of times to provide enough data for the bottom most child
-to fire enough times.
-
-\subsubsection{\splitjoin}
-
-{\splitjoin} schedule is computed in essentially the same way as
-{\pipeline}, except that number of firings of child streams depends
-on the {\joiner} and the number of firings of the {\splitter} depends
-on the child streams.  Algorithm is omitted here for brevity.
-
-\subsubsection{\feedbackloop}
-
-{\feedbackloop} schedule is also scheduled in a way very similar to
-the {\pipeline} schedule.  Since the data is output from the
-{\splitter}, the calculation begins by setting number of executions
-of the {\splitter} to 1.  Number of firings of the $body$ is
-computed, then the {\joiner} and finally the $loop$.
-
-Computing of the schedule for the {\feedbackloop} is guaranteed to
-succeed, if the {\feedbackloop} has a valid schedule.  This is
-because each component in the {\feedbackloop} is scheduled in a way
-that requires minimal amount of data input in order to produce
-some output.  Thus, if a deadlock is detected in the
-{\feedbackloop}, there genuinly is not enough data in the
-{\feedbackloop} to execute the {\splitter}, thus output data.
-
-\section{Notation and equations}
-
-Steady State $T_s = \{s, N, m, c, u\}$.
-\begin{itemize}
-\myitem $s$ - the stream itself
-
-\myitem $L$ - children of the stream
-
-\myitem $m$ - multiples of execution of the children
-
-\myitem $c$ - peek/push/pop for $s$
-\end{itemize}
-
-\noindent Phasing Schedule $P^p_s = \{S, I\}$.
-\begin{itemize}
-\myitem $S$ - steady state phasing schedule phases
-
-\myitem $I$ - phasing init schedule phases
-\end{itemize}
-
-\noindent a set of phases (steady state or init) $S = \{H, c\}$
-\begin{itemize}
-\myitem $H$ - the actual phases \myitem $c$ - peek/pop/push for
-the set
-\end{itemize}
-
-\noindent Phase $H_s = \{s, A, c, u\}$.
-\begin{itemize}
-\myitem $s$ - the stream itself
-
-\myitem $A$ - sub-phases to be executed for this phase
-
-\myitem $c$ - peek/push/pop for the phase
-
-\myitem $u$ - {\bf don't need - so don't use!} multiples for
-direct children, {\splitter} and {\joiner}.  {\splitter} and {\joiner} are
-the $n$th and the $n+1$st element.
-\end{itemize}
-
-\noindent Single Appearance $S_s = \{H, I\}$
-\begin{itemize}
-\myitem $H$ - steady state phase (single one!) \myitem $I$ -
-initialization phase (single one!)
-\end{itemize}
-
-\subsection{Steady State}
-
-The steady state is easy to determine.  It's already described,
-and I don't want to go into it here.
-
-$c$ vector describes the TRUE peek.
-
-\subsection{Scheduling}
-
-All scheduling is actually done within the framework of phased
-scheduling.  Initialization has multiple phases (doh!), so I'll
-have to be careful writing this up.
-
-
-\subsection{Initialization Schedule}
-
-Initialization schedules are done in a very simple way - the child
-that is meant to output data is executed at least once.  Because
-of feedbackloops, there may be more than one phase of
-initialization (for min-latency).
-
-\subsection{Single Appearance}
-
-\subsubsection{Filter}
-
-for {\filter} $f$:
+Now we use $v'$, $a_s'$ and $a_j'$ to compute minimal steady state
+of the {\splitjoin}.  Since $v'$, $a_s'$ and $a_j'$ represent a
+steady state, they represent a strict multiple of the minimal
+steady state.  Thus we find the multiplier by computing $g$, the
+$\gcd$ of all elements in $v'$ and integers $a_s'$ and $a_j'$, and
+dividing $v'$, $a_s'$ and $a_j'$ by $g$.  We have that
 
 \begin{displaymath}
 \begin{array}{rl}
-H = & \{f, [f], [1], [e_f, o_f, u_f], [1]\} \\
-I = & \{f, [], [], [e_f - o_f], [1]\} \\
-S_f = & \{H, I\}
+g = & \gcd(v', a_s', a_j') \\
+v = & v' \over g \\
+a_s = &  a_s' \over g \\
+a_j = & a_j' \over g
 \end{array}
 \end{displaymath}
 
-\subsubsection{Pipeline}
+Finally, we use $v$, $a_s$ and $a_j$ to construct $S_{sj}$:
 
-for {\pipeline} $p$, children $p_i$, $0 \le i < n_p$, $n_p$ children
+\begin{displaymath}
+S_{sj} = \left\{
+\begin{array}{c}
+v_0 * S_{sj_0,m} \circ \dots \circ v_{n-1} * S_{sj_{n-1}, m} \circ
+[a_s\ a_j] , \\
+S_{sj_0, N} \circ \dots \circ S_{sj_{n-1}, N} \circ \{sj_s,
+sj_j\},
+\\ \left[
+\begin{array}{c}
+n_s * o_{s} \\
+n_s * o_{s} \\
+n_j * u_{j} \\
+\end{array}\right], \\
+v \circ [a_s] \circ [a_j]
+\end{array}\right\}
+\end{displaymath}
 
-\begin{algorithm}
-\label{alg:sas-pipeline} \caption{Create a Single Appearance
-Schedule for a {\pipeline}} {\bf SASPipeline}($T_p$). Given a steady
-state for a {\pipeline}, create a single appearance schedule for it.
-\begin{algorithmic}
-\STATE no clue how to do this
-\end{algorithmic}
-\end{algorithm}
+Figure \ref{fig:steady-state} (b) depicts a sample {\splitjoin}.
+The following are the steady states of the {\splitjoin}'s
+children: $$
+\begin{array}{lrlr} S_A = & \left\{[1], \{A\}, { \left[
+\begin{array}{c} 2 \\ 2 \\ 1
+\end{array}
+\right]}, [] \right\}, & S_B = & \left\{[1], \{B\}, { \left[
+\begin{array}{c} 3 \\ 2 \\ 6
+\end{array}
+\right]}, [] \right\}
+\end{array}
+$$ For this {\splitjoin}, we select $k = 0$ (we use the left-most child
+to compute $a_j'$).  We get the following $v'$, $a_s'$ and $a_j'$
 
-\subsection{Min-Latency}
+\begin{displaymath}
+\begin{array}{rl}
+v' = & \left[
+\begin{array}{c}
+2 * 2 (2)\\
+1 * 2 (2)
+\end{array}
+\right] = \left[
+\begin{array}{c}
+8 \\ 4
+\end{array}
+\right] \\
+a_s' = & 1 * 2 (2 * 2) = 8 \\
+a_j' = & 2 * 1 (2 * 2) = 8
+\end{array}
+\end{displaymath}
 
-\subsubsection{Peek/Pop/Push from phases}
+Thus $\gcd(u', a_s', a_j') = \gcd(8,4,8,8) = 4$.  Now we obtain
 
-\begin{algorithm}
-\label{alg:ph-consumption} \caption{Computing Consumption of a Set
-of Phases} {\bf ConsPhases}($H$).  Given a set of phases $H$,
-compute the amount of data peeked/popped/pushed by this set of
-phases.
-\begin{algorithmic}
-\STATE $e = 0, o = 0, u = 0$
-\FOR{$i=0$ to $|H|-1$}
-\STATE $e = \max(e, o + H_{i, c, e})$
-\STATE $o = o + H_{i, c, o}$
-\STATE $u = u + H_{i, c, u}$
-\ENDFOR
-\STATE return $[e, o, u]$
-\end{algorithmic}
-\end{algorithm}
+\begin{displaymath}
+\begin{array}{rl}
+v = & {v \over 4} = {1 \over 4} \left[
+\begin{array}{c}
+8 \\ 4
+\end{array}
+\right] =  \left[
+\begin{array}{c}
+2 \\ 1
+\end{array}
+\right]\\
+a_s = & {a_s' \over 4} = {8 \over 4} = 2 \\
+a_j' = & {a_j' \over 4} = {8 \over 4} = 2
+\end{array}
+\end{displaymath}
 
-\begin{algorithm}
-\label{alg:init-peek} \caption{Create a Phasing schedule out of
-set of phases for Steady State and Initialization Schedules} {\bf
-MakePhases}($H^S, H^I$). Given sets of phases to execute for
-steady state and initialization schedules, construct a proper
-phasing schedule.
-\begin{algorithmic}
-\STATE $c_S = {\bf ConsPhases} (H^S)$
-\STATE $c_I = {\bf ConsPhases} (H^I)$
-\STATE $c_{I,e} = \max(c_{I,e}, c_{I,o} + c_{S,e} - c_{S,o})$
-\STATE $S = \{H^S, c_S\}$
-\STATE $I = \{H^I, c_I\}$
-\STATE return $\{S, I\}$
-\end{algorithmic}
-\end{algorithm}
+Finally, we construct $S_{sj}$:
 
-\begin{algorithm}
-\label{alg:get-phase} \caption{Return an appropriate phase of a
-schedule.  Phase 0 is the first initialization stage of the
-schedule.  Once all initialization stages have been exhausted, all
-steady state phases are returned, with wrap-around.} {\bf
-GetPhase}(n, $P$)
-\begin{algorithmic}
-\IF{$n < |P_{I, A}|$}
-\STATE return $P_{I, A, n}$
-\ELSE
-\STATE return $P_{S, A, (n - |P_{I,A}|) {\bf\ mod\ } |P_{S, A}|}$
-\ENDIF
-\end{algorithmic}
-\end{algorithm}
+\begin{displaymath}
+S_{sj} = \left\{
+\begin{array}{c}
+2 * S_{sj_0, m} \circ 1 * S_{sj_1, m} \circ [2\ 2], \\
+S_{sj_0, N} \circ S_{sj_1, N} \circ \{sj_s, sj_j\}, \\
+\left[
+\begin{array}{c}
+2 * 3 \\ 2 * 3 \\ 2 * 4
+\end{array}
+\right], \left[
+\begin{array}{c}
+2 \\ 1 \\ 2 \\ 2
+\end{array}\right]
+\end{array} \right\}
+\end{displaymath}
 
-%\subsubsection{\filter}
+It is important to note, that it is not always possible to compute
+a unique $v''$ for all possible {\splitjoins}. The reason is that
+unbalanced production/consumption ratios between different
+children of a {\splitjoin} can cause data to buffer up infinitely.
 
-\begin{algorithm}
-\label{alg:min-lat-filter} \caption{Return a min-latency phasing
-schedule for a {\filter}} {\bf MLFilter}().
-\begin{algorithmic}
-\STATE $H = \{f, \{f\}, [e_f, o_f,u_f]\}$
-\STATE return ${\bf MakePhases} (\{H\}, \emptyset)$
-\end{algorithmic}
-\end{algorithm}
+\begin{definition}[Valid {\splitjoin}] A {\splitjoin} is valid
+{\emph iff} $\forall k, 0 \le k < n-1, a_{j,k}'' = a''_{j,k+1}$,
+using notation of $a_{j,k}''$ to indicate that $k$th child of the
+{\splitjoin} was used to compute the value of $a_j''$.
+\end{definition}
 
-%\subsubsection{\pipeline}
+An example of an illegal {\splitjoin} is depicted in Figure
+\ref{fig:splitjoin-illegal}.  The rates of throughput of data for
+the left child mean that for every execution of the {\splitter},
+the {\joiner} needs to be executed exactly once to drain all data
+entering the {\splitjoin}.  The rates of throughput of data for
+the right child mean that for every execution of the {\splitter},
+the {\joiner} needs to be executed exactly twice to drain all data
+entering the {\splitjoin}. That means that consumption of data by
+the {\joiner} will be relatively slower on the right side, causing
+data to buffer up. This means that the given {\splitjoin} does not
+have a steady state.
 
-\begin{algorithm}
-\label{alg:min-lat-init-pipeline} \caption{Return a set of phases
-that execute a Minimum-Latency initialization schedule for a
-{\pipeline}, the amount of data buffered as a result of
-initialization, and how many phases each child has executed.} {\bf
-MLInitStagesPipeline} $()$
-\begin{algorithmic}
-\STATE Let $b$ vector represent amount of data stored between children of
-$p$
-\STATE Let $d$ vector represent phase/stage being currently executed; 0
-represents first initialization stage.
+If a {\splitjoin} is such that it does not have a steady state, it
+is considered an illegal {\splitjoin}.  It cannot be executed
+repeatedly without infinite buffering, so a practical target for
+{\StreamIt} cannot execute it.  The calculations presented here
+assume that the {\splitjoin} is legal.  In order to check if a
+given {\splitjoin} is legal, we test if selecting a different
+child for calculation of $a_j''$ yields a different $a_j''$. If it
+does, then the two paths tested have different
+production/consumption rates, and the {\splitjoin} does not have a
+steady state.
 
+\subsubsubsection{\feedbackloop}
 
-\STATE $b = 0$, $d = 0$
+Let {\feedbackloop} $fl$ have children $B$ (the body child) and
+$L$ (the feedback loop child). Let the {\joiner} and the
+{\splitter} of the {\feedbackloop} be denoted $fl_j$ and $fl_s$.
+Let $w_{j,I}$ and $w_{j,L}$ denote the number of data items
+consumed by the {\joiner} from the {\Input} {{\Channel}} to the
+{\feedbackloop} and from $fl_L$, respectively.  Let $w_{s,O}$ and
+$w_{s,F}$ denote the number of data items pushed by the
+{\splitter} onto the {\feedbackloop}'s {\Input} {{\Channel}} and
+to $fl_L$ respectively.  We are computing $S_{fl}$.
 
-\STATE {\bf Compute how many times each child will get
-executed at minimum}
-\STATE Let $f$ represent amount of data needed by the $i$th child
-to be initialized.  $f$ has $n_p+1$ elements, last child being
-fictional and not requiring any initialization.
-\STATE $f = 0$
+First we calculate $S_{B}$ and $S_{L}$.
 
-\FOR{$i=n_p-1$ downto $0$}
-\WHILE{$d_i < |P_{p_i, I, A}|$ {\bf or} $b_{i+1} < f_{i+1}$}
-\STATE $H' = {\bf GetPhase}(P_{p_i}, d_i)$, $d_i = d_i + 1$
-\STATE $f_i = \max(f_i, b_i + H'_{c, e})$, $b_i = b_i - H'_{c,
-o}$, $b_{i+1} = b_{i+1} + H'_{c, u}$
-\ENDWHILE
-\ENDFOR
+Now we compute a fractional vector $v'' = [a_B''\ a_L''\ a_s''\
+a_j'']$ such that executing the body child $a_B''$ times, the
+{\splitter} $a_s''$ times, the loop child $a_F''$ times and the
+{\joiner} $a_j''$ times will not change the amount of data
+buffered up in the {\feedbackloop}.  Thus
 
-\STATE {\bf Compute initialization stages:}
-\STATE Let $u$ represent minimum number of executions of each
-child
-\STATE $u = d$, $d = 0$, $b = 0$
-\STATE $stages = \emptyset$
-\WHILE{$\neg \forall i, u_{i} \le 0$}
-\STATE{\bf Compute a stage}
-\STATE Let $H$ be the stage I'm about to construct
-\STATE Let $m$ be the number of phase executions that each child
-will perform in this stage
-\STATE $H = \{p, \emptyset, [0,0,0]\}$, $b_0 = 0$, $b_{n_p} = 0$, $m = 0$
-\STATE $need = 1$
-\FOR{$i = n_p-1$ downto $0$}
-\STATE $nextNeed = 0$
-\WHILE{$need > 0$}
-\STATE $H' = {\bf GetPhase}(P_{p_i}, d_i + m_i)$, $m_i = m_i + 1$, $u_i = u_i - 1$
-\STATE $need = need - H'_{c, u}$, $nextNeed = \max(nextNeed, H'_{c, e} - b_i)$
-\STATE $b_i = b_i - H'_{c, o}$, $b_{i+1} = b_{i+1} + H'_{c, u}$
-\ENDWHILE
-\STATE $need = nextNeed$
-\ENDFOR
-\STATE $H_{c,e} = need$
-\FOR{$i=0$ to $n_p-1$}
-\WHILE{\bf true}
-\STATE $H' = {\bf GetPhase}(P_{p_i}, d_i + m_i)$
-\IF{$H'_{c, e} \le b_i$}
-\STATE $m_i = m_i + 1$, $u_i = u_1 - 1$
-\STATE $b_i = b_i - H'_{c, o}$, $b_{i+1} = b_{i+1} + H'_{c, u}$
-\ELSE
-\STATE {\bf break}
-\ENDIF
-\ENDWHILE
-\ENDFOR
-\STATE $H_{c,o} = -b_0$, $H_{c,u} = b_{n_p}$
-\STATE{\bf Create the stage:}
-\FOR{$i=0$ to $n_p-1$}
-\WHILE{$m_i \ne 0$}
-\STATE $H_A = H_A \circ {\bf GetPhase}(P_{p_i}, d_i)$
-\STATE $d_i = d_i + 1$, $m_i = m_i - 1$
-\ENDWHILE
-\ENDFOR
-\STATE $phases = phases \circ H$
-\ENDWHILE
-\STATE return $\{phases, b, d\}$
-\end{algorithmic}
-\end{algorithm}
+\begin{displaymath}
+\begin{array}{rcl}
+a_B' * u_B & = & a_s' * o_s \\
+a_L' * u_B & = & a_j' * w_{j, L} \\
+a_s' * w_{s, F} & = & a_L' * o_B \\
+a_j' * u_j & = & a_B' * o_B \\
+\end{array}
+\end{displaymath}
 
-\begin{algorithm}
-\label{alg:min-lat-steady-pipeline} \caption{Return a set of
-phases that execute a Minimum-Latency steady state schedule for a
-{\pipeline}} {\bf MLSteadyStagesPipeline} $(T_p, b^{init}_p,
-d^{init}_p)$. $T_p$ is the steady state for the {\pipeline}.
-$b^{init}_p$ is the amount of data stored between children of the
-{\pipeline} after initialization, $d^{init}_p$ is the number of
-phases and stages executed by the initialization schedule.
-\begin{algorithmic}
-\STATE Let $b$ vector represent amount of data stored between children of
-$p$
-\STATE Let $d$ vector represent phase/stage being currently executed; 0
-represents first initialization stage.
-\STATE Let $u$ be number of phase executions for each child for a full steady state execution of the {\pipeline}.
+We begin with setting $a_j'' = 1$. $B$ needs to be executed $a_B''
+= u_j \over o_B$ times, the {\splitter} needs to be executed
+$a_s'' = {u_j \over o_B}{u_B \over o_s}$ times and $L$ needs to be
+executed $a_L'' = {u_j \over o_B}{u_B \over o_s}{w_{s,L} \over
+o_L}$ times. Furthermore, in order to assure that the
+{\feedbackloop} has a valid steady state, we continue going around
+the loop, the {\joiner} must require ${u_j \over o_B}{u_B \over
+o_s}{w_{s,L} \over o_L}{u_L \over w_{j,L}} = 1$.  If this
+condition is not satisfied, the {\feedbackloop} does not have a
+steady state. This is a necessary, but not a sufficient condition
+for a {\feedbackloop} to be valid.
 
-\STATE $b = b^{init}_p$, $d = d^{init}_p$, $\forall i, u_i = T_{p, m, i} * |P_{p, S, A}|$
-\STATE {\bf Compute steady state:}
-\STATE $phases = \emptyset$
-\WHILE{$u_{n_p -1} \ne 0$}
-\STATE{\bf Compute a phase}
-\STATE Let $H$ be the phase I'm about to construct
-\STATE Let $m$ be the number of phase executions that each child
-will perform in this phase
-\STATE $H = \{p, \emptyset, [0,0,0]\}$, $b_0 = 0$, $b_{n_p} = 0$, $m = 0$
-\STATE $need = 1$
-\FOR{$i = n_p-1$ downto $0$}
-\STATE $nextNeed = 0$
-\WHILE{$need > 0$ {\bf and} $u_i \ne 0$}
-\STATE $H' = {\bf GetPhase}(P_{p_i}, d_i + m_i)$, $m_i = m_i + 1$, $u_i = u_i - 1$
-\STATE $need = need - H'_{c, u}$, $nextNeed = \max(nextNeed, H'_{c, e} - b_i)$
-\STATE $b_i = b_i - H'_{c, o}$, $b_{i+1} = b_{i+1} + H'_{c, u}$
-\ENDWHILE
-\STATE $need = nextNeed$
-\ENDFOR
-\STATE $H_{c,e} = need$
-\FOR{$i=0$ to $n_p-1$}
-\WHILE{$u_i \ne 0$}
-\STATE $H' = {\bf GetPhase}(P_{p_i}, d_i + m_i)$
-\IF{$H'_{c, e} \le b_i$}
-\STATE $m_i = m_i + 1$, $u_i = u_1 - 1$
-\STATE $b_i = b_i - H'_{c, o}$, $b_{i+1} = b_{i+1} + H'_{c, u}$
-\ELSE
-\STATE {\bf break}
-\ENDIF
-\ENDWHILE
-\ENDFOR
-\STATE $H_{c,o} = -b_0$, $H_{c,u} = b_{n_p}$
-\STATE{\bf Create a phase:}
-\FOR{$i=0$ to $n_p-1$}
-\WHILE{$m_i \ne 0$}
-\STATE $H_A = H_A \circ {\bf GetPhase}(P_{p_i}, d_i)$
-\STATE $d_i = d_i + 1$, $m_i = m_i - 1$
-\ENDWHILE
-\ENDFOR
-\STATE $phases = phases \circ H$
-\ENDWHILE
-\STATE return $phases$
-\end{algorithmic}
-\end{algorithm}
+Next we compute an integer vector $v' = [a_B'\ a_L'\ a_s'\ a_j']$
+such that executing B $a_B'$ times, {\splitter} $a_s'$ times, L
+$a_L'$ times and {\joiner} $a_j'$ times will not change the amount
+of data buffered in the {\splitjoin}. We do this by multiplying
+$v''$ by $o_B * o_s * o_L$.
 
-\begin{algorithm}
-\label{alg:min-lat-pipeline} \caption{Return a min-latency phasing
-schedule for a {\pipeline}} {\bf MLPipeline}().
-\begin{algorithmic}
-\STATE $T = {\bf SSPipeline} ()$
-\STATE $\{I, b^{init}, d^{init}\} = {\bf MLInitStagesPipeline}()$
-\STATE $H = {\bf MLSteadyPhasesPipeline}(T, b^{init}, d^{init})$
-\STATE return ${\bf MakePhases} (H, I)$
-\end{algorithmic}
-\end{algorithm}
+\begin{displaymath}
+\begin{array}{rl}
+a_B' = & u_j * o_s * o_L \\
+a_L' = & u_j * u_B * w_{s,L} \\
+a_j = & o_B * o_s * o_L \\
+a_s = & u_j * u_B * o_L
+\end{array}
+\end{displaymath}
 
-\section{Old Latency}
+We now use $v'$ to compute $v = [a_B\ a_L\ a_s\ a_j]$, a minimal
+steady state for the {\feedbackloop}.  We do this by finding an
+integer $g$, the $\gcd$ of all elements in $v'$ and computing $v =
+{v' \over g}$.
 
-\subsubsection{\filters}
+Finally, we construct $S_{fj}$ as follows:
 
-The transfer function for amount of information carried by an item
-of data before and after a {\filter} is quite simple.  The amount of
-information consumed and produced by the {\filter} needs to remain
-constant.  Using notation for a {\pipeline} $p$, the transfer
-function for a {\filter} is $info_{p_n} = info_{p_{n-1}} * {o_{p_n}
-\over u_{p_n}}$.
+\begin{displaymath}
+S_{fj} = \left\{
+\begin{array}{c}
+a_B * S_{B,m} \circ a_L * S_{L,m} \circ [a_s \ a_j], \\
+S_{B,N} \circ S_{L,N} \circ \{fl_s, fl_j\}, \\
+\left[\begin{array}{c}
+a_j * w_{j,I} \\
+a_j * w_{j,I} \\
+a_s * w_{s,O}
+\end{array} \right], v
+\end{array} \right\}
+\end{displaymath}
 
-\subsubsection{{\splitters} and {\joiners}}
+Figure \ref{fig:steady-state}(c) depicts a sample {\feedbackloop}.
+The following are the steady states of the {\splitjoin}'s
+children:
+$$
+\begin{array}{lrlr} S_B = & \left\{[1], \{B\}, { \left[
+\begin{array}{c} 2 \\ 2 \\ 1
+\end{array}
+\right]}, [] \right\}, & S_L = & \left\{[1], \{L\}, { \left[
+\begin{array}{c} 5 \\ 5 \\ 6
+\end{array}
+\right]}, [] \right\}
+\end{array}
+$$ We compute $v'$ for this {\feedbackloop}:
 
-The transfer function for the amount of information carried by an
-item of data through a {\splitter} or a {\joiner} is also very simple,
-however it is not very intuitive, compared to the {\filter} transfer
-function. An intuitive function would preserve the amount of
-information carried across a {\splitter} or a {\joiner}, and split or
-merge the information appropriately across all branches.  Such an
-approach, however, can result in a situation where a {\joiner} is
-joining data items with different amount of information carried in
-different branches.  This type of a situation is difficult to
-handle, because for simplicity all data items in a single buffer
-should carry exactly the same amount of information.
+\begin{displaymath}
+v' = \left[
+\begin{array}{c}
+5 * 3 * 5 \\
+5 * 1 * 3 \\
+5 * 1 * 5 \\
+2 * 3 * 5
+\end{array}\right] = \left[
+\begin{array}{c}
+75 \\
+15 \\
+25 \\
+30
+\end{array}\right]
+\end{displaymath}
 
-The approach that solves the problem above is to not preserve the
-amount of information across all branches when data is being split
-or joined. Instead, every branch (including the input to a
-{\splitter} or output of a {\joiner}) consumes or produces the same
-amount of information on every iteration.
+Thus $g = \gcd(75,15,25,30) = 5$ and
 
-Using the {\splitjoin} notation, amount information per data item
-transferred to $n$th branch of a {\splitter} is $info_{split_n} =
-info_{input} * {o_{split} \over u_{split,n}}$, and the amount of
-information per data item transferred from $n$th branch of a
-{\joiner} is $info_{output} = info_{join_n} * {o_{join,n} \over
-u_{join}}$.  The same equations will work for {\feedbackloops}, with
-the property that going through a loop will preserve the amount of
-information carried by a data item.
+\begin{displaymath}
+v = {1 \over 5} \left[
+\begin{array}{c}
+15 \\
+3 \\
+5 \\
+6
+\end{array}\right]
+\end{displaymath}
 
-\subsubsection{checking for messages}
+Finally, we construct $S_{fl}$
 
- by a {\filter} $f_0$ to {\filter} $f_1$. that consumes
-(and thus produces) $info_{f_0}$ amount of information, and
-delivered to {\filter} $f_1$ that consumes $info_{f_1}$ amount of
-information on every execution of its {\work} function, then the
-destination {\filter} must check for delivery of new at least
-messages every $\left \lfloor {(l_1-l_0)
-* info_{f_0}} \over info_{f_1} \right \rfloor$ firings of its
-{\work} function. If this equation yields 0, {\filter} $f_1$ must
-check for new messages before every firing of its {\work} function.
+\begin{displaymath}
+S_{fl} = \left\{
+\begin{array}{c}
+15 * S_{B, m} \circ 3 * S_{L, m} \circ [5\ 6], \\
+S_{B, N} \circ S_{L, N} \circ \{fl_s, fl_j\}, \\
+\left[
+\begin{array}{c}
+6 * 2 \\ 6 * 2 \\ 5 * 3
+\end{array}
+\right], \left[
+\begin{array}{c}
+15 \\ 3 \\ 5 \\ 6
+\end{array}\right]
+\end{array} \right\}
+\end{displaymath}
+%\end{comment}
 
-%  -- this is minor, and I don't know how to explain it well
-%Note, that this frequency of checking for messages to deliver may
-%not be sufficient to satisfy the latency requirements.  If the
-%schedule enforces very tight information buffering (very close to
-%absolute minimums or maximums, as explained below), it is possible
-%that the destination {\filter} needs to check for message delivery
-%more often.  This effect is schedule specific, and needs to be
-%computed on a case-by-case basis.
-%
-
-\subsubsection{information and latency}
-
-Next, the amount of information buffered between the source and
-the destination of a message needs to be known.  As explained
-earlier, there are three types of messages.  The easiest type of
-message to handle in terms of buffering is the downstream positive
-delay message.  Those messages impose no information buffering
-requirements on the schedule.  This is because the information
-wavefront that the message needs to be delivered with cannot
-possibly have passed the destination filter - it cannot even have
-passed the source filter.
-
-The next type of message to consider is the downstream negative
-delay message.  A downstream negative delay message will be
-delivered to the destination \emph{before} the current source
-{\filter} information wavefront reaches the destination {\filter}.
- This type of a message generates a minimal buffering requirement
-on the schedule.  There is no maximal requirement, because if the
-amount of information buffered up   between the source and
-destination is large, the message will not be delivered on the
-first iteration of checking for messages to be delivered, but on
-some subsequent iteration.  At the minimum, the message must be
-delivered just before the minimum latency wavefront reaches the
-destination {\filter}.  Just after the destination {\filter} is
-executed, the amount of data buffered up is reduced by
-$info_{dest}$.  This is the situation when the minimal amount of
-information is stored between the source and destination.  Thus,
-the amount of information stored between the two {\filters} should
-be at least $info_{src} * (-l_0) + info_{dest} {e_{dest} -
-o_{dest} \over o_{dest}} - \min (info_{src}, info_{dest})$.
-
-The case of upstream positive delay message is very similar to
-downstream negative delay message.  The destination {\filter} must
-receive the message before it produces the minimal allowed
-information wavefront.  Thus there must be less than $info_{src}
-* (l_1 + {e_{src} - o_{src} \over o_{src}})$ information
-between the destination and source {\filters}.
-
-The last step required for a complete framework relating latency
-and information is to compute the amount of information between
-two {\filters}.  This task is actually quite simple.  Given two
-{\filters}, $f_0$ and $f_1$, the algorithm selects the upstream
-{\filter}, and follows any non-cyclic downstream path towards the
-other {\filter}.  Amount of information stored along the path
-followed is summed up, and represents the information stored
-between the two {\filters}.  Note, that this algorithm will follow
-the body path of {\feedbackloops}, and select any branch of a
-{\splitjoin}.  The reason this algorithm works is because {\filters}
-do not destroy or create information when their {\work} functions
-execute, and because amount of data stored along any branch of a
-{\splitjoin} is the same.
+\end{comment}

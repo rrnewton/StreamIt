@@ -45,14 +45,14 @@ Amarasinghe}
 
 \begin{abstract}
 Applications that are structured around some notion of a "stream"
-are becoming increasingly important and widespread.  [Rixner,
-1998] provides evidence that streaming media applications are
-already consuming most of the cycles on consumer machines, and
-their use is continuing to grow. The streaming computation model
-is pervasive and ranges from small, embedded systems (ex. cell
+are becoming increasingly important and widespread. \cite{Rix98}
+provides evidence that streaming media applications are already
+consuming most of the cycles on consumer machines, and their use
+is continuing to grow. The streaming computation model is
+pervasive and ranges from small, embedded systems (ex. cell
 phones) to large, computationally powerful machines (ex. cell base
 stations).
-
+%
 In this paper, we describe a novel technique for scheduling
 execution of streaming applications exhibiting hierarchical
 properties, such as programs written in \StreamIt. \StreamIt
@@ -64,7 +64,7 @@ The smallest computational element of a \StreamIt program is a
 \filter. \StreamIt uses a static rate computational model, meaning
 that every \filters rate of consumption and production of data is
 known at compile time.
-
+%
 The technique presented here focuses on producing schedules that
 are optimized for the amount of space required for buffering and
 storing the schedule. A wide variety of real-life applications and
@@ -81,17 +81,17 @@ requires more space than the most popular technique used today
 %\input{streamit}
 \input{streamit-asplos}
 \input{basics}
-\input{hierarchical}
-\input{phased}
-\input{constrained}
-\input{results}
-\input{related}
-\input{conclusion}
+%\input{hierarchical}
+%\input{phased}
+%\input{constrained}
+%\input{results}
+%\input{related}
+%\input{conclusion}
 %\input{pseudocode}
 
-\appendix
+%\appendix
 
-\input{appfigs}
+%\input{appfigs}
 
 \bibliographystyle{plain}
 \bibliography{references}
