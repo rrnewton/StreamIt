@@ -66,7 +66,7 @@ distance of N hops.
 The results of this paper were generated using btl, a cycle-accurate
 simulator that models arrays of Raw tiles identical to those in the
 .15 micron 16-tile Raw prototype ASIC chip.  With a target clock rate
-of 250 MHz, the tile employs as compute processor an 8-stage, single
+of 450 MHz, the tile employs as compute processor an 8-stage, single
 issue, in-order MIPS-style pipeline that has a 32 KB data cache, 32 KB
 of instruction memory, and 64 KB of static router memory. All
 functional units except the floating point and integer dividers are
@@ -74,3 +74,10 @@ fully pipelined. The mispredict penalty of the static branch predictor
 is three cycles, as is the load latency. The compute processor's
 pipelined single-precision FPU operations have a latency of 4 cycles,
 and the integer multiplier has a latency of 2 cycles.
+
+\begin{figure}
+\centering
+\psfig{figure=beam-graph.eps,width=3.2in}
+\caption{Stream graph of the Radar Application consisting of 12
+channels and 4 beams. \label{fig:beam-graph}}
+\end{figure}

@@ -31,7 +31,7 @@ section, we provide a very brief overview of the syntax and semantics
 of StreamIt, version 2.0.  A more detailed description of the design
 and rationale for StreamIt can be found in~\cite{streamitcc}, which
 describes version 1.0; the most up-to-date syntax specification can
-always be found on our website~\cite{streamitweb}.
+always be found on the StreamIt website~\cite{streamitweb}.
 
 \subsection{Language Constructs}
 
@@ -70,10 +70,11 @@ The basic construct for composing filters into a communicating network
 is a {\it pipeline}.%, such as the FM Radio in Figure \ref{fig:radiocode}.  
 A pipeline behaves as the sequential composition
 of all its child streams, which are specified with successive calls to
-{\tt add} from within the pipeline.  For example, the output of {\tt
-DataSource} is implicitly connected to the input of {\tt FIRFilter},
-who's output is connected to {\tt FMDemodulator}, and so on.  The {\tt
-add} statements can be mixed with regular imperative code to
+{\tt add} from within the pipeline.  
+%For example, the output of {\tt
+%DataSource} is implicitly connected to the input of {\tt FIRFilter},
+%who's output is connected to {\tt FMDemodulator}, and so on.  
+The {\tt add} statements can be mixed with regular imperative code to
 parameterize the construction of the stream graph.
 
 There are two other stream constructs besides pipeline: {\it
@@ -91,8 +92,9 @@ and so on.  roundrobin is also the only type of joiner that we
 support; its function is analogous to a roundrobin splitter.  If a
 roundrobin is written without any weights, we assume that all $w_i =
 1$.  The splitter and joiner type are specified with the keywords {\tt
-split} and {\tt join}, respectively (see Figure \ref{fig:radiocode});
-the parallel streams are specified by successive calls to {\tt add},
+split} and {\tt join}, respectively 
+%(see Figure \ref{fig:radiocode})
+;the parallel streams are specified by successive calls to {\tt add},
 with the $i$'th call setting the $i$'th stream in the splitjoin.
 
 The last control construct provides a way to create cycles in the
