@@ -51,7 +51,7 @@ if (n>1 && needsJoiner(s))
 if (s is Node)
   return getNodeCost(s, n)
 if (s is Container)
-  int maxWidth = max(s.width[0], ..., s.width[s.height]);
+  int maxWidth = max(s.width[0], ..., s.width[s.height-1]);
   return getContCost(s, 0, maxWidth-1, 0, s.height-1, n)
 endif
 

@@ -91,14 +91,14 @@ the first phase of the algorithm, which is the most important.
 
 For each stream {\tt s} in the graph, the search finds the minimum
 cost if {\tt s} were assigned to {\tt n} tiles, where {\tt n} ranges
-from {\tt 0} to {\tt N}, the maximum number of tiles available.  In
+from {\tt 1} to {\tt N}, the maximum number of tiles available.  In
 the base case, {\tt s} is a node, and its cost is given by {\tt
 getNodeCost}, which simply parallelizes {\tt s} as much as
 possible\footnote{In the actual implementation, we maintain an upper
 limit on the parallelization factor, as communication costs quickly
 outweigh the benefits of distributing the computation.}.  Otherwise,
 {\tt s} is a container, and optimal cost is exhibited under some
-partitioning of the children (see {\tt getContainerCost}.)
+partitioning of the children (see {\tt getContCost}.)
 
 This is where the algorithm's assumption of rectangular partitions
 makes the problem tractable.  If it is looking for the optimal cost of
