@@ -1,6 +1,44 @@
-To add:
+- could add pseudocode for pre-defined kernels, e.g. something like
+for Move, below.  The problem is that there's not a clear way to
+allocate stack space for something to push/pop:
 
-- pseudocode for pre-defined kernels, e.g.:
+  typedef struct {
+    Kernel kernel;
+    IStream* srcStr,
+    OStream* destStr,
+    int _elementSize,
+    int length,
+    boolean setEOS
+  } Move;
+
+  void moveInit(Move* move, VM_NODE_PROC location, IStream* _srcStr, OStream* _destStr,
+                int _elementSize, int _length, boolean _setEOS) {
+    kernelInit(&move->kernel, location, 0, move, sizeof(Move), (ExtKernelWork)&moveWork);
+    move->srcStr = _srcStr;
+    move->destStr = _destStr;
+    move->elementSize = _elementSize;
+    move->length = _length;
+    move->setEOS = _setEOS;
+  }
+
+  void moveWork(Move* move) {
+    char[move->elementSize] buffer;                ///  This doesn't do the right thing, since elementSize isn't staticly known
+    if (move->length == STREAM_LENGTH_ALL) {
+      while (!streamPeekEOS(move->srcStr, 0)) {
+        streamPop(move->srcStr, &buffer);
+        streamPush(move->destStr, &buffer);
+      }
+      streamPop(move->srcStr, &buffer);
+      streamPushWithEOS(move->destStr, &buffer);
+    } else {
+      int i;
+      for (i = 0; i < length; i++) {
+        streamPop(move->srcStr, &buffer);
+        streamPush(move->destStr, &buffer);
+      }
+    }
+  }
+
 
 --------------------------------------------------
 
