@@ -1,5 +1,5 @@
 #
-#ident	"@(#)cvs/examples:$Name: not supported by cvs2svn $:$Id: loginfo,v 1.12 2001-04-04 06:09:40 wentzlaf Exp $"
+#ident	"@(#)cvs/examples:$Name: not supported by cvs2svn $:$Id: loginfo,v 1.13 2001-04-04 18:18:47 wentzlaf Exp $"
 #
 # The "loginfo" file is used to control where "cvs commit" log information
 # is sent.  The first entry on a line is a regular expression which is tested
@@ -38,7 +38,6 @@
 #
 ALL	   $CVSROOT/CVSROOT/log -f $CVSROOT/CVSROOT/commitlog  %s
 ALL	   $CVSROOT/CVSROOT/dolog.pl -r /projects/raw/cvsroot -h miris.lcs.mit.edu bonsai-checkin-daemon@miris.lcs.mit.edu
-ALL	   $CVSROOT/CVSROOT/dolog.pl -r /projects/raw/cvsroot -h miris.lcs.mit.edu wentzlaf@miris.lcs.mit.edu
 CVSROOT    mail -s "CVS log notification: CVSROOT" elliotw@cag.lcs.mit.edu
 ^benchmark mail -s "CVS log notification: benchmark" jbabb@mit.edu 
 ^rawcc     $CVSROOT/CVSROOT/log_accum -m rawcc-commit@cag.lcs.mit.edu -s %s
