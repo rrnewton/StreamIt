@@ -3,6 +3,7 @@ DVI := $(DOCS:%=%.dvi)
 PS := $(DOCS:%=%.ps)
 PDF := $(DOCS:%=%.pdf)
 
+MPOST := mpost
 LATEX := latex
 BIBTEX := bibtex
 DVIPS := dvips
@@ -20,8 +21,9 @@ all: $(DVI) $(PS) $(PDF)
 %.ps: %.dvi
 	$(DVIPS) -o $@ $<
 
-%.dvi %.aux %.log: %.tex
-	$(LATEX) $<
+%.dvi %.aux %.log: %.tex %.mp
+	$(MPOST) $*
+	$(LATEX) $*
 #	if egrep -q $(RERUNBIB) $*.log; then $(BIBTEX) $*; $(LATEX) $<; fi
 	while egrep -q $(RERUN) $*.log; do $(LATEX) $<; done
 
