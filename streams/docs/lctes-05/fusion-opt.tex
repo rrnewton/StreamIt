@@ -163,7 +163,7 @@ in a general-purpose language such as C because array contents might
 be aliased with other pointers.  StreamIt arrays represent values that
 are independent in memory, thereby facilitating this optimization.
 
-Note that scalar replacement can only be applied when array indicices
+Note that scalar replacement can only be applied when array indices
 can be resolved to compile-time constants.  In the presence of unpredictable
 control flow within a filter, or if the loops are too large to fully unroll,
 then scalar replacement does not apply.
