@@ -1,0 +1,24 @@
+/**
+ * this should print 1.0, 2.0, 3.0 ...
+ */
+void->void pipeline ArrayTest {
+    add void->float[1][1] filter {
+	float val;
+	init {
+	    val = 1.0f;
+	}
+	work push 1 {
+	    float[1][1] myArray;
+	    myArray[0][0] = val;
+	    val = val + 1;
+	    push(myArray);
+	}
+    }
+    add float[1][1]->void filter {
+	work pop 1 {
+	    print(pop()[0][0]);
+	}
+    }
+}
+
+	
