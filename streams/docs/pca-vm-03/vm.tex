@@ -130,8 +130,8 @@ processor API instead.}.
 In this proposal, each kernel views a stream as either an {\tt
 istream} or {\tt ostream}, depending on whether it is using the stream
 for input or output.  An {\tt istream} provides {\tt pop}, {\tt peek},
-and {\tt eos} functions, while an {\tt ostream} supports {\tt push},
-as described below: {\small
+and {\tt eos} functions, while an {\tt ostream} supports {\tt push}
+and {\tt of}, as described below: {\small
 \begin{verbatim}
     class base_stream {}
 
@@ -154,6 +154,11 @@ as described below: {\small
     public:
       // push value onto channel
       void push(T val);
+
+      // output full: returns true if and only if this stream is NOT 
+      // circular and the stream will be full after pushing an
+      // additional <count> items onto it.
+      boolean of(int count);
     }  
 \end{verbatim}}
 
@@ -358,7 +363,8 @@ An example of the stream processor API is as follows:
 {\small
 \begin{verbatim}
     // declare streams with their size and the location in which they are held
-    stream<float> s_raw(1000, MEM1), s1(100, SRF1), s2(100, PROC2), s3(1000, SRF1);
+    stream<float> s_raw(1024, MEM1, 0x1000, false), s1(128, SRF1, 0x200), 
+                  s2(16, PROC2), s3(1024, SRF1, 0x280, false);
 
     // set up a graph to do some audio filtering and compression
     Graph compress(new FileReader(s_raw, "input.dat"),
@@ -371,7 +377,7 @@ An example of the stream processor API is as follows:
     compress.wait();
 
     // if the output is still too large, run additional compression
-    stream<float> s4(1000, SRF1);
+    stream<float> s4(1024, SRF1, 0x280, false);
     if (s3.length() > SIZE_THRESHOLD) {
       Graph compressMore(new ZipCompress(s3, s4));
       compressMore.start(PROC2);
@@ -407,16 +413,17 @@ both {\tt istream} and {\tt ostream}:
     class stream : istream <T>, ostream <T> {
     public:
       // make a stream that is buffered in units of <size> and allocated
-      // at <address> of memory node <location>.  If <write_once>
-      // is true, then <size> also indicates the total size of the stream,
-      // and no buffering is necessary (the stream is "blocked")
-      stream(int size, VM_NODE_TYPE_MEM location, int address, boolean write_once = false);
+      // at <address> of memory node <location>.  If <circular> is true,
+      // then the stream is a circular buffer for holding temporary
+      // results in a stream graph.  If <circular> is false, then <size>
+      // <size> represents the maximum stream length; the stream is "blocked".
+      stream(int size, VM_NODE_TYPE_MEM location, int address, boolean circular = true);
 
       // same as above, for stream held in registers of a processor
-      stream(int size, VM_NODE_TYPE_PROC location, boolean write_once = false);
+      stream(int size, VM_NODE_TYPE_PROC location, boolean circular = true);
 
       // returns total number of elements that have been pushed to this
-      // stream (this is independent of the size and write_once properties)
+      // stream (this is independent of the size and circular properties)
       int length();
     }  
 \end{verbatim}}
@@ -426,9 +433,8 @@ refers only to the buffering strategy of the stream--that is, how many
 elements should be kept live at once before overwriting old items with
 new ones.  It is the responsibility of the low-level compiler to
 ensure that no items are overwritten before they are consumed.  If the
-{\tt write\_once} property is true, then no overwriting is allowed,
-and the {\tt size} is also an upper bound on the stream's length at
-runtime.
+{\tt circular} property is false, then {\tt size} is also an upper
+bound on the stream's length at runtime.
 
 Each {\tt stream} is also constructed with a {\tt location}, which
 indicates the memory bank in which the stream is held for its entire
@@ -438,7 +444,7 @@ assigned to a processor, which means that it is buffered in the
 processor's registers.
 
 The {\tt length} method returns how many items have been written to
-the stream (during the last execution of a graph containing the
+the stream (during the last execution of a graph that wrote to the
 stream, as described below).  Note that this is unrelated to the
 buffer size of the stream.  It is also unrelated to how many items
 will be written to the stream in the future; if this quantity is
@@ -482,20 +488,34 @@ Graphs are executed using the {\tt start} method, which substitutes
 for the KERNELLOAD and KERNELSTART functions in the previous proposal.
 The argument to {\tt start} specifies which stream processor should
 execute the arithmetic operations of the graph; note that this can be
-the same processor that is running the control code.
+the same processor that is running the control code.  Before the graph
+starts executing, the {\tt length} of each stream that is an output of
+some kernel in the graph is reset to zero.
 
-The {\tt start} method runs each kernel ``as long as possible''.  This
-means that a kernel is run until one of two conditions is met: 
+The {\tt start} method runs each kernel ``as long as possible''.  A
+kernel stops running (it is {\it terminated}) when one of these
+conditions is met:
 \begin{enumerate}
 
-\item The kernel returned {\tt true} from its last invocation of {\tt
-prework} or {\tt work}.
+\item The kernel returns {\tt true} from {\tt prework} or {\tt work}.
 
-\item The kernel declares a static peek rate of {\tt p} for an input
-stream {\tt s}, but there are fewer than {\tt p} items left in {\tt
-s}.  That is, {\tt s.eos(p-1)} is true.
+\item The kernel's downstream neighbors have terminated.  That is, a
+kernel terminates if all of its output streams are circular, and all
+of the kernels reading those streams have also terminated.
+
+\item The kernel declares a static peek rate of {\tt e} for an input
+stream {\tt s}, but there are fewer than {\tt e} items left in {\tt
+s}.  That is, {\tt s.eos(e-1)} is true.
+
+\item The kernel declares a static push rate of $u$ for an output
+stream {\tt s}, but {\tt s} is not circular and does not have space
+for an additional $u$ items.  That is, {\tt s.of(u)} is true.
 
 \end{enumerate}
+Once a kernel terminates, each of its output streams ends with the
+last item (if any) that the kernel pushed onto it.  A graph is
+finished executing only when all of its component kernels have
+terminated.
 
 The {\tt wait} and {\tt check} methods replace the VM\_DONE\_SYNC and
 VM\_DONEQUERY functions of the previous proposal.  Since the {\tt
@@ -508,12 +528,12 @@ graph has finished, while {\tt check} returns the status immediately.
 A {\tt Graph} represents only the static sections of the stream graph.
 As in the example of Section~\ref{sec:streamover}, dynamic control
 flow can surround the construction of graphs and can predicate their
-execution.  In addition, streams from one graph can be reused in
-subsequent graphs.  This is essential for carrying over results from
-one streaming computation to another.  In the example, streams {\tt
-s3} and {\tt s4} are used in multiple graphs.  Streams can also be
-declared in a global namespace if they need to be shared between
-multiple processors.
+execution.  In addition, non-circular streams from one graph can be
+reused in subsequent graphs.  This is essential for carrying over
+results from one streaming computation to another.  In the example,
+streams {\tt s3} and {\tt s4} are used in multiple graphs.  Streams
+can also be declared in a global namespace if they need to be shared
+between multiple processors.
 
 It is also possible for the processor API to inspect the public
 fields of a kernel following a streaming computation.  This could be
@@ -542,7 +562,7 @@ retrieving a reduction value from inside a kernel.  For instance:
     }
 
     // --- processor code ---
-    stream<int> s1(100, SRF);
+    stream<int> s1(100, SRF, 0x100, false);
 
     SumKernel sk(s1);
     Graph g(new FileReader(s1, "input.dat"), sk);
@@ -605,6 +625,24 @@ channels cannot be assigned to variables; they can only be passed as
 direct arguments to API functions (such as {\tt Graph.start} and the
 pre-defined kernels in Section~\ref{sec:predef}).
 
+\item A stream that is used for both input and output in a graph must
+be circular.  A stream that is used for only input or output must be
+non-circular.
+
+\item The memory allocated to a circular stream must not overlap with
+any other stream (circular or non-circular).  Non-circular streams may
+overlap with each other.
+
+\item If one or more graphs are executing, then any ordering of kernel
+execution is valid so long as streams do not overflow or underflow.
+
+In other words, the low-level compiler can select any schedule
+respecting the data dependences of the graphs; no memory analysis is
+needed.  If there are location-based dependences due to overlapping
+streams, the high-level compiler should insert synchronization (for
+inter-graph dependences) or verify that other graph dependences will
+ensure a consistent execution order (for intra-graph dependences).
+
 \item $(*)$ A kernel can appear in only one graph.  That is, on every
 execution path, a given kernel object is used as an argument to at
 most one {\tt Graph} constructor.
@@ -617,7 +655,10 @@ start} call.
 
 The $(*)$ items represent dynamic properties that are not statically
 verifiable by the low-level compiler.  Thus, they represent a contract
-that the high-level compiler must respect for the sake of correctness.
+that the high-level compiler must respect for the sake of
+correctness\footnote{In the future, these restrictions could perhaps
+be lifted to allow stream graphs to be interrupted, modified, and
+resumed}.
 
 \subsubsection{Pre-Defined Kernels}
 \label{sec:predef}
@@ -807,8 +848,7 @@ extracted segments to provide a smooth transition between them.
     // --- code for PROC1 ---
 
     for (int i=0; i<10; i++) {
-
-      stream<float> raw_data(10000, MEM1, true), spectrum(100, MEM1),
+      stream<float> raw_data(10000, MEM1, 0x1000, false), spectrum(100, MEM1, 0x3000),
                     sim(10, PROC1), seg_indices(10, PROC1), sum_data(10, PROC1);
 
       Graph g(new FileReader(raw_data, filename[i]),       // load file
@@ -825,8 +865,7 @@ extracted segments to provide a smooth transition between them.
     // --- code for PROC2 ---
 
     for (int i=0; i<10; i++) {
-
-      stream<float> sum_data(100, MEM2), smooth_data(100, MEM2);
+      stream<float> sum_data(128, MEM2, 0x2000), smooth_data(100, MEM2, 0x20080);
 
       Graph g(new Receive(sum_data, c1, 3),                // receive summaries over channel
               new FIRFilter(sum_data, smooth_data),        // filter summaries
@@ -834,7 +873,6 @@ extracted segments to provide a smooth transition between them.
 
       g.start(PROC2);
       g.wait();
-
     }   
 \end{verbatim}}
 In processor 1, a {\tt Gather} kernel is used to load the audio file

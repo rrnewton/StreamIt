@@ -70,7 +70,7 @@ proposal: \\
 
   \entry{VM\_PROP\_PROC\_SIMD} {int32 - SIMD/Vector speedup factor.}
     {The amount by which the processor will speed up (over that
-    specified by the ILP property) if the computation is data parallel.}
+    specified by the ILP property) if the computation is data parallel. \vspace{-10pt}}
 
   \entry{VM\_PROP\_PROC\_REGS} {int32 - Number of registers} {The
     number of registers on the processor (possibly to include
@@ -85,8 +85,8 @@ proposal: \\
   \entry{VM\_PROP\_PROC\_IMEMBANK} {VM\_NODE\_TYPE\_MEM} {The default
   memory node in which to hold instructions for this processor.}
 
-  \entry{VM\_PROP\_PROC\_ISIZE} {int32 - Number of words} {The number
-    of words required to store a RISC instruction for this processor.}
+  \entry{VM\_PROP\_PROC\_ISIZE} {int32 - Number of bits} {The number
+    of bits required to store a RISC instruction for this processor.}
 }
 
 \newpage
@@ -163,6 +163,7 @@ processor-processor connections.)  Also note that there can be
 multiple connections between two nodes (or between a node and itself)
 if there are communication channels with different characteristics.
 
+\newpage
 \sss{Connection Properties}
 
 Each edge in the architectural graph has the following properties: \\
