@@ -127,19 +127,21 @@ code to be executed on the compute processors.  We have completed
 parameterized code generation for linear filters.   
 
 As for the high-level algorithms, we have implemented a greedy
-algorithm to partition the stream graph into slices.  This algorithm
-produces an arbitrary ordering of slices and it is the
-task of the software pipeliner to ensure correct execution of the
-graph. 
+algorithm to partition and schedule the stream graph into ordered slices.
+This algorithm has the freedom of producing an arbitrary ordering of slices
+to best distribute the work evenly. It is the task of the software
+pipelining algorithm to take in this schedule and produce a valid
+execution by determining what executions are needed in the initialization
+stage to prime the pipeline.
 
 \absection{Future}
-In the near future we would like to explore more advanced (possibly global
-and exhaustive) partitioning and layout algorithms.  Additionally, we
-will further expand space multiplexing by investigating
-additional parallelism schemes such as filter fission (breaking a
-filter into multiple, smaller filters), investigating additional filter
-representations such as state-space, and implementing linear code
-generation for sparse matrices.  
+In the near future we would like to explore more advanced partitioning
+and layout algorithms.  Additionally, we will further expand
+space multiplexing by investigating additional parallelism schemes
+such as filter fission (breaking a filter into multiple, smaller
+filters), investigating optimizing additional filter representations
+such as state-space, and implementing optimized linear code generation 
+targeting sparse matrices.  
 
 In the long-term, we are working on a new intermediate representation
 for our compiler that will allow us to generate assembly code for
