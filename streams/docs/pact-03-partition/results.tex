@@ -1,4 +1,28 @@
 \section{Results}
+\label{sec:results}
+\input{table}
+
+advantages of this algorithm:
+  - detecting symmetry and hierarchy to save time
+    - work estimation
+    - alisasing of child configurations
+    - evaluating child configurations themselves
+    - automatically calculating things that are best
+
+- results
+  - cuts along important places, in right directions
+  - does fissoin and fusion
+
+  - partitioner takes advantage of this in two ways: 
+    1) by detecting symmetry and only calculating things once
+    2) by drawing cuts along likely paths
+    3) by automatically calculating some properties that are the best,
+       e.g. if you have the same filter duplicated in a splitjoin
+
+- show how we can provide rectangular abstraction on single-input, single-output streams
+
+LINEAR
+
 
 Average Speedup:
 
