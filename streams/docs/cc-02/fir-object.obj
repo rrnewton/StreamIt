@@ -1,0 +1,63 @@
+%TGIF 3.0-p13
+state(0,33,100.000,0,256,0,16,1,9,1,1,0,0,1,0,1,0,'Courier',0,10,0,0,0,10,1,0,1,1,0,16,0,0,1,1,1,0,1088,1408,0,0,2880).
+%
+% @(#)$Header: /afs/csail.mit.edu/group/commit/reps/projects/streamit/cvsroot/streams/docs/cc-02/fir-object.obj,v 1.1 2002-01-21 18:42:16 thies Exp $
+% %W%
+%
+unit("1 pixel/pixel").
+color_info(11,65535,0,[
+	"magenta", 65535, 0, 65535, 65535, 0, 65535, 1,
+	"red", 65535, 0, 0, 65535, 0, 0, 1,
+	"green", 0, 65535, 0, 0, 65535, 0, 1,
+	"blue", 0, 0, 65535, 0, 0, 65535, 1,
+	"yellow", 65535, 65535, 0, 65535, 65535, 0, 1,
+	"pink", 65535, 49344, 52171, 65535, 49344, 52171, 1,
+	"cyan", 0, 65535, 65535, 0, 65535, 65535, 1,
+	"CadetBlue", 24415, 40606, 41120, 24415, 40606, 41120, 1,
+	"white", 65535, 65535, 65535, 65535, 65535, 65535, 1,
+	"black", 0, 0, 0, 0, 0, 0, 1,
+	"DarkSlateGray", 12079, 20303, 20303, 12079, 20303, 20303, 1
+]).
+page(1,"",1).
+text('black',96,288,'Courier',0,10,41,0,0,1,300,491,0,0,9,2,0,1,0,0,0,2,0,0,0,0,"",0,0,0,[
+	"class FIRFilter {",
+	"  int N;",
+	"  float[] input;",
+	"",
+	"  FIRFilter(int N) {",
+	"    this.N = N;",
+	"  }",
+	"",
+	"  float[] getData(float[] output,                 ",
+	"  int offset, int length) {",
+	"    if (input==null) {",
+	"      input = new float[MAX_LENGTH];",
+	"      source.getData(input, 0, N+length);",
+	"    } else {",
+	"      source.getData(input, N, length);",
+	"    }",
+	"",
+	"    for (int i=0; i<length; i++) {",
+	"      float sum = 0;",
+	"      for (int j=0; j<N; j++) {",
+	"        sum = sum + data1[i+j]*FIR_COEFF[j][N];",
+	"      }",
+	"      output[i+offset] = sum;",
+	"    }",
+	"",
+	"    for (int i=0; i<N; i++) {",
+	"      input[i] = input[i+length];",
+	"    }",
+	"  }",
+	"}",
+	"",
+	"void main() {",
+	"  DataSource datasource = new DataSource();",
+	"  FIRFilter filter = new FIRFilter(5);",
+	"  Display display = new Display();",
+	"",
+	"  filter.source = datasource;",
+	"  display.source = filter;",
+	"",
+	"  display.run();",
+	"}"]).
