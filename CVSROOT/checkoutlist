@@ -1,5 +1,5 @@
 #
-#ident	"@(#)cvs/examples:$Name: not supported by cvs2svn $:$Id: checkoutlist,v 1.1 1997-01-15 07:46:13 jbabb Exp $"
+#ident	"@(#)cvs/examples:$Name: not supported by cvs2svn $:$Id: checkoutlist,v 1.2 2001-04-04 05:52:56 wentzlaf Exp $"
 #
 # The "checkoutlist" file is used to support additional version controlled
 # administrative files in $CVSROOT/CVSROOT, such as template files.
@@ -18,3 +18,4 @@
 #rcstemplate
 #wrap
 #unwrap
+dolog.pl
