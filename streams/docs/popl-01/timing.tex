@@ -109,7 +109,7 @@ push_A*\left\lfloor\frac{x-(peek_A-pop_A)}{pop_A}\right\rfloor & if & x \ge (pee
 By identical reasoning, the reader can verify the following
 expression for $\mi{I_A}{O_A}(x)$:
 \begin{align*}
-\mi{I_A}{O_A}(x) = \left\lceil\frac{x}{push_A}\right\rceil*pop+(peek_A-pop_A)
+\mi{I_A}{O_A}(x) = \left\lceil\frac{x}{push_A}\right\rceil*pop_A+(peek_A-pop_A)
 \end{align*}
 \subsubsection{Pipelines}
 
