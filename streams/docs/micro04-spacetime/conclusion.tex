@@ -1,4 +1,40 @@
 \section{Conclusion}
 \label{sec:conclusion}
 
-In this paper we introduced a technique. 
+This paper proposes space-time multiplexing, a flexible scheme for
+compiling streaming applications to wire-exposed architectures.  Up
+until now, the two prevailing compilation strategies have been at odds
+with one another: time-multiplexing provides flexible load balancing
+at the expense of memory traffic and limited scalability, while space
+multiplexing scales with spatial architectures but is difficult to
+load balance.  To strike a practical middle ground between these
+techniques, we introduce the concept of a {\it trace}: a commonly
+executed sequence of filters that benefits from space multiplexing.
+Further, we propose using software pipelining for scheduling
+time-multiplexed execution of traces on the chip.  The result is a
+hybrid algorithm that offers the flexible load balancing of time
+multiplexing while preserving the fine-grained benefits of space
+multiplexing.
+
+A second contribution of our work is using program traces as a target
+of domain-specific optimizations.  For traces that compute a linear
+function, we extract the coefficients and generate template assembly
+code that has been hand-tuned for Raw.  This technique yields
+near-optimal floating point utilization and provides a \todo{??}
+speedup over our benchmark suite.  Our vision is that similar
+architecture-specific templates could be generated for a variety of
+filters---not only for those that compute a given function (e.g., FFT)
+but also for filters with a specific property.  For example,
+data-parallel filters can be parallelized by a backend or can admit
+instruction reodering between different instances.  Such properties
+can facilitate a retargetable backend infrastructure, as each backend
+provides its own optimizations for a given class of filters.  Of
+course, domain-specific optimizations such as these rely on space-time
+multiplexing for their generality, as traces that are not subject to
+specific optimizations can can execute in their own time partitions.
+
+Our implementation of space-time multiplexing in the StreamIt-to-Raw
+compiler demonstrates an average improvement of \todo{??} over a
+purely space-multiplexing scheme.  We believe that hybrid space-time
+multiplexing represents a viable technique for harvesting the
+computation resources of next-generation machines.
