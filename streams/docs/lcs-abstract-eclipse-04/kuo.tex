@@ -27,7 +27,7 @@
 %% section if it doesn't apply to your work.
 
 
-\abstitle{StreamIt Development Environment}
+\abstitle{An Integrated Development Environment for Streaming Systems}
          {Kimberly Kuo, Juan Reyes, Jasper Lin, Rodric Rabbah, and Saman Amarasinghe}
 
 %% Please include an index entry for each author, keeping the names
@@ -46,10 +46,10 @@ facilitating   the   rapid   implementation   of   complex   streaming
 applications and  mitigating the need for  expert-level programmers on
 the  critical path to  achieving high  performance.  Toward  this end,
 StreamIt provides  a unified programming  model with a  single machine
-abstraction,  irrespective of wether  the eventual  target is  a tiled
+abstraction,  irrespective of whether  the eventual  target is  a tiled
 architecture, a cluster of workstations or a traditional uniprocessor.
 Furthermore,  StreamIt  is  designed  to  promote  a  natural  textual
-representation  of an application,  thereby improving  readibility and
+representation  of an application,  thereby improving  readability and
 robustness, or  in other words, programmer productivity.   Our goal is
 to leverage  the novel language  features to facilitate  practical and
 large-scale  program development,  offering a  modular,  portable, and
@@ -96,14 +96,14 @@ StreamIt  programs,  and it  features  facilities  for accurately  and
 deterministically   tracking   potentially   massive   parallelism---a
 powerful capability,  especially when one considers  the daunting task
 facing developers who  try to reason about program  correctness in the
-context of multi-threaded applications with indepent program counters.
+context of multi-threaded applications with independent program counters.
 
 \absection{How}
 
 A StreamIt  program is  represented as a  structured graph,  where the
-nodes represent anutonomous units  of computation, and the edges imply
+nodes represent autonomous units  of computation, and the edges imply
 FIFO  communication  channels.  A  StreamIt graph  (stream  graph)  is
-hierachichal in  structure, and it consists  of canonical single-input
+hierarchical in  structure, and it consists  of canonical single-input
 to single-output  constructs. The stream  graph also corresponds  to a
 precise textual counterpart that is easily edited by a programmer.  As
 such, StreamIt  affords modularity and  recursive program definitions,
@@ -122,16 +122,16 @@ The  development  tool consists  of the following main components:
 \begin{itemize}
 \item {\bf Graphical Editor:} allows for the rapid composition of
 stream applications using a graphical user interface. The editor
-affords many features, including  component duplication, hierarchichal
+affords many features, including  component duplication, hierarchical
 grouping, structure validation, and automatic template code generation.
 \item {\bf Textual Editor:} includes customizable indentation
-schemes and keywork highlighting.
+schemes and keyword highlighting.
 \item {\bf Graphical Debugger:} supports step-by-step execution, as well as
 the inspection and modification  of program variables, including those
 within the communication channels.
 \end{itemize}
 
-The  SDT largely relies  on the  exposed parallelism  and communcation
+The  SDT largely relies  on the  exposed parallelism  and communication
 patterns to enable graphical application development and debugging. In
 the  context  of  the  latter,  the  ability  to  track  the  flow  of
 information along the  FIFOs---particularly within the {\tt SplitJoin}
@@ -167,7 +167,7 @@ integration  (see www.eclipse.org  for more  information  on Eclipse).
 The SDT  is a  graphical programming environment,  and it  consists of
 several  components that  enable the  development,  visualization, and
 debugging  of programs  written in  StreamIt.  The  SDT  debugger (see
-Figure~\ref{debugger-ss} for a  screenshot) can interpret and visually
+Figure~\ref{debugger-ss} for a  screen-shot) can interpret and visually
 represent  the stream graph  and its  dynamic behavior,  including the
 flow of  information in parallel  streaming components.  The  SDT also
 includes a tutorial and extensive documentation.
