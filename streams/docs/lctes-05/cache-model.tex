@@ -7,13 +7,13 @@ ordering of the filters in the stream graph.
 
 The model is based on the notion of a filter reuse distance which is 
 based on LRU stack distance~\cite{mattson-reuse}. We develop the model
-first first the instruction cache, and then subsequently evolve it to
+first for the instruction cache, and then subsequently generalize it to
 account for the data cache.
 
 \subsection{Instruction Cache}
 
-A {\it filter execuion trace} is a sequence of executions of
-filter work functions: $T = f_0 f_1 ... f_n$; $f_i$ represents the
+A {\it filter execuion trace} is a sequence of 
+filter work functions executions: $T = f_0 f_1 ... f_n$; $f_i$ represents the
 execution of filter $f$ at logical time $i$.
 The filter {\it instruction reuse distance} ($IRD$) is defined as the
 number of unique instructions that are referenced between two
@@ -65,7 +65,7 @@ filter \texttt{A}'s instruction workingset. Hence when we transition
 back to run filter \texttt{A}, we have to refetch certain
 instructions, but in the process, we replace parts of filter
 \texttt{B}'s workingset. Hence, we have suffered one cold start miss,
-and one capacity miss for filter\texttt{A}, and similarly for
+and one capacity miss for filter \texttt{A}, and similarly for
 \texttt{B}. Our model is again in accord with intuition: 
 $ICM(\texttt{A}_1) = 1$ since
 the $IRD(\texttt{A}_1) > C_I$. Note that the
@@ -80,11 +80,11 @@ distribution.
 
 Using the metrics above, we can estimate the instruction-cache miss
 rate $(IMR)$ as $\sum ICM(f_i)$ over all $f_i$ in the trace, divided
-by the size of the trace. Note that difference execution orderings for
+by the size of the trace. Note that different execution orderings for
 the same stream graph lead to traces of the same size and hence the
-comparison are fair. The model allows us to order the quality of an
+comparisons are fair. The model allows us to rank the quality of an
 execution ordering, with scheduling decisions that boost temporal
-locality yielding miss rates closer to zero (and schedule that do not
+locality yielding miss rates closer to zero (and schedules that do not
 exploit temporal locality yielding traces with miss rates closer to
 one).
 
@@ -109,7 +109,7 @@ run_steady_state() {
 \end{verbatim}
 where \texttt{M} (the multiplicity factor) is an integer greater than
 one. From our model, it is easy to see that scaling reduces the number
-of misses for a given filter $f$ from $K$ to $K/\texttt{M}- 1$, where $K =
+of misses for a given filter $f$ from $K$ to $\frac{K}{\texttt{M}}- 1$, where $K =
 \sum ICM(f)$ for all occurences of $f$ in  the execution trace.
 
 \subsection{Data Cache}
@@ -155,9 +155,9 @@ mistmatch, the metric tells us that the effective cache size is
 reduced, or in other words, the data that is left over after a
 producer-consumer firing must be preserved until a future occurence of
 the same pair of filters. This translates to lower data locality and
-degrade cache performance.
+degrades cache performance.
 
-Mathematically. the dynamic data measure is defined as:
+Mathematically, the dynamic data measure is defined as:
 \begin{eqnarray}
   \nonumber
   Y(f_i) &=&\sum_{f_k} min(W(f_k), U(f_k) \times A(f_k)) + \\
@@ -184,16 +184,16 @@ work function fired in the phase); this avoid over estimating the
 address space when an exceedingly large buffer is reserved but only a
 portion of it is used for writing in a phase.
 
-The second term in the equation quantified the referenced address space 
+The second term in the equation quantifies the referenced address space 
 for reading the input data. This term is also the lesser of two
 values: the input buffer size, and the total number of bytes referenced for
 reading data.
 
-The third term avoid double counting since the output buffer of one
+The third term avoids double counting since the output buffer of one
 filter is also the input buffer of its successor in the stream
 graph. The term quantifies the amount of data that is consumed by the
-producer's successor, and hence release a portion of the address space
-for use by other filters in the phase.
+producer's successor (which therefore releases a portion of the
+address space for use by other filters in the phase).
 
 \subsection{Remarks}
 

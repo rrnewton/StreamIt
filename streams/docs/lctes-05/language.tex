@@ -73,8 +73,8 @@ streams, which are then joined together in a round robin fashion.  In
 a splitjoin, the {\it splitter} performs the data scattering, and the
 {\it joiner} performs the gathering. A splitter is a specialized
 filter with a single input and  multiple output channels. On 
-every execution step, they can distribute their output to any one of
-their children in either a {\it duplicate} or a {\it roundrobin}
+every execution step, it can distribute its output to any one of
+its children in either a {\it duplicate} or a {\it roundrobin}
 manner. For the former, incoming data is replicated to every
 sibling connected to the splitter. For the latter, data is scattered
 in a round-robin manner, with each item sent to exactly one child
