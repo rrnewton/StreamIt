@@ -132,8 +132,8 @@ domain (see Figure~\ref{fig:thies3-freq}).  This optimization
 transforms a linear node, which can be thought of as a convolution,
 into a sequence of a Fast Fourier Transform (FFT), a vector-vector
 multiply, and an Inverse FFT.  This technique offers an asymptotic
-speedup from $O(n^2)$ for convolution in the time domain to $O(n
-log(n))$ in the frequency domain.  As shown in
+speedup from $O(n^2)$ for convolution in the time domain to $O(n~
+\mbox{log}~n)$ in the frequency domain.  As shown in
 Figure~\ref{fig:thies3-combo}, adjacent linear nodes can also be
 algebraically simplified into a single node by evaluating the product
 of their matrices at compile time.  Note that if the matrix dimensions
