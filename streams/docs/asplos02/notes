@@ -7,7 +7,24 @@ demonstrate it.
 ---------------------------------------------------------------------------
 Here's a list of FIGURES we need to make:
 
-- diagram of the software radio to accompany the code example
+1. diagram of the software radio to accompany the code example
+
+2. sequence of transformations for the software radio that makes it
+load balanced.
+
+3. illustrating pipeline fusion with initWork and steadyWork
+
+4. illustrating data-parallel splitjoins
+
+5. illustrating splitting a filter into a pipline.
+
+6. pushing filter through splitter or joiner node
+
+7. hierarchical splitjoins
+
+8. synchronization removal of splitters/joiners with same weights
+
+9. nested pipeline removal
 
 ---------------------------------------------------------------------------
 HERE'S AN ABANDONED PARAGRAPH FROM THE OLD ABSTRACT

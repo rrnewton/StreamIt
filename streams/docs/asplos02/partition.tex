@@ -63,13 +63,13 @@ done by hand, but the transformations themselves are fully automated.
 We return to our software radio example to illustrate the partitioning
 process.  Figure~\ref{fig:fmblood1} illustrates a blocking diagram for
 the original partitioning of the radio (which appears in
-Figure~\ref{fig:??}).  The dark bands indicate where a processor is
+Figure~\ref{fig:?1}).  The dark bands indicate where a processor is
 waiting to send or receive an item, while the light areas indicate
 periods of useful work.  With the filters partitioned in the original
 configuration, most of the processors spend their time waiting for the
 input from the first LowPassFilter.
 
-Figure~\ref{fig:??} illustrates a sequence of transformations that
+Figure~\ref{fig:?2} illustrates a sequence of transformations that
 improve the load balancing for the radio, resulting in the blocking
 diagram shown in Figure~\ref{fig:fmblood2}.  \todo{Describe the
 transformations} In the following sections, we describe these
@@ -115,7 +115,7 @@ with scalar variables to facilitate optimization.
 A subtlety of our algorithm is that the fused filter differs from the
 originals in that it has two distinct execution phases: one for
 initialization, and one for steady-state execution (see
-Figure~\ref{fig:??}).  If any of the component filters peek at
+Figure~\ref{fig:?3}).  If any of the component filters peek at
 elements that they do not consume, then a separate initialization
 schedule is required to fill all the ``peek buffers'' in the pipeline.
 During this initialization, the pipeline as a whole will consume some
@@ -158,7 +158,7 @@ computationally intensive node for improved load balancing.
 There are many types of fission transformations.  We have implemented
 a data-parallel transformation for stateless filters that places a
 duplicate of the filter on each path of an $n$-way SplitJoin (see
-Figure~\ref{fig:??}).  By ``stateless'' we mean that the filter
+Figure~\ref{fig:?4}).  By ``stateless'' we mean that the filter
 contains no fields that are written on one invocation of {\tt work}
 and read on later invocations--let us consider such a filter $F$ with
 I/O rates of $peek$, $pop$, and $push$.  Our transformation produces a
@@ -175,7 +175,7 @@ a weight of $push$ for each input.
 
 Instead of duplicating the entire contents of a filter, some filters
 can be split into a pipeline, with each stage performing some part of
-the work function (see Figure~\ref{fig:??}).  In addition to the
+the work function (see Figure~\ref{fig:?5}).  In addition to the
 original input data, these pipelined stages might need to communicate
 intermediate results from within {\tt work}, as well as fields within
 the filter.  This scheme could apply to filters with state if all
@@ -193,9 +193,9 @@ There are a multitude of ways to reorder the elements of a stream
 graph so as to facilitate fission and fusion transformations.  For
 instance, identical stateless filters can be pushed through a splitter
 or joiner node if the weights are adjusted accordingly
-(Figure~\ref{fig:??}); a SplitJoin construct can be divided into a
+(Figure~\ref{fig:?6}); a SplitJoin construct can be divided into a
 hierarchical set of SplitJoins to enable a finer granularity of fusion
-(Figure~\ref{fig:??}); neighboring splitters and joiners with matching
-weights can be eliminated (Figure~\ref{fig:??}); and nested pipelines
-can be flattened into one (Figure~\ref{fig:??}).
+(Figure~\ref{fig:?7}); neighboring splitters and joiners with matching
+weights can be eliminated (Figure~\ref{fig:?8}); and nested pipelines
+can be flattened into one (Figure~\ref{fig:?9}).
 
