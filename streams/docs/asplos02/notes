@@ -1,32 +1,4 @@
-HERE'S A VERSION OF THE ABSTRACT
-
-With the increasing miniaturization of transistors, wire delays are
-becoming a dominant factor in microprocessor performance.  To address
-this issue, a number of emerging architectures contain replicated
-processing units with software-exposed communication between one unit
-and another (e.g., RAW, iWarp, SmartMemories).  However, for
-their use to be widespread, it will be necessary to develop compiler
-technology that enables a portable, high-level language to execute
-efficiently across a range of wire-exposed architectures.
-
-In this paper, we describe our compiler for StreamIt: a high-level,
-architecture-independent language for streaming applications.  Our
-compiler targets the RAW processor, and we present results using the
-cycle-accurate RAW simulator.  Though StreamIt exposes the parallelism
-and communication patterns of stream programs, much analysis is needed
-to adapt a stream program to a parallel stream processor.  We describe
-fission and fusion transformations that can be used to adjust the
-granularity of a stream graph, a layout algorithm for mapping a stream
-graph to a given network topology, and a scheduling algorithm for
-generating a fine-grained static communication pattern for each
-computational element.  We consider this work to be a first step
-towards a portable programming model for communication-exposed
-architectures.
-
----------------------------------------------------------------------------
----------------------------------------------------------------------------
-
-HERE'S AN ABANDONED PARAGRAPH
+HERE'S AN ABANDONED PARAGRAPH FROM THE OLD ABSTRACT
 
 In this paper, we formulate the techniques that are fundamental to
 such an implementation, and we demonstrate their effectiveness in
@@ -96,3 +68,4 @@ a hierarchical stream graph.
 	resources on the RAW architecture for a different application
 	granularities and architecture granularities
 
+---------------------------------------------------------------------------
