@@ -12,6 +12,9 @@ sub: clean main.ps
 main.ps: main.dvi
 	dvips -Ppdf -o main.ps main.dvi
 
+main.pdf: main.ps
+	ps2pdf main.ps
+
 main.dvi: main.tex references.bib *.tex images/*.eps
 	latex main
 	bibtex main
