@@ -1,0 +1,24 @@
+<benchmark>
+  <name>arraytest</name>
+  <desc>Tests of passing arrays over tapes</desc>
+  <description>
+This set of tests looks at the problem of using arrays as the values
+passed between filters.  These tests all have a single source and a
+single sink, with an array or matrix generated and passed between
+them.
+  </description>
+  <implementations>
+    <impl lang="StreamIt">
+      <desc>MIT, test passing float[1][1] between source and sink</desc>
+      <file>ArrayTest.str</file>
+    </impl>
+    <impl lang="StreamIt">
+      <desc>MIT, test passing float[4][4] and float[3][3]</desc>
+      <file>ArrayTest2.str</file>
+    </impl>
+    <impl lang="StreamIt">
+      <desc>MIT, test involving a splitjoin</desc>
+      <file>ArrayTest3.str</file>
+    </impl>
+  </implementations>
+</benchmark>
