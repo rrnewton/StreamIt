@@ -36,76 +36,63 @@ always be found on the StreamIt website~\cite{streamitweb}.
 \subsection{Language Constructs}
 
 The basic unit of computation in StreamIt is the {\it filter}.  A
-filter is a single-input, single-output block with a user-defined
-procedure for translating input items to output items.  
-%An example of
-%a filter is the {\tt FIRFilter}, a component of our software radio
-%(see Figure \ref{fig:radiocode}).  
-Each filter contains an {\tt init}
-function that is called at initialization time; 
-%in this case, the {\tt
-%FIRFilter} calculates {\tt weights}, which represents its impulse response.  
-The {\tt work} function describes the most fine grained
-execution step of the filter in the steady state.  Within the {\tt
-work} function, the filter can communicate with its neighbors via FIFO
-queues, termed {\it channels}, using the intuitive operations of {\tt push(value)}, {\tt
-pop()}, and {\tt peek(index)}, where {\tt peek} returns the value at
-position {\tt index} without dequeuing the item.  The number of items
-that are pushed, popped, and peeked\footnote{We define $peek$ as the
-total number of items read, including the items popped.  Thus, we
-always have that $peek \ge pop$.} on each invocation are declared with
-the {\tt work} function.
+filter is a single-input, single-output block with user-defined
+procedures for translating input items to output items.  Each filter
+contains an {\tt init} function that is called at initialization time
+and a {\tt work} function that defines the most fine grained execution
+step of the filter in the steady state.  Within the {\tt work}
+function, the filter can communicate with its neighbors via FIFO
+queues, termed {\it channels}, using the intuitive operations of {\tt
+push(value)}, {\tt pop()}, and {\tt peek(index)}, where {\tt peek}
+returns the value at position {\tt index} without dequeuing the item.
+The number of items that are pushed, popped, and peeked on each
+invocation are declared with the {\tt work} function.
 
 In addition to {\tt work}, a filter can contain a {\tt prework}
-function that is executed exactly once between initialization and the
-steady-state.  Like {\tt work}, {\tt prework} can access the input and
+function that is executed exactly once after the call to the {\tt
+init} function.  Like {\tt work}, {\tt prework} can access the input and
 output tapes of the filter; however, the I/O rates of {\tt work} and
-{\tt prework} can differ.  In an {\tt FIRFilter}, a {\tt prework}
+{\tt prework} can differ.  For example, in an FIR Filter, a {\tt prework}
 function is essential for correctly filtering the beginning of the
 input stream.  The user never calls the {\tt init}, {\tt prework}, and
-{\tt work} functions--they are all called automatically.
+{\tt work} functions--they are all scheduled automatically by the compiler.
 
-The basic construct for composing filters into a communicating network
-is a {\it pipeline}.%, such as the FM Radio in Figure \ref{fig:radiocode}.  
-A pipeline behaves as the sequential composition
-of all its child streams, which are specified with successive calls to
-{\tt add} from within the pipeline.  
-%For example, the output of {\tt
-%DataSource} is implicitly connected to the input of {\tt FIRFilter},
-%who's output is connected to {\tt FMDemodulator}, and so on.  
+There are three basic constructs for composing filters into a
+communicating network: a {\it pipeline}, a {\it splitjoin}, and a {\it
+feedbackloop}, see Figure \ref{fig:structures}.  A pipeline behaves as
+the sequential composition of all its child streams, which are
+specified with successive calls to {\tt add} from within the pipeline.
 The {\tt add} statements can be mixed with regular imperative code to
-parameterize the construction of the stream graph.
-
-There are two other stream constructs besides pipeline: {\it
-splitjoin} and {\it feedbackloop} (see Figure \ref{fig:structures}).
-From now on, we use the word {\it stream} to refer to any instance of
-a filter, pipeline, splitjoin, or feedbackloop.
-
-A splitjoin is used to specify independent parallel streams that
-diverge from a common {\it splitter} and merge into a common {\it
-joiner}.  There are two kinds of splitters: 1) $duplicate$, which
-replicates each data item and sends a copy to each parallel stream,
-and 2) $roundrobin(w_1, \dots, w_n)$, which sends the first $w_1$
-items to the first stream, the next $w_2$ items to the second stream,
-and so on.  roundrobin is also the only type of joiner that we
-support; its function is analogous to a roundrobin splitter.  If a
-roundrobin is written without any weights, we assume that all $w_i =
-1$.  The splitter and joiner type are specified with the keywords {\tt
-split} and {\tt join}, respectively 
-%(see Figure \ref{fig:radiocode})
-;the parallel streams are specified by successive calls to {\tt add},
-with the $i$'th call setting the $i$'th stream in the splitjoin.
+parameterize the construction of the stream graph. A splitjoin is used
+to specify independent parallel streams that diverge from a common
+{\it splitter} and merge into a common {\it joiner}.  There are two
+kinds of splitters: 1) $duplicate$, which replicates each data item
+and sends a copy to each parallel stream, and 2) $roundrobin(w_1,
+\dots, w_n)$, which sends the first $w_1$ items to the first stream,
+the next $w_2$ items to the second stream, and so on. roundrobin is
+also the only type of joiner that we support; its function is
+analogous to a roundrobin splitter.
 
 The last control construct provides a way to create cycles in the
 stream graph: the feedbackloop.  Due to space constraints, we omit a
-detailed discussion of the feedbackloop.
+detailed discussion of the feedbackloop. From now on, we use the word
+{\it stream} to refer to any instance of a filter, pipeline,
+splitjoin, or feedbackloop.
 
 \subsection{Linear Filters}
-We call a filter {\it linear} if its outputs can be expressed as an
-affine combination of its inputs.  Many ubiquitous DSP kernels are
-linear, including FIR filters, expanders, compressors, DFTs and DCTs.
-In \cite{streamit-linear} a framework for extracting, combining, and
-transforming linear filters is presented.  Linear components of the
-stream graph are be targeted for specialized code generation as
-described in Section \ref{sec:linear}.
+One far-reaching goal of the StreamIt project is to incorporate the
+knowledge of expert DSP programmers into the compiler.  Toward that
+end, the StreamIt compiler can recognize sections of the stream graph
+that adhere to a certain model, apply targeted transformations and
+optimizations, and generate specialized code for these sections.
+Currently the StreamIt compiler can recognize {\it linear} sections of
+a stream graph. We call a filter linear if its outputs can be
+expressed as an affine combination of its inputs.  Many ubiquitous DSP
+kernels are linear, including FIR filters, expanders, compressors,
+DFTs and DCTs.  In \cite{streamit-linear} a completely automated
+framework for extracting, combining, and transforming linear filters
+in the StreamIt compiler is presented.  Linear components of the
+stream graph are targeted for specialized code generation as described
+in Section
+\ref{sec:linear}.
 
