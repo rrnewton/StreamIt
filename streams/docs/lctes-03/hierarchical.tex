@@ -487,7 +487,7 @@ I_B\\ I_C\\ I_D\end{array}\right\},\end{array} \left[
 \end{array}\right], \left[
 \begin{array}{c}
 0\\0\\0
-\end{array}\right] \right\}, &
+\end{array}\right] \right\}, & \\
 H_{sj} = \left\{\left\{\begin{array}{c}\{2\ split\}\\ \{2T_A\}
 \\ T_B \\ \{2\ join\}\end{array}\right\}, \left\{\begin{array}{c}split\\I_A\\I_B\end{array}\right\},
 \left[
@@ -798,7 +798,7 @@ table, the first row and the last row have the same amount of data
 buffered in {\Channels}, thus indicating that a full steady
 state schedule has indeed been computed.
 
-\begin{table} \centering \scriptsize
+\begin{table*} \centering \scriptsize
 \begin{tabular}{|l|c|c|c|c|c|c|c|c|c|}
 \hline \multicolumn{4}{|c|}{data items in buffer} & \multicolumn{4}{c|}{executions left} & \parbox{0.5in}{element considered} & executions \\
 \cline{1-8} $in_B$ & $out_B$ & $in_L$ & $out_L$ & $split$ & B & $join$ & L & & \\
@@ -825,7 +825,7 @@ particular child to complete a steady state execution of the
 {\feedbackloop}. Once this value reaches 0, the child is not
 executed anymore, even if it has data to execute.}
 \label{tab:sas-fl}
-\end{table}
+\end{table*}
 
 Thus the hierarchical schedule for the {\feedbackloop} is:
 
@@ -833,8 +833,8 @@ Thus the hierarchical schedule for the {\feedbackloop} is:
 H_{fl} = \left\{
 \begin{array}{c}
 \left\{\begin{array}{c}\{3\ join\} \{7T_B\} \{2\ split\} T_L \{2\ join\} \{5T_B\},\\
-\{2\ split\}\ T_L \ join\ \{3T_B\}\ split\
-T_L,\end{array}\right\}, \{\}, \left[
+\{2\ split\}\ T_L \ join\ \{3T_B\}\ split\ T_L,\end{array}\right\}
+\\ \{\}, \left[
 \begin{array}{c}
 12\\12\\15
 \end{array}\right], \left[

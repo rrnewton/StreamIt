@@ -228,7 +228,7 @@ this is that {\feedbackloops} are cyclical structures, and
 allowing the {\joiner} to borrow elements from $out_L$ would cause
 a full cycle of borrowing, leading to possible deadlock.
 
-\begin{table}[t] \centering  \scriptsize
+\begin{table*}[t] \centering  \scriptsize
 \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
 \hline
 \multicolumn{4}{|c|}{data in {\Channel}} & \multicolumn{4}{c|}{\parbox{1in}{\centering phase executions left}} & \parbox{0.5in}{\centering child considered} & \parbox{0.6in}{\centering phases executed} & \parbox{0.6in}{\centering {\pipeline} consumption} \\
@@ -259,7 +259,7 @@ number of data in the {\Channel}, which can be negative due to
 data borrowing. The second value is the minimal number of data
 items borrowed from the {\Channel}.}
 \label{tbl:min-lat-sj}
-\end{table}
+\end{table*}
 
 Table \ref{tbl:min-lat-sj} contains a trace of execution of our
 algorithm on the sample {\splitjoin} from Figure
