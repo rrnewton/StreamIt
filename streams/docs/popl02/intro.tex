@@ -18,7 +18,10 @@ auto-correlation, voice band modulation, and a number of filters.  A
 significant industry has emerged to provide dataflow design
 environments; leading products include COSSAP from Synopsys, SPW from
 Cadence, ADS from Hewlett Packard, and DSP Station from Mentor
-Graphics.
+Graphics.  Academic projects include prototyping environments such as
+Ptolemy~\cite{Lee01} and Grape-II~\cite{Lauw95} as well as languages
+such as Lustre~\cite{lustre}, Signal~\cite{Gaut87}, and
+StreamIt~\cite{Gordo02}.
 
 Optimization is especially important for signal processing
 applications, as embedded processors often have tight resource
@@ -37,12 +40,12 @@ considered only when stiching the blocks together.
 In some sense at the other end of the spectrum are the optimization
 techniques of the scientific computing community.  These are
 characterized by fine-grained analyses of loops, statements, and
-control flow, starting from intricate source code that lacks the
-explicit parallelism and communication of a dataflow graph.  Out of
-this community has come a number of general methods for precise,
-fine-grained program analysis and optimization.  In the context of
-array dataflow analysis and automatic parallelization, one such
-framework is the polyhedral model~\cite{DRV00}, which represents
+control flow, starting from sequential C or FORTRAN source code that
+lacks the explicit parallelism and communication of a dataflow graph.
+Out of this community has come a number of general methods for
+precise, fine-grained program analysis and optimization.  In the
+context of array dataflow analysis and automatic parallelization, one
+such framework is the polyhedral model~\cite{DRV00}, which represents
 programs as sets of affine relations over polyhedral domains. In
 recent years, it has been shown that affine dependences can exactly
 represent the flow of data in certain classes of
@@ -53,7 +56,8 @@ parameterized version of the input program, avoiding the need to
 expand a graph for varying parameters and problem sizes, and it can
 often reduce to a linear program for flexible and efficient
 optimization.  Polyhedral representations have also been utilized for
-powerful storage optimizations~\cite{Lim01,Quillere,Thies01,Lefebvre98}.
+powerful storage
+optimizations~\cite{Lim01,Quillere,Thies01,Lefebvre98}.
 
 In this paper, we aim to bridge the gap and employ the polyhedral
 representations of the scientific community to analyze the synchronous

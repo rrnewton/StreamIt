@@ -18,7 +18,7 @@
                                        0 \le j \le S(n_a) - 1 ~\wedge~ 0 \le k \le U(c) - 1\}
 \end{align}
 %
-\item Introduce variable $\mt{READ}_{c, p}$ with this domain:
+\item Introduce variable $\mt{READ}_{c}$ with this domain:
 \begin{align}
 {\cal D}_{{READ}_{c}} = \{~(i,j,k)~|~0 \le i \le N-1 ~\wedge~ 
                                       0 \le j \le S(n_b) - 1 ~\wedge~ 
@@ -45,7 +45,7 @@
 \begin{align}
 &\forall (i,j) \in {\cal D}_{SW {\small \rightarrow} SB}(c,q),
 \mt{BUF}_{c}(i,j) = 
-  \mt{WRITE}_{c}(i, q, j - q * U(c) \\ \nonumber
+  \mt{WRITE}_{c}(i, q, j - q * U(c)) \\ \nonumber
 &\mt{where } {\cal D}_{SW {\small \rightarrow} SB}(c,q) = 
   {\cal D}_{{BUF}_{c}} \cap 
   \{ (i,j) | q*U(c) \le j \le (q+1)*U(c) - 1 \}

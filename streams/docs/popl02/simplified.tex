@@ -38,7 +38,9 @@ is legal to execute in the steady state.  For an SDF graph, there is a
 unique and minimal periodic schedule, of which all other periodic
 schedules are a multiple~\cite{leesdf}.  It is straightforward to use
 a set of balance equations to solve for $S(n)$ given the declared
-rates of filters in the graph (see~\cite{leesdf} for details.)
+rates of filters in the graph.  If the graph is invalid (i.e., it
+would lead to deadlock or an unbounded buffer size) then the balance
+equations will have no solution.  See~\cite{leesdf} for details.
 
 We will use the following helper function in our analysis.  Given
 channel $c = (n_a, n_b)$:
