@@ -120,6 +120,11 @@
             the input or output  type of a filter. (Better performance
             is often possible by destructuring arrays in any case.)
           </p>
+	    <li><p align="justify"> The partitioner does not yet
+	    support fusion of feedbackloops while performing load
+	    balancing for Raw.  This means that the Raw backend might
+	    fail for programs with small feedbackloops.
+          </p>
 	    <li><p align="justify">
 	      The   compiler   may  have   memory   issues  running   on
 	      particularly  large benchmarks.
