@@ -1,0 +1,46 @@
+\documentclass{article}
+
+\title{Changes in the StreamIt Infrastructure}
+
+\begin{document}
+\maketitle
+
+\noindent
+This is for the May 28, 2003 snapshot release (streamit-0.0.20030528).\\
+\verb|$Id: news.tex.in,v 1.1 2003-08-25 15:31:42 dmaze Exp $|
+
+\section*{streamit-snapshot-20030528}
+
+\begin{itemize}
+\item 28 May 2003 snapshot release.
+\item Including benchmark programs in the snapshot release.
+\item Adding support for N x M configurations on Raw (not just N x N).
+\item Drastically improved compile time and memory usage for the compiler.
+\item Improved performance and generality of the linear optimizations, and
+  new selection algorithm for when to apply linear optimizations (use
+  with --linearpartition option).
+\item Improved robustness of the dynamic programming partitioner, and
+  more fine-grained strategy for greedy partitioner.
+\item Language specification and front-end broadened to include more
+  conventional Java-like features, including a boolean primitive type
+  and typecasts.  Anonymous stream declarations should be able to
+  successfully reference variables defined in enclosing code.
+\item Cause statements like push(pop() + pop()) to be strictly sequenced
+  in the front-end by inserting temporary variables.
+\item The front-end should correctly deal with multiple source files; pass
+  them all on the 'knit' command line.
+\item The representation of nested schedules is optimized, improving some 
+  aspects of code generation.
+\item Adding support for "magic network" simulation on Raw (see OPTIONS).
+\item Correctness and performance fixes in fusion, constant propagation,
+  and loop unrolling.
+\end{itemize}
+
+\section*{streamit-snapshot-20030322}
+
+\begin{itemize}
+\item 22 Mar 2003 snapshot release.
+\item First StreamIt snapshot release.
+\end{itemize}
+
+\end{document}
