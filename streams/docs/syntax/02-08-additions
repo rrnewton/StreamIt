@@ -1,0 +1,153 @@
+                                                         8/22/02
+Summary
+-------
+
+The purpose of this proposal is to relax some of the single-input,
+single-output structure of StreamIt so that the programmer does not
+have to worry about interleaving.  Interleaving refers to the process
+of, for example, passing a stream from a high-level component to a
+target deep within a hierarchy by manually bypassing all the
+filters/constructs in between using splitjoins, with an identity
+filter on the bypass side.  This is hard for the programmer because
+the splitters and joiners have to be conscious of non-local rates in
+the stream; that is, they have to split/interleave data with some
+implicit knowledge of the meaning of items on the tape.  A prime
+example of this is any kind of video decoding, e.g. the block diagram
+on the front of the book Ali is using (MPEG).
+
+To solve this problem, this syntax extension allows multiple-input,
+multiple-output blocks within StreamIt.  A bypass can be represented
+as such a block that does not operate on one of its input/output
+streams.  In addition, we introduce a new primitive which is a
+parallel stream constructor; given a sequence of streams, the parallel
+constructor returns a new multiple-input, multiple-output block.  A
+consequence of this extension is that the splitjoin construct is no
+longer needed, as it is equivalent to a pipeline of a joiner, a
+parallel stream body, and a splitter.
+
+Note that with these constructs, the parallel components of (what used
+to be) a splitjoin can now communicate with each other mid-stream.
+However, there is still some structure in the graph, as all feedback
+loops are still nested without overlapping loop segments.
+
+Filters
+-------
+
+Filters can now take multiple inputs, and produce multiple outputs.
+The syntax for this is not yet firmed up, but it could be something
+like this (consider something that inputs two floats from different
+streams, and outputs their sum to one channel and their difference to
+another channel):
+
+float,float->float,float filter FloatDifferentiateBypass {
+  work pop 1,1 push 1,1 {
+    out[0].push(in[0].peek(0) + in[1].peek(0));
+    out[1].push(in[0].peek(0) - in[1].peek(0));
+    in[0].pop();
+    in[1].pop();
+  }
+}
+
+Parallel Segments
+-----------------
+
+Then consider an instance of our new primitive, a parallel segment,
+that passes an int stream around the above filter, in order to act as
+a bypass:
+
+float,float,int->float,float,int parallel DifferentiatingBypass {
+  add FloatDifferentiateBypass;
+  add Identity<int>;
+}
+
+Pipelines
+---------
+
+A pipeline works as before, except that it can connect multiple input,
+multiple output blocks.  The number and type of channels for
+neighboring blocks in the pipeline must match.
+
+Feedback Loops
+--------------
+
+FeedbackLoops are a little bit different in that they don't need to
+specify a joiner and a splitter.  Instead, these are just the first
+and last component streams in the body of the loop.  The first stream
+in the body must have N inputs, where N is the sum of the number of
+outputs connected to the feedback loop from above, and the number of
+outputs of the loop stream.  Symmetrically, the last stream in the
+body must have M outputs, where M is the sum of the inputs of the
+block following the feedback loop, and the number of inputs of the
+loop stream.  Note that this means you can pass multiple streams
+around the back of a loop.
+
+We will have to modify the enqueue syntax to indicate which channel
+we're enqueuing on.  Probably something like in[0].enqueue,
+in[1].enqueue, etc., although this could be misleading because the
+loop-back streams are coming from the right (in most of our diagrams,
+at least) instead of from the left.
+
+Parameterized Inputs/Outputs
+----------------------------
+
+Parameterized inputs and outputs fall directly out of this new syntax.
+We could allow the old array syntax to also be used for multiple
+inputs.  For instance, to declare an Adder that inputs N parallel
+streams and outputs one stream, it could look like this:
+
+float[N]->float filter Adder (int N) {
+  work {
+    float[N] in = pop();
+    float sum = 0;
+    for (int i=0; i<N; i++) {
+      sum += in[i];
+    }
+    push(sum);
+  }
+}
+
+This will break down when one wants to read a different number of
+items from from each of the parallel input streams.  But this might be
+unusual in a parameterized context... although passing an N-way upper
+triangular matrix (without the zero elements) might require it.  Have
+to revisit this, probably.
+
+More Brainstorming
+------------------
+
+- The syntax above is kind of wordy with all the array subscripts on
+  in and out.  It might be desirable to name the streams in the type
+  declaration and refer to them by name from within the body:
+
+  float->float (left),  float->float (right) filter FloatDifferentiateBypass {
+    work pop 1,1 push 1,1 {
+      left.push(in[0].peek(0) + in[1].peek(0));
+      out[1].push(in[0].peek(0) - in[1].peek(0));
+      in[0].pop();
+      in[1].pop();
+    }
+  }
+
+  However, this kind of naming has problems if there are different
+  numbers of inputs and outputs.  Then you'd want to name each input and
+  output stream, which could get tedious.
+
+- We still don't deal optimally with things that communicate
+  side-to-side instead of just top-to-bottom.  For instance, the mesh
+  doing the motion estimation in MPEG needs to get the previous image
+  from each of its 8 neighbors.  Right now this is possible by embedding
+  in a loop, but it's a little tedious and unnatural.
+
+  Saman suggested a concept where the stream can instead have channels
+  that are going in either direction -- some of the inputs might come from
+  the bottom, and some of the outputs might be fed to the top.  Then
+  for the mesh above, we could position a parallel block right below a 
+  row of tiles, and re-route the output of each block to its neighbors
+  (with the stream flow going from bottom to top.)
+
+  This seemed intriguing, but didn't really stamp out the details.
+
+
+
+
+
