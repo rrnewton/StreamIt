@@ -400,7 +400,8 @@ are computed as follows:
 	~~~~~~~\mt{where}~A[i,j] = \left\{
 	\begin{array}{l}
 	  1 ~\mt{if}~ i=j ~\wedge~ \\ 
-	  ~\hspace{0.13in}~ vSum_{k} \le i < vSum_{k+1} \\
+	  ~\hspace{0.13in}~ vTot-vSum_{k+1} \le i ~\wedge~ \\
+	  ~\hspace{0.13in}~ i < vTot-vSum_{k+1} \\
 	  0 ~\mt{otherwise}
 	\end{array}
 	\right.
