@@ -27,7 +27,7 @@ do not yet deal with {\tt feedbackloop}s as they require the notion of
 \vspace{-12pt}
 \end{figure}
 
-In StreamIt programs, the input and output rate of each {\tt filter} in the
+In StreamIt programs, the input and output rate of each filter in the
 stream graph is known at compile time.  The StreamIt compiler
 leverages this information to compute a static schedule--that is, an
 ordering of the node executions such that each filter will have enough
@@ -38,7 +38,7 @@ Karczmarek~\cite{karczma-thesis}.
 
 A fundamental aspect of the steady-state schedule is that neighboring
 nodes might need to be fired at different frequencies.  For example,
-if there are two {\tt filters} $F_1$ and $F_2$ in a {\tt pipeline} and
+if there are two filters $F_1$ and $F_2$ in a {\tt pipeline} and
 $F_1$ produces $2$ elements during its {\tt work} function but $F_2$
 consumes $4$ elements, then it is necessary to execute $F_1$ twice for
 every execution of $F_2$.
@@ -64,10 +64,10 @@ expansion can be done as follows.
 
 \begin{transformation} (Linear expansion)
 % DOUBLE-CHECK whether we're assuming 0-indexed or 1-indexed matrices
-Given a linear node $\lambda = \{A, b, e, o, u\}$, the expansion of
+Given a linear node $\lambda = \{A, {\vec b}, e, o, u\}$, the expansion of
 $\lambda$ to a rate of $(e', o', u')$ is given by $\mbox{\bf
-expand}(\lambda, e', o', u') = \{A', b', e', o', u'\}$, where
-$\mathbf{A'}$ is a $u' \times e'$ matrix and $\mathbf{b'}$ is a
+expand}(\lambda, e', o', u') = \{A', {\vec b}', e', o', u'\}$, where
+$\mathbf{A'}$ is a $u' \times e'$ matrix and $\mathbf{{\vec b}'}$ is a
 $u'$-element row vector:
 \vspace{-6pt} \\
 \begin{equation} \nonumber
@@ -87,7 +87,7 @@ $u'$-element row vector:
 %
 \mathbf{A'} & = & \sum_{m=0}^{\lceil u' / u \rceil} \mt{shift}(u'- u -m*u, e'-e-m*o) \\ ~ \vspace{-4pt} \\
 %
-\mathbf{b'}[j] & = & b[u-1-(u'-j-1)~\mt{mod}~u]
+\mathbf{{\vec b}'}[j] & = & {\vec b}[u-1-(u'-j-1)~\mt{mod}~u]
 %%
 %% \raisebox{-14pt}{\parbox{3in}{is created by starting with a zero
 %% matrix with $e'$ rows and $u'$ columns.  $A$ is then copied $k$ times
@@ -118,7 +118,7 @@ might not be equivalent to any sequence of executions of the original
 node $\lambda$, because expansion resets the push and pop rates and
 can thereby modify the ratio between them.  However, if $u' = k * u$
 and $o' = k * o$ for some integer $k$, then $\lambda'$ is completely
-interchangebale with $\lambda$.  In the combination rules that follow,
+interchangeable with $\lambda$.  In the combination rules that follow,
 we utilize linear expansion both in contexts that do and do not
 satisfy this condition.
 
@@ -143,7 +143,7 @@ any number of neighboring linear nodes.
 Given two linear nodes $\lambda_1$ and $\lambda_2$ where the output of
 $\lambda_1$ is connected to the input of $\lambda_2$ in a pipeline
 construct, the combination $\mbox{\bf pipe}(\lambda_1, \lambda_2)$ $=$
-$\mathbf{ \{A', b', e', o', u'\}}$ represents an equivalent node that
+$\mathbf{ \{A', {\vec b}', e', o', u'\}}$ represents an equivalent node that
 can replace the original two.  Its components are as follows:
 \begin{equation} \nonumber
 \begin{array}{rcl}
@@ -154,7 +154,7 @@ can replace the original two.  Its components are as follows:
 \lambda_2^e & = & \mt{expand}(\lambda_2, \mt{chanPeek}, \\
 ~ & ~ & ~\hspace{0.32in}~ \mt{chanPop}, \mt{chanPop} * \frac{u_2}{o_2}) \\
 \mathbf{A'} & = & A_1^e A_2^e \\ ~ \vspace{-8pt} \\
-\mathbf{b'} & = & b_1^e A_2^e + b_2^e \\ ~ \vspace{-8pt} \\
+\mathbf{{\vec b}'} & = & b_1^e A_2^e + b_2^e \\ ~ \vspace{-8pt} \\
 \mathbf{e'} & = & e_1^e \\ ~ \vspace{-8pt} \\
 \mathbf{o'} & = & o_1^e \\ ~ \vspace{-8pt} \\
 \mathbf{u'} & = & u_2^e
@@ -163,14 +163,15 @@ can replace the original two.  Its components are as follows:
 \end{transformation}
 
 The basic forms of the above equations are simple to derive.  Let
-$x_i$ and $y_i$ be the input and output channels, respectively, for
-$\lambda_i$.  Then we have by definition that $y_1 = x_1 A_1 + b_1$
-and $y_2 = x_2 A_2 + b_2$.  But since $\lambda_1$ is connected to
-$\lambda_2$, we have that $x_2 = y_1$ and thus $y_2 = y_1 A_2 + b_2$.
-Substituting the value of $y_1$ from our first equation gives $y_2 =
-x_1 A_1 A_2 + b_1 A_2 + b_2$.  Thus, the intuition is that the
+${\vec x}_i$ and ${\vec y}_i$ be the input and output channels, respectively, for
+$\lambda_i$.  Then we have by definition that ${\vec y}_1 = {\vec x}_1 A_1 + {\vec b}_1$
+and ${\vec y}_2 = {\vec x}_2 A_2 + {\vec b}_2$.  But since $\lambda_1$ is connected to
+$\lambda_2$, we have that ${\vec x}_2 = {\vec y}_1$ and thus 
+${\vec y}_2 = {\vec y}_1 A_2 + {\vec b}_2$.
+Substituting the value of ${\vec y}_1$ from our first equation gives ${\vec y}_2 =
+{\vec x}_1 A_1 A_2 + {\vec b}_1 A_2 + {\vec b}_2$.  Thus, the intuition is that the
 two-filter sequence can be represented by matrices $A' = A_1 A_2$
-and $b' = b_1 A_2 + b_2$, with peek and pop rates borrowed from
+and ${\vec b}' = {\vec b}_1 A_2 + {\vec b}_2$, with peek and pop rates borrowed from
 $\lambda_1$ and the push rate borrowed from $\lambda_2$.
 
 However, there are two implicit assumptions in the above analysis
@@ -208,13 +209,15 @@ smaller on a percentage basis.
 However, it is the case that some collapsed linear nodes are always
 less efficient than the original pipeline sequence.  The worst case is
 when $A_1^e$ is a column vector and $A_2^e$ is a row vector, which
-requires $O(n)$ operations originally but $O(n^2)$ operations if
-combined (assuming vectors of length $n$).  In general, the
+requires $O(N)$ operations originally but $O(N^2)$ operations if
+combined (assuming vectors of length $N$).  In general, the
 compiler can identify performance-degrading combinations when the
 number of non-zero elements in $A'$ exceeds the sum of non-zero
 elements in $A_1^e$ and $A_2^e$.
 % ARE WE SURE THAT LAST SENTENCE IS TRUE?  I think it's more complicated 
 % when the pop/peek rate is varied, etc.
+% I think that we can -- it just isn't implemented. We have to 
+% take a global view of the computation being performed.
 
 \subsection{Collapsing Linear SplitJoins}
 
@@ -224,7 +227,7 @@ at the {\tt splitjoin} are directed to the parallel child streams
 using one of two pre-defined {\tt splitter} constructs: 1) duplicate,
 which sends a copy of each data item to all of the child streams, and
 2) roundrobin, which distributes items cyclically according to an
-array of weights.  The data from the parallel {\tt streams} are
+array of weights.  The data from the parallel streams are
 combined back into a single stream by means of a roundrobin {\tt
 joiner} with an array of weights $w$.  First, $w_0$ items from the
 output tape of the leftmost child are placed onto the overall output
@@ -239,15 +242,15 @@ is often the case that all sibling streams are linear if any one of
 them is linear.  However, if a {\tt splitjoin} contains only a few
 adjacent streams that are linear, then these streams can be combined
 by wrapping them in a hierarchical splitjoin and then collapsing the
-wrapper completely.  Our technique also assumes that each {\tt
-splitjoin} admits a valid steady-state schedule; this property is
+wrapper completely.  Our technique also assumes that each 
+{\tt splitjoin} admits a valid steady-state schedule; this property is
 verified by the StreamIt semantic checker.
 
 \begin{figure}[t]
 \center
 \epsfxsize=3.0in
 \epsfbox{images/splitjoin-combination.eps}
-\caption{Matrix resulting from combining a {\tt splitjoin} of rate matched sub {\tt streams}.
+\caption{Matrix resulting from combining a {\tt splitjoin} of rate matched sub streams.
 \protect\label{fig:splitjoin-duplicate-matrix}}
 \vspace{-12pt}
 \end{figure}
@@ -289,7 +292,7 @@ mathematical terms.
 Given a splitjoin $s$ containing a duplicate splitter, children that
 are linear nodes $\lambda_0 \dots \lambda_{n-1}$, and a roundrobin
 joiner with weights $w_0 \dots w_{n-1}$, the combination $\mbox{\bf
-splitjoin}(s)$ $=$ $\mathbf{ \{A',}$ $\mathbf{b',}$ $\mathbf{e',}$
+splitjoin}(s)$ $=$ $\mathbf{ \{A',}$ $\mathbf{{\vec b}',}$ $\mathbf{e',}$
 $\mathbf{o',}$ $\mathbf{u'\}}$ represents an equivalent node that can
 replace the entire stream $s$.  Its components are as follows:
 \begin{equation} \nonumber
@@ -304,7 +307,7 @@ replace the entire stream $s$.  Its components are as follows:
 \multicolumn{3}{l}{\forall k \in [0, n-1], \forall m \in [0, joinRep-1], \forall n \in [0, u_k-1]:} \\ ~ \vspace{-6pt} \\
 \multicolumn{3}{l}{\mathbf{A'}[*, u'-1-n - m * \mt{wSum}_{n}-\mt{wSum}_{k}] = 
   A_{k}^e [*,u_k^e-1-n]} \\ ~ \vspace{-6pt} \\
-\multicolumn{3}{l}{\mathbf{b'}[u'-1-n - m * \mt{wSum}_{n}-\mt{wSum}_{k}] = 
+\multicolumn{3}{l}{\mathbf{{\vec b}'}[u'-1-n - m * \mt{wSum}_{n}-\mt{wSum}_{k}] = 
   b_{k}^e [u_k^e-1-n]} \\ ~ \vspace{-2pt} \\
 \mathbf{e'} & = & e_0^e = \dots = e_{n-1}^e \\
 \mathbf{o'} & = & o_0^e = \dots = o_{n-1}^e \\
@@ -322,14 +325,14 @@ by the joiner.  Similarly, $\mt{rep}_k$ gives the execution count for
 child $k$ in the steady state.  Then, in keeping with the procedure
 described above, $\lambda_k^e$ is the expansion of the $k$'th node by
 a factor of $\mt{rep}_k$, with the peek value set to the maximum peek
-across all of the children.  Following the expansion, each
+across all of the expanded children.  Following the expansion, each
 $\lambda_i^e$ has the same number of rows, as the peek uniformization
 caused shorter matrices to be padded with rows of zero's at the top.
 
 The final phase of the transformation is to re-arrange the columns of
-the child matrices into the columns of $A'$ and $b'$.
+the child matrices into the columns of $A'$ and ${\vec b}'$.
 Figure~\ref{fig:splitjoin-duplicate-matrix} elucidates this process,
-though the notation is somewhat cumbersome.  The equation can be
+though its notation is somewhat cumbersome.  The equation can be
 understood as follows: for the $k$'th child and the $m$'th cycle of
 the joiner, the $n$'th item that is pushed by child $k$ will appear
 appear at a certain location on the joiner's output tape.  This
@@ -355,7 +358,7 @@ expanded streams; otherwise, some outputs of the splitter would
 accumulate infinitely on the input channel of some stream.  
 
 These input and output rates--in combination with the values of $A'$
-and $b'$ defined above--define a linear node that exactly represents
+and ${\vec b}'$ defined above--define a linear node that exactly represents
 the parallel combination of child nodes that are fed by a duplicate
 splitter.
 
@@ -448,8 +451,8 @@ a high pass filter, actual implementations tend to determine the
 coefficients of a single combined filter that performs the same
 computation. While a simple bandpass filter is easy to combine
 manually, in an actual system several different filters might be
-designed and implemented by several different people which would be
-much harder to integrate into a single design.
+designed and implemented by several different engineers, making 
+overall filter combination infeasible.
 
 Another common operation in discrete time signal processing is
 downsampling to reduce the computational requirements of a system.
@@ -458,7 +461,7 @@ by an $M$ compressor which passes every $M$th input sample to the
 output.  In practice, the filters are combined to avoid computing dead
 items in the low pass filter.  However, the system specification
 contains both filters for the sake of understanding.  Our analysis can
-start with this and derive the efficient version automatically.
+start with the specification and derive the efficient version automatically.
 
 A final example is a multi-band equalizer, in which $N$ different
 frequency bands are filtered in parallel (see our FMRadio benchmark).

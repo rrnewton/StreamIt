@@ -39,7 +39,7 @@ number of multiplies per output using the frequency transformation.
 multiplication reduction factor and Figure~\ref{fig:frequency-win}~(b)
 shows the same reduction factor measured empirically.  The roughness
 in both the theoretical results and the data is due to the fact that
-our FFT algorithm requires $N+2(M-1)$ to be a power of two, and the
+for the best FFT performance, $N+2(M-1)$ must be a power of two, and the
 compiler automatically adjusts $N$ upward to satisfy this
 requirement. The theoretical reduction numbers account for the fact
 that our implementation requires four floating point multiplication

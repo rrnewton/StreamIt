@@ -273,18 +273,18 @@ programs have abundant parallelism and regular communication patterns.
 The StreamIt language aims to expose these properties to the compiler
 while maintaining a high level of abstraction for the programmer.
 
-StreamIt programs are composed of processing blocks called {\tt
+StreamIt programs are composed of processing blocks called {\it
 filters} which contain an input tape from which they can read values
-and an output tape to which they can write. Each {\tt filter} contains
+and an output tape to which they can write. Each filter contains
 a {\tt work} function which describes its atomic execution step in the
 steady state.  The {\tt work} function contains C-like imperative
-code, which can access {\tt filter} state, call external routines and
+code, which can access filter state, call external routines and
 produce and consume data.  The input and output channels are treated
 as FIFO queues, which can be accessed with three primitive operations:
 1) {\tt pop()}, which returns the first item on the input tape and
 advances the tape by one item, 2) {\tt peek(i)}, which returns the
 value at the $i$th position on the input tape, and 3) {\tt push(v)},
-which pushes value {\tt v} onto the output tape.  Each {\tt filter}
+which pushes value {\tt v} onto the output tape.  Each filter
 must declare the maximum element it will {\tt peek} at, the number of
 elements it will {\tt pop}, and the number of elements that it will
 {\tt push} during an execution of {\tt work}.  These rates must be
@@ -308,10 +308,8 @@ structures (see Figure~\ref{fig:structures}): 1) {\tt pipelines}
 represent the serial computation of one filter after another, 2) {\tt
 splitjoins} represent explicitly parallel computation, and 3) {\tt
 feedbackloops} allow cycles to be introduced into the stream graph.
-Each of the constructs {\tt filters}, {\tt pipelines}, 
-{\tt splitjoins} and {\tt feedbackloops} 
-is a {\tt streams} and a {\tt stream} can be used
-as a subcomponent in a structure.  Note that all {\tt streams} have
+{\tt filters}, {\tt pipelines}, {\tt splitjoins} and {\tt feedbackloops} are called
+{\it streams} and a stream can be used as a subcomponent in a structure.  Note that all {\tt streams} have
 exactly one input tape and exactly one output tape.
 
 It has been our experience that most practical applications can be
