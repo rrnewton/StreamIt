@@ -176,8 +176,8 @@ that are not multiples of the minimal steady schedule.
 
 This property means that in order to find a minimal steady state
 schedule of a stream operator, we can find any of its steady states
-and divide it by the $gcd$ of executions of all nodes in the operator
-to find the minimal steady state schedule.
+and divide it by the $gcd$ of executions of all its children to find
+the minimal steady state schedule.
 
 \subsubsection{Calculating Minimal Steady States}
 \label{sec:calc-min-steady}
@@ -201,7 +201,10 @@ multiple phases are represented by a single, coarser phase for the
 sake of the steady-state schedule.  Details can be found
 in~\cite{karczma-thesis}.  For example, the minimal steady states of
 the stream graphs in Figure~\ref{fig:steady-state} are as follows:
-\[
+
+\mbox{}
+~ \vspace{-20pt} \\
+\begin{equation*}
 \begin{tabular}{ll}
 \mbox{Sample Pipeline}: & \mt{steady}(A) = 4 \\
 ~ & \mt{steady}(B) = 6 \\
@@ -218,7 +221,7 @@ the stream graphs in Figure~\ref{fig:steady-state} are as follows:
 ~ & \mt{steady}(splitter) = 5 \\
 ~ & \mt{steady}(L) = 3 \\
 \end{tabular}
-\]
+\end{equation*}
 Note that these numbers represent the multiplicity of each node in one
 steady state execution of its parent.  In Section~\ref{chpt:phased},
 we consider how to order these executions to form a valid schedule.
@@ -291,10 +294,11 @@ that for the first execution, {\filter} $f$ requires that two data
 items be pushed onto its {\Input} {\Channel}.  After the first
 execution of $f$, it will have consumed one data item, and left at
 least one data item on its {\Input} {\Channel}.  Thus in order to
-execute $f$ for the second time, only one extra data item needs to be
-pushed onto $f$'s {\Input} {\Channel}.  The same situation persists
-for all subsequent executions of $f$ -- only one additional data item
-is required on $f$'s {\Input} {\Channel} in order to execute $f$.
+execute $f$ for the second time, no more than one extra data item
+needs to be pushed onto $f$'s {\Input} {\Channel}.  The same situation
+persists for all subsequent executions of $f$ -- no more than one
+additional data item is required on $f$'s {\Input} {\Channel} in order
+to execute $f$.
 
 This example illustrates that the first execution of a {\filter} may
 require special treatment.  Namely, some nodes will need to push extra

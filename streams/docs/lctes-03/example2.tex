@@ -1,17 +1,3 @@
-\begin{figure}[t]
-\begin{minipage}{1.3in}
-\begin{center}
-\psfig{figure=splitjoin-sample2.eps,width=0.8in} 
-\end{center}
-\end{minipage}
-\begin{minipage}{1.75in}
-\caption{\small Example splitjoin to illustrate phased scheduling.
-Each node is annotated with its input and output
-rates.\protect\label{fig:sjexlabel}}
-\end{minipage}
-\vspace{-12pt}
-\end{figure}
-
 \begin{figure*}[t]
 \psfig{figure=splitjoin-sample-tiny2.eps,width=7in}
 \caption{{\small Example construction of phased schedules for the
@@ -23,4 +9,20 @@ phases are formed that include executions of both the entry (A) and
 exit (D) nodes.  Finally, the fine-grained phases are combined into
 $\mt{maxPhases}$ phases, each of which is factored into a single
 appearance schedule.\protect\label{fig:sjex}}}
+\vspace{-12pt}
 \end{figure*}
+
+\begin{figure}
+\vspace{6pt}
+\begin{minipage}{1.3in}
+\begin{center}
+\psfig{figure=splitjoin-sample2.eps,width=0.8in} 
+\end{center}
+\end{minipage}
+\begin{minipage}{1.75in}
+\caption{\small Example splitjoin to illustrate phased scheduling.
+Each node is annotated with its input and output
+rates.\protect\label{fig:sjexlabel}}
+\end{minipage}
+\vspace{-6pt}
+\end{figure}
