@@ -111,6 +111,7 @@ could have differing widths); this necessitates the addition of the
 {\tt width} array to the algorithm.
 
 \subsection{Cost Functions}
+\label{sec:cost}
 
 The pseudocode in Figure~\ref{fig:part-alg} refers to functions {\it
 getDirectCost} and {\it getFrequencyCost} that estimate a node's
@@ -186,7 +187,7 @@ because they can be performed as a single adjustment of the tape
 position.
 
 Of course, both cost functions are undefined if $s$ is non-linear
-({\it e.g.} there is no corresponding $\lambda_s$). If this is the
+({\it i.e.}, if there is no corresponding $\lambda_s$). If this is the
 case, then the optimization selection algorithm assigns an infinite
 cost.
 
