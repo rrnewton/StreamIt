@@ -27,6 +27,14 @@ float->float splitjoin EqSplit(int bands, float[bands] cutoffs,
 }
 \end{lstlisting}
 
+\begin{figure}[htbp]
+  \begin{center}
+    \includegraphics{cookbook.4}
+    \caption{Stream graph for an equalizer}
+    \label{fig:equalizer}
+  \end{center}
+\end{figure}
+
 This equalizer works by having a series of band-pass filters running
 in parallel, with their outputs added together.  The caller provides
 arrays of cutoff frequency and respective gains.
