@@ -1,0 +1,55 @@
+We thank the reviewers for their comments.  However, there are some
+important technical misunderstandings that we aim to resolve in this
+reply.
+
+First, to address a question by the third reviewer: the term "FFT"
+refers to "Fast Fourier Transform".  This paper requires some basic
+knowledge of signal processing, which is hard to fully include in a
+conference paper.  While we will expand the final version to encompass a
+broader audience, we believe that a large segment of the PLDI community
+is versed in this material and will comprehend the paper; note that the
+fourth reviewer found the paper to be "well-written and clear".  We
+believe that the expanded version will also satisfy the readability
+concerns of the first reviewer, who made positive comments about the
+paper's technical content.
+
+The second reviewer claims that the paper has two technical flaws.  In
+fact, the paper is technically sound.  We summarize the concerns and
+reply to them below.
+
+The first issue concerns the semantics of our language construct for
+precise event handling.  The construct allows processes in a concurrent
+stream program to send out-of-band messages to each other.  Since a
+distributed system lacks a global notion of time, the construct uses
+data dependences of high-bandwidth communication channels to synchronize
+the arrival of messages.  The paper formalizes this concept in terms of
+a stream dependence function (SDEP), which can be calculated exactly
+using a simple algorithm.  The reviewer asks why messages are guaranteed
+to fall between packet boundaries in our example.  The reason is that
+the FFT processes a packet atomically, and this information propagates
+into SDEP.  (The reviewer can verify that SDEP_RFtoIF<-CheckHop (n) =
+64*ceil(n/32), guaranteeing that delivery times are multiples of 64.)
+
+A second issue concerns the scheduling constraints imposed by
+overlapping messages, and whether such messages could imply that no
+feasible schedule exists.  We are fully aware of the constraints implied
+by message delivery; one of the authors explored it in depth in his
+Master's thesis [1].  There is a trivial algorithm to test the
+feasibility of a set of message constraints (and to produce a feasible
+schedule, if one exists) using greedy list scheduling.  Optimizing the
+resulting schedule for serial execution is an interesting topic of
+ongoing research in our group; however, this is orthogonal to the
+current paper, which focuses on improving programmability via a novel
+language feature.
+
+The fourth reviewer notes that the paper only applies to the synchronous
+dataflow (SDF) model of computation, when stream applications are
+written using a variety of models.  The goal of our work is to unify the
+models of computation, so that certain dynamic behaviors can be
+integrated into SDF without sacrificing the static optimizations that
+have made it so popular.  Also, many SDF applications have high
+performance requirements (e.g., radar tracking, cell phone base
+stations) and are implemented on clusters of workstations.
+
+[1] Michal Karczmarek.  Constrained and Phased Scheduling of Synchronous
+Data Flow Graphs for StreamIt Language. S.M. Thesis, MIT, 2002.

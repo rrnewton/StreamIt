@@ -1,0 +1,258 @@
+Reviewer 1
+
+Classification: C
+
+ >>> Summary of the submission <<<
+
+This paper presents a way of reasoning about time across distributed
+components, and then shows how to integrate this into the StreamIt
+programming language to provide a clean way for programmers to
+specifying the times during which a message should be run.
+
+          >>> Evaluation <<<
+
+The idea of this paper seems like a good one, giving programmers a
+new, very natural way to coordinate the execution of their stream
+programs across distributed components.
+
+My main complaint about the paper is that it's lacking some
+explanation for the typical PLDI reader. The first time I read
+through this paper, I was lost. For example, at first I had no idea
+what the numbers in the nodes on Figure 1 meant, and why some of the
+nodes had multiple numbers with commas, and what that meant. In
+Figure 2 I didn't understand how to follow the chart and what each
+line of the figure meant. None of this is explained in the text. I
+eventually figured it out by backwards reasoning about what the text
+said the figures implied. So I would recommend that, for a general
+PLDI audience, you add a lot more introductory matieral and describe
+all the figures and tables.
+
+This was a general problem with the explanation in the paper. For
+example, in Algorithm 1, once I figured out what figures 1 and 2
+meant, I understood what you must mean by ``simulateCurrentPhase,''
+but a line of text defining it would be helpful. And in Section 4.1,
+you introduce the notation [n:m], but you never explicitly say:
+``Message sends are annotated with a range [n:m] that means...''
+
+Typo: Section 4.1, ``...of the stream graph (see [Table] 1).''
+
+---------------------------------------------------------------------------
+
+Reviewer 2
+
+Classification: C
+
+   >>> Summary of the submission <<<
+
+The authors define a stream dependence function, SDEP, which describes
+the dependence between actor firings in a stream graph, and calculate
+SDEP for an actor by pull scheduling of the actor. They then propose a
+language construct, called the portal, for precise delivery control of
+messages in stream programs, and formalize the semantics of the language
+construct using SDEP.
+
+The authors perform a case study, and implement a frequency hopping
+radio. They explain the code using the portal and the code not using
+the portal, and compare the two in terms of readability and efficiency.
+
+          >>> Evaluation <<<
+
+The paper provides a language construct for precise event handling, and
+defines the semantics using SDEP. However, it seems to me that
+Definition 2 in 4.1 has two crucial flaws.
+
+First, consider the case study in Section 4.2, The message from D to
+RFtoIF must fall at a logical packet boundary, since the FFT would
+otherwise muddle the spectrum of two different frequency bands.
+Although the authors mention (in the second paragraph of 4.2) that
+"messages sent from the detectors to RFtoIF are guaranteed to arrive
+only at iterations that are a multiple of 64", Definition 2 does not
+give such a guarantee. From the definition, we only get
+ M(D,RFtoIF,4,6,n) >= SDEP B<-A (n+4)
+and
+ M(D,RFtoIF,4,6,n) <= SDEP B<-A (n+6),
+and the definition does not impose at all that it is a multiple of 64.
+
+Second, consider an example of messaging using Figure 1, Assume that
+messages MX are sent from E to A *and* messages MY are sent from B to A.
+Then, the delivery of MX is defined using SEP A <- E (n), while the
+delivery of MY is defined using SEP A <- B (n). However, as you
+mention in the last paragraph of Section 3, the pull scheele for
+calculating SEP A<-E is different from the schedule for calculating SEP
+A<-B. When multiple nodes send messages in a stream graph, can you
+construct a schedule satisfying all the delivery constraints defined by
+Definition 2?
+
+Detailed comments
+
+3 There are two equations in the paragraph after Theorem 1. The second
+term of the RHS of the first equation is "SDEP A<-E (n-1 mod |S ^ E|)",
+but this should be written as "SDEP A<-E (n mod |S ^ E|)"? The same
+goes for the second equation.
+
+3 The last paragraph. "so we would conclude that SDEP A<-B (1) = 4." I
+think that SDEP A<-B (1) = 5.
+
+4.1 Definition 2. In Case 2,
+  "SDEP A<-B (n+k_1)" -> "SDEP B<-A (n+k_1)"
+  "SDEP A<-B (n+k_2)" -> "SDEP B<-A (n+k_2)"
+
+4.2 Figure 4. Where is the latency rage [4:6] specified in the code?
+
+4.2 Figure 4. To make the paper self-contained, I think that you should
+explain a bit about StreamIt, in particlar, the roundrobin construct for
+splitter and joiner.
+
+4.3 The third paragraph. "The actual message delivery can be
+implemented in the most efficient way for the given architecture" I think
+that many readers, including me, are equally interested in the
+implementation of the portal. Thus, it is very instructive if you
+describe (perhaps in a separate section rather than here) things like
+how the portal is implemented in the system you used in 4.4 and what
+code is generated to satisfy the latency range specified.
+
+---------------------------------------------------------------------------
+
+Reviewer 3
+
+Classification: D
+
+         >>> Summary of the submission <<<
+
+This paper presents a notion of dependence for stream-based programs. This
+dependence notion captures the number of times one actor must execute in order
+to enable the execution of another actor. A language feature is introduced that
+facilitates message passing in stream-based programs. As I understand it, the
+feature takes the form of a handler construct for receiving incoming messages
+and a mechanism for invoking message handlers. The semantics of this
+message-passing feature are defined using the aforementioned dependence notion.
+A case study is presented in which a software radio system is implemented using
+the new language feature. This resulted in a 49% speedup compared to a
+traditional implementation, and the speedup is apparently due to additional
+compiler optimizations that are enabled by the fact that the new language
+feature in the paper makes dependences explicit and therefore more easy to
+exploit in an optimizing compiler.
+
+          >>> Evaluation <<<
+
+I had great difficulty understanding this paper. The paper is extremely vague,
+the target language and key concepts are never clearly defined, and the authors
+make use of domain terminology that I'm not familiar with.
+
+Specific comments:
+
+The organization of this paper is very poor. The introduction discusses
+stream-based languages in general terms, but does not give concrete examples of
+stream-based programs, or the language features used in such programs. Then, in
+section 2, graph-based views of stream-based programs are presented without
+making clear what each graph node corresponds to. A concrete example is not
+presented until section 4.
+
+At a more fine-grained level, terms such as "actor" , "I/O rate" and the
+"phase" an actor can be in are never clearly defined.
+
+The authors also don't present their language feature very clearly. Despite a
+lot of informal discussion in the introduction and in section 4, the precise
+syntax of this feature does not become clear until the code example.
+
+Minor comments:
+
+ - Figure 1: the labels at the top and bottom of each node are not adequately
+explained.
+
+ - Algorithm 1 has several problems. The recursive call to pullSchedule only
+has one actual parameter, yet the procedure itself has 2 parameters. Moreover,
+the auxiliary procedure simulateCurrentPhase(X) is not explained, and the
+semantics of the "o" operator are left unspecified. The two occurrences of "o"
+look slightly different, which is probably the result of a typo.
+
+ - section 4.2: What does the term FFT refer to?
+
+ - section 4.3: What is a vocoder?
+
+Summary: the paper is poorly organized, vague, and is not accessible enough to
+be of use to the general PLDI audience.
+
+---------------------------------------------------------------------------
+
+Reviewer 4
+
+Classification: B
+
+ >>> Summary of the submission <<<
+
+The paper defines SDEP (Stream Dependence Function), which qualifies the
+dependence between one actor in a Cyclo-static Synchronous Data Flow (SDF)
+graph and another actor in that graph that (transitively) provides it input.
+This dependence is in terms of the minimum number of times the upstream
+actor must fire to ensure the downstream actor fires N times. Because SDF
+schedules can be calculated statically, it is easy to precisely calculate
+SDEP statically. The paper uses SDEP to support a new language construct
+for out-of-band control messages within the StreamIt language. SDEP can be
+used to precisely define bounded message latencies, in terms of a logical
+clock defined by data tokens passed through the graph. This simplifies the
+programming task and can improve performance. The paper argues SDEP can be
+used in a variety of other ways as well.
+
+          >>> Evaluation <<<
+
+The paper's domain, which is stream processing applications, is quite
+relevant, and the paper's contribution of a dependence metric and its
+application to precise out-of-band message handling are quite relevant in
+this domain. The text is well-written and clear; Figure 2 is particularly
+helpful. The argument for benefit of programming is made strongly in
+Figures 3-6, and the performance argument is persuasive (Figure 7).
+Comparison with related work seems adequate.
+
+The main drawback of the paper is its small scope. In particular, the
+defined metric is for one particular dataflow model: SDF (or cyclo-static
+SDF). Yet stream-processing applications are written in a variety of
+models; will this metric apply to them? It may no longer be statically
+computable if so; what would be the impact of this? Also,
+performance/programming results are only presented for a single case study.
+Is this application typical? Moreover, I'm confused as to why a
+frequency-hopping radio app should be tested on a high-performance
+distributed cluster. Wouldn't embedded hardware be more appropriate? This
+makes me wary of the possible performance gains on realistic hardware
+(i.e. lower-speed, less parallelism). In summary, the paper argues that
+SDEP is useful in general for stream processing apps, but only provides
+evidence in one model, for one application (precise event handling), for one
+program (frequency-hopping radio). I would like to see one of the other
+apps fleshed out more, and/or some additional case studies, as well as
+better performance analysis (only 1 paragraph of analysis in the paper now).
+
+Some other suggestions:
+
+Section 3: It would be useful to point out initially that \mathcal{S} \in
+\Phi. Also, in Algorithm 1, you are missing the n parameter to the
+recursive call of pullSchedule(). I presume this should be the number of
+tokens needed to on c_i.
+
+Section 4.1: After the bullet list, you might mention as you describe the
+semantics of message latency that this is much like a logical clock,
+well-known in distributed systems.
+
+Also in 4.1, I was confused for a while about whether or not out-of-band
+messages would affect the scheduling of synchronous streams. I came to
+believe the answer is yes, but I'm not sure how this would work, since the
+definition of SDEP relied on a particular pull schedule---how is this
+schedule affected by possible changes due to required latencies? Some
+stronger clarifications on the relation of message delivery and SDF
+scheduling would be helpful. Finally, the last sentence of 4.1 feels a
+little misleading: I believe you are meaning to say that a positive latency
+will not impact SDF scheduling, but not that positive latencies for
+downstream messages are illegal (while negative ones are for upstream
+messages).
+
+Section 4.4: Why was this cluster chosen as the benchmarking platform? I'd
+think you'd want to look at embedded hardware. More analysis please! In
+particular, what is the impact in terms of bandwidth of sending less data
+(than the manual messaging model)? Why is parallelism so much more
+important for your out-of-band messaging? How often did you perform
+frequency hops? Etc.
+
+Section 6: I didn't understand the comparison of Pugh and Rosser. "..we
+calculate the last interation of an actor which affects another." What is
+"another" referring to? "..last invocation that was relevant." Is this the
+last invocation of the actor in question, or one of its predecessors? Being
+a bit more precise might help to clarify the connection here.
