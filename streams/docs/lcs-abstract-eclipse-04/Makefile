@@ -16,4 +16,4 @@ clean:
 	rm -f *.dvi *.aux *.bbl *.blg *.ps *.log *~
 
 spotless:
-	rm -f *.dvi *.aux *.bbl *.blg *.ps *.pdf *.log *~
+	rm -f *.dvi *.aux *.bbl *.blg *.ps ${MAIN}.pdf *.log *~
