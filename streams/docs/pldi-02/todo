@@ -30,6 +30,10 @@ things to figure out / solve:
 *** Can we show that fusion preserves the min function across its
 inputs?
 
+* Add the meaning of the whole program to the denotational semantics.
+
+- Introduce comma notation for O1_S => O_1,S, etc.
+
 - Improve the translation from the abstract syntax back to a work function
 
 - Can we say anything about how message latencies should be modified
@@ -41,4 +45,13 @@ Should probably look at this and see if there's a way to fix it.
 - Also, message constraints are violated when things are empty, since
 if you require a certain amount of buffering between two filters, then
 there won't be that data until initialization time.  hmm.
+
+- Add this reference to VSIPL, the C comparison code for the PCA demo:
+
+David Schwartz, Randall R. Judd, William J. Harrod, and Dwight
+P. Manley.  Vector, signal, and image processing library (VSIPL) 1.0
+application programmer's interface.  Technical report, Georgia Tech
+Research Corporation, March 200.
+
+
 

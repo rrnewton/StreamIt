@@ -579,7 +579,7 @@ s~\in~&Stream = Filter + Pipeline + SplitJoin + FeedbackLoop \\
 \protect\label{fig:interdom}}
 \vspace{-6pt}
 \begin{align*}
-&StreamTransform = IndexTransform \ra (Tape \ra Tape)
+&StreamTransform =  IndexTransform \ra (Tape \ra Tape)
 \end{align*}
 \caption{Semantic domains specific to the transform algebra.
 \protect\label{fig:transformdom}}
@@ -646,17 +646,17 @@ algebra to the transform algebra.  For a filter, we have:
 \begin{align*}
 &{\cal S} [(Filter~push~pop~peek~(f_1~\dots~f_{push}))] = g \ra (t \ra
 (i \ra \\ &(f_{i~\%~push})(i_{local} \ra g(\mi{I_F}{O_F}(i) - peek + 1 + 
-i_{local}))(i)))
+i_{local}))(t))
 \end{align*}
 That is, the value that a filter pushes onto the $i$'th position of its
-output tape is calculated with its function at index $i~\%~push$.  By
+output tape is calculated with its function at index $if~\%~push$.  By
 the definition of $min$, the index offset to the last value the filter
 peeks is $\mi{I_F}{O_F}(i)$, where $I_F$ and $O_F$ denote the input and
 output tapes of the filter (as shown in Equation \ref{eq:minfilter},
 this is a pure function of $push$, $pop$, and $peek$).  Thus, the offset
 to the first value the filter peeks is $\mi{I_F}{O_F}(i) - peek + 1$,
 and we obtain the global index by adding this offset to the local index
-$i_{local}$. 
+$i_{local}$.
 
 For a pipeline, the transform function is simply the composition of the
 transforms of component streams.  At the internal connections of the
@@ -675,15 +675,18 @@ parallel stream $p(i)$ which computes the $i$'th output of the
 joiner:
 \begin{align}
 \label{eq:p}
-p(i) = MIN(j~s.t.~\sum_{k=0}^{j-1}{w_i} \le i\%W)
+p(i) = MIN(j~s.t.~\sum_{k=0}^{j-1}{w_i} \le i~mod~W)
 \end{align}
 Now, the $i$'th tape position assumes the value that is produced along
-stream $p(i)$ in the SplitJoin, and the index offset is obtained by
-tracing back from the output of the joiner to the input of the splitter:
+stream $p(i)$ in the SplitJoin, and the value of interest appears at
+position $\mi{Ip(i)_J}{O_J}(i)$ on the output tape of stream $p(i)$.
+The indexing function transforms the stream's local index $i_{local}$
+for its own input tape to the corresponding index
+$\mi{I_S}{Op(i)_S}(i_{local})$ for the input tape of the splitter:
 \begin{align*}
 &{\cal S} [(SplitJoin~S~s_1~s_2~\dots~s_n~J)] = g \ra (t \ra (i \ra \\
-&(({\cal S}[s_{p(i)}])(i_local \ra
-g(\mi{I_S}{Op(i)_S}(i_local))))(\mi{O_J}{Ip(i)_J}(i))))
+&(({\cal S}[s_{p(i)}])(i_{local} \ra
+g(\mi{I_S}{Op(i)_S}(i_{local}))))(\mi{Ip(i)_J}{O_J}(i))))
 \end{align*}
 This completes the formulation of the transform algebra.  Using this
 algebra, we can express the meaning of any StreamIt program as a
