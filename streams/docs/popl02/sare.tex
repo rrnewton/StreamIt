@@ -25,12 +25,11 @@ Phased Computation Graphs & X & X & X & X & X \\
 \end{table}
 
 We introduce the Phased Computation Graph (PCG) as a model of
-computation for dataflow languages; we designed the PCG to provide a
-model of computation for the StreamIt programming
-language~\cite{streamitcc}.  A PCG is a generalization of the
-Computation Graphs (CG) of Karp and Miller~\cite{KM66} to the case
-where each node has both an initial and steady-state execution epoch,
-each of which contains a number of {\it phases}.  It is also a
+computation for dataflow languages; specifically, we designed the PCG
+as a model for StreamIt~\cite{streamitcc}.  A PCG is a generalization
+of the Computation Graphs (CG) of Karp and Miller~\cite{KM66} to the
+case where each node has both an initial and steady-state execution
+epoch, each of which contains a number of {\it phases}.  It is also a
 generalization of other popular representations for dataflow graphs,
 such as synchronous dataflow (SDF) and cyclo-static dataflow (CSDF)
 (see Table~\ref{tab:models}).  Phases are attractive constructs for

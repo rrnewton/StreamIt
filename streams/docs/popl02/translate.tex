@@ -76,10 +76,10 @@ there could be an offset--an init buffer might have written into the
 beginning of the read array, or an init read array might have read
 from the beginning of the steady-state buffer\footnote{Fundamentally,
 this complication ended up in this equation because we chose to define
-the init buffer ($\mt{IBUf}$) to be the same length as its associated
+the init buffer ($\mt{IBUF}$) to be the same length as its associated
 init write array ($\mt{IWRITE}$).  If we had defined it in terms of
 the init read array ($\mt{IREAD}$) instead, the complexity would be in
-Equation~\ref{swrite2sbuf}}.
+Equation~\ref{swrite2sbuf}.}.
 
 Equation~\ref{sbuf2sread2} provides a set of helper functions to
 determine the offset for Equations~\ref{sbuf2sread0}

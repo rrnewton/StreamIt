@@ -34,8 +34,8 @@ impact; for instance, consider a 2:1 downsampler node that simply
 discards half of its input.  Using the SARE, it is straightforward to
 trace the element-wise dependence chain from each discarded item, and
 to mark each source operation as dead code (assuming the code has no
-other consumers.)  In this way, one can perform fine-grained
-decimation propagation throughout the entire graph and prevent the
+other consumers.)  In this way, one can perform fine-grained {\bf
+decimation propagation} throughout the entire graph and prevent the
 computation of any items that are not needed.  This degree of
 optimization is not possible in frameworks that treat the node as a
 black box.
@@ -107,7 +107,7 @@ efficient.
 
 \subsubsection{Buffer Minimization}
 
-Storage optimization is one area that both the scientific
+Storage optimization is one area in which both the scientific
 community\cite{Lim01,Quillere,Thies01,Lefebvre98} and the DSP
 community\cite{murt1997x1,GGD94,murt2001x1} have invested a great deal
 of attention.  Both communities have invented schemes for detecting
@@ -121,7 +121,7 @@ and see what they have to offer to each other.
 
 There is a large body of work in the scientific community regarding
 the scheduling of SARE's~\cite{DRV00}.  While they have not faced the
-same constrains on code size as the embedded domain, there are
+same constraints on code size as the embedded domain, there are
 characteristics of affine schedules that could provide new directions
 for DSP scheduling algorithms.  For instance, when solving for an
 affine schedule, one can obtain a schedule that places a statement
@@ -131,7 +131,7 @@ the single appearance schedules in the DSP community have never had
 this notion of conditional execution, perhaps because it represents a
 much larger space of schedules to consider.  It is possible that an
 affine schedule, then, would give a more flexible solution when code
-size is the critical issue.  
+size is the critical issue.
 
 Also, there are a number of sophisticated parallelization algorithms
 (e.g.,Lim and Lam~\cite{Lim01}) that could extract high performance
