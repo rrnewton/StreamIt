@@ -16,17 +16,11 @@
 
 #include <VrFileSink.h>
 #include <VrFileSource.h>
-#include <VrRealFIRfilter.h>
 
-#include "VrSimpleFilter.h"
 #include "VrLowPassFilter.h"
 #include "VrFMDemodulator.h"
 #include "VrTestSource.h"
 #include "VrFloatSink.h"
-#include "VrDuplicateSplitter.h"
-#include "VrRoundRobinJoiner.h"
-#include "VrSimpleFilterSplit.h"
-#include "VrSimpleFilterJoin.h"
 
 #include "VrFloatSubtract.h"
 #include "VrFloatAdder.h"
