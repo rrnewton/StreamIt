@@ -91,10 +91,63 @@ property that it consists includes exactly one phase of the last downstream
 component, and only the necessary number of more upstream components.
 A filter has a cyclic schedule consisting only of its single invocation.
 
-In Figure \ref{fig:sched}, the pipeline has a cyclic consisting of three
-phases: $\{A(2B)(3C)D\}, \{(2A)(2B)(3C)D\}, \{A(2B)(3C)D\}$.
+In Figure \ref{fig:sched}, the pipeline has a cyclic minimum latency
+schedule consisting of three
+phases: $\{A(2B)(3C)D\}$, $\{(2A)(2B)(3C)D\}$, $\{A(2B)(3C)D\}$.
 
 \subsection{Minimum Buffer Scheduling}
+
+Buffer size is closely related to latency.  The more data is buffered between
+filters, the more delay there is between when data enters the computation
+stream and when its results can be seen.  More importantly, however, buffer
+sizes can grow exponentially with size of streaming program.
+
+The buffer size requirement between any two filters is dictated solely by
+the sequence of execution of these two filters.  The minimum buffer size
+requirement is given by 
+$MinBuffer(A,B) = \over{push_A  pop_B}{gcd (push_A, pop_B}}$
+\cite{murthy94combined}
+
+In our construction of a minimum buffer schedule, we again use the idea
+of a cyclic schedule.  Phases of this schedule, however, are computed in
+such a way, that every phase can have at most one phase of the upstream
+most component that consumes data and one phase of the downstream most 
+component that produces data.  The ordering of inner phases within a phase
+matters here, so the schedule grows in size as compared to the minimum latency
+schedule described above.  The technique used here is equivallent to pull
+scheduling.  Because in each iteration this schedule only consumes as much 
+data as necessary to produce an output, this schedule is also a minimum 
+latency schedule.  
+
+In Figure \ref{fig:sched}, the pipeline has a cyclic minimum buffer schedule
+consisting of four phases: $\{AB(2C)BCD\}$, $\{AB(2C)\}$, $\{ABCD\}\{ABCD\}$.
+
+\subsection{Schedule Comparison}
+
+Let $children_A$ be the number of subcomponents contained in component $A$.
+Let $child_{i, A}$ be the $i$th subcomponent contained in component $A$.
+
+% \begin{tabluar}{c c c}
+% periodic & min latency & min buffer\\
+% \end{tabluar}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
