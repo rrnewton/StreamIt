@@ -10,12 +10,12 @@ The  basic programmable  unit (i.e., an actor) in  StreamIt is a {\it
 filter}.   Each filter contains  a work  function that executes
 atomically,  popping (i.e., reading)  a fixed number  of items  from
 the  filter's input  tape and pushing (i.e., writing) a fixed number
-of items to the filter's output tape.  A filter  may also {\it peek} at
+of items to the filter's output tape.  A filter  may also {\tt peek} at
 a given index  on its input tape without  consuming  the  item;  this
 makes  it  simple  to  represent computation over a
-sliding-window.   The push, pop, and peek rates are  declared as
-part  of  the work  function,  thereby enabling  the compiler    to
-construct a static schedule of filter executions. The
+sliding-window.   The {\tt push}, {\tt pop}, and {\tt peek} rates are
+declared as part  of  the work  function,  thereby enabling  the
+compiler    to construct a static schedule of filter executions. The
 following is an example implementation of a FIR   (Finite Impulse
 Response)  filter: 
 %\begin{scriptsize}

@@ -1,2 +1,20 @@
 \section{Experimental Evaluation}
 \label{sec:evaluation}
+
+- summary graph four bars:
+  - baseline: no fusion, best unrolling
+  - only fusion + partitioning
+  - only multiplicity
+  - fusion + multiplicity (best cacheopt line)
+
+- cacheopt details
+  - try different unrolling factors as baseline
+  - should demonstrate that cacheopt + full unrolling does as well as
+    any baseline unrolling factor
+  - argue that this demonstrates robustness re: choosing an unrolling factor
+
+- fusion details (time permitting)
+  - separate effects of:
+     - stack reuse
+     - scalar replacement
+     - peek scaling

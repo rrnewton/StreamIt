@@ -168,7 +168,7 @@ Mathematically. the dynamic data measure is defined as:
 \end{eqnarray}
 with $W(f)$ equal to the output buffer size reserved for writing data, $R(f)$
 equal to the input buffer size reserved for reading data, $U(f)$ equal to the
-push rate (in bytes) of the filter, $O(f)$ equal to the pop rate (in
+{\tt push} rate (in bytes) of the filter, $O(f)$ equal to the {\tt pop} rate (in
 bytes) of the filter, and $A(f)$ equal to the number of occurences of
 filter $f$ in $phase(f_i)$. Also note that the $Y(f_i)$ is defined
 over all distinct occurences of $f_k$ in the phase, and $f_s$
@@ -194,3 +194,15 @@ filter is also the input buffer of its successor in the stream
 graph. The term quantifies the amount of data that is consumed by the
 producer's successor, and hence release a portion of the address space
 for use by other filters in the phase.
+
+\subsection{Remarks}
+
+Note  that we can  combine the  instruction and  data cache  miss rate
+equations to yield one measure that estimates the temporal locality of
+a streaming computation.
+
+Also note that while we use  an execution trace to describe our model,
+it  is possible  to  calculate  the instruction  and  data cache  miss
+metrics at  compile time.  To do so,  we can leverage  the hiearchical
+StreamIt   representation  that  dictates   the  ordering   of  filter
+executions.
