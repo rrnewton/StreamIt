@@ -39,3 +39,17 @@ E(in,init,0)&=0\nonumber\\
 E(in,init,1)&=1\nonumber\\
 E(in,steady,0)&=2\nonumber
 \end{align}
+
+To make a decent example lets consider the graph of 2 FIR Filters connected in series. From now on let c denote the channel between them. Let us consider all the equations in figures \ref{fig:pcptosare2} and \ref{fig:pcptosare3} in turn.
+\begin{itemize}
+\item Equation \ref{i2ibuf} does not contribute, since A(c)=0.
+\item Equation \ref{iwrite2ibuf}:
+\begin{align}
+IBUF_c(0)&=IWRITE_{c,0}(0)\nonumber\\
+IBUF_c(1)&=IWRITE_{c,1}(0)\nonumber
+\end{align}
+\item Equation \ref{iread2iwrite}:
+%\begin{align}
+
+%\end{align}
+\end{itemize}
