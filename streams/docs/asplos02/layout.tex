@@ -81,14 +81,19 @@ The cost function is the most important parameter of the simulated
 annealing algorithm.  After some experimentation, we have arrived at
 the following cost function: 
 
+\[
+\sum _{c \in channels} items(c) \left( hops(c) + \left( 2 \bullet
+assigned(c) \right) ^{3} \right)
+\]
+
 %%Sum over channels (items(channel) *
 %%(hops(channel) + (num_assigned(channel) * 2)^3) 
 
-Where item(channel) gives the number of data items that traverse the
-channel for each steady state execution.  Hops(channel) gives the
+Where \(items(c)\) gives the number of data items that traverse the
+channel \(c\) for each steady state execution.  \(hops(c)\) gives the
 number of intermediate tiles traversed on the route of the channel.
-Finally, assigned attempts to give a cost to the added
-synchronization imposed by this channel assignment.  assigned
+Finally, \(assigned(c)\) attempts to give a cost to the added
+synchronization imposed by this channel assignment.  \(assigned(c)\)
 calculates the number of tiles that are assigned to filters plus the
 number of tiles involved in routing other channels on the route.
 
