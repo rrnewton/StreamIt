@@ -356,11 +356,13 @@ void register_receiver(portal *p, stream_context *receiver,
 @
 
 To send a message, you need to know the message number, the portal,
-the required latency, and the parameters to send on.  The C varargs
-mechanism is used to pass paramaters on to message handler functions.
+the required latency, and the parameters to send on.  Each message
+must create a structure to package its parameters in, and the sender
+needs to pass a [[malloc]]'d pointer to the parameter structure to
+[[send_message]].
 
 <<Messaging Functions>>=
-void send_message(portal *p, int msgid, latency *l, ...);
+void send_message(portal *p, int msgid, latency *l, void *params);
 @
 
 \subsection{Starting the System}
