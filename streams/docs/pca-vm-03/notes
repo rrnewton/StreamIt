@@ -1,3 +1,54 @@
+Call with Peter on 4/23/03
+--------------------------
+
+issues:
+
+  - Graphs
+  - canPop / canPush
+  - routing issues (stream-stream connections)
+
+---
+
+- implement canPop but not canPush
+  - keep the index into canPop
+  - have end-of-stream token
+
+- no graphs
+
+- so have popEos, pushEos, peekEos (possibly do a postpass on syntax)
+  - preserves kahn semantics - can't tell buffer size by pushing
+  - canPop returns bool
+
+- suspend is a method call from the work function
+
+  - can still specify dependences on inputs to kernels, for before
+    they start running
+
+- agree:  input the connectivity to the HLC
+  - not sure whether or not HLC outputs the routing information
+  - (connection+)-fifo-(connection+) processor
+
+- will pass the token to Peter for the next 
+
+- multicast:  
+  - push, pop are methods of kernel
+  - also have varargs push
+
+- undefined streams:  peekEos 
+
+- keep aliasing guarantees we had before
+
+-----
+
+- issues:
+
+  - who's taking control of this document
+
+  - Graphs, etc.
+
+  - what about canPop, canPush / draining & killing semantics
+
+
 conference call with mike vahey, peter, francois
 ------------------------------------------------
 
