@@ -13,6 +13,7 @@ DVIPS := dvips
 PS2PDF := ps2pdf
 HEVEA := hevea
 IMAGEN := imagen
+PERL := perl
 
 # RERUN := "(There were undefined references|Rerun to get (cross-references|the bars) right)"
 RERUN := "Rerun to get (cross-references|the bars) right"
@@ -39,7 +40,7 @@ all: $(DVI) $(PS) $(PDF) $(HTML) $(TEXTOUT)
 	$(HEVEA) -nosymb $*.hva $*.tex
 
 %.txt: %.html
-	./htmlformat.pl $< > $@
+	$(PERL) htmlformat.pl $< > $@
 
 INSTALL: install.txt
 	cp $< $@
@@ -52,7 +53,7 @@ NEWS: news.txt
 
 OPTIONS: options.txt
 	cp $< $@
-	
+
 clean:
 	rm -f $(DVI) $(PS) $(PDF) $(HTML) $(TEXT) $(TEXTOUT)
 	rm -f *~ *.aux *.log *.bbl *.blg *.toc *.haux *.htoc *.png
