@@ -8,8 +8,8 @@ dataflow graphs where the input rate and output rate of each node is
 constant from one invocation to the next~\cite{LM87-i,LM87-ii}.  For
 SDF graphs, it is straightforward to determine a legal steady state
 schedule using balance equations~\cite{leesdf} (see
-Section~\ref{sec:balance}).  The SDF scheduling community focusses on
-``single-appearnace schedules'' (SAS) which output each node at just
+Section~\ref{sec:balance}).  The SDF scheduling community focuses on
+``single-appearance schedules'' (SAS) which output each node at just
 one position (although that position might be enclosed in loops).  The
 interest in SAS is because the runtime overhead of a method call is
 prohibitive, so the code for each block is inlined.  However, code
@@ -91,7 +91,7 @@ of $X$.
 In the above definition, note that the index expression ${\vec i}$ on
 the left hand side must exactly match the input domain quantifier.
 Also, each index expression on the right-hand side must be an affine
-expresion of ${\vec i}$.  If the dependence function ${\vec h}$
+expression of ${\vec i}$.  If the dependence function ${\vec h}$
 happens to be a translation (${\vec h}({\vec i}) = {\vec i} - {\vec
 k}$ for constant ${\vec k}$), then the SARE is {\it uniform}, and
 referred to as a SURE or SRE~\cite{Karp67}. SURE's can be used for
@@ -114,6 +114,6 @@ Feautrier's framework is very flexible in that it allows you to select
 a desirable affine schedule by any linear heuristic.
 
 Lim and Lam~\cite{Lim01} build on Feautrier's technique with an affine
-partitioning algorithm that maximizes the degree of parallilism while
+partitioning algorithm that maximizes the degree of parallelism while
 minimizing the degree of synchronization.  It also operates on a form
 that is equivalent to a SARE.

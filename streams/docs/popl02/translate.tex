@@ -32,7 +32,7 @@ only the most interesting parts below.
 
 Equation~\ref{i2ibuf} writes the initial values of the initial tokens
 on $\mt{IBUF}$, the initial buffer.  Equation~\ref{iwrite2ibuf}
-transfers values from the initial epoch of a node to the inital buffer
+transfers values from the initial epoch of a node to the initial buffer
 of a channel.  Equations~\ref{iread2iwrite} and \ref{sread2swrite} do
 the work computation of the initial and steady-state items,
 respectively, just as we did in the simple translation of
@@ -44,7 +44,7 @@ Equation~\ref{ibuf2iread} copies values from the initial buffer
 $\mt{IBUF}$ of a channel into the initial read array for a node.
 However, since the node might read more items in the initial epoch
 than exist on the initial buffer, we restrict the domain of the
-equation to only those indicies that have a corresponding value in
+equation to only those indices that have a corresponding value in
 $\mt{IBUF}$.  If it is the case that there are fewer items in the
 initial buffer than a node reads in its initial epoch, then
 Equation~\ref{sbuf2iread} copies values from the beginning of the
@@ -62,7 +62,7 @@ reading.
 
 Equation~\ref{ibuf2sread} is dealing with the opposite case as
 Equation~\ref{sbuf2iread}: when a node finds items on its channel's
-inital buffer when it is entering the steady-state epoch.  In this
+initial buffer when it is entering the steady-state epoch.  In this
 case copying over the appropriate items to the beginning of the
 steady-state read array is rather straightforward.
 
