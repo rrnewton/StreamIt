@@ -1,23 +1,34 @@
   \clearpage
   \begin{figure*}[t]
-    \begin{tabular}{ll}
-      \begin{minipage}{6in}
+\begin{center}
+\begin{minipage}{6.5in}
+\begin{center}
+    \begin{tabular}{cc}
+%      \begin{minipage}{6in}
 	\psfig{figure=filterbank1.eps,width=2.5in} %dp-before
-	(a) ~~
-	\psfig{figure=filterbank2.eps,width=2in} %dp-during
-	(b) ~~
+	(a) &
+	\psfig{figure=filterbank2.eps,width=1.9in} %dp-during
+	(b) \\
 %	\psfig{figure=filterbank3.eps,width=2in} %dp-partitions
 %	(c)
-      \end{minipage}
+%      \end{minipage}
+    \end{tabular}
 
-      \begin{minipage}{6in}
-	\psfig{figure=filterbank4.eps,width=2in} %dp-after
-	(c)~~
-	\psfig{figure=filterbank5.eps,width=2in} %greedy-after
-	(d)~~
-      \end{minipage}
+\vspace{0.3in}
+
+    \begin{tabular}{cc}
+
+%      \begin{minipage}{6in}
+	\psfig{figure=filterbank4.eps,width=2.5in} %dp-after
+	(c) &
+	\psfig{figure=filterbank5.eps,width=1.9in} %greedy-after
+	(d)
+%      \end{minipage}
       %    \psfig{figure=filterbank6.eps,width=2.5in} %work-before
     \end{tabular}
+\end{center}
+\end{minipage}
+\end{center}
 
     \caption{While compiling FilterBank to 16 partitions, this shows
     the transitions from (a) the original program, as written by the
@@ -53,8 +64,9 @@
     \protect\label{code:vert}}
   \end{figure}
   \begin{figure}[t]
-    \psfig{figure=refactor2.eps,width=1.75in}
-    \psfig{figure=refactor1.eps,width=1.75in}
+\centering
+    \psfig{figure=refactor2.eps,width=2in}
+    \psfig{figure=refactor1.eps,width=2in}
     \caption{Vertical cut example.
     \protect\label{ex:vert}}
   \end{figure}
@@ -65,22 +77,46 @@
     \caption{Horizontal cut algorithms.
     \protect\label{code:horiz}}
   \end{figure}
-  \begin{figure}[t]
-    \psfig{figure=matchsync2.eps,width=1.75in}
-    \psfig{figure=matchsync1.eps,width=1.75in}
+  \begin{figure}[h]
+\centering
+\begin{minipage}{3in}
+\begin{center}
+\begin{tabular}{c}
+    \psfig{figure=matchsync2.eps,width=2in}
+\end{tabular}
+
+\vspace{0.2in}
+
+\begin{tabular}{c}
+    \psfig{figure=matchsync1.eps,width=2in}
+\end{tabular}
+\end{center}
+\end{minipage}
     \caption{Horizontal cut example.
       \protect\label{ex:horiz}}
   \end{figure}
-  
-  \clearpage
+
+\clearpage
   \begin{figure}[t]
     \psfig{figure=algorithm6.eps,width=3.5in}
     \caption{Aggressive synchronization removal.
     \protect\label{code:syc}}
   \end{figure}
-  \begin{figure}[t]
-    \psfig{figure=sync2.eps,width=1.75in}
-    \psfig{figure=sync1.eps,width=1.75in}
+  \begin{figure}[h]
+\centering
+\begin{minipage}{3in}
+\begin{center}
+\begin{tabular}{c}
+    \psfig{figure=sync2.eps,width=2in}
+\end{tabular}
+
+\vspace{0.2in}
+
+\begin{tabular}{c}
+    \psfig{figure=sync1.eps,width=2in}
+\end{tabular}
+\end{center}
+\end{minipage}
     \caption{Example of synchronization removal.
     \protect\label{ex:sync}}
   \end{figure}
