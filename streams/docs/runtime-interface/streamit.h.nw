@@ -98,6 +98,7 @@ know the type of a stream structure:
 
 <<Enumerations>>=
 typedef enum stream_type {
+  INVALID_STREAM_TYPE,
   FILTER,
   PIPELINE,
   SPLIT_JOIN,
@@ -166,7 +167,7 @@ There are more specialized types of handler functions for work
 functions.
 
 <<Other Types>>=
-typedef void (*work_fn)(void *, tape *in, tape *out);
+typedef void (*work_fn)(void *);
 @
 
 Interface tables are used for message handling.  An interface defines
@@ -183,6 +184,7 @@ typedef streamit_handler *interface_table;
 <<Interface Functions>>=
 <<Initialization Functions>>
 <<Messaging Functions>>
+<<Run Function>>
 @
 
 \subsection{Initialization}
@@ -228,7 +230,8 @@ the tape object sizes to be consistent, and creates a tape at least
 large enough to handle steady-state execution.
 
 <<Initialization Functions>>=
-tape *create_tape(stream_context *a, stream_context *b);
+tape *create_tape(stream_context *a, stream_context *b,
+                  int data_size, int tape_length);
 @
 
 Every object should have a ``canonical form''.  Internally, fast-path
@@ -274,6 +277,15 @@ the moment how parameters will get packaged up.
 void send_message(portal *p, int msgid, latency *l, ...);
 @
 
+\subsection{Starting the System}
+
+The [[streamit_run]] function is called with the context of the
+top-level object.  It runs the system continuously.
+
+<<Run Function>>=
+void streamit_run(stream_context *c);
+@
+
 \section{Internal Library Types}
 
 <<Opaque Types>>=
@@ -285,11 +297,44 @@ void send_message(portal *p, int msgid, latency *l, ...);
 \subsection{Filter Context}
 
 A context structure is used to store data used by the run-time
-library.  It may not need to be explicitly defined here, but we'll
-leave an empty definition in for now.
+library.  Depending on the type of the stream, it may store some
+internal data.
+
+<<Stream Context>>=
+struct stream_context;
+
+typedef struct stream_context_list {
+  struct stream_context *context;
+  struct stream_context_list *next;
+} stream_context_list;
+
+typedef struct pipeline_type_data {
+  stream_context_list *first_child;
+  stream_context_list *last_child;
+} stream_context_list;
+
+typedef union stream_type_data {
+  pipeline_type_data pipeline_data;
+} stream_type_data;
+@
+
+The actual context structure contains a [[stream_type_data]] union,
+along with quite a bit of other information.  This includes the object
+the stream is associated with, the type of the stream, the data
+ratios, the work function, the parent context, and the input and
+output tapes.  Note that two objects should point to any given tape,
+one reading from it and one writing to it.
 
 <<Stream Context>>=
 typedef struct stream_context {
+  void *stream_data;
+  stream_type type;
+  int peek_size, pop_size, push_size;
+  work_fn work_function;
+  struct stream_context *parent;
+  tape *input_tape;
+  tape *output_tape;
+  stream_type_data type_data;
 } stream_context;
 @
 
@@ -302,8 +347,12 @@ stream_context *create_context(void *p);
 
 \subsection{Portals}
 
+Messages are sent to portals.  Portals currently only track the list
+of receiving contexts.
+
 <<Portal>>=
 typedef struct portal {
+  stream_context_list *destinations;
 } portal;
 @
 
@@ -324,8 +373,8 @@ typedef struct tape {
   void *data;
   int read_pos;
   int write_pos;
-  int len;
-  int size;
+  int data_size;
+  int tape_length;
 } tape;
 @
 
@@ -334,14 +383,12 @@ to the writer end of the tape; [[PEEK]] and [[POP]] both read data
 from the reader end.
 
 <<Tapes>>=
-#define PUSH(t, type, d) \
-  ((((++(t)->write_pos) >= (t)->len) ? ((t)->write_pos = 0) : 0), \
-   ((type *)(t)->data[(t)->write_pos] = (d)))
-#define PEEK(t, type, n) \
-  (((type *)(t)->data)[((t)->read_pos+(n)+1)%(t)->len])
-#define POP(t, type) \
-  ((((++(t)->read_pos) >= (t)->len) ? ((t)->read_pos = 0) : 0), \
-   ((type *)(t)->data)[(t)->read_pos])
+#define PUSH(c, type, d) { if (++(c)->output_tape->write_pos >= (c)->output_tape->tape_length ) \
+                             (c)->output_tape->write_pos = 0; \
+                           ((type *)(c)->output_tape->data)[(c)->output_tape->write_pos] = (d); }
+#define PEEK(c, type, n) (((type *)c->input_tape->data)[(c->input_tape->read_pos+n)%c->input_tape->tape_length])
+#define POP(c, type) ((((++c->input_tape->read_pos) >= c->input_tape->tape_length) ? (c->input_tape->read_pos = 0) : 0), \
+                      ((type *)c->input_tape->data)[c->input_tape->read_pos])
 @
 
 \section{Header File}
