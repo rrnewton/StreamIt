@@ -110,8 +110,11 @@ including FIR, low and high-pass filters, and DFT.  This linear
 computation can be represented as a matrix multiplication and
 efficiently mapped to Raw.  Currently, linear slices of the stream
 graph are space multiplexed across tiles of the chip using
-parameterized computation and communication code.  In steady-state,
-our parameterized code is near-optimal...jasp?
+parameterized computation and communication code.  The matrix
+representations of the linear filters are broken into pieces
+that the compiler targets for aggressive code generation.  The
+aggressive code generation results in optimal usage of the tiles
+for the duration each individual piece runs.
  
 \absection{Progress}
 Currently, we have completed a first version of our hybrid space-time
