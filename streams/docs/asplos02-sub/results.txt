@@ -1,0 +1,42 @@
+RESULTS
+
+----------------------------------------------------------------------
+fmradio
+	- works everywhere
+	- have naive & optimized graphs for 16 tiles
+	- have some numbers
+----------------------------------------------------------------------
+fft
+	- have blood graph naive 64-way on 64 tiles
+	- fused version (into 15 tiles) runs on uniprocessor
+	- fused version looks like it deadlocks on raw
+----------------------------------------------------------------------
+pcademo
+	- works in library
+	- runs out of memory on uniprocessor
+	- null ptr going through raw
+----------------------------------------------------------------------
+gsm
+	- don't know how to split the rate-limiting filter, 
+	ShortTermSynthFilter
+
+	- had the naive version running on RAW, and it took a very
+	long time to output an item, and after that only one filter
+	seemed to be making progress (but progress was being made).
+	The simulator crashed before I could grab the blood graph.
+----------------------------------------------------------------------
+mp3
+	- needs sample I/O files to run
+	- compiles on a uniprocessor
+	- haven't tried pushing through RAW
+	- no numbers
+----------------------------------------------------------------------
+perftest4
+	- are we including this in asplos?
+----------------------------------------------------------------------
+crc
+	- goes through library correctly
+----------------------------------------------------------------------
+matmul?
+	- not written yet
+----------------------------------------------------------------------

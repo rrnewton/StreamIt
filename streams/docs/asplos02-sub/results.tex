@@ -1,0 +1,211 @@
+\section{Results}
+\label{sec:results}
+
+We have implemented a fully-functional prototype of the StreamIt
+compiler for the Raw architecture.  Our implementation includes all of
+the phases described in Section~\ref{sec:phases} as well as the
+optimizations, but the decision of which optimizations to apply is
+currently guided by the programmer.
+
+\begin{table}[t]
+\begin{center}
+\scriptsize
+\begin{tabular}{|l|l|} \hline
+{\bf Benchmark} & {\bf Description}\\
+\hline \hline
+FM Radio & A software-based FM Radio with equalizer.\\
+\hline
+GSM & A GSM decoder.\\
+\hline
+BeamFormer & A core component of modern radar, sonar, and communications signal processors. \cite{pca}\\
+\hline
+FFT & A 64-element FFT. \\
+\hline
+CRC & A 32-bit Cyclic Redundancy Check (CRC) Encoder/Decoder. \\
+\hline
+\end{tabular}
+\vspace{-6pt}
+\caption{\protect\small Application Descriptions.}
+\label{tab:benchmarks}
+\vspace{-12pt}
+\end{center}
+\end{table}
+
+%We have evaluated our compiler with StreamIt versions applications: 
+%\begin{itemize}
+%
+%\item A software-based FM Radio with
+%equalizer, 
+%
+%\item A GSM Decoder, which takes GSM-encoded parameters as
+%inputs, and uses these to synthesize audible speech, 
+%
+%\item A beamformer
+%which encapsulates the core functionality of modern radar, sonar, and
+%communications signal processors -- modeled after a system from the
+%Polymorphic Computing Architecture (PCA) \cite{pca}
+
+%\item A 64-element FFT filter implemented as a pipeline of a bit reversal 
+%filter followed by multiple-stage butterfly filters.
+
+%\item A Cyclic Redundancy Check (CRC) Encoder/Decoder, which is an error detection system utilizing a predefined 32 bit generator polynomial.  It can detect errors in bit strings of up to 64KB in size with 99.99999997% accuracy.
+
+%\item Matrix Multiplication 
+
+%\item A MP3
+
+%\item A performance test from the SpectrumWare system that
+%implements an Orthogonal Frequency Division Multiplexor (OFDM)
+%\cite{spectrumware}.  Table \ref{tab:benchmarks} gives characteristics
+%of the above applications including the number of filters implemented
+%and the size of the stream graph as coded.
+
+%%\end{itemize}
+
+\begin{table}[t]
+\begin{center}
+\scriptsize
+\begin{tabular}{|l|c|c|c|c|c|c|c|} \hline
+& \hspace{-5pt} {\bf Lines} \hspace{-5pt} & \multicolumn{3}{|c|}{\hspace{-5pt} {\bf Unoptimized} \hspace{-5pt} } & \multicolumn{3}{|c|}{\hspace{-5pt} {\bf Optimized} \hspace{-5pt}}\\
+\cline{3-8}
+\hspace{-5pt} {\bf Benchmark} \hspace{-5pt} &
+\begin{tabular}{c} 
+\hspace{-5pt} {\bf of} \hspace{-5pt} \\ \hspace{-5pt} {\bf code} \hspace{-5pt}
+\end{tabular} &    
+\begin{tabular}{c} 
+\hspace{-5pt} {\bf \# of} \hspace{-5pt} \\ \hspace{-5pt} {\bf tiles} \hspace{-5pt}
+\end{tabular} &    
+\begin{tabular}{c}\hspace{-5pt} {\bf Throughput} \hspace{-5pt}\\
+\hspace{-5pt} {\bf (per 10$^5$ cycles)} \hspace{-5pt}
+\end{tabular} &    
+\hspace{-5pt} {\bf MFLOPS} \hspace{-5pt} & 
+\begin{tabular}{c} 
+\hspace{-5pt} {\bf \# of} \hspace{-5pt} \\ \hspace{-5pt} {\bf tiles} \hspace{-5pt}
+\end{tabular} &    
+\begin{tabular}{c}\hspace{-5pt} {\bf Throughput} \hspace{-5pt} \\
+\hspace{-5pt} {\bf (per 10$^5$ cycles)} \hspace{-5pt}
+\end{tabular}  &
+{\bf MFLOPS}
+\\
+\hline \hline
+BeamFormer (12x4) & 596 & 53 & 1.1 & 619 & 15 & 2.7 & 1470 \\
+\hline
+BeamFormer (48x16) & 596 & 209 & N/A & N/A & 15 & 0.3 & 836\\
+\hline
+FM Radio & 511 & 14 & 34 & 107 & 13 & 81 & 258\\
+\hline
+FFT & 174 & 37 & 669 & 12.5 & 16 & 657 & 12.3 \\
+\hline
+GSM Decoder & 1925 & 16 & 107 & N/A & 15 & 107 & N/A\\
+\hline
+CRC & 336 & 47 & 35.1 & N/A & 5 & 52.4 & N/A\\
+\hline
+%%Matrix & \\
+%%\hline
+\end{tabular}
+\vspace{-6pt}
+\caption{\protect\small Performance Results.}
+\label{tab:performance}
+\end{center}
+\end{table}
+
+We evaluate the StreamIt compiler for the set of applications shown in
+Table~\ref{tab:benchmarks}; results appear in
+Table~\ref{tab:performance}, with MFLOPS calculated using Raw's target
+clock speed of 250 MHz.  We show the performance of the original
+application, which maps each Filter in the original program to a
+single Raw tile.  In some cases, we need to use an 8x8 Raw processor
+in order to have enough tiles for the Filters; otherwise, we target a
+4x4 configuration of Raw.  To obtain the ``optimized'' numbers, we
+perform a series of fusion, fission and reordering transformations to
+create a load-balanced set of filters that can be mapped onto a 4x4
+Raw processor.  Figures~\ref{fig:opt-diagram} and
+\ref{fig:utilization-diagram} depict the impact of our load balancing
+transformations on throughput and tile utilization, respectively.
+
+\begin{figure}
+\begin{minipage}{3.2in}
+\centering
+\psfig{figure=speedup-diagram.eps,width=3.2in}
+\caption{Speedup due to load balancing, normalized to original performance.
+\protect\label{fig:opt-diagram}}
+\end{minipage}
+\hspace{0.1in}
+\begin{minipage}{3.2in}
+\centering
+\psfig{figure=utilization-diagram.eps,width=3.2in}
+\caption{Utilization of a tile after load balancing, normalized to original utilization.\protect\label{fig:utilization-diagram}}
+\end{minipage}
+\end{figure}
+
+The results show that for programs with substantial computation
+requirements, the StreamIt compiler is able to extract good
+performance out of the Raw processor.  For example, the BeamFormer
+application (see Figure~\ref{fig:beamcode} for source code) shows a
+sustained 1.47 GFLOPS rate, after a 145\% improvement due to our
+optimizations.  Figures~\ref{fig:beam-orig} and~\ref{fig:beam-opt}
+give the original and optimized configurations of the BeamFormer's
+stream graph, and Figure~\ref{fig:beam-blood} illustrates the impact
+of our load balancing optimizations .
+%
+%However, programs such as FFT, which was created to experiment with
+%the language features of StreamIt, have very little work per
+%filter. We were unable to amortize the communication overhead for FFT,
+%leading to a slowdown.  Better tile code generation and traditional
+%optimizations may help improve the performance.
+
+\begin{figure}
+  \begin{center} \psfig{figure=beam-blood-key.eps,width=3.25in} \\
+    \subfigure[\vspace{-6pt}
+    Original.\label{fig:beam-blood1}]{\psfig{figure=beam-blood-orig.eps,width=3in}}
+    \hspace{0.3in} \subfigure[\vspace{-6pt}
+    Load-balanced.\label{fig:beam-blood2}]{\psfig{figure=beam-blood-opt.eps,width=3in}
+    \vspace{-6pt}} \vspace{-6pt} \caption{Execution traces for the (a)
+    original (on 64 tiles) and (b) load-balanced (on 16 tiles)
+    partitionings of the BeamFormer.  Graphs are shaded as in
+    Figure~\ref{fig:fm-blood}. \protect\label{fig:beam-blood}}
+\end{center}
+\vspace{24pt}
+\small
+\begin{verbatim}
+                         class BeamFormer extends Pipeline {
+                         
+                            void init(numChannels, numBeams) {
+                               add(new SplitJoin() { 
+                                  void init() {
+                                     setSplitter(Null());
+                                     for (int i=0; i<numChannels; i++) {
+                                        add(new InputGenerate(i));
+                                        add(new FIRFilter1(64));
+                                        add(new FIRFilter2(16));
+                                     }
+                                     setJoiner(RoundRobin());   
+                                   }});
+                            
+                               add(new SplitJoin() {
+                                  void init() {
+                                     setSplitter(Duplicate());
+                                     for (int i=0; i<numBeams; i++) {
+                                        add(new VectorMult(i));
+                                        add(new FIRFilter3(64));
+                                        add(new Magnitude());
+                                        add(new Detect(i));
+                                     }
+                                     setJoiner(Null());
+                                  }});
+                            }
+                         }
+\end{verbatim}
+\caption{\protect\small Top-level StreamIt code for the BeamFormer.\protect\label{fig:beamcode}}
+\end{figure}
+
+\begin{figure}
+\centering
+\psfig{figure=beam-graph-orig.eps,width=6.5in}
+\caption{\protect\small Stream graph of the original 12x4 BeamFormer.  The 12x4 BeamFormer has 12 channels and 4 beams; it is the largest version that fits onto 64 tiles without filter fusion.  \protect\label{fig:beam-orig}}
+\vspace{36pt}
+\psfig{figure=beam-graph-opt.eps,width=6.5in}
+\caption{\protect\small Stream graph of the load-balanced 12x4 BeamFormer.  Vertical fusion is applied to collapse each pipeline into a single filter, and horizontal fusion is used to transform the 4-way SplitJoin into a 2-way SplitJoin.
+Figure~\ref{fig:beam-blood} shows the benefit of these
+transformations. \protect\label{fig:beam-opt}}
+\end{figure}

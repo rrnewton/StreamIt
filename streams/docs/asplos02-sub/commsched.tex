@@ -1,0 +1,149 @@
+\begin{figure}
+\centering
+\psfig{figure=joiner-buffer-dead.eps,width=4.59in}
+\parbox{6in}{\caption{\protect\small Example of deadlock in a
+SplitJoin.  As the Joiner is reading items from the stream on the
+left, items accumulate in the channels on the right.  On Raw, senders
+will block once a channel has four items in it.  Thus, once 10 items
+have passed through the Joiner, the system is deadlocked, as the
+Joiner is trying to read from the left, but the stream on the right is
+blocked.  The Identity filter is blocking on the send of item \#10,
+and the Splitter is blocking on the send of item \#20.  If the weights
+on the Joiner were (10, 10), the system would be deadlock-free.
+\protect\label{fig:joiner-dead}}}
+
+\vspace{48pt}
+
+\psfig{figure=joiner-buffer-live.eps,width=3.97in}
+\caption{\protect\small Fixing the deadlock with a buffering Joiner.
+The BufferingRoundRobin is an internal StreamIt construct (it is not
+part of the language) which reads items from its input channels in the
+order in which they arrive, rather than in the order specified by its
+weights.  The order of arrival is determined by a simulation of the
+stream graph's execution; thus, the system is guaranteed to be
+deadlock-free, as the order given by the simulation is feasible for
+execution on Raw.  To preserve the semantics of the Joiner, the items
+are written to the output channel from the internal buffers in the
+order specified by the Joiner's weights.  The ordered items are sent
+to the output as soon as they become available.
+\protect\label{fig:joiner-live}}
+\end{figure}
+
+\section{Communication Scheduler}
+\label{sec:communic}
+
+With the nodes of the stream graph assigned to computation nodes of
+the target, the next phase of the compiler must map the communication
+explicit in the stream graph to the interconnect of the target.  This
+is the task of the communication scheduler.  The communication
+scheduler maps the infinite FIFO abstraction of the stream channels to
+the limited resources of the target.  The communication scheduler must
+avoid deadlock and starvation while trying to utilize the parallelism
+explicit in the stream graph.
+
+The exact implementation of the communication scheduler is tied to the
+communication model of the target.  The simplest mapping would occur
+for targets implementing an end-to-end, infinite FIFO abstraction, in
+which the scheduler needs only to determine the sender and receiver of
+each data item.  This information is easily calculated from the
+weights of the Splitters and Joiners.  As the communication model
+becomes more constrained, the communication scheduler becomes more
+complex, requiring analysis of the stream graph. For targets
+implementing a finite, blocking nearest-neighbor communication model,
+the exact ordering of tile execution must be specified.
+
+Due to the static nature of StreamIt, the compiler can statically
+orchestrate the communication resources.  As described in
+Section~\ref{sec:phases}, we create an initialization schedule and a
+steady-state schedule that fully describe the execution of the stream
+graph.  The schedules can give us an order for execution of the graph
+if necessary.  We can generate ordering to minimize buffer length,
+maximize parallelism, or minimize latency.
+
+%Thus, we can create a communication scheduler of arbitrary
+%detail.  If the architecture must statically orchestrate all aspects
+%of communication, the StreamIt language provides this facility.
+
+Deadlock must be carefully avoided in the communication
+scheduler. Each architecture requires a different deadlock avoidance
+mechanism and we will not go into a detailed explanation of deadlock
+here.  In general, deadlock occurs when there is a circular dependence
+on resources.  A circular dependence can surface in the stream graph
+or in the routing pattern of the layout.  If the architecture does not
+provide sufficient buffering, the scheduler must serialize all
+potentially deadlocking dependencies.
+
+%Two StreamIt language constructs that can lead to deadlock are
+%FeedbackLoops and Joiners. Figure ?? describes the potential for
+%deadlock in a FeedbackLoop.  One potential solution is to forbid
+%filters of the FeedbackLoop to interleave sends and receives.  This
+%has the effect of serializing the FeedbackLoop. In figure ?? we
+%descibe the potential for deadlock introduced by Joiner nodes.  A
+%solution to this problem is described below.
+
+\subsection{Communication Scheduler for Raw}
+\label{sec:rawcommunic}
+
+The communication scheduling phase of the StreamIt compiler maps
+StreamIt's channel abstraction to Raw's static network.  As mentioned
+in Section \ref{sec:raw}, Raw's static network provides optimized,
+nearest neighbor communication.  Tiles communicate using buffered,
+blocking sends and receives.  It is the compiler's responsibility to
+statically orchestrate the explicit communication of the stream graph
+while preventing deadlock.
+
+To statically orchestrate the communication of the stream graph, the
+communication scheduler simulates the firing of nodes in the stream
+graph, recording the communication as it simulates.  The simulation
+does not model the code inside each Filter; instead it assumes that
+each Filter fires instantaneously.  This relaxation is possible
+because of the flow control of the static network--since sends block
+when a channel is full and receives block when a channel is empty, the
+compiler needs only to determine the ordering of the sends and
+receives rather than arranging for a precise rendezvous between sender
+and receiver.
+
+% We simulate the graph for both an initialization schedule and a steady
+% state schedule (see Section \ref{sec:phases}).  A ``push schedule'' is
+% used for both phases.  We define a push schedule as one that always
+% fires the node that is the furthest downstream (among those that have
+% enough inputs to fire).  
+% 
+% A push schedule allows the implementation to
+% disregard the FIFO buffers that connect each neighboring node in the
+% stream graph.  This is because data items will not be accumulating at
+% the source, dest, or intermediate nodes.  Each destination will
+% consume the data item as it is produced (modulo the latency of
+% routing).
+
+Special care is required in the communication scheduler to avoid
+deadlock in SplitJoin constructs.  Figure~\ref{fig:joiner-dead}
+illustrates a case where the naive implementation of a SplitJoin would
+cause deadlock in Raw's static network.  The fundamental problem is
+that some SplitJoins require a buffer of values at the Joiner
+node--that is, the Joiner outputs values in a different order than it
+receives them.  This can cause deadlock on Raw because the buffers
+between channels can hold only four elements; once a channel is full,
+the sender will block when it tries to write to the channel.  If this
+blocking propagates the whole way from the Joiner to the Splitter,
+then the entire SplitJoin is blocked and can make no progress.
+
+To avoid this problem, the communication scheduler implements internal
+buffers in the Joiner node instead of exposing the buffers on the Raw
+network (see Figure~\ref{fig:joiner-live}).  As the execution of the
+stream graph is simulated, the scheduler records the order in which
+items arrive at the Joiner, and the Joiner is programmed to fill its
+internal buffers accordingly.  At the same time, the Joiner outputs
+items according to the ordering given by the weights of the
+RoundRobin.  That is, the sending code is interleaved with the
+receiving code in the Joiner; no additional items are input if a
+buffered item can be written to the output stream.  To facilitate code
+generation (Section \ref{sec:codegen}), the maximum buffer size of
+each internal buffer is recorded.
+
+Our current implementation of the communication scheduler is overly
+cautious in its deadlock avoidance.  All FeedbackLoops are serialized
+by the communication scheduler to prevent deadlock.  More precisely,
+the loop and body streams of each FeedbackLoop cannot execute in
+parallel.  Crossed routes in the layout of the graph are serialized as
+well, forcing each path to wait its turn at the contention point.

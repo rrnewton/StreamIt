@@ -1,0 +1,36 @@
+\section{Conclusion}
+\label{sec:conclusion}
+
+In this paper, we describe the StreamIt compiler and a backend for the
+Raw architecture.  The stream graph of a StreamIt program exposes the
+data communication pattern to the compiler while the lack of global
+synchronization frees the compiler to radically reorganize the program
+for efficient execution on the underlying architecture. The StreamIt
+compiler demonstrates the power of this flexibility by totally
+reorganizing large programs for better load balancing.  We were able
+to map many programs onto the Raw processor and to obtain good
+performance.
+
+We introduce a collection of optimizations--vertical and horizontal
+filter fusion, vertical and horizontal filter fission, and filter
+reordering--that can be used to restructure stream graphs.  We show
+that by applying these transformations we can map a high-level stream
+program, written to reflect the composition of the application, onto
+Raw and achieve good processor utilization and load balance, leading
+to a factor of two speedup on two applications.
+
+Unlike all previous streaming languages, the structured streams of
+StreamIt makes it possible for us to approach the optimization and
+parallelization problems very systematically. It enables us to define
+multiple optimizations--targeting different constructs and
+requirements--and to compose them in a hierarchical manner.
+
+The ability to do global transformations across multiple filters, that
+may have originated from very different parts of the application,
+makes it possible for the compiler to find optimization opportunities
+that may elude even an experienced programmer.  Such capabilities
+enable programmers to write portable streaming applications and map
+them efficiently onto any given architecture. This has the potential
+to create a programming standard for the emerging class of
+communication-exposed architectures.  The StreamIt compiler takes a
+fist step towards this goal.
