@@ -118,6 +118,21 @@ typedef enum splitjoin_type {
 } splitjoin_type;
 @
 
+There are also enumerations to indicate whether a splitter or a joiner
+should be used, for functions that can affect either, and whether the
+input or output of a structure should be affected.
+
+<<Enumerations>>=
+typedef enum split_or_join {
+  SPLITTER,
+  JOINER
+} split_or_join;
+typedef enum in_or_out {
+  INPUT,
+  OUTPUT
+} in_or_out;
+@
+
 \subsection{Latencies}
 
 Latencies can be expressed as a linked list of discrete values or a
@@ -285,29 +300,29 @@ void set_joiner(stream_context *c, splitjoin_type type, int n, ...);
 @
 
 Tapes must be explicitly created between splitters, joiners, and other
-nodes.  [[create_split_tape]] and [[create_join_tape]] do this work;
-they are similar to [[create_tape]], but to identify the source and
-destination of the tape, they take parameters for the containing
-context and the slot number (indexed from 0) on the splitter
-output/joiner input.
+nodes.  [[create_splitjoin_tape]] does this work; it is similar to
+[[create_tape]], but takes extra parameters to indicate whether the
+splitter or joiner of a node is being affected and whether an input
+or output of that part of the block is used.  For the ``many'' side
+(output of the splitter, input of the joiner), the [[slot]] parameter
+is a 0-based index telling what is being connected.
 
 <<Split/Join Initializers>>=
-void create_split_tape(stream_context *container, int slot,
-                       stream_context *dst,
-                       int data_size, int tape_length);
-void create_join_tape(stream_context *src,
-                      stream_context *container, int slot,
-                      int data_size, int tape_length);
+void create_splitjoin_tape(stream_context *container,
+                           split_or_join sj,
+                           in_or_out io,
+                           int slot,
+                           stream_context *other,
+                           int data_size, int tape_length);
 @
 
 It is an error to call splitter and joiner functions when they are not
 relevant.  In particular, no splitter or joiner functions may be
-called on [[FILTER]] or [[PIPELINE]] nodes.  [[create_split_tape]] and
-[[create_join_tape]] also may not be called for slots that don't exist
-in the splitter or joiner structures.  The run-time library also does
-consistency checking: the splitter and joiner must have the same
-number of slots, and each input and output tape must have the same
-size.
+called on [[FILTER]] or [[PIPELINE]] nodes.  [[create_splitjoin_tape]]
+and also may not be called for slots that don't exist in the splitter
+or joiner structures.  The run-time library also does consistency
+checking: the splitter and joiner must have the same number of slots,
+and each input and output tape must have the same size.
 
 The work function of parent nodes must explicitly cause data to be
 pushed through splitters and joiners.  [[run_splitter]] and
@@ -484,8 +499,7 @@ typedef struct one_to_many {
   int fan;
   int *ratio;
   int slots;
-  tape **tape, **tcache;
-  int slot_pos;
+  tape *one_tape, **tape, **tcache;
 } one_to_many;
 @
 
