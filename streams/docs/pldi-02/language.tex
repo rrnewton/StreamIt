@@ -82,7 +82,7 @@ RoundRobin is written without any weights, we assume that all $w_i =
 
 The splitter and joiner type are specified with calls to {\tt
 setSplitter} and {\tt setJoiner}, respectively (see Figure
-\ref{fig:fft}); the parallel streams are specified by successive calls
+\ref{fig:radiocode}); the parallel streams are specified by successive calls
 to {\tt add}, with the $i$'th call setting the $i$'th stream in the
 SplitJoin.  Note that a RoundRobin can function as an exclusive
 selector if one or more of the weights are zero.
@@ -189,7 +189,7 @@ readability, and compiler analysis are immense.
 
 A final benefit of stream graph construction in StreamIt is the
 ability to do {\it scripting} to parameterize graphs.  For instance,
-the Equalizer in Figure \ref{fig:radio} inputs a parameter {\tt N}
+the Equalizer in Figure \ref{fig:radiocode} inputs a parameter {\tt N}
 that controls the number of parallel streams that it contains.  This
 further improves readability and decreases code size.
 
