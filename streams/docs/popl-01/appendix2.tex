@@ -13,22 +13,21 @@
 
 \section{Java Classes}
 
-% this crashes the printer
-%
-%\begin{figure}
-%\centering
-%\psfig{figure=hierarchy.eps,width=2.0in}
-%\caption{\protect\small The StreaMIT class hierarchy.
-%\protect\label{fig:hierarchy}}
-%\end{figure}
+\begin{figure}
+\psfig{figure=hierarchy.eps,width=3.0in}
+\caption{\protect\small The StreaMIT class hierarchy.  Other StreaMIT
+classes unrelated to this hierarchy are {\tt SplitJoinType}, {\tt
+Channel}, {\tt Portal}, and {\tt TimeInterval}.
+\protect\label{fig:hierarchy}}
+\end{figure}
 
 A diagram of the Java class hierarchy for StreaMIT is shown in
 Figure~\ref{fig:hierarchy}.  A summary of the methods in each class is
 as follows.
 
-\subsection{StreamObject}
+\subsection{StreaMITObject}
 
-A {\tt StreamObject} contains static fields and methods that are
+A {\tt StreaMITObject} contains static fields and methods that are
 useful for all classes in the stream.  The other classes extend this
 type simply so that they can share the same namespace as the constants
 and methods that it defines.
@@ -64,7 +63,7 @@ constrains the schedule such that, at any given time, $a$ can only
 progress up to the wavefront of information that $b$ will see after
 $n$ invocations of its own work function.
 
-\subsection{Stream extends StreamObject}
+\subsection{Stream extends StreaMITObject}
 
 The {\tt Stream} represents a portion of the stream graph that inputs
 has exactly one input channel and exactly one output channel.
@@ -163,7 +162,7 @@ return their argument.  Each of them must be called from within the
 A {\tt SplitJoinType} represents a compiler-defined configuration for
 the splitter or joiner in a SplitJoin.  For now, the user cannot
 define custom {\tt SplitJoinType}'s, and the only ones available are
-those that are constant fields in {\tt StreamObject}.
+those that are constant fields in {\tt StreaMITObject}.
 
 \subsection{Channel}
 
@@ -226,8 +225,6 @@ the class library.
 
 \item StreaMIT does not support native method calls.
 
-\item ???
-
 \end{enumerate}
 
 \subsection{StreaMIT restrictions}
@@ -272,7 +269,5 @@ SplitJoin.
 
 \item The splitter and joiner in a feedback loop must have two outputs
 and two inputs, respectively, and must be something other than NULL.
-
-\item ???
 
 \end{enumerate}
