@@ -76,6 +76,7 @@ int main()
     LPF_processPulse(&lpf, ditLpfData, lpfBfData);
     BF_processPulse(&bf, lpfBfData, bfPcData);
     PC_processPulse(&pc, bfPcData);
+    print_string("done\n");
   }
 
 #ifdef DEBUG_0
