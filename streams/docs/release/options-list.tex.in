@@ -35,7 +35,7 @@ Show intermediate commands as they are executed.
 \subsection*{Options available for all backends}
 \begin{description}
 \item [-O0]
-Perform no optimizations (default).
+Do not optimize (default).
 
 \item [-O1]
 Perform basic optimizations that should improve performance in most
@@ -122,6 +122,9 @@ Specify loop unrolling limit. The default value is 0.
    Run the program for \metavar{n} steady-state iterations. Defaults
    to infinity.
 
+\item [-{}-marksteady]
+   Print ``*'' to standard output after each steady-state execution.
+
 \item [-{}-norun]
    Perform the library setup and schedule the stream graph, but don't
    actually run the program.
@@ -133,11 +136,4 @@ Specify loop unrolling limit. The default value is 0.
 
 \item [-{}-printsched]
    Print out the minimal-latency schedule for the program.
-
-\item [-{}-marksteady]
-   Print ``*'' to standard output after each steady-state execution.
-
-\item[-{}-library]
-      Produce a Java file compatible with the StreamIt Java library,
-      and compile and run it.
 \end{description}
