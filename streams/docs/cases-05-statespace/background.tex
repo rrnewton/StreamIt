@@ -1,9 +1,98 @@
-\mysection{Background Information}
+\mysubsection{The StreamIt Language}
 \label{sec:background}
 
-\mysubsection{The StreamIt Language}
+StreamIt~\cite{streamitcc} is an architecture-independent language for
+signal processing applications.  The basic programmable unit in
+StreamIt is a filter.  Each filter contains a work function which
+executes atomically, popping a fixed number of items from the filter's
+input tape and pushing a fixed number of items to the filter's output
+tape.  A filter can also ``peek'' at a given index on its input tape
+without consuming the item; this makes it simple to write
+sliding-window applications.  The push, pop, and peek rates are
+declared as part of the work function, thereby enabling the compiler
+to construct a static schedule of filter firings~\cite{lee87static}.
 
-TODO
+Each filter has a distinct address space.  A filter can store two
+types of variables: a {\it field} and a {\it local}.  Fields are
+declared in the scope of the filter and are preserved across
+executions, while locals are declared inside the work function and are
+only live within a single execution.  There is also an init function,
+run once at the beginning of the program, that can be used to
+initialize fields.
+
+StreamIt provides three hierarchical structures for composing filters
+into larger stream graphs (see Figure~\ref{fig:structures}).  The {\it
+pipeline} construct composes streams in sequence, with the output of
+one connected to the input of the next.  The {\it splitjoin} construct
+distributes data to a set of parallel streams, which are then joined
+together in a roundrobin fashion.  The {\it feedback loop} provides a
+mechanism for introducing cycles in the graph.  An example of a
+pipeline appears in Figure~\ref{fig:iir-pipeline}.  It contains a
+single IIR (Infinite Impulse Response) filter, which could be
+implemented as shown at the top of Figure~\ref{fig:opt-seq}.
+
+%%         A filter can store two types of variables - \textit{field} and
+%% \textit{local}. Field variables are declared outside of the
+%% specific functions (work, prework, init), and can be accessed from
+%% anywhere within the filter. Local variables are declared within a
+%% specific function, and only have scope within that function. For
+%% example, a variable declared within the init function is local,
+%% and could not be accessed within the work function. Therefore, the
+%% init function is used to initialize field variables.
+
+\mysubsection{State Space Example}
+\input{example-figures}
+
+As described previously, a linear state space model describes a stream
+in which both the outputs and the state values are updated as a linear
+combination of the inputs and the previous states.  We use the
+following notation to describe a linear state space system:
+
+\starteqnstar 
+\vec{\mathbf{y}}
+& = & \mathbf{C}\vec{\mathbf{x}} + \mathbf{D}\vec{\mathbf{u}} \\
+\vec{\dot{\mathbf{x}}} & = & \mathbf{A}\vec{\mathbf{x}} +
+\mathbf{B}\vec{\mathbf{u}} \
+\doneeqnstar
+
+\noindent In these equations, the state vector is denoted by
+$\vec{\mathbf{x}}$, the inputs by $\vec{\mathbf{u}}$, and the outputs
+by $\vec{\mathbf{y}}$. $\vec{\dot{\mathbf{x}}}$ represents the new
+state vector, i.e. the state vector after it is updated. The first
+equation is for the outputs, while the second equation is for the
+state updates.  $\mathbf{A}$, $\mathbf{B}$, $\mathbf{C}$, and
+$\mathbf{D}$ are matrices whose dimensions depend on the number of
+states, inputs, and outputs.  
+
+Figure~\ref{fig:opt-seq} illustrates an optimization sequence for an
+IIR filter.  Three versions of the filter are shown: original,
+following state removal, and following parameter reduction.  In each
+case, the state space representation for the filter is shown on the
+right, along with the number of multiplications and additions needed
+per execution of the work function.
+
+The state removal optimization identifies that the states $x_1$ and
+$x_2$ are always used as part of the expression $x_1 + x_2$.  Thus,
+one of the states can be eliminated in favor of a single variable,
+$x$, that tracks the value of the sum.  While relatively simple in
+this example, such a transformation can be quite subtle when applied
+to a large representation (e.g., the result of combining many filters
+together.)  State removal can reduce storage requirements as well as
+eliminate arithmetic operations (in this example, 1 multiplication and
+4 additions).  As described in Section~\ref{sec:state-removal}, state
+removal is formulated as a general sequence of matrix operations.
+
+The parameter reduction optimization refactors the coefficients that
+operate on the state variables in order to reduce the number of
+operations needed.  Following the transformation, $x$ assumes a value
+that is 4 times larger than the original (at any given point of
+execution).  However, this change does not effect the output of the
+filter, as the coefficients in $\mathbf{A}$ are compensated
+accordingly.  The transformation enables a coefficient in $\mathbf{D}$
+to change from 0.25 to 1, thereby eliminating a multiplication
+operation.  As described in Section~\ref{sec:parameter-reduction},
+this transformation is also formulated as a general series of matrix
+operations.
 
 %%     StreamIt is a programming language specifically tailored to DSP
 %% streaming applications. The user creates a graph composed of four
@@ -327,84 +416,3 @@ TODO
 
 %%     A process for analyzing and optimizing linear StreamIt filters
 %% is described in \cite{Lamb}.
-
-\mysubsection{State-Space Representations}
-
-    A general way of representing a block is by a state-space model.
-A set of variables captures the `state' of the filter, so that the
-output is a combination of these variables (termed state
-variables) and the inputs. Additionally, the states themselves
-change upon every execution of the block. This is represented by
-the two equations:
-\starteqnstar
-\vspace{-12pt}
-\vec{\mathbf{y}} & = & g(\vec{\mathbf{x}},\vec{\mathbf{u}}) \\
-\vec{\dot{\mathbf{x}}} & = & f(\vec{\mathbf{x}},\vec{\mathbf{u}})
-\doneeqnstar
-
-    The state vector is denoted by $\vec{\mathbf{x}}$, the inputs by $\vec{\mathbf{u}}$,
-and the outputs by $\vec{\mathbf{y}}$. $\vec{\dot{\mathbf{x}}}$
-represents the new state vector, i.e. the state vector after it is
-updated. The first equation is for the outputs, the second
-equation is for the state updates.
-
-    A linear state-space model has the additional property that
-the state updates and outputs are linear in the state variables
-and inputs. We can use a simpler set of equations:
-\starteqnstar
-\vec{\mathbf{y}} & = & \mathbf{C}\vec{\mathbf{x}}  +
-\mathbf{D}\vec{\mathbf{u}} \\
-\vec{\dot{\mathbf{x}}} & = & \mathbf{A}\vec{\mathbf{x}} +
-\mathbf{B}\vec{\mathbf{u}}
-\doneeqnstar
-
-    $\mathbf{A}$, $\mathbf{B}$, $\mathbf{C}$, and $\mathbf{D}$ are
-matrices whose dimensions depend on the number of states, inputs,
-and outputs. Not all blocks can be represented by a linear
-state-space model. However, a linear state-space model is more
-general than a linear model, so a wider class of blocks can be
-represented. We will not discuss general state-space models any
-further in this paper, therefore we will write state-space instead
-of linear state-space for conciseness.
-
-    Suppose we have the following state-space model:
-\starteqnstar
-\vec{\mathbf{y}} & = & \left [ \begin{array} {cc} 11 & 12
-\end{array} \right ] \vec{\mathbf{x}} + \left [ \begin{array} {ccc} 13 & 14 & 15 \end{array} \right
- ] \vec{\mathbf{u}} \\
-\vec{\dot{\mathbf{x}}} & = & \left [ \begin{array} {cc} 1 & 2 \\ 6
-& 7 \end{array} \right ] \vec{\mathbf{x}} + \left [ \begin{array} {ccc} 3 & 4 & 5 \\
-8 & 9 & 10 \end{array} \right ] \vec{\mathbf{u}}
-\doneeqnstar
-
-\begin{singlespace}
-\vspace{-12pt}
-\begin{scriptsize}
-\begin{verbatim}
-    int -> int pipeline Main() {
-      add Source();  // code for Source not shown
-      add IIR();
-      add Output();  // code for Output not shown
-    }
-
-    int -> int filter IIR() {
-      int x1, x2;
-      work push 1 pop 3 peek 3 {
-        int x1_temp, x2_temp;
-	// pop inputs
-	int u1 = pop();
-	int u2 = pop();
-	int u3 = pop();
-	// push result
-        push(11*x1 + 12*x2 + 13*u1 + 14*u2 + 15*u3;
-	// update state
-        x1_temp = 1*x1 + 2*x2 + 3*u1 + 4*u2 + 5*u3;
-        x2_temp = 6*x1 + 7*x2 + 8*u1 + 9*u2 + 10*u3;
-        x1 = x1_temp;
-        x2 = x2_temp;
-      }
-    }
-\end{verbatim}
-\end{scriptsize}
-\vspace{-12pt}
-\end{singlespace}

@@ -68,13 +68,14 @@ inputs, and outputs is the same, so $s$, $o$, and $u$ are
 unchanged.
 
 \mysubsection{State Removal}
+\label{sec:state-removal}
 
-    There are two types of states that can be removed from a state-space system
-without changing its behavior - unreachable and unobservable
-states. Informally, unreachable states are unaffected by inputs
-and unobservable states have no effect on outputs. More formally,
-the set of states in a system can be divided into reachable and
-unreachable states where:
+    There are two types of states that can be removed from a
+state-space system without changing its behavior: unreachable and
+unobservable states. Informally, unreachable states are unaffected by
+inputs and unobservable states have no effect on outputs. More
+formally, the set of states in a system can be divided into reachable
+and unreachable states where:
 \begin{enumerate}
 \vspace{\itemshrink} \item The unreachable states are not updated by any of the
 reachable states.
@@ -113,25 +114,24 @@ unobservable states can be removed from a representation
 
     A simple algorithm to isolate the unreachable and unobservable
 states in a system by use of transformations is explained in
-\cite{Mayne}. The algorithm works as follows: Perform row
+\cite{Mayne}. The algorithm works as follows: perform row
 operations on the augmented matrix $\left [ \begin{array} {cc}
 \mathbf{A} & \mathbf{B} \end{array} \right ]$ to put it into a
-type of row-echelon form\footnote{A matrix is in standard
-row-echelon form if the first non-zero entry in each row is a 1
-(called the leading 1) and the leading 1 in a higher row is to the
-left of the leading 1 in a lower row. For our type of row-echelon
-form, the \emph{last} non-zero entry in each row is a 1 (call it
-the ending 1) and the ending 1 in a higher row is to the left of
-the ending 1 in a lower row.}, and perform the corresponding
-inverse column operations on $\mathbf{A}$ and $\mathbf{C}$ to keep
-the system equivalent to the original (Performing a row operation
-on a matrix is equivalent to left multiplying it by some
-invertible matrix, and performing a column operation on a matrix
-is equivalent to right multiplying it by some invertible matrix).
-Once the augmented matrix is in the desired form, row $i$ of the
-combined matrix represents an unreachable state if there are no
-non-zero entries past the $i^{th}$ column. For unobservable
-states, the combined matrix $\left [ \begin{array} {cc}
+type of row-echelon form\footnote{A matrix is in standard row-echelon
+form if the first non-zero entry in each row is a 1 (called the
+leading 1) and the leading 1 in a higher row is to the left of the
+leading 1 in a lower row. For our type of row-echelon form, the
+\emph{last} non-zero entry in each row is a 1 (call it the ending 1)
+and the ending 1 in a higher row is to the left of the ending 1 in a
+lower row.}, and perform the corresponding inverse column operations
+on $\mathbf{A}$ and $\mathbf{C}$ to keep the system equivalent to the
+original. (Performing a row operation on a matrix is equivalent to
+left multiplying it by some invertible matrix, and performing a column
+operation on a matrix is equivalent to right multiplying it by some
+invertible matrix).  Once the augmented matrix is in the desired form,
+row $i$ of the combined matrix represents an unreachable state if
+there are no non-zero entries past the $i^{th}$ column. For
+unobservable states, the combined matrix $\left [ \begin{array} {cc}
 \mathbf{A}^T & \mathbf{C}^T
 \end{array} \right ]$ is operated on instead.
 
@@ -256,6 +256,7 @@ before. Removing some of these states results in reducing
 computations involving $\mathbf{D}$.
 
 \mysubsection{Parameter Reduction}
+\label{sec:parameter-reduction}
 
     After removing as many states as possible, including input
 states, we want to change the state-space system to one with the
