@@ -13,7 +13,8 @@
     stripes in the light regions represent pipeline stalls.  Our
     partitioning algorithm decreases the granularity of the graph from
     53 unbalanced tiles (original) to 15 balanced tiles (partitioned).
-    \protect\label{fig:beam-blood}}
+    The throughput of the partitioned graph is 11 times higher than
+    the original. \protect\label{fig:beam-blood}}
 \vspace{-12pt}
 \end{figure}
 
@@ -333,38 +334,6 @@ on the first iteration of the splitjoin.  As before, the joiner is a
 roundrobin that has a weight of $push$ for each stream.
 \end{enumerate}
 
-\begin{figure}
-\centering
-\psfig{figure=sync-removal-1.eps,width=3.2in}
-\caption{\protect\small Synchronization removal.  If there are
-neighboring splitters and joiners with matching rates, then the nodes
-can be removed and the component streams can be connected.  The
-example above is drawn from a subgraph of the 3GPP application; the
-compiler automatically performs this transformation to expose
-parallelism and improve the partitioning.  Synchronization removal
-is especially valuable in the context of libraries--many distinct
-components can employ splitjoins for processing interleaved data
-streams, and the modules can be composed without having to synchronize
-all the streams at each boundary.  \protect\label{fig:sync-removal}}
-\vspace{24pt}
-\psfig{figure=splitjoin-split.eps,width=3.2in} 
-\caption{\protect\small Breaking a splitjoin into hierarchical units.
-Though our horizontal fusion algorithms work on the granularity of an
-entire splitjoin, it is straightforward to transform a large splitjoin
-into a number of smaller pieces, as shown here.  Following this
-transformation, the fusion algorithms can be applied to obtain an
-intermediate level of granularity.  This technique was employed to
-help load-balance the \Radar~ application (see Section~\ref{sec:results}).
-\protect\label{fig:splitjoin-split}} 
-\vspace{24pt}
-\psfig{figure=filter-hoisting.eps,width=3.2in} 
-\caption{\protect\small Filter hoisting.  This transformation allows a
-stateless filter to be moved across a joiner node if its $push$ value
-evenly divides the weights of the joiner.
-\protect\label{fig:filter-hoisting}}
-\vspace{-12pt}
-\end{figure}
-
 \subsection{Reordering Transformations}
 
 There are a multitude of ways to reorder the elements of a stream
@@ -377,6 +346,43 @@ identical stateless filters can be pushed through a splitter or joiner
 node if the weights are adjusted accordingly
 (Figure~\ref{fig:filter-hoisting}).  Many of these transformations
 were useful in load balancing our test applications.
+
+\begin{figure}[t]
+\centering
+\psfig{figure=sync-removal-1.eps,width=3.2in}
+\vspace{-1pt}
+\caption{\protect\small Synchronization removal.  If there are
+neighboring splitters and joiners with matching rates, then the nodes
+can be removed and the component streams can be connected.  The
+example above is drawn from a subgraph of the 3GPP application; the
+compiler automatically performs this transformation to expose
+parallelism and improve the partitioning.  Synchronization removal
+is especially valuable in the context of libraries--many distinct
+components can employ splitjoins for processing interleaved data
+streams, and the modules can be composed without having to synchronize
+all the streams at each boundary.  \protect\label{fig:sync-removal}}
+\end{figure}
+
+\begin{figure}[t]
+\centering
+\vspace{12pt}
+\psfig{figure=splitjoin-split.eps,width=3.2in} 
+\caption{\protect\small Breaking a splitjoin into hierarchical units.
+Though our horizontal fusion algorithms work on the granularity of an
+entire splitjoin, it is straightforward to transform a large splitjoin
+into a number of smaller pieces, as shown here.  Following this
+transformation, the fusion algorithms can be applied to obtain an
+intermediate level of granularity.  This technique was employed to
+help load-balance the \Radar~ application (see Section~\ref{sec:results}).
+\protect\label{fig:splitjoin-split}}
+%% \vspace{24pt}
+%% \psfig{figure=filter-hoisting.eps,width=3.2in} 
+%% \caption{\protect\small Filter hoisting.  This transformation allows a
+%% stateless filter to be moved across a joiner node if its $push$ value
+%% evenly divides the weights of the joiner.
+%% \protect\label{fig:filter-hoisting}}
+\vspace{-12pt}
+\end{figure}
 
 \subsection{Automatic Partitioning}
 
