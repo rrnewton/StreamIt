@@ -5,8 +5,8 @@
 
 \section{Stream Dependence Function}
 
-In this section, we describe our model of computation for streams and
-define the stream dependence function, $\sdep$.
+In this section, we describe our model of computation and define the
+stream dependence function, $\sdep$.
 
 Our model of computation is Cyclo-Static Dataflow~\cite{BELP96}.  In
 this model, the stream graph is a directed graph where nodes represent
@@ -87,7 +87,7 @@ executes before the $n$th execution of $Y$.
 It is straightforward to calculate $\sdepf{A}{B}(n)$ via a
 fine-grained simulation of the stream graph.  Our approach is to
 construct an execution $\phi$ that provides the minimum value of
-$|\phi \wedge A|$ that is selected in Equation~\ref{eq:sdepdef}.  We
+$|\phi \wedge A|$ that is selected in Definition~\ref{eq:sdepdef}.  We
 construct $\phi$ by simulating the stream graph's execution of a
 ``pull schedule'' with respect to actor $B$.
 
