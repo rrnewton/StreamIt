@@ -20,6 +20,7 @@ output items, and possible message production and consumption.  The
 interface relies on the $min$ function to specify message timing in
 terms of a stream's input tape.
 
+
 We have evaluated our compiler with StreamIt versions of the following
 applications: 1) A GSM Decoder, which takes GSM-encoded parameters as
 inputs, and uses these to synthesize audible speech, 2) A system from
@@ -75,19 +76,32 @@ GSM Decoder & 3050 & 11 & 21 \\
 %% This application is representative of the core functionality needed by
 %% modern radar, sonar, and communications signal processors.
 
-[add performance table, number of lines of benchmarks?, discussion]
 
 
-To evaluate the performace of our compiler, we compare the StreamIt implementation
-to two other implementations of the applications.  To facilitate
-comparison 
-
-The performance of the compiled code for the above applications is
 
 
-For the GSM
-application, we obtained a hand-coded implementation for comparis 
-given in Table \ref{tab:performance}.  We compare the StreamIt 
+In the Table~\ref{tab:performance}, we evaluate the performace of our
+compiler by comparing the StreamIt implementation against either the
+SpectrumWare implementation or (in the case of GSM) an hand-optimized
+C version.
+The StreamIt compiler is able to beat the SpectrumWare performance by
+a factor of two for the PCA Demo and FM Radio and come within xxx\%
+for hand-optimized perftest4.
+
+For the GSM application, the extensively hand-optimized C version 
+which incorporate many transformations that rely on the high-level
+knowledge of the algorithm, the StreamIt performs an order of
+magnitude slower.  
+
+The StreamIt compiler infrastructure is far from complete. We are in
+the process of discovering all the optimization possibilities in this
+new domain.  We plan to implement many of the important optimizations.
+Our code generation strategy currently has many inefficiencies. In the
+future, we plan to generate optimized assembly code by interfacing
+with a code generator.  We strongly believe that we can improve the
+current performance by at least an order of magniture on
+uniprocessors. And we have yet to take advantage of the inherent data
+and pipeline parallelism in StreamIt programs for parallel execution!
 
 
 
