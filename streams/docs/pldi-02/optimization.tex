@@ -35,35 +35,29 @@ coarse-grained target; the programmer benefits from dividing the
 program into many modular components without losing the performance of
 a single, integrated procedure.
 
-An algorithm for fusing a pipeline of two filters that contain only
-{\tt push} and {\tt pop} statements is given in \cite{pro96}.
-However, in a stream program, it pays to consider not only vertical
-fusion of pipeline constructs, but also horizontal fusion of parallel
-streams in a SplitJoin.  Here we present a transformation on the
-abstract syntax of Section \ref{sec:intalgebra} that merges $n$
-filters $s_1 \dots s_n$ that 
-filters in a 
+An algorithm for fusing a pipeline of two filters that contain only {\tt
+push} and {\tt pop} statements is given in \cite{pro96}.  However, in a
+stream program, it pays to consider not only vertical fusion of pipeline
+constructs, but also horizontal fusion of parallel streams in a
+SplitJoin.  Here we present a transformation on the abstract syntax of
+Section \ref{sec:intalgebra} that collapses a SplitJoin construct
+containing $n$ parallel filters $s_1 \dots s_n$ into a single filter
+$s_c$.  We require that all the filters peek ?????
+\begin{align*}
+Merge[(S~s1~\dots~sn~J)] &= (Filter~push_{sc}~pop_{sc}~peek_{sc}~work_{sc}) \\
+where: push_{sc} &= n*LCM(push_{s1}, \dots, push_{sn}) \\
+       pop_{sc} &= LCM(pop_{s1}, \dots, pop_{sn}) \\
+       peek_{sc} &= 0\\
+       work_{sc} &= f_{sc, 1} \dots f_{sc, push_{sc} - 1} \\
+       f_{sc, j} &= t \ra (i \ra (f_{s~p(j)}(t))(i + splitPath(j)))
+\end{align*}
+where $splitPath$ and $p(i)$ are defined as in Equations
+\ref{eq:splitpath} and \ref{eq:p}, respectively.  We have proven that
+this transformation preserves the meaning of the program with respect to
+our transform algebra for the case when $n = 2$, $w_1 = w_2 = 1$, and
+$S$ is a duplicate splitter.  The proof is by straightforward algebra,
+but we omit it due to space constraints.
 
-We give 
-
-Let's look at merging:
-
-$push_sc = 2*LCM(push_s1, push_s2)$
-$pop_sc = LCM(pop_s1, pop_s2)$
-$peek_sc = ???$
-$f_sc$ = $f_{sc_{j_(input, shift) for j = 1..push_sc-1}}:$
-	
-  if j is even:
-
-$f_sc_j(input, shift) = f_s1_(j/2 % push_s1))_
-			(input,
-			 i -> shift(i)+pop_s1*floor((j/2)/push_s1))$
-
-  if j is odd:
-
-$f_sc_j(input, shift) = f_s2_((j-1)/2 % push_s2)_
-			(input,
-			 i -> shift(i)+pop_s2*floor(((j-1)/2)/push_s2))$
 \subsection{Fission}
 
 filter fission with state propagation

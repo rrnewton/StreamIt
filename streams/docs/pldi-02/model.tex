@@ -212,10 +212,12 @@ every output tape $Oi_S$ of the splitter.  Finally, the minimum number
 of items appearing on the input tape $I_S$ of the splitter is the {\it
 maximum} of the item requirement from any output tape $Oi_S$.  By this
 reasoning, the $min$ function for a SplitJoin is as follows:
-\begin{align*}
-\mi{I_S}{O_J}(x) = MAX_{i \in [1,n]}~(\mi{I_S}{Oi_S} \circ
-\mi{Oi_S}{Ii_J} \circ \mi{Ii_J}{O_J})(x)
-\end{align*}
+\begin{align}
+\label{eq:splitpath}
+\mi{I_S}{O_J}(x) &= MAX_{i \in [1,n]}~splitPath(S, J, i)(x) \\ where
+splitPath(S, J, i) &=\mi{I_S}{Oi_S} \circ \mi{Oi_S}{Ii_J} \circ
+\mi{Ii_J}{O_J}
+\end{align}
 
 \subsubsection{FeedbackLoops}
 \label{sec:timefl}
@@ -565,11 +567,11 @@ J~\in~&JoinType = {RoundRobin}
 s~\in~&Stream = Filter + Pipeline + SplitJoin + FeedbackLoop \\
 &Filter = Push \times Pop \times Peek \times WorkFunction \\
 &Pipeline = Stream^{+} \\
-&SplitJoin = SplitType \times JoinType \times Stream^{+} \\
+&SplitJoin = SplitType \times Stream^{+} \times JoinType \\
 &InitFeedback = Int^{+} \\
 &BodyStream, LoopStream = Stream \\
-&FeedbackLoop = SplitType \times JoinType \times \\
-& \hspace{0.5in} BodyStream \times LoopStream \times InitFeedback
+&FeedbackLoop = JoinType \times BodyStream \times \\
+& \hspace{0.5in} LoopStream \times SplitType \times InitFeedback
 \end{align*}
 \vspace{-18pt}
 \caption{Semantic domains specific to the intermediate algebra.
@@ -629,7 +631,6 @@ WorkFunction = \\
 &i \ra (t \ra f_{PUSH-1}(tape(i - (PEEK-1)), \dots , tape(i -
 0))))
 \end{align*}
-%$f_s(i \% push_s)_(input, i2 -> i2 + pop_s * floor(i / push_s))$)
 
 {\bf Converting from the intermediate algebra}.  To convert back to
 StreamIt, we can perform the inverse of the translation shown above,
@@ -674,12 +675,11 @@ p(i) = MIN(j~s.t.~\sum_{k=0}^{j-1}{w_i} \le i\%W)
 \end{align}
 Now, the $i$'th tape position assumes the value that is produced along
 stream $p(i)$ in the SplitJoin, and the index offset is obtained by
-tracing back from the output of the joiner to the input of the
-splitter:
+tracing back from the output of the joiner to the input of the splitter
+(using $splitPath$ from Equation \ref{eq:splitpath}):
 \begin{align*}
 {\cal S} [(SplitJoin~S~s_1~s_2~\dots~s_n~J)] = \\
-t \ra (i \ra ({\cal S}[s_{p(i)}](t))(
-(\mi{I_S}{Op(i)_S} \circ \mi{Op(i)_S}{Ip(i)_J} \circ \mi{Ip(i)_J}{O_J})(i)))
+t \ra (i \ra ({\cal S}[s_{p(i)}](t))(splitPath(S, J, p(i)))(i))
 \end{align*}
 This completes the formulation of the transform algebra.  Using this
 algebra, we can express the meaning of any StreamIt program as a
