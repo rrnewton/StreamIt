@@ -77,7 +77,7 @@ int main(void) {
     {
       demod[i] = new VrQuadratureDemod<float>(0.0);
       if_filter[i] = new VrRealFIRfilter<float,short>(RFIRdecimate,4000.0,20,1.0);
-      sink[i] = new VrNullSink<short>(1024);
+      sink[i] = new VrNullSink<short>(1);
 
       multi->add(sink[i]);
       // Connect Modules
