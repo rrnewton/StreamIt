@@ -16,7 +16,7 @@
 \catcode`\$=12
 \title{StreamIt Language Specification\thanks{
 This is a pre-release version of this document.\hfil\break\ttfamily
-\hbox{$Id: streamit-lang.tex,v 1.10 2002-11-19 17:26:37 dmaze Exp $}
+\hbox{$Id: streamit-lang.tex,v 1.11 2002-12-06 19:24:52 dmaze Exp $}
 }}
 \catcode`\$=3
 
@@ -291,8 +291,8 @@ filter fields or do other work, but have no access to the filter's
 tapes.
 
 \paragraph{Work functions.}  Work functions are declared using the
-keyword \lstinline|work|, which may be followed by a name.  At most
-one work function may be declared anonymously.  The function name must
+keyword \lstinline|work|, which may be followed by a name.  Exactly
+one work function must be declared anonymously.  The function name may
 be followed by rate declarations, of the form \lstinline|push expr|,
 \lstinline|peek expr|, and \lstinline|pop expr|, in any order.  If the
 peek rate is omitted, it is assumed to be equal to the pop rate; if
@@ -300,7 +300,37 @@ the pop or push rate is omitted, it is assumed to be zero, and the
 corresponding input or output tape type must be \lstinline|void|.  The
 function must push and pop exactly the number of items specified, and
 may peek up to the number of items specified.  All of the rate
-expressions must be compile-time constant.
+expressions must be compile-time constant.  Named work functions must
+include rate declarations; anonymous work functions may omit them, as
+described below.
+
+\paragraph{Phases.}  If the anonymous work function does not have rate
+declarations, it may not perform \lstinline|push| and \lstinline|pop|
+operations directly.  However, it may call other named work functions
+which do have these rates declared.  Each of these child work
+functions is executed as a \emph{phase}: the runtime system ensures
+that, when a work function is called, its \lstinline|peek| and
+\lstinline|pop| rates are satisfiable, even if other filters need to
+run for later phases to execute.  Beyond this special use, work
+functions may not be directly called.  For example:
+
+\begin{lstlisting}{}
+int->int filter BlockReader {
+  // Each block has a 4-int header, 24 ints of data,
+  // and a 4-int footer.
+  work {
+    readHeader();
+    for (int i = 0; i < 24; i++)
+      echoData();
+    readFooter();
+  }
+  work readHeader pop 4
+     { pop(); pop(); pop(); pop(); }
+  work echoData pop 1 push 1 { push(pop()); }
+  work readFooter pop 4
+     { pop(); pop(); pop(); pop(); }
+}
+\end{lstlisting}
 
 \paragraph{Helper functions.}  A helper function performs some
 auxiliary bit of computation, and may be called from the init function
@@ -502,11 +532,14 @@ omitted.  The semicolon that normally ends the \lstinline|add|,
 case.
 
 \begin{lstlisting}{}
-complex->float feedbackloop FeedbackMagnitude(float scaling)
-{
+complex->float feedbackloop FeedbackMagnitude
+    (float scaling) {
   join roundrobin;
-  body filter {
-    work pop 2 push 1 { push(abs(peek(0) * peek(1))); pop(); pop() }
+  body complex->float filter {
+    work pop 2 push 1 {
+      push(abs(peek(0) * peek(1)));
+      pop(); pop();
+    }
   };
   loop pipeline {
     add FloatScaler(scaling);
@@ -819,7 +852,9 @@ stream, two to the second, and so on.  \lstinline|roundrobin(2, 4, 2)|
 requires there to be exactly three children, and sends two to the
 first child, four to the second, and two to the third.  A round-robin
 weight may be 0; in this case, the child input must be of type
-\lstinline|void|.
+\lstinline|void|.  A \lstinline|roundrobin(0)| splitter on a
+split-join means that no children take any input, and the input type
+of the entire split-join is \lstinline|void|.
 
 \lstinline|roundrobin| joiners are identical to \lstinline|roundrobin|
 splitters, except that they read from the input tapes in the specified
@@ -855,10 +890,12 @@ shown in figure \ref{fig:built-in-streams}.
 template<T> T->T filter Identity {
   work pop 1 push 1 { push(pop()); }
 }
-template<T> void->T filter FileReader(string filename) {
+template<T> void->T filter FileReader
+    (string filename) {
   work push 1 { /* Implementation defined */ }
 }
-template<T> T->void filter FileWriter(string filename) {
+template<T> T->void filter FileWriter
+    (string filename) {
   work pop 1 { /* Implementation defined */ }
 }
 \end{lstlisting}
@@ -921,21 +958,6 @@ int->int filter SquareIt {
 }
 \end{lstlisting}
 
-\subsection{Multi-Phase Filters}
-
-The syntax described above allows a filter to declare multiple work
-functions, but it is unspecified how one is chosen.  The intent is
-that the init function will use an \lstinline|exec| keyword or
-something similar to pick a named work function.  Work functions can
-then use the same \lstinline|exec| keyword to change to a different
-``phase'' of execution.
-
-The exact syntax of phased filters is currently under discussion.  It
-is considered desirable to have both statically-scheduled phases,
-where each phase executes a fixed number of times, and
-dynamically-scheduled phases, where the number of executions can
-depend on the input.
-
 \subsection{Messaging}
 
 The early StreamIt papers mentioned the ability to send messages from
@@ -971,10 +993,12 @@ float->float filter VolumeControl {
   float amplification;
   init { amplification = 1.0; }
   work pop 1 push 1 { push(pop() * amplification); }
-  handler setAmplification(float val) { amplification = val; }
+  handler setAmplification(float val)
+    { amplification = val; }
 }
 
-float->float filter VolDetect(Portal<VolumeControl> vol) {
+float->float filter VolDetect
+    (Portal<VolumeControl> vol) {
   work pop 1 push 1 {
     float val = pop();
     if (/* detected */)
@@ -989,6 +1013,21 @@ float->float pipeline Volume {
   add_register vol VolumeControl();
 }
 \end{lstlisting}
+
+\subsection{Reinitialization}
+
+We might occasionally want to change parts of the stream graph at
+runtime, or to change the static parameters of the program.  This is a
+major effort the way StreamIt code is currently constructed.  The CC
+paper proposed sending an \lstinline|init| message through a portal to
+perform reinitialization; this would result in the targets'
+\lstinline|init| functions being re-run.
+
+This is simple enough for filters, though some state in the filter may
+be lost that reinitialization would want to be preserved.  What
+happens for composite streams, though?  Are their children destroyed
+and reborn, or are individual children added and removed?  What syntax
+is necessary for this?
 
 \subsection{Variable Rates}
 
@@ -1006,10 +1045,47 @@ filter, since a filter might read four bytes of input and produce
 between two and sixteen bytes of output; having this information can
 assist the scheduler.
 
-\subsection{Reinitialization}
+\subsection{Static Control Flow and Dynamic Phases}
 
-Nobody understands how this should work at all, but it seems like it
-should be mentioned.
+This document should contain a discussion of the notion of
+\emph{static control flow}.  This is essentially a requirement that
+the path through a given control flow graph is determinable at compile
+time; loops can be fully unrolled, and every branch can be
+determined.  This extends the concept of compile-time constancy
+already covered.
+
+This would allow us to refine the current description of phases.  In
+particular, we want the current phase specification to be entirely
+specified by static control.  As a future extension, the control flow
+can be dynamic, to allow data-dependent phase execution.  This can be
+used to implement some forms of dynamic-rate filters.  For example:
+
+\begin{lstlisting}{}
+// Format: #reps, #bytes, data
+byte->byte filter RLEExpand {
+  byte data[256];
+  int reps, count;
+  work {
+    readReps();
+    readCount();
+    for (int i = 0; i < count; i++)
+      readData(i);
+    for (int i = 0; i < reps; i++)
+      writeData(count);
+  }
+  work readReps pop 1 { reps = pop(); }
+  work readCount pop 1 { count = pop(); }
+  work readData(int pos) pop 1 { data[pos] = pop(); }
+  work writeData() push count {
+    for (int i = 0; i < count; i++)
+      push(data[i]);
+  }
+}
+\end{lstlisting}
+
+Note that the number of executions of the \lstinline|readData| and
+\lstinline|writeData| phases are data-dependent, as is the
+\lstinline|push| rate of \lstinline|writeData|.
 
 \section{Implementation Limits}
 
@@ -1020,12 +1096,11 @@ The following limits apply to the current implementation of StreamIt:
   statement in a work function should not contain more than a single
   \lstinline|pop()|, and if contains any \lstinline|pop()|s at all, it
   should contain no \lstinline|peek()|s.
-
+  
 \item The names \lstinline|SplitJoin|, \lstinline|FeedbackLoop|,
-  \lstinline|Filter|, \lstinline|Pipeline|, \lstinline|StreamIt|,
-  \lstinline|Complex|, and \lstinline|data| are reserved.  Certain
-  variable names beginning with underscores may cause conflicts if
-  used as local variables.
+  \lstinline|Filter|, \lstinline|Pipeline|, \lstinline|StreamIt|, and
+  \lstinline|Complex| are reserved.  Certain variable names beginning
+  with underscores may cause conflicts if used as local variables.
 
 \end{itemize}
 
