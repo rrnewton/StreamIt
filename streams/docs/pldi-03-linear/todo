@@ -1,6 +1,24 @@
 to add to paper:
 ---------------
 
+- add figure illustrating vertical, horizontal cuts?
+
+- say somewhere what method we use for the implementation of the
+matrix multiplies?
+
+- list under future work or extensions?
+
+  - detecting FFT matrix in existing code and using it as part of
+    analysis -- e.g. to move something from a different module INSIDE
+    an existing frequency domain region
+
+  - to transform frequency nodes with pop>1, just transform to pop==1
+    and follow by a decimator.
+
+- decide what to do regarding saying that we don't implement frequency
+  transforms for pop>1
+
+
 for Andrew to do:
 ------
 - in splitjoin and pipeline combo figures, we should label the (a)

@@ -6,7 +6,8 @@
 
 \begin{figure}[t]
   \psfig{figure=images/part-algorithm2.eps,width=3.5in}
-  \caption{Type declarations for code in Figure~\ref{fig:part-alg}.}
+  \caption{Type declarations for code in Figure~\ref{fig:part-alg}.
+  \protect\label{fig:part-decl}}
 \end{figure}
 
 %% \begin{figure}[t]
@@ -28,6 +29,8 @@ relevance of each of these problems, and we present an effective
 selection algorithm that relies on dynamic programming to quickly
 explore a large space of possible configurations.
 
+\subsection{The Selection Problem}
+
 First, the selection of optimizations for a given stream graph can
 have a large impact on performance.  As alluded to in
 Section~\ref{sec:combine}, linear combination can increase the number
@@ -42,8 +45,8 @@ RateConverter benchmark, in which three filters could be combined, but
 it is better to combine only two in order to enable a frequency
 transformation (see Figure~\ref{fig:rategraph}).
 
-Second, the arrangement of the stream graph can directly effect the
-set of transformations that can be applied.  Since our transformations
+Second, the arrangement of the stream graph can dictate which
+transformations are possible to apply.  Since our transformations
 operate on an entire {\tt pipeline} or {\tt splitjoin} construct, the
 graph often needs to be refactored to put linear nodes in their own
 hierarchical unit.  For example, in our TargetDetect benchmark, we can
@@ -51,59 +54,93 @@ divide the {\tt splitjoin} into two pieces and collapse the top piece
 before converting to the frequency domain, thereby amortizing the cost
 of the FFT on the input items (see Figure~\ref{fig:targetgraph}).
 
-\subsection{Dynamic Programming Algorithm}
+\subsection{Dynamic Programming Solution}
 
 Our optimization selection algorithm automatically derives both of the
 example transformations described above.  The algorithm works by
-estimating the minimum cost for each structure in the stream graph.
-The minimum cost represents the best of three configurations: 1)
-collapsed and implemented in the time domain, 2) collapsed and
-implemented in the frequency domain, and 3) uncollapsed and
-implemented as a hierarchical unit.  The cost functions for the
-collapsed cases are guided by profiler feedback, as described below.
-For the uncollapsed case, the cost is the sum of each child's minimum
-cost.  However, instead of considering the children directly, the
-children are refactored into many different configurations, and the
-cost is taken as the minimum over all configurations.  This allows the
-algorithm to simultaneously solve for the best set of transformations
-and the best arrangement of the stream graph.
+estimating the minimum cost for each structure in the stream graph
+(see Figure~\ref{fig:part-alg}).  The minimum cost represents the best
+of three configurations: 1) collapsed and implemented in the time
+domain, 2) collapsed and implemented in the frequency domain, and 3)
+uncollapsed and implemented as a hierarchical unit.  The cost
+functions for the collapsed cases are guided by profiler feedback, as
+described below.  For the uncollapsed case, the cost is the sum of
+each child's minimum cost.  However, instead of considering the
+children directly, the children are refactored into many different
+configurations, and the cost is taken as the minimum over all
+configurations.  This allows the algorithm to simultaneously solve for
+the best set of transformations and the best arrangement of the stream
+graph.
 
-The key to the algorithm's efficiency is its 
+The key to the algorithm's efficiency is the manner in which it
+considers refactoring the children of hierarchical nodes.  Instead of
+considering arbitrary arrangements of the stream graph, it considers
+only {\it rectangular} partitions, in which a given {\tt splitjoin} is
+divided into two child splitjoins by either a vertical or horizontal
+cut.  This approach works well in practice, because {\tt splitjoin}s
+often have symmetrical child streams in which linear components can be
+separated by a horizontal line (such as TargetDetect, in
+Figure~\ref{fig:targetgraph}).  Moreover, as the child splitjoins are
+decomposed and evaluated, there are overlapping sub-problems that
+enable us to search the space of child configurations in polynomial
+time, using dynamic programming.
 
-In order to consider multiple arrangements of the stream graph, the
-algorithm considers many alternative arrangements of the children when
-it performs this sum.  The cost for the uncollapsed case is then taken
-as the minimum across all possible arrangements of the children.
+Pseudocode for our optimization selection algorithm appears in
+Figures~\ref{fig:part-alg} and~\ref{fig:part-decl}.  The algorithm
+works as described above, using the {\tt memoTable} array to keep
+track of the lowest-cost configuration for each rectangular section of
+a hierarchical stream.  An important aspect of the algorithm that is
+not explicit in the pseudocode is the translation from a StreamIt
+graph to a set of hierarchical {\tt Stream} objects.  In particular,
+each {\tt Stream} corresponds only to a {\tt pipeline}; adjacent {\tt
+splitjoin} objects are wrapped in a {\tt pipeline} and their children
+are considered direct children of the {\tt pipeline}.  This enables
+different parts of neighboring {\tt splitjoins} to be combined.
+However, it implies that a {\tt Stream} might have a different width
+at different points (since neighboring {\tt splitjoin}s could have
+differing widths); this necessitates the {\tt width} array in
+Figure~\ref{fig:part-alg}.
 
-ALGORITHM
+Also ommitted from the pseudocode are the functions {\tt
+getDirectCost} and {\tt getFrequencyCost} that estimate a node's
+bexecution time if implemented in the time domain or the frequency
+domain.  These cost functions could be tailored to a specific
+architecture and code generation strategy.  For example, if there is
+architecture-level support for convolution operations, then this would
+effect the cost for certain dimensions of matrices; similarly, if a
+matrix multiplication algorithm was available that exploited symmetry
+or sparsity in a matrix, then this benefit could be detected where it
+would apply.  In our implementation, we use simple versions of the
+cost functions (let $A$ and ${\vec b}$ denote the linear
+representation for stream $s$):
+\[
+\begin{array}{rcl}
+\mt{getDirectCost}(s) \hspace{-6pt} & = \hspace{-6pt} & 1 + 3 * |\{ (i,j)~s.t.~A_{i,j} \ne 0\}| \vspace{3pt} \\ 
+ ~ & ~ & \hspace{6.8pt}+~|\{ i~s.t.~{\vec b}_i \ne 0 \}| \\ ~ & ~ & ~ \\
+%%\mt{getDirectCost}(s) \hspace{-6pt} & = \hspace{-6pt} & 1 + 3 * (\mt{rows}(A) * \mt{cols}(A) - \mt{numZeros}(A)) \\ ~ & ~ & ~~~+cols({\vec b}) - numZeros({\vec b}) \\
+\mt{getFrequencyCost}(s)  \hspace{-6pt} & = \hspace{-6pt} & \frac{1}{50}~(4 * \mt{rows}(A) * \mt{cols}(A) + \mt{rows}(A))
+\end{array}
+\]
+That is, for the direct cost, we count the number of multiplies and
+adds required to perform the matrix multiplication, giving more weight
+to the multiplies since they are more expensive.  We do not count the
+zero entries of the arrays, since our matrix multiply routines take
+advantage of the sparsity of the matrix.  We also add $1$ to represent
+the overhead of the push and pop operations of the node.  For the
+frequency cost, we count the total number of operations in a direct
+matrix multiply, since zero entries cannot be exploited in the
+frequency domain.  We also add $\mt{rows}(A)$ to represent the cost of
+performing the FFT on the input elements.  Then, we discount this sum
+by a factor of 50, as our measurements indicate that the frequency
+implementation performs 50 times higher than a direct matrix multiply
+(independent of the size of the matrix.)  Of course, both of these
+cost functions are undefined if $s$ is non-linear (or, for {\tt
+getFrequencyCost}, if $s$ pops more than 1); if this is the case, then
+the optimization selection algorithm considers its cost as infinite.
 
-- intuitive explanation
+%% OPTIMIZING EXECUTION
 
-- reference to pseudocode
-
-COST FUNCTION
-
-we consider:
-  - when/where a frequency transformation is possible
-  - number of multiplies and adds (takes into account zeros, ones)
-  - fact that frequency must operate on whole size of matrix
-  - profiling feedback to get factor of 50
-
-one could also consider:
-
-  - efficacy of matrix multiply on a given node
-    - architectural support for FIR operations
-    - size of matrix; caching effects
-    - symmetry or sparseness of matrix that could lead to more efficient implementation
-
-  - overhead of runtime system
-    - size of stream graph
-    - number of splitters and joiners
-    - on parallel system, could be additional load balancing issues
-
-OPTIMIZING EXECUTION
-
-can identify rectangles of stream graph that are equivalent, and use this to:
- - save on computing linear node representation
- - save on computing partitioning of childre
- - automatically compute closed form for some linear sections
+%% can identify rectangles of stream graph that are equivalent, and use this to:
+%%  - save on computing linear node representation
+%%  - save on computing partitioning of childre
+%%  - automatically compute closed form for some linear sections
