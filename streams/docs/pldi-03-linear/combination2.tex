@@ -9,13 +9,13 @@ of the filters are linear.  This transformation can automatically
 eliminate redundant computations in linear sections of the stream
 graph, thereby allowing the programmer to write simple, modular
 filters and leaving the combination to the compiler.  In this section,
-we first describe a {\it linear expansion} operation that is needed to 
-match the sizes of $A$ and $\vec{b}$ of different linear nodes and 
-is therefore an essential building block for the other combination 
-techniques.  We then give rules for collapsing pipelines and 
-splitjoins into linear nodes; we do not deal with feedbackloops 
-as they require the notion of ``linear state'' which we do 
-not describe here.
+we first describe a {\it linear expansion} operation that is needed to
+match the sizes of $A$ and $\vec{b}$ of different linear nodes and is
+therefore an essential building block for the other combination
+techniques.  We then give rules for collapsing pipelines and
+splitjoins into linear nodes; we do not deal with feedbackloops as
+they require a notion of ``linear state'', which we do not describe
+here.
 
 \subsection{Linear Expansion}
 
@@ -57,8 +57,10 @@ every execution of $F_2$.
 
 Consequently, when we combine hierarchical structures into a linear
 node, we often need to {\it expand} a matrix representation to
-represent multiple executions of the corresponding stream.  This
-expansion can be done as follows.
+represent multiple executions of the corresponding stream.  Expansion
+allows us to multiply matrices and interleave columns from matrices
+that originally had mismatching dimensions.  The transformation can be
+done as follows.
 
 % NOT TRUE ANYMORE
 %% If we expand a linear node by a factor of $k$, then one execution of
@@ -276,11 +278,11 @@ verified by the StreamIt semantic checker.
 \vspace{-12pt}
 \end{figure}
 
-Our analysis distinguishes between two cases. For duplicate
-splitters, we directly construct a linear node from the child streams.
-For roundrobin splitters, we translate the splitjoin to use a
-duplicate splitter and then rely on the first transformation to construct 
-the overall linear node.  We describe these translations below.
+Our analysis distinguishes between two cases. For duplicate splitters,
+we directly construct a linear node from the child streams.  For
+roundrobin splitters, we translate the splitjoin to use a duplicate
+splitter and then rely on the transformation for duplicate splitters.
+We describe these translations below.
 
 \subsubsection{Duplicate Splitter}
 
@@ -358,30 +360,30 @@ The final phase of the transformation is to re-arrange the columns of
 the child matrices into the columns of $A'$ and $\vec{b}'$ such that
 the order of the columns of $A$ generates the correct output value
 order.  Though the equations are somewhat cumbersome, the concept is
-simple (see Figure~\ref{fig:splitjoin-duplicate-matrix}):
-for the $k$th child and the
-$m$th cycle of the joiner, the $p$th item that is pushed by child $k$
-will appear at a certain location on the joiner's output tape.  This
-location (relative to the start of the node's execution) is $p + m *
-\mt{wSum}_n + \mt{wSum}_k$, as the reader can verify.  But since the
-right-most column of each array $A$ holds the formula to compute the 
-first item pushed, we need to subtract this location from the width 
-of $A$ when we are re-arranging the columns. The width of $A$ is the 
-total number of items pushed---$u'$ in the case of $A'$ and $u_k^e$ 
-in the case of $A_k^e$.  Hence the equation as written above: we copy 
-all items in a given column from $A_k^e$ to $A'$, defining each location 
-in $A'$ exactly once.  The procedure for $\vec{b}$ is analogous.
+simple (see Figure~\ref{fig:splitjoin-duplicate-matrix}): for the
+$k$th child and the $m$th cycle of the joiner, the $p$th item that is
+pushed by child $k$ will appear at a certain location on the joiner's
+output tape.  This location (relative to the start of the node's
+execution) is $p + m * \mt{wSum}_n + \mt{wSum}_k$, as the reader can
+verify.  But since the right-most column of each array $A$ holds the
+formula to compute the first item pushed, we need to subtract this
+location from the width of $A$ when we are re-arranging the
+columns. The width of $A$ is the total number of items pushed---$u'$
+in the case of $A'$ and $u_k^e$ in the case of $A_k^e$.  Hence the
+equation as written above: we copy all items in a given column from
+$A_k^e$ to $A'$, defining each location in $A'$ exactly once.  The
+procedure for $\vec{b}$ is analogous.
 
-Finally, it remains to calculate the peek, pop and push rates of the
-combined node.  The peek rate $e'$ is simply $maxPeek$, which we
-defined to be equivalent for all the expanded child nodes.  The push
-rate $\mt{joinRep}*\mt{wSum}_n$ is equivalent to the number of items
+It remains to calculate the peek, pop and push rates of the combined
+node.  The peek rate $e'$ is simply $maxPeek$, which we defined to be
+equivalent for all the expanded child nodes.  The push rate
+$\mt{joinRep}*\mt{wSum}_n$ is equivalent to the number of items
 processed through the joiner in one steady-state execution.  Finally,
 for the pop rate we rely on the fact that the splitjoin is well-formed
 and admits a schedule in which no buffer grows without bound.  If this
 is the case, then the pop rates must be equivalent for all the
 expanded streams; otherwise, some outputs of the splitter would
-accumulate infinitely on the input channel of some stream.  
+accumulate infinitely on the input channel of some stream.
 
 \begin{figure}[t]
 \center

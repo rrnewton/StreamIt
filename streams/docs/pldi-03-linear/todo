@@ -1,104 +1,68 @@
-to add to paper:
----------------
+high priority
+------------
 
----- bill todo
+- to strengthen intro and conclusion:  say there's no need for expert DSP programmer
+  - fix intro to be less language-centric, and more linear-centric
+
+- add new cost functions, as they appear in the compiler
+
+- take care of whatever needs to change for the implementation of the new multiple-pop strategy
+  - either that, or say that we only implement the pop==1 case
+
+- have a pass at the results section
+
+- typesetting of figures:
+  - a lot of them look big, black, ugly
+  - make stream structure example look cleaner
+  - make eps bounding box ratio constant
+
+- in splitjoin and pipeline combo figures, we should label the (a)
+  original, (b) expanded, and (c) collapsed versions.  Also label
+  generally what's going on (could use andrew's commented out in combination2.tex)
+
+- add figures to partitioning section
+  - places where partitioning does much better
+  - illustrate vertical, horizontal cuts?
 
 - add acknowledgements
-- some figures are ugly -- too big, too black
-- to strengthen intro and conclusion:  say there's no need for expert DSP programmer
-- add figures for partitioning stuff
-- give number for how much is improving due to just frequency conversion
+
 - at beginning of results, say what we have implemented on the compiler side (also the place to say the pop restriction)
-- in freq, * figure for all of a matrix column shouldn't be the same as * figure for convolution!
-- once figured out how to label an equation, refere to "truth of claim 1" follows in frequency section
-- do like andrew did and put a point of hspace between {\vec y} and the brackets everywhere
-- some absolute references, e.g. transformation 5
-- the for loops in the frequency transformation -- half of them are in {\tt }, half of them are in math
-- fix intro to be less language-centric, and more linear-centric
+
+medium priority
+---------------
+
+- highlight different keywords in the partitioning pseudocode
+
 - possibly move the reference the combination examples to further forward in the combination section?
-- fix captions on combination examples -- should label exactly what's going on (could use andrew's commented out in combination2.tex)
-- put the little doo-hickeys on "naive"
-- the label is still wrong on equation "5.1" -- referencing section instead of equation number
-- verify that frequency transformation does the right thing with "m" variable when pop>1 (m isn't actually counting pop, or push, is it?)
-- refer to A[*,0] from the frequency implementation page
 
-- once this is said and done, remove linearreplacecalculator -- calls childcost.plus, which is wrong
+- the for loops in the frequency transformation -- half of them are in {\tt }, half of them are in math
 
----- end bill todo
+- do like andrew did and put a point of hspace between {\vec y} and the brackets everywhere
 
-- change results graphs to reference "autoselect", not partition
+- in freq, * figure for all of a matrix column shouldn't be the same as * figure for convolution!
 
-- add number for improvement of FFTW on combined nodes over FFTW on
-individual nodes?
-
-- add figure illustrating vertical, horizontal cuts?
+- add somewhere:  can detect fft and move things into frequency region
+  - or implement FFT the best way for architecture
 
 - say somewhere what method we use for the implementation of the
-matrix multiplies?
+  matrix multiplies?
 
-- list under future work or extensions?
+- give feel for how much frequency conversoin is helping 
+  - compare combined nodes vs. non-combined nodes
+  - also how much FFTW is working
 
-  - detecting FFT matrix in existing code and using it as part of
-    analysis -- e.g. to move something from a different module INSIDE
-    an existing frequency domain region
+low priority
+------------
+- some absolute references, e.g. transformation 5
 
-  - to transform frequency nodes with pop>1, just transform to pop==1
-    and follow by a decimator.
+- make the bibliography consistent
 
-- decide what to do regarding saying that we don't implement frequency
-  transforms for pop>1
+- fix all overfull hboxes
 
-- fix all the overfull h-boxes at some point
+- emphasize that we don't count zeros (and esp, this is important in
+  splitjoin combination.  could add to splitjoin combo section that
+  the zeros will disappear.
 
-for Andrew to do:
-------
-- in splitjoin and pipeline combo figures, we should label the (a)
-  original, (b) expanded, and (c) collapsed versions
-
-- i think some typesetting could also be improved... e.g. labels of
-  splitter, joiner in the first stream graph (fig 6) could be centered
-  vertically better
-
-- also, if we have time, a nice touch with figures is to make the font
-  size consistent between them.  otherwise it looks kind of
-  sloppy... the way I've done this before is to save in the same point
-  size from illustrator, then to open the .eps file and see the size of
-  the bounding box in pixels.  Pick a constant ratio between the size of
-  the figure in inches on the page, and its size in pixels, and then
-  adjust all the sizes in latex appropriately.
-
-- This is a low-priority pain, but bibliography could use some
-  uniformizing.  For example, we reference PLDI in three completely
-  different ways.
-
-- I'm unclear about a number of things in the frequency section.  I
-  think we need to make it more clear what class of filters we
-  transform, and why.  Should define "convolutional filter" if that
-  word has any meaning.  It'd be nice to describe the algorithm for 
-  transforming matrices, not just column vectors, if possible.
-
-------
-
-- make clear what domain of inputs the frequency conversion will work
-  on (what is a convolutinoal filter?  use it a lot w/o definition.)
-
-- describe partitioning stuff (Bill)
-- updated numbers (with new benchmarks?)
-  - resolve Beamformer numbers
-- editing / proofreading
-
-Andrew's distallation of todo items (that are not already fixed) from reviewers:
-- Make stream graphs easier to read / lay them out better
-  - Perhaps show the various stream graphs for a single application (and point
-    readers to the web/thesis for the stream graphs of the other benchmarks.
-- Add examples of frequency transformation (don't know how to do this)
-- More benchmarks
-- Include measurements of code size and data size for before/after transformed programs
-- Doesn't like sampling conversion rate of 2/3. Results will get better for larger rates,
-	should I change it? 441/220 (downsample from CD to MP3 rates) perhaps?
-	(I don't think so...)
-- Address the concern of extra work being incurred by the zeros introduced
-	in splitjoin combination.
 - Possibly add the comments of the fourth reviewer:
 	"More technically, what I found most interesting about the paper is
 	that in order to perform the optimization, the optimizer first
@@ -106,71 +70,23 @@ Andrew's distallation of todo items (that are not already fixed) from reviewers:
 	an affine transformer) which then serves as a clean representation for
 	the filter transformations."
 
-Done
-------------
-- Possibly make more clear that "pushcount" and "popcount" are not simply counters but
-	are used to generate the linear nodes. 
-* Added a sentence to dataflow2.tex that says "The values of  $\mt{pushcount}$ and 
-	$\mt{popcount}$ when a push or pop is encountered are used to determine the 
-	appropriate locations within $A$ and ${\vec b}$."
-------------
-- Include some background on filters and their transformations. I wrote something
-	like this for my thesis. Perhaps we can include it in the paper (in shortened form)
-* There is a reasonable discussion of the topics of FIR filtering in the introduction to the Translation
-	to Frequency section. I think that this is more or less enough information to understand the
-	frequency transformation. I don't think that we need a more general introduction.
-------------
-- Cite Andrew's thesis for more details.
-------------
-- Add examples of combination rules
-------------
-- looks like the vector symbol goes funky (looks curvy) on b when it
-  is in bold. 
-* It was -- you need to do \vec{\mathbf{b}} instead of \mathbf{\vec{b}}. Go figure.
-------------
-- fig 9, some of the fonts are too small [esp. the (e'- (e+o*....) section]
-* made it bigger
-------------
+- look at reviewer's comments again
 
-
-
-
-to get more todo items:
------------------------
-- read paper carefully
-
-
-
-
-
-
-
-high priority
--------------
-
-- bill is confused with definitions of multiplication scaling
-
-- > >- In 5.2, when you talk about generating a new stream that uses more
-  > >   inputs, can you pose this in terms of the "expand" operation?
-  > 
-  > Can you help me with this? The other thing that is a little worrying about 
-  > the whole thing is that the transformation thing makes almost no mention of 
-  > linear nodes (only a passing comment in the intro).
-
-- note that we require a certain minimum value of e in the expansion
-process!
-
-low priority
-------------
-
-- make it explicit somewhere that whenever we introduce \lambda_x, we
-also introduce A_x, b_x, e_x, o_x, u_x.
+- make sure it's clear what multiplication removal means
 
 probably not doing
 ------------------
 
-- say more about when linear combination is a good thing?  I think the
-statement with the sum of non-zero elements is not entirely accurate.
+- make it explicit somewhere that whenever we introduce \lambda_x, we
+  also introduce A_x, b_x, e_x, o_x, u_x.
+- More benchmarks
+- Include measurements of code size and data size for before/after transformed programs
+- Add examples of frequency transformation (don't know how to do this)
+- Doesn't like sampling conversion rate of 2/3. Results will get better for larger rates,
+	should I change it? 441/220 (downsample from CD to MP3 rates) perhaps?
+	(I don't think so...)
 
-- Possibly compare to hand optimized (eg frequency transformations and all) code.
+todo after PLDI
+---------------
+- remove linearreplacecalculator -- calls childcost.plus, which is wrong
 

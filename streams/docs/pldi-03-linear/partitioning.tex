@@ -57,22 +57,21 @@ of the FFT on the input items (see Figure~\ref{fig:targetgraph}).
 
 \subsection{Dynamic Programming Solution}
 
-Our optimization selection algorithm, shown in Figures~\ref{fig:part-alg} 
-and \ref{fig:part-decl}
-automatically derives both of the example transformations described above.  
-The algorithm works by estimating the minimum cost for each structure 
-in the stream graph. The minimum cost represents the best
-of three configurations: 1) collapsed and implemented in the time
-domain, 2) collapsed and implemented in the frequency domain, and 3)
-uncollapsed and implemented as a hierarchical unit.  The cost
-functions for the collapsed cases are guided by profiler feedback, as
-described below.  For the uncollapsed case, the cost is the sum of
-each child's minimum cost.  However, instead of considering the
-children directly, the children are refactored into many different
-configurations, and the cost is taken as the minimum over all
-configurations.  This allows the algorithm to simultaneously solve for
-the best set of transformations and the best arrangement of the stream
-graph.
+Our optimization selection algorithm, shown in
+Figures~\ref{fig:part-alg} and \ref{fig:part-decl}, automatically
+derives both of the example transformations described above.  The
+algorithm works by estimating the minimum cost for each structure in
+the stream graph. The minimum cost represents the best of three
+configurations: 1) collapsed and implemented in the time domain, 2)
+collapsed and implemented in the frequency domain, and 3) uncollapsed
+and implemented as a hierarchical unit.  The cost functions for the
+collapsed cases are guided by profiler feedback, as described below.
+For the uncollapsed case, the cost is the sum of each child's minimum
+cost.  However, instead of considering the children directly, the
+children are refactored into many different configurations, and the
+cost is taken as the minimum over all configurations.  This allows the
+algorithm to simultaneously solve for the best set of transformations
+and the best arrangement of the stream graph.
 
 The key to the algorithm's efficiency is the manner in which it
 considers refactoring the children of hierarchical nodes.  Instead of
@@ -89,20 +88,19 @@ time, using dynamic programming.
 
 %Pseudocode for our optimization selection algorithm appears in
 %Figures~\ref{fig:part-alg} and~\ref{fig:part-decl}.  
-The algorithm
-works as described above, using the {\tt memoTable} array to keep
-track of the lowest-cost configuration for each rectangular section of
-a hierarchical stream.  An important aspect of the algorithm that is
-not explicit in the pseudocode is the translation from a StreamIt
-graph to a set of hierarchical {\it Stream} objects.  In particular,
-each Stream corresponds only to a pipeline; adjacent 
-splitjoin objects are wrapped in a pipeline and their children
-are considered direct children of the pipeline. This enables
-different parts of neighboring splitjoins to be combined.
-However, it implies that a Stream might have a different width
-at different points (since neighboring splitjoins could have
-differing widths); this necessitates the addition of the {\tt width}
-array to the algorithm.
+The algorithm works as described above, using the {\tt memoTable}
+array to keep track of the lowest-cost configuration for each
+rectangular section of a hierarchical stream.  An important aspect of
+the algorithm that is not explicit in the pseudocode is the
+translation from a StreamIt graph to a set of hierarchical {\it
+Stream} objects.  In particular, each Stream corresponds only to a
+pipeline; adjacent splitjoin objects are wrapped in a pipeline and
+their children are considered direct children of the pipeline. This
+enables different parts of neighboring splitjoins to be combined.
+However, it implies that a Stream might have a different width at
+different points (since neighboring splitjoins could have differing
+widths); this necessitates the addition of the {\tt width} array to
+the algorithm.
 
 Omitted from the pseudocode are the functions {\it getDirectCost} 
 and {\it getFrequencyCost} that estimate a node's
