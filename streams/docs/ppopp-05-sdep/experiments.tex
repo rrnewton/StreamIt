@@ -7,7 +7,7 @@ cluster of workstations.  A StreamIt program is compiled to a set of
 parallel threads; if two threads are allocated to different machines,
 they communicate via dedicated TCP/IP connections.  Teleport messaging
 is supported via auxilliary communication channels that transmit two
-kinds of signals from a message sender to receiver: 1) the contents of
+kinds of signals from a message sender to the receiver: 1) the contents of
 a control message, or 2) a {\it credit} that indicates the receiver
 can execute some number of iterations before checking for a message
 again.
@@ -19,7 +19,7 @@ waiting for credits until the sender has reached a given point in its
 execution.  The compiler calculates the $\sdep$ relation and
 automatically schedules the exchange of credits to make sure that the
 timing constraints are respected.  When a message is sent, it is
-tagged with the iteration number during which the sender should
+tagged with the iteration number during which the receiver should
 process it; this is also calculated using $\sdep$ in the compiler.
 
 %% In our implementation, each actor maintains an iteration number which
