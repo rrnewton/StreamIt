@@ -1,7 +1,6 @@
 \newcommand{\lefttab}[1]{\begin{minipage}{0.6in}\begin{center}#1\end{center}\end{minipage}}
 \begin{figure}[t]
-\hspace{-24pt}
-\begin{minipage}{6in}
+\hspace{-12pt}\begin{minipage}{6in}
 \begin{tabular}{c|c|c|c}
 ~ & {\small Input} & {\small Output} & {\small Input and Output}
 \\ \hline
@@ -126,6 +125,10 @@ class Block :
 \end{minipage}
 \end{tabular}
 \end{minipage}
-\caption{Class declarations for streams and blocks, with constructors ommitted for sake of brevity.  The constructors for each stream and block have the same signatures as those in {\tt BaseStream} and {\tt BaseBlock}, respectively.\protect\label{fig:declgrid}}
-\vspace{-6pt}
+\caption{Class declarations for streams and blocks, with constructors ommitted for the sake of brevity.  The constructors for each stream and block have the same signatures as those in {\tt BaseStream} and {\tt BaseBlock}, respectively.\protect\label{fig:declgrid}}
+\vspace{0.2in}
+\begin{center}
+\psfig{figure=inherit.eps,width=6in}
+\caption{Class hierarchy diagram for streams and blocks.\protect\label{fig:inherit}}
+\end{center}
 \end{figure}
