@@ -1,7 +1,7 @@
 % might need psfig, url, amsmath, amsfonts?
 \documentclass[runningheads]{llncs}
 
-\usepackage{psfig}
+\usepackage{epsfig}
 
 \begin{document}
 
@@ -18,16 +18,23 @@
 
 \titlerunning{Lecture Notes in Computer Science}
 
-\author{William Thies \and Michal Karczmarek \and Michael Gordon \and
-David Maze \and Jeremy Wong \and Henry Hoffmann \and Matthew Brown \and
-and Saman Amarasinghe}
+\author{William Thies 
+	\and Michal Karczmarek 
+%\and Michael Gordon 
+%\and David Maze 
+%\and Jeremy Wong 
+%\and Henry Hoffmann 
+%\and Matthew Brown 
+\and Saman Amarasinghe}
 
 \authorrunning{William Thies et al.}
 
 \institute{Laboratory for Computer Science \\
 	Massachusetts Institute of Technology \\
-	Cambridge, MA  02139 \\ \vspace{12pt}
-\email{\{thies, karczma, mgordon, dmaze, jnwong, hank, morris, saman\}@lcs.mit.edu} \vspace{-24pt}}
+	Cambridge, MA  02139 \\ \vspace{8pt}
+\email{\{thies, karczma, 
+%mgordon, dmaze, jnwong, hank, morris, 
+saman\}@lcs.mit.edu} \vspace{-24pt}}
 
 \maketitle
 
@@ -40,10 +47,11 @@ and Saman Amarasinghe}
 \input{overview.tex}
 %\input{timing.tex}
 \input{example.tex}
+\input{appendix.tex}
+\input{results.tex}
 \input{related.tex}
 \input{conclusion.tex}
 \bibliographystyle{splncs}
-\bibliography{references,elliotw,thies}
+\bibliography{references}
 %\input{appendix2.tex}
-\input{appendix.tex}
 \end{document}

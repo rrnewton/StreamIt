@@ -1,39 +1,33 @@
 \section{Detailed Example}
 \label{sec:example}
-This section describes the Trunked Radio example implementation in
-Figure~\ref{fig:radiocode}. The trunked radio is a frequency hopping
-system. The transition times between the preset frequencies is
-indicated to the receiver by transmitting a preset tone.  Our radio
-also has an FIR filter to increase the gain of a weak signal. However,
-in order to save power, this filter is activated only when the signal
-to noise ratio is low.  This implementation relies on transforming the
-signal into the frequency domain for processing using a FFT. For
-brevity, we have not shown the RF processing in the front-end and the
-audio processing in the back-end.  The code for the trunked radio
-demonstrates many features of StreamIt.
+This section describes a StreamIt implementation of the Trunked Radio
+illustrated in Figure~\ref{fig:radiodiagram}; the code itself is
+spread between Figures \ref{fig:firstreamit}, \ref{fig:portal-code},
+and \ref{fig:fft-streamit}.  The trunked radio is a frequency hopping
+system in which the frequencies are preset and the transitions are
+indicated to the receiver by transmitting a preset tone.
 
-\begin{figure}[t]
-\centering
-\psfig{figure=fir-block.eps,width=3.2in}
-\vspace{-0.1in}
-\caption{A block diagram of a five tap FIR filter.}
-\label{fig:firfilter}
-\vspace{-0.1in}
-\end{figure}
+% Our radio
+% also has an FIR filter to increase the gain of a weak signal. However,
+% in order to save power, this filter is activated only when the signal
+% to noise ratio is low.  This implementation relies on transforming the
+% signal into the frequency domain for processing using a FFT. For
+% brevity, we have not shown the RF processing in the front-end and the
+% audio processing in the back-end.  The code for the trunked radio
+% demonstrates many features of StreamIt.
 
-The high-level structure of the radio, graphically shown in
-Figure~\ref{fig:radiodiagram}, is implemented in the class {\tt
-TrunkedRadio}. The radio has seven stages, where the first three
-stages operate in the time domain, the last three stages operate in
-the frequency domain, and there is a conversion phase in between.  At
-this high level, the structure of the system is a pipeline of either
-six or seven stream stages. The difference is due to the {\tt Booster}
-stage, which can be active or inactive. The switching on and off of
-the {\tt Booster} stage, which happens infrequently, is accomplished
-using a reinitialization message from the {\tt CheckQuality} stage. We
-also use a message from the {\tt CheckFreqHop} stage to the {\tt
-RFtoIF} stage to change the baseband when a frequency hop tone is
-present.
+The high-level structure of the radio is evident in the toplevel class
+of {\tt TrunkedRadio}.  The radio has seven stages, where the first
+three stages operate in the time domain, the last three stages operate
+in the frequency domain, and there is a conversion phase in between.
+At this high level, the structure of the system is a pipeline of
+either six or seven stream stages. The difference is due to the {\tt
+Booster} stage, which can be active or inactive. The switching on and
+off of the {\tt Booster} stage, which happens infrequently, is
+accomplished using a reinitialization message from the {\tt
+CheckQuality} stage. We also use a message from the {\tt CheckFreqHop}
+stage to the {\tt RFtoIF} stage to change the baseband when a
+frequency hop tone is present.
 
 The {\tt RFtoIF} stage modulates the input signal from RF to a
 frequency band around the current IF frequency. This stage is
@@ -42,51 +36,46 @@ wave at the IF frequency.  To support a change in the IF frequency
 when frequency hopping occurs, the filter contains a {\tt set\_freq}
 method that can be invoked using a message.
 
-The optional {\tt Booster} stage is an FIR filter that is activated
-when the signal is hard to detect. During normal operation, however,
-it is deactivated to conserve power. The turning on and off of the
-filter is controlled by a message.  The filter itself, shown in
-Figure~\ref{fig:firfilter}, is implemented as a {\tt Filter} that
-peeks at N elements in the input stream.
+% The optional {\tt Booster} stage is an FIR filter that is activated
+% when the signal is hard to detect. During normal operation, however,
+% it is deactivated to conserve power. The turning on and off of the
+% filter is controlled by a message.  The filter itself, shown in
+% Figure~\ref{fig:firstreamit}, is implemented as a {\tt Filter} that
+% peeks at N elements in the input stream.
 
-The {\tt FFT} stage converts the program from the time domain to the
-frequency domain using a multi-stage FFT. It is graphically presented
-in~\ref{fig:fftfilter}. The FFT is composed of a reordering filter and
-a multi-stage butterfly filter. The StreamIt representation of the
-reordering filter (a bit reverse order filter) is given in
-Figure~\ref{fig:bitreverseorder}. Note that the complex data
-re-shuffling is accomplished using a few SplitJoin constructs.  A
-parameterized Butterfly implementation is used to abstract the
-multi-stage butterfly in the FFT. As shown in
-Figure~\ref{fig:butterfly}, the Butterfly filter is also implemented
-using a combination of SplitJoin constructs.
+% The {\tt FFT} stage converts the program from the time domain to the
+% frequency domain using a multi-stage FFT. It is graphically presented
+% in~\ref{fig:fftfilter}. The FFT is composed of a reordering filter and
+% a multi-stage butterfly filter. The StreamIt representation of the
+% reordering filter (a bit reverse order filter) is given in
+% Figure~\ref{fig:bitreverseorder}. Note that the complex data
+% re-shuffling is accomplished using a few SplitJoin constructs.  A
+% parameterized Butterfly implementation is used to abstract the
+% multi-stage butterfly in the FFT. 
 
-\begin{figure}[t]
-\centering
-\psfig{figure=fft-block.eps,width=3.2in}
-\vspace{-0.1in}
-\caption{The multi-stage FFT algorithm}
-\vspace{-12pt}
-\label{fig:fftfilter}
-\end{figure}
+% % ommitted for lack of space
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% %As shown in
+% %Figure~\ref{fig:fft-butterfly}, the Butterfly filter is also
+% %implemented using a combination of SplitJoin constructs.
 
-The StreamIt implementation of the FFT filter is clean and
-intuitive. It already has a large amount of pipelined parallelism. Due
-to the simple and straightforward mapping from the algorithm to the
-implementation, compiler analyses should be able to extract the
-parallel structure of the FFT when hardware resources are available.
+% The StreamIt implementation of the FFT filter is clean and
+% intuitive. It already has a large amount of pipelined parallelism. Due
+% to the simple and straightforward mapping from the algorithm to the
+% implementation, compiler analyses should be able to extract the
+% parallel structure of the FFT when hardware resources are available.
 
-The next stage, {\tt CheckFreqHop}, checks four different frequencies
-for the change frequency tone. When the stage detects this tone, it
-has to change the frequency within a time limit. This task is
-accomplished by sending a message to the {\tt RFtoIF} stage.  The
-message requires the {\tt RFtoIF} stage to deliver between $4N$ and
-$6N$ items using the old modulation before changing to the new
-frequency.
+% The next stage, {\tt CheckFreqHop}, checks four different frequencies
+% for the change frequency tone. When the stage detects this tone, it
+% has to change the frequency within a time limit. This task is
+% accomplished by sending a message to the {\tt RFtoIF} stage.  The
+% message requires the {\tt RFtoIF} stage to deliver between $4N$ and
+% $6N$ items using the old modulation before changing to the new
+% frequency.
 
-The {\tt CheckQuality} stage checks if the signal has a distinct
-frequency spectrum. If all the frequencies have similar amplitudes,
-the stage assumes that the signal-to-noise ratio is low and sends a
-message to activate the {\tt Booster}. This message is sent using
-best-effort delivery.
+% The {\tt CheckQuality} stage checks if the signal has a distinct
+% frequency spectrum. If all the frequencies have similar amplitudes,
+% the stage assumes that the signal-to-noise ratio is low and sends a
+% message to activate the {\tt Booster}. This message is sent using
+% best-effort delivery.
 

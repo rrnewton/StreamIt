@@ -1,0 +1,123 @@
+\section{Results}
+\label{sec:results}
+
+We have implemented a fully-functional prototype of the StreamIt
+compiler as an extension to the Kopi Java Compiler, a component of the
+open-source Kopi Project \cite{kopi}.  At this time, our compiler is a
+proof-of-concept and is not optimized for performance; we generate C
+code that is compiled with a StreamIt runtime library to produce the
+final executable.  We have also developed a library in Java that
+allows StreamIt code to be executed as pure Java, thereby providing a
+verification mechanism for the output of the compiler.
+
+The compilation process for streaming programs contains many novel
+aspects because the basic unit of computation is a stream rather than
+a procedure.  In order to compile stream modules separately, we have
+developed a runtime interface--analogous to that of a procedure call
+for traditional codes--that specifies how one can interact with a
+black box of streaming computation.  The stream interface contains
+separate phases for initialization and steady-state execution; in the
+execution phase, the interface includes a contract for input items,
+output items, and possible message production and consumption.
+
+Though we have yet to add optimizations to our compiler, it is
+nonetheless interesting to evaluate its baseline performance.  For
+this purpose, we developed StreamIt implementations of four
+applications: 1) A GSM Decoder, which takes GSM-encoded parameters as
+inputs, and uses these to synthesize audible speech, 2) A system from
+the Polymorphic Computing Architecture (PCA) \cite{pca} which
+encapsulates the core functionality of modern radar, sonar, and
+communications signal processors, 3) A software-based FM Radio with
+equalizer, and 4) A performance test from the SpectrumWare system that
+implements an Orthogonal Frequency Division Multiplexor (OFDM)
+\cite{spectrumware}.  Table \ref{tab:benchmarks} gives characteristics
+of the above applications including the number of filters implemented
+and the size of the stream graph as coded.
+
+Table~\ref{tab:performance} gives the performance of our compiler by
+comparing the StreamIt implementation against either the SpectrumWare
+implementation or (in the case of GSM) a hand-optimized C version.
+SpectrumWare \cite{spectrumware}~is a high-performance runtime library
+for streaming programs, implemented in C++.  The StreamIt language
+offers a higher level of abstraction than SpectrumWare (see Section
+\ref{sec:oo-rat}), and yet the StreamIt compiler is able to beat the
+SpectrumWare performance by a factor of two for the PCA Demo and FM
+Radio.
+
+\begin{table}[t]
+\begin{minipage}{2.05in}
+\centering
+\scriptsize
+\begin{tabular}{|l|r|r|r|} \hline
+Benchmark & Lines & Filters & Graph Size\\
+\hline \hline
+PCA Demo & 484 & 5 & 7\\
+\hline
+FM Radio & 411 & 5 & 27\\
+\hline
+perftest4 & 347 & 5 & 20\\
+\hline
+GSM Decoder & 3050 & 11 & 21 \\
+\hline
+\end{tabular} \\
+\vspace{6pt}
+\caption{\protect\small Application Characteristics
+\label{tab:benchmarks}}
+\end{minipage}
+\hspace{0.2in}
+\begin{minipage}{2.5in}
+\centering
+\scriptsize
+\begin{tabular}{|l|r|r|r|} \hline
+%& \multicolumn{2}{|c|}{StreamIt} &  \multicolumn{2}{|c|}{Hand Coded}\\
+%\hline 
+Benchmark & StreamIt & SpectrumWare & C \\
+\hline \hline
+PCA Demo & 1.3 & 3.4 & N/A\\
+\hline
+FM Radio & 4.9 & 9.9 & N/A\\
+\hline
+perftest4 & 330 & 330 & N/A\\
+\hline
+GSM Decoder & 4.88 & N/A & .47\\
+\hline
+\end{tabular} \\
+\vspace{6pt}
+\caption{\protect\small \mbox{Performance Results (in $\mu$sec/item)}
+\label{tab:performance}}
+\end{minipage}
+\vspace{-12pt}
+\end{table}
+
+%% \subsection{GSM Decoder}
+
+%%   The decoder portion of the StreamIt GSM Vocoder takes GSM encoded
+%% parameters as inputs, and uses these to synthesize audible speech.  This
+%% is accomplished by processing the parameters through four main filters.
+%% The RPE decoder filter produces some "pink noise" that very loosely
+%% estimates the speech waveform, using quantized bit sequences and a
+%% maximum value parameter from the encoded input.  This "pink noise" is
+%% fed to the Long Term Prediction portion, which applies long-term
+%% characteristics to the sequence through a delay filter within a feedback
+%% loop.  The resulting signal is then sent to the Short Term Synthesis
+%% filter, which decodes high frequency voice characteristics from the
+%% encoded parameters and applies these to the signal.  Finally, the
+%% Post-processing filter identifies peaks in the signal to make it audible.
+
+%% \subsection{PCA Demo}
+
+%% This application is representative of the core functionality needed by
+%% modern radar, sonar, and communications signal processors.
+
+For the GSM application, the extensively hand-optimized C version
+incorporates many transformations that rely on a high-level knowledge
+of the algorithm, and StreamIt performs an order of magnitude slower.
+However, this version of the compiler is only a proof-of-concept, and
+is not yet intended to compete with hand-coded C.  Our code generation
+strategy currently has many inefficiencies, and in the future we plan
+to generate optimized assembly code by interfacing with a code
+generator.  We believe that stream-conscious optimizations can improve
+the performance by an order of magnitude on uniprocessors; moreover,
+we have yet to consider parallel targets, and this is where we expect
+to find the most pronounced benefits of the abundant parallelism and
+regular communication patterns exposed by StreamIt.

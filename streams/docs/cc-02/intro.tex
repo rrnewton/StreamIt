@@ -19,38 +19,58 @@ special-purpose stream languages have been designed (see
 representations are elegant and theoretically sound, but they often
 lack features and are too inflexible to support straightforward
 development of modern stream applications, or their implementations
-are too inefficient to use in practice.
+are too inefficient to use in practice.  Consequently, most
+programmers turn to general-purpose languages such as C or C++ to
+implement stream programs.
 
-Consequently, most programmers turn to general-purpose languages such
-as C or C++ to implement stream programs, resorting to low-level
-assembly codes for performance-critical loops.  This practice is
-labor-intensive, error-prone, and very costly, since the
-performance-critical sections must be re-implemented for each target
-architecture.  Moreover, general purpose languages do not provide a
-natural and intuitive representation of streams, thereby having a
-negative effect on readability, robustness, and programmer
-productivity.
+There are two reasons that general-purpose languages are inadequate
+for stream programming.  Firstly, they are a mismatch for the
+application domain.  That is, they do not provide a natural or
+intuitive representation of streams, thereby having a negative effect
+on readability, robustness, and programmer productivity.  Moreover,
+because the widespread parallelism and regular communication patterns
+of data streams are left implicit in general-purpose languages,
+compilers are not stream-conscious and do not perform stream-specific
+optimizations.  As a result, programmers resort to low-level assembly
+codes for performance-critical loops, and performance-critical
+sections must be re-implemented for each target architecture.  This
+practice is labor-intensive, error-prone, and very costly.
+
+Secondly, general-purpose languages are a mismatch for the emerging
+class of grid-based architectures \cite{smartmemories,raw,trips} that
+are especially well-suited for stream processing.  Perhaps the primary
+appeal of C is that it provides a ``common machine language'' for
+von-Neumann architectures.  That is, it abstracts away the
+idiosyncratic differences between machines, but encapsulates their
+common properties: a single program counter, arithmetic operations,
+and a monolithic memory.  However, for grid-based architectures, the
+von-Neumann model no longer holds, as there are multiple instruction
+streams and distributed memory banks.  Thus, C no longer serves as a
+common machine language--in fact, it provides the wrong abstraction
+for the underlying hardware, and architecture-specific directives are
+often needed to obtain reasonable performance.  Again, this greatly
+complicates the job of the programmer and hampers portability.
 
 StreamIt is a language and compiler specifically designed for modern
-stream programming.  Its goals are two-fold: first, to raise the
-abstraction level in stream programming, thereby improving programmer
-productivity and program robustness, and second, to provide a compiler
-that performs stream-specific optimizations to achieve the performance
-of an expert assembly programmer.  
+stream programming.  The StreamIt language has two goals: first, to
+provide high-level stream abstractions that improve programmer
+productivity and program robustness within the streaming domain, and
+second, to serve as a common machine language for grid-based
+processors.  At the same time, the StreamIt compiler aims to perform
+stream-specific optimizations to achieve the performance of an expert
+programmer.
 
-To address the first of these goals, this paper motivates, describes,
-and justifies StreamIt's high-level language features.  The version of
-StreamIt described in this paper requires static flow rates in the
-streams; applications such as compression that have dynamic flow rates
-will be the subject of future work.  This paper also presents a notion
-of ``information flow'' that we believe is fundamental to the
-streaming domain.  Using this notion, we can give a clear semantics to
-the StreamIt's messaging system.
+This paper motivates, describes, and justifies the high-level language
+features of StreamIt, version 1.0.  The major limitation of StreamIt
+1.0 is that all flow rates in the streams must be static; applications
+such as compression that have dynamically varying flow rates will be
+the subject of future work.
 
-This paper is organized as follows. In Section {\ref{sec:domain}}, we
+The paper is organized as follows. In Section {\ref{sec:domain}}, we
 characterize the domain of streaming programs that motivates the
 design of StreamIt, and in Section~\ref{sec:overview} we describe the
 language features in detail.  We present an in-depth example of a
-software radio in Section~\ref{sec:example}, describe related work in
-Section~\ref{sec:related}, and conclude in Section~\ref{sec:conc}.
+software radio in Section~\ref{sec:example}, preliminary results in
+Section~\ref{sec:results}, related work in Section~\ref{sec:related},
+and conclusions in Section~\ref{sec:conc}.
 

@@ -1,82 +1,123 @@
+% \begin{figure}
+% \vspace{-6pt}
+% \begin{minipage}{2.175in}
+% \psfig{figure=fir-streamit-left.eps,width=162.35pt}
+% \end{minipage}
+% \hspace{0.2in}
+% \begin{minipage}{2.4in}
+% \psfig{figure=fir-streamit-right.eps,width=102.35pt}
+% \vspace{0.55in}
+% \caption{\protect\small An FIR filter in StreamIt.
+% \protect\label{fig:firstreamit}}
+% \end{minipage}
+% \vspace{-12pt}
+% \end{figure}
+
 \section{Language Overview}
 \label{sec:overview}
 
-\begin{figure}
-\scriptsize
-\begin{verbatim}
-class FIR extends Filter {
-   Channel input = new FloatChannel();
-   Channel output = new FloatChannel();
-   int N;
-
-   void init(int N) {
-      this.N = N;
-   }
-
-   void work() {
-      float sum = 0;
-      for (int i=0; i<N; i++) 
-         sum += input.peek(i)*FIR_COEFF[i][N];
-      input.pop();
-      output.push(sum);
-   }
-}
-
-class Main extends Pipeline {
-   void init() {
-      add(new DataSource());
-      add(new FIR(N));
-      add(new Display());
-   }
-}
-\end{verbatim}
-\vspace{-12pt}
-\caption{\protect\small An FIR filter in StreamIt.
-\protect\label{fig:firstreamit}}
-\vspace{-12pt}
-\end{figure}
+StreamIt includes stream-specific abstractions and representations
+that are designed to improve programmer productivity for the domain of
+programs described above.  In this paper, we present StreamIt in legal
+Java syntax for ease of presentation\footnote{However, for the sake of
+brevity, the code fragments in this paper are sometimes lacking
+modifiers or methods that would be needed to make them strictly legal
+Java.}.  Though this syntax can express the fundamental ideas of
+StreamIt, in the longer term we plan to develop a cleaner and more
+abstract syntax that is designed specifically for stream programs.
 
 \begin{figure}[t]
-\scriptsize
-\begin{verbatim}
-int N = 5;
-int BLOCK_SIZE = 100;
+\begin{minipage}{2.05in}
+\vspace{-6pt}
+\psfig{figure=fir-streamit.eps,width=176.47pt}
+\vspace{-24pt}
+\caption{\protect\small An FIR filter in StreamIt.~~~~~
+\protect\label{fig:firstreamit}}
+\end{minipage}
+\begin{minipage}{2.75in}
+\centering
+\vspace{10pt}
+\psfig{figure=basic-pipeline.eps,width=1.8in}
 
-void step(float[] input, float[] output, int numIn, int numOut) {
-   float sum = 0;
-   for (int k=0; k<numIn; k++)
-      sum = sum + input[k]*FIR_COEFF[k+numIn][N];
-   for (int k=numIn; k<N; k++) 
-      sum = sum + input[k]*FIR_COEFF[k-numIn][N];
-   output[numOut] = sum;
-   input[numIn] = getData();
+(a) A Pipeline. \\
+\vspace{10pt}
+\psfig{figure=basic-splitjoin.eps,width=1.8in}
+
+(b) A SplitJoin. \\
+\vspace{10pt}
+\psfig{figure=basic-feedback.eps,width=1.8in}
+
+(c) A FeedbackLoop. \\
+\caption{\protect\small Stream structures supported by StreamIt.
+\protect\label{fig:structuresp}
 }
+\end{minipage}
+\vspace{-18pt}
+\end{figure}
 
-void main() {
-   float input[] = new float[N];
-   float output[] = new float[BLOCK_SIZE];
-   int numIn, numOut;
+\subsection{Filters}
 
-   for (numIn=0; numIn<N; numIn++)
-      input[numIn] = getData();
+The basic unit of computation in StreamIt is the {\tt Filter}.  An
+example of a Filter is the {\tt FIRFilter} (see Figure
+\ref{fig:firstreamit}), a component of the software radio shown in
+Figure \ref{fig:radiodiagram}.  The central aspect of a Filter is the
+{\tt work} function, which describes the filter's most fine grained
+execution step in the steady state.  Within the {\tt work} function, a
+filter can communicate with neighboring blocks using the {\tt input}
+and {\tt output} channels, which are FIFO queues declared as fields in
+the Filter base class.  These high-volume channels support the three
+intuitive operations: 1) {\bf pop()} removes an item from the end of
+the channel and returns its value, 2) {\bf peek($i$)} returns the
+value of the item $i$ spaces from the end of the channel without
+removing it, and 3) {\bf push($x$)} writes $x$ to the front of the
+channel.  The argument $x$ is passed by value; if it is an object, a
+separate copy is enqueued on the channel.
+% \begin{enumerate}
+% \item {\tt pop()} removes an item from the end of the channel and
+% returns its value.
+% \item {\tt peek($i$)} returns the value of the item $i$ spaces from
+% the end of the channel without removing it.
+% \item {\tt push($x$)} writes $x$ to the front of the channel.  The
+% argument $x$ is passed by value; if it is an object, a separate copy
+% is enqueued on the channel.
+% \end{enumerate}
 
-   while (true) {
+A major restriction of StreamIt 1.0 is that it requires filters to
+have static input and output rates.  That is, the number of items
+peeked, popped, and pushed by each filter must be constant from one
+invocation of the {\tt work} function to the next.  In fact, as
+described below, the input and output rates must be declared in the
+Filter's {\tt init} function.  If a filter violates the declared
+rates, StreamIt throws a runtime error and the subsequent behavior of
+the program is undefined. We plan to support dynamically changing
+rates in a future version of StreamIt.
 
-      for (out=0; numIn<N; numIn++, numOut++)
-         step(input, output, numIn, numOut);
+Each {\tt Filter} contains an {\tt init} function that is called at
+initialization time.  The {\tt init} function serves two purposes.
+Firstly, it is for the user to establish the initial state of the
+Filter.  For example, the FIRFilter records {\tt weights}, the
+coefficients that it should use for filtering.  A filter can also
+push, pop, and peek items from within the {\tt init} function if it
+needs to set up some initial state on its channels, although this
+usually is not necessary.  A user should instantiate a filter by using
+its constructor, and the {\tt init} function will be called implicitly
+with the same arguments that were passed to the
+constructor{\footnote{This design might seem unnatural, but it is
+necessary to allow inlining (Section
+\ref{sec:connecting}) and re-initialization (Section \ref{sec:reinit})
+within a Java-based syntax.}}.
 
-      int wholeSteps = (BLOCK_SIZE-numOut)/N;
-      for (int k=0; k<wholeSteps; k++)
-         for (numIn=0; numIn<N; numIn++, numOut++)
-            step(input, output, numIn, numOut);
+The second purpose of the {\tt init} function is to specify the
+filter's I/O types and data rates to the StreamIt compiler.  The types
+are specified with calls to {\tt setInput} and {\tt setOutput}, while
+the rates are specified with calls to {\tt setPush}, {\tt setPop}, and
+{\tt setPeek}.  The {\tt setPeek} call can be ommitted if the peek
+count is the same as the pop count.
 
-      for (numIn=0; numOut<BLOCK_SIZE; numIn++, numOut++)
-         step(input, output, numIn, numOut);
-
-      displayBlock(output);
-   }
-}
-\end{verbatim}
+\begin{figure}[t]
+\vspace{-6pt}
+\begin{minipage}{2.4in}
+\psfig{figure=fir-proc.eps,width=194.14pt}
 \vspace{-12pt}
 \caption{\protect\small An optimized FIR filter in a procedural
    language.  A complicated loop nest is required to avoid mod
@@ -84,120 +125,22 @@ void main() {
    loops depends on the data rates (e.g., BLOCK\_SIZE) within the
    stream.  An actual implementation might inline the calls to {\tt step}.
 \protect\label{fig:firprocedural}}
+\end{minipage}
+\hspace{0.3in}
 \vspace{-12pt}
-\end{figure}
-
-\begin{figure}[t]
-\scriptsize
-\begin{verbatim}
-class FIRFilter {
-   int N;
-   float[] input;
-
-   FIRFilter(int N) {
-      this.N = N;
-   }
-
-   float[] getData(float[] output, int offset, int length) {
-      if (input==null) {
-         input = new float[MAX_LENGTH];
-         source.getData(input, 0, N+length);
-      } else {
-         source.getData(input, N, length);
-      }
-
-      for (int i=0; i<length; i++) {
-         float sum = 0;
-         for (int j=0; j<N; j++) {
-            sum = sum + data1[i+j]*FIR_COEFF[j][N];
-         }
-         output[i+offset] = sum;
-      }
-
-      for (int i=0; i<N; i++) {
-         input[i] = input[i+length];
-      }
-   }
-}
-
-void main() {
-
-   DataSource datasource = new DataSource();
-   FIRFilter filter = new FIRFilter(5);
-   Display display = new Display();
-   filter.source = datasource;
-   display.source = filter;
-   display.run();
-
-}
-\end{verbatim}
-\vspace{-12pt}
+\begin{minipage}{2in}
+\psfig{figure=fir-object.eps,width=165.88pt}
 \caption{\protect\small An FIR filter in an object oriented language.
 A ``pull model'' is used by each filter object to retrieve a chunk of
 data from its source, and straight-line code connects one filter to
 another.
 \protect\label{fig:firobject}}
-\vspace{-12pt}
+\end{minipage}
+\vspace{-6pt}
 \end{figure}
 
-StreamIt includes stream-specific abstractions and representations
-that are designed to improve programmer productivity for the domain of
-programs described above.  In this paper, we present StreamIt in legal
-Java syntax for ease of presentation.  Though this syntax can express
-the fundamental ideas of StreamIt, in the longer term we plan to
-develop a cleaner and more abstract syntax that is designed
-specifically for stream programs.
-
-Figure \ref{fig:radiocode} contains a detailed example of a software
-radio implemented in StreamIt; a block diagram of the system appears
-in Figure \ref{fig:radiodiagram}.  In the following sections, we draw
-on different components of this example to describe and justify the
-major features of StreamIt.
-
-\subsection{Filters}
-
-\subsubsection{StreamIt Approach}
-
-The basic unit of computation in StreamIt is the {\tt Filter}.  An
-example of a Filter is the {\tt FIRFilter}, a component of our
-software radio (see Figure \ref{fig:firstreamit}).  Each {\tt Filter}
-contains an {\tt init} function that is called at initialization time;
-in this case, the {\tt FIRFilter} records {\tt N}, the number of items
-it should filter at once.  A user should instantiate a filter by using
-its constructor, and the {\tt init} function will be called implicitly
-with the same arguments that were passed to the
-constructor{\footnote{This design might seem unnatural, but it is
-necessary to allow inlining (Section \ref{sec:connecting}) and
-re-initialization (Section \ref{sec:reinit}) within a Java-based
-syntax.}}.
-
-The {\tt work} function describes the most fine grained execution step
-of the filter in the steady state.  Within the {\tt work} function,
-the filter can communicate with neighboring blocks using the {\tt
-input} and {\tt output} channels, which are typed FIFO queues declared
-as fields at the top of the class.  These high-volume channels support
-the three intuitive operations: 
-\begin{enumerate}
-\item {\tt pop()} removes an item from
-the end of the channel and returns its value.
-\item {\tt peek(i)} returns the value of the item $i$ spaces from the end of the channel without
-removing it.
-\item {\tt push(x)} writes $x$ to the front of
-the channel.  The argument $x$ is passed by value; if it is an object,
-a separate copy is enqueued on the channel.
-\end{enumerate}
-A filter can also push, pop, and peek items from within
-the {\tt init} function if it needs to set up some initial state on
-its channels, although this usually is not necessary.
-
-A major restriction of the current version of StreamIt is that it
-requires filters to have static input and output rates.  That is, the
-number of items peeked, popped, and pushed by each filter must be
-constant from one invocation of the {\tt work} function to the next.
-We plan to support dynamically changing rates in a future version of
-StreamIt.
-
 \subsubsection{Rationale}
+\label{sec:oo-rat}
 
 StreamIt's representation of a filter is an improvement over
 general-purpose languages.  In a procedural language, the analog of a
@@ -230,167 +173,167 @@ distinguishes StreamIt.
 \subsection{Connecting Filters}
 \label{sec:connecting}
 
-\subsubsection{StreamIt Approach}
-
 \begin{figure}[t]
-\scriptsize
-\begin{verbatim}
-class FFT extends Pipeline {
-   void init(int N) {
-      add(new SplitJoin() {
-         void init() {
-            setSplitter(WEIGHTED_ROUND_ROBIN(N/2, N/2));
-            for (int i=0; i<2; i++) 
-               add(new SplitJoin() {
-                  void init() {
-                     setSplitter(ROUND_ROBIN);
-                     add(IDENTITY());
-                     add(IDENTITY());
-                     setJoiner(WEIGHTED_ROUND_ROBIN(N/4, N/4));
-               }});
-            setJoiner(ROUND_ROBIN);
-      }});
-      for (int i=2; i<N; i*=2)
-        add(new Butterfly(i, N));
-}}
-\end{verbatim}
-\vspace{-12pt}
-\caption{\protect\small A Fast Fourier Transform (FFT) in StreamIt.
-\protect\label{fig:fft}}
+\begin{minipage}{2.175in}
+% \psfig{figure=fft-streamit.eps,width=165.88pt}
+% \vspace{-18pt}
+% \caption{\protect\small A Fast Fourier Transform (FFT) in StreamIt.
+% \protect\label{fig:fft}}
+% \end{minipage}
+\psfig{figure=echo.eps,width=169.41pt}
 \vspace{-18pt}
-\end{figure}
-
-The basic construct for composing filters into a communicating network
-is a {\tt Pipeline}.  The FFT in Figure \ref{fig:fft} is an example of
-a {\tt Pipeline} that appears in our software radio.  Like a {\tt
-Filter}, a {\tt Pipeline} has an {\tt init} function that is called
-upon its instantiation.  However, there is no {\tt work} function, and
-all input and output channels are implicit; instead, the pipeline
-behaves as the sequential composition of filters that are specified
-with successive calls to {\tt add} from within {\tt init}.
-
-There are two other stream constructors besides {\tt Pipeline}: {\tt
-SplitJoin} and {\tt FeedbackLoop}.  The former is used to specify
-independent parallel streams that diverge from a common {\it splitter}
-and merge into a common {\it joiner}.  There are three kinds of
-splitters:\vspace{-6pt}
-\begin{enumerate}
-\item WEIGHTED\_ROUND\_ROBIN($i_1$, $i_2$, $\dots$, $i_k)$,
-which sends the first $i_1$ data items to the first stream, the next
-$i_2$ data items to the second stream, and so on.
-\item ROUND\_ROBIN, which is just a weighted round robin where all
-weights are 1.
-\item DUPLICATE, which replicates each data item and sends a copy to each
-parallel stream.
-\item NULL, which means that all of the parallel components are
-sources and there is no input to split.
-\end{enumerate}
-\vspace{-6pt}Similarly, there are three kinds of joiners:\vspace{-6pt}
-\begin{enumerate}
-\item WEIGHTED\_ROUND\_ROBIN($i_1$, $i_2$, $\dots$, $i_k)$, which reads the
-first $i_1$ data items from the first stream, the next $i_2$ data
-items to the second stream, and so on.
-\item ROUND\_ROBIN, which is just a weighted round robin where all
-weights are 1.
-\item COMBINE, which reads from all the streams in parallel and combines the results into a structure.  The structure has a separate field for each stream, 
-and the joiner cannot fire until each field is filled by an item from the 
-corresponding output channel.
-\item NULL, which means that all of the parallel components are sinks
-and there is no output to join together.
-\end{enumerate}
-\vspace{-6pt}The splitter and joiner type are specified with calls to {\tt
-setSplitter} and {\tt setJoiner}, respectively (see Figure
-\ref{fig:fft}); the parallel streams are specified by successive calls
-to {\tt add}, with the $i$'th call setting the $i$'th stream in the
-SplitJoin .  Note that a WEIGHTED-\_ROUND\_ROBIN can function as an
-exclusive selector if one or more of the weights are zero.  Also,
-there are additional splitters and joiners that we plan to add when
-StreamIt supports filters with dynamically changing rates, including:\vspace{-6pt}
-\begin{enumerate}
-\item TYPE\_DISPATCH, which sends an item to one of multiple streams
-depending on its type.
-\item ANY, which sends items to any parallel stream that has space on
-its input, or reads items from any parallel stream that has output
-available.
-\end{enumerate}
-
-\begin{figure}
-\centering
-\psfig{figure=basic-pipeline.eps,width=3.0in}
-
-(a) A Pipeline. \\
-\vspace{8pt}
-\psfig{figure=basic-splitjoin.eps,width=3.0in}
-
-(b) A SplitJoin. \\
-\vspace{8pt}
-\psfig{figure=basic-feedback.eps,width=3.0in}
-
-(c) A FeedbackLoop. \\
-\caption{Stream structures supported by StreamIt.}
-\vspace{-6pt}
-\label{fig:structuresp}
-\end{figure}
-
-\begin{figure}
-\scriptsize
-\begin{verbatim}
-class Fibonnacci extends FeedbackLoop {
-   void init() {
-      setDelay(2);
-      setJoiner(WEIGHTED_ROUND_ROBIN(0,1));
-      setBody(new Filter() {
-          Channel input = new IntChannel();
-          Channel output = new IntChannel();
-          void work() {
-              output.push(input.peek(0)+input.peek(1));
-              input.pop();
-          }
-      });
-      setSplitter(DUPLICATE);
-   }
-
-   int initPath(int index) {
-      return index;
-   }
-}
-\end{verbatim}
-\vspace{-12pt}
+\caption{\protect\small An echo effect in StreamIt.
+\protect\label{fig:echo}}
+\end{minipage}
+\hspace{0.2in}
+\begin{minipage}{2.4in}
+\psfig{figure=fib-streamit.eps,width=180pt}
+\vspace{-18pt}
 \caption{\protect\small A FeedbackLoop version of Fibonnacci.
 \protect\label{fig:feed}}
+\end{minipage}
 \vspace{-12pt}
 \end{figure}
 
-\vspace{-6pt}The last control construct provides a way to create cycles in the
-stream graph: the {\tt FeedbackLoop}.  It contains a joiner, a body
-stream, a splitter, and a loop stream, which are set with calls to
-{\tt setJoiner}, {\tt setBody}, {\tt setSplitter}, and {\tt setLoop},
-respectively (see Figure \ref{fig:feed}).  The splitters and joiners
-can be any of those for SplitJoin, except for NULL.
+StreamIt provides three constructs for composing filters into a
+communicating network: Pipeline, SplitJoin, and FeedbackLoop (see
+Figure~\ref{fig:structuresp}).  Each structure specifies a pre-defined
+way of connecting filters into a single-input, single-output block,
+which we will henceforth refer to as a ``stream''.  That is, a stream
+is any instance of a Filter, Pipeline, SplitJoin, or FeedbackLoop.
+% Generally, a Pipeline is for building a sequence of streams, a
+% SplitJoin is for running streams in parallel, and a FeedbackLoop is
+%for introducing a loop in the stream graph.  
+Every StreamIt program is a hierarchical composition of these stream
+structures.
 
-The feedback loop has a special semantics when the stream is first
+The {\bf Pipeline} construct is for building a sequence of streams.
+Like a Filter, a Pipeline has an {\tt init} function that is called
+upon its instantiation.  Within {\tt init}, component streams are
+added to the Pipeline via successive calls to {\tt add}.  For example,
+in the AudioEcho in Figure~\ref{fig:echo}, the {\tt init} function
+adds four streams to the Pipeline: an AudioSource, an EchoEffect, an
+Adder, and a Speaker.  This sequence of statements automatically
+connects these four streams in the order specified.  Thus, there is no
+{\tt work} function in a Pipeline, as the component streams fully
+specify the behavior.  The channel types and data rates are also
+implicit from the connections.
+
+The input and output channels of the Pipeline itself are connected to
+the first and last component streams, respectively.  Thus, a Pipeline
+can be embedded in another stream construct, and the channels of the
+first and last streams are implicitly connected to the Pipeline's
+neighbors in the parent construct.  Alternatively, if a Pipeline
+consumes no items from its input and produces no items to its output
+(as is the case with AudioEcho), then the Pipeline can be run as an
+independent unit--a toplevel StreamIt program.  Any Pipeline,
+SplitJoin, or FeedbackLoop that has consumes no input and produces no
+output is a valid toplevel program in StreamIt.
+
+% Of course, there are a number of semantic restrictions on the
+% construction of Pipelines.  For each pair of streams that is
+% connected, the output type of the first stream must match the input
+% type of the next.  Also, there must be non-zero production and
+% consumption rates along the inner connections of a Pipeline, such that
+% data flows through the entire pipe.  We omit a full discussion of
+% semantic checking in StreamIt due to lack of space.
+
+% Each of the stream constructs can either be executed on its own, or
+% embedded in an enclosing stream structure.  The AudioEcho must execute
+% independently, since the first component consumes no items
+% and the last component produces no items.  However, the EchoEffect must
+% be used as a component, since the first stream inputs items and the
+% last stream outputs items.  When a stream is embedded in another construct,
+% the first and last components of the stream are implicitly connected to the
+% stream's neighbors in the parent construct.
+%
+The {\bf SplitJoin} construct is used to specify independent parallel
+streams that diverge from a common {\it splitter} and merge into a
+common {\it joiner}.  As in a Pipeline, the components of a SplitJoin
+are specified with successive calls to {\tt add} from the {\tt init}
+function.  For example, the EchoEffect in Figure~\ref{fig:echo} adds
+two streams that run in parallel, each of which is a Delay filter.
+
+The splitter specifies how items from the input of the SplitJoin are
+distributed to the parallel components.  For simplicity, we allow only
+compiler-defined splitters, of which there are three types: 1) {\bf
+Duplicate}, which replicates each data item and sends a copy to each
+parallel stream, 2) {\bf RoundRobin($i_1$, $i_2$, $\dots$, $i_k)$},
+which sends the first $i_1$ data items to parallel stream 1, the next
+$i_2$ data items to parallel stream 2, and so on, and 3) {\bf Null},
+which means that none of the parallel components require any input,
+and there are no input items to split.  If the weights are ommitted
+from a RoundRobin, then they are assumed to be equal to one for each
+stream.  Note that RoundRobin can function as an exclusive selector if
+one or more of the weights are zero.
+% \begin{enumerate}
+% \item {\tt Duplicate}, which replicates each data item and sends a copy to each
+% parallel stream.
+% \item {\tt RoundRobin($i_1$, $i_2$, $\dots$, $i_k)$},
+% which sends the first $i_1$ data items to parallel stream 1, the next
+% $i_2$ data items to parallel stream 2, and so on.  If the weights are
+% ommitted, then they are assumed to be equal to one for each stream.  Note
+% that RoundRobin can function as an exclusive selector if one or more of the
+% weights are zero.
+% \item {\tt Null}, which means that none of the parallel components require
+% any input, and there are no input items to split.
+% \end{enumerate}
+
+Likewise, the joiner is used to indicate how the outputs of the
+parallel streams should be interleaved on the output channel of the
+SplitJoin.  There are two kinds of joiners: 1) {\bf RoundRobin}, whose
+function is analogous to a RoundRobin splitter, and 2) {\bf Null},
+which means that none of the parallel components produce any output,
+and there are no output items to join.
+% \begin{enumerate}
+% \item {\tt RoundRobin($i_1$, $i_2$, $\dots$, $i_k)$}, whose function is analogous to a RoundRobin splitter.
+% \item {\tt Null}, which means that none of the parallel components produce
+% any output, and there are no output items to join.
+% \end{enumerate}
+The splitter and joiner type are specified with calls to {\tt
+setSplitter} and {\tt setJoiner}, respectively.  The EchoEffect 
+uses a Duplicate splitter so that each signal appears both directly
+and as an echo; it uses a RoundRobin joiner to interleave the immediate
+signals with the delayed ones.  In AudioEcho, an Adder is used to 
+combine each pair of interleaved signals.
+
+The last control construct provides a way to create cycles in the
+stream graph: the {\bf FeedbackLoop}.  The Fibonacci stream in Figure
+\ref{fig:feed} illustrates the use of this construct.  Each FeedbackLoop
+contains: 1) a joiner, to merge the feedback path with the outside
+input stream at the top of the loop, 2) a body stream, which comprises
+the forward path of the loop, 3) a splitter, which distributes data
+between the output channel and the feedback path, and 4) a loop
+stream, which can perform some computation along the feedback path.
+These components are specified from within the {\tt init} function via
+calls to {\tt setJoiner}, {\tt setBody}, {\tt setSplitter}, and {\tt
+setLoop}, respectively.  The splitters and joiners can be any of those
+for SplitJoin, except for Null.  The call to {\tt setLoop} can be
+ommitted if no computation is performed along the feedback path.
+
+The FeedbackLoop has a special semantics when the stream is first
 starting to run.  Since there are no items on the feedback path at
 first, the stream instead inputs items from an {\tt initPath} function
-defined by the {\tt FeedbackLoop}; {\tt initPath} is called with the
-number of the data item that is being fabricated (starting from 0).
-With a call to {\tt setDelay} from within the {\tt init} function, the
-user can specify how many items should be calculated with {\tt
-initPath} before the joiner looks for data items from the feedback
-channel.
+defined by the FeedbackLoop; given an index $i$, {\tt initPath}
+provides the $i$'th initial input for the feedback joiner.  With a
+call to {\tt setDelay} from within the {\tt init} function, the user
+can specify how many items should be calculated with {\tt initPath}
+before the joiner looks for data items from the feedback channel.
 
-Evident in all of these examples is another feature of the StreamIt
-syntax: {\it inlining}.  The definition of any stream or filter can be
-inlined at the point of its instantiation, thereby preventing the
-definition of many small classes that are used only once, and,
-moreover, providing a syntax that reveals the hierarchical structure
-of the streams from the indentation level of the code.  In our Java
-syntax, we make use of anonymous classes for inlining \cite{java}.
+Evident in the Fibonnacci example of Figure \ref{fig:feed} is another
+feature of the StreamIt syntax: {\it inlining}.  The definition of any
+stream or filter can be inlined at the point of its instantiation,
+thereby preventing the definition of many small classes that are used
+only once, and, moreover, providing a syntax that reveals the
+hierarchical structure of the streams from the indentation level of
+the code.  In our Java syntax, we make use of anonymous classes for
+inlining \cite{java}.
 
 \subsubsection{Rationale}
 
 StreamIt differs from other languages in that it imposes a
 well-defined structure on the streams; all stream graphs are built out
-of a hierarchical composition of Streams, SplitJoins, and
+of a hierarchical composition of Pipelines, SplitJoins, and
 FeedbackLoops.  This is in contrast to other environments, which
 generally regard a stream as a flat and arbitrary network of filters
 that are connected by channels.  However, arbitrary graphs are very
@@ -398,8 +341,7 @@ hard for the compiler to analyze, and equally difficult for a
 programmer to describe.  Most programmers either resort to
 straight-line code that links one filter to another (thereby making it
 very hard to visualize the stream graph), or using an ad-hoc graphical
-programming environment that is awkward to use and admits no good
-textual representation.
+programming environment that admits no good textual representation.
 
 In contrast, StreamIt is a clean textual representation
 that--especially with inlined streams--makes it very easy to see the
@@ -408,23 +350,35 @@ comparison of StreamIt's structure with arbitrary stream graphs could
 be likened to the difference between structured control flow and GOTO
 statements.  Though sometimes the structure restricts the
 expressiveness of the programmer, the gains in robustness,
-readability, and compiler analysis are immense.
+readability, and compiler analysis are immense.  A graphical editor
+for StreamIt would also have advantages over a purely graphical
+environment, since 1) the hierarchical structure of the stream graph
+would enable clear visualizations, and 2) every stream graph has a
+precise textual equivalent that could also be edited by the
+programmer.
 
-A final benefit of stream graph construction in StreamIt is the
-ability to do {\it scripting} to parameterize graphs.  For instance,
-both the FFT stream in Figure \ref{fig:fft} inputs a parameter {\tt N}
-and adjusts the number of butterfly stages appropriately.  This
-further improves readability and decreases code size.
+On first glance, the statements within StreamIt {\tt init} functions
+might appear more like a verbose API than a novel language.  However,
+it was actually a careful design decision to specify all "stream
+configuration information" via function calls from within the {\tt
+init} functions.  While the current syntax is somewhat tedious, there
+is great flexibility in this approach, since the user can intermix
+configuration directives with statements that calculate the
+configuration parameters.  In all, this allows for fully parameterized
+graph construction--the FFT stream in Figure \ref{fig:fft-streamit}
+inputs a parameter {\tt N} and adjusts the number of butterfly stages
+appropriately.  This further improves readability and decreases code
+size.
 
 \subsection{Messages}
 
-\subsubsection{StreamIt Approach}
-
-\begin{figure}
-\psfig{figure=portal-code.eps,width=3.0in}
-\caption{The frequency-hopping of our software radio illustrates StreamIt's messaging system.  In {\tt TrunkedRadio}, a {\tt Portal} is created to hold the message target, {\tt rf2if}.  Then, {\tt CheckFreqHop} uses the {\tt Portal} to send a frequency-change message.}
+\begin{figure}[h]
 \vspace{-12pt}
-\label{fig:portal-code}
+\psfig{figure=messaging-code.eps,width=675.44pt}
+\vspace{-18pt}
+\caption{The frequency-hopping of our software radio illustrates StreamIt's messaging system.  In {\tt TrunkedRadio}, a {\tt Portal} is created to hold the message target, {\tt rf2if}.  Then, {\tt CheckFreqHop} uses the {\tt Portal} to send a frequency-change message.
+\protect\label{fig:portal-code}}
+\vspace{-18pt}
 \end{figure}
 
 StreamIt provides a dynamic messaging system for passing irregular,
@@ -459,10 +413,10 @@ last invocation of its own {\tt work} function which produces an item
 affecting the some output of the {\it sender's} $4N$'th to $6N$'th
 work functions, counting the sender's current work function as number
 0.  Due to space limitations, we cannot define this notion precisely
-in this paper (see \cite{streamittech} for a formal semantics), but
-the general idea is simple: the receiver is invoked when it sees the
-information wavefront that the sender sees in $4N$ to $6N$ execution
-steps.
+in this paper (see \cite{streamittech620,streamittech622} for a formal
+semantics), but the general idea is simple: the receiver is invoked
+when it sees the information wavefront that the sender sees in $4N$ to
+$6N$ execution steps.
 
 In some cases, the ability to synchronize the arrival of a message
 with some element of the data stream is very important.  For example,
@@ -474,14 +428,14 @@ the old or new frequency--{\tt CheckFreqHop} instructs the receiver to
 switch frequencies when the {\it receiver} sees one of the last data
 items at the old frequency.
 
-If the receiver of a message is a stream instead of a filter, then the
-message delivery is timed with respect to the first (most upstream)
-filter in the stream.  We are still formalizing the message delivery
-semantics in cases where the receiver is a stream that has no unique
-first filter (e.g., a SplitJoin with NULL splitter).  Note that the
-stream itself can receive a message even though the timing is in terms
-of filter-to-filter communication.
-
+% If the receiver of a message is a stream instead of a filter, then the
+% message delivery is timed with respect to the first (most upstream)
+% filter in the stream.  We are still formalizing the message delivery
+% semantics in cases where the receiver is a stream that has no unique
+% first filter (e.g., a SplitJoin with NULL splitter).  Note that the
+% stream itself can receive a message even though the timing is in terms
+% of filter-to-filter communication.
+%
 {\bf Portals for broadcast messaging.}  StreamIt also has support for
 modular broadcast messaging.  When a sender wants to send a message
 that will invoke method $M$ of the receiver $R$ upon arrival, it does
@@ -538,8 +492,6 @@ structured stream programming.
 \subsection{Re-Initialization}
 \label{sec:reinit}
 
-\subsubsection{StreamIt Approach}
-
 One of the characteristics of a streaming application is the need to
 occaisionally modify the structure of part of the stream graph.
 StreamIt allows these changes through a re-initialization mechanism
@@ -590,7 +542,10 @@ and optimization.
 
 Lastly, StreamIt provides a simple way of restricting the latency of
 an information wavefront in traveling from the input of one filter to
-the output of a downstream filter.  Issueing the directive {\tt
+the output of a downstream filter.  Issuing the directive {\tt
 MAX\_LATENCY(A, B, n)} from within an {\tt init} means that $A$ can
 only execute up to the wavefront of information that $B$ will see
 after $n$ invocations of its own work function.
+
+
+

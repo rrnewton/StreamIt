@@ -1,28 +1,54 @@
-\section{Conclusions}
+\section{Conclusions and Future Work}
 \label{sec:conc}
 
 This paper presents StreamIt, a novel language for high-performance
-streaming applications.  Streaming programs are an emerging class of
-very important applications with distinct properties from other
-recognized application classes.
+streaming applications.  Stream programs are emerging as a very
+important class of applications with distinct properties from other
+recognized application classes.  This paper develops fundamental
+programming constructs for the streaming domain.
 
-StreamIt aims to raise the abstraction level in stream programming,
-thereby improving programmer productivity and program robustness. This
-paper presents fundamental programming constructs for the Stream
-application domain. It identifies information flow as the natural
-model for reasoning about streaming applications, and presents a
-formal definition of the language using a semantics of time for
-StreamIt.
+The primary goal of StreamIt is to raise the abstraction level in
+stream programming without sacrificing performance.  We have argued
+that StreamIt's mechanisms for filter definition, filter composition,
+messaging, and re-initialization will improve programmer productivity
+and program robustness within the streaming domain.
 
-The second goal of StreamIt is to provide a compiler that performs
-stream-specific optimizations to achieve the performance of an expert
-assembly programmer. Currently, a library-based implementation of
-StreamIt is working. We are starting the development of the first
-compiler implementation of StreamIt. Another area of future research
-is to develop a clean high-level syntax for StreamIt. The Java-based
-syntax has many advantages, including programmer familiarity,
-availability of compiler frameworks and a robust language
-specification. However, the resulting StreamIt syntax is cumbersome.
+Also, we believe that StreamIt is a viable common machine language for
+grid-based architectures (e.g., \cite{smartmemories,raw,trips}), just
+as C is a common machine language for von-Neumann machines.  StreamIt
+abstracts away the target's granularity, memory layout, and network
+interconnect, while capturing the notion of independent processors
+that communicate in regular patterns.  Communication in StreamIt
+corresponds naturally to grid-based machines, as neighbors are
+connected by high-bandwidth channels, but non-neighbors can exchange
+low-bandwidth messages without relying on a global clock or a
+particular network topology.  We are developing fission and fusion
+algorithms that can automatically adjust the granularity of a stream
+graph to match that of a given target.
+
+We have a number of extensions planned for the next version of the
+StreamIt language.  The current version is designed primarily for
+uniform one-dimensional data processing, but constructs for
+hierarchical frames of data could be useful for image processing.
+Moreover, a future version will support dynamically varying I/O rates
+of the filters in the stream.  We expect that such support will
+require new language constructs--for instance, a type-dispatch
+splitter that routes items to the components of a SplitJoin based on
+their type, and a fall-through joiner that pulls items from any stream
+in a SplitJion as soon as they are produced.
+
+An orthogonal area of future research is to develop a clean high-level
+syntax for StreamIt.  The Java-based syntax has many advantages,
+including programmer familiarity, availability of compiler frameworks
+and a robust language specification.  However, the resulting StreamIt
+syntax is cumbersome.
+
+Our immediate focus is on developing a high-performance optimizing
+compiler for StreamIt 1.0.  As described in \cite{streamittech622},
+the structure of StreamIt can be exploited by the compiler to perform
+a wide range of stream-specific optimizations.  Our goal is to match
+the performance of hand-coded applications, such that the abstraction
+benefits of StreamIt come with no performance penalty.
 
 
 
