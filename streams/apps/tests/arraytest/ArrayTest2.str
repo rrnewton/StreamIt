@@ -1,0 +1,40 @@
+void->void pipeline ArrayTest2
+{
+  add void->float[4][4] filter {
+    float val;
+    init { val = 1.0; }
+    work push 1 {
+      int i, j;
+      float[4][4] myArray;
+      for (i = 0; i < 4; i++)
+        for (j = 0; j < 4; j++) {
+          myArray[i][j] = val;
+          val = val + 1;
+        }
+      push(myArray);
+    }
+  };
+  add float[4][4]->float[3][3] filter {
+    work pop 1 push 1 {
+      int i, j;
+      float[4][4] popArray;
+      float[3][3] myArray;
+      popArray = pop();
+      popArray[2][2] = 3;
+      for (i = 0; i < 3; i++)
+        for (j = 0; j < 3; j++)
+          myArray[i][j] = popArray[i][j];
+      push(myArray);
+    }
+  };
+  add float[3][3]->void filter {
+    work pop 1 {
+      int i, j;
+      float[3][3] popArray;
+      popArray = pop();
+      for (i = 0; i < 3; i++)
+        for (j = 0; j < 3; j++)
+          print(popArray[i][j]);
+    }
+  };
+}
