@@ -8,31 +8,33 @@ general
 * Figure 2: explain how to follow chart, what each line means
 * define what "simulateCurrentPhase" means in Figure 1
 * explain what [n:m] notation means 
-  - (``Message sends are annotated with a range [n:m] that means...'')
+  x added explanation to example when first introduced
+  - could still be more explicit somewhere:
+    "Message sends are annotated with a range [n:m] that means..."
 - fix "automatic" wraparound in figure caption
 
 technical things
 ----------------
-** resolve timing issue in radio, as raised by reviewer
-** fix jasper's off-by-one errors.  Might be the same as reviewer comment:
- 3 There are two equations in the paragraph after Theorem 1. The second
+x resolve timing issue in radio, as raised by reviewer
+x fix jasper's off-by-one errors.  Might be the same as reviewer comment:
+ x There are two equations in the paragraph after Theorem 1. The second
    term of the RHS of the first equation is "SDEP A<-E (n-1 mod |S ^ E|)",
    but this should be written as "SDEP A<-E (n mod |S ^ E|)"? The same
    goes for the second equation.
-** resolve SDEP bugs suggested by reviewer below
+x resolve SDEP bugs suggested by reviewer below
 * say something about determining whether message constraints are feasible
 - see if there is anything worth integrating in constrained.tex (on constrained messaging)
 
 specific reviewer comments
 --------------------------
-3 The last paragraph. "so we would conclude that SDEP A<-B (1) = 4." I
-think that SDEP A<-B (1) = 5.
+x 3 The last paragraph. "so we would conclude that SDEP A<-B (1) = 4." I
+  think that SDEP A<-B (1) = 5.
 
-4.1 Definition 2. In Case 2,
+x 4.1 Definition 2. In Case 2,
   "SDEP A<-B (n+k_1)" -> "SDEP B<-A (n+k_1)" 
   "SDEP A<-B (n+k_2)" -> "SDEP B<-A (n+k_2)"
 
-4.2 Figure 4. Where is the latency rage [4:6] specified in the code?
+x 4.2 Figure 4. Where is the latency rage [4:6] specified in the code?
 
 4.2 Figure 4. To make the paper self-contained, I think that you should
 explain a bit about StreamIt, in particlar, the roundrobin construct for

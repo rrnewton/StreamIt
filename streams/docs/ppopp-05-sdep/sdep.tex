@@ -156,9 +156,9 @@ two actors $X$ and $Y$, $\sdepf{X}{Y}(0) = 0$}:
 \begin{equation*}
 \begin{array}{l}
 \mbox{} \hspace{-5pt} \sdepf{A}{E}(n) = \\ 
-~~~~~|{\cal S} \wedge A| * \floor{n-1}{|{\cal S} \wedge E|} + \sdepf{A}{E}(n-1~\mt{mod}~|{\cal S} \wedge E|) \vspace{3pt} \\
+~~~|{\cal S} \wedge A| * \floor{n-1}{|{\cal S} \wedge E|} + \sdepf{A}{E}(1 + (n-1)~\mbox{mod}~|{\cal S} \wedge E|) \vspace{3pt} \\
 \mbox{} \hspace{-5pt} \sdepf{B}{E}(n) = \\
-~~~~~|{\cal S} \wedge B| * \floor{n-1}{|{\cal S} \wedge E|} + \sdepf{B}{E}(n-1~\mt{mod}~|{\cal S} \wedge E|)
+~~~|{\cal S} \wedge B| * \floor{n-1}{|{\cal S} \wedge E|} + \sdepf{B}{E}(1 + (n-1)~\mbox{mod}~|{\cal S} \wedge E|)
 \end{array}
 \end{equation*}
 where ${\cal S}$ is a steady state execution.  In this example,
@@ -179,9 +179,9 @@ is only with respect to the base actor $X$. For other pairs of actors
 in the graph, one actor might execute more than necessary for $n$
 executions of the other.  For example, consider what happens if we
 calculate $\sdepf{A}{B}$ using the schedule in Figure~\ref{fig:sdep1}
-(which is a pull schedule for $E$).  In the schedule, $A$ executes 4
+(which is a pull schedule for $E$).  In the schedule, $A$ executes 5
 times before the first firing of $B$, so we would conclude that
-$\sdepf{A}{B}(1) = 4$.  However, this is incorrect; since $B$ could
+$\sdepf{A}{B}(1) = 5$.  However, this is incorrect; since $B$ could
 have fired after only 2 executions of $A$, the correct value is
 $\sdepf{A}{B} = 2$.  Thus, to calculate $\sdepf{X}{Y}$, it is
 essential to calculate ${\bf pullSchedule}(Y, |{\cal S} \wedge Y|)$,

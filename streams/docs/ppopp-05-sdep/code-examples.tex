@@ -42,8 +42,8 @@ float->float splitjoin Check_Freq_Hop(int N,
           float val = pop();
           push(val);
           if (val > hop_threshold)
-            port.set_frequency(START_FREQ + 
-                               i/7*Constants.BANDWIDTH)
+            port.set_frequency(START_FREQ +
+                              i/7*Constants.BANDWIDTH) [4:4]
         }
       }
     }
