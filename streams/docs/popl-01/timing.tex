@@ -1,4 +1,4 @@
-\section{Timing Semantics}
+\section{Semantics of Time}
 
 In this section we develop a more formal semantics for the message
 delivery guarantees described above.  The timing model in StreaMIT is
@@ -241,8 +241,8 @@ guarantees.
 \subsubsection{Messages}
 
 Suppose that filter $A$ sends a message to filter $B$ with latency
-$n$, where $n$ could is any integer.  In $n$ invocations of $A$'s {\tt
-work} function, $A$ will produce one or more data items $d$.  Now, the
+$n$, where $n$ is any integer.  In $n$ invocations of $A$'s {\tt work}
+function, $A$ will produce one or more data items $d$.  Now, the
 messaging system guarantees that:
 
 \begin{enumerate}
@@ -263,110 +263,161 @@ of a shared set of splitters and joiners.  {\bf Flesh out details.}
 These guarantees can be expressed more formally as a set of
 constraints on the number of items on certain tapes in the system.
 Again, suppose that filter $A$ sends a message to filter $B$ with
-latency $n$, where $n$ could is any integer.  Let $n(a)$ denote the
-number of items on tape $a$.  For the message to be able to be
-delivered on time, we have that:
+latency $n$, where $n$ could is any integer.  Let $s$ denote the
+number of items on $O_A$ when the message was sent, and $r$ denote the
+number of items on $O_B$ when the message is received.  We have that:
 
 \begin{enumerate}
 
-\item If $B$ is upstream of $A$:
-\begin{eqnarray*}
-n(O_B) \le \mi{O_B}{O_A}(n(O_A) + push_A * n)
-\end{eqnarray*}
-That is, $n(O_A) + push_A * n$ is the number of items on $A$'s output
-tape after producing the data of interest.  Then, $y =
-\mi{O_B}{O_A}(n(O_A) + push_A * n)$ is the latest item on $B$'s output
+\item If $B$ is upstream of $A$, the message will be delivered when:
+\begin{eqnarray}
+\label{eq:msgup}
+r = \mi{O_B}{O_A}(s + push_A * n)
+\end{eqnarray}
+That is, $s + push_A * n$ is the number of items on $A$'s output tape
+after producing the data of interest.  Then, $y =
+\mi{O_B}{O_A}(s + push_A * n)$ is the latest item on $B$'s output
 tape that affects the data of interest.  The message should be
 delivered immediately after the work funtion producing this item,
-which is only possible if the item count $n(O_B)$ does not exceed $y$,
-as specified by the constraint.
+which occurs when the item count $r$ equals $y$, as specified by the
+constraint.
 
-\item If $B$ is downstream of $A$:
-\begin{eqnarray*}
-n(O_B) \le \ma{O_A}{O_B}(n(O_A) + push_A * (n-1))
-\end{eqnarray*}
-That is, $n(O_A) + push_A * (n - 1)$ is the number of items on $A$'s
-output tape before pushing the data of interest, and $z =
-\ma{O_A}{O_B}(n(O_A) + push_A * (n-1))$ is the maximum number of items
+\item If $B$ is downstream of $A$, the message will be delivered when:
+\begin{eqnarray}
+\label{eq:msgdown}
+r = \ma{O_A}{O_B}(s + push_A * (n-1))
+\end{eqnarray}
+That is, $s + push_A * (n - 1)$ is the number of items on $A$'s
+output tape before pushing the data of interest, and $y =
+\ma{O_A}{O_B}(s + push_A * (n-1))$ is the maximum number of items
 on $B$'s output tape as a result of the outputs of $A$.  Thus, when
 $A$ pushes the next set of data, it could affect the data that will be
 pushed next onto the output tape of $B$.  (Note that the next set of
 data from $A$ might not be sufficient to calculate the next set on
 $B$'s output, but it could affect it nonetheless.)  The message must
-be delivered before this effected data appears on $B$'s output, so the
-number of items $n(O_B)$ on $B$'s output must not exceed $z$.
+be delivered immediately before this effected data appears on $B$'s
+output, so the number of items $r$ on $B$'s output must equal $y$.
 
 \end{enumerate}
 
-\subsection{Scheduling Constraints}
+\subsubsection{Latency}
 
-program checking 
-	- going around feedback loop gives same coefficient of x
-	- going through both paths of split-join gives same coeff. of x
+\subsubsection{Scheduling}
 
-\begin{verbatim}
+We can fully define the possible sequences of filter executions as a
+set of constraints on the number of items on each tape in the stream
+graph.  This is useful not only from the perspective of semantics, but
+for compiler analysis of the space of valid schedules.  We will use
+$n(t)$ to represent the number of items on tape $t$ at a given point
+of execution.  A configuration C of the stream graph can be completely
+represented by the vector $(n(t_1), n(t_2), \dots, n(t_k))$, where
+$t_1$ through $t_k$ are the tapes in the graph.  A legal configuration
+must satisfy three sets of constraints:
 
---------------------------------------------------------------------------
+\begin{enumerate}
 
-- Definition of wavefront stuff
+\item {\it Data dependences.}  A filter can only have as many items on
+its output tape as can be produced by the items on its input tape.
+For each filter $A$ in the program, we have the constraint:
+\begin{eqnarray*}
+n(O_A) \le \ma{I_A}{O_A}(n(I_A))
+\end{eqnarray*}
+Equivalently, we can pose this constraint in the opposite direction:
+each input tape must contain at least the number of items that are
+required by the output tape:
+\begin{eqnarray*}
+n(I_A) \ge \mi{I_A}{O_A}(n(O_A))
+\end{eqnarray*}
 
-- Scheduling Constraints
-	- data flow
-	- messaging
+\item {\it Message guarantees.}  Suppose that a filter $A$ might send
+a message to filter $B$ with a maximum latency of $l$ during any
+invocation of its work function.  Then we must constrain the execution
+of $B$ to make sure that it is not too far ahead to receive the
+message with the given latency.  That is, we can only execute $B$ so
+long as $n(O_B)$--the item count on its output tape--does not exceed
+the count when a message would be delivered.  Recalling the expression
+for message delivery time (Equations \ref{eq:msgup} and
+\ref{eq:msgdown}), this constraint is as follows if $B$ is upstream of $A$:
+\begin{eqnarray*}
+n(O_B) \le \mi{O_B}{O_A}(n(O_A) + push_A * l)
+\end{eqnarray*}
+and as follows if $B$ is downstream of $A$:
+\begin{eqnarray*}
+n(O_B) \le \ma{O_A}{O_B}(n(O_A) + push_A * (n-1))
+\end{eqnarray*}
 
-- Semantics of the functions
-	- in terms of messages and latency
+\item {\it Latency guarantees.}
 
---
+\end{enumerate}
 
-scheduling constraints:
+{\bf Defining the schedule.}  For a stream graph with a given set of
+latency requirements and message delivery guarantees, we now have a
+set of constraints expressing whether or not a given configuration
+$(n(t_1), n(t_2), \dots, n(t_k))$ is legal.  It is a straightforward
+step to formulate a legal sequence of transitions between
+configurations, thereby exactly defining a legal order in which to
+execute the filters' work functions.
 
-- again let n_a denote the number of items on the OUTPUT tape of filter a
+When the program begins, no items have been pushed on any data
+channels.  Thus, each tape is empty, and the starting configuration
+$C_0$ is simply the zero-vector.  It is possible that the initial
+configuration violates some of the constraints imposed by the
+messaging and latency constructs, in which case the compiler can
+inform the programmer that the delivery constraints requested in the
+program are unsatisfyable.
 
-if have filters a and b in pipeline (a -> b), then these are equivalent:
-	- n_b <= h_b(n_a)
-	- n_a >= p_b(n_b)
+Let {\cal P}(C) denote whether or not the constraints for a stream
+graph are satisfied for a given configuration C.  We can then write
+the transition function between configurations as follows:
+\begin{eqnarray*}
+(n(t_1), \dots , n(out_A), \dots, n(t_k)); \\ \frac{{\cal P}((n(t_1), \dots , n(out_A + push_A), \dots, n(t_k)))}{(n(t_1), \dots , n(out_A + push_A), \dots, n(t_k))}
+\end{eqnarray*}
+To understand this rule, observe that if we execute one step of filter
+$A$, the only difference between the original configuration $C$ and
+the new configuration $C'$ is that the item count for the output tape
+of $A$ has increased by $push_A$ in $C'$.  Thus, if $C$ was valid and
+$C'$ satisfies the constraints {\cal P}, then $C'$ represents a legal
+configuration and the execution of $A$ is valid.  These operational
+semantics are interesting in that we do not need to explicitly model
+which data items are currently in which channels; instead, all of the
+state is captured in terms of each filter's execution history.
 
-if have splitjoin with input a, then (b, c) in parallel, and output d:
-	- there are n_a on input
-	- can have up to h(n_a) = (ceil(n_a/2), floor(n_a/2)) into (b, c)
-	- can have up to (h_b(ceil(n_a/2)), h_c(floor(n_a/2))) out of (b, c)
-	- can have up to min(2*h_b(ceil(n_a/2))-1,2*h_c(floor(n_a/2))) into d
+\subsection{Program Verification}
 
-	so constraint is that:
-	- n_d <= h_d( min(2*h_b(ceil(n_a/2))-1,2*h_c(floor(n_a/2))) )
+A number of program analysis techniques are also enabled by the $min$
+and $max$ functions that we have defined.  In particular, it is very
+simple to compute 1) whether or not the program will deadlock as a
+result of a starved input channel, and 2) whether or not any buffer
+will grow without bound during the steady-state execution of the
+program.
 
-	or, in other words, h(x) for a split/join is:
-		h(x) = min(2*h_b(ceil(n_a/2))-1,2*h_c(floor(n_a/2)))
+{\bf Deadlock detection.}  The deadlock detection algorithm takes
+advantage of the fact that the only loops in our stream graph are part
+of a FeedbackLoop construct.  A stream graph will be deadlock-free if
+and only if there is no net change of output rate in the feedback
+loop.  This can be formulated in terms of the $max$ function by
+requiring that the wavefront from the output of the feedback joiner
+$FJ$ unto itself is the identity function:
+\begin{eqnarray*}
+\ma{O_FJ}{O_FJ}(x) = x
+\end{eqnarray*}
+For the purposes of this calculation, one must assume that there are
+an infinite number of items on tape $I1_FJ$; that is, the join from
+the feedback loop is not limited by the external data source.  Given
+this stipulation, one can calculate $\ma{O_FJ}{O_FJ}(x)$ using the
+composition rules that we derived before, tracing a route around the
+feedback loop.  If $\ma{O_FJ}{O_FJ}(x)$ is less than $x$, then there
+will be deadlock in the program.
 
-if sending message from a to b with max wavefront latency n, then:
-	
-	1. if b is downstream, with filters x1, x2, x3 in between a and b:
-			a -> x1 -> x2 -> x3 -> b
+{\bf Overflow detection.}  There are two places that a buffer can
+overflow in the stream graph.  The first is in a feedback loop, when
+$\ma{O_FJ}{O_FJ}(x)$ (calculated above) is more than $x$.  The second
+case is when the parallel streams of a split/join have different
+production rates.  For a splitter $S$ and a joiner $J$, the production
+rates will cause an overflow if and only if $\ma{O1_S}{I1_J}(x) -
+\ma{O2_S}{I2_J}(x)$ is not $O(1)$.  This difference could be analyzed
+by a compiler for every SplitJoin in the stream graph to verify that
+no buffers will overflow during steady-state execution.
 
-		n_b <= h_b(h_x3(h_x2(h_x1(n_a + n * a.push))))
-
-	2. if b is upstream, with filters x1, x2, x3 between b and a:
-			b -> x1 -> x2 -> x3 -> a
-
-		n_b <= p_x3(p_x2(p_x1(p_a(n_a + n * a.push))))
-
-	3. in the general case, a is sending message to b.  trace a
-		path, finding y1, y2, y3 that are blocks between OUTPUT of
-		a and OUTPUT of b.  a -> y1 -> y2 -> y3 -> b.  (note that
-		if b is upstream, then y1 = a.)  Then we have:
-
-		n_b <= z_y3(z_y2(z_y1(n_ a + n * a.push)))
-
-		where z is replaced by h if we are traveling downstream, 
-		but replaced by p if we are traveling upstream.
-
-aha, if coming from common sender or going to common receiver, the wavefront
-	must have EQUAL index at the sender or receiver.  so you REFLECT
-	around split/join points instead of translating through them.
-	because if you go up one part of join and down the other, the
-	wavefront shifts
-
-\end{verbatim}
 
 
