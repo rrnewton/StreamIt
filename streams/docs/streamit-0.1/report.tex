@@ -334,6 +334,15 @@ could remove it if desired.  The inlined syntax is thus an equivalent
 way of declaring filters.  We could translate any inlined filter into
 a named filter that is explicitly instantiated.
 
+An important restriction on filter instantiation is that the stream's
+structure (i.e., which blocks appear in the stream and how they are
+connected) must be known at compile time.  For now, this means that no
+conditional control flow (e.g., {\tt for}, {\tt if}, {\tt while}) can
+surround filter instantiations.  Later we will introduce two methods
+to relax this restriction: {\tt StreamSelect} (Section
+\ref{sec:streamselect}) and the scripting language (Section
+\ref{sec:script}).
+
 \subsubsection{FilterBlocks}
 
 The second kind of functional block, the {\tt FilterBlock}, is similar
@@ -801,6 +810,7 @@ old and the new blocks (as far as flushing pipelines, etc), but {\bf
 we still need to work out the details}.
 
 \subsubsection{StreamSelect}
+\label{sec:streamselect}
 
 Now that we have a method of re-initializing blocks, it is natural to
 consider a control construct that can produce different stream
@@ -809,6 +819,9 @@ filter can change the structure of the stream dynamically, albeit
 through an expensive re-initialization operation that should be used
 sparingly.  The {\tt StreamSelect} construct serves this purpose; its
 syntax is as follows:
+
+\begin{tabbing}
+\hspace{0.2in} \= \hspace{0.2in} \= \hspace{0.2in} \= \hspace{0.2in} \= \\
 
 {\tt StreamSelect(} {\it switch-expr} {\tt )} \{ \\ \\
 \> {\tt case }{\it const-literal$_1$}{\tt :  }{\it stream$_1$}; \\
@@ -822,63 +835,77 @@ syntax is as follows:
 The stream returned by the {\tt StreamSelect} construct is a function
 of the value of {\it switch-expr}, which must be of a type allowed by
 the standard C {\tt switch} statement.  Also familiar from a common
-{\tt switch} statement is 1) the in-order evaluation of the {\tt case}
-statements, and 2) the optional {\tt default} case, which is evaluated
-if none of the case statements match.  However, the semantics differ
-from the traditional {\tt switch} statement in that we do not require
-{\tt break} commands to return control out of a given case; rather,
-control returns by default instead of falling through to the next
-case.
+{\tt switch} statement is 1) Each const-literal$_i$ must be unique,
+and 2) the optional {\tt default} case, which is evaluated if none of
+the case statements match.  However, the semantics differ from the
+traditional {\tt switch} statement in that we do not require {\tt
+break} commands to return control out of a given case; rather, control
+returns by default instead of falling through to the next case.
 
 \section{Scripting Language}
 \label{sec:script}
 
-\begin{verbatim}
+The preceding sections completely describe the class of programs that
+can be expressed in StreaMIT.  However, the restriction that block
+instantiations can not appear within any conditional control flow
+makes graph construction tedious and inflexible--for example, by
+requiring $n$ repeated filter instantiations instead of having a
+single instantiation inside a {\tt for} loop.
 
-2) scripting language
+To allow such parameterized block instantiations, we introduce special
+script variables, script control constructs, and script parameters
+whos values can be analyzed at compile time.
 
-	- to ease construction of the filter graph
-	- the script that is implemented on top of the basic language can
-		always be ``compiled out'' to leave a (possibly larger) 
-		graph in the basic language.
+\subsection{Script Type}
 
-	A. script variable type
-		- all things of type script can be determined at
-                  compile time (i.e.other script variables, constant
-                  literals, pure funcs of these)
-		- graph structure can depend only on script control
-                  flow, but all other constructs can reference script
-                  variables, too
-		- can only be assigned within scripting control flow
-			- sfor, sdo, etc (open to negotiation)
-			- can only appear within scripting control flow
-		- a function can return a script variable if its parameters
-			are script variables and it references no global
-			dynamic variables.  
+The {\tt script} keyword is a primitive type modifier, with syntax
+analogous to {\tt const} in Java or C:
 
-	A. scripting parameters to filters and filterblocks
-		- parameters of type script, denoted by < >
-		- don't change across all instantiations, for a given 
-			compilation.
+\medskip
+{\tt script }{\it type variable-name};
+\medskip
 
----------------------------------------------------------------------------
+The restriction on script variables is that their value must be
+analyzable at compile-time for all points in the program.  An
+expression is of type {\tt script} if it is: 1) a constant literal, 2)
+a script variable that has been initialized, or 3) a pure function of
+these.  A ``pure function'' is either a determistic primitive operator
+(e.g., the arithmetic operators) or a user-defined function without
+global side effects that returns a {\tt script} expression.
 
-not explicitly going into user's guide:
+Control flow that depends only on script expressions is called {\it
+script control flow}.  To make it clear to the programmer which
+control constructs have this property, we designate different keywords
+for all script control constructs.  They have the names of the normal
+constructs, but with an ``s'' prepended, e.g., {\tt sfor}, {\tt sif},
+and {\tt swhile}.  Only expressions of type {\tt script} can appear in
+the conditional clause of these constructs.
 
-- four language levels:
-	1. code implementing filters
-	2. static connection of the filters to form supergraph
-	3. scripting to make (2) simple
-	4. dynamic invocation / reinitialization
+Thus, with these definitions, we see that for the value of a script
+variable to be statically determined at all points in the program, it
+must only be assigned expresseions of type {\tt script}, and these
+assignments must appear only within script control flow.  By the same
+reasoning, the stream structure is statically analyzable if all block
+instantiations are within script control flow.  This is our new
+restriction on block instantiations: they can be enclosed in control
+flow, but it must be {\it script} control flow.
 
-- four levels of semantic checking:
-	- incorrect
-	- not implemented
-	- warning
-	- performance problem
+\subsection{Script Parameters}
 
-\end{verbatim}
+Parameters of type {\tt script} can also be passed to filters and
+filter blocks.  Since the values of these parameters can be determined
+at compile time, they will not change across multiple instantiations
+of a block.  Thus, we allow the user to specify script parameters
+enclosed between angled brackets before the regular dynamic
+parameters:
 
+{\tt Filter} filter-name $<${\tt script} type$_{s1}$, {\tt script} type$_{s2}$, \dots {\tt script} type$_{sn}>$ (type$_1$ dynamic-param$_1$, type$_2$ dynamic-param$_2$, \dots , type$_n$ dynamic-param$_n$) \{ \dots \} \\
+
+{\tt FilterBlock} filter-block-name $<${\tt script} type$_{s1}$, {\tt script} type$_{s2}$, \dots {\tt script} type$_{sn}>$ (type$_1$ dynamic-param$_1$, type$_2$ dynamic-param$_2$, \dots , type$_n$ dynamic-param$_n$) \{ \dots \} \\
+
+The script parameters can be used just like the dynamic ones in the
+context of the filters, but do not need to be given as arguments to
+re-initialization calls.
 
 \end{document}
 
