@@ -27,8 +27,7 @@
 %% section if it doesn't apply to your work.
 
 
-\abstitle{Hybrid Space-Time Partitioning of Stream Programs with
-Linear Code Generation for Raw}
+\abstitle{Hybrid Space-Time Partitioning of Stream Programs}
          {Michael Gordon, Jasper Lin, William Thies, and Saman Amarasinghe}
 
 %% Please include an index entry for each author, keeping the names
@@ -66,29 +65,29 @@ to produce an efficient executable on any of the candidate targets.
 
 \absection{How} 
 
-Given a stream graph, composed of filters (actors) and FIFO,
-uni-directional arcs connecting the filters, what is the best way to
-execute it?  If we are targeting a uniprocessor, the most obvious
-technique would be {\it time multiplexing} where we run one filter at
-a time on the processor.  Load balancing is not an issue and the
-memory interface provides synchronization.  Problems arise if we
-target a multiprocessor.  Time multiplexing leads to long latency,
-lots of memory traffic (possibly with bad cache behavior), and the
-utilization would depend on the presence of data-parallel filters that
-could be spread across the chip.
+Given a stream graph, composed of filters (actors) and uni-directional
+FIFO channels connecting the filters, what is the best way to execute
+it?  If we are targeting a uniprocessor, the most obvious technique is
+{\it time multiplexing} where we run one filter at a time on the
+processor.  Load balancing is not an issue and the memory interface
+provides synchronization.  Problems arise if we target a
+multiprocessor.  Time multiplexing leads to long latency, lots of
+memory traffic (possibly with bad cache behavior), and the utilization
+depends on the presence of data-parallel filters that can be spread
+across the chip.
 
-A second approach would be to run all the filters in parallel, each on
-its own tile.  This is termed {\it space multiplexing}.  Our first 
-StreamIt compiler for Raw uses this technique.  Space multiplexing
-affords no filter swapping overhead, reduced memory traffic,
-localized communication, and tighter latencies.  Due to these
-properties, space multiplexing scales extremely well.  
-Load balancing is the performance focal point of space multiplexing.  Merging
-and splitting filters of the stream graph until the graph is composed
-of $n$ load balanced filters, where $n <=$ \# of processing
-elements, proved difficult with many factors coming into play.
-Further, constraining ourselves to space multiplexing forced us to
-support arbitrarily complex communication patterns that did not map
+A second approach is to run all the filters in parallel, each on its
+own tile.  This is termed {\it space multiplexing}.  Our first
+StreamIt compiler for Raw uses this technique~\cite{streamit-asplos}.
+Space multiplexing affords no filter swapping overhead, reduced memory
+traffic, localized communication, and tighter latencies.  Due to these
+properties, space multiplexing scales extremely well.  Load balancing
+is the performance focal point of space multiplexing.  Merging and
+splitting filters of the stream graph until the graph is composed of
+$n$ load balanced filters, where $n \le$ the number of processing elements,
+proved difficult with many factors coming into play.  Further,
+constraining ourselves to space multiplexing forced us to support
+arbitrarily complex communication patterns that did not map
 efficiently to Raw's 2-D mesh.
 
 The technique employed by our new backend for Raw is to merge the
@@ -133,15 +132,15 @@ stream graph for a simple channel vocoder.  The dark ovals denote
 the linear filters of the application.  The white ovals are non-linear
 but stateless filters and thus can be data-parallelized.  
 
-An example mapping of this application would first execute the top
-low-pass filter slice, occupying the entire Raw chip executing enough
-times to supply the subsequent slices. Next, each band slice will
-occupy a quarter of the chip, executing the 4 bands in parallel.  Remember
-that each of the above slices are linear and our parameterized linear
-code generation provides near-optimal utilization. Finally, the
-non-linear, stateless pitch detector slice is data-parallelized across
-the entire Raw chip. Each slice reads its input from and writes its output
-to off-chip DRAM.
+An example mapping of this application first executes the top low-pass
+filter slice, occupying the entire Raw chip executing enough times to
+supply the subsequent slices. Next, each band slice will occupy a
+quarter of the chip, executing the 4 bands in parallel.  Remember that
+each of the above slices are linear and our parameterized linear code
+generation provides near-optimal utilization. Finally, the non-linear,
+stateless pitch detector slice is data-parallelized across the entire
+Raw chip. Each slice reads its input from and writes its output to
+off-chip DRAM.
  
 \absection{Progress}
 Currently, we have completed a first version of our hybrid space-time
@@ -149,7 +148,7 @@ multiplexing Raw backend for StreamIt and are in the process of
 evaluating its performance and scalability.  We have a robust
 implementation of inter-slice communication using Raw's off-chip
 streaming memory interface.  For intra-slice communication, we exploit
-Raw's static network and we translate StreamIt's filter code into C
+Raw's static network and translate StreamIt's filter code into C
 code to be executed on the compute processors.  We have completed
 parameterized code generation for linear filters that generates
 assembly directly.   
