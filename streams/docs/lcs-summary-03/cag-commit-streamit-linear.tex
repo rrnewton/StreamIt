@@ -30,24 +30,25 @@ More than fifty percent of the code that runs the Digital Signal Processors
 (DSPs) in a modern cell phone is written in assembly language and the 
 rest is written in annotated C\cite{gass-talk}. Clearly even the best 
 compilers that DSP companies can produce are utterly failing to produce
-the optimizion necessary for programs that will run the next generation
+the necessary level of performance for the programs that run the latest generation
 of signal processors.
 
 The sheer volume of analysis required to make optimal use of the special 
-purpose instructions in DSPs leaves compilers for standard languages such 
-as C unable to perform most of the simplest optimizations taught to electrical 
-engineering students. Using StreamIt~\cite{streamitcc}, 
+purpose architectures available in modern DSPs leaves compilers for existing languages 
+floundering. Existing compilers are unable to perform even the simplest 
+optimizations taught to undergraduate electrical engineering students. Using 
+StreamIt~\cite{streamitcc}, 
 a domain-specific stream processing language, we have been exploring
-high-level automatic DSP optimizations that are generally intractable 
-for a general-purpose language.
+high-level automatic DSP optimizations that are generally impossible
+to do in a general-purpose language.
 
 \formatsection{Approach}
 Our analysis and optimizations focus on filters which compute {\it linear} 
 functions of their inputs. A filter computes a linear function if
 the computation it does can be described by a vector-matrix operation. 
 Many fundamental DSP operations such as filtering, the Discrete Fourier 
-Transform (DFT), up sampling and downsampling, can be described 
-with vector-matrix operations. The foundation of this project is built on
+Transform (DFT), up sampling and down sampling, can be described 
+as vector-matrix operations. The foundation of this project is
 a simple dataflow algorithm that can determine which filters in a 
 StreamIt program perform linear computations and the specific matrices
 which describe that computation.
@@ -63,7 +64,7 @@ which describe that computation.
     \begin{minipage}{3.5in}
       \includegraphics[height=1.5in]{cag-commit-streamit-linear-sjcombo.eps} \\
       \noindent
-      {\bf (b) Combining a SplitJoin of linear sub streams.}
+      {\bf (b) Combining a {\tt splitjoin} of linear sub streams.}
     \end{minipage} \\
   \end{tabular}
   \caption{Graphical depictions of linear combination algorithms.}
@@ -73,11 +74,11 @@ which describe that computation.
 
 A primary benefit of linear filter analysis is that neighboring
 filters can be collapsed into a single matrix representation if both
-of the filters are linear. Transformations such as this automatically
+of the filters are linear. These transformations automatically
 eliminate redundant computations in linear sections of the stream
-graph. This automation allows programmers to write simple, modular 
-filters and leave complex combination and optimizations to the compiler.
-We have developed algorithms for a {\it linear expansion} operation 
+graph. Automating the optimization allows DSP programmers to write simple, 
+modular filters and leave complex combination and optimizations 
+to the compiler. We have developed algorithms for a {\it linear expansion} operation 
 (Figure~\ref{fig:cag-commit-streamit-linear-combo} (a)), and for collapsing 
 {\tt pipeline}s and {\tt splitjoin}s into overall linear nodes
 (Figure~\ref{fig:cag-commit-streamit-linear-combo} (b)).
@@ -91,15 +92,15 @@ which implement digital filtering using a standard conversion to the
 frequency domain.
 
 \formatsection{Progress}
-We have developed a fully automatic implementation of the linear analysis 
-and optimizations as passes in the StreamIt compiler. Our preliminary results
-are very promising. In our suite of benchmark applications, our optimizations
-increased execution speed by an average factor of five, $6.5$ in the best 
-case. Figure~\ref{fig:cag-commit-streamit-linear-speedup} (a) shows
-the execution time increase for our benchmarks. 
+We have developed a fully automatic implementation for linear analysis 
+and optimization as part of the StreamIt compiler. Our preliminary results
+are very promising. In our suite of benchmark applications, the optimizations
+increased execution speed by an average factor of five and a factor of $6.5$ 
+in the best case. Figure~\ref{fig:cag-commit-streamit-linear-speedup} (a) shows
+the speed up for each of the benchmarks. 
 Both optimizations significantly reduce the amount of computation required
-for each benchmarks, which is reflected by a reduction in the number of floating 
-point multiplications (Figure~\ref{fig:cag-commit-streamit-linear-speedup} (right)).
+which is reflected by a reduction in the number of floating 
+point multiplications, shown in Figure~\ref{fig:cag-commit-streamit-linear-speedup} (b).
 
 \begin{figure}
   \center
@@ -117,35 +118,34 @@ point multiplications (Figure~\ref{fig:cag-commit-streamit-linear-speedup} (righ
   \end{tabular}
   \caption{Benchmark performance for linear optimizations.}
   \label{fig:cag-commit-streamit-linear-speedup}
-\vspace{-12pt}
+  %\vspace{-12pt}
 \end{figure}
 
-To determine if our automatic optimization could fully realize the maximum 
-theoretical savings possible using the frequency
-replacement optimization, we measured multiplication reduction as a function
-of both filter size and FFT size. The results predicted by theory are shown in
-Figure~\ref{fig:cag-commit-streamit-linear-freq} (a) and the results that
+To determine if frequency replacement can fully realize the theoretical maximum 
+savings, we measured multiplication reduction as a function
+of both filter size and FFT size. It turns out that the theory and the implementation
+are very similar. The multiplication reduction predicted by theory are shown in
+Figure~\ref{fig:cag-commit-streamit-linear-freq} (a) and the reduction that
 we measured are shown in Figure~\ref{fig:cag-commit-streamit-linear-freq} (b).
 
 \formatsection{Future}
 For future research, we are developing new optimizations which make use
 of our linear analysis framework. For instance, we are investigating saving
 redundant partial results between filter executions. 
-
-We are considering expanding our framework to capture
+We are also considering expanding our analysis framework to capture
 more information about linear computations. Recognizing state variables 
 that are linear combinations of the input and previous state would 
 allow us to analyze wider range of programs such as adaptive filters 
-and in control applications.
-Another way to extend the framework is to add support for symbolic array entries.
-Symbolic entries would allow us to use out current optimizations with
-programs that are updated rarely within the program's execution.
+and control applications.
+Another way of extending the framework is to add support for symbolic array entries.
+Symbolic entries would allow us to optimize programs which perform
+linear operations, but whose coefficient matrices change at runtime.
 
 Finally, we are planning on using the linearity information our
 analysis extracts to make more informed decisions in other parts of the compiler.
-For instance,  the StreamIt compiler is going to be extended to target 
-a DSP architecture and we can make use of the linear information to 
-take advantage of the specialized instructions that DSPs offer.
+Furthermore, when the StreamIt compiler targets
+a DSP architecture,  we can use the linear information to
+take advantage of the specialized instructions offered.
 
 \begin{figure}
   \center
@@ -167,7 +167,9 @@ take advantage of the specialized instructions that DSPs offer.
 
 
 \formatsection{Research Support}
-From DARPA and the Oxygen alliance (I don't know the details.....XXXXXXXXXXXXXXXXXXXX)
+This research is supported in part by the MIT Oxygen Project, DARPA
+contract DBT6396-C-0036, and a graduate fellowship from Siebel Systems.
+(Is this correct? I don't know the details.....XXXXXXXXXXXXXXXXXXXX)
 % Although the use of BibTeX is highly recommended, you can manually
 % format your references as follows:
 %

@@ -11,4 +11,4 @@ main.ps:	main.dvi
 
 clean:
 	rm -f *.aux *.bbl *.blg *.toc *.dvi *.log
-	rm -rf main.ps
+	rm -rf main.ps main.pdf
