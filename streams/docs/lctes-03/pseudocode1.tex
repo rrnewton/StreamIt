@@ -1,0 +1,183 @@
+class Stream {
+  int initPop, steadyPop
+  int initPush, steadyPush
+  int initPeek, steadyPeek
+}
+
+class Pipeline extends Stream {
+  int size
+  Stream[] child
+}
+
+class SplitJoin extends Stream {
+  int size
+  Splitter split, Joiner join;
+  Stream[] child	
+}
+
+class FeedbackLoop extends Stream {
+  Splitter split, Joiner join;
+  Stream body
+  Stream loop
+}
+
+class Splitter {
+  int pop
+  int[] push
+}
+
+class Joiner {
+  int push
+  int[] pop
+}
+
+class Phase {
+  Stream str
+  int push, pop, peek
+  Phase[] child
+}
+
+Phase[] schedule(Filter f, int pushPerPhase) {
+  return Phase(f, f.steadyPush, f.steadyPop, f.steadyPeek, {} )
+}
+
+Phase[] schedule(Pipeline p, int pushPerPhase) {
+  result = {}
+  // buf[i] holds number of live items on input channel of node <i>
+  buf[p.size] = {infinity, p.child[0].initPush, ... , p.child[p.size-2].initPush, 0}
+  // schedules and current phase of i'th child
+  sched[i] = {schedule(p.child[i], outputsPerPhase)}
+  phase[i] = {0}
+  // iterate until we've produced steady-state outputs
+  while (buf[p.size]-1 < p.steadyPush) {
+    // start a new phase of the pipeline
+    pos = 0;
+    curPhase = Phase(p, 0, 0, 0, {} )
+    // iterate until we've produced pushPerPhase
+    while (pos>0 || curPhase.push<pushPerPhase) {
+      // execute phase of child, adjusting curPhase statistics
+      childPhase = sched[phase[i]++ % |sched[i]|]
+      // adjust statistics on curPhase of pipeline
+      curPhase.child += childPhase
+      if (pos==p.size-1) {
+        curPhase.push += childPhase.push
+      }
+      if (pos==0) {
+        curPhase.peek = max (curPhase.peek, curPhase.pop + childPhase.peek)
+        curPhase.pop += childPhase.pop
+      }
+      // adjust statistics on number of live items
+      buf[pos] -= childPhase.pop
+      buf[pos+1] += childPhase.push
+      // find next firing position
+      if (pos<p.size-1 && buf[pos+1]>=sched[pos+1 % |sched[i+1]|].peek) {
+        // move down pipeline if possible
+        pos++;
+      } else {
+        // otherwise, move up pipeline if necessary
+        while (pos>0 && buf[pos]<sched[pos].peek) {
+          pos--;
+        }
+      }
+   }
+   result = result + curPhase;
+  }
+  return result
+}
+
+Phase[] schedule(SplitJoin sj, int pushPerPhase) {
+  result = {}
+  // ibuf[i] holds number of live items after initial schedule has been executed (how to represent this?)
+  ibuf[p.size] = ????
+  // obuf[i] holds number of live items 
+  obuf[p.size] = {sj.child[0].initPush, ... , sj.child[p.size-2].initPush}
+  // schedules and current phase of i'th child
+  sched[i] = {schedule(p.child[i], outputsPerPhase)}
+  phase[i] = {0}
+  // keep track of the total number pushed out of joiner
+  numPushed = 0
+  // iterate until we've produced steady-state outputs
+  while (numPushed < sj.steadyPush) {
+    // start a new phase of the splitjoin
+    curPhase = Phase(sj, 0, 0, 0, {} )
+    // iterate until we've produced pushPerPhase
+    while (curPhase.push<pushPerPhase) {
+      // execute splitter once, adjusting curPhase statistics
+      curPhase.child += sj.split
+      curPhase.pop += sj.split.pop
+      curPhase.peek += sj.split.pop
+      // execute child streams as much as possible
+      for i = 0 to sj.size-1 {
+        // execute child i as much as possible
+        ibuf[i] += sj.split.push[i]
+        while (ibuf[i]>=sched[phase[i] % |sched[i]|].peek) {
+          curPhase.child += sched[phase[i]]
+          ibuf[i] -= sched[phase[i]].pop
+          obuf[i] += sched[phase[i]].push
+          phase[i]++
+        }
+      }
+      // run the joiner as much as possible
+      while (forall i: obuf[i]>=sj.join.pop[i]) {
+          forall i: obuf[i] -= sj.join.pop[i]
+          curPhase.child += sj.join
+          curPhase.push += sj.join.push
+          numPushed += sj.join.push
+      }
+    }
+    result = result + curPhase;
+  }
+  return result
+}
+
+Phase[] schedule(FeedbackLoop fl, int pushPerPhase) {
+  result = {}
+  // buf holds number of items after initial schedule has been executed (how to represent this?)
+  buf[fl.joiner] = ????
+  buf[fl.splitter] = ????
+  // schedules and current phase of i'th child
+  forall s in (fl.body, fl.loop):
+     buf[s] = ????
+     sched[s] = {schedule(s, outputsPerPhase)}
+     phase[s] = {0}
+  // keep track of the total number pushed out of joiner
+  numPushed = 0
+  // iterate until we've produced steady-state outputs
+  while (numPushed < fl.steadyPush) {
+    // start a new phase of the splitjoin
+    curPhase = Phase(fl, 0, 0, 0, {} )
+    // iterate until we've produced pushPerPhase
+    while (curPhase.push<pushPerPhase) {
+      // execute joiner once, adjusting curPhase statistics
+      curPhase.child += sj.join
+      curPhase.pop += sj.join.pop[0]
+      curPhase.peek += sj.join.pop[0]
+      buf[body] += sj.join.push
+      buf[joiner] -= sj.join.pop[1]
+      // execute child streams as much as possible...
+      // execute body
+      while (buf[fl.body]>=sched[phase[fl.body] % |sched[fl.body]|].peek) {
+        curPhase.child += sched[phase[fl.body]]
+        buf[fl.body] -= sched[phase[fl.body]].pop
+        buf[fl.split] += sched[phase[fl.body]].push
+        phase[fl.body]++
+      }
+      // execute splitter
+      while (buf[fl.split]>=fl.split.pop) {
+        curPhase.child += fl.split
+        buf[fl.split] -= fl.split.pop
+        numPushed += fl.split.push[0]
+        buf[fl.loop] += fl.split.push[0]
+      }
+      // execute loop
+      while (buf[fl.loop]>=sched[phase[fl.loop] % |sched[fl.loop]|].peek) {
+        curPhase.child += sched[phase[fl.loop]]
+        buf[fl.loop] -= sched[phase[fl.loop]].pop
+        buf[fl.join] += sched[phase[fl.loop]].push
+        phase[fl.loop]++
+      }
+    }
+    result = result + curPhase;
+  }
+  return result
+}
