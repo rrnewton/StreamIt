@@ -1,0 +1,296 @@
+%!PS-Adobe-3.0 EPSF-3.0
+%%BoundingBox: 52 406 254 631
+%%Title: fir-object
+%%CreationDate: Thu Jan 15 04:08:23 2004
+%%Creator: Tgif-4.1.42 written by William Chia-Wei Cheng (bill.cheng@acm.org)
+%%ProducedBy: (unknown)
+%%Pages: 1
+%%DocumentFonts: (atend)
+%%EndComments
+%%BeginProlog
+
+/tgifdict 51 dict def
+tgifdict begin
+
+/TGMAX
+ { exch dup 3 1 roll exch dup 3 1 roll gt { pop } { exch pop } ifelse
+ } def
+/TGMIN
+ { exch dup 3 1 roll exch dup 3 1 roll lt { pop } { exch pop } ifelse
+ } def
+/TGSW { stringwidth pop } def
+
+/bd { bind def } bind def
+
+/GS { gsave } bd
+/GR { grestore } bd
+/NP { newpath } bd
+/CP { closepath } bd
+/CHP { charpath } bd
+/CT { curveto } bd
+/L { lineto } bd
+/RL { rlineto } bd
+/M { moveto } bd
+/RM { rmoveto } bd
+/S { stroke } bd
+/F { fill } bd
+/TR { translate } bd
+/RO { rotate } bd
+/SC { scale } bd
+/MU { mul } bd
+/DI { div } bd
+/DU { dup } bd
+/NE { neg } bd
+/AD { add } bd
+/SU { sub } bd
+/PO { pop } bd
+/EX { exch } bd
+/CO { concat } bd
+/CL { clip } bd
+/EC { eoclip } bd
+/EF { eofill } bd
+/IM { image } bd
+/IMM { imagemask } bd
+/ARY { array } bd
+/SG { setgray } bd
+/RG { setrgbcolor } bd
+/SD { setdash } bd
+/W { setlinewidth } bd
+/SM { setmiterlimit } bd
+/SLC { setlinecap } bd
+/SLJ { setlinejoin } bd
+/SH { show } bd
+/FF { findfont } bd
+/MS { makefont setfont } bd
+/AR { arcto 4 {pop} repeat } bd
+/CURP { currentpoint } bd
+/FLAT { flattenpath strokepath clip newpath } bd
+/TGSM { tgiforigctm setmatrix } def
+/TGRM { savematrix setmatrix } def
+
+end
+
+%%EndProlog
+%%Page: 1 1
+
+%%PageBoundingBox: 52 406 254 631
+tgifdict begin
+/tgifsavedpage save def
+
+1 SM
+1 W
+
+0 SG
+
+72 0 MU 72 11 MU TR
+72 128 DI 100.000 MU 100 DI DU NE SC
+
+GS
+
+/tgiforigctm matrix currentmatrix def
+
+% TEXT
+NP
+0 SG
+   GS
+      1 W
+      96 297 M
+      GS
+            0 SG
+            /Courier FF [10 0 0 -10 0 0] MS
+            (class FIRFilter {) SH
+      GR
+      0 12 RM
+      GS
+            0 SG
+            /Courier FF [10 0 0 -10 0 0] MS
+            (  int N;) SH
+      GR
+      0 12 RM
+      GS
+            0 SG
+            /Courier FF [10 0 0 -10 0 0] MS
+            (  float[] input;) SH
+      GR
+      0 12 RM
+      GS
+      GR
+      0 12 RM
+      GS
+            0 SG
+            /Courier FF [10 0 0 -10 0 0] MS
+            (  FIRFilter\(int N\) {) SH
+      GR
+      0 12 RM
+      GS
+            0 SG
+            /Courier FF [10 0 0 -10 0 0] MS
+            (    this.N = N;) SH
+      GR
+      0 12 RM
+      GS
+            0 SG
+            /Courier FF [10 0 0 -10 0 0] MS
+            (  }) SH
+      GR
+      0 12 RM
+      GS
+      GR
+      0 12 RM
+      GS
+            0 SG
+            /Courier FF [10 0 0 -10 0 0] MS
+            (  float[] getData\(float[] output, int offset, int length\) {) SH
+      GR
+      0 12 RM
+      GS
+            0 SG
+            /Courier FF [10 0 0 -10 0 0] MS
+            (    if \(input==null\) {) SH
+      GR
+      0 12 RM
+      GS
+            0 SG
+            /Courier FF [10 0 0 -10 0 0] MS
+            (      input = new float[MAX_LENGTH];) SH
+      GR
+      0 12 RM
+      GS
+            0 SG
+            /Courier FF [10 0 0 -10 0 0] MS
+            (      source.getData\(input, 0, N+length\);) SH
+      GR
+      0 12 RM
+      GS
+            0 SG
+            /Courier FF [10 0 0 -10 0 0] MS
+            (    } else) SH
+      GR
+      0 12 RM
+      GS
+            0 SG
+            /Courier FF [10 0 0 -10 0 0] MS
+            (      source.getData\(input, N, length\);) SH
+      GR
+      0 12 RM
+      GS
+            0 SG
+            /Courier FF [10 0 0 -10 0 0] MS
+            (    for \(int i=0; i<length; i++\) {) SH
+      GR
+      0 12 RM
+      GS
+            0 SG
+            /Courier FF [10 0 0 -10 0 0] MS
+            (      float sum = 0;) SH
+      GR
+      0 12 RM
+      GS
+            0 SG
+            /Courier FF [10 0 0 -10 0 0] MS
+            (      for \(int j=0; j<N; j++\)) SH
+      GR
+      0 12 RM
+      GS
+            0 SG
+            /Courier FF [10 0 0 -10 0 0] MS
+            (        sum = sum + data1[i+j]*FIR_COEFF[j][N];) SH
+      GR
+      0 12 RM
+      GS
+            0 SG
+            /Courier FF [10 0 0 -10 0 0] MS
+            (      output[i+offset] = sum;) SH
+      GR
+      0 12 RM
+      GS
+            0 SG
+            /Courier FF [10 0 0 -10 0 0] MS
+            (    }) SH
+      GR
+      0 12 RM
+      GS
+            0 SG
+            /Courier FF [10 0 0 -10 0 0] MS
+            (    for \(int i=0; i<N; i++\)) SH
+      GR
+      0 12 RM
+      GS
+            0 SG
+            /Courier FF [10 0 0 -10 0 0] MS
+            (      input[i] = input[i+length];) SH
+      GR
+      0 12 RM
+      GS
+            0 SG
+            /Courier FF [10 0 0 -10 0 0] MS
+            (  }) SH
+      GR
+      0 12 RM
+      GS
+            0 SG
+            /Courier FF [10 0 0 -10 0 0] MS
+            (}) SH
+      GR
+      0 12 RM
+      GS
+      GR
+      0 12 RM
+      GS
+            0 SG
+            /Courier FF [10 0 0 -10 0 0] MS
+            (void main\(\) {) SH
+      GR
+      0 12 RM
+      GS
+            0 SG
+            /Courier FF [10 0 0 -10 0 0] MS
+            (  DataSource datasource = new DataSource\(\);) SH
+      GR
+      0 12 RM
+      GS
+            0 SG
+            /Courier FF [10 0 0 -10 0 0] MS
+            (  FIRFilter filter = new FIRFilter\(5\);) SH
+      GR
+      0 12 RM
+      GS
+            0 SG
+            /Courier FF [10 0 0 -10 0 0] MS
+            (  Display display = new Display\(\);) SH
+      GR
+      0 12 RM
+      GS
+            0 SG
+            /Courier FF [10 0 0 -10 0 0] MS
+            (  filter.source = datasource;) SH
+      GR
+      0 12 RM
+      GS
+            0 SG
+            /Courier FF [10 0 0 -10 0 0] MS
+            (  display.source = filter;) SH
+      GR
+      0 12 RM
+      GS
+            0 SG
+            /Courier FF [10 0 0 -10 0 0] MS
+            (  display.run\(\);) SH
+      GR
+      0 12 RM
+      GS
+            0 SG
+            /Courier FF [10 0 0 -10 0 0] MS
+            (}) SH
+      GR
+   GR
+
+GR
+tgifsavedpage restore
+end
+showpage
+
+%%Trailer
+%MatchingCreationDate: Thu Jan 15 04:08:23 2004
+%%DocumentFonts: Courier
+%%EOF
