@@ -5,7 +5,7 @@
    <meta NAME="author" CONTENT="rodric m. rabbah">
    <meta NAME="keywords" CONTENT="saman amarasinghe, streaming, programming languages, compilers">
    <meta NAME="description" CONTENT="StreamIt">
-   <title>StreamIt - Plugins for Eclipse</title>
+   <title>StreamIt Development Tool - Plugins for Eclipse</title>
 
    <style fprolloverstyle>A:hover {color: #000099}</style>
 </head>
@@ -42,48 +42,42 @@
     <td width="20" valign="top" align="left"></td>
     <td width="700" valign="top" align="left">
     <hr><br>
-      <h3>ECLIPSE PLUGINS</h3>
+      <h3>StreamIt Development Tool</h3>
       <br>
 
       <p align="justify">
         We  are  making available  the  first  public  version of  the
-        StreamIt Debugger.  The debugger  is implemented in Java as an
-        <a   href="http://www.eclipse.org">Eclipse</a>   plugin.   The
-        debugger  is a  tool  for debugging  and visualizing  programs
+        StreamIt Development Tool (SDT).  It is implemented in Java as
+        an  <a  href="http://www.eclipse.org">Eclipse</a> plugin,  and
+        intended for  developing, debugging, and  visualizing programs
         written in StreamIt.   As a graphical programming environment,
-        the   debugger   can  simply   and   intuitively  convey   the
-        hierarchical   and    structured   nature   of    a   StreamIt
-        application.  In  addition,  the  debugger can  interpret  and
-        visually represent the stream  graph and its dynamic behavior.
-        Built in  a visual, independent  development environment (IDE)
-        with a  human-computer interface, the debugger  is composed of
-        the following modules: an IDE-integrated debugger, a graphical
-        text editor, a runtime  stream graph view, and a corresponding
-        graph overview.
+        it  can simply  and  intuitively convey  the hierarchical  and
+        structured nature of a StreamIt application.  In addition, the
+        debugger can interpret and visually represent the stream graph
+        and its dynamic behavior, including the flow of information in
+        parallel stream  graphs. The SDT is composed  of the following
+        modules: an IDE-integrated  debugger, a graphical text editor,
+        a  runtime  stream  graph  view,  and  a  corresponding  graph
+        overview.
       </p>
 
         <h4><hr>Download<hr></h4> 
         <p align="justify">
-          The StreamIt Debugger is copyright 2003 by the Massachusetts
-          Institute of  Technology.  It is  provided to you  under the
-          terms       and       conditions       of       the       <a
+          The  StreamIt  Development Tool  is  copyright  2003 by  the
+          Massachusetts  Institute of Technology.   It is  provided to
+          you   under   the   terms   and   conditions   of   the   <a
           href="http://www.gnu.org/licenses/gpl.txt">GNU        General
-          Public License Version 2.0</a>.
-        </p>  
+          Public License Version 2.0</a>.  </p>
         <ul>
-          <li>Available plugins for Eclipse<br>
-            <a href="../restricted/streamit-debugger-1.0.0-eclipse-plugin.zip">StreamIt Debugger version 1.0.0</a>.<br>
-          </li>
           <li>
-            <i>Coming soon</i><br>
-               StreamIt Graphical Editor version 1.0.0.
+            Download the <a href="../restricted/SDT_1.0.0.zip">StreamIt Development Tool, version 1.0.0</a>.
           </li>
         </ul>
 
         <h4><hr>Software Requirements<hr></h4>
 	  <ul>
           <li><p align="justify">
-              The StreamIt plugins were thoroughly tested with 
+              The SDT was thoroughly tested with 
               <a href="http://download2.eclipse.org/downloads/drops/R-2.1.1-200306271545/index.php">
                 Eclipse version 2.1.1</a> and
               <a href="http://java.sun.com/j2se/1.4.2/download.html">Sun Java  2SE version 1.4.2</a>.
@@ -92,23 +86,22 @@
               XML files.
           </p></li>
           <li><p align="justify">
-              The StreamIt plugins also require
+              The SDT also requires
               <a href="http://download.eclipse.org/tools/gef/downloads/drops/R-2.1.1-200306180934/index.php">
                 GEF (Graphical Editor Framework) version 2.1.1</a>.
           </p></li>
         </ul>
 
-        <h4><hr>Installing the Plugins<hr></h4>
+        <h4><hr>Installation<hr></h4>
         <ul>
-          <li><p>
-              To   install   the   StreamIt   plugins,   extract   the
-              distribution  into your  Eclipse plugin  directory.<br>
-              For example, if you are using Eclipse in a Microsoft Windows
-              environment,    and     Eclipse    is    installed    in
-              <b>C:\Program&nbsp;Files\Eclipse</b>,  then  extract the
-              contents   of  the   StreamIt  plugin   distribution  to
-              <b>C:\Program&nbsp;Files\Eclipse\plugins</b>.
-          </p></li>
+          <li><p  align="justify">   Before  installing  the  StreamIt
+	        Development Tool, make sure the Eclipse workbench is not
+	        running, then  extract the contents  of the distribution
+	        zip-file   to  the  root   directory  of   your  Eclipse
+	        installation.  For  example, if  your Eclipse SDK  is in
+	        <b>d:\eclipse</b>  then  extract  the  contents  of  the
+	        distribution to <b>d:\</b>.
+	    </p></li>
 
           <li>
               You need to restart Eclipse. We recommend you verify
@@ -140,7 +133,7 @@
           <li><p align="justify">
             You may now name your project, and continue by clicking on "Next" again.
           </p></li>
-
+<!--
           <li><p align="justify">
             Select the "Libraries" tab, and click on "Add External JARs".
           </p></li>
@@ -152,15 +145,16 @@
             <b>streamit.jar</b>      file      is      located      in
             <b>C:\Program&nbsp;Files\Eclipse\plugins\streamit_1.0.0</b>
           </p></li>
-
+-->
           <li><p>Click on "Finish" to complete the project setup.</p></li>
 
           <li>You may now create a StreamIt file and write your own StreamIt program.</li>
           <ul>
             <li>To create a new file, from the main Eclipse window, click on "File", then select "New", and click on "File".</li>
-            <li>Select your StreamIt project, name your file and click "Finish". Note that your file must end with the extension "str". For example, "foo.str" is a valid StreamIt file name.</li>
+            <li><p>Select your StreamIt project, name your file and click "Finish". Note that your file must end with the extension "str". For example, "foo.str" is a valid StreamIt file name.</p></li>
           </ul>
 
+	    <li><p>We recomment reading through the SDT documentation found under the "Help" menu.</p></li>
           <li><p>Visit the <a href="http://cag.csail.mit.edu/streamit">StreamIt home page</a> for the language specification and cookbook.</p></li>
         </ul>
 
