@@ -27,18 +27,18 @@ Fourier transform (DFT) and discrete cosine transformation (DCT).  Our
 formal definition of a linear node is as follows (refer to
 Figure~\ref{fig:overview-matrix} for an illustration). \vspace{-4pt}
 \begin{definition}(Linear node)
-A linear node $\lambda$ $=$ $\{A,$ ${\vec b},$ $e,$ $o,$ $u\}$
+A linear node $\lambda$ $=$ $\{A,$ $\vec{b},$ $e,$ $o,$ $u\}$
 represents an abstract stream block which performs an affine
-transformation $y = x A + {\vec b}$ from input elements $x$ to output
-elements $y$.  $A$ is a $e \times u$ matrix, ${\vec b}$ is a
+transformation $\vec{y} = \vec{x} A + \vec{b}$ from input elements 
+$\vec{x}$ to output elements $\vec{y}$. $A$ is an $e \times u$ matrix, $\vec{b}$ is a
 $u$-element row vector, and $e$, $o$, and $u$ are the peek, pop, and
 push rates, respectively. \\ ~ \vspace{-8pt} \\
-%
+
 A ``firing'' of a linear node $\lambda$ corresponds to the following
 series of abstract execution steps.  First, an $e$-element row vector
-$x$ is constructed with $x[i] = \mbox{\tt peek}(i)$.  The node
-computes $y = x A + {\vec b}$, and then pushes the $u$ elements of $y$ onto
-the output tape, starting with $y[u-1]$ and proceeding through $y[0]$.
+$\vec{x}$ is constructed with $\vec{x}[e-i-1] = \mbox{\tt peek}(i)$.  The node
+computes $\vec{y} = \vec{x} A + {\vec b}$, and then pushes the $u$ elements 
+of $\vec{y}$ onto the output tape, starting with $y[u-1]$ and proceeding through $y[0]$.
 Finally, $o$ items are popped from the input tape.
 \end{definition} \vspace{-2pt}
 
@@ -53,39 +53,16 @@ Finally, $o$ items are popped from the input tape.
 \vspace{-6pt}
 \end{figure}
 
-%% To use DSP notation for {\tt streams} in StreamIt, we will call the
-%% items that are peeked and used as input $x[n]$, where
-%% $n\in[0,e-1]$. Similarly, we define the output of a {\tt stream} as
-%% $y[n]$ where $n\in[0,u]$. For a linear {\tt stream}, the output is
-%% related to the input by $y[i] = (\sum_{j=0}^{e-1} a_{i,j}x[j])+b_i$.
-%% where $a_{i,j}$ and $b_{i}$ are complex-valued constants.
-
-%% Each output element can be represented as the dot product of two
-%% vectors plus a scalar constant.  Thus, we can represent the action of
-%% the entire linear {\tt stream} in the affine matrix-vector equation
-%% ${\mathbf x} {\mathbf A} + {\mathbf b}$ as illustrated in
-%% Figure~\ref{fig:overview-matrix}.
-
-%% The input is a row vector ${\mathbf x}$ of length $e$ and the output
-%% is a row vector ${\mathbf y}$ of length $u$. The {\tt work} function
-%% is characterized by a matrix ${\mathbf A}$ and a constant vector
-%% ${\mathbf b}$.  ${\mathbf A}$ has $e$ rows and $u$ columns and $b$ has
-%% $1$ row and $u$ columns.  ${\mathbf x}$ and ${\mathbf y}$ are related
-%% by ${\mathbf y} = {\mathbf x}{\mathbf A} + {\mathbf b}$.  We
-%% characterize the computation of a linear {\tt stream} with the tuple
-%% $\lambda = ({\mathbf A},{\mathbf b},e,o,u)$ which we call a linear
-%% node.
-
 The intuition of the computation represented by a linear node is
 simply that specific columns generate specific outputs and specific
 rows correspond to using specific inputs.  The values found in row
-$e-i-1$ of $A$ represents the weights given to the $i$th
-input element when computing each output.  The values in column
-$u-j-1$ of $A$ and column $u-j-1$ of ${\vec b}$ ({\it
-i.e.} the $j$th column from the right) represent the formula to
-compute the $j$th output.
-Figure~\ref{fig:linear-node-example} shows the code for a simple
-streamit filter and its corresponding linear node, $\lambda$.
+$e-i-1$ of $A$ ({\it i.e.} the $i$th row from the bottom) and 
+column $u-j-1$ of $A$ ({\it i.e.} the $j$th column from the right) 
+represents a term in the formula to compute the $j$th output item using 
+the value of {\tt peek($i$)}. The value in column $u-j-1$ of 
+$\vec{b}$ is the constant offset added to output $j$.
+Figure~\ref{fig:linear-node-example} shows a concrete example
+of a {\tt work} function and its corresponding linear node.
 
 \begin{figure}
 \center
