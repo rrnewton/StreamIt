@@ -12,7 +12,7 @@ satisfied by the partitioning phase described above.
 
 Classically, layout (or placement) algorithms have fallen into two
 categories: constructive initial placement and iterative improvement
-[citation 11 of Wiengold].  Both try to minimize a predetermined cost
+\cite{layout}.  Both try to minimize a predetermined cost
 function.  In constructive initial placement, the algorithm calculates
 a solution from scratch, using the first complete placement
 encountered.  Iterative improvement starts with an initial random
@@ -20,7 +20,7 @@ layout and repeatedly perturbs the placement in order to minimize the
 cost function.
 
 The layout phase of the streamit compiler is implemented using
-simulated annealing [old simulated annealing paper], a type of
+simulated annealing \cite{simanneal}, a type of
 iterative improvement.  A detailed explanation of simulated annealing
 is beyond the scope of this paper, but we will mention the following.
 Simulated annealing is a form of stochastic hill-climbing. Unlike most

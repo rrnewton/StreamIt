@@ -13,7 +13,7 @@ explicit in the stream graph.
 The exact implementation of the communication scheduler is tied to the
 communication model of the target.  For targets implementing an
 end-to-end, infinite FIFO abstraction [are there any???], the
-scheduler only needs to decide to whom to send an item and from whom
+scheduler needs only to decide to whom to send an item and from whom
 to receive an item.  As the communication model becomes more
 constrained, the communication scheduler becomes more complex,
 requiring analysis of the stream graph. For targets implementing a
@@ -50,3 +50,6 @@ filters of the FeedbackLoop to interleave sends and receives.  This
 has the effect of serializing the FeedbackLoop. In figure ?? we
 descibe the potential for deadlock introduced by Joiner nodes.  A
 solution to this problem is described below.
+
+\subsection{Raw's Communication Scheduler}
+
