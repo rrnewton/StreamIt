@@ -78,10 +78,20 @@ speedup for \texttt{fft-fine} on a Pentium~3. The third bar,
 labeled {\tt CAF} adds cache-aware fusion to the baseline compiler. The fourth
 bar, labeled \texttt{CAF+scaling}, simultaneously applies scaling and
 fusion. The last two bars summarize the impact of the buffer
-management strategies, and scalar replacement in particular. 
-The fifth bar, labeled \texttt{CAF+buffer}
+management strategies. The fifth bar, labeled \texttt{CAF+buffer}
 applies scalar replacement in addition to fusion, and the last bar,
-labeled \texttt{CAF+buffer+scaling}, applies all of the optimizations.
+labeled \texttt{CAF+buffer+scaling}, applies all of the optimizations
+including copy-shift with scaling for peek buffer management.
+
+%, and scalar replacement in particular. 
+
+Only \texttt{fmradio}, \texttt{filterbank}, \texttt{filterbank2}
+and \texttt{ofdm} benchmarks have filters that peek, therefore those are the 
+only benchmarks that benefit from our copy-shift with scaling when we 
+apply all of the optimizations together. For other benchmarks
+the buffer management optimization includes only scalar replacement,
+which allows C compiler to eliminate some memory accesses and
+generate more efficient code.
 
 In general, scaling improves performance, with a speedup of 
 40\% for Pentium~3 and a speedup of 37\% for Itanium~2 over the baseline
