@@ -1,0 +1,209 @@
+\section{Graph Transformations}
+
+In this section we describe a set of transformations that can be used
+to load balance a stream graph.
+
+\subsection{Fusion Transformations}
+
+Filter fusion is a transformation whereby several adjacent filters are
+combined into one.  Fusion can be applied to decrease the granularity
+of a stream graph so that an application will fit on a given target,
+or to improve load balancing by merging small filters so that there is
+space for larger filters to be split.  Analogous to loop fusion in the
+scientific domain, filter fusion can enable other optimizations by
+merging the control flow graphs of adjacent nodes, thereby shortening
+the live ranges of variables and allowing independent instructions to
+be reordered.
+
+\subsubsection{Scheduling}
+
+Fusion relies heavily on the ability to create a static schedule for a
+given hierarchical region of the stream graph.  The scheduling is
+complicated by StreamIt's support for the {\tt peek} operation, which
+implies that some programs require a separate schedule for
+initialization and for the steady state.  The steady state schedule
+must be periodic--that is, its execution must preserve the number of
+live items on each channel in the graph (since otherwise a buffer
+would grow without bound.)  A separate initialization schedule is
+needed if there is a filter with $peek > pop$, by the following
+reasoning.  If the initialization schedule were also periodic, then
+after each firing it would return the graph to its initial
+configuration, in which there were zero live items on each channel.
+But a filter with $peek > pop$ leaves $peek-pop$ (a positive number)
+of items on its input channel after {\it every} firing, and thus could
+not be part of this periodic schedule.  Therefore, the initialization
+schedule is separate, and non-periodic.
+
+In the StreamIt compiler, the initialization schedule is constructed
+via symbolic execution of the stream graph, until each filter has at
+least $peek-pop$ items on its input channel.  For the steady state
+schedule, there are many tradeoffs between code size, buffer size, and
+latency, and we are developing techniques to optimize different
+metrics \cite{streamittech2}.  In this paper, we use a simple
+hierarchical scheduler that constructs a Single Appearance Schedule
+(SAS) \cite{leesdf} for each filter.  A SAS is a schedule where each
+node appears exactly once in the loop nest denoting the execution
+order.  We construct one such loop nest for each hierarchical stream
+construct, such that each component is executed a set number of times
+for every execution of its parent.  In later sections, we refer to the
+``multiplicity'' of a filter as the number of times that it executes
+in one steady state execution of the entire stream graph.
+
+\subsubsection{Fusion Algorithm}
+
+Given that each StreamIt filter has a constant I/O rate, it is
+possible to implement fusion for any hierarchical stream construct as
+a plain compile-time simulation of the execution of the stream graph.
+A high-level algorithm for doing so is as follows:
+\begin{enumerate}
+\item Calculate a legal initialization and steady-state schedule for
+the nodes of interest.
+
+\item For each pair of neighboring nodes, introduce a circular buffer
+that is large enough to hold all the items produced during the initial
+schedule and one iteration of the steady-state schedule.  For each
+buffer, maintain indices to keep track of the head and tail of the
+FIFO queue.
+
+\item Simulate the execution of the graph according to the calculated
+schedules, replacing all push, pop, and peek operations in the fused
+region with appropriate accesses to the circular buffers.
+\end{enumerate}
+
+\begin{figure}
+\psfig{figure=duplicate-fission-2.eps,width=3.2in}
+\caption{\protect\small Fission of a filter that does not peek.
+For filters such as a VectorMultiply that consumes every item they look
+at, horizontal fission consists of embedding copies of the filter in a
+$K$-way roundrobin splitjoin.  The weights of the splitter and joiner
+are set to match the $pop$ and $push$ rates of the filter, respectively.
+\protect\label{fig:fission-nopeek}}
+\vspace{18pt}
+%\psfig{figure=duplicate-fission-b.eps,width=2.80in} \\
+%\psfig{figure=duplicate-fission-a.eps,width=1.26in}
+\psfig{figure=duplicate-fission.eps,width=3.26in}
+{\protect\small {\bf  ~~~~~~~~ (a) Original ~~~~~~~~~~~~~~~~~~~~~~~~~ (b) Fused ~~~}}
+\caption{\protect\small Fission of a filter that peeks.  
+%Since the MovingAverage filter reads items that it does not consume, the
+%duplicated versions of the filter need to access overlapping portions
+%of the input stream.  For this reason, horizontal fission creates a
+%duplicate splitjoin in which each component filter has additional code
+%to filter out items that are irrelevant to a given path.  This
+%decimation occurs in two places: once in the prework function, to
+%disregard items considered by previous filters on the first iteration
+%of the splitjoin, and once at the end of the steady work function, to
+%account for items consumed by other components.
+\protect\label{fig:fission-peek}}
+\vspace{-3pt}
+\end{figure}
+
+\subsection{Fission Transformations}
+
+Filter fission is the analog of parallelization in the streaming
+domain.  It can be applied to increase the granularity of a stream
+graph to utilize unused processor resources, or to break up a
+computationally intensive node for improved load balancing.
+
+\subsubsection{Vertical Fission}
+
+Some filters can be split into a pipeline, with each stage performing
+part of the {\tt work} function.  In addition to the original input
+data, these pipelined stages might need to communicate intermediate
+results from within {\tt work}, as well as fields within the filter.
+This scheme could apply to filters with state if all modifications to
+the state appear at the top of the pipeline (they could be sent over
+the data channels), or if changes are infrequent (they could be sent
+via StreamIt's messaging system.)  Also, some state can be identified
+as induction variables, in which case their values can be
+reconstructed from the {\tt work} function instead of stored as
+fields.  We have yet to automate vertical filter fission in the
+StreamIt compiler.
+
+\subsubsection{Horizontal Fission}
+
+(can do this for pipelines that don't peek and splitjoins that don't
+peek.  need to deal with 2-stage schedules.)
+
+\subsubsection{Horizontal Filter Fission}
+
+(can do this for filters, even if they peek.  what about 2-stage that
+peek?)
+
+We refer to ``horizontal fission'' as the process of distributing a
+single filter across the parallel components of a splitjoin.  We have
+implemented this transformation for ``stateless'' filters--that is,
+filters that contain no fields that are written on one invocation of
+{\tt work} and read on later invocations.  Let us consider such a
+filter $F$ with steady-state I/O rates of $peek$, $pop$, and $push$,
+that is being parallelized into an $K$-way splitjoin.  There are two
+cases to consider:
+\begin{enumerate}
+\item If {\bf $peek = pop$}, then $F$ can simply be duplicated $K$
+ways in the splitjoin.  The splitter is a roundrobin that routes $pop$
+elements to each copy of $F$, and the joiner is a roundrobin that
+reads $push$ elements from each component.  Since $F$ does not peek at
+any items which it does not consume, its code does not need to be
+modified in the component streams--we are just distributing the
+invocations of $F$.
+
+\item If {\bf $peek > pop$}, then a different transformation is
+applied (see Figure~\ref{fig:fission-peek}).  In this case, the
+splitter is a duplicate, since the component filters need to examine
+overlapping parts of the input stream.  The $i$'th component has a
+steady-state work function that begins with the work function of $F$,
+but appends a series of $(K-1)*pop$ pop statements in order to account
+for the data that is consumed by the other components.  Also, the
+$i$'th filter has a prework function that pops $(i-1)*pop$ items from
+the input stream, to account for the consumption of previous filters
+on the first iteration of the splitjoin.  As before, the joiner is a
+roundrobin that has a weight of $push$ for each stream.
+\end{enumerate}
+
+\subsection{Graph Hierarchy Transformations}
+
+\subsubsection{Pipeline Lifting}
+
+If a pipeline construct $P_1$ has a pipeline parent $P_2$, then $P_1$
+can be eliminated by lifting its children directly into $P_2$.
+
+\subsubsection{Duplicate SplitJoin Lifting}
+
+\subsubsection{Adding SplitJoin Synchronization}
+
+A splitjoin construct can be divided into a hierarchical set of
+splitjoins to enable a finer granularity of fusion
+(Figure~\ref{fig:splitjoin-split}).
+
+\subsubsection{Removing SplitJoin Synchronization}
+
+(don't mention that this can lead to an unstructured graph?)
+
+See Figure~\ref{fig:sync-removal})
+
+\begin{figure}[t]
+\centering
+\psfig{figure=sync-removal-1.eps,width=3.2in}
+\caption{\protect\small Synchronization removal.  If there are
+neighboring splitters and joiners with matching rates, then the nodes
+can be removed and the component streams can be connected.  The
+example above is drawn from a subgraph of the 3GPP application; the
+compiler automatically performs this transformation to expose
+parallelism and improve the partitioning.  Synchronization removal
+is especially valuable in the context of libraries--many distinct
+components can employ splitjoins for processing interleaved data
+streams, and the modules can be composed without having to synchronize
+all the streams at each boundary.  \protect\label{fig:sync-removal}}
+\end{figure}
+
+\begin{figure}[t]
+\centering
+\psfig{figure=splitjoin-split.eps,width=3.2in} 
+\caption{\protect\small Breaking a splitjoin into hierarchical units.
+Though our horizontal fusion algorithms work on the granularity of an
+entire splitjoin, it is straightforward to transform a large splitjoin
+into a number of smaller pieces, as shown here.  Following this
+transformation, the fusion algorithms can be applied to obtain an
+intermediate level of granularity.  This technique was employed to
+help load-balance the Radar application (see
+Section~\ref{sec:results}).  \protect\label{fig:splitjoin-split}}
+\end{figure}

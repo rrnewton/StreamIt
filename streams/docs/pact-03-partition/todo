@@ -1,6 +1,8 @@
 paper:
 
-- can we omit description of 2-stage filters?
+- add 2-stage filters to the fission descriptions?
+
+- add pipeline fission
 
 - in algorithm write-up, can incorporate data or code size by
 replacing "sum" with a generic operator * and then defining * to be +
@@ -28,20 +30,34 @@ streams of a duplicate splitjoin (either introducing a reordering node
 below, or programming the roundrobin to input things in a different
 order.)  But I guess our framework doesn't support this.
 
+- how to deal with gordo's new joiner elimination stuff
+
 implementation:
 
+ * estimate number gathering
+
+ - 2D partitioning
  - 2-stage pipeline fusion (Jasper)  (vocoder/nokia waiting on it)
+ - feedbackloop fusion
 
  - backout of unfusable filters (or find way to fuse them) - file
    readers and writers, etc.
 
- - feedbackloop fusion
-
- - gordo's joiner elimination; otherwise there are going to be
-   problems partitioning when extra synchronization is needed?
-
  - (low priority) uniform splitjoin optimization
  - (low priority) don't fuse more than you have to?
+
+results:
+
+* in fft, i don't know
+
+* in beamformer, input generate and detector is a problem because they
+have counters that loop around.  there should be a transformation to
+move state inside a work function if it's periodically reset so that
+filter can be duplicated.  also need to use coarsebeamformer instead
+of the plain one because of state in the fir filters.
+
+* in bitonic sort, the source might be stateful if the elements of A
+aren't being propagated... but they should be propagated.
 
 extensions:
 
@@ -49,13 +65,13 @@ extensions:
 
  - consider interaction with sync removal
 
-  - doesn't realize that the result of SIMPLE splitjoin fusion is a
-    3-stage pipeline (in case it wanted to preserve some of these
-    cases)
+ - doesn't realize that the result of SIMPLE splitjoin fusion is a
+   3-stage pipeline (in case it wanted to preserve some of these
+   cases)
 
 bugs:
 
-* on bitonic sort with --raw 4, we're off-by-one.
+* on bitonic sort with --raw 4, partitioner is off-by-one.
 
 - blocked matrix multiply causes deadlock when fission is turned on
 

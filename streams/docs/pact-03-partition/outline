@@ -5,20 +5,37 @@
 
 - set of hierarchical graph transformations
 
-   (horizontal filter fission)
+   (horizontal filter fission) - for 2 stage, strip out initwork from
+      all the duplicate copies, and have a special round-robin that feeds
+      them?  Or could just have dupliate with decimation and all the
+      nodes that aren't doing the initial work function.  But joiner still
+      needs some reordering afterwards (could do with two-stage filter
+      afterwards, and two-stage filter inside, that decimates the
+      redundant output.)
 
    (pipeline fission) - do optimal fission of all stages, then add
-     multiplicities on the sides of the split to accommodate sync removal
+     multiplicities on the sides of the split to accommodate sync
+     removal?  But this messes up the tile count really... should fiss
+     the pipeline as a whole.  maybe try all possible pipeline fissions
+     up to the amount you're looking at?  Could do the same for splitjoin,
+     feedbackloop.
 
    (splitjoin refactor:  adding hierarchy)
+     mentioned in asplos
 
    (splitjoin refactor:  adding synchronization)
+     new, but very simple
 
    (feedbackloop fusion)
+     not even worked out
 
    (splitjoin fusion)
+     same as in asplos
 
-   (pipeline fusion) given P = {S_0, ... F_0 ... F_{n-1} ... S_1 ... S_{n-1}}
+   (pipeline fusion)
+     same as in asplos
+
+    given P = {S_0, ... F_0 ... F_{n-1} ... S_1 ... S_{n-1}}
     make P = {S_0, F', S_1 ... S_{n-1}} where 
       F' = {work', stateless', peeks'}
       work' = \sum_{i=0}^{n-1} work_i
