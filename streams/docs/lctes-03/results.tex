@@ -50,7 +50,7 @@ used for testing the StreamIt compiler. HDTV performs a HDTV signal
 decoding/encoding. CFAR implements PCA Constant False Alarm Rate
 detection. Block Matrix Mult performs a blocked matrix multiplication
 - it multiplies a 12x12 matrix by a 9x12 matrix in blocks of 3x3
-submatrices. Trellis performs trellis encoding/decoding.
+sub-matrices. Trellis performs trellis encoding/decoding.
 
 \begin{comment}
 
@@ -73,10 +73,11 @@ for pseudo single appearance and minimal latency schedules.
 \caption{\small Buffer size required by a phased minimum latency schedule,
 normalized to buffer size of a hierarchical single appearance
 schedule.\protect\label{fig:buffergraph}}
+\vspace{-8pt}
 \end{figure}
 
 \begin{figure}[t]
-\psfig{figure=code-graph.eps,width=3.35in}
+\psfig{figure=code-graph.eps,width=3.28in}
 \caption{\small Code size required by a phased minimum latency schedule,
 normalized to code size of a hierarchical single appearance
 schedule.\protect\label{fig:codegraph}}
@@ -90,6 +91,7 @@ appearance schedule.  We give equal weight to the code and buffer size
 only for illustration; in an actual system, the relative weights are
 complex and depend upon resource
 constraints. \protect\label{fig:sumgraph}}
+\vspace{-6pt}
 \end{figure}
 
 \begin{table*} \centering \small
@@ -117,6 +119,7 @@ constraints. \protect\label{fig:sumgraph}}
 \end{tabular}
 \caption{\small Results of running single appearance and minimal
 latency scheduling algorithms on various applications.}
+\vspace{-8pt}
 \label{tbl:results}
 \end{table*}
 
