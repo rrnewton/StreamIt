@@ -108,7 +108,7 @@ nexec (child_n (p)) = ceil (
      			       + peek (first(nchild_{n+1})) - pop (first (nchild_{n+1}))
                                - buff (nchild_{n+1})
 		             ) 
-			     / push (child_n (p))
+			     / push (last (child_n (p)))
 			   )
 
 This produces a single phase of the cyclic schedule.  It is repeated until
