@@ -20,12 +20,12 @@ beamformer
 
 filterbank
    M (currently "3")	numTaps (currently "100", appears in 2 places)
-1. 2			128
-2. 4			128
-3. 8			128
-4. 2			256
-5. 4			256
-6. 8			256
+1. 2			64
+2. 4			64
+3. 8			64
+4. 2			128
+5. 4			128
+6. 8			128
 
 fm
     bands                numberOfTaps (currently "64", multiple places)
@@ -36,14 +36,14 @@ fm
 5. 6                    128
 6. 8			128
 
-fft	
+fft	(CHANGE!!!)
 	N
-1.	32
-2.	64
-3.	128
-4.	256
-5.	512
-6.	1024
+1.	16
+2.	32
+3.	64
+4.	128
+5.	256
+6.	512
 
 channelvocoder
 	numTaps (currently "64")	N (# filters in VocoderFilterBank)
