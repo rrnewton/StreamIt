@@ -369,6 +369,15 @@ void send_message(portal *p, int msgid, latency *l, void *params);
 
 \subsection{Starting the System}
 
+[[connect_tapes]] makes necessary tape connections between objects;
+for example, it connects the input tape to a pipeline to the input of
+the first object within the pipeline.  It needs to be called before
+any filters are executed.
+
+<<Run Function>>=
+void connect_tapes(stream_context *c);
+@
+
 The [[streamit_run]] function is called with the context of the
 top-level object.  It runs the system continuously.
 
