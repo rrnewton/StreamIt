@@ -65,30 +65,6 @@ the stage assumes that the signal to noise ratio is low and sends a
 message to activate the {\tt Booster}. Note that this message is send
 using best effort delivery.
 
-
-
-\begin{figure}
-\centering
-\psfig{figure=fft-block.eps,width=3.2in}
-\caption{The multi-stage FFT algorithm}
-\label{fig:fftfilter}
-\end{figure}
-
-\begin{figure*}
-\centering
-\psfig{figure=fft-pre-tape.eps,width=4.8in}
-\caption{The bit reverse order filter in FFT. The tapes at each
-channel illustrates the data re-shuffling when N=8. }
-\label{fig:bitreverseorder}
-\end{figure*}
-
-\begin{figure*}
-\centering
-\psfig{figure=fft-butterfly-tape.eps,width=5.8in}
-\caption{The 4x4 butterfly stage in the FFT. The tapes at each channel illustrates the data transformation and computation. }
-\label{fig:butterfly}
-\end{figure*}
-
 \begin{figure}
 \centering
 \psfig{figure=fir-block.eps,width=3.2in}
@@ -96,9 +72,12 @@ channel illustrates the data re-shuffling when N=8. }
 \label{fig:firfilter}
 \end{figure}
 
-
-
-\newpage
+\begin{figure}
+\centering
+\psfig{figure=fft-block.eps,width=3.2in}
+\caption{The multi-stage FFT algorithm}
+\label{fig:fftfilter}
+\end{figure}
 
 \begin{figure}[t]
 \scriptsize
@@ -287,3 +266,22 @@ class TrunkedRadio extends Stream {
 \end{verbatim}
 \vspace{-12pt}
 \end{figure}
+
+\newpage
+
+\begin{figure*}
+\centering
+\psfig{figure=fft-pre-tape.eps,width=4.8in}
+\caption{The bit reverse order filter in FFT. The tapes at each
+channel illustrates the data re-shuffling when N=8. }
+\label{fig:bitreverseorder}
+\end{figure*}
+
+\begin{figure*}
+\centering
+\psfig{figure=fft-butterfly-tape.eps,width=5.8in}
+\caption{The 4x4 butterfly stage in the FFT. The tapes at each channel illustrates the data transformation and computation. }
+\label{fig:butterfly}
+\end{figure*}
+
+
