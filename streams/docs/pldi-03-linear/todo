@@ -11,12 +11,12 @@ Andrew's distallation of todo items (that are not already fixed) from reviewers:
 - Make stream graphs easier to read / lay them out better
   - Perhaps show the various stream graphs for a single application (and point
     readers to the web/thesis for the stream graphs of the other benchmarks.
-- Add examples of combination rules
 - Add examples of frequency transformation (don't know how to do this)
 - More benchmarks
 - Include measurements of code size and data size for before/after transformed programs
 - Doesn't like sampling conversion rate of 2/3. Results will get better for larger rates,
 	should I change it? 441/220 (downsample from CD to MP3 rates) perhaps?
+	(I don't think so...)
 - Address the concern of extra work being incurred by the zeros introduced
 	in splitjoin combination.
 - Possibly add the comments of the fourth reviewer:
@@ -41,6 +41,8 @@ Done
 	frequency transformation. I don't think that we need a more general introduction.
 ------------
 - Cite Andrew's thesis for more details.
+------------
+- Add examples of combination rules
 ------------
 
 
