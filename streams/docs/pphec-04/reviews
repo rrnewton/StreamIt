@@ -1,0 +1,112 @@
+--------------------------------------------------------------------------------
+Kuo, Rabbah, Amarasinghe
+Productive Programming Environment
+
+Action: 4
+	Strong Accept = 5
+	Accept = 4
+	Neutral = 3
+	Reject = 2
+	Strong Reject = 1
+
+
+
+Please summarize the paper below:
+
+The paper describes the streamIt  language and its ADE and describes a
+short usability study performed for this environment
+
+
+Comments for the author(s) - will be sent to the submitters:
+
+The results in the paper are relevant to the workshop: StreamIt can be
+used to develop  some HPC applications and it  is useful to understand
+the impact of a graphical ADE.
+
+The impact of  this study is limited because of  the small sample size
+and  possible design  flaws in  the experiment.  I am  not  sure which
+statistics   are   significant,   since   there  is   no   statistical
+analysis.  One  could  focus  on specific  hypotheses  (e.g.,  graphic
+debugger reduces debug time or increases success rate) and see if data
+supports this  hypotheses with high  confidence; or one can  treat the
+study as  an anthropological  study, focusing on  the comments  of the
+users and deemphasizing statistical results.
+
+The  list  of  references ignores  a  large  body  of work  on  visual
+programming environments for dataflow  languages. There is work, e.g.,
+by E. Glinert, that goes more than 20 years back.
+
+--------------------------------------------------------------------------------
+Action:  2
+	Strong Accept = 5
+	Accept = 4
+	Neutral = 3
+	Reject = 2
+	Strong Reject = 1
+
+
+Please summarize the paper below:
+
+This paper presents a limited productivity study on the use of the SDT
+(StreamIT Development  Tool) in tracking  and fixing bugs  in StreamIT
+programs.  The study  was conducted  in a  classroom setting  with toy
+codes and with a student population of various skill set.
+
+
+Comments for the author(s) - will be sent to the submitters:
+
+Abstracting  from the  fact that  this language  caters to  a specific
+community of  users - digital and  image processing -  rather than the
+general purpose and symbolic computing  communities, as well as to the
+fact  that the authors  have possibly  never considered  other equally
+powerful languages such  as SDF (synchronous data-flow-graph allegedly
+more powerful that the StreamIT  acyclic graphs) there are some issues
+with this work.
+
+First, the context, is of course very limited not only in the scope of
+the programs (but  then again we need to start  somewhere) but also in
+the size  of the  codes. Second, I'm  very skeptical that  the lessons
+learned  from  such  an  experiment  can  be  extrapolated  to  larger
+programs.  I'm not  even  sure if  anyone  has ever  codes such  large
+programs  in StreamIT (other  than the  ones that  can be  obtained by
+cycle-unrolling to  become arbitrarily large). Finally,  the idea that
+using a  SDT versus an  command-line interface is somewhat  trivial. I
+would be surprised if the people  using the SDT would do worse, unless
+of course the SDT itself was very intuitive to use.
+
+Minor typos: page 13 "bride" should be "bridge", in abstract a double "in" word.
+
+--------------------------------------------------------------------------------
+Action: 5
+	Strong Accept = 5
+	Accept = 4
+	Neutral = 3
+	Reject = 2
+	Strong Reject = 1
+
+
+Please summarize the paper below:
+
+The  authors   describe  the   StreamIt  language  and   the  StreamIt
+Development    tool   for    developing   and    debugging   streaming
+applications. The paper presents a productivity study done using human
+subjects  where  participants  were  gauged on  how  effectively  they
+resolved programming errors in  buggy StreamIt programs when using the
+StreamIt development tool.
+
+
+Comments for the author(s) - will be sent to the submitters:
+
+The paper is interesting in that it describes the effectiveness of the
+StreamIt development tool  using a case study as  the basis. These are
+hard to do ...  I wonder if you may have saved  some grief by using an
+automated  monitoring environment  such as  HackyStat to  monitor user
+progress.
+
+It would also be useful to  describe how you decided on the particular
+experimental organization you used in the study. If these are based on
+[1], perhaps  you could  describe some of  the salient points  as they
+apply to  the study.  For instance,  how did you  use the  two control
+experiments (Bit twiddle and Fib)?
+
+--------------------------------------------------------------------------------
