@@ -13,3 +13,17 @@ Scripting
 -	Algebraic Simplification 
 
 
+\subsection{GSM Decoder}
+
+  The decoder portion of the Streamit GSM Vocoder takes GSM encoded
+parameters as inputs, and uses these to synthesize audible speech.  This
+is accomplished by processing the parameters through four main filters.
+The RPE decoder filter produces some "pink noise" that very loosely
+estimates the speech waveform, using quantized bit sequences and a
+maximum value parameter from the encoded input.  This "pink noise" is
+fed to the Long Term Prediction portion, which applies long-term
+characteristics to the sequence through a delay filter within a feedback
+loop.  The resulting signal is then sent to the Short Term Synthesis
+filter, which decodes high frequency voice characteristics from the
+encoded parameters and applies these to the signal.  Finally, the
+Postprocessing filter identifies peaks in the signal to make it audible.

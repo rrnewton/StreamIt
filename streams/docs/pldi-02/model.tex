@@ -626,11 +626,9 @@ execution, so we subtract the local indices from the index:
 \begin{align*}
 {\cal W}&[{\tt void work() \{...\}}]: {\tt StreamIt Work} \ra
 WorkFunction = \\
-(&g \ra (t \ra f_1(t(g(1)), \dots , t(g(PEEK)))
-0))), \\
+(&g \ra (t \ra f_1(t(g(1)), \dots , t(g(PEEK)))), \\
 \dots \\
-&g \ra (t \ra f_{PUSH}(t(g(1)), \dots , t(g(PEEK))))
-0))))
+&g \ra (t \ra f_{PUSH}(t(g(1)), \dots , t(g(PEEK)))))
 \end{align*}
 
 {\bf Converting from the intermediate algebra}.  To convert back to
@@ -649,9 +647,9 @@ semantic domains are given in Figures \ref{fig:interdom} and
 Stream \ra StreamTransform$ for converting from the intermediate
 algebra to the transform algebra.  For a filter, we have:
 \begin{align*}
-{\cal S} [(Filter~push~pop~peek~(f_1~\dots~f_{push}))] = \\ 
-g \ra (f_(i~\%~push))(i_local \ra g(\mi{I_F}{O_F}(i) - peek +
-i_local))
+&{\cal S} [(Filter~push~pop~peek~(f_1~\dots~f_{push}))] = g \ra (t \ra
+(i \ra \\ &(f_{i~\%~push})(i_{local} \ra g(\mi{I_F}{O_F}(i) - peek +
+i_{local}))(i)))
 \end{align*}
 That is, the value that a filter pushes onto the $i$'th position of
 its output tape is calculated with its function at index $i~\%~push$.
@@ -665,7 +663,7 @@ the transforms of component streams:
 \begin{align*}
 {\cal S} [(Pipeline~s_1~s_2~\dots~s_n)] = \\
 g \ra ({\cal S}[s_n]({\cal I}) \circ \dots \circ {\cal S}[s_2]({\cal I}) \circ {\cal S}[s_1](g)) \\
-where {\cal I} denotes the identity function
+where~{\cal I}~denotes~the~identity~function
 \end{align*}
 The valuation function for a SplitJoin follows the same idea, but the
 notation is slightly heavier.  Given that we have a round robin joiner
@@ -680,8 +678,9 @@ Now, the $i$'th tape position assumes the value that is produced along
 stream $p(i)$ in the SplitJoin, and the index offset is obtained by
 tracing back from the output of the joiner to the input of the splitter:
 \begin{align*}
-{\cal S} [(SplitJoin~S~s_1~s_2~\dots~s_n~J)] = \\
-g \ra (t \ra (i \ra (({\cal S}[s_{p(i)}])(i_local \ra g(\mi{I_S}{Op(i)_S}(i_local))))(\mi{O_J}{Ip(i)_J}(i))))
+&{\cal S} [(SplitJoin~S~s_1~s_2~\dots~s_n~J)] = g \ra (t \ra (i \ra \\
+&(({\cal S}[s_{p(i)}])(i_local \ra
+g(\mi{I_S}{Op(i)_S}(i_local))))(\mi{O_J}{Ip(i)_J}(i))))
 \end{align*}
 This completes the formulation of the transform algebra.  Using this
 algebra, we can express the meaning of any StreamIt program as a
