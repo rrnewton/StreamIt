@@ -27,8 +27,8 @@ optimizations} that are geared toward the concomitant increase of instruction
 and data {\it temporal locality}. These
 optimization lead to significantly better utilization of the memory
 system, and as such, they deliver
-a speedup of 121\% for our streaming benchmark suite on a Pentium~3 
-architecture, and a speedup of 111\% for the same benchmark suite on
+a speedup of 131\% for our streaming benchmark suite on a Pentium~3 
+architecture, and a speedup of 114\% for the same benchmark suite on
 an Itanium~2 processor.
 
 %they deliver performance gains ranging from 11\%
@@ -113,14 +113,14 @@ larger and richer repertoire of registers. The two architectures serve
 to validate our cache-aware optimizations, in that we expect an
 architecture with more registers to benefit more from optimization such
 as scalar replacement. Fusion with scalar replacement leads to a 
-77\% speedup for our benchmark suite on the Pentium~3, and 88\% speedup 
-on the Itanium~2. Scaling gives a 40\% speedup over baseline for our 
+82\% speedup for our benchmark suite on the Pentium~3, and 84\% speedup 
+on the Itanium~2. Scaling gives a 43\% speedup over baseline for our 
 benchmark suite on the Pentium~3 and 37\% speedup on the Itanium~2.
 
 While both scaling and fusion lead to modest performance gains, we
 combine the two to deliver the best possible performance. When we
-do so, we can achieve a speedup of 121\% for our benchmark suite on a 
-Pentium~3, and a speedup of 111\% on an Itanium~2 processor.
+do so, we can achieve a speedup of 131\% for our benchmark suite on a 
+Pentium~3, and a speedup of 114\% on an Itanium~2 processor.
 Section~\ref{sec:evaluation} describes our evaluation
 methodology and presents our experimental analysis.
 
@@ -150,7 +150,7 @@ in a detailed micro-benchmark analysis.
 StreamIt compiler.
 
 \item An experimental evaluation across 11 streaming benchmarks,
-demonstrating speedup of up to 5800\% on Pentium~3 and up to 6600\% 
+demonstrating speedup of up to 5800\% on Pentium~3 and up to 6400\% 
 on Itanium~2.
 \end{itemize}
 
