@@ -16,7 +16,7 @@ FM Radio & A software-based FM Radio with equalizer.\\
 \hline
 GSM & A GSM decoder.\\
 \hline
-\BeamFormer & A core component of modern radar, sonar, and communications signal processors. \cite{pca}\\
+\Radar & A core component of modern radar, sonar, and communications signal processors. \cite{pca}\\
 \hline
 FFT & A 64-element FFT. \\
 \hline
@@ -39,7 +39,7 @@ CRC & A 32-bit Cyclic Redundancy Check (CRC) Encoder/Decoder. \\
 %\item A GSM Decoder, which takes GSM-encoded parameters as
 %inputs, and uses these to synthesize audible speech, 
 %
-%\item A \BeamFormer
+%\item A \Radar application
 %which encapsulates the core functionality of modern radar, sonar, and
 %communications signal processors -- modeled after a system from the
 %Polymorphic Computing Architecture (PCA) \cite{pca}
@@ -87,9 +87,9 @@ CRC & A 32-bit Cyclic Redundancy Check (CRC) Encoder/Decoder. \\
 {\bf MFLOPS}
 \\
 \hline \hline
-\BeamFormer (12x4) & 596 & 53 & 1.1 & 619 & 15 & 2.7 & 1470 \\
+\Radar (12x4) & 596 & 53 & 1.1 & 619 & 15 & 2.7 & 1470 \\
 \hline
-\BeamFormer (48x16) & 596 & 209 & N/A & N/A & 15 & 0.3 & 836\\
+\Radar (48x16) & 596 & 209 & N/A & N/A & 15 & 0.3 & 836\\
 \hline
 FM Radio & 511 & 14 & 34 & 107 & 13 & 81 & 258\\
 \hline
@@ -139,13 +139,13 @@ transformations on throughput and tile utilization, respectively.
 
 The results show that for programs with substantial computation
 requirements, the StreamIt compiler is able to extract good
-performance out of the Raw processor.  For example, the \BeamFormer
+performance out of the Raw processor.  For example, the \Radar
 application (see Figure~\ref{fig:beamcode} for source code) shows a
 sustained 1.47 GFLOPS rate, after a 145\% improvement due to our
 optimizations.  Figures~\ref{fig:beam-orig} and~\ref{fig:beam-opt}
-give the original and optimized configurations of the \BeamFormer's
-stream graph, and Figure~\ref{fig:beam-blood} illustrates the impact
-of our load balancing optimizations .
+give the original and optimized configurations of \Radar's stream
+graph, and Figure~\ref{fig:beam-blood} illustrates the impact of our
+load balancing optimizations .
 %
 %However, programs such as FFT, which was created to experiment with
 %the language features of StreamIt, have very little work per

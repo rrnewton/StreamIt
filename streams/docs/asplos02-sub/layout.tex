@@ -128,25 +128,18 @@ work} function.  Also, a tile that is involved in the routing of many
 channels must serialize the routes running through it.  Both limit the
 amount of parallelism in the layout and need to be avoided.
 
-\begin{figure}
-\centering
-\psfig{figure=anneal-cost.eps,width=4in}
-\parbox{4in}{\caption{\protect\small Estimated cost for successive
-configurations of the load-balanced \BeamFormer layout as evaluated by
-the simulated annealing algorithm. \protect\label{fig:anneal-cost}}}
-\end{figure}
+%% \begin{figure}
+%% \centering
+%% \psfig{figure=anneal-cost.eps,width=4in}
+%% \parbox{4in}{\caption{\protect\small Estimated cost for successive
+%% configurations of the load-balanced \Radar layout as evaluated by
+%% the simulated annealing algorithm. \protect\label{fig:anneal-cost}}}
+%% \end{figure}
 
-Figure~\ref{fig:anneal-cost} illustrates how the cost metric varies
-over time during a run of the simulated annealing algorithm for the
-\BeamFormer application.  The figure illustrates that the cost
-converges to a value that is significantly lower than a random layout.
-For the \BeamFormer, the layout determined by our algorithm has a
-throughput that exceeds that of a random layout by a factor of two.
-
-%Using the parameters described above, simulated annealing calculates
-%highly optimized assignments.  In figure ??
-%we show the initial random placement for the load-balanced FMRadio and
-%in figure ?? + 1 we show the layout annealing calculated.  Clearly,
-%the optimized assignment is superior to the random placement.
-%Importantly, the optimized placement minimizes the number of filters
-%involved in routing data.
+%% Figure~\ref{fig:anneal-cost} illustrates how the cost metric varies
+%% over time during a run of the simulated annealing algorithm for the
+%% \Radar application.  The figure illustrates that the cost
+%% converges to a value that is significantly lower than a random layout.
+%% For the \Radar application, the layout determined by our
+%% algorithm has a throughput that exceeds that of a random layout by a
+%% factor of two.

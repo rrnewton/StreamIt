@@ -1,11 +1,12 @@
 \section{Related Work}
 \label{sec:related}
 
-The Transputer architecture~\cite{transputer88} shares many
-similarities with Raw.  A Transputer system is either an array or a
-grid of tiles, where neighbors are interconnected with unbuffered
-point-to-point links. The programming language used for the Transputer
-is Occam \cite{occammanual}: a streaming language similar to CSP
+The Transputer architecture~\cite{transputer88} is an array of
+processors, where neighboring processors are connected with unbuffered
+point-to-point channels.  The Transputer does not include a separate
+communication switch, and the processor must get involved to route
+messages.  The programming language used for the Transputer is Occam
+\cite{occammanual}: a streaming language similar to CSP
 \cite{Hoare78}.  However, unlike StreamIt filters, Occam concurrent
 processes are not statically load-balanced, scheduled and bound to a
 processor. Occam processes are run off a very efficient runtime
@@ -39,19 +40,19 @@ performs local optimizations such as stream register allocation in
 order to map the current set of stream computations onto Imagine.
 
 The iWarp system \cite{iwarp} is a scalable multiprocessor with
-configurable communication between nodes.  In iWarp, one can set up
-FIFO channels for communicating between non-neighboring tiles.
-However, reconfiguring the communication channels is more
+configurable communication between nodes.  In iWarp, one can set up a
+few FIFO channels for communicating between non-neighboring
+nodes. However, reconfiguring the communication channels is more
 coarse-grained and has a higher cost than on Raw, where each cycle can
-be route items to a different location.  ASSIGN \cite{assign} is a
-tool for building large-scale applications on multiprocessors,
-especially iWarp.  ASSIGN starts with a coarse-grained flow graph that
-is written as fragments of C code.  Like StreamIt, it performs
-partitioning, placement, and routing of the nodes in the graph.
-However, ASSIGN is implemented as a runtime system instead of a full
-language and compiler such as StreamIt.  Consequently, it has fewer
-opportunities for global transformations such as fission and
-reordering.
+be used to route items to a different location~\cite{Scalar Operand
+Network paper}.  ASSIGN \cite{assign} is a tool for building
+large-scale applications on multiprocessors, especially iWarp.  ASSIGN
+starts with a coarse-grained flow graph that is written as fragments
+of C code.  Like StreamIt, it performs partitioning, placement, and
+routing of the nodes in the graph.  However, ASSIGN is implemented as
+a runtime system instead of a full language and compiler such as
+StreamIt.  Consequently, it has fewer opportunities for global
+transformations such as fission and reordering.
 
 Proebsting and Watterson \cite{pro96} present a filter fusion
 algorithm that interleaves the control flow graphs of adjacent nodes.

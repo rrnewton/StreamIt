@@ -5,7 +5,7 @@
   \hspace{0.3in} \subfigure[\vspace{-6pt}
     Load-balanced.\label{fig:beam-blood2}]{\psfig{figure=beam-blood-opt.eps,width=3in}
     \vspace{-6pt}} \vspace{-6pt} \caption{Execution traces for the (a)
-    original and (b) load-balanced partitionings of the \BeamFormer.
+    original and (b) load-balanced partitionings of the \Radar application.
     The $x$ axis denotes time, and the $y$ axis denotes the processor.
     The dark bands indicate periods where processors are blocked
     waiting to receive an input or send an output.  Light regions
@@ -15,14 +15,14 @@
 
 \begin{figure}
 \psfig{figure=beam-graph-orig.eps,width=6.5in}
-\caption{\protect\small Stream graph of the original 12x4 \BeamFormer.
-The 12x4 \BeamFormer has 12 channels and 4 beams; it is the largest
-version that fits onto 64 tiles without filter fusion.
-\protect\label{fig:beam-orig}}
+\caption{\protect\small Stream graph of the original 12x4 \Radar
+application.  The 12x4 \Radar application has 12 channels and 4 beams;
+it is the largest version that fits onto 64 tiles without filter
+fusion.  \protect\label{fig:beam-orig}}
 \vspace{36pt}
 \psfig{figure=beam-graph-opt.eps,width=6.5in}
 \caption{\protect\small Stream graph of the load-balanced 12x4
-\BeamFormer.  Vertical fusion is applied to collapse each pipeline
+\Radar application.  Vertical fusion is applied to collapse each pipeline
 into a single filter, and horizontal fusion is used to transform the
 4-way splitjoin into a 2-way splitjoin.  Figure~\ref{fig:beam-blood}
 shows the benefit of these
@@ -97,7 +97,7 @@ fused.  Currently, a simple greedy algorithm is used to automatically
 select the targets of fusion and fission, based on the estimate of the
 work in each node.
 
-For example, in the case of the \BeamFormer, the original stream graph
+For example, in the case of the \Radar application, the original stream graph
 (Figure~\ref{fig:beam-orig}) contains 52 nodes.  These nodes have
 unbalanced amounts of computation, as evidenced by the execution trace
 in Figure~\ref{fig:beam-blood1}.  The partitioner fuses all of the
@@ -322,7 +322,7 @@ entire splitjoin, it is straightforward to transform a large splitjoin
 into a number of smaller pieces, as shown here.  Following this
 transformation, the fusion algorithms can be applied to obtain an
 intermediate level of granularity.  This technique was employed to
-help load-balance the \BeamFormer (see Section~\ref{sec:results}).
+help load-balance the \Radar application (see Section~\ref{sec:results}).
 \protect\label{fig:splitjoin-split}}
 \vspace{12pt}
 \psfig{figure=sync-removal.eps,width=4.02in}
