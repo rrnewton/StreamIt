@@ -1,51 +1,49 @@
 \section{Detailed Example}
 This section describes the Trunked Radio example implementation in
-Figure~\ref{fig:radiocode}. The code for the trunked radio demonstrate
-many features of StreaMIT.
+Figure~\ref{fig:radiocode}. The code for the trunked radio
+demonstrates many features of StreaMIT.
 
 The high-level structure of the radio, graphically shown in
 Figure~\ref{fig:radiodiagram}, is implemented in the class {\tt
-TrunkedRadio}. It has 7 stages, where the first three stages operate
-in the time domain and the last three stages on the frequency domain.
-At this high level, the strcuture of the system is a pipeline of six
-or seven stream stages. The difference is due to the {\tt Booster}
-stage, which can be active or inactive. The switching on and off of
-the {\tt Booster} stage, which happens infrequently, is accomplished
-using a message from the {\tt CheckQuality} stage. We also use another
-message, from the {\tt CheckFreqHop} stage to {\tt RFtoIF} stage to
-change the baseband when a frequency hop tone is present.
+TrunkedRadio}. The radio has seven stages, where the first three
+stages operate in the time domain, the last three stages in the
+frequency domain, with a conversion phase in between.  At this high
+level, the structure of the system is a pipeline of six or seven
+stream stages. The difference is due to the {\tt Booster} stage, which
+can be active or inactive. The switching on and off of the {\tt
+Booster} stage, which happens infrequently, is accomplished using a
+message from the {\tt CheckQuality} stage. We also use another message
+from the {\tt CheckFreqHop} stage to {\tt RFtoIF} stage to change the
+baseband when a frequency hop tone is present.
 
-In the implementation we will omit the first and the last stages, {\tt
-ReadFromAtoD} and {\tt AudioBackEnd}. 
+In this example we will omit the implementation of first and the last
+stages, {\tt ReadFromAtoD} and {\tt AudioBackEnd}.
 
 The {\tt RFtoIF} stage modulates the input signal from RF to a
 frequency band around the current IF frequency. This stage is
-implented as a filter, which multiplies the current signal with the
-relevent component of a sine wave at the IF frequency. Since frequency
-hopping can change the IF frequency, we have created a method {\tt
-set\_freq} in the filter, which will be invoked using a message.
+implented as a filter that multiplies the current signal with a sine
+wave at the IF frequency.  To support a change in the IF frequency
+when frequency hopping occurs, the filter contains a {\tt set\_freq}
+method that can be invoked using a message.
 
-The optional {\tt Booster} stage will be activated when the signal is
-hard to detect. However, to conserve power, it will get deactivated
-during normal operation. The booster is a FIR filter, implemented
-using a Filter. The turning on and off the filter is implemented using
-a Stream. When the Stream is reset, the control-flow of the init
-function will decide to or not to add the FIR filter.  The FIR filter,
-shown in Figure~\ref{fig:firfilter}, is implemented using peek
-to look at N elements.
+The optional {\tt Booster} stage is a FIR filter that is activated
+when the signal is hard to detect. During normal operation, however,
+it is deactivated to conserve power. The turning on and off of the
+filter is controlled by a message.  The filter itself, shown in
+Figure~\ref{fig:firfilter}, is implemented as a Filter that uses peek
+to look at N elements in the input stream.
 
 The {\tt FFT} stage converts the program from the time domain to the
-frequency domain using a multi-stage FFT. The FFT algorithm
-implemented is graphically presented in~\ref{fig:fftfilter}. The FFT
-is composed of a reordering filter and a multi-stage butterfly
-filters. The StreaMIT representation of the reordering filter (a bit
-reverse order filter) is given in
+frequency domain using a multi-stage FFT. It is graphically presented
+in~\ref{fig:fftfilter}. The FFT is composed of a reordering filter and
+a multi-stage butterfly filter. The StreaMIT representation of the
+reordering filter (a bit reverse order filter) is given in
 Figure~\ref{fig:bitreverseorder}. Note that the complex data
-reshuffling is accomplished using few splitjoin constructs.  A
+reshuffling is accomplished using a few splitjoin constructs.  A
 parameterized Butterfly implementation is used to abstract the
 multi-stage butterfly in the FFT. As shown in
 Figure~\ref{fig:butterfly}, the Butterfly filter is also implemented
-using a combination of splitjoin constructs. 
+using a combination of splitjoin constructs.
 
 StreaMIT implementation of the FFT filter is clean and intutive. It
 already has a large amount of pipelined parallelism. Due to the simple
@@ -54,17 +52,17 @@ compiler analyses should be able to extract the parallel structure of
 the FFT when hardware resources are available.
 
 The next stage, {\tt CheckFreqHop}, checks four different frequencies
-for the change frequency tone. When this tone is detected, the
-frequency has to be changed within a time limit. Thus, a message is
-send to the {\tt RFtoIF} stage requiring it to be delivered such that 
-CheckFreqHop should receive at lest 4N and not more than 6N items
-using the old modulation.
+for the change frequency tone. When the stage detects this tone, it
+has to change the frequency within a time limit. This task is
+accomplished by sending a message to the {\tt RFtoIF} stage.  The
+message requires the {\tt RFtoIF} stage to deliver between 4N and 6N
+items using the old modulation before changing to the new frequency.
 
 The {\tt CheckQuality} stage checks if the signal has a distinct
-frequency spectrum. If all the frequencies has similar amplitute, it
-assumes that the signal to noice ratio is low and send a message to
-activate the {\tt Booster}. Note that this message is send using best
-effort delivary.
+frequency spectrum. If all the frequencies have similar amplitudes,
+the stage assumes that the signal to noise ratio is low and sends a
+message to activate the {\tt Booster}. Note that this message is send
+using best effort delivery.
 
 
 
@@ -108,7 +106,7 @@ class Butterfly extends Stream {
    void init(int N, int W) {
       add(new SplitJoin() {
          void init() {
-            weighted_round_robin(N, N);
+            setSplitter(WEIGHTED_ROUND_ROBIN(N, N));
             add (new Identity());
             add (new Filter() {
                Float weights[W];
@@ -125,11 +123,11 @@ class Butterfly extends Stream {
                   if(curr>= W) curr = 0;
                }    
             });
-            round_robin();
+            setJoiner(ROUND_ROBIN);
       }});
       add(new SplitJoin() {
          void init() {
-            duplicate();
+            setSplitter(DUPLICATE);
             add (new Filter() {   
                Channel input = new FloatChannel();
                Channel output = new FloatChannel();
@@ -144,7 +142,7 @@ class Butterfly extends Stream {
                   output.push(input.pop() - input.pop());
                }
             });
-            weighted_round_robin(N, N);
+            setJoiner(WEIGHTED_ROUND_ROBIN(N, N));
       }});
 }}
 
@@ -152,16 +150,16 @@ class FFT extends Stream {
    void init(int N) {
       add(new SplitJoin() {
          void init() {
-            weighted_round_robin(N/2, N/2);
+            setSplitter(WEIGHTED_ROUND_ROBIN(N/2, N/2));
             for(int i=0; i<2; i++) 
                add(new SplitJoin() {
                   void init() {
-                     round_robin();
+                     setSplitter(ROUND_ROBIN);
                      add (new Identity());
                      add (new Identity());
-                     weighted_round_robin(N/4, N/4);
+                     setJoiner(WEIGHTED_ROUND_ROBIN(N/4, N/4));
                }});
-            round_robin();
+            setJoiner(ROUND_ROBIN);
       }});
       for(int i=2; i<=N/2; i *= 2)
         add(new Butterfly(i, N));
@@ -224,7 +222,7 @@ class CheckFreqHop extends SplitJoin {
    RFtoIFPortal fh;
    void init(RFtoIFPortal fh) {
       this.fh = fh;
-      weighted_round_robin(N/4-2,1,1,N/2,1,1,N/4-2);
+      setSplitter(WEIGHTED_ROUND_ROBIN(N/4-2,1,1,N/2,1,1,N/4-2));
       int k = 0;
       for(int i=0; i<4; i++) {
          if((i==0)||(i==2)) {
@@ -243,7 +241,7 @@ class CheckFreqHop extends SplitJoin {
             }
          } else add(new Identity());
       }
-      weighted_round_robin(N/4-2,1,1,N/2,1,1,N/4-2);
+      setJoiner(WEIGHTED_ROUND_ROBIN(N/4-2,1,1,N/2,1,1,N/4-2));
    }
 }
 
