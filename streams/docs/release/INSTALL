@@ -3,7 +3,7 @@ Installing the StreamIt Snapshot
 
 This is for the March 14, 2003 snapshot release (streamit-0.0.20030314).
 
-$Id: INSTALL,v 1.3 2003-03-14 15:29:31 dmaze Exp $
+$Id: INSTALL,v 1.4 2003-03-14 20:08:38 dmaze Exp $
 
 
 Unpack the StreamIt source tar file somewhere; this can be in your
@@ -55,6 +55,12 @@ If you use tcsh, add to your .cshrc file
 If you want to override the settings the provided scripts set (for
 example, the RAW StarSearch directory), set the relevant variables
 after reading the dot-bashrc or dot-cshrc file.
+
+If you are trying to install both StreamIt and the RAW tools, set up
+RAW first; the setup process requires that the TOPDIR environment
+variable be unset.  After running 'make setup' in the starsearch
+directory, edit the dot-bashrc and/or dot-cshrc files to have the
+correct setting for TOPDIR.
 
 BINARY RELEASE: Add the StreamIt jar file to your Java CLASSPATH.  If
 you use bash, add to your .bashrc file
