@@ -83,17 +83,17 @@ across the chip.
 A second approach is to run all the filters in parallel, each on its
 own tile.  This is termed {\it space multiplexing}.  Our first
 StreamIt compiler for Raw uses this technique~\cite{streamit-asplos}.
-Space multiplexing affords $(i)$ filter-swapping without any overhead,
-$(ii)$ reduced memory traffic, $(iii)$ localized communication, and
-$(iv)$ tighter latencies.  Due to these properties, space multiplexing
-scales extremely well, although it is subject to effective load balancing 
-techniques. Toward that end, merging and
-splitting components of the stream graph until it is composed of
-$n$ load balanced filters, where $n \le$ the number of processing elements,
-proved difficult, as the optimization technique is constrained by
-several competing factors.  Further, the use of space multiplexing
-alone forced us to support arbitrarily complex communication patterns 
-that did not map efficiently to the 2-D mesh in Raw.
+Space multiplexing affords $(i)$ no filter-swapping overhead, $(ii)$
+reduced memory traffic, $(iii)$ localized communication, and $(iv)$
+tighter latencies.  Due to these properties, space multiplexing scales
+extremely well, although it is subject to effective load balancing
+techniques. Toward that end, merging and splitting components of the
+stream graph until it is composed of $n$ load balanced filters, where
+$n \le$ the number of processing elements, proved difficult, as the
+optimization technique is constrained by several competing factors.
+Further, the use of space multiplexing alone forced us to support
+arbitrarily complex communication patterns that did not map
+efficiently to the 2-D mesh in Raw.
 
 The technique employed by our new backend for Raw is to merge the
 advantages of space multiplexing and time multiplexing.  This hybrid
@@ -101,16 +101,15 @@ approach will time multiplex different groups of filters and space
 multiplex the filters within a group. We call each group a space-time
 slice or just a slice.  Hybrid space-time multiplexing allows space
 multiplexing for fine-grained, systolic sections of the stream graph
-and time
-multiplexing for improved load balancing.  Furthermore, we use
-software pipelining techniques to allow arbitrary ordering of slices
-during steady-state execution.
+and time multiplexing for improved load balancing.  Furthermore, we
+use software pipelining techniques to allow arbitrary ordering of
+slices during steady-state execution.
 
 An integral part of our technique is to recognize parts of the stream
 graph that can be space-multiplexed in a fine-grained, systolic
 fashion.  Using our linear analysis framework \cite{lamb03}, we can
 discover the linear sections of a streaming application.  We define a
-linear section of a stream graph as groups of filters that
+linear section of a stream graph as a group of filters that
 compute a linear combination of their inputs.  Many ubiquitous DSP
 kernels are linear including FIR, low and high-pass filters, and DFT.
 These linear computations can be represented as a matrix
