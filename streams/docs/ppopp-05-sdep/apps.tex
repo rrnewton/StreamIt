@@ -16,10 +16,8 @@ packet, and send a message downstream to invalidate the effects of
 what has been processed.  Other examples of control messages include:
 periodic channel characterization; adaptive beamforming; initiating a
 handoff ({\it e.g.,} to a new network protocol); marking the end of a
-large data segment; invalidating data that has propagated downstream
-({\it e.g.,} if an upstream filter finds that the CRC does not match);
-and responding to user inputs, environmental conditions, or
-exceptional states.
+large data segment; and responding to user inputs, environmental
+conditions, or exceptional states.
 
 Generally speaking, control messages are sent at infrequent and
 irregular intervals; however, once they are generated there might be
@@ -59,10 +57,10 @@ handler increaseGain(float amount) {
 Message handlers are just like normal functions, except that they
 cannot access the input/output channels and they have no return value.
 
-\item A parent stream declares a variable of type {\tt portal<} $T_B$
-{\tt >} which can forward messages to anything of type $T_B$.  The
-parent adds $B$ to the portal and passes the portal to $A$ during
-initialization.
+\item A parent stream which contains $A$ and $B$ declares a variable
+of type {\tt portal<} $T_B$ {\tt >} which can forward messages to
+anything of type $T_B$.  The parent adds $B$ to the portal and passes
+the portal to $A$ during initialization.
 
 \item To send a message, $A$ invokes the handler method on the portal
 from within its steady state work function.  It includes a range of
@@ -78,8 +76,8 @@ work pop 1 {
 \end{verbatim}}
 
 \end{itemize}
-The central aspect of the messaging system is the semantics for
-message latency.  Because there are many legal orderings of actor
+The most interesting aspect of the messaging system is the semantics
+for message latency.  Because there are many legal orderings of actor
 executions, there is no notion of ``global time'' in a stream graph.
 The only common frame of reference between concurrently executing
 actors is the series of data items that is passed between them.  The
@@ -99,16 +97,16 @@ message has the semantics of traveling ``with the data'' through the
 stream graph, even though it does not have to be implemented this way.
 
 The intuition for upstream messages is similar.  Consider that $B$ is
-sending a message with latency $k$ to upstream message $A$ in the
-stream graph.  This means that $A$ will receive the message
-immediately following the last invocation of its work function which
-produces an item affecting the output of $B$'s $k$th firing, counting
-the current firing as 0.  As before, we can also think of this in
-terms of $A$ tagging items and $B$ observing the tags.  In this case,
-the latency constraint says that $B$ must input a tagged item before
-it finishes $k$ additional executions.  The message is delivered
-immediately following the latest firing in $A$ during which tagging
-could start without violating this constraint.
+sending a message with latency $k$ to upstream actor $A$ in the stream
+graph.  This means that $A$ will receive the message immediately
+following the last invocation of its work function which produces an
+item affecting the output of $B$'s $k$th firing, counting the current
+firing as 0.  As before, we can also think of this in terms of $A$
+tagging items and $B$ observing the tags.  In this case, the latency
+constraint says that $B$ must input a tagged item before it finishes
+$k$ additional executions.  The message is delivered immediately
+following the latest firing in $A$ during which tagging could start
+without violating this constraint.
 
 The following definition leverages the $\sdep$ formalism to give a
 precise meaning to message timing.
@@ -360,7 +358,7 @@ with the RFtoIF stage, and an item is sent on every invocation to
 indicate whether or not a message is present.  The latency and
 periodicity of message delivery are governed by the data rates and the
 number of items on the feedback
-path. \protect\label{fig:fhr-streamit}}
+path. \protect\label{fig:fhr-manual}}
 \end{figure}
 
 \begin{figure}[t]
