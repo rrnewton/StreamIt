@@ -51,13 +51,13 @@ Since each {\tt filter}'s {\tt work} function can contain arbitrary C-like code,
 the compiler must determine which {\tt filters} can be represented by linear nodes
 automatically. 
  
-The data analysis pass that is currently employed is very much like standard constant propagation. 
+The data analysis pass that is currently employed is much similar to standard constant propagation. 
 Instead of mappings from variables to compile time constants, we keep mappings to linear forms.
 A linear forms $l$ is defined as a pair $({\mathbf v}, c)$ of a column vector $\mathbf{v}$ of size $e$ 
 and a constant $c$. For each program variable, its linear form at a particular program 
 point corresponds to the formula for computing a value from a linear 
 combination of {\tt filter} inputs. The value of a linear form at runtime is 
-${\mathbf xv} + c$.
+${\mathbf x}{\mathbf v} + c$.
 
 The analysis must keep track of how many {\tt pop()}s the {\tt work} 
 function has performed at any particular program point so that 
@@ -78,7 +78,8 @@ point.
 We define ${\mathbf v} = zerov(k)$ a row vector of size $e$ such that 
 $v[i]=0, i \neq k$, and $v[i]=1,i=k$.
 
-A linear form is generated in one of he following three ways:
+A linear form is generated in one of three ways:
+
 \begin{enumerate}
 \item A constant $r$ generates the linear form $({\mathbf 0},r)$. 
 \vspace{-6pt}
@@ -90,38 +91,37 @@ $(zerov(u-i-1-popcount), 0)$.
 \item A {\tt pop()} expression generates the linear form 
 $(zerov(u-1-popcount),0)$
 
-\vspace{-6pt}
 \end{enumerate}
 
-Linear forms propagate through the control flow graph much as constants do
+Linear forms propagate through the control flow graph as constants flow
 during constant propagation. The value of two expressions with linear forms $l_1$ 
 and $l_2$ is a new linear form $l'=l_1+l_2=({\mathbf v}_1+{\mathbf v}_2, c_1+c_2)$.
 
 The product of a linear form with a constant $r$, is a new linear form 
 $l' (r{\mathbf v},rc)$. The product of two linear forms does not produce a 
-new linear form because it corresponds to multiplying inputs together rather than
-a linear combination. 
+new linear form because the product corresponds to multiplying inputs together 
+rather than taking a linear combination. 
 
 Data is propagated through forward control flow as in standard dataflow analysis. 
 The confluence operator is set intersection, so mappings that are retained are the same 
 along all paths of control flow. Since $popcount$ and $pushcount$ must be single
 valued at all possible program points, an inconsistent $popcount$ at the
-confluence point means that any future {\tt pop} and {\tt peek} operations
+confluence point implies that any future {\tt pop} and {\tt peek} operations
 do not generate linear forms, and an inconsistent $pushcount$ results in
 terminating the analysis (concluding the filter is non-linear).
 
 Backwards edges in control flow are handled currently by the symbolic execution
-of loops. We are currently investigating the use of parameterized generator matrices 
+of loops. We are investigating the use of parameterized generator matrices 
 to describe the action of loops without requiring symbolic execution.
 
 If a function call with side effects is encountered, the operation performed
-by the filter is not linear and we discard our candidate node. Otherwise, 
-we can easily propagate the dataflow state through side-effect free function calls. 
+by the filter is not linear and we discard our candidate node. Otherwise,
+it is straightforward to propagate the dataflow state through side-effect free function calls. 
 
 When a {\tt push(expr)} expression is encountered such that {\tt expr} is a linear form 
 $({\mathbf v},c)$, we modify ${\mathbf A}$ and ${\mathbf b}$ of the candidate linear node $\lambda$.
 ${\mathbf v}$ is copied to the $u-1-pushcount$ column in ${\mathbf A}$,
-$c$ is copied to the $u-1-pushcount$ column in $a$, and $pushcount$ is incremented.
+$c$ is copied to the $u-1-pushcount$ column in ${\mathbf b}$, and $pushcount$ is incremented.
 
 If every {\tt push} expression in a {\tt filter} has a linear form as
 an argument, then candidate linear node $\lambda$ is the linear node

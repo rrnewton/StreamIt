@@ -32,7 +32,7 @@ especially important for this domain, as embedded devices often have
 high performance requirements and tight resource constraints.  Even
 with the best available C compilers for DSP chips, programmers still
 turn to assembly code to implement critical parts of embedded
-applications.  This process is time-consuming, error-prone, and
+applications.  This process is time-consuming, error-prone and
 costly, and must be repeated for each generation of the target
 architecture.  As algorithms and applications continue to grow in
 complexity, these factors will become unmanageable.  There is a
@@ -50,7 +50,7 @@ explicit the large-scale parallelism and regular communication
 patterns that are characteristic of streaming programs.  By analyzing
 the primitive building block in StreamIt--the filter--our analysis can
 detect large portions of the application that produce outputs as a
-linear combination of the inputs; then, we can exploit this linearity
+linear combination of the inputs; we can exploit this linearity
 for a number of large-scale optimizations.  Though each filter is
 programmed using imperative C-like code, the separation of filters
 into autonomous units of the stream graph enables our analysis to be
@@ -62,13 +62,16 @@ This paper makes the following contributions:
 
 \item A linear dataflow analysis that can extract a linear transfer
 function from the imperative code within a StreamIt filter.
+\vspace{-6pt}
 
 \item Combination rules for collapsing neighboring linear nodes into a
 single linear representation.
+\vspace{-6pt}
 
 \item An automated procedure for translating a stream computation into
 the frequency domain in order to optimize computationally intensive
 linear nodes.
+\vspace{-6pt}
 
 \item An implementation of the above techniques in the StreamIt
 compiler that automatically improves performance by a factor of
@@ -76,7 +79,7 @@ compiler that automatically improves performance by a factor of
 
 \end{itemize}
 
-In the rest of this section, we give a motivating example and some
+In the rest of this section, we give a motivating example and
 background information on StreamIt.  Then we present our linear
 representation (Section~\ref{sec:linearrep}) and linear dataflow
 analysis (Section~\ref{sec:dataflow}).  Next we describe the
@@ -102,7 +105,7 @@ float filter(float* weights, float* data, int pos, int N) {
 
   /* perform weighted sum, starting at index pos */
   for (i=0; i<N; i++, pos++) {
-    sum += weights[pos] * data[pos];
+    sum += weights[i] * data[pos];
     pos = (pos+1)%N;
   }
   return sum;
@@ -306,8 +309,9 @@ structures (see Figure~\ref{fig:structures}): 1) {\tt pipelines}
 represent the serial computation of one filter after another, 2) {\tt
 splitjoins} represent explicitly parallel computation, and 3) {\tt
 feedbackloops} allow cycles to be introduced into the stream graph.
-{\tt filters}, {\tt pipelines}, {\tt splitjoins} and {\tt
-feedbackloops} are all {\tt streams} and each {\tt stream} can be used
+Each of the constructs {\tt filters}, {\tt pipelines}, 
+{\tt splitjoins} and {\tt feedbackloops} 
+is a {\tt streams} and a {\tt stream} can be used
 as a subcomponent in a structure.  Note that all {\tt streams} have
 exactly one input tape and exactly one output tape.
 

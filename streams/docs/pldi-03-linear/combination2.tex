@@ -27,7 +27,7 @@ do not yet deal with {\tt feedbackloop}s as they require the notion of
 \vspace{-12pt}
 \end{figure}
 
-In StreamIt, the input and output rate of each {\tt filter} in the
+In StreamIt programs, the input and output rate of each {\tt filter} in the
 stream graph is known at compile time.  The StreamIt compiler
 leverages this information to compute a static schedule--that is, an
 ordering of the node executions such that each filter will have enough
@@ -78,7 +78,7 @@ $u'$-element row vector:
     \mt{shift}(r,c)[i,j] = \left\{
       \begin{array}{l}
 	A[i-r,j-c] \\
-	~~~~~~\mt{if}~ i-r \in [0,e] \wedge j-c \in [0, u] \\
+	~~~~~~\mt{if}~ i-r \in [0,e-1] \wedge j-c \in [0, u-1] \\
 	~ 0 \mt{~otherwise}
       \end{array}
       \right.
@@ -170,7 +170,7 @@ and $y_2 = x_2 A_2 + b_2$.  But since $\lambda_1$ is connected to
 $\lambda_2$, we have that $x_2 = y_1$ and thus $y_2 = y_1 A_2 + b_2$.
 Substituting the value of $y_1$ from our first equation gives $y_2 =
 x_1 A_1 A_2 + b_1 A_2 + b_2$.  Thus, the intuition is that the
-two-filter sequence can be represented by matrices $A' = A_1 * A_2$
+two-filter sequence can be represented by matrices $A' = A_1 A_2$
 and $b' = b_1 A_2 + b_2$, with peek and pop rates borrowed from
 $\lambda_1$ and the push rate borrowed from $\lambda_2$.
 
