@@ -20,7 +20,7 @@
 \title{StreamIt Language Specification\\
 Version 2.0\ifprerel\thanks{
 This document is the latest working version of the language specification.\hfil\break\ttfamily
-\hbox{$Id: streamit-lang.tex,v 1.16 2003-02-10 14:03:25 thies Exp $}
+\hbox{$Id: streamit-lang.tex,v 1.17 2003-04-14 18:53:39 dmaze Exp $}
 }\fi}
 \author{\texttt{streamit@cag.lcs.mit.edu}}
 \catcode`\$=3
@@ -529,7 +529,9 @@ complex->float feedbackloop FeedbackMagnitude
     }
   };
   loop pipeline {
-    add FloatScaler(scaling);
+    add float->float filter {
+      work pop 1 push 1 { push(pop() * scaling); }
+    };
     add FloatToComplex();
   };
   split duplicate;
@@ -538,6 +540,13 @@ complex->float feedbackloop FeedbackMagnitude
 
 The input and output types of anonymous streams are determined by the
 compiler, if these types are not explicitly specified in the code.
+
+Anonymous streams do not have stream parameters.  In certain cases,
+though, code within anonymous streams can access variables and stream
+parameters from the containing stream.  Values so referenced must be
+compile-time constant.  Fields of the containing stream cannot be
+accessed, and local variables and stream parameters in the containing
+code cannot be modified.
 
 \subsection{Execution Model}
 
