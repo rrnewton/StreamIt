@@ -1,4 +1,4 @@
-\section{A Minimal Program}
+\smallskip \subsection{A Minimal Program}
 
 \begin{textpic}{\includegraphics{cookbook.1}}
 \begin{lstlisting}{}
@@ -45,3 +45,52 @@ at all should also be declared to take \lstinline|void| as its input
 type, and similarly a \lstinline|void| output can be used if a filter
 produces no output.
 
+\subsection*{How to Compile and Run}
+
+The StreamIt compiler script {\bf strc} can be used to compile and
+execute StreamIt programs.  For example, if the above program is
+stored in {\tt Minimal.str}, then the following command will compile
+it for the uniprocessor backend:
+\begin{verbatim}
+strc Minimal.str -o minimal
+\end{verbatim}
+The resulting binary is stored in {\tt minimal}, and it can be
+executed for 5 iterations as follows:
+\begin{verbatim}
+minimal -i 5
+\end{verbatim}
+Doing so will print the integers from 0 to 4, in increasing order.
+
+During the course of compilation, a number of stream graphs are ouput
+to {\tt dot} files in the current directory.  The {\tt dot} format can
+be displayed and converted to other formats using the Graphviz
+software, which is available online\footnote{\tt
+http://www.research.att.com/sw/tools/graphviz/}.  Running the
+following command will draw the stream graph for the program, as
+pictured to the right of the source code above:
+\begin{verbatim}
+dotty first-sir-tree.dot
+\end{verbatim}
+There are many other {\tt dot} files that are output by the compiler;
+see Section~\ref{sec:compiler} of this document for more details.
+
+{\bf The Java Library.}  In addition to using the StreamIt compiler,
+it is possible to convert StreamIt programs into equivalent Java
+programs that can be executed using any Java VM.  This is particularly
+convenient for testing and debugging, as well as for cases when the
+compiler might encounter a bug.
+
+To run the {\tt Minimal} program for 5 iterations in the Java library,
+do as follows:
+\begin{verbatim}
+strc --library Minimal.str -i 5
+\end{verbatim}
+This command will output a {\tt Minimal.java} file, compile it with a
+Java compiler, and run it using {\tt java}.  The output should always
+be identical to that obtained using the compiler.  In addition, the
+library will output a {\tt Minimal.dot} file that can be visualized
+using Graphviz.
+
+For more details on the StreamIt compiler and execution environment,
+including instructions for compiling to the {\bf Raw architecture},
+please consult Section~\ref{sec:compiler}.
