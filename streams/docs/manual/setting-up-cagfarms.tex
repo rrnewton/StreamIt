@@ -112,18 +112,44 @@ eclipse, please put it in
  this document).  I don't know how to make eclipse use antlr to
  generate stuff yet.)
 
-\item Run eclipse and do file/new/project.
+\item Click New Project, Java, Java Project, Next.
 
-\item Java Project.
+\item Name the project ``streamit'', uncheck ``use default'' and give
+the value of your {\tt \$STREAMIT\_HOME} for the directory.  Click
+next.
 
-\item Name it ``streamit'' or something and point directory to your
-{\tt STREAMIT\_HOME}.  Click ``Next'' and say ``No'' so it doesn't
-auto-detect classes.
+\item On dialog, click NO for constructing project directory
+automatically.
 
-\item ``Add folder'' compiler/3rdparty.  It will tell you it added an
-   exclusion.
+\item Add folder, ``compiler''.  On dialog about bin directory, say
+``Yes''.
 
-\item Click ``finish''.
+\item Add folder ``compiler/3rdparty''.
+
+\item Add folder, ``library/java''.
+
+\item Select exclusion filter under compiler/3rdparty, edit it, and
+add ``cplex'' as an excluded directory.
+
+\item 
+
+Go to Libraries tab, say ``add external Jars'', and add two:
+\begin{enumerate}
+
+\item {\tt /usr/uns/java/antlr.jar}
+
+\item {\tt \$STREAMIT\_HOME/compiler/3rdparty/cplex/cplex.jar} (not
+  literally -- substitute {\tt \$STREAMIT\_HOME} with its value on
+  your setup).
+
+\end{enumerate}
+Somehow this tab seems to be finicky -- first set the filter to the
+directory you're interested in, then use the mouse to double-click the
+jar file.  Otherwise for some reason it referenced a non-existent file
+for me.
+
+\item Click finish.
+
 \end{enumerate}
 
 Everything should compile -- you'll get hundreds of ``problems'' but
