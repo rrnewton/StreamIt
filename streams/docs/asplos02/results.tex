@@ -122,6 +122,21 @@ to an individual tile. Next we perform a series of fusion, fisson and
 reindexing transformations to create a load balanced set of filters
 that can be mapped onto a 4x4 Raw processor.
 
+\begin{figure}
+\begin{minipage}{3.2in}
+\centering
+\psfig{figure=speedup-diagram.eps,width=3.3in}
+\caption{The speedup due to optimizations normalized to original performance.
+\protect\label{fig:opt-diagram}}
+\end{minipage}
+\hspace{0.1in}
+\begin{minipage}{3.2in}
+\centering
+\psfig{figure=utilization-diagram.eps,width=3.2in}
+\caption{Utilization of a tile ofter optimization normalized to the original utilization.}
+\end{minipage}
+\end{figure}
+
 The results show that for program with substantial computation
 requirements such as the BeamFormer, the StreamIt compiler is able to
 extract exteremly good performance out of the Raw processor. A
