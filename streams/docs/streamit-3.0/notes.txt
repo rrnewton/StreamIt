@@ -5,9 +5,11 @@ Table of Contents:
 * splitter/joiner types
 * messaging
 * pausing and re-initialization
+* static restrictions
 * open issues
 * applications
-* appendix: example messaging code
+* appendix 1: example messaging code
+* appendix 2: data-dependent feedback loop
 
 ---------------------------------------------------------------------------------------
 
@@ -36,7 +38,7 @@ Table of Contents:
     - dynamic memory allocation
     - naming and static resolution of message targets
 
-- still several open issues, and details to work out
+- still a few open issues, and details to work out
 
 ---------------------------------------------------------------------------------------
 
@@ -84,6 +86,9 @@ Table of Contents:
   - guarantees that for every N+M items output: N from left, M from right
 - an ANY joiner is ratio(*,*)
 - example application: IP routing from multiple sources
+- atomic execution step is 1 item transfer
+  - though this implies that compiler will have to remember where ratio was across a pause
+  - if atomic step is N+M instead, that is very coarse-grained (why not just do round-robin(N,M))
 
 * new joiner type:  inorder
 - takes wavefronts in order from incoming streams
@@ -136,7 +141,7 @@ Table of Contents:
      - note that this naming allows different handlers to be visible to 
        children and parents (good thing)
 
-  - bigger example:  see Appendix 1.
+  - bigger example:  see Appendices.
 
 - clocks
   - as part of hierarchical messaging, we will need a notion for what it 
@@ -154,18 +159,24 @@ Table of Contents:
 - timing is still SDEP in compiler, but new way of specifying it hierarchically
   - message latencies are specified in two places:
      - in a parent handler declaration as it receives message from child
-     - in a parent send statement when it sends message to child
-     - (note that a child does NOT specify the latency when sending to parent)
-        - rationale:  children only raise events; parents know how to deal with them
+     - in a send statement
+       - either parent sending to child, or child sending to parent
+       - rationale:
+          - parent might want to delay message before child sees it,
+            due to end-to-end timing constraint
+          - child might want to delay message so that it falls on one
+            of its own frame boundaries, etc., before it is visible to parent
 
   - message latencies are measured using SDEP from the sender of the message to a "clock"
      e.g., "handler filter[i].error() @ L clock MyUpstreamFilter { ... }
       - this means that the handler will execute when a message arrives
         at myUpstreamFilter, traveling from child[i] with SDEP latency L
+        - as described below "from child[i]" means "from the clock
+          specified at the send statement in child[i]"
 
   - a clock indicates a execution step of a container, and is useful as a 1) a metric
     when a parent is counting child executions, and 2) a well-timed message target
-  - corresponding to above, there are two places to specify clocks:
+  - corresponding to above, there are three places to specify clocks:
     1. a clock for a whole container
        - specified in init function, e.g. with "clock MyFilter" syntax
        - if none specified, then defaults are:
@@ -173,43 +184,88 @@ Table of Contents:
            - splitjoin:  the splitter
            - pipeline: top-most stream
            - feedback loop: the joiner 
-    2. a clock associated with each message handler
+    2. a clock associated with a message handler
       - a handler can declare a clock, e.g.:
         handler child[i].setVolume() @ 0 clock myUpstreamFilter { ... }
+      - this indicates the specific filter that is used to time delivery of message to the container
       - a handler can use a default clock (no "clock" in declaration):
         - default clock for handler of child message is the child itself (the sender)
         - default clock for handler of parent message is the clock of stream declaring handler
           - rationale:  would actually prefer child message targets to be clock, but
             there might be a fan-out, or there might not be any messages sent to children.
+    3. a clock associated with a "send" statement
+      - example uses:
+        1. a parent could say:
+           send child[i].setVolume() @ 0 clock mySplitter;
+        2. also, a child could say:
+           send myMessageEvent() @ 10 clock myTopMostFilter
 
-  - note that clocks declared with a message handler in stream s are used to count 
-    atomic executions for s in parent handling of any messages that s *sends*.
-     - this serves as a temporary overriding of a stream's default clock for the
-       purposes of a given message
-     - rationale: the common case is using the sender as the clock for messaging
+      - intended uses:
+        - case #1 is important for messaging to disabled components,
+          because it allows the message delivery to be clocked
+          according to the sender instead of the receiver
+           * this allows the implementation of "acknowledgement-based"
+             messaging.  If a splitjoin sends to a disabled component
+             with latency N using the splitter as the clock for both
+             sending and receiving, then the message must be delivered
+             to the component before the splitter has executed N
+             times.
+
+         - case #2 we haven't thought about as much, but could
+           conceivably be useful for containers that want to delay a
+           message by some specific amount before it escapes from
+           them
+
+      - default clocks for sending:
+         - for child to parent:
+           - if the message is sent from a work function, the default clock is the clock of the filter
+           - if the message is sent from a handler, the default clock is the clock declared with the handler
+              - rationale: the common case is using the sender as the clock for messaging
+         - for parent to child:
+           - the default clock is the clock declared in the child's message handler 
 
   - note that in common case, we think that this scheme translates to a few SDEP constraints
     - by default, all of upstream paths collapsed into single sender's constraint
     - unfortunately, there are multiple messaging hops while going down on the receiver side
       - if receiver specifies target as clock, then there will be single end-to-end SDEP constraint
 
-- delivery to/from disabled components is still well-timed
-  - if in a splitjoin, time with respect to splitter
-  - if in a pipeline, time with respect to identity
-  - if the component is freed / deallocated at time of arrival, message is ignored
+  - note also that we enforce FIFO order of messages if they are with
+    same latency from same src and to the same destination 
+    - these messages will arrive in the same order in which they were
+      sent
+    - "same latency" means that they are scheduled to arrive before a
+      given iteration of target
 
-- to support messaging, a few extensions to container syntax:
-  1. a field can be declared "public"
-    - then its parent can tell you to disable a certain one of your children
-    - if a handle is declared public, it must be final:  assigned only once, and
-      from init function
-        - this allows compile-time resolution of message targets
-    - if handle is passed as argument to message, it must be passed as literal
-      - this allows compile-time resolution of targets
-      - also prevents type of grandchild from escaping, if that's desirable (?)
-  2. have separate "init" function declaration
-    - since containers now declare functions, can't have init be implicit
-    - if no other functions in container, can still keep old syntax for initialization
+- delivery to/from paused components
+
+  - Current best proposal: all messages to paused streams are ignored
+    (or runtime error) except for init and resume.  Further, resume()
+    and init() are timed differently: not to the target stream, but to
+    a 1-to-1 placeholder (is another rate ever needed?)  This
+    placeholder is:
+
+     - for a splitjoin:  the splitter
+     - for a pipeline:  a dummy identity filter in place of the target
+
+   - Debunked options: various forms of enqueing.  Complicated by stale
+     messages and especially how to deliver things with internal
+     timing after the stream has been re-enabled.
+
+   - Still unclear what you should do regarding pausing sources/sinks
+     (in terms of timing) -- a high-latency message might be
+     impossible to deliver since the target might be stuck and can't
+     get that far.  Also consider null splitters, etc.
+
+  - if the component is freed / deallocated at time of arrival,
+    message is ignored or runtime error (same choice as above)
+
+- to support message handlers, a container now has a distinct "init" function
+  - since containers now declare functions, can't have init be implicit
+  - if no other functions in container, can still keep old syntax for initialization
+  - note that we now allow multiple init functions, though their argument
+    types have to be unambiguous so that the correct one can be selected
+    automatically
+  - if only one init function declared, can keep arguments as part of stream decl
 
 ---------------------------------------------------------------------------------------
 
@@ -227,10 +283,6 @@ Table of Contents:
      - might not want to depend on your parent to turn you off at the right time
 
 - init:  re-runs initializer for stream
-   - note that we now allow multiple init functions, though their argument
-     types have to be unambiguous so that the correct one can be selected
-     automatically
-   - if only one init function declared, can keep arguments in stream 
    - note that call to "init" can also come when stream is running or paused
      - in this case, there is an implicit "kill" sent with same latency
 
@@ -250,18 +302,19 @@ is executed as much as possible so long as it can complete **atomically**
   - you might have to do rollback, but wouldn't be hard to implement
     - one implementation would be suspension + double-buffering
   - why not consider atomicity for containers?
-    - it is undefined in the presence of dynamic rates
-    - might never have a time when noone in the stream is executing
-
-- if custom joiner tries to read from empty, drained channel:
-  - the joiner is rolled back (does not fire)
-  - no error thrown to programmer (would be inconsistent w/ draining strategy)
+    - we decided not to, for simplicity
+    - however, this could be done as an extension by specifying atomic
+      step for container using clocks plus a way for programmer to
+      indicate filling/draining into dynamic-rate clock (see
+      extensions)
+    - but without extension, this is undefined in the presence of
+      dynamic rates, as you might never have a time when noone in the
+      stream is executing
 
 * filling
 - timing of the enable message: is with respect to the first new data
 item starting the 1) re-initialization OR 2) normal operation of
-the re-enabled stream.  Case 1) is if the channels were cleared when
-the stream was disabled; case 2) is if the channels were not cleared.
+a paused stream.
 
 - the fill depends on how the stream was drained:
  1. KILL: data killed, filter state killed:  requires "init" call as follow-up
@@ -279,46 +332,149 @@ the stream was disabled; case 2) is if the channels were not cleared.
   rate-declaration error as in above, then the behavior is undefined
 
 - otherwise, execution is best-effort: a filter will fire whenever it
-  can do so atomically
+  can read the requisite input items atomically
   - note that this means that a child can enable/disable itself even with custom splitter/joiner
+  - also, a splitter or joiner can itself be paused
   - also, this means that burden is on compiler to fire anyone who can, atomically; should be
     deterministic behavior between everyone supporting this contract
+
+- if custom joiner tries to read from empty, drained channel:
+  - the joiner is rolled back (does not fire)
+  - no error thrown to programmer (would be inconsistent w/ draining strategy)
+
+- can you push to paused stream?  YES [we waffled many times, then decided this]
+  - the producer can run, and the items are buffered
+    - this is easier than blocking to implement
+    - might also be useful for application-level messages dealing with real-time
+  - what to do with buffered data upon re-enabling paused stream?
+    - re-init message kills all data in front of it (that is, between
+      message and first item in buffer of paused stream)
+    - resume message never kills data
+
+---------------------------------------------------------------------------------------
+
+* static restrictions
+
+- restrictions on handles 
+  1. if there is message handler for a field, can only be assigned in init function
+    - can also be left null (if you don't need it, e.g., am vs. fm children)
+    - if you try to message to null component, get runtime error
+    - for fields with no message handlers, can assign anytime
+  2. can't be on right side of add statement (only LHS)
+  3. can pass as arguments
+  4. when you send a message, must to be one of your children
+  5. can store in locals and fields
+  6. fields of one container cannot be referenced from another (e.g.,
+     child.fooHandle) unless the handle is declared public (see below)
+
+  - NOTE that this still does not restrict message targets to be fully
+    resolved at compile time.  We want to allow you to receive a
+    message target as an argument, then pass it down or send a message
+    to it (for example, as a parameter for indicating a stream to turn
+    off.)
+
+    - if handle is not assigned only once from init, then add timing
+      constriants based on the type of the target (to all possible
+      receivers)
+
+- public fields (might need to revisit given loose restrictions above)
+  - if a field is declared "public", then it is resolved at compile time
+  - this allows other streams (only container?) to reference the field
+    - e.g., a parent can tell you to disable a certain one of your children
+
+  - if a handle is declared public, it must be final:  assigned only once, and
+    from init function
+      - this allows compile-time resolution of certain message targets
+  - if handle is passed as argument to message, it must be passed as literal
+    - this allows compile-time resolution of these targets
+    - also prevents type of grandchild from escaping, if that's desirable (?)
+
+- restrictions on message latencies
+  - allow anything, but come back to option of some kind of static
+    annotation to give compiler hints (e.g., the min-max values a
+    latency could assume)
+
+- note on phases in filters
+  - you can have phases dynamically-tripped for loops in the work function
+  - work function rate decls are optional
+
+---------------------------------------------------------------------------------------
+
+* Application Scenarios
+
+1. How an application programmer should properly arrange for a pause
+   message to arrive at a container in a well-timed way if the clock
+   for that container is in the middle?
+
+   - i.e., how do you prevent the top or bottom of the container from
+     being cut off processing in the middle of a frame?
+
+   - solution: the container times arrival in terms of its clock, then
+     sends another pause message to the top of the stream with zero
+     latency
+
+     - this basically has effect of a minimum-fill on the top of the
+       stream
+
+  - Alternate proposal (but since overruled): override the pause()
+    handler to specify a clock at the top of the stream.  Problem with
+    this?  It still might violate frames, etc. enforced by the other
+    clock.  This gets into the option of specifying a "minimum fill"
+    or "maximum flush" with respect to some number of executions of
+    the clock.
+
+2. How can one dynamically turn off a child after they are *done*
+   processing some data?
+
+  - SDEP timing seems to fail, since there will be no more data items
+   sent to/from the component that you want to message to.
+
+  - solution for sending from splitter->child:
+
+    - use new ability of specifying a different clock for the target of a messsage than the target itself
+       - for example, splitjoin can send to child using the splitter as both the sender clock and receiver clock
+
+       - this will have effect of doing acknowledgement-based system
+         for splitter->child.  That is, the splitter is guaranteed
+         that the message is finished being delivered to the child by
+         the time the splitter has executed N more times.
+
+  - if child wants to notify splitjoin that it is done, this can also be done
+   - read carefully the spec that we have:  the message is delivered IMMEDIATELY AFTER in the target
+     - this means before the target fires again, even if subsequent firings of target would route items to filters other than the sender
+     - so even though there are no more items from splitter->child, the message is naturally timed in terms of items to the next child.
 
 ---------------------------------------------------------------------------------------
 
 * open issues 1 (major)
-- what are restrictions on assigning, passing around stream handles?
-  - can you take one as an argument and then send message to it?  I guess.
-  - but you can't store an argument that you received as a local, right?
-    - do all message targets need to be resolved at compile time?
-- how to implement message timing across dynamic rates
+- exactly how to implement message timing across dynamic rates
 
-* open issues 2 (minor, with way I chose to resolve them)
-- can you push to paused stream? [Bill: yes, will not change answer]
-  - driving app: buffering up low-pririoty network packets
-  - but then, can you push to a killed stream?  hmm.
-- illegal graphs
-  - can you pause a joiner? [Bill: yes, scheduling adjusts]
-  - at one point we decided to make it illegal to disable sink, (if
-    it's not in splitjoin with other children) as it would be an
-    illegal stream graph.
-    [Bill: this is not illegal graph, it is just paused stream]
-  - we also decided to throw runtime error whenever there was "mismatching
-    rates" in graph.  Is there a difference between this and pausing?
-    [Bill: yes.  Illegal graph is mismatch between declared push rate 
-     of 0 and declared pop rate of strictly greater than 0.]
-- what is atomic execution step of ratio(N,M)?  [Bill: it is 1 item transfer]
-  - though this implies that compiler will have to remember where ratio was across a pause
-  - if atomic step is N+M instead, that is very coarse-grained (why not just do round-robin(N,M))
-- a lot of messaging corner cases
-  - stream sends message to parent, but before it arrives to parent, stream
-    is deallocated.  Should parent still receive it?  etc.
-  - target enables/disables itself while messages in flight
-  - cascaded messages, make sure all timing makes sense
-  - [Bill: leave these unspecified for now.  Practically speaking, who cares?]
-- send message to killed/freed region? [Bill: message ignored]
-- what to name primitive that kills channel contents, keeps filter state?
-  [Bill: eliminate this functionality, for reasons described above]
+* open issues 2 (minor)
+- default message latency:  0 or best effort?
+- currently we only use the "send" keyword for going from child to
+  parent.  Should we use it when going from parent to child, too?
+  (Probably not.)
+- can you push to a killed stream?
+- messaging to paused components
+  - are messages to paused/killed components ignored or runtime error?  (which one?)
+  - is another rate besides 1-to-1 needed for the placeholder receiver at a paused stream?
+  - what about to paused source/sink?
+- what is keyword:  kill or free?
+- more details on static restrictions
+  - public fields -- might need to revisit
+    - we said that public fields have to be "final" and can then be
+      referenced by parents, e.g., for using as parameters
+      - question is:  can others reference the field too?  What if the
+        parent passes around a handle to the child.  Can some other
+        stream reference the child's public field?
+    - do public fields really buy us anything, given our relatively lax
+      message constraints?
+  - is there a way to specify any static guarantee on message latencies?
+- does re-initializing a stream automatically start it running again,
+  or do you have to explicitly enable()?
+- what happens if stream is killed/freed and then resumed w/o re-init?
+  - runtime error thrown?
+  - undefined?
 
 * open issues 3 (details to attend to)
 - messaging syntax
@@ -326,17 +482,21 @@ the stream was disabled; case 2) is if the channels were not cleared.
   - compact syntax for forwarding messages across containers
     - want to forward both up/down, and possibly with varying clocks
   - syntax for declaring clocks
+    - declaring with handlers, with send statements, for containers overall
+  - syntax for latencies (and what part of latencies are known statically)
   - formalize typing rules: you must send what your children send and you don't receive from children
     - but we don't currently force you to declare what you receive from children, so how do you report error?
 - formal writeup of inorder joiner semantics 
   - consider null splitter, or some weights 0 on roundrobin
-- what happens if stream is killed/freed and then resumed w/o re-init?
-  - runtime error thrown?
-  - undefined?
-- does re-initializing a stream automatically start it running again, or do you have to explicitly enable()?
 
 * possible extensions
-- allow variable amount passed around feedback loop
+- integrate clocks and atomicity of containers
+  - for example, a container is not "fired" during a drain unless its
+    clock fires the requisite number of times
+  - could say that an atomic step of a container is pull-model into
+    clock, then push-model out of clock
+- integrated support for variable amount passed around feedback loop
+  - we can support it as-is (see appendix)
 - reconfigurable splitters/joiners?
   - currently no way for a splitjoin to reconfigure roundrobin to
     duplicate without totally replacing the whole splitjoin
@@ -350,13 +510,25 @@ the stream was disabled; case 2) is if the channels were not cleared.
 - templates
 
 * probably defunct ideas
+
 - type modifier to indicate that whole container is static rate
   - documentation to user, esp. in the context of messaging
   - allows atomicicity definition
   - could help desugar teleport filters
+
 - allow ranges in a roundrobin, e.g., roundrobin(1-3, 2-4) which would
-allow some freedom in scheduling based on available items.  could also
-do roundrobin(*) for ANY joiner.
+  allow some freedom in scheduling based on available items.  could also
+  do roundrobin(*) for ANY joiner.
+
+- discussed having a predefined "tick" message that indicates
+  advancement of a clock
+  - useful for when there are a variable number of executions
+    corresponding to a given step
+  - a container could say that one of his steps is some number of
+    "ticks" of child
+  - other option: just capture with phases, tick at end of work.
+    decided to go with this because it exposes the frequency of tick
+    operations to the compiler.
 
 ---------------------------------------------------------------------------------------
 
@@ -371,6 +543,8 @@ new:
 http://www.micsymposium.org/mics_2003/Nguyen.PDF
 
 Could also use messaging to register resulting units in table?
+
+Rodric decided this app wasn't very interesting for message timing.
 
 2. Messaging
 
@@ -388,9 +562,18 @@ http://www.see.ed.ac.uk/~s0238762/research.activity/MSc.Dissertation-ISLI.2003-I
 p. 36, good explanation
 also 150 pages of code
 
+4. Server URL Load balancing.
+
+We discussed how to code this up; basically it will turn into a custom
+splitter with null joiner in a feedback loop.  Child streams will be
+enabled / disabled.
+
+http://www.di.unipi.it/~gulli/papers/webnet/98/webnet98.htm
+http://www.cisco.com/en/US/products/hw/switches/ps672/products_configuration_guide_chapter09186a008007f253.html
+
 ---------------------------------------------------------------------------------------
 
-Appendix 1:  Example Messaging Code
+Appendix 1:  Example Messaging Code 1
 
 void->float pipeline Channel {
 
@@ -461,4 +644,195 @@ void->float pipeline AMPSBaseStation(int N) {
 }
 
 
-********************************************************************************
+---------------------------------------------------------------------------------------
+
+Appendix 2:  Data Dependent Feedback Loop Example
+
+// Scenario: data-dependent feebdack loop with messaging.
+//
+//     ._______ 
+//    \|/      \
+//   ->A->B->C->D->
+//
+// A is processing data in frames.  It either draws a fresh frame of N
+// items from the input, or it draws leftover items (that need to be
+// processed more) from the loop path.  B is static rate work; C is
+// dynamic rate compression.  D is looking at frames (though they have
+// a different length than at the output of A) and deciding if the
+// frame should be output, or if it should be processed around the
+// loop path again.
+//
+// The challenges are:
+//  1. For A to indicate frame boundaries to D. 
+//  2. For D to indicate the amount of data on the feedback loop to A.
+//
+// Both of these are done using messages.  D includes a cascaded
+// message (where a message is sent from a message handler).
+
+// Issues raised by this example:
+//
+// * at first we thought there was an ambiguity with message delivery:
+//   that the downstream message had to be delivered before the 
+//   upstream message was triggered, and without the upstream message
+//   the system would deadlock.  But then we decided that this was
+//   fine, and that the compiler should not have a hard time figuring
+//   out that it should deliver all messages before the relevant
+//   firing of the downstream component.
+//
+// * Clarify the feedback loop timing: is message from splitter to
+//    joiner timed relative to the loop path or the body path?  I
+//    assumed the latter; it makes a big difference in this example.
+//
+// * Are all message latencies are 0 by default?  This would do
+//    exactly the right thing in this example, I think.  An alternate
+//    would be to do best effort by default.
+//
+// - awkward syntax on "fooJoiner = joiner FooJoiner"
+//
+// - Foo is dependent on the name of the handler in DynamicDataCount
+//    even though it just forwards the message from fooSplitter to
+//    fooJoiner.  We never invented the forwarding syntax
+
+// Messaging interface to indicate a frame boundary
+interface FrameBoundary {
+    void frameBoundary();
+}
+
+// Messaging interface to indicate how much data is coming around a
+// dynamic rate path
+interface DynamicDataCount {
+    void dynamicDataCount(int count);
+}
+
+float->float feedbackloop Foo {
+    joiner fooJoiner;
+    splitter fooSplitter;
+
+    init {
+        fooJoiner = joiner FooJoiner(64);
+        body pipeline {
+            add DoWork;           // static rate
+            add RemoveNegatives;  // dynamic rate
+        }
+        fooSplitter = splitter FooSplitter;
+    }
+
+    // forward messages between components
+    handler fooSplitter.dynamicDataCount(int count) {
+        fooJoiner.dynamicDataCount(count);
+    }
+
+    handler fooJoiner.frameBoundary() {
+        fooSplitter.frameBoundary();
+    }
+}
+
+float in, float loopPath -> float joiner FooJoiner(int N) 
+    receives DynamicDataCount sends FrameBoundary {
+    
+    int nextDynamicCount;
+
+    init {
+        nextDynamicCount = 0;
+    }
+
+    work {
+        if (nextDynamicCount>0) {
+            phase processLoop(nextDynamicCount);
+        } else {
+            phase processInputFrame();
+        }
+    }
+
+    // process <num> items from the loop path
+    phase processLoop push num pop num (int num) {
+        for (int i=0; i<num; i++) {
+            push(loopPath.pop());
+        }
+        nextDynamicCount = 0;
+    }
+
+    // passes a frame of data (N items big) through the input
+    phase processInputFrame push N pop N {
+        for (int i=0; i<N; i++) {
+            push(in.pop());
+        }
+        send frameBoundary();
+    }
+
+    handler dynamicDataCount(int count) {
+        nextDynamicCount = count;
+    }
+}
+
+// does some static-rate work on each item
+float->float filter DoWork {
+    work push 1 pop 1 {
+        push(f(pop()));
+    }
+}
+
+// removes the negative entries from a stream
+float->float filter RemoveNegatives {
+    work push [0,1] pop 1 {
+        float val = pop();
+        if (val>0) {
+            push(val);
+        }
+    }
+}
+
+// Looks at the first element of a frame.  If the element is "ok",
+// then the whole frame passes through to the output of the splitter.
+// Otherwise, the frame is routed back to the top of the feedback loop.
+float -> float out, float loopPath FooSplitter 
+    receives FrameBoundary sends DynamicDataCount {
+
+    // if true, then we are routing data out of loop
+    // if false, then we are routing data back around loop
+    boolean routingOutOfLoop;
+    
+    // whether or not the next item to be popped will be the first in
+    // its frame
+    boolean firstOfFrame;
+
+    // how many items we have passed around the loop in this frame
+    int count;
+
+    init {
+        firstOfFrame = true;
+        count = 0;
+    }
+
+    work pop 1 push [0,1],[0,1] {
+        float val = pop();
+        // test value if it is first in its frame
+        if (firstOfFrame) {
+            if (ok(val)) {
+                routingOutOfLoop = true;
+            } else {
+                routingOutOfLoop = false;
+            }
+            firstInFrame = false;
+        }
+        // push value to appropriate tape
+        if (routingOutOfLoop) {
+            out.push(val);
+        } else {
+            loopPath.push(val);
+            count++;
+        }
+    }
+
+    // returns whether or not <val> is an ok value for the first in a
+    // frame
+    boolean ok(float val) { ... }
+
+    handler frameBoundary() {
+        // tell the loop header how much data has been pushed around
+        send dynamicDataCount(count);
+        // reset the count and the tracking of frames
+        count = 0;  
+        firstInFrame = true;
+    }
+}
