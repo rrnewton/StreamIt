@@ -11,7 +11,7 @@ sub: clean main.ps
 
 main.ps: main.dvi
 	dvips -Ppdf -o main.ps main.dvi
-	cp main.ps ${HOME}/public_html/pldi.ps
+#	cp main.ps ${HOME}/public_html/pldi.ps
 
 main.pdf: main.ps
 	ps2pdf main.ps
