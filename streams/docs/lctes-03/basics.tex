@@ -4,25 +4,29 @@
 \begin{figure}
 \begin{center}
 
-\begin{minipage}{1.2in}
-\centering \psfig{figure=pipeline-buffers.eps,width=0.6in} \\
-{\protect\small (a) A sample {\pipeline}}
+\begin{minipage}{0.7in}
+\centering \psfig{figure=pipeline-buffers.eps,width=0.45in}
 \end{minipage}
 ~
-\begin{minipage}{1.2in}
-\centering \psfig{figure=splitjoin-steady-state.eps,width=1.2in} \\
-{\protect\small (b) A sample {\splitjoin}}
+\begin{minipage}{0.8in}
+\centering \psfig{figure=splitjoin-steady-state.eps,width=0.6in}
 \end{minipage}
 ~
-\begin{minipage}{1.5in}
-\centering \psfig{figure=feedback-steady-state.eps,width=1.0in} \\
-{\protect\small (c) A sample {\feedbackloop}.  The $L$ {\filter}
-has been flipped upside-down for clarity.\\ $peek_L = pop_L = 5$
-$push_L = 6, delay_{fl} = 9$}
+\begin{minipage}{0.8in}
+\centering \psfig{figure=feedback-steady-state.eps,width=0.6in}
 \end{minipage}
 
-\caption{Sample {\StreamIt} operators} \label{fig:steady-state}
+\vspace{0.1in}
 
+\begin{minipage}{2in}
+\small (a) ~~~~~~~~~~~~~~~~~ (b) ~~~~~~~~~~~~~~~~~~ (c)
+\end{minipage}
+
+\caption{\small Sample {\StreamIt} operators. (a) A sample
+{\pipeline} (b) A sample {\splitjoin} (c) A sample
+{\feedbackloop}.  The $L$ {\filter} has been flipped upside-down
+for clarity; $peek_L = pop_L = 5$ $push_L = 6$, $delay_{fl} = 9$}
+\label{fig:steady-state}
 \end{center}
 \end{figure}
 
