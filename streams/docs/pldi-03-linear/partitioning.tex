@@ -16,62 +16,93 @@
 
 \section{Optimization Selection}
 
-MOTIVATION
+To reap the maximum benefit from the optimizations described in the
+previous two sections, it is important to apply them selectively.
+There are two components of the optimization selection problem: first,
+to determine the sequence of optimizations that will give the highest
+performance for a given arrangement of the stream graph, and second,
+to determine the arrangement of the stream graph that will give the
+highest performance overall.  In this section, we explain the
+relevance of each of these problems, and we present an effective
+selection algorithm that relies on dynamic programming to quickly
+explore a large space of possible configurations.
 
-- only beneficial to combine certain filters
+First, the selection of optimizations for a given stream graph can
+have a large impact on performance.  As alluded to in
+Section~\ref{sec:combine}, linear combination can increase the number
+of arithmetic operations required, {\it e.g.} if combining a
+two-element pipeline where the second filter pushes more items than it
+peeks.  However, such a combination could be justified if it enables
+further combination with other components and leads to a benefit
+overall.  Another consideration is that a node can be converted to
+frequency only if it has $\mt{pop}=1$; thus, excessive combination
+could preclude frequency transformations.  This is the case for our
+RateConverter benchmark, in which three filters could be combined, but
+it is better to combine only two in order to enable a frequency
+transformation (see Figure~\ref{fig:rategraph}).
 
-  - further, there could be two filters that are less efficient when
-    combined, but combining them allows for larger combinations that
-    enable more savings
+Second, the arrangement of the stream graph can directly effect the
+set of transformations that can be applied.  Since our transformations
+operate on an entire {\tt pipeline} or {\tt splitjoin} construct, the
+graph often needs to be refactored to put linear nodes in their own
+hierarchical unit.  For example, in our TargetDetect benchmark, we can
+divide the {\tt splitjoin} into two pieces and collapse the top piece
+before converting to the frequency domain, thereby amortizing the cost
+of the FFT on the input items (see Figure~\ref{fig:targetgraph}).
 
-- can only combine some parts of certain structures
-- can only go to frequency if the pop rate is 1
+\subsection{Dynamic Programming Algorithm}
 
-  - thus, have to weight the tradeoff between greater linear savings
-    if combined (and raised pop rate), vs. frequency savings if
-    transformed at a given node
+Our optimization selection algorithm automatically derives both of the
+example transformations described above.  The algorithm works by
+estimating the minimum cost for each structure in the stream graph.
+The minimum cost represents the best of three configurations: 1)
+collapsed and implemented in the time domain, 2) collapsed and
+implemented in the frequency domain, and 3) uncollapsed and
+implemented as a hierarchical unit.  The cost functions for the
+collapsed cases are guided by profiler feedback, as described below.
+For the uncollapsed case, the cost is the sum of each child's minimum
+cost.  However, instead of considering the children directly, the
+children are refactored into many different configurations, and the
+cost is taken as the minimum over all configurations.  This allows the
+algorithm to simultaneously solve for the best set of transformations
+and the best arrangement of the stream graph.
 
-- further, some matrix multiplies are more or less expensive than
-  others.  for example, if there are many zeros, they can be factored
-  out.  If there is symmetry, something might be more efficient;
-  wouldn't want to lose that symmetry by combining with a higher node.
+The key to the algorithm's efficiency is its 
 
-  - differing sizes could be subjected to different cost functions on
-  a given architecture, and with a given matrix multiply routine
-
-- also, there is an overhead to different stream configurations.  For
-  examples, on some parallel architectures, there could be load
-  balancing issues involved with combining more streams
-
-- also note that in frequency, can't take advantage of zero entries of
-  matrix.
+In order to consider multiple arrangements of the stream graph, the
+algorithm considers many alternative arrangements of the children when
+it performs this sum.  The cost for the uncollapsed case is then taken
+as the minimum across all possible arrangements of the children.
 
 ALGORITHM
 
-Ours takes into account the following aspects:
+- intuitive explanation
 
-cost function
+- reference to pseudocode
 
-  - for linear nodes, the number of multiplies and adds (disregards
-    zero entries of matrix)
+COST FUNCTION
 
-  - for frequency nodes, a speedup over the linear node that was
-    obtained from profiling.  We show a factor of 50 improvement over
-    a linear node with no zero's in it.
+we consider:
+  - when/where a frequency transformation is possible
+  - number of multiplies and adds (takes into account zeros, ones)
+  - fact that frequency must operate on whole size of matrix
+  - profiling feedback to get factor of 50
 
-      - also incorporates knowledge on where a frequency
-        transformation is possible
+one could also consider:
 
-the way it works
-  - intuitively
-  - reference to pseudocode
+  - efficacy of matrix multiply on a given node
+    - architectural support for FIR operations
+    - size of matrix; caching effects
+    - symmetry or sparseness of matrix that could lead to more efficient implementation
 
-optimizations
-  - symmetery, etc.
+  - overhead of runtime system
+    - size of stream graph
+    - number of splitters and joiners
+    - on parallel system, could be additional load balancing issues
 
-EXAMPLE
+OPTIMIZING EXECUTION
 
-- target detect or filterbank
-
----
-
+can identify rectangles of stream graph that are equivalent, and use this to:
+ - save on computing linear node representation
+ - save on computing partitioning of childre
+ - automatically compute closed form for some linear sections

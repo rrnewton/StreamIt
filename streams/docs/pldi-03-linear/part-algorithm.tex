@@ -35,7 +35,7 @@ Config getNodeCost(Stream s, Transform t)
     if (isLinear(s))
       return Config(scalingFactor * getDirectCost(s), makeLinearImplementation(s))
     else
-      return INFINITY
+      return Config(INFINITY, s)
 
   if (t==Transform.FREQ)
     if (isLinear(s) && canConvertToFrequency(s))
