@@ -5,9 +5,9 @@ becoming a dominant factor in microprocessor performance.  To address
 this issue, a number of emerging architectures contain replicated
 processing units with software-exposed communication between one unit
 and another (e.g., RAW, Imagine, SmartMemories, TRIPS).  However, for
-their use to be widespread, it will be necessary to embrace a
-portable, high-level language that can be implemented efficiently
-across a range of wire-exposed targets.
+their use to be widespread, it will be necessary to develop compiler
+technology that enables a portable, high-level language to execute
+efficiently across a range of wire-exposed architectures.
 
 In this paper, we describe our compiler for StreamIt: a high-level,
 architecture-independent language for streaming applications.  Our
