@@ -1,51 +1,57 @@
 \section{Introduction}
 
-This is the intro.  I will cite some people \cite{pca}.
+As the size of the transistor becomes smaller and smaller, the next
+generation of microprocessors will have to be conscious of wire delays
+as the fundamental barrier to performance.  Recently, a number of
+architectures have been emerging that address the problem of wire
+delay by replicating the basic processing unit and exposing the
+communication between units to a software layer ({\it e.g.}, iWarp
+\cite{??}, Raw \cite{rawshort}, SmartMemories \cite{smartmemories},
+TRIPS \cite{trips}).  These machines are especially well-suited for
+streaming applications that have regular communication patterns and
+widespread parallelism.
 
----
+However, today's communication-exposed architectures are lacking a
+portable programming model.  If these machines are to be widely used,
+it is imperative that one be able to write a program once, in a
+high-level language, and rely on a compiler to produce an efficient
+executable on any of the candidate targets. For von-Neumann machines,
+the C programming language served this purpose; it abstracted away the
+idiosyncratic details between one machine and another, but
+encapsulated the common properties (such as a single program counter,
+arithmetic operations, and a monolithic memory) that are necessary to
+obtain good performance.  However, for wire-exposed targets that
+contain multiple instruction streams and distributed memory banks, C
+is obsolete.  Though C can still be used to write efficient programs
+on these machines, doing so either requires architecture-specific
+directives or a very smart compiler that can extract the parallelism
+and communication from the C semantics.  Both of these options
+disqualify C as a portable machine language, since it fails to hide
+the architectural details from the programmer and it imposes
+abstractions which are a mismatch for the domain.
 
-- as wire delay comes to dominate the performance of architectures, a
-	number of machines have software-exposed communication between
-	replicated processing units (imagine, raw, trips, grid,
-	smartmemories).  
+In this paper, we describe a compiler for StreamIt: a high level
+stream language that aims to be portable across communication-exposed
+machines \cite{streamitcc}.  StreamIt contains basic constructs that
+expose the parallelism and communication of streaming applications
+without depending on the granularity of the underlying architecture.
+Our current backend is for Raw \cite{rawshort}, a tiled architecture
+with fine-grained, programmable communication between processors.
+However, the compiler consists of three general techniques that can be
+applied to compile StreamIt to machines other than Raw: 1)
+partitioning, which adjusts the granularity of a stream graph to match
+that of a given target, 2) layout, which maps a partitioned stream
+graph to a given network topology, and 3) scheduling, which generates
+a fine-grained static communication pattern for each computational
+element.  We consider this work to be a first step towards a portable
+programming model for communication-exposed architectures.
 
-These processors have replicated processing units, and are
-especially good for regular streaming applications.
-
-For these architectures to gain wide-scale acceptance, there needs to
-be a high-level portable language that can be efficiently compiled to
-differing targets and differing granularities.
-
-- we present streamit as the language, and demonstrate a compiler that
-	maps to differing granularities of the RAW architecture, which
-	is a scalable tiled architecture.  
-
-StreamIt presents the computation as a set of communicating filters in
-a hierarchical stream graph.
-
-- streamit as language we've developed for exposing parallelism and
-	communication, especially good for static stream programs
-
-	streamit is high-level language and should be independent of
-	any architecture.  the language expresses a computation that
-	can be mapped to any number of communication-exposed architctures.
-
-- suite of fission/fusion transformations to adjust the granularity of
-	a stream graph to match the granularity of a target, and for
-	load balancing between different components of the architecture.
-
-- this load balancing is especially important in streaming
-	computations since the overall throughput depends on the
-	slowest stage; the program is only as fast as its weakest link
-
-- then, a layout generator that maps the layout to an architecture,
-	avoiding deadlock.
-
-- then, a communication scheduler that schedules the network inteface
-	between the computational elements.  relies on a simulation of
-	the execution of the graph in order to know how to schedule
-	the communication code.
-
-- results - show we can effectively utilize parallel computation
-	resources on the RAW architecture for a different application
-	granularities and architecture granularities
+The rest of this paper is organized as follows.  Section
+\ref{sec:streamit} provides an introduction to StreamIt, and
+Section~\ref{sec:raw} contains an overview of Raw.  Sections
+\ref{sec:partition}, \ref{sec:layout}, and \ref{sec:communic} describe
+our algorithms for partitioning, layout, and communication scheduling,
+respectively.  Section~\ref{sec:results} presents our results from the
+cycle-accurate Raw simulator.  Section~\ref{sec:related} considers
+related work, and Section~\ref{sec:conclusion} contains our
+conclusions.

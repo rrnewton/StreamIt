@@ -2,15 +2,15 @@ With the increasing miniaturization of transistors, wire delays are
 becoming a dominant factor in microprocessor performance.  To address
 this issue, a number of emerging architectures contain replicated
 processing units with software-exposed communication between one unit
-and another (e.g., RAW, iWarp, SmartMemories).  However, for
+and another (e.g., Raw, iWarp, SmartMemories).  However, for
 their use to be widespread, it will be necessary to develop compiler
 technology that enables a portable, high-level language to execute
 efficiently across a range of wire-exposed architectures.
 
 In this paper, we describe our compiler for StreamIt: a high-level,
 architecture-independent language for streaming applications.  Our
-compiler targets the RAW processor, and we present results using the
-cycle-accurate RAW simulator.  Though StreamIt exposes the parallelism
+compiler targets the Raw processor, and we present results using the
+cycle-accurate Raw simulator.  Though StreamIt exposes the parallelism
 and communication patterns of stream programs, much analysis is needed
 to adapt a stream program to a parallel stream processor.  We describe
 fission and fusion transformations that can be used to adjust the

@@ -1,14 +1,25 @@
+---------------------------------------------------------------------------
+Here's a list of things TODO:
+
+- add argument about compiling to different granularities, if we can
+demonstrate it.
+
+---------------------------------------------------------------------------
+Here's a list of FIGURES we need to make:
+
+
+---------------------------------------------------------------------------
 HERE'S AN ABANDONED PARAGRAPH FROM THE OLD ABSTRACT
 
 In this paper, we formulate the techniques that are fundamental to
 such an implementation, and we demonstrate their effectiveness in
-compiling the StreamIt language to the RAW processor.  Our compiler
+compiling the StreamIt language to the Raw processor.  Our compiler
 contains three stages: 1) partitioning, which adjusts the granularity
 of a stream graph to match that of a given target, 2) layout, which
 maps a partitioned stream graph to a given network topology, and 3)
 scheduling, which generates a fine-grained static communication
 pattern for each computational element.  Our results show that we can
-obtain good performance on varying granularities of RAW, even though
+obtain good performance on varying granularities of Raw, even though
 StreamIt is a high-level stream language without any notion of the
 target topology or granularity.  We believe that our compiler
 technology provides the basis for a portable programming model for
@@ -35,7 +46,7 @@ be a high-level portable language that can be efficiently compiled to
 differing targets and differing granularities.
 
 - we present streamit as the language, and demonstrate a compiler that
-	maps to differing granularities of the RAW architecture, which
+	maps to differing granularities of the Raw architecture, which
 	is a scalable tiled architecture.  
 
 StreamIt presents the computation as a set of communicating filters in
@@ -65,7 +76,7 @@ a hierarchical stream graph.
 	the communication code.
 
 - results - show we can effectively utilize parallel computation
-	resources on the RAW architecture for a different application
+	resources on the Raw architecture for a different application
 	granularities and architecture granularities
 
 ---------------------------------------------------------------------------
