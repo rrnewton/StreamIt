@@ -130,18 +130,17 @@ frequency domain: \\
 
 \subsection{Optimized Frequency Implementation}
 
-The naive frequency implementation discards $2*(e-1)$ elements from
-each ${\vec y}[j]$ that it computes.  These values represent partial
-sums in which some of the coefficients of $A$ were excluded.  In this
-section we give an optimized algorithm that utilizes these partial
-sums to increase the throughput of the node without increasing the
-size of the FFT.  Our approach is one of several methods that use
-blocking to efficiently convolve a short filter with a large amount of
-input~\cite{oppenheim-discrete}.
-
-Let us illustrate how the partial sums can be combined between
-different iterations of the node's execution.  \\ \todo{Find simple explanation.}
-
+The naive frequency implementation discards $e-1$ elements from the
+beginning and end of each ${\vec y}[j]$ that it computes.  These
+values represent partial sums in which some of the coefficients of $A$
+are excluded.  However, for $i \in [0, e-1]$, the partial sum ${\vec
+y}[j][m+i]$ from one iteration is complementary to ${\vec y}[j][i]$
+from the next iteration, and their sum gives a correct output value.
+This symmetry arises from the convolution of $A$ ``off the edges'' of
+the input block that we consider in a given iteration.  The partial
+sum technique---which is given in the transformation below---is one of
+several methods that use blocking to efficiently convolve a short
+filter with a large amount of input~\cite{oppenheim-discrete}.
 %% Recall that $A$ is of length $e$ and the input tape is given in blocks
 %% of length $m$.  Then, consider element $m+i$ of the first execution.
 %% Following equation~\ref{eq:linconv}, we have:
