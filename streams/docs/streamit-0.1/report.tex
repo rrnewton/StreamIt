@@ -1,6 +1,6 @@
 \documentclass[draft]{article}
 \usepackage{psfig, verbatim, fullpage}
-\title{The StreaMIT Programming Language \\ A Reference Manual \\ Version 1.0}
+\title{The StreaMIT Programming Language \\ A Reference Manual \\ Version 0.0.2}
 
 \begin{document}
 \maketitle
@@ -18,17 +18,6 @@ on pointers, then?
 
 \item More generally than above, what's the syntax of stuff that's not
 streaming?  Is it C, Java, something subset or combination thereof?
-
-\item Isn't it just a suggestion that {\tt input[0]} and {\tt
-output[0]} reference the first unread and unwritten items?  Can't the
-programmer manage the indices how he wants to using the {\tt advance}
-command?
-
-\item Do we have a name for a {\tt FilterBlock} that is both a source
-and a sink?  A {\tt SourceSinkBlock}?  Maybe we should make that the
-top-level construct instead of {\tt Stream} I was thinking that the
-outer-most level is more like a Pipe than a FilterBlock, but then we
-can't have member variables, so this will need revising.
 
 \item Do we want the message delivery units to be in terms of the {\it
 receiever's} work function?  It seems like that might make more sense
@@ -117,12 +106,11 @@ the main components of StreaMIT:
 \begin{verbatim}
 Stream {
 
-  Source {
+  Filter {
     output String myOutput;
 
     work() {
-      output[0] = ``Hello '';
-      output.advance(1);
+      output.push (``Hello '');
     }
   }
 
@@ -131,40 +119,35 @@ Stream {
     output String myOutput;
 
     work() {
-      output[0] = input[0] + ``World!'';
-      input.advance(1);
-      output.advance(1);
+      output.push (input.pop () + ``World!'');
   }
 
-  Sink {
+  Filter {
     input String myInput;
     
     work() {
-      System.out.println(input[0]);
-      input.advance(1);
+      System.out.println(input.pop ());
     }
   }
 }
 \end{verbatim}
 
 In StreaMIT, the basic processing unit is the {\tt Filter}, which
-reads items from an input channel and writes items to an output
-channel.  A filter that requires no input or output is called a {\tt
-Source} and a {\tt Sink}, respectively.  In the example above, a {\tt
-Source} generates the ``Hello'' string, a {\tt Filter} appends
-``World!'', and a {\tt Sink} prints the result to the screen.
+may read items from an input channel and write items to an output
+channel.  A filter that requires no input or output is called a
+source and a sink, respectively.  In the example above, a 
+source generates the ``Hello'' string, a {\tt Filter} appends
+``World!'', and a sink prints the result to the screen.
 
 Each filter defines a {\tt work} function that represents the most
 fine-grained step of execution in transforming data from the input
 channel to the output channel.  This function is called automatically
 by the runtime system when the stream is running.  The input and
-output channels are referenced as arrays, with {\tt input[0]}
-representing the first unread input and {\tt output[0]} representing
-the first unwritten output.  The {\tt advance} command is used to
-shift the channel indices so that unprocessed elements (at positive
-indices) are shifted towards the 0'th position.  In the ``Hello
-World'' example, each filter reads or writes a single item before
-advancing the tape for the next step.
+output channels are accessed as stacks.  Input is popped (or peeked, if
+the data in the input is supposed to remain there),
+while output is pushed to.  In the ``Hello World'' example, each 
+filter reads or writes a single item before advancing the tape for 
+the next step.
 
 Filters implicitly are connected together in the order of their
 definition.  Thus, in the ``Hello World!'' example, the three filters
@@ -192,6 +175,35 @@ In the following sections, we describe the StreaMIT base language from
 the bottom up: functional blocks (Section \ref{sec:blocks}), control
 constructs (Section \ref{sec:control}) and dynamic constructs (Section
 \ref{sec:dynamic}).
+
+\subsection{Types}
+
+StreaMIT language uses a type system similar to those defined by Java and
+C.  Following types are defined: bool, byte, word, int, long, float 
+and double.  These types can be combined into {\tt struct}s, similar 
+to those defined by C.  The language allows taking a (Java style) 
+reference of a {\tt struct}.  The reference can be saved inside of 
+Filters, etc, just like any other type.
+
+An array can be defined using syntax similar to that of C:
+
+element-type array-name [30];
+
+Strings are represented as references null-terminated arrays of chars.
+
+Finally, StreaMIT uses a tagged union type.  A tagged union type is similar
+to a C union, except it checks which field of the union is currently active
+(using an automatically maintained tag).  It is a run-time exception to
+read a field which is not the most-recently assigned one.  In addition
+to run-time checking of accessed fields, StreaMIT's tagged unions can also
+test if a given field is the current field:
+
+\begin{verbatim}
+union u { int num; float frac }
+u data;
+data.num = 3;
+if (data.isActive (num)) { /* do stuff if num is currently active */ }
+\end{verbatim}
 
 \subsection{Functional Blocks}
 \protect\label{sec:blocks}
@@ -223,8 +235,8 @@ Filters are declared with the following syntax:
 {\tt Filter} filter-name (type$_1$ param$_1$, type$_2$ param$_2$,
 ... , type$_n$ param$_n$) \{ \\ \\
 
-\> {\tt input} input-type input-name; \\
-\> {\tt output} output-type output-name; \\ \\
+\> \{ {\tt input} input-type input-name; \}+ \\
+\> \{ {\tt output} output-type output-name; \}+ \\ \\
 
 \> {\it data fields} \\ \\
 
@@ -244,9 +256,9 @@ appears:
 \begin{itemize}
 
 \item {\it Type declaration.}  The {\tt Filter} type indicates that
-there is both an input and output channel for this block.  If there is
-only an output channel, the type should be {\tt Source}; if there is
-only an input channel, the type should be {\tt Sink}.
+there may be an input and an output channel for this block.  If there is
+only an output channel, the {\tt Filter} is essentially a source; if there is
+only an input channel, the {\tt Filter} is a sink.
 
 \item {\it Naming filters.}  The ``filter-name'' denotes the name for
 the type of filter being defined.  This name is used to instantiate
@@ -274,16 +286,6 @@ channel must be typed and given a name for use within the filter.  All
 items within a channel are passed by value (with semantics equivalent
 to copying each value before writing it to the channel), and no
 pointers to global structures can be communicated through a channel.
-
-The input and output channels are referenced as arrays.  The first
-time the work function is called, {\tt input[0]} and {\tt output[0]}
-represent the front of the input and output queue, resepectively.  One
-can read or write the k'th item by referencing the k'th element of the
-array.  However, to simplify coding practice, we provide the {\tt
-advance} command to shift the indices of a channel.  Thus, after
-executing {\tt input.advance(k)}, the contents of {\tt intput[k]}
-should now be referenced at {\tt input[0]}.  Of course, the indexing
-scheme of the previous block's output is unaffected.
 
 \item {\it Initialization code.}  The initialization code is run when
 the filter is first instantiated, just like the constructor to an
@@ -378,35 +380,31 @@ complex structures can be obtained using control constructs (see
 Section {\ref{sec:control}}).  Thus, the filter block contains whatever
 graph of filters it initializes.  
 
-There are also {\tt FilterBlock} analogs for the {\tt Source} and {\tt
-Sink}.  A {\tt SourceBlock} is a filter block who's first filter is a
-{\tt Source}, and a {\tt SinkBlock} is a filter block who's last
-filter is a {\tt Sink}.  We modify the ``Hello World!''  program from
-Section {\ref{sec:intro}} to give a trivial example of a filter block:
+Sources and sinks are expressed simply as filters with no inputs/outputs.
+Below is a modified version of Hello World program which uses source
+and sink filters.
 
 \begin{verbatim}
-Stream {
+FilterBlock {
 
   MakeText();
 
-  Sink {
+  Filter {
     input String myInput;
     
     work() {
-      System.out.println(input[0]);
-      input.advance(1);
+      System.out.println(input.pop ());
     }
   }
 }
 
-SourceBlock MakeText() {
+FilterBlock MakeText() {
 
-  Source {
+  Filter {
     output String myOutput;
 
     work() {
-      output[0] = ``Hello '';
-      output.advance(1);
+      output.push (``Hello '');
     }
   }
 
@@ -415,9 +413,8 @@ SourceBlock MakeText() {
     input String myOutput;
 
     work() {
-      output[0] = input[0] + ``World!'';
-      input.advance(1);
-      output.advance(1);
+      output.push (input.pop () + ``World!'');
+    }
   }
 }
 
@@ -478,7 +475,7 @@ using names:
 Stream {
   FilterRef helloRef, worldRef;		// NOTE: ILLEGAL INSIDE STREAM {
 
-  helloRef = ``Hello '' Source {
+  helloRef = ``Hello '' Filter {
 	...
   }
 
@@ -486,7 +483,7 @@ Stream {
 	...
   }
 
-  Sink(ref1 = helloRef, ref2 = worldRef) {
+  Filter(ref1 = helloRef, ref2 = worldRef) {
     ...
     
     work() {
@@ -525,8 +522,8 @@ offset by improved readability and opportunity for optimization.
 
 Some terminology is in order to accurately describe the semantics of
 the control constructs.  We will use the word {\it block} to refer to
-any of a {\tt Filter}, {\tt Source}, {\tt Sink}, {\tt FilterBlock},
-{\tt SourceBlock}, or {\tt SinkBlock}.  A {\it 1-to-1 block} refers to
+any of a {\tt Filter} or a {\tt FilterBlock}.
+A {\it 1-to-1 block} refers to
 only those blocks that have both an input and output: the {\tt Filter}
 and {\tt FilterBlock}.  A {\it stream} is either a block or a
 composition of blocks formed using the control constructs.  A stream
@@ -659,8 +656,8 @@ programs.  The syntax is as follows:
 
 {\tt FeedbackLoop} \{ \\
 \> {\it FeedbackFilter} \\
-\> {\it stream$_{body}$} \\
-\> {\it stream$_{loop}$} \\
+\> \{ {\tt body} {\it stream$_{body}$} \}+ \\
+\> \{ {\tt loop} {\it stream$_{loop}$} \}+ \\
 \}
 \end{tabbing}
 
@@ -671,6 +668,10 @@ stream$_{body}$} is the output of the entire construct.  However, this
 output is also passed back through {\it stream$_{loop}$} and connected
 as a second input to the feedback filter, thereby introducing a
 backwards path of data movement in the stream.
+
+Both {\it stream$_{body}$} and {\it stream$_{loop}$} are optional.
+If they are ommitted, they are assumed to be {\tt Filter}s which simply
+copy their input to their output (do no useful work).
 
 \medskip
 \noindent {\bf FeedbackFilter}
@@ -700,8 +701,8 @@ declaration looks like this:
 We would like to provide a mechanism for the {\tt FeedbackFilter} to
 specify the {\it delay} of the feedback loop.  That is, suppose
 that--in the steady state--item $i$ of {\tt input} and item $j$ of
-{\tt feedback-input} are being read from within the work function
-(assume that there are no {\tt advance} statements.)  Then we could
+{\tt feedback-input} are being read from within the work function.
+Then we could
 characterize the delay as the smallest $d$ for which {\tt
 feedback-input[j]} depends on the value of {\tt input[i-d]}.
 Intuitively, the delay is the offset of causal time fronts between the
@@ -853,57 +854,57 @@ requiring $n$ repeated filter instantiations instead of having a
 single instantiation inside a {\tt for} loop.
 
 To allow such parameterized block instantiations, we introduce special
-script variables, script control constructs, and script parameters
-whos values can be analyzed at compile time.
+graph variables, graph control constructs, and graph parameters
+whose values can be analyzed at compile time.
 
-\subsection{Script Type}
+\subsection{Graph Type}
 
-The {\tt script} keyword is a primitive type modifier, with syntax
+The {\tt graph} keyword is a primitive type modifier, with syntax
 analogous to {\tt const} in Java or C:
 
 \medskip
-{\tt script }{\it type variable-name};
+{\tt graph }{\it type variable-name};
 \medskip
 
-The restriction on script variables is that their value must be
+The restriction on graph variables is that their value must be
 analyzable at compile-time for all points in the program.  An
-expression is of type {\tt script} if it is: 1) a constant literal, 2)
-a script variable that has been initialized, or 3) a pure function of
+expression is of type {\tt graph} if it is: 1) a constant literal, 2)
+a graph variable that has been initialized, or 3) a pure function of
 these.  A ``pure function'' is either a determistic primitive operator
 (e.g., the arithmetic operators) or a user-defined function without
-global side effects that returns a {\tt script} expression.
+global side effects that returns a {\tt graph} expression.
 
-Control flow that depends only on script expressions is called {\it
-script control flow}.  To make it clear to the programmer which
+Control flow that depends only on graph expressions is called {\it
+graph control flow}.  To make it clear to the programmer which
 control constructs have this property, we designate different keywords
-for all script control constructs.  They have the names of the normal
-constructs, but with an ``s'' prepended, e.g., {\tt sfor}, {\tt sif},
-and {\tt swhile}.  Only expressions of type {\tt script} can appear in
+for all graph control constructs.  They have the names of the normal
+constructs, but with an ``g'' prepended, e.g., {\tt gfor}, {\tt gif},
+and {\tt gwhile}.  Only expressions of type {\tt graph} can appear in
 the conditional clause of these constructs.
 
-Thus, with these definitions, we see that for the value of a script
+Thus, with these definitions, we see that for the value of a graph
 variable to be statically determined at all points in the program, it
-must only be assigned expresseions of type {\tt script}, and these
-assignments must appear only within script control flow.  By the same
+must only be assigned expresseions of type {\tt graph}, and these
+assignments must appear only within graph control flow.  By the same
 reasoning, the stream structure is statically analyzable if all block
-instantiations are within script control flow.  This is our new
+instantiations are within graph control flow.  This is our new
 restriction on block instantiations: they can be enclosed in control
-flow, but it must be {\it script} control flow.
+flow, but it must be {\it graph} control flow.
 
-\subsection{Script Parameters}
+\subsection{Graph Parameters}
 
-Parameters of type {\tt script} can also be passed to filters and
+Parameters of type {\tt graph} can also be passed to filters and
 filter blocks.  Since the values of these parameters can be determined
 at compile time, they will not change across multiple instantiations
-of a block.  Thus, we allow the user to specify script parameters
+of a block.  Thus, we allow the user to specify graph parameters
 enclosed between angled brackets before the regular dynamic
 parameters:
 
-{\tt Filter} filter-name $<${\tt script} type$_{s1}$, {\tt script} type$_{s2}$, \dots {\tt script} type$_{sn}>$ (type$_1$ dynamic-param$_1$, type$_2$ dynamic-param$_2$, \dots , type$_n$ dynamic-param$_n$) \{ \dots \} \\
+{\tt Filter} filter-name $<${\tt graph} type$_{s1}$, {\tt graph} type$_{s2}$, \dots {\tt graph} type$_{sn}>$ (type$_1$ dynamic-param$_1$, type$_2$ dynamic-param$_2$, \dots , type$_n$ dynamic-param$_n$) \{ \dots \} \\
 
-{\tt FilterBlock} filter-block-name $<${\tt script} type$_{s1}$, {\tt script} type$_{s2}$, \dots {\tt script} type$_{sn}>$ (type$_1$ dynamic-param$_1$, type$_2$ dynamic-param$_2$, \dots , type$_n$ dynamic-param$_n$) \{ \dots \} \\
+{\tt FilterBlock} filter-block-name $<${\tt graph} type$_{s1}$, {\tt graph} type$_{s2}$, \dots {\tt graph} type$_{sn}>$ (type$_1$ dynamic-param$_1$, type$_2$ dynamic-param$_2$, \dots , type$_n$ dynamic-param$_n$) \{ \dots \} \\
 
-The script parameters can be used just like the dynamic ones in the
+The graph parameters can be used just like the dynamic ones in the
 context of the filters, but do not need to be given as arguments to
 re-initialization calls.
 
