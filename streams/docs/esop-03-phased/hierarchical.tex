@@ -80,17 +80,17 @@ hierarchical structure. While it is possible to use techniques
 developed for Single Appearance Scheduling to create valid
 schedules for {\StreamIt} programs, Single Appearance Scheduling
 does not satisfy all requirements of an effective {\StreamIt}
-scheduler. This is because some {{\feedbackloops}} cannot be
+scheduler. This is because some {\feedbackloops} cannot be
 scheduled using Single Appearance Scheduling techniques. This
 difficulty arises because the amount of data provided to the
-{{\feedbackloop}} by the $delay_{fl}$ variable is not sufficient to
+{\feedbackloop} by the $delay_{fl}$ variable is not sufficient to
 perform a complete steady-state execution of the loop, thus
-preventing the schedule for the {{\feedbackloop}} to be encoded with
+preventing the schedule for the {\feedbackloop} to be encoded with
 only a single appearance of every node in the schedule.
 
 The solution to this problem is to have the same node appear
 multiple times in the schedule.  While this solves the problem of
-inability to schedule some {{\feedbackloops}}, it introduces another
+inability to schedule some {\feedbackloops}, it introduces another
 problem: which nodes should appear several times, and how many
 times should they be executed on each appearance.  The solution
 proposed here goes half-way to solve the problem. A more effective
@@ -114,16 +114,16 @@ T_{sj}\}\{4B\}\} = \{\{9A\}\{2\{\{9 split\}\{3C\}\{9D\}\{2
 join\}\}\}\{4B\}\}$$
 
 
-The problem of inability to schedule some {{\feedbackloops}} is
-alleviated by allowing {{\feedbackloop}} to interleave the execution
+The problem of inability to schedule some {\feedbackloops} is
+alleviated by allowing {\feedbackloop} to interleave the execution
 of its children (the body, the loop, and the {\splitter} and
-{\joiner}).  This results in {{\feedbackloop}} containing multiple
+{\joiner}).  This results in {\feedbackloop} containing multiple
 appearances of its children. All other streams use their
 children's schedules in their schedules only once. This technique
 is called Pseudo Single Appearance Scheduling, since it results in
 schedules that are very similar to proper single appearance
 schedules. While it does not allow scheduling of all
-{{\feedbackloops}} (a {{\feedbackloop}} may have a child which
+{\feedbackloops} (a {\feedbackloop} may have a child which
 requires more data for steady state execution then made available
 by the $delay_{fl}$ variable) it has been found to be very
 effective, and only one application has been found which cannot be
@@ -172,7 +172,7 @@ will include $T_p$.
 A hierarchical steady state schedule for a stream $s$ will be
 denoted by $T_s$, while an initialization schedule for a stream
 $s$ will be denoted $I_s$. A {\splitter} of a {\splitjoin} $sj$ or
-a {{\feedbackloop}} $fl$ will be denoted as $split_{sj}$ or
+a {\feedbackloop} $fl$ will be denoted as $split_{sj}$ or
 $split_{fl}$, while the {\joiner} will be denoted as $join_{sj}$
 or $join_{fl}$.
 
@@ -181,20 +181,20 @@ extended to streams.
 \begin{comment}
 That is, for a stream $s$,
 $e_s$ will represent the amount of data needed by $s$ on its
-{\Input} {{\Channel}} in order to execute its minimal steady state
+{\Input} {\Channel} in order to execute its minimal steady state
 schedule; $o_s$ represents the amount of data consumed by from its
-{\Input} {{\Channel}} $s$ during execution of its steady state
+{\Input} {\Channel} $s$ during execution of its steady state
 schedule; and $u_s$ represents the amount of data pushed by $s$
-onto its {\Output} {{\Channel}}.
+onto its {\Output} {\Channel}.
 \end{comment}
 The notation for $e$, $o$ and $u$ will also be extended to
 initialization schedules.  Namely, $e^i_s$ represents the amount
-of data required by stream $s$ on its {\Input} {{\Channel}} in
+of data required by stream $s$ on its {\Input} {\Channel} in
 order to execute the initialization schedule for $s$; $o^i_s$
 represents the amount of data consumed by $s$ from its {\Input}
-{{\Channel}} during its initialization schedule; and $u^i_s$
+{\Channel} during its initialization schedule; and $u^i_s$
 denotes the amount of data pushed by $s$ onto its {\Output}
-{{\Channel}} during execution of its initialization schedule. We
+{\Channel} during execution of its initialization schedule. We
 also use notation of $c_s$ denoting vector holding appropriate
 values of $e_s$, $o_s$ and $u_s$, and $c^i_s$ holding $e^i_s$,
 $o^i_s$ and $u^i_s$. The initialization schedules are created in
@@ -230,7 +230,7 @@ e_s\\o_s\\u_s\end{array}\right], c^i_s =
 ~
 \begin{minipage}{2.5in}
 \centering \psfig{figure=feedback-hierarchical.eps,width=1.0in} \\
-{\protect\small (c) A sample {{\feedbackloop}}.\\ $delay_{fl} = 15$ \\
+{\protect\small (c) A sample {\feedbackloop}.\\ $delay_{fl} = 15$ \\
 The $L$ {\filter} has been flipped upside-down for clarity. \\$e_L
 = 9, o_L = 5, u_L = 6$ }
 \end{minipage}
@@ -261,11 +261,11 @@ create initialization and steady state schedules. A simple
 implementation of the hierarchical scheduling creates a
 single-appearance schedule.  While single-appearance scheduling is
 quite effective in scheduling {\StreamIt} programs, it is also easy
-to construct programs that have {{\feedbackloops}} that are impossible
+to construct programs that have {\feedbackloops} that are impossible
 to schedule.  To alleviate the problem, the single-appearance
-scheduling was slightly modified to allow {{\feedbackloops}} to
+scheduling was slightly modified to allow {\feedbackloops} to
 schedule programs using hierarchical push scheduling.  This does
-not solve the problem altogether (some {{\feedbackloops}} are still
+not solve the problem altogether (some {\feedbackloops} are still
 impossible to schedule using this technique), but this technique
 is able to schedule many programs which cannot be scheduled with a
 simple single-appearance scheduler.
@@ -273,7 +273,7 @@ simple single-appearance scheduler.
 Sample streams for techniques described here are taken from Figure
 \ref{fig:hierarchical-schedule}.  The streams in Figure
 \ref{fig:hierarchical-schedule} are identical to those in Figure
-\ref{fig:steady-state} with exception of the {{\feedbackloop}}.
+\ref{fig:steady-state} with exception of the {\feedbackloop}.
 \end{comment}
 
 \subsubsection{\filter}
@@ -285,7 +285,7 @@ A {\filter} has no internal buffering.  Thus there is no need to
 initialize a {\filter} for its steady state.  {\filters} may,
 however, peek data.  That means that in order to enter a steady
 state, sufficient amount of data must be pushed onto {\filter}'s
-{\Input} {{\Channel}}.  Thus, for a {\filter} $f$, $e^i_f = e_f -
+{\Input} {\Channel}.  Thus, for a {\filter} $f$, $e^i_f = e_f -
 o_f$. Thus we have $$H_f = \left\{\{f\}, \{\}, \left[
 \begin{array}{c}
 e_f\\o_f\\u_f
@@ -440,7 +440,7 @@ peeked by the first child on its initialization will also be zero,
 or $e^i_{p_0} - o^i_{p_0}= 0$.
 
 \item If {\pipeline}'s first node is a {\joiner} (the first child of
-the {\pipeline} is a {{\feedbackloop}} or a {\pipeline} with a {\joiner} as
+the {\pipeline} is a {\feedbackloop} or a {\pipeline} with a {\joiner} as
 its first node) then the amount of extra data peeked by the
 {\pipeline} on initialization will be 0, for the same reasons as
 above. And again $e^i_{p_0} - o^i_{p_0}= 0$.
@@ -527,7 +527,7 @@ S_{sj} = \left\{ \left[
 {\splitjoin}, all its children must execute their initialization
 schedules.  The only requirement for executing those schedules is
 that they have been provided with sufficient data on their
-{\Input} {{\Channels}}.  Since the {\splitter} provides data for
+{\Input} {\Channels}.  Since the {\splitter} provides data for
 all the children of a {\splitjoin}, it is the only element of a
 {\splitjoin} that must execute its steady state schedule.
 
@@ -595,7 +595,7 @@ I_A\ I_B\}, \left[
 \end{displaymath}
 \end{comment}
 
-\subsubsection{{\feedbackloops}}
+\subsubsection{\feedbackloops}
 \label{sec:sas-fl}
 
 \subsubsubsection{Initialization Schedule} Initialization of a
@@ -616,42 +616,42 @@ schedulable, only that it cannot be scheduled using pseudo single
 appearance scheduling.
 
 \begin{comment}
-Scheduling of {{\feedbackloops}} is a task that can be made
-difficult, if the amount of data provided for the {{\feedbackloop}}
+Scheduling of {\feedbackloops} is a task that can be made
+difficult, if the amount of data provided for the {\feedbackloop}
 by the $delay_{fl}$ value is low. Before a {\StreamIt} program
-begins executing, the {{\feedbackloop}} needs to be provided with
-some data in one of the internal {{\Channels}}. Without this data,
-the {\splitter} and the {\joiner} of the {{\feedbackloop}} will not
+begins executing, the {\feedbackloop} needs to be provided with
+some data in one of the internal {\Channels}. Without this data,
+the {\splitter} and the {\joiner} of the {\feedbackloop} will not
 be able to execute, because they will never have sufficient data
-on their input {{\Channels}}. This is a consequence of the
-{{\feedbackloop}} having a cyclical structure.
+on their input {\Channels}. This is a consequence of the
+{\feedbackloop} having a cyclical structure.
 
 \begin{figure}
 \centering
 \psfig{figure=feedback-non-scheduleable.eps,width=1.2in}
-\caption[Example of non-shedulable {{\feedbackloop}}]{Sample
-{{\feedbackloop}}. If this {{\feedbackloop}} has a $delay_{fl}$ value
+\caption[Example of non-shedulable {\feedbackloop}]{Sample
+{\feedbackloop}. If this {\feedbackloop} has a $delay_{fl}$ value
 set to 7, it does not have a steady state schedule which will
 allow it to execute forever. If the $dealy_{fl}$ value is
-increased by 1 to 8, the {{\feedbackloop}} has a steady state
+increased by 1 to 8, the {\feedbackloop} has a steady state
 schedule of $\{join\{2B\}\{5 split\}L\ join\{2B\}\{5 split\}L\ $
 $join\{2B\}\{5 split\}L\{2\ join\}\{4B\}\{10 split\}\{2L\}\ \}$.}
 \label{fig:feedback-non-schedulable}
 \end{figure}
 
-The difficulty in scheduling {{\feedbackloops}} is that if the amount
-of data made available to the {{\feedbackloop}} by the $delay_{fl}$
+The difficulty in scheduling {\feedbackloops} is that if the amount
+of data made available to the {\feedbackloop} by the $delay_{fl}$
 value (as explained in Section \ref{sec:explain-fl}) is small,
 there will be very limited number of ways to execute the
-{{\feedbackloop}}.  In fact, it is possible that the amount of data
-available to the {{\feedbackloop}} is so small, it cannot reach and
+{\feedbackloop}.  In fact, it is possible that the amount of data
+available to the {\feedbackloop} is so small, it cannot reach and
 complete an execution of a steady state schedule. An example of
-such {{\feedbackloop}} is presented in Figure
+such {\feedbackloop} is presented in Figure
 \ref{fig:feedback-non-schedulable}.
 
-Here we will use {{\feedbackloop}} from Figure
+Here we will use {\feedbackloop} from Figure
 \ref{fig:hierarchical-schedule}(c).  The steady state schedule for
-this {{\feedbackloop}} is
+this {\feedbackloop} is
 
 \begin{displaymath} S_{fl} = \left\{
 \begin{array}{c} \left[
@@ -669,9 +669,9 @@ this {{\feedbackloop}} is
 \end{displaymath}
 
 \subsubsubsection{Initialization Schedule} Initialization for the
-{{\feedbackloop}} is calculated in a similar way to initialization
+{\feedbackloop} is calculated in a similar way to initialization
 of a {\pipeline}.  The number of steady state executions of the
-children of the {{\feedbackloop}} is denoted $l_B$ and $l_L$ for
+children of the {\feedbackloop} is denoted $l_B$ and $l_L$ for
 the body child and the loop child, respectively. The number of
 executions of the {\splitter} is denoted $l_s$ and the {\joiner}
 is denoted $l_j$.
@@ -702,7 +702,7 @@ l_{j} & = \left\lceil o^i_{fl_B} + l_B * o_{fl_B} \over u_{j}
 This initialization schedule will only be valid if there is enough
 data provided between the loop child and the {\joiner}, or
 $delay_{fl} \ge l_j * w_{j,1}$.  If this condition does not hold,
-the {{\feedbackloop}} cannot be scheduled using pseudo
+the {\feedbackloop} cannot be scheduled using pseudo
 single-appearance algorithm.
 
 Referring to the example Figure
@@ -730,7 +730,7 @@ Thus for our example we get $I_{fl} = \{\{3\ join\} I_B \{6T_B\}
 \{2\ split\} I_L\}$.
 
 We now compute the consumption of data for the initialization
-schedule of the {{\feedbackloop}}: $e^i_{fl} = o^i_{fl} = n_j *
+schedule of the {\feedbackloop}: $e^i_{fl} = o^i_{fl} = n_j *
 w_{j,0}$ and $u^i_{fl} = n_s * w_{s,0}$. Similarly as in
 computation for the {\splitjoin}, these values are simply the
 production and consumption of the {\splitter} and {\joiner} from their
@@ -739,18 +739,18 @@ of times the {\splitter} and {\joiner} are executed during
 initialization schedule.
 
 In our example, $e^i_{fl} = o^i_{fl} = 3 * 2 = 6$ and $u^i_{fl} =
-3 * 3 = 9$.  Note that the {{\feedbackloop}} pushes data out during
+3 * 3 = 9$.  Note that the {\feedbackloop} pushes data out during
 its initialization.
 
-Finally, we compute the amount of data present in {{\Channels}} after
+Finally, we compute the amount of data present in {\Channels} after
 initialization. These amounts are important because they will be
-used to compute the steady state schedule of the {{\feedbackloop}}.
+used to compute the steady state schedule of the {\feedbackloop}.
 These amounts were not necessary for computation of steady state
 schedules of {\pipeline} and {\splitjoin}. These amounts are
 calculated by simply subtracting the amount of data popped from a
-{{\Channel}} from amount of data pushed into a {{\Channel}}. Here we
+{\Channel} from amount of data pushed into a {\Channel}. Here we
 adopted the notation for
-{\Input} and {\Output} {{\Channel}} from Section \ref{sec:exec-model}.
+{\Input} and {\Output} {\Channel} from Section \ref{sec:exec-model}.
 
 \begin{displaymath}
 \begin{array}{rl}
@@ -763,9 +763,9 @@ out^i_L = & delay_{fl} + u^i_{fl_L} + l_L * u_{fl_L} - l_j * w_{j,1} \\
 \end{comment}
 
 \subsubsubsection{Steady State Schedule} Computing the steady
-state schedule for a {{\feedbackloop}} is more complicated than
+state schedule for a {\feedbackloop} is more complicated than
 for the other streams.  The reason for this is that
-{{\feedbackloops}} may require a non single-appearance schedule
+{\feedbackloops} may require a non single-appearance schedule
 due to small $delay_{fl}$ value, while other {\StreamIt}
 constructs can always be scheduled using single-appearance
 schedules.
@@ -773,13 +773,13 @@ schedules.
 \begin{comment}
 The algorithm used for creating of a steady state schedule
 will work in several phases.  The amount of data present in
-{{\Channels}} between the children of the {{\feedbackloop}}, the
+{\Channels} between the children of the {\feedbackloop}, the
 {\joiner} and the {\splitter} is kept track of to determine which
 element is allowed to execute.
 \end{comment}
 
 The algorithm for creating a steady state schedule of a
-{{\feedbackloop}} iterates over the elements of the {{\feedbackloop}}
+{\feedbackloop} iterates over the elements of the {\feedbackloop}
 in order of ({\joiner}, body child, {\splitter}, loop child). Each
 element is executed as many times as possible, considering the
 amount of data required and available to execute the element. Each
@@ -790,12 +790,12 @@ their steady state number of times, or until a complete iteration
 has been performed with no element being able to execute. The
 first case indicates a successful completion of the algorithm. The
 second case indicates a failure - the algorithm is unable to
-schedule the {{\feedbackloop}}.
+schedule the {\feedbackloop}.
 
 Table \ref{tab:sas-fl} illustrates the execution of this algorithm
-for {{\feedbackloop}} from Figure \ref{fig:steady-state}. In the
+for {\feedbackloop} from Figure \ref{fig:steady-state}. In the
 table, the first row and the last row have the same amount of data
-buffered in {{\Channels}}, thus indicating that a full steady
+buffered in {\Channels}, thus indicating that a full steady
 state schedule has indeed been computed.
 \begin{comment}
 Furthermore, the last entry considering execution of $B$ has
@@ -821,11 +821,11 @@ times to ensure that a steady state schedule is constructed.
 \hline
 \end{tabular}
 \caption[Execution of Steady-State algorithm on sample
-{{\feedbackloop}}]{Trace of execution of steady-state algorithm on
-sample {{\feedbackloop}} from Figure \ref{fig:steady-state}(c). The
+{\feedbackloop}]{Trace of execution of steady-state algorithm on
+sample {\feedbackloop} from Figure \ref{fig:steady-state}(c). The
 executions left amount is the number of executions left for a
 particular child to complete a steady state execution of the
-{{\feedbackloop}}. Onece this value reaches 0, the element is not
+{\feedbackloop}. Onece this value reaches 0, the element is not
 executed anymore, even if it has data to execute.}
 \label{tab:sas-fl}
 \end{table}
@@ -836,7 +836,7 @@ The schedule resulting from the above computation is $$T_{fl}
 split\ T_L \{2\ join\} \{4T_B\} \{2\ split\} T_L\}$$ This schedule
 is obtained by going through Table \ref{tab:sas-fl} from top to
 bottom and concatenating the appropriate number of executions of
-every child of the {{\feedbackloop}}, as listed in the "executions"
+every child of the {\feedbackloop}, as listed in the "executions"
 column.
 
 The steady state consumption $c_{fl}$ is again simply $S_{fl, c}$.
@@ -859,7 +859,7 @@ split\ T_L \{2\ join\} \{4T_B\} \{2\ split\} T_L\},\end{array}\\
 \end{displaymath}
 
 \begin{comment}
-Scheduling {{\feedbackloops}} requires some extra care, as explained
+Scheduling {\feedbackloops} requires some extra care, as explained
 above.  Once again, steady schedule multiplicities are computed,
 but this time, the amount of data buffered between the {\joiner},
 $body$, {\splitter} and $loop$ is required in order to perform the
@@ -878,11 +878,11 @@ repeated until the steady schedule is completed.
 
 It is possible, that the algorithm above deadlocks - there is not
 enough data for any of the children to advance.  This does not
-necessarily mean that the {{\feedbackloop}} has no legal schedule.
+necessarily mean that the {\feedbackloop} has no legal schedule.
 This is because pseudo single-appearance scheduling is a coarse
 scheduling technique.  Furthermore, this problem is not caused by
 hierarchical scheduling.  Figure
 \ref{fig:feedback-non-schedulable} contains an example of a
-{{\feedbackloop}} that cannot be scheduled using any single appearance
+{\feedbackloop} that cannot be scheduled using any single appearance
 technique.
 \end{comment}

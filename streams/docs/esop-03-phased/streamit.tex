@@ -21,8 +21,8 @@ In {\StreamIt} programs are composed out of streaming components
 called streams.  Each stream is a single-input, single-output
 component, possibly made up of a hierarchical composition of other
 streams. Streams can only be arranged in a limited number of ways,
-using {\pipelines}, {\splitjoins}, and {{\feedbackloops}}.  Data
-passed between {\filters} is read from and written to {{\Channels}}.
+using {\pipelines}, {\splitjoins}, and {\feedbackloops}.  Data
+passed between {\filters} is read from and written to {\Channels}.
 Figure \ref{fig:structure} contains examples of various
 {\StreamIt} streams.  The restrictions on arrangement of streams
 enforces the structure imposed by {\StreamIt}.
@@ -49,7 +49,7 @@ enforces the structure imposed by {\StreamIt}.
 \begin{minipage}{2in}
 \centering
 \psfig{figure=feedback.eps,width=1.5in} \\
-{\protect\small (d) A {{\feedbackloop}}}
+{\protect\small (d) A {\feedbackloop}}
 \end{minipage}
 \end{center}
 \caption{All {\StreamIt} streams}
@@ -71,14 +71,14 @@ of data to be consumed and produced for each execution of a
 {\work} function.  The amount of data produced by a {\filter} $F$
 upon execution of its {\work} function is called a push amount,
 denoted $push$. The amount of data consumed from {\Input}
-{{\Channel}} by a {\filter} $F$ upon execution of its {\work}
+{\Channel} by a {\filter} $F$ upon execution of its {\work}
 function is called a pop amount, denoted $pop$.  {\filters} may
 require that additional data be available in the {\Input}
-{{\Channel}} for the {\filter} to examine.  This data can be read by
+{\Channel} for the {\filter} to examine.  This data can be read by
 the {\filter}'s {\work} function, but it will not be consumed, and
-will remain in the {{\Channel}} for the next execution of the
+will remain in the {\Channel} for the next execution of the
 {\work} function.  The amount of data necessary on the {\Input}
-{{\Channel}} to execute {\filter}'s {\work} function is called peek
+{\Channel} to execute {\filter}'s {\work} function is called peek
 amount, denoted $peek$.  Note, that for all {\filters} $peek
 >= pop$.  Extra peek amount is the amount of data required on by
 the {\filter} that will be read but will not be consumed, namely
@@ -123,20 +123,20 @@ streams of the {\splitjoin} must be sources.
 Figure \ref{fig:structure}(c) depicts a
 {\splitjoin}.
 
-\subsubsection{{\feedbackloops}}
+\subsubsection{\feedbackloops}
 \label{sec:explain-fl}
 
-{{\feedbackloops}} are used to create cycles in the stream graph. A
-{{\feedbackloop}} contains a {\joiner}, a body stream, a {\splitter}, and
+{\feedbackloops} are used to create cycles in the stream graph. A
+{\feedbackloop} contains a {\joiner}, a body stream, a {\splitter}, and
 a loop stream.  Figure \ref{fig:structure}(d) depicts a
-{{\feedbackloop}}.
+{\feedbackloop}.
 
-A {{\feedbackloop}} has an additional feature required to allow a
-{{\feedbackloop}} to begin computation: since there is no data on
+A {\feedbackloop} has an additional feature required to allow a
+{\feedbackloop} to begin computation: since there is no data on
 the feedback path at first, the stream instead inputs data from a
-special function defined by the {{\feedbackloop}}.  The amount of
+special function defined by the {\feedbackloop}.  The amount of
 data pushed onto the feedback path is called delay amount, denoted
-$delay_{fl}$, for a {{\feedbackloop}} $fl$.
+$delay_{fl}$, for a {\feedbackloop} $fl$.
 
 \subsection{Messages}
 \label{sec:streamit:messages}

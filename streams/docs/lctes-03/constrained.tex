@@ -35,7 +35,7 @@ to execute on different devices without need for complicated data
 sharing techniques and synchronization. Furthermore, this model
 allows to schedule the execution of {\filters} in any order that
 does not violate the execution semantics ({\filters} always have at
-least $e_f$ data in their {\Input} {{\Channel}} before executing).
+least $e_f$ data in their {\Input} {\Channel} before executing).
 
 Due to the structured property of {\StreamIt} constructs, flow of
 data between {\filters} is very limited. This model works well for
@@ -271,14 +271,14 @@ in Figure \ref{fig:constrained-example}]{Flow of information
 wavefronts between {\filters} B and F during execution of schedule
 provided in Section \ref{sec:constrained-example}. Left column
 provides the node to be executed.  The center and right columns
-show information wavefronts carried by data in {{\Channels}} $in_s$
+show information wavefronts carried by data in {\Channels} $in_s$
 and $in_F$.  Every number corresponds to a single data item in a
 buffer.  Each number corresponds to the information wavefront
 carried by the data item. Information wavefronts are counted in
 terms of executions of {\filter} B's {\work} function, starting
 with 0.  Each line shows information wavefronts present in
-{{\Channels}} before the node is executed. Thus entry 0,0,1,1,2,2
-means that there are six data items present in the {{\Channel}}, first
+{\Channels} before the node is executed. Thus entry 0,0,1,1,2,2
+means that there are six data items present in the {\Channel}, first
 two carry information wavefront of first execution of B's {\work}
 function, second two carry information wavefront of second
 execution of B's {\work} function, etc.}
@@ -388,32 +388,32 @@ model must express the flow of information carried by data.
 
 We begin with creating a concept of abstract information.  Every
 data item carries a certain amount of information.  Every data
-item in a particular {{\Channel}} carries the same amount of
+item in a particular {\Channel} carries the same amount of
 information.  A {\filter} consumes some data items from its {\Input}
-{{\Channel}} and pushes them to its {\Output} {{\Channel}}.  We define
+{\Channel} and pushes them to its {\Output} {\Channel}.  We define
 execution of {\filters} to be an information-preserving operation.
 This means that the amount of information consumed by a {\filter}
 during its execution must be pushed out onto {\filter}'s {\Output}
-{{\Channel}}. This means that the amount of information carried by
-every data item in the {\Input} {{\Channel}} may differ from the amount
-of information carried by every data item in the {\Output} {{\Channel}}.
+{\Channel}. This means that the amount of information carried by
+every data item in the {\Input} {\Channel} may differ from the amount
+of information carried by every data item in the {\Output} {\Channel}.
 
 A {\splitter} is defined to consume some information from its {\Input}
-{{\Channel}} and provide that amount of information to each of its
-{\Output} {{\Channels}}.  That is, a {\splitter} increases the amount of
-information in the system by the number of {\Output} {{\Channels}} the
+{\Channel} and provide that amount of information to each of its
+{\Output} {\Channels}.  That is, a {\splitter} increases the amount of
+information in the system by the number of {\Output} {\Channels} the
 {\splitter} has multiplied by amount of information it consumes on
 every execution. Notice that this action has the effect of
 increasing the amount of information carried by each data item for
 {\roundrobin} {\splitters}, but does not change the amount of
 information carried by each data item across {\duplicate}
-{\splitters}.  Also, a {\splitter} with only a single {\Output} {{\Channel}}
+{\splitters}.  Also, a {\splitter} with only a single {\Output} {\Channel}
 behaves exactly the same as a {\filter}.
 
 A {\joiner} behaves in the exact opposite way to the {\splitter}.
 {\joiners} are defined to consume the same amount of information
-from every one of their {\Input} {{\Channels}}, and produce the same
-amount of information on their {\Output} {{\Channel}}.  As a result,
+from every one of their {\Input} {\Channels}, and produce the same
+amount of information on their {\Output} {\Channel}.  As a result,
 {\joiners} decrease the amount of information carried by every data
 item passing through them.
 
@@ -424,51 +424,51 @@ not change the amount of information carried by data passing
 through them.  This approach leads to inconsistency with
 {\splitjoins}, however.  Consider the {\splitjoin} from Figure
 \ref{fig:constrained-example}.  Assume that every data item in
-{{\Channel}} $in_s$ carries 1 unit of information.  By this
-alternative method, every data item in {{\Channels}} $in_C$, $in_D$
+{\Channel} $in_s$ carries 1 unit of information.  By this
+alternative method, every data item in {\Channels} $in_C$, $in_D$
 and $in_F$ also carries 1 unit of information.  {\filter} C consumes
 one data item, thus one unit of information, and produces 2 data
-items. Thus in {{\Channel}} $out_C$, every data item carries $1 \over
+items. Thus in {\Channel} $out_C$, every data item carries $1 \over
 2$ units of information.  {\filter} D consumes 2 data items, thus
 consumes 2 units of information and produces one data item, thus
-every data item in {{\Channel}} $in_E$ carries 2 units of information.
+every data item in {\Channel} $in_E$ carries 2 units of information.
 {\filter} E consumes 1 data item, thus consumes 2 units of
 information, and produces 2 data items, thus data items in
-{{\Channel}} $out_E$ carry 1 unit of information each.
+{\Channel} $out_E$ carry 1 unit of information each.
 
 We now have an inconsistency.  The {\joiner} consumes data from
-{{\Channel}} $out_C$ carrying $1 \over 2$ unit of information per data
-and data from {{\Channel}} $out_E$ carrying 1 unit of information per
-data. Since all data on the {\Output} {{\Channel}} of the {\joiner} must
+{\Channel} $out_C$ carrying $1 \over 2$ unit of information per data
+and data from {\Channel} $out_E$ carrying 1 unit of information per
+data. Since all data on the {\Output} {\Channel} of the {\joiner} must
 carry the same amount of information per data item, the {\joiner}
 must change the amount of information per data item.
 
 Our approach guarantees that every node produces and consumes the
 same amount of information from every one of its {\Input} and
-{\Output} {{\Channels}}.  This definition is consistent across all
+{\Output} {\Channels}.  This definition is consistent across all
 {\filters}, {\splitters} and {\joiners}.
 
 \subsubsection{Information Function}
 
 We define an information function, that describes amount of
-information carried by each data item in a particular {{\Channel}}.
+information carried by each data item in a particular {\Channel}.
 For a channel $c$, the function is denoted as $info_c$.   The
 value of the $info$ function must be consistent across the entire
-{\StreamIt} graph, and every {{\Channel}} needs an actual numerical
+{\StreamIt} graph, and every {\Channel} needs an actual numerical
 value.
 
 We begin computing a set of consistent values for $info$ functions
-of different {{\Channels}} by selecting a {{\Channel}} $c$ to have an
+of different {\Channels} by selecting a {\Channel} $c$ to have an
 $info$ function of 1.  We now travel the program graph upstream
 and downstream, across graph nodes, computing the $info$ function
-for all other {{\Channels}} connected to the node being crossed.
+for all other {\Channels} connected to the node being crossed.
 
 There are three types of nodes that can be crossed, and they can
 be crossed from either {\Input} or {\Output} sides.
 
 \subsubsubsection{\filters}
 
-A {\filter} $f$ has only one {\Input} and one {\Output} {{\Channel}}.  If we
+A {\filter} $f$ has only one {\Input} and one {\Output} {\Channel}.  If we
 know $info_{in_f}$, we can easily compute $info_{out_f}$, because
 we know that on every execution of $f$, we consume the same amount
 of information we produce:  $info_{out_f} = info_{in_f} {o_f \over
@@ -478,25 +478,25 @@ o_f}$.
 
 \subsubsubsection{\splitters}
 
-We have defined {\splitters} to provide their every {\Output} {{\Channel}}
+We have defined {\splitters} to provide their every {\Output} {\Channel}
 with the same amount of information as they consume from their
-{\Input} {{\Channel}}.  Thus for a {\splitter} $s$ we know that
+{\Input} {\Channel}.  Thus for a {\splitter} $s$ we know that
 $info_{out_{s,i}} = info_{in_s} {o_s \over w_{s,i}}$.  Similarly,
 $info_{in_s} = info_{out_{s,i}} {w_{s,i} \over o_s}$.  With these
 two equations we can easily compute values for $info$ of all of
-$s$'s {{\Channels}}, given the $info$ function for any of $s$'s
-{{\Channels}}.
+$s$'s {\Channels}, given the $info$ function for any of $s$'s
+{\Channels}.
 
 \subsubsubsection{\joiners}
 
 We have defined {\joiners} to consume the same amount of information
-from every one of their {\Input} {{\Channels}} and push that same amount
-of information to their {\Output} {{\Channel}}. Thus for a {\joiner} $j$
+from every one of their {\Input} {\Channels} and push that same amount
+of information to their {\Output} {\Channel}. Thus for a {\joiner} $j$
 we know that $info_{out_j} = info_{out_{j,i}} {w_{j,i} \over
 u_j}$. Similarly, $info_{in_{j,i}} = info_{out_j} {u_j \over
 w_{j,i}}$. With these two equations we can easily compute values
-for $info$ of all of $j$'s {{\Channels}}, given the $info$ function
-for any of $j$'s {{\Channels}}.
+for $info$ of all of $j$'s {\Channels}, given the $info$ function
+for any of $j$'s {\Channels}.
 
 \subsubsubsection{Example}
 
@@ -521,7 +521,7 @@ buffers}\label{tbl:constrained-info-buffer}
 \end{table}
 
 Table \ref{tbl:constrained-info-buffer} lists the values of $info$
-function for {{\Channels}} in Figure \ref{fig:constrained-example}.
+function for {\Channels} in Figure \ref{fig:constrained-example}.
 The computation of above $info$ values began with assigning
 $info_{in_B} = 1$.
 
@@ -576,7 +576,7 @@ the sender and the receiver.  The amount of information stored
 between two {\filters} is the amount of information that entered the
 interval between those two {\filters} minus the amount of
 information that is destroyed due to peeking of {\filters} plus some
-data possibly put in the feedback path of a {{\feedbackloop}} (due to
+data possibly put in the feedback path of a {\feedbackloop} (due to
 $delay_{fl} > 0$).
 
 When a {\filter} with $e_f > o_f$ executes for the first time, it
@@ -589,21 +589,21 @@ first execution of such a {\filter}.  This amount is $(e_f - o_f) *
 info_{in_f}$.
 
 We account for this lost information by setting the initial amount
-of information in a the {\Input} {{\Channel}} of every {\filter} to $(e_f
+of information in a the {\Input} {\Channel} of every {\filter} to $(e_f
 - o_f) * info_{in_f}$.  If $e_f = o_f$, the initial amount of
-information in the {\Input} {{\Channel}} of $f$ is set to 0. If $e_f >
+information in the {\Input} {\Channel} of $f$ is set to 0. If $e_f >
 o_f$, the inital amount of information is set to a negative
 number.
 
 When a {\StreamIt} program is executing, we define the amount of
-information stored in a {{\Channel}} to be equal to the initial amount
-of information in the {{\Channel}} plus the amount of information
-pushed into the {{\Channel}} minus the amount of information popped
-from the {{\Channel}}.
+information stored in a {\Channel} to be equal to the initial amount
+of information in the {\Channel} plus the amount of information
+pushed into the {\Channel} minus the amount of information popped
+from the {\Channel}.
 
 Now, in order to compute the amount of information between two
 {\filters} we simply need to sum up the amount of information stored
-in all {{\Channels}} between these two {\filters} along a directed
+in all {\Channels} between these two {\filters} along a directed
 non-cyclical path.  The selection of this path is important, as
 not all paths between two {\filters} will have equal amount of
 information stored.  The path we select is the path that stores
@@ -616,7 +616,7 @@ path through the downstream {\filter} plus the sum of information
 along the path at initialization (a non-positive value).
 
 In our sample {\pipeline}, we have $in_E = -3$ and all other
-{{\Channels}} initialized with 0 information. Thus the path selected
+{\Channels} initialized with 0 information. Thus the path selected
 between {\filters} A and G is $A \to B \to s \to D \to E \to j \to
 G$, which contains $-3$ units of information at initialization.
 
@@ -717,22 +717,22 @@ to be written down. Here all filters will be represented by $f_m$
 with $0 \leq m < n_f$ with $n_f$ filters in the program.
 {\splitters} will be represented by $s_m$ and {\joiners} with $j_m$,
 $0 \leq m < n_{sj}$, with $n_{sj}$ representing number of
-{\splitjoins} and {{\feedbackloops}}. {{\Channels}} will be represented by
+{\splitjoins} and {\feedbackloops}. {\Channels} will be represented by
 $in_{f_m}$, $in_{s_m}$ and $in_{j_m, k}$ with $k$ representing the
-$k$th branch of the {\joiner}. {{\Channels}} are designated by {\StreamIt}
-nodes that use the {{\Channel}} as an {\Input} {{\Channel}}. Number of
+$k$th branch of the {\joiner}. {\Channels} are designated by {\StreamIt}
+nodes that use the {\Channel} as an {\Input} {\Channel}. Number of
 executions of node $s$ ({\filter}, {\splitter} or {\joiner}) will be
 represented by $c_s$.
 
 First equations required represent the amount of information
-present in {{\Channels}} need to be written down. For every {{\Channel}},
+present in {\Channels} need to be written down. For every {\Channel},
 that is simply the amount of information pushed in by the source
 node minus the amount of information popped by the drain node
 minus amount of information lost on first execution of the
 downstream node, namely $in_{s_{dst}} = info_{in_{s_{dst}}}
 (c_{s_{src}} * u_{s_{src}} - c_{s_{dst}} * o_{s_{dst}} -
 (e_{s_{dst}} - o_{s_{dst}}))$. The only exception to this rule are
-joiner buffers in {{\feedbackloops}}. Those buffers start with
+joiner buffers in {\feedbackloops}. Those buffers start with
 $delay_{fl_m}$ data items, thus $info_{in_{j_m,1}} * delay_{fl_m}$
 information needs to be added the amount of information stored in
 $in_{{j_m}, 1}$.
@@ -805,7 +805,7 @@ b_{j, 2} = info_{in_{j,2}} * (c_F * o_F  - c_{j} * w_{j,2}) \\
 \end{array}
 \end{displaymath}
 
-Next we ensure that all {{\Channels}} store non-negative amounts of
+Next we ensure that all {\Channels} store non-negative amounts of
 information after initialization:
 
 \begin{displaymath}
@@ -864,7 +864,7 @@ regular data flow through channels.
 
 The technique described here uses as an input the {\StreamIt}
 program with all of its latency constraints, as well as the amount
-of information stored in all {{\Channels}} after initialization. The
+of information stored in all {\Channels} after initialization. The
 output of this algorithm is a steady state schedule which starts
 with the initialized program and executes one iteration of minimal
 steady state while respecting all constraints placed on the
@@ -885,7 +885,7 @@ $\sum_{\forall s \in \{all\ nodes\}} c^k_s = 1$. These two
 conditions assure that the schedule executed will indeed be the
 steady state schedule.
 
-Next, the amount of information in {{\Channel}} $in_s$ before step $k$
+Next, the amount of information in {\Channel} $in_s$ before step $k$
 is represented by $$in^k_s = in_s + info_{in_{s_{dst}}}
 \left(\sum_{r=0}^{k-1} c^r_{c_{src}} - \sum_{r=0}^{k-1}
 c^r_s\right)$$ We impose the buffering requirements placed upon

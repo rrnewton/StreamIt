@@ -187,18 +187,18 @@ $i$'th call setting the $i$'th stream in the splitjoin.
 \end{comment}
 
 The last control construct provides a way to create cycles in the
-stream graph: the {\feedbackloop}.  {{\feedbackloops}} are used to
-create cycles in the stream graph. A {{\feedbackloop}} contains a
+stream graph: the {\feedbackloop}.  {\feedbackloops} are used to
+create cycles in the stream graph. A {\feedbackloop} contains a
 {\joiner}, a body stream, a {\splitter}, and a loop stream. Figure
-\ref{fig:structures}(d) depicts a {{\feedbackloop}}.
+\ref{fig:structures}(d) depicts a {\feedbackloop}.
 
-A {{\feedbackloop}} has an additional feature required to allow a
-{{\feedbackloop}} to begin computation: since at first there is no
+A {\feedbackloop} has an additional feature required to allow a
+{\feedbackloop} to begin computation: since at first there is no
 data on any \Channels, the program inserts data from a special
-function defined by the {{\feedbackloop}} onto the \Channel
+function defined by the {\feedbackloop} onto the \Channel
 connecting the loop child and the \joiner. The amount of data
 pushed onto the feedback path is called delay amount, denoted
-$delay_{fl}$, for a {{\feedbackloop}} $fl$.
+$delay_{fl}$, for a {\feedbackloop} $fl$.
 
 \begin{comment}
 \subsection{Design Rationale}

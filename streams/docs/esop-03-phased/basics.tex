@@ -16,7 +16,7 @@
 ~
 \begin{minipage}{1.5in}
 \centering \psfig{figure=feedback-steady-state.eps,width=1.0in} \\
-{\protect\small (c) A sample {{\feedbackloop}}.  The $L$ {\filter}
+{\protect\small (c) A sample {\feedbackloop}.  The $L$ {\filter}
 has been flipped upside-down for clarity.\\$peek_L = pop_L = 5,
 push_L = 6$}
 \end{minipage}
@@ -62,8 +62,8 @@ push $u_j$ onto its {\Output} {\Channel}.
 \begin{comment}
 Each {\filter} node $n_f$ has exactly one incoming edge and one
 outgoing edge.  The incoming edge is referred to as an {\Input}
-{{\Channel}}, while the outgoing edge is called an {\Output}
-{{\Channel}}. A {\splitter} node $n_s$ has exactly one incoming edge
+{\Channel}, while the outgoing edge is called an {\Output}
+{\Channel}. A {\splitter} node $n_s$ has exactly one incoming edge
 ({\Input} {\Channel}), but has multiple outgoing edges ({\Output}
 {\Channels}). A {\joiner} node has multiple incoming edges ({\Input}
 {\Channels}) but only one outgoing edge ({\Output} {\Channel}).
@@ -90,8 +90,8 @@ of data which will be consumed by the {\filter} from its {\Input}
 that $e_f \ge o_f$. The final value represents the amount of data
 that will be put on the {\Output} {\Channel} of the {\filter}. This is
 called the push amount of a {\filter}.  The amount of data present
-in the {\Input} {{\Channel}} of a {\filter} node $n_f$ is denoted
-$in_f$, while data present in the {\Output} {{\Channel}} is denoted
+in the {\Input} {\Channel} of a {\filter} node $n_f$ is denoted
+$in_f$, while data present in the {\Output} {\Channel} is denoted
 $out_f$.
 
 Each {\splitter} node $n_s$ is associated with a tuple $(o_s,
@@ -101,9 +101,9 @@ order to execute $n_s$, there must be at least $o_s$ data in its
 {\Input} {\Channel}. $w_s$ is a vector of integers, each
 representing the amount of data that will be pushed onto a
 corresponding {\Output} {\Channel} of $n_s$.  The amount of data
-present in the {\Input} {{\Channel}} of a {\splitter} node $n_s$
+present in the {\Input} {\Channel} of a {\splitter} node $n_s$
 is denoted $in_s$, while data present in the $i$th {\Output}
-{{\Channel}} is denoted $out_{s,j}$.
+{\Channel} is denoted $out_{s,j}$.
 
 Each {\joiner} node $n_j$ is associated with a tuple $(w_j, u_j)$.
 The first value is a vector of integers, each representing the
@@ -113,8 +113,8 @@ each of its {\Input} {\Channels} must have at least as much data
 in it as the corresponding value in $w_j$ indicates.  $u_j$
 represents the amount of data that will be pushed by $n_j$ onto
 its {\Output} {\Channel}. The amount of data present in the $i$th
-{\Input} {{\Channel}} of a {\joiner} node $n_j$ is denoted
-$in_{j,i}$, while data present in the {\Output} {{\Channel}} is
+{\Input} {\Channel} of a {\joiner} node $n_j$ is denoted
+$in_{j,i}$, while data present in the {\Output} {\Channel} is
 denoted $in_s$.
 \end{comment}
 
@@ -131,7 +131,7 @@ a finite amount of memory.
 
 A {\StreamIt} schedule is an ordered list of firings of nodes in the
 {\StreamIt} graph.  Every firing of a node consumes some data from
-{\Input} {{\Channel}}(s) and pushes data onto the {\Output} {{\Channel}}(s).
+{\Input} {\Channel}(s) and pushes data onto the {\Output} {\Channel}(s).
 
 One of the most important concepts in scheduling streaming
 applications is the steady state schedule.  A steady state
@@ -156,10 +156,10 @@ in the program.
 \begin{comment}
 Not every {\StreamIt} program has a steady state schedule.  It is
 possible for a program to have unbalanced production and
-consumption of data in {\splitjoins} and {{\feedbackloops}}. The
+consumption of data in {\splitjoins} and {\feedbackloops}. The
 amount of data buffered continually increases, and cannot be
 reduced, thus making it impossible to create a steady state
-schedule for them.  It is also possible that a {{\feedbackloop}}
+schedule for them.  It is also possible that a {\feedbackloop}
 does not have enough data buffered up internally in order to
 complete execution of a full steady state, and thus deadlocks.
 Programs without a valid steady state schedule are not considered
@@ -230,9 +230,9 @@ $m + q$ is also a steady state.
 \end{lemma}
 
 The above lemma is true because neither $m$ nor $q$ change the
-amount of data buffered in the {{\Channels}}.  Thus a composition of
+amount of data buffered in the {\Channels}.  Thus a composition of
 the steady states does not change the amount of data buffered in
-the {{\Channels}}, which makes the composition also a steady schedule.
+the {\Channels}, which makes the composition also a steady schedule.
 
 \begin{corollary}[Composition of Steady Schedules]
 \label{corollary:composition}
@@ -241,7 +241,7 @@ then $w = m - q$ is also a steady state.
 \end{corollary}
 
 If $q$ is a steady state and $m = w + q$ is a steady state, then
-$w$ must not change the amount of data buffered in {{\Channels}}. Thus
+$w$ must not change the amount of data buffered in {\Channels}. Thus
 $w$ must be a steady state.
 \end{comment}
 
@@ -279,7 +279,7 @@ the \stream to find the minimal steady state schedule.
 
 Minimal steady states are calculated recursively in a hierarchical
 manner. That is, a minimal steady state is calculated for all
-children streams of {\pipeline}, {\splitjoin} and {{\feedbackloop}},
+children streams of {\pipeline}, {\splitjoin} and {\feedbackloop},
 and then the schedule is computed for the actual parent stream
 using these minimal states as atomic executions.
 \begin{comment}
@@ -307,7 +307,7 @@ which holds number of steady state executions of all direct
 children of $s$. $m$ and $v$ are not the same vector, because $m$
 refers to nodes in the subgraph, while $v$ refers only to the
 direct children, which may be {\filters}, {\pipelines},
-{\splitters} and {{\feedbackloops}}. For a stream $s$, set $S$ is
+{\splitters} and {\feedbackloops}. For a stream $s$, set $S$ is
 denoted as $S_s$ and the elements of $S_s$ are denoted as
 $S_{s,m}$, $S_{s,N}$, $S_{s,c} and S_{s,v}$.
 
@@ -341,19 +341,19 @@ S_{sj_0, N} \circ S_{sj_1, N} \circ \{sj_s, sj_j\}, \\
 
 Consider a {\filter} $f$, with $e_f = 2$ and a $o = 1$. When a
 {\StreamIt} program is first run, there is no data present on any
-of the {{\Channels}}.  This means that for the first execution,
+of the {\Channels}.  This means that for the first execution,
 \filter $f$ requires that two data items be pushed onto its
-{\Input} {{\Channel}}.  After the first execution of $f$, it will
+{\Input} {\Channel}.  After the first execution of $f$, it will
 have consumed one data item, and left at least one data item on
-its {\Input} {{\Channel}}.  Thus in order to execute $f$ for the
+its {\Input} {\Channel}.  Thus in order to execute $f$ for the
 second time, at most one extra data item needs to be pushed onto
-$f$'s {\Input} {{\Channel}}.  The same situation persists for all
+$f$'s {\Input} {\Channel}.  The same situation persists for all
 subsequent executions of $f$ - at most one additional data item is
-required on $f$'s {\Input} {{\Channel}} in order to execute $f$.
+required on $f$'s {\Input} {\Channel} in order to execute $f$.
 
 This example illustrates that first execution of a {\filter} may
 require special treatment.  Namely, the source for {\filter}'s data
-may need to push more data onto {\filter}'s {\Input} {{\Channel}} for
+may need to push more data onto {\filter}'s {\Input} {\Channel} for
 {\filter}'s first execution.  Due to this condition, a {\StreamIt}
 program may need to be initialized before it can enter steady
 state execution.
@@ -364,7 +364,7 @@ require more complex initialization.  These will be discussed in
 Chapter \ref{chpt:constrained}.
 
 After an execution, a {\filter} $f$ must leave at least $e_f - o_f$
-data on its {\Input} {{\Channel}}.  Thus, if the only constraints on
+data on its {\Input} {\Channel}.  Thus, if the only constraints on
 initialization are peek-related, it is a sufficient condition for
 entering steady state schedule that $\forall f \in {\filters}, in_f
 \ge e_f - o_f$.
@@ -481,7 +481,7 @@ size required in order for two {\filters} to be able to push data
 between each other indefinitely in the most buffer-efficient way.
 Buffers this size cannot always be achieved, because some
 components require that data be buffered up for execution (ex.
-{{\feedbackloops}} require data to exist internally in order to
+{\feedbackloops} require data to exist internally in order to
 execution to advance) or because extra latency constrains require
 additional buffering.
 
