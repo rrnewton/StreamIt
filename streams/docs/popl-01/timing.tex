@@ -10,12 +10,13 @@ invoked asynchronously without any notion of global time, two
 invocations of a work function occur at the same ``information-relative
 time'' if they operate on the same information wavefront.
 
-To define this notion more precisely, we present transfer functions that
-describe the flow of information across filters and streams.  Using
-these transfer functions, we translate message delivery constraints into
-a set of constraints on the execution schedule of the stream graph.
-Finally, we use these scheduling constraints to formulate an operational
-semantics for messaging, latency, and re-initialization in StreaMIT.
+To define this notion more precisely, we present transfer functions
+that describe the flow of information across filters and streams.
+Using these transfer functions, we translate message delivery
+constraints into a set of constraints on the execution schedule of the
+stream graph.  Finally, we use these scheduling constraints to
+formulate an operational semantics for messaging and latency in
+StreaMIT.
 
 \subsection{Information Flow}
 
@@ -26,9 +27,8 @@ effecting the state of filters and the values of new data items which
 are produced.  We refer to an ``information wavefront'' as the
 sequence of filter executions that first sees the effects of a given
 input item.  This wavefront is well-defined even in the presence of
-rate-changing filters that peek, pop, and push differing number of
-items in each invocation of their work function. {\bf Unclear--makes
-it sound like it changes from one invocation to the next?}
+rate-changing filters that peek or pop a different number of items
+than they push.
 
 \begin{figure}
 \centering
@@ -40,8 +40,8 @@ it sound like it changes from one invocation to the next?}
 To formalize the wavefront, we introduce some new representations for
 the state of the stream graph.  Consider that in place of each data
 channel there is an infinite ``tape'' which contains the history of
-values that have been pushed onto the channel.  Now consider the
-following functions:
+values that have been pushed onto the channel (see Figure
+\ref{fig:tapes}).  Now consider the following functions:
 
 \begin{itemize}
 
@@ -69,8 +69,8 @@ round-robin joiner before some data from another stream could be
 routed to tape $b$.
 
 We now turn to deriving expressions for $\ma{a}{b}$ and $\mi{a}{b}$ as
-a step towards formalizing the semantics of messaging, latency, and
-re-initialization.
+a step towards formalizing the semantics of messaging and latency in
+StreaMIT.
 
 \subsubsection{Filters}
 
@@ -89,7 +89,7 @@ execute $n = floor((x - (peek_A - pop_A)) / pop_A))$ times, leaving
 the following expression for $\ma{I_A}{O_A}(x)$
 \begin{eqnarray*}
 \ma{I_A}{O_A}(x)& \\ = push_A&*floor((x-(peek_A-pop_A))/pop_A) if x \ge (peek_A-pop_A) \\
-         = push_A&*floor((x-(peek_A-pop_A))/pop_A) if x <  (peek_A-pop_A)
+         = 0 <  (peek_A-pop_A)
 \end{eqnarray*}
 Similarly, the reader can verify that:
 \begin{eqnarray*}
@@ -127,13 +127,13 @@ we have that:
 \mi{x}{z} = \mi{x}{y} \circ \mi{y}{z}
 \end{eqnarray}
 However, there are some restrictions on these definitions.  They only
-apply when there is a downstream path $P_1$ from the filter preceding
-$x$ to the filter following $y$, a downstream path $P_2$ from the
-filter preceding $y$ to the filter following $z$, and the paths $P_1$
+apply when there is a downstream path $P_1$ from the filter following
+$x$ to the filter preceding $y$, a downstream path $P_2$ from the
+filter following $y$ to the filter preceding $z$, and the paths $P_1$
 and $P_2$ are non-overlapping.  This restriction prevents the
 successive composition of transfer functions around feedback loops,
 thereby ensuring a unique definition for all pairs $(x, z)$ where
-there is a downstream path from $x$ to $z$. 
+there is a downstream path from $x$ to $z$.
 
 \subsubsection{SplitJoins}
 \begin{figure}[t]
