@@ -1,0 +1,140 @@
+7/29/02 -- AAL 
+changed the file from a cpp file to a c file, with associated changes in io and constant declarations (I had to do some calculations manually that are normally parameterized -- because I couldn't tell which ms were what.
+
+Magic things added to the makefile (to increase instruction memory on raw)
+
+SPEC-IMEM-SIZE = -imem_size 131072
+SPEC-SMEM-SIZE = -smem_size 262144
+
+BTL-ARGS += $(SPEC-IMEM-SIZE) $(SPEC-SMEM-SIZE)
+
+Got new version from ali, changed the parameters to (K,N,Q,W) = (4,5,10,7)
+
+7/30/2002
+(K,N,Q,W) = (2,2,2,2)
+
+first  iteration done at 0x000006397 (25495 cycles)
+second iteration done at 0x00000bdcb (48587 cycles) (delta=23092)
+third  iteration done at 0x0000117ff (71679 cycles) (delta=23092)
+
+
+==> iter takes 23092/23092 cycles (average = 23092)
+
+we are producing a 4 element output array, 23092 cycles, so normalized to 10^5 cycles, 4*(100000/23092) = 17.322016
+
+flops reported are 979 flops, which is (979/23092) * 250 = 10.598909 MFLOPS
+
+workCount = 398659 / 407920 = 0.97729702
+workCount = 362267 / 369472 = 0.9804992
+workCount = 362267 / 369472 = 0.9804992
+
+
+
+
+Uniprocessor (7/30/2002):
+(Xenon 2.2 GHz, 512MB cache)
+1 4 element array outputs / iteration = 4 outputs/iteration)
+100% utilization
+runtime for 10000000 (ten million) iterations = 27.68 seconds
+
+We want cycles/iteration:
+10^7 iterations/ 27.68 sec * 
+4 outputs/1 iteration
+1 second / 2.2x10^9 cycles
+* 10^5 cycles 
+
+= 65.685759 outputs/10^5 cycles
+
+
+
+
+
+-------------------------------------------
+------ Old version without -O3 ------------
+-------------------------------------------
+7/30/2002
+(K,N,Q,W) = (2,2,2,2)
+
+first  iteration done at 0x000006397 (25495 cycles)
+second iteration done at 0x00000bdcb (48587 cycles) (delta=23092)
+third  iteration done at 0x0000117ff (71679 cycles) (delta=23092)
+
+
+==> iter takes 23092/23092 cycles (average = 23092)
+
+we are producing a 4 element output array, 23092 cycles, so normalized to 10^5 cycles, 4*(100000/23092) = 17.322016
+
+flops reported are 979 flops, which is (979/23092) * 250 = 10.598909 MFLOPS
+
+workCount = 398659 / 407920 = 0.97729702
+workCount = 362267 / 369472 = 0.9804992
+workCount = 362267 / 369472 = 0.9804992
+
+
+Uniprocessor (7/30/2002):
+(Xenon 2.2 GHz, 512MB cache)
+1 4 element array outputs / iteration = 4 outputs/iteration)
+100% utilization
+runtime for 10000000 (ten million) iterations = 112.09 seconds
+
+We want cycles/iteration:
+10^7 iterations/ 112.09 sec * 
+4 outputs/1 iteration
+1 second / 2.2x10^9 cycles
+* 10^5 cycles 
+
+=  16.220732 outputs/10^5 cycles
+
+
+---------------------------------------
+(K,N,Q,W) = (4,5,10,7)
+
+first  iteration done at 0x1939f3 (1653235 cycles)
+second iteration done at 0x324067 (3293287 cycles) (delta=1640052)
+third  iteration done at 0x4b46db (4933339 cycles) (delta=1640052)
+
+
+==> iter takes 1640052/1640052 cycles (average = 1640052)
+
+we are producing a 20 element output array, 1640052 cycles, so normalized to 10^5 cycles, 20*(100000/1640052) = 1.2194735
+
+flops reported are 102010 flops, which is (102010/1640052) * 250 = 15.549812 MFLOPS
+
+
+workCount = 25843348 / 26451760 = 0.97699919
+workCount = 25645256 / 26240832 = 0.97730346
+
+
+Uniprocessor (7/29/2002):
+(Xenon 2.2 GHz, 512MB cache)
+1 20 element array outputs / iteration = 20 outputs/iteration)
+100% utilization
+runtime for 200000 iterations = 211.050 seconds
+
+We want cycles/iteration:
+200000 iterations/211.050 sec * 
+20 outputs/1 iteration
+1 second / 2.2x10^9 cycles
+* 10^5 cycles 
+
+=  0.8614934 outputs/10^5 cycles
+
+
+-------------------------------------------
+(K,N,Q,W) = (4,20,15,7)
+
+Uniprocessor (7/29/2002):
+(Xenon 2.2 GHz, 512MB cache)
+1 80 element array outputs / iteration = 80 outputs/iteration)
+99.9% utilization
+runtime for 2000 iterations = 119.15 seconds
+
+We want cycles/iteration:
+2000 iterations/119.15 sec * 
+80 outputs/1 iteration
+1 second / 2.2x10^9 cycles
+* 10^5 cycles 
+
+=  0.061038416 outputs/10^5 cycles
+
+

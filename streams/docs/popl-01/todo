@@ -1,0 +1,96 @@
+things left for saman:
+----------------------
+
+- with cvs, I don't know how to get most recent change to whole
+package?  could have a dummy file written each time in makefile, and
+put it in and out, then retrieve the Entries value for it (whic has
+date and verison.)
+
+- are you ok with setSplitter, etc?
+
+----------------------------------
+
+- add to java/streamit restrictions in appendix?
+
+- add the Tech Report #
+
+would like to do, but not essential:
+
+- vectorize the hierarchy.eps.  Rasterized seems to be the best I can do.
+
+- rewrite example & conclusions
+
+- the rows of array for inference rule are too close together
+
+- make more organized future work section?  like review the semantic
+things left undone, etc.
+
+changes we decided against making?
+----------------------------------
+
+- put a splitJoin at the end of the TrunkedRadio example, since it
+makes more sense that way.
+
+- some name other than TIME interval for the message sending!
+
+- reorganize the derivations of min/max so that stuff leaving the
+split/join and stuff entering the split/join is together?  then the
+similar equaionts are placed next to each other.
+
+- number all equations?
+
+future things to think about
+----------------------------
+
+- make an example that makes use of portals for portal's sake
+	1. library notion (unknown receiver / sender)
+	2. broadcast messaging
+	3. send up and down the stream
+
+	-> like an example w/ completely messaging stuff
+	- very simple & artificial
+
+	- also have re-initialization an draining in some example?
+
+* get the centering right on the inference rule instead of using \hspace
+
+* to properly deal with messages to streams with null splits & joins,
+do we need to define the min/max functions across null splits & joins?
+how do you send message to stream (like you'd want to for
+re-initialization) if there's no unique upper or lower filter?
+
+* we need to specify default values for functions like drain(),
+initPath, etc
+
+* a quasi-problem with the operational semantics is that it doesn't
+indicate when the splits and joins execute (it assumes they execute
+immediately), which might give us less scheduling control than we'd
+like.
+
+* realtime constraints.  can we say a filter fires once per time interval?
+
+* work out the semantics of the w-message sending (disjoint pieces)
+
+* letting init codes cause an offset (do push() on output)
+
+* exact tape-based semantics of reinitialization
+
+* semantic restrictions of sending a message within a message handler.
+Need to start counting work functions in a different way.
+
+- add more precise notion of passing by value--do we do a deep copy on
+all objects?
+
+- any notion of exceptions?  error handling?
+
+- any concept of filters ignoring items?  would affect wavefront (a
+select filter, for example.)
+
+- I still vote for a reordering filter that lets you reorder chunks
+without a complicated round-robin with identitity functions.
+
+
+
+
+
+

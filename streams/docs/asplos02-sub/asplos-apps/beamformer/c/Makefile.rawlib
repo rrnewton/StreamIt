@@ -1,0 +1,43 @@
+## Created RJudd October 18, 2000
+## SPAWARSYSCEN D857
+VSIPL_DIR = vsipl/TASP_VSIPL_Core_Plus
+
+CC=/home/pkg/brave_new_linux/0072.crudo/install/rgcc/bin/raw-local-raw-gcc
+INCLUDE += -Iinclude
+INCLUDE += -Isrc
+INCLUDE += -I$(VSIPL_DIR)/include
+INCLUDE += -I/home/pkg/brave_new_linux/0072.crudo/install/rgcc 
+INCLUDE += -I/home/pkg/brave_new_linux/0072.crudo/install/newlib/include 
+INCLUDE += -I/home/pkg/brave_new_linux/0072.crudo/install/rawlib/include
+INCLUDE += -I/home/bits6/aalamb/starsearch/common 
+INCLUDE += -I/home/pkg/brave_new_linux/0072.crudo/install/rmpilib/include
+
+DEFINES=-DVSIP_PERFORMANCE_MODE
+OPTIONS= -pedantic 
+COMPILE=$(CC) $(DEFINES) $(OPTIONS)
+
+#SOURCES= 
+SRC=src
+OBJECTS=$(SRC)/LPF.o \
+	$(SRC)/DIT.o \
+	$(SRC)/BF.o \
+	$(SRC)/PC.o \
+	$(SRC)/Utils.o \
+	$(SRC)/main_raw.o
+
+all: $(OBJECTS) command
+
+
+# this is THE command to compile all of the nonsense into a raw file
+command:
+	/home/pkg/brave_new_linux/0072.crudo/install/intravenous/bin/geo link 00 16 0 src/main_raw.o src/LPF.o src/DIT.o src/BF.o src/PC.o src/Utils.o vsipl/TASP_VSIPL_Core_Plus/src/vsip_ccfftop_f.o vsipl/TASP_VSIPL_Core_Plus/lib/libvsip_raw_c.a /home/bits6/aalamb/starsearch/lib/_init_user_environment.o /home/bits6/aalamb/starsearch/lib/rbarrier.04-04.cds.00.o /home/bits6/aalamb/starsearch/lib/libssnull.a /home/bits6/aalamb/starsearch/lib/libtnunreliable.a -L/home/pkg/brave_new_linux/0072.crudo/install/newlib/lib -L/home/pkg/brave_new_linux/0072.crudo/install/rawlib/lib /home/bits6/aalamb/starsearch/lib/libssnull.a /home/bits6/aalamb/starsearch/lib/libtnunreliable.a -lgloss -lc -lm -lgloss -lscomm -lints -larch -o test00.lnk
+
+
+
+%.o: %.c
+	$(COMPILE) $(INCLUDE) -c $? -o $@
+
+
+clean:
+	rm -f $(OBJECTS)
+

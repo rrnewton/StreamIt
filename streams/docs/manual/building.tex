@@ -1,0 +1,31 @@
+\section{Building the StreamIt Compiler and Libraries}
+
+\subsection{Building the Compiler}
+Building the StreamIt compiler is as easy as
+going to the {\tt streams/compiler} directory and typing
+{\tt make}. This should create the necessary lexers and
+parsers and fully compile the compiler.
+The compiler (mostly) resides in {\tt streams/compiler},
+but there are some dependencies on files from the Java 
+library in {\tt streams/library\slash{}java} as well as 
+dependencies on the {\tt cplex} and {\tt antlr} packages.
+You shouldn't have to worry about these additional complications
+as the Makefile and {\tt dot-shell} should take care of things.
+
+\subsection{Building the Java Library}
+The Java library lives in {\tt streams/library/java}. It is 
+used to run StreamIt programs that are compiled into Java 
+bytecodes. Since the compiler relies on some of the classes
+in the Java Library, building the compiler should have build
+the library as well. To make sure, or to rebuild the library,
+you can go to the {\tt streams\slash{}library/java/streamit} 
+directory and run {\tt jikes *.java}.
+
+\subsection{Building the C Library}
+The C library is used to compile the output of the StreamIt
+compiler's uniprocessor backend. To build the library, 
+go to the {\tt streams/library/c} and run {\tt make}. 
+This will create the file {\tt libstreamit.a}, 
+which contains all of the library functions necessary to create
+an executable from the compiler's output.
+

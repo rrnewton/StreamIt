@@ -1,0 +1,57 @@
+\section{An Equalizer}
+
+\begin{lstlisting}{}
+float->float pipeline Equalizer(int bands, float[bands] cutoffs,
+                                float[bands] gains) {
+  add EqSplit(bands, cutoffs, gains);
+  add float->float filter {
+    work pop bands-1 push 1 {
+      float sum = 0;
+      for (int i = 0; i < bands-1; i++)
+        sum += pop();
+      push(sum);
+    }
+  };
+}
+float->float splitjoin EqSplit(int bands, float[bands] cutoffs,
+                               float[bands] gains) {
+  split duplicate;
+  for (int i = 1; i < bands; i++)
+    add pipeline {
+      add BandPassFilter(cutoffs[i-1], cutoffs[i]);
+      add float->float filter {
+        work pop 1 push 1 { push(pop() * gains[i]); }
+      };
+    };
+  join roundrobin;
+}
+\end{lstlisting}
+
+\begin{figure}[htbp]
+  \begin{center}
+    \includegraphics{cookbook.4}
+    \caption{Stream graph for an equalizer}
+    \label{fig:equalizer}
+  \end{center}
+\end{figure}
+
+This equalizer works by having a series of band-pass filters running
+in parallel, with their outputs added together.  The caller provides
+arrays of cutoff frequency and respective gains.
+
+In the implmentation here, the output of \lstinline|EqSplit| is a
+series of \lstinline|bands-1| outputs from the respective low-pass
+filters.  An \emph{inline filter} is used to sum the results
+together.  This is akin to an anonymous class in Java; the filter
+declaration does not have an explicit name, but otherwise has syntax
+almost identical to a top-level filter.  In general, inline filters
+should only be used for very simple filters, such as this or the
+inlined amplifier in \lstinline|EqSplit|.
+
+\lstinline|EqSplit| is a normal split-join, as shown previously.  Its
+body consists of a set of near-identical inlined pipelines; for
+pipelines and split-joins, the input and output type declarations may
+be omitted on anonymous streams.  Since the children are so similar,
+they are added within a normal \lstinline|for| loop.  The compiler is
+able to examine the loop provided that the loop bounds are expressions
+of constants and stream parameters.

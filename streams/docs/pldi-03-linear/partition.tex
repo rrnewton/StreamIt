@@ -1,0 +1,169 @@
+problems:
+
+- scalingFactor's might not be integral? would lead to float precision problems.
+
+-----
+
+questions for andrew:
+
+x Is the LEETFrequencyReplacer definately the one to use for now?  I'm
+  factoring out its canReplace method so that I can set to -infinity
+  if it's impossible to replace.  Should we look at using other
+  frequency replacers too?  (Do they sometimes apply in more general
+  cases, or get better results?)
+
+x the linear replacer visitor is doing much more work than it has
+  to... since it replaces in ALL children even if parent has been
+  replaced.  I patched this up by returning a boolean from
+  makeReplacement as to whether or not anything was done.
+
+x is it the case that no transformation of any hierarchical block ever
+  changes the pop / push ratio of that block?  hmm, I think so... will
+  assume this in this implementation.
+
+x if I call getFrequencyCost and getDirectCost(), they're going to be
+  for the same I/O rates, right?  For instance, you wouldn't do
+  something like unroll by a factor of two for frequency, such that
+  the frequency cost represented a 10->10 item filter whereas the
+  direct cost represented a 1->1 filter or something?
+
+- not sure i understand the frequency tradeoff question (or the whole
+  frequency thing in general) -- would it ever be beneficial to just
+  unroll the work function so it computers more things, and then
+  convert to frequency?  or is the peek / push ratio important?
+
+-----------------------------
+
+new strategy:
+
+- pass down the execution counts for all filters in the graph.  
+
+  actually, could pass down how many items are output from each filter
+  in an execution of the steady state.  (could keep pop counts if want
+  to check consistency)
+
+  then work back from these how many items are output from a given
+  block in a steady-state execution.
+
+  then normalize the work/cost of a block by how much it computes per
+  output item, then calculate how much it would compute in the
+
+  then calculate cost of a block by how much it would cost in steady
+  state; calculate savings as diff over children in steady state
+
+-----------------------------
+
+- does combination change the steady-state schedule?  need to account
+  for this when getting the cost and scaling by the scheduled node.
+
+- see how many are pushed/popped by structure in steady state
+  execution (via SAS schedule).  see how many times the structure
+  executes. then get new execution weighting as:
+
+	newExecs = (SAS rates / new rates) * numExecs
+
+  (note that higher rates execute fewer, thus the inversion)
+
+- so really don't need to know new counts every time, just need to
+  know number of items produced?
+
+-----------------------------
+
+new scheduler-conscious alg:
+
+(note in writeup that you need to measure savings rather than cost
+because we don't have comparable cost of non-linear nodes.  This could
+be computed with accurate work estimator, but would be harder...)
+
+given parameter: tryLinear, that will end up mapping each construct to
+what should be tried there
+
+int getSavings(stream s, int tryLinear) {
+  switch (tryLinear) {
+    case ANY:  savings = MAX ( getSavings(s, FREQUENCY),
+                               getSavings(s, COLLAPSED),
+                               getSavings(s, NOT_COLLAPSED) );
+
+    case FREQUENCY:  if (this is not linear node) {
+                       return -infinity;
+                     } else {
+                       // start with savings that collapsing gives you
+	               savings = getSavings(s, COLLAPSED);
+                       // then add savings due to frequency transform
+                       LinearFilterRep l = getLinearFilterRep(s);
+		       savings += getScalingFactor(l, s) * ( l.getDirectCost() - l.getFreqCost() )
+                     }
+
+    case COLLAPSED:
+      if (this is not linear node) {
+        return -infinity;
+      } else {
+        // get cost and savings of children
+        childSavings = 0
+        childCost = 0
+        forall children c {
+          childSavings += getSavings (c, COLLAPSED)
+	  LinearFilterRep lc = getLinearFilterRep(c);
+          childCost += getScalingFactor(lc, c) * lc.getDirectCost()
+        }
+
+        // get cost of self
+        LinearFilterRep l = getLinearFilterRep(s);
+        cost = getScalingFactor(l, s) * l.getDirectCost()
+
+	// calculate ADDED savings as diff between child cost and this cost
+        savings += childCost - cost;
+      }
+
+    case NOT_COLLAPSED:
+      savings = 0;
+      for all possible horiz and vertical cuts (child c1, child c2) {
+        savings = MAX( savings, 
+                       getSavings(c1, ANY) + getSavings(c2, ANY) )
+      }
+    }
+  }
+
+  return savings;
+}
+
+getScalingFactor(LinearFilterRep l, stream s) {
+  return s.getPushForSchedule(counts) / l.getPushCount();
+}
+
+-----------------------------
+
+given parameter: tryLinear, that will end up mapping each construct to
+what should be tried there
+
+int getSavings(stream s, int tryLinear) {
+  switch (tryLinear) {
+    case EITHER:  savings = MAX ( getSavings(s, FREQUENCY),
+                                  getSavings(s, COLLAPSED),
+                                  getSavings(s, NOT_COLLAPSED) );
+
+    case FREQUENCY:  savings = getAddedFreqBenefit(s) + getSavings(s, COLLAPSED);
+
+    case COLLAPSED:
+      if (this is not linear node) {
+        return -infinity;
+      } else {
+        savings = 0
+        forall children c {
+          savings += getSavings (c, COLLAPSED)
+        }
+        savings += (savings of this node over children)
+      }
+
+    case NOT_COLLAPSED:
+      savings = -infinity;
+      for all possible horiz and vertical cuts (child c1, child c2) {
+        savings = MAX( savings, 
+                       getSavings(c1, EITHER) + getSavings(c2, EITHER) )
+      }
+    }
+  }
+
+  return savings;
+}
+

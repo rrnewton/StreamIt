@@ -1,0 +1,50 @@
+/** 
+ * Simple program to test expanders.
+ **/
+void->void pipeline LinearTest31 {
+   add FloatSource(10);
+   add Expander(2);
+   add AverageFilter(2);
+   add FloatSink();
+ }
+
+ void->float filter FloatSource(int N) {
+   int idx;
+   float[N] x;
+   init {
+     for (int i=0; i<N; i++) {
+       x[i] = i;
+     }
+     idx = 0;
+   }
+   work push 1 {
+     push(x[idx]);
+     idx = (idx + 1) % N;
+   }
+ }
+
+ float->void filter FloatSink {
+   work pop 1 {
+     println(pop());
+   }
+ }
+
+float->float filter AverageFilter(int N) {
+  work peek N pop 1 push 1 {
+    float sum = 0;
+    for (int i=0; i<N; i++) {
+      sum += peek(i);
+    }
+    push(sum/N);
+    pop();
+  }
+}
+
+float->float filter Expander(int L) {
+  work pop 1 push L {
+    push(pop());
+    for (int i=0; i<(L-1); i++) {
+      push(0);
+    }
+  }
+}

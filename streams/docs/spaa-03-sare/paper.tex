@@ -1,0 +1,54 @@
+\documentclass{sig-alternate}
+\usepackage{epsfig}
+\usepackage{epsfig}
+\usepackage{amsmath}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+
+\title{Affine Dependence Analysis \\ for Cyclo-Static Dataflow Graphs}
+\numberofauthors{1}
+\author{
+\alignauthor \vspace{-18pt}
+William Thies,
+Jasper Lin,
+and Saman Amarasinghe \\
+	\vspace{8pt}
+	\{thies, jasperln, saman\}@lcs.mit.edu \\
+	\vspace{8pt}
+	Laboratory for Computer Science \\
+	Massachusetts Institute of Technology}
+
+\begin{document}
+
+\newtheorem{definition}{Definition}
+
+\maketitle
+
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+  \newcommand{\mt}[1]{\mbox{\it #1}}
+  \newcommand{\todo}[1]{\framebox{\bf #1}}
+  \newcommand{\dep}[0]{Dependence Frontier}                % The full name for the dependence function.
+  \newcommand{\DP}[0]{\textsc{Frontier}}                   % Abbrevation for dependence function.
+  \newcommand{\DEP}[2]{\DP_{#1 \small{\rightarrow} #2}}    % Math notation for dependence function.
+  \newcommand{\sssection}[1]{\medskip \noindent {\bf #1} \smallskip}
+
+  \begin{abstract}
+    \input{abstract}
+  \end{abstract}
+
+  \input{intro}
+  \input{related}
+  \input{sare}
+  \input{simplified}
+  \input{translate}
+  \input{apps}
+  \input{example}
+  \input{conclusion}
+
+  \bibliographystyle{abbrv}
+  \bibliography{references}
+
+  \include{alpha}
+  
+\end{document}

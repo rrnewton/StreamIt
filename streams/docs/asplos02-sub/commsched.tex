@@ -1,0 +1,202 @@
+\section{Communication Scheduler}
+\label{sec:communic}
+
+With the nodes of the stream graph assigned to computation nodes of
+the target, the next phase of the compiler must map the communication
+explicit in the stream graph to the interconnect of the target.  This
+is the task of the communication scheduler.  The communication
+scheduler maps the infinite FIFO abstraction of the stream channels to
+the limited resources of the target.  Its goal is to avoid deadlock
+and starvation while utilizing the parallelism explicit in the stream
+graph.
+
+The exact implementation of the communication scheduler is tied to the
+communication model of the target.  The simplest mapping would occur
+for targets implementing an end-to-end, infinite FIFO abstraction, in
+which the scheduler needs only to determine the sender and receiver of
+each data item.  This information is easily calculated from the
+weights of the splitters and joiners.  As the communication model
+becomes more constrained, the communication scheduler becomes more
+complex, requiring analysis of the stream graph. For targets
+implementing a finite, blocking nearest-neighbor communication model,
+the exact ordering of tile execution must be specified.
+
+Due to the static nature of StreamIt, the compiler can statically
+orchestrate the communication resources.  As described in
+Section~\ref{sec:phases}, we create an initialization schedule and a
+steady-state schedule that fully describe the execution of the stream
+graph.  The schedules can give us an order for execution of the graph
+if necessary.  One can generate orderings to minimize buffer length,
+maximize parallelism, or minimize latency.
+
+%Thus, we can create a communication scheduler of arbitrary
+%detail.  If the architecture must statically orchestrate all aspects
+%of communication, the StreamIt language provides this facility.
+
+Deadlock must be carefully avoided in the communication
+scheduler. Each architecture requires a different deadlock avoidance
+mechanism and we will not go into a detailed explanation of deadlock
+here.  In general, deadlock occurs when there is a circular dependence
+on resources.  A circular dependence can surface in the stream graph
+or in the routing pattern of the layout.  If the architecture does not
+provide sufficient buffering, the scheduler must serialize all
+potentially deadlocking dependencies.
+
+%Two StreamIt language constructs that can lead to deadlock are
+%feedbackloops and joiners. Figure ?? describes the potential for
+%deadlock in a feedbackloop.  One potential solution is to forbid
+%filters of the feedbackloop to interleave sends and receives.  This
+%has the effect of serializing the feedbackloop. In figure ?? we
+%descibe the potential for deadlock introduced by joiner nodes.  A
+%solution to this problem is described below.
+
+\begin{table*}[t]
+\begin{center}
+\scriptsize
+\begin{tabular}{|l|l||r||r|r|r|r||r||} \hline
+ & & {\bf lines of} & \multicolumn{4}{|c||}{\bf \# of constructs in the program} & {\bf \# of filters in the} \\ \cline{4-7}
+{\bf Benchmark} & {\bf Description} & {\bf code} & filters & pipelines & splitjoins & feedbackloops & {\bf expanded graph}
+\\
+\hline \hline
+FIR & 64 tap FIR & 
+125 & 5 & 1 & 0 & 0 & 132
+\\ \hline
+Radar & Radar array front-end\cite{pca} & 
+549 & 8 & 3 & 6 & 0 & 52
+\\ \hline
+Radio & FM Radio with an equalizer & 
+525 & 14 & 6 & 4 & 0 & 26
+\\ \hline
+Sort & 32 element Bitonic Sort & 
+419 & 4 & 5 & 6 & 0 & 242
+\\  \hline
+FFT & 64 element FFT & 
+200 & 3 & 3 & 2 & 0 & 24
+\\  \hline
+Filterbank & 8 channel Filterbank & 
+650 & 9 & 3 & 1 & 1 & 51
+\\  \hline
+GSM & GSM Decoder & 
+2261 & 26 & 11 & 7 & 2 & 46
+\\ \hline
+Vocoder & 28 channel Vocoder~\cite{seneff80}&  
+1964 & 55 & 8 & 12 & 1 & 101
+\\ \hline
+3GPP & 3GPP Radio Access Protocol~\cite{3gpp} &  
+1087 & 16 & 10 & 18 & 0 & 48
+\\ \hline
+\hline
+\end{tabular}
+\vspace{-6pt}
+\caption{\protect\small Application Characteristics.}
+\label{tab:benchmarks}
+\end{center}
+\end{table*}
+
+\begin{table*}[t]
+\begin{center}
+\scriptsize
+\begin{tabular}{|l||r|r|r|r||r||r||} \hline
+& \multicolumn{5}{|c||}{\bf 250 MHz Raw processor} & {\bf C on a 2.2 GHz} \\ 
+\cline{2-6} 
+{\bf Benchmark} & \multicolumn{4}{|c||}{\bf StreamIt on 16 tiles} & {\bf C on a single tile} & {\bf Intel Pentium IV}\\ 
+\cline{2-7}
+& {\bf Utilization} &
+\begin{tabular}{c}\hspace{-5pt} {\bf \# of tiles} \hspace{-5pt}\\
+\hspace{-5pt} {\bf used} \hspace{-5pt}
+\end{tabular} &    
+ {\bf MFLOPS} & 
+\begin{tabular}{c}\hspace{-5pt} {\bf Throughput} \hspace{-5pt}\\
+\hspace{-5pt} {\bf (per 10$^5$ cycles)} \hspace{-5pt}
+\end{tabular} &    
+\begin{tabular}{c}\hspace{-5pt} {\bf Throughput} \hspace{-5pt}\\
+\hspace{-5pt} {\bf (per 10$^5$ cycles)} \hspace{-5pt}
+\end{tabular} &    
+\begin{tabular}{c}\hspace{-5pt} {\bf Throughput} \hspace{-5pt}\\
+\hspace{-5pt} {\bf (per 10$^5$ cycles)} \hspace{-5pt}
+\end{tabular} \\    
+\hline \hline
+FIR    & 84\% &  14 & 815 &  1188.1  & 293.5 & 445.6 \\ \hline
+Radar  & 79\% & 16 & 1,231 &     0.52  & {\it app. too large} & 0.041 \\ \hline
+Radio  & 73\% & 16 & 421 &    53.9  & 8.85 & 14.1 \\ \hline
+Sort   & 64\% & 16  & N/A &  2,664.4 & 225.6 & 239.4 \\ \hline
+FFT    & 42\% & 16  & 182 &  2,141.9 & 468.9 & 448.5  \\ \hline
+Filterbank & 
+       41\% & 16  &  644 &   256.4  & 8.9 & 7.0   \\ \hline
+GSM    & 23\% & 16 & N/A &    80.9  & {\it app. too large} & 7.76 \\ \hline
+Vocoder& 17\% & 15  & 118 &     8.74  & {\it app. too large} & 3.35  \\ \hline
+3GPP   & 18\% & 16  & 44 &   119.6  & 17.3  & 65.7   \\ \hline \hline
+\end{tabular}
+\vspace{-6pt}
+\caption{\protect\small Performance Results.}
+\label{tab:performance}
+\end{center}
+\vspace{-12pt}
+\end{table*}
+
+\subsection{Communication Scheduler for Raw}
+\label{sec:rawcommunic}
+
+The communication scheduling phase of the StreamIt compiler maps
+StreamIt's channel abstraction to Raw's static network.  As mentioned
+in Section \ref{sec:raw}, Raw's static network provides optimized,
+nearest neighbor communication.  Tiles communicate using buffered,
+blocking sends and receives.  It is the compiler's responsibility to
+statically orchestrate the explicit communication of the stream graph
+while preventing deadlock.
+
+To statically orchestrate the communication of the stream graph, the
+communication scheduler simulates the firing of nodes in the stream
+graph, recording the communication as it simulates.  The simulation
+does not model the code inside each filter; instead it assumes that
+each filter fires instantaneously.  This relaxation is possible
+because of the flow control of the static network--since sends block
+when a channel is full and receives block when a channel is empty, the
+compiler needs only to determine the ordering of the sends and
+receives rather than arranging for a precise rendezvous between sender
+and receiver.
+
+% We simulate the graph for both an initialization schedule and a steady
+% state schedule (see Section \ref{sec:phases}).  A ``push schedule'' is
+% used for both phases.  We define a push schedule as one that always
+% fires the node that is the furthest downstream (among those that have
+% enough inputs to fire).  
+% 
+% A push schedule allows the implementation to
+% disregard the FIFO buffers that connect each neighboring node in the
+% stream graph.  This is because data items will not be accumulating at
+% the source, dest, or intermediate nodes.  Each destination will
+% consume the data item as it is produced (modulo the latency of
+% routing).
+
+Special care is required in the communication scheduler to avoid
+deadlock in splitjoin constructs.  Figure~\ref{fig:joiner-dead}
+illustrates a case where the naive implementation of a splitjoin would
+cause deadlock in Raw's static network.  The fundamental problem is
+that some splitjoins require a buffer of values at the joiner
+node--that is, the joiner outputs values in a different order than it
+receives them.  This can cause deadlock on Raw because the buffers
+between channels can hold only four elements; once a channel is full,
+the sender will block when it tries to write to the channel.  If this
+blocking propagates the whole way from the joiner to the splitter,
+then the entire splitjoin is blocked and can make no progress.
+
+To avoid this problem, the communication scheduler implements internal
+buffers in the joiner node instead of exposing the buffers on the Raw
+network (see Figure~\ref{fig:joiner-live}).  As the execution of the
+stream graph is simulated, the scheduler records the order in which
+items arrive at the joiner, and the joiner is programmed to fill its
+internal buffers accordingly.  At the same time, the joiner outputs
+items according to the ordering given by the weights of the
+roundrobin.  That is, the sending code is interleaved with the
+receiving code in the joiner; no additional items are input if a
+buffered item can be written to the output stream.  To facilitate code
+generation (Section \ref{sec:codegen}), the maximum buffer size of
+each internal buffer is recorded.
+
+Our current implementation of the communication scheduler is overly
+cautious in its deadlock avoidance.  All feedbackloops are serialized
+by the communication scheduler to prevent deadlock.  More precisely,
+the loop and body streams of each feedbackloop cannot execute in
+parallel.  Crossed routes in the layout of the graph are serialized as
+well, forcing each path to wait its turn at the contention point.

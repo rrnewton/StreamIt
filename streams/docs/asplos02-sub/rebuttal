@@ -1,0 +1,131 @@
+Firstly, we would like to thank the reviewers for their careful
+reviews and thoughtful suggestions to improve our paper.  We apologize
+for the typographical errors in the submission; indeed, our
+preparation was rushed and we had little time to proofread.  However,
+we have since posted a revised technical report with many corrections
+and updated results:
+
+  http://compiler.lcs.mit.edu/streamit/papers/streamit-627-v2.pdf
+
+We believe that the paper's primary contribution is from a systems
+perspective: it demonstrates what is needed to obtain end-to-end
+performance in compiling a stream language to a communication-exposed
+architecture.  In order to describe the entire system, we are forced
+to choose breadth over depth in most cases even though there are many
+details that deserve further discussion.
+
+Two issues were of interest to many reviewers:
+
+1. Optimization Selection.  The paper states that, although the
+   load-balancing transformations were automated in the compiler, the
+   selection of which transformations to apply was done manually.  For
+   the submission, this was an iterative process where the authors
+   examined an execution trace and adjusted the targets of fission and
+   fusion in order to improve performance.
+
+   However, we have since implemented an automatic partitioner that is
+   based on a simple greedy algorithm.  For 4 out of our 5
+   applications, this algorithm obtains performance that is 93% of our
+   hand-optimized code, on average.  For the last application (the
+   48x16 BeamFormer) this algorithm is not sufficient, and we can
+   construct other cases where a greedy strategy will fail.  We
+   believe that a robust partitioner is an important goal for future
+   research, but the complexities introduced therein are beyond the
+   scope of this paper, and even orthogonal to our other results.
+
+2. Performance of FFT.  Our submission indicated a 20-fold decrease in
+   the performance of FFT due to our "optimizations".  Two
+   clarifications are in order.  Firstly, the primary aim of our
+   fusion transformations is to reduce the granularity of the stream
+   graph so that it will fit on a 16-tile target.  This is why we did
+   not "turn off" the transformation for FFT, as the original program
+   required 37 tiles and would not fit on RAW.
+
+   Moreover, we have since obtained a better partitioning of FFT that
+   fuses the 37-tile version into a 16-tile version while losing only
+   2% of the performance (tile utilization improves by more than a
+   factor of two.)  This result also reflects some recent improvements
+   in our fusion algorithm; our latest numbers appear in the technical
+   report cited above.
+
+The following sections contain more detailed replies to each of the
+reviewers.
+
+Review #176
+-----------
+We agree that both time and space multiplexing can apply to stream
+programs, and we will adjust this section accordingly in the final
+submission.  Regarding the peek operation, we would like to emphasize
+that it is more than just a language construct--it simplifies the
+programming model since the compiler performs automated buffer
+management of items that are not consumed.  Also, peeking introduces
+considerable complexity in the compiler, with consequences that
+include two-stage filters, initialization schedules, and more careful
+deadlock avoidance techniques.
+
+Review #207
+-----------
+The clock rate of each of the 16 RAW tiles is 250 MHz.  We apologize
+for this omission.
+
+As you point out, there are some processors that are mostly idle even
+after our optimizations.  With our current set of transformations, we
+cannot achieve full utilization because: 1) currently, a joiner must
+occupy its own tile, 2) some filters cannot be split, 3) splitting
+filters horizontally involves introducing an extra node for the
+joiner, which might not be worth it, 4) splitting introduces
+synchronization overhead that can overwhelm the gains in parallelism,
+and 5) often there are several filters on the critical path, such that
+splitting only one does not improve the throughput (and there is not
+space to split them all).
+
+You mention that we should explain why fusion transformations are
+useful, e.g. compared to time multiplexing.  Fusion is preferable to
+time multiplexing because it enables additional optimizations on the
+combined filter code.  As for buffer size, we are working on improved
+scheduling techniques that minimize the size of large buffers so that
+they fit on a given tile.
+
+Thank you for noticing the bugs in our figures.  They were just
+typographical errors (not present in the implementation) and are
+corrected in the above tech report.  We will also reference SCORE in
+our final report.
+
+Review #304
+-----------
+You mention the problem of load-balancing given that there could be
+conditional statements.  StreamIt does allow conditionals, but only
+within the contents of each Filter.  All conditionals affecting the
+structure of the stream graph are resolved at compile-time.  Then, we
+estimate the average computation requirements per invocation of a
+filter's work function, and aim to distribute the filters so that they
+are balanced in the steady state.
+
+The peak performance of RAW is 4 GOPS.  However, each processor is
+single-issue, such that there is no parallelism between integer and
+floating-point operations on the same tile.  Some applications
+(e.g. BeamFormer) are able to keep almost all of the tiles busy, as
+illustrated by Figure 21 of the report referenced above.
+
+Thank you for the SISAL reference; we will include it in the final
+version.
+
+Review #375
+-----------
+Yes, each filter is a single-input, single-output construct.  Also, we
+do allow operations such as table lookups within a filter; they can
+have random-access memory, so long as it is local to the filter.
+
+Review #473 
+-----------
+We plan to place more emphasis on the benefits of having a structured
+language.  For instance, fission and fusion transformations would be
+more complicated in an unstructured realm where local changes have
+global consequences for scheduling and buffer management.  The stream
+structures also simplify scheduling and simulation, and having
+single-input, single-output blocks simplifies code generation.
+
+Regarding who wrote the applications that we used for our experiments:
+we had to write them ourselves, since there are no other sources of
+applications written in StreamIt.  Of course, the algorithms used were
+based on reference implementations from third-party sources.

@@ -1,0 +1,57 @@
+\section{A Band-Pass Filter}
+
+\begin{textpic}{\includegraphics{cookbook.3}}
+\begin{lstlisting}{}
+float->float pipeline BandPassFilter
+    (float low, float high) {
+  add BPFCore(low, high);
+  add Subtracter();
+}
+float->float splitjoin BPFCore
+    (float low, float high) {
+  split duplicate;
+  add LowPassFilter(low);
+  add LowPassFilter(high);
+  join roundrobin;
+}
+float->float filter Subtracter {
+  work pop 2 push 1 {
+    push(peek(0) - peek(1));
+    pop(); pop();
+  }
+}
+\end{lstlisting}
+\end{textpic}
+
+We implement a band-pass filter using two low-pass filters in a
+StreamIt structure called a \emph{split-join}.  This structure
+contains a \emph{splitter}, some number of children that run in
+parallel, and a \emph{joiner}.  It overall has a single input and a
+single output, and its children each have a single input and a single
+output.
+
+This split-join has a duplicating splitter; thus, each incoming item
+is sent to both of the children.  The joiner is a round-robin joiner,
+such that outputs are taken from the first child, then the second, in
+alternating order.  There may be any number of children, in which case
+a round-robin joiner takes inputs from each of them in series.  The
+order of the children is the order in which they are added.
+
+\lstinline|roundrobin| can be used as a splitter, as well as a joiner;
+the meaning is symmetric.  Other syntaxes are valid:
+\lstinline|roundrobin(2)| reads two inputs from each child in turn,
+and \lstinline|roundrobin(1,2,1)| requires exactly three children and
+reads one input from the first, two from the second, and one from the
+third.
+
+A typical use of a split-join is to duplicate the input, perform some
+computation, and then combine the results.  In this case, the desired
+output is the difference between the two filters; the
+\lstinline|Subtracter| filter is placed in a pipeline after the
+split-join, and finds the desired difference.  In general, a child can
+be any StreamIt construct, not just a filter.
+
+The implementation of \lstinline|pop()| in the compiler and runtime
+system does not allow multiple pops to occur in the same statement.
+This is reflected in the implementation of \lstinline|Subtracter|
+here.

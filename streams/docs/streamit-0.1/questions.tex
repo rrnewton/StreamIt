@@ -1,0 +1,28 @@
+\section{Open questions}
+
+\begin{enumerate}
+
+\item What are the semantics of re-initialization of filter blocks?
+What do we do about flushing pipelines, etc?
+
+\item If we're building on top of C, then how do we pass a string
+between filters without using pointers?  What is the exact restriction
+on pointers, then?
+
+\item More generally than above, what's the syntax of stuff that's not
+streaming?  Is it C, Java, something subset or combination thereof?
+
+\item Do we want the message delivery units to be in terms of the {\it
+receiever's} work function?  It seems like that might make more sense
+to the programmer (?)
+
+\item Why don't we change messages to be arbitrary point-to-point
+function calls?  Then the names could be more descriptive than {\tt
+handleMessage}, and multiple parameters could be passed instead of
+having to pack and unpack a user-defined structure.  (Also, just
+dispatching method calls on the type of structure could be
+confusing--for instance, if two different senders want to send the
+same type of data to different targets within a filter block.)
+
+\end{enumerate}
+

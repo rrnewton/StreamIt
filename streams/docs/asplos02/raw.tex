@@ -1,0 +1,122 @@
+\begin{figure}
+\centering
+\psfig{figure=raw-diagram.eps,width=3.5in}
+\caption{A block diagram of the Raw architecture.
+\protect\label{fig:raw-diagram}}
+\end{figure}
+
+\section{The Raw Architecture}
+\label{sec:raw}
+
+The Raw Microprocessor \cite{raw10,raw} addresses the wire delay
+problem \cite{raw13} by providing direct instruction set architecture
+(ISA) analogs to three underlying physical resources of the processor:
+gates, wires and pins. Because ISA primitives exist for these
+resources, a compiler such as StreamIt has direct control over both
+the computation and the communication of values between the functional
+units of the microprocessor, as well as across the pins of the
+processor.
+
+The architecture exposes the gate resources as a scalable 2-D array of
+identical, programmable tiles, that are connected to their immediate
+neighbors by four on-chip networks.  Each network is 32-bit,
+full-duplex, flow-controlled and point-to-point. On the edges of the
+array, these networks are connected via logical channels \cite{raw11}
+to the pins.  Thus, values routed through the networks off of the side
+of the array appear on the pins, and values placed on the pins by
+external devices (for example, wide-word A/Ds, DRAMS, video streams
+and PCI-X buses) will appear on the networks.
+
+Each of the tiles contains a compute processor, some memory and two
+types of routers -- one static, one dynamic -- that control the flow
+of data over the networks as well as into the compute processor (see
+Figure \ref{fig:raw-diagram}). The compute processor interfaces to the
+network through a bypassed, register-mapped interface \cite{raw10}
+that allows instructions to use the networks and the register files
+interchangeably. In other words, a single instruction can read up to
+two values from the networks, compute on them, and send the result out
+onto the networks, with no penalty.  Reads and writes in this fashion
+are blocking and flow-controlled, which allows for the computation to
+remain unperturbed by unpredictable timing variations such as cache
+misses and interrupts.
+
+Each tile's static router has a virtualized instruction memory to
+control the crossbars of the two static networks. Collectively, the
+static routers can reconfigure the communication pattern across these
+networks every cycle.  The instruction set of the static router is
+encoded as a 64-bit VLIW word that includes basic instructions
+(conditional branch with/without decrement, move, and nop) that
+operate on values from the network or from the local 4-element
+register file. Each instruction also has 13 fields that specify the
+connections between each output of the two crossbars and the network
+input FIFOs, which store values that have arrived from neighboring
+tiles or the local compute processor.  The input and output
+possibilities for each crossbar are: North, East, South, West,
+Processor, to the other crossbar, and into the static router. The
+FIFOs are typically four or eight elements large.
+
+To route a word from one tile to another, the compiler inserts a route
+instruction on every intermediate static router \cite{lee98spacetime}.
+Because the routers are pipelined and compile-time scheduled, they can
+deliver a value from the ALU of one tile to the ALU of a neighboring
+tile in 3 cycles, or more generally, 2+N hops for a inter-tile
+distance of N hops.
+
+The results of this paper were generated using btl, a cycle-accurate
+simulator that models arrays of Raw tiles identical to those in the
+.15 micron 16-tile Raw prototype chip.  With a target clock rate of
+250 MHz, the tile employs as compute processor an 8-stage, single
+issue, in-order MIPS-style pipeline that has a 32 KB data cache, 32 KB
+of instruction memory, and 64 KB of static router memory. All
+functional units except the floating point and integer dividers are
+fully pipelined. The mispredict penalty of the static branch predictor
+is three cycles, as is the load latency. The compute processor's
+pipelined single-precision FPU operations have a latency of 4 cycles,
+and the integer multiplier has a latency of 2 cycles.
+
+%The Raw Processor is a general-purpose microprocessor being developed
+%in the Computer Architecture Group at The Massachusetts Institute of
+%Technology.
+
+%The general organization of the Raw Processor is as a chip
+%multiprocessor with multiple fine-grain, first-class, register mapped
+%communication networks \cite{raw}.  The processor contains a 2-D mesh
+%of identical tiles, see Figure \ref{fig:raw-diagram}.  A tile consists
+%of a tile processor, memory, two dynamic network routers, two static
+%switch crossbars and a static switch processor.  Tiles are connected
+%to each of their four nearest neighbors by the two sets of static
+%network interconnect and two sets of dynamic network interconnect.
+%The tile processor uses a 32-bit MIPS-like instruction set with 32K
+%SRAM data memory and 32K SRAM instruction memory.
+
+%The StreamIt Compiler maps the infinite, FIFO channels of the language
+%to Raw's static networks.  Each static network routes single-word
+%quantities of data (with no header) between the switch processor of
+%nearest neighbors.  The tile processor communicates with the switch
+%processor using buffered, blocking sends and receives.  The switch
+%processors communicate using the same mechanism. Each tile must know
+%in advance to whom it is sending data and from whom it is receiving
+%data.  It is the task of the compiler to generate the appropriate
+%route instructions at compiler time.  The static network allows
+%3-cycle nearest neighbor ALU to ALU communication latency.
+
+%The switch processor controls the static networks of the chip.  The
+%switch processor uses a stripped down MIPS-like instruction set
+%containing only moves and branches.  The switch processor has 4
+%registers, an 8096-instruction instruction memory, and no data
+%memory. Each switch instruction has a ROUTE component, executed in
+%parallel, that specifies the transfer of values on the static network
+%between the switch and its neighboring switches.  Each switch
+%instruction can execute multiple moves in parallel using a VLIW-like
+%instruction encoding for the ROUTE component.  The Raw instruction set
+%architecture (ISA) works together with this parallel architecture by
+%exposing both the computational and communication resources up to the
+%software.
+
+%Currently, the StreamIt Compiler generates code that executes on Raw's
+%cycle accurate simulator. The simulator can model Raw configurations
+%of up to 8 tiles per side.  During the summer of 2002, a prototype 4x4
+%tile Raw chip will be available.  With a target clock rate of 225MHz,
+%the chip will support 16 OPS/FLOPS per cycle, 3.6 GLOPS per second,
+%and a bisection bandwidth of 230 Gb/sec.
+

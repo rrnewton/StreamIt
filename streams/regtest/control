@@ -1,0 +1,109 @@
+# $Id: control,v 1.14 2002-06-18 22:26:55 thies Exp $
+test fft-inlined {
+  directory docs/examples/hand/fft
+  source FFT_inlined.java
+  output FFT.out
+}
+
+test fft {
+  directory docs/examples/hand/fft
+  source FFT.java
+  output FFT.out
+}
+
+test fuse-test {
+  directory docs/examples/hand/fuse-test
+  source FuseTest.java
+  output FuseTest.out
+}
+
+test fib {
+  directory docs/examples/hand/fib
+  source Fib.java
+}
+
+test fib2 {
+  directory docs/examples/hand/fib2
+  source Fib2.java
+}
+
+test fir {
+  directory docs/examples/hand/fir
+  make
+  source LinkedFirTest.java
+  output LinkedFirTest.out
+}
+
+test flybit {
+  directory docs/examples/hand/flybit
+  source Flybit.java
+}
+
+test hello6 {
+  directory docs/examples/hand/hello6
+#  output Hello6.out
+  source HelloWorld6.java
+}
+
+test hello-separate {
+  directory docs/examples/hand/hello-separate
+  source HelloSeparate.java
+}
+
+test peek-pipe {
+  directory docs/examples/hand/peek-pipe
+  source PeekPipe.java
+}
+
+test simple-split {
+  directory docs/examples/hand/simple-split
+  source SimpleSplit.java
+}
+
+test unroll {
+  directory docs/examples/hand/unroll
+  source Unroll.java
+}
+
+test updown {
+  directory docs/examples/hand/updown
+  source UpDown.java
+  disabled
+}
+
+test fm {
+  directory docs/examples/hand/fm
+  source *.java
+}
+
+test matrixmult {
+  directory apps/matrixmult
+  source *.java
+  output MatrixMult.out
+}
+
+test file {
+  directory docs/examples/hand/file
+  source FileTest.java
+}
+
+test gsm {
+  directory apps/Gsm/JVocoder
+  make
+  source Gsm.java
+  disabled
+}
+
+test field-prop {
+  directory docs/examples/hand/field-prop
+  source FieldPropTest.java
+  output FieldPropTest.out
+  disabled
+}
+
+test field-prop-2 {
+  directory docs/examples/hand/field-prop
+  source FieldPropTest2.java
+  output FieldPropTest2.out
+  disabled
+}

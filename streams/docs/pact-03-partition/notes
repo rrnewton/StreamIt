@@ -1,0 +1,221 @@
+overview of numbers:
+
+- well, as it's written now, it is just not a fair comparison.  should
+be fusing adjacent filters instead of whole structures; also need help
+on fission.  need two-stage filter fusion to do this in the general
+case, although for bitonic and fir it might work without as much work.
+
+-----
+
+- open question: is there any way to work sync removal into the
+partitioning algorithm?  something like, being called not with
+needsJoiner boolean, but with some conditional on when the
+synchronization could be removed.
+
+- idea: shouldn't really expand the graph in places that don't have
+state.  This is because it's somewhat easier to duplicate something
+stateless during partitioning than to rececognize that something
+stateful can be collapsed.  The only trouble is sync removal.
+Alternatively, maybe you could annotate nodes that were equivalent in
+the graph at first, and then collapse them in the partitioner if you
+want.
+
+- something interesting is that symmetry sharing doesn't really work
+with 2-D divisions.  or at least not with something much more
+sophisticated -- like dynamically inferring which other streams would
+have to be identical when you're recursing
+
+* another thing you could do with partitioner: try to minimize
+communication in some way, e.g. by making the cuts where the
+communication is the lowest.
+
+-----
+
+- vertical fission
+
+  - what would you need to add to model for vertical filter fission to
+    work?  include a breakdown of where each filter could be split?
+    could assume that maximal vertical fission has been done
+    beforehand?  (but this does have disadvantage of making graph grow
+    very large even when you really don't need it to.)
+
+  - maybe could abstract away predicate into canFiss function?
+    Instead of embedding it in the algorithm; make the algorithm more
+    general.  but would this help prune search at all?  you still need
+    to try all the possible divisions, unless you're up to N levels
+    deep in the hieararchy and have exhausted a lot of stuff that way.
+    but even this wouldn't help since you'd have to consider all
+    partitionings of the children, i think.  so maybe assuming
+    vertical fission beforehand is okay
+
+  !!! so, open question i guess as to whether it would look more or
+  less complete to add a hook for some sort of vertical fission?  I
+  think the best thing to do is just to claim that maximal fission is
+  performed beforehand.
+
+\section{Problem}
+
+We solve a certain problem exactly.  This problem is as follows:
+
+- given structured stream graph S.  
+
+  - pipeline P \in S = {S_0 ... S_{n-1}}
+
+  - splitjoin SJ \in S = {split, S_0 ... S_{n-1}, join}
+
+  - feedbackloop FL \in S = {split, S_body, S_loop, join}
+
+  - filter F \in S = {work, stateless, peeks}
+
+    where:
+
+    - work is amount of work per steady-state exec. of stream graph
+    - stateless is boolean, true if there is no persistent state 
+    - peeks is boolean, true if it peeks more than it pops
+    - 2stage is boolean, true if it has two startup stages
+
+\section{Fission}
+
+1. only have to deal with filter fission, not stream-structure
+fission.  why? {
+  
+  - pipeline {
+  
+    - if there's peeking in middle of pipe, then there is intrinsic
+    state in the stream (e.g., as would be introduced by fusion)
+    and the stream cannot be fissed.
+    
+    - if there's no peeking in middle, then each filter could be
+    fissed with a round-robin splitter at each stage.  this could
+    subsequently be eliminated by sync-removal to be equivalent to
+    pipeline fission.
+    
+    !!! this is only the case if the fission above is done with the
+    fission below to identify what the weights on round-robin
+    should be.  e.g. consider {
+      
+      o=1
+      u=1
+      
+      o=2
+      
+    } then with naive fission (each filter x2) there is interleaving
+    in-between; we need to change the multiplicity so that sync
+    removal can eliminate the joiner without introducing duplicates.
+
+    Possible implementation options { 
+
+      - sync removal knows when all the pieces of a parallel stream
+      are equivalent (maybe by annotating the splitjoin) and can
+      adjust the weights accordingly.
+
+      - when the fisison is invoked on the children, it looks at the
+      pipeline as a whole and does it as a group.
+
+    }
+  }
+
+  - splitjoin {
+
+  }
+    
+------
+
+2. if peek==pop (which implies initPeek==initPop) but initPop>0, then
+this implies that we have some special processing the first time
+through.
+
+--> actually no, just strip the initwork function from the duplicate
+copies.  we can look inside things.  
+
+but we can't deal with peeking in pipelines... so there will never be
+initwork unless it's a single filter.  so we're okay.
+
+2. if peek > pop (we require that initPeek - initPop == Peek - Pop)
+
+	- the splitter is a duplicate
+
+we're screwed if initPeek!=initPop?  no i guess not, since it's
+round-robin or duplicate at the top
+
+---
+
+so back to 2:
+
+case 1: initPop > 0.  Implies it's a single filter (since no peeking
+  in pipelines).  Then have duplicate splitter.
+
+	- filters 2...N have different init stage that just decimates
+		the initial inputs.  All filters decimate so that they
+		only get items intended for them.  Joiner is something
+		complicated, and requires cleanup node afterwards.
+
+	could do this same thing with the node above the splitter
+
+case 2: Peek > 0.  Then have duplicate splitter.  All top position of
+streams decimate so they only get what's intended for them.  Joiner is
+round robin on push rate.
+
+case 3: peek==pop.  Then roundrobin splitter for amount consumed by
+stream, with roundrobin joiner matching.
+
+------------------------
+
+here's the old, one-dimensional cost function:
+
+// return minimal cost for allocating <n> partitions to children
+// <child1>...<child2> of stream <s>
+procedure getCost(stream s, int child1, int child2, int n)
+------------------------------------------------------------
+// if value is memoized, return it
+if (A_s[child1][child2][n] != -1)
+  return A_s[child1][child2][n]
+endif
+
+// if down to one child, descend into it
+if (child1==child2)
+  int cost = getCost(s.get(child1), 0, s.getCost(child1).size()-1, n)
+  A_s [child1][child2][n] = cost
+  return cost;
+endif
+
+// if n is 1, just sum the work of components
+if (n==1)
+  int sum = get(child1, child1, n) + get(child1+1, child2, n);
+  A[child1][child2][n] = sum;
+  return sum;
+endif
+
+// otherwise, find lowest-cost place at which to make a partition
+// at this level 
+int min = infinity
+for i = child1 to child2 - 1
+  for j = 0 to n-1
+    int cost = max(getCost(child1, i, j), getCost(i+1, child2, n-j))
+    if (cost < min)
+      min = cost
+    endif
+  endfor
+endfor
+
+A[child1][child2][n] = min;
+return min
+
+1/19/03
+-------
+
+directions from Andrew:
+
+  First of all, in the actual implementation, a "Linear Node" is
+  called a LinearFilterRepresentation.
+
+  Second of all, all of these files are in kopi/kjc/sir/linear
+
+  After you run the LinearAnalyzer (see Flattener), you get a mapping from 
+  SIRStream's to LinearFilterRepresentation.
+
+  To get the cost of that LinearFilterRepresentation, you run its
+  getCost() method, which returns a LinearCost object, which simply
+  contains the number of adds and the number of multiplies that are
+  necessary to directly implement the vector-matrix multiplication.
+

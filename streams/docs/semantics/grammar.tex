@@ -1,0 +1,120 @@
+\section{Rough Grammar}
+
+\subsection{Keywords}
+
+The following are predefined keywords (in addition to standard
+C/C++ keywords):
+
+\begin{verbatim}
+Filter, Source, Sink, input, output,
+MessagePipe, Pipe, SplitJoin, Split, Join,
+RoundRobin, WeightedRoundRobin,
+Duplicate, StreamSelect,
+StreamSelectSwitch, FeedbackFilter,
+FeedbackLoop, FeedbackPath
+\end{verbatim}
+
+\subsection{Special Functions and Types}
+
+The following are functions and structures which have 
+specific strict definitions/rules
+and cannot be modified.
+
+\begin{verbatim}
+Work, Init, BindReceiver, SendMessage, Msg
+\end{verbatim}
+
+\subsection{Statement Definition}
+
+The following are several types of statements used for 
+defining the StreaMIT grammar:
+
+\begin{verbatim}
+CStmt ::= 
+  {Any C style statement 
+   that does not use any 
+   StreaMIT constructs/structures/keywords}
+
+CStmts ::= <empty> | <CStmt> <CStmts>
+
+CStyleDefns ::=
+  <C definitions including functions
+   for computation or
+   serving as message handlers>
+
+CStmtNWrite ::=
+  <CStmt> |
+  <StreaMIT output write statement> |
+  <StreaMIT msg send statement> |
+  <StreaMIT msg receive bind calls>
+
+CStmtsNWrite ::=
+  <empty> |
+  <CStmtNWrite> <CStmtsNWrite>
+
+CStmtNIO ::=
+  <CStmt> |
+  <StreaMIT output write statement> |
+  <StreaMIT input read statement> |
+  <StreaMIT msg send statement>
+
+CStmtsNIO ::=
+  <empty> |
+  <CStmtNIO> <CStmtsNIO>
+  
+\end{verbatim}
+
+\subsection{Filter Definition}
+
+\begin{verbatim}
+InputDef ::=
+  input <TypeName> <InputName>;
+
+OutputDef ::=
+  output <TypeName> <OutputName>;
+
+FilterDef ::= 
+   class <FilterClassName> is Filter
+   {
+     <InputDef>
+     <OuputDef>
+
+     <CStyleDefns>
+
+     Init (<CStyleArgs>)
+     {
+     	<CStmtsNWrite>
+     }
+
+     Work ()
+     {
+       <CStmtsNIO>
+     }
+   };
+\end{verbatim}
+
+\subsection{Script Language}
+
+\begin{verbatim}
+FilterInstanceName ::=
+  <empty> |
+  <string>
+
+FilterStatement ::=
+  <FilterClassName> <FilterInstanceName> 
+  (<CStyleArgs>);
+
+FilterStatements ::=
+  <empty> |
+  <FilterStatement> <FilterStatements>
+
+PipeStmt ::=
+  Pipe
+  {
+    <FilterStatements>
+  }
+\end{verbatim}
+
+
+
+

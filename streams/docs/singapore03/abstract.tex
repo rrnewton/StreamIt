@@ -1,0 +1,37 @@
+With the increasing miniaturization of transistors, wire delays are
+becoming a dominant factor in microprocessor performance.  To address
+this issue, a number of emerging architectures contain replicated
+processing units with software-exposed communication between one unit
+and another (e.g., Raw, SmartMemories, TRIPS).  
+However, for their use to be widespread, it will be necesary to
+develop a common machine language to allow programmers to express an
+algorithm in a way that can be efficiently mapped across 
+these architectures. 
+  
+We propose a new common machine language for grid-based
+software-exposed architectures: StreamIt. StreamIt is a
+high-level programming language with explicit support for streaming
+computation.  Unlike sequential programs with
+obscured dependence information and complex communication patterns, a
+stream program is naturally written as a set of concurrent filters
+with regular steady-state communication.  The language
+imposes a hierarchical structure on the stream graph that enables
+novel representations and optimizations within the StreamIt compiler.
+
+We have implemented a fully functional compiler that parallelizes
+StreamIt applications for Raw, including several load-balancing
+transformations. Though StreamIt exposes the parallelism and
+communication patterns of stream programs, analysis is needed to
+adapt a stream program to a software-exposed processor.  We describe a
+partitioning algorithm that employs fission and fusion transformations
+to adjust the granularity of a stream graph, a layout algorithm that
+maps a stream graph to a given network topology, and a scheduling
+strategy that generates a fine-grained static communication pattern
+for each computational element.  Using the cycle-accurate Raw
+simulator, we demonstrate that the StreamIt compiler can automatically
+map a high-level stream abstraction to Raw.
+We consider this work to be a first step towards a portable
+programming model for communication-exposed architectures.
+
+
+

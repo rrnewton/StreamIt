@@ -1,0 +1,214 @@
+Return-Path: <curtim@di.unipi.it>
+Received: from pacific-carrier-annex.mit.edu by po10.mit.edu (8.9.2/4.7) id MAA12472; Fri, 13 Dec 2002 12:45:50 -0500 (EST)
+Received: from mailserver.di.unipi.it (apis.di.unipi.it [131.114.4.6])
+	by pacific-carrier-annex.mit.edu (8.9.2/8.9.2) with ESMTP id MAA07131
+	for <thies@mit.edu>; Fri, 13 Dec 2002 12:45:50 -0500 (EST)
+Received: from osiris (ms2 [131.114.4.12])
+	by mailserver.di.unipi.it (8.11.6/8.11.6) with ESMTP id gBDHjnp11321;
+	Fri, 13 Dec 2002 18:45:49 +0100
+Message-Id: <200212131745.gBDHjnp11321@mailserver.di.unipi.it>
+From: ESOPX2003 - CyberChair <curtim@di.unipi.it>
+To: thies@mit.edu
+Cc: degano@di.unipi.it, curtim@di.unipi.it
+Subject: ESOPX2003 Notification
+Date: Fri, 13 Dec 2002 18:45:49 CEST
+Reply-To: curtim@di.unipi.it
+X-Mailer: Python smtplib
+
+Dear William Thies,
+
+
+I regret to inform you that the Programme Committee has been unable 
+to select your paper
+
+"Affine Dependence Analysis for Cyclo-Static Dataflow Graphs"
+
+for presentation at the conference ESOP 2003.
+Actually, the committee selected only 25 papers out of 99 submissions 
+and we could not accept more, as ETAPS scheduling constraints impose 
+us a strict bound. So we have even been forced to reject some papers 
+with high rates.
+The competition was very high, and the selection process was very difficult.
+Each paper was reviewed by at least three program committee members 
+and was discussed at the Program committee meeting.
+
+I would like to thank you very much for your submission to ESOP and 
+hope to meet you in Warsaw,
+
+Pierpaolo Degano
+ESOP 2003 PC Chair
+*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=
+
+First reviewer's review:
+
+          >>> Summary of the paper <<<
+
+Dataflow graph is a formalism particularly suited to model DSP applications
+at a high-level of abstraction. A system is described as a set of processes
+(nodes) that manipulate data and communicate through channels (edges). The
+fact that the processing function at each node is expressed in a distinct
+language prevents optimizations to span accross different nodes. However,
+it has been shown that the dependences of a class of scientific programs
+can be exactly represented by a system of affine recurrence equations.
+Building on this result, the authors propose such systems as a unifying
+framework to express both inter and intra nodes data dependences in order
+to perform classical optimizations. Hence, the contribution of the paper is
+to present a translation from dataflow graphs to systems of affine
+reccurence equations. At last, the paper lists some of the optimizations
+that this translation makes possible.
+
+
+
+          >>> Comments <<<
+
+Try to avoid using so many acronyms, this is extremely painful for the
+non-expert reader. (In fact, DSP and PCP are two acronyms in the paper that
+are not defined).
+
+In the abstract, the term "analysis" seems improper, compilation or
+translation would be more appropriate.
+
+In the paper, the term "steady-state" is sometimes found spelled as "steady
+state". By the way the expression "steady-state execution" is never really
+explained. It is not so obvious to guess its meaning.
+
+In subsection 2.2, the precise semantics of SARE is not given. I guess it
+is the set of solutions of the equations. For instance, what is the meaning
+of the equations: \forall i \in Z: a[i] = 1 - a[i] and \forall i \in Z:
+a[i] = a[i] ?
+
+Is it really necessary to talk about the notion of SURE ? There is no real
+link with the scope of the paper.
+
+In section 3, the notation for the last node n_{m_n} is unfortunate because
+of the two different "n". Idem for c_{m_c}.
+
+In subsection 3.1, line 1, introduce a space after the dot: "of a CSDG. An
+exe-". The definition of subsection 3.1 is very informal. It would be nice
+(and pretty straightforward) to formalize it. This would then allow you to
+link the semantics of a dataflow graph with the semantics of the SARE to
+which it is compiled. This link is the notion of correction of your
+translation.
+
+On page 6, you have an overfull box.
+
+In section 5, second paragraph, line 3, there is a typo "concerend".
+
+In subsection 5.1, I don't understand the sentence: "It is straightforward
+to use a set of balance equations to solve for S(n) given the declared
+rates of filters in the graph". (Maybe you mean for "finding" S(n) ?) What
+are "balance equations" anyway ?
+
+You introduce section 5.2, with "We now generate SARE for the Synchronous
+Dataflow Graph". Don't you mean cyclo-static dataflow graph ? Also, the
+acronym PCP has not been introduced before.
+
+On page 8, what does the remark "(we keep track [...] must be assigned only
+once.)" really means ? This is important since it conveys an intuition
+about the translation.
+
+In the whole paper, you should be more precise and try to focus on the
+original contribution of the paper.
+
+
+
+          >>> Points in favour or against <<<
+
+Points against: The paper lacks any kind of theorem (not to mention proofs)
+about the correctness of the translation. If the translation is not
+correct, the subsequent optimizations won't either. This is very worrying,
+especially in the context of embedded systems, where safety may be crucial.
+In order to state this theorem, the authors need to be more precise. They
+should formally define the semantics of both cyclo-static dataflow graphs
+and systems of recurrence equations. They don't.
+
+The authors make hazardous claims about the performance of the
+optimizations. These are not backed up by any implementation experiments.
+
+The title "Affine Dependence Analysis for Cyclo-static Dataflow Graphs" is
+misleading since the point of the paper is to present a translation, not a
+static analysis.
+
+All in all, although initiated by an interesting idea, the paper is ruined
+by insufficient theoritical results and the absence of any practical
+experiments. It is hence difficult to objectively evaluate the advantage of
+the approach. To me, the contribution of the paper seems too little for the
+scope of this conference.
+
+
+
+ =*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=
+
+Second reviewer's review:
+
+          >>> Summary of the paper <<<
+
+The paper introduces a transformation from cyclo-static dataflow programs
+to systems of affine recurrence relations. This is done it two stages in
+that the translation first is specified for synchronous data flow graphs
+and then generalised.
+
+
+
+          >>> Points in favour or against <<<
+
+The contribution of the paper seems to be the transformation mentioned in
+the summary above and carried out in sections 5 and 6 of the paper. The
+first four sections contain motivation, describe related work and introduce
+notation whereas the last two sections suggest potential (and very
+interesting) applications of the transformation.
+
+This referee feels that the research contribution of the paper is too
+small: The paper does not report on any formal results about the
+transformation as for example the relationship between the execution model
+of the dataflow programs and the solution to the recurrence equations.
+Neither does the paper report on any practical experiments; as for example
+whether the speculated applications really give the pay off envisioned.
+
+
+
+ =*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=
+
+Third reviewer's review:
+
+          >>> Summary of the paper <<<
+
+ The paper gives a translation of a Cyclo-Static Dataflow Graph into a
+system of Affine Recurrence Equations. Here is some background: Traditional
+Synchronous Dataflow Graphs are useful for diagramming scheduling and
+buffer management to/from nodes. But the nodes are treated as black boxes,
+making it difficult to perform program optimizations that simultaneously
+exploit graph structure and internal node structure.
+
+To improve the situation, the paper proposes Cyclo-Static Dataflow Graphs,
+which equip each node of the dataflow graph with a set of phases that are
+cycled through repeatedly. Then, a translation of a Cyclo-Static Dataflow
+Graph into a set of Affine Recurrence Equations is presented. The resulting
+equations expose the system's structure so that optimizations can be
+undertaken.
+
+The paper's background and motivation sections are very well written, but I
+was a bit disappointed with the technical developments, for these reasons:
+
+(1) The translation algorithm is stated in complete detail, but it is not
+applied to a single example. This makes it difficult for the reader to gain
+intuition. Also, there is no statement of correctness, soundness, or safety
+of the translation with regards to a semantic model.
+
+(2) The abstract properly emphasizes the applications that might be
+undertaken with the equation systems, but Section 7, the Application
+Section, proceeds through a list of potential applications without
+providing any concrete examples. The overall feeling that the reader
+acquires is that none of the applications have been implemented at this
+point and the paper documents partially completed work.
+
+The paper would be much more convincing if either (1) or (2) were developed
+to some significant degree.
+
+
+
+
+
+ =*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=
+
+

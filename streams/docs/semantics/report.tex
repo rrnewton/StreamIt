@@ -1,0 +1,656 @@
+\documentclass[draft]{article}
+\usepackage{psfig, wide, verbatim}
+\title{StreaMIT Intermediate Representation \\ Version 0.0.8}
+\author{Speed Typing Inc.}
+
+\begin{document}
+\maketitle
+
+\section{Basic Ideas}
+
+The stream representation is composed of a number of basic building blocks.
+All of these blocks are put together to form a graph, which can be drawn
+on a 2D surface with no intersections.  The graph is almost a DAG, except
+we allow feedback loops in arrangement of filters.
+
+The layout of the filters is defined using a scripting language.  The scripting
+language allows us to collect filters into structures such as Pipe,
+StreamSelect, FeedbackLoop, SplitJoin and FilterBlock.  FilterBlock and 
+SplitJoin are two constructs which work together to allow us to dynamically
+change the flow of the stream.
+
+Any Filter or FilterBlock can have its reference taken.  This
+reference can be passed around to Filters and FilterBlocks.  Filters
+can in turn send messages to the reference and/or change its dynamic
+parameters via re-initialization.  Messages get delivered from the top
+to the bottom (a filter will receive its message once its predecessors
+have received this message).
+
+\section{Script Type Modifier and Control Constructs}
+
+In order to allow the programmer to express the difference between
+script variables and dynamic variables, we introduce a new type modifier
+and control constructs.  The purpose of script types is to allow the compiler
+to figure out the exact flow of the streams.  Values of script variables
+can be determined at compile time.
+
+\subsection{Script Types}
+
+A script type is also called a script type (to differentiate from C
+static variables).  A script variable can only be assigned a value
+that is analyzable at compile time (i.e., constant literals, other
+script variables, or pure functions of these.)  Also, a statement
+assigning a value to a script variable can only appear inside script
+control constructs (see below.)
+
+\begin{verbatim}
+script int foo;
+foo = 42;
+\end{verbatim}
+
+\subsection{Script Control Constructs}
+
+A script control construct is a control construct that operates only
+on script and constant (textually, as in '3') values.  Otherwise these
+control constructs behave exactly as regular C constrcuts.  Their
+names are same as their C equivalents, except we add an 's' in front
+of all script constructs ('s' as in script).
+
+\begin{verbatim}
+script int foo;
+foo = 42;
+int bar;
+bar = 13;
+sif (foo == 3) // legal
+{ }
+sif (bar == 17) // illegal
+{ }
+\end{verbatim}
+
+Script control constructs are only allowed at the top level of a
+script function or inside other script constructs:
+
+\begin{verbatim}
+sif (foo > 3)
+  sif (foo < 10) // legal
+    { }
+
+if (foo < 3)
+  sif (foo < 10) // illegal
+    { }
+\end{verbatim}
+
+Regular C constructs are allowed to use script variables, as if they
+were just regular C variables.  Functions can return a script value if
+all their parameters are script variables and they make no reference
+to global dynamic variables.
+
+\section{Filters}
+A new filter type is defined as follows:
+
+\begin{verbatim}
+Filter FooType<script params> (dynamic params)
+{
+// {data member declarations>
+
+// {initialization statements}
+
+	Work() { ... }
+
+// {other functions and message handlers
+};
+\end{verbatim}
+
+\subsection{Parameters}
+
+Upon instantiation, a filter can receive some parameters.  There are
+two types of parameters: script and dynamic.  All assignments to
+script variables must be contained within script control flow.  The
+difference between them is that script parameters are guaranteed to
+remain unchanged across multiple initializations of the filter, while
+the dynamic variables are free to change between initializations.
+
+\subsection{Input/Output}
+
+Each filter is required to have a single input and single output:
+\begin{verbatim}
+input inputType fooInput;
+output outputType fooOutput;
+\end{verbatim}
+
+\subsection{Work}
+
+Most of the work done by a filter is described in a Work function:
+
+\begin{verbatim}
+Work ()
+{
+  fooOutput [0] = fooInput [0] + fooInput [1];
+}
+\end{verbatim}
+
+Work accepts no parameters.  It is allowed to send messages.  It is
+also allowed to re-initialize other blocks, using stored references to
+FilterBlocks.  Input/output is accessed as an array.  For input,
+element 0 is first new element of input, element 1 is second new
+element of input, etc.  Element -1 is the first seen element of input.
+The input tape is advanced after the invocation of Work so that last
+input that was dynamically referenced (max over k of input[k]
+appearing in dynamically executed instructions) appears as input[-1]
+on the next invocation.
+
+Everything passed through the input and output channels is passed by
+value.  Pointers to global data structures are prohibited.
+
+\subsection{Initialization}
+
+When a filter is being initialized or reinitialized, the body of the
+Filter is executed again (including all variable declarations, default
+values, etc).
+
+Because of the difference between the script and dynamic parameters,
+we may want to preserve some of the properties of the script variables.
+We have added a 'script' modifier to indicate that a given variable's
+value is purely a function of script variables.  We also add new control
+flow constructs (identical to C's constructs in function) for the same purpose.
+These are explained later.
+
+All distinctions between script and dynamic parameters and variables
+are done in order to help the programmer to be expressive in choice of
+constructs.
+
+\begin{verbatim}
+Filter FooType<script FilterRef p> (float a)
+{
+  script FilterRef parent = p;
+  float amplification = a;
+};
+\end{verbatim}
+
+Initialization is not allowed to send messages or initialize other
+blocks.  However, the initializer may want to do some
+input/output--for instance, to initialize a feedback loop, or to
+advance the input tape so that the Work function can reference
+negative values.
+
+\subsection{Re-Initialization}
+
+A Filter or FilterBlock can be re-initialized with the syntax
+{\tt ref.reset(param1, param2)} where param1 and param2 are the dynamic
+parameters and ref is a FilterRef.  Static parameters do not need to
+be passed to the re-initialization since they can't change from one
+instance to another.
+
+\subsection{Message}
+
+Each filter is allowed to receive messages:
+
+\begin{verbatim}
+ReceiveMessage (MyMsgType fooMsg)
+{
+// .. handle msg here
+}
+\end{verbatim}
+
+MyMsgType is a custom type defined by the user (obviously it does not
+need to be called MyMsgType).  We'll assume no inheritance in message
+types to simplify things at first; rather, message types are just
+typedef'd structures that don't contain pointers.
+
+A message is sent by calling a function on a FilterRef.  Every Filter
+lying underneath the FilterBlock and containing a function with an
+appropriate name will be called.  The function called must accept at
+most one parameter, and the parameters received and passed must match
+in type.
+
+The function being called is allowed to send other messages and/or reinitialize
+FilterBlocks.  It is not allowed to read stream input/output.
+
+\section{Scripting Language}
+
+The scripting language is designed to allow for easy arrangement of
+filter structures.  The scripting language is procedural; when a
+filter variable is defined, it is considered inserted into the filter
+graph.  Outside of our scripting language, we allow any kind of C
+syntax that does not contain pointers.
+
+There are two means of abstraction within the scripting language:
+Filters define different types of leaf nodes, and FilterBlocks define
+collections of filters.  However, both of these constructs can be
+inlined into the toplevel procedure to obtain a single, continuous
+representation of a streaming program.  The outer-most FilterBlock is
+named ``main'' and accepts no dynamic or static parameters.
+
+Filters and FilterBlocks can be composed into a structure using the
+Pipe, SplitJoin, StreamSelect, and FeedbackLoop constructs.  Filters
+were described above; the following sections describe these other
+constructs.
+
+\subsection{FilterRefs}
+
+A reference to a Filter or FilterBlock is of type FilterRef.
+FilterRef behaves similarly to a C++ reference, except that it can be
+assigned a value after it's been declared (though each FilterRef must
+be assigned exactly one value).  The FilterRef is the target of all
+messages and re-initialization commands.
+
+\subsection{FilterBlock}
+
+Just like Filters, FilterBlocks accept two types of parameters, script
+and dynamic.  A FilterBlock can also have local variables and
+initialization code; however, it does not have explicit input or
+output channels, and it does not contain any functions.  Rather, it
+just initializes a sub-structure of Filters and FilterBlocks.  All of
+the rules for filter init bodies apply to the body of a FilterBlock.
+
+Instantiating a FilterBlock is equivalent to copying it's body.  Thus
+the filter structure represented by the FilterBlock will be placed at
+the point of the instantiation.
+
+Just like Filters, FilterBlocks return a reference to the enclosed
+structure.  This reference can be bound to a variable of type
+FilterRef, and then can be the target of messages and
+re-initializations.  When a FilterBlock receives a message, it passes
+it to all its components in some top-down order.
+
+A FilterBlock puts up a scope wall between it and the function it
+resides in.  All static and dynamic variables referenced within the
+body of the FilterBlock must be passed in as parameters.
+
+\begin{verbatim}
+FilterBlock main() {
+  FMRadio (99.9, RockNRoll, 1.5);
+}
+\end{verbatim}
+
+The above function calls the FMRadio function with some parameters.
+Here is a possible body of FMRadio:
+
+\begin{verbatim}
+FilterBlock FMRadio (float fmFreq,
+                     MusicType mType,
+                     float amp)
+{
+  FilterRef ampRef;
+  FMRadioSource (fmFreq);
+  Equalizer<ampRef, RadioSettings> (mType);
+  Amplifier<ampRef> (loudness);
+  Speaker ();
+}
+\end{verbatim}
+
+Here the Equalizer filter accepts not only the music type to be played
+(which is passed as a dynamic parameter, as it can potentially be
+changed when the user flips a switch on the real radio), but also a
+script parameter, which tells it that it will be processing a radio
+signal.  This can describe the frequency of the signal passing
+through, relative amplitude of the signal and other signal properties.
+
+\subsection{Pipe}
+
+The above FMRadio function aggregates four filters into one.  While
+this is useful, we define another construct to do essentially the same
+thing.  This new construct will allow us to aggregate an arbitrary
+serial connection of filters/blocks.  This construct will be very
+useful when dealing with SplitJoins, and other, more complex
+constructs:
+
+\begin{verbatim}
+FilterBlock BandPassFilter<script float amp, 
+                           script float fLow, 
+                           script float fHigh> ()
+{
+  Pipe
+  {
+    LowPass lowPassFilter (fLow);
+    HighPass highPassFilter (fHigh);
+  } 
+  Amplifier amplifier (amp);
+}
+\end{verbatim}
+
+Pipe allows us only to connect single input/single output blocks.
+
+\subsection{SplitJoin}
+
+In order to allow for splitting of single streams into multiples,
+we define a SplitJoin construct:
+
+\begin{verbatim}
+FilterBlock Equalizer<script FileterRef filterRef,
+                      script SourceType sType>
+                    (MusicType mType)
+{
+  SplitJoin
+  {
+    RoundRobin;
+    AudioEqualizer<filterRef, sType> leftAudio (mType);
+    AudioEqualizer<filterRef, sType> rightAudio (mType);
+    RoundRobin;
+  }
+}
+\end{verbatim}
+
+The first entry of a SplitJoin must be the type of splitting performed
+by this SplitJoin.  There types allowed are:  RoundRobin, WeightedRoundRobin
+and Duplicate.  The last field is the method for joining the streams.  
+Currently only RoundRobin and WeightedRoundRobin are allowed.
+
+WeightedRoundRobin requires extra information which indicates how many
+pieces of data should go to each subsequent filter.  The syntax for it
+is as follows:
+
+\begin{verbatim}
+SplitJoin
+{
+  WeightedRoundRobin(1, 2, 1);
+  Filter1 foo;
+  Filter2 bar;
+  Filter3 foobar;
+  WeightedRoundRobin(1, 2, 1);
+}
+\end{verbatim}
+
+The number of weights listed in the WeighterRoundRobin definition must
+match the number of filters providied in the SplitJoin.  If any of the
+filters within the SplitJoin are sources or sinks, then the
+WeightedRoundRobin must ouput zero to that channel.
+
+\subsection{Inlined Filters}
+
+In order to allow for easy declaration of filters inside of function
+bodies, we provide a simple method for inlining these filters:
+
+\begin{verbatim}
+FilterBlock func (float a)
+{
+  Filter1 foo;
+  Filter<script int delay = 3> (float amp = a)
+  {
+    input float in;
+    output float out;
+    float data [delay];
+    int pos;
+    sfor (pos = 0; pos < delay; pos++)
+    {
+      data [pos] = 0;
+    }
+    pos = 0;
+
+    Work ()
+    {
+       out[0] = amp * data[pos];
+       data[pos] = in[0];
+       pos = (pos + 1) % delay;
+    }
+  };
+  Filter3 bar;
+}
+\end{verbatim}
+
+The above filter has been inlined into the function body.  It delays
+the output by 3 data packets and amplifies it by amp.
+
+\subsection{StreamSelect}
+
+StreamSelect allows us to dynamically change the configuration
+of the stream graph.  
+
+\begin{verbatim}
+enum MusicType {
+  Vocal,
+  RockNRoll,
+  HeavyMetal
+}
+
+AudioEqualizer<script FilterRef blockRef,
+               script SourceType sType>
+          (MusicType mType)
+{
+  blockRef = FilterBlock<script SourceType sType>
+          (Musictype mType)
+  {
+    StreamSelect (mType)
+    {
+      case Vocal:
+        // Vocal music sounds good without 
+        // any modifications,
+        // so don't do anything
+      case RockNRoll:
+        // want to amplify bass and treble
+        LowPassFilter (0.5); // amplify
+        HighPassFilter (0.5);
+      case HeavyMetal:
+        // only amplify the base
+        LowPassFilter (0.5);
+    }
+  }
+}
+\end{verbatim}
+
+Here is a filter that might send a message to the FilterBlock in 
+the AudioEqualizer:
+
+\begin{verbatim}
+Filter VoiceControl<script FilterRef voiceBlock>
+{
+  script FilterRef vBlock  = voiceBlock;
+
+  // on some message, switch to Vocal music:
+  VoiceMsgHandler (Msg msg)
+  {
+    // process the msg
+    ..
+    // and switch
+    voiceBlock.reset (Vocal);
+  }
+}
+\end{verbatim}
+
+\subsection{Sources/Sinks}
+
+Sources and Sinks are very similar to Filters, except they either have
+no inputs or outputs.  They are defined just like Filters (without
+input/output), and used just like Filters.  A FilterBlock can
+begin/end with a Source/Sink.  This will cause it to have no
+inputs/outputs.
+
+The first block in the main FilterBlock should be a source, and the
+last one should be a sink.
+
+\begin{verbatim}
+Filter Demultiplexer
+{
+  input StereoSignal rrAudio;
+  output StereoSignal audioOut;
+  Work ()
+  {
+    audioOut [0] = rrAudio [0] + rrAudio [1];
+  }
+};
+
+Source Microphone
+{
+  output StereoSignal audio;
+  Work ()
+  {
+    audio [0] = GetValueFromMic ();
+  }
+};
+
+Source TapePlayer 
+{ ... }
+
+Filter<script int left> SeparateStereo
+{
+  input StereoSignal sAudio;
+  output float mAudio;
+  Work ()
+  {
+    if (left)
+    {
+      mAudio [0] = sAudio [0].left;
+    } else {
+      mAudio [0] = sAudio [0].right;
+    }
+  }
+};
+
+Sink Speaker
+{ ... }
+
+Filter Identity {
+
+	// just does 1-to-1 transform of input and output
+}
+
+FilterBlock Karaoke ()
+{
+  SplitJoin
+  {
+    Duplicate		// ends up just routing all input to Identity
+    Identity ();	// 	since the others are sources
+    Microphone ();
+    TapePlayer ();
+    RoundRobin
+  }
+
+  Demultiplexer ();
+  // split into 2 streams using Duplicate
+  // splitting;
+  SplitJoin
+  {
+    Duplicate
+    Identity()
+    Pipe
+    {
+      SeparateStereo<0> (); // get left audio
+      Speaker left ();
+    }
+    Pipe
+    {
+      SeparateStereo<1> (); // get right audio
+      Speaker right ();
+    }
+    RoundRobin		// only reads from identity since others are sinks
+  }
+}
+\end{verbatim}
+
+\subsection{FeedbackLoop}
+
+Some stream applications require feedback loops for data processing.
+Here we define a type that allows us to create feedback loops
+in our stream graph.
+
+A FeedbackLoop construct is very similar to Pipe.  It connects several
+blocks in a serial connection, but it also allows to connect the
+output of the pipe to the first block of the FeedbackLoop through a
+FeedbackPath (which must be the last statement of the FeedbackLoop).
+Since the first filter in a FeedbackLoop accepts two inputs, this
+filter must be of FeedbackFilter type.
+
+\begin{verbatim}
+FeedbackFilter NegFeedbackAmplifierFilter
+        (float amp, float gain)
+{
+  input float audioIn;
+  feedbackinput float feedback;
+  output float audioOut;
+  Work ()
+  {
+    // this basically implements a negative feedback
+    // loop with an amp of set gain and a set target
+    // amplification.
+    float in = audioIn [0];
+    float out = feedback [0];
+    float negFeed = in + 
+      (in + out) / (amp + 1);
+    float result = - negFeed * gain;
+    audioOut [0] = result;
+  }
+};
+
+Filter NegFeedbackBuffer<int delay>
+{
+  input float in;
+  output float out;
+  Work ()
+  {
+    in [0] = out [0];
+  }
+
+  // insert data into the buffer so the
+  // feedback can work
+  for (static int i = 0; i < delay; i++)
+  {
+    out [i] = 0;
+  }
+};
+
+FilterBlock NegFeedbackAmplifier ()
+{
+  FeedbackLoop
+  {
+    NegFeedbackAmplifierFilter (10, 1000);
+    FeedbackPath NegFeedbackFilter<2>;
+  }
+}
+\end{verbatim}
+
+\begin{comment}
+\include{grammar}
+\end{comment}
+
+\begin{comment}
+
+\begin{figure}[t]
+\centerline{\psfig{figure=block.ps}}
+\vspace{-24pt}
+\caption{\protect\small The block construct.}
+\end{figure}
+
+\section{old stuff}
+
+\begin{lgrind}
+\input{code.tex}
+\end{lgrind}
+
+\end{comment}
+
+\subsection{Naming}
+
+The above discussion has ignored our ability to name Filters and
+FilterBlocks with descriptive names orthogonal to their variable
+names.  The ability to do this could be useful for output to the user,
+as well as debugging and runtime inspection of the stream's operation.
+
+A name can be assigned to an instance of a Filter (and likewise,
+FilterBlock) by putting a string after its parameters but before its
+code, for instance:
+
+\begin{verbatim}
+Filter MyFilter<1,3>(4,5) ``toplevel filter'';
+\end{verbatim}
+
+In an inlined version, the naming could look as follows:
+
+\begin{verbatim}
+Filter MyFilter<1,3>(4,5) ``toplevel filter'' { ... }
+\end{verbatim}
+
+If the user doesn't give a name to an instance of a Filter or
+FilterBlock, then it is automatically assigned a name corresponding to
+its type (MyFilter above) and its position in the parent block.  Thus,
+the first anonymous occurence would be named MyFilter1, the next
+MyFilter2, etc.
+
+The name can be extracted from a FilterRef by doing
+{\tt ref.getName()}, which returns a string describing the full
+hierarchical name of the block.  That is, it gives the name of each
+FilterBlock containing the given reference, separated by ``.''
+delimiters, e.g. {\tt TopLevel.Stage1.MyFilter1}.  This can then be
+printed to the screen.
+
+\end{document}
+

@@ -1,0 +1,232 @@
+\newcommand{\la}{$\leftarrow$}
+\newcommand{\IND}{\begin{ALC@g}}
+\newcommand{\UND}{\end{ALC@g}}
+\newcommand{\tup}[2]{\langle{#1}, {#2}\rangle}
+
+\begin{figure}[t]
+\begin{equation} \nonumber
+\begin{array}{rcl}
+y & \in & \mbox{program-variable} \\
+c & \in & \mbox{constant}_{\bot} \\
+\vec v, \vec b & \in & \mbox{vector} \\
+\tup{\vec v}{c} & \in & \mbox{linear-form} \\
+map & \in & \mbox{program-variable} \rightarrow \mbox{linear-form  (a hashtable)} \\
+A & \in & \mbox{matrix} \\
+code & \in & \mbox{list of instructions, each of which can be:} \\
+\multicolumn{3}{l}{\parbox{3in}{
+    \vspace{-6pt}
+    \begin{equation} \nonumber
+      \begin{array}{ll}
+	y_1 := \mt{const} & \mbox{{\tt push}}(y_1) \\
+	y_1 := \mbox{\tt pop}() & (\mbox{{\tt loop}} ~N~ \mt{code}) \\
+        y_1 := \mbox{\tt peek}(i) & (\mbox{{\tt branch}} ~\mt{code}_1~ \mt{code}_2) \\
+	y_1 := y_2~\mt{op}~y_3 & ~
+      \end{array}
+\end{equation}}}
+\end{array} 
+\end{equation}
+\vspace{-18pt}
+\caption{Data types for the extraction analysis.\protect\label{fig:types}}
+\vspace{-14pt}
+\end{figure}
+
+\section{Linear Extraction Algorithm}
+\label{sec:dataflow}
+
+Our linear extraction algorithm can identify a linear filter and
+construct a linear node $\lambda$ that fully captures its behavior.
+The technique, which appears as Algorithm~\ref{alg:dataflow} on the
+next page, is a forward dataflow analysis similar to constant
+propagation.  Unlike a standard dataflow analysis, we can afford to
+symbolically execute all loop iterations, since most loops within a
+filter's work function have small bounds that are known at compile
+time (if a bound is statically unresolvable, the filter is unlikely to
+be linear and we disregard it).
+
+Figure~\ref{fig:types} contains an overview of our notation for the
+pseudocode.  During symbolic execution, the algorithm maintains a
+$\mt{map}$ between each program variable $y$ and a linear form
+$\tup{{\vec v}}{c}$. In an actual execution, the value of $y$ would be
+given by $y = {\vec v} \cdot {\vec x} + c$, where ${\vec x}$
+represents the input items.  The algorithm also maintains two
+constants $\mt{pushcount}$ and $\mt{popcount}$ that indicate how many
+items have been pushed and popped so far.  As it encounters {\tt push}
+operations, it builds up the matrix $A$ and vector ${\vec b}$ that
+will come to represent the linear node.
+
+We briefly discuss the operation of {\bf Extract} at each program
+node.  The algorithm is formulated in terms of a simplified set of
+instructions, which appear in Figure~\ref{fig:types}.  First are the
+nodes that generate fresh linear forms.  A constant assignment $y = c$
+creates a form $\tup{\vec 0}{c}$ for $y$, since $y$ has constant part
+$c$ and does not yet depend on the input.  A {\tt pop} operation
+creates a form $\tup{\mbox{\bf BuildCoeff}(\mt{popcount})}{0}$, where
+{\bf BuildCoeff} introduces a coefficient of $1$ for the current index
+on the input stream.  A {\tt peek}$(i)$ operation is similar, but
+offset by the index $i$.
+
+Next are the instructions which combine linear forms.  In the case of
+addition or subtraction, we simply add the components of the linear
+forms.  In the case of multiplication, the result is still a linear
+form if either of the terms is a known constant (that is, if either
+term has a zero vector of input coefficients.)  For division, the
+result is linear only if the divisor is a non-zero
+constant\footnote{Note that if the dividend is zero and the divisor
+has a non-zero coefficients vector, we cannot conclude that the
+result is zero, since certain values of the inputs might cause a
+singularity.} and for non-linear operations ({\it e.g.,} bit-level and
+boolean), both operands must be known constants.  If any of these
+conditions are not met, then the LHS is assigned a value of $\bot$,
+which will mark the filter as non-linear if the value is ever pushed.
+
+The final set of instructions deal with control flow.  For loops, we
+resolve the bounds at compile time and execute the body an appropriate
+number of times.  For branches, we have to ensure that all the linear
+state is modified consistently on both sides of the branch.  For this
+we apply the confluence operator $\sqcap$, which we define for scalar
+constants, vectors, matrices, linear forms, and maps.  $c_1 \sqcap
+c_2$ is defined according to the lifted lattice constant$_{\bot}$.
+That is, $c_1 \sqcap c_2 = c_1$ if and only if $c_1 = c_2$; otherwise,
+$c_1 \sqcap c_2 = \bot$.  For vectors, matrices, and linear forms,
+$\sqcap$ is defined element-wise; for example, $A' = A_1 \sqcap A_2$
+is equivalent to $A'[i,j] = A_1[i,j] \sqcap A_2[i,j]$.  For maps, the
+meet is taken on the values: $\mt{map}_1 \sqcap \mt{map}_2$ $=$
+$\mt{map'}$, where $\mt{map'}.\mt{get}(x) = \mt{map}_1.\mt{get}(x)
+\sqcap \mt{map}_2.\mt{get}(x)$.
+
+Our implementation of linear extraction also deals with function
+calls.  It is straightforward to transfer the linear state across a
+call site, although we omit this from the pseudocode for the sake of
+presentation.  Also implicit in the algorithm description is the fact
+that all variables are local to the {\tt work} function.  If a filter
+has persistent state, all accesses to that state are marked as $\bot$.
+
+\begin{algorithm}[t]
+\caption{Linear extraction analysis.\protect\label{alg:dataflow}}
+proc {\bf Toplevel}(filter $F$) returns linear node for $F$
+\begin{enumerate}
+\item Set Peek, Pop, Push equal to I/O rates of filter $F$.
+\item Let $A_{0} \leftarrow \mbox{new float[Peek][Push] with each entry =~} \bot$
+\item Let ${\vec b_{0}} \leftarrow \mbox{new float[Push] with each entry =~} \bot$
+\item $(\mt{map}, A, {\vec b}, \mt{popcount}, \mt{pushcount}) \leftarrow$ \\
+\verb+      +{\bf Extract}$(F_{work}, (\lambda x . \bot), A_{0}, {\vec b_{0}}, 0, \mbox{Push}-1)$
+\item {\bf if} $A$ and ${\vec b}$ contain no $\bot$ entries {\bf then} \\
+\verb+ + return linear node $\lambda = \{A, {\vec b}, \mbox{Peek}, \mbox{Pop}, \mbox{Push}\}$ \\
+ {\bf else} \\
+\verb+ + {\it fail} \\
+ {\bf endif}
+\end{enumerate}
+proc {\bf BuildCoeff}(int $pos$) returns $\vec v$ for peek at index $pos$ \\ \vspace{-12pt}
+\begin{algorithmic}
+\STATE $\vec v = \vec 0_{Peek}$
+\STATE $\vec v[\mbox{Peek}-\mt{pos}] = 1$
+\STATE return $\vec v$
+\end{algorithmic}
+\vspace{6pt}
+{\bf Global Variables:} int Peek, Pop, Push
+\end{algorithm}
+
+\begin{algorithm}
+proc {\bf Extract}($code$, $map$, $A$, $\vec b$, int $\mt{popcount}$, int $\mt{pushcount}$) \\
+\verb+   + returns updated $\mt{map}$, $A$, ${\vec b}$, $\mt{popcount}$, and $\mt{pushcount}$ \\ \vspace{-12pt}
+\begin{algorithmic}
+\FOR {$i \leftarrow 1$ to $\mt{code}$.length}
+\STATE {\bf switch} $\mt{code}$[i]
+\IND
+\STATE $\mbox{\bf case}~y := \mt{const}$
+\IND
+\STATE $\mt{map}.\mt{put}(y, (\vec 0_{Peek}, \mt{const}))$
+\UND
+\STATE \vspace{-6pt}
+\STATE $\mbox{\bf case}~y := \mbox{\tt pop}()$
+\IND
+\STATE $\mt{map}.\mt{put}(y, \tup{\mbox{\bf BuildCoeff}(\mt{popcount})}{0})$
+\STATE $\mt{popcount}$\verb|++|
+\UND
+\STATE \vspace{-6pt}
+\STATE $\mbox{\bf case}~y := \mbox{\tt peek}(i)$
+\IND
+\STATE $\mt{map}.\mt{put}(y, \tup{\mbox{\bf BuildCoeff}(\mt{popcount}+i)}{0})$
+\UND
+\STATE \vspace{-6pt}
+\STATE $\mbox{\bf case}~\mbox{\tt push}(y)$
+\IND
+\STATE $\tup{\vec v}{c} \leftarrow \mt{map}.\mt{get}(y)$
+\STATE {\bf if} $\mt{pushcount} = \bot$ {\bf then} $\mt{fail}$
+\STATE $A[*, \mt{pushcount}] \leftarrow \vec v$
+\STATE $b[\mt{pushcount}] \leftarrow c$
+\STATE $\mt{pushcount}$\verb|--|
+\UND
+\STATE \vspace{-6pt}
+\STATE $\mbox{\bf case}~ y_1 := y_2 \mt{~op~} y_3$, for $\mt{~op~} \in \{+, -\}$
+\IND
+\STATE $\tup{\vec v_2}{c_2} \leftarrow \mt{map}.\mt{get}(y_2)$
+\STATE $\tup{\vec v_3}{c_3} \leftarrow \mt{map}.\mt{get}(y_3)$
+\STATE $\mt{map}.\mt{put}(y_1, \tup{\vec v_2 \mt{~op~} \vec v_3}{c_2 \mt{~op~} c_3})$
+\UND
+\STATE \vspace{-6pt}
+\STATE $\mbox{\bf case}~y_1 := y_2 * y_3$
+\IND
+\STATE $\tup{\vec v_2}{c_2} \leftarrow \mt{map}.\mt{get}(y_2)$
+\STATE $\tup{\vec v_3}{c_3} \leftarrow \mt{map}.\mt{get}(y_3)$
+\STATE {\bf if} $~\vec v_2 = \vec 0_{Peek}$ {\bf then}
+\IND
+\STATE $\mt{map}.\mt{put}(y_1, (c_2*\vec v_3, c_2*c_3))$
+\UND
+\STATE {\bf else if} $~\vec v_3=\vec 0_{Peek}$ {\bf then}
+\IND
+\STATE $\mt{map}.\mt{put}(y_1, (c_3*\vec v_2, c_3*c_2))$
+\UND
+\STATE {\bf else}
+\IND
+\STATE $\mt{map}.\mt{put}(y_1, \bot)$
+\UND
+\UND
+\STATE \vspace{-6pt}
+\STATE $\mbox{\bf case}~y_1 := y_2 / y_3$
+\IND
+\STATE $\tup{\vec v_2}{c_2} \leftarrow \mt{map}.\mt{get}(y_2)$
+\STATE $\tup{\vec v_3}{c_3} \leftarrow \mt{map}.\mt{get}(y_3)$
+\STATE {\bf if} $~\vec v_3 = \vec 0_{Peek} \wedge y_3 \ne 0$ {\bf then}
+\IND
+\STATE $\mt{map}.\mt{put}(y_1, (\frac{1}{c_3}*\vec v_2, c_2/c_3))$
+\UND
+\STATE {\bf else}
+\IND
+\STATE $\mt{map}.\mt{put}(y_1, \bot)$
+\UND
+\UND
+\STATE \vspace{-6pt}
+\STATE $\mbox{\bf case}~y_1 := y_2 ~\mt{op}~ y_3$, for $\mt{op} \in \{\&, |, \wedge, \&\&, ||, !, \mt{etc.}\}$
+\IND
+\STATE $\tup{\vec v_2}{c_2} \leftarrow \mt{map}.\mt{get}(y_2)$
+\STATE $\tup{\vec v_3}{c_3} \leftarrow \mt{map}.\mt{get}(y_3)$
+\STATE $\mt{map}.\mt{put}(y_1, (\vec 0_{Peek} \sqcap \vec v_2 \sqcap \vec v_3, c_2 ~\mt{op}~ c_3))$
+\UND
+\STATE \vspace{-6pt}
+\STATE \mbox{\bf case}~({\tt loop} N $code'$)
+\IND
+\STATE \bf{for} $j \leftarrow 1$ to $N$ {\bf do}
+\IND
+\STATE $(\mt{map}, A, {\vec b}, \mt{popcount}, \mt{pushcount})~\leftarrow~$ \\
+\verb+   +\bf{Extract}$(\mt{code}, \mt{map}, A, {\vec b}, \mt{popcount}, \mt{pushcount})$
+\UND
+\UND
+\STATE \vspace{-6pt}
+\STATE \mbox{\bf case}~({\tt branch} $code_1~code_2)$
+\IND
+\STATE $(\mt{map}_1, A_1, {\vec b_1}, \mt{popcount}_1, \mt{pushcount}_1) \leftarrow$ \\
+\verb+   +${\mbox{\bf Extract}}(\mt{code}_1, \mt{map}, A, {\vec b}, \mt{popcount}, \mt{pushcount})$
+\STATE $(\mt{map}_2, A_2, {\vec b_2}, \mt{popcount}_2, \mt{pushcount}_2) \leftarrow$ \\ 
+\verb+   +${\mbox{\bf Extract}}(\mt{code}_2, \mt{map}, A, {\vec b}, \mt{popcount}, \mt{pushcount})$
+\STATE $\mt{map} \leftarrow \mt{map}_1 \sqcap \mt{map}_2$
+\STATE $A \leftarrow A_1 \sqcap A_2$
+\STATE ${\vec b} \leftarrow {\vec b_1} \sqcap {\vec b_2}$
+\STATE $\mt{popcount} \leftarrow \mt{popcount}_1 \sqcap \mt{popcount}_2$
+\STATE $\mt{pushcount} \leftarrow \mt{pushcount}_1 \sqcap \mt{pushcount}_2$
+\UND
+\UND %end case
+\ENDFOR
+\STATE return ($\mt{map}$, $A$, ${\vec b}$, $\mt{popcount}$, $\mt{pushcount}$)
+\end{algorithmic}
+\end{algorithm}

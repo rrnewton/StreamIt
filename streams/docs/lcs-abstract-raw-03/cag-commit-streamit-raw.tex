@@ -1,0 +1,206 @@
+% Name your report <group>-<unique-name>.tex, (e.g., sls-jupiter.tex)
+% to avoid name collisions.  For \label{} entries within a file,
+% please use \<group>-<unique-name>-<your label} (e.g.,
+% \label{sls-jupiter-figure}), again to avoid name collisions.  There
+% is no need to use unique names with \cite{} since each report has
+% its own citation namespace.
+
+% Normally, you would use \formattitlecontents{Title}{Authors},
+% but in this case we needed footnotes in the author list to indicate
+% visiting scientists.  You might also want to use \formattitle if you
+% wish to control line breaks in the title or author list.  Please do
+% not put any special formatting in \formattitlecontents or
+% \formatcontents as this will disturb the table of contents.
+
+\formattitle%
+  {A Stream-Aware Compiler for Communication-Exposed 
+   Architectures}
+  {Michael Gordon, William Thies, Michal Karczmarek, David Maze, and
+  Saman Amarasinghe}
+
+\formatcontents%
+  {A Stream-Aware Compiler for Communication-Exposed 
+  Architectures}
+  {Michael Gordon, William Thies, Michal Karczmarek, David Maze, and
+  Saman Amarasinghe}
+
+% Please use the following \formatsection entries unless they are
+% inappropriate: Introduction, Approach, Progress, Future, Research
+% Support.
+%
+% Do not put a blank line after a \formatsection, as this affects the
+% formatting.
+
+\formatsection{Introduction}
+As we approach the billion-transistor era, a number of emerging
+architectures are addressing the wire delay problem by replicating the
+basic processing unit and exposing the communication between units to
+a software layer.  These machines are especially well-suited for
+streaming applications that have regular communication patterns and
+widespread parallelism.  However, today's communication-exposed
+architectures are lacking a portable programming model.  If these
+machines are to be widely used, it is imperative that one be able to
+write a program once, in a high-level language, and rely on a compiler
+to produce an efficient executable on any of the candidate targets.
+
+We are developing a compiler for StreamIt~\cite{streamitcc}, a high
+level stream language that aims to be portable across
+communication-exposed machines.  StreamIt contains basic constructs
+that expose the parallelism and communication of streaming
+applications without depending on the topology or granularity of the
+underlying architecture.  Our current backend is for Raw~\cite{raw}, a
+tiled architecture with fine-grained, programmable communication
+between processors.  However, the compiler employs three general
+techniques that can be applied to compile StreamIt to machines other
+than Raw: 1) partitioning, which adjusts the granularity of a stream
+graph to match that of a given target, 2) layout, which maps a
+partitioned stream graph to a given network topology, and 3)
+scheduling, which generates a fine-grained static communication
+pattern for each computational element.  For a more detailed
+description of the compiler, please see
+\cite{streamit-asplos} and \cite{mgordon-thesis}.
+
+\formatsection{Approach}
+We have developed specific techniques for each stage of the StreamIt
+compiler:
+
+{\bf {\em Partitioning.}} StreamIt provides the filter construct as the
+basic abstract unit of autonomous stream computation.  The programmer
+should decide the boundaries of each filter according to what is most
+natural for the algorithm under consideration. We use the word {\it
+partitioning} to refer to the process of dividing a stream program
+into a set of balanced computation units.  Given that a maximum of $N$
+computation units can be supported, the partitioning stage transforms
+a stream graph into a set of no more than $N$ filters, each of which
+performs approximately the same amount of work during the execution of
+the program.
+
+Our partitioner employs a set of fusion, fission, and reordering
+transformations to incrementally adjust the stream graph to the
+desired granularity.  To achieve load balancing, the compiler
+estimates the number of instructions that are executed by each filter
+in one steady-state cycle of the entire program; then, computationally
+intensive filters can be split (fission), and less demanding filters
+can be fused (fusion).  Currently, a simple greedy algorithm is used
+to automatically select the targets of fusion and fission, based on
+the estimate of the work in each node.  We are exploring other
+techniques to drive partitioning, including dynamic programming and
+linear programming.
+
+{\bf {\em Layout.}} The goal of the layout phase is to assign nodes in the
+stream graph to computation nodes in the target architecture while
+minimizing the communication and synchronization present in the final
+layout.  The layout assigns exactly one node in the stream graph to
+one computation node in the target.
+
+The layout phase of the StreamIt compiler is implemented using
+simulated annealing.  To adapt the layout phase for a given
+architecture, we supply the simulated annealing algorithm with three
+architecture-specific parameters: a cost function, a perturbation
+function, and the set of legal layouts.  The cost function should
+accurately measure the added communication and synchronization
+generated by mapping the stream graph to the communication model of
+the target.  Due to the static qualities of StreamIt, the compiler can
+provide the layout phase with exact knowledge of the communication
+properties of the stream graph.
+
+{\bf {\em Communication Scheduling.}}  The communication scheduling
+phase of the StreamIt compiler maps StreamIt's channel abstraction to
+Raw's static network.  Raw's static network provides optimized,
+nearest neighbor communication.  Tiles communicate using buffered,
+blocking sends and receives.  It is the compiler's responsibility to
+statically orchestrate the explicit communication of the stream graph
+while preventing deadlock.
+
+To statically orchestrate the communication of the stream graph, the
+communication scheduler simulates the firing of nodes in the stream
+graph, recording the communication as it simulates.  The simulation
+does not model the code inside each filter; instead it assumes that
+each filter fires instantaneously.  This relaxation is possible
+because of the flow control of the static network--since sends block
+when a channel is full and receives block when a channel is empty, the
+compiler needs only to determine the ordering of the sends and
+receives rather than arranging for a precise rendezvous between sender
+and receiver.
+
+{\bf {\em Code Generation.}} The code generation phase of the Raw
+backend targets both the tile processor and the switch processor.  For
+the switch processor, we generate assembly code directly from the
+output of the communication scheduler.  For the tile processor, we
+generate C code that is compiled with Raw's GCC port.
+
+\begin{table*}[t]
+\begin{center}
+\scriptsize
+\begin{tabular}{|l||r|r|r|r||r||r||} \hline
+& \multicolumn{5}{|c||}{\bf 250 MHz Raw processor} & {\bf C on a 2.2 GHz} \\ 
+\cline{2-6} 
+{\bf Benchmark} & \multicolumn{4}{|c||}{\bf StreamIt on 16 tiles} & {\bf C on a single tile} & {\bf Intel Pentium IV}\\ 
+\cline{2-7}
+& {\bf Utilization} &
+\begin{tabular}{c}\hspace{-5pt} {\bf \# of tiles} \hspace{-5pt}\\
+\hspace{-5pt} {\bf used} \hspace{-5pt}
+\end{tabular} &    
+ {\bf MFLOPS} & 
+\begin{tabular}{c}\hspace{-5pt} {\bf Throughput} \hspace{-5pt}\\
+\hspace{-5pt} {\bf (per 10$^5$ cycles)} \hspace{-5pt}
+\end{tabular} &    
+\begin{tabular}{c}\hspace{-5pt} {\bf Throughput} \hspace{-5pt}\\
+\hspace{-5pt} {\bf (per 10$^5$ cycles)} \hspace{-5pt}
+\end{tabular} &    
+\begin{tabular}{c}\hspace{-5pt} {\bf Throughput} \hspace{-5pt}\\
+\hspace{-5pt} {\bf (per 10$^5$ cycles)} \hspace{-5pt}
+\end{tabular} \\    
+\hline \hline
+FIR    & 84\% &  14 & 815 &  1188.1  & 293.5 & 445.6 \\ \hline
+Radar  & 79\% & 16 & 1,231 &     0.52  & {\it app. too large} & 0.041 \\ \hline
+Radio  & 73\% & 16 & 421 &    53.9  & 8.85 & 14.1 \\ \hline
+Sort   & 64\% & 16  & N/A &  2,664.4 & 225.6 & 239.4 \\ \hline
+FFT    & 42\% & 16  & 182 &  2,141.9 & 468.9 & 448.5  \\ \hline
+Filterbank & 
+       41\% & 16  &  644 &   256.4  & 8.9 & 7.0   \\ \hline
+GSM    & 23\% & 16 & N/A &    80.9  & {\it app. too large} & 7.76 \\ \hline
+Vocoder& 17\% & 15  & 118 &     8.74  & {\it app. too large} & 3.35  \\ \hline
+3GPP   & 18\% & 16  & 44 &   119.6  & 17.3  & 65.7   \\ \hline \hline
+\end{tabular}
+\vspace{-6pt}
+\caption{\protect\small Performance Results.}
+\label{tab:performance}
+\end{center}
+\vspace{-12pt}
+\end{table*}
+
+\formatsection{Progress}
+Our current implementation of StreamIt supports fully automatic
+compilation through the Raw backend.  Our results appear in
+Table~\ref{tab:performance}.  For each application, we compare the
+throughput of StreamIt with a hand-written C program, running the
+latter on either a single tile of Raw or on a Pentium IV.  The results
+are encouraging.  In many cases, the StreamIt compiler obtains good
+processor utilization--over 60\% for four benchmarks and over 40\% for
+two additional ones.  StreamIt performs respectably compared to the C
+implementations, although there is room for improvement.  The aim of
+StreamIt is to provide a higher level of abstraction than C without
+sacrificing performance.  Our current implementation has taken a large
+step towards this goal.
+
+\formatsection{Future Work}
+There are many thrusts of future work in the StreamIt project.  One
+focus is to collaborate with researchers from other groups to develop
+backends for additional communication-exposed architectures, including
+Scale, VIRAM, Imagine, Smart Memories, and TRIPS.  In this effort, we
+plan to demonstrate that StreamIt can serve as an effective common
+machine language for this class of machines.
+
+We also plan to use StreamIt as a programming model for pervasive
+computing systems.  In this context, the compiler will need to adapt
+to dynamic resource constraints and mobile network connections.  If an
+unreliable node fails, a lightweight runtime system can leverage
+static compiler analysis to recover crucial data from a backup node,
+automatically relocate the computation, and continue processing.
+
+\formatsection{Research Support}
+This research is supported in part by the MIT Oxygen Project, DARPA
+contract DBT6396-C-0036, and a graduate fellowship from Siebel Systems.
+
+\bibtex{cag-commit-streamit-raw}

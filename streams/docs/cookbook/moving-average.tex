@@ -1,0 +1,57 @@
+\section{A Moving Average Filter}
+
+\begin{textpic}{\includegraphics{cookbook.2}}
+\begin{lstlisting}{}
+void->void pipeline MovingAverage {
+  add IntSource();
+  add Averager(10);
+  add IntPrinter();
+}
+int->int filter Averager(int n) {
+  work pop 1 push 1 peek n {
+    int sum = 0;
+    for (int i = 0; i < n; i++)
+      sum += peek(i);
+    push(sum/n);
+    pop();
+  }
+}
+\end{lstlisting}
+\end{textpic}
+
+Most of a typical StreamIt program consists of filters that produce
+some output from their input.  The \lstinline|Averager| filter shown
+here is such a filter.  Like the filters shown before,
+\lstinline|Averager| has a work function with statically declared
+input and output rates.
+
+In addition to peeking and popping, \lstinline|Averager| \emph{peeks}
+at its input stream.  The \lstinline|peek()| operator returns a
+particular item off of the input stream, with \lstinline|peek(0)|
+returning the next item that would normally be popped.  The work
+function must declare a peek rate if it peeks at all, but this peek
+rate is a maximum, rather than an exact, rate; it would be valid for
+the \lstinline|Averager| filter to \lstinline|peek(n-2)| and never
+\lstinline|peek(n-1)|, but \lstinline|peek(n)| is illegal.  Note that
+mixing peeking and popping is valid, but that popping an item shifts
+the index of future peeks.
+
+\lstinline|Averager| also has a \emph{stream parameter}.  The number
+\lstinline|n| is the number of items to average.  This is passed like
+a normal function parameter from the \lstinline|add| statement that
+creates the filter.  Within the filter, the parameter is a constant:
+it is illegal for code to modify the parameter.  This allows parameter
+values to be used in expressions for \emph{e.g.} I/O rates, as in the
+peek rate here.
+
+This program also provides a basic demonstration of StreamIt's filter
+scheduler.  There is a guarantee that the \lstinline|Averager| filter
+is not run until its input rates can be met, and in particular, that
+there are 10 inputs available so peeking can happen.  For this to
+happen, the source needs to run nine additional times at the start of
+the program; there can then be steady-state exections of source,
+averager, printer.  The StreamIt compiler handles this automatically.
+While all of the examples so far have had filters with matched I/O
+rates, the compiler also automatically schedules the execution of
+adjacent filters whose push and pop rates are different.
+

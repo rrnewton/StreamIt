@@ -1,0 +1,17 @@
+Streaming programs represent an increasingly important and widespread
+class of applications that holds unprecedented opportunities for
+high-impact compiler technology.  Unlike sequential programs with
+obscured dependence information and complex communication patterns, a
+stream program is naturally written as a set of concurrent filters
+with regular steady-state communication.  The StreamIt language aims
+to provide a natural, high-level syntax that improves programmer
+productivity in the streaming domain.  At the same time, the language
+imposes a hierarchical structure on the stream graph that enables
+novel representations and optimizations within the StreamIt compiler.
+We define the ``stream dependence function'', a fundamental
+relationship between the input channels of two filters in a stream
+graph.  We also describe a suite of stream optimizations, a
+denotational semantics for validating these optimizations, and a novel
+phased scheduling algorithm for stream graphs.  In addition, we have
+implemented a prototype of the StreamIt optimizing compiler that is
+showing promising results.

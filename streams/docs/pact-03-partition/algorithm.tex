@@ -1,0 +1,211 @@
+\section{Partitioning}
+
+\scriptsize
+\begin{verbatim}
+
+structures
+----------
+container s:
+  s.width()    : returns width of rectangle
+  s.length()   : returns length of rectangle
+  s.get(i, j)  : returns the (i,j)'th child
+
+
+globals
+-------
+// A_s[x1][x2][y1][y2][n] holds minimum cost of assigning children 
+// (x1..x2, y1..y2) of stream s to n tiles
+forall s in graph:  int[][][] A_s;
+
+
+// setup for n partitions
+void setup(int n) 
+-----------------
+(lift all redundant pipelines / splitjoins)
+(consider feedbackloops as a 2-way splitjoin, each child of which is a
+ 1-way splitjoin to prevent introducing synchronization across the loop
+ and body segments.)
+(eliminate all pipelines in splitjoins in favor of rectangular splitjoins)
+(pad all splitjoins so that each parallel stream is same length)
+
+forall s in graph
+  A_s = new int[s.length()][s.length()][s.width()][s.width()][n]
+  forall (x1,x2,y1,y2,n) \in A_s
+    A[x1][x2][y1][y2][n] = -1
+
+
+// returns whether or not stream <s> needs a joiner if it is spread
+// across multiple tiles
+boolean needsJoiner (stream s)
+------------------------------
+par = s.parent()
+if (par==null)
+  // if have no parent, then need a joiner
+  return true
+else if (par.width()>1)
+  // if par has multiple streams, it will have joiner instead
+  return false;
+else if (par.parent()==null && s!=par.get(0, par.length()-1))
+  // if we're in middle of toplevel stream, then need joiner
+  return true
+else
+  // otherwise we're guaranteed by lifter that par.parent().width>1,
+  // so there will be a joiner there and we don't need one for s
+  return false
+end if
+
+
+// return minimal cost for allocating <n> partitions to children
+int getCost(stream s, int n)
+----------------------------
+
+// see if we will need a joiner
+if (n>1 && needsJoiner(s)) 
+  n--
+endif
+
+if (s is Node)
+ return getNodeCost(s, n)
+if (s is Container)
+ return getContCost(s, 0, s.width()-1, 0, s.length()-1, n)
+
+
+int getContCost(stream s, int x1, int x2, int y1, int y2, int n)
+----------------------------------------------------------------
+// if value is memoized, return it
+if (A_s[x1][x2][y1][y2][n] != -1)
+  return A_s[x1][x2][y1][y2][n]
+endif
+
+// if down to one child, descend into it
+if (x1==x2 && y1==y2)
+  int cost = getCost(s.get(x1, y1), n)
+  A_s [x1][x2][y1][y2][n] = cost
+  return cost;
+endif
+
+// if n is 1, just sum the work of components
+if (n==1)
+  int sum = getContCost(s, x1, x1, y1, y1, n);
+  sum += x1<x2 ? getContCost(s, x1+1, x2, y1, y1, n) : 0
+  sum += y1<y2 ? getContCost(s, x1, x1, y1+1, y2, n) : 0
+  sum += x1<x2 && y1<y2 ? getContCost(s, x1+1, x2, y1+1, y2, n) : 0
+  return sum
+endif
+
+// try making vertical cut (in case s is a splitjoin)
+int min = infinity
+for xPivot = x1 to x2 - 1
+  for nPivot = 1 to n-1
+    int cost = max(getContCost(s, x1, xPivot, y1, y2, nPivot),
+                   getContCost(s, xPivot+1, x2, y1, y2, n-nPivot));
+    if (cost < min)
+      min = cost
+    endif
+  endfor
+endfor
+
+// try making horizontal cut (for splitjoin, pipeline, feedbackloop)
+for yPivot = y1 to y2 - 1
+  for nPivot = 1 to n-1
+    int cost = max(getContCost(s, x1, x2, y1, yPivot, nPivot),
+                   getContCost(s, x1, x2, yPivot+1, y2, n-nPivot));
+    if (cost < min)
+      min = cost
+    endif
+  endfor
+endfor
+
+A[x1][x2][y1][y2][n] = min;
+return min
+
+
+// returns cost of node <s> assigned to <n> tiles
+int getNodeCost(stream s, int n)
+--------------------------------
+if (isFissable(s))
+  return work / n
+else
+  return work
+endif
+
+
+// traceback and construct a mapping <map> from nodes to partitions.
+// <assigned> represents the number of partitions assigned so far.
+void traceback(stream s, list-of (stream,int) map, int assigned, int n)
+---------------------------------------------------------------
+if (s is Node)
+  tracebackNode(s, map, assigned, n)
+if (s is Container)
+  tracebackCont(s, map, assigned, 0, s.width()-1, 0, s.length()-1, n)
+
+
+// traceback for node
+void tracebackNode(stream s, list-of (stream,int) map, int assigned, int n)
+---------------------------------------------------------------
+for i = 0 to n-1
+  map.append(s, assigned+i)
+endfor
+
+
+// traceback for container
+void tracebackCont(stream s, list-of (stream,int) map, int assigned, 
+                   int x1, int x2, int y1, int y2, int n)
+---------------------------------------------------------------
+// if we only have one partition left, or if we are only
+// looking at one child, then just recurse into children
+if (tileLimit==1 || (x1==x2 && y1==y2))
+  for i = x1 to x2
+    for j = y1 to y2
+      traceback(s.get(i,j), map, assigned, n);
+
+// otherwise, see if we made a vertical cut (in case s is a splitjoin)
+int min = infinity
+for xPivot = x1 to x2-1
+  for nPivot = 1 to n-1
+    int cost = max(getContCost(s, x1, xPivot, y1, y2, nPivot),
+                   getContCost(s, xPivot+1, x2, y1, y2, n-nPivot));
+    if (cost==A[x1][x2][y1][y2][n]) {
+      // found best cost, so there's a division at this <xPivot>.  Recurse
+      // left and right, incrementing assignment count after partition.
+      traceback(s, map, assigned, x1, xPivot, y1, y2, nPivot)
+      traceback(s, map, assigned+nPivot, xPivot+1, x2, y1, y2, n-nPivot);
+      return
+    endif
+  endfor
+endfor
+
+// try making horizontal cut (for splitjoin, pipeline, feedbackloop)
+for yPivot = y1 to y2 - 1
+  for nPivot = 1 to n-1
+    int cost = max(getContCost(s, x1, x2, y1, yPivot, nPivot),
+                   getContCost(s, x1, x2, yPivot+1, y2, n-nPivot));
+    if (cost==A[x1][x2][y1][y2][n]) {
+      // found best cost, so there's a division at this <yPivot>.  Recurse
+      // left and right, incrementing assignment count after partition.
+      traceback(s, map, assigned, x1, x2, y1, yPivot, nPivot)
+      traceback(s, map, assigned+nPivot, x1, x2, yPivot+1, y2, n-nPivot);
+      return
+    endif
+  endfor
+endfor
+
+
+// do partitioning of stream s on n tiles and return mapping from node
+// to partition number
+stream->int toplevel(stream s, int n)
+-------------------------------------
+setup(n)
+cost = getCost(s, n)
+
+// if desired, eliminate extra partitions that aren't contributing to
+// the cost
+while (n>1 && getCost(s, n-1)==cost)
+  n--
+endwhile
+
+traceback(s, empty-map, 0, n)
+
+return map
+
+\end{verbatim}

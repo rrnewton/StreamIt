@@ -1,0 +1,211 @@
+\begin{figure*}
+\centering
+\psfig{figure=fft-pre-tape.eps,width=4.8in}
+\caption{The bit reverse order filter in the FFT, with N=8. The tapes illustrate the data re-shuffling.}
+\label{fig:bitreverseorder}
+\end{figure*}
+
+\begin{figure*}
+\centering
+\psfig{figure=fft-butterfly-tape.eps,width=5.8in}
+\caption{The 4x4 butterfly stage in the FFT. The tapes illustrates the data transformation and computation.}
+\label{fig:butterfly}
+\end{figure*}
+
+\begin{figure}
+\vspace{-0.6in}
+\scriptsize
+\begin{verbatim}
+class RFtoIF extends Filter {
+   Channel input = new FloatChannel();
+   Channel output = new FloatChannel();
+   int size, count;
+   float weight[];
+   void init(float f) {
+      setf(f);
+   }
+   void work() {
+      output.push(input.pop()*weight[i++]);
+      if (count==size) count = 0;
+   }
+   void setf(float f) {
+      count = 0;
+      size = CARRIER_FREQ/f*N;
+      weight = new float[size];
+      for (int i=0; i<size; i++)
+         weight[i] = sine(i*PI/size);
+   }
+}
+
+class FIR extends Filter {
+   Channel input = new FloatChannel();
+   Channel output = new FloatChannel();           
+   int N;
+   void init(int N) {
+      this.N = N;
+   }
+   void work() {
+      float sum = 0;
+      for (int i=0; i<N; i++) {
+         sum += input.peek(i)*FIR_COEFF[i][N];
+      }
+      input.pop();
+      output.push(sum);
+   }
+}
+
+class Booster extends Stream {
+   void init(int N, boolean adds) {
+      if (adds) add(new FIR(N));
+   }
+}
+
+class Butterfly extends Stream {
+   void init(int N, int W) {
+      add(new SplitJoin() {
+         void init() {
+            setSplitter(WEIGHTED_ROUND_ROBIN(N, N));
+            add(new Filter() {
+               Channel input = new FloatChannel();
+               Channel output = new FloatChannel();
+               float weights[] = new float[W];
+               int curr;
+               void init() {
+                  for (int i=0; i<W; i++)
+                     weights[i] = calcWeight(i, N, W);
+                  curr = 0;
+               }
+               void work() {
+                  output.push(input.pop()*weights[curr++]);
+                  if(curr>= W) curr = 0;
+               }    
+            });
+            add(IDENTITY());
+            setJoiner(ROUND_ROBIN);
+      }});
+      add(new SplitJoin() {
+         void init() {
+            setSplitter(DUPLICATE);
+            add(new Filter() {   
+               Channel input = new FloatChannel();
+               Channel output = new FloatChannel();
+               void work() {
+                  output.push(input.pop() - input.pop());
+               }
+            });
+            add(new Filter() {   
+               Channel input = new FloatChannel();
+               Channel output = new FloatChannel();
+               void work() {
+                  output.push(input.pop() + input.pop());
+               }
+            });
+            setJoiner(WEIGHTED_ROUND_ROBIN(N, N));
+      }});
+}}
+\end{verbatim}
+\vspace{-6pt}
+\caption{\protect\small A Trunked Radio Receiver in StreaMIT.
+\protect\label{fig:radiocode}}
+\vspace{-12pt}
+\end{figure}
+
+\begin{figure}
+\vspace{-0.6in}
+\scriptsize
+\begin{verbatim}
+class FFT extends Stream {
+   void init(int N) {
+      add(new SplitJoin() {
+         void init() {
+            setSplitter(WEIGHTED_ROUND_ROBIN(N/2, N/2));
+            for (int i=0; i<2; i++) 
+               add(new SplitJoin() {
+                  void init() {
+                     setSplitter(ROUND_ROBIN);
+                     add(IDENTITY());
+                     add(IDENTITY());
+                     setJoiner(WEIGHTED_ROUND_ROBIN(N/4, N/4));
+               }});
+            setJoiner(ROUND_ROBIN);
+      }});
+      for (int i=2; i<N; i*=2)
+        add(new Butterfly(i, N));
+}}
+
+class CheckFreqHop extends SplitJoin {
+   RFtoIFPortal freqHop;
+   void init(RFtoIFPortal freqHop) {
+      this.freqHop = freqHop;
+      setSplitter(WEIGHTED_ROUND_ROBIN(N/4-2,1,1,N/2,1,1,N/4-2));
+      int k = 0;
+      for (int i=1; i<=5; i++) {
+         if ((i==2)||(i==4)) {
+            for (int j=0; j<2; j++) {
+               add(new Filter() {
+                  Channel input = new FloatChannel();
+                  Channel output = new FloatChannel();
+                  void work() {
+                     float val = input.pop();
+                     if (val >= MIN_THRESHOLD) 
+                        freqHop.setf(FREQ[k], new TimeInterval(4*N, 6*N)); 
+                     output.push(val);
+                  }
+               });
+               k++;
+            }
+         } else add(IDENTITY());
+      }
+      setJoiner(WEIGHTED_ROUND_ROBIN(N/4-2,1,1,N/2,1,1,N/4-2));
+   }
+}
+
+class CheckQuality extends Filter {
+   Channel input = new FloatChannel();
+   Channel output = new FloatChannel();
+   float aveHi, aveLo;
+   BoosterPortal boosterSwitch;
+   boolean boosterOn;
+   void init(BoosterPortal boosterSwitch, boolean boosterOn) {
+      aveHi = 0; aveLo = 1;
+      this.boosterSwitch = boosterSwitch;
+      this.boosterOn = boosterOn;
+   }
+   void work() {
+      float val = input.pop();
+      aveHi = max(0.9*aveHi, val);
+      aveLo = min(1.1*aveLo, val);
+      if (aveHi - aveLo < QUAL_BAD_THRESHOLD && !booosterOn) {
+         boosterSwitch.init(true, BEST_EFFORT);
+         boosterOn = true;
+      }
+      if(aveHi - aveLo > QUAL_GOOD_THRESHOLD & boosterOn) {
+         boosterSwitch.init(false, BEST_EFFORT);
+         boosterOn = false;
+      }
+      output.push(val);
+   }
+}
+
+class TrunkedRadio extends Stream {
+   int N = 64;
+   RFtoIFPortal freqHop = new RFtoIFPortal();
+   BoosterPortal onOff = new BoosterPortal().
+   void init() {
+      ReadFromAtoD in = add(new ReadFromAtoD());
+      RFtoIF rf2if = add(new RFtoIF(STARTFREQ));
+      Booster iss = add(new Booster(N, false));
+      add(new FFT(N));
+      add(new CheckFreqHop(freqHop));
+      add(new CheckQuality(onOff, false));
+      AudioBackEnd out = add(new AudioBackEnd());
+
+      freqHop.register(rf2if);
+      onOff.register(iss);
+      MAX_LATENCY(in, out, 10);
+   }
+}
+\end{verbatim}
+\vspace{-12pt}
+\end{figure}
+

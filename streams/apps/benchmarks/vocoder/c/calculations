@@ -1,0 +1,16 @@
+7/30/02 -- AAL 
+
+
+Uniprocessor (7/29/2002):
+(Xenon 2.2 GHz, 512MB cache)
+10,000 iterations (1200 outputs/iteration (each output wave file has 1200 samples)
+91.3% utilization
+runtime for 10000 iterations = 163.010 seconds
+
+We want cycles/iteration:
+10000 iterations/163.010 sec * 
+1200 outputs/1 iteration
+1 second /2.2x10^9 cycles
+* 10^5 cycles 
+
+= 3.3461416 outputs/10^5 cycles

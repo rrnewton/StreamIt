@@ -1,0 +1,125 @@
+LATEST NUMBERS
+**************
+
+StreamIt Numbers
+=======================================================================================================
+
+Application     MFLOPS     % Util.    Throughput**    Date     Who        Status
+-------------------------------------------------------------------------------------------------------
+FFT             181.6       41.7%         2141.9     7/26    Andrew     Mostly done (for N=64; could do others too)
+FMRadio         421         73%           53.85      7/29    David      Done, I think
+BeamFormer      1231        79%           0.52       7/29    Chris      Done
+Vocoder         106.1       22.6%         8.74       7/30    Andrew     Needs 2-stage fusion.
+Nokia(2/2/2/2)* 43.57       17.5%         119.6      7/31    Andrew     Done.
+GSM             0           23.35         80.9       7/29    David      Code sucks, will refine later
+FIR-fine        815         85.65         1188.12    7/29    David      Done
+BitonicSort     0           63.94         2664.4     7/29    David      Done
+FilterBank      644         40.80         256.4      7/30    David      Done (too well?)
+
+
+BeamFormer (64-tile)        25.06%        0.226	     7/30    Bill       Not very important; just for reference.
+Nokia(2/2/2/2) *18.6        7.7%          51.3       7/30    Andrew     Being optimized (jasper), numbers(andrew).
+Nokia(4/5/10/7)*?           ?             ?          ?       Jasper     Being optimized.
+Nokia(4/20/15/7)*?          ?             ?          ?       Jasper     Being optimized.
+FFT(old)        304         63            ?          7/24    Bill       Mostly done (for N=64; could do others too)
+MatrixMultiply  15.4        42.5          161.6      7/26    Andrew     Not looked at.
+Lincoln Labs    ?           ?             ?          ?       ?          Stuck in frontend?
+MP3             ?           ?             ?          ?       ?          Not looked at.
+CRC             ?           ?             ?          ?       ?          Not looked at.
+HDTV            ?           ?             ?          ?       ?          Needs fusion support.
+perftest4       ?           ?             ?          ?       ?          Not looked at.
+Lattice         ?           ?             ?          ?       ?          Not looked at.
+MergeSort       ?           ?             ?          ?       ?          Would need iterative rewrite.
+FIR             ?           ?             ?          ?       ?          Doesn't exist, but why not just do a plain FIR?
+
+Comparison Numbers
+=======================================================================================================
+
+Application     C Code, 1 Tile       C Code, PIV         C Code, rawcc       Date     Who        Status
+(MFLOPS/Throughput**/Utilization)     (Tput**/Utilization)
+-------------------------------------------------------------------------------------------------------
+FFT(64)             64.2/468.9/99.1%      448.5/99.9%	     ?	              7/26    Andrew    C Code written.
+FMRadio             .29/8.85/99.0%        14.1/99%           ?	              7/29    Andrew    C Code written.
+BeamFormer          (too big)		  0.041/99.9%        ?	              7/29    Andrew    C Code written.
+Vocoder             (too big)		  3.35/91.3%         ?	              7/30    Andrew    C Code written.
+Nokia(2/2/2/2)*     10.6/17.3/98.0%       65.7/100%          ?	              7/30    Andrew    C Code written.
+GSM                 (too big)		  156.7/99.9%        ?	              7/30    Andrew    C Code supplied.
+Fir-fine            47.3/293.5/99.4%      445.6/99.9%        ?	              7/30    Andrew    C Code supplied by david.
+Filterbank          ?/8.85/?		  6.98/99.9%         ?	              7/29    Andrew    C Code supplied.
+BitonicSort         0/225.58/99.7%   	  239.4/99.9%        ?                7/30    Andrew    C Code done (chris).
+
+
+
+(Numbers without using -O3 options)
+x FFT(64)             33.5/150.48/97.7%      257.0/99.9%	     ?	              7/26    Andrew    C Code written.
+x FMRadio             29.3/2.47/97.7%        4.8/99.9%         ?	              7/29    Andrew    C Code written.
+(same)BeamFormer          (too big)		   0.041/99.9%       ?	              7/29    Andrew    C Code written.
+(same)Vocoder             (too big)		   3.35/91.3%        ?	              7/30    Andrew    C Code written.
+xNokia(2/2/2/2)*     10.6/17.3/100%         16.2/100%         ?	              7/30    Andrew    C Code written.
+xGSM                 (too big)		   7.76/99.9%        ?	              7/30    Andrew    C Code supplied.
+xFir-fine            28.7/89.3/98.0%        209.6/99.9%       ?	              7/30    Andrew    C Code supplied by david.
+Filterbank          ?/0.0032/?		   0069/99.9%        ?	              7/29    Andrew    C Code supplied.
+BitonicSort         0/93.0/98.6%   	   148.87/99.9%      ?                7/30    Andrew    C Code done (chris).
+
+
+
+Nokia(4/5/10/7)*    1.22/15.55/97.8%       0.86/100.0%       ?	              7/29    Andrew    C Code written.
+Nokia(4/20/15/7)*   (too big)              .061/99.9%	     ?	              7/29    Andrew    C Code written.
+CRC                 ?		           ?		     ?	              ?       ?	        Optimized C supplied.
+HDTV                ?		           ?		     	              ?       ?	        ?
+Lincoln Labs        ?		           ?		     ?	              ?       Ali	C Code in progress.
+MatrixMultiply 122.4/20.2	           ?		     ?	              7/26    Andrew    C Code written.
+MP3                 ?		           ?		     ?	              ?       ?	        ?
+Lattice             ?		           ?		     ?	              ?       ?	        ?
+perftest4           ?		           ?		     ?	              ?       ?	        Spectrumware C Code?
+FilterBank          ?		           ?		     ?	              ?       ?	        ?
+MergeSort           ?		           ?		     ?	              ?       ?	        ?
+FIR                 ?   	           ?   	             ?                ?       ?         C code written.
+
+*  K/N/Q/W -- constant parameters to the Nokia 3gpp algorithm
+** Throughput is for 10^5 cycles.
+
+
+Notes
+=======================================================================================================
+
+FFT
+---
+Requires some hand optimizations to get results above, namely
+synchronization, parallelization, layout, switch-coded joiners.
+
+TODO IN THE PAPER
+*****************
+
+- convert examples to new syntax
+
+- FIR filter example is wrong - should be setPush(1), not N, and needs
+  phases, anyway
+
+- describe general fusion for two-stage filters; two-stage filters all
+over instead of just as a result of fusion
+
+- describe new results, with new stream graph figures, etc.
+
+- formatting
+
+Things that we promised to do in rebuttal:
+------------------------------------------
+
+- better describe time multiplexing vs. space multiplexing; time
+multiplexing can also apply to stream programs
+
+- reference SCORE (from Berkeley) and SISAL in related work
+
+- if we can, give more stress to the benefits of having a structured
+language
+
+Low Prioity:
+------------
+
+- fix the structures figure to look like the others
+
+- make layout figures and describe them
+
+- make sure the input.pop/peek and output.push vs. pop/peek/push is
+consistent

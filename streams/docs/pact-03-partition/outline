@@ -1,0 +1,119 @@
+- intro
+
+   - we find optimal partitioning of graph with respect to a cost
+	function, given set of allowable transformations
+
+- set of hierarchical graph transformations
+
+   (horizontal filter fission) - for 2 stage, strip out initwork from
+      all the duplicate copies, and have a special round-robin that feeds
+      them?  Or could just have dupliate with decimation and all the
+      nodes that aren't doing the initial work function.  But joiner still
+      needs some reordering afterwards (could do with two-stage filter
+      afterwards, and two-stage filter inside, that decimates the
+      redundant output.)
+
+   (pipeline fission) - do optimal fission of all stages, then add
+     multiplicities on the sides of the split to accommodate sync
+     removal?  But this messes up the tile count really... should fiss
+     the pipeline as a whole.  maybe try all possible pipeline fissions
+     up to the amount you're looking at?  Could do the same for splitjoin,
+     feedbackloop.
+
+   (splitjoin refactor:  adding hierarchy)
+     mentioned in asplos
+
+   (splitjoin refactor:  adding synchronization)
+     new, but very simple
+
+   (feedbackloop fusion)
+     not even worked out
+
+   (splitjoin fusion)
+     same as in asplos
+
+   (pipeline fusion)
+     same as in asplos
+
+    given P = {S_0, ... F_0 ... F_{n-1} ... S_1 ... S_{n-1}}
+    make P = {S_0, F', S_1 ... S_{n-1}} where 
+      F' = {work', stateless', peeks'}
+      work' = \sum_{i=0}^{n-1} work_i
+      stateless' = stateless_0 \wedge ... \wedge stateless_{n-1} \wedge
+                   !peeks_1 \wedge ... \wedge !peeks_{n-1}
+        --> note that the first filter can peek and F' still be stateless
+      peeks' = peek_0 
+        --> but this has a caveat with stages
+
+- partitioning algorithm
+
+  - linear thing for linearly organized children
+
+  - rectangular thing with splitjoins
+
+  - optimizations (optional)
+
+    - symmetry optimization
+
+    - uniform optimization
+
+      - can talk about this in context of pipeline fusion, too, where
+        the pipeline has a single element that is repeated multiple
+        times.  This is how to account for vertical fission perhaps.
+
+- possible cost functions
+  - the estimate of work (by summing work of components)
+
+  - actually running a dataflow work estimator on the fused nodes (to
+    account for cost of fusion code)
+
+  - linear combination
+
+  - code size / data size explosion
+
+- results
+  - show the impact of the symmetry optimization
+
+  - plot the (calculated) bottleneck in our partitioned graph vs. the
+    average load of the nodes, as you scale each application across a
+    given number of partitions (don't even need to do perfect squares
+    just all partitions)
+
+  - keeping tile count constants (e.g., at 16) plot the predicted 
+    utilization as you increase the size of the application
+
+  - results on Raw as the tile count varies
+
+- non-hierarchical graph transformations
+   - introducing synchronization for non-rectangular pieces.  could do some 
+	kind of pre-pass to arrange the individual pipelines along the rectangles
+        that you're interested in drawing.
+
+   - vertical splitjoin fission (and permutation of components)
+
+   - pushing filter into or out of a splitjoin (e.g. to load balance
+     the pipeline of light, stateful filter with heavy, stateless one)
+
+   - sync removal, which could violate hierarchy
+
+- non-hierarchical cost functions?
+   - layout
+   - communication?
+      - e.g. if you have nested splitjoins, then once you go to raw,
+		this has additive cost at the split node
+
+   - the business with duplicate splitjoin reordering (for the streams
+       within a splitjoin)
+
+  - incorporate other costs:
+    - cost of splitting multiple ways
+       - be careful, since now if you have nested splits you could
+         have increasing cost, not at a hierarchical level.  might
+         have to pass down the current split amount as well?
+    - data memory overflow
+    - time multiplexing?
+
+- related work
+
+- conclusion
+

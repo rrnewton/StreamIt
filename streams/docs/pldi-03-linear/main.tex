@@ -1,0 +1,54 @@
+\documentclass{sig-alternate}
+\usepackage{epsfig}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+
+\title{Linear Analysis and Optimization of Stream Programs}
+\numberofauthors{1}
+\author{
+\alignauthor \vspace{-18pt}
+Andrew A. Lamb,
+William Thies
+and Saman Amarasinghe\\
+	\vspace{8pt}
+	\{aalamb, thies, saman\}@lcs.mit.edu \\
+	\vspace{8pt}
+	Laboratory for Computer Science \\
+	Massachusetts Institute of Technology}
+
+\begin{document}
+
+\newtheorem{definition}{Definition}
+\newtheorem{transformation}{Transformation}
+
+\maketitle
+
+\newcommand{\mt}[1]{\mbox{\it #1}}
+\newcommand{\todo}[1]{\framebox{\bf #1}}
+
+\begin{abstract}
+\input{abstract}
+\end{abstract}
+
+\input{introduction}
+\input{matrix}
+\input{dataflow2}
+%\input{dataflow}
+\input{combination2}
+\input{optimization}
+\input{results}
+\input{related}
+\input{conclusion}
+
+% Bibliography -- whee!
+\begin{small}
+  \bibliographystyle{abbrv}
+  \bibliography{references}
+\end{small}
+
+%\appendix
+\clearpage
+\input{streamgraphs}
+\clearpage
+\input{firscaling}
+\end{document}

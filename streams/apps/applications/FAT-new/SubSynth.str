@@ -1,0 +1,13 @@
+/* This is the subband synthesis block it performs up sampling by
+ * interleaving samples with zeroes and then filtering and frequency
+ * shifting the output of this filter is used for target detection 
+ */
+
+// this pipline performs the first few blocks in subband synthesis.
+complex[N_cnb][N_srg][N_dop]->complex[N_cnb][N_srg*N_up][N_dop] pipeline SubSynth(int N_cnb,int N_srg,int N_dop,int N_up,int N_lp, complex w, complex[N_lp] f_lp){
+    add FormChg20(N_cnb,N_srg,N_dop);
+    add UpSamp(N_up);
+    add arrayFIR(N_srg*N_up,N_lp,f_lp);
+    add FreqShift(N_rg,W);
+    add FromChg21(N_cnb, N_srg*N_up, N_dop);
+}

@@ -1,0 +1,42 @@
+\section{An Echo}
+
+\begin{textpic}{\includegraphics{cookbook.5}}
+\begin{lstlisting}{}
+float->float feedbackloop Echo
+    (int n, float f) {
+  join roundrobin(1,1);
+  body FloatAdder();
+  loop float->float filter {
+    work pop 1 push 1 {
+      push(pop() * f);
+    }
+  };
+  split duplicate;
+  for (int i = 0; i < n; i++)
+    enqueue(0);
+}
+float->float filter FloatAdder {
+  work pop 2 push 1 {
+    push(peek(0) + peek(1));
+    pop();
+    pop();
+  }
+}
+\end{lstlisting}
+\end{textpic}
+
+This example uses a StreamIt \emph{feedback loop} to implement an echo
+effect.  In a sense, a feedback loop is like an inverted split-join:
+it has a joiner at the top and a splitter at the bottom.  A feedback
+loop has exactly two children, which are added using the \lstinline|body|
+and \lstinline|loop| statements.  Thus, this implementation takes an
+input from the loop input and an input from the feedback path, adds
+them, and outputs the result.  The result is also scaled by the value
+\lstinline|f| and sent back to the top of the loop.
+
+Feedback loops have a specialized push-like statement,
+\lstinline|enqueue|.  Each enqueue statement pushes a single value on
+to the input to the joiner from the feedback path.  There must be
+enough values enqueued to prevent deadlock of the loop components;
+values enqueued delay data from the feedback path.
+

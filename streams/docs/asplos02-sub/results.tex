@@ -1,0 +1,132 @@
+\begin{figure}
+\centering
+\vspace{6pt}
+\psfig{figure=speedup-graph.eps,width=2.95in}
+\vspace{-6pt}
+\caption{\protect\small StreamIt throughput on a 16-tile Raw machine,
+normalized to throughput of hand-written C running on a single Raw
+tile.  \protect\label{fig:compare-raw}}
+\vspace{-12pt}
+\end{figure}
+
+\begin{figure}
+\centering
+\psfig{figure=throughput-graph.eps,width=3.2in}
+\vspace{-6pt}
+\caption{Throughput of StreamIt code running on 16 tiles and C code
+running on a single tile, normalized to throughput of C code on a
+Pentium IV. \protect\label{fig:compare-pentium}}
+\vspace{-12pt}
+\end{figure}
+
+\section{Results}
+\label{sec:results}
+
+Our current implementation of StreamIt supports fully automatic
+compilation through the Raw backend.  We have also implemented the
+optimizations that we have described: synchronization elimination,
+modulo expression elimination (vertical fusion), buffer localization
+(vertical fusion), and buffer sharing (horizontal fusion).
+
+We evaluate the StreamIt compiler for the set of applications shown in
+Table~\ref{tab:benchmarks}; our results appear in
+Table~\ref{tab:performance}.
+%  For each benchmark, we show the number of
+%lines of StreamIt code, the occurrence of each stream construct, and
+%the number of nodes required to execute the expanded graph on Raw.
+For each application, we compare the throughput of StreamIt with a
+hand-written C program, running the latter on either a single tile of
+Raw or on a Pentium IV.  For Radio, GSM, and Vocoder, the C source
+code was obtained from a third party; in other cases, we wrote a C
+implementation following a reference algorithm.  For each benchmark,
+we show MFLOPS (which is N/A for integer applications), processor
+utilization (the percentage of time that an {\it occupied tile} is not
+blocked on a send or receive), and throughput.  We also show the
+performance of the C code, which is not available for C programs that
+did not fit onto a single Raw tile (Radar, GSM, and Vocoder).
+Figures~\ref{fig:compare-raw} and~\ref{fig:compare-pentium} illustrate
+the speedups obtained by StreamIt compared to the C
+implementations\footnote{FFT and Filterbank perform better on a Raw
+tile than on the Pentium 4.  This could be because Raw's single-issue
+processor has a larger data cache and a shorter processor pipeline.}.
+
+The results are encouraging.  In many cases, the StreamIt compiler
+obtains good processor utilization--over 60\% for four benchmarks and
+over 40\% for two additional ones.  For GSM, parallelism is limited by
+a feedbackloop that sequentializes much of the application.  Vocoder
+is hindered by our work estimation phase, which has yet to accurately
+model the cost of library calls such as {\tt sin} and {\tt tan}; this
+impacts the partitioning algorithm and thus the load balancing.  3GPP
+also has difficulties with load balancing, in part because our current
+implementation fuses all the children of a stream construct at once.
+
+StreamIt performs respectably compared to the C implementations,
+although there is room for improvement.  The aim of StreamIt is to
+provide a higher level of abstraction than C without sacrificing
+performance.  Our current implementation has taken a large step
+towards this goal.  For instance, the synchronization removal
+optimization improves the throughput of 3GPP by a factor of 1.8 on 16
+tiles (and by a factor of 2.5 on 64 tiles.)  Also, our partitioner can
+be very effective--as illustrated in Figure~\ref{fig:beam-blood},
+partitioning the \Radar~ application improves performance by a factor
+of 2.3 even though it executes on less than one third of the tiles.
+
+The StreamIt optimization framework is far from complete, and the
+numbers presented here represent a first step rather than an upper
+bound on our performance.  We are actively implementing aggressive
+inter-node optimizations and more sophisticated partitioning
+strategies that will bring us closer to achieving linear speedups for
+programs with abundant parallelism.
+
+%% We show the performance of the original application, which maps each
+%% Filter in the original program to a single Raw tile.  In some cases,
+%% we need to use an 8x8 Raw processor in order to have enough tiles for
+%% the Filters; otherwise, we target a 4x4 configuration of Raw.  To
+%% obtain the ``optimized'' numbers, we perform a series of fusion,
+%% fission and reordering transformations to create a load-balanced set
+%% of filters that can be mapped onto a 4x4 Raw processor.
+%% Figures~\ref{fig:opt-diagram} and \ref{fig:utilization-diagram} depict
+%% the impact of our load balancing transformations on throughput and
+%% tile utilization, respectively.
+
+%% The results show that for programs with substantial computation
+%% requirements, the StreamIt compiler is able to extract good
+%% performance out of the Raw processor.  For example, the \Radar
+%% application (see Figure~\ref{fig:beamcode} for source code) shows a
+%% sustained 1.47 GFLOPS rate, after a 145\% improvement due to our
+%% optimizations.  Figures~\ref{fig:beam-orig} and~\ref{fig:beam-opt}
+%% give the original and optimized configurations of \Radar's stream
+%% graph, and Figure~\ref{fig:beam-blood} illustrates the impact of our
+%% load balancing optimizations .
+
+%We have evaluated our compiler with StreamIt versions applications: 
+%\begin{itemize}
+%
+%\item A software-based FM Radio with
+%equalizer, 
+%
+%\item A GSM Decoder, which takes GSM-encoded parameters as
+%inputs, and uses these to synthesize audible speech, 
+%
+%\item A \Radar application
+%which encapsulates the core functionality of modern radar, sonar, and
+%communications signal processors -- modeled after a system from the
+%Polymorphic Computing Architecture (PCA) \cite{pca}
+
+%\item A 64-element FFT filter implemented as a pipeline of a bit reversal 
+%filter followed by multiple-stage butterfly filters.
+
+%\item A Cyclic Redundancy Check (CRC) Encoder/Decoder, which is an error detection system utilizing a predefined 32 bit generator polynomial.  It can detect errors in bit strings of up to 64KB in size with 99.99999997% accuracy.
+
+%\item Matrix Multiplication 
+
+%\item A MP3
+
+%\item A performance test from the SpectrumWare system that
+%implements an Orthogonal Frequency Division Multiplexor (OFDM)
+%\cite{spectrumware}.  Table \ref{tab:benchmarks} gives characteristics
+%of the above applications including the number of filters implemented
+%and the size of the stream graph as coded.
+
+%%\end{itemize}
+

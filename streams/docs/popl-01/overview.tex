@@ -1,0 +1,606 @@
+\section{Language Overview}
+\label{sec:overview}
+
+\begin{figure}
+\scriptsize
+\begin{verbatim}
+class FIR extends Filter {
+   Channel input = new FloatChannel();
+   Channel output = new FloatChannel();
+   int N;
+
+   void init(int N) {
+      this.N = N;
+   }
+
+   void work() {
+      float sum = 0;
+      for (int i=0; i<N; i++) 
+         sum += input.peek(i)*FIR_COEFF[i][N];
+      input.pop();
+      output.push(sum);
+   }
+}
+
+class Main extends Stream {
+   void init() {
+      add(new DataSource());
+      add(new FIR(N));
+      add(new Display());
+   }
+}
+\end{verbatim}
+\vspace{-12pt}
+\caption{\protect\small An FIR filter in StreaMIT.
+\protect\label{fig:firstreamit}}
+\vspace{-12pt}
+\end{figure}
+
+\begin{figure}[t]
+\scriptsize
+\begin{verbatim}
+int N = 5;
+int BLOCK_SIZE = 100;
+
+void step(float[] input, float[] output, int numIn, int numOut) {
+   float sum = 0;
+   for (int k=0; k<numIn; k++)
+      sum = sum + input[k]*FIR_COEFF[k+numIn][N];
+   for (int k=numIn; k<N; k++) 
+      sum = sum + input[k]*FIR_COEFF[k-numIn][N];
+   output[numOut] = sum;
+   input[numIn] = getData();
+}
+
+void main() {
+   float input[] = new float[N];
+   float output[] = new float[BLOCK_SIZE];
+   int numIn, numOut;
+
+   for (numIn=0; numIn<N; numIn++)
+      input[numIn] = getData();
+
+   while (true) {
+
+      for (out=0; numIn<N; numIn++, numOut++)
+         step(input, output, numIn, numOut);
+
+      int wholeSteps = (BLOCK_SIZE-numOut)/N;
+      for (int k=0; k<wholeSteps; k++) {
+         for (numIn=0; numIn<N; numIn++, numOut++)
+            step(input, output, numIn, numOut);
+
+      for (numIn=0; numOut<BLOCK_SIZE; numIn++, numOut++)
+         step(input, output, numIn, numOut);
+
+      displayBlock(output);
+   }
+}
+\end{verbatim}
+\vspace{-12pt}
+\caption{\protect\small An optimized FIR filter in a procedural
+   language.  A complicated loop nest is required to avoid mod
+   functions and to use memory efficiently, and the structure of the
+   loops depends on the data rates (e.g., BLOCK\_SIZE) within the
+   stream.  An actual implementation might inline the calls to {\tt step}.
+\protect\label{fig:firprocedural}}
+\vspace{-12pt}
+\end{figure}
+
+\begin{figure}[t]
+\scriptsize
+\begin{verbatim}
+class FIRFilter {
+   int N;
+   float[] input;
+
+   FIRFilter(int N) {
+      this.N = N;
+   }
+
+   float[] getData(float[] output, int offset, int length) {
+      if (input==null) {
+         input = new float[MAX_LENGTH];
+         source.getData(input, 0, N+length);
+      } else {
+         source.getData(input, N, length);
+      }
+
+      for (int i=0; i<length; i++) {
+         float sum = 0;
+         for (int j=0; j<N; j++) {
+            sum = sum + data1[i+j]*FIR_COEFF[j][N];
+         }
+         output[i+offset] = sum;
+      }
+
+      for (int i=0; i<N; i++) {
+         input[i] = input[i+length];
+      }
+   }
+}
+
+void main() {
+
+   DataSource datasource = new DataSource();
+   FIRFilter filter = new FIRFilter(5);
+   Display display = new Display();
+   filter.source = datasource;
+   display.source = filter;
+   display.run();
+
+}
+\end{verbatim}
+\vspace{-12pt}
+\caption{\protect\small An FIR filter in an object oriented language.
+A ``pull model'' is used by each filter object to retrieve a chunk of
+data from its source, and straight-line code connects one filter to
+another.
+\protect\label{fig:firobject}}
+\vspace{-12pt}
+\end{figure}
+
+StreaMIT includes stream-specific abstractions and representations
+that are designed to improve programmer productivity for the domain of
+programs described above.  In this paper, we present StreaMIT in legal
+Java syntax for ease of presentation.  Though this syntax can express
+the fundamental ideas of StreaMIT, in the longer term we plan to
+develop a cleaner and more abstract syntax that is designed
+specifically for stream programs.
+
+Figure \ref{fig:radiocode} contains a detailed example of a software
+radio implemented in StreaMIT; a block diagram of the system appears
+in Figure \ref{fig:radiodiagram}.  In the following sections, we draw
+on different components of this example to describe and justify the
+major features of StreaMIT.  A more detailed guide to the syntax of
+StreaMIT can be found in the Appendix.
+
+\subsection{Filters}
+
+\subsubsection{StreaMIT Approach}
+
+The basic unit of computation in StreaMIT is the {\tt Filter}.  An
+example of a Filter is the {\tt FIRFilter}, a component of our
+software radio (see Figure \ref{fig:firstreamit}).  Each {\tt Filter}
+contains an {\tt init} function that is called at initialization time;
+in this case, the {\tt FIRFilter} records {\tt N}, the number of items
+it should filter at once.  A user should instantiate a filter by using
+its constructor, and the {\tt init} function will be called implicitly
+with the same arguments that were passed to the
+constructor{\footnote{This design might seem unnatural, but it is
+necessary to allow inlining (Section \ref{sec:connecting}) and
+re-initialization (Section \ref{sec:reinit}) within a Java-based
+syntax.}}.
+
+The {\tt work} function describes the most fine grained execution step
+of the filter in the steady state.  Within the {\tt work} function,
+the filter can communicate with neighboring blocks using the {\tt
+input} and {\tt output} channels, which are typed FIFO queues declared
+as fields at the top of the class.  These high-volume channels support
+the three intuitive operations: 
+\begin{enumerate}
+\item {\tt pop()} removes an item from
+the end of the channel and returns its value.
+\item {\tt peek(i)} returns the value of the item $i$ spaces from the end of the channel without
+removing it.
+\item {\tt push(x)} writes $x$ to the front of
+the channel.  The argument $x$ is passed by value; if it is an object,
+a separate copy is enqueued on the channel.
+\end{enumerate}
+A filter can also push, pop, and peek items from within
+the {\tt init} function if it needs to set up some initial state on
+its channels, although this usually is not necessary.
+
+A major restriction of the current version of StreaMIT is that it
+requires filters to have static input and output rates.  That is, the
+number of items peeked, popped, and pushed by each filter must be
+constant from one invocation of the {\tt work} function to the next.
+We plan to support dynamically changing rates in a future version of
+StreaMIT.
+
+\subsubsection{Rationale}
+
+StreaMIT's representation of a filter is an improvement over
+general-purpose languages.  In a procedural language, the analog of a
+filter is a block of statements in a complicated loop nest (see Figure
+\ref{fig:firprocedural}).  This representation is unnatural for expressing
+the feedback and parallelism that is inherent in streaming systems.
+Also, there is no clear abstraction barrier between one filter and
+another, and high-volume stream processing is muddled with global
+variables and control flow.  The loop nest must be re-arranged if the
+input or output ratios of a filter changes, and scheduling
+optimizations further inhibit the readability of the code.  In
+contrast, StreaMIT places the filter in its own independent unit,
+making explicit the parallelism and inter-filter communication while
+hiding the grungy details of scheduling and optimization from the
+programmer.
+
+One could also use an object-oriented language to implement a stream
+abstraction (see Figure \ref{fig:firobject}).  This avoids some of the
+problems associated with a procedural loop nest, but the programming
+model is again complicated by efficiency concerns.  That is, a runtime
+library usually exectutes filters according to a pull model, where a
+filter operates on a block of data that it retrieves from the input
+channel.  The block size is often optimized for the cache size of a
+given architecture, which hampers portability.  Moreover, operating on
+large-grained blocks obscures the fundamental fine-grained algorithm
+that is visible in a StreaMIT filter.  Thus, the absence of a runtime
+model in favor of automated scheduling and optimization again
+distinguishes StreaMIT.
+
+\subsection{Connecting Filters}
+\label{sec:connecting}
+
+\subsubsection{StreaMIT Approach}
+
+\begin{figure}[t]
+\scriptsize
+\begin{verbatim}
+class FFT extends Stream {
+   void init(int N) {
+      add(new SplitJoin() {
+         void init() {
+            setSplitter(WEIGHTED_ROUND_ROBIN(N/2, N/2));
+            for (int i=0; i<2; i++) 
+               add(new SplitJoin() {
+                  void init() {
+                     setSplitter(ROUND_ROBIN);
+                     add(IDENTITY());
+                     add(IDENTITY());
+                     setJoiner(WEIGHTED_ROUND_ROBIN(N/4, N/4);
+               }});
+            setJoiner(ROUND_ROBIN);
+      }});
+      for (int i=2; i<N; i*=2)
+        add(new Butterfly(i, N));
+}}
+\end{verbatim}
+\vspace{-12pt}
+\caption{\protect\small A Fast Fourier Transform (FFT) in StreaMIT.
+\protect\label{fig:fft}}
+\vspace{-12pt}
+\end{figure}
+
+The basic construct for composing filters into a communicating network
+is a {\tt Stream}.  The FFT in Figure \ref{fig:fft} is an example of a
+{\tt Stream} that appears in our software radio.  Like a {\tt Filter},
+a {\tt Stream} has an {\tt init} function that is called upon its
+instantiation.  However, there is no {\tt work} function, and all
+input and output channels are implicit; instead, the stream behaves as
+the sequential composition of filters that are specified with
+successive calls to {\tt add} from within {\tt init}.  That is, {\tt
+Stream} creates a single pipeline.
+
+There are two other stream constructors besides {\tt Stream}: {\tt
+SplitJoin} and {\tt FeedbackLoop}.  The former is used to specify
+independent parallel streams that diverge from a common {\it splitter}
+and merge into a common {\it joiner}.  There are three kinds of
+splitters:
+\begin{enumerate}
+\item WEIGHTED\_ROUND\_ROBIN($i_1$, $i_2$, $\dots$, $i_k)$,
+which sends the first $i_1$ data items to the first stream, the next
+$i_2$ data items to the second stream, and so on.
+\item ROUND\_ROBIN, which is just a weighted round robin where all
+weights are 1.
+\item DUPLICATE, which replicates each data item and sends a copy to each
+parallel stream.
+\item NULL, which means that all of the parallel components are
+sources and there is no input to split.
+\end{enumerate}
+Similarly, there are three kinds of joiners: 
+\begin{enumerate}
+\item WEIGHTED\_ROUND\_ROBIN($i_1$, $i_2$, $\dots$, $i_k)$, which reads the
+first $i_1$ data items from the first stream, the next $i_2$ data
+items to the second stream, and so on.
+\item ROUND\_ROBIN, which is just a weighted round robin where all
+weights are 1.
+\item COMBINE, which reads from all the streams in parallel and combines the results into a structure.  The structure has a separate field for each stream, 
+and the joiner cannot fire until each field is filled by an item from the 
+corresponding output channel.
+\item NULL, which means that all of the parallel components are sinks
+and there is no output to join together.
+\end{enumerate}
+The splitter and joiner type are specified with calls to {\tt
+setSplitter} and {\tt setJoiner}, respectively (see Figure
+\ref{fig:fft}); the parallel streams are specified by successive calls
+to {\tt add}, with the $i$'th call setting the $i$'th stream in the
+SplitJoin .  Note that a WEIGHTED\_ROUND\_ROBIN can function as an
+exclusive selector if one or more of the weights are zero.  Also,
+there are additional splitters and joiners that we plan to add when
+StreaMIT supports filters with dynamically changing rates, including:
+\begin{enumerate}
+\item TYPE\_DISPATCH, which sends an item to one of multiple streams
+depending on its type.
+\item ANY, which sends items to any parallel stream that has space on
+its input, or reads items from any parallel stream that has output
+available.
+\end{enumerate}
+
+\begin{figure}
+\centering
+\psfig{figure=basic-pipeline.eps,width=3.0in}
+
+(a) A Stream. \\
+\vspace{8pt}
+\psfig{figure=basic-splitjoin.eps,width=3.0in}
+
+(b) A SplitJoin. \\
+\vspace{8pt}
+\psfig{figure=basic-feedback.eps,width=3.0in}
+
+(c) A FeedbackLoop. \\
+\vspace{8pt}
+\caption{Stream structures supported by StreaMIT.}
+\label{fig:structuresp}
+\end{figure}
+
+\begin{figure}
+\scriptsize
+\begin{verbatim}
+class Fibonnacci extends FeedbackLoop {
+   void init() {
+      setDelay(2);
+      setJoiner(WEIGHTED_ROUND_ROBIN(0,1));
+      setBody(new Filter() {
+          Channel input = new IntChannel();
+          Channel output = new IntChannel();
+          void work() {
+              output.push(input.peek(0)+input.peek(1));
+              input.pop();
+          }
+      });
+      setSplitter(DUPLICATE);
+   }
+
+   int initPath(int index) {
+      return index;
+   }
+}
+\end{verbatim}
+\vspace{-12pt}
+\caption{\protect\small A FeedbackLoop version of Fibonnacci.
+\protect\label{fig:feed}}
+\vspace{-12pt}
+\end{figure}
+
+The last control construct provides a way to create cycles in the
+stream graph: the {\tt FeedbackLoop}.  It contains a joiner, a body
+stream, a splitter, and a loop stream, which are set with calls to
+{\tt setJoiner}, {\tt setBody}, {\tt setSplitter}, and {\tt setLoop},
+respectively (see Figure \ref{fig:feed}).  The splitters and joiners
+can be any of those for SplitJoin, except for NULL.
+
+The feedback loop has a special semantics when the stream is first
+starting to run.  Since there are no items on the feedback path at
+first, the stream instead inputs items from an {\tt initPath} function
+defined by the {\tt FeedbackLoop}; {\tt initPath} is called with the
+number of the data item that is being fabricated (starting from 0).
+With a call to {\tt setDelay} from within the {\tt init} function, the
+user can specify how many items should be calculated with {\tt
+initPath} before the joiner looks for data items from the feedback
+channel.
+
+Evident in all of these examples is another feature of the StreaMIT
+syntax: {\it inlining}.  The definition of any stream or filter can be
+inlined at the point of its instantiation, thereby preventing the
+definition of many small classes that are used only once, and,
+moreover, providing a syntax that reveals the hierarchical structure
+of the streams from the indentation level of the code.  In our Java
+syntax, we make use of anonymous classes for inlining \cite{java}.
+
+\subsubsection{Rationale}
+
+StreaMIT differs from other languages in that it imposes a
+well-defined structure on the streams; all stream graphs are built out
+of a hierarchical composition of Streams, SplitJoins, and
+FeedbackLoops.  This is in contrast to other environments, which
+generally regard a stream as a flat and arbitrary network of filters
+that are connected by channels.  However, arbitrary graphs are very
+hard for the compiler to analyze, and equally difficult for a
+programmer to describe.  Most programmers either resort to
+straight-line code that links one filter to another (thereby making it
+very hard to visualize the stream graph), or using an ad-hoc graphical
+programming environment that is awkward to use and admits no good
+textual representation.
+
+In contrast, StreaMIT is a clean textual representation
+that--especially with inlined streams--makes it very easy to see the
+shape of the computation from the indentation level of the code.  The
+comparison of StreaMIT's structure with arbitrary stream graphs could
+be likened to the difference between structured control flow and GOTO
+statements.  Though sometimes the structure restricts the
+expressiveness of the programmer, the gains in robustness,
+readability, and compiler analysis are immense.
+
+A final benefit of stream graph construction in StreaMIT is the
+ability to do {\it scripting} to parameterize graphs.  For instance,
+both the FFT stream in Figure \ref{fig:fft} inputs a parameter {\tt N}
+and adjusts the number of butterfly stages appropriately.  This
+further improves readability and decreases code size.
+
+\subsection{Messages}
+
+\subsubsection{StreaMIT Approach}
+
+\begin{figure}
+\psfig{figure=portal-code.eps,width=3.0in}
+\caption{The frequency-hopping of our software radio illustrates StreaMIT's messaging system.  In {\tt TrunkedRadio}, a {\tt Portal} is created to hold the message target, {\tt rf2if}.  Then, {\tt CheckFreqHop} uses the {\tt Portal} to send a frequency-change message.}
+\vspace{-12pt}
+\label{fig:portal-code}
+\end{figure}
+
+StreaMIT provides a dynamic messaging system for passing irregular,
+low-volume control information between filters and streams.  Messages
+are sent from within the body of a filter's {\tt work} function,
+perhaps to change a parameter in another filter.  For example, in the
+{\tt CheckFreqHop} stream of our software radio example (Figure
+\ref{fig:portal-code}), a message is sent upstream to change the frequency of
+the receiver if the downstream component detects that the transmitter
+is about to change frequencies.  The sender can continue to execute
+while the message is en route, and the {\tt set\_freq} method will be
+invoked in the receiver with argument {\tt Freq[k]} when the message
+arrives.  Since message delivery is asynchronous, there can be no
+return value; only void methods can be message targets.
+
+{\bf Message timing.}The central aspect of the messaging system is a
+sophisticated timing mechanism that allows filters to specify when a
+message will be received relative to the flow of information between
+the sender and the receiver.  Recall that each filter executes
+independently, without any notion of global time.  Thus, the only way
+for two filters to talk about a time that is meaningful for both of
+them is in terms of the data items that are passed through the streams
+from one to the other.
+
+In StreaMIT, one can specify a range of latencies for a message to get
+delivered.  This latency is measured in terms of an information
+``wavefront'' from one filter to another.  For example, in the {\tt
+CheckFreqHop} example of Figure \ref{fig:portal-code}, the sender
+indicates an interval of latencies between $4N$ and $6N$.  This means
+that the receiver will receive the message immediately following the
+last invocation of its own {\tt work} function which produces an item
+affecting the some output of the {\it sender's} $4N$'th to $6N$'th
+work functions, counting the sender's current work function as number
+0.  Defining this notion precisely is the subject of Section
+\ref{sec:time}, but the general idea is simple:  the receiver is
+invoked when it sees the information wavefront that the sender sees in
+$4N$ to $6N$ execution steps.  
+
+In some cases, the ability to synchronize the arrival of a message
+with some element of the data stream is very important.  For example,
+{\tt CheckFreqHop} knows that the transmitter will change the
+frequency between $4N$ and $6N$ steps later, in terms of the frame
+that {\tt CheckFreqHop} is inputting.  To ensure that the radio
+changes frequencies at the same time--so as not to lose any data at
+the old or new frequency--{\tt CheckFreqHop} instructs the receiver to
+switch frequencies when the {\it receiver} sees one of the last data
+items at the old frequency.
+
+If the receiver of a message is a stream instead of a filter, then the
+message delivery is timed with respect to the first (most upstream)
+filter in the stream.  We are still formalizing the message delivery
+semantics in cases where the receiver is a stream that has no unique
+first filter (e.g., a SplitJoin with NULL splitter).  Note that the
+stream itself can receive a message even though the timing is in terms
+of filter-to-filter communication.
+
+{\bf Portals for broadcast messaging.}  StreaMIT also has support for
+modular broadcast messaging.  When a sender wants to send a message
+that will invoke method $M$ of the receiver $R$ upon arrival, it does
+not call $M$ on the object $R$.  Rather, it calls $M$ on a {\it
+Portal} of which $R$ is a member.  Portals are typed containers that
+forward all messages they receive to the elements of the container.
+Portals could be useful in cases when a component of a filter library
+needs to announce a message (e.g., that it is shutting down) but does
+not know the list of recipients; the user of the library can pass the
+filter a Portal containing all interested receivers.  As for message
+delivery constraints, the user specifies a single time interval for
+each message, and that interval is interpreted separately (as
+described above) for each receiver in the Portal.
+
+In a language with generic data types, a Portal could be implemented
+as a templated list.  However, since Java does not yet support
+templates, we automatically generate an {\tt <X>Portal} class for
+every class and interface {\tt <X>}.  Our syntax for using Portals is
+evident in the {\tt TrunkedRadio} class in Figure
+\ref{fig:portal-code}.
+
+\subsubsection{Rationale}
+
+Stream programs present a challenge in that filters need both regular,
+high-volume data transfer and irregular, low-volume control
+communication.  Moreover, there is the problem of reasoning about the
+relative ``time'' between filters when they are running asynchronously
+and in parallel.
+
+A different approach to messaging is to embed control messages in the
+data stream instead of providing a separate mechanism for dynamic
+message passing.  This does have the effect of associating the message
+time with a data item, but it is complicated, error-prone, and leads
+to unreadable code.  Further, it could hurt performance in the steady
+state (if each filter has to check whether or not a data item is
+actual data or control, instead) and complicates compiler analysis,
+too.  Finally, one can't send messages upstream without creating a
+separate data channel for them to travel in.
+
+Another solution is to treat messages as synchronous method calls.
+However, this delays the progress of the stream when the message is en
+route, thereby degrading the performance of the program and
+restricting the compiler's freedom to reorder filter executions.  
+
+We feel that the StreaMIT messaging model is an advance in that it
+separates the notions of low-volume and high-volume data
+transfer--both for the programmer and the compiler--without losing a
+well-defind semantics where messages are {\it timed} relative to the
+high-volume data flow.  Further, by separating message communication
+into its own category, fewer connections are needed for steady-state
+data transfer and the resulting stream graphs are more amenable to
+structured stream programming.
+
+\subsection{Re-Initialization}
+\label{sec:reinit}
+
+\subsubsection{StreaMIT Approach}
+
+One of the characteristics of a streaming application is the need to
+occaisionally modify the structure of part of the stream graph.
+StreaMIT allows these changes through a re-initialization mechanism
+that is integrated with its messaging model.  If a sender targets a
+message at the {\tt init} function of a stream or filter $S$, then
+when the message arrives, it re-executes the initialazation code and
+replaces $S$ with a new version of itself.  However, the new version
+might have a different structure than the original if the arguments to
+the {\tt init} call on re-initialization were different than during
+the original initialization.
+
+When an init message arrives, it does not kill all of the data that is
+in the stream being re-initialized.  Rather, it {\it drains} the
+stream until the wavefront of information (as defined for the
+messaging model) from the top of the stream has reached the bottom.
+The draining occurs without consuming any data from the input channels
+to the re-initialized region.  Instead, a {\tt drain} function of each
+filter is invoked to provide input when its other input source is
+frozen.  (Each filter can override the {\tt drain} function as part of
+its definition.)  If the programmer prefers to kill the data in a
+stream segment instead of draining it, this can be indicated by
+sending an extra argument to the message portal with the
+re-initialization message.
+
+\subsubsection{Rationale}
+
+Re-initialization is a headache for stream programmers because--if
+done manually--the entire runtime system could be put on hold to
+re-initialize a portion of the stream.  The interface to starting and
+stopping streams could be complicated when there is not an explicit
+notion of initialization time vs. steady-state execution time, and
+ad-hoc draining techniques could risk losing data or deadlocking the
+system.
+
+StreaMIT improves on this situation by abstracting the
+re-initialization process from the user.  That is, no auxillary
+control program is needed to drain the old streams and create the new
+structure; the user need only trigger the reinitialization process
+through a message.  Additionally, any hierarchical stream construct
+automatically becomes a possible candidate for re-initialization, due
+to the well-defined stream structure and the simple interface with the
+{\tt init} function.  Finally, it is easy for the compiler to
+recognize stream re-initialization possibilities and to account for
+all possible configurations of the stream flow graph during analysis
+and optimization.
+
+\subsection{Latency Constraints}
+
+Lastly, StreaMIT provides a simple way of restricting the latency of
+an information wavefront in traveling from the input of one filter to
+the output of a downstream filter.  Issueing the directive {\tt
+MAX\_LATENCY(A, B, n)} from within an {\tt init} means that $A$ can
+only execute up to the wavefront of information that $B$ will see
+after $n$ invocations of its own work function.
+
+In the case that $A$ is a stream instead of a filter, then the latency
+is with regards to the most upstream filter of $A$; likewise, if $B$
+is a stream, then the latency is with regards to the most downstream
+filter in $B$.  We are still in the process of formalizing the
+semantics in cases when there is no unique upstream or downstream
+filter in these streams.
+
+

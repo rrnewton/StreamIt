@@ -1,0 +1,55 @@
+\begin{figure*}[t]
+\parbox{6in}{
+\begin{center}
+{\bf Appendix B:  Frequency Replacement Scaling} \\ ~ \\ ~ \\
+\begin{minipage}{2.8 in}
+\begin{center}
+\epsfxsize=2.2in
+\epsfbox{images/frequency-win-theory.eps} \\
+{\bf (a) Theoretical}
+\end{center}
+\end{minipage} 
+\begin{minipage}{2.8 in}
+\begin{center}
+\epsfxsize=2.2in
+\epsfbox{images/frequency-win-empirical.eps} \\
+{\bf (b) Empirical}
+\end{center}
+\end{minipage}
+\caption{Plots showing the theoretical and empirical multiplication reduction factor as a function of the size of the FIR ($M$) and the number of outputs produced per calculation ($N$). The dark regions denote an increase in the required number of multiplications and the light regions a reduction.}
+\label{fig:frequency-win}
+\end{center}
+
+Frequency replacement is an effective optimization because the
+asymptotic bounds for frequency domain computation is lower than the
+bound for the time domain computation.  We determined empirically the
+point at which frequency replacement improves performance.
+\\ ~ \\
+~~~~~Direct convolution requires $O(MN)$ multiplies.  The FFT requires
+$O(N+2(M-1))lg(N+2(M-1))$ multiplications for both the conversion to
+and from the frequency domain, and multiplying two $N+2(M-1)$ vectors
+in the frequency domain requires $O(N+2(M-1))$ multiplications.
+Direct convolution produces $N$ outputs per iteration and the
+frequency implementation produces $N+M-1$ outputs every iteration.  We
+define the ``multiplication reduction factor'' to be the number of
+multiplies required per output using convolution divided by the the
+number of multiplies per output using the frequency transformation.
+\\ ~ \\
+~~~~~Figure~\ref{fig:frequency-win}~(a) shows a plot of the theoretical
+multiplication reduction factor and Figure~\ref{fig:frequency-win}~(b)
+shows the same reduction factor measured empirically.  The roughness
+in both the theoretical results and the data is due to the fact that
+for the best FFT performance, $N+2(M-1)$ must be a power of two, and the
+compiler automatically adjusts $N$ upward to satisfy this
+requirement. The theoretical reduction numbers account for the fact
+that our implementation requires four floating point multiplication
+operations to perform a complex valued multiply in the frequency
+domain.
+\\ ~ \\
+~~~~~Based on the above analysis, our current compiler applies the
+frequency replacement transformation on FIR filters that have length
+$90$ or greater. The target output rate, $N$, is automatically set to
+be twice the FIR length.
+}
+\end{figure*}
+

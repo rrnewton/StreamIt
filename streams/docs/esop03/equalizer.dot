@@ -1,0 +1,14 @@
+digraph G {
+RadioSource [shape=box];
+Speaker [shape=box];
+BPF1 [label="\nBandPassFilter (100000, 50)" shape=box];
+BPF2 [label="\nBandPassFilter (200000, 50)" shape=box];
+"Adder (2)" [shape=box];
+duplicate -> BPF1 [headlabel="\n\n\n(BPF1)   " taillabel="\n\n\n\n\n\n\n\n\n\nc2                                                                                        " label="U(c2) = 1                                           \nO(c2) = 1                                           \n     E(c2) = 49                                              \nE(c2) = 50                                         "];
+duplicate -> BPF2 [headlabel="\n\n\n(BPF2)   " taillabel="\n\n\n\n\n\n\n\n\n                                                              c3" label="U(c3) = 1     \nO(c3) = 1     \n     E(c3) = 49        \nE(c3) = 50   "];
+BPF1 -> roundrobin [taillabel="\n\n\n\n\n\nc4       " label="     U(c4) = 49                                                \nU(c4) = 1                                             \nO(c4, 0) = 1                                         \nO(c4, 1) = 0                                         \n"];
+BPF2 -> roundrobin [taillabel="\n\n\n\n\n\nc5          " label="     U(c5) = 49       \nU(c5) = 1    \nO(c5, 0) = 0\nO(c5, 1) = 1\n"];
+roundrobin -> "Adder (2)" [taillabel="\n\n\n\n\nc6      " label="U(c6, 0) = 1\nU(c6, 1) = 1\nO(c6) = 2    "];
+RadioSource -> duplicate [taillabel="\n\n\n\nc1      " label="U(c1) = 1\nO(c1) = 1"];
+"Adder (2)" -> Speaker [taillabel="\n\n\n\nc7      " label="U(c7) = 1\nO(c7) = 1"];
+}

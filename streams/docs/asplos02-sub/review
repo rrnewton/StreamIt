@@ -1,0 +1,351 @@
+From: "Michael Gordon" <mgordon@MIT.EDU>
+To: <commit-stream@cag.lcs.mit.edu>
+Subject: reviews
+Date: Mon, 6 May 2002 13:15:11 -0400
+--------------------------------------------------------------------------
+
+Review #176 For Paper #46
+Attribute  Value
+Provide a short summary of the paper and its contributions
+
+This paper describes the compiler used to compile the StreamIt language, a
+streaming language based on Java, to the MIT Raw architecture. The paper
+describes the steps of partitioning, layout (mapping to hardware), and
+scheduling that are novel to this type of hardware and source language.
+
+After introducing StreamIt and Raw, the paper concentrates on the
+partitioning transformations - various forms of kernel fission and fusion.
+
+Results are presented showing that for some computations the compiler does
+quite well in mapping computations to Raw (350% improvement) while for
+others, like FFT, compilation actually decreases performance.
+Provide detailed comments to the author
+
+This paper describes the compiler used to compile the StreamIt language, a
+streaming language based on Java, to the MIT Raw architecture. The paper
+describes the steps of partitioning, layout (mapping to hardware), and
+scheduling that are novel to this type of hardware and source language.
+
+After introducing StreamIt and Raw, the paper concentrates on the
+partitioning transformations - various forms of kernel fission and fusion.
+
+Results are presented showing that for some computations the compiler does
+quite well in mapping computations to Raw (350% improvement) while for
+others, like FFT, compilation actually decreases performance.
+Provide detailed comments to the author This paper touches on what ASPLOS is
+all about - the interaction of programming languages (StreamIt), compilation
+techniques, and architecture.
+
+It is troubling that the selection and ordering of optimizations is a manual
+process. The authors should explain this. Is the automation of these
+optimizations just not complete? or is there a fundamental difficulty with
+choosing a set of optimizations and an ordering in which to apply them?
+
+The slowdown on the FFT kernel (FFT is *not* an application by itself) is
+also troubling. FFT is a very common part of many (if not most) signal
+processing applications. If the compiler cannot handle FFT, its application
+may be very limited. Also, quoting the beamformer speedup so predominantly
+is a bit misleading since none of the other "applications" come anywhere
+close to this increase in performance.
+
+The paper contrasts the space multiplexing of a stream program with the time
+multiplexing of a scientific program (page 8). This is misleading. The
+application domain (stream vs scientific) does not limit how a program can
+be mapped to hardware. A scientific program could be space multiplexed and a
+stream program could be time multiplexed. Most applications are mapped with
+a combination of both time multiplexing and space multiplexing. In fact, the
+kernel fusion transformation are really just a way of time multiplexing
+several kernels on one tile.
+
+Since the paper mentions communication scheduling, it should mention the
+ASPLOS 2001 paper with this title (Mattson et al.) and put this work in
+context.
+
+The comparison to the StreamC/KernelC programming system is misleading. The
+languages are very close - both describe kernels and have a way of composing
+them. One might argue that StreamIt is a bit cleaner in both respects, but
+there are no fundamental differences - other than perhaps the "peek"
+operation. With StreamC no manual extraction of kernels is necessary, since
+the compilation time multiplexes the kernels rather than space multiplexing
+them, there is no load imbalance.
+
+
+Review #207 For Paper #46
+Attribute  Value
+Provide a short summary of the paper and its contributions
+
+This paper presents an overview of a compiler for the StreamIT language that
+targets the RAW machine architecture, including further details on how to
+optimize and layout the stream-graph for architectures with different
+numbers of nodes. This work attempts to produce a compiler that enables a
+portable interface to different stream architectures.
+
+Provide detailed comments to the author
+Overall Comments
+----------------
+I think this work is very interesting and pertinent. However, I think the
+paper is not ASPLOS quality in its current form. Technically, I think two
+additions are necessary: 1) more information on how to automatically decide
+which of the various fusion, fission, and reordering optimizations to apply
+and when to apply them; and 2) more detailed results that include the
+effectiveness of each of the optimizations, which optimizations were
+actually applied to the applications to achieve your speedups, and some
+estimate of how close to optimal (or some conservative lower bound) the
+final results were. In terms of presentation, there were major problems that
+detracted from my understanding of the paper (3 unreferenced figures,
+serious errors in examples, etc.), and there were many other errors that
+detracted from my focus on the point being made (for instance, there were
+__10__ spelling errors in the conclusion alone!).
+
+Detailed Comments
+-----------------
+Too much time is spent explaining the simple point of Amdahl's analog for
+streaming programs. Further, your work basically starts where the 'stream
+Amdahl's law' ends -- so, an additional useful point would be the maximum
+speedup your optimizations enable (this is basically MAX(c.w) /
+AVERAGE(c.w)).
+
+Figure 6 is incorrect. The trasformed code in the figure assumes that you've
+used a DUPLICATE splitter, however a ROUNDROBIN splitter is shown in the
+graph. The code looks like the incorrect part, since the graph agrees with
+the text describing the figure.
+
+Figure 9 has two errors. First, there is no subtract at all in the
+transformed code. Second, the code seems to be assuming a ROUNDROBIN(2,2)
+splitter, while a DUPLICATE splitter is shown.
+
+Are these erroneous code examples produced by your automatic optimizer? If
+so, the presence of these errors undermine the validity of any results in
+the paper.
+
+Figures 12 and 13 need some labels. X-axis labels are especially important
+in order to understand what the difference in time-frame is for the two
+graphs.
+
+Why can't you do better than the performance shown in Figure 13? There are
+still processors that remain idle most of the time after the optimizations.
+Can't you further split kernels to eliminate those dead times?
+
+Section 5 basically presents details on the fission and fusion
+optimizations, which could be implemented with fairly simple source to
+source compiler transformations. Instead of focusing so much on the details
+of these transformations, I would like to see descriptions of how to
+identify when to use a particular optimization, and why I would choose one
+optimization over another. I know that currently these decisions are made
+manually, but the system of rules used to guide the manual process should
+have been included, as well as perhaps an outline of how one might do it
+automatically.
+
+An explanation of why fusion transformations are necessary would be useful.
+For example, I think that simply time-multiplexing the scheduling of
+multiple filters on one or more nodes might not work because of buffer
+requirements. You should confirm this statement, or state why fusion is
+better than simple time-multiplexed scheduling, especially since the latter
+would have less quantization effects (for example, consider N+1 filters on N
+nodes).
+
+The last paragraph in Section 5.5 is the most interesting one in all of
+Section 5, and seems to be the meatiest and hardest research topic in this
+section as well. More on this would be great.
+
+How does the compiler handle code generation if the required buffer size
+exceeds the amount of buffer memory available on one node?
+
+The few results that were presented were quite confusing. A quick gripe
+first: don't present MFLOPS results unless you clearly state the speed of
+your machine somewhere in the paper -- I couldn't find the clock speed
+assumed by your simulator anywhere in this paper. Second, the FFT results
+are so weird that it makes me lose confidence in the other results. How does
+the throughput increase by a factor of ~23 but the MFLOPS only decrease by a
+factor of ~8. Furthermore, why doesn't your algoritm have some sort of
+feedback that excludes an optimization unless it would help? Finally, this
+last point is the weirdest of them all. Since you have one application
+(BeamFormer) that runs at 775 MFLOPS on a 16-node machine, we can assume
+that each node can approximately handle at least 50MFLOPS peak. The FFT
+performance listed is 4.25 MFLOPS. That means the 16-node performance is
+less than 10% of the (conservative) peak of a single node, and less than 1%
+of the peak of the entire machine! You can't list this kind of figure
+without the proper treatment -- simply stating that better code generation
+or other optimizations would fix the problem is not enough!
+
+Are the speedups in Figure 14 based on throughput or MFLOPS, since these
+speedups seem to differ according to Table 3.
+
+I think that Berkeley's SCORE project should be mentioned in the related
+work. The SCORE project takes a dynamic approach to the same problem -- a
+comparison between your static approach and SCORE would be interesting.
+
+Presentation Comments
+---------------------
+o There were too many spelling and grammar errors to list here. I get the
+sense that many pieces of text were never actually proofread before
+submission. I would suggest at least running a spell checker before
+submitting the paper.
+o Furthermore, all figures should be referenced in the text. I believe
+Figures 9, 14, and 15 are three such figures.
+o The equation in Section 5.0 is formatted very poorly
+
+Review #304 For Paper #46
+Attribute  Value
+Provide a short summary of the paper and its contributions
+
+The paper describes a compiler for the Raw machine. The Raw machine is a
+2-d array of VLIW processors with communication support (routers,
+connections). The input to this compiler is StreamIt, an Occam-like
+language (explicit communication via send(push)/receive(pop)
+statements). StreamIt allows the description of pipelines, feedback
+loops, and split/join nodes to combine StreamIt programs. The compiler
+improves performance for some programs "by 350%" (BeamFormer MFLOPS
+increases from 248 to 775 MFLOPS) but totally destroys the
+performance for others (FFT goes from 36 to 4 MFLOPS).
+
+Provide detailed comments to the author
+
+The effort described in this paper is interesting. Nevertheless, the
+paper leaves a number of questions unanswered. The authors have to add
+significant depth to obtain a paper that is more than a snapshot
+description of an (interesting) compiler system.
+(a) Partitioning attempts to partition the computation into parts
+"which perform[] approximately the same amount of work during the
+execution of the program". How is this accomplished in the presence of
+conditional statements in the program. (Or is StreamIt constrained to
+exclude conditional statements?)
+(b) "the decision which transformations to apply is done by hand" This
+statement deserves more explanation. What is the kind of interaction
+that is required by the human compiler user?
+(c) "We have implemented all the phases of the compiler as well as the
+optimizations except for the optimization selection, which is currently
+done by the programmer." Does this mean the programmer is in charge of
+en/disabling all optimizations? The first comment (in the section on
+partitioning) made this reader think the restriction applies to this
+stage. The latter comment makes me think it may also apply to
+scheduling, layout, and communication mgt.
+
+Please provide (where meaningful) the % of the peak performance that is
+obtained for your applications. How busy are yoru functional units, or
+how busy is the communication system?
+
+The discussion of related work is weak. The SISAL language & compiler
+effort deserves explicit comparison with the StreamIt approach. The "S"
+in SISAL stands for STREAMS!
+
+There really aren't any conclusions. The claim that this
+approach/compiler applies to other machines ("... map [portable
+applications] to any given architecture.") is not supported in the
+paper.
+
+The paper seems to have been rushed. There are sentences without verb ("A
+sustained 755 MFLOPS rate ....") -- and the table claims 775. There are
+spelling errors (hirearchical, hirararchical, systermatic, ...).
+
+Overall I think this is an important area of research. A paper that
+provides real results and reports on real experience using the StreamIt
+compiler should be published. But the description of the compiler must
+be so that others can learn from it, and the issue "does this apply to
+machines other than Raw" must be addressed.
+
+The authors use the term "von-Neumann machine". Please read H&P's
+comments about this term. Furthermore, C does not (and never claimed todo
+so) abstract the details between one machine and another (for
+stored-program machines). The original C report left a lot of details
+unspecified so that C could serve as a high-level language for OS
+developemnt. If a language demonstrated the benefits that you discuss
+in your introduction, then this language was/is Fortran.
+
+Note to authors: the reviewing system offers only a preset list of
+choices for some of the questions. I feel that some of these choices do
+not apply and have expressed this opinion in the "PC-only" part of the
+review. So don't pay too much attention to the responses to these
+questions.
+
+
+Review #375 For Paper #46
+Attribute  Value
+Provide a short summary of the paper and its contributions
+
+This paper presents StreamIt, a streaming language for communication exposed
+processors such as RAW. StreamIt composes a program from filters which
+operate on continuous streams of data. The filters are arranged in a fixed
+set of structures. The paper describes how the efficiency of such a program
+can be increased by transforming the filters that compose the program.
+
+Provide detailed comments to the author
+
+Overall, the paper is novel and interesting. The StreamIt language is simple
+and understandable.
+The transformations applied to the filters are clean formulations of
+important optimizations for such a language.
+
+I have some lingering conerns about the ability of the language to express
+more complex applications. It is unclear what the limitations of a filter
+are. Are they limited to one input stream and one output stream? Can one
+have random memory access to a large data structure inside a filter? If not,
+how would one describe a random memory access (such as a table lookup) in
+StreamIt or interface with another language that provides this capability?
+It might help to include some code from something more complex in an
+appendix, or at least state that a complex application had been implemented.
+
+The biggest area for improvement is in the results section. The efficiency
+of the techniques are demonstrated by comparing programs implemented in
+StreamIt without optimizations to programs implemented in StreamIt with
+optimizations. I would be very interested to see a comparison to a
+conventional implementation of the programs compiled for a single RAW tile.
+This would quantify the overhead of the language and the parallelism
+achieved.
+
+
+
+
+
+Review #473 For Paper #46
+Attribute  Value
+Provide a short summary of the paper and its contributions
+
+This paper proposes a stream language and compiler for RAW that
+enforce a structured data-flow graph on the stream program, and then
+exploit this structure to produce code. They describe the language,
+many parts of the compiler, and give results (2 programs speed up, 2
+stay about the same, and one goes slower.)
+
+Provide detailed comments to the author
+
+This paper clearly represents a lot of interesting work and ideas, but
+it is not presented in a way that makes it accessible, i.e., where a
+knowledgeable reviewer (me anyway) learned much of anything by reading
+it. It describes and evaluates a point solution in the compiler
+solution for a specialized architecture, rather than a range of
+tradeoffs. This choice makes it very hard to glean any general
+scientific contribution(s) that we should take away. Even making the
+language structured instead of unstructured (which I feel positive is
+a very good idea) is not _shown_ to make the compiler simpler,
+cleaner, more powerful or whatever.
+
+Instead of pointing out all the problems in each individual section, I
+am going to focus the remainder of my review broadly on what the
+authors can do to improve the paper.
+
+I read through the compiler section in detail two times, and I could
+not understand very well why and how the individual transformations
+were doing things to the programs. I suggest the paper take one
+example, and show each transformation on the example, including
+analysis that says how the compiler decides when to apply said
+transformation. There are several examples of each transformation,
+but every one is picked out of the air, and not related to any whole
+program, nor does the text describe them well or relate them well to
+some algorithm.
+
+Who wrote the applications the experiments begin with? It is not
+clear which parts are automated and which are not. Is it all
+automated?
+
+In the results section, the paper needs to explain what the compiler
+did to the code to achieve the changed program, and why it was an
+improvement in some cases and why not in others. Each individual
+transformation should be included/excluded to see if we really need it
+or not. What could we do differently for FFT to figure out that the
+compiler should just leave it alone? Show a figure like Figure 12 for
+all the benchmarks!
+
+This paper is not anonymous.
+
+

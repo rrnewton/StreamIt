@@ -1,0 +1,98 @@
+StreamIt: A compiler for stream applicaitons
+
+A natural language for stream applications
+- Ability to built a great optimizing compiler
+
+A common machine language for grid architectures
+- Expose all the common properties and hide the differences between 
+architectures
+
+StreamIt language 
+-	Description
+o	Filters
+o	Connecting filters
+o	Messaging
+o	Reinitialization (just a pointer)
+-	Language Limitations
+o	Static Rates
+o	Syntax 
+o	First class Streams / finite streams
+-	Example
+o	Code
+o	Graph
+
+Abstract Execution model
+-	Tapes and filters
+-	Steady state definition?
+-	Semantics of split-join, feedback loops
+-	Operational semantics
+-	What is a legal program?
+-	Function model
+o	Deconstruction and reconstruction
+o	CSE on reconstruction 
+
+Timing semantics
+-	Message syntax 
+-	Transfer functions
+
+Optimization metrics
+-	Performance (throughput) 
+-	Latency
+-	Data buffer size
+-	Code size
+
+Fusion Transformation
+
+Fission Transformation
+
+Fission with state propagation 
+
+Fission of a Feedbackloop
+
+Steady-state invariant code motion
+
+Decimation Removal 
+
+Data Parallelization
+-	MMX
+-	Raw
+
+Scheduling
+-	Initialization 
+-	Coarse-grain scheduling
+-	Fine-grain scheduling
+-	Respecting the timing constraints 
+
+Implementation 
+ 
+The "stream abstraction" vs. the procedural abstraction
+-	Separate compilation
+-	Black box, vs. gray box vs. white box
+
+Runtime Model
+-	Break-up between fine-grain, coarse-grain and black/white boxes etc.
+-	Message delivery model
+
+Scripting
+-	Partial evaluation
+-	Algebraic Simplification 
+ 
+Results
+-	Examples
+o	GSM
+o	PCA Demo
+o	FM Radio
+o	Filter banks (???)
+-	Numbers
+o	Graphs of the application
+o	StreamIt runtime vs. Spectrumware runtime
+o	Transformation examples (Graphs and Speedups)
+
+
+Related Work
+
+
+
+
+
+

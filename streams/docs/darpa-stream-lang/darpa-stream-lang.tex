@@ -1,0 +1,828 @@
+\documentclass[11pt]{article}
+
+\usepackage{booktabs}
+%\usepackage[margin=0.5in]{geometry}
+\usepackage{palatino}
+\usepackage{tabularx}
+
+% Make picture sizes be sane:
+\setlength{\unitlength}{\baselineskip}
+
+\title{A Stream Kernel Abstraction for the PCA Morphware Stream
+  Virtual Machine Representation}
+\author{David Maze \and William Thies \and Michael Gordon \and Michael
+  Karczmarek \and Saman Amarasinghe}
+\date{October 15, 2002}
+
+\begin{document}
+
+\maketitle
+\tableofcontents
+
+\section{Introduction}
+
+This document describes the Stream Kernel Abstraction (SKA) for the
+proposed Stream Virtual Machine (SVM) in the Morphware forum.  This
+abstraction is largely based on the MIT StreamIt language, in which
+incoming data is processed incrementally as a ``stream'', taking a
+possibly infinite series of inputs and producing a similar stream of
+outputs.
+
+A stream kernel is a self-contained section of a larger system that
+does streaming computation.  Within a stream kernel, the programmer
+constructs a stream graph, containing blocks with a single input and a
+single output, and describes the function of atomic blocks and the
+structure of composite blocks.  The compiler generates code for each
+block, and applies optimizations to the stream graph to produce
+efficient code for the target architecture.
+
+The stream kernel abstraction is vaguely reminiscent of other
+imperative languages such as C or Java.  In particular, the bodies of
+filter work functions and stream initialization code is generally
+legal Java code.  This provides a straightforward mapping from the SKA
+to the SAAL ISA.
+
+\section{Types}
+
+This section describes the various data and object types used in
+the SKA.  Data types are passed along tapes between stream
+objects, and can be used as local variables.  Stream objects are only
+created in initialization code and form a static stream graph.
+
+\subsection{Data Types}
+
+Data types are always created atomically.  They are of fixed size, and
+are generally statically allocated.
+
+\subsubsection{Primitive Types}
+
+The following primitive types exist:
+
+\begin{description}
+\item[\texttt{bit}]  A one-bit unsigned integer type, containing
+  the value \texttt{0} or \texttt{1}.
+
+\item[\texttt{int}]  A signed integer type, of unspecified length.
+  This length will typically be the native word length on the target
+  machine.
+
+\item[\texttt{float}]  A floating-point type, of the best precision
+  that will give good performance.  On architectures with hardware
+  support for double-precision floating-point, this will generally be
+  used, but there is no guarantee of a particular bit width.
+
+\item[\texttt{complex}]  A floating-point complex type, of the same
+  precision as \texttt{float}.  This has real and imaginary parts,
+  which can be directly accessed with \texttt{c.real} and
+  \texttt{c.imag}.
+\end{description}
+
+\label{sec:operators}
+A number of operations are supported on these primitive types; these
+are listed in Table \ref{tab:primitive-operators}.  In a binary or
+ternary expression, if two expressions are of different primitive
+types, they are promoted to the lowest type on the list above.  Real
+expressions converted to \texttt{complex} have an imaginary part of
+zero.  \texttt{|}, \texttt{\&}, and \texttt{\^} are bitwise or,
+and, and exclusive-or operators, respectively.  The boolean logic
+operators \texttt{\&\&} and \texttt{||} behave as in C: they are
+short-circuiting, integer values of exactly zero are false, and other
+values are true.  \texttt{==} and other comparison operators return
+an integer 1 if the comparison is true and an integer 0 if the
+comparison is false.
+
+\begin{table}
+\begin{center}
+\begin{tabular}{ccl}
+\toprule
+\textbf{Operators} & \textbf{Types} \\
+\midrule
+\texttt{?:} & Any & First part must be \texttt{int} or \texttt{bit} \\
+\texttt{||} & \texttt{int}, \texttt{bit} \\
+\texttt{\&\&} & \texttt{int}, \texttt{bit} \\
+\texttt{|}, \texttt{\&}, \texttt{\^} &
+  \texttt{int}, \texttt{bit} \\
+\texttt{==}, \texttt{!=} & Any \\
+\texttt{<}, \texttt{<=}, \texttt{>}, \texttt{>=} &
+  \texttt{int}, \texttt{float} \\
+\texttt{+}, \texttt{-} &
+  \texttt{int}, \texttt{float}, \texttt{complex} \\
+\texttt{*}, \texttt{/}, \texttt{\%} &
+  \texttt{int}, \texttt{float}, \texttt{complex} &
+  \texttt{\%} must be \texttt{int} \\
+\texttt{++}, \texttt{--} & \texttt{int} \\
+\bottomrule
+\end{tabular}
+\end{center}
+\caption{Operators on primitive types}
+\label{tab:primitive-operators}
+\end{table}
+
+\subsubsection{Structures}
+\label{sec:data-structures}
+
+Named structures of heterogeneous data types are supported.  A
+structure must be of a fixed size.  It contains a set of fields, each
+of which has a name and a data type.  Any primitive or array type, and
+any structure type which has been previously declared in the program,
+may be used; recursive structures are not allowed.  The following two
+structure definitions are both legal:
+
+\begin{verbatim}
+struct A {
+  int a;
+  int[4] b;
+}
+
+struct B {
+  A a;
+  A[4] b;
+}
+\end{verbatim}
+
+A structure definition contains the keyword \texttt{struct}, the name
+of the structure, an open brace, a listing of field (variable)
+declarations, and a close brace.  It is not followed by a semicolon.
+
+The only supported operations on structures are field references and
+copying.  Field references are of the form \texttt{a.b}; \texttt{a} must
+be of some structure type \texttt{A}, and \texttt{b} must be a field named
+in the structure declaration of \texttt{A}.  The type of this expression
+is the declared type of the field.  Note that a similar syntax is used
+for referencing the real and imaginary parts of complex numbers; there
+is an implicit structure declaration
+
+\begin{verbatim}
+struct complex {
+  float real;
+  float imag;
+}
+\end{verbatim}
+
+\noindent
+along with some syntactic sugar to make complex arithmetic work.
+
+\subsubsection{Arrays}
+
+Arrays of any data type described here are supported.  Arrays must be
+of a fixed length.  Array types are written with the base type name,
+followed by a single dimension in square brackets.  Multi-dimensional
+arrays or matrices are supported as arrays of arrays.
+
+\subsubsection{Variable Declarations}
+
+Variable declarations appear in structure declarations, as well as in
+code blocks and \texttt{filter} declarations.  A variable declaration
+always has the form \texttt{type name;}, where \texttt{type} is a data
+type as described here.  Of note, the syntax for array declarations is
+different from C and Java.  A correct declaration is
+\texttt{int[4] rgbi;}, with the entire type stated before the variable name.
+
+
+\subsection{Stream Types}
+
+Computation is performed within stream objects.  Every stream object
+has an input type and an output data type; the object is connected to
+``tapes'' of a hypothetically infinite number of homogeneous data
+objects.  \emph{Filters} are atomic, and have initialization code and
+steady-state work code; \emph{pipelines}, \emph{split-joins}, and
+\emph{feedback loops} are all composite structures that include some
+number of stream objects as children.
+
+All stream objects have initialization code that runs when the object
+is first created.  For filters, this code may be omitted, and
+generally just sets up filter-local state.  For composite objects, the
+initialization code is responsible for creating the child objects.
+Filters also have one or more \emph{work functions}, which are called
+each time the filter executes.
+
+\paragraph{I/O types.}  Each stream declared at the top level must
+also explicitly declare its input and output types.  This is a
+declaration like \texttt{int->int} or \texttt{float->complex}; the first
+type is the stream's input type, the second its output type.  Either
+type may be \texttt{void}; in this case, the stream has no input or
+output, as appropriate.  If it is a filter, it must not declare a
+peek/pop or push rate.  The top-level stream in a program has type
+\texttt{void->void}; no other streams of this type are allowed.
+
+\subsubsection{Stream Parameters}
+
+A stream may have a set of parameters provided to it.  These
+parameters are available to all functions within the stream type, and
+may not be changed.  Values for these parameters must be passed in
+when the stream is created.  Stream parameters are declared with types
+and names in a parenthesized list after the name of the stream; when a
+stream it instantiated, values for the parameters must follow the name
+of the stream.  For example:
+
+\begin{verbatim}
+float->float filter MatrixMatrixMultiply(int A,
+                 int B, int C) { ... }
+add MatrixMatrixMultiply(3, 5, 4);
+\end{verbatim}
+
+\paragraph{Compile-time constants.}  Several things must
+be \emph{compile-time constant}; for example, the I/O rates of a
+filter must be determined at compile-time, and the compiler must be
+able to statically create the expanded stream graph.  An expression is
+compile-time constant if it is a literal, a stream parameter, or an
+expression whose components are entirely compile-time constant.
+
+\subsubsection{Parameterized Stream Types}
+
+Certain built-in stream types may be \emph{parameterized} on some data
+type or types, much like ``template'' types in C++.  These are
+detailed in section \ref{sec:built-in-streams}; they cannot be created
+by the user.  To instantiate a built-in parameterized type, use the
+name of the stream type, followed by the name of the data type in
+angle brackets, such as \texttt{Identity<int>}.
+
+\subsubsection{Filters}
+
+All computation in a stream kernel takes place within filters.
+Filters must explicitly declare their initialization code if present,
+but also have the option of omitting it.  A filter may have a single
+anonymous work function, or multiple named work functions.  Each work
+function must declare its \emph{I/O rates}, the number of items one
+call to the function removes, examines, or places on its tape.  A
+basic filter declaration looks like this:
+
+\begin{verbatim}
+int->int filter IntAvgFilter {
+  init {
+    // empty
+  }
+  work pop 1 peek 2 push 1 {
+    push(peek(0) + peek(1));
+    pop();
+  }
+}
+\end{verbatim}
+
+This filter is named \texttt{IntAvgFilter}; it reads integers off of its
+input tape, and writes integers to its output tape.  Each execution of
+the work function removes exactly one item from the input tape and
+examines at most two items; it causes exactly one item to be pushed on
+to the output tape.
+
+\paragraph{Init functions.}  Init functions are declared using the
+keyword \texttt{init}.  They take no parameters.  They may initialize
+filter fields or do other work, but have no access to the filter's
+tapes.
+
+\paragraph{Work functions.}  Work functions are declared using the
+keyword \texttt{work}, which may be followed by a name.  At most
+one work function may be declared anonymously.  The function name must
+be followed by rate declarations, of the form \texttt{push expr},
+\texttt{peek expr}, and \texttt{pop expr}, in any order.  If the
+peek rate is omitted, it is assumed to be equal to the pop rate; if
+the pop or push rate is omitted, it is assumed to be zero, and the
+corresponding input or output tape type must be \texttt{void}.  The
+function must push and pop exactly the number of items specified, and
+may peek up to the number of items specified.  All of the rate
+expressions must be compile-time constant.
+
+\paragraph{Filter state.}  The top level of the filter may include
+variable declarations.  These variables are visible to every function
+in the filter, and may be used to carry state between iterations of
+the work function.
+
+
+\subsubsection{Pipelines}
+
+The simplest composite filter is a pipeline.  A pipeline contains a
+number of child streams; the output of the first stream is connected
+to the input of the second, whose output is connected to the input of
+the third, and so on.  A pipeline declaration looks like
+
+\begin{verbatim}
+float->complex pipeline FloatToComplexAdd {
+  add ReImToComplex();
+  add ComplexPairAdd();
+}
+\end{verbatim}
+
+The body of the pipeline declaration is the initialization code; no
+internal function declarations or message handlers are allowed.  In
+addition to the internal typing constraints mentioned previously, the
+input type of the pipeline must match the input type of the first
+filter, and the output type of the pipeline must match the output type
+of the last filter.
+
+\begin{figure}[htbp]
+  \begin{center}
+    \begin{picture}(18,9)
+      \put(3,9){\vector(0,-1){1}}
+      \put(0,1){\framebox(6,7)[lt]{\texttt{Pipeline}}}
+      \put(7,8){\makebox(9,1)[l]{\texttt{float->float}}}
+      \put(7,7){\makebox(9,1)[l]{\texttt{pipeline Pipeline \{}}}
+      \put(3,8){\vector(0,-1){1}}
+      \put(1,6){\framebox(4,1){\texttt{Child1}}}
+      \put(7,6){\makebox(9,1)[l]{\texttt{\ add Child1();}}}
+      \put(3,6){\vector(0,-1){1}}
+      \put(1,4){\framebox(4,1){\texttt{Child2}}}
+      \put(7,4){\makebox(9,1)[l]{\texttt{\ add Child2();}}}
+      \put(3,4){\vector(0,-1){1}}
+      \put(1,2){\makebox(4,1){$\cdots$}}
+      \put(7,2){\makebox(9,1)[l]{\texttt{\ ...}}}
+      \put(3,2){\vector(0,-1){1}}
+      \put(7,1){\makebox(9,1)[l]{\texttt{\}}}}
+      \put(3,1){\vector(0,-1){1}}
+    \end{picture}
+    \caption{Pipelines}
+    \label{fig:pipeline}
+  \end{center}
+\end{figure}
+
+
+\subsubsection{Split-Joins}
+
+A split-join allows computation to be run in parallel, possibly using
+different parts of the input stream.  It is so named because incoming
+data passes through a \emph{splitter}, is redistributed to the child
+streams for processing, and then is fed through a \emph{joiner} to be
+recombined into a single output stream; see section
+\ref{sec:expr-splitters-joiners}.
+
+\begin{verbatim}
+int->int splitjoin AddAndSub {
+  split duplicate;
+  add IntAdder();
+  add IntSubtractor();
+  join roundrobin;
+}
+\end{verbatim}
+
+This split-join has two children.  Incoming data is duplicated on to
+both streams.  The first branch consumes two elements and adds them;
+the second consumes two elements and subtracts them.  The resulting
+values are then pushed on to the output stream in a round-robin
+fashion, with values from alternating streams.
+
+\begin{figure}[htbp]
+  \begin{center}
+    \begin{picture}(29,5)
+      \put(6,5){\vector(0,-1){1}}
+      \put(0,1){\framebox(12,3)[tl]{\texttt{SplitJoin}}}
+      \put(13,4){\makebox(16,1)[l]
+        {\texttt{int->int splitjoin SplitJoin \{}}}
+      \put(6,4){\vector(-3,-1){3}}
+      \put(6,4){\vector(0,-1){1}}
+      \put(6,4){\vector(3,-1){3}}
+      \put(13,3){\makebox(16,1)[l]{\texttt{\ split roundrobin(2);}}}
+      \put(1,2){\framebox(4,1){\texttt{Child1}}}
+      \put(5,2){\makebox(2,1){$\cdots$}}
+      \put(7,2){\framebox(4,1){\texttt{ChildN}}}
+      \put(13,2){\makebox(16,1)[l]
+        {\texttt{\ add Child1(); ... add ChildN();}}}
+      \put(3,2){\vector(3,-1){3}}
+      \put(6,2){\vector(0,-1){1}}
+      \put(9,2){\vector(-3,-1){3}}
+      \put(13,1){\makebox(16,1)[l]{\texttt{\ join roundrobin;}}}
+      \put(6,1){\vector(0,-1){1}}
+      \put(13,0){\makebox(16,1)[l]{\texttt{\}}}}
+    \end{picture}
+    \caption{Split-Joins}
+    \label{fig:splitjoin}
+  \end{center}
+\end{figure}
+
+\subsubsection{Feedback Loops}
+
+A feedback loop has a body stream.  Its output passes through a
+splitter; one branch of the splitter leaves the loop, and the other
+goes to the loop stream.  The output of the loop stream and the loop
+input then go through a joiner to the body's input.
+
+\begin{verbatim}
+float->float feedbackloop AddFeedback(float scaling) {
+  join roundrobin;
+  body FloatAdder();
+  loop FloatScaler(scaling);
+  split duplicate;
+  enqueue 0.0;
+}
+\end{verbatim}
+
+\paragraph{Semantics of splitters and joiners.}  Splitters and joiners
+both treat the stream input as the first child, and the loop edge as
+the second child.  Splitters and joiners that do not allow exactly two
+children are disallowed.
+
+\paragraph{\texttt{enqueue} statement.}  The \texttt{enqueue}
+statement takes a value and places it in FIFO order on the output tape
+from the loop stream.  You will generally need to enqueue enough items
+that the input joiner will be able to fire once; enqueuing more items
+causes a delay in the feedback loop.
+
+\begin{figure}[htbp]
+  \begin{center}
+    \begin{picture}(21,9)
+      \put(6,9){\vector(0,-1){1}}
+      \put(10,8){\makebox(11,1)[l]{\texttt{float->float}}}
+      \put(0,1){\framebox(9,7)[lt]{\texttt{Feedback}}}
+      \put(10,7){\makebox(11,1)[l]{\texttt{feedbackloop Feedback \{}}}
+      \put(6,8){\vector(0,-1){1}}
+      \put(10,6){\makebox(11,1)[l]{\texttt{\ join roundrobin;}}}
+      \put(6,7){\vector(0,-1){1}}
+      \put(4,5){\framebox(4,1){\texttt{Body}}}
+      \put(10,5){\makebox(11,1)[l]{\texttt{\ body Body();}}}
+      \put(6,5){\vector(0,-1){3}}
+      \put(6,2){\line(-1,0){3}}
+      \put(3,2){\vector(0,1){1}}
+      \put(1,3){\framebox(4,1){\texttt{Loop}}}
+      \put(10,3){\makebox(11,1)[l]{\texttt{\ loop Loop();}}}
+      \put(3,4){\line(0,1){3}}
+      \put(3,7){\vector(1,0){3}}
+      \put(6,2){\vector(0,-1){1}}
+      \put(10,1){\makebox(11,1)[l]{\texttt{\ split roundrobin(4,1);}}}
+      \put(6,1){\vector(0,-1){1}}
+      \put(10,0){\makebox(11,1)[l]{\texttt{\}}}}
+    \end{picture}
+    \caption{Feedback Loop}
+    \label{fig:feedback-loop}
+  \end{center}
+\end{figure}
+
+\subsubsection{Anonymous Streams}
+\label{sec:anonymous-streams}
+
+It is possible to declare a stream object without a name, if it is
+used in exactly one place in the program.  In general anonymous stream
+declarations look exactly like the corresponding normal stream
+declaration, except that the stream type and name are omitted.
+
+\begin{verbatim}
+complex->float feedbackloop FeedbackMagnitude(float scaling)
+{
+  join roundrobin;
+  body filter {
+    work pop 2 push 1 { push(abs(peek(0) * peek(1))); pop(); pop(); }
+  };
+  loop pipeline {
+    add FloatScaler(scaling);
+    add FloatToComplex();
+  };
+  split duplicate;
+}
+\end{verbatim}
+
+The input and output types of anonymous streams are determined by the
+compiler.
+
+\section{Statements}
+
+This section describes statements legal in stream kernel code.  For
+the most part, these are identical to legal statements in C or Java.
+Some statements, particularly those that set up the stream graph, are
+only legal in initialization code; other statements are legal
+anywhere.
+
+\subsection{Initialization-Only Statements}
+
+\subsubsection{\texttt{add} Statement}
+
+The \texttt{add} statement adds a child stream to the current stream
+object.  It is valid in split-joins and pipelines only.  In a
+split-join, it adds a new stream to the end of the current list of
+children.  In a pipeline, it adds a new stream to the end of the chain
+of children.
+
+This statement takes a \emph{stream constructor}; see section
+\ref{sec:expr-stream-constructor}.
+
+\subsubsection{\texttt{body} Statement}
+
+The \texttt{body} statement adds a child stream as the body part of
+a feedback loop.  This statement must be executed exactly once in the
+initialization code of a feedback loop, and is invalid anywhere else.
+
+This statement takes a \emph{stream constructor}; see section
+\ref{sec:expr-stream-constructor}.
+
+\subsubsection{\texttt{enqueue} Statement}
+
+The \texttt{enqueue} statement is valid only within the
+initialization code of a feedback loop.  It causes the specified item
+to be placed after all other previously enqueued items on the input to
+the feedback loop joiner.  This statement takes a single value
+expression.
+
+\subsubsection{\texttt{join} Statement}
+
+The \texttt{join} statement declares the joiner type of a feedback
+loop or split-join.  It only appears in initialization code, and is
+invalid in initialization code for any other construct.  This
+statement takes a joiner specification; the only one valid currently
+is \texttt{roundrobin}, see section \ref{sec:expr-round-robin}.
+
+\subsubsection{\texttt{loop} Statement}
+
+The \texttt{loop} statement adds a child stream as the loop part of
+a feedback loop.  This statement must be executed exactly once in the
+initialization code of a feedback loop, and is invalid anywhere else.
+
+This statement takes a \emph{stream constructor}; see section
+\ref{sec:expr-stream-constructor}.
+
+\subsubsection{\texttt{split} Statement}
+
+The \texttt{split} statement declares the splitter type of a feedback
+loop or split-join.  It only appears in initialization code, and is
+invalid in initialization code for any other construct.  This
+statement takes a splitter specification; only \texttt{duplicate} and
+\texttt{roundrobin} are currently legal, see sections
+\ref{sec:expr-duplicate} and \ref{sec:expr-round-robin}.
+
+
+\subsection{Work-only Statements}
+
+These statements may only appear within steady-state work code, and in
+particular, within a filter's \texttt{work} function(s).
+
+\subsubsection{\texttt{push} Statement}
+
+The \texttt{push} statement takes a value expression and pushes its
+value on to the output tape of the current filter.  The type of the
+expression must match the output type of the filter.
+
+\subsection{General-use Statements}
+
+These statements may appear anywhere code is legal.
+
+\subsubsection{Statements with Java-like Semantics}
+
+\texttt{do}, \texttt{for}, and \texttt{while} loops have the same
+syntax and semantics they do in Java.  The \texttt{continue} and
+\texttt{break} statements are also recognized, though they may not
+take  a label reference.
+
+For statements whose syntax match exactly
+
+\begin{verbatim}
+for (i = S; i < N; i++)
+  /* body */ ;
+\end{verbatim}
+
+\noindent
+cause the induction variable \texttt{i} to be compile-time constant
+within the loop if the start and end indices \texttt{S} and \texttt{N} are
+also compile-time constant.
+
+\subsubsection{Assignment Statements}
+
+Assignment statements have the form \texttt{lhs = expr;}.  The left-hand
+side may be a variable, a field reference, or an array element
+reference.  Each of these is evaluated to a location, with the result
+being either a primitive value, a structure, or an entire array.  If
+it is a primitive value, the right-hand side must be a value
+expression.  Otherwise, the right-hand side must be an array or
+structure of identical type, and causes all of the elements from the
+right-hand-side object to be copied to the left-hand-side object.
+
+\subsubsection{Variable Declarations}
+
+Variable declarations have the form \texttt{type name;}.  \texttt{type}
+must be a data type; \texttt{name} may be any legal name not
+corresponding to another variable previously declared in the current
+block.  A declaration must appear before the variable is used.  The
+variable declaration may also contain an initialization, as in
+\texttt{type name = expr;}  The initialization acts exactly as an
+initialization statement, above.
+
+Variables declared without initialization are initialized to 0 as best
+as possible.  \texttt{complex} variables are initialized to
+\texttt{0+0i}.  Each element of an array variable is initialized to
+0 as described here.  Similarly, each field of a structure variable is
+initialized to 0 in the same way.
+
+
+\section{Expressions}
+
+\subsection{Value Expressions}
+\label{sec:expr-value}
+
+A \emph{value expression} carries some value of a data type.  Literal
+values are value expressions; these can be signed integer or real
+values, e.g. \texttt{17}, \texttt{2.45}, or \texttt{1.4e6}.  A literal value
+can also be a pure imaginary number, e.g. \texttt{17i} or \texttt{3.4i}.
+Unary, binary, and ternary expressions of value expressions are also
+value expressions, as described in section \ref{sec:operators}.  Thus,
+while \texttt{3+4i} is not a literal, it is a valid value expression of
+complex type.
+
+Field references to structure objects are also value expressions.
+These have the form \texttt{a.b}, where \texttt{a} is a variable of
+structured type \texttt{A} and \texttt{b} is a field in \texttt{A}.
+Similarly, array references \texttt{a[b]} are value expressions;
+\texttt{a} must be an array variable, and \texttt{b} must be an
+integer-valued value expression.
+
+\subsubsection{\texttt{peek} and \texttt{pop}}
+\label{sec:expr-peek-pop}
+
+The \texttt{peek} and \texttt{pop} expressions look at items on
+the incoming tape in a filter's work function; they are illegal in any
+other context.  \texttt{peek(n)} examines the n-th item on the tape
+without removing it; \texttt{peek(0)} returns the next incoming
+item, \texttt{peek(1)} the one afterwards, and so on.
+\texttt{pop()} returns the same item \texttt{peek(0)} returns,
+but also removes it from the tape.
+
+Note that \texttt{pop()} removes an item from the tape, so
+\texttt{peek()}s afterwards use different indices.  A work function
+must pop a fixed number of items, and declare the number of items in
+its rate declaration.  It may not peek at more items than it declares
+in its rate declaration, though it may peek at fewer.  The peek
+declaration declares the furthest position on the tape examined from
+the point of view of the beginning of the function.
+
+\begin{verbatim}
+int->int filter PeekRates {
+  work pop 1 peek 3 push 1 {
+    int a, b, c, d, e;
+    a = peek(0);
+    b = peek(1);
+    c = pop();   // Same value as a
+    d = peek(0); // Same value as b
+    e = peek(1);
+    push(a + b + c + d + e);
+  }
+}
+\end{verbatim}
+
+This function pops one item and pushes 1.  It declares a peek rate of
+3 because \texttt{e} peeks at the third item that was on the tape
+at the start of the function -- one is popped, and \texttt{e}
+contains the second item beyond that.
+
+\subsubsection{Function Calls}
+\label{sec:expr-funcall}
+
+Function calls are value expressions; certain cases of built-in
+functions may return values that are compile-time constant if their
+parameters are compile-time constant.  The function call syntax
+\texttt{fn(p1, p2)} is identical to that of Java.  All parameters are
+always passed by value; this differs from Java's semantics, in which
+objects and arrays are passed by reference.
+
+Function calls may be made to declared helper functions, or to
+built-in math functions.  The math functions are listed in table
+\ref{tab:math-functions}.
+
+\begin{table}[htbp]
+  \begin{center}
+    \begin{tabular}{cl}
+      \toprule
+      \texttt{abs(v)} & Real absolute value or complex magnitude \\
+      \texttt{arg(v)} & Polar angle of complex value \\
+      \texttt{exp(v)} & Real or complex exponent \\
+      \texttt{log(v)} & Real or complex natural logarithm \\
+      \texttt{sin(v)} & Real or complex sine \\
+      \texttt{cos(v)} & Real or complex cosine \\
+      \texttt{sqrt(v)} & Real or complex square root \\
+      \texttt{csqrt(v)} & Complex square root \\
+      \bottomrule
+    \end{tabular}
+    \caption{Built-In Math Functions}
+    \label{tab:math-functions}
+  \end{center}
+\end{table}
+
+\subsection{Stream Constructors}
+\label{sec:expr-stream-constructor}
+
+A \emph{stream constructor} indicates that a new stream object should
+be created.  Stream constructors appear in \texttt{add},
+\texttt{body}, and \texttt{loop} statements in composite stream
+initialization code.
+
+Stream constructors may reference an already-declared stream type.  In
+this case, the stream constructor form is \texttt{Name(param, ...)}.
+There must be exactly as many parameters in the constructor as
+parameters for the stream type.  The parameters must all be
+compile-time constant.
+
+An anonymous stream declaration is also a valid stream constructor;
+see section \ref{sec:anonymous-streams}.
+
+\subsection{Splitters and Joiners}
+\label{sec:expr-splitters-joiners}
+
+Splitters have a single input of a given type and multiple outputs of
+the same type; joiners have multiple inputs and a single output.  They
+appear in feedback loops and split-joins.
+
+\subsubsection{\texttt{duplicate} Splitters}
+\label{sec:expr-duplicate}
+
+\texttt{duplicate} splitters take each incoming item and push the
+same item to each of the outgoing tapes, duplicating data.
+
+\subsubsection{\texttt{roundrobin} Splitters and Joiners}
+\label{sec:expr-round-robin}
+
+\texttt{roundrobin} splitters take each item and send it to exactly
+one of the child streams, in order.  Either \texttt{roundrobin} or
+\texttt{roundrobin()} causes one item to be sent to each output, in
+order; \texttt{roundrobin(2)} causes two items to be sent to the first
+stream, two to the second, and so on.  \texttt{roundrobin(2, 4, 2)}
+requires there to be exactly three children, and sends two to the
+first child, four to the second, and two to the third.  A round-robin
+weight may be 0; in this case, the child input must be of type
+\texttt{void}.
+
+\texttt{roundrobin} joiners are identical to \texttt{roundrobin}
+splitters, except that they read from the input tapes in the specified
+pattern and write data to the output tape.
+
+
+\section{Built-in Types}
+
+This section describes built in data and stream types.  These types
+are implicitly declared; code can just use these types without
+explicitly importing or otherwise declaring them.
+
+\subsection{Built-in Data Types}
+
+The \texttt{complex} type is actually implemented as a structure,
+though the compiler implements syntactic sugar for complex variables.
+The structure definition is shown above in section
+\ref{sec:data-structures}.
+It is legal to explicitly reference the \texttt{real} and
+\texttt{imag} fields of complex numbers as though they were the
+structure type instead.
+
+\subsection{Built-in Streams}
+\label{sec:built-in-streams}
+
+Several stream types are in common use, and are either simple enough
+or require non-standard language functionality that the compiler
+should support them directly.  These include parameterized
+\texttt{Identity}, \texttt{StreamReader}, and \texttt{StreamWriter}
+types, as shown in figure \ref{fig:built-in-streams}.
+
+\begin{figure}[htbp]
+    \begin{verbatim}
+template<T> T->T filter Identity {
+  work pop 1 push 1 { push(pop()); }
+}
+template<T> void->T filter StreamReader(int n) {
+  work push 1 { push(_IN(n)); }
+}
+template<T> T->void filter StreamWriter(int n) {
+  work pop 1 { _OUT_INORDER(n, pop()); }
+}
+\end{verbatim}
+    \caption{Built-in Stream Types}
+    \label{fig:built-in-streams}
+\end{figure}
+
+\section{Mapping to the Morphware Stream Virtual Machine}
+
+This section describes the general flow of the compiler and how a
+stream kernel abstraction interacts with the Morphware stream virtual
+machine.  The compiler will ultimately generate C code using the
+\texttt{\_IN}, \texttt{\_OUT\_INORDER}, and \texttt{\_PEEK} macros to
+perform stream I/O; a program can be fused into a single kernel, or
+transformed into multiple kernels that communicate using these macros.
+
+\paragraph{\texttt{StreamInput} and \texttt{StreamOutput} filters.}
+The SKA provides two built-in filters,
+\texttt{StreamInput} and \texttt{StreamOutput}, that communicate with
+the controlling threaded processor.  If the SVM API macros were exposed
+in the SKA, these could be implemented as shown in figure
+\ref{fig:built-in-streams}.
+
+These types exist such that it is possible to programmatically
+determine the top-level stream in a kernel, and so that inputs and
+outputs can be connected at arbitrary locations in the stream graph.
+The top-level stream always has the type \texttt{void->void}; it can
+use a \texttt{StreamInput} as a source and a \texttt{StreamOutput} as
+a sink in the normal case.  Figure \ref{fig:interleave-input} shows
+how \texttt{StreamInput} can also be used to interleave an input with
+other data.
+
+\begin{figure}[htbp]
+  \begin{verbatim}
+splitjoin InterleaveInputInt(int n)
+{
+  split roundrobin(1, 0);
+  add Identity<int>;
+  add StreamInput<int>(n);
+  join roundrobin(1, 1);
+}
+\end{verbatim}
+  \caption{Interleaving input with data}
+  \label{fig:interleave-input}
+\end{figure}
+
+\paragraph{Mapping to multiple stream kernels.}  The stream compiler
+can apply fusion and fission transformations to turn a stream program
+into multiple stream kernels.  In this case, the compiler will
+automatically generate appropriate calls to \texttt{\_IN} and
+\texttt{\_OUT\_INORDER} to communicate between streams.  The compiler
+will also generate the stub code required on the threading processor
+to set up, execute, and reap the streams.
+
+\end{document}

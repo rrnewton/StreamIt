@@ -1,0 +1,66 @@
+#
+# The CVS Modules File
+#
+#ident	"@(#)cvs/examples:$Name: not supported by cvs2svn $:$Id: modules,v 1.15 2003-03-17 23:39:12 wentzlaf Exp $"
+#
+# Three different line formats are valid:
+#	key	-a    aliases...
+#	key [options] directory
+#	key [options] directory files...
+#
+# Where "options" are composed of:
+#	-i prog		Run "prog" on "cvs commit" from top-level of module.
+#	-o prog		Run "prog" on "cvs checkout" of module.
+#	-e prog		Run "prog" on "cvs export" of module.
+#	-t prog		Run "prog" on "cvs rtag" of module.
+#	-u prog		Run "prog" on "cvs update" of module.
+#	-d dir		Place module in directory "dir" instead of module name.
+#	-l		Top-level directory only -- do not recurse.
+#
+# And "directory" is a path to a directory relative to $CVSROOT.
+#
+# The "-a" option specifies an alias.  An alias is interpreted as if
+# everything on the right of the "-a" had been typed on the command line.
+#
+# You can encode a module within a module by using the special '&'
+# character to interpose another module into the current module.  This
+# can be useful for creating a module that consists of many directories
+# spread out over the entire source repository.
+#
+btl	btl
+codeselect	codeselect
+crudo	crudo
+host_interface	host_interface
+icache	icache
+intravenous	intravenous
+landscaper	landscaper
+libwalt	libwalt
+medicare	medicare
+newlib	newlib
+rats	rats
+rawboards	rawboards
+rawcc-v2	rawcc-v2
+rawdoc	rawdoc
+rawlib	rawlib
+rawos	rawos
+rawpli	rawpli
+rawvideo	rawvideo
+rbarrier	rbarrier
+rbinutils	rbinutils
+rgcc	rgcc
+rgdb	rgdb
+rgdb_hostif	rgdb_hostif
+rilayout	rilayout
+rloader	rloader
+rmpilib	rmpilib
+rpci_bridge	rpci_bridge
+span	span
+starbuild	starbuild
+starsearch	starsearch
+streams	streams
+suif	suif
+suif1.3	suif1.3
+suif2	suif2
+veribuild	veribuild
+
+BonsaiAll	-a btl codeselect crudo host_interface icache intravenous landscaper libwalt medicare newlib rats rawboards rawcc-v2 rawdoc rawlib rawos rawpli rawvideo rbarrier rbinutils rgcc rgdb rgdb_hostif rilayout rloader rmpilib rpci_bridge span starbuild starsearch streams suif suif1.3 suif2 veribuild

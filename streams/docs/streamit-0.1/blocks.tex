@@ -1,0 +1,292 @@
+\subsection{Functional Blocks}
+\protect\label{sec:blocks}
+
+There are two kinds of functional blocks in StreaMIT.  The
+lowest-level block is the {\tt Filter}, which defines a leaf node;
+that is, the code within a filter is organized procedurally instead of
+as a stream.  The second construct, the {\tt FilterBlock}, represents
+a composition of other filters into a streaming structure.  Though a
+filter block does not contain procedural code like a filter, we'll see
+that filters and filter blocks can be treated as identical black-box
+abstractions during stream construction.
+
+\subsubsection{Filters}
+
+In many ways, filters correspond to the usual notion of an object in
+an object-oriented programming language.  Below we discuss their
+declaration and instantiation.
+
+\medskip
+\noindent {\bf Filter Declaration}
+\medskip
+
+Filters are declared with the following syntax:
+
+\begin{tabbing}
+\hspace{0.2in} \= \hspace{0.2in} \= \hspace{0.2in} \= \hspace{0.2in} \= \\
+
+{\tt Filter} filter-name (type$_1$ param$_1$, type$_2$ param$_2$,
+... , type$_n$ param$_n$) \{ \\ \\
+
+\> \{ {\tt input} input-type input-name; \}+ \\
+\> \{ {\tt output} output-type output-name; \}+ \\ \\
+
+\> {\it data fields} \\ \\
+
+\> {\it initialization code} \\ \\
+
+\> {\tt work()} \{ \\ \\
+\> \} \\ \\
+
+\> {\it other functions} \\
+
+\}
+\end{tabbing}
+
+We discuss the implications of the above syntax in the order that it
+appears:
+
+\begin{itemize}
+
+\item {\it Type declaration.}  The {\tt Filter} type indicates that
+there may be an input and an output channel for this block.  If there is
+only an output channel, the {\tt Filter} is essentially a source; if there is
+only an input channel, the {\tt Filter} is a sink.
+
+\item {\it Naming filters.}  The ``filter-name'' denotes the name for
+the type of filter being defined.  This name is used to instantiate
+the filter (see below).
+
+\item {\it Fields, parameters, and scoping.}  Data fields can be
+declared as in C++ or Java.  All fields are implicitly private--they
+are not visible from outside the scope of the filter.  Symmetrically,
+no variables defined globally or in an enclosing scope are visible
+from within a filter.  However, the filter can reference globally
+visible functions that have no side effects and are only pure
+functions of their arguments.
+
+The filter can receive any number of parameters upon its
+initialization.  These parameters act like data fields that are
+initialized to the values that are passed as arguments to the filter.
+That is, they are visible to all functions within the filter, they are
+part of the filter's persistent state, and they can be modified like
+normal fields.
+
+\item {\it Input and output.}  The first field declarations are for
+the input and output channels, which represent the means for passing
+data through the filter during steady state stream operation.  Each
+channel must be typed and given a name for use within the filter.  All
+items within a channel are passed by value (with semantics equivalent
+to copying each value before writing it to the channel), and no
+pointers to global structures can be communicated through a channel.
+
+\item {\it Initialization code.}  The initialization code is run when
+the filter is first instantiated, just like the constructor to an
+object.  The initialization code can modify data fields and
+parameters, as well as read input and write output.  We allow I/O from
+the initializer in case a filter needs to handle the first few data
+items differently than the steady state.
+
+\item {\it Work function.}  The work function holds the code that is
+invoked dynamically for a single execution step of the filter.  This
+function should be as fine-grained as possible--involving only as many
+input and output items as necessary--to promote program
+comprehensibility and to facilitate compiler optimization.  The
+function accepts no parameters, although (like every other function in
+a filter) it has access to the filter's fields and parameters.  Within
+the work function, input and output is done via the channels as
+described above.
+
+\item {\it Other functions.}  The filter is free to define other
+functions, just like objects can define methods in an object-oriented
+language.  However, all of these functions are implictly private, and
+can't be seen from outside the scope of the filter.
+
+\end{itemize}
+
+\medskip
+\noindent {\bf Filter Instantiation}
+\medskip
+
+A filter can be instantiated into the stream graph by calling its name
+with some arguments, e.g. {\tt MyFilter(arg$_1$, arg$_2$, ...,
+arg$_n$)}.  This is equivalent to inlining the entire filter
+definition and supplying the arguments as initial values for the
+parameters.  That is, we can convert above call into:
+
+\begin{tabbing}
+\hspace{0.2in} \= \hspace{0.2in} \= \hspace{0.2in} \= \hspace{0.2in} \= \\
+
+{\tt Filter MyFilter(type$_1$ param$_1$ = arg$_1$, type$_2$ param$_2$
+= arg$_2$, ..., type$_n$ param$_n$ = arg$_n$)} \{ \\ \\
+
+\> {\it filter body} \\ \\
+\}
+\end{tabbing}
+
+In this inlined form, the name {\tt MyFilter} becomes optional; we
+could remove it if desired.  The inlined syntax is thus an equivalent
+way of declaring filters.  We could translate any inlined filter into
+a named filter that is explicitly instantiated.
+
+An important restriction on filter instantiation is that the stream's
+structure (i.e., which blocks appear in the stream and how they are
+connected) must be known at compile time.  For now, this means that no
+conditional control flow (e.g., {\tt for}, {\tt if}, {\tt while}) can
+surround filter instantiations.  Later we will introduce two methods
+to relax this restriction: {\tt StreamSelect} (Section
+\ref{sec:streamselect}) and the scripting language (Section
+\ref{sec:script}).
+
+\subsubsection{FilterBlocks}
+
+The second kind of functional block, the {\tt FilterBlock}, is similar
+to a filter in that it transforms one data stream into another.
+However, a filter block manifests this transformation as an arrangment
+of other filters (and/or filter blocks) rather than as procedural code
+that deals explicitly with input and output channels.  FilterBlocks
+are instantiated just like filters.  However, their declaration is
+somewhat different:
+
+\begin{tabbing}
+\hspace{0.2in} \= \hspace{0.2in} \= \hspace{0.2in} \= \hspace{0.2in} \= \\
+
+{\tt FilterBlock} filter-block-name (type$_1$ param$_1$, type$_2$ param$_2$,
+... , type$_n$ param$_n$) \{ \\ \\
+
+\> {\it data fields} \\ \\
+
+\> {\it stream initialization code} \\ \\
+
+\}
+\end{tabbing}
+
+The differences between the {\tt FilterBlock} and {\tt Filter}
+declarations are as follows.  Firstly, the filter block lacks the
+input and output channels, as well as the work function and the
+capacity to define local methods.  However, the crucial difference is
+in the initialization code.  Whereas a filter's initialization code is
+for modifying fields and doing I/O, a filter block instantiates a
+series of filters (and/or filter blocks).  By default, the filters are
+connected in the order in which they are instantiated, although more
+complex structures can be obtained using control constructs (see
+Section {\ref{sec:control}}).  Thus, the filter block contains whatever
+graph of filters it initializes.  
+
+Sources and sinks are expressed simply as filters with no inputs/outputs.
+Below is a modified version of Hello World program which uses source
+and sink filters.
+
+\begin{verbatim}
+FilterBlock {
+
+  MakeText();
+
+  Filter {
+    input String myInput;
+    
+    work() {
+      System.out.println(input.pop ());
+    }
+  }
+}
+
+FilterBlock MakeText() {
+
+  Filter {
+    output String myOutput;
+
+    work() {
+      output.push (``Hello '');
+    }
+  }
+
+  Filter {
+    input String myInput;
+    input String myOutput;
+
+    work() {
+      output.push (input.pop () + ``World!'');
+    }
+  }
+}
+
+\end{verbatim}
+
+\subsubsection{Naming}
+
+StreaMIT provides a naming scheme for functional blocks that is useful
+for both dynamic events (see Section {\ref{sec:dynamic}}) and
+debugging.  Firstly, any instantiation of a block can be bound to a
+variable of type {\tt FilterRef}.  We require each {\tt FilterRef}
+variable to be defined exactly once; that is, it functions less as a
+variable than as a static denotable label for a single block
+instantiation.  Accordingly, we allow {\tt FilterRef} variables to be
+used before they are defined (but not before they are declared, of
+course.)  {\tt FilterRef}'s can be passed as parameters to {\tt
+Filter}'s and {\tt FilterBlock}'s, just like any other data type.  The
+following example illustrates the syntax of assigning to {\tt
+FilterRef}'s:
+
+\begin{verbatim}
+Filter MyFilter(FilterRef ref) {
+  ...
+}
+
+FilterBlock MyBlock() {
+
+  FilterRef ref1, ref2;
+
+  ref1 = MyFilter(ref2);
+  ref2 = Filter {
+    ...
+  }
+
+}
+\end{verbatim}
+
+The second naming feature in StreaMIT allows one to assign a string
+name to a given {\tt FilterRef} on the same line as its definition.
+Then, the name can be obtained from a {\tt FilterRef} ``ref'' by
+calling ``ref.getName()''.  Further, a hierarchical description
+containing the path-delineated names of all enclosing blocks can be
+obtained by calling ``ref.getFullName()''.  If a given block was not
+assigned a name, then a name is generated from the block's type and
+position in the stream structure.  In all, these naming functions
+serve as a runtime counterpart the variable naming above; this
+functionality is intended for user interface and debugging.  The
+abstract syntax for the naming system is thus as follows:
+
+[{\it filter-ref-variable} = [{\it string-name}] ] {\it block-instantiation}
+
+where {\it block-instantiation} can be any block, either constructed
+or inlined.  As an example, we rewrite the ``Hello World!'' program
+using names:
+
+\begin{verbatim} 
+
+Stream {
+  FilterRef helloRef, worldRef;		// NOTE: ILLEGAL INSIDE STREAM {
+
+  helloRef = ``Hello '' Filter {
+	...
+  }
+
+  worldRef = ``World!'' Filter {
+	...
+  }
+
+  Filter(ref1 = helloRef, ref2 = worldRef) {
+    ...
+    
+    work() {
+      ...
+      System.out.println(ref1.getName() + ref2.getName());
+    }
+  }
+
+}
+
+\end{verbatim}
+
+

@@ -1,0 +1,88 @@
+---------------------------------------------------------------------------
+Here's a list of things TODO:
+
+- double check that all splitters, joiners are capitalized
+
+---------------------------------------------------------------------------
+
+probably not doing:
+
+? fix the structures figure to look like the others
+
+? make layout figures and describe them
+
+? make sure the input.pop/peek and output.push vs. pop/peek/push is
+consistent
+
+---------------------------------------------------------------------------
+HERE'S AN ABANDONED PARAGRAPH FROM THE OLD ABSTRACT
+
+In this paper, we formulate the techniques that are fundamental to
+such an implementation, and we demonstrate their effectiveness in
+compiling the StreamIt language to the Raw processor.  Our compiler
+contains three stages: 1) partitioning, which adjusts the granularity
+of a stream graph to match that of a given target, 2) layout, which
+maps a partitioned stream graph to a given network topology, and 3)
+scheduling, which generates a fine-grained static communication
+pattern for each computational element.  Our results show that we can
+obtain good performance on varying granularities of Raw, even though
+StreamIt is a high-level stream language without any notion of the
+target topology or granularity.  We believe that our compiler
+technology provides the basis for a portable programming model for
+communication-exposed architectures.
+
+#1 - These machines are especially well-suited for streaming
+	applications that have regular communication patterns and
+	widespread parallelism.
+
+---------------------------------------------------------------------------
+
+HERE ARE SOME RANDOM NOTES, POSSIBLY USEFUL FOR THE INTRO
+
+- as wire delay comes to dominate the performance of architectures, a
+	number of machines have software-exposed communication between
+	replicated processing units (imagine, raw, trips, grid,
+	smartmemories).  
+
+These processors have replicated processing units, and are
+especially good for regular streaming applications.
+
+For these architectures to gain wide-scale acceptance, there needs to
+be a high-level portable language that can be efficiently compiled to
+differing targets and differing granularities.
+
+- we present streamit as the language, and demonstrate a compiler that
+	maps to differing granularities of the Raw architecture, which
+	is a scalable tiled architecture.  
+
+StreamIt presents the computation as a set of communicating filters in
+a hierarchical stream graph.
+
+- streamit as language we've developed for exposing parallelism and
+	communication, especially good for static stream programs
+
+	streamit is high-level language and should be independent of
+	any architecture.  the language expresses a computation that
+	can be mapped to any number of communication-exposed architctures.
+
+- suite of fission/fusion transformations to adjust the granularity of
+	a stream graph to match the granularity of a target, and for
+	load balancing between different components of the architecture.
+
+- this load balancing is especially important in streaming
+	computations since the overall throughput depends on the
+	slowest stage; the program is only as fast as its weakest link
+
+- then, a layout generator that maps the layout to an architecture,
+	avoiding deadlock.
+
+- then, a communication scheduler that schedules the network inteface
+	between the computational elements.  relies on a simulation of
+	the execution of the graph in order to know how to schedule
+	the communication code.
+
+- results - show we can effectively utilize parallel computation
+	resources on the Raw architecture for a different application
+	granularities and architecture granularities
+
+---------------------------------------------------------------------------

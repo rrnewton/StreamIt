@@ -1,0 +1,61 @@
+\section{Conclusion}
+\label{sec:conclusion}
+
+This paper presents a set of automated analyses for detecting,
+analyzing, and optimizing linear filters in streaming applications.
+Though the mathematical optimization of linear filters has been a
+longtime focus of the DSP community, our techniques are novel in the
+automated application of these techniques to programs that are written
+in a flexible and high-level programming language.  We demonstrate
+that using linear dataflow analysis, linear combination, and automated
+frequency translation, we can improve execution speed by a factor of $6.5$.
+
+The ominous rift between the design and implementation of signal 
+processing applications is growing by the day.  Algorithms are
+designed at a conceptual level utilizing modular processing blocks that
+that naturally express the computation.  However, in order to obtain
+good performance, each hand-tuned implementation is forced to
+disregard the abstraction layers and painstakingly consider
+specialized whole-program optimizations. The StreamIt project aims to
+reduce this process to a single stage in which the designers and
+implementors share a set of high-level abstractions that can be
+efficiently handled by the compiler.  
+
+The linear analysis described in this paper represents a first step
+toward this goal.  By automatically performing linear combination and
+frequency translation, it allows programmers to write linear stream
+operations in a natural and modular fashion without any performance
+penalty.
+
+%% \subsection{Future Work}
+
+%% Linear analysis can easily be extended to incorporate a notion of
+%% linear state.  A stateful linear node is characterized by
+%% \begin{equation} \nonumber
+%% \lambda=(({\mathbf A}_x, {\mathbf A}_s), ({\mathbf C}_x, {\mathbf C}_s), 
+%% ({\mathbf b}_x, {\mathbf b}_s))
+%% \end{equation}
+%% Each {\tt filter} in the stream graph contains a state vector
+%% ${\mathbf s}$ such that ${\mathbf y}$ at time $i$ and ${\mathbf s}$ at
+%% time $i+1$ is given by
+%% \begin{equation} \nonumber
+%% y_i={\mathbf A}_o{\mathbf x} + {\mathbf A}_s{\mathbf s}_i + {\mathbf b}_x
+%% \end{equation}
+%% \begin{equation} \nonumber
+%% {\mathbf s}_{i+1}={\mathbf C}_x{\mathbf x} + {\mathbf C}_s{\mathbf s}_i + {\mathbf b}_s
+%% \end{equation}
+%% The additon of stateful nodes allows us to describe a larger class of programs 
+%% using our linear analysis framework.
+%% Using linear state, our structure combination rules can be extended to include {\tt feedbackloops}.
+%% Examples of programs that exhibit stateful linear nodes are control systems
+%% and infinite impulse response (IIR) filters.
+
+%% Another promising avenue of research is to exploit matrix
+%% factorization in order to automatically derive fast implementations of
+%% large compuatations such as DSP transforms.  Matrix representations
+%% will also be useful for generating load-balanced parallel code in the
+%% StreamIt RAW backend~\cite{streamit-asplos}.  Finally, to increase the
+%% class of programs that would fit into our linear framework, the
+%% entries of the ${\mathbf A}$ and ${\mathbf b}$ of linear nodes could
+%% contain symbolic constants that are resolved at runtime.
+

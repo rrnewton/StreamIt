@@ -1,0 +1,1023 @@
+\section{Latency Constrained Scheduling}
+\label{chpt:constrained}
+
+In the previous chapters, an efficient framework for scheduling
+{\StreamIt} programs was developed.  In this framework, there was no
+concern for possible latency constraints specified by the
+programmer. This chapter will develop techniques which can be used
+to schedule {\StreamIt} programs that contain various latency
+constraints. These techniques will be based on linear and integer
+programming. This chapter is mainly concerned with producing
+schedules that are correct and respect all specifications of the
+program. Optimization of such schedules is left for future work.
+
+Section \ref{sec:constrained:intro} provides a detailed
+introduction to the timing semantics of message sending in
+{\StreamIt}. Section \ref{sec:constrained-example} provides an
+example of a simple stream with messages being sent. Section
+\ref{sec:constrained:info} introduces the $info$ function which is
+used to keep track of information buffered between {\filters}.
+Section \ref{sec:constrained:constraints} shows how the $info$
+function relates to messaging constraints. Section
+\ref{sec:constrained:scheduling} presents an algorithm for
+computing schedules that respect messaging constraints. Finally
+Section \ref{sec:constrained:numbers} solves the example from
+Section \ref{sec:constrained-example} using the algorithm
+presented here.
+
+\subsection{Messages}
+\label{sec:constrained:intro}
+
+In the {\StreamIt} computation model, {\filters} do not share any
+variables or memory directly.  There is no concept of global
+program time.  The purpose of this is to allow different {\filters}
+to execute on different devices without need for complicated data
+sharing techniques and synchronization. Furthermore, this model
+allows to schedule the execution of {\filters} in any order that
+does not violate the execution semantics ({\filters} always have at
+least $e_f$ data in their {\Input} {\Channel} before executing).
+
+Due to the structured property of {\StreamIt} constructs, flow of
+data between {\filters} is very limited. This model works well for
+regular steady-state execution of streaming programs, because
+{\StreamIt} programs match typical streaming algorithms well.  There
+are, however, some situations where information needs to be
+communicated only very occasionally and between {\filters} that
+cannot easily send data to one another within {\StreamIt} structure.
+In order to enable more flexible communication between {\filters} in
+such situations, {\StreamIt} provides a concept of message sending.
+
+Messages can be sent between any two {\filters} which are connected
+in the directed {\StreamIt} graph.  In other words, any two {\filters}
+which are not located in different branches of the same {\splitjoin}
+can send messages to one another.
+
+A more formal definition of all messaging concepts can be found in
+\cite{streamittech2}.
+
+\subsubsection{Timing}
+
+The timing of delivery of messages is expressed in terms of
+latency and information wavefronts.  On every execution, a {\filter}
+consumes and produces some data.  The data it consumes affects the
+data it outputs.  Thus the data output on a given iteration
+carries the same information wavefront as the data it consumed.
+Using this definition it is possible to find out on which
+execution {\filter} B receives data that {\filter} A produced on a
+given execution.  In other words, it is possible to find on which
+execution {\filter} B observes the same information wavefront that
+{\filter} A observed on a given iteration.  Note that if a {\filter}
+consumes data that carries multiple information wavefronts, the
+data produced carries the latest information wavefront of all the
+data consumed.
+
+In order to specify timing of delivery of a message sent by
+{\filter} A to {\filter} B, we state that the message will be
+delivered with latency $[l_0, l_1]$.  This means that {\filter} B
+will receive the message no earlier then just before it observes
+the information wavefront observed by {\filter} A on $l_0$ execution
+of {\filter} A's {\work} function after sending the message, and no
+later then just before it observes the information wavefront
+observed by {\filter} B on $l_1$ execution of {\filter} A's {\work}
+function after sending the message.  In other words, $l_0$ is the
+lower bound on message delivery latency, while $l_1$ is the upper
+bound on message delivery latency. Obviously, $l_0 \le l_1$.
+
+In {\StreamIt} it is possible to send messages both upstream and
+downstream.  Sending a message downstream allows both latency
+bounds to be either positive or negative.  Sending a message with
+a positive latency bound is intuitive: the message will be
+delivered to the receiver when after it observes the information
+wavefront processed when sending the message. However, sending a
+message with negative latency bound means that the message is to
+be delivered {\emph before} the receiver sees the information
+wavefront processed by the sender when sending the message.  One
+way of thinking about this is that the message is being sent back
+in time, in terms of information wavefronts.  Note that it is
+possible for the lower latency bound to be negative and for the
+upper latency bound to be positive.
+
+When a message is being sent upstream, both upper and lower bound
+on latency of delivery of the message must be positive ($l_0 \ge
+1$). This is because when the sender sends the message, the
+receiver must have already observed sender's current information
+wavefront.
+
+It is important to note that not all latency bounds are valid. It
+is not always obvious whether specified latency bounds are valid,
+as there may be many reasons for latency bounds to be invalid.
+Those reasons include too tight buffering constraints and
+contradictory latency bounds.
+
+\subsection{Example}
+\label{sec:constrained-example}
+
+\begin{figure}
+\centering \psfig{figure=constrained-example.eps,width=4in}
+\caption{Example {\StreamIt} program for latency constrained
+analysis} \label{fig:constrained-example}
+\end{figure}
+
+Figure \ref{fig:constrained-example} depicts a sample {\pipeline}
+which contains message communication.  In the example, {\filter} B
+can send a message to {\filter} F with latency $[-3,-1]$ and {\filter}
+G can send a message to {\filter} A with latency $[1,9]$.  Note that
+{\filter} B sends a message that crosses {\StreamIt} structure
+boundary (F's direct parent is not the same as B's direct parent).
+{\filter} G sends a message that travels upstream.
+
+The following is the steady state for the {\pipeline}:
+
+\begin{displaymath}
+S_p = \left\{
+\begin{array}{c}
+\left[
+\begin{array}{c}
+3 \\ 6 \\ 4 \\ 4 \\ 2 \\ 2 \\ 4 \\ 4 \\ 10
+\end{array}\right],
+\left\{
+\begin{array}{c}
+A \\ B \\ split \\ C \\ D \\ E \\ F \\ join \\ G
+\end{array}\right\},
+\left[
+\begin{array}{c}
+6 \\ 6 \\ 10
+\end{array}
+\right], \left[
+\begin{array}{c}
+3 \\ 6 \\ 2 \\ 10
+\end{array}\right]
+\end{array}
+\right\}
+\end{displaymath}
+
+Below we list a schedule which allows to execute the sample
+{\pipeline} while respecting the messaging constraints imposed.  In
+the schedule, entry $A^m$ indicates that {\filter} A checks if any
+messages have been sent to it, and if there are messages waiting
+to be delivered to A, it receives them.  Note that no message
+sending is allowed during initialization of the {\pipeline}.  This
+is the case for all programs, and will be explained later.
+
+The initialization schedule for the sample {\pipeline} is
+$\{\{2A\}\{3B\}\{2split\}D\}$.  The steady state schedule for the
+sample {\pipeline} is
+
+$$
+\begin{array}{c} \{ F^mFB A^m\{2A\} F^mF \{2B\} \{2C\} \{2\ split\} DE \{2\
+join\}
+\\ \{5G\} F^mF B A^mA F^mF \{2B\} \{2C\} \{2\ split\} DE \{2\
+join\} \{5G\} \}
+\end{array}
+$$
+
+An inspection of the schedule above reveals that because of fairly
+tight constraint on sending messages from {\filter} B to {\filter} F,
+their execution is interleaved pretty tightly.  Latency constraint
+between {\filter} G and {\filter} A is not as tight, and the
+interleaving of execution of those {\filters} is not as fine
+grained.
+
+The schedules listed above are not unique, and haven't been
+optimized for any particular criteria.
+
+Table \ref{tbl:laten-sample-trace-B} depicts the flow of
+information wavefronts produced by {\filter} B between {\filter} B and
+{\filter} F when executing the schedule listed above.  According to
+the schedule given above, {\filter} F checks for messages before its
+every execution.  The latency of messages from B to F is given as
+$[-3,-1]$ in Figure \ref{fig:constrained-example}.  Thus before F
+checks for messages, it is must be the case that B has produced
+the information wavefront F will see on its next execution.  It
+also must be that B has not produced the information wavefront F
+will see in four executions.  It is easy to see that this
+condition is respected.  We simply inspect all executions of B,
+and make sure that on every one of its executions, the wavefront
+generated by B on its previous execution has not passed F yet.  As
+stated above, we skip initialization, as messages cannot be
+delivered during initialization.
+
+On B's first steady state execution it produces wavefront 3.  Its
+previous execution produced wavefront 2.  F has only observed
+wavefront 1, so message sent by B can be delivered. On B's second
+steady state execution it produces wavefront 4.  Its previous
+execution produced wavefront 3.  F has only observed observed
+wavefront 2, so message sent by B can be delivered.  This analysis
+continues until an entire steady state has been completed.
+
+\begin{table}
+\centering \scriptsize
+\begin{tabular}{|c|c|c|}
+\hline element & \multicolumn{2}{c|}{B's info wavefronts in buffer}\\
+\cline{2-3} executed & $in_s$ & $in_F$ \\
+\hline 2 A & - & - \\
+\hline 3 B & - & - \\
+\hline 2 split & 0,0,1,1,2,2 & - \\
+\hline 1 D & - & 1,2 \\
+\hline init done & - & 1,2 \\
+\hline 1 F & - & 1,2 \\
+\hline 1 B & - & 2 \\
+\hline 2 A & 3,3 & 2 \\
+\hline 1 F & 3,3 & 2 \\
+\hline 2 B & 3,3 & - \\
+\hline 2 C & 3,3,4,4,5,5 & - \\
+\hline 2 split & - & 4,5 \\
+\hline 1 D & - & 4,5 \\
+\hline 1 E & - & 4,5 \\
+\hline 2 join & - & 4,5 \\
+\hline 5 G & - & 4,5 \\
+\hline 1 F & - & 4,5 \\
+\hline 1 B & - & 5 \\
+\hline 1 A & 6,6 & 5 \\
+\hline 1 F & 6,6 & 5 \\
+\hline 2 B & 6,6 & - \\
+\hline 2 C & 6,6,7,7,8,8 & - \\
+\hline 2 split & 6,6,7,7,8,8 & - \\
+\hline 1 D & - & 7,8 \\
+\hline 1 E & - & 7,8 \\
+\hline 2 join & - & 7,8 \\
+\hline 5 G & - & 7,8 \\
+\hline run 1 done & - & 7,8 \\
+\hline 1 F & - & 7,8 \\
+\hline 1 B & - & 8 \\
+\hline 2 A & 9,9 & 8 \\
+\hline 1 F & 9,9 & 8 \\
+\hline 2 B & 9,9 & - \\
+\hline 2 C & 9,9,10,10,11,11 & - \\
+\hline 2 split & - & 10,11 \\
+\hline 1 D & - & 10,11 \\
+\hline 1 E & - & 10,11 \\
+\hline 2 join & - & 10,11 \\
+\hline 5 G & - & 10,11 \\
+\hline 1 F & - & 10,11 \\
+\hline 1 B & - & 11 \\
+\hline 1 A & 12,12 & 11 \\
+\hline 1 F & 12,12 & 11 \\
+\hline 2 B & 12,12 & - \\
+\hline 2 C & 12,12,13,13,14,14 & - \\
+\hline 2 split & 12,12,13,13,14,14 & - \\
+\hline 1 D & - & 13,14 \\
+\hline 1 E & - & 13,14 \\
+\hline 2 join & - & 13,14 \\
+\hline 5 G & - & 13,14 \\
+\hline run 2 done & - & 13,14 \\
+\hline
+\end{tabular}
+\begin{comment}
+\hline
+\end{comment}
+\caption[Flow of information wavefronts between {\filters} B an dF
+in Figure \ref{fig:constrained-example}]{Flow of information
+wavefronts between {\filters} B and F during execution of schedule
+provided in Section \ref{sec:constrained-example}. Left column
+provides the node to be executed.  The center and right columns
+show information wavefronts carried by data in {\Channels} $in_s$
+and $in_F$.  Every number corresponds to a single data item in a
+buffer.  Each number corresponds to the information wavefront
+carried by the data item. Information wavefronts are counted in
+terms of executions of {\filter} B's {\work} function, starting
+with 0.  Each line shows information wavefronts present in
+{\Channels} before the node is executed. Thus entry 0,0,1,1,2,2
+means that there are six data items present in the {\Channel}, first
+two carry information wavefront of first execution of B's {\work}
+function, second two carry information wavefront of second
+execution of B's {\work} function, etc.}
+\label{tbl:laten-sample-trace-B}
+\end{table}
+
+Table \ref{tbl:laten-sample-trace-A} depicting the flow of
+information wavefronts produced by {\filter} A across the sample
+{\pipeline} when executing the schedule listed above.  We can use
+this table to verify that messages sent from {\filter} G to {\filter}
+A will be delivered within the specified latency.
+
+Messages sent from {\filter} G to {\filter} A have to be delivered
+with latency $[1,9]$.  This means that a message sent by {\filter} G
+must be delivered to {\filter} A before it produces information
+wavefront that G will see in 9 executions.  The lower bound does
+not impose any real constraint, because the message cannot be
+delivered before A has produced an information wavefront that G
+sees when it sends the message.  Since the information wavefronts
+flow downstream, but the message must be delivered upstream, we
+must do the verification in terms of the receiver's wavefronts.
+
+On G's first execution it observes A's wavefront 2.  Nine
+executions later it sees wavefront 4.  {\filter} A has only produced
+wavefront 3, so any message sent can be delivered on time. On G's
+second execution it again observes A's wavefront 2.  Nine
+executions later it observes wavefront 5.  {\filter} A has again
+only produced wavefront 3, so any message sent can also be
+delivered on time. This analysis can be performed for all
+executions of G within a single steady state to verify that all
+possible messages sent by G to A can be delivered on time.
+
+\begin{table}
+\centering \scriptsize
+\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|}
+\hline element & \multicolumn{10}{c|}{A's info wavefronts in buffer } \\
+\cline{2-11} executed & $in_B$ & $in_s$ & $in_C$ & $in_D$ & $in_E$ & $in_F$ & $out_C$ & $out_E$ & $out_F$ & $in_G$ \\
+\hline 2 A & - & - & - & - & - & - & - & - & - & - \\
+\hline 3 B & 0,0,1,1 & - & - & - & - & - & - & - & - & - \\
+\hline 2 split & 1 & 0,0,0,0,1,1 & - & - & - & - & - & - & - & - \\
+\hline 1 D & 1 & - & 0,1 & 0,1 & - & 0,1 & - & - & - & - \\
+\hline init done & 1 & - & 0,1 & - & 1 & 0,1 & - & - & - & - \\
+\hline 1 F & 1 & - & 0,1 & - & 1 & 0,1 & - & - & - & - \\
+\hline 1 B & 1 & - & 0,1 & - & 1 & 1 & - & - & 0,0 & - \\
+\hline 2 A & - & 1,1 & 0,1 & - & 1 & 1 & - & - & 0,0 & - \\
+\hline 1 F & 2,2,3,3 & 1,1 & 0,1 & - & 1 & 1 & - & - & 0,0 & - \\
+\hline 2 B & 2,2,3,3 & 1,1 & 0,1 & - & 1 & - & - & - & 0,0,1,1 & - \\
+\hline 2 C & 3,3 & 1,1,2,2,2,2 & 0,1 & - & 1 & - & - & - & 0,0,1,1 & - \\
+\hline 2 split & 3,3 & 1,1,2,2,2,2 & - & - & 1 & - & 0,0,1,1 & - & 0,0,1,1 & - \\
+\hline 1 D & 3,3 & - & 2,2 & 2,2 & 1 & 2,2 & 0,0,1,1 & - & 0,0,1,1 & - \\
+\hline 1 E & 3,3 & - & 2,2 & - & 1,2 & 2,2 & 0,0,1,1 & - & 0,0,1,1 & - \\
+\hline 2 join & 3,3 & - & 2,2 & - & 2 & 2,2 & 0,0,1,1 & 2,2 & 0,0,1,1 & - \\
+\hline 5 G & 3,3 & - & 2,2 & - & 2 & 2,2 & - & - & - & \parbox{0.5in}{2,2,2,2,2, \\ 2,2,2,2,2} \\
+\hline 1 F & 3,3 & - & 2,2 & - & 2 & 2,2 & - & - & - & - \\
+\hline 1 B & 3,3 & - & 2,2 & - & 2 & 2 & - & - & 2,2 & - \\
+\hline 1 A & 3 & 3,3 & 2,2 & - & 2 & 2 & - & - & 2,2 & - \\
+\hline 1 F & 3,4,4 & 3,3 & 2,2 & - & 2 & 2 & - & - & 2,2 & - \\
+\hline 2 B & 3,4,4 & 3,3 & 2,2 & - & 2 & - & - & - & 2,2,2,2 & - \\
+\hline 2 C & 4 & 3,3,3,3,4,4 & 2,2 & - & 2 & - & - & - & 2,2,2,2 & - \\
+\hline 2 split & 4 & 3,3,3,3,4,4 & - & - & 2 & - & 2,2,2,2 & - & 2,2,2,2 & - \\
+\hline 1 D & 4 & - & 3,4 & 3,4 & 2 & 3,4 & 2,2,2,2 & - & 2,2,2,2 & - \\
+\hline 1 E & 4 & - & 3,4 & - & 2,4 & 3,4 & 2,2,2,2 & - & 2,2,2,2 & - \\
+\hline 2 join & 4 & - & 3,4 & - & 4 & 3,4 & 2,2,2,2 & 4,4 & 2,2,2,2 & - \\
+\hline 5 G & 4 & - & 3,4 & - & 4 & 3,4 & - & - & - & \parbox{0.5in}{4,4,4,4,4, \\ 4,4,4,4,4} \\
+\hline \parbox{0.5in}{1st steady \\ state done} & 4 & - & 3,4 & - & 4 & 3,4 & - & - & - & - \\
+\hline 1 F & 4 & - & 3,4 & - & 4 & 3,4 & - & - & - & - \\
+\hline 1 B & 4 & - & 3,4 & - & 4 & 4 & - & - & 3,3 & - \\
+\hline 2 A & - & 4,4 & 3,4 & - & 4 & 4 & - & - & 3,3 & - \\
+\hline 1 F & 5,5,6,6 & 4,4 & 3,4 & - & 4 & 4 & - & - & 3,3 & - \\
+\hline 2 B & 5,5,6,6 & 4,4 & 3,4 & - & 4 & - & - & - & 3,3,4,4 & - \\
+\hline 2 C & 6,6 & 4,4,5,5,5,5 & 3,4 & - & 4 & - & - & - & 3,3,4,4 & - \\
+\hline 2 split & 6,6 & 4,4,5,5,5,5 & - & - & 4 & - & 3,3,4,4 & - & 3,3,4,4 & - \\
+\hline 1 D & 6,6 & - & 5,5 & 5,5 & 4 & 5,5 & 3,3,4,4 & - & 3,3,4,4 & - \\
+\hline 1 E & 6,6 & - & 5,5 & - & 4,5 & 5,5 & 3,3,4,4 & - & 3,3,4,4 & - \\
+\hline 2 join & 6,6 & - & 5,5 & - & 5 & 5,5 & 3,3,4,4 & 5,5 & 3,3,4,4 & - \\
+\hline 5 G & 6,6 & - & 5,5 & - & 5 & 5,5 & - & - & - & \parbox{0.5in}{5,5,5,5,5, \\ 5,5,5,5,5} \\
+\hline 1 F & 6,6 & - & 5,5 & - & 5 & 5,5 & - & - & - & - \\
+\hline 1 B & 6,6 & - & 5,5 & - & 5 & 5 & - & - & 5,5 & - \\
+\hline 1 A & 6 & 6,6 & 5,5 & - & 5 & 5 & - & - & 5,5 & - \\
+\hline 1 F & 6,7,7 & 6,6 & 5,5 & - & 5 & 5 & - & - & 5,5 & - \\
+\hline 2 B & 6,7,7 & 6,6 & 5,5 & - & 5 & - & - & - & 5,5,5,5 & - \\
+\hline 2 C & 7 & 6,6,6,6,7,7 & 5,5 & - & 5 & - & - & - & 5,5,5,5 & - \\
+\hline 2 split & 7 & 6,6,6,6,7,7 & - & - & 5 & - & 5,5,5,5 & - & 5,5,5,5 & - \\
+\hline 1 D & 7 & - & 6,7 & 6,7 & 5 & 6,7 & 5,5,5,5 & - & 5,5,5,5 & - \\
+\hline 1 E & 7 & - & 6,7 & - & 5,7 & 6,7 & 5,5,5,5 & - & 5,5,5,5 & - \\
+\hline 2 join & 7 & - & 6,7 & - & 7 & 6,7 & 5,5,5,5 & 7,7 & 5,5,5,5 & - \\
+\hline 5 G & 7 & - & 6,7 & - & 7 & 6,7 & - & - & - & \parbox{0.5in}{7,7,7,7,7, \\ 7,7,7,7,7} \\
+\hline \parbox{0.7in}{\centering 2nd steady state done} & 7 & - & 6,7 & - & 7 & 6,7 & - & - & - & - \\
+\hline
+\end{tabular}
+\caption[Flow of information wavefronts between {\filters} A and G
+in Figure \ref{fig:constrained-example}]{Flow of information
+wavefronts between {\filters} A and G. The representation is same
+as in Table \ref{tbl:laten-sample-trace-B}, except wavefronts are
+given in terms of {\filter} A's {\work} function executions.}
+\label{tbl:laten-sample-trace-A}
+\end{table}
+
+\subsection{Information Buffering Model}
+\label{sec:constrained:info}
+
+In order to satisfy possible latency constraints, a global model
+of accounting for data buffered up needs to be constructed.  The
+model must express the flow of information carried by data.
+
+\subsubsection{Intuition}
+
+We begin with creating a concept of abstract information.  Every
+data item carries a certain amount of information.  Every data
+item in a particular {\Channel} carries the same amount of
+information.  A {\filter} consumes some data items from its {\Input}
+{\Channel} and pushes them to its {\Output} {\Channel}.  We define
+execution of {\filters} to be an information-preserving operation.
+This means that the amount of information consumed by a {\filter}
+during its execution must be pushed out onto {\filter}'s {\Output}
+{\Channel}. This means that the amount of information carried by
+every data item in the {\Input} {\Channel} may differ from the amount
+of information carried by every data item in the {\Output} {\Channel}.
+
+A {\splitter} is defined to consume some information from its {\Input}
+{\Channel} and provide that amount of information to each of its
+{\Output} {\Channels}.  That is, a {\splitter} increases the amount of
+information in the system by the number of {\Output} {\Channels} the
+{\splitter} has multiplied by amount of information it consumes on
+every execution. Notice that this action has the effect of
+increasing the amount of information carried by each data item for
+{\roundrobin} {\splitters}, but does not change the amount of
+information carried by each data item across {\duplicate}
+{\splitters}.  Also, a {\splitter} with only a single {\Output} {\Channel}
+behaves exactly the same as a {\filter}.
+
+A {\joiner} behaves in the exact opposite way to the {\splitter}.
+{\joiners} are defined to consume the same amount of information
+from every one of their {\Input} {\Channels}, and produce the same
+amount of information on their {\Output} {\Channel}.  As a result,
+{\joiners} decrease the amount of information carried by every data
+item passing through them.
+
+The behavior of {\splitters} and {\joiners} is a little
+counter-intuitive.  Intuition dictates that since {\splitters} and
+{\joiners} do not inspect or modify the data in any way, they should
+not change the amount of information carried by data passing
+through them.  This approach leads to inconsistency with
+{\splitjoins}, however.  Consider the {\splitjoin} from Figure
+\ref{fig:constrained-example}.  Assume that every data item in
+{\Channel} $in_s$ carries 1 unit of information.  By this
+alternative method, every data item in {\Channels} $in_C$, $in_D$
+and $in_F$ also carries 1 unit of information.  {\filter} C consumes
+one data item, thus one unit of information, and produces 2 data
+items. Thus in {\Channel} $out_C$, every data item carries $1 \over
+2$ units of information.  {\filter} D consumes 2 data items, thus
+consumes 2 units of information and produces one data item, thus
+every data item in {\Channel} $in_E$ carries 2 units of information.
+{\filter} E consumes 1 data item, thus consumes 2 units of
+information, and produces 2 data items, thus data items in
+{\Channel} $out_E$ carry 1 unit of information each.
+
+We now have an inconsistency.  The {\joiner} consumes data from
+{\Channel} $out_C$ carrying $1 \over 2$ unit of information per data
+and data from {\Channel} $out_E$ carrying 1 unit of information per
+data. Since all data on the {\Output} {\Channel} of the {\joiner} must
+carry the same amount of information per data item, the {\joiner}
+must change the amount of information per data item.
+
+Our approach guarantees that every node produces and consumes the
+same amount of information from every one of its {\Input} and
+{\Output} {\Channels}.  This definition is consistent across all
+{\filters}, {\splitters} and {\joiners}.
+
+\subsubsection{Information Function}
+
+We define an information function, that describes amount of
+information carried by each data item in a particular {\Channel}.
+For a channel $c$, the function is denoted as $info_c$.   The
+value of the $info$ function must be consistent across the entire
+{\StreamIt} graph, and every {\Channel} needs an actual numerical
+value.
+
+We begin computing a set of consistent values for $info$ functions
+of different {\Channels} by selecting a {\Channel} $c$ to have an
+$info$ function of 1.  We now travel the program graph upstream
+and downstream, across graph nodes, computing the $info$ function
+for all other {\Channels} connected to the node being crossed.
+
+There are three types of nodes that can be crossed, and they can
+be crossed from either {\Input} or {\Output} sides.
+
+\subsubsubsection{\filters}
+
+A {\filter} $f$ has only one {\Input} and one {\Output} {\Channel}.  If we
+know $info_{in_f}$, we can easily compute $info_{out_f}$, because
+we know that on every execution of $f$, we consume the same amount
+of information we produce:  $info_{out_f} = info_{in_f} {o_f \over
+u_f}$.  Similarly, if we know $info_{out_f}$, we compute
+$info_{in_f}$ as follows:  $info_{in_f} = info_{out_f} {u_f \over
+o_f}$.
+
+\subsubsubsection{\splitters}
+
+We have defined {\splitters} to provide their every {\Output} {\Channel}
+with the same amount of information as they consume from their
+{\Input} {\Channel}.  Thus for a {\splitter} $s$ we know that
+$info_{out_{s,i}} = info_{in_s} {o_s \over w_{s,i}}$.  Similarly,
+$info_{in_s} = info_{out_{s,i}} {w_{s,i} \over o_s}$.  With these
+two equations we can easily compute values for $info$ of all of
+$s$'s {\Channels}, given the $info$ function for any of $s$'s
+{\Channels}.
+
+\subsubsubsection{\joiners}
+
+We have defined {\joiners} to consume the same amount of information
+from every one of their {\Input} {\Channels} and push that same amount
+of information to their {\Output} {\Channel}. Thus for a {\joiner} $j$
+we know that $info_{out_j} = info_{out_{j,i}} {w_{j,i} \over
+u_j}$. Similarly, $info_{in_{j,i}} = info_{out_j} {u_j \over
+w_{j,i}}$. With these two equations we can easily compute values
+for $info$ of all of $j$'s {\Channels}, given the $info$ function
+for any of $j$'s {\Channels}.
+
+\subsubsubsection{Example}
+
+\begin{table}
+\centering
+\begin{tabular}{|c|c|c|}
+\hline buffer & $info$ function & information per data item \\
+\hline ${in_B}$ & $info_{in_B}$ & 1 \\
+\hline ${in_s}$ & $info_{in_s}$ & 0.5 \\
+\hline ${in_C}$ & $info_{in_C}$ & 1.5 \\
+\hline ${in_D}$ & $info_{in_D}$ & 1.5 \\
+\hline ${in_E}$ & $info_{in_E}$ & 3 \\
+\hline ${in_F}$ & $info_{in_F}$ & 1.5 \\
+\hline ${out_C}$ & $info_{out_C}$ & 0.75 \\
+\hline ${out_E}$ & $info_{out_E}$ & 1.5 \\
+\hline ${out_F}$ & $info_{out_F}$ & 0.75 \\
+\hline ${in_G}$ & $info_{in_G}$ & 0.3 \\
+\hline
+\end{tabular}
+\caption{Information per data item in
+buffers}\label{tbl:constrained-info-buffer}
+\end{table}
+
+Table \ref{tbl:constrained-info-buffer} lists the values of $info$
+function for {\Channels} in Figure \ref{fig:constrained-example}.
+The computation of above $info$ values began with assigning
+$info_{in_B} = 1$.
+
+\subsection{Latency Constraints and Information}
+\label{sec:constrained:constraints}
+
+The next step is to decide how the latency constraints correspond
+to the amount of information consumed, produced or buffered in the
+application.
+
+\subsubsection{Checking for Messages}
+
+One of the most important issues to solve is to find out how often
+an intended recipient of a message needs to check for messages.
+This frequency can easily be calculated in terms of number of
+executions of the {\work} function.  The assumption being made here
+is that the message is delivered to the destination as soon as it
+is generated.  Such a model can be easily achieved on a single
+processor machine.  Different models may require different
+calculations.
+
+{\filter} $f_s$ sends a message to {\filter} $f_r$ with latency
+$[l_0,l_1]$.  On every execution of its {\work} function, {\filter}
+$f_s$ processes $x = o_{f_s} * info_{in_{f_s}}$ information.
+Similarly, {\filter} $f_r$ processes $y = o_{f_r} * info_{in_{f_r}}$
+information on every execution of its {\work} function.
+
+Latency $[l_0, l_1]$ means that the receiver must check for
+messages from the sender every time it processes as much
+information, as the sender will send over $l_1 - l_0$ executions.
+The sender will send $x * (l_1 - l_0)$ information over that many
+executions.  The receiver will process that much information over
+${x * (l_1 - l_0) \over y}$ executions of its {\work} function.
+
+This value may be fractional, but execution of {\filters} is an
+atomic operation in {\StreamIt}.  Thus the receiver must actually
+check for new messages from the sender at least every
+$\left\lfloor {x * (l_1 - l_0) \over y}\right\rfloor$ executions
+of its {\work} function.
+
+Note that calculation assumes a fairly dumb message delivery
+method, where the latency of the message is not taken into
+account.  More sophisticated models of message delivery can allow
+to reduce the frequency of checking for new messages
+significantly.
+
+\subsubsection{Information Buffering}
+
+In computing a schedule that respects the latency constraints, it
+is necessary to compute the amount of information stored between
+the sender and the receiver.  The amount of information stored
+between two {\filters} is the amount of information that entered the
+interval between those two {\filters} minus the amount of
+information that is destroyed due to peeking of {\filters} plus some
+data possibly put in the feedback path of a {\feedbackloop} (due to
+$delay_{fl} > 0$).
+
+When a {\filter} with $e_f > o_f$ executes for the first time, it
+observes $info_{in_f} * e_f$ information, but pushes out only
+$info_{out_f} * u_f$ information.  Since for every {\filter}
+$info_{in_f} * o_f = info_{out_f} * u_f$ and $e_f > o_f$, the
+amount of information observed is not the same as the amount of
+information pushed out.  Thus some information is lost during the
+first execution of such a {\filter}.  This amount is $(e_f - o_f) *
+info_{in_f}$.
+
+We account for this lost information by setting the initial amount
+of information in a the {\Input} {\Channel} of every {\filter} to $(e_f
+- o_f) * info_{in_f}$.  If $e_f = o_f$, the initial amount of
+information in the {\Input} {\Channel} of $f$ is set to 0. If $e_f >
+o_f$, the inital amount of information is set to a negative
+number.
+
+When a {\StreamIt} program is executing, we define the amount of
+information stored in a {\Channel} to be equal to the initial amount
+of information in the {\Channel} plus the amount of information
+pushed into the {\Channel} minus the amount of information popped
+from the {\Channel}.
+
+Now, in order to compute the amount of information between two
+{\filters} we simply need to sum up the amount of information stored
+in all {\Channels} between these two {\filters} along a directed
+non-cyclical path.  The selection of this path is important, as
+not all paths between two {\filters} will have equal amount of
+information stored.  The path we select is the path that stores
+the least amount of information before any {\filters} are executed.
+In other words, we select the path that has the most negative
+information stored in it at initialization.  This is also
+equivalent to the amount of information entering the path through
+the upstream {\filter} minus the amount of information leaving the
+path through the downstream {\filter} plus the sum of information
+along the path at initialization (a non-positive value).
+
+In our sample {\pipeline}, we have $in_E = -3$ and all other
+{\Channels} initialized with 0 information. Thus the path selected
+between {\filters} A and G is $A \to B \to s \to D \to E \to j \to
+G$, which contains $-3$ units of information at initialization.
+
+\subsubsection{Information Buffering and Latency}
+
+The last element of relating information flow and latency
+constraints is expressing the latency constraints in terms of
+information buffered up between the sender and recipient of a
+message. The three types of latency constraints are analyzed
+below.
+
+\subsubsubsection{Downstream Positive}
+
+The downstream positive latency constraint is the easiest one to
+analyze. A downstream positive delay specifies that a downstream
+recipient should receive the message before it observes
+information wavefront that will be produced by the sender in the
+future.  In other words, there is no restriction on the amount of
+data buffered up between the sender and receiver, because the
+information wavefront cannot have possibly entered the path
+between the sender and recipient. Thus downstream positive latency
+constraint are effectively ignored by the scheduler.
+
+\subsubsubsection{Upstream Positive}
+
+An upstream positive latency constraint specifies that the
+recipient should receive the message just before it produces an
+information wavefront that will be observed by the sender between
+$l_0$ and $l_1$ executions later.  This specifies an upper limit
+on the amount of information stored between the {\filters}.  If
+$f_s$ is the recipient, the amount of information stored between
+the sender and the recipient must be less than $l_1
+* info_{in_{f_s}} * o_{f_s}$.
+
+In our example, the latency for messages sent from {\filter} G to
+{\filter} A is $[1,9]$.  Thus when {\filter} G is executed, the amount
+of information between A and G must be less than $9 * 0.3 * 2 =
+5.4$  An inspection of the sample schedule and amount of
+information stored between A and G reveals that amount of
+information stored between A and G peeks at 5.
+
+\subsubsubsection{Downstream Negative}
+
+A downstream negative latency constraint specifies that the
+recipient should receive the message just before it observes the
+information wavefront produced by the sender between $-l_1$ and
+$-l_0$ executions of the {\work} function before it sent the
+message.  This specifies a lower limit on the amount of
+information stored between the {\filters}.  If $f_s$ is the sender,
+the amount of information stored between the sender and the
+recipient must be at least $-l_1 * info_{out_{f_s}} * u_{f_s}$.
+
+In our example, the latency of the messages sent from {\filter} B to
+{\filter} F is $[-3,-1]$.  Thus when {\filter} B is executed, the
+amount of information between B and F must be at least $-(-1) *
+0.5 * 2 = 1$.  An inspection of the sample schedule and amount of
+information stored between B and F reveals that amount of
+information stored between B and F bottoms out at 1.
+
+\subsection{Computing the Schedule}
+\label{sec:constrained:scheduling}
+
+Now that we have the tools to restrict information flow in a way
+that will guarantee a schedule that respects the rules imposed on
+the schedule by the program, we are ready to compute the schedule.
+
+\subsubsection{Initialization Schedule}
+
+Construction of the initialization schedule with latency
+constraints is very different from initialization schedule without
+latency constraints.  The reason for this is that buffering
+requirements imposed by peeking are much easier to satisfy than
+requirements imposed by latency constraints.  The requirements
+imposed by latency constraints require global analysis of data
+(information) buffering.  This is because different overlapping
+latency constraints can contain conflicting requirements (minimum
+versus maximum amount of buffered information).
+
+The approach used here will create a solution using a simple set
+of linear equations.  If the constraints are not too tight, it is
+easy to convert the fractional solutions of linear equations into
+a real schedule.  If the constraints are tight, it may be
+necessary to use integer programming to obtain integer solutions
+which will automatically map exactly to a valid schedule.
+
+It is important to note, that the goal of construction of an
+initialization schedule here is to create a buffering that
+satisfies all constraints imposed by the program.  During
+initialization of the program, not all constraints will be
+satisfied.  In fact, it is impossible to satisfy all constraints
+before initialization completes, because when the program begins
+executing it has no data buffered up, and there are latency
+constraints that require minimal buffering of data.
+
+With all that in mind, equations that govern number of {\StreamIt}
+graph node executions for the initialization schedule simply need
+to be written down. Here all filters will be represented by $f_m$
+with $0 \leq m < n_f$ with $n_f$ filters in the program.
+{\splitters} will be represented by $s_m$ and {\joiners} with $j_m$,
+$0 \leq m < n_{sj}$, with $n_{sj}$ representing number of
+{\splitjoins} and {\feedbackloops}. {\Channels} will be represented by
+$in_{f_m}$, $in_{s_m}$ and $in_{j_m, k}$ with $k$ representing the
+$k$th branch of the {\joiner}. {\Channels} are designated by {\StreamIt}
+nodes that use the {\Channel} as an {\Input} {\Channel}. Number of
+executions of node $s$ ({\filter}, {\splitter} or {\joiner}) will be
+represented by $c_s$.
+
+First equations required represent the amount of information
+present in {\Channels} need to be written down. For every {\Channel},
+that is simply the amount of information pushed in by the source
+node minus the amount of information popped by the drain node
+minus amount of information lost on first execution of the
+downstream node, namely $in_{s_{dst}} = info_{in_{s_{dst}}}
+(c_{s_{src}} * u_{s_{src}} - c_{s_{dst}} * o_{s_{dst}} -
+(e_{s_{dst}} - o_{s_{dst}}))$. The only exception to this rule are
+joiner buffers in {\feedbackloops}. Those buffers start with
+$delay_{fl_m}$ data items, thus $info_{in_{j_m,1}} * delay_{fl_m}$
+information needs to be added the amount of information stored in
+$in_{{j_m}, 1}$.
+
+Next the minimal amount of data required in buffers is required to
+at least match the extra peeking amount of buffers (otherwise the
+steady schedule would not be able to repeat indefinitely).  This
+is simply restricted by $b_{f_m} \ge 0$.  This takes care of the
+the peeking amount, because {\filters} that peek destroy some
+information, which is accounted for by setting the amount of
+information to be negative. For buffers belonging to {\splitters}
+and {\joiners}, the only requirement is that the amount of
+information in the buffers is at least zero.  This is easily
+expressed by $b_{s_m} \ge 0$ and $b_{j_m, k} \ge 0$.  Thus for all
+buffers we simply require that $b \ge 0$.
+
+The last set of equations needed puts restrictions based on
+latency constraints.  As described above, those equations simply
+sum up information stored in all buffers between the source and
+destination {\filters}, and make sure that it is less or more than
+what the latency constraint requires.
+
+Solving equations above for $c$s yields number of executions of
+{\filters}, {\splitters} and {\joiners} required in order to initialize
+a {\StreamIt} program with latency constraints.  The numbers of
+execution obtained may be non-integer, if only a linear
+programming solution is sought. Simple rounding of the solution
+may be able to result in valid schedule.  If that is not the case,
+integer programming solutions may be obtained, which would
+guarantee satisfying all requirements.  If there are multiple
+solutions, any of the solutions will satisfy the requirements of a
+valid initialization schedule.
+
+\begin{comment}
+Since the system of equations should be under-specified, it is may
+be beneficial to add an additional requirement to the system. For
+example, minimizing the number of executions of {\filters} or amount
+of information or data buffered may be a useful metric to optimize
+for.
+\end{comment}
+
+\subsubsubsection{Example}
+
+Here we present equations which can be used to initialize the
+{\pipeline} in Figure \ref{fig:constrained-example}.
+
+First we compute the amount of information in each buffer after
+initialization.
+
+\begin{displaymath}
+\begin{array}{ll}
+b_{B} = info_{in_B} * (c_{A} * o_A - c_{B} * o_B) &
+
+b_{C} = info_{in_C} * (c_{s} * w_{s,0} - c_{C} * o_C) \\
+
+b_{D} = info_{in_D} * (c_{s} * w_{s,1} - c_{D} * o_D) &
+
+b_{F} = info_{in_F}* (c_{s} * w_{s,2} - c_{F} * o_F) \\
+
+b_{G} = info_{in_G}* (c_{j} * o_j - c_{G} * o_G) &
+
+b_{j, 0} = info_{in_{j,0}} * (c_C * o_C  - c_{j} * w_{j,0}) \\
+
+b_{j, 1} = info_{in_{j,1}} * (c_E * o_E  - c_{j} * w_{j,1}) &
+
+b_{j, 2} = info_{in_{j,2}} * (c_F * o_F  - c_{j} * w_{j,2}) \\
+
+\multicolumn{2}{l}{b_{E} = info_{in_E}* (c_{D} * o_D - c_{E} * o_E - (e_E - o_E))} \\
+
+\end{array}
+\end{displaymath}
+
+Next we ensure that all {\Channels} store non-negative amounts of
+information after initialization:
+
+\begin{displaymath}
+\begin{array}{ccc}
+b_{B} \ge 0 & b_{C} \ge 0 & b_{D} \ge 0 \\
+b_{E} \ge 0 & b_{F} \ge 0 & b_{G} \ge 0 \\
+b_{j,0} \ge 0 & b_{j,1} \ge 0 & b_{j,2} \ge 0 \\
+b_{s} \ge 0
+\end{array}
+\end{displaymath}
+
+Finally, following equations ensure that all buffers contain
+enough information for the graph to be considered initialized for
+steady state execution.
+
+\begin{displaymath}
+\begin{array}{rl}
+b_{B} + b_{s} + b_{D} + b_{E} + b_{j, 1} + b_{G} & < 5.4 \\
+b_{s_0} + b_{f_5} & \ge 1 \\
+\end{array}
+\end{displaymath}
+
+One solution to the equations above, which can be found using an
+integer linear programming solver) is:
+
+\begin{displaymath}
+\begin{array}{ccc}
+c_A = 2 & c_B = 3 & c_C = 0 \\
+c_D = 1 & c_E = 0 & c_F = 0 \\
+c_G = 0 & c_s = 2 & c_j = 0 \\
+\end{array}
+\end{displaymath}
+
+This solution corresponds to the initialization schedule for the
+example provided in Section \ref{sec:constrained-example}.
+
+\subsubsection{Steady State Schedule}
+
+Calculating the steady state schedule should in most cases be a
+fairly simple task, but may, in some cases be very difficult. The
+distinction between these two situations is not very easy to
+define.  Basically, if the imposed set of constraints is very
+tight (not much space to maneuver buffered data), creating such a
+schedule may be difficult.  On the other hand, if there is some
+space to maneuver buffered data, applying a simple scheduling
+technique like minimum latency scheduling should work.  Simple
+techniques tailored to satisfying latency constraints can be
+applied to programs that cannot be scheduled using minimum latency
+scheduling.  The common case for computing steady state schedules
+should be relatively easy to compute, because message sending is
+meant to be a low bandwidth activity, and the delivery constraints
+are meant to have large ranges. Absence of such conditions will
+result in reduced performance of the compiled code, and the
+program should be redesigned to pass appropriate information using
+regular data flow through channels.
+
+The technique described here uses as an input the {\StreamIt}
+program with all of its latency constraints, as well as the amount
+of information stored in all {\Channels} after initialization. The
+output of this algorithm is a steady state schedule which starts
+with the initialized program and executes one iteration of minimal
+steady state while respecting all constraints placed on the
+program. The algorithm uses integer programming to assure that if
+a valid schedule exists, it will be found.  The resulting schedule
+is expressed as a flat list of {\filter} firings.
+
+The first step is to compute the multiplicities of execution of
+all components.  Let $t$ represent the sum of all execution
+multiplicities of all components, $t = \sum_{i} S_{m,i}$, where S
+is the steady state for the program. Thus, there will be a total
+of $t$ steps in the final schedule. Let variable $c^r_s$ represent
+an execution of a component $s$ during the $r$th step. The first
+restriction on $c$s is that $\sum_{r=0}^{t-1} c^r_s = v_s$ (here
+the $v$ notation is taken from subsection
+\ref{sec:calc-min-steady}). Furthermore, we must have that
+$\sum_{\forall s \in \{all\ nodes\}} c^k_s = 1$. These two
+conditions assure that the schedule executed will indeed be the
+steady state schedule.
+
+Next, the amount of information in {\Channel} $in_s$ before step $k$
+is represented by $$in^k_s = in_s + info_{in_{s_{dst}}}
+\left(\sum_{r=0}^{k-1} c^r_{c_{src}} - \sum_{r=0}^{k-1}
+c^r_s\right)$$ We impose the buffering requirements placed upon
+$in_s$ for every $in^i_s$, thus ensuring that after every step of
+the program, all latency and peeking requirements are met.
+
+Solving the resulting system of equations for all $c$s (including
+the $c$s required for initialization) will yield a correct
+schedule for the given program.  The integer programming
+requirement should be that $\forall c, c \in \{0, 1\}$.  The
+schedule is extracted for step $r$ by finding the node $s$ for
+which $c^r_s = 1$, and firing this component.
+
+\subsection{Example}
+\label{sec:constrained:numbers}
+
+Here we provide equations and a solution for construction of a
+steady state schedule for the {\pipeline} in Figure
+\ref{fig:constrained-example}. The steady state for the sample
+{\pipeline} has been provided in Section
+\ref{sec:constrained-example}.
+
+The equations for determining the steady schedule are presented
+below.  For the large part they are identical to equations
+governing the initialization schedule, except amount of
+information buffered is calculated differently, and there are far
+more variables.  There are a total of 39 steady state execution
+steps.  Variable $r$ will be used here to denote a particular step
+of the schedule.
+
+\begin{displaymath}
+\forall r \in \{0,1,\dots,38 \} \left\{
+\begin{array}{l}
+\begin{array}{rlc}
+b^r_{B} & = b_{B} + info_{in_B} \sum_{q=0}^{r} (c^q_A * u_A - c^q_B * o_B) & b^r_B \ge 0 \\
+b^r_{s} & = b_{s} + info_{in_s} \sum_{q=0}^{r} (c^q_B * u_B - c^q_s * o_s) & b^r_s \ge 0 \\
+b^r_{C} & = b_{C} + info_{in_C} \sum_{q=0}^{r} (c^q_s * w_{s,0} - c^q_C * o_C) & b^r_C \ge 0 \\
+b^r_{D} & = b_{D} + info_{in_D} \sum_{q=0}^{r} (c^q_s * w_{s,1} - c^q_D * o_D) & b^r_D \ge 0 \\
+b^r_{E} & = b_{E} + info_{in_E} \sum_{q=0}^{r} (c^q_D * u_D - c^q_E * o_E) & b^r_E \ge 0 \\
+b^r_{F} & = b_{F} + info_{in_F} \sum_{q=0}^{r} (c^q_s * w_{s,2} - c^q_F * o_F) & b^r_F \ge 0 \\
+b^r_{j,0} & = b_{j,0} + info_{in_{j,0}} \sum_{q=0}^{r} (c^q_C * u_C - c^q_j * w_{j,0}) & b^r_{j,0} \ge 0 \\
+b^r_{j,1} & = b_{j,1} + info_{in_{j,1}} \sum_{q=0}^{r} (c^q_E * u_E - c^q_j * w_{j,1}) & b^r_{j,1} \ge 0 \\
+b^r_{j,2} & = b_{j,2} + info_{in_{j,2}} \sum_{q=0}^{r} (c^q_F * u_F - c^q_j * w_{j,2}) & b^r_{j,2} \ge 0 \\
+b^r_{G} & = b_{G} + info_{in_G} \sum_{q=0}^{r} (c^q_j * u_j - c^q_G * o_G) & b^r_G \ge 0 \\
+\end{array} \\
+\\
+b^r_{B} + b^r_{s} + b^r_{D} + b^r_{E} + b^r_{j, 1} + b^r_{G} < 5.4 \\
+b^r_{s} + b^r_{F} \ge 1 \\
+\end{array} \right.
+\end{displaymath}
+
+The following equations are bookkeeping equations that ensure that
+each component is executed the correct number of times, and that
+every step has exactly one execution.
+
+\begin{displaymath}
+\begin{array}{l}
+\begin{array}{rlrlrlrl}
+\sum_{r=0}^{38}c^r_{A} = & 3 & \sum_{r=0}^{38}c^r_{B} = & 6 &
+\sum_{r=0}^{38}c^r_{C} = & 4 & \sum_{r=0}^{38}c^r_{D} = & 2 \\
+\sum_{r=0}^{38}c^r_{E} = & 2 & \sum_{r=0}^{38}c^r_{F} = & 4 &
+\sum_{r=0}^{38}c^r_{G} = & 10 & \sum_{r=0}^{38}c^r_{s} = & 4 \\
+\sum_{r=0}^{38}c^r_{j} = & 4
+\end{array}
+\\
+\forall r \in \{0,1,\dots,38\} \sum_{s \in \{ A, B, C, D, E, F, G,
+s, j \}}c^r_{s} = 1
+\end{array}
+\end{displaymath}
+
+Solving the equations above for non-negative integral $c_s$
+variables, yields a schedule which can be executed safely, without
+fear of violating any requirements imposed by the programmer.  If
+no solution exists, then there is no schedule for the program,
+because the equations above do not overrestrict the execution of
+the program.
+
+Table \ref{tbl:const-lat-ss-sol} provides a solution to the
+equations above.  The solution corresponds to schedule provided in
+Section \ref{sec:constrained-example}. Once again that schedule is
+$$ \begin{array}{c}\{ F^mFB A^m\{2A\} F^mF \{2B\} \{2C\} \{2\ split\} DE \{2\
+join\} \{5G\} \\F^mF B A^mA F^mF \{2B\} \{2C\} \{2\ split\} DE
+\{2\ join\} \{5G\} \} \end{array}
+$$
+
+\begin{table} \centering
+\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|}
+\hline step $\backslash$ node & A & B & s & C & D & E & F & j & G \\
+\hline 0                      & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 \\
+\hline 1                      & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+\hline 2                      & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+\hline 3                      & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+\hline 4                      & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 \\
+\hline 5                      & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+\hline 6                      & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+\hline 7                      & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 \\
+\hline 8                      & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 \\
+\hline 9                      & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 \\
+\hline 10                     & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 \\
+\hline 11                     & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 \\
+\hline 12                     & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 \\
+\hline 13                     & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 \\
+\hline 14                     & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 \\
+\hline 15                     & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 \\
+\hline 16                     & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 \\
+\hline 17                     & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 \\
+\hline 18                     & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 \\
+\hline 19                     & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 \\
+\hline 20                     & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 \\
+\hline 21                     & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+\hline 22                     & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+\hline 23                     & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 \\
+\hline 24                     & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+\hline 25                     & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+\hline 26                     & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 \\
+\hline 27                     & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 \\
+\hline 28                     & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 \\
+\hline 29                     & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 \\
+\hline 30                     & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 \\
+\hline 31                     & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 \\
+\hline 32                     & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 \\
+\hline 33                     & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 \\
+\hline 34                     & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 \\
+\hline 35                     & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 \\
+\hline 36                     & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 \\
+\hline 37                     & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 \\
+\hline 38                     & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 \\
+\hline
+\end{tabular}
+\caption[Sample solution to equations from Section
+\ref{sec:constrained-example}]{A solution to equations for steady
+state of stream from Figure \ref{fig:constrained-example}.This
+solution corresponds to the schedule given in
+\ref{sec:constrained-example}.} \label{tbl:const-lat-ss-sol}
+\end{table}

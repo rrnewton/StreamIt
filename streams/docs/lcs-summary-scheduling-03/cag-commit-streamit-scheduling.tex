@@ -1,0 +1,133 @@
+% Name your report <group>-<unique-name>.tex, (e.g., sls-jupiter.tex)
+% to avoid name collisions.  For \label{} entries within a file,
+% please use \<group>-<unique-name>-<your label} (e.g.,
+% \label{sls-jupiter-figure}), again to avoid name collisions.  There
+% is no need to use unique names with \cite{} since each report has
+% its own citation namespace.
+
+% You can also use \formattitle{Title}{Authors} to gain formatting
+% control (e.g., footnotes on author names or controlling line breaks
+% with \\) and \formatcontents{Title}{Authors}.  Since we did not need
+% such control, we simply used \formattitlecontents{Title}{Authors}
+% here.  Please do not put any special formatting in
+% \formattitlecontents or \formatcontents as this will disturb the
+% table of contents.
+
+\formattitlecontents 
+{Scheduling of Execution of StreamIt Programs}
+{Michal Karczmarek, Saman Amarasinghe}
+
+
+% Please use the following \formatsection entries unless they are
+% inappropriate: Introduction, Approach, Progress, Future, Research
+% Support.
+%
+% Do not put a blank line after a \formatsection, as this affects the
+% formatting.
+\formatsection{Introduction}
+Applications structured around some notion of a ``stream'' are
+becoming increasingly important and widespread. \cite{Rix98}
+provides evidence that streaming media applications are already
+consuming most of the cycles on consumer machines, and their use
+is continuing to grow. The streaming computation model is
+pervasive and ranges from small, embedded systems (ex. cell
+phones) to large, computationally powerful machines (ex. cell base
+stations).
+
+StreamIt \cite{streamitcc} is a language and a compiler designed to deal
+with the new problems created by the shift in computation from general
+purpose computing to stream processing.  One of the problems
+faced by a compiler is scheduling of streaming computation in a way
+that minimizes usage of available resources. In this document, we
+describe a set of techniques developed to solve the problem of
+scheduling. For a more detailed description of algorithms introduced
+here, see \cite{karczma-thesis}.
+
+\formatsection{Approach} StreamIt introduces a novel concept of
+structure to streaming programming. The structures used by StreamIt
+programs map the flow of streaming data into simple to understand
+patterns. These patterns introduce an inherent hierarchy to the flow
+of computation.
+
+Our scheduling algorithms take advantage of this hierarchy in order
+to simplify the task of scheduling: each structure only needs to
+learn of its children's properties in order to produce a valid 
+schedule. No global view of flow of data is required.
+
+\noindent {\it Phased Scheduling}
+
+The dominant technique used for scheduling streaming programs is
+called Single Appearance Scheduling. In this technique, every
+node in the stream program appears only once in every schedule.
+This assures that the schedules produced are small. The trade-off,
+however, is that these schedules often require a large amount of
+storage memory to execute.
+
+Phased Scheduling is a technique developed to deal with the issue
+of large storage requirements, without overly growing the size of the
+schedules. The technique relies on producing several small schedules
+for each hierarchical element in the StreamIt program, each of
+which works on a small dataset. These schedules are then grouped and 
+interleaved in order to produce schedules that are small, but do not
+require lots of data buffering.
+
+\noindent {\it Scheduling Strategies}
+\begin{table} \centering \small
+\begin{tabular}{|c|c|c|c|c|c|c|c|}
+\hline benchmark & \parbox{0.5in}{\centering number of nodes} & \parbox{0.5in}{\centering number of node executions} & \multicolumn{2}{c|}{pseudo single appearance} & \multicolumn{3}{c|}{minimal latency} \\
+\cline{4-8} & & & \parbox{0.5in}{\centering schedule size} & \parbox{0.5in}{\centering buffer size} & \parbox{0.5in}{\centering schedule size} & \parbox{0.8in}{\centering compressed schedule size} & \parbox{0.5in}{\centering buffer size} \\
+\hline bitonic sort & 370 & 468 & 439 & 2112 & 448 & 448 & 2112 \\
+\hline CD-DAT & 6 & 612 & 7 & 1021 & 170 & 72 & 72 \\
+\hline FFT & 26 & 488 & 31 & 3584 & 31 & 31 & 3584 \\
+\hline filter bank & 53 & 312 & 166 & 2063 & 160 & 145 & 1991 \\
+\hline FIR & 132 & 152 & 133 & 1560 & 133 & 133& 1560 \\
+\hline radio & 30 & 43 & 58 & 1351 & 50 & 50 & 1351 \\
+\hline GSM & 47& 3356 & - & - & 724 & 78 & 3900 \\
+\hline 3GPP & 94 & 356 & 147 & 986 & 149 & 137 & 970 \\
+\hline QMF & 65 & 184 & 143 & 1225 & 132 & 122 & 1225 \\
+\hline radar & 68 & 161 & 100 & 332 & 100 & 100 & 332 \\
+\hline SJ\_PEEK\_1024 & 6 & 3081 & 11 & 7168 & 40 & 16 & 4864 \\
+\hline SJ\_PEEK\_31 & 6 & 12063 & 11 & 19964 & 250 & 24 & 12063 \\
+\hline vocoder & 117 & 415 & 172 & 1285 & 293 & 206 & 1094 \\
+\hline
+\end{tabular}
+\caption{Results of running pseudo single appearance and minimal
+latency scheduling algorithms on various applications.}
+\label{tbl:results}
+\end{table}
+
+The flexible approach to scheduling used by Phased Scheduling allows
+for a wide variety of methods for producing schedules for each
+hierarchical component in a StreamIt program as well as a wide variety
+of techniques for grouping and interleaving these schedules
+together. The combination of this flexibility allows us to select
+whether emphasis should be put on minimizing resources necessary for
+storing streaming data, minimizing resources necessary for storing
+execution schedules, or finding an acceptable solution in between
+these two conflicting goals.
+
+\formatsection{Progress}
+We have implemented Phased Scheduling as part of the StreamIt system.
+Our current results from using a certain scheduling strategy (depicted
+in Table~\ref{tbl:results}) show we are able to consistently reduce the
+combined amount of resources necessary for storage of the schedule and
+buffer space.  We achieve this by reducing buffer requirements by an
+average of 14.5\% on a variety of benchmarks, with a peak savings of
+93\%.
+
+\formatsection{Future Work}
+The current results of our scheduling techniques are promising, but
+require much more work. We are planning on designing techniques which
+will be able to conform to hard constraints, such as very limited amount
+of memory and real-time latency constraints.
+
+We also plan on designing scheduling algorithms that will allow us to
+take advantage of low-bandwidth, asynchronous communication constructs
+used by StreamIt to send non-streaming data between computational elements.
+
+\formatsection{Research Support}
+This work is supported by DARPA (PCA F29601-04-2-0166),
+the NSF (CISE EIA-0071841), and fellowships from the
+Singapore-MIT Alliance and the MIT-Oxygen Project.
+
+\bibtex{cag-commit-streamit-scheduling}

@@ -1,0 +1,75 @@
+%!
+%%BoundingBox: 61 336 250 595
+%%Title: fir-proc
+%%CreationDate: Mon Jan 21 09:14:59 2002
+%%Creator: Tgif-3.0-p13 by William Chia-Wei Cheng (william@cs.UCLA.edu)
+
+/tgifdict 2 dict def
+tgifdict begin
+
+end
+
+%%PageBoundingBox: 61 336 250 595
+tgifdict begin
+/tgifsavedpage save def
+
+1 setmiterlimit
+1 setlinewidth
+
+0 setgray
+
+72 0 mul 72 11.00 mul translate
+72 128 div 100.000 mul 100 div dup neg scale
+
+gsave
+
+/tgiforigctm matrix currentmatrix def
+
+% TEXT
+0 setgray
+/Courier findfont [10 0 0 -10 0 0] makefont setfont
+   gsave
+      112 361 moveto (int N = 5;) show
+      112 373 moveto (int BLOCK_SIZE = 100;) show
+      112 385 moveto () show
+      112 397 moveto (void step\(float[] input, float[] output,) show
+      112 409 moveto (       int numIn, int numOut\) {) show
+      112 421 moveto (  float sum = 0;) show
+      112 433 moveto (  for \(int k=0; k<numIn; k++\)) show
+      112 445 moveto (    sum = sum + input[k]*FIR_COEFF[k+numIn][N];) show
+      112 457 moveto (  for \(int k=numIn; k<N; k++\) ) show
+      112 469 moveto (    sum = sum + input[k]*FIR_COEFF[k-numIn][N];) show
+      112 481 moveto (  output[numOut] = sum;) show
+      112 493 moveto (  input[numIn] = getData\(\);) show
+      112 505 moveto (}) show
+      112 517 moveto () show
+      112 529 moveto (void main\(\) {) show
+      112 541 moveto (  float input[] = new float[N];) show
+      112 553 moveto (  float output[] = new float[BLOCK_SIZE];) show
+      112 565 moveto (  int numIn, numOut;) show
+      112 577 moveto () show
+      112 589 moveto (  for \(numIn=0; numIn<N; numIn++\)) show
+      112 601 moveto (    input[numIn] = getData\(\);) show
+      112 613 moveto ( ) show
+      112 625 moveto (  while \(true\) {) show
+      112 637 moveto () show
+      112 649 moveto (    for \(out=0; numIn<N; numIn++, numOut++\)) show
+      112 661 moveto (      step\(input, output, numIn, numOut\);) show
+      112 673 moveto () show
+      112 685 moveto (    int wholeSteps = \(BLOCK_SIZE-numOut\)/N;) show
+      112 697 moveto (    for \(int k=0; k<wholeSteps; k++\)) show
+      112 709 moveto (      for \(numIn=0; numIn<N; numIn++, numOut++\)) show
+      112 721 moveto (        step\(input, output, numIn, numOut\);) show
+      112 733 moveto () show
+      112 745 moveto (    for \(numIn=0; numOut<BLOCK_SIZE; numIn++, numOut++\)) show
+      112 757 moveto (      step\(input, output, numIn, numOut\);) show
+      112 769 moveto () show
+      112 781 moveto (    displayBlock\(output\);) show
+      112 793 moveto (  }) show
+      112 805 moveto (}) show
+   grestore
+
+grestore
+tgifsavedpage restore
+end
+%MatchingCreationDate: Mon Jan 21 09:14:59 2002

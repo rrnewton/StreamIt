@@ -1,0 +1,309 @@
+%% Upward of fifty percent of the code that runs the DSP(s) in a modern
+%% cell phone is coded in assembly with the rest written in C. Hand
+%% optimized assembly code typically makes the best use of the available
+%% resources such as power, specialized coprocessors, and specialized
+%% instructions.  The problem with assembly code is that the same
+%% algorithm must be mapped time and time again whenever a new chip comes
+%% out. The life cycle of a typical DSP is much shorter than the life
+%% cycle of a general purpose microprocessor -- each new generation is
+%% separated by months rather than years.
+ 
+%% Therefore frequently reimplementing algorithms by hand is a costly,
+%% arduous process that increases cost and slows the pace of
+%% advances. Engineers must spend time working out details rather than
+%% focusing on solving harder problems. Compilers were invented forty
+%% years ago exactly to let engineers focus on the problem at hand rather
+%% than spend time with machine specific details. Compilers for DSP
+%% architectures have a difficult job, and are not very good at mapping a
+%% program written in a general purpose language like C into the
+%% specialized instructions provided by DSPs. Many of the instructions
+%% provided by a DSP are targeted for a very specific application (like
+%% FIR filtering), but most general purpose languages have no way to
+%% describe higher level behavior other than functionally. If you don't
+%% express your algorithm in the same way that the compiler expects to
+%% encounter it, the resulting program will not take best advantage of
+%% the available DSP resources.
+
+\section{Introduction}
+Digital computation is becoming an increasingly ubiquitous element of
+modern life.  Everything from cell phones to GPS systems to satellite
+radios require increasingly sophisticated algorithms.  Optimization is
+especially important for this domain, as embedded devices often have
+high performance requirements and tight resource constraints.  Even
+with the best available C compilers for DSP chips, programmers still
+turn to assembly code to implement critical parts of embedded
+applications.  This process is time-consuming, error-prone and
+costly, and must be repeated for each generation of the target
+architecture.  As algorithms and applications continue to grow in
+complexity, these factors will become unmanageable.  There is a
+pressing need for high-level DSP abstractions that a compiler can
+consistently reduce to efficient low-level code.
+
+In this paper, we demonstrate that a domain-specific stream language
+can enable novel high-level DSP optimizations that would otherwise be
+intractable in a general-purpose language.  Our source language is
+StreamIt, which is specifically designed for high-performance signal
+processing applications~\cite{streamit-asplos,streamitcc}; our
+analysis focuses on filters that are {\it linear}.  StreamIt is
+distinguished from a general purpose language in that it makes
+explicit the large-scale parallelism and regular communication
+patterns that are characteristic of streaming programs.  By analyzing
+the primitive building block in StreamIt--the filter--our analysis can
+detect large portions of the application that produce outputs as a
+linear combination of the inputs; we can exploit this linearity
+for a number of large-scale optimizations.  Though each filter is
+programmed using imperative C-like code, the separation of filters
+into autonomous units of the stream graph enables our analysis to be
+far more effective and efficient than it could be on an equivalent
+implementation in C alone.
+
+This paper makes the following contributions:
+\begin{itemize}
+
+\item A linear dataflow analysis that can extract a linear transfer
+function from the imperative code within a StreamIt filter.
+\vspace{-6pt}
+
+\item Combination rules for collapsing neighboring linear nodes into a
+single linear representation.
+\vspace{-6pt}
+
+\item An automated procedure for translating a stream computation into
+the frequency domain in order to optimize computationally intensive
+linear nodes.
+\vspace{-6pt}
+
+\item An implementation of the above techniques in the StreamIt
+compiler that automatically improves performance by a factor of
+five on average and by a factor of $6.5$ in the best case.
+
+\end{itemize}
+
+In the rest of this section, we give a motivating example and
+background information on StreamIt.  Then we present our linear
+representation (Section~\ref{sec:linearrep}) and our 
+supporting dataflow analysis (Section~\ref{sec:dataflow}).  
+Next we describe the
+combination of linear filters (Section~\ref{sec:combine}) and the
+translation to the frequency domain (Section~\ref{sec:freq}) before
+giving results (Section~\ref{sec:results}), related work
+(Section~\ref{sec:related}), and conclusions
+(Section~\ref{sec:conclusion}).
+
+\subsection{Motivating Example}
+\begin{figure}[t]
+\vspace{-6pt}
+\center
+\epsfxsize=2.0in
+\epsfbox{images/motivating-example.eps}
+\vspace{-5pt}
+\caption{Block diagram of two FIR filters.}
+\scriptsize
+\begin{verbatim}
+/* perform N-element FIR filter with weights and data */
+float filter(float* weights, float* data, int pos, int N) {
+  int i;
+  float sum = 0;
+
+  /* perform weighted sum, starting at index pos */
+  for (i=0; i<N; i++, pos++) {
+    sum += weights[i] * data[pos];
+    pos = (pos+1)%N;
+  }
+  return sum;
+}
+
+void main() {
+  int i;
+  float data[N];         /* input data buffer */
+  float buffer[N];       /* inter-filter buffer */
+  
+  for (i=0; i<N; i++) {  /* initialize the input data buffer */
+    data[i] = get_next_input();
+  }
+  
+  for (i=0; i<N; i++) {  /* initialize inter-filter buffer */
+    buffer[i] = filter(weights1, data, i, N);
+    data[i] = get_next_input();
+  }
+  
+  i = 0;
+  while(true) {
+    /* generate next output item */
+    push_output(filter(weights2, buffer, i, N));
+    /* generate the next element in the inter-filter buffer */
+    buffer[i] = filter(weights1, data, i, N);
+    /* get next data item */
+    data[i] = get_next_input();
+    /* update current start of buffer */
+    i = (i+1)%N;
+  }
+}
+\end{verbatim}
+\vspace{-18pt}
+\caption{Two consecutive FIR filters in C.  Channels are represented
+as circular buffers, and the scheduling is done by hand.
+\protect\label{fig:motivating-example}}
+\vspace{-12pt}
+\end{figure}
+
+\begin{figure}[t]
+\vspace{-6pt}
+\scriptsize
+\begin{verbatim}
+float->float pipeline TwoPipe {
+  add FIRFilter(weights1);
+  add FIRFilter(weights2);
+}
+
+float->float filter FIRFilter(float[N] weights) {
+  work push 1 pop 1 peek N {
+    float sum = 0;
+    for (int i=0; i<N; i++) {
+      sum += weights[i] * peek(i);
+    }
+    push(sum);
+    pop();
+}
+\end{verbatim}
+\vspace{-18pt}
+\caption{Two consecutive FIR filters in StreamIt.  Buffer management
+and scheduling are handled by the compiler.\protect\label{fig:example-streamit}}
+\begin{verbatim}
+float->float filter CollapsedTwoPipe() {
+  float[N] combined_weights;
+
+  init {  /* calculate combined_weights as 
+             combination of weights1 and weights2 */ }
+
+  work push 1 pop 1 peek N {
+    float sum = 0;
+    for (int i=0; i<N; i++) {
+      sum += combined_weights[i]*peek(i);
+      }
+    push(sum);
+    pop();
+  }
+}
+\end{verbatim}
+\vspace{-18pt}
+\caption{Combined version of the two FIR filters.  Since each FIR
+filter is linear, the weights can be combined into a single {\tt
+combined\_weights} array.\protect\label{fig:example-combine}}
+%% float->float filter FreqTwoPipe() {
+%%   complex[N] H;
+%%   init {
+%%     H = FFT(combined_weights);
+%%   }
+%%   work push L pop L peek N+L {
+%%     float[N] X = FFT(peek(0..N+L-1)); /* input FFT */
+%%     float[N] Y =  X .* H; /* element wise mult */
+%%     float[N] y = IFFT(Y); /* inverse FFT */
+%%     push(y[0..L-1]); /* push first L elts of y */
+%%   }
+%% }
+\begin{verbatim}
+float->float pipeline FreqTwoPipe(int L) {
+  float[N] combined_weights = ... ;     // calc. combined weights 
+  complex[N] H = fft(combined_weights); // take FFT of weights     
+  add FFT(N+L);                         // add FFT stage to stream 
+  add ElementMultiply(H);               // add multiplication by H 
+  add IFFT(N+L);                        // add inverse FFT         
+}
+\end{verbatim}
+\vspace{-18pt}
+\caption{Combined version of two FIR filters in the frequency domain.
+\protect\label{fig:example-frequency}}
+\vspace{-20pt}
+\end{figure}
+
+To illustrate the program transformations that our technique is
+designed to automate, consider a sequence of finite impulse response
+(FIR) filters as shown in Figure~\ref{fig:motivating-example}. The
+imperative C style code that implements this simple DSP application is
+also shown. The program largely defies many standard compiler analysis
+and optimization techniques because of its use of circular buffers and
+the muddled relationship between {\tt data}, {\tt buffer} and the
+output.
+
+Figure~\ref{fig:example-streamit} shows the same filtering process
+implemented in StreamIt. The StreamIt version is more abstract than
+the C version.  It indicates the communication pattern between filters;
+it shows the structure of the original block diagram; and it leaves
+the complexities of buffer management and scheduling to the compiler.
+
+Two optimized versions of the FIR program are shown in
+Figures~\ref{fig:example-combine} and~\ref{fig:example-frequency}.  In
+Figure~\ref{fig:example-combine}, the programmer has combined the {\tt
+weights} arrays from the two filters into a single, equivalent array.
+This reduces the number of multiply operations by a factor of two.  In
+Figure~\ref{fig:example-frequency}, the programmer has done the
+filtering in the frequency domain, using the FFT and IFFT to translate
+between time and frequency.  Computationally intensive filters and
+streams are more efficient when done in frequency instead of time.
+
+Our linear analysis can automatically derive both of the
+implementations in Figures~\ref{fig:example-combine}
+and~\ref{fig:example-frequency}, starting with the code in
+Figure~\ref{fig:example-streamit}.  These optimizations free the
+programmer from the burden of combining and optimizing linear filters
+by hand.  Instead, the programmer can design modular filters at the
+natural granularity for the algorithm in question, relying on the
+compiler to do the analysis and combination.
+
+\subsection{StreamIt}
+
+%% \begin{figure}
+%% \center
+%% \epsfxsize=3.0in
+%% \epsfbox{images/general-picture-filter.eps}
+%% \caption{Graphical illustration of $e_{F}$, $o_{F}$ and $u_{F}$}
+%% \label{fig:overview-filter}
+%% \end{figure}
+
+StreamIt is a language and compiler for high-performance signal
+processing~\cite{gordon-thesis,streamit-asplos,streamitcc}.  In a
+streaming application, each data item is in the system for only a
+small amount of time, as opposed to scientific applications where the
+data set is used extensively over the entire execution.  Also, stream
+programs have abundant parallelism and regular communication patterns.
+The StreamIt language aims to expose these properties to the compiler
+while maintaining a high level of abstraction for the programmer.
+
+StreamIt programs are composed of processing blocks called {\it
+filters} which contain an input tape from which they can read values
+and an output tape to which they can write. Each filter contains
+a {\tt work} function which describes its atomic execution step in the
+steady state.  The {\tt work} function contains C-like imperative
+code, which can access filter state, call external routines and
+produce and consume data.  The input and output channels are treated
+as FIFO queues, which can be accessed with three primitive operations:
+1) {\tt pop()}, which returns the first item on the input tape and
+advances the tape by one item, 2) {\tt peek(i)}, which returns the
+value at the $i$th position on the input tape, and 3) {\tt push(v)},
+which pushes value {\tt v} onto the output tape.  Each filter
+must declare the maximum element it will {\tt peek} at, the number of
+elements it will {\tt pop}, and the number of elements that it will
+{\tt push} during an execution of {\tt work}.  These rates must be
+resolvable at compile time and constant from one invocation of {\tt
+work} to the next.  
+%Figure~\ref{fig:overview-filter} gives our notation these input/ouput rates.
+
+A program in StreamIt consists of a hierarchical graph of {\tt
+filters}.  Filters can be connected using one of three predefined
+structures (see Figure~\ref{fig:structures}): 1) {\tt pipelines}
+represent the serial computation of one filter after another, 2) {\tt
+splitjoins} represent explicitly parallel computation, and 3) {\tt
+feedbackloops} allow cycles to be introduced into the stream graph.
+A {\it stream} is defined to be either a {\tt filter}, {\tt pipeline}, 
+{\tt splitjoin} or {\tt feedbackloop}. Every subcomponents of a structure 
+is a stream, and all streams have
+exactly one input tape and exactly one output tape.
+
+It has been our experience that most practical applications can be
+represented using StreamIt's hierarchical structures.  Though
+sometimes a program needs to be reorganized to fit into the structured
+paradigm, there are benefits for both the programmer and the compiler
+in having a structured language~\cite{streamitcc}.  In particular,
+linear analysis relies heavily on the structure of StreamIt to express
+stream transformations at a local and hierarchical level.

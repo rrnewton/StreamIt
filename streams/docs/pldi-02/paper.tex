@@ -1,0 +1,78 @@
+% uncomment this to use pubform
+%\documentstyle[psfig, amsmath]{pubform}
+
+\documentclass{sig-alternate}
+\usepackage{gregs-defs}
+
+\begin{document}
+
+% need this on cagfarm's besides cagfarm-01
+%\advance\topmargin by 1in
+
+\title{StreamIt: A Compiler for Streaming Applications\thanks{This document is MIT Laboratory for Computer Science Technical Memo LCS-TM-622, February, 2002.}}
+
+% uncomment this to use pubform
+%% \author{Bill Thies, Michal Karczmarek, Michael Gordon, David Maze, Jeremy Wong, \\ Henry Hoffmann, Matthew Brown, and Saman Amarasinghe \\
+%% \parbox{6in}{\centering{Laboratory For Computer Science\\
+%%     Massachusetts Institute of Technology\\
+%%     Cambridge, MA  02139\\
+%%     \tt{\{thies, karczma, mgordon, dmaze, jnwong, hank, morris, saman\}@lcs.mit.edu}}}}
+%% \date{\today}
+
+\numberofauthors{1}
+\author{
+\alignauthor \vspace{-18pt}
+William Thies, 
+Michal Karczmarek, 
+Michael Gordon, 
+David Maze, 
+Jeremy Wong,
+Henry Hoffmann, 
+Matthew Brown, 
+and Saman Amarasinghe\\
+	\vspace{8pt}
+	\{thies, karczma, mgordon, dmaze, jnwong, hank, morris, saman\}@lcs.mit.edu \\
+	\vspace{8pt}
+	Laboratory for Computer Science \\
+	Massachusetts Institute of Technology \\
+	Cambridge, MA  02139 \\
+	\vspace{8pt}
+        February 12, 2002}
+	
+%        \today
+
+% for the arrow of a function def, etc.
+\newcommand{\ma}[2]{max_{#1 \rightarrow #2}}
+\newcommand{\sdep}[0]{\textsc{sdep}}
+\newcommand{\loopdep}[0]{\textsc{loopdep}}
+\newcommand{\mi}[2]{\sdep_{#2 \small{\rightarrow} #1}}
+\newcommand{\floor}[2]{\left\lfloor\frac{#1}{#2}\right\rfloor}
+\newcommand{\ceil}[2]{\left\lceil\frac{#1}{#2}\right\rceil}
+\newcommand{\ra}[0]{\rightarrow}
+\newcommand{\la}[0]{\lambda}
+
+\def\fn#1{\mathop{\mbox{\it #1}}}
+\def\fun#1#2{\ensuremath{\mathop{\mbox{\it #1}}(#2)}} % function call
+
+\newtheorem{definition}{Definition}
+\newtheorem{theorem}{Theorem}
+
+\maketitle
+
+\begin{abstract}
+\input{abstract}
+\end{abstract}
+
+\input{intro}
+\input{language}
+\input{model}
+\input{optimization}
+\input{scheduler2}
+\input{implementation}
+\input{related}
+\input{conclusion}
+%\begin{small}
+\bibliographystyle{abbrv}
+\bibliography{references}
+%\end{small}
+\end{document}

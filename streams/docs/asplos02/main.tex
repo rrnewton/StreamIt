@@ -1,0 +1,69 @@
+\documentclass{article}
+
+\usepackage{amsmath}
+\usepackage{fullpage}
+\usepackage{doublespace}
+\usepackage{epsfig}
+\usepackage{subfigure}
+
+\title{A Stream Compiler for Communication-Exposed Architectures\thanks{This document is the {\bf second version} of MIT Laboratory for Computer Science Technical Memo LCS-TM-627, May, 2002.}}
+
+\author{Michael Gordon, William Thies, Michal Karczmarek, Jeremy Wong, \\
+  Henry Hoffmann, David Maze and Saman Amarasinghe\\ \\
+  MIT Laboratory for Computer Science\\
+  Cambridge, MA  02139\\ \\
+  \sffamily{\{mgordon, thies, karczma, jnwong, hank, dmaze, saman\}@lcs.mit.edu}}
+
+% don't include the date
+\date{}
+
+% this is the line spacing
+\setstretch{1.25}
+
+% \sloppy lets Latex be a little less anal about interword spacing.  It is
+% one way to eliminate those annoying Overfull hbox warnings.
+% Another way is to surround each offending paragraph with
+% \begin{sloppypar} ... \end{sloppypar}
+
+%\sloppy
+
+% See page 90 of the Latex book for info about vertical spacing probs.
+
+\begin{document}
+
+  \newcommand{\mt}[1]{\mbox{\it #1}}
+  \newcommand{\todo}[1]{\framebox{#1}}
+
+  %\toappear{\centerline{\Large\bf MIT LCS Technical Memo,}
+  %          \centerline{\Large\bf MIT-LCS-TM-6XX,}
+  %          \centerline{\Large\bf November, 2001.}}
+  
+  \begin{singlespace}
+    \maketitle
+    \begin{abstract}
+      \input{abstract}
+    \end{abstract}
+  \end{singlespace}
+  
+  \advance\topmargin by -0.35inn      % Correct for LaTeX gratuitousness
+
+  \input{intro}
+  \input{streamit}
+  \input{raw}
+  \input{phases}
+  \input{partition}
+  \input{layout}
+  \input{commsched}	
+  \input{codegen}
+  \input{results}
+  \input{related}
+  \input{conclusion}
+  
+  \begin{small}
+    \begin{singlespace}
+      \bibliographystyle{abbrv}
+      \bibliography{references}
+    \end{singlespace}
+  \end{small}
+  
+\end{document}

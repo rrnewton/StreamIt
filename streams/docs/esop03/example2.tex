@@ -1,0 +1,373 @@
+\section{Appendix: Detailed Example (OPTIONAL READING)}
+
+In this section we present an example translation from a PCP to a
+SARE.  Our source language is StreamIt, which is a high-level language
+designed to offer a simple and portable means of constructing phased
+computation programs.  We are developing a StreamIt compiler with
+aggressive optimizations and backends for communication-exposed
+architectures.  For more information on StreamIt, please
+consult~\cite{streamitcc,Gordo02}.
+
+\subsection{StreamIt Code for an Equalizer}
+
+Figure~\ref{fig:eq-code} contains a simple example of an equalizing
+software radio written in StreamIt.  The phased computation graph
+corresponding to this piece of code appears in
+Figure~\ref{fig:eq-graph}.  For simplicity, we model the input to the
+Equalizer as a RadioSource that pushes one item on every invocation.
+Likewise, the output of the Equalizer is fed to a Speaker that pops
+one item on every invocation.
+
+The Equalizer itself has two stages: a splitjoin that filters each
+frequency band in parallel (using BandPassFilter's), and an Adder that
+combines the output from each of the parallel filters.  The splitjoin
+uses a duplicate splitter to send a copy of the input stream to each
+BandPassFilter.  Then, it contains a roundrobin joiner that inputs an
+item from each parallel stream in sequence.  The roundrobin joiner is
+an example of a node that has multiple steady-state phases: in each
+phase, it copies an item from one of the parallel streams
+
+\begin{figure}[h]
+\scriptsize
+\begin{minipage}{3in}
+\vspace{6pt}
+\begin{verbatim}
+void->void pipeline EqualizingRadio {
+   add RadioSource();
+   add Equalizer(2);
+   add Speaker();
+}
+
+float->float pipeline Equalizer (int BANDS) {
+   add splitjoin {
+      split duplicate;
+      float centerFreq = 100000;
+      for (int i=0; i<BANDS; i++, centerFreq*=2) {
+         add BandPassFilter(centerFreq, 50);
+      }
+      join roundrobin;
+   }
+   add Adder(BANDS);
+}
+
+float->float filter Adder (int N) {
+   work push 1 pop N {
+      float sum = 0;
+      for (int i=0; i<N; i++) {
+         sum += pop();
+      }
+      push(sum);
+   }
+}
+
+float->float filter BandPassFilter (float centerFreq, 
+                                    int N) {
+   float[N] weights;
+
+   init {
+      weights = calcImpulseResponse(centerFreq, N);
+   }
+
+   work push 1 pop 1 peek N {
+      float val = 0;
+      for (int i=0; i<N; i++) {
+         val += weights[i] * peek(N-i-1);
+      }
+      push(val);
+      pop();
+   }
+}
+\end{verbatim}
+\vspace{-6pt}
+\parbox{2.7in}{\caption{StreamIt code for a simple software radio with equalizer.
+\protect\label{fig:eq-code}}}
+\end{minipage}
+\hspace{0.3in}
+\begin{minipage}{3.2in}
+%\vspace{2.125in}
+\psfig{figure=equalizer.eps,width=3.2in}
+\vspace{12pt}
+\caption{Stream graph of the 2-band equalizer.  Channels are annotated
+with their push (U), pop (O), and peek (E) rates.  Rates with a value
+of zero are omitted. \protect\label{fig:eq-graph}}
+\end{minipage}
+\end{figure}
+
+\clearpage \noindent 
+to the output of the splitjoin.  In StreamIt, splitter and joiner
+nodes are compiler-defined primitives.
+
+For an example of a user-defined node, consider the Adder filter.  The
+Adder takes an argument, N, indicating the number of items it should
+add.  The declaration of its steady-state work block indicates that on
+each invocation, the Adder pushes 1 item to the output channel and
+pops N items from the input channel.  The code within the work
+function performs the addition.
+
+\subsection{Converting to a SARE}
+
+We will generate a SARE corresponding to $N$ steady-state executions
+of the above PCP.
+
+\subsubsection{The Steady-State Period}
+
+The first step in the translation is to calculate $S(n)$, the number
+of times that a given node $n$ fires in a periodic steady-state
+execution (see Section~\ref{sec:balance}).  Using $S(n)$ we can also
+derive $\mt{Period}(c)$, the number of items that are transferred over
+channel $c$ in one steady-state period.  This can be done using
+balance equations on the steady-state I/O rates of the
+stream~\cite{leesdf}:
+\begin{align*}
+\forall c = (n_a, n_b):~~S(n_a) * \mt{TotalWrite}(n_a, c) 
+  = S(n_b) * \mt{TotalRead}(n_b, c)
+\end{align*}
+where $\mt{TotatalRead}$ and $\mt{TotalWrite}$ are defined as in
+Figure~\ref{fig:helper} to denote the total number of items that a
+node reads and writes to a given channel during one cycle of its
+phases.  Expanding these definitions for the stream graph in
+Figure~\ref{fig:eq-graph}, we have:
+\begin{align*}
+S(\mt{RadioSource}) * \mt{TotalWrite}(\mt{RadioSource}, \mt{c1}) 
+  &= S(\mt{duplicate}) * \mt{TotalRead}(\mt{duplicate}, \mt{c1}) \\
+S(\mt{duplicate}) * \mt{TotalWrite}(\mt{duplicate}, \mt{c2}) 
+  &= S(\mt{BPF}_1) * \mt{TotalRead}(\mt{BPF}_1, \mt{c2}) \\
+S(\mt{duplicate}) * \mt{TotalWrite}(\mt{duplicate}, \mt{c3})
+  &= S(\mt{BPF}_2) * \mt{TotalRead}(\mt{BPF}_2, \mt{c3}) \\
+S(\mt{BPF}_1) * \mt{TotalWrite}(\mt{BPF}_1, \mt{c4}) 
+  &= S(\mt{roundrobin}) * \mt{TotalRead}(\mt{roundrobin}, \mt{c4}) \\
+S(\mt{BPF}_2) * \mt{TotalWrite}(\mt{BPF}_2, \mt{c5}) 
+  &= S(\mt{roundrobin}) * \mt{TotalRead}(\mt{roundrobin}, \mt{c5}) \\
+S(\mt{roundrobin}) * \mt{TotalWrite}(\mt{roundrobin}, \mt{c6})
+  &= S(\mt{Adder}) * \mt{TotalRead}(\mt{Adder}, \mt{c6}) \\
+S(\mt{Adder}) 
+  &= S(\mt{Speaker})
+\end{align*}
+Evaluating the I/O rates, this simplifies to:
+\begin{align*}
+S(\mt{RadioSource}) &= S(\mt{duplicate}) \\
+S(\mt{duplicate})  &= S(\mt{BPF}_2) \\
+S(\mt{duplicate})  &= S(\mt{BPF}_2) \\
+S(\mt{BPF}_1) &= S(\mt{roundrobin}) \\
+S(\mt{BPF}_2) &= S(\mt{roundrobin}) \\
+S(\mt{roundrobin}) * 2 &= S(\mt{Adder}) * 2 \\
+S(\mt{Adder}) &= S(\mt{Speaker})
+\end{align*}
+Solving for the minimum integral solution for $S$ gives that $S(n) = 1$ for all nodes $n$:
+\begin{align*}
+S(\mt{RadioSource}) &= S(\mt{duplicate}) = S(\mt{BPF}_1) = S(\mt{BPF}_2) = S(\mt{roundrobin}) = S(\mt{Adder}) = S(\mt{Speaker}) = 1
+\end{align*}
+We can now calculate $\mt{Period}(c)$ for each channel $c$ in the
+graph.  Using the definition of $\mt{Period}$ from
+Figure~\ref{fig:helper}, we have the following:
+\begin{align*}
+\mt{Period(c1)} &= S(\mt{RadioSource}) * TotalWrite(\mt{RadioSource}, \mt{c1}) \\
+\mt{Period(c2)} &= S(\mt{duplicate}) * TotalWrite(\mt{duplicate}, \mt{c2}) \\
+\mt{Period(c3)} &= S(\mt{duplicate}) * TotalWrite(\mt{duplicate}, \mt{c3}) \\
+\mt{Period(c4)} &= S(\mt{BPF}_1) * TotalWrite(\mt{BPF}_1, \mt{c4}) \\
+\mt{Period(c5)} &= S(\mt{BPF}_2) * TotalWrite(\mt{BPF}_2, \mt{c5}) \\
+\mt{Period(c6)} &= S(\mt{roundrobin}) * TotalWrite(\mt{roundrobin}, \mt{c6}) \\
+\mt{Period(c7)} &= S(\mt{Adder}) * TotalWrite(\mt{Adder}, \mt{c7})
+\end{align*}
+Evaluating each right hand side gives the following:
+\begin{align*}
+\mt{Period(c1)} = \mt{Period(c2)} = \mt{Period(c3)} &= \mt{Period(c4)} = \mt{Period(c5)} = 1 \\
+\mt{Period(c6)} &= 2 \\
+\mt{Period(c7)} &= 1 
+\end{align*}
+
+\subsubsection{Variables of the SARE}
+
+\sssection{BUF} 
+
+The $\mt{BUF}$ variables represent the buffer space on a channel.
+They contain two dimensions: the first counts over steady-state
+execution cycles, and the second counts over items that appear on the
+channel during a given cycle (that is, the $\mt{Period}$ of the
+channel).  In the case of our example, all channels have a period of
+1, except for $\mt{c6}$, which has a period of 2.  Thus, the equations
+for $\mt{SBUF}$ are as follows:
+\begin{align*}
+{\cal D}_{{BUF}_{c1}} &= \{ ~(i,0)~|~0 \le i \le N - 1\} \\
+{\cal D}_{{BUF}_{c2}} &= \{ ~(i,0)~|~0 \le i \le N - 1 \} \\
+{\cal D}_{{BUF}_{c3}} &= \{ ~(i,0)~|~0 \le i \le N - 1 \} \\
+{\cal D}_{{BUF}_{c4}} &= \{ ~(i,0)~|~0 \le i \le N - 1 \} \\
+{\cal D}_{{BUF}_{c5}} &= \{ ~(i,0)~|~0 \le i \le N - 1 \} \\
+{\cal D}_{{BUF}_{c6}} &= \{ ~(i,j)~|~0 \le i \le N - 1 ~\wedge~ 0 \le j \le 1 \} \\
+{\cal D}_{{BUF}_{c7}} &= \{ ~(i,0)~|~0 \le i \le N - 1\}
+\end{align*}
+
+\sssection{WRITE} 
+
+The $\mt{WRITE}$ variables represent temporary buffers for the output
+of nodes in the steady state.  Here $\mt{c6}$ is distinguished
+because it has two separate phases, corresponding to the cyclic
+behavior of the $\mt{roundrobin}$ node.  Since each phase outputs an
+item, there is a buffer to hold the output of each:
+\begin{align*}
+{\cal D}_{{WRITE}_{c1}} &= \{~(i,0,0)~|~0 \le i \le N-1\} \\
+{\cal D}_{{WRITE}_{c2}} &= \{~(i,0,0)~|~0 \le i \le N-1 \} \\
+{\cal D}_{{WRITE}_{c3}} &= \{~(i,0,0)~|~0 \le i \le N-1 \} \\
+{\cal D}_{{WRITE}_{c4}} &= \{~(i,0,0)~|~0 \le i \le N-1 \} \\
+{\cal D}_{{WRITE}_{c5}} &= \{~(i,0,0)~|~0 \le i \le N-1 \} \\
+{\cal D}_{{WRITE}_{{c6}, 0}} &= \{~(i,0,0)~|~0 \le i \le N-1 \} \\
+{\cal D}_{{WRITE}_{{c6}, 1}} &= \{~(i,0,0)~|~0 \le i \le N-1 \} \\
+{\cal D}_{{WRITE}_{c7}} &= \{~(i,0,0)~|~0 \le i \le N-1\} 
+\end{align*}
+
+\sssection{READ} 
+
+The $\mt{READ}$ variables represent temporary buffers for the nodes to
+read from.  The $k$ dimension of these buffers represents the number
+of items that are read at once; this is 50 in the case of the inputs
+to the BandPassFilter's, and 1 for all other channels:
+\begin{align*}
+{\cal D}_{{READ}_{c1}} &= \{~(i,0,0)~|~0 \le i \le N-1\} \\
+{\cal D}_{{READ}_{c2}} &= \{~(i,0,k)~|~0 \le i \le N-1 ~\wedge~ 0 \le k \le 49\} \\
+{\cal D}_{{EAD}_{c3}} &= \{~(i,0,k)~|~0 \le i \le N-1 ~\wedge~ 0 \le k \le 49\} \\
+{\cal D}_{{READ}_{{c4}, 0}} &= \{~(i,0,0)~|~0 \le i \le N-1 \} \\
+{\cal D}_{{READ}_{{c5}, 1}} &= \{~(i,0,0)~|~0 \le i \le N-1 \} \\
+{\cal D}_{{READ}_{c6}} &= \{~(i,0,k)~|~0 \le i \le N-1 ~\wedge~ 0 \le k \le 1 \} \\
+{\cal D}_{{READ}_{c7}} &= \{~(i,0,0)~|~0 \le i \le N-1\}
+\end{align*}
+Note that channels $\mt{c4}$ and $\mt{c5}$ have two separate phases,
+corresponding to the cycle of the roundrobin joiner.  However, since
+the roundrobin joiner does not read from $\mt{c5}$ during phase 0, and
+does not read from $\mt{c4}$ during phase 1, the domains for these
+arrays are empty.  Instead, there is a buffer only for $\mt{c4}$ at
+phase 0 and $\mt{c5}$ at phase 1.
+
+\subsubsection{Equations of the SARE}
+
+We consider each of the equations from Figures~\ref{fig:pcptosare2} and \ref{fig:pcptosare3} in turn.
+
+\sssection{I to READ} 
+
+This equation has a non-empty domain for channels which contain
+initial items--channels The following equations simply copy the
+initial items from into the read buffer:
+\begin{align*}
+\forall i \in [0, 48]:~~\mt{READ}_{{c4}, 0}(i,0,0) &= \mt{I}_{c4}(i) \\
+\forall i \in [0, 48]:~~\mt{READ}_{{c5}, 1}(i,0,0) &= \mt{I}_{c5}(i) 
+\end{align*}
+
+\sssection{READ to WRITE}
+
+These equations represent the steady-state computation of the nodes.
+For the BandPassFilter and Adder nodes, the computation is according
+to the user-defined work function $W$ (corresponding to the {\tt work}
+function in the StreamIt code):
+\begin{align*}
+\forall i \in [0, N-1]:~~\mt{WRITE}_{c4}(i,0,0) &= W(\mt{BPF}_1)(\mt{READ}_{c2}(i, 0, *))[0][0] \\
+\forall i \in [0, N-1]:~~\mt{WRITE}_{c5}(i,0,0) &= W(\mt{BPF}_2)(\mt{READ}_{c3}(i, 0, *))[0][0] \\
+\forall i \in [0, N-1]:~~\mt{WRITE}_{c7}(i,0,0) &= W(\mt{Adder})(\mt{READ}_{c6}(i, 0, *))[0][0]
+\end{align*}
+For the $\mt{duplicate}$ and $\mt{roundrobin}$ nodes, the work
+function is simple and compiler-defined, so we give the equations
+directly without appealing to a work function:
+\begin{align*}
+\forall i \in [0, N-1]:&& ~~\mt{WRITE}_{c2}(i,0,0) &= \mt{READ}_{c1}(i, 0, 0)[0][0] &&~~~~~~~~~~~~~~ (\mt{c1} \rightarrow \mt{duplicate} \rightarrow \mt{c2}) \\
+\forall i \in [0, N-1]:&& ~~\mt{WRITE}_{c3}(i,0,0) &= \mt{READ}_{c1}(i, 0, 0)[0][0] &&~~~~~~~~~~~~~~ (\mt{c1} \rightarrow \mt{duplicate} \rightarrow \mt{c3}) \\
+\forall i \in [0, N-1]:&& ~~\mt{WRITE}_{{c6}, 0}(i,0,0) &= \mt{READ}_{{c4}, 0}(i, 0, 0)[0][0]  &&~~~~~~~~~~~~~~ (\mt{c4} \rightarrow \mt{roundrobin} \rightarrow \mt{c6}) \\
+\forall i \in [0, N-1]:&& ~~\mt{WRITE}_{{c6}, 1}(i,0,0) &= \mt{READ}_{{c5}, 1}(i, 0, 0)[0][0] &&~~~~~~~~~~~~~~ (\mt{c5} \rightarrow \mt{roundrobin} \rightarrow \mt{c6}) 
+\end{align*}
+
+\sssection{WRITE to BUF}
+
+This equation transfers items from the index space in which they were
+written to the index space of the buffer for a given channel.  In the
+general case (Equation~\ref{write2buf}) we need to ``slice'' the
+domain into $S(n)$ pieces in order to maintain a uniform left-hand
+side (see Section~\ref{sec:simplesare}).  However, in this example,
+$S(n) = 1$ for all $n$, and this equation becomes a direct copy
+between the $\mt{WRITE}$ and $\mt{BUF}$ variables.  There is one
+such copy for each channel in the program:
+\begin{align*}
+\forall i \in [0, N-1]:~~\mt{BUF}_{c1}(i, 0) &= \mt{WRITE}_{c1}(i, 0, 0) \\
+\forall i \in [0, N-1]:~~\mt{BUF}_{c2}(i, 0) &= \mt{WRITE}_{c2}(i, 0, 0) \\
+\forall i \in [0, N-1]:~~\mt{BUF}_{c3}(i, 0) &= \mt{WRITE}_{c3}(i, 0, 0) \\
+\forall i \in [0, N-1]:~~\mt{BUF}_{c4}(i, 0) &= \mt{WRITE}_{c4}(i, 0, 0) \\
+\forall i \in [0, N-1]:~~\mt{BUF}_{c5}(i, 0) &= \mt{WRITE}_{c5}(i, 0, 0) \\
+\forall i \in [0, N-1]:~~\mt{BUF}_{c6}(i, 0) &= \mt{WRITE}_{{c6}, 0}(i, 0, 0) \\
+\forall i \in [0, N-1]:~~\mt{BUF}_{c6}(i, 1) &= \mt{WRITE}_{{c6}, 1}(i, 0, 0) \\
+\forall i \in [0, N-1]:~~\mt{BUF}_{c7}(i, 0) &= \mt{WRITE}_{c7}(i, 0, 0)
+\end{align*}
+Note that $\mt{c6}$ is slightly different because there is one
+equation required for each phase of writing.
+
+\sssection{BUF to READ}
+
+These equations represent the copying of items from a channel's buffer
+to the read array that a node will access.  There are two equations
+for this operation (Equations~\ref{buf2read0} and~\ref{buf2read1})
+because, in the general case, offsets due to writing the initial items
+could necessitate two different copy operations.  This will occur if
+the offset is not a multiple of the extent of the $j$ dimension of
+$\mt{BUF}$, in which case the copy of the $j$ dimension is split
+across two different values of $i$: one equation copies the upper part
+of the $j$ dimension of $\mt{BUF}$ for a given $i$, and the other
+equation copies the lower part of the $j$ dimension for $i+1$.
+However, in the case of our example, the extent of the $j$ dimension
+is 1 (because the period of each channel is 1) and the offset always
+is a multiple of 1, of course.  Thus, Equation~\ref{buf2read1} always
+has an empty domain, and we consider only Equation~\ref{buf2read0}
+below.  As the notation for this equation is rather heavy, we consider
+each channel individually.
+
+First let us examine $\mt{c1}$ and $\mt{c2}$, which are simple because
+they do not peek.  In this case, Equation~\ref{buf2read0} copies
+items directly from the $\mt{BUF}$ array to the $\mt{READ}$ array:
+\begin{align*}
+\forall i \in [0,N-1]:~~\mt{READ}_{c1}(i,0,0) = \mt{BUF}_{c1}(i,0) \\
+\forall i \in [0,N-1]:~~\mt{READ}_{c7}(i,0,0) = \mt{BUF}_{c7}(i,0)
+\end{align*}
+Only slightly more complex is the equation for $\mt{c6}$, in which two
+items are read from the channel for each invocation of the Adder.
+This requires an extra subscript $q$ on $\mt{READ}$, that happens to
+coincide with $\mt{BUF}$ since the Adder executes once per
+steady-state execution of the graph:
+\begin{align*}
+\forall q \in [0,1]:~~\forall i \in [0,N-1]:~~\mt{READ}_{c6}(i,0,q) = \mt{BUF}_{c6}(i,q)
+\end{align*}
+Note that the above translation is naively specified as two separate
+equations (one for each value of $q$); however, as we saw above, we
+can combine these equations into a single one by considering $q$ to be
+a domain quantifier rather than an enumerator over equations.
+
+Next, let us consider the equations for $\mt{c2}$ and $\mt{c3}$, which
+encapsulate the peeking behavior of the BandPassFilter's.  In this
+case, $\mt{READ}$ is viewing the channel as overlapping segments of 50
+items each, whereas $\mt{BUF}$ is viewing the channel as a continuous
+sequence where each item appears only once.  Thus, the following
+equations duplicate the data by a factor of 50 as they copy it into
+the $\mt{READ}$ array:
+\begin{align*}
+\forall q \in [0,49]:~~\forall i \in [0,N-1]:~~\mt{READ}_{c2}(i,0,q) = \mt{BUF}_{c2}(i+q,0) \\
+\forall q \in [0,49]:~~\forall i \in [0,N-1]:~~\mt{READ}_{c3}(i,0,q) = \mt{BUF}_{c3}(i+q,0)
+\end{align*}
+
+Finally, consider the equations for $\mt{c4}$ and $\mt{c5}$.  On these
+channels, the beginning of the $\mt{READ}$ array was filled by the
+initial output of the BandPassFilter's (see I to READ above).  Thus,
+the steady-state output in the $\mt{BUF}$ array needs to be copied at
+an offset into the $\mt{READ}$ array so that it does not overwrite the
+initial output.  Following Equation~\ref{buf2read2}, we calculate this
+offset as the number of initial items that were pushed onto the
+channel; this is given by the size of the domain of the I to READ
+equation: $|{\cal D}_{I \rightarrow READ}(\mt{roundrobin}, c4)|$ $=$
+$|{\cal D}_{I \rightarrow READ}(\mt{roundrobin}, c4)|$ $=$ $49$.
+Since the $\mt{c4}$ and $\mt{c5}$ both have a period of 1, this offset
+does not fall on the boundary between two different $i$ indices in
+$\mt{BUF}$, and thus we don't need to worry about the
+$\mt{Int\_Offset}$ and $\mt{Mod\_Offset}$ defined in
+Equation~\ref{buf2read2}.  The resulting equations represent a simple
+shifted copy operation, as follows:
+\begin{align*}
+\forall i \in [49,N-1]:~~\mt{READ}_{{c4}, 0}(i,0,0) = \mt{BUF}_{c4}(i-49,0) \\
+\forall i \in [49,N-1]:~~\mt{READ}_{{c5}, 1}(i,0,0) = \mt{BUF}_{c5}(i-49,0)
+\end{align*}
+
+This concludes the translation of the StreamIt-based PCP to a SARE.
+The equations and variables defined above are exactly equivalent to an
+execution of the original StreamIt program for $N$ steady-state
+cycles.

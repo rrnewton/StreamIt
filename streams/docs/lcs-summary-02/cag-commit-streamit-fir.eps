@@ -1,0 +1,64 @@
+%!
+%%BoundingBox: 43 442 215 613
+%%Title: fir-streamit
+%%CreationDate: Mon Jan 21 09:13:45 2002
+%%Creator: Tgif-3.0-p13 by William Chia-Wei Cheng (william@cs.UCLA.edu)
+
+/tgifdict 2 dict def
+tgifdict begin
+
+end
+
+%%PageBoundingBox: 43 442 215 613
+tgifdict begin
+/tgifsavedpage save def
+
+1 setmiterlimit
+1 setlinewidth
+
+0 setgray
+
+72 0 mul 72 11.00 mul translate
+72 128 div 100.000 mul 100 div dup neg scale
+
+gsave
+
+/tgiforigctm matrix currentmatrix def
+
+% TEXT
+0 setgray
+/Courier findfont [10 0 0 -10 0 0] makefont setfont
+   gsave
+      80 329 moveto (class FIRFilter extends Filter {) show
+      80 341 moveto (   float[] weights;) show
+      80 353 moveto (   int N;) show
+      80 365 moveto () show
+      80 377 moveto (   void init\(float[] weights\) {) show
+      80 389 moveto (      setInput\(Float.TYPE\); setOutput\(Float.TYPE\);) show
+      80 401 moveto (      setPush\(N\); setPop\(1\); setPeek\(N\); ) show
+      80 413 moveto (      this.weights = weights;) show
+      80 425 moveto (      this.N = weights.length;) show
+      80 437 moveto (   }) show
+      80 449 moveto () show
+      80 461 moveto (   void work\(\) {) show
+      80 473 moveto (      float sum = 0;) show
+      80 485 moveto (      for \(int i=0; i<N; i++\) ) show
+      80 497 moveto (         sum += input.peek\(i\)*weights[i];) show
+      80 509 moveto (      input.pop\(\);) show
+      80 521 moveto (      output.push\(sum\);) show
+      80 533 moveto (   }) show
+      80 545 moveto (}) show
+      80 557 moveto () show
+      80 569 moveto (class Main extends Pipeline {) show
+      80 581 moveto (   void init\(\) {) show
+      80 593 moveto (      add\(new DataSource\(\)\);) show
+      80 605 moveto (      add\(new FIRFilter\(WEIGHTS\)\);) show
+      80 617 moveto (      add\(new Display\(\)\);) show
+      80 629 moveto (   }) show
+      80 641 moveto (}) show
+   grestore
+
+grestore
+tgifsavedpage restore
+end
+%MatchingCreationDate: Mon Jan 21 09:13:45 2002

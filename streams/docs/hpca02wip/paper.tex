@@ -1,0 +1,381 @@
+% uncomment this to use pubform
+%\documentstyle[psfig, amsmath]{pubform}
+
+\documentclass{sig-alternate}
+\usepackage{gregs-defs}
+
+\begin{document}
+
+\title{\makebox{A Common Machine Language for Grid-Based Architectures}}
+
+% uncomment this to use pubform
+%% \author{Bill Thies, Michal Karczmarek, Michael Gordon, David Maze, Jeremy Wong, \\ Henry Hoffmann, Matthew Brown, and Saman Amarasinghe \\
+%% \parbox{6in}{\centering{Laboratory For Computer Science\\
+%%     Massachusetts Institute of Technology\\
+%%     Cambridge, MA  02139\\
+%%     \tt{\{thies, karczma, mgordon, dmaze, jnwong, hank, morris, saman\}@lcs.mit.edu}}}}
+%% \date{\today}
+
+\numberofauthors{1}
+\author{
+\alignauthor \vspace{-28pt}
+William Thies, 
+Michal Karczmarek, 
+Michael Gordon, 
+David Maze, 
+Jeremy Wong,
+Henry Hoffmann, 
+Matthew Brown
+and Saman Amarasinghe\\
+	\vspace{6pt}
+	{\large \{thies, karczma, mgordon, dmaze, jnwong, hank, morris,
+	saman\}@lcs.mit.edu} \\ 
+	\vspace{6pt}
+	Laboratory for Computer Science, Massachusetts Institute of
+	Technology\\ \vspace{-12pt}
+%	\vspace{12pt}
+%        \today
+}
+
+% for the arrow of a function def, etc.
+\newcommand{\ma}[2]{max_{#1 \rightarrow #2}}
+\newcommand{\mi}[2]{\textsc{sdep}_{#2 \small{\rightarrow} #1}}
+\newcommand{\floor}[2]{\left\lfloor\frac{#1}{#2}\right\rfloor}
+\newcommand{\ceil}[2]{\left\lceil\frac{#1}{#2}\right\rceil}
+\newcommand{\ra}[0]{\rightarrow}
+\newcommand{\la}[0]{\lambda}
+
+\def\fn#1{\mathop{\mbox{\it #1}}}
+\def\fun#1#2{\ensuremath{\mathop{\mbox{\it #1}}(#2)}} % function call
+
+\newtheorem{definition}{Definition}
+\newtheorem{theorem}{Theorem}
+
+\maketitle
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Introduction}
+
+A {\it common machine language} is an essential abstraction that
+allows programmers to express an algorithm in a way that can be
+efficiently executed on a variety of architectures.  The key
+properties of a common machine language (CML) are: 1) it abstracts
+away the idiosyncratic differences between one architecture and
+another so that a programmer doesn't have to worry about them, and 2)
+it encapsulates the common properties of the architectures such that a
+compiler for any given target can still produce an efficient
+executable.
+
+For von-Neumann architectures, the canonical CML is C: instructions
+consist of basic arithmetic operations, executed sequentially, which
+operate on either local variables or values drawn from a global block
+of memory.  C has been implemented efficiently on a wide range of
+architectures, and it saves the programmer from having to adapt to
+each kind of register layout, cache configuration, and instruction
+set.
+
+However, recent years have seen the emergence of a class of grid-based
+architectures \cite{smartmemories, raw, trips} for which the
+von-Neumann model no longer holds, and for which C is no longer an
+adequate CML.  The design of these processors is fundamentally
+different in that they are conscious of wire delays--instead of just
+arithmetic computations--as the barriers to performance.  Accordingly,
+grid-based architectures support fine-grained, reconfigurable
+communication between replicated processing units.  Rather than a
+single instruction stream with a monolithic memory, these machines
+contain multiple instruction streams with distributed memory banks.
+
+Though C can still be used to write efficient programs on these
+machines, doing so either requires architecture-specific directives or
+a very smart compiler that can extract the parallelism and
+communication from the C semantics.  Both of these options renders C
+obsolete as a CML, since it fails to hide the architectural details
+from the programmer and it imposes abstractions which are a mismatch
+for the domain.
+
+To bridge this gap, we propose a new common machine language for
+grid-based processors: StreamIt.  The StreamIt language makes explicit
+the large-scale parallelism and regular communication patterns that
+these architectures were designed to exploit.  A program is
+represented not as a monolithic memory and instruction stream, but
+rather as a composition of autonomous filters, each of which contains
+its own memory and can only communicate with its immediate neighbors
+via high-bandwidth data channels.  In addition, StreamIt provides a
+low-bandwidth messaging system that filters can use for non-local
+communication.  We believe that StreamIt abstracts away the variations
+in grid-based processors while encapsulating their common properties,
+thereby enabling compilers to efficiently map a single source program
+to a variety of modern processors.
+
+\section{The StreamIt Language}
+
+In this section we provide a brief overview of the StreamIt language;
+please see \cite{streamitcc} for a more detailed description.  The
+current version of StreamIt is legal Java syntax to simplify our
+presentation and implementation, and it is designed to support only
+streams with static input and output rates.
+
+\subsection{The Stream Graph}
+
+The basic unit of computation in StreamIt is the {\tt Filter}.  An
+example of a Filter is the {\tt Adder}, a component of our software
+radio (see Figure \ref{fig:radiocode}).  Each {\tt Filter} contains an
+{\tt init} function that is called at initialization time; in this
+case, the {\tt Adder} records {\tt N}, the number of items it should
+add at once.  The {\tt work} function describes the most fine grained
+execution step of the filter in the steady state.  Within the {\tt
+work} function, the filter can communicate with neighboring blocks
+using the {\tt input} and {\tt output} channels, which are typed FIFO
+queues declared within the {\tt init} function.  These high-volume
+channels support the intuitive operations of {\tt push(value)}, {\tt
+pop()}, and {\tt peek(index)}, where {\tt peek} returns the value at
+position $index$ without dequeuing an item.
+
+The basic construct for composing filters into a communicating network
+is a {\tt Pipeline}, such as the {\tt Radio} in Figure
+\ref{fig:radiocode}.  Like a {\tt Filter}, a {\tt Pipeline} has an
+{\tt init} function that is called upon its instantiation.  However,
+there is no {\tt work} function, and all input and output channels are
+implicit; the stream behaves as the sequential composition of filters
+that are specified with successive calls to {\tt add} from within {\tt
+init}.
+
+\begin{figure}
+\psfig{figure=radio.eps,height=1.4in}
+\vspace{-6pt}
+\caption{Block diagram of a software radio.
+\protect\label{fig:radiodiagram}}
+%\vspace{-6pt}
+%\end{figure}
+
+%\begin{figure}
+\scriptsize
+\begin{verbatim}
+class Adder extends Filter {
+  int N;
+
+  void init(int N) {
+    setInput(Float.TYPE); setOutput(Float.TYPE);
+    setPush(1); setPop(N);
+    this.N = N;
+  }
+  
+  void work() {
+    float sum = 0;
+    for (int i=0; i<N; i++) {
+      sum += input.pop();
+    }
+    output.push(sum);
+  }
+}
+
+class Equalizer extends Pipeline {
+  void init(int BANDS) {
+    add(new SplitJoin() {
+      void init() {
+        int bottom = 2500;
+        int top = 5000;
+        setSplitter(Duplicate());
+        for (int i=0; i<BANDS; i++, bottom*=2, top*=2) {
+          add(new BandPassFilter(bottom, top));
+        }
+        setJoiner(RoundRobin());
+    }});
+    add(new Adder(BANDS));
+  }
+}
+  
+class CheckHop extends Filter {
+   int DELAY;
+   RFtoIFPortal portal;
+
+   void init(RFtoIF rf2if, int DELAY) {
+      setInput(Float.TYPE); setOutput(Float.TYPE);
+      setPush(N); setPop(N);
+      this.portal = new RFtoIFPortal(rf2if);
+      this.DELAY = DELAY;
+   }
+
+   void work() {
+      boolean hopped = /* calculate if hopped */
+      float newFreq =  /* detect new frequency */
+      if (hopped) {
+         portal.setFreq(newFreq, DELAY);
+      }
+   }
+}
+
+class Radio extends Stream {
+   void init() {
+      add(new ReadFromAtoD());
+      RFtoIF rf2if = add(new RFtoIF());
+      add(new SignalBooster());
+      add(new CheckHop(rf2if, 256));
+      add(new Equalizer(10));
+      add(new Speaker());
+   }
+}
+\end{verbatim}
+\vspace{-16pt}
+\caption{StreamIt code for a software radio.
+\protect\label{fig:radiocode}}
+\end{figure}
+
+There are two other stream constructors besides {\tt Pipeline}: {\tt
+SplitJoin} and {\tt FeedbackLoop}.  The former is used to specify
+independent parallel streams that diverge from a common {\it splitter}
+and merge into a common {\it joiner} (see the Equalizer in Figure
+\ref{fig:radiocode}).  There are two kinds of splitters: 1) Duplicate,
+which replicates each data item and sends a copy to each parallel
+stream, and 2) RoundRobin($w_1, \dots, w_n$), which sends the first
+$w_1$ items to the first stream, the next $w_2$ items to the second
+stream, and so on.  RoundRobin is the only joiner type.  The parallel
+streams are specified by successive calls to {\tt add}; the $i$'th
+call sets the $i$'th stream in the SplitJoin.
+
+%% The splitter
+%% and joiner type are specified with calls to {\tt setSplitter} and {\tt
+%% setJoiner}, respectively; the parallel streams are specified by
+%% successive calls to {\tt add}, with the $i$'th call setting the $i$'th
+%% stream in the SplitJoin.  We do not discuss FeedbackLoops do to space
+%% constraints.
+
+%% Evident in all of these examples is another feature of the StreamIt
+%% syntax: {\it inlining}.  The definition of any stream or filter can be
+%% inlined at the point of its instantiation, thereby preventing the
+%% definition of many small classes that are used only once, and,
+%% moreover, providing a syntax that reveals the hierarchical structure
+%% of the streams from the indentation level of the code.  In our Java
+%% syntax, we make use of anonymous classes for inlining \cite{java}.
+
+StreamIt differs from other languages in that it imposes a
+well-defined structure on the streams: all stream graphs are built out
+of a hierarchical composition of Pipelines, SplitJoins, and
+FeedbackLoops.  This structure enables the stream to be mapped
+efficiently onto a grid target, since all of the communication is
+between neighboring filters.  Moreover, we are developing fission and
+fusion algorithms that can, for example, collapse a large Pipeline
+into a single filter for execution on a single processor, thereby
+allowing us to adjust the granularity of the stream graph to match the
+granularity of a given target.
+
+%% The comparison of StreamIt's structure with arbitrary stream graphs
+%% could be likened to the difference between structured control flow and
+%% GOTO statements.  Though sometimes the structure restricts the
+%% expressiveness of the programmer, the gains in robustness,
+%% readability, and compiler analysis are immense.
+
+\subsection{Messages}
+
+StreamIt provides a dynamic messaging system for passing irregular,
+low-volume control information between non-neighboring filters.
+Messages are sent from within the body of a filter's {\tt work}
+function, perhaps to change a parameter in another filter.  For
+example, in the {\tt CheckHop} filter of our software radio example
+(Figure \ref{fig:radiocode}), a message is sent upstream to change the
+frequency of the receiver if the downstream component detects that the
+transmitter is about to change frequencies.  The sender can continue
+to execute while the message is en route, and the {\tt setFreq} method
+will be invoked in the receiver with argument {\tt newFreq} when the
+message arrives.  Since message delivery is asynchronous, there can be
+no return value; only void methods can be message targets.
+
+The central aspect of the messaging system is a sophisticated timing
+mechanism that allows filters to specify when a message will be
+received relative to the flow of information between the sender and
+the receiver.  This mechanism enables a consistent definition of
+message delivery timing across varying architectures that have no
+global clock.  For example, the {\tt CheckHop} filter sends a
+message with a latency of {\tt DELAY}.  This means that the target
+will receive the message when it is processing the data item that the
+the {\tt CheckHop} filter sees in {\tt DELAY} executions of its
+own work function.  That is, the sender of a message specifies the
+delivery timing in terms of its own local time; the translation to the
+receiver's time is done relative to data items in the stream.  This
+timing mechanism is important not only for portability, as it is
+independent of any architecture's clock or topology, but also for
+programmability, as it is often important to synchronize events with
+wavefronts of data in the stream.  
+%Please see \cite{streamittech} for
+%a precise definition of the message delivery semantics.
+
+%% In StreaMIT, one can specify a range of latencies for a message to get
+%% delivered.  This latency is measured in terms of an information
+%% ``wavefront'' from one filter to another.  For example, in the {\tt
+%% CheckHop} example of Figure \ref{fig:portal-code}, the sender
+%% indicates an interval of latencies between $4N$ and $6N$.  This means
+%% that the receiver will receive the message immediately following the
+%% last invocation of its own {\tt work} function which produces an item
+%% affecting the some output of the {\it sender's} $4N$'th to $6N$'th
+%% work functions, counting the sender's current work function as number
+%% 0.  Defining this notion precisely is the subject of Section
+%% \ref{sec:time}, but the general idea is simple:  the receiver is
+%% invoked when it sees the information wavefront that the sender sees in
+%% $4N$ to $6N$ execution steps.  
+
+%% In some cases, the ability to synchronize the arrival of a message
+%% with some element of the data stream is very important.  For example,
+%% {\tt CheckHop} knows that the transmitter will change the
+%% frequency between $4N$ and $6N$ steps later, in terms of the frame
+%% that {\tt CheckHop} is inputting.  To ensure that the radio
+%% changes frequencies at the same time--so as not to lose any data at
+%% the old or new frequency--{\tt CheckHop} instructs the receiver to
+%% switch frequencies when the {\it receiver} sees one of the last data
+%% items at the old frequency.
+
+%% \subsubsection{Rationale}
+
+%% Stream programs present a challenge in that filters need both regular,
+%% high-volume data transfer and irregular, low-volume control
+%% communication.  Moreover, there is the problem of reasoning about the
+%% relative ``time'' between filters when they are running asynchronously
+%% and in parallel.
+
+%% A different approach to messaging is to embed control messages in the
+%% data stream instead of providing a separate mechanism for dynamic
+%% message passing.  This does have the effect of associating the message
+%% time with a data item, but it is complicated, error-prone, and leads
+%% to unreadable code.  Further, it could hurt performance in the steady
+%% state (if each filter has to check whether or not a data item is
+%% actual data or control, instead) and complicates compiler analysis,
+%% too.  Finally, one can't send messages upstream without creating a
+%% separate data channel for them to travel in.
+
+%% Another solution is to treat messages as synchronous method calls.
+%% However, this delays the progress of the stream when the message is en
+%% route, thereby degrading the performance of the program and
+%% restricting the compiler's freedom to reorder filter executions.  
+
+%% We feel that the StreaMIT messaging model is an advance in that it
+%% separates the notions of low-volume and high-volume data
+%% transfer--both for the programmer and the compiler--without losing a
+%% well-defined semantics where messages are {\it timed} relative to the
+%% high-volume data flow.  Further, by separating message communication
+%% into its own category, fewer connections are needed for steady-state
+%% data transfer and the resulting stream graphs are more amenable to
+%% structured stream programming.
+
+\section{Status and Conclusions}
+
+We have implemented a fully-functional prototype of the StreamIt
+optimizing compiler that targets both uniprocessors and Raw
+\cite{streamitraw}.  The compiler exploits the structure of the stream
+graph to perform load-balancing transformations that can improve
+performance on Raw by over 300\%.
+
+We believe that StreamIt represents a viable common machine language
+for grid-based architectures.  It abstracts away the target's
+granularity, memory layout, and network interconnect, while capturing
+the notion of replicated processors that communicate in regular
+patterns.  With this representation, we believe that the StreamIt
+compiler will match the performance of C code that was hand-tailored
+for a given grid-based machine.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{small}
+\bibliographystyle{plain}
+\bibliography{references}
+\end{small}
+\end{document}

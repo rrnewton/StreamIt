@@ -1,0 +1,178 @@
+\begin{figure}[t]
+\framebox[5.5in]{
+\begin{minipage}{5.5in}
+\begin{center}
+{\bf Helper Functions}
+\end{center}
+\begin{itemize}
+\item The number of integral points in a one-dimensional domain ${\cal
+D}$ is denoted by $|{\cal D}|$.  The sign and absolute value of an
+integer $i$ are given by $sign(i)$ and $abs(i)$, respectively.
+%
+\item $\mt{PartialWrite}(c,p) = \sum_{r=0}^{p-1} U(c, r)$
+%
+\item $\mt{TotalWrite}(n,c) = \sum_{r=0}^{{num}(n)-1} U(c, r)$
+%
+\item $\mt{PartialRead}(c,p) = \sum_{r=0}^{p-1} O(c, r)$
+%
+\item $\mt{TotalRead}(n,c) =  \sum_{r=0}^{{num}(n)-1} O(c, r)$
+%
+\item Given channel $c = (n_a, n_b)$:
+\begin{align*}
+\mt{Period}(c) \equiv S(n_a) * \mt{TotalWrite}(n_a, c) = 
+S(n_b) * \mt{TotalRead}(n_b, c)
+\end{align*}
+%
+\end{itemize}
+%
+\end{minipage}}
+\caption{Helper functions for the PCP to SARE translation.
+\protect\label{fig:helper}}
+\end{figure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{figure}[ht]
+\framebox[5.5in]{
+\begin{minipage}{5.5in}
+\begin{center}
+{\bf Variables}
+\end{center}
+
+For each channel $c = (n_a, n_b)$, do the following:
+\begin{itemize}
+
+\item Introduce variable $\mt{BUF}_c$ with the following domain:
+\begin{align}
+\label{eq:buf}
+{\cal D}_{{BUF}_c} = \{ ~(i,j)~|~0 \le i \le N - 1 ~\wedge~ 0 \le j \le \mt{Period}(c) - 1\}
+\end{align}
+
+\item For each $p \in [0, num(n_a)-1]$, introduce
+variable $\mt{WRITE}_{c, p}$ with this domain:
+\begin{align}
+\label{eq:write}
+{\cal D}_{{WRITE}_{c, p}} = \{~(i,j,k)~|~0 \le i \le N-1 ~\wedge~ 0 \le j \le S(n_a) - 1 ~\wedge~ 0 \le k \le U(c, p) - 1\}
+\end{align}
+%
+\item For each $p \in [0, num(n_b)-1]$, introduce
+variable $\mt{READ}_{c, p}$ with this domain:
+\begin{align}
+\label{eq:read}
+{\cal D}_{{READ}_{c, p}} = \{~(i,j,k)~|~0 \le i \le N-1 ~\wedge~ 0 \le j \le S(n_b) - 1 ~\wedge~ 0 \le k \le O(c, p) - 1\}
+\end{align}
+%
+\end{itemize}
+%
+\end{minipage}}
+\caption{Variables for the PCP to SARE translation.
+\protect\label{fig:pcptosare1}}
+\end{figure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\begin{figure}[ht]
+%\framebox[6.5in]{
+%\begin{minipage}{6.3in}
+%\begin{center}
+%{\bf Equations (1 of 2)}
+%\end{center}
+%\noindent For each node $n$, introduce the following equations:
+%\begin{itemize}
+%
+%\item {\bf(I to READ)} For each $c \in \mt{chan\_in}(n)$, and for each phase $p \in [0,
+%\mt{num}(n)-1]$:
+%\begin{align}
+%\label{i2read}
+%&\forall (i,j,k) \in {\cal D}_{I \rightarrow SR}(n,c,p):~~
+%\mt{READ}_{c, p}(i,j,k) = 
+%    \mt{I}(c)[\mt{ReadIndex}(n,c,p,i,j,k)], \mt{where} \nonumber\\
+%&\mt{ReadIndex}(n,c,p,i,j,k) = (i*S(n)+j)*\mt{TotalRead}(n,c) \\ \nonumber
+%                &~~~~~~+ \mt{PartialRead}(c,p) + k \\\nonumber
+%&\mt{and }{\cal D}_{I \rightarrow SR}(n,c,p) = 
+%  \{ (i,j,k)~|~\mt{ReadIndex}(n,c,p,i,j,k) \in [0, A(c) - 1] \}
+%\end{align}
+%
+%\end{itemize}
+%\end{minipage}}
+%\caption{Equations for PCP to SARE translation.
+%\protect\label{fig:pcptosare2}}
+%\end{figure}
+
+\begin{figure}[ht]
+\framebox[6.5in]{
+\begin{minipage}{6.3in}
+\begin{center}
+%{\bf Equations (2 of 2)}
+\end{center}
+\noindent For each node $n$, introduce the following equations:
+\begin{itemize}
+%
+\item {\bf(READ to WRITE)} For each $c \in \mt{chan\_out}(n)$, and for each $p \in [0,
+num(n)-1]$:
+%
+\begin{align}
+\label{read2write}
+&\forall (i, j, k) \in {\cal D}_{{WRITE}_{c, p}}:~~\mt{WRITE}_{c,p}(i,j,k) =\nonumber\\
+&~~~~~~W(n, p)(\mt{Steady\_Inputs})[\mt{pos\_out}(n, c)][k], \mt{where}\\\nonumber&
+\mt{Steady\_Inputs} = [\mt{READ}_{{chan\_in}(n)[0], p}(i, j, *), \dots, \mt{READ}_{{chan\_in}(n)[{num\_in}(n)-1], p}(i, j, *) ]
+\end{align}
+%
+\item {\bf(WRITE to BUF)} For each $c \in \mt{chan\_out}(n)$, for each $p \in [0,
+\mt{num}(n)-1]$, and for each $q \in [0,S(n)-1]$:
+\begin{align}
+\label{write2buf}
+&\forall (i,j) \in {\cal D}_{SW \rightarrow SB}(c,p,q):~~
+\mt{BUF}_{c}(i,j) = \nonumber\\ \nonumber
+&~~~~~~\mt{WRITE}_{c, p}(i, q,
+                     j - \mt{Offset}_{SW \rightarrow SB}(q,n,c,p)),
+\mt{where } \\&{\cal D}_{SW \rightarrow SB}(c,p,q) = 
+  {\cal D}_{{BUF}_{c}} \cap 
+  \{ (i,j)~|~\mt{Offset}_{SW \rightarrow SB}(q,n,c,p) \le j
+             \le \mt{Offset}_{SW \rightarrow SB}(q,n,c,p+1) - 1 \} \\ \nonumber
+&\mt{and } \mt{Offset}_{SW \rightarrow SB}(q,n,c,p') = q*\mt{TotalWrite}(n,c) + \mt{PartialWrite}(c,p')
+\end{align}
+% here is the simple, base case of the BUF -> READ function
+\item {\bf(BUF to READ)} For each $c \in \mt{chan\_in}(n)$, for each phase $p \in [0,
+\mt{num}(n)-1]$:
+% two possible problems: read has already been written to, or buf has already been read from
+\begin{align}
+\label{buf2read0}
+&\forall (i,j,k) \in {{\cal D}}_{{READ}_{c, p}}(c,p,q):~~
+\mt{READ}_{c, p}(i,j,k) = \nonumber \\ 
+&~~~~~~\mt{BUF}_{c}(i,j*\mt{TotalRead}(n,c) + 
+                    \mt{PartialRead}(c,p) + k)
+%\end{align}
+%\begin{align}
+%
+%
+%\label{buf2read1}
+%&\forall (i,j,k) \in {{\cal D}\mt{2}}_{SB \rightarrow SR}(c,p,q):~~
+%\mt{READ}_{c, p}(i,j,k) = \nonumber\\
+%    &~~~~~~\mt{BUF}_{c}(i,
+%                  j*\mt{TotalRead}(n,c) + \\\nonumber
+%                    &~~~~~~~~~~~~\mt{PartialRead}(c,p)
+%		+ k - \mt{Period}(c)),\\ \nonumber&
+%\mt{where }{{\cal D}\mt{2}}_{SB \rightarrow SR}(c,p,q) = 
+%  {\cal D}_{{READ}_{c, p}} - {{\cal D}\mt{1}}_{SB \rightarrow SR}(c,p,q)\\ \nonumber \\
+%\label{buf2read2}
+%\end{align}
+%\begin{align}
+%
+%
+%&\mt{where }\mt{PUSHED}(n,c,p) = {\cal D}_{I \rightarrow SR}(n,c,p) \nonumber\\ \nonumber
+%&\mt{and }\mt{Num\_Pushed}(n,c,p) = 
+% this is a dot product of (i,j,k) with something
+%  (max_{\preceq}\mt{PUSHED}(n,c,p)) \cdot (S(n) * \mt{TotalRead}(n,c), \\ \nonumber
+%                                        &~~~~~~\mt{TotalRead}(n,c), 1 ) + \mt{PartialRead}(c, p) \\ \nonumber
+%&\mt{and }\mt{Offset}(n,c,p) = \mt{Num\_Pushed}(n,c,p) + O(c,p)-O(c,p) \\ \nonumber
+%&\mt{and }\mt{Int\_Offset}(n,c,p) = - \lfloor \frac{\mt{Offset}(n,c,p)}{\mt{Period}(c)} \rfloor 
+%~~\mt{and }\mt{Mod\_Offset}(n,c,p) = - \mt{Offset}(n,c,p)~\mt{mod}~\mt{Period}(c) \nonumber
+%
+\end{align}
+\vspace{-12pt}
+\end{itemize}
+\end{minipage}}
+\caption{Equations for CSDP to SARE translation.
+\protect\label{fig:pcptosare3}}
+\end{figure}

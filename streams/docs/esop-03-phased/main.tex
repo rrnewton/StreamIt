@@ -1,0 +1,95 @@
+% Michal Karczmarek
+
+
+%\documentclass[times,11pt,twoside,oneandahalfspace]{mitthesis}
+%\documentclass[times,11pt,twoside,draft,oneandahalfspace]{mitthesis}
+%\documentclass[10pt,oneandahalfspace,twoside,openany]{mitthesis} %\pagestyle{drafthead}
+%\documentclass[10pt,oneandahalfspace,twoside,openany,draft]{mitthesis} \pagestyle{drafthead}
+%\documentclass[10pt,singlespace,twoside,openany,largemargin]{mitthesis} \pagestyle{drafthead}
+%\pagestyle{drafthead}
+
+\documentclass[runningheads,roman]{article}
+
+%\usepackage{lgrind}
+\usepackage{verbatim}
+\usepackage{epsfig, graphicx}
+\usepackage{enumerate}
+\usepackage{fullpage}
+%\usepackage{doublespace}
+%\setstretch{1.05}
+%\usepackage{algorithm}
+%\usepackage{algorithmic}
+
+%\pagestyle{plain}
+\newtheorem{theorem}{Theorem}
+\newtheorem{proof}{Proof}
+\newtheorem{lemma}{Lemma}
+\newtheorem{corollary}{Corollary}
+\newtheorem{definition}{Definition}
+
+
+\pagestyle{headings}
+
+%\mainmatter
+
+\title{Phased Scheduling of Stream Programs}
+\author{Michal Karczmarek, William Thies and Saman
+Amarasinghe \\
+Laboratory for Computer Science \\
+        Massachusetts Institute of Technology \\
+        Cambridge, MA  02139 \\
+\texttt{\{karczma, thies, saman\}@lcs.mit.edu} \vspace{-24pt}}
+\date{}
+
+\begin{document}
+\maketitle
+
+\input{commands}
+
+\vspace{0.1in}
+
+\begin{abstract}
+Applications structured around some notion of a ``stream'' are
+becoming increasingly important and widespread. \cite{Rix98}
+provides evidence that streaming media applications are already
+consuming most of the cycles on consumer machines, and their use
+is continuing to grow. The streaming computation model is
+pervasive and ranges from small, embedded systems (ex. cell
+phones) to large, computationally powerful machines (ex. cell base
+stations). In this paper, we describe a novel technique for
+scheduling execution of synchronous data flow streaming
+applications exhibiting hierarchical properties. A vital aspect in
+compiling such programs is finding an efficient schedule. The
+technique presented here focuses on producing schedules that are
+optimized for the amount of space required for buffering and
+storing the schedule. A wide variety of real-life applications and
+a few synthetic applications are surveyed. Applications benefit
+from an average 14.5\% decrease in buffer requirements, with a
+peak of 93\% savings in buffer size. No application requires more
+space than the most popular technique used today (Single
+Appearance Scheduling).
+\end{abstract}
+
+%\input{cover}
+%\input{contents}
+\input{intro}
+%\input{streamit}
+\input{streamit-asplos}
+\input{basics}
+\input{hierarchical}
+\input{phased}
+%\input{constrained}
+\input{results}
+\input{related}
+\input{conclusion}
+%\input{pseudocode}
+
+\bibliographystyle{plain}
+\bibliography{references}
+
+\appendix
+\input{appeqs}
+
+%\input{appfigs}
+
+\end{document}

@@ -1,0 +1,77 @@
+\section{Introduction}
+\label{sec:intro}
+
+The StreaMIT programming language is designed to enhance the
+programmability and performance of streaming applications.  In
+providing high-level constructs for building streams out of a number
+of simple blocks, the language provides a clean, expressive, and
+modular framework that programmers can use to reason about streaming
+computations.  At the same time, the language imposes a structure on
+the streams which can be exploited by a compiler to perform
+stream-specific optimizations.  Thus, the abstractions provided by the
+language serve not only to improve the programming model, but to
+facilitate performance improvements that motivate the language in
+their own right.
+
+The following example defines a stream that prints a continuous
+sequence of ``Hello World!'' messages to the screen.  It illustrates
+the main components of StreaMIT:
+
+\begin{verbatim}
+Stream {
+
+  Filter {
+    output String myOutput;
+
+    work() {
+      output.push (``Hello '');
+    }
+  }
+
+  Filter {
+    input String myInput;
+    output String myOutput;
+
+    work() {
+      output.push (input.pop () + ``World!'');
+  }
+
+  Filter {
+    input String myInput;
+    
+    work() {
+      System.out.println(input.pop ());
+    }
+  }
+}
+\end{verbatim}
+
+In StreaMIT, the basic processing unit is the {\tt Filter}, which
+may read items from an input channel and write items to an output
+channel.  A filter that requires no input or output is called a
+source and a sink, respectively.  In the example above, a 
+source generates the ``Hello'' string, a {\tt Filter} appends
+``World!'', and a sink prints the result to the screen.
+
+Each filter defines a {\tt work} function that represents the most
+fine-grained step of execution in transforming data from the input
+channel to the output channel.  This function is called automatically
+by the runtime system when the stream is running.  The input and
+output channels are accessed as stacks.  Input is popped (or peeked, if
+the data in the input is supposed to remain there),
+while output is pushed to.  In the ``Hello World'' example, each 
+filter reads or writes a single item before advancing the tape for 
+the next step.
+
+Filters implicitly are connected together in the order of their
+definition.  Thus, in the ``Hello World!'' example, the three filters
+are pipelined together and enclosed within a {\tt Stream} construct,
+which denotes the top-level stream in the program.
+
+The following sections describe the StreaMIT language in more detail.
+First we present the {\it base language}, which encompasses all of the
+expressive power of StreaMIT.  Then we discuss the {\it scripting
+language}, a layer on top of the base language that simplifies stream
+construction via the use of compile-time macros.
+
+

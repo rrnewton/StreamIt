@@ -1,0 +1,293 @@
+%!PS-Adobe-2.0
+%%Creator: dot version gviz 1.7.3b (Mon Feb 26 14:10:22 EST 2001)
+%%For: (aalamb) Andrew Lamb
+%%Title: streamit
+%%Pages: (atend)
+%%BoundingBox: 36 36 235 689
+%%EndComments
+%%BeginProlog
+save
+/DotDict 200 dict def
+DotDict begin
+
+%%BeginResource: procset
+/coord-font-family /Times-Roman def
+/default-font-family /Times-Roman def
+/coordfont coord-font-family findfont 8 scalefont def
+
+/InvScaleFactor 1.0 def
+/set_scale {
+	dup 1 exch div /InvScaleFactor exch def
+	dup scale
+} bind def
+
+% styles
+/solid { } bind def
+/dashed { [9 InvScaleFactor mul dup ] 0 setdash } bind def
+/dotted { [1 InvScaleFactor mul 6 InvScaleFactor mul] 0 setdash } bind def
+/invis {/fill {newpath} def /stroke {newpath} def /show {pop newpath} def} bind def
+/bold { 2 setlinewidth } bind def
+/filled { } bind def
+/unfilled { } bind def
+/rounded { } bind def
+/diagonals { } bind def
+
+% hooks for setting color 
+/nodecolor { sethsbcolor } bind def
+/edgecolor { sethsbcolor } bind def
+/graphcolor { sethsbcolor } bind def
+/nopcolor {pop pop pop} bind def
+
+/beginpage {	% i j npages
+	/npages exch def
+	/j exch def
+	/i exch def
+	/str 10 string def
+	npages 1 gt {
+		gsave
+			coordfont setfont
+			0 0 moveto
+			(\() show i str cvs show (,) show j str cvs show (\)) show
+		grestore
+	} if
+} bind def
+
+/set_font {
+	findfont exch
+	scalefont setfont
+} def
+
+% draw aligned label in bounding box aligned to current point
+% alignfactor tells what fraction to place on the left.
+% -.5 is centered.
+/alignedtext {			% text labelwidth fontsz alignfactor
+	/alignfactor exch def
+	/fontsz exch def
+	/width exch def
+	/text exch def
+	gsave
+		% even if node or edge is dashed, don't paint text with dashes
+		[] 0 setdash
+		currentpoint newpath moveto
+		text stringwidth pop
+		alignfactor mul fontsz -.3 mul rmoveto
+		text show
+	grestore
+} def
+
+/boxprim {				% xcorner ycorner xsize ysize
+		4 2 roll
+		moveto
+		2 copy
+		exch 0 rlineto
+		0 exch rlineto
+		pop neg 0 rlineto
+		closepath
+} bind def
+
+/ellipse_path {
+	/ry exch def
+	/rx exch def
+	/y exch def
+	/x exch def
+	matrix currentmatrix
+	newpath
+	x y translate
+	rx ry scale
+	0 0 1 0 360 arc
+	setmatrix
+} bind def
+
+/endpage { showpage } bind def
+
+/layercolorseq
+	[	% layer color sequence - darkest to lightest
+		[0 0 0]
+		[.2 .8 .8]
+		[.4 .8 .8]
+		[.6 .8 .8]
+		[.8 .8 .8]
+	]
+def
+
+/setlayer {/maxlayer exch def /curlayer exch def
+	layercolorseq curlayer get
+	aload pop sethsbcolor
+	/nodecolor {nopcolor} def
+	/edgecolor {nopcolor} def
+	/graphcolor {nopcolor} def
+} bind def
+
+/onlayer { curlayer ne {invis} if } def
+
+/onlayers {
+	/myupper exch def
+	/mylower exch def
+	curlayer mylower lt
+	curlayer myupper gt
+	or
+	{invis} if
+} def
+
+/curlayer 0 def
+
+%%EndProlog
+%%BeginSetup
+14 default-font-family set_font
+1 setmiterlimit
+% /arrowlength 10 def
+% /arrowwidth 5 def
+
+% make sure pdfmark is harmless for PS-interpreters other than Distiller
+/pdfmark where {pop} {userdict /pdfmark /cleartomark load put} ifelse
+% make '<<' and '>>' safe on PS Level 1 devices
+/languagelevel where {pop languagelevel}{1} ifelse
+2 lt {
+    userdict (<<) cvn ([) cvn load put
+    userdict (>>) cvn ([) cvn load put
+} if
+
+%%EndResource
+%%EndSetup
+%%Page: 1 1
+%%PageBoundingBox: 36 36 235 689
+%%PageOrientation: Portrait
+gsave
+35 35 200 654 boxprim clip newpath
+36 36 translate
+0 0 1 beginpage
+0 0 translate 0 rotate
+[ /CropBox [36 36 235 689] /PAGES pdfmark
+0.000 0.000 0.000 graphcolor
+14.00 /Times-Roman set_font
+gsave 10 dict begin
+newpath 8 8 moveto
+190 8 lineto
+190 644 lineto
+8 644 lineto
+closepath
+stroke
+gsave 10 dict begin
+82 637 moveto (SamplingRateConverter) 135 14.00 -0.50 alignedtext
+end grestore
+end grestore
+gsave 10 dict begin
+newpath 24 136 moveto
+174 136 lineto
+174 516 lineto
+24 516 lineto
+closepath
+stroke
+gsave 10 dict begin
+54 509 moveto (Pipeline) 45 14.00 -0.50 alignedtext
+end grestore
+end grestore
+
+%	node2
+gsave 10 dict begin
+99 574 71 45 ellipse_path
+stroke
+gsave 10 dict begin
+99 599 moveto (SampledSource_1) 101 14.00 -0.50 alignedtext
+99 583 moveto (push=1) 41 14.00 -0.50 alignedtext
+99 567 moveto (pop=0) 35 14.00 -0.50 alignedtext
+99 551 moveto (peek=0) 41 14.00 -0.50 alignedtext
+end grestore
+end grestore
+
+%	node4
+gsave 10 dict begin
+99 446 54 45 ellipse_path
+stroke
+gsave 10 dict begin
+99 471 moveto (Expander_1) 67 14.00 -0.50 alignedtext
+99 455 moveto (push=2) 41 14.00 -0.50 alignedtext
+99 439 moveto (pop=1) 35 14.00 -0.50 alignedtext
+99 423 moveto (peek=1) 41 14.00 -0.50 alignedtext
+end grestore
+end grestore
+
+%	node2 -> node4
+newpath 99 528 moveto
+99 519 99 510 99 502 curveto
+stroke
+newpath 97 502 moveto
+99 492 lineto
+102 502 lineto
+closepath
+gsave 0 setgray stroke grestore fill
+
+%	node5
+gsave 10 dict begin
+99 318 67 45 ellipse_path
+stroke
+gsave 10 dict begin
+99 343 moveto (LowPassFilter_1) 94 14.00 -0.50 alignedtext
+99 327 moveto (push=1) 41 14.00 -0.50 alignedtext
+99 311 moveto (pop=1) 35 14.00 -0.50 alignedtext
+99 295 moveto (peek=300) 55 14.00 -0.50 alignedtext
+end grestore
+end grestore
+
+%	node4 -> node5
+newpath 99 400 moveto
+99 391 99 382 99 374 curveto
+stroke
+newpath 97 374 moveto
+99 364 lineto
+102 374 lineto
+closepath
+gsave 0 setgray stroke grestore fill
+
+%	node6
+gsave 10 dict begin
+99 190 61 45 ellipse_path
+stroke
+gsave 10 dict begin
+99 215 moveto (Compressor_1) 81 14.00 -0.50 alignedtext
+99 199 moveto (push=1) 41 14.00 -0.50 alignedtext
+99 183 moveto (pop=3) 35 14.00 -0.50 alignedtext
+99 167 moveto (peek=3) 41 14.00 -0.50 alignedtext
+end grestore
+end grestore
+
+%	node5 -> node6
+newpath 99 272 moveto
+99 263 99 254 99 246 curveto
+stroke
+newpath 97 246 moveto
+99 236 lineto
+102 246 lineto
+closepath
+gsave 0 setgray stroke grestore fill
+
+%	node7
+gsave 10 dict begin
+99 62 60 45 ellipse_path
+stroke
+gsave 10 dict begin
+99 87 moveto (FloatPrinter_1) 80 14.00 -0.50 alignedtext
+99 71 moveto (push=0) 41 14.00 -0.50 alignedtext
+99 55 moveto (pop=1) 35 14.00 -0.50 alignedtext
+99 39 moveto (peek=1) 41 14.00 -0.50 alignedtext
+end grestore
+end grestore
+
+%	node6 -> node7
+newpath 99 144 moveto
+99 135 99 126 99 118 curveto
+stroke
+newpath 97 118 moveto
+99 108 lineto
+102 118 lineto
+closepath
+gsave 0 setgray stroke grestore fill
+endpage
+grestore
+%%PageTrailer
+%%EndPage: 1
+%%Trailer
+%%Pages: 1
+end
+restore
+%%EOF

@@ -1,0 +1,156 @@
+\section{Scheduling}
+
+\begin{figure}
+\centering
+\psfig{figure=sched_diag.eps,width=3.0in}
+\caption{The three different scheduling schemes.  Each channel is labeled with its number of live data items}
+\label{fig:sched}
+
+\end{figure}
+
+Scheduling the order of the execution of filters has a large impact on 
+the behavior of a StreamIt program.  In this section we introduce three
+different scheduling techniques and analyze their properties.
+
+\subsection{Periodic Schedule}
+A schedule for a StreamIt program needs to satisfy a requirement that
+a repeated execution of the schedule cannot lead to changed data
+buffering between filters.  We call a schedule that satisfies this
+requirement a periodic schedule.  (Here a schedule represents the
+multiplicity of executions of filters, ignoring the ordering of these
+executions.)
+
+For every valid program, there exists a unique, minimal periodic
+schedule.  Every other periodic schedule for a StreamIt program is a
+multiple of the underlying periodic schedule \cite{bhat1994x3}.
+
+While computing periodic schedules for StreamIt, we chose to preserve the
+hierarchical structure presented in the program.
+
+A filter has a periodic schedule of a single execution.  This is
+because there are no scheduler-visible buffers inside of a filter.
+All other components of the program express their periodic schedules
+in terms of number of executions of their subcomponents necessary to
+construct a valid schedule.  This technique relies on Theorem {\bf
+???} to assure that the periodic schedule built is indeed the minimal
+periodic schedule.
+
+\subsection{Initialization Schedule}
+
+Before we can execute any periodic schedule on a program, the program
+may require intialization.  This is because we allow filters with
+$peek_A$ values greater than their $pop_A$ values.  If the program is
+not initialized, a filter that peeks more than it pops would not be
+able to consume all the input provided for it during the first
+execution of a periodic schedule.  The subsequent executions would
+force the filter to consume the exact same amount of data, eventually
+causing buffer overflow.
+
+The initialization schedule is computed by ensuring that every filter $A$ has
+at least $peek_A - pop_A$ unread data on its input tape available after 
+initialization has been completed.
+
+\subsection{Single Appearance Schedule}
+
+A single appearance schedule (SAS) is a schedule in which every filter
+and every structure appears exactly once.  Groups of filters and
+structures can be combined together to form bigger structures.  In our
+approach, we chose to perserve the structuring of the original program
+when selecting structures to be grouped together.  Thus a schedule for
+a given structure is a list of tuples of components included in this
+structure and corresponding number of times each of these components
+needs to be executed in a given periodic schedule. (Better results for
+buffer size have been presented in \cite{somepaper}, they are however
+within the same order of magnitude.)
+
+As an example, the pipeline in Figure \ref{fig:sched} has a schedule
+$(4A)(6B)(9C)(3D)$.  This schedule is represented in the left column of
+Figure \ref{fig:sched}.
+
+\subsection{Minimum Latency Scheduling}
+
+In many streaming applications, there is an inherent delay between when data
+is introduced into the system and when its results can be seen at the output
+of the stream.  This delay is inherent to the structure of the particular
+stream setup - in Figure \ref{fig:sched}, filter $B$ needs to be executed
+three times before filter $D$ can output results directly dependent on the
+second execution of filter $D$ (we may want to modify the figure to get a
+better example here - I'd want to have first filter need to execute twice 
+before the last filter can execute once).  Inherent latency can cause 
+deadlocks in FeedbackLoops. 
+
+A minimum latency schedule (MLS) is a schedule that, for every invocation
+of the sink filter, minimizes number of invocations of all other filters.
+This definition restrains the multiplicity of invocations of each filter, 
+but it does not define the order of execution of these filters.
+
+Developing a (MLS) is important because a SAS can easily introduce latency 
+into FeedbackLoops that will cause the schedule to deadlock.  Our approach 
+to building an MLS is hierarchical: for every stream component we construct
+a cyclic schedule, consisting of a number of phases.  Each phase has the
+property that it consists includes exactly one phase of the last downstream
+component, and only the necessary number of more upstream components.
+A filter has a cyclic schedule consisting only of its single invocation.
+
+In Figure \ref{fig:sched}, the pipeline has a cyclic minimum latency
+schedule consisting of three
+phases: $\{A(2B)(3C)D\}$, $\{(2A)(2B)(3C)D\}$, $\{A(2B)(3C)D\}$.
+
+\subsection{Minimum Buffer Scheduling}
+
+Buffer size is closely related to latency.  The more data is buffered between
+filters, the more delay there is between when data enters the computation
+stream and when its results can be seen.  More importantly, however, buffer
+sizes can grow exponentially with size of streaming program.
+
+The buffer size requirement between any two filters is dictated solely
+by the sequence of execution of these two filters.  The minimum buffer
+size requirement is given by 
+
+%$MinBuffer(A,B) = \frac{push_A pop_B}{gcd (push_A, pop_B)}}$ 
+Due to \cite{murthy94combined}.
+
+In our construction of a minimum buffer schedule, we again use the idea
+of a cyclic schedule.  Phases of this schedule, however, are computed in
+such a way, that every phase can have at most one phase of the upstream
+most component that consumes data and one phase of the downstream most 
+component that produces data.  The ordering of inner phases within a phase
+matters here, so the schedule grows in size as compared to the minimum latency
+schedule described above.  The technique used here is equivallent to pull
+scheduling.  Because in each iteration this schedule only consumes as much 
+data as necessary to produce an output, this schedule is also a minimum 
+latency schedule.  
+
+In Figure \ref{fig:sched}, the pipeline has a cyclic minimum buffer schedule
+consisting of four phases: $\{AB(2C)BCD\}$, $\{AB(2C)\}$, $\{ABCD\}\{ABCD\}$.
+
+\subsection{Schedule Comparison}
+
+Let $children_A$ be the number of subcomponents contained in component $A$.
+Let $child_{i, A}$ be the $i$th subcomponent contained in component $A$.
+
+% \begin{tabluar}{c c c}
+% periodic & min latency & min buffer\\
+% \end{tabluar}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

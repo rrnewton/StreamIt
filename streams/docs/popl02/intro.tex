@@ -1,0 +1,87 @@
+\section{Introduction}
+
+Synchronous dataflow graphs have become a powerful and widespread
+programming abstraction for DSP environments.  Originally proposed by
+Lee and Messerchmitt in 1987~\cite{LM87-i}, synchronous dataflow has
+since evolved into a number of
+varieties~\cite{BELP96,Bhatt00,Murthy2002,Buck93} which provide a
+natural framework for developing modular processing blocks and
+composing them into a concurrent network.  A dataflow graph consists
+of a set of nodes with channels running between them; data values are
+passed as streams over the channels.  The {\it synchronous} assumption
+is that a node will not fire until all of its inputs are ready.  Also,
+the input/output rates of the nodes are known at compile time, such
+that a static schedule can be computed for the steady-state execution.
+Synchronous dataflow graphs have been shown to successfully model a
+large class of DSP applications, including speech coding,
+auto-correlation, voice band modulation, and a number of filters.  A
+significant industry has emerged to provide dataflow design
+environments; leading products include COSSAP from Synopsys, SPW from
+Cadence, ADS from Hewlett Packard, and DSP Station from Mentor
+Graphics.  Academic projects include prototyping environments such as
+Ptolemy~\cite{Lee01} and Grape-II~\cite{Lauw95} as well as languages
+such as Lustre~\cite{lustre}, Signal~\cite{Gaut87}, and
+StreamIt~\cite{Gordo02}.
+
+Optimization is especially important for signal processing
+applications, as embedded processors often have tight resource
+constraints on speed, memory, and power.  In the synchronous dataflow
+domain, this has resulted in a number of aggressive optimizations that
+are specially designed to operate on dataflow graphs--e.g., minimizing
+buffer size while restricting code size~\cite{murt1997x1}, minimizing
+buffer size while maintaining parallelism~\cite{GGD94},
+resynchronization~\cite{Bhatta2000}, and buffer
+sharing~\cite{murt2001x1}.  While these optimizations are beneficial,
+they unilaterally regard each node as a black box that is invisible to
+the compiler.  Blocks are programmed at a coarse level of granularity,
+often with hand-tweaked implementations inside, and optimizations are
+considered only when stitching the blocks together.
+
+In some sense at the other end of the spectrum are the optimization
+techniques of the scientific computing community.  These are
+characterized by fine-grained analyses of loops, statements, and
+control flow, starting from sequential C or FORTRAN source code that
+lacks the explicit parallelism and communication of a dataflow graph.
+Out of this community has come a number of general methods for
+precise, fine-grained program analysis and optimization.  In the
+context of array dataflow analysis and automatic parallelization, one
+such framework is the polyhedral model~\cite{DRV00}, which represents
+programs as sets of affine relations over polyhedral domains. In
+recent years, it has been shown that affine dependences can exactly
+represent the flow of data in certain classes of
+programs~\cite{Feautrier92i}, and that affine partitioning can subsume
+loop fusion, reversal, permutation, and reindexing as a scheduling
+technique~\cite{Lim98}.  Moreover, affine scheduling can operate on a
+parameterized version of the input program, avoiding the need to
+expand a graph for varying parameters and problem sizes, and it can
+often reduce to a linear program for flexible and efficient
+optimization.  Polyhedral representations have also been utilized for
+powerful storage
+optimizations~\cite{Lim01,Quillere,Thies01,Lefebvre98}.
+
+In this paper, we aim to bridge the gap and employ the polyhedral
+representations of the scientific community to analyze the synchronous
+dataflow graphs of the DSP community.  Towards this end, we present a
+translation from a dataflow graph to a System of Affine Recurrence
+Equations (SARE), which are equivalent to a certain class of
+imperative programs and can be used as input to the affine analysis
+described above.  The input of our analysis is a ``Phased Computation
+Graph'' (PCG), which we formalize as a generalization of several
+existing dataflow frameworks.  Once a PCG is represented as a SARE, we
+demonstrate how affine techniques could be employed to perform novel
+optimizations such as node splitting, decimation propagation, and
+steady-state invariant code motion that exploit both the structure of
+the dataflow graph as well as the internal contents of each node.  We
+also discuss the potential of affine techniques for scheduling
+parameterized dataflow graphs, as well as offering new approaches to
+classic problems in the dataflow domain.
+
+The rest of this paper is organized as follows.  We begin by
+describing background information and related work on dataflow graphs
+and SARE's (Section 2).  Then we define a Phased Computation Graph
+(Section 3) and Phased Computation Program (Section 4), and give the
+procedure for translating a simple, restricted PCP to a SARE (Section
+5).  Next, we give the full details for the general translation
+(Section 6), describe a range of applications for the technique
+(Section 7), and conclude (Section 8).  A detailed example that
+illustrates our technique appears in the Appendix.

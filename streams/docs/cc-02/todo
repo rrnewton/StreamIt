@@ -1,0 +1,50 @@
+TODO with little things
+-----------------------
+
+- uggh, common machine language into abstract?
+
+- in the echo figure, could have that pipeline not having four stages.
+also don't like the adder in there--not clear what it's doing.
+
+- mention somewhere what the identity filter is.
+
+- add the arrows on the messaging stuff
+
+- acknowledgements - matt frank, streamit team.
+
+- change things to be FIRFilter instead of just FIR
+
+- double-check delay in checkhop with that in WIP submission, which I
+had sanitized
+
+- be consistent about truetype versus non - see what the cc formatting
+guidelines recommend
+
+- layout pass.  really need to run the typsetting stuff by someone.
+
+TODO on net
+-----------
+
+- get reference for amps cellular base station, gsm, bluetooth
+
+TODO with Saman
+---------------
+
+- (NOTE) having the setInput / setOutput type in the init function
+also allows for parameterizable types, which could be interesting, I
+guess.  or could be bad?  might be good if switching between
+byte/int/char at runtime, or something, but maybe these things should
+be
+
+- (NOTE) the pop/peek/push thing without a float arg is also illegal
+java.  unless we make float the default, I guess.  hmm.
+
+TODO with very low priority
+---------------------------
+
+- making sure the two-column figures are centered perfectly
+
+- redo the radio diagram to have arrows connecting the stages, and
+better labels.  actually just a better diagram.
+
+- could rewrite the example (dry/detailed)

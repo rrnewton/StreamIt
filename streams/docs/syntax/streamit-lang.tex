@@ -1,0 +1,1146 @@
+\documentclass[11pt]{article}
+
+\usepackage{booktabs}
+%\usepackage[margin=0.5in]{geometry}
+\usepackage{palatino}
+\usepackage{tabularx}
+\usepackage{streamit}
+
+\newif\ifprerel
+\prereltrue
+
+\def\note{\trivlist \small\item\relax\textbf{Note:}}
+\def\endnote{\endtrivlist}
+
+% Make picture sizes be sane:
+\setlength{\unitlength}{\baselineskip}
+
+% Please look the other way, this is a little gross.
+\catcode`\$=12
+\title{StreamIt Language Specification\\
+Version 2.0\ifprerel\thanks{
+This document is the latest working version of the language specification.\hfil\break\ttfamily
+\hbox{$Id: streamit-lang.tex,v 1.16 2003-02-10 14:03:25 thies Exp $}
+}\fi}
+\author{\texttt{streamit@cag.lcs.mit.edu}}
+\catcode`\$=3
+
+\begin{document}
+
+\maketitle
+\tableofcontents
+
+\section{Introduction}
+
+StreamIt is a language intended to simplify coding of
+signal-processing and other streaming computations.  The programmer
+constructs a stream graph, containing blocks with a single input and a
+single output, and describes the function of atomic blocks and the
+structure of composite blocks.  The compiler generates code for each
+block, and applies optimizations to the stream graph to produce
+efficient code for the target architecture.
+
+The current implementation of the StreamIt compiler translates the
+syntax described in this document to Java code, which can then be
+either run against a Java library or compiled to C code and linked
+with a runtime library.  Since the compiler can reconstruct the stream
+graph, it can combine adjacent filters, or split computationally
+intensive filters into multiple parts, or duplicate filters to have
+more parallel computation.
+
+The StreamIt language is vaguely reminiscent of other imperative
+languages such as C or Java.  In particular, the bodies of filter work
+functions and stream initialization code is generally legal Java
+code.
+
+\section{Types}
+
+This section describes the various data and object types used in
+StreamIt programs.  Data types are passed along tapes between stream
+objects, and can be used as local variables.  Stream objects are only
+created in initialization code and form a static stream graph.
+
+\subsection{Data Types}
+
+Data types are always created atomically.  They are of fixed size, and
+are generally statically allocated.
+
+\subsubsection{Primitive Types}
+
+The following primitive types exist in StreamIt:
+
+\begin{description}
+\item[\lstinline|bit|]  A one-bit unsigned integer type, containing
+  the value \lstinline|0| or \lstinline|1|.
+
+\item[\lstinline|int|]  A signed integer type, of unspecified length.
+  This length will typically be the native word length on the target
+  machine; for RAW and x86 compilation, this is usually 32 bits.
+
+\item[\lstinline|float|]  A floating-point type, of the best precision
+  that will give good performance.  On x86 this is a double-precision
+  float, since computation with single-precision floats is implicitly
+  converted to double-precision; on RAW, this is single-precision,
+  since that is all that is supported in hardware.
+
+\item[\lstinline|complex|]  A floating-point complex type, of the same
+  precision as \lstinline|float|.  This has real and imaginary parts,
+  which can be directly accessed with \lstinline|c.real| and
+  \lstinline|c.imag|.
+\end{description}
+
+\label{sec:operators}
+A number of operations are supported on these primitive types; these
+are listed in Table \ref{tab:primitive-operators}.  In a binary or
+ternary expression, if two expressions are of different primitive
+types, they are promoted to the lowest type on the list above.  Real
+expressions converted to \lstinline|complex| have an imaginary part of
+zero.  \lstinline/|/, \lstinline|&|, and \lstinline|^| are bitwise or,
+and, and exclusive-or operators, respectively.  The boolean logic
+operators \lstinline|&&| and \lstinline/||/ behave as in C: they are
+short-circuiting, integer values of exactly zero are false, and other
+values are true.  \lstinline|==| and other comparison operators return
+an integer 1 if the comparison is true and an integer 0 if the
+comparison is false.
+
+\begin{table}
+\begin{center}
+\begin{tabular}{ccl}
+\toprule
+\textbf{Operators} & \textbf{Types} \\
+\midrule
+\lstinline|?:| & Any & First part must be \lstinline|int| or \lstinline|bit| \\
+\lstinline/||/ & \lstinline|int|, \lstinline|bit| \\
+\lstinline|&&| & \lstinline|int|, \lstinline|bit| \\
+\lstinline/|/, \lstinline|&|, \lstinline|^| &
+  \lstinline|int|, \lstinline|bit| \\
+\lstinline|==|, \lstinline|!=| & Any \\
+\lstinline|<|, \lstinline|<=|, \lstinline|>|, \lstinline|>=| &
+  \lstinline|int|, \lstinline|float| \\
+\lstinline|+|, \lstinline|-| &
+  \lstinline|int|, \lstinline|float|, \lstinline|complex| \\
+\lstinline|*|, \lstinline|/|, \lstinline|%| &
+  \lstinline|int|, \lstinline|float|, \lstinline|complex| &
+  \lstinline|%| must be \lstinline|int| \\
+\lstinline|++|, \lstinline|--| & \lstinline|int| \\
+\bottomrule
+\end{tabular}
+\end{center}
+\caption{Operators on primitive types}
+\label{tab:primitive-operators}
+\end{table}
+
+\subsubsection{Structures}
+\label{sec:data-structures}
+
+Named structures of heterogeneous data types are supported.  A
+structure must be of a fixed size.  It contains a set of fields, each
+of which has a name and a data type.  Any primitive or array type, and
+any structure type which has been previously declared in the program,
+may be used; recursive structures are not allowed.  The following two
+structure definitions are both legal:
+
+\begin{lstlisting}{}
+struct A {
+  int a;
+  int[4] b;
+}
+
+struct B {
+  A a;
+  A[4] b;
+}
+\end{lstlisting}
+
+A structure definition contains the keyword \lstinline|struct|, the name
+of the structure, an open brace, a listing of field (variable)
+declarations, and a close brace.  It is not followed by a semicolon.
+
+The only supported operations on structures are field references and
+copying.  Field references are of the form \lstinline|a.b|; \lstinline|a| must
+be of some structure type \lstinline|A|, and \lstinline|b| must be a field named
+in the structure declaration of \lstinline|A|.  The type of this expression
+is the declared type of the field.  Note that a similar syntax is used
+for referencing the real and imaginary parts of complex numbers; there
+is an implicit structure declaration
+
+\begin{lstlisting}{}
+struct complex {
+  float real;
+  float imag;
+}
+\end{lstlisting}{}
+
+\noindent
+along with some syntactic sugar to make complex arithmetic work.
+
+\subsubsection{Arrays}
+
+Arrays of any data type described here are supported.  Arrays must be
+of a fixed length.  Array types are written with the base type name,
+followed by a single dimension in square brackets.  Multi-dimensional
+arrays or matrices are supported as arrays of arrays.
+
+\subsubsection{Variable Declarations}
+
+Variable declarations appear in structure declarations, as well as in
+code blocks and \lstinline|filter| declarations.  A variable declaration
+always has the form \lstinline|type name;|, where \lstinline|type| is a data
+type as described here.  Of note, the syntax for array declarations is
+different from C and Java.  A correct declaration is
+\lstinline|int[4] rgbi;|, with the entire type stated before the variable name.
+
+
+\subsection{Stream Types}
+
+Computation in StreamIt is performed within stream objects.  Every
+stream object has an input type and an output data type; the object is
+connected to ``tapes'' of a hypothetically infinite number of
+homogeneous data objects.  \emph{Filters} are atomic, and have
+initialization code and steady-state work code; \emph{pipelines},
+\emph{split-joins}, and \emph{feedback loops} are all composite
+structures that include some number of stream objects as children.
+
+All stream objects have initialization code that runs when the object
+is first created.  For filters, this code may be omitted, and
+generally just sets up filter-local state.  For composite objects, the
+initialization code is responsible for creating the child objects.
+Filters also have one or more \emph{work functions}, which are called
+each time the filter executes.
+
+\paragraph{I/O types.}  Each stream declared at the top level must
+also explicitly declare its input and output types.  This is a
+declaration like \lstinline|int->int| or \lstinline|float->complex|; the first
+type is the stream's input type, the second its output type.  Either
+type may be \lstinline|void|; in this case, the stream has no input or
+output, as appropriate.  If it is a filter, it must not declare a
+peek/pop or push rate.  The top-level stream in a program has type
+\lstinline|void->void|; no other streams of this type are allowed.
+
+\subsubsection{Stream Parameters}
+
+A stream may have a set of parameters provided to it.  These
+parameters are available to all functions within the stream type, and
+may not be changed.  Values for these parameters must be passed in
+when the stream is created.  Stream parameters are declared with types
+and names in a parenthesized list after the name of the stream; when a
+stream it instantiated, values for the parameters must follow the name
+of the stream.  For example:
+
+\begin{lstlisting}{}
+float->float filter MatrixMatrixMultiply(int A,
+                 int B, int C) { ... }
+add MatrixMatrixMultiply(3, 5, 4);
+\end{lstlisting}
+
+\paragraph{Compile-time constants.}  Several things in StreamIt must
+be \emph{compile-time constant}; for example, the I/O rates of a
+filter must be determined at compile-time, and the compiler must be
+able to statically create the expanded stream graph.  An expression is
+compile-time constant if it is a literal, a stream parameter, or an
+expression whose components are entirely compile-time constant.
+
+\subsubsection{Parameterized Stream Types}
+
+Stream types may be \emph{parameterized} on some data type or types,
+much like ``template'' types in C++.  This may be used for
+data-reordering operations, and is used for several cases of built-in
+filters.
+
+Parameterized objects cannot currently be created by the user.  To
+instantiate a built-in parameterized type, use the name of the stream
+type, followed by the name of the data type in angle brackets, such as
+\lstinline|Identity<int>|.
+
+\begin{note}
+User-instantiated parameterized types are a future StreamIt
+extension.
+\end{note}
+
+\subsubsection{Filters}
+
+All computation in StreamIt takes place within filters.  Filters must
+explicitly declare their initialization code if present, but also have
+the option of omitting it.  A filter has a single work function; it
+may also declare other phase functions.  Each work or phase function
+must declare its \emph{I/O rates}, the number of items one call to the
+function removes, examines, or places on its tape.  A basic filter
+declaration looks like this:
+
+\begin{lstlisting}{}
+int->int filter IntAvgFilter {
+  init {
+    // empty
+  }
+  work pop 1 peek 2 push 1 {
+    push(peek(0) + peek(1));
+    pop();
+  }
+}
+\end{lstlisting}
+
+This filter is named \lstinline|IntAvgFilter|; it reads integers off of its
+input tape, and writes integers to its output tape.  Each execution of
+the work function removes exactly one item from the input tape and
+examines at most two items; it causes exactly one item to be pushed on
+to the output tape.
+
+\paragraph{Init functions.}  Init functions are declared using the
+keyword \lstinline|init|.  They take no parameters.  They may initialize
+filter fields or do other work, but have no access to the filter's
+tapes.
+
+\paragraph{Work functions.}  Work functions are declared using the
+keyword \lstinline|work|.  This keyword may be followed by rate
+declarations; if these are absent, the filter is a \emph{phased
+  filter}.  Rate declarations consist of \lstinline|push expr|,
+\lstinline|peek expr|, and \lstinline|pop expr|, in any order.  If the
+peek rate is omitted, it is assumed to be equal to the pop rate; if
+the pop or push rate is omitted, it is assumed to be zero, and the
+corresponding input or output tape type must be \lstinline|void|.  The
+function must push and pop exactly the number of items specified, and
+may peek up to the number of items specified.  All of the rate
+expressions must be compile-time constant.
+
+\paragraph{Phased filters.}  If the work function does not have rate
+declarations, it may not perform \lstinline|push| and \lstinline|pop|
+operations directly.  However, it may call \emph{phase functions},
+which are declared like work functions but begin with the keyword
+\lstinline|phase| and a name, and always have rate declarations.  The
+runtime system ensures that, when a phase function is called, its
+\lstinline|peek| and \lstinline|pop| rates are satisfiable, even if
+other filters need to run for later phases to execute.  Beyond this
+special use, phase functions may not be directly called.  For example:
+
+\begin{lstlisting}{}
+int->int filter BlockReader {
+  // Each block has a 4-int header, 24 ints of data,
+  // and a 4-int footer.
+  work {
+    readHeader();
+    for (int i = 0; i < 24; i++)
+      echoData();
+    readFooter();
+  }
+  phase readHeader pop 4
+     { pop(); pop(); pop(); pop(); }
+  phase echoData pop 1 push 1 { push(pop()); }
+  phase readFooter pop 4
+     { pop(); pop(); pop(); pop(); }
+}
+\end{lstlisting}
+
+\paragraph{Pre-work functions.}  A filter may specify an additional
+work function that is run in place of the normal work function the
+first time the filter executes.  This function uses the
+\lstinline|prework| keyword, and is otherwise identical to the normal
+work function.
+
+\paragraph{Helper functions.}  A helper function performs some
+auxiliary bit of computation, and may be called from the init function
+or the work function.  A helper function has a list of zero or more
+parameters, and returns zero or one values.  A helper function
+declaration contains the return type, the name of the function, the
+parameter list, and the function body, just like a normal C or Java
+function.
+
+\paragraph{Filter state.}  The top level of the filter may include
+variable declarations.  These variables are visible to every function
+in the filter, and may be used to carry state between iterations of
+the work function.
+
+
+\subsubsection{Pipelines}
+
+The simplest composite filter is a pipeline.  A pipeline contains a
+number of child streams; the output of the first stream is connected
+to the input of the second, whose output is connected to the input of
+the third, and so on.  A pipeline declaration looks like
+
+\begin{lstlisting}{}
+float->complex pipeline FloatToComplexAdd {
+  add ReImToComplex();
+  add ComplexPairAdd();
+}
+\end{lstlisting}
+
+The body of the pipeline declaration is the initialization code; no
+internal function declarations or message handlers are allowed.  In
+addition to the internal typing constraints mentioned previously, the
+input type of the pipeline must match the input type of the first
+filter, and the output type of the pipeline must match the output type
+of the last filter.
+
+\begin{figure}[htbp]
+  \begin{center}
+    \begin{picture}(18,9)
+      \put(3,9){\vector(0,-1){1}}
+      \put(0,1){\framebox(6,7)[lt]{\lstinline|Pipeline|}}
+      \put(7,8){\makebox(9,1)[l]{\lstinline|float->float|}}
+      \put(7,7){\makebox(9,1)[l]{\lstinline|pipeline Pipeline \{|}}
+      \put(3,8){\vector(0,-1){1}}
+      \put(1,6){\framebox(4,1){\lstinline|Child1|}}
+      \put(7,6){\makebox(9,1)[l]{\lstinline|\ add Child1();|}}
+      \put(3,6){\vector(0,-1){1}}
+      \put(1,4){\framebox(4,1){\lstinline|Child2|}}
+      \put(7,4){\makebox(9,1)[l]{\lstinline|\ add Child2();|}}
+      \put(3,4){\vector(0,-1){1}}
+      \put(1,2){\makebox(4,1){$\cdots$}}
+      \put(7,2){\makebox(9,1)[l]{\lstinline|\ ...|}}
+      \put(3,2){\vector(0,-1){1}}
+      \put(7,1){\makebox(9,1)[l]{\lstinline|\}|}}
+      \put(3,1){\vector(0,-1){1}}
+    \end{picture}
+    \caption{Pipelines}
+    \label{fig:pipeline}
+  \end{center}
+\end{figure}
+
+
+\subsubsection{Split-Joins}
+
+A split-join allows computation to be run in parallel, possibly using
+different parts of the input stream.  It is so named because incoming
+data passes through a \emph{splitter}, is redistributed to the child
+streams for processing, and then is fed through a \emph{joiner} to be
+recombined into a single output stream; see section
+\ref{sec:expr-splitters-joiners}.
+
+\begin{lstlisting}{}
+int->int splitjoin AddAndSub {
+  split duplicate;
+  add IntAdder();
+  add IntSubtractor();
+  join roundrobin;
+}
+\end{lstlisting}
+
+This split-join has two children.  Incoming data is duplicated on to
+both streams.  The first branch consumes two elements and adds them;
+the second consumes two elements and subtracts them.  The resulting
+values are then pushed on to the output stream in a round-robin
+fashion, with values from alternating streams.
+
+\begin{figure}[htbp]
+  \begin{center}
+    \begin{picture}(29,5)
+      \put(6,5){\vector(0,-1){1}}
+      \put(0,1){\framebox(12,3)[tl]{\lstinline|SplitJoin|}}
+      \put(13,4){\makebox(16,1)[l]
+        {\lstinline|int->int splitjoin SplitJoin \{|}}
+      \put(6,4){\vector(-3,-1){3}}
+      \put(6,4){\vector(0,-1){1}}
+      \put(6,4){\vector(3,-1){3}}
+      \put(13,3){\makebox(16,1)[l]{\lstinline|\ split roundrobin(2);|}}
+      \put(1,2){\framebox(4,1){\lstinline|Child1|}}
+      \put(5,2){\makebox(2,1){$\cdots$}}
+      \put(7,2){\framebox(4,1){\lstinline|ChildN|}}
+      \put(13,2){\makebox(16,1)[l]
+        {\lstinline|\ add Child1(); ... add ChildN();|}}
+      \put(3,2){\vector(3,-1){3}}
+      \put(6,2){\vector(0,-1){1}}
+      \put(9,2){\vector(-3,-1){3}}
+      \put(13,1){\makebox(16,1)[l]{\lstinline|\ join roundrobin;|}}
+      \put(6,1){\vector(0,-1){1}}
+      \put(13,0){\makebox(16,1)[l]{\lstinline|\}|}}
+    \end{picture}
+    \caption{Split-Joins}
+    \label{fig:splitjoin}
+  \end{center}
+\end{figure}
+
+\subsubsection{Feedback Loops}
+
+A feedback loop has a body stream.  Its output passes through a
+splitter; one branch of the splitter leaves the loop, and the other
+goes to the loop stream.  The output of the loop stream and the loop
+input then go through a joiner to the body's input.
+
+\begin{lstlisting}{}
+float->float feedbackloop AddFeedback(float scaling) {
+  join roundrobin;
+  body FloatAdder();
+  loop FloatScaler(scaling);
+  split duplicate;
+  enqueue 0.0;
+}
+\end{lstlisting}
+
+\paragraph{Semantics of splitters and joiners.}  Splitters and joiners
+both treat the stream input as the first child, and the loop edge as
+the second child.  Splitters and joiners that do not allow exactly two
+children are disallowed.
+
+\paragraph{\lstinline|enqueue| statement.}  The \lstinline|enqueue|
+statement takes a value and places it in FIFO order on the output tape
+from the loop stream.  You will generally need to enqueue enough items
+that the input joiner will be able to fire once; enqueuing more items
+causes a delay in the feedback loop.
+
+\begin{figure}[htbp]
+  \begin{center}
+    \begin{picture}(21,9)
+      \put(3,9){\vector(0,-1){1}}
+      \put(10,8){\makebox(11,1)[l]{\lstinline|float->float|}}
+      \put(0,1){\framebox(9,7)[lt]{\lstinline|Feedback|}}
+      \put(10,7){\makebox(11,1)[l]{\lstinline|feedbackloop Feedback \{|}}
+      \put(3,8){\vector(0,-1){1}}
+      \put(10,6){\makebox(11,1)[l]{\lstinline|\ join roundrobin;|}}
+      \put(3,7){\vector(0,-1){1}}
+      \put(1,5){\framebox(4,1){\lstinline|Body|}}
+      \put(10,5){\makebox(11,1)[l]{\lstinline|\ body Body();|}}
+      \put(3,5){\vector(0,-1){3}}
+      \put(3,2){\line(1,0){3}}
+      \put(6,2){\vector(0,1){1}}
+      \put(4,3){\framebox(4,1){\lstinline|Loop|}}
+      \put(10,3){\makebox(11,1)[l]{\lstinline|\ loop Loop();|}}
+      \put(6,4){\line(0,1){3}}
+      \put(6,7){\vector(-1,0){3}}
+      \put(10,2){\makebox(11,1)[l]{\lstinline|\ split roundrobin(4,1);|}}
+      \put(3,2){\vector(0,-1){1}}
+      \put(10,1){\makebox(11,1)[l]{\lstinline|\ enqueue(0.0);|}}
+      \put(3,1){\vector(0,-1){1}}
+      \put(10,0){\makebox(11,1)[l]{\lstinline|\}|}}
+    \end{picture}
+    \caption{Feedback Loop}
+    \label{fig:feedback-loop}
+  \end{center}
+\end{figure}
+
+\subsubsection{Anonymous Streams}
+\label{sec:anonymous-streams}
+
+It is possible to declare a stream object without a name, if it is
+used in exactly one place in the program.  In general anonymous stream
+declarations look exactly like the corresponding normal stream
+declaration, except that the stream type is optional for non-filter
+streams and the name is omitted.  The semicolon that normally ends the
+\lstinline|add|, \lstinline|body|, or \lstinline|loop| statement is
+optional in this case.
+
+\begin{lstlisting}{}
+complex->float feedbackloop FeedbackMagnitude
+    (float scaling) {
+  join roundrobin;
+  body complex->float filter {
+    work pop 2 push 1 {
+      push(abs(peek(0) * peek(1)));
+      pop(); pop();
+    }
+  };
+  loop pipeline {
+    add FloatScaler(scaling);
+    add FloatToComplex();
+  };
+  split duplicate;
+}
+\end{lstlisting}
+
+The input and output types of anonymous streams are determined by the
+compiler, if these types are not explicitly specified in the code.
+
+\subsection{Execution Model}
+
+StreamIt does not explicitly assume sequential or parallel hardware.
+A component of the stream graph may \emph{fire}, possibly in parallel
+with other firings, if its conditions to execute are met.  The
+scheduler in the compiler chooses an order to execute filters such
+that the firing conditions are met.  A particular back-end may place
+additional restrictions on firings; a uniprocessor back-end may
+require that only one stream object executes at a time, or a parallel
+back-end might add the constraint that two objects may not both be
+executing if the output of one is an input of another.  These
+constraints are transparent to the programmer, however.
+
+\begin{itemize}
+\item A filter may fire when its input has at least as many items as
+  its peek rate.  It pops its pop rate from the input, and pushes its
+  push rate on to its output.
+\item A phased filter has a current phase.  Phases are executed in
+  order according to the static control flow in the work function.
+  Code between phase invocations may be executed any time between the
+  preceding and succeeding phases.  The current phase may execute
+  under the same conditions listed above for a filter; execution of
+  the phased filter then may pause until the next phase may fire.
+\item A joiner in a feedback loop or split-join may fire when the
+  specified number of items are available on each of its inputs.  It
+  pushes the sum of the input weights on to its output.
+\item A round-robin splitter may fire when the sum of the number of
+  output items is available on its input, and produces the specified
+  number of items on each output.
+\item A duplicate splitter may fire when at least one item is
+  available on its input.  It pops one item from its input and pushes
+  one item to each output.
+\end{itemize}
+
+\section{Statements}
+
+This section describes statements legal in StreamIt code.  For the
+most part, these are identical to legal statements in C or Java.  Some
+statements, particularly those that set up the stream graph, are only
+legal in initialization code; other statements are legal anywhere.
+
+\subsection{Initialization-Only Statements}
+
+\subsubsection{\lstinline|add| Statement}
+
+The \lstinline|add| statement adds a child stream to the current stream
+object.  It is valid in split-joins and pipelines only.  In a
+split-join, it adds a new stream to the end of the current list of
+children.  In a pipeline, it adds a new stream to the end of the chain
+of children.
+
+This statement takes a \emph{stream constructor}; see section
+\ref{sec:expr-stream-constructor}.
+
+\subsubsection{\lstinline|body| Statement}
+
+The \lstinline|body| statement adds a child stream as the body part of
+a feedback loop.  This statement must be executed exactly once in the
+initialization code of a feedback loop, and is invalid anywhere else.
+
+This statement takes a \emph{stream constructor}; see section
+\ref{sec:expr-stream-constructor}.
+
+\subsubsection{\lstinline|enqueue| Statement}
+
+The \lstinline|enqueue| statement is valid only within the
+initialization code of a feedback loop.  It causes the specified item
+to be placed after all other previously enqueued items on the input to
+the feedback loop joiner.  This statement takes a single value
+expression.
+
+\subsubsection{\lstinline|join| Statement}
+
+The \lstinline|join| statement declares the joiner type of a feedback
+loop or split-join.  It only appears in initialization code, and is
+invalid in initialization code for any other construct.  This
+statement takes a joiner specification; the only one valid currently
+is \lstinline|roundrobin|, see section \ref{sec:expr-round-robin}.
+
+\subsubsection{\lstinline|loop| Statement}
+
+The \lstinline|loop| statement adds a child stream as the loop part of
+a feedback loop.  This statement must be executed exactly once in the
+initialization code of a feedback loop, and is invalid anywhere else.
+
+This statement takes a \emph{stream constructor}; see section
+\ref{sec:expr-stream-constructor}.
+
+\subsubsection{\lstinline|split| Statement}
+
+The \lstinline|split| statement declares the splitter type of a feedback
+loop or split-join.  It only appears in initialization code, and is
+invalid in initialization code for any other construct.  This
+statement takes a splitter specification; only \lstinline|duplicate| and
+\lstinline|roundrobin| are currently legal, see sections
+\ref{sec:expr-duplicate} and \ref{sec:expr-round-robin}.
+
+
+\subsection{Work-only Statements}
+
+These statements may only appear within steady-state work code, and in
+particular, within a filter's \lstinline|prework|, \lstinline|work|
+and \lstinline|phase| function(s).
+
+\subsubsection{\lstinline|push| Statement}
+
+The \lstinline|push| statement takes a value expression and pushes its
+value on to the output tape of the current filter.  The type of the
+expression must match the output type of the filter.
+
+\subsection{General-use Statements}
+
+These statements may appear anywhere code is legal.
+
+\subsubsection{Statements with Java-like Semantics}
+
+\lstinline|do|, \lstinline|for|, and \lstinline|while| loops have the same
+syntax and semantics they do in Java.  The \lstinline|continue| and
+\lstinline|break| statements are also recognized, though they may not
+take  a label reference.
+
+For statements whose syntax match exactly
+
+\begin{lstlisting}{}
+for (i = S; i < N; i++)
+  /* body */ ;
+\end{lstlisting}
+
+\noindent
+cause the induction variable \lstinline|i| to be compile-time constant
+within the loop if the start and end indices \lstinline|S| and \lstinline|N| are
+also compile-time constant.
+
+\subsubsection{Assignment Statements}
+
+Assignment statements have the form \lstinline|lhs = expr;|.  The left-hand
+side may be a variable, a field reference, or an array element
+reference.  Each of these is evaluated to a location, with the result
+being either a primitive value, a structure, or an entire array.  If
+it is a primitive value, the right-hand side must be a value
+expression.  Otherwise, the right-hand side must be an array or
+structure of identical type, and causes all of the elements from the
+right-hand-side object to be copied to the left-hand-side object.
+
+\subsubsection{Variable Declarations}
+
+Variable declarations have the form \lstinline|type name;|.  \lstinline|type|
+must be a data type; \lstinline|name| may be any legal name not
+corresponding to another variable previously declared in the current
+block.  A declaration must appear before the variable is used.  The
+variable declaration may also contain an initialization, as in
+\lstinline|type name = expr;|  The initialization acts exactly as an
+initialization statement, above.
+
+Variables declared without initialization are initialized to 0 as best
+as possible.  \lstinline|complex| variables are initialized to
+\lstinline|0+0i|.  Each element of an array variable is initialized to
+0 as described here.  Similarly, each field of a structure variable is
+initialized to 0 in the same way.
+
+
+\section{Expressions}
+
+\subsection{Value Expressions}
+\label{sec:expr-value}
+
+A \emph{value expression} carries some value of a data type.  Literal
+values are value expressions; these can be signed integer or real
+values, e.g. \lstinline|17|, \lstinline|2.45|, or \lstinline|1.4e6|.  A literal value
+can also be a pure imaginary number, e.g. \lstinline|17i| or \lstinline|3.4i|.
+Unary, binary, and ternary expressions of value expressions are also
+value expressions, as described in section \ref{sec:operators}.  Thus,
+while \lstinline|3+4i| is not a literal, it is a valid value expression of
+complex type.
+
+Field references to structure objects are also value expressions.
+These have the form \lstinline|a.b|, where \lstinline|a| is a variable of
+structured type \lstinline|A| and \lstinline|b| is a field in \lstinline|A|.
+Similarly, array references \lstinline|a[b]| are value expressions;
+\lstinline|a| must be an array variable, and \lstinline|b| must be an
+integer-valued value expression.
+
+\subsubsection{\lstinline|peek| and \lstinline|pop|}
+\label{sec:expr-peek-pop}
+
+The \lstinline|peek| and \lstinline|pop| expressions look at items on
+the incoming tape in a filter's work function; they are illegal in any
+other context.  \lstinline|peek(n)| examines the n-th item on the tape
+without removing it; \lstinline|peek(0)| returns the next incoming
+item, \lstinline|peek(1)| the one afterwards, and so on.
+\lstinline|pop()| returns the same item \lstinline|peek(0)| returns,
+but also removes it from the tape.
+
+\begin{note}
+There is not a guaranteed evaluation order for StreamIt expressions,
+and the implementation of \lstinline|pop()| in C doesn't give any
+guarantees for when the item is actually removed from the tape.  Thus,
+an expression should contain no more than one \lstinline|pop()|, and
+if there is one, there should be no \lstinline|peek()|s.
+\end{note}
+
+Note that \lstinline|pop()| removes an item from the tape, so
+\lstinline|peek()|s afterwards use different indices.  A work function
+must pop a fixed number of items, and declare the number of items in
+its rate declaration.  It may not peek at more items than it declares
+in its rate declaration, though it may peek at fewer.  The peek
+declaration declares the furthest position on the tape examined from
+the point of view of the beginning of the function.
+
+\begin{lstlisting}{}
+int->int filter PeekRates {
+  work pop 1 peek 3 push 1 {
+    int a, b, c, d, e;
+    a = peek(0);
+    b = peek(1);
+    c = pop();   // Same value as a
+    d = peek(0); // Same value as b
+    e = peek(1);
+    push(a + b + c + d + e);
+  }
+}
+\end{lstlisting}
+
+This function pops one item and pushes 1.  It declares a peek rate of
+3 because \lstinline|e| peeks at the third item that was on the tape
+at the start of the function -- one is popped, and \lstinline|e|
+contains the second item beyond that.
+
+\subsubsection{Function Calls}
+\label{sec:expr-funcall}
+
+Function calls are value expressions; certain cases of built-in
+functions may return values that are compile-time constant if their
+parameters are compile-time constant.  The function call syntax
+\lstinline|fn(p1, p2)| is identical to that of Java.  All parameters are
+always passed by value; this differs from Java's semantics, in which
+objects and arrays are passed by reference.
+
+Function calls may be made to declared helper functions, or to
+built-in math functions.  The math functions are listed in table
+\ref{tab:math-functions}.
+
+\begin{note}
+  As an implementation detail, any function name not optimized as a
+  built-in function in the front-end or recognized as a phase or
+  helper function is treated as a call to a function in the Java
+  package \lstinline|java.lang.Math|; see \emph{Java in a Nutshell} or
+  another Java reference for details.  These get blindly translated
+  again to calls to the C math library.
+\end{note}
+
+\begin{note}
+  It is conceivable that calls to side-effect-free functions with
+  compile-time constant parameters return compile-time constant
+  results.  This is only the case for built-in functions in the
+  current implementation of the compiler; adding this involves
+  inlining helper functions, and doing analysis to determine if a
+  helper is in fact side-effect free.
+\end{note}
+
+\begin{table}[htbp]
+  \begin{center}
+    \begin{tabular}{cl}
+      \toprule
+      \texttt{abs(v)} & Real absolute value or complex magnitude \\
+      \texttt{arg(v)} & Polar angle of complex value \\
+      \texttt{exp(v)} & Real or complex exponent \\
+      \texttt{log(v)} & Real or complex natural logarithm \\
+      \texttt{sin(v)} & Real or complex sine \\
+      \texttt{cos(v)} & Real or complex cosine \\
+      \texttt{sqrt(v)} & Real or complex square root \\
+      \texttt{csqrt(v)} & Complex square root \\
+      \bottomrule
+    \end{tabular}
+    \caption{StreamIt Math Functions}
+    \label{tab:math-functions}
+  \end{center}
+\end{table}
+
+\subsection{Stream Constructors}
+\label{sec:expr-stream-constructor}
+
+A \emph{stream constructor} indicates that a new stream object should
+be created.  Stream constructors appear in \lstinline|add|,
+\lstinline|body|, and \lstinline|loop| statements in composite stream
+initialization code.
+
+Stream constructors may reference an already-declared stream type.  In
+this case, the stream constructor form is \lstinline|Name(param, ...)|.
+There must be exactly as many parameters in the constructor as
+parameters for the stream type.  The parameters must all be
+compile-time constant.
+
+An anonymous stream declaration is also a valid stream constructor;
+see section \ref{sec:anonymous-streams}.  A statement containing an
+anonymous stream declaration does not need to be terminated with a
+semicolon, since it ends with a close-brace.
+
+\subsection{Splitters and Joiners}
+\label{sec:expr-splitters-joiners}
+
+Splitters have a single input of a given type and multiple outputs of
+the same type; joiners have multiple inputs and a single output.  They
+appear in feedback loops and split-joins.
+
+\begin{note}
+  Other types of splitters and joiners besides duplicate and
+  round-robin are conceivable; in particular, structure and array
+  packing and unpacking splitters and joiners are obvious.  There also
+  may be demand for ``custom'' splitters and joiners, where a
+  data-reordering operation is described by the programmer.
+\end{note}
+
+\subsubsection{\lstinline|duplicate| Splitters}
+\label{sec:expr-duplicate}
+
+\lstinline|duplicate| splitters take each incoming item and push the
+same item to each of the outgoing tapes, duplicating data.
+
+\subsubsection{\lstinline|roundrobin| Splitters and Joiners}
+\label{sec:expr-round-robin}
+
+\lstinline|roundrobin| splitters take each item and send it to exactly
+one of the child streams, in order.  Either \lstinline|roundrobin| or
+\lstinline|roundrobin()| causes one item to be sent to each output, in
+order; \lstinline|roundrobin(2)| causes two items to be sent to the first
+stream, two to the second, and so on.  \lstinline|roundrobin(2, 4, 2)|
+requires there to be exactly three children, and sends two to the
+first child, four to the second, and two to the third.  A round-robin
+weight may be 0; in this case, the child input must be of type
+\lstinline|void|.  A \lstinline|roundrobin(0)| splitter on a
+split-join means that no children take any input, and the input type
+of the entire split-join is \lstinline|void|.
+
+\lstinline|roundrobin| joiners are identical to \lstinline|roundrobin|
+splitters, except that they read from the input tapes in the specified
+pattern and write data to the output tape.
+
+
+\section{Built-in Types}
+
+This section describes built in data and stream types in StreamIt.
+These types are implicitly declared; code can just use these types
+without explicitly importing or otherwise declaring them.
+
+\subsection{Built-in Data Types}
+
+The \lstinline|complex| type is actually implemented as a structure,
+though the compiler implements syntactic sugar for complex variables.
+The structure definition is shown above in section
+\ref{sec:data-structures}.
+It is legal to explicitly reference the \lstinline|real| and
+\lstinline|imag| fields of complex numbers as though they were the
+structure type instead.
+
+\subsection{Built-in Streams}
+
+Several stream types are in common use, and are either simple enough
+or require non-standard language functionality that the compiler
+should support them directly.  These include parameterized
+\lstinline|Identity|, \lstinline|FileReader|, and \lstinline|FileWriter| types, as
+shown in figure \ref{fig:built-in-streams}.
+
+\begin{figure}[htbp]
+    \begin{lstlisting}{}
+template<T> T->T filter Identity {
+  work pop 1 push 1 { push(pop()); }
+}
+template<T> void->T filter FileReader
+    (string filename) {
+  work push 1 { /* Implementation defined */ }
+}
+template<T> T->void filter FileWriter
+    (string filename) {
+  work pop 1 { /* Implementation defined */ }
+}
+\end{lstlisting}
+    \caption{Built-in Stream Types}
+    \label{fig:built-in-streams}
+\end{figure}
+
+\section{Future Changes}
+
+This section describes features that may appear in future versions of
+StreamIt.
+
+\subsection{Additional Primitive Types}
+
+Support for characters and strings is somewhat uncertain.  There is no
+particular use for a character primitive type in StreamIt at the
+moment, though a byte type may be useful for reading in files.
+Strings may be useful for debugging code, and for file name parameters
+to file reader and writer objects.
+
+\subsection{Parameterized Types}
+
+StreamIt should allow parameterized types, using a syntax similar to
+C++'s \lstinline|template| construct.  For example, one might write:
+
+\begin{lstlisting}{}
+template<T> T->T filter Duplicate {
+  work pop 1 push 2 {
+    T val = pop();
+    push(val);
+    push(val);
+  }
+}
+\end{lstlisting}
+
+Then \lstinline|Duplicate<int>| would be a stream type that duplicates
+integers.
+
+There is some disagreement on how to implement array types.  The
+language currently accepts \lstinline|int[N]->int[N] filter Name(int N)| to
+have a specified-length array.  It may be better to use a template
+construct for this, though then value parameters can appear in two
+different places in the code.
+
+\subsection{Helper Packages}
+
+It is entirely conceivable that the programmer might want to write a
+set of stateless helper functions that can be used in multiple
+filters.  For example, the GSM encoder we have now uses the C
+preprocessor to include a set of functions to perform 16-bit
+arithmetic.  Syntax for this functionality does not yet exist, though
+we may create a \lstinline|static| keyword:
+
+\begin{lstlisting}{}
+static MyHelpers {
+  int square(int x) { return x * x; }
+}
+int->int filter SquareIt {
+  work pop 1 push 1 { push(MyHelpers.square(pop())); }
+}
+\end{lstlisting}
+
+\subsection{Messaging}
+
+The early StreamIt papers mentioned the ability to send messages from
+one filter to another stream object, and defines semantics for this.
+The new StreamIt syntax does not have support for messaging.  However,
+there are fundamentals that we clearly will want:
+
+\begin{itemize}
+
+\item \textbf{Portals.}  The template type syntax can be readily used
+  to implement portal types.  We'll need to add new syntax to register
+  objects with portals and to send messages.
+
+\item \textbf{Message handlers.}  These can use a \lstinline|handler|
+  keyword and have a syntax similar to work function declarations.
+  The most recent agreement is that message handlers can only be
+  installed in filters, avoiding a syntax problem with compound stream
+  initialization code.
+
+\item \textbf{Interfaces.}  It is possible multiple stream types may
+  implement the same set of functions.  An \lstinline|interface|
+  keyword can declare a message interface.  No objects of interface
+  types exist, but portals to these types can be created, and any
+  object that has message handlers matching the signatures in the
+  interface declaration can be added to the portal.
+
+\end{itemize}
+
+This might result in message-handling code that looks like this:
+
+\begin{lstlisting}{}
+float->float filter VolumeControl {
+  float amplification;
+  init { amplification = 1.0; }
+  work pop 1 push 1 { push(pop() * amplification); }
+  handler setAmplification(float val)
+    { amplification = val; }
+}
+
+float->float filter VolDetect
+    (Portal<VolumeControl> vol) {
+  work pop 1 push 1 {
+    float val = pop();
+    if (/* detected */)
+      send vol setAmplification(0.5);
+    push(val);
+  }
+}
+
+float->float pipeline Volume {
+  Portal<VolumeControl> vol;
+  add VolDetect(vol);
+  add_register vol VolumeControl();
+}
+\end{lstlisting}
+
+\subsection{Reinitialization}
+
+We might occasionally want to change parts of the stream graph at
+runtime, or to change the static parameters of the program.  This is a
+major effort the way StreamIt code is currently constructed.  The CC
+paper proposed sending an \lstinline|init| message through a portal to
+perform reinitialization; this would result in the targets'
+\lstinline|init| functions being re-run.
+
+This is simple enough for filters, though some state in the filter may
+be lost that reinitialization would want to be preserved.  What
+happens for composite streams, though?  Are their children destroyed
+and reborn, or are individual children added and removed?  What syntax
+is necessary for this?
+
+\subsection{Variable Rates}
+
+Certain types of applications, such as those involving compression
+algorithms, do not have a fixed ratio of outputs to inputs.  StreamIt
+does not currently support variable rates.  The current proposal is
+that variable rates will be accomodated by phased filters: one phase
+reads the input, and then runs another phase for a certain number of
+executions that writes the output, with the number of executions being
+variable.
+
+It is still possible that dedicated syntax for variable rates will be
+added.  This will likely accomodate bounds on the I/O rates of the
+filter, since a filter might read four bytes of input and produce
+between two and sixteen bytes of output; having this information can
+assist the scheduler.
+
+\subsection{Static Control Flow and Dynamic Phases}
+
+This document should contain a discussion of the notion of
+\emph{static control flow}.  This is essentially a requirement that
+the path through a given control flow graph is determinable at compile
+time; loops can be fully unrolled, and every branch can be
+determined.  This extends the concept of compile-time constancy
+already covered.
+
+This would allow us to refine the current description of phases.  In
+particular, we want the current phase specification to be entirely
+specified by static control.  As a future extension, the control flow
+can be dynamic, to allow data-dependent phase execution.  This can be
+used to implement some forms of dynamic-rate filters.  For example:
+
+\begin{lstlisting}{}
+// Format: #reps, #bytes, data
+byte->byte filter RLEExpand {
+  byte data[256];
+  int reps, count;
+  work {
+    readReps();
+    readCount();
+    for (int i = 0; i < count; i++)
+      readData(i);
+    for (int i = 0; i < reps; i++)
+      writeData(count);
+  }
+  phase readReps pop 1 { reps = pop(); }
+  phase readCount pop 1 { count = pop(); }
+  phase readData(int pos) pop 1 { data[pos] = pop(); }
+  phase writeData() push count {
+    for (int i = 0; i < count; i++)
+      push(data[i]);
+  }
+}
+\end{lstlisting}
+
+Note that the number of executions of the \lstinline|readData| and
+\lstinline|writeData| phases are data-dependent, as is the
+\lstinline|push| rate of \lstinline|writeData|.
+
+\section{Implementation Limits}
+
+The following limits apply to the current implementation of StreamIt:
+
+\begin{itemize}
+\item There is no guaranteed order of evaluation.  In particular, a
+  statement in a work function should not contain more than a single
+  \lstinline|pop()|, and if contains any \lstinline|pop()|s at all, it
+  should contain no \lstinline|peek()|s.
+  
+\item The names \lstinline|SplitJoin|, \lstinline|FeedbackLoop|,
+  \lstinline|Filter|, \lstinline|Pipeline|, \lstinline|StreamIt|, and
+  \lstinline|Complex| are reserved.  Certain variable names beginning
+  with underscores may cause conflicts if used as local variables.
+
+\end{itemize}
+
+\section{History}
+
+\subsection{StreamIt 2.0}
+
+The first formal language specification for StreamIt documented
+StreamIt 2.0.  Version 2.0 of the language adds a completely new
+syntax with simplified constructs for declaring stream objects but
+keeping a Java-like syntax for the bodies of init and work functions.
+Other new features include \lstinline|prework| functions, phased
+filters, and changing from delay functions to \lstinline|enqueue|
+statements in feedback loops.  The \lstinline|null| splitter/joiner
+type was replaced with \lstinline|roundrobin(0)|.
+
+\subsection{StreamIt 1.0}
+
+The initial StreamIt compiler was based on a restricted subset of
+Java, dubbed StreamIt 1.0.  This version of the language used pure
+Java syntax for stream constructs, and was compilable with a normal
+Java compiler given an appropriate run-time library.  Early
+publications referred to the language as StreaMIT, but this
+capitalization is now deprecated.
+
+\end{document}

@@ -1,0 +1,497 @@
+\section{General {\StreamIt} Scheduling Concepts}
+\label{chpt:sched-basic}
+
+\begin{figure}
+\begin{center}
+
+\begin{minipage}{1.2in}
+\centering \psfig{figure=pipeline-buffers.eps,width=0.6in} \\
+{\protect\small (a) A sample {\pipeline}}
+\end{minipage}
+~
+\begin{minipage}{1.2in}
+\centering \psfig{figure=splitjoin-steady-state.eps,width=1.2in} \\
+{\protect\small (b) A sample {\splitjoin}}
+\end{minipage}
+~
+\begin{minipage}{1.5in}
+\centering \psfig{figure=feedback-steady-state.eps,width=1.0in} \\
+{\protect\small (c) A sample {\feedbackloop}.  The $L$ {\filter}
+has been flipped upside-down for clarity.\\ $peek_L = pop_L = 5$
+$push_L = 6, delay_{fl} = 9$}
+\end{minipage}
+
+\caption{Sample {\StreamIt} operators} \label{fig:steady-state}
+
+\end{center}
+\end{figure}
+
+This section introduces the general concepts used for scheduling
+{\StreamIt} programs.  Concepts presented here are common with
+other languages \cite{ptolemyoverview} \cite{esterel92}
+\cite{lustre}.
+
+Section \ref{sec:exec-model} presents the {\StreamIt} execution
+model. Section \ref{sec:steady-state} introduces the concept of a
+steady state and shows how to calculate it. Section
+\ref{sec:init-peeking} explains the need for initialization of
+{\StreamIt} program. Section \ref{sec:general:schedules} introduces
+simple notation for expressing schedules while Section
+\ref{sec:sched-vs-buffer} presents the tradeoff between schedule
+and buffer storage requirements.
+
+\subsection{{\StreamIt} execution model}
+\label{sec:exec-model}
+
+A {\StreamIt} program is represented by a directed graph, $G = (N,
+E)$.  A node in $G$ is either a {\filter}, a {\splitter} or a
+{\joiner}. Edges in $G$ represent data {\Channels}.  Each node in
+$G$ takes data from its {\Input} {\Channel}(s), processes this data,
+and puts the result on the {\Output} {\Channel}(s).  Each data
+{\Channel} is simply a FIFO queue.
+
+In order for a {\filter} $f$ to execute, it must have at least $e_f$
+data on its {\Input} {\Channel}. After its execution it will decrease
+amount of data on its {\Input} {\Channel} by $o_f$ and increase the
+amount of data on its {\Output} {\Channel} by $u_f$. Similarly, a
+{\splitter} will consume $o_s$ data from its {\Input} {\Channel} and
+push $w_{s,i}$ data into each of its {\Output} {\Channels}, while a
+{\joiner} will consume $w_{j,i}$ data from its {\Input} {\Channels} and
+push $u_j$ onto its {\Output} {\Channel}.
+
+\begin{comment}
+Each {\filter} node $n_f$ has exactly one incoming edge and one
+outgoing edge.  The incoming edge is referred to as an {\Input}
+{\Channel}, while the outgoing edge is called an {\Output}
+{\Channel}. A {\splitter} node $n_s$ has exactly one incoming edge
+({\Input} {\Channel}), but has multiple outgoing edges ({\Output}
+{\Channels}). A {\joiner} node has multiple incoming edges ({\Input}
+{\Channels}) but only one outgoing edge ({\Output} {\Channel}).
+
+Each node of graph $G$ can be executed.  An execution of a node
+causes some data to be collected from the node's {\Input}
+{\Channel}(s), the data to be processed and the result to be put on
+the {\Output} {\Channel}(s).  An execution of a node transfers the
+smallest amount of data across the node - it is an atomic
+operation.  {\StreamIt} uses a static data flow model, meaning
+that every execution of a node $n$ will require the same amount of
+data to be present on node's {\Input} {\Channel}(s) for consumption or
+inspection, same amount to be consumed from the {\Input} {\Channel}(s)
+and same amount of data to be pushed onto its {\Output} {\Channel}(s).
+
+Each {\filter} node $n_f$ is associated with a 3-tuple $(e_f, o_f,
+u_f)$. These three values represent the rate of data flow for the
+{\filter} for each execution.  The first value represents the
+amount of data necessary to be present in its {\Input} {\Channel} in
+order to execute the {\filter}.  This is also called the peek
+amount of the {\filter}.  The second value represents the amount
+of data which will be consumed by the {\filter} from its {\Input}
+{\Channel}. This is called the pop amount of the {\filter}.  Note,
+that $e_f \ge o_f$. The final value represents the amount of data
+that will be put on the {\Output} {\Channel} of the {\filter}. This is
+called the push amount of a {\filter}.  The amount of data present
+in the {\Input} {\Channel} of a {\filter} node $n_f$ is denoted
+$in_f$, while data present in the {\Output} {\Channel} is denoted
+$out_f$.
+
+Each {\splitter} node $n_s$ is associated with a tuple $(o_s,
+w_s)$. The first value represents the amount amount of data that
+will be consumed by $n_s$ from its {\Input} {\Channel}. Thus, in
+order to execute $n_s$, there must be at least $o_s$ data in its
+{\Input} {\Channel}. $w_s$ is a vector of integers, each
+representing the amount of data that will be pushed onto a
+corresponding {\Output} {\Channel} of $n_s$.  The amount of data
+present in the {\Input} {\Channel} of a {\splitter} node $n_s$
+is denoted $in_s$, while data present in the $i$th {\Output}
+{\Channel} is denoted $out_{s,j}$.
+
+Each {\joiner} node $n_j$ is associated with a tuple $(w_j, u_j)$.
+The first value is a vector of integers, each representing the
+amount of data that will be consumed by $n_j$ from its
+corresponding {\Input} {\Channels}.  In order to execute $n_j$,
+each of its {\Input} {\Channels} must have at least as much data
+in it as the corresponding value in $w_j$ indicates.  $u_j$
+represents the amount of data that will be pushed by $n_j$ onto
+its {\Output} {\Channel}. The amount of data present in the $i$th
+{\Input} {\Channel} of a {\joiner} node $n_j$ is denoted
+$in_{j,i}$, while data present in the {\Output} {\Channel} is
+denoted $in_s$.
+\end{comment}
+
+A schedule for a {\StreamIt} program is a list of executions of
+nodes of graph $G$.  The list describes the order in which these
+nodes are to be executed.  In order for a schedule to be legal, it
+must satisfy two conditions: first,for every execution of a node,
+a sufficient amount of data must be present on its {\Input}
+{\Channel}(s); second, the execution of the schedule must require
+a finite amount of memory.
+
+\subsection{Steady State}
+\label{sec:steady-state}
+
+A {\StreamIt} schedule is an ordered list of firings of nodes in the
+{\StreamIt} graph.  Every firing of a node consumes some data from
+{\Input} {\Channel}(s) and pushes data onto the {\Output} {\Channel}(s).
+
+One of the most important concepts in scheduling streaming
+applications is the steady state schedule.  A steady state
+schedule is a schedule that the program can repeatedly execute
+forever.  It has a property that the amount of data buffered up
+between any two nodes does not change from before to after the
+execution of the steady state schedule.
+
+\begin{comment}
+This property is important, because it allows the compiler to
+statically schedule the program at compile time, and simply repeat
+the schedule forever at runtime.  A schedule without this property
+cannot be repeated continuously.  This is because the delta in
+amount of data buffered up on between nodes will continue
+accumulating, requiring an infinite amount of buffering space.
+\end{comment}
+
+A steady state of a program is a collection of number of times
+that every node in the program needs to execute in a steady state
+schedule.  It does not impose an order of execution of the nodes
+in the program.
+\begin{comment}
+Not every {\StreamIt} program has a steady state schedule.  It is
+possible for a program to have unbalanced production and
+consumption of data in {\splitjoins} and {\feedbackloops}. The
+amount of data buffered continually increases, and cannot be
+reduced, thus making it impossible to create a steady state
+schedule for them.  It is also possible that a {\feedbackloop}
+does not have enough data buffered up internally in order to
+complete execution of a full steady state, and thus deadlocks.
+Programs without a valid steady state schedule are not considered
+valid {\StreamIt} programs. In other words, all valid {\StreamIt}
+programs have a steady state schedule.
+\end{comment}
+
+\subsubsection{Minimal Steady State}
+
+The size of a steady state is defined as the sum of all executions
+of all the nodes in the program per iteration of the steady state.
+
+\begin{definition}
+A steady state of a stream operator $s$ is represented by vector
+$m$ of non-negative integers. Each of the elements in $m$
+represents the number of times a corresponding node in $s$ must be
+executed in the steady state.
+\end{definition}
+
+Note that $m$ does not impose an order of execution of nodes. Size
+of a steady state is the total number of executions of all the
+nodes in the steady state.
+
+Next we will summarize the properties of schedules presented in
+\cite{lee87static}. Detailed proofs of these properties are
+presented in \cite{karczma-thesis}.
+
+\begin{theorem}[Minimal Steady State Uniqueness]
+A {\StreamIt} program that has a valid steady state, has a unique
+minimal steady state.
+\end{theorem}
+
+This means that every valid {\StreamIt} program has a unique minimal
+steady state. Our scheduler will produce schedules that execute
+exactly the minimal steady state of a program.
+
+\begin{comment}
+\begin{proof}[Minimal Steady State Uniqueness]
+Assume that there are two different minimal steady states with
+same size.  Let $m$ and $q$ denote vectors representing the two
+steady states. Let $\sum_i m_i$ denote size of schedule $m$ and
+$\sum_i q_i$ denote size of schedule $q$. Note that since both $m$
+and $q$ are minimal steady states, $\sum_i m_i = \sum_i q_i$.
+Since the schedules are different, there must be some $j$ for
+which $m_j \ne q_j$. Assume without loss of generality that $m_j <
+q_j$. Since a steady state does not change the amount of data
+buffered between nodes, the node producing data for node $i$ must
+also execute less times than corresponding node in $q$. Similarly,
+the node consuming data produced by node $j$ also must execute
+less times than the corresponding node in schedule $q$. Since a
+{\StreamIt} program describes a connected graph, it follows that
+$\forall i, m_i < q_i$.  Thus $\sum_i m_i \ne \sum_i q_i$, which
+is a contradiction. Thus there cannot be two different minimal
+steady state.
+\end{proof}
+
+\begin{corollary}[Minimal Steady State Uniqueness]
+\label{corollary:minimal-state}
+The additional property we have from the above proof is that if
+$m$ represents a minimal steady and $q$ any other steady state,
+then $\forall i, m_i < q_i$.
+\end{corollary}
+
+\begin{lemma}[Composition of Steady Schedules]
+\label{lemma:composition}
+If $m$ and $q$ are two steady states for a {\StreamIt} program, then
+$m + q$ is also a steady state.
+\end{lemma}
+
+The above lemma is true because neither $m$ nor $q$ change the
+amount of data buffered in the {\Channels}.  Thus a composition of
+the steady states does not change the amount of data buffered in
+the {\Channels}, which makes the composition also a steady schedule.
+
+\begin{corollary}[Composition of Steady Schedules]
+\label{corollary:composition}
+If $m$ and $q$ are two steady states, and $\forall i, m_i > q_i$,
+then $w = m - q$ is also a steady state.
+\end{corollary}
+
+If $q$ is a steady state and $m = w + q$ is a steady state, then
+$w$ must not change the amount of data buffered in {\Channels}. Thus
+$w$ must be a steady state.
+\end{comment}
+
+\begin{theorem}[Multiplicity of Minimal Steady States]
+If a {\StreamIt} program has a valid steady state, then all its
+steady states are strict multiples of its minimal steady state.
+\label{thm:multiplicity}
+\end{theorem}
+
+\begin{comment}
+\begin{proof}[Multiplicity of Minimal Steady State]
+Assume that there exists a steady state that is not a multiple of
+the minimal steady state.  Let $m$ denote the minimal steady
+state. Let $q$ denote the other steady state.  Note that $w = q -
+m$ is still a steady state, as long as all elements of $w$ remain
+non-negative (by Corollary \ref{corollary:composition}).  Repeat
+subtracting $m$ from $q$ until no more subtractions can be
+performed without generating at least one negative element in
+vector $w$.  Since $q$ is not a multiple of $m$, $w \ne 0$. But
+since we cannot subtract $m$ from $w$ any further, $\exists i, m_i
+> w_i$.  Since $m$ is a minimal steady state and $w$ is a steady
+state, this is impossible due to Corollary
+\ref{corollary:minimal-state}. Thus there are no steady states
+that are not multiples of the minimal steady schedule.
+\end{proof}
+\end{comment}
+
+This property means that in order to find a minimal steady state
+schedule of an operator we can find any of its steady states and
+divide it by the $gcd$ of executions of all nodes in the operator
+to find the minimal steady state schedule. A detailed explanation
+of minimal steady state schedules is presented in Appendix
+\ref{apx:eqs}.
+
+\subsubsection{Calculating Minimal Steady States}
+\label{sec:calc-min-steady}
+
+Minimal steady states are calculated recursively in a hierarchical
+manner. That is, a minimal steady state is calculated for all
+child operators of {\pipeline}, {\splitjoin} and {\feedbackloop},
+and then the schedule is computed for the actual parent operator
+using these minimal states as atomic executions.
+\begin{comment}
+This yields a minimal steady state because all child operators
+must execute their steady states (to avoid buffering changes), and
+all steady states are multiples of the minimal steady states (per
+Theorem \ref{thm:multiplicity}).
+\end{comment}
+Executing a full steady state of an operator is referred to as
+``executing an operator". The notation for $peek$, $pop$ and
+$push$ is is extended to mean entire operators in their minimal
+steady state execution.  That is, a {\pipeline} $p$ will consume
+$o_p$ data, produce $u_p$ data and peek $e_p$ data on every
+execution of its steady state.  Again, in the hierarchical view of
+{\StreamIt} programs, a child operator of a {\pipeline} will
+execute its steady state atomically.
+
+A steady state of a stream operator $s$ is represented by an
+ordered set $S_s$ of elements, $S_s = \{m, N, c, v\}$. The set
+includes a vector $m$, which describes how many times each
+{\StreamIt} node of the operator will be executed in the steady
+state, a corresponding ordered set $N$ which stores all the nodes
+of the operator, a vector $c$, which holds values $[e_s, o_s,
+u_s]$ for stream operator $s$, and a vector $v$ which holds number
+of steady state executions of all direct children of $s$. $m$ and
+$v$ are not the same vector, because $m$ refers to nodes in the
+subgraph, while $v$ refers only to the direct children, which may
+be {\filters}, {\pipelines}, {\splitters} and {\feedbackloops}.
+For a stream operator $s$, set $S$ is denoted as $S_s$ and the
+elements of $S_s$ are denoted as $S_{s,m}$, $S_{s,N}$, $S_{s,c}$
+and $S_{s,v}$.
+
+Note, that a steady state does not say anything about the ordering
+of the execution of nodes, only how many times each node needs to
+be executed to preserve amount of data buffered by the operator.
+
+We omit the equations for calculating the minimal steady states
+for brevity. Details can be found in Appendix \ref{apx:eqs}. As an
+example, the {\splitjoin} from Figure \ref{fig:steady-state}(b) has
+the following steady state:
+
+\begin{displaymath}
+S_{sj} = \left\{
+\begin{array}{c}
+2 * S_{sj_0, m} \circ 1 * S_{sj_1, m} \circ [2\ 2], \\
+S_{sj_0, N} \circ S_{sj_1, N} \circ \{sj_s, sj_j\}, \\
+\left[
+\begin{array}{c}
+2 * 3 \\ 2 * 3 \\ 2 * 4
+\end{array}
+\right], \left[
+\begin{array}{c}
+2 \\ 1 \\ 2 \\ 2
+\end{array}\right]
+\end{array} \right\}
+\end{displaymath}
+
+\subsection{Initialization for Peeking}
+\label{sec:init-peeking}
+
+Consider a {\filter} $f$, with $e_f = 2$ and a $o_f = 1$. When a
+{\StreamIt} program is first run, there is no data present on any
+of the {\Channels}.  This means that for the first execution,
+{\filter} $f$ requires that two data items be pushed onto its
+{\Input} {\Channel}.  After the first execution of $f$, it will
+have consumed one data item, and left at least one data item on
+its {\Input} {\Channel}.  Thus in order to execute $f$ for the
+second time, at most one extra data item needs to be pushed onto
+$f$'s {\Input} {\Channel}.  The same situation persists for all
+subsequent executions of $f$ - at most one additional data item is
+required on $f$'s {\Input} {\Channel} in order to execute $f$.
+
+This example illustrates that first execution of a {\filter} may
+require special treatment.  Namely, the source for {\filter}'s data
+may need to push more data onto {\filter}'s {\Input} {\Channel} for
+{\filter}'s first execution.  Due to this condition, a {\StreamIt}
+program may need to be initialized before it can enter steady
+state execution.
+
+\begin{comment}
+There are other constraints (latency constraints) which may
+require more complex initialization.  These will be discussed in
+Chapter \ref{chpt:constrained}.
+
+After an execution, a {\filter} $f$ must leave at least $e_f - o_f$
+data on its {\Input} {\Channel}.  Thus, if the only constraints on
+initialization are peek-related, it is a sufficient condition for
+entering steady state schedule that $\forall f \in {\filters}, in_f
+\ge e_f - o_f$.
+
+Specific strategies for generating initialization schedules for
+peeking will be presented in Chapter \ref{chpt:hierarchical} and
+Chapter \ref{chpt:phased}.
+\end{comment}
+
+\subsection{Schedules}
+\label{sec:general:schedules}
+
+Once a program has been initialized, it is ready to execute its
+steady state. In order to do this, a steady state schedule needs
+to be computed. The steady states computed above do not indicate
+the ordering of execution of the nodes, only how many times the
+nodes need to be executed.
+
+A schedule is an ordering of nodes in a {\StreamIt} operator. In
+order to execute the schedule, we iterate through all of its nodes
+in order of appearance and execute them one by one.  For example
+in order to execute schedule $\{ABBCCBBBCC\}$ we would execute
+node A once, node B twice, node C two times, node B three times
+and node C twice again, in that order. In order to shorten the
+above schedule we can run-length encode it.  The schedule becomes
+$\{A \{2B\}\{2C\}\{3B\}\{2C\}\}$.
+
+\subsection{Schedule Size vs. Buffer Size}
+\label{sec:sched-vs-buffer}
+
+\begin{comment}
+\begin{figure}
+\begin{center}
+
+\psfig{figure=pipeline-buffers.eps,width=0.6in} \caption[4 {\filter}
+{\pipeline}]{Sample 4 {\filter} {\pipeline}.  This {\pipeline} is
+the same as one in Figure \ref{fig:steady-state} (a), except that
+its children do not peek extra data} \label{fig:pipeline-buffers}
+\end{center}
+\end{figure}
+\end{comment}
+
+When creating a schedule, two very important properties of it are
+schedule size and amount of buffering required.  Schedule size
+depends on encoding the schedule in an efficient way, while amount
+of space required depends only on order of execution of nodes. The
+two are related, however, because order of execution of {\filters}
+affects how efficiently the schedule can be encoded.
+
+For example, execution of {\filters} in {\pipeline} depicted in
+Figure \ref{fig:steady-state} can be ordered in two simple ways,
+one resulting in a large schedule but minimal amount of buffering,
+the other resulting in a small schedule but a large amount of
+buffering.
+
+The steady schedule of the {\pipeline} in Figure
+\ref{fig:steady-state}(a) executes {\filter} $A$ 4 times,
+{\filter} $B$ 6 times, {\filter} $C$ 9 times and {\filter} $D$ 3
+times. Writing out a schedule that requires minimal buffering
+results in schedule $\{AB\{2C\}BCDAB\{2C\}ABCDB\{2C\}ABCD\}$. This
+schedule requires a buffer for 4 data items between {\filters} $A$
+and $B$, 4 items between $B$ and $C$ and 3 items between $C$ and
+$D$, resulting in total buffers size 11, assuming data items in
+all buffers require the same amount of space. The schedule itself
+has 18 entries.
+
+To compare, writing the schedule in the most compact method we get
+$\{4A\}\{6B\}\{9C\}\{3D\}$  This schedule requires a buffer for 12
+data items between {\filters} $A$ and $B$, 18 items between $B$
+and $C$, and 9 data items between $C$ and $D$, resulting in total
+buffers size 39.  The schedule has 4 entries.
+
+Even on such a small example, it is easy to see that the encoding
+scheme for a schedule has an immense influence over the amount of
+space necessary to store the buffered data and the schedule.
+
+\begin{comment}
+We can compare the storage efficiency of these two schedules by
+assuming that one data item in a buffer requires $x$ amount of
+memory and each entry in a schedule requires $y$ amount of memory.
+Thus the two schedules will require the same amount of storage to
+store themselves and execute if $11 x + 18 y = 39 x + 4 y$.
+
+\begin{displaymath}
+\begin{array}{rcl}
+11 x + 18 y & = & 39 x + 4 y \\
+14 y & = & 28 x \\
+y & = & 2x
+\end{array}
+\end{displaymath}
+
+Thus the smaller schedule is more efficient if every data item
+requires less than twice the amount of storage than every entry in
+the schedule.
+
+One of the difficulties in scheduling {\StreamIt} programs lies in
+finding a good set of trade-offs between schedule size and
+buffering requirements.
+\end{comment}
+
+\begin{comment}
+
+\subsection{Minimum Buffer Size between {\filters}}
+
+As illustrated above, the amount of buffering in a {\pipeline} can
+be affected greatly by the order of executions of {\filters} in the
+{\pipeline}.  The following equation calculates the minimal buffer
+size required in order for two {\filters} to be able to push data
+between each other indefinitely in the most buffer-efficient way.
+Buffers this size cannot always be achieved, because some
+components require that data be buffered up for execution (ex.
+{\feedbackloops} require data to exist internally in order to
+execution to advance) or because extra latency constrains require
+additional buffering.
+
+\begin{equation}
+buffer_{A \to B} = \left\lceil {{peek_B} \over {\gcd(push_A,
+pop_B)}} - 1 \right\rceil \gcd (push_A, pop_B) + push_A
+\end{equation}
+
+\emph{I can explain this equation, but I cannot prove it.  what
+should I do with this?  it's not necessary for the thesis, but it
+is a neat result we never published (PLDI submission), nor have I
+seen it in any other papers (nobody does peeking, so it can't be
+anywhere else)}
+
+\end{comment}

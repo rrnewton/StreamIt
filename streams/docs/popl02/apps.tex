@@ -1,0 +1,161 @@
+\section{Applications}
+
+\subsection{Node-Level Optimization}
+
+Perhaps the most immediate application of our technique is to use the
+SARE representation to bridge the gap between intra-node dependences
+and inter-node dependences.  Our presentation in the last section was
+in terms of a coarse-grained work function $W$ mapping inputs to
+outputs.  However, if the source code is available for the node, then
+the equations containing $W$ can be expanded into another level of
+affine recurrences that represent the implementation of the node
+itself.  (If the node contained only static control flow, then this
+formulation as a SARE would be exact; otherwise, one could use a
+conservative approximation of the dependences.)
+
+The resulting SARE would expose the fine-grained dependences between
+local variables of a given node with the local variables of
+neighboring nodes.  We believe that this information opens the door
+for a wide range of novel node optimizations, which we outline in the
+following sections.
+
+\subsubsection{Inter-Node Dataflow Optimizations}
+
+Once the SARE has exposed the flow dependences between the internal
+variables of two different nodes, one can perform all of the classical
+dataflow optimizations as if the variables were placed in the same
+node to begin with.  For instance, constant propagation, copy
+propagation, common sub-expression elimination, and dead code
+elimination can all be performed throughout the internals of the nodes
+as if they were connected in a single control flow graph.
+
+Some of these optimizations could have a very large performance
+impact; for instance, consider a 2:1 downsampler node that simply
+discards half of its input.  Using a SARE, it is straightforward to
+trace the element-wise dependence chain from each discarded item, and
+to mark each source operation as dead code (assuming the code has no
+other consumers.)  In this way, one can perform fine-grained {\bf
+decimation propagation} throughout the entire graph and prevent the
+computation of any items that are not needed.  This degree of
+optimization is not possible in frameworks that treat the node as a
+black box.
+
+\subsubsection{Fission Transformations}
+
+It may be the case that many of the operations that are grouped within
+a node are completely independent, and that the node can be split into
+sub-components that can execute in parallel or as part of a more
+fine-grained schedule.  For instance, many operations using complex
+data types are grouped together from the programmer's view, even
+though the operations on the real and imaginary parts could be
+separated.  Given a SARE representation of the graph and the node,
+this ``node fission'' is completely automatic, as there would be no
+dependence between the operations in the SARE.  A scheduling pass
+would treat the real and imaginary operations as if they were written
+in two different nodes to begin with.
+
+\subsubsection{Steady-State Invariant Code Motion}
+
+In the streaming domain, the analog of loop-invariant code motion is
+the motion of code from the steady-state epoch to the initialization
+epoch if it does not depend on any quantity that is changing during
+the steady-state execution of a node.  Quantities that the compiler
+detects to be constant during the execution of a work function can be
+computed from the initialization epoch, with the results being passed
+through a feedback loop for availability on future executions.
+
+\subsubsection{Induction Variable Detection}
+
+The work functions and feedback paths of a node could be analyzed (as
+would the body of a loop in the scientific domain) to see if there are
+induction variables from one steady-state execution to the next.  This
+analysis is useful both for strength reduction, which {\it adds} a
+dependence between invocations by converting an expensive operation to
+a cheaper, incremental one, as well as for data parallelization, which
+{\it removes} a dependence from one invocation to the next by changing
+incremental operations on filter state to equivalent operations on
+privatized variables.
+
+\subsection{Graph Parameterization}
+
+In the scientific community, the SARE representation is specifically
+designed so that a parameterized schedule can be obtained for loop
+nests without having to unroll each loop and schedule each iteration
+independently.  The same should hold true for dataflow graphs.  Often
+there is redundant structure within a graph, such as an N-level
+filterbank.  However, to the best of our knowledge, all scheduling
+algorithms for synchronous dataflow operate only on a fully expanded
+graph (``parameterized dataflow'' is designed more for flexible
+re-initialization, and dynamically schedules an expanded version of
+each program graph~\cite{Bhatt00}.)
+
+We believe that parameterized scheduling would be straightforward
+using the polyhedral model to represent the graph.  For future work,
+we plan on implementing such a scheduler in the StreamIt
+compiler~\cite{Gordo02}.  The StreamIt language~\cite{streamitcc} is
+especially well-tailored to this endeavor because it provides basic
+stream primitives that are hierarchical and parameterizable (e.g., an
+N-way SplitJoin structure that has N parallel child streams.)
+
+\subsection{Graph-Level Optimization}
+
+The SARE representation could also have something to offer with
+regards to the graph-level optimization problems that are already the
+focus of the DSP community.  The polyhedral model is appealing because
+it provides a linear algebra framework that is simple, flexible, and
+efficient.
+
+\subsubsection{Buffer Minimization}
+
+Storage optimization is one area in which both the scientific
+community~\cite{Lim01,Quillere,Thies01,Lefebvre98} and the DSP
+community~\cite{murt1997x1,GGD94,murt2001x1} have invested a great
+deal of energy.  Both communities have invented schemes for detecting
+live ranges, collapsing arrays across dead locations, and sharing
+buffers/arrays between different statements.  It will be an
+interesting avenue for future work to use the SARE representation of
+dataflow graphs to compare the sets of storage optimization algorithms
+and see what they have to offer to each other.
+
+\subsubsection{Scheduling}
+
+There is a large body of work in the scientific community regarding
+the scheduling of SARE's~\cite{DRV00}.  While they have not faced the
+same constraints on code size as the embedded domain, there are
+characteristics of affine schedules that could provide new directions
+for DSP scheduling algorithms.  For instance, when solving for an
+affine schedule, one can obtain a schedule that places a statement
+within a loop nest but only executes it conditionally for certain
+values of the enclosing loop bounds.  To the best of our knowledge,
+the single appearance schedules in the DSP community have never had
+this notion of conditional execution, perhaps because it represents a
+much larger space of schedules to consider.  It is possible that an
+affine schedule, then, would give a more flexible solution when code
+size is the critical issue.
+
+Also, there are a number of sophisticated parallelization algorithms
+(e.g., Lim and Lam~\cite{Lim01}) that could extract high performance
+from dataflow graphs.  It will be an interesting topic for future work
+to see how they compare with the scheduling algorithms currently in
+use for dataflow graphs.
+
+%% \subsection{Verification}
+
+%% Buffer overrun, no exploding schedules, etc.
+
+%% \subsection{Semantics of Time}
+
+%% \noindent {\bf \dep}
+
+%% \begin{align*}
+%% \DEP{X}{Y}(i) = max_{\preceq}~\{~ j ~|~ \exists ~&~ T_0 \dots T_n, ~ k_0 \dots k_n, ~ {\cal E}_1 \dots {\cal E}_n ~ s.t. ~ & ~ \\ 
+%% ~ & T_0 = Y ~\wedge~ T_n = X ~\wedge~ k_0 = j ~\wedge~ k_n = i ~\wedge~ & ~ \\
+%% ~ & \forall p \in 1 \dots n:~~T_p(k_p) \equiv f_{{\cal E}_p}(\dots, T_{p-1}(h_{{{\cal E}_p}, T_{p-1}}(k_p)), \dots) ~ \} & ~ \\
+%% \end{align*}
+
+%% In StreamIt, this function is composable because of single-input,
+%% single-output blocks.  Since every junction is a one-dimensional
+%% array, it gives unique point in time for a given filter.  Can use this
+%% to think modularly/composably about time in components, too.
+
+%% Describe messaging semantics?  Is there space?

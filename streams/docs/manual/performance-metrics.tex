@@ -1,0 +1,390 @@
+% $Id: performance-metrics.tex,v 1.6 2003-02-19 16:12:25 dmaze Exp $
+\section{Measuring StreamIt Performance}
+\subsection{Introduction}
+{\huge This section is slightly out of date -- there is a new number
+gathering infrastructure that Gordo made.} 
+
+To use the new infrastructure, run the compiler with the {\tt
+--numbers <n>} option, where {\tt <n>} represents the number of
+steady-state cycles that should be measured.  Then find your results
+in the {\tt results.out} file.  For manual number gathering, you might find
+use for some of the {\tt btl} commands described in this section.
+
+\vspace{12pt}
+
+\noindent Andrew Lamb 8/6/2002
+
+This section is intended to introduce people how to measure the performance
+of StreamIt programs.
+
+
+\subsection{Performance on RAW}
+\subsubsection{\textit{btl} Simulator Setup}
+To be done.
+
+\subsubsection{Running the compiler}
+The actual command to run the compiler is 
+\begin{verbatim}java -Xmx512M  at.dms.kjc.Main -s MyProgram.java\end{verbatim}
+
+If you have copied a \texttt{.cshrc} file from someone else in the
+StreamIt group, you mist likely have the above command aliased to \texttt{s}
+so the above can be run using the following shorthand notation:
+\begin{verbatim}s MyProgram.java\end{verbatim}
+
+There are also a number of options, which control optimizations,
+which I will elucidate here because they are not written up anywhere
+else that I can find.
+\begin{description}
+\item [-c or --constprop] Turns on FIELD propagation.
+\item [-a or --partition] Turns on auto partitioning
+\item [-o or --fusion] Fuses the entire stream into one gigantic filter
+\item [-u] Turns on loop unrolling (which is unnecessary as it is run with fieldprop automatically)
+\item [-k] Turns on sync removal
+\item [-x] Turns on rate matching. Doesn't actually exist (eg don't use this option)
+\item [-S] Uses the old partitioner/fuser (ostensibly)
+\end{description}
+
+
+\subsubsection{Running the simulator}
+To run the RAW program that the StreamIt compiler just created
+you can type 
+
+\begin{verbatim}make -f Makefile.streamit run\end{verbatim}
+
+This command will cause the simulator to boot up, execute the startup code
+and then run for a bunch of cycles. If you want to quit before the 
+simulation is done, use CTL-C. 
+
+Output from the simulator should look something like the following:
+\begin{verbatim}
+[03: 000034de8]: 0
+[03: 000037ab4]: 0
+[03: 00003a74a]: 0
+[03: 00003d44a]: 0
+[03: 0000400d3]: 0
+[03: 000042d1c]: 0
+[03: 000045998]: 1
+[03: 0000485d2]: 1
+[03: 00004b248]: 1
+[03: 00004de94]: 2
+[03: 000050b08]: 2
+\end{verbatim}
+
+The first number (03) represents the fact that the tile at row 0, column 3
+issued the print command. The next number 
+(eg 000034de8) is the cycle count (in hexadecimal) at which the third number was produced. The 
+third number is the output value that is produced by your program.
+
+\subsubsection{Running in debug mode}
+To run the simulator in interactive debug mode, you should run
+\begin{verbatim}make -f Makefile.streamit debug\end{verbatim}
+
+Which will bring up a ``shunt'' window which looks something like this:
+
+\begin{verbatim}
+Configuration: 
+
+[THREAD   DEVICE NAME    RESET ROUTINE          CALC ROUTINE           PARAM   ]
+
+[0816d010 Serial Rom     dev_serial_rom_reset   dev_serial_rom_calc    08105880]
+[084230a0 Print Service  dev_print_service_rese dev_print_service_calc 0816a720]
+[08420e48 DRAM           dev_dram_reset         dev_dram_calc          08426068]
+[08455c70 DRAM           dev_dram_reset         dev_dram_calc          0842a4d0]
+[08445000 DRAM           dev_dram_reset         dev_dram_calc          0841efc0]
+[0842bcf8 DRAM           dev_dram_reset         dev_dram_calc          0843fe68]
+[08420708 Quick Print De dev_quick_print_reset  dev_quick_print_calc   08424fa0]
+
+// Use VMShowPositionOfThread(THREAD #); to inspect execution of device 
+
+/*[0] 0*/ 
+\end{verbatim}
+
+by typing 
+
+\begin{verbatim}go();\end{verbatim}
+
+you can start the simulator, which will then boot up the raw processor,  
+bring your program into memory, and perform any other initialization tasks 
+that it needs to do.
+
+After initialiation (which takes time proportional to the amount of code
+that needs to be loaded into raw) you will get a message and a prompt much like
+
+\begin{verbatim}
+/*[0] 0*/ go();
+running...
+// [ serial rom : finished tile.rbf --> static port 15 ]
+// *** interrupted [13756/inf]
+stopped.
+/*[2129249] 1*/ 
+\end{verbatim}
+
+You are now ready to start doing useful things with the debugger.
+
+\paragraph{go();}
+If you simply run the \texttt{go();} command, you will set the simulator executing, 
+without any limit as to how many cycles it will run.
+
+If you want to stop the simulator, you can hit CTL-C in the main window (not the
+shunt window), which will give you the command prompt back in the shunt window.
+
+\paragraph{step(xxxxx);}
+By running the \texttt{step(xxxxx);} command, you will step the simulator 
+forward xxxxx cycles. At the end of that many cycles, the simulator 
+will stop executing and return you to a command prompt.
+
+By stepping the simulator xxxxx cycles, each processor (of the 16) is stepped
+forward xxxxx cycles.
+
+\paragraph{sv(xxxxx);}
+By running the \texttt{sv();} command, you will generate the much vaunted
+bloodgraph that is the proverbial bread and butter of the StreamIt performance
+SWAT team. The simulator will run the program for xxxxx cycles, and then
+emit a bloodgraph that graphically depicts the program's state during those
+xxxxx cycles. (The bloodgraph is displayed using an external call to \textit{xv}).
+
+Also of interest is the \texttt{workCount} line that is displayed. The
+following line was generated by running \textit{sv(500);}.
+
+\begin{verbatim}workCount = 6865 / 8000\end{verbatim}
+
+The first number is the number of useful work cycles that the raw chip did. The second
+number is the total number of cycles available to the program.
+
+There is a subtlety involved. The total available cycles will be exactly $16*xxxxx$ where 
+xxxxx is the number of cycles that sv was run with (eg \texttt{sv(xxxxx);}). This
+corresponds to the fact that there are 16 tiles on raw and each was run for xxxxx cycles.
+However, if a tile is not doing useful work (eg StreamIt did assign it any code)
+all of the xxxxx cycles for that tile are reported as doing ``useful'' work, while this is
+clearly not the case. 
+
+If you want to know how many tiles are not in use, you can either examine the 
+layout file generated by the StreamIt compiler (\textit{layout.dot}) or you
+can look at the bloodgraph. Any tile that shows up as totally white (no green or anything) is
+not actually doing useful work (it must be sitting in some sort of busy loop,
+or executing \texttt{NOP}s or something.
+
+\paragraph{count\_FLOPS(xxxxx);}
+If you want to know how many floating point operations (FLOPS) your 
+program performed, you can use the \texttt{count\_FLOPS(xxxxx);} command which will 
+count FLOPS that are executed over xxxxx cycles. It should produce a line such as
+
+\begin{verbatim}// **** count_FLOPS: 7006 FLOPS,   64 mFLOPS\end{verbatim}
+
+the first number, 7006 FLOPS is the actual number of FLOPS that occurred. The second
+number, 64 mFLOPS, is actually millions of floating point operations \textbf{per second};
+which is calculated from FLOPS by using $(FLOPS/xxxxx) * 250$ because
+the raw processor is running at 250 MHz.
+
+
+\paragraph{Quitting \textit{btl}}
+When you are done with the interactive debugger, use the command
+
+\begin{verbatim}quit();\end{verbatim}
+
+to stop the debugger and return you to the command prompt.
+
+Incidentally, typing CTL-D will close the annoying shunt window.
+
+\subsubsection{Hacking \texttt{Makefile.streamit}}
+The most useful way to hack the makefile produced by the compiler,
+\texttt{Makefile.streamit}, is to add a line such as the following to it:
+
+\begin{verbatim}SIM-COMMAND = sv(216552); sv(11468); sv(11414);\end{verbatim}
+
+Which you should put right under \texttt{LIMIT} and \texttt{SIM-CYCLES}
+command in the Makefile.
+\begin{verbatim}
+LIMIT = TRUE
+SIM-CYCLES = 500000
+SIM-COMMAND = sv(216552); sv(11468); sv(11414); 
+\end{verbatim}
+
+Defining the \texttt{SIM-COMMAND} variable in your Makefile.streamit and 
+then running the simulator with 
+
+\begin{verbatim}make -f Makefile.streamit run\end{verbatim}
+
+will cause the simulator to execute the commands in \texttt{SIM-COMMAND}
+in batch mode and then quit. This is useful when trying to automate
+the collection of bloodgraphs and FLOPS counts (see below).
+
+
+
+
+%%%%%%%%%%%%%%%%%%%% How to Measure Performance %%%%%%%%%%%%%%%%%%%%%
+
+
+\subsubsection{Determining Performance}
+The following subsection describes (hopefully in enough detail) how
+to determine throughput, utilization, and MFLOPS for a StreamIt program
+while causing the least possible pain to the measurer.
+
+\paragraph{Determining the StreamIt Steady State}
+The critical part of measuring performance is to determine how many cycles
+it takes a program to enter the steady state and then how many cycles
+it takes for each steady state iteration. When we say steady state and steady
+state iteration we are talking about the StreamIt notion of steady state: the
+smallest number of cycles that it takes to start the same pattern again.
+
+To date we have been relying on the StreamIt output that is produced 
+to delineate the steady state cycles. Typically, using our knowledge of
+the algorithm or using the Java Library (with -i 1) we have determined the
+number of outputs that gets produced by a single steady state iteration, let's call
+it $N$.
+
+To account for the startup cost of getting the StreamIt program running on
+the simulator, we have typically looked for cycle that the program produces
+the $N$th output, the $2N$th output and the $3N$th output, call them $x$, $y$ and $z$. 
+Armed with these numbers we can calculate the throughput, and instrument
+\texttt{Makefile.streamit} to produce bloodgraphs, utilization, and MFLOPS very easily. 
+
+\paragraph{Throughput} 
+With just $x$, $y$ and $z$ we can figure out the throughput. We have been reporting
+throughput as output per $10^5$ cycles. Therefore, given that the program produces
+$N$ outputs, throughput is given either by $(N/(y-x))(100000)$ or $(N/(z-y))(100000)$.
+These two numbers represent the throughput per 100000 cycles for the second and third
+steady state iteration, respectively. There are sometimes discrepancies between the two 
+numbers, and in this case we average the results.
+
+The source of these discrepencies is not known, but it probably has something to do with
+the way that stalls effect the processor pipelines, or possibly with how long it takes to
+print different length outputs.
+
+\paragraph{Bloodgraph and Utilization} 
+If we supplement \texttt{Makefile.streamit} with the following line, as described above,
+we can get the bloodgraphs for the first three steady state iterations of
+our program.
+\begin{verbatim}SIM-COMMAND = sv(x); sv(y); sv(z);\end{verbatim} 
+
+When we run using the augmented Makefile, three blood graphs should appear, 
+corresponding to the first, second and third steady state iterations.
+Also produced should be \texttt{workCount}s for all three iterations, which
+should look something like:
+\begin{verbatim}
+workCount = 490843 / 497360
+// (xv -rotate 270 -hflip /tmp/file5YCnNd; rm /tmp/file5YCnNd ) &
+[00: 00000796d]: 1
+workCount = 432983 / 436752
+// (xv -rotate 270 -hflip /tmp/fileCafZiF; rm /tmp/fileCafZiF ) &
+[00: 00000e40e]: 1
+workCount = 432983 / 436752
+// (xv -rotate 270 -hflip /tmp/filedJvo9H; rm /tmp/filedJvo9H ) &
+\end{verbatim} 
+
+Averaging the final two work counts should give you a reasonable estimate for
+the steady state utilization of RAW. \textit{Note you might have to adjust your calculations
+to account for unused tiles.}
+
+\paragraph{MFLOPS} 
+You can use \texttt{count\_FLOPS} to get the FLOPS and mFLOPS as described above. To get more
+significant figures for mFLOPS than provided, you can do the MFLOP calculation by hand. I found it
+helpful to replace the \texttt{sv} in \texttt{Makefile.streamit} with \texttt{count\_FLOPS} and then look
+at the output for the utilization.
+
+Put a line in \texttt{Makefile.streamit} that looks something like:
+\begin{verbatim}SIM-COMMAND = count\_FLOPS(x); count\_FLOPS(y); count\_FLOPS(z);\end{verbatim} 
+
+
+And the output produced should look something like this:
+\begin{verbatim}
+// **** count_FLOPS: 7181 FLOPS,   57 mFLOPS
+[00: 00000796d]: 1
+// **** count_FLOPS: 7006 FLOPS,   64 mFLOPS
+[00: 00000e40e]: 1
+// **** count_FLOPS: 7006 FLOPS,   64 mFLOPS
+\end{verbatim}
+
+Note that the FLOPS for the first steady state iteration is different -- 
+it includes the startup costs associated with getting the filters going. Normally the best 
+way to proceed is to average the mFLOPS numbers from the second and
+third iterations (if they differ).
+
+\paragraph{Advanced MFLOPS counting}
+If you are hacking your own program from either C or assembly, 
+the following the code (called a \textit{bc} device for some reason) implements count\_FLOPS.
+This might be useful if you wish to measure performance of an analogous non-streamit
+program executing on raw, for instance.
+
+\begin{verbatim}
+global gFLOPS = 0;
+fn __clock_handler(hms)
+{
+  local i;
+  for (i = 0; i < gNumProc; i++)
+  {
+    gFLOPS += imem_instr_is_fpu(get_imem_instr(i, get_pc_for_proc(i)));
+  }
+}
+
+EventManager_RegisterHandler("clock", "__clock_handler");
+
+fn count_FLOPS(steps)
+{
+  gFLOPS = 0;
+  step(steps);
+  printf("// **** count_FLOPS: %4d FLOPS, %4d mFLOPS
+",
+         gFLOPS, (250*gFLOPS)/steps);
+}
+
+
+\end{verbatim}
+
+\subsection{Performance on Uniprocessor}
+
+\subsection{Appendices}
+\subsubsection{PERL script to calculate steady state numbers}
+\begin{verbatim}
+#!//usr/local/bin/perl
+# script to calculate the numbers I want to put in the asplos paper
+use strict;
+# pull these in from the simulator -- get it to print only once
+# for each iteration.
+my $first_iter = "0x000034de8";
+my $second_iter = "0x000037ab4";
+my $third_iter = "0x00003a74a";
+
+my $dec_first_iter = hex($first_iter);
+my $dec_second_iter = hex($second_iter);
+my $dec_third_iter = hex($third_iter);
+
+my $delta_one = ($dec_second_iter - $dec_first_iter);
+my $delta_two = ($dec_third_iter - $dec_second_iter);
+
+print "first  iteration done at $first_iter ($dec_first_iter cycles)\n";
+print "second iteration done at $second_iter ($dec_second_iter cycles)".
+  " (delta=$delta_one)\n";
+print "third  iteration done at $third_iter ($dec_third_iter cycles)".
+  " (delta=$delta_two)\n";
+
+my $avg = ($delta_one + $delta_two) / 2;
+print "\n\n==> iter takes $delta_one/$delta_two cycles (average = $avg)\n";
+\end{verbatim}
+
+
+
+
+\subsubsection{Sample calculations}
+\begin{verbatim}
+7/30/02 -- AAL 
+Changed -- (at Mike's suggestion) FIR size from 128 to 28.
+
+first  iteration done at 0x000034de8 (216552 cycles)
+second iteration done at 0x000037ab4 (228020 cycles) (delta=11468)
+third  iteration done at 0x00003a74a (239434 cycles) (delta=11414)
+
+==> iter takes 11468/11414 cycles (average = 11441)
+
+we produce 1 output every 11441 cycles, so normalized to 10^5 cycles,
+1*(100000/11441) = 8.7404947
+
+flops reported are 4867,4846=4856.5 flops, which is
+(4856.5/11441) * 250 = 106.12053 MFLOPS
+
+
+workCount = 733555 / 3464832 = 0.21171445
+workCount = 41596 / 183488 = 0.22669602
+workCount = 41553 / 182624 = 0.22753307
+\end{verbatim}
+

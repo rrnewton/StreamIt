@@ -1,0 +1,18 @@
+7/26/02 -- AAL 
+got rid of the code that writes to files, stuck main body in loop that runs three times, 
+
+
+
+Uniprocessor (7/29/2002):
+(Xenon 2.2 GHz, 512MB cache)
+100,000 iterations (1 outputs/iteration)
+99.9% utilization
+runtime for 100,000 iterations = 110.450 seconds
+
+We want cycles/iteration:
+100000 iterations/ 110.450 sec * 
+1 outputs/1 iteration
+1 second /2.2x10^9 cycles
+* 10^5 cycles 
+
+= 0.041153957 outputs/10^5 cycles

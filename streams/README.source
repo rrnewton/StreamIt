@@ -1,0 +1,62 @@
+-*- Text -*-
+
+The StreamIt Source Tree
+========================
+
+$Id: README.source,v 1.3 2003-02-18 22:48:01 aalamb Exp $
+
+Directory Layout
+----------------
+
+The main "streamit" package is split between the "compiler"
+and "library" directory.  The "library" contains classes that
+are specific to run-time interpretation of Java code, while
+"compiler" contains the frontend and scheduler that are used
+during the actual compilation process.
+
+The output of the compiler is one of two things:
+1. A C program on standard out (STDOUT) that is built and linked against 
+   libstreamit.a, which is built from sources in library/c.
+2. A program designed to work on the CAG RAW simulator consisting of
+   multiple tileXX.c, swXX.s files and Makefile.streamit.
+
+
+Compiler Flow
+-------------
+
+Compilation with the new syntax begins with the front-end.  Currently
+there is only a converter to the old syntax, which is invoked via the
+class streamit.frontend.ToJava (under compiler/streamit/frontend).
+
+The old-syntax compiler is entirely contained under compiler/kopi.
+Directories here correspond to sub-packages of at.dms; for example,
+source files for classes in at.dms.kjc are in compiler/at/dms/kjc.
+The main entry point to Kopi is in at.dms.kjc.Main, which calls
+at.dms.kjc.StreaMITMain.compile() after parsing the old-syntax file.
+
+The Kopi front-end will generate a series of JClassDeclarations.
+at.dms.kjc.Kopi2SIR converts these into SIR (Stream IR) structures, in
+package at.dms.kjc.sir.  There is one SIR class for each stream type,
+so class declarations are converted into the appropriate one of
+SIRPipeline, SIRStructure, SIRFilter, etc.
+
+The compiler diverges here between the uniprocessor and RAW
+back-ends.  The RAW backend is contained in the at.dms.kjc.raw
+package, and the main driver is in the RawBackend class.  The
+uniprocessor backend uses the at.dms.kjc.sir.lowering and
+at.dms.kjc.lir packages.
+
+The at.dms.kjc.sir.lowering package is used by the uniprocessor
+backend to convert SIR to LIR (Low IR).  It also contains a number of
+optimization passes, which are run out of
+at.dms.kjc.sir.lowering.Flattener.flatten().  The ultimate output of
+this function is a single JClassDeclaration representing a C version
+of the StreamIt program.  LIR nodes are defined in at.dms.kjc.lir;
+they mostly contain specialized nodes that represent specific function
+calls in the C output.  SIR nodes may also remain in work functions
+when appropriate (e.g. SIRPeekExpression).
+
+Ultimately, the uniprocessor backend uses the visitor class
+at.dms.kjc.lir.LIRToC to translate the IR tree to a C file.  This is
+compiled against streamit.h and then linked with libstreamit.a, both
+from the library/c directory, to produce a binary.

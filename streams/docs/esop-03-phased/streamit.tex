@@ -1,0 +1,246 @@
+\section{{\StreamIt} Language}
+\label{chpt:streamit}
+
+This chapter introduces relevant constructs of the {\StreamIt}
+language.  Syntax is not explored here, as it is not relevant to
+{\StreamIt} scheduling.
+
+Section \ref{sec:streamit:struct} introduces the structured
+streaming concept, while Section \ref{sec:streamit:messages}
+introduces the low bandwidth messaging semantics of {\StreamIt}.
+
+\subsection{Structure}
+\label{sec:streamit:struct}
+
+Perhaps the most distinguishing feature of {\StreamIt} language is
+that it introduces structure to the concept of stream computation.
+{\StreamIt} concept of structure is conceptually similar to
+structured constructs in functional languages such as \C.
+
+In {\StreamIt} programs are composed out of streaming components
+called streams.  Each stream is a single-input, single-output
+component, possibly made up of a hierarchical composition of other
+streams. Streams can only be arranged in a limited number of ways,
+using {\pipelines}, {\splitjoins}, and {\feedbackloops}.  Data
+passed between {\filters} is read from and written to {\Channels}.
+Figure \ref{fig:structure} contains examples of various
+{\StreamIt} streams.  The restrictions on arrangement of streams
+enforces the structure imposed by {\StreamIt}.
+
+\begin{figure}\begin{center}
+\begin{minipage}{2in}
+\centering
+\psfig{figure=filter.eps,width=0.7in} \\
+{\protect\small (a) A {\filter}}
+\end{minipage}
+~
+\begin{minipage}{2in}
+\centering
+\psfig{figure=pipeline.eps,width=0.7in} \\
+{\protect\small (b) A {\pipeline} with $n$ children.}
+\end{minipage}
+~
+\begin{minipage}{2in}
+\centering
+\psfig{figure=splitjoin.eps,width=2in} \\
+{\protect\small (c) A {\splitjoin} with $n$ children}
+\end{minipage}
+~
+\begin{minipage}{2in}
+\centering
+\psfig{figure=feedback.eps,width=1.5in} \\
+{\protect\small (d) A {\feedbackloop}}
+\end{minipage}
+\end{center}
+\caption{All {\StreamIt} streams}
+\label{fig:structure}
+\end{figure}
+
+\subsubsection{\filters}
+
+The basic unit of computation in {\StreamIt} is the {\filter}. The
+central aspect of a filter is the {\work} function, which
+describes the filter's atomic execution step. Within the {\work}
+function, the filter can communicate with its neighbors using the
+{\Input} and {\Output} channels, which are typed FIFO queues
+declared during initialization of a {\filter}.  Figure
+\ref{fig:structure}(a) depicts a {\filter}.
+
+{\filters} also have the restriction of requiring a static amount
+of data to be consumed and produced for each execution of a
+{\work} function.  The amount of data produced by a {\filter} $F$
+upon execution of its {\work} function is called a push amount,
+denoted $push$. The amount of data consumed from {\Input}
+{\Channel} by a {\filter} $F$ upon execution of its {\work}
+function is called a pop amount, denoted $pop$.  {\filters} may
+require that additional data be available in the {\Input}
+{\Channel} for the {\filter} to examine.  This data can be read by
+the {\filter}'s {\work} function, but it will not be consumed, and
+will remain in the {\Channel} for the next execution of the
+{\work} function.  The amount of data necessary on the {\Input}
+{\Channel} to execute {\filter}'s {\work} function is called peek
+amount, denoted $peek$.  Note, that for all {\filters} $peek
+>= pop$.  Extra peek amount is the amount of data required on by
+the {\filter} that will be read but will not be consumed, namely
+$peek - pop$.  The \emph{peek}, \emph{pop} and \emph{push} values
+in Figure \ref{fig:structure}(a) correspond to the $peek$, $pop$
+and $push$ amounts of the {\filter}'s {\work} function.
+
+A {\filter} can be a source, if it does not consume any data, but
+it produced data.  Namely, a {\filter} is a source if it has $peek
+= pop = 0$. Likewise, a {\filter} can be a sink, if it consumes
+data, but does not produce any, or $push = 0$.
+
+\subsubsection{\pipelines}
+
+{\pipelines} are used to connect {\StreamIt} structures in a chain
+fashion: each child stream's output is the next child stream's
+input. {\pipelines} have no {\work} function, as they do not perform
+any computation themselves. {\pipelines} are simply containers of
+other {\StreamIt} structures.  Figure \ref{fig:structure}(b) depicts
+a {\pipeline}.
+
+\subsubsection{\splitjoins}
+
+{\splitjoins} are used to specify independent parallel structures
+that diverge from a common {\splitter} and merge into a common
+{\joiner}.  There are two types of {\splitters}:
+\begin{enumerate}[(a)]
+\item %(a)
+{\duplicate}, which replicates each data item and sends a copy to
+each parallel stream, and
+
+\item %(b)
+{\roundrobin} $(w_0,\dots, w_{n-1})$, which sends the first $w_0$
+items to the first stream, the next $w_1$ items to the second
+stream, and so on.  If all $w_i$ are equal to $0$, all child
+streams of the {\splitjoin} must be sources.
+\end{enumerate}
+
+{\roundrobin} is also the only type of a {\joiner} supported in
+{\StreamIt}; its function is analogous to a {\roundrobin} {\splitter}.
+
+Figure \ref{fig:structure}(c) depicts a
+{\splitjoin}.
+
+\subsubsection{\feedbackloops}
+\label{sec:explain-fl}
+
+{\feedbackloops} are used to create cycles in the stream graph. A
+{\feedbackloop} contains a {\joiner}, a body stream, a {\splitter}, and
+a loop stream.  Figure \ref{fig:structure}(d) depicts a
+{\feedbackloop}.
+
+A {\feedbackloop} has an additional feature required to allow a
+{\feedbackloop} to begin computation: since there is no data on
+the feedback path at first, the stream instead inputs data from a
+special function defined by the {\feedbackloop}.  The amount of
+data pushed onto the feedback path is called delay amount, denoted
+$delay_{fl}$, for a {\feedbackloop} $fl$.
+
+\subsection{Messages}
+\label{sec:streamit:messages}
+
+In addition to passing data between {\filters} using structured
+streams, {\StreamIt} provides a method for low-bandwidth data
+passing, similar to a combination of sending messages and function
+calls. Messages are sent from within the body of a {\filter}'s
+{\work} function, perhaps to change a parameter in another
+{\filter}. The sender can continue to execute while the message is
+en route. When the message arrives at its destination, a special
+message receiver method is called within the destination
+{\filter}. Since message delivery is asynchronous, there can be no
+return value; only void methods can be message targets. This
+allows the send to continue execution while the message is en
+route - the sender does not have to wait for the receiver to
+receive the message and send a return value back. If the receiver
+wants to send a return value to the sender, it can send a message
+back to the sender.
+
+Although message delivery in {\StreamIt} is asynchronous in
+principle, {\StreamIt} does include semantics to restrict the
+latency of delivery of a message. Since {\StreamIt} does not
+provide any shared resources to {\filters} (including global
+memory, global clock, etc), the timing mechanism uses a concept of
+flow of information.
+
+One motivating example for messaging in {\StreamIt} can be found in
+cell phone processing application. Modern cellular phone protocols
+involve a technique called frequency hopping - the cell phone base
+station selects a new frequency or channel for the phone to
+communicate with the base station and informs the phone of this
+change.  The phone must switch to the new channel within a certain
+amount of time, or it risks losing connection with the base
+station.
+
+If the phone decoder application is written in {\StreamIt}, the
+{\filter} controlling the antenna and the {\filter} which will process
+control signals are likely far apart, and may not have a simple
+way of communicating data directly with each other. In {\StreamIt},
+the {\filter} which decodes control signals can simply send a
+message to the {\filter} controlling the antenna. The message can be
+sent with a specific latency corresponding to the timing required
+by the base station. When the antenna controller receives the
+message it can change the appropriate settings in the hardware to
+switch to the appropriate new frequency, without having to wait
+for the appropriate time. The timing of delivery is taken care of
+by {\StreamIt}.
+
+\subsubsection{Information Wavefronts}
+
+When a data item enters a stream, it carries with it some new
+information. As execution progresses, this information cascades
+through the stream, affecting the state of {\filters} and the values
+of new data items which are produced. We refer to an information
+wavefront as the set of {\filter} executions that first sees the
+effects of a given input item. Thus, although each {\filter}'s {\work}
+function is invoked asynchronously without any notion of global
+time, two invocations of a work function occur at the same
+information-relative time if they operate on the same information
+wavefront.
+
+\subsubsection{Message Sending}
+
+Messages can be sent upstream or downstream between any two
+{\filters}.  Sending messages across branches of a {\splitjoin} is not
+legal.  Timing of message delivery uses the concept of information
+wavefront.  The sender specifies that the message is supposed to
+be delivered with a certain delay of information wavefront. The
+delays are specified as ranges, $[l_0, l_1], l_0 \le l_1$. $l_0$
+and $l_1$ specify the information wavefront in executions of the
+{\work} function of the sender {\filter}.
+
+If the message is being sent downstream, the sender specifies that
+the receiver will receive the data just before it sees the
+information wavefront produced by the sender between $l_0$ and
+$l_1$ executions of its {\work} function from when it sends the
+message. If the message is being sent upstream, the sender
+specifies that the receiver must receive the message just before
+it produces an information wavefront the sender will see between
+$l_0$ and $l_1$ executions of its {\work} function from when it
+sends the message.
+
+Message sending is meant to be a low-bandwidth method of
+communication between {\filters}. Message sending is not a fast
+operation and is intended not to interfere with the high bandwidth
+{\StreamIt} communication and processing.  However, depending on how
+tight the latency constraints are (both the magnitude of the
+latency as well as the range), declaring that messages can be sent
+may slow program execution down considerably.
+
+Figure \ref{fig:message-example} presents an example of a
+{\pipeline} in which the last {\filter} sends a message to the first
+{\filter}.  {\filter}$_3$ sends a message to {\filter}$_0$.  The message
+is sent with latency $[3,8]$. This means that after at least 3 and
+at most 8 executions of sender's {\work} function, it will see data
+produced by the receiver just after receiving the message.
+
+\begin{figure}\begin{center}
+\begin{minipage}{4in}
+\centering
+\psfig{figure=message-example.eps,width=1.5in} \\
+\end{minipage}
+\end{center}
+\caption{Example of a {\pipeline} with a message being sent}
+\label{fig:message-example}
+\end{figure}

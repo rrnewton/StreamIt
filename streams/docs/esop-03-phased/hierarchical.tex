@@ -1,0 +1,888 @@
+\section{Pseudo Single Appearance Hierarchical Scheduling}
+\label{chpt:hierarchical}
+
+In this section we present Pseudo Single Appearance Hierarchical
+Scheduling, a technique which is quite effective for scheduling
+{\StreamIt} programs, but which cannot schedule all programs, and
+which may require the buffers to be very large.
+
+\begin{comment}
+Section \ref{sec:hierarchical:motivation} provides some motivation
+for hierarchical scheduling.
+\end{comment}
+Section \ref{sec:hierarchical-notation} presents the notation used
+for hierarchical schedules. Section \ref{sec:sas} provides an
+algorithm for computing pseudo single appearance hierarchical
+schedules.
+
+\begin{comment}
+\subsection{Motivation}
+\label{sec:hierarchical:motivation}
+
+As has been explained in Section \ref{sec:sched-vs-buffer}, the
+ordering of execution of nodes in a {\StreamIt} program can have a
+significant effect on the amount of resources necessary to execute
+the schedule.  The two important factors to consider when creating
+the schedule is amount of buffering necessary to execute the
+schedule, and the amount of space necessary to store the schedule.
+The amount of buffering necessary is controlled by the ordering of
+execution of nodes of the {\StreamIt} graph.  The amount of storage
+necessary to store the schedule is controlled by the encoding of
+the schedule.  As a general rule, ordering which minimizes the
+buffering space requirements is fairly irregular and difficult to
+encode efficiently.
+
+\begin{figure}
+\centering \psfig{figure=hierarchical-sample.eps,width=1in}
+\caption[Stream for hierarchical scheduling]{A sample stream used
+for hierarchical scheduling.} \label{fig:sample-sj}
+\end{figure}
+
+One technique used for encoding schedules is to form loop-nests of
+sub-schedules and repeat them multiple times, until a steady-state
+schedule is reached.  For example, the stream in Figure
+\ref{fig:sample-sj} has a following steady state:
+
+\begin{displaymath}
+S_{s} = \left\{ \left[
+\begin{array}{c}
+9 \\ 6 \\ 18 \\ 18 \\ 4 \\ 4
+\end{array} \right], \left[
+\begin{array}{c}
+A \\ C \\ D \\ split \\ join \\ B
+\end{array}
+\right], \left[
+\begin{array}{c}
+54 \\ 54 \\ 40
+\end{array}
+\right], \left[
+\begin{array}{c}
+9 \\ 2 \\ 4
+\end{array}
+\right]\right\}
+\end{displaymath}
+
+\noindent Thus one steady state schedule for this stream can be
+$$\{9\{A\{2 split\}\{2D\}\}\}\{2\{\{3C\}\{2 split\}\{2B\}\}\}$$
+Here, $\{A\{2 split\}\{2D\}\}$ and $\{\{3C\}\{2 split\}\{2B\}\}$
+are the inner nests, executed 9 and 2 times respectively.
+
+If, the overall schedule has every {\StreamIt} node appear only
+once (as in the example above), the technique is called Single
+Appearance Scheduling \cite{bhattacharyya94looped}. One of
+difficulties in using Single Appearance Scheduling is finding a
+good way to form loop-nests for the sub-schedules, because the
+buffering requirements can grow quite large.  An example of this
+has been presented in Section \ref{sec:sched-vs-buffer}.
+
+{\StreamIt} provides the scheduler with a pre-existing
+hierarchical structure. While it is possible to use techniques
+developed for Single Appearance Scheduling to create valid
+schedules for {\StreamIt} programs, Single Appearance Scheduling
+does not satisfy all requirements of an effective {\StreamIt}
+scheduler. This is because some {\feedbackloops} cannot be
+scheduled using Single Appearance Scheduling techniques. This
+difficulty arises because the amount of data provided to the
+{\feedbackloop} by the $delay_{fl}$ variable is not sufficient to
+perform a complete steady-state execution of the loop, thus
+preventing the schedule for the {\feedbackloop} to be encoded with
+only a single appearance of every node in the schedule.
+
+The solution to this problem is to have the same node appear
+multiple times in the schedule.  While this solves the problem of
+inability to schedule some {\feedbackloops}, it introduces another
+problem: which nodes should appear several times, and how many
+times should they be executed on each appearance.  The solution
+proposed here goes half-way to solve the problem. A more effective
+solution will be proposed in Chapter \ref{chpt:phased}.
+
+In hierarchical scheduling we use the pre-existing structure
+(hierarchy) to determine the nodes that belong in every loop-nest.
+Basically, every stream receives its own loop-nest, and treats
+steady-state execution of its children as atomic (even if those
+children are streams whose executions can be broken down into more
+fine-grained steps). In the example above, the {\pipeline} has a
+{\splitjoin} child.  The {\splitjoin} is responsible for
+scheduling its children (nodes $C$, $B$, $split$ and $join$).  The
+{\pipeline} will use the {\splitjoin}'s schedule to create its
+own steady state schedule. Here the {\splitjoin}'s schedule can be
+$T_{sj} = \{\{9 split\}\{3C\}\{9D\}\{2 join\}\}$, thus making the
+{\pipeline}'s schedule \footnote{Notation for this schedule is
+explained in next section (Section
+\ref{sec:hierarchical-notation}).} $$T_{pipe} = \{\{9A\}\{2
+T_{sj}\}\{4B\}\} = \{\{9A\}\{2\{\{9 split\}\{3C\}\{9D\}\{2
+join\}\}\}\{4B\}\}$$
+
+
+The problem of inability to schedule some {\feedbackloops} is
+alleviated by allowing {\feedbackloop} to interleave the execution
+of its children (the body, the loop, and the {\splitter} and
+{\joiner}).  This results in {\feedbackloop} containing multiple
+appearances of its children. All other streams use their
+children's schedules in their schedules only once. This technique
+is called Pseudo Single Appearance Scheduling, since it results in
+schedules that are very similar to proper single appearance
+schedules. While it does not allow scheduling of all
+{\feedbackloops} (a {\feedbackloop} may have a child which
+requires more data for steady state execution then made available
+by the $delay_{fl}$ variable) it has been found to be very
+effective, and only one application has been found which cannot be
+scheduled using this technique.
+\end{comment}
+
+\subsection{Notation}
+\label{sec:hierarchical-notation}
+
+\begin{comment}
+The notation in the above example, is very similar to that
+presented in Section \ref{sec:sched-vs-buffer}.  A number in front
+of a node represents that the node is meant to be executed a
+certain number of times.  The one big difference is that
+$\{2T_{sj}\}$ means that the schedule for the {\pipeline} is meant
+to be executed twice.  Since $T_{sj} = \{\{9
+split\}\{3C\}\{9D\}\{2 join\}\}$, $\{2T_{sj}\}$ is same as
+$\{2\{\{9 split\}\{3C\}\{9D\}\{2 join\}\}\}$.
+
+This means that to execute $T_{pipe}$, node $A$ is executed 9
+times, schedule $T_{sj}$ is executed twice and node $B$ is
+executed twice, in that order. To execute $T_{sj}$, the {\splitter}
+is executed 9 times, node $C$ is executed 3 times, node $D$ 9
+times and the {\joiner} twice.
+
+Thus, writing the schedule of $T_{pipe}$ into a flat schedule (one
+with no loop-nests) results in schedule $\{9A\}\{9
+split\}\{3C\}\{9D\}\{2 join\}\{9 split\}\{3C\}\{9D\}\{2
+join\}\{4B\}$.
+
+In other words, $T_{sj}$ is a loop-nest, which can be executed
+multiple times. When storing a schedule, $T_{sj}$ is stored only
+once, and every use of $T_{sj}$ becomes the reference to the
+actual schedule.
+\end{comment}
+
+A hierarchical schedule is a schedule which uses the hierarchy of
+the program to create a schedule. Each hierarchical component in
+the program has a corresponding schedule. This schedule only
+consists of executions of steady state schedules of the
+component's direct children. For example, if a {\splitjoin} has a
+{\pipeline} child, the {\pipeline} will have a steady schedule $T_p$,
+while the {\splitjoin} will have a steady schedule $T_{sj}$, which
+will include $T_p$.
+
+A hierarchical steady state schedule for a stream $s$ will be
+denoted by $T_s$, while an initialization schedule for a stream
+$s$ will be denoted $I_s$. A {\splitter} of a {\splitjoin} $sj$ or
+a {\feedbackloop} $fl$ will be denoted as $split_{sj}$ or
+$split_{fl}$, while the {\joiner} will be denoted as $join_{sj}$
+or $join_{fl}$.
+
+This section will continue using the notation for $e$, $o$ and $u$
+extended to streams.
+\begin{comment}
+That is, for a stream $s$,
+$e_s$ will represent the amount of data needed by $s$ on its
+{\Input} {\Channel} in order to execute its minimal steady state
+schedule; $o_s$ represents the amount of data consumed by from its
+{\Input} {\Channel} $s$ during execution of its steady state
+schedule; and $u_s$ represents the amount of data pushed by $s$
+onto its {\Output} {\Channel}.
+\end{comment}
+The notation for $e$, $o$ and $u$ will also be extended to
+initialization schedules.  Namely, $e^i_s$ represents the amount
+of data required by stream $s$ on its {\Input} {\Channel} in
+order to execute the initialization schedule for $s$; $o^i_s$
+represents the amount of data consumed by $s$ from its {\Input}
+{\Channel} during its initialization schedule; and $u^i_s$
+denotes the amount of data pushed by $s$ onto its {\Output}
+{\Channel} during execution of its initialization schedule. We
+also use notation of $c_s$ denoting vector holding appropriate
+values of $e_s$, $o_s$ and $u_s$, and $c^i_s$ holding $e^i_s$,
+$o^i_s$ and $u^i_s$. The initialization schedules are created in
+such a way, that after all streams have executed their
+initialization schedules, the program is ready to enter its steady
+state execution.
+
+\begin{comment}
+Note, that it is possible that a stream $s$ has $u^i_s \ne
+0$. An example of this will be presented in Section
+\ref{sec:sas-fl}.
+\end{comment}
+
+A hierarchical schedule for a stream $s$ is denoted as $$H_s =
+\left\{T_s, I_s, c_s = \left[\begin{array}{c}
+e_s\\o_s\\u_s\end{array}\right], c^i_s =
+\left[\begin{array}{c}e^i_s\\o^i_s\\u^i_s\end{array}\right]\right\}$$
+
+\subsection{Pseudo Single-Appearance Hierarchical Scheduling}
+\label{sec:sas}
+
+\begin{comment}
+\begin{figure}
+\begin{minipage}{1.5in}
+\centering \psfig{figure=pipeline-steady-state.eps,width=0.6in} \\
+{\protect\small (a) A sample {\pipeline}}
+\end{minipage}
+~
+\begin{minipage}{1.5in}
+\centering \psfig{figure=splitjoin-steady-state.eps,width=1.2in} \\
+{\protect\small (b) A sample {\splitjoin}}
+\end{minipage}
+~
+\begin{minipage}{2.5in}
+\centering \psfig{figure=feedback-hierarchical.eps,width=1.0in} \\
+{\protect\small (c) A sample {\feedbackloop}.\\ $delay_{fl} = 15$ \\
+The $L$ {\filter} has been flipped upside-down for clarity. \\$e_L
+= 9, o_L = 5, u_L = 6$ }
+\end{minipage}
+\caption{Sample {\StreamIt} streams used for Pseudo
+Single-Appearance Hierarchical Scheduling}
+\label{fig:hierarchical-schedule}
+\end{figure}
+\end{comment}
+
+A single appearance schedule is a schedule in which every node
+appears exactly once. The advantage of single appearance schedules
+is that they are very small. The disadvantage of single appearance
+schedules is that they can require large amount of buffering
+between {\filters}. Not all valid {\StreamIt} programs can be
+scheduled using single appearance schedules. This is because a
+{\feedbackloop} may not provide enough data in its feedback path.
+Pseudo single appearance scheduling allows a large number of
+applications to be scheduled, while keeping the size of the
+schedule small. There still exist applications which cannot be
+scheduled.
+
+Due to space constraints, algorithms presented below are not
+detailed. Refer to \cite{karczma-thesis} for details.
+
+\begin{comment}
+This section will develop hierarchical scheduling techniques to
+create initialization and steady state schedules. A simple
+implementation of the hierarchical scheduling creates a
+single-appearance schedule.  While single-appearance scheduling is
+quite effective in scheduling {\StreamIt} programs, it is also easy
+to construct programs that have {\feedbackloops} that are impossible
+to schedule.  To alleviate the problem, the single-appearance
+scheduling was slightly modified to allow {\feedbackloops} to
+schedule programs using hierarchical push scheduling.  This does
+not solve the problem altogether (some {\feedbackloops} are still
+impossible to schedule using this technique), but this technique
+is able to schedule many programs which cannot be scheduled with a
+simple single-appearance scheduler.
+
+Sample streams for techniques described here are taken from Figure
+\ref{fig:hierarchical-schedule}.  The streams in Figure
+\ref{fig:hierarchical-schedule} are identical to those in Figure
+\ref{fig:steady-state} with exception of the {\feedbackloop}.
+\end{comment}
+
+\subsubsection{\filter}
+
+An execution of a {\filter} is an atomic operation.  Thus a steady
+state schedule for a {\filter} $f$ is simply $T_f = \{f\}$.
+
+A {\filter} has no internal buffering.  Thus there is no need to
+initialize a {\filter} for its steady state.  {\filters} may,
+however, peek data.  That means that in order to enter a steady
+state, sufficient amount of data must be pushed onto {\filter}'s
+{\Input} {\Channel}.  Thus, for a {\filter} $f$, $e^i_f = e_f -
+o_f$. Thus we have $$H_f = \left\{\{f\}, \{\}, \left[
+\begin{array}{c}
+e_f\\o_f\\u_f
+\end{array}\right], \left[
+\begin{array}{c}
+e_f-o_f\\0\\0\end{array}\right] \right\}
+$$
+
+\subsubsection{{\pipelines} and {\splitjoins}}
+
+Scheduling {\pipelines} and {\splitjoin} consists of computing a
+single appearance schedule for the {\pipeline} or {\splitjoin}.
+This means that the resulting schedule contains each child of the
+{\pipeline} or {\splitjoin} exactly once.
+
+\subsubsubsection{Initialization Schedule} In order for a
+{\pipeline} or {\splitjoin} to be initialized, all their children
+must have executed their own initialization schedules.
+
+The initialization schedule for a {\pipeline} is calculated as
+follows. For every child stream of the {\pipeline}, the amount of
+data necessary to initialize all the streams below it is
+calculated. For $k$th stream, that amount is denoted $init_k$. If
+the {\pipeline} has $n$ children, then for the bottom-most child,
+$p_{n-1}$, that amount is $init_{n-1} = e^i_{p_{n-1}}$. The data
+to the $k$th child is provided by the $k-1$ child, during its
+initialization and subsequent execution of its steady state
+schedule. Thus the $k-1$ child must execute its steady state
+schedule $l_{k-1} = \left\lceil init_k - u^i_{p_{k-1}} \over
+u_{p_{k-1}} \right\rceil$ times.  The amount of data required for
+initialization of the {\pipeline} by the $k-1$ child is
+$init_{k-1} = e^i_{p_{k-1}} + l_{k-1} * o_{p_{k-1}}$.
+
+Now, the initialization schedule is simply constructed by
+iterating over all children of the {\pipeline}, from top to
+bottom, and concatenating all initialization and appropriate
+steady state schedules.
+
+Constructing an initialization schedule for a {\splitjoin} is
+similar to the {\pipeline}. Every stream child will execute only
+their initialization schedule. The {\splitter} will execute as
+many times as necessary to provide enough data for all the
+children to initialize. The {\joiner} will not execute. The
+schedule is created by concatenating executions of the
+{\splitter}, followed by initialization schedules of all the
+children.
+
+\begin{comment}
+In order to create an initialization schedule of a
+{\pipeline}, all of {\pipeline}'s children's initialization
+schedules must be executed. Every child must execute its
+initialization schedule before it can execute its steady-state
+schedule.  Some children may require some data in order to execute
+their initialization schedules. The upstream children provide this
+data to them by first executing their own initialization schedule,
+and then their steady-state schedule. Thus, in the final form, the
+execution of a {\pipeline}'s initialization schedule first
+executes the initialization schedule of the top-most child, then
+executes the steady-state schedule this child several times, then
+the initialization schedule of the second-from-the-top child,
+followed by executing this child's steady-state schedule several,
+etc, until the bottom-most child is reached.  Since the
+bottom-most child does not need to provide any data {\pipeline}'s
+downstream children (there aren't any), the bottom-most child only
+executes its initialization schedule.
+
+The initialization schedule is calculated as follows. At every
+stream of the {\pipeline}, the amount of data necessary to
+initialize all the streams below is calculated. For $k$th stream,
+that amount is denoted $init_k$. If the {\pipeline} has $n$
+children, then for the bottom-most child, $p_{n-1}$, that amount
+is $init_{n-1} = e^i_{p_{n-1}}$. The data to the $k$th child is
+provided by the $k-1$ child, during its initialization and
+subsequent execution of its steady state schedule.  The
+initialization provides $u^i_{p_{k-1}}$ data items. Thus the $k-1$
+child must execute its steady state schedule $l_{k-1} =
+\left\lceil init_k - u^i_{p_{k-1}} \over u_{p_{k-1}} \right\rceil$
+times.  The amount of data required for initialization of the
+{\pipeline} by the $k-1$ child is $init_{k-1} = e^i_{p_{k-1}} +
+l_{k-1} * o_{p_{k-1}}$.
+
+This calculation is performed for all children of the {\pipeline},
+starting at the last (bottom-most) child, and moving up.  For the
+sample {\pipeline} in Figure \ref{fig:hierarchical-schedule}(a), the
+values computed are:
+
+\begin{displaymath}
+\begin{array}{lr}
+\begin{array}{rl}
+l_3 & = 0 \raisebox{-0.2in}{ } \\
+l_2 & = \left\lceil init_3 - u^i_C \over u_C \right\rceil = \left\lceil 2 - 0 \over 1 \right\rceil = 2 \raisebox{-0.2in}{ } \\
+l_1 & = \left\lceil init_2 - u^i_B \over u_B \right\rceil =
+\left\lceil 4 - 0 \over 3 \right\rceil = 1 \raisebox{-0.2in}{ } \\
+l_0 & = \left\lceil init_1 - u^i_A \over u_A \right\rceil =
+\left\lceil 4 - 0 \over 3 \right\rceil = 2 \raisebox{-0.2in}{ } \\
+\end{array} &
+\begin{array}{rl}
+init_3 & = e^i_D + l_3 * o_D = 2 + 0 * 1 = 2 \raisebox{-0.2in}{ }\\
+init_2 & = e^i_C + l_2 * o_C = 0 + 2 * 2 = 4 \raisebox{-0.2in}{ }\\
+init_1 & = e^i_B + l_1 * o_B = 1 + 1 * 3 = 4 \raisebox{-0.2in}{ }\\
+init_0 & = e^i_A + l_0 * o_A = 0 + 2 * 1 = 2 \raisebox{-0.2in}{ }\\
+\end{array}
+\end{array}
+\end{displaymath}
+
+Now, the initialization schedule is simply constructed by
+iterating over all children of the {\pipeline}, from top to
+bottom, and concatenating all initialization and appropriate
+steady state schedules.  Thus $I_p = \{I_A\{2T_A\} I_{B}T_B
+I_C\{2T_C\} I_D\}$.
+
+Finally, we need to compute the amount of data peeked, popped and
+pushed by the {\pipeline} during its initialization.
+
+The amount of data popped is simply the amount of data popped by
+the top-most child when executing the {\pipeline}'s initialization
+schedule, that is the amount of data popped by the first child
+during its own initialization plus the amount of data popped
+during its steady-state execution times number of steady state
+executions. That is $o^i_p = o^i_{p_0} + l_0 * o_{p_0}$.
+
+Similarly, the amount of data pushed by the {\pipeline} is simply
+the amount of data pushed by the bottom-most child during its
+initialization. Remember that the bottom-most child never executes
+its steady-state schedule.  Thus $u^i_p = u^i_{p_{n-1}}$.
+
+Computing the amount of data peeked by the {\pipeline} during
+initialization may be a little more complicated, because unlike
+popping and pushing, peeking is not accumulative. Luckily, we can
+rely on our knowledge of structure of the {\StreamIt} graph to
+calculate the amount of data peeked by a {\pipeline}. We know that a
+{\pipeline} is a single-input structure. We also know that this
+single input will lead directly into a {\StreamIt} node.  There are
+only three possibilities for what this node will be.
+
+\begin{itemize}
+\item If {\pipeline}'s first node is a {\filter} $f$ (the first child
+of the {\pipeline} is a {\filter} or a {\pipeline} with a {\filter} as its
+first node) then the extra amount of data peeked by the {\pipeline}
+on initialization will be $e^i_f - o^i_f$. If the first child is a
+{\filter}, then $p_0$ is $f$ and the extra amount peeked is also
+$e^i_{p_0} - o^i_{p_0}$.  If the first child is a {\pipeline} with a
+{\filter} first node, we can show by induction that this {\pipeline}'s
+extra peek amount will also be $e^i_{p_0} - o^i_{p_0}$.
+
+\item If {\pipeline}'s first node is a {\splitter} (the first child of
+the {\pipeline} is a {\splitjoin} or a {\pipeline} with a {\splitter} as
+its first node) then the extra amount of data peeked by the
+{\pipeline} on initialization will be 0, because {\splitters} never
+peek. Furthermore, for the same reason, the amount of extra data
+peeked by the first child on its initialization will also be zero,
+or $e^i_{p_0} - o^i_{p_0}= 0$.
+
+\item If {\pipeline}'s first node is a {\joiner} (the first child of
+the {\pipeline} is a {\feedbackloop} or a {\pipeline} with a {\joiner} as
+its first node) then the amount of extra data peeked by the
+{\pipeline} on initialization will be 0, for the same reasons as
+above. And again $e^i_{p_0} - o^i_{p_0}= 0$.
+\end{itemize}
+
+Thus on initialization, the {\pipeline} will have an extra peek
+amount of $e^i_{p_0} - o^i_{p_0}$, and the total amount of data
+peeked by the {\pipeline} for initialization is $e^i_p = (e^i_{p_0}
+- o^i_{p_0}) + l_0
+* o_{p_0}$.
+\end{comment}
+
+\subsubsubsection{Steady State Schedule}
+\begin{comment}
+The steady state state schedule is calculated as a
+single-appearance schedule.
+\end{comment}
+Calculation of a single-appearance schedule for a {\pipeline} starts
+with computing $S_p$, the steady state for the {\pipeline}. The
+steady state schedule simply executes every child $p_i$ of the
+{\pipeline} $S_{p,v,i}$ times. The topmost child is executed first,
+then the second child, and so on.
+
+Similarly, calculation of a single-appearance schedule for a
+{\splitjoin} starts with computing $S_{sj}$. The children are
+executed the appropriate number of times, starting with the
+{\splitter}, then all the stream children, and finally the {\joiner}.
+
+The consumption and production of data for the steady state
+schedule is already calculated by the steady state, and is
+$S_{p,c}$ or $S_{sj,c}$.
+
+For our examples in Figure \ref{fig:steady-state}(a) and (b) we
+have the following steady state schedules:
+
+\begin{displaymath}
+\begin{array}{lr}
+H_p = \left\{\begin{array}{l}\left\{\begin{array}{c}\{4T_A\}\\
+\{6T_B\} \\ \{9T_C\}\\ \{3T_D\}\end{array}\right\}, \left\{\begin{array}{c}I_A\\
+I_B\\ I_C\\ I_D\end{array}\right\},\end{array} \left[
+\begin{array}{c}
+4\\4\\3
+\end{array}\right], \left[
+\begin{array}{c}
+0\\0\\0
+\end{array}\right] \right\}, &
+H_{sj} = \left\{\left\{\begin{array}{c}\{2\ split\}\\ \{2T_A\} T_B
+\\ \{2\ join\}\end{array}\right\}, \left\{\begin{array}{c}split\\I_A\\I_B\end{array}\right\},
+\left[
+\begin{array}{c}
+6\\6\\8
+\end{array}\right], \left[
+\begin{array}{c}
+3\\3\\0
+\end{array}\right] \right\}
+\end{array}
+\end{displaymath}
+
+\begin{comment}
+\subsubsection{\splitjoins}
+
+Creating a schedule for a {\splitjoin} is essentially identical to
+scheduling a {\pipeline}.  The initialization schedule only needs to
+compute how many times the {\splitter} needs to be executed, and
+construct the actual schedule.  The steady state schedule is
+constructed by concatenating steady state schedule of {\splitjoin}'s
+children, the {\splitter} and {\joiner}.
+
+For our example in Figure \ref{fig:hierarchical-schedule}(b), the
+steady state is
+
+\begin{displaymath}
+S_{sj} = \left\{ \left[
+\begin{array}{c} 2 \\ 1 \\ 2 \\ 2 \end{array}\right], \left\{
+\begin{array}{c} A \\ B \\ {\splitter} \\ {\joiner} \end{array} \right\},
+\left[ \begin{array}{c} 6 \\ 6 \\ 8
+\end{array} \right], \left[
+\begin{array}{c}
+2 \\ 1 \\ 2 \\ 2
+\end{array}\right]\right\}
+\end{displaymath}
+
+\subsubsubsection{Initialization} In order to initialize a
+{\splitjoin}, all its children must execute their initialization
+schedules.  The only requirement for executing those schedules is
+that they have been provided with sufficient data on their
+{\Input} {\Channels}.  Since the {\splitter} provides data for
+all the children of a {\splitjoin}, it is the only element of a
+{\splitjoin} that must execute its steady state schedule.
+
+For $k$th child of a {\splitjoin}, the {\splitter} must provide
+$e^i_{sj_k}$ data items.  One execution of the {\splitter} causes
+it to push $w_{s,k}$ data items toward the $k$th child.  Thus the
+{\splitter} must execute at least $l_k = \left\lceil e^i_{sj_k}
+\over w_{s,k} \right\rceil$ times.  In order to find out how many
+times the {\splitter} needs to execute to initialize all children,
+$l_s$, we simply find the maximum $l_k$. Thus $l_s = {\max \atop
+k}(l_k)$.
+
+In the sample {\splitjoin} from Figure
+\ref{fig:hierarchical-schedule}(b), we get following $l_k$s:
+
+\begin{displaymath}
+\begin{array}{rl}
+l_0 = & \left\lceil e^i_A \over w_{s,0} \right\rceil = \left\lceil
+0 \over 2 \right\rceil = 0 \raisebox{-0.2in}{ }\\
+l_1 = & \left\lceil e^i_B \over w_{s,1} \right\rceil = \left\lceil
+1 \over 1 \right\rceil = 1 \raisebox{-0.2in}{ }\\
+\end{array}
+\end{displaymath}
+
+The maximum $l_k$s is 1, thus $l_s = 1$, the {\splitter} must be
+executed once for initialization.
+
+The initialization schedule is constructed by concatenating an
+appropriate number of executions of the {\splitter} and
+initialization schedules of all the children.  Thus in our
+example, $I_{sj} = \{split\ I_A\ I_B\}$.
+
+The consumption of an initialization schedule of a  {\splitjoin} is
+computed as follows:  $e^i_{sj} = u^i_{sj} = l_s * o_{sj_s}$ and
+$u^i_{sj} = 0$. The peeking and popping amounts are simply the
+amount of data popped by the {\splitter} for every one of its
+executions times the number of times it is executed.  The {\joiner}
+is never executed, thus the push amount is 0.
+
+Thus for our example, $e^i_{sj} = u^i_{sj} = 1 * 3 = 3$ and
+$u^i_{s} = 0$.
+
+\subsubsubsection{Steady State} Similarly to the algorithm for
+{\pipeline}, the steady state is constructed by using $S_{sj,v}$
+to concatenate the executions of the {\splitter}, all children of
+the {\splitjoin} and the {\joiner} together.
+
+For our example, the steady state schedule is simply $$T_{sj} =
+\{\{2\ split\}\{2T_A\}T_B\{2\ join\}\}$$
+
+The consumption vector, $c_{sj}$ is the same as $S_{sj,c}$.
+
+Thus the hierarchical schedule for the {\splitjoin} in Figure
+\ref{fig:hierarchical-schedule}(b) is
+
+\begin{displaymath}
+H_{sj} = \left\{\{\{2\ split\}\{2T_A\}T_B\{2\ join\}\},\{split\
+I_A\ I_B\}, \left[
+\begin{array}{c}
+6\\6\\8
+\end{array}\right], \left[
+\begin{array}{c}
+3\\3\\0
+\end{array}\right] \right\}
+\end{displaymath}
+\end{comment}
+
+\subsubsection{\feedbackloops}
+\label{sec:sas-fl}
+
+\subsubsubsection{Initialization Schedule} Initialization of a
+{\feedbackloop} is similar to initializing a {\pipeline}. First
+the children are iterated over to find out how many times they
+need to execute to initialize the {\feedbackloop}, and then they
+are iterated in reverse order and their executions concatenated
+appropriately. The order of first traversal is (loop child,
+{\splitter}, body child and {\joiner}). The loop child only
+executes its initialization schedule, while other children may
+need to execute their steady state schedules.
+
+It is possible that the {\joiner} will require more than
+$delay_{fl}$ data from its second input (the feedback path). If
+this is the case, then this algorithm cannot schedule such a
+{\feedbackloop}. This does not mean that the loop is not
+schedulable, only that it cannot be scheduled using pseudo single
+appearance scheduling.
+
+\begin{comment}
+Scheduling of {\feedbackloops} is a task that can be made
+difficult, if the amount of data provided for the {\feedbackloop}
+by the $delay_{fl}$ value is low. Before a {\StreamIt} program
+begins executing, the {\feedbackloop} needs to be provided with
+some data in one of the internal {\Channels}. Without this data,
+the {\splitter} and the {\joiner} of the {\feedbackloop} will not
+be able to execute, because they will never have sufficient data
+on their input {\Channels}. This is a consequence of the
+{\feedbackloop} having a cyclical structure.
+
+\begin{figure}
+\centering
+\psfig{figure=feedback-non-scheduleable.eps,width=1.2in}
+\caption[Example of non-shedulable {\feedbackloop}]{Sample
+{\feedbackloop}. If this {\feedbackloop} has a $delay_{fl}$ value
+set to 7, it does not have a steady state schedule which will
+allow it to execute forever. If the $dealy_{fl}$ value is
+increased by 1 to 8, the {\feedbackloop} has a steady state
+schedule of $\{join\{2B\}\{5 split\}L\ join\{2B\}\{5 split\}L\ $
+$join\{2B\}\{5 split\}L\{2\ join\}\{4B\}\{10 split\}\{2L\}\ \}$.}
+\label{fig:feedback-non-schedulable}
+\end{figure}
+
+The difficulty in scheduling {\feedbackloops} is that if the amount
+of data made available to the {\feedbackloop} by the $delay_{fl}$
+value (as explained in Section \ref{sec:explain-fl}) is small,
+there will be very limited number of ways to execute the
+{\feedbackloop}.  In fact, it is possible that the amount of data
+available to the {\feedbackloop} is so small, it cannot reach and
+complete an execution of a steady state schedule. An example of
+such {\feedbackloop} is presented in Figure
+\ref{fig:feedback-non-schedulable}.
+
+Here we will use {\feedbackloop} from Figure
+\ref{fig:hierarchical-schedule}(c).  The steady state schedule for
+this {\feedbackloop} is
+
+\begin{displaymath} S_{fl} = \left\{
+\begin{array}{c} \left[
+\begin{array}{c}
+15 \\ 3 \\ 5 \\ 6 \end{array}\right], \left\{
+\begin{array}{c} B \\ L \\ {\splitter} \\ {\joiner} \end{array}\right\}, \left[
+\begin{array}{c}
+12 \\ 12 \\ 15
+\end{array}
+\right], \left[
+\begin{array}{c}
+15 \\ 3 \\ 5 \\ 6
+\end{array}\right]
+\end{array} \right\}
+\end{displaymath}
+
+\subsubsubsection{Initialization Schedule} Initialization for the
+{\feedbackloop} is calculated in a similar way to initialization
+of a {\pipeline}.  The number of steady state executions of the
+children of the {\feedbackloop} is denoted $l_B$ and $l_L$ for
+the body child and the loop child, respectively. The number of
+executions of the {\splitter} is denoted $l_s$ and the {\joiner}
+is denoted $l_j$.
+
+Since the initial data is inserted into the buffer between the
+loop child and the {\joiner} (as explained in \ref{sec:explain-fl}),
+it follows that the loop child should initialize last - it will be
+the last one receive data to initialize. Since the computation of
+the initialization schedule is similar to the way it was done for
+{\pipeline}, we will start with the child which is executed last,
+namely the loop child. Similarly as with {\pipeline}, the which is
+initialized last does not execute its steady state schedule for
+initialization, thus we set $l_L = 0$. The {\splitter} must provide
+the loop child with just enough data to initialize, the body child
+must provide the {\splitter} with just enough data for the {\splitter}
+to pass enough data to the loop child, etc. Thus,
+
+\begin{displaymath}
+\begin{array}{rl}
+l_L & = 0 \\
+l_{s} & = \left\lceil {o^i_{fl_L} \over w_{s,1}} \right\rceil \raisebox{-0.2in}{ } \\
+l_{B} & = \left\lceil o_{s} * l_{s} - u^i_{fl_B} \over u_{fl_B} \right\rceil \raisebox{-0.2in}{ } \\
+l_{j} & = \left\lceil o^i_{fl_B} + l_B * o_{fl_B} \over u_{j}
+\right\rceil \raisebox{-0.2in}{ }
+\end{array}
+\end{displaymath}
+
+This initialization schedule will only be valid if there is enough
+data provided between the loop child and the {\joiner}, or
+$delay_{fl} \ge l_j * w_{j,1}$.  If this condition does not hold,
+the {\feedbackloop} cannot be scheduled using pseudo
+single-appearance algorithm.
+
+Referring to the example Figure
+\ref{fig:hierarchical-schedule}(c), we obtain the following values
+for $n$s:
+
+\begin{displaymath}
+\begin{array}{rl}
+l_{s} & = \left\lceil {4 \over 3} \right\rceil = 2 \raisebox{-0.2in}{ } \\
+l_{B} & = \left\lceil 2 * 3 - 0 \over 1 \right\rceil = 6 \raisebox{-0.2in}{ } \\
+l_{j} & = \left\lceil 0 + 6 * 2 \over 5 \right\rceil = 3 \raisebox{-0.2in}{ } \\
+\end{array}
+\end{displaymath}
+
+Furthermore, since $delay_{fl} = 15$, we have $15 \ge 3 * 3$, thus
+a valid initialization schedule can be constructed.
+
+The initialization schedule is constructed by concatenating
+executions of the {\joiner}, body child, {\splitter} and the loop
+child.  The body child will execute both its initialization
+schedule as well as its steady state schedule, while the loop
+child will only execute its initialization schedule.
+
+Thus for our example we get $I_{fl} = \{\{3\ join\} I_B \{6T_B\}
+\{2\ split\} I_L\}$.
+
+We now compute the consumption of data for the initialization
+schedule of the {\feedbackloop}: $e^i_{fl} = o^i_{fl} = n_j *
+w_{j,0}$ and $u^i_{fl} = n_s * w_{s,0}$. Similarly as in
+computation for the {\splitjoin}, these values are simply the
+production and consumption of the {\splitter} and {\joiner} from their
+appropriate {\Input} and {\Output} channels multiplied by the number
+of times the {\splitter} and {\joiner} are executed during
+initialization schedule.
+
+In our example, $e^i_{fl} = o^i_{fl} = 3 * 2 = 6$ and $u^i_{fl} =
+3 * 3 = 9$.  Note that the {\feedbackloop} pushes data out during
+its initialization.
+
+Finally, we compute the amount of data present in {\Channels} after
+initialization. These amounts are important because they will be
+used to compute the steady state schedule of the {\feedbackloop}.
+These amounts were not necessary for computation of steady state
+schedules of {\pipeline} and {\splitjoin}. These amounts are
+calculated by simply subtracting the amount of data popped from a
+{\Channel} from amount of data pushed into a {\Channel}. Here we
+adopted the notation for
+{\Input} and {\Output} {\Channel} from Section \ref{sec:exec-model}.
+
+\begin{displaymath}
+\begin{array}{rl}
+in^i_B = & l_j * u_j - l_B * o_{fl_B} \\
+out^i_B = & u^i_{fl_B} + l_B * u_{fl_B} - l_s * o_s\\
+in^i_L = & l_s * w_{s, 1} - l_L * o_{fl_L} \\
+out^i_L = & delay_{fl} + u^i_{fl_L} + l_L * u_{fl_L} - l_j * w_{j,1} \\
+\end{array}
+\end{displaymath}
+\end{comment}
+
+\subsubsubsection{Steady State Schedule} Computing the steady
+state schedule for a {\feedbackloop} is more complicated than
+for the other streams.  The reason for this is that
+{\feedbackloops} may require a non single-appearance schedule
+due to small $delay_{fl}$ value, while other {\StreamIt}
+constructs can always be scheduled using single-appearance
+schedules.
+
+\begin{comment}
+The algorithm used for creating of a steady state schedule
+will work in several phases.  The amount of data present in
+{\Channels} between the children of the {\feedbackloop}, the
+{\joiner} and the {\splitter} is kept track of to determine which
+element is allowed to execute.
+\end{comment}
+
+The algorithm for creating a steady state schedule of a
+{\feedbackloop} iterates over the elements of the {\feedbackloop}
+in order of ({\joiner}, body child, {\splitter}, loop child). Each
+element is executed as many times as possible, considering the
+amount of data required and available to execute the element. Each
+execution of an element is appended to the steady state schedule.
+
+This iteration is repeated until either all elements have executed
+their steady state number of times, or until a complete iteration
+has been performed with no element being able to execute. The
+first case indicates a successful completion of the algorithm. The
+second case indicates a failure - the algorithm is unable to
+schedule the {\feedbackloop}.
+
+Table \ref{tab:sas-fl} illustrates the execution of this algorithm
+for {\feedbackloop} from Figure \ref{fig:steady-state}. In the
+table, the first row and the last row have the same amount of data
+buffered in {\Channels}, thus indicating that a full steady
+state schedule has indeed been computed.
+\begin{comment}
+Furthermore, the last entry considering execution of $B$ has
+sufficient data to execute $B$ 5 times, but only executes it 4
+times to ensure that a steady state schedule is constructed.
+\end{comment}
+
+\begin{table} \centering \scriptsize
+\begin{tabular}{|l|c|c|c|c|c|c|c|c|c|}
+\hline \multicolumn{4}{|c|}{data items in buffer} & \multicolumn{4}{c|}{executions left} & \parbox{0.5in}{element considered} & executions \\
+\cline{1-8} $in_B$ & $out_B$ & $in_L$ & $out_L$ & $split$ & B & $join$ & L & & \\
+\hline  1   &   6   &   6   &   0   &   5   &   9   &   4   &   3   &   $split$ &   2   \\
+\hline  1   &   0   &   12  &   0   &   3   &   9   &   4   &   3   &   $L$ &   1   \\
+\hline  1   &   0   &   7   &   6   &   3   &   9   &   4   &   2   &   $join$  &   2   \\
+\hline  11  &   0   &   7   &   0   &   3   &   9   &   2   &   2   &   $B$ &   5   \\
+\hline  1   &   5   &   7   &   0   &   3   &   4   &   2   &   2   &   $split$ &   1   \\
+\hline  1   &   2   &   10  &   0   &   2   &   4   &   2   &   2   &   $L$ &   1   \\
+\hline  1   &   2   &   5   &   6   &   2   &   4   &   2   &   1   &   $join$  &   2   \\
+\hline  11  &   2   &   5   &   0   &   2   &   4   &   2   &   1   &   $B$ &   4   \\
+\hline  3   &   6   &   5   &   0   &   2   &   0   &   2   &   1   &   $split$ &   2   \\
+\hline  3   &   0   &   11  &   0   &   0   &   0   &   0   &   1   &   $L$ &   1   \\
+\hline  3   &   0   &   6   &   6   &   0   &   0   &   0   &   0   &       &       \\
+\hline
+\end{tabular}
+\caption[Execution of Steady-State algorithm on sample
+{\feedbackloop}]{Trace of execution of steady-state algorithm on
+sample {\feedbackloop} from Figure \ref{fig:steady-state}(c). The
+executions left amount is the number of executions left for a
+particular child to complete a steady state execution of the
+{\feedbackloop}. Onece this value reaches 0, the element is not
+executed anymore, even if it has data to execute.}
+\label{tab:sas-fl}
+\end{table}
+
+\begin{comment}
+The schedule resulting from the above computation is $$T_{fl}
+= \{\{2\ join\} \{6T_B\} \{2\ split\} T_L \{2\ join\} \{5T_B\}\
+split\ T_L \{2\ join\} \{4T_B\} \{2\ split\} T_L\}$$ This schedule
+is obtained by going through Table \ref{tab:sas-fl} from top to
+bottom and concatenating the appropriate number of executions of
+every child of the {\feedbackloop}, as listed in the "executions"
+column.
+
+The steady state consumption $c_{fl}$ is again simply $S_{fl, c}$.
+\end{comment}
+
+Thus the hierarchical schedule for the {\feedbackloop} is:
+
+\begin{displaymath}
+H_{fl} = \left\{
+\begin{array}{l}
+\begin{array}{c}\{\{2\ join\} \{6T_B\} \{2\ split\} T_L \{2\ join\} \{5T_B\},\\
+split\ T_L \{2\ join\} \{4T_B\} \{2\ split\} T_L\},\end{array}\\
+\{\{3\ join\} I_B \{6T_B\} \{2\ split\} I_L\}, \left[
+\begin{array}{c}
+12\\12\\15
+\end{array}\right], \left[
+\begin{array}{c}
+6\\6\\9
+\end{array}\right] \end{array}\right\}
+\end{displaymath}
+
+\begin{comment}
+Scheduling {\feedbackloops} requires some extra care, as explained
+above.  Once again, steady schedule multiplicities are computed,
+but this time, the amount of data buffered between the {\joiner},
+$body$, {\splitter} and $loop$ is required in order to perform the
+algorithm.
+
+The first step in the algorithm is to execute the {\joiner} as many
+times as possible, depending on how much data is available between
+the $loop$ and the {\joiner}, up to the number permitted in
+executing a steady schedule. Data is transferred between buffers
+at known rates, and buffering is adjusted appropriately. Next the
+$body$ is executed as much as possible, followed by the {\splitter},
+followed by the $loop$.  If, after executing this sequence, the
+{\joiner}, $body$, {\splitter} or $loop$ need to be executed more
+times in order to complete a steady schedule, this execution is
+repeated until the steady schedule is completed.
+
+It is possible, that the algorithm above deadlocks - there is not
+enough data for any of the children to advance.  This does not
+necessarily mean that the {\feedbackloop} has no legal schedule.
+This is because pseudo single-appearance scheduling is a coarse
+scheduling technique.  Furthermore, this problem is not caused by
+hierarchical scheduling.  Figure
+\ref{fig:feedback-non-schedulable} contains an example of a
+{\feedbackloop} that cannot be scheduled using any single appearance
+technique.
+\end{comment}

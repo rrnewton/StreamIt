@@ -1,0 +1,18 @@
+digraph G {
+node[shape=box];
+A [label="",color=white];
+C [label="",color=white];
+A->Selector
+Selector->"Active Stream"
+"Inactive Stream 1" [style=dotted]
+". . ." [color=white]
+"Inactive Stream N" [style=dotted]
+Selector->"Inactive Stream 1" [style=dotted]
+Selector->". . ." [style=dotted]
+Selector->"Inactive Stream N" [style=dotted]
+"Active Stream"->Joiner
+"Inactive Stream 1"->Joiner [style=dotted]
+". . ."->Joiner [style=dotted]
+"Inactive Stream N"->Joiner [style=dotted]
+Joiner->C
+}

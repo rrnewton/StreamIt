@@ -1,0 +1,45 @@
+% might need psfig, url, amsmath, amsfonts?
+\documentclass[psfig]{acm_proc_article-sp}
+
+\begin{document}
+
+\title{StreaMIT: A Language for Streaming Applications\thanks{This
+document is {\bf MIT/LCS Technical Memo LCS-TM-620}, August 2001.  A similar
+version was submitted to POPL 2002.  Please do not distribute.}}
+
+\numberofauthors{1}
+\author{
+\alignauthor \vspace{-18pt} Bill Thies, Michal Karczmarek, and Saman Amarasinghe\\
+	\vspace{12pt}
+	Laboratory for Computer Science \\
+	Massachusetts Institute of Technology \\
+	Cambridge, MA  02139 \\
+	\vspace{12pt}
+	{\tt \{thies, karczma, saman\}@lcs.mit.edu} \\
+	\vspace{12pt}
+	\mbox{August 13, 2001}
+}
+
+% for the arrow of a function def, etc.
+\newcommand{\ma}[2]{max_{#1 \rightarrow #2}}
+\newcommand{\mal}[1]{maxloop_{#1 \rightarrow #1}}
+\newcommand{\mi}[2]{min_{#1 \leftarrow #2}}
+
+\maketitle
+
+\begin{abstract}
+\input{abstract.tex}
+\end{abstract}
+
+\input{intro.tex}
+\input{domain.tex}
+\input{overview.tex}
+\input{timing.tex}
+\input{example.tex}
+\input{related.tex}
+\input{conclusion.tex}
+\bibliographystyle{abbrv}
+\bibliography{references,elliotw,thies}
+\input{appendix.tex}
+\input{appendix2.tex}
+\end{document}

@@ -1,0 +1,433 @@
+\begin{figure}
+  \psfig{figure=beam-blood-key.eps,width=3.2in} \\
+  \subfigure[\vspace{-6pt}
+    {\bf Original (runs on 64 tiles).}\label{fig:beam-blood1}]{\psfig{figure=beam-blood-orig.eps,width=3.2in}}
+  \hspace{0.3in} \subfigure[\vspace{-6pt}
+    {\bf Partitioned (runs on 16 tiles).}\label{fig:beam-blood2}]{\psfig{figure=beam-blood-opt.eps,width=3.2in}
+    \vspace{-6pt}} \vspace{-6pt} \caption{\protect\small Execution
+    traces for the (a) original and (b) partitioned versions of the
+    \Radar~ application.  The $x$ axis denotes time, and the $y$ axis
+    denotes the processor.  Dark bands indicate periods where
+    processors are blocked waiting to receive an input or send an
+    output; light regions indicate periods of useful work.  The thin
+    stripes in the light regions represent pipeline stalls.  Our
+    partitioning algorithm decreases the granularity of the graph from
+    53 unbalanced tiles (original) to 15 balanced tiles (partitioned).
+    The throughput of the partitioned graph is 2.3 times higher than
+    the original. \protect\label{fig:beam-blood}}
+\vspace{-12pt}
+\end{figure}
+
+\begin{figure}
+\centering
+\psfig{figure=beam-graph-orig.eps,width=3.2in}
+\caption{\protect\small Stream graph of the original 12x4 \Radar~
+application.  The 12x4 \Radar application has 12 channels and 4 beams;
+it is the largest version that fits onto 64 tiles without filter
+fusion.  \protect\label{fig:beam-orig}}
+\vspace{36pt}
+\psfig{figure=beam-graph-opt.eps,width=1.98in}
+\caption{\protect\small Stream graph of the load-balanced 12x4
+\Radar~ application.  Vertical fusion is applied to collapse each pipeline
+into a single filter, and horizontal fusion is used to transform the
+4-way splitjoin into a 2-way splitjoin.  Figure~\ref{fig:beam-blood}
+shows the benefit of these
+transformations. \protect\label{fig:beam-opt}}
+\end{figure}
+
+\section{Partitioning}
+\label{sec:partition}
+
+StreamIt provides the filter construct as the basic abstract unit of
+autonomous stream computation.  The programmer should decide the
+boundaries of each filter according to what is most natural for the
+algorithm under consideration.  While one could envision each filter
+running on a separate machine in a parallel system, StreamIt hides the
+granularity of the target machine from the programmer.  Thus, it is
+the responsibility of the compiler to adapt the granularity of the
+stream graph for efficient execution on a particular architecture.
+
+We use the word {\it partitioning} to refer to the process of dividing
+a stream program into a set of balanced computation units.  Given that
+a maximum of $N$ computation units can be supported, the partitioning
+stage transforms a stream graph into a set of no more than $N$
+filters, each of which performs approximately the same amount of work
+during the execution of the program.  Following this stage, each
+filter can be run on a separate processor to obtain a load-balanced
+executable.
+
+%% Load balancing is particularly important in the streaming domain,
+%% since the throughput of a stream graph is equal to the {\it minimum}
+%% throughput of each of its stages.  This is in contrast to scientific
+%% programs, which often contain a number of stages which process a given
+%% data set; the running time is the {\it sum} of the running times of
+%% the phases, such that a high-performance, parallel phase can partially
+%% compensate for an inefficient phase.  In mathematical terms, Amdahl's
+%% Law captures the maximum realizable speedup for scientific
+%% applications.  However, for streaming programs, the maximum
+%% improvement in throughput is given by the following expression:
+%% \begin{align*}
+%% \mbox{\it Maximum speedup}(w, c) = \frac{\sum_{i=1}^N{w_i \cdot c_i}}{MAX_i(w_i \cdot c_i)}
+%% \end{align*}
+%% where $w_1 \dots w_m$ denote the amount of work in each of the $N$
+%% partitions of a program, and $c_i$ denotes the multiplicity of work
+%% segment $i$ in the steady-state schedule.  Thus, if we double the load
+%% of the heaviest node ({\it i.e.}, the node with the maximum $w_i \cdot
+%% c_i$), then the performance could suffer by as much as a factor of
+%% two.  The impact of load balancing on performance places particular
+%% value on the partitioning phase of a stream compiler.
+
+% This can be posed in
+% mathematical terms by appealing to Amdahl's Law, which expresses the
+% maximum speedup that can be achieved on $N$ processors when there are
+% $S_1 \dots S_x$ units of sequential work and $P_1 \dots P_y$ units of
+% parallel work:
+% \begin{align*}
+% \mbox{\it Maximum speedup}(S, P, N) = \frac{\sum_{i=1}^x{S_i}+\sum_{i=1}^y{P_i}}{\sum_{i=1}^x{S_i}+\frac{\sum_{i=1}^y{P_i}}{N}}
+% \end{align*}
+% However, in a stream program, the measure of performance is throughput
+% rather than running time.  Using $w_1 \dots w_m$ to denote the amount
+% of work in each of the $m$ partitions of a program, and denoting the
+% multiplicity of work segment $i$ in the steady-state schedule by
+% $c_i$, we have that:
+
+\subsection{Overview}
+
+Our partitioner employs a set of fusion, fission, and reordering
+transformations to incrementally adjust the stream graph to the
+desired granularity.  To achieve load balancing, the compiler
+estimates the number of instructions that are executed by each filter
+in one steady-state cycle of the entire program; then, computationally
+intensive filters can be split, and less demanding filters can be
+fused.  Currently, a simple greedy algorithm is used to automatically
+select the targets of fusion and fission, based on the estimate of the
+work in each node.
+
+For example, in the case of the \Radar~ application, the original
+stream graph (Figure~\ref{fig:beam-orig}) contains 52 filters.  These
+filters have unbalanced amounts of computation, as evidenced by the
+execution trace in Figure~\ref{fig:beam-blood1}.  The partitioner
+fuses all of the pipelines in the graph, and then fuses the bottom
+4-way splitjoin into a 2-way splitjoin, yielding the stream graph in
+Figure~\ref{fig:beam-opt}.  As illustrated by the execution trace in
+Figure~\ref{fig:beam-blood2}, the partitioned graph has much better
+load balancing.  In the following sections, we describe in more detail
+the transformations utilized by the partitioner.
+
+\subsection{Fusion Transformations}
+
+Filter fusion is a transformation whereby several adjacent filters are
+combined into one.  Fusion can be applied to decrease the granularity
+of a stream graph so that an application will fit on a given target,
+or to improve load balancing by merging small filters so that there is
+space for larger filters to be split.  Analogous to loop fusion in the
+scientific domain, filter fusion can enable other optimizations by
+merging the control flow graphs of adjacent nodes, thereby shortening
+the live ranges of variables and allowing independent instructions to
+be reordered.
+
+\subsubsection{Unoptimized Fusion Algorithm}
+
+In the domain of structured stream programs, there are two types of
+fusion that we are interested in: {\it vertical fusion} for collapsing
+pipelined filters into a single unit, and {\it horizontal fusion} for
+combining the parallel components of a splitjoin into one.  Given that
+each StreamIt filter has a constant I/O rate, it is possible to
+implement both vertical and horizontal fusion as a plain compile-time
+simulation of the execution of the stream graph.  A high-level
+algorithm for doing so is as follows:
+\begin{enumerate}
+\item Calculate a legal initialization and steady-state schedule for
+the nodes of interest.
+
+\item For each pair of neighboring nodes, introduce a circular buffer
+that is large enough to hold all the items produced during the initial
+schedule and one iteration of the steady-state schedule.  For each
+buffer, maintain indices to keep track of the head and tail of the
+FIFO queue.
+
+\item Simulate the execution of the graph according to the calculated
+schedules, replacing all push, pop, and peek operations in the fused
+region with appropriate accesses to the circular buffers.
+\end{enumerate}
+That is, a naive approach to filter fusion is to simply implement the
+channel abstraction and to leverage StreamIt's static rates to
+simulate the execution of the graph.  However, the performance of
+fusion depends critically on the implementation of channels, and there
+are several high-level optimizations that the compiler employs to
+improve upon the performance of a general-purpose buffer
+implementation.  We describe a few of these optimizations in detail in
+the following sections.
+
+\begin{figure}
+\begin{center}
+\begin{minipage}{1.22in}
+\centering
+\psfig{figure=fuse-pipeline-a.eps,width=1.22in} \\ ~ \vspace{-6pt} \\
+(a) Original~~~~~~~~
+\end{minipage}
+~
+\begin{minipage}{1.97in}
+\centering
+\psfig{figure=fuse-pipeline-b.eps,width=1.97in} \\ ~ \vspace{-6pt} \\
+(b) Fused~~~~~~~~
+\end{minipage}
+\vspace{-6pt}
+\caption{\protect\small Vertical fusion with buffer localization and
+modulo-division optimizations. \label{fig:fuse-pipe}}
+\end{center}
+\vspace{12pt}
+\begin{minipage}{2.25in}
+\centering
+\psfig{figure=fuse-splitjoin-a.eps,width=2.25in} \\ ~ \vspace{-6pt} \\
+(a) Original~~~~
+\end{minipage} \\
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\begin{minipage}{1.30in}
+\centering
+\psfig{figure=fuse-splitjoin-b.eps,width=1.30in} \\ ~ \vspace{-6pt} \\
+(b) Fused~~~~
+\end{minipage}
+\caption{\protect\small Horizontal fusion of a duplicate splitjoin
+construct with buffer sharing optimization. \protect\label{fig:fuse-splitjoin}}
+%% \vspace{18pt}
+%% \psfig{figure=fuse-splitjoin2.eps,width=4.93in}
+%% \caption{\protect\small Fusion of a roundrobin splitjoin construct.
+%% The fusion transformation for splitjoins containing roundrobin
+%% splitters is similar to those containing duplicate splitters.  One
+%% filter simulates the execution of a steady-state cycle in the
+%% splitjoin by inlining the code from each filter.  This filter is
+%% surrounded by Reorderroundrobin filters that recreate the reordering of
+%% the roundrobin nodes.  In the above example, the difference the
+%% splitter's weights, the filter's I/O rates, and the joiner's weights
+%% adds complexity to the reordering.  Though this transformation is
+%% fully automated in the StreamIt compiler, a general formulation is
+%% beyond the scope of this paper.  \protect\label{fig:fuse-splitjoin2}}
+\end{figure}
+
+\subsubsection{Optimizing Vertical Fusion}
+
+Figure~\ref{fig:fuse-pipe} illustrates two of our optimizations for
+vertical fusion: the localization of buffers and the elimination of
+modulo operations.  In this example, the UpSampler pushes $K$ items on
+every step, while the MovingAverage filter peeks at $N$ items but only
+pops 1.  The effect of the optimizations are two-fold.  First, buffer
+localization splits the channel between the filters into a local {\tt
+buffer} (holding items that are transfered within {\tt work}) and a
+persistent {\tt peek\_buffer} (holding items that are stored between
+iterations of {\tt work}).  Second, modulo elimination arranges copies
+between these two buffers so that all index expressions are known at
+compile time, preventing the need for a modulo operation to wrap
+around a circular buffer.
+
+The execution of the fused filter proceeds as follows.  In the prework
+function, which is called only on the first invocation, the {\tt
+peek\_buffer} is filled with initial values from the UpSampler.  The
+steady work function implements a steady-state schedule in which
+$\mt{LCM}(N, K)$ items are transferred between the two original
+filters--these items are communicated through a local, temporary {\tt
+buffer}.  Before and after the execution of the MovingAverage code,
+the contents of the {\tt peek\_buffer} are transferred in and out of
+the {\tt buffer}.  If the {\tt peek\_buffer} is small, this copying
+can be eliminated with loop unrolling and copy propagation.  Note that
+the {\tt peek\_buffer} is for storing items that are persistent from
+one firing to the next, while the local {\tt buffer} is just for
+communicating values during a single firing.
+
+\subsubsection{Optimizing Horizontal Fusion}
+
+The naive fusion algorithm maintains a separate input buffer for each
+parallel stream in a splitjoin.  However, in the case of a duplicate
+splitter, the input buffer can be shared between the streams, as
+illustrated in Figure~\ref{fig:fuse-splitjoin}.  As in pipeline
+fusion, the code of the component filters is inlined into a single
+filter with repetition according to the steady-state schedule.
+However, there are some modifications: all {\tt pop} statements are
+converted to {\tt peek} statements, and the {\tt pop}'s are performed
+at the end of the fused work function.  This allows all the filters to
+see the data items before they are consumed.  Finally, the roundrobin
+joiner is simulated by a reorder-roundrobin filter that re-arranges
+the output of the fused filter according to the weights of the joiner.
+Separating this reordering phase from the fused filter also decreases
+the buffer requirements within the fused node.  When appropriate,
+pipeline fusion can be applied to fuse these two nodes into a single
+filter that represents the entire splitjoin.
+
+\begin{figure}
+\centering
+%\psfig{figure=duplicate-fission-2.eps,width=3.2in}
+%\caption{\protect\small Fission of a filter that does not peek.
+%For filters such as a VectorMultiply that consumes every item they look
+%at, horizontal fission consists of embedding copies of the filter in a
+%$K$-way roundrobin splitjoin.  The weights of the splitter and joiner
+%are set to match the $pop$ and $push$ rates of the filter, respectively.  
+%\protect\label{fig:fission-nopeek}}
+%\vspace{18pt}
+%\psfig{figure=duplicate-fission-b.eps,width=2.80in} \\
+%\psfig{figure=duplicate-fission-a.eps,width=1.26in}
+\psfig{figure=duplicate-fission.eps,width=3.26in}
+{\protect\small {\bf  ~~~~~~~~ (a) Original ~~~~~~~~~~~~~~~~~~~~~~~~~ (b) Fused ~~~}}
+\caption{\protect\small Fission of a filter that peeks.  
+%Since the MovingAverage filter reads items that it does not consume, the
+%duplicated versions of the filter need to access overlapping portions
+%of the input stream.  For this reason, horizontal fission creates a
+%duplicate splitjoin in which each component filter has additional code
+%to filter out items that are irrelevant to a given path.  This
+%decimation occurs in two places: once in the prework function, to
+%disregard items considered by previous filters on the first iteration
+%of the splitjoin, and once at the end of the steady work function, to
+%account for items consumed by other components.
+\protect\label{fig:fission-peek}}
+\vspace{-3pt}
+\end{figure}
+
+\subsection{Fission Transformations}
+
+Filter fission is the analog of parallelization in the streaming
+domain.  It can be applied to increase the granularity of a stream
+graph to utilize unused processor resources, or to break up a
+computationally intensive node for improved load balancing.
+
+\subsubsection{Vertical Fission}
+
+Some filters can be split into a pipeline, with each stage performing
+part of the {\tt work} function.  In addition to the original input
+data, these pipelined stages might need to communicate intermediate
+results from within {\tt work}, as well as fields within the filter.
+This scheme could apply to filters with state if all modifications to
+the state appear at the top of the pipeline (they could be sent over
+the data channels), or if changes are infrequent (they could be sent
+via StreamIt's messaging system.)  Also, some state can be identified
+as induction variables, in which case their values can be
+reconstructed from the {\tt work} function instead of stored as
+fields.  We have yet to automate vertical filter fission in the
+StreamIt compiler.
+
+\subsubsection{Horizontal Fission}
+
+We refer to ``horizontal fission'' as the process of distributing a
+single filter across the parallel components of a splitjoin.  We have
+implemented this transformation for ``stateless'' filters--that is,
+filters that contain no fields that are written on one invocation of
+{\tt work} and read on later invocations.  Let us consider such a
+filter $F$ with steady-state I/O rates of $peek$, $pop$, and $push$,
+that is being parallelized into an $K$-way splitjoin.  There are two
+cases to consider:
+\begin{enumerate}
+\item If {\bf $peek = pop$}, then $F$ can simply be duplicated $K$
+ways in the splitjoin.  The splitter is a roundrobin that routes $pop$
+elements to each copy of $F$, and the joiner is a roundrobin that
+reads $push$ elements from each component.  Since $F$ does not peek at
+any items which it does not consume, its code does not need to be
+modified in the component streams--we are just distributing the
+invocations of $F$.
+
+\item If {\bf $peek > pop$}, then a different transformation is
+applied (see Figure~\ref{fig:fission-peek}).  In this case, the
+splitter is a duplicate, since the component filters need to examine
+overlapping parts of the input stream.  The $i$'th component has a
+steady-state work function that begins with the work function of $F$,
+but appends a series of $(K-1)*pop$ pop statements in order to account
+for the data that is consumed by the other components.  Also, the
+$i$'th filter has a prework function that pops $(i-1)*pop$ items from
+the input stream, to account for the consumption of previous filters
+on the first iteration of the splitjoin.  As before, the joiner is a
+roundrobin that has a weight of $push$ for each stream.
+\end{enumerate}
+
+\subsection{Reordering Transformations}
+
+There are a multitude of ways to reorder the elements of a stream
+graph so as to facilitate fission and fusion transformations.  For
+instance, neighboring splitters and joiners with matching weights can
+be eliminated (Figure~\ref{fig:sync-removal}); a splitjoin construct
+can be divided into a hierarchical set of splitjoins to enable a finer
+granularity of fusion (Figure~\ref{fig:splitjoin-split}); and 
+identical stateless filters can be pushed through a splitter or joiner
+node if the weights are adjusted accordingly.
+%(Figure~\ref{fig:filter-hoisting}).  
+
+\begin{figure}[t]
+\centering
+\psfig{figure=sync-removal-1.eps,width=3.2in}
+\vspace{-1pt}
+\caption{\protect\small Synchronization removal.  If there are
+neighboring splitters and joiners with matching rates, then the nodes
+can be removed and the component streams can be connected.  The
+example above is drawn from a subgraph of the 3GPP application; the
+compiler automatically performs this transformation to expose
+parallelism and improve the partitioning.  Synchronization removal
+is especially valuable in the context of libraries--many distinct
+components can employ splitjoins for processing interleaved data
+streams, and the modules can be composed without having to synchronize
+all the streams at each boundary.  \protect\label{fig:sync-removal}}
+\vspace{-7pt}
+\end{figure}
+
+\begin{figure}[t]
+\centering
+\psfig{figure=splitjoin-split.eps,width=3.2in} 
+\vspace{-6pt}
+\caption{\protect\small Breaking a splitjoin into hierarchical units.
+Though our horizontal fusion algorithms work on the granularity of an
+entire splitjoin, it is straightforward to transform a large splitjoin
+into a number of smaller pieces, as shown here.  Following this
+transformation, the fusion algorithms can be applied to obtain an
+intermediate level of granularity.  This technique was employed to
+help load-balance the \Radar~ application (see Section~\ref{sec:results}).
+\protect\label{fig:splitjoin-split}}
+%% \vspace{24pt}
+%% \psfig{figure=filter-hoisting.eps,width=3.2in} 
+%% \caption{\protect\small Filter hoisting.  This transformation allows a
+%% stateless filter to be moved across a joiner node if its $push$ value
+%% evenly divides the weights of the joiner.
+%% \protect\label{fig:filter-hoisting}}
+\vspace{-18pt}
+\end{figure}
+
+\subsection{Automatic Partitioning}
+
+In order to drive the partitioning process, we have implemented a
+simple greedy algorithm that performs well on most applications.  The
+algorithm analyzes the {\tt work} function of each filter and
+estimates the number of cycles required to execute it.  Because of the
+static I/O rates in StreamIt, most loops within {\tt work} can be
+unrolled, allowing a close approximation of the actual cycle count.
+Multiplying this cycle count by the multiplicity of the filter in the
+steady-state schedule, the algorithm obtains an estimate of the
+steady-state computational requirements for each filter.
+
+In the case where there are fewer filters than tiles, the partitioner
+considers the filters in decreasing order of their computational
+requirements and attempts to split them using the filter fission
+algorithm described above.  Fission proceeds until there are enough
+filters to occupy the available machine resources, or until the
+heaviest node in the graph is not amenable to a fission
+transformation.  Generally, it is not beneficial to split nodes other
+than the heaviest one, as this would introduce more synchronization
+without alleviating the bottleneck in the graph.
+
+If the stream graph contains more nodes than the target architecture,
+then the partitioner works in the opposite direction and repeatedly
+fuses the least demanding stream construct until the graph will fit on
+the target.  The work estimates of the filters are tabulated
+hierarchically and each construct ({\it i.e.,} pipeline, splitjoin,
+and feedbackloop) is ranked according to the sum of its children's
+computational requirements.  At each step of the algorithm, an entire
+stream construct is collapsed into a single filter.  The only
+exception is the final fusion operation, which only collapses to the
+extent necessary to fit on the target; for instance, a 4-element
+pipeline could be fused into two 2-element pipelines if no more
+collapsing was necessary.
+
+Despite its simplicity, this greedy strategy works well in practice
+because most applications have many more filters than can fit on the
+target architecture; since there is a long sequence of fusion
+operations, it is easy to compensate from a short-sighted greedy
+decision.  However, we can construct cases in which a greedy strategy
+will fail.  For instance, graphs with wildly unbalanced filters will
+require fission of some components and fusion of others; also, some
+graphs have complex symmetries where fusion or fission will not be
+beneficial unless applied uniformly to each component of the graph.
+We are working on improved partitioning algorithms that take these
+measures into account.

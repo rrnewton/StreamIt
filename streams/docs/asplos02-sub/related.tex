@@ -1,0 +1,96 @@
+\newpage
+\section{Related Work}
+\label{sec:related}
+
+The Transputer architecture~\cite{transputer88} is an array of
+processors, where neighboring processors are connected with unbuffered
+point-to-point channels.  The Transputer does not include a separate
+communication switch, and the processor must get involved to route
+messages.  The programming language used for the Transputer is Occam
+\cite{occammanual}: a streaming language similar to CSP
+\cite{Hoare78}.  However, unlike StreamIt filters, Occam concurrent
+processes are not statically load-balanced, scheduled and bound to a
+processor. Occam processes are run off a very efficient runtime
+scheduler implemented in microcode~\cite{may87communicating}.
+
+DSPL is a language with simple filters interconnected in a flat acyclic
+graph using unbuffered channels~\cite{Thiel93}.  Unlike the Occam
+compiler for the Transputer, the DSPL compiler automatically maps the
+graph into the available resources of the Transputer. The DSPL language
+does not expose a cyclic schedule, thus the compiler models the
+possible executions of each filter to determine the possible cost of
+execution and the volume of communication. It uses a search technique
+to map multiple filters onto a single processor for load balancing and
+communication reduction. 
+
+The Imagine architecture is specifically designed for the streaming
+application domain~\cite{rixner98bandwidthefficient}.  It operates on
+streams by applying a computation kernel to multiple data items off
+the stream register file.  The compute kernels are written in Kernel-C
+while the applications stitching the kernels are written in Stream-C.
+Unlike StreamIt, with Imagine the user has to manually extract the
+computation kernels that fit the machine resources in order to get
+good steady state performance for the execution of the
+kernel~\cite{kapasi:2001:ss}.  On the other hand, StreamIt uses
+fission and fusion transformations to create load-balanced computation
+units and filters are replicated to create more data parallelism when
+needed.  Furthermore, the StreamIt compiler is able to use global
+knowledge of the program for layout and transformations at
+compile-time while Stream-C interprets each basic block at runtime and
+performs local optimizations such as stream register allocation in
+order to map the current set of stream computations onto Imagine.
+
+The iWarp system \cite{iwarp} is a scalable multiprocessor with
+configurable communication between nodes.  In iWarp, one can set up a
+few FIFO channels for communicating between non-neighboring
+nodes. However, reconfiguring the communication channels is more
+coarse-grained and has a higher cost than on Raw, where the network
+routing patterns can be reconfigured on a cycle-by-cycle
+basis~\cite{scalaroperands}.  ASSIGN \cite{assign} is a tool for
+building large-scale applications on multiprocessors, especially
+iWarp.  ASSIGN starts with a coarse-grained flow graph that is written
+as fragments of C code.  Like StreamIt, it performs partitioning,
+placement, and routing of the nodes in the graph.  However, ASSIGN is
+implemented as a runtime system instead of a full language and
+compiler such as StreamIt.  Consequently, it has fewer opportunities
+for global transformations such as fission and reordering.
+
+SCORE (Stream Computations Organized for Reconfigurable Execution) is
+a stream-oriented computational model for virtualizing the resources
+of a reconfigurable architecture~\cite{score}.  Like StreamIt, SCORE
+aims to improve portability across reconfigurable machines, but it
+takes a dynamic approach of time-multiplexing computations (divided
+into ``compute pages'') from within the operating system, rather than
+statically scheduling a program within the compiler.
+
+Ptolemy~\cite{ptolemyoverview} is a simulation environment for
+heterogeneous embedded systems, including the domain of Synchronous
+Dataflow (SDF) that is similar to the static-rate stream graphs of
+StreamIt.  While there are many well-established scheduling techniques
+for SDF~\cite{leesdf}, the round-robin nodes in our stream graph
+require the more general model of Cyclo-Static Dataflow
+(CSDF)~\cite{BELP96} for which there are fewer results.  Even CSDF
+does not have a notion of an initialization phase, filters that peek,
+or a dynamic messaging system as supported in StreamIt.  In all, the
+StreamIt compiler differs from Ptolemy in its focus on optimized code
+generation for the nodes in the graph, rather than high-level modeling
+and design.
+
+Proebsting and Watterson \cite{pro96} present a filter fusion
+algorithm that interleaves the control flow graphs of adjacent nodes.
+However, they assume that nodes communicate via synchronous {\tt get}
+and {\tt put} operations; StreamIt's asynchronous peek operations and
+implicit buffer management fall outside the scope of their model.
+
+A large number of programming languages have included a concept of a
+stream; see \cite{survey97} for a survey.  Synchronous languages such
+as LUSTRE~\cite{lustre}, Esterel~\cite{esterel92}, and
+Signal~\cite{signal} also target the embedded domain, but they are
+more control-oriented than StreamIt and are not aggressively optimized
+for performance.  Sisal (Stream and Iteration in a Single Assignment
+Language) is a high-performance, implicitly parallel functional
+language~\cite{sisal}.  The Distributed Optimizing Sisal
+Compiler~\cite{sisal} considers compiling Sisal to distributed memory
+machines, although it is implemented as a coarse-grained master/slave
+runtime system instead of a fine-grained static schedule.
+

@@ -1,0 +1,35 @@
+# this performs linking, packaging, symbol creation for a one-tile
+# version of beamformer
+#
+
+LIMIT = TRUE
+SIM-CYCLES = 5000000
+SIM-COMMAND = sv(88907); sv(85057); sv(85057); 
+
+BTL-MACHINE-FILE = fileio.bc
+
+SRC = src
+INC = include
+
+
+ROOT = test
+TILES = 00
+
+include $(TOPDIR)/Makefile.include
+
+ifndef TOPDIR
+$(error TOPDIR not defined, make sure to include Makefile.include)
+endif
+
+VSIPL_DIR = vsipl/TASP_VSIPL_Core_Plus
+INCLUDE_DIRS += -I$(VSIPL_DIR)/include -I$(INC)
+
+OBJECT_FILES_00 = $(SRC)/main_raw.o $(SRC)/LPF.o $(SRC)/DIT.o $(SRC)/BF.o $(SRC)/PC.o $(SRC)/Utils.o
+
+include $(COMMONDIR)/Makefile.all
+
+BTL-ARGS += -host
+SPEC-IMEM-SIZE = -imem_size 131072
+SPEC-SMEM-SIZE = -smem_size 262144
+
+BTL-ARGS += $(SPEC-IMEM-SIZE) $(SPEC-SMEM-SIZE)

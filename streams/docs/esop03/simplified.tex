@@ -1,0 +1,315 @@
+\section{Basic Translation: SDF to SARE}
+\label{sec:simple}
+
+In order to familiarize the reader with the basics of our technique,
+we present in this section the translation procedure for a simplified
+input domain.  The translation rules for the general case can be found
+in Section~\ref{sec:translate}.
+
+Our basic translation operates on a Synchronous Dataflow Graph.  This
+is equivalent to a Cyclo-Static Dataflow Graph where there is exactly
+one phase for each node.  That is, $\forall n,~\mt{num}(n) = 1$.
+Since we are only concerend with the 0'th phase of each node, we
+simplify our notation and omit an argument to any function that
+requires a phase $p$.  For instance, the push and pop rates of a
+channel $c$ are now just $U(c)$ and $O(c)$, respectively; the work
+function for a node $n$ is simply $W(n)$.
+
+\input{simplefig}
+
+\subsection{Calculating the Steady-State Period}
+\label{sec:balance}
+
+Let $S(n)$ denote the number of times that node $n$ fires its first
+phase for a periodic steady-state execution of the entire graph. A
+{\it periodic} schedule is one that does not change the number of
+items on the channels in the graph after executing; in other words, it
+is legal to execute in the steady state.  For an SDF graph, there is a
+unique and minimal periodic schedule, of which all other periodic
+schedules are a multiple~\cite{leesdf}.  It is straightforward to use
+a set of balance equations to solve for $S(n)$ given the declared
+rates of filters in the graph.  If the graph is invalid (i.e., it
+would lead to deadlock or an unbounded buffer size) then the balance
+equations will have no solution.  See~\cite{leesdf} for details.
+
+We will use the following helper function in our analysis.  Given
+channel $c = (n_a, n_b)$:
+\begin{align*}
+\mt{Period}(c) \equiv S(n_a) * U(c) = S(n_b) * O(c)
+\end{align*}
+
+That is, $\mt{Period}(c)$ denotes the number of items that are passed
+over channel $c$ during a single steady-state execution of the graph.
+
+\subsection{Generating a SARE}
+\label{sec:simplesare}
+
+We now generate a SARE for the Synchronous Dataflow Graph.  The {\it
+domains} of the SARE will be parameterized by $N$, the number of
+steady-state cycles that one wishes to execute in the PCP.  However,
+it is important to note that $N$ does not affect the number of
+variables or equations in the SARE, as that would require a separate
+compilation and analysis for each value of $N$.  It is a key benefit
+of the SARE representation that $N$ can be incorporated as a symbolic
+parameter in the schedule.
+
+The procedure for generating the SARE appears in
+Figure~\ref{fig:sdftosare}.  The basic idea is to introduce a variable
+$\mt{BUF}_c$ for each channel $c$ which keeps track of the entire
+history of values that are transmitted over $c$ (we keep track of the
+entire history since all elements in a SARE must be assigned only
+once.)  The $i$ dimension of $\mt{BUF}$ counts over steady-state
+periods, while the $j$ dimension holds elements that were written
+during a given period.  We also introduce variables $\mt{WRITE}_c$ and
+$\mt{READ}_c$ that write and read from channel $c$.  For reasons that
+become clear below, these variables have a $k$ dimension to index the
+values that are pushed on a given firing, while the $j$ dimension
+counts firings of a node and the $i$ dimension counts steady-state
+periods, as before.
+
+Equation~\ref{eq:r2w} expresses the computation internal to each node,
+whereas Equations~\ref{eq:w2b} and~\ref{eq:b2r} expresses the
+communication of the nodes with the channels.  In
+Equation~\ref{eq:r2w}, the node's work function is used to calculate
+all of the $\mt{WRITE}$ values from all of the $\mt{READ}$ values,
+during a given firing $(i,j)$. 
+%The $k$ dimension was added to
+%$\mt{READ}$ and $\mt{WRITE}$ so that a given $(i,j)$ index pair would
+%uniquely identify the read and write operations of a given firing.
+
+Equation~\ref{eq:w2b} shows the communication from the $\mt{WRITE}$
+array to the $\mt{BUF}$ array for a given channel.  To understand this
+equation, it might help to consider a simpler version which expresses
+the correct relationship but is not a legal SARE:
+\begin{align*}
+&\forall (i,j,k) \in {\cal D}_{\mt{WRITE}_c}:~~
+\mt{BUF}_{c}(i,j*U(c)+k) = \mt{WRITE}_{c}(i, j, k)
+\end{align*}
+The equation above is simply copying the contents of $\mt{WRITE}$ into
+$\mt{BUF}$ while accounting for the differing array dimensions.
+However, this equation is not valid for a SARE, since there is an
+affine expression indexing the array on the left hand side.
+
+To deal with this issue, we split up the equation into several pieces,
+each of which assigns to a different portion of the $\mt{BUF}$ array.
+In Equation~\ref{eq:w2b}, we introduce a variable $q$ that counts up
+to $S(n)$, which is the extent of the $j$ dimension of $\mt{WRITE}_c$.
+For each of these $q$, we copy over $U(c)$ values from the appropriate
+section of the $\mt{WRITE}$ array; the domain ${\cal D}_{W \rightarrow
+B}(c,q)$ represents the $q$'th slice of $\mt{BUF}$ into which the
+section should be written.  This equation is a valid component of our
+SARE, as the boundaries on each equation's domain are fully resolvable
+at compile time.
+
+Equation~\ref{eq:b2r} is similar to Equation~\ref{eq:w2b} regarding
+the slicing technique that is used to parameterize the domain of the
+equation.
+
+%% Equation~\ref{eq:b2r} also contains the shortcoming that is mentioned
+%% above for the simplified translator: the index expression of $i+q$
+%% into $\mt{BUF}_c$ can overflow 
+
+%% -------------
+
+%% for all c, 
+%% for all q in [0, E(c)/period(c)],
+
+%% forall (i,j,k) in X:  READ(i,j,k) = BUF(i, j*O(c) + k)
+
+%% X = D_READ intersect (i',j',k | 
+%%   j <= (Period(c) - (E(c) mod Period))/O(c) 
+%%   q*Pop(c) <= k <= min( (q+1)*pop(C), E(c) ) - 1
+%% )
+
+%% -------------
+
+%% for all c, 
+%% for all q in [0, E(c)/period(c)],
+
+%% forall (i,j,k) in X:  READ(i,j,k) = BUF(i+1, j*O(c) + k - [(Period(c) - (E(c) mod Period)) mod O(c)])
+
+%% X = D_READ intersect (i',j',k | 
+%%   j >= (Period(c) - (E(c) mod Period)) / O(c)
+%%   k >= (Period(c) - (E(c) mod Period)) - j * O(c)
+%% )
+
+%% --------
+
+%% for all c, 
+%% for all q in [0, E(c)/period(c)],
+
+%% forall (i,j,k) in X:  READ(i,j,k) = BUF(i, j*O(c) + k)
+
+%% X = D_READ intersect (i',j',k | 
+%%   j >= (Period(c) - (E(c) mod Period)) / O(c)
+%%   k <= (Period(c) - (E(c) mod Period)) - j * O(c)
+%% )
+
+%% --------
+
+%% assumptions:
+
+%% E(c) < Period
+
+%% for all c, 
+%% for all q in [0, E(c)/period(c)],
+
+%% forall (i,j,k) in X:  READ(i,j,k) = BUF(i+1, k - (Period(c) - j * O(c))
+
+%% X = D_READ intersect (i,j,k | 
+%%   i <= N - 2
+%%   j > (Period(c) - E(c)) / O(c)  (== index of the boundary firing that doesn't overlap next period in buf)
+%%   k >= Period(c) - E(c) - j * O(c)
+
+%%    --> k in range [0, E(c)]
+%%    --> where it overlaps in j-index of buf:  Period(c) - E(c)
+%%    --> overlap in k-index of read = ``'' - starting-k-index of READ in frame of buf = ``'' - j * O(c)
+%%    --> yielding Period(c) - E(c) - j * O(c)
+%% )
+
+%% --------
+
+%% assumptions:
+
+%% E(c) < Period
+
+%% for all c, 
+%% for all q in [0, E(c)/period(c)],
+
+%% forall (i,j,k) in X:  READ(i,j,k) = BUF(i, j * O(c) + k)
+
+%% X = D_READ intersect (i,j,k | 
+%%   j > (Period(c) - E(c)) / O(c)  (== index of the boundary firing that doesn't overlap next period in buf)
+%%   k <= Period(c) - E(c) - j * O(c) - 1
+
+%%    --> k in range [0, E(c)]
+%%    --> where it overlaps in j-index of buf:  Period(c) - E(c)
+%%    --> overlap in k-index of read = ``'' - starting-k-index of READ in frame of buf = ``'' - j * O(c)
+%%    --> yielding Period(c) - E(c) - j * O(c)
+%% )
+
+%% --------
+
+%% assumptions:
+
+%% E(c) < Period
+
+%% for all c, 
+%% for all q in [0, E(c)/period(c)],
+
+%% forall (i,j,k) in X:  READ(i,j,k) = BUF(i, j * O(c) + k)
+
+%% X = D_READ intersect (i,j,k | 
+%%   j <= (Period(c) - E(c)) / O(c) - 1  (== index of the boundary firing that doesn't overlap next period in buf)
+
+%%    --> k in range [0, E(c)]
+%%    --> where it overlaps in j-index of buf:  Period(c) - E(c)
+%%    --> overlap in k-index of read = ``'' - starting-k-index of READ in frame of buf = ``'' - j * O(c)
+%%    --> yielding Period(c) - E(c) - j * O(c)
+%% )
+
+%% -------
+
+%% write to buf with a(c)
+
+%% i to buf:  
+
+%% forall q in [0, a(c)/period(c)]
+
+%% forall (i,j) in X:  buf_c(i,j) = I[period(c)*i + j]
+
+%% where X = D_buf intersect {i,j | i==q &&
+%%                                  0 <= j <= min (period(c), A(c) - q * period(c) ) - 1
+
+
+%% -------
+
+%% write to buf (ABANDONED)
+
+%% assume period > a_c
+
+%% forall q in [0, a(c)-1]
+
+%% forall (i, j) in in X:  buf[i,j] = write(i,q,j-p*U(c))
+
+%% X: {i,j | j <= a(c) - 1
+
+
+
+
+%% forall q in [0, a(c)/period(c)]
+
+%% forall (i,j) in X:  buf_c(i,j) = I[period(c)*i + j]
+
+%% where X = D_buf intersect {i,j | i==q &&
+%%                                  0 <= j <= min (period(c), A(c) - q * period(c) ) - 1
+
+
+
+%% ===============================================================================
+
+%% --------
+
+%% assumptions:
+
+%% Num_Pushed items from I have been put on READ in lexicographic order (onto read)
+%% PUSHED represents the index set that has been pushed
+%% E(c) < Period
+
+%% for all c, 
+%% for all q in [0, E(c)/period(c)],
+
+%% forall (i,j,k) in X:  READ(i,j,k) = BUF(i+1 - num_pushed/period(c), k - (Period(c) - j * O(c))
+
+%% X = D_READ - PUSHED intersect (i,j,k | 
+%%   i <= N - 2
+%%   j > (Period(c) - E(c)) / O(c)  (== index of the boundary firing that doesn't overlap next period in buf)
+%%   k >= Period(c) - E(c) - j * O(c)
+
+%%    --> k in range [0, E(c)]
+%%    --> where it overlaps in j-index of buf:  Period(c) - E(c)
+%%    --> overlap in k-index of read = ``'' - starting-k-index of READ in frame of buf = ``'' - j * O(c)
+%%    --> yielding Period(c) - E(c) - j * O(c)
+%% )
+
+%% --------
+
+%% assumptions:
+
+%% E(c) < Period
+
+%% for all c, 
+%% for all q in [0, E(c)/period(c)],
+
+%% forall (i,j,k) in X:  READ(i,j,k) = BUF(i, j * O(c) + k)
+
+%% X = D_READ intersect (i,j,k | 
+%%   j > (Period(c) - E(c)) / O(c)  (== index of the boundary firing that doesn't overlap next period in buf)
+%%   k <= Period(c) - E(c) - j * O(c) - 1
+
+%%    --> k in range [0, E(c)]
+%%    --> where it overlaps in j-index of buf:  Period(c) - E(c)
+%%    --> overlap in k-index of read = ``'' - starting-k-index of READ in frame of buf = ``'' - j * O(c)
+%%    --> yielding Period(c) - E(c) - j * O(c)
+%% )
+
+%% --------
+
+%% assumptions:
+
+%% E(c) < Period
+
+%% for all c, 
+%% for all q in [0, E(c)/period(c)],
+
+%% forall (i,j,k) in X:  READ(i,j,k) = BUF(i, j * O(c) + k)
+
+%% X = D_READ intersect (i,j,k | 
+%%   j <= (Period(c) - E(c)) / O(c) - 1  (== index of the boundary firing that doesn't overlap next period in buf)
+
+%%    --> k in range [0, E(c)]
+%%    --> where it overlaps in j-index of buf:  Period(c) - E(c)
+%%    --> overlap in k-index of read = ``'' - starting-k-index of READ in frame of buf = ``'' - j * O(c)
+%%    --> yielding Period(c) - E(c) - j * O(c)
+%% )
+

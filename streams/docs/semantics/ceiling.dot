@@ -1,0 +1,20 @@
+digraph G {
+  node[shape=box,label=""];
+  A [label="",color=white];
+  C [label="",color=white];
+
+  subgraph cluster0 {
+    label="ceiling for\nSelectMessage,\nSwitchMessage"
+Before->Splitter
+Splitter->B1
+Splitter->B2
+Splitter->BN
+B1->Joiner
+B2->Joiner
+BN->Joiner
+Joiner->After
+  }
+
+A->Before
+  After->C
+}

@@ -1,0 +1,59 @@
+% might need psfig, url, amsmath, amsfonts?
+\documentclass[runningheads]{llncs}
+
+\usepackage{epsfig}
+
+\begin{document}
+
+%{\copyright Springer-Verlag, 2002}
+
+\pagestyle{headings}
+%In order to omit page numbers and running heads
+%please change this line to
+%\pagestyle{empty}
+%and change the first command line too, see above.
+
+\mainmatter
+
+\title{\mbox{StreamIt:  A Language for Streaming Applications
+\thanks{\mbox{For more information about StreamIt, see http://compiler.lcs.mit.edu/streamit.}}}}
+
+\titlerunning{Copyright 2002 Springer-Verlag}
+
+\author{William Thies 
+	\and Michal Karczmarek 
+%	\and Michael Gordon 
+%	\and David Maze
+%	\and \\ Jeremy Wong 
+%	\and Henry Hoffmann 
+%	\and Matthew Brown 
+	\and Saman Amarasinghe}
+
+\authorrunning{Copyright 2002 Springer-Verlag}
+
+\institute{Laboratory for Computer Science \\
+	Massachusetts Institute of Technology \\
+	Cambridge, MA  02139 \\ \vspace{8pt}
+\email{\{thies, karczma, 
+%mgordon, dmaze, jnwong, hank, morris, 
+saman\}@lcs.mit.edu} \vspace{-24pt}}
+
+\maketitle
+
+\begin{abstract}
+\input{abstract.tex}
+\end{abstract}
+
+\input{intro.tex}
+\input{domain.tex}
+\input{overview.tex}
+%\input{timing.tex}
+\input{appendix.tex}
+\input{example.tex}
+\input{results.tex}
+\input{related.tex}
+\input{conclusion.tex}
+\bibliographystyle{splncs}
+\bibliography{references}
+%\input{appendix2.tex}
+\end{document}

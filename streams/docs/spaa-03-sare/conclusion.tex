@@ -1,0 +1,17 @@
+\section{Conclusion}
+
+This paper shows that the inter-node dependences of a Cyclo-Static
+Dataflow Graph can be cleanly represented as a System of Affine
+Recurrence Equations.  In combination with Feautrier's array dataflow
+analysis~\cite{Feautrier01} for deducing intra-node dependences, this
+establishes the SARE as a unified analysis and optimization framework
+for high-level DSP programming models.
+
+We believe that the precise affine dependence framework provided by
+the SARE representation will enable a powerful suite of node
+optimizations in dataflow graphs.  The SARE is a robust and
+well-established framework within the systolic and scientific
+communities, with methods for graph parameterization, automatic
+parallelization, and storage optimization.  We propose optimizations
+such as decimation propagation and node fission that are first
+applications of these techniques to the signal processing domain.

@@ -1,0 +1,12 @@
+digraph G {
+node [shape=box];
+{rank = same;MEM1;MEM2;}
+{rank = same;PROC1;PROC2;}
+nodesep=0.7;
+MEM1 -> PROC1;
+PROC1 -> MEM1;
+PROC1 -> PROC2 [taillabel="\n             c1"];
+PROC2 -> PROC1;
+PROC2 -> MEM2;
+MEM2 -> PROC2;
+}

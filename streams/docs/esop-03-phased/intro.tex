@@ -1,0 +1,149 @@
+\section{Introduction}
+
+Applications structured around some notion of a ``stream'' are
+becoming increasingly important and widespread. There is evidence
+that streaming media applications are already consuming most of
+the cycles on consumer machines \cite{Rix98}, and their use is
+continuing to grow.  In the embedded domain, applications for
+hand-held computers, cell phones, and DSP's are centered around
+stream of voice or video data.  The stream abstraction is also
+fundamental to high-performance applications such as intelligent
+software routers, cell phone base stations and HDTV editing
+consoles.
+
+Despite the prevalence of these applications, there is
+surprisingly little language and compiler for practical,
+large-scale stream programming.  The notion of a stream as a
+programming abstraction has been around for decades \cite{SICP},
+and a number of special-purpose stream languages have been
+designed (see \cite{survey97} for a review). Many of these
+languages and representations are elegant and theoretically sound,
+but they often are not designed with neither practical use nor
+efficient in mind. Consequently most programmers turn to
+general-purpose languages such as C or C++ to implement stream
+programs.
+
+\begin{comment}
+There are two reasons that general-purpose languages are
+inappropriate for stream programming.  Firstly, they are a
+mismatch for the application domain.  That is they do not provide
+a natural or intuitive representation of streams thereby having a
+negative effect on readability, robustness, and programmer
+productivity.  Furthermore, general-purpose languages do not
+communicate well the inherent parallelism of stream computations.
+ Secondly, general-purpose languages are a mismatch for the
+emerging class of grid-based architectures
+\cite{smartmemories,rawshort,trips}.
+\end{comment}
+
+{\StreamIt} is a language and compiler specifically designed for
+modern stream programming.  The main goal of the {\StreamIt}
+langauge is to provide high-level stream abstractions that improve
+programmer productivity and program robustness within the
+streaming domain.  At the same time, {\StreamIt} compiler aims to
+perform stream-specific optimizations to achieve the performance
+of an expert programmer.
+
+In order to achieve these goals, {\StreamIt} provides a number of
+features, designed to allow the programmer to easily and naturally
+express the required computation, while keeping the program easy
+to analyze by a compiler: all {\StreamIt} streaming constructs are
+single-input, single-output; all computation happens in
+{\filters}; data is passed around between {\filters} using three
+streaming constructs: {\pipeline}, which allows stacking of
+{\filters} one after another, {\splitjoin}, which allows splitting
+and joining of data amongst multiple streams, and
+{\feedbackloop}, which constructs cyclic streams. {\StreamIt}
+programs are built hierarchically, using {\filters} as the inner
+building blocks and {\pipelines}, {\splitjoins} and
+{\feedbackloops} as outer building blocks.\footnote{We use the
+word {\stream} to refer to any instance of a {\filter},
+{\pipeline}, {\splitjoin}, or {\feedbackloop}.} In {\StreamIt},
+every {\filter} must declare the rate at which it processes data:
+how much data is consumed and produced on every invocation of the
+{\filter}'s {\work} function. This model of data passing is called
+Synchronous Data Flow ({\SDF}).
+
+\begin{comment}
+In addition to {\SDF}, {\StreamIt} allows the programmer to pass
+data between {\filters} in an asynchronous manner, similar to a
+combination of message passing and function calls. Timing of such
+data delivery is expressed in terms of amount of information
+wavefronts - the programmer can specify a delay between message
+delivery and destination {\filter}'s processing of data currently
+being produced or consumed by the source {\filter}.  Such timing
+mechanism introduces latency and buffering constraints on
+execution of {\StreamIt} programs.
+\end{comment}
+
+Using the features present in {\StreamIt}, the programmer can
+express complex algorithms and computation models.  One of the
+challenges faced in compiling {\StreamIt} programs is scheduling.
+Since {\StreamIt} uses {\SDF} computation model it is possible to
+schedule the order of execution of {\filters} at compile time.
+Scheduling {\SDF} programs presents a difficult challenge to the
+compiler:  as the complexity of the program grows, the amount of
+memory required to execute the program increases.  This increase
+comes from two sources: the schedule size increases, as well as
+amount of data needed for buffering increases.  These two sources
+are closely coupled. There exist tradeoffs between the schedule
+size and the buffer size. The smallest schedules (Single
+Appearance schedules) require buffer space may in the worst case
+grow exponentially with number of components. The general rule is
+that very small schedules result in very large buffering
+requirements. On the other hand, reducing buffering requirements
+can lead to substantially larger schedule sizes.
+
+\begin{comment}
+This problem is further complicated by message latency constraints
+placed on the program by the programmer.  While {\StreamIt}
+programs are meant to provide relatively lax latency requirements,
+it is possible to write programs with latency constraints so tight
+that very few valid schedules exist. Finding these schedules is a
+challenging task.
+\end{comment}
+
+This paper develops a novel technique for scheduling execution of
+{\StreamIt} programs. The technique takes advantage of structure
+of {\StreamIt} to create compact schedules. These schedules will
+be purely hierarchical in nature. The concept of a phased schedule
+(which is also hierarchical) will be introduced to reduce the
+requirement for buffering data between {\filters} without overly
+increasing the size of the schedule. Phased scheduling is meant to
+to reduce the severity of tradeoffs the compiler needs to make
+between schedule size and buffer requirements, thus allowing
+compilation of programs to more resource constrained
+architectures. It can also help to allocate resources more
+appropriately between resources necessary for execution of the
+program and resources necessary to store data.
+
+Hierarchical schedules are also useful, because they allow for
+separate compilation of program components. This enables creation
+of standardized libraries and their distribution in binary form,
+rather than source code. This ability may become important as
+streaming languages become more widely used for larger
+applications.
+
+\begin{comment}
+The contributions of this thesis are:
+\begin{itemize} \item
+hierarchical scheduling of streaming application, a concept
+enabled by {\StreamIt} language, \item first formal handling of
+{\SDF} graphs with peeking, \item novel phasing scheduling
+technique, \item a minimal latency schedule using hierarchical
+phases, \item novel {\SDF} program abstraction called the
+information buffering model that simplifies information latency
+analysis, \item a solution to scheduling of {\StreamIt} programs
+with latency constraints.
+\end{itemize}
+\end{comment}
+
+The remainder of this paper is organized as follows: Section
+\ref{sec:streamit} describes relevant {\StreamIt} constructs;
+Section \ref{chpt:sched-basic} explains basic concepts in
+scheduling {\StreamIt} graphs; chapter \ref{chpt:hierarchical}
+describes a hierarchical single-appearance scheduling technique;
+Section \ref{chpt:phased} describes phasing scheduling technique
+and presents minimum-latency scheduling algorithm; Section
+\ref{chpt:results} presents results of scheduling applications
+using the phased scheduling algorithm.

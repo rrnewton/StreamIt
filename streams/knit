@@ -1,0 +1,254 @@
+#!/usr/bin/perl -w
+#
+# knit: StreamIt compiler wrapper
+# David Maze <dmaze@cag.lcs.mit.edu>
+# $Id: knit,v 1.23 2003-03-31 18:16:32 thies Exp $
+#
+
+use strict;
+use vars qw(%opts);
+
+use Getopt::Long;
+Getopt::Long::Configure("bundling", "no_ignore_case");
+
+get_options() or die "Error parsing options";
+if ($opts{'more-help'})
+  {
+    usage(\*STDOUT, 1);
+    exit(0);
+  }
+if ($opts{help})
+  {
+    usage(\*STDOUT, 0);
+    exit(0);
+  }
+my $fns = \@ARGV;
+$fns = new_to_old($fns) unless $opts{java};
+if ($opts{'library'}) {
+    run_in_library($fns);
+    exit(0);
+}
+$fns = old_to_c($fns);
+c_to_out($fns, $opts{output}) unless $opts{raw};
+exit(0);
+
+sub usage
+  {
+    my ($fh, $more) = @_;
+    my $text = <<'EOT';
+knit: StreamIt compiler wrapper
+
+Usage: knit [options] file.str ...
+	
+Options:
+  --help              Show this screen
+* --more-help         Include internal-only options
+* --java              Input file is "old" syntax
+  --output filename   Write a binary to filename
+  --raw n             Compile for RAW, with an n-by-n grid
+* --viram, -V         Compile for VIRAM, a vector uniprocessor
+  --verbose           Print commands as they are executed
+  --library           Run in the Java library instead of compiling
+
+Options available for all backends:
+  --frequencyreplacement, -F
+                      Convert FIR filters to frequency
+* --fusion, -f        Fuse entire program to a single filter
+  --linearreplacement Perform linear transformations based on analysis
+* --linearpartition, -B
+                      Automatically selecting targets of linear analyses
+  --nofieldprop, -L   Do not propagate constant field values
+  --redundantreplacement, -t
+                      Create linear filters without redundant computation
+* --simplesjfusion    Revert to the old, simple SplitJoin fusion algorithm
+  --sjtopipe, -J      Convert split-joins to pipelines
+  --sync, -k          Turn on sync removal
+  --unroll, -u        Specify loop unrolling limit
+
+Options specific to RAW backend:
+* --altcodegen, -z    Alternate RAW communication code generation
+  --dppartition, -y   Use the dynamic programming partitioner
+* --dpscaling, -Y     Collect theoretical scaling statistics
+* --ilppartition, -A  Use the integer linear programming partitioner
+* --magic-net, -M     Generate RAW "magic network" code
+* --noanneal, -W      Do not run simulated annealing for layout
+  --numbers n, -N     Automatically gather numbers and put in results.out
+  --partition, -a     Automatically partition stream graph
+  --ptraccess, -Q     Access buffers through a pointer
+* --ratematch, -x     Turn on rate matching
+  --raw-uni, -U       Use RAW backend to generate uniprocessor code
+  --removeglobals, -G Inline all functions and turn globals into locals
+  --simulatework, -T  Use simulator for work estimation
+
+Options specific to uniprocessor backend:
+  --poptopeek, -P     Convert all pop expressions into peeks
+  --profile           Compile with profiling information
+EOT
+    if ($more) {
+      $text =~ s/^\*/ /mg;
+    } else {
+      $text =~ s/^\*.*\n//mg;
+    }
+    print $fh $text;
+}
+
+sub get_options
+  {
+    $opts{home} = $ENV{STREAMIT_HOME};
+    $opts{output} = "a.out";
+    GetOptions(\%opts,
+	       "help",
+	       "more-help|help-more",
+	       "java!",
+	       "output|o=s",
+	       "raw|r=i",
+	       "verbose|v",
+	       "altcodegen|z",
+	       "dppartition|y",
+	       "dpscaling|Y",
+	       "frequencyreplacement|F",
+	       "fusion|f",
+	       "ilppartition|A",
+	       "library",
+	       "linearpartition|B",
+	       "linearreplacement|I",
+	       "magic-net|magic_net|M",
+	       "noanneal|W",
+	       "nofieldprop|L",
+	       "numbers|N=i",
+	       "partition|a",
+	       "poptopeek|P",
+	       "profile",
+	       "ptraccess|Q",
+	       "ratematch|x",
+	       "raw-uni|raw_uni|U",
+	       "redundantreplacement|t",
+	       "removeglobals|G",
+	       "simplesjfusion|S",
+	       "simulatework|T",
+	       "sjtopipe|J",
+	       "sync|k",
+	       "unroll|u=i",
+	       "viram|V");
+  }
+
+sub call
+  {
+    my ($cmd) = @_;
+    print "$cmd\n" if $opts{verbose};
+    return system($cmd);
+  }
+
+sub change_extension
+  {
+    my ($old, $from, $to) = @_;
+    my $fn = $old;
+    $fn =~ s/.$from$//;
+    $fn .= ".$to";
+    return $fn;
+  }
+
+sub remove_extension
+  {
+    my ($old, $from) = @_;
+    my $fn = $old;
+    $fn =~ s/.$from$//;
+    return $fn;
+  }
+
+sub new_to_old
+  {
+    my ($fns) = @_;
+    my @out = ();
+    foreach my $str (@$fns)
+      {
+	my $java = change_extension($str, "str", "java");
+	call("java streamit.frontend.ToJava $str --output $java");
+	push @out, $java;
+      }
+    return \@out;
+  }
+
+sub old_to_c
+  {
+    my ($fns) = @_;
+    my @out = ();
+    my $kjcopts = get_kjc_opts();
+    foreach my $java (@$fns)
+      {
+	if (!$opts{raw})
+	  {
+	    my $c = change_extension($java, "java", "c");
+	    call("java -Xmx512M at.dms.kjc.Main -s $kjcopts $java > $c");
+	    push @out, $c;
+	  }
+	else
+	  {
+	    call("java -Xmx512M at.dms.kjc.Main -s $kjcopts $java");
+	  }
+      }
+    return \@out;
+  }
+
+sub run_in_library
+  {
+    my ($fns) = @_;
+    my @out = ();
+    foreach my $java (@$fns)
+      {
+	  my $class = remove_extension($java, "java");
+	  call("javac $java");
+	  call("java $class");
+      }
+  }
+
+sub c_to_out
+  {
+    my ($fns, $target) = @_;
+    my $sh = $opts{home};
+    my ($gcc, $libs);
+    if ($opts{profile})
+      {
+	$gcc = "gcc -pg -a";
+	$libs = "-nodefaultlibs -lstreamit_p -lsrfftw -lssftw -lm_p " .
+	  "-lc_p -lgcc";
+      }
+    else
+      {
+	$gcc = "gcc";
+	$libs = "-lstreamit -lsrfftw -lsfftw -lm";
+      }
+    call("$gcc -g -O2 -o$target -I$sh/library/c " . join(' ', @$fns) .
+	 " -L$sh/library/c $libs");
+  }
+
+sub get_kjc_opts
+  {
+    my $kjcopts = "";
+    $opts{raw} && ($kjcopts .= " -raw " . $opts{raw});
+    $opts{altcodegen} && ($kjcopts .= " -z");
+    $opts{dppartition} && ($kjcopts .= " -y");
+    $opts{dpscaling} && ($kjcopts .= " -Y");
+    $opts{frequencyreplacement} && ($kjcopts .= " -F");
+    $opts{fusion} && ($kjcopts .= " -o");
+    $opts{ilppartition} && ($kjcopts .= " -A");
+    $opts{linearreplacement} && ($kjcopts .= " -I");
+    $opts{linearpartition} && ($kjcopts .= " -B");
+    $opts{'magic-net'} && ($kjcopts .= " -M");
+    $opts{noanneal} && ($kjcopts .= " -W");
+    $opts{nofieldprop} && ($kjcopts .= " -L");
+    $opts{numbers} && ($kjcopts .= " -N" . $opts{numbers});
+    $opts{partition} && ($kjcopts .= " -a");
+    $opts{poptopeek} && ($kjcopts .= " -P");
+    $opts{ptraccess} && ($kjcopts .= " -Q");
+    $opts{ratematch} && ($kjcopts .= " -x");
+    $opts{'raw-uni'} && ($kjcopts .= " -U");
+    $opts{removeglobals} && ($kjcopts .= " -G");
+    $opts{simplesjfusion} && ($kjcopts .= " -S");
+    $opts{simulatework} && ($kjcopts .= " -T");
+    $opts{sjtopipe} && ($kjcopts .= " -J");
+    $opts{sync} && ($kjcopts .= " -k");
+    $opts{unroll} && ($kjcopts .= " -u " . $opts{unroll});
+    $opts{viram} && ($kjcopts .= " -V");
+    return $kjcopts;
+}

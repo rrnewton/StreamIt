@@ -1,0 +1,5 @@
+#!/bin/csh
+
+foreach item (`grep -l '\\bibstyle' *.aux | sed 's/\.aux//'`)
+    bibtex $item
+end

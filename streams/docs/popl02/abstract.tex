@@ -1,0 +1,16 @@
+We present a translation scheme that allows a broad class of dataflow
+graphs to be considered under the optimization framework of the
+polyhedral model.  The input to our analysis is a Phased Computation
+Graph, which we define as a generalization of the most widely used
+dataflow representations, including synchronous dataflow, cyclo-static
+dataflow, and computation graphs.  The output of our analysis is a
+System of Affine Recurrence Equations (SARE) that exactly captures the
+data dependences between the nodes of the original graph.  Using the
+SARE representation, one can apply many techniques from the scientific
+community that are new to the DSP domain.  For example, we propose
+simple optimizations such as node splitting, decimation propagation,
+and steady-state invariant code motion that leverage the fine-grained
+dependence information of the SARE to perform novel transformations on a
+stream graph.  We also propose ways in which the polyhedral model can
+offer new approaches to classic problems of the DSP community, such as
+minimizing buffer size, code size, and optimizing the schedule.

@@ -1,0 +1,124 @@
+\section{Background and Related Work}
+\label{sec:related}
+
+\subsection{Dataflow Graphs}
+
+Strictly speaking, synchronous dataflow (SDF) refers to a class of
+dataflow graphs where the input rate and output rate of each node is
+constant from one invocation to the next~\cite{LM87-i,LM87-ii}.  For
+SDF graphs, it is straightforward to determine a legal steady state
+schedule using balance equations~\cite{leesdf} (see
+Section~\ref{sec:balance}).  The SDF scheduling community focuses on
+``single-appearance schedules'' (SAS) in which each filter appears at
+only one position in the loop nest denoting the schedule.  The
+interest in SAS is because the runtime overhead of a method call is
+prohibitive, so the code for each block is inlined.  However, code
+size is so important that they can't afford to duplicate the inlining,
+thus leading to the restriction that each filter appear only once.
+They have demonstrated that minimizing buffer size in general graphs
+is NP-complete, but they explore two heuristics to do it in acyclic
+graphs~\cite{Bhatta97}.
+
+Cyclo-static dataflow (CSDF) is the generalization of SDF to the case
+where each node has a set of phases with different I/O rates that are
+cycled through repeatedly~\cite{BELP96,Parks95}.  Compared to SDF,
+CSDF is more natural for the programmer for writing phased filters,
+since periodic tasks can be separated.  For instance, consider a
+channel decoder that inputs a large matrix of coefficients at regular
+intervals, but decodes one element at a time for $N$ invocations in
+between each set of coefficients.  By having two separate phases, the
+programmer doesn't have to interleave this functionality in a single,
+convoluted work function.  Also, CSDF can have lower latency and more
+fine-grained parallelism than SDF.  However, current scheduling
+techniques for CSDF involve converting each phase to an SDF actor,
+which can cause deadlock even for legal graphs~\cite{BELP96} and does
+not take advantage of the fine-grained dataflow exposed by CSDF.
+
+The computation graph (CG) was described by Karp and
+Miller~\cite{Karp67} as a model of computation that, unlike the two
+above, allows the nodes to {\it peek}.  By ``peek'' we mean that a
+node can read and use a value from a channel without consuming
+(popping) it from the channel; peeking is good for the programmer
+because it automates the buffer management for input items that are
+used on multiple firings, as in an FIR filter.  However, peeking
+complicates the schedule because an initialization schedule is needed
+to ensure that enough items are on the channel in order to
+fire~\cite{Gordo02}.  In~\cite{Karp67}, conditions are given for when
+a computation graph terminates and when its data queues are bounded.
+
+Govindarajan et. al develop a linear programming framework for
+determining the ``rate-optimal schedule'' with the minimal memory
+requirement~\cite{GGD94}.  A rate-optimal schedule is one that takes
+advantage of parallel resources to execute the graph with the maximal
+throughput.  Though their formulation is attractive and bears some
+likeness to ours, it is specific for rate-optimal schedules and does
+not directly relate to the polyhedral model.  It also can result in a
+code size blow up, as the same node could be executed in many
+different contexts.
+
+\subsection{Systems of Affine Recurrence Equations}
+
+A System of Affine Recurrence Equations (SARE) is a set of equations
+${\cal E}_1 \dots {\cal E}_{m_{\cal E}}$ of the following form~\cite{DRV00,Feautrier92i}:
+\begin{equation}
+\forall {\vec i} \in {\cal D_{\cal E}}:~~X({\vec i}) = f_{\cal E}(\dots, Y({\vec h}_{{\cal
+E}, Y}({\vec i})), \dots)
+\label{eq:sare}
+\end{equation}
+In this equation, our notation is as follows:
+\begin{itemize}
+
+\item $\{X, Y, \dots\}$ is the set of {\it variables} defined by the
+SARE.  Variables can be considered as multi-dimensional arrays mapping
+a vector of indices ${\vec i}$ to a value in some space ${\cal V}$.
+
+\item ${\cal D_{\cal E}}$ is a polyhedron representing the {\it
+domain} of the equation ${\cal E}$.  Each equation for a variable $X$
+has a disjoint domain; the domain $D_X$ for variable $X$ is taken as
+the convex union of all domains over which $X$ is defined.
+
+\item ${\vec h}_{{\cal E}, Y}$ is a vector-valued affine function,
+giving the index of variable $Y$ that $X({\vec i})$ depends on.  A
+vector-valued function ${\vec h}$ is affine if it can be written as
+${\vec h}({\vec i}) = C{\vec i} + {\vec d}$, where C is a constant
+array and ${\vec d}$ is a constant vector that do not vary with ${\vec
+i}$.
+
+\item $f_{\cal E}$ is a strict function used to compute the elements
+of $X$.
+
+\end{itemize}
+
+Intuitively, the SARE can be considered as follows.  Given an array
+element at a known index $\vec i$, the SARE gives the set of arrays
+and indices that this element depends on.  Furthermore, each index
+expression on the right hand side is an affine expression of $\vec i$.
+Note that in order to map directly from an array element to the
+elements that it depends on, the index expression on the left hand
+side must exactly match the domain quantifier $\vec i$.
+
+A SARE has no notion of internal state per se; however, state can be
+modeled by introducing a self-loop in the graph of variables.  If the
+dependence function ${\vec h}$ happens to be a translation (${\vec
+h}({\vec i}) = {\vec i} - {\vec k}$ for constant ${\vec k}$), then the
+SARE is {\it uniform}, and referred to as a SURE or
+SRE~\cite{Karp67}. SURE's can be used for systolic array
+synthesis~\cite{Quinton84}, and there are techniques to uniformize
+SARE's into SURE's~\cite{Manjun00}.
+
+SARE's became interesting from the standpoint of program analysis upon
+Feautrier's discovery~\cite{Feautrier92i,Feautrier92ii} that a SARE is
+mathematically equivalent to a ``static control flow program''.  A
+program has static control flow if the entire path of control can be
+determined at compile time (see~\cite{Feautrier92i,DRV00} for
+details).  Feautrier showed that using a SARE, one can use linear
+programming to produce a {\it parameterized} schedule for a program.
+That is, if a loop bound is unknown at compile time, then the symbolic
+bound enters the schedule and it does not affect the complexity of the
+technique.  Feautrier's framework is very flexible in that it allows
+one to select a desirable affine schedule by any linear heuristic.
+
+Lim and Lam~\cite{Lim01} build on Feautrier's technique with an affine
+partitioning algorithm that maximizes the degree of parallelism while
+minimizing the degree of synchronization.  It also operates on a form
+that is equivalent to a SARE.

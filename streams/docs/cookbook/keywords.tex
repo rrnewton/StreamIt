@@ -1,0 +1,48 @@
+\section{Keyword Review}
+
+\noindent Stream object types:
+
+\begin{description}
+\item[filter] Declares a filter with a work function
+\item[pipeline] Declares a series of stream objects, with the output
+  of the first connected to the input of the second, etc.
+\item[splitjoin] Declares a parallel set of stream objects, with a
+  splitter and a joiner distributing and collecting data
+\item[feedbackloop] Declares a feedback loop with two children, with a
+  joiner combining input data and the output of the loop and a
+  splitter distributing the output of the body to the output and the
+  input of the loop
+\end{description}
+
+\noindent Filter work functions:
+
+\begin{description}
+\item[push] Pushes an item on to the output of the filter.  Must be
+  called the exact number of times as in the rate declaration.
+\item[pop] Retrieves and removes the first item from the input of the
+  filter.  Must be called the exact number of times as in the rate
+  declaration.
+\item[peek(k)] Retrieves the $k+1$-th item from the input of the
+  filter, without removing it.  If $n$ items have been popped, $k+n$
+  must be less than the declared peek rate.
+\end{description}
+
+\noindent Composite stream declarations:
+
+\begin{description}
+\item[add] Adds a child after the existing children.  (pipeline,
+  splitjoin)
+\item[body] Adds a child as the body part of a feedback loop.
+\item[loop] Adds a child as the loop part of a feedback loop.
+\item[enqueue] Pushes an item on to the input of the joiner coming
+  from the loop part of a feedback loop.
+\item[split] Declares the type and weights of the splitter.
+  (splitjoin, feedbackloop)
+\item[join] Declares the type and weights of the joiner.  (splitjoin,
+  feedbackloop)
+\item[duplicate] Splitter type that takes each input item and copies
+  it to the input of each child.
+\item[roundrobin] Splitter or joiner type that takes a specified
+  number of items from the input (or output) and copies it to the
+  input (or output) of each child.
+\end{description}

@@ -1,0 +1,92 @@
+%%% Scientific things that use SARE's
+
+- for sare conversion, it should be "dataflow analysis of array and
+  scalar refernces" instead of the scheduling paper fr/ feautrier
+
+- could reference the alpha system, Tanguy Risset, the Alpha homepage,
+
+add application:
+- hardware synthesis (systolic synthesis) [could reference opera project,
+http://icps.u-strasbg.fr/opera/home.html]
+
+look for:
+
+* lee/kedem, mapping nested loop algorithms into multidimensional systolic arrays
+* quinton, the mapping of linear recurrence equations on regular arrays
+* moldovan, on the analysis and synthesis of vlsi systolic arrays
+
+  -> definately related, looking at converting something with
+     different rates (decimation factors) but still constant
+     requirements of computation, into a systolic array.
+
+- mongonet, a geometrical coding to compile affine recurrence equations on regular arrays
+
+--
+is this the only synthesis paper i can find?
+S. V. Rajopadhye, S. Purushothaman and R. M. Fujimoto. 
+
+On Synthesizing Systolic arrays from Recurrence Equations with linear dependencies
+in FST &TCS, 1986 
+--
+
+here's something more on synthesis:
+Patrice Quinton: Automatic Synthesis of Systolic Arrays from Uniform Recurrent Equations. ISCA 
+
+something else on uniformization:
+
+--
+Journal of VLSI Signal Processing Systems >archive
+Volume 11 ,  Issue 1-2   Oct./Nov. 1995 >toc
+Special issue on VLSI design methodologies for digital signal processing systems 
+
+Converting affine recurrence equations to quasi-uniform recurrence equations
+--
+
+this could have some overlap with what i'm doing in this paper:  Multirate VLSI Arrays and Their Synthesis 
+
+this also looks relevant:
+A. Kerihuel, R. McConnell, S. Rajopadhye. VSDF: synchronous data flow for VLSI.  Proceedings of the 37th Midwest Symposium on Circuits and Systems, Lafayette, Louisiane, Aot, 1994
+
+%---
+% proving properties of multidimensional recurrences with applicatin to regular parallel algorithms
+% cachera, quinton, rajopadhye, risset
+% not exaclty sure what they're proving, but could be relevant
+%---
+
+@InProceedings{LoeMon97,
+author={V. Loechner and C. Mongenet},
+title={Solutions to the Communication Minimization Problem for Affine recurrence Equations},
+booktitle={Proceedings of Euro-Par}
+year={1997}}
+
+NOPE use this instead:
+
+Vincent Loechner, Catherine Mongenet: Communication Optimization for
+Affine Recurrence Equations Using Broadcast and
+Locality. International Journal of Parallel Programming 28(1): 47-102
+(2000)
+
+%% the next two articles look to be related
+
+% haven't read this
+@InProceedings{MarPalCas00,
+  author = 	 {A. Marongiu and P. Palazzari and C. Casaccia},
+  title = {A New Memory-Saving Technique to Map System of Affine
+  Recurrence Equations (SARE) onto Distributed Memory Systems},
+  booktitle = {Proceedings of the 13th International Parallel Processing Symposium and 10th Symposium on Parallel and Distributed Processing},
+  year = 	 {1999},
+}
+
+% haven't read this
+@Article{MarPal00,
+  author = 	 {Alessandro Marongiu and Paolo Palazzari},
+  title = 	 {Automatic Mapping of System of N-Dimensional Affine Recurrence
+Equations (SARE) onto Distributed Memory Parallel Systems},
+  journal = 	 {IEEE Transactions on Signal Processing},
+  year = 	 {2000}
+}
+
+===============================================================================================
+
+
+

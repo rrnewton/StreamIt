@@ -1,0 +1,231 @@
+\newcommand{\mt}[1]{\mbox{\it #1}}
+
+\subsection{Stream Graph Partitioning}
+\label{sec:partition}
+
+StreamIt provides the filter construct as the basic abstract unit of
+autonomous stream computation.  The programmer should decide the
+boundaries of each filter according to what is most natural for the
+algorithm under consideration.  While one could envision each filter
+running on a separate machine in a parallel system, StreamIt hides the
+granularity of the target machine from the programmer.  Thus, it is
+the responsibility of the compiler to adapt the granularity of the
+stream graph for efficient execution on a particular architecture.
+
+We use the word {\it partitioning} to refer to the process of dividing
+a stream program into a set of balanced computation units.  Given that
+a maximum of $N$ computation units can be supported, the partitioning
+stage transforms a stream graph into a set of no more than $N$
+filters, each of which performs approximately the same amount of work
+during the execution of the program.  Following this stage, each
+filter can be run on a separate processor to obtain a load-balanced
+executable.
+
+%\begin{figure}[htpb]
+\begin{figure}[!h]
+%\vspace{-.5in}
+\centering
+\begin{minipage}{3.0in}
+\centering
+\psfig{figure=beam-graph-orig.eps,width=2.5in}
+\caption{\protect\small Stream graph of the original 12x4 Radar
+application.  The 12x4 Radar application has 12 channels and 4 beams;
+it is the largest version that fits onto 64 tiles without filter
+fusion.  \protect\label{fig:beam-orig}}
+\end{minipage}
+\hspace{0.1in}
+\begin{minipage}{3.0in}
+\centering
+\psfig{figure=beam-graph-opt.eps,width=1.9in}
+\caption{\protect\small Stream graph of the load-balanced 12x4
+Radar application.  Vertical fusion is applied to collapse each pipeline
+into a single filter, and horizontal fusion is used to transform the
+4-way splitjoin into a 2-way splitjoin.  Figure~\ref{fig:beam-blood}
+shows the benefit of these
+transformations. \protect\label{fig:beam-opt}}
+\end{minipage}
+\end{figure}
+
+\begin{figure}[!h]
+  \psfig{figure=beam-blood-key.eps,width=3.0in} \\
+  \subfigure[
+    {\bf Original (runs on 64 tiles).}\label{fig:beam-blood1}]{\psfig{figure=beam-blood-orig.eps,width=3.1in}}
+  \hspace{0.3in} \subfigure[
+    {\bf Partitioned (runs on 16 tiles).}\label{fig:beam-blood2}]{\psfig{figure=beam-blood-opt.eps,width=3.1in}
+    } \caption{\protect\small Execution
+    traces for the (a) original and (b) partitioned versions of the
+    Radar application.  The $x$ axis denotes time, and the $y$ axis
+    denotes the processor.  Dark bands indicate periods where
+    processors are blocked waiting to receive an input or send an
+    output; light regions indicate periods of useful work.  The thin
+    stripes in the light regions represent pipeline stalls.  Our
+    partitioning algorithm decreases the granularity of the graph from
+    53 unbalanced tiles (original) to 15 balanced tiles (partitioned).
+    The throughput of the partitioned graph is 2.3 times higher than
+    the original. \protect\label{fig:beam-blood}}
+\end{figure}
+
+Our partitioner employs a set of fusion, fission, and reordering
+transformations to incrementally adjust the stream graph to the
+desired granularity.  To achieve load balancing, the compiler
+estimates the number of instructions that are executed by each filter
+in one steady-state cycle of the entire program; then, computationally
+intensive filters can be split, and less demanding filters can be
+fused.  Currently, a simple greedy algorithm is used to automatically
+select the targets of fusion and fission, based on the estimate of the
+work in each node.
+
+
+For example, in the case of the Radar application, the original
+stream graph (Figure~\ref{fig:beam-orig}) contains 52 filters.  These
+filters have unbalanced amounts of computation, as evidenced by the
+execution trace in Figure~\ref{fig:beam-blood1}.  The partitioner
+fuses all of the pipelines in the graph, and then fuses the bottom
+4-way splitjoin into a 2-way splitjoin, yielding the stream graph in
+Figure~\ref{fig:beam-opt}.  As illustrated by the execution trace in
+Figure~\ref{fig:beam-blood2}, the partitioned graph has much better
+load balancing.  In the following sections, we describe in more detail
+the transformations utilized by the partitioner.
+
+
+\subsubsection{Fusion Transformations}
+
+Filter fusion is a transformation whereby several adjacent filters are
+combined into one.  Fusion can be applied to decrease the granularity
+of a stream graph so that an application will fit on a given target,
+or to improve load balancing by merging small filters so that there is
+space for larger filters to be split.  Analogous to loop fusion in the
+scientific domain, filter fusion can enable other optimizations by
+merging the control flow graphs of adjacent nodes, thereby shortening
+the live ranges of variables and allowing independent instructions to
+be reordered.
+
+
+
+\subsubsection{Fission Transformations}
+
+Filter fission is the analog of parallelization in the streaming
+domain.  It can be applied to increase the granularity of a stream
+graph to utilize unused processor resources, or to break up a
+computationally intensive node for improved load balancing.
+
+
+\subsubsection{Reordering Transformations}
+
+There are a multitude of ways to reorder the elements of a stream
+graph so as to facilitate fission and fusion transformations.  For
+instance, neighboring splitters and joiners with matching weights can
+be eliminated a splitjoin construct can be divided into a hierarchical
+set of splitjoins to enable a finer granularity of fusion and
+identical stateless filters can be pushed through a splitter or joiner
+node if the weights are adjusted accordingly.
+
+\begin{table*}[!t]
+\begin{center}
+\scriptsize
+\begin{tabular}{|l|l||r||r|r|r|r||r||} \hline
+ & & {\bf lines of} & \multicolumn{4}{|c||}{\bf \# of constructs in the program} & {\bf \# of filters in the} \\ \cline{4-7}
+{\bf Benchmark} & {\bf Description} & {\bf code} & filters & pipelines & splitjoins & feedbackloops & {\bf expanded graph}
+\\
+\hline \hline
+FIR & 64 tap FIR & 
+125 & 5 & 1 & 0 & 0 & 132
+\\ \hline
+Radar & Radar array front-end~\cite{pca} & 
+549 & 8 & 3 & 6 & 0 & 52
+\\ \hline
+Radio & FM Radio with an equalizer & 
+525& 14 & 6 & 4 & 0 & 26
+\\ \hline
+Sort & 32 element Bitonic Sort & 
+419 & 4 & 5 & 6 & 0 & 242
+\\  \hline
+FFT & 64 element FFT & 
+200 & 3 & 3 & 2 & 0 & 24
+\\  \hline
+Filterbank & 8 channel Filterbank & 
+650 & 9 & 3 & 1 & 1 & 51
+\\  \hline
+GSM & GSM Decoder & 
+2261 & 26 & 11 & 7 & 2 & 46
+\\ \hline
+Vocoder & 28 channel Vocoder~\cite{seneff80} &  
+1964 & 55 & 8 & 12 & 1 & 101
+\\ \hline
+3GPP & 3GPP Radio Access Protocol~\cite{3gpp} &  
+1087 & 16 & 10 & 18 & 0 & 48
+\\ \hline
+\hline
+\end{tabular}
+\caption{\protect\small Application Characteristics.}
+\label{tab:benchmarks}
+\end{center}
+\end{table*}
+
+\begin{table*}[!t]
+\begin{center}
+\scriptsize
+\begin{tabular}{|l||r|r|r|r||r||r||} \hline
+& \multicolumn{5}{|c||}{\bf 250 MHz Raw processor} & {\bf C on a 2.2 GHz} \\ 
+\cline{2-6} 
+{\bf Benchmark} & \multicolumn{4}{|c||}{\bf StreamIt on 16 tiles} & {\bf C on a single tile} & {\bf Intel Pentium IV}\\ 
+\cline{2-7}
+& {\bf Utilization} &
+\begin{tabular}{c}\hspace{-5pt} {\bf \# of tiles} \hspace{-5pt}\\
+\hspace{-5pt} {\bf used} \hspace{-5pt}
+\end{tabular} &    
+ {\bf MFLOPS} & 
+\begin{tabular}{c}\hspace{-5pt} {\bf Throughput} \hspace{-5pt}\\
+\hspace{-5pt} {\bf (per 10$^5$ cycles)} \hspace{-5pt}
+\end{tabular} &    
+\begin{tabular}{c}\hspace{-5pt} {\bf Throughput} \hspace{-5pt}\\
+\hspace{-5pt} {\bf (per 10$^5$ cycles)} \hspace{-5pt}
+\end{tabular} &    
+\begin{tabular}{c}\hspace{-5pt} {\bf Throughput} \hspace{-5pt}\\
+\hspace{-5pt} {\bf (per 10$^5$ cycles)} \hspace{-5pt}
+\end{tabular} \\    
+\hline \hline
+FIR    & 84\% &  14 & 815 &  1188.1  & 293.5 & 445.6 \\ \hline
+Radar  & 79\% & 16 & 1,231 &     0.52  & {\it app. too large} & 0.041 \\ \hline
+Radio  & 73\% & 16 & 421 &    53.9  & 8.85 & 14.1 \\ \hline
+Sort   & 64\% & 16  & N/A &  2,664.4 & 225.6 & 239.4 \\ \hline
+FFT    & 42\% & 16  & 182 &  2,141.9 & 468.9 & 448.5  \\ \hline
+Filterbank & 
+       41\% & 16  &  644 &   256.4  & 8.9 & 7.0   \\ \hline
+GSM    & 23\% & 16 & N/A &    80.9  & {\it app. too large} & 7.76 \\ \hline
+Vocoder& 17\% & 15  & 118 &     8.74  & {\it app. too large} & 3.35  \\ \hline
+3GPP   & 18\% & 16  & 44 &   119.6  & 17.3  & 65.7   \\ \hline \hline
+\end{tabular}
+\caption{\protect\small Performance Results.}
+\label{tab:performance}
+\vspace{-5pt}
+\end{center}
+\end{table*}
+
+\subsubsection{Automatic Partitioning}
+
+In order to drive the partitioning process, we have implemented a
+simple greedy algorithm that performs well on most applications.  The
+algorithm analyzes the {\tt work} function of each filter and
+estimates the number of cycles required to execute it.  
+In the case where there are fewer filters than tiles, the partitioner
+considers the filters in decreasing order of their computational
+requirements and attempts to split them using the filter fission
+algorithm described above.  
+If the stream graph contains more nodes than the target architecture,
+then the partitioner works in the opposite direction and repeatedly
+fuses the least demanding stream construct until the graph will fit on
+the target.  
+
+Despite its simplicity, this greedy strategy works well in practice
+because most applications have many more filters than can fit on the
+target architecture; since there is a long sequence of fusion
+operations, it is easy to compensate from a short-sighted greedy
+decision.  However, we can construct cases in which a greedy strategy
+will fail.  For instance, graphs with wildly unbalanced filters will
+require fission of some components and fusion of others; also, some
+graphs have complex symmetries where fusion or fission will not be
+beneficial unless applied uniformly to each component of the graph.
+We are working on improved partitioning algorithms that take these
+measures into account.
+

@@ -1,0 +1,237 @@
+\documentclass[11pt]{article}
+
+\usepackage{palatino}
+\usepackage{streamit}
+
+\title{StreamIt Semantic Checks}
+
+\begin{document}
+
+\maketitle
+
+This document contains a list of semantic checks that should be
+performed on StreamIt programs after they have been parsed.  These
+assume the program is syntactically correct; it must pass through the
+parser correctly.
+
+\section{Statement Placement}
+
+\subsection{Init, Work, and Phase Functions}
+
+\begin{enumerate}
+\item \lstinline|add| statements can only appear in init functions in
+  split-joins and pipelines;
+\item \lstinline|split| and \lstinline|join| statements can only
+  appear in init functions in split-joins and feedback loops;
+\item \lstinline|loop|, \lstinline|body|, and \lstinline|enqueue|
+  statements can only appear in init functions in feedback loops;
+\item \lstinline|push| statements can only appear in work and phase
+  functions in filters.
+\item \lstinline|pop| and \lstinline|peek| expressions can only appear
+  in work and phase functions in filters.
+\item If a work function does not declare I/O rates, it may not use
+  \lstinline|push|, \lstinline|pop|, or \lstinline|peek|.
+\end{enumerate}
+
+\subsection{Control Flow and Initialization Code}
+
+Several statements may only be executed once per function; other
+statements are sensitive to the order in which they are executed.
+
+\begin{enumerate}
+\item \lstinline|split|, \lstinline|join|, \lstinline|body|, and
+  \lstinline|loop| statements must be executed exactly once if they
+  are allowed at all.  Every path of control through the
+  initialization code must result in exactly one execution.
+\item For purposes of type-checking for pipelines, a data-flow
+  analysis must be able to determine the exact type of the pipeline at
+  each point in the initialization code.
+\item A data-flow analysis must be able to determine the number and
+  sequence of phases, along with any intermediate code, for a phased
+  filter.
+\item Nothing other than a work function which does not declare I/O
+  rates may call a phase function.
+\end{enumerate}
+
+\section{Typing}
+
+\subsection{Streams}
+
+``Match'' within this section means an \emph{exact} match in type;
+there is no implicit type promotion across tapes.
+
+\begin{enumerate}
+\item If the input type of a filter is \lstinline|void|, all of its
+  work functions must declare peek and pop rates of 0; if its output
+  type is \lstinline|void|, all of its work functions must have a push
+  rate of 0.
+\item For a pipeline, the input type must match the input type of the
+  first child and the output type of the last child must match the
+  output type of the pipeline.
+\item Within a pipeline, the output type of one child must match the
+  input type of the next child.
+\item The input type of a split-join must match the input type of all
+  of its children.  If the input type is \lstinline|void|, the
+  splitter must be \lstinline|roundrobin(0)|.  Identical constraints
+  hold for the output.
+\item The output type of a feedback loop's loop stream must match the
+  input type of its body stream.  If this type is \lstinline|void|,
+  the input type of the feedback loop must also be \lstinline|void|
+  and the joiner must be \lstinline|roundrobin(0)|.  Otherwise, the
+  input type of the feedback loop must be either the same type as the
+  body input or \lstinline|void|.  If the feedback loop's input type
+  is \lstinline|void| but the input type of the body stream is not,
+  then the joiner must be a round-robin joiner that gives a zero
+  weight to the external input.  Identical constraints hold for the
+  output side of the feedback loop.
+\end{enumerate}
+
+\subsection{Statements and Expressions}
+
+\begin{enumerate}
+\item Types can be promoted: a \lstinline|bit| can be implicitly
+  converted to an \lstinline|int|, an \lstinline|int| can be promoted
+  to a \lstinline|float|, and a \lstinline|float| can be promoted to
+  \lstinline|complex|.
+\item Every referenced variable must have a declared type.
+\item Every expression has a type:
+\begin{enumerate}
+\item The type of a variable reference is the type of the variable;
+\item The type of a literal is the lowest type that can contain the
+  literal (the type of \lstinline|1| is \lstinline|bit|, the type of
+  \lstinline|2| is \lstinline|int|, the type of \lstinline|2.0| is
+  \lstinline|float|, and the type of \lstinline|2i| is
+  \lstinline|complex|);
+\item The type of a unary expression is the type of the child
+  expression.  The type of a binary expression is the join of the
+  types of the child expression, possibly promoted to a type the
+  operator can accept.  The type of the first part of the ternary
+  expression must be promotable to \lstinline|int|, and the second and
+  third parts must be promotable to a common type; the resulting type
+  is the common type.
+\item For a field reference \lstinline|a.b|, \lstinline|a| must be of
+  some structure type \lstinline|A|, which must have a field named
+  \lstinline|b|.  The type of the expression is the type of
+  \lstinline|b| in the structure declaration.
+\item For an array access \lstinline|a[i]|, \lstinline|a| must be of
+  some array type \lstinline|T[n]|, and the type of the expression is
+  \lstinline|T|.
+\item The type of a \lstinline|peek()| or \lstinline|pop()| expression
+  is the input type of the filter.
+\item The parameter of a \lstinline|peek()| expression and the index
+  of an array must both be of type \lstinline|int|.
+\item The type of a call to a helper function is the return type of
+  that function.
+\end{enumerate}
+\item The type of the parameter of a \lstinline|push()| statement must
+  be the output type of the filter.
+\item The type of the parameter of an \lstinline|enqueue()| statement
+  must be the output type of the feedback loop's loop stream.
+\item The type of the right-hand side of an assignment statement must
+  be promotable to the type of the left-hand side of the statement.
+\end{enumerate}
+
+\section{Naming}
+
+\subsection{Object Names}
+
+\begin{enumerate}
+\item No two streams or structures may have the same name.
+\item Within a single structure, no two member fields may have the
+  same name.  Field names must also be distinct from all stream and
+  structure names.
+\item Stream parameters within a single stream must have distinct
+  names from each other and from all stream and structure names.
+\item Functions declared within a filter must have unique names; these
+  include phase functions, message handlers, and helper functions.
+  The name of a function must be distinct from stream and structure
+  names.
+\item A variable may not be declared with the same name as a stream
+  parameter.  (Other variable hiding is legal.)  The name of a
+  variable must be distinct from stream, structure, and function
+  names within the current filter.
+\end{enumerate}
+
+\subsection{Using Names}
+
+\begin{enumerate}
+\item A stream constructor (the parameter to \lstinline|add|,
+  \lstinline|body|, and \lstinline|loop| statements) must be an
+  anonymous stream declaration, or must have a name matching the name
+  of a stream object with a parameter list matching the parameter list
+  of  the the stream.
+\end{enumerate}
+
+\section{Warnings}
+
+Things in this section are technically legal, but indicate
+questionable code:
+
+\begin{enumerate}
+\item Some things in StreamIt are counted; these include split-join
+  children (with fixed-length weighted round-robin splitters or
+  joiners), and work function pushes, pops, and peeks.  It should be a
+  warning if the compiler cannot statically confirm that these numbers
+  are not met exactly (or, for peeks, that the peek rate is not
+  exceeded).   For feedback loops, the compiler can also issue a
+  warning if it cannot confirm that enough items are enqueued to cause
+  the joiner to be fired at the start of the program.
+\item The compiler may need to guess at the I/O types of anonymous
+  streams.  If the type isn't clear from context a warning should be
+  issued.
+\item A warning should be issued if a phase function is declared which
+  is not used.
+\end{enumerate}
+
+\section{Temporary Checks}
+
+These checks are necessary due to current constraints in the StreamIt
+compiler.  They should be able to be removed when the compiler is
+improved.
+
+\begin{enumerate}
+\item A statement cannot contain more than one \lstinline|pop()|
+  expression; if it contains any \lstinline|pop()| expressions, it can
+  contain no \lstinline|peek()| expressions.  This can be removed once
+  the ordering of these expressions is established in the language
+  specification and enforced appropriately in the compiler.
+\item All child-constructing statements in initialization code must
+  have consistent types.  While the front-end can perform minimal
+  data-flow analysis to check that the types of pipelines, control
+  flow like the following is presently illegal:
+
+\begin{lstlisting}{}
+int->int filter IntIntBody { ... }
+int->int filter IntIntLoop { ... }
+float->int filter FloatIntBody { ... }
+int->float filter IntFloatLoop { ... }
+
+void->int feedbackloop SketchyLoop(int p) {
+  join roundrobin(0, 1);
+  if (p) {
+    body IntIntBody();
+    loop IntIntLoop();
+  } else {
+    body FloatIntBody();
+    loop IntFloatLoop();
+  }
+  split duplicate;
+  enqueue(1);
+}
+\end{lstlisting}
+
+  The types of the loop and all of its components are consistent
+  regardless of the value of \lstinline|p|, but if \lstinline|p| is
+  zero, the \lstinline|enqueue| statement takes a \lstinline|float|
+  parameter.  Presently the front-end should reject this construction
+  since it is unclear if the types around the joiner are consistent or
+  not.  This check can be removed if the compiler does stream
+  type-checking after constant propagation.
+\item None of the names listed in the ``Implementation Limits''
+  section of the language specification should be used.  These include
+  the capitalized names \lstinline|SplitJoin|,
+  \lstinline|FeedbackLoop|, \lstinline|Filter|, \lstinline|Pipeline|,
+  \lstinline|StreamIt|, and \lstinline|Complex|.
+\end{enumerate}
+
+\end{document}

@@ -1,0 +1,54 @@
+\documentclass[10pt]{article}
+
+\usepackage{epsfig}
+\usepackage{amsmath}
+\usepackage{fullpage}
+\usepackage{doublespace}
+\setstretch{1.2}
+
+\title{Phased Computation Graphs in the Polyhedral Model~\footnote{\small This document is Version 1 of MIT Laboratory for Computer Science Technical Memo LCS-TM-630, August 2002.  Our latest work on this subject will be available from \texttt{http://compiler.lcs.mit.edu/streamit}} \hfill}
+
+\author{William Thies, Jasper Lin and Saman Amarasinghe \\
+  MIT Laboratory for Computer Science\\
+  Cambridge, MA  02139\\ \\
+  \texttt{\symbol{`\{}thies, jasperln, saman\symbol{`\}}@lcs.mit.edu}}
+
+% don't include the date
+\date{}
+
+\begin{document}
+
+  \maketitle
+
+  \newcommand{\mt}[1]{\mbox{\it #1}}
+  \newcommand{\todo}[1]{\framebox{\bf #1}}
+  \newcommand{\dep}[0]{Dependence Frontier}                % The full name for the dependence function.
+  \newcommand{\DP}[0]{\textsc{Frontier}}                   % Abbrevation for dependence function.
+  \newcommand{\DEP}[2]{\DP_{#1 \small{\rightarrow} #2}}    % Math notation for dependence function.
+  \newcommand{\sssection}[1]{\medskip \noindent {\bf #1} \smallskip}
+
+  \begin{abstract}
+    \input{abstract}
+  \end{abstract}
+
+  \input{intro}
+  \input{related}
+  \input{sare}
+  \input{simplified}
+  \input{translate}
+  \input{apps}
+  \input{conclusion}
+
+\vspace{-18pt}
+  \begin{small}
+    \begin{singlespace}
+      \bibliographystyle{abbrv}
+      \bibliography{references}
+    \end{singlespace}
+  \end{small}
+  
+  \newpage
+  \setstretch{1.24}
+  \input{example2}
+  
+\end{document}

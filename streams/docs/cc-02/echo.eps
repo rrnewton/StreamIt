@@ -1,0 +1,115 @@
+%!
+%%BoundingBox: 61 563 226 748
+%%Title: echo
+%%CreationDate: Mon Jan 21 11:07:36 2002
+%%Creator: Tgif-3.0-p13 by William Chia-Wei Cheng (william@cs.UCLA.edu)
+
+/tgifdict 4 dict def
+tgifdict begin
+
+/tgifarrowtipdict 8 dict def
+tgifarrowtipdict /mtrx matrix put
+
+/tgifarrowtip
+ { tgifarrowtipdict begin
+      /dy exch def
+      /dx exch def
+      /h exch def
+      /w exch def
+      /y exch def
+      /x exch def
+      /savematrix mtrx currentmatrix def
+      x y translate
+      dy dx atan rotate
+      0 0 moveto
+      w neg h lineto
+      w neg h neg lineto
+      savematrix setmatrix
+   end
+ } def
+
+end
+
+%%PageBoundingBox: 61 563 226 748
+tgifdict begin
+/tgifsavedpage save def
+
+1 setmiterlimit
+1 setlinewidth
+
+0 setgray
+
+72 0 mul 72 11.00 mul translate
+72 128 div 100.000 mul 100 div dup neg scale
+
+gsave
+
+/tgiforigctm matrix currentmatrix def
+
+% TEXT
+0 setgray
+/Courier findfont [10 0 0 -10 0 0] makefont setfont
+   gsave
+      112 89 moveto (class Delay extends Filter {) show
+      112 101 moveto (  void init\(int delay\) {) show
+      112 113 moveto (    setInput\(Float.TYPE\); setOutput\(Float.TYPE\);) show
+      112 125 moveto (    setPush\(1\); setPop\(1\);) show
+      112 137 moveto (    for \(int i=0; i<delay; i++\)) show
+      112 149 moveto (      output.push\(0\);) show
+      112 161 moveto (  }) show
+      112 173 moveto (  void work\(\) { output.push\(input.pop\(\)\); }) show
+      112 185 moveto (}) show
+      112 197 moveto () show
+      112 209 moveto (class EchoEffect extends SplitJoin {) show
+      112 221 moveto (  void init\(\) {) show
+      112 233 moveto (    setSplitter\(Duplicate\(\)\);) show
+      112 245 moveto (    add\(new Delay\(100\)\);) show
+      112 257 moveto (    add\(new Delay\(0\)\);) show
+      112 269 moveto (    setJoiner\(RoundRobin\(\)\);) show
+      112 281 moveto (  }) show
+      112 293 moveto (}) show
+      112 305 moveto () show
+      112 317 moveto (class AudioEcho extends Pipeline {) show
+      112 329 moveto (  void init\(\) {) show
+      112 341 moveto (    add\(new AudioSource\(\)\);) show
+      112 353 moveto (    add\(new EchoEffect\(\)\);) show
+      112 365 moveto (    add\(new Adder\(\)\);) show
+      112 377 moveto (    add\(new Speaker\(\)\);) show
+      112 389 moveto (  }) show
+      112 401 moveto (}) show
+   grestore
+
+% POLY/OPEN-SPLINE
+0 setgray
+gsave
+   newpath
+      290 362 moveto
+      0 -49 atan dup cos 8.000 mul 241 exch sub
+      exch sin 8.000 mul 362 exch sub lineto
+   tgiforigctm setmatrix
+   1 setlinewidth
+   stroke
+grestore
+gsave
+   tgiforigctm setmatrix
+   newpath
+      241 362 8.000 3.000 -49 0 tgifarrowtip
+   1 setgray closepath fill
+   0 setgray
+   newpath
+      241 362 8.000 3.000 -49 0 tgifarrowtip
+   closepath fill
+grestore
+
+% TEXT
+0 setgray
+/Helvetica-Oblique findfont [12 0 0 -12 0 0] makefont setfont
+   gsave
+      297 360 moveto (Adder is defined) show
+      297 376 moveto (in Figure 8.) show
+   grestore
+
+grestore
+tgifsavedpage restore
+end
+%MatchingCreationDate: Mon Jan 21 11:07:36 2002

@@ -1,0 +1,832 @@
+\section{Phased Scheduling}
+\label{chpt:phased}
+
+We now propose Phased Scheduling, a technique which allows to
+schedule all valid {\StreamIt} programs, and which allows for
+better control of trade-off between schedule size and buffer size.
+
+Section \ref{sec:phased:intro} provides an introduction to and
+explanation of Phased Scheduling. Section \ref{sec:min-latency}
+presents a Minimal Latency Schedule implementation using Phased
+Scheduling.
+
+\subsection{Phased Scheduling}
+\label{sec:phased:intro}
+
+The pseudo single-appearance hierarchical scheduling technique
+presented in Section \ref{chpt:hierarchical}, while quite
+effective in scheduling simple applications, cannot schedule a
+small number of tight {\feedbackloops}. Furthermore, the
+technique is quite inflexible when it comes to attempting to
+create a different tradeoff between schedule size and buffer size.
+Phased scheduling solves both of these problems.
+
+Phased schedule is a hierarchical schedule, just like the pseudo
+single appearance schedule. Every stream uses only the schedule of
+its immediate child streams to create its own schedule. Phased
+schedules, however, consist of several steps, called phases. All
+of the phases must be executed in order to guarantee correctness.
+Once all of the phases have been executed, the complete schedule
+has been executed. A parent stream can interleave execution of its
+children's phases in its own schedule, to provide any level of
+granularity desired.
+
+\begin{comment}
+The schedules created using single appearance hierarchical
+scheduling tend to be quite small at the expense of larger
+buffering requirements.  A quite simple situation when such
+tradeoff is not desired, could be if the schedule is being stored
+in a large cheap ROM device, while the RAM used for buffering data
+is more expensive.  It is also quite possible that latency
+constraints cannot be satisfied by a single appearance
+hierarchical schedule. Clearly, a more flexible technique is
+required for scheduling.
+
+A key observation in hierarchical scheduling is that each
+component only needs to worry about the data that enters or leaves
+its children.  The amount of buffering done internally in a child
+is not noticeable or important to the parent component. This
+observation changes slightly if latency constraints are placed on
+the computation. Namely, the important information to keep track
+of is amount of data that leaves or enters children as well as
+amount of data that crosses latency constraint boundaries.
+
+This observation leads to a conclusion that scheduling execution
+of the {\StreamIt} programs using hierarchical scheduling can be
+simpler than scheduling the entire program all at once (scheduling
+the program all at once requires tracking all buffers and latency
+constraints at once).  Phased scheduling is a concept that expends
+on hierarchical scheduling, but does not require that a stream has
+a single or pseudo single appearance schedule.  Each stream is
+allowed to have multiple sub-schedules, also called phases. Each
+phase consists of phases of the children of the stream that will
+be executed to execute the phase. The phases must be executed in
+correct order. When all of the initialization phases of a stream
+have been executed, the stream has executed its initialization
+schedule and is ready to enter steady state execution. When all of
+the steady state phases of a stream have been executed in order,
+the entire steady state schedule for the stream has been executed.
+\end{comment}
+
+The granularity of splitting the steady state schedule into phases
+is left up to the specific scheduler.  Different streams can use
+different granularities of execution.  In principle, the parent
+should not need to know the scheduling granularity of its
+children. The only exception to this rule are {\feedbackloops},
+which can have children which are not scheduled tightly enough to
+allow the {\feedbackloop} to execute.
+
+\begin{comment}
+One important observation to make is that it makes little sense to
+have phases which do not consume or produce any data, and which do
+not have data cross any latency boundaries.  This is because such
+phases can easily be merged with preceding or following phases
+without any effect on ability to schedule a particular program.
+This observation allows to easily bound the size of the resulting
+schedules to be the sum of executions of first child, last child
+and children with latency boundaries. For example, the {\pipeline}
+in Figure \ref{fig:hierarchical-schedule} executes its first
+child, {\filter} A, 4 times in steady state execution, and its last
+child, {\filter} D, 9 times. Thus a phasing schedule of this
+pipeline should at most have $4+9=13$ phases.
+\end{comment}
+
+\subsection{Minimal Latency Phased Scheduling}
+\label{sec:min-latency}
+
+One of the problems with pseudo single-appearance scheduling is
+that it cannot schedule all legal {\StreamIt} programs.  A program
+with a {\feedbackloop} can have requirements for tight execution
+that cannot be satisfied using a pseudo single-appearance
+schedule, leading to deadlock. Phasing scheduling can alleviate
+this problem by allowing the program to be scheduled in a more
+fine-grained manner. Minimal latency scheduling is an example of a
+specific scheduling strategy that solves the problem of deadlock.
+Minimal latency schedule is a schedule that consumes a minimal
+amount of input data in order to output data. In other words, a
+minimal latency schedule only buffers as much data as is
+absolutely necessary. This means that if a {\feedbackloop} can be
+scheduled, a minimal latency schedule will be able to schedule it.
+
+\begin{comment}
+A minimal latency schedule is not necessarily single
+appearance. In fact, very few applications can have their minimal
+latency schedules expressed as a single appearance schedule.  One
+of the consequences of this is that minimal latency schedules
+require more space for storage of the schedule. Use of phasing
+scheduling facilitates creation of acceptably small minimal
+latency schedules.  In spirit of hierarchical scheduling, every
+component is scheduled separately, in hierarchical order.
+
+One important consequence of phased scheduling, one that is
+highlighted when calculating a minimal latency schedule, is that
+every phase is allowed to consume a different amount of data and
+produce a different amount of data.
+
+\subsubsection{Peeking}
+
+Phased scheduling has interesting consequence for peeking
+calculations.  The reason for this is that not all phases must
+consume data, thus not all phases will peek.  The amount of
+peeking done by a stream is important for creating an
+initialization schedule.  It is thus important to remember that
+the amount of peeking done by a stream is not necessarily the
+amount of peeking done by that stream in its first phase, because
+on first phase, the stream may not consume or peek any data.
+\end{comment}
+
+\subsubsection{Notation}
+
+\begin{comment}
+We extend the notation for peeking, popping and pushing to
+include phases. $u^m_s$ will denote amount of data pushed by the
+$m$th phase of stream $s$, $o^m_s$ will denote amount of data
+popped by the $m$th phase of stream $s$ and $e^m_s$ will denote
+amount of data peeked by $m$th phase of stream $s$.
+\end{comment}
+
+A phasing schedule of a stream $s$ is a set $P_s$ of elements,
+$P_s = \{T_s, I_s, c_s, c^i_s\}$.  The first element, $T_s$
+denotes the phases used for the steady state schedule of $s$.
+$I_s$ denotes the phases used for the initialization schedule of
+$s$. $c_s$ and $c^i_s$ are defined identically to their
+definitions in hierarchical schedules: $c_s$ is the consumption
+rate of the stream during its steady state execution and $c^i_s$
+is the consumption rate of the initialization schedule.
+
+$T_s$ and $I_s$ are defined by identical structures.  Both are
+defined as sets of phases. The only real difference between $T_s$
+and $I_s$ is that $T_s$ will be executed indefinitely, while $I_s$
+will be executed only once. A phase $A$ is defined as $A = \{E,
+c\}$.  $E$ is an ordered list of children's phases, {\splitters}
+and {\joiners} that are to be executed in order to execute the
+phase. $c$ is the consumption of the phase, with respect to its
+stream.
+
+\begin{comment}
+As an example, here is a minimal latency schedule for the sample
+stream in Figure \ref{fig:sample-sj}.  First, the schedule for the
+internal {\splitjoin}:
+
+\begin{displaymath} \small
+P_{sj} = \left\{
+\begin{array}{c}
+T_{sj} = \left\{
+\begin{array}{c}
+A_{sj,0} = \left\{\{\{6\ split\}\{2C\}\{5D\}\ join\},
+\left[\begin{array}{c}12\\12\\12\end{array}\right]\right\}, \\
+A_{sj,1} = \left\{\{\{3\ split\}C\{4D\}\ join\},
+\left[\begin{array}{c}6\\6\\12\end{array}\right]\right\}
+\end{array}\right\}, \\
+I_{sj} = \left\{ \right\}, \\
+c_{sj} = \left[ \begin{array}{c} 18 \\ 18 \\ 24 \end{array}
+\right], c^i_{sj} = \left[ \begin{array}{c} 0 \\ 0 \\ 0
+\end{array} \right]
+\end{array} \right\}
+\end{displaymath}
+
+\noindent And the following is a schedule for the {\pipeline}:
+
+\begin{displaymath} \small
+P_p = \left\{
+\begin{array}{c}
+T_p = \left\{
+\begin{array}{c}
+A_{p,0} = \left\{ \{\{3A\}A_{sj,0}\ B\}, \left[\begin{array}{c} 18 \\ 18 \\ 10 \end{array}\right]\right\}, \\
+A_{p,1} = \left\{ \{\{2A\}A_{sj,1}\ B\}, \left[\begin{array}{c} 12 \\ 12 \\ 10 \end{array}\right]\right\}, \\
+A_{p,2} = \left\{ \{\{3A\}A_{sj,0}\ B\}, \left[\begin{array}{c} 18 \\ 18 \\ 10 \end{array}\right]\right\}, \\
+A_{p,3} = \left\{ \{A\ A_{sj,1}\ B\}, \left[\begin{array}{c} 6 \\ 6 \\ 10 \end{array}\right]\right\} \\
+\end{array}\right\}, \\
+I_p = \left\{ \right\}, \\
+c_p = \left[ \begin{array}{c} 54 \\ 54 \\ 40 \end{array} \right],
+c^i_p = \left[ \begin{array}{c} 0 \\ 0 \\ 0 \end{array} \right]
+\end{array}
+\right\}
+\end{displaymath}
+\end{comment}
+
+\subsubsection{\filter}
+
+Since {\filters} have no internal buffering and only one {\work}
+function, their schedules are simple.  They contain a single
+phase, which in turn contains a single execution of the filter's
+{\work} function.  Although in principle, a {\filter} does not need to
+be executed to be initialized, it may require some data to be
+buffered for its execution.  This means that if $e_f > o_f$, we
+insert an artificial initialization phase to phasing schedules of
+{\filters}:
+
+\begin{displaymath} \small
+P_p = \left\{
+\begin{array}{c}
+T_p = \left\{
+\begin{array}{c}
+A_{f,0} = \left\{ \{f\}, \left[\begin{array}{c} e_f \\ o_f \\ u_f \end{array}\right]\right\} \\
+\end{array}\right\}, \\
+I_p = \left\{ A^i_{f,0} = \left\{ \{ \}, \left[\begin{array}{c}e_f - o_f \\ 0 \\ 0 \end{array}\right]\right\} \right\}, \\
+c_p = \left[ \begin{array}{c} e_f \\ o_f \\ u_f \end{array}
+\right], c^i_p = \left[ \begin{array}{c} e_f - o_f \\ 0 \\ 0
+\end{array} \right]
+\end{array}
+\right\}
+\end{displaymath}
+
+\subsubsection{{\pipeline}, {\splitjoin} and {\feedbackloop}}
+
+Technique used for calculating minimal latency phasing schedule
+for a {\pipeline}, {\splitjoin} and {\feedbackloop} is similar to
+the technique used to create a pseudo single-appearance
+hierarchical schedule for a {\feedbackloop}. Every phase is
+computed separately. Every phase knows how much data has been left
+in internal buffers by the previous phase.  The goal is to create
+a phase that consumes the minimum amount of data from the {\Input}
+{\Channel} in order to push at least one data item out to the
+{\Output} {\Channel}. Once the minimum amount of data has been
+consumed by the stream, the maximum amount of data possible is
+pushed out of the stream without consuming any more data. This is
+meant to prevent unnecessary buffering of data internally within
+streams, and reduce the number of phases necessary to compute a
+complete schedule.
+
+One important technique used for creating phased schedules is
+borrowing of data from {\Channels}.  When a child is being
+executed, it is allowed to borrow some data from the {\Channel},
+and expect that the upstream child will provide the right amount
+of data in the {\Channel} for real execution. In the tables, this
+means that amount of data can fall below 0.
+\begin{comment}
+This is obviously illegal during real execution for any
+{\Channel}. Some {\Channels}, however, have even stricter
+restrictions. If the node reading from a {\Channel} peeks more
+than it pops, the amount of data in the {\Channel} during real
+execution cannot fall below the $peek-pop$ amount.
+\end{comment}
+Since some {\filters} require a positive number of data items in
+the {\Channel}, we also need to keep track of amount of data
+needed from a {\Channel}, as can be seen in
+Table\ref{tbl:min-lat-sj}.
+
+The initialization schedule starts with no internally buffered
+data (with exception of {\feedbackloops}) and executes as many
+phases as is necessary to ensure that all children have executed
+all of their initialization phases. Once that has been achieved,
+the steady state schedule is created. The only difference between
+computation of an initialization and steady state schedules is
+that the steady state schedule stops executing children early, if
+they have already executed all the phases allocated to them for
+the steady state, while the initialization schedule continues
+executing until all initialization phases of all children have
+been executed.
+
+The only significant difference between the algorithms used for
+minimal latency scheduling of different stream types ({\pipeline},
+{\splitjoin} and {\feedbackloop}) is the order with which children
+of the stream are considered for execution.
+
+\begin{comment}
+For an $i$th child of a stream $s$ (stream $s_n$), the number of
+phases that must be executed for its steady state schedule to be
+complete is $S_{s,v,i} * |P_{s_i,T}|$.
+\end{comment}
+
+For a {\pipeline}, the order with which children are considered for
+execution is as follows.  First all the children are considered
+for execution moving from bottom to top.  The last child executes
+just enough phases to produce some data.  The child directly above
+it executes just enough phases to provide sufficient data for the
+child below to execute its child.  This process is repeated until
+the top-most child is reached.  At this point the direction of
+traversal is reversed. This time, the top-most child is skipped,
+and the second top-most child is considered.  It only executes as
+many phases as it can, while only using data already buffered
+between it and the child above it. Then, the child below it is
+executed in the same way. This is repeated until the bottom-most
+child is reached. The number of phases executed by each child is
+added up, and the phases are inserted in order (all phases of
+every child together, in order, iterating from top-most child down
+to bottom-most child).  This constitutes one complete phase of the
+{\pipeline}.
+
+For a {\splitjoin}, the process is similar, but the children are
+first executed bottom up starting with {\joiner}, then the stream
+children and finally the {\splitter}. After, the children are
+executed from top to bottom (excluding the {\splitter}), consuming
+only data already available to them in {\Channels}.
+
+\begin{comment}
+Using the sample {\pipeline} from Figure
+\ref{fig:hierarchical-schedule}(a), the following are phasing
+schedules for {\filters} A, B, C and D:
+
+\begin{displaymath} \small
+P_A = \left\{
+\begin{array}{c}
+T_A = \left\{
+\begin{array}{c}
+A_{A,0} = \left\{ \{A\}, \left[\begin{array}{c} 1 \\ 1 \\ 3 \end{array}\right]\right\} \\
+\end{array}\right\}, \\
+I_A = \left\{ \right\},  c_A = \left[ \begin{array}{c} 1 \\ 1 \\
+3 \end{array} \right], c^i_B = \left[ \begin{array}{c} 0 \\ 0 \\ 0
+\end{array} \right]
+\end{array}
+\right\}
+\end{displaymath}
+
+\begin{displaymath} \small
+P_B = \left\{
+\begin{array}{c}
+T_B = \left\{
+\begin{array}{c}
+A_{B,0} = \left\{ \{B\}, \left[\begin{array}{c} 3 \\ 2 \\ 3 \end{array}\right]\right\} \\
+\end{array}\right\}, \\
+I_B = \left\{ A^i_{B,0} = \left\{ \{ \}, \left[\begin{array}{c}1 \\ 0 \\ 0 \end{array}\right]\right\} \right\}, \\
+c_B = \left[ \begin{array}{c} 3 \\ 2 \\ 3 \end{array} \right],
+c^i_B = \left[ \begin{array}{c} 1 \\ 0 \\ 0
+\end{array} \right]
+\end{array}
+\right\}
+\end{displaymath}
+
+\begin{displaymath} \small
+P_C = \left\{
+\begin{array}{c}
+T_C = \left\{
+\begin{array}{c}
+A_{C,0} = \left\{ \{C\}, \left[\begin{array}{c} 2 \\ 2 \\ 1 \end{array}\right]\right\} \\
+\end{array}\right\}, \\
+I_C = \left\{ \right\}, c_C = \left[ \begin{array}{c} 2 \\ 2 \\ 1
+\end{array} \right], c^i_C = \left[ \begin{array}{c} 0 \\ 0 \\ 0
+\end{array} \right]
+\end{array}
+\right\}
+\end{displaymath}
+
+\begin{displaymath} \small
+P_D = \left\{
+\begin{array}{c}
+T_D = \left\{
+\begin{array}{c}
+A_{D,0} = \left\{ \{D\}, \left[\begin{array}{c} 5 \\ 3 \\ 1 \end{array}\right]\right\} \\
+\end{array}\right\}, \\
+I_D = \left\{ A^i_{D,0} = \left\{ \{ \}, \left[\begin{array}{c}2 \\ 0 \\ 0 \end{array}\right]\right\} \right\}, \\
+c_D = \left[ \begin{array}{c} 5 \\ 3 \\ 1 \end{array} \right],
+c^i_D = \left[ \begin{array}{c} 2 \\ 0 \\ 0
+\end{array} \right]
+\end{array}
+\right\}
+\end{displaymath}
+
+\noindent Table \ref{tbl:min-lat-pipe} shows a trace of execution
+of the algorithm on the {\pipeline} from Figure
+\ref{fig:hierarchical-schedule}(a).
+
+\begin{table} \centering
+\small
+\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|}
+\hline
+\multicolumn{3}{|c|}{data in {\Channel}} & \multicolumn{4}{c|}{\parbox{1in}{\centering phase executions left}} & \parbox{0.5in}{\centering child considered} & \parbox{0.8in}{\centering phases executed} & \parbox{0.8in}{\centering {\pipeline} consumption} \\
+\cline{1-7} $in_B$ & $in_C$ & $in_D$ & A & B & C & D & & & \\
+
+\hline 0 (0) & 0 (0) & 0 (-2) & 0 & 1 & 0 & 0 & C & $\{2 A_{C,0}\}$ & $[0\ 0\ 0]$ \\
+\hline 0 (0) & -4 (-4) & 2 (0) & 0 & 1 & 0 & 0 & B & $A^i_{B,0}, \{2A_{B,0}\}$ & $[0\ 0\ 0]$ \\
+\hline -4 (-5) & 2 (0) & 2 (0) & 0 & 0 & 0 & 0 & A & $\{2A_{A, 0}\}$ & $[2\ 2\ 0]$ \\
+\hline 2 (0) & 2 (0) & 2 (0) & 0 & 0 & 0 & 0 & B & - & $[0\ 0\ 0]$ \\
+\hline 2 (0) & 2 (0) & 2 (0) & 0 & 0 & 0 & 0 & C & $A_{C,0}$ & $[0\ 0\ 0]$ \\
+\hline 2 (0) & 0 (0) & 3 (0) & 0 & 0 & 0 & 0 & D & - & $[0\ 0\ 0]$ \\
+\hline 2 (0) &  0 (0) &  3 (0) & \multicolumn{7}{|c|}{init phase 0 done, init done} \\
+\hline 2 (0) & 0 (0) & 3 (0) & 4 & 6 & 9 & 3 & D & $A_{D,0}$ & $[0\ 0\ 1]$ \\
+\hline 2 (0) & 0 (0) & 0 (-2) & 4 & 6 & 9 & 2 & C & $\{2 A_{C,0}\}$ & $[0\ 0\ 0]$ \\
+\hline 2 (0) & -4 (-4) & 2 (0) & 4 & 6 & 7 & 2 & B & $\{2 A_{B,0}\}$ & $[0\ 0\ 0]$ \\
+\hline -2 (-3) & 2 (0) & 2 (0) & 4 & 4 & 7 & 2 & A & $A_{A,0}$ & $[1\ 1\ 0]$ \\
+\hline 1 (0) & 2 (0) & 2 (0) & 3 & 4 & 7 & 2 & B & - & $[0\ 0\ 0]$ \\
+\hline 1 (0) & 2 (0) & 2 (0) & 3 & 4 & 7 & 2 & C & $A_{C,0}$ & $[0\ 0\ 0]$ \\
+\hline 1 (0) & 0 (0) & 3 (0) & 3 & 4 & 6 & 2 & D & - & $[0\ 0\ 0]$ \\
+\hline 1 (0) &  0 (0) &  3 (0) &  \multicolumn{7}{|c|}{phase 0 done} \\
+\hline 1 (0) & 0 (0) & 3 (0) & 3 & 4 & 6 & 2 & D & $A_{D,0}$ & $[0\ 0\ 1]$ \\
+\hline 1 (0) & 0 (0) & 0 (-2) & 3 & 4 & 6 & 1 & C & $\{2 A_{C,0}\}$ & $[0\ 0\ 0]$ \\
+\hline 1 (0) & -4 (-4) & 2 (0) & 3 & 4 & 4 & 1 & B & $\{2 A_{B,0}\}$ & $[0\ 0\ 0]$ \\
+\hline -3 (-4) & 2 (0) & 2 (0) & 3 & 2 & 4 & 1 & A & $\{2 A_{A,0}\}$ & $[2\ 2\ 0]$ \\
+\hline 3 (0) & 2 (0) & 2 (0) & 1 & 2 & 4 & 1 & B & $A_{B,0}$ & $[0\ 0\ 0]$ \\
+\hline 1 (0) & 5 (0) & 2 (0) & 1 & 1 & 4 & 1 & C & $\{2 A_{C,0}\}$ & $[0\ 0\ 0]$ \\
+\hline 1 (0) & 1 (0) & 4 (0) & 1 & 1 & 2 & 1 & D & - & $[0\ 0\ 0]$ \\
+\hline 1 (0) &  1 (0) &  4 (0) &  \multicolumn{7}{|c|}{phase 1 done} \\
+\hline 1 (0) & 1 (0) & 4 (0) & 1 & 1 & 2 & 1 & D & $A_{D,0}$ & $[0\ 0\ 1]$ \\
+\hline 1 (0) & 1 (0) & 1 (-1) & 1 & 1 & 2 & 0 & C & $A_{C,0}$ & $[0\ 0\ 0]$ \\
+\hline 1 (0) & -1 (-1) & 2 (0) & 1 & 1 & 1 & 0 & B & $A_{B,0}$ & $[0\ 0\ 0]$ \\
+\hline -1 (-2) & 2 (0) & 2 (0) & 1 & 1 & 1 & 0 & A & $A_{A,0}$ & $[1\ 1\ 0]$ \\
+\hline 2 (0) & 2 (0) & 2 (0) & 0 & 0 & 1 & 0 & B & - & $[0\ 0\ 0]$ \\
+\hline 2 (0) & 2 (0) & 2 (0) & 0 & 0 & 1 & 0 & C & $A_{C,0}$ & $[0\ 0\ 0]$ \\
+\hline 2 (0) & 0 (0) & 3 (0) & 0 & 0 & 0 & 0 & D & - & $[0\ 0\ 0]$ \\
+\hline 2 (0) &  0 (0) &  3 (0) &  \multicolumn{7}{|c|}{phase 2 done, steady state schedule done} \\
+\hline
+\end{tabular}
+\caption[Trace of execution of Minimal Latency Scheduling on a
+{\pipeline}]{Trace of execution of Minimal Latency Scheduling
+Algorithm on {\pipeline} from Figure
+\ref{fig:hierarchical-schedule}(a). In the "data in {\Channel}"
+columns the first value represents the actual number of data in
+the {\Channel}, which can be negative if more data has been popped
+from the {\Channel} than has been pushed into it.  This is due to
+borrowing of data from {\Channels}. The second value represents the
+minimal number of data items that the downstream {\filter} has
+inspected beyond the 0th data. This value can be higher than the
+negative amount of data in the {\Channel} because a {\filter} may
+peek at data without consuming it.  In general, for a {\filter}
+$f$, the amount of data needed on its input {\Channel} is $\max(0,
+-(in_f - (e_f - o_f)))$. The needed amount is 0 until the
+downstream {\filter} is executed for the first time.}
+\label{tbl:min-lat-pipe}
+\end{table}
+
+\noindent The following is the resulting phasing schedule:
+
+\begin{displaymath} \small
+P_p = \left\{
+\begin{array}{c}
+T_p = \left\{
+\begin{array}{c}
+A_{p,0} = \left\{ \{A\{2B\}\{3C\}D\}, \left[\begin{array}{c} 1 \\ 1 \\ 1 \end{array}\right]\right\}, \\
+A_{p,1} = \left\{ \{\{2A\}\{3B\}\{4C\}D\}, \left[\begin{array}{c} 2 \\ 2 \\ 1 \end{array}\right]\right\}, \\
+A_{p,2} = \left\{ \{A\ B\{2C\}D\}, \left[\begin{array}{c} 1 \\ 1 \\ 1 \end{array}\right]\right\} \\
+\end{array}\right\}, \\
+I_p = \left\{ A^i_{p,0} = \left\{
+\{\{2A\}A^i_{B,0}\{2B\}\{3C\}A^i_{D,0}\}, \left[\begin{array}{c} 2  \\2 \\ 0 \\
+\end{array}\right]\right\}
+\right\}, \\
+c_p = \left[ \begin{array}{c} 4 \\ 4 \\ 3 \end{array} \right],
+c^i_p = \left[ \begin{array}{c} 2 \\ 2 \\ 0 \end{array} \right]
+\end{array}
+\right\}
+\end{displaymath}
+
+\subsubsection{\splitjoin}
+
+As explained above, the only difference between the algorithm for
+a {\pipeline} and a {\splitjoin} is the order in which the children
+streams are considered for execution.  In a {\pipeline}, the
+children are considered from the bottom-most child to the top
+child, and then from second top-most child down to the bottom most
+child again.  A {\splitjoin} has only three levels of direct
+children in it: the top is a {\splitter}, the middle is formed by
+all the child streams of the {\splitjoin} and the bottom is the
+{\joiner}.  To schedule a {\splitjoin}, the children are also
+considered in the bottom to top and top to bottom order, but the
+child streams are also considered from left to right (this choice
+is arbitrary - the order does not affect the number of child phase
+executions per phase of the {\splitjoin}).
+
+Using the sample {\splitjoin} from Figure
+\ref{fig:hierarchical-schedule}(b), the following are phasing
+schedules for {\filters} A and B:
+
+\begin{displaymath} \small
+P_A = \left\{
+\begin{array}{c}
+T_A = \left\{
+\begin{array}{c}
+A_{A,0} = \left\{ \{A\}, \left[\begin{array}{c} 2 \\ 2 \\ 1 \end{array}\right]\right\} \\
+\end{array}\right\}, \\
+I_A = \left\{ \right\}, c_A = \left[ \begin{array}{c} 2 \\ 2 \\ 1
+\end{array} \right], c^i_A = \left[ \begin{array}{c} 0 \\ 0 \\ 0
+\end{array} \right]
+\end{array}
+\right\}
+\end{displaymath}
+
+\begin{displaymath} \small
+P_B = \left\{
+\begin{array}{c}
+T_B = \left\{
+\begin{array}{c}
+A_{B,0} = \left\{ \{B\}, \left[\begin{array}{c} 3 \\ 2 \\ 6 \end{array}\right]\right\} \\
+\end{array}\right\}, \\
+I_B = \left\{ A^i_{B,0} = \left\{ \{ \}, \left[\begin{array}{c} 1 \\ 0 \\ 0 \end{array}\right]\right\} \right\}, \\
+c_B = \left[ \begin{array}{c} 3 \\ 2 \\ 6 \end{array} \right],
+c^i_B = \left[ \begin{array}{c} 1 \\ 0 \\ 0
+\end{array} \right]
+\end{array}
+\right\}
+\end{displaymath}
+
+\noindent Table \ref{tbl:min-lat-sj} shows execution of the
+algorithm on the {\splitjoin} from Figure
+\ref{fig:hierarchical-schedule}(b).
+
+\begin{table} \centering \small
+\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+\hline
+\multicolumn{4}{|c|}{data in {\Channel}} & \multicolumn{4}{c|}{\parbox{1in}{\centering phase executions left}} & \parbox{0.5in}{\centering child considered} & \parbox{0.6in}{\centering phases executed} & \parbox{0.6in}{\centering {\pipeline} consumption} \\
+\cline{1-8} split & A & B & join & $in_A$ & $out_A$ & $in_B$ & $out_B$ & & & \\
+\hline
+\hline 0 (0) & 0 (0) & 0 (0) & 0 (0) & 0 & 0 & 1 & 0 & join & - & $[0\ 0\ 0]$ \\
+\hline 0 (0) & 0 (0) & 0 (0) & 0 (0) & 0 & 0 & 1 & 0 & A & - & $[0\ 0\ 0]$ \\
+\hline 0 (0) & 0 (0) & 0 (0) & 0 (0) & 0 & 0 & 1 & 0 & B & $A^i_{B,0}$ & $[0\ 0\ 0]$ \\
+\hline 0 (0) & 0 (0) & 0 (-1) & 0 (0) & 0 & 0 & 0 & 0 & split & split & $[3\ 3\ 0]$ \\
+\hline 2 (0) & 0 (0) & 1 (0) & 0 (0) & 0 & 0 & 0 & 0 & A & $A^i_{A,0}$ & $[0\ 0\ 0]$ \\
+\hline 0 (0) & 1 (0) & 1 (0) & 0 (0) & 0 & 0 & 0 & 0 & B & - & $[0\ 0\ 0]$ \\
+\hline 0 (0) & 1 (0) & 1 (0) & 0 (0) & 0 & 0 & 0 & 0 & join & - & $[0\ 0\ 0]$ \\
+\hline 0 (0) &  1 (0) &  1 (0) &  0 (0) & \multicolumn{7}{|c|}{init phase 0 done, init done} \\
+\hline 0 (0) & 1 (0) & 1 (0) & 0 (0) & 2 & 2 & 1 & 2 & join & join & $[0\ 0\ 4]$ \\
+\hline 0 (0) & 0 (0) & 1 (0) & -3 (-3) & 2 & 2 & 1 & 2 & A & - & $[0\ 0\ 0]$ \\
+\hline 0 (0) & 0 (0) & 1 (0) & -3 (-3) & 2 & 2 & 1 & 1 & B & $A_{B,0}$ & $[0\ 0\ 0]$ \\
+\hline 0 (0) & 0 (0) & -1 (-2) & 3 (0) & 2 & 2 & 0 & 2 & split & $\{2split\}$ & $[6\ 6\ 0]$ \\
+\hline 4 (0) & 0 (0) & 1 (0) & 3 (0) & 0 & 2 & 0 & 2 & A & $\{2A_{A,0}\}$ & $[0\ 0\ 0]$ \\
+\hline 0 (0) & 2 (0) & 1 (0) & 3 (0) & 0 & 0 & 0 & 0 & B & - & $[0\ 0\ 0]$ \\
+\hline 0 (0) & 2 (0) & 1 (0) & 3 (0) & 0 & 0 & 0 & 1 & join & join  & $[0\ 0\ 4]$ \\
+\hline 0 (0) &  1 (0) &  1 (0) &  0 (0) & \multicolumn{7}{|c|}{phase 0 done, steady state schedule done} \\
+\hline
+\end{tabular}
+\caption[Execution of Minimal Latency Scheduling Algorithm on a
+{\splitjoin}]{Execution of Minimal Latency Scheduling Algorithm on
+{\splitjoin} from Figure \ref{fig:hierarchical-schedule}(b).}
+\label{tbl:min-lat-sj}
+\end{table}
+
+The trace of the execution shows that even though it is strictly
+necessary to traverse the children of the stream second time from
+bottom to top, doing so can pay off in reducing the number of
+phases necessary to construct a phasing schedule.  Namely, in its
+first steady state execution, the {\splitter} needs to push enough
+data to execute the {\joiner} again, thus eliminating a need for an
+additional phase.
+
+Once all the phases are computed, the phasing schedule is
+constructed. For every phase, the number of child phases executed
+is added up, and the actual schedule is constructed by
+concatenating all the phases of all the children, starting with
+the {\splitter}, all stream children (as listed from left to right)
+and finally the {\joiner}. The following is the resulting phasing
+schedule:
+
+\begin{displaymath} \small
+P_{sj} = \left\{
+\begin{array}{c}
+T_{sj} = \left\{
+\begin{array}{c}
+A_{sj,0} = \left\{ \{\{2 split\}\{2A\}B\{2 join\}\}, \left[\begin{array}{c} 6 \\ 6 \\ 8 \end{array}\right]\right\} \\
+\end{array}\right\}, \\
+I_{sj} = \left\{ A^i_{sj,0} = \left\{
+\{split\ A^i_{A,0}\ A^i_{B,0}\}, \left[\begin{array}{c} 3 \\ 3 \\ 0 \\
+\end{array}\right]\right\}
+\right\}, \\
+c_{sj} = \left[ \begin{array}{c} 6 \\ 6 \\ 8 \end{array} \right],
+c^i_{sj} = \left[ \begin{array}{c} 3 \\ 3 \\ 0 \end{array}
+\right],
+\end{array}
+\right\}
+\end{displaymath}
+
+\subsubsection{\feedbackloop}
+\end{comment}
+
+Scheduling of {\feedbackloops} is again similar to the above
+algorithms.  The children's phases are executed in order of
+({\splitter}, body child, {\joiner}, body child, {\splitter}, loop
+child).  The {\splitter} tries to execute exactly one time on its
+first iteration.  The body child and the {\joiner} execute just
+enough times to provide data for the {\splitter} to perform its
+first execution.  Then the body child, {\splitter} and the loop
+child are executed as many times as possible with the data
+available to them on their {\Input} {\Channels}.
+
+The one big difference between {\feedbackloop} and the other streams
+({\pipeline} and {\splitjoin}) is that in scheduling a {\feedbackloop},
+the {\joiner} is {\emph not} allowed to borrow elements from $out_L$
+{\Channel}.  That is in the trace table, the $out_L$ entry is never
+allowed to become negative.  The reason for this is that
+{\feedbackloops} are cyclical structures, and allowing the {\joiner}
+to borrow elements from $out_L$ would cause a full cycle of
+borrowing, leading to deadlock.
+
+\begin{comment}
+This one condition does not prevent from scheduling any legal
+{\feedbackloops}.  The reason for this is that before the
+{\feedbackloop} is initialized, there is data pushed onto the
+$out_L$ {\Channel}.  At the end of scheduling of any phase, all
+available data is pushed through the {\feedbackloop} into the
+$out_L$ {\Channel}.  Thus any available free data is already always
+stored in the $out_L$ {\Channel}, and there is no additional data to
+borrow from in a {\feedbackloop}.
+
+If the algorithm is unable to schedule an execution of the {\joiner}
+in a phase without borrowing data from $out_L$ {\Channel}, then the
+{\feedbackloop} cannot be scheduled.
+
+\begin{lemma}[{\feedbackloop} Scheduling]
+If all children of a {\feedbackloop} are scheduled using minimal
+latency scheduling algorithm, then if the {\feedbackloop} cannot
+be scheduled using the minimal latency scheduling algorithm then
+there is no valid schedule for this {\feedbackloop}.
+\end{lemma}
+
+We believe this lemma to be true because minimal latency
+scheduling always consumes the minimal amount of data to produce
+some data, and produces the maximal amount of data possible given
+the amount of data it consumes.  Thus no data is being buffered up
+in {\Channels} and if the {\feedbackloop} cannot be scheduled, then
+the $delay_{fl}$ value is too low and does not provide enough data
+to complete a steady state execution. A formal proof is left for
+future work.
+
+We will again use the sample {\feedbackloop} from Figure
+\ref{fig:hierarchical-schedule}(c).  The following are the phasing
+schedules for {\filters} B and L:
+
+\begin{displaymath} \small
+P_B = \left\{
+\begin{array}{c}
+T_B = \left\{
+\begin{array}{c}
+A_{B,0} = \left\{ \{B\}, \left[\begin{array}{c} 2 \\ 2 \\ 1 \end{array}\right]\right\} \\
+\end{array}\right\}, \\
+I_B = \left\{ \right\}, \\
+c_B = \left[ \begin{array}{c} 2 \\ 2 \\ 1 \end{array} \right],
+c^i_B = \left[ \begin{array}{c} 0 \\ 0 \\ 0
+\end{array} \right]
+\end{array}
+\right\}
+\end{displaymath}
+
+\begin{displaymath} \small
+P_L = \left\{
+\begin{array}{c}
+T_L = \left\{
+\begin{array}{c}
+A_{L,0} = \left\{ \{L\}, \left[\begin{array}{c} 9 \\ 5 \\ 6 \end{array}\right]\right\} \\
+\end{array}\right\}, \\
+I_L = \left\{ A^i_{L,0} = \left\{ \{ \}, \left[\begin{array}{c} 4 \\ 0 \\ 0 \end{array}\right]\right\} \right\}, \\
+c_L = \left[ \begin{array}{c} 9 \\ 5 \\ 6 \end{array} \right],
+c^i_L = \left[ \begin{array}{c} 4 \\ 0 \\ 0
+\end{array} \right]
+\end{array}
+\right\}
+\end{displaymath}
+
+\noindent Table \ref{tbl:min-lat-fl} shows execution of the
+algorithm on the {\feedbackloop} from Figure
+\ref{fig:hierarchical-schedule}(c).
+
+\begin{table} \centering
+\scriptsize
+\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+\hline
+\multicolumn{4}{|c|}{data in {\Channel}} & \multicolumn{4}{c|}{\parbox{1in}{\centering phase executions left}} & \parbox{0.5in}{\centering child considered} & \parbox{0.6in}{\centering phases executed} & \parbox{0.6in}{\centering {\pipeline} consumption} \\
+\cline{1-8} $in_B$ & $out_B$ & $in_F$ & $out_F$ & join & B & split & F & & & \\
+\hline 0 (0) & 0 (0) & 0 (0) & 15 (0) & 0 & 0 & 0 & 1 & split & split & $[0\ 0\ 3]$ \\
+\hline 0 (0) & -3 (3) & 3 (0) & 15 (0) & 0 & 0 & 0 & 1 & B & $\{3A_{B,0}\}$ & $[0\ 0\ 0]$ \\
+\hline -6 (6) & 0 (0) & 3 (0) & 15 (0) & 0 & 0 & 0 & 1 & join & $\{2\ join\}$ & $[4\ 4\ 0]$ \\
+\hline 4 (0) & 0 (0) & 3 (0) & 9 (0) & 0 & 0 & 0 & 1 & B & $\{2A_{B,0}\}$ & $[0\ 0\ 0]$ \\
+\hline 0 (0) & 2 (0) & 3 (0) & 9 (0) & 0 & 0 & 0 & 1 & split & - & $[0\ 0\ 0]$ \\
+\hline 0 (0) & 2 (0) & 3 (0) & 9 (0) & 0 & 0 & 0 & 1 & F & - & $[0\ 0\ 0]$ \\
+
+\hline 0 (0) &  2 (0) &  3 (0) &   9 (0) & \multicolumn{7}{|c|}{init phase 0 done} \\
+
+\hline 0 (0) & 2 (0) & 3 (0) & 9 (0) & 0 & 0 & 0 & 1 & split & split & $[0\ 0\ 3]$ \\
+\hline 0 (0) & -1 (1) & 6 (0) & 9 (0) & 0 & 0 & 0 & 1 & B & $\{A_{B,0}\}$ & $[0\ 0\ 0]$ \\
+\hline -2 (2) & 0 (0) & 6 (0) & 9 (0) & 0 & 0 & 0 & 1 & join & join & $[2\ 2\ 0]$ \\
+\hline 3 (0) & 0 (0) & 6 (0) & 6 (0) & 0 & 0 & 0 & 1 & B & $\{A_{B,0}\}$ & $[0\ 0\ 0]$ \\
+\hline 1 (0) & 1 (0) & 6 (0) & 6 (0) & 0 & 0 & 0 & 1 & split & - & $[0\ 0\ 0]$ \\
+\hline 1 (0) & 1 (0) & 6 (0) & 6 (0) & 0 & 0 & 0 & 1 & F & $\{A^i_{F,0}\}$ & $[0\ 0\ 0]$ \\
+
+\hline 1 (0) &  1 (0) &  6 (0) &   6 (0) & \multicolumn{7}{|c|}{init phase 1 done, init done} \\
+
+\hline 1 (0) & 1 (0) & 6 (0) & 6 (0) & 6 & 15 & 5 & 3 & split & split & $[0\ 0\ 3]$ \\
+\hline 1 (0) & -2 (2) & 9 (0) & 6 (0) & 6 & 15 & 4 & 3 & B & $\{3A_{B,0}\}$ & $[0\ 0\ 0]$ \\
+\hline -5 (5) & 1 (0) & 9 (0) & 6 (0) & 6 & 12 & 4 & 3 & join & join & $[2\ 2\ 0]$ \\
+\hline 0 (0) & 1 (0) & 9 (0) & 3 (0) & 5 & 12 & 4 & 3 & B & - & $[0\ 0\ 0]$ \\
+\hline 0 (0) & 1 (0) & 9 (0) & 3 (0) & 5 & 12 & 4 & 3 & split & - & $[0\ 0\ 0]$ \\
+\hline 0 (0) & 1 (0) & 4 (0) & 9 (0) & 5 & 12 & 4 & 3 & F & $\{A_{F,0}\}$ & $[0\ 0\ 0]$ \\
+
+\hline 0 (0) &  1 (0) &  4 (0) &   9 (0) & \multicolumn{7}{|c|}{phase 0 done} \\
+
+\hline 0 (0) & 1 (0) & 4 (0) & 9 (0) & 5 & 12 & 4 & 2 & split & split & $[0\ 0\ 3]$ \\
+\hline 0 (0) & -2 (2) & 7 (0) & 9 (0) & 5 & 12 & 3 & 2 & B & $\{2A_{B,0}\}$ & $[0\ 0\ 0]$ \\
+\hline -4 (4) & 0 (0) & 7 (0) & 9 (0) & 5 & 10 & 3 & 2 & join & join & $[2\ 2\ 0]$ \\
+\hline 1 (0) & 0 (0) & 7 (0) & 6 (0) & 4 & 10 & 3 & 2 & B & - & $[0\ 0\ 0]$ \\
+\hline 1 (0) & 0 (0) & 7 (0) & 6 (0) & 4 & 10 & 3 & 2 & split & - & $[0\ 0\ 0]$ \\
+\hline 1 (0) & 0 (0) & 7 (0) & 6 (0) & 4 & 10 & 3 & 2 & F & - & $[0\ 0\ 0]$ \\
+
+\hline 1 (0) & 0 (0) & 7 (0) & 6 (0) & \multicolumn{7}{|c|}{phase 1 done} \\
+
+\hline 1 (0) & 0 (0) & 7 (0) & 6 (0) & 4 & 10 & 3 & 2 & split & split & $[0\ 0\ 3]$ \\
+\hline 1 (0) & -3 (3) & 10 (0) & 6 (0) & 4 & 10 & 2 & 2 & B & $\{3A_{B,0}\}$ & $[0\ 0\ 0]$ \\
+\hline -5 (5) & 0 (0) & 10 (0) & 6 (0) & 4 & 7 & 2 & 2 & join & join & $[2\ 2\ 0]$ \\
+\hline 0 (0) & 0 (0) & 10 (0) & 3 (0) & 3 & 7 & 2 & 2 & B & - & $[0\ 0\ 0]$ \\
+\hline 0 (0) & 0 (0) & 10 (0) & 3 (0) & 3 & 7 & 2 & 2 & split & - & $[0\ 0\ 0]$ \\
+\hline 0 (0) & 0 (0) & 10 (0) & 3 (0) & 3 & 7 & 2 & 2 & F & $\{A_{F,0}\}$ & $[0\ 0\ 0]$ \\
+
+\hline 0 (0) & 0 (0) & 5 (0) & 9 (0) & \multicolumn{7}{|c|}{phase 2 done} \\
+
+\hline 0 (0) & 0 (0) & 5 (0) & 9 (0) & 3 & 7 & 2 & 1 & split & split & $[0\ 0\ 3]$ \\
+\hline 0 (0) & -3 (3) & 8 (0) & 9 (0) & 3 & 7 & 1 & 1 & B & $\{3A_{B,0}\}$ & $[0\ 0\ 0]$ \\
+\hline -6 (6) & 0 (0) & 8 (0) & 9 (0) & 3 & 4 & 1 & 1 & join & $\{2\ join\}$ & $[4\ 4\ 0]$ \\
+\hline 4 (0) & 0 (0) & 8 (0) & 3 (0) & 1 & 4 & 1 & 1 & B & $\{2A_{B,0}\}$ & $[0\ 0\ 0]$ \\
+\hline 0 (0) & 2 (0) & 8 (0) & 3 (0) & 1 & 2 & 1 & 1 & split & - & $[0\ 0\ 0]$ \\
+\hline 0 (0) & 2 (0) & 8 (0) & 3 (0) & 1 & 2 & 1 & 1 & F & - & $[0\ 0\ 0]$ \\
+
+\hline 0 (0) & 2 (0) & 8 (0) & 3 (0) & \multicolumn{7}{|c|}{phase 3 done} \\
+
+\hline 0 (0) & 2 (0) & 8 (0) & 3 (0) & 1 & 2 & 1 & 1 & split & split & $[0\ 0\ 3]$ \\
+\hline 0 (0) & -1 (1) & 11 (0) & 3 (0) & 1 & 2 & 0 & 1 & B & $\{A_{B,0}\}$ & $[0\ 0\ 0]$ \\
+\hline -2 (2) & 0 (0) & 11 (0) & 3 (0) & 1 & 1 & 0 & 1 & join & join & $[2\ 2\ 0]$ \\
+\hline 3 (0) & 0 (0) & 11 (0) & 0 (0) & 0 & 1 & 0 & 1 & B & $\{A_{B,0}\}$ & $[0\ 0\ 0]$ \\
+\hline 1 (0) & 1 (0) & 11 (0) & 0 (0) & 0 & 0 & 0 & 1 & split & - & $[0\ 0\ 0]$ \\
+\hline 1 (0) & 1 (0) & 11 (0) & 0 (0) & 0 & 0 & 0 & 1 & F & $\{A_{F,0}\}$ & $[0\ 0\ 0]$ \\
+
+\hline 1 (0) & 1 (0) & 6 (0) & 6 (0) & \multicolumn{7}{|c|}{phase 4 done, steady state schedule done} \\
+\hline
+\end{tabular}
+\caption[Execution of Minimal Latency Scheduling Algorithm on a
+{\feedbackloop}]{Execution of Minimal Latency Scheduling Algorithm
+on {\feedbackloop} from Figure
+\ref{fig:hierarchical-schedule}(c).} \label{tbl:min-lat-fl}
+\end{table}
+
+Once the number of executions of children's phases is known for
+every phase of the {\feedbackloop}'s schedule, the phasing schedule
+can be constructed.  For every phase, the children of the
+{\feedbackloop} are iterated over in order of ({\joiner}, body child,
+{\splitter}, loop child) and for every child the appropriate number
+of phases is inserted into the schedule.  Below is the schedule
+for {\feedbackloop} in Figure \ref{fig:hierarchical-schedule}(c):
+
+\begin{displaymath} \small
+P_{fl} = \left\{
+\begin{array}{c}
+T_{fl} = \left\{
+\begin{array}{c}
+A_{fl,0} = \left\{ \{join\ \{3B\}\ split\ F\}, \left[\begin{array}{c} 2 \\ 2 \\ 3 \end{array}\right]\right\}, \\
+A_{fl,1} = \left\{ \{join\ \{2B\}\ split\}, \left[\begin{array}{c} 2 \\ 2 \\ 3 \end{array}\right]\right\}, \\
+A_{fl,2} = \left\{ \{join\ \{3B\}\ split\ F\}, \left[\begin{array}{c} 2 \\ 2 \\ 3 \end{array}\right]\right\}, \\
+A_{fl,3} = \left\{ \{\{2\ join\}\{5B\}\ split\}, \left[\begin{array}{c} 4 \\ 4 \\ 3 \end{array}\right]\right\}, \\
+A_{fl,4} = \left\{ \{join\ \{2B\}\ split\ F\}, \left[\begin{array}{c} 2 \\ 2 \\ 3 \end{array}\right]\right\} \\
+\end{array}\right\}, \\
+T_{fl} = \left\{
+\begin{array}{c}
+A^i_{fl,0} = \left\{ \{\{2\ join\}\{5B\}\ split\}, \left[\begin{array}{c} 4 \\ 4 \\ 3 \end{array}\right]\right\}, \\
+A^i_{fl,1} = \left\{ \{join\ \{2B\}\ split\}, \left[\begin{array}{c} 2 \\ 2 \\ 3 \end{array}\right]\right\} \\
+\end{array}\right\}, \\
+c_{fl} = \left[ \begin{array}{c} 12 \\ 12 \\ 15 \end{array}
+\right], c^i_{fl} = \left[ \begin{array}{c} 6 \\ 6 \\ 6
+\end{array} \right],
+\end{array}
+\right\}
+\end{displaymath}
+\end{comment}
+
+\begin{table}[t] \centering  \scriptsize
+\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+\hline
+\multicolumn{4}{|c|}{data in {\Channel}} & \multicolumn{4}{c|}{\parbox{1in}{\centering phase executions left}} & \parbox{0.5in}{\centering child considered} & \parbox{0.6in}{\centering phases executed} & \parbox{0.6in}{\centering {\pipeline} consumption} \\
+\cline{1-8} $in_A$ & $out_A$ & $in_B$ & $out_B$ & split & A & B & join & & & \\
+\hline 0 (0) & 0 (0) & 0 (0) & 0 (0) & 0 & 0 & 1 & 0 & join & - & $[0\ 0\ 0]$ \\
+\hline 0 (0) & 0 (0) & 0 (0) & 0 (0) & 0 & 0 & 1 & 0 & A & - & $[0\ 0\ 0]$ \\
+\hline 0 (0) & 0 (0) & 0 (0) & 0 (0) & 0 & 0 & 1 & 0 & B & $A^i_{B,0}$ & $[0\ 0\ 0]$ \\
+\hline 0 (0) & 0 (0) & 0 (-1) & 0 (0) & 0 & 0 & 0 & 0 & split & split & $[3\ 3\ 0]$ \\
+\hline 2 (0) & 0 (0) & 1 (0) & 0 (0) & 0 & 0 & 0 & 0 & A & $A^i_{A,0}$ & $[0\ 0\ 0]$ \\
+\hline 0 (0) & 1 (0) & 1 (0) & 0 (0) & 0 & 0 & 0 & 0 & B & - & $[0\ 0\ 0]$ \\
+\hline 0 (0) & 1 (0) & 1 (0) & 0 (0) & 0 & 0 & 0 & 0 & join & - & $[0\ 0\ 0]$ \\
+\hline 0 (0) &  1 (0) &  1 (0) &  0 (0) & \multicolumn{7}{|c|}{init phase 0 done, init done} \\
+\hline 0 (0) & 1 (0) & 1 (0) & 0 (0) & 2 & 2 & 1 & 2 & join & join & $[0\ 0\ 4]$ \\
+\hline 0 (0) & 0 (0) & 1 (0) & -3 (-3) & 2 & 2 & 1 & 2 & A & - & $[0\ 0\ 0]$ \\
+\hline 0 (0) & 0 (0) & 1 (0) & -3 (-3) & 2 & 2 & 1 & 1 & B & $A_{B,0}$ & $[0\ 0\ 0]$ \\
+\hline 0 (0) & 0 (0) & -1 (-2) & 3 (0) & 2 & 2 & 0 & 2 & split & $\{2split\}$ & $[6\ 6\ 0]$ \\
+\hline 4 (0) & 0 (0) & 1 (0) & 3 (0) & 0 & 2 & 0 & 2 & A & $\{2A_{A,0}\}$ & $[0\ 0\ 0]$ \\
+\hline 0 (0) & 2 (0) & 1 (0) & 3 (0) & 0 & 0 & 0 & 0 & B & - & $[0\ 0\ 0]$ \\
+\hline 0 (0) & 2 (0) & 1 (0) & 3 (0) & 0 & 0 & 0 & 1 & join & join  & $[0\ 0\ 4]$ \\
+\hline 0 (0) &  1 (0) &  1 (0) &  0 (0) & \multicolumn{7}{|c|}{phase 0 done, steady state schedule done} \\
+\hline
+\end{tabular}
+\caption[Execution of Minimal Latency Scheduling Algorithm on a
+{\splitjoin}]{Execution of Minimal Latency Scheduling Algorithm on
+{\splitjoin} from Figure \ref{fig:steady-state}(b). In the ``data
+in {\Channel}'' columns, the first value represents the actual
+number of data in the {\Channel}, which can be negative due to
+data borrowing. The second value is the minimal number of
+additional data items needed in the {\Channel}.}
+\label{tbl:min-lat-sj}
+\end{table}
+
+Table \ref{tbl:min-lat-sj} contains a trace of execution of our
+algorithm on the sample {\splitjoin} from Figure
+\ref{fig:steady-state}(b). Below is the phasing schedule for the
+{\splitjoin}. Note that this example produces a phased single
+appearance schedule.
+
+\begin{displaymath} \scriptsize
+P_{sj} = \left\{
+\begin{array}{c}
+T_{sj} = \left\{
+\begin{array}{c}
+A_{sj,0} = \left\{ \{\{2 split\}\{2A\}B\{2 join\}\}, \left[\begin{array}{c} 6 \\ 6 \\ 8 \end{array}\right]\right\} \\
+\end{array}\right\}, \\
+I_{sj} = \left\{ A^i_{sj,0} = \left\{
+\{split\ A^i_{A,0}\ A^i_{B,0}\}, \left[\begin{array}{c} 3 \\ 3 \\ 0 \\
+\end{array}\right]\right\}
+\right\}, \\
+c_{sj} = \left[ \begin{array}{c} 6 \\ 6 \\ 8 \end{array} \right],
+c^i_{sj} = \left[ \begin{array}{c} 3 \\ 3 \\ 0 \end{array}
+\right],
+\end{array}
+\right\}
+\end{displaymath}

@@ -1,0 +1,133 @@
+\section{Linear Dataflow Analysis}
+\label{sec:dataflow}
+
+%\begin{figure}[t]
+%\scriptsize
+%\begin{verbatim}
+%float->float filter LowPassFilter(float g, float cutoffFreq, int N) {
+%  float[N] h;%
+%
+%  /* since the impulse response is symmetric, 
+%   * don't worry about reversing h[n]. */
+%  init {
+%    int OFFSET = N/2;
+%    for (int i=0; i<N; i++) {
+%      int idx = i + 1;
+%      // generate real part
+%      if (idx == OFFSET) 
+%	/* take care of div by 0 error 
+%	(lim x->oo of sin(x)/x actually equals 1)*/
+%	h[i] = g * cutoffFreq / pi; 
+%      else 
+%	h[i] = g * sin(cutoffFreq * (idx-OFFSET)) / (pi*(idx-OFFSET));
+%    }
+%  }
+%
+%  /* implement the FIR filtering operation 
+%   * as the convolution sum. */
+%  work peek N pop 1 push 1 {
+%    float sum = 0;
+%    for (int i=0; i<N; i++) { 
+%      sum += h[i]*peek(i);
+%    }
+%    push(sum);
+%    pop();
+%  }
+%}
+%
+%\end{verbatim}
+%\vspace{-12pt}
+%\caption{\protect\small StreamIt code for a low pass filter.
+%\protect\label{fig:lowpasscode}}
+%\vspace{-12pt}
+%\end{figure}
+
+%Figure~\ref{fig:lowpasscode} contains the code to implement a rectangularly windowed 
+%low pass filter. Note that the {\tt init} function gets called once when the program
+%starts up.
+
+Since each {\tt filter}'s {\tt work} function can contain arbitrary
+C-like code, the compiler must determine which {\tt filters} can be
+represented by linear nodes automatically.
+ 
+The data analysis pass that is currently employed is much similar to
+standard constant propagation.  Instead of mappings from variables to
+compile time constants, we keep mappings to linear forms.  A linear
+forms $l$ is defined as a pair $({\mathbf v}, c)$ of a column vector
+$\mathbf{v}$ of size $e$ and a constant $c$. For each program
+variable, its linear form at a particular program point corresponds to
+the formula for computing a value from a linear combination of {\tt
+filter} inputs. The value of a linear form at runtime is ${\mathbf
+x}{\mathbf v} + c$.
+
+The analysis must keep track of how many {\tt pop()}s the {\tt work}
+function has performed at any particular program point so that the
+position of the data returned by each {\tt pop()} or {\tt peek(i)}
+encountered is determinable. We define $popcount$ for each program
+point as the number of {\tt pops} encountered along all possible
+execution paths.  $pushcount$ is defined to be the number of push
+expressions already seen at a particular program point.  If different
+execution paths could cause $pushcount$ or $popcount$ to take
+inconsistent values, then the appropriate variable becomes undefined.
+At each point in the program, we keep a candidate linear node
+$\lambda=({\mathbf A}, {\mathbf b}, e,o,u)$ that represents the
+computations necessary to produce the output generated up to that
+point.
+
+We define ${\mathbf v} = zerov(k)$ a row vector of size $e$ such that
+$v[i]=0, i \neq k$, and $v[i]=1,i=k$.
+
+A linear form is generated in one of three ways:
+
+\begin{enumerate}
+\item A constant $r$ generates the linear form $({\mathbf 0},r)$. 
+\vspace{-6pt}
+
+\item A {\tt peek(i)} statement generates the linear form 
+$(zerov(u-i-1-popcount), 0)$.
+\vspace{-6pt}
+
+\item A {\tt pop()} expression generates the linear form 
+$(zerov(u-1-popcount),0)$
+
+\end{enumerate}
+
+Linear forms propagate through the control flow graph as constants
+flow during constant propagation. The value of two expressions with
+linear forms $l_1$ and $l_2$ is a new linear form
+$l'=l_1+l_2=({\mathbf v}_1+{\mathbf v}_2, c_1+c_2)$.
+
+The product of a linear form with a constant $r$, is a new linear form
+$l' (r{\mathbf v},rc)$. The product of two linear forms does not
+produce a new linear form because the product corresponds to
+multiplying inputs together rather than taking a linear combination.
+
+Data is propagated through forward control flow as in standard
+dataflow analysis.  The confluence operator is set intersection, so
+mappings that are retained are the same along all paths of control
+flow. Since $popcount$ and $pushcount$ must be single valued at all
+possible program points, an inconsistent $popcount$ at the confluence
+point implies that any future {\tt pop} and {\tt peek} operations do
+not generate linear forms, and an inconsistent $pushcount$ results in
+terminating the analysis (concluding the filter is non-linear).
+
+Backward edges in control flow are handled currently by the symbolic
+execution of loops. We are investigating the use of parameterized
+generator matrices to describe the action of loops without requiring
+symbolic execution.
+
+If a function call with side effects is encountered, the operation
+performed by the filter is not linear and we discard our candidate
+node. Otherwise, it is straightforward to propagate the dataflow state
+through side-effect free function calls.
+
+When a {\tt push(expr)} expression is encountered such that {\tt expr}
+is a linear form $({\mathbf v},c)$, we modify ${\mathbf A}$ and
+${\mathbf b}$ of the candidate linear node $\lambda$.  ${\mathbf v}$
+is copied to the $u-1-pushcount$ column in ${\mathbf A}$, $c$ is
+copied to the $u-1-pushcount$ column in ${\mathbf b}$, and $pushcount$
+is incremented.
+
+If every {\tt push} expression in a {\tt filter} has a linear form as
+an argument, then candidate linear node $\lambda$ is the linear node
+for the {\tt filter}.

@@ -1,0 +1,150 @@
+\section{Appendix: Detailed Example}
+Here we present a simple example of how to construct a SARE from an
+input program.  Our source language is StreamIt, which is a high-level
+language designed to offer a simple and portable means of constructing
+programs as phased computation graphs.  We are developing an StreamIt
+compiler with backends for communication-exposed architectures.  For
+more information on StreamIt, please
+consult~\cite{streamitcc,Gordo02}.
+
+%% StreamIt takes on a slightly different approach than allowing
+%% arbitrary graphs to be constructed from nodes connected by
+%% channels. Instead nodes, or Filters as we call them, can be joined
+%% together by being contained in other Stream constructs such as
+%% Pipelines, SplitJoins, and FeedBackLoops. Further, these Pipelines,
+%% SplitJoins, and FeedBackLoops can in turned be contained in other
+%% Pipeline, SplitJoins, and FeedBackLoops to form complex hierarchies of
+%% Filters that interact to perform what the programmer desires. Together
+%% Filters, Pipelines, SplitJoins, and FeedBackLoops are referred to as
+%% Streams.
+
+%% Streams use an input tape and output tape to communicate with other
+%% Streams, which is analogous to channels in a Phased Computational
+%% Graph. Pipelines allow Streams to be connected in series, one after
+%% the other, by connecting the output tape of a Stream to the input tape
+%% of the Stream immediately following it in the Pipeline. SplitJoins
+%% allow an input tape to be shared among several parallel Streams. The
+%% SplitJoin can use a programmer specifiable splitter and joiner to
+%% demultiplex the one input tape of the SplitJoin into the the many
+%% input tapes of the parallel Streams and then multiplex the output from
+%% the many output tapes of the parallel Streams into one output tape of
+%% the SplitJoin. Finally, FeedBackLoops allow loops in the stream
+%% graph. A FeedBackLoop has a main forward Stream and feedback Stream
+%% which data cycles through an the way around. A programmer specifiable
+%% splitter selects which data from the output tape of the main Stream is
+%% to be fed into the input tape of the feedback Stream and which date is
+%% to leave through the FeedBackLoops output tape. Likewise, the
+%% specifiable splitter selects whether data from the input tape of the
+%% FeedBackLoop or the output tape of feedback Stream is fed into the
+%% input tape of the forward Stream.
+
+%% StreamIt supports a sizable subset of the Phased Computational Program
+%% model. StreamIt is still under development and more time has been
+%% given to the correctness and efficiency of the common cases than
+%% developing a fully general framework. Both the initial and
+%% steady-state epochs are supported. Further, both epochs support
+%% arbitrary phases.
+
+\begin{figure}[t]
+\begin{verbatim}
+                    float->float filter FIR (int N, int LENGTH) {
+                       float[N] weights;
+
+                       init {
+                          calcWeights();
+                          for (int i=0; i<N; i++) {
+                             doFIR(i);   //Queue doFIR(i) for init
+                          }
+                          exec doFIR(N); //Queue doFIR(N) for steady-state
+                        }
+
+                        work doFIR (int K) push 1 pop 1 peek K {
+                           float val = 0;
+                           for (int i=0; i<K; i++) {
+                              val += weights[i] * peek(i);
+                           }
+                           push(val);
+                           pop();
+                        }
+                    }
+\end{verbatim}
+\caption{StreamIt code for an FIR Filter.
+\protect\label{fig:fir}}
+\end{figure}
+
+Figure \ref{fig:fir} is a representative example of a Filter (a node
+of the stream graph) in StreamIt. The init block contains all the
+information about the phases of the Filter.  Calling a work function,
+such as ``doFIR(i)'' enqueues that execution for an init phase, while
+calling a work function following the token exec, such as ``exec
+doFIR(N)'', enqueues that execution for a steady-state phase. Another
+important piece of information is ``push 1 pop 1 peek K'', which
+specifies that $U(\mt{out},\mt{steady-state},\mt{p})=1$,
+$O(\mt{in},\mt{steady-state},\mt{p})=1$, and
+$E(\mt{in},\mt{steady-state},\mt{p})=K_p$, where $\mt{in}$,
+$\mt{out}$, and $K_p$ are the input channel, output channel, and $K$'s
+value during phase $p$, respectively. Let us, for the sake of this
+example, say N=2. The final result is that U and O always equal 1 but
+E takes on the following values:
+\begin{align}
+\mt{E}(in,init,0)&=1\nonumber\\
+\mt{E}(in,init,1)&=1\nonumber\\
+\mt{E}(in,steady,0)&=2\nonumber
+\end{align}
+
+To make a simple example lets consider the graph of a FIR Filter (denoted fir) connected to the output of a filter that produces [1,2] each iteration\footnote{Another way of saying that it pushes 1 then 2 out of its output.}. From now on let us denote the channel between them as in and the output channel of fir as c. Further, let fir's weights=[1,2]. Let us consider all the equations in figures \ref{fig:pcptosare2} and \ref{fig:pcptosare3} in turn.
+\begin{itemize}
+\item Equation \ref{i2ibuf} does not contribute, since A(c)=0.
+\item Equation \ref{iwrite2ibuf}:
+\begin{align}
+\mt{IBUF}_c(0)&=\mt{IWRITE}_{c,0}(0)\label{ex0}\\
+\mt{IBUF}_c(1)&=\mt{IWRITE}_{c,1}(0)\nonumber
+\end{align}
+\item Equation \ref{iread2iwrite}:
+\begin{align}
+\mt{IWRITE}_{c,0}(0)&=(\mt{W}(fir,init,0)([\mt{IREAD}_{in,0}(*)]))[0][0]\nonumber\\
+&=(\mt{W}(fir,init,0)([1]))[0][0]\nonumber\\
+&=([[1]])[0][0]=1\label{ex1}\\
+\mt{IWRITE}_{c,1}(0)&=(\mt{W}(fir,init,1)([\mt{IREAD}_{in,1}](*)))[0][0]\nonumber\\
+&=(\mt{W}(fir,init,1)([2]))[0][0]\nonumber\\
+&=([[2*1]])[0][0]=2\nonumber
+\end{align}
+Therefore, by equations \ref{ex0}
+\begin{align}
+\mt{IBUF}_c(0)&=1\label{ex2}\\
+\mt{IBUF}_c(1)&=2\nonumber
+\end{align}
+\item Equation \ref{sread2swrite}:
+\begin{align}
+SWRITE_{c,0}(i,j,0)&=(\mt{W}(fir,steady,0)([\mt{SREAD}_{in,0}(i,j,\*)]))[0][0]\nonumber\\
+&=(\mt{W}(fir,steady,0)([[1,2]]))[0][0]\label{ex3}\\
+&=([1*1+2*2]))[0][0]=5\nonumber
+\end{align}
+\item Equation \ref{swrite2sbuf}:
+\begin{align}
+\mt{SBUF}_c(i,0)=SWRITE_{c,0}(i,0,0)\label{ex4}
+\end{align}
+Therefore, by equation \ref{ex3}
+\begin{align}
+\mt{SBUF}_c(i,0)=5\label{ex5}
+\end{align}
+\item Equation \ref{ibuf2iread}:
+\begin{align}
+IREAD_{c,0}(0)&=\mt{IBUF}_c(\mt{PartialRead}(c,init,0)+0)\nonumber\\
+&=\mt{IBUF}_c(0)\label{ex6}\\
+IREAD_{c,1}(0)&=\mt{IBUF}_c(\mt{PartialRead}(c,init,1)+0)\nonumber\\
+&=\mt{IBUF}_c(1)\nonumber
+\end{align}
+Therefore, by equations \ref{ex2}
+\begin{align}
+\mt{IREAD}_c(0)&=1\label{ex7}\\
+\mt{IREAD}_c(1)&=2\nonumber
+\end{align}
+\item Equation \ref{sbuf2iread}: Doesn't exist, since for the domain to be non-empty it would have to be the case that $i\in D_{IREAD_{c,p}}$, which implies $i<2$, and $i>|D_{IBUF_c}|=2$.
+\item Equation \ref{ibuf2sread}: Doesn't exist, since the domain is empty--the lowest value ReadIndex can take on is TotalRead(n,c,init)=2, so it can never be the case that ReadIndex(n,c,p,i,j,k)$\in D_{IBUF_c}$
+\item Equation \ref{sbuf2sread0} and \ref{sbuf2sread1}: Period(c)=1\\
+Therefore, by equation \ref{ex5}
+\begin{align}
+SREAD_{c,0}(i,j,k)=\mt{SBUF}_c(i,0)=5
+\end{align}
+\end{itemize}

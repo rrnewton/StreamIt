@@ -1,0 +1,64 @@
+10/24/01
+
+Here's my understanding of portals/messaging based on what David and I
+agreed on this afternoon.
+
+Each receiver of a message must implement an interface corresponding
+to that message.  For instance, in UpDown, we have:
+
+interface UpDownMsg
+{
+    void setUp(boolean up);
+}
+
+and then the receiver, UpDownGen, implements the interface:
+
+class UpDownGen extends Filter implements UpDownMsg { ...
+
+To send a message to UpDownGen, one needs to instantiate a portal and
+register senders and receivers with the portal.  Portals are classes
+that implement: 1) the interface of the receiver, and 2) regSender and
+regReceiver functions.  For example:
+
+class UpDownMsgPortal implements UpDownMsg {
+    public void regSender(Filter sender) {}
+    public void regReceiver(UpDownMsg receiver) {}
+    public void setUp(boolean up) {}
+}
+
+It would be possible to pull the regSender function out into another
+interface (like BasePortal), but the regReceiver function needs to be
+defined for each portal since its argument type varies depending on
+the interface that the message targets.  Conversely, the UpDownMsg
+interface does not include regReceiver and regSender to prevent all of
+the receivers from having to implement these functions.
+
+The contents of the methods in the portal class itself are irrelevant
+for the sake of the compiler, but might want to be hacked in the Java
+runtime library.
+
+Then, to actually send a message, one needs to instantiate a portal,
+register a sender and receiver, then invoke the method on the portal
+from within the receiver:
+
+UpDownMsgPortal p = new UpDownMsgPortal();
+UpDownGen receiver = new UpDownGen();
+p.regReceiver(receiver);
+
+// then within the sender's init function...
+p.regSender(this);
+// and within the sender's work function...
+p.setUp(true);
+
+For the complete example, refer to UpDown.java in docs/examples/hand/updown.
+
+---
+
+To compile the portals, we are going to identify all the interfaces
+declared in the program (we assume that the only reason to declare an
+interface is to send a message) and make them inner types
+(JInterfaceDecl's) of the top-level class that is passed to the
+backend.  Also, each regReceiver node will contain a list of CMethod
+objects that it uses to implement each portal node.
+
+

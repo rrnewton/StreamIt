@@ -1,0 +1,44 @@
+\section{StreamIt Overview}
+
+Most data-flow or signal-processing algorithms can be broken down into
+a number of simple blocks with connections between them.  In StreamIt
+parlance, the smallest block is a \emph{filter}; it has a single input
+and a single output, and its body consists of Java-like code.  Filters
+are then connected by placing them into one of three composite blocks:
+pipelines, split-joins, and feedback loops.  Each of these structures
+also has a single input and a single output, so these blocks can be
+recursively composed.
+
+A typical streaming application might be a software FM radio, as shown
+in Figure \ref{fig:fm-radio}.  The program receives its input from an
+antenna, and its output is connected to a speaker.  The main program
+is a pipeline with a band-pass filter for the desired frequency, a
+demodulator, and an equalizer; the equalizer in turn is made up of a
+split-join, where each child adjusts the gain over a particular
+frequency range, followed by a filter that adds together the outputs
+of each of the bands.
+
+\begin{figure}[htbp]
+  \begin{center}
+    \includegraphics{cookbook.0}
+    \caption{Stream graph for a software FM radio}
+    \label{fig:fm-radio}
+  \end{center}
+\end{figure}
+
+Our goal with choosing these constructs was to create a language with
+most of the expressiveness of a general data-flow graph structure, but
+to keep the block-level abstraction that modern programming languages
+offer.  Allowing arbitrary graphs makes scheduling and partitioning
+difficult for the compiler.  The hierarchical graph structure allows
+the implementation of blocks to be ``hidden'' from users of the block;
+for example, an FFT could be implemented as a single filter or as
+multiple filters, but so long as there is a stream structure named
+``FFT'' somewhere in the program the actual implementation is
+irrelevant to other modules that use it.  Since most graphs can be
+readily transformed into StreamIt structures, StreamIt is suitable for
+working on a wide range of signal-processing applications.
+
+%%% Local Variables:
+%%% TeX-master: "cookbook.tex"
+%%% End:

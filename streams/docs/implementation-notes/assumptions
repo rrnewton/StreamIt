@@ -1,0 +1,41 @@
+This file contains assumptions that we're making to simplify the
+initial implementation of the StreaMIT language, compiler,
+applications, and runtime system.  Please mark each assumption in the
+proper category, with a date, too.  
+
+Assumptions inherent in the language definition
+-----------------------------------------------
+
+8/01	All input and output rates of filters are known at compile
+	time.
+
+8/01	There is an upstream or downstream path between the sender of
+	a message and the receiver of that message.  For example, you
+	can't send a message from one part of a SplitJoin to another.
+
+Compiler / Runtime System
+-------------------------
+
+9/01 	There is no re-initialization.  Further, the initialization at
+	the beginning of the program can have only one possibility; for
+	instance, the stream structure can't depend on a random number
+	that's generated in the init function.
+
+9/01	The whole program is available to the compiler.  In
+	combination with the above assumption, this implies that the
+	entire graph is known statically.
+
+9/19/01	There are no messages sent during initialization.
+
+9/19/01	DUPLICATE splitters allow sources as children.  ROUND_ROBIN splitters
+	do not.  ROUND_ROBIN joiners do not allow sinks as parents.
+
+9/28/01 When a stream is initialized, it first constructs and initializes
+	its children, and only after they're all done, it creates the tapes
+	that connect these children.
+
+10/23/01 The methods in a portal cannot be overloaded.  That is, there is
+	only one method with a given name in each portal.
+10/24/01 Cannot assign to/from stream variables.
+
+11/2/01 No mutually recursive streams!

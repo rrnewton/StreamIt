@@ -1,0 +1,111 @@
+\documentclass{article}
+\usepackage{fullpage}
+\usepackage{epsfig}
+
+\title{HDTV Encoder/Decoder writeup/description}
+\author{Andrew Lamb}
+\date{\today}
+
+
+\begin{document}
+\maketitle
+\newpage
+
+\section{Introduction/Overview}
+
+This article presents a partial implementation in StreamIT of the HDTV standard 
+for transmitting digital television signals as described in 
+ASTC Standard A53\cite{atsc:a53b}. 
+
+\subsection{StreamIT}
+StreamII is a novel language for representing streaming applications. Streaming applications 
+are applications that operate on a (potentially) infinite amount of data. Examples of 
+streaming applications include media processing (audio, video), digital communicaton
+(cell phones, wireless networking), digital signal processing, and any other 
+application that needs to operate on a large amount of streaming data.
+
+\subsection{HDTV}
+\begin{figure}
+\center
+\epsfxsize=4.5in
+\epsfbox{images/transmission-model.eps}
+\caption{Transmission model for HDTV. ATSC A53b only describes channel coding, which is the part of the HDTV system that this document pertains to. Source: ATSC Standard A53b\cite{atsc:a53b}.}
+\label{fig:hdtv-system}
+\end{figure}
+
+\begin{figure}
+\center
+\epsfxsize=4.0in
+\epsfbox{images/hdtv-encoder-pipeline.eps}
+\epsfxsize=4.0in
+\epsfbox{images/hdtv-decoder-pipeline.eps}
+
+\caption{Encoder(left) and Decoder(right) Pipelines for HDTV. Blue squares represent implemented components in StreamIT.}
+\label{fig:hdtv-pipeline}
+\end{figure}
+
+The system model for HDTV is 
+shown in Figure~\ref{fig:hdtv-system}. The A53 standard describes
+the service multiplex and transport, otherwise known as the channel coding.
+ATSC Standard A52\cite{atsc:a52a} specifies the audio coding and the ISO  
+standard for MEPG-2\cite{iso:13818-1}\cite{iso:13818-2} specifies the video coding.
+
+Since StreamIT is currently limited to static rate applications (the rate that data 
+moves through the system can not be data dependent), compression schemes (like MPEG-2)
+can not currently be implemented. Therefore, we will focus our attention in this paper on
+a partial implementation of the HDTV channel coder and decoder. 
+
+HDTV lies squarely in the domain of communication theory, which a typical programmer does
+not have an indepth knowledge of. Since there seemed to be a dearth of explanations and tutorials
+on the web that explain not only the HDTV system in terms of atomic communication systems
+building blocks but also expalins those building blocks. 
+
+Figure~\ref{hdtv-pipeline} shows the internal structure of the HDTV channel coder, and 
+internal structure of the decoder on the left and right respectively. We did not 
+have any input/output traces to work with, we had to implement the encoder pieces as well so 
+that we could verify that our decoder worked. 
+
+\section{Data Randomizer}
+To Be Done.
+
+
+\section{Reed-Solomon Codes}
+\input{hdtv_writeup_rs.tex}
+
+
+\section{Data Interleaving (Convolutional Interleaving)}
+\input{hdtv_writeup_conv_interleaver.tex}
+
+\section{Trellis Coder}
+\input{hdtv_writeup_trellis.tex}
+
+\section{Precoding}
+\input{hdtv_writeup_precode.tex}
+
+\section{``Optimal 4 state Ungerboeck code''}
+\input{hdtv_writeup_ungerboeck.tex}
+
+
+
+\begin{small}
+%\begin{singlespace}
+\bibliographystyle{abbrv}
+\bibliography{references}
+%\end{singlespace}
+\end{small}
+
+
+\section{Appendix: Stream Graph}
+
+\begin{figure}
+\center
+\epsfxsize=4.5in
+\epsfbox{images/hdtv-stream-graph.eps}
+\caption{Stream Graph of the HDTV application.}
+\label{fig:hdtv-stream-graph}
+\end{figure}
+
+
+\end{document}
+
+

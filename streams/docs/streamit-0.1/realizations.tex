@@ -1,0 +1,26 @@
+\section{Realizations / Changes}
+
+\begin{enumerate}
+
+\item When we're inlining filters, we don't need to provide the name
+of the filter.
+
+\item It's a misnomer to call the toplevel stream a {\tt FilterBlock},
+since it has no input and output.  Let's call it a {\tt Stream}
+instead?  Also, why name it, since there can be only one of them and
+it's not accepting parameters?  Let's just say {\tt Stream} at the
+toplevel.
+
+\item I'm again of the opinion that control constructs should return
+objects.  It's very difficult to explain what they *do* return (or
+represent) if it's not an object--it's a collection of blocks, but
+it's a control construct?  Then what if it's exactly one block?  Then
+it's not an object anymore?  Doesn't make sense.
+
+\item Is it ok not to require break statements at the end of each {\tt
+case} in a {\tt StreamSelect}?  We'd differ from standard convention,
+but would anyone use the fall-through feature?
+
+\end{enumerate}
+
+

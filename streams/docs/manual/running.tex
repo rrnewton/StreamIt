@@ -1,0 +1,182 @@
+\section{Running the StreamIt Compiler and StreamIt Programs}
+
+\subsection{Introduction}
+The actual compiler takes StreamIt Java programs and makes either 
+uniprocessor C code, or files ready for the RAW simulator. Most
+of the old applications are written in the old Java syntax. 
+New programs should be written in the new StreamIt syntax.
+We have a nice new syntax spec (see {\tt streams/docs/syntax}).
+
+
+\subsection{{\tt knit}}
+The simplest way to run the StreamIt compiler is to run the 
+{\tt knit} program on an {\tt .str} file. 
+
+To try it out, go to the {\tt streams/apps/examples/hello}
+directory and type {\tt knit HelloWorld6.str}. The HelloWorld6 example
+will be our example program throughout the rest of this section. 
+It is the simplest program that you can write in StreamIt. It doesn't
+actually print HelloWorld, it merely prints out numbers in
+increasing order, starting from 0.
+
+The knit script does the following three things for you:
+\begin{enumerate}
+  \item Convert {\tt HelloWorld6.str} to {\tt HelloWorld6.java} with the frontend.
+  \item Compile {\tt HelloWorld6.java} to {\tt HelloWorld6.c} with the compiler.
+  \item Compile {\tt HelloWorld6.c} to {\tt a.out} using gcc and linking against the C library.
+\end{enumerate}
+
+\subsection{Viewing the Stream Graph}
+Following the execution of the compiler, you can see graphs of various
+views of the program in the {\tt .dot} files in the directory.  For
+example, the original stream graph of the application is in {\tt
+before.dot}.  These dot files can be viewed following the directions
+in Section~\ref{sec:dot}.
+
+\subsection{Running Compiled StreamIt Programs}
+StreamIt programs are infinite loops -- if you simply execute the {\tt a.out} 
+program generated from HelloWorld6, you will see a counter increasing 
+rapidly and it won't stop until you hit CTL-C.
+
+To force a StreamIt program's main loop to execute a finite number
+of times, you can include the {\tt -i NUM} command line argument.
+This will cause the StreamIt program to execute {\tt NUM} steady state
+{\it (i)terations} and quit. For example, running {\tt a.out -i 10} will 
+cause the following output.
+
+\begin{verbatim}
+cagfarm-46 % ./a.out -i 10
+0
+1
+2
+3
+4
+5
+6
+7
+8
+9
+\end{verbatim}
+
+
+
+\subsection{Frontend {\tt .str} $\rightarrow$ {\tt .java}}
+To manually convert a {\tt .str} file into a StreamIt {\tt .java} 
+file, you can use the following command:
+
+\begin{verbatim}
+java streamit.frontend.ToJava input.str > output.java
+\end{verbatim}
+
+The frontend will convert all of the files on the command line
+into a single StreamIt {\tt .java} file which will appear on
+standard out (STDOUT). You can either redirect STDOUT to a file, 
+or you can use the command line option {\tt --output filename}.
+To convert the HelloWorld6 program from {\tt .str} to {\tt .java}
+you would use the following command:
+
+\begin{verbatim}
+java streamit.frontend.ToJava HelloWorld6.str > HelloWorld6.java
+\end{verbatim}
+
+\subsection{Java Library}
+To execute a StreamIt {\tt .java} program using the Java library
+you should simply be able to compile your {\tt .java} file using
+{\tt jikes}. In the HelloWorld6 example from above,
+you could do the following steps to compile and run the HelloWorld
+application for 10 iterations.
+
+\begin{verbatim}
+java streamit.frontend.ToJava --library HelloWorld6.str > HelloWorld6.java
+jikes HelloWorld6.java
+java HelloWorld6 -i 10
+\end{verbatim}
+
+\subsection{StreamIt Compiler}
+You can run the StreamIt compiler by issuing the following command
+\begin{verbatim}
+java -Xmx1500M  at.dms.kjc.Main -s filename.java
+\end{verbatim}
+
+Currently, the compiler is rather space inefficient, so to get large 
+programs to compile you sometimes need to use the {\tt -Xmx1500M} option,
+which sets the JVM's max heap size to 1.5GB.
+Most people have the above command aliased to something like {\tt s}, which
+can be accomplished by putting the following line in your {\tt .cshrc} file.
+
+\begin{verbatim}
+alias s "java -Xmx1500M  at.dms.kjc.Main -s "
+\end{verbatim}
+
+
+\subsubsection{{\tt .java} $\rightarrow$ {\tt .c}}
+With no arguments other than file names, the compiler will produce
+a C program on STDOUT. This C program can be compiled 
+and linked against the C library to generate executables for a 
+uniprocessor. To actually compile the C program with gcc 
+you need to execute the following command to include the appropriate
+headers and link against the appropriate libraries.
+
+\begin{verbatim}
+gcc -O2 -I${STREAMIT_HOME}/library/c -L${STREAMIT_HOME}/library/c \
+    HelloWorld6.c -lstreamit -lsrfftw -lsfftw -lm
+\end{verbatim}
+
+{\tt gcc} will generate {\tt a.out} as an executable. If you want a different
+name try using the {\tt -o filename.exe} command link argument.
+Again, most people have a script that
+automatically includes all of the required arguments.
+Carrying on the same HelloWorld example from above, you could generate
+and run the program for 10 executions using the C library with the following
+commands:
+
+\begin{verbatim}
+java streamit.frontend.ToJava HelloWorld6.str > HelloWorld6.java
+java -Xmx1500M  at.dms.kjc.Main -s HelloWorld6.java > HelloWorld6.c
+gcc -O2 -I/u/username/streams/library/c -L/u/username/streams/library/c \
+    HelloWorld6.c -lstreamit -lsrfftw -lsfftw -lm
+./a.out -i 10
+\end{verbatim}
+
+
+\subsubsection{{\tt .java} $\rightarrow$ {\tt raw}}
+To generate programs that will execute on the RAW simulator
+you can pass the {\tt --raw X} command line argument to the compiler,
+where {\tt X} specifies that you want to use an {\tt X}x{\tt X}
+RAW machine. Unless you
+have good reason, you should use {\tt --raw 4} which
+corresponds to the size of the actual chip. After compiling
+for RAW, there will be several new files in your directory.
+To execute the simulator (assuming you have BTL set up correctly)
+you can use one of the following commands:
+
+\begin{verbatim}
+make -f Makefile.streamit
+\end{verbatim}
+
+\begin{verbatim}
+make -f Makefile.streamit debug
+\end{verbatim}
+
+\begin{verbatim}
+make -f Makefile.streamit run
+\end{verbatim}
+
+
+So, one final time, using the HelloWorld6 application,
+to compile and run on the RAW simulator {\tt btl}, 
+you would use the following sequence of commands.
+
+\begin{verbatim}
+java streamit.frontend.ToJava HelloWorld6.str > HelloWorld6.java
+java -Xmx1500M  at.dms.kjc.Main -s --raw 4 HelloWorld6.java
+make -f Makefile.streamit run
+\end{verbatim}
+
+
+\subsubsection{Command Line Arguments}
+The command line arguments for the StreamIt compiler are
+very ephemeral -- they change from day to day. The best way 
+to figure out which ones are available is to look at the
+source file where they are defined. This file is
+{\tt /streams/compiler/at/dms/kjc/KjcOptions.opt}.

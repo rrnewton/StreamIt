@@ -1,0 +1,61 @@
+/** Test out combining splitjoins. **/
+void->void pipeline LinearTest16 {
+  add FloatSource();
+  add LinearSJ();
+  add LinearSJ2();
+  add FloatSink();
+}
+
+void->float filter FloatSource {
+  float x;
+  init {
+    x = 0;
+  }
+  work push 1 {
+    push(x);
+    x = x + 1;
+  }
+}
+
+float->void filter FloatSink {
+  work pop 1 {
+    println(pop());
+  }
+}
+
+/** A linear split join to test combination with different round robin weightings. **/
+float->float splitjoin LinearSJ {
+  split roundrobin(2,3);
+  add FloatFilter1();
+  add FloatFilter2();
+  join roundrobin(2,3);
+}
+
+float->float splitjoin LinearSJ2 {
+  split roundrobin(4,6);
+  add FloatFilter1();
+  add FloatFilter2();
+  join roundrobin(4,6);
+}
+
+
+/** filter that computes [[1 2][3 4]] **/
+float->float filter FloatFilter1 {
+  work pop 2 push 2 {
+    float t1 = pop();
+    float t2 = pop();
+    push(t2*2 + t1*4);
+    push(t2*1 + t1*3);
+  }
+}
+/** filter that computes [[5 6 7][8 9 10][11 12 13]] **/
+float->float filter FloatFilter2 {
+  work pop 3 push 3 {
+    float t1 = pop();
+    float t2 = pop();
+    float t3 = pop();
+    push(13*t1 + 10*t2 + 7*t3);
+    push(12*t1  + 9*t2 + 6*t3);
+    push(11*t1  + 8*t2 + 5*t3);
+  }
+}

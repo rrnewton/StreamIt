@@ -1,0 +1,532 @@
+\documentclass[11pt]{article}
+
+\usepackage{cite}
+\usepackage[margin=1in]{geometry}
+\usepackage{mathpple}
+\usepackage{url}
+
+% Abstract formatting:
+\def\class#1{\texttt{#1}}
+
+% Print acronyms in small caps.
+\def\cfg{\textsc{cfg}}
+\def\dsp{\textsc{dsp}}
+\def\fortran{\textsc{fortran}}
+\def\ir{\textsc{ir}}
+\def\Ir{\textsc{Ir}}
+\def\mips{\textsc{mips}}
+\def\mit{\textsc{mit}}
+\def\opi{\textsc{opi}}
+\def\raw{\textsc{raw}}
+\def\scale{\textsc{scale}}
+\def\sir{\textsc{sir}}
+\def\ssa{\textsc{ssa}}
+\def\Ssa{\textsc{Ssa}}
+\def\stair{\textsc{stair}}
+\def\Stair{\textsc{Stair}}
+\def\streamit{Stream\-It}
+\def\suif{\textsc{suif}}
+\def\Suif{\textsc{Suif}}
+\def\suifvm{\texttt{suifvm}}
+\def\vliw{\textsc{vliw}}
+\def\vm{\textsc{vm}}
+\def\xml{\textsc{xml}}
+\def\Xml{\textsc{Xml}}
+\def\machsuif{Machine \suif}
+
+% Predefine useful email addresses.
+\urldef\dmazemail\url{dmaze@cag.lcs.mit.edu}
+
+\hyphenation{op-er-and op-er-ands}
+
+\title{Design of \Stair: StreamIt Target Architecture Intermediate
+  Representation}
+\author{David Maze\\\dmazemail}
+
+\begin{document}
+
+\maketitle
+\tableofcontents
+
+\section{Motivation}
+
+\streamit{} is a language for programs that process continuous streams
+of input data, including audio processors and other signal-processing
+applications.  For familiarity with students working on the project,
+\streamit{} uses the Kopi compiler\cite{kopi} as its base; this was
+the only available Java compiler written in Java.  However, Kopi's
+only ``backend'' is for Java bytecode, and this is deeply twisted into
+the innards of the compiler.  \streamit's two existing backends, for
+uniprocessor machines and \mit's \raw{} architecture, both work by
+generating C code and using a native compiler.
+
+The \streamit{} group plans to extend the compiler to a number of
+different architectures.  These include the low-power \mit{} \scale{}
+project, Stanford's Imagine chip, and an off-the-shelf \dsp.  To make
+effective use of these processors' features, a native-code backend is
+required; for example, both \scale{} and Imagine have \vliw{} modes,
+and the \streamit{} compiler can add parallelism by unrolling or fusing
+filters in ways that a C compiler might not be able to figure out.
+
+This document describes \stair, a proposed system for writing generic
+backends to the \streamit{} compiler.  \Stair{} follows in the spirit
+of \machsuif\cite{machsuif}, but is written in Java as a standalone
+component to avoid several workarounds required by the C++ language
+and the \suif~2 core.
+
+\subsection{Related Work}
+
+The Stanford University Intermediate Format, \suif\cite{suif,suif2},
+has been around for some time.  The original \suif{} work focused on
+parallelizing \fortran{} code.  \suif{} 2 was released more recently,
+and uses a more Java-like \ir{} structure, but still focuses more on
+high-level optimization.
+
+Glenn Holloway's group at Harvard has developed a generic backend
+system for \suif{} called \machsuif\cite{machsuif}.  Much of the
+inspiration for the \stair{} design comes from this project.
+\machsuif{} is built on top of \suif{} 2; backend nodes are actually
+specialized \suif{} nodes, for example, and extending the backend
+system involves understanding the \suif{} object scheme.  The
+\machsuif{} documentation suggests that the system implements a
+generic optimization programming infrastructure (\opi), but practical
+use of the system involves knowing the internal design of the
+\machsuif{} nodes and the underlying \suif{} implementation.
+
+Kathryn McKinley and her group at the University of Massachusetts at
+Amherst have developed a compiler infrastructure in Java called
+Scale\cite{scale-umass}.  The Scale Web page suggests that most of
+their work is aimed towards high-level optimization, but the package
+includes a backend package with targets including the Alpha, \mips,
+PowerPC, and Sparc processors.  Scale also includes a backend for the
+University of Texas' Trips architecture, which outputs code for the
+Trips Intermediate Language.  Scale appears to have one Java class per
+variety of machine instruction, and machine specialization is
+performed by creating objects of types specific to the target backend
+package.  There is no generic notion of an operand as such; possible
+operands are defined by the various per-instruction classes.
+
+\section{Goals and Features}
+
+\Stair{} has a diverse set of goals and considerations.  This section
+lists the goals, considerations, and features \stair{} will
+accomodate.
+
+\subsection{Goals}
+
+\begin{enumerate}
+\item \textbf{Input.}  \Stair{} is immediately intended for
+  use by \streamit, and may have features specific to StreamIt.
+  However, the design should not preclude a Java-to-native compiler
+  based on Kopi, or more ambitiously, a Java-based C compiler.
+\item \textbf{Outputs.}  \Stair{} should be able to generate
+  machine-specific assembly, but it should also be able to generate C
+  code to emulate the current uniprocessor backend and provide support
+  for machines that we haven't necessarily written a native-code
+  backend for yet.
+\item \textbf{Targets.}  Various targets have different features that
+  might require \ir{} support.  Intel's Itanium and other architectures
+  have predication support, which requires a field in the \ir{} for the
+  predicate.  \Ir{} support may also be necessary for various sorts of
+  scheduling.
+\item \textbf{Scheduling.}  We want to be able to accomodate various
+  sorts of schedulers, and hopefully in a reasonably portable way.  It
+  should be easy to reuse scheduler code for \scale's \vliw{} mode and
+  Imagine, for example.  Scheduling information wants to be attached
+  to individual instructions, and \ir{} support is needed to avoid
+  e.g.~Fenway's ``bundle'' instructions\cite{fenway}.  Abstract code
+  also needs to be able to determine if two instructions are
+  dependent, and if they are scheduled, whether they are scheduled to
+  execute simultaneously or not.
+\end{enumerate}
+
+\subsection{Features}
+
+\begin{enumerate}
+\item \textbf{XML text storage.}  It may be desirable to save an \ir{}
+  to a file in a way that will be recoverable later, or to examine the
+  \ir{} outside of the infrastructure.  \Xml{} provides a somewhat
+  convenient and somewhat standard way of doing this.  The world
+  likely contains browsers for \xml{} and Java tools to generate
+  \xml{} for us, which saves some work.
+\item \textbf{Single static assignment form.}  \Ssa{} form is useful
+  for a reasonable number of algorithms; in particular, constant and
+  copy propagation and dead code elimination become trivial after
+  \ssa{} is run.  Base \ir{} support for \ssa{} should be included in
+  \stair; however, always using \ssa{} adds some overhead, since the
+  \ssa{} information needs to be recalculated if the \ir{} changes.
+  Passes are not required to use the \ssa{} information; passes that
+  do need it must call a function to ensure that the annotations are
+  valid.
+\item \textbf{Data-flow engine.}  One noticable lack in the existing
+  StreamIt infrastructure is a generic data-flow engine.  Given a
+  portable \ir{} based on a control-flow graph, this should be easy to
+  create, simplifying the creation of new optimizations.
+\end{enumerate}
+
+\subsection{Issues}
+
+\begin{enumerate}
+\item \textbf{Initialized data.}  While StreamIt programs generally
+  don't have a lot of initialized data, things like weight vectors are
+  not inconceivable, and other languages definitely do.  \machsuif{}
+  uses \suif's infrastructure for initialized data, rather than coming
+  up with its own mechanism.
+\item \textbf{Types.}  \Suif, and consequently \machsuif, is very
+  typeful; every operand has a type which includes signedness and bit
+  width.  This in practicate is more of an irritation than a feature:
+  is a typical general-purpose register unsigned?  How many bits wide
+  is the constant ``1''?  StreamIt only really has two primitive
+  types, ``int'' and ``float'', with no specified width.  A simpler
+  type scheme might work here, though we also may want to accomodate
+  languages like \fortran{} where the language includes specific bit
+  widths.
+\item \textbf{Functions and larger bodies.}  \machsuif{} provides a
+  ``function'' abstraction, and a file is made up of a list of
+  functions.  At the level \stair{} will be used, this isn't
+  necessarily appropriate, though it does make sense for a
+  uniprocessor backend.  \Stair{} probably wants to provide a
+  control-flow graph and a ``function'' abstraction, but leave
+  higher-level organization of functions to the calling code.  In the
+  particular case of StreamIt, \stair{} could replace Kopi for the
+  bodies of functions in the \sir{}.
+\end{enumerate}
+
+\section{The Backend System}
+
+\machsuif{} has a very useful treatment of per-processor backends.  An
+input pass converts \suif{} 2 \ir{} nodes into \machsuif{} nodes,
+using a virtual machine target called \suifvm.
+Architecture-independent passes can then run on this layer.  Each
+``real'' backend has a visitor that can visit \suifvm{} instructions
+and generate target-specific instructions.  Other passes, notably
+register allocation, then happen on the target-specific instructions.
+
+A backend provides details about the target machine.  This includes
+the possible set of opcodes, the available registers, and valid
+instruction formats.  The architecture-independent virtual machine
+concept seems like a useful one.  The backend needs to provide
+information as required for the register allocator, and possibly other
+specific passes, and may also need to provide default liveness
+information for machine registers.
+
+In \machsuif{}, a machine opcode is an integer, and the backend is
+responsible for translating an integer opcode to a name.  It makes
+somewhat more sense to make opcodes singleton objects, and in the
+external representation treat them by name.  This avoids problems we
+ran into with Fenway\cite{fenway} where changing the list of opcodes
+invalidates any extant intermediate files on disk.  It also gives an
+obvious place to ask about instruction formats and valid operands.
+However, this comes at the cost of complicating the actual backend
+code; this implementation requires a class per opcode, where
+\machsuif{} could be satisfied with a couple of lists of properties.
+The \machsuif{} model could actually be implemented with a single
+\class{Generic\-Opcode} class that deferred questions to the backend,
+so long as glue was provided to create the singleton objects.
+
+\subsection{Input Virtual Machine}
+
+Code from earlier stages of the compiler is translated into code for a
+virtual machine.  This \vm{} has a fixed set of opcodes and a standard
+\class{Backend} object.  Machine-independent optimizations and
+transformations can happen on this ``target'', which is then converted
+into \ir{} specialized for the real target machine.
+
+Some \class{Opcode} objects in the \vm{} can actually be shared across
+all architectures.  For example, \ssa{} requires an instruction for
+$\phi$-nodes at join points; since this does not correspond to a real
+machine instruction, it does not need to be specialized for particular
+targets.  Similarly, flat code requires labels for branch targets,
+which are target-independent.
+
+By default, the \vm{} code is as simple as possible.  High-level
+constructs such as array and field references may be present, and the
+code is unpredicated.  This does not mean that the \vm{} code will
+always have this form; a generic pass to perform predication before
+specialization would be useful on multiple architectures, and
+array dismantling can happen in the \vm{} to encourage code reuse.
+
+\section{Classes}
+
+\subsection{Instructions}
+
+Fundamentally, a low \ir{} represents a program as a list of
+instructions.  This suggests the following basic class for an
+instruction:
+
+\begin{verbatim}
+public class Instruction {
+  public Backend getBackend();
+
+  public void setBlock(Block block);
+  public Block getBlock();
+  public void setLabel(String label);
+  public String getLabel();
+  public void setOpcode(Opcode opcode);
+  public Opcode getOpcode();
+  public List getSources();
+  public void setSource(int n, Operand op);
+  public int getNumSources();
+  public Operand getSource(int n);
+  public List getDests();
+  public void setDest(int n, Operand op);
+  public int getNumDests();
+  public Operand getDest(int n);
+  public void setPred(Operand op);
+  public Operand getPred();
+  public void setSched(Scheduling sched);
+  public Scheduling getSched();
+  public void setAnnotation(String key, Object annotation);
+  public Object getAnnotation(String key);
+}
+\end{verbatim}
+
+Every instruction has a pointer to its container; this implies that
+instructions can't be shared.  An instruction is specialized for a
+particular machine, and the opcode should come from the set of
+instructions supported by the target.  Opcodes are objects (not
+integers as in \machsuif); they should come from a factory object such
+that there is a single object for each machine opcode.  Instructions
+can have string-keyed annotations, where the annotation can be an
+arbitrary object.  The label is a string that lists either the target
+of a control-transfer instruction, if present, or the value of a label
+instruction.
+
+\subsection{Operands}
+
+There are several conceivable sorts of operands.  These include
+integer immediates, program variables, machine registers, and several
+base-plus-offset combinations.  \machsuif{} has a reasonably extensive
+set of these, including null, variable, physical register, virtual
+register, integer immediate, string immediate, address-of-symbol,
+base-displacement, base-symbol-displacement, base-index, and
+symbol-displacement.  Having all of the various sorts of
+indirect-address operands is only useful if real machines support
+them; base-plus-index-times-scale-plus-displacement is the most
+complex thing supported in \machsuif, but it is conceivable that this
+exists on some processor architecture.
+
+Useful operands can be classified:
+
+\begin{itemize}
+\item \textbf{Immediates.}  These should include integer and float
+  immediates, and possibly character and string immediates too (though
+  a character is conventionally an integer and a string initialized
+  data).
+\item \textbf{Registers.}  A ``register'' in this context is either a
+  physical machine register or something that could be allocated to
+  one.  This includes most cases of local variables.  A register can
+  be ``hard'' or ``virtual'', as in \machsuif.  A register has an
+  \ssa{} label, a types , and an optional pointer to a symbol object.
+\item \textbf{Array and field references.}  If a register contains a
+  pointer to an array or structure object, code may access an element
+  of the array or structure directly as an operand.  This will
+  probably need to be dismantled eventually, but the high-level
+  information can be useful for architecture-independent passes and to
+  minimize confusion about aliasing.
+\item \textbf{Addresses.}  Addresses can be complicated.  The simplest
+  case is ``address of variable'', but a machine can have arbitrarily
+  complicated hardware-supported addresses.  For example, on a 6502:
+\begin{verbatim}
+LDX $40
+LDY $40
+LDA (X),2
+STA (Y,2)
+\end{verbatim}
+  loads the accumulator from ((address pointed to at address 0x40) plus
+  2), and stores the result into (address pointed to at (address 0x40
+  plus 2)).  One generic answer is to create a composite operand, with
+  operations ``add'' and ``multiply'', and make ``dereference'' a
+  separate operand type.
+\item \textbf{Address-of-symbol.}
+\item \textbf{Contents-of-address.}
+\end{itemize}
+
+Most of these have completely different contents, but we also want to
+avoid descending into class-hierarchy hell.  Nevertheless, as an
+immediate proposal, classes \class{Operand}, \class{Int\-Immediate},
+\class{Float\-Immediate}, \class{Register}, \class{Address\-Of},
+\class{Contents\-Of}, and \class{Composite\-Address} supply the list
+of operands here.
+
+A composite-address operand is a little tricky to use.  The intent is
+that it only be used where it corresponds to a real machine
+instruction.  This means that code like \verb|A[4]=6| for an integer
+array would ultimately be translated into a relative-address store on
+the target machine, such as
+
+\begin{verbatim}
+__temp_1 = load-constant 6
+__temp_2 = load-address A
+           store __temp_1, (__temp_2 + (4 * 4))
+\end{verbatim}
+
+\subsection{Backends}
+
+\begin{verbatim}
+public class Backend {
+  public String getName();
+  public Opcode getOpcode(String name);
+  public boolean verifyInstruction(Instruction instr);
+
+  public void insertSpill(ListIterator pos, Operand op);
+  public void insertUnspill(ListIterator pos, Operand op);
+  public void insertLabel(ListIterator pos, String target);
+  public void insertUnconditionalBranch(ListIterator pos,
+                                        String target);
+  public void insertConditionalBranch(ListIterator pos,
+                                      Operand cond, String target);
+}
+\end{verbatim}
+
+As discussed above, a backend is a connection between the \ir{} and a
+real machine architecture.  It contains a method for getting the
+\texttt{Opcode} object corresponding to an opcode name, and to verify
+that an instruction is valid.  The input virtual machine also has a
+\class{Backend} object associated with it.
+
+Backends also contain methods to assist the register allocator.
+\texttt{insert\-Spill()} and \texttt{insert\-Unspill()} insert store and
+load instructions around a particular instruction.  These take a
+\class{List\-Iterator} object that points immediately after the
+instruction to be spilled; they can get the instruction by calling the
+\texttt{previous()} method on the iterator, and use the iterator's
+methods to insert spill/re\-store code.
+
+The generic backend interface also contains methods needed to flatten
+a control-flow graph.  Methods to insert labels and conditional and
+unconditional branches insert instructions after the specified
+iterator.  It is conceivable that a conditional branch, in particular,
+might need to insert multiple instructions.
+
+\subsection{Symbols and Types}
+
+Register operands may reference a symbol, generally corresponding to a
+source-level variable.  Every symbol has a type; the type of a
+register operand is either determined by the backend for a hard
+register or the attached symbol for a virtual register.  Symbols may
+also be annotated.
+
+A type has a primitive type, signed or unsigned integer or float, and
+an optional bit-width.  Hard registers should always have a fixed bit
+width.  Symbols may additionally have structured, union, and laid-out
+types.  A structured type contains an ordered list of pairs of names
+and types, corresponding to a C structure; a union type has an
+unordered list of names and types corresponding to a C union.  A
+laid-out type has explicit bit widths for its consituents, which have
+names, types, and offsets within the structure.  Each of these types
+also has a queryable size.
+
+\subsection{Blocks}
+
+With all of these components, we can assemble a block.  Each block
+contains a Java \class{List} of instructions.  For \ssa{} form, each
+block also needs sets of live variables on entry and exit.  Finally,
+since instruction sharing is prohibited, block sharing can be too;
+thus, each block has a list of its predecessors and successors, and a
+condition under which one successor would be chosen over another, as
+well as the containing object.
+
+It is conceivable that things other than functions might contain
+control-flow graphs.  A block container should therefore be a Java
+interface:
+
+\begin{verbatim}
+public interface BlockContainer {
+  public Block getEntry();
+  public Block getExit();
+}
+\end{verbatim}
+
+Edges between blocks should be classified as normal or impossible;
+other classifications are possible.  An impossible edge exists from
+the head of a loop to the exit of the container if there is no other
+path from that point to the exit (in particular, a known-infinite
+loop).
+
+Ignoring multi-way branches (C switch statements), a block has an
+arbitrary number of predecessors and exactly two successors.  However,
+we want to consider other schemes, such as hyperblocks, where there
+may be multiple exits from a trace block.  Similarly, multiple-entry
+schemes should not be discarded out-of-hand.  Probably the best way to
+describe where an entry or exit point is is with an
+\class{Instruction} pointer, such that an entry is before the
+specified instruction (or at the start of the block if \texttt{null}),
+and an exit is after the specified instruction (or the end of the
+block).  Maintaining these will be tricky if other optimizations
+happen after block formation.
+
+With this in mind, we get the following structure for a block:
+
+\begin{verbatim}
+public class ControlEdge {
+  public Block getPredecessor();
+  public Block getSuccessor();
+  public boolean isNormal();
+  public boolean isImpossible();
+  public Instruction getInstruction();
+  public Operand getCondition();
+}
+public class Block {
+  public List getBody(); // mutable list of Instruction
+  public ControlEdgeEdge
+    makeEdgeTo(Block target, boolean normal,
+               Operand condition, Instruction instr);
+  public List getPredecessors(); // mutable list of ControlEdge
+  public List getSuccessors(); // mutable list of ControlEdge
+  public static Block flatten(BlockContainer region);
+  public BlockContainer unflatten();
+  public static void buildLiveness(BlockContainer region);
+};
+\end{verbatim}
+
+There is some demand to convert blocks into a flattened form.  The
+\texttt{flatten} and \texttt{unflatten} methods convert a \cfg{} to
+flat code and vice versa; the flattened code is stored in a Block.
+Details such as liveness and \ssa{} annotations need to be rebuilt if
+the \cfg{} structure changes; \texttt{build\-Liveness} does this, and
+needs to be called by passes that depend on this information before
+they use it.
+
+\section{Usage}
+
+Currently the StreamIt compiler uses Kopi's high-level Java \ir{} for
+its program representation.  After the input code is parsed, the
+program is converted to a form called \sir{}, where stream
+transformations happen.  For \raw{}, further stream transformations
+are used to partition the stream graph; in both current backends, the
+final output is C code.
+
+I envision the following compiler flow for StreamIt:
+
+\begin{enumerate}
+\item \textbf{Frontend.}  Parse a StreamIt program.  Create the
+  frontend data structures.
+\item \textbf{Graph expansion.}  Within the frontend, perform constant
+  propagation, unroll loops, and produce an expanded stream graph.
+  This happens here since characteristics such as loop bounds should
+  be easier to find in the input \ir.
+\item \textbf{SIR construction.}  Convert the front-end stream graph
+  to StreamIt \ir.  Use \stair{} for the bodies of functions.
+\item \textbf{Stream transformations.}  Perform various stream
+  transformations on \sir{} as the compiler currently does.
+\item \textbf{Partitioning.}  As happens currently for \raw{} and
+  other tiled architectures.  This may also do time partitioning if
+  necessary.  If the target in \stair{} is known at this point, the
+  backend object may be able to provide more efficient time estimates
+  for operations.
+\item \textbf{Native code generation.}  This uses \stair{} features to
+  produce efficient code.
+\end{enumerate}
+
+This flow completely avoids Kopi.  The \sir{} construct for a filter
+needs to include structure type for the filter's fields, and have a
+reference be passed to the init and work functions.  What happens to
+this depends on the backend: in the uniprocessor backend, this
+structure would be preserved, while on \raw{}, its members would be
+promoted to per-tile global variables.
+
+\bibliographystyle{plain}
+\bibliography{references}
+
+\end{document}

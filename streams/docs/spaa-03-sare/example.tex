@@ -1,0 +1,303 @@
+\section{Example}
+
+%\begin{figure}[h]
+%\centering
+%\psfig{figure=example.eps,width=3.2in}
+%\vspace{12pt}
+%\caption{Stream graph of the audio segmenter.  Channels are annotated
+%with their push (U) and pop (O) rates. \protect\label{fig:seg-graph}}
+%\end{figure}
+
+\begin{figure}[t]
+\scriptsize
+\begin{verbatim}
+// show segments of song <filename> for first P seconds, using
+// samples of size K
+void->void pipeline DisplaySegments(String filename, int P, int K) {
+  const int W = 128;    // width of correlation window
+  const int RATE = 128000;  // sampling rate of file (kbps)
+  const int S = 256;        // # of spectral points per sample
+  const int L = P/K;        // number of samples
+
+  add FileReader(filename, P, RATE);
+  add STFT(K, RATE, S);
+  add SimilarityMatrix(L, S);
+  add ExtractDiagonal(L, W);
+  add Correlate(L, W);
+  add DisplayThreshold(L, K);
+}
+
+void->float filter FileReader(String filename, int P, float RATE) {
+  work push RATE*P { ... }
+}
+
+float->float[S] filter STFT(int K, int S) {
+  work pop RATE*K push 1 { ... }
+}
+
+float[S]->float filter SimilarityMatrix(int L, int S) {
+  work pop L push L*L {
+    for (int i=0; i<L; i++) {
+      for (int j=0; j<L; j++) {
+        push(cosineDistance(peek(i), peek(j)));
+      }
+    }
+  }
+
+  float cosineDistance(float[S] v1, float[S] v2) {
+    return (1-dotProduct(v1, v2)) / (magnitude(v1) * magnitude(v2));
+  }
+ 
+}
+
+float->float filter ExtractDiagonal(int L, int W) {
+  work {
+    for (int i=0; i<W/2; i++)
+      extract(0);
+    for (int i=0; i<L-W; i++)
+      extract(i);
+    for (int i=0; i<W/2; i++)
+      extract(L-W);
+  }
+
+  phase extract(int top) push W pop L {ssh
+    for (int i=0; i<top; i++)
+      pop();
+    for (int i=top; i<top+W; i++)
+      push(pop());
+    for (int i=top+W; i<L; i++) {
+      pop();
+  }
+}
+
+float->float filter Correlate(int L, int W) {
+  work pop L*W push L {
+    for (int i=0; i<L; i++) {
+      for (int j=0; j<W; j++)
+        A[i][j] = pop();
+    B[] = calcCorrelation(A);
+    for (int i=0; i<L; i++) {
+      push(B[i]);
+  }
+}
+
+float->void filter DisplayThreshold(int L, int K) {
+  const float CUTOFF = 0.5;
+  work pop L {
+    boolean above = false;
+    for (int i=0; i<L; i++) {
+      boolean above_before = above;
+      above = pop() > CUTOFF;
+      if (above && !above_before)
+        print("New segment at time " + K*i);
+    }
+  }
+}   
+\end{verbatim}
+\caption{StreamIt code for media segmenter.\protect\label{fig:seg-code}}
+\end{figure}
+
+In this section we present an example translation from a CSDP to a
+SARE.  Our source language is StreamIt, which is a high-level language
+designed to offer a simple and portable means of constructing stream
+programs.  We are developing a StreamIt compiler with aggressive
+optimizations and backends for communication-exposed architectures.
+For more information on StreamIt, please
+consult~\cite{streamitcc,Gordo02}.
+
+\subsection{StreamIt Code for Media Segmentation}
+
+Figure~\ref{fig:seg-code} contains a simple example of an equalizing
+software radio written in StreamIt.  The cyclo-static dataflow graph
+corresponding to this piece of code appears in
+Figure~\ref{fig:seg-graph}.
+
+\todo{Describe application \& pseudocode}
+
+\subsection{Converting to a SARE}
+
+We will generate a SARE corresponding to $N$ steady-state executions
+of the above CSDP.
+
+\subsubsection{The Steady-State Period}
+
+The first step in the translation is to calculate $S(n)$, the number
+of times that a given node $n$ fires in a periodic steady-state
+execution (see Section~\ref{sec:balance}).  Using $S(n)$ we can also
+derive $\mt{Period}(c)$, the number of items that are transferred over
+channel $c$ in one steady-state period.  This can be done using
+balance equations on the steady-state I/O rates of the
+stream~\cite{leesdf}:
+{\scriptsize
+\begin{align*}
+\forall c = (n_a, n_b):~~S(n_a) * \mt{TotalWrite}(n_a, c) 
+  = S(n_b) * \mt{TotalRead}(n_b, c)
+\end{align*}}
+where $\mt{TotatalRead}$ and $\mt{TotalWrite}$ are defined as in
+Figure~\ref{fig:helper} to denote the total number of items that a
+node reads and writes to a given channel during one cycle of its
+phases.  Expanding these definitions for the stream graph in
+Figure~\ref{fig:seg-graph}, we have:
+{\scriptsize
+\begin{align*}
+S(\mt{FileReader}) * \mt{RATE}*P
+  &= S(\mt{STFT}) * \mt{RATE}*K \\
+S(\mt{STFT}) * 1
+  &= S(\mt{SimilarityMatrix}) * L \\
+S(\mt{SimilarityMatrix}) * L * L
+  &= S(\mt{ExtractDiagonal}) * L * L \\
+S(\mt{ExtractDiagonal}) * L * W
+  &= S(\mt{Correlate}) * L * W \\
+S(\mt{Correlate}) * L 
+  &= S(\mt{DisplayThreshold}) * L
+\end{align*}}
+Solving for the minimum integral solution for $S$ gives the following:
+{\scriptsize
+\begin{align*}
+S(\mt{FileReader}) = 1 \\
+S(\mt{STFT}) = L \\
+S(\mt{SimilarityMatrix}) = 1 \\
+S(\mt{ExtractDiagonal}) = 1 \\
+S(\mt{Correlate}) = 1 \\
+S(\mt{DisplayThreshold}) = 1 \\
+\end{align*}}
+We can now calculate $\mt{Period}(c)$ for each channel $c$ in the
+graph.  Using the definition of $\mt{Period}$ from
+Figure~\ref{fig:helper}, we have the following:
+{\scriptsize
+\begin{align*}
+\mt{Period(c1)} &= L * K * \mt{RATE}\\
+\mt{Period(c2)} &= L \\
+\mt{Period(c3)} &= L * L \\
+\mt{Period(c4)} &= L * W \\
+\mt{Period(c5)} &= L
+\end{align*}}
+
+\subsubsection{Variables of the SARE}
+
+\sssection{BUF} 
+
+The $\mt{BUF}$ variables represent the buffer space on a channel.
+They contain two dimensions: the first counts over steady-state
+execution cycles, and the second counts over items that appear on the
+channel during a given cycle (that is, the $\mt{Period}$ of the
+channel).  Thus, the equations for $\mt{BUF}$ are as follows:
+{\scriptsize
+\begin{align*}
+{\cal D}_{{BUF}_{c1}} &= \{ ~(i,j)~|~0 \le i \le N - 1 ~\wedge~ 0 \le j \le L * K * \mt{RATE} - 1\} \\
+{\cal D}_{{BUF}_{c2}} &= \{ ~(i,j)~|~0 \le i \le N - 1 ~\wedge~ 0 \le j \le L - 1\} \\
+{\cal D}_{{BUF}_{c3}} &= \{ ~(i,j)~|~0 \le i \le N - 1 ~\wedge~ 0 \le j \le L * L - 1\} \\
+{\cal D}_{{BUF}_{c4}} &= \{ ~(i,j)~|~0 \le i \le N - 1 ~\wedge~ 0 \le j \le L * W - 1\} \\
+{\cal D}_{{BUF}_{c5}} &= \{ ~(i,j)~|~0 \le i \le N - 1 ~\wedge~ 0 \le j \le L - 1\}
+\end{align*}}
+
+\sssection{WRITE} 
+
+The $\mt{WRITE}$ variables represent temporary buffers for the output
+of nodes in the steady state.  Here $\mt{c4}$ is distinguished because
+it has three separate phases, corresponding to the cyclic behavior of
+the $\mt{ExtractDiagonal}$ node.  Since each phase outputs items,
+there are buffers to hold the output of each:
+{\scriptsize
+\begin{align*}
+{\cal D}_{{WRITE}_{c1}} &= \{~(i,0,k)~|~0 \le i \le N-1 ~\wedge~ 0 \le k \le L * K * \mt{RATE} - 1\} \\
+{\cal D}_{{WRITE}_{c2}} &= \{~(i,j,0)~|~0 \le i \le N-1 ~\wedge~ 0 \le j \le L - 1 \} \\
+{\cal D}_{{WRITE}_{c3}} &= \{~(i,0,k)~|~0 \le i \le N-1 ~\wedge~ 0 \le k \le L * L - 1\} \\
+{\cal D}_{{WRITE}_{{c4}, 0}} &= \{~(i,0,k)~|~0 \le i \le N-1 ~\wedge~ 0 \le k \le W * W / 2\} \\
+{\cal D}_{{WRITE}_{{c4}, 1}} &= \{~(i,0,k)~|~0 \le i \le N-1 ~\wedge~ 0 \le k \le W * (L - W) \} \\
+{\cal D}_{{WRITE}_{{c4}, 2}} &= \{~(i,0,k)~|~0 \le i \le N-1 ~\wedge~ 0 \le k \le W * W / 2 \} \\
+{\cal D}_{{WRITE}_{c5}} &= \{~(i,0,k)~|~0 \le i \le N-1 ~\wedge~ 0 \le k \le L - 1\} \\
+\end{align*}}
+
+\sssection{READ} 
+
+The $\mt{READ}$ variables represent temporary buffers for the nodes to
+read from.  The $k$ dimension of these buffers represents the number
+of items that are read at once.
+{\scriptsize
+\begin{align*}
+{\cal D}_{{READ}_{c1}} &= \{~(i,j,k)~|~0 \le i \le N-1\ ~\wedge~ \\ &~~~~~~0 \le j \le L - 1 ~\wedge~ 0 \le k \le K * \mt{RATE} - 1 \} \\
+{\cal D}_{{READ}_{c2}} &= \{~(i,0,k)~|~0 \le i \le N-1 ~\wedge~  0 \le k \le L - 1\} \\
+{\cal D}_{{READ}_{c3, 0}} &= \{~(i,0,k)~|~0 \le i \le N-1 ~\wedge~ 0 \le k \le L * W / 2 - 1 \} \\
+{\cal D}_{{READ}_{c3, 1}} &= \{~(i,0,k)~|~0 \le i \le N-1 ~\wedge~ 0 \le k \le L * (L - W) - 1 \} \\
+{\cal D}_{{READ}_{c3, 2}} &= \{~(i,0,k)~|~0 \le i \le N-1 ~\wedge~ 0 \le k \le L * W / 2 - 1 \} \\
+{\cal D}_{{READ}_{c4}} &= \{~(i,0,k)~|~0 \le i \le N-1 ~\wedge~ 0 \le k \le L * W - 1 \} \\
+{\cal D}_{{READ}_{c5}} &= \{~(i,0,k)~|~0 \le i \le N-1 ~\wedge~ 0 \le k \le L - 1 \} \\
+\end{align*}}
+
+\subsubsection{Equations of the SARE}
+
+We consider each of the equations from Figure~\ref{fig:csdptosare3} in turn.
+
+\sssection{READ to WRITE}
+
+These equations represent the steady-state computation of the nodes.
+{\scriptsize
+\begin{equation*}
+\begin{array}{c}
+\forall i \in [0, N-1], \forall k \in [0, L*K*\mt{RATE}-1]:\\
+ ~~~~\mt{WRITE}_{c1}(i,0,k) = W(\mt{FileReader})()[0][k] \\ ~ \\
+\forall i \in [0, N-1], \forall j \in [0, L-1]:\\
+ ~~~~\mt{WRITE}_{c2}(i,j,0) = W(\mt{STFT})(\mt{READ}_{c1}(i,j,*))[0][0] \\ ~ \\
+\forall i \in [0, N-1], \forall k \in [0, L*L-1]:\\
+ ~~~~\mt{WRITE}_{c3}(i,0,k) = W(\mt{SimilarityMatrix})(\mt{READ}_{c2}(i,0,*))[0][k] \\ ~ \\
+\forall i \in [0, N-1], \forall k \in [0, W*W/2-1]:\\
+ ~~~~\mt{WRITE}_{c4,0}(i,0,k) = W(\mt{ExtractDiagonal}, 0)(\mt{READ}_{c3,0}(i,0,*))[0][k] \\ ~ \\
+\forall i \in [0, N-1], \forall k \in [0, W*(L-W)]:\\
+ ~~~~\mt{WRITE}_{c4,1}(i,0,k) = W(\mt{ExtractDiagonal}, 1)(\mt{READ}_{c3,1}(i,0,*))[0][k] \\ ~ \\
+\forall i \in [0, N-1], \forall k \in [0, W*W/2-1]:\\
+ ~~~~\mt{WRITE}_{c4,2}(i,0,k) = W(\mt{ExtractDiagonal}, 2)(\mt{READ}_{c3,2}(i,0,*))[0][k] \\ ~ \\
+\forall i \in [0, N-1], \forall k \in [0, L-1]:\\
+ ~~~~\mt{WRITE}_{c5}(i,j,0) = W(\mt{Correlate})(\mt{READ}_{c5}(i,0,*))[0][k]
+\end{array}
+\end{equation*}}
+
+\sssection{WRITE to BUF}
+
+This equation transfers items from the index space in which they were
+written to the index space of the buffer for a given channel.  In the
+case of channels $c1$, $c3$, and $c5$, this is a simple copy because
+$S(n) = 1$ and there are no phases.  In the case of $c2$, the we need
+to ``slice'' the domain into pieces in order to maintain a uniform
+left-hand side (see Section~\ref{sec:simplesare}); however, since
+$\mt{STFT}$ only pushes one item per invocation, each slice contains
+only one element.  For channel $c4$, we need to account for the
+offsets of each phase as it is transfered into the buffer.
+{\scriptsize
+\begin{equation*}
+\begin{array}{c}
+\forall i \in [0, N-1], \forall j \in [0, L*K*RATE-1]: \\ \mt{BUF}_{c1}(i,j) = \mt{WRITE}_{c1}(i,0,j) \\ ~ \\
+\forall q \in [0, L-1], \forall i \in [0,N-1], \forall j \in [q, q]: \\ \mt{BUF}_{c2}(i,j) = \mt{WRITE}_{c2}(i,q,j-q) \\ ~ \\
+\forall i \in [0, N-1], \forall j \in [0, L*L-1]: \\ \mt{BUF}_{c3}(i,j) = \mt{WRITE}_{c3}(i,0,j) \\ ~ \\
+\forall i \in [0, N-1], \forall j \in [0, W*W/2-1]: \\ \mt{BUF}_{c4}(i,j) = \mt{WRITE}_{c4,0}(i,0,j) \\ ~ \\
+\forall i \in [0, N-1], \forall j \in [W*W/2, W*(L-W/2)-1]: \\ \mt{BUF}_{c4}(i,j) = \mt{WRITE}_{c4,1}(i,0,j-W*W/2) \\ ~ \\
+\forall i \in [0, N-1], \forall j \in [W*(L-W/2), L*W-1]: \\ \mt{BUF}_{c4}(i,j) = \mt{WRITE}_{c4,2}(i,0,j-W*(L-W/2)) \\ ~ \\
+\forall i \in [0, N-1], \forall j \in [0, L-1]: \\ \mt{BUF}_{c5}(i,j) = \mt{WRITE}_{c5}(i,0,j)
+\end{array}
+\end{equation*}}
+
+\sssection{BUF to READ}
+
+These equations represent the copying of items from a channel's buffer
+to the read array that a node will access.
+{\scriptsize
+\begin{equation*}
+\begin{array}{c}
+\forall i \in [0,N-1], \forall j \in [0, L-1], \forall k \in [0,K*\mt{RATE}-1]: \\ \mt{READ}_{c1}(i,j,k) = \mt{BUF}_{c1}(i,j*\mt{RATE}*K+k) \\ ~ \\
+\forall i \in [0, N-1], \forall k \in [0, L-1]: \\ {\mt{READ}_{c2}}(i,0,k) = \mt{BUF}_{c2}(i,k) \\ ~ \\
+\forall i \in [0, N-1], \forall k \in [0, L*W/2-1]: \\ {\mt{READ}_{c3, 0}}(i,0,k) =  \mt{BUF}_{c3}(i,k) \\ ~ \\
+\forall i \in [0, N-1], \forall k \in [0, L*(L-W)-1]: \\ {\mt{READ}_{c3, 1}}(i,0,k) = \mt{BUF}_{c3}(i,L*W/2 + k) \\ ~ \\
+\forall i \in [0, N-1], \forall k \in [0, L*W/2-1]: \\ {\mt{READ}_{c3, 2}}(i,0,k) = \mt{BUF}_{c3}(i,L*L-W/2 + k) \\ ~ \\
+\forall i \in [0, N-1], \forall k \in [0, L*W-1]: \\ {\mt{READ}_{c4}}(i,0,k) = \mt{BUF}_{c4}(i,k)\\ ~ \\
+\forall i \in [0, N-1], \forall k \in [0, L-1]: \\ {\mt{READ}_{c5}}(i,0,k) = \mt{BUF}_{c5}(i,k)
+\end{array}
+\end{equation*}}
+
+This concludes the translation of the StreamIt-based CSDP to a SARE.
+The equations and variables defined above are exactly equivalent to an
+execution of the original StreamIt program for $N$ steady-state
+cycles.
+
+\subsection{Optimization}
+
+

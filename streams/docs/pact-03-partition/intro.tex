@@ -1,0 +1,30 @@
+This is the intro~\cite{streamit-asplos}.
+
+Load balancing is particularly important in the streaming domain,
+since the throughput of a stream graph is equal to the {\it minimum}
+throughput of each of its stages.  This is in contrast to scientific
+programs, which often contain a number of stages which process a given
+data set; the running time is the {\it sum} of the running times of
+the phases, such that a high-performance, parallel phase can partially
+compensate for an inefficient phase.  In mathematical terms, Amdahl's
+Law captures the maximum realizable speedup for scientific
+applications.  However, for streaming programs, the maximum
+improvement in throughput is given by the following expression:
+\begin{align*}
+\mbox{\it Maximum speedup}(w, c) = \frac{\sum_{i=1}^N{w_i \cdot c_i}}{MAX_i(w_i \cdot c_i)}
+\end{align*}
+where $w_1 \dots w_m$ denote the amount of work in each of the $N$
+partitions of a program, and $c_i$ denotes the multiplicity of work
+segment $i$ in the steady-state schedule.  Thus, if we double the load
+of the heaviest node ({\it i.e.}, the node with the maximum $w_i \cdot
+c_i$), then the performance could suffer by as much as a factor of
+two.  The impact of load balancing on performance places particular
+value on the partitioning phase of a stream compiler.
+
+Our partitioner employs a set of fusion, fission, and reordering
+transformations to incrementally adjust the stream graph to the
+desired granularity.  To achieve load balancing, the compiler
+estimates the number of instructions that are executed by each filter
+in one steady-state cycle of the entire program; then, computationally
+intensive filters can be split, and less demanding filters can be
+fused.
