@@ -3,8 +3,6 @@ to add to paper:
 
 for Andrew to do:
 ------
-- Figure out font problems -- even not printing to pdf makes for messed up fonts.
-
 - Change how the frequency transformation algorithm is presented. Eg
   make it look like the other transforms: take a linear node and
   produce a frequency filter.
@@ -14,39 +12,8 @@ for Andrew to do:
   that implements an abstract matrix.  I think the first would be
   better.
 
-- add to fig 7, xA + b = y.  (The b is missing)
-
-- fig 9, some of the fonts are too small [esp. the (e'- (e+o*....) section]
-
-- looks like the vector symbol goes funky (looks curvy) on b when it
-  is in bold.
-
 - should add vector symobls to x and y in all transformations and
-everywhere where they're used as vectors
-
-- some bugs in fig. 10:
-
-   - in second line of matrices, add "e" superscript to A_1 (in label above)
-
-   - in lamba_1^e, the push and pop rates are reversed (should be pop=1, push=3)
-
-   - the vector sign is missing from b
-
-- in figure 12:
-   - in the second splitjoin, we have lambda_1^e but A_1.  Should add
-     e in both cases or neither (same with actual matrix inside the node).
-
-   - vector signs missing from b.
-   
-   - I would expand "duplicate" and "roundrobin" in the splitters and
-     joiners.  We have room for the labels and other people might not
-     understand.
-
-- Figs 1 and 10 draw stream graphs horizontally, while figs. 6, 12,
-  and appendices are vertically.  Do you think it'd make sense to
-  always be vertical?  Not a big deal.
-
-- I would remove titles of the graphs from excel.
+  everywhere where they're used as vectors
 
 - This is a low-priority pain, but bibliography could use some
   uniformizing.  For example, we reference PLDI in three completely
@@ -104,6 +71,13 @@ Done
 - Cite Andrew's thesis for more details.
 ------------
 - Add examples of combination rules
+------------
+- looks like the vector symbol goes funky (looks curvy) on b when it
+  is in bold. 
+* It was -- you need to do \vec{\mathbf{b}} instead of \mathbf{\vec{b}}. Go figure.
+------------
+- fig 9, some of the fonts are too small [esp. the (e'- (e+o*....) section]
+* made it bigger
 ------------
 
 
