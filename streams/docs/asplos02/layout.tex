@@ -80,15 +80,12 @@ tile processors.
 The cost function is the most important parameter of the simulated
 annealing algorithm.  After some experimentation, we have arrived at
 the following cost function: 
-
 \[
-\sum _{c \in channels} items(c) \left( hops(c) + \left( 2 \bullet
+cost(channels) = \sum _{c \in channels} items(c) \cdot \left( hops(c) + \left( 2 \cdot
 assigned(c) \right) ^{3} \right)
 \]
-
 %%Sum over channels (items(channel) *
 %%(hops(channel) + (num_assigned(channel) * 2)^3) 
-
 Where \(items(c)\) gives the number of data items that traverse the
 channel \(c\) for each steady state execution.  \(hops(c)\) gives the
 number of intermediate tiles traversed on the route of the channel.
@@ -103,13 +100,13 @@ more important than the length of the route because neighbor
 communication over the static network is cheap.  If a tile that is
 assigned a filter must route data items through it, then it must
 synchronize the routing of these items with the execution of its
-work().  Also, a tile that is involved in the routing of many
-channels must serialize the routes running through it.  Both limit
-the amount of parallelism in the layout and need to be avoided.
+work().  Also, a tile that is involved in the routing of many channels
+must serialize the routes running through it.  Both limit the amount
+of parallelism in the layout and need to be avoided.
 
 Using the parameters described above, simulated annealing calculates
 highly optimized assignments.  The layouts are generated rather
-quickly (about ?? minutes for the FMRadio application).  In figure ?? 
+quickly (about ?? minutes for the FMRadio application).  In figure ??
 we show the initial random placement for the load-balanced FMRadio and
 in figure ?? + 1 we show the layout annealing calculated.  Clearly,
 the optimized assignment is superior to the random placement.

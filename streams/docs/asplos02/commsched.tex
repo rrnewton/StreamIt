@@ -13,8 +13,8 @@ communication model of the target.  For targets implementing an
 end-to-end, infinite FIFO abstraction [are there any???], the
 scheduler only needs to decide to whom to send an item and from whom
 to receive an item.  As the communication model becomes more
-constrained, the communication scheduler become more complex,
-requiring analysis of the stream graph. For target implementing a
+constrained, the communication scheduler becomes more complex,
+requiring analysis of the stream graph. For targets implementing a
 finite, blocking near-neighbor communication model, the exact ordering
 of tile execution must be specified.  Raw's communication model falls
 under this category.
@@ -29,7 +29,7 @@ disregard the ordering and just use the execution counts of each node
 in the stream graph to decide when the job of the communication
 scheduler is complete.  Thus, we can create a communication scheduler
 of arbitrary detail.  If the architecture must statically orchestrate
-all aspects of communication, the streamit language provides this
+all aspects of communication, the StreamIt language provides this
 facility.
 
 Deadlock must be carefully avoided in the communication
