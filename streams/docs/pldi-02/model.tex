@@ -232,33 +232,33 @@ to a pipeline of streams $S_1 \dots S_n$, then:
 
 We now derive $sdep$ expressions for the components of a SplitJoin, and
 for the SplitJoin construct as a whole.  We denote the $n$ output
-tapes of the splitter $S$ by $O1_S \dots On_S$, and the $n$ input
-tapes of the joiner $J$ by $I1_J \dots In_J$ (see Figure
+tapes of the splitter $S$ by $O_{1,S} \dots O_{n,S}$, and the $n$ input
+tapes of the joiner $J$ by $I_{1,J} \dots I_{n,J}$ (see Figure
 \ref{fig:tapelabels}).
 
 {\bf Duplicate splitter.}  We consider the $i$'th output tape of an
 $n$-way duplicating splitter.  Since the splitter duplicates each
 input item onto each output tape, there must be at least $x$ items on
-$I_S$ if there are $x$ items on $Oi_S$.  This yields a simple
+$I_S$ if there are $x$ items on $O_{i,S}$.  This yields a simple
 expression for $sdep$:
 \begin{align*}
-\mi{I_S}{Oi_S}(x) = x
+\mi{I_S}{O_{i,S}}(x) = x
 \end{align*}
 
 {\bf Weighted round robin splitter.}  Let us consider an $n$-way
 splitter with weights $w_1 \dots w_n$.  Observe that if there are
-$n(On_S)$ items on the $n$'th output tape, then the splitter must have
-executed $\floor{n(On_S)}{w_n}$ complete cycles in distributing items
+$n(O_{n,S})$ items on the $n$'th output tape, then the splitter must have
+executed $\floor{n(O_{n,S})}{w_n}$ complete cycles in distributing items
 to the output tapes; each cycle draws $sum_{i}{w_i}$ items from the
-input tape $I_S$.  Further, if there are $n(Oi_S)$ items on the $i$'th
-output tape, then $n(Oi_S) mod w_i$ additional items have been
-deposited on $Oi_S$ during the current cycle of the splitter, and
-$n(Oi_S)~mod~w_i + sum_{j=0}^{i-1}{w_j}$ items have been drawn from
+input tape $I_S$.  Further, if there are $n(O_{i,S})$ items on the $i$'th
+output tape, then $n(O_{i,S}) mod w_i$ additional items have been
+deposited on $O_{i,S}$ during the current cycle of the splitter, and
+$n(O_{i,S})~mod~w_i + sum_{j=0}^{i-1}{w_j}$ items have been drawn from
 the input since the last complete cycle.  Summing the item count for
 the completed cycles and the current cycle gives the following
 expression for $sdep$:
 \begin{align*}
-\mi{I_S}{Oi_S}(x) = \floor{n(On_S)}{w_n} * \sum_{i}{w_i} + x~mod~w_i +
+\mi{I_S}{O_{i,S}}(x) = \floor{n(O_{n,S})}{w_n} * \sum_{i}{w_i} + x~mod~w_i +
 \sum_{j=0}^{i-1}{w_j}
 \end{align*}
 
@@ -273,7 +273,7 @@ drawn $x~mod~W$ items from its inputs, and $MIN(0, x~mod~W -
 Thus, the $sdep$ function from the output of the joiner to the $i$'th
 input tape is as follows:
 \begin{align*}
-\mi{Ii_J}{O_J}(x) = w_i * W + MIN(0, x~mod~W - \sum_{j=0}^{i-1}{w_j})
+\mi{I_{i,J}}{O_J}(x) = w_i * W + MIN(0, x~mod~W - \sum_{j=0}^{i-1}{w_j})
 \end{align*}
 
 {\bf SplitJoin construct.}  As with the Pipeline construct, we can
@@ -281,17 +281,17 @@ derive the $sdep$ function across an entire SplitJoin as a composition
 of the component functions.  However, a SplitJoin differs from a
 Pipeline in that the joiner imposes a control dependence between the
 parallel streams.  That is, for there to be $x$ items on the output of
-the joiner, there must be at least $\mi{Ii_J}{O_J}(x)$ items on {\it
-every} input tape $Ii_J$.  Applying the composition law for pipelines
+the joiner, there must be at least $\mi{I_{i,J}}{O_J}(x)$ items on {\it
+every} input tape $I_{i,J}$.  Applying the composition law for pipelines
 (Equation \ref{eq:composepipe}), it follows that there must be at
-least at least $\mi{Oi_S}{Ii_J} \circ \mi{Ii_J}{O_J}(x)$ items on
-every output tape $Oi_S$ of the splitter.  Finally, the minimum number
+least at least $\mi{O_{i,S}}{I_{i,J}} \circ \mi{I_{i,J}}{O_J}(x)$ items on
+every output tape $O_{i,S}$ of the splitter.  Finally, the minimum number
 of items appearing on the input tape $I_S$ of the splitter is the {\it
-maximum} of the item requirement from any output tape $Oi_S$.  By this
+maximum} of the item requirement from any output tape $O_{i,S}$.  By this
 reasoning, the $sdep$ function for a SplitJoin is as follows:
 \begin{align}
-\mi{I_S}{O_J}(x) &= MAX_{i \in [1,n]}(\mi{I_S}{Oi_S} \circ
-\mi{Oi_S}{Ii_J} \circ \mi{Ii_J}{O_J})(x)
+\mi{I_S}{O_J}(x) &= MAX_{i \in [1,n]}(\mi{I_S}{O_{i,S}} \circ
+\mi{O_{i,S}}{I_{i,J}} \circ \mi{I_{i,J}}{O_J})(x)
 \end{align}
 
 \subsubsection{FeedbackLoops}
@@ -314,12 +314,12 @@ as items on the input tape.  Using $J$ to denote a weighted round
 robin joiner as considered above, we thus have the following
 expression for the $sdep$ function across the feedback path:
 \begin{align*}
-\mi{I2_{FJ}}{O_{FJ}}(x) = \mi{I2_J}{O_J}(x) - d
+\mi{I_{2,FJ}}{O_{FJ}}(x) = \mi{I_{2,J}}{O_J}(x) - d
 \end{align*}
 However, the $sdep$ function remains unchanged with respect to the
 input from the main stream:
 \begin{align*}
-\mi{I1_{FJ}}{O_{FJ}}(x) = \mi{I1_J}{O_J}(x)
+\mi{I1_{FJ}}{O_{FJ}}(x) = \mi{I_{1,J}}{O_J}(x)
 \end{align*}
 
 {\bf Feedback components}.  Within a feedback loop, the $sdep$ function
@@ -341,7 +341,7 @@ application of Equation \ref{eq:composetape}).
 above, we can see that the $sdep$ function for the feedback loop as a
 whole is the composition of the $sdep$ functions along the main path:
 \begin{align*}
-\mi{I1_{FJ}}{O_{FS}}(x) = \mi{I1_J}{O_J}(x) \circ \mi{I1_J}{O_J}(x) 
+\mi{I1_{FJ}}{O_{FS}}(x) = \mi{I_{1,J}}{O_J}(x) \circ \mi{I_{1,J}}{O_J}(x) 
 \end{align*}
 Intuitively, this is because--in any semantically correct stream
 program--the loop itself is guaranteed to have enough inputs to feed
@@ -397,11 +397,11 @@ and the buffer will overflow.
 The second case of buffer overflow is when the parallel streams of a
 SplitJoin have asymptotically different production rates.  For a given
 stream $i$ in a SplitJoin construct, the buffer corresponding to the
-joiner input tape $Ii_J$ will overflow if and only if there is a
+joiner input tape $I_{i,J}$ will overflow if and only if there is a
 stream $j$ in the SplitJoin for which:
 \begin{align*}
-(\mi{I_S}{Oi_S}& \circ \mi{Oi_S}{Ii_J} \circ \mi{Ii_J}{O_J})(x) - \\
-(\mi{I_S}{Oj_S}& \circ \mi{Oj_S}{Ij_J} \circ \mi{Ij_J}{O_J})(x) = \omega(1)
+(\mi{I_S}{O_{i,S}}& \circ \mi{O_{i,S}}{I_{i,J}} \circ \mi{I_{i,J}}{O_J})(x) - \\
+(\mi{I_S}{O_{j,S}}& \circ \mi{O_{j,S}}{I_{j,J}} \circ \mi{I_{j,J}}{O_J})(x) = \omega(1)
 \end{align*}
 Both of these cases could be detected by a compiler to verify that no
 buffers will overflow during steady-state execution.
@@ -540,13 +540,14 @@ graph as a transformation from an input tape to an output tape.  Its
 semantic domains are given in Figures \ref{fig:interdom} and
 \ref{fig:transformdom}.  We now give the valuation function ${\cal S}:
 Stream \ra StreamTransform$ for converting from the intermediate
-algebra to the transform algebra.  For a filter, we have:
+algebra to the transform algebra.  Letting $\%$ denote the $mod$
+function, for a filter we have that:
 \begin{align*}
 &{\cal S} [(Filter~push~pop~peek~(f_1~\dots~f_{push}))] =
   \la~g~t~i~.~\\ &(f_{i~\%~push})(\la~i_{local}~.~g((\mi{I_F}{O_F}(i) - peek + 1 + i_{local})))(t)
 \end{align*}
 That is, the value that a filter pushes onto the $i$'th position of its
-output tape is calculated with its function at index $if~\%~push$.  By
+output tape is calculated with its function at index $i~\%~push$.  By
 the definition of $sdep$, the index offset to the last value the filter
 peeks is $\mi{I_F}{O_F}(i)$, where $I_F$ and $O_F$ denote the input and
 output tapes of the filter (as shown in Equation \ref{eq:minfilter},
@@ -576,19 +577,21 @@ p(i) = MIN(j~s.t.~\sum_{k=0}^{j-1}{w_i} \le i~mod~W)
 \end{align}
 Now, the $i$'th tape position assumes the value that is produced along
 stream $p(i)$ in the SplitJoin, and the value of interest appears at
-position $\mi{Ip(i)_J}{O_J}(i)$ on the output tape of stream $p(i)$.
+position $\mi{I_{p(i),J}}{O_J}(i)$ on the output tape of stream $p(i)$.
 The indexing function transforms the stream's local index $i_{local}$
 for its own input tape to the corresponding index
-$\mi{I_S}{Op(i)_S}(i_{local})$ for the input tape of the splitter:
+$\mi{I_S}{O_{p(i),S}}(i_{local})$ for the input tape of the splitter:
 \begin{align*}
 &{\cal S} [(SplitJoin~S~s_1~s_2~\dots~s_n~J)] = \la~g~t~i~.~ \\
-&(({\cal S}[s_{p(i)}])(\la~i_{local}~.~g(\mi{I_S}{Op(i)_S}(i_{local}))))(\mi{Ip(i)_J}{O_J}(i))
+&(({\cal S}[s_{p(i)}])(\la~i_{local}~.~g(\mi{I_S}{O_{p(i),S}}(i_{local}))))(\mi{I_{p(i),J}}{O_J}(i))
 \end{align*}
-This completes the formulation of the transform algebra.  Using this
-algebra, we can express the meaning of any StreamIt program as a
-mathematical transformation between infinite tapes.  We will utilize
-this formulation to prove that certain transformations of the stream
-graph preserve the meaning of the program.
+This completes our formulation of the transform algebra, as we have
+not yet formulated the valuation function for FeedbackLoops.  Given
+the valuation functions above, however, we express the meaning of any
+combination of Pipelines and SplitJoins as a mathematical
+transformation between infinite tapes.  We will utilize this
+formulation to prove that certain transformations of the stream graph
+preserve the meaning of the program.
 
 %% $\cal{S}$ 
 %%   [(FeedbackLoop (. S) $s_body$ $s_loop$ (. J) ($init_1 \dots

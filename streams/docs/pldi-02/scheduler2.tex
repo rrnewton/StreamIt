@@ -61,12 +61,12 @@ implementing a ``pull schedule'', in which filters are executed in
 demand-driven order to fire the output node of the stream.  A pull
 schedule guarantees the minimal static buffer size (assuming each
 filter has its own input buffer), with each channel not exceeding
-
-$\left\lceil {\frac{peek_B}{\gcd{(push_A, pop_B)}} - 1} \right\rceil
-\gcd{(push_A, pop_B)} + push_A$
-However, a pull
-schedule is very irregular, and could require an exponential number of
-instructions to encode.
+\begin{align*}
+\left\lceil {\frac{peek_B}{\gcd{(push_A, pop_B)}} - 1} \right\rceil
+\gcd{(push_A, pop_B)} + push_A
+\end{align*}
+However, a pull schedule is very irregular, and could require an
+exponential number of instructions to encode.
 
 \subsection{Minimizing Latency}
 
