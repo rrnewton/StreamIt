@@ -109,13 +109,13 @@ class Butterfly extends Stream {
             setSplitter(WEIGHTED_ROUND_ROBIN(N, N));
             add (new Identity());
             add (new Filter() {
-               Float weights[W];
+               float weights[W];
                int curr;
                Channel input = new FloatChannel();
                Channel output = new FloatChannel();
                void init() {
                   for(int i=0; i<W; i++)
-                     weights[i] = calc_weight(i, N, W);
+                     weights[i] = calcWeight(i, N, W);
                   curr = 0;
                }
                void work() {
@@ -173,9 +173,9 @@ class FIR extends Filter {
       this.N = N;
    }
    void work() {
-      Float sum = 0;
+      float sum = 0;
       for (int i=0; i<N; i++) {
-         sum += input.peek(i)*fir_coeff[i][N];
+         sum += input.peek(i)*firCoeff[i][N];
       }
       input.pop();
       output.push(sum);
@@ -201,20 +201,20 @@ class RFtoIF extends Filter {
    Channel input = new FloatChannel();
    Channel output = new FloatChannel();
    int sz, i;
-   Float weight[];
-   void init(Float f) {
+   float weight[];
+   void init(float f) {
       setf(f);
    }
    void work() {
       output.push(input.pop()*weight[i++]);
       if(i==sz) i = 0;
    }
-   void setf(Float f) {
+   void setf(float f) {
       i = 0;
       sz = CarrierFreq/f*N;
-      weight = new Float[sz];
+      weight = new float[sz];
       for(int i=0; i<sz; i++)
-         weight[i] = sine(i*pi/sz);
+         weight[i] = sine(i*PI/sz);
    }
 }
 
@@ -231,8 +231,8 @@ class CheckFreqHop extends SplitJoin {
                   Channel input = new FloatChannel();
                   Channel output = new FloatChannel();
                   void work() {
-                     Float val = input.pop();
-                     if(val >= MIN_TRASHOLD) 
+                     float val = input.pop();
+                     if(val >= MIN_THRESHOLD) 
                         fh.setf(Freq[k], new TimeInterval(4*N, 6*N)); 
                      output.push(val);
                   }
@@ -248,38 +248,38 @@ class CheckFreqHop extends SplitJoin {
 class CheckQuality extends Filter {
    Channel input = new FloatChannel();
    Channel output = new FloatChannel();
-   Float ave_hi, ave_lo;   
-   BoosterPortal on_off_switch;
-   void init(BoosterPortal on_off_switch) {
-      ave_hi = 0; ave_lo = 0;
-      this.on_off_switch = on_off_switch;
+   float aveHi, aveLo;   
+   BoosterPortal onOffSwitch;
+   void init(BoosterPortal onOffSwitch) {
+      aveHi = 0; aveLo = 0;
+      this.onOffSwitch = onOffSwitch;
    }
    void work() {
-      Float val = input.pop();
-      ave_hi = max(0.9*ave_hi, val);
-      ave_lo = min(1.1*ave_lo, val);
-      if(ave_hi - ave_lo < QUAL_BAD_TRASHOLD)
-         on_off_switch.init(true);
-      if(ave_hi - ave_lo > QUAL_GOOD_TRASHOLD)
-         on_off_switch.init(false);
+      float val = input.pop();
+      aveHi = max(0.9*aveHi, val);
+      aveLo = min(1.1*aveLo, val);
+      if(aveHi - aveLo < QUAL_BAD_THRESHOLD)
+         onOffSwitch.init(true);
+      if(aveHi - aveLo > QUAL_GOOD_THRESHOLD)
+         onOffSwitch.init(false);
       output.push(val);
    }
 }
 
 class TrunkedRadio extends Stream {
-   RFtoIFPortal freq_hop = new RFtoIFPortal();
-   BoosterPortal onoff = new BoosterPortal().
+   RFtoIFPortal freqHop = new RFtoIFPortal();
+   BoosterPortal onOff = new BoosterPortal().
    void init() {
       add(new ReadFromAtoD());
-      RFtoIF RF2IF = new RFtoIF(STARTFREQ);
-      add(RF2IF);
-      freq_hop.register(RF2IF);
-      Booster ISS = new Booster(false);
-      add(ISS);
-      onoff.register(ISS);
+      RFtoIF rf2if = new RFtoIF(STARTFREQ);
+      add(rf2if);
+      freqHop.register(rf2if);
+      Booster iss = new Booster(false);
+      add(iss);
+      onOff.register(iss);
       add(new FFT());
-      add(new CheckFreqHop(freq_hop));
-      add(new CheckQuality(onoff));
+      add(new CheckFreqHop(freqHop));
+      add(new CheckQuality(onOff));
       add(new AudioBackEnd());
    }
 }

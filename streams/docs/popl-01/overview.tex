@@ -378,22 +378,22 @@ filter a Portal containing all interested receivers.
 \scriptsize
 \begin{verbatim}
 class TrunkedRadio extends Stream {
-   RFtoIFPortal freq_hop = new RFtoIFPortal();
-   BoosterPortal onoff = new BoosterPortal().
+   RFtoIFPortal freqHop = new RFtoIFPortal();
+   BoosterPortal onOff = new BoosterPortal().
    void init() {
       add(new ReadFromAtoD());
 
-      RFtoIF RF2IF = new RFtoIF();
-      add(RF2IF);
-      freq_hop.register(RF2IF);
+      RFtoIF rf2if = new RFtoIF();
+      add(rf2if);
+      freq_hop.register(rf2if);
 
-      Booster ISS = new Booster();
-      add(ISS);
-      onoff.register(ISS);
+      Booster iss = new Booster();
+      add(iss);
+      onOff.register(iss);
  
       add(new FFT());
-      add(new CheckFreqHop(freq_hop));
-      add(new CheckQuality(onoff));
+      add(new CheckFreqHop(freqHop));
+      add(new CheckQuality(onOff));
       add(new AudioBackEnd());
    }
 }
