@@ -157,14 +157,14 @@ producer-consumer firing must be preserved until a future occurence of
 the same pair of filters. This translates to lower data locality and
 degrade cache performance.
 
-Mathematically. the dynamic data measures is defined as:
+Mathematically. the dynamic data measure is defined as:
 \begin{eqnarray}
   \nonumber
   Y(f_i) &=&\sum_{f_k} min(W(f_k), U(f_k) \times A(f_k)) + \\
   \nonumber
 	   &&\sum_{f_k} min(R(f_k), O(f_k) \times A(f_k)) - \\
   \nonumber
-         &&\sum{f_s} O(f_s) \times A(f_s)
+         &&\sum_{f_s} O(f_s) \times A(f_s)
 \end{eqnarray}
 with $W(f)$ equal to the output buffer size reserved for writing data, $R(f)$
 equal to the input buffer size reserved for reading data, $U(f)$ equal to the
