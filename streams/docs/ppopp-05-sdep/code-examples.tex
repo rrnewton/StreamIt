@@ -1,0 +1,172 @@
+\clearpage
+\begin{figure}[t]
+\psfig{figure=fhr-streamit.eps,width=3.5in}
+\caption{\small Stream graph of frequency-hopping radio with language
+support for messaging.  A messaging portal delivers point-to-point
+latency-constrained messages from the detectors to the RFtoIF stage.
+\protect\label{fig:fhr-streamit}}
+\end{figure}
+
+\begin{figure}[t]
+\scriptsize
+\begin{verbatim}
+float->float filter RFtoIF(int N, float START_FREQ) {
+  float[N] weights;
+  int size, count;
+  
+  init { set_frequency(START_FREQ); }
+  
+  work pop 1 push 1 {
+    push(pop() * weights[count++]);
+    count = count % size;
+  }
+  
+  handler set_frequency(float freq) {
+    count = 0;
+    size  = (int) (N * START_FREQ / freq);
+    for (int i = 0; i < size; i++)
+      weights[i] = sin(i * pi / size);
+  }
+}
+
+float->float splitjoin Check_Freq_Hop(int N, 
+                                      float START_FREQ, 
+                                      portal<RFtoIF> port) {
+  split roundrobin(N/4-2, 1, 1, N/2, 1, 1, N/4-2);
+  for (int i=1; i<=7; i++) {
+    if (i==1 || i==4 || i==7) {
+      add Identity<float>;
+    } else {
+      add float->float filter {
+        work pop 1 push 1 {
+          float val = pop();
+          push(val);
+          if (val > hop_threshold)
+            port.set_frequency(START_FREQ + 
+                               i/7*Constants.BANDWIDTH)
+        }
+      }
+    }
+  }
+  join roundrobin(N/4-2, 1, 1, N/2, 1, 1, N/4-2);
+}
+
+void->void pipeline Freq_Hopping_Radio {
+  int   N          = 32;
+  float START_FREQ = 2402000000;
+  portal <RFtoIF> port;
+
+  add Read_From_AtoD(N);
+  add RFtoIF(N, START_FREQ) to port;
+  add FFT(N);
+  add Magnitude();
+  add Check_Freq_Hop(N, START_FREQ, port);
+  add Output()
+}
+\end{verbatim}
+\vspace{-12pt}
+\caption{\small Frequency hopping radio with language support for event handling. \protect\label{fig:freq1}}
+\end{figure}
+
+\clearpage
+\begin{figure}[t]
+\psfig{figure=fhr-feedback.eps,width=3.5in}
+\caption{\small Stream graph of frequency-hopping radio with control
+messages implemented manually.  A feedback loop connects the detectors
+with the RFtoIF stage, and an item is sent on every invocation to
+indicate whether or not a message is present.  The latency and
+periodicity of message delivery are governed by the data rates and the
+number of items on the feedback
+path. \protect\label{fig:fhr-manual}}
+\end{figure}
+
+\begin{figure}[t]
+\scriptsize
+\begin{verbatim}
+ float->float filter RFtoIF(int N, float START_FREQ) {
+   float[N] weights;
+   int size, count;
+   
+   init { set_frequency(START_FREQ); }
+   
+*  work pop 3*N push 2*N {
+*    // manual loop to 2*N.  Factor of N because messages 
+*    // for given time slice come in groups of N; factor 
+*    // of 2 for data-rate conversion of Magnitude filter
+*    for (int i=0; i<2*N; i++) {
+*      push(pop() * weights[count++]);
+*      count = count % size;
+*    }
+*    // manually check for messages; 
+*    // special value of 0 encodes no message
+*    for (int i=0; i<N; i++) {
+*      float freqHop = pop();
+*      if (freqHop!=0)
+*        set_frequency(freqHop);
+*    }
+*  }
+   
+   handler set_frequency(float freq) {
+     count  = 0;
+     size   = (int) (N * START_FREQ / freq);
+     for (int i = 0; i < size; i++)
+       weights[i] = sin(i * pi / size);
+   }
+ }
+
+ float->float splitjoin Check_Freq_Hop(int N, 
+                                       float START_FREQ) {
+   split roundrobin(N/4-2, 1, 1, N/2, 1, 1, N/4-2);
+   for (int i=1; i<=7; i++) {
+     if (i==1 || i==4 || i==7) {
+       add float->float filter {
+*        work pop 1 push 2 {
+           push(pop());
+*          push(0);
+         }
+       }
+     } else {
+       add float->float filter {
+*        work pop 1 push 2 {
+           float val = pop();
+           push(val);
+*          if (val > hop_threshold) {
+*            push(val);
+*          } else {
+*            push(0);
+*          }
+         }
+       }
+     }
+   }
+*  join roundrobin(2*(N/4-2), 2, 2, 2*(N/2), 2, 2, 2*(N/4-2));
+ }
+
+ void->void pipeline Freq_Hopping_Radio {
+   int   N             = 32;
+   float START_FREQ    = 2402000000;
+   
+   add Read_From_AtoD(N);
+*  add float->float feedbackloop {
+*    // adjust joiner rates to match data rates in loop
+*    join roundrobin(2*N,N);
+*    body pipeline {
+*      add RFtoIF(N, START_FREQ);
+*      add FFT(N);
+*      add Magnitude();
+*      add Check_Freq_Hop(N, START_FREQ);
+*    }
+*    split roundrobin();
+*    // number of items on loop path = latency * N
+*    for (int i=0; i<6*N; i++)
+*      enqueue(0);
+*  }
+   add Output()
+ }
+\end{verbatim}
+\vspace{-12pt}
+\caption{\small Frequency hopping radio with manual feedback loop for
+event handling.  Lines that differ from Figure~\ref{fig:freq1} are
+marked with an asterisk. \protect\label{fig:freq2}}
+\end{figure}
+\clearpage
