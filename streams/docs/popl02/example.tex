@@ -1,3 +1,42 @@
 \section{Appendix: Detailed Example}
+StreamIt is a high-level language designed to offer a simple and portable means of constructing programs as computational graphs. It is being developed here as a testbed for stream-based computing research and as a compiler geared towards parallelism-exposed architectures.
 
+StreamIt takes on a slightly different approach than allowing arbitrary graphs to be contructed from nodes connected by channels. Instead nodes, or Filters as we call them, can be joined together by being contained in other Stream contructs such as Pipelines, SplitJoins, and FeedBackLoops. Further, these Pipelines, SplitJoins, and FeedBackLoops can in turned be contained in other Pipeline, SplitJoins, and FeedBackLoops to form complex hierarchies of Filters that interact to perform what the programmer desires. Together Filters, Pipelines, SplitJoins, and FeedBackLoops are refered to as Streams.
 
+Streams use an input tape and output tape to communicate with other Streams, which is analogous to channels in a Phased Computational Graph. Pipelines allow Streams to be connected in series, one after the other, by connecting the output tape of a Stream to the input tape of the Stream immediately following it in the Pipeline. SplitJoins allow an input tape to be shared among several parallel Streams. The SplitJoin can use a programmer specifiable splitter and joiner to demultiplex the one input tape of the SplitJoin into the the many input tapes of the parallel Streams and then multiplex the output from the many output tapes of the parallel Streams into one output tape of the SplitJoin. Finally, FeedBackLoops allow loops in the stream graph. A FeedBackLoop has a main forward Stream and feedback Stream which data cycles through an the way around. A programmer specifiable splitter selects which data from the output tape of the main Stream is to be fed into the input tape of the feedback Stream and which date is to leave through the FeedBackLoops output tape. Likewise, the specifiable splitter selects whether data from the input tape of the FeedBackLoop or the output tape of feedback Stream is fed into the input tape of the forward Stream.
+
+StreamIt supports a sizable subset of the Phased Computational Program model. StreamIt is still under development and more time has been given to the correctness and efficiency of the common cases than developing a fully general framework. Both the initial and steady-state epochs are supported. Further, both epochs support arbitrary phases.
+
+\begin{figure}[t]
+\begin{verbatim}
+// this filter performs both a FIR operation over an array	    
+complex[N_arr]->complex[N_arr] filter arrayFIR(int N_arr, int N_lp, complex[] h){
+
+   init{
+   }    
+
+   work push 1 pop 1 peek 0 {
+      complex[N_arr] in_arr;
+      complex[N_arr] out_arr;
+
+      in_arr=pop();
+
+      for (int i=0 ; i < N_lp  ; i++){
+         out_arr[i]=0;
+         for (int j=0; (j < N_lp) & ((i-j)>=0) ; j++)
+            out_arr[i]=out_arr[i]+h[j]*in_arr[i-j];
+      }
+		
+      for (int i=N_lp ; i < N_in ; i++){
+         out_arr[i]=0;
+         for (int j=0; (j < N_lp) ; j++)
+            out_arr[i]=out_arr[i]+h[j]*in_arr[i-j];
+      }
+
+      push(out_arr);
+   }
+}
+\end{verbatim}
+\caption{Fir Code
+\protect\label{fig:fir}}
+\end{figure}
