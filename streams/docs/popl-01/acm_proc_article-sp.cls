@@ -794,7 +794,10 @@
 \def\@copyrightspace{
 \@float{copyrightbox}[b]
 \begin{center}
-\setlength{\unitlength}{1pc}
+%\setlength{\unitlength}{1pc}
+% UNCOMMENT THE PREVIOUS LINE FOR SUBMITTING TO POPL; BELOW I JUST 
+% ADJUSTED FOR THE TECH REPORT.  -Bill
+\setlength{\unitlength}{60pt}
 \begin{picture}(20,6) %Space for copyright notice
 \put(0,-0.95){\crnotice{\@toappear}}
 \end{picture}

@@ -1,0 +1,39 @@
+\clearpage
+
+\renewcommand{\theequation}{A-\arabic{equation}}
+% redefine the command that creates the equation no.
+\setcounter{equation}{0}  % reset counter 
+
+\begin{center}
+{\bf APPENDIX:  Details on Java Syntax}
+\end{center}
+
+\begin{verbatim}
+- add semantic restrictions
+- add java restrictions
+- diagram with class hierarchy
+- add a method-summary diagram
+
+
+------------------------------------------------------------------------
+add these semantic restrictions:
+
+1. round-robin split/join must be non-null
+2. must have static rates in work function (compiler-detectable)
+
+3. must only call input.pop() once per statement.  otherwise it's
+ambiguous what value is being referenced.  similarly, a peek() can't
+appear in the same expression as a pop().
+
+4. same for nested add statements
+
+------------------------------------------------------------------------
+add these java restrictions:
+
+- no class libraries except for:
+	1. String
+	2. 
+
+- no aliasing allowed.  what does this mean?
+
+\end{verbatim}

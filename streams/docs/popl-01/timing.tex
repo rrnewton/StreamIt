@@ -57,9 +57,10 @@ of items that can appear on tape $b$ is $\ma{a}{b}(x)$.
 of items that must appear on tape $a$ is $\mi{a}{b}(x)$.
 \end{itemize}
 Note that these functions are only defined over pairs of tapes $(a,
-b)$ where $a$ is ``upstream'' of $b$--that is, where there is a
+b)$ where $a$ is {\it upstream} of $b$--that is, where there is a
 directed path in the stream graph from the filter following $a$ to the
-filter preceding $b$.
+filter preceding $b$.  We will say that the filter $b$ is {\it
+downstream} of $a$ under exactly these same conditions.
 
 The $max$ and $min$ functions are related to the information wavefront
 in the following sense.  The item at position $y = \mi{a}{b}(x)$ of
@@ -107,32 +108,34 @@ push_A*\left\lfloor\frac{x-(peek_A-pop_A)}{pop_A}\right\rfloor & if & x \ge (pee
 
 Let us now derive expressions for $min$ and $max$ in the case of
 pipelined filters.  In the base case, consider that two filters are
-connected, with the output of $A$ feeding the input of $B$.  We are
-seeking $\ma{I_A}{O_B}(x)$: the maximum number of items that can
+connected, with the output of $A$ feeding into the input of $B$.  We
+are seeking $\ma{I_A}{O_B}(x)$: the maximum number of items that can
 appear on tape $O_B$ given that there are $x$ items on tape $I_A$.
 Observing that a maximum of $\ma{I_A}{O_A}(x)$ items can appear on
 tape $O_A$, and that $O_A$ must equal $I_B$ since the filters are
-connected, we see that a maximum of
-$\ma{I_B}{O_B}(\ma{I_A}{O_A}(x))$ items can appear on $O_B$:
-\begin{equation*}
+connected, we see that a maximum of $\ma{I_B}{O_B}(\ma{I_A}{O_A}(x))$
+items can appear on $O_B$:
+\begin{align*}
 \ma{I_A}{O_B} = \ma{I_B}{O_B} \circ \ma{I_A}{O_A}
-\end{equation*}
+\end{align*}
 In the case of $\mi{I_A}{O_B}(x)$, the order of composition is
 reversed: given that there are $x$ items on tape $O_B$, a minimum of
 $\mi{I_B}{O_B}(x)$ are on tape $I_B$, and since $O_B = I_A$, we have
 that a minimum of $\mi{I_A}{O_A}(\mi{I_B}{O_B}(x))$ items appear on
 $I_A$, leaving:
-\begin{equation*}
+\begin{align*}
 \mi{I_A}{O_B} = \mi{I_A}{O_A} \circ \mi{I_B}{O_B}
-\end{equation*}
+\end{align*}
 By identical reasoning, these composition laws hold for pipelined
 streams as well as filters.  That is, given tapes $x$, $y$, and $z$, 
 we have that:
-\begin{eqnarray}
+\begin{align}
 \label{eq:compose}
-\ma{x}{z} = \ma{y}{z} \circ \ma{x}{y} \\
-\mi{x}{z} = \mi{x}{y} \circ \mi{y}{z}
-\end{eqnarray}
+\begin{split}
+\ma{x}{z} &= \ma{y}{z} \circ \ma{x}{y} \\
+\mi{x}{z} &= \mi{x}{y} \circ \mi{y}{z}
+\end{split}
+\end{align}
 However, there are some restrictions on these definitions.  They only
 apply when there is a downstream path $P_1$ from the filter following
 $x$ to the filter preceding $y$, a downstream path $P_2$ from the
@@ -155,20 +158,21 @@ We now derive $min$ and $max$ in the case of a SplitJoin, as pictured
 in Figure \ref{splitjoin}.  For the splitter $S$ there are two output
 tapes; let us denote them by $O1_S$ and $O2_S$.  Similarly, let us
 denote the two input tapes of the joiner $J$ by $I1_J$ and $I2_J$.  We
-now derive the transfer functions for round robin and
+derive below the transfer functions the round robin and
 duplicate/combine nodes.  Note that the duplicate/combine nodes can be
 simulated with round robins and duplicating filters, but we provide
 the transfer functions anyways to simplify the semantic analysis of a
-program.
+program.  We have yet to derive these expressions for the weighted
+round robin nodes.
 
 {\bf Round robin splitter.}  In the case of a round-robin splitter, the
 items from the input tape are alternately routed to the output tapes,
 with the first item going onto tape $O1_S$.  By this definition, we
 can see that the splitter's $max$ is defined as follows:
-\begin{eqnarray*}
-\ma{I_S}{O1_S}(x) = \left\lceil\frac{x}{2}\right\rceil \\
-\ma{I_S}{O2_S}(x) = \left\lfloor\frac{x}{2}\right\rfloor
-\end{eqnarray*}
+\begin{align*}
+\ma{I_S}{O1_S}(x) &= \left\lceil\frac{x}{2}\right\rceil \\
+\ma{I_S}{O2_S}(x) &= \left\lfloor\frac{x}{2}\right\rfloor
+\end{align*}
 To derive the $min$ function across a splitter, observe that the input
 tape need only progress so far as to produce the items on the emptier
 output tape.  That is, we need to consider the number of items on both
@@ -176,42 +180,42 @@ of the splitter's output to determine the minimum number of items that
 are needed at its input.  Thus, our $min$ function has two arguments:
 the first corresponding to $O1_S$ and the second corresponding to
 $O2_S$.  The equation is as follows:
-\begin{eqnarray*}
+\begin{align*}
 \mi{I_S}{(O1_S, O2_S)}(x_1, x_2) = MIN(2*x_1-1, 2*x_2)
-\end{eqnarray*}
+\end{align*}
 {\bf Round robin joiner.}  The rules for a round robin joiner are in
 some sense dual to those of the round robin splitter.  Again assuming
 that items are alternately drawn from the input tapes, starting with
 $I1_J$, we have that:
-\begin{eqnarray*}
-\mi{I1_J}{O_J}(x) = \left\lceil\frac{x}{2}\right\rceil \\
-\mi{I2_J}{O_J}(x) = \left\lfloor\frac{x}{2}\right\rfloor
-\end{eqnarray*}
+\begin{align*}
+\mi{I1_J}{O_J}(x) &= \left\lceil\frac{x}{2}\right\rceil \\
+\mi{I2_J}{O_J}(x) &= \left\lfloor\frac{x}{2}\right\rfloor
+\end{align*}
 Again, the $max$ function takes two arguments, corresponding to the
 number of items on $I1_J$ and $I2_J$, respectively:
-\begin{eqnarray*}
+\begin{align*}
 \ma{(I1_J, I2_J)}{O_J}(x_1, x_2) = MIN(2*x_1-1, 2*x_2)
-\end{eqnarray*}
+\end{align*}
 {\bf Duplicate splitter}.  Clearly, the $max$ function of a duplicate
 splitter is simply the identity function, since it maps each element
 on the input tape to the same location on the output tapes:
-\begin{eqnarray*}
-\ma{I_S}{O1_S}(x) = x \\
-\ma{I_S}{O2_S}(x) = x
-\end{eqnarray*}
+\begin{align*}
+\ma{I_S}{O1_S}(x) &= x \\
+\ma{I_S}{O2_S}(x) &= x
+\end{align*}
 The $min$ function is similar, except that--like the round robin
 split--the input need only progress as far as the lesser output:
-\begin{eqnarray*}
+\begin{align*}
 \mi{I_S}{(O1_S, O2_S)}(x_1, x_2) = MIN(x_1, x_2)
-\end{eqnarray*}
+\end{align*}
 {\bf Combine joiner.} The combine joiner is simply the dual of the
 duplicate splitter, with transfer functions that the reader can verify
 as follows:
-\begin{eqnarray*}
-\ma{(I1_J, I2_J)}{O_J}(x_1, x_2) = MIN(x_1, x_2) \\
-\mi{I1_J}{O_J}(x) = x \\
-\mi{I2_J}{O_J}(x) = x
-\end{eqnarray*}
+\begin{align*}
+\ma{(I1_J, I2_J)}{O_J}(x_1, x_2) &= MIN(x_1, x_2) \\
+\mi{I1_J}{O_J}(x) &= x \\
+\mi{I2_J}{O_J}(x) &= x
+\end{align*}
 
 \subsubsection{FeedbackLoops}
 
@@ -241,20 +245,20 @@ SplitJoins.  Now, let us define the transfer functions for $FJ$, the
 feedback joiner.
 
 The $min$ function for the main stream is as before:
-\begin{eqnarray*}
+\begin{align*}
 \mi{I1_{FJ}}{O_{FJ}} = \mi{I1_J}{O_J} 
-\end{eqnarray*}
+\end{align*}
 However, we must offset by $n$ when considering the $min$ function
 that draws from the loop's tape:
-\begin{eqnarray*}
+\begin{align*}
 \mi{I2_{FJ}}{O_{FJ}}(x) = \mi{I2_J}{O_J}(x) - n
-\end{eqnarray*}
+\end{align*}
 Finally, the $max$ function must be similarly shifted for the input
 from the loop:
-\begin{eqnarray*}
+\begin{align*}
 \ma{(I1_{FJ}, I2_{FJ})}{O_{FJ}}(x_1, x_2) = \ma{(I1_J, I2_J)}{O_J}(x_1,
 x_2 + n)
-\end{eqnarray*}
+\end{align*}
 
 \subsubsection{Summary}
 
@@ -265,7 +269,11 @@ composing these expressions following Equation~\ref{eq:compose}, we
 can arrive at values of $\ma{a}{b}$ and $\mi{a}{b}$ for all pairs of
 tapes $(a, b)$ where there is some directed path through the stream
 graph--that is, along the direction of data flow--from the filter
-reading from tape $a$ to the filter writing to tape $b$.
+reading from tape $a$ to the filter writing to tape $b$.  
+
+Ommitted from the above analysis are weighted round robin nodes and
+filters that push or pop items from within their {\tt init} functions.
+We hope to address these cases in a future document.
 
 \subsection{Semantics}
 
@@ -276,9 +284,9 @@ guarantees.
 \subsubsection{Messages}
 
 Suppose that filter $A$ sends a message to filter $B$ with latency
-$n$, where $n$ is any integer.  In $n$ invocations of $A$'s {\tt work}
-function, $A$ will produce one or more data items $d$.  Now, the
-messaging system guarantees that:
+$\lambda$, where $\lambda$ is any integer.  In $\lambda$ invocations
+of $A$'s {\tt work} function, $A$ will produce one or more data items
+$d$.  Now, the messaging system guarantees that:
 \begin{enumerate}
 \item If $B$ is upstream of $A$, then $B$ will receive the message
 immediately following the last invocation of its {\tt work} function
@@ -293,42 +301,43 @@ of a shared set of splitters and joiners.  We are developing semantics
 for this case, but they are beyond the scope of this paper.
 \end{enumerate}
 These guarantees can be expressed more formally as a set of
-constraints on the number of items on certain tapes in the system.
-Again, suppose that filter $A$ sends a message to filter $B$ with
-latency $n$, where $n$ is any integer.  Let $s$ denote the number of
-items on $O_A$ when the message was sent, and $r$ denote the number of
-items on $O_B$ when the message is received.  We have that:
+constraints on the number of items on certain tapes in the system.  We
+will use $n(t)$ to represent the number of items on tape $t$ at a
+given point of execution.  Again, suppose that filter $A$ sends a
+message to filter $B$ with latency $\lambda$, where $\lambda$ is any
+integer.  Let $s$ be equal to $n(O_A)$ at the time that the message
+was sent.  We have that:
 
 \begin{enumerate}
 
 \item If $B$ is upstream of $A$, the message will be delivered when:
-\begin{eqnarray}
+\begin{align}
 \label{eq:msgup}
-r = \mi{O_B}{O_A}(s + push_A * n)
-\end{eqnarray}
-That is, $s + push_A * n$ is the number of items on $A$'s output tape
+n(O_B) = \mi{O_B}{O_A}(s + push_A * \lambda)
+\end{align}
+That is, $s + push_A * \lambda$ is the number of items on $A$'s output tape
 after producing the data of interest.  Then, $y =
-\mi{O_B}{O_A}(s + push_A * n)$ is the latest item on $B$'s output
+\mi{O_B}{O_A}(s + push_A * \lambda)$ is the latest item on $B$'s output
 tape that affects the data of interest.  The message should be
 delivered immediately after the work function producing this item,
-which occurs when the item count $r$ equals $y$, as specified by the
-constraint.
+which occurs when the item count $n(O_B)$ equals $y$, as specified by
+the constraint.
 
 \item If $B$ is downstream of $A$, the message will be delivered when:
-\begin{eqnarray}
+\begin{align}
 \label{eq:msgdown}
-r = \ma{O_A}{O_B}(s + push_A * (n-1))
-\end{eqnarray}
-That is, $s + push_A * (n - 1)$ is the number of items on $A$'s
+n(O_B) = \ma{O_A}{O_B}(s + push_A * (\lambda-1))
+\end{align}
+That is, $s + push_A * (\lambda - 1)$ is the number of items on $A$'s
 output tape before pushing the data of interest, and $y =
-\ma{O_A}{O_B}(s + push_A * (n-1))$ is the maximum number of items
+\ma{O_A}{O_B}(s + push_A * (\lambda-1))$ is the maximum number of items
 on $B$'s output tape as a result of the outputs of $A$.  Thus, when
 $A$ pushes the next set of data, it could affect the data that will be
 pushed next onto the output tape of $B$.  (Note that the next set of
 data from $A$ might not be sufficient to calculate the next set on
 $B$'s output, but it could affect it nonetheless.)  The message must
 be delivered immediately before this effected data appears on $B$'s
-output, so the number of items $r$ on $B$'s output must equal $y$.
+output, so the number of items $n(O_B)$ on $B$'s output must equal $y$.
 
 \end{enumerate}
 
@@ -343,27 +352,26 @@ $n$.
 We can fully define the possible sequences of filter executions as a
 set of constraints on the number of items on each tape in the stream
 graph.  This is useful not only from the perspective of semantics, but
-for compiler analysis of the space of valid schedules.  We will use
-$n(t)$ to represent the number of items on tape $t$ at a given point
-of execution.  A configuration C of the stream graph can be completely
-represented by the vector $(n(t_1), n(t_2), \dots, n(t_k))$, where
-$t_1$ through $t_k$ are the tapes in the graph.  A legal configuration
-must satisfy three sets of constraints:
+for compiler analysis of the space of valid schedules.  A
+configuration C of the stream graph can be completely represented by
+the vector $(n(t_1), n(t_2), \dots, n(t_k))$, where $t_1$ through
+$t_k$ are the tapes in the graph.  A legal configuration must satisfy
+three sets of constraints:
 \begin{enumerate}
 \item {\it Data dependences.}  A filter can only have as many items on
 its output tape as can be produced by the items on its input tape.
 For each filter $A$ in the program, we have the constraint:
-\begin{eqnarray*}
+\begin{align*}
 n(O_A) \le \ma{I_A}{O_A}(n(I_A))
-\end{eqnarray*}
+\end{align*}
 Equivalently, we can pose this constraint in the opposite direction:
 each input tape must contain at least the number of items that are
 required by the output tape:
-\begin{eqnarray*}
+\begin{align*}
 n(I_A) \ge \mi{I_A}{O_A}(n(O_A))
-\end{eqnarray*}
+\end{align*}
 \item {\it Message guarantees.}  Suppose that a filter $A$ might send
-a message to filter $B$ with a maximum latency of $l$ during any
+a message to filter $B$ with a maximum latency of $\lambda$ during any
 invocation of its work function.  Then we must constrain the execution
 of $B$ to make sure that it is not too far ahead to receive the
 message with the given latency.  That is, we can only execute $B$ so
@@ -371,13 +379,13 @@ long as $n(O_B)$--the item count on its output tape--does not exceed
 the count when a message would be delivered.  Recalling the expression
 for message delivery time (Equations \ref{eq:msgup} and
 \ref{eq:msgdown}), this constraint is as follows if $B$ is upstream of $A$:
-\begin{eqnarray*}
-n(O_B) \le \mi{O_B}{O_A}(n(O_A) + push_A * l)
-\end{eqnarray*}
+\begin{align*}
+n(O_B) \le \mi{O_B}{O_A}(n(O_A) + push_A * \lambda)
+\end{align*}
 and as follows if $B$ is downstream of $A$:
-\begin{eqnarray*}
-n(O_B) \le \ma{O_A}{O_B}(n(O_A) + push_A * (n-1))
-\end{eqnarray*}
+\begin{align*}
+n(O_B) \le \ma{O_A}{O_B}(n(O_A) + push_A * (\lambda-1))
+\end{align*}
 \item {\it Latency guarantees.}  The guarantees for latency are
 treated identically to message guarantees, as fitting with the
 semantics of latency as described above.
@@ -401,9 +409,9 @@ program are unsatisfiable.
 Let {\cal P}(C) denote whether or not the constraints for a stream
 graph are satisfied for a given configuration C.  We can then write
 the transition function between configurations as follows:
-\begin{eqnarray*}
+\begin{align*}
 (n(t_1), \dots , n(out_A), \dots, n(t_k)); \\ \frac{{\cal P}((n(t_1), \dots , n(out_A + push_A), \dots, n(t_k)))}{(n(t_1), \dots , n(out_A + push_A), \dots, n(t_k))}
-\end{eqnarray*}
+\end{align*}
 To understand this rule, observe that if we execute one step of filter
 $A$, the only difference between the original configuration $C$ and
 the new configuration $C'$ is that the item count for the output tape
@@ -433,27 +441,27 @@ $FJ$ unto itself is the identity function.  However, since we were
 careful to leave the $max$ function undefined over cycles in the
 stream graph, we define a new function $maxloop$ that maps a given
 feedback joiner to the information wavefront around the loop:
-\begin{eqnarray*}
+\begin{align*}
 \mal{FJ}(x) \equiv \ma{I2_FJ}{O_FJ} \circ \ma{O_FJ}{I2_FJ}
-\end{eqnarray*}
+\end{align*}
 The order of composition is as in Equation \ref{eq:compose} for the
 composition of pipelines. Also, for the purposes of calculating
 $\mal{FJ}$, one must assume that there are an infinite number of items
-on tape $I1_FJ$; that is, the join from the feedback loop is not
-limited by the external data source.  
+on tape $I1_{FJ}$; that is, the join from the feedback loop is not
+limited by the external data source.
 
 Finally, we can state the constraint that the feedback loop must
-respect.  For a loop with declared latency $n$, the loop will neither
+respect.  For a loop with declared latency $\lambda$, the loop will neither
 overflow nor deadlock if:
-\begin{eqnarray*}
-\mal{FJ}(x) = x + n
-\end{eqnarray*}
-If $\mal{FJ}(x)$ is less than $x + n$, then there will be deadlock in
+\begin{align*}
+\mal{FJ}(x) = x + \lambda
+\end{align*}
+If $\mal{FJ}(x)$ is less than $x + \lambda$, then there will be deadlock in
 the program.
 
 {\bf Overflow detection.}  There are two places that a buffer can
 overflow in the stream graph.  The first is in a feedback loop, when
-$\mal{FJ}(x)$ (calculated above) is more than $x + n$.  The second
+$\mal{FJ}(x)$ (calculated above) is more than $x + \lambda$.  The second
 case is when the parallel streams of a split/join have different
 production rates.  For a splitter $S$ and a joiner $J$, the production
 rates will cause an overflow if and only if $\ma{O1_S}{I1_J}(x) -

@@ -85,39 +85,55 @@ class Main extends Stream {
 int N = 5;
 int BLOCK_SIZE = 100;
 
+void step(float[] input, float[] output, int numIn, int numOut) {
+   float sum = 0;
+   for (int k=0; k<numIn; k++) {
+      sum = sum + input[k]*FIR_COEFF[k+numIn][N];
+   }
+   for (int k=numIn; k<N; k++) {
+      sum = sum + input[k]*FIR_COEFF[k-numIn][N];
+   }
+
+   output[numOut] = sum;
+   input[numIn] = getData();
+}
+
 void main() {
+   float input[] = new float[N];
+   float output[] = new float[BLOCK_SIZE];
+   int numIn, numOut;
 
-   float data1[] = new float[BLOCK_SIZE+N];
-   float data2[] = new float[BLOCK_SIZE];
-
-   for (int i=0; i<N; i++) {
-      data1[i] = getData();
+   for (numIn=0; numIn<N; numIn++) {
+      input[numIn] = getData();
    }
 
    while (true) {
 
-      for (int i=0; i<BLOCK_SIZE; i++) {
-         data1[i+N] = getData();
+      for (out=0; numIn<N; numIn++, numOut++) {
+         step(input, output, numIn, numOut);
       }
 
-      for (int i=0; i<BLOCK_SIZE; i++) {
-         float sum = 0;
-         for (int j=0; j<N; j++) {
-            sum = sum + data1[i+j]*FIR_COEFF[j][N];
+      int wholeSteps = (BLOCK_SIZE-numOut)/N;
+      for (int k=0; k<wholeSteps; k++) {
+         for (numIn=0; numIn<N; numIn++, numOut++) {
+            step(input, output, numIn, numOut);
          }
-         data2[i] = sum;
       }
 
-      displayBlock(data2);
-
-      for (int i=0; i<N; i++) {
-         data1[i] = data1[i+BLOCK_SIZE];
+      for (numIn=0; numOut<BLOCK_SIZE; numIn++, numOut++) {
+         step(input, output, numIn, numOut);
       }
+
+      displayBlock(output);
    }
 }
 \end{verbatim}
 \vspace{-12pt}
-\caption{\protect\small An unoptimized FIR filter in a procedural language.
+\caption{\protect\small An optimized FIR filter in a procedural
+   language.  A complicated loop nest is required to avoid mod
+   functions and to use memory efficiently, and the structure of the
+   loops depends on the data rates (e.g., BLOCK\_SIZE) within the
+   stream.  An actual implementation might inline the calls to {\tt step}.
 \protect\label{fig:firprocedural}}
 \vspace{-12pt}
 \end{figure}
@@ -127,50 +143,50 @@ void main() {
 \begin{verbatim}
 class FIRFilter {
    int N;
-   float[] data1;
+   float[] input;
 
    FIRFilter(int N) {
       this.N = N;
    }
 
-   float[] getData(int BLOCK_SIZE) {
-      if (data1==null) {
-         data1 = input.getData(BLOCK_SIZE+N);
+   float[] getData(float[] output, int offset, int length) {
+      if (input==null) {
+         input = new float[MAX_LENGTH];
+         source.getData(input, 0, N+length);
        } else {
-         float[] newData = input.getData(BLOCK_SIZE);
-         for (int i=0; i<BLOCK_SIZE; i++) {
-            data1[i+N] = newData[i];
-         }
+         source.getData(input, N, length);
       }
 
-      float data2 = new float[BLOCK_SIZE];
-      for (int i=0; i<BLOCK_SIZE; i++) {
+      for (int i=0; i<length; i++) {
          float sum = 0;
          for (int j=0; j<N; j++) {
             sum = sum + data1[i+j]*FIR_COEFF[j][N];
          }
-         data2[i] = sum;
+         output[i+offset] = sum;
       }
 
       for (int i=0; i<N; i++) {
-         data1[i] = data1[i+BLOCK_SIZE];
+         input[i] = input[i+length];
       }
    }
 }
 
 void main() {
 
-   DataSource source = new DataSource();
-   FIRFilter filter = new FIRFilter();
+   DataSource datasource = new DataSource();
+   FIRFilter filter = new FIRFilter(5);
    Display display = new Display();
-   filter.input = source;
-   display.input = filter;
+   filter.source = datasource;
+   display.source = filter;
    display.run();
 
 }
 \end{verbatim}
 \vspace{-12pt}
-\caption{\protect\small An unoptimized FIR filter in an object oriented language.
+\caption{\protect\small An FIR filter in an object oriented language.
+A ``pull model'' is used by each filter object to retrieve a chunk of
+data from its source, and straight-line code connects one filter to
+another.
 \protect\label{fig:firobject}}
 \vspace{-12pt}
 \end{figure}
@@ -182,18 +198,24 @@ example of a Filter is the {\tt FIRFilter}, a component of our
 software radio (see Figure \ref{fig:firstreamit}).  Each {\tt Filter}
 contains an {\tt init} function that is called at initialization time;
 in this case, the {\tt FIRFilter} records {\tt N}, the number of items
-it should filter at once.
+it should filter at once.  A user should instantiate a filter by using
+its constructor, and the {\tt init} function will be called implicitly
+with the same arguments that were passed to the
+constructor{\footnote{This design might seem unnatural, but it is
+necessary to allow inlining (Section \ref{sec:connecting}) and
+re-initialization (Section \ref{sec:reinit}) within a Java-based
+syntax.}}.
 
 The {\tt work} function describes the most fine grained execution step
 of the filter in the steady state.  Within the {\tt work} function,
 the filter can communicate with neighboring blocks using the {\tt
 input} and {\tt output} channels, which are typed FIFO queues declared
 as fields at the top of the class.  These high-volume channels support
-the three intuitive operations: 1) {\tt pop()} removes an item from the
-end of the channel and returns its value, 2) {\tt peek(i)} returns the
-value of the item $i$ spaces from the end of the channel without
+the three intuitive operations: 1) {\tt pop()} removes an item from
+the end of the channel and returns its value, 2) {\tt peek(i)} returns
+the value of the item $i$ spaces from the end of the channel without
 removing it, and 3) {\tt push(v)} writes the value $v$ to the front of
-the channel.  
+the channel.
 
 A major restriction of the current version of StreaMIT is that it
 requires filters to have static input and output rates.  That is, the
@@ -233,6 +255,7 @@ model in favor of automated scheduling and optimization again
 distinguishes StreaMIT.
 
 \subsection{Connecting Filters}
+\label{sec:connecting}
 
 \subsubsection{StreaMIT Approach}
 
@@ -250,11 +273,11 @@ class FFT extends Stream {
                      setSplitter(ROUND_ROBIN);
                      add (new Identity());
                      add (new Identity());
-                     setSplitter(WEIGHTED_ROUND_ROBIN(N/4, N/4);
+                     setJoiner(WEIGHTED_ROUND_ROBIN(N/4, N/4);
                }});
             setJoiner(ROUND_ROBIN);
       }});
-      for(int i=2; i<=N/2; i*=2)
+      for(int i=2; i<N; i*=2)
         add(new Butterfly(i, N));
 }}
 \end{verbatim}
@@ -265,14 +288,14 @@ class FFT extends Stream {
 \end{figure}
 
 The basic construct for composing filters into a communicating network
-is a {\tt Stream}.  The FFT in Figure \ref{fig:firfilter} is an
-example of a {\tt Stream} that appears in our software radio.  Like a
-{\tt Filter}, a {\tt Stream} has an {\tt init} function that is called
-upon its instantiation.  However, there is no {\tt work} function, and
-all input and output channels are implicit; instead, the stream
-behaves as the sequential composition of filters that are specified
-with successive calls to {\tt add} from within {\tt init}.  That is,
-{\tt Stream} creates a single pipeline.
+is a {\tt Stream}.  The FFT in Figure \ref{fig:fft} is an example of a
+{\tt Stream} that appears in our software radio.  Like a {\tt Filter},
+a {\tt Stream} has an {\tt init} function that is called upon its
+instantiation.  However, there is no {\tt work} function, and all
+input and output channels are implicit; instead, the stream behaves as
+the sequential composition of filters that are specified with
+successive calls to {\tt add} from within {\tt init}.  That is, {\tt
+Stream} creates a single pipeline.
 
 There are two other stream constructors besides {\tt Stream}: {\tt
 SplitJoin} and {\tt FeedbackLoop}.  The former is used to specify
@@ -304,7 +327,9 @@ and there is no output to join together.
 \end{enumerate}
 The splitter and joiner type are specified with calls to {\tt
 setSplitter} and {\tt setJoiner}, respectively (see Figure
-\ref{fig:fft}).  Note that a WEIGHTED\_ROUND\_ROBIN can function as an
+\ref{fig:fft}); the parallel streams are specified by successive calls
+to {\tt add}, with the $i$'th call setting the $i$'th stream in the
+SplitJoin .  Note that a WEIGHTED\_ROUND\_ROBIN can function as an
 exclusive selector if one or more of the weights are zero.  Also,
 there are additional splitters and joiners that we plan to add when
 StreaMIT supports filters with dynamically changing rates, including:
@@ -407,32 +432,44 @@ further improves readability and decreases code size.
 \begin{figure}
 \scriptsize
 \begin{verbatim}
+class TrunkedRadio extends Stream {
+   RFtoIFPortal freqHop = new RFtoIFPortal();
+   ...
+   void init() {
+      ...
+      RFtoIF rf2if;
+      add(rf2if = new RFtoIF(STARTFREQ));
+      freqHop.register(rf2if);
+      ...
+      add(new CheckFreqHop(freqHop));
+      ...
+   }
+}
+
+class RFtoIF extends Filter {
+   ...
+   // sets frequency to <f>
+   void setf(float f) {
+      ...
+   }
+}
+
 class CheckFreqHop extends SplitJoin {
-   RFtoIFPortal freq_hop;
-   void init(Portal fh) {
-      freq_hop = fh;
-      setSplitter(WEIGHTED_ROUND_ROBIN(N/4-2,1,1,N/2,1,1,N/4-2));
-      int k = 0;
-      for(int i=0; i<4; i++) {
-         if((i==0)||(i==2)) {
-            for(int j=0; j<2; j++) {
-               add(new Filter() {
-                  Channel input = new FloatChannel();
-                  Channel output = new FloatChannel();
-                  void work() {
-                     float val = input.pop();
-                     if(val >= MIN_THRESHOLD) 
-                        freq_hop.set_freq(Freq[k], 
-                                new TimeInterval(4*N, 6*N)); 
-                     output.push(val);
-                  }
-               });
-               k++;
-            }
-         } else
-            add(new Identity());
-      }
-      setJoiner(WEIGHTED_ROUND_ROBIN(N/4-2,1,1,N/2,1,1,N/4-2));
+   RFtoIFPortal freqHop;
+
+   void init(RFtoIFPortal freqHop) {
+      this.freqHop = freqHop;
+      ...
+      add(new Filter() {
+         ...
+         void work() {
+            ... 
+            if(val >= MIN\_THRESHOLD) 
+               freqHop.setf(Freq[k], new TimeInterval(4*N, 6*N)); 
+            ...
+          }
+      });
+      ...
    }
 }
 \end{verbatim}
@@ -472,12 +509,12 @@ CheckFreqHop} example of Figure \ref{fig:mess}, the sender indicates
 an interval of latencies between $4N$ and $6N$.  This means that the
 receiver will receive the message immediately following the last
 invocation of its own {\tt work} function which produces an item
-affecting the output of the {\it sender's} $4N$'th, $5N$'th, or
-$6N$'th work functions, counting the sender's current work function as
-number 0.  Defining this notion precisely is the subject of Section
+affecting the some output of the {\it sender's} $4N$'th to $6N$'th
+work functions, counting the sender's current work function as number
+0.  Defining this notion precisely is the subject of Section
 \ref{sec:time}, but the general idea is simple:  the receiver is
 invoked when it sees the information wavefront that the sender sees in
-$4N-6N$ execution steps.  
+$4N-6N$ execution steps.
 
 In some cases, the ability to synchronize the arrival of a message
 with some element of the data stream is very important.  For example,
@@ -498,44 +535,16 @@ forward all messages they receive to the elements of the container.
 Portals could be useful in cases when a component of a filter library
 needs to announce a message (e.g., that it is shutting down) but does
 not know the list of recipients; the user of the library can pass the
-filter a Portal containing all interested receivers.
-
-\begin{figure}
-\scriptsize
-\begin{verbatim}
-class TrunkedRadio extends Stream {
-   RFtoIFPortal freqHop = new RFtoIFPortal();
-   BoosterPortal onOff = new BoosterPortal().
-   void init() {
-      add(new ReadFromAtoD());
-
-      RFtoIF rf2if = new RFtoIF();
-      add(rf2if);
-      freqHop.register(rf2if);
-
-      Booster iss = new Booster();
-      add(iss);
-      onOff.register(iss);
- 
-      add(new FFT());
-      add(new CheckFreqHop(freqHop));
-      add(new CheckQuality(onOff));
-      add(new AudioBackEnd());
-   }
-}
-\end{verbatim}
-\vspace{-12pt}
-\caption{\protect\small TrunkedRadio is the top-level class for our
-      software radio, demonstrating the use of Portals for messaging.
-\protect\label{fig:highradiocode}}
-\vspace{-12pt}
-\end{figure}
+filter a Portal containing all interested receivers.  As for message
+delivery constraints, the user specifies a single time interval for
+each message, and that interval is interpreted separately (as
+described above) for each receiver in the Portal.
 
 In a language with generic data types, a Portal could be implemented
 as a templated list.  However, since Java does not yet support
 templates, we automatically generate a {\tt \{Class\}Portal} class for
 every class \{Class\}.  Our syntax for using Portals is evident in the
-high-level radio code in Figure \ref{fig:highradiocode}.
+{\tt TrunkedRadio} class in Figure \ref{fig:mess}.
 
 \subsubsection{Rationale}
 
@@ -567,6 +576,7 @@ well-defind semantics where messages are {\it timed} relative to the
 high-volume data flow.
 
 \subsection{Re-Initialization}
+\label{sec:reinit}
 
 \subsubsection{StreaMIT Approach}
 
@@ -602,13 +612,16 @@ stopping streams could be complicated when there is not an explicit
 notion of initialization time vs. steady-state execution time.
 
 StreaMIT improves on this situation by abstracting the
-re-initialization process from the user.  Additionally, any
-hierarchical stream construct automatically becomes a possible
-candidate for re-initialization, due to the well-defined stream
-structure and the simple interface with the {\tt init} function.
-Finally, it is easy for the compiler to recognize stream
-re-initialization possibilities and to account for all possible
-configurations of the stream flow graph during analysis and optimization.
+re-initialization process from the user.  That is, no auxillary
+control program is needed to drain the old streams and create the new
+structure; the user need only trigger the reinitialization process
+through a message.  Additionally, any hierarchical stream construct
+automatically becomes a possible candidate for re-initialization, due
+to the well-defined stream structure and the simple interface with the
+{\tt init} function.  Finally, it is easy for the compiler to
+recognize stream re-initialization possibilities and to account for
+all possible configurations of the stream flow graph during analysis
+and optimization.
 
 \subsection{Latency Constraints}
 

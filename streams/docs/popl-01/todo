@@ -1,49 +1,11 @@
-add these semantic restrictions:
-
-1. round-robin split/join must be non-null
-2. must have static rates in work function (compiler-detectable)
-
 ------------------------------------------------------------------------
-add these java restrictions:
-
-- no class libraries except for:
-	1. String
-	2. 
-
-- no aliasing allowed.  what does this mean?
-
-------------------------------------------------------------------------
-from meeting w/ saman
 
 - emphasize in title or abstract that this is for static rates
 
 - make it more clear in words what the semantics are of message
 sending, etc.
 
-- make an example that makes use of portals for portal's sake
-	1. library notion (unknown receiver / sender)
-	2. broadcast messaging
-	3. send up and down the stream
-
-	-> like an example w/ completely messaging stuff
-	- very simple & artificial
-
-- think about processor simulator?
-
 - add to intro:  timing emphasis
-
-------------------------------------------------------------------------
-from Saman's emails
-
-- One thing we did not do is list current limitations we may fix soon
-such as rate changing filters, a type dispatch splitter, any joiner,
-etc. etc. Current class can be named something lime "static rates" and
-some of these extensions as "dynamic rates". Your java class diagram
-should go in too.
-
-- Figure 4, two set splitters, second should be a joiner...
-
-- Section 3.2.1 should refer to figure 11.
 
 - In Figure 7 don't put all the code of TrunkedRadio, also put parts of code
 from Booster and Check Quality to show message delivery. (Copy the class,
@@ -55,13 +17,6 @@ a structured streaming model.
 
 - 3.4.1 Justify reinitializatoin by need to change a part of the stream graph.
 
-Another meta point.
-Because of messaging and reinitilization we can integrate control part with
-the data part. Most other stream programs need a separate control program.
-(eg: Chapin's software radio)
-
-- It would be nice to add a example with reinitialization and draining....
-
 - Adhoc reinitialization can easily loose data or deadlock the system.
 
 - Need to note somewhere that sending a message does not affect the info
@@ -72,19 +27,11 @@ latency but also to prove program correctness (deadlock etc.)
 
 - 4.1.1 Where is min?
 
-- Why are some equn's numbered?
-
-- List of equ'n should be aligned at =
-
-- 4.1.3 Should we do a general weighted-round-robin??
-
 - Figure 10 has J and S not FJ and FS is that consistent??
 
 - 4.2.3 We can do something cool on for scheduling, we can bound the
 total number of buffer space!  Find the number of items that must be
 on a tape, sum them up, and say it has to be less than MAXBUFFERSIZE
-
-- 4.3 Wrong formatting for I1FJ in the 3rd para.
 
 - We should say something in intro/abstract about how easy for us to
 prove/show deadlock freedom etc.
@@ -93,88 +40,92 @@ prove/show deadlock freedom etc.
 description I e-mailed to you yesterday?)
 
 ------------------------------------------------------------------------
-Big things to think about
 
-0. realtime constraints
+- write appendix
 
-2. message sending syntax
-3. letting init codes cause an offset (do push() on output)
-4. verifying round-robin's are legal by having same rate on both sides
+* define latency for things other than filters.  same with messages!
+	- will need concept of first/last filters in a stream, which
+		could get complicated
+	- ability to send to other targets?
 
-5. semantics for weighted round-robin / duplicates?  or proof of
-simulation by a single round-robin.
+- make an example that makes use of portals for portal's sake
+	1. library notion (unknown receiver / sender)
+	2. broadcast messaging
+	3. send up and down the stream
 
-6. if a stream sends or receives a message, is the wavefront relative
-to the output or input?
+	-> like an example w/ completely messaging stuff
+	- very simple & artificial
 
-7. exact semantics of initialization when combining with tapes/messaging.
+	- also have re-initialization an draining in some example?
 
-8. define exactly the w-behavior if you're sending messages or adding
-constraints between disjoint pieces
+todo in windows
+---------------
 
-9. add a pre-made reordering filter?
+- expand the messaging diagram into a nice picture with the source,
+destination, portal, and connecting code.
 
-------------------------------------------------------------------------
-Future things to think about
+todo later this afternoon
+-------------------------
 
-1. any notion of exceptions?  error handling?
+- should this be manuscript format instead of two-column?
 
-2. any concept of filters ignoring items?  would affect wavefront (a
-select filter, for example.)
+- add the Tech Report #
 
-------------------------------------------------------------------------
-Things to write about
+questions for saman
+-------------------
 
-2. drain/destroy initialization semantics
-3. feedback loop initialization
-4. portals - let's just adopt templated java lists for the sake of presentation
-5. exact restrictions on java?
-6. semantic restrictions of streamit
+* order of evaluation of input.pop() in statements that contain more
+than 1?  I modified your function to input on different lines.  If we
+can have clean semantics, then let's change it back... but I think
+this is a mess we don't want to get into.  In fact, let's disallow
+it.  (Although we could detect commutativity, maybe...)
 
-7. the scripting component - having a pipeline of n blocks at runtime
-isn't supported in all langs.
+* checkFreqHop had a messed up for loop, right?  changed to 1-5, ==2, ==4
 
-8. diagram with class hierarchy?
+* should checkQuality be in the freq domain?  We really want a booster
+if the frequency spectrum is even?  But we said that we expect low
+values at the hop positions for the hopping... maybe they shouldn't
+output anything at the hop positions?
 
-9. reorganize the derivations of min/max so that stuff leaving the
+* I'm going to let the init function push and pop, ok?  We still have
+to give semantics.
+
+-> note: I'm using semantics of add so that it returns what it adds.
+this leads to a nicer syntax.
+
+changes we decided against making?
+----------------------------------
+
+- put a splitJoin at the end of the TrunkedRadio example, since it
+makes more sense that way.
+
+- some name other than TIME interval for the message sending!
+
+- reorganize the derivations of min/max so that stuff leaving the
 split/join and stuff entering the split/join is together?  then the
 similar equaionts are placed next to each other.
 
-10. improve writing of feedbackloop section.
+- number all equations?
 
-11. talk to saman about changing example FIR so that it
-pushes(peek(i)); pop(); instead of pushing the dummy values.
+future things to think about
+----------------------------
 
-13. make latency symbol consistent - l or n?  
+* realtime constraints.  can we say a filter fires once per time interval?
 
-14. introduce n(t) notation earlier.
+* work out the semantics of the w-message sending (disjoint pieces)
 
-15. change messaging semantics so it's clear what happens in the case
-of a portal.
+* letting init codes cause an offset (do push() on output)
 
-16. improve timing by defining upstream and downstream somewhere near
-the top.
+* exact tape-based semantics of reinitializatin
 
-17. how do they declare how many they push and pop?
+* semantic restrictions of sending a message within a message handler.
+Need to start counting work functions in a different way.
 
-19. put a split/join in the radio example -- looks better and makes more sense
+- any notion of exceptions?  error handling?
 
-21. somewhere in semantics, say what we don't do
+- any concept of filters ignoring items?  would affect wavefront (a
+select filter, for example.)
 
-22. some name other than TIME interval for the message sending!
-
-** put the feedbackloop joiner transfer functions as a composition of
-some other joiner function so that I can still use duplicate, etc there.
-
-** add some latency constraints to the example
-
-- get rid of caching in some of the examples?
-
-- make it clear that latency constraints with a portal apply to all
-elements of the portal
-
-- expand on captions to procedural / oo examples
-
-
-
+- I still vote for a reordering filter that lets you reorder chunks
+without a complicated round-robin with identitity functions.
 
