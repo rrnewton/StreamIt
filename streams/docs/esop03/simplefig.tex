@@ -58,7 +58,7 @@
 \begin{align}
 \label{eq:b2r}
 &~~~~~\forall (i,j,k) \in {\cal D}_{B \rightarrow R}:~~
-\mt{READ}_{c}(i,j,k) = \mt{BUF}_{c}(i+q,j*O(n) + k - q * \mt{Period}(c)) \\ \nonumber
+\mt{READ}_{c}(i,j,k) = \mt{BUF}_{c}(i+q,j*O(c) + k - q * \mt{Period}(c)) \\ \nonumber
 &\mt{where }{\cal D}_{B \rightarrow R} = 
   {\cal D}_{READ_{c}} \cap \{ (i,j,k)~|~q * \mt{Period}(c) \le k \le \mt{min}((q+1)*\mt{Period}(c), E(c)) - 1 \} 
 \end{align}
