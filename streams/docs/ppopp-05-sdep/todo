@@ -51,11 +51,12 @@ code is generated to satisfy the latency range specified.
  - Figure 1: the labels at the top and bottom of each node are not adequately
 explained. 
 
- - Algorithm 1 has several problems. The recursive call to pullSchedule only
-has one actual parameter, yet the procedure itself has 2 parameters. Moreover,
-the auxiliary procedure simulateCurrentPhase(X) is not explained, and the
-semantics of the "o" operator are left unspecified. The two occurrences of "o"
-look slightly different, which is probably the result of a typo.
+x Algorithm 1 has several problems. The recursive call to pullSchedule only
+  has one actual parameter, yet the procedure itself has 2 parameters. Moreover,
+  the auxiliary procedure simulateCurrentPhase(X) is not explained,
+  and the semantics of the "o" operator are left unspecified. The two
+  occurrences of "o" look slightly different, which is probably the
+  result of a typo.
 
  - section 4.2: What does the term FFT refer to? 
 
@@ -66,10 +67,10 @@ a high-performance distributed cluster. Wouldn't embedded hardware be
 more appropriate?  This makes me wary of the possible performance
 gains on realistic hardware (i.e. lower-speed, less parallelism).
 
-Section 3: It would be useful to point out initially that \mathcal{S} \in
-\Phi. Also, in Algorithm 1, you are missing the n parameter to the
-recursive call of pullSchedule(). I presume this should be the number of
-tokens needed to on c_i.
+x Section 3: It would be useful to point out initially that \mathcal{S} \in
+  \Phi. Also, in Algorithm 1, you are missing the n parameter to the
+  recursive call of pullSchedule(). I presume this should be the
+  number of tokens needed to on c_i.
 
 Section 4.1: After the bullet list, you might mention as you describe the
 semantics of message latency that this is much like a logical clock,
