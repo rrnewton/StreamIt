@@ -1,32 +1,75 @@
 \section{Introduction}
 
-This is the intro~\cite{streamit-asplos}.
+big picture:  
+- two emerging trends:  wire delay and streaming applications
 
-Load balancing is particularly important in the streaming domain,
-since the throughput of a stream graph is equal to the {\it minimum}
-throughput of each of its stages.  This is in contrast to scientific
-programs, which often contain a number of stages which process a given
-data set; the running time is the {\it sum} of the running times of
-the phases, such that a high-performance, parallel phase can partially
-compensate for an inefficient phase.  In mathematical terms, Amdahl's
-Law captures the maximum realizable speedup for scientific
-applications.  However, for streaming programs, the maximum
-improvement in throughput is given by the following expression:
-\begin{align*}
-\mbox{\it Maximum speedup}(w, c) = \frac{\sum_{i=1}^N{w_i \cdot c_i}}{MAX_i(w_i \cdot c_i)}
-\end{align*}
-where $w_1 \dots w_m$ denote the amount of work in each of the $N$
-partitions of a program, and $c_i$ denotes the multiplicity of work
-segment $i$ in the steady-state schedule.  Thus, if we double the load
-of the heaviest node ({\it i.e.}, the node with the maximum $w_i \cdot
-c_i$), then the performance could suffer by as much as a factor of
-two.  The impact of load balancing on performance places particular
-value on the partitioning phase of a stream compiler.
+  - need high-level programming view that will abstract away the
+details of the architecture and allow for platform-indpenedent stream
+programming.  Towards this end, the StreamIt language makes a number
+of improvements... the one we focus on in this paper is the structure
+of the language.
 
-Our partitioner employs a set of fusion, fission, and reordering
-transformations to incrementally adjust the stream graph to the
-desired granularity.  To achieve load balancing, the compiler
-estimates the number of instructions that are executed by each filter
-in one steady-state cycle of the entire program; then, computationally
-intensive filters can be split, and less demanding filters can be
-fused.
+give laundry list of reasons for structure FOR *programmer's sake*.
+Say that the problem with restricting programmer flexibility is that
+you restrict compiler flexibility.  After all, the structuring pattern
+they chose isnt' necessarily the most effiecient.  So compiler needs
+to have flexibility to morph the stream representation between
+different equivalent forms.  It also needs to have a powerful and
+efficient analysis framework for choosing between which form is the
+"best".
+
+This paper makes two contibutions: demonstrate flexibility of
+structure by a series of stream graphs, then demonstrate power lended
+by structure by abstracting the structures into a canonical form that
+is very analyzable.  We give a dynamic programming algorithm that
+leverages the structure of the graph to consider many possibilities, 
+ could be used to determine any number of things about the graph; in
+we focus on the load balancing problem.
+
+Using the flexibility of the graph transformations, we can transform a
+graph into a canonical form, on which we can do powerful analyses, and
+then have the flexibility to transform it back into the form that is
+most efficient.
+
+ then say that contributions are a partitioner that is in some
+respects more powerful than on an unstructured graph:
+  - cuts along important places
+  - cuts in the right directions
+  - detecting symmetry and hierarchy to save time
+    - work estimation
+    - alisasing of child configurations
+    - evaluating child configurations themselves
+
+- does fissoin and fusion
+- shows how to effectively compile something that was convenient for the programmer
+- maintains single-input, single-output
+- sticks with space multiplexing
+
+- show how we can provide rectangular abstraction on single-input, single-output streams
+
+- stream structures present one level of granularity... explore other
+granularities through partitioning.  demonstrate two things: that with
+single-input, single-output structures, can have flexible algorithms
+with dynamic programming (e.g. that does both fission and fusion of
+nodes), and 2) that a host of graph transformations can flexibly
+support a range of other granularities in the program.
+
+- another observation: the symmetry.  programs very often have not
+only structure in their communication, but structure in their loads,
+both vertically and horizontally.  the most advantageous partitionings
+are ones that cut along those dimensions, which is exposed to the
+compiler in a structured language.
+
+  - partitioner takes advantage of this in two ways: 
+    1) by detecting symmetry and only calculating things once
+    2) by drawing cuts along likely paths
+    3) by automatically calculating some properties that are the best,
+       e.g. if you have the same filter duplicated in a splitjoin
+
+- two thrusts: that structure actually SUPPORTS powerful ways of
+program reasoning, and that we are flexible enough to manipulate
+structured programs into a number of isomorphic forms.  can consider
+structures on an abstract level, and then implement them in any number
+of ways.
+
+- very fast?  no

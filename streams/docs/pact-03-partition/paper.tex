@@ -33,24 +33,51 @@ Saman Amarasinghe \\
   \input{intro}
   \input{language}
   \input{transforms}
-%  \input{algorithm}
+  \input{dynprg}
   \input{results}
-  \input{nonhier-transforms}
+  \input{related}
+  \input{conclusion}
+%  \input{nonhier-transforms}
 
+  \clearpage
   \begin{figure}[t]
-    \psfig{figure=algorithm4.eps,width=3.5in}
-    \caption{Refactoring hierarchical splitjoin children.}
+    \psfig{figure=algorithm4.eps,width=3.3in}
+    \caption{Vertical cut algorithms.
+    \protect\label{code:vert}}
+  \end{figure}
+  \begin{figure}[t]
+    \psfig{figure=refactor2.eps,width=1.75in}
+    \psfig{figure=refactor1.eps,width=1.75in}
+    \caption{Vertical cut example.
+    \protect\label{ex:vert}}
   \end{figure}
   
+  \clearpage
   \begin{figure}[t]
     \psfig{figure=algorithm5.eps,width=3.5in}
-    \caption{Adding and removing splitjoin synchronization.}
+    \caption{Horizontal cut algorithms.
+    \protect\label{code:horiz}}
+  \end{figure}
+  \begin{figure}[t]
+    \psfig{figure=matchsync2.eps,width=1.75in}
+    \psfig{figure=matchsync1.eps,width=1.75in}
+    \caption{Horizontal cut example.
+      \protect\label{ex:horiz}}
   \end{figure}
   
+  \clearpage
   \begin{figure}[t]
     \psfig{figure=algorithm6.eps,width=3.5in}
-    \caption{Aggressive synchronization removal.}
+    \caption{Aggressive synchronization removal.
+    \protect\label{code:syc}}
   \end{figure}
+  \begin{figure}[t]
+    \psfig{figure=sync2.eps,width=1.75in}
+    \psfig{figure=sync1.eps,width=1.75in}
+    \caption{Example of synchronization removal.
+    \protect\label{ex:sync}}
+  \end{figure}
+  
   
   \clearpage
   \begin{figure*}[t]
@@ -64,7 +91,6 @@ Saman Amarasinghe \\
   \end{figure*}
 
   \section*{Appendix}
-  \clearpage
   \begin{figure}[t]
     \psfig{figure=algorithm3.eps,width=3.5in}
   \end{figure}

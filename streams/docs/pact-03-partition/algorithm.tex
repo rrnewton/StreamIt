@@ -1,9 +1,12 @@
 structures
 -------------------------------------------------------------------------
-container s:
-  s.height       : returns height of region
-  s.width[i]     : returns width of i'th row
-  s.get(i, j)    : returns the (i,j)'th child
+Container s:
+  s.height       : returns height of container
+  s.width[y]     : returns width of y'th row
+  s.get(x, y)    : returns the (x, y)'th child (where x is col, y is row)
+
+Node d extends Container:
+  d.work         : the steady-state work of this node
 
 globals
 -------------------------------------------------------------------------
@@ -32,7 +35,7 @@ void setup(int n)
 (add maximal synchronization to all splitjoins)
 (consider feedbackloops as a 2-way splitjoin, each child of which is a
  2-element pipeline (to prevent fusing with loop/body separately)
-(eliminate all splitjoins in pipelines in favor of rectangular pipelines)
+(eliminate all splitjoins in pipelines in favor of synchronized pipelines)
 
 forall s in graph
   A_s = new int[s.length()][s.length()][s.width()][s.width()][n]
