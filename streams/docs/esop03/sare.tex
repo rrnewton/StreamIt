@@ -5,16 +5,16 @@
 \small
 \begin{center}
 \begin{tabular}{|c|c|c|c|c|c|} \hline
-Model of Computation & Items on Channels & Nodes with & Nodes with & Cyclic Steady & Initialization \\
-                     & at Start & Pop $\ne$ Push & Peek $>$ Pop & State Phases & Phases \\
+Model of Computation & Items on Channels & Nodes with & Nodes with & Cyclic Steady \\
+                     & at Start & Push $\ne$ Pop & Peek $>$ Pop & State Phases \\
 \hline \hline
-Synchronous Dataflow~\cite{LM87-i} & X & X & & & \\
+Synchronous Dataflow~\cite{LM87-i} & X & X & & \\
 \hline
-Cyclo-Static Dataflow~\cite{BELP96} & X & X & & X & \\
+Cyclo-Static Dataflow~\cite{BELP96} & X & X & & X \\
 \hline
-Computation Graphs~\cite{KM66} & X & X & X & & \\
+Computation Graphs~\cite{KM66} & X & X & X & \\
 \hline
-Phased Computation Graphs & X & X & X & X & X \\
+Phased Computation Graphs & X & X & X & X \\
 \hline
 \end{tabular}
 \vspace{-6pt}
@@ -28,15 +28,9 @@ We introduce the Phased Computation Graph (PCG) as a model of
 computation for dataflow languages; specifically, we designed the PCG
 as a model for StreamIt~\cite{streamitcc}.  A PCG is a generalization
 of the Computation Graph (CG) of Karp and Miller~\cite{KM66} to the
-case where each node has both an initial and steady-state execution
-epoch, each of which contains a number of {\it phases}.  It is also a
-generalization of other popular representations for dataflow graphs,
-such as synchronous dataflow (SDF) and cyclo-static dataflow (CSDF)
-(see Table~\ref{tab:models}).  Phases are attractive constructs for
-the reasons given in describing CSDF in Section~\ref{sec:related};
-also, an initial epoch is critical for applications such as a WAV file
-decoder that adjusts its parameters based on the data it finds in the
-header of the stream.
+case where each node has a number of {\it phases} (or, equivalently, a
+generalization of CSDF to allow peeking).  Thus, a PCG is also a
+generalization of synchronous dataflow (see Table~\ref{tab:models}).
 
 Formally, a PCG is a directed graph with the following components:
 \begin{itemize}
@@ -46,18 +40,24 @@ Formally, a PCG is a directed graph with the following components:
 \item Channels $c_1 \dots c_{m_c}$, where each channel is directed
 from a given node $n_a$ to a given node $n_b$.
 
+\item The number of phases $\mt{num}(n)$ that node $n$ exhibits.  For
+all $n$, $\mt{num}(n) \ge 1$.
+
+\item Non-negative integers $U(c, p)$, $O(c, p)$, and $E(c, p)$, which
+give the number of items pushed, popped, and peeked, respectively,
+over channel $c$ during the $p$'th phase.
+
+% NOTE that this is overly cautious within loops... could have smaller A(c)
 \item A non-negative integer $A(c)$ indicating the number of items
-  that are initially present on channel $c$.
-
-\item The number of phases $\mt{num}(n, t)$ that node $n$ exhibits
-during epoch $t$.  Here $t$ indicates the type of epoch, which is
-either initial ($\mt{init}$) or steady-state ($\mt{steady}$).  For all
-$n$, $\mt{num}(n, \mt{init}) \ge 0$ and $\mt{num}(n, \mt{steady}) \ge
-1$.
-
-\item Non-negative integers $U(c, t, p)$, $O(c, t, p)$, and $E(c, t,
-p)$, which give the number of items pushed, popped, and peeked,
-respectively, over channel $c$ during the $p$'th phase of epoch $t$.
+  that are initially present on channel $c$.  There must be enough
+  items present on $c$ to ensure a node can execute all of its phases
+  during a steady-state schedule.  This constraint can be posed
+  conservatively\footnote{A more precise formulation is as follows.
+  For a given channel $c$, set $Emax_0 = 0$ and $Emax_{p+1} =
+  max(maxE_p, E(c,p) + \sum_{i=0}^{p} O(c,p))$ for all $p \in [0,
+  num(c) - 1]$.  Then $A(c) \ge Emax_{num(c)-1} -
+  \sum_{i=0}^{num(c)-1} O(c,p)$.} as $A(t) \ge max_p (E(c,p) -
+  o(c,p))$.
 
 \end{itemize}
 
@@ -66,24 +66,18 @@ respectively, over channel $c$ during the $p$'th phase of epoch $t$.
 We give an informal description of the execution semantics of a PCG,
 which is an intuitive extension to that of a CG.  An execution
 consists of a sequence of atomic {\it firings} of nodes in the graph.
-The effect of firing a given node depends on its epoch and its phase,
-which are both local states of the node.  At the start of execution,
-each node is in phase 0 of the initial epoch, and each channel $c$
-contains $A(c)$ items.
+The effect of firing a given node depends on its phase, which is a
+local state of the node.  At the start of execution, each node is in
+phase 0, and each channel $c$ contains $A(c)$ items.
 
-Let us consider a node $n$ that is in phase $p$ of epoch $t$.  It is
-legal for $n$ to fire if $p \in [0, \mt{num}(n, t)-1]$ and, for each
-channel $c_{in}$ directed into $n$, there are at least $E(c_{in}, t,
-p)$ items on $c_{in}$.  The effect of this firing is to consume
-$O(c_{in}, t, p)$ items from each channel $c_{in}$ directed into $n$;
-to produce $U(c_{out}, t, p)$ new items on each channel $c_{out}$
-directed out of $n$; and to advance the phase $p$ of $n$ to
-$\mt{next}(t, p)$.  In the initial epoch, each phase executes only
-once and $\mt{next}(\mt{init}, p) = p + 1$; in the steady-state epoch,
-the phases execute cyclically and $\mt{next}(\mt{steady}, p) = (p +
-1)~\mt{mod}~\mt{num}(n, t)$.  If a node $n$ is in phase $\mt{num}(n,
-\mt{init})$ of the initial epoch, then it transitions to the
-steady-state epoch and resets its phase to 0.
+Let us consider a node $n$ that is in phase $p$.  It is legal for $n$
+to fire if $p \in [0, \mt{num}(n)-1]$ and, for each channel $c_{in}$
+directed into $n$, there are at least $E(c_{in}, p)$ items on
+$c_{in}$.  The effect of this firing is to consume $O(c_{in}, p)$
+items from each channel $c_{in}$ directed into $n$; to produce
+$U(c_{out}, p)$ new items on each channel $c_{out}$ directed out of
+$n$; and to advance the phase $p$ of $n$ to $(p +
+1)~\mt{mod}~\mt{num}(n)$.
 
 From the starting state of the graph, execution proceeds via an
 infinite sequence of node firings.  The order of node firings is
@@ -142,17 +136,17 @@ channel $c$, $I(c)$ has type ${\cal V}[A(c)]$.
 %the start of execution.  The procedure $I(c)$ takes no arguments; its
 %signature is $\mt{void} {\small \rightarrow} {\cal V}[A(c)]$.
 %
-\item A work function $W(n, t, p)$ that represents the computation of
-node $n$ in phase $p$ and epoch $t$.  The signature of $W(n, t, p)$ is
-$[{\cal V}[E(\mt{chan\_in}(n)[1], t, p)], \dots, {\cal
-V}[E(\mt{chan\_in}(n)[\mt{num\_in}(n)], t, p)]]$ $\rightarrow$ \\ $[
-{\cal V}[U(\mt{chan\_out}(n)[1], t, p)], \dots, {\cal
-V}[U(\mt{chan\_out}(n)[\mt{num\_out}(n)], t, p)]]$.  That is, the
+\item A work function $W(n, p)$ that represents the computation of
+node $n$ in phase $p$.  The signature of $W(n, p)$ is $[{\cal
+V}[E(\mt{chan\_in}(n)[1], p)], \dots, {\cal
+V}[E(\mt{chan\_in}(n)[\mt{num\_in}(n)], p)]]$ $\rightarrow$ \\ $[
+{\cal V}[U(\mt{chan\_out}(n)[1], p)], \dots, {\cal
+V}[U(\mt{chan\_out}(n)[\mt{num\_out}(n)], p)]]$.  That is, the
 function inputs a list of arrays, each of which corresponds to an
-incoming channel $c_{in}$ and contains the $E(c_{in},t,p)$ values that
+incoming channel $c_{in}$ and contains the $E(c_{in},p)$ values that
 $n$ reads from $c_{in}$ in a given firing.  The procedure returns a
 list of arrays, each of which corresponds to an outgoing channel
-$c_{out}$ and contains the $U(c_{out},t,p)$ values that $n$ writes to
+$c_{out}$ and contains the $U(c_{out},p)$ values that $n$ writes to
 $c_{out}$ in a given firing.
 
 \end{itemize}

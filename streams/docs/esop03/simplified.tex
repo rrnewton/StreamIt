@@ -3,8 +3,11 @@
 
 In order to familiarize the reader with the basics of our technique,
 we present in this section the translation procedure for a simplified
-input domain.  The translation rules for the general case can be found
-in Section~\ref{sec:translate}.
+input domain.  The intuitive translation has a slight flaw in
+calculating the extreme elements of the domain, but we present it for
+pedagogical purposes and to motivate our more sophisticated approach.
+The correct and complete translation rules for the general case can be
+found in Section~\ref{sec:translate}.
 
 Our basic translation operates on the computation graphs of Karp and
 Miller~\cite{KM66} with all of the channels initially empty.  That is,
@@ -13,18 +16,16 @@ we assume that:
 
 \item No items appear on the channels at the beginning:  $\forall c,~A(c) = 0$.
 
-\item There are no initialization phases: $\forall n,~\mt{num}(n, \mt{init}) = 0$.
-
-\item Each node has only one steady-state phase: $\forall n,~\mt{num}(n, \mt{steady}) = 1$.
+\item Each node has only one phase: $\forall n,~\mt{num}(n, \mt{steady}) = 1$.
 
 \end{enumerate}
 
 Given these restrictions, we can simplify our notation considerably.
-Since we are only concerned with the steady-state epoch and the 0'th
-phase of each node, we can omit some arguments to any function that
-requires an epoch $t$ or a phase $p$.  For instance, the push and pop
-rates of a channel $c$ are now just $U(c)$ and $O(c)$, respectively;
-the work function for a node $n$ is simply $W(n)$.
+Since we are only concerned with the 0'th phase of each node, we can
+omit an argument to any function that requires a phase $p$.  For
+instance, the push and pop rates of a channel $c$ are now just $U(c)$
+and $O(c)$, respectively; the work function for a node $n$ is simply
+$W(n)$.
 
 \input{simplefig}
 
@@ -123,3 +124,212 @@ $E(c)$ into $\mt{Period}(c)$-sized chunks so as to resolve the proper
 source location in $\mt{BUF}$.  Again, all the variables in the index
 expressions are compile-time constants (except, of course, for the
 index quantifiers $i$, $j$, and $k$.)
+
+%% Equation~\ref{eq:b2r} also contains the shortcoming that is mentioned
+%% above for the simplified translator: the index expression of $i+q$
+%% into $\mt{BUF}_c$ can overflow 
+
+%% -------------
+
+%% for all c, 
+%% for all q in [0, E(c)/period(c)],
+
+%% forall (i,j,k) in X:  READ(i,j,k) = BUF(i, j*O(c) + k)
+
+%% X = D_READ intersect (i',j',k | 
+%%   j <= (Period(c) - (E(c) mod Period))/O(c) 
+%%   q*Pop(c) <= k <= min( (q+1)*pop(C), E(c) ) - 1
+%% )
+
+%% -------------
+
+%% for all c, 
+%% for all q in [0, E(c)/period(c)],
+
+%% forall (i,j,k) in X:  READ(i,j,k) = BUF(i+1, j*O(c) + k - [(Period(c) - (E(c) mod Period)) mod O(c)])
+
+%% X = D_READ intersect (i',j',k | 
+%%   j >= (Period(c) - (E(c) mod Period)) / O(c)
+%%   k >= (Period(c) - (E(c) mod Period)) - j * O(c)
+%% )
+
+%% --------
+
+%% for all c, 
+%% for all q in [0, E(c)/period(c)],
+
+%% forall (i,j,k) in X:  READ(i,j,k) = BUF(i, j*O(c) + k)
+
+%% X = D_READ intersect (i',j',k | 
+%%   j >= (Period(c) - (E(c) mod Period)) / O(c)
+%%   k <= (Period(c) - (E(c) mod Period)) - j * O(c)
+%% )
+
+%% --------
+
+%% assumptions:
+
+%% E(c) < Period
+
+%% for all c, 
+%% for all q in [0, E(c)/period(c)],
+
+%% forall (i,j,k) in X:  READ(i,j,k) = BUF(i+1, k - (Period(c) - j * O(c))
+
+%% X = D_READ intersect (i,j,k | 
+%%   i <= N - 2
+%%   j > (Period(c) - E(c)) / O(c)  (== index of the boundary firing that doesn't overlap next period in buf)
+%%   k >= Period(c) - E(c) - j * O(c)
+
+%%    --> k in range [0, E(c)]
+%%    --> where it overlaps in j-index of buf:  Period(c) - E(c)
+%%    --> overlap in k-index of read = ``'' - starting-k-index of READ in frame of buf = ``'' - j * O(c)
+%%    --> yielding Period(c) - E(c) - j * O(c)
+%% )
+
+%% --------
+
+%% assumptions:
+
+%% E(c) < Period
+
+%% for all c, 
+%% for all q in [0, E(c)/period(c)],
+
+%% forall (i,j,k) in X:  READ(i,j,k) = BUF(i, j * O(c) + k)
+
+%% X = D_READ intersect (i,j,k | 
+%%   j > (Period(c) - E(c)) / O(c)  (== index of the boundary firing that doesn't overlap next period in buf)
+%%   k <= Period(c) - E(c) - j * O(c) - 1
+
+%%    --> k in range [0, E(c)]
+%%    --> where it overlaps in j-index of buf:  Period(c) - E(c)
+%%    --> overlap in k-index of read = ``'' - starting-k-index of READ in frame of buf = ``'' - j * O(c)
+%%    --> yielding Period(c) - E(c) - j * O(c)
+%% )
+
+%% --------
+
+%% assumptions:
+
+%% E(c) < Period
+
+%% for all c, 
+%% for all q in [0, E(c)/period(c)],
+
+%% forall (i,j,k) in X:  READ(i,j,k) = BUF(i, j * O(c) + k)
+
+%% X = D_READ intersect (i,j,k | 
+%%   j <= (Period(c) - E(c)) / O(c) - 1  (== index of the boundary firing that doesn't overlap next period in buf)
+
+%%    --> k in range [0, E(c)]
+%%    --> where it overlaps in j-index of buf:  Period(c) - E(c)
+%%    --> overlap in k-index of read = ``'' - starting-k-index of READ in frame of buf = ``'' - j * O(c)
+%%    --> yielding Period(c) - E(c) - j * O(c)
+%% )
+
+%% -------
+
+%% write to buf with a(c)
+
+%% i to buf:  
+
+%% forall q in [0, a(c)/period(c)]
+
+%% forall (i,j) in X:  buf_c(i,j) = I[period(c)*i + j]
+
+%% where X = D_buf intersect {i,j | i==q &&
+%%                                  0 <= j <= min (period(c), A(c) - q * period(c) ) - 1
+
+
+%% -------
+
+%% write to buf (ABANDONED)
+
+%% assume period > a_c
+
+%% forall q in [0, a(c)-1]
+
+%% forall (i, j) in in X:  buf[i,j] = write(i,q,j-p*U(c))
+
+%% X: {i,j | j <= a(c) - 1
+
+
+
+
+%% forall q in [0, a(c)/period(c)]
+
+%% forall (i,j) in X:  buf_c(i,j) = I[period(c)*i + j]
+
+%% where X = D_buf intersect {i,j | i==q &&
+%%                                  0 <= j <= min (period(c), A(c) - q * period(c) ) - 1
+
+
+
+%% ===============================================================================
+
+%% --------
+
+%% assumptions:
+
+%% Num_Pushed items from I have been put on READ in lexicographic order (onto read)
+%% PUSHED represents the index set that has been pushed
+%% E(c) < Period
+
+%% for all c, 
+%% for all q in [0, E(c)/period(c)],
+
+%% forall (i,j,k) in X:  READ(i,j,k) = BUF(i+1 - num_pushed/period(c), k - (Period(c) - j * O(c))
+
+%% X = D_READ - PUSHED intersect (i,j,k | 
+%%   i <= N - 2
+%%   j > (Period(c) - E(c)) / O(c)  (== index of the boundary firing that doesn't overlap next period in buf)
+%%   k >= Period(c) - E(c) - j * O(c)
+
+%%    --> k in range [0, E(c)]
+%%    --> where it overlaps in j-index of buf:  Period(c) - E(c)
+%%    --> overlap in k-index of read = ``'' - starting-k-index of READ in frame of buf = ``'' - j * O(c)
+%%    --> yielding Period(c) - E(c) - j * O(c)
+%% )
+
+%% --------
+
+%% assumptions:
+
+%% E(c) < Period
+
+%% for all c, 
+%% for all q in [0, E(c)/period(c)],
+
+%% forall (i,j,k) in X:  READ(i,j,k) = BUF(i, j * O(c) + k)
+
+%% X = D_READ intersect (i,j,k | 
+%%   j > (Period(c) - E(c)) / O(c)  (== index of the boundary firing that doesn't overlap next period in buf)
+%%   k <= Period(c) - E(c) - j * O(c) - 1
+
+%%    --> k in range [0, E(c)]
+%%    --> where it overlaps in j-index of buf:  Period(c) - E(c)
+%%    --> overlap in k-index of read = ``'' - starting-k-index of READ in frame of buf = ``'' - j * O(c)
+%%    --> yielding Period(c) - E(c) - j * O(c)
+%% )
+
+%% --------
+
+%% assumptions:
+
+%% E(c) < Period
+
+%% for all c, 
+%% for all q in [0, E(c)/period(c)],
+
+%% forall (i,j,k) in X:  READ(i,j,k) = BUF(i, j * O(c) + k)
+
+%% X = D_READ intersect (i,j,k | 
+%%   j <= (Period(c) - E(c)) / O(c) - 1  (== index of the boundary firing that doesn't overlap next period in buf)
+
+%%    --> k in range [0, E(c)]
+%%    --> where it overlaps in j-index of buf:  Period(c) - E(c)
+%%    --> overlap in k-index of read = ``'' - starting-k-index of READ in frame of buf = ``'' - j * O(c)
+%%    --> yielding Period(c) - E(c) - j * O(c)
+%% )
+

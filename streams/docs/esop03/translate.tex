@@ -14,71 +14,29 @@ a concrete illustration of the techniques described below.
 
 Figure~\ref{fig:pcptosare1} illustrates the variables used for the
 translation.  These are very similar to those in the simple case,
-except that now there are separate variables for initialization and
-steady state, as well as variables for each phase.  The equations for
-the translation appear in Figures~\ref{fig:pcptosare2}
-and~\ref{fig:pcptosare3}.  A diagram of which variables depend on
-others appears in Figure~\ref{fig:communic}.  Due to space
-limitations, we discuss only the most interesting parts of the
-translation below.
+except that now there are separate variables for each phase.  The
+equations for the translation appear in Figures~\ref{fig:pcptosare2}
+and~\ref{fig:pcptosare3}.  Due to space limitations, we discuss only
+the most interesting parts of the translation below.
 
-Equation~\ref{i2ibuf} writes the initial values of the initial tokens
-on $\mt{IBUF}$, the initial buffer.  Equation~\ref{iwrite2ibuf}
-transfers values from the initial epoch of a node to the initial
-buffer of a channel.  Equations~\ref{iread2iwrite} and
-\ref{sread2swrite} do the work computation of the initial and
-steady-state items, respectively, just as in the simple translation of
-Section~\ref{sec:simplesare}.  Equation~\ref{swrite2sbuf} copies items
-from the node to the channel, using the same slicing technique as
-Equation~\ref{eq:w2b}.
+Equation~\ref{i2read} writes the initial values of the initial tokens
+on $\mt{READ}$, the read buffer.  Equation~\ref{write2buf} copies
+items from the node to the channel, using the same slicing technique
+as Equation~\ref{eq:w2b}.
 
-Equation~\ref{ibuf2iread} copies values from the initial buffer
-($\mt{IBUF}$) of a channel into the initial read array for a node.
-However, since the node might read more items in the initial epoch
-than exist on the initial buffer, we restrict the domain of the
-equation to only those indices that have a corresponding value in
-$\mt{IBUF}$.  If it is the case that there are fewer items in the
-initial buffer than a node reads in its initial epoch, then
-Equation~\ref{sbuf2iread} copies values from the beginning of the
-channel's steady-state buffer into the remaining locations on the
-node's initial array.  The upper bound for $q$ in
-Equation~\ref{sbuf2iread} is calculating the maximum amount that any
-phase peeks in the initialization epoch, so that enough equations are
-defined to fill the node's initial read array.  Note that for some
-phases, the dependence domain of Equation~\ref{sbuf2iread} will be
-empty, in which case no equation is introduced.  Also,
-Equation~\ref{sbuf2iread} uses the slicing method (see
-Section~\ref{sec:simplesare}) because the initial read array is of
-lower dimensionality than the steady-state buffer from which it is
-reading.
+Much of the complexity of the translation is pushed into
+Equations~\ref{buf2read0} and~\ref{buf2read1}.  There are two distinct
+complications in these equations.  First is one that we tackled in
+Equation~\ref{eq:b2r}: the fact that the read array might peek beyond
+the limits of the buffer, which requires us to slice the domain in
+increments of one period.  The second complication is that there could
+be an offset--initial tokens might have been written into the
+beginning of the read array.
 
-Equation~\ref{ibuf2sread} is dealing with the opposite case as
-Equation~\ref{sbuf2iread}: when a node finds items on its channel's
-initial buffer when it is entering the steady-state epoch.  In this
-case copying over the appropriate items to the beginning of the
-steady-state read array is rather straightforward.
-
-Much of the complexity of the entire translation is pushed into
-Equations~\ref{sbuf2sread0} and~\ref{sbuf2sread1}.  There are two
-distinct complications in these equations.  First is one that we
-tackled in Equation~\ref{eq:b2r}: the fact that the read array might
-peek beyond the limits of the buffer, which requires us to slice the
-domain in increments of one period.  The second complication is that
-there could be an offset--an initial buffer might have written into
-the beginning of the read array, or an initial read array might have
-read from the beginning of the steady-state
-buffer\footnote{Fundamentally, this complication ended up in this
-equation because we chose to define the initial buffer ($\mt{IBUF}$)
-to be the same length as its associated initial write array
-($\mt{IWRITE}$).  If we had defined it in terms of the initial read
-array ($\mt{IREAD}$) instead, the complexity would be in
-Equation~\ref{swrite2sbuf}.}.
-
-Equation~\ref{sbuf2sread2} provides a set of helper functions to
-determine the offset for Equations~\ref{sbuf2sread0}
-and~\ref{sbuf2sread1}.  The result is a number $\mt{Offset}$ that the
+Equation~\ref{buf2read2} provides a set of helper functions to
+determine the offset for Equations~\ref{buf2read0}
+and~\ref{buf2read1}.  The result is a number $\mt{Offset}$ that the
 domain needs to shift.  Unfortunately this involves splitting the
 original equation into two pieces, since after the shift the original
 domain could be split between two different periods (with different
-$i$ indices in $\mt{SBUF}$).  Each of these equations is clever about
-the sign of the offset to adjust the indices in the right direction.
+$i$ indices in $\mt{BUF}$).
