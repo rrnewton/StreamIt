@@ -28,7 +28,31 @@ runtime tuned library for computing the FFT as fast as possible.
 \section{Conclusion}
 \label{sec:conclusion}
 
-(this is the conclusion)
+This paper presents a set of automated analyses for detecting,
+analyzing, and optimizing linear filters in streaming applications.
+Though the mathematical optimization of linear filters has been a
+longtime focus of the DSP community, our techniques are novel in the
+automated application of these techniques to programs that are written
+in a flexible and high-level programming language.  We demonstrate
+that using linear dataflow analysis, linear combination, and automated
+frequency translation, we can improve \todo{performance number}.
+
+There is becoming an increasingly ominous rift between the design and
+implementation of signal processing applications.  Algorithms are
+designed at a conceptual level, with modular processing blocks that
+that naturally express the computation.  However, in order to obtain
+good performance, each hand-tuned implementation is forced to
+disregard the abstraction layers and painstakingly consider
+specialized whole-program optimizations.  The StreamIt project aims to
+reduce this process to a single stage in which the designers and
+implementors share a set of high-level abstractions that can be
+efficiently handled by the compiler.  
+
+The linear analysis described in this paper represents a first step
+towards this goal.  By automatically performing linear combination and
+frequency translation, it allows programmers to write linear stream
+operations in a natural and modular fashion without any performance
+penalty.
 
 \subsection{Future Work}
 
@@ -58,5 +82,6 @@ done on matrix factorizations in order to automatically derive fast
 implementations of large compuatations such as DSP transforms.  Also,
 to increase the class of programs that would fit into our linear
 framework, the entries of the ${\mathbf A}$ and ${\mathbf b}$ of
-linear nodes could contain symbolic runtime resolvable information.
+linear nodes could contain symbolic constants that are resolved at
+runtime.
 
