@@ -14,45 +14,46 @@ actors are allowed to have multiple input and output channels.
 \cite{benveniste93dataflow} provides an overview of dataflow
 synchronous languages.
 
-There are many results of scheduling {\SDF} programs
-\cite{leesdf}. Many of these results concentrate on reducing buffer
-requirements. Many of the systems inline all actor code into a single
-function, and try to minimize the code and buffer size at once
-\cite{bhattacharyya99synthesis}.  This approach leads to a strong
-preference for single appearance schedules.  In this paper we assume
-that the schedule and filter code are stored separately to allow for a
-compact representation of non-single appearance schedules.
+There are many results on the scheduling of {\SDF} programs
+\cite{leesdf,bhattacharyya99synthesis}.  While the tradeoff between
+data size and code size is well recognized, most projects focus on
+minimizing memory requirements while maintaining minimal code size in
+the form of a single appearance schedule.  A single appearance
+schedule is attractive because filters can be inlined into the
+schedule without effecting the size of the code.  In this paper, we
+assume that the schedule and the filter code are stored separately,
+and that non-single appearance schedules are supported with function
+calls. \cite{bhat1999x1} considres a hybrid model between these two
+extremes, in which actor invocations are inlined unless the resulting
+code grows too large.
 
-Other publications focus on synthesis of software for embedded
-systems. \cite{bhat1999x1} recognizes that non single-appearance
-schedules which inline actor invocations have problems with code
-growth.  A hybrid model is introduced, where actor invocations are
-inlined unless the resulting code grows too large. If inlining is not
-performed, actors are invoked through a function call.
+There are a number of approaches to minimizing the buffer requirements
+for single-appearance schedules (see \cite{bhattacharyya99synthesis}
+for a review).  APGAN (Pairwise Grouping of Adjacent Nodes) and RPMC
+(Recursive Partitioning by Minimum Cuts) are two complementary
+heuristics that have shown to be effective when applied together,
+taking the best result~\cite{Bhatta97}.  Another technique for
+reducing buffering requirements is buffer merging
+\cite{murthy99buffer,murt1999x3}, which will be explored for use in
+{\StreamIt} in the future.  Yet another approach is the GASAS system,
+which uses genetic algorithms to minimize buffer size~\cite{GASAS}.
 
-Other approaches to reducing the buffering requirements use buffer
-merging \cite{murthy99buffer}, a technique which will be explored for
-{\StreamIt} in the future.
-
-Many publications focus on synthesis for hardware systems.  Such
-systems can execute multiple actors at once
-\cite{govindarajan-minimizing}.  Currently the {\StreamIt} compiler
-produces code for uniprocessor architectures \cite{thies02streamit}
-and for the RAW processor \cite{gordo-thesis}.  RAW processor can
-execute multiple {\filters} in parallel, but every parallel execution
-is given its own separate set of resources like memory.
+Buffer minimization has also been done in the context of a
+multiprocessor implementation \cite{govindarajan-minimizing}. Using a
+linear programming framework, they minimize the buffer size across
+schedules that have optimal throughput.
 
 There are some streaming computation models which are less constrained
 than {\SDF}. The most relevant is Cyclo-Static Data Flow (CSDF)
-computation model \cite{BELP96,parks95comparison}.  CSDF actors have
-multiple {\work} functions, with each one being allowed to
-consume/produce a different number of data items.  Phased scheduling
-could be viewed as a generalization of CSDF to the case where
-hierarchical stream containers -- not just leaf nodes -- have cyclic
-phases.  In addition, incorporating child phases into parent schedules
-allows the phase information in a CSDF graph to be fully utilized,
-{\it e.g.,} for decreasing latency and for scheduling tightly
-constrained feedback loops.
+\cite{BELP96,parks95comparison}.  CSDF actors have multiple {\work}
+functions, with each one being allowed to produce/consume a different
+number of data items.  Phased scheduling could be viewed as a
+generalization of CSDF to the case where hierarchical stream
+containers -- not just leaf nodes -- have cyclic phases.  In addition,
+incorporating child phases into parent schedules allows the phase
+information in a CSDF graph to be fully utilized, {\it e.g.,} for
+decreasing latency and for scheduling tightly constrained feedback
+loops.
 
 \cite{wauters96cyclodynamic} proposes a model where the flow of data
 is not static, but may depend on data being processed. The model is
@@ -67,13 +68,12 @@ A large number of programming languages have included a concept of a
 stream; see \cite{survey97} for a survey.  Synchronous languages such
 as LUSTRE~\cite{lustre}, Esterel~\cite{esterel92}, and
 Signal~\cite{signal} also target the embedded domain, but they are
-more control-oriented than StreamIt and are not aggressively optimized
-for performance.  Sisal (Stream and Iteration in a Single Assignment
+more control-oriented than StreamIt and are less amenable to static
+scheduling.  Sisal (Stream and Iteration in a Single Assignment
 Language) is a high-performance, implicitly parallel functional
 language~\cite{sisal}.  The Distributed Optimizing Sisal
 Compiler~\cite{sisal} considers compiling Sisal to distributed memory
 machines, although it is implemented as a coarse-grained master/slave
 runtime system instead of a fine-grained static schedule.
-
 
 % http://www.cis.ohio-state.edu/~gb/cis888.12g/Papers/bhattacharyya99software.pdf, page 14, reviews related work for buffer stuff
