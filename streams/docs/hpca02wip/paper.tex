@@ -6,7 +6,7 @@
 
 \begin{document}
 
-\title{A Common Machine Language for Grid-Based Architectures}
+\title{A Common Machine Language for Grid-Based Machines}
 
 % uncomment this to use pubform
 %% \author{Bill Thies, Michal Karczmarek, Michael Gordon, David Maze, Jeremy Wong, \\ Henry Hoffmann, Matthew Brown, and Saman Amarasinghe \\
@@ -76,7 +76,7 @@ adapt to each kind of register layout, cache configuration, and
 instruction set.
 
 However, recent years have seen the emergence of a class of grid-based
-architectures \cite{raw, trips, smartmemories} for which the
+architectures \cite{smartmemories, trips, raw} for which the
 von-Neumann model no longer holds, and for which C is no longer an
 adequate CML.  The design of these processors is fundamentally
 different in that they are conscious of wire delays--instead of just
@@ -86,15 +86,119 @@ communication between replicated processing units.  Rather than a
 single instruction stream with a monolithic memory, these machines
 contain multiple instruction streams with distributed memory banks.
 
-Though C can still be used to program these machines, doing so either
-requires architecture-specific directives 
+Though C can still be used to write efficient programs on these
+machines, doing so either requires architecture-specific directives or
+a very smart compiler that can extract the parallelism and
+communication from the C semantics.  Both of these options renders C
+obsolete as a common machine language, since it fails to hide the
+architectural details from the programmer and it imposes abstractions
+which are a mismatch for the domain.
 
-We propose the StreamIt language as a new CML for grid-based
-processors.  
+To bridge this gap, we propose a new common machine language for
+grid-based processors: StreamIt.  The StreamIt language makes explicit
+the large-scale parallelism and regular communication patterns that
+these architectures were designed to exploit.  A program is
+represented not as a monolithic memory and instruction stream, but
+rather as a composition of autonomous filters, each of which contains
+its own memory and can only communicate with its immediate neighbors
+via high-bandwidth data channels.  In addition, StreamIt provides a
+low-bandwidth messaging system that filters can use for non-local
+communication.  We believe that StreamIt abstracts away the variations
+in grid-based processors while encapsulating their common properties,
+thereby enabling compilers to efficiently map a single source program
+to a variety of modern processors.
 
-\section{StreamIt Language}
+\section{The StreamIt Language}
 
-\subsection{Status}
+In this section we provide a very brief overview of the StreamIt
+language; please see \cite{streamittech} for a more detailed
+description.  The current version of StreamIt is legal Java syntax to
+simplify our presentation and implementation, and it is designed to
+support only streams with static input and output rates.  Designing a
+cleaner syntax and considering dynamically varying rates will be the
+subject of future work.
+
+\subsection{Filters}
+
+The basic unit of computation in StreamIt is the {\tt Filter}.  An
+example of a Filter is the {\tt Adder}, a component of our software
+radio (see Figure \ref{fig:radiocode}).  Each {\tt Filter} contains an
+{\tt init} function that is called at initialization time; in this
+case, the {\tt Adder} records {\tt N}, the number of items it should
+add at once.  The {\tt work} function describes the most fine grained
+execution step of the filter in the steady state.  Within the {\tt
+work} function, the filter can communicate with neighboring blocks
+using the {\tt input} and {\tt output} channels, which are typed FIFO
+queues declared within the {\tt init} function.  These high-volume
+channels support the intuitive operations of {\tt push(value)}, {\tt
+pop()}, and {\tt peek(index)}, where {\tt peek} returns the value at
+position $index$ without dequeuing the item.
+
+\subsection{Connecting Filters}
+\label{sec:connecting}
+
+The basic construct for composing filters into a communicating network
+is a {\tt Pipeline}, such as the Radio in Figure \ref{fig:radiocode}.
+Like a {\tt Filter}, a {\tt Pipeline} has an {\tt init} function that
+is called upon its instantiation.  However, there is no {\tt work}
+function, and all input and output channels are implicit; instead, the
+stream behaves as the sequential composition of filters that are
+specified with successive calls to {\tt add} from within {\tt init}.
+
+There are two other stream constructors besides {\tt Pipeline}: {\tt
+SplitJoin} and {\tt FeedbackLoop}.  The former is used to specify
+independent parallel streams that diverge from a common {\it splitter}
+and merge into a common {\it joiner} (see the Equalizer in Figure
+\ref{fig:radiocode}).  There are two kinds of splitters: 1) Duplicate,
+which replicates each data item and sends a copy to each parallel
+stream, and 2) RoundRobin($w_1, \dots, w_n$), which sends the first
+$w_1$ items to the first stream, the next $w_2$ items to the second
+stream, and so on.  RoundRobin is the only joiner type.  The splitter
+and joiner type are specified with calls to {\tt setSplitter} and {\tt
+setJoiner}, respectively; the parallel streams are specified by
+successive calls to {\tt add}, with the $i$'th call setting the $i$'th
+stream in the SplitJoin.  We do not discuss FeedbackLoops do to space
+constraints.
+
+%% Evident in all of these examples is another feature of the StreamIt
+%% syntax: {\it inlining}.  The definition of any stream or filter can be
+%% inlined at the point of its instantiation, thereby preventing the
+%% definition of many small classes that are used only once, and,
+%% moreover, providing a syntax that reveals the hierarchical structure
+%% of the streams from the indentation level of the code.  In our Java
+%% syntax, we make use of anonymous classes for inlining \cite{java}.
+
+StreamIt differs from other languages in that it imposes a
+well-defined structure on the streams; all stream graphs are built out
+of a hierarchical composition of Pipelines, SplitJoins, and
+FeedbackLoops.  This structure enables the stream to be mapped
+efficiently onto a grid target, since all of the communication is
+between neighboring filters.  Moreover, we are developing fission and
+fusion algorithms that can, for example, collapse a large Pipeline
+into a single filter for execution on a single processor, thereby
+allowing us to adjust the granularity of the stream graph to match the
+granularity of a given target.
+
+%% The comparison of StreamIt's structure with arbitrary stream graphs
+%% could be likened to the difference between structured control flow and
+%% GOTO statements.  Though sometimes the structure restricts the
+%% expressiveness of the programmer, the gains in robustness,
+%% readability, and compiler analysis are immense.
+
+\subsection{Messages}
+
+StreamIt provides a dynamic messaging system for passing irregular,
+low-volume control information between filters and streams.  Messages
+are sent from within the body of a filter's {\tt work} function,
+perhaps to change a parameter in another filter.  The central aspect
+of the messaging system is a sophisticated timing mechanism that
+allows filters to specify when a message will be received relative to
+the flow of information between the sender and the receiver.  Due to
+space constraints, we do not describe the syntax for message
+statements, but we do consider the semantics of message timing in
+Section \ref{sec:messagesemantics}.
+
+\subsection{Implementation Status}
 
 \section{Conclusions}
 
@@ -139,7 +243,7 @@ public class Equalizer extends Pipeline {
         }
         setJoiner(ROUND_ROBIN());
     }});
-    add(new Adder(N));
+    add(new Adder(BANDS));
   }
 }
   
@@ -163,7 +267,7 @@ class CheckFreqHop extends Filter {
    }
 }
 
-class TrunkedRadio extends Stream {
+class Radio extends Stream {
    int N = 64;
    int BANDS = 10;
 
