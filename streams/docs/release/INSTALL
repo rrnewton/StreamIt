@@ -1,9 +1,9 @@
 Installing the StreamIt Snapshot
 --------------------------------
 
-This is for the March 22, 2003 snapshot release (streamit-0.0.20030322).
+This is for the May 28, 2003 snapshot release (streamit-0.0.20030528).
 
-$Id: INSTALL,v 1.6 2003-03-21 21:35:21 dmaze Exp $
+$Id: INSTALL,v 1.7 2003-05-28 15:44:35 dmaze Exp $
 
 
 Unpack the StreamIt source tar file somewhere; this can be in your
@@ -33,11 +33,11 @@ PER-USER SETUP: depends on the shell you use; you need to set the
 STREAMIT_HOME environment variable and search paths for Java and
 LaTeX.  If you use bash, add to your .bashrc file
 
-  export STREAMIT_HOME=$HOME/streamit-0.0.20030322 # or elsewhere
+  export STREAMIT_HOME=$HOME/streamit-0.0.20030528 # or elsewhere
 
 If you use tcsh, add to your .cshrc file
 
-  setenv STREAMIT_HOME ${HOME}/streamit-0.0.20030322
+  setenv STREAMIT_HOME ${HOME}/streamit-0.0.20030528
 
 SOURCE RELEASE: The release comes with provided dotfiles that set up
 all of the possible environment variables.  Note that the settings in
