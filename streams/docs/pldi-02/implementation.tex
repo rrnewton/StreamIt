@@ -1,33 +1,51 @@
-\section{Implementation}
+\section{Implementation and Evaluation}
 
-The "stream abstraction" vs. the procedural abstraction
--	Separate compilation
--	Black box, vs. gray box vs. white box
+We have implemented a fully-functional prototype of the StreamIt
+optimizing compiler as an extension to the Kopi Java Compiler, a
+component of the open-source Kopi Project \cite{kopi}.  Our compiler
+generates C code that is compiled with a StreamIt runtime library to
+produce the final executable.  We have also developed a library in
+Java that allows StreamIt code to be executed as pure Java, thereby
+providing a verification mechanism for the output of the compiler.
 
-Runtime Model
--	Break-up between fine-grain, coarse-grain and black/white boxes etc.
--	Message delivery model
+The compilation process for streaming programs contains many novel
+aspects because the basic unit of computation is a stream rather than
+a procedure.  In order to compile stream modules separately, we have
+developed a runtime interface--analogous to that of a procedure call
+for traditional codes--that specifies how one can interact with a
+black box of streaming computation.  The stream interface contains
+separate phases for initialization and steady-state execution; in the
+execution phase, the interface includes a contract for input items,
+output items, and possible message production and consumption.  The
+interface relies on the $min$ function to specify message timing in
+terms of a stream's input tape.
 
-Scripting
--	Partial evaluation
--	Algebraic Simplification 
+We have evaluated our compiler with StreamIt versions of the following
+applications: 1) A GSM Decoder, which takes GSM-encoded parameters as
+inputs, and uses these to synthesize audible speech, 2) A system from
+the Polymorphic Computing Architecture (PCA) \cite{pca} which
+encapsulates the core functionality of modern radar, sonar, and
+communications signal processors, 3) A software-based FM Radio, and 4)
+A performance test from the SpectrumWare system \cite{spectrumware}.
 
-\subsection{GSM Decoder}
+[add performance table, number of lines of benchmarks?, discussion]
 
-  The decoder portion of the Streamit GSM Vocoder takes GSM encoded
-parameters as inputs, and uses these to synthesize audible speech.  This
-is accomplished by processing the parameters through four main filters.
-The RPE decoder filter produces some "pink noise" that very loosely
-estimates the speech waveform, using quantized bit sequences and a
-maximum value parameter from the encoded input.  This "pink noise" is
-fed to the Long Term Prediction portion, which applies long-term
-characteristics to the sequence through a delay filter within a feedback
-loop.  The resulting signal is then sent to the Short Term Synthesis
-filter, which decodes high frequency voice characteristics from the
-encoded parameters and applies these to the signal.  Finally, the
-Postprocessing filter identifies peaks in the signal to make it audible.
+%% \subsection{GSM Decoder}
 
-\subsection{PCA Demo}
+%%   The decoder portion of the Streamit GSM Vocoder takes GSM encoded
+%% parameters as inputs, and uses these to synthesize audible speech.  This
+%% is accomplished by processing the parameters through four main filters.
+%% The RPE decoder filter produces some "pink noise" that very loosely
+%% estimates the speech waveform, using quantized bit sequences and a
+%% maximum value parameter from the encoded input.  This "pink noise" is
+%% fed to the Long Term Prediction portion, which applies long-term
+%% characteristics to the sequence through a delay filter within a feedback
+%% loop.  The resulting signal is then sent to the Short Term Synthesis
+%% filter, which decodes high frequency voice characteristics from the
+%% encoded parameters and applies these to the signal.  Finally, the
+%% Postprocessing filter identifies peaks in the signal to make it audible.
 
-This application is representative of the core functionality needed by
-modern radar, sonar, and communications signal processors.
+%% \subsection{PCA Demo}
+
+%% This application is representative of the core functionality needed by
+%% modern radar, sonar, and communications signal processors.
