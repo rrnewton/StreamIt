@@ -1,8 +1,13 @@
 to add to paper:
 ---------------
 
-possibly for Andrew to do:
+for Andrew to do:
 ------
+- Figure out font problems -- even not printing to pdf makes for messed up fonts.
+
+- Change how the frequency transformation algorithm is presented. Eg
+  make it look like the other transforms: take a linear node and
+  produce a frequency filter.
 
 - give example of a linear node.  Could go in one of two ways: give
   streamit code and then the matrix, or give general streamit code
@@ -42,12 +47,6 @@ everywhere where they're used as vectors
   always be vertical?  Not a big deal.
 
 - I would remove titles of the graphs from excel.
-
-- In results, I think we should move the description of the benchmarks
-  into a table like in ASPLOS, which is "program characteristics" --
-  lines of code, number of filters orig, number of filters expanded,
-  and then possibly the results (mult. reduction and execution time
-  with differnent options), if there's room in the same table.
 
 - This is a low-priority pain, but bibliography could use some
   uniformizing.  For example, we reference PLDI in three completely
