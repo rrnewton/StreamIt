@@ -1,0 +1,316 @@
+Dear Michal Karczmarek,
+
+
+I regret to inform you that the Programme Committee has been unable 
+to select your paper
+
+"Phased Scheduling of Stream Programs"
+
+for presentation at the conference ESOP 2003.
+Actually, the committee selected only 25 papers out of 99 submissions 
+and we could not accept more, as ETAPS scheduling constraints impose 
+us a strict bound. So we have even been forced to reject some papers 
+with high rates.
+The competition was very high, and the selection process was very difficult.
+Each paper was reviewed by at least three program committee members 
+and was discussed at the Program committee meeting.
+
+I would like to thank you very much for your submission to ESOP and 
+hope to meet you in Warsaw,
+
+Pierpaolo Degano
+ESOP 2003 PC Chair
+*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=
+
+First reviewer's review:
+
+          >>> Summary of the paper <<<
+
+This paper addresses compilation of "stream programs", programs which
+compute an output stream from an input stream using a network of stream
+processors, and in particular the generation of a static schedule which
+does not require too much buffer space. Rather than consider arbitrary
+networks of stream processors, the paper restricts attention to particular
+combinations -- pipelines, split-joins, and feedback loops -- and defines
+compositional scheduling algorithms for these constructions. Two scheduling
+algorithms are considered: "psuedo single appearance scheduling", which
+basically runs each process in order from left to right enough times to
+generate/consume data at a steady rate, and "minimal latency phased
+scheduling", which more-or-less statically simulates the effect that demand
+driven evaluation would give. The former, not surprisingly, requires a lot
+of buffer space, while the latter requires much much less. There are a
+number of benchmarks given to support the claim that the second is much
+better than the first.
+
+The paper is not entirely clear. Funnily enough for a paper on compiling a
+language, StreamIt, no example programs, or even a grammar for the
+language, are included. The meaning of some StreamIt constructions is
+unclear -- for example, a splitter collects data from its input channel and
+pushes it onto its output channels, but it seems unspecified how the
+splitter decides *which* values to push onto each output channel. Is every
+value sent to every channel? Apparently not. May the same value be sent to
+more than one output? Who can tell.
+
+The paper consistently uses the word "set" to refer to an ordered tuple.
+There is some unnecessary repetition. The meaning of "borrowing" in section
+5 -- which I interpret as corresponding to demand-driven evaluation -- is
+unclear.
+
+I feel that the pseudo single appearance schedule is somewhat of a straw
+man: it seems clear that this algorithm will use a great deal of buffer
+space, so evaluating the minimal latency algorithm against it is not so
+convincing. Why not evaluate against someone else's benchmarks?
+
+For the actual benchmarks considered, the memory requirements are fairly
+modest in all cases anyway: I am not convinced that a reduction from a 4KB
+buffer to a 0.3KB buffer is actually of any importance in practice.
+
+The problem does seem interesting, and the approach may well be a good one,
+but I do not really find the paper convincing.
+
+
+
+ =*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=
+
+Second reviewer's review:
+
+          >>> Summary of the paper <<<
+
+The paper looks at two scheduling techniques for synchronous dataflow
+streamed applications with hierarchical properties. The basic graph element
+is a block which will take a number of items from an input queue, peek a
+number of items, and produce a number of items, per "invocation". The
+programs are produced hierarchically by the use of 3 structures: pipelining
+subgraphs (concatenation), arranging subgraphs in parallel, or making loops
+from subgraphs.
+
+A schedule is created that is a list of basic graph node invocations that
+bring the graph from empty to a steady state and then process data in the
+steady state. The schedule allows the graph to be efficiently executed in a
+single processor software environment.
+
+The schedules are created hierarchically, by making schedules for
+subgraphs, and then using these to generate a schedule for the entire
+graph. A naive scheduling algorithm is introduced, and then a more complex
+"phased" algorithm, which minimises latency and buffering, and can cope
+with more cases, at the expense of schedule size.
+
+Results are presented, showing the second algorithm to generally produce
+better results than the naive algorithm.
+
+
+
+          >>> Comments <<<
+
+The hierarchical scheduling approach leads to simple and neat scheduling
+algorithms. The phased scheduling approach is a neat way of optimising
+space requirements using a hierarchical approach. However, I feel the
+presentation of this paper lets it down. Starting with the most major
+points, first:
+
+I felt Section 5.2.3, "Pipeline, SplitJoin and FeedbackLoop" was unclear.
+While the algorithm itself felt intuitive, I found the description very
+hard to understand. This section seems more or less the core of the paper,
+and I think it would be very useful for it, and a few of the surrounding
+subsections, to be clearer. Explaining how iterating through Pipeline
+stages, and "borrowing" data is done could perhaps be improved. The use of
+an example, as in Table 2, is a good idea, but it did not feel
+well-explained, and the match between the "phases executed" column of that
+table, and the final schedule did not seem obvious.
+
+There are a lot of variables introduced, without any obvious, simple
+mnemonics, making the paper perhaps heavier reading than is necessary.
+There are many variables of the form S_{s, v}, where s is a variable, but v
+is some form of label, which can be confusing. The steady states are not
+very clear to read. In general, it feels like a tidy-up of the notation
+would make it much more readable.
+
+When Section 2.1 introduces u_f, o_f and e_f, you may want to emphasise the
+relation to pUshing, pOpping and pEeking (it took me an embarassingly long
+time to work it out, anyway).
+
+Footnote 1 says that "stream" is used to describe Filters, Pipelines,
+SplitJoins and FeedbackLoops. It seems strange to me that "stream program"
+isn't used to describe such a thing, and "stream" used to describe the
+actual stream of data itself, rather than what processes it.
+
+"Set" seems to be used to describe what look rather more like ordered
+tuples. (eg the steady state)
+
+Page 6, "The schedule can also be expressed as {A{2{BC}}{3{BC}}}" - I don't
+understand this.
+
+The first two lines of Table 1 appear to be missing.
+
+The tables should be tidied up; the vertical spacing improved so that words
+do not touch horizontal lines, column headings capitalised, and where
+possible the column widths adjusted to remove hyphenation.
+
+The Appendix seems to take a lot of space to explain something relatively
+simple, although it's not obvious how much could be removed without losing
+detail.
+
+Minor (and pedantic) points mainly about English usage:
+
+Page 1: "around stream of" -> "around streams of" "compiler for practical"
+-> "compiler support for practical" "but they are often not designed with
+neither practical use nor efficient in mind" sounds clunky - a bit like a
+double negative, perhaps "same time, StreamIt compiler" -> "same time, the
+StreamIt compiler"
+
+Page 2: "uses SDF computation model" -> "uses the SDF computation model"
+"require buffer space may" -> "require buffer space that may" "with number
+of components" -> "with the number of components" "advantage of structure"
+-> "advantage of the structure" "chapter 4" -> "Section 4" "phasing
+scheduling technique" -> "the phased scheduling technique" "presents
+minimum-latency" -> "presents a minimum-latency" Should Sections 7 and 8 be
+mentioned at the end of Section 1?
+
+Page 3: "presented here are are common" -> "presented here are common"
+
+Page 4: Figure 3 - the line break for label c), with the 5 at the start of
+a line, is messy. "order of execution of the nodes" -> "order of execution
+on the nodes" "A steady state of stream s is represented by vector m" -> "A
+steady state of a stream s is represented by a vector m"
+
+Page 5: "stream to" (stream in italics) doesn't have correct spacing
+"Calculating Minimal Steady State" -> "Calculating Minimal Steady States"
+"''" should be "``" for opening quotes. "splitters" (in italics) should
+probably have a capital "S". "S_{s, c} and S_{s, v}" should probably have a
+non-italic "and". "o = 1" looks like it is missing some text.
+
+Page 6: "We also use notation of c_s..." reads a little awkwardly.
+
+Page 7: Shifting k -> k+1, k-1 -> k would simplify the equations.
+
+Page 8: "Initialization Schedule" - an example of something that cannot be
+scheduled using single-appearance schedules could be useful. "which allows
+to schedule" -> "which allows us to schedule" "control of trade-off" ->
+"control of the trade-off"
+
+Page 9: "Onece" -> "Once" "Phased schedule is a" -> "A phased schedule is
+a" "Minimal latency schedule is a" -> "A minimal latency schedule is a"
+
+Page 10: "c is the consumption of the phase, with repsect to its stream" -
+"consumption" doesn't appear to be defined anywhere else, although it can
+be worked out from context, and explains the abbreviation of "c_s" in
+Section 4.1. "Technique used for calculating" -> "The technique used for
+calculating" "schedules is borrowing" -> "schedules is the borrowing"
+"Table2" -> "Table 2" "The last child executes just enough phases to
+produce some data. The child directly above it executes just enough phases
+to provide sufficient data for the child below to execute its child." - I
+don't think this makes sense, has the last child has no child? Is "its
+child" the next child in the pipeline, a child it contains hierarchically,
+or something? "It only executes as many phases as it can..." - sounds odd.
+Maybe this makes more sense in the context of borrowing, but this did not
+seem well-explained.
+
+Page 11: "executed in order of" -> "executed in the order of" "is not
+allowed" - only the "n" of "not" is italicised. "highlight effectiveness"
+-> "highlight the effectiveness"
+
+Page 12: "([18])" - Looks rather messy to me. "are a synthetic benchmarks"
+-> "are synthetic benchmarks" "They have been introduced" -> "They were
+introduced"
+
+Page 13: "research of various" -> "research on various" "This chapter" ->
+"This section", perhaps? "StreamIt scheduler stores a the" -> "The StreamIt
+scheduler stores the"
+
+Page 14: "Other approaches include to reducing" -> "Other approaches
+include reducing" "Hierarchical approach to scheduling" -> "A hierarchical
+approach to scheduling" "In hierarchical approaches presented" -> "In the
+hierarchical approaches presented" "Phasing approach to scheduling allows
+to schedule arbitrarily tight" -> "The phased approach to scheduling allows
+the scheduling of arbitrarily tight"
+
+References: [3] - "I mplementation" -> "Implementation" [7] - Why the
+quotes around the names? "''" should be "``", too.     "Implementat ion" ->
+"Implementation"     "Paralle l" -> "Parallel" [9] - "u.s. navy" -> "U.S.
+Navy", etc. [11] - "In In", "Oper ating" [15] - "streamit" isn't
+capitalised. [18] - "sdf" isn't capitalised. [22] - "Streamit" has only an
+initial capital. The use of full and abbreviated forenames seems a little
+inconsistent.
+
+Appendix A:
+
+Top of page 17: The readability of the equation might be improved by
+splitting it onto two lines, and removing the for-alls?
+
+Halfway down page 17: The first two elements of S_p could go on different
+lines, to improve readability.
+
+Top of page 18: Ditto.
+
+Top of page 19: "Figure ??e (b)" - a missing or unlabelled figure?
+
+Definition 2: "iff" has "i" upright, the rest italicised.
+
+
+
+
+
+          >>> Points in favour or against <<<
+
++ Neat idea - Untidy presentation 
+
+
+
+ =*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=
+
+Third reviewer's review:
+
+          >>> Summary of the paper <<<
+
+The authors present an optimisation technique for their domain-specific
+programming language for processing streaming data. #
+
+
+
+          >>> Comments <<<
+
+I think that your paper is targeting an interesting and useful application
+but I found it hard to understand its contribution.  You are proposing an
+optimisation to your StreamIt programming language but I think that the
+optimisation is particular to your language and not a general-purpose one.
+On page 14 you report that    ``*Unlike other languages*, StreamIt enforces
+a structure on the  stream graph ...''
+
+Additionally, I think that your optimiation only works under certain
+conditions. On page 3 you write that you require that
+
+  ``... the input and output rates of each filter are known at  compile
+time.''
+
+which seems to give you an advantage over the case where this is not
+available.
+
+I found a lot of the paper hard to follow. The central idea of a
+``minimal'' steady state was never explained well enough for me to
+understand what it was. Minimal with respect to what measure? For me,
+steady state is a unique equilibrium and it doesn't make sense to have
+several of them.
+
+I was also unable to understand ``... it is ready to execute its steady
+state'' (p. 5). Here ``steady state'' seems to be a program of some kind.
+What is the notion of minimal here?
+
+Other notation seemed to be used without being defined, such as \circ.
+
+There seemed to be some errors in your paper: the schedule introduced at
+the top of page 6 is then run-length encoded but the run-length encoded
+version is wrong.
+
+
+
+          >>> Points in favour or against <<<
+
+Points in favour: interesting application area Points against: hard to
+understand, details and definitions missing, very specific optimisation,
+not generalisable.
+
+
+
+ =*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=
+
+
