@@ -1,0 +1,290 @@
+Return-Path: <thies@MIT.EDU>
+Received: from fort-point-station.mit.edu by po10.mit.edu (8.9.2/4.7) id OAA27668; Wed, 23 Jan 2002 14:01:18 -0500 (EST)
+Received: from catfish.lcs.mit.edu (catfish.lcs.mit.edu [18.111.0.152])
+	by fort-point-station.mit.edu (8.9.2/8.9.2) with ESMTP id OAA04508;
+	Wed, 23 Jan 2002 14:01:18 -0500 (EST)
+Received: from pacific-carrier-annex.mit.edu (PACIFIC-CARRIER-ANNEX.MIT.EDU [18.7.21.83])
+	by catfish.lcs.mit.edu (8.11.4/8.11.4) with ESMTP id g0NJ1FF17224
+	for <commit-stream@cag.lcs.MIT.EDU>; Wed, 23 Jan 2002 14:01:15 -0500 (EST)
+Received: from central-city-carrier-station.mit.edu (CENTRAL-CITY-CARRIER-STATION.MIT.EDU [18.7.21.75])
+	by pacific-carrier-annex.mit.edu (8.9.2/8.9.2) with ESMTP id OAA29024
+	for <commit-stream@cag.lcs.MIT.EDU>; Wed, 23 Jan 2002 14:01:15 -0500 (EST)
+Received: from manawatu-mail-centre.mit.edu (MANAWATU-MAIL-CENTRE.MIT.EDU [18.7.21.85])
+	by central-city-carrier-station.mit.edu (8.9.2/8.9.2) with ESMTP id OAA09430
+	for <commit-stream@cag.lcs.MIT.EDU>; Wed, 23 Jan 2002 14:01:15 -0500 (EST)
+Received: from home-on-the-dome.mit.edu (HOME-ON-THE-DOME.MIT.EDU [18.7.16.76])
+	by manawatu-mail-centre.mit.edu (8.9.2/8.9.2) with ESMTP id OAA18174
+	for <commit-stream@cag.lcs.MIT.EDU>; Wed, 23 Jan 2002 14:01:15 -0500 (EST)
+Received: (from thies@localhost) by home-on-the-dome.mit.edu (8.9.3)
+	id OAA20303; Wed, 23 Jan 2002 14:01:15 -0500 (EST)
+Message-Id: <200201231901.OAA20303@home-on-the-dome.mit.edu>
+To: commit-stream@cag.lcs.mit.edu
+Subject: bad news
+Date: Wed, 23 Jan 2002 14:01:15 -0500
+From: Bill Thies <thies@MIT.EDU>
+
+
+------- Forwarded Message
+
+Return-Path: <pldi2002admin@sable.mcgill.ca>
+Received: from fort-point-station.mit.edu by po10.mit.edu (8.9.2/4.7) id NAA15831; Wed, 23 Jan 2002 13:05:31 -0500 (EST)
+Received: from pobox.cs.mcgill.ca (pobox.CS.McGill.CA [132.206.51.249])
+	by fort-point-station.mit.edu (8.9.2/8.9.2) with ESMTP id NAA12333
+	for <thies@mit.edu>; Wed, 23 Jan 2002 13:05:31 -0500 (EST)
+Received: from umbra.CS.McGill.CA (umbra.CS.McGill.CA [132.206.3.24])
+	by pobox.cs.mcgill.ca (8.9.3/8.9.3/Debian 8.9.3-21) with ESMTP id NAA07923;
+	Wed, 23 Jan 2002 13:05:30 -0500
+Received: from umbra.CS.McGill.CA (localhost [127.0.0.1])
+	by umbra.CS.McGill.CA (8.9.3+Sun/8.9.3) with ESMTP id NAA24278;
+	Wed, 23 Jan 2002 13:05:30 -0500 (EST)
+Message-Id: <200201231805.NAA24278@umbra.CS.McGill.CA>
+From: PLDI 2002 - CyberChair <pldi2002admin@sable.mcgill.ca>
+To: thies@mit.edu
+Cc: pldi2002pcchair@sable.mcgill.ca, pldi2002admin@sable.mcgill.ca
+Subject: PLDI 2002 Notification
+Date: Wed Jan 23 13:05:30 2002 EDT
+Reply-To: pldi2002admin@sable.mcgill.ca
+X-Mailer: Python smtplib
+
+Dear William Thies,
+
+Thank you for your submission to PLDI 2002.  We regret to inform
+you that your paper, titled
+
+"StreamIt:  A Compiler for Streaming Applications"
+
+has not been accepted.  Papers went through a rigorous reviewing
+process. Each paper was reviewed by at least three program
+committee members.  Often reviews include comments from external
+experts as well.  An initial electronic discussion was followed
+by a two-day program committee meeting.  In several cases we have
+added more feedback to the reviews after discussions at the
+meeting.  As program chair I was very impressed by the hard work
+and detailed feedback given by the program committee members.
+
+The competition this year was quite high, of 168 papers
+submitted, 28 were accepted.
+
+We hope that the comments made by the program committee will be
+useful to you when preparing your work for submission to future
+conferences.  If important new comments were raised during the PC
+meeting, these have been added to your reviews.  Please do not
+ask for further information about your paper, because all of the
+important points are contained in the reviews.
+
+We thank you for your interest in PLDI 2002, and we hope to see
+you at the conference in Berlin.  Also note that there are
+several collocated events at PLDI.  Please refer to
+http://www.acm.org/sigplan/pldi.htm for a complete list.  Three
+of these events (LCTES/SCOPES 2002, ISMM 2002 and MSP 2002) have
+paper submission deadlines in the near future.
+
+Sincerely,
+
+Laurie Hendren
+PLDI 2002 PC Chair
+*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=
+
+First reviewer's review:
+
+          >>> Summary of the paper <<<
+
+The paper presents a language (more precisely, a set of Java classes)
+for doing high-level stream programming.  The abstractions of the
+language include Filter and various ways to connect filters together
+(Pipeline, SplitJoin, FeedbackLoop) that allow one to create
+networks of filters in a hierarchical manner (rather than simply
+connecting filters in an arbitrary graph).
+
+A semantics of a stream program is presented, based on the notion
+of a stream transfer function (sdep), which captures a flow dependence
+relationship: the presence of x items on some filter f's queue implies 
+that
+there are at least y items on some filter g's queue (where the output
+of g eventually flows into f's queue).  It is shown how the sdep function
+can be computed for each pair of filters. A denotational semantics
+for stream programs is given, based on the hierarchical structure of
+stream programs and the sdep function.
+
+A number of optimizations are briefy mentioned and the problem
+of scheduling is addressed in some detail. A prototype implementation 
+has been  completed and some preliminary (encouraging) performance 
+numbers are given.
+
+
+
+          >>> Comments <<<
+
+The paper is targeting an interesting application domain, but leaves
+a lot to be desired.  First, a lot of details are missing and there
+is much in the paper that is not clear. For example: 1. the paper presents
+a language in terms of Java syntax examples, rather than simplify defining 
+the abstract syntax of the StreamIt language directly; 2. the sdep function
+is defined informally and seems to require first having a semantics for 
+stream programs - but then sdep is used in giving the "semantics" of 
+stream
+programs: 3. the paper lists a number of optimizations, but doesn't 
+present
+details about them.
+
+Second, I can't believe that this domain is so "new". Has no one else 
+ever had the idea of constructing stream/dataflow programs in a 
+hierarchical manner? Highly unlikely. Also, it would seem 
+that queueing theory would have a lot to say about stream programs, 
+especially the SDEP function (which seems to be the primary new idea
+in the paper).  I am far from an expert in the area of languages
+for dataflow/streaming, but my "related work" alarms are going off.
+
+ =*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=
+
+Second reviewer's review:
+
+          >>> Summary of the paper <<<
+
+The paper presents the design and implementation of a prototype optimizing 
+compiler for the language StreamIt.  This language is aimed at 
+programming streaming applications. The compiler includes optimizations 
+that are dedicated to the application domain. Some encouraging 
+preliminary results are presented.
+
+
+
+          >>> Comments <<<
+
+This paper presents some promising results in a hot area. It motivates 
+convincingly the need for a dedicated programming language for streaming 
+applications. The description of compiler optimizations required for this 
+domain is very interesting but lacks details.
+
+
+Details:
+
+- - The comparison with related work is very subjective. Other approaches are 
+discarded in one sentence. Some concrete comparisons would be 
+needed.  Also, you should be more humble. For example (page 3)  you say " 
+StreamIt is a 
+clean textual representation that ... makes it easy to see the shape of 
+computation form the indentation level of the code". First that's pretty naive, 
+to 
+think that indentation makes it all. Second, it would have been more 
+effective to compare a fragment written in StreamIt and a fragment written in 
+some other appropriate language. Third, please define  "clean" or drop this 
+word.
+
+- - Explanations on "messages" (2.3) is much too short. Please expand or 
+drop. What's the point? Give a concrete example.
+
+- - The verifications done by the compiler are interesting but how do we know 
+that these properties were the most important ones to check?
+
+- - In fact, it would be helpful to include a domain analysis to better 
+understand the design choices made for StreamIt.
+
+- - You should make a comparison with hand-coded programs to assess benefits 
+like complexity, conciseness, ...
+
+
+
+
+ =*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=
+
+Third reviewer's review:
+
+          >>> Summary of the paper <<<
+
+The paper presents aspects of StreamIt, a stream-based language, plus
+some ideas about optimizing StreamIt programs.  There may be an
+interesting contribution lurking in the optimization, but the paper
+suffers from serious flaws: it disregards related work; too much
+important information is omitted; what is in the paper is presented
+badly; and the work is incomplete.
+
+
+          >>> Comments <<<
+
+Your introductory sections suggest that you are completely unaware of
+the vast body of work on using both concurrent and functional
+languages to implement stream programming models.  For the former, see
+Concurrent ML (Reppy), Occam, Limbo, and Newsqueak.  For the latter
+see work in the Haskell community including that of Hughes, McIlroy,
+and especially the Yale group on Functional Reactive Programming.
+Much of Section 2 is old news, e.g., your reinvention of lambda as
+inlining and your observations about high-level specifications of
+computations.  I suspect that work on process calculi is also
+relevant.
+
+Obviously what is going on here is you have picked a restricted form
+of stream computation that you can optimize.  But there is no hint as
+to *why* you've picked restrictions and no comparison with other
+forms.  You must make the case of your design, and you must emphasize
+the enduring ideas and principles (which connect to your
+optimizations) as opposed to accidental details such as `inlining'.
+
+When I see a new language design, I want a clean, simple explanation
+of the structure of terms in the language (abstract syntax) and the
+dynamic semantics of those terms.  Section 3 (up through 3.3) clearly
+has a dynamic operational semantics in mind, but this semantics is
+never completely revealed in the paper.  Even the incomplete
+information is accessible only by piecing together chance remarks from
+various parts of the paper.  I grew increasingly frustrated reading
+the paper, especially section 3, because there's no semantics.
+
+The closest thing to a clean explanation of what you are talking about
+is the piece on the canonical form of the work function.  This starts
+to reveal your model of computation.  
+
+Your explanation of tapes is unclear.  Eventually I puzzled out that
+you want a model which models both the entire history of any item a
+tape has ever contained, but also models the dynamic removal of items
+from a tape.
+
+Your tapes are not infinite; they are merely unbounded.  Otherwise
+Definition 1 makes no sense.
+
+Definition 1, the central definition of your paper, is unclear.  What
+in the world do you mean by `must appear'?  Do you mean sdep[b->a](x)
+is the smallest number y such that in every execution of the graph, in
+any state when x items appear on tape b, at least y items appear on
+tape a?  If so, the next question is what is an execution of the
+graph?  If not, what *can* you mean.
+
+Things get worse on the next page when you claim that the item can be
+produced on tape b if and only if tape a contains at least y items.
+Your definition gives only one direction!  You get only if, because y
+items are needed, but you haven't shown y items are sufficient.
+You've got to prove this!
+
+The arguments in section 3.3 are informal.  These should be shown
+correct with respect to a dynamic semantics.  
+
+The denotational semantics in section 3.5 is incomplete and
+unsatisfying.
+
+In section 4, I can't believe you are talking about optimization
+without presenting either a cost model for your stream graphs or some
+explanation of your intended target.  Perhaps some readers can guess
+what you have in mind and get something out of this section; most
+won't bother.
+
+In section 6, I'm sure the compilation process for streaming programs
+does contain many novel aspects.  So does the compilation process for
+the related language Pict (Pierce and Turner), which is based on
+Milner's pi-calculus.  I commend it to you for study.
+
+Your references should be more exact; e.g., [4] is not much of a
+pointer.
+
+
+          >>> Points in favour or against <<<
+
+For: may have an interesting optimization lurking
+
+Against: very large number of mistakes and omissions (too many to
+enumerate here)
+
+
+ =*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=
+
+
+------- End of Forwarded Message
+

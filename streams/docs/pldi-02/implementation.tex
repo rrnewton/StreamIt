@@ -1,3 +1,25 @@
+\begin{table}[t]
+\begin{center}
+\scriptsize
+\begin{tabular}{|l|r|r|r|} \hline
+Benchmark & Lines & Filters & Graph Size\\
+\hline \hline
+PCA Demo & 484 & 5 & 7\\
+\hline
+FM Radio & 411 & 5 & 27\\
+\hline
+perftest4 & 347 & 5 & 20\\
+\hline
+GSM Decoder & 3050 & 11 & 21 \\
+\hline
+\end{tabular}
+\vspace{-6pt}
+\caption{\protect\small Application Characteristics}
+\label{tab:benchmarks}
+\vspace{-12pt}
+\end{center}
+\end{table}
+
 \section{Implementation and Evaluation}
 \label{sec:results}
 
@@ -36,22 +58,24 @@ and the size of the stream graph as coded.
 \begin{table}[t]
 \begin{center}
 \scriptsize
-\begin{tabular}{|l|r|r|r|} \hline
-Benchmark & Lines & Filters & Graph Size\\
+\begin{tabular}{|l|r|r|r|r|} \hline
+& \multicolumn{2}{|c|}{StreamIt} &  \multicolumn{2}{|c|}{Hand Coded}\\
+\hline 
+Benchmark & Baseline & Fusion & Spectra & C \\
 \hline \hline
-PCA Demo & 484 & 5 & 7\\
+PCA Demo & 1.3 & - & 3.4 & N/A\\
 \hline
-FM Radio & 411 & 5 & 27\\
+FM Radio & 5.8 & 4.9 & 9.9 & N/A\\
 \hline
-perftest4 & 347 & 5 & 20\\
+perftest4 & 330 & - & 330 & N/A\\
 \hline
-GSM Decoder & 3050 & 11 & 21 \\
+GSM Decoder & 4.88 & - & N/A & .47\\
 \hline
 \end{tabular}
 \vspace{-6pt}
-\caption{\protect\small Application Characteristics}
-\label{tab:benchmarks}
-\vspace{-12pt}
+\caption{\protect\small Performance Results (in $\mu$sec/output)}
+\label{tab:performance}
+\vspace{-21pt}
 \end{center}
 \end{table}
 

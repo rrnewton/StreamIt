@@ -130,7 +130,7 @@ tape $a$ to {\it affect} the item at position $x$ of tape $b$.  This
 is because item $x$ on tape $b$ can be produced if and only if tape
 $a$ contains at least $y$ items.  Note that this effect might be via a
 control dependence rather than a data dependence--for instance, if
-item $y$ needs to pass through a round-robin joiner before some data
+item $y$ needs to pass through a round robin joiner before some data
 from another stream can be routed to tape $b$.  This is why we choose
 ``information flow'' instead of ``data flow'' to describe the timing
 concept.
@@ -243,36 +243,76 @@ expression for \sdep:
 \mi{I_S}{O_{i,S}}(x) = x
 \end{align*}
 
-{\bf Round robin splitter.}  Let us consider an $n$-way
-splitter with weights $w_1 \dots w_n$.  Observe that if there are
-$n(O_{n,S})$ items on the $n$'th output tape, then the splitter must have
-executed $\floor{n(O_{n,S})}{w_n}$ complete cycles in distributing items
-to the output tapes; each cycle draws $sum_{i}{w_i}$ items from the
-input tape $I_S$.  Further, if there are $n(O_{i,S})$ items on the $i$'th
-output tape, then $n(O_{i,S}) mod w_i$ additional items have been
-deposited on $O_{i,S}$ during the current cycle of the splitter, and
-$n(O_{i,S})~mod~w_i + sum_{j=0}^{i-1}{w_j}$ items have been drawn from
-the input since the last complete cycle.  Summing the item count for
-the completed cycles and the current cycle gives the following
-expression for \sdep:
-\begin{align*}
-\mi{I_S}{O_{i,S}}(x) = \floor{n(O_{n,S})}{w_n} * \sum_{i}{w_i} + x~mod~w_i +
-\sum_{j=0}^{i-1}{w_j}
-\end{align*}
+\begin{table}[t]
+\begin{center}
+\scriptsize
+\begin{tabular}{|c|c|} \hline
+$n(O_{i,S})$ & $\mi{I_S}{O_{i,S}}(n(O_{i,S}))$ \\
+\hline \hline
+$0$  & $\le 0$ \\ \hline
+$1$  & $X + 1$ \\ \hline
+$2$  & $X + 2$ \\ \hline
+$\dots$ & $\dots$ \\ \hline
+$w_i$ & $X + w_i$ \\ \hline
+$w_i + 1$ & $X + W + 1$ \\ \hline
+$w_i + 2$ & $X + W + 2$ \\ \hline
+$\dots$ & $\dots$ \\ \hline
+$2 * w_i$ & $X + W + w_i$ \\ \hline
+$2 * w_i + 1$ & $X + 2*W + 1$ \\ \hline
+$2 * w_i + 2$ & $X + 2*W + 2$ \\ \hline
+$\dots$ & $\dots$ \\ \hline
+\end{tabular}
+\vspace{-6pt}
+\caption{\protect\small SDEP values for a round robin splitter, where
+$X = \sum_{j=0}^{i-1} w_j$ and $W = \sum_{j=0}^n w_j$.  A closed-form
+solution appears in Equation~\ref{eq:sdepsplit}.
+\label{tab:sdepsplit}}
+\vspace{-12pt}
+\end{center}
+\end{table}
 
-{\bf Round robin joiner.}  The reasoning is similar for an
-$n$-way joiner with weights $w_1 \dots w_n$.  Let us use $W$ to denote
-the sum of the weights: $W = \sum{i=1}^{n}{w_i}$.  If there are $x$
-items on the output tape $O_J$, then the joiner must have executed
-$\floor{x}{W}$ complete cycles, each of which drew $w_i$ items from
-the $i$'th input tape.  Since the last complete cycle, the joiner has
-drawn $x~mod~W$ items from its inputs, and $MIN(0, x~mod~W -
-\sum_{j=0}^{i-1}{w_j})$ of these items were taken from input tape $j$.
-Thus, the \sdep~function from the output of the joiner to the $i$'th
-input tape is as follows:
-\begin{align*}
-\mi{I_{i,J}}{O_J}(x) = w_i * W + MIN(0, x~mod~W - \sum_{j=0}^{i-1}{w_j})
-\end{align*}
+{\bf Round robin splitter.}  We consider an $n$-way splitter with
+weights $w_1 \dots w_n$.  Let $X$ denote the sum of the weights before
+the $i$'th output tape, and $W$ denote the sum of all the weights.
+That is, for a given output tape $i$, $X = \sum_{j=0}^{i-1} w_j$ and
+$W = \sum_{j=0}^n w_j$.  To derive $\mi{I_S}{O_{i,S}}$, the reader is
+referred to Table \ref{tab:sdepsplit}, which lists \sdep~for a number
+of representative inputs.  Generally speaking, the table illustrates
+that for each set of $w_i$ items appearing on tape $O_{i,S}$, the
+splitter must have executed a full round.  Additionally, $X$ items
+must have gone through the splitter before the first item could appear
+on $O_{i,S}$.  The reader can verify that the following expression
+gives the values of \sdep~shown in the table:
+\begin{align}
+\protect\label{eq:sdepsplit}
+&\mi{I_S}{O_{i,S}}(x) = \\ &~~~~~~X +
+W*\left\lfloor\frac{n(O_{i,S})-1}{w_i}\right\rfloor + 1 +
+(n(O_{i,S})-1)~mod~w_i \nonumber
+\end{align}
+Note that this equation does give a negative value for \sdep~in the
+case when $n(O_{i,S}) = 0$.  However, this is not problematic, since
+an output tape can contain zero items regardless of the number of
+items on the input.  In general, \sdep~is only meaningful within the
+domain of strictly positive tape values.
+
+{\bf Round robin joiner.}  Let us consider an $n$-way joiner with
+weights $w_1 \dots w_n$, with $X = \sum_{j=0}^{i-1} w_j$ and $W =
+\sum_{j=0}^n w_j$ for a given input tape $i$.  The values of
+$\mi{I_{i,J}}{O_J}$ for representative inputs is shown in Table
+\ref{tab:sdepjoin}.  No items are required on tape $I_{i,J}$ until
+there are $X+1$ items on the output of the joiner, since the first $X$
+items are drawn from tapes $0$ to $i-1$.  Then, the joiner reads from
+tape $I_{i,J}$ as it outputs items $X+1$ through $X+w_i$, thereby
+requiring $w_i$ items on $I_{i,J}$ to produce output $X+w_i$.  The
+joiner does not read from the $i$'th input tape until the next round,
+when it is producing item $X + W + 1$.  From here, the cycle repeats.
+The reader can verify that the following expression gives the correct
+values for \sdep:
+\begin{align}
+\protect\label{eq:sdepjoin}
+&\mi{I_{i,J}}{O_J}(x) = \\ &~~~~~~w_i *
+\left\lfloor\frac{x}{W}\right\rfloor + min(max(0, x~mod~W - X), w_i) \nonumber
+\end{align}
 
 {\bf SplitJoin construct.}  As with the Pipeline construct, we can
 derive the \sdep~function across an entire SplitJoin as a composition
@@ -294,6 +334,42 @@ reasoning, the \sdep~function for a SplitJoin is as follows:
 
 \subsubsection{FeedbackLoops}
 \label{sec:timefl}
+
+\begin{table}[t]
+\begin{center}
+\scriptsize
+\begin{tabular}{|c|c|} \hline
+$n(O_J)$ & $\mi{I_{i,J}}{O_J}(n(O_J))$ \\
+\hline \hline
+$0$ & $0$ \\ \hline
+$\dots$ & $\dots$ \\ \hline
+$X$ & $0$ \\ \hline
+$X + 1$ & $1$ \\ \hline
+$X + 2$ & $2$ \\ \hline
+$\dots$ & $\dots$ \\ \hline
+$X + w_i$ & $w_i$ \\ \hline
+$X + w_i + 1$ & $w_i$ \\ \hline
+$\dots$ & $\dots$ \\ \hline
+$X + W$ & $w_i$ \\ \hline
+$X + W + 1$ & $w_i + 1$ \\ \hline
+$X + W + 2$ & $w_i + 2$ \\ \hline
+$\dots$ & $\dots$ \\ \hline
+$X + W + w_i$ & $2 * w_i$ \\ \hline
+$X + W + w_i + 1$ & $2 * w_i$ \\ \hline
+$\dots$ & $\dots$ \\ \hline
+$X + 2 * W$ & $2 * w_i$ \\ \hline
+$X + 2 * W + 1$ & $2 * w_i + 1$ \\ \hline
+$X + 2 * W + 2$ & $2 * w_i + 2$ \\ \hline
+$\dots$ & $\dots$ \\ \hline
+\end{tabular}
+\vspace{-6pt}
+\caption{\protect\small SDEP values for a round robin joiner, where $X
+= \sum_{j=0}^{i-1} w_j$ and $W = \sum_{j=0}^n w_j$.  A closed-form
+solution appears in Equation~\ref{eq:sdepjoin}.
+\label{tab:sdepjoin}}
+\vspace{-12pt}
+\end{center}
+\end{table}
 
 The \sdep~function for a feedback loop requires extra care. Although
 the feedback splitter $FS$ serves as a normal splitter, with the same
@@ -476,7 +552,6 @@ s~\in~&Stream = Filter + Pipeline + SplitJoin + FeedbackLoop \\
 \vspace{-18pt}
 \caption{Semantic domains specific to the transform algebra.
 \protect\label{fig:transformdom}}
-\vspace{-12pt}
 \end{figure}
 
 The domains of the intermediate algebra are shown in
@@ -616,7 +691,6 @@ combination of Pipelines and SplitJoins as a mathematical
 transformation between infinite tapes.  We will utilize this
 formulation to prove that certain transformations of the stream graph
 preserve the meaning of the program.
-
 %% $\cal{S}$ 
 %%   [(FeedbackLoop (. S) $s_body$ $s_loop$ (. J) ($init_1 \dots
 %%   init_n$))] = ??????
