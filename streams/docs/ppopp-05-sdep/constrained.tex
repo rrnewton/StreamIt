@@ -1,30 +1,34 @@
 \subsection{Latency Constrained Scheduler}
 
-\begin{figure}[t]
+\begin{figure*}[t]
 \begin{center}
-\psfig{figure=constrained-example.eps,height=1.5in}
-\caption{{\small Example of construction of a constrained schedule. The $\sdepf{R}{S}$ function for filters $R$ and $S$ is given in Table \ref{tab:sdepconst}. The blob between filters $R$ and $S$ illustrates other possible stream elements. $R$ sends a message to $S$ with latency $[1,2]$. Executions of the blob are omitted, it is assumed that at the point $S$ executes, the blob has drained data provided by $R$.}}
+\psfig{figure=constrained-example.eps,height=3.5in}
+\caption{{\small   Example   of    construction   of   a   constrained
+schedule. The $\sdepf{R}{S}$ function for filters $R$ and $S$ is given
+in  Table \ref{tab:sdepconst}. The  blob between  filters $R$  and $S$
+illustrates other possible stream elements. $R$ sends a message to $S$
+with  latency $[1,2]$.  Executions  of  the blob  are  omitted, it  is
+assumed  that at the  point $S$  executes, the  blob has  drained data
+provided by $R$.}}
 \end{center}
 \vspace{-12pt}
 \label{fig:sdepconst}
-\end{figure}
+\end{figure*}
+
 
 \begin{table*}[t]
 {\small
-\begin{tabular}{|c|c|} \hline
-{\bf $sdepf{R}{S}$} & {\bf Execs of S} \\ \hline
-$9n+2$ & $8n+1$ \\ \hline
-$9n+3$ & $8n+2$ \\ \hline
-$9n+5$ & $8n+3$ \\ \hline
-$9n+5$ & $8n+4$ \\ \hline
-$9n+6$ & $8n+5$ \\ \hline
-$9n+8$ & $8n+6$ \\ \hline
-$9n+9$ & $8n+7$ \\ \hline
-$9n+9$ & $8n+8$ \\ \hline
+\begin{tabular}{|c|c|c|c|c|c|c|c|c|} \hline
+{\bf $sdepf{R}{S}$} & $9n+2$ & $9n+3$  & $9n+5$  & $9n+5$ & $9n+6$ &
+$9n+8$ & $9n+9$ & $9n+9$ \\ \hline
+{\bf Execs of S} & $8n+1$ & $8n+2$ & $8n+3$ & $8n+4$ & $8n+5$ & $8n+6$ &
+$8n+7$ & $8n+8$ \\ \hline
 \end{tabular}}
 \caption{\small $sdepf{R}{S}$ function for example in Figure \ref{fig:sdepconst}. This particular $\sdep$ function was obtained by setting $push_R=2$, $pop_S=3$ and making the blob between $R$ and $S$ into a filter that pops 3 and pushes 4 every iteration of its work function. No initialization due to peeking is necessary in this example.}
 \label{tab:sdepconst}
 \end{table*}
+
+In this section we decribe latency constrained scheduling, an 
 
 The example  in Figure~\ref{fig:sdepconst} illustrates  the scheduling
 of a single constraint: a  message sent upstream with latency $[1,2]$.
@@ -33,7 +37,7 @@ schedule and a  {\it steady state} schedule.  The  former is necessary
 to ensure that during the actor's steady state execution, it may check
 for messages  at proper boundaries.  For  the sake of  clarify, we use
 $lastReceived$  to represent  the firing  of  $S$ that  sent the  last
-message to be  received by $R$; $n_S$ and  $n_R$ respectively indicate
+message which has been  received by $R$; $n_S$ and  $n_R$ respectively indicate
 the number of firings of $S$ and $R$.
 
 In order  to compute  the initialization schedule,  $R$ is  allowed to
@@ -44,10 +48,10 @@ receiving,   thus  allowing   the  steady   state  schedule   to  fire
 perpetually. In our example, the initialization schedule does not send
 or receive any messages.
 
-Once the  initialize schedule is  known, the steady state  schedule is
+Once the  initialization schedule is  known, the steady state  schedule is
 computed by  allowing the receiver $R$ to  fire continuously, provided
 it  does not violate  the constraint  that a  message sent  during the
-$lastReceived+1$ firing $S$ must  reach $R$ according to the specified
+$lastReceived+1$ firing of $S$ must  reach $R$ according to the specified
 latency;  this  is indicated  by  {\it  "Oldest  msg to  receive"}  in
 Figure~\ref{fig:sdepcons}.  Now the  sender  $S$ is  executed as  many
 times as possible, given the data provided via $R$. At this point, $R$
