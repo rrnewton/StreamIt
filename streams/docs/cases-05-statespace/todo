@@ -1,1 +1,30 @@
+- address reviewer comments
+
+  - explain in second paragraph why DSP programs defy high-level
+    language analysis
+
+      Reviews 376 and 338 seek a better explanation for why DSP
+      applications typically defy high-level analysis.  As detailed in a
+      CC'02 paper (reference #18), languages such as C are nearly
+      impossible to analyze due to: 1) complex modulo expressions for
+      circular buffers, 2) possible aliasing between internal states of 
+      different filters, 3) scheduling is done by hand, obscuring 
+      parallelism, 4) atomic execution steps are muddled with global 
+      control flow, and 5) FIFO's between channels are muddled with 
+      global data.  Also, general programs differ from the Synchronous 
+      Dataflow model because they lack the explicit I/O rates exploited 
+      by our analysis.  For these reasons, we believe it is completely 
+      infeasible to perform linear state-space optimizations on a
+      traditional IR.  We will expand on this point in the final
+      version.
+
+  - explain streamit example code better
+    - point out peek/pop annotations
+
 - strengthen conclusion
+- better typesetting for parameter reduction algorithm 
+- final formatting
+- see if inputs really have to be converted to states for
+  optimization
+
+x cite full sitij thesis 

@@ -1,4 +1,4 @@
-\begin{figure}[t]
+\begin{figure*}[t]
 \vspace{-18pt}
 \begin{singlespace}
 
@@ -27,7 +27,7 @@
 ~~~~
 \raisebox{12pt}{\psfig{figure=iir-pipeline2.eps, width=0.46in}}
 \end{minipage}
-\\ ~ \\ {\protect\small (a) A pipeline. ~~(b) A splitjoin. ~~(c) A feedbackloop.}
+\\ ~ \\ {\protect\small \mbox{~}(a) A pipeline. ~~~~~~~~~~(b) A splitjoin. ~~~~~~~~~~~~~~(c) A feedbackloop.}
 
 \begin{minipage}{3.5in}
 \caption{Stream structures supported by StreamIt.
@@ -36,9 +36,9 @@
 \begin{minipage}{3in}
 \caption{Example pipeline with IIR filter.\protect\label{fig:iir-pipeline}}
 \end{minipage}
-\vspace{3pt}
+\vspace{6pt}
 \hrule
-\vspace{3pt}
+\vspace{6pt}
 
 \hfill
 \begin{minipage}{2.2in}
@@ -47,6 +47,7 @@
 ~~~~
 \raisebox{10pt}{
 \begin{minipage}{3.5in}
+\vspace{20pt}
 Number of multiplications: 8 \\
 Number of additions: 8 \\
 State space representation:
@@ -59,9 +60,9 @@ State space representation:
 & 0.25 \end{array} \right ] \vec{\mathbf{x}} + \left [ \begin{array} {ccc} 0.5 & 0 & 0 \\
 0 & 0.25 & 0 \end{array} \right ] \vec{\mathbf{u}}
 \end{eqnarray*}
-\vspace{9pt} ~ \\
-\hrule
 \vspace{12pt} ~ \\
+\hrule
+\vspace{34pt} ~ \\
 Number of multiplications: 7 \\
 Number of additions: 4 \\
 State space representation:
@@ -73,19 +74,19 @@ State space representation:
 \vec{\dot{\mathbf{x}}} & = & \left [ \begin{array} {cc} 0.75
 \end{array} \right ] \vec{\mathbf{x}} + \left [ \begin{array} {ccc} 0.5 & 0.25 & 0 \end{array} \right ] \vec{\mathbf{u}}
 \end{eqnarray*}
-\vspace{-3pt} ~ \\
+\vspace{15pt} ~ \\
 \hrule
-\vspace{12pt} ~ \\
-Number of multiplications: 6 \\
+\vspace{24pt} ~ \\
+Number of multiplications: 5 \\
 Number of additions: 4 \\
 State space representation:
 \begin{eqnarray*}
 \small
-\vec{\mathbf{y}} & = & \left [ \begin{array} {cc} 0.5 \\ -1.25
+\vec{\mathbf{y}} & = & \left [ \begin{array} {cc} 1 \\ -2.5
 \end{array} \right ] \vec{\mathbf{x}} + \left [ \begin{array} {ccc} 3 & 0 & 0 \\ 0 & 0 & 4 \end{array} \right
  ] \vec{\mathbf{u}} \\
 \vec{\dot{\mathbf{x}}} & = & \left [ \begin{array} {cc} 0.75
-\end{array} \right ] \vec{\mathbf{x}} + \left [ \begin{array} {ccc} 2 & 1 & 0 \end{array} \right ] \vec{\mathbf{u}}
+\end{array} \right ] \vec{\mathbf{x}} + \left [ \begin{array} {ccc} 1 & 0.5 & 0 \end{array} \right ] \vec{\mathbf{u}}
 \end{eqnarray*}
 \end{minipage}}
 \end{singlespace}
@@ -97,8 +98,8 @@ space analysis.  The top segment shows the original code.  The middle
 segment depicts the action of state removal, in which the quantity
 $x_1 + x_2$ is replaced by a single variable $x$.  The bottom segment
 illustrates parameter reduction, in which the coefficients are
-refactored so as to eliminate a multiplication (the coefficient of
-$u_2$ becomes 1.)\protect\label{fig:opt-seq}}
+refactored so as to eliminate two multiplications (two coefficients
+assume a value of 1).\protect\label{fig:opt-seq}}
 \end{center}
 \vspace{-12pt}
-\end{figure}
+\end{figure*}
