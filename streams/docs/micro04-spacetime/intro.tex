@@ -31,39 +31,44 @@ containing multiple instruction streams and distributed memory banks.
 Hitherto, there have been two basic approaches for compiling a stream
 program to a communication-exposed architecture.  {\it Time
 multiplexing} utilizes the entire chip for each filter, switching
-between filters over time.  Time multiplexing's efficacy extends from
-its freedom from having to balance the workload between filters.
-However, this technique can lead to long latencies, increased memory
-traffic, and the utilization is highly dependent upon how effectively
-each filter can be parallelized across the machine.
+between filters over time (see Figure~\ref{fig:spacevstime}b).  Time
+multiplexing's efficacy extends from its freedom from having to
+balance the workload between filters.  However, this technique can
+lead to long latencies, increased memory traffic, and the utilization
+is highly dependent upon how effectively each filter can be
+parallelized across the machine.
 
 Conversely, {\it space multiplexing} distributes filters across the
-entire chip, running them continuously and in parallel.  Space
-multiplexing affords $(i)$ no filter swapping, $(ii)$ reduced memory
-traffic, $(iii)$ localized communication, and $(iv)$ tighter
-latencies.  Because it distributes computation across decentralized
-processing units, space multiplexing supports architectures that scale
-spatially without any global wires.  Unfortunately, this approach is
-highly dependent on effective load balancing techniques: filters must
-be merged and split until all computation resources are assigned a
-filter with a uniform workload.  Such load balancing can be very
-difficult for applications with an irregular distribution of work.
+entire chip, running them continuously and in parallel (see
+Figure~\ref{fig:spacevstime}a).  Space multiplexing affords $(i)$ no
+filter swapping, $(ii)$ reduced memory traffic, $(iii)$ localized
+communication, and $(iv)$ tighter latencies.  Because it distributes
+computation across decentralized processing units, space multiplexing
+supports architectures that scale spatially without any global wires.
+Unfortunately, this approach is highly dependent on effective load
+balancing techniques: filters must be merged and split until all
+computation resources are assigned a filter with a uniform workload.
+Such load balancing can be very difficult for applications with an
+irregular distribution of work.
 
 This paper proposes a hybrid approach, {\it space-time multiplexing},
 that exploits the advantages of both space multiplexing and time
-multiplexing.  This technique uses space multiplexing to schedule a
-group of filters for parallel execution on part of the chip; however,
-time multiplexing is used to switch between different groups as
-execution progresses.  Space-time multiplexing affords the flexible
-load balancing of time multiplexing, while preserving the locality and
-latency benefits of space multiplexing.  We develop a simple compiler
-algorithm that treats each group of space-multiplexed filters, which
-we refer to as a {\it trace}, as an atomic unit for scheduling.
-Traces can be scheduled using techniques traditionally limited to
-individual instructions in a given loop nest.  Our approach extends
-these loop-level techniques---in particular, software pipelining---to
-a coarse level of granularity that encompasses multiple program
-modules at a time.
+multiplexing (see Figure~\ref{fig:spacevstime}c).  This technique uses
+space multiplexing to schedule a group of filters for parallel
+execution on part of the chip; however, time multiplexing is used to
+switch between different groups as execution progresses.  Space-time
+multiplexing affords the flexible load balancing of time multiplexing,
+while preserving the locality and latency benefits of space
+multiplexing.
+
+\begin{figure}[t]
+  \centering
+  \vspace{-18pt}
+  \psfig{figure=space-vs-time.eps,width=5.5in}
+  \vspace{-12pt}
+  \caption{Techniques for scheduling stream programs. \protect\label{fig:spacevstime}}
+  \vspace{-6pt}
+\end{figure}
 
 In this paper, we describe and evaluate a fully-automatic
 implementation of space-time multiplexing.  Our source language is
@@ -71,9 +76,27 @@ StreamIt~\cite{streamitcc}, a high-level stream programming language
 that aims to be portable across next-generation communication-exposed
 architectures.  Our target is the Raw
 microprocessor~\cite{raw10,raw_isca}, a tiled architecture with
-fine-grained, programmable communication between processors.  In
-describing the space-multiplexing backend from StreamIt to Raw, this
-paper makes the following contributions:
+fine-grained, programmable communication between processors.  
+
+Our implementation of space-time multiplexing treats each group of
+space-multiplexed filters, which we refer to as a {\it trace}, as an
+atomic unit for scheduling.  Traces can be scheduled using techniques
+traditionally limited to individual instructions in a given loop nest.
+Our approach extends these loop-level techniques---in particular,
+software pipelining---to a coarse level of granularity that
+encompasses multiple program modules at a time.
+
+Also, since each trace is independent, a specific code generation
+strategy can be applied depending on the properties of the trace.  In
+this paper, we recognize traces that compute a {\it linear} function
+of their input.  Using the coefficients and I/O rates of the linear
+trace (extracted automatically from the code), we generate template
+assembly code based on a hand-optimized systolic algorithm.  By
+decoupling memory accesses from computation and carefully utilizing
+the register-mapped communication network on Raw, this code achieves
+near-optimal performance for linear functions.
+
+In summary, this paper makes the following contributions:
 
 \begin{itemize}
 \item A procedure for eliminating synchronization from a hierarchical
@@ -81,6 +104,8 @@ stream graph, yielding a flat graph that directly exposes
 communication patterns.
 \item An algorithm for extracing load-balanced traces from a flat
 stream graph.
+\item An optimized code generation strategy for traces that compute a
+linear function.
 \item A modified software pipelining algorithm for scheduling traces,
 respecting layout and occupancy constraints on a tiled architecture.
 \item An evaluation of space-time multiplexing in the StreamIt-to-Raw
