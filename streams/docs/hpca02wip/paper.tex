@@ -145,63 +145,6 @@ function, and all input and output channels are implicit; instead, the
 stream behaves as the sequential composition of filters that are
 specified with successive calls to {\tt add} from within {\tt init}.
 
-There are two other stream constructors besides {\tt Pipeline}: {\tt
-SplitJoin} and {\tt FeedbackLoop}.  The former is used to specify
-independent parallel streams that diverge from a common {\it splitter}
-and merge into a common {\it joiner} (see the Equalizer in Figure
-\ref{fig:radiocode}).  There are two kinds of splitters: 1) Duplicate,
-which replicates each data item and sends a copy to each parallel
-stream, and 2) RoundRobin($w_1, \dots, w_n$), which sends the first
-$w_1$ items to the first stream, the next $w_2$ items to the second
-stream, and so on.  RoundRobin is the only joiner type.  The splitter
-and joiner type are specified with calls to {\tt setSplitter} and {\tt
-setJoiner}, respectively; the parallel streams are specified by
-successive calls to {\tt add}, with the $i$'th call setting the $i$'th
-stream in the SplitJoin.  We do not discuss FeedbackLoops do to space
-constraints.
-
-%% Evident in all of these examples is another feature of the StreamIt
-%% syntax: {\it inlining}.  The definition of any stream or filter can be
-%% inlined at the point of its instantiation, thereby preventing the
-%% definition of many small classes that are used only once, and,
-%% moreover, providing a syntax that reveals the hierarchical structure
-%% of the streams from the indentation level of the code.  In our Java
-%% syntax, we make use of anonymous classes for inlining \cite{java}.
-
-StreamIt differs from other languages in that it imposes a
-well-defined structure on the streams; all stream graphs are built out
-of a hierarchical composition of Pipelines, SplitJoins, and
-FeedbackLoops.  This structure enables the stream to be mapped
-efficiently onto a grid target, since all of the communication is
-between neighboring filters.  Moreover, we are developing fission and
-fusion algorithms that can, for example, collapse a large Pipeline
-into a single filter for execution on a single processor, thereby
-allowing us to adjust the granularity of the stream graph to match the
-granularity of a given target.
-
-%% The comparison of StreamIt's structure with arbitrary stream graphs
-%% could be likened to the difference between structured control flow and
-%% GOTO statements.  Though sometimes the structure restricts the
-%% expressiveness of the programmer, the gains in robustness,
-%% readability, and compiler analysis are immense.
-
-\subsection{Messages}
-
-StreamIt provides a dynamic messaging system for passing irregular,
-low-volume control information between filters and streams.  Messages
-are sent from within the body of a filter's {\tt work} function,
-perhaps to change a parameter in another filter.  The central aspect
-of the messaging system is a sophisticated timing mechanism that
-allows filters to specify when a message will be received relative to
-the flow of information between the sender and the receiver.  Due to
-space constraints, we do not describe the syntax for message
-statements, but we do consider the semantics of message timing in
-Section \ref{sec:messagesemantics}.
-
-\subsection{Implementation Status}
-
-\section{Conclusions}
-
 \begin{figure}
 \psfig{figure=radio.ps,height=2in}
 \vspace{-6pt}
@@ -285,6 +228,154 @@ class Radio extends Stream {
 \caption{StreamIt code for a software radio.
 \protect\label{fig:radiocode}}
 \end{figure}
+
+There are two other stream constructors besides {\tt Pipeline}: {\tt
+SplitJoin} and {\tt FeedbackLoop}.  The former is used to specify
+independent parallel streams that diverge from a common {\it splitter}
+and merge into a common {\it joiner} (see the Equalizer in Figure
+\ref{fig:radiocode}).  There are two kinds of splitters: 1) Duplicate,
+which replicates each data item and sends a copy to each parallel
+stream, and 2) RoundRobin($w_1, \dots, w_n$), which sends the first
+$w_1$ items to the first stream, the next $w_2$ items to the second
+stream, and so on.  RoundRobin is the only joiner type.  The splitter
+and joiner type are specified with calls to {\tt setSplitter} and {\tt
+setJoiner}, respectively; the parallel streams are specified by
+successive calls to {\tt add}, with the $i$'th call setting the $i$'th
+stream in the SplitJoin.  We do not discuss FeedbackLoops do to space
+constraints.
+
+%% Evident in all of these examples is another feature of the StreamIt
+%% syntax: {\it inlining}.  The definition of any stream or filter can be
+%% inlined at the point of its instantiation, thereby preventing the
+%% definition of many small classes that are used only once, and,
+%% moreover, providing a syntax that reveals the hierarchical structure
+%% of the streams from the indentation level of the code.  In our Java
+%% syntax, we make use of anonymous classes for inlining \cite{java}.
+
+StreamIt differs from other languages in that it imposes a
+well-defined structure on the streams; all stream graphs are built out
+of a hierarchical composition of Pipelines, SplitJoins, and
+FeedbackLoops.  This structure enables the stream to be mapped
+efficiently onto a grid target, since all of the communication is
+between neighboring filters.  Moreover, we are developing fission and
+fusion algorithms that can, for example, collapse a large Pipeline
+into a single filter for execution on a single processor, thereby
+allowing us to adjust the granularity of the stream graph to match the
+granularity of a given target.
+
+%% The comparison of StreamIt's structure with arbitrary stream graphs
+%% could be likened to the difference between structured control flow and
+%% GOTO statements.  Though sometimes the structure restricts the
+%% expressiveness of the programmer, the gains in robustness,
+%% readability, and compiler analysis are immense.
+
+\subsection{Messages}
+
+StreamIt provides a dynamic messaging system for passing irregular,
+low-volume control information between non-neighboring filters.
+Messages are sent from within the body of a filter's {\tt work}
+function, perhaps to change a parameter in another filter.  For
+example, in the {\tt CheckFreqHop} filter of our software radio
+example (Figure \ref{radio-code}), a message is sent upstream to
+change the frequency of the receiver if the downstream component
+detects that the transmitter is about to change frequencies.  The
+sender can continue to execute while the message is en route, and the
+{\tt setFreq} method will be invoked in the receiver with argument
+{\tt newFreq} when the message arrives.  Since message delivery is
+asynchronous, there can be no return value; only void methods can be
+message targets.
+
+The central aspect of the messaging system is a sophisticated timing
+mechanism that allows filters to specify when a message will be
+received relative to the flow of information between the sender and
+the receiver.  This mechanism enables a consistent definition of
+message delivery timing across varying architectures that have no
+global clock.  For example, the {\tt CheckFreqHop} filter sends a
+message with a latency of {\tt DELAY}.  This means that the target
+will receive the message when it is processing the data item that the
+the {\tt CheckFreqHop} filter sees in {\tt DELAY} executions of its
+own work function.  That is, the sender of a message specifies the
+delivery timing in terms of its own local time; the translation to the
+receiver's time is done relative to data items in the stream.  This
+timing mechanism is important not only for portability, as it is
+independent of any architecture's clock or topology, but also for
+programmability, as it is often important to synchronize events with
+wavefronts of data in the stream.  Please see \cite{streamittech} for
+a more precise definition of the message delivery semantics.
+
+%% In StreaMIT, one can specify a range of latencies for a message to get
+%% delivered.  This latency is measured in terms of an information
+%% ``wavefront'' from one filter to another.  For example, in the {\tt
+%% CheckFreqHop} example of Figure \ref{fig:portal-code}, the sender
+%% indicates an interval of latencies between $4N$ and $6N$.  This means
+%% that the receiver will receive the message immediately following the
+%% last invocation of its own {\tt work} function which produces an item
+%% affecting the some output of the {\it sender's} $4N$'th to $6N$'th
+%% work functions, counting the sender's current work function as number
+%% 0.  Defining this notion precisely is the subject of Section
+%% \ref{sec:time}, but the general idea is simple:  the receiver is
+%% invoked when it sees the information wavefront that the sender sees in
+%% $4N$ to $6N$ execution steps.  
+
+%% In some cases, the ability to synchronize the arrival of a message
+%% with some element of the data stream is very important.  For example,
+%% {\tt CheckFreqHop} knows that the transmitter will change the
+%% frequency between $4N$ and $6N$ steps later, in terms of the frame
+%% that {\tt CheckFreqHop} is inputting.  To ensure that the radio
+%% changes frequencies at the same time--so as not to lose any data at
+%% the old or new frequency--{\tt CheckFreqHop} instructs the receiver to
+%% switch frequencies when the {\it receiver} sees one of the last data
+%% items at the old frequency.
+
+%% \subsubsection{Rationale}
+
+%% Stream programs present a challenge in that filters need both regular,
+%% high-volume data transfer and irregular, low-volume control
+%% communication.  Moreover, there is the problem of reasoning about the
+%% relative ``time'' between filters when they are running asynchronously
+%% and in parallel.
+
+%% A different approach to messaging is to embed control messages in the
+%% data stream instead of providing a separate mechanism for dynamic
+%% message passing.  This does have the effect of associating the message
+%% time with a data item, but it is complicated, error-prone, and leads
+%% to unreadable code.  Further, it could hurt performance in the steady
+%% state (if each filter has to check whether or not a data item is
+%% actual data or control, instead) and complicates compiler analysis,
+%% too.  Finally, one can't send messages upstream without creating a
+%% separate data channel for them to travel in.
+
+%% Another solution is to treat messages as synchronous method calls.
+%% However, this delays the progress of the stream when the message is en
+%% route, thereby degrading the performance of the program and
+%% restricting the compiler's freedom to reorder filter executions.  
+
+%% We feel that the StreaMIT messaging model is an advance in that it
+%% separates the notions of low-volume and high-volume data
+%% transfer--both for the programmer and the compiler--without losing a
+%% well-defind semantics where messages are {\it timed} relative to the
+%% high-volume data flow.  Further, by separating message communication
+%% into its own category, fewer connections are needed for steady-state
+%% data transfer and the resulting stream graphs are more amenable to
+%% structured stream programming.
+
+\subsection{Implementation Status}
+
+We have implemented a fully-functional prototype of the StreamIt
+optimizing compiler.  Currently, we generate code for a uniprocessor,
+and obtain performance comparable to SpectrumWare \cite{spectrumware},
+a streaming runtime library implemented in C++.  We are in the process
+of implementing a backend for the Raw processor \cite{raw}.
+
+\subsection{Conclusions}
+
+We belive that StreamIt represents a viable common machine language
+for grid-based architectures.  It abstracts away the target's
+granularity, memory layout, and network interconnect, while capturing
+the notion of replicated processors that communicate in regular
+patterns.  With this representation, we believe that the StreamIt
+compiler will match the performance of C code that was hand-tailored
+for a a given grid-based machine.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
