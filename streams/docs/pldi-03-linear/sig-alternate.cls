@@ -1,25 +1,30 @@
-% SIG-ALTERNATE.CLS - VERSION 1.1
-% "COMPATIBLE" WITH THE "ACM_PROC_ARTICLE-SP.CLS" V2.01SP
-% Gerald Murray May 11 2001
+% SIG-ALTERNATE.CLS - VERSION 1.6
+% "COMPATIBLE" WITH THE "ACM_PROC_ARTICLE-SP.CLS" V2.6SP
+% Gerald Murray October 2nd. 2002
 %
 % ---- Start of 'updates'  ----
 %
 % Allowance made to switch default fonts between those systems using
 % METAFONT and those using 'Type 1' or 'Truetype' fonts.
-% See LINE NUMBER 232 for details.
+% See LINE NUMBER 252 for details.
 % Also provided for enumerated/annotated Corollaries 'surrounded' by
-% enumerated Theorems (line 790).
+% enumerated Theorems (line 841).
 % Gerry November 11th. 1999
 %
 % Made the Permission Statement / Conference Info / Copyright Info
 % 'user definable' in the source .tex file OR automatic if
 % not specified.
 %
+% Georgia fixed bug in sub-sub-section numbering in paragraphs (July 29th. 2002)
+% JS/GM fix to vertical spacing before Proofs (July 30th. 2002)
+%
+% Footnotes inside table cells using \minipage (Oct. 2002)
+%
 % ---- End of 'updates' ----
 %
-\def\fileversion{v1.1}          % for ACM's tracking purposes
-\def\filedate{May 11, 2001}    % Gerry Murray's tracking data
-\def\docdate {Friday 11th. May 2001} % Gerry Murray (with deltas to doc}
+\def\fileversion{v1.6}          % for ACM's tracking purposes
+\def\filedate{October 2, 2002}    % Gerry Murray's tracking data
+\def\docdate {Wednesday 2nd. October 2002} % Gerry Murray (with deltas to doc}
 \usepackage{epsfig}
 \usepackage{amssymb}
 \usepackage{amsmath}
@@ -85,12 +90,12 @@
 %%% You may turn this hackery off via the -e option:
 %%%     dvips -e 0 foo.dvi >foo.ps
 %%%
-\typeout{Document Class 'sig-alternate' <11th. May '01>.  Modified by G.K.M. Tobin/Gerry Murray}
+\typeout{Document Class 'sig-alternate' <2nd. October '02>.  Modified by G.K.M. Tobin/Gerry Murray}
 \typeout{Based in part upon document Style `acmconf' <22 May 89>. Hacked 4/91 by}
 \typeout{shivers@cs.cmu.edu, 4/93 by theobald@cs.mcgill.ca}
 \typeout{Excerpts were taken from (Journal Style) 'esub2acm.cls'.}
 \typeout{****** Bugs/comments/suggestions/technicalities to Gerry Murray -- murray@hq.acm.org ******}
-\typeout{Questions on the style, SIGS policies, etc. to Julie Goetz goetz@acm.org or Adrienne Griscti griscti@acm.org}
+\typeout{Questions on the style, SIGS policies, etc. to Adrienne Griscti griscti@acm.org}
 \oddsidemargin 4.5pc
 \evensidemargin 4.5pc
 \advance\oddsidemargin by -1in  % Correct for LaTeX gratuitousness
@@ -282,11 +287,10 @@
 % Gerry Murray 11/11/1999
 % *** THIS BLOCK FOR THOSE USING METAFONT *****
 % *********************************************
-% HACKED BY BILL -- USED TO BE 12 12 11 11
-\newfont{\secfnt}{ptmb at 11pt}
-\newfont{\secit}{ptmbi at 11pt}    %13 Jan 00 gkmt
-\newfont{\subsecfnt}{ptmri at 10pt}
-\newfont{\subsecit}{ptmbi at 10pt}  % 13 Jan 00 gkmt -- was ptmr changed to ptmbi gm 2/4/2000
+\newfont{\secfnt}{ptmb at 12pt}
+\newfont{\secit}{ptmbi at 12pt}    %13 Jan 00 gkmt
+\newfont{\subsecfnt}{ptmri at 11pt}
+\newfont{\subsecit}{ptmbi at 11pt}  % 13 Jan 00 gkmt -- was ptmr changed to ptmbi gm 2/4/2000
                          % because "normal" is italic, "italic" is Roman
 \newfont{\ttlfnt}{phvb at 18pt}
 \newfont{\ttlit}{phvbo at 18pt}    % GM 2/4/2000
@@ -304,6 +308,7 @@
 \newfont{\ninept}{ptmr at 9pt}
 % +++++++++++++++++++++++++++++++++++++++++++++
 % -- End of block B --
+
 
 \def\email#1{{{\eaddfnt{\vskip 4pt#1}}}}
 
@@ -418,8 +423,8 @@
 \def\thepart{\Roman{part}} % Roman numeral part numbers.
 \def\thesection       {\arabic{section}}
 \def\thesubsection    {\thesection.\arabic{subsection}}
-\def\thesubsubsection {\thesubsection.\arabic{subsubsection}}
-\def\theparagraph     {\thesubsubsection.\arabic{paragraph}}
+%\def\thesubsubsection {\thesubsection.\arabic{subsubsection}} % GM 7/30/2002
+%\def\theparagraph     {\thesubsubsection.\arabic{paragraph}}  % GM 7/30/2002
 \def\thesubparagraph  {\theparagraph.\arabic{subparagraph}}
 
 \def\@pnumwidth{1.55em}
@@ -473,8 +478,11 @@
 \def\footnoterule{\kern-3\p@
   \hrule width .4\columnwidth
   \kern 2.6\p@}                 % The \hrule has default height of .4pt .
-\long\def\@makefntext#1{\noindent
-\hbox to .5em{\hss$^{\@thefnmark}$}#1}
+% ------
+\long\def\@makefntext#1{\noindent 
+%\hbox to .5em{\hss$^{\@thefnmark}$}#1}   % original
+\hbox to .5em{\hss\textsuperscript{\@thefnmark}}#1}  % C. Clifton / GM Oct. 2nd. 2002
+% -------
 
 \long\def\@maketntext#1{\noindent
 #1}
@@ -563,7 +571,7 @@
 
 \if@ll
   \NeedsTeXFormat{LaTeX2e}
-  \ProvidesClass{sig-alternate} [2001/05/11 - V1.1 - based on acmproc.cls V1.3 <Nov. 30 '99>]
+  \ProvidesClass{sig-alternate} [2002/02/10 - V1.6 - based on acmproc.cls V1.3 <Nov. 30 '99>]
   \RequirePackage{latexsym}% QUERY: are these two really needed?
   \let\dooptions\ProcessOptions
 \else
@@ -791,16 +799,15 @@
 %%%
 \newtoks\copyrightnotice
 \def\ftype@copyrightbox{8}
-\def\@copyrightspace{}
-% UNCOMMENT THIS STUFF TO ADD BACK THE COPYRIGHT NOTICE.  -Bill
-%\@float{copyrightbox}[b]
-%\begin{center}
-%\setlength{\unitlength}{0pc}
-%\begin{picture}(20,0) %Space for copyright notice
-%\put(0,-0.95){\crnotice{\@toappear}}
-%\end{picture}
-%\end{center}
-%\end@float}
+\def\@copyrightspace{
+\@float{copyrightbox}[b]
+\begin{center}
+\setlength{\unitlength}{1pc}
+\begin{picture}(20,6) %Space for copyright notice
+\put(0,-0.95){\crnotice{\@toappear}}
+\end{picture}
+\end{center}
+\end@float}
 
 \def\@toappear{} % Default setting blank - commands below change this.
 \long\def\toappear#1{\def\@toappear{\parbox[b]{20pc}{\baselineskip 9pt#1}}}
@@ -848,10 +855,20 @@
 }
 \newif\if@qeded
 \global\@qededfalse
+
+% -- original
+%\def\proof{%
+%  \vspace{-\parskip} % GM July 2000 (for tighter spacing)
+%    \global\@qededfalse
+%    \@ifnextchar[{\@xproof}{\@proof}%
+%}
+% -- end of original
+
+% (JSS) Fix for vertical spacing bug - Gerry Murray July 30th. 2002
 \def\proof{%
-  \vspace{-\parskip} % GM July 2000 (for tighter spacing)
-    \global\@qededfalse
-    \@ifnextchar[{\@xproof}{\@proof}%
+\vspace{-\lastskip}\vspace{-\parsep}\penalty-51%
+\global\@qededfalse
+\@ifnextchar[{\@xproof}{\@proof}%
 }
 
 \def\endproof{%
@@ -930,8 +947,8 @@
 \def\thepart{\Roman{part}}
 \def\thesection{\arabic{section}}
 \def\thesubsection{\thesection.\arabic{subsection}}
-\def\thesubsubsection{{\subsecfnt\thesubsection.\arabic{subsubsection}}}
-\def\theparagraph{{\subsecfnt\thesubsubsection.\arabic{paragraph}}}
+\def\thesubsubsection{\thesubsection.\arabic{subsubsection}} %removed \subsecfnt 29 July 2002 gkmt
+\def\theparagraph{\thesubsubsection.\arabic{paragraph}} %removed \subsecfnt 29 July 2002 gkmt
 \newif\if@uchead
 \@ucheadfalse
 
@@ -993,7 +1010,8 @@
         \refstepcounter{#1}%
         \edef\@svsec{%
             \begingroup
-                \ifnum#2>2 \noexpand\rm \fi
+                %\ifnum#2>2 \noexpand\rm \fi % changed to next 29 July 2002 gkmt
+			\ifnum#2>2 \noexpand#6 \fi
                 \csname the#1\endcsname
             \endgroup
             \ifnum #2=1\relax .\fi
@@ -1320,11 +1338,9 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%
 \ps@plain
 \baselineskip=11pt
-%% TO TAKE AWAY PAGE NUMBERS, UNCOMMENT NEXT LINE AND RECOMMENT ``ARABIC...''
-%% THREE LINES DOWN.  -BILL
-%\let\thepage\relax % For NO page numbers - GM Nov. 30th. 1999 and July 2000
+\let\thepage\relax % For NO page numbers - GM Nov. 30th. 1999 and July 2000
 \def\setpagenumber#1{\global\setcounter{page}{#1}}
-\pagenumbering{arabic}  % Arabic page numbers GM July 2000
+%\pagenumbering{arabic}  % Arabic page numbers GM July 2000
 \twocolumn             % Double column.
 \flushbottom           % Even bottom -- alas, does not balance columns at end of document
 \pagestyle{plain}
@@ -1335,7 +1351,7 @@
 \newtoks\acmcopyr
 \newtoks\boilerplate
 \global\acmcopyr={X-XXXXX-XX-X/XX/XX}  % Default - 5/11/2001 *** Gerry
-\global\copyrtyr={2001}                % Default - 12/4/2000 *** Gerry
+\global\copyrtyr={200X}                % Default - 3/3/2003 *** Gerry
 \def\CopyrightYear#1{\global\copyrtyr{#1}}
 \def\crdata#1{\global\acmcopyr{#1}}
 \def\permission#1{\global\boilerplate{#1}}
@@ -1347,6 +1363,5 @@
 \toappear{\the\boilerplate\par
 {\confname{\the\conf}} \the\confinfo\par \the\copyrightetc.}
 %
-%% End of sig-alternate.cls -- V1.1 - 5/11/2001 --
-%% Gerry Murray -- Friday May 11th. 2001
-
+%% End of sig-alternate.cls -- V1.6 - 10/02/2002 --
+%% Gerry Murray -- Wednesday October 2nd. 2002
