@@ -1,3 +1,43 @@
+Thu Mar 25 17:24:24 EST 2004
+
+* why are pointers a problem?  aliasing of kernels, streams, etc. is impossible
+
+answering rich's question as to why there are pointers:
+
+- for stream push/pop, can pass any size of data
+  - otherwise would need a different function for each type
+
+- in general, need to have identifiers for streams, kernels, etc.  If
+they are't explicit pointers then they will be equivalent of pointers
+(like an ID number).
+
+- pointer to kernel work function: how else do you specify work
+function without objects, etc?
+
+- pointer to kernel data: the type problem again.  maybe something
+with updating state?
+
+- maybe something with the initialization
+  - oh yes, the loop with mutually dependent kernels
+
+- more of a type problem?  maybe not (can define own init function for
+extensions).
+
+- the work function would need to return new state instead of mutating
+state.
+
+- harder to optimize a library implementation if there is a lot of
+copying in the C language semantics.
+
+- when running a kernel, hard to see how state changes would propagate
+back to control thread without pointers.  Especially in library
+implementation.  would probably have to introduce a "getState"
+function or something (or have it be returned from kernelPause,
+kernelEnd).  This would have to be implemented separately for each
+kernel so that it retrieves the right size of data, etc.
+
+------------------
+
 Things to bring to front of intro:
 
 - structure of morpwhare flow (hlc, llc, etc.)
