@@ -16,7 +16,7 @@ that can be supported, the partitioning stage transforms a stream
 graph into a set of no more than $N$ filters, each of which performs
 approximately the same amount of work during the execution of the
 program.  Following this stage, each filter can be run on a separate
-machine to obtain a load-balanced executable.  
+processor to obtain a load-balanced executable.
 
 Load balancing is particularly important in the streaming domain,
 since the throughput of a stream graph is equal to the {\it minimum}
@@ -79,58 +79,115 @@ transformations in more detail.
 
 \subsection{Fusion Transformations}
 
-\begin{verbatim}
+Filter fusion is a transformation whereby several adjacent filters are
+combined into one.  Fusion can be applied to decrease the granularity
+of a stream graph so that an application will fit on a given target,
+or to improve load balancing by merging small filters so that there is
+space for larger filters to be split.  Analogous to loop fusion in the
+scientific domain, filter fusion can enable other optimizations by
+merging the control flow graphs of adjacent nodes, thereby shortening
+the live ranges of variables and allowing independent instructions to
+be reordered.
 
-  - motivation
-    - decreases granularity of stream graph to fit on a given target
-    - opens up opportunities for further optimization
-      . comparably to loop fusion
-      . like keeping working set in cache the whole way through a set of
-        filters, even though each stage would overflow cache (or registers)
-	if run to completion as a unit.
+\subsection{Vertical Fusion}
 
-  - examples
-    . pipeline fusion algorithm
-      - could use Filter Fusion ala Proebsting
-        . but code blowup possible
-      - we use simple hierarchical scheduling
-    . split-join fusion algorithm
-      - for taking something with explicit parallelism and start/end
-        synchronization and sequentializing it
-      - determining the order of interleaving will have effect on
-        memory requirements of fused region.
+Vertical fusion describes the combination of sequential, pipelined
+filters into a single unit.  An algorithm for vertical filter fusion
+is given in \cite{pro96} that interleaves the control flow graphs of
+adjacent nodes, where each node communicates with its neighbors via
+synchronous {\tt get} and {\tt put} operations.  This is not
+sufficient for StreamIt filters, since {\tt peek} operations allow
+asynchronous communication between filters, with implicit buffering.
 
-  - implementation
-    - two-stage filters ??
-    - involves some simulation of the scheduling, then serializing
-      code to match
+Our algorithm relies on the static I/O rates of each filter to
+calculate a legal execution ordering for the filters being fused.
+Then, the fused filter simulates the execution of this schedule,
+inlining the code from each of the original filters and using local
+variables for buffering.  In our current implementation, the scheduler
+computes only the multiplicity of each component filter in relation to
+the fused filter; then, the fused code is a sequence of loops that
+each execute a component filter for the appropriate multiplicity,
+buffering its results in a local array.  If the multiplicity is small,
+then the loop can be unrolled and all array references can be replaced
+with scalar variables to facilitate optimization.
 
-\end{verbatim}
+A subtlety of our algorithm is that the fused filter differs from the
+originals in that it has two distinct execution phases: one for
+initialization, and one for steady-state execution (see
+Figure~\ref{fig:??}).  If any of the component filters peek at
+elements that they do not consume, then a separate initialization
+schedule is required to fill all the ``peek buffers'' in the pipeline.
+During this initialization, the pipeline as a whole will consume some
+input, but will not produce any output.  Then, during the steady state
+schedule, the sizes of the buffers are preserved, and the pipeline
+both produces and consumes items.  Thus, when there is peeking in the
+stream, there will be different I/O rates for the initialization and
+steady-state phases, and the fused filter will be a {\it two stage
+filter}: it executes one work function on its first invocation, and a
+separate work function on all subsequent invocations.  Though these
+work functions may have different I/O rates, each rate is constant and
+known at compile time.
+
+\subsection{Horizontal Fusion}
+
+We refer to the combination of the parallel streams in a SplitJoin
+construct as ``horizontal fusion''.  Our horizontal fusion algorithm
+inputs a SplitJoin where each component is a single filter, and
+outputs a Pipeline of three filters: one to emulate the splitter, one
+to simulate the execution of the parallel filters, and one to emulate
+the joiner.  The splitters and joiners need to be emulated in case
+they are RoundRobin's that perform some reordering of the data items
+with respect to the component streams.  The fusion of the parallel
+components is similar to that of vertical fusion--a sequential
+steady-state schedule is calculated, and the component work functions
+are inlined and executed within loops.  However, horizontal fusion
+requires no buffering of internal items, as the parallel streams do
+not communicate with each other.  Also, for Duplicate splitters, the
+{\tt pop} expressions in component filters need to be converted to
+{\tt peek} expressions so that items are not consumed before
+subsequent filters can read them.
 
 \subsection{Fission Transformations}
 
+Filter fission is the analog of parallelization in the streaming
+domain.  It can be applied to increase the granularity of a stream
+graph to utilize unused processor resources, or to break up a
+computationally intensive node for improved load balancing.  
+
+There are many types of fission transformations.  We have implemented
+a data-parallel transformation for stateless filters that places a
+duplicate of the filter on each path of an $n$-way SplitJoin (see
+Figure~\ref{fig:??}).  By ``stateless'' we mean that the filter
+contains no fields that are written on one invocation of {\tt work}
+and read on later invocations--let us consider such a filter $F$ with
+I/O rates of $peek$, $pop$, and $push$.  Our transformation produces a
+SplitJoin that has a set of two-stage filters as its components.  The
+$i$'th component has a steady-state work function that is exactly the
+same as in $F$, and an initialization work function that simply pops
+$(i-1)*pop$ items from the input stream (to account for the
+consumption of previous filters).  If $peek=pop$, the splitter is a
+RoundRobin that routes $pop$ elements to each component stream.
+However, if $peek>pop$, then the splitter is a Duplicate, and each
+stream contains a decimator to consume items that are unused by the
+component filter.  In either case, the joiner is a RoundRobin that has
+a weight of $push$ for each input.
+
+Instead of duplicating the entire contents of a filter, some filters
+can be split into a pipeline, with each stage performing some part of
+the work function (see Figure~\ref{fig:??}).  In addition to the
+original input data, these pipelined stages might need to communicate
+intermediate results from within {\tt work}, as well as fields within
+the filter.  This scheme could apply to filters with state if all
+modifications to the state appear at the top of the pipeline (they
+could be sent over the data channels), or if changes are infrequent
+(they could be sent via StreamIt's messaging system.)
+
 \begin{verbatim}
 
-  - motivation
-    - fission not typically considered as an ``optimization'', but
-           it is the analog of parallelization for the stream domain
-      . can split the heaviest filters to distribute the load
-
-  - examples
-    . stateless filter into splitjoin
-    . stateless filter into pipeline
-       - communicate partial results across the pipe
-       - can be stateful if all state is written on top and read on bottom
     . feedback loop into splitjoin (?? is there a case this really helps?)
        - if all components of the loop are stateless, then can extract
          parallel streams
        - ?? need to define real transformation here
-    . a stateless feedback loop can be ``unrolled'' into a splitjoin with
-       multiple instances of the the feedbackloop on different parts of
-       the splitjoin.  how realistic are stateless feedback loops?  well,
-       you could apply this transformation to do stateful fission.  just
-       put all the state in the loop, with delay one, then unroll... and
-       you ... maybe this doesn't work after all.
 
   -> using induction variable analysis to eliminate some state
 
