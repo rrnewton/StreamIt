@@ -27,7 +27,7 @@ actors are allowed to have multiple input and output channels.
 \cite{benveniste93dataflow} provides an overview of dataflow
 synchronous languages.
 
-There are many results of scheduling SDF programs \cite{leesdf}.
+There are many results of scheduling \SDF programs \cite{leesdf}.
 Many of these results concentrate on reducing buffering
 requirements. Many of the systems inline all actor code into a
 single function, and try to minimize the code and buffer size at
@@ -56,7 +56,7 @@ execute multiple {\filters} in parallel, but every parallel
 execution is given its own separate set of resources like memory.
 
 There are some streaming computation models which are less
-constrained than SDF. Most popular is Cyclic Synchronous Data Flow
+constrained than \SDF. Most popular is Cyclic Synchronous Data Flow
 CSDF computation model \cite{parks95comparison}.  CSDF actors have
 multiple {\work} functions, with each one being allowed to
 consume/produce different number of data items. The current
@@ -72,6 +72,6 @@ data is not static, but may depend on data being processed. The
 model is called Cyclo-Dynamic Data Flow (CDDF). This greatly helps
 flexibility of programming, but prevents fully static scheduling
 of programs. The U.S. Navy Processing Graph Method (PGM) uses a
-version of SDF with an equivalent of peeking \cite{goddard00navy}.
+version of \SDF with an equivalent of peeking \cite{goddard00navy}.
 The paper is focused on real-time execution and provides analysis
 and verification of latency of data flow through their system.
