@@ -140,33 +140,36 @@ easy to combine manually, in an actual design several different
 filters might be designed and implemented by several different people 
 which would be much harder to integrate into a single design.
 
-Another common operation in discrete time signal processing is downsampling.
+A common operation in discrete time signal processing is downsampling
+to reduce the computational requirements of a system.
 Downsampling is most often implemented as a low pass filter followed
 by an $M$ compressor which passes every $M$th input sample to the
-output.  For every output of the downsampler, $M-1$ outputs from the
-low pass filter are ignored, so only every $M$th sample needs be
-computed.  While this optimization is almost always done in actual
-system implementations because it reduces the computational
-requirements by a factor of $\frac{M-1}{M}$, in the system
-specifications very often both the filter and the compressor will
-appear. The inefficient implementation is represented because it is
-conceptually easier to understand.  Our linear analysis covers this
-case, and thus our compiler can implement the transformation
-automatically.
+output.  Therefore, $M$ outputs from the
+low pass filter are calculated for every overall output, when in actual fact
+only every $M$th sample needs be computed.  Almost all actual systems 
+do not calculate the $M-1$ unused outputs which decreases computational
+requirements by a factor of $\frac{M-1}{M}$. However, most often 
+the system's actual specification will include both the filter and the compressor. 
+This inefficient implementation appears because it is
+conceptually easier to understand. Our linear analysis and transformations
+can describe the computation well enough enough so that our compiler can
+derive the efficient transformation automatically.
 
-Another example is a multi-band equalizer (such as is found in the
+Another example of how combining linear nodes can help overall performance
+is a multi-band equalizer (such as is found in the
 FMRadio benchmark).  The purpose of such an equalizer is to filter $N$
-different frequency bands separately (like the graphic equalizer found
-on stereos). The intuitive system specification of an equalizer
+different frequency bands separately, exactly like the graphic equalizer found
+on stereos. The intuitive system specification of an equalizer
 consists of $N$ bandpass filters operating in parallel whose output is
 combined to produce the equalized signal. However, if the filters do
 not vary with time, a single filter which performs the equivalent
-computation can be substituted instead.  However, designing this
-single combined filter is difficult, and any subsequent changes to any
-one of the sub filters will necessitate a redesign of the overall
-filter.  Out compiler can automatically derive the equivalent filter,
-and any subsequent design changes will only necessitate a recompile
-rather than a manual redesign.
+computation can be substituted instead. Designing this
+single overall filter is difficult, and any subsequent changes to any
+one of the sub filters will necessitate a total redesign of the
+filter. Using the linear analysis and combination presented,
+our compiler can automatically derive the equivalent filter from the
+intuitive specification. Therefore any subsequent design changes will 
+necessitate only a recompile rather than a manual redesign.
 
 
 \subsection{Overall optimization performance}
@@ -199,22 +202,22 @@ rather than a manual redesign.
 \end{figure}
 
 To determine the effects of our linear replacement and frequency replacement 
-optimizations, we compiled each benchmark with the linear 
-replacement, frequency replacement (overlap-add),
+optimizations, we compiled each benchmark program with the linear 
+replacement, wtih frequency replacement (overlap-add),
 and with linear replacement followed by frequency replacement. 
 Figure~\ref{fig:linear-freq-both} shows the multiplication reduction factor 
 achieved for each set of optimizations.
 
 For the FIR filter, all of the multiplication reduction comes from the frequency
 replacement optimization because the entire application is comprised of a single
-{\tt filter} calculating a convolution sum and there is nothing to combine.
+{\tt filter} calculating a convolution sum so there is nothing to combine.
 The TargetDetect program experiences a small decrease in multiplications 
 for linear replacement, and a larger boost from frequency replacement alone.
 The main work of the target detector system occurs in the four parallel FIR filters, whose
 results can not be combined.
 
-However, linear replacement reduces the number of multiplies 
-requried for FilterBank by a factor of three because the parallel analysis and 
+The linear replacement optimization reduces the number of multiplies 
+required for FilterBank by a factor of three because the parallel analysis and 
 synthesis pipelines can be combined. Unfortunately, after
 linear replacement, the frequency translation doesn't reduce computation 
 because our current implementation only works for one column linear filters.
@@ -223,9 +226,7 @@ The RateConverter also benefits greatly from the frequency
 transformation due to the fact that it contains a large FIR
 filter. Our implementation currently doesn't support the full range of
 pipeline combination rules so we miss potential savings from linear
-combination.
-
-Similairly, FMRadio contains a multiband equalizer whose gain stages are collapsed
+combination. Similairly, FMRadio contains a multiband equalizer whose gain stages are collapsed
 into a single filter during linear combination.
 
 The number of multiplies in the Radar program actually increases because our 
