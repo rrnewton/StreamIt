@@ -352,17 +352,15 @@ documentation for how this works.
 portal *create_portal(void);
 void register_receiver(portal *p, stream_context *receiver,
                        interface_table *vtbl, latency *l);
-void register_sender(portal *p, stream_context *sender, latency *l);
+/* void register_sender(portal *p, stream_context *sender, latency *l); */
 @
 
 To send a message, you need to know the message number, the portal,
-the required latency, and the parameters to send on.  Each message
-must create a structure to package its parameters in, and the sender
-needs to pass a [[malloc]]'d pointer to the parameter structure to
-[[send_message]].
+the required latency, and the parameters to send on.  The C varargs
+mechanism is used to pass paramaters on to message handler functions.
 
 <<Messaging Functions>>=
-void send_message(portal *p, int msgid, latency *l, void *params);
+void send_message(portal *p, int msgid, latency *l, ...);
 @
 
 \subsection{Starting the System}
