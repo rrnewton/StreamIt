@@ -39,7 +39,9 @@ streaming codes. In SDF, computation is represented as a graph
 consisting of {\it  actors} connected by communication channels; the
 actors consume  and produce a constant number  of items from their
 input and output  channels every time they execute. SDF is appealing
-because it is amenable to static scheduling and optimization. 
+because it is amenable to static scheduling and
+optimization. Sections~\ref{sec:streamit}~and~\ref{sec:execmodel}
+describe StreamIt.
 
 From a general purpose architecture's point of view, actors represent
 computation kernels, and the communication between actors represents
@@ -54,14 +56,14 @@ on to some other actor in the stream
 graph. This serves to $(i)$ amortize the cost of fetching the actor's
 instructions into the cache from memory (an expensive operation), $(ii)$
 improve the instruction temporal locality, and $(iii)$ improve overall
-performance. However, as our cache model will show, we 
+performance. However, as our cache model will show (Section~\ref{sec:cache-model}, we
 cannot arbitrarily scale the execution frequency of an actor. This
 is because actors produce data that must be buffered, and therefore,
 we must also consider the amount of data an actor produces and
 consumes if we are to adequately manage the data cache. This paper is unique
 in that it is the first to present a unified optimization methodology
 that simultaneously considers instruction and data locality for
-mapping streaming computation to cache-based architectures.
+mapping streaming computation to cache-based architectures (Section~\ref{sec:cache-opt}).
 
 In terms of improving the data cache behavior, the compiler schedules
 actor firing such that the producer-consumer locality is
@@ -72,7 +74,8 @@ destroy the arrays used to buffer data between the actors and replace
 the corresponding array references with scalars.  It also allows for
 various competing implementations for managing the buffers between the
 fused actors.  This paper evaluates several implementation
-alternatives (for buffer management) and evaluates their performance.
+alternatives (for buffer management) and evaluates their performance
+(Section~\ref{sec:buffer}).
 
 The methodology for fusing actors leverages a distinguishing StreamIt
 characteristic, namely, the hierarchical organization of
@@ -118,10 +121,10 @@ While both scaling and fusion lead to modest performance gains, we
 must combine the two to deliver the best possible performance. When we
 do so, we can further improve the performance of our benchmarks by
 53\% on average for the Pentium~3, and 55\% for the Itanium~2.
+Section~\ref{sec:evaluation} reports describes our evaluation
+methodology and presents our experimental analysis.
 
-\subsection{Summary of Contributions}
-
-This paper makes the following contributions:
+In summary, this paper makes the following contributions:
 \begin{itemize}
 
 \item A cache model for stream computing that provides a quantitative
@@ -147,15 +150,15 @@ StreamIt compiler.
 demonstrating performance improvements of up to 99\%.
 \end{itemize}
 
-\subsection{Paper Roadmap}
+% \subsection{Paper Roadmap}
 
-The remainder of the paper is organized as follows. Section~\ref{sec:streamit}
-describes StreamIt and introduces our motivating example.
-Section~\ref{sec:cache-model} introduces our cache model for 
-reasoning about the performance of a streaming
-computation. Section~\ref{sec:cache-opt} describes our cache-aware
-optimizations, and Section~\ref{sec:buffer} describes the 
-optimization enabled by fusion. Section~\ref{sec:evaluation} describes
-our evaluation methodology and present our experimental
-analysis. Sections~\ref{sec:related-work}~and~\ref{sec:conclusion}
-discuss related work and concludes the paper.
+% The remainder of the paper is organized as follows. Section~\ref{sec:streamit}
+% describes StreamIt and introduces our motivating example.
+% Section~\ref{sec:cache-model} introduces our cache model for 
+% reasoning about the performance of a streaming
+% computation. Section~\ref{sec:cache-opt} describes our cache-aware
+% optimizations, and Section~\ref{sec:buffer} describes the 
+% optimization enabled by fusion. Section~\ref{sec:evaluation} describes
+% our evaluation methodology and present our experimental
+% analysis. Sections~\ref{sec:related-work}~and~\ref{sec:conclusion}
+% discuss related work and concludes the paper.
