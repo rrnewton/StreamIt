@@ -1,8 +1,9 @@
-* filter fission doesn't seem to work with DP partitioner
-
-* need good estimator of how much overhead we add in splitjoin fusion.
+x need good estimator of how much overhead we add in splitjoin fusion.
 Actually could be good research goal to bring this overhead to a
 minimum.
+
+  - for now just doing this with fusing filters directly... fusing
+    the result of fusion could be tricky?
 
 - fission in the greedy partitioner is pretty stupid because it can't
 fiss 2-stage filters that peek -- thus each filter only gets fissed
@@ -16,24 +17,17 @@ mutated (e.g. lifter)
 * actually look at the applications and speculate where dynamic
 programming would fundamentally help over something greedy
 
-- extend algorithm to include joiners in the middle of 2-D stuff
+- extend algorithm description to include joiners in the middle of 2-D
+stuff
 
 - need to fix 2-stage filter fusion (look like regtest dying in ~7 places)
-
-- extending non-rectangular splitjoins with identities to make them
-rectangular (then we can look at fm)
 
 - think about application to feedbackloops
 
 GENERAL
 
-- debug michal's thing by calling the schedule buffers thing with the
-init and steady schedule
-
 - get someone to do a moratorium on all the options and figure out
 what the best combination is.
-
-- write a more general _structured_ sync-removal pass
 
 --------------------------------------------------------------
 
