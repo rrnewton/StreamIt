@@ -29,16 +29,16 @@ weights on its incoming channels. To achieve this, the various input
 streams of the traces are collected into the memory module attached to
 the tile to which the first filter of the trace is mapped. Streaming
 DRAM requests are generated to read each input channel and to write
-the final, reassemble input.  Code is generated for the static
+the final, reassembled input.  Code is generated for the static
 routers, as they enforce the ordering of the final input stream.
 
 After the last filter of a trace executes, its single output stream is
 split into memory ports assigned to the output channels of the trace.
 The choice of memory port for each inter-trace channel is beyond the
-scope of this paper. A streaming DRAM requests is generated to read
-the output of the last filter and streaming DRAM requests are
-generated to write the reordered (and possible duplicated) output to
-the memory ports assigned to the inter-trace channels.
+scope of this paper. Streaming DRAM requests are generated to read the
+output of the last filter and streaming DRAM requests are generated to
+write the reordered (and possible duplicated) output to the memory
+ports assigned to the inter-trace channels.
 
 \subsection{Filter Code Generation}
 When we visit a trace in the schedule for each execution phase, we
@@ -73,12 +73,12 @@ except for the channel expressions {\tt push()}, {\tt peek(index)} and
 {\tt pop()}.
 
 One major benefit of StreamIt over other streaming languages is that
-the StreamIt compiler is responsible for input buffer management.  The
+the StreamIt compiler is responsible for buffer management.  The
 programmer is free to call {\tt pop()} or {\tt peek(index)} without
 having to worry about the structure of the buffer or updating the
 buffer's index variable after each execution of the work function.
 Currently, we classify filters as one of three types with respect to
-buffer management: 
+buffer management:
 \begin{enumerate}
 \item If a filter $(i)$ does not contain any {\tt peek} statments, $(ii)$
 does not contain any control-flow dependent channel expressions, and

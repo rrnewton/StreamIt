@@ -26,15 +26,6 @@ returns the value at position {\tt index} without dequeuing the item.
 The number of items that are pushed, popped, and peeked on each
 invocation are declared with the {\tt work} function.
 
-In addition to {\tt work}, a filter can contain a {\tt prework}
-function that is executed exactly once after the call to the {\tt
-init} function.  Like {\tt work}, {\tt prework} can access the input and
-output tapes of the filter; however, the I/O rates of {\tt work} and
-{\tt prework} can differ.  For example, in an FIR Filter, a {\tt prework}
-function is essential for correctly filtering the beginning of the
-input stream.  The user never calls the {\tt init}, {\tt prework}, and
-{\tt work} functions--they are all scheduled automatically by the compiler.
-
 There are three basic constructs for composing filters into a
 communicating network: a {\it pipeline}, a {\it splitjoin}, and a {\it
 feedbackloop}, see Figure \ref{fig:structures}.  A pipeline behaves as

@@ -11,3 +11,110 @@ Related Work:
 * Hank's streaming stuff
 
 Results:
+
+-----------------------------------------------------------------------
+
+Bill's comments:
+
+- "for traces that output to multiple traces"
+
+  -- do you mean "filters that output to multiple traces"?  It could
+  make sense as written, but sounds awkward.
+
+- why have the work threshold relative to the first filter in the
+trace?  It seems like what you care about is the ratio of the biggest
+filter to the smallest filter in the trace so far.
+
+- first paragraph of "trace scheduling" - might explicitly say that
+you are going to simulate the execution of a steady state (or multiple
+steady states?) by keeping track of an execution time and the state of
+trace executions at that time.  also be careful to be consistent
+between "time" and "cycle".
+
+- "trace scheduling section" -- second paragraph sounds like you are
+reading through some psuedocode, but it is very verbose.  You could
+extract concise pseudocode, put it in a figure, then explain the
+interesting parts from the text.
+
+- "trace scheduling section" -- third paragraph.  One thing you could
+point out here, as a general contribution of the paper, is the
+observation that it is non-trivial to schedule spatial traces on
+ragged areas of the chip.  Hopefully this will be evident in the
+example -- some case where there are n free tiles, but an n-long trace
+cannot be scheduled due to layout constraints (cannot snake it around
+in a contiguous way so that endpoints are on the edges.)  Then you can
+say that heuristics need to be used, and you won't give the details;
+as it stands now, I don't think it's clear why it is a hard problem.
+
+- "trace scheduling section" -- last paragraph.  I think this
+paragraph (about the priority function) is out of place.  It should go
+in one of two other places: 1) right after you talk about the priority
+function, earlier in this paragraph, or 2) in results.  Actually, if
+you have time, it would make the results section more interesting if
+you did a run of the numbers with each of the heuristics you describe.
+Then it appears that there is some actual scientific study, and you
+can back up the claim that you tried the alternatives.  This shouldn't
+be hard to do, should it?
+
+- section 11 -- I don't think the word "amalgam" makes any sense in
+this context.
+
+- section 11, first type of filter -- need to define what it means for
+a filter "not to peek".  this means it never calls the peek function?
+(it does not mean that peek <= pop.)  Also, this whole list might be
+preceded by an explanation that when peek>pop, there are items carried
+over from one execution of work to the next that need to be stored in
+a circular buffer.
+
+- switch processor code generation -- it says that it is "rather
+simple" but you can be more precise without wasting much space.  For a
+given trace, the switch code consists of a single routing instruction
+between neighboring tiles; this instruction is enclosed in a loop that
+iterates over the items sent during a trace (known at compile-time).
+[Or maybe you don't bother to factor them into loops now?  In this
+case, omit the description.]
+
+- in the results, the columns should not be labeled "throughput" and
+"old throughput".  It should be "Throughput (Hybrid Space-Time
+Multiplexing)" and "Throughput (Space Multiplexing)" or something.
+
+TODO:
+
+- results should include discussion of the distribution of trace
+sizes.  Also the utilization of the chip (how often we intenionally
+left tiles empty.)  Discuss the middle 4 tiles not being as useful,
+possibly.  Say that we couldn't extend to larger configurations due to
+implementation constraints.
+
+  - hey, why aren't we testing on 2x2, 2x3, 2x4, etc?  Oh, did you say
+    that this was impossible to support in current infrastructure?
+    This would give good scaling numbers, presumably.  and 2x3, 2x4
+    performance might be better since all tiles are next to an I/O
+    port.
+
+  - it would also be good if you could break down the execution time
+    into 1) linear sections, 2) non-linear sections, and 3) time spent
+    re-organizing data.
+
+  - It would be interesting to see the effect of increasing the
+    off-chip buffer sizes (the length of time each trace runs) on
+    performance.  This is a step towards characterizing the context
+    switching overhead and the prologue/epilogue times, which are both
+    interesting aspects of the work, I think.
+
+  - as mentioned above, give the numbers for the other heuristics
+
+- the linear extraction (or codegen) should give a theoretical
+argument on the linear efficiency as a function of peek, pop, and push
+rates.  this is something kind of interesting.
+
+- if linear stuff is part of this paper, the results should also
+include the new backend on FIR vs. Hank's (or Nate's) hand-coded FIR.
+It should give the number of lines of code in each version.  This is
+almost a more compelling result (lines of code for hand-assembly
+vs. StreamIt while keeping performance constant) than comparison with
+our old backend (performance improving while keeping code constant.)
+
+- we need lots more figures, esp. for explaining the example of trace
+scheduling and maybe for the way the linear stuff works.  I can help
+with that after the introduction.
