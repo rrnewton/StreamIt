@@ -1,12 +1,13 @@
 general
 -------
-** rewrite abstract and intro
+* describe how messaging is actually implemented (credits, SDEP, etc)
+
+x rewrite abstract and intro
   - explain about SDF, StreamIt
   - explain roundrobin splitters, joiners
   - explain "actor" , "I/O rate" and "phase" of actor
-* explain numbers in figure 1 (separated by commas)
-* Figure 2: explain how to follow chart, what each line means
-* describe how messaging is actually implemented (credits, SDEP, etc)
+x explain numbers in figure 1 (separated by commas)
+x Figure 2: explain how to follow chart, what each line means
 x explain what [n:m] notation means 
   x added explanation to example when first introduced
   - could still be more explicit somewhere:
@@ -17,6 +18,9 @@ x define what "simulateCurrentPhase" means in Figure 1
 
 technical things
 ----------------
+* say something about determining whether message constraints are feasible
+- see if there is anything worth integrating in constrained.tex (on constrained messaging)
+
 x resolve timing issue in radio, as raised by reviewer
 x fix jasper's off-by-one errors.  Might be the same as reviewer comment:
  x There are two equations in the paragraph after Theorem 1. The second
@@ -24,8 +28,6 @@ x fix jasper's off-by-one errors.  Might be the same as reviewer comment:
    but this should be written as "SDEP A<-E (n mod |S ^ E|)"? The same
    goes for the second equation.
 x resolve SDEP bugs suggested by reviewer below
-* say something about determining whether message constraints are feasible
-- see if there is anything worth integrating in constrained.tex (on constrained messaging)
 
 specific reviewer comments
 --------------------------
@@ -38,9 +40,9 @@ x 4.1 Definition 2. In Case 2,
 
 x 4.2 Figure 4. Where is the latency rage [4:6] specified in the code?
 
-4.2 Figure 4. To make the paper self-contained, I think that you should
-explain a bit about StreamIt, in particlar, the roundrobin construct for
-splitter and joiner.
+x 4.2 Figure 4. To make the paper self-contained, I think that you should
+  explain a bit about StreamIt, in particlar, the roundrobin construct
+  for splitter and joiner.
 
 4.3 The third paragraph. "The actual message delivery can be
 implemented in the most efficient way for the given architecture" I think
@@ -60,9 +62,9 @@ x Algorithm 1 has several problems. The recursive call to pullSchedule only
   occurrences of "o" look slightly different, which is probably the
   result of a typo.
 
- - section 4.2: What does the term FFT refer to? 
+x section 4.2: What does the term FFT refer to? 
 
- - section 4.3: What is a vocoder?
+x section 4.3: What is a vocoder?
 
 - Address concern: why should frequency-hopping radio app be tested on
 a high-performance distributed cluster. Wouldn't embedded hardware be
@@ -105,7 +107,6 @@ a bit more precise might help to clarify the connection here.
 
 original submission todo list
 -----------------------------
-x change A and B to {S}ender and {R}eceiver
 - mention complexity of scheduling algorithm
 - describe structured streams in streamit
 - mention inverse SDEP in the latency section
@@ -114,7 +115,8 @@ x change A and B to {S}ender and {R}eceiver
   - draw arrows maybe in illustrator
 - clean up second bullet of what happens with messaging (4.5)
 - maybe superscript the n^th 
-- come up with a name for messaging -- Warp or something.  It's
-  impossible to write about
 - the feedback edge in the graph of the manual radio should be darker
 - make the label on the enqueue of the loop back path a little bigger
+x change A and B to {S}ender and {R}eceiver
+x come up with a name for messaging -- Warp or something.  It's
+  impossible to write about
