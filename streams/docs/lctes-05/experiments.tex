@@ -33,8 +33,10 @@ Our benchmark suite (see Table~\ref{tab:benchmarks} consists of eleven
 different StreamIt applications. They are compiled with the StreamIt
 compiler which applies the optimizations described in this paper, and
 outputs an functionally equivalent C program that is compiled with the
-\texttt{gcc} (version 3.4, optimization level 3). Each benchmark is
-then run five times, and the median user time is recorded.
+\texttt{gcc} (v3.4, -O3) on the Pentium and \texttt{ecc} 
+(v7.0, -O3).
+% Each benchmark is
+% then run five times, and the median user time is recorded.
 
 \begin{figure}
   \psfig{figure=p3-caf.eps, width=3.4in}
