@@ -4,8 +4,7 @@
 We have implemented a fully-functional prototype of the StreamIt
 compiler for the Raw architecture.  Our implementation includes all of
 the phases described in Section~\ref{sec:phases} as well as the
-optimizations, but the decision of which optimizations to apply is
-currently guided by the programmer.
+optimizations.
 
 \begin{table}[t]
 \begin{center}
@@ -153,37 +152,3 @@ of our load balancing optimizations .
 %filter. We were unable to amortize the communication overhead for FFT,
 %leading to a slowdown.  Better tile code generation and traditional
 %optimizations may help improve the performance.
-
-%% \vspace{24pt}
-%% \small
-%% \begin{verbatim}
-%%                          class \BeamFormer extends Pipeline {
-                         
-%%                             void init(numChannels, numBeams) {
-%%                                add(new SplitJoin() { 
-%%                                   void init() {
-%%                                      setSplitter(Null());
-%%                                      for (int i=0; i<numChannels; i++) {
-%%                                         add(new InputGenerate(i));
-%%                                         add(new FIRFilter1(64));
-%%                                         add(new FIRFilter2(16));
-%%                                      }
-%%                                      setJoiner(RoundRobin());   
-%%                                    }});
-                            
-%%                                add(new SplitJoin() {
-%%                                   void init() {
-%%                                      setSplitter(Duplicate());
-%%                                      for (int i=0; i<numBeams; i++) {
-%%                                         add(new VectorMult(i));
-%%                                         add(new FIRFilter3(64));
-%%                                         add(new Magnitude());
-%%                                         add(new Detect(i));
-%%                                      }
-%%                                      setJoiner(Null());
-%%                                   }});
-%%                             }
-%%                          }
-%% \end{verbatim}
-%% \caption{\protect\small Top-level StreamIt code for the \BeamFormer.\protect\label{fig:beamcode}}
-%% \end{figure}

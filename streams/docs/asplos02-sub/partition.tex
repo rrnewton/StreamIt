@@ -232,24 +232,24 @@ filter that represents the entire splitjoin.
 \begin{figure}
 \centering
 \psfig{figure=duplicate-fission-2.eps,width=4.60in}
-\caption{\protect\small Fission of a filter that does not peek.  For
-filters such as a VectorMultiply that consumes every item they look
-at, horizontal fission consists of embedding copies of the filter in a
-$K$-way roundrobin splitjoin.  The weights of the splitter and joiner
-are set to match the $pop$ and $push$ rates of the filter,
-respectively.  \protect\label{fig:fission-nopeek}}
+\caption{\protect\small Fission of a filter that does not peek.
+%For filters such as a VectorMultiply that consumes every item they look
+%at, horizontal fission consists of embedding copies of the filter in a
+%$K$-way roundrobin splitjoin.  The weights of the splitter and joiner
+%are set to match the $pop$ and $push$ rates of the filter, respectively.  
+\protect\label{fig:fission-nopeek}}
 \vspace{18pt}
 \psfig{figure=duplicate-fission.eps,width=3.94in}
-\caption{\protect\small Fission of a filter that peeks.  Since the
-MovingAverage filter reads items that it does not consume, the
-duplicated versions of the filter need to access overlapping portions
-of the input stream.  For this reason, horizontal fission creates a
-duplicate splitjoin in which each component filter has additional code
-to filter out items that are irrelevant to a given path.  This
-decimation occurs in two places: once in the initial work function, to
-disregard items considered by previous filters on the first iteration
-of the splitjoin, and once at the end of the steady work function, to
-account for items consumed by other components.
+\caption{\protect\small Fission of a filter that peeks.  
+%Since the MovingAverage filter reads items that it does not consume, the
+%duplicated versions of the filter need to access overlapping portions
+%of the input stream.  For this reason, horizontal fission creates a
+%duplicate splitjoin in which each component filter has additional code
+%to filter out items that are irrelevant to a given path.  This
+%decimation occurs in two places: once in the initial work function, to
+%disregard items considered by previous filters on the first iteration
+%of the splitjoin, and once at the end of the steady work function, to
+%account for items consumed by other components.
 \protect\label{fig:fission-peek}}
 \end{figure}
 
@@ -281,12 +281,10 @@ We refer to ``horizontal fission'' as the process of distributing a
 single filter across the parallel components of a splitjoin.  We have
 implemented this transformation for ``stateless'' filters--that is,
 filters that contain no fields that are written on one invocation of
-{\tt work} and read on later invocations.  Also, our current
-implementation assumes that the {\tt initWork} function of the filter
-is empty, although this is not fundamental to the algorithm. Let us
-consider such a filter $F$ with steady-state I/O rates of $peek$,
-$pop$, and $push$, that is being parallelized into an $K$-way
-splitjoin.  There are two cases to consider:
+{\tt work} and read on later invocations.  Let us consider such a
+filter $F$ with steady-state I/O rates of $peek$, $pop$, and $push$,
+that is being parallelized into an $K$-way splitjoin.  There are two
+cases to consider:
 \begin{enumerate}
 \item If {\bf $peek = pop$}, then $F$ can simply be duplicated $K$
 ways in the splitjoin (see Figure~\ref{fig:fission-nopeek}).  The
