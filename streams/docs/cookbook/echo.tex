@@ -2,7 +2,7 @@
 
 \begin{lstlisting}{}
 float->float feedbackloop Echo(int n, float f) {
-  join roundrobin;
+  join roundrobin(1,1);
   body FloatAdder();
   loop float->float filter { work pop 1 push 1 { push(pop() * f); } };
   split duplicate;
