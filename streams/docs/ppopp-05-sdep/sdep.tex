@@ -4,6 +4,7 @@
 \newcommand{\tup}[2]{\langle{#1}, {#2}\rangle}
 
 \section{Model of Computation}
+\label{sec:modelofcomp}
 
 %In this section, we describe our model of computation and define the
 %stream dependence function, $\sdep$.
@@ -56,6 +57,7 @@ repeating the pattern).
 %time (note that peeking is not part of CSDF).
 
 \section{Stream Dependence Function}
+\label{sec:sdep}
 
 In this section we formally define the stream dependence function,
 $\sdep$.
@@ -121,6 +123,7 @@ executes before the $n$th execution of $Y$.
 \end{figure*}
 
 \section{Calculating SDEP}
+\label{sec:calc-sdep}
 
 It is straightforward to calculate $\sdepf{A}{B}(n)$ via a
 fine-grained simulation of the stream graph.  Our approach is to
