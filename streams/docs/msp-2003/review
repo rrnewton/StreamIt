@@ -1,0 +1,172 @@
+Date: Tue, 4 Nov 2003 09:52:33 -0500 (EST)
+Message-Id: <200311041452.hA4EqXq13009@yajur.eng.wayne.edu>
+To: thies@mit.edu
+From: vipin@wayne.edu
+Reply-To: vipin@wayne.edu
+Cc: matta_vijay@wayne.edu
+
+Dear William Thies,
+
+thank you for your submission to MSP-5  Workshop.
+
+We are pleased to inform you that your paper
+
+TITLE  : Partitioning a Structured Stream Graph Using Dynamic Programming
+AUTHORS: William Thies, Jasper Lin, Saman Amarasinghe
+
+has been ACCEPTED as a full paper for the final program. Congratulations!!
+
+The review process was extremely selective and many good papers could
+not be included in the final program.
+
+To ensure pre-event proceedings, the camera-ready version of your paper must
+be returned not later than November 11, 2003.
+
+E-mail your Final paper to vipin@wayne.edu
+
+For Camera ready Instructions please visit the homepage http://www.pdcl.eng.wayn
+e.edu/msp5/
+
+We are looking forward to see you at the conference.
+Best Regards
+MSP5 Workshop-Organizing Committee
+
+Best regards
+
+MSP-5 Workshop
+
+------------------------ Reviewers Comments -----------------------------
+
+Reviewers Familiarity:               8
+Evaluation of work and contribution: 7
+Significance to theory and practice: 7
+Originality and novelty:             7
+Relevance for MSP-5  Workshop:               8
+Readability and organization:        8
+Overall recommendation:              7
+
+**(0 = no mark set by reviewer)**
+
+Summary:
+                              This is a very straightforward
+presentation of a dynamic programming algorithm that can be used to do
+efficient stream partitioning.  A relatively new language called
+StreamIt is used to write the algorithm and then the algo is compared
+with a current greedy strategy.  Their new algo has an average 63
+speedup.  The paper is very well written and presented.  The results are
+believable as well.  The only issue that I have is that it is only
+compared to one other algo (a greedy approach) and if there are other
+ones out there for stream partitioning, it would be nice to see a
+comparison with them as well.
+
+Comments to the author:
+
+
+---------------------------------------
+
+Reviewers Familiarity:               8
+Evaluation of work and contribution: 8
+Significance to theory and practice: 7
+Originality and novelty:             8
+Relevance for MSP-5  Workshop:               8
+Readability and organization:        3
+Overall recommendation:              6
+
+**(0 = no mark set by reviewer)**
+
+Summary:
+
+The authors` work on programming languages for streaming applications is
+definitely novel and very interesting, and compiler research into such
+languages is certainly a crucial component in making the language
+feasible and effective.  Unfortunately, the submitted extended abstract
+was too short, and the material too condensed, to make the material
+understandable.  However, based on the authors` previous work, I expect
+that their final paper will prove a significant contribution.
+
+Comments to the author:
+
+
+---------------------------------------
+
+Reviewers Familiarity:               6
+Evaluation of work and contribution: 8
+Significance to theory and practice: 7
+Originality and novelty:             7
+Relevance for MSP-5  Workshop:               9
+Readability and organization:        8
+Overall recommendation:              7
+
+**(0 = no mark set by reviewer)**
+
+Summary:
+
+
+Comments to the author:
+              Summary
+
+The authors present a new dynamic partitioning scheme for load balancing
+on the tiled architecture Raw. The scheme leverages the inherent stream
+structures to perform a variety of graph transformations such as
+horizontal and vertical cuts, fission, fusion etc that split the work
+across N computation elements. A stream whose hash matches that
+of one seen earlier is not transformed again, and the lowest cost
+partition is loaded from a memory table. The results are
+compared with an earlier implemented greedy partitioning algorithm that
+simply fused the two nodes with the least work together. The results are
+presented across a range of Raw tile configurations.
+
+Detailed constructive comments
+
+1. The paper is written concisely and well. It is essentially a self
+contained unit, and all details are presented clearly without any need
+for repetition.
+
+2. It is mentioned in the Results section that the algorithm outperforms
+the greedy partitioning algorithm because it can do fission and fusion
+in the same algorithm. But it is mentioned that the greedy algorithm
+performs fusion. If the greedy algorithm is preceded or followed by a
+method that performs fission, will this scheme still outperform it?
+This could be cleared up in a line or two. (is this the only difference
+between the two ?)
+
+3. Do the partitioning figures depend on the workload offered to the
+filters? For instance, the hash method to recognize a seen
+container loads the previously recorded partition from the memo
+table? Will this necessarily yield the best load balancing if the
+workload offered to the container changes slightly or dramatically? ( I
+notice that the authors mention
+hash of the control flow and
+arithmetic operations
+. in Section 3.3 para 3)
+
+4. The algorithm at the end has several instances where there are calls
+to GetNodeCost or GetCost with 6 arguments, when these methods seem to
+really accept only 2 parameters.
+
+---------------------------------------
+
+Reviewers Familiarity:               4
+Evaluation of work and contribution: 7
+Significance to theory and practice: 7
+Originality and novelty:             6
+Relevance for MSP-5  Workshop:               8
+Readability and organization:        8
+Overall recommendation:              7
+
+**(0 = no mark set by reviewer)**
+
+Summary:
+
+The paper presents a partitioning algorithm that exploits some
+regularities of a structured stream graph to partition for load-balanced
+execution on a parallel target. The algorithm makes use of dynamic
+programming for efficiency, and its comparison to a greedy approach is
+briefly given. It outperforms the greedy approach in a number of cases;
+however, there are some important cases where the greedy algorithm has a
+better performance. Communication costs should have been considered in
+the performance model of the algorithm.
+
+Comments to the author:
+
+---------------------------------------
