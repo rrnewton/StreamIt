@@ -40,16 +40,6 @@ computation of any items that are not needed.  This degree of
 optimization is not possible in frameworks that treat the node as a
 black box.
 
-\subsubsection{Steady-State Invariant Code Motion}
-
-In the streaming domain, the analog of loop-invariant code motion is
-the motion of code from the steady-state epoch to the initialization
-epoch if it does not depend on any quantity that is changing during
-the steady-state execution of a node.  Quantities that the compiler
-detects to be constant during the execution of a work function can be
-computed from the initialization epoch, with the results being passed
-through a feedback loop for availability on future executions of work.
-
 \subsubsection{Fission Transformations}
 
 It may be the case that many of the operations that are grouped within
@@ -64,70 +54,90 @@ dependence between the operations in the SARE.  A scheduling pass
 would treat the real and imaginary operations as if they were written
 in two different nodes to begin with.
 
+\subsubsection{Steady-State Invariant Code Motion}
+
+In the streaming domain, the analog of loop-invariant code motion is
+the motion of code from the steady-state epoch to the initialization
+epoch if it does not depend on any quantity that is changing during
+the steady-state execution of a node.  Quantities that the compiler
+detects to be constant during the execution of a work function can be
+computed from the initialization epoch, with the results being passed
+through a feedback loop for availability on future executions of work.
+
 \subsubsection{Induction Variable Detection}
 
-SAMAN HERE'S HOW FAR I AM
+The work functions and feedback paths of a node could be analyzed as
+would the body of a loop to see if there are induction variables from
+one steady-state execution to the next.  This analysis is useful both
+for strength reduction, which {\it adds} a dependence between
+invocations by converting an expensive operation to a cheaper,
+incremental one, as well as for data parallelization, which {\it
+removes} a dependence from one invocation to the next by changing
+incremental operations on filter state to equivalent operations on
+privatized variables.
 
-The {\tt work} function can also be analyzed as would the body of a loop
-to see if there are induction variables from one steady-state execution
-to the next.  This analysis is useful both for strength reduction, which
-{\it adds} a dependence between invocations by converting an expensive
-operation to a cheaper, incremental one, as well as for data
-parallelization, which {\it removes} a dependence from one invocation to
-the next by changing incremental operations on filter state to
-equivalent operations on privatized variables.
+\subsection{Graph Parameterization}
 
-\subsection{Parameterized Graphs}
+In the scientific community, the SARE representation is specifically
+designed so that a parameterized schedule can be obtained for loop
+nests without having to unroll each loop and schedule each iteration
+independently.  The same should hold true for dataflow graphs.  Often
+there is redundant structure within a graph, such as an N-level
+filterbank.  However, to the best of our knowledge, all scheduling
+algorithms for synchronous dataflow operate only on a fully expanded
+graph (``parameterized dataflow''\cite{Bhatt00} is designed for
+flexible re-initialization, and dynamically schedules an expanded
+version of each program graph.)
 
-Don't need to duplicate code for nodes that are repeated.  Can also
-parameterize the schedule along these dimensions.  Especially
-well-tailored to StreamIt.  Compare to PSDF.
+We believe that parameterized scheduling would be straightforward
+using the polyhedral model to represent the graph.  For future work,
+we plan on implementing such a scheduler in the StreamIt
+compiler~\cite{Gordo02}.  The StreamIt language~\cite{streamitcc} is
+especially well-tailored to this endeavor because it provides basic
+stream primitives that are hierarchical and parameterizable (e.g., an
+N-way SplitJoin structure that has N parallel child streams.)
 
 \subsection{Graph-Level Optimization}
 
-Attractive because there's a unified mathematical model for expressing
-constraints.
-
-\subsubsection{Scheduling}
-
-Perhaps most attractive feature, as there is a large body of work on
-scheduling and automatic parallelization for affine dependences
-(lim/lam, feautrier, darte/vivien etc.)  It can identify what filters
-can run in parallel, and optimize for different metrics
-(synchronization, communication, etc.)  Hasn't been addressed as
-thoroughly in the SDF community.
-
-Also scheduling for other optimization metrics is interesting.
+The SARE representation could also have something to offer with
+regards to the graph-level optimization problems that are already the
+focus of the DSP community.  The polyhedral model is appealing because
+it provides a linear algebra framework that is simple, flexible, and
+efficient.
 
 \subsubsection{Buffer Minimization}
 
-Data buffer size is important to the DSP community.  There's a large
-body of work on minimizing buffer requirements in their community as
-well as in the scientific community.  This lets the results of the
-whole scientific community apply to the dataflow community.
+Storage optimization is one area that both the scientific
+community\cite{Lim01,Quillere,Thies01,Lefebvre98} and the DSP
+community\cite{murt1997x1,GGD94,murt2001x1} have invested a great deal
+of attention.  Both communities have invented schemes for detecting
+live ranges, collapsing arrays across dead locations, and sharing
+buffers/arrays between different statements.  It will be an
+interesting avenue for future work to use the SARE representation of
+dataflow graphs to compare the sets of storage optimization algorithms
+and see what they have to offer to each other.
 
-Not just scheduling - also collapsing, reusing, detecting live ranges,
-sharing buffers, etc.
+\subsubsection{Scheduling}
 
-\subsubsection{Code Size}
+There is a large body of work in the scientific community regarding
+the scheduling of SARE's~\cite{DRV00}.  While they have not faced the
+same constrains on code size as the embedded domain, there are
+characteristics of affine schedules that could provide new directions
+for DSP scheduling algorithms.  For instance, when solving for an
+affine schedule, one can obtain a schedule that places a statement
+within a loop nest but only executes it conditionally for certain
+values of the enclosing loop bounds.  To the best of our knowledge,
+the single appearance schedules in the DSP community have never had
+this notion of conditional execution, perhaps because it represents a
+much larger space of schedules to consider.  It is possible that an
+affine schedule, then, would give a more flexible solution when code
+size is the critical issue.  
 
-Cody size is also very important.  While this has perhaps received
-less attention in the context of SARE's, there are interesting
-advantages that affine scheduling could offer to the DSP community.
-For instance, most DSP schedules abide by a ``single appearance
-schedule'' where the execution of each filter is in a perfect loop
-nest.  However, often times an affine schedule will lead to a case
-where a filter is nested in a given loop, but only executes on every
-other invocation; it's execution is governed by a conditional.  To our
-knowledge, this kind of schedule hasn't been explored by the DSP
-community, and could be promising.
-
-Also not just scheduling - how do you arrange things.
-
-\subsubsection{Partitioning}
-
-Provides a good framework for distributing a streaming computation
-across an architecture.
+Also, there are a number of sophisticated parallelization algorithms
+(e.g.,Lim and Lam~\cite{Lim01}) that could extract high performance
+from dataflow graphs.  It will be an interesting topic for future work
+to see how they compare with the scheduling algorithms currently in
+use for dataflow graphs.
 
 %% \subsection{Verification}
 
