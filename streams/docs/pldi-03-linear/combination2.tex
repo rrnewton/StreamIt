@@ -60,17 +60,20 @@ $u'$-element row vector:
 \vspace{-6pt} \\
 \begin{equation} \nonumber
 \begin{array}{rcl}
-\mathbf{A'}[i,j] & = & \mt{even}(i,j) ~\mt{if}~ (j \ge u'~\mt{mod}~u) \\
-~ & = & \mt{even}(i+o, j+u'~\mt{mod}~u) ~\mt{otherwise} \\ ~ \vspace{-4pt} \\
+\multicolumn{3}{l}{\mt{shift}(r,c) ~\mt{is a}~ u' \times e' ~\mt{matrix}:} \\
+\multicolumn{3}{l}{\parbox{3in}{
+    \begin{equation} \nonumber
+    \mt{shift}(r,c)[i,j] = \left\{
+      \begin{array}{l}
+	A[i-r,j-c] \\
+	~~~~~~\mt{if}~ i-r \in [0,e] \wedge j-c \in [0, u] \\
+	~ 0 \mt{~otherwise}
+      \end{array}
+      \right.
+    \end{equation}
+}} \\ ~ \vspace{-6pt} \\
 %
-\mt{even}(k)& = & \sum_{m=0}^{\lfloor u' / u \rfloor}
-\mt{shift}(u'- u -m*u, \\
-~ & ~ & ~ \hspace{0.68in}~ e'-e-m*o) \\ ~ \vspace{-4pt} \\
-%
-\multicolumn{3}{l}{\mt{shift}(r,c) ~\mt{is a}~ u' \times e' ~\mt{matrix}:} \\ ~ \vspace{-8pt} \\
-\mt{shift}(r,c)[i,j] & = & A[i-r,j-c] \\
-~ & ~ & ~~~~~\mt{if}~ i-r \in [0,e] \wedge j-c \in [0, u] \\
-~ & = & 0 \mt{~otherwise} \\ \vspace{-4pt} \\
+\mathbf{A'} & = & \sum_{m=0}^{\lceil u' / u \rceil} \mt{shift}(u'- u -m*u, e'-e-m*o) \\ ~ \vspace{-4pt} \\
 %
 \mathbf{b'}[j] & = & b[u-1-(u'-j-1)~\mt{mod}~u]
 %%
@@ -142,29 +145,31 @@ $\mathbf{ \{A', b', e', o', u'\}}$ represents an equivalent node that
 can replace the original two.  Its components are as follows: \\
 \begin{equation} \nonumber
 \begin{array}{rcl}
-L & = & \mt{lcm}(u_1, o_2) \\
-\lambda_1^e & = & \mt{expand}(\lambda_1, \frac{o_1 * L}{u_1} + e_1 - o_1, 
-\frac{o_1 * L}{u_1}, L+e_2-o_2) \\
-\lambda_2^e & = & \mt{expand}(\lambda_2, L+e_2-o_2, L, \frac{u_2 * L}{o_2}) \\
-\mathbf{A'} & = & A_1^e A_2^e \\
-\mathbf{b'} & = & b_1^e A_2^e + b_2^e \\
-\mathbf{e'} & = & e_1^e \\
-\mathbf{o'} & = & o_1^e \\
+\mt{chanPop} & = & \mt{lcm}(u_1, o_2) \\ ~ \vspace{-8pt} \\
+\mt{chanPeek} & = & \mt{chanPop} + e_2 - o_2 \\ ~ \vspace{-8pt} \\
+\lambda_1^e & = & \mt{expand}(\lambda_1, \mt{chanPeek} * \frac{o_1}{u_1} + e_1 - o_1, \\
+~ & ~ & ~\hspace{0.32in}~ \mt{chanPop} * \frac{o_1}{u_1}, \mt{chanPeek}) \\ ~ \vspace{-8pt} \\
+\lambda_2^e & = & \mt{expand}(\lambda_2, \mt{chanPeek}, \\
+~ & ~ & ~\hspace{0.32in}~ \mt{chanPop}, \mt{chanPop} * \frac{u_2}{o_2}) \\
+\mathbf{A'} & = & A_1^e A_2^e \\ ~ \vspace{-8pt} \\
+\mathbf{b'} & = & b_1^e A_2^e + b_2^e \\ ~ \vspace{-8pt} \\
+\mathbf{e'} & = & e_1^e \\ ~ \vspace{-8pt} \\
+\mathbf{o'} & = & o_1^e \\ ~ \vspace{-8pt} \\
 \mathbf{u'} & = & u_2^e
 \end{array}
 \end{equation}
 \end{transformation}
 
-It is straightforward to derive the equations above.  Let $x_i$ and
-$y_i$ be the input and output channels, respectively, for $\lambda_i$.
-Then we have by definition that $y_1 = x_1 A_1 + b_1$ and $y_2 = x_2
-A_2 + b_2$.  But since $\lambda_1$ is connected to $\lambda_2$, we
-have that $x_2 = y_1$ and thus $y_2 = y_1 * A_2 + b_2$.  Substituting
-the value of $y_1$ from our first equation gives $y_2 = x_1 A_1 * A_2
-+ b_1 A_2 + b_2$.  Thus, the intuition is that the two-filter sequence
-can be represented by matrices $A' = A_1 * A_2$ and $b' = b_1 A_2 +
-b_2$, with peek and pop rates borrowed from $\lambda_1$ and the push
-rate borrowed from $\lambda_2$.
+The basic forms of the above equations are simple to derive.  Let
+$x_i$ and $y_i$ be the input and output channels, respectively, for
+$\lambda_i$.  Then we have by definition that $y_1 = x_1 A_1 + b_1$
+and $y_2 = x_2 A_2 + b_2$.  But since $\lambda_1$ is connected to
+$\lambda_2$, we have that $x_2 = y_1$ and thus $y_2 = y_1 A_2 + b_2$.
+Substituting the value of $y_1$ from our first equation gives $y_2 =
+x_1 A_1 A_2 + b_1 A_2 + b_2$.  Thus, the intuition is that the
+two-filter sequence can be represented by matrices $A' = A_1 * A_2$
+and $b' = b_1 A_2 + b_2$, with peek and pop rates borrowed from
+$\lambda_1$ and the push rate borrowed from $\lambda_2$.
 
 However, there are two implicit assumptions in the above analysis
 which complicate the equations for the general case.  First, the
@@ -183,30 +188,29 @@ representation.  To deal with this issue, we adjust the expanded form
 of $\lambda_1$ to recalculate items that $\lambda_2$ uses more than
 once, thereby trading computation for storage space.  This adjustment
 is evident in the push and pop rates chosen for $\lambda_1^e$: though
-$\lambda_1$ pushes $\frac{u_1}{o_1}$ for every item that it pops, for
-$\lambda_1^e$ this ratio is $\frac{u_1^e}{o_1^e}$ $=$
-$\frac{L+e_2-o_2}{o_1 * L / u_1}$ $=$
-$(\frac{u_1}{o_1})(\frac{L+e_2-o_2}{L})$, which is larger due to the
-$e_2-o_2$ items that are regenerated for consumption by $\lambda_2$.
+$\lambda_1$ pushes $u_1$ items for every $o_1$ items that it pops,
+$\lambda_1^e$ pushes $\mt{chanPeek}*u_1$ for every $\mt{chanPop}*o_1$
+that it pops.  When $\mt{chanPeek}>\mt{chanPop}$, this means that the
+outputs of $\lambda_1^e$ are overlapping, and
+$\mt{chanPeek}-\mt{chanPop}$ items are being regenerated on every
+firing.
 
 Note that although $\lambda_1^e$ performs duplicate computations in
-the case where $\lambda_2$ is peeking, this redundancy disappears in
-the collapsed node $\mt{pipe}(\lambda_1, \lambda_2)$ because
-overlapping operations are combined in the matrix multiplication.  One
-way to see this is that the dimensions of the matrix $A'$ are
-independent of $e_2$, the peek rate of $\lambda_2$.  That is, $A'$ has
-$e'$ $=$ $e_1^e$ $=$ $\frac{o_1*\mt{lcm}(u_1, o_2)}{u_1}+e_1-o_1$ rows
-and $u'$ $=$ $u_2^e$ $=$ $\frac{u_2 * \mt{lcm}(u_1, o_2)}{o_2}$
-columns; neither of these expressions depends on $e_2$.
+the case where $\lambda_2$ is peeking, this computation cost can be
+amortized by increasing the value of $\mt{chanPop}$.  That is, though
+the equations set $\mt{chanPop}$ as the {\it least} common multiple of
+$u_1$ and $o_2$, any common multiple is legal.  As $\mt{chanPop}$
+grows, the regenerated portion $\mt{chanPeek}-\mt{chanPop}$ becomes
+smaller on a percentage basis.
 
-However, it is the case that a collapsed linear node can be less
-efficient than the original pipeline sequence.  The worst case is when
-$A_1^e$ is a column vector and $A_2^e$ is a row vector, which requires
-$O(n)$ operations originally but $O(n^2)$ operations if combined
-(assuming the vectors are of length $n$).  In general, the compiler
-can identify performance-degrading combinations when the number of
-non-zero elements in $A'$ exceeds the sum of non-zero elements in
-$A_1^e$ and $A_2^e$.
+However, it is the case that some collapsed linear nodes are always
+less efficient than the original pipeline sequence.  The worst case is
+when $A_1^e$ is a column vector and $A_2^e$ is a row vector, which
+requires $O(n)$ operations originally but $O(n^2)$ operations if
+combined (assuming the vectors are of length $n$).  In general, the
+compiler can identify performance-degrading combinations when the
+number of non-zero elements in $A'$ exceeds the sum of non-zero
+elements in $A_1^e$ and $A_2^e$.
 % ARE WE SURE THAT LAST SENTENCE IS TRUE?  I think it's more complicated 
 % when the pop/peek rate is varied, etc.
 
@@ -282,9 +286,9 @@ mathematical terms.
 Given a splitjoin $s$ containing a duplicate splitter, children that
 are linear nodes $\lambda_0 \dots \lambda_{n-1}$, and a roundrobin
 joiner with weights $w_0 \dots w_{n-1}$, the combination $\mbox{\bf
-splitjoin}(s)$ $=$ $\mathbf{ \{A', b', e', o', u'\}}$ represents an
-equivalent node that can replace the entire stream $s$.  Its
-components are as follows: \\
+splitjoin}(s)$ $=$ $\mathbf{ \{A',}$ $\mathbf{b',}$ $\mathbf{e',}$
+$\mathbf{o',}$ $\mathbf{u'\}}$ represents an equivalent node that can
+replace the entire stream $s$.  Its components are as follows: \\
 \begin{equation} \nonumber
 \begin{array}{rcl}
 \mt{joinRep} & = & \mt{lcm}(\frac{\mt{lcm}(u_1,w_1)}{w_1}, \dots, \frac{\mt{lcm}(u_n,w_n)}{w_n}) \\
@@ -380,17 +384,17 @@ linear child nodes $\mathbf{\lambda_0'} \dots
 are computed as follows: \\
 \begin{equation} \nonumber
 \begin{array}{rcl}
-\mt{wSum}_k & = & \sum_{i=0}^{k-1} w_i \\ ~ \vspace{-6pt} \\
-\mt{wTot} & = & \mt{wSum}_{n-1} \\ ~ \vspace{-4pt} \\
+\mt{vSum}_k & = & \sum_{i=0}^{k-1} v_i \\ ~ \vspace{-6pt} \\
+\mt{vTot} & = & \mt{vSum}_{n-1} \\ ~ \vspace{-4pt} \\
 \multicolumn{3}{l}{\forall k \in [0, n-1]:} \\ ~ \vspace{-12pt} \\ 
 \multicolumn{3}{l}{\parbox{3in}{
     \begin{equation} \nonumber
       \begin{array}{l}
-      ~~~~\mt{decimate}[k] ~\mt{is a linear node}~ \{A, \vec 0, \mt{wTot}, \mt{wTot}, \mt{wTot}\} \\
+      ~~~~\mt{decimate}[k] ~\mt{is a linear node}~ \{A, \vec 0, \mt{vTot}, \mt{vTot}, \mt{vTot}\} \\
 	~~~~~~~\mt{where}~A[i,j] = \left\{
 	\begin{array}{l}
 	  1 ~\mt{if}~ i=j ~\wedge~ \\ 
-	  ~\hspace{0.13in}~ wSum_{k} < i < wSum_{k+1} \\
+	  ~\hspace{0.13in}~ vSum_{k} < i < vSum_{k+1} \\
 	  0 ~\mt{otherwise}
 	\end{array}
 	\right.
