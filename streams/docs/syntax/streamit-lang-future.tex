@@ -1,0 +1,136 @@
+\section{Future Changes}
+
+This section describes features that may appear in future versions of
+StreamIt.
+
+\subsection{Additional Primitive Types}
+
+Support for characters and strings is somewhat uncertain.  There is no
+particular use for a character primitive type in StreamIt at the
+moment, though a byte type may be useful for reading in files.
+Strings may be useful for debugging code, and for file name parameters
+to file reader and writer objects.
+
+\subsection{Parameterized Types}
+
+StreamIt should allow parameterized types, using a syntax similar to
+C++'s \lstinline|template| construct.  For example, one might write:
+
+\begin{lstlisting}{}
+template<T> T->T filter Duplicate {
+  work pop 1 push 2 {
+    T val = pop();
+    push(val);
+    push(val);
+  }
+}
+\end{lstlisting}
+
+Then \lstinline|Duplicate<int>| would be a stream type that duplicates
+integers.
+
+There is some disagreement on how to implement array types.  The
+language currently accepts \lstinline|int[N]->int[N] filter Name(int N)| to
+have a specified-length array.  It may be better to use a template
+construct for this, though then value parameters can appear in two
+different places in the code.
+
+\subsection{Helper Packages}
+
+It is entirely conceivable that the programmer might want to write a
+set of stateless helper functions that can be used in multiple
+filters.  For example, the GSM encoder we have now uses the C
+preprocessor to include a set of functions to perform 16-bit
+arithmetic.  Syntax for this functionality does not yet exist, though
+we may create a \lstinline|static| keyword:
+
+\begin{lstlisting}{}
+static MyHelpers {
+  int square(int x) { return x * x; }
+}
+int->int filter SquareIt {
+  work pop 1 push 1 { push(MyHelpers.square(pop())); }
+}
+\end{lstlisting}
+
+\subsection{Messaging Extensions}
+
+Future versions of StreamIt may have two extensions to the existing
+messaging system.  First, an \emph{interface}, much like a Java
+interface, may be declared, and filters may declare that they
+implement an interface.  Then a portal to an interface type may be
+declared, and filters of any implementing type may be added.  Second,
+we may lift the restriction that only filters may receive messages.
+
+\subsection{Reinitialization}
+
+We might occasionally want to change parts of the stream graph at
+runtime, or to change the static parameters of the program.  This is a
+major effort the way StreamIt code is currently constructed.  The CC
+paper proposed sending an \lstinline|init| message through a portal to
+perform reinitialization; this would result in the targets'
+\lstinline|init| functions being re-run.
+
+This is simple enough for filters, though some state in the filter may
+be lost that reinitialization would want to be preserved.  What
+happens for composite streams, though?  Are their children destroyed
+and reborn, or are individual children added and removed?  What syntax
+is necessary for this?
+
+\subsection{Variable Rates}
+
+Certain types of applications, such as those involving compression
+algorithms, do not have a fixed ratio of outputs to inputs.  StreamIt
+does not currently support variable rates.  The current proposal is
+that variable rates will be accomodated by phased filters: one phase
+reads the input, and then runs another phase for a certain number of
+executions that writes the output, with the number of executions being
+variable.
+
+It is still possible that dedicated syntax for variable rates will be
+added.  This will likely accomodate bounds on the I/O rates of the
+filter, since a filter might read four bytes of input and produce
+between two and sixteen bytes of output; having this information can
+assist the scheduler.
+
+\subsection{Static Control Flow and Dynamic Phases}
+
+This document should contain a discussion of the notion of
+\emph{static control flow}.  This is essentially a requirement that
+the path through a given control flow graph is determinable at compile
+time; loops can be fully unrolled, and every branch can be
+determined.  This extends the concept of compile-time constancy
+already covered.
+
+This would allow us to refine the current description of phases.  In
+particular, we want the current phase specification to be entirely
+specified by static control.  As a future extension, the control flow
+can be dynamic, to allow data-dependent phase execution.  This can be
+used to implement some forms of dynamic-rate filters.  For example:
+
+\begin{lstlisting}{}
+// Format: #reps, #bytes, data
+byte->byte filter RLEExpand {
+  byte data[256];
+  int reps, count;
+  work {
+    readReps();
+    readCount();
+    for (int i = 0; i < count; i++)
+      readData(i);
+    for (int i = 0; i < reps; i++)
+      writeData(count);
+  }
+  phase readReps pop 1 { reps = pop(); }
+  phase readCount pop 1 { count = pop(); }
+  phase readData(int pos) pop 1 { data[pos] = pop(); }
+  phase writeData() push count {
+    for (int i = 0; i < count; i++)
+      push(data[i]);
+  }
+}
+\end{lstlisting}
+
+Note that the number of executions of the \lstinline|readData| and
+\lstinline|writeData| phases are data-dependent, as is the
+\lstinline|push| rate of \lstinline|writeData|.
