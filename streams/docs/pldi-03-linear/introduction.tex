@@ -36,6 +36,122 @@ We can then leverage the existing work on DSP algorithm optimization to perform 
 at a fairly sophisticated level. Our system lets programmers describe the
 computation to be performed at an appropriate level and the compiler takes care of 
 
+\subsection{Motivating Example}
+\begin{figure}
+\epsfxsize=2.0in
+\epsfbox{images/motivating-example.eps}
+\begin{verbatim}
+float data[N]; /* input data buffer */
+float buffer[N]; /* inter-filter buffer */
+
+/* initialize inter-filter buffer */
+for (i=0; i<N; i++) {
+  /* filter starting at index i of input data, wrap around */
+  buffer[i] = filter(weights1, data, i, N);
+  data[i] = get_next_input();
+}
+
+i = 0;
+while(true) {
+  push_output(filter(weights2, buffer, i, N));
+  /* get next data item */
+  data[i] = get_next_input();
+  /* generate the next element in the inter filter buffer */
+  buffer[i] = filter(weights1, data, i, N);
+  /* update current start of buffer */
+  i = (i+1)%N
+}
+\end{verbatim}
+\caption{FIR filtering with back to back filters in {\tt C}. Note the use of circular buffers.}
+\label{fig:motivating-example}
+\end{figure}
+
+As an example of the types of program transformation that our optimization allows,
+consider a sequence of finite impulse response (FIR) filters as shown in 
+Figure~\ref{fig:motivating-example}. The imperative {\tt C} style code that implements
+this simple DSP application is also shown. The program largely defies many
+standard compiler analysis and optimization techniques because of its use of circular
+buffers and the muddled relationship between {\tt data}, {\tt buffer} and the output.
+
+\begin{figure}
+\begin{verbatim}
+float->float pipeline TwoPipe {
+  add FIRFilter(weights1);
+  add FIRFilter(weights2);
+}
+
+float->float filter FIRFilter(float[N] weights) {
+  work push 1 pop 1 peek N {
+    float sum = 0;
+    for (int i=0; i<N; i++) {
+      sum += weights[i] * peek(i);
+    }
+    push(sum);
+    pop();
+}
+\end{verbatim}
+\caption{StreamIt program to implement the same processing as the program in Figure~\ref{fig:motivating-example}}
+\label{fig:example-streamit}
+\end{figure}
+
+
+Figure~\ref{fig:example-streamit} shows the same filtering process implemented in 
+StreamIt. The StreamIt program is better because it uses explicit input/output channels,
+lets the compiler worry about buffer management and shows the structure of the original
+block diagram. 
+
+
+\begin{figure}
+\begin{verbatim}
+float->float filter LinearTwoPipe() {
+  work push 1 pop 1 peek N {
+    float sum = 0;
+    for (int i=0; i<N; i++) {
+      sum += combined_weights[i]*peek(i);
+      }
+    push(sum);
+    pop();
+  }
+}
+\end{verbatim}
+\caption{Program after combination in psuedo-StreamIt.}
+\label{fig:example-combine}
+\end{figure}
+
+Our data analysis provides a complete relationship between input and output for
+each filter, and furthermore can combine the actions of the two filters as shown
+in Figure~\ref{fig:example-combine}. The new combined filter's {\tt combined\_weights}
+array contains elements such that the overall output is the same.
+
+\begin{figure}
+\begin{verbatim}
+float->float filter FreqTwoPipe() {
+  complex[N] H;
+  init {
+    H = FFT(combined_weights);
+  }
+  work push L pop L peek N+L {
+    float[N] X = FFT(peek(0..N+L-1)); /* input FFT */
+    float[N] Y =  X .* H; /* elementwise mult */
+    float[N] y = IFFT(Y); /* inverse FFT */
+    push(y[0..L-1]); /* push first L elts of y */
+  }
+}
+\end{verbatim}
+\caption{Program after using the FFT to implement the filter in psuedo-StreamIt.}
+\label{fig:example-frequency}
+\end{figure}
+
+Out compiler can actually go one step farther and apply a well known 
+optimization to calculate the output values using a frequency transformation
+as is outlined in psuedo code in Figure~\ref{fig:example-frequency}.
+
+
+
+
+
+
+
 
 \subsection{StreamIt}
 
