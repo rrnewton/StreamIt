@@ -1,0 +1,175 @@
+Return-Path: <start@popl03.cs.cornell.edu>
+Received: from fort-point-station.mit.edu by po10.mit.edu (8.9.2/4.7) id GAA23218; Tue, 1 Oct 2002 06:02:06 -0400 (EDT)
+From: <start@popl03.cs.cornell.edu>
+Received: from popl03.cs.cornell.edu (popl03.cs.cornell.edu [128.84.154.87])
+	by fort-point-station.mit.edu (8.9.2/8.9.2) with ESMTP id GAA13190
+	for <thies@mit.edu>; Tue, 1 Oct 2002 06:02:06 -0400 (EDT)
+Received: (from start@localhost)
+	by popl03.cs.cornell.edu (8.11.6/8.11.6) id g919xDk29176;
+	Tue, 1 Oct 2002 05:59:13 -0400
+Date: Tue, 1 Oct 2002 05:59:13 -0400
+Message-Id: <200210010959.g919xDk29176@popl03.cs.cornell.edu>
+To: thies@mit.edu
+Subject: Your POPL03 paper #99
+Reply-To: jgm.cornell.edu@popl03.cs.cornell.edu
+
+Dear William Thies:
+
+Please find enclosed below your referee reports for the paper:
+
+      Phased Computation Graphs in the Polyhedral Model
+
+ 
+If you have any additional questions, please feel free to get in touch.
+
+Best Regards,
+Greq Morrisett, 
+POPL03 
+
+
+============================================================================ 
+POPL03 Reviews for Paper #99
+============================================================================ 
+
+Title: Phased Computation Graphs in the Polyhedral Model
+
+Authors: William Thies, Jasper Lin, and Saman Amarasinghe
+
+============================================================================ 
+
+REVIEWER #1
+============================================================================ 
+
+Numerical Scores:
+
+     appropriateness: 4
+     originality: 2
+     tech_strength: 2
+     presentation: 3
+     overall: 2
+
+
+Comments:
+
+The authors propose to optimize a variation of synchronous dataflow
+graphs by generating a system of affine equations from the dataflow
+graph, and then optimizing and scheduling the system of affine
+equations using techniques that are well-known in the compiler
+community.
+
+There is a certain irony in taking this approach. 
+
+The restructuring compiler algorithms that the authors propose to use
+(such as Feautrier's scheduling algorithm, linear loop
+transformations, etc.) are actually based on algorithms developed much
+earlier in the systolic array community by people like Kung and
+Moldovan. See for example S.Y Kung's book on systolic arrays. The main
+difference is that the compiler algorithms start with computations
+expressed as FOR-loops while the systolic array community started with
+computations expressed as dataflow graphs whose meaning was specified
+formally using recurrence equations. We have known since Landin's work
+that there is a close connection between FOR-loops and stream
+(recurrence) computations, so it is not surprising that optimizing
+algorithms that worked well for dataflow graphs and recurrence
+equations also work well for FOR-loop computations.
+
+Judging from the references, the authors of this paper seem unaware of
+this history, so they now propose to transfer this technology back
+again to the systolic array (reborn as "phased computation graph")
+community!
+
+In principle, it is possible that the compiler community has improved
+on the systolic array algorithms, in which case this reverse tech
+transfer has a point. Feautrier's "multi-dimensional time" scheduling
+algorithm for example is an improvement over the "one-dimensional
+time" scheduling algorithms already known in the systolic array
+community. However, the authors seem unaware of this historical
+background, so they do not say why their techniques are better.
+
+I would also expect a paper such as this to have experimental numbers
+that argue for the superiority of the proposed approach. No numbers
+are given, so it is impossible to know whether the proposed
+optimizations have any practical utility.
+
+In short, the approach proposed in the paper has the flavor of
+"carrying coals to Newcastle", and if there is indeed a point to doing
+this, it is not clear how important it is.
+
+I would encourage the authors to resubmit a paper after these two
+issues have been addressed.
+
+============================================================================
+REVIEWER #2
+============================================================================ 
+
+Numerical Scores:
+
+     appropriateness: 4
+     originality: 3
+     tech_strength: 2
+     presentation: 2
+     overall: 3
+
+
+Comments:
+
+Title: Phase Computation Graphs in the Polyhedral Model Author:
+William Thies, Jasper Lin and Saman Amarasinghe
+
+This paper describes an approach for translating synchronous dataflow
+graphs to a framework of the polyhedral model.  The benefit is that
+the resulting system of affine equations can then be optimized using
+the slew of transformations developed for this domain.
+
+I think the proposed approach makes sense and certainly the DSP
+community is struggling with techniques to automatically produce
+"production-quality code".  The big question, which this paper hasn't
+answered, is does the approach actually work.  As presented, the paper
+describes a paper design.  The only way to evaluate the approach is
+via an implementation and gain some practical experience.
+
+It's not clear to me what the programmer will write.  Will they
+write standard code, MATLAB, or some other language?  What's the
+computation model the programmer has to deal with?  Probably
+an example would have been helpful.
+
+============================================================================
+REVIEWER #3
+============================================================================ 
+
+Numerical Scores:
+
+     appropriateness: 4
+     originality: 4
+     tech_strength: 3
+     presentation: 3
+     overall: 3
+
+
+Comments:
+
+This paper shows how to convert an architectural model of computation,
+phased computation graphs (PCG), into a control oriented model of
+computation, system of affine recurrence equations (SARE). PCGs are
+general in the sense that nodes can consume inputs at different rates,
+input channels may be peeked at without being consumed, and a
+computation at a node is permitted to have several stages. SAREs are
+well understood in scientific computing, and have some maturity with
+respect to optimization techniques. The paper concludes with a
+discussion of the new optimization opportunities that the
+transformation avails. The translation is presented in good
+detail. The applications are outlined in broad terms.
+
+Regarding the translation, it must be at least somewhat similar to
+what compilers for synchronous languages use. Any comparison to
+related work? 
+
+Also the translation is subtle: a small mistake here and there would
+cause deadlocks or buffer overflows. Any attempt to formalize it and
+prove any of its properties.
+
+Finally the translation itself is just a means to an end: apply
+optimizations. But unfortunately the section on applications is rather
+speculative and preliminary.
+
+============================================================================
