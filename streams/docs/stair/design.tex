@@ -2,13 +2,14 @@
 
 \usepackage{cite}
 \usepackage[margin=1in]{geometry}
-\usepackage{palatino}
+\usepackage{mathpple}
 \usepackage{url}
 
 % Abstract formatting:
 \def\class#1{\texttt{#1}}
 
 % Print acronyms in small caps.
+\def\cfg{\textsc{cfg}}
 \def\dsp{\textsc{dsp}}
 \def\fortran{\textsc{fortran}}
 \def\ir{\textsc{ir}}
@@ -23,10 +24,12 @@
 \def\Ssa{\textsc{Ssa}}
 \def\stair{\textsc{stair}}
 \def\Stair{\textsc{Stair}}
+\def\streamit{Stream\-It}
 \def\suif{\textsc{suif}}
 \def\Suif{\textsc{Suif}}
 \def\suifvm{\texttt{suifvm}}
 \def\vliw{\textsc{vliw}}
+\def\vm{\textsc{vm}}
 \def\xml{\textsc{xml}}
 \def\Xml{\textsc{Xml}}
 \def\machsuif{Machine \suif}
@@ -36,8 +39,8 @@
 
 \hyphenation{op-er-and op-er-ands}
 
-\title{\Stair: StreamIt Target Architecture Intermediate
-  Representation\\Design}
+\title{Design of \Stair: StreamIt Target Architecture Intermediate
+  Representation}
 \author{David Maze\\\dmazemail}
 
 \begin{document}
@@ -47,27 +50,27 @@
 
 \section{Motivation}
 
-StreamIt is a language for programs that process continuous streams of
-input data, including audio processors and other signal-processing
+\streamit{} is a language for programs that process continuous streams
+of input data, including audio processors and other signal-processing
 applications.  For familiarity with students working on the project,
-StreamIt uses the Kopi compiler\cite{kopi} as its base; this was the
-only available Java compiler written in Java.  However, Kopi's only
-``backend'' is for Java bytecode, and this is deeply twisted into the
-innards of the compiler.  StreamIt's two existing backends, for
+\streamit{} uses the Kopi compiler\cite{kopi} as its base; this was
+the only available Java compiler written in Java.  However, Kopi's
+only ``backend'' is for Java bytecode, and this is deeply twisted into
+the innards of the compiler.  \streamit's two existing backends, for
 uniprocessor machines and \mit's \raw{} architecture, both work by
 generating C code and using a native compiler.
 
-The StreamIt group plans to extend the compiler to a number of
+The \streamit{} group plans to extend the compiler to a number of
 different architectures.  These include the low-power \mit{} \scale{}
 project, Stanford's Imagine chip, and an off-the-shelf \dsp.  To make
 effective use of these processors' features, a native-code backend is
 required; for example, both \scale{} and Imagine have \vliw{} modes,
-and the StreamIt compiler can add parallelism by unrolling or fusing
+and the \streamit{} compiler can add parallelism by unrolling or fusing
 filters in ways that a C compiler might not be able to figure out.
 
 This document describes \stair, a proposed system for writing generic
-backends to the StreamIt compiler.  \Stair{} follows in the spirit of
-\machsuif\cite{machsuif}, but is written in Java as a standalone
+backends to the \streamit{} compiler.  \Stair{} follows in the spirit
+of \machsuif\cite{machsuif}, but is written in Java as a standalone
 component to avoid several workarounds required by the C++ language
 and the \suif~2 core.
 
@@ -113,7 +116,7 @@ accomodate.
 
 \begin{enumerate}
 \item \textbf{Input.}  \Stair{} is immediately intended for
-  use by StreamIt, and may have features specific to StreamIt.
+  use by \streamit, and may have features specific to StreamIt.
   However, the design should not preclude a Java-to-native compiler
   based on Kopi, or more ambitiously, a Java-based C compiler.
 \item \textbf{Outputs.}  \Stair{} should be able to generate
@@ -146,13 +149,15 @@ accomodate.
   convenient and somewhat standard way of doing this.  The world
   likely contains browsers for \xml{} and Java tools to generate
   \xml{} for us, which saves some work.
-\item \textbf{Single static assignment form.}  \Ssa{} form is useful for
-  a reasonable number of algorithms; in particular, constant and copy
-  propagation and dead code elimination become trivial after \ssa{} is
-  run.  \Ssa{} has also become recently available as an add-on for
-  \machsuif.  Base \ir{} support for \ssa{} should be included in \stair;
-  however, always using \ssa{} adds some overhead, since the \ssa{}
-  information needs to be recalculated if the \ir{} changes.
+\item \textbf{Single static assignment form.}  \Ssa{} form is useful
+  for a reasonable number of algorithms; in particular, constant and
+  copy propagation and dead code elimination become trivial after
+  \ssa{} is run.  Base \ir{} support for \ssa{} should be included in
+  \stair; however, always using \ssa{} adds some overhead, since the
+  \ssa{} information needs to be recalculated if the \ir{} changes.
+  Passes are not required to use the \ssa{} information; passes that
+  do need it must call a function to ensure that the annotations are
+  valid.
 \item \textbf{Data-flow engine.}  One noticable lack in the existing
   StreamIt infrastructure is a generic data-flow engine.  Given a
   portable \ir{} based on a control-flow graph, this should be easy to
@@ -218,6 +223,28 @@ code; this implementation requires a class per opcode, where
 The \machsuif{} model could actually be implemented with a single
 \class{Generic\-Opcode} class that deferred questions to the backend,
 so long as glue was provided to create the singleton objects.
+
+\subsection{Input Virtual Machine}
+
+Code from earlier stages of the compiler is translated into code for a
+virtual machine.  This \vm{} has a fixed set of opcodes and a standard
+\class{Backend} object.  Machine-independent optimizations and
+transformations can happen on this ``target'', which is then converted
+into \ir{} specialized for the real target machine.
+
+Some \class{Opcode} objects in the \vm{} can actually be shared across
+all architectures.  For example, \ssa{} requires an instruction for
+$\phi$-nodes at join points; since this does not correspond to a real
+machine instruction, it does not need to be specialized for particular
+targets.  Similarly, flat code requires labels for branch targets,
+which are target-independent.
+
+By default, the \vm{} code is as simple as possible.  High-level
+constructs such as array and field references may be present, and the
+code is unpredicated.  This does not mean that the \vm{} code will
+always have this form; a generic pass to perform predication before
+specialization would be useful on multiple architectures, and
+array dismantling can happen in the \vm{} to encourage code reuse.
 
 \section{Classes}
 
@@ -286,13 +313,17 @@ Useful operands can be classified:
   immediates, and possibly character and string immediates too (though
   a character is conventionally an integer and a string initialized
   data).
-\item \textbf{Variables.}  They probably come by reference to a symbol
-  table.  Variable references as operands have an integer for the \ssa{}
-  index within the current function.
-\item \textbf{Registers.}  \machsuif's hard/virtual register
-  distinction is useful; however, a virtual register is really just a
-  special sort of anonymous variable.  ``Register'' should be reserved
-  for a physical register.
+\item \textbf{Registers.}  A ``register'' in this context is either a
+  physical machine register or something that could be allocated to
+  one.  This includes most cases of local variables.  A register can
+  be ``hard'' or ``virtual'', as in \machsuif.  A register has an
+  \ssa{} label, a types , and an optional pointer to a symbol object.
+\item \textbf{Array and field references.}  If a register contains a
+  pointer to an array or structure object, code may access an element
+  of the array or structure directly as an operand.  This will
+  probably need to be dismantled eventually, but the high-level
+  information can be useful for architecture-independent passes and to
+  minimize confusion about aliasing.
 \item \textbf{Addresses.}  Addresses can be complicated.  The simplest
   case is ``address of variable'', but a machine can have arbitrarily
   complicated hardware-supported addresses.  For example, on a 6502:
@@ -314,31 +345,21 @@ STA (Y,2)
 Most of these have completely different contents, but we also want to
 avoid descending into class-hierarchy hell.  Nevertheless, as an
 immediate proposal, classes \class{Operand}, \class{Int\-Immediate},
-\class{Float\-Immediate}, \class{Variable}, \class{Register},
-\class{Address\-Of}, \class{Contents\-Of}, and
-\class{Composite\-Address} supply the list of operands here.
+\class{Float\-Immediate}, \class{Register}, \class{Address\-Of},
+\class{Contents\-Of}, and \class{Composite\-Address} supply the list
+of operands here.
 
 A composite-address operand is a little tricky to use.  The intent is
 that it only be used where it corresponds to a real machine
 instruction.  This means that code like \verb|A[4]=6| for an integer
-array would get translated into VM code
+array would ultimately be translated into a relative-address store on
+the target machine, such as
 
 \begin{verbatim}
-__temp_1 = address-of A
-__temp_2 = mul 4, 4
-__temp_3 = add __temp_1, __temp_2
-__temp_4 = 6
-           store __temp_3, __temp_4
+__temp_1 = load-constant 6
+__temp_2 = load-address A
+           store __temp_1, (__temp_2 + (4 * 4))
 \end{verbatim}
-
-\noindent and then the backend code would be responsible for turning it back
-into a single instruction if that were possible on the target machine.
-
-One implication of this is that a back-end driver should be able to
-run transformation passes on the VM code.  For example, a constant
-folding pass followed by constant propagation and dead-code
-elimination could remove the multiply instruction; trivial strength
-reduction is also important.
 
 \subsection{Backends}
 
@@ -361,7 +382,8 @@ public class Backend {
 As discussed above, a backend is a connection between the \ir{} and a
 real machine architecture.  It contains a method for getting the
 \texttt{Opcode} object corresponding to an opcode name, and to verify
-that an instruction is valid.
+that an instruction is valid.  The input virtual machine also has a
+\class{Backend} object associated with it.
 
 Backends also contain methods to assist the register allocator.
 \texttt{insert\-Spill()} and \texttt{insert\-Unspill()} insert store and
@@ -377,44 +399,37 @@ unconditional branches insert instructions after the specified
 iterator.  It is conceivable that a conditional branch, in particular,
 might need to insert multiple instructions.
 
-\subsection{Symbols and Symbol Tables}
+\subsection{Symbols and Types}
 
-A variable lives in a symbol table; a symbol table is associated with
-the block it appears in.  ``Block'' here may actually be context
-larger than a single function for files in the scope of a filter; it
-is up to higher-level code to appropriately manipulate (rename,
-rescope) variables depending on the desired output.
+Register operands may reference a symbol, generally corresponding to a
+source-level variable.  Every symbol has a type; the type of a
+register operand is either determined by the backend for a hard
+register or the attached symbol for a virtual register.  Symbols may
+also be annotated.
 
-Symbols and registers, but nothing else, have types.\footnote{This may
-  result in corner cases involving integer overflow being missed,
-  though.}  A type has a primitive type, signed or unsigned integer or
-float, and an optional bit-width.  Registers always have bit width.
-Symbols may additionally have structured, union, and laid-out types.  A
-structured type contains an ordered list of pairs of names and types,
-corresponding to a C structure; a union type has an unordered list of
-names and types corresponding to a C union.  A laid-out type has
-explicit bit widths for its consituents, which have names, types, and
-offsets within the structure.  Each of these types also has a
-queryable size.
-
-A symbol table then consists of just an unordered association between
-names and types.  Global symbols will need to live forever, but also
-have no interesting information beyond their name and type, possibly
-including layout in the type.  Local symbols will be replaced by
-registers in register allocation, and those that aren't will be
-replaced by register memory references in a layout/finalization pass.
+A type has a primitive type, signed or unsigned integer or float, and
+an optional bit-width.  Hard registers should always have a fixed bit
+width.  Symbols may additionally have structured, union, and laid-out
+types.  A structured type contains an ordered list of pairs of names
+and types, corresponding to a C structure; a union type has an
+unordered list of names and types corresponding to a C union.  A
+laid-out type has explicit bit widths for its consituents, which have
+names, types, and offsets within the structure.  Each of these types
+also has a queryable size.
 
 \subsection{Blocks}
 
-With all of these components, we can assemble a basic block.  A block
-contains a Java \class{List} of instructions and a symbol table.  For
-\ssa{} form, each block also needs sets of live variables on entry and
-exit.  Finally, since instruction sharing is prohibited, block sharing
-can be too; thus, each block has a list of its predecessors and
-successors, and a condition under which one successor would be chosen
-over another, as well as the containing object.
+With all of these components, we can assemble a block.  Each block
+contains a Java \class{List} of instructions.  For \ssa{} form, each
+block also needs sets of live variables on entry and exit.  Finally,
+since instruction sharing is prohibited, block sharing can be too;
+thus, each block has a list of its predecessors and successors, and a
+condition under which one successor would be chosen over another, as
+well as the containing object.
 
-A block container should be a Java interface:
+It is conceivable that things other than functions might contain
+control-flow graphs.  A block container should therefore be a Java
+interface:
 
 \begin{verbatim}
 public interface BlockContainer {
@@ -444,21 +459,34 @@ happen after block formation.
 With this in mind, we get the following structure for a block:
 
 \begin{verbatim}
+public class ControlEdge {
+  public Block getPredecessor();
+  public Block getSuccessor();
+  public boolean isNormal();
+  public boolean isImpossible();
+  public Instruction getInstruction();
+  public Operand getCondition();
+}
 public class Block {
   public List getBody(); // mutable list of Instruction
-  public class Edge {
-    public Block getTarget();
-    public boolean isNormal();
-    public boolean isImpossible();
-    public Instruction getInstruction();
-    public Operand getCondition();
-  }
-  public Edge makeEdgeTo(Block target, boolean normal,
-                         Operand condition, Instruction instr);
-  public List getPredecessors(); // mutable list of Edge
-  public List getSuccessors(); // mutable list of Edge
+  public ControlEdgeEdge
+    makeEdgeTo(Block target, boolean normal,
+               Operand condition, Instruction instr);
+  public List getPredecessors(); // mutable list of ControlEdge
+  public List getSuccessors(); // mutable list of ControlEdge
+  public static Block flatten(BlockContainer region);
+  public BlockContainer unflatten();
+  public static void buildLiveness(BlockContainer region);
 };
 \end{verbatim}
+
+There is some demand to convert blocks into a flattened form.  The
+\texttt{flatten} and \texttt{unflatten} methods convert a \cfg{} to
+flat code and vice versa; the flattened code is stored in a Block.
+Details such as liveness and \ssa{} annotations need to be rebuilt if
+the \cfg{} structure changes; \texttt{build\-Liveness} does this, and
+needs to be called by passes that depend on this information before
+they use it.
 
 \section{Usage}
 
@@ -492,10 +520,11 @@ I envision the following compiler flow for StreamIt:
 \end{enumerate}
 
 This flow completely avoids Kopi.  The \sir{} construct for a filter
-needs to include a \stair{} symbol table object for the filter's
-fields.  What happens to this depends on the backend: in the
-uniprocessor code, the fields would become a \stair{} structure type,
-while on \raw{}, they would be promoted to per-tile global variables.
+needs to include structure type for the filter's fields, and have a
+reference be passed to the init and work functions.  What happens to
+this depends on the backend: in the uniprocessor backend, this
+structure would be preserved, while on \raw{}, its members would be
+promoted to per-tile global variables.
 
 \bibliographystyle{plain}
 \bibliography{references}
