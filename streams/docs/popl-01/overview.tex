@@ -276,7 +276,8 @@ class CheckFreqHop extends SplitJoin {
                   void work() {
                      Float val = input.pop();
                      if(val >= MIN_TRASHOLD) 
-                        freq_hop.set_freq(Freq[k], new TimeInterval(4*N, 6*N)); 
+                        freq_hop.set_freq(Freq[k], 
+                                new TimeInterval(4*N, 6*N)); 
                      output.push(val);
                   }
                });
