@@ -147,7 +147,7 @@ proc {\bf Extract}($code$, $map$, $A$, $\vec b$, int $\mt{popcount}$, int $\mt{p
 \IND
 \STATE $\mbox{\bf case}~y := \mt{const}$
 \IND
-\STATE $\mt{map}.\mt{put}(y, (\vec 0_{Peek}, \mt{const}))$
+\STATE $\mt{map}.\mt{put}(y, (\vec 0, \mt{const}))$
 \UND
 \STATE \vspace{-6pt}
 \STATE $\mbox{\bf case}~y := \mbox{\tt pop}()$
@@ -199,7 +199,7 @@ proc {\bf Extract}($code$, $map$, $A$, $\vec b$, int $\mt{popcount}$, int $\mt{p
 \IND
 \STATE $\tup{\vec v_2}{c_2} \leftarrow \mt{map}.\mt{get}(y_2)$
 \STATE $\tup{\vec v_3}{c_3} \leftarrow \mt{map}.\mt{get}(y_3)$
-\STATE {\bf if} $~\vec v_3 = \vec 0_{Peek} \wedge y_3 \ne 0$ {\bf then}
+\STATE {\bf if} $~\vec v_3 = \vec 0_{Peek} \wedge c_3 \ne 0$ {\bf then}
 \IND
 \STATE $\mt{map}.\mt{put}(y_1, (\frac{1}{c_3}*\vec v_2, c_2/c_3))$
 \UND
