@@ -13,7 +13,7 @@ splitjoin contains another splitjoin as one of its
 children. Coalescing is done by analyzing the weight of the parent
 splitter that feeds the child splitter. Splitters are cyclic in nature
 so their weights and outputs can always be repeated an integral number
-of times to arive at a semantically equivalent splitter. This fact is
+of times to arrive at a semantically equivalent splitter. This fact is
 leveraged to repeat the parent splitter enough times to contain a
 multiple of the sum of the child's weights. Then the child's weights
 and outputs are incorporated into the parent.
