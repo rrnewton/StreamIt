@@ -1,36 +1,35 @@
 \begin{figure}[t]
 \begin{center}
-
-\psfig{figure=fft-block.eps,width=3in}
-\caption{The multi-stage FFT algorithm.
-\protect\label{fig:fftfilter}}
-\vspace{12pt}
-
+% \psfig{figure=fft-block.eps,width=3in}
+% \caption{The multi-stage FFT algorithm.
+% \protect\label{fig:fftfilter}}
+% \vspace{12pt}
+%
 \psfig{figure=fft-pre-tape.eps,width=3.53in}
 \vspace{-6pt}
-\caption{The bit reverse order filter in the FFT, with N=8.  The tapes illustrate the data re-shuffling.  The Butterfly stage is similar, but ommitted for lack of space.
+\caption{The bit-reversal phase in the FFT, with N=8.  A bit-reversal permutation is one that swaps all elements with indices whose binary representations are the reverse of each other.  The Butterfly stage is similar, but ommitted for lack of space.
 \protect\label{fig:bitreverseorder}}
-\vspace{12pt}
-
+\vspace{-18pt}
 % \psfig{figure=fft-butterfly-tape.eps,width=4.75in}
 % \vspace{-6pt}
 % \caption{The 4x4 butterfly stage in the FFT.
 % \protect\label{fig:butterfly}}
 \end{center}
-
-\begin{minipage}{2.2in}
-\psfig{figure=fft-streamit.eps,width=162.35pt}
-\end{minipage}
-\hspace{0.2in}
-\begin{minipage}{2.4in}
-\centering
-\psfig{figure=fft-butterfly.eps,width=183.52pt}
-\end{minipage}
-\vspace{-12pt}
-\caption{The FFT stage of the software radio.  The Subtractor filter can be implemented in the same way as the Adder shown above, but is ommitted due to space considerations.
-\protect\label{fig:fft-streamit}}
-
 \end{figure}
+
+% \begin{figure}[t]
+% \begin{minipage}{2.2in}
+% \psfig{figure=fft-streamit.eps,width=162.35pt}
+% \end{minipage}
+% \hspace{0.2in}
+% \begin{minipage}{2.4in}
+% \centering
+% \psfig{figure=fft-butterfly.eps,width=183.52pt}
+% \end{minipage}
+% \vspace{-12pt}
+% \caption{The FFT stage of the software radio.  The Subtractor filter can be implemented in the same way as the Adder shown above, but is ommitted due to space considerations.
+% \protect\label{fig:fft-streamit}}
+% \end{figure}
 
 % \begin{figure}
 % \vspace{-0.4in}
@@ -202,5 +201,10 @@
 % \protect\label{fig:radiocode}}
 % \vspace{-12pt}
 % \end{figure}
+
+
+
+
+
 
 

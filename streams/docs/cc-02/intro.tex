@@ -23,21 +23,21 @@ are too inefficient to use in practice.  Consequently, most
 programmers turn to general-purpose languages such as C or C++ to
 implement stream programs.
 
-There are two reasons that general-purpose languages are inadequate
-for stream programming.  Firstly, they are a mismatch for the
-application domain.  That is, they do not provide a natural or
-intuitive representation of streams, thereby having a negative effect
-on readability, robustness, and programmer productivity.  Moreover,
-because the widespread parallelism and regular communication patterns
-of data streams are left implicit in general-purpose languages,
-compilers are not stream-conscious and do not perform stream-specific
-optimizations.  As a result, programmers resort to low-level assembly
-codes for performance-critical loops, and performance-critical
-sections must be re-implemented for each target architecture.  This
-practice is labor-intensive, error-prone, and very costly.
+There are two reasons that general-purpose languages are inadequate for
+stream programming.  Firstly, they are a mismatch for the application
+domain.  That is, they do not provide a natural or intuitive
+representation of streams, thereby having a negative effect on
+readability, robustness, and programmer productivity.  Moreover, because
+the widespread parallelism and regular communication patterns of data
+streams are left implicit in general-purpose languages, compilers are
+not stream-conscious and do not perform stream-specific optimizations.
+As a result, performance-critical loops are often hand-coded in a
+low-level assembly language and must be re-implemented for each target
+architecture.  This practice is labor-intensive, error-prone, and very
+costly.
 
 Secondly, general-purpose languages are a mismatch for the emerging
-class of grid-based architectures \cite{smartmemories,raw,trips} that
+class of grid-based architectures \cite{smartmemories,rawshort,trips} that
 are especially well-suited for stream processing.  Perhaps the primary
 appeal of C is that it provides a ``common machine language'' for
 von-Neumann architectures.  That is, it abstracts away the
@@ -64,7 +64,10 @@ This paper motivates, describes, and justifies the high-level language
 features of StreamIt, version 1.0.  The major limitation of StreamIt
 1.0 is that all flow rates in the streams must be static; applications
 such as compression that have dynamically varying flow rates will be
-the subject of future work.
+the subject of future work.  A large set of applications can be
+implemented with static rates, and while dynamic rates will require a
+different runtime model, it will still be essential to fully analyse
+and optimize static sub-sections in order to obtain high performance.
 
 The paper is organized as follows. In Section {\ref{sec:domain}}, we
 characterize the domain of streaming programs that motivates the

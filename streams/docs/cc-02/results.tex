@@ -4,32 +4,33 @@
 We have implemented a fully-functional prototype of the StreamIt
 compiler as an extension to the Kopi Java Compiler, a component of the
 open-source Kopi Project \cite{kopi}.  At this time, our compiler is a
-proof-of-concept and is not optimized for performance; we generate C
-code that is compiled with a StreamIt runtime library to produce the
-final executable.  We have also developed a library in Java that
-allows StreamIt code to be executed as pure Java, thereby providing a
+proof-of-concept and does not yet include the stream-specific
+optimizations that we are working on; we generate C code that is
+compiled with a StreamIt runtime library to produce the final
+executable.  We have also developed a library in Java that allows
+StreamIt code to be executed as pure Java, thereby providing a
 verification mechanism for the output of the compiler.
 
 The compilation process for streaming programs contains many novel
-aspects because the basic unit of computation is a stream rather than
-a procedure.  In order to compile stream modules separately, we have
-developed a runtime interface--analogous to that of a procedure call
-for traditional codes--that specifies how one can interact with a
-black box of streaming computation.  The stream interface contains
-separate phases for initialization and steady-state execution; in the
-execution phase, the interface includes a contract for input items,
-output items, and possible message production and consumption.
+aspects because the basic unit of computation is a stream rather than a
+procedure.  In order to compile stream modules separately, we have
+developed a runtime interface--analogous to that of a procedure call for
+traditional codes--that specifies how one can interact with a black box
+of streaming computation.  The stream interface contains separate phases
+for initialization and steady-state execution; in the execution phase,
+the interface includes a contract for input items, output items, and
+possible message production and consumption.
 
 Though we have yet to add optimizations to our compiler, it is
-nonetheless interesting to evaluate its baseline performance.  For
-this purpose, we developed StreamIt implementations of four
-applications: 1) A GSM Decoder, which takes GSM-encoded parameters as
-inputs, and uses these to synthesize audible speech, 2) A system from
-the Polymorphic Computing Architecture (PCA) \cite{pca} which
-encapsulates the core functionality of modern radar, sonar, and
-communications signal processors, 3) A software-based FM Radio with
-equalizer, and 4) A performance test from the SpectrumWare system that
-implements an Orthogonal Frequency Division Multiplexor (OFDM)
+nonetheless interesting to evaluate its baseline performance.  For this
+purpose, we developed StreamIt implementations of four applications: 1)
+A GSM Decoder, which takes GSM-encoded parameters as inputs, and uses
+these to synthesize audible speech\cite{gsm}, 2) A system from the
+Polymorphic Computing Architecture (PCA) \cite{pca} which encapsulates
+the core functionality of modern radar, sonar, and communications signal
+processors, 3) A software-based FM Radio with equalizer, and 4) A
+performance test from the SpectrumWare system that implements an
+Orthogonal Frequency Division Multiplexor (OFDM)
 \cite{spectrumware}.  Table \ref{tab:benchmarks} gives characteristics
 of the above applications including the number of filters implemented
 and the size of the stream graph as coded.
@@ -63,6 +64,7 @@ GSM Decoder & 3050 & 11 & 21 \\
 \vspace{6pt}
 \caption{\protect\small Application Characteristics
 \label{tab:benchmarks}}
+\vspace{-24pt}
 \end{minipage}
 \hspace{0.2in}
 \begin{minipage}{2.5in}
@@ -85,8 +87,8 @@ GSM Decoder & 4.88 & N/A & .47\\
 \vspace{6pt}
 \caption{\protect\small \mbox{Performance Results (in $\mu$sec/item)}
 \label{tab:performance}}
+\vspace{-24pt}
 \end{minipage}
-\vspace{-12pt}
 \end{table}
 
 %% \subsection{GSM Decoder}
@@ -110,14 +112,14 @@ GSM Decoder & 4.88 & N/A & .47\\
 %% modern radar, sonar, and communications signal processors.
 
 For the GSM application, the extensively hand-optimized C version
-incorporates many transformations that rely on a high-level knowledge
-of the algorithm, and StreamIt performs an order of magnitude slower.
-However, this version of the compiler is only a proof-of-concept, and
-is not yet intended to compete with hand-coded C.  Our code generation
-strategy currently has many inefficiencies, and in the future we plan
-to generate optimized assembly code by interfacing with a code
-generator.  We believe that stream-conscious optimizations can improve
-the performance by an order of magnitude on uniprocessors; moreover,
-we have yet to consider parallel targets, and this is where we expect
-to find the most pronounced benefits of the abundant parallelism and
-regular communication patterns exposed by StreamIt.
+incorporates many transformations that rely on a high-level knowledge of
+the algorithm, and StreamIt performs an order of magnitude slower.
+However, this version of the compiler is only a prototype, and is not
+yet intended to compete with hand-coded C.  Our code generation strategy
+currently has many inefficiencies, and in the future we plan to generate
+optimized assembly code by interfacing with a code generator.  We
+believe that stream-conscious optimizations can improve the performance
+by an order of magnitude on uniprocessors; moreover, we have yet to
+consider parallel targets, and this is where we expect to find the most
+pronounced benefits of the abundant parallelism and regular
+communication patterns exposed by StreamIt.
