@@ -185,14 +185,19 @@ on the input tape to the same location on the output tapes:
 \ma{I_S}{O1_S}(x) = x \\
 \ma{I_S}{O2_S}(x) = x
 \end{eqnarray*}
-The $min$ function is similar, except that
-
-{\bf Combine joiner.} The derivations for a duplicating
-splitter and combining joiner are simply the identity function, since
-each element on the input tape(s) is mapped to the same index position
-on the output tape(s).  That is, in the case of duplicate/combine,
-$\ma{I1_J}{O_J}(x) = \ma{I2_J}{O_J}(x) = \mi{I1_J}{O_J}(x) =
-\mi{I2_J}{O_J}(x) = x$.
+The $min$ function is similar, except that--like the round robin
+split--the input need only progress as far as the lesser output:
+\begin{eqnarray*}
+\mi{I_S}{(O1_S, O2_S)}(x_1, x_2) = min(x_1, x_2)
+\end{eqnarray*}
+{\bf Combine joiner.} The combine joiner is simply the dual of the
+duplicate splitter, with transfer functions that the reader can verify
+as follows:
+\begin{eqnarray*}
+\ma{(I1_J, I2_J)}{O_J}(x_1, x_2) = max(x_1, x_2) \\
+\mi{I1_J}{O_J}(x) = x \\
+\mi{I2_J}{O_J}(x) = x
+\end{eqnarray*}
 
 \begin{verbatim}
 
