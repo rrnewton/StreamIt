@@ -2,14 +2,13 @@
 \label{sec:results}
 
 Our compiler currently has two linear analysis optimizations. The first,
-{\it linear replacement}, replaces the largest linear heirarchal {\tt streams} 
-possible with filters that directly compute the calculation specified by 
-the associated linear node. The second optimization, called 
+{\it linear replacement}, replaces the largest linear hierarchal {\tt streams} 
+possible with {\tt filters} that directly compute the calculation specified by 
+the {\tt stream}s associated linear node. The second optimization, called 
 {\it frequency replacement}, replaces all {\tt streams} which implement 
 a convolution using the frequency transformation described in 
-\ref{sec:freq}. Below we describe experiements and results which measure the
-performance of these two optimizations.
-
+\ref{sec:freq}. Below we describe experiments and results that demonstrate
+performance improvements due to these two optimizations.
 
 
 \subsection{Measurement Methodology}
@@ -35,50 +34,42 @@ performance of these two optimizations.
 %probably not an appropriate metric.
 
 
-Both linear replacement and frequency replacement increase performance primarily by 
-decreasing the number of floating point multiplications required per output.
-Our measurement platform was a Dual Intel 2.2 GHz P4 Xenon processor system 
-with 2GB of memory running Linux. We compiled programs using StreamIt's uniprocessor backend
-and generated executables from the resulting C using {\tt gcc} with {\tt -O2} optimization.
+Both linear replacement and frequency replacement increase performance by 
+decreasing the number of floating point computations (principally multiplications) required per output.
+Our measurement platform is a Dual Intel 2.2 GHz P4 Xenon processor system 
+with 2GB of memory running Linux. We compiled our benchmarks using StreamIt's uniprocessor backend
+and generated executables from the resulting C files using {\tt gcc} with {\tt -O2} optimization.
 
-To measure the number of FLOPs executed at runtime we used the DynamoRIO\cite{dynamo99}
-infrastructure. Using a simple DynamoRIO application 
-we instrumented each benchmark program at runtime to count the number of FLOPs.
+To measure the number of runtime multiplications we use a simple program written with the 
+the DynamoRIO\cite{dynamo99} infrastructure. Floating point multiplication instructions 
+in the IA-32 instruction set are defined to be any of ({\tt fmul fmulp fimulp fdiv fdivp fidivp fdivr fdivrp fidivr}).
+We measure execution time normalized to the number of program outputs generated.
 
-We define the following three opcode classes for the Intel x86 instruction set:
-\begin{itemize}
-\item[flops] Any opcode whose name that begins with {\tt f} in the x86 instruction set.
-\vspace{-6pt}
-\item[fadds] Any of ({\tt fadd faddp fiaddp fsub fsubp fisubp fsubr fsubrp fisubr}).
-\vspace{-6pt}
-\item[fadds] Any of ({\tt fmul fmulp fimulp fdiv fdivp fidivp fdivr fdivrp fidivr}).
-\vspace{-6pt}
-\end{itemize}
-
-There are no standard benchmarks written for StreamIt, so we use
+There are no standard benchmarks written yet for StreamIt, so we use
 a set of representative programs which perform computations that 
-are found in actual applications: 
+are found in actual streaming applications: 
 
 \begin{enumerate}
-\item FilterBank: Implements a multi-rate signal decomposition processing block common in communications and image processing.
+\item FIR: A single 256 point rectangularly windowed low pass FIR filter ($\omega_c=\frac{\pi}{3}$).
 \vspace{-6pt}
 
-\item FIR: A single 100 point rectangularly windowed low pass FIR filter ($\omega_c=\frac{\pi}{3}$).
+\item TargetDetect: Four matched filters performing threshold target detection in parallel.
+\vspace{-6pt}
+
+\item FilterBank: A multi-rate signal decomposition processing block common in communications and image processing.
+\vspace{-6pt}
+
+\item RateConvert: An audio signal down sampler that converts the sampling rate by a non-integral factor.
 \vspace{-6pt}
 
 \item FMRadio: An FM software radio with equalizer.
 \vspace{-6pt}
 
-\item RateConverter: A downsampler for an audio signal that converts
-the rate by a non-integral factor ($\frac{3}{2}$).
+\item Radar: A radar front end with beamformer and target detection.
 \vspace{-6pt}
-
-\item TargetDetect: Four matched filters performing threshold target
-detection in parallel.
-\vspace{-6pt}
-
-\item Radar: A radar frontend with beamformer and target detection.
 \end{enumerate}
+
+
 
 \subsection{Frequency Replacement Scaling}
 
@@ -96,29 +87,38 @@ detection in parallel.
 \epsfbox{images/frequency-win-empirical.eps} \\
 {\bf (b): Empirical}
 \end{minipage}
-\caption{Plots showing the theoretical and emphirical multiplication reduction factor as a function of the size of the FIR ($M$) and the number of outputs produced ($N$). The dark regions denote an increase in the required number of multiplications.}
+\caption{Plots showing the theoretical and empirical multiplication reduction factor as a function of the size of the FIR ($M$) and the number of outputs produced per calculation ($N$). The dark regions denote an increase in the required number of multiplications and the light regions a reduction.}
 \label{fig:frequency-win}
-\vspace{-12pt}
 \end{figure*}
 
-Direct convolution requires $O(MN)$ multiplies to generate $N$ output
-values. The FFT requires $O(N+2(M-1))lg(N+2(M-1))$ multiplications for both the
+Frequency replacement is an effective optimization because the asymptotic bounds for 
+frequency domain computation is lower than the bound for the time domain computation. 
+We determined empirically the point at which frequency replacement improves performance.
+  
+Direct convolution requires $O(MN)$ multiplies. 
+The FFT requires $O(N+2(M-1))lg(N+2(M-1))$ multiplications for both the
 conversion to and from the frequency domain, and multiplying two $N+2(M-1)$
-vectors in the frequency domain requires $O(N+2(M-1))$. After the frequency transformation,
-$N+M-1$ outputs are produced every execution. We define the multiplication reduction factor
-as the number of multiplies required per output using convolution divided by the 
-the number of multiplies per output using the frequency transformation. 
+vectors in the frequency domain requires $O(N+2(M-1))$ multiplications. 
+Direct convolution produces $N$ outputs per iteration and the frequency implementation 
+produces $N+M-1$ outputs every iteration. 
+We define the ``multiplication reduction factor''
+to be the number of multiplies required per output using convolution divided by the 
+the number of multiplies per output using the frequency transformation.
 
-Figure~\ref{fig:frequency-win}~(a) shows a plot of the theoretical multiplication savings
-in $M$, $N$ space and Figure~\ref{fig:frequency-win}~(b) shows our empirically 
-measured savings. The roughness of both the theory and the data is due to the fact that
+Figure~\ref{fig:frequency-win}~(a) shows a plot of the theoretical multiplication reduction factor
+and Figure~\ref{fig:frequency-win}~(b) shows the same reduction factor measured empirically. 
+The roughness in both the theoretical results and the data is due to the fact that
 our FFT algorithm requires $N+2(M-1)$ to be a power of two, and the compiler
-automatically adjusts $N$ upwards to satisfy this requirement. The theoretical 
+automatically adjusts $N$ upward to satisfy this requirement. The theoretical 
 reduction numbers account for the fact that our implementation requires four 
-floating point muliplication operations to perform a complex valued multiply 
+floating point multiplication operations to perform a complex valued multiply 
 in the frequency domain.
 
-\subsection{Overall Optimization Performance}
+Based on the above analysis, our current compiler applies the frequency replacement
+transformation on FIR filters that have length $90$ or greater. The target output
+rate, $N$, is automatically set to be twice the FIR length.
+
+\subsection{Performance}
 
 %\begin{figure}
 %\center
@@ -140,7 +140,7 @@ in the frequency domain.
 \begin{figure}
 \center
 \epsfxsize=3.2in
-\epsfbox{images/linear-freq-both.eps}
+\epsfbox{images/linear-freq-both-new.eps}
 \vspace{-6pt}
 \caption{Multiplication reduction factors for each of the benchmarks with linear replacement, frequency replacement, and both.}
 \label{fig:linear-freq-both}
@@ -148,49 +148,54 @@ in the frequency domain.
 \end{figure}
 
 To determine the effects of our linear replacement and frequency replacement 
-optimizations, we compiled each benchmark program with the linear 
-replacement, wtih frequency replacement (overlap-add),
-and with linear replacement followed by frequency replacement. 
+optimizations, we compiled each benchmark program with linear 
+replacement, with frequency replacement and with both linear 
+replacement and frequency replacement. 
 Figure~\ref{fig:linear-freq-both} shows the multiplication reduction factor 
 achieved for each set of optimizations.
 
 For the FIR filter, all of the multiplication reduction comes from the frequency
 replacement optimization because the entire application is comprised of a single
 {\tt filter} calculating a convolution sum so there is nothing to combine.
-The TargetDetect program experiences a small decrease in multiplications 
-for linear replacement, and a larger boost from frequency replacement alone.
-The main work of the target detector system occurs in the four parallel FIR filters, whose
-results can not be combined.
+The reduction multiplication reduction in TargetDetect is also solely due to 
+the frequency transformation because threshold detection is non-linear which
+makes the parallel computation blocks uncollapsible. Finally, RateConvert contains
+a large low pass filter which can benefit from frequency replacement. A complete
+implementation of the linear combination rules will allow linear replacement 
+to improve performance as well.
 
-The linear replacement optimization reduces the number of multiplies 
-required for FilterBank by a factor of three because the parallel analysis and 
-synthesis pipelines can be combined. Unfortunately, after
-linear replacement, the frequency translation doesn't reduce computation 
-because our current implementation only works for one column linear filters.
+The reduction in multiplies of the FMRadio benchmark is all due to
+automatic replacement of the parallel equalizer computations.
+The multiplication reduction in the Radar benchmark comes from algebraic  
+simplification due to combining several serial computations into one using
+the pipeline combination rules. Table~\ref{fig:benchmark-statistics} shows
+the number of nodes in the stream graph both before and after linear replacement. 
 
-The RateConverter also benefits greatly from the frequency
-transformation due to the fact that it contains a large FIR
-filter. Our implementation currently doesn't support the full range of
-pipeline combination rules so we miss potential savings from linear
-combination. Similairly, FMRadio contains a multiband equalizer whose gain stages are collapsed
-into a single filter during linear combination.
-
-The number of multiplies in the Radar program actually increases because our 
-compiler does not take into account the fact that combined linear structures 
-might actually increase computation. %this is bs, obviously...
+FilterBank is the only benchmark whose multiplication reduction factor due to both optimizations
+is greater than the reduction for either alone. Linear replacement reduces
+multiplication because it can combine the action of the parallel analysis 
+and synthesis channels into an overall FIR filter. Frequency replacement reduces
+multiplication a small amount for each of the smaller FIR filters. However, when
+a frequency implementation of the overall linear form is generated,
+even more multiplications are reduced.
 
 \begin{figure}
 \center
 \epsfxsize=3.2in
 \epsfbox{images/execution-speedup.eps}
 \vspace{-6pt}
-\caption{Execution time reduction for each of the benchmarks with both linear replacement and frequency replacement.}
+\caption{Execution speedup for each of the benchmarks with both linear replacement and frequency replacement optimizations.}
 \label{fig:execution-speedup}
 \vspace{-12pt}
 \end{figure}
 
-Figure~\ref{fig:execution-speedup} shows the execution time decrease due to the back to back
-application of the linear replacment and frequency replacement options.
+Reducing computation does not necessarily translate into execution time improvement, but as
+Figure~\ref{fig:execution-speedup} demonstrates, our benchmarks shows an average execution time speedup of XXXXXX.
+Our current implementation takes advantage of the machine tuned 
+FFT package FFTW~\cite{frigo99fast}), to perform the necessary time-frequency conversions. 
+The benchmarks where multiplication reduction is due only to linear replacement (FMRadio, Radar) 
+also show a marked speedup.
+
 
 
 \begin{table*}[t]
@@ -203,19 +208,19 @@ application of the linear replacment and frequency replacement options.
 Benchmark & Filters & Pipelines & SplitJoins & Average     & Filters      & Pipelines         & SplitJoins \\
           & (linear)& (linear)  & (linear)   & vector size &              &                   &            \\
 \hline
-FIRProgram & 3 (1) & 1(0) & 0 (0) & 100 & 3 & 1 & 0 \\
+FIR       & 3 (1)  & 1(0)      & 0 (0)      & 256         & 3            & 1                 & 0 \\
 \hline
-TargetDetect & 10 (4) & 1 (0) & 2 (1) & 100 & 7 & 1 & 1 \\
+TargetDetect & 10 (4)& 1 (0)    & 1 (0)      & 300         & 10           & 1                 & 1 \\
 \hline
-FilterBank & 27 (25) & 17 (9) & 4 (3) & 51 & 15 & 8 & 1 \\
+FilterBank & 27 (25) & 17 (9)   & 4 (3)      & 51          & 15           & 8                 & 1 \\
 \hline
-SampleRate & 5 (3) & 2 (0) & 0 (0) & 335 & 5 & 2 & 0 \\
+RateConvert& 5 (3)   & 2 (0)    & 0 (0)      & 335         & 5            & 2                 & 0 \\
 \hline
-FMRadio & 25 (22) & 3 (1) & 2 (2) & 33 & 5 & 1 & 0 \\
+FMRadio    & 25 (22) & 3 (1)    & 2 (2)      & 33          & 5            & 1                 & 0 \\
 \hline
-BeamFormer & 65 (60) & 33 (14) & 2 (0) & 46 & 37 & 17 & 2\\
+Radar      & 10 (7) & 5 (2)     & 2 (0)      & 46          & 6            & 3                 & 2 \\
 \hline
 \end{tabular}
 \caption{Statistics for benchmarks before and after transformations.}
-\label{fig:benchmark-stastics}
+\label{fig:benchmark-statistics}
 \end{table*}
