@@ -1,0 +1,29 @@
+\begin{table*}[t]
+\begin{center}
+\scriptsize
+\begin{tabular}{|l|l||r||r|r|r|r||r||} \hline
+ & & {\bf lines of} & \multicolumn{4}{|c||}{\bf \# of constructs in the program} & {\bf \# of filters in the} \\ \cline{4-7}
+{\bf Benchmark} & {\bf Description} & {\bf code} & filters & pipelines & splitjoins & feedbackloops & {\bf expanded graph}
+\\
+\hline \hline
+FIR & 64 tap FIR & 
+125 & 5 & 1 & 0 & 0 & 132
+\\ \hline
+Radar & Radar array front-end\cite{pca} & 
+549 & 8 & 3 & 6 & 0 & 52
+\\ \hline
+Sort & 32 element Bitonic Sort & 
+419 & 4 & 5 & 6 & 0 & 242
+\\  \hline
+FFT & 64 element FFT & 
+200 & 3 & 3 & 2 & 0 & 24
+\\  \hline
+Filterbank & 8 channel Filterbank & 
+650 & 9 & 3 & 1 & 1 & 51
+\\  \hline
+\end{tabular}
+\vspace{-6pt}
+\caption{\protect\small Application Characteristics.}
+\label{tab:benchmarks}
+\end{center}
+\end{table*}
