@@ -11,7 +11,7 @@ computing. In StreamIt, a program is described as a structured dataflow
 graph, where the nodes represent actors that carry out 
 computation. The edges in a stream graph represent
 communication. Our work is unique in that the compiler
-accounts for the size of instruction and data workingsets as it
+accounts for the size of instruction and data working sets as it
 performs a series of cache-aware optimizations, all while deriving an
 ordering of executions for the nodes in the stream graph. The
 optimizations are founded upon two simple and intuitive models that
@@ -19,6 +19,6 @@ quantify $(i)$ the temporal locality for a sequence of  actor
 executions, and $(ii)$ the overhead for managing the communication
 between actors. The cache-aware transformations lead to significantly
 better utilization of the memory system, and as such, they deliver
-performance gains ranging from 11 to 96\% for our streaming
-benchmark suite on a Pentium~3 architecture, and 11 to 99\% on an
+performance gains ranging from 11\% to 96\% for our streaming
+benchmark suite on a Pentium~3 architecture, and 11\% to 99\% on an
 Itanium~2 processor.

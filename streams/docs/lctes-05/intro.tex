@@ -26,7 +26,7 @@ workloads. This model serves as a foundation for several {\it cache-aware
 optimizations} that are geared toward the concomitant increase of instruction
 and data {\it temporal locality}. These
 optimization lead to significantly better utilization of the memory
-system, and as such, they deliver performance gains ranging from 11
+system, and as such, they deliver performance gains ranging from 11\%
 to 99\% for our streaming benchmark suite.
 
 The context for our work is StreamIt, an architecture-independent
@@ -48,9 +48,9 @@ computation kernels, and the communication between actors represents
 data buffers that must be streamed to and from the processor. Thus
 the size of an actor and the
 order of actor executions are critical properties that
-impact the performance of the instruction cache. For example, the
-compiler must make sure the actor's code size is not
-greater than the instruction cache. Furthermore, we must {\it scale}
+impact the performance of the instruction cache. For example, our
+compiler ensures sure the actor's code size is not
+greater than the instruction cache. Furthermore, we {\it scale}
 the execution of the actor so that it runs several times before we move
 on to some other actor in the stream 
 graph. This serves to $(i)$ amortize the cost of fetching the actor's
@@ -78,17 +78,17 @@ fused actors.  This paper investigates several implementation
 alternatives (for buffer management) and evaluates their performance
 (Section~\ref{sec:buffer}).
 
-The methodology for fusing actors leverages a distinguishing StreamIt
-characteristic, namely, the hierarchical organization of
-the stream graph. Furthermore, the algorithm for fusing actors applies
-for the various topologies allowed by StreamIt.
-It also considers another distinguishing characteristics of StreamIt,
-namely the {\tt peek} operation whereby an actor may inspect data
-items in its input buffer without consuming them until some future
-execution. While peeking is a powerful language feature, it does pose
-some challenges to the compiler and the cache optimizations. Peeking
-also impacts the choice for the best buffer management strategy, as our
-study will show.
+%% The methodology for fusing actors leverages a distinguishing StreamIt
+%% characteristic, namely, the hierarchical organization of
+%% the stream graph. Furthermore, the algorithm for fusing actors applies
+%% for the various topologies allowed by StreamIt.
+%% It also considers another distinguishing characteristics of StreamIt,
+%% namely the {\tt peek} operation whereby an actor may inspect data
+%% items in its input buffer without consuming them until some future
+%% execution. While peeking is a powerful language feature, it does pose
+%% some challenges to the compiler and the cache optimizations. Peeking
+%% also impacts the choice for the best buffer management strategy, as our
+%% study will show.
 
 %% the comment about p3 and itanium not being embedded architectures
 %% is out of the blue! need a better transition.
@@ -106,20 +106,13 @@ Pentium~3 processor because it has very few registers in its
 instruction set architecture. The Itanium by contrast has a much 
 larger and richer repertoire of registers. The two architectures serve
 to validate our cache-aware optimizations, in that we expect an
-architecture with more register to benefit more from optimization such
+architecture with more registers to benefit more from optimization such
 as scalar replacement. On average, fusion leads to a 47\% improvement
-on the Pentium~3, and 50\% on the Itanium~2.
-
-The two architectures also differ in terms of their memory system
-organization. The Itanium is an in-order VLIW processor and does not
-tolerate a memory stall as well as its out-of-order
-counterpart. Therefore we expect different gains from the scaling
-optimization which amortize the long access latencies for instruction
-and data caches. On average, scaling leads to a 21\% improvement on
-the Itanium~2, and 17\% on the Pentium~3.
+on the Pentium~3, and 50\% on the Itanium~2.  On average, scaling 
+leads to a 21\% improvement on the Itanium~2, and 17\% on the Pentium~3.
 
 While both scaling and fusion lead to modest performance gains, we
-must combine the two to deliver the best possible performance. When we
+combine the two to deliver the best possible performance. When we
 do so, we can further improve the performance of our benchmarks by
 53\% on average for the Pentium~3, and 55\% for the Itanium~2.
 Section~\ref{sec:evaluation} describes our evaluation

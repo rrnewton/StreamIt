@@ -1,7 +1,7 @@
 \section{StreamIt}
 \label{sec:streamit}
 
-StreamIt  is   an  architecture-independent  language that was
+StreamIt  is   an  architecture-independent  language that is
 designed for  streaming applications. In StreamIt, programs are
 represented as graphs where  nodes represent  computation and edges
 represent FIFO-ordered communication of data over tapes.
@@ -16,7 +16,7 @@ makes  it  simple  to  represent computation over a
 sliding-window.   The {\tt push}, {\tt pop}, and {\tt peek} rates are
 declared as part  of  the work  function,  thereby enabling  the
 compiler    to construct a static schedule of filter executions. The
-following is an example implementation of a FIR   (Finite Impulse
+following is an example implementation of an FIR   (Finite Impulse
 Response)  filter: 
 %\begin{scriptsize}
 {\small
@@ -86,7 +86,7 @@ sibling connected to the splitter. For the latter, data are scattered
 in a round-robin manner, with each item sent to exactly one child
 stream, in order.  The splitter type and the weights for distributing data to
 child streams are declared as part of the syntax (e.g., \texttt{split
-duplicate} or \texttt{split roundrobin($w_0$, $w_1$, ... $w_n$)}). The
+duplicate} or \texttt{split roundrobin($w_1$, $w_1$, ... $w_n$)}). The
 splitter counterpart, the joiner, is a specialized filter with  
 multiple input channels but only one output channel. The joiner
 gathers data from its predecessors in a round-robin manner (declared
@@ -151,11 +151,12 @@ run_steady_state() {
 }
 \end{verbatim}
 %\end{scriptsize}
-To execute the program, the steady state kernel is wrapped with
-another loop that invokes the kernel a designated number of
+To execute the program, the steady state is wrapped with
+another loop that invokes the steady state a designated number of
 times. Preceding the state steady, a similar initialization schedule
-is run to prime the data buffers, and following the steady state, an
-epilogue is run to drain the buffers as necessary.
+is run to prime the data buffers.
+%, and following the steady state, an
+%epilogue is run to drain the buffers as necessary.
 
 \begin{figure}[t]
 \begin{center}
@@ -174,20 +175,20 @@ filter's instruction working set is fetched into the cache, we must
 execute that filter as many times as possible to improve instruction
 locality and amortize the cost of the accesses to lower levels of the
 memory hierarchy. This of course assumes that the total code size for
-the filters in the steady state exceeds the capacity of the
-instruction cache (which is commonly the case;). In
+all filters in the steady state exceeds the capacity of the
+instruction cache (which is commonly the case). In
 Figure~\ref{fig:ssi-single} we show a representative breakdown of the
 code size per filter in a steady state execution of a StreamIt
-implementation of FFT. In all, the total code size for a steady state
+implementation of a Fast Fourier Transform (FFT). In all, the total code size for a steady state
 ranges from 16~Kb to over 60~Kb for our benchmarks. These results
 provide evidence that while individual filters may have a
 small instruction footprint, the total footprint of the filters in a
 steady state exceeds a typical instruction cache size.
 From these observations, it is evident that we must {\it scale} the
 execution of filters in the steady state in order to improve temporal
-locality. In other words, rather than running a filter $S$ times per
+locality. In other words, rather than running a filter $\texttt{S}$ times per
 steady state, we increase the loop bound so that it runs $\texttt{M}
-\times S$ times (e.g., the loop bound for \verb+A_work+ is
+\times \texttt{S}$ times (e.g., the loop bound for \verb+A_work+ is
 changed to $\texttt{M} \times 4$ in the example shown earlier). 
 We term \texttt{M} the {\it multiplicity factor}.
 
@@ -197,7 +198,7 @@ scaling, while beneficial to the instruction cache behavior, may
 overburden the data cache as the buffers between actors may grow to
 prohibitively large sizes that degrade the data cache
 behavior. Specifically, if a buffer overflows the cache, then
-produce-consumer locality is lost. 
+producer-consumer locality is lost. 
 
 Also complicating matters is the amount of state a filter must retain
 from one execution of its work function to the next. In the FIR

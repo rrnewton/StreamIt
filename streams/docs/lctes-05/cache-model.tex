@@ -15,29 +15,29 @@ account for the data cache.
 A {\it filter execution trace} is a sequence of 
 filter work functions executions: $T = f_0 f_1 ... f_n$; $f_i$ represents the
 execution of filter $f$ at logical time $i$.
-The filter {\it instruction reuse distance} ($IRD$) is defined as the
+The filter {\it instruction reuse distance} ($\mt{IRD}$) is defined as the
 number of unique instructions that are referenced between two
 instances of the same work function. Formally, we define $phase(f_i)$
 as the sequence $f_i ... f_l$ ($i < l$) of work functions occurring in
-$T$ such that $f_i = f_l$ and no where else (i.e., $f_i \neq f_k$
-$\forall{k}~~s.t.~~i < k < l$). The $IRD(f_i) = \sum I(f_j)$ over all
+$T$ such that $f_i = f_l$ and nowhere else (i.e., $f_i \neq f_k$
+$\forall{k}~~s.t.~~i < k < l$). The $\mt{IRD}(f_i) = \sum I(f_j)$ over all
 distinct filters occurring in $phase(f_i)$, and $I(f)$ equals the code
 size of a filter $f$. Based on this reuse metric, we define an
-instruction-cache-miss step function $ICM(f_i)$ such that:
+instruction-cache-miss step function $\mt{IMS}(f_i)$ such that:
 \begin{equation}
-\label{eq:icm}
-  ICM(f_i) =
+\label{eq:ims}
+  \mt{IMS}(f_i) =
     \begin{cases}
-      0& \text{if $IRD(f_i) \leq C_I$; hit/no cache refill},\\
+      0& \text{if $\mt{IRD}(f_i) \leq C_I$; hit/no cache refill},\\
       1& \text{else; a miss/(some) cache refill}.\\
     \end{cases}
 \end{equation}
 Note that if $f_i$ is the last occurrence of a filter $f$ in the trace,
-then $ICM(f_i) = 0$. In Equation~\ref{eq:icm}, $C_I$ represents a
+then $IMS(f_i) = 0$. In Equation~\ref{eq:ims}, $C_I$ represents a
 constant proportional to the instruction cache size.
 
 We do not account for the cold start
-effects of an execution trace. This does not effect our model, and can
+effects of an execution trace. This does not affect our model, and can
 be easily remedied if necessary. To see why this is so, consider the
 following two execution traces which represent the executions of work
 functions for two filters \texttt{A} and \texttt{B}:
@@ -50,25 +50,25 @@ traces, the number of cold starts is the same (i.e., two in all).
 What our reuse metric quantifies is the number of misses when a specific work
 function is reinvoked. For example, assume that each filter is of the exact
 size: $I(\texttt{A}) = I(\texttt{B}) = \lceil{C_I / 2}\rceil + 1$;
-that is, the combined instruction workingset of both filters exceeds
+that is, the combined instruction working sets of both filters exceeds
 the instruction cache, although each filter has a code size that is
 smaller than the cache size. Naturally, we expect the trace $T_1$ to
 suffer one cold start miss and no other misses for filter \texttt{A}
 (and similarly for the other filter). Our model is in accord with
-intuition:  $ICM(\texttt{A}_1) = 0$ since
-the $IRD(\texttt{A}_1) < C_I$.
+intuition:  $\mt{IMS}(\texttt{A}_1) = 0$ since
+the $\mt{IRD}(\texttt{A}_1) < C_I$.
 
 In the case of trace $T_2$, we know that since the combined
-instruction workingset of the filters exceeds the cache size, when
+instruction working sets of the filters exceeds the cache size, when
 filter \texttt{B} is invoked following \texttt{A}, it evicts part of
-filter \texttt{A}'s instruction workingset. Hence when we transition
+filter \texttt{A}'s instruction working sets. Hence when we transition
 back to run filter \texttt{A}, we have to refetch certain
 instructions, but in the process, we replace parts of filter
-\texttt{B}'s workingset. Hence, we have suffered one cold start miss,
+\texttt{B}'s working sets. Hence, we have suffered one cold start miss,
 and one capacity miss for filter \texttt{A}, and similarly for
 \texttt{B}. Our model is again in accord with intuition: 
-$ICM(\texttt{A}_1) = 1$ since
-the $IRD(\texttt{A}_1) > C_I$. Note that the
+$\mt{IMS}(\texttt{A}_1) = 1$ since
+the $\mt{IRD}(\texttt{A}_1) > C_I$. Note that the
 amount of refill is proportional to the number of cache lines that are
 replaced when swapping filters, and as such, we may wish to adjust
 our cache miss step function. One simple variation is to allow for
@@ -79,7 +79,7 @@ a more complicated miss function with a more uniform probability
 distribution.
 
 Using the metrics above, we can estimate the instruction-cache miss
-rate $(IMR)$ as $\sum ICM(f_i)$ over all $f_i$ in the trace, divided
+rate $(IMR)$ as $\sum IMS(f_i)$ over all $f_i$ in the trace, divided
 by the size of the trace. Note that different execution orderings for
 the same stream graph lead to traces of the same size and hence the
 comparisons are fair. The model allows us to rank the quality of an
@@ -101,7 +101,7 @@ run_steady_state() {
   for (i = 0; i < 1; i++) B_work();
 }
 \end{verbatim}}
-but a scaled program that increases temporal locality is as follows:
+\noindent but a scaled program that increases temporal locality is as follows:
 {\small
 \begin{verbatim}
 run_steady_state() {
@@ -109,49 +109,49 @@ run_steady_state() {
   for (i = 0; i < M * 1; i++) B_work();
 }
 \end{verbatim}}
-where \texttt{M} (the multiplicity factor) is an integer greater than
+\noindent where \texttt{M} (the multiplicity factor) is an integer greater than
 one. From our model, it is easy to see that scaling reduces the number
 of misses for a given filter $f$ from $K$ to $\frac{K}{\texttt{M}}- 1$, where $K =
-\sum ICM(f)$ for all occurrences of $f$ in  the execution trace.
+\sum \mt{IMS}(f)$ for all occurrences of $f$ in  the execution trace.
 
 \subsection{Data Cache}
 
 As noted earlier, we can not arbitrarily scale the execution frequency
 of a filter without also considering how scaling might impact
-the data buffer sizes between filers. In this regard, a filter's
+the data buffer sizes between filters. In this regard, a filter's
 output buffer size is also constrained by the amount of state that a
 filter retains with every execution of its work function.
 
 Clearly if a filter has any static data (e.g., state information or
 coefficient arrays), then it is prudent to maximize their temporal
-access locality. We can define a data-cache miss rate equation ($DMR$) based on
+access locality. We can define a data-cache miss rate ($\mt{DMR}$) based on
 a derivation similar to that for the instruction-cache miss rate:
-replace $C_I$ with $C_D$ in Equation~\ref{eq:icm}, and $I(f_i)$ with
-$S(f_i)$ when calculating the {\it data reuse distance} ($DRD$). 
+replace $C_I$ with $C_D$ in Equation~\ref{eq:ims}, and $I(f_i)$ with
+$S(f_i)$ when calculating the {\it data reuse distance} ($\mt{DRD}$). 
 Here, $C_D$ represents a constant proportional to the data cache size,
 and $S(f)$ represents the total size of the static data in the
 specified filter.
 
 The presence of static data in a filter implies that we have to limit
 the scaling of a filter $f$ such that it does not require more than $C_D -
-S(f_i)$ bytes of buffer space for reading and writing data; otherwise
-the data workingset of the filter will overflow the cache and we lose
-produce-consumer locality. The buffer requirements are represented by
+S(f)$ bytes of buffer space for reading and writing data; otherwise
+the data working sets of the filter will overflow the cache and we lose
+producer-consumer locality. The buffer requirements are represented by
 $Y(f_i)$, and the data-cache model accounts for the dynamic data
 requirements by adjusting the data reuse distance as follows:
-$DRD(f_i) = \sum (S(f_i) + Y(f_i))$ over all distinct filters occurring
+$\mt{DRD}(f_i) = \sum (S(f_i) + Y(f_i))$ over all distinct filters occurring
 in $phase(f_i)$.
 
 Intuitively, the dynamic data accounts for the size of the buffer
 required for writing new values, as well as the size of the buffer
 necessary for reading values. It also adjusts for any
 producer-consumer locality since the output buffer of one filter is
-also the input buffer of its sibling in the stream graph. What this
-measures tells us is that we can scale the execution of a filter as
+also the input buffer of its neighbor in the stream graph. What this
+measure tells us is that we can scale the execution of a filter as
 long as its buffer requirements (for reading and writing) do not
 exceed the cache, and furthermore, as long as the input-output rates
-between producer consumer pairs are not grossly mismatched. This later
-qualification is important and motivates a series of cache
+between producer consumer pairs are not grossly mismatched. Managing the buffer 
+requirements is important and motivates a series of cache
 optimizations discussed in the next section. In the case of rate
 mismatch, the metric tells us that the effective cache size is
 reduced, or in other words, the data that is left over after a
@@ -178,7 +178,7 @@ represents the filter that consumes the data produced by $f_k$ (i.e.,
 it is $f_k$'s successor in the stream graph, and $f_k$--$f_s$
 constitute a producer-consumer pair; $f_s$ is unique unless $f_k$ is a splitter).
 
-The first term in the equation above quantifies the address space
+The first summand in the equation above quantifies the address space
 accessed for writing data. It is  equal to the lesser of the buffer size
 reserved for output, and the total number of items produced by
 the filter (i.e., the push rate multiplied by the number of times the

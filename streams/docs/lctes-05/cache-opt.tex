@@ -20,17 +20,17 @@ The goal of this optimization is to increase the execution frequency
 of the actors in a steady state schedule, such that the temporal
 locality in the memory hierarchy is improved. Our approach is to find a
 single multiplicity factor \texttt{M} for scaling all actors, such that
-at least 90\% of the actors have a data workingset that fits in the cache.
+at least 90\% of the actors have a data working sets that fits in the cache.
 In other words, using our model, we calculate \texttt{M} such that 
-$S(f) + D(f) \leq C_D$
+$S(f) + Y(f) \leq C_D$
 % and $DCM(f) = 0$ % this is wrong!
 for 90\% of the actors in the stream graph.
 
 The algorithm 
 computes the largest scaling factor for every actor such that its data
-workingset does not exceed the size of the primary data cache
+working sets does not exceed the size of the primary data cache
 (16~Kb on a Pentium~3 for example). This yields a set of multiplicities
-${\texttt{M}_0, \ldots, \texttt{M}_n}$ for the actors in the stream
+${\texttt{M}_1, \ldots, \texttt{M}_n}$ for the actors in the stream
 graph. For example, the algorithm might calculate
 $\texttt{M}_\texttt{A} = 10$,
 $\texttt{M}_\texttt{B} = 20$, 
@@ -39,18 +39,18 @@ $\texttt{M}_\texttt{D} = 40$ for four filters \texttt{A}, \texttt{B},
 \texttt{C}, and \texttt{D} in a stream graph.
 The algorithm then examines the
 distribution and selects the largest $\texttt{M}_i$
-for which 90\% of the actors satisfy our data workingset criterion.
+for which 90\% of the actors satisfy our data working sets criterion.
 In the example, the 90-10 heuristic
-selects $\texttt{M} = 10$, otherwise, the workingset of filter
+selects $\texttt{M} = 10$, otherwise, the working sets of filter
 \texttt{A} will exceed the cache. By contrast,
 a 75-25 heuristic selects $\texttt{M} = 20$, where 75\% of the
-data workingsets are smaller than the cache, and the remaining 25\%
+data working sets are smaller than the cache, and the remaining 25\%
 overflowing it.
 
 The 90-10 heuristic was determined empirically. We found that
 increasing the threshold beyond 90\% leads to marginal
 performance gains. The graphs in Figure~\ref{fig:9010} show the
-performance (y-axis) of our benchmarks for different values of the multiplicity
+execution time (y-axis) of our benchmarks for different values of the multiplicity
 factor (x-axis). In each plot, the diamond represents the \texttt{M} chosen via
 the 90-10 rule, and the square represents the largest calculated
 \texttt{M} (e.g., in the example above, the largest \texttt{M} is 40).
@@ -65,23 +65,24 @@ can lead to a high overhead in terms of context swapping between work
 functions, and buffer management for the shared data between filters.
 It is the compiler's role to adjust the granularity of execution such
 that actors do not vary significantly in terms of code  or data
-workingset size.
+working sets size.
 
-We use a greedy partitioning algorithm to find a set of vertical cuts
+We use a greedy partitioning algorithm to find a set of horizontal cuts
 in a stream graph such that the resulting partitions are more or less
 balanced. The algorithm uses code size estimation to quantify the
 instruction footprint of a partition, and analyzes the work function
 declarations to estimate the data buffer requirements. The algorithm
 also considers the amount of static state that is persistent across
-filter executions. This approach is similar to that in
-\cite{streamit-asplos} with two distinctions. First, the algorithm
+filter executions. This differs from that in
+\cite{streamit-asplos} in that the algorithm
 only considers vertical fusion (i.e., within a pipeline): horizontal
-fusion is not beneficial from  caching perspective, and may not even
-be feasible. Second, since the graph partitioning is limited to
-vertical cuts, our actor coarsening optimizations employs a greedy
-algorithm instead of a dynamic programing methodology; this reduces
-compilation time. 
+fusion is not beneficial from caching perspective. \framebox{Expand on this} \framebox{Emphasize order:  fuse then scale.}
+%Second, since the 
+%graph partitioning is limited to
+%horizontal cuts, our actor coarsening optimizations employs a greedy
+%algorithm instead of a dynamic programing methodology; this reduces
+%compilation time. 
 
 The cache-aware coarsening of actors, which we will also refer to as
 cache-aware fusion, greatly impacts performance as
-our results in Section~\ref{sec:evaluation} will demonstrate.
+our results in Section~\ref{sec:evaluation} demonstrate.
