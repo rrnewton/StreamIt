@@ -23,12 +23,12 @@ y_0 = {\vec x} A + {\vec b} = \sum_{k=0}^{e-1} A[k] \mbox{\tt peek}(e-k-1)
 \]
 Note that in this case, $y_0$ is a scalar since $\mt{push}=1$.  Now
 let us consider the values that appear on the output tape over time,
-which we denote by ${\vec y}$.  On the $n$'th iteration, the
+which we denote by ${\vec y}_1$.  On the $n$'th iteration, the
 computation is exactly as above, except that the input and output
 tapes are offset by $n$:
 \[
-\label{fig:linconv}
-{\vec y}[n] = \sum_{k=0}^{e-1} A[k] \mbox{\tt peek}(n+e-1-k) 
+\protect\label{eq:linconv}
+{\vec y}_1[n] = \sum_{k=0}^{e-1} A[k] \mbox{\tt peek}(n+e-1-k) 
 \]
 At this point, our equation is in the same form as a convolution sum
 from digital signal processing: given two vectors ${\vec h}$ and
@@ -41,8 +41,8 @@ frequency domain, due to the Fast Fourier Transform (FFT).  To compute
 the convolution, an N-point FFT of ${\vec x}$ and ${\vec h}$ is
 performed to obtain ${\vec X}$ and ${\vec H}$, each of which are
 complex-valued vectors of length $N$.  Element-wise multiplication of
-${\vec X}$ and ${\vec H}$ yields a vector ${\vec Y}$, on which we can
-perform an inverse FFT (IFFT) to obtain the result ${\vec y}$.
+${\vec X}$ and ${\vec H}$ yields a vector ${\vec Y}_1$, on which we can
+perform an inverse FFT (IFFT) to obtain the result ${\vec y}_1$.
 Convolution in the frequency domain requires $O(N \lg(N))$ operations,
 as each FFT and IFFT has a cost of $O(N \lg (N))$ and the vector
 multiplication is $O(N)$.  By contrast, the complexity is $O(N^2)$ in
@@ -50,14 +50,15 @@ the time domain, as each of the $N$ output values requires $O(N)$
 operations.  For more details, refer to~\cite{oppenheim-discrete}.
 
 We can use the exact procedure described above to implement
-Equation~\ref{fig:linconv} in the frequency domain.  The only
-modification to the procedure is due to the offset of $e-1$ in the
-peek argument.  Because of this offset, the complete convolution will
-yield values of ${\vec y}[i]$ for $i \in [-(e-1), n]$, even though the
-values at negative indices are not directly meaningful.  In the naive
-implementation, we simply disregard these values; however, in the next
-section, we give an optimized implementation that takes advantage of
-them.
+Equation~\ref{eq:linconv} in the frequency domain.  Let us consider
+the convolution of the $e$-element coefficient matrix $A$ with the
+first $m$ values on the input tape (we assume that $m>e$).  The only
+caveat is that the convolution will produce a total of $e+m-1$ values,
+of which only $m-e$ will be valid results to push on the output tape.
+The other values represent partial sums in which some of the
+coefficients were excluded.  In our naive implementation, we simply
+disregard these values; however, in the next section, we give an
+optmized implementation that takes advantage of them.
 
 The only task remaining for the implementation is to choose $N$, which
 for performance reasons should be a power of two, and as large as
@@ -66,27 +67,30 @@ can process per iteration, as too many items will cause frequency
 aliasing.  According to Fourier's theorem, an $N$-point FFT can
 exactly represent any discrete sequence of $N$
 numbers~\cite{oppenheim-discrete}.  The numbers we need to represent
-are the results ${\vec y}$, of which there are $n+e-1$ (where $n$
+are the results ${\vec y}$, of which there are $m+e-1$ (where $m$
 represents the number of input items per iteration).  Thus, we can
-choose $N$ as we please and use $n = N-e+1$.  In our implementation,
+choose $N$ as we please and use $m = N-e+1$.  In our implementation,
 we set $N$ to the first power of two that is larger than $2e$, which
 strikes a reasonable compromise between storage space and performance
 for our uniprocessor benchmarking platform.  Under a different set of
 resource constraints, the choice of $N$ should be adjusted.
 
 The transformation below gives a naive translation of a linear node to
-the frequency domain.  In addition, it relaxes all of the assumptions
-that we made above.  The algorithm allows for a non-zero value of
-${\vec b}$ by simply adding ${\vec b}$ after returning from the
-frequency domain.  To accommodate a push rate greater than one, the
-algorithm cycles between alternate columns of the $A$ matrix, pushing
-values from each one in turn.  Finally, to accommodate a pop rate
-greater than one, the algorithm performs extra computations and
-proceeds as if the pop rate was one; then, the node is followed by a
-decimator that eliminates the spurious output.  Though this introduces
-some inefficiency, it still leaves room for large performance
-improvements, as the frequency transformation improves performance by
-an average factor of 50 (in the case where $\mt{pop}=1$.)
+the frequency domain\footnote{Note that the ${\vec y}$ in the
+pseudocode is distinct from ${\vec y}_1$ in Equation~\ref{eq:linconv}.
+The relationship is that ${\vec y}[i] = {\vec y}_1[i-(e-1)]$.}  In
+addition, it relaxes all of the assumptions that we made above.  The
+algorithm allows for a non-zero value of ${\vec b}$ by simply adding
+${\vec b}$ after returning from the frequency domain.  To accommodate
+a push rate greater than one, the algorithm cycles between alternate
+columns of the $A$ matrix, pushing values from each one in turn.
+Finally, to accommodate a pop rate greater than one, the algorithm
+performs extra computations and proceeds as if the pop rate was one;
+then, the node is followed by a decimator that eliminates the spurious
+output.  Though this introduces some inefficiency, it still leaves
+room for large performance improvements, as the frequency
+transformation improves performance by an average factor of 50 (in the
+case where $\mt{pop}=1$.)
 
 \begin{transformation} (Naive frequency implementation)
 Given a linear node $\lambda = \{A, {\vec b}, e, o, u\}$, the
@@ -98,21 +102,21 @@ frequency domain: \\
     {\tt float \rightarrow float}~{\tt pipeline~naiveFreq~}(A, {\vec b}, e, o, u){\tt ~\{} & \hspace{40pt}\\
     ~~{\tt add~float->float~filter~\{}\\
     ~~~~N \leftarrow 2^{\lceil \lg(2e) \rceil} \\
-    ~~~~n \leftarrow N-e-1 \\
+    ~~~~m \leftarrow N-(e-1) \\
     \\
     ~~~~{\tt init}~{\tt \{} \\
     ~~~~~~{\tt for~j~=~0~to~}u-1\\
     ~~~~~~~~\vec{H}[j] \leftarrow \mathbf{FFT}(N,A[*,u-1-j]) \\
     ~~~~{\tt \}} \\
     \\
-    ~~~~{\tt work}~{\tt peek}~u*n~{\tt pop}~u*n~{\tt push}~u*n~{\tt \{} \\
-    ~~~~~~\vec{x} \leftarrow {\tt pop}(0 \dots n - 1) \\
+    ~~~~{\tt work}~{\tt peek}~u*(m-(e-1))~{\tt pop}~u*(m-(e-1))~{\tt push}~u*(m-(e-1))~{\tt \{} \\
+    ~~~~~~\vec{x} \leftarrow {\tt pop}(0 \dots m - (e-1)) \\
     ~~~~~~\vec{X} \leftarrow \mathbf{FFT} (N, \vec{x}) \\
     ~~~~~~{\tt for~j~=~0~to~}u-1\\
     ~~~~~~~~\vec{Y}[j] \leftarrow \vec{X} .* \vec{H}[j] \\
     ~~~~~~~~\vec{y}[j] \leftarrow \mathbf{IFFT}(N, \vec{Y}[j]) \\
     ~~~~~~{\tt \}} \\
-    ~~~~~~{\tt for~i~=~0~to~}n-1\\
+    ~~~~~~{\tt for~i~=~0~to~}m-(e-1)\\
     ~~~~~~~~{\tt for~j~=~0~to~}u-1\\
     ~~~~~~~~~~{\tt push}(\vec{y}[j][i+e-1] + {\vec b}[j])\\
     ~~~~{\tt \}} \\
@@ -126,6 +130,32 @@ frequency domain: \\
 
 \subsection{Optimized Frequency Implementation}
 
+The naive frequency implementation discards $2*(e-1)$ elements from
+each ${\vec y}[j]$ that it computes.  These values represent partial
+sums in which some of the coefficients of $A$ were excluded.  In this
+section we give an optimized algorithm that utilizes these partial
+sums to increase the throughput of the node without increasing the
+size of the FFT.  Our approach is one of several methods that use
+blocking to efficiently convolve a short filter with a large amount of
+input~\cite{oppenheim-discrete}.
+
+Let us illustrate how the partial sums can be combined between
+different iterations of the node's execution.  \\ \todo{Find simple explanation.}
+
+%% Recall that $A$ is of length $e$ and the input tape is given in blocks
+%% of length $m$.  Then, consider element $m+i$ of the first execution.
+%% Following equation~\ref{eq:linconv}, we have:
+%% \[
+%% {\vec y}[m+i] = \sum_{k=0}^{e-1} A[k] \mbox{\tt peek}(m+i+e-1-k)
+%% \]
+%% Since we are in the first execution, we can only peek at values $0
+%% \dots m-1$, which implies that $m+i+e-1-k \in [0, m-1]$ and thus $k
+%% \in [i+e, m+i+e-1]$.  That is, only coefficients $A[k]$ for these
+%% values of $k$ will be included in the sum.  Now consider the
+%% computation of element $i$ on the second iteration.  Since the second
+%% iteration can peek at values in the range of $[m,2m-1]$, we have (by
+%% the same reasoning as above) that $k \in [$.
+
 \begin{transformation} (Optimized frequency implementation)
 Given a linear node $\lambda = \{A, {\vec b}, e, o, u\}$, the
 following stream is an optimized implementation of $\lambda$ in the
@@ -136,7 +166,7 @@ frequency domain: \\
     {\tt float \rightarrow float}~{\tt pipeline~optimizedFreq~}(A, {\vec b}, e, o, u){\tt ~\{} & \hspace{40pt}\\
     ~~{\tt add~float->float~filter~\{}\\
     ~~~~N \leftarrow 2^{\lceil \lg(2e) \rceil} \\
-    ~~~~n \leftarrow N-e-1 \\
+    ~~~~m \leftarrow N-e-1 \\
     ~~~~\vec{partials} \leftarrow {\tt new~float}[u][e] \\
     \\
     ~~~~{\tt init}~{\tt \{} \\
@@ -144,31 +174,31 @@ frequency domain: \\
     ~~~~~~~~\vec{H}[j] \leftarrow \mathbf{FFT}(N,A[*,u-1-j]) \\
     ~~~~{\tt \}} \\
     \\
-    ~~~~{\tt prework}~{\tt peek}~u*n~{\tt pop}~u*n~{\tt push}~u*(n-(e-1))~{\tt \{}\\
-    ~~~~~~\vec{x} \leftarrow {\tt pop}(0 \dots n-1) \\
+    ~~~~{\tt prework}~{\tt peek}~u*m~{\tt pop}~u*m~{\tt push}~u*(m-(e-1))~{\tt \{}\\
+    ~~~~~~\vec{x} \leftarrow {\tt pop}(0 \dots m-1) \\
     ~~~~~~\vec{X} \leftarrow \mathbf{FFT} (N, \vec{x}) \\
     ~~~~~~{\tt for~j~=~0~to~}u-1\\
     ~~~~~~~~\vec{Y}[j] \leftarrow \vec{X} .* \vec{H} \\
     ~~~~~~~~\vec{y}[j] \leftarrow \mathbf{IFFT}(N, \vec{Y}[j]) \\
-    ~~~~~~~~\vec{partials}[j] \leftarrow \vec{y}[j][n \dots (N-1)]\\
+    ~~~~~~~~\vec{partials}[j] \leftarrow \vec{y}[j][m \dots (N-1)]\\
     ~~~~~~{\tt \}} \\
-    ~~~~~~{\tt for~i~=~0~to~}n-(e-1)\\
+    ~~~~~~{\tt for~i~=~0~to~}m-(e-1)\\
     ~~~~~~~~{\tt for~j~=~0~to~}u-1\\
     ~~~~~~~~~~{\tt push}(\vec{y}[j][i+e-1] + b[j]) \\
     ~~~~{\tt \}} \\
     \\
-    ~~~~{\tt work}~{\tt peek}~u*n~{\tt pop}~u*n~{\tt push}~u*n~{\tt \{} \\
-    ~~~~~~{\tt for~i~=~0~to~}e-1\\
-    ~~~~~~~~{\tt for~j~=~0~to~}u-1\\
-    ~~~~~~~~~~{\tt push}(\vec{y}[j][i] + {\vec partials}[j][i])\\
-    ~~~~~~\vec{x} \leftarrow {\tt pop}(0 \dots n - 1) \\
+    ~~~~{\tt work}~{\tt peek}~u*m~{\tt pop}~u*m~{\tt push}~u*m~{\tt \{} \\
+    ~~~~~~\vec{x} \leftarrow {\tt pop}(0 \dots m - 1) \\
     ~~~~~~\vec{X} \leftarrow \mathbf{FFT} (N, \vec{x}) \\
     ~~~~~~{\tt for~j~=~0~to~}u-1\\
     ~~~~~~~~\vec{Y}[j] \leftarrow \vec{X} .* \vec{H}[j] \\
     ~~~~~~~~\vec{y}[j] \leftarrow \mathbf{IFFT}(N, \vec{Y}[j]) \\
-    ~~~~~~~~{\vec partials}[j] \leftarrow \vec{y}[j][n \dots (N-1)]\\
+    ~~~~~~~~{\vec partials}[j] \leftarrow \vec{y}[j][m \dots (N-1)]\\
     ~~~~~~{\tt \}} \\
-    ~~~~~~{\tt for~i~=~0~to~}n-(e-1)\\
+    ~~~~~~{\tt for~i~=~0~to~}e-1\\
+    ~~~~~~~~{\tt for~j~=~0~to~}u-1\\
+    ~~~~~~~~~~{\tt push}(\vec{y}[j][i] + {\vec partials}[j][i])\\
+    ~~~~~~{\tt for~i~=~0~to~}m-(e-1)\\
     ~~~~~~~~{\tt for~j~=~0~to~}u-1\\
     ~~~~~~~~~~{\tt push}(\vec{y}[j][i+e-1] + {\vec b}[j])\\
     ~~~~{\tt \}} \\
