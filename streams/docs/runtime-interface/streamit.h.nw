@@ -112,6 +112,7 @@ types of splitters and joiners.
 <<Enumerations>>=
 typedef enum splitjoin_type {
   ROUND_ROBIN,
+  WEIGHTED_ROUND_ROBIN,
   DUPLICATE,
   COMBINE,
   NULL_SJ
@@ -281,8 +282,8 @@ within the stream graph.  Both functions take a [[splitjoin_type]] as
 their first parameter, indicating the type of the splitter or joiner.
 The second parameter is the fan-out/in of the splitter or joiner.  The
 remaining parameters are the number of consecutive items that go to
-each stream, for a [[ROUND_ROBIN]] type.  There are assumed to be
-exactly [[n]] ratio items.
+each stream, for a [[WEIGHTED_ROUND_ROBIN]] type.  There are assumed
+to be exactly [[n]] ratio items.
 
 A particular stream structure is assumed to have at most one splitter
 or joiner.  A [[SPLIT_JOIN]] has the splitter at the top of the block,
@@ -328,9 +329,10 @@ and each input and output tape must have the same size.
 The work function of parent nodes must explicitly cause data to be
 pushed through splitters and joiners.  [[run_splitter]] and
 [[run_joiner]] push data through a splitter or joiner; one call pushes
-one ``item'' of data.  For [[ROUND_ROBIN]] splits and joins, one call
-moves one complete round-robin cycle; for [[DUPLICATE]] splits, one
-call moves one data item from the input to each of the outputs.
+one ``item'' of data.  For [[ROUND_ROBIN]] and
+[[WEIGHTED_ROUND_ROBIN]] splits and joins, one call moves one complete
+round-robin cycle; for [[DUPLICATE]] splits, one call moves one data
+item from the input to each of the outputs.
 
 <<Split/Join Initializers>>=
 void run_splitter(stream_context *c);
