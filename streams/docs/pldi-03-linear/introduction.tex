@@ -26,11 +26,11 @@
 
 \section{Introduction}
 Digital computation is becoming a ubiquitous element of modern life.
-Everything from cell phones to GPS systems to satellite radios require
-increasingly sophisticated algorithms for digital signal processing.
-Optimization is especially important in this domain, as embedded
-devices commonly have high performance requirements and tight resource
-constraints.  Consequently, there are often two stages to the
+Everything from cell phones to HDTV systems to satellite radios
+require increasingly sophisticated algorithms for digital signal
+processing.  Optimization is especially important in this domain, as
+embedded devices commonly have high performance requirements and tight
+resource constraints.  Consequently, there are often two stages to the
 development process: first, the algorithm is designed and simulated at
 a high level of abstraction, and second, it is optimized and
 re-implemented at a low level by an expert DSP programmer.  In order
@@ -67,8 +67,8 @@ and complex to implement.  They are only beneficial under certain
 conditions---conditions that might change with the next version of the
 system, or that might depend on neighboring components that are being
 written by other developers.  To improve the modularity, portability,
-and extensibility of stream programs, we believe that the compiler
-should be responsible for identifying linear nodes and performing the
+and extensibility of stream programs, the compiler should be
+responsible for identifying linear nodes and performing the
 appropriate optimizations.  Towards this end, we make the following
 contributions:
 \begin{itemize}

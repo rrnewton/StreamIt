@@ -160,7 +160,7 @@ For the direct cost, we consider the cost to be infinite for
 splitjoins with roundrobin splitters.  This is because the splitjoin
 combination does not eliminate any arithmetic operations, and for the
 roundrobin case it introduces extra overhead (the duplicate case is
-different because the input items are shared between streams.)  For
+different because the input items are shared between streams).  For
 other streams, we count the number of multiplies and adds required to
 perform the matrix multiplication, giving more weight to the
 multiplies since they are more expensive.  We do not count the zero
