@@ -68,6 +68,10 @@
   - results on Raw as the tile count varies
 
 - non-hierarchical graph transformations
+   - introducing synchronization for non-rectangular pieces.  could do some 
+	kind of pre-pass to arrange the individual pipelines along the rectangles
+        that you're interested in drawing.
+
    - vertical splitjoin fission (and permutation of components)
 
    - pushing filter into or out of a splitjoin (e.g. to load balance

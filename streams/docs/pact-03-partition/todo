@@ -2,8 +2,20 @@ paper:
 
 - can we omit description of 2-stage filters?
 
+- in algorithm write-up, can incorporate data or code size by
+replacing "sum" with a generic operator * and then defining * to be +
+in the case of just summing, but + with a threshold otherwise... also
+modify traceback, e.g., to pick a given cost with the FEWEST number of
+nodes.
+
 theoretical:
 
+- how to do pipeline fission, e.g. in FFT - since joiners will still
+exist if each node is fissed individually, need to consider pipeline
+fission on the whole.  Or guarantee somehow that sync removal can work
+afterwards.  (After fission, could annotate the splitjoin that the
+multiplicity of each parallel stream can be scaled if it facilitates
+joiner removal.)
 
 - problem with first doing fission of filters inside a splitjoin and
 then slicing them horizontally, together.  this is allowed with the
@@ -16,10 +28,6 @@ below, or programming the roundrobin to input things in a different
 order.)  But I guess our framework doesn't support this.
 
 implementation:
-
- - dealing with pipeline fission in FFT - should have pipeline look at
-   the optimal allocation and then adjust weights if it helps sync
-   removal.
 
  - 2-stage pipeline fusion (Jasper)  (vocoder/nokia waiting on it)
 

@@ -126,3 +126,46 @@ round robin on push rate.
 case 3: peek==pop.  Then roundrobin splitter for amount consumed by
 stream, with roundrobin joiner matching.
 
+------------------------
+
+here's the old, one-dimensional cost function:
+
+// return minimal cost for allocating <n> partitions to children
+// <child1>...<child2> of stream <s>
+procedure getCost(stream s, int child1, int child2, int n)
+------------------------------------------------------------
+// if value is memoized, return it
+if (A_s[child1][child2][n] != -1)
+  return A_s[child1][child2][n]
+endif
+
+// if down to one child, descend into it
+if (child1==child2)
+  int cost = getCost(s.get(child1), 0, s.getCost(child1).size()-1, n)
+  A_s [child1][child2][n] = cost
+  return cost;
+endif
+
+// if n is 1, just sum the work of components
+if (n==1)
+  int sum = get(child1, child1, n) + get(child1+1, child2, n);
+  A[child1][child2][n] = sum;
+  return sum;
+endif
+
+// otherwise, find lowest-cost place at which to make a partition
+// at this level 
+int min = infinity
+for i = child1 to child2 - 1
+  for j = 0 to n-1
+    int cost = max(getCost(child1, i, j), getCost(i+1, child2, n-j))
+    if (cost < min)
+      min = cost
+    endif
+  endfor
+endfor
+
+A[child1][child2][n] = min;
+return min
+
+
