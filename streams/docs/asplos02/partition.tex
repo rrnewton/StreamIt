@@ -96,7 +96,7 @@ Law captures the maximum realizable speedup for scientific
 applications, but for streaming programs, the maximum improvement in
 throughput is given by the following expression:
 \begin{align*}
-\mbox{\it Maximum speedup}(w, c) = \frac{\sum_{i=1}^m{c_i}}{MAX_i(c_i \cdot w_i)}
+\mbox{\it Maximum speedup}(w, c) = \frac{\sum_{i=1}^m{c_i \cdot w_i}}{MAX_i(c_i \cdot w_i)}
 \end{align*}
 where $w_1 \dots w_m$ denote the amount of work in each of the $m$
 partitions of a program, and $c_i$ denotes the multiplicity of work
