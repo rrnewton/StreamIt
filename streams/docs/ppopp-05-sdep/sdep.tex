@@ -145,31 +145,34 @@ in the stream graph.  However, for longer execution traces, there is a
 pattern in the marginal growth of $\sdep$ ({\it i.e.,} in $\sdep(n) -
 \sdep(n-1)$); this quantity follows a cyclic pattern and has the same
 periodicity as the steady state of the stream graph.  A steady state
-is an execution that does not change the buffering in the channels;
-the number of items on each channel after the execution is the same as
-it was before the execution.  Figure~\ref{fig:sdep1} simulates a
-single steady state, meaning that additional entries of the pull
-schedule will repeat the pattern given in the figure.  Thus, $\sdep$
-will also grow in the same pattern, and we can calculate $\sdep$ for
-$n > 4$ as follows\footnote{Note that for any two actors $X$ and $Y$,
-$\sdepf{X}{Y}(0) = 0$}:
+${\cal S}$ is an execution that does not change the buffering in the
+channels; the number of items on each channel after the execution is
+the same as it was before the execution.  The execution simulated in
+Figure~\ref{fig:sdep1} is a steady state, meaning that additional
+entries of the pull schedule will repeat the pattern given in the
+figure.  Thus, $\sdep$ will also grow in the same pattern, and we can
+calculate $\sdep$ for $n > 4$ as follows\footnote{Note that for any
+two actors $X$ and $Y$, $\sdepf{X}{Y}(0) = 0$}:
 \begin{equation*}
-\begin{array}{c}
-\mbox{} \hspace{-5pt} \sdepf{A}{E}(n) = {\cal S}(A) * \floor{n-1}{{\cal S}(E)} + \sdepf{A}{E}(n-1~\mt{mod}~{\cal S}(E)) \vspace{3pt} \\
-\mbox{} \hspace{-5pt} \sdepf{B}{E}(n) = {\cal S}(B) * \floor{n-1}{{\cal S}(E)} + \sdepf{B}{E}(n-1~\mt{mod}~{\cal S}(E))
+\begin{array}{l}
+\mbox{} \hspace{-5pt} \sdepf{A}{E}(n) = \\ 
+~~~~~|{\cal S} \wedge A| * \floor{n-1}{|{\cal S} \wedge E|} + \sdepf{A}{E}(n-1~\mt{mod}~|{\cal S} \wedge E|) \vspace{3pt} \\
+\mbox{} \hspace{-5pt} \sdepf{B}{E}(n) = \\
+~~~~~|{\cal S} \wedge B| * \floor{n-1}{|{\cal S} \wedge E|} + \sdepf{B}{E}(n-1~\mt{mod}~|{\cal S} \wedge E|)
 \end{array}
 \end{equation*}
-where ${\cal S}(X)$ represents the number of times that actor $X$
-appears in the steady state schedule.  In this example, ${\cal S}(A) =
-6$, ${\cal S}(B) = 3$, and ${\cal S}(E) = 4$.
+where ${\cal S}$ is a steady state execution.  In this example,
+$|{\cal S} \wedge A| = 6$, $|{\cal S} \wedge B| = 3$, and $|{\cal S}
+\wedge E| = 4$.  There are well-known techniques for computing steady
+state schedules~\cite{LM87-i}.
 
 Thus, to calculate $\sdepf{X}{Y}(n)$, it is not necessary to simulate
 a pull schedule for $n$ iterations of $Y$ as described in Algorithm 1.
-Instead, one can simulate ${\cal S}(Y)$ iterations as a pre-processing
-step and answer all future $\sdep$ queries in constant time.  In
-addition, the pull schedule for $Y$ can be reused to calculate $\sdep$
-from $Y$ to any other actor ({\it e.g.,} $\sdepf{W}{Y}$ in addition to
-$\sdepf{X}{Y}$).  
+Instead, one can simulate $|{\cal S} \wedge Y|$ iterations as a
+pre-processing step and answer all future $\sdep$ queries in constant
+time.  In addition, the pull schedule for $Y$ can be reused to
+calculate $\sdep$ from $Y$ to any other actor ({\it e.g.,}
+$\sdepf{W}{Y}$ in addition to $\sdepf{X}{Y}$).
 
 However, note that the pull schedule for $Y$ can NOT be used to
 calculate $\sdep$ from any actor other than $Y$ ({\it e.g.,}
@@ -183,8 +186,9 @@ times before the first firing of $B$, so we would conclude that
 $\sdepf{A}{B}(1) = 4$.  However, this is incorrect; since $B$ could
 have fired after only 2 executions of $A$, the correct value is
 $\sdepf{A}{B} = 2$.  Thus, to calculate $\sdepf{X}{Y}$, it is
-essential to calculate ${\bf pullSchedule}(Y, {\cal S}(Y))$, that is,
-a steady state cycle of the pull schedule with respect to $Y$.
+essential to calculate ${\bf pullSchedule}(Y, |{\cal S} \wedge Y|)$,
+that is, a steady state cycle of the pull schedule with respect to
+$Y$.
 
 %% {\scriptsize
 %% \begin{verbatim}
