@@ -1,0 +1,279 @@
+From: "LCT03" <lctes03@ce.chalmers.se>
+To: <karczma@lcs.mit.edu>
+Cc: <lctes03@ce.chalmers.se>
+Sent: Monday, March 31, 2003 12:45 AM
+Subject: Your LCTES 2003 Paper (Number 128)
+
+
+Dear Michal Karczmarek:
+
+On behalf of the LCTES 2003 Program Committee, I am delighted to inform
+you that the following paper has been conditionally accepted to appear at the
+ACM SIGPLAN Langauges, Compilers, and Tools for Embedded Systems - 2003
+(LCTES'03):
+
+     Phased Scheduling of Stream Programs
+
+if the following condition is met.
+
+You will shortly be contacted by the publication chair, Dr. Uli Kremer,
+(uli@cs.rutgers.edu) about formatting details. The final version is
+due April 25.
+
+NOTE: In order for the paper to be included in the proceedings,
+one author must have registered for the conference before this
+deadline!!!
+
+
+The Program Committee worked very hard to thoroughly review
+all the submitted papers.  Please repay their efforts, by following
+their suggestions when you revise your paper. The reviews and comments
+are attached below.
+
+Congratulations on your fine work.  If you have any additional
+questions, please feel free to get in touch.
+
+
+Best Regards,
+
+Per Stenstrom
+Program Chair, LCTES 2003
+
+Email: pers@ce.chalmers.se
+
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+
+==========================================================================
+LCTES 2003 Reviews for Paper #128
+
+==========================================================================
+
+Title: Phased Scheduling of Stream Programs
+
+Authors: Michal Karczmarek, William Thies, Saman Amarasinghe
+
+==========================================================================
+                            REVIEWER #1
+
+==========================================================================
+
+                           Reviewer's Scores
+                  -----------------------------------
+
+                      Relevance to LCTES: 7
+                             Originality: 7
+                      Technical Strength: 9
+                            Presentation: 9
+                      Overall Evaluation: 7
+
+
+
+--------------------------------------------------------------------------
+
+                          Detailed Comments
+--------------------------------------------------------------------------
+
+
+In techincal sense, this paper looks good and interesting, and has sound
+theoretical foundation. This papers is also written cleanly. (But I think the
+paper is too long...actually way too long.)
+
+I like this paper in some sense because I always believe we need a good
+language
+designed for signal processing instead of C/C++. However, as evertbody knows
+all the previous efforts to develop new (stream programming) languages have
+been
+failed. By 'fail' I mean that those languages, though very elegant and
+efficient, could
+not draw attentions to the real users. Although the authors claime in this
+paper that
+if the language is very efficient and helps the user to get very high
+performance with
+relatively minor programming efforts (as compared to C/C++), it will finally
+attract the
+users in the field, various previous experience tells us the opposite. For
+instance,
+Sisal has proven in various experiments that parallel programming with Sisal
+helps
+the user to program more easily and also to produce a very high quality code as
+compared to conventional C/Fortran code. However, no one did not seriously
+ever used the language in industry, and thus Sisal eventually faded away..
+
+In this sense, this effort to develop a new language may be important in
+academic
+sense, but probably not in industrial sense.... I think.
+
+I know there have been more related studies. You better check with Silage and
+DFL languages.
+
+
+==========================================================================
+                            REVIEWER #2
+
+==========================================================================
+
+                           Reviewer's Scores
+                  -----------------------------------
+
+                      Relevance to LCTES: 10
+                             Originality: 7
+                      Technical Strength: 8
+                            Presentation: 9
+                      Overall Evaluation: 8
+
+
+
+--------------------------------------------------------------------------
+
+                          Detailed Comments
+--------------------------------------------------------------------------
+
+
+This paper presents novel hierarchical methods for scheduling
+a class of stream programs. The paper is well written
+and the techniques appear sound. To better tie the paper
+to previous related work it would be useful to mention
+analogies when related concepts are presented. For example
+steady state schedules and steady states in relation to periodic
+schedules and repetitions vectors. Brief mention of the similarities
+and differences of related terms would be useful. Additional minor
+comments follow.
+
+-- page 5: "corresponding ordered set $N$": how is this set ordered?
+
+-- cyclic synchronous dataflow (CSDF) --> cyclo-static dataflow.  An
+original
+CSDF reference ([19] is not one) appears in the 1994  Workshop on VLSI
+Signal
+Processing Proceedings. Regarding the bibliography in general, several
+references are missing information.
+
+-- More details in relation to the latency considerations of [8] would
+be useful.
+
+-- The arguments about reducing scheduling complexity are vague. Casting
+these in terms of algorithmic/storage complexity expressions would be
+more illuminating.
+
+
+==========================================================================
+                            REVIEWER #3
+
+==========================================================================
+
+                           Reviewer's Scores
+                  -----------------------------------
+
+                      Relevance to LCTES: 9
+                             Originality: 8
+                      Technical Strength: 6
+                            Presentation: 5
+                      Overall Evaluation: 7
+
+
+
+--------------------------------------------------------------------------
+
+                          Detailed Comments
+--------------------------------------------------------------------------
+
+
+Many DSP algorithms fit a streaming model of computation
+very well.   StreamIt is a language built with these
+algorithms in mind.   Its graphical representation and
+and simple primitives provide what looks to be intuitive
+for representing streaming applications.
+
+The paper's presentation of StreamIt reads well, but is
+considerably longer than the page limit allowed.   I suspect
+that even if the Appendices were dropped that the length
+would be too great.
+
+  So, in summary, the topic is important, the language is
+promising, the presentation seems to lack a very strong
+focus. Instead of trying to give a complete overview of
+StreamIt and also talk about compilation techniques, perhaps
+the paper should do one of those things, or do both at a much
+less detailed level.
+
+ Personally I think two papers are
+called for.   First a description of the basic ideas and
+the language concepts and then another paper focusing
+entirely on compilation issues.   Can a StreamIt program
+be easily (or even not easily) mapped to excellent performance
+on a "traditional" VLIW architecture? Or does it require
+a different hardware model to be effective?
+
+
+==========================================================================
+                            REVIEWER #4
+
+==========================================================================
+
+                           Reviewer's Scores
+                  -----------------------------------
+
+                      Relevance to LCTES: 5
+                             Originality: 5
+                      Technical Strength: 5
+                            Presentation: 1
+                      Overall Evaluation: 5
+
+
+
+--------------------------------------------------------------------------
+
+                          Detailed Comments
+--------------------------------------------------------------------------
+
+
+The paper introduces a scheduling technique (phased scheduling)
+for synchronous dataflow (SDF) graphs that attempts to minimize
+the amountof buffer space required to execute an SDF graph.
+Evaluation on realistic benchmark kernels shows improvement
+in a couple of cases over a naive algorithm.
+
+Scheduling SDF graphs is an old area with a lot of results
+over almost two decades. The results described here breathe
+a little bit of new life into this somewhat tired area, and while
+not tremendously exciting, and somwhat hard to understand the way
+they are presented, they are solid and worth publishing in
+LCTES.
+
+Recommendation: Weak accept.
+
+Major strenths:
+- The phased scheduling technique shows some improvement
+over the naive approach and never makes things worse, and
+in one case provides smaller buffer sizes than the buffer
+merging technique by Murthy
+
+- The application benchmarks are realistic and
+are a superset of the ones considered in the 2002 ASPLOS paper
+on the StreamIt compiler. So the authors are continuing to
+expand their benchmark set, which is good.
+
+Major Weaknesses:
+
+- The evaluation compares the author's approach to a naive
+approach, which is also developed by the authors. This isn't
+very convincing. What is needed is a comparison to prior
+scheduling approaches, such as the buffer merging approach
+of Murthy. The evaluation does mention that phased scheduling
+beats buffer merging for the CD-DAT, but the comparison needs
+to be done more systematically across all benchmarks and across
+a wider set of competing scheduling algorithms, to be convincing.
+
+- The buffer merging approach of Murthy seems to be closely
+related to this work, but is only given scant passing mention.
+The paper must be more specific about the similarities and
+differences of these two approaches.
+
+- Most bibliography entries don't contain the conference or
+journal name, only the name and date. This is very sloppy and
+must be corrected in any final version.
+
+- The paper is hard to read and understand.
+
+

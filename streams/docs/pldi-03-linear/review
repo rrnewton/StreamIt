@@ -1,0 +1,272 @@
+    Date: Sat, 25 Jan 2003 15:54:11 EST
+    From: PLDI 2003 - CyberChair <pldi-admin@borbala.com>
+Reply-To: pldi-admin@borbala.com
+ Subject: PLDI 2003 Notification
+      To: aalamb@lcs.mit.edu
+
+Dear Andrew Lamb,
+
+Thank you for your submission to PLDI'03. We are pleased to inform
+you that your paper, titled
+
+"Linear Analysis and Optimization of Stream Programs"
+
+has been accepted for publication in the Proceedings. Papers went
+through a rigorous reviewing process.  Each paper was reviewed by
+three program committee members and one external reviewer. Of 131
+papers submitted only 28 were accepted.
+
+Please carefully take into account the enclosed comments by the
+reviewers when preparing the camera-ready version.
+
+You will shortly receive the instructions for preparing the camera
+ready copy from Sheridan Printing.
+
+Congratulations on having your paper accepted. I look forward to
+seeing you at PLDI'03.
+
+Sincerely,
+
+Rajiv Gupta
+PLDI 2003 PC Chair
+
+*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=
+Remark about the reviews below.
+Reviewers could fill in 3 sections:
+  1. Summary of the submission;
+  2. Comments;
+  3. Points in favour or against.
+
+Only sections that have been filled in by the reviewers are included below.
+*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=
+
+First reviewer's review:
+
+          >>> Summary of the submission <<<
+
+This paper describes linear analysis and optimization of stream programs
+written in StreamIt, a streaming language. Tha analysis identifies a linear
+transfer function from code written in StreamIt. Neighbouing linear functions
+are then collapsed into a single linear representation. This transformation
+automatically eliminates redundant computations. The paper also describes
+automatically converting a stream computation into the frequency domain,
+computation in which is more efficienct than in the (discrete) time domain.
+They present implementation result, which show quite impressive speedups:
+5x on average, and 6.5x in the best case.
+
+ =*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=
+
+          >>> Comments <<<
+
+The task of extracting a linear transfer function from code is simplified
+partly because the language, StreamIt, hides low-level details
+and makes easier for the compiler to recognize these functions. Once
+linear functions are recognized, collapsing neighboring linear functions
+are easily done by mimicking matrix manipulations.
+The approach is quite similar to SPIRAL, which uses SPL as the input
+language. The main difference is that with SPL, matrix computations are
+directly expressed in a parameterized way, while with StreamIt, they need
+be recognized by the compiler. However, StreamIt makes matrix computations
+more easily exposed than other general languages do.
+
+ =*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=
+
+          >>> Points in favour or against <<<
+
+Favour: simple techniques that work quite well.
+
+Against: simple, domain specific analysis and optimization technqiues
+
+ =*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=
+
+Second reviewer's review:
+
+          >>> Summary of the submission <<<
+
+The paper presents a series of optimizations for StreamIt programs.
+These optimizations take a StreamIt program fragment consisting of
+modular filters (combined using simple pipelining, stream duplication
+or round-robin combinators) and merges the separate filters into a
+single filter. In essence this is a sophisticated loop fusion
+optimization.
+
+ =*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=
+
+          >>> Comments <<<
+
+The motivating example in 1.1 is actually not a very good "motivating"
+example. It is a good illustrative example because it exemplifies the
+basic ideas. However, I don't think it does a good job of motivating
+the paper. I think if I were to show this to someone who
+writes DSP code for a living, they would not take it seriously:
+everyone knows that there is a very simple transformation that
+combines consecutive FIR filters with the same number of taps!
+In fact, this kind of transformation would probably be done during
+algorithm design (within something like Matlab) even before any C
+code is written.
+
+p3/Fig 8: where is the condition on the branch?
+Also, it is not clear where the reasoning about branches is useful.
+Since both branches have to do produce the same linear forms, they
+would seem to be identical code? The only case where I could see use
+for this would be if one case of the branch called some side effecting
+function e.g. some logging or debugging function. However, the
+expressions in fig 8 don't seem to cover this? Perhaps an example
+would help explain this point.
+
+p7: "appear appear"
+
+p8: "where where"
+
+appendix: the graphs are very useful, but the fonts are too small!
+Why not expand fig 17 to take up the entire page?
+
+More comments:
+
+The paper contains a number of excellent ideas, but suffers for some
+presentation problems. The biggest problem is a lack of examples,
+especially in Sections 4 and 5. You provide a motivating example in
+Section 3, and some optimizations that are supposedly obtained from
+applying the techniques described in the paper, but the reader is left
+to infer how the analysis and combinations gives you the optimized
+versions of the code. For example, in Section 4.4 you state "Our
+analysis can start with the specification and derive the efficient
+version automatically", but provide little information on exactly how
+this would be done. Including a short extra example or two would
+greatly increase the clarity of the paper. Perhaps you could excise
+one or more of the stream graph figures. Other than that issue, I
+feel the paper is a fairly strong contribution, although the scope of
+filters that the frequency domain translator can handle is limited.
+
+Specific comments:
+- (Section 3) In your description of the linear extraction algorithm,
+you should make clearer that the variables "pushcount" and "popcount"
+are not simply counters, but are the actual indices used to build the
+elements of the linear node.
+- (Section 4) Transformation 3.
+ Should joinRep = lcm(lcm(u0,w0)/w0,...,lcm(un-1,wn-1))?
+- (Section 5) You should be a little more explicit in stating that
+your method of detecting convolution regions involves only
+transforming FIR filters with a unit push rate. This info is spread
+around a bit. Also, what is the threshold for considering a
+convolution region large enough to perform this transformation?
+- (Section 6) The results are a bit light, as there are only five
+examples. Where are the representative programs from? I would like
+to see some of this applied to a real DSP rather than a ideal
+simulation platform running on an Intel Box.
+
+ =*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=
+
+          >>> Points in favour or against <<<
+
+One weakness of the paper is in the measurement of the effectiveness
+of the optimizations. The results show a clear improvement in
+performance, but the starting point (separate modular filters) is very
+naive and inefficient, so a performance improvement is only to be
+expected. A more compelling measure of the utility of these
+optimizations would be to compare the optimized StreamIt code with
+hand crafted C code for these applications. In addition, the
+measurements should include code size and data size (especially
+coefficient storage requirements as well buffering requirements).
+
+A related concern is that there are only a five benchmarks. Most of
+these are either artificial or only represent a small portion of a
+real application. The only "full application" (FM radio benchmark) is
+still very simple. The most compelling (at least from an end-to-end
+application point of view) are the transformations that deal with
+complex oversampling, interpolation, decimation and multiplexing
+(i.e. uses of round-robin split/join) operations. However, none of
+the examples really push this (the rate conversion benchmark is only
+2/3). Looking at the transformations, it seems that they may not
+perform well on such applications. In particular, if I have a network
+with a round-robin splitter, then I will apply transformation 4
+followed by transformation 3, and it seems that in so doing the final
+linear filter will potentially have a huge coefficient matrix, with
+many of the entries being 0. This could actually make performance
+worse because it could significantly increase the number of
+multiplication operations. The question is: how to take advantage of
+the 0 entries. We could expand out the matrix multiplication loop,
+but that would likely lead to unacceptable code explosion.
+
+In short, I am concerned how the transformations scale to real
+applications. While they may give acceptable results on an PC (where
+we have relatively large memory and so code and date sizes are less
+critical), I'm not sure they would give acceptable results for
+deployment on a typical embedded DSP platform where code size and
+filter coefficient size are at a premium.
+
+ =*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=
+
+Third reviewer's review:
+
+          >>> Summary of the submission <<<
+
+This paper develops an automatic optimization system for common
+signal processing applications expressed in a domain-specific
+language StreamIt. A natural description in a high-level language
+does not always lead directly to an efficient implementation. For
+this, the authors develop filter transformations applied to a
+high-level model extracted from the specification. The paper is
+novel. The authors demonstrate significant performance improvement.
+
+ =*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=
+
+          >>> Comments <<<
+
+Can you extract information from a high-level specification that can
+give you a clear picture of how much speedup you can get and what
+transformations are most likely to be useful?
+
+Do you have access to hand-optimized code to compare the output
+of your system? It is not clear what the speedup numbers really
+represent in the absence of information about the baseline codes.
+
+ =*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=
+
+          >>> Points in favour or against <<<
+
+For:
+  + effective solution for generating high-quality code from very
+   high-level specification of DSP computations in a domain-specific
+   language
+
+ =*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=
+
+Fourth reviewer's review:
+
+          >>> Summary of the submission <<<
+
+This paper develops an automatic optimizer for linear-filter programs
+common in the DSP domain. The optimizer performs two simple, but
+effective, filter transformations: filter collapsing and filter
+translation into the frequency domain. I found it quite impressive
+that the optimizer is able to work with programs written in a
+(relatively) flexible language (as opposed to requiring a language for
+writing strictly linear filters).
+
+In its philosophy, this paper is an exciting exemplar of what I
+believe will soon be a burgeoning area: high-level translation and
+optimization of domain-specific languages. This fact is alone, I
+think, a reason to accept the paper, despite the deficiencies it may
+have.
+
+More technically, what I found most interesting about the paper is
+that in order to perform the optimization, the optimizer first
+attempts to extract from the program a high-level model (in this case,
+an affine transformer) which then serves as a clean representation for
+the filter transformations.
+
+Also quite noteworthy is that to aid the extraction of the high-level
+model, the programs are written in a carefully designed
+domain-specific language (StreamIt). StreamIt is itself already a
+high-level language, but the affine model extraction elevates the
+program even higher, to make the proposed optimizations possible.
+
+Parts of the paper appear hastily written; in particular, since this
+paper can speak to researchers outside scientific and DSP computing,
+it may be worthwhile to present more background on filters and their
+transformations.
+
+ =*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=
+
+----- End forwarded message -----
