@@ -12,7 +12,7 @@
 
 \noindent
 This is for the May 28, 2003 snapshot release (streamit-0.0.20030528).\\
-\verb|$Id: readme.tex.in,v 1.2 2003-09-10 14:42:03 dmaze Exp $|
+\verb|$Id: readme.tex.in,v 1.3 2003-09-24 17:27:54 dmaze Exp $|
 
 \section{What is this?}
 
@@ -95,6 +95,11 @@ research compiler; as such, it has several known shortcomings:
 \item For stream I/O types, arrays are not supported on the uniprocessor
    backend.  Primitive types and structures are supported on both the
    uniprocessor backend and RAW, and should work in the Java library.
+
+\item The compiler may have memory issues running on particularly
+  large benchmarks.  The dynamic programming partitioner
+  (\verb|--dppartition|) generally uses less memory than the default
+  greedy partitioner.
 
 \item Multidimensional arrays may not work well, particularly as the
    input or output type of a filter.  (Better performance is often
