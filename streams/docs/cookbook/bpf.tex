@@ -5,7 +5,7 @@
 float->float pipeline BandPassFilter
     (float low, float high) {
   add BPFCore(low, high);
-  add Subtractor();
+  add Subtracter();
 }
 float->float splitjoin BPFCore
     (float low, float high) {
@@ -14,7 +14,7 @@ float->float splitjoin BPFCore
   add LowPassFilter(high);
   join roundrobin;
 }
-float->float filter Subtractor {
+float->float filter Subtracter {
   work pop 2 push 1 {
     push(peek(0) - peek(1));
     pop(); pop();
@@ -47,11 +47,11 @@ third.
 A typical use of a split-join is to duplicate the input, perform some
 computation, and then combine the results.  In this case, the desired
 output is the difference between the two filters; the
-\lstinline|Subtractor| filter is placed in a pipeline after the
+\lstinline|Subtracter| filter is placed in a pipeline after the
 split-join, and finds the desired difference.  In general, a child can
 be any StreamIt construct, not just a filter.
 
 The implementation of \lstinline|pop()| in the compiler and runtime
 system does not allow multiple pops to occur in the same statement.
-This is reflected in the implementation of \lstinline|Subtractor|
+This is reflected in the implementation of \lstinline|Subtracter|
 here.
