@@ -1,0 +1,74 @@
+StreaMIT Low IR
+===============
+
+$Id: low-ir.txt,v 1.1 2001-09-26 22:41:17 dmaze Exp $
+
+This file describes a low intermediate representation for StreaMIT.
+This IR is created from a lowering pass from the StreaMIT high IR; it
+can be straightforwardly converted into C, and then compiled and
+linked against the runtime library.
+
+The major issue is dealing with function pointers.  Java simply
+doesn't have the concept of a function pointer, and presumably
+Kopi has no way of representing them.  Within our IR, though, there's
+no reason we couldn't keep pointers to function nodes internally.
+
+The C printer needs to be responsible for decoding these nodes and
+printing them correctly.
+
+The general structure of the low IR is a single class declaration,
+with embedded class and function declarations.  The inner classes only
+contain data members, possibly of other inner-class types.  The
+functions are normal Kopi functions; they may include special
+constructs, as noted here.
+
+The Java-level library probably needs to include definitions for
+several StreaMIT types.  These include at least Tape, and probably the
+Latency information as well.  The constants for split/joins also need
+to come from the Java library.
+
+Normal functions:
+
+  void set_stream_type(StreamContext c, StreamType type);
+  void set_peek(StreamContext c, int peeks);
+  void set_pop(StreamContext c, int pops);
+  void set_push(StreamContext c, int pushes);
+  void register_child(StreamContext c, StreamContext child);
+  StreamContext get_parent(StreamContext c);
+  Portal create_portal(void);
+  void register_sender(Portal p, StreamContext c, Latency l);
+
+StreaMIT statements:
+
+  SIRRegistrationStatement: Register a function with the run-time library
+    name: string (one of "work", "teardown", "to_canon", "from_canon")
+    context: variable reference
+    function: function reference
+
+  SIRPushStatement: Push a value on to a tape
+    tape: variable reference
+    type: (?)
+    value: expression
+
+  SIRRegisterReceiverStatement: Register a message receiver
+    portal: expression
+    context: expression
+    vtbl: InterfaceTable reference
+    latency: expression
+
+StreaMIT expressions:
+
+  SIRPopStatement: Pop a value off of a tape
+    tape: variable reference
+    type: (?)
+
+  SIRPeekStatement: Look at a value on a tape without removing it
+    tape: variable reference
+    type: (?)
+    position: integer (possibly expression)
+
+Other objects:
+
+  InterfaceTable: Map object functions to an interface
+    name: C variable name
+    funcs: array of function objects
