@@ -2,12 +2,15 @@
 
 \usepackage{booktabs}
 %\usepackage[margin=0.5in]{geometry}
+\usepackage{fullpage}
 \usepackage{palatino}
 \usepackage{tabularx}
 \usepackage{streamit}
 
 \newif\ifprerel
 \prereltrue
+
+\newcommand{\new}{\marginpar{\footnotesize \textbf{~~--~New~--}}}
 
 \def\note{\trivlist \small\item\relax\textbf{Note:}}
 \def\endnote{\endtrivlist}
@@ -20,11 +23,11 @@
 % Please look the other way, this is a little gross.
 \catcode`\$=12
 \title{StreamIt Language Specification\\
-Version 2.0\ifprerel\thanks{
+Version 3.0\ifprerel\thanks{
 This document is the latest working version of the language specification.\hfil\break\ttfamily
-\hbox{$Id: streamit-lang.tex,v 1.25 2003-12-19 00:18:31 rabbah Exp $}
+\hbox{$Id: streamit-lang.tex,v 1.26 2004-11-23 10:43:33 thies Exp $}
 }\fi}
-\author{\texttt{streamit@cag.lcs.mit.edu}}
+\author{\texttt{streamit@cag.csail.mit.edu}}
 \catcode`\$=3
 
 \begin{document}
@@ -191,13 +194,17 @@ arrays or matrices are supported as arrays of arrays.
 \subsubsection{Variable Declarations}
 
 Variable declarations appear in structure declarations, as well as in
-code blocks and \lstinline|filter| declarations.  A variable
-declaration may declare one or multiple variables, possibly with
-initializers; multiple variables are separated with commas.  Of note,
-the syntax for array declarations is different from C and Java.  A
-correct declaration is \lstinline|int[4] rgbi;|, with the entire type
-stated before the variable name.  An initializer may not be provided
-for array variables.
+code blocks and stream declarations.  A variable declaration may
+declare one or multiple variables, possibly with initializers;
+multiple variables are separated with commas.  Of note, the syntax for
+array declarations is different from C and Java.  A correct
+declaration is \lstinline|int[4] rgbi;|, with the entire type stated
+before the variable name.  A static array initializer may be provided
+as in C and Java, for example:
+
+\begin{lstlisting}{}
+int[3][2] arr = {{1, 2}, {3, 4}, {5, 6}};
+\end{lstlisting}{}
 
 \subsection{Stream Types}
 
@@ -237,12 +244,19 @@ stream it instantiated, values for the parameters must follow the name
 of the stream.  For example:
 
 \begin{lstlisting}{}
+// declaration
 float->float filter MatrixMatrixMultiply(int A,
                  int B, int C) { ... }
-add MatrixMatrixMultiply(3, 5, 4);
+
+void->void pipeline Toplevel() {
+  add Source();
+  // instantiation
+  add MatrixMatrixMultiply(3, 5, 4);
+  add Sink();
+}
 \end{lstlisting}
 
-Note that is is also possible to pass a parameterized-length array as
+Note that it is also possible to pass a parameterized-length array as
 a parameter to a stream, so long as the length is also passed as a
 parameter. For example, the following is a legal filter declaration:
 
@@ -331,7 +345,7 @@ to the output tape.
 %% of its input tape, and writes integers to its output tape.  Each
 %% execution of the work function removes exactly one item from the input
 %% tape and examines at most two items; it causes exactly one item to be
-%% pushed on to the output tape, and looks at the item pushed on the
+%% pushed onto the output tape, and looks at the item pushed on the
 %% previous iteration.
 
 \paragraph{Init functions.}  Init functions are declared using the
@@ -339,60 +353,158 @@ keyword \lstinline|init|.  They take no parameters.  They may initialize
 filter fields or do other work, but have no access to the filter's
 tapes.
 
+\paragraph{Filter state.}  The top level of the filter may include
+variable declarations.  These variables are visible to every function
+in the filter, and may be used to carry state between iterations of
+the work function.  {\new} We refer to these variables as {\it fields}
+of the filter.  For example, the variable \lstinline|i| is a field of
+the following filter:
+\begin{lstlisting}{}
+void->int filter Counter {
+  int i = 0;
+  work push 1 {
+    push(i++);
+  }
+}
+\end{lstlisting}{}
+
 \paragraph{Work functions.}  Work functions are declared using the
 keyword \lstinline|work|.  This keyword may be followed by rate
-declarations; 
-%if these are absent, the filter is a \emph{phased filter}.  
-Rate declarations consist of \lstinline|push expr|, \lstinline|peek expr|, 
-and \lstinline|pop expr|,
+declarations; if these are absent, the filter is a \emph{phased
+filter} (see Section~\ref{sec:phased-filter}).  
+
+Rate declarations consist of \lstinline|push rate-expr|,
+\lstinline|peek rate-expr|, and \lstinline|pop rate-expr|,
 %, and \lstinline|keep expr|, 
-in any order.  If the peek 
-%or keep 
-rate is omitted, it is assumed to be equal to the pop rate; if the pop
-or push rate is omitted, it is assumed to be zero, and the
-corresponding input or output tape type must be \lstinline|void|.  The
-function must push and pop exactly the number of items specified, and
-may peek 
-%or keep 
-up to the number of items specified.  As a special case, if there are
-no \lstinline|pop| calls at all in the function body (all access to
-the input tape is by peeking), the number of items declared as the pop
-rate will be automatically popped at the end of the work function.
-All of the rate expressions must be compile-time constants.
+in any order.  The push and pop rates specify the number of items
+produced and consumed by a given execution of the work function.  The
+peek rate specifies the maximum index that is peeked in a given
+execution; that is, given a peek rate of $r$, the filter can execute
+\lstinline|peek(i)| for all $i < r$.
 
-%% \paragraph{Phased filters.}  If the work function does not have rate
-%% declarations, it may not perform \lstinline|push| and \lstinline|pop|
-%% operations directly.  However, it may call \emph{phase functions},
-%% which are declared like work functions but begin with the keyword
-%% \lstinline|phase| and a name, and always have rate declarations.  The
-%% runtime system ensures that, when a phase function is called, its
-%% \lstinline|peek| and \lstinline|pop| rates are satisfiable, even if
-%% other filters need to run for later phases to execute.  Beyond this
-%% special use, phase functions may not be directly called.  For example:
+Each {\new} rate expression is of the form \lstinline|[min, avg, max]|, 
+where \lstinline|min| denotes the minimum number of items,
+\lstinline|avg| denotes the average number of items (over all
+executions), and \lstinline|max| denotes the maximum number of items.
+The average rate may optionally be ommitted, in which case the rate
+declaration is of the form \lstinline|[min, max]|.  If only one
+expression appears, then it represents both the minimum and maximum
+rate (i.e., the rates are equal); in this case, the brackets are
+ommitted.  For example, a work function that pops exactly 1 item and
+pushes between 2 and 4 items, with an average of 3 items, is declared
+as follows:
 
-%% \begin{lstlisting}{}
-%% int->int filter BlockReader {
-%%   // Each block has a 4-int header, 24 ints of data,
-%%   // and a 4-int footer.
-%%   work {
-%%     readHeader();
-%%     for (int i = 0; i < 24; i++)
-%%       echoData();
-%%     readFooter();
-%%   }
-%%   phase readHeader pop 4
-%%      { pop(); pop(); pop(); pop(); }
-%%   phase echoData pop 1 push 1 { push(pop()); }
-%%   phase readFooter pop 4
-%%      { pop(); pop(); pop(); pop(); }
-%% }
-%% \end{lstlisting}
+\begin{lstlisting}{}
+work pop 1 push [2, 3, 4] { ... }
+\end{lstlisting}
 
-%% \paragraph{Pre-work functions.}  A filter may specify an additional
-%% work function that is run in place of the normal work function the
-%% first time the filter executes.  This function uses the
-%% \lstinline|prework| keyword, and is otherwise identical to the normal
-%% work function.
+The declaration above signifies a {\it dynamic rate} in that the exact
+number of items produced on any given execution is unknown at compile
+time.  Rate declarations support three forms of dynamism:
+\begin{itemize}
+
+\item A rate that falls within a static range, as specified above.
+
+\item A rate that changes intermittently throughout the program.  In
+this case, the rate should be declared in terms of a filter field that
+is updated occaisionally (for instance, from \lstinline|work| or a
+message handler).  For example:
+
+\begin{lstlisting}{}
+float->float filter AdaptiveAverage(int initial_N) {
+  int N;
+  init {
+    N = initial_N;
+  }
+  work push 1 pop 1 peek N {
+    // push average of N inputs
+    float sum = 0;
+    for (int i=0; i<N; i++) {
+      sum += peek(i);
+    }
+    push(sum/((float)N));
+
+    // calculate noise, increase N if necessary
+    boolean tooMuchNoise = ... ;
+    if (tooMuchNoise) {
+      N = N*2;
+    }
+  }
+}
+\end{lstlisting}
+
+In the above filter, the peek rate for a given instance of
+\lstinline|work| is the value of \lstinline|N| as defined when
+\lstinline|work| starts to execute.  Changes made to \lstinline|N|
+from within \lstinline|work| effect the rate declaration of the next
+execution, but not the current one.
+
+\item A rate that is completely unpredictable.  In this case, the
+special token \lstinline|*| may be substituted for one or more of the
+\lstinline|min|, \lstinline|avg|, and \lstinline|max| fields in the
+declaration.  For example, the following filter pushes one item and
+pops an unbounded number of items:
+
+\begin{lstlisting}{}
+int->int filter FilterLessThan(int N) {
+  work push 1 pop [1,*] {
+    while (peek(0) < N) {
+      pop();
+    }
+    push(peek(0));
+    pop();
+  }
+}
+\end{lstlisting}
+
+While the \lstinline|*| token allows one to declare filters with
+unbounded I/O rates, a concrete upper bound should be provided
+whenever possible.  Unbounded I/O rates can drastically degrade
+performance, as it becomes difficult (or impossible) to predict the
+amount of data needed for a filter to complete an atomic execution.
+
+\end{itemize}
+
+\noindent There is also some syntactic sugar for rate declarations:
+
+\begin{itemize}
+
+\item If the push or pop rate is ommitted, it is assumed to be zero.
+The corresponding input or output tape type must be \lstinline|void|.
+
+\item If the peek rate is ommitted, it is assumed to be equal to the
+pop rate.
+
+\item If there are no \lstinline|pop| calls at all in the function
+body (all access to the input tape is by peeking), the number of items
+declared as the pop rate will be automatically popped at the end of
+the work function.
+
+\end{itemize}
+
+\paragraph{Prework Functions.}  A filter {\new} may specify an additional work 
+function that is run in place of the normal work function the first
+time the filter executes.  This function uses the \lstinline|prework|
+keyword, and is otherwise identical to the normal work function.
+
+Prework functions can be very useful for setting up initial conditions
+based on the first set of inputs, or for pushing extra items on the
+first invocation.  For example, consider the following implementation
+of a Delay:
+
+\begin{lstlisting}{}
+float->float filter Delay(int N) {
+  prework push N {
+    for (int i=0; i<N; i++) {
+      push(0);
+    }
+  }
+
+  work push 1 pop 1{
+    push(pop());
+  }
+}
+\end{lstlisting}
 
 \paragraph{Helper functions.}  A helper function performs some
 auxiliary bit of computation, and may be called from the init function
@@ -402,21 +514,59 @@ declaration contains the return type, the name of the function, the
 parameter list, and the function body, just like a normal C or Java
 function.
 
-%% \paragraph{Message-handler functions.}  A message handler function
-%% changes the state of the filter in response to some external event,
-%% delivered via a message.  It is declared with the keyword
-%% \lstinline|handler|, the name of the message, the parameter list, and
-%% the function body.
+\paragraph{Message-handler functions.}  A message handler function
+changes the state of the filter in response to some external event,
+delivered via a message.  It is declared with the keyword
+\lstinline|handler|, the name of the message, the parameter list, and
+the function body.  A message handler cannot return a value, so no
+return type is declared.
 
-\paragraph{Filter state.}  The top level of the filter may include
-variable declarations.  These variables are visible to every function
-in the filter, and may be used to carry state between iterations of
-the work function.
+\paragraph{Naming I/O tapes.}  For {\new} documentation 
+purposes, a filter's input and output tapes can be given a name as
+part of their type declaration.  This name is subsequently used as a
+prefix for all push and pop operations.  For example:
+\begin{lstlisting}{}
+int fullData -> int maskedData filter DoMask {
+  work push 1 pop 1 {
+    maskedData.push(fullData.pop() & 128);
+  }
+}
+\end{lstlisting}
 
+\subsubsection{Phased Filters}  
+\label{sec:phased-filter}
+
+If the work function does not have rate declarations, it may not
+perform \lstinline|push| and \lstinline|pop| operations directly.
+However, in a phased filter, it may call \emph{phase functions}, which
+are declared like work functions but begin with the keyword
+\lstinline|phase| and a name, and always have rate declarations.  The
+runtime system ensures that, when a phase function is called, its
+\lstinline|peek| and \lstinline|pop| rates are satisfiable, even if
+other filters need to run for later phases to execute.  Beyond this
+special use, phase functions may not be directly called.  For example:
+
+\begin{lstlisting}{}
+int->int filter BlockReader {
+  // Each block has a 4-int header, 24 ints of data,
+  // and a 4-int footer.
+  work {
+    readHeader();
+    for (int i = 0; i < 24; i++)
+      echoData();
+    readFooter();
+  }
+  phase readHeader pop 4
+     { pop(); pop(); pop(); pop(); }
+  phase echoData pop 1 push 1 { push(pop()); }
+  phase readFooter pop 4
+     { pop(); pop(); pop(); pop(); }
+}
+\end{lstlisting}
 
 \subsubsection{Pipelines}
 
-The simplest composite filter is a pipeline.  A pipeline contains a
+The simplest composite stream is a pipeline.  A pipeline contains a
 number of child streams; the output of the first stream is connected
 to the input of the second, whose output is connected to the input of
 the third, and so on.  A pipeline declaration looks like
@@ -480,10 +630,10 @@ int->int splitjoin AddAndSub {
 }
 \end{lstlisting}
 
-This split-join has two children.  Incoming data is duplicated on to
+This split-join has two children.  Incoming data is duplicated onto
 both streams.  The first branch consumes two elements and adds them;
 the second consumes two elements and subtracts them.  The resulting
-values are then pushed on to the output stream in a round-robin
+values are then pushed onto the output stream in a round-robin
 fashion, with values from alternating streams.
 
 \begin{figure}[htbp]
@@ -576,6 +726,166 @@ causes a delay in the feedback loop.
   \end{center}
 \end{figure}
 
+\subsubsection{Splitters and Joiners}
+
+Splitters have a single input tape and multiple output tapes; joiners
+have multiple input tapes and a single output tape.  They appear in
+feedback loops and split-joins.
+
+Splitters {\new} and joiners are programmable, just like filters.  The
+only difference is that they declare multiple input or output tapes,
+with corresponding mechanisms for declaring I/O rates and accessing
+items on the tapes.  There is also a set of predefined splitters and
+joiners with special semantics; their behaviors cannot be fully
+emulated by programmable splitters and joiners.
+
+For example, the following joiner inputs a data value and a boolean
+flag; if the flag is true, the data is forwarded to the output.
+Otherwise, the data is simply consumed.
+\begin{lstlisting}{}
+int val, boolean flag -> int joiner Router() {
+  work pop 1,1 push [0,1] {
+    if (flag.pop()) {
+      push(val.pop());
+    } else {
+      val.pop();
+    }
+  }
+}
+\end{lstlisting}
+
+The syntax for filters is extended in the following ways to support
+multiple input and output tapes:
+\begin{enumerate}
+
+\item The stream is declared using the keyword ``splitter'' or
+``joiner'' instead of ``filter''.
+
+\item To declare a fixed number of inputs (resp. outputs), each input
+(resp. output) stream must be named, as described for filters.  Each
+tape declaration consists of a type and a name; declarations are
+separated by commas.  For example:
+\begin{lstlisting}{}
+complex MyInput1, float MyInput2 -> float MyOutput joiner Foo { ... }
+\end{lstlisting}
+As in filters, push and pop operations to a named stream follow the
+form \lstinline|MyInput1.pop()|.
+
+\item Work functions are annotated with a comma-delineated list of I/O
+rates, one for each tape declared by the splitter or joiner.  For
+example, a work function that pops one item from its first input, pops
+two items from its second input, and pushes 3 items to its output is
+declared as follows:
+\begin{lstlisting}{}
+work pop 1,2 push 3 { ... }
+\end{lstlisting}
+
+\item The number of inputs and outputs can also be parameterized.
+This is done using array syntax on the {\it name} of the input tape.
+For example, a joiner with $N$ integer inputs can be declared:
+\begin{lstlisting}{}
+int A[N] -> int joiner Bar { ... }
+\end{lstlisting}
+In this case, pop expressions take the form of \lstinline|A[i].pop()|.
+The rate declaration can also be parameterized to indicate a distinct
+rate on each input stream.  This is done by preceding the rate
+declaration with the quantifier \lstinline|A[i]:|, where $A$ is the
+name of the input stream, and $i$ is a free variable that can be used
+to specify the rate on the $i$th stream.  For example, the following
+joiner performs a ``triangular join'' by reading $i$ items from the
+$i$th input stream:
+\begin{lstlisting}{}
+int A[N] -> int joiner Triangular(int N) {
+  work pop A[i]:i push N*(N+1)/2 {
+    for (int i=0; i<N; i++) {
+      for (int j=0; j<=i; j++) {
+	push(A[i].pop());
+      }      
+    }
+  }
+}
+\end{lstlisting}
+
+If each stream can be described by the same rate declaration, then no
+quantification is necessary, and the declared rate applies
+independently to each stream.  For example, the following splitter
+duplicates each item from the input tape onto each of $N$ output
+tapes:
+\begin{lstlisting}{}
+int A -> int B[N] splitter MyDuplicate(int N) {
+  work pop 1 push 1 {
+    int val = A.pop();
+    for (int i=0; i<N; i++) {
+      B[i].push(val);
+    }
+  }
+}
+\end{lstlisting}
+If there is a dynamic rate declaration for an array of streams, then
+each stream might process a different number of items on a given
+execution.
+
+As a final example of parameterization, consider a joiner that inputs
+integers from $N$ different streams and packs them into an $N$-element
+array that is output as a single item:
+\begin{lstlisting}{}
+int A[N] -> int[N] B joiner Pack(int N) {
+  work pop 1 push 1 {
+    int[N] result;
+    for (int i=0; i<N; i++) {
+      result[i] = A[i].pop();
+    }
+    B.push(result);
+  }
+}
+\end{lstlisting}
+
+\end{enumerate}
+
+The rest of this section describes predefined splitters and joiners
+that have special semantics.
+
+\paragraph{\lstinline|duplicate| Splitters.} \lstinline|duplicate| 
+splitters take each incoming item and push the same item to each of
+the outgoing tapes, duplicating data.  As illustrated previously, the
+\lstinline|duplicate| splitter can be implemented within the StreamIt
+language if the data type and number of output streams are fixed.
+
+\paragraph{\lstinline|roundrobin| Splitters and Joiners.}  \lstinline|roundrobin| 
+splitters take each item and send it to exactly one of the child
+streams, in order.  Either \lstinline|roundrobin| or
+\lstinline|roundrobin()| causes one item to be sent to each output, in
+order; \lstinline|roundrobin(2)| causes two items to be sent to the
+first stream, two to the second, and so on.  \lstinline|roundrobin(2, 4, 2)| 
+requires there to be exactly three children, and sends two to
+the first child, four to the second, and two to the third.  A
+round-robin weight may be 0; in this case, the child input must be of
+type \lstinline|void|.  A \lstinline|roundrobin(0)| splitter on a
+split-join means that no children take any input, and the input type
+of the entire split-join is \lstinline|void|.
+
+\lstinline|roundrobin| joiners are identical to \lstinline|roundrobin|
+splitters, except that they read from the input tapes in the specified
+pattern and write data to the output tape.
+
+\paragraph{\lstinline|ratio| Splitters and Joiners.}  \lstinline|ratio| 
+{\new} splitters and joiners are declared with the same syntax as
+round-robin.  However, within a given execution, items may be sent out
+of order.  For example, a \lstinline|ratio(2, 3)| splitter processes a
+total of 5 items in a single execution; any 2 of the items will go to
+the first stream, and the other 3 items will go to the second stream.
+One can increase the granularity at which the ratio is maintained by
+scaling up all rates by a constant factor.  Note that one or more of
+the rates may be dynamic, as indicated by the token \lstinline|*|.  In
+particular, a \lstinline|ratio(*, *)| joiner indicates that the
+compiler is free to merge items in any pattern.
+
+\paragraph{\lstinline|inorder| Joiners.}  \lstinline|inorder| {\new} 
+joiners merge items in the same order that they were produced by the
+corresponding splitter.  If there is a change of data rate on a given
+path of a split-join, then items are merged according to the stream
+dependence relation as used by the messaging system.
+
 \subsubsection{Anonymous Streams}
 \label{sec:anonymous-streams}
 
@@ -588,8 +898,7 @@ streams and the name is omitted.  The semicolon that normally ends the
 optional in this case.
 
 \begin{lstlisting}{}
-complex->float feedbackloop FeedbackMagnitude
-    (float scaling) {
+complex->float feedbackloop FeedbackMagnitude(float scaling) {
   join roundrobin;
   body complex->float filter {
     work pop 2 push 1 {
@@ -635,7 +944,7 @@ constraints are transparent to the programmer, however.
   its peek rate.
 %, and if firing would not leave fewer items on its
 %  input than its predecessor's keep rate.  
-  It pops its pop rate from the input, and pushes its push rate on to
+  It pops its pop rate from the input, and pushes its push rate onto
   its output.
 %% \item If a filter has never fired, and it has a prework function, then
 %%   the prework function is executed in place of the work function, and
@@ -649,7 +958,7 @@ constraints are transparent to the programmer, however.
 %%   the phased filter then may pause until the next phase may fire.
 \item A joiner in a feedback loop or split-join may fire when the
   specified number of items are available on each of its inputs.  It
-  pushes the sum of the input weights on to its output.
+  pushes the sum of the input weights onto its output.
 \item A round-robin splitter may fire when the sum of the number of
   output items is available on its input, and produces the specified
   number of items on each output.
@@ -702,9 +1011,7 @@ expression.
 
 The \lstinline|join| statement declares the joiner type of a feedback
 loop or split-join.  It only appears in initialization code, and is
-invalid in initialization code for any other construct.  This
-statement takes a joiner specification; the only one valid currently
-is \lstinline|roundrobin|, see section \ref{sec:expr-round-robin}.
+invalid in initialization code for any other construct.  
 
 \subsubsection{\lstinline|loop| Statement}
 
@@ -722,11 +1029,7 @@ This statement takes a \emph{stream constructor}; see section
 
 The \lstinline|split| statement declares the splitter type of a feedback
 loop or split-join.  It only appears in initialization code, and is
-invalid in initialization code for any other construct.  This
-statement takes a splitter specification; only \lstinline|duplicate| and
-\lstinline|roundrobin| are currently legal, see sections
-\ref{sec:expr-duplicate} and \ref{sec:expr-round-robin}.
-
+invalid in initialization code for any other construct.  
 
 \subsection{Work-only Statements}
 
@@ -738,7 +1041,7 @@ These statements may only appear within the \lstinline|work| function.
 \subsubsection{\lstinline|push| Statement}
 
 The \lstinline|push| statement takes a value expression and pushes its
-value on to the output tape of the current filter.  The type of the
+value onto the output tape of the current filter.  The type of the
 expression must match the output type of the filter.
 
 %% \subsubsection{Message-sending Statements}
@@ -878,9 +1181,11 @@ contains the second item beyond that.
 Function calls are value expressions; certain cases of built-in
 functions may return values that are compile-time constant if their
 parameters are compile-time constant.  The function call syntax
-\lstinline|fn(p1, p2)| is identical to that of Java.  All parameters are
-always passed by value; this differs from Java's semantics, in which
-objects and arrays are passed by reference.
+\lstinline|fn(p1, p2)| is identical to that of Java.  All parameters
+are passed by value, with all elements of structures and arrays
+implicitly copied across a call; this differs from Java's semantics,
+in which the value passed is a reference (i.e., a pointer) to each
+object and array parameter.
 
 Function calls may be made to declared helper functions, or to
 built-in math functions.  The math functions are listed in table
@@ -965,8 +1270,9 @@ initialization code.
 Stream constructors may reference an already-declared stream type.  In
 this case, the stream constructor form is \lstinline|Name(param, ...)|.
 There must be exactly as many parameters in the constructor as
-parameters for the stream type.  The parameters must all be
-compile-time constant.
+parameters for the stream type.  
+%The parameters must all be
+%compile-time constant.
 
 An anonymous stream declaration is also a valid stream constructor;
 see section \ref{sec:anonymous-streams}.  A statement containing an
@@ -976,47 +1282,6 @@ semicolon, since it ends with a close-brace.
 A stream constructor may be followed by the keyword \lstinline|to| and
 the name of a portal variable.  This causes the newly created stream
 to be registered with the named portal.
-
-\subsection{Splitters and Joiners}
-\label{sec:expr-splitters-joiners}
-
-Splitters have a single input of a given type and multiple outputs of
-the same type; joiners have multiple inputs and a single output.  They
-appear in feedback loops and split-joins.
-
-\begin{note}
-  Other types of splitters and joiners besides duplicate and
-  round-robin are conceivable; in particular, structure and array
-  packing and unpacking splitters and joiners are obvious.  There also
-  may be demand for ``custom'' splitters and joiners, where a
-  data-reordering operation is described by the programmer.
-\end{note}
-
-\subsubsection{\lstinline|duplicate| Splitters}
-\label{sec:expr-duplicate}
-
-\lstinline|duplicate| splitters take each incoming item and push the
-same item to each of the outgoing tapes, duplicating data.
-
-\subsubsection{\lstinline|roundrobin| Splitters and Joiners}
-\label{sec:expr-round-robin}
-
-\lstinline|roundrobin| splitters take each item and send it to exactly
-one of the child streams, in order.  Either \lstinline|roundrobin| or
-\lstinline|roundrobin()| causes one item to be sent to each output, in
-order; \lstinline|roundrobin(2)| causes two items to be sent to the first
-stream, two to the second, and so on.  \lstinline|roundrobin(2, 4, 2)|
-requires there to be exactly three children, and sends two to the
-first child, four to the second, and two to the third.  A round-robin
-weight may be 0; in this case, the child input must be of type
-\lstinline|void|.  A \lstinline|roundrobin(0)| splitter on a
-split-join means that no children take any input, and the input type
-of the entire split-join is \lstinline|void|.
-
-\lstinline|roundrobin| joiners are identical to \lstinline|roundrobin|
-splitters, except that they read from the input tapes in the specified
-pattern and write data to the output tape.
-
 
 \section{Built-in Types}
 
@@ -1067,62 +1332,6 @@ This section describes features that are likely to be present in a
 future release of the language.  In particular, parts of the compiler
 already have full support for pre-work functions, phased filters, and
 messaging.
-
-\subsection{Prework Functions}  
-
-A filter may specify an additional work function that is run in place
-of the normal work function the first time the filter executes.  This
-function uses the \lstinline|prework| keyword, and is otherwise
-identical to the normal work function.
-
-Prework functions can be very useful for setting up initial conditions
-based on the first set of inputs, or for pushing extra items on the
-first invocation.  For example, consider the following implementation
-of a Delay:
-
-\begin{lstlisting}{}
-float->float filter Delay(int N) {
-  prework push N {
-    for (int i=0; i<N; i++) {
-      push(0);
-    }
-  }
-
-  work push 1 pop 1{
-    push(pop());
-  }
-}
-\end{lstlisting}
-
-\subsection{Phased Filters}  
-
-If the work function does not have rate declarations, it may not
-perform \lstinline|push| and \lstinline|pop| operations directly.
-However, in a phased filter, it may call \emph{phase functions}, which
-are declared like work functions but begin with the keyword
-\lstinline|phase| and a name, and always have rate declarations.  The
-runtime system ensures that, when a phase function is called, its
-\lstinline|peek| and \lstinline|pop| rates are satisfiable, even if
-other filters need to run for later phases to execute.  Beyond this
-special use, phase functions may not be directly called.  For example:
-
-\begin{lstlisting}{}
-int->int filter BlockReader {
-  // Each block has a 4-int header, 24 ints of data,
-  // and a 4-int footer.
-  work {
-    readHeader();
-    for (int i = 0; i < 24; i++)
-      echoData();
-    readFooter();
-  }
-  phase readHeader pop 4
-     { pop(); pop(); pop(); pop(); }
-  phase echoData pop 1 push 1 { push(pop()); }
-  phase readFooter pop 4
-     { pop(); pop(); pop(); pop(); }
-}
-\end{lstlisting}
 
 \subsection{Messaging}
 \label{sec:messaging}
@@ -1263,22 +1472,22 @@ int->int filter SquareIt {
 
 %\input{streamit-lang-future}
 
-\section{Implementation Limits}
+%% \section{Implementation Limits}
 
-The following limits apply to the current implementation of StreamIt:
+%% The following limits apply to the current implementation of StreamIt:
 
-\begin{itemize}
-\item There is no guaranteed order of evaluation.  In particular, a
-  statement in a work function should not contain more than a single
-  \lstinline|pop()|, and if contains any \lstinline|pop()|s at all, it
-  should contain no \lstinline|peek()|s.
+%% \begin{itemize}
+%% \item There is no guaranteed order of evaluation.  In particular, a
+%%   statement in a work function should not contain more than a single
+%%   \lstinline|pop()|, and if contains any \lstinline|pop()|s at all, it
+%%   should contain no \lstinline|peek()|s.
   
-\item The names \lstinline|SplitJoin|, \lstinline|FeedbackLoop|,
-  \lstinline|Filter|, \lstinline|Pipeline|, \lstinline|StreamIt|, and
-  \lstinline|Complex| are reserved.  Certain variable names beginning
-  with underscores may cause conflicts if used as local variables.
+%% \item The names \lstinline|SplitJoin|, \lstinline|FeedbackLoop|,
+%%   \lstinline|Filter|, \lstinline|Pipeline|, \lstinline|StreamIt|, and
+%%   \lstinline|Complex| are reserved.  Certain variable names beginning
+%%   with underscores may cause conflicts if used as local variables.
 
-\end{itemize}
+%% \end{itemize}
 
 \section{History}
 
