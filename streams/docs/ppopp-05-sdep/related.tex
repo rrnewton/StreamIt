@@ -18,19 +18,21 @@ slicing analyses for general procedural languages; $\sdep$ is
 decidable, exact, and admits a compact representation in terms of the
 steady state schedule.
 
-Pugh and Rosser present an iteration-based slicing algorithm~\cite{pugh97slice}
-to identify the dynamic instances of statements (in terms of
-their loop iteration) that effect a given value.  This also bears
-some similarity to $\sdep$, as we calculate the last iteration of an
-actor that affects another.  However,~\cite{pugh97slice} focuses on the
-problem of computing the transitive closure of dependences in loops.
-We are not interested in this question, as we assume that all actor
-invocations depend on their previous invocations; $\sdep$ addresses
-the question of finding the last invocation that was relevant.
-Moreover, our motivation differs from the slicing community, as we
-apply $\sdep$ to enrich the semantics of language features.  To the
-best of our knowledge, slicing has not been applied in this way
-before.
+Pugh and Rosser present an iteration-based slicing
+algorithm~\cite{pugh97slice} to identify the dynamic instances of
+statements (in terms of their loop iteration) that effect a given
+value.  This bears some similarity to stream dependence analysis, as
+$\sdep{A}{B}(n)$ represents the last iteration of actor $A$ that
+affected the $n$th iteration of actor $B$.
+However,~\cite{pugh97slice} focuses on the problem of computing the
+transitive closure of dependences in loops, in which some iterations
+do not depend on others.  We are not interested in this question, as
+we assume that all actor invocations depend on their previous
+invocations; $\sdep$ addresses the question of finding only the most
+recent invocation that is relevant.  Moreover, our motivation differs
+from the slicing community, as we apply $\sdep$ to enrich the
+semantics of language features.  To the best of our knowledge, slicing
+has not been applied in this way before.
 
 The models of computation in our system are closely related to those
 explored in the Ptolemy project for heterogeneous
