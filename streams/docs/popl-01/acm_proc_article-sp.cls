@@ -104,6 +104,7 @@
                                 % Top of page:
 \topmargin 4.5pc                % Nominal distance from top of page to top of
                                 % box containing running head.
+\advance\topmargin by -0.125in  % by BILL to make it look centered
 %%%\advance\topmargin by -1in      % Correct for LaTeX gratuitousness
 \headheight 0pt                 % Height of box containing running head.
 \headsep 0pt                    % Space between running head and text.
@@ -794,7 +795,7 @@
 \def\@copyrightspace{
 \@float{copyrightbox}[b]
 \begin{center}
-%\setlength{\unitlength}{1pc}
+\setlength{\unitlength}{1pc}
 % UNCOMMENT THE PREVIOUS LINE FOR SUBMITTING TO POPL; BELOW I JUST 
 % ADJUSTED FOR THE TECH REPORT.  -Bill
 \setlength{\unitlength}{60pt}
@@ -1352,9 +1353,9 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%
 \ps@plain
 \baselineskip=11pt
-\let\thepage\relax % For  NO page numbers - Gerry Nov. 30th. 1999
+%\let\thepage\relax % For  NO page numbers - Gerry Nov. 30th. 1999
 \def\setpagenumber#1{\global\setcounter{page}{#1}}
-%\pagenumbering{arabic}  % Arabic page numbers but commented out for NO page numbes - Gerry Nov. 30th. 1999
+\pagenumbering{arabic}  % Arabic page numbers but commented out for NO page numbes - Gerry Nov. 30th. 1999
 \twocolumn             % Double column.
 \flushbottom           % Even bottom -- alas, does not balance columns at end of document
 \pagestyle{plain}

@@ -177,11 +177,16 @@ of the filter in the steady state.  Within the {\tt work} function,
 the filter can communicate with neighboring blocks using the {\tt
 input} and {\tt output} channels, which are typed FIFO queues declared
 as fields at the top of the class.  These high-volume channels support
-the three intuitive operations: 1) {\tt pop()} removes an item from
-the end of the channel and returns its value, 2) {\tt peek(i)} returns
-the value of the item $i$ spaces from the end of the channel without
-removing it, and 3) {\tt push(v)} writes the value $v$ to the front of
-the channel.  A filter can also push, pop, and peek items from within
+the three intuitive operations: 
+\begin{enumerate}
+\item {\tt pop()} removes an item from
+the end of the channel and returns its value.
+\item {\tt peek(i)} returns the value of the item $i$ spaces from the end of the channel without
+removing it.
+\item {\tt push(v)} writes the value $v$ to the front of
+the channel.  
+\end{enumerate}
+A filter can also push, pop, and peek items from within
 the {\tt init} function if it needs to set up some initial state on
 its channels, although this usually is not necessary.
 
