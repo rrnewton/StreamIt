@@ -1,0 +1,205 @@
+\section{SARE}
+
+A System of Affine Recurrence Equations (SARE) is a set of equations
+${\cal E}_1 \dots {\cal E}_p$ of the following form~\cite{DRV00}:
+\begin{equation}
+\forall i \in {\cal D_{\cal E}}, X(i) = f_{\cal E}(\dots, Y(h_{{\cal
+E}, Y}(i)), \dots)
+\label{eq:sare}
+\end{equation}
+In this equation, our notation is as follows:
+\begin{itemize}
+
+\item $\{X, Y, \dots\}$ is the set of {\it variables} defined by the
+SARE.  Variables can be considered as multi-dimensional arrays mapping
+an index to a value.
+
+\item ${\cal D_{\cal E}}$ is a polyhedron representing the {\it
+domain} of the equation ${\cal E}$.  Each equation for a variable $X$
+has a disjoint domain; the domain $D_X$ for variable $X$ is taken as
+the convex union of all domains over which $X$ is defined.
+
+\item $h_{{\cal E}, Y}$ is a vector-valued affine function, giving the
+index of variable $Y$ that $X(i)$ depends on.
+
+\item $f_{\cal E}$ is a strict function used to compute the elements
+of $X$.
+
+\end{itemize}
+
+If each dependence function $h$ is a translation ($h(i) = i - k$ for
+constant $k$) then the SARE is {\it uniform}, and referred to as a
+SURE or SRE~\cite{karp67}.
+
+%Given an equation ${\cal E}$, we will use $\mt{lhs}({\cal E})$ to
+%refer to the variable defined on the left hand side of ${\cal E}$, and
+%$\mt{rhs}({\cal E})$ to refer to the set of variables referenced on
+%the right hand side of ${\cal E}$.  Thus, in the case of
+%(\ref{eq:sare}), $\mt{lhs}({\cal E}) = X$ and $Y \in \mt{rhs}({\cal
+%E})$.
+
+\section{\dep}
+
+\begin{align*}
+\DEP{X}{Y}(i) = max_{\preceq}~\{~ j ~|~ \exists ~&~ T_0 \dots T_n, ~ k_0 \dots k_n, ~ {\cal E}_1 \dots {\cal E}_n ~ s.t. ~ & ~ \\ 
+~ & T_0 = Y ~\wedge~ T_n = X ~\wedge~ k_0 = j ~\wedge~ k_n = i ~\wedge~ & ~ \\
+~ & \forall p \in 1 \dots n, ~ T_p(k_p) \equiv f_{{\cal E}_p}(\dots, T_{m-1}(h_{{{\cal E}_p}, T_{m-1}}(k_p)), \dots) ~ \} & ~ \\
+\end{align*}
+
+\section{Phased Computation Graphs}
+\label{sec:pcg}
+
+We introduce the Phased Computation Graph (PCG) as a model of
+computation for dataflow languages.  A PCG is a generalization of the
+Computation Graphs (CG) of Karp and Miller~\cite{KM66} to the case
+where each node has both an initial and steady-state execution epoch,
+each of which contains a number of {\it phases}.  Formally, a PCG is a
+directed graph with the following components:
+\begin{itemize}
+
+\item Nodes $n_1 \dots n_l$.
+
+\item Channels $c_1 \dots c_m$, where each channel is directed from a
+  given node $n_i$ to a given node $n_j$.
+
+\item A non-negative integer $A(c)$ indicating the number of items
+  that are initially present on channel $c$.
+
+\item The number of phases $\mt{num}(n, t)$ that node $n$ exhibits
+during epoch $t$.  Here $t$ indicates the type of epoch, which is
+either \textit{initial} or \textit{steady-state}.  For all $n$,
+$\mt{num}(n, \mt{initial}) \ge 0$ and $\mt{num}(n, \mt{steady-state})
+\ge 1$.
+
+\item Non-negative integers $U(c, t, p)$, $O(c, t, p)$, and $E(c, t,
+p)$, which give the number of items pushed, popped, and peeked,
+respectively, over channel $c$ during the $p$'th phase of epoch $t$.
+
+\end{itemize}
+
+\subsection{Execution Model}
+
+We give an informal description of the execution semantics of a PCG,
+which is an intuitive extension to that of a CG.  An execution
+consists of a sequence of atomic {\it firings} of nodes in the graph.
+The effect of firing a given node depends on the epoch (which is a
+global state of the graph) and the phase (which is a local state of
+each node). At the start of execution, the graph is in the initial
+epoch, each node is in phase 0, and each channel $c$ contains $A(c)$
+items.
+
+Let us consider a node $n$ that is in phase $p$ within a graph that is
+in epoch $t$.  It is legal for $n$ to fire if $p \in [0, \mt{num}(n,
+t))$ and, for each channel $c_{in}$ directed into $n$, there are at
+least $E(c_{in}, t, p)$ items on $c_{in}$.  The effect of this firing
+is to consume $O(c_{in}, t, p)$ items from each channel $c_{in}$
+directed into $n$, to produce $U(c_{out}, t, p)$ new items on each
+channel $c_{out}$ directed out of $n$, and to advance the phase $p$ of
+$n$ to $\mt{next}(t, p)$.  In the initial epoch, each phase executes
+only once and $\mt{next}(\mt{initial}, p) = p + 1$; in the
+steady-state epoch, the phases execute cyclically and
+$\mt{next}(\mt{steady-state}, p) = (p + 1)~\mt{mod}~\mt{num}(n, t)$.
+
+From the starting state of the graph, execution proceeds through the
+initial epoch via a sequence of node firings.  The order of node
+firings is constrained only by the conditions given above.  When no
+further node can fire in the initial epoch, the graph enters the
+steady state epoch and the phases of all nodes are reset to 0.
+Execution then continues by a (possibly infinite) sequence of
+steady-state firings.
+
+\section{Phased Computation Program}
+
+The PCG described above is a representation for a graph, treating each
+node and channel as a black box.  Here we introduce some notation for
+the internals of the nodes, as well as the ordering of items on the
+channels.  We refer to the aggregate model as a Phased Computation
+Program (PCP).  A PCP consists of the following:
+\begin{itemize}
+
+\item A Phased Computation Graph $G = (n_1 \dots n_l, c_1 \dots c_m,
+A, \mt{num}, U, O, E)$ describing the nodes, channels, and I/O rates
+of the program (see Section~\ref{sec:pcg}).  Each channel $c = (n_i,
+n_j)$ is a FIFO queue; $n_i$ pushes items onto the back of $c$ and
+$n_j$ consumes items from the front of $c$.
+
+\item An initialization procedure $I(c)$ that returns an array of
+length $A(c)$, the elements of which are enqueued onto channel $c$ at
+the start of execution.  The procedure $I(c)$ takes no arguments.
+
+\item A work procedure $W(n, t, p)$ that represents the computation of
+node $n$ in phase $p$ and epoch $t$.  This procedure has an argument
+$input_c$ for each channel $c$ that is directed into $n$.  Each
+$input_c$ is an array of values that the node $n$ reads from the
+channel $c$ during its firing; thus, $input_c$ has $E(c, t, p)$
+elements.  The procedure returns an array $output_c$ for each channel
+$c$ that is directed out of $n$; $output_c$ is of length $U(c, t, p)$
+and represents the items written by $n$ onto $c$.
+
+\end{itemize}
+
+The components $I$ and $W$ above are referred to as ``procedures''
+rather than mathematical functions because we expect them to be
+represented as blocks of source code for an actual procedure
+declaration, thereby allowing a straightforward conversion to a PCG
+from a dataflow program.
+
+\section{Example}
+
+For example...
+
+\section{Translating a PCP to an SARE}
+
+In this section we give the formal translation of a Phased Computation
+Program to a System of Affine Recurrence Equations.  The SARE will be
+parameterized by $N$, the number of steady-state cycles that one
+wishes to execute in the PCP.
+
+\subsection{Computing the Steady State Cycle}
+
+Let $S(n)$ denote the number of times that node $n$ fires its 0'th
+phase for a balanced steady-state execution cycle of the entire graph.
+
+\subsection{The Translation}
+
+For each channel $c = (n_a, n_b)$, do following:
+\begin{itemize}
+
+\item Introduce a variable $BUF_c$ with the following domain ${\cal
+D}_{BUF_c}$:
+\begin{align*}
+{\cal D}_{BUF_c} = \{~i~|~0 \le i \le \sum_{p=0}^{\mt{num}(n_a,
+\mt{initial})-1} U(c, \mt{initial}, p) + N * S(n_a) *
+\sum_{p=0}^{\mt{num}(n_a, \mt{steady-state})-1} U(c,
+\mt{steady-state}, p)
+\end{align*}
+
+\item For each $t \in \{\mt{initial}, \mt{steady-state}\}$ and
+for each $p \in [0, num(n_b, t))$, introduce a variable $READ_{c, t,
+p}$ with the following domain ${\cal D}_{READ_{c, t, p}}$:
+
+\begin{align*}
+{\cal D}_{READ_{c, t, p}} = \{~(i,j)~|~0 \le i \le S(n_b) ~\wedge~ 0 \le j \le E(c, t, p)\}
+\end{align*}
+
+\item For each $t \in \{\mt{initial}, \mt{steady-state}\}$ and
+for each $p \in [0, num(n_a), t))$, introduce a variable $WRITE_{c, t,
+p}$ with the following domain ${\cal D}_{WRITE_{c, t, p}}$:
+
+\begin{align*}
+{\cal D}_{WRITE_{c, t, p}} = \{~(i,j)~|~0 \le i \le S(n_a) ~\wedge~ 0 \le j \le U(c, t, p)\}
+\end{align*}
+
+\item Equation ${\cal E}$ for BUF in terms of WRITE.
+
+\item Equation ${\cal E}$ for READ in terms of BUF
+
+\item Equation ${\cal E}$ for WRITE in terms of READ.
+
+\end{itemize}
+
+
+
+
+
+

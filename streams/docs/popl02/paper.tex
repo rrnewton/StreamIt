@@ -1,0 +1,42 @@
+\documentclass[10pt]{article}
+
+\usepackage{amsmath}
+\usepackage{fullpage}
+\usepackage{doublespace}
+\setstretch{1.25}
+
+\title{Dependences}
+
+\author{William Thies and Saman Amarasinghe \\
+  MIT Laboratory for Computer Science\\
+  Cambridge, MA  02139\\ \\
+  \texttt{\symbol{`\{}thies, saman\symbol{`\}}@lcs.mit.edu}}
+
+% don't include the date
+\date{}
+
+\begin{document}
+
+  \maketitle
+
+  \newcommand{\mt}[1]{\mbox{\it #1}}
+  \newcommand{\todo}[1]{\framebox{#1}}
+  \newcommand{\dep}[0]{Dependence Frontier}                % The full name for the dependence function.
+  \newcommand{\DP}[0]{\textsc{Frontier}}                   % Abbrevation for dependence function.
+  \newcommand{\DEP}[2]{\DP_{#1 \small{\rightarrow} #2}}    % Math notation for dependence function.
+
+  \begin{abstract}
+    \input{abstract}
+  \end{abstract}
+
+  \input{intro}
+  \input{sare}
+  
+  \begin{small}
+    \begin{singlespace}
+      \bibliographystyle{abbrv}
+      \bibliography{references}
+    \end{singlespace}
+  \end{small}
+  
+\end{document}
