@@ -9,4 +9,4 @@ options-list.tex: ../release/options-list.tex
 	cp ../release/options-list.tex .
 
 cookbook.dvi: overview.tex minimal.tex moving-average.tex lpf.tex bpf.tex \
-	equalizer.tex echo.tex fib.tex keywords.tex compiler.tex options.tex options-list.tex \
+	equalizer.tex echo.tex fib.tex keywords.tex compiler.tex options.tex options-list.tex *.eps \
