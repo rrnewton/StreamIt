@@ -41,6 +41,11 @@ Michal Karczmarek, Janis Sermulins, William Thies and Rodric Rabbah \\
 
 \maketitle
 
+\newcommand{\sdep}[0]{\textsc{sdep}}
+\newcommand{\sdepf}[2]{\sdep_{#1 \small{\leftarrow} #2}}
+\newcommand{\floor}[2]{\left\lfloor\frac{#1}{#2}\right\rfloor}
+\newcommand{\ceil}[2]{\left\lceil\frac{#1}{#2}\right\rceil}
+
 \newcommand{\mt}[1]{\mbox{\it #1}}
 \newcommand{\todo}[1]{\framebox{\bf #1}}
 \newcommand{\naive}[0]{na\"{\i}ve}
@@ -55,6 +60,7 @@ Michal Karczmarek, Janis Sermulins, William Thies and Rodric Rabbah \\
 \input{sdep}
 \input{apps}
 % implementation goes here -- cluster and constrained
+\input{cluster}
 \input{related}
 \input{conclusion}
 
