@@ -1,9 +1,26 @@
+* understand why dp is performing worse than greedy on beamformer 7
+
+* actually look at the applications and speculate where dynamic
+programming would fundamentally help over something greedy
+
+- extend algorithm to include joiners in the middle of 2-D stuff
+
 - need to fix 2-stage filter fusion (look like regtest dying in ~7 places)
 
 - extending non-rectangular splitjoins with identities to make them
-rectangular
+rectangular (then we can look at fm)
 
 - think about application to feedbackloops
+
+GENERAL
+
+- debug michal's thing by calling the schedule buffers thing with the
+init and steady schedule
+
+- get someone to do a moratorium on all the options and figure out
+what the best combination is.
+
+- write a more general _structured_ sync-removal pass
 
 --------------------------------------------------------------
 

@@ -1,0 +1,30 @@
+\section{Partitioning}
+
+This is the beginning of a non-hierarchical rectangular partitioner.
+
+\scriptsize
+\begin{verbatim}
+
+can draw horizontal cut when:
+1. there are nodes on both sides of the cut
+2. NOT right above a joiner or right below a splitter (no diagonal lines crossed)
+
+can draw vertical cut when:
+1. there are nodes on both sides of the cut
+
+2. all splitjoin (diagonal) lines crossed lead to 1) a splitter just
+   below the top edge of the current rectangle, or 2) a joiner just
+   above the bottom edge of the current rectangle
+
+3. the line can be extended to the latest common ancestor (or,
+   equivalently, the earliest common descendent) of all nodes in the
+   rectangle without crossing any other line.  That is, it represents
+   a division of the least common ancestor.
+
+
+when building graph:
+- should space out parallel streams so that joiner on one side doesn't
+  clobber a stream on the other.
+
+
+\end{verbatim}
