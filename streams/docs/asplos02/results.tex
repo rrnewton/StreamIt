@@ -89,7 +89,7 @@ CRC & A 32-bit Cyclic Redundancy Check (CRC) Encoder/Decoder. \\
 {\bf MFLOPS}
 \\
 \hline \hline
-BeamFormer (12x4) & 596 & 53 & 0.9 & 573 & 15 & 1.8 & 1124\\
+BeamFormer (12x4) & 596 & 53 & 0.9 & 573 & 15 & 1.8 & 1120\\
 \hline
 BeamFormer (48x16) & 596 & 209 & N/A & N/A & 15 & 0.3 & 840\\
 \hline
@@ -140,22 +140,63 @@ transformations on performance and tile utilization, respectively.
 \end{figure}
 
 The results show that for programs with substantial computation
-requirements such as the BeamFormer, the StreamIt compiler is able to
-extract good performance out of the Raw processor.  The BeamFormer
-application shows a sustained 1.03 GFLOPS rate, after a 400\%
-improvement due to our optimizations.  However, programs such as FFT,
-which was created to experiment with the language features of
-StreamIt, has very little work per filter. We were unable to amortize
-the communication overhead for FFT, leading to a slowdown.  Better
-tile code generation and traditional optimizations may help improve
-the performance.
+requirements, the StreamIt compiler is able to extract good
+performance out of the Raw processor.  For example, the BeamFormer
+application (see Figure~\ref{fig:beamcode} for source code) shows a
+sustained 1.12 GFLOPS rate, after a 95\% improvement due to our
+optimizations.  Figures~\ref{fig:beam-orig} and~\ref{fig:beam-opt}
+give the original and optimized configurations of the BeamFormer's
+stream graph, and Figure~\ref{fig:beam-blood} illustrates the impact
+of our load balancing optimizations .
+
+However, programs such as FFT, which was created to experiment with
+the language features of StreamIt, have very little work per
+filter. We were unable to amortize the communication overhead for FFT,
+leading to a slowdown.  Better tile code generation and traditional
+optimizations may help improve the performance.
 
 \begin{figure}
 \centering
-\psfig{figure=beam-graph-orig.eps,width=1.97in}
+\small
+\begin{verbatim}
+                         class BeamFormer extends Pipeline {
+                         
+                            void init(numChannels, numBeams) {
+                         
+                               add(new SplitJoin() { 
+                                  void init() {
+                                     setSplitter(Null());
+                                     for (int i=0; i<numChannels; i++) {
+                                        add(new InputGenerate(i));
+                                        add(new FIRFilter1(64));
+                                        add(new FIRFilter2(16));
+                                     }
+                                     setJoiner(RoundRobin());   
+                                   }});
+                            
+                               add(new SplitJoin() {
+                                  void init() {
+                                     setSplitter(Duplicate());
+                                     for (int i=0; i<numBeams; i++) {
+                                        add(new VectorMult(i));
+                                        add(new FIRFilter3(64));
+                                        add(new Magnitude());
+                                        add(new Detect(i));
+                                     }
+                                     setJoiner(Null());
+                                  }});
+                            }
+                         }
+\end{verbatim}
+\caption{\protect\small Top-level StreamIt code for the BeamFormer.\protect\label{fig:beamcode}}
+\end{figure}
+
+\begin{figure}
+\centering
+\psfig{figure=beam-graph-orig.eps,width=6.5in}
 \caption{\protect\small Stream graph of the original 12x4 BeamFormer.  The 12x4 BeamFormer has 12 channels and 4 beams; it is the largest version that fits onto 64 tiles without filter fusion.  \protect\label{fig:beam-orig}}
 \vspace{36pt}
-\psfig{figure=beam-graph-opt.eps,width=6in}
+\psfig{figure=beam-graph-opt.eps,width=6.5in}
 \caption{\protect\small Stream graph of the load-balanced 12x4 BeamFormer.  Vertical fusion is applied to collapse each pipeline into a single filter, and horizontal fusion is used to transform the 4-way SplitJoin into a 2-way SplitJoin.
 Figure~\ref{fig:beam-blood} shows the benefit of these
 transformations. \protect\label{fig:beam-opt}}

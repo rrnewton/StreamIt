@@ -1,11 +1,18 @@
 \begin{figure}
+\begin{minipage}{3.2in}
 \centering
-\psfig{figure=radio-graph-orig.eps,width=4in}
+\psfig{figure=radio-graph-orig.eps,width=3in}
+\parbox{2.75in}{
 \caption{\protect\small Stream graph of the original FM Radio, in
 which the Filters are at a granularity that is natural for the
-algorithm. \protect\label{fig:fm-orig}}
-\vspace{36pt}
-\psfig{figure=radio-graph-opt.eps,width=4in}
+algorithm. \protect\label{fig:fm-orig}}}
+\end{minipage}
+\hspace{0.1in}
+\begin{minipage}{3.2in}
+\centering
+\vspace{1.1in}
+\psfig{figure=radio-graph-opt.eps,width=3in}
+\parbox{2.75in}{
 \caption{\protect\small Stream graph of the load-balanced FM Radio.
 Since the first LowPassFilter was the most demanding node, it was
 duplicated across a 2-way SplitJoin.  Then, to conserve tiles, the
@@ -13,15 +20,16 @@ Subtract node was moved across a downstream Joiner via the Filter
 Hoisting transformation.  The Subtract, Add, and Printer nodes were
 then fused into a single Filter.  This configuration of the stream
 graph displays much better load balancing than the original (see
-Figure~\ref{fig:fm-blood}).  \protect\label{fig:fm-opt}}
+Figure~\ref{fig:fm-blood}).  \protect\label{fig:fm-opt}}}
+\end{minipage}
 \end{figure}
 
 \begin{figure}
   \begin{center} \psfig{figure=beam-blood-key.eps,width=3.25in} \\
     \subfigure[\vspace{-6pt}
-    Original.\label{fig:radio-blood1}]{\psfig{figure=radio-blood-orig.eps,width=3in}}
+    Original.\label{fig:fm-blood1}]{\psfig{figure=radio-blood-orig.eps,width=3in}}
     \hspace{0.3in} \subfigure[\vspace{-6pt}
-    Load-balanced.\label{fig:radio-blood2}]{\psfig{figure=radio-blood-opt.eps,width=3in}
+    Load-balanced.\label{fig:fm-blood2}]{\psfig{figure=radio-blood-opt.eps,width=3in}
     \vspace{-6pt}} \vspace{-6pt} \caption{Execution traces for the (a)
     original and (b) load-balanced partitionings of the FM Radio.  The
     $x$ axis denotes time, and the $y$ axis denotes the processor.
@@ -212,19 +220,18 @@ intensive filters can be split, and less demanding filters can be
 fused.  Currently, the decision of which transformations to apply is
 done by hand, but the transformations themselves are fully automated.
 
-We use the BeamFormer application \cite{pca} to illustrate the
-partitioning process (see Section~\ref{sec:results} for more
-information about the BeamFormer).  The original partitioning of the
-BeamFormer (Figure~\ref{fig:fm-orig}) is highly unbalanced, as the
-$\mbox{FIRFilter}_3$ nodes constitute most of the work in the stream
-graph.  Figure~\ref{fig:fm-blood1} provides an execution trace of the
-original partitioning and demonstrates that these two filters are the
-bottleneck for the entire computation.  The StreamIt compiler performs
-four vertical fusion transformations and two five-way horizontal
-fission transformations to obtain the load-balanced stream graph given
-in Figure~\ref{fig:fm-opt}.  As illustrated by the execution trace in
-Figure~\ref{fig:fm-blood2}, the optimized graph achieves approximately
-five times as much processor utilization as the original, since the
+We use the FM Radio application \cite{pca} to illustrate the
+partitioning process..  The original partitioning of the radio
+(Figure~\ref{fig:fm-orig}) is highly unbalanced, as the first
+LowPassFilter node constitutes a large fraction of the work in the
+stream graph.  Figure~\ref{fig:fm-blood1} provides an execution trace
+of the original partitioning and demonstrates that this filter is the
+bottleneck for the computation.  The StreamIt compiler performs a
+horizontal fission, filter hoisting, and vertical fusion
+transformation to obtain the improved stream graph given in
+Figure~\ref{fig:fm-opt}.  As illustrated by the execution trace in
+Figure~\ref{fig:fm-blood2}, the load-balanced graph achieves more than
+twice as much processor utilization as the original, since the
 computationally intensive nodes have been split and the lighter nodes
 have been combined. In the following sections, we describe these
 transformations in more detail.

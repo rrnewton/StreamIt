@@ -16,10 +16,11 @@ on the Joiner were (10, 10), the system would be deadlock-free.
 
 \psfig{figure=joiner-buffer-live.eps,width=3.97in}
 \caption{\protect\small Fixing the deadlock with a buffering joiner.
-Here, the Joiner is modified to read items from its input channels in
-the order in which they arrive, rather than in the order specified by
-its weights.  The order of arrival is determined by a simulation of
-the stream graph's execution; thus, the system is guaranteed to be
+The BufferingRoundRobin is an internal StreamIt construct (it is not
+part of the language) which reads items from its input channels in the
+order in which they arrive, rather than in the order specified by its
+weights.  The order of arrival is determined by a simulation of the
+stream graph's execution; thus, the system is guaranteed to be
 deadlock-free, as the order given by the simulation is feasible for
 execution on Raw.  To preserve the semantics of the Joiner, the items
 are written to the output channel from the internal buffers in the
