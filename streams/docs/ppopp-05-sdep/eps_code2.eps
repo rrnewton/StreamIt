@@ -1,0 +1,4798 @@
+%!PS-Adobe-3.0 EPSF-3.0
+%%Title: (Microsoft Word - code2.doc)
+%%Version: 1 3
+%%Creator: (PScript5.dll Version 5.2)
+%%CreationDate: (D:20031115163823-05'00')
+%%For: (mgordon)
+%%DocumentData: Clean7Bit
+%%BoundingBox: 0 0 612 792
+%%Pages: 0
+%%DocumentProcessColors: Cyan Magenta Yellow Black
+%%DocumentSuppliedResources:
+%%+ procset (Adobe Acrobat - PDF operators) 1.2 0
+%%+ procset (Adobe Acrobat - type operators) 1.2 0
+%%EndComments
+0 0 moveto 612 0 lineto 612 792 lineto 0 792 lineto closepath clip newpath
+%%BeginProlog
+%%EndProlog
+%%BeginSetup
+/currentpacking where{pop currentpacking true setpacking}if
+%%BeginResource: procset pdfvars
+%%Copyright: Copyright 1987-2001 Adobe Systems Incorporated. All Rights Reserved.
+%%Version: 5.0 6
+%%Title: definition of dictionary of variables used by PDF & PDFText procsets
+userdict /PDF 160 dict put
+userdict /PDFVars 89 dict dup begin put
+/docSetupDone false def
+/InitAll 0 def
+/TermAll 0 def
+/DocInitAll 0 def
+/DocTermAll 0 def
+/_pdfEncodings 2 array def
+/_pdf_str1 1 string def
+/_pdf_i 0 def
+/_pdf_na 0 def
+/_pdf_showproc 0 def
+/_italMtx [1 0 .212557 1 0 0] def
+/_italMtx_WMode1 [1 -.212557 0 1 0 0] def
+/_italMtxType0 [1 0 .1062785 1 0 0] def
+/_italMtx_WMode1Type0 [1 -.1062785 0 1 0 0] def
+/_basefont 0 def
+/_basefonto 0 def
+/_pdf_oldCIDInit null def
+/_pdf_FontDirectory 30 dict def
+/_categories 10 dict def
+/_sa? true def
+/_ColorSep5044? false def
+/nulldict 0 dict def
+/_processColors 0 def
+/overprintstack null def
+/_defaulttransfer currenttransfer def
+/_defaultflatness currentflat def
+/_defaulthalftone null def
+/_defaultcolortransfer null def
+/_defaultblackgeneration null def
+/_defaultundercolorremoval null def
+/_defaultcolortransfer null def
+PDF begin
+[/c/cs/cm/d/d0/f/h/i/j/J/l/m/M/n/q/Q/re/ri/S/sc/sh/Tf/w/W
+/applyInterpFunc/applystitchFunc/domainClip/encodeInput
+/initgs/int/limit/rangeClip
+/defineRes/findRes/setSA/pl
+%% to keep CoolType entries in GlyphDirProcs safe from collisions with Win PS driver
+/? /! /| /: /+ /GetGlyphDirectory
+/pdf_flushFilters /pdf_readstring /pdf_dictOp /pdf_image /pdf_maskedImage
+/pdf_shfill /pdf_sethalftone
+] {null def} bind forall
+end
+end
+%%EndResource
+PDFVars begin PDF begin
+%%BeginResource: procset pdfutil
+%%Copyright: Copyright 1993-1999 Adobe Systems Incorporated. All Rights Reserved.
+%%Version: 4.0 2
+%%Title: Basic utilities used by other PDF procsets
+/bd {bind def} bind def
+/ld {load def} bd
+/bld {
+dup length dict begin
+{ null def } forall
+bind
+end
+def
+} bd
+/dd { PDFVars 3 1 roll put } bd
+/xdd { exch dd } bd
+/Level2?
+systemdict /languagelevel known
+{ systemdict /languagelevel get 2 ge } { false } ifelse
+def
+/Level1? Level2? not def
+/Level3?
+systemdict /languagelevel known
+{systemdict /languagelevel get 3 eq } { false } ifelse
+def
+/getifknown {
+2 copy known { get true } { pop pop false } ifelse
+} bd
+/here {
+currentdict exch getifknown
+} bd
+/isdefined? { where { pop true } { false } ifelse } bd
+%%EndResource
+%%BeginResource: l2compat
+%%Version: 5.0 9
+%%Copyright: Copyright 1987-2001 Adobe Systems Incorporated. All Rights Reserved.
+%%LanguageLevel: 1
+%%Title: Level 1 emulation of level 2 operators
+/setcmykcolor isdefined? not
+{
+/setcmykcolor {
+1 sub 4 1 roll
+3 {
+3 index add neg dup 0 lt { pop 0 } if
+3 1 roll
+} repeat
+setrgbcolor
+pop
+} bd
+} if
+/rectclip isdefined? not
+{
+/rectclip { newpath re clip newpath } bd
+} if
+/rectfill isdefined? not
+{
+/rectfill { gsave newpath re fill grestore } bd
+} if
+/sethalftone isdefined? not
+{
+/sethalftone {
+begin
+HalftoneType 1 eq
+{ Frequency Angle /SpotFunction load setscreen }
+if
+end
+} bd
+} if
+Level1?
+{
+/pdf_show {show} bd
+/xshow
+{
+PDFVars /_pdf_showproc /pdf_show load put
+pdf_xshow
+} bd
+/yshow
+{
+PDFVars /_pdf_showproc /pdf_show load put
+pdf_yshow
+} bd
+/xyshow
+{
+PDFVars /_pdf_showproc /pdf_show load put
+pdf_xyshow
+} bd
+} if
+%%EndResource
+%%BeginResource: procset pdf
+%%Version: 5.0 6
+%%Copyright: Copyright 1998-2001 Adobe Systems Incorporated. All Rights Reserved.
+%%Title: General operators for PDF, common to all Language Levels.
+/cm { matrix astore concat } bd
+/d /setdash ld
+/f /fill ld
+/h /closepath ld
+/i {dup 0 eq {pop _defaultflatness} if setflat} bd
+/j /setlinejoin ld
+/J /setlinecap ld
+/M /setmiterlimit ld
+/n /newpath ld
+/S /stroke ld
+/w /setlinewidth ld
+/W /clip ld
+/initgs {
+0 setgray
+[] 0 d
+0 j
+0 J
+10 M
+1 w
+false setSA
+/_defaulttransfer load settransfer
+0 i
+/RelativeColorimetric ri
+newpath
+} bd
+/int {
+dup 2 index sub 3 index 5 index sub div 6 -2 roll sub mul
+exch pop add exch pop
+} bd
+/limit {
+dup 2 index le { exch } if pop
+dup 2 index ge { exch } if pop
+} bd
+/domainClip {
+Domain aload pop 3 2 roll
+limit
+} [/Domain] bld
+/applyInterpFunc {
+0 1 DimOut 1 sub
+{
+dup C0 exch get exch
+dup C1 exch get exch
+3 1 roll
+1 index sub
+3 index
+N exp mul add
+exch
+currentdict /Range_lo known
+{
+dup Range_lo exch get exch
+Range_hi exch get
+3 2 roll limit
+}
+{
+pop
+}
+ifelse
+exch
+} for
+pop
+} [/DimOut /C0 /C1 /N /Range_lo /Range_hi] bld
+/encodeInput {
+NumParts 1 sub
+0 1 2 index
+{
+dup Bounds exch get
+2 index gt
+{ exit }
+{ dup
+3 index eq
+{ exit }
+{ pop } ifelse
+} ifelse
+} for
+3 2 roll pop
+dup Bounds exch get exch
+dup 1 add Bounds exch get exch
+2 mul
+dup Encode exch get exch
+1 add Encode exch get
+int
+} [/NumParts /Bounds /Encode] bld
+/rangeClip {
+exch dup Range_lo exch get
+exch Range_hi exch get
+3 2 roll
+limit
+} [/Range_lo /Range_hi] bld
+/applyStitchFunc {
+Functions exch get exec
+currentdict /Range_lo known {
+0 1 DimOut 1 sub {
+DimOut 1 add -1 roll
+rangeClip
+} for
+} if
+} [/Functions /Range_lo /DimOut] bld
+/pdf_flushfilters
+{
+aload length
+{ dup status
+1 index currentfile ne and
+{ dup flushfile closefile }
+{ pop }
+ifelse
+} repeat
+} bd
+/pdf_readstring
+{
+1 index dup length 1 sub get
+exch readstring pop
+exch pdf_flushfilters
+} bind def
+/pdf_dictOp
+{
+3 2 roll
+10 dict copy
+begin
+_Filters dup length 1 sub get def
+currentdict exch exec
+_Filters pdf_flushfilters
+end
+} [/_Filters] bld
+/pdf_image {{image} /DataSource pdf_dictOp} bd
+/pdf_imagemask {{imagemask} /DataSource pdf_dictOp} bd
+/pdf_shfill {{sh} /DataSource pdf_dictOp} bd
+/pdf_sethalftone {{sethalftone} /Thresholds pdf_dictOp} bd
+/pdf_maskedImage
+{
+10 dict copy begin
+/miDict currentdict def
+/DataDict DataDict 10 dict copy def
+DataDict begin
+/DataSource
+_Filters dup length 1 sub get
+def
+miDict image
+_Filters pdf_flushfilters
+end
+end
+} [/miDict /DataDict /_Filters] bld
+%%EndResource
+%%BeginResource: procset sep_ops
+%%Version: 4.0 1
+%%Copyright: Copyright 1987-1999 Adobe Systems Incorporated. All Rights Reserved.
+%%Title: Support for Separations in Level 1, following the conventions of Tech Note 5044
+userdict /sep_ops 50 dict dup begin put
+/bdef {bind def} bind def
+/xdef {exch def} bdef
+/colorimagebuffer {
+0 1 2 index length 1 sub {
+dup 2 index exch get 255 exch sub 2 index 3 1 roll put
+} for
+} bdef
+/addprocs {
+[ 3 1 roll
+/exec load
+dup 3 1 roll
+] cvx
+} bdef
+/L1? {
+systemdict /languagelevel known {
+systemdict /languagelevel get 2 lt
+}{
+true
+} ifelse
+} bdef
+/colorexists {
+statusdict /processcolors known {
+statusdict /processcolors get exec
+}{
+/deviceinfo where {
+pop deviceinfo /Colors known {
+deviceinfo /Colors get
+statusdict /processcolors {
+deviceinfo /Colors known {
+deviceinfo /Colors get
+}{
+1
+} ifelse
+} put
+}{
+1
+} ifelse
+}{
+1
+} ifelse
+} ifelse
+1 gt
+} bdef
+/colorplate colorexists { 0 } { 5 } ifelse def
+/negativecolorplate false def
+/setcmykcolor where {
+pop
+gsave
+1 0 0 0 setcmykcolor systemdict /currentgray get exec 1 exch sub
+0 1 0 0 setcmykcolor systemdict /currentgray get exec 1 exch sub
+0 0 1 0 setcmykcolor systemdict /currentgray get exec 1 exch sub
+0 0 0 1 setcmykcolor systemdict /currentgray get exec 1 exch sub
+4 {4 copy} repeat
+grestore
+1 dict begin
+/foureq {
+4 index eq 8 1 roll
+4 index eq 8 1 roll
+4 index eq 8 1 roll
+4 index eq 8 1 roll
+pop pop pop pop and and and
+} def
+1 0 0 0 foureq {/colorplate 1 store} if
+0 1 0 0 foureq {/colorplate 2 store} if
+0 0 1 0 foureq {/colorplate 3 store} if
+0 0 0 1 foureq {/colorplate 4 store} if
+0 0 0 0 foureq {/colorplate 6 store} if
+end
+} if
+0 systemdict /currenttransfer get exec exec
+1 systemdict /currenttransfer get exec exec
+2 copy
+eq
+{
+/colorplate 6 store
+pop
+/negativecolorplate exch 0.5 lt store
+}
+{
+gt /negativecolorplate exch store
+}
+ifelse
+/findcmykcustomcolor where { pop }
+{
+/findcmykcustomcolor {
+[ 6 1 roll ] readonly
+} bdef
+} ifelse
+/setoverprint where {
+pop
+}{
+/setoverprint {
+pop
+} bdef
+} ifelse
+/currentoverprint where {
+pop
+}{
+/currentoverprint {
+false
+} bdef
+} ifelse
+/setcustomcolor where {
+pop
+}{
+L1? {
+/setcustomcolor {
+exch
+aload pop pop
+4 { 4 index mul 4 1 roll } repeat
+5 -1 roll pop
+setcmykcolor
+} bdef
+}{
+/setcustomcolor {
+exch
+[ exch /Separation exch dup 4 get exch /DeviceCMYK exch
+0 4 getinterval
+[ exch /dup load exch cvx {mul exch dup}
+/forall load /pop load dup] cvx
+] setcolorspace setcolor
+} bdef
+} ifelse
+} ifelse
+/ik 0 def
+/iy 0 def
+/im 0 def
+/ic 0 def
+/imagetint {
+ic .3 mul
+im .59 mul
+iy .11 mul
+ik add add add dup
+1 gt {pop 1} if
+} bdef
+/setcmykcolor where {
+pop
+}{
+/setcmykcolor {
+/ik xdef /iy xdef /im xdef /ic xdef
+imagetint
+1 exch sub setgray
+} bdef
+} ifelse
+/customcolorimage where {
+pop
+}{
+L1? {
+/customcolorimage{
+gsave
+colorexists {
+aload pop pop
+/ik xdef /iy xdef /im xdef /ic xdef
+currentcolortransfer
+{ik mul ik sub 1 add} addprocs
+4 1 roll {iy mul iy sub 1 add} addprocs
+4 1 roll {im mul im sub 1 add} addprocs
+4 1 roll {ic mul ic sub 1 add} addprocs
+4 1 roll setcolortransfer
+/magentabuf 0 string def
+/yellowbuf 0 string def
+/blackbuf 0 string def
+{
+colorimagebuffer dup length magentabuf length ne
+{
+dup length dup dup
+/magentabuf exch string def
+/yellowbuf exch string def
+/blackbuf exch string def
+} if
+dup magentabuf copy yellowbuf copy
+blackbuf copy pop
+} addprocs
+{magentabuf}{yellowbuf}{blackbuf} true 4 colorimage
+}{
+aload pop pop /ik xdef /iy xdef /im xdef /ic xdef /tint
+imagetint def
+currenttransfer
+{tint mul 1 tint sub add} addprocs settransfer image
+} ifelse
+grestore
+} bdef
+}{
+/customcolorimage {
+gsave
+[ exch /Separation exch dup 4 get exch /DeviceCMYK exch
+0 4 getinterval
+[ exch /dup load exch cvx {mul exch dup}
+/forall load /pop load dup] cvx
+] setcolorspace
+10 dict begin
+/ImageType 1 def
+/DataSource exch def
+/ImageMatrix exch def
+/BitsPerComponent exch def
+/Height exch def
+/Width exch def
+/Decode [1 0] def
+currentdict end
+image
+grestore
+} bdef
+} ifelse
+} ifelse
+/setseparationgray where {
+pop
+}{
+L1? {
+/setseparationgray { 1 exch sub dup dup dup setcmykcolor } bdef
+}{
+/setseparationgray {
+[/Separation /All /DeviceCMYK {dup dup dup}] setcolorspace
+1 exch sub setcolor
+} bdef
+} ifelse
+} ifelse
+/separationimage where { pop }
+{
+/separationimage {
+gsave
+1 1 1 1 (All)
+findcmykcustomcolor customcolorimage
+grestore
+} bdef
+} ifelse
+currentdict readonly pop end
+%%EndResource
+%%BeginResource: procset pdflev15044
+%%Version: 5.0 12
+%%Copyright: Copyright 1987-2001 Adobe Systems Incorporated. All Rights Reserved.
+%%LanguageLevel: 1
+%%Title: PDF operators, Level 1, with emulated separations (TN 5044)
+/_ColorSep5044? true dd
+/docinitialize {
+PDF begin
+/_defaulthalftone
+/currenthalftone where
+{ pop currenthalftone }
+{ 4 dict dup begin
+currentscreen
+/SpotFunction exch def
+/Angle exch def
+/Frequency exch def
+/HalftoneType 1 def
+end }
+ifelse
+dd
+/currentcolortransfer where
+{ pop /_defaultcolortransfer [ currentcolortransfer ] dd }
+{ /_defaultcolortransfer [currenttransfer dup dup dup] dd }
+ifelse
+end
+} bd
+/initialize {
+/overprintstack null dd
+sep_ops begin
+50 dict begin
+_defaulthalftone sethalftone
+} bd
+/terminate {
+end end
+} bd
+/currentcolortransfer where
+{ pop }
+{
+/setcolortransfer
+{
+settransfer pop pop pop
+} bd
+} ifelse
+/pl {
+transform
+0.25 sub round 0.25 add exch
+0.25 sub round 0.25 add exch
+itransform
+} bd
+/m { _sa? { pl } if moveto } bd
+/l { _sa? { pl } if lineto } bd
+/c
+{
+_sa? {3 {pl 6 2 roll} repeat} if
+curveto
+} bd
+/ri/pop ld
+/setSA { /_sa? xdd } bd
+/re
+{
+_sa?
+{
+8 dict begin
+/:h exch def
+/:w exch def
+/:y exch def
+/:x exch def
+:x :y pl
+/:ymin exch def /:xmin exch def
+:x :w add :y :h add pl
+/:ymax exch def /:xmax exch def
+:xmin :ymin moveto
+:xmax :ymin lineto
+:xmax :ymax lineto
+:xmin :ymax lineto
+closepath
+end
+}
+{
+4 2 roll moveto
+1 index 0 rlineto
+0 exch rlineto
+neg 0 rlineto
+closepath
+} ifelse
+} bd
+/q
+{
+gsave
+[currentoverprint overprintstack] /overprintstack xdd
+}
+[/overprintstack] bld
+/Q
+{
+overprintstack aload pop /overprintstack xdd setoverprint
+grestore
+}
+[/overprintstack] bld
+/AlmostFull?
+{ dup maxlength exch length sub 2 le
+} bd
+/Expand
+{ 1 index maxlength mul cvi dict
+dup begin exch { def } forall end
+} bd
+/xput
+{ 3 2 roll
+dup 3 index known not
+{ dup AlmostFull? { 1.5 Expand } if
+} if
+dup 4 2 roll put
+} bd
+/defineRes
+{ _categories 1 index known not
+{ /_categories _categories 2 index 10 dict xput store
+} if
+_categories exch 2 copy get 5 -1 roll 4 index xput put
+} bd
+/findRes {
+_categories exch get exch get
+} bd
+/L1setcolor {
+aload length
+dup 0 eq
+{ pop .5 setgray }
+{ dup 1 eq
+{ pop setgray }
+{ 3 eq
+{ setrgbcolor }
+{ setcmykcolor }
+ifelse }
+ifelse }
+ifelse
+} bind dd
+/concattransferfuncs {
+[ 3 1 roll /exec load exch /exec load ] cvx
+} bd
+/concatandsettransfer {
+/_defaulttransfer load concattransferfuncs settransfer
+} bd
+/concatandsetcolortransfer {
+colorplate 0 eq
+{
+_defaultcolortransfer aload pop
+8 -1 roll 5 -1 roll concattransferfuncs 7 1 roll
+6 -1 roll 4 -1 roll concattransferfuncs 5 1 roll
+4 -1 roll 3 -1 roll concattransferfuncs 3 1 roll
+concattransferfuncs
+setcolortransfer
+} if
+colorplate 1 ge colorplate 4 le and
+{
+4 colorplate sub index 4 { exch pop } repeat
+concatandsettransfer
+} if
+colorplate 5 ge
+{
+0 index 4 { exch pop } repeat
+concatandsettransfer
+} if
+} bd
+/tn5044sethalftone
+{
+begin
+HalftoneType 5 eq
+{ [/Default /Cyan /Magenta /Yellow /Black /Default /Default /Default]
+colorplate get
+here not {
+/Default here not { currentdict } if
+} if
+}
+{ currentdict }
+ifelse
+end
+begin
+/TransferFunction here
+{
+concatandsettransfer
+currentdict dup length dict
+begin
+{
+1 index /TransferFunction ne { def } { pop pop } ifelse
+} forall
+currentdict
+end
+}
+{
+currentdict
+} ifelse
+end
+sethalftone
+} bd
+/paintimage
+{
+colorplate 0 eq
+{
+{ {currentfile cyanstr readstring pop}
+{currentfile magentastr readstring pop}
+{currentfile yellowstr readstring pop}
+{currentfile blackstr readstring pop
+currentfile graystr readstring pop pop}
+}
+{ {currentfile cyanstr readhexstring pop}
+{currentfile magentastr readhexstring pop}
+{currentfile yellowstr readhexstring pop}
+{currentfile blackstr readhexstring pop
+currentfile graystr readhexstring pop pop}
+} ifelse
+true 4 colorimage
+}
+{
+3 dict begin
+/binaryOK exch def
+[
+1 1 5 {
+dup
+/currentfile cvx
+[ /cyanstr /magentastr /yellowstr /blackstr /graystr ]
+3 -1 roll 1 sub get cvx
+binaryOK { /readstring } { /readhexstring } ifelse cvx
+/pop cvx
+5 -1 roll
+colorplate dup 5 gt { pop 5 } if
+eq not { /pop cvx } if
+} for
+] cvx bind
+end
+[
+colorplate 6 eq {
+/pop cvx
+negativecolorplate { 0 } { 1 } ifelse
+} if
+colorplate 4 le
+{
+1 /exch cvx /sub cvx
+} if
+colorplate 6 ne
+{
+systemdict /currenttransfer get exec
+aload pop
+} if
+] cvx
+gsave
+systemdict /settransfer get exec
+systemdict /image get exec
+grestore
+} ifelse
+} bd
+/getrampcolor {
+/indx exch def
+[
+0 1 NumComp 1 sub {
+dup
+Samples exch get
+dup type /stringtype eq { indx get } if
+exch
+Scaling exch get aload pop
+3 1 roll
+mul add
+} for
+]
+L1setcolor
+} bd
+/GenStrips {
+40 dict begin
+/background exch def
+/ext1 exch def
+/ext0 exch def
+/BBox exch def
+/y2 exch def
+/x2 exch def
+/y1 exch def
+/x1 exch def
+/rampdict exch def
+gsave
+BBox length 0 gt {
+BBox 0 get BBox 1 get
+BBox 2 get BBox 0 get sub
+BBox 3 get BBox 1 get sub
+rectclip
+} if
+x1 x2 eq
+{
+y1 y2 lt {/theta 90 def}{/theta 270 def} ifelse
+}
+{
+/slope y2 y1 sub x2 x1 sub div def
+/theta slope 1 atan def
+x2 x1 lt y2 y1 ge and { /theta theta 180 sub def} if
+x2 x1 lt y2 y1 le and { /theta theta 180 add def} if
+}
+ifelse
+gsave
+clippath
+x1 y1 translate
+theta rotate
+{ pathbbox } stopped
+{ 0 0 0 0 } if
+/yMax exch def
+/xMax exch def
+/yMin exch def
+/xMin exch def
+grestore
+xMax xMin eq yMax yMin eq or
+{
+grestore
+end
+}
+{
+rampdict begin
+20 dict begin
+background length 0 gt { background L1setcolor gsave clippath fill grestore } if
+gsave
+x1 y1 translate
+theta rotate
+/xStart 0 def
+/xEnd x2 x1 sub dup mul y2 y1 sub dup mul add 0.5 exp def
+/ySpan yMax yMin sub def
+/numsteps NumSamples def
+/rampIndxInc 1 def
+/subsampling false def
+xStart 0 transform
+xEnd 0 transform
+3 -1 roll
+sub dup mul
+3 1 roll
+sub dup mul
+add 0.5 exp 72 div
+0 72 matrix defaultmatrix dtransform dup mul exch dup mul add sqrt
+72 0 matrix defaultmatrix dtransform dup mul exch dup mul add sqrt
+1 index 1 index lt { exch } if pop
+mul
+/numpix exch def
+numpix 0 ne
+{
+NumSamples numpix div 0.5 gt
+{
+/numsteps numpix 2 div round cvi dup 1 le { pop 2 } if def
+/rampIndxInc NumSamples 1 sub numsteps div def
+/subsampling true def
+} if
+} if
+ext0 {
+0 getrampcolor
+xMin xStart lt
+{ xMin yMin xMin neg ySpan rectfill } if
+} if
+/xInc xEnd xStart sub numsteps div def
+/x xStart def
+0
+numsteps
+{
+dup
+subsampling { round cvi } if
+getrampcolor
+x yMin xInc ySpan rectfill
+/x x xInc add def
+rampIndxInc add
+}
+repeat
+pop
+ext1 {
+xMax xEnd gt
+{ xEnd yMin xMax xEnd sub ySpan rectfill } if
+} if
+grestore
+grestore
+end
+end
+end
+} ifelse
+} bd
+/RadialShade {
+40 dict begin
+/background exch def
+/ext1 exch def
+/ext0 exch def
+/BBox exch def
+/r2 exch def
+/c2y exch def
+/c2x exch def
+/r1 exch def
+/c1y exch def
+/c1x exch def
+/rampdict exch def
+gsave
+BBox length 0 gt {
+BBox 0 get BBox 1 get
+BBox 2 get BBox 0 get sub
+BBox 3 get BBox 1 get sub
+rectclip
+} if
+gsave
+clippath
+pathbbox
+/BByMax exch def
+/BBxMax exch def
+/BByMin exch def
+/BBxMin exch def
+grestore
+BBxMax BBxMin eq BByMax BByMin eq or
+{
+grestore
+end
+}
+{
+rampdict begin
+20 dict begin
+background length 0 gt { background L1setcolor gsave clippath fill grestore } if
+/areaOfConcern
+BBxMin BByMin BBxMax BByMax
+BBxMin BByMin
+BBxMax BBxMin sub 0
+0 BByMax BByMin sub
+BBxMin BBxMax sub 0
+12 packedarray
+< 0B 00 01 04 04 04 0A>
+2 packedarray
+def
+c1x c2x sub dup mul
+c1y c2y sub dup mul
+add 0.5 exp
+r1 add
+r2 sub
+abs
+0 dtransform
+dup mul exch dup mul add 0.5 exp 72 div
+0 72 matrix defaultmatrix dtransform dup mul exch dup mul add sqrt
+72 0 matrix defaultmatrix dtransform dup mul exch dup mul add sqrt
+1 index 1 index lt { exch } if pop
+/hires exch def
+hires mul
+/numpix exch def
+/numsteps NumSamples def
+/rampIndxInc 1 def
+/subsampling false def
+numpix 0 ne
+{
+NumSamples numpix div 0.5 gt
+{
+/numsteps numpix 2 div round cvi dup 1 le { pop 2 } if def
+/rampIndxInc NumSamples 1 sub numsteps div def
+/subsampling true def
+} if
+} if
+/xInc c2x c1x sub numsteps div def
+/yInc c2y c1y sub numsteps div def
+/rInc r2 r1 sub numsteps div def
+/cx c1x def
+/cy c1y def
+/radius r1 def
+newpath
+xInc 0 eq yInc 0 eq rInc 0 eq and and
+{
+0 getrampcolor
+cx cy radius 0 360 arc
+stroke
+NumSamples 1 sub getrampcolor
+cx cy radius 72 hires div add 0 360 arc
+0 setlinewidth
+stroke
+}
+{
+0
+numsteps
+{
+dup
+subsampling { round cvi } if
+getrampcolor
+cx cy radius 0 360 arc
+/cx cx xInc add def
+/cy cy yInc add def
+/radius radius rInc add def
+cx cy radius 360 0 arcn
+eofill
+rampIndxInc add
+}
+repeat
+pop
+} ifelse
+grestore
+end
+end
+end
+} ifelse
+} bd
+%%EndResource
+%%BeginResource: procset pdftext
+%%Version: 5.0 5
+%%Copyright: Copyright 1987-2001 Adobe Systems Incorporated. All Rights Reserved.
+%%Title: Text operators for PDF
+PDF /PDFText 78 dict dup begin put
+/docinitialize
+{
+/resourcestatus where {
+pop
+/CIDParams /ProcSet resourcestatus {
+pop pop
+false /CIDParams /ProcSet findresource /SetBuildCompatible get exec
+} if
+} if
+PDF begin
+PDFText /_pdfDefineIdentity-H known
+{ PDFText /_pdfDefineIdentity-H get exec}
+if
+end
+} bd
+/initialize {
+PDFText begin
+} bd
+/terminate { end } bd
+Level2?
+{
+/_safeput
+{
+3 -1 roll load 3 1 roll put
+}
+bd
+}
+{
+/_safeput
+{
+2 index load dup dup length exch maxlength ge
+{ dup length 5 add dict copy
+3 index xdd
+}
+{ pop }
+ifelse
+3 -1 roll load 3 1 roll put
+}
+bd
+}
+ifelse
+/pdf_has_composefont? systemdict /composefont known def
+/CopyFont {
+{
+1 index /FID ne 2 index /UniqueID ne and
+{ def } { pop pop } ifelse
+} forall
+} bd
+/Type0CopyFont
+{
+exch
+dup length dict
+begin
+CopyFont
+[
+exch
+FDepVector
+{
+dup /FontType get 0 eq
+{
+1 index Type0CopyFont
+/_pdfType0 exch definefont
+}
+{
+/_pdfBaseFont exch
+2 index exec
+}
+ifelse
+exch
+}
+forall
+pop
+]
+/FDepVector exch def
+currentdict
+end
+} bd
+Level2? {currentglobal true setglobal} if
+/cHexEncoding
+[/c00/c01/c02/c03/c04/c05/c06/c07/c08/c09/c0A/c0B/c0C/c0D/c0E/c0F/c10/c11/c12
+/c13/c14/c15/c16/c17/c18/c19/c1A/c1B/c1C/c1D/c1E/c1F/c20/c21/c22/c23/c24/c25
+/c26/c27/c28/c29/c2A/c2B/c2C/c2D/c2E/c2F/c30/c31/c32/c33/c34/c35/c36/c37/c38
+/c39/c3A/c3B/c3C/c3D/c3E/c3F/c40/c41/c42/c43/c44/c45/c46/c47/c48/c49/c4A/c4B
+/c4C/c4D/c4E/c4F/c50/c51/c52/c53/c54/c55/c56/c57/c58/c59/c5A/c5B/c5C/c5D/c5E
+/c5F/c60/c61/c62/c63/c64/c65/c66/c67/c68/c69/c6A/c6B/c6C/c6D/c6E/c6F/c70/c71
+/c72/c73/c74/c75/c76/c77/c78/c79/c7A/c7B/c7C/c7D/c7E/c7F/c80/c81/c82/c83/c84
+/c85/c86/c87/c88/c89/c8A/c8B/c8C/c8D/c8E/c8F/c90/c91/c92/c93/c94/c95/c96/c97
+/c98/c99/c9A/c9B/c9C/c9D/c9E/c9F/cA0/cA1/cA2/cA3/cA4/cA5/cA6/cA7/cA8/cA9/cAA
+/cAB/cAC/cAD/cAE/cAF/cB0/cB1/cB2/cB3/cB4/cB5/cB6/cB7/cB8/cB9/cBA/cBB/cBC/cBD
+/cBE/cBF/cC0/cC1/cC2/cC3/cC4/cC5/cC6/cC7/cC8/cC9/cCA/cCB/cCC/cCD/cCE/cCF/cD0
+/cD1/cD2/cD3/cD4/cD5/cD6/cD7/cD8/cD9/cDA/cDB/cDC/cDD/cDE/cDF/cE0/cE1/cE2/cE3
+/cE4/cE5/cE6/cE7/cE8/cE9/cEA/cEB/cEC/cED/cEE/cEF/cF0/cF1/cF2/cF3/cF4/cF5/cF6
+/cF7/cF8/cF9/cFA/cFB/cFC/cFD/cFE/cFF] def
+Level2? {setglobal} if
+/modEnc {
+/_enc xdd
+/_icode 0 dd
+counttomark 1 sub -1 0
+{
+index
+dup type /nametype eq
+{
+_enc _icode 3 -1 roll put
+_icode 1 add
+}
+if
+/_icode xdd
+} for
+cleartomark
+_enc
+} bd
+/trEnc {
+/_enc xdd
+255 -1 0 {
+exch dup -1 eq
+{ pop /.notdef }
+{ Encoding exch get }
+ifelse
+_enc 3 1 roll put
+} for
+pop
+_enc
+} bd
+/TE {
+/_i xdd
+StandardEncoding 256 array copy modEnc
+_pdfEncodings exch _i exch put
+} bd
+/TZ
+{
+/_usePDFEncoding xdd
+findfont
+dup length 6 add dict
+begin
+{
+1 index /FID ne { def } { pop pop } ifelse
+} forall
+/pdf_origFontName FontName def
+/FontName exch def
+currentdict /PaintType known
+{ PaintType 2 eq {/PaintType 0 def} if }
+if
+_usePDFEncoding 0 ge
+{
+/Encoding _pdfEncodings _usePDFEncoding get def
+pop
+}
+{
+_usePDFEncoding -1 eq
+{
+counttomark 0 eq
+{ pop }
+{
+Encoding 256 array copy
+modEnc /Encoding exch def
+}
+ifelse
+}
+{
+256 array
+trEnc /Encoding exch def
+}
+ifelse
+}
+ifelse
+pdf_EuroProcSet pdf_origFontName known
+{
+pdf_origFontName pdf_AddEuroGlyphProc
+} if
+Level2?
+{
+currentdict /pdf_origFontName undef
+} if
+FontName currentdict
+end
+definefont pop
+}
+bd
+Level2?
+{
+/TZG
+{
+currentglobal true setglobal
+2 index _pdfFontStatus
+{
+2 index findfont
+false setglobal
+3 index findfont
+true setglobal
+ne
+{
+2 index findfont dup rcheck
+{
+dup length dict begin
+{
+1 index /FID ne { def } { pop pop } ifelse
+} forall
+currentdict end
+}
+if
+3 index exch definefont pop
+}
+if
+} if
+setglobal
+TZ
+} bd
+}
+{
+/TZG {TZ} bd
+} ifelse
+Level2?
+{
+currentglobal false setglobal
+userdict /pdftext_data 5 dict put
+pdftext_data
+begin
+/saveStacks
+{
+pdftext_data
+begin
+/vmmode currentglobal def
+false setglobal
+count array astore /os exch def
+end
+countdictstack array dictstack pdftext_data exch /ds exch put
+cleardictstack pdftext_data /dscount countdictstack put
+pdftext_data /vmmode get setglobal
+} bind def
+/restoreStacks
+{
+pdftext_data /vmmode currentglobal put false setglobal
+clear cleardictstack
+pdftext_data /ds get dup
+pdftext_data /dscount get 1 2 index length 1 sub
+{ get begin dup } for
+pop pop
+pdftext_data /os get aload pop
+pdftext_data /vmmode get setglobal
+} bind def
+/testForClonePrinterBug
+{
+currentglobal true setglobal
+/undefinedCategory /Generic /Category findresource
+dup length dict copy /Category defineresource pop
+setglobal
+pdftext_data /saveStacks get exec
+pdftext_data /vmmode currentglobal put false setglobal
+/undefined /undefinedCategory { resourcestatus } stopped
+pdftext_data exch /bugFound exch put
+pdftext_data /vmmode get setglobal
+pdftext_data /restoreStacks get exec
+pdftext_data /bugFound get
+} bind def
+end
+setglobal
+/pdf_resourcestatus
+pdftext_data /testForClonePrinterBug get exec
+{
+{
+pdftext_data /saveStacks get exec
+pdftext_data /os get dup dup length 1 sub
+dup 1 sub dup 0 lt { pop 0 } if
+exch 1 exch { get exch dup } for
+pop pop
+{ resourcestatus }
+stopped
+{
+clear cleardictstack pdftext_data /restoreStacks get exec
+{ pop pop } stopped pop false
+}
+{
+count array astore pdftext_data exch /results exch put
+pdftext_data /restoreStacks get exec pop pop
+pdftext_data /results get aload pop
+}
+ifelse
+}
+}
+{ { resourcestatus } }
+ifelse
+bd
+}
+if
+Level2?
+{
+/_pdfUndefineResource
+{
+currentglobal 3 1 roll
+_pdf_FontDirectory 2 index 2 copy known
+{undef}
+{pop pop}
+ifelse
+1 index (pdf) exch _pdfConcatNames 1 index
+1 index 1 _pdfConcatNames 1 index
+5 index 1 _pdfConcatNames 1 index
+4
+{
+2 copy pdf_resourcestatus
+{
+pop 2 lt
+{2 copy findresource gcheck setglobal undefineresource}
+{pop pop}
+ifelse
+}
+{ pop pop}
+ifelse
+} repeat
+setglobal
+} bd
+}
+{
+/_pdfUndefineResource { pop pop} bd
+}
+ifelse
+Level2?
+{
+/_pdfFontStatus
+{
+currentglobal exch
+/Font pdf_resourcestatus
+{pop pop true}
+{false}
+ifelse
+exch setglobal
+} bd
+}
+{
+/_pdfFontStatusString 50 string def
+_pdfFontStatusString 0 (fonts/) putinterval
+/_pdfFontStatus
+{
+FontDirectory 1 index known
+{ pop true }
+{
+_pdfFontStatusString 6 42 getinterval
+cvs length 6 add
+_pdfFontStatusString exch 0 exch getinterval
+{ status } stopped
+{pop false}
+{
+{ pop pop pop pop true}
+{ false }
+ifelse
+}
+ifelse
+}
+ifelse
+} bd
+}
+ifelse
+Level2?
+{
+/_pdfCIDFontStatus
+{
+/CIDFont /Category pdf_resourcestatus
+{
+pop pop
+/CIDFont pdf_resourcestatus
+{pop pop true}
+{false}
+ifelse
+}
+{ pop false }
+ifelse
+} bd
+}
+if
+/_pdfString100 100 string def
+/_pdfComposeFontName
+{
+dup length 1 eq
+{
+0 get
+1 index
+type /nametype eq
+{
+_pdfString100 cvs
+length dup dup _pdfString100 exch (-) putinterval
+_pdfString100 exch 1 add dup _pdfString100 length exch sub getinterval
+2 index exch cvs length
+add 1 add _pdfString100 exch 0 exch getinterval
+exch pop
+true
+}
+{
+pop pop
+false
+}
+ifelse
+}
+{
+false
+}
+ifelse
+dup {exch cvn exch} if
+} bd
+/_pdfConcatNames
+{
+exch
+_pdfString100 cvs
+length dup dup _pdfString100 exch (-) putinterval
+_pdfString100 exch 1 add dup _pdfString100 length exch sub getinterval
+3 -1 roll exch cvs length
+add 1 add _pdfString100 exch 0 exch getinterval
+cvn
+} bind def
+/_pdfTextTempString 50 string def
+/_pdfRegOrderingArray [(Adobe-Japan1) (Adobe-CNS1) (Adobe-Korea1) (Adobe-GB1)] def
+/_pdf_CheckCIDSystemInfo
+{
+1 index _pdfTextTempString cvs
+(Identity) anchorsearch
+{
+pop pop pop pop true
+}
+{
+false
+_pdfRegOrderingArray
+{
+2 index exch
+anchorsearch
+{ pop pop pop true exit}
+{ pop }
+ifelse
+}
+forall
+exch pop
+exch /CIDFont findresource
+/CIDSystemInfo get
+3 -1 roll /CMap findresource
+/CIDSystemInfo get
+exch
+3 -1 roll
+{
+2 copy
+/Supplement get
+exch
+dup type /dicttype eq
+{/Supplement get}
+{pop 0 }
+ifelse
+ge
+}
+{ true }
+ifelse
+{
+dup /Registry get
+2 index /Registry get eq
+{
+/Ordering get
+exch /Ordering get
+dup type /arraytype eq
+{
+1 index type /arraytype eq
+{
+true
+1 index length 1 sub -1 0
+{
+dup 2 index exch get exch 3 index exch get ne
+{ pop false exit}
+if
+} for
+exch pop exch pop
+}
+{ pop pop false }
+ifelse
+}
+{
+eq
+}
+ifelse
+}
+{ pop pop false }
+ifelse
+}
+{ pop pop false }
+ifelse
+}
+ifelse
+} bind def
+pdf_has_composefont?
+{
+/_pdfComposeFont
+{
+2 copy _pdfComposeFontName not
+{
+2 index
+}
+if
+(pdf) exch _pdfConcatNames
+dup _pdfFontStatus
+{ dup findfont 5 2 roll pop pop pop true}
+{
+4 1 roll
+1 index /CMap pdf_resourcestatus
+{
+pop pop
+true
+}
+{false}
+ifelse
+1 index true exch
+{
+_pdfCIDFontStatus not
+{pop false exit}
+if
+}
+forall
+and
+{
+1 index 1 index 0 get _pdf_CheckCIDSystemInfo
+{
+3 -1 roll pop
+2 index 3 1 roll
+composefont true
+}
+{
+pop pop exch pop false
+}
+ifelse
+}
+{
+_pdfComposeFontName
+{
+dup _pdfFontStatus
+{
+exch pop
+1 index exch
+findfont definefont true
+}
+{
+pop exch pop
+false
+}
+ifelse
+}
+{
+exch pop
+false
+}
+ifelse
+}
+ifelse
+{ true }
+{
+dup _pdfFontStatus
+{ dup findfont true }
+{ pop false }
+ifelse
+}
+ifelse
+}
+ifelse
+} bd
+}
+{
+/_pdfComposeFont
+{
+_pdfComposeFontName not
+{
+dup
+}
+if
+dup
+_pdfFontStatus
+{exch pop dup findfont true}
+{
+1 index
+dup type /nametype eq
+{pop}
+{cvn}
+ifelse
+eq
+{pop false}
+{
+dup _pdfFontStatus
+{dup findfont true}
+{pop false}
+ifelse
+}
+ifelse
+}
+ifelse
+} bd
+}
+ifelse
+/_pdfStyleDicts 4 dict dup begin
+/Adobe-Japan1 4 dict dup begin
+Level2?
+{
+/Serif
+/HeiseiMin-W3-83pv-RKSJ-H _pdfFontStatus
+{/HeiseiMin-W3}
+{
+/HeiseiMin-W3 _pdfCIDFontStatus
+{/HeiseiMin-W3}
+{/Ryumin-Light}
+ifelse
+}
+ifelse
+def
+/SansSerif
+/HeiseiKakuGo-W5-83pv-RKSJ-H _pdfFontStatus
+{/HeiseiKakuGo-W5}
+{
+/HeiseiKakuGo-W5 _pdfCIDFontStatus
+{/HeiseiKakuGo-W5}
+{/GothicBBB-Medium}
+ifelse
+}
+ifelse
+def
+/HeiseiMaruGo-W4-83pv-RKSJ-H _pdfFontStatus
+{/HeiseiMaruGo-W4}
+{
+/HeiseiMaruGo-W4 _pdfCIDFontStatus
+{/HeiseiMaruGo-W4}
+{
+/Jun101-Light-RKSJ-H _pdfFontStatus
+{ /Jun101-Light }
+{ SansSerif }
+ifelse
+}
+ifelse
+}
+ifelse
+/RoundSansSerif exch def
+/Default Serif def
+}
+{
+/Serif /Ryumin-Light def
+/SansSerif /GothicBBB-Medium def
+{
+(fonts/Jun101-Light-83pv-RKSJ-H) status
+}stopped
+{pop}{
+{ pop pop pop pop /Jun101-Light }
+{ SansSerif }
+ifelse
+/RoundSansSerif exch def
+}ifelse
+/Default Serif def
+}
+ifelse
+end
+def
+/Adobe-Korea1 4 dict dup begin
+/Serif /HYSMyeongJo-Medium def
+/SansSerif /HYGoThic-Medium def
+/RoundSansSerif SansSerif def
+/Default Serif def
+end
+def
+/Adobe-GB1 4 dict dup begin
+/Serif /STSong-Light def
+/SansSerif /STHeiti-Regular def
+/RoundSansSerif SansSerif def
+/Default Serif def
+end
+def
+/Adobe-CNS1 4 dict dup begin
+/Serif /MKai-Medium def
+/SansSerif /MHei-Medium def
+/RoundSansSerif SansSerif def
+/Default Serif def
+end
+def
+end
+def
+/TZzero
+{
+/_wmode xdd
+/_styleArr xdd
+/_regOrdering xdd
+3 copy
+_pdfComposeFont
+{
+5 2 roll pop pop pop
+}
+{
+[
+0 1 _styleArr length 1 sub
+{
+_styleArr exch get
+_pdfStyleDicts _regOrdering 2 copy known
+{
+get
+exch 2 copy known not
+{ pop /Default }
+if
+get
+}
+{
+pop pop pop /Unknown
+}
+ifelse
+}
+for
+]
+exch pop
+2 index 3 1 roll
+_pdfComposeFont
+{3 -1 roll pop}
+{
+findfont dup /FontName get exch
+}
+ifelse
+}
+ifelse
+dup /WMode 2 copy known
+{ get _wmode ne }
+{ pop pop _wmode 1 eq}
+ifelse
+{
+exch _wmode _pdfConcatNames
+dup _pdfFontStatus
+{ exch pop dup findfont false}
+{ exch true }
+ifelse
+}
+{
+dup /FontType get 0 ne
+}
+ifelse
+{
+dup /FontType get 3 eq _wmode 1 eq and
+{
+_pdfVerticalRomanT3Font dup length 10 add dict copy
+begin
+/_basefont exch
+dup length 3 add dict
+begin
+{1 index /FID ne {def}{pop pop} ifelse }
+forall
+/Encoding Encoding dup length array copy
+dup 16#27 /quotesingle put
+dup 16#60 /grave put
+_regOrdering /Adobe-Japan1 eq
+{dup 16#5c /yen put dup 16#a5 /yen put dup 16#b4 /yen put}
+if
+def
+FontName
+currentdict
+end
+definefont
+def
+/Encoding _basefont /Encoding get def
+/_fauxfont true def
+}
+{
+dup length 3 add dict
+begin
+{1 index /FID ne {def}{pop pop} ifelse }
+forall
+FontType 0 ne
+{
+/Encoding Encoding dup length array copy
+dup 16#27 /quotesingle put
+dup 16#60 /grave put
+_regOrdering /Adobe-Japan1 eq
+{dup 16#5c /yen put}
+if
+def
+/_fauxfont true def
+} if
+} ifelse
+/WMode _wmode def
+dup dup /FontName exch def
+currentdict
+end
+definefont pop
+}
+{
+pop
+}
+ifelse
+/_pdf_FontDirectory 3 1 roll _safeput
+}
+bd
+Level2?
+{
+/Tf {
+_pdf_FontDirectory 2 index 2 copy known
+{get exch 3 -1 roll pop}
+{pop pop}
+ifelse
+selectfont
+} bd
+}
+{
+/Tf {
+_pdf_FontDirectory 2 index 2 copy known
+{get exch 3 -1 roll pop}
+{pop pop}
+ifelse
+exch findfont exch
+dup type /arraytype eq
+{makefont}
+{scalefont}
+ifelse
+setfont
+} bd
+}
+ifelse
+/cshow where
+{
+pop /pdf_cshow /cshow load dd
+/pdf_remove2 {pop pop} dd
+}
+{
+/pdf_cshow {exch forall} dd
+/pdf_remove2 {} dd
+} ifelse
+/pdf_xshow
+{
+/_pdf_na xdd
+/_pdf_i 0 dd
+currentpoint
+/_pdf_y xdd
+/_pdf_x xdd
+{
+pdf_remove2
+_pdf_str1 exch 0 exch put
+_pdf_str1 /_pdf_showproc load exec
+{_pdf_na _pdf_i get} stopped
+{ pop pop }
+{
+_pdf_x _pdf_y moveto
+0
+rmoveto
+}
+ifelse
+_pdf_i 1 add /_pdf_i xdd
+currentpoint
+/_pdf_y xdd
+/_pdf_x xdd
+}
+exch
+pdf_cshow
+} bd
+/pdf_yshow
+{
+/_pdf_na xdd
+/_pdf_i 0 dd
+currentpoint
+/_pdf_y xdd
+/_pdf_x xdd
+{
+pdf_remove2
+_pdf_str1 exch 0 exch put
+_pdf_str1 /_pdf_showproc load exec
+{_pdf_na _pdf_i get} stopped
+{ pop pop }
+{
+_pdf_x _pdf_y moveto
+0 exch
+rmoveto
+}
+ifelse
+_pdf_i 1 add /_pdf_i xdd
+currentpoint
+/_pdf_y xdd
+/_pdf_x xdd
+}
+exch
+pdf_cshow
+} bd
+/pdf_xyshow
+{
+/_pdf_na xdd
+/_pdf_i 0 dd
+currentpoint
+/_pdf_y xdd
+/_pdf_x xdd
+{
+pdf_remove2
+_pdf_str1 exch 0 exch put
+_pdf_str1 /_pdf_showproc load exec
+{_pdf_na _pdf_i get} stopped
+{ pop pop }
+{
+{_pdf_na _pdf_i 1 add get} stopped
+{ pop pop pop}
+{
+_pdf_x _pdf_y moveto
+rmoveto
+}
+ifelse
+}
+ifelse
+_pdf_i 2 add /_pdf_i xdd
+currentpoint
+/_pdf_y xdd
+/_pdf_x xdd
+}
+exch
+pdf_cshow
+} bd
+/pdfl1xs {/_pdf_showproc /show load dd pdf_xshow} bd
+/pdfl1ys {/_pdf_showproc /show load dd pdf_yshow} bd
+/pdfl1xys {/_pdf_showproc /show load dd pdf_xyshow} bd
+Level2? _ColorSep5044? not and
+{
+/pdfxs {{xshow} stopped {pdfl1xs} if} bd
+/pdfys {{yshow} stopped {pdfl1ys} if} bd
+/pdfxys {{xyshow} stopped {pdfl1xys} if} bd
+}
+{
+/pdfxs /pdfl1xs load dd
+/pdfys /pdfl1ys load dd
+/pdfxys /pdfl1xys load dd
+} ifelse
+/pdf_charpath {false charpath} bd
+/pdf_xcharpath {/_pdf_showproc /pdf_charpath load dd pdf_xshow} bd
+/pdf_ycharpath {/_pdf_showproc /pdf_charpath load dd pdf_yshow} bd
+/pdf_xycharpath {/_pdf_showproc /pdf_charpath load dd pdf_xyshow} bd
+/pdf_strokepath
+{
+{
+pdf_remove2
+_pdf_str1 exch 0 exch put
+_pdf_str1 false charpath
+currentpoint S moveto
+} bind
+exch pdf_cshow
+} bd
+/pdf_xstrokepath {/_pdf_showproc {pdf_charpath S} dd pdf_xshow} bd
+/pdf_ystrokepath {/_pdf_showproc {pdf_charpath S} dd pdf_yshow} bd
+/pdf_xystrokepath {/_pdf_showproc {pdf_charpath S} load dd pdf_xyshow} bd
+Level2? {currentglobal true setglobal} if
+/d0/setcharwidth ld
+/nND {{/.notdef} repeat} bd
+/T3Defs {
+/BuildChar
+{
+1 index /Encoding get exch get
+1 index /BuildGlyph get exec
+}
+def
+/BuildGlyph {
+exch begin
+GlyphProcs exch get exec
+end
+} def
+/_pdfT3Font true def
+} bd
+/_pdfBoldRomanWidthProc
+{
+stringwidth 1 index 0 ne { exch .03 add exch }if setcharwidth
+0 0
+} bd
+/_pdfType0WidthProc
+{
+dup stringwidth 0 0 moveto
+2 index true charpath pathbbox
+0 -1
+7 index 2 div .88
+setcachedevice2
+pop
+0 0
+} bd
+/_pdfType0WMode1WidthProc
+{
+dup stringwidth
+pop 2 div neg -0.88
+2 copy
+moveto
+0 -1
+5 -1 roll true charpath pathbbox
+setcachedevice
+} bd
+/_pdfBoldBaseFont
+11 dict begin
+/FontType 3 def
+/FontMatrix[1 0 0 1 0 0]def
+/FontBBox[0 0 1 1]def
+/Encoding cHexEncoding def
+/_setwidthProc /_pdfBoldRomanWidthProc load def
+/_bcstr1 1 string def
+/BuildChar
+{
+exch begin
+_basefont setfont
+_bcstr1 dup 0 4 -1 roll put
+dup
+_setwidthProc
+3 copy
+moveto
+show
+_basefonto setfont
+moveto
+show
+end
+}bd
+currentdict
+end
+def
+pdf_has_composefont?
+{
+/_pdfBoldBaseCIDFont
+11 dict begin
+/CIDFontType 1 def
+/CIDFontName /_pdfBoldBaseCIDFont def
+/FontMatrix[1 0 0 1 0 0]def
+/FontBBox[0 0 1 1]def
+/_setwidthProc /_pdfType0WidthProc load def
+/_bcstr2 2 string def
+/BuildGlyph
+{
+exch begin
+_basefont setfont
+_bcstr2 1 2 index 256 mod put
+_bcstr2 0 3 -1 roll 256 idiv put
+_bcstr2 dup _setwidthProc
+3 copy
+moveto
+show
+_basefonto setfont
+moveto
+show
+end
+}bd
+currentdict
+end
+def
+/_pdfDefineIdentity-H
+{
+/Identity-H /CMap PDFText /pdf_resourcestatus get exec
+{
+pop pop
+}
+{
+/CIDInit/ProcSet findresource begin 12 dict begin
+begincmap
+/CIDSystemInfo
+3 dict begin
+/Registry (Adobe) def
+/Ordering (Identity) def
+/Supplement 0 def
+currentdict
+end
+def
+/CMapName /Identity-H def
+/CMapVersion 1 def
+/CMapType 1 def
+1 begincodespacerange
+<0000> <ffff>
+endcodespacerange
+1 begincidrange
+<0000> <ffff> 0
+endcidrange
+endcmap
+CMapName currentdict/CMap defineresource pop
+end
+end
+} ifelse
+} def
+} if
+/_pdfVerticalRomanT3Font
+10 dict begin
+/FontType 3 def
+/FontMatrix[1 0 0 1 0 0]def
+/FontBBox[0 0 1 1]def
+/_bcstr1 1 string def
+/BuildChar
+{
+exch begin
+_basefont setfont
+_bcstr1 dup 0 4 -1 roll put
+dup
+_pdfType0WidthProc
+moveto
+show
+end
+}bd
+currentdict
+end
+def
+Level2? {setglobal} if
+/MakeBoldFont
+{
+dup /ct_SyntheticBold known
+{
+dup length 3 add dict begin
+CopyFont
+/ct_StrokeWidth .03 0 FontMatrix idtransform pop def
+/ct_SyntheticBold true def
+currentdict
+end
+definefont
+}
+{
+dup dup length 3 add dict
+begin
+CopyFont
+/PaintType 2 def
+/StrokeWidth .03 0 FontMatrix idtransform pop def
+/dummybold currentdict
+end
+definefont
+dup /FontType get dup 9 ge exch 11 le and
+{
+_pdfBoldBaseCIDFont
+dup length 3 add dict copy begin
+dup /CIDSystemInfo get /CIDSystemInfo exch def
+/_Type0Identity /Identity-H 3 -1 roll [ exch ] composefont
+/_basefont exch def
+/_Type0Identity /Identity-H 3 -1 roll [ exch ] composefont
+/_basefonto exch def
+currentdict
+end
+/CIDFont defineresource
+}
+{
+_pdfBoldBaseFont
+dup length 3 add dict copy begin
+/_basefont exch def
+/_basefonto exch def
+currentdict
+end
+definefont
+}
+ifelse
+}
+ifelse
+} bd
+/MakeBold {
+1 index
+_pdf_FontDirectory 2 index 2 copy known
+{get}
+{exch pop}
+ifelse
+findfont
+dup
+/FontType get 0 eq
+{
+dup /WMode known {dup /WMode get 1 eq }{false} ifelse
+version length 4 ge
+and
+{version 0 4 getinterval cvi 2015 ge }
+{true}
+ifelse
+{/_pdfType0WidthProc}
+{/_pdfType0WMode1WidthProc}
+ifelse
+_pdfBoldBaseFont /_setwidthProc 3 -1 roll load put
+{MakeBoldFont} Type0CopyFont definefont
+}
+{
+dup /_fauxfont known not 1 index /SubstMaster known not and
+{
+_pdfBoldBaseFont /_setwidthProc /_pdfBoldRomanWidthProc load put
+MakeBoldFont
+}
+{
+2 index 2 index eq
+{ exch pop }
+{
+dup length dict begin
+CopyFont
+currentdict
+end
+definefont
+}
+ifelse
+}
+ifelse
+}
+ifelse
+pop pop
+dup /dummybold ne
+{/_pdf_FontDirectory exch dup _safeput }
+{ pop }
+ifelse
+}bd
+/MakeItalic {
+_pdf_FontDirectory exch 2 copy known
+{get}
+{exch pop}
+ifelse
+dup findfont
+dup /FontInfo 2 copy known
+{
+get
+/ItalicAngle 2 copy known
+{get 0 eq }
+{ pop pop true}
+ifelse
+}
+{ pop pop true}
+ifelse
+{
+exch pop
+dup /FontType get 0 eq Level2? not and
+{ dup /FMapType get 6 eq }
+{ false }
+ifelse
+{
+dup /WMode 2 copy known
+{
+get 1 eq
+{ _italMtx_WMode1Type0 }
+{ _italMtxType0 }
+ifelse
+}
+{ pop pop _italMtxType0 }
+ifelse
+}
+{
+dup /WMode 2 copy known
+{
+get 1 eq
+{ _italMtx_WMode1 }
+{ _italMtx }
+ifelse
+}
+{ pop pop _italMtx }
+ifelse
+}
+ifelse
+makefont
+dup /FontType get 42 eq Level2? not or
+{
+dup length dict begin
+CopyFont
+currentdict
+end
+}
+if
+1 index exch
+definefont pop
+/_pdf_FontDirectory exch dup _safeput
+}
+{
+pop
+2 copy ne
+{
+/_pdf_FontDirectory 3 1 roll _safeput
+}
+{ pop pop }
+ifelse
+}
+ifelse
+}bd
+/MakeBoldItalic {
+/dummybold exch
+MakeBold
+/dummybold
+MakeItalic
+}bd
+Level2?
+{
+/pdf_CopyDict
+{1 index length add dict copy}
+def
+}
+{
+/pdf_CopyDict
+{
+1 index length add dict
+1 index wcheck
+{ copy }
+{ begin
+{def} forall
+currentdict
+end
+}
+ifelse
+}
+def
+}
+ifelse
+/pdf_AddEuroGlyphProc
+{
+currentdict /CharStrings known
+{
+CharStrings /Euro known not
+{
+dup
+/CharStrings
+CharStrings 1 pdf_CopyDict
+begin
+/Euro pdf_EuroProcSet 4 -1 roll get def
+currentdict
+end
+def
+/pdf_PSBuildGlyph /pdf_PSBuildGlyph load def
+/pdf_PathOps /pdf_PathOps load def
+/Symbol eq
+{
+/Encoding Encoding dup length array copy
+dup 160 /Euro put def
+}
+if
+}
+{ pop
+}
+ifelse
+}
+{ pop
+}
+ifelse
+}
+def
+Level2? {currentglobal true setglobal} if
+/pdf_PathOps 4 dict dup begin
+/m {moveto} def
+/l {lineto} def
+/c {curveto} def
+/cp {closepath} def
+end
+def
+/pdf_PSBuildGlyph
+{
+gsave
+8 -1 roll pop
+7 1 roll
+currentdict /PaintType 2 copy known {get 2 eq}{pop pop false} ifelse
+dup 9 1 roll
+{
+currentdict /StrokeWidth 2 copy known
+{
+get 2 div
+5 1 roll
+4 -1 roll 4 index sub
+4 1 roll
+3 -1 roll 4 index sub
+3 1 roll
+exch 4 index add exch
+4 index add
+5 -1 roll pop
+}
+{
+pop pop
+}
+ifelse
+}
+if
+setcachedevice
+pdf_PathOps begin
+exec
+end
+{
+currentdict /StrokeWidth 2 copy known
+{ get }
+{ pop pop 0 }
+ifelse
+setlinewidth stroke
+}
+{
+fill
+}
+ifelse
+grestore
+} def
+/pdf_EuroProcSet 13 dict def
+pdf_EuroProcSet
+begin
+/Courier-Bold
+{
+600 0 6 -12 585 612
+{
+385 274 m
+180 274 l
+179 283 179 293 179 303 c
+179 310 179 316 180 323 c
+398 323 l
+423 404 l
+197 404 l
+219 477 273 520 357 520 c
+409 520 466 490 487 454 c
+487 389 l
+579 389 l
+579 612 l
+487 612 l
+487 560 l
+449 595 394 612 349 612 c
+222 612 130 529 98 404 c
+31 404 l
+6 323 l
+86 323 l
+86 304 l
+86 294 86 284 87 274 c
+31 274 l
+6 193 l
+99 193 l
+129 77 211 -12 359 -12 c
+398 -12 509 8 585 77 c
+529 145 l
+497 123 436 80 356 80 c
+285 80 227 122 198 193 c
+360 193 l
+cp
+600 0 m
+}
+pdf_PSBuildGlyph
+} def
+/Courier-BoldOblique /Courier-Bold load def
+/Courier
+{
+600 0 17 -12 578 584
+{
+17 204 m
+97 204 l
+126 81 214 -12 361 -12 c
+440 -12 517 17 578 62 c
+554 109 l
+501 70 434 43 366 43 c
+266 43 184 101 154 204 c
+380 204 l
+400 259 l
+144 259 l
+144 270 143 281 143 292 c
+143 299 143 307 144 314 c
+418 314 l
+438 369 l
+153 369 l
+177 464 249 529 345 529 c
+415 529 484 503 522 463 c
+522 391 l
+576 391 l
+576 584 l
+522 584 l
+522 531 l
+473 566 420 584 348 584 c
+216 584 122 490 95 369 c
+37 369 l
+17 314 l
+87 314 l
+87 297 l
+87 284 88 272 89 259 c
+37 259 l
+cp
+600 0 m
+}
+pdf_PSBuildGlyph
+} def
+/Courier-Oblique /Courier load def
+/Helvetica
+{
+556 0 24 -19 541 703
+{
+541 628 m
+510 669 442 703 354 703 c
+201 703 117 607 101 444 c
+50 444 l
+25 372 l
+97 372 l
+97 301 l
+49 301 l
+24 229 l
+103 229 l
+124 67 209 -19 350 -19 c
+435 -19 501 25 509 32 c
+509 131 l
+492 105 417 60 343 60 c
+267 60 204 127 197 229 c
+406 229 l
+430 301 l
+191 301 l
+191 372 l
+455 372 l
+479 444 l
+194 444 l
+201 531 245 624 348 624 c
+433 624 484 583 509 534 c
+cp
+556 0 m
+}
+pdf_PSBuildGlyph
+} def
+/Helvetica-Oblique /Helvetica load def
+/Helvetica-Bold
+{
+556 0 12 -19 563 710
+{
+563 621 m
+537 659 463 710 363 710 c
+216 710 125 620 101 462 c
+51 462 l
+12 367 l
+92 367 l
+92 346 l
+92 337 93 328 93 319 c
+52 319 l
+12 224 l
+102 224 l
+131 58 228 -19 363 -19 c
+417 -19 471 -12 517 18 c
+517 146 l
+481 115 426 93 363 93 c
+283 93 254 166 246 224 c
+398 224 l
+438 319 l
+236 319 l
+236 367 l
+457 367 l
+497 462 l
+244 462 l
+259 552 298 598 363 598 c
+425 598 464 570 486 547 c
+507 526 513 517 517 509 c
+cp
+556 0 m
+}
+pdf_PSBuildGlyph
+} def
+/Helvetica-BoldOblique /Helvetica-Bold load def
+/Symbol
+{
+750 0 20 -12 714 685
+{
+714 581 m
+650 645 560 685 465 685 c
+304 685 165 580 128 432 c
+50 432 l
+20 369 l
+116 369 l
+115 356 115 347 115 337 c
+115 328 115 319 116 306 c
+50 306 l
+20 243 l
+128 243 l
+165 97 300 -12 465 -12 c
+560 -12 635 25 685 65 c
+685 155 l
+633 91 551 51 465 51 c
+340 51 238 131 199 243 c
+555 243 l
+585 306 l
+184 306 l
+183 317 182 326 182 336 c
+182 346 183 356 184 369 c
+614 369 l 644 432 l
+199 432 l
+233 540 340 622 465 622 c
+555 622 636 580 685 520 c
+cp
+750 0 m
+}
+pdf_PSBuildGlyph
+} def
+/Times-Bold
+{
+500 0 16 -14 478 700
+{
+367 308 m
+224 308 l
+224 368 l
+375 368 l
+380 414 l
+225 414 l
+230 589 257 653 315 653 c
+402 653 431 521 444 457 c
+473 457 l
+473 698 l
+444 697 l
+441 679 437 662 418 662 c
+393 662 365 700 310 700 c
+211 700 97 597 73 414 c
+21 414 l
+16 368 l
+69 368 l
+69 359 68 350 68 341 c
+68 330 68 319 69 308 c
+21 308 l
+16 262 l
+73 262 l
+91 119 161 -14 301 -14 c
+380 -14 443 50 478 116 c
+448 136 l
+415 84 382 40 323 40 c
+262 40 231 77 225 262 c
+362 262 l
+cp
+500 0 m
+}
+pdf_PSBuildGlyph
+} def
+/Times-BoldItalic
+{
+500 0 9 -20 542 686
+{
+542 686 m
+518 686 l
+513 673 507 660 495 660 c
+475 660 457 683 384 683 c
+285 683 170 584 122 430 c
+58 430 l
+34 369 l
+105 369 l
+101 354 92 328 90 312 c
+34 312 l
+9 251 l
+86 251 l
+85 238 84 223 84 207 c
+84 112 117 -14 272 -14 c
+326 -14 349 9 381 9 c
+393 9 393 -10 394 -20 c
+420 -20 l
+461 148 l
+429 148 l
+416 109 362 15 292 15 c
+227 15 197 55 197 128 c
+197 162 204 203 216 251 c
+378 251 l
+402 312 l
+227 312 l
+229 325 236 356 241 369 c
+425 369 l
+450 430 l
+255 430 l
+257 435 264 458 274 488 c
+298 561 337 654 394 654 c
+437 654 484 621 484 530 c
+484 516 l
+516 516 l
+cp
+500 0 m
+}
+pdf_PSBuildGlyph
+} def
+/Times-Italic
+{
+500 0 23 -10 595 692
+{
+399 317 m
+196 317 l
+199 340 203 363 209 386 c
+429 386 l
+444 424 l
+219 424 l
+246 514 307 648 418 648 c
+448 648 471 638 492 616 c
+529 576 524 529 527 479 c
+549 475 l
+595 687 l
+570 687 l
+562 674 558 664 542 664 c
+518 664 474 692 423 692 c
+275 692 162 551 116 424 c
+67 424 l
+53 386 l
+104 386 l
+98 363 93 340 90 317 c
+37 317 l
+23 279 l
+86 279 l
+85 266 85 253 85 240 c
+85 118 137 -10 277 -10 c
+370 -10 436 58 488 128 c
+466 149 l
+424 101 375 48 307 48 c
+212 48 190 160 190 234 c
+190 249 191 264 192 279 c
+384 279 l
+cp
+500 0 m
+}
+pdf_PSBuildGlyph
+} def
+/Times-Roman
+{
+500 0 10 -12 484 692
+{
+347 298 m
+171 298 l
+170 310 170 322 170 335 c
+170 362 l
+362 362 l
+374 403 l
+172 403 l
+184 580 244 642 308 642 c
+380 642 434 574 457 457 c
+481 462 l
+474 691 l
+449 691 l
+433 670 429 657 410 657 c
+394 657 360 692 299 692 c
+204 692 94 604 73 403 c
+22 403 l
+10 362 l
+70 362 l
+69 352 69 341 69 330 c
+69 319 69 308 70 298 c
+22 298 l
+10 257 l
+73 257 l
+97 57 216 -12 295 -12 c
+364 -12 427 25 484 123 c
+458 142 l
+425 101 384 37 316 37 c
+256 37 189 84 173 257 c
+335 257 l
+cp
+500 0 m
+}
+pdf_PSBuildGlyph
+} def
+end
+Level2? {setglobal} if
+currentdict readonly pop end
+%%EndResource
+PDFText begin
+[39/quotesingle 96/grave 128/Adieresis/Aring/Ccedilla/Eacute/Ntilde/Odieresis
+/Udieresis/aacute/agrave/acircumflex/adieresis/atilde/aring/ccedilla/eacute
+/egrave/ecircumflex/edieresis/iacute/igrave/icircumflex/idieresis/ntilde
+/oacute/ograve/ocircumflex/odieresis/otilde/uacute/ugrave/ucircumflex
+/udieresis/dagger/degree/cent/sterling/section/bullet/paragraph/germandbls
+/registered/copyright/trademark/acute/dieresis/.notdef/AE/Oslash
+/.notdef/plusminus/.notdef/.notdef/yen/mu/.notdef/.notdef
+/.notdef/.notdef/.notdef/ordfeminine/ordmasculine/.notdef/ae/oslash
+/questiondown/exclamdown/logicalnot/.notdef/florin/.notdef/.notdef
+/guillemotleft/guillemotright/ellipsis/space/Agrave/Atilde/Otilde/OE/oe
+/endash/emdash/quotedblleft/quotedblright/quoteleft/quoteright/divide
+/.notdef/ydieresis/Ydieresis/fraction/currency/guilsinglleft/guilsinglright
+/fi/fl/daggerdbl/periodcentered/quotesinglbase/quotedblbase/perthousand
+/Acircumflex/Ecircumflex/Aacute/Edieresis/Egrave/Iacute/Icircumflex
+/Idieresis/Igrave/Oacute/Ocircumflex/.notdef/Ograve/Uacute/Ucircumflex
+/Ugrave/dotlessi/circumflex/tilde/macron/breve/dotaccent/ring/cedilla
+/hungarumlaut/ogonek/caron
+0 TE
+[1/dotlessi/caron 39/quotesingle 96/grave 
+127/bullet/Euro/bullet/quotesinglbase/florin/quotedblbase/ellipsis
+/dagger/daggerdbl/circumflex/perthousand/Scaron/guilsinglleft/OE
+/bullet/Zcaron/bullet/bullet/quoteleft/quoteright/quotedblleft
+/quotedblright/bullet/endash/emdash/tilde/trademark/scaron
+/guilsinglright/oe/bullet/zcaron/Ydieresis/space/exclamdown/cent/sterling
+/currency/yen/brokenbar/section/dieresis/copyright/ordfeminine
+/guillemotleft/logicalnot/hyphen/registered/macron/degree/plusminus
+/twosuperior/threesuperior/acute/mu/paragraph/periodcentered/cedilla
+/onesuperior/ordmasculine/guillemotright/onequarter/onehalf/threequarters
+/questiondown/Agrave/Aacute/Acircumflex/Atilde/Adieresis/Aring/AE/Ccedilla
+/Egrave/Eacute/Ecircumflex/Edieresis/Igrave/Iacute/Icircumflex/Idieresis
+/Eth/Ntilde/Ograve/Oacute/Ocircumflex/Otilde/Odieresis/multiply/Oslash
+/Ugrave/Uacute/Ucircumflex/Udieresis/Yacute/Thorn/germandbls/agrave
+/aacute/acircumflex/atilde/adieresis/aring/ae/ccedilla/egrave/eacute
+/ecircumflex/edieresis/igrave/iacute/icircumflex/idieresis/eth/ntilde
+/ograve/oacute/ocircumflex/otilde/odieresis/divide/oslash/ugrave/uacute
+/ucircumflex/udieresis/yacute/thorn/ydieresis
+1 TE
+end
+currentdict readonly pop
+end end
+/currentpacking where {pop setpacking}if
+PDFVars/DocInitAll{[PDF PDFText]{/docinitialize get exec}forall }put
+PDFVars/InitAll{[PDF PDFText]{/initialize get exec}forall initgs}put
+PDFVars/TermAll{[PDFText PDF]{/terminate get exec}forall}put
+PDFVars begin PDF begin
+PDFVars/DocInitAll get exec PDFVars/InitAll get exec
+PDFVars/TermAll get exec end end
+
+%%EndSetup
+PDFVars begin PDF begin PDFVars/InitAll get exec
+0 0 612 792 rectclip
+/N15 [/DeviceRGB] /ColorSpace defineRes pop
+
+%%BeginResource: font AKKOPC+CourierNewPS-ItalicMT
+11 dict begin
+/FontName /AKKOPC+CourierNewPS-ItalicMT def
+/FontMatrix [1 1000 div 0 0 1 1000 div 0 0 ] def
+/Encoding  256 array 0 1 255 {1 index exch /.notdef put} for  def
+/PaintType 0 def
+/FontType 1 def
+/FontBBox { 0 0 0 0 } def
+/FontInfo 1 dict dup begin
+  /OrigFontType /TrueType def
+end readonly def
+currentdict
+end
+
+systemdict begin
+dup /Private 7 dict dup begin
+/BlueValues [-15 0 600 650] def
+/MinFeature {16 16} def
+/password 5839 def
+/ND {def} def
+/NP {put} def
+/RD {string currentfile exch readhexstring pop} def
+2 index /CharStrings 943 dict dup begin
+/.notdef 
+<10bf31704faacd681306918a900cf73e2aff8bc9dc53b3d16740c661dcae
+115aefebecee1c075714d8bad1> ND 
+/space 
+<10bf317079c84b925b> ND 
+/asterisk 
+<10bf317005c1f2615de1fcc36799d34b1ed817d040ace4272a7c07d1efde
+38afb2b9149dd2c4f10dc80430343a7eb0e7190e0528adfa5e834fadb7e4
+4982188fa603aea9418562c83ce1a29c8527a04930380fe97b60ff0e0db0
+2a37f10b7d8eff22ee513dd4e18c74fd957f890378879fc72964ef233b75
+16947a365105b7861bd60aa355dd13df289168948334063c094a4a78a2b5
+808eb76e7953cc79fad83b56d941783d107ae2d39e14c81e98acfb7fa0e2
+7250938603cd01b701dade1c0c2f1f093b7437af5982797598e82616f933
+6d7471cd08fa> ND 
+/hyphen 
+<10bf31700582c6ff30078606755ca0f75b7f0876e73e574c075453> ND 
+/period 
+<10bf317005d99d917ca0ace2321403fdceff517c1afe95549e6c4c62211d
+135ad413a0a05a996b7e77ac198372f2e83dce0fec99daaf3816944fadba
+f1641be1531e3320bab544362cb2> ND 
+/slash 
+<10bf31701ccac013379d1c7b84adb1e6ff744893d109803b456bb4ddbc05
+7639f7c80a4ce81d39461867838f996f6051d1c3a490ea0fb6dae71f9921
+c5b512e14b27ab3f4b5d2d6f036758883508c9f6d525693f58e390c2d447
+cd94afe36b> ND 
+/zero 
+<10bf31700597d53a67d6409ee2c20969e01551b932935d82709c088f0d12
+dbc8d97c033d6569fb7fe7d48874abf5fe1020ea98fb704afb343d9b8c6f
+601cfb077ecfaaa3d8e7e2eaf2bdb2031982e5b4aa377bb7bf978292e996
+88fae0aa6526913a32701b8df70fe5d939a5011f8491d05ca86661a13dde
+a53bd7a4651b195aafbcbc46f5626d0a9f44c342ae64558bc3b094ae4f14
+c0411293b2aed8ee9179545b37aa4aeea1a7ae9440f95b4ff3e59345f431
+08936dfcb4150a4e4ea2141bba11e4410d8867bc45> ND 
+/two 
+<10bf31702ce1b272e2b12e6422a36f3ae07c7224f57154e8c499f1524667
+060572d8c998249f06803cb6169d49fb1706bb7a716be006de9df0cddaa7
+20480fa75ddfc4ca593506d6c24136762792875dd2a7bb18328693e39734
+9a96837501b105055d2a9f6683d1a2f3c5628598227fff472e0c6ab7bc38
+941b0c0e41590111625b5567e4051371648be45ea717520c89033d4db7c4
+ab7624d3c5de97af259c3b6fc5f8b744e0db4b0837e7ef98cf432f484aa2
+e2c3e2aa0128f3b6f3a0459783a205efe7715af37b66a3> ND 
+/semicolon 
+<10bf317005eae28dd0d425c02cfde83d10a147f4ee85e44ca7faf62cb81d
+06fffbecb8099824c4884b2b357a8f674b6846a6200f036f7262f1a004b8
+72e90b1049ab14d14b0cd751c3b4a0b3e7080a9b00049a6227c8bdef2e43
+56fe16f5f6c6a4be2ba9c1846b41a5927738b73cb2e4abaa1c39dfe17f6c
+1707365f88f1d0cbdf5d> ND 
+/equal 
+<10bf31701b9c9648373ce4055d509add0623588408e9635e8ba0d1e9dddf
+8811b68e0f5a4ff403b4aaf7dc47b05a89d6cefdbc20cae75737387b6ee8
+7738b499f113946bae554cfb3bc6c71f6a1a020abe801cbae055f3d256de
+f2cb5695630c5d8e7ac51c27b4a44c41e485510be1f5cd41760cd168a0e2
+27090825d455bf82491f9d8b16b27d19d1e41b20f40c4a56> ND 
+/F 
+<10bf317014475bc96b69d33aa0ed4f6096ce66da99ef5a91cb89d5a9f1e2
+b8a7a749065140904eb0f257f4d1e86682a9171e42d670042e33c580fbaf
+5ea0dfd0331b09d5aaf7897b17ef4bbfe0a780d309f748263dd904ccb985
+e82d4007a7401d0fff136c32a5d6337cb2453d16cd3a251d05e0a5f94e93
+d7d67dd7c561c2e1b48c5e722bdc0d1fbd4e2e63bfda810e33a60eaf0f21
+990a1f4d59995b9bfd7a951b88aac283a37e479b5453cbc36ab2171c3964
+7ef4172d23a6c39e015d3cbac98cea2f156393d1450cfab8905b0f96f9a9
+df993109384ef43a179942fd39d672578a5b17be57857505f47ddf0b3b63
+d60e7047706dd75660ab926409012c> ND 
+/M 
+<10bf317069b199d7676048ab80963388484cd27a947d816276405f5fe91a
+16e59b9f7066e940dc9f7a85de80679b0df77af5d2a7da2ecff207b0f341
+a0eda823ccd5a46895b8046d609c34b69e2d461febf12e26f95ef4727e0f
+c515e2849d7417e8aedebd38cc3416cea04c2c4aad477fed18503834f2d5
+4e93e87b6c8b4ae1258a0673fe3bcd70c949e8ab4f346e05603b2df7c0a7
+5431fe2743b5e70d41a579d5f40ba350301a511c20ff06e545914f4cdb1d
+153a02bd1a0379781ed20886420bbf4d780ba41c23a94dd87d2da6e9509d
+9cc026b72b71b883bd4823ce8b4ec7a95f187d5757609b26a17e477eda4e
+94d3a82a1c7f> ND 
+/N 
+<10bf31704855b2bc447d520393b7f9e0c5a80808ad4801ba9126fcf20687
+229c438c193ac98293c0ab89bf2a1107246d8f48a15544479513bc5e4bfb
+ffd3b0c6f6d7ce47c9f948736cfdd677f09ddcd8619e124d7793e0eb4bf2
+c63f32dc9594911ab85cffe664646e45cefe58ce2012048edc35dcb09adf
+2f3b660eaa495c8277cbcaf12f60c881bfc5f461d3351a8b8c5ee96e8fe9
+315b1ecf9ca0f230b527b1d67d053711c1c69832d0a11651ffbd8ecf7e68
+09d073b6a665fd949fbb151e9d01f0da840b2c7e130aaeb0> ND 
+/a 
+<10bf3170157585909babe1a87d484e4481e47ab3b9c7e40672c428fa79eb
+1efcaada4b41cffe40b2266af8962f1b74d8e11fc2b578dd12fb206719b0
+48ef269a2ac22761ab13cc58514f2d02d0b20a84923a320333dae31c132a
+51e0bcad3512d451aabfffc1fe686d260a42bf0813db123d90ef0252ff97
+9e253d251f85c76dcf47aecce7bc659e1580c7e464300eeaea504ae15c8d
+bf644ea064eca9e00d09c2e96879d256f2acb17e5056d5f02a41a04ca959
+ce8ef81909ab52560a20cdba8aaa12d631bb449f0817504ee9c9dfc4a42d
+be155f15f593ef80055819b73a9da656f799d1146b54d5bdd7d58c55b7b9
+997c3b80d3> ND 
+/b 
+<10bf3170573e32279782f73cef52b9430d589089ec1d37df59cce2ae9189
+7061fe2ca0079c9ed6c2fa4189a37cf496a8ed0aa144e68299f2e6c4e6e3
+75d457fd22ebeb764528d51743d08666366fbce9de8a98d0b7b7b0ab98e5
+02eb591dc57834c796a2be83de87a40be18d03c27cb0e3cd3811a81f0843
+a6c35cec826e518e993f7ce611f276e0a7c49ebf0aa2d5565abc5ec29f84
+2e7854182311d9cc7ac33ab82312f35500fb5793d1bdccf1b867ce3df448
+018ec12fb97388434ba1889856a7b09a9ab5a811f2df41475a2eef9f35ca
+f0bd6fadf29c646ce701c4a2> ND 
+/c 
+<10bf317005a948133dc5794bd4d2a143e9a50406cbe9d5504c8e5eb9ffd1
+87e0d338bebd5b21e8444c33b1a740b9df0840bff4ff50e4d82539105430
+6d436cd95181f713bd4a7b3ffb8c469b0ef4f098864292e64c4aa066ac6e
+9f03af74d3855c04d637895d23b001482ba652d75a95694ade94ea4ae601
+698c639eac94af7af09360f611e518ac5611a2b5990544896a4fb2d6c9c7
+a3772e8f950ff81c2fc7f5245ee31421c67684718f9fc0536f8538dcbbb8
+e84ebcf19d460632222aa88682e8dd90aa2ad790da90432d0a69b4b0ba20
+4764688744f3a9194538ad3eea28535530993a81c75f5433e5022f3d6b06
+1f03cfbdab173bccf65ecbe5268a20844c> ND 
+/d 
+<10bf317002c334dabc32d8a14ee2aa03ac8923186490f5ce7dbcf47bef08
+2be8c94e0fe0c2c82de0f20ad41a69d23a63ca00e3f5f8aef109a8403851
+521ecbbb64cbf3b0fe2f85be8844b2191f04cc3e1fe9776e76032cbb01fc
+ec22059005a94b97eed22c1dc0c4d1c2da4ab5a223eb6220ccd3aabdea90
+6124619586b0accf9bbcb0e529170e3da162eace0aab78b28daef3f74513
+b30a4bacf66b9db7adc07e3a7432f987f82d3ab2fadebdeeff188083c354
+fe38fa2d26d9a9aa972512ff530dccdfe39b3845d79094512103dc8485f0
+4f48bf0afabb> ND 
+/e 
+<10bf31700195cadd018fad8eefce4b0eabd0021c040a13d4e4e26c166143
+8a3cc546b17f98b9b25890fea0164a8421b2bbadbb680380982e6639b17e
+58bb6794d8320e0e9de2c2a7d7181d22a8d570539a034a57e9fbba0fb3d0
+0fd6a8744347e39aad6b34b1f4326c921c5be7582912299fdde83cfa655f
+444159e42088a68bec825d0fea5e917e43c70f5c7a05cf70a071c6c1b52e
+ea2d0cc302cdbff3f8590b7085b05519451b2345290fb2369dfc11508959
+6f4bd0e9e8ec22c4d918352c04> ND 
+/f 
+<10bf317005a6bd645053be3dd122e677bcd71e6adabaadfaf7115656026a
+5e3f05fbe43512c73b99a663037d751a6fbe8146e622df511796713d773a
+ce3f0028ba6de6458bbbc9fd13f8018a92ab777ad8da40ef8f517a4d0432
+a77eb94bf1f58ca1708da3ddfa3fdf855cc7299b06cf5b6ad28fa4c08aca
+318b4e81cee214257cee6714aa72a2d9e19579199cc05f7117590ad87f9a
+60de6751e9a736db6e8cacd9d626633dc0dd0f26c7424edc69351edf86a5
+b09ae103865410bdebdd28c4e22496f972f740851b1e8ce1381030f0b452
+f1f9d666c961af6c5f147be434cb572b0fec569d0d4f97314a11c2> ND 
+/g 
+<10bf31700195cadd36a784de227a90c65b109efd6a3f08bb89bc511778dc
+291074cada6ed1ca8df7e26269fa1d78c1b62b4356df1128560606283734
+d0e74e3481aeeb62bb9ad06246268525eac52767ab8763ba0b1259f43205
+629b898ece2f7b7f350548d195830c5a80b9eddc164f4c31efdae63cf217
+0a278251babe61ff44759f71f0be269c9606edbc4664e2c0470a40706e28
+64f7824263e1721c081aa369f058fc0a6aace23b8ec3791f7ed6bc7c2e4c
+684d60cab9a80abf6b29e7d8608dc6897fc7751423c70ae2e7ff0f1f0f76
+20ed45a6b9f7ca4cf3ad6c7ba9248361412cf56edf1f4bc89a66ca632279
+6a1c2b33f3f2a75b143a4a0f639e2ab2c6fa731f7d8fe507420ae5724d61
+a2022208> ND 
+/h 
+<10bf317030abd1d250c56d66951d3ad56d8ba5aa46e8d84d8911d09c4ad6
+0fa4ef534884bdc4c06734ea21960766d9de6279cc787982d75ec88417f2
+502fe0313807f806b6227a98aee8d12e05af4331ae8724be75384b6e6384
+caa7b7078ee27d16fbdf0bb6962a4759cc8fd369d51d1256e57441e02b43
+667ae17ffc894ee41d0065eec1817605e711af58a8b17d353e47f88a1ce3
+0154db86fb5632ed7bb48fc94aa4c15b5d9c48b60d40760a0f0caabe47bd
+6a2919f3be876cfcf3c5b36932e0f21c066b2d861f365d5d1759e7056438
+1be3acdf3ddf67c80e126a68ce5c5f6920f50969c093df7af593d21369a8
+bc081a80b0a96bc3fb80440766321170019fc6fa99abf589> ND 
+/i 
+<10bf3170193fabaf8b04f813785003b90ae08b5a083c806329ca96258bc3
+42e653a6e7d8f1b95baea1521b18bb51ea292bc286cce42ee5ea59f53c6a
+d9f27c1eb292eedcee3656a2a285e605721e9b5cbfe5032c7c7024e4452c
+dd85233a56cafa7b724cf54ec9e815a7475140d0f3819959069081c06ee7
+265430c36c61ac31a596e437e0a812b133be> ND 
+/j 
+<10bf31704d4d03fca79ba12643214570152b852d2c23aacf96fc84b50e36
+e283bd1bd24c84202422d7c4df5b1e8d0456a8894b3d79d3b9e3bff785a0
+ee4b00d9e03335bc72426cdb9a846a66e323bdb408760e7df1a4e0c929f6
+9d1c583d0673dc20b90262047eb301f7a9ded0cc2068744b991c1e0046bb
+19c73dc3e75b6d981696df02a85f503f4d45ab34140e> ND 
+/k 
+<10bf31703d3650504de429ae5de23cf1a037c73099310d92a37a8d980507
+01e67322ebed8c74274c7dfe55c0b3eeae439b3e544f7fe233b346b06132
+b4cc54564db5aced6c13a9e94b96bdbe18204db3f358ef0311816914b0c9
+8e48b2539917c2e89c67206feee5550da9960e9bff0df12ff28bc9c9f097
+c97c84c9a1997bfeedd186b847e159c98a1bd93b1f56c14ac12d93da0854
+89920d8b464cf99ee2d1a5556c997ae130f6dd86434b3e54391370211104
+ccea8e6d7e3ef47638afb8c52a5072cfa3b9e9379c4ab9df6340252e0eb4
+fcfcf7584b4a77544234f6549efc568f3c7c9377a159ab5641208ffc7a7c
+8b> ND 
+/l 
+<10bf3170193fabaf8bdba7856fa82178f8af69a441fd861d93ef8b399c16
+d5d653cc351686db2984bc2ccf21b6c5a284c8168411d243bc8ce79e817f
+fe30ccf65f2cc67036fa1c71d35978dae40ff8a99443d6b43abff5a8239a
+c3e43d695ac8a9ef30bb8fdbc077832634a752220fb63c0cced553cfd9a4
+2069f21a> ND 
+/m 
+<10bf31706b1ecd9a1827d8afbfb1c4d2b34e418a3b22571d8d76a0822474
+2591b935d108a0bd79de4073184c5558e4eb87c51dbe714f433eec04034c
+06b3580f7a7b0157ff3edd71b18537cc82833e74e560dd9d3ba75209395d
+74a3e3465c48519655000ea3802910c80128a2b7f39d7e9493313ec8fcdb
+01b1c225b7701a98f0c2c28815b32b3369fa7d499901d0a509433fc684e9
+182dc80f33dc51a34435b9060b59ed8b5b03f438541d4569e64586b6ab4a
+ca64a06338770aa013cf99aff5d384158cda9cb28f5e13bcae11ea0073c8
+9df0824acd39d0144aa53979131172cde026994f025086ffb2600128c83f
+641e654d8be23f449d2ded7e6962c6d620214597017b23a927658e220aa2
+8ec378a5d85bdc40fa04ce274b574bbae5933f6f98919efd2bbe3cc8908f
+0a86903a36590d43b1f259bece018f811fe6fc69246b2b224af792> ND 
+/n 
+<10bf317036d1933551c76cec48cdd20f243a6cc06aa56488ee68ba64f1ce
+c4fc42c94f3c1eab2336a2d116d0658f247679749567f1637976a0ca1c07
+d2ca360ae0e11a633f9842e84aa58c7ea2c966c3351ae757f9ae42c8a12f
+30b02dd11e605a1b01624b95d14ca63fe326c5e761e58c387b4708e59182
+b86c4aed5c9bb94ac039b105830b38fc6721da7c091a8e19c456b821d1d8
+cea23cbaccaa7d012d865d5664592ae8c7c782fd0589412a8823a79b01f6
+63148c6785c2706be2e8a6b23bab7a62f485e07d7d0b49a44922e9124eb1
+01c9c1169a0077c9bfc3a62c3cc8b31d4a1afc61bf21e33919443918b823
+3d26f52b09ccba32cba51b039e00a7dbfb2cdf637ebb> ND 
+/o 
+<10bf317005a4508329e3e4d448665dc2b273e5f378c373e58d62f1f728f4
+19e72a6c9e878ec5ce9567570e3deef21de89c6dcca6d5cfc4458a305a8d
+ad67c897d1d45e85920f57556a7c1bf575be0819fe83227b452587d551b7
+84fbdeaecd188f7db3a9adb54f8f3b1c067ae4293d586d9a8386860c9206
+0be739aa7f743dec6d21482d08e0f9aa0aa78337b211fc2155be0dbb56c0
+10ab0ca8634e09d179c6c06483fd6c9c52> ND 
+/p 
+<10bf31708f157ac84448a9b9606f11189ffd5035bf49fe3e4209f8e23a0d
+2be720f6cf779615398e7579b880925ee4cd7e7a5a44c86ee32fbc3a1ee5
+b14caa72f66ad5bc8b1d8b980889d80a125e6e45a7cf127ebfc06edb66a4
+5cdf2ec837cce4e38c07d02310b2724057776bded002557cbc6854a3da0c
+7aecdf0e1a1506ebfdfe257e1d5ac4a6975aec266640a7ce5724892cc2ba
+730e6d83e7c6243e90100024d5df80f7606f7825a4a7ff664bb966ffe6ad
+0aff5d109dfb117fb4a7b70b234a3adb0e8b9cd88fc1ba17bd3cb8971cac
+eee8bab0b5d058bb72671138196a744e20932990333339c610477494a7> ND 
+/r 
+<10bf3170107d34fd21cf6f41df874e53d1cff1bfcdb5760a920e8254a2fc
+41ff48f1fc39b4a5a4d0da29502dfeb529957418f67213b196a79a6e2810
+bec5f416b39d25fb2a58dd88f2685de12c38602166566b90af91ef0e9425
+8de4b6ce8707d5765eed7f5a4160d43df314354f1ff00385623c8cb0ba85
+acfc087a6a13e469e560f774765611bf90ab8e32289703315ddae07fd392
+fdfe2277b6abadf00fc7b7f41a58dad3b67e7cd4d365cf1a55768343bb07
+17674c71bcf769e8ca9969b8a3e6afdb424c06e3e52eea530481ac> ND 
+/s 
+<10bf3170068d5ba6fde16357800fbf747461bc617dd97c2f5cef479e9747
+532fc5e6ccfdf62bba0d022c970e7c58fe872f1130ff455acbceabb50212
+a7e39e79e4f1e280db3a14c8cb04890aab24f302a062e17eec86b20e3eda
+9eaee6054ea7e3d3e10c6693699d253054a6d3fb88e875e4351d799d3f08
+883bf26395ca458d75a21a38ee605e61babe77875557bc927e27b0a062ef
+fd66656c98638bf3d959abb934c87a5b739d9661996ac3aa72e59256d6e2
+a5d2257d9b7afd894ed83f32520d709a1b7063a7d8f6ac524f3856cf928b
+01cb4920c2c12ca75f4da10f5188d565c3753312f5039e28938b7503b989
+044bd6f31becc6016bfd39f12097c4111d8b53ee4415e0012a3197b60d9d
+0b21ecc45cfd19d4f085528342b614ea19318a1d7081be378c82384bd6ce
+2925293a5820e97d4b1b55add51daed35f16a8931e1270c5346eac2bf315
+78ac9a2161578206e5fdcf6a4e9826e6555f3b9c5f18f9c1c36aeead9c40
+ff988507780cb65bab89f075cc> ND 
+/t 
+<10bf317005956851b38547492481d2e66f9c7e75d82ebd13d940b8c08bf3
+2a706cbf323894d34f872c18168e7e55d8b41ca0db356f8bcaf0dd69b5fd
+bd80c20ac57cdb3d69e33d12acbf37356d31a5b8879758aa89f957e2f020
+51890d0af91794b57058d9dcb675efc8659f33959e0c6c849e457f2230f4
+f4db3749b82b9d82d52e2fbce2ff455424943313d9443fa2d4821ed520c1
+0b1534226b3cc851e7b9793b9a1c9836afa682ad63081620155303c6eaad
+fd18335525ebe47f97955144887ce763140db6750d511b42c9c25763be78
+f9ec54593a27f602ce8a03dfbcfb50789eb5d05b290bbfbfd88eadea> ND 
+/u 
+<10bf317005b20a8330eb097cbdae109690878641f20d8f1b8d95d9d243f2
+4066606620bba31e952a5c23c7e9239ab43e3a976fbe872dba73c465c9ea
+eb5047ea1acfac8227e083d7d4263044368e5a0f68473f8de3372aa0643f
+9ed727ab7f815a7a0497189638dba8dd9111b1b169fa168e9100d2e3e339
+4371865be3af19fe445e8a9d5093c5cec6f4c6fd5b6d2ad7f2aefa86af96
+e0c265ae0e338d1997f189567a01a4d381fcdaba326a1b84c1b4b015a5bb
+0f27a9a81427> ND 
+/v 
+<10bf317005a1c51b2e5bcf74f5ef332149aef8e2df41fd3af25fa33cd0bb
+5be3af35adb95dd32dcbffacd97ea7056c6e587a00bba97b81aa7779da63
+8b049f8845d47aaf09599e3c18ea50a76109961ec389d7ab715289c1ac07
+90f11218358b816713fa1389bdaae63e1f781ecd25422b9da9a3f87e3fc4
+18ecea220da1910b966800c136a9bad02c64290d0ca949199d1e26a892d7
+b6aaeb58b421b9525502ac8decdd> ND 
+/y 
+<10bf317068832f68309ff68b408f3d60417d302b5c5411769c82e897957c
+e05880ce1f80a7e04776773feec3415c14c60f6f9a729ecb3fb9e389ce28
+a6b603cdc1b692a337e611a1b7924cc0d810e190e1e7f96b236fa4c11a1a
+1d6e37741e78460f6419a49f9c724deffa920db0a6dbd4228ac6d834f452
+7ff5ce25322041cee0fb400393229187fa8afa9a1c42840127db4d10a78f
+cdda9e85f7ed46b0d831e050fba5800cd04fb3c8356321656b383ac58787
+ce0bf3b746591e7c0acb9cf63a33dbbc7c6109b26daa54822fb57357ffe2
+c6532814e8e25c216eb7d1bc8e34b3c95cc34b585af72f2c02ab311e71db
+57e0a001ae46bcff8c043e493b5f> ND 
+end
+end
+put
+put
+dup /FontName get exch definefont pop
+end
+/AKKOPC+CourierNewPS-ItalicMT findfont /Encoding get
+dup 0 /.notdef put
+dup 32 /space put
+dup 42 /asterisk put
+dup 45 /hyphen put
+dup 46 /period put
+dup 47 /slash put
+dup 48 /zero put
+dup 50 /two put
+dup 59 /semicolon put
+dup 61 /equal put
+dup 70 /F put
+dup 77 /M put
+dup 78 /N put
+dup 97 /a put
+dup 98 /b put
+dup 99 /c put
+dup 100 /d put
+dup 101 /e put
+dup 102 /f put
+dup 103 /g put
+dup 104 /h put
+dup 105 /i put
+dup 106 /j put
+dup 107 /k put
+dup 108 /l put
+dup 109 /m put
+dup 110 /n put
+dup 111 /o put
+dup 112 /p put
+dup 114 /r put
+dup 115 /s put
+dup 116 /t put
+dup 117 /u put
+dup 118 /v put
+dup 121 /y put
+dup 160 /space put
+dup 173 /hyphen put
+pop
+%%EndResource
+[/N16/AKKOPC+CourierNewPS-ItalicMT 1 TZ
+%%BeginResource: font AKKOPA+CourierNewPSMT
+11 dict begin
+/FontName /AKKOPA+CourierNewPSMT def
+/FontMatrix [1 1000 div 0 0 1 1000 div 0 0 ] def
+/Encoding  256 array 0 1 255 {1 index exch /.notdef put} for  def
+/PaintType 0 def
+/FontType 1 def
+/FontBBox { 0 0 0 0 } def
+/FontInfo 1 dict dup begin
+  /OrigFontType /TrueType def
+end readonly def
+currentdict
+end
+
+systemdict begin
+dup /Private 7 dict dup begin
+/BlueValues [-15 0 600 650] def
+/MinFeature {16 16} def
+/password 5839 def
+/ND {def} def
+/NP {put} def
+/RD {string currentfile exch readhexstring pop} def
+2 index /CharStrings 1318 dict dup begin
+/.notdef 
+<10bf31704faacd68130743d1032b190034e66bfe220959d1d966dfb0f017
+1a28cd5cf1737c91b7113f3bf6> ND 
+/space 
+<10bf317079c84b925b> ND 
+/exclam 
+<10bf317005235b9245d038bef2a40bcd5a425a3c8a4068a5a3173f4c52ca
+eb496aae290a269ff8a025f4ff83469a5465253b955ec1a951ac5557b11c
+d9d535b83ce2810b19350380a4a271e3e7199f29aeb6b6acc0c89ff747c9
+0cf14b9f1fdd825dcfe2fe571cbe4cc7a9bf22d4d1bb407bf46117bbd98d
+33ed7c51283363efeb27c4e5f415e6bca11f4e3d72d9778c659bbcbe731d
+e4317288046b6a> ND 
+/percent 
+<10bf317014475bc96bcd3f5294b0bd958a01e92b6e4f3c71340920736164
+896ec50cd68a13049a28b25b9961e18ad6ed213e1f94c2b79a609d914532
+5399dab7da19685f1bf06be0bf3f8be0eff71d6619157b4cde0b20d891c2
+ef2a779d9bc8d5662c47a395945688d4ba628507e60d91cbdfa191daf912
+cea1b946ece42a940791b0275904728dcb33ad9266dbcba4483a257b95b2
+f09e8a98b1dfa31585b6d4fda5ca23bc537e8677c0e8bc818d0b5a2ca1b7
+94806245be27932baf4d56925bdc388ae0383b88043194725147e96ffdf1
+2a30aa3f66273e9a118f1120465ad87b82ef3163167e8230152032bbafe9
+f89ac1bbcd9f5c81a9d16e8a2b3228fd306d4c47cfa88936fbe0389a7904
+74ecd87a6a6a86ece1869c5e16b3fd04d1b3ae9455b4cf59fca4cb7acc1a
+da44c8ba04488810e323b0e01d6b6e54c1aba7fa933a398336e0934d6300
+928c6fdeea3b0df45128> ND 
+/parenleft 
+<10bf3170051c0657cad441b8f532cd3da010ece2575ef7de2db56ee8fb73
+7f2fd180d91201129a5968decec9580fb835746486f21039af7f682e263a
+317a4c1038a70a08035305726dc4f4b7eb31235335e3a2765c50925e4795
+0533122ff696b6c8d444ddcd6b9a32e7bad24b1b8685e61b3b0dfcb5d945
+abc07d33825263c924c6cda5f3a33396b203fe4186> ND 
+/parenright 
+<10bf317005805916296da6243ee0e467f2f3313f9a036e34d827e2cea6e3
+edd0af68ac5d3c4bddf14f5abad36a23995504293a2c8865869ac64e8fa0
+9fc8b07f1b351b67db4fecfed37964e1564c2faaf1fe1b557a754431a18a
+78747d7d81db11314c2ec7b02fa10201e0193bc9510aa16c0d513153c840
+0ae4f6ae70b8922887de3dcfd91c3843728618e4c261> ND 
+/asterisk 
+<10bf317005a58f3a8e408e5e2704683172aa665e2ab3d3bdeb1ae50c5e91
+0150ee4f39d9ad72d393ea0fc0e5f8921d8b3f0c58587ff0cb982c8b1f3e
+131687ee4024158d47577850f7800969ac4b0b8621352efc5be857910b59
+a3c0df2c9d077ae541deda3ecede0681f846d0ded7eae55fb7b63c86a936
+1ead57007dad5a7b461f1cbba730e3358dfd4f9f718a41dcb6c2c2449f07
+e03a44ac72d2e63055bb4650fbdaa6246d6b605ba9c2d51ef1451d4c75a7
+734f4a5133ef2d3b9be0eed3eb29bee45d225d06d710e836ec5806> ND 
+/plus 
+<10bf3170232f85bb91e9d84a88fb0295da2026833d3b3f257f9aa7ab40eb
+00f08a3e517fbaf25c14739f21795a8a57146d768d9ba5a864182930a22f
+221f28324e225edaf3745ecb0a8f346b399faa58a6103872a2629d72a3a8
+6b4fe516cf7fe191c6fa392b5fad83c494eadcc55502315e81a2fc1b2f22
+50479dc2d1696e28dc0ff1f47b2b50fb40893974342eb8acc52b34ee5c20
+99> ND 
+/comma 
+<10bf31700581977eaf182c6123e4a98da1a350304b0ca60e47d10247e979
+d286859ebba062d886fb7d8319a75a3067f9d2eff4bb6794> ND 
+/hyphen 
+<10bf317014475bc96b7fe50be51ef1d16eb77cb6d699ad> ND 
+/slash 
+<10bf317005a32251dac62a2b05f4793d8df2c2a9d83e2c746706ec6f1513
+59b7e5484192172e3abb2061164fb721b55b2c40125b3120e6020bea1ab1
+1b3956920a01c382b5124e5251959c5769f33d57eea8c80808aa7a492f> ND 
+/zero 
+<10bf317005a32251dac96c2e8a0698834239615d91ae4e74b2354a3d22c3
+a68cd84ae142e7483b1c4b5bced8ea492db34f6881bfda63358b887ec236
+d2cbab1d96e12fdb7ea887b883a009d7cce1510b5f8065f1c14f5f476b04
+c6999cd2b92fc0f1757604a569b9bca551ba35f768492d9951e477634f63
+c42f4763914ec027dcb247dbd566895ec45eaeeec3b6b7ef527b4960bae7
+ee3b8a92446df2912e0944faad8a856a7cd64102e9a83c124e6f1666c80b
+3817d1565dec213596b82d26e7a1499d1c7df570b0daf568fa3c1282d042
+89> ND 
+/one 
+<10bf317005a4508329b5ddd7b22b109df223d600eef5524e2d82dda21233
+5e0221ef511677ecd5fd11f2c8faa5a3539cceb3e8f496929afb1635f17c
+9908e773909fedf540c5871290df753daeb2114c2135d44749daeabb9715
+360fa9d22349a3e96555fa294bd04c8d501870316575f306540dd8d136a6
+b9c637e619566c4fba> ND 
+/two 
+<10bf31702ce1b272ebff9b16764f8de85aa02f57f5999d54704240163fa9
+7fd1d9894d59ce6b648ce4a59eec49a7dc0cd69437c058b1f662c1c6d5ff
+a77b6cb2496438455e29ce4a8523a2deb5feaa9b9a4d6bd222fdc618fd31
+c4794b3191fa0190e1df9675feffca7b9d112596b333479cd5c8644365ab
+1e3f3e48cb3ec59f98dd5b0a9af3ed1e2b811a338fda4848983012568c7f
+1946745c046828ec9e8ea2fd4645f0c4077e2ed1879f682542eebfbf0a7e
+e4e85f2c291e0513c68b07a0d2a9a446f5e0765c357b> ND 
+/three 
+<10bf31701801432976392f1124966f16bdb6fa5274121e7ae70ea5a0e025
+acc6dc17e105f63c635baa74343f3c3b1cf8df40679930b68ab9aa23a644
+55b72125039e400f82696e9df8de2040071eda73571e049a7c9889261802
+1c8030440860291dbd429ed8bbdc26ad5887e64e06db21a8ac571f3d97ba
+0857df517741c58acc521eaf00d8a066e1407cd7352ff28a48464c05ba29
+cb3539aef0cdd6e71b3a373a4d1f3e8935e3879cd56cd85efcec588db947
+8ec627a9f7c2f0e847123bb006d6e8f686761e7c8f38bb4f27bf2aa8fc08
+af3f773dbc70b8dc51337b39680e6852d4fec6b150928f7032c3a6a88a37
+ffc26cc4673f56bf4c3d32b178255f0cd031cc1b17872f949c835b123f> ND 
+/four 
+<10bf31700195cadd36910bd5fcc897ef9ea857828d4cf087eeaab14220fb
+8bc853e2278b1a8f74db0ac950059d1e1cb71ee296067dc76bf1f9f4400d
+08b4080e9672f43ea98ad3b0a15796f3ffd7d18b3e935689bd32921f0dbc
+87da7fc54b459e8ce8d02e2ef7cf98f526589664ed2d4cc03938418c9d9d
+9bcc2ffd522607dbdcbe65b400ac9a9f229c0a31b754d5507fc281b59aae
+> ND 
+/six 
+<10bf317005bd29fc10e74a1ea8b6a5c751376fd7fe34118efc6b0fe8c30a
+c74c224e4fc8a848ece22432b6391c94c2cfc8a86d4cddf02e210627194e
+de8b3622b4b075648f3e3afb5f20200e15143b3ff523d42faa4ed40e544f
+097fa4522873019295d6e353e9606e3951935ddb23a26f0c6fa7498e69bf
+a0df0ff2c1df4c100b5b5d7bb00440029ef710eaf4b884639a1751b0e395
+cedf2bcb8566d6f83e9072702f0e6758ef0edb7bad8953e8211b76b8e617
+4f45ca7cb28adde6daec81e7f18fd708f3de8bfb2b1fb418ed7ac79d56c5
+05e673751a316fd70e497e2e04b441ac96e32ff5> ND 
+/seven 
+<10bf317000664a0e09d943c62225e5fbc227ac4201538a29b4ac2f57bd56
+de44705a88ffa3d0899cc0087c3625506ad886c72052e2232d7fd60a383a
+65d6158b8b84618a24c59ea605beda67fabd090042a8580da2417fff9d56
+8bfbfacb87d303c4da28d2> ND 
+/semicolon 
+<10bf3170058b7877a4fe5eb241e585c70aa2098cf561833aab3de6aa1f7d
+0d8f326a1fa5eb8c92f114fcccd907b2f35bc6627bab3579eb730093a289
+98001b9b714e27f7c9f4f80553db2918ae353cc84d832d47e4a8d39ea37a
+678939fbc5dad7e7b6844498fbd4a80372d912e916952d3a71e83d9c2c2f
+7d4d658b09bf3f> ND 
+/less 
+<10bf31704984321cd08147c74845d75a8580c9ebcab0d68f3970422a7647
+fb02fa17999b5680fcd65934851d886a36ec5870fdad567858da88d5190f
+c5c930967ac508ca13a71f4ef2cc4b1f982fab8271cc8780eb2de4016b67
+> ND 
+/equal 
+<10bf31704e7c83b017883ef69181b2fb407bc70fb2051458c14b8dd9828f
+55e026fe9cfcbe5980343b4d20db0759bd75b13f86275c6e32bcf31d3866
+d50e212e717658f4aa1c9c824e5817d6d2d345d695430bd7029199b6dd7c
+ac18255810c66a4e083c8619eb1bd4da55db01ff912ced32d2da255aec98
+ff033f28bc0c06099ae34ad2377c08f274c3fa5a5106f4> ND 
+/greater 
+<10bf317021c3675c605e9c826a755046e103d1509e56506dc8789a4f547e
+a9b0c088906fb0bbe6407fdc6c69eb85c86e7084e0ca03b32a16b6f21e67
+3b4d334485b1d00482031d8c426467ec7a4a56c0e4b3d9ea2eb205daebee
+> ND 
+/A 
+<10bf3170612eecd395b8d9522a68224200d56a25caff4f3f16ccb56f58a2
+4b316e90c42bbb37cb79edbe21ec0971a63e78962a0ebb36dc8a2332dc14
+5d3e2cca9c7f8d847fb5877c931bc8582b7b8c58017b341c91e147696c2e
+665ed228b989479453bb09c7ba1f4daffb788ddd20bb778cbd545a6fa6b5
+5e125b8d6c44a4b3dd5a9c044dfd2f47cdb31dce6b2afee373d0415d2691
+d756e806fee92b92655cd540c01a3ef55fd44b0db14f26ddc0fd76f4f967
+f02bb1b14d7648fe52573f8b546e40c2c58d4dc342faa950b376ecfbe9c9
+b3aa966bf21a> ND 
+/C 
+<10bf31703bca32f53e4514c0ee4b712d01a9661b361252d38f6afea713ec
+4555e7f15f2a0dfc1c210d759b1168ac917daca8b9659589e72b168e2ea0
+799e7c1a71597e91af0e6a6c795a4b552a9d5967c7d14378777bbb84a9f6
+a2806d94d6475db9fb1540da83ad6f9f0dc2de5e570355c5586eaa0d44b2
+24e2749965dfdbebaaa4106856bf9ae8515e7e48f5a7b826cea159d22bbb
+7d7ae27a2221d504959b950f77f17d7d63e66279adf4454f501ace0adc94
+009d943a3a0822137729abf17ca65fa211efe3d63ede5ffd39fc07082cc7
+2f1fcde786ed4ac927f29cb0a09499fbacafff1d2cbf482278b00dcca83d
+ae5279595e98e849ae3bc08f91864d> ND 
+/D 
+<10bf31702a84c03a3b9a27ad4643479729e0883d4837149ff3964053ff5d
+ee0a34b96225cb500faa15bc094f88dc7dd6d3047b687ec9b4f237ea9928
+a7a16cbfa677efef57d282b324a60bf9e12dc6778d2ffa5e37940243f7c6
+b1734ee0802e457c66227c2d9dc18ab4339b5b9797a418b26ad7e318dcc2
+3837021f9539d37ed3a5984de8a47ca5860d79e0d6e96856de45bbadc2c3
+a339466200ebab55b2b89d9d7a15e3c98a1f137f427cda372b839edbda0a
+1408bf9000da76dbb30a50e3549c97b6633a> ND 
+/E 
+<10bf3170448b935c85dd09dd820673c83d0baf6d968df9cbe72d30b27c5e
+a8dddf8e07fd51b565f1819084b7c098b0e7f2f81ffba06746aa529360d4
+13d7625478328fbc9004345cc67dc9b4585792ab03010c741d1dc0ec4e1c
+f7a965e681deeed7b55930f52cf1880037f1f81b9bd4a658427944f9bd3f
+02bd22515b887f09529ee28fe9848d90adcc71a3c4b108dbe67456767e54
+449af0c27cb7d4f04c6d0d7cfc7689d41247e229b90f99e5302fd39ff944
+c8d1b0442779e6aa85f9817072c5e48132d0c532dfa606a30e354e6593e2
+94d58e502cfc86eb69ec4cb8bd4c80e7108c9fcf486d> ND 
+/F 
+<10bf31702bb3409a83446a4f6ff5b2735e8c384af903fd5d1e0fc3f702c9
+cd7c08f0267104b755e4af5a29b88d3eb4c8dcbb11580daf5be87bca3c4e
+2a99a87f572480e56a17718fe7e0fa00cd03b7013267fbccbe775bf535f3
+5e35dc0d3e29546cc8d4ac25c1b4b826ee42823cd46e12ef1f2b454ee22a
+09ecd82a351406cc232eda8cb00bab7cffaf6306334dcc6363dd49da39d5
+31fe167933d7c5484af749c17cab6144398ca62f83cd776233827171258e
+1896db6cc16b8fa496414173e4960ad7374370f1744fed2503b7415e20d7
+3805bd0be055dee405a928a7adcb7f5a> ND 
+/H 
+<10bf31704d4d03fca79d41e2d5abb87edccd3e98d77f29d3a6d81dc7bfb5
+785c07cbe8d47174fe84b9254ad612c17638fe436f59a5f954200aa0e18a
+ec77e5d0e525fd6f5fc8f4018a5c9301f4fa8ceb73250b81f034a7d7923c
+8a9301244d90b36f628808e5e9729e6d2c3e49e67aa18b3cbc3dc5172a9a
+c2fd1351700fe5db23b986d996a9e0a550ab2166b1e843b35a8161dc1a18
+4fde2606bfd3e49e241154ec2f50e9cc11aba817c254e45bdeeeab53e948
+0cb1fe235b93a39d64ca62c2923ce7bd4cdb06e0a748132acc0e3a25d180
+8807179f32f329c3745f1d7c61a1e35f816c45792d932aeed99ab78374dd
+40abbd26746e504ac3df4d2b28c30f70831bca027fc63e166605eea75b06
+50fec9a660c359aeea40217501043e658ce51ca9> ND 
+/I 
+<10bf317005a32251dac97ea542056b7727247b5b08dc928f73595e4faa12
+5a86961a208e53cd722da6e5449af070a2c998770f0639fb49ff9e2e6358
+a76a4edfce1dc71d2f89946eba0330032b460112943362a7aac43fca6a32
+d34eb64972dce83b6105ee460f8748058a0a95170ddfb28e167ea297f10a
+9c23f873c61a4e104f54937a9352c3c7da5ecc8dd14b0d8d60e9e04f3457
+95c6> ND 
+/M 
+<10bf317065f791a1261f5359b0f181d4ff303dcd24f94a3fb8f57d71666d
+bb28c5c141331961c133c690f195c3c549a44482be4e547e166288a217e1
+c5b44e183367a699f9ccc0d9002be5d4b57de969e1f00b3df1b67e66aa46
+1aadacc90ac5ecf4781767ee2035f49d4d803f65aa4ae25f86130398cb50
+083d4be2d21f6d98ed826289e2121dd8fce2fcf4b3ad3211fc144a7be11d
+12babc1c0541a1faf8c3c742bd984aea64a11d00a05a8e9e9ebf0e9caa2a
+d592dc17e750a3ec96b0e8f743923a8498412cd84053399f236bf1cbac22
+bd70c50bbbbca46f72096b445490531a74fcf2abbd025018de67a5b61691
+af3df4> ND 
+/N 
+<10bf31705374ecc9fba36de2a3f6f853f358a05ee2dfbfd158ce221b80d1
+5afecafcfcde9727aa4e1bc13c40d0c7b54d2c5cd8d390bc3760f935edd0
+3fd5f56acbe818f61b5edbaadf877f4acabe3d8335c599e4fa208545e1a3
+25993102906a12dc38b29114da6ebd36492cc92cbe73663b938cfe2a0875
+24180f008d408125c16a3515d9efb04468dc40d6c11bbf22d6075734baeb
+030b3eedfbe2c1fbb03b7b23fc0b61778d9805e4f69a951a123aa81173e5
+fde9c1ec66c37c04b5dd30987480ef4e1f70> ND 
+/O 
+<10bf31704c1fd11c615f7421ee5f60ff86f18c61a76b78d53c61203736ba
+95fc37fad35314574f9dafe11200d63358ade6db6ebfaacf0c35515d55c7
+6c0a9e06d7feb40c8f9b94af31ea9a2ab516a295bc00a16e785aae073432
+2b88fcbc4d39fb9e8186b4c46d55c083650cbd6323f6150e5a19dd09910d
+4ffd8bd8c7a3d3dcc880d43b90c9e8fbdb5609d6bcf05676d054> ND 
+/Q 
+<10bf31704c1fd11c6106194c159c351d345210942a263bd4941b349b01b4
+546fe4c3961996c11834148ee6a5004d94d194eb816ab100436cdf81cdc0
+0ab1422743af827cbd64e806c4dae80ff759889c2228e219e96e55fadb0e
+5d0c8e57fd871a12e5219d999b8b9068ccc7328db0f88bad3a14b8c68ebd
+d7735efb201177b978814bf620338fc35aabfcb64222a06e3a82915a3a57
+0c0f5605a7c335290f26dd9c1058eabd0a7c6132e5f5764ecd9fddf5ecac
+a2dadd39d09541028cfbf2aa8b4b8d0c79f584001b269a0c62ee586ae05d
+c1a97cb4b5d1ffda965516f7f068d11e233c5002f3c8c81da2efaafa4972
+7c88a800cd1a0b6a3c33e6bde6e2f5e00f6b35dfdbf8> ND 
+/R 
+<10bf3170448b935c85ee44dadf59223a593db8e20d0106979a329b47dada
+77efadcf52834f29916a82f995e150d08e96cc32e1e3bdc99af4cea10e6f
+0c68ea3a724169def6007676a7d43d1914e583237a730c2ca49c63d37292
+c9c7cafae4e371b4a9557f071c3fde7550f20bafa162ca038926b46323ec
+3f6faae0e3cb69f7fead301997bd8098bd37fbc428b9c564559d2c7d8696
+c0a9e06c72126e5539b777ff15e241696a116427e2b09c6410f793cd538a
+ad861fb9e9af5938f0d4836f0769bb18858ae74f9fb7ae62a5de1e84d09e
+76acff50fc87e64e02ec5a6d49e98cff3a8a00c24d3a20fc536f5b7fa8c6
+4274750788a4e838b9ffaa87770fac1366d3> ND 
+/S 
+<10bf317017d277e804374b06c6f3b02c18599c1cdfc789476c06ca82ca10
+c3d8e66dc7faa15df4ebf5d44c58d109162542488bc4f06a9c6a10ce5025
+c1fe80d1c87edf5be49ce05022db079585a5b287a8abdc01de4dc167d4f5
+48f1b6ca8d372ae5419fffa6d021e0d703cef821e96cfdfc3a4e3695ce8c
+9760851cb613bb81d1cdb4ff9053110f68b064551abe67b9f49454daf2b3
+a51a3662bb34f388a5f3b87b74dd5e32e57bf4bc928a54de12c8125b0df2
+8af60cb625a24422f281ac3ba354b38f538bda8902c922f83aecf782736c
+f5c23b9958bd02234da2fb1a900e63e74a435b2771aa874816dd25c26dc1
+fd79e0c509bff4e3058ab01cc32d2eaa19f1a4700a7b4f476671ce9dbb6b
+9a899066390c358ab26f8ff4be1d2778b4673468969614defdf70d9dbc92
+3f91be30d02bc60e0700de0890fe9ab933ba> ND 
+/T 
+<10bf3170232f85bb919bb2819e64154599e05d119aac562517fac8bae489
+ba9bc902971dafeb85a7c4d1fe0f669676ad4503cd6dc29a38b49e4f5dfa
+8c289a70a852acbdbb7acd8433629e5dc60b1680e86ccfc9bf82754fb782
+0f66a864750ab13dfc01523570b0b2655037d47b206faa8c6ff42247076d
+f85be67d77ccfc0bf79060b9769ba702e670881c5053a5e06f2216b96f6a
+95b77d816f978652925746> ND 
+/bracketleft 
+<10bf3170050bb1b178616e3bb6eff463b99e75b5e72f67ada2a5000aab09
+163f44ec47645f8ec351043892d47b153bd0588a7d47f1e0ce1b888f8e18
+95c617bac257877bc95058dfc918f8cff585c6bb452bff54e391ab04> ND 
+/bracketright 
+<10bf317005891b856f642fd1ff6a9a1abfc187cbb5386c97bf6eef66f599
+cebc4c2f2a79bc8efdbfbbdd0c772b306655cc87a026c27ab06b41924e92
+f2da38dc78c85a78793512efb7ba37ebeccc112d5e81cd25b301> ND 
+/underscore 
+<10bf317079c84b92ad1db04e5bb4bc76ca2bec87807729f667d307425fd7
+8f71833699c5c610e21c83e59521cc1d16799d35ce5613d18bc1ba621bef
+5964726b7942b1fd41ef3de5e1b9dc1748> ND 
+/a 
+<10bf3170232f85bb91fd59ea4e6eead0126de560aebc020c547b48f32d2b
+abf93200bad04879ad1bd23f7ed1ee74f058dcafeda9b28230093761878b
+ce932f46a60e5ee361904ea5f5aa9dada691c20e75c341d821d103a06670
+bd04aa001d36164c2c53462a248c68b1a096e1e1731f0d513d61689724b1
+eaf4466b0b071658231f9e540ea28aa6001d68e22fe44fd43054e99d5e01
+1b42649288af7cb657336a6dab295618d586bc69c3219cd3e6ddfbf9d9b8
+5146df15a31b20e2116d63f0204c3258194efa025105c76978026da95a2d
+2c6a82899809d2f0446bae470cb67bd05df83f189d0e1cd217bace53a6ae
+ff> ND 
+/b 
+<10bf31705374ecc9a4510497c7f4ac1a62bf05080bbc7e1c77f092dc031d
+b6972b7c556257f76c172fa7b4d913a36c5f8bd7e87b885382352c0cf94c
+e1ba7bc62c1ef20fb292d2fd17b7a51241e5187451b2c9075649fbe830e3
+8ba5561432b8f13d09391fff28ff5c994889ac1bdab0300e7b811d13f599
+a0f2d4865910c062a4dedcdc368087aa37302a49fd68755e7c11c9bbaf0d
+96e4441e05a0cc16ff5b830babbaa4d224bc82a0570bb79bda689bea189b
+dde1d9c88fc757163144> ND 
+/c 
+<10bf31702ce1b272a974523f106d916e62297489d83166a408d334ea0831
+8891c563969ac7a1af1b8242f3cd390eca23e4a7bbe0e5e28ff78928646a
+5ceeab9b6644150ee02d024168d48f4ba55347e031ede47a7ceacd9a4580
+91243c90d13538afab4e9559496040795ba61d3de23b6ff5b85e7b43e53b
+ae89d195b0e7298e1a19b83fbf87ed268322197550f50d27ee7ef693c9b0
+7e54c994416b10ea39f48b7297e7fe04a3b69de806c6ce0183799b687e97
+b7d40f0fe3b1187f8258be5558cfa1d00c017c9ee1> ND 
+/d 
+<10bf31703bca32f53e29a0e58a8e86ab76580b42a543d71714373fa77625
+0a3496dbdf756172210d600e083d6a26a5a5a7053e1585edaf403de966a7
+a707562aa1d1ac00b1f99e8f70c32aa2c1570dafc991b9ca53ad47f74e33
+b52744440daf1c0e95cd76ac4c31cd7d6e8a4a5a9e971771a0fa628e7784
+b0f505693e89b3d0b4175edda213be0da823266019a3fd336c9a1fad64dd
+4b89a72878cccfe57466ec4732ff092e9a67376dc671d0583090c07072aa
+5dea1b9bdb40afef3dd56e6a25568ebcbb9704f2bf18fb9d> ND 
+/e 
+<10bf3170383ec05dd664788074553f78752bdcb76c418fd5ffe9a10b0d24
+a52cb57694a22e7c481c43c88a64f0e0098fcd3307e0b20b122d8920b0f8
+56b30705d24db3f5fc4badd1597f173ff5476673dbb00f0694615ce846a5
+a647b19e7820da01c8104df7d59927e6c05c834865730c173833000ec3d5
+e58b6b8f7e43633b2ca59416f67c8cd3f143402766c1da49ee8e03c2f589
+a9048d7887964fd46cb0de319625ab7e13> ND 
+/f 
+<10bf3170068d5ba6fde035a4a5cc01ee050d0a5a5d5b75bc557316a90d85
+08ff9867dbe48afb3c4cbd26d3c7704bd4e5dc07fb707b0268d0c27c95e9
+ba22dbe15cb223abdfa1e53ca512eff98c6fdd69b6cfcb8d9e4345870968
+b7815cb9fc29a02ecc6233a6b257687147f131574ee711bc06df43aeeed3
+04be4277bf18e4856f66d816a17d16afd1397afefa1802ac0c133460bd89
+7f4116b822f8d8812475ea32a5df0c99a8c39067e6e3865b0d5eb511a2c5
+68a96a729d10ab3246f9c8c05174f69939b30b62dc645fc24e78327833e4
+83d50d19ce00a56d4b44f82f7c71dfecc764ebd76f6c> ND 
+/g 
+<10bf31703a9bb295071b7b5d2463545d97b84cfcc3f47ab728a132cc62c6
+99cc639eba0f5cace6204241a75201a3180341e8ba23be6a2589f82f2b7a
+492ca1f81d506e133c0dd3ac5201603e1886d319d5568577761caffb0e06
+079b8700ee1223cf6ab4ad116419893ad2e92dd5977c21b4ee2dd5dcdf40
+c53cb0b2c97bf6ebad5b3560e647dbf6b79b3cafa409b9e5d7c7a3d25eaa
+2d1b993d563e13fe0618306504ee4e9d5319adaadb6ca2bbefde2a30f8b6
+1581ef1b596307040503a04fa57e2e2ca46425973fc2826591ab13629eda
+ccc1e8ca9e56db1e618a47f7af19d9abc1603b66656002d6af2ae83e6493
+99> ND 
+/h 
+<10bf3170472740c4a38a899208b8a13c7b0fb1c21b83e74c0a517820101b
+10e67cbc80626559d428aaa06780d6e8840a305c7b19c5120f84f983a428
+3ee995fabee18b04d1a60f7f09352ae663446a001427d4f8a415e57373aa
+3d1e08dfca375fdc63db87c169f8afc5dfaf544f695f5fe73d149f43c503
+9400e47fe454e86201fa5c9a6c4b6bb19be41733c785845ab4aeab8ebb8d
+089400238f96f4027124dd14aa9c6dd4dc188fa775c938823256369b045c
+9c92db4625e79324fffdc2e3d84180858ec6ee204ab498fea91aa6c57a8f
+112a872407a0acd4ad6616b9cd788939c223df80af38236951c6a47222e0
+02fbb0712b820a31a73a> ND 
+/i 
+<10bf31701575859094c8d8dccbc4f7940557b0dba46eabcd2b410561593f
+1c3b57c0f4283368afb1586fb0f465724159f7c8f7c4c45cbf98842cdbdd
+a3bac01111ae963878f51cab75fb912a6bcb1ec9b94cdfe0c63078f174b9
+1445570a816b4348a969be2042e9bb526ae4184baf486a97be393f42778f
+3f19a1af185cd40db467dcfbdd> ND 
+/k 
+<10bf31701a6e2450ef156e7bb7c31add805f21dd31be7f1292e16454c4cf
+6364036af9e24898ad91b735d39e2f9f2a3c88a59b9f2c7c54b95f2ea996
+2bbe6e82a790af3cc247a94f104fd601e97ffb79a7fe32b289b5b9782eb3
+a54aaec7e1387f5592c438bae21f59c6895dfb545a528d23a12d7658117d
+5d0b8286abd5979ea17b5acd9416a15bbfe127cae7021848b6b96ed09953
+591ea103c7283be955035566f20aa4e400126e92742a6db2f3841ceb4e99
+a902fdb16a243816a9b4a793ba77b176b40b5735e0cfe29019fc4a7b047a
+28512b082f34a811283a2b1bbc15bf0e1ef4878ec103dce5fabb19> ND 
+/l 
+<10bf317014475bc94d7b76462b300a267411c22b05f1442892f39494dada
+04043360430ee1bc362f1e1d0a6f11b05a168341eb18d1bd014b79de6627
+9b03c2dbde10574656077bc23565266ee11fd48ae9f5f8c73bcd3f222783
+d17386cd1f8b1d1fbe465c474fe24ed81bd4d906e207427235f68f747b> ND 
+/m 
+<10bf31706754ae3a022e0d545fc45cf8f2854fb66f4e351364584b2a04d9
+e0241fcf3d7c6c297fb168b77ed3a3657e0f74377de82b53b67b245cf6d9
+7fa85a78916379497c0e4a22092e790a9b39c41efb32642b26d976aa446f
+435663bf5b145aeb78f28d8c571aabcf1ebdc63ccca98361a58a5b7ccc72
+6437f5d5745eb98ff3dc55a692f89e92f4c0e8d024e883e35aed6ccc0445
+e9107df180d05ec5814641eaa6d8c517e49971141f5da7a8c51d2ea59f47
+6b3ea0b3294cdf25bd37a1ffbffe6f257994a868975058c356d40dd5b917
+3478526f70f4ddda8a43d4a0cd59d9b96a63bb3f33c98a9bef6102da36b3
+59c4470acd00cb416635a5c078f42f3c9461efb46e75943a0fa574ccd2a7
+fc0ef8e3680edba443929601bf7cd7fcdf3c52ef78bc8236e4cf3fe6> ND 
+/n 
+<10bf31703208ee67869336341cf9a553ed5921ba24dfcc23366b642a1603
+f8d8318bcea36bb67e5ea6cda948875b4c2b8558898264bf9cc37ed272bf
+4454efa61c79c53934d751332012576509d8efb8ee9cacdf5457498e7bc3
+6d02f57f1ae5bc8404d96da4b0b2bc1523a25e92e8ef2c7820f69b9a8ad2
+54ea270f066dc2be1a2de027b4c238a84e015e7f748229ab012829478f04
+be096bb9b5733e5db891ed7dd0c27d057335ac852b6dec5593e764989898
+1cc46ae59ba09107b00ed95813450d878e755878967075674caf2d5a40c4
+ba5b248db93cfd82a8c4c649c4df86ce04b13d12d62a8fd6b3d081db8568
+8697febd04ced3972d> ND 
+/o 
+<10bf31702094e62e57ba031cd9f618fa49b1fbf116ef636835dbc7768fae
+c8df4c0908b89fe0646715c51b45a90079abd2690a10607ae79881b92b5a
+375bed1e8f05175f9423d58ec0f6889237f015a8145f6d8109026bc2a146
+4c7ae9fee59de83eb06630e4d965fabef7de6894e14fb92feeba7e76c259
+ce36c38d589caa7f92751b8a> ND 
+/p 
+<10bf31705374ecc9a451c6e4e09171a4eea24c71ac7d1dce65b5fdc06f32
+5ec5231b780eaf8855d18e1abfa3edcdefe9eee40b04669d804d8bb56e46
+7bb165d25af4eeb819555983e617eb34dc365af46ec63b7b2dfeec055759
+85fef68746c83d78f454411c502ccf6511435e6ea5f32f8cd0ddd0177e59
+04d8ec2d6ce4a3ee957d42a0b7ef335bd887529778118efa1c4057f08ae9
+8cd6df47f0d380fe0c7b1b2a343d179289b6765efe33e43a31429182affd
+65e0d1d12d7312011a30ae9c6ed0f6f7e4377d6170e0e58d89bba5bb1706
+718428618d1199cde4b00b2751a3653aa25dc422ae2fb6b8ab> ND 
+/q 
+<10bf3170383ec05dd989ddb60e7cd615b4f9d10b91b70c22eb2f5d4878af
+7646904ed912a75301782c82f8f0d1640c0d85641c47396e877e952c4d56
+0e84370cf1dc6bf0f743976b4ec8286fd3a62d4eb31d43c15a24536cb6a4
+9a43a2e485526103b712534bae7e3d363e6d133fbae154a086e90e641133
+7b6171a3ea6ef76ed148256086e6c44df24bc6ba93b2f6c8d96174611578
+d8903347ee32c047d3f7a8d59eca871fc08c4f59d7b8ad880d7d66acea12
+54c760bbbb9d5d73e5c7caad6688dae81b309abda39cf957bce9539fdce3
+d45b74c4edc8485d848a6652> ND 
+/r 
+<10bf31702ce1b272e1cfea273864a55b510451ce2e699e3a05850d33fa41
+fd2614bd419625fc1c6755defd118fd83f002d6a0ec3dc82f8442b64c24a
+a84fb6745177fd22b8b0b2c2b1dc5a86d4b6b3259781be385f368a63b247
+0c71a448bc514b3db35bcf7863f44c92c7a044dbf87c371f4b2bbcf4c896
+797386e5c2baf124d22bc9c3f04cf863d5a7039c892f654d46812bce460c
+ab30b56fa13b9a757b612341d59389f65b9d7682ba6a833799fc3c3048ff
+d2f126276eebb8e64c01658ce6f7f21bc018285d8fb8eb> ND 
+/s 
+<10bf317002c334dab3629f7a671113a749f85c0dc9cd007b5c722c30c298
+c379034a1d4dff63659ab6ee7d28c1b50f6acfbe7097ca323ff9a1d92da8
+a5a8fa26a6b978329c7ac9264ffd0c310fee0de2aa9eea54b20b9b72f165
+69d2fb00093c098531b58470c59a04b3f549cc5176f6c0cbeb8e781060df
+60db409a177d850029a682caf2a8dfa86e97718d5190c2b20d5fbbe88daa
+c5cda07598bbfae6f51515472e4b6cd489cc11d1d5097ec478219063517e
+bf9d6e33f8197ca58033b5a19aa2c87426655e79f87bc280c4b0a1f6234b
+db4b0b5685733017a57444d9d45a085cf22a811f5a9c277184e642721bc9
+c089f5c25ebd8c8f45f6983859fafaae7e67882d8be9cafc094c7bb60ba6
+3afba644e37c53d6aeb42ee83b3543622478875ffb503a11244e3ad97ccc
+e2c7171d3675844e40975990d6> ND 
+/t 
+<10bf31702094e62e5851135cb2cea9c8879583241a0e969bea74a623b2a4
+bc5d546fe56dabf32903e97e457eaab7f6d06bd0f8e9bb64762fd6bc5100
+1d4a3a56e8c5514ceb4878028b31374e0165e40ecb9cabcef37f2e33c2d0
+bfcb7d3627376c4b2081651e1e2c272abc99d0c00094d3de745d7b62fbaf
+41bf6ff60b962626842781631bf9513246667da15ddb5457e1ab9e8a2424
+eec22cf0f015f40246e797ccc20e63b7c00d8e6cace3c37f93b8f3cd5a4d
+24fb69db1bf13106ddcc61ed00b020b826230a453c28542c1a> ND 
+/u 
+<10bf317045baeca689f9c696808664edf815b85652c0600af14b7e1e74eb
+5b2e50f5d8262c6db101478a3e023a2771f8dc4dc59dcc312d19ae1cb243
+473cc20b3705e39da558a90149eba9b62182f59329e84cc34ef008e254a5
+202ecd27d1b3d3a51cf607ec1bc0694b01b97e09aa42809e698d9df64cea
+30c84ed67f9c5f559333abc817d12230ddff72e4fc3de2e8a323c68be929
+cb0866c3e07942d9339d0e88bdaded06> ND 
+/v 
+<10bf31705ac92f4103cbed62fab9c3efa08dbda54f3e3541020524c1fd5b
+b866cfd0d1e55779567ca1f180045e08271d29f89482e759cbce37ad5d87
+0b2bdc3c5712e2b297be931100a2b9ab2403c0947c7188e9d01eeacab8fe
+19106b3f8e5bca5915402df947944402685362dd9f8e2705f703414662fb
+9d39b4000045f883c878bbf791d59f82cd48e2b562b0c2698049c2b050ab
+3d76f044220a033be3cf1da7d21503> ND 
+/w 
+<10bf317054a25e4d3fd8a5c041cd868e055b2e0ceb62c12b2c6f8f557f7f
+dd824797705967dce1578cce540d7e10890c749b4aad1a2be670a881264d
+36e599096a57844619c8b95e2d7be3aa5067ca60369b0d44991366824971
+7801b7eb0c3775d29381dc7ed4a8d5680585853c26fb48e5d4c62ce99500
+490efc3f114410c972240c3c3fa187bd2134c9fd5f1cabb56e9b7775d151
+e099234da0e513bc427145f0c8d55b336beb665cec2d202eb8406464> ND 
+/y 
+<10bf317026bbf7c77e4588baf827d3936f8fefa2d84ccdfa79c9f8ed6c62
+ae74f87922300f26864a5ed2fb19cab970aef96d8a6208138010de07fccf
+a8ce1c31b28bca80b9a26115c09d159dc58726da3b0f4cb2174097c2569e
+aeca4a6540176b713257632a09d720c94b51a90c0e16bc071d9a5ee93941
+2596d4f0f9755a1978ce1c64ea92f2b1ff5e9ff8aabc9dd1b4b4ba02fef1
+9fac0de6a0d4cb0c92bc08ccebfb8c46127883f51ec7cd839bde7812482c
+d58a15eb6e7a38df2303d9409fc20a967466551bc71e21f2a232bf3e34e5
+5d4a82d4dab73d20ef168e371fac492dcd1e26a8dadff91dc5e03f6d8838
+b9> ND 
+/z 
+<10bf317005af7f1b300e026eb6e081714b5ae0c7e46c1e74bbd5bb54bc5b
+de03371ee4d9b0952ecbd4318e076d6a2a44e3b059db4b09578d22eb0a03
+518015b0eef655dfec5ce19ded1f07f59e066f181d8b1d889d6e3bd5f21e
+f684511d3327d3a1c2a1e2e209f2ad> ND 
+/braceleft 
+<10bf317005fd941edfc03127079a2d09178c85642b1facda30035410f544
+5b9261a4b62df3d09acfd163cc5aa08b9a7b1eb4b29bb08471f500ac7ac7
+87baaff6f8e6334aa228a5e469752285dc1a4c880188a6483987aa26c4e1
+06fb77d933234661ecbf4401f1d1f3825563ab6481b16f832a90f302789a
+85761dc41c461bc9927170fe17b89e76eaf98c22ff8cc6ac09e3d010b4ac
+28a8008a1b720c6308d3d2a7c739e984439b756d0fc58bf8012d6b65d344
+8fef77ec34e4b4919f08325a80b1a2faaa28f12b31f79b1c4f20033144d8
+26a34703f79f3415c8cb170f4f4b> ND 
+/bar 
+<10bf3170050cef1a5846e67997fa5bb55f3c8e2000460eaf445adaa29217
+dec4356415b131c4cf1712abcaeb22654c6c36133ec7fbfda797ab79aa88
+9d0f62f205624de5b92e4c15f736cdd2873f> ND 
+/braceright 
+<10bf317005fec248a6194a8446a55a08b98593edef6d66fd5972222f5c5c
+67c42a411757833ff83ef6c9c71ffd0ed6277844ed25c91762162cfa7dc6
+f1c386827a9f9b14684f41a917a62ac4a1320508336d0c1c934d6288f3e7
+e305cdf67a8cc7dd84c275cb4288e3eee5a2e0e9a2acc9056138aac93960
+8e215357d46de5ecac82f7a90c1bf256b8386d731698b007e7a59acd3d6c
+1f5f2f4d1a9ec87c781dc038c9dde372fdd4ddb4b952f72d8c96ec148f77
+90f62c472976812de8bd5d41181a34985d1eb1bd879b9f5c38abb9edead8
+9de1985def2ccf6af9956336da> ND 
+end
+end
+put
+put
+dup /FontName get exch definefont pop
+end
+/AKKOPA+CourierNewPSMT findfont /Encoding get
+dup 0 /.notdef put
+dup 32 /space put
+dup 33 /exclam put
+dup 37 /percent put
+dup 40 /parenleft put
+dup 41 /parenright put
+dup 42 /asterisk put
+dup 43 /plus put
+dup 44 /comma put
+dup 45 /hyphen put
+dup 47 /slash put
+dup 48 /zero put
+dup 49 /one put
+dup 50 /two put
+dup 51 /three put
+dup 52 /four put
+dup 54 /six put
+dup 55 /seven put
+dup 59 /semicolon put
+dup 60 /less put
+dup 61 /equal put
+dup 62 /greater put
+dup 65 /A put
+dup 67 /C put
+dup 68 /D put
+dup 69 /E put
+dup 70 /F put
+dup 72 /H put
+dup 73 /I put
+dup 77 /M put
+dup 78 /N put
+dup 79 /O put
+dup 81 /Q put
+dup 82 /R put
+dup 83 /S put
+dup 84 /T put
+dup 91 /bracketleft put
+dup 93 /bracketright put
+dup 95 /underscore put
+dup 97 /a put
+dup 98 /b put
+dup 99 /c put
+dup 100 /d put
+dup 101 /e put
+dup 102 /f put
+dup 103 /g put
+dup 104 /h put
+dup 105 /i put
+dup 107 /k put
+dup 108 /l put
+dup 109 /m put
+dup 110 /n put
+dup 111 /o put
+dup 112 /p put
+dup 113 /q put
+dup 114 /r put
+dup 115 /s put
+dup 116 /t put
+dup 117 /u put
+dup 118 /v put
+dup 119 /w put
+dup 121 /y put
+dup 122 /z put
+dup 123 /braceleft put
+dup 124 /bar put
+dup 125 /braceright put
+dup 160 /space put
+dup 173 /hyphen put
+pop
+%%EndResource
+[/N14/AKKOPA+CourierNewPSMT 1 TZ
+%%BeginResource: font AKKONO+CourierNewPS-BoldMT
+11 dict begin
+/FontName /AKKONO+CourierNewPS-BoldMT def
+/FontMatrix [1 1000 div 0 0 1 1000 div 0 0 ] def
+/Encoding  256 array 0 1 255 {1 index exch /.notdef put} for  def
+/PaintType 0 def
+/FontType 1 def
+/FontBBox { 0 0 0 0 } def
+/FontInfo 1 dict dup begin
+  /OrigFontType /TrueType def
+end readonly def
+currentdict
+end
+
+systemdict begin
+dup /Private 7 dict dup begin
+/BlueValues [-15 0 600 650] def
+/MinFeature {16 16} def
+/password 5839 def
+/ND {def} def
+/NP {put} def
+/RD {string currentfile exch readhexstring pop} def
+2 index /CharStrings 1318 dict dup begin
+/.notdef 
+<10bf31704faacd681306918a900cf73e2aff8bc9dc53b3d16740c661dcae
+115aefebecee1c075714d8bad1> ND 
+/space 
+<10bf317079c84b925b> ND 
+/hyphen 
+<10bf3170157585909bafc63fe3a78193a32c65ca3555e07915> ND 
+/greater 
+<10bf317046e85e2bb035e25ab48309fc18a6beb5835db469922f8eebe1cf
+b47c4495d3fe49f5279f49db483b3c9444d7a6266a6fa0e1839202dea15e
+27cad9a6a1bed46f197ddd364b2b65fa86c4422d9d4d926330ada5e33f4c
+b93837b64804826ceb29445000> ND 
+/a 
+<10bf3170448b935c8ae3ceb8f7609397956d1fc3d91f3c9fd77b2b8508b5
+86bad5dc8fe0a126c972700e6360228dc8b4b939fc174691d903355173cb
+534e1fbf9b34309fa5c5dae4caa6827ea0f1bd9048c4dab45927b8f8f906
+5dead3dd102bb4f63e48fd155dbcad400b6cdaae07764752773e58df06e1
+15221b487ce3a5ab413f7f319b72a1afa5ffc79c726da3224eacba572177
+540c57c20d7957ae5da69a164604fbf9000ab53a572e750bbe27805a6faa
+9fef4a0dece3d67b2282432807c527c466d2b3d3893618caa716a379a495
+d6b2450907a15c8161b23cf5ed75525d9c494e5e292f419c4437f447463a
+6c502cbe0695450fcd93> ND 
+/b 
+<10bf317073a17a9eece450c946c7ffa6e7b94b648fda04a1e37511638edf
+159a0f5a65d66aed5176efa0bbc308d05853e8fdf23e8254453b0b4e498a
+e938c33ca73e60b5b13ed2a603bdc52cc51cc85b269b831fdc5e0391ba4f
+b631761dabd8ccd0fab94e9d8ce07fd2c6f4566ad70fea195ff4f5fec7fa
+de3e9adce13c946d27f81105fa5e57cd69c44880c37518e75bffa840d61c
+cbcddc2bd6e9eb5ad0d4256e5f7d0ac6e2532a4fbfea8fc19865770ea1ea
+676c95f33f7f04a48d7ddc9afa9f73291ca1aac94dc2cc801231> ND 
+/c 
+<10bf317031d903b2f6d256b249ae2dbce0e868c1662b33db8ca7622266b7
+6d8cb8c36eb190d40ba9837efb32d10c18d836a88226e0a0b65dd2dec2c1
+869bb3d292c7d00939ae45ab515dccbbfe329cfeeb18768529316315952e
+e1404d6610849497884236ef07a642b5cb9212555bd7cebdb68fb464ab8d
+4e77fc81f7ca1ed0d3684e730f83864009cd02eb4f6ceab6aef92440be49
+572e3cb5ff53c8cff2df15e6863db9c12a517c2d98fcbe7fbf526dd10a4b
+2bb942d0c4b87b0305939b755add5a109cc14d> ND 
+/d 
+<10bf31705b070307d2b6fa41723785c676746b1651fc528e2e941055a06e
+27d2cbeb6bcf4fa18813047f2d7b3a8a6410b1769acd3c61e45f646e9a73
+d5fe340603e1ef6d5f6e2e97230915fb54ae7f1d5b3a6d4474391f74724b
+230d77b8a8943bed19b09ed91ffad424435a830771ea85b88bfd7210b8bd
+ebc3980022f49d5082b058d7e272a3706cc0cd1fe4914ed6f898b6f38586
+5360bd10b674529bc1aa4ee1e6db23af67c3a3090579542764c37c4e7f4e
+d1419d48749d3daf5a89c7faa0fb26655eede2bbe2f7c2fe06d7> ND 
+/e 
+<10bf3170599aae132187a9561a9e256d344113bc1a7d8ddfa4432d1c7133
+bde432167c57176416f9b5ef25911b5f00e22be5a5ca85c5d8f0bb65cde9
+76fce9c1bc05ba165dc16951df47491a697296a5f717ac228762a4b1ec16
+dec0efc25eaad255232579deddf47418ff005435dc050a0dfc9012c325d5
+bb79dd957c1d13c61539e2a8172897ece1132415a99d9a6c9228bb33a846
+ca4d3824a7e4c254b3c33b9173d5c2d149df87891025c8f725b8> ND 
+/f 
+<10bf317026bbf7c771eb81e8a09241aabf142085003c65214b1b487749bb
+dfd6bbb9714fc3d016081eda0a4aee39cd7669182c7030e776abff3dda12
+4e6693465c74dd5b7b663c1551e561e37c799d40fac1745b9b9d35d7a7e4
+19f69042dfce0b712c9a5e54d55e2920c7f4fbe053081c5aafe15f71edf6
+a46f97814f226ec89296e3d96ff2204b4e35e897f74c5d663585d191ce52
+96f247aa68a74807aae9dc935fde7893d295596b5ce82ac3b0f0386981d8
+d8d35f0ce62c869d22dfcd57bd931f7f6ff999fa538fe8278891c1369ef4
+7d96db2a11cec7b356ce6e393e59f1521587e982eae2> ND 
+/h 
+<10bf31706ae019346e37c9e6ab74b195c89e0b8c2a6ff20c482d55fa7552
+3730988b9b9da912ee218d58c36d5e22251210dbec91d230a50e4d6140e7
+1388571031fb2dbec24b7b8996874e25536fae46c125b1c771f6410dcf7a
+bdfcb79d4b7aa39dbe41fa5c9d509723a8b75b3f8aaf160b369f8aa832bc
+cd0541818a8f75f6dc4ccf8e584f6f8ae13cca76d180eb2d97d537524c4d
+ba874280de2ec7f9fc820a494d03bb048aab9d907e0317373e969b4d02b9
+e47d8fe90fd99d0d6fdc8d5ee72ffe45145456a829f4ffdcd992781c2535
+7f5c5949ba49cfc6c675b095727e92c3d65bf122a785beff1434f14a55a2
+f3> ND 
+/i 
+<10bf3170383ec05dd9c80ba75ca28d354167be50281f6c9e18c2b8f95567
+536cc884efcf4b84404d201fae57ecb9b8a825869ed8fd4d49d439893dbb
+5749fe8bab6b69a3ce348e9fa5f821ed4fce3e082c9cbeef7fa7ad9ed201
+34935dcec37ab27ee0eff2498532e3ca8be015635b950c1567a55f23e50e
+ef34a8927ee57d15c9583ed39cd4> ND 
+/j 
+<10bf31701309f2e9bcc6497b006496089757d6889dcd2195bf74b6795850
+f1f2c666acece2b5dc89176868d4b15699d296faa0c5035f3d66fb83ce2d
+2e9d591bb01cb7b8ed3e46dced67ace7fe930d7519208209ecf48a5f9eaa
+539ec052a998660fe3a8ec2e3b69c5b2449d785acc6286342addb308a41f
+dd6e300ccc1f003dc51ecc57a75bb819d81e23> ND 
+/k 
+<10bf31705fc1bfc8b0f4866efe6acd94c1961312ebab42035eae503bf2e6
+0705105a6643b31fcc8440ad06edf7ec0c0e411f328a8ef64afd53949c03
+7451a8d0e0c89f4298f939c8c7a6beaa419bc4e79b7a0cd53e0383305b3a
+a2163e965dccee9e75f9324b8169cc920eeb76b34c7ce7186f4a28ac1a6c
+f691659fc728501867a4fcef7c791a49197418be8bb517905fa1730fd388
+0addbcebe5b6a3716b69f5ed8ad15f2dce75beb84ee6bb0135b7e7c091c6
+1d06ecc51b755dcd6c9b864b605bc12784bf58eb0a18eafe4f5b56d6dec3
+da88c236fb46> ND 
+/l 
+<10bf3170383ec05ddb7a4c94d8c6b1afe3aef173620a058173c0140cfaf4
+524b2536cb390f349cbad8ded0d4f1264d70caf317e7b68eb2b64c10ead9
+e8f54795dbf0cc56cdbefd2eb8d0033fe0fa304d2ca41ce567a2d557a6d0
+7c202d3f80800c6b6365a165d686df8095020a744adcf9b560816558> ND 
+/n 
+<10bf3170560fb2c721b16876e55f0f9e62a4aefba36dc90010c1a6d9aa35
+ef823621a4d973880315696ab7ee77e8174b63191723d972865301f99245
+3feaeb8882a8ee431ba2355dbf552caf0bea3ce458498629145fbd5521bc
+a66ec7971f41bad9b4afec45a7652d9604bf7d6a1314ec1743e8ee536144
+53e616cc0ba9a2d6ba5b69c614ad905eb2836cb662feee0398ac4d3c638f
+eee1010cf97dc0ba1ea25b300ed1653906bfe3af3d954db66cabfca2d5f0
+0771378b10a718782631d20416abbe940dde4f9d43f2e577b4c36055176c
+7075c324a40d2c4360f94a43d874833b101f0584> ND 
+/o 
+<10bf3170472740c4fd7efb6e0d8bc6990520c82f43f523510ffdcde97895
+078a25949bc62d0e519d34f0c87e493ef7e2b62a2444b10cc3c4c4173d9a
+10e41ac03a4cca117a02e04ea81ddf537a0f79731c6356994eb79a0ea424
+106563653dcdbb344d52accc183626623df9c21af890f620d4e7356b08e3
+fdbbe629fc83eea299609652446e6a44b360bdd498f2a3e00a6330994044
+afa662ad98e4d2df381688> ND 
+/p 
+<10bf31707145de33ab31cfaecfc7e5a1fab3820dd1f5de7b160f6c9341a8
+130622c5e32a723a6af124b15ff88333c5c34c27d59d7e437af48d5c1cad
+eac9b3a66ce790ba35c9de3895b359b3010416609ff960558a90b0f76a4c
+eec2b9fae5286c9364da4105e7b406e0d24f78ea091967ea1ef223c31af6
+b94dfc47d0ce5a8e9aeef2ffab1e62003544d046ff916cb1fec7a8c8e5b4
+4eb53bbc784c88185260dcc6bf5905a2cc379bc7bf61c6a32ae23a310213
+9f36c885d579a1152fb14debb4964809bfd901b1b21b7f600f1c33b64c03
+5fcf7417b0d109790b7c296c78a92329f7d3cfc6bcc1e895f4f00d9a7a52
+256a97> ND 
+/q 
+<10bf31705c3683dadf4cf99de428339224dd884cdf3510877596673b5f44
+b758b120bbb1337b1634eaf4635e069617e5bbf532aad6905e764e3fccce
+86365998fcb377bc04212c3476c2b29f74d639b9fd1ed60fa72567c8ff14
+0032b30c7144a25337f39db1e59156b05ed2a37d5f8f1af140d8aa6c8652
+a8bee2ca537e9588dbdaf9622e1339c5d75b92defd0d85da01bc0e7e5b26
+8ab9b3caf62ee48d177d1bb5c1d9dc2e825bfef802a112b44d191cd839db
+5f31c8e86e30deccf94a8066e59ee39d41edae6d60066d0a7f7746ee53dc
+c645b6ace50aa949d8314febccd73e02a92e471d4f638d6b5374cc6c4b5e
+916aec60> ND 
+/r 
+<10bf31703208ee67d11c1a9a8888592b115d1df9eb54e4df7ee404954d77
+477f1c82dfe3fa72d19a71e15b32640616a10008f437278e459951492969
+0cf07c2490c2cf40b984431f545d3dacb8492d76251e47ad760245d99797
+de0c066e74267ba921e019c3e8321a5b6251aa8244921fd656502a3d19e8
+3eac2d32f4401869625de30c0b1d02418919ca7210762e403c6b23bcda3d
+e1dd032a205788b14bf7ff6219e5bc64926c5c79b357ad36ade03764e853
+1f3479b3d308539e36> ND 
+/s 
+<10bf317027e9213adce654e42f913e278dec4f771860c1c2241bed63a84b
+bd9c43d32298f1c03d3e580e36189cbe51043b2c6beeb1c47a95a098b0e0
+8d110f3ed56a2f9533ebfcb70fcf944e13610bd6c8a46229036f7b584777
+ad868c79108e9e0770c4da585ceaed2ba5488d0ae359f7838f14983cf89e
+702727c1bad04495abdd504f10d85a8492c9f85d54c50b70e31afd72bb1d
+50d8cf6e79f25fd930d1bf74cc8673143949edd97b4052e2bb03e1a70010
+bba1dc4be509df07a099142752b2bba64ea61ce3a4cc67920335735580a2
+d354f0c0650c782ddc7c074055cf98f4ebfd228e8dc808fa7e511691d435
+0b4efa06da1d064aff519e6b364d6270414291ba35aedc7bba8c3118cc78
+e581589a5e0b54976da1679c130e2ddb313eaeecffd17d3b334c2f1fdf3e
+27b19ae8428f> ND 
+/t 
+<10bf317021c3675c2866170f00660cdd8d7b7e5540910a976fa988d89315
+b18d4a979dd1586d2b0ab24a0fb74b2867749610e003f665cce8035941d4
+ef506a5814abbe9bb034859737a0fe312a3f87de8f9da1a8c73511a1bf5e
+2b8bd037ef626e5ec374111bcf74091b6119790d01dfb5b5d2781b7ebd36
+7c2b47f9cdad940f2b29e6536a8dc122111fe72fd734af31dda756145ced
+64f322aaf3c756837b6136fc1dcae4e7c151ebebf9c9a56ce577f85f8734
+3f53e23b654d0279bbc83365f0f421f4> ND 
+/u 
+<10bf317068832f6830559a954e48a78b29ff55984ec0a438d1209e12279f
+2646c6d6d41c5e342400a56d207b4ee438fdf2fe4557ea14df8e647ae473
+70b7ae5d5ec6a2e2a2be2daf2969a15ec7d5233df86469064a133ca5d6c1
+e9304a63dcc7ad88f87a146317ce31bcf4c081132e0390c39ba248258e53
+62ed7fbc209da999e49562a270d807343f604257539d5ec0207c17880d81
+08e5a15698c243857aa1040ed58a69c29698a24f15f60924726eb9ffe4a9
+4b1f57b0af848760> ND 
+/v 
+<10bf317079c84b92a248a21313a7b8cb010f80563aec34086458ab318e65
+766d0317a6262c0d191dfa610a2361454796decffe6e27c31f79a9e97653
+847f9466f9d12be94b4ce541d7aa373edba62eed9f1627c9127e2ba3270a
+537f63164e7b7c4780b3ea08b949cc4681735d142825388880bc26c13645
+c8788f12ef9e279f174c36af077842c7ff0181d314a17be8408054940fbe
+0656232a9d515cbf49> ND 
+/w 
+<10bf31707b35bff5bb1bf409011f4214ab37d6fd7974dfc45f0327e53018
+7b46b5d343f499a8ffefdc74d0f6f31a20d9d08424ce5da266e1a2370113
+15b6247185efc684b93ce0c7845d4d2e1c74fae9f95fd70d4e5258087eb7
+3def5c3a9e8fb2e0b1db3e0c4ceb1b7e89d1575aa601ed2dc7ce88332696
+8f7d201d5fe68e17c735394c3adf4f4fe3bccb62be6c6449a136a44be692
+273312469c100353726319696780b90026> ND 
+/y 
+<10bf3170524593662b115fdcfaa7ef619aaa11307f57328dcc3e55f105d9
+73721ec54e5bc0018879341a134c2e5fee9a1324e7cde2584aa205de4d8e
+5d82f0f2ee91748f0f445f20a821515772de3a62c05aa54afc53edb12887
+368535d804442cdfc3ef957c463e4b4878627c7208944279771aab2443c8
+c030e53ac7a998594a76d6ec972b556a2d08089de80fd712afb79934e663
+e88e8eac75e9b6183a42ab277e2ed53a3ac479069e66fd17391e7bd7920c
+1a75bc1e33b87a3e6b9e529dbacf60c54e234e7b70e45954abbab823596c
+c1dd96c9f9e12b4a> ND 
+end
+end
+put
+put
+dup /FontName get exch definefont pop
+end
+/AKKONO+CourierNewPS-BoldMT findfont /Encoding get
+dup 0 /.notdef put
+dup 32 /space put
+dup 45 /hyphen put
+dup 62 /greater put
+dup 97 /a put
+dup 98 /b put
+dup 99 /c put
+dup 100 /d put
+dup 101 /e put
+dup 102 /f put
+dup 104 /h put
+dup 105 /i put
+dup 106 /j put
+dup 107 /k put
+dup 108 /l put
+dup 110 /n put
+dup 111 /o put
+dup 112 /p put
+dup 113 /q put
+dup 114 /r put
+dup 115 /s put
+dup 116 /t put
+dup 117 /u put
+dup 118 /v put
+dup 119 /w put
+dup 121 /y put
+dup 160 /space put
+dup 173 /hyphen put
+pop
+%%EndResource
+[/N13/AKKONO+CourierNewPS-BoldMT 1 TZ
+%%BeginResource: font AKKOMM+TimesNewRoman,Bold
+11 dict begin
+/FontName /AKKOMM+TimesNewRoman,Bold def
+/FontMatrix [1 1000 div 0 0 1 1000 div 0 0 ] def
+/Encoding  256 array 0 1 255 {1 index exch /.notdef put} for  def
+/PaintType 0 def
+/FontType 1 def
+/FontBBox { 0 0 0 0 } def
+/FontInfo 1 dict dup begin
+  /OrigFontType /TrueType def
+end readonly def
+currentdict
+end
+
+systemdict begin
+dup /Private 7 dict dup begin
+/BlueValues [-15 0 600 650] def
+/MinFeature {16 16} def
+/password 5839 def
+/ND {def} def
+/NP {put} def
+/RD {string currentfile exch readhexstring pop} def
+2 index /CharStrings 1320 dict dup begin
+/.notdef 
+<10bf317005b8302fd45b0609d6bde5a48b0240d44d91aabd11b7ee50303a
+812fda6ed97443c437b8d3bea589> ND 
+/space 
+<10bf317079c757bf91> ND 
+end
+end
+put
+put
+dup /FontName get exch definefont pop
+end
+/AKKOMM+TimesNewRoman,Bold findfont /Encoding get
+dup 0 /.notdef put
+dup 32 /space put
+dup 160 /space put
+pop
+%%EndResource
+[/N11/AKKOMM+TimesNewRoman,Bold 1 TZ
+false setSA
+0 0 0 setrgbcolor
+92.52 714.18 m
+/N13 7.02 Tf
+(float->float filter)
+[4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 
+4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 ] pdfxs
+172.32 714.18 m
+/N14 7.02 Tf
+( RFtoIF\()
+[4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 ] pdfxs
+205.92 714.18 m
+/N13 7.02 Tf
+(int)
+[4.1993 4.1993 4.1993 ] pdfxs
+218.52 714.18 m
+/N14 7.02 Tf
+( N, )
+[4.1993 4.1993 4.1993 4.1993 ] pdfxs
+235.32 714.18 m
+/N13 7.02 Tf
+(float)
+[4.1993 4.1993 4.1993 4.1993 4.1993 ] pdfxs
+256.321 714.18 m
+/N14 7.02 Tf
+( START_FREQ\) { )
+[4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 
+4.1993 4.1993 4.1993 4.1993 ] pdfxs
+102.601 706.26 m
+/N13 7.02 Tf
+(float)
+[4.1993 4.1993 4.1993 4.1993 4.1993 ] pdfxs
+123.601 706.26 m
+/N14 7.02 Tf
+([N] weights; )
+[4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 
+4.1993 4.1993 ] pdfxs
+102.601 698.34 m
+/N13 7.02 Tf
+(int)
+[4.1993 4.1993 4.1993 ] pdfxs
+115.202 698.34 m
+/N14 7.02 Tf
+( size, count; )
+[4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 
+4.1993 4.1993 4.1993 ] pdfxs
+102.602 682.441 m
+/N13 7.02 Tf
+(init)
+[4.1993 4.1993 4.1993 4.1993 ] pdfxs
+119.403 682.441 m
+/N14 7.02 Tf
+( { set_frequency\(START_FREQ\); } )
+[4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 
+4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 
+4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 ] pdfxs
+90.0027 666.6 m
+(*) show
+102.603 666.6 m
+/N13 7.02 Tf
+(work)
+[4.1993 4.1993 4.1993 4.1993 ] pdfxs
+123.603 666.6 m
+(pop)
+[4.1993 4.1993 4.1993 ] pdfxs
+136.204 666.6 m
+/N14 7.02 Tf
+( 3*N )
+[4.1993 4.1993 4.1993 4.1993 4.1993 ] pdfxs
+157.204 666.6 m
+/N13 7.02 Tf
+(push)
+[4.1993 4.1993 4.1993 4.1993 ] pdfxs
+174.004 666.6 m
+/N14 7.02 Tf
+( 2*N { )
+[4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 ] pdfxs
+90.0042 658.5 m
+(*) show
+111.005 658.5 m
+/N16 7.02 Tf
+(// manual loop to 2*N.  Factor of N because messages)
+[4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 
+4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 
+4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 
+4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 
+4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 ] pdfxs
+90.0042 650.58 m
+/N14 7.02 Tf
+(*) show
+111.005 650.58 m
+/N16 7.02 Tf
+(// for given time slice come in groups of N; factor)
+[4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 
+4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 
+4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 
+4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 
+4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 ] pdfxs
+90.0042 642.66 m
+/N14 7.02 Tf
+(*) show
+111.005 642.66 m
+/N16 7.02 Tf
+(// of 2 for data-rate conversion of Magnitude filter)
+[4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 
+4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 
+4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 
+4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 
+4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 ] pdfxs
+90.0042 634.86 m
+/N14 7.02 Tf
+(*) show
+111.005 634.86 m
+/N13 7.02 Tf
+(for)
+[4.1993 4.1993 4.1993 ] pdfxs
+123.605 634.86 m
+/N14 7.02 Tf
+( \()
+[4.1993 4.1993 ] pdfxs
+132.005 634.86 m
+/N13 7.02 Tf
+(int)
+[4.1993 4.1993 4.1993 ] pdfxs
+144.605 634.86 m
+/N14 7.02 Tf
+( i=0; i<2*N; i++\) { )
+[4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 
+4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 ] pdfxs
+90.005 626.94 m
+(*) show
+119.405 626.94 m
+/N13 7.02 Tf
+(push)
+[4.1993 4.1993 4.1993 4.1993 ] pdfxs
+136.205 626.94 m
+/N14 7.02 Tf
+(\() show
+140.405 626.94 m
+/N13 7.02 Tf
+(pop)
+[4.1993 4.1993 4.1993 ] pdfxs
+153.005 626.94 m
+/N14 7.02 Tf
+(\(\) * weights[count++]\); )
+[4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 
+4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 
+4.1993 4.1993 ] pdfxs
+90.0051 618.84 m
+(*      count = count % size; )
+[4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 
+4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 
+4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 ] pdfxs
+90.0051 610.92 m
+(*    } )
+[4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 ] pdfxs
+90.0051 603 m
+(*) show
+111.005 603 m
+/N16 7.02 Tf
+(// manually check for messages;)
+[4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 
+4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 
+4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 ] pdfxs
+90.0051 595.08 m
+/N14 7.02 Tf
+(*) show
+111.005 595.08 m
+/N16 7.02 Tf
+(// special value of 0 encodes no message)
+[4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 
+4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 
+4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 
+4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 ] pdfxs
+90.0051 587.28 m
+/N14 7.02 Tf
+(*) show
+111.005 587.28 m
+/N13 7.02 Tf
+(for)
+[4.1993 4.1993 4.1993 ] pdfxs
+123.606 587.28 m
+/N14 7.02 Tf
+( \()
+[4.1993 4.1993 ] pdfxs
+132.006 587.28 m
+/N13 7.02 Tf
+(int)
+[4.1993 4.1993 4.1993 ] pdfxs
+144.606 587.28 m
+/N14 7.02 Tf
+( i=0; i<N; i++\) { )
+[4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 
+4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 ] pdfxs
+90.0058 579.36 m
+(*) show
+119.406 579.36 m
+/N13 7.02 Tf
+(float)
+[4.1993 4.1993 4.1993 4.1993 4.1993 ] pdfxs
+140.406 579.36 m
+/N14 7.02 Tf
+( freqHop = pop\(\); )
+[4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 
+4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 ] pdfxs
+90.0058 571.44 m
+(*) show
+119.406 571.44 m
+/N13 7.02 Tf
+(if)
+[4.1993 4.1993 ] pdfxs
+132.006 571.44 m
+/N14 7.02 Tf
+(\(freqHop!=0\))
+[4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 
+4.1993 ] pdfxs
+90.0059 563.341 m
+(*        set_frequency\(freqHop\); )
+[4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 
+4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 
+4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 
+] pdfxs
+90.0059 555.421 m
+(*    } )
+[4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 ] pdfxs
+90.0059 547.501 m
+(*  } )
+[4.1993 4.1993 4.1993 4.1993 4.1993 ] pdfxs
+102.606 531.781 m
+/N13 7.02 Tf
+(handler)
+[4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 ] pdfxs
+132.006 531.781 m
+/N14 7.02 Tf
+( set_frequency\()
+[4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 
+4.1993 4.1993 4.1993 4.1993 ] pdfxs
+195.006 531.781 m
+/N13 7.02 Tf
+(float)
+[4.1993 4.1993 4.1993 4.1993 4.1993 ] pdfxs
+216.007 531.781 m
+/N14 7.02 Tf
+( freq\) { )
+[4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 ] pdfxs
+90.0067 523.681 m
+(     count  = 0; )
+[4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 
+4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 ] pdfxs
+90.0067 515.941 m
+(     size   = \()
+[4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 
+4.1993 4.1993 4.1993 4.1993 ] pdfxs
+153.007 515.941 m
+/N13 7.02 Tf
+(int)
+[4.1993 4.1993 4.1993 ] pdfxs
+165.607 515.941 m
+/N14 7.02 Tf
+(\) \(N * START_FREQ / freq\); )
+[4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 
+4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 
+4.1993 4.1993 4.1993 4.1993 4.1993 ] pdfxs
+111.008 508.021 m
+/N13 7.02 Tf
+(for)
+[4.1993 4.1993 4.1993 ] pdfxs
+123.608 508.021 m
+/N14 7.02 Tf
+( \()
+[4.1993 4.1993 ] pdfxs
+132.008 508.021 m
+/N13 7.02 Tf
+(int)
+[4.1993 4.1993 4.1993 ] pdfxs
+144.608 508.021 m
+/N14 7.02 Tf
+( i = 0; i < size; i++\) )
+[4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 
+4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 
+4.1993 ] pdfxs
+90.0082 499.921 m
+(       weights[i] = sin\(i * pi / size\); )
+[4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 
+4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 
+4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 
+4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 ] pdfxs
+90.0082 491.942 m
+(   } )
+[4.1993 4.1993 4.1993 4.1993 4.1993 ] pdfxs
+90.0082 484.022 m
+( } )
+[4.1993 4.1993 4.1993 ] pdfxs
+94.2082 468.361 m
+/N13 7.02 Tf
+(float->float splitjoin)
+[4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 
+4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 
+] pdfxs
+186.608 468.361 m
+/N14 7.02 Tf
+( Check_Freq_Hop\()
+[4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 
+4.1993 4.1993 4.1993 4.1993 4.1993 ] pdfxs
+253.809 468.361 m
+/N13 7.02 Tf
+(int)
+[4.1993 4.1993 4.1993 ] pdfxs
+270.609 468.361 m
+/N14 7.02 Tf
+(N,)
+[4.1993 4.1993 ] pdfxs
+253.809 460.441 m
+/N13 7.02 Tf
+(float)
+[4.1993 4.1993 4.1993 4.1993 4.1993 ] pdfxs
+279.008 460.441 m
+/N14 7.02 Tf
+(START_FREQ\) { )
+[4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 
+4.1993 4.1993 4.1993 ] pdfxs
+102.608 452.521 m
+/N13 7.02 Tf
+(split)
+[4.1993 4.1993 4.1993 4.1993 4.1993 ] pdfxs
+123.609 452.521 m
+/N14 7.02 Tf
+( roundrobin\(N/4-2, 1, 1, N/2, 1, 1, N/4-2\); )
+[4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 
+4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 
+4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 
+4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 
+] pdfxs
+90.0089 444.601 m
+/N13 7.02 Tf
+(   for)
+[4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 ] pdfxs
+115.209 444.601 m
+/N14 7.02 Tf
+( \()
+[4.1993 4.1993 ] pdfxs
+123.609 444.601 m
+/N13 7.02 Tf
+(int)
+[4.1993 4.1993 4.1993 ] pdfxs
+136.209 444.601 m
+/N14 7.02 Tf
+( i=1; i<=7; i++\) { )
+[4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 
+4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 ] pdfxs
+111.009 436.621 m
+/N13 7.02 Tf
+(if)
+[4.1993 4.1993 ] pdfxs
+119.409 436.621 m
+/N14 7.02 Tf
+( \(i==1 || i==4 || i==7\) { )
+[4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 
+4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 
+4.1993 4.1993 4.1993 4.1993 ] pdfxs
+119.409 428.701 m
+/N13 7.02 Tf
+(add float->float filter)
+[4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 
+4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 
+4.1993 ] pdfxs
+216.01 428.701 m
+/N14 7.02 Tf
+( { )
+[4.1993 4.1993 4.1993 ] pdfxs
+90.0096 420.781 m
+(*) show
+127.809 420.781 m
+/N13 7.02 Tf
+(work pop)
+[4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 ] pdfxs
+161.409 420.781 m
+/N14 7.02 Tf
+( 1 )
+[4.1993 4.1993 4.1993 ] pdfxs
+174.01 420.781 m
+/N13 7.02 Tf
+(push)
+[4.1993 4.1993 4.1993 4.1993 ] pdfxs
+190.81 420.781 m
+/N14 7.02 Tf
+( 2 { )
+[4.1993 4.1993 4.1993 4.1993 4.1993 ] pdfxs
+136.21 412.861 m
+/N13 7.02 Tf
+(push)
+[4.1993 4.1993 4.1993 4.1993 ] pdfxs
+153.01 412.861 m
+/N14 7.02 Tf
+(\() show
+157.21 412.861 m
+/N13 7.02 Tf
+(pop)
+[4.1993 4.1993 4.1993 ] pdfxs
+169.81 412.861 m
+/N14 7.02 Tf
+(\(\)\);)
+[4.1993 4.1993 4.1993 4.1993 ] pdfxs
+90.0105 404.941 m
+(*) show
+136.211 404.941 m
+/N13 7.02 Tf
+(push)
+[4.1993 4.1993 4.1993 4.1993 ] pdfxs
+153.011 404.941 m
+/N14 7.02 Tf
+(\(0\);)
+[4.1993 4.1993 4.1993 4.1993 ] pdfxs
+90.0106 396.841 m
+(         } )
+[4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 
+] pdfxs
+90.0106 388.861 m
+(       } )
+[4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 ] pdfxs
+90.0106 381.121 m
+(     } )
+[4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 ] pdfxs
+119.41 381.121 m
+/N13 7.02 Tf
+(else)
+[4.1993 4.1993 4.1993 4.1993 ] pdfxs
+136.211 381.121 m
+/N14 7.02 Tf
+( { )
+[4.1993 4.1993 4.1993 ] pdfxs
+119.41 373.201 m
+/N13 7.02 Tf
+(add float->float filter)
+[4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 
+4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 
+4.1993 ] pdfxs
+216.011 373.201 m
+/N14 7.02 Tf
+( { )
+[4.1993 4.1993 4.1993 ] pdfxs
+90.0106 365.281 m
+(*) show
+127.81 365.281 m
+/N13 7.02 Tf
+(work pop)
+[4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 ] pdfxs
+161.41 365.281 m
+/N14 7.02 Tf
+( 1 )
+[4.1993 4.1993 4.1993 ] pdfxs
+174.011 365.281 m
+/N13 7.02 Tf
+(push)
+[4.1993 4.1993 4.1993 4.1993 ] pdfxs
+190.811 365.281 m
+/N14 7.02 Tf
+( 2 { )
+[4.1993 4.1993 4.1993 4.1993 4.1993 ] pdfxs
+136.211 357.361 m
+/N13 7.02 Tf
+(float)
+[4.1993 4.1993 4.1993 4.1993 4.1993 ] pdfxs
+157.211 357.361 m
+/N14 7.02 Tf
+( val = )
+[4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 ] pdfxs
+186.611 357.361 m
+/N13 7.02 Tf
+(pop)
+[4.1993 4.1993 4.1993 ] pdfxs
+199.211 357.361 m
+/N14 7.02 Tf
+(\(\);)
+[4.1993 4.1993 4.1993 ] pdfxs
+136.211 349.441 m
+/N13 7.02 Tf
+(push)
+[4.1993 4.1993 4.1993 4.1993 ] pdfxs
+153.011 349.441 m
+/N14 7.02 Tf
+(\(val\);)
+[4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 ] pdfxs
+90.0109 341.46 m
+(*) show
+136.211 341.46 m
+/N13 7.02 Tf
+(if)
+[4.1993 4.1993 ] pdfxs
+144.611 341.46 m
+/N14 7.02 Tf
+( \(val > hop_threshold\) { )
+[4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 
+4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 
+4.1993 4.1993 4.1993 ] pdfxs
+90.0109 333.54 m
+(*) show
+144.611 333.54 m
+/N13 7.02 Tf
+(push)
+[4.1993 4.1993 4.1993 4.1993 ] pdfxs
+161.411 333.54 m
+/N14 7.02 Tf
+(\(val\);)
+[4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 ] pdfxs
+90.0116 325.62 m
+(*          } )
+[4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 
+4.1993 4.1993 ] pdfxs
+144.612 325.62 m
+/N13 7.02 Tf
+(else)
+[4.1993 4.1993 4.1993 4.1993 ] pdfxs
+161.412 325.62 m
+/N14 7.02 Tf
+( { )
+[4.1993 4.1993 4.1993 ] pdfxs
+90.0124 317.7 m
+(*) show
+144.613 317.7 m
+/N13 7.02 Tf
+(push)
+[4.1993 4.1993 4.1993 4.1993 ] pdfxs
+161.413 317.7 m
+/N14 7.02 Tf
+(\(0\);)
+[4.1993 4.1993 4.1993 4.1993 ] pdfxs
+90.0131 309.601 m
+(*          } )
+[4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 
+4.1993 4.1993 ] pdfxs
+90.0131 301.681 m
+(         } )
+[4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 
+] pdfxs
+90.0131 293.701 m
+(       } )
+[4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 ] pdfxs
+90.0131 285.781 m
+(     } )
+[4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 ] pdfxs
+90.0131 277.861 m
+(   } )
+[4.1993 4.1993 4.1993 4.1993 4.1993 ] pdfxs
+90.0131 270.121 m
+(*) show
+102.613 270.121 m
+/N13 7.02 Tf
+(join)
+[4.1993 4.1993 4.1993 4.1993 ] pdfxs
+119.414 270.121 m
+/N14 7.02 Tf
+( roundrobin\(2*\(N/4-2\), 2, 2, 2*\(N/2\), 2, 2, 2*\(N/4-2\)\); )
+[4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 
+4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 
+4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 
+4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 
+4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 
+4.1993 ] pdfxs
+90.0139 262.021 m
+( } )
+[4.1993 4.1993 4.1993 ] pdfxs
+94.2139 246.301 m
+/N13 7.02 Tf
+(void->void pipeline)
+[4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 
+4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 ] pdfxs
+174.014 246.301 m
+/N14 7.02 Tf
+( Freq_Hopping_Radio { )
+[4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 
+4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 
+] pdfxs
+102.614 238.381 m
+/N13 7.02 Tf
+(int)
+[4.1993 4.1993 4.1993 ] pdfxs
+115.214 238.381 m
+/N14 7.02 Tf
+( N = 32; )
+[4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 ] pdfxs
+102.615 230.461 m
+/N13 7.02 Tf
+(float)
+[4.1993 4.1993 4.1993 4.1993 4.1993 ] pdfxs
+123.615 230.461 m
+/N14 7.02 Tf
+( START_FREQ = 2402000000; )
+[4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 
+4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 
+4.1993 4.1993 4.1993 4.1993 ] pdfxs
+102.615 214.621 m
+/N13 7.02 Tf
+(add)
+[4.1993 4.1993 4.1993 ] pdfxs
+115.216 214.621 m
+/N14 7.02 Tf
+( Read_From_AtoD\(N\); )
+[4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 
+4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 ] pdfxs
+90.016 206.701 m
+(*) show
+102.616 206.701 m
+/N13 7.02 Tf
+(add)
+[4.1993 4.1993 4.1993 ] pdfxs
+119.417 206.701 m
+(float->float)
+[4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 
+4.1993 ] pdfxs
+174.017 206.701 m
+(feedbackloop)
+[4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 
+4.1993 ] pdfxs
+224.417 206.701 m
+/N14 7.02 Tf
+( { )
+[4.1993 4.1993 4.1993 ] pdfxs
+90.0168 198.602 m
+(*) show
+111.017 198.602 m
+/N16 7.02 Tf
+(// adjust joiner rates to match data rates in loop )
+[4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 
+4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 
+4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 
+4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 
+4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 ] pdfxs
+90.0168 190.802 m
+/N14 7.02 Tf
+(*) show
+111.017 190.802 m
+/N13 7.02 Tf
+(join)
+[4.1993 4.1993 4.1993 4.1993 ] pdfxs
+127.817 190.802 m
+/N14 7.02 Tf
+( roundrobin\(2*N,N\); )
+[4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 
+4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 ] pdfxs
+90.0176 182.882 m
+(*) show
+111.018 182.882 m
+/N13 7.02 Tf
+(body)
+[4.1993 4.1993 4.1993 4.1993 ] pdfxs
+132.018 182.882 m
+(pipeline)
+[4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 ] pdfxs
+165.618 182.882 m
+/N14 7.02 Tf
+( { )
+[4.1993 4.1993 4.1993 ] pdfxs
+90.0183 174.962 m
+(*) show
+119.418 174.962 m
+/N13 7.02 Tf
+(add)
+[4.1993 4.1993 4.1993 ] pdfxs
+132.018 174.962 m
+/N14 7.02 Tf
+( RFtoIF\(N, START_FREQ\); )
+[4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 
+4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 
+4.1993 4.1993 ] pdfxs
+90.0185 167.042 m
+(*) show
+119.418 167.042 m
+/N13 7.02 Tf
+(add)
+[4.1993 4.1993 4.1993 ] pdfxs
+132.019 167.042 m
+/N14 7.02 Tf
+( FFT\(N\); )
+[4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 ] pdfxs
+90.0186 159.122 m
+(*) show
+119.418 159.122 m
+/N13 7.02 Tf
+(add)
+[4.1993 4.1993 4.1993 ] pdfxs
+132.019 159.122 m
+/N14 7.02 Tf
+( Magnitude\(\); )
+[4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 
+4.1993 4.1993 4.1993 ] pdfxs
+90.0187 151.202 m
+(*) show
+119.418 151.202 m
+/N13 7.02 Tf
+(add)
+[4.1993 4.1993 4.1993 ] pdfxs
+132.019 151.202 m
+/N14 7.02 Tf
+( Check_Freq_Hop\(N, START_FREQ\); )
+[4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 
+4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 
+4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 ] pdfxs
+90.0188 143.042 m
+(*    } )
+[4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 ] pdfxs
+90.0188 135.301 m
+(*) show
+111.019 135.301 m
+/N13 7.02 Tf
+(split)
+[4.1993 4.1993 4.1993 4.1993 4.1993 ] pdfxs
+132.019 135.301 m
+/N14 7.02 Tf
+( roundrobin\(\); )
+[4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 
+4.1993 4.1993 4.1993 4.1993 ] pdfxs
+90.0195 127.202 m
+(*) show
+111.02 127.202 m
+/N16 7.02 Tf
+(// number of items on loop path = latency * N )
+[4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 
+4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 
+4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 
+4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 
+4.1993 4.1993 ] pdfxs
+90.0195 119.461 m
+/N14 7.02 Tf
+(*) show
+111.02 119.461 m
+/N13 7.02 Tf
+(for)
+[4.1993 4.1993 4.1993 ] pdfxs
+123.62 119.461 m
+/N14 7.02 Tf
+( \()
+[4.1993 4.1993 ] pdfxs
+132.02 119.461 m
+/N13 7.02 Tf
+(int)
+[4.1993 4.1993 4.1993 ] pdfxs
+144.62 119.461 m
+/N14 7.02 Tf
+( i=0; i<6*N; i++\) )
+[4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 
+4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 ] pdfxs
+90.0203 111.541 m
+(*) show
+119.42 111.541 m
+/N13 7.02 Tf
+(enqueue)
+[4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 ] pdfxs
+148.82 111.541 m
+/N14 7.02 Tf
+(\(0\);)
+[4.1993 4.1993 4.1993 4.1993 ] pdfxs
+90.0196 103.442 m
+(*  } )
+[4.1993 4.1993 4.1993 4.1993 4.1993 ] pdfxs
+102.62 95.6419 m
+/N13 7.02 Tf
+(add)
+[4.1993 4.1993 4.1993 ] pdfxs
+115.22 95.6419 m
+/N14 7.02 Tf
+( Output\(\); )
+[4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 4.1993 
+] pdfxs
+90.0204 87.5422 m
+( } )
+[4.1993 4.1993 4.1993 ] pdfxs
+PDFVars/TermAll get exec end end
+%%PageTrailer
+%%EndPage
+%%Trailer
+%%EOF
