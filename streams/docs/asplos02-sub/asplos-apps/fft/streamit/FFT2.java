@@ -160,8 +160,8 @@ public class FFT2 extends StreamIt
     }
     public void init()
     {
-        add(new FFTTestSource(128));
-        add(new FFTKernel2(128));
+        add(new FFTTestSource(64));
+        add(new FFTKernel2(64));
         add(new FloatPrinter());
     }
 }
