@@ -1,24 +1,33 @@
-\documentclass[10pt]{article}
+\documentclass[runningheads]{llncs}
 
 \usepackage{epsfig}
 \usepackage{amsmath}
-\usepackage{fullpage}
-\usepackage{doublespace}
-\setstretch{1.05}
-
-\title{Affine Dependence Analysis for Phased Computation Graphs}
-
-\author{William Thies, Jasper Lin and Saman Amarasinghe \\
-  MIT Laboratory for Computer Science\\
-  Cambridge, MA  02139\\ \\
-  \texttt{\symbol{`\{}thies, jasperln, saman\symbol{`\}}@lcs.mit.edu}}
-
-% don't include the date
-\date{}
 
 \begin{document}
 
+  \pagestyle{headings}
+  %In order to omit page numbers and running heads
+  %please change this line to
+  %\pagestyle{empty}
+  %and change the first command line too, see above.
+
+  \mainmatter
+
+  \title{Affine Dependence Analysis \\ for Cyclo-Static Dataflow Graphs}
+
+  \titlerunning{Copyright 2002 Springer-Verlag}
+
+  \author{William Thies \and Jasper Lin \and Saman Amarasinghe}
+
+  \authorrunning{Copyright 2002 Springer-Verlag}
+
+  \institute{Laboratory for Computer Science \\
+    Massachusetts Institute of Technology \\
+    Cambridge, MA  02139 \\ \vspace{8pt}
+    \email{\{thies, jasperln, saman\}@lcs.mit.edu}}
   \maketitle
+
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
   \newcommand{\mt}[1]{\mbox{\it #1}}
   \newcommand{\todo}[1]{\framebox{\bf #1}}
@@ -39,16 +48,65 @@
   \input{apps}
   \input{conclusion}
 
-\vspace{-18pt}
-\begin{small}
-  \begin{singlespace}
-    \bibliographystyle{abbrv}
-    \bibliography{references}
-  \end{singlespace}
-\end{small}
-
   \newpage
-  \setstretch{1.05}
-  \input{example2}
+  \bibliographystyle{abbrv}
+  \bibliography{references}
+  
+  %\newpage
+  %\input{example2}
   
 \end{document}
+%% \documentclass[10pt]{article}
+
+%% \usepackage{epsfig}
+%% \usepackage{amsmath}
+%% \usepackage{fullpage}
+%% \usepackage{doublespace}
+%% \setstretch{1.05}
+
+%% \title{Affine Dependence Analysis for Cyclo-Static Dataflow Graphs}
+
+%% \author{William Thies, Jasper Lin and Saman Amarasinghe \\
+%%   MIT Laboratory for Computer Science\\
+%%   Cambridge, MA  02139\\ \\
+%%   \texttt{\symbol{`\{}thies, jasperln, saman\symbol{`\}}@lcs.mit.edu}}
+
+%% % don't include the date
+%% \date{}
+
+%% \begin{document}
+
+%%   \maketitle
+
+%%   \newcommand{\mt}[1]{\mbox{\it #1}}
+%%   \newcommand{\todo}[1]{\framebox{\bf #1}}
+%%   \newcommand{\dep}[0]{Dependence Frontier}                % The full name for the dependence function.
+%%   \newcommand{\DP}[0]{\textsc{Frontier}}                   % Abbrevation for dependence function.
+%%   \newcommand{\DEP}[2]{\DP_{#1 \small{\rightarrow} #2}}    % Math notation for dependence function.
+%%   \newcommand{\sssection}[1]{\medskip \noindent {\bf #1} \smallskip}
+
+%%   \begin{abstract}
+%%     \input{abstract}
+%%   \end{abstract}
+
+%%   \input{intro}
+%%   \input{related}
+%%   \input{sare}
+%%   \input{simplified}
+%%   \input{translate}
+%%   \input{apps}
+%%   \input{conclusion}
+
+%% \vspace{-18pt}
+%% \begin{small}
+%%   \begin{singlespace}
+%%     \bibliographystyle{abbrv}
+%%     \bibliography{references}
+%%   \end{singlespace}
+%% \end{small}
+
+%%   \newpage
+%%   \setstretch{1.05}
+%%   \input{example2}
+  
+%% \end{document}

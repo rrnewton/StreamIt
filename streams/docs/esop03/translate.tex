@@ -1,42 +1,20 @@
-\section{General Translation: PCP to SARE}
+\section{General Translation: CSDP to SARE}
 \label{sec:translate}
 
-In this section we give the formal translation of a Phased Computation
-Program to a System of Affine Recurrence Equations.  Again, the SARE
-will be parameterized by $N$, the number of steady-state cycles that
-one wishes to execute in the PCP.  The translation will use the helper
-functions shown in Figure~\ref{fig:helper}.  We also make use of the
-$S(n)$ function giving the number of steady-state executions of node
-$n$ (see Section~\ref{sec:balance}).  Please refer to the Appendix for
-a concrete illustration of the techniques described below.
+In this section we give the formal translation of a Cyclo-Static
+Dataflow Program to a System of Affine Recurrence Equations.  Again,
+the SARE will be parameterized by $N$, the number of steady-state
+cycles that one wishes to execute in the CSDP.  The translation will
+use the helper functions shown in Figure~\ref{fig:helper}.  We also
+make use of the $S(n)$ function giving the number of steady-state
+executions of node $n$ (see Section~\ref{sec:balance}).  
+%Please refer
+%to the Appendix for a concrete illustration of the techniques
+%described below.
 
 \input{complexfig}
 
 Figure~\ref{fig:pcptosare1} illustrates the variables used for the
 translation.  These are very similar to those in the simple case,
 except that now there are separate variables for each phase.  The
-equations for the translation appear in Figures~\ref{fig:pcptosare2}
-and~\ref{fig:pcptosare3}.  Due to space limitations, we discuss only
-the most interesting parts of the translation below.
-
-Equation~\ref{i2read} writes the initial values of the initial tokens
-on $\mt{READ}$, the read buffer.  Equation~\ref{write2buf} copies
-items from the node to the channel, using the same slicing technique
-as Equation~\ref{eq:w2b}.
-
-Much of the complexity of the translation is pushed into
-Equations~\ref{buf2read0} and~\ref{buf2read1}.  There are two distinct
-complications in these equations.  First is one that we tackled in
-Equation~\ref{eq:b2r}: the fact that the read array might peek beyond
-the limits of the buffer, which requires us to slice the domain in
-increments of one period.  The second complication is that there could
-be an offset--initial tokens might have been written into the
-beginning of the read array.
-
-Equation~\ref{buf2read2} provides a set of helper functions to
-determine the offset for Equations~\ref{buf2read0}
-and~\ref{buf2read1}.  The result is a number $\mt{Offset}$ that the
-domain needs to shift.  Unfortunately this involves splitting the
-original equation into two pieces, since after the shift the original
-domain could be split between two different periods (with different
-$i$ indices in $\mt{BUF}$).
+equations for the translation appear in Figure~\ref{fig:pcptosare3}.

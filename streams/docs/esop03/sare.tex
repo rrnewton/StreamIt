@@ -1,38 +1,31 @@
-\section{Phased Computation Graphs}
+\section{Notation: Cyclo-Static Dataflow Graph}
 \label{sec:pcg}
 
-\begin{table}[t]
-\small
-\begin{center}
-\begin{tabular}{|c|c|c|c|c|c|} \hline
-Model of Computation & Items on Channels & Nodes with & Nodes with & Cyclic Steady \\
-                     & at Start & Push $\ne$ Pop & Peek $>$ Pop & State Phases \\
-\hline \hline
-Synchronous Dataflow~\cite{LM87-i} & X & X & & \\
-\hline
-Cyclo-Static Dataflow~\cite{BELP96} & X & X & & X \\
-\hline
-Computation Graphs~\cite{KM66} & X & X & X & \\
-\hline
-Phased Computation Graphs & X & X & X & X \\
-\hline
-\end{tabular}
-\vspace{-6pt}
-\caption{\protect\small Models of Computation for Dataflow Graphs.}
-\label{tab:models}
-\vspace{-12pt}
-\end{center}
-\end{table}
+%% \begin{table}[t]
+%% \small
+%% \begin{center}
+%% \begin{tabular}{|c|c|c|c|c|c|} \hline
+%% Model of Computation & Items on Channels & Nodes with & Nodes with & Cyclic Steady \\
+%%                      & at Start & Push $\ne$ Pop & Peek $>$ Pop & State Phases \\
+%% \hline \hline
+%% Synchronous Dataflow~\cite{LM87-i} & X & X & & \\
+%% \hline
+%% Cyclo-Static Dataflow~\cite{BELP96} & X & X & & X \\
+%% \hline
+%% Computation Graphs~\cite{KM66} & X & X & X & \\
+%% \hline
+%% Phased Computation Graphs & X & X & X & X \\
+%% \hline
+%% \end{tabular}
+%% \vspace{-6pt}
+%% \caption{\protect\small Models of Computation for Dataflow Graphs.}
+%% \label{tab:models}
+%% \vspace{-12pt}
+%% \end{center}
+%% \end{table}
 
-We introduce the Phased Computation Graph (PCG) as a model of
-computation for dataflow languages; specifically, we designed the PCG
-as a model for StreamIt~\cite{streamitcc}.  A PCG is a generalization
-of the Computation Graph (CG) of Karp and Miller~\cite{KM66} to the
-case where each node has a number of {\it phases} (or, equivalently, a
-generalization of CSDF to allow peeking).  Thus, a PCG is also a
-generalization of synchronous dataflow (see Table~\ref{tab:models}).
-
-Formally, a PCG is a directed graph with the following components:
+Formally, a Cyclo-Static Dataflow Graph is a directed graph with the
+following components:
 \begin{itemize}
 
 \item Nodes $n_1 \dots n_{m_n}$.
@@ -43,36 +36,35 @@ from a given node $n_a$ to a given node $n_b$.
 \item The number of phases $\mt{num}(n)$ that node $n$ exhibits.  For
 all $n$, $\mt{num}(n) \ge 1$.
 
-\item Non-negative integers $U(c, p)$, $O(c, p)$, and $E(c, p)$, which
-give the number of items pushed, popped, and peeked, respectively,
-over channel $c$ during the $p$'th phase.
+\item Non-negative integers $U(c, p)$ and $O(c, p)$, which give the
+number of items pushed and popped, respectively, over channel $c$
+during the $p$'th phase.
 
-% NOTE that this is overly cautious within loops... could have smaller A(c)
-\item A non-negative integer $A(c)$ indicating the number of items
-  that are initially present on channel $c$.  There must be enough
-  items present on $c$ to ensure a node can execute all of its phases
-  during a steady-state schedule.  This constraint can be posed
-  conservatively\footnote{A more precise formulation is as follows.
-  For a given channel $c$, set $Emax_0 = 0$ and $Emax_{p+1} =
-  max(maxE_p, E(c,p) + \sum_{i=0}^{p} O(c,p))$ for all $p \in [0,
-  num(c) - 1]$.  Then $A(c) \ge Emax_{num(c)-1} -
-  \sum_{i=0}^{num(c)-1} O(c,p)$.} as $A(t) \ge max_p (E(c,p) -
-  o(c,p))$.
+%% % NOTE that this is overly cautious within loops... could have smaller A(c)
+%% \item A non-negative integer $A(c)$ indicating the number of items
+%%   that are initially present on channel $c$.  There must be enough
+%%   items present on $c$ to ensure a node can execute all of its phases
+%%   during a steady-state schedule.  This constraint can be posed
+%%   conservatively\footnote{A more precise formulation is as follows.
+%%   For a given channel $c$, set $Emax_0 = 0$ and $Emax_{p+1} =
+%%   max(maxE_p, E(c,p) + \sum_{i=0}^{p} O(c,p))$ for all $p \in [0,
+%%   num(c) - 1]$.  Then $A(c) \ge Emax_{num(c)-1} -
+%%   \sum_{i=0}^{num(c)-1} O(c,p)$.} as $A(t) \ge max_p (E(c,p) -
+%%   o(c,p))$.
 
 \end{itemize}
 
 \subsection{Execution Model}
 
-We give an informal description of the execution semantics of a PCG,
-which is an intuitive extension to that of a CG.  An execution
-consists of a sequence of atomic {\it firings} of nodes in the graph.
-The effect of firing a given node depends on its phase, which is a
-local state of the node.  At the start of execution, each node is in
-phase 0, and each channel $c$ contains $A(c)$ items.
+We give an informal description of the execution semantics of a
+CSDG.An execution consists of a sequence of atomic {\it firings} of
+nodes in the graph.  The effect of firing a given node depends on its
+phase, which is a local state of the node.  At the start of execution,
+each node is in phase 0, and each channel $c$ contains 0 items.
 
 Let us consider a node $n$ that is in phase $p$.  It is legal for $n$
 to fire if $p \in [0, \mt{num}(n)-1]$ and, for each channel $c_{in}$
-directed into $n$, there are at least $E(c_{in}, p)$ items on
+directed into $n$, there are at least $O(c_{in}, p)$ items on
 $c_{in}$.  The effect of this firing is to consume $O(c_{in}, p)$
 items from each channel $c_{in}$ directed into $n$; to produce
 $U(c_{out}, p)$ new items on each channel $c_{out}$ directed out of
@@ -83,14 +75,14 @@ From the starting state of the graph, execution proceeds via an
 infinite sequence of node firings.  The order of node firings is
 constrained only by the conditions given above.
 
-\section{Phased Computation Programs}
+\section{Notation: Cyclo-Static Dataflow Program}
 
-The PCG described above is a representation for a graph, treating each
-node and channel as a black box.  Here we introduce some notation for
-the internals of the nodes, as well as the ordering of items on the
-channels.  We refer to the aggregate model as a Phased Computation
-Program (PCP).  Before describing a PCP, we will need some additional
-notation:
+The CSDG described above is a representation for a graph, treating
+each node and channel as a black box.  Here we introduce some notation
+for the internals of the nodes, as well as the ordering of items on
+the channels.  We refer to the aggregate model as a Cyclo-Static
+Dataflow Program (CSDP).  Before describing a CSDP, we will need some
+additional notation:
 \begin{itemize}
 
 \item We assume that all items passed over channels are drawn from the
@@ -118,19 +110,19 @@ c)}] = c$.
 
 \end{itemize}
 
-\noindent A PCP consists of the following:
+\noindent A Cyclo-Static Dataflow Program (CSDP) consists of the
+following:
 \begin{itemize}
 
-\item A Phased Computation Graph $G = (\{n_1 \dots n_{m_n}\}, \{c_1
-\dots c_{m_c}\}, A, \mt{num}, U, O, E)$ describing the nodes,
+\item A Cyclo-Static Dataflow Graph $G = (\{n_1 \dots n_{m_n}\}, \{c_1
+\dots c_{m_c}\}, \mt{num}, U, O)$ describing the nodes,
 channels, and I/O rates of the program (see Section~\ref{sec:pcg}).
 Each channel $c = (n_a, n_b)$ is a FIFO queue; $n_a$ pushes items onto
 the back of $c$ and $n_b$ consumes items from the front of $c$.
 
-\item The initial values $I(c)$ that are enqueued onto channel $c$ at
-the start of execution.  Since there are $A(c)$ initial values on
-channel $c$, $I(c)$ has type ${\cal V}[A(c)]$.
-
+%% \item The initial values $I(c)$ that are enqueued onto channel $c$ at
+%% the start of execution.  Since there are $A(c)$ initial values on
+%% channel $c$, $I(c)$ has type ${\cal V}[A(c)]$.
 %An initialization function $I(c)$ that returns an array of
 %length $A(c)$, the elements of which are enqueued onto channel $c$ at
 %the start of execution.  The procedure $I(c)$ takes no arguments; its
@@ -138,12 +130,12 @@ channel $c$, $I(c)$ has type ${\cal V}[A(c)]$.
 %
 \item A work function $W(n, p)$ that represents the computation of
 node $n$ in phase $p$.  The signature of $W(n, p)$ is $[{\cal
-V}[E(\mt{chan\_in}(n)[1], p)], \dots, {\cal
-V}[E(\mt{chan\_in}(n)[\mt{num\_in}(n)], p)]]$ $\rightarrow$ \\ $[
+V}[O(\mt{chan\_in}(n)[1], p)], \dots, {\cal
+V}[O(\mt{chan\_in}(n)[\mt{num\_in}(n)], p)]]$ $\rightarrow$ $[
 {\cal V}[U(\mt{chan\_out}(n)[1], p)], \dots, {\cal
 V}[U(\mt{chan\_out}(n)[\mt{num\_out}(n)], p)]]$.  That is, the
 function inputs a list of arrays, each of which corresponds to an
-incoming channel $c_{in}$ and contains the $E(c_{in},p)$ values that
+incoming channel $c_{in}$ and contains the $O(c_{in},p)$ values that
 $n$ reads from $c_{in}$ in a given firing.  The procedure returns a
 list of arrays, each of which corresponds to an outgoing channel
 $c_{out}$ and contains the $U(c_{out},p)$ values that $n$ writes to

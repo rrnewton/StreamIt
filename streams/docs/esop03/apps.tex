@@ -25,10 +25,9 @@ Once the SARE has exposed the flow dependences between the internal
 variables of two different nodes, one can perform all of the classical
 dataflow optimizations as if the variables were placed in the same
 node to begin with.  For instance, constant propagation, copy
-propagation, common sub-expression elimination, and 
-\clearpage \noindent dead code elimination can all be performed
-throughout the internals of the nodes as if they were connected in a
-single control flow graph.
+propagation, common sub-expression elimination, and dead code
+elimination can all be performed throughout the internals of the nodes
+as if they were connected in a single control flow graph.
 
 Some of these optimizations could have a very large performance
 impact; for instance, consider a 2:1 downsampler node that simply
@@ -54,17 +53,6 @@ this ``node fission'' is completely automatic, as there would be no
 dependence between the operations in the SARE.  A scheduling pass
 would treat the real and imaginary operations as if they were written
 in two different nodes to begin with.
-
-\subsubsection{Steady-State Invariant Code Motion}
-
-In the streaming domain, the analog of loop-invariant code motion is
-the motion of code from the steady-state to initialization time if it
-does not depend on any quantity that is changing during the
-steady-state execution of a node.  Quantities that the compiler
-detects to be constant during the execution of a work function can be
-computed ahead of time and placed as initial items on a channel, with
-the results being passed through a feedback loop for availability on
-future executions.
 
 \subsubsection{Induction Variable Detection}
 

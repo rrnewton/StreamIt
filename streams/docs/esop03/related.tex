@@ -1,7 +1,7 @@
 \section{Background and Related Work}
 \label{sec:related}
 
-\subsection{Dataflow Graphs}
+\subsection{Cyclo-Static Dataflow Graphs}
 
 Strictly speaking, synchronous dataflow (SDF) refers to a class of
 dataflow graphs where each node can consume and produce multiple items
@@ -35,17 +35,17 @@ techniques for CSDF involve converting each phase to an SDF actor,
 which can cause deadlock even for legal graphs~\cite{BELP96} and does
 not take advantage of the fine-grained dataflow exposed by CSDF.
 
-The computation graph (CG) was described by Karp and
-Miller~\cite{Karp67} as a model of computation that, unlike the two
-above, allows the nodes to {\it peek}.  By ``peek'' we mean that a
-node can read and use a value from a channel without consuming
-(popping) it from the channel; peeking is good for the programmer
-because it automates the buffer management for input items that are
-used on multiple firings, as in an FIR filter.  However, peeking
-complicates the schedule because an initialization schedule is needed
-to ensure that enough items are on the channel in order to
-fire~\cite{Gordo02}.  In~\cite{Karp67}, conditions are given for when
-a computation graph terminates and when its data queues are bounded.
+%% The computation graph (CG) was described by Karp and
+%% Miller~\cite{Karp67} as a model of computation that, unlike the two
+%% above, allows the nodes to {\it peek}.  By ``peek'' we mean that a
+%% node can read and use a value from a channel without consuming
+%% (popping) it from the channel; peeking is good for the programmer
+%% because it automates the buffer management for input items that are
+%% used on multiple firings, as in an FIR filter.  However, peeking
+%% complicates the schedule because an initialization schedule is needed
+%% to ensure that enough items are on the channel in order to
+%% fire~\cite{Gordo02}.  In~\cite{Karp67}, conditions are given for when
+%% a computation graph terminates and when its data queues are bounded.
 
 A dependence graph (DG) is often presented as an alternate
 representation for a System of Uniform Recurrence
@@ -54,8 +54,8 @@ reduced dependence graph (RDG) in which there is only one node per
 variable~\cite{DRV00}.  Of course, these graphs have (by definition) a
 one-to-one correspondence with a set of recurrence equations, but they
 are more trivial than the graphs described above: they only produce
-and consume one item per firing and do not have a concept of phases or
-peeking.
+and consume one item per firing and do not have a concept of
+cyclic phases.
 
 Govindarajan et al. develop a linear programming framework for
 determining the ``rate-optimal schedule'' with the minimal memory

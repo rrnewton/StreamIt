@@ -60,13 +60,12 @@ computation into a SARE.
 
 Our main contribution is a translation which encapsulates the
 inter-node dependences: from a dataflow graph to a SARE.  The input of
-our analysis is a ``Phased Computation Graph'' (PCG), which we
-formalize as a generalization of several existing dataflow frameworks.
-Once a SARE has been constructed that captures both inter-node and
-intra-node dependences, we demonstrate how affine techniques could be
-employed to perform novel optimizations such as node splitting,
-decimation propagation, and steady-state invariant code motion that
-exploit both the structure of the dataflow graph as well as the
+our analysis is a Cyclo-Static Dataflow Graph, which is one of the
+more flexible representations in the DSP domain. Once a SARE has been
+constructed that captures both inter-node and intra-node dependences,
+we demonstrate how affine techniques could be employed to perform
+novel optimizations such as node splitting and decimation propagation
+that exploit both the structure of the dataflow graph as well as the
 internal contents of each node.  We also discuss the potential of
 affine techniques for scheduling parameterized dataflow graphs, as
 well as offering new approaches to classic problems in the dataflow
@@ -74,10 +73,11 @@ domain.
 
 The rest of this paper is organized as follows.  We begin by
 describing background information and related work on dataflow graphs
-and SARE's (Section 2).  Then we define a Phased Computation Graph
-(Section 3) and Phased Computation Program (Section 4), and give the
-procedure for translating a simple, restricted PCP to a SARE (Section
-5).  Next, we give the full details for the general translation
-(Section 6), describe a range of applications for the technique
-(Section 7), and conclude (Section 8).  A detailed example that
-illustrates our technique appears in the Appendix.
+and SARE's (Section 2).  Then we give our notation for Cyclo-Static
+Dataflow (Section 3), and give the procedure for translating a simple
+synchronous dataflow graph to a SARE (Section 5).  Next, we give the
+full details for the general translation (Section 6), describe a range
+of applications for the technique (Section 7), and conclude (Section
+8).  
+%A detailed example that illustrates our technique appears in the
+%Appendix.
