@@ -1,46 +1,46 @@
 class Butterfly extends Stream {
-      void init(int N, int W) {
-         add(new SplitJoin() {
-	    void init() {
-	       weighted_round_robin(N, N);
-               add (new Identity());
-	       add (new Filter() {
-	         Complex weights[W];
-		 int curr;
-	         Channel input = new ComplexChannel();
-	         Channel output = new ComplexChannel();
-		 void init() {
-		    for(int i=0; i<W; i++)
-		      weights[i] = calc_weight(i, N, W);
-		    curr = 0;
-		 }
-		 void work() {
-		    output.push(input.pop()*weights[curr++]);
-		    if(curr>= W) curr = 0;
-		}    
-	       })
-	       round_robin();
-	    }});
-	 add(new SplitJoin() {
-	    void init() {
-	       duplicate();
-	       add (new Filter() {   
-	         Channel input = new ComplexChannel();
-	         Channel output = new ComplexChannel();
-		 void work() {
-		    putput.push(input.pop() + input.pop());
-		 }
-               })
-	       add (new Filter() {   
-	         Channel input = new ComplexChannel();
-	         Channel output = new ComplexChannel();
-		 void work() {
-		    putput.push(input.pop() - input.pop());
-		 }
-               })
-	       weighted_round_robin(N, N);
-         }})      
-      }
+   void init(int N, int W) {
+      add(new SplitJoin() {
+         void init() {
+            weighted_round_robin(N, N);
+            add (new Identity());
+            add (new Filter() {
+               Complex weights[W];
+               int curr;
+               Channel input = new ComplexChannel();
+               Channel output = new ComplexChannel();
+               void init() {
+                  for(int i=0; i<W; i++)
+                     weights[i] = calc_weight(i, N, W);
+                  curr = 0;
+               }
+               void work() {
+                  output.push(input.pop()*weights[curr++]);
+                  if(curr>= W) curr = 0;
+               }    
+            })
+            round_robin();
+      }});
+      add(new SplitJoin() {
+         void init() {
+            duplicate();
+            add (new Filter() {   
+               Channel input = new ComplexChannel();
+               Channel output = new ComplexChannel();
+               void work() {
+                  putput.push(input.pop() + input.pop());
+               }
+            })
+            add (new Filter() {   
+               Channel input = new ComplexChannel();
+               Channel output = new ComplexChannel();
+               void work() {
+                  putput.push(input.pop() - input.pop());
+               }
+            })
+            weighted_round_robin(N, N);
+      }});
+   }
 }
 
 class FFT extends Stream {
