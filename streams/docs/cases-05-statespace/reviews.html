@@ -1,0 +1,399 @@
+
+<html>
+
+<head> <title> See Outcome, Reviews and Comments For Paper #88 </title><table align=center cellspacing=2 cellpadding=1  width=95% border=0 bgcolor=#000000 ><tr> <td> <table align=center border=0 bgcolor=#eeeeff ><tr> <td align=center width=100% colspan=3> <font size=+3> CGO-2005 Paper Submission Site </font></td> </tr><tr><td align=left width=15%><FORM method="GET" action="http://www.cgo.org/"><input type="submit" value="Go To CGO-2005 Site" name="textButton"></FORM></td><td width=70% align=center valign=center> <font size=+2> See Outcome, Reviews and Comments For Paper #88 </font></td><td align=right width=15%><FORM method="GET" action="http://cgo2005.ucsd.edu/index.php"><input type="submit" value="Go To CGO-2005 Submissions" name="textButton"></FORM></td></tr><tr> <td colspan=3 align=center><font size=+1 color=red>It is currently Saturday 30th of October 2004 10:33:06 PM PDT</font></td> </tr></table></td> </tr> </table></head><br>
+<body>
+
+<TABLE BORDER=0 BGCOLOR=#000000 CELLSPACING=2 CELLPADDING=1 WIDTH=85% align=center>
+<tr> <td>
+<TABLE BORDER=0 BGCOLOR=fuchsia CELLSPACING=0 CELLPADDING=1  WIDTH=100%  align=center>
+<tr> <td>
+<b>This paper was not selected for the conference</b>  </td>  </tr> 
+  </table>
+  </td>  </tr> 
+  </table><br>
+<TABLE BORDER=0 BGCOLOR=#000000 CELLSPACING=2 CELLPADDING=1 WIDTH=85% align=center>
+<tr> <td>
+<TABLE BORDER=0 BGCOLOR=yellow CELLSPACING=0 CELLPADDING=1  WIDTH=100%  align=center>
+<tr> <td>
+<b>EDUCATING REVIEWERS: Reviewing papers is a  difficult process, and it is sometimes difficult  for reviewers to determine if their review was  appropriate or to understand why a paper was rejected  or accepted. If you would like to allow the reviewers  for your specific paper to see either the author response  or the other reviews, select the appropriate options below.  This information is only available to reviewers of your paper,  and unless you or reviewers have revealed any information,  the information is anonymous. </b>  </td>  </tr> 
+  </table>
+  </td>  </tr> 
+  </table><br>
+<table align=center width=50% border=1>
+<tr> <td> 
+<FORM name=Checks method="POST" action="/Author/ViewDecision.php">
+<input type=hidden name=paperId value=88>
+<input type=checkbox name=showResponseToReviewers value=1 > Allow reviewers to see your response to all reviews</td> </tr> <tr> <td>
+<input type=checkbox name=showReviewsToReviewers value=1 > Allow reviewers to see all reviews</td> </tr>
+<tr> <td align=center><input type=submit name=updateReviewerView value='Update Choices'>
+</td> </tr></FORM>
+</table><br> <br> <br>
+<center>    <table align=center border=1 bgcolor="#9999cc" >
+       <tr> <th colspan=2 align=center><font size=+1>
+       <b> Paper #
+88       <a href="http://cgo2005.ucsd.edu/Download/GetPaper.php?paperId=88" target=_blank>
+	  (Download paper of type application/pdf, 222820 bytes) </a>
+	</b> </font> </th> </tr>
+   <tr> <td> Title: </td> <td> Optimizing Stream Programs Using Linear State Space Analysis </td> </tr>
+   <tr> <td> Abstract: </td> <td> Digital Signal Processing (DSP) is becoming increasingly<br />
+widespread in portable devices.  Due to harsh constraints on<br />
+power, latency, and throughput in embedded environments,<br />
+developers often appeal to signal processing experts to<br />
+hand-optimize algorithmic aspects of the application.<br />
+However, such DSP optimizations are tedious, error-prone,<br />
+and very expensive, as they require sophisticated <br />
+domain-specific knowledge.<br />
+<br />
+We present a general model for automatically representing<br />
+and optimizing a large class of signal processing<br />
+applications.  The model is based on linear state space<br />
+systems.  A program is viewed as a set of filters, each of<br />
+which has an input stream, an output stream, and a set of<br />
+internal states.  At each time step, the filter produces<br />
+some outputs that are a linear combination of the inputs and<br />
+the state values; the state values are also updated in a<br />
+linear fashion.  Examples of linear state space filters<br />
+include IIR filters and linear difference equations.<br />
+<br />
+Using the state space representation, we describe a novel<br />
+set of program transformations, including combination of<br />
+adjacent filters, elimination of redundant states and<br />
+minimal parameterization of the system.  We have implemented<br />
+the optimizations in the StreamIt compiler and demonstrate<br />
+performance gains over previous techniques.<br />
+ </td> </tr>
+</table>
+<CENTER><TABLE BORDER BGCOLOR='#9999cc'><TR><TH>Authors Response:</TH></TR><TR><TD ALIGN=LEFT> We thank the reviewers for their comments.  We believe our paper is<br />
+appropriate for CGO because it develops a rigorous framework for<br />
+representing and optimizing stream programs.  As stream programs are<br />
+becoming more common in both embedded and high-performance systems,<br />
+optimizations for streams are of interest to much of the CGO audience.<br />
+Our paper adapts well-known techniques in linear state space theory to<br />
+the realm of programming languages and compilers.  We consider such<br />
+&quot;domain-specific optimizations&quot; to be a new and promising avenue for<br />
+optimizing compilers, and thus of central importance to CGO.<br />
+<br />
+Reviews 376 and 338 seek a better explanation for why DSP applications<br />
+typically defy high-level analysis.  As detailed in a CC'02 paper<br />
+(reference #18), languages such as C are nearly impossible to analyze<br />
+due to: 1) complex modulo expressions for circular buffers, 2)<br />
+possible aliasing between internal states of different filters, 3)<br />
+scheduling is done by hand, obscuring parallelism, 4) atomic execution<br />
+steps are muddled with global control flow, and 5) FIFO's between<br />
+channels are muddled with global data.  Also, general programs differ<br />
+from the Synchronous Dataflow model because they lack the explicit I/O<br />
+rates exploited by our analysis.  For these reasons, we believe it is<br />
+completely infeasible to perform linear state-space optimizations on a<br />
+traditional IR.  We will expand on this point in the final version.<br />
+<br />
+Review 326 states that our results are significantly different from<br />
+those reported in a PLDI'04 paper (reference #11).  There is no<br />
+inconsistency.  In reference #11, the &quot;linear&quot; bar of Figure 15 shows<br />
+the percentage of FLOPS *removed*.  In the current submission, Table 1<br />
+shows the percentage of FLOPS *remaining*.  Thus, the numbers for FIR,<br />
+FM, and ChannelVocoder are identical in the two papers.  FFT is not<br />
+included in reference #11.  The only discrepancy is for FilterBank,<br />
+which is due to a naming conflict: the two papers evaluate completely<br />
+different filter bank applications.  We apologize for this confusion<br />
+and will rename FilterBank to FilterBank2 in the final submission.<br />
+<br />
+Review 248 asks about our analysis for extracting linear state space<br />
+representations.  Yes, one can construct cases where symbolic<br />
+evaluation of multiple filter iterations is needed to detect that a<br />
+filter is linear state space.  However, we believe that the<br />
+overwhelming majority of practical instances exhibit the state space<br />
+property on each iteration.  If desired, unrolling can be used to<br />
+expose additional cases.  Regarding how the analysis infers peek and<br />
+pop rates: they are declared with each work function (see Figure 3).<br />
+<br />
+Review 338 notes that the expanded version of this work (anonymous<br />
+reference #1) should be made available as part of the final version.<br />
+We agree; it is already available online (with a permanent URL).<br />
+</TD></TR></TABLE>
+</CENTER></center><table width=100% ><tr bgcolor=#eeeeee><th> <big> <big> Review #59 For Paper #88 </big></big> </th></tr><tr bgcolor=#eeeeee> <td> <table columns=2 border=1 align=center>
+<tr>
+<th width=25%> Attribute </th>
+<th width=75% colspan=12> Value </th>
+</tr>
+<tr> <td> 
+Provide a short summary of the paper </td> <td> 
+This paper describes a set of optimizations that can be used when a sequence of linear transforms are applied to a digital signal. Each linear transform is called a filter. When filters are composed, opportunities for optimization are created. Optimizations have been integrated into the StreamIt compiler. </td> </tr>
+<tr> <td> 
+What is the strength of the paper? (1-3 sentences) </td> <td> 
+Optimizations were implemented within the StreamIt compiler and reduced operation counts were observed. </td> </tr>
+<tr> <td> 
+What is the weakness of the paper? (1-3 sentences) </td> <td> 
+This paper does not treat material that is appropriate for the CGO conference. </td> </tr>
+<tr> <td> 
+Your qualifications  to review this paper  </td> <td> 
+I have passing familiarity </td> </tr>
+<tr> <td> 
+Writing Quality </td> <td> 
+Good </td> </tr>
+<tr> <td> 
+Relevance to CGO? </td> <td> 
+I would neither read the paper nor attend the talk </td> </tr>
+<tr> <td> <b>
+Experimental Methodology</b> </td> <td> <b>
+Poor</b> </td> </tr>
+<tr> <td> 
+Novelty of paper </td> <td> 
+This has been done and published before </td> </tr>
+<tr> <td> <b>
+Overall paper merit</b> </td> <td> <b>
+Reject - Paper is not of interest to CGO, it has already been done, or has serious methodology flaws.</b> </td> </tr>
+<tr> <td> 
+Provide comments for the author to address in the rebuttal </td> <td> 
+This paper does not treat material that is appropriate for the CGO conference. Although results are demonstrated as a decreased number of floating point operations in the StreamIt compiler, the paper is really about linear system optimization. The paper should be evaluated by criteria established within a more appropriate forum consisting of experts in the field of linear system optimization. </td> </tr>
+<tr> <td> 
+Provide additional detailed comments to the author </td> <td> 
+none </td> </tr>
+</table></td> </tr></table><table width=100% ><tr bgcolor=#cccccc><th> <big> <big> Review #248 For Paper #88 </big></big> </th></tr><tr bgcolor=#cccccc> <td> <table columns=2 border=1 align=center>
+<tr>
+<th width=25%> Attribute </th>
+<th width=75% colspan=12> Value </th>
+</tr>
+<tr> <td> 
+Provide a short summary of the paper </td> <td> 
+This paper proposes to represent a class of DSP filters using linear state space. Each of the filters has an input stream, an output stream, and a set of internal states. The authors then develop a set of optimizations, including state-space transformations, state removal, and parameter reduction. They have implemented the optimizations in the StreamIt compiler and demonstrate the reduction of floating-point operations. </td> </tr>
+<tr> <td> 
+What is the strength of the paper? (1-3 sentences) </td> <td> 
+- Good formulation of the problem and solutions.<br />
+- Interesting work on streaming model. </td> </tr>
+<tr> <td> 
+What is the weakness of the paper? (1-3 sentences) </td> <td> 
+- Evaluation is a bit weak with only the count of floating-point operations. </td> </tr>
+<tr> <td> 
+Your qualifications  to review this paper  </td> <td> 
+I know the material, but am not an expert </td> </tr>
+<tr> <td> 
+Writing Quality </td> <td> 
+Good </td> </tr>
+<tr> <td> 
+Relevance to CGO? </td> <td> 
+I would read the paper and attend the talk </td> </tr>
+<tr> <td> <b>
+Experimental Methodology</b> </td> <td> <b>
+Average</b> </td> </tr>
+<tr> <td> 
+Novelty of paper </td> <td> 
+This is a new contribution to an established area </td> </tr>
+<tr> <td> <b>
+Overall paper merit</b> </td> <td> <b>
+Accept - This is of interest to CGO, a novel or new contribution with average/weak methodology, or incremental contribution paper that has good methodology.</b> </td> </tr>
+<tr> <td> 
+Provide comments for the author to address in the rebuttal </td> <td> 
+Using linear representations for program kernel computation is not a new idea and has been done in many different contexts. Such a representation is a good fit to DSP filters. The authors argue for a linear state space representation over a linear representation since the benefit is that feedback loops can be collapsed. Each DSP filter is represented as an input stream, an output stream, and a set of internal states. DSP applications are typical streaming computations.<br />
+<br />
+Sec 2.2 states that this scheme symbolically executes a single iteration of a filter’s work function to check whether program variables have vector pair representations and to decide whether the filter is state space linear. Is executing one iteration always sufficient? For example, if the computation of iteration depends on the results from a number of previous iterations, wouldn’t one want to symbolically execute a number of iterations to capture the steady state? What is the program analysis to determine whether a peek rate is greater than its pop rate?<br />
+<br />
+One weak point of this work is on its evaluation. The only metric used is to count the number of floating point operations. Although this is a good metric for DSP application, it would be nice if there is at least a simulation environment to validate these program transformations and measure the program performance.<br />
+ </td> </tr>
+<tr> <td> 
+Provide additional detailed comments to the author </td> <td> 
+none </td> </tr>
+</table></td> </tr></table><table width=100% ><tr bgcolor=#eeeeee><th> <big> <big> Review #286 For Paper #88 </big></big> </th></tr><tr bgcolor=#eeeeee> <td> <table columns=2 border=1 align=center>
+<tr>
+<th width=25%> Attribute </th>
+<th width=75% colspan=12> Value </th>
+</tr>
+<tr> <td> 
+Provide a short summary of the paper </td> <td> 
+This paper describes the use of linear state space analysis for analyzing and optimizing a large and important class of DSP kernels (IIR, FIR, DCT, etc.). The techniques apply to languages that are based on the synchronous dataflow model of computation. The techniques have been implemented and evaluated using the StreamIt compiler.<br />
+<br />
+ </td> </tr>
+<tr> <td> 
+What is the strength of the paper? (1-3 sentences) </td> <td> 
+The paper describes an interesting application of linear state space analysis. </td> </tr>
+<tr> <td> 
+What is the weakness of the paper? (1-3 sentences) </td> <td> 
+It is difficult to judge quality of the results. There is no comparisons to existing systems only a comparison against a precursor system. </td> </tr>
+<tr> <td> 
+Your qualifications  to review this paper  </td> <td> 
+I know a lot about this area </td> </tr>
+<tr> <td> 
+Writing Quality </td> <td> 
+Good </td> </tr>
+<tr> <td> 
+Relevance to CGO? </td> <td> 
+I would read the paper and attend the talk </td> </tr>
+<tr> <td> <b>
+Experimental Methodology</b> </td> <td> <b>
+Average</b> </td> </tr>
+<tr> <td> 
+Novelty of paper </td> <td> 
+Incremental improvement </td> </tr>
+<tr> <td> <b>
+Overall paper merit</b> </td> <td> <b>
+Accept - This is of interest to CGO, a novel or new contribution with average/weak methodology, or incremental contribution paper that has good methodology.</b> </td> </tr>
+<tr> <td> 
+Provide comments for the author to address in the rebuttal </td> <td> 
+None.<br />
+ </td> </tr>
+<tr> <td> 
+Provide additional detailed comments to the author </td> <td> 
+Is there any notion of optimality? There is an infinite number of state-space transformations possible. What criteria guides the compiler?<br />
+<br />
+One of the difficulties with compiling for DSPs is the need to deal with cross-cutting constraints: power, code size, execution performance. Can the technique be extended to handle such issues?<br />
+<br />
+Can you make comparisons to some existing systems/languages such as StreamC or Spiral? This would definitely make the work more interesting.<br />
+<br />
+Can't you generate actual machine code? I thought StreamIt had a x86 code generator. You could then compare execution times with the transformation disabled and then enabled. </td> </tr>
+</table></td> </tr></table><table width=100% ><tr bgcolor=#cccccc><th> <big> <big> Review #326 For Paper #88 </big></big> </th></tr><tr bgcolor=#cccccc> <td> <table columns=2 border=1 align=center>
+<tr>
+<th width=25%> Attribute </th>
+<th width=75% colspan=12> Value </th>
+</tr>
+<tr> <td> 
+Provide a short summary of the paper </td> <td> 
+This paper prposes a linear state space model for DSP filters. The program is considered as a set of filters with a set of internal states.<br />
+optimization techniques are proposed for optimizing the code and gain performance.<br />
+ </td> </tr>
+<tr> <td> 
+What is the strength of the paper? (1-3 sentences) </td> <td> 
+(1) extend the linear analysis to cases that have persistent states and feedback loops in the the filters. </td> </tr>
+<tr> <td> 
+What is the weakness of the paper? (1-3 sentences) </td> <td> 
+n/a </td> </tr>
+<tr> <td> 
+Your qualifications  to review this paper  </td> <td> 
+I know the material, but am not an expert </td> </tr>
+<tr> <td> 
+Writing Quality </td> <td> 
+Average </td> </tr>
+<tr> <td> 
+Relevance to CGO? </td> <td> 
+I would read the paper, but not attend the talk </td> </tr>
+<tr> <td> <b>
+Experimental Methodology</b> </td> <td> <b>
+Average</b> </td> </tr>
+<tr> <td> 
+Novelty of paper </td> <td> 
+Incremental improvement </td> </tr>
+<tr> <td> <b>
+Overall paper merit</b> </td> <td> <b>
+Weak Accept - Paper is of interest to CGO, and is an incremental contribution paper with average/weak methodology.</b> </td> </tr>
+<tr> <td> 
+Provide comments for the author to address in the rebuttal </td> <td> 
+If the paper is from the same group as [11],<br />
+I would like to see the reason why the benchmark<br />
+programs without state (first 5 in table 1)<br />
+have significantly different results from those<br />
+reported in their PLDI paper.<br />
+<br />
+ </td> </tr>
+<tr> <td> 
+Provide additional detailed comments to the author </td> <td> 
+As an extension from their previous linear analysis, it is an incremental paper for solving benchmark with feedback loops and persistent states. It is a nice work to complete the related research.<br />
+<br />
+The paper is written in a way that readers should have sufficient knowledge of their<br />
+previous linear analysis work, it could be helpful if brief summary of [11] or comparison can be given in the example. </td> </tr>
+</table></td> </tr></table><table width=100% ><tr bgcolor=#eeeeee><th> <big> <big> Review #338 For Paper #88 </big></big> </th></tr><tr bgcolor=#eeeeee> <td> <table columns=2 border=1 align=center>
+<tr>
+<th width=25%> Attribute </th>
+<th width=75% colspan=12> Value </th>
+</tr>
+<tr> <td> 
+Provide a short summary of the paper </td> <td> 
+This paper describes a model for representing linear state space systems,<br />
+as used for signal processing applications.  It then describes a set of<br />
+optimizations that can be applied to such systems, removing unnecessary<br />
+states and reducing parameterization to minimize calculations.<br />
+<br />
+ </td> </tr>
+<tr> <td> 
+What is the strength of the paper? (1-3 sentences) </td> <td> 
+This is considerably different from our usual compiler fare.  It appears to<br />
+be a solid, rigorous presentation, though some key pieces are relegated to<br />
+an anonymous reference.<br />
+<br />
+ </td> </tr>
+<tr> <td> 
+What is the weakness of the paper? (1-3 sentences) </td> <td> 
+Some of the key optimization methods are described in a master's thesis,<br />
+referenced anonymously.  I'm not very concerned about its absence here --<br />
+there isn't space for it -- but I wonder how accessible it will be after<br />
+publication.<br />
+<br />
+ </td> </tr>
+<tr> <td> 
+Your qualifications  to review this paper  </td> <td> 
+I have passing familiarity </td> </tr>
+<tr> <td> 
+Writing Quality </td> <td> 
+Good </td> </tr>
+<tr> <td> 
+Relevance to CGO? </td> <td> 
+I would read the paper, but not attend the talk </td> </tr>
+<tr> <td> <b>
+Experimental Methodology</b> </td> <td> <b>
+Average</b> </td> </tr>
+<tr> <td> 
+Novelty of paper </td> <td> 
+This is a new contribution to an established area </td> </tr>
+<tr> <td> <b>
+Overall paper merit</b> </td> <td> <b>
+Accept - This is of interest to CGO, a novel or new contribution with average/weak methodology, or incremental contribution paper that has good methodology.</b> </td> </tr>
+<tr> <td> 
+Provide comments for the author to address in the rebuttal </td> <td> 
+None<br />
+.<br />
+ </td> </tr>
+<tr> <td> 
+Provide additional detailed comments to the author </td> <td> 
+You assert in the second paragraph that &quot;DSP applications typically defy<br />
+high-level language compiler analysis,&quot; but give no hint as to why.<br />
+You need at least a nominal explanation.  I'm left wondering how much of<br />
+the problem is simply due to DSP processors not having decent compilers<br />
+available because of unusual architectures.<br />
+<br />
+p. 14, halfway down:  &quot;effect&quot; should be &quot;affect.&quot;<br />
+<br />
+ </td> </tr>
+</table></td> </tr></table><table width=100% ><tr bgcolor=#cccccc><th> <big> <big> Review #376 For Paper #88 </big></big> </th></tr><tr bgcolor=#cccccc> <td> <table columns=2 border=1 align=center>
+<tr>
+<th width=25%> Attribute </th>
+<th width=75% colspan=12> Value </th>
+</tr>
+<tr> <td> 
+Provide a short summary of the paper </td> <td> 
+The authors introduce a translation from code to state-space diagrams, a series of transformations on state-space diagrams, and a mechanism to go back to code.  They argue that this set of tools is the right set to optimize DSP programs. </td> </tr>
+<tr> <td> 
+What is the strength of the paper? (1-3 sentences) </td> <td> 
+State-space representations appear to be a nice tool for handling simple DSP filter programs. </td> </tr>
+<tr> <td> 
+What is the weakness of the paper? (1-3 sentences) </td> <td> 
+The paper fails to connect its results to any frame of reference that would allow me to evaluate it.   </td> </tr>
+<tr> <td> 
+Your qualifications  to review this paper  </td> <td> 
+I know the material, but am not an expert </td> </tr>
+<tr> <td> 
+Writing Quality </td> <td> 
+Good </td> </tr>
+<tr> <td> 
+Relevance to CGO? </td> <td> 
+I would read the paper, but not attend the talk </td> </tr>
+<tr> <td> <b>
+Experimental Methodology</b> </td> <td> <b>
+Average</b> </td> </tr>
+<tr> <td> 
+Novelty of paper </td> <td> 
+This has been done and published before </td> </tr>
+<tr> <td> <b>
+Overall paper merit</b> </td> <td> <b>
+Weak Reject - Paper is potentially of interest to CGO, and has some value in the ideas presented, but it has either potential methodology issues or it is a borderline incremental/already been done contribution.</b> </td> </tr>
+<tr> <td> 
+Provide comments for the author to address in the rebuttal </td> <td> 
+The paper argues that &quot;DSP optimizations typically defy highlevel langauge compiler analysis.&quot;  In reading the paper, it appears that your system replicates representations to create larger contexts and to make interface issues (scheduling, argument alignment on the input tape, ...) explicit.  If you applied these same techniques to create a single large IR representation in a traditional IR, and then optimized it, how would the results compare.<br />
+<br />
+I have a hard time convincing myself that the results are significant, because the paper provides no comparisons that are within my frame of reference.  Instead, the paper tells me that these problems are somehow harder (in the introduction) but does nothing to convince me of the truth of that statement. </td> </tr>
+<tr> <td> 
+Provide additional detailed comments to the author </td> <td> 
+Explain the syntax of your language; it took me quiet a while to work out an explanation of the example in Figure 3 that made sense.<br />
+<br />
+Compare the impact and the effect of your transformations against those of traditional optimizations that might be applied in a whole-program compiler that could perform code replication to match up the filter functions. </td> </tr>
+</table></td> </tr></table>
+<hr><table align=center width=50%><tr> <td align=left> <FORM method="GET" action="http://cgo2005.ucsd.edu/index.php"><input type="submit" value="Goto Main Index" name="textButton"></FORM></td> <td align=right><form><input type=submit onClick="javascript:window.close()" value="Close Window"></form></td> </tr></table><h5><a href="http://crp.sourceforge.net"> Conference Review Package -- Copyright © 2001&nbsp; </a><br>All rights reserved.<br></h5> 
+</body>
+</html>
