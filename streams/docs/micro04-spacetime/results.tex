@@ -1,0 +1,64 @@
+\section{Results}
+\label{sec:results}
+
+\begin{table*}[t]
+\begin{center}
+\scriptsize
+\begin{tabular}{|l|l||r||r|r|r||} \hline
+& & {\bf lines of} & {\bf Filters} &  {\bf Pipelines} & {\bf SplitJoins}\\
+{\bf Benchmark} & {\bf Description} & {\bf code} & {\bf (linear)} &
+ {\bf (linear)} & {\bf (linear)} \\
+\hline \hline
+%D2A & one-bit D to A oversampler and noise shaper &  200 \\ \hline 
+FilterBank & 3 band Filterbank & 147 & 27 (24) & 17 (9) & 4 (4)\\ \hline
+FIR & ? tap FIR & 90 & 3 (1) & 1 (0) & 0 (0)\\ \hline 
+Oversampler & one-bit D to A oversampler & 105 & 10 (8) & 1 (1) & 0 (0)\\ \hline 
+Radar & Radar array front-end  & 500 & 76 (60) & 17 (0) & 2 (0)\\ \hline 
+Radio & FM Radio with an equalizer & 245 & 26 (22) & 11 (9) & 2 (2)\\ \hline 
+RateConvert & Multirate filtering to change sampling rate & 117 & 5 (3) & 2 (1) & 0 (0)\\ \hline 
+Sort & 32 element bitonic sort & 260 & & & \\ \hline
+TargetDetect & Target detection & 185 & 10(4) & 6 (0) & 1 (0)\\ \hline 
+Vocoder & Channel vocoder with filterbank & 253 & 17 (13) & 10 (8) & 0 (0)\\ \hline 
+3GPP & 3GPP Radio Access Protocol & 606 & & & \\ \hline
+\hline
+\end{tabular}
+\caption{\protect\small Application Characteristics.}
+\label{tab:benchmarks}
+\end{center}
+\end{table*}
+
+\begin{table*}[t]
+\begin{center}
+\scriptsize
+\begin{tabular}{|l||r|r||r||}\hline
+& {\bf Throughput} &  & {\bf Old Throughput}\\
+{\bf Benchmark} &  {\bf cycles per output} & {\bf MFLOPS} &  {\bf cycles per output}\\ 
+\hline \hline
+FilterBank & & & 305 \\ \hline
+FIR & & & N/A\\ \hline
+Oversampler & & & N/A \\ \hline
+Radar & & & 2380 \\ \hline
+Radio & & & 2610 \\ \hline
+RateConvert & & & N/A\\ \hline
+Sort & & & 11 \\ \hline
+TargetDetect & & & N/A\\ \hline
+Vocoder & & & \\ \hline
+3GPP& & & \\ \hline
+\hline
+\end{tabular}
+\caption{\protect\small Performance Results.}
+\label{tab:results}
+\end{center}
+\end{table*}
+
+We have implemented a fully automated hybrid space-time multiplexing
+compiler for Streamit including all of the transformations and
+optimizations discussed in this paper.  We evaluate our compiler using
+the suite of streaming applications shown in Table
+\ref{tab:benchmarks}.  The performance results for running each
+application on the Raw architecture is shown in Table
+\ref{tab:results}.
+
+We will reveal the final performance numbers if the paper is
+accepted.  But rest assured, the numbers are incredible.
+Earth-shattering. Also, we will be using the geometric mean.
