@@ -4,9 +4,9 @@
 %% You can process specific files by typing their names in at the
 %% \files=
 %% prompt when you run the file main.tex through LaTeX.
-\section{Introduction}
+\mysection{Introduction}
 
-\subsection{Problem Overview}
+%\mysubsection{Problem Overview}
 
     Digital devices are increasingly common in everyday
 life. Examples include cell phones, modems, CD players, and high
@@ -29,7 +29,7 @@ architecture dependent, hence they are not portable or robust.
 These factors indicate there is a need to effectively analyze DSP
 applications, and automate their optimizations in a compiler.
 
-\subsection{DSP Analysis}
+\mysubsection{DSP Analysis}
 
     In order to properly analyze DSP applications, we must use an
 appropriate framework to model them.  This framework should
@@ -47,9 +47,9 @@ These blocks are interconnected in a certain way to form the full
 application. We can think of each block as a mini-application: it
 takes its own inputs, performs calculations, and produces outputs.
 
-\begin{figure}[bthp]
+\begin{figure}[t]
   \centering
-  \includegraphics[width=6.0in]{figures/beamformer.eps}
+  \includegraphics[width=5.0in]{figures/beamformer.eps}
   \caption{A DSP block diagram of the application Beamformer}
   \label{fig:block-diagram}
 \end{figure}
@@ -86,28 +86,27 @@ their own blocks, but limits the way these blocks can be
 connected. We perform the following steps on a StreamIt program:
 
 \begin{enumerate}
-\item Examine each block and determine whether or not it can be
+\vspace{\itemshrink} \item Examine each block and determine whether or not it can be
 characterized as linear state-space. If it can, extract the
 appropriate state-space representation.
 
-\item Combine connected blocks that each have a state-space
+\vspace{\itemshrink} \item Combine connected blocks that each have a state-space
 representation, using an appropriate set of rules depending on the
 type of connection.
 
-\item Optimize representations through the use of state-space
+\vspace{\itemshrink} \item Optimize representations through the use of state-space
 transformations.
 
-\item Convert the state-space representation(s) back to StreamIt
+\vspace{\itemshrink} \item Convert the state-space representation(s) back to StreamIt
 code.
-\end{enumerate}
+\vspace{\itemshrink} \end{enumerate}
 
-\subsection{Organization}
+\mysubsection{Organization}
 
-    The rest of this thesis is organized as follows.  In Section 2 we
+    The rest of this paper is organized as follows.  In Section 2 we
 provide background information about StreamIt and formal linear
 and linear state-space models.  Section 3 is devoted to
 state-space analysis of StreamIt programs (Items 1, 2, and 4).
 Section 4 describes optimizations (Item 3). In Section 5 we
 discuss our implementation and results.  Section 6 details related
-work.  In Section 7 we provide our conclusions and list possible
-future work.
+work, and Section 7 concludes.

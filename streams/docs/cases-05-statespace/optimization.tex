@@ -1,4 +1,4 @@
-\section{Optimization}
+\mysection{Optimization}
 
      There are multiple metrics used to analyze performance
 of a computer program - speed (throughput, or outputs per second),
@@ -21,7 +21,7 @@ zero and one entries in its matrices. This directly eliminates
 computations, since all multiplications by zero or one are not
 processed by the replacement algorithm.
 
-\subsection{State-Space Transformations}
+\mysubsection{State-Space Transformations}
 
     For any state-space equation pair, there are an infinite
 number of transformations to an equivalent state-space system.
@@ -31,13 +31,13 @@ $\mathbf{T}$ is an invertible matrix. Consider the state-update
 equation $\vec{\dot{\mathbf{x}}} = \mathbf{A} \vec{\mathbf{x}} +
 \mathbf{B} \vec{\mathbf{u}}$. Multiplying the entire equation by
 $\mathbf{T}$ yields:
-\begin{eqnarray*}
+\starteqnstar
 \mathbf{T} \vec{\dot{\mathbf{x}}} = \mathbf{TA} \vec{\mathbf{x}} +
 \mathbf{TB} \vec{\mathbf{u}}
-\end{eqnarray*}
+\doneeqnstar
 
     Since $\mathbf{T}^{-1} \mathbf{T} = \mathbf{I}$, we can write:
-\begin{eqnarray*}
+\starteqnstar
 \mathbf{T} \vec{\dot{\mathbf{x}}} & = & \mathbf{TA}
 (\mathbf{T}^{-1} \mathbf{T}) \vec{\mathbf{x}} + \mathbf{TB}
 \vec{\mathbf{u}} = \mathbf{TA}
@@ -46,18 +46,18 @@ $\mathbf{T}$ yields:
 \vec{\mathbf{x}} + \mathbf{D} \vec{\mathbf{u}} = \mathbf{C}
 \mathbf{T}^{-1} (\mathbf{T} \vec{\mathbf{x}}) + \mathbf{D}
 \vec{\mathbf{u}}
-\end{eqnarray*}
+\doneeqnstar
 
     Where we have introduced the output equation as well. Let
 $\vec{\mathbf{z}} = \mathbf{T} \vec{\mathbf{x}}$.
 $\vec{\mathbf{z}}$ is a new state vector related to the old state
 vector $\vec{\mathbf{x}}$ by the change of basis $\mathbf{T}$.
 Substituting into the equations above we get:
-\begin{eqnarray*}
+\starteqnstar
 \vec{\dot{\mathbf{z}}} & = & \mathbf{TA} \mathbf{T}^{-1} \vec{\mathbf{z}} + \mathbf{TB} \vec{\mathbf{u}} \\
 \vec{\mathbf{y}} & = & \mathbf{C} \mathbf{T}^{-1}\vec{\mathbf{z}}
 + \mathbf{D}\vec{\mathbf{u}}
-\end{eqnarray*}
+\doneeqnstar
 
     These is precisely the original state-space equation pair,
 with $\mathbf{A}$, $\mathbf{B}$, and $\mathbf{C}$ transformed to
@@ -75,7 +75,7 @@ state vector is multiplied by $\mathbf{T}$. The number of states,
 inputs, and outputs is the same, so $s$, $o$, and $u$ are
 unchanged.
 
-\subsection{State Removal}
+\mysubsection{State Removal}
 
     There are two types of states that can be removed from a state-space system
 without changing its behavior - unreachable and unobservable
@@ -84,11 +84,11 @@ and unobservable states have no effect on outputs. More formally,
 the set of states in a system can be divided into reachable and
 unreachable states where:
 \begin{enumerate}
-\item The unreachable states are not updated by any of the
+\vspace{\itemshrink} \item The unreachable states are not updated by any of the
 reachable states.
 
-\item The unreachable states are not updated by any inputs.
-\end{enumerate}
+\vspace{\itemshrink} \item The unreachable states are not updated by any inputs.
+\vspace{\itemshrink} \end{enumerate}
 
     In terms of the state-space equation pair, this means $\mathbf{A}[i,j] =
 0, \mathbf{B}[i,k] = 0$ where $i$ is the row of an unreachable
@@ -104,11 +104,11 @@ the outputs.
     The set of states in a system can also be divided into
 observable and unobservable states where:
 \begin{enumerate}
-\item The observable states are not updated by any of the
+\vspace{\itemshrink} \item The observable states are not updated by any of the
 unobservable states.
 
-\item The outputs do not depend on the unobservable states.
-\end{enumerate}
+\vspace{\itemshrink} \item The outputs do not depend on the unobservable states.
+\vspace{\itemshrink} \end{enumerate}
 
     In terms of the state-space equation pair, this means $\mathbf{C}[i,j] =
 0, \mathbf{D}[k,j] = 0$ where $j$ is the column of an observable
@@ -184,14 +184,14 @@ Suppose this sub-matrix is in upper-triangular form, which means
 that all entries below the main diagonal are zero. We can remove
 states in the following manner:
 \begin{enumerate}
-\item Check the states in reverse order, from state $k$ to state
+\vspace{\itemshrink} \item Check the states in reverse order, from state $k$ to state
 $1$.
 
-\item For the $i^{th}$ state, check whether the state has an
+\vspace{\itemshrink} \item For the $i^{th}$ state, check whether the state has an
 initial value, is updated by the initialization matrices, or
 depends on a state with a higher index. If any of these are true,
 we cannot remove the state. Otherwise, we can remove the state.
-\end{enumerate}
+\vspace{\itemshrink} \end{enumerate}
 
     Since the unreachable state sub-matrix is in upper-triangular
 form, all unreachable states can only have dependencies on states
@@ -207,11 +207,11 @@ converting any square matrix $\mathbf{P}$ to upper-triangular
 form. The algorithm is essentially the following two step
 procedure, applied as many times as necessary.
 \begin{enumerate}
-\item $\mathbf{Q} \mathbf{R} = \mathbf{P}$   (QR factorization of
+\vspace{\itemshrink} \item $\mathbf{Q} \mathbf{R} = \mathbf{P}$   (QR factorization of
 P)
 
-\item $\mathbf{P} = \mathbf{R} \mathbf{Q}$
-\end{enumerate}
+\vspace{\itemshrink} \item $\mathbf{P} = \mathbf{R} \mathbf{Q}$
+\vspace{\itemshrink} \end{enumerate}
 
     The QR factorization of a matrix $\mathbf{P}$ factors
 $\mathbf{P}$ into the product of an orthogonal matrix
@@ -229,7 +229,7 @@ matrix applied to $\mathbf{A}$, $\mathbf{B}$, $\mathbf{C}$ is
 $\mathbf{T} = \left [ \begin{array} {cc} \mathbf{Q}^{-1} &
 \mathbf{0} \\ \mathbf{0} & \mathbf{I} \end{array} \right ]$
 
-\subsection{Putting Inputs into States}
+\mysubsection{Putting Inputs into States}
 
     So far we have considered optimizations that affect $\mathbf{A}$,
 $\mathbf{B}$, and $\mathbf{C}$. Since the optimizations are
@@ -242,7 +242,7 @@ changed by state optimizations.
     We have already discussed how to store inputs as states. When
 every input is stored as a state, we find the new state-equation
 pair is:
-\begin{eqnarray*}
+\starteqnstar
 \left [ \begin{array} {c} \vec{\dot{\mathbf{x}}} \\
 \vec{\dot{\mathbf{x_{inputs}}}} \end{array} \right ] & = & \left [
 \begin{array} {cc} \mathbf{A} & \mathbf{B} \\ \mathbf{0} &
@@ -254,7 +254,7 @@ pair is:
 \mathbf{D} \end{array} \right ] \left [ \begin{array} {c}
 \vec{\mathbf{x}} \\ \vec{\mathbf{x_{inputs}}} \end{array} \right ]
 + \mathbf{0} \vec{\mathbf{u}}
-\end{eqnarray*}
+\doneeqnstar
 
     These states should be added before state-removal is
 performed. It may seem counter-intuitive that we first add states,
@@ -263,7 +263,7 @@ computations involving $\mathbf{D}$, which were not considered
 before. Removing some of these states results in reducing
 computations involving $\mathbf{D}$.
 
-\subsection{Parameter Reduction}
+\mysubsection{Parameter Reduction}
 
     After removing as many states as possible, including input
 states, we want to change the state-space system to one with the
@@ -278,30 +278,30 @@ responses. We will achieve this same form using row operations on
 the augmented matrix $\left [
 \begin{array} {cc} \mathbf{A}^T & \mathbf{C}^T \end{array} \right
 ]$. The form we want is:
-\begin{eqnarray*}
-\mathbf{A}^T & = & \left [ \begin{array} {ccccc} \mathbf{L_1} &
+\starteqnstar
+\mathbf{A}^T = \left [ \begin{array} {ccccc} \mathbf{L_1} &
 \mathbf{A_{12}} & \mathbf{A_{13}} & ... & \mathbf{A_{1u}} \\
 \mathbf{0} & \mathbf{L_2} & \mathbf{A_{23}} & ... &
 \mathbf{A_{2u}} \\ \mathbf{0} & \mathbf{0} & \mathbf{L_3} & ... &
 \mathbf{A_{3u}} \\ ... & ... & ... & ... & ... \\ \mathbf{0} &
-\mathbf{0} & \mathbf{0} & ... & \mathbf{L_u} \end{array} \right ] \\
-\mathbf{C}^T & = & \left [ \begin{array} {ccccc} 1 & 0 & 0 & ... &
+\mathbf{0} & \mathbf{0} & ... & \mathbf{L_u} \end{array} \right ] ~~~~~
+\mathbf{C}^T = \left [ \begin{array} {ccccc} 1 & 0 & 0 & ... &
 0 \\ 0 & 0 & 0 & ... & 0 \\ ... & ... & ... & ... & ... \\ 0 & 1 &
 0 & ... & 0 \\ 0 & 0 & 0 & 0 & 0 \\ ... & ... & ... & ... & ... \\
 0 & 0 & 0 & ... & 1 \end{array} \right ]
-\end{eqnarray*}
+\doneeqnstar
 
     The matrices $\mathbf{L_i}$ are rectangular, and the matrices
 $\mathbf{A_{ij}}$ are square, but do not necessarily have the same
 dimensions as each other. These matrices have the form:
-\begin{eqnarray*}
-\mathbf{L_i} & = & \left [ \begin{array} {ccccc} 0 & 0 & ...
+\starteqnstar
+\mathbf{L_i} = \left [ \begin{array} {ccccc} 0 & 0 & ...
 & 0 & * \\ 1 & 0 & ... & 0 & * \\ 0 & 1 & ... & 0 & * \\
 ... & ... & ... & ... & ... \\ 0 & 0 & ... & 1 & * \end{array}
-\right ] \\
-\mathbf{A_{ij}} & = & \left [ \begin{array} {cccc} 0 & 0 & ... & *
+\right ] ~~~~~
+\mathbf{A_{ij}} = \left [ \begin{array} {cccc} 0 & 0 & ... & *
 \\ ... & ... & ... & ... \\ 0 & 0 & ... & * \end{array} \right ]
-\end{eqnarray*}
+\doneeqnstar
 
     The entries marked with a * are the parameters of the system.
 This is known as the observable canonical form of the system. In
@@ -314,8 +314,9 @@ $\mathbf{B}$.
 above. We do not include the necessary inverse column operations
 that must go with all row operations.
 
-\begin{scriptsize}
 \begin{singlespace}
+\vspace{-12pt}
+\begin{scriptsize}
 \begin{verbatim}
 Reduce Parameters {
   currRow = 0; colA = 0; colC = 0;
@@ -344,8 +345,9 @@ Reduce Parameters {
   }
 }
 \end{verbatim}
-\end{singlespace}
 \end{scriptsize}
+\vspace{-12pt}
+\end{singlespace}
 
     It is possible that one type of form has fewer parameters than the
 other. Therefore, we perform the above algorithm on $\left [
@@ -355,16 +357,16 @@ other. Therefore, we perform the above algorithm on $\left [
 ]$ to produce the reachable form, and check which one has fewer
 parameters.
 
-\subsection{Staged Execution}
+\mysubsection{Staged Execution}
 
     Using input state variables corresponds to executing a state-space
 block in two stages:
 \begin{enumerate}
-\item Put inputs into input state variables.
+\vspace{\itemshrink} \item Put inputs into input state variables.
 
-\item Execute the original block, using input states instead of
+\vspace{\itemshrink} \item Execute the original block, using input states instead of
 actual inputs.
-\end{enumerate}
+\vspace{\itemshrink} \end{enumerate}
 
     We can add additional stages by having multiple sets of input
 states - $\vec{\mathbf{x_{inputs1}}}$,
@@ -372,7 +374,7 @@ $\vec{\mathbf{x_{inputs2}}}$, etc. The first set gets saved in the
 second set, the second set gets saved in the third set, etc.
 Suppose there are $k$ input sets. We can write our state-space
 equation pair as follows:
-\begin{eqnarray*}
+\starteqnstar
 \left [ \begin{array} {c} \vec{\dot{\mathbf{x}}} \\ \vec{\dot{\mathbf{x_{inputsk}}}} \\
 ... \\ \vec{\dot{\mathbf{x_{inputs2}}}} \\
 \vec{\dot{\mathbf{x_{inputs1}}}}
@@ -392,7 +394,7 @@ equation pair as follows:
 \left [ \begin{array} {c} \vec{\mathbf{x}}
 \\ \vec{\mathbf{x_{inputsk}}} \\ ... \\ \vec{\mathbf{x_{inputs2}}}
 \\ \vec{\mathbf{x_{inputs1}}} \end{array} \right ] + \mathbf{0} \vec{\mathbf{u}}
-\end{eqnarray*}
+\doneeqnstar
 
     By itself, executing the work of a filter in stages does not
 result in any gain in performance. However, minimally

@@ -1,4 +1,4 @@
-\section{Conclusion}
+\mysection{Conclusion}
 
     We present a methodology for the detection, analysis, combination, and
 optimization of linear state-space filters in DSP applications.
@@ -9,48 +9,48 @@ low-level optimized code that requires expert DSP analysis.
 Instead, the programmer can focus on the top-level design of a DSP
 application and write modular code in a structured setting.
 
-    Due to the infinite number of possible state-space transforms,
-the optimizations discussed are not necessarily ideal.
-Additionally, parts of DSP applications are non-linear and cannot
-be analyzed in the state-space domain. Therefore, the work
-presented in this thesis does not fully optimize some portions of
-DSP applications, and does not apply towards other portions.
-However, it does represent an additional step towards the goal of
-a full analysis and optimization of any application. We outline
-some of the future steps that can be taken, both to improve on the
-work in this thesis and to expand it to other types of
-domain-specific analyses and optimizations.
-\begin{itemize}
+%%     Due to the infinite number of possible state-space transforms,
+%% the optimizations discussed are not necessarily ideal.
+%% Additionally, parts of DSP applications are non-linear and cannot
+%% be analyzed in the state-space domain. Therefore, the work
+%% presented in this thesis does not fully optimize some portions of
+%% DSP applications, and does not apply towards other portions.
+%% However, it does represent an additional step towards the goal of
+%% a full analysis and optimization of any application. We outline
+%% some of the future steps that can be taken, both to improve on the
+%% work in this thesis and to expand it to other types of
+%% domain-specific analyses and optimizations.
+%% \begin{itemize}
 
-\item As mentioned in Section 4, minimally parameterize a system,
-then uses multiple execution stages.
+%% \vspace{\itemshrink} \item As mentioned in Section 4, minimally parameterize a system,
+%% then uses multiple execution stages.
 
-\item Use a balanced representation \cite{Moore} to quantify the
-relative impact of each state of a filter on its execution. Then
-the states that have impact values below a certain threshold can
-be removed, resulting in only a small change in the filter's
-execution.
+%% \vspace{\itemshrink} \item Use a balanced representation \cite{Moore} to quantify the
+%% relative impact of each state of a filter on its execution. Then
+%% the states that have impact values below a certain threshold can
+%% be removed, resulting in only a small change in the filter's
+%% execution.
 
-\item Formulate loops in traditional programming languages as
-state-space filters, and use state-space work developed in this
-thesis to detect their induction variables and optimize their
-execution.
+%% \vspace{\itemshrink} \item Formulate loops in traditional programming languages as
+%% state-space filters, and use state-space work developed in this
+%% thesis to detect their induction variables and optimize their
+%% execution.
 
-\item Create a cost function metric,
-$f(\mathbf{A},\mathbf{B},\mathbf{C},\mathbf{D})$, that balances
-the traditional program analysis metrics (throughput, power
-consumption, memory allocation, etc.) in any manner desired. Then
-find a general way to minimize this cost function over all
-possible state-space transformations $\mathbf{T}$.
+%% \vspace{\itemshrink} \item Create a cost function metric,
+%% $f(\mathbf{A},\mathbf{B},\mathbf{C},\mathbf{D})$, that balances
+%% the traditional program analysis metrics (throughput, power
+%% consumption, memory allocation, etc.) in any manner desired. Then
+%% find a general way to minimize this cost function over all
+%% possible state-space transformations $\mathbf{T}$.
 
-\item Formulate a methodology to deal with filters whose outputs
-are a linear combination of their inputs but a non-linear
-combination of their state variables.
+%% \vspace{\itemshrink} \item Formulate a methodology to deal with filters whose outputs
+%% are a linear combination of their inputs but a non-linear
+%% combination of their state variables.
 
-\item Use a `black box' method to find the appropriate
-representation of a filter. In this approach the filter is given
-inputs and the output data is collected. The input/output
-relations are used to formulate an appropriate state-space model
-that may not exactly represent the filter, but does so within a
-tolerable error margin (see \cite{Schutter}).
-\end{itemize}
+%% \vspace{\itemshrink} \item Use a `black box' method to find the appropriate
+%% representation of a filter. In this approach the filter is given
+%% inputs and the output data is collected. The input/output
+%% relations are used to formulate an appropriate state-space model
+%% that may not exactly represent the filter, but does so within a
+%% tolerable error margin (see \cite{Schutter}).
+%% \vspace{\itemshrink} \end{itemize}
