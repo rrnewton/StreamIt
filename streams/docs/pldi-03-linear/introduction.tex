@@ -1,4 +1,4 @@
-`%% Upward of fifty percent of the code that runs the DSP(s) in a modern
+%% Upward of fifty percent of the code that runs the DSP(s) in a modern
 %% cell phone is coded in assembly with the rest written in C. Hand
 %% optimized assembly code typically makes the best use of the available
 %% resources such as power, specialized coprocessors, and specialized
@@ -58,7 +58,9 @@ more effective and efficient than it could be on an equivalent
 implementation in C alone.
 
 This paper makes the following contributions:
+
 \begin{itemize}
+\vspace{-6pt}
 
 \item A linear dataflow analysis that can extract a linear transfer
 function from the imperative code within a StreamIt filter.
@@ -79,7 +81,8 @@ determines which transformations are most beneficial to apply.
 
 \item An implementation of the above techniques in the StreamIt
 compiler that automatically improves performance by a factor of
-XXXX  on average and by a factor of $XXXXXX$ in the best case.
+$XXXX$ on average and by a factor of $XXXXXX$ in the best case.
+\vspace{-6pt}
 
 \end{itemize}
 
@@ -213,9 +216,9 @@ combined\_weights} array.\protect\label{fig:example-combine}}
 float->float pipeline FreqTwoFilters(float[N] w1, float[N] w2) {
   float[N] combined_weights = ... ;     // calc. combined weights
   complex[N] H = fft(combined_weights); // take FFT of weights
-  add FFT(N+FFT_SIZE);                  // add FFT stage to stream
+  add FFT();                            // add FFT stage to stream
   add ElementMultiply(H);               // add multiplication by H
-  add IFFT(N+FFT_SIZE);                 // add inverse FFT
+  add IFFT();                           // add inverse FFT
 }
 \end{verbatim}
 \vspace{-18pt}
@@ -282,23 +285,25 @@ while maintaining a high level of abstraction for the programmer.
 StreamIt programs are composed of processing blocks called {\it
 filters}.  Each filter has an input tape from which it can read values
 and an output tape to which it can write values.  Each filter also
-contains a {\tt work} function which describes the filter's atomic
+contains a {\it work} function which describes the filter's atomic
 execution step in the steady state.  If the first invocation of the
-{\tt work} function has different behavior than other executions, a
-special {\tt prework} function is defined.
+work function has different behavior than other executions, a
+special {\it prework} function is defined.
 
-The {\tt work} function contains C-like imperative code, which can
+The work function contains C-like imperative code, which can
 access filter state, call external routines and produce and consume
 data.  The input and output channels are treated as FIFO queues, which
-can be accessed with three primitive operations: 1) {\tt pop()}, which
-returns the first item on the input tape and advances the tape by one
-item, 2) {\tt peek(i)}, which returns the value at the $i$th position
-on the input tape, and 3) {\tt push(v)}, which pushes value {\tt v}
-onto the output tape.  Each filter must declare the maximum element it
-will {\tt peek} at, the number of elements it will {\tt pop}, and the
-number of elements that it will {\tt push} during an execution of {\tt
-work}.  These rates must be resolvable at compile time and constant
-from one invocation of {\tt work} to the next.
+can be accessed with three primitive operations: 
+1) {\it pop()}, which returns the first item on the input tape and 
+advances the tape by one item, 
+2) {\it peek(i)}, which returns the value at the $i$th position
+on the input tape, 
+and 3) {\it push$(v)$}, which pushes value $v$ onto the output tape.  
+Each filter must declare the maximum element it
+will peek at, the number of elements it will pop, and the
+number of elements that it will push during an execution of 
+work.  These rates must be resolvable at compile time and constant
+from one invocation of work to the next.
 
 A program in StreamIt consists of a hierarchical graph of filters.
 Filters can be connected using one of the three predefined structures
@@ -318,3 +323,15 @@ in having a structured language~\cite{streamitcc}.  In particular, the
 linear analyses described in this paper rely heavily on the structure
 of StreamIt, as they can focus on each hierarchical primitive rather
 than dealing with the complexity of arbitrary graphs.
+
+\begin{figure}[t]
+\vspace{-6pt}
+\center
+\epsfxsize=3.0in
+\epsfbox{images/streamit-structures.eps}
+\vspace{-12pt}
+\caption{StreamIt structures: pipeline, splitjoin, and feedbackloop.
+\protect\label{fig:structures}}
+\vspace{-12pt}
+\end{figure}
+

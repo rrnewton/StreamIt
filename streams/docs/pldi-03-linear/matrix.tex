@@ -1,14 +1,3 @@
-\begin{figure}[t]
-\vspace{-6pt}
-\center
-\epsfxsize=3.0in
-\epsfbox{images/streamit-structures.eps}
-\vspace{-12pt}
-\caption{StreamIt structures: {\tt pipeline}, {\tt splitjoin}, and {\tt feedbackloop}.
-\protect\label{fig:structures}}
-\vspace{-12pt}
-\end{figure}
-
 \section{Representing Linear Nodes}
 \label{sec:linearrep}
 
@@ -32,14 +21,15 @@ A linear node $\lambda$ $=$ $\{A,$ $\vec{b},$ $e,$ $o,$ $u\}$
 represents an abstract stream block which performs an affine
 transformation $\vec{y} = \vec{x} A + \vec{b}$ from input elements 
 $\vec{x}$ to output elements $\vec{y}$. $A$ is an $e \times u$ matrix, $\vec{b}$ is a
-$u$-element row vector, and $e$, $o$, and $u$ are the peek, pop, and
-push rates, respectively. \\ ~ \vspace{-8pt} \\
-
+$u$-element row vector, and $e$, $o$ and $u$ are the peek, pop and
+push rates, respectively. \\ 
+~ \vspace{-6pt} \\
 A ``firing'' of a linear node $\lambda$ corresponds to the following
 series of abstract execution steps.  First, an $e$-element row vector
-$\vec{x}$ is constructed with $\vec{x}[e-1-i] = \mbox{\tt peek}(i)$.  The node
-computes $\vec{y} = \vec{x} A + {\vec b}$, and then pushes the $u$ elements 
-of $\vec{y}$ onto the output tape, starting with $y[u-1]$ and proceeding through $y[0]$.
+$\vec{x}$ is constructed with $\vec{x}[e-1-i] = \mbox{peek}(i)$.  The node
+computes $\vec{y} = \vec{x} A + \vec{b}$, and then pushes the $u$ elements 
+of $\vec{y}$ onto the output tape, starting with $\vec{y}\hspace{1pt}[u-1]$ 
+and proceeding through $\vec{y}\hspace{1pt}[0]$.
 Finally, $o$ items are popped from the input tape.
 \end{definition} \vspace{-2pt}
 
@@ -60,10 +50,10 @@ rows correspond to using specific inputs.  The values found in row
 $e-1-i$ of $A$ ({\it i.e.} the $i$th row from the bottom) and 
 column $u-1-j$ of $A$ ({\it i.e.} the $j$th column from the right) 
 represents a term in the formula to compute the $j$th output item using 
-the value of {\tt peek($i$)}. The value in column $u-1-j$ of 
+the value of peek($i$). The value in column $u-1-j$ of 
 $\vec{b}$ is a constant offset added to output $j$.
 Figure~\ref{fig:linear-node-example} shows a concrete example
-of a {\tt work} function and its corresponding linear node.
+of a work function and its corresponding linear node.
 
 \begin{figure}
 \center
