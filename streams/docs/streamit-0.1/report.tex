@@ -21,7 +21,7 @@ output[0]} reference the first unread and unwritten items?  Can't the
 programmer manage the indices how he wants to using the {\tt advance}
 command?
 
-\item do we have a name for a {\tt FilterBlock} that is both a source
+\item Do we have a name for a {\tt FilterBlock} that is both a source
 and a sink?  A {\tt SourceSinkBlock}?  Maybe we should make that the
 top-level construct instead of {\tt Stream}?
 
@@ -52,6 +52,8 @@ steady state streaming time.  And then scripting time, too.
 \item Better names for everything.  Especially control constructs
 (graph construction constructs instead?), filters, ``functional
 blocks'', etc.
+
+\item Get number layered 4 deep instead of boldface headings.
 
 \end{enumerate}
 
@@ -165,15 +167,17 @@ filter block does not contain procedural code like a filter, we'll see
 that filters and filter blocks can be treated as identical black-box
 abstractions during stream construction.
 
-\subsection{Filters}
+\subsubsection{Filters}
 
 In many ways, filters correspond to the usual notion of an object in
 an object-oriented programming language.  Below we discuss their
 declaration and instantiation.
 
-\subsubsection{Filter Declaration}
+\medskip
+\noindent {\bf Filter Declaration}
+\medskip
 
-They are declared with the following syntax:
+Filters are declared with the following syntax:
 
 \begin{tabbing}
 \hspace{0.2in} \= \hspace{0.2in} \= \hspace{0.2in} \= \hspace{0.2in} \= \\
@@ -252,12 +256,13 @@ items differently than the steady state.
 
 \item {\it Work function.}  The work function holds the code that is
 invoked dynamically for a single execution step of the filter.  This
-function should be as fine-grained as possible--involving as few input
-and output items as possible--to promote program comprehensibility and
-to facilitate compiler optimization.  The function accepts no
-parameters, although (like every other function in a filter) it has
-access to the filter's fields and parameters.  Within the work
-function, input and output is done via the channels as described above.
+function should be as fine-grained as possible--involving only as many
+input and output items as necessary--to promote program
+comprehensibility and to facilitate compiler optimization.  The
+function accepts no parameters, although (like every other function in
+a filter) it has access to the filter's fields and parameters.  Within
+the work function, input and output is done via the channels as
+described above.
 
 \item {\it Other functions.}  The filter is free to define other
 functions, just like objects can define methods in an object-oriented
@@ -266,7 +271,9 @@ can't be seen from outside the scope of the filter.
 
 \end{itemize}
 
-\subsubsection{Filter Instantiation}
+\medskip
+\noindent {\bf Filter Instantiation.}
+\medskip
 
 A filter can be instantiated into the stream graph by calling its name
 with some arguments, e.g. {\tt MyFilter(arg$_1$, arg$_2$, ...,
@@ -289,15 +296,15 @@ could remove it if desired.  The inlined syntax is thus an equivalent
 way of declaring filters.  We could translate any inlined filter into
 a named filter that is explicitly instantiated.
 
-\subsection{FilterBlocks}
+\subsubsection{FilterBlocks}
 
 The second kind of functional block, the {\tt FilterBlock}, is similar
 to a filter in that it transforms one data stream into another.
 However, a filter block manifests this transformation as an arrangment
 of other filters (and/or filter blocks) rather than as procedural code
-that deals explicitly with the input and output channels.
-FilterBlocks are instantiated just like filters.  However, their
-declaration is somewhat different:
+that deals explicitly with input and output channels.  FilterBlocks
+are instantiated just like filters.  However, their declaration is
+somewhat different:
 
 \begin{tabbing}
 \hspace{0.2in} \= \hspace{0.2in} \= \hspace{0.2in} \= \hspace{0.2in} \= \\
@@ -318,10 +325,10 @@ input and output channels, as well as the work function and the
 capacity to define local methods.  However, the crucial difference is
 in the initialization code.  Whereas a filter's initialization code is
 for modifying fields and doing I/O, a filter block instantiates a
-series of filters (an/or filter blocks).  By default, the filters are
+series of filters (and/or filter blocks).  By default, the filters are
 connected in the order in which they are instantiated, although more
 complex structures can be obtained using control constructs (see
-Section {\ref{sec:control}}.  Thus, the filter block contains whatever
+Section {\ref{sec:control}}).  Thus, the filter block contains whatever
 graph of filters it initializes.  
 
 There are also {\tt FilterBlock} analogs for the {\tt Source} and {\tt
@@ -393,7 +400,7 @@ to arbitrarily connected streams as structured control flow compares
 to goto statements: the loss of expressive power will be more than
 offset by improved readability and opportunity for optimization.
 
-\subsection{Pipe}
+\subsubsection{Pipe}
 
 The {\tt Pipe} construct is used for 
 
