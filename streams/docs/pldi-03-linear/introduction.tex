@@ -14,9 +14,9 @@ whenever a new chip comes out. The life cycle of a typical DSP is much shorter t
 cycle of a general purpose microprocessor -- each new generation is separated by months rather
 than years.
  
-Therefore frequenctly reimplementing algorithms by hand is a costly arduous process that 
+Therefore frequently reimplementing algorithms by hand is a costly arduous process that 
 increases cost and slows the pace of advances. Engineers must spend time working out details rather 
-than focusing on solving harder problems. Compilers were invented fourty years ago 
+than focusing on solving harder problems. Compilers were invented forty years ago 
 exactly to let engineers focus on the problem at hand rather than spend time with 
 machine specific details. Compilers for DSP architectures have a difficult job, and are not
 very good at mapping a program written in a general purpose language like C into the specialized 
@@ -27,9 +27,9 @@ your algorithm in the same way that the compiler expects to encounter it, the re
 program will not take best advantage of the available DSP resources.
 
 We are attempting to solve this problem by introducing a new domain specific language which
-supports imperative {\tt C} like code to describe computation. By imposing structure and
+supports imperative C like code to describe computation. By imposing structure and
 explicitly identifying the input and the output of different program sub components
-we can run analyses that determine if a program is performing a common DSP task.  
+we can run an analysis that determine if a program is performing a common DSP task.  
 We can then use this information to take advantage of special purpose DSP hardware
 or we can even apply standard signal processing algorithm optimizations to 
 We can then leverage the existing work on DSP algorithm optimization to perform compiler transformation
@@ -38,8 +38,10 @@ computation to be performed at an appropriate level and the compiler takes care 
 
 \subsection{Motivating Example}
 \begin{figure}
+\center
 \epsfxsize=2.0in
 \epsfbox{images/motivating-example.eps}
+
 \begin{verbatim}
 float data[N]; /* input data buffer */
 float buffer[N]; /* inter-filter buffer */
@@ -62,13 +64,13 @@ while(true) {
   i = (i+1)%N
 }
 \end{verbatim}
-\caption{FIR filtering with back to back filters in {\tt C}. Note the use of circular buffers.}
+\caption{FIR filtering with back to back filters in C. Note the use of circular buffers.}
 \label{fig:motivating-example}
 \end{figure}
 
 As an example of the types of program transformation that our optimization allows,
 consider a sequence of finite impulse response (FIR) filters as shown in 
-Figure~\ref{fig:motivating-example}. The imperative {\tt C} style code that implements
+Figure~\ref{fig:motivating-example}. The imperative C style code that implements
 this simple DSP application is also shown. The program largely defies many
 standard compiler analysis and optimization techniques because of its use of circular
 buffers and the muddled relationship between {\tt data}, {\tt buffer} and the output.
@@ -132,7 +134,7 @@ float->float filter FreqTwoPipe() {
   }
   work push L pop L peek N+L {
     float[N] X = FFT(peek(0..N+L-1)); /* input FFT */
-    float[N] Y =  X .* H; /* elementwise mult */
+    float[N] Y =  X .* H; /* element wise mult */
     float[N] y = IFFT(Y); /* inverse FFT */
     push(y[0..L-1]); /* push first L elts of y */
   }
@@ -149,71 +151,68 @@ as is outlined in psuedo code in Figure~\ref{fig:example-frequency}.
 
 
 
-
-
-
-
 \subsection{StreamIt}
 
 \begin{figure}
 \center
 \epsfxsize=3.0in
 \epsfbox{images/general-picture-filter.eps}
-\caption{Filter F with $peek_{F}$, $pop_{F}$ and $push_{F}$}
+\caption{Graphical illustration of $e_{F}$, $o_{F}$ and $u_{F}$}
 \label{fig:overview-filter}
 \end{figure}
 
 
-The StreamIt\cite{thies02streamit,thies01streamit,william-stream,michal-common} project
+The StreamIt\cite{streamitcc, streamit-asplos, gordon-thesis} language
 aims to provide a language and compiler for streaming applications. Streaming applications 
 are characterized by data streaming in and out of the application. Each data element (both
 input and output) is in the system for only a small amount of time as opposed to scientific
-applications where the data set is used extensively for the life of the computation.
- 
-StreamIt programs are composed of processing blocks called {\tt Filters} which
-contain a typed input tape from which they can read values and an output tape to which
-they can write typed values. Each filter defines a {\tt work} function that executes when there
-is sufficient data on the input tape or there is a need for data on the output tape.
-{\tt Filters} can contain fields (like a Java field, or a C++ member variable) that
-persist between calls to {\tt work}. The {\tt work} function is written in C like imperative code, 
-and it can access {\tt Filter} fields (eg state), call external routines, etc.
-There are very few limits on what code a {\tt work} function can contain except for
-producing and consuming the appropriate amount of data.  
-During the execution of the {\tt work} function, input is consumed and output is produced.
-{\tt Filters } can examine data items (called {\tt peek}ing) on the input tape without
-consuming them (called {\tt pop}ing). A {\tt Filter} {\tt push}es items on to its output tape.
+applications where the data set is typically used extensively over the execution time.
 
-All {\tt Filters} in StreamIt declare the number of elements they
+StreamIt programs are composed of processing blocks called {\tt filters} which
+contain an input tape from which they can read values and an output tape to which
+they can write. Each {\tt filter} contains a {\tt work} function which describes 
+a steady state computation that consumes input and produces output.
+{\tt filters } can examine data items  on the input tape without consuming them 
+via {\tt peek} expressions. {\tt pop} expressions consume data from the input
+tape. A {\tt filter} calls {\tt push} to add values to the output tape.
+{\tt filters} can contain stateful fields that persist between calls to {\tt work}. 
+The {\tt work} function is C-like imperative code, 
+which can access {\tt filter} state, call external routines and produce and consume data. 
+There are few restrictions on a {\tt work} function other than the requirement that
+it consume input and produce output at the stated rates.
+
+All {\tt filters} in StreamIt declare the number of elements they
 will {\tt peek} at, the number of elements they will {\tt pop} and the number
-of elements that they will {\tt push}. A {\tt Filter} $F$ can examine up to $peek_{F}$ 
-items from its input tape, consumes exactly $pop_{F}$ items and {\tt push}es 
-$push_{F}$ items into the output tape. Currently StreamIt requires that each filter has 
-$peek_F$, $pop_F$ and $push_F$ rates that are static and known at compile time. 
-Figure~\ref{fig:overview-filter} shows a schematic of how the various filter rates are related.
+of elements that they will {\tt push}. A {\tt Filter} $F$ can examine up to $e_F$ 
+items from its input tape, consumes exactly $o_F$ items and produces exactly
+$u_F$ items. Currently StreamIt requires that each filter has declared $e_F$, $o_F$ 
+and $u_F$ that are statically determinable at compile time. 
+Figure~\ref{fig:overview-filter} shows how $e_F$, $o_F$ and $u_F$ are related.
 
 \begin{figure}
 \center
 \epsfxsize=3.0in
 \epsfbox{images/streamit-structures.eps}
-\caption{StreamIt Structures: Pipeline, SplitJoin, and FeedbackLoop.}
+\caption{StreamIt structures: {\tt pipeline}, {\tt splitjoin}, and {\tt feedbackloop}.}
 \label{fig:structures}
 \end{figure}
 
-{\tt Filters} in StreamIt are composed hierarchically using predefined structures to form
+{\tt filters} in StreamIt are composed hierarchically using predefined structures to form
 a program. 
 
 \begin{enumerate}
-\item {\tt Pipelines} represent the serial computation of one filter after another.
-\item {\tt SplitJoins} represent parallel computation. 
-\item {\tt FeedbackLoops} allow cycles to be introduced into the stream graph. 
+\item {\tt pipelines} represent the serial computation of one filter after another.
+\item {\tt splitjoins} represent explicitly parallel computation. 
+\item {\tt feedbackloops} allow cycles to be introduced into the stream graph. 
 \end{enumerate}
 
-{\tt Filters}, {\tt Pipelines}, {\tt SplitJoins} and {\tt FeedbackLoops} 
-are {\tt Streams} and each {\tt Stream} can be used as a subcomponent in 
-a structure. Figure~\ref{fig:structures} illustrates the three structures provided by StreamIt.
-StreamIt programs can also be represented as a connected graph of filters 
+{\tt filters}, {\tt pipelines}, {\tt splitjoins} and {\tt feedbackloops} 
+are all {\tt streams} and each {\tt stream} can be used as a subcomponent in 
+a structure. Figure~\ref{fig:structures} illustrates the three structures 
+provided as primitives in StreamIt.
+StreamIt programs can therefore be represented as a connected graph of filters 
 which we will refer to as the stream graph. It is also important to note
-{\tt Streams} have exactly one input and one output tape.
+{\tt streams} have exactly one input tape and one exactly one output tape.
 
 Most real world programs can be fit into StreamIt's structured stream model, 
 though the fit sometimes requires extra manipulation. We believe
@@ -221,32 +220,30 @@ that benefits of structure to both the programmer and the compiler outweigh the
 costs of imposing structure on the programmer.
 
 \subsection{Matrices and DSP}
-We take advantage of StreamIt's one input one output {\tt Streams} and 
+We take advantage of StreamIt's explicit input and output tapes and
 our knowledge that a large class of StreamIt programs will be performing
-digital signal processing (DSP) functions to perform some useful automatic 
+standard digital signal processing (DSP) operations to generate useful
 optimizations.
 
-The is an entire research area of Electrical Engineering devoted to DSP. The
+There is an entire research area in Electrical Engineering devoted to DSP. The
 theory and the implementation of systems to process digital signals is well developed (see
 an introductory text such as\cite{oppenheim-discrete} or \cite{lyons-understanding}). 
-There are a few very widely used building blocks of most DSP systems, and their output 
-can be formulated as a simply a linear combination of their inputs. Examples are
-finite impulse response (FIR) filters, compressors, expanders and signal transforms
-(most notably the discrete Fourier transform (DFT) -- 
-see \cite{oppenheim-discrete} for a detailed discussion).
+There are a few fundamental primitives used to describe most DSP systems, and the output of 
+most of these primitives can be expressed as a linear combination of their inputs. Examples are
+finite impulse response (FIR) filters, compressors, expanders and signal processing transforms
+such as the discrete Fourier transform (DFT) and discrete cosine transformation (DCT).
 
 Electrical engineers who concentrate on DSP applications spend a large percentage of their 
-time designing an appropriate implementation for a particular design. Choosing
+time designing an appropriate implementation given a particular design. Choosing
 the appropriate implementation structure is a highly non trivial task, and sometimes determining the 
-the right choice is more of an art than a science. There are many systems that allow design choices
-to be explored, for example Matlab\cite{matlab} is a (dare we say ridiculously) widely used package 
-in both academia and in industry. There are also research projects such as \cite{covell-ade} 
+the ``right'' choice is often more of an art than a science. There are many systems that allow a
+designer to explore design choices such as Matlab\cite{matlab} which is used extensively in
+both academia and industry.  There are also research projects such as \cite{covell-ade} 
 and those described in \cite{oppenheim-symbolic} aimed at allowing a DSP designer to explore
 various implementation choices.(XXXXXXXXXXXXx -- Are there other things we should reference here?) 
 
 Given that a product called Matlab (as in  MATrix LAB) is used extensively
-in signal processing applications, it probably comes as no  that 
-matrices often provide a convenient way of working with
-digital data and describing digital filters. If we can determine that StreamIt {\tt Filter}'s
-{\tt work} function is doing matrix computation, we can take advantage of the huge body
-of knowledge in DSP and in linear algebra.
+in DSP applications, it is probably not surprising that matrices often provide 
+a convenient way of working with digital data and for describing digital filters. 
+If a {\tt work} function is doing matrix computation, by recognizing this fact
+we can take advantage of the huge body of existing knowledge.

@@ -1,7 +1,7 @@
 \section{Optimizations}
 The goal of linear analysis and combination is to allow us to do optimizations
-that are hard to formulate in imperiative languages. For example, combining the action
-of {\tt Streams} in a {\tt Pipeline} is equivalent to doing algebriaic simplification across
+that are hard to formulate in imperative languages. For example, combining the action
+of {\tt Streams} in a {\tt Pipeline} is equivalent to doing algebraic simplification across
 sequential loops. Combining the action of {\tt Streams} in a {\tt SplitJoin} is equivalent
 to combining the action of multiple inner loops of a larger enclosing loop.
 
@@ -13,7 +13,7 @@ such as implementing discrete time convolution using the discrete Fourier transf
 
 \subsection{Algebraic Simplification from Combination}
 One result of combining linear representations in {\tt Pipelines} in the stream graph is that  
-the compiler can perform algebriac simplification {\textbf across} the execution of {\tt Streams}. 
+the compiler can perform algebraic simplification {\textbf across} the execution of {\tt Streams}. 
 If the compiler simply replaces the {\tt Pipeline} structure with a {\tt Filter} that 
 directly computes the overall vector matrix product, performance can be significantly improved.
 For instance, instead of implementing a band pass filter as a back to back combination
@@ -26,7 +26,7 @@ Another example of a processing block which is implemented in a different way th
 usually represented is a FIR filter followed by a compressor block 
 (see \cite{oppenheim-discrete}) decimates the input by a factor $M$ (eg only every $M$th 
 input sample is passed on to the output filter). 
-Obviously there is no need to calcluate all of the outputs. 
+Obviously there is no need to calculate all of the outputs. 
 Instead you should only calculate every $M$th sample.
 Therefore, we end up with an FIR {\tt Filter} that pops $M$ instead of poping one. While
 this is a transformation that is certainly worth doing (it reduces the computational
@@ -34,15 +34,15 @@ requirements by a factor of $\frac{M-1}{M}$ the system is almost always represen
 as a filter followed by the compressor in system design diagrams. The inefficient
 implementation is represented because it is easier to understand the operation of the
 two fundamental processing blocks in cascade than it is to understand the combined system.
-Given the linear representations for both blcoks, when such a pipeline is combined into an
+Given the linear representations for both blocks, when such a pipeline is combined into an
 overall representation the efficient implementation is automatically derived. Therefore,
-our compiler with the lienar analysis can perform the transformation automatically, 
-letting the programmer express the system in the most natural way (seperate filter and compressor).
+our compiler with the linear analysis can perform the transformation automatically, 
+letting the programmer express the system in the most natural way (separate filter and compressor).
 
 Another example is a multi band equalizer (such as is found in the FMRadio benchmark). 
 The overall purpose of such an equalizer is to filter $N$ different frequency bands 
 separately (like the graphic equalizer found on stereos). 
-The system diagram that best describes the operation of the multiband equalizer
+The system diagram that best describes the operation of the multi band equalizer
 passes the input signal though the $N$ different filters, and then combines the $N$
 different outputs into the final output signal.
 This obvious design calls for $N$ filters, but if the filters do not vary with time, 
@@ -53,7 +53,7 @@ redesign of the overall filter. Ideally, the designer would specify the system a
 the combination of multiple filters and then let the compiler combine them. 
 This automatic combination can is exactly what happens as a result of combining
 linear representations as described above. Because the linear analysis can
-figure out what is happening across the execution of multiple sub combonents, 
+figure out what is happening across the execution of multiple sub components, 
 it can do implementation optimizations that normally must be done by hand.
 
 
@@ -106,7 +106,7 @@ will process. $y[n]$ is is the $N+M-1$ values the filter produces.
 
 Our compiler computes the complex values of $H[k]=H(e^{j\omega})|_{\omega=\frac{2{\pi}k}{L}}$, 
 the DFT of $h[n]$, at compile time. The filter is transformed 
-so that it  calcluates $X[k]=X(e^{j\omega})|_{\omega=\frac{2{\pi}k}{L}}$, the DFT 
+so that it  calculates $X[k]=X(e^{j\omega})|_{\omega=\frac{2{\pi}k}{L}}$, the DFT 
 of $x[n]$. Then it calculates $Y[k]=X[k]H[k]$, the DFT of $h[n]*x[n]$.
 Then the filter converts $Y[k]$ into $y[n]$ using the inverse DFT. Finally, 
 the appropriate values from $y[n]$ are pushed on to the output tape. The
@@ -128,7 +128,7 @@ Without going into detail, we use a simple overlap and add\cite{oppenheim-discre
 method to calculate the values of $y[n]$ for each iteration. To do so 
 we need to introduce state into our filters. If the filters did not have state
 we would have to throw out partial values each execution of the {\tt work} function
-which makes our technique much less effective. Figure~\ref{frequency-example} shows
+which makes our technique much less effective. Figure~\ref{fig:frequency-example} shows
 the basic idea of what is going on.
 
 
