@@ -180,41 +180,21 @@ intermediate results from within {\tt work}, as well as fields within
 the filter.  This scheme could apply to filters with state if all
 modifications to the state appear at the top of the pipeline (they
 could be sent over the data channels), or if changes are infrequent
-(they could be sent via StreamIt's messaging system.)
-
-\begin{verbatim}
-
-    . feedback loop into splitjoin (?? is there a case this really helps?)
-       - if all components of the loop are stateless, then can extract
-         parallel streams
-       - ?? need to define real transformation here
-
-  -> using induction variable analysis to eliminate some state
-
-  - implementation
-    . stateless duplication algorithm
-
-\end{verbatim}
+(they could be sent via StreamIt's messaging system.)  Also, some
+state can be identified as induction variables, in which case their
+values can be reconstructed from the {\tt work} function instead of
+stored as fields.
+% no space to talk about stateless feedback loop fission
 
 \subsection{Reordering Transformations}
 
-\begin{verbatim}
-
-- re-arrangement ('hoisting'? 'simplification'? 'refactoring'?)
-
-  - can sometimes change granularity of graph by re-arranging nodes
-     . eg to remove duplicate / redundant operations
-
-  - examples
-     . pushing a stateless filter through a round-robin and adjusting weights
-     . making a big split-join into a hierarchical split-join, or vice versa
-     . synchronization removal at split-joins
-
-  - can eliminate pipelines that are used only for packaging
-     . pipeline that contains a pipeline
-     . pipeline that contains only one filter
-
-\end{verbatim}
-
-
+There are a multitude of ways to reorder the elements of a stream
+graph so as to facilitate fission and fusion transformations.  For
+instance, identical stateless filters can be pushed through a splitter
+or joiner node if the weights are adjusted accordingly
+(Figure~\ref{fig:??}); a SplitJoin construct can be divided into a
+hierarchical set of SplitJoins to enable a finer granularity of fusion
+(Figure~\ref{fig:??}); neighboring splitters and joiners with matching
+weights can be eliminated (Figure~\ref{fig:??}); and nested pipelines
+can be flattened into one (Figure~\ref{fig:??}).
 
