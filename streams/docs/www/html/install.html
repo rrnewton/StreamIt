@@ -58,155 +58,130 @@
 	download, unpack the distributions in a directory of your
 	choice (e.g., <tt>tar zxvf streamit.tar.gz</tt>).
 
-	If you downloaded the source StreamIt distribution, you need to
-	build the compiler before using it. To do this, you need to
-	setup your shell enviroment, configure, and build the compiler
-	and libraries. Instructionns are provided below.<br>
-	<ul>
-	  <li><p align="justify">
-	    Review the list of
-	    <a href="../html/download-reqs.html">software
-	    requirements</a> before proceeding.
+	Before using StreamIt, you  need to setup your shell enviroment,
+	configure, and  build the compiler  and libraries. Instructionns
+	are   provided  below,  but   first  review   the  list   of  <a
+	href="../html/download-reqs.html">software       requirements</a>
+	before proceeding.
 	  </p>
-	  <li><p align="justify">
-	    If you downloaded the binary release, skip
-	    to <a href="../html/install.html#setup-binary">1b</a>.
-	  </p>
-      </ul>
 
 	<h2><hr><a name="setup-source">1a) Setting the Shell Enviroment (Source Release)</a><hr></h2>
       <p align="justify">
-	The following environment variables must be set appropriately to
-	build (and subsequently use) the StreamIt compiler.<br>
-
+	  In   order   to  compile   StreamIt,   ensure   that  the   <a
+        href="http://www-124.ibm.com/developerworks/oss/jikes">     IBM
+        Jikes  Java compiler</a>  is  installed and  can compile  Java
+        programs on  your system. Next, add the  following commands to
+        your shell startup files:<br>
+	
 	<ul>
-	  <li>If you are using bash<br>
+	  <li>If you are using bash, add the following to your <b>.bashrc</b><br>
 	  <pre>
-        ##Customize to system
+        ###Location of StreamIt
+        STREAMIT_HOME=$HOME/streams        
 
-        #Where streamit was untarred to
-        export STREAMIT_HOME=/home/quaker/streams
+        ###Location of Antlr jar
+        ANTLRJAR=/usr/share/java/antlr.jar 
 
-        #Jikes location
-        export JIKES_BIN_PATH=/usr/bin
+        ###Update CLASSPATH
+        CLASSPATH=$CLASSPATH:$ANTLRJAR     
+        CLASSPATH=$CLASSPATH:$STREAMIT_HOME/src
+        CLASSPATH=$CLASSPATH:$STREAMIT_HOME/3rdparty
+        CLASSPATH=$CLASSPATH:$STREAMIT_HOME/3rdparty/cplex/cplex.jar
 
-        #Java location
-        export JAVA_BIN_PATH=/usr/java/bin
+        ###Update the shell path
+        PATH=$PATH:$STREAMIT_HOME
 
-        #Java lib locations (where rt.jar is)
-        export JAVA_LIB_PATH=/usr/java/lib
-
-        #Antlr location (where antlr.jar is)
-        export ANTLR_LIB_PATH=/opt/antlr
-
-        ##Copy CLASSPATH as is
-        export CLASSPATH=.:${JAVA_LIB_PATH}/rt.jar:${ANTLR_LIB_PATH}/antlr.jar:${STREAMIT_HOME}/src:${STREAMIT_HOME}/3rdparty:${STREAMIT_HOME}/3rdparty/cplex/cplex.jar
-
-        ##Update the path
-        export PATH=$PATH:${STREAMIT_HOME}:${JIKES_BIN_PATH}:${JAVA_BIN_PATH}
+        export STREAMIT_HOME CLASSPATH
 	  </pre>
 
-	  <li>If you are using tcsh<br>
+	  <li>If you are using tcsh, add the following to your <b>.tcshrc</b><br>
 	  <pre>
-        ##Customize to system
+        ###Location of StreamIt
+        setenv STREAMIT_HOME $HOME/streams
 
-        #Where streamit was untarred to
-        setenv STREAMIT_HOME  /home/quaker/streams
+        ###Location of Antlr jar
+        setenv ANTLRJAR      /usr/share/java/antlr.jar
 
-        #Jikes location
-        setenv JIKES_BIN_PATH /usr/bin
+        ###Update CLASSPATH
+        setenv CLASSPATH     $CLASSPATH:${ANTLRJAR}
+        setenv CLASSPATH     $CLASSPATH:${STREAMIT_HOME}/src
+        setenv CLASSPATH     $CLASSPATH:${STREAMIT_HOME}/3rdparty
+        setenv CLASSPATH     $CLASSPATH:${STREAMIT_HOME}/3rdparty/cplex/cplex.jar
 
-        #Java location
-        setenv JAVA_BIN_PATH  /usr/java/bin
-
-        #Java lib locations (where rt.jar is)
-        setenv JAVA_LIB_PATH  /usr/java/lib
-
-        #Antlr location (where antlr.jar is)
-        setenv ANTLR_LIB_PATH /opt/antlr
-
-        ##Copy CLASSPATH as is
-        setenv CLASSPATH .:${JAVA_LIB_PATH}/rt.jar:${ANTLR_LIB_PATH}/antlr.jar:${STREAMIT_HOME}/src:${STREAMIT_HOME}/3rdparty:${STREAMIT_HOME}/3rdparty/cplex/cplex.jar
-
-        ##Update the path
-        set path = ($path ${STREAMIT_HOME} ${JIKES_BIN_PATH} ${JAVA_BIN_PATH})
-        rehash
+        ###Update the shell path
+        setenv PATH          ${PATH}:${STREAMIT_HOME}
 	  </pre>
 	</ul>
 
 	<h2><hr><a name="setup-binary">1b) Setting the Shell Enviroment (Binary Release)</a><hr></h2>
       <p align="justify">
 	  If you downloaded the binary release, setup your environment
-        as follows and then test the compiler as shown above:
+        as follows:
 
 	<ul>
-	  <li>If you are using bash<br>
+	  <li>If you are using bash, add the following to your <b>.bashrc</b><br>
 	  <pre>
-        ##Customize to system
+        ###Location of StreamIt
+        STREAMIT_HOME=$HOME/streams        
 
-        #Where streamit was untarred to
-        export STREAMIT_HOME=/home/quaker/streams
+        ###Update CLASSPATH
+        CLASSPATH=$CLASSPATH:$STREAMIT_HOME/streamit.jar
 
-        ##Copy CLASSPATH as is
-        export CLASSPATH=.:${STREAMIT_HOME}/streamit.jar
+        ###Update the shell path
+        PATH=$PATH:$STREAMIT_HOME
 
-        ##Update the path
-        export PATH=$PATH:${STREAMIT_HOME}
+        export STREAMIT_HOME CLASSPATH
 	  </pre>
 
-	  <li>If you are using tcsh<br>
+	  <li>If you are using tcsh, add the following to your <b>.tcshrc</b><br>
 	  <pre>
-        ##Customize to system
+        ###Location of StreamIt
+        setenv STREAMIT_HOME $HOME/streams
 
-        #Where streamit was untarred to
-        setenv STREAMIT_HOME  /home/quaker/streams
+        ###Update CLASSPATH
+        setenv CLASSPATH     $CLASSPATH:${STREAMIT_HOME}/streamit.jar
 
-        ##Copy CLASSPATH as is
-        setenv CLASSPATH .:${STREAMIT_HOME}/streamit.jar
-
-        ##Update the path
-        set path = ($path ${STREAMIT_HOME})
-        rehash
+        ###Update the shell path
+        setenv PATH          ${PATH}:${STREAMIT_HOME}
 	  </pre>
 	</ul>
 
-<!--
-	<h2><hr><a name="2">2) Re-source Startup Scripts (Source and Binary)</a><hr></h2>
+	<h2><hr><a name="resource">2) Re-source Shell Startup Files</a><hr></h2>
       <p align="justify">
-        Re-source startup scripts or relogin to register changes to shell environment.
--->
+        Re-source  your  shell startup  file  or  relogin to  register
+        changes to your shell environment.
+      </p>
 
-	<h2><hr><a name="config">2a) Configuring the Compiler (Source and Binary)</a><hr></h2>
+	<h2><hr><a name="config">3) Configuring the Compiler</a><hr></h2>
       <p align="justify">
-        An     autoconfiguration     script     is    available     in
-        ${STREAMIT_HOME}.  To  configure the compiler,  launch the
-        script from the top level StreamIt directory as follows:
-
+        An autoconfiguration script  is available in $STREAMIT_HOME.
+        To  configure the  compiler, launch  the script  from  the top
+        level StreamIt directory as follows:
+      </p>
 	<ul>
 	  <pre>
-        cd ${STREAMIT_HOME}
+        cd $STREAMIT_HOME
         ./configure
 	  </pre>
       </ul>
-        If you downloaded the binary release, skip
-          to <a href="../html/install.html#test">3</a>.
 
-	<h2><hr><a name="build">2b) Building the StreamIt Compiler (Source)</a><hr></h2>
+	<h2><hr><a name="build">4) Building the StreamIt Compiler</a><hr></h2>
       <p align="justify">
-        Once your system is configured, compile StreamIt as follows:
-
+        Once  your system  is  configured, build  StreamIt as  follows
+        (this is required for the binary release as well):
+      </p>
 	<ul>
 	  <pre>
-        cd ${STREAMIT_HOME}
+        cd $STREAMIT_HOME
         make
 	  </pre>
       </ul>
 
-
-	<h2><hr><a name="test">3) Testing the StreamIt Compiler (Source and Binary)</a><hr></h2>
+	<h2><hr><a name="test">5) Testing the StreamIt Compiler</a><hr></h2>
       <p align="justify">
         Once your system is built, run the following simple test
         (remember to <a href="../html/install.html#setup-source">setup you environment</a>):
+      </p>
 
 	<ul>
 	  <pre>
