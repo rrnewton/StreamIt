@@ -1,25 +1,25 @@
 class Butterfly extends Stream {
-      void init(int N) {
+      void init(int N, int W) {
          add(new SplitJoin() {
 	    void init() {
-	       weighted_splitter(N, N);
+	       weighted_round_robin(N, N);
                add (new Identity());
 	       add (new Filter() {
-	         Complex weights[N];
+	         Complex weights[W];
 		 int curr;
 	         Channel input = new ComplexChannel();
 	         Channel output = new ComplexChannel();
 		 void init() {
-		    for(int i=0; i<N; i++)
-		      weights[i] = ...;
+		    for(int i=0; i<W; i++)
+		      weights[i] = calc_weight(i, N, W);
 		    curr = 0;
 		 }
 		 void work() {
 		    output.push(input.pop()*weights[curr++]);
-		    if(curr>= N) curr = 0;
+		    if(curr>= W) curr = 0;
 		}    
 	       })
-	       weighted_joiner(1, 1)      
+	       round_robin();
 	    }});
 	 add(new SplitJoin() {
 	    void init() {
@@ -38,49 +38,27 @@ class Butterfly extends Stream {
 		    putput.push(input.pop() - input.pop());
 		 }
                })
-	       weighted_joiner(N, N);
+	       weighted_round_robin(N, N);
          }})      
       }
 }
 
 class FFT extends Stream {
    void init(int N) {
+      add(new SplitJoin() {
+         void init() {
+            weighted_round_robin(N/2, N/2);
+            for(int i=0; i<2; i++) 
+               add(new SplitJoin() {
+                  void init() {
+                     round_robin();
+                     add (new Identity());
+                     add (new Identity());
+                     weighted_round_robin(N/4, N/4);
+               }});
+            round_robin();
+      }});
       for(int i=2; i<=N/2; i *= 2)
-        add(new Butterfly(i));
-   }
-}
--------------------
-class Butterfly extends Stream {
-         add(new SplitJoin(weighted_round_robin(N,N), round_robin) {
-	       weighted_splitter(N, N);
-               add (new Identity());
-	       add (new Filter() {
-	         Complex weights[N];
-		 int curr;
-		    for(int i=0; i<N; i++)
-		      weights[i] = ...;
-		    curr = 0;
-		 void work() {
-		    output.push(input.pop()*weights[curr++]);
-		    if(curr>= N) curr = 0;
-		}    
-	    }});
-	 add(new SplitJoin(duplicate, weighted_round_robin(N,N)) {
-	       add (new Filter() {   
-		 void work() {
-		    putput.push(input.pop() + input.pop());
-		 }
-	       add (new Filter() {   
-		 void work() {
-		    putput.push(input.pop() - input.pop());
-		 }
-               })
-      }
-}
-
-class FFT extends Stream {
-   void init(int N) {
-      for(int i=2; i<=N/2; i *= 2)
-        add(new Butterfly(i));
+        add(new Butterfly(i, N));
    }
 }
