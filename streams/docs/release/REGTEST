@@ -13,7 +13,7 @@ Execution Time: 250.70325 minutes.
 Summary: There were 30 failures:
 
 
-30 Failures (see log file for details)
+21 Failures (see log file for details)
 -------------------------------
 Compile /apps/applications/crc/streamit/CrcEncoder32Test.java 
    --streamit --fusion
@@ -23,10 +23,6 @@ Compile /apps/applications/mp3decoder/LinkedMP3Simple.java
 Compile /apps/benchmarks/beamformer/streamit/CoarseBeamFormer.java 
    --streamit --partition --raw 4
 Compile /apps/benchmarks/bitonic-sort/streamit/BitonicSortRecursive.java 
-   --streamit
-   --streamit --fusion
-   --streamit --partition --raw 4
-Compile /apps/benchmarks/cfar/streamit/CFARtest.java 
    --streamit
    --streamit --fusion
    --streamit --partition --raw 4
@@ -44,16 +40,8 @@ Compile /apps/examples/file/FileTest.java
    --streamit --fusion
 Compile /apps/examples/lattice/Lattice.java 
    --streamit --fusion
-Compile /apps/examples/mergesort/MergeSort.java 
-   --streamit
-   --streamit --fusion
-   --streamit --partition --raw 4
 Compile /apps/tests/arraytest/ArrayTest.java 
    --streamit
-   --streamit --partition --raw 4
-Compile /apps/tests/recursive/Recursive.java 
-   --streamit
-   --streamit --fusion
    --streamit --partition --raw 4
 Executing /apps/benchmarks/gsm/streamit/Gsm.java 
    --streamit
@@ -65,7 +53,7 @@ Verify output /apps/examples/matrixmult/MatrixMult.java
    --streamit --fusion
 
 
-368 Successes (see log file for details)
+374 Successes (see log file for details)
 -------------------------------
 Compile /apps/applications/crc/streamit/CrcEncoder32Test.java 
    --streamit 
@@ -156,6 +144,10 @@ Compile /apps/examples/lattice/Lattice.java
 Compile /apps/examples/matrixmult/MatrixMult.java 
    --streamit 
    --streamit --fusion 
+Compile /apps/examples/mergesort/MergeSort.java 
+   --streamit
+   --streamit --fusion
+   --streamit --partition --raw 4
 Compile /apps/examples/vectadd/VectAdd.java 
    --streamit 
    --streamit --fusion 
@@ -218,6 +210,10 @@ Compile /apps/tests/peek-pipe/PeekPipe.java
    --streamit 
    --streamit --fusion 
    --streamit --partition --raw 4 
+Compile /apps/tests/recursive/Recursive.java 
+   --streamit
+   --streamit --fusion
+   --streamit --partition --raw 4
 Compile /apps/tests/simple-split/SimpleSplit.java 
    --streamit 
    --streamit --fusion 
