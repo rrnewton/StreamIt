@@ -8,7 +8,7 @@
 \setcounter{section}{0}
 
 \begin{center}
-{\bf APPENDIX:  Details on Java Syntax}
+{\bf APPENDIX:  Details on Java Syntax \\ ***DRAFT***}
 \end{center}
 
 \section{Java Classes}
@@ -127,13 +127,6 @@ region into the drain, so the {\tt drain} function is invoked instead
 to fabricate data.  The {\tt drain} function is successively called
 with indices 0, 1, 2, $\dots$ until the downstream region has drained.
 
-\subsection{SplitJoinType}
-
-A {\tt SplitJoinType} represents a compiler-defined configuration for
-the splitter or joiner in a SplitJoin.  For now, the user cannot
-define custom {\tt SplitJoinType}'s, and the only ones available are
-those that are constant fields in {\tt StreamObject}.
-
 \subsection{SplitJoin extends Stream}
 
 \subsubsection{Methods}
@@ -165,6 +158,13 @@ return their argument.  Each of them must be called from within the
 \doc{<varying type> initPath(int index)}  The {\tt initPath} function provides inputs to the joiner at the head of the feedback loop during the initialization period when there are no items on the channels around the loop.  The function is called with the number of the item that is being requested, starting from 0.
 
 \doc{void setDelay(int delay)}  The {\tt setDelay} function specifies how many times the {\tt initPath} function is invoked before the joiner starts drawing input items from the feedback channel.
+
+\subsection{SplitJoinType}
+
+A {\tt SplitJoinType} represents a compiler-defined configuration for
+the splitter or joiner in a SplitJoin.  For now, the user cannot
+define custom {\tt SplitJoinType}'s, and the only ones available are
+those that are constant fields in {\tt StreamObject}.
 
 \subsection{Channel}
 
@@ -206,7 +206,7 @@ the upper and lower time limits for a message delivery.
 
 \doc{TimeInterval(int minTime, int maxTime)}  This constructs a time interval with minimum delivery time {\tt minTime} and maximum delivery time {\tt maxTime}.  The units of time are according to relative information wavefronts as described in the paper.
 
-\section{Semantic restrictions}
+\section{Semantic checking}
 
 \subsection{Java restrictions}
 \label{sec:javarestrict}
@@ -250,6 +250,8 @@ until a future paper.
 
 \item A given instance of a stream or filter must not appear more than
 once in the stream graph.
+
+\item A message handler 
 
 \item There must be no deadlock or buffer overflow in the program.  We
 have developed a simple algorithm to verify that feedback loops and
