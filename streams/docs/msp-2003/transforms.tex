@@ -1,17 +1,144 @@
 \section{Graph Transformations}
 \label{sec:transforms}
 
-We have developed a large suite of graph transformations that can be
-used to adjust the hierarchy and communication patterns of a
-structured stream graph.  These transformations--which include filter
-fusion, filter fission, horizontal cuts, vertical cuts, and aggressive
-synchronization removal--serve two distinct purposes.  Firstly, they
-provide a means of deriving a canonical form: a program representation
-that is insensitive to changes in the source code and is easily
-analyzed by the compiler (for example, the hierarchical ragged arrays
-of the partitioner).  Secondly, they serve as the implementation
-mechanism by which the compiler arrives at an efficient executable
-once it has analyzed the canonical form (for example, the
-partitioner's traceback function).  In our final paper, we will
-describe these transformations in detail, as well as their role in the
-structured partitioning algorithm.
+In this section we present a set of flexible transformations that can
+be used to adjust the hierarchy and communication patterns of a
+structured stream graph.  These transformations serve two purposes.
+Firstly, they provide a means of deriving a canonical form: a program
+representation that is insensitive to changes in the source code and
+is easily analyzed by the compiler (for example, the hierarchical
+ragged arrays of the partitioner).  Secondly, they serve as the
+implementation mechanism by which the compiler arrives at an efficient
+executable once it has analyzed the canonical form (for example, the
+partitioner's traceback function).
+
+Thus, we consider the transformations in pairs, each of which
+represents a step in the opposite direction with respect to the
+partitioner's representation.  After describing the transformations,
+we describe the sequence in which they are employed when interfacing
+to and from the partitioner.
+
+\subsection{Vertical Cut Transformations}
+
+The vertical cut transforms effect the distribution of parallel
+streams across a hierarchy of splitjoin constructs (see
+Figures~\ref{code:vert} and~\ref{ex:vert}).  The {\tt lowerChildren}
+transform can factor any adjacent subset of a splitjoin's children
+into a new splitjoin, which becomes a child of the original.  This is
+a simple matter of re-arranging the weights in the splitters and
+joiners.  It qualifies as a ``vertical cut'' transform because two
+adjacent applications can divide a splitjoin with a vertical line.
+
+The {\tt raiseChildren} transform will reverse the effect of any {\tt
+lowerChildren} transform.  However, independent applications of this
+transform are comparably rare: as detailed in the pseudocode, a child
+can only be raised if its splitter type matches that of its parent,
+and if the sums of its split and join weights match the corresponding
+slots in the parent.
+
+\subsection{Horizontal Cut Transformations}
+
+The horizontal cut transforms are capable of transforming between a
+splitjoin and a pipeline of splitjoins (see Figures~\ref{code:horiz}
+and~\ref{ex:horiz}).  The {\tt addMatchingSyncPoints} transformation
+inputs a rectangular splitjoin--one with pipeline children that have
+equal lengths--and factors them into a sequence of splitjoins with
+children that have unit length.  For the purpose of program analysis,
+any splitjoin can be made rectangular by extending its shorter streams
+with {\tt Identity} filters (a pre-defined node in StreamIt.)  Like an
+hourglass, this transformation has the effect of squeezing a splitjoin
+together at points of synchronization.
+
+The {\tt removeMatchingSyncPoints} transformations directly implements
+the inverse of {\tt addMatchingSyncPoints} via a simple re-arrangement
+of weights.  Though very simple, this transformation can apply in
+practice on interface boundaries where compound data streams are being
+interleaved at a static rate.
+
+A more aggressive transformation for synchronization removal is {\tt
+removeStructuredSyncPoints} (see Figures~\ref{code:sync}
+and~\ref{ex:sync}).  This algorithm removes not only synchronization
+points with exactly matching weights, but it also expands any
+join/split pair where the set of incoming and outgoing streams can be
+partitioned such that no data item is passed between members of
+different partitions during a steady-state execution.  The only
+disadvantage of this transformation over {\tt
+removeMatchingSyncPoints} is that it has the potential to introduce
+non-adjacent joiners, which in the StreamIt compiler requires
+additional processor resources.  However, like all transformations
+described in this paper, the output of {\tt
+removeStructuredSyncPoints} is still a structured graph (as the name
+would suggest).
+
+We have also implemented horizontal cut transforms for pipelines,
+which consist simply of adding or removing a wrapper pipeline around a
+sub-segment of the stream.  This is very straightforward (requiring no
+change of weights or rates) so we omit the details here.
+
+\subsection{Fusion and Fission Transformations}
+
+Filter fusion describes a transform where several adjacent filters are
+combined into one, while filter fission refers to the parallelization
+of a filter via conversion to a splitjoin or pipeline.  These
+transformations are at the heart of the load balancing partitioner
+described in this paper.  A detailed description of fusion, fission,
+and other intra-node transformations are described
+in~\cite{streamit-asplos}; we restrict our attention to graph-level
+transformations in this paper.
+
+\subsection{Transforming to Partitioner's Representation}
+
+To build the hierarchical arrays required by the partitioner, the
+following transformations are applied, starting from the leaf nodes
+and propagating upward through the stream:
+\begin{itemize}
+
+\item {\tt raiseChildren} and {\tt removeStructuredSyncPoints}
+wherever possible.
+
+\item {\tt removeMatchingSyncPoints} wherever possible.
+
+\item Convert all non-rectangular splitjoins to rectangular ones by
+extending their shorter child pipelines with Identity filters.
+
+\item {\tt addMatchingSyncPoints} on all splitjoins.
+\end{itemize}
+
+The last step above will have the effect of replacing every splitjoin
+with a pipeline of unit-length splitjoin constructs.  This pipeline is
+exactly the representation that is sent to the partitioner; the width
+of row {\tt y} is the width of the splitjoin at that location.  
+
+\subsection{Transforming from Partitioner's Representation}
+
+The traceback function is what calculates the sequence of
+transformations needed to transform from the partitioner's
+representation to the load-balanced set of partitions for program
+execution.  In Figure~\ref{code:trace}, the points corresponding to a
+vertical and horizontal cut are where traceback recurses after finding
+the optimal {\tt xPivot} (for vertical cut) or {\tt yPivot} for
+horizontal cut.  In our implementation, these cuts are recorded during
+traceback, and then replayed on the stream graph at a later time.  The
+only extra step to take is that synchronization must be removed before
+any vertical cut is applied.
+
+An example of the conversion to and from the partitioner's
+representation appears in Figure~\ref{fig:trans}.
+
+%% \section{Graph Transformations}
+%% \label{sec:transforms}
+
+%% We have developed a large suite of graph transformations that can be
+%% used to adjust the hierarchy and communication patterns of a
+%% structured stream graph.  These transformations--which include filter
+%% fusion, filter fission, horizontal cuts, vertical cuts, and aggressive
+%% synchronization removal--serve two distinct purposes.  Firstly, they
+%% provide a means of deriving a canonical form: a program representation
+%% that is insensitive to changes in the source code and is easily
+%% analyzed by the compiler (for example, the hierarchical ragged arrays
+%% of the partitioner).  Secondly, they serve as the implementation
+%% mechanism by which the compiler arrives at an efficient executable
+%% once it has analyzed the canonical form (for example, the
+%% partitioner's traceback function).  In our final paper, we will
+%% describe these transformations in detail, as well as their role in the
+%% structured partitioning algorithm.

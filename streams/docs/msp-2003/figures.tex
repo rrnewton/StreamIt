@@ -6,3 +6,108 @@
       \protect\label{code:partition}}
       \end{center}
   \end{figure*}
+
+\clearpage
+  \begin{figure*}[t]
+\begin{center}
+\begin{minipage}{6.5in}
+\begin{center}
+    \begin{tabular}{cc}
+%      \begin{minipage}{6in}
+	\psfig{figure=filterbank1.eps,width=2.5in} %dp-before
+	(a) &
+	\psfig{figure=filterbank2.eps,width=1.9in} %dp-during
+	(b) \\
+%	\psfig{figure=filterbank3.eps,width=2in} %dp-partitions
+%	(c)
+%      \end{minipage}
+    \end{tabular}
+
+\vspace{0.3in}
+
+    \begin{tabular}{cc}
+
+%      \begin{minipage}{6in}
+	\psfig{figure=filterbank4.eps,width=2.5in} %dp-after
+	(c) &
+	\psfig{figure=filterbank5.eps,width=1.9in} %greedy-after
+	(d)
+%      \end{minipage}
+      %    \psfig{figure=filterbank6.eps,width=2.5in} %work-before
+    \end{tabular}
+\end{center}
+\end{minipage}
+\end{center}
+
+    \caption{While compiling FilterBank to 16 partitions, this shows
+    the transitions from (a) the original program, as written by the
+    programmer, to (b) the representation used by the partitioner, to
+    (c) the final partitioning.  On this benchmark, the dynamic
+    programming partitioner demonstrates a 176\% improvement over the
+    greedy partitioner, whose final partitioning appears in
+    (d). \protect\label{fig:trans}}
+  \end{figure*}
+
+  \clearpage
+  \begin{figure}[t]
+    \psfig{figure=algorithm4.eps,width=3.3in}
+    \caption{Vertical cut algorithms.
+    \protect\label{code:vert}}
+  \end{figure}
+  \begin{figure}[t]
+\centering
+    \psfig{figure=refactor1.eps,width=2in}
+    \psfig{figure=refactor2.eps,width=2in}
+    \caption{Vertical cut example.
+    \protect\label{ex:vert}}
+  \end{figure}
+  
+  \clearpage
+  \begin{figure}[t]
+    \psfig{figure=algorithm5.eps,width=3.5in}
+    \caption{Horizontal cut algorithms.
+    \protect\label{code:horiz}}
+  \end{figure}
+  \begin{figure}[h]
+\centering
+\begin{minipage}{3in}
+\begin{center}
+\begin{tabular}{c}
+    \psfig{figure=matchsync1.eps,width=2in}
+\end{tabular}
+
+\vspace{0.2in}
+
+\begin{tabular}{c}
+    \psfig{figure=matchsync2.eps,width=2in}
+\end{tabular}
+\end{center}
+\end{minipage}
+    \caption{Horizontal cut example.
+      \protect\label{ex:horiz}}
+  \end{figure}
+
+\clearpage
+  \begin{figure}[t]
+    \psfig{figure=algorithm6.eps,width=3.5in}
+    \caption{Aggressive synchronization removal.
+    \protect\label{code:sync}}
+  \end{figure}
+  \begin{figure}[h]
+\centering
+\begin{minipage}{3in}
+\begin{center}
+\begin{tabular}{c}
+    \psfig{figure=sync1.eps,width=2in}
+\end{tabular}
+
+\vspace{0.2in}
+
+\begin{tabular}{c}
+    \psfig{figure=sync2.eps,width=2in}
+\end{tabular}
+\end{center}
+\end{minipage}
+    \caption{Example of synchronization removal.
+    \protect\label{ex:sync}}
+  \end{figure}

@@ -1,35 +1,30 @@
-\documentclass[10pt]{article}
-\usepackage{doublespace}
-\setstretch{1.5}
+\documentclass{acm_proc_article-sp}
 \usepackage{amsmath}
-\usepackage{fullpage}
 \usepackage{epsfig}
 \usepackage{algorithm}
 \usepackage{algorithmic}
 
-\title{Partitioning a Structured Stream Graph \\ Using Dynamic Programming}
+\title{Partitioning a Structured Stream Graph \\ Using Dynamic Programming \\ ~ \\ DRAFT - PLEASE DO NOT DISTRIBUTE \vspace{-12pt}}
 
 \author{William Thies, Jasper Lin and Saman Amarasinghe \\
   MIT Computer Science and Artificial Intelligence Laboratory\\
-  Cambridge, MA  02139\\ \\
-  \texttt{\symbol{`\{}thies, jasperln, saman\symbol{`\}}@csail.mit.edu}}
+  \texttt{\symbol{`\{}thies, jasperln, saman\symbol{`\}}@csail.mit.edu} \\
+  ~ \\
+  November, 2003}
 
 \date{}
 
 \begin{document}
 
   \newtheorem{definition}{Definition}
-  \newtheorem{transformation}{Transformation}
   \newcommand{\mt}[1]{\mbox{\it #1}}
   \newcommand{\todo}[1]{\framebox{\bf #1}}
   
-\begin{singlespace}
   \maketitle
   
   \begin{abstract}
     \input{abstract}
   \end{abstract}
-\end{singlespace}
 
   \input{intro}
   \input{language}
@@ -42,12 +37,10 @@
   \input{conclusion}
   % Bibliography -- whee!
 
-\begin{singlespace}
   \small
   \vspace{-8pt}
   \bibliographystyle{abbrv}
   \bibliography{references}
-\end{singlespace}
 
 \input{figures}
   

@@ -23,10 +23,9 @@ The goal is to produce a mapping $\mt{map}$ from nodes to partitions
 that minimizes the cost of the bottleneck node {\it while maintaining
 a structured stream graph}.  Formally, this could be posed as:
 
-\begin{singlespace}
 \begin{center}
   \framebox{
-  \begin{minipage}{6in}
+  \begin{minipage}{3in}
     {\bf Minimize} $MAX_{i}  (\sum_{d~s.t.~map(d)=i\}} d.work)$
     ~~~Subject to:
     \begin{enumerate}
@@ -46,7 +45,6 @@ a structured stream graph}.  Formally, this could be posed as:
     \end{enumerate}
   \end{minipage}}
 \end{center}
-\end{singlespace}
 
 Of course, it is difficult to infer whether condition (2) holds above,
 as there are a large (if not infinite) number of possible

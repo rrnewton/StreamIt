@@ -1,0 +1,35 @@
+x simulatework issues (breaks fm)
+- understand mergesort, lattice, beamformer, filterbank
+- try some much bigger apps?
+- gathering bitonic numbers without printer
+
+- finish implementing identity support (not for paper)
+- updating "2" versions of apps in CVS
+
+--------------------------
+
+need 5.5 more pages
+
+in paper:
+---------
+- talk about graph restructuring algorithms (1)
+  - make pseudocode out of all the cutting things (2)
+  - format the graphs
+- examples of why greedy does bad (0.5)
+  - in pipeline
+  - in splitjoin
+- speedup graphs of performance vs. number of tiles (1)
+- example of greedy vs. dynamic programming partitioning (filterbank) (1)
+
+implementation:
+---------------
+* implementing other algorithm for greedy partitioning (jasper)
+* get final set of numbers
+
+other research things:
+-----------------------
+- effect of symmetry optimization on compile time?
+- linear fission?
+- scaling results as we go past 256?
+- magic network?
+- different optimization levels?  simulatework?
