@@ -175,7 +175,7 @@ frequency code over the direct code, the filter has to peek $50*n$
 items.  Mathematically, this translates to a logarithmic expression
 for the cost of the frequency node in terms of the number of items $e$
 (we actually use the next power of two above $e$, as that is the size
-of the FFT).  We multiply the above cost by the numer of items pushed,
+of the FFT).  We multiply the above cost by the number of items pushed,
 add the constant offset of $100+2u$ for a node, and then multiply by
 $\mt{max}(o, 1)$ because only one out of $o$ items represents a valid
 output from the frequency domain.  Finally, we add $\mt{dec}(s)$, the

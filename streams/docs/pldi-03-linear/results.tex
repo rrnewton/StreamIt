@@ -15,7 +15,7 @@
 \small
 \begin{tabular}{|l|c|c|c||c||c|c|c|} 
 \hline
-& \multicolumn{3}{|c||}{Originally}  &             & \multicolumn{3}{|c|}{After Optimizations (using Automatic Selection)} \\
+& \multicolumn{3}{|c||}{Originally}  &             & \multicolumn{3}{|c|}{After Optimizations} \\
 \hline
 Benchmark  & Filters & Pipelines& SplitJoins & Average     & Filters      & Pipelines         & SplitJoins \\
            & (linear)& (linear) & (linear)   & vector size &              &                   &            \\
@@ -40,7 +40,7 @@ DToA       & 14 (10) & 3 (1)    & 0 (0)      & 52          & 7            & 2   
 \hline
 \end{tabular}
 \vspace{-3pt}
-\caption{Statistics for benchmarks before and after optimizations.
+\caption{Statistics for benchmarks before and after running optimizations with automatic selection.
 \protect\label{fig:benchmark-statistics}}
 \makeline
 \vspace{-8pt}
@@ -176,7 +176,7 @@ using linear replacement instead of frequency replacement for part of
 the stream graph.  However, linear replacement does reduce performance
 for FIR, TargetDetect, and DToA despite reducing the number of FLOPS.
 We believe that this is due to inefficiencies in our implementation of
-the matrix multiplication routine, as well as auxillary effects on the
+the matrix multiplication routine, as well as auxiliary effects on the
 runtime overhead in the StreamIt library.  If we use the machine-tuned
 ATLAS library for the matrix multiply~\cite{whaley01automated},
 performance for the linear replacement optimization varies widely:
