@@ -24,7 +24,7 @@ tradeoff between throughput and latency, or code size and data size,
 such that the optimality of a stream program depends on the metric of
 interest.
 
-\subsection{Fusion}
+\subsection{Fusion Transformations}
 
 A primary stream optimization is the fusion of multiple filters and
 streams into a single atomic unit.  This can be beneficial for
@@ -49,14 +49,13 @@ Merge[(S~s1~\dots&~sn~J)] = (Filter~push_{sc}~pop_{sc}~peek_{sc}~work_{sc}) \\
 where: {\bf push_{sc}} &= totalRounds * W \\
        {\bf pop_{sc}} &= totalPop ~~~~~~~~~if~S~=~WeightedRR \\
                 &= totalPop / n ~~~~~if~S~=~Duplicate \\
-       {\bf peek_{sc}} &= MAX_{j \in [1,push_{sc}]}(shift(peek_{sj}, j)) \\
+       {\bf peek_{sc}} &= MAX_{j \in [1,push_{sc}]}(shift_j(peek_{sj})) \\
        {\bf work_{sc}} &= f_{sc, 1} \dots f_{sc, push_{sc}} \\
        totalRounds &= lcm(lcm(push_{s1}, w_1), \dots, lcm(push_{sn},
        w_n)) \\
-       rounds_i &= totalRounds * w_i  / push_{si} \\
-       totalPop &= \sum_{i=1}^{n}(rounds_i*pop_i) \\
-       shift(x, j) &= \mi{I_S}{I_{sj}}(g(i_{local})+ \\ &~~~~~(\mi{I_{sj}}{O_{sj}} \circ \mi{O_{sj}}{O_J})(j)-peek_{sj}) \\
-       f_{sc, j} &= g \ra f_{s~p(j)}(i_{local} \ra shift(g(i_{local}, j)))
+       totalPop &= \sum_{i=1}^{n}(totalRounds * w_i *pop_i / push_{si}) \\
+       shift_j(x) &= \mi{I_S}{I_{sj}}(g(i_{local})+ \\ &~~~~~(\mi{I_{sj}}{O_{sj}} \circ \mi{O_{sj}}{O_J})(j)-peek_{sj}) \\
+       f_{sc, j} &= g \ra f_{s~p(j)}(i_{local} \ra shift_j(g(i_{local})))
 \end{align*}
 We have proven that this transformation preserves the meaning of the
 program with respect to our transform algebra for the case when $n = 2$,
@@ -64,16 +63,54 @@ $w_1 = w_2 = 1$, and $S$ is a duplicate splitter.  The proof is by
 straightforward algebra, but we omit it due to space constraints; we
 expect that the general proof is also straightforward.
 
-\subsection{Fission}
+\subsection{Fission Transformations}
 
-filter fission with state propagation
-fission of a feedback loop
+It might also be advantageous to break filters up into smaller pieces if
+the machine target is more fine-grained than the stream graph.  We
+propose three fission transformations:
+\begin{enumerate}
+\item {\bf Parallelizing stateless filters.}  If a filter has no state,
+  then we can gain task parallelism by duplicating the filter $n$ times
+  and embedding it in an $n$-way SplitJoin with a round robin splitter
+  and joiner.
+\item {\bf Parallelizing stateless feedback loops.}  If the body of a
+  feedback loop is stateless [then with more conditions on peek/pop/push
+  ratios, you can duplicate it and shrink the delay... do we have space
+  to explain this?]
+\item {\bf Splitting stateful filters.}  If a filter has persistent
+  state, we can still gain pipeline parallelism by breaking the the
+  filter into an $n$-stage pipeline in which the state is communicated
+  through the data channels.
+\end{enumerate}
 
-\subsection{Steady-state Invariant code motion}
+\subsection{Steady-State Invariant Code Motion}
 
-steady-state invariant code motion
+In the streaming domain, the analog of loop-invariant code motion is the
+motion of code from the steady-state {\tt work} function to the {\tt
+init} function if it does not depend on any quantity that is changing
+during the steady-state execution of a filter.  Quantities that the
+compiler detects to be constant during the execution of {\tt work} can
+be assigned to fields in the {\tt init} function and then referenced
+from {\tt work}.
 
-\subsection{Decimation Removal}
+\subsection{Decimation Propagation}
+
+Decimation refers to the regular discarding of a fraction of a filter's
+input items, perhaps to reduce the sampling rate in a stream.  In the
+streaming domain, the analog of dead code elimination is the propagation
+of this decimation up through the stream graph, thereby eliminating the
+computations that produce the unused items.  [give some formula's?]
+
+\subsection{Synchronization Removal}
+
+In a StreamIt graph, the SplitJoin construct allows a way to define
+independent units of parallel computation.  However, when two SplitJoins
+$s_1$ and $s_2$ are connected in a pipeline, there is a joiner/splitter
+pair that serializes all of the items passing from $s_1$ to $s_2$.  If
+the joiner of $s_1$ and the splitter of $s_2$ are both round robins with
+equal weights, then this node can be eliminated in favor of a single
+SplitJoin $s_c$ with the $i$'th parallel stream in $s_c$ is a pipeline
+of the corresponding streams in $s_1$ and $s_2$.  [model with language!]
 
 \subsection{Data Parallelization}
 
