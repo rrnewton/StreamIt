@@ -34,3 +34,5 @@ Compiler / Runtime System
 	its children, and only after they're all done, it creates the tapes
 	that connect these children.
 
+10/23/01 The methods in a portal cannot be overloaded.  That is, there is
+	only one method with a given name in each portal.
