@@ -19,9 +19,9 @@ There are many results of scheduling {\SDF} programs
 requirements. Many of the systems inline all actor code into a single
 function, and try to minimize the code and buffer size at once
 \cite{bhattacharyya99synthesis}.  This approach leads to a strong
-preference for single appearance schedules.  The {\StreamIt} scheduler
-stores the schedule and {\filter} code separately, thus allowing for
-more efficient schedule storage.
+preference for single appearance schedules.  In this paper we assume
+that the schedule and filter code are stored separately to allow for a
+compact representation of non-single appearance schedules.
 
 Other publications focus on synthesis of software for embedded
 systems. \cite{bhat1999x1} recognizes that non single-appearance

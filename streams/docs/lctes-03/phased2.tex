@@ -44,7 +44,8 @@ by collapsing some of these fine-grained phases together and shuffling
 the resulting schedule so that the phases of a given child stream are
 all adjacent.  As we demonstrate below, a single appearance schedule
 and minimum latency schedule are both special cases of a parameterized
-phased schedule.
+phased schedule.  For a more mathematical description of the phased
+scheduling technique, see~\cite{karczma-thesis}.
 
 \subsection{Algorithm Details}
 
@@ -246,14 +247,25 @@ sequence of phases for child nodes.  However, since this
 representation can become large for some programs, our implementation
 employs compression to keep code size to a minimum.  
 
-We compress the schedule in three simple ways.  First, if a sequence
-of child phases occurs more than once during the exection of a parent
-node, then we denote this sequence by a new symbol and use the symbol
-in place of the sequence.  Second, if a given child phase is only used
-once in all executions of its parent, then its contents can be lifted
-into the parent (thereby eliminating a symbolic name.)  Finally, if
-there are adjacent invocations of the same phase, then we can run
-length encode the schedule and execute that phase in a loop.
+We compress the schedule in three simple ways.  First, we collect
+repetition of identical phases into a loop.  For example, if {\tt A}
+is a phase:
+\[
+\mbox{{\tt A=BBB}} ~\rightarrow~ \mbox{{\tt A=\{3B\}}}
+\]
+Second, if a hierarchical phase contains only one execution of a
+child, then we substitute all occurrences of the parent with a direct
+call to the child:
+\[
+\mbox{{\tt A=BCD, C=E}} ~\rightarrow~ \mbox{{\tt A=BED}}
+\]
+Finally, if a phase is used only once, then it can be replaced by its
+child phases, even if there are multiple children:
+\[
+\mbox{{\tt A=BCD, C=EFG, C}}~\mt{used}~\mt{only}~\mt{once}~ ~\rightarrow~ \mbox{{\tt A=BEFGD}}
+\]
+To improve the compression of the schedule, we repeatedly apply the
+above three transformations until no further changes can be made.
 
 %% During testing it was found that in some applications some operators
 %% had many phases that were identical to other phases of the
