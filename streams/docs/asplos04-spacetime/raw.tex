@@ -1,0 +1,76 @@
+\section{The Raw Architecture}
+\label{sec:raw}
+
+The Raw Microprocessor \cite{raw10,raw} addresses the wire delay
+problem \cite{raw13} by providing direct instruction set architecture
+(ISA) analogs to three underlying physical resources of the processor:
+gates, wires and pins. Because ISA primitives exist for these
+resources, a compiler such as StreamIt has direct control over both
+the computation and the communication of values between the functional
+units of the microprocessor, as well as across the pins of the
+processor.
+
+The architecture exposes the gate resources as a scalable 2-D array of
+identical, programmable tiles, that are connected to their immediate
+neighbors by four on-chip networks.  Each network is 32-bit,
+full-duplex, flow-controlled and point-to-point. On the edges of the
+array, these networks are connected via logical channels \cite{raw11}
+to the pins.  Thus, values routed through the networks off of the side
+of the array appear on the pins, and values placed on the pins by
+external devices (for example, wide-word A/Ds, DRAMS, video streams
+and PCI-X buses) will appear on the networks.
+
+\begin{figure}[t]
+\centering
+\psfig{figure=raw-diagram.eps,width=3.2in}
+\caption{\protect\small Block diagram of the Raw architecture.
+\protect\label{fig:raw-diagram}}
+\vspace{-12pt}
+\end{figure}
+
+Each of the tiles contains a compute processor, some memory and two
+types of routers--one static, one dynamic--that control the flow of
+data over the networks as well as into the compute processor (see
+Figure \ref{fig:raw-diagram}). The compute processor interfaces to the
+network through a bypassed, register-mapped interface \cite{raw10}
+that allows instructions to use the networks and the register files
+interchangeably. In other words, a single instruction can read up to
+two values from the networks, compute on them, and send the result out
+onto the networks, with no penalty.  Reads and writes in this fashion
+are blocking and flow-controlled, which allows for the computation to
+remain unperturbed by unpredictable timing variations such as cache
+misses and interrupts.
+
+Each tile's static router has a virtualized instruction memory to
+control the crossbars of the two static networks. Collectively, the
+static routers can reconfigure the communication pattern across these
+networks every cycle.  The instruction set of the static router is
+encoded as a 64-bit VLIW word that includes basic instructions
+(conditional branch with/without decrement, move, and nop) that
+operate on values from the network or from the local 4-element
+register file. Each instruction also has 13 fields that specify the
+connections between each output of the two crossbars and the network
+input FIFOs, which store values that have arrived from neighboring
+tiles or the local compute processor.  The input and output
+possibilities for each crossbar are: North, East, South, West,
+Processor, to the other crossbar, and into the static router. The
+FIFOs are typically four or eight elements large.
+
+To route a word from one tile to another, the compiler inserts a route
+instruction on every intermediate static router \cite{lee98spacetime}.
+Because the routers are pipelined and compile-time scheduled, they can
+deliver a value from the ALU of one tile to the ALU of a neighboring
+tile in 3 cycles, or more generally, 2+N cycles for an inter-tile
+distance of N hops.
+
+The results of this paper were generated using btl, a cycle-accurate
+simulator that models arrays of Raw tiles identical to those in the
+.15 micron 16-tile Raw prototype ASIC chip.  With a target clock rate
+of 250 MHz, the tile employs as compute processor an 8-stage, single
+issue, in-order MIPS-style pipeline that has a 32 KB data cache, 32 KB
+of instruction memory, and 64 KB of static router memory. All
+functional units except the floating point and integer dividers are
+fully pipelined. The mispredict penalty of the static branch predictor
+is three cycles, as is the load latency. The compute processor's
+pipelined single-precision FPU operations have a latency of 4 cycles,
+and the integer multiplier has a latency of 2 cycles.
