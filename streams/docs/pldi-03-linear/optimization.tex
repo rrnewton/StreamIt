@@ -37,29 +37,27 @@ the optimal transform.
 
 \begin{equation}
 \label{eqn:conv-sum-again}
-y[n]=x[n]*h[n]=\sum_{k=-\infty}^{\infty}x[k]h[n-k]
+\vec{y}[n]=\vec{x}[n]*\vec{h}[n]=\sum_{k=-\infty}^{\infty}\vec{x}[k]\vec{h}[n-k]
 \end{equation}
 
-We first explain the notation used in the rest of the section. 
-We choose the notation of the DSP literature because
-these transformations are due to that body of knowledge.
-
-A convolution sum is a vector operation on two vectors $x[n]$ and 
-$h[n]$ and is defined in Equation~\ref{eqn:conv-sum-again} for
-convenience. We will sometimes refer to the vector $h[n]$ as 
-{\it filter coefficients}. In general, when talking about vectors, $n$ denotes 
-an index in the time domain, and $k$ represents an index in the 
-frequency domain. Filters which compute convolution sums are often called 
+A convolution sum is a vector operation on two vectors $\vec{x}$ and 
+$\vec{h}$ and is defined in Equation~\ref{eqn:conv-sum-again} for
+convenience. We will sometimes refer to the vector $\vec{h}$ as 
+{\it filter coefficients}. 
+%In general, when talking about vectors, $n$ denotes 
+%an index in the time domain, and $k$ represents an index in the 
+%frequency domain. 
+Filters which compute convolution sums are often called 
 Finite Impulse Response (FIR) filters. An FIR filter has a corresponding linear 
-node with unit pop rate ($o=1$) and ${\vec b} = {\vec 0}$. From 
+node with unit pop rate ($o=1$) and $\vec{b} = \vec{\mathbf{0}}$. From 
 Equation~\ref{eqn:conv-sum-again} and the definition of a linear node,
-if $o=1$ then each column of $A$ is identified with a vector $h[n]$
+if $o=1$ then each column of $A$ is identified with a vector $\vec{h}$
 in a convolution sum. If $A$ has $u$ columns,	
 the linear node is equivalent to $u$ FIR filters 
 executing in parallel with their outputs interleaved.
 To complete the identification of a linear node with an FIR filter,
-we denote the input to the filter as $x[n]$ and the output of
-a filter as $y[n]$.
+we denote the input to the filter as $\vec{x}$ and the output of
+a filter as $\vec{y}$.
 
 Calculating a convolution sum in the frequency domain is much
 more efficient because of a class of algorithms known collectively as 
@@ -67,13 +65,13 @@ the Fast Fourier Transform (FFT) which quickly calculate
 the Discrete Fourier Transform (DFT) of a signal.
 %\footnote{see Section~\ref{sec:background-fft} for the general derivation.}
 
-To compute the convolution of two discrete time signals, $y[n]=x[n]*h[n]$,
-first the $N$-point DFT of $h[n]$, $H[k]$, is calculated.
-Second, the $N$-point DFT of $x[n]$, $X[k]$, is calculated.
-Note that both $X[k]$ and $H[k]$ are complex valued vectors, each with 
-length $N$. Multiplying $X[k]$ and $H[k]$ element-wise produces a new $N$ point
-vector, $Y[k]$. Taking the inverse DFT (IDFT) of $Y[k]$ produces 
-$y[n]$ which is exactly the same as $x[n]*h[n]$. See Oppenheim
+To compute the convolution of two discrete time signals, $\vec{y}=\vec{x}*\vec{h}$,
+first the $N$-point DFT of $\vec{h}$, $\vec{H}$, is calculated.
+Second, the $N$-point DFT of $\vec{x}$, $\vec{X}$, is calculated.
+Note that both $\vec{X}$ and $\vec{H}$ are complex valued and each has
+length $N$. Multiplying $\vec{X}$ and $\vec{H}$ element-wise produces a new $N$ point
+vector, $\vec{Y}$. Taking the inverse DFT (IDFT) of $\vec{Y}$ produces 
+$\vec{y}$ which is exactly the same as $\vec{x}*\vec{h}$. See Oppenheim
 \cite{oppenheim-discrete} for a thorough treatment.
 
 The computational complexity of calculating $N$ outputs in the time domain
@@ -85,13 +83,13 @@ $O(N \lg(N))$ coupled with an $O(N)$ vector multiplication.
 \begin{algorithm}
   \caption{Convolution in the Frequency Domain.\label{alg:freq-overview}}
   \begin{algorithmic}
-    \STATE $h[n] \leftarrow {\mathit column~of}A$ extracted by dataflow analysis
-    \STATE $H[k] \leftarrow \mathbf{FFT}(h[n],N)$ 
+    \STATE $\vec{h} \leftarrow {\mathit column~of}A$ extracted by dataflow analysis
+    \STATE $\vec{H} \leftarrow \mathbf{FFT}(\vec{h},N)$ 
     \WHILE {true}
-      \STATE $X[k] \leftarrow \mathbf{FFT}(x[n],N)$
-      \STATE $X[k] \leftarrow H[k] .* Y[k]$ 
-      \STATE $y[n] \leftarrow \mathbf{IFFT}(Y[k],N)$
-      \STATE push($y[n]$)
+      \STATE $\vec{X} \leftarrow \mathbf{FFT}(\vec{x},N)$
+      \STATE $\vec{Y} \leftarrow \vec{H} .* \vec{X}$ 
+      \STATE $\vec{y} \leftarrow \mathbf{IFFT}(\vec{Y},N)$
+      \STATE push($\vec{y}$)
     \ENDWHILE
   \end{algorithmic}
   {\bf Note:} $.*$ denotes element wise multiplication.
@@ -130,12 +128,13 @@ of signal processing.
 
 It is critically important to choose the length of the FFT to perform. 
 Lengths that are powers of two can be calculated most efficiently. 
-In general, if $y[n]$ is the result of a convolution of 
-two sequences with lengths $e$ and $N$, $y[n]$ has length $e+N-1$.
+In general, if $\vec{y}$ is the result of a convolution of 
+two sequences with lengths $e$ and $N$, $\vec{y}$ has length $e+N-1$.
 We need to compute the element wise vector multiplication of
-$X[k]$ and $H[k]$ in the frequency domain which requires that $X[k]$ and $H[k]$ 
-be the same length. Therefore, to recover $y[n]$ from its transform, $Y[k]$, 
-$Y[k]$ must both be at least $e+N-1$ elements long because 
+$\vec{X}$ and $\vec{H}$ in the frequency domain which requires that 
+$\vec{X}$ and $\vec{H}$ be the same length. Therefore, to 
+recover $\vec{y}$ from its transform, $\vec{Y}$, 
+$\vec{Y}$ must both be at least $e+N-1$ elements long because 
 of Fourier's theorem which states that any discrete sequence of $M$ numbers 
 can be represented exactly (without frequency aliasing) with 
 $M$ values of the DFT. 
@@ -144,8 +143,8 @@ In the StreamIt language, filters operate on infinite input streams
 and generate infinite output streams.
 The FFT can only be evaluated for finite input. To use the FFT we need to
 generate discrete sections of the output using discrete sections of the input.
-There are many known ways of convolving a short filter ($h[n]$) with
-a large amount of input ($x[n]$) block by block.
+There are many known ways of convolving a short filter ($\vec{h}$) with
+a large amount of input ($\vec{x}$) block by block.
 For a good treatment, again see Oppenheim~\cite{oppenheim-discrete}. 
 
 In their original form, StreamIt FIR filters consume one input and 
@@ -155,8 +154,8 @@ values on each work function execution.
 Using $N+x-1$ input values with an $e$ length FIR filter implies that we
 must use $N+2(e-1)$ point FFT in order to avoid aliasing.
 
-A $N+2(e-1)$ point FFT and IFFT will result in the output, $y[n]$, being $N+2(e-1)$
-items long. However, both the starting and ending $e-1$ points of $y[n]$ correspond
+A $N+2(e-1)$ point FFT and IFFT will result in the output, $\vec{y}$, being $N+2(e-1)$
+items long. However, both the starting and ending $e-1$ points of $\vec{y}$ correspond
 the tails of the convolution sum where not all of the input values are used. 
 A naive implementation would simply discard these tail values to produce 
 $N$ output values, consume $N$ input values and peek at $N+e-1$ items.
@@ -187,14 +186,6 @@ reasonable trade off between state and performance.
 %Although this doesn't change the asymptotic performance gains, it provides
 %a considerable speedup in practice.
 
-\begin{algorithm}
-\caption{Frequency Replacement $N$ Selection .\label{alg:freq-size}}
-\begin{algorithmic}
-\STATE $targetN \leftarrow (2*e)$
-\STATE $FFTSize \leftarrow 2^{\lceil \lg(targetN + 2*(e-1)) \rceil}$
-\STATE $N \leftarrow FFTSize - 2*(e-1)$ 
-\end{algorithmic}
-\end{algorithm}
 
 %The parameter $N$, described above, is approximately the number of outputs to 
 %produce on each execution of the new work function. $N$ is determined automatically according
@@ -223,50 +214,53 @@ reasonable trade off between state and performance.
 %\label{fig:fft-replacement}
 %\end{figure}
 
-\begin{algorithm}
-  \caption{Frequency replaced filter init pseudo code.\label{alg:freq-init}}
-  \begin{algorithmic}
-    \STATE $partials[0 \dots e-1] \leftarrow 0$
-    \STATE $H[0 \dots N+2(e-1)] \leftarrow \mathbf{FFT}(N+2(e-1),h[n])$
-  \end{algorithmic}
-\end{algorithm}
+\begin{transformation} (Frequency implementation)
+Given a linear node $\lambda = \{A, {\vec b}, e, o, u\}$, 
+the frequency implementation is a two stage filter filter $f$ which
+computes Algorithm~\ref{alg:freq-overview}. $f$ has
+initWork rates of $e'_{i}=N+e-1$, $o'_{i}=N+e-1$ $u'_{i}=N$ and
+work rates of $e'=N+e-1$, $o'=N+e-1$ $u'=N+e-1$.
+\\
+\begin{equation} \nonumber
+  \begin{array}{rccl}
+    % perhaps we should condense the next few lines.
+    targetN & = &&  (2*e) \\
+    FFTSize & = &&  2^{\lceil \lg(targetN + 2*(e-1)) \rceil} \\
+    N       & = &&  FFTSize - 2*(e-1) \\ 
+    \\
+    f.init  & = &\{&\vec{partials} \leftarrow \vec{\mathbf{0}} \\
+%            &   &&  H[0 \dots N+2(e-1)] \leftarrow \mathbf{FFT}(N+2(e-1),h[n]) \\
+            &   &&  \vec{H} \leftarrow \mathbf{FFT}(N+2(e-1),h[n])~~\} \\
+    \\
+    f.initWork & = &\{&\vec{x} \leftarrow \mathbf{pop}(0 \dots (N+e-1)) \\
+           &     &&\vec{X} \leftarrow \mathbf{FFT} (N+2(e-1), \vec{x}) \\
+           &     &&\vec{Y} \leftarrow \vec{X} .* \vec{H} \\
+           &     &&\vec{y} \leftarrow \mathbf{IFFT}(N+2(e-1), \vec{Y} \\
+           &     &&\mathbf{push}(\vec{y}[e-1 \dots N+e-1]) \\
+           &     &&\vec{partials} \leftarrow \vec{y}[N+e-1 \dots N+2(e-1)]~~\} \\
+    f.work &   & = &\{\vec{x} \leftarrow \mathbf{pop}(0 \dots (N+e-1)) \\
+           &     &&\vec{X} \leftarrow \mathbf{FFT} (N+2(e-1), \vec{x}) \\
+           &     &&\vec{Y} \leftarrow \vec{X} .* \vec{H} \\
+           &     &&\vec{y} \leftarrow \mathbf{IFFT}(N+2(e-1), \vec{Y}) \\
+           &     &&\mathbf{push}(\vec{y}[0 \dots e-1] + \vec{partials})\\
+           &     &&\mathbf{push}(\vec{y}[e-1 \dots N+e-1]) \\
+           &     &&\vec{partials} \leftarrow \vec{y}[N+e-1 \dots N+2(e-1)]~~\} \\
+    \end{array}
+\end{equation}
+\label{trans:freq}
+\end{transformation}
 
-\begin{algorithm}
-  \caption{Frequency Replaced Filter {\tt initWork} Pseudo Code 
-  ($e'_{i}=N+e-1$, $o'_{i}=N+e-1$ $u'_{i}=N$).\label{alg:freq-init-work}}
-  \begin{algorithmic}
-    \STATE $x[n] \leftarrow \mathbf{pop}(0 \dots (N+e-1))$
-    \STATE $X[0 \dots N+2(e-1)] \leftarrow \mathbf{FFT} (N+2(e-1), x[n])$
-    \STATE $Y[0 \dots N+2(e-1)] \leftarrow X[k] .* H[k]$
-    \STATE $y[n] \leftarrow \mathbf{IFFT}(N+2(e-1), Y[k])$
-    \STATE $\mathbf{push}(y[e-1 \dots N+e-1])$
-    \STATE $partials[0 \dots e-1] \leftarrow y[N+e-1 \dots N+2(e-1)]$
-  \end{algorithmic}
-\end{algorithm}
 
-\begin{algorithm}
-  \caption{Frequency Replaced Filter {\tt work} Pseudo Code. 
-    ($e'=N+e-1$, $o'=N+e-1$ $u'=N+e-1$)\label{alg:freq-work}}
-  \begin{algorithmic}
-    \STATE $x[n] \leftarrow \mathbf{pop}(0 \dots (N+e-1))$
-    \STATE $X[0 \dots N+2(e-1)] \leftarrow \mathbf{FFT} (N+2(e-1), x[n])$
-    \STATE $Y[0 \dots N+2(e-1)] \leftarrow X[k] .* H[k]$
-    \STATE $y[n] \leftarrow \mathbf{IFFT}(N+2(e-1), Y[k])$
-    \STATE $\mathbf{push}(y[0 \dots e-1] + partials[0 \dots e-1])$
-    \STATE $\mathbf{push}(y[e-1 \dots N+e-1])$
-    \STATE $partials[0 \dots e-1] \leftarrow y[N+e-1 \dots N+2(e-1)]$
-  \end{algorithmic}
-\end{algorithm}
 
-Algorithm~\ref{alg:freq-init} shows the replaced filter's initialization
-function in pseudocode. Algorithm~\ref{alg:freq-init-work} shows the 
-pseudocode for the first invocation of the work function and
-Algorithm~\ref{alg:freq-work} shows the pseudocode for all of the 
-remaining work function invocations. Both Algorithm~\ref{alg:freq-init-work}
-and Algorithm~\ref{alg:freq-work} apply to the case where there is a single
-column in $A$. The general case for arbitrary columns is a trivial extension:
-simply apply the algorithms to each column individually. $C$ columns
-is more efficient than a single column because the values of $X[k]$ can 
+Transformation~\ref{trans:freq} shows how to generate a 
+filter which implements the computation of $\lambda$ using the
+frequency transformation described in this section. 
+Transformation~\ref{trans:freq} as written applies only for
+linear nodes with unit push rate (so $A$ is a column vector).
+The general case for arbitrary columns is a trivial extension:
+simply apply the algorithms to each column individually and interleave
+the result. $C$ columns is more efficient than $C$ individual columns
+because the values of $\vec{X}$ can 
 be reused for each column. The complete algorithm is described by 
 Lamb\cite{lamb-thesis}. 
 
