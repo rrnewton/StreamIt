@@ -1,0 +1,342 @@
+%!PS-Adobe-2.0
+%%Creator: dot version uwin97 (4-15-97)
+%%For: (thies) William F. Thies,,,,
+%%Title: G
+%%Pages: (atend)
+%%BoundingBox: 36 36 307 361
+%%EndComments
+%%BeginProlog
+save
+/DotDict 200 dict def
+DotDict begin
+
+%%BeginResource: procset
+/coord-font-family /Times-Roman def
+/default-font-family /Times-Roman def
+/coordfont coord-font-family findfont 8 scalefont def
+
+/InvScaleFactor 1.0 def
+/set_scale {
+	dup 1 exch div /InvScaleFactor exch def
+	dup scale
+} bind def
+
+% styles
+/solid { } bind def
+/dashed { [9 InvScaleFactor mul dup ] 0 setdash } bind def
+/dotted { [1 InvScaleFactor mul 6 InvScaleFactor mul] 0 setdash } bind def
+/invis {/fill {newpath} def /stroke {newpath} def /show {pop newpath} def} bind def
+/bold { 2 setlinewidth } bind def
+/filled { } bind def
+/unfilled { } bind def
+/rounded { } bind def
+/diagonals { } bind def
+
+% hooks for setting color 
+/nodecolor { sethsbcolor } bind def
+/edgecolor { sethsbcolor } bind def
+/graphcolor { sethsbcolor } bind def
+/nopcolor {pop pop pop} bind def
+
+/beginpage {	% i j npages
+	/npages exch def
+	/j exch def
+	/i exch def
+	/str 10 string def
+	npages 1 gt {
+		gsave
+			coordfont setfont
+			0 0 moveto
+			(\\() show i str cvs show (,) show j str cvs show (\\)) show
+		grestore
+	} if
+} bind def
+
+/set_font {
+	findfont exch
+	scalefont setfont
+} def
+
+/arrowhead {
+	/arrowwidth exch def
+	/arrowlength exch def
+	gsave
+		3 1 roll
+		translate
+			rotate
+			newpath
+			arrowlength arrowwidth 2 div moveto
+			0 0 lineto
+			arrowlength arrowwidth -2 div lineto
+		closepath fill
+		stroke
+	grestore
+} def
+
+% draw aligned label in bounding box aligned to current point
+% alignfactor tells what fraction to place on the left.
+% -.5 is centered.
+/alignedtext {			% text labelwidth fontsz alignfactor
+	/alignfactor exch def
+	/fontsz exch def
+	/width exch def
+	/text exch def
+	gsave
+		% even if node or edge is dashed, don't paint text with dashes
+		[] 0 setdash
+		currentpoint newpath moveto
+		text stringwidth pop
+		alignfactor mul fontsz -.3 mul rmoveto
+		text show
+	grestore
+} def
+
+/boxprim {				% xcorner ycorner xsize ysize
+		4 2 roll
+		moveto
+		2 copy
+		exch 0 rlineto
+		0 exch rlineto
+		pop neg 0 rlineto
+		closepath
+} bind def
+
+/ellipse_path {
+	/ry exch def
+	/rx exch def
+	/y exch def
+	/x exch def
+	matrix currentmatrix
+	newpath
+	x y translate
+	rx ry scale
+	0 0 1 0 360 arc
+	setmatrix
+} bind def
+
+/endpage { showpage } bind def
+
+/layercolorseq
+	[	% layer color sequence - darkest to lightest
+		[0 0 0]
+		[.2 .8 .8]
+		[.4 .8 .8]
+		[.6 .8 .8]
+		[.8 .8 .8]
+	]
+def
+
+/setlayer {/maxlayer exch def /curlayer exch def
+	layercolorseq curlayer get
+	aload pop sethsbcolor
+	/nodecolor {nopcolor} def
+	/edgecolor {nopcolor} def
+	/graphcolor {nopcolor} def
+} bind def
+
+/onlayer { curlayer ne {invis} if } def
+
+/onlayers {
+	/myupper exch def
+	/mylower exch def
+	curlayer mylower lt
+	curlayer myupper gt
+	or
+	{invis} if
+} def
+
+/curlayer 0 def
+
+%%EndResource
+%%EndProlog
+%%BeginSetup
+14 default-font-family set_font
+% /arrowlength 10 def
+% /arrowwidth 5 def
+%%EndSetup
+%%Page: 1 1
+%%PageBoundingBox: 36 36 307 361
+gsave
+35 35 272 326 boxprim clip newpath
+36 36 translate
+0 0 1 beginpage
+0 0 translate 0 rotate
+0.000 0.000 0.000 graphcolor
+14.00 /Times-Roman set_font
+
+%	A
+gsave 10 dict begin
+0.000 0.000 1.000 nodecolor
+newpath 162 324 moveto
+108 324 lineto
+108 288 lineto
+162 288 lineto
+closepath
+stroke
+end grestore
+
+%	Splitter
+gsave 10 dict begin
+newpath 162 252 moveto
+108 252 lineto
+108 216 lineto
+162 216 lineto
+closepath
+stroke
+gsave 10 dict begin
+135 235 moveto (Splitter) 41 14.00 -0.50 alignedtext
+end grestore
+end grestore
+
+%	A -> Splitter
+newpath 135 288 moveto
+135 280 135 270 135 261 curveto
+stroke
+135 252 90.00 10.00 5.00 arrowhead
+
+%	C
+gsave 10 dict begin
+0.000 0.000 1.000 nodecolor
+newpath 162 36 moveto
+108 36 lineto
+108 0 lineto
+162 0 lineto
+closepath
+stroke
+end grestore
+
+%	B1
+gsave 10 dict begin
+newpath 54 180 moveto
+0 180 lineto
+0 144 lineto
+54 144 lineto
+closepath
+stroke
+gsave 10 dict begin
+27 163 moveto (B1) 16 14.00 -0.50 alignedtext
+end grestore
+end grestore
+
+%	Splitter -> B1
+newpath 108 216 moveto
+93 207 76 195 61 185 curveto
+stroke
+54 180 35.54 10.00 5.00 arrowhead
+
+%	B2
+gsave 10 dict begin
+newpath 126 180 moveto
+72 180 lineto
+72 144 lineto
+126 144 lineto
+closepath
+stroke
+gsave 10 dict begin
+99 163 moveto (B2) 16 14.00 -0.50 alignedtext
+end grestore
+end grestore
+
+%	Splitter -> B2
+newpath 126 216 moveto
+121 207 116 197 112 188 curveto
+stroke
+108 180 63.43 10.00 5.00 arrowhead
+
+%	B3
+gsave 10 dict begin
+0.000 0.000 1.000 nodecolor
+newpath 198 180 moveto
+144 180 lineto
+144 144 lineto
+198 144 lineto
+closepath
+stroke
+gsave 10 dict begin
+0.000 0.000 0.000 nodecolor
+171 163 moveto (. . .) 17 14.00 -0.50 alignedtext
+end grestore
+end grestore
+
+%	Splitter -> B3
+gsave 10 dict begin
+dotted
+newpath 144 216 moveto
+149 207 154 197 158 188 curveto
+stroke
+162 180 116.57 10.00 5.00 arrowhead
+end grestore
+
+%	BN
+gsave 10 dict begin
+newpath 270 180 moveto
+216 180 lineto
+216 144 lineto
+270 144 lineto
+closepath
+stroke
+gsave 10 dict begin
+243 163 moveto (BN) 19 14.00 -0.50 alignedtext
+end grestore
+end grestore
+
+%	Splitter -> BN
+newpath 162 216 moveto
+177 207 194 195 209 185 curveto
+stroke
+216 180 144.46 10.00 5.00 arrowhead
+
+%	Joiner
+gsave 10 dict begin
+newpath 162 108 moveto
+108 108 lineto
+108 72 lineto
+162 72 lineto
+closepath
+stroke
+gsave 10 dict begin
+135 91 moveto (Joiner) 34 14.00 -0.50 alignedtext
+end grestore
+end grestore
+
+%	B1 -> Joiner
+newpath 54 144 moveto
+68 135 86 123 101 113 curveto
+stroke
+108 108 144.46 10.00 5.00 arrowhead
+
+%	B2 -> Joiner
+newpath 108 144 moveto
+113 135 118 125 122 116 curveto
+stroke
+126 108 116.57 10.00 5.00 arrowhead
+
+%	B3 -> Joiner
+gsave 10 dict begin
+dotted
+newpath 162 144 moveto
+157 135 152 125 148 116 curveto
+stroke
+144 108 63.43 10.00 5.00 arrowhead
+end grestore
+
+%	BN -> Joiner
+newpath 216 144 moveto
+202 135 184 123 169 113 curveto
+stroke
+162 108 35.54 10.00 5.00 arrowhead
+
+%	Joiner -> C
+newpath 135 72 moveto
+135 64 135 54 135 45 curveto
+stroke
+135 36 90.00 10.00 5.00 arrowhead
+endpage
+grestore
+%%PageTrailer
+%%EndPage: 1
+%%Trailer
+%%Pages: 1
+end
+restore
+%%EOF

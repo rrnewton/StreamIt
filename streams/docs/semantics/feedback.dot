@@ -1,0 +1,10 @@
+digraph G {
+node[shape=box];
+A [label="",color=white];
+C [label="",color=white];
+A->Joiner
+Joiner->Body
+Body->Buffer
+Buffer->Joiner
+Body->C
+}

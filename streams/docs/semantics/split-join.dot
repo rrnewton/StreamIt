@@ -1,0 +1,16 @@
+digraph G {
+node[shape=box];
+A [label="",color=white];
+C [label="",color=white];
+A->Splitter
+Splitter->B1
+Splitter->B2
+B3 [label=". . .",color=white];
+Splitter->B3 [style=dotted]
+Splitter->BN
+B1->Joiner
+B2->Joiner
+B3->Joiner [style=dotted]
+BN->Joiner
+Joiner->C
+}

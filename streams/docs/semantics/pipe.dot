@@ -1,0 +1,11 @@
+digraph G {
+  node[shape=box];
+    A [label="",color=white];
+    C [label="",color=white];
+    A->B1
+    B1->B2 
+    B3 [label=". . .", color=white];
+    B2->B3 [style=dotted]
+    B3->BN [style=dotted]
+    BN->C
+}
