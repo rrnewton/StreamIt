@@ -30,20 +30,12 @@ sequence of filter executions that first sees the effects of a given
 input item.  This wavefront is well-defined even in the presence of
 rate-changing filters that peek or pop a different number of items
 than they push.
-
 \begin{figure}
 \centering
 \psfig{figure=Tapes.eps,width=3.2in}
-\caption{The behavior of the tapes in a filter that pops two items
-from the input channel, peeks at the next three, and pushes two
-elements to the output channel. The tape of the input channel before
-an invocation is drawn on the left. The state of the input channel
-tape, the output channel tape, and the filter during execution is
-shown in the middle. The state of the output channel tape after
-completion of the filter's execution is given on the right.}
+\caption{A filter's input and output tapes during an execution step.  With each step, the filter pushes two items, pops two items, and peeks at three additional items.  The initial state of the input tape is shown at left.  The center shows the filter with both input and output tapes during the invocation of {\tt work}.  The final state of the output tape is shown at right}
 \label{fig:tapes}
 \end{figure}
-
 To formalize the wavefront, we introduce some new representations for
 the state of the stream graph.  Consider that in place of each data
 channel there is an infinite ``tape'' which contains the history of
