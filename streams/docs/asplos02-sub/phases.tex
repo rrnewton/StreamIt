@@ -36,7 +36,7 @@ schedule, there are many tradeoffs between code size, buffer size, and
 latency, and we are developing techniques to optimize different
 metrics \cite{streamittech2}.  In this paper, we use a simple
 hierarchical scheduler that constructs a Single Appearance Schedule
-(SAS) \cite{leesdf} for each filter.  An SAS is a schedule where each
+(SAS) \cite{leesdf} for each filter.  A SAS is a schedule where each
 node appears exactly once in the loop nest denoting the execution
 order.  We construct one such loop nest for each hierarchical stream
 construct, such that each component is executed a set number of times
@@ -48,6 +48,3 @@ Following the scheduler, the compiler has stages that are specific for
 communication-exposed architectures: partitioning, layout, and
 communication scheduling.  The next three sections of the paper are
 devoted to these phases.
-
-
-

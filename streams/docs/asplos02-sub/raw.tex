@@ -1,11 +1,3 @@
-\begin{figure}
-\centering
-\psfig{figure=raw-diagram.eps,width=3.2in}
-\caption{A block diagram of the Raw architecture.
-\protect\label{fig:raw-diagram}}
-\vspace{-20pt}
-\end{figure}
-
 \section{The Raw Architecture}
 \label{sec:raw}
 
@@ -27,6 +19,14 @@ to the pins.  Thus, values routed through the networks off of the side
 of the array appear on the pins, and values placed on the pins by
 external devices (for example, wide-word A/Ds, DRAMS, video streams
 and PCI-X buses) will appear on the networks.
+
+\begin{figure}[t]
+\centering
+\psfig{figure=raw-diagram.eps,width=3.2in}
+\caption{\protect\small Block diagram of the Raw architecture.
+\protect\label{fig:raw-diagram}}
+\vspace{-12pt}
+\end{figure}
 
 Each of the tiles contains a compute processor, some memory and two
 types of routers--one static, one dynamic--that control the flow of
@@ -95,8 +95,8 @@ distance of N hops.
 
 The results of this paper were generated using btl, a cycle-accurate
 simulator that models arrays of Raw tiles identical to those in the
-.15 micron 16-tile Raw prototype chip.  With a target clock rate of
-250 MHz, the tile employs as compute processor an 8-stage, single
+.15 micron 16-tile Raw prototype ASIC chip.  With a target clock rate
+of 250 MHz, the tile employs as compute processor an 8-stage, single
 issue, in-order MIPS-style pipeline that has a 32 KB data cache, 32 KB
 of instruction memory, and 64 KB of static router memory. All
 functional units except the floating point and integer dividers are

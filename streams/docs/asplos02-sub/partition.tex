@@ -1,27 +1,31 @@
 \begin{figure}
   \psfig{figure=beam-blood-key.eps,width=3.2in} \\
   \subfigure[\vspace{-6pt}
-    Original.\label{fig:beam-blood1}]{\psfig{figure=beam-blood-orig.eps,width=3.2in}}
+    {\bf Original (runs on 64 tiles).}\label{fig:beam-blood1}]{\psfig{figure=beam-blood-orig.eps,width=3.2in}}
   \hspace{0.3in} \subfigure[\vspace{-6pt}
-    Load-balanced.\label{fig:beam-blood2}]{\psfig{figure=beam-blood-opt.eps,width=3.2in}
-    \vspace{-6pt}} \vspace{-6pt} \caption{Execution traces for the (a)
-    original and (b) load-balanced partitionings of the \Radar~
-    application.  The $x$ axis denotes time, and the $y$ axis denotes
-    the processor.  The dark bands indicate periods where processors
-    are blocked waiting to receive an input or send an output.  Light
-    regions indicate periods of useful work.  The thin stripes in the
-    light regions represent pipeline
-    stalls. \protect\label{fig:beam-blood}}
+    {\bf Partitioned (runs on 16 tiles).}\label{fig:beam-blood2}]{\psfig{figure=beam-blood-opt.eps,width=3.2in}
+    \vspace{-6pt}} \vspace{-6pt} \caption{\protect\small Execution
+    traces for the (a) original and (b) partitioned versions of the
+    \Radar~ application.  The $x$ axis denotes time, and the $y$ axis
+    denotes the processor.  Dark bands indicate periods where
+    processors are blocked waiting to receive an input or send an
+    output; light regions indicate periods of useful work.  The thin
+    stripes in the light regions represent pipeline stalls.  Our
+    partitioning algorithm decreases the granularity of the graph from
+    53 unbalanced tiles (original) to 15 balanced tiles (partitioned).
+    \protect\label{fig:beam-blood}}
+\vspace{-12pt}
 \end{figure}
 
 \begin{figure}
-\psfig{figure=beam-graph-orig.eps,width=2.5in}
+\centering
+\psfig{figure=beam-graph-orig.eps,width=3.2in}
 \caption{\protect\small Stream graph of the original 12x4 \Radar~
 application.  The 12x4 \Radar application has 12 channels and 4 beams;
 it is the largest version that fits onto 64 tiles without filter
 fusion.  \protect\label{fig:beam-orig}}
 \vspace{36pt}
-\psfig{figure=beam-graph-opt.eps,width=2.5in}
+\psfig{figure=beam-graph-opt.eps,width=1.98in}
 \caption{\protect\small Stream graph of the load-balanced 12x4
 \Radar~ application.  Vertical fusion is applied to collapse each pipeline
 into a single filter, and horizontal fusion is used to transform the
@@ -43,13 +47,13 @@ the responsibility of the compiler to adapt the granularity of the
 stream graph for efficient execution on a particular architecture.
 
 We use the word {\it partitioning} to refer to the process of dividing
-a stream program into a set of balanced computation units.  Given a
-number $N$, which represents the maximum number of computation units
-that can be supported, the partitioning stage transforms a stream
-graph into a set of no more than $N$ filters, each of which performs
-approximately the same amount of work during the execution of the
-program.  Following this stage, each filter can be run on a separate
-processor to obtain a load-balanced executable.
+a stream program into a set of balanced computation units.  Given that
+a maximum of $N$ computation units can be supported, the partitioning
+stage transforms a stream graph into a set of no more than $N$
+filters, each of which performs approximately the same amount of work
+during the execution of the program.  Following this stage, each
+filter can be run on a separate processor to obtain a load-balanced
+executable.
 
 %% Load balancing is particularly important in the streaming domain,
 %% since the throughput of a stream graph is equal to the {\it minimum}
@@ -99,8 +103,8 @@ select the targets of fusion and fission, based on the estimate of the
 work in each node.
 
 For example, in the case of the \Radar~ application, the original
-stream graph (Figure~\ref{fig:beam-orig}) contains 52 nodes.  These
-nodes have unbalanced amounts of computation, as evidenced by the
+stream graph (Figure~\ref{fig:beam-orig}) contains 52 filters.  These
+filters have unbalanced amounts of computation, as evidenced by the
 execution trace in Figure~\ref{fig:beam-blood1}.  The partitioner
 fuses all of the pipelines in the graph, and then fuses the bottom
 4-way splitjoin into a 2-way splitjoin, yielding the stream graph in
@@ -121,7 +125,7 @@ merging the control flow graphs of adjacent nodes, thereby shortening
 the live ranges of variables and allowing independent instructions to
 be reordered.
 
-\subsubsection{Naive Fusion}
+\subsubsection{Unoptimized Fusion Algorithm}
 
 In the domain of structured stream programs, there are two types of
 fusion that we are interested in: {\it vertical fusion} for collapsing
@@ -149,25 +153,40 @@ That is, a naive approach to filter fusion is to simply implement the
 channel abstraction and to leverage StreamIt's static rates to
 simulate the execution of the graph.  However, the performance of
 fusion depends critically on the implementation of channels, and there
-are several high-level optimizations that the compiler can employ to
+are several high-level optimizations that the compiler employs to
 improve upon the performance of a general-purpose buffer
-implementation.  We describe some of these optimizations in detail in
+implementation.  We describe a few of these optimizations in detail in
 the following sections.
 
 \begin{figure}
+\begin{center}
+\begin{minipage}{1.22in}
 \centering
-\psfig{figure=fuse-pipeline-a.eps,width=1in}
-\subfigure{\label{fig:fuse-pipe-a}}
-\psfig{figure=fuse-pipeline-b.eps,width=2.2in}
-\subfigure{\label{fig:fuse-pipe-b}}
+\psfig{figure=fuse-pipeline-a.eps,width=1.22in} \\ ~ \vspace{-6pt} \\
+(a) Original~~~~~~~~
+\end{minipage}
+~
+\begin{minipage}{1.97in}
+\centering
+\psfig{figure=fuse-pipeline-b.eps,width=1.97in} \\ ~ \vspace{-6pt} \\
+(b) Fused~~~~~~~~
+\end{minipage}
 \vspace{-6pt}
 \caption{\protect\small Vertical fusion with buffer localization and
 modulo-division optimizations. \label{fig:fuse-pipe}}
+\end{center}
 \vspace{12pt}
-\psfig{figure=fuse-splitjoin-a.eps,width=3in}
-\subfigure{\label{fig:fuse-splitjoin-a}}
-\psfig{figure=fuse-splitjoin-b.eps,width=3in}
-\subfigure{\label{fig:fuse-splitjoin-b}}
+\begin{minipage}{2.25in}
+\centering
+\psfig{figure=fuse-splitjoin-a.eps,width=2.25in} \\ ~ \vspace{-6pt} \\
+(a) Original~~~~
+\end{minipage} \\
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\begin{minipage}{1.30in}
+\centering
+\psfig{figure=fuse-splitjoin-b.eps,width=1.30in} \\ ~ \vspace{-6pt} \\
+(b) Fused~~~~
+\end{minipage}
 \caption{\protect\small Horizontal fusion of a duplicate splitjoin
 construct with buffer sharing optimization. \protect\label{fig:fuse-splitjoin}}
 %% \vspace{18pt}
@@ -200,19 +219,19 @@ between these two buffers so that all index expressions are known at
 compile time, preventing the need for a modulo operation to wrap
 around a circular buffer.
 
-The execution of the fused filter proceeds as follows.  In the initial
-work function, which is called only on the first invocation, the {\tt
+The execution of the fused filter proceeds as follows.  In the prework
+function, which is called only on the first invocation, the {\tt
 peek\_buffer} is filled with initial values from the UpSampler.  The
 steady work function implements a steady-state schedule in which
 $\mt{LCM}(N, K)$ items are transferred between the two original
 filters--these items are communicated through a local, temporary {\tt
 buffer}.  Before and after the execution of the MovingAverage code,
 the contents of the {\tt peek\_buffer} are transferred in and out of
-the temporary {\tt buffer}.  If the {\tt peek\_buffer} is small, this
-copying can be eliminated with loop unrolling and copy propagation.
-Note that the {\tt peek\_buffer} is for storing items that are
-persistent from one firing to the next, while the local {\tt buffer}
-is just for communicating values during a single firing.
+the {\tt buffer}.  If the {\tt peek\_buffer} is small, this copying
+can be eliminated with loop unrolling and copy propagation.  Note that
+the {\tt peek\_buffer} is for storing items that are persistent from
+one firing to the next, while the local {\tt buffer} is just for
+communicating values during a single firing.
 
 \subsubsection{Optimizing Horizontal Fusion}
 
@@ -243,17 +262,17 @@ filter that represents the entire splitjoin.
 %are set to match the $pop$ and $push$ rates of the filter, respectively.  
 %\protect\label{fig:fission-nopeek}}
 %\vspace{18pt}
-\psfig{figure=duplicate-fission-a.eps,width=1.2in}
-\subfigure{\label{fig:fission-peek-a}}
-\psfig{figure=duplicate-fission-b.eps,width=2in}
-\subfigure{\label{fig:fission-peek-b}}
+%\psfig{figure=duplicate-fission-b.eps,width=2.80in} \\
+%\psfig{figure=duplicate-fission-a.eps,width=1.26in}
+\psfig{figure=duplicate-fission.eps,width=3.26in}
+{\protect\small {\bf  ~~~~~~~~ (a) Original ~~~~~~~~~~~~~~~~~~~~~~~~~ (b) Fused ~~~}}
 \caption{\protect\small Fission of a filter that peeks.  
 %Since the MovingAverage filter reads items that it does not consume, the
 %duplicated versions of the filter need to access overlapping portions
 %of the input stream.  For this reason, horizontal fission creates a
 %duplicate splitjoin in which each component filter has additional code
 %to filter out items that are irrelevant to a given path.  This
-%decimation occurs in two places: once in the initial work function, to
+%decimation occurs in two places: once in the prework function, to
 %disregard items considered by previous filters on the first iteration
 %of the splitjoin, and once at the end of the steady work function, to
 %account for items consumed by other components.
@@ -270,17 +289,17 @@ computationally intensive node for improved load balancing.
 \subsubsection{Vertical Fission}
 
 Some filters can be split into a pipeline, with each stage performing
-some part of the {\tt work} function.  In addition to the original
-input data, these pipelined stages might need to communicate
-intermediate results from within {\tt work}, as well as fields within
-the filter.  This scheme could apply to filters with state if all
-modifications to the state appear at the top of the pipeline (they
-could be sent over the data channels), or if changes are infrequent
-(they could be sent via StreamIt's messaging system.)  Also, some
-state can be identified as induction variables, in which case their
-values can be reconstructed from the {\tt work} function instead of
-stored as fields.  We have yet to automate vertical filter fission in
-the StreamIt compiler.
+part of the {\tt work} function.  In addition to the original input
+data, these pipelined stages might need to communicate intermediate
+results from within {\tt work}, as well as fields within the filter.
+This scheme could apply to filters with state if all modifications to
+the state appear at the top of the pipeline (they could be sent over
+the data channels), or if changes are infrequent (they could be sent
+via StreamIt's messaging system.)  Also, some state can be identified
+as induction variables, in which case their values can be
+reconstructed from the {\tt work} function instead of stored as
+fields.  We have yet to automate vertical filter fission in the
+StreamIt compiler.
 
 \subsubsection{Horizontal Fission}
 
@@ -308,21 +327,27 @@ overlapping parts of the input stream.  The $i$'th component has a
 steady-state work function that begins with the work function of $F$,
 but appends a series of $(K-1)*pop$ pop statements in order to account
 for the data that is consumed by the other components.  Also, the
-$i$'th filter has an initial work function that pops $(i-1)*pop$ items
-from the input stream, to account for the consumption of previous
-filters on the first iteration of the splitjoin.  As before, the
-joiner is a roundrobin that has a weight of $push$ for each stream.
+$i$'th filter has a prework function that pops $(i-1)*pop$ items from
+the input stream, to account for the consumption of previous filters
+on the first iteration of the splitjoin.  As before, the joiner is a
+roundrobin that has a weight of $push$ for each stream.
 \end{enumerate}
 
 \begin{figure}
 \centering
-\psfig{figure=filter-hoisting.eps,width=3.2in}
-\caption{\protect\small Filter hoisting.  This transformation allows a
-stateless filter to be moved across a joiner node if its $push$ value
-evenly divides the weights of the joiner.
-\protect\label{fig:filter-hoisting}}
-\vspace{12pt}
-\psfig{figure=splitjoin-split.eps,width=3.2in}
+\psfig{figure=sync-removal-1.eps,width=3.2in}
+\caption{\protect\small Synchronization removal.  If there are
+neighboring splitters and joiners with matching rates, then the nodes
+can be removed and the component streams can be connected.  The
+example above is drawn from a subgraph of the 3GPP application; the
+compiler automatically performs this transformation to expose
+parallelism and improve the partitioning.  Synchronization removal
+is especially valuable in the context of libraries--many distinct
+components can employ splitjoins for processing interleaved data
+streams, and the modules can be composed without having to synchronize
+all the streams at each boundary.  \protect\label{fig:sync-removal}}
+\vspace{24pt}
+\psfig{figure=splitjoin-split.eps,width=3.2in} 
 \caption{\protect\small Breaking a splitjoin into hierarchical units.
 Though our horizontal fusion algorithms work on the granularity of an
 entire splitjoin, it is straightforward to transform a large splitjoin
@@ -330,30 +355,28 @@ into a number of smaller pieces, as shown here.  Following this
 transformation, the fusion algorithms can be applied to obtain an
 intermediate level of granularity.  This technique was employed to
 help load-balance the \Radar~ application (see Section~\ref{sec:results}).
-\protect\label{fig:splitjoin-split}}
-\vspace{12pt}
-\psfig{figure=sync-removal.eps,width=3.2in}
-\caption{\protect\small Synchronization removal.  If a splitter is
-bordering a joiner with identical weights, the nodes can be removed
-and the component streams can be connected.  This is especially useful
-in the context of libraries--many distinct components can employ
-splitjoins for processing interleaved data streams, and the modules
-can be composed without having to synchronize all the streams at each
-boundary.  \protect\label{fig:sync-removal}}
-\vspace{-6pt}
+\protect\label{fig:splitjoin-split}} 
+\vspace{24pt}
+\psfig{figure=filter-hoisting.eps,width=3.2in} 
+\caption{\protect\small Filter hoisting.  This transformation allows a
+stateless filter to be moved across a joiner node if its $push$ value
+evenly divides the weights of the joiner.
+\protect\label{fig:filter-hoisting}}
+\vspace{-12pt}
 \end{figure}
 
 \subsection{Reordering Transformations}
+
 There are a multitude of ways to reorder the elements of a stream
 graph so as to facilitate fission and fusion transformations.  For
-instance, identical stateless filters can be pushed through a splitter
-or joiner node if the weights are adjusted accordingly
-(Figure~\ref{fig:filter-hoisting}); a splitjoin construct can be
-divided into a hierarchical set of splitjoins to enable a finer
+instance, neighboring splitters and joiners with matching weights can
+be eliminated (Figure~\ref{fig:sync-removal}); a splitjoin construct
+can be divided into a hierarchical set of splitjoins to enable a finer
 granularity of fusion (Figure~\ref{fig:splitjoin-split}); and
-neighboring splitters and joiners with matching weights can be
-eliminated (Figure~\ref{fig:sync-removal}).  Many of these
-transformations were useful in load balancing our test applications.
+identical stateless filters can be pushed through a splitter or joiner
+node if the weights are adjusted accordingly
+(Figure~\ref{fig:filter-hoisting}).  Many of these transformations
+were useful in load balancing our test applications.
 
 \subsection{Automatic Partitioning}
 
@@ -372,7 +395,7 @@ considers the filters in decreasing order of their computational
 requirements and attempts to split them using the filter fission
 algorithm described above.  Fission proceeds until there are enough
 filters to occupy the available machine resources, or until the
-heaviest node in the graph is not ammenable to a fission
+heaviest node in the graph is not amenable to a fission
 transformation.  Generally, it is not beneficial to split nodes other
 than the heaviest one, as this would introduce more synchronization
 without alleviating the bottleneck in the graph.
@@ -385,7 +408,7 @@ hierarchically and each construct ({\it i.e.,} pipeline, splitjoin,
 and feedbackloop) is ranked according to the sum of its children's
 computational requirements.  At each step of the algorithm, an entire
 stream construct is collapsed into a single filter.  The only
-exception is the last fusion operation, which only collapses to the
+exception is the final fusion operation, which only collapses to the
 extent necessary to fit on the target; for instance, a 4-element
 pipeline could be fused into two 2-element pipelines if no more
 collapsing was necessary.

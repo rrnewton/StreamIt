@@ -8,13 +8,28 @@
 
 \begin{document}
 
+\toappear{
+\raisebox{2pt}[2pt]{\underline{~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}} \\
+$^*$ More information on the StreamIt project is available from
+\texttt{http://compiler.lcs.mit.edu/streamit} \\ 
+~ \\
+\small{
+Permission to make digital or hard copies of all or part of this work
+for personal or classroom use is granted without fee provided that
+copies are not made or distributed for profit or commercial advantage
+and that copies bear this notice and the full citation on the first
+page.  To copy otherwise, to republish, to post on servers or to
+redistribute to lists, requires prior specific permission and/or a
+fee. \par
+{\it ASPLOS X} 10/02 San Jose, CA, USA \par
+Copyright 2002 ACM 1-58113-574-2/02/0010 ...\$5.00 \\ ~ \\ ~ \\
+}}
+
 \conferenceinfo{ASPLOS X}{10/02 San Jose, CA, USA} 
 \CopyrightYear{2002}
 \crdata{1-58113-574-2/02/0010}
 
-\title{A Stream Compiler for \\ Communication-Exposed Architectures
-\huge\thanks{More information on the StreamIt project is available
-from \texttt{\tt http://compiler.lcs.mit.edu/streamit}}}
+\title{A Stream Compiler for \\ Communication-Exposed Architectures}
 
 \numberofauthors{1}
 
@@ -47,7 +62,6 @@ from \texttt{\tt http://compiler.lcs.mit.edu/streamit}}}
 %\additionalauthors{Additional Authors: Jeremy Wong, Henry Hoffman, David 
 %Maze, and Saman Amarasinghe, email: {\texttt{\{jnwong, hank, dmaze, saman\}@lcs.mit.edu}}}
 
-
 \date{}
 
 % this is the line spacing
@@ -65,6 +79,9 @@ from \texttt{\tt http://compiler.lcs.mit.edu/streamit}}}
   \newcommand{\mt}[1]{\mbox{\it #1}}
   \newcommand{\todo}[1]{\framebox{#1}}
   \newcommand{\Radar}[0]{Radar}
+  \newcommand{\bibfont}{\fontencoding{OT1}\fontfamily{ptmr}\fontseries{m}
+    \fontshape{n} \fontsize{9pt}{12pt}\selectfont}
+  \newcommand{\bibfontt}{\fontsize{8pt}{10pt}\selectfont}
 
   %\toappear{\centerline{\Large\bf MIT LCS Technical Memo,}
   %          \centerline{\Large\bf MIT-LCS-TM-6XX,}
@@ -90,7 +107,8 @@ from \texttt{\tt http://compiler.lcs.mit.edu/streamit}}}
   \input{related}
   \input{conclusion}
   \input{ack}
-  
+
+  \bibfontt
   \bibliographystyle{abbrv}
   \bibliography{references}
   

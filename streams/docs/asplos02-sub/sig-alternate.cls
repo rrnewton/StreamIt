@@ -794,8 +794,9 @@
 \@float{copyrightbox}[b]
 \begin{center}
 \setlength{\unitlength}{1pc}
-\begin{picture}(20,6) %Space for copyright notice
-\put(0,-0.95){\crnotice{\@toappear}}
+\begin{picture}(20,9) %Space for copyright notice
+%% CHANGED FROM 0.95 to 1.95 by BILL
+\put(0,-2.55){\crnotice{\@toappear}}
 \end{picture}
 \end{center}
 \end@float}

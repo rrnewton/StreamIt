@@ -22,22 +22,6 @@ execution and the volume of communication. It uses a search technique
 to map multiple filters onto a single processor for load balancing and
 communication reduction. 
 
-\begin{figure}
-\begin{minipage}{3.2in}
-\centering
-\psfig{figure=speedup-graph.eps,width=3.2in}
-\caption{TODO.
-\protect\label{fig:opt-diagram}}
-\end{minipage}
-\hspace{0.1in}
-\begin{minipage}{3.2in}
-\centering
-\psfig{figure=throughput-graph.eps,width=3.2in}
-\caption{TODO
-\protect\label{fig:utilization-diagram}}
-\end{minipage}
-\end{figure}
-
 The Imagine architecture is specifically designed for the streaming
 application domain~\cite{rixner98bandwidthefficient}.  It operates on
 streams by applying a computation kernel to multiple data items off
@@ -59,16 +43,27 @@ The iWarp system \cite{iwarp} is a scalable multiprocessor with
 configurable communication between nodes.  In iWarp, one can set up a
 few FIFO channels for communicating between non-neighboring
 nodes. However, reconfiguring the communication channels is more
-coarse-grained and has a higher cost than on Raw, where each cycle can
-be used to route items to a different location~\cite{scalaroperands}.
-ASSIGN \cite{assign} is a tool for building large-scale applications
-on multiprocessors, especially iWarp.  ASSIGN starts with a
-coarse-grained flow graph that is written as fragments of C code.
-Like StreamIt, it performs partitioning, placement, and routing of the
-nodes in the graph.  However, ASSIGN is implemented as a runtime
-system instead of a full language and compiler such as StreamIt.
-Consequently, it has fewer opportunities for global transformations
-such as fission and reordering.
+coarse-grained and has a higher cost than on Raw, where the network
+routing patterns can be reconfigured on a cycle-by-cycle
+basis~\cite{scalaroperands}.  ASSIGN \cite{assign} is a tool for
+building large-scale applications on multiprocessors, especially
+iWarp.  ASSIGN starts with a coarse-grained flow graph that is written
+as fragments of C code.  Like StreamIt, it performs partitioning,
+placement, and routing of the nodes in the graph.  However, ASSIGN is
+implemented as a runtime system instead of a full language and
+compiler such as StreamIt.  Consequently, it has fewer opportunities
+for global transformations such as fission and reordering.
+
+\begin{figure}
+\centering
+\vspace{6pt}
+\psfig{figure=speedup-graph.eps,width=2.95in}
+\vspace{-6pt}
+\caption{\protect\small StreamIt throughput on a 16-tile Raw machine,
+normalized to throughput of hand-written C running on a single Raw
+tile.  \protect\label{fig:opt-diagram}}
+\vspace{-12pt}
+\end{figure}
 
 SCORE (Stream Computations Organized for Reconfigurable Execution) is
 a stream-oriented computational model for virtualizing the resources
@@ -80,7 +75,7 @@ statically scheduling an application within the compiler.
 
 Ptolemy~\cite{ptolemyoverview} is a simulation environment for
 heterogeneous embedded systems, including the domain of Synchronous
-Dataflow (SDF) that is similiar to the static-rate stream graphs of
+Dataflow (SDF) that is similar to the static-rate stream graphs of
 StreamIt.  While there are many well-established scheduling techniques
 for SDF~\cite{leesdf}, the round-robin nodes in our stream graph
 require the more general model of Cyclo-Static Dataflow
@@ -90,6 +85,16 @@ or a dynamic messaging system as supported in StreamIt.  In all, the
 StreamIt compiler differs from Ptolemy in its focus on optimized code
 generation for the nodes in the graph, rather than high-level modeling
 and design.
+
+\begin{figure}
+\centering
+\psfig{figure=throughput-graph.eps,width=3.2in}
+\vspace{-6pt}
+\caption{Throughput of StreamIt code running on 16 tiles and C code
+running on a single tile, normalized to throughput of C code on a
+Pentium IV. \protect\label{fig:utilization-diagram}}
+\vspace{-12pt}
+\end{figure}
 
 Proebsting and Watterson \cite{pro96} present a filter fusion
 algorithm that interleaves the control flow graphs of adjacent nodes.
