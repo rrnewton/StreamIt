@@ -97,7 +97,7 @@ approach will time multiplex different groups of filters and space
 multiplex the filters within a group. We call each group a space-time
 slice or just a slice.  Hybrid space-time multiplexing allows space
 multiplexing for fine-grained, systolic sections of the stream graph
-5and time
+and time
 multiplexing for improved load balancing.  Furthermore, we use
 software pipelining techniques to allow arbitrary ordering of slices
 during steady-state execution.
@@ -151,7 +151,8 @@ implementation of inter-slice communication using Raw's off-chip
 streaming memory interface.  For intra-slice communication, we exploit
 Raw's static network and we translate StreamIt's filter code into C
 code to be executed on the compute processors.  We have completed
-parameterized code generation for linear filters.   
+parameterized code generation for linear filters that generates
+assembly directly.   
 
 As for the high-level algorithms, we have implemented a greedy
 algorithm to partition and schedule the stream graph into ordered slices.
