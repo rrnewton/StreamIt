@@ -1,0 +1,24 @@
+
+Streaming computation is an increasngly popular model of computation
+becasue it makes explicit the parallelism and communication in the
+applications. This in turns lessens the burden on the compiler to
+extract parallelism, and allows for greater innovation in mapping the
+computation to a computing substrate. In this paper we propose a
+methodology for compiling streaming applications to general purpose,
+cache-based architectures. The work is done in the context of
+StreamIt, a language and compiler specifically engineered for stream
+computing. In StreamIt, a program is described as a structured dataflow
+graph, where the nodes represent actors which carry out the
+computation. The edges in a stream graph represent
+communication. Our work is unique in that the compiler
+accounts for the size of instruction and data workingsets as it
+performs a series of cache-aware optimizations while derriving an
+ordering of executions for the nodes in the stream graph. The
+optimizations are founded upon two simple and intuitive models that
+quantify $(i)$ the temporal locality for a sequence of  actor
+executions, and $(ii)$ the overhead for managing the communication
+between actors. The cache-aware transformations lead to significantly
+better utilization of the memory system, and as such, they deliver
+performance gains ranging from XXX to XXX\% for our streaming
+benchmark suite on a Pentium~3 architecture, and XXX to XXX\% on an
+Itanium~2 processor.
