@@ -311,8 +311,10 @@ size.
 
 The work function of parent nodes must explicitly cause data to be
 pushed through splitters and joiners.  [[run_splitter]] and
-[[run_joiner]] move as much data as is available from a splitter or
-joiner's input(s) to its output(s).
+[[run_joiner]] push data through a splitter or joiner; one call pushes
+one ``item'' of data.  For [[ROUND_ROBIN]] splits and joins, one call
+moves one complete round-robin cycle; for [[DUPLICATE]] splits, one
+call moves one data item from the input to each of the outputs.
 
 <<Split/Join Initializers>>=
 void run_splitter(stream_context *c);
