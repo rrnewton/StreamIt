@@ -127,6 +127,11 @@ S               J
   \           /
     A1 ... An
 
+but I want the splitter and joiner split up into 3 ports, that look
+like differen filters but are grouped together into one.  This will
+ease the semantic definitions.  Label the import port S0, the bottom
+S1 and the top S2; same for joiner.  
+
 \end{verbatim}
 \vspace{-12pt}
 \caption{\protect\small SplitJoin labeling.
@@ -145,18 +150,22 @@ definitions of $f$ and $g$:
 $S$, then $f_{SAB}(x)$ is a pair of values $(y_1, y_2)$ where $y_1$
 and $y_2$ are the maximum number of items on the output tapes of $A$
 and $B$, respectively.  That is, $f_{SAB}(x) = max( (out_A, out_B) |
-in_S = x)$ where max operates component-wise.
+in_S = x)$ where max operates component-wise.  Similarly, for a joiner
+$J$, $g_{ABJ}(x) = min( (in_A, in_B) | out_J = x)$
 
-\item Given that there are $x$ items on the output tape of joiner
-$J$, then $g_{ABJ}(x)$ is a pair of values $(y_1, y_b2)$ where $y_1$
-and $y_2$ are the minimum number of items on the input tapes of $A$
-and $B$, respectively.  That is, $g_{SAB}(x) = min( (in_A, in_B) |
-in_S = x)$ where min operates component-wise.
+\item Given that there are $(y_1, y_2)$ items on the output tapes of a
+filters $A$ and $B$, respectively, then $g_{SAB}(y_1, y_2)$ is the
+minimum number of items on the input tape of $S$.  That is,
+$g_{SAB}(y_1, y_2) = min(in_S | out_A = y_1 \wedge out_B = y_2)$,
+where min operates component-wise.  Similarly, for a joiner $J$,
+$f_{ABJ}(y_1) = max( out_J | in_A = y_1 \wedge in_B = y_2)$.
 
 \end{itemize}
 
 {\bf Round robin.}  We first give derivations for round-robin
-splitters and joiners.  For a split, 
+splitters and joiners.  At a round-robin splitter, items are
+alternately dispatched to two different filters.  We define
+$f_{SSS}(x)$ 
 
 \begin{verbatim}
 
