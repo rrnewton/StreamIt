@@ -326,8 +326,8 @@ I/O.  These functions are described in detail below:
 \name{streamInitRAM}
 {\small
 \begin{verbatim}
-void svm_streamInitRAM(svm_Stream* s, mm_Mem ramLocation, int address, 
-                       int capacity, int elementSize, int maxBuffering, int flags)
+void svm_streamInitRAM(svm_Stream* s, mm_Mem ramLocation, size_t address, 
+                       size_t capacity, size_t elementSize, size_t maxBuffering, int flags)
 \end{verbatim}}
 
 \spec{Initializes an empty stream that resides in RAM with the
@@ -364,9 +364,9 @@ overhead.}
 \name{streamInitWithDataRAM}
 {\small
 \begin{verbatim}
-void svm_streamInitWithDataRAM(svm_Stream* s, mm_Mem ramLocation, int address, 
-                               int capacity, int elementSize, int initLength, 
-                               boolean initEOS, int maxBuffering, int flags)
+void svm_streamInitWithDataRAM(svm_Stream* s, mm_Mem ramLocation, size_t address, 
+                               size_t capacity, size_t elementSize, size_t initLength, 
+                               boolean initEOS, size_t maxBuffering, int flags)
 \end{verbatim}}
 
 \spec{Initializes a stream in RAM with some elements already in place.
@@ -397,7 +397,7 @@ svm\_streamInitRAM}.}
 {\small
 \begin{verbatim}
 void svm_streamInitFIFO(svm_Stream* s, mm_Mem fifoLocation, 
-                        int elementSize, int maxBuffering, int flags)
+                        size_t elementSize, size_t maxBuffering, int flags)
 \end{verbatim}}
 
 \spec{Initializes an empty stream mapped to a hardware FIFO with the
@@ -483,10 +483,11 @@ onto all streams. \medskip }
 following are all legal implementations of {\tt svm\_streamMulticastPush(\&x, \&s1,
 \&s2)}:
 \begin{itemize}
+\addtolength{\itemsep}{-4pt} % so this fits on one page
 \item Push {\tt x} onto {\tt s1}, wait until {\tt s2} is not full, then push {\tt x} onto {\tt s2}.
 \item Wait until {\tt s2} is not full, push {\tt x} onto {\tt s2}, then push {\tt x} onto {\tt s1}.
 \item Wait until {\tt s2} is not full, push {\tt x} onto {\tt s1}, then push {\tt x} onto {\tt s2}.
-\end{itemize} \medskip }
+\end{itemize} \smallskip }
 
 \spec{Aside from the stalling behavior, this method is equivalent to a
 series of calls to {\tt svm\_streamPush}.  It is included in the API in
@@ -497,7 +498,7 @@ broadcast messages.}
   {\tt s1, s2, ..., sn} - streams to push onto.\\
   {\tt element} - value to push.}
 
-\req{{\tt s1}, {\tt s2}, etc. have been initialized.}
+\req{{\tt s1, s2, ..., sn} have been initialized.}
 
 \callkc
 %%%%%%%%%%%%%%%%%%%%%%%%%
@@ -521,7 +522,7 @@ the EOS information is no longer accessible.}
 \clearpage
 \makeline
 \name{streamPeek}
-\decl{void svm\_streamPeek(svm\_Stream* s, int n, void* element)}
+\decl{void svm\_streamPeek(svm\_Stream* s, size\_t n, void* element)}
 
 \spec{Retrieves the value at position {\tt n} from the front of the
 stream, without changing any state of the stream.  The index {\tt n}
@@ -571,7 +572,7 @@ pushed onto all streams.  See {\tt svm\_streamPushMulticast} for an example.}
   {\tt s1, s2, ..., sn} - streams to push onto.\\
   {\tt element} - value to push.}
 
-\req{{\tt s1}, {\tt s2}, etc. have been initialized.}
+\req{{\tt s1, s2, ..., sn} have been initialized.}
 
 \callkc
 %%%%%%%%%%%%%%%%%%%%%%%%%
@@ -580,7 +581,7 @@ pushed onto all streams.  See {\tt svm\_streamPushMulticast} for an example.}
 \makeline
 \name{streamPeekEOS}
 
-\decl{boolean svm\_streamPeekEOS(svm\_Stream* s, int n)}
+\decl{boolean svm\_streamPeekEOS(svm\_Stream* s, size\_t n)}
 
 \spec{Returns whether or not there is an EOS tag on element {\tt n}
 from the front of the stream; stalls if less than {\tt n+1} elements
@@ -630,7 +631,7 @@ given kernel:
 \makeline
 \name{blockInit}
 
-\decl{void svm\_blockInit(svm\_Block* b, mm\_Mem ramLocation, int address, int capacity, int elementSize)}
+\decl{void svm\_blockInit(svm\_Block* b, mm\_Mem ramLocation, size\_t address, size\_t capacity, size\_t elementSize)}
 
 \spec{Initializes a block with the given location and size.  The {\tt
 address} and {\tt capacity} might be dynamically calculated at runtime.}
@@ -652,7 +653,7 @@ address} and {\tt capacity} might be dynamically calculated at runtime.}
 \makeline
 \name{blockWrite}
 
-\decl{void svm\_blockWrite(svm\_Block* b, int index, void* element)}
+\decl{void svm\_blockWrite(svm\_Block* b, size\_t index, void* element)}
 
 \spec{Stores an element into a memory block.}
 
@@ -670,7 +671,7 @@ address} and {\tt capacity} might be dynamically calculated at runtime.}
 \makeline
 \name{blockRead}
 
-\decl{void svm\_blockRead(svm\_Block* b, int index, void* element)}
+\decl{void svm\_blockRead(svm\_Block* b, size\_t index, void* element)}
 
 \spec{Reads an element from a memory block.}
 
@@ -767,7 +768,7 @@ have a well-defined status.\\}
 {\small
 \begin{verbatim}
 void svm_kernelInit(svm_Kernel* k, mm_Proc procLocation, svm_IOBlock* scratch,
-                    void* extKernelData, int extKernelDataSize, svm_ExtKernelWork extKernelWork)
+                    void* extKernelData, size_t extKernelDataSize, svm_ExtKernelWork extKernelWork)
 \end{verbatim}}
 
 \spec{Initializes a kernel for execution on a given processor with a
@@ -851,6 +852,8 @@ or {\tt Finished}.}
 \callc
 %%%%%%%%%%%%%%%%%%%%%%%%%
 \makeline
+\clearpage
+\makeline
 \name{kernelRunMultiplexed}
 \decl{void svm\_kernelRunMultiplexed(svm\_Kernel* k, int N)}
 
@@ -930,9 +933,7 @@ its work function.}
   If called from within a kernel, then that kernel is {\tt k}.  (Kernels may not end other kernels.)}
 
 \callkc
-\makeline
 %%%%%%%%%%%%%%%%%%%%%%%%%
-\clearpage
 \makeline
 \name{kernelWait}
 \decl{void svm\_kernelWait(svm\_Kernel* k)}
@@ -949,22 +950,23 @@ is {\tt Unstarted}, {\tt Paused} or {\tt Finished}.}
 %%%%%%%%%%%%%%%%%%%%%%%%%
 \makeline
 \name{kernelWaitMultiple}
-\decl{void svm\_kernelWaitMultiple(svm\_Kernel* k0, svm\_Kernel* k1, ...)}
+\decl{void svm\_kernelWaitMultiple(int n, svm\_Kernel* k1, svm\_Kernel* k2, ...)}
 
-\spec{Considers the set $K$ of kernels in {\tt k0}, {\tt k1},
-etc. that have a status other than {\tt Unstarted}, and does not
-return until one of the following is true: 1) at least one kernel in
-$K$ is {\tt Paused}, 2) all kernels in $K$ are {\tt Finished}, or 3)
-$K$ is empty.\\}
+\spec{Considers the set $K$ of kernels in {\tt k1}, {\tt k2}, {\tt
+...}, {\tt kn} that have a status other than {\tt Unstarted}, and does
+not return until one of the following is true: 1) at least one kernel
+in $K$ is {\tt Paused}, 2) all kernels in $K$ are {\tt Finished}, or
+3) $K$ is empty.\\}
 
 \spec{Note that {\tt svm\_kernelWaitMultiple} cannot be emulated by a
 sequence of calls to {\tt svm\_kernelWait}, as the former returns as soon
 as any concurrently running kernel has paused.}
 
 \param{
-  {\tt k0, k1, etc.} - kernels to wait for.}
+  {\tt n} - number of kernels.\\
+  {\tt k1, k2, ..., kn} - kernels to wait for.}
 
-\req{{\tt k0, k1, etc.} have been initialized.}
+\req{{\tt k1, k2, ..., kn} have been initialized.}
 
 \callc
 %%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1249,15 +1251,14 @@ reference implementation of the pre-defined kernels can be found in
 Appendix~\ref{sec:referenceimpl}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%
+\clearpage
 \makeline
 \name{Constants}
 \decl{const int svm\_Stream\_Length\_All = -1;}
 
 \spec{Indicates that a pre-defined kernel should execute until it
 finds an EOS in its input stream.}  
-\makeline
 %%%%%%%%%%%%%%%%%%%%%%%%%
-\clearpage
 \makeline
 \name{Move}
 {\small
@@ -1268,7 +1269,7 @@ typedef struct {
 } svm_Move;
 
 void svm_moveInit(svm_Move* move, mm_Proc location, svm_IStream* srcStr, 
-                  svm_OStream* destStr, int length, boolean setEOS);
+                  svm_OStream* destStr, size_t length, boolean setEOS);
 \end{verbatim}}
 
 \spec{The primary use of this kernel is for moving elements between
@@ -1297,6 +1298,7 @@ move itself.}
 \req{
   {\tt move} is {\tt Unstarted}, {\tt Finished}, or uninitialized.\\
   {\tt srcStr} and {\tt destStr} have been initialized.\\
+  {\tt srcStr} and {\tt destStr} have the same {\tt elementSize}.\\
   {\tt length} $>$ 0 or {\tt length} = {\tt svm\_Stream\_Length\_All}.}
       
 \callc
@@ -1311,8 +1313,8 @@ typedef struct {
 } svm_StridedScatter;
 
 void svm_stridedScatterInit(svm_StridedScatter* scatter, mm_Proc location, 
-                            svm_IStream* srcStr, svm_OBlock* destBlock, int length,
-                            int destStride, int elementsPerStride)
+                            svm_IStream* srcStr, svm_OBlock* destBlock, size_t length,
+                            size_t destStride, size_t elementsPerStride)
 \end{verbatim}}
 
 \spec{Moves segments of {\tt elementsPerStride} elements from a
@@ -1336,6 +1338,7 @@ processes a single stride.}
 \req{
   {\tt scatter} is {\tt Unstarted}, {\tt Finished}, or uninitialized.\\
   {\tt srcStr} and {\tt destBlock} have been initialized.\\
+  {\tt srcStr} and {\tt destBlock} have the same {\tt elementSize}.\\
   {\tt length} $>$ 0 or {\tt length} = {\tt svm\_Stream\_Length\_All}.\\
   All accesses to {\tt destBlock} are within its capacity.}
 
@@ -1351,8 +1354,8 @@ typedef struct {
 } svm_StridedGather;
 
 void svm_stridedGatherInit(svm_StridedGather* gather, mm_Proc location, 
-                           svm_IBlock* srcBlock, svm_OStream* destStr, int length,
-                           int srcStride, int elementsPerStride, boolean setEOS)
+                           svm_IBlock* srcBlock, svm_OStream* destStr, size_t length,
+                           size_t srcStride, size_t elementsPerStride, boolean setEOS)
 \end{verbatim}}
 
 \spec{Copies segments of {\tt elementsPerStride} elements from strided
@@ -1375,11 +1378,14 @@ stride.  Each iteration of this kernel processes a single stride.}
 \req{
   {\tt gather} is {\tt Unstarted}, {\tt Finished}, or uninitialized.\\
   {\tt srcBlock} and {\tt destStr} have been initialized.\\
+  {\tt srcBlock} and {\tt destStr} have the same {\tt elementSize}.\\
   {\tt length} $>$ 0 or {\tt length} = {\tt svm\_Stream\_Length\_All}.\\
   All accesses to {\tt srcBlock} are within its capacity.}
 
 \callc
 %%%%%%%%%%%%%%%%%%%%%%%%%
+\makeline
+\clearpage
 \makeline
 \name{IndexedScatter}
 {\small
@@ -1391,7 +1397,7 @@ typedef struct {
 
 void svm_indexedScatterInit(svm_IndexedScatter* scatter, mm_Proc location,
                             svm_IStream* srcStr, svm_IStream* indexStr, svm_OBlock* destBlock, 
-                            int length, int elementsPerIndex)
+                            size_t length, size_t elementsPerIndex)
 \end{verbatim}}
 
 \spec{This kernel allows irregular scattering of elements from an
@@ -1415,7 +1421,9 @@ processes a single index.}
 \req{
   {\tt scatter} is {\tt Unstarted}, {\tt Finished}, or uninitialized.\\
   {\tt srcStr}, {\tt indexStr}, and {\tt destBlock} have been initialized.\\
+  {\tt srcStr} and {\tt destBlock} have the same {\tt elementSize}.\\
   {\tt length} $>$ 0 or {\tt length} = {\tt svm\_Stream\_Length\_All}. \\
+  {\tt indexStr} uses an unsigned representation for the indices.\\
   All accesses to {\tt destBlock} are within its capacity.}
 
 \callc
@@ -1431,7 +1439,7 @@ typedef struct {
 
 void svm_indexedGatherInit(svm_IndexedGather* gather, mm_Proc location, 
                            svm_IBlock* srcBlock, svm_IStream* indexStr, svm_OStream* destStr, 
-                           int length, int elementsPerIndex, boolean setEOS)
+                           size_t length, size_t elementsPerIndex, boolean setEOS)
 \end{verbatim}}
 
 \spec{This kernel allows irregular gathering of elements from an input
@@ -1456,7 +1464,9 @@ iteration of this kernel processes a single index.}
 \req{
   {\tt gather} is {\tt Unstarted}, {\tt Finished}, or uninitialized.\\
   {\tt srcBlock}, {\tt indexStr} and {\tt destStr} have been initialized.\\
+  {\tt srcBlock} and {\tt destStr} have the same {\tt elementSize}.\\
   {\tt length} $>$ 0 or {\tt length} = {\tt svm\_Stream\_Length\_All}. \\
+  {\tt indexStr} uses an unsigned representation for the indices.\\
   All accesses to {\tt srcBlock} are within its capacity.}
 
 \callc
@@ -2005,14 +2015,14 @@ function, the {\tt iteration} variable marks the current iteration.
     svm_Kernel kernel;
     svm_IStream* srcStr,
     svm_OStream* destStr,
-    int elementSize,
-    int length,
+    size_t elementSize,
+    size_t length,
     boolean setEOS
   } svm_Move;
 
   void svm_moveInit(svm_Move* move, mm_Proc location, svm_IStream* _srcStr, 
-                    svm_OStream* _destStr, int _length, boolean _setEOS);
-    kernelInit(&move->kernel, location, 0, move, sizeof(svm_Move), (ExtKernelWork)&moveWork);
+                    svm_OStream* _destStr, size_t _length, boolean _setEOS);
+    kernelInit(&move->kernel, location, 0, move, sizeof(svm_Move), (ExtKernelWork)&svm_moveWork);
     move->srcStr = _srcStr;
     move->destStr = _destStr;
     move->elementSize = _elementSize;
@@ -2020,8 +2030,8 @@ function, the {\tt iteration} variable marks the current iteration.
     move->setEOS = _setEOS;
   }
 
-  void moveWork(svm_Move* move) {
-    int iteration;
+  void svm_moveWork(svm_Move* move) {
+    size_t iteration;
     void* element = malloc(move->elementSize);
     for (iteration=0; iteration<move->length; iteration++) {
       boolean eos = svm_streamPeekEOS(move->srcStr, 0);
@@ -2050,16 +2060,16 @@ function, the {\tt iteration} variable marks the current iteration.
     svm_Kernel kernel;
     svm_IStream* srcStr,
     svm_OBlock* destBlock,
-    int length,
-    int destStride,
-    int elementsPerStride
+    size_t length,
+    size_t destStride,
+    size_t elementsPerStride
   } svm_StridedScatter;
 
   void svm_stridedScatterInit(svm_StridedScatter* scatter, mm_Proc location, 
-                              svm_IStream* _srcStr, svm_OBlock* _destBlock, int _length,
-                              int _destStride, int _elementsPerStride)
+                              svm_IStream* _srcStr, svm_OBlock* _destBlock, size_t _length,
+                              size_t _destStride, size_t _elementsPerStride)
     kernelInit(&scatter->kernel, location, 0, scatter, sizeof(svm_StridedScatter), 
-               (ExtKernelWork)&stridedScatterWork);
+               (ExtKernelWork)&svm_stridedScatterWork);
     scatter->srcStr = _srcStr;
     scatter->destBlock = _destBlock;
     scatter->length = _length;
@@ -2067,8 +2077,8 @@ function, the {\tt iteration} variable marks the current iteration.
     scatter->elementsPerStride = _elementsPerStride;
   }
 
-  void stridedScatterWork(svm_StridedScatter* scatter) {
-    int iteration, j, num_items = 0;
+  void svm_stridedScatterWork(svm_StridedScatter* scatter) {
+    size_t iteration, j, num_items = 0;
     boolean done_stream_all = false;
     void* element = malloc(scatter->elementSize);
     for (iteration=0; num_items<scatter->length && !done_stream_all; iteration++) {
@@ -2095,17 +2105,17 @@ function, the {\tt iteration} variable marks the current iteration.
     svm_Kernel kernel;
     svm_IBlock* srcBlock,
     svm_OStream* destStr,
-    int length,
-    int srcStride,
-    int elementsPerStride,
+    size_t length,
+    size_t srcStride,
+    size_t elementsPerStride,
     boolean setEOS
   } svm_StridedGather;
 
   void svm_stridedGatherInit(svm_StridedGather* gather, mm_Proc location, 
-                             svm_IBlock* _srcBlock, svm_OStream* _destStr, int _length,
-                             int _srcStride, int _elementsPerStride, boolean setEOS)
+                             svm_IBlock* _srcBlock, svm_OStream* _destStr, size_t _length,
+                             size_t _srcStride, size_t _elementsPerStride, boolean setEOS)
     kernelInit(&gather->kernel, location, 0, gather, sizeof(svm_StridedGather), 
-               (ExtKernelWork)&stridedGatherWork);
+               (ExtKernelWork)&svm_stridedGatherWork);
     gather->srcBlock = _srcBlock;
     gather->destStr = _destStr;
     gather->length = _length;
@@ -2114,8 +2124,8 @@ function, the {\tt iteration} variable marks the current iteration.
     gather->setEOS = _setEOS;
   }
 
-  void stridedGatherWork(svm_StridedGather* gather) {
-    int iteration, j, num_items = 0;
+  void svm_stridedGatherWork(svm_StridedGather* gather) {
+    size_t iteration, j, num_items = 0;
     boolean done_stream_all = false;
     void* element = malloc(gather->elementSize);
 
@@ -2149,15 +2159,15 @@ function, the {\tt iteration} variable marks the current iteration.
     svm_IStream* srcStr,
     svm_IStream* indexStr,
     svm_OBlock* destBlock,
-    int length,
-    int elementsPerIndex
+    size_t length,
+    size_t elementsPerIndex
   } svm_IndexedScatter;
 
   void svm_indexedScatterInit(svm_IndexedScatter* scatter, mm_Proc location, 
                               svm_IStream* _srcStr, svm_IStream* _indexStr, 
-                              svm_OBlock* _destBlock, int _length, int _elementsPerIndex)
+                              svm_OBlock* _destBlock, size_t _length, size_t _elementsPerIndex)
     kernelInit(&scatter->kernel, location, 0, scatter, sizeof(svm_IndexedScatter), 
-               (ExtKernelWork)&indexedScatterWork);
+               (ExtKernelWork)&svm_indexedScatterWork);
     scatter->srcStr = _srcStr;
     scatter->indexStr = _indexStr;
     scatter->destBlock = _destBlock;
@@ -2165,8 +2175,8 @@ function, the {\tt iteration} variable marks the current iteration.
     scatter->elementsPerIndex = _elementsPerIndex;
   }
 
-  void indexedScatterWork(svm_IndexedScatter* scatter) {
-    int iteration, j;
+  void svm_indexedScatterWork(svm_IndexedScatter* scatter) {
+    size_t iteration, j;
     boolean done_stream_all = false;
     void* element = malloc(scatter->srcStr->elementSize);
     void* index = malloc(scatter->indexStr->elementSize);
@@ -2191,9 +2201,9 @@ function, the {\tt iteration} variable marks the current iteration.
     int i;
     for (i=0; i<indexSize; i++) {
       if (mm_BigEndian) {
-        result = (result << 8) + (*(index+i));
+        result = (result << 8) + index[i];
       } else {
-        result = (result << 8) + (*(index+indexSize-i-1));
+        result = (result << 8) + index[indexSize-i-1];
       }
     }
     return result;
@@ -2210,16 +2220,16 @@ function, the {\tt iteration} variable marks the current iteration.
     svm_IBlock* srcBlock,
     svm_IStream* indexStr,
     svm_OStream* destStr,
-    int length,
-    int elementsPerIndex,
+    size_t length,
+    size_t elementsPerIndex,
     boolean setEOS
   } svm_IndexedGather;
 
   void svm_indexedGatherInit(svm_IndexedGather* gather, mm_Proc location, 
                               svm_IBlock* _srcBlock, svm_IStream* _indexStr, svm_OStream* _destStr,
-                              int _length, int _elementsPerIndex, boolean _setEOS)
+                              size_t _length, size_t _elementsPerIndex, boolean _setEOS)
     kernelInit(&gather->kernel, location, 0, gather, sizeof(svm_IndexedGather), 
-               (ExtKernelWork)&indexedGatherWork);
+               (ExtKernelWork)&svm_indexedGatherWork);
     gather->srcBlock = _srcBlock;
     gather->indexStr = _indexStr;
     gather->destStr = _destStr;
@@ -2228,8 +2238,8 @@ function, the {\tt iteration} variable marks the current iteration.
     gather->setEOS = _setEOS;
   }
 
-  void indexedGatherWork(svm_IndexedGather* gather) {
-    int iteration, j;
+  void svm_indexedGatherWork(svm_IndexedGather* gather) {
+    size_t iteration, j;
     boolean done_stream_all = false;
     void* element = malloc(gather->srcBlock->elementSize);
     void* index = malloc(gather->indexStr->elementSize);
