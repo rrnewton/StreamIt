@@ -13,7 +13,7 @@ we first describe a {\it linear expansion} operation that serves as a
 building block for the combination techniques.  We then give rules for
 collapsing {\tt pipeline}s and {\tt splitjoin}s into linear nodes; we
 do not yet deal with {\tt feedbackloop}s as they require the notion of
-``linear state'' (see Future Work).
+``linear state'' which we do not describe here.
 
 \subsection{Linear Expansion}
 
@@ -154,7 +154,7 @@ can replace the original two.  Its components are as follows:
 \lambda_2^e & = & \mt{expand}(\lambda_2, \mt{chanPeek}, \\
 ~ & ~ & ~\hspace{0.32in}~ \mt{chanPop}, \mt{chanPop} * \frac{u_2}{o_2}) \\
 \mathbf{A'} & = & A_1^e A_2^e \\ ~ \vspace{-8pt} \\
-\mathbf{{\vec b}'} & = & b_1^e A_2^e + b_2^e \\ ~ \vspace{-8pt} \\
+\mathbf{{\vec b}'} & = & {\vec b}_1^e A_2^e + {\vec b}_2^e \\ ~ \vspace{-8pt} \\
 \mathbf{e'} & = & e_1^e \\ ~ \vspace{-8pt} \\
 \mathbf{o'} & = & o_1^e \\ ~ \vspace{-8pt} \\
 \mathbf{u'} & = & u_2^e

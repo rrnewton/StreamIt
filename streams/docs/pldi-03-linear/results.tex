@@ -54,8 +54,7 @@ filters performing threshold target detection in parallel; 3) {\bf
 FilterBank}, a multi-rate signal decomposition processing block common
 in communications and image processing; 4) {\bf RateConvert}, an audio
 signal down sampler that converts the sampling rate by a non-integral
-factor; 5) {\bf FMRadio}, an FM software radio with equalizer; 6) {\bf
-Radar}, a radar front end with beamformer and target detection.
+factor; 5) {\bf FMRadio}, an FM software radio with equalizer.
 
 \subsection{Performance}
 
@@ -107,9 +106,7 @@ a large low pass filter which also benefits from frequency replacement.
 
 All of the multiplication reduction in the FMRadio benchmark is due to
 the automatic combination of parallel equalizer computations.
-The reduction in the Radar benchmark is due to algebraic  
-simplification by combining several serial computations using
-the pipeline combination rules. Table~\ref{fig:benchmark-statistics} shows
+Table~\ref{fig:benchmark-statistics} shows
 the number of nodes in each benchmark both before and after linear replacement. 
 
 FilterBank is the only benchmark where multiplications are reduced  
@@ -134,7 +131,7 @@ Reducing computation does not necessarily translate into execution time improvem
 Figure~\ref{fig:execution-speedup} demonstrates, our benchmarks speedup on average by a factor of five 
 and by a factor of $6.5$ in the best case. Our current implementation takes advantage of the machine tuned 
 FFT package FFTW~\cite{frigo99fast}), to perform the necessary time-frequency conversions. 
-The benchmarks where multiplication reduction is due only to linear replacement (FMRadio, Radar) 
+The benchmarks where multiplication reduction is due only to linear replacement (FMRadio) 
 also show a large speedup.
 
 
