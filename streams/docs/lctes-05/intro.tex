@@ -26,8 +26,8 @@ workloads. This model serves as a foundation for several {\it cache-aware
 optimizations} that are geared toward the concomitant increase of instruction
 and data {\it temporal locality}. These
 optimization lead to significantly better utilization of the memory
-system, and as such, they deliver performance gains ranging from XXX
-to XXX\% for our streaming benchmark suite.
+system, and as such, they deliver performance gains ranging from 11
+to 99\% for our streaming benchmark suite.
 
 The context for our work is StreamIt, an architecture-independent
 language that is engineered for streaming
@@ -103,21 +103,21 @@ instruction set architecture. The Itanium by contrast has a much
 larger and richer repertoire of registers. The two architectures serve
 to validate our cache-aware optimizations, in that we expect an
 architecture with more register to benefit more from optimization such
-as scalar replacement. On average, fusion leads to a XXX\% improvement
-on the Pentium~3, and XXX\% on the Itanium~2.
+as scalar replacement. On average, fusion leads to a 47\% improvement
+on the Pentium~3, and 50\% on the Itanium~2.
 
 The two architectures also differ in terms of their memory system
 organization. The Itanium is an in-order VLIW processor and does not
 tolerate a memory stall as well as its out-of-order
 counterpart. Therefore we expect different gains from the scaling
 optimization which amortize the long access latencies for instruction
-and data caches. On average, scaling leads to a XXX\% improvement on
-the Itanium~2, and XXX\% on the Pentium~3.
+and data caches. On average, scaling leads to a 21\% improvement on
+the Itanium~2, and 17\% on the Pentium~3.
 
 While both scaling and fusion lead to modest performance gains, we
 must combine the two to deliver the best possible performance. When we
 do so, we can further improve the performance of our benchmarks by
-XXX\% on average for the Pentium~3, and XXX\% for the Itanium~2.
+53\% on average for the Pentium~3, and 55\% for the Itanium~2.
 
 \subsection{Summary of Contributions}
 
