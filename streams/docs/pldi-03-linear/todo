@@ -8,10 +8,41 @@ to add to paper:
 
 - editing / proofreading
 
+Andrew's distallation of todo items (that are not already fixed) from reviewers:
+- Make stream graphs easier to read / lay them out better
+- Add examples of combination rules
+- Add examples of frequency transformation (don't know how to do this)
+- Possibly make more clear that "pushcount" and "popcount" are not simply counters but
+	are used to generate the linear nodes.
+- More benchmarks
+- Include measurements of code size and data size for before/after transformed programs
+- Doesn't like smapling conversion rate of 2/3. Results will get better for larger rates,
+	should I change it? 441/220 perhaps?
+- Address the concern of extra work being incurred by the zeros introduced
+	in splitjoin combination.
+- Possibly compare to hand optimized (eg frequency transformations and all) code.
+- Possibly add the comments of the fourth reviewer:
+	"More technically, what I found most interesting about the paper is
+	that in order to perform the optimization, the optimizer first
+	attempts to extract from the program a high-level model (in this case,
+	an affine transformer) which then serves as a clean representation for
+	the filter transformations."
+- Include some background on filters and their transformations. I wrote something
+	like this for my thesis. Perhaps we can include it in the paper (in shortened form)
+
+
+
+
+
 to get more todo items:
 -----------------------
 - read paper carefully
-- look at reviewers comments
+
+
+
+
+
+
 
 high priority
 -------------
