@@ -96,7 +96,7 @@ approach will time multiplex different groups of filters and space
 multiplex the filters within a group. We call each group a space-time
 slice or just a slice.  Hybrid space-time multiplexing allows space
 multiplexing for fine-grained, systolic sections of the stream graph
-(see the paragraph on linear code generation below) and time
+ and time
 multiplexing for improved load balancing.  Furthermore, we use
 software pipelining techniques to allow arbitrary ordering of slices
 during steady-state execution.
@@ -119,7 +119,7 @@ for each piece.
 \begin{figure}[tbh]
 	\vspace{-.2in}
   \centerline{\includegraphics[width=3.0in]{mgordon_figure1.pdf}}
-	\vspace{-.1in}
+	\vspace{-.2in}
   \caption{The Stream Graph for the Channel Vocoder.}
 	\vspace{-.2in}
   \label{streamgraph}
@@ -128,7 +128,7 @@ for each piece.
 
    
 We will now present a small example to solidify the reader's
-understanding of our work.  In Figure \ref{streamgraph}, we show the
+understanding of our work.  In Figure \ref{streamgraph} we show the
 stream graph for a simple channel vocoder.  The dark ovals denote
 the linear filters of the application.  The white ovals are non-linear
 but stateless filters and thus can be data-parallelized.  
@@ -169,12 +169,9 @@ space multiplexing by investigating additional parallelism schemes
 such as filter fission (breaking a filter into multiple, smaller
 filters), investigating optimizing additional filter representations
 such as state-space, and implementing optimized linear code generation 
-targeting sparse matrices.  
-
-In the long-term, we are working on a new intermediate representation
-for our compiler that will allow us to generate assembly code for
-Raw's compute processors (currently we compile our generated C code
-with Raw's GCC port).  Generating our stream code in a procedural
+targeting sparse matrices.  We are working on a new intermediate representation
+for our compiler that will allow us to directly generate assembly code for
+Raw's compute processors. Generating our stream code in a procedural
 framework is a source of many inefficiencies.  
 
 \absection{Research Support}
