@@ -3,16 +3,16 @@
 
 This paper builds directly on the work done to analyze and optimize
 linear components in StreamIt graphs \cite{Lamb}. We extend the
-theoretical framework for linear analysis to state-space analysis in
+theoretical framework for linear analysis to state space analysis in
 order to apply our optimizations to a wider class of applications.
-Specifically, state-space analysis applies to filters with persistent
-state, and feedback loops can be combined into a single state-space
+Specifically, state space analysis applies to filters with persistent
+state, and feedback loops can be combined into a single state space
 representation; neither of these cases are handled by linear analysis.
-The extension from linear analysis to state-space analysis required a
+The extension from linear analysis to state space analysis required a
 fundamental change to the underlying representation, as well as a
 complete reformulation of the rules for combination and expansion.
 Moreover, this paper introduces novel optimizations of state removal
-and minimal parameterization, both of which operate on the state-space
+and minimal parameterization, both of which operate on the state space
 representation.
 
 Several other groups are researching methods for automated DSP
@@ -31,4 +31,4 @@ Signal \cite{Signal}. Other stream-based languages are Occam
 \cite{Occam}, SISAL \cite{sisal}, and StreamC \cite{streamc}.  Some of
 these languages are designed to exploit vector and parallel
 processing. However, none of these languages have compilers that run
-state-space or linear analysis.
+state space or linear analysis.

@@ -1,19 +1,30 @@
 \mysection{Conclusion}
 \label{sec:conclusion}
 
-We present a methodology for the detection, analysis, combination, and
-optimization of linear state-space filters in DSP applications.  This
-work is automated in the compiler for StreamIt, a high-level
-programming language for streaming applications.  This frees the
-programmer from the burden of writing low-level optimized code that
-requires expert DSP analysis.  Instead, the programmer can focus on
-the top-level design of a DSP application and write modular code in a
-structured setting.
+As embedded applications come to support more and more functionality,
+the software will inevitably become more complex, and it will soon be
+unmanageable to satisfy tight resource constraints via manual tuning
+of low-level DSP code.  In order to replace the signal processing
+expert in the design flow, compilers need to incorporate
+domain-specific knowledge and have a clean, unified framework for
+representing and optimizing the application.  This paper presents one
+such framework, which is based on linear state space systems.  Using a
+state space representation, we develop two novel optimizations for
+stream programs: state removal and parameter reduction.  To
+effectively apply these optimizations, we develop a general framework
+for extracting, expanding, and combining state space representations.
+An implementation of the framework within the StreamIt compiler
+demonstrates speedups and increased generality over plain linear
+optimizations.
 
-%%     Due to the infinite number of possible state-space transforms,
+%A large class of applications can be described using a
+%linear state space model; in particular, the model subsumes a linear
+%model that was developed previously~\cite{Lamb}.  
+
+%%     Due to the infinite number of possible state space transforms,
 %% the optimizations discussed are not necessarily ideal.
 %% Additionally, parts of DSP applications are non-linear and cannot
-%% be analyzed in the state-space domain. Therefore, the work
+%% be analyzed in the state space domain. Therefore, the work
 %% presented in this thesis does not fully optimize some portions of
 %% DSP applications, and does not apply towards other portions.
 %% However, it does represent an additional step towards the goal of
@@ -33,7 +44,7 @@ structured setting.
 %% execution.
 
 %% \vspace{\itemshrink} \item Formulate loops in traditional programming languages as
-%% state-space filters, and use state-space work developed in this
+%% state space filters, and use state space work developed in this
 %% thesis to detect their induction variables and optimize their
 %% execution.
 
@@ -42,7 +53,7 @@ structured setting.
 %% the traditional program analysis metrics (throughput, power
 %% consumption, memory allocation, etc.) in any manner desired. Then
 %% find a general way to minimize this cost function over all
-%% possible state-space transformations $\mathbf{T}$.
+%% possible state space transformations $\mathbf{T}$.
 
 %% \vspace{\itemshrink} \item Formulate a methodology to deal with filters whose outputs
 %% are a linear combination of their inputs but a non-linear
@@ -51,7 +62,7 @@ structured setting.
 %% \vspace{\itemshrink} \item Use a `black box' method to find the appropriate
 %% representation of a filter. In this approach the filter is given
 %% inputs and the output data is collected. The input/output
-%% relations are used to formulate an appropriate state-space model
+%% relations are used to formulate an appropriate state space model
 %% that may not exactly represent the filter, but does so within a
 %% tolerable error margin (see \cite{Schutter}).
 %% \vspace{\itemshrink} \end{itemize}
