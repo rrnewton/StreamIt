@@ -101,14 +101,13 @@ context of multi-threaded applications with independent program counters.
 \absection{How}
 
 A StreamIt  program is  represented as a  structured graph,  where the
-nodes represent autonomous units  of computation, and the edges imply
-FIFO  communication  channels.  A  StreamIt graph  (stream  graph)  is
-hierarchical in  structure, and it consists  of canonical single-input
-to single-output  constructs. The stream  graph also corresponds  to a
-precise textual counterpart that is easily edited by a programmer.  As
-such, StreamIt  affords modularity and  recursive program definitions,
-whereby  simple structures are  composed to  create large  and complex
-graphs.
+nodes represent  autonomous units of computation, and  the edges imply
+FIFO  communication channels.   A  StreamIt graph  is hierarchical  in
+structure, and it consists  of canonical single-input to single-output
+constructs.  The  stream graph also  corresponds to a  precise textual
+counterpart that is easily edited  by a programmer.  As such, StreamIt
+affords modularity  and recursive program  definitions, whereby simple
+structures are composed to create large and complex graphs.
 
 The basic unit of computation in StreamIt is the {\tt Filter}, and the
 simplest construct  for filter  composition is the  {\tt Pipeline}---a
@@ -118,18 +117,29 @@ common  splitter and  merge  into a  common  joiner. There  is also  a
 mechanism for introducing cycles in the graph via a {\tt FeedbackLoop}
 construct.
 
-The  development  tool consists  of the following main components:
-\begin{itemize}
-\item {\bf Graphical Editor:} allows for the rapid composition of
-stream applications using a graphical user interface. The editor
-affords many features, including  component duplication, hierarchical
-grouping, structure validation, and automatic template code generation.
-\item {\bf Textual Editor:} includes customizable indentation
-schemes and keyword highlighting.
-\item {\bf Graphical Debugger:} supports step-by-step execution, as well as
-the inspection and modification  of program variables, including those
-within the communication channels.
-\end{itemize}
+% The  development  tool consists  of the following main components:
+% \begin{itemize}
+% \item {\bf Graphical Editor:} allows for the rapid composition of
+% stream applications using a graphical user interface. The editor
+% affords many features, including  component duplication, hierarchical
+% grouping, structure validation, and automatic template code generation.
+% \item {\bf Textual Editor:} includes customizable indentation
+% schemes and keyword highlighting.
+% \item {\bf Graphical Debugger:} supports step-by-step execution, as well as
+% the inspection and modification  of program variables, including those
+% within the communication channels.
+% \end{itemize}
+
+The  development tool  consists of  a {\it  graphical editor}  that is
+designed  for the  rapid composition  of stream  applications  using a
+graphical user  interface. The editor includes many  features, such as
+``cut-and-paste''   component   duplication,  hierarchical   grouping,
+structure validation, and automatic  template code generation. The SDT
+also  features a  {\it textual  editor} with  customizable indentation
+schemes  and keyword highlighting.   In addition,  the SDT  includes a
+{\it  graphical debugger}  that supports  step-by-step execution  of a
+stream program, as well as  the inspection and modification of program
+variables, including those within the communication channels.
 
 The  SDT largely relies  on the  exposed parallelism  and communication
 patterns to enable graphical application development and debugging. In
@@ -143,31 +153,22 @@ when debugging parallel programs.
 %% simple way to scale your figures. Other options can be found in 
 %% graphicx documentation. Please use PDF files for your figures.
 
-%% \begin{figure}[tbh]
-%%   \centerline{\includegraphics[width=2.5in]{example_figure1.pdf}}
-%%   \caption{This is an uniformative graph} 
-%%   \label{graph}
-%% \end{figure}
-
-%% \begin{figure}[tbh]
-%%   \begin{center}
-%%     \includegraphics[width=1in]{example_figure2.pdf}
-%%     \hspace{1in}
-%%     \includegraphics[width=1in]{example_figure2.pdf}
-%%   \end{center}
-%%   \caption{The CSAIL logo, in stereovision}
-%% \end{figure}
+\begin{figure}[tbh]
+  \centerline{\includegraphics[width=3.0in, angle=270]{kuo_figure1.pdf}}
+  \caption{A screen-shot of the StreamIt debugger.} 
+  \label{kuo_figure1}
+\end{figure}
 
 \absection{Progress}
 
 We  have recently  made  available  the first  public  version of  the
 StreamIt Development Tool (SDT).  It  is implemented in Java as a {\it
 plug-in}  extension  to   Eclipse---a  universal  platform  for  tools
-integration  (see {\it www.eclipse.org}  for more  information).
+integration  (see {\it www.eclipse.org}  for more  information on Eclipse).
 The SDT  is a  graphical programming environment,  and it  consists of
 several  components that  enable the  development,  visualization, and
 debugging  of programs  written in  StreamIt.  The  SDT  debugger (see
-Figure~\ref{debugger-ss} for a  screen-shot) can interpret and visually
+Figure~\ref{kuo_figure1} for a  screen-shot) can interpret and visually
 represent  the stream graph  and its  dynamic behavior,  including the
 flow of  information in parallel  streaming components.  The  SDT also
 includes a tutorial and extensive documentation.
@@ -175,17 +176,14 @@ includes a tutorial and extensive documentation.
 \absection{Future}
 
 There are  two main directions that  we hope to explore  in our future
-work.
-
-First, we  would like to formally  evaluate the SDT  as a productivity
-tool.   That is,  to what  extent does  the graphical  development and
-debugging  environment  help  programmers  implement  and  verify  the
-correctness  of StreamIt  applications?  We  are  currently evaluating
-various  options for  conducting a  set of  controlled  experiments to
-explicitly quantify the SDT impact on overall programmer productivity;
-we believe  the advantages  afforded by the  SDT are  significant when
-compared to conventional methodologies.  
-
+work.  First,  we  would  like  to  formally evaluate  the  SDT  as  a
+productivity  tool.   That  is,  to  what extent  does  the  graphical
+development and  debugging environment help  programmers implement and
+verify  the correctness  of StreamIt  applications?  We  are currently
+evaluating  various  options  for   conducting  a  set  of  controlled
+experiments  to   explicitly  quantify  the  SDT   impact  on  overall
+programmer productivity; we believe the advantages afforded by the SDT
+are significant when compared to conventional methodologies.
 Second, we plan to thoroughly  evaluate the scalability of the SDT for
 massively  parallel  applications,   with  thousands  of  filters  and
 communication  edges.   In  particular,   we  would  like  to  explore
