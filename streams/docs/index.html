@@ -1,0 +1,146 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN">
+<html>
+  <head>
+    <title>StreamIt Documentation</title>
+  </head>
+
+  <body>
+    <h1>StreamIt Documentation</h1>
+    <h2>About This Release</h2>
+    <dl>
+      <dt><b>StreamIt README</b>
+	[<a href="release/readme.html">HTML</a>]
+	[<a href="release/readme.ps">PS</a>]
+	[<a href="release/readme.pdf">PDF</a>]
+      </dt>
+      <dd>
+	General information about this release of the StreamIt
+	compiler and runtime system.  Includes information on
+	dependencies of this package and some warnings on language
+	features that are unimplemented or broken.
+      </dd>
+      <dt><b>Recent Changes (NEWS)</b>
+	[<a href="release/news.html">HTML</a>]
+	[<a href="release/news.ps">PS</a>]
+	[<a href="release/news.pdf">PDF</a>]
+      </dt>
+      <dd>
+	High-level listing of changes between releases of the StreamIt
+	compiler and runtime system.
+      </dd>
+      <dt><b>Installation Instructions</b>
+	[<a href="release/install.html">HTML</a>]
+	[<a href="release/install.ps">PS</a>]
+	[<a href="release/install.pdf">PDF</a>]
+      </dt>
+      <dd>
+	Installation instructions for the StreamIt compiler and
+	runtime system.
+      </dd>
+      <dt><b>Command-Line Options</b>
+	[<a href="release/options.html">HTML</a>]
+	[<a href="release/options.ps">PS</a>]
+	[<a href="release/options.pdf">PDF</a>]
+      </dt>
+      <dd>
+	Listing of command-line options for the <tt>knit</tt> driver
+	script.  Includes options for selecting the uniprocessor, RAW,
+	or Java library backend, as well as various optimization
+	choices.
+      </dd>
+      <dt><b>Test Status</b>
+	[<a href="release/REGTEST">Text</a>]
+      </dt>
+      <dd>
+	A listing of the results of automated tests of the compiler
+	and runtime system against the benchmarks in the <tt>apps</tt>
+	directory.
+      </dd>
+      <dt><b>StreamIt License</b>
+	[<a href="release/COPYING">Text</a>]
+	<br><b>GNU General Public License</b>
+	[<a href="release/COPYING.GPL">Text</a>]
+      </dt>
+      <dd>
+	The core of the StreamIt compiler is derived from the <a
+	href="http://www.at.dms/kopi/">Kopi</a> Java compiler, and is
+	consequently released under the GNU General Public License
+	(GPL).  However, some of the surrounding code is not subject
+	to the terms of the GPL.  All of this release is free to
+	download, modify, and redistribute.
+      </dd>
+    </dl>
+
+    <h2>The StreamIt Language</h2>
+    <dl>
+      <dt><b>StreamIt Language Specification</b>
+	[<a href="syntax/streamit-lang.html">HTML</a>]
+	[<a href="syntax/streamit-lang.ps">PS</a>]
+	[<a href="syntax/streamit-lang.pdf">PDF</a>]
+      </dt>
+      <dd>
+	Description of the StreamIt programming language, including
+	all allowed language constructs.
+      </dd>
+      <dt><b>StreamIt Cookbook</b>
+	[<a href="cookbook/cookbook.html">HTML</a>]
+	[<a href="cookbook/cookbook.ps">PS</a>]
+	[<a href="cookbook/cookbook.pdf">PDF</a>]
+      </dt>
+      <dd>
+	A set of examples demonstrating simple StreamIt programs.  The
+	examples show most of the basic StreamIt features, including
+	examples of basic filters, pipelines, split-joins, and
+	feedback loops.
+      </dd>
+      <dt><b>Semantic Checks</b>
+	[<a href="syntax/semantic-checks.html">HTML</a>]
+	[<a href="syntax/semantic-checks.ps">PS</a>]
+	[<a href="syntax/semantic-checks.pdf">PDF</a>]
+      </dt>
+      <dd>
+	A listing of semantic checks that should be performed by the
+	StreamIt compiler frontend.  Many actually are implemented,
+	though not all.
+      </dd>
+    </dl>
+
+    <h2>Implementation Notes and Internal Documentation</h2>
+    <p>
+      These documents will not necessarily be useful to the casual
+      user of the StreamIt compiler; however, we distribute them in
+      the hope that people modifying the compiler internals will gain
+      insight into the design decisions and development environment we
+      use.
+    </p>
+    <dl>
+      <dt><b>Implementation Notes</b>
+	[<a href="implementation-notes/">Listing</a>]
+      </dt>
+      <dd>
+	A set of text files giving assumptions and design notes for
+	various parts of the StreamIt compiler.  Includes some notes
+	on possible implementations for future language features.
+      </dd>
+      <dt><b>Runtime Interface Notes</b>
+	[<a href="runtime-interface/">Listing</a>]
+      </dt>
+      <dd>
+	C header files detailing possible implementations for the
+	uniprocessor runtime interface.
+      </dd>
+      <dt><b>CAG StreamIt Manual</b>
+	[<a href="manual/manual.html">HTML</a>]
+	[<a href="manual/manual.ps">PS</a>]
+	[<a href="manual/manual.pdf">PDF</a>]
+      </dt>
+      <dd>
+	Instructions for setting up the StreamIt infrastructure in the
+	MIT Computer Architecture Group.  This includes a breakdown of
+	the steps taken by the <tt>knit</tt> script, which may be
+	useful for testing and debugging, along with a description of
+	our methodology for gathering performance statistics.
+      </dd>
+    </dl>
+  </body>
+</html>
