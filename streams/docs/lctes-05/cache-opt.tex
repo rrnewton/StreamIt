@@ -64,5 +64,33 @@ the 90-10 rule, and the square represents the largest calculated
   \label{fig:90-10}
 \end{figure*}
 
-\subsection{Actor Granularity}
+\subsection{Actor Coarsening}
 
+In StreamIt, the computation boundaries (i.e., the granularity of a
+filter) is determined by the application developed according to the
+most natural representation of an algorithm. When compiling to a
+cache-based architecture, the presence of a  large number of filters
+can lead to a high overhead in terms of context swapping between work
+functions and buffer management for the shared data between filters.
+It is the compiler's role to adjust the granularity of execution such
+that actors do not vary significantly in terms of code size, or data
+workingset size.
+
+We use a greedy partitioning algorithm to find a set of vertical cuts
+in a stream graph such that the resulting partitions are more or less
+balanced. The algorithm uses code size estimation to quantify the
+instruction footprint of a partition, and analyzes the work function
+declarations to estimate the data buffer requirements. The algorithm
+also considers the amount of static state that is persistent across
+filter executions. This approach is similar to that in
+\cite{streamit-asplos} with two deistinctions. First, the algorithm
+only considers vertical fusion (i.e., within a pipeline): horizontal
+fusion is not beneficial from  caching perspective, and may not even
+be feasible. Second, since the graph partitioning is limited to
+vertical cuts, our actor coarsening optimizations employs a greedy
+algorithm instead of a dynamic programing methodology; this reduces
+compilation time. 
+
+The cache-aware coarsening of actors, which we will also refer to as
+cache-aware fusion, greatly impacts performance as
+our results in Section~\ref{sec:evaluation} will demonstrate.
