@@ -60,6 +60,7 @@
 	  href="http://www.java.sun.com">Java   Virtual  Machine</a>  is
 	  required to run the compiler.<br>
 	  <br>
+
 	  The    StreamIt   frontend    depends    on   the    <a
 	  href="http://www.antlr.org">ANTLR LL(k)</a> parser generator.
 	  If you are using the source release, the ANTLR classes must be
@@ -68,6 +69,7 @@
 	  the  required  ANTLR  classes  are  already  included  in  the
 	  StreamIt  jar file.<br>
 	  <br>
+
 	  The C library depends on the <a href="http://www.fftw.org">FFTW library</a>. The
 	  StreamIt runtime system currently only supports <i>fftw-2.1.x</i>, not the newer
 	  <i>fftw-3.0</i> branch. FFTW  should be installed somewhere in
@@ -78,12 +80,22 @@
 	  FFTW   from   source,   use  the   <i>--enable-float</i>   and
 	  <i>--enable-type-prefix</i> options when compiling.<br>
 	  <br>
+
 	  Compilation  for  <a href="http://cag.lcs.mit.edu/raw">Raw</a>
 	  depends on the most  recent released Raw build environment (as
 	  of    this    release,    <i>raw_dist_2003_03_18</i>).     The
 	  <i>TOPDIR</i>  environment  variable needs  to  point to  your
 	  <i>StarSearch</i> directory;  this may be  the reduced workdir
-	  tree from the Raw distribution, or the full starsearch tree.
+	  tree from the Raw distribution, or the full starsearch tree.<br>
+        <br>
+
+	  Also, rebuilding the StreamIt documentation requires the
+        following:          <li><a href="http://search.cpan.org/~gaas/Font-AFM-1.18/">Perl Adobe Font Metrics Interface</a>,
+          <li><a href="http://search.cpan.org/~sburke/HTML-Format-2.03/">Perl HTML Formating</a>,
+	    <li><a href="http://search.cpan.org/~sburke/HTML-Tree-3.18/">Perl HTML Tree Parser</a>,
+	    <li><a href="http://pauillac.inria.fr/~maranget/hevea/">
+              H<font SIZE=2><sup>E</sup></font>V<font SIZE=2><sup>E</sup></font>A</a>
+              L<sup>A</sup>T<sub>E</sub>X to HTML translator.
 
       </p>
     </td>
