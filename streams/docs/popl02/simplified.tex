@@ -30,18 +30,37 @@ the work function for a node $n$ is simply $W(n)$.
 \subsection{Calculating the Steady-State Period}
 \label{sec:balance}
 
-Let $S(n)$ denote the number of times that node $n$ fires its 0'th
-phase for a balanced steady-state execution cycle of the entire
-graph. \todo{Say more about this.}
+Let $S(n)$ denote the number of times that node $n$ fires its first
+phase for a periodic steady-state execution of the entire graph. A
+{\it periodic} schedule is one that does not change the number of
+items on the channels in the graph after executing; in other words, it
+is legal to execute in the steady state.  For an SDF graph, there is a
+unique and minimal periodic schedule, of which all other periodic
+schedules are a multiple~\cite{leesdf}.  It is straightforward to use
+a set of balance equations to solve for $S(n)$ given the declared
+rates of filters in the graph (see~\cite{leesdf} for details.)
 
-We will use the following helper function.  Given channel $c = (n_a, n_b)$:
+We will use the following helper function in our analysis.  Given
+channel $c = (n_a, n_b)$:
 \begin{align*}
 \mt{Period}(c) \equiv S(n_a) * U(c) = S(n_b) * O(c)
 \end{align*}
 
+That is, $\mt{Period}(c)$ denotes the number of items that are passed
+over channel $c$ during a single steady-state execution of the graph.
+
 \subsection{Generating a SARE}
 
-The SARE will be parameterized by $N$, the number of steady-state
-cycles that one wishes to execute in the PCP.
+We now generate a SARE for a given PCP.  The {\it domains} of the SARE
+will be parameterized by $N$, the number of steady-state cycles that
+one wishes to execute in the PCP.  However, it is important to note
+that $N$ does not affect the number of variables or equations in the
+SARE, as that would require a separate compilation and analysis for
+each value of $N$.  It is a key benefit of the SARE representation
+that $N$ can be incorporated as a symbolic parameter in the schedule.
 
 \input{simplefig}
+
+The procedure for generating the SARE appears in Figure~\ref{fig:sdftosare}.
+
+\todo{Describe simple translation (remember what's resolvable at compile time)}

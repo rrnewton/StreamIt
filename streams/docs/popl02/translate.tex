@@ -3,8 +3,19 @@
 \label{sec:translate}
 
 In this section we give the formal translation of a Phased Computation
-Program to a System of Affine Recurrence Equations.  The SARE will be
-parameterized by $N$, the number of steady-state cycles that one
-wishes to execute in the PCP.
+Program to a System of Affine Recurrence Equations.  Again, the SARE
+will be parameterized by $N$, the number of steady-state cycles that
+one wishes to execute in the PCP.  
 
-The translation will use helper functions shown in Figure~\ref{fig:helper}:
+The translation will use helper functions shown in
+Figure~\ref{fig:helper}.  We also make use of the $S(n)$ function
+giving the number of steady-state executions of node $n$ (see
+Section~\ref{sec:balance}).
+
+\input{complexfig}
+
+The general translation proceudre is illustrated in
+Figures~\ref{fig:pcptosare1},\ref{fig:pcptosare1}, and
+\ref{fig:pcptosare1}.
+
+\todo{Describe full translation}

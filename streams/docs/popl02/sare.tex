@@ -31,8 +31,13 @@ where each node has both an initial and steady-state execution epoch,
 each of which contains a number of {\it phases}.  It is also a
 generalization of other popular representations for dataflow graphs,
 such as synchronous dataflow (SDF) and cyclo-static dataflow (CSDF)
-(see Table~\ref{tab:models}).  Formally, a PCG is a directed graph
-with the following components:
+(see Table~\ref{tab:models}).  Phases are attractive constructs for
+the reasons given in describing CSDF in Section~\ref{sec:related};
+also, an initial epoch is critical for applications such as a WAV file
+decoder that adjusts its parameters based on the data it finds in the
+header of the stream.
+
+Formally, a PCG is a directed graph with the following components:
 \begin{itemize}
 
 \item Nodes $n_1 \dots n_{m_n}$.
@@ -126,7 +131,7 @@ A PCP consists of the following:
 
 \item A Phased Computation Graph $G = (\{n_1 \dots n_{m_n}\}, \{c_1
 \dots c_{m_c}\}, A, \mt{num}, U, O, E)$ describing the nodes,
-channels, and I/O rates of the program (see Section~\ref{sec:pcp}).
+channels, and I/O rates of the program (see Section~\ref{sec:pcg}).
 Each channel $c = (n_a, n_b)$ is a FIFO queue; $n_a$ pushes items onto
 the back of $c$ and $n_b$ consumes items from the front of $c$.
 

@@ -20,12 +20,18 @@ explore two heuristics to do it in acyclic graphs \cite{Bhatta97}.
 
 Cyclo-static dataflow (CSDF) is the generalization of SDF to the case
 where each node has a set of phases with different I/O rates that are
-cycled through repeatedly~\cite{BEPL96,Parks95}.  Compared to SFD,
-CSDF is more natural for the programmer for writing phased
-applications, can have lower latency, and more fine-grained
-parallelism.  However, current scheduling techniques for CSDF involve
-converting each phase to an SDF actor, which can cause deadlock even
-for legal graphs~\cite{BELP96}.
+cycled through repeatedly~\cite{BELP96,Parks95}.  Compared to SFD,
+CSDF is more natural for the programmer for writing phased filters,
+since periodic tasks can be separated.  For instance, consider a
+channel decoder that inputs a large matrix of coefficients at regular
+intervals, but decodes one element at a time for $N$ invocations in
+between each set of coefficients.  By having two separate phases, the
+programmer doesn't have to interleave this functionality in a single,
+convoluted work function.  Also, CSDF can have lower latency and more
+fine-grained parallelism than SDF.  However, current scheduling
+techniques for CSDF involve converting each phase to an SDF actor,
+which can cause deadlock even for legal graphs~\cite{BELP96} and does
+not take advantage of the fine-grained dataflow exposed by CSDF.
 
 The computation graph {CG} was described by Karp and
 Miller~\cite{Karp67} as a model of computation that, unlike the above
@@ -99,7 +105,7 @@ SARE's became interesting from the standpoint of program analysis upon
 Feautrier's discovery~\cite{Feautrier92i,Feautrier92ii} that a SARE is
 mathematically equivalent to a ``static control flow program''.  A
 program has static control flow if the entire path of control can be
-determined at compile time (see~\cite{Feautrier92i,FV00} for details).
+determined at compile time (see~\cite{Feautrier92i,DRV00} for details).
 Feautrier showed that using a SARE, one can use linear programming to
 produce a {\it parameterized} schedule for a program.  That is, if a
 loop bound is unknown at compile time, then the symbolic bound enters

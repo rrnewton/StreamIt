@@ -1,8 +1,94 @@
 \section{Applications}
 
-\subsection{Inter-Node Optimization}
+\subsection{Node-Level Optimization}
 
-\subsection{Scheduling}
+Perhaps the most immediate application of our technique is to use the
+SARE representation to bridge the gap between intra-node dependences
+and inter-node dependences.  Our presentation in the last section was
+in terms of a coarse-grained work function $W$ mapping inputs to
+outputs.  However, if the source code is available for the node, then
+the equations containing $W$ can be expanded into another level of
+affine recurrences that represent the implementation of the node
+itself.  (If the node contained only static control flow, then this
+formulation as a SARE would be exact; otherwise, one could use a
+conservative approximation of the dependences.)
+
+The resulting SARE would expose the fine-grained dependences between
+local variables of a given node with the local variables of
+neighboring nodes.  We believe that this information opens the door
+for a wide range of novel node optimizations, which we outline in the
+following sections.
+
+\subsubsection{Inter-Node Dataflow Optimizations}
+
+Once the SARE has exposed the flow dependences between the internal
+variables of two different nodes, one can perform all of the classical
+dataflow optimizations as if the variables were placed in the same
+node to begin with.  For instance, constant propagation, copy
+propagation, common sub-expression elimination, and dead code
+elimination can all be performed throughout the internals of the nodes
+as if they were connected in a single control flow graph.
+
+Some of these optimizations could have a very large performance
+impact; for instance, consider a 2:1 downsampler node that simply
+discards half of its input.  Using the SARE, it is straightforward to
+trace the element-wise dependence chain from each discarded item, and
+to mark each source operation as dead code (assuming the code has no
+other consumers.)  In this way, one can perform fine-grained
+decimation propagation throughout the entire graph and prevent the
+computation of any items that are not needed.  This degree of
+optimization is not possible in frameworks that treat the node as a
+black box.
+
+\subsubsection{Steady-State Invariant Code Motion}
+
+In the streaming domain, the analog of loop-invariant code motion is
+the motion of code from the steady-state epoch to the initialization
+epoch if it does not depend on any quantity that is changing during
+the steady-state execution of a node.  Quantities that the compiler
+detects to be constant during the execution of a work function can be
+computed from the initialization epoch, with the results being passed
+through a feedback loop for availability on future executions of work.
+
+\subsubsection{Fission Transformations}
+
+It may be the case that many of the operations that are grouped within
+a node are completely independent, and that the node can be split into
+sub-components that can execute in parallel or as part of a more
+fine-grained schedule.  For instance, many operations using complex
+data types are grouped together from the programmer's view, even
+though the operations on the real and imaginary parts are completely
+separate.  Given a SARE representation of the graph and the node, this
+``node fission'' is completely automatic, as there would be no
+dependence between the operations in the SARE.  A scheduling pass
+would treat the real and imaginary operations as if they were written
+in two different nodes to begin with.
+
+\subsubsection{Induction Variable Detection}
+
+SAMAN HERE'S HOW FAR I AM
+
+The {\tt work} function can also be analyzed as would the body of a loop
+to see if there are induction variables from one steady-state execution
+to the next.  This analysis is useful both for strength reduction, which
+{\it adds} a dependence between invocations by converting an expensive
+operation to a cheaper, incremental one, as well as for data
+parallelization, which {\it removes} a dependence from one invocation to
+the next by changing incremental operations on filter state to
+equivalent operations on privatized variables.
+
+\subsection{Parameterized Graphs}
+
+Don't need to duplicate code for nodes that are repeated.  Can also
+parameterize the schedule along these dimensions.  Especially
+well-tailored to StreamIt.  Compare to PSDF.
+
+\subsection{Graph-Level Optimization}
+
+Attractive because there's a unified mathematical model for expressing
+constraints.
+
+\subsubsection{Scheduling}
 
 Perhaps most attractive feature, as there is a large body of work on
 scheduling and automatic parallelization for affine dependences
@@ -12,11 +98,6 @@ can run in parallel, and optimize for different metrics
 thoroughly in the SDF community.
 
 Also scheduling for other optimization metrics is interesting.
-
-\subsection{Inter-Node Optimization}
-
-Attractive because there's a unified mathematical model for expressing
-constraints.
 
 \subsubsection{Buffer Minimization}
 
@@ -47,74 +128,6 @@ Also not just scheduling - how do you arrange things.
 
 Provides a good framework for distributing a streaming computation
 across an architecture.
-
-\subsection{Intra-Node Optimization}
-
-Unlike other program domains, where the principle aim of compiler
-optimization is to shorten the total execution time, there are many
-distinct optimization metrics for streaming applications, including
-throughput, latency, data size, and code size.  The latter two of these
-are especially important in embedded domains, where memory is in short
-supply; latency can be critical for real-time applications, and
-throughput is always of interest.
-
-\subsection{Fission Transformations}
-
-Just specify the relations within a node, and you have a complete view
-of program.
-
-When the machine target is more fine-grained than the stream graph, it
-is advantageous to break filters up into smaller pieces so that more
-hardware resources can be utilized.  We propose two fission
-transformations:
-
-Split in Half
-Data Parallel Duplication
-
-\subsection{Fusion Transformations}
-
-e.g. Just doing constant prop on a node.
-
-\subsection{Steady-State Invariant Code Motion}
-
-With the dependence analysis, the compiler can detect items that are
-constant during the work epoch, and can move their computation to the
-init epoch, letting the data flow through in a feedback loop afterwards.
-
-In the streaming domain, the analog of loop-invariant code motion is
-the motion of code from a steady-state work function to an
-initialization function if it does not depend on any quantity that is
-changing during the steady-state execution of a node.  Quantities that
-the compiler detects to be constant during the execution of a work can
-be computed from within init, with the results being passed through a
-feedback loop for availability on future executions of work.
-
-\subsection{Induction Variable Detection}
-
-The {\tt work} function can also be analyzed as would the body of a loop
-to see if there are induction variables from one steady-state execution
-to the next.  This analysis is useful both for strength reduction, which
-{\it adds} a dependence between invocations by converting an expensive
-operation to a cheaper, incremental one, as well as for data
-parallelization, which {\it removes} a dependence from one invocation to
-the next by changing incremental operations on filter state to
-equivalent operations on privatized variables.
-
-\subsection{Decimation Propagation}
-
-Decimation refers to the regular discarding of a fraction of a filter's
-input items, perhaps to reduce the sampling rate in a stream.  In the
-streaming domain, the analog of dead code elimination is the propagation
-of this decimation up through the stream graph, thereby eliminating the
-computations that produce the unused items.
-
-\subsection{Parameterized Graphs}
-
-Don't need to duplicate code for nodes that are repeated.  Can also
-parameterize the schedule along these dimensions.  Especially
-well-tailored to StreamIt.  Compare to PSDF.
-
-\subsection{Semantics}
 
 %% \subsection{Verification}
 
