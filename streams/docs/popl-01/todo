@@ -7,9 +7,32 @@ much prettier, but why would you want the blocked structure (display?)
 calls so it's not blatently wasting memory?
 
 ------------------------------------------------------------------------
-processor simulator
 
+int N = 5;
+int M = 7;
 
+void main() {
+
+   float data[] = new float[N+M];
+   int pos;
+
+   for (int pos=0; pos<N; pos++) {
+      data[pos] = getData();
+   }
+
+   while (true) {
+      pos = (pos+1)\%N;
+
+      float sum = 0;
+      for (int i=0; i<N; i++) {
+         sum = data[(i+pos)\%N]*FIR_COEFF[j][N];
+      }
+
+      display(sum);
+
+      data[pos] = getData();
+   }
+}
 
 ------------------------------------------------------------------------
 add these semantic restrictions:
