@@ -1,0 +1,171 @@
+<html>
+
+<head>
+   <meta http-equiv="Content-Type" content="text/html;charset=iso-8859-1">
+   <meta NAME="author" CONTENT="rodric m. rabbah">
+   <meta NAME="keywords" CONTENT="saman amarasinghe, streaming, programming languages, compilers">
+   <meta NAME="description" CONTENT="StreamIT">
+   <title>StreamIt - Download</title>
+
+   <style fprolloverstyle>A:hover {color: #FF0000}</style>
+</head>
+
+<!--body BGCOLOR="#444A50" TEXT="#FFFFFF" LINK="#FFCC00" VLINK="#FFCC00" ALINK="#FFCC00"-->
+
+<table border="0" width="600" cellpadding="2" align="center">
+
+  <tr>
+    <td width="17%" valign="center" align="left">
+      <img src="../images/streamit-logo.jpg" height="90" width="90">
+    </td>
+    <td valign="center" align="center">
+      <font color="#444A50">
+        <br><br><br>
+        <nobr><b>
+            <a href="../index.html"><font color="#FF0000">home</font></a>
+          | <a href="../html/news.html"><font color="#FF0000">news</font></a>
+          | <a href="../html/research.html"><font color="#FF0000">research</font></a>
+          | <a href="../html/people.html"><font color="#FF0000">people</font></a> 
+          | <a href="../html/documentation.html"><font color="#FF0000">documentation</font></a>
+          | download</a>
+          | <a href="../html/contact.html"><font color="#FF0000">contact</font></a>
+        </nobr></b>
+        <hr>
+      </font>
+    </td>
+    <td width="17%" valign="top" align="left"></td>
+  </tr>
+
+  <tr>
+    <td width="17%" valign="top" align="left"></td>
+    <td valign="top" align="right"><h3>DOWNLOAD</h3></td>
+    <td width="17%" valign="top" align="left"></td>
+  </tr>
+
+</table>
+
+<table border="0" width="1000" cellpadding="0" align="center">
+
+  <tr>
+    <td width="130" valign="top" align="left">
+<!--
+      <hr>
+	<a href="../html/systems-reqs.html"><font color="#FF0000">requirements</font></a><br><hr>
+	<a href="../html/systems-dwnl.html"><font	color="#FF0000">download    </font></a><br><hr>
+	<a href="../html/systems-faqs.html"><font color="#FF0000">faq         </font></a><br><hr>
+	<a href="../html/systems-sprt.html"><font color="#FF0000">support     </font></a><br><hr>
+-->
+    </td>
+    <td width="20" valign="top" align="left"></td>
+
+    <td width="700" valign="top" align="left">
+      <br><br><br>
+      <p align="justify">
+
+	  A snapshot  of the  StreamIt compiler, including  the StreamIt
+	  benchmarks,    is    now    available.     You    may    <b><a
+	  href="register.html">register and download</a></b> either the
+	  <i>full source package</i> which  includes all of the StreamIt
+	  sources,  or the  <i>full  binary package</i>  which does  not
+	  contain any sources, but includes  a Java jar file of the full
+	  compiler.<br>
+
+	  <ul>
+	    <li><p align="justify">
+	    	Review the list of
+	    	<a href="../html/download-reqs.html">software
+	    	requirements</a> before downloading StreamIt.
+	    </p>
+	    <li><p align="justify">
+	    	Read the <a
+	    	href="../html/install.html">installation instructions</a>
+	    	after you have downloaded StreamIt.
+	    </p>
+	    <li><p align="justify">
+	    	Browse the <a
+	    	href="../html/strc-options.html">quick start guide to StreamIt</a>
+	    	for instructions on using the compiler.
+	    </p>
+	    <li><p align="justify">
+	      For   technical  assistance  and   support,  you   may  <a
+		href="../html/contact.html">        contact</a>        the
+		StreamIt support  team.
+	    </p>	    
+	  </ul>
+
+	  <hr>
+
+	  <p align="justify">
+	    The StreamIt  compiler is  a research infrastructure  and it
+	    remains under  active development; if it breaks,  you get to
+	    keep both pieces.  The compiler produces functional code for
+	    both      uniprocessor      targets      and     the      <a
+	    href="http://cag.lcs.mit.edu/raw">MIT Raw</a> processor, but
+	    has several known shortcomings:
+	  </p>
+	  <ul>
+	    <li><p align="justify">
+	      The compiler works by converting StreamIt syntax to
+            a Java intermediate  form; compiling <i>"foo.str"</i> will
+            clobber  a  file   named  <i>"foo.java"</i>  in  the  same
+            directory.
+          </p>
+	    <li><p align="justify">
+	      The frontend  has only rudimentary  correctness checks. If
+	      you get  strange exceptions from the  frontend, check your
+	      program's  syntax,  and that  all  variables are  declared
+	      before  being used.  A  semantic checker  is currently  in
+	      progress.
+          </p>
+	    <li><p align="justify">
+	      For  stream I/O  types, arrays  are not  supported  on the
+	      uniprocessor backend.  Primitive types and  structures are
+	      supported on  both the  uniprocessor backend and  Raw, and
+	      should work in the Java library.
+          </p>
+	    <li><p align="justify">
+	      The   compiler   may  have   memory   issues  running   on
+	      particularly  large benchmarks.   The  dynamic programming
+	      partitioner  (<i>--dppartition</i>)  generally  uses  less
+	      memory than the default greedy partitioner.
+          </p>
+	    <li><p align="justify">
+            Multidimensional arrays may not work well, particularly as
+            the input or output  type of a filter. (Better performance
+            is often possible by destructuring arrays in any case.)
+          </p>
+	    <li><p align="justify">
+	      Phased  filter support  differs between  the  compiler and
+		library.  A  work function that consists only  of calls to
+		phase functions  should work  in both; a  more complicated
+		work  function, possibly  including  variable declarations
+		and static  control flow, would  work in the  compiler but
+		not  the  library.  The  intermediate  Java  code  differs
+		between the two compilation paths.
+          </p>
+	    <li><p align="justify">
+	      The Java  library infrastructure may  not allow particular
+	      combinations of  stream parameters.  This should  not be a
+	      problem with the compiler; if you run into it, see
+	      <i>library-init-functions.txt</i>       in             the
+		<i>docs/implementation-notes/</i> directory for instructions that
+	      may resolve the issue.
+          </p>
+	    <li><p align="justify">
+	      Most  of  our  development  is  carried  out  in  a  Linux
+	      environment; some aspects of  the compiler may be specific
+	      to gcc and/or Linux.
+          </p>
+
+      </p>
+    </td>
+
+    <td width="150" valign="top" align="left"></td>
+  </tr>
+
+</table>
+
+</body>
+
+
+</html>
