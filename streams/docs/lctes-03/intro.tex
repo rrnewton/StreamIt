@@ -22,13 +22,13 @@ support for high-level stream programming.  A StreamIt program
 consists of a set of autonomous filters that communicate using FIFO
 queues.  Filters can be combined into single-input, single-output
 modules by using a set of hierarchical primitives, thereby imposing a
-struture on the stream graph that is akin to structured control flow
+structure on the stream graph that is akin to structured control flow
 in a mainstream language.  In order to facilitate static scheduling,
 the input and output rates of each filter are known at compile time.
 
 In this paper, we present techniques for scheduling stream graphs such
 as those found in StreamIt.  The StreamIt representation has much in
-commmon with Synchronous Dataflow (SDF) graphs~\cite{lee87static}, for
+common with Synchronous Dataflow (SDF) graphs~\cite{lee87static}, for
 which there is a large body of literature devoted to scheduling (see
 \cite{bhattacharyya99synthesis} for a review).  There are two aspects
 of StreamIt programs that distinguish our scheduling problem from a
@@ -82,7 +82,6 @@ strategies for one steady state execution of a simple pipeline.
 Channels are annotated with the number of live data items that they
 contain; shaded nodes represent those that fire on a given time
 step.\protect\label{fig:trace}}
-\vspace{-12pt}
 \end{figure}
 
 \subsection{Example}
@@ -197,5 +196,4 @@ anywhere else)}
 Figure~\ref{fig:trace}.  For brevity, we show these figures on the
 same graph, even though a unit of storage might have a different cost
 for code and data.\protect\label{fig:codedata}}
-\vspace{-12pt}
 \end{figure}

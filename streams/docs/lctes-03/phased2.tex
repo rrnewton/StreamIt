@@ -3,13 +3,14 @@
 
 \begin{figure}[t]
 \psfig{figure=pseudocode5.eps,width=3.5in}
-\vspace{-12pt}
+\vspace{-22pt}
 \caption{\small Phased Scheduling Algorithm.\protect\label{fig:phasealg}}
+\vspace{-18pt}
 \end{figure}
 
 A schedule for a given hierarchical node of a {\StreamIt} program is a
 list of the node's immediate children, specifying the order in which
-they should be executed.  More precisly, since filters (and, as we
+they should be executed.  More precisely, since filters (and, as we
 will see, hierarchical nodes as well) can have multiple phases, a
 schedule is a list of phases of child nodes.  In order for a schedule
 to be legal, it must satisfy two conditions: first, for every
@@ -101,7 +102,7 @@ $\mt{peek}$ items on the channel.
 Once it has gathered the list of maximally fine-grained phases, the
 {\tt phasedSchedule} algorithm makes two modifications.  First, it
 combines some adjacent phases so that only {\tt maxPhases} are
-returned.  Combination works simply by concatanating the sequence of
+returned.  Combination works simply by concatenating the sequence of
 child executions from the given phases.  Second, even if no phases are
 combined, the algorithm re-arranges the order of child phases so that
 all phases corresponding to a given stream are adjacent.  This is an
@@ -223,7 +224,7 @@ loop.\protect\label{fig:gsm-phases}}
 
 \begin{figure}[t]
 \psfig{figure=pseudocode6.eps,width=3.5in}
-\vspace{-6pt}
+\vspace{-16pt}
 \caption{\small Algorithm to detect the minimum number of phases required by
 a given feedback loop.\protect\label{fig:feedalg}}
 \end{figure}
@@ -234,7 +235,7 @@ Some feedback loops require a minimum number of phases in order to
 construct a valid schedule.  This is because if the latency of child
 streams is too high, then a node could deadlock waiting for its own
 (upcoming) output to propagate through the loop.  For example, in our
-GSM benchmark, there is a tightly constrainted feedback loop (see
+GSM benchmark, there is a tightly constrained feedback loop (see
 Figure~\ref{fig:gsm}).  While it is impossible to schedule this loop
 with a single appearance schedule, a minimum latency schedule results
 in a legal ordering (see~Figure~\ref{fig:gsm-phases}).
@@ -300,6 +301,6 @@ the current phase number until runtime.  This would allow more
 opportunities for schedule compression, as two different phases would
 be considered equal if they call the same child streams, rather than
 requiring them to call the same phases on those children.  However,
-proper evaulation of this technique would need to take into account
+proper evaluation of this technique would need to take into account
 the overhead of this indirection at runtime, and we do not evaluate it
 here.

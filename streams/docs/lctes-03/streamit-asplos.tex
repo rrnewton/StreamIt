@@ -29,6 +29,33 @@ as the total number of items read, including the items popped.  Thus,
 we always have that $peek \ge pop$.}} on each invocation are declared
 with each phase of the {\work} function.
 
+\begin{figure}
+\begin{center}
+
+\begin{minipage}{0.7in}
+\centering \psfig{figure=pipeline-buffers.eps,width=0.4049in}
+\end{minipage}
+~~~~~~
+\begin{minipage}{0.8in}
+\centering \psfig{figure=splitjoin-steady-state.eps,width=0.6in}
+\end{minipage}
+~~~~~~
+\begin{minipage}{0.8in}
+\centering \psfig{figure=feedback-steady-state.eps,width=0.79in}
+\end{minipage}
+
+\vspace{0.1in}
+
+{\small ~~~~(a) a pipeline ~~~~~~~ (b) a splitjoin ~~~~ (c) a feedbackloop~~~~}
+
+\caption{\small Sample {\StreamIt} operators.  Each node is labeled
+with its peek, pop rates (at top) and push rate (at bottom).  The $L$
+{\filter} has been flipped upside-down for clarity.
+\label{fig:steady-state}}
+\vspace{-12pt}
+\end{center}
+\end{figure}
+
 %% {\StreamIt}'s representation of a filter is an improvement over
 %% general-purpose languages.  In a procedural language, the analog of a
 %% filter is a block of statements in a complicated loop nest.  There is
@@ -80,7 +107,7 @@ modules that admit a linear textual representation.  In addition, it
 helps the compiler by restricting certain analyses to a local level
 rather than dealing with global properties of the graph.  In the
 context of scheduling, hierarchy is also useful because it allows for
-the separate compilation of program componenets.  This enables
+the separate compilation of program components.  This enables
 creation of standardized libraries and their distribution in binary
 form, rather than source code.  This ability may become important as
 streaming languages become more widely used for larger applications.
@@ -88,7 +115,7 @@ streaming languages become more widely used for larger applications.
 The peek construct is also an important feature of StreamIt, though it
 requires special support from the scheduler.  By using the peek
 command, a filter can examine input items at a given index without
-dequeing them from the channel.  This exposes to the compiler the
+dequeuing them from the channel.  This exposes to the compiler the
 reuse of input items between successive invocations of a filter's work
 function.  A primary example is an FIR filter, which pops 1 item but
 peeks N items.  Without the capability to peek, the programmer would
@@ -99,37 +126,12 @@ linear analysis and optimization passes within the StreamIt compiler
 benefit greatly from analyzing peek statements directly instead of
 reverse-engineering internal filter state~\cite{lamb03}.
 
-\begin{figure}
-\begin{center}
-
-\begin{minipage}{0.7in}
-\centering \psfig{figure=pipeline-buffers.eps,width=0.4049in}
-\end{minipage}
-~~~~~~
-\begin{minipage}{0.8in}
-\centering \psfig{figure=splitjoin-steady-state.eps,width=0.6in}
-\end{minipage}
-~~~~~~
-\begin{minipage}{0.8in}
-\centering \psfig{figure=feedback-steady-state.eps,width=0.79in}
-\end{minipage}
-
-\vspace{0.1in}
-
-{\small ~~~~(a) a pipeline ~~~~~~~ (b) a splitjoin ~~~~ (c) a feedbackloop~~~~}
-
-\caption{\small Sample {\StreamIt} operators.  Each node is labelled
-with its peek, pop rates (at top) and push rate (at bottom).  The $L$
-{\filter} has been flipped upside-down for clarity.
-\label{fig:steady-state}}
-\end{center}
-\end{figure}
-
 \begin{figure}[t]
 \begin{center}
 \hspace{0.1in} \psfig{figure=radio-ascoded.eps, width=2.8in}
-\vspace{-36pt} \caption{\protect\small Block diagram of an FM
+\vspace{-24pt} \caption{\protect\small Block diagram of an FM
 Radio. \protect\label{fig:radio-ascoded}}
+\vspace{-12pt}
 %% \begin{minipage}{0.46in}
 %% \centering
 %% \psfig{figure=pipeline.eps,width=0.46in} \\
