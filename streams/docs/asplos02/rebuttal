@@ -24,12 +24,14 @@ Two issues were of interest to many reviewers:
    fusion in order to improve performance.
 
    However, we have since implemented an automatic partitioner that is
-   based on a simple greedy algorithm.  This algorithm obtains
-   respectable performance (more than 2X speedup for two applications)
-   but we can construct cases in which a greedy strategy will fail.
-   We believe that a robust partitioner is an important goal for
-   future research, but the complexities introduced therein are beyond
-   the scope of this paper, and even orthogonal to our other results.
+   based on a simple greedy algorithm.  For 4 out of our 5
+   applications, this algorithm obtains performance that is 93% of our
+   hand-optimized code, on average.  For the last application (the
+   48x16 BeamFormer) this algorithm is not sufficient, and we can
+   construct other cases where a greedy strategy will fail.  We
+   believe that a robust partitioner is an important goal for future
+   research, but the complexities introduced therein are beyond the
+   scope of this paper, and even orthogonal to our other results.
 
 2. Performance of FFT.  Our submission indicated a 20-fold decrease in
    the performance of FFT due to our "optimizations".  Two
