@@ -3,7 +3,7 @@ StreamIt Snapshot Release
 
 This is for the March 14, 2003 snapshot release (streamit-0.0.20030314).
 
-$Id: README,v 1.4 2003-03-14 15:29:31 dmaze Exp $
+$Id: README,v 1.5 2003-03-14 16:35:44 dmaze Exp $
 
 1. What is this?
 2. Dependencies
@@ -79,8 +79,9 @@ research compiler; as such, it has several known shortcomings:
    backend.  Primitive types and structures are supported on both the
    uniprocessor backend and RAW, and should work in the Java library.
 
--- Built-in Identity<type> filters don't work in the compiler for
-   complex or structured types.
+-- Multidimensional arrays may not work well, particularly as the
+   input or output type of a filter.  (Better performance is often
+   possible by destructuring arrays in any case.)
 
 -- enqueue statements can only occur outside of any control flow, and
    can only enqueue fixed constant values, not expressions involving
