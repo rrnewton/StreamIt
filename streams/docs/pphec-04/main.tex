@@ -8,9 +8,9 @@
 \usepackage{subfigure}
 \usepackage{setspace}
 
-%\topmargin -0.6truein
-%\textheight 9.1truein
-%\textwidth 6.3truein
+\topmargin -0.2truein
+\textheight 9.5truein
+\textwidth 6.5truein
 \sloppy
 
 \date{}
@@ -19,13 +19,14 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\title {\bf Productive Programming in Stream Computing}
+\title {\bf Productive Programming Environment for Stream Computing}
 
 \author{
   Kimberly Kuo, Rodric M. Rabbah, Saman Amarasinghe\\
-  Computer Science and Artifical Intelligence Laboratory\\
+  Computer Science and Artificial Intelligence Laboratory\\
   Massachusetts Institute of Technology\\
-  Cambridge, MA 02139
+  Cambridge, MA 02139\\
+  {kkuo, rabbah, saman}@mit.edu
 }
 
 \begin{document}
@@ -34,6 +35,30 @@
 
 \singlespacing
 \begin{abstract}
+This paper  presents StreamIt and  the StreamIt Development  Tool. The
+development tool is an IDE  designed to improve the coding, debugging,
+and visualization of streaming applications by exploiting the StreamIt
+language's   ability  to  naturally   represent  streaming   codes  as
+structured, hierarchical  graphs.  The StreamIt  Development Tool aims
+to emulate  the best  of traditional debuggers  and IDEs  while moving
+toward hierarchical  visualization and debugging  concepts specialized
+for streaming applications.  As such, it provides utilities for stream
+graph   examination,   tracking   of   data  flow   between   streams,
+deterministic execution of parallel  streams. These features are in in
+addition to  more conventional tools  for creating and  editing codes,
+integrated   compilers,    setting   breakpoints,   watchpoints,   and
+step-by-step program execution.
+
+A user study evaluating StreamIt  and the development tool was held at
+MIT during which  participants were given buggy programs  and asked to
+resolve the  programming errors.  We compared the  productivity of the
+users  when  using the  StreamIt  Development  Tool  and its  graphical
+features  to  those who  were  restricted  to line-oriented  debugging
+strategies, and we found that the former produced twenty seven correct
+solutions which is ten more than the latter set of users. Furthermore,
+our data suggests that the graphical tool chain helped to mitigate user
+frustration and  encouraged participants to invest  more time tracking
+and fixing programming bugs.
 \end{abstract}
 
 \doublespacing
@@ -46,7 +71,7 @@
 
 The last  few years  have witnessed the  rebirth of  supercomputing as
 computer  scientists  and engineers  realize  that current  monolithic
-architectures  and conventional von~Neuman  programming styles  are at
+architectures  and conventional von~Neumann  programming styles  are at
 their  limits in terms  of deliverable  end-user performance.  Thus as
 architects, compiler  engineers, and application  developers look into
 the  future, there  is a  concerted effort  to develop  processors and
@@ -54,7 +79,7 @@ programming   paradigms   that   can  deliver   significantly   better
 performance,   and  more   so,  to   deliver  high   performance  more
 productively.  This is  especially important  since the  complexity of
 applications  continues to  increase, and  compilers are  more heavily
-burdened with the extraction  of parallelism and the effecient mapping
+burdened with the extraction  of parallelism and the efficient mapping
 of  computation  to  physical  substrate.  What's  more  is  that  the
 architectures of the future  will tend toward distributed resources in
 an effort  to manage the complexity of  centralized architectures with
@@ -63,23 +88,23 @@ academia alike  are investigating  ideas and methodologies  to address
 the computing challenges  of the future with an  eye toward delivering
 high performance and to  do so productively: $(i)$ relieve application
 developers from architecture details  and allow for natural expression
-of  application, $(ii)$ lessen  the burden  for heroic  compilers that
+of  applications, $(ii)$ lessen  the burden  for heroic  compilers that
 extract parallelism,  $(iii)$ develop scalable  architectures that are
 powerful yet easier to verify and assemble.
 
 The Computer Architecture Group at  MIT has for the last several years
-conducted  research to  address all  of the  aformentioned objectives.
-This   paper    focuses   on   the    productivitiy   of   application
-developers. Specifically, the paper  will briefly describe StreamIt, a
-novel language  for the prevalent application class of  stream computing. StreamIt
-provides  high-level  stream   abstractions  that  improve  programmer
-productivity  and  program robustness.  The  language is  architecture
-independent language, and it features several characteristics (such as
-parameterization  and modularity)  geared toward  large  scale program
-development.  Furthermore,  this paper  will  also  describe a  unique
-development  environment  that  leverages  the  language  features  to
-deliver  a  toolchain for  the  rapid  verification  and debugging  of
-StreamIt programs.
+conducted  research to  address all  of the  aforementioned objectives.
+This   paper    focuses   on   the    productivity   of   application
+developers.   Specifically,   the    paper   will   briefly   describe
+StreamIt~\cite{streamitcc},  a   novel  language  for   the  prevalent
+application  class of stream  computing. StreamIt  provides high-level
+stream abstractions  that improve programmer  productivity and program
+robustness.  The language is architecture independent, and it features
+several  characteristics  (such  as parameterization  and  modularity)
+geared  toward  large scale  program  development.  Furthermore,  this
+paper  will  also  describe  a  unique  development  environment  that
+leverages the language  features to deliver a tool chain  for the rapid
+verification and debugging of StreamIt programs.
 
 StreamIt represents  a program as  a hierarchical graph  of concurrent
 filters  that operate  on streams  of  data and  communicate via  FIFO
@@ -99,21 +124,61 @@ the transformations depend on the architecture details.
 By contrast application developers  using StreamIt focus on specifying
 the functional behavior of their programs and verify correctness using
 high   level  abstractions   that   result  in   clean  and   portable
-implementations.   The task  of  optimizing the  code and  effeciently
+implementations.   The task  of  optimizing the  code and  efficiently
 mapping  it to target  processors is  left to  the compiler  which can
 automate many  powerful domain specific optimizations  to deliver high
-performance~\cite{streambit, linear, statespace}. This paper will not
-discuss the StreamIt compiler technology; the interested reader can
-visit the StreamIt web page~\cite{streamit-web}.
+performance~\cite{streambit, linear}. This  paper will not discuss the
+StreamIt  compiler technology;  the  interested reader  can visit  the
+StreamIt  web  page~\cite{streamit-web} for  more  information on  the
+topic.
 
-In  addition  to  the  language  and compiler  effort,  we  have  also
-developed  a programming environment  that graphically  represents the
-the hierarchical  nature of a StreamIt application.   In addition, the
-StreamIt  Development  Tool  (SDT)  provides  an  elaborate  debugging
-environment  that  can  interpret  and  visually  represent  streaming
-computation, including  the flow of data between  streams, an intuitive
-concept  of  time  for   distributed  programs,  and  a  deterministic
-execution order for parallel streams.
+In addition  to the language  and compiler effort, we  have engineered
+and  developed a programming  environment that  graphically represents
+the  hierarchical nature  of streaming  codes with  an eye  toward the
+productivity  of the application  engineer.  The  StreamIt Development
+Tool (SDT) provides an elaborate prototyping and debugging environment
+that can  interpret and visually represent  streaming computation. The
+key distinguishing  features of the SDT  are its ability  to track the
+flow  of data  between  streams, and  the  deterministic execution  of
+parallel streams. The latter leverages an intuitive concept of time in
+StreamIt that is  tied to the flow of data  in distributed programs. A
+significant portion of  this paper is dedicated to  evaluating the SDT
+and  its   impact  on  programmer   productivity.  Toward  quantifying
+productivity, we organized  a user study at MIT.  The study involved a
+number of students who were  given a set of ``buggy'' applications and
+asked  to   fix  the  codes  according   to  corresponding  functional
+specifications. Some of the study participants were allowed to use the
+graphical  debugger and  its distinguishing  features,  whereas others
+were restricted to line-oriented  debugging strategies. The results of
+our study  provide evidence that  the SDT was instrumental  in helping
+the users  track down and  repair programming errors. The  evidence is
+particularly strong  in cases where the applications  were large, with
+many streams and non trivial communication topologies.
+
+As  we analyzed  the data  from  the user  study, we  made a  somewhat
+surprising observation.   From the data,  it was evident that  the SDT
+did not make users faster. In fact, the mean time to solution (i.e., a
+program where all  of the bugs are fixed)  was longer for participants
+using the graphical debugger. Perhaps this is to be expected since the
+participants did  not have prior  experience with the language  or the
+IDE, and  indeed our post-study  interviews and feedback  support this
+theory. The power of the  SDT rather was in mitigating the frustration
+factor of  the participants, especially  in the later portions  of the
+study. That is, the  participants who were restricted to line-oriented
+debugging strategies gave  up more often, and did  so sooner, compared
+to their  counterparts using the  graphical debugger.  This led  us to
+conclude that  users tend  to be more  productive when they  trust the
+tools  at their  disposal. In  other  words, one  might believe  their
+probability of success  is reasonably high if they  confident that the
+tools they are using are  adequate, and therefore they are more likely
+to invest their time objectively.
+
+In  the  following  Section   we  describe  the  StreamIt  programming
+language,  and  in   Section~\ref{sec:de}  we  describe  the  StreamIt
+development environment. Section~\ref{sec:ps} describes our user study
+and reports our  results and analysis. Section~\ref{sec:rw} summarizes
+related work and Section~\ref{sec:cr} concludes the paper.
+
 
 
 
@@ -121,16 +186,16 @@ execution order for parallel streams.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\section{Programming Language}
+\section{The StreamIt Programming Language}
 \label{sec:pl}
 
-StreamIt~\cite{streamitcc} is an architecture-independent language for
+StreamIt is an architecture-independent language for
 streaming applications.   StreamIt programs are  represented as graphs
 where  nodes represent  computation and  edges  represent FIFO-ordered
 communication  of data  over tapes.  
 
 The  basic programmable  unit in  StreamIt is  a filter.   Each filter
-contains  a work  function which  executes atomically,  popping (i.e.,
+contains  a work  function that executes atomically,  popping (i.e.,
 reading)  a fixed number  of items  from the  filter's input  tape and
 pushing (i.e., writing) a fixed number of items to the filter's output
 tape.  A filter  can also ``peek'' at a given index  on its input tape
@@ -213,14 +278,15 @@ into larger stream graphs (see Figure~\ref{fig:containers}).  The {\it
 pipeline} construct  composes streams in sequence, with  the output of
 one connected to the input of the next.  The {\it splitjoin} construct
 distributes data to  a set of parallel streams,  which are then joined
-together in a roundrobin fashion.   The {\it feedback loop} provides a
+together in a round robin fashion.   The {\it feedback loop} provides a
 mechanism  for introducing  cycles  in  the graph.   An  example of  a
 pipeline  appears  in  Figure~\ref{fig:pipeline}.  It  contains  a
-single  FIR   (Finite  Impulse   Response)  filter,  which   could  be
+single  FIR   (Finite  Impulse   Response)  filter which   could  be
 implemented as follows:
+\vspace{-12pt}
 \begin{singlespace}
 \begin{verbatim}
-  float->float filter  FIR(int N, float[] weights) {
+  float->float filter  FIR (int N, float[] weights) {
     work push 1 pop 1 peek N {
       float sum = 0;
       for (int i = 0; i < N; i++) {
@@ -234,7 +300,7 @@ implemented as follows:
 \end{singlespace}
 
 The filter can now serve as  a module that is incorporated into stream
-graphs as necessary, for example as part of an accoustic beamformer. A
+graphs as necessary, for example as part of an acoustic beam former. A
 filter is akin to a class in object oriented programming with the work
 function  serving as  the main  method. A  filter may  also  declare a
 constructor function  to initialize the filter state  before any other
@@ -248,8 +314,9 @@ graph and its communication topology.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Development Environment}
+\label{sec:de}
 
-The StreamIt  Development Tool (SDT)  features many aspect of  an IDE,
+The StreamIt  Development Tool (SDT)  features many aspects of  an IDE,
 including a text editor and  a debugger. For example, the SDT debugger
 supports line and method breakpoints, watchpoints, program suspension,
 code stepping,  variable inspection and  value modification to  list a
@@ -258,13 +325,13 @@ few.
 Moreover,   the  SDT   offers  features   tailored  to   the  StreamIt
 language.  The  SDT  graphically  represents  StreamIt  programs,  and
 preserves hierarchical information to allow an application engineer to
-focus on  the aspect of  the stream program  that are of  interest. In
+focus on  the parts of  the stream program  that are of  interest. In
 addition, the SDT can track the flow of data between filters, and most
 importantly, it  provides a deterministic mechanism  to debug parallel
 streams.
 
-The SDT  is implemented in Java as  an Eclipse~\cite{eclispe} plug-in.
-The  Eclipse universal  tools  platform is  an extansible  development
+The SDT  is implemented in Java as  an Eclipse~\cite{eclipse} plug-in.
+The  Eclipse universal  tools  platform is  an extensible  development
 environment. We leverage the built-in user interfaces for editing and
 viewing  files,  the  resource  management system,  the  documentation
 infrastructure,  and the  runtime  support of  launching, running  and
@@ -292,17 +359,31 @@ debugging programs.
 \end{center}
 \end{figure}
 
-As seen  in Figure~\ref{fig:eg-hierarchy},  a StreamIt program  can be
+As  seen  in Figure~\ref{fig:hierarchy},  a  StreamIt  program can  be
 visually depicted  as a hierarchical  directed graph of  streams, with
 graph nodes representing streams and graph edges representing tapes or
 channels.   The   containers  are  rendered  according   to  the  code
 declarations, and the visualization tools in the SDT allow the user to
-selectevily collapse  and expand containers. This is  useful in large
-streams  where  the  application  developers  are only  interested  in
+selectevily collapse  and expand containers.  This is  useful in large
+streams  where  the  application  developers are  only  interested  in
 visualizing   a  particular   subset,  for   example  to   verify  the
-interconnect topology of  the graph. In Figure~\ref{fig:eg-hierarchy},
-the splitjoin  is expanded whereas  the other streams in  the external
-pipeline are collapsed.
+interconnect       topology        of       the       graph.        In
+Figure~\ref{fig:eg-hierarchy-collapsed}, we show  a screen shot of the
+SDT  for a simple  StreamIt program  which consists  of a  filter that
+generates input data (\texttt{IntSource}), a splitjoin (\texttt{Echo})
+that operates on the data produced  by the source and whose data is in
+turn    consumed   by   an    \texttt{Adder}.    Lastly,    a   filter
+(\texttt{IntPrinter})  reads and  prints  the computed  values to  the
+screen.   In Figure~\ref{fig:eg-hierarchy-expanded}, the  splitjoin is
+expanded  to   reveal  to  parallel   streams:  \texttt{Original}  and
+\texttt{Delay}. The  former is simply an identity  filter, whereas the
+later shifts its input data one position in time (i.e., at time $t$ it
+outputs data consumed at time $t+1$. The splitter in this example is a
+duplicate splitter, meaning that the input stream is duplicated to all
+of its sibligns. The joiner  is a roundrobin joiner which collects one
+data item  from the  left stream  followed by an  item from  the right
+stream. This particular stream program simulates how echos are added
+to sound waves.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -319,11 +400,22 @@ pipeline are collapsed.
 
 An important distinguishing characterisitic  of the SDT is its ability
 to track  the flow  of data between  streams.  This is  illustrated in
-Figure~\ref{fig:dataflow} which shows the data that is live between
-two filters.  The  SDT allows the user to  highlight and automatically
-track  data items  as they  propagate between  streams.  The  SDT also
-allows the user  to modify values on a tape,  much like a conventional
-debugger allows users to modify variables and registers.
+Figure~\ref{fig:dataflow} which  shows the  data that is  live between
+two  filters  \texttt{Source}  and \texttt{DropBit}.  This  particular
+program  generates  a sequence  of  numbers  at  its source,  and  the
+\texttt{DropBit} filter removes the third element of the sequence with
+every execution of its main function.  In the figure, the values 2, 3,
+and 4 are  queued on the input tape to  \texttt{DropBit}, and from the
+expanded filter node, we can  see that the filter required four queued
+data items  before the work  function can execute (i.e.,  the declared
+pop rate is 4). The expanded filter node also displays other
+information such as the input and output types of the stream, as well
+as profiling information that is usefull for debugging.
+
+The SDT also allows the user to highlight and automatically track data
+items as  they propagate  between streams.  The  user can  also modify
+values on  a tape, much like  a conventional debugger  allows users to
+modify variables and registers.
 
 The flow of data is especially helpfull in splitjoins where sequential
 data streams are distributed to parallel streams, and parallel streams
@@ -339,19 +431,31 @@ pinpoint unexpected outputs (e.g., a filter pushing NaN's).
 
 Perhaps  the most  important feature  of the  SDT is  its  support for
 debugging parallel  streams. In StreamIt,  the streams in  a splitjoin
-are  independent,  and can  fire  when  their  corresponding data  are
-queued. Unlike threads in parallel programs, there is a unique program
-counter,  and a  deterministic schedule  that  the SDT  can follow  to
-execute parallel streams.  Furthermore,  by tracking the flow of data,
-StreamIt provides a natural way  to reason about time in a distributed
-system  thereby greatly  simplifying  the task  of debugging  parallel
-streaming programs.
+are  independent, and can  execute when  their corresponding  data are
+queued.  Thus, the SDT can execute parallel streams in a deterministic
+order using  a single  program counter and  machine state; this  is in
+contrast to  a multi-threaded  program where a  user has to  cope with
+multiple  program counters  and  a scheduling  order  that may  appear
+non-deterministic   and  subject   to  the   host   operating  system.
+Furthermore, by exposing  the flow of data and  the communication in a
+stream graph, StreamIt provides a  natural way to reason about time in
+a  distributed  system---thereby   greatly  simplifying  the  task  of
+debugging parallel streaming programs.
+
+The SDT  also features a unique  capability that allows a  user to set
+instance-breakpoints. This features is usefull in splitjoins with many
+parallel streams or in long pipelines which contain multiple instances
+of  a  single filter.  As  with  conventional  debuggers, the  program
+executes until the designated instance of a filter is encountered---in
+which case control is transfered to the user for further input.
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Productivity Study}
+\label{sec:ps}
 
 We designed and carried out a  user study to assess the extent the SDT
 helps in debugging StreamIt programs.  The goals were two fold. First,
@@ -366,8 +470,7 @@ asked to find and fix the  errors and to record their experience using
 various forms  and questionaries.  The participants  were divided into
 different  groups,  some of  which  used  the  SDT and  its  graphical
 debugging features  whereas others did not.  Our  results and analysis
-are repored  in the  following section, following  the details  of the
-study.
+are repored  in the  following sections.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -375,14 +478,14 @@ study.
 \subsection{Target Population}
 
 We solicited participants for the  user study by advertising it to MIT
-students population majoring in  computer science. We favored students
-who specialize in  communications, signal processing, computer systems
-and  architecture,  and  who  are experienced  in  popular  imperative
-languages  (e.g.,  C,  C++,  Java).   The  nature  of  study  was  not
-explicitly  divulged  in  our  solicitation; this  served  to  prevent
-potential  users from  learning about  StreamIt and  becoming familiar
-with the SDT  prior to the study. The particpants  were awared a small
-monetary gift upon completion of the study.
+students  majoring  in  computer  science.  We  favored  students  who
+specialize in communications,  signal processing, computer systems and
+architecture, and who are  experienced in popular imperative languages
+(e.g., C, C++, Java).  The nature of study was not explicitly divulged
+in  our solicitation;  this  served to  prevent  potential users  from
+learning about  StreamIt and becoming  familiar with the SDT  prior to
+the  study. The  particpants were  awared a  small monetary  gift upon
+completion of the study.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -399,7 +502,7 @@ information  on  the participant's  programming  background and  skill
 level. Questions such  as year in school, major,  degree being sought,
 area  of computer  science concentration,  relevant  classes, language
 proficiency,  application development  experience,  and background  in
-DSP, IDE, and the SDT are asked.
+DSP, IDE, and the SDT were asked.
 \item  StreamIt  Language  Tutorial:  This  written  presentation  was
 intended to give  a cursory introduction to the  StreamIt language. It
 described  and illustrated the  syntax and  semantics of  the StreamIt
@@ -414,8 +517,8 @@ step-by-step instructions on  how to compile, run, and  debug a sample
 application.
 \item  User  Tasks:  This  document  instructed users  to  debug  nine
 StreamIt applications in  a specific order. Each of  the nine programs
-contained one  or more bugs.  As  the users moved from  program to the
-next,  they  were asked  to  record their  start  and  end times,  the
+contained one  or more bugs.  As  the users moved from  one program to
+the next,  they were asked  to record their  start and end  times, the
 debugging methods they used  (e.g., code inspection, print statements,
 graphical debugger),  and a short  diagnosis of the program  bugs they
 uncovered.
@@ -424,32 +527,48 @@ description  of  each  application  (numbered  1 through  9),  a  code
 listing, a sample buggy output, and a sample correct output. The
 applications are summarized in Table~\ref{tab:applications}.
 \item Post-Study  Questionnaire: This document was  designed to gather
-data   on  the   participant's   experience.  Furthermore,   questions
-pertaining to the  perceived difficulty of each problem  and a general
-description of  how the user  debugged each application are  asked, in
-addition to questions concerning  bugs, satisfaction, ability to learn
-and  remember,  speed  after  learning, ease  of  use,  functionality,
-comments, and improvements related to the SDT.
+data pertaining to the participant's experience, such as the perceived
+difficulty  of each  problem, a  general description  of how  the user
+debugged  each application,  user satisfaction,  ability to  learn and
+recall various features of the SDT, etc.
 \end{enumerate}
+
+\begin{table}
+\caption{Applications used in the productivity study.}
+\centering
+\begin{tabular}{|l|p{5.0in}|} \hline
+\label{tab:applications}
+{\bf 1. Bit Twiddle} & Removes every third bit from a 96 bit stream.\\ \hline
+{\bf 2. Fib}         & Generates a Fibonacci sequence using a feedback loop.\\ \hline
+{\bf 3. Echo Effect} & Simulates how echos are introduced into sound waves. Uses a splitjoin with two parallel streams.\\ \hline
+{\bf 4. Merge Sort}  & Implements a merge sort algorithm using 16 parallel streams.\\ \hline
+{\bf 5. Cornerturn}  & Implements a matrix transpose using a splitjoin to exchange the rows and columns. Stresses the visual tracking of data.\\ \hline
+{\bf 6. Echo Effect2}& Alternate implementation of Echo Effect using a feedback loop.\\ \hline
+{\bf 7. Bubble Sort} & Implements a bubble sort algorithm. This is a conceptually difficult implementation that stresses the visualization features of the debugger.\\ \hline
+{\bf 8. Bit Reverse} & Sorts a sequence of 16 consecutive numbers in bit-reversed order. This is an adaptation of the bit-reversal stage in FFT.\\ \hline
+{\bf 9. Overflow}  & A synthetic benchmark with a substantial number of hierarchies, filters, and parallel streams. Stresses the visual tracking of data, and the instance breakpoint capabilities of the debugger.\\ \hline
+\end{tabular}
+\end{table}
 
 In  order  to control  against  the  SDT's  effect on  a  programmer's
 debugging  ability and  ensure internal  validity, users  were grouped
-into four categories,  which were based on which  applications were to
-be     debugged     with      and     without     the     SDT     (see
-Table~\ref{tab:apps-groups}).    All  users   were   asked  to   debug
-application 1 without the SDT and application 2 with the SDT to assess
-starting ability and create a baseline reference for later comparison.
-Moreover, these  two ``control'' application were  designed to bolster
-the user's confidence.  Then, half of the users (group A) were told to
-debug applications 3,  4, and 5 with  the SDT and 6, 7,  and 8 without
-the SDT. Meanwhile, the other half  (group B) were told to debug 3, 4,
-and 5 without the  SDT and 6, 7, and 8 with  the SDT to avoid ordering
-effects.  Due to this grouping  structure, applications 3 and 6, 4 and
-7,  and 5  and 8  were written  to be  of comparable  difficulty.  For
-application 9,  half of  group A (A1)  and half  of group B  (B1) were
-asked to debug  with the SDT, while the other halves  (A2 and B2) were
-asked to debug without the SDT.  Cross-sectioning the groups was aimed
-at ensuring external validity.
+into four  categories.  All  users were asked  to debug  application 1
+without the SDT's graphical features. The participants were then asked
+to debug application 2 using the SDT and its graphical features. These
+``control'' experiments  served to assess create  a baseline reference
+for   meaningful   comparison  later   on.    Moreover,  the   control
+applications  were designed  to bolster  the user's  confidence. Next,
+half of the users (group A)  were told to debug applications 3, 4, and
+5  with the  SDT and  6, 7,  and 8  without the  SDT (i.e.,  using the
+graphical   features   of  the   SDT   then   without  the   graphical
+features). Meanwhile, the  other half (group B) were  told to debug 3,
+4, and 5  without the SDT and 6,  7, and 8 with the SDT.   Due to this
+grouping structure,  applications 3 and 6, 4  and 7, and 5  and 8 were
+designed to be  of comparable difficulty.  For application  9, half of
+group A  (A1) and half of  group B (B1)  were asked to debug  with the
+SDT, while  the other halves (A2  and B2) were asked  to debug without
+the SDT.   Cross-sectioning the groups was aimed  at ensuring external
+validity.
 
 The study was divided into three sessions over a three-day period.  We
 estimated that each session would  last for two hours (with 45 minutes
@@ -457,24 +576,23 @@ spent  on  the  tutorials  and  the  rest of  the  time  dedicated  to
 debugging), but  in reality  the sessions spanned  an average  of four
 hours.  Many users  were either unable or did not  have enough time to
 debug certain  applications.  Participants were asked  to complete the
-set of documents at their own pace.  Upon completion of the study, the
-participants were  individually interviewed  and received a  \$40 gift
-certificate.  During the study, users were encouraged to ask questions
-although particulars  relating to  the problems and  the SDT  were not
-revealed.
+set of  documents at  their own pace,  and upon completion,  they were
+individually interviewed and received a \$40 gift certificate.  During
+the study, users were encouraged to ask questions although particulars
+relating to the problems and the SDT were not revealed.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \subsection{Results and Analysis}
 
-Eventhough 25  users were  scheduled  to participate  (5 people  for
+Even though 25  users were  scheduled  to participate  (5 people  for
 sessions 1 and  2 and 15 people for  session 3), cancellations reduced
 the participation to 20 users  and led to uneven groupings. There were
 6 people in A1, 5 in A2, 4 in B1, and 5 in B2. Of the 20 participants,
 there were 4 juniors, 2 seniors,  8 masters, and 6 Ph.D. students, all
-majoring in Electrical Engineering and Computer Science. Although none
-had used the SDT in the past, 6 users had experience with DSP.
+majoring in Electrical Engineering and Computer Science. None of the
+users had prior StreamIt or SDT experience.
 
 \begin{figure}[t]
 \begin{center}
@@ -488,25 +606,27 @@ Figure~\ref{fig:solutions} summarizes the study in terms of the number
 of solutions  reported for each of  the applications in  the study. In
 the figure,  the bars  labeled ``solved with  the SDT''  represent the
 number   of  participants  that   fully  debugged   the  corresponding
-applications  using  the SDT.  Similarly,  the  bars labeled  ``solved
-without  the SDT''  represent the  number of  participants  that fully
-debugged  the corresponding applications  without using  the graphical
-debugger. The bars that  are labeled ``unsolved'' represent the number
-of participants  whose applications  remained buggy. For  example, for
-the application \texttt{EchoEffect} there were two users who were
-allowed to used the SDT and were unable to debug the code
-properly. There was also one other participant who did not debug
-\texttt{EchoEffect} although this user was not allowed to use the SDT.
+applications using the SDT and its graphical features.  Similarly, the
+bars  labeled  ``solved without  the  SDT''  represent  the number  of
+participants  that  fully   debugged  the  corresponding  applications
+without  using  the graphical  debugger.  The  bars  that are  labeled
+``unsolved'' represent  the number of  participants whose applications
+remained buggy.  For example, for  the application \texttt{EchoEffect}
+there were two users who were  allowed to used the SDT and were unable
+to debug the  code properly. There was also  one other participant who
+did not  debug \texttt{EchoEffect} although this user  was not allowed
+to use the SDT's graphical features.
 
 Because the groupings are  uneven as previously mentioned, the numbers
 seen in  the figure are weighted  depending on which  group is lacking
 users. The  percentage above each quadruple of  columns represents the
-percentage increase  or decrease in  debugging each application  due to
-the  SDT.   For  example,  the   SDT  did  not  particularly  help  in
-applications  3,  4,  and 5,  but  does  help  for  all of  the  other
-applications.   On  average, 1.56  fewer  participants fully  debugged
-applications  3, 4,  and 5  when using  the SDT,  and 2.56  more users
-solved applications  6, 7,  8, and  9 when using  the SDT.
+percentage increase  or decrease in  debugged applications due  to the
+SDT (and its graphical features).  For example, the graphical debugger
+did not particularly help in applications 3, 4, and 5, but did help in
+debugging  the  others.  On  average,  1.56  fewer participants  fully
+debugged applications 3,  4, and 5 when using  the graphical debugger,
+and 2.56  more users debugged applications  6, 7, 8, and  9 when using
+the graphical debugger.
 
 \begin{figure}[t]
 \begin{center}
@@ -519,7 +639,7 @@ solved applications  6, 7,  8, and  9 when using  the SDT.
 Figure~\ref{fig:times} compares the  average time spent debugging each
 application. The  percentage above each set of  columns represents the
 percentage improvement or deficiency in  time caused by using the SDT.
-On  average,   users  took  7.78  (36.48\%)  more   minutes  to  solve
+On  average,   users  took  7.78  (36.48\%)  more   minutes  to  debug
 applications 3, 4, 5, 6, 7, and 9 when using the graphical featuers of
 the  debugger,   compared  to  participants   using  more  traditional
 debugging means. Furthermore, participants who were allowed to use the
@@ -531,43 +651,41 @@ respective applications.
 
 Summarizing the results, we found  that more participants were able to
 successfully  debug their  applications  when using  the  SDT and  its
-graphical features.  However, we also observed that  the SDT increased
+graphical features.  However, we  also observed that the SDT increased
 the  ``time to  solution'' as  users had  to navigate  through  a user
 interface  they were  not familiar  with. Interestingly,  we  can also
-observe  that  the  SDT   may  have  mitigated  user  frustration.  As
+observe  that  the  SDT  may  have  mitigated  user  frustration.   As
 previously mentioned, because users  generally took much more than the
 two  hours  allotted  to   complete  the  study,  users  often  became
 frustrated  or rushed  with the  later  applications. Correspondingly,
-this  might have  caused  users to  spend  less time  and solve  fewer
+this  might have  caused  users to  spend  less time  and debug  fewer
 applications  as users  progressed  through the  study. Although  this
 pattern is true for participants who did not use the SDT, the opposite
-occurs  for participants who  used the  SDT: Eventhough  32.97\% fewer
-users  were able  to solve  applications 3,  4, and  5 when  using the
-graphical debugger, 41.76\% more users were able to solve applications
-6, 7,  8, and 9 using  the SDT. Furthermore, users  spent 83.35\% more
-time when  unable to  solve applications  6, 7, and  8 when  using the
-graphical debugger.  These results suggest  that users are  willing to
-spend more time and work on more problems when using a tool that they
-felt more certain would lead them to a solution.
+occurs for participants who used the SDT: 41.76\% more users were able
+to debug applications 6, 7, 8, and 9 using the SDT. Furthermore, users
+spent 83.35\% more time tracking down bugs in applications 6, 7, and 8
+when using  the graphical debugger.  These results  suggest that users
+are willing to spend more time  and work on more problems when using a
+tool that they felt more certain would lead them to a solution.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \subsection{User Feedback}
 
-Qualitative data  obtained from the post-study  questionnaires was
-quite helpfull toward  finding  new   feature  ideas  and  problems  with
+Comments  obtained  from  the  post-study  questionnaires  were  quite
+helpfull  toward   finding  new   feature  ideas  and   problems  with
 functionality, performance, reliability, and usability.
 
 Summarizing  the most  notable  feedback, users  largely commented  on
 their difficulties using Eclipse and navigating the StreamIt code. Ten
-participants commented that Eclipse was difficult to get familiar with
-in the  time alloted, and there  was an over abundance  of windows and
-options  to  choose  from,  and therefore  finding  vital  information
-immediately  was  slow.   Five   participants  noted  that  they  were
-uncomfortable  or  unaccustomed  to  thinking  in  terms  filters  and
-streams, while an equal number  also found it overwhelming to remember
-some of the language syntax and concepts.
+participants reported that  the time alloted to learn  how to navigate
+Eclipse was too  short, and that the many  windows, menus, and options
+made   it  difficult   to  find   vital  information   quickly.   Five
+participants  noted that  they were  uncomfortable or  unaccustomed to
+thinking  in terms  filters and  streams, while  an equal  number also
+found  it overwhelming  to remember  some of  the language  syntax and
+concepts.
 
 In general however, participants rated the SDT a 3.85 on average (on a
 scale of  1 to 10,  from easy to  hard), praising many aspects  of the
@@ -583,62 +701,66 @@ when the applications were large.
 
 Many problems and issues arose in running the study itself. One of the
 major  problems  was the  time  allotted  for  users to  complete  the
-study. As  previously mentioned, on  average it took the  slowest user
-twice  the budgeted  amount of  time.  The timing   negatively
-impacted users in several ways, all of which contributed to incomplete
-or  unreliable data: Users  became frustrated  and overwhelmed  by the
-amount of information presented to them, users were unable to complete
-the study due to time constraints, users did not properly fill out the
+study.  As previously  mentioned,  the slowest  user  spent twice  the
+budgeted  amount of  time.  The  timing negatively  impacted  users in
+several  ways, all of  which contributed  to incomplete  or unreliable
+data:  Users  became  frustrated  and  overwhelmed by  the  amount  of
+information presented to them; Users were unable to complete the study
+due  to  time  constraints;  Users  did  not  properly  fill  out  the
 post-study questionnaire, etc.
 
-Better participant  screening for DSP-related  and general programming
-experience   should   also  have   been   done.   In  the   post-study
-questionnaire, several users commented  that they were unaccustomed to
-thinking  in terms of  streaming applications,  while some  users made
-remarks  that  suggested they  never  truly  understood how  streaming
-applications  work. In  general, the  more inexperienced  users either
-focused  their  attentions on  Eclipse-related  and StreamIt  language
-problems, indicating  a lack of IDE  and language-learning experience,
-or  relied almost  exclusively on  breakpoint functionality  and print
-statements. Because several of  the applications were designed to test
-the effectiveness  of the graphical debugger, these  applications were
-purposely  written   to  be  too  large  and   complicated  for  these
-traditional debugging techniques.
+We  believe that  better  screening  can help  bride  the gap  between
+between parcipants, although the biggest lesson learned centers on the
+method of compensating  the participants.  Specifically, a multi-level
+pay  scale for  compensation may  have  alleviated some  of the  above
+problems and lead to more conclusive results. A graded pay scale would
+allow each  participant to  judge whether they  can or are  willing to
+complete the study. In other words, each user is rewarded according to
+their  investments.  Nonetheless, the  gap is  participant experiences
+and skills within a user  study is a well-documented issue.  Usability
+studies have found that the best users are often ten times better than
+the worst users,  and the fastest quartile of users  are twice as fast
+as   the  slowest   quartile   of  users~\cite{controlled-experiments,
+research-issues}.  However, because increasing  the number of users in
+a study only narrows the standard  deviation of the mean by the square
+root   of  the   number  of   users\cite{controlled-experiments},  the
+improvment  in  results  and  reliability  becomes  an  expensive  and
+time-consuming task.   For example, in  order to double  accuracy, the
+number of participants in this study would have to be quadrupled to 80
+users, which would cost an additional \$2400 and 24 man-hours.
 
-Having a  multi-level pay scale  for compensation may  have alleviated
-some  of the above  problems, as  it would  allow the  participants to
-judge  whether they  could  or were  willing  to complete  all of  the
-applications  in  the  study.   Nonetheless,  the  variation  in  each
-participant's  experience   and  skill  within  a  user   study  is  a
-well-documented  issue. Usability  studies  have found  that the  best
-users are often ten times better than the worst users, and the fastest
-quartile  of  users are  twice  as fast  as  the  slowest quartile  of
-users~cite{13, 17}.  However, because  increasing the number  of users
-within a study only narrows the  standard deviation of the mean by the
-square root of the  number of users\cite{13}, improving reliability of
-results  is an  expensive and  time-consuming task.   For  example, in
-order to  double accuracy,  the number of  participants in  this study
-would  have  to  be  quadrupled  to  80 users,  which  would  cost  an
-additional \$2400 and 24 man-hours.
+%% In  the   post-study
+%% questionnaire, several users commented  that they were unaccustomed to
+%% thinking  in terms of  streaming applications,  while some  users made
+%% remarks  that  suggested they  never  truly  understood how  streaming
+%% applications  work. In  general, the  more inexperienced  users either
+%% focused  their  attentions on  Eclipse-related  and StreamIt  language
+%% problems, indicating  a lack of IDE  and language-learning experience,
+%% or  relied almost  exclusively on  breakpoint functionality  and print
+%% statements. Because several of  the applications were designed to test
+%% the effectiveness  of the graphical debugger, these  applications were
+%% purposely  written   to  be  too  large  and   complicated  for  these
+%% traditional debugging techniques.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Related Work}
+\label{sec:rw}
 
-Numerous        debuggers       and        program       visualization
-tools~\cite{42,35,7,39,19,6,9,36}  exist for DSP  applications written
-in C/C++  and assembly.  The majority  of these tools  are targeted at
-specific hardware  platforms, offering traditional  debugging features
-(i.e.,  program suspension,  breakpoint  stepping, watchpoints,  local
-variable  and  output display,  etc.)   combined  with assembly  code,
-memory register, and signal plot display.
+%~\cite{42,35,7,39,19,6,9,36}
+Numerous  debuggers  and program  visualization  tools  exist for  DSP
+applications  written in C/C++  and assembly.   The majority  of these
+tools   are  targeted   at  specific   hardware   platforms,  offering
+traditional debugging  features (i.e., program  suspension, breakpoint
+stepping,  watchpoints,  local  variable  and  output  display,  etc.)
+combined with assembly code, memory register, and signal plot display.
 
 In recent years,  some movement in the streaming  domain has been made
 towards  OOP   languages  such  as   C++  or  Java,   which  introduce
 abstractions   that  improve  the   portability  and   reusability  of
-code~\cite{30}. The  introduction of conceptual  abstractions empowers
+code. The  introduction of conceptual  abstractions empowers
 the design,  debugging, visualization, and analysis  tools created for
 OOP  based streaming applications  to introduce  hierarchical, modular
 structures while  hiding unnecessary  details from the  programmer. On
@@ -647,7 +769,7 @@ three of the  tools described next use some variation  on the theme of
 signal processing blocks that  are connected, displayed, and navigated
 graphically.
 
-Simulink~\cite{1}  is a  modeling, simulation,  and analysis  tool for
+Simulink  is a  modeling, simulation,  and analysis  tool for
 control,  signal processing,  and communications  system  design. This
 tool  imposes   OOP  conventions  on  Matlab,  C,   Fortran,  and  Ada
 programmers  by allowing  its  users  to insert  their  code into  the
@@ -659,28 +781,41 @@ which is simultaneously displayed on its associated block.  Additional
 information, such as block state,  inputs, and outputs, are visible in
 other windows.
 
-Process-Level  Debugger  (PDG)~\cite{8} is  designed  for a  graphical
+Process-Level  Debugger  (PDG) is  designed  for a  graphical
 parallel  programming environment  for concurrent  applications called
 GRAPE. The PDG models processes as black boxes that interact with each
 other. Like Simulink, programmers build their applications by creating
 and connecting black boxes hierarchically (i.e., each black box may be
 composed  of  sub-boxes--subprocesses--and  displayed in  a  graphical
 view). As an application is  debugged, the PDG shows the application's
-behavior  on  this  view and  allows  a  programmer  to zoom  down  on
+behavior  in  a  window  and  allows  a programmer  to  zoom  down  on
 suspicious process  blocks in the hierarchy.   This top-down debugging
-method can eventually  find the associated erroneous code.
+method can eventually find the associated erroneous code.
 
-The MULTI Integrated Development Environment~\cite{12} is designed for
+The MULTI Integrated Development Environment is designed for
 multiprocessor, distributed systems and embedded applications using C,
 C++,  Ada,  Fortran,  and   assembly.  Besides  standard  editing  and
 debugging functionality,  this IDE  conveys program control  flow with
 perusable  static and dynamic  call graphs  and class  hierarchies.
+
+Much  like other  language efforts,  StreamIt addresses  many software
+engineering  concerns  by   embracing  concepts  such  as  modularity,
+parameterization,         hierachical         composition,         and
+portability. Furthermore, the language automates several tedious tasks
+such as circular buffer management  that is common in streaming codes.
+StreamIt also  facilitates the  verification of program  via inductive
+reasoning since  simple components are  assembled to create  large and
+complex  graphs.   Moreover,  the  language treats  communication  and
+parallelism as ``first-class citizens'', and by naturally exposing the
+flow  of data  in a  program, the  StreamIt Develpment  Tool  can help
+application engineers in their debugging and verification tasks.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Concluding Remarks}
+\label{sec:cr}
 
 This paper  presents StreamIt and  the StreamIt Development  Tool. The
 SDT  is  an  IDE  designed  to  improve  the  coding,  debugging,  and
@@ -690,27 +825,47 @@ structured, hierarchical graphs.   Although industry and academia have
 devoted much  effort to tools  for developing and  debugging software,
 the SDT  aims to  emulate the best  of traditional debuggers  and IDEs
 while moving toward  hierarchical visualization and debugging concepts
-specialized for streaming applications.  As such, utilities for stream
-graph   examination   and   navigation   and  stream   data   display,
-modification,  and  tracking  are  provided, in  addition  to  program
-creation and code editing, breakpoints, program compilation and launch
-support, and general debugging and help support.
+specialized  for   streaming  applications.   As   such,  it  provides
+utilities for  stream graph  examination and navigation,  and detailed
+tracking of  data between streams, as well  as deterministic execution
+of  parallel  streams.  These  features  are  in  addition to  program
+creation and code editing, program compilation and launch support, and
+general debugging and help support.
 
 A user study  evaluating the SDT uncovered several  problems and areas
-of improvement that need to be addressed before this tool can approach
-its goals. From the user  study, we have empirical evidence to suggest
-that  the  SDT  improved the  ability  of  users  to find  and  repair
-programming errors.
+of improvement  that need to be  addressed before this  tool can fully
+realize its  goals.  From  the user study  however, we  have empirical
+evidence to suggest that the SDT improved the ability of users to find
+and  repair  programming errors.  The  user  study  also provided  key
+insights that  suggest that  application developers and  engineers are
+more likely  to invest  their time tracking  bugs and  enhancing their
+applications if they  are confident they have adequate  tools at their
+disposal.  In our  user  study, several  subjects  using the  StreamIt
+graphical debugger spent considerable more time debugging applications
+in  the latter  parts  of the  study,  compared to  subjects who  were
+restricted to line oriented debugging.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\noindent {\bf ACKNOWLEDGMENTS}\\
-Thanks to...
+\singlespacing
 
-%\setstretch{0.1}
+\noindent {\bf ACKNOWLEDGMENTS}\\ Special  thanks to William Thies who
+suggested  and/or wrote  many of  the  applications in  the study  and
+supplied advice on improving and enhancing the SDT and the study. Both
+David Maze  and William  Thies modified the  StreamIt Java  library to
+interface with the SDT. Jasper Lin, Juan Carlos, Sitij Agarwal, Jeremy
+Wong,  Michael  Gordon,  and  Michal Karczmarek  all  participated  in
+in-house evaluations of  the SDT.  Finally we thanks  the MIT students
+who participated in  this study, without whom this  paper would not be
+possible.  This work was funded in part by IBM under the PERCS project
+and  the  Defense  Advanced  Research Projects  Agency  (DARPA)  under
+contract No. NBCH30390004.
+
+
+\setstretch{0.1}
 \bibliographystyle{abbrv}
-%\bibliography{references}
+\bibliography{main}
 
 \end{document}
