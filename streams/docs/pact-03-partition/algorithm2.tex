@@ -1,18 +1,18 @@
 // Return whether or not a vertical cut is possible on stream <s>
 // within the given bounds.  This is true if: 1) There are at least
-// two streams to cut bewteen, 2) all rows of this have equal width,
+// two streams to cut between, 2) all rows of this have equal width,
 // and 3) it is possible to remove synchronization between rows.
 boolean canCutVertically(stream s, int x1, int x2, int y1, int y2)
 ------------------------------------------------------------------
 return x1<x2 && (width[y1]==...==width[y2]) && canRemoveSync(y1,y2)
 
 // returns cost of node <s> assigned to <n> tiles
-int getNodeCost(stream s, int n)
+int getNodeCost(node d, int n)
 -------------------------------------------------------------------------
-if (isFissable(s))
-  return work / n
+if (isFissable(d))
+  return d.work / n
 else
-  return work
+  return d.work
 endif
 
 int getContCost(stream s, int x1, int x2, int y1, int y2, int n)
@@ -48,7 +48,7 @@ endif
 
 int min = infinity
 // try making vertical cut (in case s is a splitjoin)
-if (tryVertical) {
+if (canCutVertically(s, x1, x2, y1, y2)) {
   for xPivot = x1 to x2 - 1
     for nPivot = 1 to n-1
       int cost = max(getContCost(s, x1, xPivot, y1, y2, nPivot),

@@ -1,0 +1,84 @@
+\section{Partitioning Algorithm}
+
+In this section we describe our partitioning algorithm, which operates
+on an abstract representation of the stream graph and is well-suited
+for many interesting problems.
+
+\subsection{Problem Definition}
+
+In this paper we focus on a static load-balancing problem, which we
+define as follows.  We are given the following:
+\begin{itemize}
+
+\item A StreamIt stream graph $\mt{str}$ in which each filter $filter$
+has a certain amount of steady-state $\mt{work}$ and can be run in
+data parallel (to an arbitrary degree) if $\mt{isFissable(f)}$ is
+true.
+
+\item An integer $N$ denoting the number of available partitions.
+
+\end{itemize}
+
+The goal is to produce a mapping $\mt{map}$ from nodes to partitions
+that minimizes the cost of the bottleneck node {\it while maintaining
+a structured stream graph}.  Formally, this could be posed as:
+
+%% \begin{center}
+%% \framebox{
+%% Minimize $MAX_{i}  (\sum_{d \in \{ d~|~map(d)=i\}} d.work)$
+%% Subject to:
+%% \begin{enumerate}
+
+%% \item Every node is assigned to a legal partition:
+%%   \[
+%%   \forall d \in s:~~ 0 < \mt{map}(d) < n
+%%   \]
+
+%% \item There exists a structured stream graph with the same.
+%% \end{enumerate}}
+%% \end{center}
+
+
+\subsection{Converting to the Canonical Form}
+
+
+\subsection{Implementing the Transformations}
+
+
+
+
+operates on an abstract representation of the stream graph to
+
+exploits
+the hierarchical structure of the stream graph
+
+
+canonical representation
+- maintains single-input, single-output
+
+advantages of this algorithm:
+ - canonical form
+  - cuts along important places, in right directions
+  - detecting symmetry and hierarchy to save time
+    - work estimation
+    - alisasing of child configurations
+    - evaluating child configurations themselves
+
+- does fissoin and fusion
+- sticks with space multiplexing
+
+- show how we can provide rectangular abstraction on single-input, single-output streams
+
+  - partitioner takes advantage of this in two ways: 
+    1) by detecting symmetry and only calculating things once
+    2) by drawing cuts along likely paths
+    3) by automatically calculating some properties that are the best,
+       e.g. if you have the same filter duplicated in a splitjoin
+
+- two thrusts: that structure actually SUPPORTS powerful ways of
+program reasoning, and that we are flexible enough to manipulate
+structured programs into a number of isomorphic forms.  can consider
+structures on an abstract level, and then implement them in any number
+of ways.
+
+- very fast?  no
