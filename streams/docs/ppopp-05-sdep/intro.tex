@@ -30,9 +30,15 @@ message to the frontend that is timed precisely with respect to the
 data stream, even though the two components are running on different
 processors with independent clocks.
 
-In  this  paper,  we  make  two contributions  toward  improving  the
-programming model  for stream programming.  First, we  define a stream
-dependence function, $\sdep$,
+In  this  paper, we focus on the 
+computation paradigm embodied by Synchronous  Dataflow~\cite{LM87-i},
+a popular  model  that  is well suited for  streaming codes.  
+In this model, computation is represented  as a structured graph consisting
+of {\it actors} connected by communication channels.
+
+Our contributions are two-fold, and they are geared toward improving
+the programming model for stream programming. First, we  define a
+stream dependence function, $\sdep$, 
 % which describes the
 % ordering constraints of actor firings in an SDF graph.  This
 % dependence information is similar to a program slice, which has a rich
@@ -41,11 +47,10 @@ dependence function, $\sdep$,
 % program analysis.  However, unlike program slicing, one can leverage
 % the static properties of SDF 
 to  provide   an  exact,  complete,  and   compact  representation  of
-dependencies between stream processing components.
-% $\sdep$ at compile time.  
+dependencies between stream processing components.  
 Second,  we define  {\it  teleport messaging}  as a  novel language
 construct  to provide  simple  and precise  handling of control
-messages in stream
+messages between actors in stream
 programs.
 % Our work  is presented  in the context  of Synchronous  Dataflow (SDF)
 % which  is a popular  model of  computation~\cite{LM87-i} that  is well
@@ -77,12 +82,17 @@ that
 the $\sdep$  formalism and language support for  messaging enables the
 simultaneous improvement of both programmability and performance.
 
-The rest of this paper is organized as follows.  Sections 2 and 3
-define the stream dependence function and show how to calculate it
-efficiently.  Section 4 describes our language support for precise
+The rest of this paper is organized as follows.  Section~\ref{sec:modelofcomp} describes
+our model of computation, Section~\ref{sec:sdep} 
+define the stream dependence function, and Section~\ref{sec:calc-sdep}
+shows how to calculate it
+efficiently.  Section~\ref{sec:language} describes our language support for precise
 event handling, including a case study and implementation results.
-Other applications for $\sdep$ appear in Section 5, related work in
-Section 6, and conclusions in Section 7.
+Other applications for $\sdep$ appear in
+Section~\ref{sec:others-apps}, related work in
+Section~\ref{sec:related-work}, and conclusions in
+Section~\ref{sec:conclusion}.
+
 
 %% This paper makes two contributions towards this goal.  First, we
 %% formulate a stream dependence function, $\sdep$, which describes the
