@@ -1,0 +1,339 @@
+\documentclass[12pt]{article}
+
+\usepackage{epsfig}
+\usepackage{amsmath}
+\usepackage{fullpage}
+%\usepackage{doublespace}
+%\setstretch{1.2}
+
+\title{A Linear Programming Framework \\ for Partitioning a Structured Stream Graph}
+
+\author{Bill Thies}
+
+\begin{document}
+
+  \maketitle
+
+  \newcommand{\mt}[1]{\mbox{\it #1}}
+  \newcommand{\todo}[1]{\framebox{\bf #1}}
+  \newcommand{\head}[1]{\subsubsection*{#1}}
+
+  \section{Problem Statement}
+
+  Let us consider the partitioning problem where the input is a
+  structured stream graph, and the output is a map from each node of
+  the graph to a partition.  We assume that fission and
+  synchronization removal are performed prior to the partitioning;
+  that is, the partitioner is deciding only where to fuse.  We assume
+  that the following fusion operations are available:
+  \begin{itemize}
+
+    \item Fuse adjacent filters in a pipeline into a single filter.
+
+    \item Fuse adjacent filters in a splitjoin into a single filter.
+    That is, if two adjacent parallel streams contain only a single
+    filter, then we can merge them into a single parallel stream that
+    contains only one filter.
+
+    \item Fuse a feedbackloop containing a single filter on each of
+    the body and loop segments into a single filter.
+
+  \end{itemize}
+  In other words, the fusion is also structured/hierarchical, although
+  parts of a pipeline and splitjoin can be fused without fusing the
+  entire construct.
+
+  We make the following assumptions about the backend:
+  \begin{itemize}
+
+    \item Each filter requires its own tile.
+
+    \item Each joiner requires its own tile.  (Unless it is for a
+    splitjoin that has been reduced to only one parallel stream, in
+    which case the joiner can be eliminated.)
+
+    \item The splitters do not require tiles; they are ``free''.
+
+  \end{itemize}
+
+  \section{LP Tools}
+  \label{sec:tools}
+
+  First we demonstrate how some simple logical constraints can be
+  posed mathematically in terms of an integer linear program.  In the
+  presentation below, we will state only the constraint instead of the
+  linear inequalities.  All of the variables $x$ and $y$ are assumed
+  to be 0-1 variables.
+
+  \begin{tabular}{ll}
+    ~ \\
+    {\bf Logical:} & $(x_1 = x_2 = \dots = x_n = 1) \implies (y = 1)$ \\
+    {\bf Mathematical:} & $x_1 + x_2 + \dots + x_n - (n - 1) \le y$ \\
+    ~ \\
+    {\bf Logical:} & $(x_1 \ne x_2) \implies (y = 0)$ \\
+    {\bf Mathematical:} & $|x_1 - x_2| \le 1 - y$
+  \end{tabular}
+  
+  \section{LP Solution}
+
+  \head{Constants}
+
+  \begin{itemize}
+
+  \item Let us consider the stream graph as a set of nodes $n_1 \dots
+    n_{num_n}$.  There is a node for each filter and each joiner, but not
+    for splitters.
+
+  \item Let $w_i$ denote the amount of work that is contained in node
+  $n_i$ for one steady-state execution.  (Note that our current work
+  estimator does not calculate the work for joiners; presumably it
+  could be set to 0.)
+
+  \item Let $t_1 \dots t_{num_t}$ denote the tiles that the partitioner
+  is targeting.  (For now these tiles are indistinguishable, though if
+  we ever integrate layout with partitioning, there could be special
+  meaning for different tiles.)
+
+  \end{itemize}
+
+  \head{Variables}
+
+  \begin{itemize}
+
+  \item Let $P_{n,t} \in \{0,1\}$ indicate whether or not node $n$ is
+  {\it present} on tile $t$.
+
+  \item Let $w_{max}$ denote the maximum amount of work in the
+  partitioned graph.
+
+  \end{itemize}
+
+  \head{Objective Function}
+
+  The objective function is: minimize $w_{max}$.
+
+  \head{Constraints I:  Definitions}
+
+  \begin{enumerate}
+
+    \item Each node must appear on exactly one tile:
+      \[
+      \forall n:~~\sum_{i=1}^{num_t} P_{n,t_i} = 1
+      \]
+
+    \item The work on each tile must be less than $w_{max}$:
+      \[
+      \forall t:~~\sum_{i=1}^{num_n} w_i * P_{n_i,t} \le w_{max}
+      \]
+
+  \end{enumerate}
+
+  \head{Constraints II: Expressing Legal Partitionings}
+
+  We need some extra constraints to assure that each tile contains
+  either a filter, a fused pipeline (or pipeline segment), a fused
+  splitjoin (or adjacent streams), or a fused feedbackloop.  Examples
+  of illegal partitionings are ones that cross over structure
+  boundaries (e.g., a tile containing the bottom half of one splitjoin
+  and the top half of the next) or ones that contain completely
+  unconnected components (e.g., a tile containing only the first and
+  last components of a pipeline.)
+
+  To express these constraints, we make use of a {\it canonical
+  ordering} of the nodes of a stream graph.  We define a translation
+  function ${\cal L}$ from a stream construct to a list of nodes that
+  is ordered canonically (we use $\circ$ for appending lists):
+  \[
+  \begin{array}{rcll}
+    {\cal L}[f] 
+    & = & \{f\}
+    & \mbox{(filter)} \\
+    {\cal L}[s_1, \dots, s_k] 
+    & = & {\cal L}[s_1] \circ \dots \circ {\cal L}[s_k]
+    & \mbox{(pipeline)} \\
+    {\cal L}[\mt{split}, s_1, \dots, s_k, \mt{join}] 
+    & = & {\cal L}[s_1] \circ \dots \circ {\cal L}[s_k] \circ \{ \mt{join} \}
+    & \mbox{(splitjoin)} \\
+    {\cal L}[\mt{join}, s_{body}, s_{loop}, \mt{split}]
+    & = & \{ \mt{join} \} \circ {\cal L}[s_{body}] \circ {\cal L}[s_{loop}]
+    & \mbox{(feedbackloop)}
+  \end{array}
+  \]
+  Also, let us define the toplevel translation ${\cal L}_T$ to place a
+  dummy start and end node in the canonical ordering:
+  \[
+  \begin{array}{rcll}
+    {\cal L}_T[s]
+    & = & \{ \mt{start} \} \circ {\cal L}[s] \circ \{ \mt{end} \}
+    & \mbox{(toplevel)}
+  \end{array}
+  \]
+  The {\it start} and {\it end} nodes will not be assigned to any
+  tile:
+  \[
+  \forall t:~~P_{start,t} = P_{end,t} = 0
+  \]
+  We will refer to the canonical order for the entire toplevel program
+  $s_{top}$ as $L = {\cal L}_T[s_{top}]$.  Also, for a given stream
+  construct $s$, let $\mt{first}(s)$ and $\mt{last}(s)$ denote the
+  respective indices of the first and last nodes of $s$ within $L$.
+
+  Now, we can express the legal partitionings in terms of three
+  constraints:
+  \begin{enumerate}
+
+    \item {\bf Connected partitions.}  This constraint guarantees that
+    each tile covers a continous, connected portion of the stream
+    graph.  We do this using the same trick that is employed for LP
+    formulations of cuts and flows: by introducing variables to track
+    the {\it change} of partitions between nodes, and constraining the
+    change to occur just once for each traversal from the start to the
+    end.
+
+    That is, for each tile $t$ and for each $i \in [1, |L|-1]$ let us
+    introduce a variable $d_{i,t}$ that tracks whether or not index
+    $i$ represents a boundary of the tile $t$:
+    \[
+    \forall t, \forall i \in [0, |L|-2]:~~d_{i,t} \ge |P_{L[i],t} - P_{L[i+1],t}|
+    \]
+    Then, we can see that a tile has a continuous range in the graph
+    if and only if it has exactly two boundaries, which we can define
+    in terms of $d$ as follows:
+    \[
+    \forall t:~~\sum_{i=0}^{|L|-2} d_{i,t} \le 2
+    \]
+    This is all we need to guard against disjoint partitionings.  Note
+    that this constraint also guarantees that only adjacent components
+    of a splitjoin are candidates for fusion.
+
+    \item {\bf Hierarchical partitions.}  Here we enforce that a given
+    stream construct is fused with a parent or sibling only if the
+    construct has been entirely fused itself.  There is a constraint
+    for each stream construct $s$:
+    %(other than the toplevel stream $s_{top}$):
+    \[
+    \begin{array}{c}
+    \forall s, \forall t:~~P_{L[first(s)],t} = P_{L[first(s)-1],t} = 1 
+    \implies P_{L[last(s)],t} = 1 \\
+    \forall s, \forall t:~~P_{L[last(s)],t} = P_{L[last(s)+1],t} = 1 
+    \implies P_{L[first(s)],t} = 1 \\
+    \end{array}
+    \]
+    This constraint says that if a given tile $t$ overlaps the end of
+    a stream construct $s$, then that tile must contain the other end
+    of $s$ as well.  (And because of constraint \#1 above, the tile
+    must contain all of $s$ if it contains both ends of $s$).
+
+    Note also that this constraint implies that component streams of a
+    splitjoin can be fused only if they are first reduced to a single
+    filter.  That is, it is impossible to fuse the bottom of one
+    parallel stream with the top of the next parallel stream.
+
+    \item {\bf Separate Joiners}.  The final constraint is that each
+    joiner must be on a different tile than the streams it is joining,
+    unless all of these streams have been fused together.  We express
+    this constraint for each of the constructs that contains a joiner:
+    the splitjoin and the feedbackloop.
+
+    For a splitjoin $[\mt{split}, s_1, \dots, s_k, \mt{join}]$, we must
+    guarantee that if there is a tile that contains a proper subset of
+    the parallel streams, then the joiner is not also on that tile:
+    \[
+    \forall t, \forall i \in 
+	    [1, k-1]:~~P_{L[last(s_i)],t} \ne P_{L[last(s_{i+1})],t}
+	    \implies P_{join,t} = 0
+    \]
+    For a feedbackloop $fl = [\mt{join}, s_{body}, s_{loop},
+    \mt{split}]$, the constraint is analogous.  If the loop stream is
+    on a different tile than the stream preceding the feedbackloop,
+    then the joiner must be on yet another tile:
+    \[
+    \forall t:~~P_{L[last(s_{loop})],t} \ne P_{L[first(fl)-1],t}
+	    \implies P_{join,t} = 0
+    \]
+
+  \end{enumerate}
+
+  These constraints can be represented as linear inequalities
+  following the techniques in Section~\ref{sec:tools}.
+
+  \head{Summary}
+
+  Here are some statistics on the linear program described above.
+
+  \begin{tabular}{l} \\
+    Number of variables: $1 + num_n * num_t + (num_n-1) * num_t$ \\
+    Number of variables constrained to be integral: $num_n * num_t$ \\
+    Number of equations: {\it depends on structure, but linear in}$~num_n * num_t$
+  \end{tabular}
+
+  \section{Related Ideas}
+
+  \begin{itemize}
+
+    \item Something we should be doing in partitioning is {\bf
+    re-using code} that is being fused together.  For instance, if a
+    splitjoin was constructed to have identical filters on each
+    branch, then the fused filter doesn't need to inline all the
+    copies; it should use one version of the code with different
+    versions of the state.
+
+    \item Another approach to the partitioning problem could be one
+    that uses {\bf dynamic programming}, and also fisses/fuses on
+    demand as it descends through the stream graph.  The basic step
+    would be to consider the cost (i.e., the work in the heaviest
+    node) if a partition boundary were placed at each position in a
+    given structure.  For example, if the top level is a pipeline with
+    $n$ stages and we're fusing to $k$ tiles, then the best partition
+    is one of $n*k$ options: 1) allocate 1 tile to stage 1, and $k-1$
+    tiles to stages $2 \dots n$, 2) allocate 2 tiles to stage 1, and
+    $k-2$ tiles to stages $2 \dots n$, $\dots$ \#) allocate 1 tile to
+    stages $1 \dots 2$, and $k-1$ tiles to stages $3 \dots n$, etc.
+
+    Of course this is exponential in the naive formulation, but there
+    are overlapping sub-problems that would make it polynomial with
+    dynamic programming.
+
+  \end{itemize}
+
+  \section{Open Problems}
+
+  A tempting extension is to integrate splitjoin refactoring with
+  fusion.  For example, if two long pipelines are running in parallel,
+  it might desirable to add a join/split pair in the middle, and then
+  to fuse only one of the resulting splitjoins.  One could also think
+  of this as fusing across some parallel streams of the splitjoin,
+  without first reducing each stream to a single filter.  However,
+  this has some problems:
+  \begin{itemize}
+
+    \item Adding a new joiner will require an extra tile, which needs
+    to be accounted for somehow.  I found it harder to account for
+    added joiners than for removed ones.
+
+    \item It becomes harder to express the legal partitionings.  For
+    instance, how do you guard against criss-crossing partitions in
+    two adjacent streams?-- one that would fuse the top of the first
+    stream with the bottom of the next, and vice-versa.
+
+  \end{itemize}
+  Also there are some details that weren't worked out above:
+  \begin{itemize}
+
+    \item How do you perform the maximal/best fission?  It isn't
+    enough to make the fission very large, as the
+    divisors/multiplicity of the resulting splitjoin might have an
+    impact on load balancing.
+
+    \item How could you fuse/fiss/partition on an unstructured graph?
+    The approach above makes use of the structure to simplify things.
+
+    \item How to guard against making a feedbackloop unschedulable as
+    a result of fusion?  One solution is to use the phased scheduler,
+    although this will require generating fused filters that have
+    multiple phases.  The other is to detect the latency constraints
+    and add them to the linear program.
+    
+  \end{itemize}
+
+\end{document}
