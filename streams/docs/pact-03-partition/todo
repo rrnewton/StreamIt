@@ -1,0 +1,53 @@
+paper:
+
+- can we omit description of 2-stage filters?
+
+theoretical:
+
+
+- problem with first doing fission of filters inside a splitjoin and
+then slicing them horizontally, together.  this is allowed with the
+transformations of our framework but we wouldn't find it in current
+formulation.
+
+- hmm, seems like a simple transformatin to roerder the parallel
+streams of a duplicate splitjoin (either introducing a reordering node
+below, or programming the roundrobin to input things in a different
+order.)  But I guess our framework doesn't support this.
+
+implementation:
+
+ - dealing with pipeline fission in FFT - should have pipeline look at
+   the optimal allocation and then adjust weights if it helps sync
+   removal.
+
+ - 2-stage pipeline fusion (Jasper)  (vocoder/nokia waiting on it)
+
+ - backout of unfusable filters (or find way to fuse them) - file
+   readers and writers, etc.
+
+ - feedbackloop fusion
+
+ - gordo's joiner elimination; otherwise there are going to be
+   problems partitioning when extra synchronization is needed?
+
+ - (low priority) uniform splitjoin optimization
+ - (low priority) don't fuse more than you have to?
+
+extensions:
+
+ - consider interaction with time-multiplexing
+
+ - consider interaction with sync removal
+
+  - doesn't realize that the result of SIMPLE splitjoin fusion is a
+    3-stage pipeline (in case it wanted to preserve some of these
+    cases)
+
+bugs:
+
+* on bitonic sort with --raw 4, we're off-by-one.
+
+- blocked matrix multiply causes deadlock when fission is turned on
+
+

@@ -1,0 +1,67 @@
+\section{Partitioning}
+
+for the load balancing case:
+
+1. consider allocating container with N children to T tiles
+
+   toplevel:  call get(0, N-1, T)
+
+   get(child1, child2, tileLimit) {
+
+	    // if we've memoized the value before, return it
+		return A[child1][child2][tileLimit];
+	    }
+
+	    // if we are down to one child, then descend into child
+	    if (child1==child2) {
+		int childCost = childConfig(child1).get(tileLimit);
+		A[child1][child2][tileLimit] = childCost;
+		return childCost;
+	    }	    
+
+	    // otherwise, if <tileLimit> is 1, then just SUM the work
+	    // of our components
+	    if (tileLimit==1) {
+		int sum = get(child1, child1, tileLimit) + get(child1+1, child2, tileLimit);
+		A[child1][child2][tileLimit] = sum;
+		return sum;
+	    }
+
+	    // otherwise, find the lowest-cost child AFTER WHICH to
+	    // make a partition at this level
+	    int min = infinity;
+	    for (int i=child1; i<child2; i++) {
+		for (int j=1; j<tileLimit; j++) {
+		    int cost = Math.max(get(child1, i, j), get(i+1, child2, tileLimit-j));
+		    if (cost < min) {
+			min = cost;
+		    }
+		}
+	    }
+	    A[child1][child2][tileLimit] = min;
+	    return min;
+   }
+
+2. consider allocating leaf filter to T tiles:
+
+  get(tileLimit) {
+     if (isFissable()) {
+        return work / tileLimit;
+     } else {
+        return work
+     }
+  }
+
+ - 
+
+for general cost functions, a few problems you'd like to solve:
+
+1. partitioning to given number of tiles while not violating some property
+2. partitioning to minimum number of tiles while not violating some property
+3. partitioning to any number of tiles while maximizing some number
+
+--- 
+
+
+
+

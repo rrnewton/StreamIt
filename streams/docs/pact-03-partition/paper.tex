@@ -1,0 +1,43 @@
+\documentclass{sig-alternate}
+\usepackage{epsfig}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+
+\title{Partitioning a Structured Stream Graph \\ Using Dynamic Programming}
+\numberofauthors{1}
+\author{
+\alignauthor \vspace{-18pt}
+William Thies,
+Jasper Lin,
+David Maze, and 
+Saman Amarasinghe \\
+	\vspace{8pt}
+	\{thies, jasperln, dmaze, saman\}@lcs.mit.edu \\
+	\vspace{8pt}
+	Laboratory for Computer Science \\
+	Massachusetts Institute of Technology}
+
+\begin{document}
+
+\newtheorem{definition}{Definition}
+\newtheorem{transformation}{Transformation}
+
+\maketitle
+
+\newcommand{\mt}[1]{\mbox{\it #1}}
+\newcommand{\todo}[1]{\framebox{\bf #1}}
+
+\begin{abstract}
+\input{abstract}
+\end{abstract}
+
+\input{intro}
+\input{algorithm}
+
+% Bibliography -- whee!
+\begin{small}
+  \bibliographystyle{abbrv}
+  \bibliography{references}
+\end{small}
+
+\end{document}

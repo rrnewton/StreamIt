@@ -1,0 +1,128 @@
+- vertical fission
+
+  - what would you need to add to model for vertical filter fission to
+    work?  include a breakdown of where each filter could be split?
+    could assume that maximal vertical fission has been done
+    beforehand?  (but this does have disadvantage of making graph grow
+    very large even when you really don't need it to.)
+
+  - maybe could abstract away predicate into canFiss function?
+    Instead of embedding it in the algorithm; make the algorithm more
+    general.  but would this help prune search at all?  you still need
+    to try all the possible divisions, unless you're up to N levels
+    deep in the hieararchy and have exhausted a lot of stuff that way.
+    but even this wouldn't help since you'd have to consider all
+    partitionings of the children, i think.  so maybe assuming
+    vertical fission beforehand is okay
+
+  !!! so, open question i guess as to whether it would look more or
+  less complete to add a hook for some sort of vertical fission?  I
+  think the best thing to do is just to claim that maximal fission is
+  performed beforehand.
+
+\section{Problem}
+
+We solve a certain problem exactly.  This problem is as follows:
+
+- given structured stream graph S.  
+
+  - pipeline P \in S = {S_0 ... S_{n-1}}
+
+  - splitjoin SJ \in S = {split, S_0 ... S_{n-1}, join}
+
+  - feedbackloop FL \in S = {split, S_body, S_loop, join}
+
+  - filter F \in S = {work, stateless, peeks}
+
+    where:
+
+    - work is amount of work per steady-state exec. of stream graph
+    - stateless is boolean, true if there is no persistent state 
+    - peeks is boolean, true if it peeks more than it pops
+    - 2stage is boolean, true if it has two startup stages
+
+\section{Fission}
+
+1. only have to deal with filter fission, not stream-structure
+fission.  why? {
+  
+  - pipeline {
+  
+    - if there's peeking in middle of pipe, then there is intrinsic
+    state in the stream (e.g., as would be introduced by fusion)
+    and the stream cannot be fissed.
+    
+    - if there's no peeking in middle, then each filter could be
+    fissed with a round-robin splitter at each stage.  this could
+    subsequently be eliminated by sync-removal to be equivalent to
+    pipeline fission.
+    
+    !!! this is only the case if the fission above is done with the
+    fission below to identify what the weights on round-robin
+    should be.  e.g. consider {
+      
+      o=1
+      u=1
+      
+      o=2
+      
+    } then with naive fission (each filter x2) there is interleaving
+    in-between; we need to change the multiplicity so that sync
+    removal can eliminate the joiner without introducing duplicates.
+
+    Possible implementation options { 
+
+      - sync removal knows when all the pieces of a parallel stream
+      are equivalent (maybe by annotating the splitjoin) and can
+      adjust the weights accordingly.
+
+      - when the fisison is invoked on the children, it looks at the
+      pipeline as a whole and does it as a group.
+
+    }
+  }
+
+  - splitjoin {
+
+  }
+    
+------
+
+2. if peek==pop (which implies initPeek==initPop) but initPop>0, then
+this implies that we have some special processing the first time
+through.
+
+--> actually no, just strip the initwork function from the duplicate
+copies.  we can look inside things.  
+
+but we can't deal with peeking in pipelines... so there will never be
+initwork unless it's a single filter.  so we're okay.
+
+2. if peek > pop (we require that initPeek - initPop == Peek - Pop)
+
+	- the splitter is a duplicate
+
+we're screwed if initPeek!=initPop?  no i guess not, since it's
+round-robin or duplicate at the top
+
+---
+
+so back to 2:
+
+case 1: initPop > 0.  Implies it's a single filter (since no peeking
+  in pipelines).  Then have duplicate splitter.
+
+	- filters 2...N have different init stage that just decimates
+		the initial inputs.  All filters decimate so that they
+		only get items intended for them.  Joiner is something
+		complicated, and requires cleanup node afterwards.
+
+	could do this same thing with the node above the splitter
+
+case 2: Peek > 0.  Then have duplicate splitter.  All top position of
+streams decimate so they only get what's intended for them.  Joiner is
+round robin on push rate.
+
+case 3: peek==pop.  Then roundrobin splitter for amount consumed by
+stream, with roundrobin joiner matching.
+
