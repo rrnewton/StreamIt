@@ -1,0 +1,174 @@
+<html>
+
+<head>
+   <meta http-equiv="Content-Type" content="text/html;charset=iso-8859-1">
+   <meta NAME="author" CONTENT="rodric m. rabbah">
+   <meta NAME="keywords" CONTENT="saman amarasinghe, streaming, programming languages, compilers">
+   <meta NAME="description" CONTENT="StreamIT">
+   <title>StreamIt - Software Requirements</title>
+
+   <style fprolloverstyle>A:hover {color: #000099}</style>
+</head>
+
+<body>
+
+<table border="0" width="1000" cellpadding="0" align="center">
+
+<tr><td colspan=4>
+<table border="0" width="600" cellpadding="2" align="center">
+  <tr>
+    <td valign="center" align="center">
+    <br>
+      <img src="../images/streamit-logo.gif" width="400">
+      <font color="#FF6633">
+        <br><br>
+        <nobr><b>
+            <a href="../index.html"><font color="#000099">home</font></a>
+          | <a href="../html/news.html"><font color="#000099">news</font></a>
+          | <a href="../html/research.html"><font color="#000099">research</font></a>
+          | <a href="../html/people.html"><font color="#000099">people</font></a> 
+          | <a href="../html/documentation.html"><font color="#000099">documentation</font></a>
+          | <a href="../html/download.html"><font color="#000099">download</font></a>
+          | <a href="../html/contact.html"><font color="#000099">contact</font></a>
+        </nobr></b>
+      </font>
+    </td>
+  </tr>
+</table>
+</td></tr>
+
+  <tr>
+    <td width="130" valign="top" align="left"></td>
+    <td width="20" valign="top" align="left"></td>
+    <td width="700" valign="top" align="left">
+    <hr><br>
+      <h3>ECLIPSE PLUGINS</h3>
+      <br>
+
+      <p align="justify">
+        We  are  making available  the  first  public  version of  the
+        StreamIt Debugger.  The debugger  is implemented in Java as an
+        <a   href="http://www.eclipse.org">Eclipse</a>   plugin.   The
+        debugger  is a  tool  for debugging  and visualizing  programs
+        written in StreamIt.   As a graphical programming environment,
+        the   debugger   can  simply   and   intuitively  convey   the
+        hierarchical   and    structured   nature   of    a   StreamIt
+        application.  In  addition,  the  debugger can  interpret  and
+        visually represent the stream  graph and its dynamic behavior.
+        Built in  a visual, independent  development environment (IDE)
+        with a  human-computer interface, the debugger  is composed of
+        the following modules: an IDE-integrated debugger, a graphical
+        text editor, a runtime  stream graph view, and a corresponding
+        graph overview.
+      </p>
+
+        <h4><hr>Download<hr></h4> 
+        <p align="justify">
+          The StreamIt Debugger is copyright 2003 by the Massachusetts
+          Institute of  Technology.  It is  provided to you  under the
+          terms       and       conditions       of       the       <a
+          href="http://www.gnu.org/licenses/gpl.txt">GNU        General
+          Public License Version 2.0</a>.
+        </p>  
+        <ul>
+          <li>Available plugins for Eclipse<br>
+            <a href="../restricted/streamit-debugger-1.0.0-eclipse-plugin.zip">StreamIt Debugger version 1.0.0</a>.<br>
+          </li>
+          <li>
+            <i>Coming soon</i><br>
+               StreamIt Graphical Editor version 1.0.0.
+          </li>
+        </ul>
+
+        <h4><hr>Software Requirements<hr></h4>
+	  <ul>
+          <li><p align="justify">
+              The StreamIt plugins were thoroughly tested with 
+              <a href="http://download2.eclipse.org/downloads/drops/R-2.1.1-200306271545/index.php">
+                Eclipse version 2.1.1</a> and
+              <a href="http://java.sun.com/j2se/1.4.2/download.html">Sun Java  2SE version 1.4.2</a>.
+              If you  are using the IBM Java  Runtime Environment, you
+              may encounter some problems related to the processing of
+              XML files.
+          </p></li>
+          <li><p align="justify">
+              The StreamIt plugins also require
+              <a href="http://download.eclipse.org/tools/gef/downloads/drops/R-2.1.1-200306180934/index.php">
+                GEF (Graphical Editor Framework) version 2.1.1</a>.
+          </p></li>
+        </ul>
+
+        <h4><hr>Installing the Plugins<hr></h4>
+        <ul>
+          <li><p>
+              To   install   the   StreamIt   plugins,   extract   the
+              distribution  into your  Eclipse plugin  directory.<br>
+              For example, if you are using Eclipse in a Microsoft Windows
+              environment,    and     Eclipse    is    installed    in
+              <b>C:\Program&nbsp;Files\Eclipse</b>,  then  extract the
+              contents   of  the   StreamIt  plugin   distribution  to
+              <b>C:\Program&nbsp;Files\Eclipse\plugins</b>.
+          </p></li>
+
+          <li>
+              You need to restart Eclipse. We recommend you verify
+              that the installation was successful as follows.
+              <ul>
+                <li>From the main Eclipse window, click on "Window".
+                <li>Next select the "Preferences" option from the menu.
+                <li>In the Preferences dialogue box, verify that the "StreamIt Editor" option exists in the preferences hierarchy.
+                <li>Expand the "Plug-In Development" option and click on "Target Platform".
+                <li>Verify that the following three plugins exist.
+                <ul>
+                  <li>streamit (1.0.0)
+                  <li>streamit.eclipse.debugger (1.0.0)
+                  <li>streamit.eclipse.help (1.0.0)
+                </ul>
+              </ul>
+          </li>
+        </ul>
+
+        <h4><hr>Creating a StreamIt Project<hr></h4>
+        <ul>
+          <li><p align="justify">
+            To  create  a  StreamIt  project, from  the  main  Eclipse
+            window, click  on "File", then select "New",  and click on
+            "Other". From the new dialogue window, click on "StreamIt"
+            and continue by clicking on "Next".
+          </p></li>
+
+          <li><p align="justify">
+            You may now name your project, and continue by clicking on "Next" again.
+          </p></li>
+
+          <li><p align="justify">
+            Select the "Libraries" tab, and click on "Add External JARs".
+          </p></li>
+
+          <li><p>
+            Find the <b>streamit.jar</b> file, located in the StreamIt
+            plugin directory.  For example, if Eclipse is installed in
+            <b>C:\Program&nbsp;Files\Eclipse</b>         then         the
+            <b>streamit.jar</b>      file      is      located      in
+            <b>C:\Program&nbsp;Files\Eclipse\plugins\streamit_1.0.0</b>
+          </p></li>
+
+          <li><p>Click on "Finish" to complete the project setup.</p></li>
+
+          <li>You may now create a StreamIt file and write your own StreamIt program.</li>
+          <ul>
+            <li>To create a new file, from the main Eclipse window, click on "File", then select "New", and click on "File".</li>
+            <li>Select your StreamIt project, name your file and click "Finish". Note that your file must end with the extension "str". For example, "foo.str" is a valid StreamIt file name.</li>
+          </ul>
+
+          <li><p>Visit the <a href="http://cag.csail.mit.edu/streamit">StreamIt home page</a> for the language specification and cookbook.</p></li>
+        </ul>
+
+      </p>
+    </td>
+    <td width="150" valign="top" align="left"></td>
+  </tr>
+</table>
+
+</body>
+</html>
