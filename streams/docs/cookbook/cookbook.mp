@@ -1,7 +1,7 @@
 %
 % cookbook.mp: MetaPost diagrams for StreamIt Cookbook
 % David Maze <dmaze@cag.lcs.mit.edu>
-% $Id: cookbook.mp,v 1.5 2003-03-06 20:52:46 dmaze Exp $
+% $Id: cookbook.mp,v 1.6 2003-03-10 21:25:23 thies Exp $
 %
 % MetaPost is a drawing language based on Knuth's METAFONT that can
 % produce embedded PostScript figures, with TeX strings embedded in it.
@@ -18,6 +18,10 @@ defaultscale := 11pt/fontsize defaultfont;
 
 % Basic unit length:
 u=11pt;
+% Border around text in filters
+filterBorder=3pt;
+% Border between pipeline label and contents
+pipeBorder=5pt;
 % Standard block width:
 fw=5u;
 
@@ -34,11 +38,11 @@ def xright expr p = xpart lrcorner bbox p enddef;
 def arrowline (expr p, pa) = addto p doublepath pa withpen currentpen;
   addto p contour arrowhead pa withpen currentpen; enddef;
 
-% Returns p, but with name placed at its top left and a box around
-% the whole thing.  Add o distance above/below.
-vardef boxed(expr name, o)(suffix p) =
-  addto p doublepath (ulcorner p+(-u,o))--(urcorner p+(u,o))--
-    (lrcorner p+(u,-o))--(llcorner p+(-u,-o))--cycle withpen currentpen;
+% Returns p, but with name placed at its top left and a box around the
+% whole thing.  Add ot distance on top and ob distance below.
+vardef boxed(expr name, ot, ob)(suffix p) =
+  addto p doublepath (ulcorner p+(-u,ot))--(urcorner p+(u,ot))--
+    (lrcorner p+(u,-ob))--(llcorner p+(-u,-ob))--cycle withpen currentpen;
   addto p also thelabel.lrt(name, ulcorner p);
   p
 enddef;
@@ -47,8 +51,8 @@ enddef;
 % Returns a picture expression.
 vardef filter(expr name) =
   save p; picture p; p=nullpicture;
-  addto p doublepath (0,0)--(0,u)--(fw,u)--(fw,0)--cycle withpen currentpen;
-  addto p also thelabel.bot(name, (fw/2,u));
+  addto p doublepath (0,-filterBorder)--(0,u+filterBorder)--(fw,u+filterBorder)--(fw,-filterBorder)--cycle withpen currentpen;
+  addto p also thelabel(name, (fw/2,u/2));
   p
 enddef;
 
@@ -73,7 +77,7 @@ vardef toppipe(expr name)(text t) =
     addto _p also _r;
     _h := _h - height _r;
   endfor;
-  boxed(name, u, _p)
+  boxed(name, u+pipeBorder, u, _p)
 enddef;
   
 % Usage:
@@ -98,7 +102,7 @@ vardef pipeline(expr name)(text t) =
   addto _p doublepath (0,_h)--(0,_h-u) withpen currentpen;
   addto _p contour arrowhead (0,_h)--(0,_h-u) withpen currentpen;
   _h := _h-u;
-  boxed(name, 0, _p)
+  boxed(name, pipeBorder, 0, _p)
 enddef;
 
 % Usage:
@@ -155,7 +159,7 @@ vardef splitjoin(expr name, split, join)(text children)(text sws)(text jws) =
   addto _p also thelabel.bot(join, (_xc,_y));
   addto _p doublepath (_xc,_y-u)--(_xc,_y-2u) withpen currentpen;
   addto _p contour arrowhead (_xc,_y-u)--(_xc,_y-2u) withpen currentpen;
-  boxed(name, 0, _p)
+  boxed(name, 0, 0, _p)
 enddef;
 
 % Usage:
@@ -208,7 +212,7 @@ vardef feedbackloop(expr name, join, split, cb, cl, jx, jl, sx, sl) =
   addto _p doublepath (0,_y)--(0,_y-u) withpen currentpen;
   addto _p contour arrowhead (0,_y)--(0,_y-u) withpen currentpen;
   addto _p also thelabel.rt(sx, (0,_y-u/2));
-  boxed(name, 0, _p)
+  boxed(name, 0, 0, _p)
 enddef;
 
 % End of macro section.
