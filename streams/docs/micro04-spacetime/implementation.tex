@@ -11,12 +11,12 @@ extract the traces from the graph and schedule them for execution.
 %underlying, low-level implementation.
 
 \subsection{Low-level Space-Time Implementation}
-Currently, we have implemented a robust, though restricted, hybrid
+We have implemented a robust, though restricted, hybrid
 space-time execution model.  Firstly and obviously, the number of
 filters in a trace must be less than or equal to the number of tiles
 in the Raw chip to which we are targeting.  Traces are homogeneous,
 meaning that traces are composed of either completely linear or
-completely non-linear filters.  Currently, traces are restricted to
+completely non-linear filters.  Traces are restricted to
 straight pipelines of filters.  More specifically, only the end-points
 of traces can communicate with more than one filter; inner filters are
 restricted to single input and single output.  All intra-trace
