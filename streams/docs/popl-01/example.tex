@@ -148,33 +148,31 @@ class RFtoIF extends Filter {
    }
 }
 
-class CheckFreqHop extends Stream {
+class CheckFreqHop extends SplitJoin {
    void init() {
-      add(new SplitJoin() {
-         void init() {
-            weighted_round_robin(N/4-2,1,1,N/2,1,1,N/4-2);
-            int k = 0;
-            for(int i=0; i<4; i++) {
-               if((i==0)||(i==2)) {
-                  for(int j=0; j<2; j++) {
-                     add(new Filter() {
-                        Channel input = new ComplexChannel();
-                        Channel output = new ComplexChannel();
-                        void work() {
-                           Complex val = input.pop();
-                           if(val >= MIN_TRASHOLD)
-                              send init(Freq[k])
-                           output.push(val);
-                        }
-                     });
-                     k++;
-		  }
-               } else
-                  add(new Identity());
+      weighted_round_robin(N/4-2,1,1,N/2,1,1,N/4-2);
+      int k = 0;
+      for(int i=0; i<4; i++) {
+         if((i==0)||(i==2)) {
+            for(int j=0; j<2; j++) {
+               add(new Filter() {
+                  Channel input = new ComplexChannel();
+                  Channel output = new ComplexChannel();
+                  void work() {
+                     Complex val = input.pop();
+                     if(val >= MIN_TRASHOLD)
+                        send init(Freq[k])
+                     output.push(val);
+                  }
+               });
+               k++;
             }
-            weighted_round_robin(N/4-2,1,1,N/2,1,1,N/4-2);
-     }});
-}}
+         } else
+            add(new Identity());
+      }
+      weighted_round_robin(N/4-2,1,1,N/2,1,1,N/4-2);
+   }
+}
 
 class CheckQuality extends Filter {
    Channel input = new ComplexChannel();
