@@ -1,0 +1,181 @@
+MORE BRAINSTORMING ON SDEP APPLICATIONS:
+
+- debugging application
+  - user says that there are n invocations of data
+  - wants there to be a buffer of a certain size
+
+  - you could write messages as part of application to tag data item
+
+  - trace backwards to see when things break (****)
+     - you know it breaks at N downstream, what is M upstream
+
+- speculation
+  - need sdep to do rollback
+  - do control speculation within a filter, that will affect data values
+    and propagate downstream
+
+- slicing instead of information wavefronts / sdep
+  - we're basically doing stream slicing
+
+*********************************************************************
+
+twists to put on the paper
+--------------------------
+
+1. calculation, implementation, and applications of SDEP
+
+  - "Stream Dependence Analysis and its Applications"
+
+  - talk about SDEP as the fundamental intellectual aspect, and list
+    messaging and constrained latency as possible applications
+
+   - possible outline (with # pages) -- currently sums to 10 pages
+
+     I. intro (1)
+       - talk about timing, scheduling of concurrent systems; need for
+         some way for programmer to synchronize global time
+
+       - talk about the usefulness of a dependence abstraction in
+         general, for enabling optimization and showing that program
+         transformations are correct
+
+     II. definition of sdep (0.75)
+       - give formal definition, with simple example of SDEP table
+
+     III. applications of SDEP (2.75)
+
+       A. messaging (1.5)
+         - give messaging semantics
+         - example of its use in a program -- freq. hopping radio
+            - pros and cons vs. other messaging techniques
+
+       B. latency constraints (0.25)
+         - with the MAX_LATENCY directive (or similar), guaranteeing
+           bound on number of items produced vs. number consumed
+
+       C. program verification? (0.5)
+          - deadlock detection
+          - overflow detection
+          - others?
+
+       D. program transformation and optimization (0.5)
+          - re-iterate the case from introduction on why dependence
+            function is useful
+          - possibly make reference to constrained scheduler as
+            something that can benefit from SDEP
+
+     IV. calculating SDEP (1.5)
+
+        - possibly give preface that one way to calculate is to
+          enumerate push schedule for program, and count the number of
+          appearances of upstream and downstream filter
+
+             - argue that this is too slow
+
+        - give michal's compositional implementation
+             - present algorithm pseudocode, give high-level ideas
+             - step through detailed execution, deriving example from
+               introduction (or more sophisticated example)
+
+     V. case study:  implementation of messaging (2)
+
+       - describe two backends that utilize SDEP for messaging
+         abstraction: uniprocessor and cluster.
+       - give high-level differences in the way they approach
+         guaranteeing the message is delivered on time
+
+        A. Uniprocessor implementation (1)
+           - describe constrained scheduling algorithm, possibly with examples
+
+        B. Cluster implementation (0.5)
+           - describe basic implementation
+
+        C. Performance (0.5)
+           - give a few numbers of both backends
+
+      VI. Related Work (0.75)
+        - heterogeneous static/dynamic models of computation in Ptolemy
+
+      V. Conclusions (0.5)
+        - mention all of the other twists that are below
+
+      VII. References (0.75)
+
+2. messaging as a language feature
+
+  - "Precise Event Handling for Stream Programs"
+    "Control Messages for Stream Programs"
+    "Dynamic Messages in a Synchronous Dataflow Language"
+
+  - give standard argument, as in talk, that it improves (for both
+    programmer and compiler) over either embedding the message in the
+    stream, or treating it as a synchronous method call
+      - precise timing on delivery
+      - portals for one-to-many messaging
+
+  - develop SDEP as the analysis that is needed for this feature; talk
+    about its calculation and implementation
+
+  - problem with this twist is that it relies on applications for
+    motivation, which we may or may not have
+
+3. a means of guaranteeing latency constraints
+
+   - "Specification and Enforcement of Latency Constraints
+      in Stream Programs"
+
+   - basically treats latency as the fundamental intellectual
+     contribution, have messaging auxilliary
+
+4. a system for integrating "push" dataflow with "pull" dataflow
+
+  - "Integrating Dynamic Control with Synchronous Dataflow"
+
+  - synchronous dataflow was always "pull", requiring that a filter
+    know exactly what it will consume, and it can only fire if it has
+    all of those inputs ready
+
+  - what we're saying is that there can be a dynamic, irregular "push"
+    model in which a filter basically INVOKES another filter, but it is
+    guaranteed that the downstream filter will not produce anything as
+    a result of this invocation.  Another way to think of this is that
+    the message sender will place items on a dynamic-length queue of
+    the message receiver, and the number of items on this queue will
+    not effect the other I/O rates of the message receiver.  The
+    receiver can test for emptiness of this queue and can proceed
+    however it wants.
+
+  - this also provides a way to integrate some dynamic behavior
+    with static scheduling.  the only restriction is that there is a
+    static "backbone" to the application; the dynamism is only for
+    control, on top of that.
+
+5. a method for reasoning about distributed time
+
+  - "Reasoning About Time in Concurrent Stream Programs"
+    "Global Timing Analysis for Stream Programs"
+    "Distributed Time in Stream Programs"
+
+  - talk about the fact that concurrently running filters have
+
+todo list
+---------
+
+- writing
+  - cluster implementation
+  - SDEP calculation
+  - constrained scheduling algorithm
+  - exact message delivery semantics
+
+- messaging applications
+  - freq-hopping radio
+  - vocoder?
+  - the lame beamformer?
+
+- finish constrained scheduler and fix SDEP bugs (Michal)
+
+- gather numbers (cluster + uniprocessor)
+  - performance degradation as function of number of dynamic messages?
+    as number of static message portals?  (using 0 as control.)
+  - comparison to other messaging techniques -- e.g., embedding the
+    message in the stream
