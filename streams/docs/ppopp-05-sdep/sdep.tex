@@ -3,27 +3,58 @@
 \newcommand{\UND}{\end{ALC@g}}
 \newcommand{\tup}[2]{\langle{#1}, {#2}\rangle}
 
-\section{Stream Dependence Function}
+\section{Model of Computation}
 
-In this section, we describe our model of computation and define the
-stream dependence function, $\sdep$.
+%In this section, we describe our model of computation and define the
+%stream dependence function, $\sdep$.
 
-Our model of computation is Cyclo-Static Dataflow~\cite{BELP96}.  In
-this model, the stream graph is a directed graph where nodes represent
-actors and edges represent FIFO communication channels.  Each actor
-has a set of execution steps, or phases, that consume some items from
-the input channels and produce some items on the output channels.  The
-number and ordering of phases is known at compile time, and their
-execution is cyclic (that is, after executing the last phase, the
-first phase is executed again).  Also, for each phase, the number of
-items produced and consumed from the channels is fixed and known at
-compile time.
+Our model of computation is Cyclo-Static Dataflow~\cite{BELP96},
+a generalization of Synchronous Dataflow (SDF). It  is a popular  model of
+computation~\cite{LM87-i} that  is well suited for  streaming
+codes. In this model, computation is represented  as a graph consisting of
+{\it  actors} connected by FIFO communication channels.
+Each actor follows a set of execution steps, or phases, that consume
+a constant number of items from the input channels and produce s a
+constant number of items onto the
+output channels.  
+The  ordering of phases is known at
+compile time, and their execution is cyclic (that is, after executing
+the last phase, the first phase is executed again).
+SDF is appealing because every actor has a fixed input and output rate
+(I/O rate) thus making the stream graphs  amenable to static
+scheduling and optimization.
+
+Figure~\ref{fig:sdep-rates} illustrates an example stream graph. The
+nodes represent the actors, and the numbers within the nodes represent
+the I/O rate of each actor. For example, actor $C$  consumes 3 input
+items and produces 2 output times with every execution step. Actors
+with a single input and multiple output channels are known as splitters, and on
+every execution step, they can distribute their output to any one of
+their children. For example, actor $A$ writes the output of its first
+execution to its left child ($C$), and the output of its second
+execution to its right child ($D$). This type of a splitter is a
+round-robin splitter with one I/O rate per output edge. A duplicate
+splitter is also possible but is not illustrated. A counterpart to splitters
+are the joiners which have multiple input channels but only one output
+channel. The joiner assemble the data from their predecessors
+in a round-robin manner. In Figure~\ref{fig:sdep-rates}, actor $E$ is
+a joiner which reads one item from $C$ then another from $D$ in a
+repeating pattern. 
+
+%The actors consume
+%and produce a constant number  of items from their input and output
+%channels every time they execute.  
+%In
+%this model, the stream graph is a directed graph where nodes represent
+%actors and edges represent FIFO communication channels.  
+%Also, for each phase, the number of
+%items produced and consumed from the channels is fixed and known at
+%compile time.
 %We also permit actors to ``peek'' at items that are not
 %consumed from the channel, and the peek amount is known at compile
 %time (note that peeking is not part of CSDF).
-Cyclo-Static Dataflow is a generalization of Synchronous
-Dataflow~\cite{LM87-i}, which requires each actor to have only a
-single phase.
+
+\section{Stream Dependence Function}
 
 An execution $\phi$ of a dataflow graph is an ordered sequence of
 actor firings.  Each firing represents the execution of a single phase
