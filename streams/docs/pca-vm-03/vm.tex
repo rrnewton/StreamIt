@@ -1,0 +1,80 @@
+\section{VM Description}
+
+\begin{verbatim}
+
+- use streamit filters as basis for connected kernels.  Say that the
+  ``stream parameters'' are constant *per connectivity of the graph*
+  -- that is, for a given run statement, it will not change.  This is
+  in contrast to the fields of the filters, which might change as they
+  are running.  (Have fields so that the compiler can separate
+  dependence information.)
+
+ - setting and reading of fields can only occur within the filter that
+   owns the field, as well as from the processor that owns the filter.
+
+- based on streamc / kernelc
+
+- a "stream" is a new type of variable.  Represents a persistent
+  finite piece of memory allocated to a stream / the values in a 
+  piece of a the stream.
+
+  - declared statically with their size and type.  Types are:
+
+    - Blocked stream.  Means that each element in buffer is only
+      written once; "size" represents total number of elements in
+      stream.  
+
+      e.g. "blocked_stream<int>[10000] str;"
+
+    - Buffered stream.  Means that the buffer is shorter than the
+      stream itself, and locations in the actual memory store will
+      be written to multiple times.  The stream will start blocking
+      when all of the locations have been written (that is, before
+      wrapping around.)  The buffer management for the stream is
+      left to the low-level compiler.
+
+      e.g. "buffered_stream<char>[10000] str;"
+
+- about kernels:
+
+  - within kernels:
+    - have push/pop/peek for communicating channel values
+
+  - annotations for each kernel:
+
+    - whether or not it's fit for SIMD execution (stateless,
+      data parallel)
+    - whether or not it contains dynamic control flow
+      (if it does, then it can't be fit for SIMD)
+    - should it be annotated with static rates?  (for streamit)
+
+- obligatory details:
+
+  - allow _structured_ control flow everywhere
+  - can't push/pop/peek outside of kernel
+  - support C opcodes as common operations
+    e.g. logical, boolean, arithmetic
+    float, 32, 16, 8 - bit numbers, boolean
+  - functions allowed, but not recursive; inline semantics
+  - no pointers
+  - no dynamic memory allocation
+  - scoping allowed w/ braces
+
+- communicate dependence info from high to low
+  - scalar value communication - _just scalars_
+
+main() {
+
+  kernel (s1, s2  --> bfs(up1), 10) {
+
+  }
+
+  kernel (s1, s2  --> bfs(up1), 10) {
+  }
+
+  kernel (s1, s2  --> bfs(up1), 10) {
+  }
+
+}
+
+\end{verbatim}
