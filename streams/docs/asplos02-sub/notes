@@ -33,12 +33,12 @@ Comparison Numbers
 Application     C Code, 1 Tile       C Code, PIII         C Code, rawcc       Date     Who        Status
 (MFLOPS/Throughput**/Utilization)
 -------------------------------------------------------------------------------------------------------
-FFT                 33.5/150.48/97.7%      ?	             ?	              7/26    Andrew       C Code written.
-FMRadio             29.3/2.47/97.7%        ?		     ?	              7/29    Andrew	   C Code written.
+FFT                 33.5/150.48/97.7%      ?	             ?	              7/26    Andrew    C Code written.
+FMRadio             29.3/2.47/97.7%        ?		     ?	              7/29    Andrew    C Code written.
 BeamFormer          ?		           ?		     ?	              ?       ?	        C Code written?  (Hank?)
 Vocoder             ?		           ?		     ?	              ?       ?	        C Code supplied.
-Nokia               ?		           ?		     ?	              ?       Ali         C Code in progress.
-GSM                 ?		           ?		     ?	              ?       ?           C Code supplied.
+Nokia(4/5/10/7)*    1.22/15.55/97.8%       ?		     ?	              7/29    Andrew    C Code in progress.
+GSM                 ?		           ?		     ?	              ?       ?         C Code supplied.
 
 
 CRC                 ?		           ?		     ?	              ?       ?	        Optimized C supplied.
@@ -53,6 +53,7 @@ MergeSort           ?		           ?		     ?	              ?       ?	        ?
 BitonicSort         ?   	           ?     	     ?                ?       ?         ?
 FIR                 ?   	           ?   	             ?                ?       ?         ?
 
+*  K/N/Q/W -- constant parameters to the Nokia 3gpp algorithm
 ** Throughput is for 10^5 cycles.
 
 
