@@ -7,11 +7,10 @@ application, we traverse the schedule for each phase of computation:
 first the peek initialization stage, then prologue stage, and finally
 the steady-state.  As we traverse each schedule, we generate the
 computation and communication code as we visit each trace.  For the
-initialization and stage stages, we traverse a breadth-first traversal
-of the trace graph to maintain the data-dependencies stipulated by the
-stream graph. For the steady-state we traverse the schedule as
-calculated by the trace scheduling algorithm of Section
-\ref{sec:scheduling}.
+initialization and prologue stages, we do a traversal of the trace
+graph that respects the data-dependencies stipulated by the stream
+graph. For the steady-state we traverse the schedule as calculated by
+the trace scheduling algorithm of Section \ref{sec:scheduling}.
 
 When we visit a trace, we first generate the DRAM requests and
 communication code to gather its input.  Next, we generate computation

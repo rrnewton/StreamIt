@@ -30,13 +30,13 @@ placed in a loop and appears exactly once in the schedule.  The number
 of executions of a filter in a schedule is called its {\it
 multiplicity} in later sections.  The natural execution order for both
 the peek initialization schedule and the steady-state schedule is
-given by a topological traversal of the stream graph. Of course, the
-trace scheduling phase has some freedom in ignoring the
-information-flow dependencies of the trace graph when constructing a
-trace schedule, as the traces can be executing from different
-iterations of the original program.  The prologue schedule (described
-below) orchestrates initial executions so that the data dependences
-are satisfied.
+given by a traversal of the stream graph, executing a node only after
+its sources have executed. Of course, the trace scheduling phase has
+some freedom in ignoring the information-flow dependencies of the
+trace graph when constructing a trace schedule, as the traces can be
+executing from different iterations of the original program.  The
+prologue schedule (described below) orchestrates initial executions so
+that the data dependences are satisfied.
 
 %It is the responsibility of the {\it Prologue Schedule} to ensure that the...
 
