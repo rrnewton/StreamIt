@@ -19,7 +19,9 @@ in this case, the {\tt FloatAdder} records {\tt N}, the number of
 items it should filter at once.  A user should instantiate a filter by
 using its constructor, and the {\tt init} function will be called
 implicitly with the same arguments that were passed to the
-constructor.
+constructor{\footnote{This design might seem unnatural, but it is
+necessary to allow inlining (Section \ref{sec:connecting}) within a
+Java-based syntax.}}.
 
 The {\tt work} function describes the most fine grained execution step
 of the filter in the steady state.  Within the {\tt work} function,
@@ -72,7 +74,7 @@ diverge from a common {\it splitter} and merge into a common {\it
 joiner}.  There are two kinds of splitters: 1) Duplicate, which
 replicates each data item and sends a copy to each parallel stream,
 and 2) RoundRobin($w_1, \dots, w_n$), which sends the first $w_1$
-items to the first stream, the next $i_2$ items to the second stream,
+items to the first stream, the next $w_2$ items to the second stream,
 and so on.  RoundRobin is also the only type of joiner that we
 support; its function is analogous to a round robin splitter.  If a
 RoundRobin is written without any weights, we assume that all $w_i =

@@ -1,65 +1,36 @@
 things to do with figures:
 --------------------------
 
-- shrink the figure that labels stream constructs.
-
 - shrink the tape figure, if you want to see it back in the paper
 
 things to do with paper:
 ------------------------
 
-* add much more motivation for section 3 -- why you want min function,
-look at optimizations first, and then come back to prove them, etc.
+* mention that we haven't defined semantics of feedback loop
 
-- inlining as textual substitution instead of optimization
-
-- i2 -> w2
-
-- not clear why calling init function instead of constructor.  either
-bring back footnote or obscure what's going on.
-
-- comma instead of arrow in min function
-
--> min function stuff would be more clear if it was motivated with the
-use of the min function
-
--> bring out that the min function 
+- reverse the order of arguments to min function?
 
 ---
 
--> message semantics not defining stuff
+- get the f_i % push
+
+- define the mod function
+
+---
+
+* change Ip(i)_J to I_{p(i),J}, esp. if Saman has!!
 
 - note that push_A and pop_A have different tapes
 
-- need to show that W has signature StreamIt -> work, not the
-application of it to the work function
-
-- suppose w_1 in the canonical form above before showing W
-
-- need to convert arrows to lambda's in definition
-
-- make clear that PEEK comes from work above
-
-- make clear that we're doing an example on a typical work function
-
 - do \mbox{ } around words in math.
-
----
-
-- define the composition operator the first time you introduce
-it--otherwise it's not clear what the circle means
-
-* look for the max function
-
-------
-
-- change the "denotational semantics" heading so as not to attract
-	denotational semanticists
 
 - remove most of the message-constrained scheduling in favor of something
 	that's honest but short.
 
-- mention limitiation of first-class streams?
+---
+
+- change the "denotational semantics" heading so as not to attract
+	denotational semanticists
 
 - include picture of the equalizer in the intro?
 
@@ -75,14 +46,15 @@ plus capitalization of all stream constructs.
 - add note that the message delivery constraints sometimes specify a
 minimum buffer size, sometimes specify a maximum buffer size?
 
+things i'm not likely to do in paper
+------------------------------------
+
+- mention limitiation of first-class streams?
+
 - define a max function in the case of the downstream message sending,
 just for the sake of making the explanation clearer (and defining the
 max function, so that other people can use it in other papers, and
 think about the concept even.)
-
-- abstract away the function composing streams around a path of a
-splitjoin?  then could use it again when talking about the
-denotational semantics.
 
 things to figure out / solve:
 -----------------------------

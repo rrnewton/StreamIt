@@ -199,8 +199,8 @@ minimum number of items that must appear on tape $I_A$ given that
 there are $x$ items on tape $O_B$.  Observing that a minimum of
 $\mi{I_B}{O_B}(x)$ items must appear on tape $I_B$, and that $I_B$
 must equal $O_A$ since the filters are connected, we see that a
-minimum of $(\mi{I_A}{O_A} \circ \ma{I_B}{O_B})(x)$ items must appear
-on $I_A$:
+minimum of $\mi{I_A}{O_A}((\mi{I_B}{O_B})(x))$ items must appear
+on $I_A$.  Using $\circ$ to denote function composition, we have:
 \begin{align*}
 \mi{I_A}{O_B} = \mi{I_A}{O_A} \circ \mi{I_B}{O_B}
 \end{align*}
@@ -494,17 +494,20 @@ to generate an expression in the intermediate algebra that reflects
 the meaning of a given StreamIt program.  Due to space limitations, we
 consider here only the translation of the work functions.
 
-The translation of a filter's work function contains two steps.  First,
-the function is arranged in a {\it canonical form}, in which each pushed
-item is given as a direct function of the peeked items, and all of the
-pop statements are at the end of the function.  For example: \\
+The translation of a filter's work function contains two steps.
+First, the function is arranged in a {\it canonical form}, in which
+each pushed item is given as a direct function of the peeked items,
+and all of the pop statements are at the end of the function.  Let us
+consider a work function with I/O rates PUSH, POP, and PEEK.  The
+canonical form of this work function gives us an element {\tt w} of
+the syntactic domain {\tt StreamItWorkFunction}: \\
 \vspace{0.2in}
 \begin{scriptsize}
 \begin{tabular}{l}
-{\tt void work()}\{ \\
-\hspace{12pt} {\tt output.push(} $f_1$ {\tt (input.peek(0), ... , input.peek(PEEK-1) )} \\
+{\tt w = void work()}\{ \\
+\hspace{12pt} {\tt output.push(} ($f_{1}$ {\tt input.peek(0) ... input.peek(PEEK-1)} ) \\
 \hspace{12pt} $\dots$ \\
-\hspace{12pt} {\tt output.push(} $f_{PUSH}$ {\tt (input.peek(0), ... , input.peek(PEEK-1) )} \\
+\hspace{12pt} {\tt output.push(} ($f_{PUSH}$ {\tt input.peek(0) ... input.peek(PEEK-1)} ) \\
 \hspace{12pt} {\tt for (int i=0; i$<$POP; i++) \{ input.pop(); \}} \\
 \}
 \vspace{-12pt}
@@ -512,23 +515,25 @@ pop statements are at the end of the function.  For example: \\
 \end{scriptsize}
 Above, we model the computation of the work function as pure
 mathematical functions that can be injected into the semantic domain.
-The algebraic work function, then, is the alternate application of each
-push statement's function $f$, with the index expressions transformed
-from their local index $x$ to a global index $g(x)$ on the input tape.
+To simplify our notation, we define the valuation ${\cal W}: {\tt
+StreamIt Work} \ra WorkFunction$ in terms of {\tt w}, the example
+syntactic work function from above.  The valuation, then, is the
+alternate application of each push statement's function $f$, with the
+index expressions transformed from their local index $x$ to a global
+index $g(x)$ on the input tape:
 \begin{align*}
-{\cal W}&[{\tt void~work() \{...\}}]: {\tt StreamIt Work} \ra
-WorkFunction = \\
-(&g \ra (t \ra f_1(t(g(0)), \dots , t(g(PEEK-1)))), \\
+{\cal W}&[{\tt w}] = \\
+[&~\la~g~t~.~f_1(t(g(0)), \dots, t(g(\fn(PEEK-1)))), \\
 \dots \\
-&g \ra (t \ra f_{PUSH}(t(g(0)), \dots , t(g(PEEK-1)))))
+&~\la~g~t~.~f_{PUSH}(t(g(0)), \dots, t(g(\fn(PEEK-1))))~]
 \end{align*}
 
 {\bf Converting from the intermediate algebra}.  To convert back to
 StreamIt, we can perform the inverse of the translation shown above,
-with a push statement for each function and a local index expression $x$
-in place of the global index $g(x)$.  Common sub-expression elimination
-can be used to eliminate duplicate peek statements or shared portions of
-the $f_i$'s.
+with a push statement for each function and a local index expression
+$x$ in place of the global index $g(x)$.  Common sub-expression
+elimination can be used to eliminate duplicate peek statements or
+shared portions of the $f_i$'s.
 
 \subsubsection{Transform Algebra}
 
@@ -539,9 +544,8 @@ semantic domains are given in Figures \ref{fig:interdom} and
 Stream \ra StreamTransform$ for converting from the intermediate
 algebra to the transform algebra.  For a filter, we have:
 \begin{align*}
-&{\cal S} [(Filter~push~pop~peek~(f_1~\dots~f_{push}))] = g \ra (t \ra
-(i \ra \\ &(f_{i~\%~push})(i_{local} \ra g(\mi{I_F}{O_F}(i) - peek + 1 + 
-i_{local}))(t))
+&{\cal S} [(Filter~push~pop~peek~(f_1~\dots~f_{push}))] =
+  \la~g~t~i~.~\\ &(f_{i~\%~push})(\la~i_{local}~.~g((\mi{I_F}{O_F}(i) - peek + 1 + i_{local})))(t)
 \end{align*}
 That is, the value that a filter pushes onto the $i$'th position of its
 output tape is calculated with its function at index $if~\%~push$.  By
@@ -560,7 +564,7 @@ of the pipeline we apply the transform $g$ to interface the pipeline to
 its outside connection.
 \begin{align*}
 {\cal S} [(Pipeline~s_1~s_2~\dots~s_n)] = \\
-g \ra ({\cal S}[s_n]({\cal I}) \circ \dots \circ {\cal S}[s_2]({\cal I}) \circ {\cal S}[s_1](g)) \\
+\la~g~.~({\cal S}[s_n]({\cal I}) \circ \dots \circ {\cal S}[s_2]({\cal I}) \circ {\cal S}[s_1](g)) \\
 where~{\cal I}~denotes~the~identity~function
 \end{align*}
 The valuation function for a SplitJoin follows the same idea, but the
@@ -579,9 +583,8 @@ The indexing function transforms the stream's local index $i_{local}$
 for its own input tape to the corresponding index
 $\mi{I_S}{Op(i)_S}(i_{local})$ for the input tape of the splitter:
 \begin{align*}
-&{\cal S} [(SplitJoin~S~s_1~s_2~\dots~s_n~J)] = g \ra (t \ra (i \ra \\
-&(({\cal S}[s_{p(i)}])(i_{local} \ra
-g(\mi{I_S}{Op(i)_S}(i_{local}))))(\mi{Ip(i)_J}{O_J}(i))))
+&{\cal S} [(SplitJoin~S~s_1~s_2~\dots~s_n~J)] = \la~g~t~i~.~ \\
+&(({\cal S}[s_{p(i)}])(\la~i_{local}~.~g(\mi{I_S}{Op(i)_S}(i_{local}))))(\mi{Ip(i)_J}{O_J}(i))
 \end{align*}
 This completes the formulation of the transform algebra.  Using this
 algebra, we can express the meaning of any StreamIt program as a

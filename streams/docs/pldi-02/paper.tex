@@ -39,10 +39,14 @@ and Saman Amarasinghe\\
 
 % for the arrow of a function def, etc.
 \newcommand{\ma}[2]{max_{#1 \rightarrow #2}}
-\newcommand{\mi}[2]{min_{#1 \leftarrow #2}}
+\newcommand{\mi}[2]{min_{#1, #2}}
 \newcommand{\floor}[2]{\left\lfloor\frac{#1}{#2}\right\rfloor}
 \newcommand{\ceil}[2]{\left\lceil\frac{#1}{#2}\right\rceil}
 \newcommand{\ra}[0]{\rightarrow}
+\newcommand{\la}[0]{\lambda}
+
+\def\fn#1{\mathop{\mbox{\it #1}}}
+\def\fun#1#2{\ensuremath{\mathop{\mbox{\it #1}}(#2)}} % function call
 
 \newtheorem{definition}{Definition}
 \newtheorem{theorem}{Theorem}

@@ -56,7 +56,7 @@ where: {\bf push_{sc}} &= totalRounds * W \\
        w_n)) \\
        totalPop &= \sum_{i=1}^{n}(totalRounds * w_i * pop_{si} / push_{si}) \\
        shift_j(x) &= \mi{I_S}{I_{sj}}(x + \\ &~~~~~(\mi{I_{sj}}{O_{sj}} \circ \mi{O_{sj}}{O_J})(j)-peek_{sj}) \\
-       f_{sc, j} &= g \ra f_{s~p(j)}(i_{local} \ra shift_j(g(i_{local})))
+       f_{sc, j} &= \la~g~.~f_{s~p(j)}(\la~i_{local}~.~shift_j(g(i_{local})))
 \end{align*}
 We have proven that this transformation preserves the meaning of the
 program with respect to our transform algebra for the case when $n = 2$,
