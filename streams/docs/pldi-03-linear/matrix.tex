@@ -5,58 +5,45 @@
 \epsfbox{images/general-picture-matrix.eps}
 \caption{Linear filter as a vector-matrix operation}
 \label{fig:overview-matrix}
+\vspace{-12pt}
 \end{figure}
 
-A {\tt Filter} takes some input and produces some output on
-each invocation of the {\tt work} function. There is no general 
-relationship that always holds true between the {\tt Filter}'s input and
-the {\tt Filter}'s output.
+There is no general relationship between a {\tt filter}'s input data and
+its output data. In actual applications, however, the output is typically 
+derived from the input, but the relationship is not always clear 
+since a {\tt filter} has state and can call external functions.
 
-However, in actual applications, the output is typically some function of the input. 
-The type of function is not clear -- since a {\tt Filter} has state and can call
-external functions, the compiler is not, in general, going to be able to determine 
-the exact function that the filter computes. So far a rather bleak picture for 
-the possibility of the compiler figuring out what is going on.
+However, we note that a large subset of DSP operations produce outputs
+that are some affine function of their input, and we call {\tt filters} that 
+implement such operations ``linear.'' To use standard DSP notation to talk about
+StreamIt programs, we will call the $e_F$ items that {\tt filter} $F$ uses as input
+$x[n]$, where  $n\in[0,e_F-1]$. Similarly, we  
+define the output of a {\tt filter} as $y[n]$ where  $n\in[0,push]$. For 
+linear {\tt filter}, the output can be related to the input by 
+$y[k] = (\sum_{i=0}^{e_F-1} a_{k,i}x[i])+b_k$.
+where $a_{k,i}$ and $b_{k}$ are constants with complex values. 
 
-However, we are saved by the fact that the output of a large subset of filters 
-in DSP applications compute linear functions of their input. We name
-such filters ``linear filters.'' To match notation with the existing DSP 
-literature, we will call the $peek_F$ items that filter $F$ uses as input
-each work function $x[n]$, where  $n\in[0,peek_F]$. Similarly, we  
-define  $y[n]$ where  $n\in[0,push]$ is the output. For {\tt Filters} that
-compute linear functions of their input, we can succinctly express their
-computation as $y[k] = (\sum_{i=0}^{N} a_{k,i}x[i])+b_{k}$ 
-where $a_{k,i}$ is a (possibly complex) constant weight and $C_{k}$ is some
-(possibly) constant value. For each output $y[k]$ produced by {\tt Filter}
-$F$ we will have a set of $N$ $a$s and one $C$ that characterize the computation.
+Each $y[k]$ can be represented as the dot product of two vectors, plus a scalar constant. 
+Thus, we can represent the action of the entire linear {\tt filter} 
+in an affine matrix-vector equation as illustrated in 
+Figure~\ref{fig:overview-matrix}.
 
-We can interpret the above equation as the dot product of two vectors, (the input 
-vector and the linear weights vector) plus a scalar constant. Thus, each output is the result
-of a vector-vector dot product and we can represent the entire action of a linear filter 
-as a vector-matrix product plus a constant vector. Figure~\ref{fig:overview-matrix} 
-illustrates how to represent {\tt Filter} $F$'s action as a vector-matrix 
-multiplication. We think of the input stream as a row vector $x$ of length $peek_F$
-and the output as a row vector $y$ of length $push_F$. The {\tt work} function
-of $F$ can then be represented with matrix operations using a weight matrix $A$ and 
-a constant row vector $a$. We can then relate the the input $x$ with the output $y$
-with the matrix equation $y$ = $xA + a$. To fully characterize $F$ we need only to 
-store the triple ($A$, $a$, $pop_F$) which we call the ``linear representation'' of $F$. 
-Once we have extracted linear representations from the original {\tt Filter} code we can
-then simply use it in our structure combinations and optimizations.
+The input data is a row vector $x$ of length $e_F$
+and the output data is a row vector $y$ of length $u_F$. The {\tt work} function
+of $F$ is represented as a weight matrix $A$ and a constant row vector $b$. 
+$A$ has $e_F$ rows and $u_F$ columns while $b$ has $1$ row and $u_F$ columns. 
+$x$ and $y$ are related by $y$ = $xA + b$. To fully characterize the computation of $F$ 
+we need only to store the triple ($A$, $b$, $o_F$) which we call 
+the ``linear representation'' of $F$.
 
-It is important to note the dimensions of the various elements of a linear representations.
-The matrix $A$ has $peek_F$ rows and $push_F$ columns. The constant vector $a$ 
-has $1$ row and $push_F$ columns. The value of $push_F$ is a simple scalar.
-
-It is instructive to interpret the the linear representations in the following
-way. The $i$th column of $A$ and $a$ represent the formula to compute the 
-$(push_F-i)$th output. The $j$th row of $A$ represents using the $(peek_F-j)$ input.
-Therefore, the rightmost column of $A$ represents the first output element 
-that is produced (eg the first {\tt push()} statement). The bottom row 
+It is instructive to interpret the the linear representations of a {\tt filter}
+in the following way. The values in column $i$ of $A$ and column $i$ of $b$ 
+represent the formula to compute the $(u_F-i)$th output. 
+Row $j$ of $A$ represents the weights given to the $(e_F-j)$ input element 
+when computing each output. The rightmost column of $A$ represents the first output element 
+that is produced (eg the value of the first {\tt push()} statement). The bottom row 
 of $A$ represents the weight use for the first input 
 (eg {\tt peek(0)}), the second to bottom row the second input ({\tt peek(1)}) and so forth.
-Using this interpretation to understand what the various linear representations elements mean 
-helps significantly to understanding the combination rules described below.
 
 
 

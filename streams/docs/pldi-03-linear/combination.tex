@@ -1,179 +1,163 @@
 \section{Container Combination(propagation)}
-Merely determining that a single filter computes a linear combination of its input is not
-all that interesting or useful. However, we can take advantage of StreamIt's hierarchal 
-structures to find the linear representation for {\tt Stream} structures ({\tt Pipelines},
-{\tt SplitJoins} and {\tt FeedbackLoops}. First we require that all of the structure's 
-children {\tt Streams} need to have linear representations for us determine an overall
-linear representation. In the following discussion we restrict our attention to combining
-{\tt Pipelines} and {\tt SplitJoins}. There is nothing inherent in the discussion that 
-forecloses combining {\tt FeedbackLoops} into an overall linear representation, but it
-requires us to develop the notion of linear state (see Future Work).
+We can use our knowledge of the linear representations of individual filters
+to determine linear representations for the StreamIt's heirarchal structures.
+To determine a structure's overall linear representation, we require that all 
+of the structure's sub {\tt streams} have linear representations. 
+In the following discussion we discuss methods for determining overall representations for 
+{\tt pipeline}s and {\tt splitjoin}s. Combining {\tt feedbackloop}s will not be discussed
+here as it requires the notion of ``linear state'' (see Future Work).
+
+
 
 \subsection{Rate Matching}
+The StreamIt can determine the input and output rates of each {\tt filter} and compile
+time. The rates of data production and data consumption for structures is determined 
+by the compiler, and the critical determination of a scheduling for the order to execute 
+the {\tt filter}s is described elsewhere \cite{karczma-thesis}. However,  
+in order to describe the overall action of StreamIt structures, we must take
+be able to match the input and output rates effectively. 
 
-As in any streaming systems, the issue of rate is important. Data is being produced
-and consumed by the various {\tt Filters} and when they are combined with structures
-the overall {\tt Streams} have specific rates as well. The problem of scheduling the
-the number and order of executions of {\tt work} functions is fully described in
-\cite{karczma-thesis}. In order to combine filters, the rules we develop must take
-rate matching into account. 
-
-For example, if there are two
-{\tt Filters} $F_1$ and $F_2$ in a {\tt Pipeline} and $F_1$ produces ({\tt push}es) 2 elements 
-during its {\tt work} function but $F_2$ needs to examine ({\tt peek()}s) 4 elements 
-to produce any output, it will be necessary to execute $F_1$'s {\tt work} function 
-twice to produce enough output for $F_2$. If we want to combine the action of the 
-{\tt Pipeline} into a single linear representation, we need to take into account
-the different rates of the sub components.
+For example, if there are two {\tt filters} $F_1$ and $F_2$ in 
+a {\tt pipeline} and $F_1$ produces $2$ elements 
+during its {\tt work} function ($u_{F_1}=2$) but $F_2$ needs to examine $4$ elements 
+($e_{F_2}=4$) to produce any output, it is necessary to execute $F_1$
+twice before executing $F_2$. 
 
 \begin{figure}
 \center
 \epsfxsize=3.0in
 \epsfbox{images/expanding-a-filter.eps}
-\caption{Expanding {\tt Stream} $S$ by a factor $f_A$}
+\caption{Expanding {\tt stream} $S$ by a factor $f$}
 \label{fig:expanding-a-filter}
+\vspace{-12pt}
 \end{figure}
 
-Therefore, a fundamental operation necessary to combine any of StreamIt's structures, 
-we need an expansion operation on our linear forms which represents the data produced
-by multiple invocations of a {\tt Stream}. 
-We denote expanding a filter $F$ by a factor $f_a$ as $expand(F, f_a)$.
-When a {\tt Stream}'s linear form is expanded by $f_A$ 
-the resulting linear form describes the formula for describing the filter's work
-function exactly $f_a$ times. Figure~\ref{fig:expanding-a-filter} shows a 
-high level picture of expanding filter $F$ to $F'$. Specifically, 
-the new peek rate $peek_{F'}$ is  $peek_F + (f_A-1)pop_F$, the new pop rate
-$pop_{F'}$ is  $f_{a}pop_F$ and the new push rate $push_{F'}$ is  $f_{a}push_F$.
+Therefore, a fundamental operation necessary to combine any of StreamIt's structures is 
+an expansion operation on our linear forms which represents the data produced
+by multiple invocations of a {\tt stream}'s {\tt work} function.
+We denote $F'$, the expansion of $F$ by a factor $f$ as $F' = expand(F, f)$
+and this process is depicted in Figure~\ref{fig:expanding-a-filter}.
+The rates of $F'$ are $e_{F'}=e_F + (f-1)o_F$, $o_{F'}=fo_F$, and $u_{F'}=fu_F$.
 
 \begin{figure}
 \center
 \epsfxsize=3.0in
 \epsfbox{images/expanding-a-matrix.eps}
-\caption{Expanding a linear form $(A,a)$ by a factor $f_{A}$}
+\caption{Expanding a linear form $(A,b)$ by a factor $f$}
 \label{fig:expanding-a-matrix}
+\vspace{-12pt}
 \end{figure}
 
-Expansion is an operation that can be performed on any filter. Since we are interested
-in linear filters, we need to formulate expansion on linear forms as well.
+Thus the linear form of $F'=expand(F, f)$ describes the formula for computing
+exactly $fu_F$ output elements from $e_F + (f-1)o_F$ input elements.
 Figure~\ref{fig:expanding-a-matrix} shows the result of expanding the linear 
-form $lf = (A,a)$ by a factor $f_A$ such that $lf' = expand(lf, f_A) = (A',a')$. 
-The expansion of $A$ to $A'$ is done by first creating a zero matrix 
-with $peek_{F}+(f_{A}-1)*pop_{F}$ rows and $f_{A}push_F$ columns which corresponds 
-to the expanded filter. The original matrix $A$ is then copied $f_{A}$ times and placed along the
-diagonal. Starting from the top left, each copy of $A$ is offset from the previous copy 
-by $push_{F}$ columns and $pop_{F}$ rows. To expand the constant vector $a$ to $a'$ we simply
-create a row vector with $f_{A}push_F$ rows and place $f_A$ adjacent copies in there.
+form $lf = (A,b)$ by a factor $f$ such that $lf' = expand(lf, f) = (A',b')$. 
+$A'$ is created by starting with a zero matrix with $e_F+(f-1)*o_F$ rows 
+and $fu_F$. $A$ is then copied $f$ times along the
+diagonal. Starting at the top left, each copy of $A$ is offset from the previous copy 
+by $u_F$ columns and $o_F$ rows. To expand the constant vector $b$ to $b'$ we 
+create a row vector with $fu_F$ rows containing $f$ adjacent copies of $b$.
 
 \subsection{Pipelines}
 
 \begin{figure}
 \center
 \epsfxsize=3.0in
-\epsfbox{images/pipeline-combination-before.eps}
-\epsfxsize=3.0in
-\epsfbox{images/pipeline-combination-after.eps}
-\caption{A {\tt Pipeline} of two linear {\tt Streams} with linear forms $(A,a)$ and $(B,b)$ (above) and the same {\tt Pipeline} after we have expanded the child filters (below).}
+\epsfbox{images/pipeline-combination.eps}
+\caption{A {\tt pipeline} of two linear forms $(A,b)$ and $(C,d)$ (above) and the same {\tt pipeline} with rate matched forms (below).}
 \label{fig:combining-pipeline}
+\vspace{-12pt}
 \end{figure}
 
-{\tt Pipelines} are serial combinations of {\tt Streams}, one followed directly after 
-another. Below we describe the rules necessary to combine two serial filters. 
-Combining a {\tt Pipeline} with an arbitrary number of {\tt Streams} can be accomplished 
-by continually combining adjacent pairs until there are none left. 
-We wish to derive the rules for combining two adjacent {\tt Streams}, 
-$S_{1}$ followed by $S_{2}$ with linear forms $(A,a)$ and $(B,b$) respectively.
-The combination rules follow directly from the equations relating the inputs and the outputs of the 
-two {\tt Streams}. Defining our notation: $S_{1}$ takes $x[n]$ as input and produces 
-$y_1[n]$ as output. $S_{2}$ inputs $y_1[n]$ and produces $y_2[n]$. 
-Using our linear input to output equations from above,
-$y_1 = xA + a$ and $y_2 = yB + b$. Combining the
-two previous equations, it is clear that $y_2 = xAB + (Aa + b)$ 
-which corresponds to a new linear form $(AB, Aa+b)$. 
+Serial combinations of {\tt streams} are formed with {\tt pipelines}.
+Combining a {\tt pipeline} with an arbitrary number of linear forms can be accomplished 
+by continually combining adjacent pairs until a single linear form remains. 
+The method for combining a single pair of linear forms, $lf_1=(A,b)$ and $lf_2=(C,d)$ follows
+directly from the equations relating the inputs and the outputs of the 
+two linear forms. Defining our notation: $lf_1$ takes $x$ as input and produces 
+$y_1[n]$ as output. $lf_2$ inputs $y_1$ and produces $y_2$ as output. 
+Using our linear input to output equations from above, $y_1 = xA + b$ 
+and $y_2 = y_1C + d$. Combining the two previous equations, it is clear 
+that $y_2 = xAC + (bC + d)$  which corresponds to a new linear form $lf'=(AC, bC+d)$
+that takes $x$ directly to $y_2$.
 
-The equations for the overall linear form is very elegant, but it is important to 
-remember that the expressions are matrix operations, and that the dimensions of 
-$A$ and $B$ might not be compatible (we don't worry about $a$ and $b$ because if the 
-we can multiply $AB$ then we can also multiply $ab$. The problem of incompatible
-matrix sizes is the same problem of scheduling the first {\tt Stream} to produce
-enough data for the second {\tt Stream} to read from. To make the dimensions match up, 
-we have at our disposal the $expand$ operation described above. We will try and 
-choose expansion factors $f_A$ and $f_B$ such that the expanded linear forms are
-compatible. For most pairs of linear filters, there are multiple $(f_A,f_B)$ combinations
-that make the multiplication compatible. In general, we try and choose the pair that
-will result in the smallest overall matrix.
+Because the expressions for $lf'$ are matrix equations, the dimensions of 
+$A$ and $C$ might not be compatible for general programs.
+The problem of incompatible matrix sizes is the same problem of scheduling execution 
+such that the first {\tt stream} produces enough data for the second {\tt stream} 
+to read. To make the dimensions match up, we use the $expand$ operation. We choose
+expansions factors $f_1$ and $f_2$ such that $lf_1' = expand(lf_1,f_1) = (A',b')$ and 
+$lf_2' = expand(lf_2,f_2) = (C',d')$. Once we have determined $f_1$ and $f_2$ such 
+that we can multiply $A'C'$, we are guaranteed the be able to multiply $b'C'$.
 
+Figure~\ref{fig:combining-pipeline} shows graphically the process of expanding
+two linear forms in a {\tt pipeline} so that they can be combined into a single linear filter.
 
-In general, to make the rates of two {\tt Streams} match, one needs to satisfy
-$push_{S_1'} = push_{S_2'}$ which means that 
-$f_Apush_{S_1}=peek_{S_2}+(f_B-1)pop_{S_2}$, where $push_{S_1}$,
-$peek_{S_2}$ and $pop_{S_2}$ are all arbitrary integers and 
-$f_A$ and $f_B$ are integers calculated by the compiler.
-This constraint is not always satisfiable. For instance if
-$push_{F_1}=2$, $peek_{F_2}=3$ and $pop_{F_2}=2$, you can not
-choose $f_a$ and $f_2$ to satisfy the above equation. In this 
-case we can use something called a {\tt TwoStageFilter} to block
-the operation into a {\tt work} function that initializes the 
-computation and another {\tt work} function that computes values
-in the steady state.
+To multiply $A'C'$, the equation
+$f_1u_{lf_1}$ = $e_{lf_2} + (f_2-1)o_{lf_2}$ must hold, where $u_{lf_1}$, $e_{lf_2}$, and $o_{lf_2}$
+are program defined. For most pairs of linear forms encountered in real programs, 
+there are multiple pairs of $f_1$ and $f_2$ that satisfy the constraint, from which
+we choose the smallest.
 
-It is also interesting to note that in some cases the combined linear form
-actually represents a less inefficient way of computing the results of the
-filters. (Possibly an example????XXXXXXXXXXXXXXX)
+However, in general problems, this constraint is not always satisfiable. For instance if
+$u_{lf_1}=2$, $e_{lf_2}=3$ and $o_{lf_2}=2$, there are pair of integers $f_1$ and $f_2$ to 
+satisfy the above equation. Due to the buffering between the filters, we can not generate an 
+overall linear form that represents the pair's computation except by introducing redundant
+computation. However, by recognizing that the output from the first execution of the structure
+can be written as a linear form $lf'_i$, and that the output from each subsequent execution
+of the structure can be written as a linear form $lf'_j$ we can store the two linear forms $lf'_i$ and
+$lf'_j$ which represent the initial execution and each subsequent execution respectively.
 
-Figure~\ref{fig:combining-pipeline} shows graphically the process of expanding the
-two {\tt Streams} in a {\tt Pipeline} so that they can be combined into a single linear filter.
-
+In some cases the combined linear form
+actually represents a less efficient way of computing the results of the
+filters. Specifically, when the number of non zero entries of $A'C'$ is greater
+than the number of non zero entries $A'$ plus the non zero entries of $C'$, the overall
+representation requires more computation.
 
 
 \subsection{SplitJoins}
-{\tt SplitJoins} are the StreamIt construct that allow a programmer to express explicitly 
-parallel computation. Data elements come into the top of the {\tt SplitJoin} and are directed
-to parallel {\tt Streams} by one of two types of splitter elements. 
-The simpler of the two is a duplicate splitter that sends a copy of 
-each data element to the parallel {\tt Streams}. The second type of splitter is a roundrobin splitter 
-that is specified by $N$ weights, $v_k$ for $k\in[1..N]$, 
-where $N$ is the number of parallel {\tt Streams} in the {\tt SplitJoin}. The first $v_1$ data elements
-are sent to the leftmost {\tt Stream}. The next $v_2$ elements
-are directed to the next {\tt Stream} and so on. When all $\sum_{k=0}^{N} v_k$ elements
-have been seen, then the splitter starts directing elements to the left most filter again in the
-same pattern.
+{\tt splitjoin}s allow a StreamIt programmer to express explicitly parallel computation. 
+Data elements that arrive at the {\tt splitjoin} are directed
+to the parallel sub {\tt streams} in one of two ways.
+The simpler of the two is to send copy of each data element to the each of the sub {\tt streams}. 
+The second of the two is specified by $N$ weights, $v_k$ for $k\in[0..N-1]$, 
+where $N$ is the number of sub {\tt streams} in the {\tt splitjoin}. The first $v_0$ data elements
+are sent to the leftmost {\tt Stream}. The next $v_1$ elements are sent 
+to the next {\tt stream} and so on. When all $\sum_{k=0}^{N-1} v_k$ elements
+have been seen, the splitter starts the same pattern over again.
 
-The data from the parallel {\tt Streams} are combined back into a single stream by means of
-a roundrobin joiner specified by weights $w_k$ for $k\in[1..N]$ where $N$ is the number
-of parallel {\tt Streams} in the {\tt SplitJoin}. First, $w_1$ items from the output tape of the 
-leftmost filter are placed onto the output tape of the overall {\tt SplitJoin}. 
-Then $w_2$ elements are taken from the second leftmost filter and placed onto the 
-overall output tape and so on. Again, the process repeats itself after one complete set
-of $\sum_{k=0}^{N} w_k$ elements has been pushed on the overall output tape.
+The data from the parallel {\tt streams} are combined back into a single stream by means of
+a joiner specified by weights $w_k$ for $k\in[0..N-1]$. First, $w_0$ items from the output tape of the 
+leftmost {\tt stream} are placed onto the overall output tape, then 
+$w_1$ elements are taken from the second leftmost {\tt stream} and so on. 
+Again, the process repeats itself after one complete set of $\sum_{k=0}^{N-1} w_k$ 
+elements has been pushed.
 
 \begin{figure}
 \center
 \epsfxsize=3.0in
 \epsfbox{images/splitjoin-combine.eps}
-\caption{Combining a {\tt SplitJoin} that is composed of linear {\tt Streams}.}
+\caption{Combining a {\tt splitjoin}.}
 \label{fig:splitjoin-combine}
+\vspace{-12pt}
 \end{figure}
 
-If our analysis has determined that all the subcomponents of a {\tt SplitJoin} 
-have linear representation, then we can describe the action of the entire {\tt SplitJoin} 
-with a new linear representation. Figure~\ref{fig:splitjoin-combine} shows the idea of
-determining an overall linear representation from a {\tt SplitJoin} with all linear sub components.
-Requiring that all sub components are linear is not as restrictive as it might first 
-appear. In our experience, in most applications where the programmer uses {\tt SplitJoins}
-The sub components often perform very similar computations, so when one sub {\tt Stream} 
+If we know that all subcomponents of a {\tt splitjoin} 
+have linear representations, then we can describe the action of the entire {\tt splitjoin} 
+with a single linear representation as is shown in Figure~\ref{fig:splitjoin-combine}.
+{\tt splitjoin}s containing all linear components are not as infrequenct as they might seem -- 
+most {\tt splitjoin} sub {\tt streams} often perform very similar computations, so when one 
 is linear there is a high probability that all linear.
 
-One can think of the roundrobin joiner of a {\tt SplitJoin} as a reordering of the output data 
-that is produced by the parallel {\tt Stream} blocks. If one remembers that each column 
-of a linear representation represents the formula for calculating a single output of a {\tt Stream}, 
-it is intuitively obvious\footnote{I love that phrase} that the overall linear representation 
-of a combined {\tt SplitJoin} will be exactly a particular order of the columns in the 
-parallel {\tt Streams} that depends on the joiner weights $w_i$.
+The joiner of a {\tt splitjoin} specifies a specific order of the output data 
+that is produced by the parallel {\tt stream} blocks. Because each column 
+of a linear representation's matrix represents the formula for calculating a single output value, 
+the overall linear representation of a combined {\tt splitjoin} will be exactly 
+the same columns of the parallel {\tt streams} in an ordering that depends on the joiner weights $w_i$.
 
-Below we will describe the relatively straightforward combination rules for a {\tt SplitJoin}
-with a duplicate splitter. Then we will describe how we can transform the harder problem
-of combining {\tt SplitJoins} with roundrobin splitters into the easier problem of combining
-{\tt SplitJoins} with duplicate splitters. 
+Below we will describe the combination rules for a {\tt splitjoin}
+with a duplicate splitter. Then we will describe how we can transform 
+a roundrobin splitter {\tt splitjoin} into a duplicate splitter {\tt splitjoin}. 
 
 
 \subsubsection{Duplicate Splitter}
@@ -186,21 +170,17 @@ of combining {\tt SplitJoins} with roundrobin splitters into the easier problem 
 \label{fig:splitjoin-duplicate-ratematch}
 \end{figure}
 
-In the following discussion, we will focus mainly on the matrix $A$ of a linear representation.
-Combining the constant vectors occurs in exactly the same way (the expansion factors are exactly 
-the same, and we do both combinations at the same time.
+In the following discussion, we focus on the matrix $A$ of a linear representation.
+The operations for the constant vector $a$ occur in a very similar way.
 
-If we remember that each row in the matrix $A$ of a linear form corresponds to the
-weight associated with a particular input item, combining a {\tt SplitJoin} 
-where the splitter is a duplicate is straightforward.
-The same rows in each of the sub {\tt Streams} refer to the same items from the
-input (assuming that the linear representations of each of the sub {\tt Streams} has the same number
-of rows). The same rows in different linear representations correspond to the different 
-{\tt Streams} using the same data items because each the sub {\tt Streams} gets the same
-data as input because of the duplicate splitter. 
+Each row in the matrix $A$ of a linear form corresponds to the
+weight associated with a particular input item. For a duplicate splitter,
+the same rows in the matrices of each of the sub {\tt streams} correspond to the same
+input as long as each linear form has the same number of rows becasue the same data items 
+are being used by each sub {\tt stream}.
 
 We wish to produce an overall representation by simply determining the correct 
-ordering the columns of the sub {\tt Stream}' linear representations. In order to
+ordering the columns of the sub {\tt stream}' linear representations. In order to
 do this, we need to ensure that the number of rows in each sub {\tt Stream} is the same.
 We are also faced with the additional constraint that the total number of columns 
 from all the sub linear representations must equal some multiple of the sum of the
