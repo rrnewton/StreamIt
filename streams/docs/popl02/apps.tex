@@ -1,0 +1,51 @@
+\section{Applications}
+
+\subsection{Semantics of Time}
+
+\noindent {\bf \dep}
+
+\begin{align*}
+\DEP{X}{Y}(i) = max_{\preceq}~\{~ j ~|~ \exists ~&~ T_0 \dots T_n, ~ k_0 \dots k_n, ~ {\cal E}_1 \dots {\cal E}_n ~ s.t. ~ & ~ \\ 
+~ & T_0 = Y ~\wedge~ T_n = X ~\wedge~ k_0 = j ~\wedge~ k_n = i ~\wedge~ & ~ \\
+~ & \forall p \in 1 \dots n, ~ T_p(k_p) \equiv f_{{\cal E}_p}(\dots, T_{p-1}(h_{{{\cal E}_p}, T_{p-1}}(k_p)), \dots) ~ \} & ~ \\
+\end{align*}
+
+In StreamIt, this function is composable because of single-input,
+single-output blocks.  Since every junction is a one-dimensional
+array, it gives unique point in time for a given filter.  Can use this
+to think modularly/composably about time in components, too.
+
+Describe messaging semantics?  Is there space?
+
+\subsection{Scheduling}
+
+\subsubsection{Uniprocessor Scheduling}
+
+\subsubsection{Parallel Scheduling}
+
+\subsubsection{Conditional-Appearance Scheduling}
+
+- Like SAS, but you wrap a conditional around a loop.  Automatic
+  outcome of affine scheduling.
+
+\subsection{Node Fission}
+
+Just specify the relations within a node, and you have a complete view
+of program.
+
+\subsection{Node Fusion}
+
+\subsection{Buffer Minimization}
+
+\subsection{Code Size}
+
+\subsection{Parameterized Graphs}
+
+Don't need to duplicate code for nodes that are repeated.  Can also
+parameterize the schedule along these dimensions.  Especially
+well-tailored to StreamIt.  Compare to PSDF.
+
+\subsection{Verification}
+
+Buffer overrun, no exploding schedules, etc.
+
