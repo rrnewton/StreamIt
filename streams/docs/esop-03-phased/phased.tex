@@ -1,10 +1,9 @@
 \section{Phased Scheduling}
 \label{chpt:phased}
 
-We then propose Phased Scheduling, a technique which allows to
-schedule all non-messaging {\StreamIt} programs, and which allows
-for better control of trade-off between schedule size and buffer
-size.
+We now propose Phased Scheduling, a technique which allows to
+schedule all valid {\StreamIt} programs, and which allows for
+better control of trade-off between schedule size and buffer size.
 
 Section \ref{sec:phased:intro} provides an introduction to and
 explanation of Phased Scheduling. Section \ref{sec:min-latency}
@@ -19,15 +18,29 @@ presented in Chapter \ref{chpt:hierarchical}, while quite
 effective in scheduling simple applications, cannot schedule a
 small number of tight {\feedbackloops}. Furthermore, the technique
 is quite inflexible when it comes to attempting to create a
-different tradeoff between schedule size and buffer size.  The
-schedules created using single appearance hierarchical scheduling
-tend to be quite small at the expense of larger buffering
-requirements.  A quite simple situation when such tradeoff is not
-desired, could be if the schedule is being stored in a large cheap
-ROM device, while the RAM used for buffering data is more
-expensive.  It is also quite possible that latency constraints
-cannot be satisfied by a single appearance hierarchical schedule.
-Clearly, a more flexible technique is required for scheduling.
+different tradeoff between schedule size and buffer size. Phased
+scheduling solves both of these problems.
+
+Phased schedule is a hierarchical schedule, just like the pseudo
+single appearance schedule. Every stream uses only the schedule of
+its immediate child streams to create its own schedule. Phased
+schedules, however, consist of several steps, called phases. All
+of the phases must be executed in order to guarantee correctness.
+Once all of the phases have been executed, the schedule has been
+executed. A parent stream can interleave execution of its
+children's phases in its own schedule, to provide any level of
+granularity desired.
+
+\begin{comment}
+The schedules created using single appearance hierarchical
+scheduling tend to be quite small at the expense of larger
+buffering requirements.  A quite simple situation when such
+tradeoff is not desired, could be if the schedule is being stored
+in a large cheap ROM device, while the RAM used for buffering data
+is more expensive.  It is also quite possible that latency
+constraints cannot be satisfied by a single appearance
+hierarchical schedule. Clearly, a more flexible technique is
+required for scheduling.
 
 A key observation in hierarchical scheduling is that each
 component only needs to worry about the data that enters or leaves
@@ -53,6 +66,7 @@ have been executed, the stream has executed its initialization
 schedule and is ready to enter steady state execution. When all of
 the steady state phases of a stream have been executed in order,
 the entire steady state schedule for the stream has been executed.
+\end{comment}
 
 The granularity of splitting the steady state schedule into phases
 is left up to the specific scheduler.  Different streams can use
@@ -65,6 +79,7 @@ pseudo single-appearance hierarchical scheduling algorithm
 described in Section \ref{sec:sas} implemented using phase
 scheduling.
 
+\begin{comment}
 One important observation to make is that it makes little sense to
 have phases which do not consume or produce any data, and which do
 not have data cross any latency boundaries.  This is because such
@@ -77,6 +92,7 @@ in Figure \ref{fig:hierarchical-schedule} executes its first
 child, {\filter} A, 4 times in steady state execution, and its last
 child, {\filter} D, 9 times. Thus a phasing schedule of this
 pipeline should at most have $4+9=13$ phases.
+\end{comment}
 
 \subsection{Minimal Latency Phased Scheduling}
 \label{sec:min-latency}
@@ -89,34 +105,26 @@ schedule, leading to deadlock. Phasing scheduling can alleviate
 this problem by allowing the program to be scheduled in a more
 fine-grained manner. Minimal latency scheduling is an example of a
 specific scheduling strategy that solves the problem of deadlock.
-Foregoing latency constraints, minimal latency scheduling can
-schedule any legal {\StreamIt} program.
-
 Minimal latency schedule is a schedule that requires a minimal
 amount of input data in order to output data. In other words, a
 minimal latency schedule only buffers as much data as is
-absolutely necessary.
+absolutely necessary. This means that if a \feedbackloop can be
+scheduled, a minimal latency schedule will be able to schedule it.
 
-A minimal latency schedule is not necessarily single appearance.
-In fact, very few applications can have their minimal latency
-schedules expressed as a single appearance schedule.  One of the
-consequences of this is that minimal latency schedules require
-more space for storage of the schedule. Use of phasing scheduling
-facilitates creation of acceptably small minimal latency
-schedules.  In spirit of hierarchical scheduling, every component
-is scheduled separately, in hierarchical order.
+\begin{comment}
+A minimal latency schedule is not necessarily single
+appearance. In fact, very few applications can have their minimal
+latency schedules expressed as a single appearance schedule.  One
+of the consequences of this is that minimal latency schedules
+require more space for storage of the schedule. Use of phasing
+scheduling facilitates creation of acceptably small minimal
+latency schedules.  In spirit of hierarchical scheduling, every
+component is scheduled separately, in hierarchical order.
 
 One important consequence of phased scheduling, one that is
 highlighted when calculating a minimal latency schedule, is that
 every phase is allowed to consume a different amount of data and
 produce a different amount of data.
-
-Below is the description of algorithms used for each type of
-{\StreamIt} component. The remainder of this section, $push^m_s$
-will denote amount of data pushed by the $m$th phase of stream
-$s$, $pop^m_s$ will denote amount of data popped by the $m$th
-phase of stream $s$ and $peek^m_s$ will denote amount of data
-peeked by $m$th phase of stream $s$.
 
 \subsubsection{Peeking}
 
@@ -128,8 +136,17 @@ initialization schedule.  It is thus important to remember that
 the amount of peeking done by a stream is not necessarily the
 amount of peeking done by that stream in its first phase, because
 on first phase, the stream may not consume or peek any data.
+\end{comment}
 
 \subsubsection{Notation}
+
+\begin{comment}
+We extend the notation for peeking, popping and pushing to
+include phases. $u^m_s$ will denote amount of data pushed by the
+$m$th phase of stream $s$, $o^m_s$ will denote amount of data
+popped by the $m$th phase of stream $s$ and $e^m_s$ will denote
+amount of data peeked by $m$th phase of stream $s$.
+\end{comment}
 
 A phasing schedule of a stream $s$ is a set $P_s$ of elements,
 $P_s = \{T_s, I_s, c_s, c^i_s\}$.  The first element, $T_s$
@@ -148,6 +165,7 @@ c\}$.  $E$ is an ordered list of phases and nodes that are to be
 executed in order to execute the phase.  $c$ is the consumption of
 the phase, with respect to its stream.
 
+\begin{comment}
 As an example, here is a minimal latency schedule for the sample
 stream in Figure \ref{fig:sample-sj}.  First, the schedule for the
 internal {\splitjoin}:
@@ -187,60 +205,7 @@ c^i_p = \left[ \begin{array}{c} 0 \\ 0 \\ 0 \end{array} \right]
 \end{array}
 \right\}
 \end{displaymath}
-
-\subsubsection{General Concept}
-
-Technique used for calculating minimal latency phasing schedule
-for a {\pipeline}, {\splitjoin} and {\feedbackloop} is similar to the
-technique used to create a pseudo single-appearance hierarchical
-schedule for a {\feedbackloop}. Every phase is computed separately.
-Every phase knows how much data has been left in internal buffers
-by the previous phase.  The goal is to create a phase that
-consumes the minimum amount of data from the {\Input} {{\Channel}} in
-order to push at least one data item out to the {\Output} {{\Channel}}.
-Once the minimum amount of data has been consumed by the stream,
-the maximum amount of data possible is pushed out of the stream
-without consuming any more data. This is meant to prevent
-unnecessary buffering of data internally within streams, and
-reduce the number of phases necessary to compute a complete
-schedule.
-
-One important technique used for creating phased schedules is
-borrowing of data from {\Channels}.  When a child is being executed,
-it is allowed to borrow some data from the {\Channel}, and expect
-that the upstream child will provide the right amount of data in
-the {\Channel} for real execution. In the tables, this means that
-amount of data can fall below 0. This is obviously illegal during
-real execution for any {\Channel}. Some {\Channels}, however, have
-even stricter restrictions. If the node reading from a {\Channel}
-peeks more than it pops, the amount of data in the {\Channel} during
-real execution cannot fall below the $peek-pop$ amount. For this
-reason, we also need to keep track of amount of data needed from a
-{\Channel}. This is illustrated in Tables \ref{tbl:min-lat-pipe},
-\ref{tbl:min-lat-sj} and \ref{tbl:min-lat-fl}. At the end of a
-phase, all {\Channels} must have all items borrowed from them
-returned by the upstream child.
-
-The initialization schedule starts with no internally buffered
-data (with exception of {\feedbackloops}) and executes as many
-phases as is necessary to ensure that all children have executed
-all of their initialization phases. Once that has been achieved,
-the steady state schedule is created. The only difference between
-computation of an initialization and steady state schedules is
-that the steady state schedule stops executing children early, if
-they have already executed all the phases allocated to them for
-the steady state, while the initialization schedule continues
-executing until all initialization phases of all children have
-been executed.
-
-The only significant difference between the algorithms used for
-minimal latency scheduling of different stream types ({\pipeline},
-{\splitjoin} and {\feedbackloop}) is the order with which children of
-the stream are considered for execution.
-
-For an $i$th child of a stream $s$ (stream $s_n$), the number of
-phases that must be executed for its steady state schedule to be
-complete is $S_{s,v,i} * |P_{s_i,T}|$.
+\end{comment}
 
 \subsubsection{\filter}
 
@@ -268,25 +233,88 @@ c_p = \left[ \begin{array}{c} e_f \\ o_f \\ u_f \end{array}
 \right\}
 \end{displaymath}
 
-\subsubsection{\pipeline}
+\subsubsection{\pipeline, \splitjoin and \feedbackloop}
 
-The order with which children are considered for execution is as
-follows.  First all the children are considered for execution
-moving from bottom to top.  The last child executes just enough
-phases to produce some data.  The child directly above it executes
-just enough phases to provide sufficient data for the child below
-to execute its child.  This process is repeated until the top-most
-child is reached.  At this point the direction of traversal is
-reversed. This time, the top-most child is skipped, and the second
-top-most child is considered.  It only executes as many phases as
-it can, while only using data already buffered between it and the
-child above it. Then, the child below it is executed in the same
-way. This is repeated until the bottom-most child is reached. The
-number of phases executed by each child is added up, and the
-phases are inserted in order (all phases of every child together,
-in order, iterating from top-most child down to bottom-most
-child).  This constitutes one complete phase of the {\pipeline}.
+Technique used for calculating minimal latency phasing schedule
+for a {\pipeline}, {\splitjoin} and {\feedbackloop} is similar to
+the technique used to create a pseudo single-appearance
+hierarchical schedule for a {\feedbackloop}. Every phase is
+computed separately. Every phase knows how much data has been left
+in internal buffers by the previous phase.  The goal is to create
+a phase that consumes the minimum amount of data from the {\Input}
+{{\Channel}} in order to push at least one data item out to the
+{\Output} {{\Channel}}. Once the minimum amount of data has been
+consumed by the stream, the maximum amount of data possible is
+pushed out of the stream without consuming any more data. This is
+meant to prevent unnecessary buffering of data internally within
+streams, and reduce the number of phases necessary to compute a
+complete schedule.
 
+One important technique used for creating phased schedules is
+borrowing of data from {\Channels}.  When a child is being
+executed, it is allowed to borrow some data from the {\Channel},
+and expect that the upstream child will provide the right amount
+of data in the {\Channel} for real execution. In the tables, this
+means that amount of data can fall below 0.
+\begin{comment}
+This is obviously illegal during real execution for any
+{\Channel}. Some {\Channels}, however, have even stricter
+restrictions. If the node reading from a {\Channel} peeks more
+than it pops, the amount of data in the {\Channel} during real
+execution cannot fall below the $peek-pop$ amount.
+\end{comment}
+Since some \filters require a positive number of data items in the
+\Channel , we also need to keep track of amount of data needed
+from a {\Channel}, as can be seen in Table\ref{tbl:min-lat-sj}.
+
+The initialization schedule starts with no internally buffered
+data (with exception of {\feedbackloops}) and executes as many
+phases as is necessary to ensure that all children have executed
+all of their initialization phases. Once that has been achieved,
+the steady state schedule is created. The only difference between
+computation of an initialization and steady state schedules is
+that the steady state schedule stops executing children early, if
+they have already executed all the phases allocated to them for
+the steady state, while the initialization schedule continues
+executing until all initialization phases of all children have
+been executed.
+
+The only significant difference between the algorithms used for
+minimal latency scheduling of different stream types ({\pipeline},
+{\splitjoin} and {\feedbackloop}) is the order with which children
+of the stream are considered for execution.
+
+\begin{comment}
+For an $i$th child of a stream $s$ (stream $s_n$), the number of
+phases that must be executed for its steady state schedule to be
+complete is $S_{s,v,i} * |P_{s_i,T}|$.
+\end{comment}
+
+For a \pipeline, the order with which children are considered for
+execution is as follows.  First all the children are considered
+for execution moving from bottom to top.  The last child executes
+just enough phases to produce some data.  The child directly above
+it executes just enough phases to provide sufficient data for the
+child below to execute its child.  This process is repeated until
+the top-most child is reached.  At this point the direction of
+traversal is reversed. This time, the top-most child is skipped,
+and the second top-most child is considered.  It only executes as
+many phases as it can, while only using data already buffered
+between it and the child above it. Then, the child below it is
+executed in the same way. This is repeated until the bottom-most
+child is reached. The number of phases executed by each child is
+added up, and the phases are inserted in order (all phases of
+every child together, in order, iterating from top-most child down
+to bottom-most child).  This constitutes one complete phase of the
+{\pipeline}.
+
+For a \splitjoin, the process is similar, but the children are
+first executed bottom up starting with \joiner, then the stream
+children and finally the \splitter. After the children are
+executed from top to bottom (excluding the \splitter), consuming
+only data already available to them in \Channels.
+
+\begin{comment}
 Using the sample {\pipeline} from Figure
 \ref{fig:hierarchical-schedule}(a), the following are phasing
 schedules for {\filters} A, B, C and D:
@@ -550,6 +578,7 @@ c^i_{sj} = \left[ \begin{array}{c} 3 \\ 3 \\ 0 \end{array}
 \end{displaymath}
 
 \subsubsection{\feedbackloop}
+\end{comment}
 
 Scheduling of {\feedbackloops} is again similar to the above
 algorithms.  The children's phases are executed in order of
@@ -570,6 +599,7 @@ allowed to become negative.  The reason for this is that
 to borrow elements from $out_L$ would cause a full cycle of
 borrowing, leading to deadlock.
 
+\begin{comment}
 This one condition does not prevent from scheduling any legal
 {\feedbackloops}.  The reason for this is that before the
 {\feedbackloop} is initialized, there is data pushed onto the
@@ -740,6 +770,64 @@ A^i_{fl,1} = \left\{ \{join\ \{2B\}\ split\}, \left[\begin{array}{c} 2 \\ 2 \\ 3
 c_{fl} = \left[ \begin{array}{c} 12 \\ 12 \\ 15 \end{array}
 \right], c^i_{fl} = \left[ \begin{array}{c} 6 \\ 6 \\ 6
 \end{array} \right],
+\end{array}
+\right\}
+\end{displaymath}
+\end{comment}
+
+\begin{table}[t] \centering \small
+\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+\hline
+\multicolumn{4}{|c|}{data in {{\Channel}}} & \multicolumn{4}{c|}{\parbox{1in}{\centering phase executions left}} & \parbox{0.5in}{\centering child considered} & \parbox{0.6in}{\centering phases executed} & \parbox{0.6in}{\centering {\pipeline} consumption} \\
+\cline{1-8} split & A & B & join & $in_A$ & $out_A$ & $in_B$ & $out_B$ & & & \\
+\hline 0 (0) & 0 (0) & 0 (0) & 0 (0) & 0 & 0 & 1 & 0 & join & - & $[0\ 0\ 0]$ \\
+\hline 0 (0) & 0 (0) & 0 (0) & 0 (0) & 0 & 0 & 1 & 0 & A & - & $[0\ 0\ 0]$ \\
+\hline 0 (0) & 0 (0) & 0 (0) & 0 (0) & 0 & 0 & 1 & 0 & B & $A^i_{B,0}$ & $[0\ 0\ 0]$ \\
+\hline 0 (0) & 0 (0) & 0 (-1) & 0 (0) & 0 & 0 & 0 & 0 & split & split & $[3\ 3\ 0]$ \\
+\hline 2 (0) & 0 (0) & 1 (0) & 0 (0) & 0 & 0 & 0 & 0 & A & $A^i_{A,0}$ & $[0\ 0\ 0]$ \\
+\hline 0 (0) & 1 (0) & 1 (0) & 0 (0) & 0 & 0 & 0 & 0 & B & - & $[0\ 0\ 0]$ \\
+\hline 0 (0) & 1 (0) & 1 (0) & 0 (0) & 0 & 0 & 0 & 0 & join & - & $[0\ 0\ 0]$ \\
+\hline 0 (0) &  1 (0) &  1 (0) &  0 (0) & \multicolumn{7}{|c|}{init phase 0 done, init done} \\
+\hline 0 (0) & 1 (0) & 1 (0) & 0 (0) & 2 & 2 & 1 & 2 & join & join & $[0\ 0\ 4]$ \\
+\hline 0 (0) & 0 (0) & 1 (0) & -3 (-3) & 2 & 2 & 1 & 2 & A & - & $[0\ 0\ 0]$ \\
+\hline 0 (0) & 0 (0) & 1 (0) & -3 (-3) & 2 & 2 & 1 & 1 & B & $A_{B,0}$ & $[0\ 0\ 0]$ \\
+\hline 0 (0) & 0 (0) & -1 (-2) & 3 (0) & 2 & 2 & 0 & 2 & split & $\{2split\}$ & $[6\ 6\ 0]$ \\
+\hline 4 (0) & 0 (0) & 1 (0) & 3 (0) & 0 & 2 & 0 & 2 & A & $\{2A_{A,0}\}$ & $[0\ 0\ 0]$ \\
+\hline 0 (0) & 2 (0) & 1 (0) & 3 (0) & 0 & 0 & 0 & 0 & B & - & $[0\ 0\ 0]$ \\
+\hline 0 (0) & 2 (0) & 1 (0) & 3 (0) & 0 & 0 & 0 & 1 & join & join  & $[0\ 0\ 4]$ \\
+\hline 0 (0) &  1 (0) &  1 (0) &  0 (0) & \multicolumn{7}{|c|}{phase 0 done, steady state schedule done} \\
+\hline
+\end{tabular}
+\caption[Execution of Minimal Latency Scheduling Algorithm on a
+{\splitjoin}]{Execution of Minimal Latency Scheduling Algorithm on
+{\splitjoin} from Figure \ref{fig:steady-state}(b). In the "data
+in {{\Channel}}" columns, the first value represents the actual
+number of data in the {{\Channel}}, which can be negative due to
+data borrowing. The second value is the minimal number of
+additional data items needed in the \Channel.}
+\label{tbl:min-lat-sj}
+\end{table}
+
+Table \ref{tbl:min-lat-sj} contains a trace of execution of our
+algorithm on the sample \splitjoin from Figure
+\ref{fig:steady-state}(b). Below is the phasing schedule for the
+\splitjoin. Note that this example does produce a single
+appearance schedule.
+
+\begin{displaymath} \scriptsize
+P_{sj} = \left\{
+\begin{array}{c}
+T_{sj} = \left\{
+\begin{array}{c}
+A_{sj,0} = \left\{ \{\{2 split\}\{2A\}B\{2 join\}\}, \left[\begin{array}{c} 6 \\ 6 \\ 8 \end{array}\right]\right\} \\
+\end{array}\right\}, \\
+I_{sj} = \left\{ A^i_{sj,0} = \left\{
+\{split\ A^i_{A,0}\ A^i_{B,0}\}, \left[\begin{array}{c} 3 \\ 3 \\ 0 \\
+\end{array}\right]\right\}
+\right\}, \\
+c_{sj} = \left[ \begin{array}{c} 6 \\ 6 \\ 8 \end{array} \right],
+c^i_{sj} = \left[ \begin{array}{c} 3 \\ 3 \\ 0 \end{array}
+\right],
 \end{array}
 \right\}
 \end{displaymath}
