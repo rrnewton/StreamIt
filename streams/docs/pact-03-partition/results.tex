@@ -2,39 +2,23 @@
 \label{sec:results}
 \input{table}
 
-advantages of this algorithm:
-  - detecting symmetry and hierarchy to save time
-    - work estimation
-    - alisasing of child configurations
-    - evaluating child configurations themselves
-    - automatically calculating things that are best
+Our results appear in Table 1.  We implemented and evaluated the
+partitioner compared to an improved version of our greedy partitioner
+(which was used in~\cite{streamit-asplos}).  The greedy partitioner
+simply identifies the two nodes with the least work, and fuses them
+together before proceeding.  An interesting single case comparison
+appears in Figure~\ref{fig:trans}.  
 
-- results
-  - cuts along important places, in right directions
-  - does fissoin and fusion
+One reason that the dynamic programming partitioner performs better
+than greedy is that it can perform both filter fission and filter
+fusion in the same partitioning operation, since it knows the extent
+to which it should fuse or split things.  In fact, we believe that
+this is a characteristic which separates our partitioner from general
+scientific partitioners, and could hold the greatest promise in its
+applications to other problems.
 
-  - partitioner takes advantage of this in two ways: 
-    1) by detecting symmetry and only calculating things once
-    2) by drawing cuts along likely paths
-    3) by automatically calculating some properties that are the best,
-       e.g. if you have the same filter duplicated in a splitjoin
+We have also implemented this partitioning algorithm to decide when it
+is beneficial to combine linear sections of a stream graph, and/or to
+them to the frequency domain~\cite{lamb03}.  The partitioner
+demonstrates significant savings over a naive replacement strategy.
 
-- show how we can provide rectangular abstraction on single-input, single-output streams
-
-LINEAR
-
-
-Average Speedup:
-
-BitonicSort     1.34
-FilterBank      1.77
-FFT             .915
-TargetDetect    1.05
-Average         1.27
-
-Magic:
-BitonicSort     1.34
-FilterBank      1.83
-FFT             .954
-TargetDetect    1.04
-Average         1.29
