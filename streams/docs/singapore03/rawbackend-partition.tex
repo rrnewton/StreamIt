@@ -22,13 +22,13 @@ filter can be run on a separate processor to obtain a load-balanced
 executable.
 
 
-\begin{figure}[htpb]
-  \psfig{figure=beam-blood-key.eps,width=3.2in} \\
-  \subfigure[\vspace{-6pt}
-    {\bf Original (runs on 64 tiles).}\label{fig:beam-blood1}]{\psfig{figure=beam-blood-orig.eps,width=3.2in}}
-  \hspace{0.3in} \subfigure[\vspace{-6pt}
-    {\bf Partitioned (runs on 16 tiles).}\label{fig:beam-blood2}]{\psfig{figure=beam-blood-opt.eps,width=3.2in}
-    \vspace{-6pt}} \vspace{-6pt} \caption{\protect\small Execution
+\begin{figure}[!h]
+  \psfig{figure=beam-blood-key.eps,width=3.0in} \\
+  \subfigure[
+    {\bf Original (runs on 64 tiles).}\label{fig:beam-blood1}]{\psfig{figure=beam-blood-orig.eps,width=3.1in}}
+  \hspace{0.3in} \subfigure[
+    {\bf Partitioned (runs on 16 tiles).}\label{fig:beam-blood2}]{\psfig{figure=beam-blood-opt.eps,width=3.1in}
+    } \caption{\protect\small Execution
     traces for the (a) original and (b) partitioned versions of the
     Radar application.  The $x$ axis denotes time, and the $y$ axis
     denotes the processor.  Dark bands indicate periods where
@@ -39,7 +39,6 @@ executable.
     53 unbalanced tiles (original) to 15 balanced tiles (partitioned).
     The throughput of the partitioned graph is 2.3 times higher than
     the original. \protect\label{fig:beam-blood}}
-\vspace{-12pt}
 \end{figure}
 
 Our partitioner employs a set of fusion, fission, and reordering
@@ -51,6 +50,32 @@ intensive filters can be split, and less demanding filters can be
 fused.  Currently, a simple greedy algorithm is used to automatically
 select the targets of fusion and fission, based on the estimate of the
 work in each node.
+
+%\begin{figure}[htpb]
+\begin{figure}[!h]
+%\vspace{-.5in}
+\centering
+\begin{minipage}{3.0in}
+\centering
+\psfig{figure=beam-graph-orig.eps,width=2.5in}
+\caption{\protect\small Stream graph of the original 12x4 Radar
+application.  The 12x4 Radar application has 12 channels and 4 beams;
+it is the largest version that fits onto 64 tiles without filter
+fusion.  \protect\label{fig:beam-orig}}
+\end{minipage}
+\hspace{0.1in}
+\begin{minipage}{3.0in}
+\centering
+\psfig{figure=beam-graph-opt.eps,width=1.9in}
+\caption{\protect\small Stream graph of the load-balanced 12x4
+Radar application.  Vertical fusion is applied to collapse each pipeline
+into a single filter, and horizontal fusion is used to transform the
+4-way splitjoin into a 2-way splitjoin.  Figure~\ref{fig:beam-blood}
+shows the benefit of these
+transformations. \protect\label{fig:beam-opt}}
+\end{minipage}
+\end{figure}
+
 
 For example, in the case of the Radar application, the original
 stream graph (Figure~\ref{fig:beam-orig}) contains 52 filters.  These
@@ -122,30 +147,4 @@ graphs have complex symmetries where fusion or fission will not be
 beneficial unless applied uniformly to each component of the graph.
 We are working on improved partitioning algorithms that take these
 measures into account.
-
-
-%\begin{figure}[htpb]
-\begin{figure}[t]
-\vspace{-.5in}
-\centering
-\begin{minipage}{3.0in}
-\centering
-\psfig{figure=beam-graph-orig.eps,width=2.5in}
-\caption{\protect\small Stream graph of the original 12x4 Radar
-application.  The 12x4 Radar application has 12 channels and 4 beams;
-it is the largest version that fits onto 64 tiles without filter
-fusion.  \protect\label{fig:beam-orig}}
-\end{minipage}
-\hspace{0.1in}
-\begin{minipage}{3.0in}
-\centering
-\psfig{figure=beam-graph-opt.eps,width=1.9in}
-\caption{\protect\small Stream graph of the load-balanced 12x4
-Radar application.  Vertical fusion is applied to collapse each pipeline
-into a single filter, and horizontal fusion is used to transform the
-4-way splitjoin into a 2-way splitjoin.  Figure~\ref{fig:beam-blood}
-shows the benefit of these
-transformations. \protect\label{fig:beam-opt}}
-\end{minipage}
-\end{figure}
 

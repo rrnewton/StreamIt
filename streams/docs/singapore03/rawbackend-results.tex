@@ -1,13 +1,7 @@
 \subsection{Preliminary Results}
 \label{sec:results}
 
-Our current implementation of StreamIt supports fully automatic
-compilation through the Raw backend.  We have also implemented the
-optimizations that we have described: synchronization elimination,
-modulo expression elimination (vertical fusion), buffer localization
-(vertical fusion), and buffer sharing (horizontal fusion).
-
-\begin{table*}[htpb]
+\begin{table*}[!t]
 \begin{center}
 \scriptsize
 \begin{tabular}{|l|l||r||r|r|r|r||r||} \hline
@@ -22,7 +16,7 @@ Radar & Radar array front-end~\cite{pca} &
 549 & 8 & 3 & 6 & 0 & 52
 \\ \hline
 Radio & FM Radio with an equalizer & 
-525 & 14 & 6 & 4 & 0 & 26
+525& 14 & 6 & 4 & 0 & 26
 \\ \hline
 Sort & 32 element Bitonic Sort & 
 419 & 4 & 5 & 6 & 0 & 242
@@ -44,46 +38,12 @@ Vocoder & 28 channel Vocoder~\cite{seneff80} &
 \\ \hline
 \hline
 \end{tabular}
-\vspace{-6pt}
 \caption{\protect\small Application Characteristics.}
 \label{tab:benchmarks}
 \end{center}
 \end{table*}
 
-
-We evaluate the StreamIt compiler for the set of applications shown in
-Table~\ref{tab:benchmarks}; our results appear in
-Table~\ref{tab:performance}.
-%  For each benchmark, we show the number of
-%lines of StreamIt code, the occurrence of each stream construct, and
-%the number of nodes required to execute the expanded graph on Raw.
-For each application, we compare the throughput of StreamIt with a
-hand-written C program, running the latter on either a single tile of
-Raw or on a Pentium IV.  For Radio, GSM, and Vocoder, the C source
-code was obtained from a third party; in other cases, we wrote a C
-implementation following a reference algorithm.  For each benchmark,
-we show MFLOPS (which is N/A for integer applications), processor
-utilization (the percentage of time that an {\it occupied tile} is not
-blocked on a send or receive), and throughput.  We also show the
-performance of the C code, which is not available for C programs that
-did not fit onto a single Raw tile (Radar, GSM, and Vocoder).
-Figures~\ref{fig:compare-raw} and~\ref{fig:compare-pentium} illustrate
-the speedups obtained by StreamIt compared to the C
-implementations\footnote{FFT and Filterbank perform better on a Raw
-tile than on the Pentium 4.  This could be because Raw's single-issue
-processor has a larger data cache and a shorter processor pipeline.}.
-
-The results are encouraging.  In many cases, the StreamIt compiler
-obtains good processor utilization--over 60\% for four benchmarks and
-over 40\% for two additional ones.  For GSM, parallelism is limited by
-a feedbackloop that sequentializes much of the application.  Vocoder
-is hindered by our work estimation phase, which has yet to accurately
-model the cost of library calls such as {\tt sin} and {\tt tan}; this
-impacts the partitioning algorithm and thus the load balancing.  3GPP
-also has difficulties with load balancing, in part because our current
-implementation fuses all the children of a stream construct at once.
-
-\begin{table*}[htpb]
+\begin{table*}[!t]
 \begin{center}
 \scriptsize
 \begin{tabular}{|l||r|r|r|r||r||r||} \hline
@@ -117,13 +77,43 @@ GSM    & 23\% & 16 & N/A &    80.9  & {\it app. too large} & 7.76 \\ \hline
 Vocoder& 17\% & 15  & 118 &     8.74  & {\it app. too large} & 3.35  \\ \hline
 3GPP   & 18\% & 16  & 44 &   119.6  & 17.3  & 65.7   \\ \hline \hline
 \end{tabular}
-\vspace{-6pt}
 \caption{\protect\small Performance Results.}
 \label{tab:performance}
 \end{center}
-\vspace{-12pt}
 \end{table*}
 
+We evaluate the StreamIt compiler for the set of applications shown in
+Table~\ref{tab:benchmarks}; our results appear in
+Table~\ref{tab:performance}.
+
+%  For each benchmark, we show the number of
+%lines of StreamIt code, the occurrence of each stream construct, and
+%the number of nodes required to execute the expanded graph on Raw.
+For each application, we compare the throughput of StreamIt with a
+hand-written C program, running the latter on either a single tile of
+Raw or on a Pentium IV.  For Radio, GSM, and Vocoder, the C source
+code was obtained from a third party; in other cases, we wrote a C
+implementation following a reference algorithm.  For each benchmark,
+we show MFLOPS (which is N/A for integer applications), processor
+utilization (the percentage of time that an {\it occupied tile} is not
+blocked on a send or receive), and throughput.  We also show the
+performance of the C code, which is not available for C programs that
+did not fit onto a single Raw tile (Radar, GSM, and Vocoder).
+Figures~\ref{fig:compare-raw} and~\ref{fig:compare-pentium} illustrate
+the speedups obtained by StreamIt compared to the C
+implementations\footnote{FFT and Filterbank perform better on a Raw
+tile than on the Pentium 4.  This could be because Raw's single-issue
+processor has a larger data cache and a shorter processor pipeline.}.
+
+The results are encouraging.  In many cases, the StreamIt compiler
+obtains good processor utilization--over 60\% for four benchmarks and
+over 40\% for two additional ones.  For GSM, parallelism is limited by
+a feedbackloop that sequentializes much of the application.  Vocoder
+is hindered by our work estimation phase, which has yet to accurately
+model the cost of library calls such as {\tt sin} and {\tt tan}; this
+impacts the partitioning algorithm and thus the load balancing.  3GPP
+also has difficulties with load balancing, in part because our current
+implementation fuses all the children of a stream construct at once.
 
 StreamIt performs respectably compared to the C implementations,
 although there is room for improvement.  The aim of StreamIt is to
@@ -136,28 +126,25 @@ be very effective--as illustrated in Figure~\ref{fig:beam-blood},
 partitioning the Radar application improves performance by a factor
 of 2.3 even though it executes on less than one third of the tiles.
 
-
-\begin{figure}[htpb]
+\begin{figure*}[!t]
 \centering
-\vspace{6pt}
 \begin{minipage}{3.0in}
 \centering
 \psfig{figure=speedup-graph.eps,width=2.95in}
-\vspace{-6pt}
 \caption{\protect\small StreamIt throughput on a 16-tile Raw machine,
 normalized to throughput of hand-written C running on a single Raw
 tile.  \protect\label{fig:compare-raw}}
 \end{minipage}
+~
 \hspace{0.1in}
 \begin{minipage}{3.0in}
 \centering
 \psfig{figure=throughput-graph.eps,width=2.95in}
-\vspace{-6pt}
 \caption{Throughput of StreamIt code running on 16 tiles and C code
 running on a single tile, normalized to throughput of C code on a
 Pentium IV. \protect\label{fig:compare-pentium}}
 \end{minipage}
-\end{figure}
+\end{figure*}
 
 The StreamIt optimization framework is far from complete, and the
 numbers presented here represent a first step rather than an upper
