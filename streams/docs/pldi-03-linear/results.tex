@@ -72,39 +72,45 @@ detection in parallel.
 
 \subsection{Frequency Replacement Scaling}
 
-\begin{figure}
+\begin{figure*}[t]
 \center
-\epsfxsize=3.2in
-\epsfbox{images/frequency-win-theory.eps}
-\caption{Plot showing the theoretical multiplication reduction factor as a function of the size of the FIR ($M$) and the number of outputs produced ($N$). The dark regions denote an increase in the required number of multiplications.}
+\begin{minipage}{3.4 in}
+\center
+\epsfxsize=2.2in
+\epsfbox{images/frequency-win-theory.eps} \\
+{\bf (a): Theoretical}
+\end{minipage} 
+\begin{minipage}{3.4 in}
+\center
+\epsfxsize=2.2in
+\epsfbox{images/frequency-win-empirical.eps} \\
+{\bf (b): Emphirical}
+\end{minipage}
+\caption{Plots showing the theoretical and emphirical multiplication reduction factor as a function of the size of the FIR ($M$) and the number of outputs produced ($N$). The dark regions denote an increase in the required number of multiplications.}
 \label{fig:frequency-win-theory}
 \vspace{-12pt}
-\end{figure}
+\end{figure*}
 
-Direct convolution requires $O(MN)$ multiplies to generate $N$ output values. 
-Implementing convolution using an FFT algorithm to calculate the DFT requires 
-$O((M+N)lg(M+N))$ multiplications for both the conversion to and from the frequency domain
-and $O(M+N)$ multiplications in the frequency domain and produces $M+N$ outputs.
-We define the multiplication savings factor as the number of multiplies per output
-using direct convolution over the number of multiplies per output using the 
-frequency transformation. The reduction factor 
-$f(M,N)=\frac{O(M(M+N))}{O(M+N)lg(M+N))+(M+N))}$.
-Figure~\ref{fig:frequency-win-theory} shows a plot of this function in normalized 
-$M$, $N$ space.
+
+
+
+Direct convolution requires $O(MN)$ multiplies to generate $N$ output
+values.  Implementing convolution using an FFT algorithm to calculate
+the DFT requires $O((M+N)lg(M+N))$ multiplications for both the
+conversion to and from the frequency domain and $O(M+N)$
+multiplications in the frequency domain and produces $M+N$ outputs.
+We define the multiplication savings factor as the number of
+multiplies per output using direct convolution over the number of
+multiplies per output using the frequency transformation. The
+reduction factor $f(M,N)=\frac{O(M(M+N))}{O(M+N)lg(M+N))+(M+N))}$.
+Figure~\ref{fig:frequency-win-theory} shows a plot of this function in
+normalized $M$, $N$ space.
 
 We also performed experiments to measure the actual multiplication reduction
 as a function of $M$ (filter size) and output size ($N$).
 Figure~\ref{fig:frequency-win-empirical} shows the empirically measured
 multiplication savings factor per output.
 
-\begin{figure}
-\center
-\epsfxsize=3.2in
-\epsfbox{images/frequency-win-empirical.eps}
-\caption{Plot showing the empirically measured multiplication reduction factor as a function of the size of the FIR ($M$) and the number of outputs produced ($N$). The dark regions denote an increase in the required number of multiplications.}
-\label{fig:frequency-win-empirical}
-\vspace{-12pt}
-\end{figure}
 
 Our experimental results have the same shape, however we don't get the same
 speedup because of constant factors hidden by the assymptotic notation. For instance,

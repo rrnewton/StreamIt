@@ -52,6 +52,16 @@ expansion can be done as follows.
 %% the new node will be exactly equivalent to $k$ executions of the
 %% original.
 
+\begin{figure}
+\center
+\epsfxsize=3.0in
+\epsfbox{images/filter-expand.eps}
+\caption{Expanding a linear node to have I/O rates $(e', o', u')$.  }
+\label{fig:expanding-a-matrix}
+\vspace{-12pt}
+\end{figure}
+
+
 \begin{transformation} (Linear expansion)
 % DOUBLE-CHECK whether we're assuming 0-indexed or 1-indexed matrices
 Given a linear node $\lambda = \{A, b, e, o, u\}$, the expansion of
@@ -112,15 +122,6 @@ and $o' = k * o$ for some integer $k$, then $\lambda'$ is completely
 interchangebale with $\lambda$.  In the combination rules that follow,
 we utilize linear expansion both in contexts that do and do not
 satisfy this condition.
-
-\begin{figure}
-\center
-\epsfxsize=3.0in
-\epsfbox{images/filter-expand.eps}
-\caption{Expanding a linear node to have I/O rates $(e', o', u')$.  }
-\label{fig:expanding-a-matrix}
-\vspace{-12pt}
-\end{figure}
 
 \subsection{Collapsing Linear Pipelines}
 
