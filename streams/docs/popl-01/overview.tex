@@ -270,7 +270,7 @@ class FFT extends Stream {
       add(new SplitJoin() {
          void init() {
             setSplitter(WEIGHTED_ROUND_ROBIN(N/2, N/2));
-            for(int i=0; i<2; i++) 
+            for (int i=0; i<2; i++) 
                add(new SplitJoin() {
                   void init() {
                      setSplitter(ROUND_ROBIN);
@@ -280,7 +280,7 @@ class FFT extends Stream {
                }});
             setJoiner(ROUND_ROBIN);
       }});
-      for(int i=2; i<N; i*=2)
+      for (int i=2; i<N; i*=2)
         add(new Butterfly(i, N));
 }}
 \end{verbatim}
