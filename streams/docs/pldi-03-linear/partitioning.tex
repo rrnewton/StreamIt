@@ -87,9 +87,9 @@ dynamic programming.
   \vspace{-10pt}
   \caption{Type declarations for code in Figure~\ref{fig:part-alg}.
   \protect\label{fig:part-decl}}
-  \vspace{-22pt}
+  \vspace{-24pt}
   \makeline
-  \vspace{-12pt}
+  \vspace{-14pt}
 \end{figure}
 
 \begin{figure}[t]
@@ -141,24 +141,29 @@ $s$):
 %% \]
 \[
 \mt{getDirectCost}(s) = \left\{ \begin{array}{l}
-\infty ~~~~~~~~~ \mbox{(if }s\mbox{~is roundrobin splitjoin)} \\ ~ \\ \vspace{-8pt} \\
+\infty ~~~~~~~~~ \mbox{(if }s\mbox{~is roundrobin splitjoin)} \\ ~ \\ \vspace{-14pt} \\
 185 + 2*u + ~~~~~~~~~~~~~~~~\mbox{(otherwise)} \\ \vspace{-8pt} ~ \\
 ~~~|\{ i~s.t.~{\vec b}_i \ne 0 \}|~+ \\ \vspace{-8pt} ~ \\
 ~~~3 * |\{ (i,j)~s.t.~A_{i,j} \ne 0\}| \\ 
 \end{array} \right.
 \]
+\vspace{-2pt}
 \[
 % trial and error with the ~, can't get it to move over :(
 \mt{getFrequencyCost}(s) = ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
-\vspace{-8pt}
+\vspace{-7pt}
 \]
 \[
 ~~~\left[185 + 2*u + u * \mt{ln}\left(\frac{1 + 4*e}{1 + \frac{2^{\lceil lg(2*e) \rceil}}{50}}\right)\right] * \mt{max}(o, 1) + \mt{dec}(s)
 \]
-~ \vspace{-11pt} \\
+~ \vspace{-12pt} \\
 \[ 
 % trial and error with the ~, can't get it to move over :(
-\mt{dec}(s) = (o-1) * (185 + 4 * u) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+\mt{dec}(s) = \left\{ \begin{array}{l}
+0~~~~~~~~~~~~~\hspace{0.202in}(\mbox{if }o \le 1) \\
+185+4*u~~~~~(\mbox{if }o > 1) \\
+\end{array} \right.
+%(o-1) * (185 + 4 * u) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 \]
 \clearpage
 
