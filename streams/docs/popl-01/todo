@@ -67,8 +67,6 @@ similar equaionts are placed next to each other.
 11. talk to saman about changing example FIR so that it
 pushes(peek(i)); pop(); instead of pushing the dummy values.
 
-12. add some latency constraints to the example
-
 13. make latency symbol consistent - l or n?  
 
 14. introduce n(t) notation earlier.
@@ -81,16 +79,19 @@ the top.
 
 17. how do they declare how many they push and pop?
 
-18. can't have operator overloading on the complex add operation
-
 19. put a split/join in the radio example -- looks better and makes more sense
 
-20. change Complex to float for example
-
 21. somewhere in semantics, say what we don't do
+
+22. some name other than TIME interval for the message sending!
 
 ** put the feedbackloop joiner transfer functions as a composition of
 some other joiner function so that I can still use duplicate, etc there.
 
-22. some name other than TIME interval for the message sending!
+** add some latency constraints to the example
+
+
+
+
+
 

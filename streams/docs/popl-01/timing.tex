@@ -3,12 +3,13 @@
 In this section we develop a more formal semantics for the message
 delivery guarantees described above.  The timing model in StreaMIT is
 unique in that all time is relative to {\it information
-wavefronts}--that is, two independent filters can describe a common time
-only in terms of when the {\it effects} of one filter's execution are
-seen by another.  Thus, although each filter's {\tt work} function is
-invoked asynchronously without any notion of global time, two
-invocations of a work function occur at the same ``information-relative
-time'' if they operate on the same information wavefront.
+wavefronts}--that is, two independent filters can describe a common
+time only in terms of when the {\it effects} of one filter's execution
+are seen by the other.  Thus, although each filter's {\tt work}
+function is invoked asynchronously without any notion of global time,
+two invocations of a work function occur at the same
+``information-relative time'' if they operate on the same information
+wavefront.
 
 To define this notion more precisely, we present transfer functions
 that describe the flow of information across filters and streams.
@@ -33,12 +34,13 @@ than they push.
 \begin{figure}
 \centering
 \psfig{figure=Tapes.eps,width=3.2in}
-\caption{The behavior of the tapes in a filter that pop two elements, peeks the next three from the input
-channel and pushes two elements to the output channel. The tape of the
-input channel before an invocation is denoted in the left. The state of
-both input channel tape and output channel tape and the filter during
-execution is shown in the middle. The state of the output channel tape
-after completion of the filter invocation is given in the right.}
+\caption{The behavior of the tapes in a filter that pops two items
+from the input channel, peeks at the next three, and pushes two
+elements to the output channel. The tape of the input channel before
+an invocation is drawn on the left. The state of the input channel
+tape, the output channel tape, and the filter during execution is
+shown in the middle. The state of the output channel tape after
+completion of the filter's execution is given on the right.}
 \label{fig:tapes}
 \end{figure}
 
@@ -47,17 +49,13 @@ the state of the stream graph.  Consider that in place of each data
 channel there is an infinite ``tape'' which contains the history of
 values that have been pushed onto the channel (see Figure
 \ref{fig:tapes}).  Now consider the following functions:
-
 \begin{itemize}
-
 \item Given that there are $x$ items on tape $a$, the maximum number
 of items that can appear on tape $b$ is $\ma{a}{b}(x)$.
 
 \item Given that there are $x$ items on tape $b$, the minimum number
 of items that must appear on tape $a$ is $\mi{a}{b}(x)$.
-
 \end{itemize}
-
 Note that these functions are only defined over pairs of tapes $(a,
 b)$ where $a$ is ``upstream'' of $b$--that is, where there is a
 directed path in the stream graph from the filter following $a$ to the
@@ -149,12 +147,12 @@ there is a downstream path from $x$ to $z$.
 \begin{figure}
 \centering
 \psfig{figure=splitjoin.eps,width=3.2in}
-\caption{\protect\small SplitJoin Construct with labeling.
+\caption{\protect\small SplitJoin construct with labeling.
 \protect\label{splitjoin}}
 \end{figure}
 
 We now derive $min$ and $max$ in the case of a SplitJoin, as pictured
-in Figure {\ref:splitjoin}.  For the splitter $S$ there are two output
+in Figure \ref{splitjoin}.  For the splitter $S$ there are two output
 tapes; let us denote them by $O1_S$ and $O2_S$.  Similarly, let us
 denote the two input tapes of the joiner $J$ by $I1_J$ and $I2_J$.  We
 now derive the transfer functions for round robin and
@@ -220,39 +218,42 @@ as follows:
 \begin{figure}
 \centering
 \psfig{figure=feedback.eps,width=3.2in}
-\caption{\protect\small  FeedbackLoop construct labeling.
+\caption{\protect\small  FeedbackLoop construct with labeling.
 \protect\label{looplabel}}
 \end{figure}
 
 We have to be careful when defining the transfer functions for
-feedback loops (see Figure {\ref:looplabel}).  The feedback splitter
+feedback loops (see Figure \ref{looplabel}).  The feedback splitter
 $FS$ serves as a normal splitter, and has the same $min$ and $max$
 functions as defined above.  However, the feedback joiner $FJ$ is
 slightly different than a standard joiner, since during the first few
 executions it fabricates values from the loop body before they appear
 on the input tape.  The transfer function must take special account of
-these initial values, since they are never appear on $I2_{FJ}$, the
-input tape from the loop body.  This is because we model the
-initialization of FeedbackLoops by feeding the joiner the initial
-values directly instead of pushing them onto a channel.
+these initial values, since they never appear on $I2_{FJ}$, the input
+tape from the loop body.  This is because we model the initialization
+of FeedbackLoops by feeding the joiner the initial values directly
+instead of pushing them onto a channel.
 
-Let $n$ be the number of initial values are provided to the feedback
-joiner before values from the feedback loop are read.  Assume that the
-round robin feedback joiner first draws from the data stream $I1_J$,
-and then from the feedback loop $I2_J$.
+Let $n$ be the number of initial values that are provided to the
+feedback joiner before values from the feedback loop are read.  Let
+$J$ be a normal COMBINE or ROUND\_ROBIN joiner as defined for
+SplitJoins.  Now, let us define the transfer functions for $FJ$, the
+feedback joiner.
 
 The $min$ function for the main stream is as before:
 \begin{eqnarray*}
-\mi{I1_J}{O_J}(x) = \left\lceil\frac{x}{2}\right\rceil 
+\mi{I1_{FJ}}{O_{FJ}} = \mi{I1_J}{O_J} 
 \end{eqnarray*}
-However, the equation must include the initial $n$ values for the
-$min$ function of the loop:
+However, we must offset by $n$ when considering the $min$ function
+that draws from the loop's tape:
 \begin{eqnarray*}
-\mi{I2_J}{O_J}(x) = \left\lfloor\frac{x}{2}\right\rfloor - n
+\mi{I2_{FJ}}{O_{FJ}}(x) = \mi{I2_J}{O_J}(x) - n
 \end{eqnarray*}
-The $max$ function must be similarly shifted for the input from the loop:
+Finally, the $max$ function must be similarly shifted for the input
+from the loop:
 \begin{eqnarray*}
-\ma{(I1_J, I2_J)}{O_J}(x_1, x_2) = MIN(2*x_1-1, 2*(x_2+n))
+\ma{(I1_{FJ}, I2_{FJ})}{O_{FJ}}(x_1, x_2) = \ma{(I1_J, I2_J)}{O_J}(x_1,
+x_2 + n)
 \end{eqnarray*}
 
 \subsubsection{Summary}
@@ -278,9 +279,7 @@ Suppose that filter $A$ sends a message to filter $B$ with latency
 $n$, where $n$ is any integer.  In $n$ invocations of $A$'s {\tt work}
 function, $A$ will produce one or more data items $d$.  Now, the
 messaging system guarantees that:
-
 \begin{enumerate}
-
 \item If $B$ is upstream of $A$, then $B$ will receive the message
 immediately following the last invocation of its {\tt work} function
 which produces items that affect $d$.
@@ -292,15 +291,13 @@ which produces items that are effected by $d$.
 \item If $B$ runs in parallel with $A$, then the message timing is in terms
 of a shared set of splitters and joiners.  We are developing semantics
 for this case, but they are beyond the scope of this paper.
-
 \end{enumerate}
-
 These guarantees can be expressed more formally as a set of
 constraints on the number of items on certain tapes in the system.
 Again, suppose that filter $A$ sends a message to filter $B$ with
-latency $n$, where $n$ could is any integer.  Let $s$ denote the
-number of items on $O_A$ when the message was sent, and $r$ denote the
-number of items on $O_B$ when the message is received.  We have that:
+latency $n$, where $n$ is any integer.  Let $s$ denote the number of
+items on $O_A$ when the message was sent, and $r$ denote the number of
+items on $O_B$ when the message is received.  We have that:
 
 \begin{enumerate}
 
@@ -352,9 +349,7 @@ of execution.  A configuration C of the stream graph can be completely
 represented by the vector $(n(t_1), n(t_2), \dots, n(t_k))$, where
 $t_1$ through $t_k$ are the tapes in the graph.  A legal configuration
 must satisfy three sets of constraints:
-
 \begin{enumerate}
-
 \item {\it Data dependences.}  A filter can only have as many items on
 its output tape as can be produced by the items on its input tape.
 For each filter $A$ in the program, we have the constraint:
@@ -367,7 +362,6 @@ required by the output tape:
 \begin{eqnarray*}
 n(I_A) \ge \mi{I_A}{O_A}(n(O_A))
 \end{eqnarray*}
-
 \item {\it Message guarantees.}  Suppose that a filter $A$ might send
 a message to filter $B$ with a maximum latency of $l$ during any
 invocation of its work function.  Then we must constrain the execution
@@ -384,13 +378,10 @@ and as follows if $B$ is downstream of $A$:
 \begin{eqnarray*}
 n(O_B) \le \ma{O_A}{O_B}(n(O_A) + push_A * (n-1))
 \end{eqnarray*}
-
 \item {\it Latency guarantees.}  The guarantees for latency are
 treated identically to message guarantees, as fitting with the
 semantics of latency as described above.
-
 \end{enumerate}
-
 {\bf Defining the schedule.}  For a stream graph with a given set of
 latency requirements and message delivery guarantees, we now have a
 set of constraints expressing whether or not a given configuration
@@ -462,10 +453,10 @@ the program.
 
 {\bf Overflow detection.}  There are two places that a buffer can
 overflow in the stream graph.  The first is in a feedback loop, when
-$\mal{FJ}(x)$ (calculated above) is more than $x$.  The second case is
-when the parallel streams of a split/join have different production
-rates.  For a splitter $S$ and a joiner $J$, the production rates will
-cause an overflow if and only if $\ma{O1_S}{I1_J}(x) -
+$\mal{FJ}(x)$ (calculated above) is more than $x + n$.  The second
+case is when the parallel streams of a split/join have different
+production rates.  For a splitter $S$ and a joiner $J$, the production
+rates will cause an overflow if and only if $\ma{O1_S}{I1_J}(x) -
 \ma{O2_S}{I2_J}(x)$ is not $O(1)$.  This difference could be analyzed
 by a compiler for every SplitJoin in the stream graph to verify that
 no buffers will overflow during steady-state execution.

@@ -10,7 +10,6 @@ we will refer to as {\it streaming applications.}  The following are
 the salient properties of a streaming application, independent of its
 implementation:
 \begin{enumerate}
-
 \item {\it Large streams of data.}  Perhaps the most fundamental
 aspect of a streaming application is that it operates on a large (or
 virtually infinite) sequence of data items, hereafter referred to as a
@@ -39,14 +38,14 @@ that is a given function of the input stream.
 
 \item {\it Occasional re-initialization.}  Even though each
 arrangement of filters is executed for a long time, there are still
-dynamic modifications to the stream graph that occur on occasion.
-For instance, if a wireless network interface is experiencing high
-noise on an input channel, it might react by adding some filters to
-clean up the signal; a software radio re-initializes a portion of the
-stream graph when a user switches from AM to FM.  Sometimes, these
+dynamic modifications to the stream graph that occur on occasion.  For
+instance, if a wireless network interface is experiencing high noise
+on an input channel, it might react by adding some filters to clean up
+the signal; a software radio re-initializes a portion of the stream
+graph when a user switches from AM to FM.  Sometimes, these
 re-initializations are synchronized with some data in the stream--for
 instance, when a network protocol changes from bluetooth to 802.11 at
-a certain point of a transmission.  There are typically an enumerable
+a certain point of a transmission.  There is typically an enumerable
 number of configurations that the stream graph can adopt in any one
 program, such that all of the possible arrangements of filters are
 known at compile time.
@@ -64,7 +63,6 @@ efficiency (in terms of both latency and throughput) is of primary
 concern.  Additionally, many embedded applications are intended for
 mobile environments where power consumption, memory requirements, and
 code size are also important.
-
 \end{enumerate}
 
 

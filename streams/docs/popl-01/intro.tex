@@ -4,11 +4,11 @@ Applications that are structured around some notion of a ``stream''
 are becoming increasingly important and widespread.  There is evidence
 that streaming media applications are already consuming most of the
 cycles on consumer machines \cite{Rix98}, and their use is continuing
-to grow \cite{someone}.  In the embedded domain, applications for
-hand-held computers, cell phones, and DSP's are centered around a
-stream of voice or video data.  The stream abstraction is also
-fundamental to high-performance applications such as intelligent
-software routers, cell phone base stations, and HDTV editing consoles.
+to grow.  In the embedded domain, applications for hand-held
+computers, cell phones, and DSP's are centered around a stream of
+voice or video data.  The stream abstraction is also fundamental to
+high-performance applications such as intelligent software routers,
+cell phone base stations, and HDTV editing consoles.
 
 Despite the prevalence of these applications, there is surprisingly
 little language and compiler support for practical, large-scale stream
@@ -38,15 +38,16 @@ productivity and program robustness, and second, to provide a compiler
 that performs stream-specific optimizations to achieve the performance
 of an expert assembly programmer.  To address the first of these
 goals, this paper presents a high-level language specifically designed
-for streaming applications.  
+for streaming applications.
 
 The paper is organized as follows. In Section {\ref{sec:domain}}, we
-characterize the domain of streaming programs that motivated the
+characterize the domain of streaming programs that motivates the
 design of StreaMIT.  In Section~\ref{sec:overview}, we provide a
-detailed description of StreaMIT, and Section~\ref{sec:time} formally
-defines the semantics of StreaMIT using information flow. Next, we
-describe related work in Section~\ref{sec:related}.  Next,
-Section~\ref{sec:example} expands on the software trunked radio
-receiver example. Finally, we conclude in Section~\ref{sec:conc}.
+detailed description of StreaMIT, and in Section~\ref{sec:time} we
+formally define the semantics of StreaMIT using a notion of
+``information flow''. We describe related work in
+Section~\ref{sec:related} and a detailed example of a software radio
+in Section~\ref{sec:example}.  Section~\ref{sec:conc} contains our
+conclusions.
 
 

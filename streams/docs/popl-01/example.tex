@@ -7,15 +7,16 @@ demonstrates many features of StreaMIT.
 The high-level structure of the radio, graphically shown in
 Figure~\ref{fig:radiodiagram}, is implemented in the class {\tt
 TrunkedRadio}. The radio has seven stages, where the first three
-stages operate in the time domain, the last three stages in the
-frequency domain, with a conversion phase in between.  At this high
-level, the structure of the system is a pipeline of six or seven
-stream stages. The difference is due to the {\tt Booster} stage, which
-can be active or inactive. The switching on and off of the {\tt
-Booster} stage, which happens infrequently, is accomplished using a
-message from the {\tt CheckQuality} stage. We also use another message
-from the {\tt CheckFreqHop} stage to {\tt RFtoIF} stage to change the
-baseband when a frequency hop tone is present.
+stages operate in the time domain, the last three stages operate in
+the frequency domain, and there is a conversion phase in between.  At
+this high level, the structure of the system is a pipeline of either
+six or seven stream stages. The difference is due to the {\tt Booster}
+stage, which can be active or inactive. The switching on and off of
+the {\tt Booster} stage, which happens infrequently, is accomplished
+using a reinitialization message from the {\tt CheckQuality} stage. We
+also use a message from the {\tt CheckFreqHop} stage to the {\tt
+RFtoIF} stage to change the baseband when a frequency hop tone is
+present.
 
 In this example we will omit the implementation of first and the last
 stages, {\tt ReadFromAtoD} and {\tt AudioBackEnd}.
@@ -27,12 +28,12 @@ wave at the IF frequency.  To support a change in the IF frequency
 when frequency hopping occurs, the filter contains a {\tt set\_freq}
 method that can be invoked using a message.
 
-The optional {\tt Booster} stage is a FIR filter that is activated
+The optional {\tt Booster} stage is an FIR filter that is activated
 when the signal is hard to detect. During normal operation, however,
 it is deactivated to conserve power. The turning on and off of the
 filter is controlled by a message.  The filter itself, shown in
-Figure~\ref{fig:firfilter}, is implemented as a Filter that uses peek
-to look at N elements in the input stream.
+Figure~\ref{fig:firfilter}, is implemented as a {\tt Filter} that
+peeks at N elements in the input stream.
 
 The {\tt FFT} stage converts the program from the time domain to the
 frequency domain using a multi-stage FFT. It is graphically presented
@@ -40,250 +41,42 @@ in~\ref{fig:fftfilter}. The FFT is composed of a reordering filter and
 a multi-stage butterfly filter. The StreaMIT representation of the
 reordering filter (a bit reverse order filter) is given in
 Figure~\ref{fig:bitreverseorder}. Note that the complex data
-re-shuffling is accomplished using a few splitjoin constructs.  A
+re-shuffling is accomplished using a few SplitJoin constructs.  A
 parameterized Butterfly implementation is used to abstract the
 multi-stage butterfly in the FFT. As shown in
 Figure~\ref{fig:butterfly}, the Butterfly filter is also implemented
-using a combination of splitjoin constructs.
+using a combination of SplitJoin constructs.
 
-StreaMIT implementation of the FFT filter is clean and intuitive. It
-already has a large amount of pipelined parallelism. Due to the simple
-and straightforward mapping from the algorithm to implementation,
-compiler analyses should be able to extract the parallel structure of
-the FFT when hardware resources are available.
+The StreaMIT implementation of the FFT filter is clean and
+intuitive. It already has a large amount of pipelined parallelism. Due
+to the simple and straightforward mapping from the algorithm to the
+implementation, compiler analyses should be able to extract the
+parallel structure of the FFT when hardware resources are available.
 
 The next stage, {\tt CheckFreqHop}, checks four different frequencies
 for the change frequency tone. When the stage detects this tone, it
 has to change the frequency within a time limit. This task is
 accomplished by sending a message to the {\tt RFtoIF} stage.  The
-message requires the {\tt RFtoIF} stage to deliver between 4N and 6N
-items using the old modulation before changing to the new frequency.
+message requires the {\tt RFtoIF} stage to deliver between $4N$ and
+$6N$ items using the old modulation before changing to the new
+frequency.
 
 The {\tt CheckQuality} stage checks if the signal has a distinct
 frequency spectrum. If all the frequencies have similar amplitudes,
-the stage assumes that the signal to noise ratio is low and sends a
-message to activate the {\tt Booster}. Note that this message is send
-using best effort delivery.
+the stage assumes that the signal-to-noise ratio is low and sends a
+message to activate the {\tt Booster}. Note that this message is sent
+using best-effort delivery.
 
-\begin{figure}
+\begin{figure}[t]
 \centering
 \psfig{figure=fir-block.eps,width=3.2in}
 \caption{A block diagram of a five tap FIR filter.}
 \label{fig:firfilter}
 \end{figure}
 
-\begin{figure}
+\begin{figure}[t]
 \centering
 \psfig{figure=fft-block.eps,width=3.2in}
 \caption{The multi-stage FFT algorithm}
 \label{fig:fftfilter}
 \end{figure}
-
-\begin{figure}
-\scriptsize
-\begin{verbatim}
-class Butterfly extends Stream {
-   void init(int N, int W) {
-      add(new SplitJoin() {
-         void init() {
-            setSplitter(WEIGHTED_ROUND_ROBIN(N, N));
-            add (new Identity());
-            add (new Filter() {
-               float weights[W];
-               int curr;
-               Channel input = new FloatChannel();
-               Channel output = new FloatChannel();
-               void init() {
-                  for(int i=0; i<W; i++)
-                     weights[i] = calcWeight(i, N, W);
-                  curr = 0;
-               }
-               void work() {
-                  output.push(input.pop()*weights[curr++]);
-                  if(curr>= W) curr = 0;
-               }    
-            });
-            setJoiner(ROUND_ROBIN);
-      }});
-      add(new SplitJoin() {
-         void init() {
-            setSplitter(DUPLICATE);
-            add (new Filter() {   
-               Channel input = new FloatChannel();
-               Channel output = new FloatChannel();
-               void work() {
-                  output.push(input.pop() + input.pop());
-               }
-            });
-            add (new Filter() {   
-               Channel input = new FloatChannel();
-               Channel output = new FloatChannel();
-               void work() {
-                  output.push(input.pop() - input.pop());
-               }
-            });
-            setJoiner(WEIGHTED_ROUND_ROBIN(N, N));
-      }});
-}}
-
-class FFT extends Stream {
-   void init(int N) {
-      add(new SplitJoin() {
-         void init() {
-            setSplitter(WEIGHTED_ROUND_ROBIN(N/2, N/2));
-            for(int i=0; i<2; i++) 
-               add(new SplitJoin() {
-                  void init() {
-                     setSplitter(ROUND_ROBIN);
-                     add (new Identity());
-                     add (new Identity());
-                     setJoiner(WEIGHTED_ROUND_ROBIN(N/4, N/4));
-               }});
-            setJoiner(ROUND_ROBIN);
-      }});
-      for(int i=2; i<=N/2; i *= 2)
-        add(new Butterfly(i, N));
-}}
-
-class FIR extends Filter {
-   Channel input = new FloatChannel();
-   Channel output = new FloatChannel();           
-   int N;
-   void init(int N) {
-      this.N = N;
-   }
-   void work() {
-      float sum = 0;
-      for (int i=0; i<N; i++) {
-         sum += input.peek(i)*firCoeff[i][N];
-      }
-      input.pop();
-      output.push(sum);
-   }
-}
-
-class Booster extends Stream {
-   void init(boolean adds) {
-      if(adds) add(new FIR(N));
-   }
-}
-\end{verbatim}
-\vspace{-12pt}
-\caption{\protect\small The StreaMIT program for the Trunked Radio Receiver.
-\protect\label{fig:radiocode}}
-\vspace{-12pt}
-\end{figure}
-
-
-
-\begin{figure}
-\scriptsize
-\begin{verbatim}
-class RFtoIF extends Filter {
-   Channel input = new FloatChannel();
-   Channel output = new FloatChannel();
-   int sz, i;
-   float weight[];
-   void init(float f) {
-      setf(f);
-   }
-   void work() {
-      output.push(input.pop()*weight[i++]);
-      if(i==sz) i = 0;
-   }
-   void setf(float f) {
-      i = 0;
-      sz = CarrierFreq/f*N;
-      weight = new float[sz];
-      for(int i=0; i<sz; i++)
-         weight[i] = sine(i*PI/sz);
-   }
-}
-
-class CheckFreqHop extends SplitJoin {
-   RFtoIFPortal fh;
-   void init(RFtoIFPortal fh) {
-      this.fh = fh;
-      setSplitter(WEIGHTED_ROUND_ROBIN(N/4-2,1,1,N/2,1,1,N/4-2));
-      int k = 0;
-      for(int i=0; i<4; i++) {
-         if((i==0)||(i==2)) {
-            for(int j=0; j<2; j++) {
-               add(new Filter() {
-                  Channel input = new FloatChannel();
-                  Channel output = new FloatChannel();
-                  void work() {
-                     float val = input.pop();
-                     if(val >= MIN_THRESHOLD) 
-                        fh.setf(Freq[k], new TimeInterval(4*N, 6*N)); 
-                     output.push(val);
-                  }
-               });
-               k++;
-            }
-         } else add(new Identity());
-      }
-      setJoiner(WEIGHTED_ROUND_ROBIN(N/4-2,1,1,N/2,1,1,N/4-2));
-   }
-}
-
-class CheckQuality extends Filter {
-   Channel input = new FloatChannel();
-   Channel output = new FloatChannel();
-   float aveHi, aveLo;   
-   BoosterPortal onOffSwitch;
-   void init(BoosterPortal onOffSwitch) {
-      aveHi = 0; aveLo = 0;
-      this.onOffSwitch = onOffSwitch;
-   }
-   void work() {
-      float val = input.pop();
-      aveHi = max(0.9*aveHi, val);
-      aveLo = min(1.1*aveLo, val);
-      if(aveHi - aveLo < QUAL_BAD_THRESHOLD)
-         onOffSwitch.init(true);
-      if(aveHi - aveLo > QUAL_GOOD_THRESHOLD)
-         onOffSwitch.init(false);
-      output.push(val);
-   }
-}
-
-class TrunkedRadio extends Stream {
-   RFtoIFPortal freqHop = new RFtoIFPortal();
-   BoosterPortal onOff = new BoosterPortal().
-   void init() {
-      add(new ReadFromAtoD());
-      RFtoIF rf2if = new RFtoIF(STARTFREQ);
-      add(rf2if);
-      freqHop.register(rf2if);
-      Booster iss = new Booster(false);
-      add(iss);
-      onOff.register(iss);
-      add(new FFT());
-      add(new CheckFreqHop(freqHop));
-      add(new CheckQuality(onOff));
-      add(new AudioBackEnd());
-   }
-}
-\end{verbatim}
-\vspace{-12pt}
-\end{figure}
-
-\newpage
-
-\begin{figure*}
-\centering
-\psfig{figure=fft-pre-tape.eps,width=4.8in}
-\caption{The bit reverse order filter in FFT. The tapes at each
-channel illustrates the data re-shuffling when N=8. }
-\label{fig:bitreverseorder}
-\end{figure*}
-
-\begin{figure*}
-\centering
-\psfig{figure=fft-butterfly-tape.eps,width=5.8in}
-\caption{The 4x4 butterfly stage in the FFT. The tapes at each channel illustrates the data transformation and computation. }
-\label{fig:butterfly}
-\end{figure*}
-
-
