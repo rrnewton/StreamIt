@@ -1,8 +1,16 @@
 \documentstyle[psfig,lgrind]{article}
-\title{StreaMIT Intermediate Representation \\ Version 2.1}
+\title{StreaMIT Intermediate Representation \\ Version 2.2}
 
 \begin{document}
 \maketitle
+
+\begin{verbatim}
+things to add:
+- initialization
+- hierarchical naming 
+- how to do merges with the packaging semantics
+- direct name invocation of messages
+\end{verbatim}
 
 \section{Basic Constructs}
 
@@ -27,9 +35,16 @@ A block could be represented with the following syntax:
 
 \begin{verbatim}
 Block sum_pairs {
+   // blocks can have private member fields that are visible only
+   // to the member functions of this block
+   int x, y;
+
    // the initialization function is called when the block is 
    // instantiated.
-   init() {}
+   init(int _x, int _y) {
+     x = _x;
+     y = _y;
+   }
 
    // each step of this block will input at 
    // most two items and output at most one
@@ -56,6 +71,12 @@ subclass of the Block type. Its syntax could be as follows:
 
 \begin{verbatim}
 Block my_pipe = pipe {
+  // member fields
+  int x, y;
+
+  // initialization function
+  init() {}
+
   block_1();
   block_2();
   ...
@@ -87,12 +108,12 @@ are:
 \item {\em Round-Robin (splitter/joiner)}.  The round-robin block gets
 (or puts) an item to each of the input (or output) channels in sequence.
 
+\item {\em Null (splitter/joiner)}.  The null block serves as a
+placeholder in constructs that do not require input from the splitter or
+do not pass any output to the joiner.
+
 \item {\em Duplicator (splitter)}.  The duplicator sends a copy of its
 input to each of the output channels.
-
-\item {\em Any (splitter/joiner)}.  We are still thinking about this
-type, but the idea is to output to any channel that isn't full, and to
-input from any channel that isn't empty.
 
 \end{enumerate}
 
