@@ -3,7 +3,7 @@ StreamIt Snapshot Release
 
 This is for the May 28, 2003 snapshot release (streamit-0.0.20030528).
 
-$Id: README,v 1.14 2003-08-07 17:56:33 dmaze Exp $
+$Id: README,v 1.15 2003-08-07 18:17:16 dmaze Exp $
 
 1. What is this?
 2. Dependencies
@@ -55,11 +55,13 @@ StreamIt compiler.  If you are using the binary release, the required
 ANTLR classes are already included in the StreamIt jar file.
 
 The C library depends on the FFTW library; see http://www.fftw.org/.
-FFTW should be installed somewhere in your default compiler search
-path if you are using the uniprocessor compiler backend.  You need to
-build single-precision versions of the library, such that you have an
-srfftw.h and a libsrfftw.a.  If you are building FFTW from source, use
-the --enable-float and --enable-type-prefix options when compiling.
+The StreamIt runtime system currently only supports fftw-2.1.x, not
+the newer fftw-3.0 branch.  FFTW should be installed somewhere in your
+default compiler search path if you are using the uniprocessor
+compiler backend.  You need to build single-precision versions of the
+library, such that you have an srfftw.h and a libsrfftw.a.  If you are
+building FFTW from source, use the --enable-float and
+--enable-type-prefix options when compiling.
 
 Compilation for RAW depends on the most recent released RAW build
 environment (as of this release, raw_dist_2003_03_18).  The TOPDIR
