@@ -1,7 +1,7 @@
 #
 # The CVS Modules File
 #
-#ident	"@(#)cvs/examples:$Name: not supported by cvs2svn $:$Id: modules,v 1.2 1997-08-20 22:02:40 beng Exp $"
+#ident	"@(#)cvs/examples:$Name: not supported by cvs2svn $:$Id: modules,v 1.3 1997-08-20 22:05:20 beng Exp $"
 #
 # Three different line formats are valid:
 #	key	-a    aliases...
@@ -32,15 +32,15 @@
 world		-a .
 
 # CVSROOT support
-CVSROOT		-i /usr/local/bin/mkmodules CVSROOT
-commitinfo	-i /usr/local/bin/mkmodules CVSROOT commitinfo
-cvswrappers	-i /usr/local/bin/mkmodules CVSROOT cvswrappers
-editinfo	-i /usr/local/bin/mkmodules CVSROOT editinfo
-modules		-i /usr/local/bin/mkmodules CVSROOT modules
-loginfo		-i /usr/local/bin/mkmodules CVSROOT loginfo
-rcsinfo		-i /usr/local/bin/mkmodules CVSROOT rcsinfo
-rcstemplate	-i /usr/local/bin/mkmodules CVSROOT rcstemplate
-taginfo		-i /usr/local/bin/mkmodules CVSROOT taginfo
+CVSROOT		-i mkmodules CVSROOT
+commitinfo	-i mkmodules CVSROOT commitinfo
+cvswrappers	-i mkmodules CVSROOT cvswrappers
+editinfo	-i mkmodules CVSROOT editinfo
+modules		-i mkmodules CVSROOT modules
+loginfo		-i mkmodules CVSROOT loginfo
+rcsinfo		-i mkmodules CVSROOT rcsinfo
+rcstemplate	-i mkmodules CVSROOT rcstemplate
+taginfo		-i mkmodules CVSROOT taginfo
 
 # Add more modules here 
 #
