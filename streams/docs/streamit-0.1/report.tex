@@ -9,6 +9,9 @@
 
 \begin{enumerate}
 
+\item What are the semantics of re-initialization of filter blocks?
+What do we do about flushing pipelines, etc?
+
 \item If we're building on top of C, then how do we pass a string
 between filters without using pointers?  What is the exact restriction
 on pointers, then?
@@ -26,6 +29,18 @@ and a sink?  A {\tt SourceSinkBlock}?  Maybe we should make that the
 top-level construct instead of {\tt Stream} I was thinking that the
 outer-most level is more like a Pipe than a FilterBlock, but then we
 can't have member variables, so this will need revising.
+
+\item Do we want the message delivery units to be in terms of the {\it
+receiever's} work function?  It seems like that might make more sense
+to the programmer (?)
+
+\item Why don't we change messages to be arbitrary point-to-point
+function calls?  Then the names could be more descriptive than {\tt
+handleMessage}, and multiple parameters could be passed instead of
+having to pack and unpack a user-defined structure.  (Also, just
+dispatching method calls on the type of structure could be
+confusing--for instance, if two different senders want to send the
+same type of data to different targets within a filter block.)
 
 \end{enumerate}
 
@@ -48,11 +63,19 @@ represent) if it's not an object--it's a collection of blocks, but
 it's a control construct?  Then what if it's exactly one block?  Then
 it's not an object anymore?  Doesn't make sense.
 
+\item Is it ok not to require break statements at the end of each {\tt
+case} in a {\tt StreamSelect}?  We'd differ from standard convention,
+but would anyone use the fall-through feature?
+
 \end{enumerate}
 
 \section{To improve this document...}
 
 \begin{enumerate}
+
+\item Add lots of examples.
+
+\item Replace my dinky syntax defs with the actual grammar.
 
 \item Better / more clear distinction between initialization time and
 steady state streaming time.  And then scripting time, too.
@@ -69,8 +92,6 @@ blocks'', etc.
 
 \item Make it clear that FilterBlocks can contain streams, not just
 blocks.
-
-\item Add spec. for message delivery time with @ syntax.
 
 \end{enumerate}
 
@@ -107,7 +128,7 @@ Stream {
 
   Filter {
     input String myInput;
-    input String myOutput;
+    output String myOutput;
 
     work() {
       output[0] = input[0] + ``World!'';
@@ -715,15 +736,16 @@ based on the values of the initialization parameters.
 A filter can send dynamic messages from within its {\tt work}
 function.  The syntax is as follows:
 
-{\it filter-ref-target}.{\tt handleMessage(}{\it msg}{\tt ) %[@ delay | [min-delay, ] max-delay]}
+\medskip
+{\it filter-ref-target}.{\tt handleMessage(}{\it msg}{\tt) }[{\tt @ }{\it delay} $|$ {\tt (}{\it min-delay}, {\it max-delay}{\tt )}]
+\medskip
 
 Let us examine the different parts of this statement:
 
 \begin{itemize}
 
-\item The message {\it msg} is an instance of a user-defined type.
-This type can be a primitive or structure, so long as the structure
-does not contain pointers.
+\item The message {\it msg} is an instance of a primitive type or a
+user-defined structure that does not contain pointers.
 
 \item The target of the message is given by {\it filter-ref-target},
 of type {\it FilterRef}.  In the event that {\it filter-ref-target} is
@@ -732,7 +754,23 @@ handleMessage} method with the appropriate parameter type.  If such a
 method exists, it is invoked with {\it msg} as the argument;
 otherwise, the message has no effect.  If the target is instead a
 filter block, then the above procedure is repeated in a top-down
-fashion for every filter within the block.
+fashion for every filter within the block.  In this case, ``top-down''
+means that every filter is guaranteed that those blocks who dominate
+it will receive the message before it does.
+
+\item The optional @ syntax at the end of the statement indicates when
+the message should be delivered.  The units of measurement are
+executions of the {\it sender's} {\tt work} function.  If the message
+delay is $k$, then the handler will be invoked (not necessarily
+finishing) between the $(k-1)$'th and $k$'th fresh execution of {\tt
+work}.  One may specify either an exact {\it delay}, or a range of
+acceptable delays {\it (min-delay, max-delay)}.  If no delay is
+specified, then the compiler makes a best-effort attempt to deliver
+the message quickly.  The compiler will generate a warning message if
+a specified delay is so small that it restricts its scheduling of the
+stream; likewise, an error will be generated if the scheduling
+constraints make it impossible to deliver a message as quicly as
+requested.
 
 \end{itemize}
 
@@ -745,23 +783,52 @@ state.
 
 \subsubsection{Re-Initialization}
 
-\begin{verbatim}
-- ref.reset(<dynamic parameters>). static params do not need to be
-passed again because they don't change from one instantiation to the
-next
-- legal to initialize from within work function and message handlers
-of Filters, but not from within initialization code.
-- semantics of flushing streams?
-\end{verbatim}
+Filters can re-initialize blocks from within their {\tt work} function
+and message handlers.  Re-initialization can not be done from within
+initialization code.  The syntax is as follows:
+
+\medskip
+{\it filter-ref-target}.{\tt reset(}{\it param$_1$, param$_2$, \dots, param$_n$}{\tt) }[{\tt @ }{\it delay} $|$ {\tt (}{\it min-delay}, {\it max-delay}{\tt )}]
+\medskip
+
+The re-initialization signal is delivered to a block just like any
+other message.  Upon receiving the re-initialization message, the
+target block executes all of its initialization code just as it did in
+the beginning, but with the parameters specified by the caller.  
+
+The compiler guarantees that there is a clean transition between the
+old and the new blocks (as far as flushing pipelines, etc), but {\bf
+we still need to work out the details}.
 
 \subsubsection{StreamSelect}
 
-\begin{verbatim}
-- now that we have construct for re-initialization, might
-	want to dynamically change part of stream structure
-- switches on an enumerated type with cases
-- the enumerated variable is dynamic
-\end{verbatim}
+Now that we have a method of re-initializing blocks, it is natural to
+consider a control construct that can produce different stream
+structures depending on the initialization parameters.  In this way, a
+filter can change the structure of the stream dynamically, albeit
+through an expensive re-initialization operation that should be used
+sparingly.  The {\tt StreamSelect} construct serves this purpose; its
+syntax is as follows:
+
+{\tt StreamSelect(} {\it switch-expr} {\tt )} \{ \\ \\
+\> {\tt case }{\it const-literal$_1$}{\tt :  }{\it stream$_1$}; \\
+\> {\tt case }{\it const-literal$_2$}{\tt :  }{\it stream$_2$}; \\
+\> \dots \\
+\> {\tt case }{\it const-literal$_n$}{\tt :  }{\it stream$_{n}$}; \\
+\> [{\tt default}{\tt :  }{\it stream$_{default}$};] \\
+\}
+\end{tabbing}
+
+The stream returned by the {\tt StreamSelect} construct is a function
+of the value of {\it switch-expr}, which must be of a type allowed by
+the standard C {\tt switch} statement.  Also familiar from a common
+{\tt switch} statement is 1) the in-order evaluation of the {\tt case}
+statements, and 2) the optional {\tt default} case, which is evaluated
+if none of the case statements match.  However, the semantics differ
+from the traditional {\tt switch} statement in that we do not require
+{\tt break} commands to return control out of a given case; rather,
+control returns by default instead of falling through to the next
+case.
 
 \section{Scripting Language}
 \label{sec:script}
