@@ -21,14 +21,15 @@ of the actors in a steady state schedule, such that the temporal
 locality in the memory hierarchy is improved. Our approach is to find a
 single multiplicity factor \texttt{M} for scaling all actors, such that
 at least 90\% of the actors have a data workingset that fits in the cache.
-In other words, using our model, we calculate $M$ such that 
-$S(f) + D(f) \leq C_D$ and $DCM(f) = 0$ for 90\% of the actors in the
-stream graph.
+In other words, using our model, we calculate \texttt{M} such that 
+$S(f) + D(f) \leq C_D$
+% and $DCM(f) = 0$ % this is wrong!
+for 90\% of the actors in the stream graph.
 
 The algorithm 
 computes the largest scaling factor for every actor such that its data
 workingset does not exceed the size of the primary data cache
-(16~Kb on P3 for example). This yields a set of multiplicities
+(16~Kb on a Pentium~3 for example). This yields a set of multiplicities
 ${\texttt{M}_0, \ldots, \texttt{M}_n}$ for the actors in the stream
 graph. For example, the algorithm might calculate
 $\texttt{M}_\texttt{A} = 10$,
@@ -37,13 +38,14 @@ $\texttt{M}_\texttt{C} = 30$,
 $\texttt{M}_\texttt{D} = 40$ for four filters \texttt{A}, \texttt{B},
 \texttt{C}, and \texttt{D} in a stream graph.
 The algorithm then examines the
-distribution and selects the $\texttt{M}_i$
+distribution and selects the largest $\texttt{M}_i$
 for which 90\% of the actors satisfy our data workingset criterion.
 In the example, the 90-10 heuristic
-selects $\texttt{M} = 10$; by contrast,
+selects $\texttt{M} = 10$, otherwise, the workingset of filter
+\texttt{A} will exceed the cache. By contrast,
 a 75-25 heuristic selects $\texttt{M} = 20$, where 75\% of the
 data workingsets are smaller than the cache, and the remaining 25\%
-overflowing the it.
+overflowing it.
 
 The 90-10 heuristic was determined empirically. We found that
 increasing the threshold beyond 90\% leads to marginal

@@ -81,8 +81,8 @@ a splitjoin, the {\it splitter} performs the data scattering, and the
 filter with a single input and  multiple output channels. On 
 every execution step, it can distribute its output to any one of
 its children in either a {\it duplicate} or a {\it roundrobin}
-manner. For the former, incoming data is replicated to every
-sibling connected to the splitter. For the latter, data is scattered
+manner. For the former, incoming data are replicated to every
+sibling connected to the splitter. For the latter, data are scattered
 in a round-robin manner, with each item sent to exactly one child
 stream, in order.  The splitter type and the weights for distributing data to
 child streams are declared as part of the syntax (e.g., \texttt{split
@@ -90,7 +90,7 @@ duplicate} or \texttt{split roundrobin($w_0$, $w_1$, ... $w_n$)}). The
 splitter counterpart, the joiner, is a specialized filter with  
 multiple input channels but only one output channel. The joiner
 gathers data from its predecessors in a round-robin manner (declared
-as part of the syntax). 
+as part of the syntax) to produce a single output stream.
 
 StreamIt also provides a {\it feedback loop} construct for introducing
 cycles in the graph.

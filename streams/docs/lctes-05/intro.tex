@@ -74,7 +74,7 @@ The fusion allows for better register allocation as we can
 destroy the arrays used to buffer data between the actors and replace
 the corresponding array references with scalars.  It also allows for
 various competing implementations for managing the buffers between the
-fused actors.  This paper evaluates several implementation
+fused actors.  This paper investigates several implementation
 alternatives (for buffer management) and evaluates their performance
 (Section~\ref{sec:buffer}).
 
@@ -122,7 +122,7 @@ While both scaling and fusion lead to modest performance gains, we
 must combine the two to deliver the best possible performance. When we
 do so, we can further improve the performance of our benchmarks by
 53\% on average for the Pentium~3, and 55\% for the Itanium~2.
-Section~\ref{sec:evaluation} reports describes our evaluation
+Section~\ref{sec:evaluation} describes our evaluation
 methodology and presents our experimental analysis.
 
 In summary, this paper makes the following contributions:
