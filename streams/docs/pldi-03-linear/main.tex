@@ -3,8 +3,8 @@
 \usepackage{doublespace}
 \usepackage{epsfig}
 
-\title{Linear Data Analysis and Optimization in a Streaming Language}
-\author{Andrew A. Lamb and Saman Amarasinghe}
+\title{Linear Data Analysis and Optimization in StreamIt}
+\author{Andrew A. Lamb \\ Saman Amarasinghe}
 \date{\today}
 
 \begin{document}
@@ -12,40 +12,13 @@
 \maketitle
 \clearpage
 
-\section{Abstract}
 
-
-\section{Introduction}
-Something about DSP being important
-
-Something about Streamit being cool
-
-Something about taking advantage of both StreamIt's one input one output and 
-the fact that we know what a large class of programs is going to be doing 
-(namely dsp and FIRs, etc).
-
-Remember to cite \cite{xiong-thesis,xiong01spl,johnson01searching,egner01automatic} etc.
-
-
-\section{Filter-Matrix Representations}
-\begin{figure}
-\center
-\epsfxsize=4.5in
-\epsfbox{images/general-picture.eps}
-\caption{General Linear Filter Picture}
-\label{fig:overview}
-\end{figure}
-
-\subsection{Extraction}
-\subsection{Container Combination(propagation)}
-
-\section{Optimizations}
-\subsection{Common Sub Expression Elimination for free}
-\subsection{Frequency Implementation}
-
-\section{results}
-
-
+\input{abstract}
+\input{introduction}
+\input{matrix}
+\input{optimization}
+\input{results}
+\input{conclusion}
 
 % Bibliography -- whee!
 \begin{small}

@@ -1,0 +1,46 @@
+\section{Introduction}
+As more and more parts of modern life use digital computation, from cell phones to GPS systems
+and satellite radio systems, the importance of digitally processing signals is growing.
+Each successive generation of applications requires ever more sophisticated algorithms mapped 
+on to ever more specialized processors. Since embedded computers have severe performance
+requirements placed on them, typically the mapping of algorithm to architecture is done by hand.
+When writing optimized assempbly for the latest DSP processors, one has to map the same algorithm
+and time again. This remapping is costly arduous process that slows the pace of advance
+because it forces engineers to spend time working out details rather than focusing on new technology.
+
+\subsection{StreamIt}
+\begin{figure}
+\center
+\epsfxsize=4.5in
+\epsfbox{images/streamit-structures.eps}
+\caption{StreamIt Structures: Pipeline, Splitjoin, and FeedbackLoop.}
+\label{fig:structures}
+\end{figure}
+
+The StreamIt\cite{thies02streamit,thies01streamit,william-stream,michal-common} project
+aims to provide a common language and compiler for streaming computations. Streaming computations
+are characterized by data streaming in and out of the system while each data element (both
+input and output) is in the system for only a small amount of time. 
+StreamIt programs are composed of processing blocks called {\tt Filters} which
+contain an input tape from which they can read values and an output tape to which
+they can write values. {\tt Filters} are composed heirarchally into structures to form
+a Stream Graph representation of the program (*need to explain stream graph).
+ 
+{\tt Pipelines} represent the serial computation of one filter after another.
+{\tt SplitJoins} represent parallel computation. {\tt FeedbackLoops} allow cycles
+to be introduced into the stream graph. Figure~\ref{fig:structures} shows a {\tt Pipeline},
+{\tt SplitJoin} and a {\tt FeedbackLoop}. StreamIt programs do not support arbitrary connections
+between {\tt Filters} and as such not every stream graph is expressable. Most real world programs
+can be fit into the structured stream model, even if it takes some extra manipulation. We believe
+that benefits of structure outweigh and costs associated with it.
+
+\subsection{Matrices and Digital Signal Processing}  
+We take advantage of StreamIt's one input one output computation blocks and 
+our observations that a large class of likely StreamIt programs are performing
+digital signal processing functions (eg filtering of the data) to do domain specific
+optimizations on the program.
+
+Remember to cite \cite{xiong-thesis,xiong01spl,johnson01searching,egner01automatic} about
+past work on automatic matrix factorization and automatic code generation within the 
+SPIRAL\cite{spiral} project. Also interesting to note is the work done at UTenn Knoxville 
+with the ATLAS package\cite{whaley01automated}.
