@@ -1,5 +1,11 @@
 all: main.ps
 
+sub: main.ps main.pdf
+	cp main.ps p94-lamb.ps
+	cp main.pdf p94-lamb.pdf
+	cp whole-submission.tex p94-lamb.tex
+
+
 main.ps: main.dvi
 	dvips -P cmz -t letter -o main.ps main.dvi
 #	cp main.ps ${HOME}/public_html/pldi.ps
