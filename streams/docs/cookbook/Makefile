@@ -32,4 +32,4 @@ clean:
 	rm -f *~ *.aux *.log *.bbl *.blg *.toc
 
 cookbook.dvi: overview.tex minimal.tex moving-average.tex lpf.tex bpf.tex \
-	equalizer.tex echo.tex fib.tex
+	equalizer.tex echo.tex fib.tex keywords.tex \
