@@ -4,7 +4,6 @@
 \begin{table}[t]
 \center
 \label{tab:benchmarks}
-\caption{Evaluation benchmark suite.}
 {\tiny
 \begin{tabular}{|c|c|c|} \hline
 {\bf Benchmark}&{\bf description}&{\bf \# of actors}\\ \hline \hline
@@ -21,6 +20,8 @@
 \texttt{ofdm	 }&OFDM SpectrumWare performance test	&	16 \\ \hline
 \end{tabular}
 }
+\vspace{-12pt}
+\caption{Evaluation benchmark suite.}
 \end{table}
 
 
@@ -38,15 +39,21 @@ outputs an functionally equivalent C program that is compiled with the
 % Each benchmark is
 % then run five times, and the median user time is recorded.
 
-\begin{figure}
-  \psfig{figure=p3-caf.eps, width=3.4in}
-  \caption{Performance results for a Pentium~3.}
+\begin{figure}[t]
+  \vspace{-24pt}
+  \hspace{-0.3in}\psfig{figure=p3-caf.eps, width=3.7in}
+  \vspace{-48pt}
+  \caption{Performance results for a Pentium~3.  The bars for each
+  benchmark appear in the same order as the legend.}
   \label{fig:results-p3}
 \end{figure}
 
-\begin{figure}
-  \psfig{figure=itanium-caf.eps, width=3.4in}
-  \caption{Performance results for an Itanium~2.}
+\begin{figure}[t]
+  \vspace{-24pt}
+  \hspace{-0.3in}\psfig{figure=itanium-caf.eps, width=3.7in}
+  \vspace{-48pt}
+  \caption{Performance results for an Itanium~2.  The bars for each
+  benchmark appear in the same order as the legend.}
   \label{fig:results-ipf}
 \end{figure}
 
