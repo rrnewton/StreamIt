@@ -29,6 +29,7 @@
 \def\Suif{\textsc{Suif}}
 \def\suifvm{\texttt{suifvm}}
 \def\vliw{\textsc{vliw}}
+\def\vm{\textsc{vm}}
 \def\xml{\textsc{xml}}
 \def\Xml{\textsc{Xml}}
 \def\machsuif{Machine \suif}
@@ -128,6 +129,76 @@
 \item Perhaps \class{BlockContainer} should be replaced by
   \class{Function}; are there other interesting case of containers?
   [Bill]
+
+\item Probably want more widespread use of annotations.
+
+  \emph{Makes sense.  I'm not sure how much we actually want to
+    annotate; annotations on instructions, blocks, and symbols all
+    make sense, but on individual operands might be a bit excessive.
+    Annotating blocks is also a little risky if blocks are going to be
+    repeatedly refactored.  ---dzm}
+
+\item \Suif's approach to types, using explicit bit sizes on types, is
+  good.  This implies that a general type-conversion instruction is
+  necessary.  Not having types on constants is fine, though.  [Mike K]
+
+\item While control flow graphs can be useful, should they be the only
+  representation of the program?  Having a flat graph can be useful.
+  [Mike K]
+
+  \emph{After discussion in the meeting, it sounds like people are
+    happy if there isn't a hard global invariant that the \cfg{}
+    representation isn't a fixed minimal control-flow graph of basic
+    blocks.  In particular, Mike is satisfied if the representation
+    has a ``flatten'' call that produces a single \class{Block}
+    containing all of the code for a function.  In turn, this means
+    that branch and label instructions are necessary in the \vm{}
+    layer.  Functions to do common \cfg{} manipulations such as
+    ``insert a block before this one'' also are important.}
+
+\item \Ssa{} is a bit overrated.  We don't necessarily want to use it
+  everywhere, and it's not useful for array references and globals.
+  [Everybody]  ``It's fine if it's optional.''
+
+  \emph{The \ssa-with-numbers approach does make \ssa{} pretty
+    optional; if you don't want to use the \ssa{} information, you can
+    just ignore it.  Since recomputing the liveness information can
+    take time and passes might not need it, this means that passes
+    using \ssa{} should be forced to recompute the relevant
+    information.  Dealing with arrays and globals is an issue,
+    though.  ---dzm}
+
+\item The \ir{} has an operand field for predicates; the input \vm{}
+  code should be unpredicated, though.
+
+\item Having array and field access instructions in the \vm{} is
+  useful for analysis.  It's better to have the instructions and
+  dismantle them than to not have the instructions and be forced to
+  reconstruct the information.  [Mike K]
+
+\item \Suif{} has ``registers'' and ``memory'', but no ``symbols''.
+  Registers in this world can be virtual registers, or can be bound to
+  a hard register.  This means that the symbol table hierarchy can be
+  eliminated, or at least reduced.  It also simplifies generating
+  temporaries.  [Mike K]
+
+  \emph{I suspect the concept of a symbol is still useful; if nothing
+    else, you might want to annotate it for alias analysis.  At this
+    \ir{} level, we can deal with field variables by putting them in a
+    structure that's a function parameter.  This just leaves globals,
+    which fall into the ``memory'' world.  I'm fine with dumping
+    symbol tables.  ---dzm}
+
+\item Explicit $\phi$-nodes are useful for \ssa.  Without them, it can
+  be hard to find the definition(s) for a particular variable.
+
+\item User-level constants should all be put into globals in the
+  program, rather than being used as immediates.
+
+\item There should be strong invariants for the \ir{} that passes can
+  easily check.  Similarly, there should be coding standards for
+  writing passes so that people who aren't us don't screw it up.
+  [Mike K]
 
 \end{itemize}
 \end{document}
