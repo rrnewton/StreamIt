@@ -12,7 +12,7 @@
 
 \noindent
 This is for the May 28, 2003 snapshot release (streamit-0.0.20030528).\\
-\verb|$Id: readme.tex.in,v 1.1 2003-08-25 15:31:42 dmaze Exp $|
+\verb|$Id: readme.tex.in,v 1.2 2003-09-10 14:42:03 dmaze Exp $|
 
 \section{What is this?}
 
@@ -99,10 +99,6 @@ research compiler; as such, it has several known shortcomings:
 \item Multidimensional arrays may not work well, particularly as the
    input or output type of a filter.  (Better performance is often
    possible by destructuring arrays in any case.)
-
-\item enqueue statements can only occur outside of any control flow, and
-   can only enqueue fixed constant values, not expressions involving
-   stream parameters or other compile-time constants.
 
 \item Phased filter support differs between the compiler and library.  A
    work function that consists only of calls to phase functions should
