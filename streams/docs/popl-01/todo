@@ -1,6 +1,9 @@
 ------------------------------------------------------------------------
 Big things to think about
 
+0. how exactly to define the latency of a feedback loop in terms of
+wavefronts and stuff, hmm.
+
 1. operational semantics
 2. message sending syntax
 3. letting init codes cause an offset (do push() on output)
@@ -52,4 +55,9 @@ isn't supported in all langs.
 9. reorganize the derivations of min/max so that stuff leaving the
 split/join and stuff entering the split/join is together?  then the
 similar equaionts are placed next to each other.
+
+10. aha!-- minimum that you need at output of feedback joiner to have
+consumable amount at end of loop-back should be added to latency times
+something to get the number of items to init on the input channel to
+the feedback loop.
 

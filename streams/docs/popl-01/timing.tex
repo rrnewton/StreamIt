@@ -145,7 +145,10 @@ in Figure {\ref:splitjoin}.  For the splitter $S$ there are two output
 tapes; let us denote them by $O1_S$ and $O2_S$.  Similarly, let us
 denote the two input tapes of the joiner $J$ by $I1_J$ and $I2_J$.  We
 now derive the transfer functions for round robin and
-duplicate/combine nodes.
+duplicate/combine nodes.  Note that the duplicate/combine nodes can be
+simulated with round robins and duplicating filters, but we provide
+the transfer functions anyways to simplify the semantic analysis of a
+program.
 
 {\bf Round robin splitter.}  In the case of a round-robin splitter, the
 items from the input tape are alternately routed to the output tapes,
@@ -198,6 +201,35 @@ as follows:
 \mi{I1_J}{O_J}(x) = x \\
 \mi{I2_J}{O_J}(x) = x
 \end{eqnarray*}
+
+\subsubsection{FeedbackLoops}
+
+\begin{figure}[t]
+\scriptsize
+\begin{verbatim}
+Here I want a feedback diagram, labelled as:
+
+         LOOP  
+      /        \
+
+A - FJ - BODY - FS - ->
+
+\end{verbatim}
+\vspace{-12pt}
+\caption{\protect\small  FeedbackLoop labeling.
+\protect\label{looplabel}}
+\vspace{-12pt}
+\end{figure}
+
+We have to be careful when defining the transfer functions for
+feedback loops (see Figure {\ref:looplabel}).  The feedback splitter
+$FS$ serves as a normal splitter, and has the same $min$ and $max$
+functions as defined above.  However, the feedback joiner $FJ$, even
+though it functions like a normal joiner, 
+
+\subsection{Formulating Constraints}
+
+\subsection{Semantics}
 
 \begin{verbatim}
 
