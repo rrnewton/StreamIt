@@ -53,6 +53,13 @@ language and compiler such as StreamIt.  Consequently, it has fewer
 opportunities for global transformations such as fission and
 reordering.
 
+Proebsting and Watterson \cite{pro96} present a filter fusion
+algorithm that interleaves the control flow graphs of adjacent nodes.
+However, they assume that nodes communicate via synchronous {\tt get}
+and {\tt put} operations, such that StreamIt's asynchronous peek
+operations and implicit buffer management fall outside the scope of
+their model.  
+
 A large number of programming languages have included a concept of a
 stream; see \cite{survey97} for a survey. However, the compilers for
 these languages have focused only on efficient sequential execution of

@@ -17,7 +17,7 @@ FM Radio & A software-based FM Radio with equalizer.\\
 \hline
 GSM & A GSM decoder.\\
 \hline
-BeamFormer & A core component of modern radar, sonar, and communications signal processors. \cite{pca}\\
+\BeamFormer & A core component of modern radar, sonar, and communications signal processors. \cite{pca}\\
 \hline
 FFT & A 64-element FFT. \\
 \hline
@@ -40,7 +40,7 @@ CRC & A 32-bit Cyclic Redundancy Check (CRC) Encoder/Decoder. \\
 %\item A GSM Decoder, which takes GSM-encoded parameters as
 %inputs, and uses these to synthesize audible speech, 
 %
-%\item A beamformer
+%\item A \BeamFormer
 %which encapsulates the core functionality of modern radar, sonar, and
 %communications signal processors -- modeled after a system from the
 %Polymorphic Computing Architecture (PCA) \cite{pca}
@@ -88,9 +88,9 @@ CRC & A 32-bit Cyclic Redundancy Check (CRC) Encoder/Decoder. \\
 {\bf MFLOPS}
 \\
 \hline \hline
-BeamFormer (12x4) & 596 & 53 & 1.1 & 619 & 15 & 2.7 & 1470 \\
+\BeamFormer (12x4) & 596 & 53 & 1.1 & 619 & 15 & 2.7 & 1470 \\
 \hline
-BeamFormer (48x16) & 596 & 209 & N/A & N/A & 15 & 0.3 & 836\\
+\BeamFormer (48x16) & 596 & 209 & N/A & N/A & 15 & 0.3 & 836\\
 \hline
 FM Radio & 511 & 14 & 34 & 107 & 13 & 81 & 258\\
 \hline
@@ -140,11 +140,11 @@ transformations on throughput and tile utilization, respectively.
 
 The results show that for programs with substantial computation
 requirements, the StreamIt compiler is able to extract good
-performance out of the Raw processor.  For example, the BeamFormer
+performance out of the Raw processor.  For example, the \BeamFormer
 application (see Figure~\ref{fig:beamcode} for source code) shows a
 sustained 1.47 GFLOPS rate, after a 145\% improvement due to our
 optimizations.  Figures~\ref{fig:beam-orig} and~\ref{fig:beam-opt}
-give the original and optimized configurations of the BeamFormer's
+give the original and optimized configurations of the \BeamFormer's
 stream graph, and Figure~\ref{fig:beam-blood} illustrates the impact
 of our load balancing optimizations .
 %
@@ -162,13 +162,13 @@ of our load balancing optimizations .
     Load-balanced.\label{fig:beam-blood2}]{\psfig{figure=beam-blood-opt.eps,width=3in}
     \vspace{-6pt}} \vspace{-6pt} \caption{Execution traces for the (a)
     original (on 64 tiles) and (b) load-balanced (on 16 tiles)
-    partitionings of the BeamFormer.  Graphs are shaded as in
+    partitionings of the \BeamFormer.  Graphs are shaded as in
     Figure~\ref{fig:fm-blood}. \protect\label{fig:beam-blood}}
 \end{center}
 \vspace{24pt}
 \small
 \begin{verbatim}
-                         class BeamFormer extends Pipeline {
+                         class \BeamFormer extends Pipeline {
                          
                             void init(numChannels, numBeams) {
                                add(new SplitJoin() { 
@@ -196,16 +196,16 @@ of our load balancing optimizations .
                             }
                          }
 \end{verbatim}
-\caption{\protect\small Top-level StreamIt code for the BeamFormer.\protect\label{fig:beamcode}}
+\caption{\protect\small Top-level StreamIt code for the \BeamFormer.\protect\label{fig:beamcode}}
 \end{figure}
 
 \begin{figure}
 \centering
 \psfig{figure=beam-graph-orig.eps,width=6.5in}
-\caption{\protect\small Stream graph of the original 12x4 BeamFormer.  The 12x4 BeamFormer has 12 channels and 4 beams; it is the largest version that fits onto 64 tiles without filter fusion.  \protect\label{fig:beam-orig}}
+\caption{\protect\small Stream graph of the original 12x4 \BeamFormer.  The 12x4 \BeamFormer has 12 channels and 4 beams; it is the largest version that fits onto 64 tiles without filter fusion.  \protect\label{fig:beam-orig}}
 \vspace{36pt}
 \psfig{figure=beam-graph-opt.eps,width=6.5in}
-\caption{\protect\small Stream graph of the load-balanced 12x4 BeamFormer.  Vertical fusion is applied to collapse each pipeline into a single filter, and horizontal fusion is used to transform the 4-way SplitJoin into a 2-way SplitJoin.
+\caption{\protect\small Stream graph of the load-balanced 12x4 \BeamFormer.  Vertical fusion is applied to collapse each pipeline into a single filter, and horizontal fusion is used to transform the 4-way SplitJoin into a 2-way SplitJoin.
 Figure~\ref{fig:beam-blood} shows the benefit of these
 transformations. \protect\label{fig:beam-opt}}
 \end{figure}
