@@ -7,15 +7,6 @@
 \vspace{-12pt}
 \end{figure}
 
-\begin{figure}[t]
-\vspace{-12pt}
-\psfig{figure=images/execution-speedup.eps,width=3.5in}
-\vspace{-12pt}
-\caption{Execution speedup for linear replacement, frequency replacement, and automatic optimization selection.}
-\label{fig:execution-speedup}
-\vspace{-6pt}
-\end{figure}
-
 \begin{table*}[t]
 \vspace{-6pt}
 \centering
@@ -69,6 +60,15 @@ implement as a matrix multiply.  For small nodes (less than 256
 operations), this takes the form of an unrolled arithmetic expression,
 whereas for large nodes we implement an indexed matrix multiply that
 avoids zero entries at the top and bottom of each column.
+
+\begin{figure}[t]
+\vspace{-12pt}
+\psfig{figure=images/execution-speedup.eps,width=3.5in}
+\vspace{-12pt}
+\caption{Execution speedup for linear replacement, frequency replacement, and automatic optimization selection.}
+\label{fig:execution-speedup}
+\vspace{-6pt}
+\end{figure}
 
 \item {\it Frequency replacement}, which transforms maximal linear
 sections of the stream graph into a single node in the frequency

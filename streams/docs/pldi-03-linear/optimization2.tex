@@ -11,7 +11,6 @@ transforming linear nodes to frequency.
 
 \subsection{Basic Frequency Implementation}
 
-
 Our first goal is to show that the computation of a linear node can be
 represented as a convolution sum.  Consider executing $m$ iterations
 of a linear node $\lambda = \{A, {\vec 0}, e, 1, 1\}$---that is, a
@@ -99,7 +98,7 @@ $\mbox{pop}=1$.)
 \begin{transformation} ({\Naive} frequency implementation)
 Given a linear node $\lambda = \{A, {\vec b}, e, o, u\}$, the
 following stream is a {\naive} implementation of $\lambda$ in the
-frequency domain: \\
+frequency domain:
 \begin{equation} \nonumber
 {\small
   \begin{array}{ll}
@@ -140,6 +139,7 @@ frequency domain: \\
     {\tt \}}
   \end{array}}
 \end{equation}
+\vspace{-6pt}
 \label{trans:freq1}
 \end{transformation}
 
@@ -171,20 +171,29 @@ amount of input~\cite{oppenheim-discrete}.
 %% iteration can peek at values in the range of $[m,2m-1]$, we have (by
 %% the same reasoning as above) that $k \in [$.
 
-\begin{transformation} (Optimized frequency implementation)
+\begin{transformation} \label{trans:freq1}
+(Optimized frequency implementation)
 Given a linear node $\lambda = \{A, {\vec b}, e, o, u\}$, the
 following stream is an optimized implementation of $\lambda$ in the
-frequency domain: \\
+frequency domain:
 \begin{equation} \nonumber
 {\small
   \begin{array}{ll}
-
     {\tt float \rightarrow float}~{\tt pipeline~optimizedFreq~}(A, {\vec b}, e, o, u){\tt ~\{} & \hspace{40pt}\\
     ~~{\tt add~float \rightarrow float~filter~\{}\\
     ~~~~N \leftarrow 2^{\lceil \lg(2e) \rceil} \\
     ~~~~m \leftarrow N-2e+1 \\
     ~~~~\vec{partials} \leftarrow {\tt new~array}[0 \dots (e-1)-1, 0\dots u-1] \\
     ~~~~r \leftarrow m+e-1 \\
+\end{array}
+}
+\end{equation}
+\end{transformation}
+
+\begin{equation} \nonumber 
+\small{
+\begin{array}{ll}
+\vspace{-24pt}
     \\
     ~~~~{\tt init}~{\tt \{} \\
     ~~~~~~{\tt for}~j=0~to~u-1\\
@@ -224,8 +233,6 @@ frequency domain: \\
     {\tt \}} \\
   \end{array}}
 \end{equation}
-\label{trans:freq1}
-\end{transformation}
 
 \subsection{Applications of Frequency Transformation}
 
