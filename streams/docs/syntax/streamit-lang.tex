@@ -37,7 +37,7 @@
 \lstdefinelanguage{StreamIt}%
 {keywords={filter,pipeline,splitjoin,int,float,complex,void,struct,%
 init,work,push,pop,peek,feedbackloop,enqueue,add,loop,body,%
-splitter,joiner,duplicate,roundrobin,template,string,continue,%
+split,join,duplicate,roundrobin,template,string,continue,%
 break,do,handler,for,while},%
 commentline=//,singlecomment={/*}{*/},%
 %literate={->}{$\rightarrow$}1%
@@ -47,7 +47,7 @@ commentline=//,singlecomment={/*}{*/},%
 \lstdefinelanguage{StreamIt}%
 {keywords={filter,pipeline,splitjoin,int,float,complex,void,struct,%
 init,work,push,pop,peek,feedbackloop,enqueue,add,loop,body,%
-splitter,joiner,duplicate,roundrobin,template,string,continue,%
+split,join,duplicate,roundrobin,template,string,continue,%
 break,do,handler,for,while},%
 comment=[l]//,comment=[s]{/*}{*/},%
 %literate={->}{$\rightarrow$}1%
@@ -331,12 +331,12 @@ filter fields or do other work, but have no access to the filter's
 tapes.
 
 \paragraph{Work functions.}  Work functions are declared using the
-keyword \lstinline|work|, which may be followed by a name.  At most one
-work function may be declared anonymously.  The function name must be
-followed by rate declarations, of the form \lstinline|push expr|,
-\lstinline|peek expr|, and \lstinline|pop expr|.  If the peek
-rate is omitted, it is assumed to be equal to the pop rate; if the pop
-or push rate is omitted, it is assumed to be zero, and the
+keyword \lstinline|work|, which may be followed by a name.  At most
+one work function may be declared anonymously.  The function name must
+be followed by rate declarations, of the form \lstinline|push expr|,
+\lstinline|peek expr|, and \lstinline|pop expr|, in any order.  If the
+peek rate is omitted, it is assumed to be equal to the pop rate; if
+the pop or push rate is omitted, it is assumed to be zero, and the
 corresponding input or output tape type must be \lstinline|void|.  The
 function must push and pop exactly the number of items specified, and
 may peek up to the number of items specified.  All of the rate
@@ -383,10 +383,10 @@ recombined into a single output stream; see section
 
 \begin{lstlisting}{}
 int->int splitjoin AddAndSub {
-  splitter duplicate;
+  split duplicate;
   add IntAdder();
   add IntSubtractor();
-  joiner roundrobin;
+  join roundrobin;
 }
 \end{lstlisting}
 
@@ -406,10 +406,10 @@ input then go through a joiner to the body's input.
 
 \begin{lstlisting}{}
 float->float feedbackloop AddFeedback(float scaling) {
-  joiner roundrobin;
+  join roundrobin;
   body FloatAdder();
   loop FloatScaler(scaling);
-  splitter duplicate;
+  split duplicate;
   enqueue 0.0;
 }
 \end{lstlisting}
@@ -436,15 +436,15 @@ declaration, except that the stream type and name are omitted.
 \begin{lstlisting}{}
 complex->float feedbackloop FeedbackMagnitude(float scaling)
 {
-  joiner roundrobin;
+  join roundrobin;
   body filter {
-    work pop 2 push 1 { push(abs(pop() * pop())); }
+    work pop 2 push 1 { push(abs(peek(0) * peek(1))); pop(); pop() }
   };
   loop pipeline {
-    add(new FloatScaler(scaling));
-    add(new FloatToComplex());
+    add FloatScaler(scaling);
+    add FloatToComplex();
   };
-  splitter duplicate;
+  split duplicate;
 }
 \end{lstlisting}
 
@@ -479,8 +479,8 @@ This statement takes a \emph{stream constructor}; see section
 
 \subsubsection{\lstinline|body| Statement}
 
-The \lstinline|body| statement adds a child stream as the body part of a
-feedback loop.  This statement must appear exactly once in the
+The \lstinline|body| statement adds a child stream as the body part of
+a feedback loop.  This statement must be executed exactly once in the
 initialization code of a feedback loop, and is invalid anywhere else.
 
 This statement takes a \emph{stream constructor}; see section
@@ -494,9 +494,9 @@ to be placed after all other previously enqueued items on the input to
 the feedback loop joiner.  This statement takes a single value
 expression.
 
-\subsubsection{\lstinline|joiner| Statement}
+\subsubsection{\lstinline|join| Statement}
 
-The \lstinline|joiner| statement declares the joiner type of a feedback
+The \lstinline|join| statement declares the joiner type of a feedback
 loop or split-join.  It only appears in initialization code, and is
 invalid in initialization code for any other construct.  This
 statement takes a joiner specification; the only one valid currently
@@ -504,16 +504,16 @@ is \lstinline|roundrobin|, see section \ref{sec:expr-round-robin}.
 
 \subsubsection{\lstinline|loop| Statement}
 
-The \lstinline|loop| statement adds a child stream as the loop part of a
-feedback loop.  This statement must appear exactly once in the
+The \lstinline|loop| statement adds a child stream as the loop part of
+a feedback loop.  This statement must be executed exactly once in the
 initialization code of a feedback loop, and is invalid anywhere else.
 
 This statement takes a \emph{stream constructor}; see section
 \ref{sec:expr-stream-constructor}.
 
-\subsubsection{\lstinline|splitter| Statement}
+\subsubsection{\lstinline|split| Statement}
 
-The \lstinline|splitter| statement declares the splitter type of a feedback
+The \lstinline|split| statement declares the splitter type of a feedback
 loop or split-join.  It only appears in initialization code, and is
 invalid in initialization code for any other construct.  This
 statement takes a splitter specification; only \lstinline|duplicate| and
@@ -783,7 +783,17 @@ It is entirely conceivable that the programmer might want to write a
 set of stateless helper functions that can be used in multiple
 filters.  For example, the GSM encoder we have now uses the C
 preprocessor to include a set of functions to perform 16-bit
-arithmetic.  Syntax for this functionality does not yet exist.
+arithmetic.  Syntax for this functionality does not yet exist, though
+we may create a \lstinline|static| keyword:
+
+\begin{lstlisting}{}
+static MyHelpers {
+  int square(int x) { return x * x; }
+}
+int->int filter SquareIt {
+  work pop 1 push 1 { push(MyHelpers.square(pop())); }
+}
+\end{lstlisting}
 
 \subsection{Multi-Phase Filters}
 
