@@ -16,7 +16,7 @@
 \catcode`\$=12
 \title{StreamIt Language Specification\thanks{
 This is a pre-release version of this document.\hfil\break\ttfamily
-\hbox{$Id: streamit-lang.tex,v 1.11 2002-12-06 19:24:52 dmaze Exp $}
+\hbox{$Id: streamit-lang.tex,v 1.12 2002-12-06 21:20:58 dmaze Exp $}
 }}
 \catcode`\$=3
 
@@ -291,28 +291,26 @@ filter fields or do other work, but have no access to the filter's
 tapes.
 
 \paragraph{Work functions.}  Work functions are declared using the
-keyword \lstinline|work|, which may be followed by a name.  Exactly
-one work function must be declared anonymously.  The function name may
-be followed by rate declarations, of the form \lstinline|push expr|,
+keyword \lstinline|work|.  This keyword may be followed by rate
+declarations; if these are absent, the filter is a \emph{phased
+  filter}.  Rate declarations consist of \lstinline|push expr|,
 \lstinline|peek expr|, and \lstinline|pop expr|, in any order.  If the
 peek rate is omitted, it is assumed to be equal to the pop rate; if
 the pop or push rate is omitted, it is assumed to be zero, and the
 corresponding input or output tape type must be \lstinline|void|.  The
 function must push and pop exactly the number of items specified, and
 may peek up to the number of items specified.  All of the rate
-expressions must be compile-time constant.  Named work functions must
-include rate declarations; anonymous work functions may omit them, as
-described below.
+expressions must be compile-time constant.
 
-\paragraph{Phases.}  If the anonymous work function does not have rate
+\paragraph{Phased filters.}  If the work function does not have rate
 declarations, it may not perform \lstinline|push| and \lstinline|pop|
-operations directly.  However, it may call other named work functions
-which do have these rates declared.  Each of these child work
-functions is executed as a \emph{phase}: the runtime system ensures
-that, when a work function is called, its \lstinline|peek| and
-\lstinline|pop| rates are satisfiable, even if other filters need to
-run for later phases to execute.  Beyond this special use, work
-functions may not be directly called.  For example:
+operations directly.  However, it may call \emph{phase functions},
+which are declared like work functions but begin with the keyword
+\lstinline|phase| and a name, and always have rate declarations.  The
+runtime system ensures that, when a phase function is called, its
+\lstinline|peek| and \lstinline|pop| rates are satisfiable, even if
+other filters need to run for later phases to execute.  Beyond this
+special use, phase functions may not be directly called.  For example:
 
 \begin{lstlisting}{}
 int->int filter BlockReader {
@@ -324,10 +322,10 @@ int->int filter BlockReader {
       echoData();
     readFooter();
   }
-  work readHeader pop 4
+  phase readHeader pop 4
      { pop(); pop(); pop(); pop(); }
-  work echoData pop 1 push 1 { push(pop()); }
-  work readFooter pop 4
+  phase echoData pop 1 push 1 { push(pop()); }
+  phase readFooter pop 4
      { pop(); pop(); pop(); pop(); }
 }
 \end{lstlisting}
@@ -336,27 +334,9 @@ int->int filter BlockReader {
 auxiliary bit of computation, and may be called from the init function
 or the work function.  A helper function has a list of zero or more
 parameters, and returns zero or one values.  A helper function
-declaration contains the return type, an optional keyword
-\lstinline|const|, the \lstinline|helper| keyword, the name of the
-function, the parameter list, and the function body:
-
-\begin{lstlisting}{}
-float const helper add_and_limit(float a, float b) {
-  float c = a + b;
-  if (c > limit) return limit;
-  if (c < -limit) return -limit;
-  return c;
-}
-\end{lstlisting}
-
-A helper function is \lstinline|const| if it has no side effects, such
-as changing the value of a filter field or calling a
-non-\lstinline|const| helper function.  The compiler may inline calls
-to helper functions, and may remove calls to \lstinline|const|
-functions if it finds it appropriate.  For example,
-\lstinline|(0 * constHelper(foo))| can be replaced with a constant
-zero, since the return value of the helper is irrelevant and it has no
-side effects.
+declaration contains the return type, the name of the function, the
+parameter list, and the function body, just like a normal C or Java
+function.
 
 \paragraph{Filter state.}  The top level of the filter may include
 variable declarations.  These variables are visible to every function
@@ -625,7 +605,8 @@ statement takes a splitter specification; only \lstinline|duplicate| and
 \subsection{Work-only Statements}
 
 These statements may only appear within steady-state work code, and in
-particular, within a filter's \lstinline|work| function(s).
+particular, within a filter's \lstinline|work| and \lstinline|phase|
+function(s).
 
 \subsubsection{\lstinline|push| Statement}
 
@@ -775,11 +756,12 @@ built-in math functions.  The math functions are listed in table
 \end{note}
 
 \begin{note}
-  It is conceivable that calls to \lstinline|const| functions with
+  It is conceivable that calls to side-effect-free functions with
   compile-time constant parameters return compile-time constant
   results.  This is not the case for non-built-in functions in the
   current implementation of the compiler; adding this involves
-  inlining helper functions.
+  inlining helper functions, and doing analysis to determine if a
+  helper is in fact side-effect free.
 \end{note}
 
 \begin{table}[htbp]
@@ -951,7 +933,7 @@ we may create a \lstinline|static| keyword:
 
 \begin{lstlisting}{}
 static MyHelpers {
-  int const helper square(int x) { return x * x; }
+  int square(int x) { return x * x; }
 }
 int->int filter SquareIt {
   work pop 1 push 1 { push(MyHelpers.square(pop())); }
@@ -1073,10 +1055,10 @@ byte->byte filter RLEExpand {
     for (int i = 0; i < reps; i++)
       writeData(count);
   }
-  work readReps pop 1 { reps = pop(); }
-  work readCount pop 1 { count = pop(); }
-  work readData(int pos) pop 1 { data[pos] = pop(); }
-  work writeData() push count {
+  phase readReps pop 1 { reps = pop(); }
+  phase readCount pop 1 { count = pop(); }
+  phase readData(int pos) pop 1 { data[pos] = pop(); }
+  phase writeData() push count {
     for (int i = 0; i < count; i++)
       push(data[i]);
   }
