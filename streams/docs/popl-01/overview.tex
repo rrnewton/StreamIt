@@ -1,0 +1,76 @@
+\begin{figure}[t]
+\scriptsize
+\begin{verbatim}
+class EdgeDetector extends Filter {
+  Channel input = new FloatChannel();
+  Channel output = new FloatChannel();
+  
+  FilterPortal portal;
+
+  void init(FilterPortal portal) {
+    this.portal = portal;
+  }
+
+  void work() {
+    float x1 = input.pop();
+    float x2 = input.peek(0);
+    if (x2 - x1 > THRESHOLD) {
+      // freeze display within 2-5 firings of work()
+      portal.reset(FREEZE_DISPLAY), 2, 5);
+    } else {
+      output.push(x1);
+    }
+  }
+}
+\end{verbatim}
+\vspace{-12pt}
+\caption{\protect\small An edge detector.  If two successive input
+values differ by more than the threshold, a message is sent to freeze
+the display.  Otherwise, the items pass through the filter.
+\protect\label{fig1}}
+\vspace{-12pt}
+\end{figure}
+
+\begin{figure}[t]
+\scriptsize
+\begin{verbatim}
+class Oscilloscope extends Stream {
+  void init(int mode) {
+    switch(mode) {
+      case CONTINUOUS_DISPLAY:
+        add(new DataSource());
+        add(new ContinuousDisplay());
+        break;
+      case FREEZE_DISPLAY:
+        add(new ScreenMemory());
+        break;
+      case EDGE_TRIGGER:
+	FilterPortal fp = new FilterPortal();
+	fp.add(this)
+        add(new DataSource());
+        add(new EdgeDetector(fp));
+        add(new ContinuousDisplay());
+        break;
+      case EXTERNAL_TRIGGER:
+        add(new SplitJoin() {
+          void init() {
+            add(new DataSource());
+            add(new TriggerSource());
+            joiner(ROUND_ROBIN);
+          }
+        });
+        add(new ExternalEdgeDetector(this));
+        break;
+    }  
+    add(new ContinuousDisplay());
+  }
+}
+\end{verbatim}
+\vspace{-12pt}
+\caption{\protect\small An oscilloscope that behaves
+as a composition of other streams, and depends on the mode that is
+passed to {\tt init}.
+\protect\label{fig2}}
+\vspace{-12pt}
+\end{figure}
+

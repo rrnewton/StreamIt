@@ -1,0 +1,79 @@
+\section{Streaming Application Domain}
+
+Applications that are structured around some notion of a ``stream''
+are becoming increasingly important and widespread.  For example,
+embedded programs on cell phones and handheld computers often spend
+most of their time dealing with streams of voice or video data.  The
+stream abstraction is also fundemantal to high-performance
+applications such as intelligent software routers, cell phone base
+stations, and HDTV editing consoles.  We have observed a number of
+properties that these programs have in common--enough so as to
+characterize them as belonging to a distinct class of programs, which
+we will refer to as {\it streaming applications.}  The following are
+the salient properties of a streaming application, independent of its
+implementation:
+
+\begin{enumerate}
+
+\item {\it Large streams of data.}  Perhaps the most fundamental
+aspect of a streaming application is that it operates on a large (or
+virtually infinite) sequence of data items, hereafter referred to as a
+{\it data stream}.  The data streams generally enter the program from
+some external source, and each item is processed for a limited time
+before being discarded.  This is in contrast to scientific
+applications, in which a fixed input set is manipulated with a large
+degree of data reuse.
+
+\item {\it Independent stream filters.}  Conceptually, a streaming computation
+represents a sequence of transformations on the data streams in the
+program.  We will refer to the basic unit of this transformation as a
+{\it filter}: an operation that--on each execution step--reads one or
+more items from an input stream, performs some computation, and writes
+one or more items to an output stream.  Filters are generally
+independent and self-contained, without references to global variables
+or other filters.  A stream program is the composition of filters into
+a {\it stream graph}, in which the output of some filters are
+connected to the inputs of others.
+
+\item {\it A stable computation pattern.}  The structure of the stream
+graph is generally constant during the steady-state operation of a
+stream program.  That is, a certain set of filters are repeatedly
+applied in a regular, preditable order to produce an output stream
+that is a given function of the input stream.
+
+\item {\it Occaisional re-initialization.}  Even though each
+arrangement of filters is executed for a long time, there are still
+dynamic modifications to the stream graph that occur on occaision.
+For instance, if a wireless network interface is experiencing high
+noise on an input channel, it might react by adding some filters to
+clean up the signal; a software radio re-initializes a portion of the
+stream graph when a user switches from AM to FM.  Sometimes, these
+re-iniitializations are synchronized with some data in the stream--for
+instance, when a network protocol changes from bluetooth to 802.11 at
+a certain point of a transmisison.  There are typically an ennumerable
+number of configurations that the stream graph can adopt in any one
+program, such that all of the possible arrangments of filters are
+known at compile time.
+
+\item {\it Occaisional out-of-stream communication.}  In addition to
+the high-volume data streams passing from one filter to another,
+filters also communicate small amounts of control information on an
+infrequent and irregular basis.  Examples include changing the volume
+on a cell phone, printing an error message to a screen, or changing a
+coefficient in an upstream FIR filter.
+
+\item {\it High performance expectations.}  Often there are real-time
+constraints that must be satisfied by streaming applications; thus,
+efficiency (in terms of both latency and throughput) is of primary
+concern.  Additionally, many embedded applications are intended for
+mobile environments where power consumption, memory requirements, and
+code size are also important.
+
+\end{enumerate}
+
+ 
+
+
+
+
+
