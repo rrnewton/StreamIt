@@ -3,7 +3,7 @@ StreamIt Snapshot Release
 
 This is for the March 14, 2003 snapshot release (streamit-0.0.20030314).
 
-$Id: README,v 1.8 2003-03-14 20:16:41 dmaze Exp $
+$Id: README,v 1.9 2003-03-19 19:27:10 dmaze Exp $
 
 1. What is this?
 2. Dependencies
@@ -93,10 +93,6 @@ research compiler; as such, it has several known shortcomings:
    variable declarations and static control flow, would work in the
    compiler but not the library.  The intermediate Java code differs
    between the two compilation paths.
-
--- Due to incompatibilities with the released RAW infrastructure,
-   automated number gathering for RAW is not available for this
-   release.
 
 -- The Java library infrastructure may not allow particular
    combinations of stream parameters.  This should not be a problem
