@@ -37,24 +37,27 @@
 \begin{align}
 &\forall (i, j, k) \in {\cal D}_{{WRITE}_{c}},~\mt{WRITE}_{c}(i,j,k) = W(n)(\mt{Steady\_Inputs})[\mt{pos\_out}(n, c)][k] \\ \nonumber
 &\mt{where Steady\_Inputs} = [\mt{READ}_{{chan\_in}(n)[1]}(i, j, *), \dots, 
-                             \mt{READ}_{{chan\_in}(n)[\mt{num\_in}(n)]}(i, j, *) ]
+                             \mt{READ}_{{chan\_in}(n)[{num\_in}(n)]}(i, j, *) ]
 \end{align}
 %
 \item {\bf(WRITE to BUF)} For each $c \in \mt{chan\_out}(n)$, and for each $q \in
-[0,S(n)-\mt{1}]$:
+[0,S(n)-1]$:
 \begin{align}
-&\forall (i,j) \in {\cal D}_{SW {\small \rightarrow} SB}(c,q),
+&\forall (i,j) \in {\cal D}_{W {\small \rightarrow} B}(c,q),
 \mt{BUF}_{c}(i,j) = 
   \mt{WRITE}_{c}(i, q, j - q * U(c)) \\ \nonumber
-&\mt{where } {\cal D}_{SW {\small \rightarrow} SB}(c,q) = 
+&\mt{where } {\cal D}_{W {\small \rightarrow} B}(c,q) = 
   {\cal D}_{{BUF}_{c}} \cap 
   \{ (i,j) | q*U(c) \le j \le (q+1)*U(c) - 1 \}
 \end{align}
 % here is the simple, base case of the BUF -> READ function
-\item {\bf(BUF to READ)} For each $c \in \mt{chan\_in}(n)$:
+\item {\bf(BUF to READ)} For each $c \in \mt{chan\_in}(n)$, 
+       and for each $q \in [0, \lfloor \frac{E(c)}{\mt{Period}(c)} \rfloor ]$:
 \begin{align}
-\forall (i,j,k) \in {\cal D}_{{READ}_{c}},
-\mt{READ}_{c}(i,j,k) = \mt{BUF}_{c}(i,j*O(n) + k)
+&~~~~~\forall (i,j,k) \in {\cal D}_{B {\small \rightarrow} R},
+\mt{READ}_{c}(i,j,k) = \mt{BUF}_{c}(i+q,j*O(n) + k - q * \mt{Period}(c)) \\ \nonumber
+&\mt{where }{\cal D}_{B {\small \rightarrow} R} = 
+  {\cal D}_{READ_{c}} \cap \{ (i,j,k) | q * \mt{Period}(c) \le k \le \mt{min}((q+1)*\mt{Period}(c), E(c)) - 1 \}
 \end{align}
 \end{itemize}
 
