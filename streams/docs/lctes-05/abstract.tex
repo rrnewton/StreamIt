@@ -1,5 +1,5 @@
 
-Streaming computation is an increasngly popular model of computation
+Stream computing is an increasingly popular model of computation
 becasue it makes explicit the parallelism and communication in the
 applications. This in turns lessens the burden on the compiler to
 extract parallelism, and allows for greater innovation in mapping the
@@ -8,11 +8,11 @@ methodology for compiling streaming applications to general purpose,
 cache-based architectures. The work is done in the context of
 StreamIt, a language and compiler specifically engineered for stream
 computing. In StreamIt, a program is described as a structured dataflow
-graph, where the nodes represent actors which carry out the
+graph, where the nodes represent actors that carry out 
 computation. The edges in a stream graph represent
 communication. Our work is unique in that the compiler
 accounts for the size of instruction and data workingsets as it
-performs a series of cache-aware optimizations while derriving an
+performs a series of cache-aware optimizations, all while derriving an
 ordering of executions for the nodes in the stream graph. The
 optimizations are founded upon two simple and intuitive models that
 quantify $(i)$ the temporal locality for a sequence of  actor
