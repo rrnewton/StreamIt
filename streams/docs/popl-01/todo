@@ -1,34 +1,12 @@
 things left for saman:
 ----------------------
 
-- fig 1, increase signal strenth -> booster
-
-- fig 10, should have OAb = I1j, OBn = I2j
-
-- add pipeline labeling with a and b to make composition clear
-
 - with cvs, I don't know how to get most recent change to whole
 package?  could have a dummy file written each time in makefile, and
 put it in and out, then retrieve the Entries value for it (whic has
 date and verison.)
 
 - are you ok with setSplitter, etc?
-
-conversation w/ saman 8/5/01
-----------------------------
-
-- enumerate on combine() - make slots, fire when they're all filled
-
-- specify pass by value from work functions
-
-- keep top and bottom markers on tape, so sink is right
-
-	- then rewrite constraints on max buffer size as being
-		local to channel, too
-
-- in abstract, make information flow more general - not just messaging
-
-- do the layout again, since now I've been messing with it
 
 ----------------------------------
 
@@ -99,6 +77,9 @@ like.
 
 * semantic restrictions of sending a message within a message handler.
 Need to start counting work functions in a different way.
+
+- add more precise notion of passing by value--do we do a deep copy on
+all objects?
 
 - any notion of exceptions?  error handling?
 

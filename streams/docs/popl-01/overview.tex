@@ -183,8 +183,9 @@ the three intuitive operations:
 the end of the channel and returns its value.
 \item {\tt peek(i)} returns the value of the item $i$ spaces from the end of the channel without
 removing it.
-\item {\tt push(v)} writes the value $v$ to the front of
-the channel.  
+\item {\tt push(x)} writes $x$ to the front of
+the channel.  The argument $x$ is passed by value; if it is an object,
+a separate copy is enqueued on the channel.
 \end{enumerate}
 A filter can also push, pop, and peek items from within
 the {\tt init} function if it needs to set up some initial state on
@@ -293,8 +294,9 @@ first $i_1$ data items from the first stream, the next $i_2$ data
 items to the second stream, and so on.
 \item ROUND\_ROBIN, which is just a weighted round robin where all
 weights are 1.
-\item COMBINE, which reads from all the streams in parallel and
-combines the results in a structure which is passed on.
+\item COMBINE, which reads from all the streams in parallel and combines the results into a structure.  The structure has a separate field for each stream, 
+and the joiner cannot fire until each field is filled by an item from the 
+corresponding output channel.
 \item NULL, which means that all of the parallel components are sinks
 and there is no output to join together.
 \end{enumerate}
@@ -423,6 +425,7 @@ further improves readability and decreases code size.
 \begin{figure}
 \psfig{figure=portal-code.eps,width=3.0in}
 \caption{The frequency-hopping of our software radio illustrates StreaMIT's messaging system.  In {\tt TrunkedRadio}, a {\tt Portal} is created to hold the message target, {\tt rf2if}.  Then, {\tt CheckFreqHop} uses the {\tt Portal} to send a frequency-change message.}
+\vspace{-12pt}
 \label{fig:portal-code}
 \end{figure}
 
