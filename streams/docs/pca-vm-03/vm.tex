@@ -749,9 +749,6 @@ loops if some function is to be executed repeatedly.\\}
       svm_Kernel_Unstarted,
       svm_Kernel_Waiting,
       svm_Kernel_Running,
-\end{verbatim}}
-{\small
-\begin{verbatim}
       svm_Kernel_Paused,
       svm_Kernel_Finished
   } svm_Kernel_Status;
@@ -893,7 +890,9 @@ this call has no effect.}
 \param{
   {\tt k} - kernel to pause.}
 
-\req{{\tt k} is {\tt Running}, {\tt Paused}, or {\tt Finished}.}
+\req{
+  {\tt k} is {\tt Running}, {\tt Paused}, or {\tt Finished}.\\
+  If called from within a kernel, than that kernel is {\tt k}.  (Kernels may not pause other kernels.)}
 
 \callkc
 %%%%%%%%%%%%%%%%%%%%%%%%%
@@ -922,7 +921,9 @@ its work function.}
 \param{
   {\tt k} - kernel to end.}
 
-\req{{\tt k} is {\tt Running}, {\tt Paused}, or {\tt Finished}.}
+\req{
+  {\tt k} is {\tt Running}, {\tt Paused}, or {\tt Finished}.\\
+  If called from within a kernel, than that kernel is {\tt k}.  (Kernels may not end other kernels.)}
 
 \callkc
 \makeline
@@ -1252,7 +1253,7 @@ entire length of one of its inputs.}
 %%%%%%%%%%%%%%%%%%%%%%%%%
 \clearpage
 \makeline
-\name{svm\_Move}
+\name{Move}
 {\small
 \begin{verbatim}
 typedef struct {
