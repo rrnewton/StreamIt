@@ -35,24 +35,6 @@ have a specified-length array.  It may be better to use a template
 construct for this, though then value parameters can appear in two
 different places in the code.
 
-\subsection{Helper Packages}
-
-It is entirely conceivable that the programmer might want to write a
-set of stateless helper functions that can be used in multiple
-filters.  For example, the GSM encoder we have now uses the C
-preprocessor to include a set of functions to perform 16-bit
-arithmetic.  Syntax for this functionality does not yet exist, though
-we may create a \lstinline|static| keyword:
-
-\begin{lstlisting}{}
-static MyHelpers {
-  int square(int x) { return x * x; }
-}
-int->int filter SquareIt {
-  work pop 1 push 1 { push(MyHelpers.square(pop())); }
-}
-\end{lstlisting}
-
 \subsection{Messaging Extensions}
 
 Future versions of StreamIt may have two extensions to the existing
