@@ -1,43 +1,54 @@
-\subsection{Experimental Evaluation of Messaging}
+\section{Experimental Evaluation}
+\label{sec:evaluation}
 
-In order to evaluate teleport messaging, we compile the two
-implementations of the frequency hopping radio into a set of
-threads. The message-based implementation is compiled into 28 threads,
-whereas the alternate version---relying on a feedback-loop for
-notification---results in 32 threads.  Each thread implements a
-specific component of the stream graph (e.g., filter) and is allocated
-to a specific machine in a networked computing cluster.  The cluster
-consists of sixteen 750Mhz Pentium~III workstations, each with a
+We use a cluster of workstations as our evluation testbed. Our
+StreamIt compiler automatically partitions an input program into a set
+of threads that are mapped to the workstations and then run concurently.
+We chose a cluster-based evlauation for two reasons. First, clusters
+provides a practical environment for analyzing the effects of
+synchronization between concurrent proceses running on different
+machines with independent clocks. Second, clusters provide a
+simple abstraction for distrbuted computing---multiple program
+counters, and distributed memories---which 
+is at the heart of emerging multi-core and tile-based architectures
+for embedded, desktop, and server computing.
+In our experiments, we are primarly interested in quantifying two
+performance metrics: throughput and communication overhead.
+For the purpose of this paper, throughput is defined
+as the number of outputs produced per unit of time, and communication
+overhead reflects the quantity of data transmitted between
+workstations.
+
+
+The teleport messaging-based implementation of the frequency hopping
+radio was compiled into 28 threads
+whereas the alternate version---relying on a feedback-loop---was
+compiled into 32 threads.  Each thread implements a
+specific subset of the stream graph  and is assigned to one of
+sixteen 750Mhz Pentium~III workstations, each with a
 256~Kb cache.  The machines are interconnected using a fully switched
-high speed network, and the threads are allowed to communicate via
-dedicated channels. Specifically, every channel in the stream graph is
-assigned a unique TCP/IP connection for the exchange of data and
-messages between actors.
+high speed network, and the threads intercommunicate via
+dedicated  TCP/IP connections. 
 
-In order to perform the thread-to-machine allocation, our {\it
-clustering} backend, part of the StreamIt compiler
-infrastructure~\cite{streamit-asplos}, applies a partitioning
-algorithm to reduce the overall application bottleneck while
-maximizing the throughput of the output filter in the stream
-dependence graph. For the purpose of this paper, throughput is defined
-as the number of outputs produced per unit of time.
+Our compiler maps threads to workstations using an algorithm that aims
+to reduce the overall application bottleneck while
+maximizing the throughput of the output filter (i.e., most downstream
+actor) in the stream graph.
 
 \begin{figure}[t]
 \psfig{figure=throughput-graph.eps,width=3.3in}
-\caption{\small Throughput as a function of the number of clusters for
-the two implementations of the frequency hopping radio.
+\caption{\small Throughput as a function of the number of workstations
+in the cluster. 
 \protect\label{fig:fhr-throughput}}
 \end{figure}
 
-In Figure~\ref{fig:fhr-throughput}, we report the throughput for the
-two applications along the $y$-axis.  Each data point corresponds to a
-specific allocation of the threads to the number of clusters shown
-along the $x$-axis.  Note that due to the limited parallelism in the
-two implementations of the frequency hopper, increasing the number of
-clusters beyond five workstations leads to negligible gains with
-respect to throughput.  Nonetheless, the use of messaging achieves a
-maximal throughput that is 49.8\% better than its feedback-loop
-counterpart. Furthermore, a detailed analysis of the results indicates
-a 35\% reduction in the total number of data items sent across the
-communication channels when messaging is used (in contrast to a
-continuous feedback-loop).
+In Figure~\ref{fig:fhr-throughput}, we report the measured throughput 
+($y$-axis) for various cluster sizes ranging from one to sixteen
+interconnected workstations. Note that due to the limited parallelism in the
+two implementations of the frequency hopper, cluster configurations
+with more than five workstations lead to negligible gains in
+terms of throughput. From the data, we can observe that teleport
+messaging achieves a maximal throughput that is 49.8\% better than its
+feedback-loop counterpart. Furthermore, a detailed analysis of the
+results shows that teleport messaging reduces the communication
+overhead by 35\%.
