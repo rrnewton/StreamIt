@@ -223,7 +223,7 @@ class IncreaseSignalStrength extends Stream {
    }
 }
 
-class Radio extends Stream {
+class TrunkedRadio extends Stream {
    void init() {
       add(new ReadFromAtoD());
       add(new RFtoIF(Freq[0]));
