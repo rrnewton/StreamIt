@@ -26,8 +26,13 @@ workloads. This model serves as a foundation for several {\it cache-aware
 optimizations} that are geared toward the concomitant increase of instruction
 and data {\it temporal locality}. These
 optimization lead to significantly better utilization of the memory
-system, and as such, they deliver performance gains ranging from 11\%
-to 99\% for our streaming benchmark suite.
+system, and as such, they deliver
+a speedup of 121\% for our streaming benchmark suite on a Pentium~3 
+architecture, and a speedup of 111\% for the same benchmark suite on
+an Itanium~2 processor.
+
+%they deliver performance gains ranging from 11\%
+%to 99\% for our streaming benchmark suite.
 
 The context for our work is StreamIt, an architecture-independent
 language that is engineered for streaming
@@ -107,16 +112,20 @@ instruction set architecture. The Itanium by contrast has a much
 larger and richer repertoire of registers. The two architectures serve
 to validate our cache-aware optimizations, in that we expect an
 architecture with more registers to benefit more from optimization such
-as scalar replacement. On average, fusion leads to a 47\% improvement
-on the Pentium~3, and 50\% on the Itanium~2.  On average, scaling 
-leads to a 21\% improvement on the Itanium~2, and 17\% on the Pentium~3.
+as scalar replacement. Fusion leads to a 77\% speedup for
+the benchmark suite on the Pentium~3, and 88\% speedup on the Itanium~2.  
+On average, scaling gives a 40\% speedup for our benchmark suite
+on the Pentium~3 and 37\% speedup on the Itanium~2.
 
 While both scaling and fusion lead to modest performance gains, we
 combine the two to deliver the best possible performance. When we
-do so, we can further improve the performance of our benchmarks by
-53\% on average for the Pentium~3, and 55\% for the Itanium~2.
+do so, we can achieve a speedup of 121\% for our benchmark suite on a 
+Pentium~3, and a speedup of 111\% on an Itanium~2 processor.
 Section~\ref{sec:evaluation} describes our evaluation
 methodology and presents our experimental analysis.
+
+%further improve the performance of our benchmarks by
+%53\% on average for the Pentium~3, and 55\% for the Itanium~2.
 
 In summary, this paper makes the following contributions:
 \begin{itemize}
@@ -141,7 +150,7 @@ in a detailed micro-benchmark analysis.
 StreamIt compiler.
 
 \item An experimental evaluation across 11 streaming benchmarks,
-demonstrating performance improvements of up to 99\%.
+demonstrating performance improvements of up to 6577\%.
 \end{itemize}
 
 %% The remainder of the paper is organized as
