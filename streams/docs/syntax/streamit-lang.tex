@@ -20,7 +20,7 @@
 \title{StreamIt Language Specification\\
 Version 2.0\ifprerel\thanks{
 This is a pre-release version of this document.\hfil\break\ttfamily
-\hbox{$Id: streamit-lang.tex,v 1.13 2003-01-22 20:34:05 dmaze Exp $}
+\hbox{$Id: streamit-lang.tex,v 1.14 2003-01-22 22:52:10 dmaze Exp $}
 }\fi}
 \author{\texttt{streamit@cag.lcs.mit.edu}}
 \catcode`\$=3
@@ -47,11 +47,6 @@ with a runtime library.  Since the compiler can reconstruct the stream
 graph, it can combine adjacent filters, or split computationally
 intensive filters into multiple parts, or duplicate filters to have
 more parallel computation.
-
-\begin{note}
-Java library support will likely soon be deprecated, as the StreamIt
-language becomes more expressive than what can be described in Java.
-\end{note}
 
 The StreamIt language is vaguely reminiscent of other imperative
 languages such as C or Java.  In particular, the bodies of filter work
@@ -266,9 +261,9 @@ extension.
 
 All computation in StreamIt takes place within filters.  Filters must
 explicitly declare their initialization code if present, but also have
-the option of omitting it.  A filter may have a single anonymous work
-function, or multiple named work functions.  Each work function must
-declare its \emph{I/O rates}, the number of items one call to the
+the option of omitting it.  A filter has a single work function; it
+may also declare other phase functions.  Each work or phase function
+must declare its \emph{I/O rates}, the number of items one call to the
 function removes, examines, or places on its tape.  A basic filter
 declaration looks like this:
 
@@ -485,25 +480,26 @@ causes a delay in the feedback loop.
 \begin{figure}[htbp]
   \begin{center}
     \begin{picture}(21,9)
-      \put(6,9){\vector(0,-1){1}}
+      \put(3,9){\vector(0,-1){1}}
       \put(10,8){\makebox(11,1)[l]{\lstinline|float->float|}}
       \put(0,1){\framebox(9,7)[lt]{\lstinline|Feedback|}}
       \put(10,7){\makebox(11,1)[l]{\lstinline|feedbackloop Feedback \{|}}
-      \put(6,8){\vector(0,-1){1}}
+      \put(3,8){\vector(0,-1){1}}
       \put(10,6){\makebox(11,1)[l]{\lstinline|\ join roundrobin;|}}
-      \put(6,7){\vector(0,-1){1}}
-      \put(4,5){\framebox(4,1){\lstinline|Body|}}
+      \put(3,7){\vector(0,-1){1}}
+      \put(1,5){\framebox(4,1){\lstinline|Body|}}
       \put(10,5){\makebox(11,1)[l]{\lstinline|\ body Body();|}}
-      \put(6,5){\vector(0,-1){3}}
-      \put(6,2){\line(-1,0){3}}
-      \put(3,2){\vector(0,1){1}}
-      \put(1,3){\framebox(4,1){\lstinline|Loop|}}
+      \put(3,5){\vector(0,-1){3}}
+      \put(3,2){\line(1,0){3}}
+      \put(6,2){\vector(0,1){1}}
+      \put(4,3){\framebox(4,1){\lstinline|Loop|}}
       \put(10,3){\makebox(11,1)[l]{\lstinline|\ loop Loop();|}}
-      \put(3,4){\line(0,1){3}}
-      \put(3,7){\vector(1,0){3}}
-      \put(6,2){\vector(0,-1){1}}
-      \put(10,1){\makebox(11,1)[l]{\lstinline|\ split roundrobin(4,1);|}}
-      \put(6,1){\vector(0,-1){1}}
+      \put(6,4){\line(0,1){3}}
+      \put(6,7){\vector(-1,0){3}}
+      \put(10,2){\makebox(11,1)[l]{\lstinline|\ split roundrobin(4,1);|}}
+      \put(3,2){\vector(0,-1){1}}
+      \put(10,1){\makebox(11,1)[l]{\lstinline|\ enqueue(0.0);|}}
+      \put(3,1){\vector(0,-1){1}}
       \put(10,0){\makebox(11,1)[l]{\lstinline|\}|}}
     \end{picture}
     \caption{Feedback Loop}
@@ -517,10 +513,10 @@ causes a delay in the feedback loop.
 It is possible to declare a stream object without a name, if it is
 used in exactly one place in the program.  In general anonymous stream
 declarations look exactly like the corresponding normal stream
-declaration, except that the stream type is optional and the name is
-omitted.  The semicolon that normally ends the \lstinline|add|,
-\lstinline|body|, or \lstinline|loop| statement is optional in this
-case.
+declaration, except that the stream type is optional for non-filter
+streams and the name is omitted.  The semicolon that normally ends the
+\lstinline|add|, \lstinline|body|, or \lstinline|loop| statement is
+optional in this case.
 
 \begin{lstlisting}{}
 complex->float feedbackloop FeedbackMagnitude
@@ -540,14 +536,8 @@ complex->float feedbackloop FeedbackMagnitude
 }
 \end{lstlisting}
 
-\begin{note}
-We may add the constraint that anonymous filters consist only of work
-code.  In this case, the syntax might look like
-\lstinline|body filter pop 2 push 1 { push(...) };|
-\end{note}
-
 The input and output types of anonymous streams are determined by the
-compiler.
+compiler, if these types are not explicitly specified in the code.
 
 \subsection{Execution Model}
 
@@ -578,9 +568,9 @@ constraints are transparent to the programmer, however.
 \item A round-robin splitter may fire when the sum of the number of
   output items is available on its input, and produces the specified
   number of items on each output.
-\item A duplicate splitter may fire when at least the specified number
-  of items is available on its input.  It pops this number of items
-  from its input and pushes this number of items to each output.
+\item A duplicate splitter may fire when at least one item is
+  available on its input.  It pops one item from its input and pushes
+  one item to each output.
 \end{itemize}
 
 \section{Statements}
@@ -650,8 +640,8 @@ statement takes a splitter specification; only \lstinline|duplicate| and
 \subsection{Work-only Statements}
 
 These statements may only appear within steady-state work code, and in
-particular, within a filter's \lstinline|work| and \lstinline|phase|
-function(s).
+particular, within a filter's \lstinline|prework|, \lstinline|work|
+and \lstinline|phase| function(s).
 
 \subsubsection{\lstinline|push| Statement}
 
@@ -793,17 +783,17 @@ built-in math functions.  The math functions are listed in table
 
 \begin{note}
   As an implementation detail, any function name not optimized as a
-  built-in function in the front-end or recognized as a helper
-  function is treated as a call to a function in the Java package
-  \lstinline|java.lang.Math|; see \emph{Java in a Nutshell} or another
-  Java reference for details.  These get blindly translated again to
-  calls to the C math library.
+  built-in function in the front-end or recognized as a phase or
+  helper function is treated as a call to a function in the Java
+  package \lstinline|java.lang.Math|; see \emph{Java in a Nutshell} or
+  another Java reference for details.  These get blindly translated
+  again to calls to the C math library.
 \end{note}
 
 \begin{note}
   It is conceivable that calls to side-effect-free functions with
   compile-time constant parameters return compile-time constant
-  results.  This is not the case for non-built-in functions in the
+  results.  This is only the case for built-in functions in the
   current implementation of the compiler; adding this involves
   inlining helper functions, and doing analysis to determine if a
   helper is in fact side-effect free.
