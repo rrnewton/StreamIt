@@ -1,3 +1,13 @@
+Things to bring to front of intro:
+
+- (Peter) SVM describes mapping, is not intended as a programming language
+- (Peter) streaming and kernels are separate abstractions
+- (Peter) spec introduces the notion of streaming DMA -- continuous data movement, not pre-blocked
+
+
+
+*********************************************************************************
+
 questions:
 
 1. can a stream be aliased if it's in a FIFO?  that is, can you

@@ -366,8 +366,8 @@ of tracking a set of EOS tokens.\\}
 onto all streams. \medskip }
 
 \spec{For example, if {\tt s1} is empty and {\tt s2} is full, then the
-following are all legal implementations of {\tt streamMulticastPush(x, s1,
-s2)}:
+following are all legal implementations of {\tt streamMulticastPush(\&x, \&s1,
+\&s2)}:
 \begin{itemize}
 \item Push {\tt x} onto {\tt s1}, wait until {\tt s2} is not full, then push {\tt x} onto {\tt s2}.
 \item Wait until {\tt s2} is not full, push {\tt x} onto {\tt s2}, then push {\tt x} onto {\tt s1}.
@@ -1497,172 +1497,20 @@ For example:
 }\end{verbatim}}
 
 \sss{FIFO Cleanup}
+\label{sec:fifoclean}
 
 It is the responsibility of the High Level Compiler to ensure that all
 elements are drained from FIFO's before a fresh set of streams and
-kernels are mapped to the resources.  There are many ways in which
-this draining functionality can be implemented using the primitives
-described in this document.
+kernels are mapped to the resources.  In the common case, a FIFO is
+empty when the neighboring kernels terminate, as the kernels execute
+until they push or pop an item with an EOS tag.  However, in
+exceptional cases, a kernel might finish before reaching the EOS, and
+leftover items need to be cleared from a FIFO before additional
+kernels are executed.
 
-For instance, consider a producer kernel {\tt k1} that communicates
-through a FIFO stream {\tt s} to a consumer kernel {\tt k2}.  The
-application specifies that {\tt k2} might terminate abnormally (before
-the end of stream), in which case {\tt k1} should be automatically
-interrupted and {\tt s} should be drained.  The High Level Compiler
-can support these semantics by testing the status of {\tt k1} upon the
-termination of {\tt k2} and running custom draining kernels if
-necessary.  
-
-The following code implements this example.  It works by using two
-kernels to replace {\tt k1} and {\tt k2}.  First, a {\tt PopKernel}
-replaces {\tt k2} and executes one pop at a time (pausing in between)
-until {\tt k1} has finished.  Then, a {\tt PushKernel} is started in
-place of {\tt k1}, which pushes a fixed number of dummy items (to
-clear leftover junk items from {\tt k1}) before pushing a single item
-with an EOS tag.  Finally, {\tt PopKernel} is modified to enter a
-``bounded remainder mode'' in which it pops into the dummy buffer of
-{\tt PushKernel} before looking for the single item with an EOS tag.
-Once it finds this EOS item, both kernels terminate naturally and the
-stream is drained.
-
-{\small
-\begin{verbatim}
-  // ------------- control code -------------
-
-  // assume that:
-  //   k1 is running on processor P1
-  //   k2 is running on processor P2
-  //   s has a capacity of "c"
-
-  // upstream draining kernel
-  static PushKernel pushKernel;
-  // downstream draining kernel
-  static PopKernel popKernel;
-
-  // start k1 and k2 running
-  kernelRun(&k1.kernel)
-  kernelRun(&k2.kernel)
-
-  // wait for k2 to finish
-  kernelWait(&k2.kernel);
-
-  // if k1 did not finish, run the drain procedure
-  if (kernelGetStatus(&k1.kernel)==KERNEL_RUNNING) {
-
-    kernelEnd(&k1.kernel);
-
-    // start PopKernel running in its "unbounded remainder mode", in which
-    // it pauses itself after each item that it pops.
-    PopKernelInit(&popKernel, P2, &s1, c, FALSE);
-    kernelRun(&popKernel.kernel);
-
-    // pop one item at a time from s until k1 has finished
-    do {
-      kernelWaitMultiple(&k1.kernel, &popKernel.kernel);
-      if (kernelGetStatus(&popKernel.kernel)==KERNEL_PAUSED) {
-        kernelRun(&popKernel.kernel);
-      }
-      if (kernelGetStatus(&k1.kernel)==KERNEL_PAUSED) {
-        kernelRun(&k1.kernel);
-      }
-    } while (kernelGetStatus(&k1.kernel)!=KERNEL_FINISHED);
-    
-    // start PushKernel running
-    PushKernelInit(&pushKernel, P1, &s1, c);
-    kernelRun(&pushKernel.kernel);
-
-
-    // change the PopKernel's state to be in "bounded remainder mode", in which
-    // it will pop c items and then keep popping until it finds an EOS tag
-    kernelWait(&popKernel.kernel);
-    popKernel.boundedRemainder = TRUE;
-    kernelRun(&popKernel.kernel);
-
-    // wait for PopKernel to finish
-    kernelWait(&popKernel.kernel);
-
-    // at this point, we are guaranteed that both kernels have finished, 
-    // and that the stream s has been completely drained
-    ASSERT(kernelGetStatus(&popKernel.kernel)==KERNEL_FINISHED);
-    ASSERT(kernelGetStatus(&pushKernel.kernel)==KERNEL_FINISHED);
-  }
-
-  // ------------- kernel code for PopKernel -------------
-
-  typedef struct {
-    Kernel kernel;
-    IStream* in;
-    int capacity;
-    boolean boundedRemainder;
-  } PopKernel;
-
-  void popKernelWork();
-  
-  sumInit(PopKernel* k, VM_NODE_PROC procLocation, IStream* _in, int _capacity, boolean _boundedRemainder) {
-    kernelInit(&k->kernel, procLocation, 0, k, sizeof(PopKernel), (ExtKernelWork)&popKernelWork); 
-    k->in = _in;
-    k->capacity = _capacity;
-    k->boundedRemainder = _boundedRemainder;
-  }
-
-  void popKernelWork(PopKernel* k) {
-    int i, x;
-    boolean done = FALSE;
-    do {
-      if (k->boundedRemainder) {
-        // if we have a bounded remainder, first pop as many items
-        // as will fit in the stream, as these could be junk leftovers 
-        // from the original upstream kernel.
-        for (i = 0; i < k->capacity; i++) {
-          streamPop(&k->in, &x);
-        }
-        done = FALSE;
-        // then, pop until we find the EOS tag that the pushKernel output
-        do {
-          done = streamPeekEOS(&k->in, 0);
-          streamPop(&k->in, &x);
-        } while (!done);
-      } else {
-        // if we do not have a bounded remainder, then pop one item and pause
-        streamPop(&k->in, &x);
-        kernelPause(&k->kernel);
-      }
-    } while (!done);
-  }
-
-  // ------------- kernel code for PushKernel -------------
-
-  typedef struct {
-    Kernel kernel;
-    OStream* out;
-    int capacity;
-  } PushKernel;
-
-  void pushKernelWork();
-  
-  sumInit(PushKernel* k, VM_NODE_PROC procLocation, OStream* _out, int _capacity) {
-    kernelInit(&k->kernel, procLocation, 0, k, sizeof(PushKernel), (ExtKernelWork)&pushKernelWork); 
-    k->out = _out;
-    k->capacity = _capacity;
-  }
-
-  void pushKernelWork(PushKernel* k) {
-    int i, dummy = 0;
-    // push as many dummy items as would fill up the stream, in case
-    // the original kernel did not leave any junk leftovers for PopKernel 
-    // to consume
-    for (i = 0; i < k->capacity; i++) {
-      streamPush(&k->kernel, &dummy);
-    }
-    // push a single item with an EOS tag, indicating the true end of stream
-    streamPushEOS(&k->kernel, &dummy);
-  }
-\end{verbatim}}
-
-The above procedure is an example of a basic draining operation that
-can be constructed using the primitives in the SVM.  The High Level
-Compiler should employ similar mechanisms in other scenarios to ensure
-that it always has a consistent view of FIFO contents.
+There are many ways in which this draining functionality can be
+implemented using the primitives described in this document.  An
+in-depth example appears in Appendix~\ref{sec:fifocleanexample}.
 
 \sss{Managing Kernel Instruction Memory}
 
@@ -1807,6 +1655,179 @@ logical entities to assign to each resource.  The details of this cost
 estimation will be addressed in the future.
 
 \end{enumerate}
+
+\appendix
+
+\clearpage
+\section{FIFO Cleanup Example}  % use *-form to suppress numbering
+\label{sec:fifocleanexample}
+As described in Section~\ref{sec:fifoclean}, the High Level Compiler
+is responsible for draining FIFO's before a fresh set of streams and
+kernels are mapped to the resources.  In the common case, FIFO's will
+be drained by the kernels themselves.  However, if a kernel terminates
+before consuming the EOS, the control thread will have to take
+additional steps to ensure that the FIFO's are clear before additional
+kernels can be run.
+
+For instance, consider a producer kernel {\tt k1} that communicates
+through a FIFO stream {\tt s} to a consumer kernel {\tt k2}.  The
+application specifies that {\tt k2} might terminate abnormally (before
+the end of stream), in which case {\tt k1} should be automatically
+interrupted and {\tt s} should be drained.  The High Level Compiler
+can support these semantics by testing the status of {\tt k1} upon the
+termination of {\tt k2} and running custom draining kernels if
+necessary.  
+
+The following code implements this example.  It works by using two
+kernels to replace {\tt k1} and {\tt k2}.  First, a {\tt PopKernel}
+replaces {\tt k2} and executes one pop at a time (pausing in between)
+until {\tt k1} has finished.  Then, a {\tt PushKernel} is started in
+place of {\tt k1}, which pushes a fixed number of dummy items (to
+clear leftover junk items from {\tt k1}) before pushing a single item
+with an EOS tag.  Finally, {\tt PopKernel} is modified to enter a
+``bounded remainder mode'' in which it pops into the dummy buffer of
+{\tt PushKernel} before looking for the single item with an EOS tag.
+Once it finds this EOS item, both kernels terminate naturally and the
+stream is drained.
+
+{\small
+\begin{verbatim}
+  // ------------- control code -------------
+
+  // assume that:
+  //   k1 is running on processor P1
+  //   k2 is running on processor P2
+  //   s has a capacity of "c"
+
+  // upstream draining kernel
+  static PushKernel pushKernel;
+  // downstream draining kernel
+  static PopKernel popKernel;
+
+  // start k1 and k2 running
+  kernelRun(&k1.kernel)
+  kernelRun(&k2.kernel)
+
+  // wait for k2 to finish
+  kernelWait(&k2.kernel);
+
+  // if k1 did not finish, run the drain procedure
+  if (kernelGetStatus(&k1.kernel)==KERNEL_RUNNING) {
+
+    kernelEnd(&k1.kernel);
+
+    // start PopKernel running in its "unbounded remainder mode", in which
+    // it pauses itself after each item that it pops.
+    PopKernelInit(&popKernel, P2, &s1, c, FALSE);
+    kernelRun(&popKernel.kernel);
+
+    // pop one item at a time from s until k1 has finished
+    do {
+      kernelWaitMultiple(&k1.kernel, &popKernel.kernel);
+      if (kernelGetStatus(&popKernel.kernel)==KERNEL_PAUSED) {
+        kernelRun(&popKernel.kernel);
+      }
+      if (kernelGetStatus(&k1.kernel)==KERNEL_PAUSED) {
+        kernelRun(&k1.kernel);
+      }
+    } while (kernelGetStatus(&k1.kernel)!=KERNEL_FINISHED);
+    
+    // start PushKernel running
+    PushKernelInit(&pushKernel, P1, &s1, c);
+    kernelRun(&pushKernel.kernel);
+
+
+    // change the PopKernel's state to be in "bounded remainder mode", in which
+    // it will pop c items and then keep popping until it finds an EOS tag
+    kernelWait(&popKernel.kernel);
+    popKernel.boundedRemainder = TRUE;
+    kernelRun(&popKernel.kernel);
+
+    // wait for PopKernel to finish
+    kernelWait(&popKernel.kernel);
+
+    // at this point, we are guaranteed that both kernels have finished, 
+    // and that the stream s has been completely drained
+    ASSERT(kernelGetStatus(&popKernel.kernel)==KERNEL_FINISHED);
+    ASSERT(kernelGetStatus(&pushKernel.kernel)==KERNEL_FINISHED);
+  }
+
+  // ------------- kernel code for PopKernel -------------
+
+  typedef struct {
+    Kernel kernel;
+    IStream* in;
+    int capacity;
+    boolean boundedRemainder;
+  } PopKernel;
+
+  void popKernelWork();
+  
+  pushInit(PopKernel* k, VM_NODE_PROC procLocation, IStream* _in, int _capacity, boolean _boundedRemainder) {
+    kernelInit(&k->kernel, procLocation, 0, k, sizeof(PopKernel), (ExtKernelWork)&popKernelWork); 
+    k->in = _in;
+    k->capacity = _capacity;
+    k->boundedRemainder = _boundedRemainder;
+  }
+
+  void popKernelWork(PopKernel* k) {
+    int i, x;
+    boolean done = FALSE;
+    do {
+      if (k->boundedRemainder) {
+        // if we have a bounded remainder, first pop as many items
+        // as will fit in the stream, as these could be junk leftovers 
+        // from the original upstream kernel.
+        for (i = 0; i < k->capacity; i++) {
+          streamPop(&k->in, &x);
+        }
+        done = FALSE;
+        // then, pop until we find the EOS tag that the pushKernel output
+        do {
+          done = streamPeekEOS(&k->in, 0);
+          streamPop(&k->in, &x);
+        } while (!done);
+      } else {
+        // if we do not have a bounded remainder, then pop one item and pause
+        streamPop(&k->in, &x);
+        kernelPause(&k->kernel);
+      }
+    } while (!done);
+  }
+
+  // ------------- kernel code for PushKernel -------------
+
+  typedef struct {
+    Kernel kernel;
+    OStream* out;
+    int capacity;
+  } PushKernel;
+
+  void pushKernelWork();
+  
+  sumInit(PushKernel* k, VM_NODE_PROC procLocation, OStream* _out, int _capacity) {
+    kernelInit(&k->kernel, procLocation, 0, k, sizeof(PushKernel), (ExtKernelWork)&pushKernelWork); 
+    k->out = _out;
+    k->capacity = _capacity;
+  }
+
+  void pushKernelWork(PushKernel* k) {
+    int i, dummy = 0;
+    // push as many dummy items as would fill up the stream, in case
+    // the original kernel did not leave any junk leftovers for PopKernel 
+    // to consume
+    for (i = 0; i < k->capacity; i++) {
+      streamPush(&k->kernel, &dummy);
+    }
+    // push a single item with an EOS tag, indicating the true end of stream
+    streamPushEOS(&k->kernel, &dummy);
+  }
+\end{verbatim}}
+
+The above procedure is an example of a basic draining operation that
+can be constructed using the primitives in the SVM.  The High Level
+Compiler should employ similar mechanisms in other scenarios to ensure
+that it always has a consistent view of FIFO contents.
 
 %% \subsection*{Appendix A:  Reference Implementation of Pre-Defined Kernels}
 %%
