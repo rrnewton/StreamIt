@@ -2013,15 +2013,15 @@ function, the {\tt iteration} variable marks the current iteration.
 \begin{verbatim}
   typedef struct {
     svm_Kernel kernel;
-    svm_IStream* srcStr,
-    svm_OStream* destStr,
-    size_t elementSize,
-    size_t length,
-    boolean setEOS
+    svm_IStream* srcStr;
+    svm_OStream* destStr;
+    size_t elementSize;
+    size_t length;
+    boolean setEOS;
   } svm_Move;
 
   void svm_moveInit(svm_Move* move, mm_Proc location, svm_IStream* _srcStr, 
-                    svm_OStream* _destStr, size_t _length, boolean _setEOS);
+                    svm_OStream* _destStr, size_t _length, boolean _setEOS) {
     kernelInit(&move->kernel, location, 0, move, sizeof(svm_Move), (ExtKernelWork)&svm_moveWork);
     move->srcStr = _srcStr;
     move->destStr = _destStr;
@@ -2058,16 +2058,16 @@ function, the {\tt iteration} variable marks the current iteration.
 \begin{verbatim}
   typedef struct {
     svm_Kernel kernel;
-    svm_IStream* srcStr,
-    svm_OBlock* destBlock,
-    size_t length,
-    size_t destStride,
-    size_t elementsPerStride
+    svm_IStream* srcStr;
+    svm_OBlock* destBlock;
+    size_t length;
+    size_t destStride;
+    size_t elementsPerStride;
   } svm_StridedScatter;
 
   void svm_stridedScatterInit(svm_StridedScatter* scatter, mm_Proc location, 
                               svm_IStream* _srcStr, svm_OBlock* _destBlock, size_t _length,
-                              size_t _destStride, size_t _elementsPerStride)
+                              size_t _destStride, size_t _elementsPerStride) {
     kernelInit(&scatter->kernel, location, 0, scatter, sizeof(svm_StridedScatter), 
                (ExtKernelWork)&svm_stridedScatterWork);
     scatter->srcStr = _srcStr;
@@ -2103,17 +2103,17 @@ function, the {\tt iteration} variable marks the current iteration.
 \begin{verbatim}
   typedef struct {
     svm_Kernel kernel;
-    svm_IBlock* srcBlock,
-    svm_OStream* destStr,
-    size_t length,
-    size_t srcStride,
-    size_t elementsPerStride,
-    boolean setEOS
+    svm_IBlock* srcBlock;
+    svm_OStream* destStr;
+    size_t length;
+    size_t srcStride;
+    size_t elementsPerStride;
+    boolean setEOS;
   } svm_StridedGather;
 
   void svm_stridedGatherInit(svm_StridedGather* gather, mm_Proc location, 
                              svm_IBlock* _srcBlock, svm_OStream* _destStr, size_t _length,
-                             size_t _srcStride, size_t _elementsPerStride, boolean setEOS)
+                             size_t _srcStride, size_t _elementsPerStride, boolean setEOS) {
     kernelInit(&gather->kernel, location, 0, gather, sizeof(svm_StridedGather), 
                (ExtKernelWork)&svm_stridedGatherWork);
     gather->srcBlock = _srcBlock;
@@ -2156,17 +2156,17 @@ function, the {\tt iteration} variable marks the current iteration.
 \begin{verbatim}
   typedef struct {
     svm_Kernel kernel;
-    svm_IStream* srcStr,
-    svm_IStream* indexStr,
-    svm_OBlock* destBlock,
-    size_t length,
-    size_t elementsPerIndex
+    svm_IStream* srcStr;
+    svm_IStream* indexStr;
+    svm_OBlock* destBlock;
+    size_t length;
+    size_t elementsPerIndex;
   } svm_IndexedScatter;
 
   void svm_indexedScatterInit(svm_IndexedScatter* scatter, mm_Proc location, 
                               svm_IStream* _srcStr, svm_IStream* _indexStr, 
-                              svm_OBlock* _destBlock, size_t _length, size_t _elementsPerIndex)
-    kernelInit(&scatter->kernel, location, 0, scatter, sizeof(svm_IndexedScatter), 
+                              svm_OBlock* _destBlock, size_t _length, size_t _elementsPerIndex) {
+    kernelInit(&scatter->kernel, location, 0, scatter, sizeof(svm_IndexedScatter),
                (ExtKernelWork)&svm_indexedScatterWork);
     scatter->srcStr = _srcStr;
     scatter->indexStr = _indexStr;
@@ -2217,17 +2217,17 @@ function, the {\tt iteration} variable marks the current iteration.
 \begin{verbatim}
   typedef struct {
     svm_Kernel kernel;
-    svm_IBlock* srcBlock,
-    svm_IStream* indexStr,
-    svm_OStream* destStr,
-    size_t length,
-    size_t elementsPerIndex,
-    boolean setEOS
+    svm_IBlock* srcBlock;
+    svm_IStream* indexStr;
+    svm_OStream* destStr;
+    size_t length;
+    size_t elementsPerIndex;
+    boolean setEOS;
   } svm_IndexedGather;
 
   void svm_indexedGatherInit(svm_IndexedGather* gather, mm_Proc location, 
                               svm_IBlock* _srcBlock, svm_IStream* _indexStr, svm_OStream* _destStr,
-                              size_t _length, size_t _elementsPerIndex, boolean _setEOS)
+                              size_t _length, size_t _elementsPerIndex, boolean _setEOS) {
     kernelInit(&gather->kernel, location, 0, gather, sizeof(svm_IndexedGather), 
                (ExtKernelWork)&svm_indexedGatherWork);
     gather->srcBlock = _srcBlock;
