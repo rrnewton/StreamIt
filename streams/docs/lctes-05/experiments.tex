@@ -43,7 +43,7 @@ applies the scalar-replacement, an the last bar,
 labeled \texttt{CAF+buffer+scaling}, applies all three optimizations.
 
 In general, scaling improves performance, with speedups ranging for
-XXX-XXX\% compared to the baseline on the Petium. In the case of
+4-87\% compared to the baseline on the Petium. In the case of
 \texttt{matmult} and \texttt{ofmd}, there is a slight degradation
 (nearly 5\%) due to poor code size estimation. By comparsion, the
 scaling resutls on the 
@@ -84,5 +84,5 @@ applied (the last bar). In this case, the granualarity-adjusted actors
 are scaled to maximize cache locality. In addition, the scalar replacement
 helps to reduce the overhead of moving data
 between actors. As a result, the performance gains can be quite
-dramatic, ranging upto 98\% savings in execution time.
+dramatic, ranging upto 99\% savings in execution time.
 
