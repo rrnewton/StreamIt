@@ -16,7 +16,7 @@ Scheduling.
 The pseudo single-appearance hierarchical scheduling technique
 presented in Chapter \ref{chpt:hierarchical}, while quite
 effective in scheduling simple applications, cannot schedule a
-small number of tight {\feedbackloops}. Furthermore, the technique
+small number of tight {{\feedbackloops}}. Furthermore, the technique
 is quite inflexible when it comes to attempting to create a
 different tradeoff between schedule size and buffer size. Phased
 scheduling solves both of these problems.
@@ -72,9 +72,9 @@ The granularity of splitting the steady state schedule into phases
 is left up to the specific scheduler.  Different streams can use
 different granularities of execution.  In principle, the parent
 should not need to know the scheduling granularity of its
-children. The only exception to this rule are {\feedbackloops},
+children. The only exception to this rule are {{\feedbackloops}},
 which can have children which are not scheduled tightly enough to
-allow the {\feedbackloop} to execute. An example of that may be a
+allow the {{\feedbackloop}} to execute. An example of that may be a
 pseudo single-appearance hierarchical scheduling algorithm
 described in Section \ref{sec:sas} implemented using phase
 scheduling.
@@ -99,7 +99,7 @@ pipeline should at most have $4+9=13$ phases.
 
 One of the problems with pseudo single-appearance scheduling is
 that it cannot schedule all legal {\StreamIt} programs.  A program
-with a {\feedbackloop} can have requirements for tight execution
+with a {{\feedbackloop}} can have requirements for tight execution
 that cannot be satisfied using a pseudo single-appearance
 schedule, leading to deadlock. Phasing scheduling can alleviate
 this problem by allowing the program to be scheduled in a more
@@ -108,7 +108,7 @@ specific scheduling strategy that solves the problem of deadlock.
 Minimal latency schedule is a schedule that requires a minimal
 amount of input data in order to output data. In other words, a
 minimal latency schedule only buffers as much data as is
-absolutely necessary. This means that if a \feedbackloop can be
+absolutely necessary. This means that if a {\feedbackloop} can be
 scheduled, a minimal latency schedule will be able to schedule it.
 
 \begin{comment}
@@ -233,12 +233,12 @@ c_p = \left[ \begin{array}{c} e_f \\ o_f \\ u_f \end{array}
 \right\}
 \end{displaymath}
 
-\subsubsection{\pipeline, \splitjoin and \feedbackloop}
+\subsubsection{{\pipeline}, {\splitjoin} and {\feedbackloop}}
 
 Technique used for calculating minimal latency phasing schedule
-for a {\pipeline}, {\splitjoin} and {\feedbackloop} is similar to
+for a {\pipeline}, {\splitjoin} and {{\feedbackloop}} is similar to
 the technique used to create a pseudo single-appearance
-hierarchical schedule for a {\feedbackloop}. Every phase is
+hierarchical schedule for a {{\feedbackloop}}. Every phase is
 computed separately. Every phase knows how much data has been left
 in internal buffers by the previous phase.  The goal is to create
 a phase that consumes the minimum amount of data from the {\Input}
@@ -263,12 +263,12 @@ restrictions. If the node reading from a {\Channel} peeks more
 than it pops, the amount of data in the {\Channel} during real
 execution cannot fall below the $peek-pop$ amount.
 \end{comment}
-Since some \filters require a positive number of data items in the
-\Channel , we also need to keep track of amount of data needed
+Since some {\filters} require a positive number of data items in the
+{\Channel} , we also need to keep track of amount of data needed
 from a {\Channel}, as can be seen in Table\ref{tbl:min-lat-sj}.
 
 The initialization schedule starts with no internally buffered
-data (with exception of {\feedbackloops}) and executes as many
+data (with exception of {{\feedbackloops}}) and executes as many
 phases as is necessary to ensure that all children have executed
 all of their initialization phases. Once that has been achieved,
 the steady state schedule is created. The only difference between
@@ -281,7 +281,7 @@ been executed.
 
 The only significant difference between the algorithms used for
 minimal latency scheduling of different stream types ({\pipeline},
-{\splitjoin} and {\feedbackloop}) is the order with which children
+{\splitjoin} and {{\feedbackloop}}) is the order with which children
 of the stream are considered for execution.
 
 \begin{comment}
@@ -290,7 +290,7 @@ phases that must be executed for its steady state schedule to be
 complete is $S_{s,v,i} * |P_{s_i,T}|$.
 \end{comment}
 
-For a \pipeline, the order with which children are considered for
+For a {\pipeline}, the order with which children are considered for
 execution is as follows.  First all the children are considered
 for execution moving from bottom to top.  The last child executes
 just enough phases to produce some data.  The child directly above
@@ -308,11 +308,11 @@ every child together, in order, iterating from top-most child down
 to bottom-most child).  This constitutes one complete phase of the
 {\pipeline}.
 
-For a \splitjoin, the process is similar, but the children are
-first executed bottom up starting with \joiner, then the stream
-children and finally the \splitter. After the children are
-executed from top to bottom (excluding the \splitter), consuming
-only data already available to them in \Channels.
+For a {\splitjoin}, the process is similar, but the children are
+first executed bottom up starting with {\joiner}, then the stream
+children and finally the {\splitter}. After the children are
+executed from top to bottom (excluding the {\splitter}), consuming
+only data already available to them in {\Channels}.
 
 \begin{comment}
 Using the sample {\pipeline} from Figure
@@ -577,10 +577,10 @@ c^i_{sj} = \left[ \begin{array}{c} 3 \\ 3 \\ 0 \end{array}
 \right\}
 \end{displaymath}
 
-\subsubsection{\feedbackloop}
+\subsubsection{{\feedbackloop}}
 \end{comment}
 
-Scheduling of {\feedbackloops} is again similar to the above
+Scheduling of {{\feedbackloops}} is again similar to the above
 algorithms.  The children's phases are executed in order of
 ({\splitter}, body child, {\joiner}, body child, {\splitter}, loop
 child).  The {\splitter} tries to execute exactly one time on its
@@ -590,46 +590,46 @@ first execution.  Then the body child, {\splitter} and the loop
 child are executed as many times as possible with the data
 available to them on their {\Input} {{\Channels}}.
 
-The one big difference between {\feedbackloop} and the other streams
-({\pipeline} and {\splitjoin}) is that in scheduling a {\feedbackloop},
+The one big difference between {{\feedbackloop}} and the other streams
+({\pipeline} and {\splitjoin}) is that in scheduling a {{\feedbackloop}},
 the {\joiner} is {\emph not} allowed to borrow elements from $out_L$
 {{\Channel}}.  That is in the trace table, the $out_L$ entry is never
 allowed to become negative.  The reason for this is that
-{\feedbackloops} are cyclical structures, and allowing the {\joiner}
+{{\feedbackloops}} are cyclical structures, and allowing the {\joiner}
 to borrow elements from $out_L$ would cause a full cycle of
 borrowing, leading to deadlock.
 
 \begin{comment}
 This one condition does not prevent from scheduling any legal
-{\feedbackloops}.  The reason for this is that before the
-{\feedbackloop} is initialized, there is data pushed onto the
+{{\feedbackloops}}.  The reason for this is that before the
+{{\feedbackloop}} is initialized, there is data pushed onto the
 $out_L$ {{\Channel}}.  At the end of scheduling of any phase, all
-available data is pushed through the {\feedbackloop} into the
+available data is pushed through the {{\feedbackloop}} into the
 $out_L$ {{\Channel}}.  Thus any available free data is already always
 stored in the $out_L$ {{\Channel}}, and there is no additional data to
-borrow from in a {\feedbackloop}.
+borrow from in a {{\feedbackloop}}.
 
 If the algorithm is unable to schedule an execution of the {\joiner}
 in a phase without borrowing data from $out_L$ {{\Channel}}, then the
-{\feedbackloop} cannot be scheduled.
+{{\feedbackloop}} cannot be scheduled.
 
-\begin{lemma}[{\feedbackloop} Scheduling]
-If all children of a {\feedbackloop} are scheduled using minimal
-latency scheduling algorithm, then if the {\feedbackloop} cannot
+\begin{lemma}[{{\feedbackloop}} Scheduling]
+If all children of a {{\feedbackloop}} are scheduled using minimal
+latency scheduling algorithm, then if the {{\feedbackloop}} cannot
 be scheduled using the minimal latency scheduling algorithm then
-there is no valid schedule for this {\feedbackloop}.
+there is no valid schedule for this {{\feedbackloop}}.
 \end{lemma}
 
 We believe this lemma to be true because minimal latency
 scheduling always consumes the minimal amount of data to produce
 some data, and produces the maximal amount of data possible given
 the amount of data it consumes.  Thus no data is being buffered up
-in {{\Channels}} and if the {\feedbackloop} cannot be scheduled, then
+in {{\Channels}} and if the {{\feedbackloop}} cannot be scheduled, then
 the $delay_{fl}$ value is too low and does not provide enough data
 to complete a steady state execution. A formal proof is left for
 future work.
 
-We will again use the sample {\feedbackloop} from Figure
+We will again use the sample {{\feedbackloop}} from Figure
 \ref{fig:hierarchical-schedule}(c).  The following are the phasing
 schedules for {\filters} B and L:
 
@@ -664,7 +664,7 @@ c^i_L = \left[ \begin{array}{c} 4 \\ 0 \\ 0
 \end{displaymath}
 
 \noindent Table \ref{tbl:min-lat-fl} shows execution of the
-algorithm on the {\feedbackloop} from Figure
+algorithm on the {{\feedbackloop}} from Figure
 \ref{fig:hierarchical-schedule}(c).
 
 \begin{table} \centering
@@ -738,18 +738,18 @@ algorithm on the {\feedbackloop} from Figure
 \hline
 \end{tabular}
 \caption[Execution of Minimal Latency Scheduling Algorithm on a
-{\feedbackloop}]{Execution of Minimal Latency Scheduling Algorithm
-on {\feedbackloop} from Figure
+{{\feedbackloop}}]{Execution of Minimal Latency Scheduling Algorithm
+on {{\feedbackloop}} from Figure
 \ref{fig:hierarchical-schedule}(c).} \label{tbl:min-lat-fl}
 \end{table}
 
 Once the number of executions of children's phases is known for
-every phase of the {\feedbackloop}'s schedule, the phasing schedule
+every phase of the {{\feedbackloop}}'s schedule, the phasing schedule
 can be constructed.  For every phase, the children of the
-{\feedbackloop} are iterated over in order of ({\joiner}, body child,
+{{\feedbackloop}} are iterated over in order of ({\joiner}, body child,
 {\splitter}, loop child) and for every child the appropriate number
 of phases is inserted into the schedule.  Below is the schedule
-for {\feedbackloop} in Figure \ref{fig:hierarchical-schedule}(c):
+for {{\feedbackloop}} in Figure \ref{fig:hierarchical-schedule}(c):
 
 \begin{displaymath} \small
 P_{fl} = \left\{
@@ -804,14 +804,14 @@ c_{fl} = \left[ \begin{array}{c} 12 \\ 12 \\ 15 \end{array}
 in {{\Channel}}" columns, the first value represents the actual
 number of data in the {{\Channel}}, which can be negative due to
 data borrowing. The second value is the minimal number of
-additional data items needed in the \Channel.}
+additional data items needed in the {\Channel}.}
 \label{tbl:min-lat-sj}
 \end{table}
 
 Table \ref{tbl:min-lat-sj} contains a trace of execution of our
-algorithm on the sample \splitjoin from Figure
+algorithm on the sample {\splitjoin} from Figure
 \ref{fig:steady-state}(b). Below is the phasing schedule for the
-\splitjoin. Note that this example does produce a single
+{\splitjoin}. Note that this example does produce a single
 appearance schedule.
 
 \begin{displaymath} \scriptsize

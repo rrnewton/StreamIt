@@ -576,7 +576,7 @@ the sender and the receiver.  The amount of information stored
 between two {\filters} is the amount of information that entered the
 interval between those two {\filters} minus the amount of
 information that is destroyed due to peeking of {\filters} plus some
-data possibly put in the feedback path of a {\feedbackloop} (due to
+data possibly put in the feedback path of a {{\feedbackloop}} (due to
 $delay_{fl} > 0$).
 
 When a {\filter} with $e_f > o_f$ executes for the first time, it
@@ -717,7 +717,7 @@ to be written down. Here all filters will be represented by $f_m$
 with $0 \leq m < n_f$ with $n_f$ filters in the program.
 {\splitters} will be represented by $s_m$ and {\joiners} with $j_m$,
 $0 \leq m < n_{sj}$, with $n_{sj}$ representing number of
-{\splitjoins} and {\feedbackloops}. {{\Channels}} will be represented by
+{\splitjoins} and {{\feedbackloops}}. {{\Channels}} will be represented by
 $in_{f_m}$, $in_{s_m}$ and $in_{j_m, k}$ with $k$ representing the
 $k$th branch of the {\joiner}. {{\Channels}} are designated by {\StreamIt}
 nodes that use the {{\Channel}} as an {\Input} {{\Channel}}. Number of
@@ -732,7 +732,7 @@ minus amount of information lost on first execution of the
 downstream node, namely $in_{s_{dst}} = info_{in_{s_{dst}}}
 (c_{s_{src}} * u_{s_{src}} - c_{s_{dst}} * o_{s_{dst}} -
 (e_{s_{dst}} - o_{s_{dst}}))$. The only exception to this rule are
-joiner buffers in {\feedbackloops}. Those buffers start with
+joiner buffers in {{\feedbackloops}}. Those buffers start with
 $delay_{fl_m}$ data items, thus $info_{in_{j_m,1}} * delay_{fl_m}$
 information needs to be added the amount of information stored in
 $in_{{j_m}, 1}$.

@@ -16,7 +16,7 @@
 ~
 \begin{minipage}{1.5in}
 \centering \psfig{figure=feedback-steady-state.eps,width=1.0in} \\
-{\protect\small (c) A sample {\feedbackloop}.  The $L$ {\filter}
+{\protect\small (c) A sample {{\feedbackloop}}.  The $L$ {\filter}
 has been flipped upside-down for clarity.\\$peek_L = pop_L = 5,
 push_L = 6$}
 \end{minipage}
@@ -50,14 +50,14 @@ $G$ takes data from its {\Input} {\Channel}(s), processes this data,
 and puts the result on the {\Output} {\Channel}(s).  Each data
 {\Channel} is simply a FIFO queue.
 
-In order for a \filter $f$ to execute, it must have at least $e_f$
-data on its \Input \Channel. After its execution it will decrease
-amount of data on its \Input \Channel by $o_f$ and increase the
-amount of data on its \Output \Channel by $u_f$. Similarly, a
-\splitter will consume $o_s$ data from its \Input \Channel and
-push $w_{s,i}$ data into each of its \Output \Channels, while a
-\joiner will consume $w_{j,i}$ data from its \Input \Channels and
-push $u_j$ onto its \Output \Channel.
+In order for a {\filter} $f$ to execute, it must have at least $e_f$
+data on its {\Input} {\Channel}. After its execution it will decrease
+amount of data on its {\Input} {\Channel} by $o_f$ and increase the
+amount of data on its {\Output} {\Channel} by $u_f$. Similarly, a
+{\splitter} will consume $o_s$ data from its {\Input} {\Channel} and
+push $w_{s,i}$ data into each of its {\Output} {\Channels}, while a
+{\joiner} will consume $w_{j,i}$ data from its {\Input} {\Channels} and
+push $u_j$ onto its {\Output} {\Channel}.
 
 \begin{comment}
 Each {\filter} node $n_f$ has exactly one incoming edge and one
@@ -155,12 +155,12 @@ schedule.  It does not impose an order of execution of the nodes
 in the program. Not every {\StreamIt} program has a steady state
 schedule.  It is possible for a program to have unbalanced
 production and consumption of data in {\splitjoins} and
-{\feedbackloops}.
+{{\feedbackloops}}.
 \begin{comment}
 The amount of data buffered
 continually increases, and cannot be reduced, thus making it
 impossible to create a steady state schedule for them.  It is also
-possible that a {\feedbackloop} does not have enough data buffered
+possible that a {{\feedbackloop}} does not have enough data buffered
 up internally in order to complete execution of a full steady
 state, and thus deadlocks. Programs without a valid steady state
 schedule are not considered valid {\StreamIt} programs. In other
@@ -193,7 +193,7 @@ A {\StreamIt} program that has a valid steady state, has a unique
 minimal steady state.
 \end{theorem}
 
-This means that every valid \StreamIt program has a unique minimal
+This means that every valid {\StreamIt} program has a unique minimal
 steady state. Our scheduler will produce schedules that execute
 exactly the minimal steady state of a program.
 
@@ -280,7 +280,7 @@ the \stream to find the minimal steady state schedule.
 
 Minimal steady states are calculated recursively in a hierarchical
 manner. That is, a minimal steady state is calculated for all
-children streams of {\pipeline}, {\splitjoin} and {\feedbackloop},
+children streams of {\pipeline}, {\splitjoin} and {{\feedbackloop}},
 and then the schedule is computed for the actual parent stream
 using these minimal states as atomic executions.
 \begin{comment}
@@ -308,7 +308,7 @@ which holds number of steady state executions of all direct
 children of $s$. $m$ and $v$ are not the same vector, because $m$
 refers to nodes in the subgraph, while $v$ refers only to the
 direct children, which may be {\filters}, {\pipelines},
-{\splitters} and {\feedbackloops}. For a stream $s$, set $S$ is
+{\splitters} and {{\feedbackloops}}. For a stream $s$, set $S$ is
 denoted as $S_s$ and the elements of $S_s$ are denoted as
 $S_{s,m}$, $S_{s,N}$, $S_{s,c} and S_{s,v}$.
 
@@ -318,7 +318,7 @@ be executed to preserve amount of data buffered by the stream.
 
 We omit the equations for calculating the minimal steady states
 for brevity. Details can be found in Appendix \ref{apx:eqs}. As an
-example, the \splitjoin from Figure \ref{fig:steady-state}(b) has
+example, the {\splitjoin} from Figure \ref{fig:steady-state}(b) has
 the following steady state:
 
 \begin{displaymath}
@@ -482,7 +482,7 @@ size required in order for two {\filters} to be able to push data
 between each other indefinitely in the most buffer-efficient way.
 Buffers this size cannot always be achieved, because some
 components require that data be buffered up for execution (ex.
-{\feedbackloops} require data to exist internally in order to
+{{\feedbackloops}} require data to exist internally in order to
 execution to advance) or because extra latency constrains require
 additional buffering.
 

@@ -5,7 +5,7 @@ This appendix presents equations used for calculating minimal
 steady states.  Minimal steady states are calculated recursively
 in a hierarchical manner. That is, a minimal steady state is
 calculated for all children streams of {\pipeline}, {\splitjoin}
-and {\feedbackloop}, and then the schedule is computed for the
+and {{\feedbackloop}}, and then the schedule is computed for the
 actual parent stream using these minimal states as atomic
 executions. This yields a minimal steady state because all child
 streams must execute their steady states (to avoid buffering
@@ -29,12 +29,12 @@ stream.''
 ~
 \begin{minipage}{2in}
 \centering \psfig{figure=feedback-steady-state.eps,width=1.0in} \\
-{\protect\small (c) A sample {\feedbackloop}.  The $L$ {\filter}
+{\protect\small (c) A sample {{\feedbackloop}}.  The $L$ {\filter}
 has been flipped upside-down for clarity.\\$peek_L = pop_L = 5,
 push_L = 6$}
 \end{minipage}
 
-\caption{Sample {\StreamIt} streams. Except for the \pipeline,
+\caption{Sample {\StreamIt} streams. Except for the {\pipeline},
 these are identical to streams in Figure \ref{fig:steady-state}}
 \label{fig:app:steady-state}
 
@@ -242,7 +242,7 @@ We start by calculating all $S_{sj_i}, i \in \{0, \dots, n-1\}$.
 Next we compute a fraction vector $v''$ and a fraction $a_j''$
 such that executing the {\splitter} exactly once, each child
 $sj_i$ $v_i''$ times and the {\joiner} $a_j''$ times does not
-change the amount of data buffered on any \Channel in the
+change the amount of data buffered on any {\Channel} in the
 {\splitjoin}. Again, since $v''$ and $a_j''$ are fractions, we
 multiply the steady-state pop and push amounts by appropriate
 fractions to obtain the amount of data pushed and popped.  For
@@ -265,7 +265,7 @@ o_{s_k}}{u_{sj_k} \over w_{j,k}}}$ times.
 Next we compute integer vector $v'$ and integers $a_s$ and $a_j$
 such that executing the {\splitter} $a_s$ times, each child $sj_i$
 $v_i'$ times and the {\joiner} $a_j$ times still does not change
-the amount of data buffered on any \Channel in the {\splitjoin}.
+the amount of data buffered on any {\Channel} in the {\splitjoin}.
 We do this by multiplying $a_s''$, $v''$ and $a_j''$ by $w_{j,k}
 \left(\prod_{r=0}^{n-1}o_{sj_r}\right)$. Thus we get
 
@@ -429,16 +429,16 @@ does, then the two paths tested have different
 production/consumption rates, and the {\splitjoin} does not have a
 steady state.
 
-\subsection{\feedbackloop}
+\subsection{{\feedbackloop}}
 
-Let {\feedbackloop} $fl$ have children $B$ (the body child) and
+Let {{\feedbackloop}} $fl$ have children $B$ (the body child) and
 $L$ (the feedback loop child). Let the {\joiner} and the
-{\splitter} of the {\feedbackloop} be denoted $fl_j$ and $fl_s$.
+{\splitter} of the {{\feedbackloop}} be denoted $fl_j$ and $fl_s$.
 Let $w_{j,I}$ and $w_{j,L}$ denote the number of data items
 consumed by the {\joiner} from the {\Input} {{\Channel}} to the
-{\feedbackloop} and from $fl_L$, respectively.  Let $w_{s,O}$ and
+{{\feedbackloop}} and from $fl_L$, respectively.  Let $w_{s,O}$ and
 $w_{s,F}$ denote the number of data items pushed by the
-{\splitter} onto the {\feedbackloop}'s {\Input} {{\Channel}} and
+{\splitter} onto the {{\feedbackloop}}'s {\Input} {{\Channel}} and
 to $fl_L$ respectively.  We are computing $S_{fl}$.
 
 First we calculate $S_{B}$ and $S_{L}$.
@@ -447,7 +447,7 @@ Now we compute a fractional vector $v'' = [a_B''\ a_L''\ a_s''\
 a_j'']$ such that executing the body child $a_B''$ times, the
 {\splitter} $a_s''$ times, the loop child $a_L''$ times and the
 {\joiner} $a_j''$ times will not change the amount of data
-buffered up in any \Channel in the {\feedbackloop}.  Thus
+buffered up in any {\Channel} in the {{\feedbackloop}}.  Thus
 
 \begin{displaymath}
 \begin{array}{rcl}
@@ -463,12 +463,12 @@ We begin with setting $a_j'' = 1$. $B$ needs to be executed $a_B''
 $a_s'' = {u_j \over o_B}{u_B \over o_s}$ times and $L$ needs to be
 executed $a_L'' = {u_j \over o_B}{u_B \over o_s}{w_{s,L} \over
 o_L}$ times. Furthermore, in order to assure that the
-{\feedbackloop} has a valid steady state, we continue going around
+{{\feedbackloop}} has a valid steady state, we continue going around
 the loop, the {\joiner} must require ${u_j \over o_B}{u_B \over
 o_s}{w_{s,L} \over o_L}{u_L \over w_{j,L}} = 1$.  If this
-condition is not satisfied, the {\feedbackloop} does not have a
+condition is not satisfied, the {{\feedbackloop}} does not have a
 steady state. This is a necessary, but not a sufficient condition
-for a {\feedbackloop} to be valid.
+for a {{\feedbackloop}} to be valid.
 
 Next we compute an integer vector $v' = [a_B'\ a_L'\ a_s'\ a_j']$
 such that executing B $a_B'$ times, {\splitter} $a_s'$ times, L
@@ -486,7 +486,7 @@ a_s = & u_j * u_B * o_L
 \end{displaymath}
 
 We now use $v'$ to compute $v = [a_B\ a_L\ a_s\ a_j]$, a minimal
-steady state for the {\feedbackloop}.  We do this by finding an
+steady state for the {{\feedbackloop}}.  We do this by finding an
 integer $g$, the $\gcd$ of all elements in $v'$ and computing $v =
 {v' \over g}$.
 
@@ -506,7 +506,7 @@ a_s * w_{s,O}
 \end{displaymath}
 
 Figure \ref{fig:app:steady-state}(c) depicts a sample
-{\feedbackloop}. The following are the steady states of the
+{{\feedbackloop}}. The following are the steady states of the
 {\splitjoin}'s children:
 $$
 \begin{array}{lrlr} S_B = & \left\{[1], \{B\}, { \left[
@@ -517,7 +517,7 @@ $$
 \end{array}
 \right]}, [] \right\}
 \end{array}
-$$ We compute $v'$ for this {\feedbackloop}:
+$$ We compute $v'$ for this {{\feedbackloop}}:
 
 \begin{displaymath}
 v' = \left[

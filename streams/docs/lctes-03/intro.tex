@@ -54,15 +54,15 @@ single-input, single-output; all computation happens in
 {\filters}; data is passed around between {\filters} using three
 streaming constructs: {\pipeline}, which allows stacking of
 {\filters} one after another, {\splitjoin}, which allows splitting
-and joining of data amongst multiple streams, and {\feedbackloop},
+and joining of data amongst multiple streams, and {{\feedbackloop}},
 which constructs cyclic streams.  In {\StreamIt}, every {\filter}
 must declare the rate at which it processes data: how much data is
 consumed and produced on every invocation of the {\filter}'s
 {\work} function.  This model of data passing is called
-Synchronous Data Flow (\SDF).
+Synchronous Data Flow ({\SDF}).
 
 \begin{comment}
-In addition to \SDF, {\StreamIt} allows the programmer to pass
+In addition to {\SDF}, {\StreamIt} allows the programmer to pass
 data between {\filters} in an asynchronous manner, similar to a
 combination of message passing and function calls. Timing of such
 data delivery is expressed in terms of amount of information
@@ -76,10 +76,10 @@ execution of {\StreamIt} programs.
 Using the features present in {\StreamIt}, the programmer can
 express complex algorithms and computation models.  One of the
 difficulties faced by {\StreamIt} is scheduling of the execution
-of the program.  Since {\StreamIt} uses \SDF computation model
+of the program.  Since {\StreamIt} uses {\SDF} computation model
 %with latency constraints,
 it is possible to schedule the order of execution of {\filters} at
-compile time.  Scheduling \SDF programs presents a difficult
+compile time.  Scheduling {\SDF} programs presents a difficult
 challenge to the compiler:  as the complexity of the program
 grows, the amount of memory required to execute the program
 increases.  This increase comes from two sources: the schedule
@@ -109,9 +109,9 @@ The contributions of this thesis are:
 \begin{itemize} \item
 hierarchical scheduling of streaming application, a concept
 enabled by {\StreamIt} language, \item first formal handling of
-\SDF graphs with peeking, \item novel phasing scheduling
+{\SDF} graphs with peeking, \item novel phasing scheduling
 technique, \item a minimal latency schedule using hierarchical
-phases, \item novel \SDF program abstraction called the
+phases, \item novel {\SDF} program abstraction called the
 information buffering model that simplifies information latency
 analysis, \item a solution to scheduling of {\StreamIt} programs
 with latency constraints.

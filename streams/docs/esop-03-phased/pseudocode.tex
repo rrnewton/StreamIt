@@ -15,7 +15,7 @@
 ~
 \begin{minipage}{1.5in}
 \centering \psfig{figure=feedback-steady-state.eps,width=1.0in} \\
-{\protect\small (c) A sample {\feedbackloop}.  The $L$ {\filter}
+{\protect\small (c) A sample {{\feedbackloop}}.  The $L$ {\filter}
 has been flipped upside-down for clarity.\\$peek_L = pop_L = 5,
 push_L = 6$}
 \end{minipage}
@@ -43,7 +43,7 @@ S_f = \left\{[1], \{f\}, { \left[
 Notice that $S_{f,v}$ is empty, because a {\filter} does not have
 any children.
 
-\subsubsection{\pipeline, \splitjoin and \feedbackloop}
+\subsubsection{{\pipeline}, {\splitjoin} and {\feedbackloop}}
 \begin{figure}\begin{center}
 \begin{minipage}{2in}
 \centering \psfig{figure=splitjoin-illegal.eps,width=2in}
@@ -53,8 +53,8 @@ any children.
 \end{figure}
 
 
-The computation of a steady state for a \pipeline, \splitjoin or a
-\feedbackloop is divided into three steps. In the first step we
+The computation of a steady state for a {\pipeline}, {\splitjoin} or a
+{\feedbackloop} is divided into three steps. In the first step we
 compute a fractional steady state (a steady state which includes
 fractional executions of internal \streams). In the second step we
 compute an integral steady state from the fractional steady state.
@@ -66,7 +66,7 @@ assign a value of 1 execution for an internal \stream, and iterate
 over all the children of the \stream to calculate how many times
 they need to execute to consume or produce enough data to conserve
 amount of data buffered in the \stream. Here we'll present
-specific equations for a \pipeline.
+specific equations for a {\pipeline}.
 
 Let the {\pipeline} $p$ have $n$ children and let $p_i$ denote the
 $i$th child of the {\pipeline} (counting from {\Input} to
@@ -144,7 +144,7 @@ v_{n-1} * u_{p_{n-1}}
 \end{displaymath}
 
 An example is presented in Figure \ref{fig:steady-state} (a). $A$,
-$B$, $C$ and $D$ are \filters.
+$B$, $C$ and $D$ are {\filters}.
 %\begin{comment}For this {\pipeline},
 we have the following steady states for all children of the
 {\pipeline}:
@@ -208,7 +208,7 @@ v = {v' \over 3} = {1 \over 3} \left[
 
 Finally, we construct $S_p$:
 %\end{comment}
-This \pipeline has the following steady state:
+This {\pipeline} has the following steady state:
 
 \begin{displaymath}
 S_p = \left\{
@@ -226,14 +226,14 @@ S_{D,m}, S_{A,N} \circ S_{B,N} \circ S_{C,N} \circ S_{D,N} \\
 \right\}
 \end{displaymath}
 
-The steady state for \splitjoins and \feedbackloops is computed in
+The steady state for {\splitjoins} and {\feedbackloops} is computed in
 a very similar way. It is important to note that not all
-\splitjoins and \feedbackloops have a steady state. It is possible
-that one branch of a \splitjoin will produce data at a rate
+{\splitjoins} and {\feedbackloops} have a steady state. It is possible
+that one branch of a {\splitjoin} will produce data at a rate
 disproportional to the other branch, thus causing data to
-infinitely buffer up inside the \splitjoin. An example of such a
-\splitjoin is presented in Figure \ref{fig:splitjoin-illegal}.
-Similarly it is possible for a \feedbackloop to consume the data
+infinitely buffer up inside the {\splitjoin}. An example of such a
+{\splitjoin} is presented in Figure \ref{fig:splitjoin-illegal}.
+Similarly it is possible for a {\feedbackloop} to consume the data
 from the feedback path slower or faster than it is pushed into the
 feedback path, thus causing either deadlock or infinite buffering.
 
@@ -431,16 +431,16 @@ does, then the two paths tested have different
 production/consumption rates, and the {\splitjoin} does not have a
 steady state.
 
-\subsubsubsection{\feedbackloop}
+\subsubsubsection{{\feedbackloop}}
 
-Let {\feedbackloop} $fl$ have children $B$ (the body child) and
+Let {{\feedbackloop}} $fl$ have children $B$ (the body child) and
 $L$ (the feedback loop child). Let the {\joiner} and the
-{\splitter} of the {\feedbackloop} be denoted $fl_j$ and $fl_s$.
+{\splitter} of the {{\feedbackloop}} be denoted $fl_j$ and $fl_s$.
 Let $w_{j,I}$ and $w_{j,L}$ denote the number of data items
 consumed by the {\joiner} from the {\Input} {{\Channel}} to the
-{\feedbackloop} and from $fl_L$, respectively.  Let $w_{s,O}$ and
+{{\feedbackloop}} and from $fl_L$, respectively.  Let $w_{s,O}$ and
 $w_{s,F}$ denote the number of data items pushed by the
-{\splitter} onto the {\feedbackloop}'s {\Input} {{\Channel}} and
+{\splitter} onto the {{\feedbackloop}}'s {\Input} {{\Channel}} and
 to $fl_L$ respectively.  We are computing $S_{fl}$.
 
 First we calculate $S_{B}$ and $S_{L}$.
@@ -449,7 +449,7 @@ Now we compute a fractional vector $v'' = [a_B''\ a_L''\ a_s''\
 a_j'']$ such that executing the body child $a_B''$ times, the
 {\splitter} $a_s''$ times, the loop child $a_F''$ times and the
 {\joiner} $a_j''$ times will not change the amount of data
-buffered up in the {\feedbackloop}.  Thus
+buffered up in the {{\feedbackloop}}.  Thus
 
 \begin{displaymath}
 \begin{array}{rcl}
@@ -465,12 +465,12 @@ We begin with setting $a_j'' = 1$. $B$ needs to be executed $a_B''
 $a_s'' = {u_j \over o_B}{u_B \over o_s}$ times and $L$ needs to be
 executed $a_L'' = {u_j \over o_B}{u_B \over o_s}{w_{s,L} \over
 o_L}$ times. Furthermore, in order to assure that the
-{\feedbackloop} has a valid steady state, we continue going around
+{{\feedbackloop}} has a valid steady state, we continue going around
 the loop, the {\joiner} must require ${u_j \over o_B}{u_B \over
 o_s}{w_{s,L} \over o_L}{u_L \over w_{j,L}} = 1$.  If this
-condition is not satisfied, the {\feedbackloop} does not have a
+condition is not satisfied, the {{\feedbackloop}} does not have a
 steady state. This is a necessary, but not a sufficient condition
-for a {\feedbackloop} to be valid.
+for a {{\feedbackloop}} to be valid.
 
 Next we compute an integer vector $v' = [a_B'\ a_L'\ a_s'\ a_j']$
 such that executing B $a_B'$ times, {\splitter} $a_s'$ times, L
@@ -488,7 +488,7 @@ a_s = & u_j * u_B * o_L
 \end{displaymath}
 
 We now use $v'$ to compute $v = [a_B\ a_L\ a_s\ a_j]$, a minimal
-steady state for the {\feedbackloop}.  We do this by finding an
+steady state for the {{\feedbackloop}}.  We do this by finding an
 integer $g$, the $\gcd$ of all elements in $v'$ and computing $v =
 {v' \over g}$.
 
@@ -507,7 +507,7 @@ a_s * w_{s,O}
 \end{array} \right\}
 \end{displaymath}
 
-Figure \ref{fig:steady-state}(c) depicts a sample {\feedbackloop}.
+Figure \ref{fig:steady-state}(c) depicts a sample {{\feedbackloop}}.
 The following are the steady states of the {\splitjoin}'s
 children:
 $$
@@ -519,7 +519,7 @@ $$
 \end{array}
 \right]}, [] \right\}
 \end{array}
-$$ We compute $v'$ for this {\feedbackloop}:
+$$ We compute $v'$ for this {{\feedbackloop}}:
 
 \begin{displaymath}
 v' = \left[
