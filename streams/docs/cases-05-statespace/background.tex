@@ -1,16 +1,46 @@
+\begin{figure}[t]
+{\scriptsize
+\begin{verbatim}
+   float->float filter MovingAverage(int N) {
+     float[N] weights;  // a filter field
+
+     // init function initializes the weights
+     init {
+       for (int i=0; i<N; i++)
+         weights[i] = 1/N;
+     }
+
+     // work function declares push, pop, peek rates
+     work push 1 pop 1 peek N {
+       float result = 0;  // a local variable
+       for (int i=0; i<N; i++) {
+         result += weights[i] * peek(i);
+       }
+       push(result);
+       pop();
+     }
+   } 
+\end{verbatim}
+\vspace{-12pt}
+\caption{Example of a StreamIt filter.\protect\label{fig:filter-example}}}
+\vspace{-6pt}
+\end{figure}
+
 \mysubsection{The StreamIt Language}
 \label{sec:background}
 
 StreamIt~\cite{streamitcc} is an architecture-independent language for
 signal processing applications.  The basic programmable unit in
-StreamIt is a filter.  Each filter contains a work function which
-executes atomically, popping a fixed number of items from the filter's
-input tape and pushing a fixed number of items to the filter's output
-tape.  A filter can also ``peek'' at a given index on its input tape
-without consuming the item; this makes it simple to write
-sliding-window applications.  The push, pop, and peek rates are
-declared as part of the work function, thereby enabling the compiler
-to construct a static schedule of filter firings~\cite{lee87static}.
+StreamIt is a filter; for example, see the {\tt MovingAverage} filter
+in Figure~\ref{fig:filter-example}.  A filter contains a work function
+which executes atomically, popping a fixed number of items from the
+filter's input tape and pushing a fixed number of items to the
+filter's output tape.  A filter can also ``peek'' at a given index on
+its input tape without consuming the item; this makes it simple to
+write sliding-window applications such as the {\tt MovingAverage}.
+The push, pop, and peek rates are declared on the same line as the
+work function, thereby enabling the compiler to construct a static
+schedule of filter firings~\cite{lee87static}.
 
 Each filter has a distinct address space.  A filter can store two
 types of variables: a {\it field} and a {\it local}.  Fields are
@@ -29,7 +59,7 @@ together in a roundrobin fashion.  The {\it feedback loop} provides a
 mechanism for introducing cycles in the graph.  An example of a
 pipeline appears in Figure~\ref{fig:iir-pipeline}.  It contains a
 single IIR (Infinite Impulse Response) filter, which could be
-implemented as shown at the top of Figure~\ref{fig:opt-seq}.
+implmeneted as shown at the top of Figure~\ref{fig:opt-seq}.
 
 %%         A filter can store two types of variables - \textit{field} and
 %% \textit{local}. Field variables are declared outside of the
