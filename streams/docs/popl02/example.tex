@@ -1,11 +1,11 @@
 \section{Appendix: Detailed Example}
-Here we present a simple example of how to construct an SARE from an
+Here we present a simple example of how to construct a SARE from an
 input program.  Our source language is StreamIt, which is a high-level
 language designed to offer a simple and portable means of constructing
-programs as computational graphs.  We are developing a StreamIt
-compiler with aggressive optimizations and backends for
-parallelism-exposed architectures.  For more information on StreamIt,
-please consult~\cite{streamitcc,Gordo02}
+programs as phased computation graphs.  We are developing an StreamIt
+compiler with backends for communication-exposed architectures.  For
+more information on StreamIt, please
+consult~\cite{streamitcc,Gordo02}.
 
 %% StreamIt takes on a slightly different approach than allowing
 %% arbitrary graphs to be constructed from nodes connected by
@@ -66,7 +66,7 @@ please consult~\cite{streamitcc,Gordo02}
                            push(val);
                            pop();
                         }
-                    }            
+                    }
 \end{verbatim}
 \caption{StreamIt code for an FIR Filter.
 \protect\label{fig:fir}}

@@ -4,44 +4,42 @@
 In this section we give the formal translation of a Phased Computation
 Program to a System of Affine Recurrence Equations.  Again, the SARE
 will be parameterized by $N$, the number of steady-state cycles that
-one wishes to execute in the PCP.  
-
-The translation will use helper functions shown in
-Figure~\ref{fig:helper}.  We also make use of the $S(n)$ function
-giving the number of steady-state executions of node $n$ (see
-Section~\ref{sec:balance}).
+one wishes to execute in the PCP.  The translation will use helper
+functions shown in Figure~\ref{fig:helper}.  We also make use of the
+$S(n)$ function giving the number of steady-state executions of node
+$n$ (see Section~\ref{sec:balance}).
 
 \input{complexfig}
 
 Figure~\ref{fig:pcptosare1} illustrates the variables used for the
-translation.  These are very similar as in the simple case, except
-that now there are separate variables for initialization and steady
-state, as well as variables for each phase.
+translation.  These are very similar to those in the simple case,
+except that now there are separate variables for initialization and
+steady state, as well as variables for each phase.  The equations for
+the translation appear in Figures~\ref{fig:pcptosare2}
+and~\ref{fig:pcptosare3}.  A diagram of which variables depend on
+others appears in Figure~\ref{fig:communic}.  Due to space
+limitations, we discuss only the most interesting parts of the
+translation below.
 
-\begin{figure}
+\begin{figure}[t]
 \centering
 \psfig{figure=communic.eps,width=3.2in}
 \parbox{4in}{\caption{Flow of data between SARE variables.  Data flows from the base of each arrow to the tip.  Dotted lines indicate communication that might not occur for a given channel.}
 \protect\label{fig:communic}}
 \end{figure}
 
-The equations for the translation appear in
-Figures~\ref{fig:pcptosare2} and~\ref{fig:pcptosare3}.  A diagram of
-which variables depend on others Due to space limitations, we discuss
-only the most interesting parts below.
-
 Equation~\ref{i2ibuf} writes the initial values of the initial tokens
 on $\mt{IBUF}$, the initial buffer.  Equation~\ref{iwrite2ibuf}
-transfers values from the initial epoch of a node to the initial buffer
-of a channel.  Equations~\ref{iread2iwrite} and \ref{sread2swrite} do
-the work computation of the initial and steady-state items,
-respectively, just as we did in the simple translation of
+transfers values from the initial epoch of a node to the initial
+buffer of a channel.  Equations~\ref{iread2iwrite} and
+\ref{sread2swrite} do the work computation of the initial and
+steady-state items, respectively, just as in the simple translation of
 Section~\ref{sec:simplesare}.  Equation~\ref{swrite2sbuf} copies items
 from the node to the channel, using the same slicing technique as
 Equation~\ref{eq:w2b}.
 
 Equation~\ref{ibuf2iread} copies values from the initial buffer
-$\mt{IBUF}$ of a channel into the initial read array for a node.
+($\mt{IBUF}$) of a channel into the initial read array for a node.
 However, since the node might read more items in the initial epoch
 than exist on the initial buffer, we restrict the domain of the
 equation to only those indices that have a corresponding value in
@@ -72,13 +70,14 @@ distinct complications in these equations.  First is one that we
 tackled in Equation~\ref{eq:b2r}: the fact that the read array might
 peek beyond the limits of the buffer, which requires us to slice the
 domain in increments of one period.  The second complication is that
-there could be an offset--an init buffer might have written into the
-beginning of the read array, or an init read array might have read
-from the beginning of the steady-state buffer\footnote{Fundamentally,
-this complication ended up in this equation because we chose to define
-the init buffer ($\mt{IBUF}$) to be the same length as its associated
-init write array ($\mt{IWRITE}$).  If we had defined it in terms of
-the init read array ($\mt{IREAD}$) instead, the complexity would be in
+there could be an offset--an initial buffer might have written into
+the beginning of the read array, or an initial read array might have
+read from the beginning of the steady-state
+buffer\footnote{Fundamentally, this complication ended up in this
+equation because we chose to define the initial buffer ($\mt{IBUF}$)
+to be the same length as its associated initial write array
+($\mt{IWRITE}$).  If we had defined it in terms of the initial read
+array ($\mt{IREAD}$) instead, the complexity would be in
 Equation~\ref{swrite2sbuf}.}.
 
 Equation~\ref{sbuf2sread2} provides a set of helper functions to
@@ -86,6 +85,6 @@ determine the offset for Equations~\ref{sbuf2sread0}
 and~\ref{sbuf2sread1}.  The result is a number $\mt{Offset}$ that the
 domain needs to shift.  Unfortunately this involves splitting the
 original equation into two pieces, since after the shift the original
-domain will be split between two different periods ($i$ indices in
-$SBUF$).  Each of these equations is clever about the sign of the
-offset to adjust the indices in the right direction.
+domain will be split between two different periods (with different $i$
+indices in $\mt{SBUF}$).  Each of these equations is clever about the
+sign of the offset to adjust the indices in the right direction.

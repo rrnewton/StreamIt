@@ -8,11 +8,11 @@
 Model of Computation & Items on Channels & Nodes with & Nodes with & Cyclic Steady & Initialization \\
                      & at Start & Pop $\ne$ Push & Peek $>$ Pop & State Phases & Phases \\
 \hline \hline
-Synchronous Dataflow \cite{LM87-i} & X & X & & & \\
+Synchronous Dataflow~\cite{LM87-i} & X & X & & & \\
 \hline
-Cyclo-Static Dataflow \cite{BELP96} & X & X & & X & \\
+Cyclo-Static Dataflow~\cite{BELP96} & X & X & & X & \\
 \hline
-Computation Graphs \cite{KM66} & X & X & X & & \\
+Computation Graphs~\cite{KM66} & X & X & X & & \\
 \hline
 Phased Computation Graphs & X & X & X & X & X \\
 \hline
@@ -27,7 +27,7 @@ Phased Computation Graphs & X & X & X & X & X \\
 We introduce the Phased Computation Graph (PCG) as a model of
 computation for dataflow languages; specifically, we designed the PCG
 as a model for StreamIt~\cite{streamitcc}.  A PCG is a generalization
-of the Computation Graphs (CG) of Karp and Miller~\cite{KM66} to the
+of the Computation Graph (CG) of Karp and Miller~\cite{KM66} to the
 case where each node has both an initial and steady-state execution
 epoch, each of which contains a number of {\it phases}.  It is also a
 generalization of other popular representations for dataflow graphs,
@@ -148,16 +148,15 @@ channel $c$, $I(c)$ has type ${\cal V}[A(c)]$.
 \item A work function $W(n, t, p)$ that represents the computation of
 node $n$ in phase $p$ and epoch $t$.  The signature of $W(n, t, p)$ is
 $[{\cal V}[E(\mt{chan\_in}(n)[1], t, p)], \dots, {\cal
-V}[E(\mt{chan\_in}(n)[\mt{num\_in}(n)], t, p)]]$
-${\small \rightarrow}$\\
-$[ {\cal
-V}[U(\mt{chan\_out}(n)[1], t, p)], \dots, {\cal
-V}[U(\mt{chan\_out}(n)[\mt{num\_out}(n)], t, p)]]$.  That is, the function
-inputs a list of arrays, each of which corresponds to an incoming
-channel $c$ and contains the $E(c,t,p)$ values that $n$ reads from $c$
-in a given firing.  The procedure returns a list of arrays, each of
-which corresponds to an outgoing channel $c$ and contains the
-$U(c,t,p)$ values that $n$ writes to $c$ in a given firing.
+V}[E(\mt{chan\_in}(n)[\mt{num\_in}(n)], t, p)]]$ $\rightarrow$ \\ $[
+{\cal V}[U(\mt{chan\_out}(n)[1], t, p)], \dots, {\cal
+V}[U(\mt{chan\_out}(n)[\mt{num\_out}(n)], t, p)]]$.  That is, the
+function inputs a list of arrays, each of which corresponds to an
+incoming channel $c_{in}$ and contains the $E(c_{in},t,p)$ values that
+$n$ reads from $c_{in}$ in a given firing.  The procedure returns a
+list of arrays, each of which corresponds to an outgoing channel
+$c_{out}$ and contains the $U(c_{out},t,p)$ values that $n$ writes to
+$c_{out}$ in a given firing.
 
 \end{itemize}
 

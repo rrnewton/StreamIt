@@ -31,7 +31,7 @@ as if they were connected in a single control flow graph.
 
 Some of these optimizations could have a very large performance
 impact; for instance, consider a 2:1 downsampler node that simply
-discards half of its input.  Using the SARE, it is straightforward to
+discards half of its input.  Using a SARE, it is straightforward to
 trace the element-wise dependence chain from each discarded item, and
 to mark each source operation as dead code (assuming the code has no
 other consumers.)  In this way, one can perform fine-grained {\bf
@@ -47,9 +47,9 @@ a node are completely independent, and that the node can be split into
 sub-components that can execute in parallel or as part of a more
 fine-grained schedule.  For instance, many operations using complex
 data types are grouped together from the programmer's view, even
-though the operations on the real and imaginary parts are completely
-separate.  Given a SARE representation of the graph and the node, this
-``node fission'' is completely automatic, as there would be no
+though the operations on the real and imaginary parts could be
+separated.  Given a SARE representation of the graph and the node,
+this ``node fission'' is completely automatic, as there would be no
 dependence between the operations in the SARE.  A scheduling pass
 would treat the real and imaginary operations as if they were written
 in two different nodes to begin with.
@@ -62,17 +62,17 @@ epoch if it does not depend on any quantity that is changing during
 the steady-state execution of a node.  Quantities that the compiler
 detects to be constant during the execution of a work function can be
 computed from the initialization epoch, with the results being passed
-through a feedback loop for availability on future executions of work.
+through a feedback loop for availability on future executions.
 
 \subsubsection{Induction Variable Detection}
 
-The work functions and feedback paths of a node could be analyzed as
-would the body of a loop to see if there are induction variables from
-one steady-state execution to the next.  This analysis is useful both
-for strength reduction, which {\it adds} a dependence between
-invocations by converting an expensive operation to a cheaper,
-incremental one, as well as for data parallelization, which {\it
-removes} a dependence from one invocation to the next by changing
+The work functions and feedback paths of a node could be analyzed (as
+would the body of a loop in the scientific domain) to see if there are
+induction variables from one steady-state execution to the next.  This
+analysis is useful both for strength reduction, which {\it adds} a
+dependence between invocations by converting an expensive operation to
+a cheaper, incremental one, as well as for data parallelization, which
+{\it removes} a dependence from one invocation to the next by changing
 incremental operations on filter state to equivalent operations on
 privatized variables.
 
@@ -85,9 +85,9 @@ independently.  The same should hold true for dataflow graphs.  Often
 there is redundant structure within a graph, such as an N-level
 filterbank.  However, to the best of our knowledge, all scheduling
 algorithms for synchronous dataflow operate only on a fully expanded
-graph (``parameterized dataflow''\cite{Bhatt00} is designed for
-flexible re-initialization, and dynamically schedules an expanded
-version of each program graph.)
+graph (``parameterized dataflow'' is designed more for flexible
+re-initialization, and dynamically schedules an expanded version of
+each program graph~\cite{Bhatt00}.)
 
 We believe that parameterized scheduling would be straightforward
 using the polyhedral model to represent the graph.  For future work,
@@ -108,9 +108,9 @@ efficient.
 \subsubsection{Buffer Minimization}
 
 Storage optimization is one area in which both the scientific
-community\cite{Lim01,Quillere,Thies01,Lefebvre98} and the DSP
-community\cite{murt1997x1,GGD94,murt2001x1} have invested a great deal
-of attention.  Both communities have invented schemes for detecting
+community~\cite{Lim01,Quillere,Thies01,Lefebvre98} and the DSP
+community~\cite{murt1997x1,GGD94,murt2001x1} have invested a great
+deal of energy.  Both communities have invented schemes for detecting
 live ranges, collapsing arrays across dead locations, and sharing
 buffers/arrays between different statements.  It will be an
 interesting avenue for future work to use the SARE representation of
@@ -134,7 +134,7 @@ affine schedule, then, would give a more flexible solution when code
 size is the critical issue.
 
 Also, there are a number of sophisticated parallelization algorithms
-(e.g.,Lim and Lam~\cite{Lim01}) that could extract high performance
+(e.g., Lim and Lam~\cite{Lim01}) that could extract high performance
 from dataflow graphs.  It will be an interesting topic for future work
 to see how they compare with the scheduling algorithms currently in
 use for dataflow graphs.
