@@ -118,61 +118,7 @@ reduction numbers account for the fact that our implementation requires four
 floating point muliplication operations to perform a complex valued multiply 
 in the frequency domain.
 
-\subsection{Simplification from Combination}
-Linear analysis is valuable because it provides a precise relationship
-between input and output that is nearly impossible to extract from
-general-purpose imperative programs. By combining the actions of
-StreamIt structures by combining their linear nodes we can do 
-optimizations that are impossible for a standard compiler.
-
-Combining the action of {\tt streams} in a {\tt pipeline} is equivalent 
-to algebraic simplification between the bodies of sequential loops in 
-an imperative program. Once an overall linear node for the
-{\tt pipeline} has been determined, our compiler can perform this highly non-trivial 
-transformation automatically, leaving the the programmer to express 
-the computation in the most convenient manner.
-
-For example, although a bandpass filter can be implemented with a low
-pass filter followed by a high pass filter, actual implementations
-tend to determine the coefficients of a single combined filter that 
-performs the same computation. While a simple bandpass filter is 
-easy to combine manually, in an actual design several different 
-filters might be designed and implemented by several different people 
-which would be much harder to integrate into a single design.
-
-A common operation in discrete time signal processing is downsampling
-to reduce the computational requirements of a system.
-Downsampling is most often implemented as a low pass filter followed
-by an $M$ compressor which passes every $M$th input sample to the
-output.  Therefore, $M$ outputs from the
-low pass filter are calculated for every overall output, when in actual fact
-only every $M$th sample needs be computed.  Almost all actual systems 
-do not calculate the $M-1$ unused outputs which decreases computational
-requirements by a factor of $\frac{M-1}{M}$. However, most often 
-the system's actual specification will include both the filter and the compressor. 
-This inefficient implementation appears because it is
-conceptually easier to understand. Our linear analysis and transformations
-can describe the computation well enough enough so that our compiler can
-derive the efficient transformation automatically.
-
-Another example of how combining linear nodes can help overall performance
-is a multi-band equalizer (such as is found in the
-FMRadio benchmark).  The purpose of such an equalizer is to filter $N$
-different frequency bands separately, exactly like the graphic equalizer found
-on stereos. The intuitive system specification of an equalizer
-consists of $N$ bandpass filters operating in parallel whose output is
-combined to produce the equalized signal. However, if the filters do
-not vary with time, a single filter which performs the equivalent
-computation can be substituted instead. Designing this
-single overall filter is difficult, and any subsequent changes to any
-one of the sub filters will necessitate a total redesign of the
-filter. Using the linear analysis and combination presented,
-our compiler can automatically derive the equivalent filter from the
-intuitive specification. Therefore any subsequent design changes will 
-necessitate only a recompile rather than a manual redesign.
-
-
-\subsection{Overall optimization performance}
+\subsection{Overall Optimization Performance}
 
 %\begin{figure}
 %\center

@@ -1,0 +1,60 @@
+\section{Related Work}
+\label{sec:related}
+
+Several groups are researching strategies for efficient code
+generation for DSP applications.  SPIRAL is a system that generates
+libraries for signal processing
+algorithms\cite{spiral,johnson01searching,egner01automatic}.  Using a
+feedback-directed search process, DSP transforms are optimized for the
+underlying architecture.  The input language to SPIRAL is
+SPL\cite{xiong01spl,xiong-thesis}, which provides a parameterizable
+way of expressing matrix computations.  Given a matrix representation
+in SPL, SPIRAL generates formulas that correspond to different
+factorizations of the matrix.  It searches for the most efficient
+formula using several techniques, including dynamic programming and
+stochastic evolutionary search.
+
+We consider our work to be complementary to SPIRAL.  While SPIRAL
+starts with a matrix representation in SPL, we start with general
+StreamIt code and use linear dataflow analysis to extract a matrix
+representation where possible.  Our linear combination rules are
+distinct from the factorizations of SPIRAL, as StreamIt nodes can peek
+at items that they do not consume.  In the future, SPIRAL could be
+integrated with StreamIt to optimize a matrix factorization for a
+given architecture.
+
+The ATLAS project \cite{whaley01automated} also aims to produce fast
+libraries for linear algebra manipulations, focusing on adaptive
+library generation for varying architectures.  FFTW
+\cite{frigo99fast,fftw} is a runtime library of highly optimized FFT's
+that dynamically adapt to architectural variations.  Again, StreamIt
+is distinguished by its extraction and optimization of linear filters
+from general user-level code.
+
+ADE (A Design Environment) is a system for specifying, analyzing, and
+manipulating DSP algorithms~\cite{covell-ade}.  ADE includes a
+rule-based system that can search for improved arrangments of stream
+algorithms using extensible transformation rules.  However, the system
+uses predefined signal processing blocks that are specified in
+mathematical terms, rather than the user-specified imperative code
+that appears in a StreamIt filter.  Moreover, ADE is intended for
+algorithm exploration, while StreamIt includes support for code
+generation and whole-program development.  In addition to ADE, other
+work on DSP algorithm development is surveyed
+in~\cite{oppenheim-symbolic}.
+
+A number of other programming languages are oriented around a notion
+of a stream (see \cite{survey97} for a survey.)  Synchronous languages
+such as LUSTRE~\cite{lustre}, Esterel~\cite{esterel92}, and
+Signal~\cite{signal} target the embedded domain, while languages such
+as Occam~\cite{occam}, SISAL~\cite{sisal} and StreamC~\cite{Rix98}
+target parallel and vector targets.  However, none of the compilers
+for these languages have coarse-grained, DSP-specific analyses such as
+linear filter detection.
+
+Note that the ``linear data flow analysis'' of Ryan~\cite{ryan92} is
+completely unrelated to our work; it aims to do program analysis in
+linear time.
+
+% Something should be said about other stream projects and their attempts at optimizations...
+% which I know very little about.
