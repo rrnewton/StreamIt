@@ -1,0 +1,216 @@
+----- Review of Paper 279 -------
+
+Title:   Partitioning a Structured Stream Graph Using Dynamic Programming
+Reviewer:0-1
+
+Originality: [3]
+Technical merit: [2]
+Readability: [2]
+Relevance: [3]
+Overall rating: [2]
+Recommended Action:     Weak Reject
+
+   ---Comments for the Author---
+
+This paper presents an algorithm which uses dynamic programming to
+partition a structured stream graph. Efficient stream graph partitioning
+is important for distributed architectures in order to exploit the
+parallelism exposed in stream programs. This algorithm has been
+implemented in the StreamIt compiler for the Raw architecture, improving
+the previously implemented greedy partitioner.
+
+I think this algorithm is an interesting contribution, achieving good
+performance improvements when compared to a naive partitioning
+algorithm.  However, the performance metric should be clarified. Are the
+authors talking about an overall architecture performance improvement?
+In addition, too few experimental results are shown in the paper. I
+believe a more comprehensive evaluation is needed to allow a better
+understanding of the presented algorithm.
+
+The main problem of this paper is its organization. The algorithm is
+described, and then a lot of code is shown. This organization makes very
+hard for any reader to understand the algorithm. I think the authors
+should explain the most important parts of the algorithm in detail,
+probably using small algorithms written in high-level pseudocode. The
+amount of pseudocode and explicative text should be correctly balanced
+in order to guarantee the quality of the explanation.
+
+Moreover, some of the figures presented in this paper are absolutely
+illegible. This is specially true for figures 4(a) and (b). The authors
+must find other ways to facilitate the understanding of the presented
+algorithm. Nevertheless, if the algorithm is more clearly explained and
+more experimental data are presented, this paper could be a worthwhile
+contribution for a conference.
+
+
+----- Review of Paper 279 -------
+
+Title:   Partitioning a Structured Stream Graph Using Dynamic Programming
+Reviewer:0-2
+
+Originality: [2]
+Technical merit: [3]
+Readability: [1]
+Relevance: [2]
+Overall rating: [2]
+Recommended Action:     Weak Reject
+
+   ---Comments for the Author---
+
+This paper presents an algorithm that partitions a program, represented
+as a static stream graph, into pieces (streams) for their load-balanced
+execution on a parallel target. It constitutes a software help to
+mitigate the increasingly important wire delay problem. It seems ,not
+only this algorithm but specially the StreamIt language and compiler, a
+very good candidate for programming on emerging clustered arquitectures
+as RAW or GPA, for example. However, this paper has got serious problems
+of readability that hinder its understanding.
+
+Explaining an algorithm can become a hard job sometimes, but commenting
+a source code can not be called "explaining an algorithm". In fact, you
+devote 5 pages of the 11 pages document to source code but only 1 page
+to a figure (Figure 4) that could be crucial for a better understanding
+of the idea. And I say "could" because that figure is completely
+illegible. Using a short and representative example to illustrate the
+idea would be a very good idea.
+
+Some terms are used before being defined, forcing the reader to jump and
+reread the text to keep the track of the explanation. Take "filter" (in
+Section 2) as an example of this. A previous list of simple and clear
+definitions could let the reader understanding better the following
+explanation.
+
+In section 2.2, it would be desirable to include a brief description of
+related work in order to better appreciate the benefits of
+StreamIt. What you have here could be a good summary for that
+description and comparison.
+
+Talking about other works, it is referenced the RAW architecture as
+clustered architecture where to use the algorithm herein exposed. How
+close is the term stream, as defined in this paper, to the RAW's stream
+execution unit? In any case, it should have been explicitly explained
+within the text.  Summarizing, the text is too obscure, and too hard to
+be clearly understood. This fact strongly hinders the comprehension of
+what seems could be a good idea for future architectures concerned in
+the increasingly important wire delay problem.
+
+----- Review of Paper 279 -------
+
+Title:   Partitioning a Structured Stream Graph Using Dynamic Programming
+Reviewer:1-1
+
+Originality: [3]
+Technical merit: [3]
+Readability: [3]
+Relevance: [4]
+Overall rating: [3]
+Recommended Action:     Weak Accept
+
+   ---Comments for the Author---
+
+The paper describes a compiler for a structured stream language that
+partitions stream programs represented in a canonical graph form. The
+paper was interesting, but suffers from some problems that could be
+overcome to yield a much better paper.
+
+In the last paragraph of col. 1, page 1, you mention compiler
+restrictions. Does the fact that an input program needs to be structured
+really restrict the compiler, or have you just chosen to restrict the
+compiler for the benefit of your techniques?  I think the latter. This
+is a reasonable design decision, and one that seems to be correct, but
+it seems to be a property of your methodology and not the compiler,
+per-se.
+
+Section 2.2: one of the reasons that structured programming succeeded is
+that it can be used to represent any computation, and to *cleanly*
+represent most common computations. I am not intimately familiar with
+the problem domain you are targeting -- a few words as to how suitbable
+the structured representation is for real programs would be helpful.
+
+Would the use of a more compact representation (some sort of
+psuedo-code?) give more space to allow the algorithms to be described in
+the text? The actual code could be made available on-line. If so, this
+would benefit the overall presentatation.
+
+A minor point: "less choices" (Section 3.4) should be "fewer choices".
+
+Section 5 should give some insight into why performance of 2 out of 5
+benchmarks experience degraded performance. Are there standard
+benchmarks for this area that could be used? Could you spend a few lines
+describing Raw to make the paper more self contained?
+
+----- Review of Paper 279 -------
+
+Title:   Partitioning a Structured Stream Graph Using Dynamic Programming
+Reviewer:2-1
+
+Originality: [3]
+Technical merit: [2]
+Readability: [2]
+Relevance: [4]
+Overall rating: [2]
+Recommended Action:     Weak Reject
+
+   ---Comments for the Author---
+
+The paper is about some aspects of implementing the STREAMIT language on
+a parallel processor. It focuses on the partitioning of stream graphs
+using dynamic programming.  While some of the ideas in the paper seem
+novel, it has many shortcomings as well.  It seems to be written in
+undue haste and that makes the paper very difficult to understand. The
+explanation and examples for the working of algorithms has been replaced
+by pages of pseudo-code that the reader has to struggle with. Most
+references are only to self. Related work in the area of partitioning is
+inadequate.
+
+While dynamic programming normally yields good results, the time and
+space requirements can become quite large, and if this is the case, then
+the approach fails to be scalable.  The paper does not talk about these
+aspects and it should compare these aspects with the greedy
+approach. Further, the dynamic programming approach does not seem to
+have yielded consistent results; three results are positive and two are
+negative. This needs explanation. More results are needed before any
+conclusions can be drawn.
+
+In summary, the work seems incomplete.
+
+----- Review of Paper 279 -------
+
+Title:   Partitioning a Structured Stream Graph Using Dynamic Programming
+Reviewer:2-2
+
+Originality: [2]
+Technical merit: [1]
+Readability: [1]
+Relevance: [2]
+Overall rating: [1]
+Recommended Action:     Reject
+
+   ---Comments for the Author---
+No related work on partitioning, only compared with previous own results.
+
+Hard to follow algorithms. No explanatory example to follow. No
+explaining texts for the figures.
+
+Weak description of problem definition: What are the nodes and edges of
+the graph? Why do you need isFissable function? That could be derived
+from the dependencies(edges) in the graph. What is a container? What is
+the set s? (== str?)
+
+What exactly does the 2:nd condition in the problem definition mean?
+
+What is memo table?
+
+Weak results: Two out of five results were negative.  Where does the 24%
+improvement figure come from?
+
+Figures: Too much code, no explanatory text. Some graphical figures too
+small (Figure 4).
+
+Detail about graph:There is no difference in notation for a round robin
+split node and a round robin join node. How can they be treated the same
+way?
+
+Detail about 3.2 Dynamic Programming Solution.  Undefined optimal
+partition. In what whay is it optimal? There is no proof of the
+optimality.
