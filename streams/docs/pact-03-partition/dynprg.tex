@@ -128,7 +128,7 @@ whether or not a joiner is needed for a stream (based on the search
 parameters, and what it can infer about its parents).  If the stream
 needs a joiner, then it subtracts one from the tile count {\tt n} that
 it is searching for.  While this is an implementation-specific detail,
-it illustrates that diverse (and sometimes seemingly non-hiearchical)
+it illustrates that diverse (and sometimes seemingly non-hierarchical)
 constraints can be straightforward to integrate into the algorithm.
 
 \subsection{Taking Advantage of Symmetry}
@@ -155,7 +155,7 @@ hundreds of elements, a hash of the filter's control flow and
 arithmetic operations reveals uniform structures that make this
 operation vastly cheaper.  For instance, the expanded version of our
 Radar application contains 52 filters, and though each has its own
-parameters, all shared one of 7 strucuures, allowing us to get the
+parameters, all shared one of 7 structures, allowing us to get the
 full benefit of profiling at only a fraction of the cost.
 
 \item {\bf Aliasing of children and memo tables.}  Similarly, for

@@ -50,7 +50,7 @@ hourglass, this transformation has the effect of squeezing a splitjoin
 together at points of synchronization.
 
 The {\tt removeMatchingSyncPoints} transformations directly implements
-the inverse of {\tt addMatchingSyncPoints} via a simple re-arrangment
+the inverse of {\tt addMatchingSyncPoints} via a simple re-arrangement
 of weights.  Though very simple, this transformation can apply in
 practice on interface boundaries where compound data streams are being
 interleaved at a static rate.
@@ -64,7 +64,7 @@ partitioned such that no data item is passed between members of
 different partitions during a steady-state execution.  The only
 disadvantage of this transformation over {\tt
 removeMatchingSyncPoints} is that it has the potential to introduce
-non-adjacent joiners, which in the StreamIt compiler requiers
+non-adjacent joiners, which in the StreamIt compiler requires
 additional processor resources.  However, like all transformations
 described in this paper, the output of {\tt
 removeStructuredSyncPoints} is still a structured graph (as the name
@@ -73,7 +73,7 @@ would suggest).
 We have also implemented horizontal cut transforms for pipelines,
 which consist simply of adding or removing a wrapper pipeline around a
 sub-segment of the stream.  This is very straightforward (requiring no
-change of weights or rates) so we ommit the details here.
+change of weights or rates) so we omit the details here.
 
 \subsection{Fusion and Fission Transformations}
 
@@ -90,7 +90,7 @@ transformations in this paper.
 
 To build the hierarchical arrays required by the partitioner, the
 following transformations are applied, starting from the leaf nodes
-and propagating upwards through the stream:
+and propagating upward through the stream:
 \begin{itemize}
 
 \item {\tt raiseChildren} and {\tt removeStructuredSyncPoints}
@@ -112,7 +112,7 @@ of row {\tt y} is the width of the splitjoin at that location.
 \subsection{Transforming from Partitioner's Representation}
 
 The traceback function is what calculates the sequence of
-transformations needed to trasnform from the partitioner's
+transformations needed to transform from the partitioner's
 representation to the load-balanced set of partitions for program
 execution.  In Figure~\ref{code:trace}, the points corresponding to a
 vertical and horizontal cut are where traceback recurses after finding
