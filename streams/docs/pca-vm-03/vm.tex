@@ -239,7 +239,7 @@ supporting functions are declared as follows:
 
   // non-blocking function that indicates that kernel <k> should not 
   // execute the work function until kernel <dependsOnKernel> is FINISHED.  
-  // This function can only be called when the <k> is in the UNSTARTED state.
+  // This function can only be called when <k> is in the UNSTARTED state.
   void addDependence(Kernel* k, Kernel* dependsOnKernel);
 
   // hint to low-level compiler to ready the kernel in the ICache.
@@ -257,14 +257,14 @@ supporting functions are declared as follows:
 
   // non-blocking function that interrupts execution of a kernel on a 
   // best-effort basis, and then sets the kernel's status to FINISHED.  This 
-  // should be followed by a call to wait() if the control thread wants to 
+  // should be followed by a call to kernelWait() if the control thread wants to
   // ensure that the kernel is finished.
   void kernelEnd(Kernel* k);
 
   // waits for the status of the kernel to be PAUSED or FINISHED.
   void kernelWait(Kernel* k);
 
-  // waits for at least one kernel to be PAUSED or all kernels to be FINSIHED
+  // waits for at least one kernel to be PAUSED or all kernels to be FINISHED
   void kernelWaitMultiple(Kernel* k0, Kernel* k1, ...);
 
   // returns the current status of the kernel as last known by the control
@@ -326,7 +326,7 @@ For example, a kernel for a simple amplifier could be as follows:
   void amplifierWork(Amplifier* amp);
 
   void amplifierInit(Amplifier* amp, VM_NODE_PROC procLocation, Block* scratch, 
-                           IStream* _in, OStream* _out, int _N) {
+                     IStream* _in, OStream* _out, int _N) {
       kernelInit(&amp->kernel, procLocation, scratch, 
         amp, sizeof(Amplifier), (ExtKernelWork)&amplifierWork);
       amp->in = _in;
