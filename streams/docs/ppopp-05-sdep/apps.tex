@@ -263,7 +263,7 @@ standpoint.  By separating the data-intensive code from the
 control-oriented code, the common case of the steady state actor
 execution is not sacrificed for the uncommon case of message
 processing.  There are no ``dummy items'' serving as placeholders in
-on the static-rate channels.  In addition, by exposing the message
+the static-rate channels.  In addition, by exposing the message
 latency as part of the language, the compiler can infer the true
 dependences between filter firings and reorder the execution so long
 as the message constraints are respected.  The actual message delivery
