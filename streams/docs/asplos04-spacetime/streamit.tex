@@ -48,7 +48,7 @@ function that is called at initialization time;
 The {\tt work} function describes the most fine grained
 execution step of the filter in the steady state.  Within the {\tt
 work} function, the filter can communicate with its neighbors via FIFO
-queues, using the intuitive operations of {\tt push(value)}, {\tt
+queues, termed {\it channels}, using the intuitive operations of {\tt push(value)}, {\tt
 pop()}, and {\tt peek(index)}, where {\tt peek} returns the value at
 position {\tt index} without dequeuing the item.  The number of items
 that are pushed, popped, and peeked\footnote{We define $peek$ as the
@@ -64,7 +64,6 @@ output tapes of the filter; however, the I/O rates of {\tt work} and
 function is essential for correctly filtering the beginning of the
 input stream.  The user never calls the {\tt init}, {\tt prework}, and
 {\tt work} functions--they are all called automatically.
-
 
 The basic construct for composing filters into a communicating network
 is a {\it pipeline}.%, such as the FM Radio in Figure \ref{fig:radiocode}.  
@@ -100,3 +99,13 @@ with the $i$'th call setting the $i$'th stream in the splitjoin.
 The last control construct provides a way to create cycles in the
 stream graph: the feedbackloop.  Due to space constraints, we omit a
 detailed discussion of the feedbackloop.
+
+\subsection{Linear Filters}
+We call a filter {\it linear} if its outputs can be expressed as an
+affine combination of its inputs.  Many ubiquitous DSP kernels are
+linear, including FIR filters, expanders, compressors, DFTs and DCTs.
+In \cite{streamit-linear} a framework for extracting, combining, and
+transforming linear filters is presented.  Linear components of the
+stream graph are be targeted for specialized code generation as
+described in Section \ref{sec:linear}.
+

@@ -1,2 +1,108 @@
 \section{Introduction}
-The intro goes here! Raw is cool\cite{raw}.
+
+We are approaching the juncture where transistors are essentially free
+to the designer of a microprocessor.  Designers are now looking for
+novel solutions to the wire delay problem. Recently the architecture
+community has witnessed the ascendancy of communication-exposed
+architectures, examples include Raw
+\cite{raw}, SmartMemories \cite{smartmemories}, TRIPS \cite{trips},
+WaveScalar \cite{wavescalar}, UltraScalar, and RDR \cite{rdr}.  These
+machines propose to solve the wire delay problem by replicating
+processing units and exposing the interconnect between these units to
+a software layer.  For these architectures to gain programmer
+acceptance, there must exist a high-level, portable programming
+language that can be compiled efficiently to any of the candidate
+targets.  
+
+Imperative programming languages such as C and FORTRAN served
+von-Neumann machines well.  They abstracted away the idiosyncrasies of
+a machine while encapsulating the common properties (such as a single
+program counter, arithmetic operations, and a monolithic memory) that
+are necessary to obtain good performance.  However, for wire-exposed
+targets that contain multiple instruction streams and distributed
+memory banks, a language such as C is obsolete.  One can
+still produce efficient code for a single wire-exposed target using C,
+but doing so would require either an impossibly smart compiler or the use
+of architecture specific directives.  
+
+%Short description of Streamit 
+In this paper we present a compiler for the StreamIt programming
+language \cite{streamitcc}.  StreamIt is a high-level stream
+programming language that aims to be portable across next-generation
+communication-exposed architectures.  StreamIt contains basic
+constructs that expose the parallelism and communication of streaming
+applications without depending on the topology or granularity of the
+target architecture \cite{streamit-asplos}. In StreamIt the basic unit
+of computation is a {\it filter}, a single-input, single-output block.
+Filters are composed into a communication network using hierarchical,
+structured constructs (introduced below).  A {\it stream graph},
+composed of filters and uni-directional FIFO channels connecting the
+filters, describes the resulting computation. Our StreamIt compiler
+currently targets the Raw microprocessor, a tiled architecture with
+fine-grained, programmable communication between processors.
+
+Hitherto, there existed two basic approaches for compiling a
+computation graph to a communication-exposed architecture.  
+{\it Time multiplexing} utilizes the entire chip for each computation unit,
+switching between these units over time.  Time multiplexing's efficacy
+extends from its freedom from having to balance the workload between
+nodes of the computation graph.  Negatively, this technique can lead
+to long latencies, lots of memory traffic, and the utilization is
+highly dependent upon how effectively each individual computation node
+can be parallelized across the machine.
+
+Conversely, {\it space multiplexing} distributes computation units
+across the entire chip, running them continuously and in parallel.
+Space multiplexing affords $(i)$ no filter swapping, $(ii)$ reduced
+memory traffic, $(iii)$ localized communication, and $(iv)$ tighter
+latencies.  Due to these properties space multiplexing scales
+extremely well.  Unfortunately, this approach is highly dependent on
+effective load balancing techniques.  Merging and splitting components
+of a coarse-grained computation graph until it is composed of $n$ load
+balanced nodes, where $n \le$ to the number of processing elements, is
+difficult, as the optimization technique is constrained by many
+competing factors.
+
+The approach outlined in this paper is to merge the advantages of
+space multiplexing and time multiplexing.  This hybrid approach will
+time multiplex different groups of filters and space multiplex the
+filters within a group.  We call each group a {\it space-time trace}
+or just a {\it trace}.  We show that this technique achieves high
+performance on the Raw microprocessor, providing the flexible load
+balancing of time multiplexing, while preserving the locality and
+latency benefits of space multiplexing.  Furthermore, we can recognize
+traces that can be executed in a fine-grained, systolic fashion.
+Currently, our compiler identifies traces that compute a linear
+function and produces parameterized, template assembly code for such
+traces.
+
+Hybrid space-time multiplexing differs from other techniques by...
+
+Our compiler flow is as follows. First, we identify the linear
+sub-components of the stream graph.  Our compiler then extracts the
+traces from the stream graph, considering the concurrency, layout, and
+type (linear or non-linear) of each filter.  Next, we schedule the
+traces, producing both a steady-state schedule and initialization
+schedule.  The initialization schedule determines what steps are
+necessary for steady-state execution as the steady-state schedule may
+produce an arbitrary ordering of traces (with respect to
+data-dependencies).  Lastly, we generate both communication and
+computation code for Raw.  The contributions of this monograph include:
+\begin{itemize}
+\item An automated transformation of a structured stream graph into a
+unstructured stream graph with unnecessary synchronization removed.
+\item An algorithm for extracting traces from a stream graph.
+\item Parameterized code generation for traces that linear compute a
+linear function of their inputs.
+\item A fully automated implementation of hybrid space-time
+partitioning for Raw.
+\end{itemize}
+
+The remainder of this paper is organized as follows.  Section 
+\ref{sec:streamit} gives an introduction to the StreamIt programming
+language, Section \ref{sec:raw} provides an overview of Raw,...,
+and Section \ref{sec:results} presents our results.  Section 
+\ref{sec:related} considers related work and Section 
+\ref{sec:conclusion} concludes the paper.
+
+
