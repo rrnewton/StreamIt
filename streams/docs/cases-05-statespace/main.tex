@@ -2,12 +2,13 @@
 
 \usepackage{lgrind}
 \usepackage{fullpage}
+\usepackage{times}
 \usepackage{doublespace}
 \usepackage{epsfig}
 
 %\title{Optimizing Stream Programs \\ Using a Linear State Space Representation}
 %\title{A Linear State Space Representation \\ for Optimizing Stream Programs}
-\title{Domain-Specific Optimization of Stream Programs \\ Using a Linear State Space Representation}
+\title{~ \vspace{-48pt} \\ Optimizing Stream Programs \\ Using Linear State Space Analysis}
 
 %% \author{Sitij Agrawal, William Thies, Rodric M. Rabbah, and Saman Amarasinghe \\
 %%   MIT Computer Science and Artificial Intelligence Laboratory \\
@@ -18,7 +19,7 @@
 \date{}
 
 % this is the line spacing
-\setstretch{2}
+\setstretch{1.9}
 
 % \sloppy lets Latex be a little less anal about interword spacing.  It is
 % one way to eliminate those annoying Overfull hbox warnings.
@@ -34,16 +35,36 @@
   \newcommand{\subsubsubsection}[1]{\medskip\noindent{\bf #1}\\\smallskip}
   \newcommand{\mt}[1]{\mbox{\it #1}}
   \newcommand{\todo}[1]{\framebox{#1}}
+  
+  % shrink the itemized lists
+  \newlength{\itemshrink}
+  \setlength{\itemshrink}{-12pt}
 
+  % shrink spacing of section titles
+  \newcommand{\mysection}[1]{\vspace{-12pt} \section{#1} \vspace{-12pt}}
+  \newcommand{\mysubsection}[1]{\vspace{-12pt} \subsection{#1} \vspace{-12pt}}
+  \newcommand{\mysubsubsection}[1]{\vspace{-6pt} \subsubsection{#1} \vspace{-12pt}}
+
+  % proper spacing of equations
+  \newlength{\topeqn}
+  \setlength{\topeqn}{-24pt}
+  \newlength{\boteqn}
+  \setlength{\boteqn}{-20pt}
+  \newcommand{\starteqnstar}[0]{\begin{singlespace}\vspace{\topeqn}\begin{eqnarray*}}
+  \newcommand{\doneeqnstar}[0]{\end{eqnarray*}\vspace{\boteqn}\end{singlespace}}
+  \newcommand{\starteqn}[0]{\begin{singlespace}\begin{eqnarray}\vspace{\topeqn}}
+  \newcommand{\doneeqn}[0]{\end{eqnarray}\vspace{\boteqn}\end{singlespace}}
   %\toappear{\centerline{\Large\bf MIT LCS Technical Memo,}
   %          \centerline{\Large\bf MIT-LCS-TM-6XX,}
   %          \centerline{\Large\bf November, 2001.}}
   
   \begin{singlespace}
     \maketitle
+    \vspace{-48pt}
     \begin{abstract}
       \input{abstract}
     \end{abstract}
+    \vspace{-12pt}
   \end{singlespace}
   
   \advance\topmargin by -0.35in      % Correct for LaTeX gratuitousness
@@ -59,6 +80,7 @@
 
   \begin{small}
     \begin{singlespace}
+      \vspace{-12pt}
       \bibliographystyle{abbrv}
       \bibliography{main}
     \end{singlespace}
