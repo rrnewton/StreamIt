@@ -350,7 +350,7 @@ getCapacity} functions:
   class IBlock {
   public:
     // construct block of size <capacity>, at <address> of <memLocation>
-    IBlock(int capacity, VM_NODE_TYPE_MEM memLocation, int address);
+    IBlock(int capacity, VM_NODE_TYPE_MEM loc, int addr);
 
     // construct block of size <capacity>, in registers of <procLocation>
     IBlock(int capacity, VM_NODE_TYPE_PROC procLocation);
@@ -420,12 +420,8 @@ Each kernel is described as a subclass of the basic kernel class:
    
   public:
     // non-blocking method that indicates that the kernel should not enter the RUNNING state
-    // again until kernels <predececessor1>, <predecessor2>, ... are all FINISHED.
-    void waitFor(Kernel& predecessor1 = 0, Kernel& predecessor2 = 0, ...);
-
-    // blocking method that waits until the kernel's status is something other than RUNNING,
-    // at which point it returns the status.
-    STATUS wait();
+    // again until kernel <k> is FINISHED.
+    void addDependence(Kernel& k);
 
     // non-blocking method that returns the current status of the kernel
     STATUS getStatus();
@@ -480,9 +476,9 @@ The {\tt run} function is the external interface for executing a
 kernel.  It operates as follows: 
 {\small
 \begin{verbatim}
-  void Kernel::run(Kernel& predecessor1 = 0, Kernel& predecessor2 = 0, ...) {
-    // wait for predecessor kernels to finish
-    for (all kernels k specified in previous calls to waitFor) {
+  void Kernel::run() {
+    // wait for dependent kernels to finish
+    for (all kernels k specified in previous calls to addDependence) {
       k.wait();
     }
 
@@ -732,12 +728,11 @@ space for the contents of a stream:
   public:
     // make a stream buffer that can hold at most <capacity> elements,
     // allocated at <address> of memory node <memLocation>, with <initLength>
-    // items already in place.  The last two arguments are optional hints to
-    // the low-level compiler:  <aliased> is true if some other stream buffer can
-    // overlap this in memory, and <startAtZero> is true if the first element of
-    // this is always stored at <address> instead of being offset.
+    // items already in place.  The last argument is an optional hint to the
+    // the low-level compiler:  <compact> is true if no more than <capacity>
+    // elements will be pushed to the stream.
     StreamBuffer(int capacity, VM_NODE_TYPE_MEM memLocation, int address, 
-                 int initLength=0, boolean aliased=true, boolean startAtZero=true);
+                 int initLength=0, boolean compact=false);
 
     // same as above, for stream held in registers of a processor
     StreamBuffer(int capacity, VM_NODE_TYPE_PROC procLocation, int initLength=0);
@@ -845,27 +840,22 @@ stream object at the same time unless they are in the same graph.
     // calls k.run() on all kernels k in the graph that have k.getStatus()!=RUNNING
     Kernel::STATUS run();
 
-    // calls status() on every kernel in the graph.  Then proceeds as follows:
-    //  - if all kernels return FINISHED, then return FINISHED
-    //  - if all kernels return UNSTARTED, then return UNSTARTED
-    //  - otherwise, consider kernels that did not return FINISHED or UNSTARTED:
-    //    - if all of these kernels returned RUNNING, then return RUNNING
-    //    - otherwise, return SUSPENDED
-    Kernel::STATUS getStatus();
-
     // blocking method that waits until at least one kernel in the graph 
-    // has a status other than RUNNING.  Then, returns getStatus().
+    // has a status other than RUNNING.  Then proceed as follows:
+    //  - if all kernels have status UNSTARTED, then return UNSTARTED
+    //  - if all kernels have status FINISHED, then return FINISHED
+    //  - otherwise, return SUSPENDED
     Kernel::STATUS wait();
-
-    // calls terminate() on each kernel in the graph
-    void terminate();
   }
 \end{verbatim}}
 \noindent The connectivity of the kernels in a graph is implicit in
 the stream buffers that are shared between the input of one kernel and
 the output of another.  The graph does not need to be structured (as
 in StreamIt).  However, no two kernels in a graph may read from (or
-write to) the same stream buffer.
+write to) the same stream buffer.  Also, a kernel may appear in only
+one graph during its entire lifetime (this is to avoid the complexity
+of having unfinished graphs with kernel components that have been
+moved to other graphs.)
 
 In a given graph, at most one user-defined kernel can be assigned to a
 given processor resource.  (However, pre-defined kernels (see
@@ -931,9 +921,9 @@ if, for example, a single output stream is being split between
 multiple input streams, all of which are in the local memory of some
 processor.  In this case, the control code should indicate that the
 kernel reading the new stream is dependent on the kernel that wrote
-the original stream; this is done by use of the kernel's {\tt waitFor}
-method, thereby saving the low-level compiler from doing
-location-based memory analysis to discover dependences between
+the original stream; this is done by use of the kernel's {\tt
+addDependence} method, thereby saving the low-level compiler from
+doing location-based memory analysis to discover dependences between
 kernels.
 
 It is also possible for the control processor to inspect and modify

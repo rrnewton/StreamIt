@@ -12,9 +12,22 @@
   \begin{verbatim}
 
 template <class T>
-class IStreamUnordered {
+class IStreamUnordered :
+      public BaseStream {
 public:
-  IStreamUnordered(StreamBuffer<T> &s);
+  IStreamUnordered(int capacity,
+          VM_NODE_TYPE_MEM loc,
+          int addr,
+          int initLength=0,
+          boolean aliased=true,
+          boolean wraps=true);
+  IStreamUnordered(int capacity,
+          VM_NODE_TYPE_PROC loc,
+          int addr,
+          int initLength=0,
+          boolean aliased=true,
+          boolean wraps=true);
+
   T pop();
   boolean canPop(int n);
 }
@@ -26,9 +39,22 @@ public:
   \begin{verbatim}
 
 template <class T>
-class OStreamUnordered {
+class OStreamUnordered :
+      public BaseStream {
 public:
-  OStreamUnordered(StreamBuffer<T> &s);
+  OStreamUnordered(int capacity,
+          VM_NODE_TYPE_MEM loc,
+          int addr,
+          int initLength=0,
+          boolean aliased=true,
+          boolean wraps=true);
+  OStreamUnordered(int capacity,
+          VM_NODE_TYPE_PROC loc,
+          int addr,
+          int initLength=0,
+          boolean aliased=true,
+          boolean wraps=true);
+
   void push(T& val);
   boolean canPush(int n);
 }
@@ -40,11 +66,22 @@ public:
   \begin{verbatim}
 
 template <class T>
-class IOStreamUnordered : 
-       IStreamUnordered<T>, 
-       OStreamUnordered<T> {
+class StreamUnordered : 
+      public IStreamUnordered<T>, 
+      public OStreamUnordered<T> {
 public:
-  IOStreamUnordered(StreamBuffer<T> &s);
+  StreamUnordered(int capacity,
+          VM_NODE_TYPE_MEM loc,
+          int addr,
+          int initLength=0,
+          boolean aliased=true,
+          boolean wraps=true);
+  StreamUnordered(int capacity,
+          VM_NODE_TYPE_PROC loc,
+          int addr,
+          int initLength=0,
+          boolean aliased=true,
+          boolean wraps=true);
 }
   \end{verbatim}
 \end{minipage}
@@ -57,9 +94,21 @@ public:
 
 template <class T>
 class IStream : 
-      IStreamUnordered<T> {
+      public IStreamUnordered<T> {
 public:
-  IStream(StreamBuffer<T> &s);
+  IStream(int capacity,
+          VM_NODE_TYPE_MEM loc,
+          int addr,
+          int initLength=0,
+          boolean aliased=true,
+          boolean wraps=true);
+  IStream(int capacity,
+          VM_NODE_TYPE_PROC loc,
+          int addr,
+          int initLength=0,
+          boolean aliased=true,
+          boolean wraps=true);
+
   T peek(int index);
 }
   \end{verbatim}
@@ -71,9 +120,20 @@ public:
 
 template <class T>
 class OStream : 
-      OStreamUnordered<T> {
+      public OStreamUnordered<T> {
 public:
-  OStream(StreamBuffer<T> &s);
+  OStream(int capacity,
+          VM_NODE_TYPE_MEM loc,
+          int addr,
+          int initLength=0,
+          boolean aliased=true,
+          boolean wraps=true);
+  OStream(int capacity,
+          VM_NODE_TYPE_PROC loc,
+          int addr,
+          int initLength=0,
+          boolean aliased=true,
+          boolean wraps=true);
 }
   \end{verbatim}
 \end{minipage}
@@ -83,16 +143,85 @@ public:
   \begin{verbatim}
 
 template <class T>
-class IOStream : 
-       IStream<T>, 
-       OStream<T> {
+class Stream : 
+      public IStream<T>, 
+      public OStream<T> {
 public:
-  IOStream(StreamBuffer<T> &s);
+  Stream(int capacity,
+         VM_NODE_TYPE_MEM loc,
+         int addr,
+         int initLength=0,
+         boolean aliased=true,
+         boolean wraps=true);
+  Stream(int capacity,
+         VM_NODE_TYPE_PROC loc,
+         int addr,
+         int initLength=0,
+         boolean aliased=true,
+         boolean wraps=true);
+}
+  \end{verbatim}
+\end{minipage}
+\\ \hline
+\lefttab{\small Block}
+&
+\begin{minipage}{1.95in}
+  \scriptsize
+  \begin{verbatim}
+
+template <class T>
+class IBlock : 
+      public BaseBlock {
+public:
+  IBlock(int capacity, 
+         VM_NODE_TYPE_MEM loc, 
+         int addr);
+  IBlock(int capacity, 
+         VM_NODE_TYPE_PROC loc);
+
+  T read(int index);
+}
+  \end{verbatim}
+\end{minipage}
+&
+\begin{minipage}{2.0in}
+  \scriptsize
+  \begin{verbatim}
+
+template <class T>
+class OBlock :
+      public BaseBlock {
+public:
+  OBlock(int capacity, 
+         VM_NODE_TYPE_MEM loc, 
+         int addr);
+  OBlock(int capacity, 
+         VM_NODE_TYPE_PROC loc);
+
+  void write(int index, T& val);
+}
+  \end{verbatim}
+\end{minipage}
+&
+\begin{minipage}{1.8in}
+  \scriptsize
+  \begin{verbatim}
+
+template <class T>
+class Block : 
+      public IBlock<T>, 
+      public OBlock<T> {
+public:
+  Block(int capacity, 
+        VM_NODE_TYPE_MEM loc, 
+        int addr);
+  Block(int capacity, 
+        VM_NODE_TYPE_PROC loc);
 }
   \end{verbatim}
 \end{minipage}
 \end{tabular}
 \end{minipage}
-\caption{Class declarations for stream objects.\protect\label{fig:declgrid}}
+\caption{Partial class declarations for streams and blocks.  Each stream and block also contains constructors with the same signature as those in {\tt BaseStream} and {\tt BaseBlock}, respectively, but these are ommitted for the sake of brevity.\protect\label{fig:declgrid}}
 \vspace{-6pt}
 \end{figure}
