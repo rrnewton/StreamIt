@@ -27,16 +27,16 @@ vector.
 Then, we make the following claim:
 \begin{equation}
 \label{eq:claim1}
-\forall i \in [0, m-1]:~~{\vec{out}}[i] = {\vec y}[i+e-1]
+\forall i \in [0, m-1]:~~{\vec{out}}[i] = {\vec y}\hspace{1pt}[i+e-1]
 \end{equation}
 To see that this is true, recall the definition of convolution:
 \[
-  {\vec y}[i] = A[i,0] * \vec{in}[i] = \sum_{k=-\infty}^{\infty} A[k,0] \vec{in}[i-k]
+  {\vec y}\hspace{1pt}[i] = A[i,0] * \vec{in}[i] = \sum_{k=-\infty}^{\infty} A[k,0] \vec{in}[i-k]
 \]
 Substituting $\vec{in}$ by its definition, and restricting $k$ to
 range over the valid rows of $A$, we have:
 \[
-  {\vec y}[i] = \sum_{k=0}^{e-1} A[k,0] \mbox{peek}(i-k)
+  {\vec y}\hspace{1pt}[i] = \sum_{k=0}^{e-1} A[k,0] \mbox{peek}(i-k)
 \]
 Remapping the index $i$ to $i+e-1$ makes the right hand side
 equivalent to ${\vec{out}}[i]$, by Definition 1.
@@ -60,8 +60,8 @@ details, refer to~\cite{oppenheim-discrete}.
 
 We can use the procedure described above to implement a linear node in
 the frequency domain.  We simply calculate ${\vec y} = A[*,0] * {\vec
-in}$, and extract values ${\vec y}[e-1] \dots {\vec y}[m+(e-1)-1]$ as
-the $m$ values pushed by the node.  Note that ${\vec y}[i]$ is also
+in}$, and extract values ${\vec y}\hspace{1pt}[e-1] \dots {\vec y}\hspace{1pt}[m+(e-1)-1]$ as
+the $m$ values pushed by the node.  Note that ${\vec y}\hspace{1pt}[i]$ is also
 defined for $i \in [0, e-2]$ and $i \in [m+e-1,m+2e-2]$; these values
 represent partial sums in which some coefficients were excluded.  Our
 {\naive} implementation simply disregards these values.  However, in the
@@ -121,7 +121,7 @@ frequency domain:
     ~~~~~~{\tt \}} \\
     ~~~~~~{\tt for}~i=0~{\tt to}~m-1\\
     ~~~~~~~~{\tt pop()} \\
-    ~~~~~~~~{\tt for}~j=0~to~u-1\\
+    ~~~~~~~~{\tt for}~j=0~{\tt to}~u-1\\
     ~~~~~~~~~~{\tt push}(\vec{y}\hspace{1pt}[i+e-1,j] + {\vec b}[j])\\
     ~~~~~~{\tt \}} \\
     ~~~~{\tt \}} \\
@@ -130,10 +130,10 @@ frequency domain:
     {\tt \}} \\ ~ \\
     {\tt float \rightarrow float}~{\tt filter~freqDecimator~}(o, u){\tt ~\{} & \hspace{40pt}\\
     ~~{\tt work~}{\tt peek}~u*o~{\tt pop}~u*o~{\tt push}~u~{\tt \{} \\
-    ~~~~{\tt for~i~=~0~to~}u-1 \\
+    ~~~~{\tt for}~i=0~{\tt to}~u-1 \\
     ~~~~~~{\tt push(pop())} \\
-    ~~~~{\tt for~i~=~0~to~}u-1 \\
-    ~~~~~~{\tt for~j~=~0~to~}o-2 \\
+    ~~~~{\tt for}~i=0~{\tt to}~u-1 \\
+    ~~~~~~{\tt for}~j=0{\tt to}~o-2 \\
     ~~~~~~~~{\tt pop()} \\
     ~~{\tt \}} \\
     {\tt \}}
@@ -161,7 +161,7 @@ amount of input~\cite{oppenheim-discrete}.
 %% of length $m$.  Then, consider element $m+i$ of the first execution.
 %% Following equation~\ref{eq:linconv}, we have:
 %% \[
-%% {\vec y}[m+i] = \sum_{k=0}^{e-1} A[k] \mbox{\tt peek}(m+i+e-1-k)
+%% {\vec y}\hspace{1pt}[m+i] = \sum_{k=0}^{e-1} A[k] \mbox{\tt peek}(m+i+e-1-k)
 %% \]
 %% Since we are in the first execution, we can only peek at values $0
 %% \dots m-1$, which implies that $m+i+e-1-k \in [0, m-1]$ and thus $k
@@ -287,5 +287,5 @@ frequency domain.
 %% sum from digital signal processing.  Given two vectors $\vec{h}$ and
 %% $\vec{x}$, their convolution is defined as:
 %% \begin{equation}
-%%   {\vec y}[n] = \vec{x} * \vec{h} = \sum_{k=-\infty}^{\infty} \vec{x}[k] \vec{h}[n-k]
+%%   {\vec y}\hspace{1pt}[n] = \vec{x} * \vec{h} = \sum_{k=-\infty}^{\infty} \vec{x}[k] \vec{h}[n-k]
 %% \end{equation}
