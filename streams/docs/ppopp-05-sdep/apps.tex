@@ -471,14 +471,13 @@ channels. Specifically, every channel  in the stream graph is assigned
 a  unique TCP/IP  connections for  the exchange  of data  and messages
 between actors.
 
-In  order  to  perform  the  thread-to-machine  allocation,  our  {\it
-clustering}       backend,       part       of      the       StreamIt
-compiler~\cite{streamit-compiler}     infrastructure,     applies    a
-partitioning   algorithm~\cite{thies-msp}   to   reduce  the   overall
-application bottleneck  while maximizing the throughput  of the output
-filter in the stream dependence  graph. For the purpose of this paper,
-throughput is  defined as the number  of outputs produced  per unit of
-time.
+In order to perform the thread-to-machine allocation, our {\it
+clustering} backend, part of the StreamIt
+compiler~\cite{streamit-asplos} infrastructure, applies a partitioning
+algorithm~\cite{thies-msp} to reduce the overall application
+bottleneck while maximizing the throughput of the output filter in the
+stream dependence graph. For the purpose of this paper, throughput is
+defined as the number of outputs produced per unit of time.
 
 \begin{figure}[t]
 \psfig{figure=throughput-graph.eps,width=3.5in}
