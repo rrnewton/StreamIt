@@ -1,10 +1,11 @@
 \section{Results}
 \label{chpt:results}
 
-This section presents results of creating schedules using the
-technique described in Section \ref{chpt:phased}.  Section
-\ref{sec:results:apps} presents the applications used for evaluation.
-Section \ref{sec:results:results} presents the results and analysis.
+We have implemented the phased single appearance and minimum latency
+scheduling algorithms as part of the StreamIt compiler, and we
+evaluate them in this section.  Section \ref{sec:results:apps}
+presents the applications used for evaluation, while Section
+\ref{sec:results:results} presents the results and analysis.
 
 \subsection{Benchmarks}
 \label{sec:results:apps}
@@ -32,18 +33,18 @@ is a radar array front-end application with beamforming; Vocoder is a
 
 Two test applications (QMF and CD-DAT) are applications used in
 another publication on scheduling streaming applications
-(\cite{murthy99buffer}). QMF is a filter bank application. CD-DAT is a
+(\cite{murt1999x3}). QMF is a filter bank application. CD-DAT is a
 sample rate conversion application. The code inside of the {\filters}
 has not been implemented. QMF is a filter bank application which uses
 a 1/2-1/2 split for the spectrum up to a depth of 3 (qmf12\_3d
-in~\cite{murthy99buffer}).  It was slightly modified to use
+in~\cite{murt1999x3}).  It was slightly modified to use
 {\StreamIt}'s pre-defined {\splitter} and {\joiner} constructs.  The
 high-pass and low-pass filtering in multiple-output blocks has been
 converted to a splitter followed by filters on each of the output
 channels. The low and highb pass filters have also been given a peek
 amount of 16 so they can perform their function in the way intended in
 {\StreamIt}.  CD-DAT is exactly the same application as that described
-in \cite{murthy99buffer}.
+in \cite{murt1999x3}.
 
 The remaining 4 applications were chosen from our sample applications
 used for testing the StreamIt compiler. HDTV performs a HDTV signal

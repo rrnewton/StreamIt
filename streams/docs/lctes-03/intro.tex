@@ -77,8 +77,11 @@ Section \ref{chpt:related} describes related work and Section
 
 \begin{figure}[t]
 \psfig{figure=sched-diag2.eps,width=3.35in}
-\caption{Execution trace for three different scheduling
-strategies.\protect\label{fig:trace}}
+\caption{Execution trace of three different scheduling strategies for
+one steady state execution of a simple pipeline.  Channels are
+annotated with the number of live data items that they contain; shaded
+nodes represent those that are firing on a given time
+step.\protect\label{fig:trace}}
 \vspace{-12pt}
 \end{figure}
 
@@ -203,6 +206,8 @@ anywhere else)}
 \begin{figure}[t]
 \psfig{figure=codedata.eps,width=3.35in}
 \caption{Code and data sizes for the execution traces of
-Figure~\ref{fig:trace}.  \protect\label{fig:codedata}}
+Figure~\ref{fig:trace}.  For brevity, we show these figures on the
+same graph, even though a unit of storage might have a different cost
+for code and data.\protect\label{fig:codedata}}
 \vspace{-12pt}
 \end{figure}
