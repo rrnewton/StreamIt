@@ -1,0 +1,39 @@
+------------------------------------------------------------------------
+Big things to think about
+1. operational semantics
+2. message sending syntax
+3. letting init codes cause an offset (do push() on output)
+4. verifying round-robin's are legal by having same rate on both sides
+
+5. semantics for weighted round-robin / duplicates?  or proof of
+simulation by a single round-robin.
+
+6. if a stream sends or receives a message, is the wavefront relative
+to the output or input?
+
+7. exact semantics of initialization when combining with tapes/messaging.
+
+8. define the path you take in non-i/o connected streams for
+messaging.  If they're parallel pieces of split/join, do you
+synchronize from above or below?  I think theres's a difference.
+
+
+------------------------------------------------------------------------
+Little things to think about
+1. would it help to outlaw aliasing?
+
+
+------------------------------------------------------------------------
+Future things to think about
+1. any notion of exceptions?  error handling?
+
+2. any concept of filters ignoring items?  would affect wavefront (a
+select filter, for example.)
+
+------------------------------------------------------------------------
+Things to write about
+1. latency
+2. drain/destroy initialization semantics
+3. feedback loop initialization
+4. portals - let's just adopt templated java lists for the sake of presentation
+

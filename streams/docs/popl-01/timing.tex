@@ -1,2 +1,73 @@
 \section{Timing Semantics}
 
+\begin{verbatim}
+
+let's try some new definitions:
+
+given that there are exactly x items on your input tape, the maximum
+number of items you can have on your output tape is h(x)
+
+the inverse is now well-defined: given that there are exactly x items
+on your output tape, the minimum number of items you need on your
+input tape is p(x)
+
+filter:		h(x) = push*max(0, floor((x-(peek-pop))/pop))
+split:		h(x) = (ceil(x/2), floor(x/2))
+join:		h(x1, x2) = min(2*x1-1, 2*x2)
+
+filter:		p(x) = ceil(x/push)*pop+(peek-pop)
+split:		p(x1, x2) = min(2*x1-1, 2*x2)
+join:		p(x) = (ceil(x/2), floor(x/2))
+
+--
+
+scheduling constraints:
+
+- again let n_a denote the number of items on the OUTPUT tape of filter a
+
+if have filters a and b in pipeline (a -> b), then these are equivalent:
+	- n_b <= h_b(n_a)
+	- n_a >= p_b(n_b)
+
+if have splitjoin with input a, then (b, c) in parallel, and output d:
+	- there are n_a on input
+	- can have up to h(n_a) = (ceil(n_a/2), floor(n_a/2)) into (b, c)
+	- can have up to (h_b(ceil(n_a/2)), h_c(floor(n_a/2))) out of (b, c)
+	- can have up to min(2*h_b(ceil(n_a/2))-1,2*h_c(floor(n_a/2))) into d
+
+	so constraint is that:
+	- n_d <= h_d( min(2*h_b(ceil(n_a/2))-1,2*h_c(floor(n_a/2))) )
+
+	or, in other words, h(x) for a split/join is:
+		h(x) = min(2*h_b(ceil(n_a/2))-1,2*h_c(floor(n_a/2)))
+
+if sending message from a to b with max wavefront latency n, then:
+	
+	1. if b is downstream, with filters x1, x2, x3 in between a and b:
+			a -> x1 -> x2 -> x3 -> b
+
+		n_b <= h_b(h_x3(h_x2(h_x1(n_a + n * a.push))))
+
+	2. if b is upstream, with filters x1, x2, x3 between b and a:
+			b -> x1 -> x2 -> x3 -> a
+
+		n_b <= p_x3(p_x2(p_x1(p_a(n_a + n * a.push))))
+
+	3. in the general case, a is sending message to b.  trace a
+		path, finding y1, y2, y3 that are blocks between OUTPUT of
+		a and OUTPUT of b.  a -> y1 -> y2 -> y3 -> b.  (note that
+		if b is upstream, then y1 = a.)  Then we have:
+
+		n_b <= z_y3(z_y2(z_y1(n_ a + n * a.push)))
+
+		where z is replaced by h if we are traveling downstream, 
+		but replaced by p if we are traveling upstream.
+
+aha, if coming from common sender or going to common receiver, the wavefront
+	must have EQUAL index at the sender or receiver.  so you REFLECT
+	around split/join points instead of translating through them.
+	because if you go up one part of join and down the other, the
+	wavefront shifts
+
+\end{verbatim}
+
