@@ -2,24 +2,31 @@
 
 \section{Translation to Frequency Domain}
 
-Our linear analysis framework provides a compile time formulation of the 
-computation that a linear {\tt stream} is performing and we can use this information 
-to exploit well known domain specific optimizing transformations. 
-We have implemented one such optimization which is implementing
-convolution using a translation to the frequency domain.
+Our linear analysis framework provides a compile time formulation of
+the computation that a linear {\tt stream} is performing and we can
+use this information to exploit well known domain specific optimizing
+transformations.  Using this information, our compiler identify
+convolution regions that requires substantially computation to be
+executed in the frequency domain.
 
-Calculating a convolution sum is a fundamental operation in discrete time signal processing 
-because it defines how to compute the output of a linear time invariant 
-(LTI) system from the inputs. Convolution sums 
-can be implemented very efficiently be exploiting a transformation to the frequency domain.
+Calculating a convolution sum is a common and fundamental operation in
+discrete time signal processing.
+If the convolution region is sufficiently large,
+transforming the data to the
+frequency domain, performing a simple vector multiply and converting
+back to the time domain will require substantially smaller number of
+operations than the original convolution computation.
 
-The transformation from convolution sum into frequency multiplication is currently
-done explicity by the programmer because no compiler analysis today has the information 
-to determine when a convolution sum is being computed and which program variables
-are acting as the input $x[n]$, the weights $h[n]$ and the output $y[n]$. As the 
-complexity of DSP programs grow, determining the disparate reigons across which these 
-optimizations can be applied is an ever more daunting task. Furthermore, the applicability 
-details of different architectures make the task even harder to do in a portable manner.
+The transformation from convolution sum into frequency multiplication
+is done explicitly by the programmer because no compiler analysis today
+has the information to determine when a convolution sum is being
+computed.  As the complexity of DSP programs grow, determining the
+disparate regions across which these optimizations can be applied is
+an ever more daunting task. For example, individual filters may not
+have sufficiently large convolutions to merit this transformation, but
+after a liner combination of multiple filters the transformation will
+be beneficial.  Furthermore, the applicability details of different
+architectures make the task even harder to do in a portable manner.
 
 \subsection{Transformation Overview}
 The convolution sum $y[n]=x[n]*h[n]$ is defined 
@@ -29,30 +36,41 @@ the input ($x[n]$) and output ($y[n]$) correspond exactly to the input and outpu
 Furthermore, a {\tt stream} will be computing a convolution sum when $o_F=1$ in which
 case we can identify the values $h[n]$ as exactly the columns of $A$.
 
-Very often, fewer calculations are required to transform the input signal to the 
-frequency domain, do a multiplication, and then convert back to the time domain
-than for computing the convolution directly. This seeming roundabout calculation
-is feasible because a class of fast algorithms known as the FFT are known that convert
-to frequency and back again. For a thorough treatment of the theory of discrete time 
-signal processing, including using the DFT to implement convolution, see \cite{oppenheim-discrete}.
+Very often, fewer calculations are required to transform the input
+signal to the frequency domain, do a multiplication, and then convert
+back to the time domain than for computing the convolution
+directly. This is due to the fact that, while calculating a
+convolution takes ${\cal O}(n^2)$ time, performing the equivalent
+computation by transforming to and from frequency domain using an FFT
+takes only ${\cal O}(n log(n))$ time coupled with an ${\cal O}(n)$
+vector multiply in the frequency domain.
+
+%This seeming roundabout calculation
+%is feasible because a class of fast algorithms known as the FFT are known that convert
+%to frequency and back again. For a thorough treatment of the theory of discrete time 
+%signal processing, including using the DFT to implement convolution, see \cite{oppenheim-discrete}.
 
 To compute the convolution of two discrete time signals, $x[n]$ and $h[n]$ 
 one can calculate the DFT of both sequences to produce 
-$X[k]$ and $H[k]$. Multiplying $X[k]$ and $H[k]$ elementwise
+$X[k]$ and $H[k]$. Multiplying $X[k]$ and $H[k]$ element wise
 produces a new sequence $Y[k]$, and taking the inverse DFT (IDFT) of $Y[k]$ 
 produces $y[n]$ which is exactly the same as $x[n]*h[n]$.
 
-When we identify a {\tt stream} that computes a convolution sum, the compiler
-computes and stores $H[k]$ from $h[n]$ in a field. The {\tt stream}'s 
-{\tt work} function is changed so that $y[n]$ 
+When we identify a {\tt stream} that computes a convolution sum, the
+compiler computes and stores $H[k]$ from $h[n]$ at initialization
+time. The {\tt stream}'s {\tt work} function is changed so that $x[n]$
+is first transformed to the frequency domain using a FFT algorithm,
+multiplied with the vector $H[n]$, and $y[n]$ is obtained by
+transforming the resulting vector back to the time domain using an
+inverse FFT algorithm.
 
 \subsection{Automatic Transformation}
 %this is where the fun starts.  
 
-The compiler can  $h[n]$ at compile time, we can implement this standard frequency 
-transformation automatically, but to do so we need to take care with the details.
-If $x[n]$ has length $P$ and $h[n]$ has length $L$, then the resulting convolution
-will be on length $P+L-1$ which implies a $P+L-1$ length DFT must be used.
+To implement this transformation, first we need to compute $h[n]$ at
+compile time.  If $x[n]$ has length $P$ and $h[n]$ has length $L$,
+then the resulting convolution will be on length $P+L-1$ which implies
+a $P+L-1$ length DFT must be used.
 
 Each {\tt work} execution of an FIR filter in Streamit is going to be 
 producing one value of the output sequence. Matching the above terminology to StreamIt, 
@@ -80,8 +98,8 @@ However, the discarded values of $y[n]$ are not meaningless. The first $e_F-1$ a
 computation from the previous invocation of the work function and the last $e_f-1$ are part
 of the computation from the next invocation of the work function. 
 
-We use this observation in our smarter implementation to exploit a method widely used 
-in the DSP community known as overlap and add. On each {\tt work} function exection, 
+We use this observation in our smarter implementation to exploit a method (known i
+in the DSP community known as overlap and add~\cite{???}). On each {\tt work} function exection, 
 the filter outputs the first $e_F-1$ items in $y[n]$ plus the partial results from 
 the previous invocation followed by the middle $N$ elements. Finally, it 
 and stores the last $e_f-1$ elements in $y[n]$ for the next invocation.
