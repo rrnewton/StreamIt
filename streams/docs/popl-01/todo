@@ -1,3 +1,65 @@
+- By the way, for the tech report, we should get a small example and
+write it using C, an OO library and StreaMIT. And also add few
+example. One thing we did not do is list current limitations we may
+fix soon such as rate changing filters, a type dispatch splitter, any
+joiner, etc. etc. Current class can be named something lime "static
+rates" and some of these extensions as "dynamic rates". Your java
+class diagram should go in too.
+
+- Figure 4, two set splitters, second should be a joiner...
+
+- Section 3.2.1 should refer to figure 11.
+
+- In Figure 7 don't put all the code of TrunkedRadio, also put parts of code
+from Booster and Check Quality to show message delivery. (Copy the class,
+eliminate extraneous stuff and put dots)
+
+- The message window is 4N to 6N, your description is for 4 to 6, you missed
+the N!
+
+- IN 3.3.2 having a messaging system reduces the number of channels since only
+high bandwidth comm. need a channel, making most programs easier to fit into
+a structured streaming model.
+
+- 3.4.1 Justify reinitializatoin by need to change a part of the stream graph.
+
+Another meta point.
+Because of messaging and reinitilization we can integrate control part with
+the data part. Most other stream programs need a separate control program.
+(eg: Chapin's software radio)
+
+- It would be nice to add a example with reinitialization and draining....
+
+- Adhoc reinitialization can easily loose data or deadlock the system.
+
+- Need to note somewhere that sending a message does not affect the info
+wavefront. I.e. can go "back to the future" using messages.
+
+- Just before 4.1.1 The formalism is not only used for define messaging and
+latency but also to prove program correctness (deadlock etc.)
+
+- 4.1.1 Where is min?
+
+- Why are some equn's numbered?
+
+- List of equ'n should be aligned at =
+
+- 4.1.3 Should we do a general weighted-round-robin??
+
+- Figure 10 has J and S not FJ and FS is that consistent??
+
+- 4.2.3 We can do something cool on for scheduling, we can bound the
+total number of buffer space!  Find the number of items that must be
+on a tape, sum them up, and say it has to be less than MAXBUFFERSIZE
+
+- 4.3 Wrong formatting for I1FJ in the 3rd para.
+
+- We should say something in intro/abstract about how easy for us to
+prove/show deadlock freedom etc.
+
+- Section 6 needs a description about the TrunkedRadio (how about the
+description I e-mailed to you yesterday?)
+
 ------------------------------------------------------------------------
 Big things to think about
 
