@@ -1,2 +1,41 @@
 \section{Conclusion}
 \label{sec:conclusion}
+
+In this paper, we describe the StreamIt compiler for the Raw
+architecture.  The stream graph of a StreamIt program exposes the data
+communication pattern to the compiler while the lack of global
+synchronization frees the compiler to radically reoganize the program
+for efficient execution on the underline architecture. The StreamIt
+compiler demonstrates the power of this flexibility by totally
+reoganizing large programs for better load balance. We were able to
+map many of programs on to the Raw processor and obtain extremely good
+performance, which can go as high as xxx FLOPS.
+
+We introduce a collection of optimizations, vertical and horizontal
+filter fusion, vertical and horizontal filter fission and filter
+reordering transformations, that are used to radically restructure the
+programs.  We show that applying these transformaitons we can map a
+high-level stream program, written to reflect the composition of the
+application, onto Raw and achieve good processor utilization and load
+balance. 
+
+We show how to automatically map a stream graph on to Raw tiles and
+produce a communication sschedule and generate efficient code.
+
+Unlike all previous streaming languages, the structured streams of
+StreamIt makes it possible for us to approach the optimization and
+parallelization problems in a very systermatic manner. It enables us
+to define multiple optimizations -- targetting different constructs
+and requirements -- compose them and apply them in a hirearchical
+manner.
+
+The ability to do global transformations across multiple filters, that
+may have originated from very different parts of the application,
+makes it possible for the compiler to find optimization opportunities
+that may ellude even an experience programmer.  Such capabilities
+enables the programmers to write protable streaming applications and
+map them efficiently onto any given architecture. This has the
+potential of creating a programming standard for the emerging
+communication exposed architectures. The StreamIt compiler takes a
+fist step towareds this goal.
+
