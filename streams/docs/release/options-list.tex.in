@@ -9,7 +9,7 @@
 \item [-{}-help]
 Displays a summary of common options.
 
-\item [-{}-more-help]													
+\item [-{}-more-help]                                                                                                   
 Displays a summary of advanced options (which are not described below).
 
 \item[-{}-output \metavar{filename}, -o \metavar{filename}]
@@ -44,7 +44,7 @@ cases. Adds \texttt{--unroll 16 --destroyfieldarray --partition --ratematch --wb
 \item [-O2]
 Perform extended optimizations that should improve performance in
 most cases, but may also cause the compiler to become unstable.
-Adds \texttt{--unroll 256 --destroyfieldarray --partition --ratematch --removeglobals --simulatework --wbs}.
+Adds \texttt{--unroll 256 --destroyfieldarray --partition --ratematch --removeglobals --wbs}.
 
 \item [-{}-linearreplacement, -l]
 Domain-specific optimization: combine adjacent ``linear'' filters in the
@@ -54,7 +54,7 @@ possible.  Corresponds to the ``linear'' option in the PLDI'03 paper.
 \item [-{}-unroll \metavar{n}, -u\metavar{n}]
 Specify loop unrolling limit. The default value is 0.
 \end{description}
-	  
+          
 \subsection*{Options specific to Raw backend}
 \begin{description}
 \item [-{}-partition, -p] Partition the stream graph,
@@ -81,12 +81,6 @@ Specify loop unrolling limit. The default value is 0.
 
 \item [-{}-rawcol \metavar{m}, -c\metavar{m}]
     Specify number of columns in Raw processor; --raw specifies number of rows.
-
-\item [-{}-simulatework, -s]
-    Use the Raw simulator to calculate the amount of time required
-    to execute a work function, rather than using an estimator.
-    This makes the compiler substantially slower; it may result in
-    better partitioning.
 
 \item [-{}-wbs] When laying out communication
    instructions, use the work-based simulator to estimate exactly when
