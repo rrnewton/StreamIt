@@ -1,6 +1,6 @@
 \newcommand{\lefttab}[1]{\begin{minipage}{0.6in}\begin{center}#1\end{center}\end{minipage}}
 \begin{figure}[t]
-\hspace{-12pt}\begin{minipage}{6in}
+\hspace{-13pt}\begin{minipage}{6in}
 \begin{tabular}{c|c|c|c}
 ~ & {\small Input} & {\small Output} & {\small Input and Output}
 \\ \hline
@@ -12,10 +12,10 @@
 
 template <class T>
 class IStreamUnordered :
-      public BaseStream {
+      public virtual BaseStream {
 public:
-  virtual T pop();
-  virtual boolean canPop(int n);
+  T pop();
+  boolean canPop(int n);
 }
   \end{verbatim}
 \end{minipage}
@@ -26,10 +26,10 @@ public:
 
 template <class T>
 class OStreamUnordered :
-      public BaseStream {
+      public virtual BaseStream {
 public:
-  virtual void push(T& val);
-  virtual boolean canPush(int n);
+  void push(T& val);
+  boolean canPush(int n);
 }
   \end{verbatim}
 \end{minipage}
@@ -56,7 +56,8 @@ template <class T>
 class IStream : 
       public IStreamUnordered<T> {
 public:
-  virtual T peek(int index);
+  T pop();
+  T peek(int index);
 }
   \end{verbatim}
 \end{minipage}
@@ -68,6 +69,7 @@ public:
 template <class T>
 class OStream : 
       public OStreamUnordered<T> {
+  void push(T& val);
 }
   \end{verbatim}
 \end{minipage}
@@ -92,9 +94,9 @@ class Stream :
 
 template <class T>
 class IBlock : 
-      public BaseBlock {
+      public virtual BaseBlock {
 public:
-  virtual T read(int index);
+  T read(int index);
 }
   \end{verbatim}
 \end{minipage}
@@ -105,9 +107,9 @@ public:
 
 template <class T>
 class OBlock :
-      public BaseBlock {
+      public virtual BaseBlock {
 public:
-  virtual void write(int index, T& val);
+  void write(int index, T& val);
 }
   \end{verbatim}
 \end{minipage}
