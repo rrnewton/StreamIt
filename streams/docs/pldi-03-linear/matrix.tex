@@ -1,4 +1,15 @@
-\section{Linear Nodes}
+\begin{figure}[t]
+\vspace{-6pt}
+\center
+\epsfxsize=3.0in
+\epsfbox{images/streamit-structures.eps}
+\vspace{-12pt}
+\caption{StreamIt structures: {\tt pipeline}, {\tt splitjoin}, and {\tt feedbackloop}.
+\protect\label{fig:structures}}
+\vspace{-12pt}
+\end{figure}
+
+\section{Representing Linear Nodes}
 \label{sec:linearrep}
 
 There is no general relationship that must hold between a {\tt
@@ -14,15 +25,14 @@ filters are finite impulse response (FIR) filters, compressors,
 expanders and signal processing transforms such as the discrete
 Fourier transform (DFT) and discrete cosine transformation (DCT).  Our
 formal definition of a linear node is as follows (refer to
-Figure~\ref{fig:overview-matrix} for an illustration).
-
+Figure~\ref{fig:overview-matrix} for an illustration). \vspace{-4pt}
 \begin{definition}(Linear node)
-A linear node $\lambda$ $=$ $\{A,$ ${\vec b},$ $e,$ $o,$ $u\}$ represents an
-abstract stream block which performs an affine transformation $y = x A
-+ {\vec b}$ from input elements $x$ to output elements $y$.  
-$A$ is a $e \times u$ matrix, 
-${\vec b}$ is a $u$-element row vector, and $e$, $o$, and
-$u$ are the peek, pop, and push rates, respectively. \\ ~ \\
+A linear node $\lambda$ $=$ $\{A,$ ${\vec b},$ $e,$ $o,$ $u\}$
+represents an abstract stream block which performs an affine
+transformation $y = x A + {\vec b}$ from input elements $x$ to output
+elements $y$.  $A$ is a $e \times u$ matrix, ${\vec b}$ is a
+$u$-element row vector, and $e$, $o$, and $u$ are the peek, pop, and
+push rates, respectively. \\ ~ \vspace{-8pt} \\
 %
 A ``firing'' of a linear node $\lambda$ corresponds to the following
 series of abstract execution steps.  First, an $e$-element row vector
@@ -30,9 +40,10 @@ $x$ is constructed with $x[i] = \mbox{\tt peek}(i)$.  The node
 computes $y = x A + {\vec b}$, and then pushes the $u$ elements of $y$ onto
 the output tape, starting with $y[u-1]$ and proceeding through $y[0]$.
 Finally, $o$ items are popped from the input tape.
-\end{definition}
+\end{definition} \vspace{-2pt}
 
 \begin{figure}[t]
+\vspace{-6pt}
 \center
 \epsfxsize=3.0in
 \epsfbox{images/general-picture-matrix.eps}

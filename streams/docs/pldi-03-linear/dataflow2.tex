@@ -3,6 +3,33 @@
 \newcommand{\UND}{\end{ALC@g}}
 \newcommand{\tup}[2]{\langle{#1}, {#2}\rangle}
 
+\begin{figure}[t]
+\begin{equation} \nonumber
+\begin{array}{rcl}
+y & \in & \mbox{program-variable} \\
+c & \in & \mbox{constant}_{\bot} \\
+\vec v, \vec b & \in & \mbox{vector} \\
+\tup{\vec v}{c} & \in & \mbox{linear-form} \\
+map & \in & \mbox{program-variable} \rightarrow \mbox{linear-form  (a hashtable)} \\
+A & \in & \mbox{matrix} \\
+code & \in & \mbox{list of instructions, each of which can be:} \\
+\multicolumn{3}{l}{\parbox{3in}{
+    \vspace{-6pt}
+    \begin{equation} \nonumber
+      \begin{array}{ll}
+	y_1 := \mt{const}  & y_1 := y_2~\mt{op}~y_3\\
+	y_1 := \mbox{\tt peek}(i) & y_1 := \mbox{\tt pop}() \\
+	\mbox{{\tt push}}(y_1) & (\mbox{{\tt loop}} ~N~ \mt{code}) \\
+	(\mbox{{\tt branch}} ~\mt{code}_1~ \mt{code}_2) & ~
+      \end{array}
+\end{equation}}}
+\end{array} 
+\end{equation}
+\vspace{-18pt}
+\caption{Data types for the extraction analysis.\protect\label{fig:types}}
+\vspace{-14pt}
+\end{figure}
+
 \section{Linear Extraction Algorithm}
 \label{sec:dataflow}
 
@@ -74,34 +101,8 @@ presentation.  Also implicit in the algorithm description is the fact
 that all variables are local to the {\tt work} function.  If a filter
 has persistent state, all accesses to that state are marked as $\bot$.
 
-\begin{figure}[t]
-\begin{equation} \nonumber
-\begin{array}{rcl}
-y & \in & \mbox{program-variable} \\
-c & \in & \mbox{constant}_{\bot} \\
-\vec v, \vec b & \in & \mbox{vector} \\
-\tup{\vec v}{c} & \in & \mbox{linear-form} \\
-map & \in & \mbox{program-variable} \rightarrow \mbox{linear-form  (a hashtable)} \\
-A & \in & \mbox{matrix} \\
-code & \in & \mbox{list of instructions, each of which can be:} \\
-\multicolumn{3}{l}{\parbox{3in}{
-    \vspace{-6pt}
-    \begin{equation} \nonumber
-      \begin{array}{ll}
-	y_1 := \mt{const}  & y_1 := y_2~\mt{op}~y_3\\
-	y_1 := \mbox{\tt peek}(i) & y_1 := \mbox{\tt pop}() \\
-	\mbox{{\tt push}}(y_1) & (\mbox{{\tt loop}} ~N~ \mt{code}) \\
-	(\mbox{{\tt branch}} ~\mt{code}_1~ \mt{code}_2) & ~
-      \end{array}
-\end{equation}}}
-\end{array} 
-\end{equation}
-\vspace{-18pt}
-\caption{Data types for the extraction analysis.\protect\label{fig:types}}
-\end{figure}
-
-\begin{algorithm}
-\caption{Pseudocode for linear extraction.\protect\label{alg:dataflow}}
+\begin{algorithm}[t]
+\caption{Linear extraction analysis.\protect\label{alg:dataflow}}
 proc {\bf Toplevel}(filter $F$) returns linear node for $F$
 \begin{enumerate}
 \item Set Peek, Pop, Push equal to I/O rates of filter $F$.
@@ -221,7 +222,7 @@ proc {\bf Extract}($code$, $map$, $A$, $\vec b$, int $\mt{popcount}$, int $\mt{p
 \STATE $\mt{popcount} \leftarrow \mt{popcount}_1 \sqcap \mt{popcount}_2$
 \STATE $\mt{pushcount} \leftarrow \mt{pushcount}_1 \sqcap \mt{pushcount}_2$
 \STATE $A \leftarrow A_1 \sqcap A_2$
-\STATE $b \leftarrow b_1 \sqcap b_2$
+\STATE ${\vec b} \leftarrow {\vec b_1} \sqcap {\vec b_2}$
 \STATE $\mt{map} \leftarrow \mt{map}_1 \sqcap \mt{map}_2$
 \UND
 \UND %end case

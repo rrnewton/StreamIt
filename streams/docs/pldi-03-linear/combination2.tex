@@ -22,7 +22,7 @@ do not yet deal with {\tt feedbackloop}s as they require the notion of
 \epsfxsize=3.0in
 \epsfbox{images/filter-expand.eps}
 \vspace{-6pt}
-\caption{Expanding a linear node to have I/O rates $(e', o', u')$.  }
+\caption{Expanding a linear node to rates $(e', o', u')$.  }
 \label{fig:expanding-a-matrix}
 \vspace{-12pt}
 \end{figure}
@@ -78,7 +78,7 @@ $u'$-element row vector:
     \mt{shift}(r,c)[i,j] = \left\{
       \begin{array}{l}
 	A[i-r,j-c] \\
-	~~~~~~\mt{if}~ i-r \in [0,e-1] \wedge j-c \in [0, u-1] \\
+	~~~\mt{if}~ i-r \in [0,e-1] \wedge j-c \in [0, u-1] \\
 	~ 0 \mt{~otherwise}
       \end{array}
       \right.
