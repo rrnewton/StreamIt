@@ -1,10 +1,8 @@
 /*
  * fmref.c: C reference implementation of FM Radio
  * David Maze <dmaze@cag.lcs.mit.edu>
- * $Id: fmref.c,v 1.8 2002-07-29 14:05:48 aalamb Exp $
+ * $Id: fmref.c,v 1.9 2002-07-30 02:20:09 aalamb Exp $
  */
-
-#define raw
 
 #ifdef raw
 #include <raw.h>
@@ -23,7 +21,7 @@
 #define BANDWIDTH 10000
 #define DECIMATION 4
 /* Must be at least NUM_TAPS+1: */
-#define IN_BUFFER_LEN 128
+#define IN_BUFFER_LEN 10000
 
 void begin(void);
 
@@ -73,21 +71,16 @@ static int numiters = -1;
 #ifndef raw
 int main(int argc, char **argv)
 {
-  int option;
-
-  while ((option = getopt(argc, argv, "i:")) != -1)
-  {
-    switch(option)
-    {
-    case 'i':
-      numiters = atoi(optarg);
-    }
+  int i;
+  for (i=0; i<1000; i++) {
+    begin();
   }
-
-  begin();
+  
   return 0;
 }
 #endif
+
+
 
 void begin(void)
 {
@@ -95,6 +88,9 @@ void begin(void)
   FloatBuffer fb1, fb2, fb3, fb4;
   LPFData lpf_data;
   EqualizerData eq_data;
+
+  // set up number of iterations
+  numiters = 10000;
 
   fb1.rpos = fb1.rlen = 0;
   fb2.rpos = fb2.rlen = 0;
@@ -129,7 +125,7 @@ void begin(void)
     run_lpf(&fb1, &fb2, &lpf_data);
     run_demod(&fb2, &fb3);
     run_equalizer(&fb3, &fb4, &eq_data);
-    write_floats(&fb4);
+    //write_floats(&fb4);
   }
 }
 
