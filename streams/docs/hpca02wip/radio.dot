@@ -1,7 +1,0 @@
-digraph G {
-ReadFromAtoD -> RFtoIF;
-RFtoIF -> FFT;
-FFT -> CheckFreqHop;
-CheckFreqHop -> Equalizer;
-Equalizer -> Speaker;
-}

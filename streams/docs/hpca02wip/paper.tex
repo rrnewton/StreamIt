@@ -142,7 +142,7 @@ that are specified with successive calls to {\tt add} from within {\tt
 init}.
 
 \begin{figure}
-\psfig{figure=radio.ps,height=1.4in}
+\psfig{figure=radio.eps,height=1.4in}
 \vspace{-6pt}
 \caption{Block diagram of a software radio.
 \protect\label{fig:radiodiagram}}
@@ -177,7 +177,7 @@ public class Equalizer extends Pipeline {
         int bottom = 2500;
         int top = 5000;
         setSplitter(DUPLICATE());
-        for (int i=0; i<N; i++, bottom*=2, top*=2) {
+        for (int i=0; i<BANDS; i++, bottom*=2, top*=2) {
           add(new BandPassFilter(bottom, top));
         }
         setJoiner(ROUND_ROBIN());
