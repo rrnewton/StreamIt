@@ -95,9 +95,28 @@ throughput of each of its stages.  This is in contrast to scientific
 programs, which often contain a number of stages which process a given
 data set; the running time is the {\it sum} of the running times of
 the phases, such that a high-performance, parallel phase can partially
-compensate for an inefficient phase.  However, in a stream program,
-the most burdened node is the bottleneck for the entire computation,
-and the other nodes sit idle while the low-throughput node is working.
+compensate for an inefficient phase.  This can be posed in
+mathematical terms by appealing to Amdahl's Law, which expresses the
+maximum speedup that can be achieved on $N$ processors when there are
+$S_1 \dots S_x$ units of sequential work and $P_1 \dots P_y$ units of
+parallel work:
+\begin{align*}
+\mbox{\it Maximum speedup}(S, P, N) = \frac{\sum_{i=1}^x{S_i}+\sum_{i=1}^y{P_i}}{\sum_{i=1}^x{S_i}+\frac{\sum_{i=1}^y{P_i}}{N}}
+\end{align*}
+However, in a stream program, the measure of performance is throughput
+rather than running time.  Using $w_1 \dots w_m$ to denote the amount
+of work in each of the $m$ partitions of a program, and denoting the
+multiplicity of work segment $i$ in the steady-state schedule by
+$c_i$, we have that:
+\begin{align*}
+\mbox{\it Maximum speedup}(w, c) = \frac{\sum_{i=1}^m{c_i}}{MAX_i(c_i \cdot w_i)}
+\end{align*}
+That is, in a stream program, the most burdened node is the bottleneck
+for the entire computation, and the other nodes sit idle while the
+low-throughput node is working.  If we double the load the the
+heaviest node, then the performance will suffer by a factor of two.
+Thus, the partitioning phase is of particular value in a stream
+compiler due to the performance implications of load balancing.
 
 \subsection{Overview}
 
