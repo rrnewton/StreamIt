@@ -14,14 +14,16 @@ Compiler Flow
 
 Here's the general flow of the compiler as it stands now:
 
-1. The Kopi scanner/parser reads in a source file.
+1. The Kopi scanner/parser reads in a source file (see kjc/Main.java)
 
 2. The Kopi system type-checks the code and resolves object references
-   to point to actual objects instead of just symbolic names.
+   to point to actual objects instead of just symbolic names. (see
+   kjc/Main.java)
 
 3. We translate the Kopi IR into a StreamIt high ir (SIR) consisting
    of a stream graph of filters, pipelines, splitjoins, and
-   feedbackloops.  The class that does this translation is kjc/Kopi2SIR.
+   feedbackloops.  The class that does this translation is
+   kjc/Kopi2SIR; the toplevel streamit stuff is in kjc/StreaMITMain.
 
 4. We have some passes that operate on the sir code, such as:
 
