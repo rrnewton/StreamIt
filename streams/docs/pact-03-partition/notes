@@ -168,4 +168,46 @@ endfor
 A[child1][child2][n] = min;
 return min
 
+1/19/03
+-------
+
+directions from Andrew:
+
+  First of all, in the actual implementation, a "Linear Node" is
+  called a LinearFilterRepresentation.
+
+  Second of all, all of these files are in kopi/kjc/sir/linear
+
+  After you run the LinearAnalyzer (see Flattener), you get a mapping from 
+  SIRStream's to LinearFilterRepresentation.
+
+  To get the cost of that LinearFilterRepresentation, you run its
+  getCost() method, which returns a LinearCost object, which simply
+  contains the number of adds and the number of multiplies that are
+  necessary to directly implement the vector-matrix multiplication.
+
+changes I'd like to make to CVS:
+--------------------------------
+
+- remove streams/scheduler directory (empty)
+- remove streams/library/java/streamit/scheduler directory (empty)
+- remove streams/misc/java directory (empty)
+- remove streams/router directory (gleb has his own copy)
+- remove streams/click directory (gleb has his own copy)
+- make streams/compiler/3rdparty directory to hold compiler/{gnu, java_cup, JFlex, lpsolve}
+- move streams/compiler/kopi/3rdparty/cplex into compiler/3rdparty
+  - adjust classpath to use cplex.jar in case we ever have to
+- remove streams/compiler/frontend, as I don't think it's being used
+- remove streams/compiler/kopi, retaining start-cplex-server under streams/compiler
+- there are some OLD example programs in streams/library.  Move these into
+  apps/tests if they compile or apps/old/orig otherwise
+
+- update the README and README.source in the streams directory
+
+- for someone else to do:
+-  add a README or some documentation to streams/misc/c/ regarding file2raw.cpp
+   (does this just translate a binary, e.g. compiled with gcc, to run on raw?
+   what do you need to do before and after for it to run on raw?)
+
+
 
