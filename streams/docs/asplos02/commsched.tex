@@ -70,7 +70,7 @@ allows this relaxation.  Instead the simulator operates on the
 granularity of a data item.  Modeling the path each data item follows.
 
 We simulate the graph for both an initialization schedule and a steady
-state schedule, both are described in section ??.  A push model
+state schedule, both are described in Section \ref{sec:phases}.  A push model
 schedule is used for both phases.  We define a push model schedule as
 a schedule that advances computation on the furthest downstream node
 in the stream graph at each step.  The push model schedule allows the
@@ -82,7 +82,7 @@ item as it is produced (modulo the latency of routing).
 
 To assure deadlock free execution of Joiner nodes, we must allow the
 Joiner nodes to receive data in the firing order of its upstream
-Filters (figure ??). So, the Joiner must buffer data until it can fire
+Filters. So, the Joiner must buffer data until it can fire
 in the order specified by its incoming weights.  First, remember that
 we collapse all neighboring Joiners into a single Joiner node.
 We create an internal buffer for each

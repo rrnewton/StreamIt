@@ -27,6 +27,11 @@ Polymorphic Computing Architecture (PCA) \cite{pca}
 \item A 64-element FFT filter implemented as a pipeline of a bit reversal 
 filter followed by multiple-stage butterfly filters.
 
+\item A Cyclic Redundancy Check (CRC) Encoder/Decoder, which is an error detection system utilizing a predefined 32 bit generator polynomial.  It can detect errors in bit strings of up to 64KB in size with 99.99999997% accuracy.
+
+\item Matrix Multiplication 
+
+\item A MP3
 
 %\item A performance test from the SpectrumWare system that
 %implements an Orthogonal Frequency Division Multiplexor (OFDM)
@@ -53,27 +58,31 @@ of \\ code
 \begin{tabular}{c} Throughput \\
 cycles / output 
 \end{tabular} &    
-FLOPS & 
+MFLOPS & 
 \begin{tabular}{c} 
 \# of \\ filters
 \end{tabular} &    
 \begin{tabular}{c} Throughput \\
 cycles / output 
 \end{tabular}  &
-FLOPS  
+MFLOPS
 \\
 \hline \hline
-PCA Demo &  & - & 3.4 & N/A\\
+BeamFormer & 596 & 15 &  & 525 & & 16 & 2300\\
 \hline
-FM Radio & 5.8 & 4.9 & 9.9 & N/A\\
+FM Radio & 511 & 14 & 4466 & 141.5 & 14 & 1742 & 363.5\\
 \hline
-perftest4 & 330 & - & 330 & N/A\\
+FFT & 174 & 31 & 156 & 35.75 & 15 & 3601 & 4.25\\
 \hline
-GSM Decoder & 4.88 & - & N/A & .47\\
+GSM Decoder & 1925 & 14 & 17067 & N/A & 16 & 1656 & N/A\\
 \hline
+CRC & 336 & 47 & 2847 & N/A & 5 & 1909 & N/A\\
+\hline
+%%Matrix & \\
+%%\hline
 \end{tabular}
 \vspace{-6pt}
-\caption{\protect\small Performance Results (in $\mu$sec/output)}
+\caption{\protect\small Performance Results}
 \label{tab:performance}
 \vspace{-21pt}
 \end{center}
