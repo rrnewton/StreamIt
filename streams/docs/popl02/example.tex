@@ -35,21 +35,64 @@ float->float filter FIR (init N, int LENGTH) {
 
 Figure \ref{fig:fir} is a fairly typical sample of Filter code. Calling a work function, such as ``doFIR(i)'' enqueues that execution for an init phase, while calling a work function following the token exec, such as ``exec doFIR(N)'', enqueues that execution for a steady-state phase. Another important peice of information is ``push 1 pop 1 peek K'' specifies that U(out,steady-state,p)=1, O(in,steady-state,p)=1, E(in,steady-state,p)=K$_p$, where in, out, and K$_p$ are the input channel, output channel, and K's value during phase p, respectively. Let us, for the sake of this example, say N=2. The final result is that U and O always equal 1 but E takes on the following values:
 \begin{align}
-E(in,init,0)&=0\nonumber\\
-E(in,init,1)&=1\nonumber\\
-E(in,steady,0)&=2\nonumber
+\mt{E}(in,init,0)&=1\nonumber\\
+\mt{E}(in,init,1)&=1\nonumber\\
+\mt{E}(in,steady,0)&=2\nonumber
 \end{align}
 
-To make a decent example lets consider the graph of 2 FIR Filters (denoted by fir0 and fir1) connected in series with fir0 first. From now on let c denote the channel between them. Further, both their weights=[1,2] and the first FIR is connected to a filter that only produces 1's. Let us consider all the equations in figures \ref{fig:pcptosare2} and \ref{fig:pcptosare3} in turn.
+To make a simple example lets consider the graph of a FIR Filter (denoted fir) connected to the output of a filter that produces [1,2] each iteration\footnote{Another way of saying that it pushes 1 then 2 out of its output.}. From now on let us denote the channel between them as in and the output channel of fir as c. Further, let fir's weights=[1,2]. Let us consider all the equations in figures \ref{fig:pcptosare2} and \ref{fig:pcptosare3} in turn.
 \begin{itemize}
 \item Equation \ref{i2ibuf} does not contribute, since A(c)=0.
 \item Equation \ref{iwrite2ibuf}:
 \begin{align}
-IBUF_c(0)&=IWRITE_{c,0}(0)\nonumber\\
-IBUF_c(1)&=IWRITE_{c,1}(0)\nonumber
+\mt{IBUF}_c(0)&=\mt{IWRITE}_{c,0}(0)\label{ex0}\\
+\mt{IBUF}_c(1)&=\mt{IWRITE}_{c,1}(0)\nonumber
 \end{align}
 \item Equation \ref{iread2iwrite}:
 \begin{align}
-IWRITE_{c,0}=W(fir0,)[IREAD_{c,0}]
+\mt{IWRITE}_{c,0}(0)&=(\mt{W}(fir,init,0)([\mt{IREAD}_{in,0}(*)]))[0][0]\nonumber\\
+&=(\mt{W}(fir,init,0)([1]))[0][0]\nonumber\\
+&=([[1]])[0][0]=1\label{ex1}\\
+\mt{IWRITE}_{c,1}(0)&=(\mt{W}(fir,init,1)([\mt{IREAD}_{in,1}](*)))[0][0]\nonumber\\
+&=(\mt{W}(fir,init,1)([2]))[0][0]\nonumber\\
+&=([[2*1]])[0][0]=2\nonumber
+\end{align}
+Therefore, by equations \ref{ex0}
+\begin{align}
+\mt{IBUF}_c(0)&=1\label{ex2}\\
+\mt{IBUF}_c(1)&=2\nonumber
+\end{align}
+\item Equation \ref{sread2swrite}:
+\begin{align}
+SWRITE_{c,0}(i,j,0)&=(\mt{W}(fir,steady,0)([\mt{SREAD}_{in,0}(i,j,\*)]))[0][0]\nonumber\\
+&=(\mt{W}(fir,steady,0)([[1,2]]))[0][0]\label{ex3}\\
+&=([1*1+2*2]))[0][0]=5\nonumber
+\end{align}
+\item Equation \ref{swrite2sbuf}:
+\begin{align}
+\mt{SBUF}_c(i,0)=SWRITE_{c,0}(i,0,0)\label{ex4}
+\end{align}
+Therefore, by equation \ref{ex3}
+\begin{align}
+\mt{SBUF}_c(i,0)=5\label{ex5}
+\end{align}
+\item Equation \ref{ibuf2iread}:
+\begin{align}
+IREAD_{c,0}(0)&=\mt{IBUF}_c(\mt{PartialRead}(c,init,0)+0)\nonumber\\
+&=\mt{IBUF}_c(0)\label{ex6}\\
+IREAD_{c,1}(0)&=\mt{IBUF}_c(\mt{PartialRead}(c,init,1)+0)\nonumber\\
+&=\mt{IBUF}_c(1)\nonumber
+\end{align}
+Therefore, by equations \ref{ex2}
+\begin{align}
+\mt{IREAD}_c(0)&=1\label{ex7}\\
+\mt{IREAD}_c(1)&=2\nonumber
+\end{align}
+\item Equation \ref{sbuf2iread}: Impossible since it would have to be the case that $i\in D_{IREAD_{c,p}}$, which implies $i<2$, and $i>|D_{IBUF_c}|=2$.
+\item Equation \ref{ibuf2sread}: Impossible since the lowest value ReadIndex can take on is TotalRead(n,c,init)=2, so it can never be the case that ReadIndex(n,c,p,i,j,k)$\in D_{IBUF_c}$
+\item Equation \ref{sbuf2sread0} and \ref{sbuf2sread1}: Period(c)=1\\
+Therefore, by equation \ref{ex5}
+\begin{align}
+SREAD_{c,0}(i,j,k)=\mt{SBUF}_c(i,0)=5
 \end{align}
 \end{itemize}
