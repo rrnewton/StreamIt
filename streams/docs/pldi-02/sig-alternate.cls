@@ -282,10 +282,11 @@
 % Gerry Murray 11/11/1999
 % *** THIS BLOCK FOR THOSE USING METAFONT *****
 % *********************************************
-\newfont{\secfnt}{ptmb at 12pt}
-\newfont{\secit}{ptmbi at 12pt}    %13 Jan 00 gkmt
-\newfont{\subsecfnt}{ptmri at 11pt}
-\newfont{\subsecit}{ptmbi at 11pt}  % 13 Jan 00 gkmt -- was ptmr changed to ptmbi gm 2/4/2000
+% HACKED BY BILL -- USED TO BE 12 12 11 11
+\newfont{\secfnt}{ptmb at 11pt}
+\newfont{\secit}{ptmbi at 11pt}    %13 Jan 00 gkmt
+\newfont{\subsecfnt}{ptmri at 10pt}
+\newfont{\subsecit}{ptmbi at 10pt}  % 13 Jan 00 gkmt -- was ptmr changed to ptmbi gm 2/4/2000
                          % because "normal" is italic, "italic" is Roman
 \newfont{\ttlfnt}{phvb at 18pt}
 \newfont{\ttlit}{phvbo at 18pt}    % GM 2/4/2000
