@@ -1,3 +1,5 @@
+\subsection{Latency Constrained Scheduler}
+
 \begin{figure}[t]
 \begin{center}
 \psfig{figure=constrained-example.eps,height=1.5in}
@@ -24,13 +26,31 @@ $9n+9$ & $8n+8$ \\ \hline
 \label{tab:sdepconst}
 \end{table*}
 
+The example  in Figure~\ref{fig:sdepconst} illustrates  the scheduling
+of a single constraint: a  message sent upstream with latency $[1,2]$.
+The resulting schedule consists  of two parts, an {\it initialization}
+schedule and a  {\it steady state} schedule.  The  former is necessary
+to ensure that during the actor's steady state execution, it may check
+for messages  at proper boundaries.  For  the sake of  clarify, we use
+$lastReceived$  to represent  the firing  of  $S$ that  sent the  last
+message to be  received by $R$; $n_S$ and  $n_R$ respectively indicate
+the number of firings of $S$ and $R$.
 
-Explanation of working of the example:
+In order  to compute  the initialization schedule,  $R$ is  allowed to
+fire  $SDEP(minLatency)-1$ times,  while $S$  fires as  many  times as
+possible.   This assures  that when  the steady  schedule  begins, all
+firings  of  filters  will  contribute  to  new  message  sending  and
+receiving,   thus  allowing   the  steady   state  schedule   to  fire
+perpetually. In our example, the initialization schedule does not send
+or receive any messages.
 
-The example in Figure \ref{fig:sdepconst} illustrates scheduling of a single constraint. The constraint is a message sent upstream with latency $[1,2]$. The resulting schedule consists of two parts, an initialization schedule and a steady state schedule. The initialization schedule is necessary to initialize the constraint, to ensure that the steady schedule can be executed repeatedly forever. Notation used here is: $lastReceived$ denotes the execution of S which sent the last message to be received by R; $n_S$ indicates number of executions of $S$ and $n_R$ indicates number of executions of $R$.
+Once the  initialize schedule is  known, the steady state  schedule is
+computed by  allowing the receiver $R$ to  fire continuously, provided
+it  does not violate  the constraint  that a  message sent  during the
+$lastReceived+1$ firing $S$ must  reach $R$ according to the specified
+latency;  this  is indicated  by  {\it  "Oldest  msg to  receive"}  in
+Figure~\ref{fig:sdepcons}.  Now the  sender  $S$ is  executed as  many
+times as possible, given the data provided via $R$. At this point, $R$
+can receive the messages sent  by $S$ in  its executions
+$[lastReceived+1  ... \min(n_S,$"{\it Newest msg to receive}"$)]$.
 
-Initialization schedule is computed by executing R $SDEP(minLatency)-1$ number of times, and executing S as many times as possible, given data provided by R. This assures that when the steady schedule starts, all executions of filters will contribute to new message sending and receiving, thus allowing the steady state schedule to execute forever. The initialization schedule does not need to send or receive messages here.
-
-The steady state schedule is computed by executing the receiver R as far as possible without going beyond the boundary of being able to receive message sent by S on execution $lastReceived+1$ (indicated by "Oldest msg to receive" in the figure). Now the sender S is executed as many times as possible, given data provided by R. Now S can receive messages sent by S in its executions $[lastReceived+1 ... \min(n_S, $"Newest msg to receive"$)]$.
-
-"Oldest msg to receive" is equal to $iSDEP(n_R)-maxLatency$. "Newest msg to receive" is equal to $m-minLatency$ with $m$ being the greatest integer such that $SDEP(m) \le n_R$.
