@@ -47,6 +47,12 @@
       <br><br><br>
       <p align="justify">
 
+	  The   StreamIt    makefile   infrastructure   uses    the   <a
+	  href="http://www.gnu.org">GNU  tools</a>.  In  particular, GNU
+	  Make is  required to build; this is  the default <tt>make<\tt>
+	  on Linux  machines, and may be available  as <tt>gmake</tt> on
+	  other Unix-like machines.
+
 	  The    source    release    only    builds   with    the    <a
 	  href="http://www-124.ibm.com/developerworks/oss/jikes">IBM
 	  Jikes       Java      Compiler</a>.      Also,       a      <a
@@ -54,15 +60,15 @@
 	  required to run the compiler.<br>
 	  <br>
 
-	  The    StreamIt   frontend    depends    on   the    <a
-	  href="http://www.antlr.org">ANTLR LL(k)</a> parser generator.
+	  The     StreamIt     frontend     depends    on     the     <a
+	  href="http://www.antlr.org">ANTLR  LL(k)</a> parser generator.
 	  If you are using the source release, the ANTLR classes must be
-	  in your Java CLASSPATH when compiling and running the
-	  StreamIt compiler. If you are using the binary release,
-	  the  required  ANTLR  classes  are  already  included  in  the
-	  StreamIt  jar file.<br>
-	  <br>
+	  in your Java CLASSPATH when compiling and running the StreamIt
+	  compiler. If  you are using  the binary release,  the required
+	  ANTLR  classes  are  already  included  in  the  StreamIt  jar
+	  file.<br>
 
+	  <br>
 	  The C library depends on the <a href="http://www.fftw.org">FFTW library</a>. The
 	  StreamIt runtime system currently only supports <i>fftw-2.1.x</i>, not the newer
 	  <i>fftw-3.0</i> branch. FFTW  should be installed somewhere in
