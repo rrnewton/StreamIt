@@ -15,8 +15,8 @@ do not yet deal with {\tt feedbackloop}s as they require the notion of
 
 \subsection{Linear Expansion}
 
-In StreamIt, the input and output rates of each {\tt filter} in the
-stream graph are known at compile time.  The StreamIt compiler
+In StreamIt, the input and output rate of each {\tt filter} in the
+stream graph is known at compile time.  The StreamIt compiler
 leverages this information to compute a static schedule--that is, an
 ordering of the node executions such that each filter will have enough
 data available to atomically execute its {\tt work} function, and no
@@ -27,9 +27,9 @@ Karczmarek~\cite{karczma-thesis}.
 A fundamental aspect of the steady-state schedule is that neighboring
 nodes might need to be fired at different frequencies.  For example,
 if there are two {\tt filters} $F_1$ and $F_2$ in a {\tt pipeline} and
-$F_1$ produces $2$ elements during its {\tt work} function
-($u_{F_1}=2$) but $F_2$ consumes $4$ elements ($e_{F_2}=4$), then it
-is necessary to execute $F_1$ twice for every execution of $F_2$.
+$F_1$ produces $2$ elements during its {\tt work} function but $F_2$
+consumes $4$ elements, then it is necessary to execute $F_1$ twice for
+every execution of $F_2$.
 
 %% \begin{figure}
 %% \center
@@ -42,38 +42,82 @@ is necessary to execute $F_1$ twice for every execution of $F_2$.
 
 Consequently, when we combine hierarchical structures into a linear
 node, we often need to {\it expand} a matrix representation to
-represent multiple executions of the corresponding stream.  If we
-expand a linear node by a factor of $k$, then one execution of the new
-node will be exactly equivalent to $k$ executions of the original.
+represent multiple executions of the corresponding stream.  This
+expansion can be done as follows.
+
+% NOT TRUE ANYMORE
+%% If we expand a linear node by a factor of $k$, then one execution of
+%% the new node will be exactly equivalent to $k$ executions of the
+%% original.
 
 \begin{definition} (Linear expansion)
+% DOUBLE-CHECK whether we're assuming 0-indexed or 1-indexed matrices
 Given a linear node $\lambda = \{A, b, e, o, u\}$, the expansion of
-$\lambda$ by a factor of $k$ is given by $\mbox{\bf expand}(\lambda, k) =
-\{A', b', e', o', u'\}$, where: \\ ~ \vspace{-6pt} \\
-\begin{tabular}{rl}
-$e'$ & $= e + (k-1) * o$ \\ ~ \vspace{-10pt} \\
-$o'$ & $= k * o$ \\ ~ \vspace{-10pt} \\
-$u'$ & $= k * u$ \\ ~ \vspace{-10pt} \\
-$A'$ & \raisebox{-14pt}{\parbox{3in}{is created by starting with a zero
-matrix with $e'$ rows and $u'$ columns.  $A$ is then copied $k$ times
-along the diagonal. Starting at the top left, each copy of $A$ is
-offset from the previous copy by $u$ columns and $o$ rows.}} \\ ~ \vspace{-8pt} \\
-$b'$ & is a row vector containing $k$ adjacent copies of $b$.
-\end{tabular}
-
+$\lambda$ to a rate of $(e', o', u')$ is given by $\mbox{\bf
+expand}(\lambda, e', o', u') = \{A', b', e', o', u'\}$, where
+$\mathbf{A'}$ is a $u' \times e'$ matrix and $\mathbf{b'}$ is a
+$u'$-element row vector:
+\vspace{-6pt} \\
+\begin{equation} \nonumber
+\begin{array}{rcl}
+\mathbf{A'}[i,j] & = & \mt{even}(i,j) ~\mt{if}~ (j \ge u'~\mt{mod}~u) \\
+~ & = & \mt{even}(i+o, j+u'~\mt{mod}~u) ~\mt{otherwise} \\ ~ \vspace{-4pt} \\
+%
+\mt{even}(k)& = & \sum_{m=0}^{\lfloor u' / u \rfloor}
+\mt{shift}(u'- u -m*u, \\
+~ & ~ & ~ \hspace{0.68in}~ e'-e-m*o) \\ ~ \vspace{-4pt} \\
+%
+\multicolumn{3}{l}{\mt{shift}(r,c) ~\mt{is a}~ u' \times e' ~\mt{matrix}:} \\ ~ \vspace{-8pt} \\
+\mt{shift}(r,c)[i,j] & = & A[i-r,j-c] \\
+~ & ~ & ~~~~~\mt{if}~ i-r \in [0,e] \wedge j-c \in [0, u] \\
+~ & = & 0 \mt{~otherwise} \\ \vspace{-4pt} \\
+%
+\mathbf{b'}[j] & = & b[u-1-(u'-j-1)~\mt{mod}~u]
+%%
+%% \raisebox{-14pt}{\parbox{3in}{is created by starting with a zero
+%% matrix with $e'$ rows and $u'$ columns.  $A$ is then copied $k$ times
+%% along the diagonal. Starting at the top left, each copy of $A$ is
+%% offset from the previous copy by $u$ columns and $o$ rows.}} \\ ~ \vspace{-8pt} \\
+%% $b'$ & is an row vector containing $k$ adjacent copies of $b$.
+\end{array}
+\end{equation}
 \end{definition}
-Figure~\ref{fig:expanding-a-matrix} illustrates linear expansion.
+
+Despite the bulky notation above, the intuition behind linear
+expansion is straightforward (see
+Figure~\ref{fig:expanding-a-matrix}.)  Linear expansion aims to scale
+the push, pop, and peek rates of a linear node while preserving the
+functional relationship between the values pushed and the values
+peeked on a given execution.  To do this, we construct a new matrix
+$A'$ that contains copies of $A$ along the diagonal.  To account for
+items that are popped between invocations, each copy of $A$ is offset
+by $o$ from the previous copy.  The complexity of the definition is
+due to the end cases.  If the new push rate $u'$ is not a multiple of
+the old push rate $u$, then the last copy of $A$ includes only some of
+its columns.  Similarly, if the new peek rate $e'$ exceeds that which
+is needed by the diagonal of $A$s, then $A'$ needs to be padded with
+zero's at the top (since it peeks at some values without using them in
+the computation.)
+
+Note that a sequence of executions of an expanded node $\lambda'$
+might not be equivalent to any sequence of executions of the original
+node $\lambda$, because expansion resets the push and pop rates and
+can thereby modify the ratio between them.  However, if $u' = k * u$
+and $o' = k * o$ for some integer $k$, then $\lambda'$ is completely
+interchangebale with $\lambda$.  In the combination rules that follow,
+we utilize linear expansion both in contexts that do and do not
+satisfy this condition.
 
 \begin{figure}
 \center
 \epsfxsize=3.0in
 \epsfbox{images/expanding-a-matrix.eps}
-\caption{Expanding a linear node by factor $k$.}
+\caption{Expanding a linear node to have I/O rates $(e', o', u')$.  }
 \label{fig:expanding-a-matrix}
 \vspace{-12pt}
 \end{figure}
 
-\subsection{Pipelines}
+\subsection{Collapsing Linear Pipelines}
 
 \begin{figure}
 \center
@@ -84,69 +128,100 @@ Figure~\ref{fig:expanding-a-matrix} illustrates linear expansion.
 \vspace{-12pt}
 \end{figure}
 
-Serial combinations of {\tt streams} are formed with {\tt pipelines}.
-Combining a {\tt pipeline} with an arbitrary number of linear forms
-can be accomplished by continually combining adjacent pairs until a
-single linear form remains.  The method for combining a single pair of
-linear forms, $l_1=(A_1,b_1)$ and $l_2=(A_2,b_2)$ follows directly
-from the equations relating the inputs and the outputs of the two
-linear forms. Defining our notation: $l_1$ takes $x$ as input and
-produces $y_1[n]$ as output. $l_2$ inputs $y_1$ and produces $y_2$ as
-output.  Using our linear input to output equations from above, $y_1 =
-xA_1 + b_1$ and $y_2 = y_1A_2 + b_2$. Combining the two previous
-equations, $y_2 = xA_1A_2 + (b_1A_2 + b_2)$ which corresponds to a new
-linear form $l'=(A_1A_2, b_1A_2+b_2)$ which computes $y_2$ directly
-from $x$.
+The {\tt pipeline} construct is used to compose streams in sequence,
+with the output of stream $i$ connected to the input of stream $i+1$.
+The following transformation describes how to collapse two linear
+nodes in a {\tt pipeline}; it can be applied repeatedly to collapse
+any number of neighboring linear nodes.
 
-Because the expressions for $l'$ are matrix equations, the dimensions
-of $A_1$ and $A_2$ might not be compatible for general programs.  The
-problem of incompatible matrix sizes is the same problem of scheduling
-execution such that the first {\tt stream} produces enough data for
-the second {\tt stream} to read. To make the dimensions match up, we
-use the $expand$ operation. We choose expansion factors $f_1$ and
-$f_2$ such that $l_1' = expand(l_1,f_1) = (A_1',b_1')$ and $l_2' =
-expand(l_2,f_2) = (A_2',b_2')$.  The equation $f_1u_{l_1}$ = $e_{l_2}
-+ (f_2-1)o_{l_2}$ must hold, where $u_{lf_1}$, $e_{lf_2}$, and
-$o_{lf_2}$ are program defined integers. Rewriting, we obtain
-$(u_{l_1})f_1 + (-o_{l_2})f_2 = (e_{l_2}-o_{l_2})$ which is in the
-form of the Diophantine equation $ax+by=c$ with $f_1=x$ and $f_2=y$. A
-solution can be found using the Euclidean algorithm if
-$gcd(u_{l_1},-o_{l_2})$ divides
-$e_{l_2}-o_{l_2}$\cite{theory-of-numbers}. Once we have determined
-$f_1$ and $f_2$ such that we can multiply $A_1'A_2'$, we are
-guaranteed the be able to multiply $b_1'A_1'$.
-Figure~\ref{fig:combining-pipeline} shows graphically the process of
-expanding two linear forms in a {\tt pipeline} so that they can be
-combined into a single linear filter.
+\begin{combination} (Linear pipeline)
+Given two linear nodes $\lambda_1$ and $\lambda_2$ where the output of
+$\lambda_1$ is connected to the input of $\lambda_2$ in a pipeline
+construct, the combination $\mbox{\bf pipe}(\lambda_1, \lambda_2)$ $=$
+$\mathbf{ \{A', b', e', o', u'\}}$ represents an equivalent node that
+can replace the original two.  Its components are as follows: \\
+\begin{equation} \nonumber
+\begin{array}{rcl}
+L & = & \mt{lcm}(u_1, o_2) \\
+\lambda_1^e & = & \mt{expand}(\lambda_1, \frac{o_1 * L}{u_1} + e_1 - o_1, 
+\frac{o_1 * L}{u_1}, L+e_2-o_2) \\
+\lambda_2^e & = & \mt{expand}(\lambda_2, L+e_2-o_2, L, \frac{u_2 * L}{o_2}) \\
+\mathbf{A'} & = & A_1^e A_2^e \\
+\mathbf{b'} & = & b_1^e A_2^e + b_2^e \\
+\mathbf{e'} & = & e_1^e \\
+\mathbf{o'} & = & o_1^e \\
+\mathbf{u'} & = & u_2^e
+\end{array}
+\end{equation}
+\end{combination}
 
-% not clear if this is still important
+It is straightforward to derive the equations above.  Let $x_i$ and
+$y_i$ be the input and output channels, respectively, for $\lambda_i$.
+Then we have by definition that $y_1 = x_1 A_1 + b_1$ and $y_2 = x_2
+A_2 + b_2$.  But since $\lambda_1$ is connected to $\lambda_2$, we
+have that $x_2 = y_1$ and thus $y_2 = y_1 * A_2 + b_2$.  Substituting
+the value of $y_1$ from our first equation gives $y_2 = x_1 A_1 * A_2
++ b_1 A_2 + b_2$.  Thus, the intuition is that the two-filter sequence
+can be represented by matrices $A' = A_1 * A_2$ and $b' = b_1 A_2 +
+b_2$, with peek and pop rates borrowed from $\lambda_1$ and the push
+rate borrowed from $\lambda_2$.
 
-However, in general problems, this constraint is not always satisfiable. For instance if
-$u_{l_1}=2$, $e_{l_2}=3$ and $o_{l_2}=2$, there are pair of integers $f_1$ and $f_2$ to 
-satisfy the above equation. Due to the buffering between the filters, we can not generate an 
-overall linear form that represents the pair's computation except by introducing redundant
-computation. However, by recognizing that the output from the first execution of the structure
-can be written as a linear form $l'_i$, and that the output from each subsequent execution
-of the structure can be written as a linear form $l'_j$ we can store the two linear forms $l'_i$ and
-$l'_j$ which represent the initial execution and each subsequent execution respectively.
+However, there are two implicit assumptions in the above analysis
+which complicate the equations for the general case.  First, the
+dimensions of $A_1$ and $A_2$ must match for the matrix multiplication
+to be well-defined.  If $u_1 \ne e_2$, this will require constructing
+expanded nodes $\lambda_1^e$ and $\lambda_2^e$ in which the push and
+peek rates match (and thus $A_1^e$ and $A_2^e$ can be multiplied.)
 
-In some cases the combined linear form
-actually represents a less efficient way of computing the results of the
-filters. Specifically, when the number of non zero entries of $A_1'A_2'$ is greater
-than the number of non zero entries $A_1'$ plus the non zero entries of $A_2'$, the overall
-representation requires more computation.
+The second complication is with regards to peeking.  If the downstream
+node $\lambda_2$ peeks at items which it does not consume ({\it i.e.},
+if $e_2 > o_2$), then there needs to be a buffer to hold items that
+are read during multiple invocations of $\lambda_2$.  However, in our
+current formulation, a linear node has no concept of internal state,
+such that this buffer cannot be incorporated into the collapsed
+representation.  To deal with this issue, we adjust the expanded form
+of $\lambda_1$ to recalculate items that $\lambda_2$ uses more than
+once, thereby trading computation for storage space.  This adjustment
+is evident in the push and pop rates chosen for $\lambda_1^e$: though
+$\lambda_1$ pushes $\frac{u_1}{o_1}$ for every item that it pops, for
+$\lambda_1^e$ this ratio is $\frac{u_1^e}{o_1^e}$ $=$
+$\frac{L+e_2-o_2}{o_1 * L / u_1}$ $=$
+$(\frac{u_1}{o_1})(\frac{L+e_2-o_2}{L})$, which is larger due to the
+$e_2-o_2$ items that are regenerated for consumption by $\lambda_2$.
 
+Note that although $\lambda_1^e$ performs duplicate computations in
+the case where $\lambda_2$ is peeking, this redundancy disappears in
+the collapsed node $\mt{pipe}(\lambda_1, \lambda_2)$ because
+overlapping operations are combined in the matrix multiplication.  One
+way to see this is that the dimensions of the matrix $A'$ are
+independent of $e_2$, the peek rate of $\lambda_2$.  That is, $A'$ has
+$e'$ $=$ $e_1^e$ $=$ $\frac{o_1*\mt{lcm}(u_1, o_2)}{u_1}+e_1-o_1$ rows
+and $u'$ $=$ $u_2^e$ $=$ $\frac{u_2 * \mt{lcm}(u_1, o_2)}{o_2}$
+columns; neither of these expressions depends on $e_2$.
 
-\subsection{SplitJoins}
-{\tt splitjoin}s allow a StreamIt programmer to express explicitly parallel computation. 
-Data elements that arrive at the {\tt splitjoin} are directed
-to the parallel sub {\tt streams} in one of two ways.
-The simpler of the two is to send copy of each data element to the each of the sub {\tt streams}. 
-The second of the two is specified by $N$ weights, $v_k$ for $k\in[0..N-1]$, 
-where $N$ is the number of sub {\tt streams} in the {\tt splitjoin}. The first $v_0$ data elements
-are sent to the leftmost {\tt Stream}. The next $v_1$ elements are sent 
-to the next {\tt stream} and so on. When all $\sum_{k=0}^{N-1} v_k$ elements
-have been seen, the splitter starts the same pattern over again.
+However, it is the case that a collapsed linear node can be less
+efficient than the original pipeline sequence.  The worst case is when
+$A_1^e$ is a column vector and $A_2^e$ is a row vector, which requires
+$O(n)$ operations originally but $O(n^2)$ operations if combined
+(assuming the vectors are of length $n$).  In general, the compiler
+can identify performance-degrading combinations when the number of
+non-zero elements in $A'$ exceeds the sum of non-zero elements in
+$A_1^e$ and $A_2^e$.
+% ARE WE SURE THAT LAST SENTENCE IS TRUE?  I think it's more complicated 
+% when the pop/peek rate is varied, etc.
+
+\subsection{Collapsing Linear SplitJoins}
+{\tt splitjoin}s allow a StreamIt programmer to express explicitly
+parallel computation.  Data elements that arrive at the {\tt
+splitjoin} are directed to the parallel sub {\tt streams} in one of
+two ways.  The simpler of the two is to send copy of each data element
+to the each of the sub {\tt streams}.  The second of the two is
+specified by $N$ weights, $v_k$ for $k\in[0..N-1]$, where $N$ is the
+number of sub {\tt streams} in the {\tt splitjoin}. The first $v_0$
+data elements are sent to the leftmost {\tt Stream}. The next $v_1$
+elements are sent to the next {\tt stream} and so on. When all
+$\sum_{k=0}^{N-1} v_k$ elements have been seen, the splitter starts
+the same pattern over again.
 
 The data from the parallel {\tt streams} are combined back into a single stream by means of
 a joiner specified by weights $w_k$ for $k\in[0..N-1]$. First, $w_0$ items from the output tape of the 
