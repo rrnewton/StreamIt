@@ -14,11 +14,11 @@ producer-consumer pairs.
 % - partitioning algorithm
 % - forward reference to results
 
-\subsection{Multipilicity Scaling}
+\subsection{Multiplicity Scaling}
 
 The goal of this optimization is to increase the execution frequency
 of the actors in a steady state schedule, such that the temporal
-locality in the memory hiearchy is improved. Our approach is to find a
+locality in the memory hierarchy is improved. Our approach is to find a
 single multiplicity factor \texttt{M} for scaling all actors, such that
 at least 90\% of the actors have a data workingset that fits in the cache.
 In other words, using our model, we calculate $M$ such that 
@@ -39,9 +39,9 @@ $\texttt{M}_\texttt{D} = 40$ for four filters \texttt{A}, \texttt{B},
 The algorithm then examines the
 distribution and selects the $\texttt{M}_i$
 for which 90\% of the actors satisfy our data workingset criterion.
-In the example, the 90-10 heurisitic
+In the example, the 90-10 heuristic
 selects $\texttt{M} = 10$; by contrast,
-a 75-25 heurisitc selects $\texttt{M} = 20$, where 75\% of the
+a 75-25 heuristic selects $\texttt{M} = 20$, where 75\% of the
 data workingsets are smaller than the cache, and the remaining 25\%
 overflowing the it.
 
