@@ -208,7 +208,12 @@ The translation will use the following helper functions:
 
 \item $\mt{TotalRead}(n,c,t) =  \sum_{r=0}^{\mt{num}(n, t)-1} O(c, t, r)$
 
-\item $If channel c = (n_a, n_b), then \mt{Period}(c) = \mt{LCM}(\mt{TotalWrite}(n_a, c, \mt{steady-state}), \mt{TotalRead}(n_b, c, \mt{steady-state}))$
+\item If channel $c = (n_a, n_b)$, then 
+\begin{align*}
+\mt{Period}(c) = S(n)_a * \mt{TotalWrite}(n_a, c, \mt{steady-state}) \\
+\equiv \\
+S(n)_b * \mt{TotalRead}(n_b, c, \mt{steady-state})
+\end{align*}
 
 \end{itemize}
 
@@ -220,10 +225,8 @@ For each channel $c = (n_a, n_b)$, do the following:
 {\cal D}_{\mt{IBUF}_c} = \{~i~|~0 \le i \le A(c) +
 \sum_{p=0}^{\mt{num}(n_a, \mt{initial})-1} U(c, \mt{initial}, p) - 1\} \\ ~ \\
 %
-{\cal D}_{\mt{SBUF}_c} = \{~(i,j)~|~0 \le i \le \frac{N *
-S(n_a)}{\mt{Period}(c)} * \sum_{p=0}^{\mt{num}(n_a,
-\mt{steady-state})-1} U(c, \mt{steady-state}, p) \\
-\wedge~0 \le j \le Period(c) \}
+{\cal D}_{\mt{SBUF}_c} = \{ ~(i,j)~|~0 \le i \le N \\
+~\wedge~ 0 \le j \le \mt{Period}(c) \}
 \end{align*}
 
 \item For each $p \in [0, num(n_a, \mt{initial})-1]$, introduce
@@ -247,7 +250,7 @@ variable $\mt{SWRITE}_{c, p}$ with this domain:
 \item For each $p \in [0, num(n_b, \mt{steady-state})-1]$, introduce
 variable $\mt{SREAD}_{c, p}$ with this domain:
 \begin{align*}
-{\cal D}_{\mt{SREAD}_{c, p}} = \{~(i,j,k)~|~0 \le i \le N ~\wedge~ 0 \le j \le S(n_b) - 1 ~\wedge~ 0 \le k \le E(c, \mt{steady-state}, p) - 1\} \\
+{\cal D}_{\mt{SREAD}_{c, p}} = \{~(i,j,k)~|~0 \le i \le N-1 ~\wedge~ 0 \le j \le S(n_b) - 1 ~\wedge~ 0 \le k \le E(c, \mt{steady-state}, p) - 1\} \\
 \end{align*}
 
 \item Introduce this equation (I to IBUF):
@@ -348,34 +351,69 @@ SREAD):
   \{ (i,j,k) | \mt{ReadIndex}(n,c,p,i,j,k) \in {\cal D}_{\mt{IBUF}_{c}} \}
 \end{align*}
 
+% here is the simple, base case of the SBUF -> SREAD function
+%\item For each $c \in \mt{chan-in}(n)$, and for each phase $p \in [0,
+%\mt{num}(n, \mt{steady-state})-1]$, introduce this equation (SBUF to
+%SREAD):
+%\begin{align*}
+%\forall (i,j,k) \in {\cal D}_{\mt{SREAD}_{c, p}},
+%\mt{SREAD}_{c, p}(i,j,k) = 
+%    \mt{SBUF}_{c}(i,
+%                  j*\mt{TotalRead}(n,c,\mt{steady-state}) + 
+%                    \mt{PartialRead}(c,\mt{steady-state},p) + k)
+%\end{align*}
+
 \item For each $c \in \mt{chan-in}(n)$, for each phase $p \in [0,
-\mt{num}(n, \mt{steady-state})-1]$, for each $q \in [0,
-\frac{\mt{Period}(c)}{\mt{TotalRead}(n,c,\mt{steady-state})}-1]$, and
-for each $r \in [0, S(n)-1]$, introduce this equation (SBUF to SREAD):
+\mt{num}(n, \mt{steady-state})-1]$, and for each $q \in [0, \lfloor
+\frac{E(c, \mt{steady-state}, p)}{\mt{Period}(c)} \rfloor]$, introduce
+these equations (SBUF to SREAD):
+% two possible problems: sread has already been written to, or sbuf has already been read from
 \begin{align*}
-\forall (i,j,k) \in {\cal D}_{SB \rightarrow SR}(n,c,p,q,r),
+\forall (i,j,k) \in {\cal D}_{SB \rightarrow SR}(c,p,q), \\
 \mt{SREAD}_{c, p}(i,j,k) = 
-    \mt{SBUF}_{c}(
-
-
-floor(i*S(n)*TotalRead(n,c,steady-state)/Period(c)),
-j*TotalRead(n,c,steady-state) + PartialRead(c,steady-state,p) + k) \\
-
-SREAD: (i*S(n) + j) * TotalRead(n,c,steady-state) + PartialRead(c,steady-state,p) + k
-
-SBUF:  i*Period(c) + j
-
-\mt{where }{\cal D}_{SB \rightarrow SR}(n,c,p,q,r) =
-   \{ (i,j,k) | 
-
+    \mt{SBUF}_{c}(i+q+
+                  \mt{sign(Offset)}*\lfloor \frac{|\mt{Offset}(n,c,p)|}{\mt{Period}(c)} \rfloor, \\
+                  j*\mt{TotalRead}(n,c,\mt{steady-state}) + 
+                    \mt{PartialRead}(c,\mt{steady-state},p) + k \\
+                   - q * \mt{Period}(c) + (\mt{Offset}(n,c,p)~\mt{mod}~\mt{Period}(c))) \\
+\mt{where }{\cal D}_{SB \rightarrow SR}(c,p,q) = 
+  ({\cal D}_{\mt{SREAD}_{c, p}} - \mt{PUSHED}) \\
+                         \cap \{ k | q * \mt{Period}(c) 
+                                \le k 
+                                \le min((q+1)*\mt{Period}(c),  \\
+                                        E(c, \mt{steady-state}, p)) - 1 
+                                        - |\mt{Offset}(n,c,p)|~\mt{mod}~\mt{Period}(c) \} \\ ~ \\
+%
+%
+\forall (i,j,k) \in {\cal D}_{SB \rightarrow SR}(c,p,q), \\
+\mt{SREAD}_{c, p}(i,j,k) = 
+    \mt{SBUF}_{c}(i+q+
+                  \mt{sign(Offset)}*(1 + \lfloor \frac{|\mt{Offset}(n,c,p)|}{\mt{Period}(c)} \rfloor), \\
+                  j*\mt{TotalRead}(n,c,\mt{steady-state}) + 
+                    \mt{PartialRead}(c,\mt{steady-state},p) + k  \\
+                   - q * \mt{Period}(c) 
+                   - (\mt{Period}(c) - (|\mt{Offset}(n,c,p)|~\mt{mod}~\mt{Period}(c))) \\
+\mt{where }{\cal D}_{SB \rightarrow SR}(c,p,q) = 
+  ({\cal D}_{\mt{SREAD}_{c, p}} - \mt{PUSHED}) \\
+                         \cap \{ k | min((q+1)*\mt{Period}(c), \\
+                                        E(c, \mt{steady-state}, p)) - 1 
+                                        - |\mt{Offset}(n,c,p)|~\mt{mod}~\mt{Period}(c)
+                                \le k 
+                                \le min((q+1)*\mt{Period}(c), 
+                                        E(c, \mt{steady-state}, p)) - 1 \} \\ ~ \\
+%
+%
+\mt{where }\mt{PUSHED}(n,c,p) = {\cal D}_{IB \rightarrow SR}(n,c,p) \\
+\mt{and }\mt{Num\_Pushed}(n,c,p) = 
+% this is a dot product of (i,j,k) with something
+  max_{\preceq}\mt{PUSHED} \cdot \{S(n) * \mt{TotalRead}(n,c,\mt{steady-state}), \\
+                                        \mt{TotalRead}(n,c,\mt{steady-state}), \\
+                                        1 \} + \mt{PartialRead}(c, \mt{steady-state}, p) \\
+\mt{and }\mt{PEEKED}(c,p) = {SB \rightarrow IR}(c,p) \\
+\mt{and }\mt{Num\_Popped}(c,p) = |PEEKED| - (E(c,\mt{steady-state},p) - O(c,\mt{steady-state},p)) \\
+\mt{and }\mt{Offset}(n,c,p) = \mt{Num\_Popped}(c,p)-\mt{Num\_Pushed}(n,c,p) \\
+%
 \end{align*}
 
 \end{itemize}
-
-q,i*\mt{TotalRead}(n,c,\mt{steady-state}) + 
-                      \mt{PartialRead}(c,\mt{steady-state},p) + j) \\
-
-
-
-
 
