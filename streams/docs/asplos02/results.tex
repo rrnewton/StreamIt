@@ -99,4 +99,13 @@ to an individual tile. Next we perform a series of fusion, fisson and
 reindexing transformations to create a load balanced set of filters
 that can be mapped onto a 4x4 Raw processor.
 
+The results show that for program with substantial computation
+requirements such as the BeamFormer, the StreamIt compiler is able to
+extract exteremly good performance out of the Raw processor. A
+sustained 2.3 GFLOPS rate after 438% improvement due to our
+optimizations. However programs such as FFT, which was created to
+experiment with the languatge features of StreamIt, has very little
+work per filter. We were unable to amortize the code generation
+overhead for FFT, leading to a slowdown. Better tile code generation
+and traditional optimizations may help in this. 
 
