@@ -102,20 +102,20 @@ for initialization and steady-state execution; in the execution phase,
 the interface includes a contract for input items, output items, and
 possible message production and consumption.
 
-\begin{figure}
-  \centering
-  \includegraphics{fusion-vert}
-  \caption{Vertical fusion.  Sequential filters in a pipeline are
-    joined into a single filter.}
-  \label{fig:vert-fusion}
-\end{figure}
-\begin{figure}
-  \centering
-  \includegraphics{fusion-horiz}
-  \caption{Horizontal fusion.  Parallel filters in a split-join are
-    joined into a single filter.}
-  \label{fig:horiz-fusion}
-\end{figure}
+%% \begin{figure}
+%%   \centering
+%%   \includegraphics{fusion-vert}
+%%   \caption{Vertical fusion.  Sequential filters in a pipeline are
+%%     joined into a single filter.}
+%%   \label{fig:vert-fusion}
+%% \end{figure}
+%% \begin{figure}
+%%   \centering
+%%   \includegraphics{fusion-horiz}
+%%   \caption{Horizontal fusion.  Parallel filters in a split-join are
+%%     joined into a single filter.}
+%%   \label{fig:horiz-fusion}
+%% \end{figure}
 
 Compiling for Raw involves constructing an expanded stream graph from
 the input program, and then partitioning this into 16 sections to fit
@@ -123,18 +123,20 @@ on to the tiles of the chip\cite{gordon02}.  The principal technique
 for doing this involves \emph{fusing} adjacent filters in the stream
 graph to form a single filter.  \emph{Vertical fusion} performs fusion
 on successive filters in a pipeline, while \emph{horizontal fusion}
-joins the parallel streams in a split-join.  These fusion
-optimizations are shown in Figures~\ref{fig:vert-fusion} and
-\ref{fig:horiz-fusion} respectively.
+joins the parallel streams in a split-join.
 
-The  StreamIt   compiler  also  contains  a   set  of  domain-specific
-optimizations for linear  filters, in which each output  is a weighted
-sum of  the inputs (e.g.,  FIR, FFT, DCT). The  compiler automatically
-detects   linear   filters    and   performs   large-scale   algebraic
-simplification   of  adjacent   components,  as   well   as  automated
-translation into the frequency  domain when the transformation results
-in  faster  code \cite{lamb03}.  These  techniques yield  average
-speedups of 450\% for benchmarks for our evaluation suite.
+%These fusion optimizations are shown in
+%Figures~\ref{fig:vert-fusion} and \ref{fig:horiz-fusion} respectively.
+
+The StreamIt compiler also contains a set of domain-specific
+optimizations for linear filters, in which each output is a weighted
+sum of the inputs (e.g., FIR, FFT, DCT). The compiler automatically
+detects linear filters and performs large-scale algebraic
+simplification of adjacent components, as well as automated
+translation into the frequency domain when the transformation results
+in faster code.  These techniques yield average speedups of 450\% for
+benchmarks with large linear components; see~\cite{lamb03} for
+details.
 
 We have implemented a number of stream programs to test the
 performance of our compiler.  These are summarized in

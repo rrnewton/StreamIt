@@ -24,13 +24,12 @@ constraints imposed by point-to-point messages, and do not include a
 notion of StreamIt's information wavefronts, re-initialization, and
 programming language support.
 
-A specification package used in industry bearing some likeness to
-StreamIt is SDL: Specification and Description Language~\cite{sdlrec}.
-SDL is a formal, object-oriented language for describing the structure
-and behavior of large, real-time systems, especially for
-telecommunications applications.  It includes a notion of asynchronous
-messaging based on queues at the receiver, but does not incorporate
-wavefront semantics as does StreamIt.  Moreover, its focus is on
-specification and verification whereas StreamIt aims to produce an
-efficient implementation.
-
+The Imagine architecture is specifically designed for the streaming
+application domain~\cite{rixner98bandwidthefficient}.  It operates on
+streams by applying a computation kernel to multiple data items off
+the stream register file.  The compute kernels are written in Kernel-C
+while the applications stitching the kernels are written in Stream-C.
+Unlike StreamIt, with Imagine the user has to manually extract the
+computation kernels that fit the machine resources in order to get
+good steady state performance for the execution of the
+kernel~\cite{kapasi:2001:ss}.

@@ -119,11 +119,24 @@ omitted if it is the same as the pop rate.
 \begin{figure}
 \centering
 \includegraphics{fir-object.eps}
+\vspace{-6pt}
 \caption{An FIR filter in an object oriented language.  A ``pull
   model'' is used by each filter object to retrieve a chunk of data
   from its source, and straight-line code connects one filter to
   another.}
 \label{fig:firobject}
+\vspace{6pt}
+\includegraphics{echo.eps}
+\vspace{-6pt}
+\caption{An echo effect in StreamIt.  Extra items are pushed on to
+  \texttt{Delay}'s output tape in the \texttt{prework} function to
+  cause the delay.}
+\label{fig:echo}
+\vspace{6pt}
+\includegraphics{fib-streamit.eps}
+\vspace{-6pt}
+\caption{A \texttt{feedbackloop} version of Fibonnacci.}
+\label{fig:feed}
 \end{figure}
 
 \label{sec:oo-rat}
@@ -157,22 +170,6 @@ distinguishes StreamIt.
 
 \subsection{Connecting Filters}
 \label{sec:connecting}
-
-\begin{figure}
-\centering
-\includegraphics{echo.eps}
-\caption{An echo effect in StreamIt.  Extra items are pushed on to
-  \texttt{Delay}'s output tape in the \texttt{prework} function to
-  cause the delay.}
-\label{fig:echo}
-\end{figure}
-
-\begin{figure}
-\centering
-\includegraphics{fib-streamit.eps}
-\caption{A \texttt{feedbackloop} version of Fibonnacci.}
-\label{fig:feed}
-\end{figure}
 
 StreamIt provides three constructs for composing filters into a
 communicating network. They are \texttt{pipeline}, \texttt{splitjoin}, and
@@ -404,11 +401,11 @@ In StreamIt, one can specify a range of latencies for each message
 delivery.  This latency is measured in terms of an information
 ``wavefront'' from one filter to another.  For example, in the
 \texttt{CheckFreqHop} example of Figure~\ref{fig:radiodiagram}, the
-sender indicates an interval of  latencies between $4N$ and $6N$.  Due
+sender indicates an interval of  latencies between $4$ and $6$.  Due
 to  space limitations,  we cannot  define this  notion  precisely (see
 \cite{streamittech620,streamittech622} for  the formal semantics), but
 the general idea  is simple: the receiver is invoked  when it sees the
-information wavefront that  the sender sees in $4N$  to $6N$ execution
+information wavefront that  the sender sees in $4$  to $6$ execution
 steps.
 
 % In some cases, the ability to synchronize the arrival of a message
@@ -476,52 +473,52 @@ category, fewer connections are needed for steady-state data transfer
 and the resulting stream graphs are more amenable to structured stream
 programming.
 
-\subsection{Re-Initialization}
-\label{sec:reinit}
+%% \subsection{Re-Initialization}
+%% \label{sec:reinit}
 
-One of the characteristics of a streaming application is the need to
-occasionally modify the structure of  the stream graph.
-StreamIt allows these changes through a re-initialization mechanism
-that is integrated with its messaging model.  If a sender targets a
-message at the \texttt{init} function of a stream or filter $S$, then
-when the message arrives, it re-executes the initialization code and
-replaces $S$ with a new version of itself.  However, the new version
-might have a different structure than the original if the arguments to
-the \texttt{init} call on re-initialization were different than during
-the original initialization.
+%% One of the characteristics of a streaming application is the need to
+%% occasionally modify the structure of  the stream graph.
+%% StreamIt allows these changes through a re-initialization mechanism
+%% that is integrated with its messaging model.  If a sender targets a
+%% message at the \texttt{init} function of a stream or filter $S$, then
+%% when the message arrives, it re-executes the initialization code and
+%% replaces $S$ with a new version of itself.  However, the new version
+%% might have a different structure than the original if the arguments to
+%% the \texttt{init} call on re-initialization were different than during
+%% the original initialization.
 
-When an \texttt{init} message arrives, it does not kill all of the
-data that is in the stream being re-initialized.  Rather, it
-\emph{drains} the stream until the wavefront of information (as
-defined for the messaging model) from the top of the stream has
-reached the bottom.  The draining occurs without consuming any data
-from the input channels to the re-initialized region.  Instead, a
-\texttt{drain} function of each filter is invoked to provide input
-when its other input source is frozen.  (Each filter can override the
-\texttt{drain} function as part of its definition.)  If the programmer
-prefers to kill the data in a stream segment instead of draining it,
-this can be indicated by sending an extra argument to the message
-portal with the re-initialization message.
+%% When an \texttt{init} message arrives, it does not kill all of the
+%% data that is in the stream being re-initialized.  Rather, it
+%% \emph{drains} the stream until the wavefront of information (as
+%% defined for the messaging model) from the top of the stream has
+%% reached the bottom.  The draining occurs without consuming any data
+%% from the input channels to the re-initialized region.  Instead, a
+%% \texttt{drain} function of each filter is invoked to provide input
+%% when its other input source is frozen.  (Each filter can override the
+%% \texttt{drain} function as part of its definition.)  If the programmer
+%% prefers to kill the data in a stream segment instead of draining it,
+%% this can be indicated by sending an extra argument to the message
+%% portal with the re-initialization message.
 
-\emph{Rationale.}  Re-initialization is a headache for stream
-programmers because---if done manually---the entire runtime system could
-be put on hold to re-initialize a portion of the stream.  The
-interface to starting and stopping streams could be complicated when
-there is not an explicit notion of initialization time vs.
-steady-state execution time, and ad-hoc draining techniques could risk
-losing data or deadlocking the system.
+%% \emph{Rationale.}  Re-initialization is a headache for stream
+%% programmers because---if done manually---the entire runtime system could
+%% be put on hold to re-initialize a portion of the stream.  The
+%% interface to starting and stopping streams could be complicated when
+%% there is not an explicit notion of initialization time vs.
+%% steady-state execution time, and ad-hoc draining techniques could risk
+%% losing data or deadlocking the system.
 
-StreamIt improves on this situation by abstracting the
-re-initialization process from the user.  That is, no axillary
-control program is needed to drain the old streams and create the new
-structure; the user need only trigger the reinitialization process
-through a message.  Additionally, any hierarchical stream construct
-automatically becomes a possible candidate for re-initialization, due
-to the well-defined stream structure and the simple interface with the
-\texttt{init} function.  Finally, it is easy for the compiler to
-recognize stream re-initialization possibilities and to account for
-all possible configurations of the stream flow graph during analysis
-and optimization.
+%% StreamIt improves on this situation by abstracting the
+%% re-initialization process from the user.  That is, no axillary
+%% control program is needed to drain the old streams and create the new
+%% structure; the user need only trigger the reinitialization process
+%% through a message.  Additionally, any hierarchical stream construct
+%% automatically becomes a possible candidate for re-initialization, due
+%% to the well-defined stream structure and the simple interface with the
+%% \texttt{init} function.  Finally, it is easy for the compiler to
+%% recognize stream re-initialization possibilities and to account for
+%% all possible configurations of the stream flow graph during analysis
+%% and optimization.
 
 %\subsection{Latency Constraints}
 
