@@ -75,7 +75,7 @@ linear nodes.
 
 \item An implementation of the above techniques in the StreamIt
 compiler that automatically improves performance by a factor of
-five on average and $6.5$ in the best cast.
+five on average and by a factor of $6.5$ in the best cast.
 
 \end{itemize}
 
@@ -309,8 +309,9 @@ structures (see Figure~\ref{fig:structures}): 1) {\tt pipelines}
 represent the serial computation of one filter after another, 2) {\tt
 splitjoins} represent explicitly parallel computation, and 3) {\tt
 feedbackloops} allow cycles to be introduced into the stream graph.
-{\tt filters}, {\tt pipelines}, {\tt splitjoins} and {\tt feedbackloops} are called
-{\it streams} and a stream can be used as a subcomponent in a structure.  Note that all {\tt streams} have
+A {\it stream} is defined to be either a {\tt filter}, {\tt pipeline}, 
+{\tt splitjoin} or {\tt feedbackloop}. Every subcomponents of a structure 
+is a stream, and all streams have
 exactly one input tape and exactly one output tape.
 
 It has been our experience that most practical applications can be
