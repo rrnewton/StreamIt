@@ -17,10 +17,10 @@ code & \in & \mbox{list of instructions, each of which can be:} \\
     \vspace{-6pt}
     \begin{equation} \nonumber
       \begin{array}{ll}
-	y_1 := \mt{const}  & y_1 := y_2~\mt{op}~y_3\\
-	y_1 := \mbox{\tt peek}(i) & y_1 := \mbox{\tt pop}() \\
-	\mbox{{\tt push}}(y_1) & (\mbox{{\tt loop}} ~N~ \mt{code}) \\
-	(\mbox{{\tt branch}} ~\mt{code}_1~ \mt{code}_2) & ~
+	y_1 := \mt{const} & \mbox{{\tt push}}(y_1) \\
+	y_1 := \mbox{\tt pop}() & (\mbox{{\tt loop}} ~N~ \mt{code}) \\
+        y_1 := \mbox{\tt peek}(i) & (\mbox{{\tt branch}} ~\mt{code}_1~ \mt{code}_2) \\
+	y_1 := y_2~\mt{op}~y_3 & ~
       \end{array}
 \end{equation}}}
 \end{array} 
@@ -133,13 +133,29 @@ proc {\bf Extract}($code$, $map$, $A$, $\vec b$, int $\mt{popcount}$, int $\mt{p
 \FOR {$i \leftarrow 1$ to $\mt{code}$.length}
 \STATE {\bf switch} $\mt{code}$[i]
 \IND
-\STATE \mbox{\bf case}~({\tt loop} N $code'$)
+\STATE $\mbox{\bf case}~y := \mt{const}$
 \IND
-\STATE \bf{for} $j \leftarrow 1$ to $N$ {\bf do}
-\IND
-\STATE $(\mt{map}, A, {\vec b}, \mt{popcount}, \mt{pushcount})~\leftarrow~$ \\
-\verb+   +\bf{Extract}$(\mt{code}, \mt{map}, A, {\vec b}, \mt{popcount}, \mt{pushcount})$
+\STATE $\mt{map}.\mt{put}(y, (\vec 0_{Peek}, \mt{const}))$
 \UND
+\STATE \vspace{-6pt}
+\STATE $\mbox{\bf case}~y := \mbox{\tt pop}()$
+\IND
+\STATE $\mt{map}.\mt{put}(y, \tup{\mbox{\bf BuildCoeff}(\mt{popcount})}{0})$
+\STATE $\mt{popcount}$\verb|++|
+\UND
+\STATE \vspace{-6pt}
+\STATE $\mbox{\bf case}~y := \mbox{\tt peek}(i)$
+\IND
+\STATE $\mt{map}.\mt{put}(y, \tup{\mbox{\bf BuildCoeff}(\mt{popcount}+i)}{0})$
+\UND
+\STATE \vspace{-6pt}
+\STATE $\mbox{\bf case}~\mbox{\tt push}(y)$
+\IND
+\STATE $\tup{\vec v}{c} \leftarrow \mt{map}.\mt{get}(y)$
+\STATE {\bf if} $\mt{pushcount} = \bot$ {\bf then} $\mt{fail}$
+\STATE $A[*, \mt{pushcount}] \leftarrow \vec v$
+\STATE $b[\mt{pushcount}] \leftarrow c$
+\STATE $\mt{pushcount}$\verb|--|
 \UND
 \STATE \vspace{-6pt}
 \STATE $\mbox{\bf case}~ y_1 := y_2 + y_3$ or $y_1 := y_2 - y_3$
@@ -147,20 +163,6 @@ proc {\bf Extract}($code$, $map$, $A$, $\vec b$, int $\mt{popcount}$, int $\mt{p
 \STATE $\tup{\vec v_2}{c_2} \leftarrow \mt{map}.\mt{get}(y_2)$
 \STATE $\tup{\vec v_3}{c_3} \leftarrow \mt{map}.\mt{get}(y_3)$
 \STATE $\mt{map}.\mt{put}(y_1, \tup{\vec v_2+\vec v_3}{c_2+c_3})$
-\UND
-\STATE \vspace{-6pt}
-\STATE $\mbox{\bf case}~y_1 := y_2 / y_3$
-\IND
-\STATE $\tup{\vec v_2}{c_2} \leftarrow \mt{map}.\mt{get}(y_2)$
-\STATE $\tup{\vec v_3}{c_3} \leftarrow \mt{map}.\mt{get}(y_3)$
-\STATE {\bf if} $~\vec v_3 = \vec 0_{Peek} \wedge y_3 \ne 0$ {\bf then}
-\IND
-\STATE $\mt{map}.\mt{put}(y_1, (\frac{1}{c_3}*\vec v_2, c_2/c_3))$
-\UND
-\STATE {\bf else}
-\IND
-\STATE $\mt{map}.\mt{put}(y_1, \bot)$
-\UND
 \UND
 \STATE \vspace{-6pt}
 \STATE $\mbox{\bf case}~y_1 := y_2 * y_3$
@@ -181,6 +183,20 @@ proc {\bf Extract}($code$, $map$, $A$, $\vec b$, int $\mt{popcount}$, int $\mt{p
 \UND
 \UND
 \STATE \vspace{-6pt}
+\STATE $\mbox{\bf case}~y_1 := y_2 / y_3$
+\IND
+\STATE $\tup{\vec v_2}{c_2} \leftarrow \mt{map}.\mt{get}(y_2)$
+\STATE $\tup{\vec v_3}{c_3} \leftarrow \mt{map}.\mt{get}(y_3)$
+\STATE {\bf if} $~\vec v_3 = \vec 0_{Peek} \wedge y_3 \ne 0$ {\bf then}
+\IND
+\STATE $\mt{map}.\mt{put}(y_1, (\frac{1}{c_3}*\vec v_2, c_2/c_3))$
+\UND
+\STATE {\bf else}
+\IND
+\STATE $\mt{map}.\mt{put}(y_1, \bot)$
+\UND
+\UND
+\STATE \vspace{-6pt}
 \STATE $\mbox{\bf case}~y_1 := y_2 ~\mt{op}~ y_3$, for $\mt{op} \in \{\&, |, \wedge, \&\&, ||, !, \mt{etc.}\}$
 \IND
 \STATE $\tup{\vec v_2}{c_2} \leftarrow \mt{map}.\mt{get}(y_2)$
@@ -188,29 +204,13 @@ proc {\bf Extract}($code$, $map$, $A$, $\vec b$, int $\mt{popcount}$, int $\mt{p
 \STATE $\mt{map}.\mt{put}(y_1, (\vec 0_{Peek} \sqcap \vec v_2 \sqcap \vec v_3, c_2 ~\mt{op}~ c_3))$
 \UND
 \STATE \vspace{-6pt}
-\STATE $\mbox{\bf case}~y := \mt{const}$
+\STATE \mbox{\bf case}~({\tt loop} N $code'$)
 \IND
-\STATE $\mt{map}.\mt{put}(y, (\vec 0_{Peek}, \mt{const}))$
+\STATE \bf{for} $j \leftarrow 1$ to $N$ {\bf do}
+\IND
+\STATE $(\mt{map}, A, {\vec b}, \mt{popcount}, \mt{pushcount})~\leftarrow~$ \\
+\verb+   +\bf{Extract}$(\mt{code}, \mt{map}, A, {\vec b}, \mt{popcount}, \mt{pushcount})$
 \UND
-\STATE \vspace{-6pt}
-\STATE $\mbox{\bf case}~y := \mbox{\tt peek}(i)$
-\IND
-\STATE $\mt{map}.\mt{put}(y, \tup{\mbox{\bf BuildCoeff}(\mt{popcount}+i)}{0})$
-\UND
-\STATE \vspace{-6pt}
-\STATE $\mbox{\bf case}~y := \mbox{\tt pop}()$
-\IND
-\STATE $\mt{map}.\mt{put}(y, \tup{\mbox{\bf BuildCoeff}(\mt{popcount})}{0})$
-\STATE $\mt{popcount}$\verb|++|
-\UND
-\STATE \vspace{-6pt}
-\STATE $\mbox{\bf case}~\mbox{\tt push}(y)$
-\IND
-\STATE $\tup{\vec v}{c} \leftarrow \mt{map}.\mt{get}(y)$
-\STATE {\bf if} $\mt{pushcount} = \bot$ {\bf then} $\mt{fail}$
-\STATE $A[*, \mt{pushcount}] \leftarrow \vec v$
-\STATE $b[\mt{pushcount}] \leftarrow c$
-\STATE $\mt{pushcount}$\verb|--|
 \UND
 \STATE \vspace{-6pt}
 \STATE \mbox{\bf case}~({\tt branch} $code_1~code_2)$
@@ -219,14 +219,14 @@ proc {\bf Extract}($code$, $map$, $A$, $\vec b$, int $\mt{popcount}$, int $\mt{p
 \verb+   +${\mbox{\bf Extract}}(\mt{code}_1, \mt{map}, A, {\vec b}, \mt{popcount}, \mt{pushcount})$
 \STATE $(\mt{map}_2, A_2, {\vec b_2}, \mt{popcount}_2, \mt{pushcount}_2) \leftarrow$ \\ 
 \verb+   +${\mbox{\bf Extract}}(\mt{code}_2, \mt{map}, A, {\vec b}, \mt{popcount}, \mt{pushcount})$
-\STATE $\mt{popcount} \leftarrow \mt{popcount}_1 \sqcap \mt{popcount}_2$
-\STATE $\mt{pushcount} \leftarrow \mt{pushcount}_1 \sqcap \mt{pushcount}_2$
+\STATE $\mt{map} \leftarrow \mt{map}_1 \sqcap \mt{map}_2$
 \STATE $A \leftarrow A_1 \sqcap A_2$
 \STATE ${\vec b} \leftarrow {\vec b_1} \sqcap {\vec b_2}$
-\STATE $\mt{map} \leftarrow \mt{map}_1 \sqcap \mt{map}_2$
+\STATE $\mt{popcount} \leftarrow \mt{popcount}_1 \sqcap \mt{popcount}_2$
+\STATE $\mt{pushcount} \leftarrow \mt{pushcount}_1 \sqcap \mt{pushcount}_2$
 \UND
 \UND %end case
 \ENDFOR
-\STATE return ($\mt{popcount}$, $\mt{pushcount}$, $\mt{map}$, $A$, ${\vec b}$)
+\STATE return ($\mt{map}$, $A$, ${\vec b}$, $\mt{popcount}$, $\mt{pushcount}$)
 \end{algorithmic}
 \end{algorithm}
