@@ -1,4 +1,46 @@
 \section{Synchronization Removal}
 \label{sec:synchremoval}
 
-Jasp, is there any worth in describing synchronization removal? 
+Synchronization removal transforms the structured stream graph into a
+canonicalized flattened graph that exposes all the underlying
+data movement to the backend. The algorithm is composed of three
+sub-algorithms that are run repetitively till the graph reaches a
+fixed point.
+
+The first algorithm coalesces adjacent splitters into one large
+equivalent splitter. Adjacent splitters commonly arise when a
+splitjoin contains another splitjoin as one of its
+children. Coalescing is done by analyzing the weight of the parent
+splitter that feeds the child splitter. Splitters are cyclic in nature
+so their weights and outputs can always be repeated an integral number
+of times to arive at a semantically equivalent splitter. This fact is
+leveraged to repeat the parent splitter enough times to contain a
+multiple of the sum of the child's weights. Then the child's weights
+and outputs are incorporated into the parent.
+
+The second algorithm coalesces adjacent joiners in much the same way
+as when coalescing splitters. The only difference is the joiner being
+fed is the one repeated to incorporate the weights of the feeding joiner.
+
+The third algorithm decomposes a joiner feeding a splitter. The result
+may completely eliminate the need for splitters and joiners if the weights
+match up or may decompose into a mixture of direct communication and
+splitters feeding joiners. In either case, the joiner feeding into a
+splitter synchronization point is eliminated from the graph. This is
+done summing up the weights on the splitter and joiner and calculating
+their lowest common multiple. Then the splitter and joiner are
+repeated sufficiently many times such that their new sums are the lowest
+common multiple. The new weights can then be easily compared to
+determine which inputs of the joiner communicate to which output of
+the splitter. The graph is then transformed such that if an input can
+send directly to an output they are connected directly otherwise small
+splitters may need to be introduced if an input sends to multiple
+outputs or small joiners if an output receives from multiple inputs.
+
+When the fixed point is reached the underlying communication pattern
+is exposed. The third algorithm ensures that joiners output to filters
+and splitters input from filters. Further, the first and second
+algorithms ensure that these splitters output to and joiners input
+from filters directly. Thus splitters and joiners can be removed
+entirely from the graph and the structured graph can be replaced by a
+representation where the filters communicate directly with each other.
