@@ -94,19 +94,21 @@ that a filter's work function is run for a greater number of times in
 the steady state before transitioning to the next filter in the
 graph. Hence for example, a program that would generate a trace $T_2$
 might be as follows:
+{\small
 \begin{verbatim}
 run_steady_state() {
   for (i = 0; i < 1; i++) A_work();
   for (i = 0; i < 1; i++) B_work();
 }
-\end{verbatim}
+\end{verbatim}}
 but a scaled program that increases temporal locality is as follows:
+{\small
 \begin{verbatim}
 run_steady_state() {
   for (i = 0; i < M * 1; i++) A_work();
   for (i = 0; i < M * 1; i++) B_work();
 }
-\end{verbatim}
+\end{verbatim}}
 where \texttt{M} (the multiplicity factor) is an integer greater than
 one. From our model, it is easy to see that scaling reduces the number
 of misses for a given filter $f$ from $K$ to $\frac{K}{\texttt{M}}- 1$, where $K =
