@@ -20,7 +20,7 @@
 \title{StreamIt Language Specification\\
 Version 2.0\ifprerel\thanks{
 This document is the latest working version of the language specification.\hfil\break\ttfamily
-\hbox{$Id: streamit-lang.tex,v 1.18 2003-05-13 20:49:59 dmaze Exp $}
+\hbox{$Id: streamit-lang.tex,v 1.19 2003-05-14 18:51:38 dmaze Exp $}
 }\fi}
 \author{\texttt{streamit@cag.lcs.mit.edu}}
 \catcode`\$=3
@@ -100,7 +100,8 @@ ternary expression, if two expressions are of different primitive
 types, they are promoted to the lowest type on the list above.  Real
 expressions converted to \lstinline|complex| have an imaginary part of
 zero.  \lstinline/|/, \lstinline|&|, and \lstinline|^| are bitwise or,
-and, and exclusive-or operators, respectively.  The boolean logic
+and, and exclusive-or operators, respectively; \lstinline|!| is a
+boolean not.  The boolean logic
 operators \lstinline|&&| and \lstinline/||/ behave as in C: they are
 short-circuiting, integer values of exactly zero are false, and other
 values are true.  \lstinline|==| and other comparison operators return
@@ -125,6 +126,8 @@ a boolean value.
 \lstinline|*|, \lstinline|/|, \lstinline|%| &
   \lstinline|int|, \lstinline|float|, \lstinline|complex| &
   \lstinline|%| must be \lstinline|int| \\
+\lstinline|(cast)| & Any \\
+\lstinline|!| & \lstinline|boolean| \\
 \lstinline|++|, \lstinline|--| & \lstinline|int| \\
 \bottomrule
 \end{tabular}
