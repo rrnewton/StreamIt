@@ -36,38 +36,49 @@
   text = "E.A. Lee, Overview of the Ptolemy Project, UCB/ERL Technical Memorandum UCB/ERL M01/11, Dept. EECS, University of California, Berkeley, CA 94720, March 2001."
 }
 
-@book{leesdf,
+@Book{leesdf,
   author = {S. S. Bhattacharyya and P. K. Murthy and E. A. Lee},
-  title = "{Software Synthesis from Dataflow Graphs}",
-  year = {1996},
+  title = {Software Synthesis from Dataflow Graphs},
   publisher = {Kluwer Academic Publishers},
+  isbn = {0-7923-9722-3},
+  year = {1996},
   url = {http://www.wkap.nl/book.htm/0-7923-9722-3}
 }
 
-@misc{ bhattacharyya99synthesis,
-  author = "S. Bhattacharyya and P. Murthy and E. Lee",
-  title = "Synthesis of embedded software from synchronous dataflow specifications",
-  text = "S.S. Bhattacharyya, P.K. Murthy, and E.A. Lee. Synthesis of embedded software
-    from synchronous dataflow specifications. invited paper, J. of VLSI Signal
-    Processing, page to appear, 1999.",
-  year = "1999",
-  url = "citeseer.nj.nec.com/bhattacharyya99synthesis.html" }
+@Article{bhattacharyya99synthesis,
+  author = {S. Bhattacharyya and P. Murthy and E. Lee},
+  title = {Synthesis of embedded software from synchronous dataflow specifications},
+  journal = {Journal of VLSI Signal Processing Systems},
+  year = {1999},
+  volume = {21},
+  number = {2},
+  month = {June},
+}
 
-@misc{ murthy99buffer,
-  author = "P. Murthy and S. Bhattacharyya",
-  title = "Buffer Merging---A Powerful Technique for Reducing Memory Requirements
-    in SDF Specifications",
-  text = "P. K. Murthy, S. S. Bhattacharyya, Buffer Merging---A Powerful Technique
-    for Reducing Memory Requirements in SDF Specifications, Proc. ISSS, Nov.
-    1999.",
-  year = "1999",
-  url = "citeseer.nj.nec.com/murthy00buffer.html" }
+@TechReport{murthy99buffer,
+  author = {P. K. Murthy and S. S. Bhattacharyya},
+  title = {Buffer Merging --- A Powerful Technique for Reducing Memory
+  Requirements of Synchronous Dataflow Specifications},
+  year = {2000},
+  month = {April},
+  number = {UMIACS-TR-2000-20},
+  institution = {Institute for Advanced Computer Studies, University of
+  Maryland at College Park},
+  note = {Also Computer Science Technical Report CS-TR-4126},
+  postscript = {murt2000x2.ps},
+  pdf = {murt2000x2.pdf}
+}
 
-@misc{ govindarajan-minimizing,
-  author = "R. Govindarajan and Guang R. Gao and Palash Desai",
-  title = "Minimizing Buffer Requirements under Rate-Optimal Schedule in Regular Dataflow
-    Networks",
-  url = "citeseer.nj.nec.com/article/govindarajan94minimizing.html" }
+
+@InProceedings{govindarajan-minimizing,
+  author = {R. Govindarajan and Guang R. Gao and Palash Desai},
+  title = {Minimizing memory requirements in rate optimal schedules},
+  booktitle = {Proceedings of the 1994 International Conference on Application Specific Array Processors},
+  pages = {75-86},
+  year = {1994},
+  month = {August},
+  organization = {IEEE Computer Society},
+}
 
 @misc{streamittech2,
   author = "William Thies and Michal Karczmarek and Michael Gordon and David Maze and Jeremy Wong and Henry Hoffmann and Matthew Brown and Saman Amarasinghe",
@@ -86,9 +97,10 @@
 @inproceedings{ thies02streamit,
     author = "William Thies and Michal Karczmarek and Saman Amarasinghe",
     title = "{StreamIt:  A Language for Streaming Applications}",
-    booktitle = "{Proceedings of the International Conference on Compiler Construction, to appear}",
-    year = "{2002}",
-    address = "{Grenoble, France}"}
+    booktitle = "{Proceedings of the International Conference on Compiler Construction}",
+    year = {2002},
+    address = {Grenoble, France}
+}
 
 @misc{ gordo-thesis,
   author = "Michael Gordon",
@@ -106,40 +118,35 @@
   }
 
 @Article{BELP96,
-  author = 	 {Greet Bilsen and Marc Engels and Rudy Lauwereins and Jean Peperstraete},
-  title = 	 {Cyclo-Static Dataflow},
-  journal = 	 {IEEE Transactions on Signal Processing},
-  year = 	 {1996},
-  OPTkey = 	 {},
-  OPTvolume = 	 {},
-  OPTnumber = 	 {},
-  pages = 	 {397-408},
-  month = 	 {February},
-  OPTnote = 	 {},
-  OPTannote = 	 {}
+  author =   {Greet Bilsen and Marc Engels and Rudy Lauwereins and Jean Peperstraete},
+  title =    {Cyclo-Static Dataflow},
+  journal =      {IEEE Transactions on Signal Processing},
+  year =     {1996},
+  pages =    {397-408},
+  month =    {February},
 }
 
-@misc{ parks95comparison,
+@inproceedings{ parks95comparison,
   author = "T. Parks and J. Pino and E. Lee",
   title = "A Comparison of Synchronous and CycloStatic Dataflow",
-  text = "T. M. Parks, J. L. Pino, and E. A. Lee, A Comparison of Synchronous and
-    CycloStatic Dataflow, Proc. IEEE Asilomar Conference on Signals, Systems,
-    and Computers, Pacific Grove, CA, October 29 - November 1, 1995.",
-  year = "1995",
+  month = {October},
+  year = {1995},
+  booktitle = {IEEE Asilomar Conference on Signals, Systems,
+    and Computers},
   url = "citeseer.nj.nec.com/parks95comparison.html" }
 
-@misc{ lee87static,
+@article{ lee87static,
   author = "E. Lee and D. Messershmitt",
   title = "Static Scheduling of Synchronous Data Flow Programs for Digital Signal Processing",
     journal = "IEEE Transactions on Computers",
     volume = "C-36",
     number = "1",
-    OPTmonth = "January",
-    OPTpages = "24-35",
+    month = "January",
+    pages = "24-35",
     year = "1987",
   }
 
-@misc{ goddard00navy,
+@article{ goddard00navy,
   author = "S. Goddard and K. Jeffay",
   title = "Analyzing the Real-Time Properties of a U.S. Navy Singer Processing System",
     journal = "International Journal of Reliability. Quality and Safety Engineering",
@@ -168,11 +175,11 @@
 @article{lustre,
     author = "N. Halbwachs and P. Caspi and P. Raymond and D. Pilaud",
     title = "{The synchronous data-flow programming language LUSTRE}",
-    journal = "Proc. of the IEEE",
+    journal = "Proceedings of the IEEE",
     volume = "79",
     number = "9",
-    OPTmonth = "September",
-    OPTpages = "1305--1320",
+    month = "September",
+    pages = "1305--1320",
     year = "1991",
     url = "citeseer.nj.nec.com/halbwachs91synchronous.html"
 }
@@ -189,12 +196,11 @@
   pdf = {bhat1999x3.pdf}
 }
 
-@misc{ wauters96cyclodynamic,
+@inproceedings{ wauters96cyclodynamic,
   author = "P. Wauters and M. Engels and R. Lauwereins and J. Peperstraete",
   title = "Cyclo-dynamic dataflow",
-  text = "P. Wauters, M. Engels, R. Lauwereins, J.A. Peperstraete, Cyclo-dynamic
-    dataflow,  4th EUROMICRO Workshop on Parallel and Distributed Processing,
-    January, 1996.",
+  booktitle = "4th EUROMICRO Workshop on Parallel and Distributed Processing",
+  month = "January",
   year = "1996",
   url = "citeseer.nj.nec.com/wauters96cyclodynamic.html" }
 
@@ -204,7 +210,7 @@
     journal = "Acta Informatica",
     volume = "34",
     number = "7",
-    OPTpages = "491--541",
+    pages = "491-541",
     year = "1997",
     url = "citeseer.nj.nec.com/stephens95survey.html"
 }
@@ -215,7 +221,7 @@
     journal = "Science of Computer Programming",
     volume = "19",
     number = "2",
-    OPTpages = "87-152",
+    pages = "87-152",
     year = "1992"
 }
 
@@ -225,33 +231,17 @@
 real-time systems},
   journal =      {Springer Verlag Lecture Notes in Computer Science},
   year =         {1987},
-  OPTkey =       {},
   volume =       {274},
-  OPTnumber =    {},
-  OPTpages =     {257--277},
-  OPTmonth =     {},
-  OPTnote =      {},
-  OPTannote =    {}
+  pages =     {257--277},
+  OPTmonth =     {November},
 }
 
 @InProceedings{sisal,
   author =       "{J. Gaudiot and W. Bohm and T. DeBoni and J. Feo and P. Mille}",
   title =        "{The Sisal Model of Functional Programming and its Implementation}",
-  OPTcrossref =  {},
-  OPTkey =       {},
   booktitle = {Proceedings of the Second Aizu International Symposium on Parallel Algorithms/Architectures Synthesis},
-  OPTOPTpages =          {},
   year =         {1997},
-  OPTeditor =    {},
-  OPTvolume =    {},
-  OPTnumber =    {},
-  OPTseries =    {},
-  OPTaddress =   {},
-  OPTmonth =     {},
-  OPTorganization = {},
-  OPTpublisher = {},
-  OPTnote =      {},
-  OPTannote =    {}
+  OPTmonth =     {March},
 }
 
 @INPROCEEDINGS(Rix98,
@@ -263,17 +253,13 @@ real-time systems},
     address = "Dallas, TX")
 
 
-@misc{smartmemories,
+@inproceedings{smartmemories,
   author = "K. Mai and T. Paaske and N. Jayasena and R. Ho and W. Dally and
 M. Horowitz",
   title = "{Smart memories: A modular recongurable architecture}",
-  text = "K. Mai, T. Paaske, N. Jayasena, R. Ho, W. J. Dally, and M.
-Horowitz, \Smart
-    memories: A modular recongurable architecture, in Proceedings of the
-27th
-    Annual International Symposium on Computer Architecture (ISCA'00),
-(Vancouver,
-    BC, Canada), pp. 161-171, June 12-14 2000.",
+  booktitle = {Proceedings of the 27th Annual International Symposium on Computer Architecture (ISCA'00)},
+  page = {161-171},
+  month={June},
   year = "2000" }
 
 @misc{rawshort,
@@ -302,45 +288,25 @@ Burger",
     year = "1994",
     url = "citeseer.nj.nec.com/article/bhattacharyya94looped.html" }
 
-@misc{sicp,
+@book{sicp,
     author = "H. Abelson and G. Sussman",
     title = "{Structure and Interpretation of Computer Programs}",
     howpublished = "MIT Press, Cambridge, MA",
     year = "1985",
-    text = "Harold Abelson and Gerald Sussman. Structure and Interpretation of C
-omputer
-      Programs. MIT Press, Cambridge, Mass., 1985."
+    isbn = {0-262-01153-0}
 }
 
 
 @InProceedings{Gordo02,
   author =       {Michael Gordon and William Thies and Michal Karczmarek and Jeremy Wong and Henry Hoffmann and David Maze and Saman Amarasinghe},
   title =        {A Stream Compiler for Communication-Exposed Architectures},
-  OPTcrossref =  {},
-  OPTkey =       {},
-  booktitle = {In the Proceedings of the Tenth Conference on Architectural Support for Programming Languages and Oper\
-ating Systems},
-  OPTpages =     {75--86},
+  booktitle = {Proceedings of the Tenth Conference on Architectural Support for Programming Languages and Operating Systems},
+  pages =     {75--86},
   year =         {2002},
-  OPTeditor =    {},
-  OPTvolume =    {},
-  OPTnumber =    {},
-  OPTseries =    {},
-  OPTaddress =   {},
   month =        {October},
-  OPTorganization = {},
-  OPTpublisher = {},
-  OPTnote =      {},
-  OPTannote =    {}
 }
 
 @Misc{streamitweb,
-  OPTkey =       {},
-  OPTauthor =    {},
   author =        {StreamIt Homepage},
   howpublished = {\texttt{http://compiler.lcs.mit.edu/streamit}},
-  OPTmonth =     {},
-  OPTyear =      {},
-  OPTnote =      {},
-  OPTannote =    {}
 }
