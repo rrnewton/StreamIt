@@ -38,28 +38,29 @@ of arithmetic operations required, {\it e.g.} if combining a
 two-element pipeline where the second filter pushes more items than it
 peeks.  However, such a combination could be justified if it enables
 further combination with other components and leads to a benefit
-overall.  Another consideration is that a node can be converted to
-frequency only if it has $\mt{pop}=1$; thus, excessive combination
-could preclude frequency transformations.  This is the case for our
+overall.  Another consideration is that as the pop rate grows,
+the benefit of converting to frequency diminishes; thus, excessive combination
+could preclude the most effective frequency transformations.  
+This is the case for our
 RateConverter benchmark, in which three filters could be combined, but
 it is better to combine only two in order to enable a frequency
 transformation (see Figure~\ref{fig:rategraph}).
 
 Second, the arrangement of the stream graph can dictate which
 transformations are possible to apply.  Since our transformations
-operate on an entire {\tt pipeline} or {\tt splitjoin} construct, the
+operate on an entire pipeline or splitjoin construct, the
 graph often needs to be refactored to put linear nodes in their own
 hierarchical unit.  For example, in our TargetDetect benchmark, we can
-divide the {\tt splitjoin} into two pieces and collapse the top piece
+divide the splitjoin into two pieces and collapse the top piece
 before converting to the frequency domain, thereby amortizing the cost
 of the FFT on the input items (see Figure~\ref{fig:targetgraph}).
 
 \subsection{Dynamic Programming Solution}
 
-Our optimization selection algorithm automatically derives both of the
-example transformations described above.  The algorithm works by
-estimating the minimum cost for each structure in the stream graph
-(see Figure~\ref{fig:part-alg}).  The minimum cost represents the best
+Our optimization selection algorithm, shown in Figure~\ref{fig:part-alg}
+automatically derives both of the example transformations described above.  
+The algorithm works by estimating the minimum cost for each structure 
+in the stream graph. The minimum cost represents the best
 of three configurations: 1) collapsed and implemented in the time
 domain, 2) collapsed and implemented in the frequency domain, and 3)
 uncollapsed and implemented as a hierarchical unit.  The cost
@@ -75,9 +76,9 @@ graph.
 The key to the algorithm's efficiency is the manner in which it
 considers refactoring the children of hierarchical nodes.  Instead of
 considering arbitrary arrangements of the stream graph, it considers
-only {\it rectangular} partitions, in which a given {\tt splitjoin} is
+only {\it rectangular} partitions, in which a given splitjoin is
 divided into two child splitjoins by either a vertical or horizontal
-cut.  This approach works well in practice, because {\tt splitjoin}s
+cut.  This approach works well in practice, because splitjoins
 often have symmetrical child streams in which linear components can be
 separated by a horizontal line (such as TargetDetect, in
 Figure~\ref{fig:targetgraph}).  Moreover, as the child splitjoins are
@@ -92,27 +93,28 @@ track of the lowest-cost configuration for each rectangular section of
 a hierarchical stream.  An important aspect of the algorithm that is
 not explicit in the pseudocode is the translation from a StreamIt
 graph to a set of hierarchical {\tt Stream} objects.  In particular,
-each {\tt Stream} corresponds only to a {\tt pipeline}; adjacent {\tt
-splitjoin} objects are wrapped in a {\tt pipeline} and their children
-are considered direct children of the {\tt pipeline}.  This enables
-different parts of neighboring {\tt splitjoins} to be combined.
-However, it implies that a {\tt Stream} might have a different width
-at different points (since neighboring {\tt splitjoin}s could have
-differing widths); this necessitates the {\tt width} array in
-Figure~\ref{fig:part-alg}.
+each Stream corresponds only to a pipeline; adjacent 
+splitjoin objects are wrapped in a pipeline and their children
+are considered direct children of the pipeline. This enables
+different parts of neighboring splitjoins to be combined.
+However, it implies that a Stream might have a different width
+at different points (since neighboring splitjoins could have
+differing widths); this necessitates the addition of the {\tt width}
+array to the algorithm.
 
-Also ommitted from the pseudocode are the functions {\tt
-getDirectCost} and {\tt getFrequencyCost} that estimate a node's
-bexecution time if implemented in the time domain or the frequency
-domain.  These cost functions could be tailored to a specific
+Ommitted from the pseudocode are the functions {\it getDirectCost} 
+and {\it getFrequencyCost} that estimate a node's
+execution time if implemented in the time domain or the frequency
+domain.  These cost functions can be tailored to a specific
 architecture and code generation strategy.  For example, if there is
-architecture-level support for convolution operations, then this would
-effect the cost for certain dimensions of matrices; similarly, if a
+architecture-level support for convolution operations (such as 
+the the {\tt FIRS} instruction in the TMS320C54x~\cite{ti-dsp-manual}), 
+then this would effect the cost for certain dimensions of matrices; similarly, if a
 matrix multiplication algorithm was available that exploited symmetry
 or sparsity in a matrix, then this benefit could be detected where it
 would apply.  In our implementation, we use simple versions of the
-cost functions (let $A$ and ${\vec b}$ denote the linear
-representation for stream $s$):
+cost functions (let $\lambda_s=(A,\vec{b},e,o,u)$ be the linear node
+corresponding to stream $s$):
 \[
 \begin{array}{rcl}
 \mt{getDirectCost}(s) \hspace{-6pt} & = \hspace{-6pt} & 1 + 3 * |\{ (i,j)~s.t.~A_{i,j} \ne 0\}| \vspace{3pt} \\ 
@@ -125,18 +127,21 @@ That is, for the direct cost, we count the number of multiplies and
 adds required to perform the matrix multiplication, giving more weight
 to the multiplies since they are more expensive.  We do not count the
 zero entries of the arrays, since our matrix multiply routines take
-advantage of the sparsity of the matrix.  We also add $1$ to represent
+advantage of the sparsity of the matrix.  We add $1$ to represent
 the overhead of the push and pop operations of the node.  For the
 frequency cost, we count the total number of operations in a direct
 matrix multiply, since zero entries cannot be exploited in the
-frequency domain.  We also add $\mt{rows}(A)$ to represent the cost of
-performing the FFT on the input elements.  Then, we discount this sum
+frequency domain.  We also add $\mt{rows}(A)$ to represent the 
+cost of copying the input values into $\vec{X}$. Then, we discount this sum
 by a factor of 50, as our measurements indicate that the frequency
 implementation performs 50 times higher than a direct matrix multiply
 (independent of the size of the matrix.)  Of course, both of these
-cost functions are undefined if $s$ is non-linear (or, for {\tt
-getFrequencyCost}, if $s$ pops more than 1); if this is the case, then
-the optimization selection algorithm considers its cost as infinite.
+cost functions are undefined if $s$ is non-linear (eg there is no
+corresponding $\lambda_s$). If this is the case, then
+the optimization selection algorithm assigns infinite cost.
+Because the frequency transformation in the compiler is not implemented for
+non unit pop rates, {\it getFrequencyCost} is also infinite 
+for nodes where $o \ne 1$.; 
 
 %% OPTIMIZING EXECUTION
 
