@@ -1,4 +1,4 @@
-\section{Implementation}
+\section{Space-Time Execution Model}
 \label{sec:implementation}
 After synchronization removal, we are left with a flat stream graph
 composed of filters.  Conceptually, we break away from the notion that
@@ -25,7 +25,7 @@ upstream filter simply sends its output to its downstream filter that
 is guaranteed to be mapped to a neighboring tile and so on.
 
 Inter-trace communication is handled differently from intra-trace
-communication.  As mentioned in Section \ref{section:raw}, in this
+communication.  As mentioned in Section \ref{sec:raw}, in this
 project we have configured the Raw chip to have a streaming DRAM
 module attached to each I/O port of the chip.  It is the task of the
 tile to send memory requests to these modules and communicate data to
@@ -70,9 +70,10 @@ output stream.
 \subsubsection{Support for Software Pipelining of Traces}
 \label{sec:softpipe}
 Currently, the hybrid space-time multiplexing backend does not support
-full software-pipelining of traces, in the tradition sense.  The trace
-scheduling algorithm (see Section \ref{sec:scheduling}) is limited
-when scheduling traces because of the underlying implementation.
+full software-pipelining of traces, in the traditional sense.  The
+trace scheduling algorithm (see Section \ref{sec:scheduling}) is
+limited when scheduling traces because of the underlying
+implementation.
 
 The scheduler is free to schedule a trace for execution as long as in
 the final schedule, for each trace $t$:

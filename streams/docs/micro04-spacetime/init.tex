@@ -2,7 +2,7 @@
 \subsection{Peek Initialization Schedule}
 The StreamIt compiler is responsible for the automatic scheduling of
 the filters of the stream graph. In this context, we use the term
-scheduling to refer to the calculation of a steady-state schedule for
+``scheduling'' to refer to the calculation of a steady-state schedule for
 a stream graph composed of StreamIt filters.  Calculating a
 steady-state schedule is orthogonal to trace scheduling. The
 steady-state schedule is calculated before entry to the space-time
@@ -30,11 +30,15 @@ placed in a loop and appears exactly once in the schedule.  The number
 of executions of a filter in a schedule is called its {\it
 multiplicity} in later sections.  The natural execution order for both
 the peek initialization schedule and the steady-state schedule is
-given by a breadth-first traversal of the stream graph. Of course, the
+given by a topological traversal of the stream graph. Of course, the
 trace scheduling phase has some freedom in ignoring the
 information-flow dependencies of the trace graph when constructing a
-trace schedule.  It is the responsibility of the {\it Prologue
-Schedule} to ensure that the...
+trace schedule, as the traces can be executing from different
+iterations of the original program.  The prologue schedule (described
+below) orchestrates initial executions so that the data dependences
+are satisfied.
+
+%It is the responsibility of the {\it Prologue Schedule} to ensure that the...
 
 \subsection{Prologue Schedule}
 \label{sec:prologue}
@@ -42,25 +46,27 @@ The prologue schedule is executed before the steady-state of the
 application to make sure that each trace that is scheduled to execute
 {\it before} its upstream neighbor has input to execute on the first
 iteration in the steady-state.  The prologue schedule is calculated as
-follows.  We iterate over the steady-state schedule, $S$, as
-calculated by the trace scheduler.  For each trace $t$, call {\tt
-incrementUpstream(}$t${\tt,}$S${\tt )} listed below.
+follows.  We iterate over the steady-state schedule of traces, $S$, as
+calculated by the trace scheduler.  For each trace $t$, first set
+$\mt{t.prologue} = 0$ (where $\mt{t.prologue}$ represents the
+multiplicity of $\mt{t}$ in the prologue schedule).  Then, for each
+trace, in the order in which they are scheduled, call {\tt
+incrementUpstream(}$t${\tt,}$S${\tt )} as listed below.
 
 \begin{algorithm}
-\caption{IncrementUpstream} \label{alg:incrementUpstream}
-{\tt incrementUpStream(}$t${\tt ,}$S${\tt )}. Given a trace $t$, and a
-schedule $S$ that allows us to query whether a trace is scheduled
-before another trace, $\mt{trace}.\mt{prologue}$ is
-the multiplicity of a trace in the prologue schedule, and
-$\mt{upstream}(t)$ are the upstream neighbors of $t$:
+\caption{IncrementUpstream} \label{alg:incrementUpstream} {\tt
+incrementUpStream(}$t${\tt ,}$S${\tt )}. Given a trace $t$, and a
+trace schedule $S$ that allows us to query whether a trace is
+scheduled before another trace, and $\mt{upstream}(t)$ are the
+upstream neighbors of $t$ in the trace graph:
 \begin{algorithmic}
 \FORALL {$u \in \mt{upstream}(t)$}
-\IF {$u$ scheduled before $t$}
+\IF {$u$ scheduled before $t$ in $S$}
 \STATE $u.prologue = t.prologue$
 \ELSE
 \STATE $u.prologue = t.prologue + 1$ 
 \ENDIF 
-\STATE {\tt incrementUpStream(}$s${\tt ,}$S${\tt )}
+\STATE {\tt incrementUpStream(}$u${\tt ,}$S${\tt )}
 \ENDFOR
 \end{algorithmic}
 \end{algorithm}
