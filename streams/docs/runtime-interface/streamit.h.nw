@@ -431,6 +431,7 @@ typedef struct stream_context {
   tape *input_tape;
   tape *output_tape;
   stream_type_data type_data;
+  int num_splits, num_joins;
   splitjoin_type split_type, join_type;
   int *split_ratio, *join_ratio;
   tape **split_tape, **join_tape;
