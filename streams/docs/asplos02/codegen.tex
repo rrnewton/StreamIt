@@ -43,14 +43,14 @@ see fig ??.  The loop and the body cannot execute in parallel.  We are
 investigating methods for relaxing the serialization.
 
 Next, we generate code for the collapsed Joiner nodes.  As described
-in section ??, the communication scheduler computes a buffer schedule
+in section ??, the communication scheduler computes a virtual buffer schedule
 for each collapsed Joiner.  This schedule exactly describes the order
 in which to send and receive data items from within the Joiner.  The
 schedule is annotated with the destination buffer of the receive
 instruction and the source buffer of send instruction.  Also, the
 communication scheduler calculates the maximum size of each buffer.
 With this information the code generation phase can produce the code
-necessary to realize a buffer schedule on the tile processor.
+necessary to realize the virtual buffer schedule on the tile processor.
 
 Lastly, to generate the instructions for the switch processor, we
 directly translate the switch schedules computed by the communication
