@@ -1,9 +1,39 @@
 \section{Initialization Schedules}
+\subsection{Peek Initialization Schedule}
+The StreamIt compiler is responsible for the automatic scheduling of
+the filters of the stream graph. In this context, we use the term
+scheduling to refer to the calculation of a steady-state schedule for
+a stream graph composed of StreamIt filters.  Calculating a
+steady-state schedule is orthogonal to trace scheduling. The
+steady-state schedule is calculated before entry to the space-time
+backend.  Calculating a steady-state schedule for a StreamIt stream
+graph is complicated by the presence of the {\tt peek} operation which
+implies that some programs require a separate schedule for
+initialization that is distinct from the steady-state schedule.  We
+call this stage the {\it peek initialization} stage and its schedule
+of execution, the {peek initialization schedule}.
 
-* peek initialization schedule
+A more detailed discussion of the peek initialization schedule is
+beyond the scope of this paper, see \ref{streamitcc} for a more
+detailed discussion.  But it suffices to know that there is
+need for a peek initialization schedule because the steady-state schedule
+must be periodic, that is it must preserve the number of live items on
+each channel in the graph.  The peek initialization is needed if there
+is a filter with $peek > pop$ because such a filter leaves $peek -
+pop$ items on its input channel after every firing, and thus the
+channel could never be emptied.  A separate schedule is needed to
+place at least $peek - pop$ items in the input channel to such a filter.
 
-* prologue schedule
+The peek initialization schedule and the steady-state schedule are
+both Single Appearance Schedules (SAS) meaning that each filter is
+placed in a loop and appears exactly once in the schedule.  The number
+of executions of a filter in a schedule is called its {\it
+multiplicity} in later sections.  The natural execution order for both
+the peek initialization schedule and the steady-state schedule is
+given by a breadth-first traversal of the stream graph. Of course, the
+trace scheduling phase has some freedom in ignoring the
+information-flow dependencies of the trace graph when constructing a
+trace schedule.  It is the responsibility of the {\it Prologue
+Schedule} to 
 
-\subsection{Calculation of the Prologue Schedule}
-
-To facilitate the out-of-order execution of 
+\subsection{Prologue Schedule}

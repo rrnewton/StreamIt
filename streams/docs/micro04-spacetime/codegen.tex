@@ -81,9 +81,9 @@ buffer's index variable after each execution of the work function.
 Currently, we classify filters as one of three types with respect to
 buffer management: 
 \begin{enumerate}
-\item If a filter $i$ does not contain any {\tt peek} statments, $ii$
+\item If a filter $(i)$ does not contain any {\tt peek} statments, $(ii)$
 does not contain any control-flow dependent channel expressions, and
-$iii$ has peek rate equals to pop rate, then a buffer is not needed
+$(iii)$ has peek rate equals to pop rate, then a buffer is not needed
 and {\tt pop()} statements are translated directly into static network
 receives.  There exist other initialization considerations which are
 beyond the scope of this paper.
