@@ -151,15 +151,15 @@ use the word {\it stream} to refer to any instance of a Filter,
 Pipeline, SplitJoin, or FeedbackLoop.
 
 A SplitJoin is used to specify independent parallel streams that
-diverge from a common {\it splitter} and merge into a common {\it
-joiner}.  There are two kinds of splitters: 1) Duplicate, which
+diverge from a common {\it Splitter} and merge into a common {\it
+Joiner}.  There are two kinds of Splitters: 1) Duplicate, which
 replicates each data item and sends a copy to each parallel stream,
 and 2) RoundRobin($w_1, \dots, w_n$), which sends the first $w_1$
 items to the first stream, the next $w_2$ items to the second stream,
-and so on.  RoundRobin is also the only type of joiner that we
-support; its function is analogous to a round robin splitter.  If a
+and so on.  RoundRobin is also the only type of Joiner that we
+support; its function is analogous to a RoundRobin Splitter.  If a
 RoundRobin is written without any weights, we assume that all $w_i =
-1$.  The splitter and joiner type are specified with calls to {\tt
+1$.  The Splitter and Joiner type are specified with calls to {\tt
 setSplitter} and {\tt setJoiner}, respectively (see Figure
 \ref{fig:radiocode}); the parallel streams are specified by successive
 calls to {\tt add}, with the $i$'th call setting the $i$'th stream in

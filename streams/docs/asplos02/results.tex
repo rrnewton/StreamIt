@@ -66,7 +66,7 @@ CRC & A 32-bit Cyclic Redundancy Check (CRC) Encoder/Decoder. \\
 \begin{table}[t]
 \begin{center}
 \scriptsize
-\begin{tabular}{|l|c|r|r|r|r|r|r|} \hline
+\begin{tabular}{|l|c|c|c|c|c|c|c|} \hline
 & {\bf Lines} & \multicolumn{3}{|c|}{{\bf Unoptimized}} & \multicolumn{3}{|c|}{{\bf Optimized}}\\
 \cline{3-8}
 {\bf Benchmark} &
@@ -77,19 +77,19 @@ CRC & A 32-bit Cyclic Redundancy Check (CRC) Encoder/Decoder. \\
 {\bf \# of} \\ {\bf filters}
 \end{tabular} &    
 \begin{tabular}{c} {\bf Throughput} \\
-{\bf (output / 100,000 cycles)}
+{\bf (per 10$^5$ cycles)}
 \end{tabular} &    
 {\bf MFLOPS} & 
 \begin{tabular}{c} 
 {\bf \# of} \\ {\bf filters}
 \end{tabular} &    
 \begin{tabular}{c} {\bf Throughput} \\
-{\bf (output / 100,000 cycles)}
+{\bf (per 10$^5$ cycles)}
 \end{tabular}  &
 {\bf MFLOPS}
 \\
 \hline \hline
-BeamFormer & 596 & 15 & 0.8 & 248 & 16 & 2.8 & 775\\
+BeamFormer & 596 & 15 & 0.7 & 443 & 15 & 3.5 & 1030\\
 \hline
 FM Radio & 511 & 14 & 22.4 & 141.5 & 14 & 57.4 & 363.5\\
 \hline
@@ -117,28 +117,30 @@ single Raw tile.  In some cases, we need to use an 8x8 Raw processor
 in order to have enough tiles for the Filters; otherwise, we target a
 4x4 configuration of Raw.  To obtain the ``optimized'' numbers, we
 perform a series of fusion, fission and reordering transformations to
-create an load-balanced set of filters that can be mapped onto a 4x4
-Raw processor.
+create a load-balanced set of filters that can be mapped onto a 4x4
+Raw processor. Figures~\ref{fig:opt-diagram} and
+\ref{fig:utilization-diagram} depict the impact of our load balancing
+transformations on performance and tile utilization, respectively.
 
 \begin{figure}
 \begin{minipage}{3.2in}
 \centering
 \psfig{figure=speedup-diagram.eps,width=3.3in}
-\caption{The speedup due to optimizations normalized to original performance.
+\caption{The speedup due to load balancing normalized to original performance.
 \protect\label{fig:opt-diagram}}
 \end{minipage}
 \hspace{0.1in}
 \begin{minipage}{3.2in}
 \centering
 \psfig{figure=utilization-diagram.eps,width=3.2in}
-\caption{Utilization of a tile ofter optimization normalized to the original utilization.}
+\caption{Utilization of a tile ofter load balancing normalized to the original utilization.}
 \end{minipage}
 \end{figure}
 
 The results show that for programs with substantial computation
 requirements such as the BeamFormer, the StreamIt compiler is able to
 extract good performance out of the Raw processor.  The BeamFormer
-application shows a sustained 755 MFLOPS rate, after a 350\%
+application shows a sustained 1.03 GFLOPS rate, after a 500\%
 improvement due to our optimizations.  However, programs such as FFT,
 which was created to experiment with the language features of
 StreamIt, has very little work per filter. We were unable to amortize

@@ -1,83 +1,32 @@
 ---------------------------------------------------------------------------
-comments for gordo:
-
-! I don't understand the part about push schedules "disregarding" FIFO
-buffers?
-
-! The size of the buffer is "equal" to the number of items peeked by
-the filter?  on p.17.  I think it should be greater than or equal to.
-
-- did you mean to describe the perturbation function and set of valid
-layouts in the layout section?
-
-- for sync(c), does it really add the number of tiles that are
-assigned to filters, or does it also add number of tiles assigned to
-joiners?
-
-- can we get that cost vs. time graph for beamforming annealing?
-
----------------------------------------------------------------------------
 Here's a list of things TODO:
 
-- make sure the input.pop/peek and output.push vs. pop/peek/push is
-consistent
+- caption and layout figures in partition.tex
 
-- add the ref
+- fix the key in the blocking diag
+
+- double-check beamform results and describe them throughout paper
+
+	-> do the speedups make sense?  what's relation between mflop
+		improvement and output improvement?
+	-> fix saman's graphs!
 
 --------------
+probably not doing:
 
-- finish editing the writing from the other sections
+? make layout figures and describe them
 
-- do the beamformer example:
-  - implement the fusion for the sources, and get new numbers for beamform
-  - make sure the 350% number is accurate, and adjust abstract/results
-  - get figures illustrating sequence of figures for beamformer
-  - get layout before and after
+? fix the structures figure to look like the others
 
-- rewrite the partitioning section
+? make sure the input.pop/peek and output.push vs. pop/peek/push is
+consistent
 
-- final look through
-
-- then quickly:
-  - apply for ibm prog. lang. day
-  - some tek stuff
-
-if i have time:
-
-- make figure illustrating deadlock
-
-- fix the structures figure to look like the others
+--------------
 
 for SAMAN:
 
 - fix the first sentence with something that assumes the right level
 of knowledge
-
----------------------------------------------------------------------------
-Here's a list of FIGURES we need to make:
-
-2. sequence of transformations for the software radio that makes it
-load balanced.
-
---
-
-3. illustrating pipeline fusion with initWork and steadyWork         x
-
-4. illustrating data-parallel splitjoins
-
-5. illustrating horizontal fusion
-
-5. illustrating splitting a filter into a pipline.                   no
-
---
-
-6. pushing filter through splitter or joiner node                    x
-
-7. hierarchical splitjoins                                           x
-
-8. synchronization removal of splitters/joiners with same weights    x
-
-9. nested pipeline removal                                           no
 
 ---------------------------------------------------------------------------
 HERE'S AN ABANDONED PARAGRAPH FROM THE OLD ABSTRACT

@@ -74,11 +74,11 @@ suit a given architecture.
 For Raw, the layout phase maps nodes in the stream graph to the tile
 processors.  Each Filter is assigned to exactly one tile, and no tile
 holds more than one Filter.  However, the ends of a SplitJoin
-construct are treated differently; each splitter node is folded into
-its upstream neighbor, and neighboring joiner nodes are collapsed into
-a single tile (see Section \ref{sec:rawcommunic}).  Thus, joiners
-occupy their own tile, but splitters are integrated into the tile of
-another Filter or joiner.
+construct are treated differently; each Splitter node is folded into
+its upstream neighbor, and neighboring Joiner nodes are collapsed into
+a single tile (see Section \ref{sec:rawcommunic}).  Thus, Joiners
+occupy their own tile, but Splitters are integrated into the tile of
+another Filter or Joiner.
 
 Due to the properties of the static network and the communication
 scheduler (Section \ref{sec:rawcommunic}), the layout phase does not
@@ -123,6 +123,21 @@ synchronize the routing of these items with the execution of its {\tt
 work} function.  Also, a tile that is involved in the routing of many
 channels must serialize the routes running through it.  Both limit the
 amount of parallelism in the layout and need to be avoided.
+
+\begin{figure}
+\centering
+\psfig{figure=anneal-cost.eps,width=4in}
+\parbox{4in}{\caption{\protect\small Estimated cost for successive
+configurations of the load-balanced BeamFormer layout as evaluated by
+the simulated annealing algorithm. \protect\label{fig:anneal-cost}}}
+\end{figure}
+
+Figure~\ref{fig:anneal-cost} illustrates how the cost metric varies
+over time during a run of the simulated annealing algorithm for the
+BeamFormer application.  The figure illustrates that the cost
+converges to a value that is significantly lower than a random layout.
+For the BeamFormer, the layout determined by our algorithm has a
+throughput that exceeds that of a random layout by a factor of two.
 
 %Using the parameters described above, simulated annealing calculates
 %highly optimized assignments.  In figure ??

@@ -1,11 +1,30 @@
 \begin{figure}
 \centering
-\psfig{figure=joiner-buffer-dead.eps,width=4in}
-\caption{\protect\small Example of deadlock in a SplitJoin.
-\protect\label{fig:joiner-dead}}
-\vspace{36pt}
-\psfig{figure=joiner-buffer-live.eps,width=4in}
+\psfig{figure=joiner-buffer-dead.eps,width=4.59in}
+\parbox{6in}{\caption{\protect\small Example of deadlock in a
+SplitJoin.  As the Joiner is reading items from the stream on the
+left, items accumulate in the channels on the right.  On Raw, senders
+will block once a channel has four items in it.  Thus, once 10 items
+have passed through the joiner, the system is deadlocked, as the
+Joiner is trying to read from the left, but the stream on the right is
+blocked.  The Identity filter is blocking on the send of item \#10,
+and the Splitter is blocking on the send of item \#20.  If the weights
+on the Joiner were (10, 10), the system would be deadlock-free.
+\protect\label{fig:joiner-dead}}}
+
+\vspace{48pt}
+
+\psfig{figure=joiner-buffer-live.eps,width=3.97in}
 \caption{\protect\small Fixing the deadlock with a buffering joiner.
+Here, the Joiner is modified to read items from its input channels in
+the order in which they arrive, rather than in the order specified by
+its weights.  The order of arrival is determined by a simulation of
+the stream graph's execution; thus, the system is guaranteed to be
+deadlock-free, as the order given by the simulation is feasible for
+execution on Raw.  To preserve the semantics of the Joiner, the items
+are written to the output channel from the internal buffers in the
+order specified by the Joiner's weights.  The ordered items are sent
+to the output as soon as they become available.
 \protect\label{fig:joiner-live}}
 \end{figure}
 
@@ -83,12 +102,11 @@ compiler needs only to determine the ordering of the sends and
 receives rather than arranging for a precise rendezvous between sender
 and receiver.
 
-We simulate the graph for both an initialization schedule and a steady
-state schedule (see Section \ref{sec:phases}).  A ``push schedule'' is
-used for both phases.  We define a push schedule as one that always
-fires the node that is the furthest downstream (among those that have
-enough inputs to fire).  
-% DON'T UNDERSTAND -- GORDO?
+% We simulate the graph for both an initialization schedule and a steady
+% state schedule (see Section \ref{sec:phases}).  A ``push schedule'' is
+% used for both phases.  We define a push schedule as one that always
+% fires the node that is the furthest downstream (among those that have
+% enough inputs to fire).  
 % 
 % A push schedule allows the implementation to
 % disregard the FIFO buffers that connect each neighboring node in the
@@ -107,7 +125,7 @@ receives them.  This can cause deadlock on Raw because the buffers
 between channels can hold only four elements; once a channel is full,
 the sender will block when it tries to write to the channel.  If this
 blocking propagates the whole way from the Joiner to the Splitter,
-then the entier SplitJoin is blocked and can make no progress.
+then the entire SplitJoin is blocked and can make no progress.
 
 To avoid this problem, the communication scheduler implements internal
 buffers in the Joiner node instead of exposing the buffers on the Raw
