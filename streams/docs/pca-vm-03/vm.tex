@@ -1486,7 +1486,7 @@ An example follows:
   length1 = readFile("input.dat", GLOBALMEM1, 0x1000, 1024);
 
   svm_streamInitWithDataRAM(&s0, GLOBALMEM1, 0x1000, 1024, 4, length1, TRUE, length1, svm_Stream_Never_Wraps);
-  svm_streamInitRAM(&s1, LOCALMEM1, 0x0, 256, 4, 256, svm_Stream_Unaliased_Ram);
+  svm_streamInitRAM(&s1, LOCALMEM1, 0x0, 256, 4, 256, svm_Stream_Unaliased_RAM);
   svm_streamInitRAM(&s2, LOCALMEM1, 0x100, 128, 4, 128, svm_Stream_Never_Wraps);
   svm_blockInit(&scratch, LOCALMEM1, 0x180, 32, 1);
 
