@@ -4,7 +4,8 @@ detail. The code for the trunked radio demonstrate many features of
 StreaMIT. 
 
 The high-level structure of the radio, graphically shown in
-Figure~\ref{fig:radiodiagram}, is implemented in the class {\tt TrunkedRadio}.
+Figure~\ref{fig:radiodiagram}, is implemented in the class {\tt
+TrunkedRadio}.
 
 
 
@@ -146,9 +147,8 @@ class RFtoIF extends Filter {
    Channel output = new FloatChannel();
    int sz, i;
    Float weight[];
-   void init(Float f, FloatPortal fq_set) {
+   void init(Float f) {
       set_freq(f);
-      fq_set.register(set_freq());
    }
    void work() {
       output.push(input.pop()*weight[i++]);
@@ -178,7 +178,7 @@ class CheckFreqHop extends SplitJoin {
                   void work() {
                      Float val = input.pop();
                      if(val >= MIN_TRASHOLD) 
-                        freq_hop.send(Freq[k], new TimeInterval(4*N, 6*N));
+                        freq_hop.set_freq(Freq[k], new TimeInterval(4*N, 6*N)); 
                      output.push(val);
                   }
                });
@@ -195,8 +195,8 @@ class CheckQuality extends Filter {
    Channel input = new FloatChannel();
    Channel output = new FloatChannel();
    Float ave_hi, ave_lo;   
-   BooleanPortal on_off_switch;
-   void init(BooleanPortal on_off) {
+   BoosterPortal on_off_switch;
+   void init(BoosterPortal on_off) {
       ave_hi = 0;
       ave_lo = 0;
       on_off_switch = on_off;
@@ -206,27 +206,30 @@ class CheckQuality extends Filter {
       ave_hi = max(0.9*ave_hi, val);
       ave_lo = min(1.1*ave_lo, val);
       if(ave_hi - ave_lo < QUAL_BAD_TRASHOLD)
-         on_off_switch.send(True);
+         on_off_switch.init(true);
       if(ave_hi - ave_lo > QUAL_GOOD_TRASHOLD)
-         on_off_switch.send(False);
+         on_off_switch.init(false);
       output.push(val);
    }
 }
 
-class IncreaseSignalStrength extends Stream {
+class Booster extends Stream {
    void init(boolean adds) {
       if(adds) add(new FIR(N));
    }
 }
 
 class TrunkedRadio extends Stream {
-   FloatPortal   freq_hop = new FloatPortal().
-   BooleanPortal onoff = new BooleanPortal().
+   RFtoIFPortal freq_hop = new RFtoIFPortal();
+   BoosterPortal onoff = new BoosterPortal().
    void init() {
       add(new ReadFromAtoD());
-      add(new RFtoIF(Freq[0], freq_hop));
 
-      Stream ISS = new IncreaseSignalStrength(false);
+      RFtoIF RF2IF = new RFtoIF();
+      add(RF2IF);
+      freq_hop.register(RF2IF);
+
+      Booster ISS = new Booster();
       add(ISS);
       onoff.register(ISS);
  
