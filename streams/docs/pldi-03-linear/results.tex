@@ -1,61 +1,69 @@
 \section{Results}
 We chose to measure the strength of our optimizations in terms of 
 floating point instruction reduction. The StreamIt compiler currently
-has two code generation backends. The uniprocessor backend generates C code
-that can be compiled and linked against a supporting library to produce an
-executable. There is also a backend that generates code designed to be 
-run on the RAW microprocessor\cite{waingold97baring, raw-micro}, which features
-a communication exposed grid of processors with various communication facilities. 
-Mapping a StreamIt program on to the raw architecture is complicated
-by issues of communication, load balancing and partitioning\cite{streamit-asplos}
-and the effects of the linear analysis optimizations presented above can not
-be easily differentiated in differences in placement, routing and fusion. Therefore
-we chose to use the uniprocessor backend for our measurements.
+has two code generation backends. The uniprocessor backend generates sequential C code
+that can be compiled and linked against a supporting library. 
+There is also a backend that generates code for the RAW microprocessor
+\cite{waingold97baring, raw-micro}, which features
+a grid of processors interconnected via various communication facilities. 
+Mapping a StreamIt program on to the RAW architecture is complicated
+by issues of communication, load balancing and partitioning\cite{streamit-asplos}. 
+Therefore, the effects of our linear analysis optimizations can not
+be easily differentiated from differences in placement, routing and fusion that result
+from modifying the program's stream graph (as is the case for linear replacement). 
+Therefore we chose to use the uniprocessor backend for our measurements.
 
 \subsection{Measurement Methodology}
-As always, it is not totally clear what the appropriate metric for measuring performance
-is for our uniprocessor programs. Measuring running time is complicated by the multitasking
-environment offered by modern operating systems. Given that the uniprocessor backend for
-the StreamIt compiler is meant as a prototyping system, the supporting library is anything
-but optimized, so measutring timing information is probably not very useful anyways.
+As always, the appropriate metric to measure performance is not totally clear. 
+Running time is complicated by the multitasking environment offered by 
+modern operating systems. Also, given that the uniprocessor backend for
+the StreamIt compiler is meant for prototyping, the supporting 
+library is anything but optimized. Therefore, measuring running time is
+probably not an appropriate metric.
 
-The optimizations that we have presented are all aimed at reducing the amount of 
-computation that is performed. Most of the applications that are and will
-be written in streamit process floating point instructions(FLOPs), so reducing their
-number is advantageous. Therefore, we choose as our measurement metric the number of 
-floating point instructions executed.
+The fundamental metric of processing performance is amount of computation, and since
+our optimizations are both aimed at reducing the amount of computation we will focus 
+on that reduction in our results section. Most of the applications that are and will
+be written in StreamIt process floating point data with floating point instructions (FLOPs), 
+and so reducing their number is good for overall performance. 
+Therefore, we chose the reduction in FLOPs as our measurement metric executed.
 
 Our measurement platform was a Dual Intel 2.2 GHz P4 Xenon processor system 
-running Linux.
+running Linux. We compiled the benchmark programs using StreamIt's uniprocessor
+and compiled the resulting C code with {\tt gcc}, with {\tt -O2} optimization.
 
-Obviously counting statically the number of FLOPs is not helpful, so we need to
-measure the number of floating point instructions that are executed at runtime.
-To do this dynamic measurement, we utilized the DynamoRIO\cite{rio-webpage}
-runtime introspection and optimization infrastructure. Using DynamoRio we
-inserted counters into the program stream that counted the number of floading point
-operations as each basic block was executed. We define
+Obviously statically counting the number of FLOPs in a program is not helpful. We 
+need to measure the number of floating point instructions that are executed at runtime.
+To do measure FLOPs dynamically, we utilized the DynamoRIO\cite{rio-webpage}
+runtime introspection and optimization infrastructure. Using a simple DynamoRIO application 
+we instrumented each benchmark program at runtime and counted the number of FLOPs executed.
 
+
+We define three instruction types of interest for the Intel x86 instruction set:
 \begin{itemize}
-\item[flops] Any instruction that begins with {\tt f} in the x86 instruction set.
+\item[flops] Any opcode whose name that begins with {\tt f} in the x86 instruction set.
 \item[fadds] Any of ({\tt fadd faddp fiaddp fsub fsubp fisubp fsubr fsubrp fisubr}).
 \item[fadds] Any of ({\tt fmul fmulp fimulp fdiv fdivp fidivp fdivr fdivrp fidivr}).
 \end{itemize}
 
-The benchmark programs that we used are:
+There are no standard benchmark written for StreamIt, so we had to assemble
+a set of programs which perform computations that are likely to be representative
+real world applications. We settled on a set of six, which we describe below.
 
 \begin{enumerate}
-\item FilterBank: Implements a multi-rate signal processing block common in communications and image processing.
-\item FIR: A single 100 point rectangularly windowed low pass filter with $\omega_c=\frac{\pi}{3}$
-\item FMRadio Implements the demodulation and processing necessary for an FM radio in software.
-\item RateConverter Changes the effective sampling rate of the input sequence by a factor of $\frac{3}{2}$.
-\item TargetDetect Four matched filters performing target detection in parallel.
-\item Radar Beamformer, radar array and radar frontend.
+\item FilterBank: Implements a multi-rate signal decomposition processing block which is common in communications and image processing.
+\item FIR: A single 100 point FIR filter which implements a low pass filter with cutoff frequency $\omega_c=\frac{\pi}{3}$
+\item FMRadio: Implements an FM demodulator in software.
+\item RateConverter: Converts a sampling rate $f_{s1}=\frac{1}{T}$ to $f_{s2}=\frac{3}{2T}$.
+\item TargetDetect: Four matched filters perform threshold target detection in parallel.
+\item Radar: radar frontend, beamformer and target detection.
 \end{enumerate}
 
 
 \subsection{Linear Replacement}
+
 \begin{figure}
-\center
+x\center
 \epsfxsize=3.0in
 \epsfbox{images/combination-graph.eps}
 \caption{Performance gains realized by replacing structures with direct linear forms.}
