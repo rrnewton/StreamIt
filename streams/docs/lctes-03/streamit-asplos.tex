@@ -107,24 +107,25 @@ modules that admit a linear textual representation.  In addition, it
 helps the compiler by restricting certain analyses to a local level
 rather than dealing with global properties of the graph.  In the
 context of scheduling, hierarchy is also useful because it allows for
-the separate compilation of program components.  This enables
+the separate compilation of program components.  This enables the
 creation of standardized libraries and their distribution in binary
 form, rather than source code.  This ability may become important as
 streaming languages become more widely used for larger applications.
 
 Another important feature of StreamIt---and one that requires special
 support from the scheduler---is the peek construct.  By using the peek
-command, a filter can examine input items at a given index without
-dequeuing them from the channel.  This exposes to the compiler the
-reuse of input items between successive invocations of a filter's work
+command, a filter can examine an input item at a given index without
+removing it from the channel.  This exposes to the compiler the reuse
+of input items between successive invocations of a filter's work
 function.  A primary example is an FIR filter, which pops 1 item but
 peeks N items.  Without the capability to peek, the programmer would
 have to maintain a persistent circular buffer within the filter to
-retain previous input items.  Apart from being difficult to program,
-this would greatly complicate compiler analysis.  In particular, the
-linear analysis and optimization passes within the StreamIt compiler
-benefit greatly from analyzing peek statements directly instead of
-reverse-engineering internal filter state~\cite{lamb03}.
+retain previous input items.  Apart from being difficult to implement
+and understand, this would greatly complicate compiler analysis.  In
+particular, the linear analysis and optimization passes within the
+StreamIt compiler benefit greatly from analyzing peek statements
+directly instead of reverse-engineering internal filter
+state~\cite{lamb03}.
 
 \begin{figure}[t]
 \begin{center}

@@ -109,12 +109,13 @@ Figure~\ref{fig:trace} is the best SAS schedule for this case.
 %np-hard to determine the one that gives the smallest buffers.
 
 At the other end of the spectrum is a push schedule, which results in
-the minimal buffer size at the expense of code size.  A push schedule
-starts by executing the top-most node, and then pushes the items
-produced through the rest of the graph, always executing the most
-downstream node possible.  When no further node can fire, the top node
-is executed again.  In this case, the push schedule reduces the buffer
-size by 48\% but increases code size by 325\% over the SAS schedule.
+the minimal buffer size at the expense of code size
+(Figure~\ref{fig:trace}(c)).  A push schedule starts by executing the
+top-most node, and then pushes the items produced through the rest of
+the graph, always executing the most downstream node possible.  When
+no further node can fire, the top node is executed again.  In this
+case, the push schedule reduces the buffer size by 48\% but increases
+code size by 325\% over the SAS schedule.
 %However, since the code was originally smaller than the buffers, the
 %total amount of space required decreases slightly (see
 %Figure~\ref{fig:codedata}).
