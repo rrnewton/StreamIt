@@ -8,11 +8,12 @@ Application     MFLOPS     % Util.    Throughput**    Date     Who        Status
 -------------------------------------------------------------------------------------------------------
 FFT             304         63            ?          7/24     Bill      Mostly done (for N=64; could do others too)
 FFT             181.6       41.7%         2141.9     7/26     Andrew    Mostly done (for N=64; could do others too)
-FMRadio         ?           ?             ?          ?       ?          Not looked at.
+FMRadio         421         73            53.85      7/29    David      Done, I think
 BeamFormer      ?           ?             ?          ?       ?          Waiting for Hank.
 Vocoder         ?           ?             ?          ?       ?          Needs 2-stage fusion.
 Nokia           ?           ?             ?          ?       Jasper     Being optimized.
 GSM             ?           ?             ?          ?       ?          Not looked at.
+FIR-fine        730         71            1111.1     7/29    David      Done, I think
 
 MatrixMultiply  15.4        42.5          161.6      7/26    Andrew     Not looked at.
 Lincoln Labs    ?           ?             ?          ?       ?          Stuck in frontend?
