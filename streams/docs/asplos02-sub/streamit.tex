@@ -52,7 +52,7 @@ void->void pipeline FMRadio {
 \vspace{-12pt}
 \caption{\protect\small Parts of an FM Radio in StreamIt.
 \protect\label{fig:radiocode}}
-\vspace{-6pt}
+\vspace{-12pt}
 \end{figure}
 
 \begin{figure}[t]
@@ -120,14 +120,13 @@ always have that $peek \ge pop$.} on each invocation are declared with
 the {\tt work} function.
 
 In addition to {\tt work}, a filter can contain a {\tt prework}
-function that is executed exactly once between the initialization
-period and the steady-state.  Like {\tt work}, {\tt prework} can
-access the input and output tapes of the filter; however, the I/O
-rates of {\tt work} and {\tt prework} can differ.  In an {\tt
-FIRFilter}, a {\tt prework} function is essential for correctly
-filtering the beginning of the input stream.  The user never calls the
-{\tt init}, {\tt prework}, and {\tt work} functions--they are all
-called automatically.
+function that is executed exactly once between initialization and the
+steady-state.  Like {\tt work}, {\tt prework} can access the input and
+output tapes of the filter; however, the I/O rates of {\tt work} and
+{\tt prework} can differ.  In an {\tt FIRFilter}, a {\tt prework}
+function is essential for correctly filtering the beginning of the
+input stream.  The user never calls the {\tt init}, {\tt prework}, and
+{\tt work} functions--they are all called automatically.
 
 %% StreamIt's representation of a filter is an improvement over
 %% general-purpose languages.  In a procedural language, the analog of a

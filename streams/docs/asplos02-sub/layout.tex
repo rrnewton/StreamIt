@@ -4,11 +4,11 @@
 The goal of the layout phase is to assign nodes in the stream graph to
 computation nodes in the target architecture while minimizing the
 communication and synchronization present in the final layout.  The
-final layout assigns exactly one node in the stream graph to one
-computation node in the target.  The layout phase assumes that the
-given stream graph will fit onto the computation fabric of the target
-and that the filters are load balanced.  Both of these requirements
-are satisfied by the partitioning phase described above.
+layout assigns exactly one node in the stream graph to one computation
+node in the target.  The layout phase assumes that the given stream
+graph will fit onto the computation fabric of the target and that the
+filters are load balanced.  These requirements are satisfied by the
+partitioning phase described above.
 
 %Classically, layout (or placement) algorithms have fallen into two
 %categories: constructive initial placement and iterative improvement

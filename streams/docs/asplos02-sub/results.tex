@@ -1,23 +1,43 @@
+\begin{figure}
+\centering
+\vspace{6pt}
+\psfig{figure=speedup-graph.eps,width=2.95in}
+\vspace{-6pt}
+\caption{\protect\small StreamIt throughput on a 16-tile Raw machine,
+normalized to throughput of hand-written C running on a single Raw
+tile.  \protect\label{fig:compare-raw}}
+\vspace{-12pt}
+\end{figure}
+
+\begin{figure}
+\centering
+\psfig{figure=throughput-graph.eps,width=3.2in}
+\vspace{-6pt}
+\caption{Throughput of StreamIt code running on 16 tiles and C code
+running on a single tile, normalized to throughput of C code on a
+Pentium IV. \protect\label{fig:compare-pentium}}
+\vspace{-12pt}
+\end{figure}
+
 \section{Results}
 \label{sec:results}
 
-We have implemented a fully-functional prototype of the StreamIt
-compiler for the Raw architecture.  The compilation process is fully
-automated, and includes the optimizations that we have described:
-synchronization elimination, modulo expression elimination (vertical
-fusion), buffer localization (vertical fusion), and buffer sharing
-(horizontal fusion).
+Our current implementation of StreamIt supports fully automatic
+compilation through the Raw backend.  We have also implemented the
+optimizations that we have described: synchronization elimination,
+modulo expression elimination (vertical fusion), buffer localization
+(vertical fusion), and buffer sharing (horizontal fusion).
 
 We evaluate the StreamIt compiler for the set of applications shown in
-Table~\ref{tab:benchmarks}.  For each benchmark, we show the number of
-lines of StreamIt code, the occurrence of each stream construct, and
-the number of nodes required to execute the expanded graph on Raw.
-
-Our results appear in Table~\ref{tab:performance}.  For each
-application, we compare the throughput of StreamIt with a hand-written
-C program, running the latter on either a single tile of Raw or on a
-Pentium IV.  For Radio, GSM, and Vocoder, the C source code was
-obtained from a third party; in other cases, we wrote a C
+Table~\ref{tab:benchmarks}; our results appear in
+Table~\ref{tab:performance}.
+%  For each benchmark, we show the number of
+%lines of StreamIt code, the occurrence of each stream construct, and
+%the number of nodes required to execute the expanded graph on Raw.
+For each application, we compare the throughput of StreamIt with a
+hand-written C program, running the latter on either a single tile of
+Raw or on a Pentium IV.  For Radio, GSM, and Vocoder, the C source
+code was obtained from a third party; in other cases, we wrote a C
 implementation following a reference algorithm.  For each benchmark,
 we show MFLOPS (which is N/A for integer applications), processor
 utilization (the percentage of time that an {\it occupied tile} is not

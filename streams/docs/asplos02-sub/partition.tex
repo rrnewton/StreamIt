@@ -278,6 +278,7 @@ filter that represents the entire splitjoin.
 %of the splitjoin, and once at the end of the steady work function, to
 %account for items consumed by other components.
 \protect\label{fig:fission-peek}}
+\vspace{-3pt}
 \end{figure}
 
 \subsection{Fission Transformations}
@@ -341,11 +342,10 @@ graph so as to facilitate fission and fusion transformations.  For
 instance, neighboring splitters and joiners with matching weights can
 be eliminated (Figure~\ref{fig:sync-removal}); a splitjoin construct
 can be divided into a hierarchical set of splitjoins to enable a finer
-granularity of fusion (Figure~\ref{fig:splitjoin-split}); and
+granularity of fusion (Figure~\ref{fig:splitjoin-split}); and 
 identical stateless filters can be pushed through a splitter or joiner
-node if the weights are adjusted accordingly
-(Figure~\ref{fig:filter-hoisting}).  Many of these transformations
-were useful in load balancing our test applications.
+node if the weights are adjusted accordingly.
+%(Figure~\ref{fig:filter-hoisting}).  
 
 \begin{figure}[t]
 \centering
@@ -361,12 +361,13 @@ is especially valuable in the context of libraries--many distinct
 components can employ splitjoins for processing interleaved data
 streams, and the modules can be composed without having to synchronize
 all the streams at each boundary.  \protect\label{fig:sync-removal}}
+\vspace{-7pt}
 \end{figure}
 
 \begin{figure}[t]
 \centering
-\vspace{12pt}
 \psfig{figure=splitjoin-split.eps,width=3.2in} 
+\vspace{-6pt}
 \caption{\protect\small Breaking a splitjoin into hierarchical units.
 Though our horizontal fusion algorithms work on the granularity of an
 entire splitjoin, it is straightforward to transform a large splitjoin
@@ -381,7 +382,7 @@ help load-balance the \Radar~ application (see Section~\ref{sec:results}).
 %% stateless filter to be moved across a joiner node if its $push$ value
 %% evenly divides the weights of the joiner.
 %% \protect\label{fig:filter-hoisting}}
-\vspace{-12pt}
+\vspace{-18pt}
 \end{figure}
 
 \subsection{Automatic Partitioning}
