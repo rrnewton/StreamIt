@@ -7,31 +7,54 @@ in Table~\ref{tab:stages}. We have implemented all the phases of the
 compiler as well as the optimizations except for the optimization
 selection, which is currently done by the programmer.
 
+\begin{table}[t]
+\begin{center}
+\scriptsize
+\begin{tabular}{|l|l|} \hline
+Benchmark & Description\\
+\hline \hline
+FM Radio & A software-based FM Radio with equalizer\\
+\hline
+GSM & A GSM Decoder\\
+\hline
+Beamformer & code of modern radar, sonar, and communications signal processors \cite{pca}\\
+\hline
+FFT & A 64-element FFT filter \\
+\hline
+CRC & A 32-bit Cyclic Redundancy Check (CRC) Encoder/Decoder\\
+\hline
+\end{tabular}
+\vspace{-6pt}
+\caption{\protect\small Application Characteristics}
+\label{tab:benchmarks}
+\vspace{-12pt}
+\end{center}
+\end{table}
 
 
-We have evaluated our compiler with StreamIt versions of the following
-applications: 
-\begin{itemize}
 
-\item A software-based FM Radio with
-equalizer, 
+%We have evaluated our compiler with StreamIt versions applications: 
+%\begin{itemize}
+%
+%\item A software-based FM Radio with
+%equalizer, 
+%
+%\item A GSM Decoder, which takes GSM-encoded parameters as
+%inputs, and uses these to synthesize audible speech, 
+%
+%\item A beamformer
+%which encapsulates the core functionality of modern radar, sonar, and
+%communications signal processors -- modeled after a system from the
+%Polymorphic Computing Architecture (PCA) \cite{pca}
 
-\item A GSM Decoder, which takes GSM-encoded parameters as
-inputs, and uses these to synthesize audible speech, 
+%\item A 64-element FFT filter implemented as a pipeline of a bit reversal 
+%filter followed by multiple-stage butterfly filters.
 
-\item A beamformer
-which encapsulates the core functionality of modern radar, sonar, and
-communications signal processors -- modeled after a system from the
-Polymorphic Computing Architecture (PCA) \cite{pca}
+%\item A Cyclic Redundancy Check (CRC) Encoder/Decoder, which is an error detection system utilizing a predefined 32 bit generator polynomial.  It can detect errors in bit strings of up to 64KB in size with 99.99999997% accuracy.
 
-\item A 64-element FFT filter implemented as a pipeline of a bit reversal 
-filter followed by multiple-stage butterfly filters.
+%\item Matrix Multiplication 
 
-\item A Cyclic Redundancy Check (CRC) Encoder/Decoder, which is an error detection system utilizing a predefined 32 bit generator polynomial.  It can detect errors in bit strings of up to 64KB in size with 99.99999997% accuracy.
-
-\item Matrix Multiplication 
-
-\item A MP3
+%\item A MP3
 
 %\item A performance test from the SpectrumWare system that
 %implements an Orthogonal Frequency Division Multiplexor (OFDM)
@@ -39,7 +62,7 @@ filter followed by multiple-stage butterfly filters.
 %of the above applications including the number of filters implemented
 %and the size of the stream graph as coded.
 
-\end{itemize}
+%%\end{itemize}
 
 
 \begin{table}[t]
@@ -68,7 +91,7 @@ cycles / output
 MFLOPS
 \\
 \hline \hline
-BeamFormer & 596 & 15 &  & 525 & & 16 & 2300\\
+BeamFormer & 596 & 15 & 125000 & 525 & 16 & 35714 & 2300\\
 \hline
 FM Radio & 511 & 14 & 4466 & 141.5 & 14 & 1742 & 363.5\\
 \hline
@@ -105,7 +128,7 @@ extract exteremly good performance out of the Raw processor. A
 sustained 2.3 GFLOPS rate after 438% improvement due to our
 optimizations. However programs such as FFT, which was created to
 experiment with the languatge features of StreamIt, has very little
-work per filter. We were unable to amortize the code generation
+work per filter. We were unable to amortize the communication
 overhead for FFT, leading to a slowdown. Better tile code generation
 and traditional optimizations may help in this. 
 
