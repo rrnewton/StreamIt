@@ -9,7 +9,7 @@ in streaming codes does not require heroic efforts, and thus,
 processors can deliver higher performance with significantly lower
 power costs. This is especially important since
 leading microprocessor companies have realized that modern general
-purpose architecture are near their  performance limits for  the
+purpose architectures are near their  performance limits for  the
 amount of power they consume. Thus, the future will place a greater
 emphasis on exploiting the properties of streaming workloads in
 conventional von~Neumann architectures.
@@ -23,8 +23,8 @@ methodology for compiling streaming codes to general purpose,
 cache-based architectures. We first introduce a simple model for
 reasoning effectively about the caching behavior of streaming
 workloads. This models serves as a foundation for several {\it cache-aware
-optimizations} that are geared toward concomitantly increasing the {\it
-temporal locality} of the instruction and data caches. These
+optimizations} that are geared toward the concomitant increase of instruction
+and data {\it temporal locality}. These
 optimization lead to significantly better utilization of the memory
 system, and as such, they deliver performance gains ranging from XXX
 to XXX\% for our streaming benchmark suite.
@@ -34,7 +34,7 @@ language that is engineered for streaming
 applications~\cite{streamit}. It adopts the 
 Cyclo-Static Dataflow~\cite{BELP96} model of computation which is a
 generalization of Synchronous Dataflow~\cite{LM87-i} (SDF).  
-SDF is a popular  model~\cite{LM87-i} that  is well suited for
+SDF is a popular  modelthat  is well suited for
 streaming codes. In SDF, computation is represented as a graph
 consisting of {\it  actors} connected by communication channels; the
 actors consume  and produce a constant number  of items from their
@@ -60,20 +60,19 @@ is because actors produce data that must be buffered, and therefore,
 we must also consider the amount of data an actor produces and
 consumes if we are to adequately manage the data cache. This paper is unique
 in that it is the first to present a unified optimization methodology
-for streaming computation that
-simultaneously considers instruction and data locality for
-cache-based architectures.
+that simultaneously considers instruction and data locality for
+mapping streaming computation to cache-based architectures.
 
 In terms of improving the data cache behavior, the compiler schedules
 actor firing such that the producer-consumer locality is
 preserved. Furthermore,  the compiler may {\it fuse}
-together two or more are actors to form a coarser grained kernel.
+together two or more actors to form a coarser grained kernel.
 The fusion allows for better register allocation as we can
 destroy the arrays used to buffer data between the actors and replace
 the corresponding array references with scalars.  It also allows for
 various competing implementations for managing the buffers between the
 fused actors.  This paper evaluates several implementation
-alternatives (for buffer management) and introduces a formal model or
+alternatives (for buffer management) and introduces a formal model for
 estimating their impact on performance.
 
 The methodology for fusing actors leverages a distinguishing StreamIt
@@ -88,7 +87,9 @@ some challenges to the compiler and the cache optimizations. Peeking
 also impacts the choice for the best buffer management strategy, as our
 model will show.
 
-While fusion alone delivers significant performance gains, our
+%% the comment about p3 and itanium not being embedded architectures
+%% is out of the blue! need a better transition.
+Fusion alone delivers significant performance gains, although our
 evaluation shows that fusion with scaling leads to the best
 performance on a general purpose, cache-based architecture. For our
 experiments, we use two different processors: a superscalar out-of-order
@@ -106,7 +107,7 @@ architecture with more register to benefit more from optimization such
 as scalar replacement. On average, fusion leads to a XXX\% improvement
 on the Pentium~3, and XXX\% on the Itanium~2.
 
-The two architecture also differ in terms of their memory system
+The two architectures also differ in terms of their memory system
 organization. The Itanium is an in-order VLIW processor and does not
 tolerate a memory stall as well as its out-of-order
 counterpart. Therefore we expect different gains from the scaling
@@ -118,7 +119,6 @@ While both scaling and fusion lead to modest performance gains, we
 must combine the two to deliver the best possible performance. When we
 do so, we can further improve the performance of our benchmarks by
 XXX\% on average for the Pentium~3, and XXX\% for the Itanium~2.
-
 
 \subsection{Summary of Contributions}
 
