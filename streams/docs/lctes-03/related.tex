@@ -5,10 +5,10 @@ There has been a wealth of research on scheduling dataflow graphs.
 This section introduces some of the other projects.
 
 Ptolemy \cite{ptolemyoverview} is a simulation environment for
-heterogenous embedded systems, including Synchronous Data Flow,
-the method used for {\StreamIt}. {\SDF} programs, however, do not
-include the peeking constructs of {\StreamIt}.  In {\SDF} languages,
-actors are the active computational elements ({\filters}).  {\SDF}
+heterogenous embedded systems, including Synchronous Data Flow, the
+method used for {\StreamIt}. {\SDF} programs, however, do not include
+the peeking constructs of {\StreamIt}.  In {\SDF} languages, actors
+are the active computational elements ({\filters}).  The {\SDF}
 computation model does not impose structure on the program.  All
 actors are allowed to have multiple input and output channels.
 \cite{benveniste93dataflow} provides an overview of dataflow
@@ -27,8 +27,8 @@ Other publications focus on synthesis of software for embedded
 systems. \cite{bhat1999x1} recognizes that non single-appearance
 schedules which inline actor invocations have problems with code
 growth.  A hybrid model is introduced, where actor invocations are
-inlined unless the resulting code grow too large. If inlining is
-not performed, actors are invoked through a function call.
+inlined unless the resulting code grows too large. If inlining is not
+performed, actors are invoked through a function call.
 
 Other approaches to reducing the buffering requirements use buffer
 merging \cite{murthy99buffer}, a technique which will be explored for
@@ -36,11 +36,11 @@ merging \cite{murthy99buffer}, a technique which will be explored for
 
 Many publications focus on synthesis for hardware systems.  Such
 systems can execute multiple actors at once
-\cite{govindarajan-minimizing}.  Currently {\StreamIt} compiler
-produces code for uniprocessor architectures \cite{streamittech2}
+\cite{govindarajan-minimizing}.  Currently the {\StreamIt} compiler
+produces code for uniprocessor architectures \cite{thies02streamit}
 and for the RAW processor \cite{gordo-thesis}.  RAW processor can
-execute multiple {\filters} in parallel, but every parallel
-execution is given its own separate set of resources like memory.
+execute multiple {\filters} in parallel, but every parallel execution
+is given its own separate set of resources like memory.
 
 There are some streaming computation models which are less constrained
 than {\SDF}. The most relevant is Cyclo-Static Data Flow (CSDF)
