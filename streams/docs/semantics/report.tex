@@ -1,17 +1,11 @@
-\documentstyle[psfig,lgrind,wide]{article}
-\title{StreaMIT Intermediate Representation \\ Version 2.2}
+\documentclass[twocolumn, draft]{article}
+\usepackage{psfig, wide}
+\title{StreaMIT Intermediate Representation \\ Version 0.3-pre}
+\author{Stream Worshipers Inc.}
 
 
 \begin{document}
 \maketitle
-
-\begin{verbatim}
-things to add:
-- initialization
-- hierarchical naming 
-- how to do merges with the packaging semantics
-- direct name invocation of messages
-\end{verbatim}
 
 \section{Basic Ideas}
 
@@ -148,6 +142,18 @@ The above creates three filters connected in series.
 
 The Message function for a FilterBlock looks/works
 identically to Filter's Message function.
+
+\section{StreamID}
+
+As seen before, StreamID is used to keep track of other blocks in the 
+program.  They can only be assigned values in Init function, only 
+values from parameters and/or internal blocks can be used to assign
+to a StreamID variable, and a value of a StreamID variable must be
+static for every invocation of the Init function (this is somewhat
+clumsy - can we fix this somehow?).
+
+StreamID is used to call Init function on a particular block and for
+sending messages.  There are several exaples of StreamID in this document.
 
 \section{Pipe}
 
@@ -309,12 +315,15 @@ type Karaoke
   StreamID me;
   Init (float micVol, float speakerVol)
   {
-    Split (RoundRobin, RoundRobin) // first RoundRobin is unnecesary...
+    // first RoundRobin is unnecesary..
+    Split (RoundRobin, RoundRobin)
     {
       Microphone left (micVol);
       Microphone right (micVol);
     }
-    LeftHeavySplit customSplit; // would give strange sound effect here...
+
+    // would give strange sound effect here
+    LeftHeavySplit customSplit; 
     Speaker left;
     Speaker right;
     me = this.GetID ();
@@ -346,7 +355,9 @@ Init (AudioType preset, float volume)
         FilterBass (0.5);
         FilterTreble (1);
       case Vocal:
-        // do nothing here - Vocal can be played on speaker as is...
+        // do nothing here...
+        // Vocal can be played 
+        // on speaker as is...
       case Heavy:
         FilterBass (1.5);
         FilterTreble (0.75);
@@ -360,36 +371,112 @@ Init (AudioType preset, float volume)
 There is a restriction on parameters allowed to control StreamSelect - they
 must all be constants computable at compile time.
 
-\section{Feedback}
+\section{FeedbackBlock}
 
 Some stream applications require feedback loops for data processing.
 Here we define a type that allows us to create feedback loops
 in our stream graph.
 
-A Feedback type uses two inputs and one output.  The first input
+A FeedbackBlock type is very similar to FilterBlock, but it uses two inputs 
+and one output.  The first input
 is from the outside stream.  The second input is the feedback input.
-The last block of the Init function in a Feedback block defines
-the feedback filter.  [Finish this!]
+The feedback input is defined using FeedbackPath construct.  FeedbackPath
+allows us to specify in the Init function what type of FeedbackPath will
+be used.  FeedbackPath must be used exactly once per Init function, and
+may only be used in FeedbackBlock.
 
-\section{StreamID}
+A FeedbackBlock does not have a Work function, but its first non-source
+block must be a Merge.
 
-StreamID is an internal data type which allows for refering
-to filter blocks.  Data of StreamID type has an unusual restriction on its
-use, which is that every time a variable of StreamID type is being
-accessed, it should have exactly one reaching definition for all
-paths of the program.
+\begin{verbatim}
+type NegFeedbackAmplifierMerge is CustomMerge
+{
+  input float audioIn;
+  input float feedback;
+  output float audioOut;
+  float ampGain;
+  float amplification;
+  Work ()
+  {
+    // this basically implements a negative feedback
+    // loop with an amp of set gain and a set target
+    // amplification.
+    float in = audioIn [0];
+    float out = feedback [0];
+    float negFeed = in + 
+      (in + out) / (-amplification + 1);
+    float result = - negFeed * ampGain;
+    audioOut [0] = result;
+	
+    audioIn.release (1);
+    audioIn.advance (1);
+    feedback.release (1);
+    feedback.advance (1);
+    audioOut.push (1);
+  }
 
-\begin{figure}[t]
-\centerline{\psfig{figure=block.ps}}
-\vspace{-24pt}
-\caption{\protect\small The block construct.}
-\end{figure}
+  // note: here a is the POSITIVE amplification
+  Init (float a, float gain)
+  {
+    ampGain = gain;
+    amplification = -a;
+  }
+};
 
-\section{old stuff}
+type NegFeedbackBuffer is Filter
+{
+  input float in;
+  output float out;
+  Work ()
+  {
+    in [0] = out [0];
 
-\begin{lgrind}
-\input{code.tex}
-\end{lgrind}
+    in.release (1);
+    in.advance (1);
+    out.push (1);
+  }
+
+  Init (int delay)
+  {
+    for (int i = 0; i < delay; i++)
+    {
+      out [i] = 0;
+    }
+    out.push (delay);
+  }
+};
+
+type NegFeedbackAmplifier is NegFeedbackAmp
+{
+  input float in;
+  input float feedback;
+  output float out;
+
+  Init(float amp)
+  {
+    // gain = amp * 10 should be sufficient
+    NegFeedbackAmplifierMerge (amp, amp * 10);
+
+    // feedback will be delayed by 2 
+    FeedbackPath NegFeedbackBufffer myBuffer (2);
+  }
+};
+
+\end{verbatim}
+
+
+%\begin{figure}[t]
+%\centerline{\psfig{figure=block.ps}}
+%\vspace{-24pt}
+%\caption{\protect\small The block construct.}
+%\end{figure}
+
+%\section{old stuff}
+
+%\begin{lgrind}
+%\input{code.tex}
+%\end{lgrind}
+
 
 \end{document}
 
