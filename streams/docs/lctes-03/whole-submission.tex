@@ -33,7 +33,7 @@
   page.  To copy otherwise, to republish, to post on servers or to
   redistribute to lists, requires prior specific permission and/or a
   fee.} \par
-  {\it LCTES'03}, June 11--13, 2003, San Diego, California, USA. \par
+  {\confname LCTES'03}, June 11--13, 2003, San Diego, California, USA. \par
   Copyright 2003 ACM 1-58113-647-1/03/0006 ...\$5.00 \\ ~ \\ ~ \\
  }
 
@@ -403,7 +403,6 @@ for code and data.\protect\label{fig:codedata}}
 \end{figure}
 
 %\input{streamit}
-
 \subsection{The {\StreamIt} Language}
 \label{sec:streamit}
 
@@ -572,7 +571,6 @@ Radio. \protect\label{fig:radio-ascoded}}
 %% messaging system, {\StreamIt} is equipped to support full application
 %% development--not just high-bandwidth data channels, but also events,
 %% control, and re-initialization.
-
 
 \section{StreamIt Scheduling Concepts}
 \label{chpt:sched-basic}
@@ -786,16 +784,16 @@ the stream graphs in Figure~\ref{fig:steady-state} are as follows:
 ~ & \mt{steady}(B) = 6 \\
 ~ & \mt{steady}(C) = 9 \\
 ~ & \mt{steady}(D) = 3 \\
-~ & ~ \\
+~ & ~ \vspace{-4pt} \\
 \mbox{Sample SplitJoin}: & \mt{steady}(splitter) = 2 \\
 ~ & \mt{steady}(A) = 2 \\
 ~ & \mt{steady}(B) = 1 \\
 ~ & \mt{steady}(joiner) = 2 \\
-~ & ~ \\
+~ & ~ \vspace{-4pt} \\ 
 \mbox{Sample FeedbackLoop}: & \mt{steady}(joiner) = 6 \\
 ~ & \mt{steady}(B) = 15 \\
 ~ & \mt{steady}(splitter) = 5 \\
-~ & \mt{steady}(L) = 3 \\
+~ & \mt{steady}(L) = 3 \vspace{4pt}\\
 \end{tabular}
 \end{equation*}
 Note that these numbers represent the multiplicity of each node in one
@@ -900,7 +898,6 @@ need to be initialized before it can enter steady state execution.
 %% above schedule we can run-length encode it.  The schedule becomes
 %% $\{A \{2B\}\{2C\}\{3B\}\{2C\}\}$.
 
-
 \section{Phased Scheduling}
 \label{chpt:phased}
 
@@ -970,8 +967,9 @@ items as far forward as possible, only executing the entrance node
 again if the exit node could not fire.
 
 \begin{figure}[t]
+\vspace{3pt}
 \psfig{figure=pseudocode5.eps,width=3.5in}
-\vspace{-30pt}
+\vspace{-26pt}
 \caption{\small Phased Scheduling Algorithm.\protect\label{fig:phasealg}}
 \vspace{-8pt}
 \end{figure}
@@ -1262,7 +1260,6 @@ a given feedback loop.\protect\label{fig:feedalg}}
 %\input{hierarchical}
 %\input{phased}
 %\input{constrained}
-
 \section{Results}
 \label{chpt:results}
 
@@ -1293,8 +1290,7 @@ performs a 32 element bitonic sort; FFT performs a 64-element FFT;
 FilterBank is an 8 channel filter bank; FIR is a 64-tap fine-grained
 FIR filter; Radio is an FM radio decoder with an equalizer; 3GPP is a
 3GPP Radio Access Protocol application; Radar is a radar array
-front-end application with beamforming; Vocoder is a 28 channel
-Vocoder.
+front-end with beamforming; Vocoder is a 28 channel Vocoder.
 
 Two test applications (CD-DAT and QMF) are borrowed from
 \cite{murt2000x2}. We model only the communication properties of the
@@ -1387,7 +1383,7 @@ constraints. \protect\label{fig:sumgraph}}
 \end{figure}
 
 \begin{table*} \centering \small
-\vspace{-4pt}
+\vspace{6pt}
 \begin{tabular}{|c|c|c|c|c|c|c|}
 \hline {\parbox{0.8in}{ \vspace{3pt} {\bf Benchmark}}} & \parbox{0.8in}{\centering \vspace{8pt}{\bf Number of Nodes}} & \parbox{0.8in}{\centering \vspace{16pt} {\bf Number of Node Executions}} & \multicolumn{2}{c|}{{\bf Single Appearance}} & \multicolumn{2}{c|}{{\bf Minimal Latency}} \\
 \cline{4-7} & & & \parbox{0.8in}{\centering ~ \\ \vspace{-3pt}{\bf Code Size} ~ \\ } & \parbox{0.8in}{\centering ~ \\ \vspace{-3.3pt} {\bf Buffer Size} ~ \\ } & \parbox{0.8in}{\centering ~ \\ \vspace{3pt} {\bf Code Size} ~ \vspace{6pt} \\ } & \parbox{0.8in}{\centering ~ \\ \vspace{-3.3pt} {\bf Buffer Size} ~ \\ } \\
@@ -1441,7 +1437,6 @@ single-appearance schedule, two consecutive executions of a pipeline
 construct would execute all of its nodes once before executing all of
 the nodes again.  We are exploring other interleaving strategies for
 the nodes within a given phase.
-
 
 \section{Related Work}
 \label{chpt:related}
@@ -1520,7 +1515,6 @@ machines, although it is implemented as a coarse-grained master/slave
 runtime system instead of a fine-grained static schedule.
 
 % http://www.cis.ohio-state.edu/~gb/cis888.12g/Papers/bhattacharyya99software.pdf, page 14, reviews related work for buffer stuff
-
 \section{Conclusion and Future Work}
 \label{chpt:conclusion}
 
@@ -1551,7 +1545,6 @@ processor caches to provide high performance.  Adapting buffer sharing
 to phased scheduling will also be explored, as it promises further
 reduction in buffer requirements.
 
-
 \section{Acknowledgements}
 
 Many people have contributed to the StreamIt infrastructure that was
@@ -1559,6 +1552,7 @@ utilized in this paper, including Michael Gordon, David Maze, Jasper
 Lin, and Andrew Lamb.  We also thank Ali Meli, Chris Leger, and Jeremy
 Wong for implementing some of the applications.  The StreamIt project
 is supported by grants from DARPA, NSF, and the MIT Oxygen Alliance.
+
 %\input{pseudocode}
 {\small
 \begin{thebibliography}{10}
