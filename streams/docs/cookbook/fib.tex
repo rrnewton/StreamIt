@@ -14,7 +14,7 @@ void->int feedbackloop Fib {
 \end{lstlisting}
 
 Using a feedback loop for a Fibonacci number generator is slightly
-abusive but possible.  The joiner reads no items from the stream input
+unusual but possible.  The joiner reads no items from the stream input
 (also declared of type \lstinline|void|), but reads items continuously
 from the feedback path.  Within a feedback loop, round-robin splitters
 and joiners address the external path first and the feedback path
@@ -22,3 +22,4 @@ second.  This loop also uses the special \lstinline|Identity| filter
 on the loop path; this is equivalent to an empty filter that copies
 its input to its output, but occurs frequently enough that a shorthand
 is useful to both the programmer and the compiler.
+
