@@ -117,6 +117,9 @@ are generally statically allocated.
 The following primitive types exist in StreamIt:
 
 \begin{description}
+\item[\lstinline|bit|]  A one-bit unsigned integer type, containing
+  the value \lstinline|0| or \lstinline|1|.
+
 \item[\lstinline|int|]  A signed integer type, of unspecified length.
   This length will typically be the native word length on the target
   machine; for RAW and x86 compilation, this is usually 32 bits.
@@ -153,15 +156,18 @@ comparison is false.
 \toprule
 \textbf{Operators} & \textbf{Types} \\
 \midrule
-\lstinline|?:| & Any & First part must be \lstinline|int| \\
-\lstinline/||/ & \lstinline|int| \\
-\lstinline|&&| & \lstinline|int| \\
-\lstinline/|/, \lstinline|&|, \lstinline|^| & \lstinline|int| \\
+\lstinline|?:| & Any & First part must be \lstinline|int| or \lstinline|bit| \\
+\lstinline/||/ & \lstinline|int|, \lstinline|bit| \\
+\lstinline|&&| & \lstinline|int|, \lstinline|bit| \\
+\lstinline/|/, \lstinline|&|, \lstinline|^| &
+  \lstinline|int|, \lstinline|bit| \\
 \lstinline|==|, \lstinline|!=| & Any \\
 \lstinline|<|, \lstinline|<=|, \lstinline|>|, \lstinline|>=| &
   \lstinline|int|, \lstinline|float| \\
-\lstinline|+|, \lstinline|-| & Any \\
-\lstinline|*|, \lstinline|/|, \lstinline|%| & Any &
+\lstinline|+|, \lstinline|-| &
+  \lstinline|int|, \lstinline|float|, \lstinline|complex| \\
+\lstinline|*|, \lstinline|/|, \lstinline|%| &
+  \lstinline|int|, \lstinline|float|, \lstinline|complex| &
   \lstinline|%| must be \lstinline|int| \\
 \lstinline|++|, \lstinline|--| & \lstinline|int| \\
 \bottomrule
@@ -869,11 +875,6 @@ This section describes features that may appear in future versions of
 StreamIt.
 
 \subsection{Additional Primitive Types}
-
-There is some demand for a \lstinline|bit| type; this would act exactly
-as a one-bit unsigned integer, but the compiler would be free to
-convert bits to integers, or to convert operations to bitwise
-operations and perform parallel operations across an entire byte.
 
 Support for characters and strings is somewhat uncertain.  There is no
 particular use for a character primitive type in StreamIt at the
