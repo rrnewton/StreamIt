@@ -129,7 +129,7 @@ frequency domain: \\
     ~~{\tt add~FreqDecimator(o, u)} \\
     {\tt \}} \\ ~ \\
     {\tt float \rightarrow float}~{\tt filter~freqDecimator~}(o, u){\tt ~\{} & \hspace{40pt}\\
-    ~~{\tt work}{\tt peek}~u*o~{\tt pop}~u*o~{\tt push}~u~{\tt \{} \\
+    ~~{\tt work~}{\tt peek}~u*o~{\tt pop}~u*o~{\tt push}~u~{\tt \{} \\
     ~~~~{\tt for~i~=~0~to~}u-1 \\
     ~~~~~~{\tt push(pop())} \\
     ~~~~{\tt for~i~=~0~to~}u-1 \\
@@ -181,7 +181,7 @@ frequency domain: \\
     ~~{\tt add~float \rightarrow float~filter~\{}\\
     ~~~~N \leftarrow 2^{\lceil \lg(2e) \rceil} \\
     ~~~~m \leftarrow N-2e+1 \\
-    ~~~~\vec{partials} \leftarrow {\tt new~array}[0\dots u-1,0 \dots (e-1)-1] \\
+    ~~~~\vec{partials} \leftarrow {\tt new~array}[0 \dots (e-1)-1, 0\dots u-1] \\
     ~~~~r \leftarrow m+e-1 \\
     \\
     ~~~~{\tt init}~{\tt \{} \\
@@ -190,12 +190,12 @@ frequency domain: \\
     ~~~~{\tt \}} \\
     \\
     ~~~~{\tt prework}~{\tt peek}~r~{\tt pop}~r~{\tt push}~u*m~{\tt \{}\\
-    ~~~~~~\vec{x} \leftarrow {\tt pop}(0 \dots r-1) \\
+    ~~~~~~\vec{x} \leftarrow {\tt pop}(0 \dots m+e-2) \\
     ~~~~~~\vec{X} \leftarrow \mathbf{FFT} (N, \vec{x}) \\
     ~~~~~~{\tt for}~j=0~to~u-1\\
     ~~~~~~~~\vec{Y}[*,j] \leftarrow \vec{X} .* \vec{H}[*,j] \\
     ~~~~~~~~\vec{y}[*,j] \leftarrow \mathbf{IFFT}(N, \vec{Y}[*,j]) \\
-    ~~~~~~~~\vec{partials}[*,j] \leftarrow \vec{y}\hspace{1pt}[r \dots r+(e-1)-1,j] \\
+    ~~~~~~~~\vec{partials}[*,j] \leftarrow \vec{y}\hspace{1pt}[m+e-1 \dots m+2e-3,j] \\
     ~~~~~~{\tt \}} \\
     ~~~~~~{\tt for}~i=0~to~m-1\\
     ~~~~~~~~{\tt for}~j=0~to~u-1\\
@@ -203,7 +203,7 @@ frequency domain: \\
     ~~~~{\tt \}} \\
     \\
     ~~~~{\tt work}~{\tt peek}~r~{\tt pop}~r~{\tt push}~u*r~{\tt \{} \\
-    ~~~~~~\vec{x} \leftarrow {\tt pop}(0 \dots r-1) \\
+    ~~~~~~\vec{x} \leftarrow {\tt pop}(0 \dots m+e-2) \\
     ~~~~~~\vec{X} \leftarrow \mathbf{FFT} (N, \vec{x}) \\
     ~~~~~~{\tt for}~j=0~to~u-1\\
     ~~~~~~~~\vec{Y}[*,j] \leftarrow \vec{X} .* \vec{H}[*,j] \\

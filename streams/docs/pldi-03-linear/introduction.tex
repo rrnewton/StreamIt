@@ -239,8 +239,8 @@ output.
 
 Figure~\ref{fig:example-streamit} shows the same filtering process
 implemented in StreamIt. The StreamIt version is more abstract than
-the C version.  It indicates the communication pattern between filters,
-shows the structure of the original block diagram and leaves
+the C version.  It indicates the communication pattern between
+filters, shows the structure of the original block diagram and leaves
 the complexities of buffer management and scheduling to the compiler.
 
 Two optimized versions of the FIR program are shown in
@@ -265,9 +265,8 @@ compiler for combination and transformation.
 \subsection{StreamIt}
 
 StreamIt is a language and compiler for high-performance signal
-processing.
-%~\cite{gordon-thesis,streamit-asplos,streamitcc} -- it was already cited earlier in intro.
-In a streaming application, each data item is in the system for only a
+processing~\cite{gordon-thesis,streamit-asplos,streamitcc}.  In a
+streaming application, each data item is in the system for only a
 small amount of time, as opposed to scientific applications where the
 data set is used extensively over the entire execution.  Also, stream
 programs have abundant parallelism and regular communication patterns.

@@ -1,6 +1,31 @@
 to add to paper:
 ---------------
 
+---- bill todo
+
+- add acknowledgements
+- some figures are ugly -- too big, too black
+- to strengthen intro and conclusion:  say there's no need for expert DSP programmer
+- add figures for partitioning stuff
+- give number for how much is improving due to just frequency conversion
+- at beginning of results, say what we have implemented on the compiler side (also the place to say the pop restriction)
+- in freq, * figure for all of a matrix column shouldn't be the same as * figure for convolution!
+- once figured out how to label an equation, refere to "truth of claim 1" follows in frequency section
+- do like andrew did and put a point of hspace between {\vec y} and the brackets everywhere
+- some absolute references, e.g. transformation 5
+- the for loops in the frequency transformation -- half of them are in {\tt }, half of them are in math
+- fix intro to be less language-centric, and more linear-centric
+- possibly move the reference the combination examples to further forward in the combination section?
+- fix captions on combination examples -- should label exactly what's going on (could use andrew's commented out in combination2.tex)
+- put the little doo-hickeys on "naive"
+- the label is still wrong on equation "5.1" -- referencing section instead of equation number
+- verify that frequency transformation does the right thing with "m" variable when pop>1 (m isn't actually counting pop, or push, is it?)
+- refer to A[*,0] from the frequency implementation page
+
+- once this is said and done, remove linearreplacecalculator -- calls childcost.plus, which is wrong
+
+---- end bill todo
+
 - change results graphs to reference "autoselect", not partition
 
 - add number for improvement of FFTW on combined nodes over FFTW on
