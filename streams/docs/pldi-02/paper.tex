@@ -1,15 +1,23 @@
-% might need psfig, url, amsmath, amsfonts?
-\documentclass[psfig]{acm_proc_article-sp}
+% uncomment this to use pubform
+%\documentstyle[psfig, amsmath]{pubform}
 
-\newtheorem{theorem}{Theorem}
+\documentclass[psfig]{sig-alternate}
 
 \begin{document}
 
 \title{StreamIt: A Compiler for Streaming Applications}
 
+% uncomment this to use pubform
+%% \author{Bill Thies, Michal Karczmarek, Michael Gordon, David Maze, Jeremy Wong, \\ Henry Hoffmann, Matthew Brown, and Saman Amarasinghe \\
+%% \parbox{6in}{\centering{Laboratory For Computer Science\\
+%%     Massachusetts Institute of Technology\\
+%%     Cambridge, MA  02139\\
+%%     \tt{\{thies, karczma, mgordon, dmaze, jnwong, hank, morris, saman\}@lcs.mit.edu}}}}
+%% \date{\today}
+
 \numberofauthors{1}
 \author{
-\alignauthor \vspace{-18pt} 
+\alignauthor \vspace{-18pt}
 Bill Thies, 
 Michal Karczmarek, 
 Michael Gordon, 
@@ -18,14 +26,14 @@ Jeremy Wong,
 Henry Hoffmann, 
 Matthew Brown, 
 and Saman Amarasinghe\\
-	\vspace{12pt}
+	\vspace{6pt}
 	Laboratory for Computer Science \\
 	Massachusetts Institute of Technology \\
 	Cambridge, MA  02139 \\
-	\vspace{12pt}
-	{\tt \{thies, karczma, mgordon, dmaze, jnwong, hank, morris, saman\}@lcs.mit.edu} \\
-	\vspace{12pt}
-        \today
+%	\vspace{6pt}
+%	{\tt \{thies, karczma, mgordon, dmaze, jnwong, hank, morris, saman\}@lcs.mit.edu} \\
+%	\vspace{12pt}
+%        \today
 }
 
 % for the arrow of a function def, etc.
@@ -34,6 +42,8 @@ and Saman Amarasinghe\\
 \newcommand{\floor}[2]{\left\lfloor\frac{#1}{#2}\right\rfloor}
 \newcommand{\ceil}[2]{\left\lceil\frac{#1}{#2}\right\rceil}
 \newtheorem{definition}{Definition}
+\newtheorem{theorem}{Theorem}
+
 \newcommand{\ra}[0]{\rightarrow}
 
 \maketitle
@@ -48,6 +58,6 @@ and Saman Amarasinghe\\
 \input{scheduler.tex}
 %\input{related.tex}
 %\input{conclusion.tex}
-\bibliographystyle{abbrv}
-\bibliography{references}
+%\bibliographystyle{abbrv}
+%\bibliography{references}
 \end{document}
