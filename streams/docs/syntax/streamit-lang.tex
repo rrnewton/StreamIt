@@ -20,7 +20,7 @@
 \title{StreamIt Language Specification\\
 Version 2.0\ifprerel\thanks{
 This document is the latest working version of the language specification.\hfil\break\ttfamily
-\hbox{$Id: streamit-lang.tex,v 1.17 2003-04-14 18:53:39 dmaze Exp $}
+\hbox{$Id: streamit-lang.tex,v 1.18 2003-05-13 20:49:59 dmaze Exp $}
 }\fi}
 \author{\texttt{streamit@cag.lcs.mit.edu}}
 \catcode`\$=3
@@ -66,10 +66,14 @@ Data types are always created atomically.  They are of fixed size, and
 are generally statically allocated.
 
 \subsubsection{Primitive Types}
+\label{sec:primitive-types}
 
 The following primitive types exist in StreamIt:
 
 \begin{description}
+\item[\lstinline|boolean|]  Either \lstinline|true| or
+  \lstinline|false|.
+
 \item[\lstinline|bit|]  A one-bit unsigned integer type, containing
   the value \lstinline|0| or \lstinline|1|.
 
@@ -100,8 +104,7 @@ and, and exclusive-or operators, respectively.  The boolean logic
 operators \lstinline|&&| and \lstinline/||/ behave as in C: they are
 short-circuiting, integer values of exactly zero are false, and other
 values are true.  \lstinline|==| and other comparison operators return
-an integer 1 if the comparison is true and an integer 0 if the
-comparison is false.
+a boolean value.
 
 \begin{table}
 \begin{center}
@@ -109,9 +112,9 @@ comparison is false.
 \toprule
 \textbf{Operators} & \textbf{Types} \\
 \midrule
-\lstinline|?:| & Any & First part must be \lstinline|int| or \lstinline|bit| \\
-\lstinline/||/ & \lstinline|int|, \lstinline|bit| \\
-\lstinline|&&| & \lstinline|int|, \lstinline|bit| \\
+\lstinline|?:| & Any & First part must be \lstinline|boolean| \\
+\lstinline/||/ & \lstinline|int|, \lstinline|bit|, \lstinline|boolean| \\
+\lstinline|&&| & \lstinline|int|, \lstinline|bit|, \lstinline|boolean| \\
 \lstinline/|/, \lstinline|&|, \lstinline|^| &
   \lstinline|int|, \lstinline|bit| \\
 \lstinline|==|, \lstinline|!=| & Any \\
@@ -166,8 +169,7 @@ is an implicit structure declaration
 
 \begin{lstlisting}{}
 struct complex {
-  float real;
-  float imag;
+  float real, imag;
 }
 \end{lstlisting}{}
 
@@ -184,12 +186,13 @@ arrays or matrices are supported as arrays of arrays.
 \subsubsection{Variable Declarations}
 
 Variable declarations appear in structure declarations, as well as in
-code blocks and \lstinline|filter| declarations.  A variable declaration
-always has the form \lstinline|type name;|, where \lstinline|type| is a data
-type as described here.  Of note, the syntax for array declarations is
-different from C and Java.  A correct declaration is
-\lstinline|int[4] rgbi;|, with the entire type stated before the variable name.
-
+code blocks and \lstinline|filter| declarations.  A variable
+declaration may declare one or multiple variables, possibly with
+initializers; multiple variables are separated with commas.  Of note,
+the syntax for array declarations is different from C and Java.  A
+correct declaration is \lstinline|int[4] rgbi;|, with the entire type
+stated before the variable name.  An initializer may not be provided
+for array variables.
 
 \subsection{Stream Types}
 
@@ -299,8 +302,11 @@ peek rate is omitted, it is assumed to be equal to the pop rate; if
 the pop or push rate is omitted, it is assumed to be zero, and the
 corresponding input or output tape type must be \lstinline|void|.  The
 function must push and pop exactly the number of items specified, and
-may peek up to the number of items specified.  All of the rate
-expressions must be compile-time constant.
+may peek up to the number of items specified.  As a special case, if
+there are no \lstinline|pop| calls at all in the function body (all
+access to the input tape is by peeking), the number of items declared
+as the pop rate will be automatically popped at the end of the work
+function.  All of the rate expressions must be compile-time constant.
 
 \paragraph{Phased filters.}  If the work function does not have rate
 declarations, it may not perform \lstinline|push| and \lstinline|pop|
@@ -466,6 +472,10 @@ float->float feedbackloop AddFeedback(float scaling) {
 }
 \end{lstlisting}
 
+The \lstinline|body| and \lstinline|loop| declarations may be omitted;
+if so, an implicit \lstinline|Identity| filter of the appropriate type
+is inserted.
+
 \paragraph{Semantics of splitters and joiners.}  Splitters and joiners
 both treat the stream input as the first child, and the loop edge as
 the second child.  Splitters and joiners that do not allow exactly two
@@ -605,8 +615,11 @@ This statement takes a \emph{stream constructor}; see section
 \subsubsection{\lstinline|body| Statement}
 
 The \lstinline|body| statement adds a child stream as the body part of
-a feedback loop.  This statement must be executed exactly once in the
+a feedback loop.  This statement must be executed at most once in the
 initialization code of a feedback loop, and is invalid anywhere else.
+If a feedback loop does not contain a \lstinline|body| statement, an
+\lstinline|Identity| filter of the appropriate type is used by
+default.
 
 This statement takes a \emph{stream constructor}; see section
 \ref{sec:expr-stream-constructor}.
@@ -630,8 +643,11 @@ is \lstinline|roundrobin|, see section \ref{sec:expr-round-robin}.
 \subsubsection{\lstinline|loop| Statement}
 
 The \lstinline|loop| statement adds a child stream as the loop part of
-a feedback loop.  This statement must be executed exactly once in the
+a feedback loop.  This statement must be executed at most once in the
 initialization code of a feedback loop, and is invalid anywhere else.
+If a feedback loop does not contain a \lstinline|loop| statement, an
+\lstinline|Identity| filter of the appropriate type is used by
+default.
 
 This statement takes a \emph{stream constructor}; see section
 \ref{sec:expr-stream-constructor}.
@@ -826,6 +842,37 @@ built-in math functions.  The math functions are listed in table
     \label{tab:math-functions}
   \end{center}
 \end{table}
+
+\subsubsection{Typecasts}
+
+If a primitive type in parentheses precedes an expression, that
+expression is interpreted as being of the particular type.  See the
+listing of types in Section \ref{sec:primitive-types}.  Conversions to
+types later in the list take place in the obvious way:
+\lstinline|boolean| values convert to \lstinline|bit| values with 0
+for \lstinline|false| and 1 for \lstinline|true|, \lstinline|bit|
+values convert to \lstinline|int| values with the same value, and so
+on.  \lstinline|float| values convert to \lstinline|complex| values
+with an imaginary part of 0.  Conversions to types earlier in the list
+may lose data; conversions from \lstinline|complex| are not possible,
+\lstinline|bit| converts to \lstinline|boolean| in the obvious way.
+The exact conversion from \lstinline|float| to \lstinline|int| is not
+specified.  \lstinline|int| values of 0 convert to \lstinline|bit|
+values of 0, and other \lstinline|int| values convert to 1.
+
+\begin{lstlisting}{}
+/* For each input, pushes (float) 1 if the integer representation
+ * of the input has the 64-bit set. */
+float->float filter TypeCast {
+  work pop 1 push 1 {
+    complex c = (complex)pop();
+    float f = abs(c); // can't directly cast from complex
+    int i = (int)f;
+    bit b = (bit)(i & 64);
+    push((float)b);
+  }
+}
+\end{lstlisting}
 
 \subsection{Stream Constructors}
 \label{sec:expr-stream-constructor}
@@ -1112,6 +1159,34 @@ byte->byte filter RLEExpand {
 Note that the number of executions of the \lstinline|readData| and
 \lstinline|writeData| phases are data-dependent, as is the
 \lstinline|push| rate of \lstinline|writeData|.
+
+\subsection{Output Peeking}
+
+StreamIt's current \lstinline|peek| operator allows straightforward
+construction of FIR filters, but a \lstinline|feedbackloop| is
+necessary for IIR filters.  A simple IIR filter might have a transfer
+function of
+
+\begin{eqnarray*}
+H(z) & = & \frac{1}{1-0.5z^{-1}} \\
+(1-0.5z^{-1})Y(z) & = & X(z) \\
+y[n] - 0.5y[n-1] & = & x[n] \\
+y[n] & = & x[n] + 0.5y[n-1] \\
+\end{eqnarray*}
+
+Implementing causal filters like this requires an operator like
+\lstinline|peek|, but that peeks at values on the output tape of a
+filter.  Implementation of this operator is mostly waiting on a name.
+If it were named \lstinline|peer|, the above filter could be
+implemented as
+
+\begin{lstlisting}{}
+float->float filter OutputPeeking {
+  work pop 1 push 1 peer 1 {
+    push(pop() + 0.5 * peer(0));
+  }
+}
+\end{lstlisting}
 
 \section{Implementation Limits}
 
