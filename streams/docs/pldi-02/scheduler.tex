@@ -2,7 +2,7 @@
 
 \begin{figure}
 \centering
-\psfig{figure=sched_diag.eps,width=3.4in}
+%\psfig{figure=sched_diag.eps,width=3.4in}
 \caption{Three different scheduling schemes.}
 \label{fig:sched}
 
@@ -10,28 +10,19 @@
 
 Scheduling the order of the execution of filters has a large impact on 
 the behavior of a StreamIt program.  In this section we introduce three
-different scheduling techniques and analyze their properties.  The analysis
-presented here is quite superficial, as detailed analysis falls outside of
-the scope of this paper.
+different scheduling techniques and analyze their properties.
 
 \subsection{Periodic Schedule}
 A schedule for a StreamIt program needs to satisfy a requirement that
-a repeated execution of the schedule cannot lead to changed data buffering
-between filters.  This is a separate constraint from that in section
-\ref{sec:prog-verif}:  while it is impossible to produce a valid schedule
-for an invalid program, it is quite easy to produce an invalid schedule for
-a valid program.  We call a schedule that satisfies these requirement a
-periodic schedule.  (Here a schedule represents the multiplicity of executions
-of filters, ignoring the ordering of these executions.)
+a repeated execution of the schedule cannot lead to changed data
+buffering between filters.  We call a schedule that satisfies this
+requirement a periodic schedule.  (Here a schedule represents the
+multiplicity of executions of filters, ignoring the ordering of these
+executions.)
 
-\begin{theorem}
-\label{theo:period-sched}
-For every valid program, there exists a unique, minimal periodic schedule.
-Every other periodic schedule for a StreamIt program is a multiple of the
-underlying periodic schedule [\ref{bhat1994x3}].  (the multiple principle
-is never clearly stated (I don't think) but I don't want to have to prove
-it and I need it)
-\end{theorem}
+For every valid program, there exists a unique, minimal periodic
+schedule.  Every other periodic schedule for a StreamIt program is a
+multiple of the underlying periodic schedule \cite{bhat1994x3}.
 
 While computing periodic schedules for StreamIt, we chose to preserve the
 hierarchical structure presented in the program.
