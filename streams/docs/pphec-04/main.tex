@@ -1,4 +1,5 @@
 \documentclass[11pt, letterpaper, onecolumn]{article}
+\special{papersize=8.5in,11in}
 
 \usepackage{times}
 \usepackage{amsmath}
@@ -7,8 +8,8 @@
 \usepackage{subfigure}
 \usepackage{setspace}
 
-\topmargin -0.6truein
-\textheight 9.1truein
+%\topmargin -0.6truein
+%\textheight 9.1truein
 %\textwidth 6.3truein
 \sloppy
 
@@ -70,7 +71,7 @@ The Computer Architecture Group at  MIT has for the last several years
 conducted  research to  address all  of the  aformentioned objectives.
 This   paper    focuses   on   the    productivitiy   of   application
 developers. Specifically, the paper  will briefly describe StreamIt, a
-novel language  for the prevalent class of  stream computing. StreamIt
+novel language  for the prevalent application class of  stream computing. StreamIt
 provides  high-level  stream   abstractions  that  improve  programmer
 productivity  and  program robustness.  The  language is  architecture
 independent language, and it features several characteristics (such as
@@ -110,9 +111,10 @@ developed  a programming environment  that graphically  represents the
 the hierarchical  nature of a StreamIt application.   In addition, the
 StreamIt  Development  Tool  (SDT)  provides  an  elaborate  debugging
 environment  that  can  interpret  and  visually  represent  streaming
-computation, including  the flow of data between  streams, a intuitive
+computation, including  the flow of data between  streams, an intuitive
 concept  of  time  for   distributed  programs,  and  a  deterministic
 execution order for parallel streams.
+
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -138,83 +140,98 @@ are  declared as  part  of  the work  function,  thereby enabling  the
 compiler    to    construct    a    static    schedule    of    filter
 firings~\cite{lee87static}.
 
-Each filter has a distinct address space.  A filter can store two
-types of variables: a {\it field} and a {\it local}.  Fields are
-declared in the scope of the filter and are preserved across
-executions, while locals are declared inside the work function and are
-only live within a single execution.  There is also an init function
-which runs once at the beginning of the program and is used to
-initialize fields.
+%% Each filter has a distinct address space.  A filter can store two
+%% types of variables: a {\it field} and a {\it local}.  Fields are
+%% declared in the scope of the filter and are preserved across
+%% executions, while locals are declared inside the work function and are
+%% only live within a single execution.  There is also an init function
+%% which runs once at the beginning of the program and is used to
+%% initialize fields.
+%% \begin{figure}[t]
+%% \vspace{-18pt}
+%% \begin{singlespace}
+
+%% ~~
+%% \begin{minipage}{0.46in}
+%% {\centering
+%% \psfig{figure=pipeline.eps,width=0.46in} \\
+%% }
+%% \end{minipage} 
+%% ~
+%% \begin{minipage}{1.3in}
+%% {\centering
+%% \psfig{figure=splitjoin.eps,width=1.3in} \\
+%% }
+%% \end{minipage}
+%% ~
+%% \begin{minipage}{1.02in}
+%% {\centering
+%% \psfig{figure=feedback.eps,width=1.02in} \\
+%% }
+%% \end{minipage}
+%% ~~~~~~~~~
+%% \begin{minipage}{3in}
+%% \vspace{36pt}
+%% \psfig{figure=iir-pipeline.eps, width=2.33in}
+%% ~~~~
+%% \raisebox{12pt}{\psfig{figure=iir-pipeline2.eps, width=0.46in}}
+%% \end{minipage}
+%% \\ ~ \\ {\protect\small (a) A pipeline. ~~(b) A splitjoin. ~~(c) A feedbackloop.}
+
+%% \begin{minipage}{3.5in}
+%% \caption{Stream structures supported by StreamIt.
+%% \protect\label{fig:structures}}
+%% \end{minipage}
+%% \begin{minipage}{3in}
+%% \caption{Example pipeline with FIR filter.\protect\label{fig:iir-pipeline}}
+%% \end{minipage}
+%% \vspace{3pt}
+%% \hrule
+%% \vspace{3pt}
+%% \end{singlespace}
+%% \vspace{-12pt}
+%% \end{figure}
 
 \begin{figure}[t]
-\vspace{-18pt}
-\begin{singlespace}
+\begin{center}
+  \framebox{\includegraphics[scale=1, angle=0]{./constructs-eg.pdf}}
+  \caption{StreamIt containers.}
+  \label{fig:containers}
+\end{center}
+\end{figure}
 
-~~
-\begin{minipage}{0.46in}
-{\centering
-\psfig{figure=pipeline.eps,width=0.46in} \\
-}
-\end{minipage} 
-~
-\begin{minipage}{1.3in}
-{\centering
-\psfig{figure=splitjoin.eps,width=1.3in} \\
-}
-\end{minipage}
-~
-\begin{minipage}{1.02in}
-{\centering
-\psfig{figure=feedback.eps,width=1.02in} \\
-}
-\end{minipage}
-~~~~~~~~~
-\begin{minipage}{3in}
-\vspace{36pt}
-\psfig{figure=iir-pipeline.eps, width=2.33in}
-~~~~
-\raisebox{12pt}{\psfig{figure=iir-pipeline2.eps, width=0.46in}}
-\end{minipage}
-\\ ~ \\ {\protect\small (a) A pipeline. ~~(b) A splitjoin. ~~(c) A feedbackloop.}
-
-\begin{minipage}{3.5in}
-\caption{Stream structures supported by StreamIt.
-\protect\label{fig:structures}}
-\end{minipage}
-\begin{minipage}{3in}
-\caption{Example pipeline with FIR filter.\protect\label{fig:iir-pipeline}}
-\end{minipage}
-\vspace{3pt}
-\hrule
-\vspace{3pt}
-\end{singlespace}
-\vspace{-12pt}
+\begin{figure}[t]
+\begin{center}
+  \framebox{\includegraphics[scale=1, angle=0]{./pipeline-eg.pdf}}
+  \caption{Example pipeline with FIR filter.}
+  \label{fig:pipeline}
+\end{center}
 \end{figure}
 
 StreamIt provides three  hierarchical structures for composing filters
-into larger stream graphs (see Figure~\ref{fig:structures}).  The {\it
+into larger stream graphs (see Figure~\ref{fig:containers}).  The {\it
 pipeline} construct  composes streams in sequence, with  the output of
 one connected to the input of the next.  The {\it splitjoin} construct
 distributes data to  a set of parallel streams,  which are then joined
 together in a roundrobin fashion.   The {\it feedback loop} provides a
 mechanism  for introducing  cycles  in  the graph.   An  example of  a
-pipeline  appears  in  Figure~\ref{fig:iir-pipeline}.  It  contains  a
+pipeline  appears  in  Figure~\ref{fig:pipeline}.  It  contains  a
 single  FIR   (Finite  Impulse   Response)  filter,  which   could  be
 implemented as follows:
+\begin{singlespace}
 \begin{verbatim}
   float->float filter  FIR(int N, float[] weights) {
     work push 1 pop 1 peek N {
       float sum = 0;
-
       for (int i = 0; i < N; i++) {
         sum += peek(i) * weights[i];
       }
-
       pop();
       push(sum);
     }
   }
 \end{verbatim}
+\end{singlespace}
 
 The filter can now serve as  a module that is incorporated into stream
 graphs as necessary, for example as part of an accoustic beamformer. A
@@ -248,7 +265,7 @@ streams.
 
 The SDT  is implemented in Java as  an Eclipse~\cite{eclispe} plug-in.
 The  Eclipse universal  tools  platform is  an extansible  development
-environments. We leverage the built-in user interfaces for editing and
+environment. We leverage the built-in user interfaces for editing and
 viewing  files,  the  resource  management system,  the  documentation
 infrastructure,  and the  runtime  support of  launching, running  and
 debugging programs.
@@ -259,13 +276,29 @@ debugging programs.
 
 \subsection{Hierarchical Graphs}
 
+\begin{figure}[t]
+\begin{center}
+  \subfigure[Collapsed pipeline.\label{fig:eg-hierarchy-collapsed}]{
+    \framebox{\includegraphics[scale=.4, angle=0]{./hierarchy-eg1.pdf}}
+  }
+  \subfigure[Expanded splitjoin.\label{fig:eg-hierarchy-expanded}]{
+    \framebox{\includegraphics[scale=.4, angle=0]{./hierarchy-eg2.pdf}}
+  }
+  \subfigure[Example pipeline with data in transit.\label{fig:dataflow}]{
+    \framebox{\includegraphics[scale=.4, angle=0]{./dataflow-eg.pdf}}
+  }
+  \caption{Hierarchical stream graph views.}
+  \label{fig:hierarchy}
+\end{center}
+\end{figure}
+
 As seen  in Figure~\ref{fig:eg-hierarchy},  a StreamIt program  can be
 visually depicted  as a hierarchical  directed graph of  streams, with
 graph nodes representing streams and graph edges representing tapes or
 channels.   The   containers  are  rendered  according   to  the  code
 declarations, and the visualization tools in the SDT allow the user to
-selectevily collapse  and expand containers. This is  usefull in large
-streams  where  the  application  developers  is  only  interested  in
+selectevily collapse  and expand containers. This is  useful in large
+streams  where  the  application  developers  are only  interested  in
 visualizing   a  particular   subset,  for   example  to   verify  the
 interconnect topology of  the graph. In Figure~\ref{fig:eg-hierarchy},
 the splitjoin  is expanded whereas  the other streams in  the external
@@ -276,9 +309,17 @@ pipeline are collapsed.
 
 \subsection{Data Flow}
 
+%% \begin{figure}[t]
+%% \begin{center}
+%%   \framebox{\includegraphics[scale=1, angle=0]{./dataflow-eg.pdf}}
+%%   \caption{Example pipeline with data in transit.}
+%%   \label{fig:dataflow}
+%% \end{center}
+%% \end{figure}
+
 An important distinguishing characterisitic  of the SDT is its ability
 to track  the flow  of data between  streams.  This is  illustrated in
-Figure~\ref{fig:eg-dataflow} which shows the data that is live between
+Figure~\ref{fig:dataflow} which shows the data that is live between
 two filters.  The  SDT allows the user to  highlight and automatically
 track  data items  as they  propagate between  streams.  The  SDT also
 allows the user  to modify values on a tape,  much like a conventional
@@ -316,18 +357,17 @@ We designed and carried out a  user study to assess the extent the SDT
 helps in debugging StreamIt programs.  The goals were two fold. First,
 we aimed to identify difficulties in using the SDT and toward this end
 we used questionnaires and  automatic action logging.  The second goal
-was  to  gather data  and  qualitative  findings  to draw  conclusions
-suggesting  that the  SDT  improved a  programmer's  ability to  debug
-StreamIt applications.
+was to gather data to support  the hypothesis that the SDT can improve
+a programmer's ability to debug StreamIt applications.
 
-Briefly,  we provided participants  with a  set of  ``buggy'' StreamIt
-programs,  along  with  verbal  descriptions  of  the  programs.   The
-participants were asked to find and fix the errors and to record their
-experience  using various forms  and questionaries.   The participants
-were divided into different groups, some of which used the SDT and its
-graphical debugging  features whereas others did not.  Our results and
-analysis are  repored in the following section,  following the details
-of the study.
+We provided  participants with a  set of ``buggy''  StreamIt programs,
+along with verbal descriptions of the programs.  The participants were
+asked to find and fix the  errors and to record their experience using
+various forms  and questionaries.  The participants  were divided into
+different  groups,  some of  which  used  the  SDT and  its  graphical
+debugging features  whereas others did not.  Our  results and analysis
+are repored  in the  following section, following  the details  of the
+study.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -396,45 +436,53 @@ In  order  to control  against  the  SDT's  effect on  a  programmer's
 debugging  ability and  ensure internal  validity, users  were grouped
 into four categories,  which were based on which  applications were to
 be     debugged     with      and     without     the     SDT     (see
-Table~\ref{tab:apps-groups}).   All   users   were  asked   to   debug
+Table~\ref{tab:apps-groups}).    All  users   were   asked  to   debug
 application 1 without the SDT and application 2 with the SDT to assess
 starting ability and create a baseline reference for later comparison.
-Moreover,  the simplicity  of  their  purpose and  bugs  was aimed  at
-bolstering the  user's confidence with  easy warm-ups.  Then,  half of
-the users (group  A) were told to debug applications 3,  4, and 5 with
-the SDT  and 6, 7,  and 8 without  the SDT. Meanwhile, the  other half
-(group B) were told to debug 3, 4, and 5 without the SDT and 6, 7, and
-8  with  the SDT  to  avoid ordering  effects.  Due  to this  grouping
-structure, applications 3 and 6, 4 and  7, and 5 and 8 were written to
-be of comparable difficulty.  For  application 9, half of group A (A1)
-and half of group  B (B1) were asked to debug with  the SDT, while the
-other  halves   (A2  and   B2)  were  asked   to  debug   without  the
-SDT.  Cross-sectioning  the  groups  was aimed  at  ensuring  external
-validity.
+Moreover, these  two ``control'' application were  designed to bolster
+the user's confidence.  Then, half of the users (group A) were told to
+debug applications 3,  4, and 5 with  the SDT and 6, 7,  and 8 without
+the SDT. Meanwhile, the other half  (group B) were told to debug 3, 4,
+and 5 without the  SDT and 6, 7, and 8 with  the SDT to avoid ordering
+effects.  Due to this grouping  structure, applications 3 and 6, 4 and
+7,  and 5  and 8  were written  to be  of comparable  difficulty.  For
+application 9,  half of  group A (A1)  and half  of group B  (B1) were
+asked to debug  with the SDT, while the other halves  (A2 and B2) were
+asked to debug without the SDT.  Cross-sectioning the groups was aimed
+at ensuring external validity.
 
-The study  was divided  into three sessions  over a  three-day period.
-Each session was intended to last  two hours (with 45 minutes spent on
-the tutorials  and the rest of  the time dedicated  to debugging), the
-sessions  spanned an  average of  four hours.  Many users  were either
-unable  or did  not have  enough time  to debug  certain applications.
-Participants were asked to complete  the set of documents at their own
-pace.   Upon completion  of the  study, participants  submitted  to an
-interveiw  and received  a \$40  gift certificate.  During  the study,
-users were  encouraged to ask questions  although particulars relating
-to the problems and the SDT were not revealed.
+The study was divided into three sessions over a three-day period.  We
+estimated that each session would  last for two hours (with 45 minutes
+spent  on  the  tutorials  and  the  rest of  the  time  dedicated  to
+debugging), but  in reality  the sessions spanned  an average  of four
+hours.  Many users  were either unable or did not  have enough time to
+debug certain  applications.  Participants were asked  to complete the
+set of documents at their own pace.  Upon completion of the study, the
+participants were  individually interviewed  and received a  \$40 gift
+certificate.  During the study, users were encouraged to ask questions
+although particulars  relating to  the problems and  the SDT  were not
+revealed.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \subsection{Results and Analysis}
 
-Even  though 25  users were  scheduled  to participate  (5 people  for
+Eventhough 25  users were  scheduled  to participate  (5 people  for
 sessions 1 and  2 and 15 people for  session 3), cancellations reduced
 the participation to 20 users  and led to uneven groupings. There were
 6 people in A1, 5 in A2, 4 in B1, and 5 in B2. Of the 20 participants,
 there were 4 juniors, 2 seniors,  8 masters, and 6 Ph.D. students, all
 majoring in Electrical Engineering and Computer Science. Although none
 had used the SDT in the past, 6 users had experience with DSP.
+
+\begin{figure}[t]
+\begin{center}
+  \includegraphics[scale=.5, angle=0]{./users-results.pdf}
+  \caption{Summary of results.}
+  \label{fig:solutions}
+\end{center}
+\end{figure}
 
 Figure~\ref{fig:solutions} summarizes the study in terms of the number
 of solutions  reported for each of  the applications in  the study. In
@@ -453,12 +501,20 @@ properly. There was also one other participant who did not debug
 Because the groupings are  uneven as previously mentioned, the numbers
 seen in  the figure are weighted  depending on which  group is lacking
 users. The  percentage above each quadruple of  columns represents the
-percentage increase  or decrease in  debuggin each application  due to
+percentage increase  or decrease in  debugging each application  due to
 the  SDT.   For  example,  the   SDT  did  not  particularly  help  in
 applications  3,  4,  and 5,  but  does  help  for  all of  the  other
 applications.   On  average, 1.56  fewer  participants fully  debugged
 applications  3, 4,  and 5  when using  the SDT,  and 2.56  more users
 solved applications  6, 7,  8, and  9 when using  the SDT.
+
+\begin{figure}[t]
+\begin{center}
+  \includegraphics[scale=.5, angle=0]{./times-results.pdf}
+  \caption{Summary of results.}
+  \label{fig:times}
+\end{center}
+\end{figure}
 
 Figure~\ref{fig:times} compares the  average time spent debugging each
 application. The  percentage above each set of  columns represents the
@@ -468,7 +524,7 @@ applications 3, 4, 5, 6, 7, and 9 when using the graphical featuers of
 the  debugger,   compared  to  participants   using  more  traditional
 debugging means. Furthermore, participants who were allowed to use the
 SDT and its graphical features  spent an avearge of 16.96 more minutes
-debuggin applications  6, 7,  and 8, compared  to an average  of 10.67
+debugging applications  6, 7,  and 8, compared  to an average  of 10.67
 minutes invested by  the participants who could not  use the graphical
 debugger. In  both cases  the participants did  not fully  debug their
 respective applications.
@@ -549,21 +605,21 @@ the effectiveness  of the graphical debugger, these  applications were
 purposely  written   to  be  too  large  and   complicated  for  these
 traditional debugging techniques.
 
-Having a graduated pay scale for compensation may have alleviated some
-of the  above problems,  as it would  allow the participants  to judge
-whether they could or were willing to complete all of the applications
-in  the  study.   Nonetheless,  the variation  in  each  participant's
-experience  and  skill  within  a  user  study  is  a  well-documented
-issue. Usability studies have found  that the best users are often ten
-times better than  the worst users, and the  fastest quartile of users
-are  twice   as  fast  as  the  slowest   quartile  of  users~cite{13,
-17}. However,  because increasing the  number of users within  a study
-only narrows the standard deviation of  the mean by the square root of
-the number  of users\cite{13}, improving reliability of  results is an
-expensive  and time-consuming task.  For example,  in order  to double
-accuracy, the  number of participants in  this study would  have to be
-quadrupled to 80  users, which would cost an  additional \$2400 and 24
-man-hours.
+Having a  multi-level pay scale  for compensation may  have alleviated
+some  of the above  problems, as  it would  allow the  participants to
+judge  whether they  could  or were  willing  to complete  all of  the
+applications  in  the  study.   Nonetheless,  the  variation  in  each
+participant's  experience   and  skill  within  a  user   study  is  a
+well-documented  issue. Usability  studies  have found  that the  best
+users are often ten times better than the worst users, and the fastest
+quartile  of  users are  twice  as fast  as  the  slowest quartile  of
+users~cite{13, 17}.  However, because  increasing the number  of users
+within a study only narrows the  standard deviation of the mean by the
+square root of the  number of users\cite{13}, improving reliability of
+results  is an  expensive and  time-consuming task.   For  example, in
+order to  double accuracy,  the number of  participants in  this study
+would  have  to  be  quadrupled  to  80 users,  which  would  cost  an
+additional \$2400 and 24 man-hours.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -650,8 +706,11 @@ programming errors.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+\noindent {\bf ACKNOWLEDGMENTS}\\
+Thanks to...
+
 %\setstretch{0.1}
-%\bibliographystyle{abbrv}
+\bibliographystyle{abbrv}
 %\bibliography{references}
 
 \end{document}
