@@ -5,20 +5,102 @@
 
 \begin{figure*}[t]
   \center
-      {\bf Appendix A: Benchmark Stream Graphs} \\ ~ \\ ~ \\
-      \begin{tabular}{lcr}
-	\begin{minipage}{3in}
+  %{\bf Appendix A: Benchmark Stream Graphs} \\ ~ \\ ~ \\
+  \begin{tabular}{ccc}
+    \begin{minipage}{3in}
+      \center
+      \begin{tabular}{cc}
+	\begin{minipage}{1.2in}
+	  \center
+	  \epsfxsize=1.0in
+	  \epsfbox{streamgraphs/fir.ps} 
+	\end{minipage} &
+	\begin{minipage}{1.2in}
+	  \center
+	  \epsfxsize=1.0in
+	  \epsfbox{streamgraphs/sample.ps}
+	\end{minipage}\\
+      \end{tabular}
+    \end{minipage} & ~\hspace{0.5in} & 
+    \begin{minipage}{3in}
+      \center
+      \epsfysize=1.8in
+      \epsfbox{streamgraphs/target.ps} 
+    \end{minipage}  
+    \\
+    \begin{tabular}{cc}
+      \begin{minipage}{1.2in}
+	\center
+	{\bf a) FIR} 
+      \end{minipage} &
+      \begin{minipage}{1.2in}
+	\center
+	{\bf b) RateConvert} 
+      \end{minipage}\\
+    \end{tabular} & &
+    \begin{minipage}{3in}
+      \center
+      {\bf c) TargetDetect}
+    \end{minipage}
+    \\~\\
+
+    \multicolumn{3}{c}{
+      \begin{tabular}{cc}
+	\begin{minipage}{4in}
 	  \center
 	  \epsfysize=1.8in
-	  \epsfbox{streamgraphs/FIRProgram.ps}
-	\end{minipage} & ~\hspace{0.5in} & 
-	\begin{minipage}{3in}
+	  \epsfbox{streamgraphs/fm.ps}
+	\end{minipage} &
+	\begin{minipage}{2in}
 	  \center
-	  \epsfysize=2.5in
-	  \epsfbox{streamgraphs/FIRProgram.ps}
-	\end{minipage}
+	  \epsfysize=1.8in
+	  \epsfbox{streamgraphs/vocoder.ps}
+	\end{minipage} \\
+      {\bf d) FM} & {\bf e) Vocoder} \\
       \end{tabular}
-      ~ \vspace{30pt} \\
-      \caption{Benchmark Stream Graphs.}
-      \label{fig:streamgraphs}
+    }
+    
+    \\~\\
+
+    \multicolumn{3}{c}{
+      \begin{tabular}{cc}
+	\begin{minipage}{5in}
+	  \center
+	  \epsfxsize=5.0in
+	  \epsfbox{streamgraphs/bf.ps}
+		  {\bf f) Radar}
+	\end{minipage} &
+	\begin{minipage}{1in}
+	  \center
+	  \begin{tabular}{c}
+	    \epsfxsize=0.5in
+	    \epsfbox{streamgraphs/oversampler.ps} \\
+            {\bf g) Oversample} \\
+	  \end{tabular}
+	\end{minipage} \\
+      \end{tabular}
+    }
+  
+    \\~\\
+
+    \begin{minipage}{2.5in}
+      \center
+      \epsfysize=2.5in
+      \epsfbox{streamgraphs/onebit.ps}
+    \end{minipage} &  &
+    \begin{minipage}{3in}
+      \center
+      \epsfysize=2.5in
+      \epsfbox{streamgraphs/fb.ps}
+	
+    \end{minipage}
+    \\
+    {\bf h) OneBit}  & & 
+    {\bf i) FilterBank}
+    \\
+ 
+    
+  \end{tabular}
+  \caption{Benchmark Stream Graphs.}
+  \label{fig:streamgraphs}
 \end{figure*}

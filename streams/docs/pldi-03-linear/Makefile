@@ -34,8 +34,8 @@ stream-graphs: streamgraphs/*.dot
 	dot -Tps streamgraphs/FIRProgram-linear-linear-simple.dot > streamgraphs/fir.ps
 	dot -Tps streamgraphs/SamplingRateConverter-linear-linear-simple.dot > streamgraphs/sample.ps
 	dot -Tps streamgraphs/TargetDetect-linear-linear-simple.dot > streamgraphs/target.ps
-#	dot -Tps streamgraphs/LinkedFMTest-linear-linear-simple.dot > streamgraphs/fm.ps
-	dot -Tps streamgraphs/CoarseSerializedBeamFormer-linear-linear-simple.dot > streamgraphs/bf.ps
+	dot -Tps streamgraphs/LinkedFMTest-linear-linear-simple.dot > streamgraphs/fm.ps
+	dot -Tps streamgraphs/CoarseSerializedBeamFormer-2linear-linear-simple.dot > streamgraphs/bf.ps
 	dot -Tps streamgraphs/FilterBank-linear-linear-simple.dot > streamgraphs/fb.ps
 	dot -Tps streamgraphs/ChannelVocoder-linear-linear-simple.dot > streamgraphs/vocoder.ps
 	dot -Tps streamgraphs/Oversampler-linear-linear-simple.dot > streamgraphs/oversampler.ps
@@ -51,4 +51,4 @@ main.dvi: main.tex references.bib *.tex images/*.eps images/part-algorithm.eps i
 
 clean:
 	rm -f main.pdf main.ps main.dvi main.log main.aux main.bbl main.blg
-	rm -rf sub
+	rm -rf sub streamgraphs/*.ps images/part-algorithm*.eps images/part-algorithm*.ps
