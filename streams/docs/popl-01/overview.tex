@@ -258,9 +258,12 @@ further improves readability and decreases code size.
 
 \subsubsection{StreaMIT Approach}
 
+\begin{figure}
+\scriptsize
+\begin{verbatim}
 class CheckFreqHop extends SplitJoin {
-   FloatPortal freq_hop;
-   void init(FloatPortal fh) {
+   RFtoIFPortal freq_hop;
+   void init(Portal fh) {
       freq_hop = fh;
       weighted_round_robin(N/4-2,1,1,N/2,1,1,N/4-2);
       int k = 0;
@@ -285,29 +288,136 @@ class CheckFreqHop extends SplitJoin {
       weighted_round_robin(N/4-2,1,1,N/2,1,1,N/4-2);
    }
 }
+\end{verbatim}
+\vspace{-12pt}
+\caption{\protect\small The CheckFreqHop stream from our software
+   radio provides an example of the messaging system in StreaMIT.
+\protect\label{fig:mess}}
+\vspace{-12pt}
+\end{figure}
 
 StreaMIT provides a dynamic messaging system for passing irregular,
-low-volume control information between filters and streams.  The key
-feature is a sophisticated timing system that allows filters to
-specify when a message will be received in terms of the ``wavefront''
-of data that it sees during the execution of its own work function.  
+low-volume control information between filters and streams.  Messages
+are sent from within the body of a filter's {\tt work} function,
+perhaps to change a parameter in another filter.  For example, in the
+CheckFreqHop stream of our software radio example (Figure
+\ref{fig:mess}), a message is sent upstream to change the frequency of
+the receiver if the downstream component detects that the transmitter
+is about to change frequencies.  The sender can continue to execute
+while the message is en route, and the {\tt set\_freq} method will be
+invoked in the receiver with argument {\tt Freq[k]} when the message
+arrives.  Since message delivery is asynchronous, there can be no
+return value; only void methods can be message targets.
 
+{\bf Message timing.}The central aspect of the messaging system is a
+sophisticated timing mechanism that allows filters to specify when a
+message will be received relative to the flow of information between
+the sender and the receiver.  Recall that each filter executes
+independently, without any notion of global time.  Thus, the only way
+for two filters to talk about a time that is meaningful for both of
+them is in terms of the data items that are passed through the streams
+from one to the other.
 
-Messages are sent from within the body of a filter's {\tt work}
-function, perhaps to change a parameter in another filter (see Figure
-??).  
+In StreaMIT, one can specify a range of latencies for a message to get
+delivered.  This latency is measured in terms of an information
+``wavefront'' from one filter to another.  For example, in the {\tt
+CheckFreqHop} example of Figure \ref{fig:mess}, the sender indicates
+an interval of latencies between $4N$ and $6N$.  This means that the
+receiver will receive the message immediately following the last
+invocation of its own {\tt work} function which produces an item
+affecting the output of the {\it sender's} 4'th, 5'th, or 6'th work
+functions, counting the sender's current work function as number 0.
+Defining this notion precisely is the subject of Section
+\ref{sec:time}, but the general idea is simple:  the receiver is
+invoked when it sees the information wavefront that the sender sees in
+4-6 execution steps.  
 
-Message delivery is asynchronous in that a filter can continue to
-execute while the message is en route; however, StreaMIT provides a
-sophisticated timing system so that filters can synchronize 
+In some cases, the ability to synchronize the arrival of a message
+with some element of the data stream is very important.  For example,
+{\tt CheckFreqHop} knows that the transmitter will change the
+frequency between 4 and 6 steps later, in terms of the frame that {\tt
+CheckFreqHop} is inputting.  To ensure that the radio changes
+frequencies at the same time--so as not to lose any data at the old or
+new frequency--{\tt CheckFreqHop} instructs the receiver to switch
+frequencies when the {\it receiver} sees one of the last data items at
+the old frequency.
 
-Messages
-are sent from within the body of a filter's {\tt work} function.
-Message delivery is asynchr Any
-filter can send a message within the body of its work function.  The
-message is 
+{\bf Portals for broadcast messaging.}  StreaMIT also has support for
+modular broadcast messaging.  When a sender wants to send a message
+that will invoke method $M$ of the receiver $R$ upon arrival, it does
+not call $M$ on the object $R$.  Rather, it calls $M$ on a {\it
+Portal} of which $R$ is a member.  Portals are typed containers that
+forward all messages they receive to the elements of the container.
+Portals could be useful in cases when a component of a filter library
+needs to announce a message (e.g., that it is shutting down) but does
+not know the list of recipients; the user of the library can pass the
+filter a Portal containing all interested receivers.
+
+\begin{figure}
+\scriptsize
+\begin{verbatim}
+class TrunkedRadio extends Stream {
+   RFtoIFPortal freq_hop = new RFtoIFPortal();
+   BoosterPortal onoff = new BoosterPortal().
+   void init() {
+      add(new ReadFromAtoD());
+
+      RFtoIF RF2IF = new RFtoIF();
+      add(RF2IF);
+      freq_hop.register(RF2IF);
+
+      Booster ISS = new Booster();
+      add(ISS);
+      onoff.register(ISS);
+ 
+      add(new FFT());
+      add(new CheckFreqHop(freq_hop));
+      add(new CheckQuality(onoff));
+      add(new AudioBackEnd());
+   }
+}
+\end{verbatim}
+\vspace{-12pt}
+\caption{\protect\small TrunkedRadio is the top-level class for our
+      software radio, demonstrating the use of Portals for messaging.
+\protect\label{fig:radiocode}}
+\vspace{-12pt}
+\end{figure}
+
+In a language with generic data types, a Portal could be implemented
+as a templated list.  However, since Java does not yet support
+templates, we automatically generate a {\tt \{Class\}Portal} class for
+every class \{Class\}.  Our syntax for using Portals is evident in the
+high-level radio code in Figure \ref{fig:radiocode}.
 
 \subsubsection{Rationale}
+
+Stream programs present a challenge in that filters need both regular,
+high-volume data transfer and irregular, low-volume control
+communication.  Moreover, there is the problem of reasoning about the
+relative ``time'' between filters when they are running asynchronously
+and in parallel.
+
+A different approach to messaging is to embed control messages in the
+data stream instead of providing a separate mechanism for dynamic
+message passing.  This does have the effect of associating the message
+time with a data item, but it is complicated, error-prone, and leads
+to unreadable code.  Further, it could hurt performance in the steady
+state (if each filter has to check whether or not a data item is
+actual data or control, instead) and complicates compiler analysis,
+too.  Finally, one can't send messages upstream without creating a
+separate data channel for them to travel in.
+
+Another solution is to treat messages as synchronous method calls.
+However, this delays the progress of the stream when the message is en
+route, thereby degrading the performance of the program and
+restricting the compiler's freedom to reorder filter executions.  
+
+We feel that the StreaMIT messaging model is an advance in that it
+separates the notions of low-volume and high-volume data
+transfer--both for the programmer and the compiler-- without losing a
+well-defind semantics where messages are {\it timed} relative to the
+high-volume data flow.
 
 \subsection{Re-Initialization}
 
@@ -318,35 +428,6 @@ message is
 
 \begin{verbatim}
 
----------------------------------------------------------------------------
-- integrated support for infrequent, low-bandwidh messages
-- others:
-	- embed control messages in data stream
-		- complicated, error-prone, unreadable code
-		- hurts performance of steady state (if you have to 
-			check if everything is message or data)
-		- complicates compiler analysis
-		- can't send messages upstream without explicit
-			feedback loop
-	- treat messages as synchronous method calls
-		- but delays stream progress when method en route, 
-			disrupting scheduling freedom of compiler, as
-			well as efficiency when at time of call
-		- usually there is no return value (it's a message!)
-		- no good notion of ``when'' message arrives relative
-			to sender
-- us: 	- talk about PORTALS
-	- support for asynchronous messages with timing relative to
-		data items
-	- (define the ``wavefront'' of a data item, and say that
-		messages sent with range of times)
-	- avoids problems of two above approaches (it's readable, out
-		of the way of steady-state data, and out of way of compiler)
-	- this RELATIVE time gives more freedom to compiler for
-		scheduling blocks
-	- absence of global time good for parallel programming
-
-- syntax presented:  sendMessage, messageHandlers, messageStubs.
 ---------------------------------------------------------------------------
 - integrated support for re-initialization sections of a stream
 - others:	
