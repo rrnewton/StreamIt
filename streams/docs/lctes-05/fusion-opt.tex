@@ -25,8 +25,6 @@ uniprocessor, efficient buffer management translates to efficient
 maintenance and addressing of this buffer in memory.  On a parallel
 system, buffers can also be implemented using network links.
 
-\input{fusion-fig1}
-
 In this section, we explore two basic strategies for buffer management
 in stream programs.  The first strategy, termed {\it modulation},
 implements a traditional circular buffer that is indexed by wraparound
@@ -93,8 +91,6 @@ original filter are fully unrolled.
 {\bf Evaluation.}  The time required for the modulation strategy
 increases linearly with the peek rate.  This is expected, as there is
 a constant overhead per peek operation.
-
-\input{fusion-fig2}
 
 \subsection{Copy-Shift}
 
@@ -246,3 +242,6 @@ strategy.
 %% in the work function of the fused partition.
 
 %% The above optimization improves data access locality.
+
+\input{fusion-fig1}
+\input{fusion-fig2}

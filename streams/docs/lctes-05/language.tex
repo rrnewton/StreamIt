@@ -19,6 +19,7 @@ compiler    to construct a static schedule of filter executions. The
 following is an example implementation of a FIR   (Finite Impulse
 Response)  filter: 
 %\begin{scriptsize}
+{\small
 \begin{verbatim}
 float->float filter FIR (int N, float[] weights) 
 {
@@ -31,7 +32,7 @@ float->float filter FIR (int N, float[] weights)
     push(sum);
   }
 }
-\end{verbatim}
+\end{verbatim}}
 %\end{scriptsize}
 
 The work function is invoked (fired) whenever there is sufficient data
@@ -48,6 +49,7 @@ explicit management of the data buffers between filters.
 
 \begin{figure}[t]
 \begin{center}
+\vspace{-12pt}
  \framebox{\includegraphics[scale=1, angle=0]{./constructs-eg.eps}}
  \caption{StreamIt containers.}
  \label{fig:containers}
@@ -56,9 +58,11 @@ explicit management of the data buffers between filters.
 
 \begin{figure}[t]
 \begin{center}
+\vspace{-12pt}
  \framebox{\includegraphics[scale=1, angle=0]{./pipeline-eg.eps}}
  \caption{Example pipeline with FIR filter.}
  \label{fig:pipeline}
+\vspace{-24pt}
 \end{center}
 \end{figure}
 
@@ -110,7 +114,9 @@ before and after the actor executions.
 
 \begin{figure}[t]
 \begin{center}
+\vspace{-12pt}
  \includegraphics[scale=1, angle=0]{./pipe-with-rates.eps}
+\vspace{-6pt}
  \caption{Example pipeline.}
  \label{fig:pipe-with-rates}
 \end{center}
@@ -151,10 +157,12 @@ epilogue is run to drain the buffers as necessary.
 
 \begin{figure}[t]
 \begin{center}
- \psfig{figure=ssi.eps,width=3.4in}
+\vspace{-12pt}
+ \psfig{figure=ssi.eps,width=3in}
  \caption{Instruction size (in bytes along the y-axis) per filter
  (x-axis) occuring in a steady state execution of FFT.}
  \label{fig:ssi-single}
+\vspace{-24pt}
 \end{center}
 \end{figure}
 
