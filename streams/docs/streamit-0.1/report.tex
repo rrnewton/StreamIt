@@ -23,7 +23,9 @@ command?
 
 \item Do we have a name for a {\tt FilterBlock} that is both a source
 and a sink?  A {\tt SourceSinkBlock}?  Maybe we should make that the
-top-level construct instead of {\tt Stream}?
+top-level construct instead of {\tt Stream} I was thinking that the
+outer-most level is more like a Pipe than a FilterBlock, but then we
+can't have member variables, so this will need revising.
 
 \end{enumerate}
 
@@ -39,6 +41,12 @@ since it has no input and output.  Let's call it a {\tt Stream}
 instead?  Also, why name it, since there can be only one of them and
 it's not accepting parameters?  Let's just say {\tt Stream} at the
 toplevel.
+
+\item I'm again of the opinion that control constructs should return
+objects.  It's very difficult to explain what they *do* return (or
+represent) if it's not an object--it's a collection of blocks, but
+it's a control construct?  Then what if it's exactly one block?  Then
+it's not an object anymore?  Doesn't make sense.
 
 \end{enumerate}
 
@@ -58,6 +66,9 @@ blocks'', etc.
 \item Add a section on scheduling guarantees (or lack thereof.)
 
 \item Define terms earlier (blocks vs. 1-to-1 blocks, etc.)
+
+\item Make it clear that FilterBlocks can contain streams, not just
+blocks.
 
 \end{enumerate}
 
@@ -156,8 +167,8 @@ and modifying the structure while the stream is executing.
 
 In the following sections, we describe the StreaMIT base language from
 the bottom up: functional blocks (Section \ref{sec:blocks}), control
-constructs (Section \ref{sec:control}), and dynamic constructs
-(Section \ref{sec:dynamic}).
+constructs (Section \ref{sec:control}) and dynamic constructs (Section
+\ref{sec:dynamic}).
 
 \subsection{Functional Blocks}
 \protect\label{sec:blocks}
@@ -276,7 +287,7 @@ can't be seen from outside the scope of the filter.
 \end{itemize}
 
 \medskip
-\noindent {\bf Filter Instantiation.}
+\noindent {\bf Filter Instantiation}
 \medskip
 
 A filter can be instantiated into the stream graph by calling its name
@@ -380,6 +391,82 @@ SourceBlock MakeText() {
 
 \end{verbatim}
 
+\subsubsection{Naming}
+
+StreaMIT provides a naming scheme for functional blocks that is useful
+for both dynamic events (see Section {\ref{sec:dynamic}}) and
+debugging.  Firstly, any instantiation of a {\tt Filter} or {\tt
+FilterBlock} can be bound to a variable of type {\tt FilterRef}.  We
+require each {\tt FilterRef} variable to be defined exactly once; that
+is, it functions less as a variable than as a static denotable label
+for a single block instantiation.  Accordingly, we allow {\tt
+FilterRef} variables to be used before they are defined (but not
+before they are declared, of course.)  {\tt FilterRef}'s can be passed
+as parameters to {\tt Filter}'s and {\tt FilterBlock}'s, just like any
+other data type.  The following example illustrates the syntax of
+assigning to {\tt FilterRef}'s:
+
+\begin{verbatim}
+Filter MyFilter(FilterRef ref) {
+  ...
+}
+
+FilterBlock MyBlock() {
+
+  FilterRef ref1, ref2;
+
+  ref1 = MyFilter(ref2);
+  ref2 = Filter {
+    ...
+  }
+
+}
+\end{verbatim}
+
+The second naming feature in StreaMIT allows one to assign a string
+name to a given {\tt FilterRef} on the same line as its definition.
+Then, the name can be obtained from a {\tt FilterRef} ``ref'' by
+calling ``ref.getName()''.  Further, a hierarchical description
+containing the path-delineated names of all enclosing blocks can be
+obtained by calling ``ref.getFullName()''.  If a given block was not
+assigned a name, then a name is generated from the block's type and
+position in the stream structure.  In all, these naming functions
+serve as a runtime counterpart the variable naming above; this
+functionality is intended for user interface and debugging.  The
+abstract syntax for the naming system is thus as follows:
+
+[{\it filter-ref-variable} = [{\it string-name}] ] {\it block-instantiation}
+
+where {\it block-instantiation} can be any block, either constructed
+or inlined.  As an example, we rewrite the ``Hello World!'' program
+using names:
+
+\begin{verbatim} 
+
+Stream {
+  FilterRef helloRef, worldRef;		// NOTE: ILLEGAL INSIDE STREAM {
+
+  helloRef = ``Hello '' Source {
+	...
+  }
+
+  worldRef = ``World!'' Filter {
+	...
+  }
+
+  Sink(ref1 = helloRef, ref2 = worldRef) {
+    ...
+    
+    work() {
+      ...
+      System.out.println(ref1.getName() + ref2.getName());
+    }
+  }
+
+}
+
+\end{verbatim}
+
 \subsection{Control Constructs}
 \protect\label{sec:control}
 
@@ -399,7 +486,7 @@ connecting filters into a linear chain, 2) SplitJoin, for splitting a
 stream into parallel components, and 3) FeedbackLoop, for
 incorporating loops into the graph.  Note that while these constructs
 are very expressive, they can not express all arbitrary connections of
-filters.  However, the philosophy is that structured streams compare
+filters.  However, our philosophy is that structured streams compare
 to arbitrarily connected streams as structured control flow compares
 to goto statements: the loss of expressive power will be more than
 offset by improved readability and opportunity for optimization.
@@ -409,9 +496,11 @@ the control constructs.  We will use the word {\it block} to refer to
 any of a {\tt Filter}, {\tt Source}, {\tt Sink}, {\tt FilterBlock},
 {\tt SourceBlock}, or {\tt SinkBlock}.  A {\it 1-to-1 block} refers to
 only those blocks that have both an input and output: the {\tt Filter}
-and {\tt FilterBlock}.  A {\it stream} is either a 1-to-1 block or a
-composition of 1-to-1 blocks formed using the control constructs.  FIX
-THIS DEF OF STREAM--DO WE NEED SOURCESTREAM, SINKSTREAM?
+and {\tt FilterBlock}.  A {\it stream} is either a block or a
+composition of blocks formed using the control constructs.  A stream
+can be characterized by the presence or absence of the input and
+output channel; a stream is designated {\it 1-to-1} if it both
+consumes input and produces output.
 
 \subsubsection{Pipe}
 
@@ -422,16 +511,188 @@ series of streams into a linear chain, using the following syntax:
 \hspace{0.2in} \= \hspace{0.2in} \= \hspace{0.2in} \= \hspace{0.2in} \= \\
 
 {\tt Pipe} \{ \\ \\
-
 \> {\it stream$_1$} \\
 \> {\it stream$_2$} \\
-\> \dots
+\> \dots \\
+\> {\it stream$_{n-1}$} \\
 \> {\it stream$_n$} \\
 
 \}
 \end{tabbing}
 
-Each stream in the pipeline can be a 
+The {\tt Pipe} construct defines a stream where the output channel of
+stream $i$ is connected to the input channel of stream $i+1$, for all
+$i$ from $1$ to $n-1$.  Naturally, this requires that {\it stream$_1$}
+produces output, {\it stream$_n$} consumes input, and {\it stream$_2$}
+through {\it stream$_{n-1}$} are 1-to-1.  Further, each pair of input
+and output channels that is connected must be of the same type.  The
+stream defined by the {\tt Pipe} adopts the input channel of {\it
+stream$_1$} and the output channel of {\it stream$_n$}, if these
+channels exist.
+
+The control flow defined by a {\tt Pipe} is the default control flow
+in StreaMIT.  For instance, the streams defined within a {\tt
+FilterBlock} are implicitly enclosed within a {\tt Pipe}.  
+
+\subsubsection{Stream}
+
+The {\tt Stream} construct is used to denote the top-level stream in
+the program.  Its syntax and semantics are identical to that of {\tt
+Pipe}, except that the first stream must require no input and the last
+stream must produce no output.
+
+\subsubsection{SplitJoin}
+
+Up to this point, all of our streams have been arranged in a single
+line.  The {\tt SplitJoin} construct can be used to split a stream
+into multiple parallel sections.  It imposes structure in that no
+connections are allowed between parallel sections; that is, parallel
+streams must remain distinct until they are joined together again.
+The syntax is as follows:
+
+\begin{tabbing}
+\hspace{0.2in} \= \hspace{0.2in} \= \hspace{0.2in} \= \hspace{0.2in} \= \\
+{\tt SplitJoin} \{ \\
+\> splitter-type \\
+\> {\it stream$_1$} \\
+\> {\it stream$_2$} \\
+\> \dots \\
+\> {\it stream$_n$} \\
+\> joiner-type \\
+\}
+\end{tabbing}
+
+The {\tt SplitJoin} construct defines a stream where input items are
+distributed to {\it stream$_1$} through {\it stream$_n$} according to
+``splitter-type'', and outputs of {\it stream$_1$} through {\it
+stream$_n$} are combined according to ``joiner-type''.  Thus, each
+stream must be 1-to-1, and must have identical input and output types
+(until we introduce type-dispatching splitters and joiners.)
+
+The types of the splitter and joiner are compiler defined.  For now,
+we support the following splitters:
+
+\begin{enumerate}
+
+\item {\tt DUPLICATE}, which sends a copy of each input item to each
+of the parallel streams.
+
+\item {\tt ROUND\_ROBIN}, which sends input item $i$ to {\it
+stream$_{1+(i~mod~n)}$}.  That is, the inputs are alternately sent to
+each stream, starting with the first one.
+
+\item {\tt WEIGHTED\_ROUND\_ROBIN} (weight$_1$, weight$_2$, \dots,
+weight$_n$), which operates like ROUND\_ROBIN, except that weight$_i$
+items are sent to the $i$'th stream before moving on to the next one.
+If stream $i$ does not have an input channel, then weight$_i$ must be
+0.
+
+\item {\tt NULL}, which is syntactic sugar for {\tt
+WEIGHTED\_ROUND\_ROBIN}(0, 0, ..., 0).  That is, all of the streams
+contain a source and require no input from the splitter.
+
+\end{enumerate}
+
+The joiners we support are as follows:
+
+\begin{enumerate}
+
+\item {\tt ROUND\_ROBIN}, which selects output item $i$ from {\it
+stream$_{1+i~mod~n}$}.  That is, the outputs are alternately selected
+from each stream, starting with the first one.
+
+\item {\tt WEIGHTED\_ROUND\_ROBIN} (weight$_1$, weight$_2$, \dots,
+weight$_n$), which operates like ROUND\_ROBIN, except that weight$_i$
+items are drawn from the $i$'th stream before moving on to the next
+one.  If stream $i$ does not have an ouput channel, then weight$_i$
+must be 0.
+
+\item {\tt NULL}, which is syntactic sugar for {\tt
+WEIGHTED\_ROUND\_ROBIN}(0, 0, ..., 0).  That is, all of the streams
+contain a sink and produce no output for the joiner.
+
+\end{enumerate}
+
+\subsubsection{FeedbackLoop}
+
+The {\tt FeedbackLoop} construct provides a means for introducing
+loops into the stream structure.  However, we impose the restriction
+that there can be no channel connections between blocks inside the
+loop and blocks outside the loop.  This results in a flow of data that
+is similar to the flow of control in the loop nests of traditional
+programs.  The syntax is as follows:
+
+\begin{tabbing}
+\hspace{0.2in} \= \hspace{0.2in} \= \hspace{0.2in} \= \hspace{0.2in} \= \\
+
+{\tt FeedbackLoop} \{ \\
+\> {\it FeedbackFilter} \\
+\> {\it stream$_{body}$} \\
+\> {\it stream$_{loop}$} \\
+\}
+\end{tabbing}
+
+The {\tt FeedbackLoop} passes the input stream through a ``feedback
+filter'' (see below), whose output is connected to {\it
+stream$_{body}$}, the body of the loop.  The output of {\it
+stream$_{body}$} is the output of the entire construct.  However, this
+output is also passed back through {\it stream$_{loop}$} and connected
+as a second input to the feedback filter, thereby introducing a
+backwards path of data movement in the stream.
+
+\medskip
+\noindent {\bf FeedbackFilter}
+\medskip
+
+The {\tt FeedbackLoop} utilizes a special kind of filter called a {\tt
+FeedbackFilter}.  A {\tt FeedbackFilter} is identical to a {\tt
+Filter} except that it has an extra input channel for the feedback
+loop.  This channel is declared as {\tt feedback-input} in the body of
+the filter, such that the beginnig of a {\tt FeedbackFilter}
+declaration looks like this:
+
+\begin{tabbing}
+\hspace{0.2in} \= \hspace{0.2in} \= \hspace{0.2in} \= \hspace{0.2in} \= \\
+
+{\tt FeedbackFilter} filter-name (type$_1$ param$_1$, type$_2$ param$_2$,
+... , type$_n$ param$_n$) \{ \\ \\
+
+\> {\tt feedback-input} feedback-input-type feedback-input-name; \\
+\> {\tt input} input-type input-name; \\
+\> {\tt output} output-type output-name; \\ \\
+
+\> \dots \\
+\}
+\end{tabbing}
+
+We would like to provide a mechanism for the {\tt FeedbackFilter} to
+specify the {\it delay} of the feedback loop.  That is, suppose
+that--in the steady state--item $i$ of {\tt input} and item $j$ of
+{\tt feedback-input} are being read from within the work function
+(assume that there are no {\tt advance} statements.)  Then we could
+characterize the delay as the smallest $d$ for which {\tt
+feedback-input[j]} depends on the value of {\tt input[i-d]}.
+Intuitively, the delay is the offset of causal time fronts between the
+inputs of the {\tt FeedbackFilter}, measured in the units of the
+original stream.  Note that the delay is not necessarily equal to the
+number of items that are in transit around the loop, since the item
+count could vary if there are rate changes between blocks.
+
+To allow the {\tt FeedbackFilter} to control the loop delay, as well
+as to control which initial values are propagated around the feedback
+path, we make a further restriction on the {\tt feedback-input}
+channel: it can not be read from within the initialization code.
+Instead, the {\tt FeedbackFilter} initializer should read {\it delay}
+elements from the original {\tt input} channel and fabricate initial
+outputs accordingly.  These outputs will propagate around the loop and
+accumulate on the {\tt feedback-input} channel.  Then, when the
+initializer exits and we enter the steady state, the {\tt
+feedback-input} channel will be exactly $delay$ items ``behind'' the
+{\tt input} channel, as desired.  Additionally, channels throughout
+the feedback loop are initialized as a natural consequence of each
+block's instantiation.  The compiler will signal an error if the
+initializers do not output enough items to reach the {\tt
+feedback-input} channel.
 
 \subsection{Dynamic Constructs}
 \protect\label{sec:dynamic}
@@ -440,34 +701,6 @@ Each stream in the pipeline can be a
 \label{sec:script}
 
 \begin{verbatim}
-
-	B. control constructs
-		- toplevel is Stream construct
-			- first is source, last is sink
-		- already seen flow of control is implicitly linear inside
-			filterblocks
-	
-		I. SplitJoin
-		- for splitting / merging streams
-		- split: RoundRobin, WeightedRoundRobin (+ syntax), Dupliate
-		- join: RoundRobin, WeightedRoundRobin
-		- for WeightedRoundRobin, must have zero for sources/sinks?
-
-		II. Pipe
-		- explicit way of grouping 1-to-1 units to form larger blocks
-		- compared to FilterBlock construct, can't be bound to 
-			variable, doesn't create a scoping barrier
-
-		III. Feedback
-		- specify time in loop (number of elements in delay)
-		- need to flesh out rest of details
-
-	C. referencing filters:  FilterRef's
-
-		- whenever a filter/filterblock is instantiated (or inlined),
-			the result can be bound to a FilterRef variable
-		- FilterRef's can only be assigned once, and (unlike normal
-			variables) they can be used before they're defined
 
 		I. Using FilterRef's:  Initialization
 			- ref.reset(<dynamic parameters>)
@@ -486,14 +719,6 @@ Each stream in the pipeline can be a
 			- message handlers can send messages and
 				   re-initialize, but not read i/o
 			- delivery is from top to bottom
-
-		III. naming FilterRef's
-			- ref.getName() returns hierarchical name
-			- can assign names after equals sign of
-                          assignments to references
-			- if no name given, then default name assigned
-                          based on name of filter/filterblock and
-                          position in parent
 
 	D. advanced control flow:  StreamSelect
 		- now that we have construct for re-initialization, might
@@ -543,20 +768,6 @@ not explicitly going into user's guide:
 	- warning
 	- performance problem
 
-x outline
-
-  pipe - inlined
-  filter - inlined
-  splitjoin
-  feedback
-  functions
-  sources & sinks
-  whole program (main, etc)
-  script vs dynamic
-  filter block
-  stream select
-  messaging system
-
 x need to define subset of c that we allow
 
 x messages
@@ -567,15 +778,6 @@ x messages
 		read i/o
 
 x scripting language
-  x procedural; upon instantiating filter, it's put into graph.
-  x two means of abstraction: filter & filterblock
-  x outermost filterblock is called main, takes no paramters
-	x first thing is source, last is sink
-
-  x filterref's
-    - can have use before def.
-    - require exactly one assignment
-
   x script variable type
     - all things of type script can be bdetermined at compile time
     - i.e. other script variables, constant literals, pure funcs of these
@@ -585,71 +787,14 @@ x scripting language
 	control flow.
     - regular constructs can use script variables just like they were normal
 
-x filterblocks
-   - also take parameters & have variables scoped
-   - no functions, no message handlers, no explicit input/output
-   - instantiation equivalent to copying body
-   - scope wall between it and enclosing
-
-x pipe
-	- somehow implicit in filter blocks
-	- for connecting single input, single output blocks
-
-x splitjoin (?? - what's the verdict on joins/splits?)
-	- split: roundrobin, weightedroundrobin (+ syntax), duplicate
-	- join: roundrobin, weightedroundrobin
-
-	- for w.r.r., must have zero for sources/sinks
-
 x streamselect
 	- just goes on an enumerated type with cases
 	- the enumerated variable is dynamic
 
-x sources/sinks
-	- defined just like filters, but with either no input or no output
-	- have special keywords for types, source & sink
-
-x feedback loop
-	- specify time in loop (number of elements in delay)
-	- need to flesh out rest of details
-
-x naming
-	- ref.getName() returns name
-	- can assign names after equals sign of assignments to references
-
-x filters 
-
-    x defined as ``Filter FooType<script params>(dynamic params)'' {
-	// data members
-	// initialization statements
-	Work()
-	// other functions, message handlers
-	}
-
-    x distinction between script and dynamic parameters - script don't
-	change across multiple instantiations.
-
-    x single input and output, declared with ``input'', ``output'' with
-	name and type.
-
-    x work function
-	- no parameters
-	- can send messages and re-initialize
-	- input/output accessed as an array.  each is advanced with advance
-		statement
-	- things going through i/o are passed by value.  no pointers to 
-		global data structures.
-
-    x initialization
-	- no messages, initialization of other blocks
-	- but can read i/o to get stuff going
-
-    x re-initialization
+x re-initialization
 	- do ref.reset(dynamic params...).  static params do not need to
 		be passed again because they don't change from one 
 		instantiation to the next
-
-    x inlined by copying body and having default values for all parameters
 
 \end{verbatim}
 
