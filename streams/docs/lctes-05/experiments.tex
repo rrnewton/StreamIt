@@ -1,6 +1,29 @@
 \section{Experimental Evaluation}
 \label{sec:evaluation}
 
+\begin{table}[t]
+\center
+\label{tab:benchmarks}
+\caption{Evaluation benchmark suite.}
+{\tiny
+\begin{tabular}{|c|c|c|} \hline
+{\bf Benchmark}&{\bf description}&{\bf \# of actors}\\ \hline \hline
+\texttt{beamformer} &beamformer with 12 sources and 4 detectors& 54 \\ \hline
+\texttt{fft-fine	} &fine grained FFT implementation	&	121 \\ \hline
+\texttt{fft-coarse} &coarse grained FFT implementation	&	26 \\ \hline
+\texttt{fmradio	} &FM Radio with 10 way equalizer	&	49 \\ \hline
+\texttt{filterbank} &simple filterbank program	&	53 \\ \hline
+\texttt{bitonic	} &bitonic sort of 64 integers	&	972 \\ \hline
+\texttt{matmult	} &matrix multiplication	&	48 \\ \hline
+\texttt{fir	      } &finite impulse response program	&	132 \\ \hline
+\texttt{3gpp	} &3GPP Radio Access Protocol application	&	105 \\ \hline
+\texttt{filterbank2}&alternate implementation of a filterbank &	37 \\ \hline
+\texttt{ofdm	 }&OFDM SpectrumWare performance test	&	16 \\ \hline
+\end{tabular}
+}
+\end{table}
+
+
 In this section we evaluate the merits of the proposed cache-aware
 optimizations and buffer management strategies. We use two
 different architectures: a 600~MHz Pentium~3 and a 1.3~GHz
