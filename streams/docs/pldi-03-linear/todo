@@ -1,10 +1,6 @@
 to add to paper:
 ---------------
 
-- make clear we're not implementing plain matrix multiply; only
-mutliplying non-zero elements
-
-- put in updated frequency transform stuff (Andrew)
 - describe partitioning stuff (Bill)
 - updated numbers (with new benchmarks?)
   - resolve Beamformer numbers
@@ -13,26 +9,39 @@ mutliplying non-zero elements
 
 Andrew's distallation of todo items (that are not already fixed) from reviewers:
 - Make stream graphs easier to read / lay them out better
+  - Perhaps show the various stream graphs for a single application (and point
+    readers to the web/thesis for the stream graphs of the other benchmarks.
 - Add examples of combination rules
 - Add examples of frequency transformation (don't know how to do this)
-- Possibly make more clear that "pushcount" and "popcount" are not simply counters but
-	are used to generate the linear nodes.
 - More benchmarks
 - Include measurements of code size and data size for before/after transformed programs
-- Doesn't like smapling conversion rate of 2/3. Results will get better for larger rates,
-	should I change it? 441/220 perhaps?
+- Doesn't like sampling conversion rate of 2/3. Results will get better for larger rates,
+	should I change it? 441/220 (downsample from CD to MP3 rates) perhaps?
 - Address the concern of extra work being incurred by the zeros introduced
 	in splitjoin combination.
-- Possibly compare to hand optimized (eg frequency transformations and all) code.
 - Possibly add the comments of the fourth reviewer:
 	"More technically, what I found most interesting about the paper is
 	that in order to perform the optimization, the optimizer first
 	attempts to extract from the program a high-level model (in this case,
 	an affine transformer) which then serves as a clean representation for
 	the filter transformations."
+
+Done
+------------
+- Possibly make more clear that "pushcount" and "popcount" are not simply counters but
+	are used to generate the linear nodes. 
+* Added a sentence to dataflow2.tex that says "The values of  $\mt{pushcount}$ and 
+	$\mt{popcount}$ when a push or pop is encountered are used to determine the 
+	appropriate locations within $A$ and ${\vec b}$."
+------------
 - Include some background on filters and their transformations. I wrote something
 	like this for my thesis. Perhaps we can include it in the paper (in shortened form)
-
+* There is a reasonable discussion of the topics of FIR filtering in the introduction to the Translation
+	to Frequency section. I think that this is more or less enough information to understand the
+	frequency transformation. I don't think that we need a more general introduction.
+------------
+- Cite Andrew's thesis for more details.
+------------
 
 
 
@@ -73,4 +82,6 @@ probably not doing
 
 - say more about when linear combination is a good thing?  I think the
 statement with the sum of non-zero elements is not entirely accurate.
+
+- Possibly compare to hand optimized (eg frequency transformations and all) code.
 
