@@ -446,10 +446,10 @@ from one to the other.
 In StreaMIT, one can specify a range of latencies for a message to get
 delivered.  This latency is measured in terms of an information
 ``wavefront'' from one filter to another.  For example, in the {\tt
-CheckFreqHop} example of Figure \ref{fig:mess}, the sender indicates
-an interval of latencies between $4N$ and $6N$.  This means that the
-receiver will receive the message immediately following the last
-invocation of its own {\tt work} function which produces an item
+CheckFreqHop} example of Figure \ref{fig:portal-code}, the sender
+indicates an interval of latencies between $4N$ and $6N$.  This means
+that the receiver will receive the message immediately following the
+last invocation of its own {\tt work} function which produces an item
 affecting the some output of the {\it sender's} $4N$'th to $6N$'th
 work functions, counting the sender's current work function as number
 0.  Defining this notion precisely is the subject of Section
