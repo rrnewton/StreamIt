@@ -803,7 +803,8 @@
 \@float{copyrightbox}[b]
 \begin{center}
 \setlength{\unitlength}{1pc}
-\begin{picture}(20,6) %Space for copyright notice
+% CHANGED BY BILL to give more space for text
+\begin{picture}(20,4) %Space for copyright notice
 \put(0,-0.95){\crnotice{\@toappear}}
 \end{picture}
 \end{center}

@@ -77,13 +77,17 @@ configurations in polynomial time, using dynamic programming.
 
 \begin{figure}[t]
   \psfig{figure=images/part-algorithm2.eps,width=3.5in}
+  \vspace{-14pt}
   \caption{Type declarations for code in Figure~\ref{fig:part-alg}.
   \protect\label{fig:part-decl}}
+  \vspace{-18pt}
 \end{figure}
 
 \begin{figure}[t]
   \psfig{figure=images/part-algorithm.eps,width=3.5in}
+  \vspace{-12pt}
   \caption{Algorithm for optimization selection.
+  \vspace{-12pt}
   \protect\label{fig:part-alg}}
 \end{figure}
 
@@ -116,7 +120,6 @@ detected where it would apply.  In our implementation, we use the
 following versions of the cost functions (let
 $\lambda=(A,\vec{b},e,o,u)$ be the linear node corresponding to stream
 $s$):
-\clearpage
 %% \[
 %% \begin{array}{rcl}
 %% \mt{getDirectCost}(s) \hspace{-6pt} & = \hspace{-6pt} & 1 + 3 * |\{ (i,j)~s.t.~A_{i,j} \ne 0\}| \vspace{3pt} \\ 
@@ -145,6 +148,7 @@ $s$):
 % trial and error with the ~, can't get it to move over :(
 \mt{dec}(s) = (o-1) * (100 + 4 * u) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 \]
+\clearpage
 
 For the direct cost, we consider the cost to be infinite for
 splitjoins with roundrobin splitters.  This is because the splitjoin
