@@ -18,7 +18,7 @@
 \texttt{fir	      } &finite impulse response program	&	132 \\ \hline
 \texttt{3gpp	} &3GPP Radio Access Protocol application	&	105 \\ \hline
 \texttt{filterbank2}&alternate implementation of a filterbank &	37 \\ \hline
-\texttt{ofdm	 }&OFDM SpectrumWare performance test	&	16 \\ \hline
+\texttt{ofdm	 }& Orthogonal Frequency Division Multiplexor~\cite{spectrumware}	&	16 \\ \hline
 \end{tabular}
 }
 \vspace{-12pt}
@@ -31,7 +31,7 @@ optimizations and buffer management strategies. We use two
 different architectures: a 600~MHz Pentium~3 and a 1.3~GHz
 Itanium~2. Both have 16~Kb primary instruction and data caches.
 
-Our benchmark suite (see Table~\ref{tab:benchmarks} consists of eleven
+Our benchmark suite (see Table~\ref{tab:benchmarks}) consists of eleven
 different StreamIt applications. They are compiled with the StreamIt
 compiler which applies the optimizations described in this paper, and
 outputs a functionally equivalent C program that is compiled with the
@@ -80,9 +80,9 @@ The fifth bar, labeled \texttt{CAF+buffer}
 applies scalar-replacement in addition to fusion, and the last bar,
 labeled \texttt{CAF+buffer+scaling}, applies all of the optimizations.
 
-In general, scaling improves performance, with speedups ranging for
-4-87\% compared to the baseline on the Petium. In the case of
-\texttt{matmult} and \texttt{ofmd}, there is a slight degradation
+In general, scaling improves performance, with speedups ranging from
+4-87\% compared to the baseline on the Pentium. In the case of
+\texttt{matmult} and \texttt{ofdm}, there is a slight degradation
 (nearly 5\%) due to poor code size estimation. By comparsion, the
 scaling results on the 
 Itanium are more uniform, and in fact, scaling does not degrade the
