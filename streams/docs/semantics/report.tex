@@ -1,6 +1,7 @@
 \documentstyle[psfig,lgrind]{article}
 \title{StreaMIT Intermediate Representation \\ Version 2.2}
 
+
 \begin{document}
 \maketitle
 
@@ -11,6 +12,321 @@ things to add:
 - how to do merges with the packaging semantics
 - direct name invocation of messages
 \end{verbatim}
+
+\section{Basic Ideas}
+
+The stream representation is composed of a number of basic building blocks.
+All of these blocks are put together to form a graph, which can be drawn
+on a 2D surface with no intersections.  The graph is almost a DAG, except
+we allow feedback loops in arrangement of filters.
+
+All blocks can be aggregated into larger superblocks:  Pipes, StreamSelects,
+FeedbackLoops, Splits and FilterBlocks.  
+All of these superblocks can be named.  Every 
+(super)block has a StreamID associated with it.  A message can be sent 
+to a StreamID, which will cause all highest-level blocks prepared to
+receive messages contained in within the named block
+to receive this msg.
+
+A named (super)block can also be reinitialized.  This will cause all the 
+in/outflowing buffers to be purged.
+
+\section{Filters}
+A new filter type is defined as follows:
+
+\begin{verbatim}
+type FooType is Filter
+{
+// insert data/functions here
+};
+\end{verbatim}
+
+\subsection{Input/Output}
+
+Each filter is required to have a single input and single output:
+\begin{verbatim}
+input inputType fooInput;
+output outputType fooOutput;
+\end{verbatim}
+
+\subsection{Work}
+
+Most of the work done by a filter is described in a Work function:
+
+\begin{verbatim}
+Work ()
+{
+  fooOutput [0] = fooInput [0] + fooInput [1];
+  fooInput.release (2);
+  fooInput.advance (2);
+  fooOutput.push (1);
+}
+\end{verbatim}
+
+Work accepts no parameters.  It is allowed to send messages.  It is also
+allowed to re-initialize other blocks.
+Input/output
+is accessed as an array.  For input, element 0 is first new element of input,
+element 1 is second new element of input, etc.  Element -1 is the first seen
+element of input.
+
+\subsection{Init}
+
+When a new filter is being constructed, a constructor (called Init) is called.
+This constructor has a chance to initialize the filter with some initial
+data (passed as arguments):
+
+\begin{verbatim}
+type FooType is Filter
+{
+  StreamID parent;
+  float amplification;
+  Init (float a, StreamID p)
+  {
+    parent = p;
+    amplification = a;
+  }
+};
+\end{verbatim}
+
+Init is not allowed to send messages or initialize other blocks.
+
+\subsection{Message}
+
+Each filter is allowed to receive messages:
+
+\begin{verbatim}
+Message (Msg fooMsg)
+{
+// .. handle msg here
+}
+\end{verbatim}
+
+A message is defined as follows:
+
+\begin{verbatim}
+struct Msg
+{
+  StreamID source;
+  int type;
+  int length;
+  void *data;
+};
+\end{verbatim}
+
+Message is allowed to send other messages and/or reinitialize blocks.
+Message is not allowed to read stream input or output any stream data.
+Initialization of a filter causes this filter's message queue to be emptied.
+A filter is guaranteed that all of its appropriate predecessors (in the graph)
+will have received the msg before it does.
+
+\section{FilterBlock}
+
+FilterBlock is used to aggregate filters and superblocks.  It is a 
+single input/single output structure.  It is allowed to have Init and Message
+functions, but it is not allowed to have a Work function, nor define its
+input or output.
+
+\subsection{Init}
+
+Init function for a FilterBlock is similar to Init function of a Filter.
+FilterBlock, however, can also contain Filters/superblocks:
+
+\begin{verbatim}
+Init (float amp, float fLow, float fHigh, StreamID p)
+{
+  LowPass lowPassFilter (aLow);
+  HighPass highPassFilter (aHigh);
+  Amplifier amplifier (amp);
+  parent = p;
+}
+\end{verbatim}
+
+The above creates three filters connected in series.
+
+\subsection{Message}
+
+The Message function for a FilterBlock looks/works
+identically to Filter's Message function.
+
+\section{Pipe}
+
+The above Init function aggregates three filters into one.  While this is
+useful, we define another construct to do essentially the same thing
+without having to define an all new type.  This new construct will
+allow us to aggregate an arbitrary serial connection of fileters/superblocks:
+
+\begin{verbatim}
+Init (float amp, float fLow, float fHigh, StreamID p)
+{
+  Pipe BandPassFilter
+  {
+    LowPass lowPassFilter (aLow);
+    HighPass highPassFilter (aHigh);
+  } 
+  Amplifier amplifier (amp);
+  parent = p;
+}
+\end{verbatim}
+
+Pipe allows us only to connect single input/single output blocks.
+
+\section{Split}
+
+In order to allow for splitting of single streams into multiples,
+we define a Split construct:
+
+\begin{verbatim}
+Init ()
+{
+  Split(RoundRobin, RoundRobin)
+  {
+    LeftAudioFilter leftAudio;
+    RightAudioFilter rightAudio;
+  }
+}
+\end{verbatim}
+
+The first field passed to Split is the type of splitting (RoundRobin,
+Duplicate).  Second field passed to Split is type of merge (RoundRobin)
+[shouldn't there be more?!!].  The body of Split defines all single input/
+single output filters which are part of the Split.
+
+\section{Custom Split/Merge}
+
+The predefined Split construct does not allow for much flexability in
+creating interesting designs of stream flow.  Following two base types
+are used for defining custom splits and merges:
+
+\begin{verbatim}
+type LeftHeavySplit is CustomSplit
+{
+  input float audio;
+  output float leftAudio;
+  output float rightAudio;
+  Work ()
+  {
+    leftAudio[0] = audio[0];
+    leftAudio[1] = audio[1];
+    rightAudio[0] = audio[2];
+
+    audio.release (3);
+    audio.advance (3);
+    leftAudio.push (2);
+    rightAudio.push (1);
+  }
+};
+
+type LeftHeavyMerge is CustomMerge
+{
+  input float leftAudio;
+  input float rightAudio;
+  output float audio;
+  Work ()
+  {
+    audio[0] = leftAudio [0];
+    audio[1] = leftAudio [1];
+    audio[2] = rightAudio [2];
+
+    leftAudio.release (2);
+    leftAudio.advance (2);
+    rightAudio.release (1);
+    rightAudio.advance (1);
+    audio.push (3);
+  }
+};
+
+type LeftHeavyFilter is FilterBlock
+{
+  input float inAudio;
+  output float outAudio;
+  Init ()
+  {
+    LeftHeavySplit s;
+    LeftAudioFilter l;
+    RightAudioFilter r;
+    LeftHeavyMerge m;
+  }
+};
+\end{verbatim}
+
+Both CustomMerge and CustomSplit are allowed to have Init and Message
+functions.  Their functionality and definition syntax is overall very
+similar to that of Filter, except Filter is allowed only single input/
+single output, where as CustomSplit can have multiple outputs and 
+CustomMerge can have multiple inputs.
+
+When using CustomSplit/CustomMerge, we simply declare the Split, followed
+by appropriate number of singe input/single output blocks, followed by
+a CustomMerge of appropriate number of inputs.
+
+\section{Sources/Sinks}
+
+Sources and Sinks are very similar to Filters, except they either have
+no inputs or outputs.  They are defined just like Filters (without
+input/output), and used just like Filters.  A FilterBlock can begin/end
+its Init function with a Source/Sink.  This will cause it to have
+no inputs/outputs.
+
+A block with no input/output can be used in the middle of a FilterBlock (or
+other appropriate structure).  The constraint is that after/before block(s) 
+with no input/output, a Merge/Join is required.  These can be either
+custom or defined as a part of Split construct.
+
+\begin{verbatim}
+type Microphone is Source
+{
+  float vol;
+  output float audio;
+  Init (float freq, float v)
+  {
+    vol = v;
+    InitHardwareMic (freq);
+  }
+  Work()
+  {
+    audio [0] = vol * GetInputFromMic ();
+    audio.push (1);
+  }
+};
+
+type Speaker is Sink
+{
+  float vol;
+  input float audio;
+  Init (float v)
+  {
+    vol = v;
+  }
+  Work ()
+  {
+    SendToSpeaker (vol * audio[0]);
+  }
+};
+
+type Karaoke
+{
+  StreamID me;
+  Init (float micVol, float speakerVol)
+  {
+    Split (RoundRobin, RoundRobin) // first RoundRobin is unnecesary...
+    {
+      Microphone left (micVol);
+      Microphone right (micVol);
+    }
+    LeftHeavySplit customSplit; // would give strange sound effect here...
+    Speaker left;
+    Speaker right;
+    me = this.GetID ();
+  }
+  Message(Msg volume)
+  {
+    me.Init (float (thisvolume.type));
+  }
+};
+
+\end{verbatim}
+
 
 \section{Basic Constructs}
 
