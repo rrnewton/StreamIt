@@ -3,13 +3,13 @@
 
 Our compiler currently has two linear analysis optimizations. The
 first, {\it linear replacement}, transforms linear streams 
-(one of filter, splitjoin or pipeline) by replacement with a filter 
-that directly compute the calculation of the corresponding linear node. 
+(either filter, splitjoin or pipeline) by replacement with a filter 
+that directly computes the calculation of the corresponding linear node. 
 The second optimization, {\it frequency replacement}, applies the 
 transformation described in Section \ref{sec:freq}. The partitioner 
-automatically determines which subsections of the overall program to apply
-each of the transformations to. Below we describe experiments and results 
-that demonstrate performance improvements due to our method.
+automatically determines to which subsections of the overall program to apply
+each of the transformations. Below we describe experiments and results 
+that demonstrate substantial performance improvements due to our methods.
 
 \subsection{Measurement Methodology}
 %We chose to measure the strength of our optimizations in terms of 
@@ -44,45 +44,43 @@ that demonstrate performance improvements due to our method.
 \vspace{-12pt}
 \end{figure}
 
-Both linear replacement and frequency replacement increase performance primarily
-decreasing the number of floating point computations (principally multiplications) 
-required per output.
 Our measurement platform is a Dual Intel 2.2 GHz P4 Xenon processor system 
 with 2GB of memory running GNU/Linux. We compile our benchmarks using StreamIt's uniprocessor backend
 and generate executables from the resulting C files using {\tt gcc} with {\tt -O2} optimization.
-
-To measure the number of runtime multiplications we use a simple instruction counting 
+Both linear replacement and frequency replacement increase performance primarily
+decreasing the number of floating point computations (principally multiplications) 
+required per output.
+To measure the number of runtime multiplications we use an instruction counting 
 DynamoRIO\cite{dynamo99} client.
 %Floating point multiplication instructions 
 %in the IA-32 instruction set are defined to be any of ({\tt fmul fmulp fimulp fdiv fdivp fidivp fdivr fdivrp fidivr}).
 %We measure execution time normalized to the number of program outputs generated. 
 There are no standard benchmarks written yet for StreamIt, so we use
 a set of representative programs\footnote{Stream graphs appear in Appendix A.}
-which perform computations that 
-are found in actual streaming applications: 
+which perform computations that are commonly found in streaming applications: 
+
 1) {\bf FIR}, a single 256 point rectangularly windowed low pass FIR filter; 
 2) {\bf RateConvert}, an audio down sampler that converts the 
 sampling rate by a non-integral factor ($\frac{2}{3}$); 
 3) {\bf TargetDetect}, four matched filters performing threshold target detection in parallel; 
 4) {\bf FMRadio}, an FM software radio with equalizer;
-5) {\bf Radar}, {\bf XXXXXX} core functionality of modern radar signal processors -- modeled after a 
-system from the Polymorphic Computing Architecture (PCA);
+5) {\bf Radar}, the core functionality in modern radar signal processors 
+-- modeled after a system from the Polymorphic Computing Architecture (PCA);
 6) {\bf FilterBank}, a multi-rate signal decomposition 
 processing block common in communications and image processing; 
-7) {\bf Vocoder} Channel voice coder, used for speech analysis and compression;
-8) {\bf Oversample} $16x$ oversampler, a function commonly found in audio applications 
+7) {\bf Vocoder}, a channel voice coder, used for speech analysis and compression;
+8) {\bf Oversample}, a $16x$ oversampler, a function commonly found in audio applications 
 such as CD players;
-9) {\bf DToA} Audio post-processing stage prior to a 1-bit D/A converter 
+9) {\bf DToA}, an audio post-processing stage prior to a 1-bit D/A converter 
 with oversampler and first order noise shaper.
 
 \subsection{Performance}
-
 To determine the effects of our linear replacement and frequency
 replacement optimizations, we compiled each benchmark program with
-linear replacement, with frequency replacement and with both linear
-replacement and frequency replacement.
-Figure~\ref{fig:linear-freq-both} shows the reduction of
-multiplications due to our optimizations.
+linear replacement, with frequency replacement, with a back to back application of
+frequency replacement and linear replacement and with the partitioner.
+Figure~\ref{fig:linear-freq-both} shows the reduction in the number
+of multiplications that our optimizations achieve.
 
 
 %%%%%%%%% This paragraph is no longer accurate.
@@ -98,18 +96,6 @@ detection is non-linear which makes the parallel computation blocks
 uncollapsible. Finally, RateConvert contains a large low pass filter
 which also benefits from frequency replacement.
 
-
-\begin{figure}[t]
-%\vspace{-6pt}
-\center
-\epsfxsize=3.2in
-\epsfbox{images/execution-speedup.eps}
-\vspace{-6pt}
-\caption{Execution speedup for each of the benchmarks with both linear replacement and frequency replacement optimizations.}
-\label{fig:execution-speedup}
-\vspace{-6pt}
-\end{figure}
-
 All of the multiplication reduction in the FMRadio benchmark is due to
 the automatic combination of parallel equalizer computations.
 Table~\ref{fig:benchmark-statistics} shows the number of nodes in each
@@ -123,12 +109,27 @@ multiplication reduction only somewhat because FilterBank contains fairly small 
 However, frequency replacement speeds up the calculation of the overall filter
 generated by linear replacement, and thus decreases the number of multiplies even further.
 
-Reducing computation does not necessarily translate into execution time improvement, but as
-Figure~\ref{fig:execution-speedup} demonstrates, our benchmarks speedup on average by a factor of five 
-and by a factor of $6.5$ in the best case. Our current implementation takes advantage of the machine tuned 
-FFT package FFTW~\cite{frigo99fast}), to perform the necessary time-frequency conversions. 
-The benchmarks where multiplication reduction is due only to linear replacement (FMRadio) 
-also show a large speedup.
+\begin{figure}[t]
+\center
+\epsfxsize=3.2in
+\epsfbox{images/execution-speedup.eps}
+\vspace{-6pt}
+\caption{Execution speedup for each of the benchmarks with both linear replacement and frequency replacement optimizations.}
+\label{fig:execution-speedup}
+\vspace{-6pt}
+\end{figure}
+
+In general, reducing computation does not necessarily translate into 
+execution time improvement, but as Figure~\ref{fig:execution-speedup} 
+demonstrates, our benchmarks speedup on average by a factor of {\bf XXXXX} 
+and by a factor of $XXXXXXX$ in the best case. Our frequency replacement optimization
+takes advantage of the machine tuned FFT package FFTW~\cite{frigo99fast}), 
+to perform the necessary time-frequency conversions.
+
+However, our performance improvements are due only in part to to the efficiency of FFTW. 
+Multiplications are decreased and execution is sped up in RateConvert, FM, FilterBank and
+Vocoder with only linear replacement. Linear replacement only improvements are
+due to savings obtained during linear collapsing.
 
 \begin{table*}[t]
 \vspace{-6pt}
@@ -136,26 +137,33 @@ also show a large speedup.
 \small
 \begin{tabular}{|l|c|c|c||c||c|c|c|} 
 \hline
-          & \multicolumn{3}{|c||}{Originally}  &             & \multicolumn{3}{|c|}{After Linear Replacement} \\
+& \multicolumn{3}{|c||}{Originally}  &             & \multicolumn{3}{|c|}{After Optimizations} \\
 \hline
-Benchmark & Filters & Pipelines & SplitJoins & Average     & Filters      & Pipelines         & SplitJoins \\
-          & (linear)& (linear)  & (linear)   & vector size &              &                   &            \\
+Benchmark  & Filters & Pipelines& SplitJoins & Average     & Filters      & Pipelines         & SplitJoins \\
+           & (linear)& (linear) & (linear)   & vector size &              &                   &            \\
 \hline
-FIR       & 3 (1)  & 1(0)      & 0 (0)      & 256         & 3            & 1                 & 0 \\
+FIR        & 3 (1)   & 1(0)     & 0 (0)      & 256         & 3            & 1                 & 0 \\
 \hline
-TargetDetect & 10 (4)& 1 (0)    & 1 (0)      & 300         & 10           & 1                 & 1 \\
+RateConvert& 5 (3)   & 2 (1)    & 0 (0)      & 102         & 4            & 1                 & 0 \\
 \hline
-FilterBank & 27 (25) & 17 (9)   & 4 (3)      & 51          & 15           & 8                 & 1 \\
+TargetDetect& 10 (4) & 6 (0)    & 1 (0)      & 300         & 7            & 2                 & 1 \\
 \hline
-RateConvert& 5 (3)   & 2 (0)    & 0 (0)      & 335         & 5            & 2                 & 0 \\
+FMRadio    & 26 (22) & 11 (9)   & 2 (2)      & 40          & 5            & 1                 & 0 \\
 \hline
-FMRadio    & 25 (22) & 3 (1)    & 2 (2)      & 33          & 5            & 1                 & 0 \\
-%\hline
-%Radar      & 10 (7) & 5 (2)     & 2 (0)      & 46          & 6            & 3                 & 2 \\
+Radar      & 76 (60) & 17 (0)   & 2 (0)      & 4412        & 21           & 1                 & 2 \\
 \hline
+FilterBank & 27 (24) & 17 (9)   & 4 (4)      & 52          & 10           & 1                 & 2 \\
+\hline
+Vocoder    & 17 (13) & 10 (8)   & 2 (1)      & 60          & 7            & 2                 & 1 \\
+\hline
+Oversampler& 10 (8) & 1 (1)     & 0 (0)      & 33          & 3            & 1                 & 0 \\
+\hline
+DToA       & 14 (10) & 3 (1)    & 0 (0)      & 52          & 6            & 2                 & 0 \\
+\hline
+
 \end{tabular}
 \vspace{-3pt}
-\caption{Statistics for benchmarks before and after transformations.
+\caption{Statistics for benchmarks before and after optimizations.
 \protect\label{fig:benchmark-statistics}}
 \vspace{-4pt}
 \end{table*}
