@@ -1,0 +1,162 @@
+\section{Setting up the Farm}
+
+\subsection{Introduction}
+The CAG group has a bunch of Linux machines where StreamIt development
+occurs on. You can probably set up a local development environment
+but that is your own problem. The machines are named {\tt cagfarm-1.lcs.mit.edu} to 
+{\tt cagfarm-49.lcs.mit.edu}. For StreamIt development,
+it is probably best to use numbers 40-49. These machines are accessible via ssh
+and they run X so you can forward X packets and run an X server on
+your local machine if you so desire. Most of the file systems on the 
+cagfarms are remote mounted via NFS
+so your home directory and most other directories of interest are
+always the same.
+
+\subsection{Setting up Environment Variables}
+There are two environment variables that you absolutely need to set up
+in order to checkout and compile the StreamIt compiler. It is probably
+a good idea to use your {\tt .cshrh} or {\tt .bashrc} files to set
+the values each time you log in. Unless you change it, your account
+on the cagfarm will use {\tt csh} for your shell, and so you should
+edit the {\tt .cshrc} file to do things each login.
+
+\paragraph{CVSROOT}
+This environment variable tells cvs where the root repository is 
+located. To work on StreamIt, you should set it to 
+{\tt /projects/raw/cvsroot}.
+
+\paragraph{STREAMIT\_HOME}
+This should be set to path of the {\tt streams} directory that 
+you check out of CVS. It is used by various scripts and programs
+to find out the StreamIt installation path.
+
+\paragraph{CLASSPATH}
+Back in the day, you had to set up your class path manually.
+Now there are two files which will do it for you, depending
+on your choice of shell. Since they both live in the CVS
+repository, you first need to check out the {\tt streams} project,
+as described in Section~\ref{sec:checkout}. Then you can
+use {\tt streams/include/dot-cshrc} by putting the following
+command in your {\tt .cscrc}
+\begin{verbatim}
+source $\STREAMIT_HOME}/include/dot-cshrc
+\end{verbatim}
+
+or by putting the following command in your {\tt .basrc}
+
+\begin{verbatim}
+. $STREAMIT_HOME/include/dot-bashrc
+export STREAMIT_HOME
+\end{verbatim}
+
+\subsubsection{Example section of {\tt .cshrc}}
+\begin{verbatim}
+## Set up class path (by using the classpath in include/dot-cshrc)
+setenv STREAMIT_HOME $HOME/streams
+source ${STREAMIT_HOME}/include/dot-cshrc
+
+## for starsearch / raw streamit
+setenv STARSEARCH_HOME /home/bits6/NO_BACKUP/streamit/starsearch
+setenv TOPDIR /home/bits6/NO_BACKUP/streamit/starsearch
+
+## cvsroot for streams stuff
+setenv CVSROOT /projects/raw/cvsroot
+
+## for dot
+setenv LEFTYPATH /u/diego/bin/gv1.7c/lib/lefty/
+
+\end{verbatim}
+
+
+
+\subsection{Checking out the {\tt streams} Repository}
+\label{sec:checkout}
+Once you have set up the {\tt CVSROOT} environment variable
+you need to check out the StreamIt source tree. All of the
+StreamIt code gets checked out into a new directory named
+{\tt streams}, so your home directory is fine for this purpose.
+Go to your chosen directory and run {\tt cvs co streams} which
+will check out all of the StreamIt files, documentation, etc.
+There are several hundred megabytes of files, so the checkout 
+will take several minutes.
+
+
+\subsection{Eclipse}
+There is a graphical IDE that you can use to work on the compiler called
+Eclipse\footnote{Emacs, however, is the bomb.}. You can probably use other 
+IDEs too, but we know how to set up
+Eclipse. If you are interested, you should talk to one of the grad
+students and they can help you set it up. 
+
+\subsection{Useful Things Andrew would have Liked to Know}
+
+\paragraph{fu2}
+For some reason, the command to use to find an unused cagfarm machine
+is called {\tt fu2}. It generates output something like this:
+\begin{verbatim}
+cagfarm-01: 2:14pm up 6 days, 50 min, 5 users, load average: 1.00, 1.03, 1.00
+...
+cagfarm-40: 2:14pm up 10 days, 22:33, 1 user, load average: 0.00, 0.00, 0.00
+cagfarm-41: 2:14pm up 50 days, 15:51, 6 users, load average: 0.00, 0.00, 0.00
+cagfarm-42: 2:14pm up 50 days, 15:50, 1 user, load average: 0.06, 0.07, 0.01
+cagfarm-43: 2:14pm up 50 days, 15:51, 6 users, load average: 0.91, 0.53, 0.25
+cagfarm-44: 2:14pm up 10 days, 22:33, 1 user, load average: 0.00, 0.00, 0.00
+cagfarm-45: 2:14pm up 5 days, 2:30, 0 users, load average: 0.00, 0.01, 0.15
+cagfarm-46: 2:14pm up 50 days, 15:51, 3 users, load average: 0.01, 0.00, 0.00
+cagfarm-47: 2:14pm up 50 days, 15:51, 1 user, load average: 1.00, 1.04, 1.00
+cagfarm-48: 2:14pm up 50 days, 15:51, 4 users, load average: 0.00, 0.03, 0.00
+cagfarm-49: 2:14pm up 50 days, 15:51, 1 user, load average: 0.00, 0.00, 0.00
+\end{verbatim}
+
+\paragraph{dot}
+{\tt dot} is a useful graph making tool. For some reason, most of us use
+the version of dot installed in {\tt /u/diego}. To use that install
+of dot, you need to add {\tt /u/diego/bin} to your path and set
+the LEFTYPATH environment variable to {\tt /u/diego/bin/gv1.7c/lib/lefty/}
+Once {\tt dot}
+has been installed, you can convert {\tt .dot} files into {\tt .ps}
+files by using the command {\tt dot -Tps filename.dot > filename.ps}.
+
+\paragraph{.forward}
+Mail typically gets sent to you at your account at {\tt cag.lcs.mit.edu}. 
+You probably want to
+at least look at it. To get mail sent to {\tt username@cag.lcs.mit.edu}
+forwarded to some other account, make a file called {\tt .forward}
+in your home directory with a single line that contains the email address
+to forward to (for example, {\tt username@mit.edu}).
+
+\paragraph{Default Permissions}
+The default permissions for everyone's files in their home directories
+is world readable. Therefore, if you have any configuration questions 
+you can look at how someone else has done things in their config files.
+It is also useful sometimes to copy a file from someones
+CVS directory if they forget to checkin a file or two with their
+latest modification.
+
+\paragraph{Homepage}
+If you want to have files available via the web on the cagfarms, make
+a directory called {\tt public\_html} in your home directory. The contents
+of this directory are available at the website \\
+\begin{verbatim}
+http://cag.lcs.mit.edu/~username
+\end{verbatim}
+ where (obviously) {\tt username} is your username.
+
+\paragraph{Filesystems}
+There are several filesystems for use if you need to store large files.
+{\tt /home/bits6/} and {\tt home/bits7} are good locations. They are
+automounted, so to use one, you should go to {\tt home/bits6} and make 
+a temp directory and just go wild. 
+
+\paragraph{Access via Windows}
+If you want access to the cag filesystems via windows
+(which is very convenient) you can use
+\begin{verbatim}
+\\catfish\u\username
+\end{verbatim}
+to get at your home directory and 
+\begin{verbatim}
+\\catfish\home\bits6
+\end{verbatim}
+ to get at {\tt home/bits6}, etc.
+

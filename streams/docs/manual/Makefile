@@ -1,14 +1,13 @@
-all: clean ps pdf
+all: ps
 
-dvi: 
-	latex performance-metrics.tex
+dvi: *.tex
+	latex manual.tex
 ps: dvi
-	dvips performance-metrics.dvi -o performance-metrics.ps
+	dvips manual.dvi -o manual.ps
+pdf: ps
+	ps2pdf manual.ps
 view: ps
-	gv performance-metrics.ps &
-
-pdf: 
-	pdflatex performance-metrics.tex
+	gv manual.ps &
 
 clean:
 	rm -f *.aux
