@@ -86,15 +86,16 @@ offset by the index $i$.
 Next are the instructions which combine linear forms.  In the case of
 addition or subtraction, we simply add the components of the linear
 forms.  In the case of multiplication, the result is still a linear
-form if either of the terms is a known constant ({\it e.g.} $\vec{v}=\vec{0}$).
-For division, the result is linear only if the divisor is a non-zero
-constant\footnote{Note that if the dividend is zero and the divisor
-has a non-zero coefficients vector, we cannot conclude that the result
-is zero, since certain runtime inputs might cause a
-singularity.} and for non-linear operations ({\it e.g.,} bit-level and
-boolean), both operands must be known constants.  If any of these
-conditions are not met, then the LHS is assigned a value of $\top$,
-which will mark the filter as non-linear if the value is ever pushed.
+form if either of the terms is a known constant ({\it e.g.}
+$\vec{v}=\vec{0}$).  For division, the result is linear only if the
+divisor is a non-zero constant\footnote{{\small Note that if the
+dividend is zero and the divisor has a non-zero coefficients vector,
+we cannot conclude that the result is zero, since certain runtime
+inputs might cause a singularity.}} and for non-linear operations ({\it
+e.g.,} bit-level and boolean), both operands must be known constants.
+If any of these conditions are not met, then the LHS is assigned a
+value of $\top$, which will mark the filter as non-linear if the value
+is ever pushed.
 
 The final set of instructions deal with control flow.  For loops, we
 resolve the bounds at compile time and execute the body an appropriate
@@ -122,7 +123,7 @@ has persistent state, all accesses to that state are marked as $\top$.
 \caption{Linear extraction analysis.\protect\label{alg:dataflow}}
 proc {\bf Toplevel}(filter $F$) returns linear node for $F$
 \begin{enumerate}
-\item Set Peek, Pop, Push equal to I/O rates of filter $F$.
+\item Set globals Peek, Pop, Push to I/O rates of filter $F$.
 \item Let $A_{0} \leftarrow \mbox{new float[Peek, Push] with each entry =~} \bot$
 \item Let ${\vec b_{0}} \leftarrow \mbox{new float[Push] with each entry =~} \bot$
 \item $(\mt{map}, A, {\vec b}, \mt{popcount}, \mt{pushcount}) \leftarrow$ \\
@@ -139,8 +140,6 @@ proc {\bf BuildCoeff}(int $pos$) returns $\vec v$ for peek at index $pos$ \\ \vs
 \STATE $\vec{v}[\mbox{Peek}-1-\mt{pos}] = 1$
 \STATE return $\vec{v}$
 \end{algorithmic}
-\vspace{6pt}
-{\bf Global Variables:} int Peek, Pop, Push
 \end{algorithm}
 
 \begin{algorithm}

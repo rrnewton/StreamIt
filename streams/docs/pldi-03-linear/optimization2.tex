@@ -65,7 +65,7 @@ in}$, and extract values ${\vec y}[e-1] \dots {\vec y}[m+(e-1)-1]$ as
 the $m$ values pushed by the node.  Note that ${\vec y}[i]$ is also
 defined for $i \in [0, e-2]$ and $i \in [m+e-1,m+2e-2]$; these values
 represent partial sums in which some coefficients were excluded.  Our
-naive implementation simply disregards these values.  However, in the
+{\naive} implementation simply disregards these values.  However, in the
 next section, we give an optimized implementation that takes advantage
 of them.
 
@@ -81,7 +81,7 @@ between storage space and performance for our uniprocessor
 benchmarking platform.  The choice of $N$ should be adjusted for the
 particular resource constraints of the target architecture.
 
-The transformation below gives a naive translation of a linear node to
+The transformation below gives a {\naive} translation of a linear node to
 the frequency domain.  In addition, it relaxes all of the assumptions
 that we made above.  The algorithm allows for a non-zero value of
 ${\vec b}$ by simply adding $\vec{b}$ after returning from the
@@ -96,9 +96,9 @@ large performance improvements, as the frequency transformation
 improves performance by an average factor of 50 (in the case where
 $\mbox{pop}=1$.)
 
-\begin{transformation} (Naive frequency implementation)
+\begin{transformation} ({\Naive} frequency implementation)
 Given a linear node $\lambda = \{A, {\vec b}, e, o, u\}$, the
-following stream is a naive implementation of $\lambda$ in the
+following stream is a {\naive} implementation of $\lambda$ in the
 frequency domain: \\
 \begin{equation} \nonumber
   \begin{array}{ll}
@@ -144,7 +144,7 @@ frequency domain: \\
 
 \subsection{Optimized Frequency Implementation}
 
-The naive frequency implementation discards $e-1$ elements from the
+The {\naive} frequency implementation discards $e-1$ elements from the
 beginning and end of each column of ${\vec y}$ that it computes.
 These values represent partial sums in which some of the coefficients
 of $A$ are excluded. However, for $i \in [0, e-1-1]$, ${\vec
