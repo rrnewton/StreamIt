@@ -1,5 +1,5 @@
-\newcommand{\taba}[1]{\parbox{2.4in}{ ~ \vspace{-2pt} \\ #1 \vspace{-8pt} \\ }}
-\newcommand{\tabb}[1]{\parbox{3.6in}{ ~ \vspace{-2pt} \\ #1 \vspace{-8pt} \\ }}
+\newcommand{\taba}[1]{\parbox{2.4in}{ ~ \vspace{-0pt} \\ #1 \vspace{-6pt} \\ }}
+\newcommand{\tabb}[1]{\parbox{3.6in}{ ~ \vspace{-0pt} \\ #1 \vspace{-6pt} \\ }}
 \newcommand{\mytable}[2]{
   {\small
     \begin{tabular}{|l|l|} \hline
@@ -16,7 +16,7 @@
 \newcommand{\summary}[2]{\taba{#1} & \tabb{#2} \\ \hline}
 \newcommand{\just}[3]{\taba{#1} & \tabb{#2 \\ {\it #3}} \\ \hline}
 
-\section{Metadata Description}
+\section{Virtual Machine Metadata Description and Interfaces}
 
 An architecture is represented as a directed graph, where each node
 represents a processor or memory unit and each edge represents a
@@ -25,7 +25,36 @@ graph must be {\it planar}--that is, it can be drawn in two dimensions
 without any intersecting edges.
 
 In the following, we describe the essential properties of a processor
-node, a memory node, and a communication channel.
+node, a memory node, and a communication channel.  An outline of the
+changes from the previous proposal appears in
+Figure~\ref{fig:archdiff}.
+
+\begin{figure}[t]
+\begin{center}
+\framebox[6.5in]{
+\begin{minipage}{6in}
+
+\begin{itemize}
+
+\item {\bf Architecture description is a graph rather than a tree,} to
+support architectures such as Raw.
+
+\item {\bf Memory nodes are simplified.}  There is only one type of
+memory, with much fewer properties.
+
+\item {\bf Network properties are expressed pairwise,} as edges
+between nodes, instead of as an interface at the nodes themselves.
+
+\item {\bf No distinction is made between threaded processors and
+streaming processors,} except for a new MASTER property to specify
+control processors.
+
+\end{itemize}
+\caption{Outline of changes to the metadata description.
+  \protect\label{fig:archdiff}}
+\end{minipage}}
+\end{center}
+\end{figure}
 
 \subsection{Processor Nodes}
 
@@ -52,8 +81,8 @@ proposal: \\
     specified by the ILP property) if the input is data parallel.}
 
   \entry{VM\_PROP\_PROC\_REGS} {int32 - Number of registers} {The
-    number of registers on the processor (should it include
-    scratchpad?)}
+    number of registers on the processor (possibly to include
+    scratchpad or cache space?)}
 
   \entry{VM\_PROP\_PROC\_IMEM} {int32 - Number of RISC ops} {The size
     of the instruction memory.}
@@ -137,7 +166,7 @@ Our simplifications are as follows:
 \item There are only three memory properties: size, latency, and
 bandwidth (as defined by the previous proposal).
 
-\item Nodes for caches and instruction memory are ommitted from the
+\item Nodes for caches and instruction memory are omitted from the
 graph.  Thus, the graph contains only data memory nodes (including
 SRF's).
 

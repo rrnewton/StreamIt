@@ -1,80 +1,659 @@
-\section{VM Description}
+\clearpage
+\section{Processor}
 
+An overview of the changes to the virtual machine API appears in
+Figure~\ref{fig:vmdiff}.
+
+\begin{figure}[t]
+\begin{center}
+\framebox[6.5in]{
+\begin{minipage}{6in}
+
+\begin{center}
+\underline{Stream Kernel API}
+\end{center}
+
+\begin{itemize}
+
+\item {\bf The VM is object-oriented.}  Kernels, streams, and stream graphs
+are all represented as objects.  Among other benefits, this makes
+explicit which data are local to kernels.
+
+\item {\bf Input and output streams are strictly typed within
+kernels.}  This preserves type information and avoids casts that would
+have resulted from generic STREAM\_DESCRIPTOR accesses in the previous
+proposal.
+
+\end{itemize}
+
+\begin{center}
+\underline{Stream Processor API}
+\end{center}
+
+\begin{itemize}
+
+\item {\bf Stream objects are annotated with the node in which they
+are stored.}  A stream object resides in a given memory or processor
+node for its entire lifetime, and is declared with that node.
+
+\item {\bf Memory layout is not done by the high-level compiler.}
+Streams are declared with their length and node location, but not with
+a physical (or virtual) memory address.  This simplifies the
+high-level compiler and gives more flexibility to the low-level
+compiler.
+
+\item {\bf Static stream operations are represented as an explicit
+stream graph,} in which kernels are the nodes and streams are the
+edges.  The graph representation exposes parallelism and communication
+patterns, and gives scheduling freedom to the low-level compiler.
+
+\item {\bf Memory management and processor-processor 
+communication are integrated into the stream graph,} as a set of
+pre-defined kernels.  This replaces the previous proposal for
+processor memory operations and stream network protocols.
+
+\end{itemize}
+
+\caption{Outline of changes to the virtual machine API.
+  \protect\label{fig:vmdiff}}
+\end{minipage}}
+\end{center}
+\end{figure}
+
+\subsection{Threaded Processor API}
+
+No changes.
+
+\subsection{Stream Kernel API}
+
+To simplify the presentation, we describe the stream kernel API before
+the stream processor API.
+
+\subsubsection{Overview}
+
+Each kernel is now represented as a C++ object, with the following
+components:
+
+\begin{enumerate}
+
+\item A constructor, which receives the input and output streams for
+the kernel, as well as any other initialization settings.
+
+\item A {\it work} function that represents the steady-state
+execution step.
+
+\item (Optional) A {\it prework} function that is called instead of
+{\it work} on the first execution.
+
+\item (Optional) Data members, which represent local kernel data that
+are preserved between invocations of {\it work}.
+
+\end{enumerate}
+
+For example, a kernel for a simple amplifier could be as follows:
 \begin{verbatim}
+   class AmplifierKernel : Kernel_1_1 <float, float> {
+     int N;
 
-- use streamit filters as basis for connected kernels.  Say that the
-  ``stream parameters'' are constant *per connectivity of the graph*
-  -- that is, for a given run statement, it will not change.  This is
-  in contrast to the fields of the filters, which might change as they
-  are running.  (Have fields so that the compiler can separate
-  dependence information.)
+     AmplifierKernel(istream<float> in, ostream<float> out, int _N) : Kernel_1_1(in, out) {
+       N = _N
+     }
 
- - setting and reading of fields can only occur within the filter that
-   owns the field, as well as from the processor that owns the filter.
-
-- based on streamc / kernelc
-
-- a "stream" is a new type of variable.  Represents a persistent
-  finite piece of memory allocated to a stream / the values in a 
-  piece of a the stream.
-
-  - declared statically with their size and type.  Types are:
-
-    - Blocked stream.  Means that each element in buffer is only
-      written once; "size" represents total number of elements in
-      stream.  
-
-      e.g. "blocked_stream<int>[10000] str;"
-
-    - Buffered stream.  Means that the buffer is shorter than the
-      stream itself, and locations in the actual memory store will
-      be written to multiple times.  The stream will start blocking
-      when all of the locations have been written (that is, before
-      wrapping around.)  The buffer management for the stream is
-      left to the low-level compiler.
-
-      e.g. "buffered_stream<char>[10000] str;"
-
-- about kernels:
-
-  - within kernels:
-    - have push/pop/peek for communicating channel values
-
-  - annotations for each kernel:
-
-    - whether or not it's fit for SIMD execution (stateless,
-      data parallel)
-    - whether or not it contains dynamic control flow
-      (if it does, then it can't be fit for SIMD)
-    - should it be annotated with static rates?  (for streamit)
-
-- obligatory details:
-
-  - allow _structured_ control flow everywhere
-  - can't push/pop/peek outside of kernel
-  - support C opcodes as common operations
-    e.g. logical, boolean, arithmetic
-    float, 32, 16, 8 - bit numbers, boolean
-  - functions allowed, but not recursive; inline semantics
-  - no pointers
-  - no dynamic memory allocation
-  - scoping allowed w/ braces
-
-- communicate dependence info from high to low
-  - scalar value communication - _just scalars_
-
-main() {
-
-  kernel (s1, s2  --> bfs(up1), 10) {
-
-  }
-
-  kernel (s1, s2  --> bfs(up1), 10) {
-  }
-
-  kernel (s1, s2  --> bfs(up1), 10) {
-  }
-
-}
-
+     void work(istream<float> in, ostream<float> out) {
+       KernelInfo.setPop(in, 1);
+       KernelInfo.setPush(out, 1);
+       KernelInfo.isSIMD();
+       out.push(in.pop() * N);
+     }
+   }  
 \end{verbatim}
+As evident in the example, input and output streams are represented by
+objects that support {\tt push} and {\tt pop} operations.  In the
+following sections, we describe the API for streams
+(Section~\ref{sec:kerstreams}) and the API for kernels
+(Section~\ref{sec:kernels}).
+
+\subsubsection{Stream Objects}
+\label{sec:kerstreams}
+
+As in the previous proposal, a {\it stream} is a C++ data type that
+represents a sequence of items of a given type.  Streams are
+instantiated as part of the stream processor API, but their member
+functions can only be invoked from the stream kernel API\footnote{Most
+of the member functions are in {\tt istream} and {\tt ostream}, which
+can only be invoked from the stream kernel API.  However, the member
+functions declared in {\tt stream} must be invoked from the stream
+processor API instead.}.
+
+In this proposal, each kernel views a stream as either an {\tt
+istream} or {\tt ostream}, depending on whether it is using the stream
+for input or output.  An {\tt istream} provides {\tt pop}, {\tt peek},
+and {\tt eos} functions, while an {\tt ostream} supports {\tt push}
+and {\tt of}, as described below:
+\begin{verbatim}
+   class base_stream {}
+
+   template <class T>
+   class istream : base_stream {
+     // peek at item at position <offset> without dequeuing it
+     T peek(int offset);
+
+     // pop next item off of the stream
+     T pop();
+
+     // whether or not input is empty (end of stream)
+     boolean eos();
+   }
+
+   template <class T>
+   class ostream : base_stream {
+     // push value onto channel
+     void push(T val);
+
+     // whether or not output is full
+     boolean of();
+   }  
+\end{verbatim}
+
+The processor API uses the {\tt stream} class, which inherits from
+both {\tt istream} and {\tt ostream}. It is described in
+Section~\ref{sec:procstreams}.
+
+\subsubsection{Kernel Objects}
+\label{sec:kernels}
+
+Each kernel is described as a subclass of a basic kernel class, such
+as the following:
+\begin{verbatim}
+   template <class I1, class I2, class O1>
+   class Kernel_2_1 {
+     // construct a kernel with the given input and output streams
+     Kernel(istream<I1> in1, istream<I2> in2, ostream<O1> out1);
+
+     // steady-state execution step
+     virtual void work(istream<I1> in1, istream<I2> in2, ostream<O1> out1);
+
+     // (optional) execution step for first invocation
+     void prework(istream<I1> in1, istream<I2> in2, ostream<O1> out1);
+   }  
+\end{verbatim}
+
+The {\tt Kernel\_2\_1} base class is named as such because it contains
+two input streams and one output stream.  In order to propagate type
+information into the work function, the kernel is templated on the
+types of the input and output streams.  Though it might be infeasible
+to manually define all such base classes, the low-level compiler can
+identify each appearance of Kernel\_N\_M and interpret it accordingly.
+
+Each kernel provides a constructor in which the input and output
+streams are specified.  These streams are then made available as
+parameters to {\tt work} and {\tt prework}.  This is supported
+automatically by the low-level compiler; no call to {\tt work} or {\tt
+prework} appears in the output of the high-level compiler.
+
+\sss{Annotations}
+
+There are several pieces of information that are available to the
+high-level compiler which should be transferred to the low-level
+compiler in the form of annotations.  Each annotation takes the form
+of a function call to the {\tt KernelInfo} class, and it applies to
+the part of the kernel where the call appears.
+\begin{verbatim}
+   class KernelInfo {
+     // constant indicating a dynamic input or output rate
+     static const int DYNAMIC_RATE = -1;
+
+     // these functions declare the push, pop, and maximum peek rate
+     // of a work or prework function with respect to a given stream
+     static void setPush(base_stream str, int push);
+     static void setPop(base_stream str, int pop);
+     static void setPeek(base_stream str, int maxPeek);
+
+     // indicates that a work or prework function is data-parallel 
+     // and fit for SIMD execution
+     static void isSIMD();
+   }  
+\end{verbatim}
+
+All arguments to annotations must be compile-time constants.  For
+example, in a kernel from a MergeSort, the input rates are marked
+dynamic because they depend on values from the input streams:
+\begin{verbatim}
+   class MergeKernel : Kernel_2_1 <int, int> {
+     MergeKernel(istream<int> in1, 
+                 istream<int> in2, 
+                 ostream<int> out) : Kernel_2_1(in1, in2, out) {}
+
+     void work(istream<float> in1, istream<int> in2, ostream<int> out) {
+       KernelInfo.setPop(in1, KernelInfo.DYNAMIC_RATE);
+       KernelInfo.setPop(in2, KernelInfo.DYNAMIC_RATE);
+       KernelInfo.setPush(out, 1);
+
+       if (in1.peek(0) < in2.peek(0)) {
+         out.push(in1.pop());
+       } else {
+         out.push(in2.pop());
+       }
+     }
+   }  
+\end{verbatim}
+
+All streams in {\tt work} and {\tt prework} functions must be
+annotated with their input and output rates.  If a peek rate is
+omitted, it is assumed to be equal to the pop rate.
+
+\sss{Kernel Restrictions}
+
+Only a subset of C is supported from within a kernel.  The following
+restrictions apply:
+
+\begin{enumerate}
+
+\item No pointers.
+
+\item No dynamic memory allocation.
+
+\item No GOTO statements (all control flow is structured).
+
+\item No recursive functions (all function calls have inline
+semantics).
+
+\item No push, pop, or peek operations from within the constructor.
+
+\item Supported opcodes are only the logical, arithmetic, and boolean
+operations found in C (no special-purpose DSP operations).
+
+\item Supported types include 32-bit {\tt float}, 32-bit {\tt int},
+16-bit {\tt short}, 8-bit {\tt byte}, and {\tt boolean}.
+
+\end{enumerate}
+
+Note also that this proposal does not provide special support for
+directly accessing streams (e.g., in the SRF).  Random access to a
+stream can be achieved by using the {\tt peek} operation without any
+{\tt pop}'s.
+
+\subsection{Stream Processor API}
+
+\subsubsection{Overview}
+\label{sec:streamover}
+
+As in the previous proposal, a control thread in a restricted subset
+of C++ is used to manage stream memory and to supervise the execution
+of stream kernels.  However, in this proposal, all static stream
+operations are represented by explicit stream graphs, in which kernel
+objects are the nodes and stream objects are the edges.  The network
+model is also integrated into the graph representation: each stream
+object is annotated with the memory bank in which it resides, and
+pre-defined network kernels are used to communicate between streams in
+different memories.  Dynamic operations and dynamic control flow are
+fully supported in the code that constructs stream graphs and
+transitions between them.
+
+An example of the stream processor API is as follows:
+\begin{verbatim}
+   // declare streams with their size and the location in which they are held
+   stream<float> s_raw(1000, MEM1), s1(100, SRF1), s2(100, PROC2), s3(1000, SRF1);
+
+   // set up a graph to do some audio filtering and compression
+   Graph compress(new FileReader(s_raw, "input.dat"),
+                  new Copy(s_raw, s1),
+                  new FIRFilter(s1, s2),
+                  new RunLengthEncode(s2, s3));
+
+   // run the kernels on PROC2 until 1000 words are read from the input file
+   STREAM_SEG run_limit;
+   run_limit.str = s_raw;
+   run_limit.num_words = 1000;
+   DONE finished = compress.run(PROC2, run_limit);
+   VM_DONE_SYNC(finished)
+
+   // if the output is still too large, run additional compression
+   stream<float> s4(1000, SRF1);
+   if (s3.length() > SIZE_THRESHOLD) {
+     Graph compressMore(new ZipCompress(s3, s4));
+     finished = compressMore.run(PROC2);
+   } else {
+     Graph copy(new Copy(s3, s4));
+     finished = copy.run(PROC2);
+   }
+   VM_DONE_SYNC(finished);
+
+   // store the result to "output.dat"
+   Graph store(new FileWriter(s4, "output.dat"));
+   finished = store.run(PROC2);
+   VM_DONE_SYNC(finished);
+\end{verbatim}
+
+The above code fragment illustrates several aspects of the stream
+processor API.  In the following, Section~\ref{sec:procstreams}
+describes the processor's view of the {\tt stream} type;
+Section~\ref{sec:streamgraph} explains the construction of graphs from
+kernels and streams; and Section~\ref{sec:predef} describes a
+pre-defined set of kernels for dealing with memory and network
+operations (such as the {\tt Copy} kernel above).
+
+\subsubsection{Stream Objects}
+\label{sec:procstreams}
+
+The processor API uses the {\tt stream} class, which inherits from
+both {\tt istream} and {\tt ostream}:
+\begin{verbatim}
+   template <class T> 
+   class stream : istream <T>, ostream <T> {
+     // make a stream that is buffered in units of <size>.  If <write_once>
+     // is true, then <size> also indicates the total size of the stream,
+     // and no buffering is necessary (the stream is "blocked")
+     stream(int size, VM_NODE_TYPE_MEM location, boolean write_once = false);
+
+     // same as above, for stream held in registers of a processor
+     stream(int size, VM_NODE_TYPE_PROC location, boolean write_once = false);
+
+     // returns total number of elements that have been pushed to this
+     // stream (this is independent of the size and write_once properties)
+     int length();
+   }  
+\end{verbatim}
+
+Each {\tt stream} is constructed with a {\tt size}.  The {\tt size}
+refers only to the buffering strategy of the stream--that is, how many
+elements should be kept live at once before overwriting old items with
+new ones.  It is the responsibility of the low-level compiler to
+ensure that no items are overwritten before they are consumed.  If the
+{\tt write\_once} property is true, then no overwriting is allowed,
+and the {\tt size} is also an upper bound on the stream's length at
+runtime.
+
+Each {\tt stream} is also constructed with a {\tt location}, which
+indicates the memory bank in which the stream is held for its entire
+lifetime.  Using the second constructor, a stream can also be assigned
+to a processor, which means that it is buffered in the processor's
+registers.
+
+The {\tt length} method returns how many items have been written to
+the stream from the time it was constructed.  Note that this is
+unrelated to the buffer size of the stream.  It is also unrelated to
+how many items will be written to the stream in the future; if this
+quantity is predictable, then it can be calculated as a function of
+the {\tt length} of inactive streams.
+
+\subsubsection{Stream Graphs}
+\label{sec:streamgraph}
+
+A stream graph represents a static unit of streaming computation.  It
+supports the following interface:
+\begin{verbatim}
+   class Graph {
+     // construct a graph out of any number of kernels
+     Graph(void* kernel1, void* kernel2, ...);
+
+     // run as long as possible -- until an input stream is empty.  
+     // Execute the kernels on processor <proc>.
+     DONE run(VM_NODE_TYPE_PROC proc);
+
+     // given an array of stream segments, run as long as possible
+     // on processor <proc>, stopping when either:
+     //   1. an input stream is empty
+     //   2. there is an index i for which more than segments[i].num_words 
+     //      have been pushed onto segments[i].str
+     DONE run(VM_NODE_TYPE_PROC proc, STREAM_SEG *segments);
+   }
+
+   typedef struct {
+     base_stream str;
+     int num_words;
+   } STREAM_SEG;
+\end{verbatim}
+
+A {\tt Graph} is constructed as a set of kernels.  The connectivity of
+these kernels is implicit in the stream objects that are shared
+between the input of one kernel and the output of another.  The graph
+does not need to be structured (as in StreamIt).  However, no two
+kernels in a graph may read from (or write to) the same stream object.
+
+Graphs are executed using the {\tt run} method, which substitutes for
+the KERNELLOAD and KERNELSTART functions in the previous proposal.
+The first argument to {\tt run} specifies which stream processor
+should execute the arithmetic operations of the graph; note that this
+can be the same processor that is running the control code.
+
+The first {\tt run} method runs until one of the input streams is
+empty.  Using the second {\tt run} method, one can specify a finite
+stream segment for execution by passing a list of streams with a
+counter for each.  If the length of any stream is incremented by more
+than its counter, then execution stops.  Note that this mechanism can
+be applied to graph inputs as well as outputs, since even inputs are
+first written to a stream using a network operation (see below).  Also
+note that the low-level compiler guarantees to ``drain'' each stream
+as much as possible before halting execution; that is, {\tt run}
+returns only when no kernel could execute except one that would exceed
+the counter.
+
+Both {\tt run} methods return a {\tt DONE} handle, which can be tested
+for completion as in the previous proposal.
+
+\sss{Transitioning Between Graphs}
+
+A {\tt Graph} represents only the static sections of the stream graph.
+As in the example of Section~\ref{sec:streamover}, dynamic control
+flow can surround the construction of graphs and can predicate their
+execution.  In addition, streams and kernels from one graph can be
+reused in subsequent graphs.  This is essential for carrying over
+results from one streaming computation to another.  In the example,
+streams {\tt s3} and {\tt s4} are used in multiple graphs.  Streams
+can also be declared in a global namespace if they need to be shared
+between multiple processors.
+
+It is also possible for the processor API to inspect the internal
+fields of a kernel following a streaming computation.  This could be
+useful in passing parameters to subsequent stream graphs, or for
+retrieving a reduction value from inside a kernel.  For instance:
+\begin{verbatim}
+   // --- kernel code ---
+   class SumKernel : Kernel_1_0 <int> {
+     int sum;
+
+     SumKernel(istream<int> in) : Kernel_1_0 (in) {}
+
+     void work(istream<int> in) {
+       KernelInfo.setPop(in, 1);
+       sum += in.pop();
+     }
+   }
+
+   // --- processor code ---
+   stream<int> s1(100, SRF);
+
+   SumKernel sk(s1);
+   Graph g(new FileReader(s1, "input.dat"), sk);
+   VM_DONE_SYNC(g.run());
+
+   int final_sum = sk.sum;
+\end{verbatim}
+
+There seems to be nothing fundamental to prevent the stream processor
+API to mutate kernel fields as well as inspect them, but at this point
+we disallow this since (for performance reasons) most mutation should
+be done from within the kernel itself.
+
+\subsubsection{Pre-Defined Kernels}
+\label{sec:predef}
+
+This proposal integrates all memory management and network support for
+streams into the graph model of the previous section.  This is done
+using pre-defined kernels that can connect streams in different
+memories, or route streams to network channels.
+
+\subsubsection*{Memory Management Kernels}
+
+The memory management kernels correspond directly to one or more of
+the functions that the previous proposal included in the stream
+processor API.
+
+\ssss{Copy} The {\tt Copy} kernel substitutes for the load, store, and move
+functions of the previous proposal.
+\begin{verbatim}
+   template <class I1, class O1>
+   class Copy : Kernel_1_1 <I1, O1> {
+     Copy(istream<I1> src_str, ostream<O1> dest_str, int record_size = 1, int stride = 1);
+   }  
+\end{verbatim}
+
+The primary use of this kernel is for copying items between streams in
+different memory banks, though it can also be used for copying between
+streams in a single memory.  However, it can only copy across one
+connection--in the architectural graph, there must be an edge from the
+location of the input stream to the location of the output stream.
+(When the source stream is located in main memory, this corresponds to
+the previous notion of a load; when the source stream is located in
+the SRF, this corresponds to the previous notion of a store.)
+
+As in the previous proposal, the {\tt record\_size} indicates the
+number of words in each data record, and the {\tt stride} indicates
+the separation between records in the source stream.  We omit the
+optional {\tt \_op} allowed by the previous proposal (for in-place
+memory updates), because we believe that the new structure of the
+stream graph will clearly expose these optimization opportunities.
+
+\ssss{Scatter/Gather}  The {\tt Scatter} and {\tt Gather} kernels are very similar to the
+functions in the previous proposal.
+\begin{verbatim}
+   template <class I1, class I2, class O1>
+   class Scatter : Kernel_2_1 <I1, I2, O2> {
+     Scatter(istream<I1> src_str, istream<I2> index_str, 
+             ostream<O1> dest_str, int record_size = 1);
+   }
+
+   template <class I1, class I2, class O1>
+   class Gather : Kernel_2_1 <I1, I2, O2> {
+     Gather(istream<I1> src_str, istream<I2> index_str, 
+            ostream<O1> dest_str, int record_size = 1);
+   }  
+\end{verbatim}
+
+These kernels copy items from a source stream to a destination stream,
+in chunks of {\tt record\_size} words.  In the {\tt Scatter} kernel,
+the {\tt index\_str} indicates the positions in the output stream at
+which the records should be written; in the {\tt Gather} kernel, the
+{\tt index\_str} indicates the positions in the input stream at which
+the records should be read.
+
+Like the {\tt Copy} kernel, these kernels assume that the
+architectural graph contains an edge from the location of the input
+stream to the location of the output stream.  The location of the
+index stream can be on either of the two nodes.
+
+\subsubsection*{Network Kernels}
+
+The network kernels are for processor-processor communication.  They
+serve as a substitute for the previous proposal's network management
+of streams.
+
+\ssss{Send}  The {\tt Send} kernel sends a stream from one processor to another,
+subject to the connection protocol described below.
+\begin{verbatim}
+   template <class I1>
+   class Send : Kernel_1_0 <I1> {
+     // send <src_str> on <channel> of <connection>
+     Send(istream<I1> src_str,  VM_EDGE connection, int channel);
+   }
+\end{verbatim}
+
+Given that the kernel is executing on processor $P$, we require that
+{\tt src\_str} is located in a memory connected to $P$ (or located
+within $P$ itself), and that {\tt connection} is an edge from $P$ to a
+neighboring processor.
+
+\ssss{Receive}  The {\tt Receive} kernel receives a stream from a neighboring
+processor, subject to the connection protocol described below.
+\begin{verbatim}
+   template <class O1>
+   class Receive : Kernel_0_1 <I1> {
+     // receive <dest_str> from <channel> of <connection>.
+     Receive(ostream<O1> dest_str,  VM_EDGE connection, int channel);
+   }  
+\end{verbatim}
+
+Given that the kernel is executing on processor $P$, we require that
+{\tt dest\_str} is located in a memory connected to $P$ (or located
+within $P$ itself), and that {\tt connection} is an edge into $P$ from
+a a neighboring processor.
+
+\ssss{Send/Receive Protocol} We refer to channel number $n$ of connection $c$ as the pair $(c, n)$.
+Note that $n$ is a virtual channel identifier; $n$ does not need to
+fall within $[0, \mbox{VM\_PROP\_CHAN\_NUM}]$ for connection $c$.
+Rather, the communication protocol will ensure that there are less
+than VM\_PROP\_CHAN\_NUM active channels at a time.
+
+The protocol maintains a queue of {\tt Send} and {\tt Receive} kernels
+that are waiting to communicate across each $(c, n)$; let them be
+$\mt{SendQ}(c, n)$ and $\mt{ReceiveQ}(c, n)$, respectively.  Kernels
+are pushed onto these queues in the same order that their containing
+graphs are executed from the stream processor API.  We disallow the
+case where multiple kernels in a given graph are targeting the same
+queue.  Thus, the order of the kernels in the queues is
+well-defined\footnote{Unless there are multiple threads executing on
+the control processor, in which case synchronization should be used to
+ensure a deterministic ordering of the send/receive kernels across
+threads.}.
+
+To open a new session of data transfer across $(c, n)$, the following
+conditions must be met:
+\begin{enumerate}
+
+\item Channel $n$ is {\it free} on connection $c$.  That is, no other
+session is open on $(c, n)$, and $c$ has room for another active
+channel.
+
+\item $\mt{SendQ}(n,c)$ and $\mt{ReceiveQ}(c, n)$ are non-empty.
+
+\end{enumerate}
+If these conditions are satisfied, then a new session is opened
+between the kernels at the front of $\mt{SendQ}(c, n)$ and
+$\mt{ReceiveQ}(c, n)$.  Items are transmitted across the channel until
+one of the following events occurs:
+\begin{enumerate}
+
+\item The graph containing the {\tt Send} kernel finishes its
+execution. (This could occur because its inputs have drained, or
+because a finite stream segment has expired.)  At this point, an
+end-of-stream marker is inserted into the {\tt dest\_str} of the {\tt
+Receive} kernel, the session is terminated, and both the {\tt Send}
+and {\tt Receive} kernels are removed from the respective queues for
+$(c, n)$.
+
+\item The {\tt Send} kernel still has more items to send, but the
+graph containing the {\tt Receive} kernel finishes its execution.  In
+this case, the session is terminated, and the {\tt Receive} kernel is
+removed from $\mt{ReceiveQ}(c, n)$.  The {\tt Send} kernel is {\bf
+not} removed from $\mt{SendQ}(c, n)$.  That is, the active {\tt Send}
+kernel waits until another {\tt Receive} kernel is ready to receive
+the rest of its output.
+
+\end{enumerate}
+Of the above two cases, presumably the first is much more common.  It
+occurs either when there is a dynamic-length stream that the receiver
+is consuming, or when both the sender and receiver schedule a
+static-length communication and terminate at the same time.  The
+second case occurs only when multiple {\tt Receive} kernels are
+time-sharing the input across a processor-processor connection.  In
+this event, the sending stream should continue to send to each kernel
+in turn.
+
+Note that until a session is opened, all pending kernels are blocked.
+The graphs that contain these kernels could possibly execute other
+nodes, but the {\tt Send} or {\tt Receive} nodes must wait until the
+channel is ready.
+
+\section{Memory}
+
+With regards to the threaded VM, there are no changes to the memory
+API.  As described above, this proposal allows streaming memory access
+only via stream objects.  The layout of stream objects to specific
+memory addresses is not done by the high-level compiler.
+
+\section{Network}
+
+With regards to the threaded VM, there are no changes to the network
+API. As described above, this proposal allows streaming network access
+only through a pre-defined set of kernels.

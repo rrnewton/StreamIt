@@ -1,28 +1,12 @@
-plan
-----
-
-- work out arch. til it makes sense to me
-- work out vm til it makes sense to me
-- go through UT proposal and take note of diffs
-- write up arch/vm better
-
-- write up diffs better
-- go through notes to see if nothing lost
-- email saman
-
-- express RAW/imagine in architecture?
-- work out some examples?
-- look at scalar operand networks for network characterization stuff
-   - or note that network characterization is incomplete
-
 todo
 ----
 
-- rate declarations need to be per incoming stream/channel
-
 - deal with loops and initPath
 
-- send end of stream signal over a dynamic rate stream between filters
+- note that details of how to retrieve the graph structure is left for future
 
-- more details for sending and receiving and loading and storing
+- work out metadata description for Raw
+
+- look at scalar operand networks for network characterization stuff
+
 

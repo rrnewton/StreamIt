@@ -424,3 +424,79 @@ class globals {
 
 - allow threaded processor communication either by single-element
 stream copy, or by proposed VIA model... don't really care
+
+-------------------
+
+vm in terms of their outline
+----------------------------
+
+Processor
+---------
+
+Leave threaded API the way it is.
+
+stream processor api
+--------------------
+
+old proposal had:
+
+load(stream *address_from_main, stream *address_to_srf, int #records, int recordsize, int stride)
+store(stream* address_from_srf, stream *address_to_main, int #records, int recordsize, int stride)
+
+call is asynchronous; returns DONE type which can be blocked or checked with other routines
+
+DIFF: don't allow "op" to be appended to storing; put this right in the stream graph
+
+gather(int dest_srf_number, stream *address_to_srf, ptr_stream *record_ptrs_srf, int source_region, int #records, 
+		int recordsize)
+
+scatter (int source_srf_number, stream *address_from_srf, ptr_stream *record_ptrs_srf, int dest_region, int #records, 
+		int recordsize)
+
+move (stream *address_from, stream *address_to, int #records, int recordsize)
+
+load (byte *address_from_main, byte *address_to_kmem, int kernelSize)
+
+kernelexecute (vm_node stream_processor, byte *kmem_start_address, stream_descriptor *ios);
+
+typedef struct {
+  stream *address_from;
+  int stream_length;
+}
+
+stream kernel api
+-----------------
+
+subset of C
+
+they allow direct SRF access -- we could allow such access to streams
+held within a memory node that is connected to a stream.  just give
+the name of a stream, and the index into that stream, and the number
+of bytes.
+
+just use push, pop, peek
+
+they allow SOS for size of stream within kernels -- should move this
+outside into processor API, and then pass it as a parameter (since the
+kernel won't know how long it is)
+
+but do allow vm_eos (end of stream) in kernel
+
+allow vm_of for output full
+
+memory api
+----------
+
+looks like refers to the threaded VM.
+
+note that all the addresses of stream objects are abstracted away --
+stream memory -allocation- is not done in high-level compiler.
+
+so, no proposed changes, so long as what's there can't affect any
+stream resources.
+
+network api
+-----------
+
+no comments.  the network model for streaming is completely covered by
+above, but a model like this could still apply to the threaded world.
