@@ -1,7 +1,7 @@
 %
 % streamit.sty: declare a `streamit' language for listings
 % David Maze <dmaze@cag.lcs.mit.edu>
-% $Id: streamit.sty,v 1.3 2002-12-06 19:47:57 dmaze Exp $
+% $Id: streamit.sty,v 1.4 2002-12-06 21:22:46 dmaze Exp $
 %
 
 % Cause the `listings' package to exist, and define a `streamit'
@@ -32,9 +32,9 @@
 \lstdefinelanguage{StreamIt}%
 {morekeywords={filter,pipeline,splitjoin,feedbackloop,%
 bit,int,float,complex,void,struct,%
-init,work,push,pop,peek,enqueue,add,loop,body,%
+init,work,phase,push,pop,peek,enqueue,add,loop,body,%
 split,join,duplicate,roundrobin,template,string,continue,%
-break,do,const,handler,for,while},%
+break,do,for,while},%
 morecomment=[l]{//},morecomment=[s]{/*}{*/},%
 %literate={->}{$\rightarrow$}1%
 }
