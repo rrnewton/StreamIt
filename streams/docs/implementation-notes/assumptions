@@ -27,3 +27,6 @@ Compiler / Runtime System
 
 9/19/01	There are no messages sent during initialization.
 
+9/19/01	DUPLICATE splitters allow sources as children.  ROUND_ROBIN splitters
+	do not.  ROUND_ROBIN joiners do not allow sinks as parents.
+
