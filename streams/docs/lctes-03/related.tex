@@ -18,14 +18,14 @@ coarse-grained master/slave runtime system instead of a
 fine-grained static schedule.
 
 Ptolemy \cite{ptolemyoverview} is a simulation environment for
-heterogenous embedded systems, including Synchronous Data Flow
-that is similar to static-rate stream graphs in {\StreamIt}.  SDF
-programs, however, do not include the peeking and messaging
-constructs of {\StreamIt}.  In SDF languages, actors are the active
-computational elements ({\filters}).  SDF computation model does not
-impose structure on the program.  All actors are allowed to have
-multiple input and output channels.  \cite{benveniste93dataflow}
-provides an overview of dataflow synchronous languages.
+heterogenous embedded systems, including Synchronous Data Flow,
+the method used for \StreamIt. \SDF programs, however, do not
+include the peeking constructs of {\StreamIt}.  In \SDF languages,
+actors are the active computational elements ({\filters}).  \SDF
+computation model does not impose structure on the program.  All
+actors are allowed to have multiple input and output channels.
+\cite{benveniste93dataflow} provides an overview of dataflow
+synchronous languages.
 
 There are many results of scheduling SDF programs \cite{leesdf}.
 Many of these results concentrate on reducing buffering
@@ -71,9 +71,7 @@ any valid CSDF graph.
 data is not static, but may depend on data being processed. The
 model is called Cyclo-Dynamic Data Flow (CDDF). This greatly helps
 flexibility of programming, but prevents fully static scheduling
-of programs.
-
-The U.S. Navy Processing Graph Method (PGM) uses a version of SDF
-with an equivalent of peeking \cite{goddard00navy}. The paper is
-focused on real-time execution and provides analysis and
-verification of latency of data flow through their system.
+of programs. The U.S. Navy Processing Graph Method (PGM) uses a
+version of SDF with an equivalent of peeking \cite{goddard00navy}.
+The paper is focused on real-time execution and provides analysis
+and verification of latency of data flow through their system.

@@ -1,11 +1,9 @@
 \section{Results}
 \label{chpt:results}
 
-In this chapter we present results of creating schedules using
-techniques described in Chapters \ref{chpt:hierarchical} and
-\ref{chpt:phased}. No results are presented for latency
-constrained scheduling, as no applications have been written to
-exploit the usefulness of messaging.
+This section presents results of creating schedules using
+techniques described in Sections \ref{chpt:hierarchical} and
+\ref{chpt:phased}.
 
 Section \ref{sec:results:apps} presents the applications used for
 testing.  Section \ref{sec:results:methodology} presents the
@@ -43,11 +41,8 @@ CD-DAT is exactly the same application as that described in
 \cite{murthy99buffer}.
 
 The last two applications (SJ\_PEEK\_1024 and SJ\_PEEK\_31) are a
-synthetic benchmarks.
-
-Figures illustrating the layout of all of the applications are
-available in Appendix \ref{apx:apps}.
-
+synthetic benchmarks. They have been introduced in
+\cite{karczma-thesis}
 
 \subsection{Methodology}
 \label{sec:results:methodology}
@@ -80,23 +75,20 @@ included in the results as a separate value.
 
 \subsubsection{Sinks}
 
-Any application in {\StreamIt} must receive its data from somewhere,
-and its data must be sent somewhere. {\filters} that perform these
-functions are called sinks and sources. In particular, sinks have
-the property of having $u_f = 0$ while sources have $e_f = o_f =
-0$. In other words, sinks do not push any data out and sources do
-not consume any data.
+Any application in {\StreamIt} must receive its data from
+somewhere, and its data must be sent somewhere. {\filters} that
+perform these functions are called sinks and sources. In
+particular, sinks have the property of having $u_f = 0$ while
+sources have $e_f = o_f = 0$. Sinks are problematic for minimal
+latency scheduling, because they do not produce any data. Thus any
+schedule of a sink stream is a minimal latency schedule. This
+leads to the minimal latency schedule of the outer-most
+{\pipeline} becoming a single appearance schedule, thus destroying
+some of the benefit of using phasing scheduling. The technique
+used here for scheduling \pipeline sinks has been discussed in
+\cite{karczma-thesis}.
 
-Sinks are problematic for minimal latency scheduling purposes,
-because they do not produce any data. Remember that a minimal
-latency schedule will execute a bottom-most {\filter} of a {\pipeline}
-in every phase as many times as is necessary to produce some data.
-Since sinks do not produce any data, the sinks are executed their
-steady state number of executions. This leads to the minimal
-latency schedule of the outer-most {\pipeline} becoming a single
-appearance schedule, thus destroying some of the benefit of using
-phasing scheduling.
-
+\begin{comment}
 This problem has been alleviated by detecting sinks at the end of
 a {\pipeline} and scheduling them in a unique way. Namely, a simple
 attempt is made to minimize the amount of storage necessary to
@@ -126,11 +118,12 @@ For simplicity, we set $x = y = 1$, thus obtaining that $b =
 Now, for every phase of the parent {\pipeline} of the sink, the sink
 is executed $\sqrt{a}$ times on the first step of scheduling a
 phase of the {\pipeline}.
+\end{comment}
 
 \subsection{Results}
 \label{sec:results:results}
 
-\begin{table} \centering \scriptsize
+\begin{table} \centering \small
 \begin{tabular}{|c|c|c|c|c|c|c|c|}
 \hline benchmark & \parbox{0.5in}{\centering number of nodes} & \parbox{0.5in}{\centering number of node executions} & \multicolumn{2}{c|}{pseudo single appearance} & \multicolumn{3}{c|}{minimal latency} \\
 \cline{4-8} & & & \parbox{0.5in}{\centering schedule size} & \parbox{0.5in}{\centering buffer size} & \parbox{0.5in}{\centering schedule size} & \parbox{0.8in}{\centering compressed schedule size} & \parbox{0.5in}{\centering buffer size} \\
@@ -154,6 +147,7 @@ latency scheduling algorithms on various applications.}
 \label{tbl:results}
 \end{table}
 
+\begin{comment}
 \begin{figure}
 \centering \psfig{figure=kz-1.eps,width=6in} \caption[Buffer
 storage space savings of Phased Minimal Latency schedule vs.
@@ -171,6 +165,7 @@ required by Hierarchical schedule. Each entry in every schedule
 and data items in all {\Channels} are assumed to consume same
 amount of space.}
 \end{figure}
+\end{comment}
 
 Table \ref{tbl:results} presents buffer and schedule sizes
 necessary to execute various applications using the algorithms
@@ -201,7 +196,7 @@ Other applications show no or little improvement in buffer
 requirements. As expected, no application requires more buffer
 space.
 
-It is interesting to note that the schedule sizes have decreased
-between the single appearance and compressed minimal latency
-phasing schedules. This is due to slightly different encoding
-technique of single appearance schedules.
+It is interesting to note that for some applications the schedule
+sizes have decreased between the single appearance and compressed
+minimal latency phasing schedules. This is due to slightly
+different encoding technique of single appearance schedules.

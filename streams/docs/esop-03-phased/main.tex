@@ -8,40 +8,45 @@
 %\documentclass[10pt,singlespace,twoside,openany,largemargin]{mitthesis} \pagestyle{drafthead}
 %\pagestyle{drafthead}
 
-\documentclass[runningheads,roman]{llncs}
+\documentclass[runningheads,roman]{article}
 
 %\usepackage{lgrind}
 \usepackage{verbatim}
 \usepackage{epsfig, graphicx}
 \usepackage{enumerate}
+\usepackage{fullpage}
+%\usepackage{doublespace}
+%\setstretch{1.05}
 %\usepackage{algorithm}
 %\usepackage{algorithmic}
 
 %\pagestyle{plain}
-%\newtheorem{theorem}{Theorem}
-%\newtheorem{proof}{Proof}
-%\newtheorem{lemma}{Lemma}
-%\newtheorem{corollary}{Corollary}
-%\newtheorem{definition}{Definition}
+\newtheorem{theorem}{Theorem}
+\newtheorem{proof}{Proof}
+\newtheorem{lemma}{Lemma}
+\newtheorem{corollary}{Corollary}
+\newtheorem{definition}{Definition}
 
 
-\begin{document}
 \pagestyle{headings}
 
-\mainmatter
+%\mainmatter
 
 \title{Phased Scheduling of Stream Programs}
-\author{Michal Karczmarek \and William Thies \and Saman
-Amarasinghe}
-
-\institute{Laboratory for Computer Science \\
+\author{Michal Karczmarek, William Thies and Saman
+Amarasinghe \\
+Laboratory for Computer Science \\
         Massachusetts Institute of Technology \\
-        Cambridge, MA  02139 \\ \vspace{8pt}
-\email{\{karczma, thies, saman\}@lcs.mit.edu} \vspace{-24pt}}
+        Cambridge, MA  02139 \\
+\texttt{\{karczma, thies, saman\}@lcs.mit.edu} \vspace{-24pt}}
+\date{}
 
+\begin{document}
 \maketitle
 
 \input{commands}
+
+\vspace{0.1in}
 
 \begin{abstract}
 Applications that are structured around some notion of a "stream"
@@ -84,9 +89,9 @@ requires more space than the most popular technique used today
 \input{hierarchical}
 \input{phased}
 %\input{constrained}
-%\input{results}
-%\input{related}
-%\input{conclusion}
+\input{results}
+\input{related}
+\input{conclusion}
 %\input{pseudocode}
 
 %\appendix

@@ -1,17 +1,17 @@
 \section{Conclusion and Future Work}
 
-This thesis presents a variety of techniques used for scheduling
+This thesis presents two techniques used for scheduling
 Synchronous Data Flow Graphs as used by the {\StreamIt} language.
 Unlike other langauge, {\StreamIt} enforces a structure on the
 stream graph, thus allowing a variety of new approaches to
 scheduling execution. Algorithms presented here improve current
 current scheduling techniques in multiple ways.
 
-Hierarchical approach to scheduling execution of streaming
-applications allows for a simplification of algorithms. Program
-graphs do not have to be considered globally, thus less data needs
-to be kept track of. In hierarchical approaches presented here, we
-only need to consider immediate children of a given stream.
+Hierarchical approach to scheduling of streaming applications
+allows for very simple algorithms. Program graphs do not have to
+be considered globally, thus less data needs to be kept track of.
+In hierarchical approaches presented here, we only need to
+consider immediate children of a given stream.
 
 Phasing approach to scheduling allows to schedule arbitrarily
 tight {\feedbackloops} and allows for more fine-grained control of
@@ -21,13 +21,8 @@ requirements when scheduling streaming applications, as has been
 presented here. Furthermore, phased schedules lend themselves to
 some easy forms of compression, thus reducing the schedule size.
 Future work will concentrate on expanding phasing scheduling to
-implement schedules that conform to specific buffering
-constraints, take advantage of cache sizes, etc. Producing of a
-single schedule for many instances of identical streams will also
-be explored.
-
-The solution to latency constrained scheduling presented here is
-an important contribution to development of {\StreamIt}. It will be
-extended to allow for morphing graphs (\cite{thies02streamit}). It
-will also be adapted to use phasing scheduling to reduce buffer
-and schedule size.
+implement schedules that have some real-life constraints put upon
+them. For example, a program may want to keep all its data in
+processor caches to provide high performance. Adapting buffer
+sharing to phased scheduling will also be explored, as it promises
+further reduction in buffer requirements.

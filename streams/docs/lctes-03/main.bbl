@@ -1,9 +1,14 @@
-\begin{thebibliography}{1}
+\begin{thebibliography}{10}
 
 \bibitem{SICP}
 H.~Abelson and G.~Sussman.
 \newblock {Structure and Interpretation of Computer Programs}.
 \newblock MIT Press, Cambridge, MA, 1985.
+
+\bibitem{benveniste93dataflow}
+Albert Benveniste, Paul Caspi, Paul~Le Guernic, and Nicolas Halbwachs.
+\newblock Data-flow synchronous languages.
+\newblock In {\em {REX} School/Symposium}, pages 1--45, 1993.
 
 \bibitem{esterel92}
 Gerard Berry and Georges Gonthier.
@@ -11,10 +16,65 @@ Gerard Berry and Georges Gonthier.
   mplementation}.
 \newblock {\em Science of Computer Programming}, 19(2), 1992.
 
+\bibitem{bhattacharyya99synthesis}
+S.~Bhattacharyya, P.~Murthy, and E.~Lee.
+\newblock Synthesis of embedded software from synchronous dataflow
+  specifications, 1999.
+
+\bibitem{bhat1999x1}
+S.~S. Bhattacharyya.
+\newblock {Optimization Trade-offs in the Synthesis of Software for Embedded
+  {DSP}}.
+\newblock In {\em Proceedings of the International Workshop on Compiler and
+  Architecture Support for Embedded Systems}, October 1999.
+\newblock Washington, D. C.
+
+\bibitem{leesdf}
+S.~S. Bhattacharyya, P.~K. Murthy, and E.~A. Lee.
+\newblock {\em {Software Synthesis from Dataflow Graphs}}.
+\newblock Kluwer Academic Publishers, 1996.
+
+\bibitem{sisal}
+"J. Gaudiot, W.~Bohm, T.~DeBoni, J.~Feo, and P.~Mille".
+\newblock {The Sisal Model of Functional Programming and its Implementat ion}.
+\newblock In {\em Proceedings of the Second Aizu International Symposium on
+  Paralle l Algorithms/Architectures Synthesis}, 1997.
+
+\bibitem{signal}
+Thierry Gautier, Paul~Le Guernic, and Loic Besnard.
+\newblock Signal: A declarative language for synchronous programming of
+  real-time systems.
+\newblock {\em Springer Verlag Lecture Notes in Computer Science}, 274, 1987.
+
+\bibitem{goddard00navy}
+S.~Goddard and K.~Jeffay.
+\newblock Analyzing the real-time properties of a u.s. navy singer processing
+  system, 2000.
+
+\bibitem{gordo-thesis}
+Michael Gordon.
+\newblock A stream-aware compiler for communication exposed-architectures.
+
+\bibitem{Gordo02}
+Michael Gordon, William Thies, Michal Karczmarek, Jeremy Wong, Henry Hoffmann,
+  David Maze, and Saman Amarasinghe.
+\newblock A stream compiler for communication-exposed architectures.
+\newblock In {\em In the Proceedings of the Tenth Conference on Architectural
+  Support for Programming Languages and Oper\ ating Systems}, October 2002.
+
+\bibitem{govindarajan-minimizing}
+R.~Govindarajan, Guang~R. Gao, and Palash Desai.
+\newblock Minimizing buffer requirements under rate-optimal schedule in regular
+  dataflow networks.
+
 \bibitem{lustre}
 N.~Halbwachs, P.~Caspi, P.~Raymond, and D.~Pilaud.
 \newblock {The synchronous data-flow programming language LUSTRE}.
 \newblock {\em Proc. of the IEEE}, 79(9), 1991.
+
+\bibitem{streamitweb}
+StreamIt Homepage.
+\newblock \texttt{http://compiler.lcs.mit.edu/streamit}.
 
 \bibitem{karczma-thesis}
 Michal Karczmarek.
@@ -32,6 +92,15 @@ Edward~A. Lee.
 \newblock UCB/ERL Technical Memorandum UCB/ERL M01/11, Dept. EECS, University
   of California, Berkeley, CA, March 2001.
 
+\bibitem{murthy99buffer}
+P.~Murthy and S.~Bhattacharyya.
+\newblock Buffer merging---a powerful technique for reducing memory
+  requirements in sdf specifications, 1999.
+
+\bibitem{parks95comparison}
+T.~Parks, J.~Pino, and E.~Lee.
+\newblock A comparison of synchronous and cyclostatic dataflow, 1995.
+
 \bibitem{Rix98}
 Scott Rixner and {et al}.
 \newblock {A Bandwidth-Efficient Architecture for Media Processing}.
@@ -41,5 +110,25 @@ Scott Rixner and {et al}.
 Robert Stephens.
 \newblock {A Survey of Stream Processing}.
 \newblock {\em Acta Informatica}, 34(7), 1997.
+
+\bibitem{thies02streamit}
+William Thies, Michal Karczmarek, and Saman Amarasinghe.
+\newblock Streamit: A language for streaming applications.
+\newblock In {\em Computational Complexity}, pages 179--196, 2002.
+
+\bibitem{streamittech2}
+William Thies, Michal Karczmarek, Michael Gordon, David Maze, Jeremy Wong,
+  Henry Hoffmann, Matthew Brown, and Saman Amarasinghe.
+\newblock {StreamIt: A Compiler for Streaming Applications}.
+\newblock MIT-LCS Technical Memo LCS-TM-622, Cambridge, MA, 2001.
+
+\bibitem{streamittech3}
+William Thies, Jasper Lin, and Saman Amarasinghe.
+\newblock {Phased Computation Graphs in the Polyhedral Model}.
+\newblock MIT-LCS Technical Memo LCS-TM-630, Cambridge, MA, 2002.
+
+\bibitem{wauters96cyclodynamic}
+P.~Wauters, M.~Engels, R.~Lauwereins, and J.~Peperstraete.
+\newblock Cyclo-dynamic dataflow, 1996.
 
 \end{thebibliography}

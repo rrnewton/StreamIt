@@ -94,7 +94,7 @@ and output rates of each filter are known at compile time.  In
 this section, we provide a very brief overview of
 %the syntax and
 semantics of \StreamIt.  A more detailed description of the design
-and rationale for \StreamIt can be found in~\cite{streamitcc} or
+and rationale for \StreamIt can be found in~\cite{thies02streamit} or
 on our website~\cite{streamitweb}.
 
 \subsection{Language Constructs}
@@ -156,8 +156,7 @@ called automatically.
 %% optimization from the programmer.
 
 The basic construct for composing filters into a communicating
-network is \pipeline, such as the {\tt FMRadio} in Figure
-\ref{fig:radiocode}.  A \pipeline behaves as the sequential
+network is \pipeline.  A \pipeline behaves as the sequential
 composition of all its child streams.  For example, the output of
 {\tt DataSource} is implicitly connected to the input of {\tt
 FIRFilter}, who's output is connected to {\tt FMDemodulator}, and

@@ -420,14 +420,14 @@ of space required depends only on order of execution of nodes. The
 two are related, however, because order of execution of {\filters}
 affects how efficiently the schedule can be encoded.
 
-For example, execution of {\filters} in {\pipeline} depicted in Figure
-\ref{fig:pipeline-buffers} can be ordered in two simple ways, one
-resulting in a large schedule but minimal amount of buffering, the
-other resulting in a small schedule but a large amount of
+For example, execution of {\filters} in {\pipeline} depicted in
+Figure \ref{fig:steady-state} can be ordered in two simple ways,
+one resulting in a large schedule but minimal amount of buffering,
+the other resulting in a small schedule but a large amount of
 buffering.
 
 The steady schedule of the {\pipeline} in Figure
-\ref{fig:steady-states}(a) executes {\filter} $A$ 4 times,
+\ref{fig:steady-state}(a) executes {\filter} $A$ 4 times,
 {\filter} $B$ 6 times, {\filter} $C$ 9 times and {\filter} $D$ 3
 times. Writing out a schedule that requires minimal buffering
 results in schedule $\{AB\{2C\}BCDAB\{2C\}ABCDB\{2C\}ABCD\}$. This
