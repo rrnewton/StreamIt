@@ -1,5 +1,3 @@
-- note that division could be further optimized to detect 0 / vector.
-
 high priority
 -------------
 
@@ -17,9 +15,6 @@ process!
 
 low priority
 ------------
-
-- do we need a word other than dataflow analysis to describe what
-we're doing?  It's not really a dataflow analysis.
 
 - make it explicit somewhere that whenever we introduce \lambda_x, we
 also introduce A_x, b_x, e_x, o_x, u_x.
