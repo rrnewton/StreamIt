@@ -1,76 +1,149 @@
+\section{Language Overview}
+
 \begin{figure}[t]
 \scriptsize
 \begin{verbatim}
-class EdgeDetector extends Filter {
-  Channel input = new FloatChannel();
-  Channel output = new FloatChannel();
-  
-  FilterPortal portal;
-
-  void init(FilterPortal portal) {
-    this.portal = portal;
-  }
-
-  void work() {
-    float x1 = input.pop();
-    float x2 = input.peek(0);
-    if (x2 - x1 > THRESHOLD) {
-      // freeze display within 2-5 firings of work()
-      portal.reset(FREEZE_DISPLAY), 2, 5);
-    } else {
-      output.push(x1);
-    }
-  }
-}
+Example FIR / FFT goes here.
 \end{verbatim}
 \vspace{-12pt}
-\caption{\protect\small An edge detector.  If two successive input
-values differ by more than the threshold, a message is sent to freeze
-the display.  Otherwise, the items pass through the filter.
+\caption{\protect\small FIR / FFT Filters.
 \protect\label{fig1}}
 \vspace{-12pt}
 \end{figure}
 
-\begin{figure}[t]
-\scriptsize
+In this section, we give an overview of the StreaMIT language.
+
 \begin{verbatim}
-class Oscilloscope extends Stream {
-  void init(int mode) {
-    switch(mode) {
-      case CONTINUOUS_DISPLAY:
-        add(new DataSource());
-        add(new ContinuousDisplay());
-        break;
-      case FREEZE_DISPLAY:
-        add(new ScreenMemory());
-        break;
-      case EDGE_TRIGGER:
-	FilterPortal fp = new FilterPortal();
-	fp.add(this)
-        add(new DataSource());
-        add(new EdgeDetector(fp));
-        add(new ContinuousDisplay());
-        break;
-      case EXTERNAL_TRIGGER:
-        add(new SplitJoin() {
-          void init() {
-            add(new DataSource());
-            add(new TriggerSource());
-            joiner(ROUND_ROBIN);
-          }
-        });
-        add(new ExternalEdgeDetector(this));
-        break;
-    }  
-    add(new ContinuousDisplay());
-  }
-}
+
+- motivated by properties above
+- this is interface language; developing higher-level streamit
+- legal java syntax for now, to ease development cycle
+
+- point to example, talk through major features
+
+---------------------------------------------------------------------------
+- representing filters 
+- others:
+	- procedural language
+		- complicated loops that don't express well the feedback,
+			parallelism in streaming systems
+		-> loop overhead dominates, data leaves the cache
+
+	- object oriented language
+		- complicated runtime-model, pulling data and trying to 
+			get block size right for machine configuration
+			(scheduling is complicated)
+
+- us: only define base-level blocks, leave the rest to language/compiler
+	- init, work, message handlers
+
+	- define in init function anything that has to be set up when
+          the block is first defined.
+
+	- define in work function the finest-grained step of
+          execution, expressing the simple transfer function of one
+          stream into another
+
+	- no global data or global time
+
+- syntax presented:  filter/channel declarations, init & work functions
+---------------------------------------------------------------------------
+- representing streams (how to ``connect the blocks together'')
+- others:
+	- straight-line code declaring & connecting blocks
+		problem: can't see the structure.
+			 easy to make mistakes
+	- ad-hoc graph languages for declaring & connecting blocks
+		problem: awkward to use
+			 no good textual representation
+
+	  generally, arbitrary connections are too hard to think
+		about. and too hard for compiler to analyze.
+		make connection with unstructured control flow
+
+- us: structured streams.
+	- compose out of simple structures:  
+		pipe, feedbackloop, splitjoin
+
+	   advantages: can see structure in code, with indentation
+		level corresponding to hierarchical stream
+		depth (pointer to natural syntax argument?)
+
+		- can have clean abstractions about *hierarchical*
+		structure.  Provides better abstraction and
+		modularity than *flat* layout of blocks.
+
+- syntax presented:  stream, feedbackloop, splitjoin.  inlining.
+---------------------------------------------------------------------------
+- integrated support for infrequent, low-bandwidh messages
+- others:
+	- embed control messages in data stream
+		- complicated, error-prone, unreadable code
+		- hurts performance of steady state (if you have to 
+			check if everything is message or data)
+		- complicates compiler analysis
+		- can't send messages upstream without explicit
+			feedback loop
+	- treat messages as synchronous method calls
+		- but delays stream progress when method en route, 
+			disrupting scheduling freedom of compiler, as
+			well as efficiency when at time of call
+		- usually there is no return value (it's a message!)
+		- no good notion of ``when'' message arrives relative
+			to sender
+- us: 	- support for asynchronous messages with timing relative to
+		data items
+	- (define the ``wavefront'' of a data item, and say that
+		messages sent with range of times)
+	- avoids problems of two above approaches (it's readable, out
+		of the way of steady-state data, and out of way of compiler)
+	- this RELATIVE time gives more freedom to compiler for
+		scheduling blocks
+	- absence of global time good for parallel programming
+
+- syntax presented:  sendMessage, messageHandlers, messageStubs.
+---------------------------------------------------------------------------
+- integrated support for re-initialization sections of a stream
+- others:	
+	- ad-hoc halting of whole stream's data flow so that some
+		restructuring can take place
+		
+		- complicated programming to interface between the time of
+			reinitialization and starting/stopping the stream
+
+- us:
+	- re-invoke the original initialization routine with different 
+		parameters.
+
+		- talk about draining the pipeline.  the compiler
+                  worries about doing the reinitialization at the
+                  right time so that the re-initialized segment drains
+                  completely.  but the re-init message is delivered
+                  just like a message, and a warning is given if the
+                  message delivery schedule does not encompass a clean
+                  draining point.
+
+		- (alternatively, could destroy the pipeline.)
+
+		- so improvement #1 is that the interface to the user is 
+			cleaner.  Also it's easier for the compiler to 
+			analyze.
+
+		- improvement #2: very clear targets of
+			re-initiailization.  Can reinitialize any
+			block in the hierarchy in a very well-defined
+			way.
+
+		- improvement #3 is that the draining analysis is done
+                  automatically, which otherwise is very complicated
+                  for the programmer to deal with.
+
+- syntax presented:  special reset method
+
 \end{verbatim}
-\vspace{-12pt}
-\caption{\protect\small An oscilloscope that behaves
-as a composition of other streams, and depends on the mode that is
-passed to {\tt init}.
-\protect\label{fig2}}
-\vspace{-12pt}
-\end{figure}
+
+
+
+
+
 
