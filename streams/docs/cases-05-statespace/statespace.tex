@@ -1,3 +1,4 @@
+\clearpage
 \mysection{State-Space Analysis}
 \label{sec:statespace}
 
@@ -16,17 +17,17 @@ be combined with blocks of mis-matching dimensions.
 \mysubsection{Representation}
 
 Our first task is to create a data structure that fully captures the
-state space representation of a StreamIt filter.  We save a filter's
-number of states, push rate, and pop rate in variables which we term
-$s$, $u$, and $o$, respectively. Our data structure also contains the
-matrices $\mathbf{A}$, $\mathbf{B}$, $\mathbf{C}$, and $\mathbf{D}$
-with dimensions $s \times s$, $s
+state space representation of a StreamIt filter.  We save a 
+filter's number of states, push rate, and pop rate in variables which
+we term $s$, $u$, and $o$, respectively. Our data structure also
+contains the matrices $\mathbf{A}$, $\mathbf{B}$, $\mathbf{C}$, and
+$\mathbf{D}$ with dimensions $s \times s$, $s
 \times o$, $u \times s$, and $u \times o$, respectively. The
-inputs to a filter are denoted as $\vec{\mathbf{u}}$ (length $o$),
-the outputs as $\vec{\mathbf{y}}$ (length $u$), and the states as
-$\vec{\mathbf{x}}$ (length $s$). Upon every execution of the
-filter, we can calculate the outputs by the formula
-$\vec{\mathbf{y}} = \mathbf{C}\vec{\mathbf{x}} +
+inputs to a filter are denoted as $\vec{\mathbf{u}}$ (length $o$), the
+outputs as $\vec{\mathbf{y}}$ (length $u$), and the states as
+$\vec{\mathbf{x}}$ (length $s$). Upon every execution of the filter,
+we can calculate the outputs by the formula $\vec{\mathbf{y}} =
+\mathbf{C}\vec{\mathbf{x}} +
 \mathbf{D}\vec{\mathbf{u}}$, and update the state matrix by the
 formula $\vec{\dot{\mathbf{x}}} = \mathbf{A}\vec{\mathbf{x}} +
 \mathbf{B}\vec{\mathbf{u}}$. For convenience, we will calculate
@@ -37,11 +38,10 @@ $s$).
 
 Since we have not included a constant term in our model, we will set
 one of the state variables to be the constant $1$. This variable will
-not be updated by any of the states or inputs, and
-\clearpage \noindent
-its initial value will be $1$, so it will always remain that
-value. Any state or output that depends on a constant term can now
-refer to a multiple of the constant state variable instead.
+not be updated by any of the states or inputs, and its initial value
+will be $1$, so it will always remain that value. Any state or output
+that depends on a constant term can now refer to a multiple of the
+constant state variable instead.
 
 As long as a filter's peek rate (which we term $e$) equals its pop
 rate, the data structure as currently designed can fully represent the

@@ -7,6 +7,9 @@
 \newcommand{\setstretch}[1]{}
 \newenvironment{singlespace}{}
 
+\usepackage{smaller}
+\usepackage{algorithm}
+\usepackage{algorithmic}
 \usepackage{lgrind}
 \usepackage{simplemargins}
 \usepackage{times}
@@ -92,11 +95,11 @@
   \input{conclusion}
   %\input{apps}
 
-  \begin{small}
+  \begin{smaller}
     \begin{singlespace}
       \bibliographystyle{abbrv}
       \bibliography{main}
     \end{singlespace}
-  \end{small}
+  \end{smaller}
   
 \end{document}

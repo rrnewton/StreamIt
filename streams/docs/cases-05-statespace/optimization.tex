@@ -283,12 +283,12 @@ The matrices $\mathbf{L_i}$ are rectangular, and the matrices
 $\mathbf{A_{ij}}$ are square, but do not necessarily have the same
 dimensions as each other. These matrices have the form:
 \starteqnstar
-\mathbf{L_i} = \left [ \begin{array} {ccccc} 0 & 0 & ...
-& 0 & * \\ 1 & 0 & ... & 0 & * \\ 0 & 1 & ... & 0 & * \\
-... & ... & ... & ... & ... \\ 0 & 0 & ... & 1 & * \end{array}
-\right ] ~~~~~
-\mathbf{A_{ij}} = \left [ \begin{array} {cccc} 0 & 0 & ... & *
-\\ ... & ... & ... & ... \\ 0 & 0 & ... & * \end{array} \right ]
+\mathbf{L_i} = \left [ \begin{array} {ccccc} \hspace{-1pt}0 & 0 & ...
+& 0 & * \hspace{-1pt}\\\hspace{-1pt} 1 & 0 & ... & 0 & * \hspace{-1pt}\\\hspace{-1pt} 0 & 1 & ... & 0 & * \hspace{-1pt}\\\hspace{-1pt}
+... & ... & ... & ... & ... \hspace{-1pt}\\\hspace{-1pt} 0 & 0 & ... & 1 & *\hspace{-1pt} \end{array}
+\right ] ~~
+\mathbf{A_{ij}} = \left [ \begin{array} {cccc} \hspace{-1pt}0 & 0 & ... & *
+\hspace{-1pt}\\\hspace{-1pt} ... & ... & ... & ... \hspace{-1pt}\\\hspace{-1pt} 0 & 0 & ... & *\hspace{-1pt} \end{array} \right ]
 \doneeqnstar
 
 The entries marked with a * are the parameters of the system.  This is
@@ -301,42 +301,71 @@ Figure~\ref{fig:param} gives pseudocode for a a simple algorithm to
 attain the form above.  The pseudocode does not include the necessary
 inverse column operations that must go with all row operations.
 
-\begin{figure*}[t]
-\begin{verbatim}
-Reduce Parameters {
-  currRow = 0; colA = 0; colC = 0;
+\newcommand{\IND}{\begin{ALC@g}}
+\newcommand{\UND}{\end{ALC@g}}
 
-  while(currRow < totalRows) {
+\begin{figure}[t]
+\hspace{-0.05in}\parbox{3.2in}{
+{\bf Reduce\_Parameters}(\mbox{$A, C$}) \{
+\begin{algorithmic}
+\STATE - $\mt{currRow} = 0$; \\ \vspace{6pt}
+\STATE - $\mt{colA} = 0$; \\ \vspace{6pt}
+\STATE - $\mt{colC} = 0$; \\ \vspace{6pt}
+\STATE {\bf while} $(\mt{currRow} < \mt{totalRows})$ \{
+\IND
+\STATE - \parbox[t]{2.85in}{Find a non-zero entry in column $\mt{colC}$ at or below row $\mt{currRow}$ of $C^T$, and swap it with the entry in row $\mt{currRow}$} \\ \vspace{6pt}
+\STATE - \parbox[t]{2.85in}{Set $C^T[\mt{currRow}, colC] = 1$ by scaling the row appropriately; make all entries above and below it zero by adding appropriate multiple of row $\mt{currRow}$ to other rows} \\ \vspace{6pt}
+\STATE - $\mt{currRow} = \mt{currRow} + 1$ \\ \vspace{6pt}
+\STATE - $\mt{colC} = \mt{colC} + 1$ \\ \vspace{6pt}
+\STATE {\bf do} \{  \\ \vspace{6pt}
+\IND
+\STATE - \parbox[t]{2.75in}{Find a non-zero entry in column $\mt{colA}$ at or below row $\mt{currRow}$ of $A^T$, and swap it with the entry in row $\mt{currRow}$} \\ \vspace{6pt}
+\STATE - \parbox[t]{2.75in}{Set $A^T[\mt{currRow}, colA] = 1$ by scaling the row appropriately; make all entries below it zero by adding appropriate multiple of row $\mt{currRow}$ to other rows} \\ \vspace{6pt}
+\STATE - $\mt{currRow} = \mt{currRow} + 1$ \\ \vspace{6pt}
+\STATE - $\mt{colA} = \mt{colA} + 1$ \\ \vspace{6pt}
+\UND
+\STATE \} {\bf while} a non-zero entry in column $\mt{colA}$ is found \\ \vspace{6pt}
+\STATE - $\mt{colA} = \mt{colA}+1$ \\ \vspace{6pt}
+\STATE \} \\ \vspace{6pt}
+\UND 
+\STATE \} \\ \vspace{6pt}
+\end{algorithmic}
+} % end parbox
+%% \begin{verbatim}
+%% Reduce Parameters {
+%%   currRow = 0; colA = 0; colC = 0;
 
-   -find a non-zero entry in column colC at or below row currRow 
-    of C{transpose}, and swap it with the entry in row currRow;
+%%   while(currRow < totalRows) {
 
-   -set C{transpose}[currRow,colC] = 1 by scaling the row appropriately;
-    make all entries above and below it zero by adding appropriate 
-    multiple of row currRow to other rows;
+%%    -find a non-zero entry in column colC at or below row currRow 
+%%     of C{transpose}, and swap it with the entry in row currRow;
 
-    currRow = currRow + 1;
-    colC = colC + 1;
+%%    -set C{transpose}[currRow,colC] = 1 by scaling the row appropriately;
+%%     make all entries above and below it zero by adding appropriate 
+%%     multiple of row currRow to other rows;
 
-    do {
-     -find a non-zero entry in column colA at or below row currRow 
-      of A{transpose}, and swap it with the entry in row currRow;
+%%     currRow = currRow + 1;
+%%     colC = colC + 1;
 
-     -set A{transpose}[currRow,colA] = 1 by scaling the row appropriately;
-      make all entries below it zero by adding appropriate multiple 
-      of row currRow to other rows;
+%%     do {
+%%      -find a non-zero entry in column colA at or below row currRow 
+%%       of A{transpose}, and swap it with the entry in row currRow;
 
-      currRow = currRow + 1;
-      colA = colA + 1;
-    } while a non-zero entry in column colA is found
+%%      -set A{transpose}[currRow,colA] = 1 by scaling the row appropriately;
+%%       make all entries below it zero by adding appropriate multiple 
+%%       of row currRow to other rows;
 
-    colA = colA + 1;
-  }
-}
-\end{verbatim}
-\vspace{-24pt}
+%%       currRow = currRow + 1;
+%%       colA = colA + 1;
+%%     } while a non-zero entry in column colA is found
+
+%%     colA = colA + 1;
+%%   }
+%% }
+%% \end{verbatim}
+\vspace{-12pt}
 \caption{Algorithm for parameter reduction. \protect\label{fig:param}}
-\end{figure*}
+\end{figure}
 
     It is possible that one type of form has fewer parameters than the
 other. Therefore, we perform the above algorithm on $\left [

@@ -648,7 +648,7 @@
   \newcommand\scriptsize{\@setfontsize\scriptsize\@viipt{8\p@}}
   \newcommand\tiny{\@setfontsize\tiny\@vpt{6\p@}}
   \newcommand\large{\@setfontsize\large\@xiipt{14\p@}}
-  \newcommand\Large{\@setfontsize\Large\@xivpt{18\p@}}
+  \newcommand\Large{\@setfontsize\Large\@xivpt{11\p@}}
   \newcommand\LARGE{\@setfontsize\LARGE\@xviipt{20\p@}}
   \newcommand\huge{\@setfontsize\huge\@xxpt{25\p@}}
   \newcommand\Huge{\@setfontsize\Huge\@xxvpt{30\p@}}
@@ -1247,7 +1247,7 @@
         \leftmargin\labelwidth
         \advance\leftmargin\labelsep
         \advance\leftmargin\bibindent
-        \parsep=0pt\itemsep=3pt % GM July 2000
+        \parsep=0pt\itemsep=8pt % GM July 2000
         \itemindent -\bibindent
         \listparindent \itemindent
         \usecounter{enumi}

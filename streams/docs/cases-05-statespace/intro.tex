@@ -15,27 +15,43 @@ for a variety of applications, including signal compression and
 decompression, noise reduction, and error correction.  Because such
 programs often run in embedded environments with limited power and
 strict real-time requirements, this is a domain where optimization is
-still very important.
+still very important.  The streaming domain is also rich with
+optimization opportunities, as DSP algorithms often exhibit widespread
+parallelism and regular communication patterns that could be exploited
+by a compiler.
 
-Unfortunately, DSP optimizations typically defy high level language
-compiler analysis.  Consequently, DSP applications must be hand-coded
-or at the very least fine-tuned at the assembly level. This leads to a
-host of problems: DSP experts must spend valuable hours writing
-optimized low level code; every change in the design of the
-application necessitates rewriting the code; the optimizations are
-typically architecture-dependent, hence they are not portable or
-robust.  These factors indicate that there is a need to effectively
-analyze DSP applications and to automate their optimization in a
-compiler.
+However, many of the optimization opportunities for DSP programs are
+obscured by general-purpose languages such as C.  As detailed
+elsewhere~\cite{streamitcc}, C obscures the high-level structure of a
+streaming application due to possible aliasing between autonomous
+filters, complex modulo expressions on circular bufers, and muddling
+of atomic execution steps with global control flow.  There is not
+enough information in C code to automatically perform the high-level
+transformations that experts use to achieve competitive performance.
 
-In this paper, we introduce a new framework for analyzing and
-optimizing a large class of DSP applications.  The framework, which we
-call linear state space analysis, applies a large body of work on
-linear state space systems to the domain of programming languages and
-compilers.  A state space system is one in which a computational
-element produces and consumes some values on each execution.  In
-addition, some internal data may be preserved between executions; we
-refer to these values as {\it states}.
+Consequently, DSP programs typically are implemented in two phases.
+First, the functionality of the algorithm is specified at a high level
+of abstraction by applications designers.  Next, a set of DSP experts
+examine the global flow of data and perform specialized
+transformations to efficiently map the algorithm to C and assembly
+code.  This process is tedious and costly, as every change in the
+high-level design necessitates new optimizations and re-implementation
+of the code; in addition, the optimizations are typically
+architecture-dependent, thereby sacrificing portability and
+robustness.  In an ideal world, the compiler would provide a unified
+framework for optimizing high-level DSP algorithms, thereby providing
+an automatic path from the functional specification to an efficient
+implementation.
+
+As a small step towards this vision, this paper introduces a new
+framework for analyzing and optimizing a large class of DSP
+applications.  The framework, which we call linear state space
+analysis, applies a large body of work on linear state space systems
+to the domain of programming languages and compilers.  A state space
+system is one in which a computational element produces and consumes
+some values on each execution.  In addition, some internal data may be
+preserved between executions; we refer to these values as {\it
+states}.
 
 A state space system is linear if it satisfies two criteria.  First,
 each output must be a linear combination of the inputs and the current
