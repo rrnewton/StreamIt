@@ -273,8 +273,8 @@ it is straightforward to send a message that is delivered
 synchronously to two actors in parallel streams.  For example,
 consider a vocoder that is separately manipulating the magnitude and
 phase components of a signal.  If something triggers an adjusment to
-the speech transformation ({\it e.g.,} the speaker requests a change of
-pitch) then the mask needs to be updated at the same data-relative
+the speech transformation ({\it e.g.,} the speaker requests a change
+of pitch) then the mask needs to be updated at the same data-relative
 time in both parallel streams.  A portal that contains both components
 seamlessly provides this functionality.  Finally, portals are useful
 as an external programming interface; an application can export a
@@ -456,14 +456,55 @@ marked with an asterisk. \protect\label{fig:freq2}}
 
 \section{Other SDEP Applications}
 
-There are a number of other 
+We believe that there are many interesting applications for $\sdep$ in
+programming language design and implementation.  We summarize four
+potential applications below.
 
-\subsection{Latency Constraints}
+\subsection{Specifying Latency Constraints}
+
+The latency range included in the messaging construct can be directly
+employed as a declarative way to specify latency constraints between
+actors.  For instance, our infrastructure can interpret a directive
+such as $\mt{maxLatency}(A, B, k)$ to indicate a maximum latency of
+$k$ between actors $A$ and $B$.  To implement this directive, the
+schedule is constrained as if there were an upstream message with
+latency range $[0,k]$.  This kind of data-centric latency constraint
+could be important for reactive applications that need to produce an
+output before consuming too many items from the input.
 
 \subsection{Debugging}
 
-\subsection{Speculation}
+An immediate application of $\sdep$ is as part of a graphical
+debugging environment for stream programs.  For example, if a user is
+stepping through the execution of the work function of actor $B$, it
+might become apparent that the errant behavior of $B$ is due to
+aspects of the input items that originated in actor $A$.  By utilizing
+$\sdep$ information, the debugger can provide the iteration of $A$ in
+which the items originated, and the user can continue debugging at
+that location.
+
+\subsection{Software-Based Speculation}
+
+Software-based speculation is one approach to improving the
+performance of irregular scientific applications~\cite{frank-thesis}.
+While the graph-level control flow in Synchronous Dataflow is known at
+compile time, there could be unpredictable control flow within the
+work function of each actor, and a compiler could attempt to improve
+performance by speculatively executing a given path.  However, if the
+prediction failed, the results of the speculation might have passed
+outside the boundaries of the actor and on to other actors in the
+graph.  In this case, $\sdep$ provides an exact count of how many
+iterations the downstream actors should roll back in order to arrive
+at the original state.
 
 \subsection{Program Transformation}
 
-and validation?
+In the realm of scientific computing, a precise notion of dependences
+proved essential for developing a robust suite of program analyses and
+optimizations.  Representations such as dependence levels~\cite{AK82},
+direction vectors~\cite{wolfe82}, and dependence
+polyhedra~\cite{Irig88} were important abstractions because they
+provided an efficient way to test the validity of program
+transformations.  We believe that a similar abstraction of dependences
+is needed for the emerging realm of streaming applications, and
+$\sdep$ represents our first step towards this goal.
