@@ -46,16 +46,16 @@ that are relative to a given filter in the graph, instead of being
 global characteristics of a program.
 
 We will arrive at this notion of relative timing and dependence via a
-{\bf stream transfer function}, $sdep$, that is defined for a given
+{\bf stream dependence function}, \sdep, that is defined for a given
 stream graph. In Section \ref{sec:notation} we provide a definition of
-$sdep$ along with some notation.  We then motivate the $sdep$ function
+\sdep~along with some notation.  We then motivate the \sdep~function
 in \ref{sec:informationflow} by deriving a concept of relative time
 and a meaning for StreamIt's messaging system.  Only then, in Section
-\ref{sec:derivemin}, do we turn to deriving expressions for the $sdep$
-function itself; Sections \ref{sec:prog-verif}, \ref{sec:denotational}
-and \ref{sec:optimization} further employ the function in the
-respective contexts of program verification, denotational semantics,
-and program optimization.
+\ref{sec:derivemin}, do we turn to deriving expressions for the
+\sdep~function itself; Sections \ref{sec:prog-verif},
+\ref{sec:denotational} and \ref{sec:optimization} further employ the
+function in the respective contexts of program verification,
+denotational semantics, and program optimization.
 
 \subsection{Notation}
 \label{sec:notation}
@@ -72,7 +72,7 @@ We use the following notation:
   number of items on tape $T$ at a given point of execution.
 
 \item We say that a filter $A$ is {\it upstream} of filter $B$ (or,
-  equivalently, $B$ is {\it downstream} $A$) if there is a directed
+  equivalently, $B$ is {\it downstream} of $A$) if there is a directed
   path in the stream graph from $O_A$ to $I_B$.  We use this
   terminology for tapes as well as filters.
 
@@ -84,33 +84,32 @@ We use the following notation:
 
 \end{itemize}
 
-Now, we are ready to give a definition of the $sdep$ function:
+Now, we are ready to give a definition of the stream dependence
+function, \sdep:
 \begin{definition}
 $\mi{a}{b}(x)$ is the minimum number of items that must appear on tape
-$a$ given that there are $x$ items on tape $b$, where $b$ is
+ $a$ given that there are $x$ items on tape $b$, where $b$ is
 downstream of $a$.
 \end{definition}
-Thus, one can think of $sdep$ as an inter-filter data dependence
+Thus, one can think of \sdep~as an inter-filter data dependence
 mapping.  Though the actual data references in a stream program appear
 from within the work functions, there is an aggregate dependence that
 restricts a filter from firing until it has enough items on its input
 tape to satisfy all its internal references (we assume that each
-firing is atomic).  The $sdep$ function generalizes this dependence to
+firing is atomic).  The \sdep~function generalizes this dependence to
 answer a different question: how many items are needed on {\it
 another} filter's input tape before my filter can fire?  The following
 sections will provide some additional intuition as to the meaning and
-applications of the $sdep$ function.
+applications of the \sdep~function.
 
 \subsection{Information Flow}
 \label{sec:informationflow}
 
-Above, the $sdep$ function is described in terms of data dependences.
+Above, the \sdep~function is described in terms of data dependences.
 However, we can also think of this function as defining a common
 timing mechanism that asynchronous filters can use to synchronize
 events.  We present this timing mechanism in terms of ``information
 flow'', which we believe is a central concept of the streaming domain.
-Using this concept, we give a precise semantics to message delivery
-timing in StreamIt.
 
 \subsubsection{Information Wavefronts}
 
@@ -124,7 +123,7 @@ asynchronously without any notion of global time, two invocations of a
 work function occur at the same ``information-relative time'' if they
 operate on the same information wavefront.
 
-The $sdep$ function can be used to give a precise definition to an
+The \sdep~function can be used to give a precise definition to an
 information wavefront.  One interpretation of $y = \mi{a}{b}(x)$ is
 that the item at position $y$ of tape $a$ is the the latest item on
 tape $a$ to {\it affect} the item at position $x$ of tape $b$.  This
@@ -139,10 +138,10 @@ concept.
 \subsubsection{Message Timing}
 \label{sec:messagesemantics}
 
-We can use the $sdep$ function to give a precise meaning to the message
-delivery guarantees in StreamIt.  Though we cannot give the details
-here due to space constraints (see \cite{streamittech} for a careful
-treatment), the general idea is as follows.
+We can also use the \sdep~function to give a precise meaning to the
+message delivery guarantees in StreamIt.  Though we cannot give the
+details here due to space constraints (see \cite{streamittech} for a
+careful treatment), the general idea is as follows.
 
 A filter $A$ can send a message to filter $B$ to communicate
 low-bandwidth, asynchronous data.  To send a message, there needs to
@@ -150,13 +149,13 @@ be an upstream or downstream path from $A$ to $B$ in the stream graph
 (the filters need not be directly connected.)  The message statement
 appears in $A$'s {\tt work} function and includes a specified latency
 $n$ that indicates ``when'' the target filter $B$ should receive the
-message.  Now, the StreamIt language specification measures the
-latency $n$ in terms of information wavefronts: if $A$ is upstream of
-$B$, then $B$ will receive the message immediately preceding the first
+message.  The StreamIt language specification measures the latency $n$
+in terms of information wavefronts: if $A$ is upstream of $B$, then
+$B$ will receive the message immediately preceding the first
 invocation of its own {\tt work} function which reads items that were
 affected by some output of the $n$'th invocation of $A$'s {\tt work}
-function.  That is, $B$ is invoked when it sees the information
-wavefront that $A$ sees in $n$ execution steps.
+function.  That is, the message handler in $B$ is invoked when $B$
+sees the information wavefront that $A$ sees in $n$ execution steps.
 
 In some cases, the ability to synchronize a message with an
 information wavefront can be very useful.  For instance, if the input
@@ -167,7 +166,7 @@ reconfigure just in time to understand the new protocol, but will
 still process previous elements in the pipeline according to the old
 protocol.
 
-\subsection{The Stream Transfer Function}
+\subsection{The Stream Dependence Function}
 \label{sec:derivemin}
 
 We now turn to deriving $\mi{a}{b}$ for all pairs of tapes $a$ and $b$
@@ -190,7 +189,7 @@ must be present on the input is:
 \subsubsection{Pipelines}
 \label{sec:timepipe}
 
-Let us now derive an expression for $sdep$ in the case of a pipeline.
+Let us now derive an expression for \sdep~in the case of a pipeline.
 In the base case, consider that two filters are connected, with the
 output of $A$ feeding into the input of $B$ (see
 Figure~\ref{fig:tapelabels}).  We are seeking $\mi{I_A}{O_B}(x)$: the
@@ -205,12 +204,12 @@ on $I_A$.  Using $\circ$ to denote function composition, we have:
 \end{align*}
 By identical reasoning, this composition law holds for pipelined
 streams as well as filters.  That is, a Pipeline of streams $S1 \dots
-Sn$ has the following $sdep$ function:
+Sn$ has the following \sdep~function:
 \begin{align}
 \label{eq:composepipe}
 \mi{S1}{Sn} &= \mi{I_{S1}}{O_{S1}} \circ \dots \circ \mi{I_{Sn}}{O_{Sn}}
 \end{align}
-One might be tempted to define the $sdep$ function for any pair of
+One might be tempted to define the \sdep~function for any pair of
 connected tapes as the composition of functions for the operators
 connecting those tapes.  However, such a definition turns out to be
 problematic for the SplitJoin and FeedbackLoop constructs, which
@@ -229,17 +228,17 @@ to a pipeline of streams $S_1 \dots S_n$, then:
 \subsubsection{SplitJoins}
 \label{sec:timesj}
 
-We now derive $sdep$ expressions for the components of a SplitJoin, and
+We now derive \sdep~expressions for the components of a SplitJoin, and
 for the SplitJoin construct as a whole.  We denote the $n$ output
-tapes of the splitter $S$ by $O_{1,S} \dots O_{n,S}$, and the $n$ input
-tapes of the joiner $J$ by $I_{1,J} \dots I_{n,J}$ (see Figure
+tapes of the splitter $S$ by $O_{1,S} \dots O_{n,S}$, and the $n$
+input tapes of the joiner $J$ by $I_{1,J} \dots I_{n,J}$ (see Figure
 \ref{fig:tapelabels}).
 
 {\bf Duplicate splitter.}  We consider the $i$'th output tape of an
 $n$-way duplicating splitter.  Since the splitter duplicates each
 input item onto each output tape, there must be at least $x$ items on
 $I_S$ if there are $x$ items on $O_{i,S}$.  This yields a simple
-expression for $sdep$:
+expression for \sdep:
 \begin{align*}
 \mi{I_S}{O_{i,S}}(x) = x
 \end{align*}
@@ -255,7 +254,7 @@ deposited on $O_{i,S}$ during the current cycle of the splitter, and
 $n(O_{i,S})~mod~w_i + sum_{j=0}^{i-1}{w_j}$ items have been drawn from
 the input since the last complete cycle.  Summing the item count for
 the completed cycles and the current cycle gives the following
-expression for $sdep$:
+expression for \sdep:
 \begin{align*}
 \mi{I_S}{O_{i,S}}(x) = \floor{n(O_{n,S})}{w_n} * \sum_{i}{w_i} + x~mod~w_i +
 \sum_{j=0}^{i-1}{w_j}
@@ -269,14 +268,14 @@ $\floor{x}{W}$ complete cycles, each of which drew $w_i$ items from
 the $i$'th input tape.  Since the last complete cycle, the joiner has
 drawn $x~mod~W$ items from its inputs, and $MIN(0, x~mod~W -
 \sum_{j=0}^{i-1}{w_j})$ of these items were taken from input tape $j$.
-Thus, the $sdep$ function from the output of the joiner to the $i$'th
+Thus, the \sdep~function from the output of the joiner to the $i$'th
 input tape is as follows:
 \begin{align*}
 \mi{I_{i,J}}{O_J}(x) = w_i * W + MIN(0, x~mod~W - \sum_{j=0}^{i-1}{w_j})
 \end{align*}
 
 {\bf SplitJoin construct.}  As with the Pipeline construct, we can
-derive the $sdep$ function across an entire SplitJoin as a composition
+derive the \sdep~function across an entire SplitJoin as a composition
 of the component functions.  However, a SplitJoin differs from a
 Pipeline in that the joiner imposes a control dependence between the
 parallel streams.  That is, for there to be $x$ items on the output of
@@ -287,7 +286,7 @@ least at least $\mi{O_{i,S}}{I_{i,J}} \circ \mi{I_{i,J}}{O_J}(x)$ items on
 every output tape $O_{i,S}$ of the splitter.  Finally, the minimum number
 of items appearing on the input tape $I_S$ of the splitter is the {\it
 maximum} of the item requirement from any output tape $O_{i,S}$.  By this
-reasoning, the $sdep$ function for a SplitJoin is as follows:
+reasoning, the \sdep~function for a SplitJoin is as follows:
 \begin{align*}
 &\mi{I_S}{O_J}(x) = \\ &~~~~~\fn{MAX}_{i \in [1,n]}(\mi{I_S}{O_{i,S}} \circ
 \mi{O_{i,S}}{I_{i,J}} \circ \mi{I_{i,J}}{O_J})(x)
@@ -296,34 +295,34 @@ reasoning, the $sdep$ function for a SplitJoin is as follows:
 \subsubsection{FeedbackLoops}
 \label{sec:timefl}
 
-The $sdep$ function for a feedback loop requires extra care. Although
+The \sdep~function for a feedback loop requires extra care. Although
 the feedback splitter $FS$ serves as a normal splitter, with the same
-$sdep$ function as derived above, the feedback joiner $FJ$ is slightly
+\sdep~function as derived above, the feedback joiner $FJ$ is slightly
 different due to the initialization phase of the loop.  Also, the
-$sdep$ function does not compose across all components of the loop,
+\sdep~function does not compose across all components of the loop,
 since otherwise there would be conflicting definitions for paths that
 circle the loop several times.
 
 {\bf Feedback joiner}.  For a feedback loop with delay $d$, the
 feedback joiner must fabricate its first $d$ input values, since no
 items have yet been pushed onto the loop tape $I_{2,FJ}$.  This means
-that there must be an offset of $d$ in the $sdep$ function, since the
+that there must be an offset of $d$ in the \sdep~function, since the
 first $d$ items are direct inputs to the joiner instead of appearing
 as items on the input tape.  Using $J$ to denote a round robin joiner
 as considered above, we thus have the following expression for the
-$sdep$ function across the feedback path:
+\sdep~function across the feedback path:
 \begin{align*}
 \mi{I_{2,FJ}}{O_{FJ}}(x) = \mi{I_{2,J}}{O_J}(x) - d
 \end{align*}
-However, the $sdep$ function remains unchanged with respect to the
+However, the \sdep function remains unchanged with respect to the
 input from the main stream:
 \begin{align*}
 \mi{I_{1,FJ}}{O_{FJ}}(x) = \mi{I_{1,J}}{O_J}(x)
 \end{align*}
 
-{\bf Feedback components}.  Within a feedback loop, the $sdep$ function
+{\bf Feedback components}.  Within a feedback loop, the \sdep function
 between tape $a$ and any downstream tape $b$ can be uniquely defined
-by composing the $sdep$ functions along the directed acyclic path
+by composing the \sdep functions along the directed acyclic path
 between $a$ and $b$.  We require an acyclic path to avoid successive
 passes around the loop, which would prevent a unique definition of the
 function.  Denoting this path of tapes by $(a, t_1, \dots , t_n, b)$,
@@ -337,8 +336,8 @@ relation between the loop tape $I_{2,FJ}$ and a downstream pipeline (by
 application of Equation \ref{eq:composetape}).
 
 {\bf Feedback loop construct.}  As a special case of the equation
-above, we can see that the $sdep$ function for the feedback loop as a
-whole is the composition of the $sdep$ functions along the main path:
+above, we can see that the \sdep function for the feedback loop as a
+whole is the composition of the \sdep functions along the main path:
 \begin{align*}
 \mi{I_{1,FJ}}{O_{FS}}(x) = \mi{I_{1,J}}{O_J}(x) \circ \mi{I_{1,J}}{O_J}(x) 
 \end{align*}
@@ -349,7 +348,7 @@ restriction only on the input tape of the feedback loop.
 
 \subsubsection{Summary}
 
-In the preceding sections, we have derived a $sdep$ function for the
+In the preceding sections, we have derived a \sdep function for the
 components of each stream construct, as well as for the stream
 construct as a whole.  By application of Equation
 \ref{eq:composetape}, this yields a function $\mi{a}{b}$ for every
@@ -359,7 +358,7 @@ pair of tapes $a$ and $b$ where $b$ is downstream of $a$.
 \label{sec:prog-verif}
 
 A number of program analysis techniques are immediately afforded by
-the $sdep$ function.  In particular, it is very simple to compute 1)
+the \sdep function.  In particular, it is very simple to compute 1)
 whether or not the program will deadlock as a result of a starved
 input channel, and 2) whether or not any buffer will grow without
 bound during the steady-state execution of the program.
@@ -368,27 +367,27 @@ bound during the steady-state execution of the program.
 advantage of the fact that the only loops in our stream graph are part
 of a FeedbackLoop construct.  A stream graph will be deadlock-free if
 and only if every feedback loop produces enough data to satisfy its
-own feedback joiner.  This can be formulated in terms of the $sdep$
+own feedback joiner.  This can be formulated in terms of the \sdep
 function by considering $\mi{t}{t}$, the data that a tape $t$ in a
 feedback loop requires of itself.  However, since we didn't define
-$sdep$ across circular paths in the stream graph, we will denote this
-function by $sdeploop$ and define it at the loop input to the feedback
+\sdep across circular paths in the stream graph, we will denote this
+function by \loopdep and define it at the loop input to the feedback
 joiner:
 \begin{align*}
-sdeploop(x) \equiv \mi{I_{2,FJ}}{O_{FJ}} \circ \mi{O_{FJ}}{I_{2,FJ}}
+\loopdep(x) \equiv \mi{I_{2,FJ}}{O_{FJ}} \circ \mi{O_{FJ}}{I_{2,FJ}}
 \end{align*}
-Now, the loop will be deadlock-free if and only if $\forall x \in N, x
-- sdeploop(x) > 0$.  This condition follows directly from
-causality--the $x$'th item can be produced if and only if its
+Now, the loop will be deadlock-free if and only if $\forall x \in
+\mathcal{N}, x - \loopdep(x) > 0$.  This condition follows directly
+from causality--the $x$'th item can be produced if and only if its
 production depends only on some subset of the $x-1$ items that are
 already on the channel.
 
 {\bf Overflow detection.}  There are two places that a buffer can grow
 to an unbounded size in the stream graph.  The first is in a feedback
 loop, when\footnote{$f(x) = \omega(g(x))$ if $lim_{x \rightarrow
-\infty}\frac{f(x)}{g(x)} = \infty$}~$x - sdeploop(x) = \omega(1)$.
-That is, if $sdeploop(x)$ items on the feedback tape enables the
-production of an additional $x - sdeploop(x)$ items that grows
+\infty}\frac{f(x)}{g(x)} = \infty$}~$x - \loopdep(x) = \omega(1)$.
+That is, if $\loopdep(x)$ items on the feedback tape enables the
+production of an additional $x - \loopdep(x)$ items that grows
 asymptotically with the position $x$ on the tape, then the constant
 consumption rate will not keep up with the growing production rate,
 and the buffer will overflow.
@@ -453,7 +452,8 @@ J~\in~&JoinType = \{RoundRobin\}
 \caption{Semantic domains that are shared between the intermediate and
   transform algebras.
 \protect\label{fig:shareddom}}
-\vspace{-6pt}
+\vspace{3pt}
+%\vspace{-6pt}
 \begin{align*}
 s~\in~&Stream = Filter + Pipeline + SplitJoin + FeedbackLoop \\
 &Filter = Push \times Pop \times Peek \times WorkFunction \\
@@ -467,11 +467,13 @@ s~\in~&Stream = Filter + Pipeline + SplitJoin + FeedbackLoop \\
 \vspace{-18pt}
 \caption{Semantic domains specific to the intermediate algebra.
 \protect\label{fig:interdom}}
-\vspace{-6pt}
+\vspace{3pt}
+%\vspace{-6pt}
 \begin{align*}
-&StreamTransform =  IndexTransform \ra (Tape \ra Tape)
+&TapeTransform = Tape \ra Tape \\
+&StreamTransform =  IndexTransform \ra TapeTransform
 \end{align*}
-\vspace{-12pt}
+\vspace{-18pt}
 \caption{Semantic domains specific to the transform algebra.
 \protect\label{fig:transformdom}}
 \vspace{-12pt}
@@ -479,11 +481,11 @@ s~\in~&Stream = Filter + Pipeline + SplitJoin + FeedbackLoop \\
 
 The domains of the intermediate algebra are shown in
 Figures~\ref{fig:shareddom}~and~\ref{fig:interdom}.  The algebra
-represents tapes as an infinite mapping from an index to an item.
-Generally, stream constructs are represented as a list of their
-component streams, and filters' work functions are encoded as a list of
+represents a tape as an infinite mapping from indices to items.
+Generally, stream constructs are represented as lists of their
+component streams, and filters' work functions are encoded as lists of
 push statements that--given the transform from their local indexing to
-the global tape position--returns a mapping from a tape to an output
+the global tape position--return a mapping from a tape to an output
 item.
 
 {\bf Converting to the intermediate algebra}.  It is straightforward
@@ -497,32 +499,29 @@ each pushed item is given as a direct function of the peeked items,
 and all of the pop statements are at the end of the function.  Let us
 consider a work function with I/O rates PUSH, POP, and PEEK.  The
 canonical form of this work function gives us an element {\tt w} of
-the syntactic domain {\tt StreamItWorkFunction}: \\
-\vspace{0.2in}
+the syntactic domain {\tt StreamItWorkFunction}: \\ \\
 \begin{scriptsize}
 \begin{tabular}{l}
-{\tt w = void work()}\{ \\
+{\tt w = void work()}~\{ \\
 \hspace{12pt} {\tt output.push(} ($f_{1}$ {\tt input.peek(0) ... input.peek(PEEK-1)} ) \\
 \hspace{12pt} $\dots$ \\
 \hspace{12pt} {\tt output.push(} ($f_{PUSH}$ {\tt input.peek(0) ... input.peek(PEEK-1)} ) \\
 \hspace{12pt} {\tt for (int i=0; i$<$POP; i++) \{ input.pop(); \}} \\
 \}
-\vspace{-12pt}
 \end{tabular}
 \end{scriptsize}
+\\ \\
 Above, we model the computation of the work function as pure
 mathematical functions that can be injected into the semantic domain.
 To simplify our notation, we define the valuation ${\cal W}: {\tt
-StreamIt Work} \ra WorkFunction$ in terms of {\tt w}, the example
+StreamItWorkFunction} \ra WorkFunction$ in terms of {\tt w}, the example
 syntactic work function from above.  The valuation, then, is the
 alternate application of each push statement's function $f$, with the
 index expressions transformed from their local index $x$ to a global
 index $g(x)$ on the input tape:
 \begin{align*}
-{\cal W}&[{\tt w}] = \\
-[&~\la~g~t~.~f_1(t(g(0)), \dots, t(g(\fn(PEEK-1)))), \\
-\dots \\
-&~\la~g~t~.~f_{PUSH}(t(g(0)), \dots, t(g(\fn(PEEK-1))))~]
+{\cal W}[{\tt w}] =& [h_1 \dots h_{push}] \\
+where~h_i =& [~\la~g~t~.~f_i(t(g(0)), \dots, t(g(\fn(PEEK-1))))]
 \end{align*}
 
 {\bf Converting from the intermediate algebra}.  To convert back to
@@ -536,18 +535,44 @@ shared portions of the $f_i$'s.
 
 The transform algebra is designed to express the meaning of a stream
 graph as a transformation from an input tape to an output tape.  Its
-semantic domains are given in Figures \ref{fig:interdom} and
-\ref{fig:transformdom}.  We now give the valuation function ${\cal S}:
-Stream \ra StreamTransform$ for converting from the intermediate
-algebra to the transform algebra.  Letting $\%$ denote the $mod$
-function, for a filter we have that:
+semantic domains are given in Figures \ref{fig:shareddom} and
+\ref{fig:transformdom}.  Our goal is to express the meaning of a
+$Stream$ in the intermediate algebra as a $TapeTransform$ in the
+transform algebra.  
+
+To do this, we introduce the $StreamTransform$ domain, each element of
+which maps an $IndexTransform$ (let us call it $g$) to a
+$TapeTransform$.  The intuition is that $g$ represents a relative
+indexing function that is imposed by an enclosing stream construct.
+For instance, in a two-way SplitJoin with a RoundRobin splitter, the
+SplitJoin construct imposes a $g = \la~i~.~2*i$ on the second parallel
+stream component.  That is, index $i$ on the component stream's input
+tape corresponds to index $g(i)$ on the input tape of the SplitJoin.
+Thus, if the component stream is transforming the input tape of the
+entire SplitJoin, it must apply $g$ to its original index references.
+
+Let us denote our valuation functions as ${\cal M}: Stream \ra
+TapeTransform$ and ${\cal S}: Stream \ra StreamTransform$ .  Then the
+meaning of a top-level stream $s$ is as follows:
 \begin{align*}
-&{\cal S} [(Filter~push~pop~peek~(f_1~\dots~f_{push}))] =
-  \la~g~t~i~.~\\ &(f_{i~\%~push})(\la~i_{local}~.~g((\mi{I_F}{O_F}(i) - peek + 1 + i_{local})))(t)
+&{\cal M} [s] = {\cal S}[s]({\cal I}) \\
+where~{\cal I}~den&otes~the~identity~function
+\end{align*}
+That is, the meaning of an entire stream program is simply the
+$Stream$-$Transform$ for that program applied to the identity function
+as the $Index$-$Transform$, since at the top level there is no
+enclosing stream constructs and the the tape transformation is
+relative to the input tape of the stream itself.  We now turn our
+attention to deriving ${\cal S}$ for Filters, Pipelines, and
+SplitJoins.  Letting $\%$ denote the $mod$ function, for a filter we
+have that:
+\begin{align*}
+&{\cal S} [(\mbox{in~Filter}~push~pop~peek~(h_1~\dots~h_{push}))] =
+  \la~g~t~i~.~\\ &(h_{i~\%~push})(\la~i_{local}~.~g((\mi{I_F}{O_F}(i) - peek + 1 + i_{local})))(t)
 \end{align*}
 That is, the value that a filter pushes onto the $i$'th position of its
 output tape is calculated with its function at index $i~\%~push$.  By
-the definition of $sdep$, the index offset to the last value the filter
+the definition of \sdep, the index offset to the last value the filter
 peeks is $\mi{I_F}{O_F}(i)$, where $I_F$ and $O_F$ denote the input and
 output tapes of the filter (as shown in Equation \ref{eq:minfilter},
 this is a pure function of $push$, $pop$, and $peek$).  Thus, the offset
@@ -561,7 +586,7 @@ pipeline, the index transform is the identity function, but at the start
 of the pipeline we apply the transform $g$ to interface the pipeline to
 its outside connection.
 \begin{align*}
-{\cal S} [(Pipeline~s_1~s_2~\dots~s_n)] = \\
+{\cal S} [(\mbox{in~Pipeline}~s_1~s_2~\dots~s_n)] = \\
 \la~g~.~({\cal S}[s_n]({\cal I}) \circ \dots \circ {\cal S}[s_2]({\cal I}) \circ {\cal S}[s_1](g)) \\
 where~{\cal I}~denotes~the~identity~function
 \end{align*}
@@ -581,7 +606,7 @@ The indexing function transforms the stream's local index $i_{local}$
 for its own input tape to the corresponding index
 $\mi{I_S}{O_{p(i),S}}(i_{local})$ for the input tape of the splitter:
 \begin{align*}
-&{\cal S} [(SplitJoin~S~s_1~s_2~\dots~s_n~J)] = \la~g~t~i~.~ \\
+&{\cal S} [(\mbox{in~SplitJoin}~S~s_1~s_2~\dots~s_n~J)] = \la~g~t~i~.~ \\
 &(({\cal S}[s_{p(i)}])(\la~i_{local}~.~g(\mi{I_S}{O_{p(i),S}}(i_{local}))))(\mi{I_{p(i),J}}{O_J}(i))
 \end{align*}
 This completes our description of the transform algebra, as we have

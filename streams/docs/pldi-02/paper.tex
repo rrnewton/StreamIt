@@ -6,7 +6,10 @@
 
 \begin{document}
 
-\title{StreamIt: A Compiler for Streaming Applications}
+% need this on cagfarm's besides cagfarm-01
+%\advance\topmargin by 1in
+
+\title{StreamIt: A Compiler for Streaming Applications\thanks{This document is MIT Laboratory for Computer Science Technical Memo LCS-TM-???.  A similar version was submitted to PLDI 2002.}}
 
 % uncomment this to use pubform
 %% \author{Bill Thies, Michal Karczmarek, Michael Gordon, David Maze, Jeremy Wong, \\ Henry Hoffmann, Matthew Brown, and Saman Amarasinghe \\
@@ -19,7 +22,7 @@
 \numberofauthors{1}
 \author{
 \alignauthor \vspace{-18pt}
-Bill Thies, 
+William Thies, 
 Michal Karczmarek, 
 Michael Gordon, 
 David Maze, 
@@ -27,19 +30,22 @@ Jeremy Wong,
 Henry Hoffmann, 
 Matthew Brown, 
 and Saman Amarasinghe\\
-	\vspace{6pt}
+	\vspace{8pt}
+	\{thies, karczma, mgordon, dmaze, jnwong, hank, morris, saman\}@lcs.mit.edu \\
+	\vspace{8pt}
 	Laboratory for Computer Science \\
 	Massachusetts Institute of Technology \\
 	Cambridge, MA  02139 \\
-%	\vspace{6pt}
-%	{\tt \{thies, karczma, mgordon, dmaze, jnwong, hank, morris, saman\}@lcs.mit.edu} \\
-%	\vspace{12pt}
+	\vspace{8pt}
+        December 19, 2001}
+	
 %        \today
-}
 
 % for the arrow of a function def, etc.
 \newcommand{\ma}[2]{max_{#1 \rightarrow #2}}
-\newcommand{\mi}[2]{\textsc{sdep}_{#2 \small{\rightarrow} #1}}
+\newcommand{\sdep}[0]{\textsc{sdep}}
+\newcommand{\loopdep}[0]{\textsc{loopdep}}
+\newcommand{\mi}[2]{\sdep_{#2 \small{\rightarrow} #1}}
 \newcommand{\floor}[2]{\left\lfloor\frac{#1}{#2}\right\rfloor}
 \newcommand{\ceil}[2]{\left\lceil\frac{#1}{#2}\right\rceil}
 \newcommand{\ra}[0]{\rightarrow}
@@ -65,8 +71,8 @@ and Saman Amarasinghe\\
 \input{implementation}
 \input{related}
 \input{conclusion}
-\begin{small}
+%\begin{small}
 \bibliographystyle{abbrv}
 \bibliography{references}
-\end{small}
+%\end{small}
 \end{document}

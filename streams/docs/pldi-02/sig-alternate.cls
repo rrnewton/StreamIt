@@ -1320,9 +1320,11 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%
 \ps@plain
 \baselineskip=11pt
-\let\thepage\relax % For NO page numbers - GM Nov. 30th. 1999 and July 2000
+%% TO TAKE AWAY PAGE NUMBERS, UNCOMMENT NEXT LINE AND RECOMMENT ``ARABIC...''
+%% THREE LINES DOWN.  -BILL
+%\let\thepage\relax % For NO page numbers - GM Nov. 30th. 1999 and July 2000
 \def\setpagenumber#1{\global\setcounter{page}{#1}}
-%\pagenumbering{arabic}  % Arabic page numbers GM July 2000
+\pagenumbering{arabic}  % Arabic page numbers GM July 2000
 \twocolumn             % Double column.
 \flushbottom           % Even bottom -- alas, does not balance columns at end of document
 \pagestyle{plain}
