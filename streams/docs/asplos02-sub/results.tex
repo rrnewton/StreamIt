@@ -154,58 +154,36 @@ of our load balancing optimizations .
 %leading to a slowdown.  Better tile code generation and traditional
 %optimizations may help improve the performance.
 
-\begin{figure}
-  \begin{center} \psfig{figure=beam-blood-key.eps,width=3.25in} \\
-    \subfigure[\vspace{-6pt}
-    Original.\label{fig:beam-blood1}]{\psfig{figure=beam-blood-orig.eps,width=3in}}
-    \hspace{0.3in} \subfigure[\vspace{-6pt}
-    Load-balanced.\label{fig:beam-blood2}]{\psfig{figure=beam-blood-opt.eps,width=3in}
-    \vspace{-6pt}} \vspace{-6pt} \caption{Execution traces for the (a)
-    original (on 64 tiles) and (b) load-balanced (on 16 tiles)
-    partitionings of the \BeamFormer.  Graphs are shaded as in
-    Figure~\ref{fig:fm-blood}. \protect\label{fig:beam-blood}}
-\end{center}
-\vspace{24pt}
-\small
-\begin{verbatim}
-                         class \BeamFormer extends Pipeline {
+%% \vspace{24pt}
+%% \small
+%% \begin{verbatim}
+%%                          class \BeamFormer extends Pipeline {
                          
-                            void init(numChannels, numBeams) {
-                               add(new SplitJoin() { 
-                                  void init() {
-                                     setSplitter(Null());
-                                     for (int i=0; i<numChannels; i++) {
-                                        add(new InputGenerate(i));
-                                        add(new FIRFilter1(64));
-                                        add(new FIRFilter2(16));
-                                     }
-                                     setJoiner(RoundRobin());   
-                                   }});
+%%                             void init(numChannels, numBeams) {
+%%                                add(new SplitJoin() { 
+%%                                   void init() {
+%%                                      setSplitter(Null());
+%%                                      for (int i=0; i<numChannels; i++) {
+%%                                         add(new InputGenerate(i));
+%%                                         add(new FIRFilter1(64));
+%%                                         add(new FIRFilter2(16));
+%%                                      }
+%%                                      setJoiner(RoundRobin());   
+%%                                    }});
                             
-                               add(new SplitJoin() {
-                                  void init() {
-                                     setSplitter(Duplicate());
-                                     for (int i=0; i<numBeams; i++) {
-                                        add(new VectorMult(i));
-                                        add(new FIRFilter3(64));
-                                        add(new Magnitude());
-                                        add(new Detect(i));
-                                     }
-                                     setJoiner(Null());
-                                  }});
-                            }
-                         }
-\end{verbatim}
-\caption{\protect\small Top-level StreamIt code for the \BeamFormer.\protect\label{fig:beamcode}}
-\end{figure}
-
-\begin{figure}
-\centering
-\psfig{figure=beam-graph-orig.eps,width=6.5in}
-\caption{\protect\small Stream graph of the original 12x4 \BeamFormer.  The 12x4 \BeamFormer has 12 channels and 4 beams; it is the largest version that fits onto 64 tiles without filter fusion.  \protect\label{fig:beam-orig}}
-\vspace{36pt}
-\psfig{figure=beam-graph-opt.eps,width=6.5in}
-\caption{\protect\small Stream graph of the load-balanced 12x4 \BeamFormer.  Vertical fusion is applied to collapse each pipeline into a single filter, and horizontal fusion is used to transform the 4-way SplitJoin into a 2-way SplitJoin.
-Figure~\ref{fig:beam-blood} shows the benefit of these
-transformations. \protect\label{fig:beam-opt}}
-\end{figure}
+%%                                add(new SplitJoin() {
+%%                                   void init() {
+%%                                      setSplitter(Duplicate());
+%%                                      for (int i=0; i<numBeams; i++) {
+%%                                         add(new VectorMult(i));
+%%                                         add(new FIRFilter3(64));
+%%                                         add(new Magnitude());
+%%                                         add(new Detect(i));
+%%                                      }
+%%                                      setJoiner(Null());
+%%                                   }});
+%%                             }
+%%                          }
+%% \end{verbatim}
+%% \caption{\protect\small Top-level StreamIt code for the \BeamFormer.\protect\label{fig:beamcode}}
+%% \end{figure}
