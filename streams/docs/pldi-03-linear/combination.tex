@@ -51,7 +51,7 @@ The rates of $F'$ are $e_{F'}=e_F + (f-1)o_F$, $o_{F'}=fo_F$, and $u_{F'}=fu_F$.
 Thus the linear form of $F'=expand(F, f)$ describes the formula for computing
 exactly $fu_F$ output elements from $e_F + (f-1)o_F$ input elements.
 Figure~\ref{fig:expanding-a-matrix} shows the result of expanding the linear 
-form $lf = (A,b)$ by a factor $f$ such that $lf' = expand(lf, f) = (A',b')$. 
+form $l = (A,b)$ by a factor $f$ such that $l' = expand(lf, f) = (A',b')$. 
 $A'$ is created by starting with a zero matrix with $e_F+(f-1)o_F$ rows 
 and $fu_F$. $A$ is then copied $f$ times along the
 diagonal. Starting at the top left, each copy of $A$ is offset from the previous copy 
@@ -87,33 +87,32 @@ The problem of incompatible matrix sizes is the same problem of scheduling execu
 such that the first {\tt stream} produces enough data for the second {\tt stream} 
 to read. To make the dimensions match up, we use the $expand$ operation. We choose
 expansions factors $f_1$ and $f_2$ such that $l_1' = expand(l_1,f_1) = (A_1',b_1')$ and 
-$l_2' = expand(l_2,f_2) = (A_2',b_2')$. 
-The equation $f_1u_{l_1}$ = $e_{l_2} + (f_2-1)o_{lf_2}$ must hold, where $u_{lf_1}$, $e_{lf_2}$, and $o_{lf_2}$
-are program defined. For most pairs of linear forms encountered in real programs, 
-there are multiple pairs of $f_1$ and $f_2$ that satisfy the constraint, from which
-we choose the smallest.
-
-
-Once we have determined $f_1$ and $f_2$ such 
-that we can multiply $A'C'$, we are guaranteed the be able to multiply $b'C'$.
-
+$l_2' = expand(l_2,f_2) = (A_2',b_2')$.
+The equation $f_1u_{l_1}$ = $e_{l_2} + (f_2-1)o_{l_2}$ must hold, where $u_{lf_1}$, 
+$e_{lf_2}$, and $o_{lf_2}$ are program defined integers. Rewriting, we obtain
+$(u_{l_1})f_1 + (-o_{l_2})f_2 = (e_{l_2}-o_{l_2})$ which is in the form of  
+the Diophantine equation $ax+by=c$ with $f_1=x$ and $f_2=y$. A solution
+can be found using the Euclidian algorithm if $gcd(u_{l_1},-o_{l_2})$ divides
+$e_{l_2}-o_{l_2}$\cite{theory-of-numbers}. Once we have determined $f_1$ and $f_2$
+such that we can multiply $A_1'A_2'$, we are guaranteed the be able to multiply $b_1'A_1'$.
 Figure~\ref{fig:combining-pipeline} shows graphically the process of expanding
 two linear forms in a {\tt pipeline} so that they can be combined into a single linear filter.
 
+% not clear if this is still important
 
 However, in general problems, this constraint is not always satisfiable. For instance if
-$u_{lf_1}=2$, $e_{lf_2}=3$ and $o_{lf_2}=2$, there are pair of integers $f_1$ and $f_2$ to 
+$u_{l_1}=2$, $e_{l_2}=3$ and $o_{l_2}=2$, there are pair of integers $f_1$ and $f_2$ to 
 satisfy the above equation. Due to the buffering between the filters, we can not generate an 
 overall linear form that represents the pair's computation except by introducing redundant
 computation. However, by recognizing that the output from the first execution of the structure
-can be written as a linear form $lf'_i$, and that the output from each subsequent execution
-of the structure can be written as a linear form $lf'_j$ we can store the two linear forms $lf'_i$ and
-$lf'_j$ which represent the initial execution and each subsequent execution respectively.
+can be written as a linear form $l'_i$, and that the output from each subsequent execution
+of the structure can be written as a linear form $l'_j$ we can store the two linear forms $l'_i$ and
+$l'_j$ which represent the initial execution and each subsequent execution respectively.
 
 In some cases the combined linear form
 actually represents a less efficient way of computing the results of the
-filters. Specifically, when the number of non zero entries of $A'C'$ is greater
-than the number of non zero entries $A'$ plus the non zero entries of $C'$, the overall
+filters. Specifically, when the number of non zero entries of $A_1'A_2'$ is greater
+than the number of non zero entries $A_1'$ plus the non zero entries of $A_2'$, the overall
 representation requires more computation.
 
 
