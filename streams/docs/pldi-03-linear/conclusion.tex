@@ -1,45 +1,56 @@
 \section{conclusion}
 
+(this is the conclusion)
 
 
 
 \subsection{Future Work}
+
 Linear analysis is easily extended to incorporate a notion of linear state.
-Our formulation would then be very much like a standard state space model used 
-frequently in the area of control system analysis. A stateful linear node would
-be characterized by
+A stateful linear node is characterized by
+
 \begin{equation} \nonumber
 \lambda=(({\mathbf A}_x, {\mathbf A}_s), ({\mathbf C}_x, {\mathbf C}_s), 
 ({\mathbf b}_x, {\mathbf b}_s))
 \end{equation}
 
 Each {\tt filter} in the streamgraph contains a state vector ${\mathbf s}$
-such that the output at time $i$ is given by 
-$y_i={\mathbf A}_o{\mathbf x} + {\mathbf A}_s{\mathbf s} + {\mathbf b}_x$
-and the state vector at time $i+1$ is given by
-$s_{i+1}={\mathbf C}_x{\mathbf x} + {\mathbf C}_s{\mathbf s} + {\mathbf b}_s$
+such that ${\mathbf x}$ at time $i$ and ${\mathbf s}$ at time $i+1$ is given by
 
-Each iteration of the filter would update the new state to be
-a linear combination of the input and the current state. The output of the 
-filter would also be some linear combination of the input and the current state.
-This representation would be able to capture the fundamental operation of
-a large set of programs -- specifically digital control systems (where state
-space models are used frequently to model real systems ) and IIR filters (which
-is represented as a feed back loop). An transformation that we could do with 
-a feed back loop that we determine is IIR would be to calculate enough of its
-frequency response so that its behavior could be captured in a FFT, multiplie,
-IFFT sequence. Another possible use would be to remove a feedback loop that was
-performing IIR filtering and convert it into a single linear state filter.  
+\begin{equation} \nonumber
+y_i={\mathbf A}_o{\mathbf x} + {\mathbf A}_s{\mathbf s}_i + {\mathbf b}_x
+\end{equation}
+\begin{equation} \nonumber
+{\mathbf s}_{i+1}={\mathbf C}_x{\mathbf x} + {\mathbf C}_s{\mathbf s}_i + {\mathbf b}_s
+\end{equation}
 
+The additon of stateful nodes allows us to describe a larger class of programs 
+using our linear analysis framework.
+Using linear state, our structure combination rules can be extended to include {\tt feedbackloops}.
+Examples of programs that exhibit stateful linear nodes are control systems
+and infinite impulse response (IIR) filters.
 
+Another promising avenue of research is attempting to exploit work done
+on matrix factorizations in order to automatically derive fast implementations of 
+large compuatations such as DSP transforms.
+
+To increase the class of programs that would fit into our linear framework, 
+the entries of the ${\mathbf A}$ and ${\mathbf b}$ of linear nodes could contain symbolic
+runtime resolvable information.
 
 
 \subsection{Related Works}
 Several interesting projects are underway to determine how to generate efficient programs
-for computing DSP transforms that are expressed as matrices. For instance, the SPIRAL
-project\cite{spiral} aims to determine the fastest implementation for various transforms
-using several techniques ranging from group theory to stochastic search algorithms. See
- \cite{xiong-thesis,xiong01spl,johnson01searching,egner01automatic}.
-Similiarly, the ATLAS project \cite{whaley01automated} aims to automatically produce fast
-performance tuned libraries for linear algebra manipulations.
+for DSP applications. The SPIRAL project\cite{spiral, xiong-thesis,xiong01spl,johnson01searching,egner01automatic} 
+aims to determine the fastest implementation for various transforms DSP transforms
+using several techniques such as group theory and stochastic search algorithms. SPIRAL
+requires the user to enter a matrix corresponding to the desired transform, whereas our
+system does this automatically. 
+The ATLAS project \cite{whaley01automated} aims to automatically produce fast
+libraries for linear algebra manipulations, focusing on adaptive library generation. 
+FFTW \cite{frigo99fast, fftw} is a runtime tuned library for computing the FFT as
+fast as possible.
+
+% Something should be said about other stream projects and their attempts at optimizations...
+% which I know very little about.
 
