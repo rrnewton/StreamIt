@@ -19,12 +19,13 @@ do not yet deal with {\tt feedbackloop}s as they require the notion of
 
 \begin{figure}[t]
 \center
-\epsfxsize=3.0in
+\vspace{-12pt}
+\epsfxsize=3.2in
 \epsfbox{images/filter-expand.eps}
-\vspace{-6pt}
+\vspace{-12pt}
 \caption{Expanding a linear node to rates $(e', o', u')$.  }
 \label{fig:expanding-a-matrix}
-\vspace{-12pt}
+\vspace{-24pt}
 \end{figure}
 
 In StreamIt programs, the input and output rate of each filter in the
@@ -67,7 +68,7 @@ expansion can be done as follows.
 Given a linear node $\lambda = \{A, {\vec b}, e, o, u\}$, the expansion of
 $\lambda$ to a rate of $(e', o', u')$ is given by $\mbox{\bf
 expand}(\lambda, e', o', u') = \{A', {\vec b}', e', o', u'\}$, where
-$\mathbf{A'}$ is a $e' \times u'$ matrix and $\mathbf{{\vec b}'}$ is a
+$\mathbf{A'}$ is a $e' \times u'$ matrix and $\vec{\mathbf{b}}'$ is a
 $u'$-element row vector:
 \vspace{-6pt} \\
 \begin{equation} \nonumber
@@ -143,7 +144,8 @@ any number of neighboring linear nodes.
 Given two linear nodes $\lambda_1$ and $\lambda_2$ where the output of
 $\lambda_1$ is connected to the input of $\lambda_2$ in a pipeline
 construct, the combination $\mbox{\bf pipe}(\lambda_1, \lambda_2)$ $=$
-$\mathbf{ \{A', {\vec b}', e', o', u'\}}$ represents an equivalent node that
+$\{\mathbf{A}', \vec{\mathbf{b}}', \mathbf{e}', \mathbf{o}', \mathbf{u}'\}$ 
+represents an equivalent node that
 can replace the original two.  Its components are as follows:
 \begin{equation} \nonumber
 \begin{array}{rcl}
@@ -154,7 +156,7 @@ can replace the original two.  Its components are as follows:
 \lambda_2^e & = & \mt{expand}(\lambda_2, \mt{chanPeek}, \\
 ~ & ~ & ~\hspace{0.32in}~ \mt{chanPop}, \mt{chanPop} * \frac{u_2}{o_2}) \\
 \mathbf{A'} & = & A_1^e A_2^e \\ ~ \vspace{-8pt} \\
-\mathbf{{\vec b}'} & = & {\vec b}_1^e A_2^e + {\vec b}_2^e \\ ~ \vspace{-8pt} \\
+\vec{\mathbf{b}}' & = & {\vec b}_1^e A_2^e + {\vec b}_2^e \\ ~ \vspace{-8pt} \\
 \mathbf{e'} & = & e_1^e \\ ~ \vspace{-8pt} \\
 \mathbf{o'} & = & o_1^e \\ ~ \vspace{-8pt} \\
 \mathbf{u'} & = & u_2^e
@@ -221,7 +223,7 @@ elements in $A_1^e$ and $A_2^e$.
 
 \begin{figure}[t]
 \center
-\epsfxsize=3.0in
+\epsfxsize=3.2in
 \epsfbox{images/example-pipeline-combination.eps}
 \vspace{-6pt}
 \caption{Pipeline combination example.}
@@ -268,7 +270,7 @@ verified by the StreamIt semantic checker.
 
 \begin{figure}[t]
 \center
-\epsfxsize=3.0in
+\epsfxsize=3.2in
 \epsfbox{images/splitjoin-combination.eps}
 \caption{Matrix resulting from combining a {\tt splitjoin} of rate matched sub streams.
 \protect\label{fig:splitjoin-duplicate-matrix}}
@@ -311,9 +313,9 @@ mathematical terms.
 \begin{transformation} (Duplicate splitjoin combination)
 Given a splitjoin $s$ containing a duplicate splitter, children that
 are linear nodes $\lambda_0 \dots \lambda_{n-1}$, and a roundrobin
-joiner with weights $w_0 \dots w_{n-1}$, the combination $\mbox{\bf
-splitjoin}(s)$ $=$ $\mathbf{ \{A',}$ $\mathbf{{\vec b}',}$ $\mathbf{e',}$
-$\mathbf{o',}$ $\mathbf{u'\}}$ represents an equivalent node that can
+joiner with weights $w_0 \dots w_{n-1}$, the combination 
+$\mbox{\bf splitjoin}(s)$ $=$ $ \{ \mathbf{A}',$ $\vec{\mathbf{b}}',$ $\mathbf{e}',$
+$\mathbf{o}',$ $\mathbf{u}'\}$ represents an equivalent node that can
 replace the entire stream $s$.  Its components are as follows:
 \begin{equation} \nonumber
 \begin{array}{rcl}
@@ -325,13 +327,13 @@ replace the entire stream $s$.  Its components are as follows:
 \lambda_k^e & = & \mt{expand}(\lambda_k, \mt{maxPeek}, 
                               o_k * \mt{rep}_k, u_k * \mt{rep}_k) \\ ~ \vspace{-2pt} \\
 \multicolumn{3}{l}{\forall k \in [0, n-1], \forall m \in [0, joinRep-1], \forall n \in [0, u_k-1]:} \\ ~ \vspace{-6pt} \\
-\multicolumn{3}{l}{\mathbf{A'}[*, u'-1-n - m * \mt{wSum}_{n}-\mt{wSum}_{k}] = 
+\multicolumn{3}{l}{\mathbf{A}'[*, u'-1-n - m * \mt{wSum}_{n}-\mt{wSum}_{k}] = 
   A_{k}^e [*,u_k^e-1-n]} \\ ~ \vspace{-6pt} \\
-\multicolumn{3}{l}{\mathbf{{\vec b}'}[u'-1-n - m * \mt{wSum}_{n}-\mt{wSum}_{k}] = 
+\multicolumn{3}{l}{\vec{\mathbf{b}}'[u'-1-n - m * \mt{wSum}_{n}-\mt{wSum}_{k}] = 
   b_{k}^e [u_k^e-1-n]} \\ ~ \vspace{-2pt} \\
-\mathbf{e'} & = & e_0^e = \dots = e_{n-1}^e \\
-\mathbf{o'} & = & o_0^e = \dots = o_{n-1}^e \\
-\mathbf{u'} & = & \mt{joinRep} * \mt{wSum}_n \\
+\mathbf{e}' & = & e_0^e = \dots = e_{n-1}^e \\
+\mathbf{o}' & = & o_0^e = \dots = o_{n-1}^e \\
+\mathbf{u}' & = & \mt{joinRep} * \mt{wSum}_n \\
 \end{array}
 \end{equation}
 \end{transformation}
@@ -350,7 +352,7 @@ $\lambda_i^e$ has the same number of rows, as the peek uniformization
 caused shorter matrices to be padded with rows of zero's at the top.
 
 The final phase of the transformation is to re-arrange the columns of
-the child matrices into the columns of $A'$ and ${\vec b}'$.
+the child matrices into the columns of $A'$ and $\vec{b}'$.
 Figure~\ref{fig:splitjoin-duplicate-matrix} elucidates this process,
 though its notation is somewhat cumbersome.  The equation can be
 understood as follows: for the $k$'th child and the $m$'th cycle of
