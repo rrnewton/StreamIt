@@ -46,6 +46,17 @@ statements are sensitive to the order in which they are executed.
   each point in the initialization code.
 \end{enumerate}
 
+\subsection{Helper Functions}
+
+\begin{enumerate}
+\item A \lstinline|helper| function may not use any StreamIt statement
+  only allowed in work functions or in init functions.
+\item Within a \lstinline|const helper| function, no calls may be made
+  to helper functions that are not built-in or also declared
+  \lstinline|const|.
+\item A \lstinline|const helper| function may not modify fields of its
+  containing filter.
+\end{enumerate}
 
 \section{Typing}
 
@@ -217,6 +228,12 @@ void->int feedbackloop SketchyLoop(int p) {
   since it is unclear if the types around the joiner are consistent or
   not.  This check can be removed if the compiler does stream
   type-checking after constant propagation.
+\item None of the names listed in the ``Implementation Limits''
+  section of the language specification should be used.  These include
+  the capitalized names \lstinline|SplitJoin|,
+  \lstinline|FeedbackLoop|, \lstinline|Filter|, \lstinline|Pipeline|,
+  \lstinline|StreamIt|, and \lstinline|Complex|, along with the work
+  function parameter \lstinline|data|.
 \end{enumerate}
 
 \end{document}
