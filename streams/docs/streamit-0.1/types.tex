@@ -1,0 +1,30 @@
+\subsection{Types}
+
+StreaMIT language uses a type system similar to those defined by Java and
+C.  Following types are defined: bool, byte, word, int, long, float 
+and double.  These types can be combined into {\tt struct}s, similar 
+to those defined by C.  The language allows taking a (Java style) 
+reference of a {\tt struct}.  The reference can be saved inside of 
+Filters, etc, just like any other type.
+
+An array can be defined using syntax similar to that of C:
+
+element-type array-name [30];
+
+Strings are represented as references null-terminated arrays of chars.
+
+Finally, StreaMIT uses a tagged union type.  A tagged union type is similar
+to a C union, except it checks which field of the union is currently active
+(using an automatically maintained tag).  It is a run-time exception to
+read a field which is not the most-recently assigned one.  In addition
+to run-time checking of accessed fields, StreaMIT's tagged unions can also
+test if a given field is the current field:
+
+\begin{verbatim}
+union u { int num; float frac }
+u data;
+data.num = 3;
+if (data.isActive (num)) { /* do stuff if num is currently active */ }
+\end{verbatim}
+
+

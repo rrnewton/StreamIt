@@ -1,0 +1,117 @@
+\subsection{Dynamic Constructs}
+\protect\label{sec:dynamic}
+
+Up until now, we have been considering only static definitions of
+blocks and streaming structures.  We now introduce two dynamic
+features of StreaMIT: message passing and re-initialization.  The
+messaging system allows blocks to communicate data outside of the
+primary input and output channels, perhaps to change some internal
+parameters elsewhere in the stream.  The re-initialization construct
+enables a filter to completely reset the internal state of a block in
+the stream; this feature motivates an advanced control structure
+called {\tt StreamSelect} that returns different stream structures
+based on the values of the initialization parameters.
+
+\subsubsection{Messages}
+
+A filter can send dynamic messages from within its {\tt work}
+function.  The syntax is as follows:
+
+\medskip
+{\it filter-ref-target}.{\tt handleMessage(}{\it msg}{\tt) }[{\tt @ }{\it delay} $|$ {\tt (}{\it min-delay}, {\it max-delay}{\tt )}]
+\medskip
+
+Let us examine the different parts of this statement:
+
+\begin{itemize}
+
+\item The message {\it msg} is an instance of a primitive type or a
+user-defined structure that does not contain pointers.
+
+\item The target of the message is given by {\it filter-ref-target},
+of type {\it FilterRef}.  In the event that {\it filter-ref-target} is
+a filter, the runtime system inspects the filter for a {\tt
+handleMessage} method with the appropriate parameter type.  If such a
+method exists, it is invoked with {\it msg} as the argument;
+otherwise, the message has no effect.  If the target is instead a
+filter block, then the above procedure is repeated in a top-down
+fashion for every filter within the block.  In this case, ``top-down''
+means that every filter is guaranteed that those blocks who dominate
+it will receive the message before it does.
+
+\item The optional @ syntax at the end of the statement indicates when
+the message should be delivered.  The units of measurement are
+executions of the {\it sender's} {\tt work} function.  If the message
+delay is $k$, then the handler will be invoked (not necessarily
+finishing) between the $(k-1)$'th and $k$'th fresh execution of {\tt
+work}.  One may specify either an exact {\it delay}, or a range of
+acceptable delays {\it (min-delay, max-delay)}.  If no delay is
+specified, then the compiler makes a best-effort attempt to deliver
+the message quickly.  The compiler will generate a warning message if
+a specified delay is so small that it restricts its scheduling of the
+stream; likewise, an error will be generated if the scheduling
+constraints make it impossible to deliver a message as quicly as
+requested.
+
+\end{itemize}
+
+There are some additional constraints on message passing.  The only
+place that messages can be sent is from within the {\tt work} function
+of a filter; initialization code and message handlers can not send
+messages.  Also, a filter's message handlers are prohibited from doing
+I/O on its channels, although they are allowed to modify the filter's
+state.
+
+\subsubsection{Re-Initialization}
+
+Filters can re-initialize blocks from within their {\tt work} function
+and message handlers.  Re-initialization can not be done from within
+initialization code.  The syntax is as follows:
+
+\medskip
+{\it filter-ref-target}.{\tt reset(}{\it param$_1$, param$_2$, \dots, param$_n$}{\tt) }[{\tt @ }{\it delay} $|$ {\tt (}{\it min-delay}, {\it max-delay}{\tt )}]
+\medskip
+
+The re-initialization signal is delivered to a block just like any
+other message.  Upon receiving the re-initialization message, the
+target block executes all of its initialization code just as it did in
+the beginning, but with the parameters specified by the caller.  
+
+The compiler guarantees that there is a clean transition between the
+old and the new blocks (as far as flushing pipelines, etc), but {\bf
+we still need to work out the details}.
+
+\subsubsection{StreamSelect}
+\label{sec:streamselect}
+
+Now that we have a method of re-initializing blocks, it is natural to
+consider a control construct that can produce different stream
+structures depending on the initialization parameters.  In this way, a
+filter can change the structure of the stream dynamically, albeit
+through an expensive re-initialization operation that should be used
+sparingly.  The {\tt StreamSelect} construct serves this purpose; its
+syntax is as follows:
+
+\begin{tabbing}
+\hspace{0.2in} \= \hspace{0.2in} \= \hspace{0.2in} \= \hspace{0.2in} \= \\
+
+{\tt StreamSelect(} {\it switch-expr} {\tt )} \{ \\ \\
+\> {\tt case }{\it const-literal$_1$}{\tt :  }{\it stream$_1$}; \\
+\> {\tt case }{\it const-literal$_2$}{\tt :  }{\it stream$_2$}; \\
+\> \dots \\
+\> {\tt case }{\it const-literal$_n$}{\tt :  }{\it stream$_{n}$}; \\
+\> [{\tt default}{\tt :  }{\it stream$_{default}$};] \\
+\}
+\end{tabbing}
+
+The stream returned by the {\tt StreamSelect} construct is a function
+of the value of {\it switch-expr}, which must be of a type allowed by
+the standard C {\tt switch} statement.  Also familiar from a common
+{\tt switch} statement is 1) Each const-literal$_i$ must be unique,
+and 2) the optional {\tt default} case, which is evaluated if none of
+the case statements match.  However, the semantics differ from the
+traditional {\tt switch} statement in that we do not require {\tt
+break} commands to return control out of a given case; rather, control
+returns by default instead of falling through to the next case.
+
+

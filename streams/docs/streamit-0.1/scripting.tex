@@ -1,0 +1,67 @@
+\section{Scripting Language}
+\label{sec:script}
+
+The preceding sections completely describe the class of programs that
+can be expressed in StreaMIT.  However, the restriction that block
+instantiations can not appear within any conditional control flow
+makes graph construction tedious and inflexible--for example, by
+requiring $n$ repeated filter instantiations instead of having a
+single instantiation inside a {\tt for} loop.
+
+To allow such parameterized block instantiations, we introduce special
+graph variables, graph control constructs, and graph parameters
+whose values can be analyzed at compile time.
+
+\subsection{Graph Type}
+
+The {\tt graph} keyword is a primitive type modifier, with syntax
+analogous to {\tt const} in Java or C:
+
+\medskip
+{\tt graph }{\it type variable-name};
+\medskip
+
+The restriction on graph variables is that their value must be
+analyzable at compile-time for all points in the program.  An
+expression is of type {\tt graph} if it is: 1) a constant literal, 2)
+a graph variable that has been initialized, or 3) a pure function of
+these.  A ``pure function'' is either a determistic primitive operator
+(e.g., the arithmetic operators) or a user-defined function without
+global side effects that returns a {\tt graph} expression.
+
+Control flow that depends only on graph expressions is called {\it
+graph control flow}.  To make it clear to the programmer which
+control constructs have this property, we designate different keywords
+for all graph control constructs.  They have the names of the normal
+constructs, but with an ``g'' prepended, e.g., {\tt gfor}, {\tt gif},
+and {\tt gwhile}.  Only expressions of type {\tt graph} can appear in
+the conditional clause of these constructs.
+
+Thus, with these definitions, we see that for the value of a graph
+variable to be statically determined at all points in the program, it
+must only be assigned expresseions of type {\tt graph}, and these
+assignments must appear only within graph control flow.  By the same
+reasoning, the stream structure is statically analyzable if all block
+instantiations are within graph control flow.  This is our new
+restriction on block instantiations: they can be enclosed in control
+flow, but it must be {\it graph} control flow.
+
+\subsection{Graph Parameters}
+
+Parameters of type {\tt graph} can also be passed to filters and
+filter blocks.  Since the values of these parameters can be determined
+at compile time, they will not change across multiple instantiations
+of a block.  Thus, we allow the user to specify graph parameters
+enclosed between angled brackets before the regular dynamic
+parameters:
+
+{\tt Filter} filter-name $<${\tt graph} type$_{s1}$, {\tt graph} type$_{s2}$, \dots {\tt graph} type$_{sn}>$ (type$_1$ dynamic-param$_1$, type$_2$ dynamic-param$_2$, \dots , type$_n$ dynamic-param$_n$) \{ \dots \} \\
+
+{\tt FilterBlock} filter-block-name $<${\tt graph} type$_{s1}$, {\tt graph} type$_{s2}$, \dots {\tt graph} type$_{sn}>$ (type$_1$ dynamic-param$_1$, type$_2$ dynamic-param$_2$, \dots , type$_n$ dynamic-param$_n$) \{ \dots \} \\
+
+The graph parameters can be used just like the dynamic ones in the
+context of the filters, but do not need to be given as arguments to
+re-initialization calls.
+
+
+

@@ -1,0 +1,232 @@
+\subsection{Control Constructs}
+\protect\label{sec:control}
+
+So far we have focussed on building the objects that do the
+steady-state processing of stream data.  We now turn our attention to
+the constructs that are used to connect the functional blocks into a
+streaming structure.  Here it is important to emphasize that the graph
+structure is created at {\it initialization time}, whereas the {\tt
+work} functions of the filters are executed during the {\it steady
+state} operation of the stream.  The initialization code is run only
+once for any given period of steady state operation.  Thus, we have
+two distinct times of execution in our language (we will introduce yet
+another time in Section {\ref{sec:script}}.)
+
+There are three basic control constructs in StreaMIT: 1) Pipe, for
+connecting filters into a linear chain, 2) SplitJoin, for splitting a
+stream into parallel components, and 3) FeedbackLoop, for
+incorporating loops into the graph.  Note that while these constructs
+are very expressive, they can not express all arbitrary connections of
+filters.  However, our philosophy is that structured streams compare
+to arbitrarily connected streams as structured control flow compares
+to goto statements: the loss of expressive power will be more than
+offset by improved readability and opportunity for optimization.
+
+Some terminology is in order to accurately describe the semantics of
+the control constructs.  We will use the word {\it block} to refer to
+any of a {\tt Filter} or a {\tt FilterBlock}.
+A {\it 1-to-1 block} refers to
+only those blocks that have both an input and output: the {\tt Filter}
+and {\tt FilterBlock}.  A {\it stream} is either a block or a
+composition of blocks formed using the control constructs.  A stream
+can be characterized by the presence or absence of the input and
+output channel; a stream is designated {\it 1-to-1} if it both
+consumes input and produces output.
+
+\subsubsection{Pipe}
+
+The simplest control construct is the {\tt Pipe}.  It connects a
+series of streams into a linear chain, using the following syntax:
+
+\begin{tabbing}
+\hspace{0.2in} \= \hspace{0.2in} \= \hspace{0.2in} \= \hspace{0.2in} \= \\
+
+{\tt Pipe} \{ \\ \\
+\> {\it stream$_1$} \\
+\> {\it stream$_2$} \\
+\> \dots \\
+\> {\it stream$_{n-1}$} \\
+\> {\it stream$_n$} \\
+
+\}
+\end{tabbing}
+
+The {\tt Pipe} construct defines a stream where the output channel of
+stream $i$ is connected to the input channel of stream $i+1$, for all
+$i$ from $1$ to $n-1$.  Naturally, this requires that {\it stream$_1$}
+produces output, {\it stream$_n$} consumes input, and {\it stream$_2$}
+through {\it stream$_{n-1}$} are 1-to-1.  Further, each pair of input
+and output channels that is connected must be of the same type.  The
+stream defined by the {\tt Pipe} adopts the input channel of {\it
+stream$_1$} and the output channel of {\it stream$_n$}, if these
+channels exist.
+
+The control flow defined by a {\tt Pipe} is the default control flow
+in StreaMIT.  For instance, the streams defined within a {\tt
+FilterBlock} are implicitly enclosed within a {\tt Pipe}.  
+
+\subsubsection{Stream}
+
+The {\tt Stream} construct is used to denote the top-level stream in
+the program.  Its syntax and semantics are identical to that of {\tt
+Pipe}, except that the first stream must require no input and the last
+stream must produce no output.
+
+\subsubsection{SplitJoin}
+
+Up to this point, all of our streams have been arranged in a single
+line.  The {\tt SplitJoin} construct can be used to split a stream
+into multiple parallel sections.  It imposes structure in that no
+connections are allowed between parallel sections; that is, parallel
+streams must remain distinct until they are joined together again.
+The syntax is as follows:
+
+\begin{tabbing}
+\hspace{0.2in} \= \hspace{0.2in} \= \hspace{0.2in} \= \hspace{0.2in} \= \\
+{\tt SplitJoin} \{ \\
+\> splitter-type \\
+\> {\it stream$_1$} \\
+\> {\it stream$_2$} \\
+\> \dots \\
+\> {\it stream$_n$} \\
+\> joiner-type \\
+\}
+\end{tabbing}
+
+The {\tt SplitJoin} construct defines a stream where input items are
+distributed to {\it stream$_1$} through {\it stream$_n$} according to
+``splitter-type'', and outputs of {\it stream$_1$} through {\it
+stream$_n$} are combined according to ``joiner-type''.  Thus, each
+stream must be 1-to-1, and must have identical input and output types
+(until we introduce type-dispatching splitters and joiners.)
+
+The types of the splitter and joiner are compiler defined.  For now,
+we support the following splitters:
+
+\begin{enumerate}
+
+\item {\tt DUPLICATE}, which sends a copy of each input item to each
+of the parallel streams.
+
+\item {\tt ROUND\_ROBIN}, which sends input item $i$ to {\it
+stream$_{1+(i~mod~n)}$}.  That is, the inputs are alternately sent to
+each stream, starting with the first one.
+
+\item {\tt WEIGHTED\_ROUND\_ROBIN} (weight$_1$, weight$_2$, \dots,
+weight$_n$), which operates like ROUND\_ROBIN, except that weight$_i$
+items are sent to the $i$'th stream before moving on to the next one.
+If stream $i$ does not have an input channel, then weight$_i$ must be
+0.
+
+\item {\tt NULL}, which is syntactic sugar for {\tt
+WEIGHTED\_ROUND\_ROBIN}(0, 0, ..., 0).  That is, all of the streams
+contain a source and require no input from the splitter.
+
+\end{enumerate}
+
+The joiners we support are as follows:
+
+\begin{enumerate}
+
+\item {\tt ROUND\_ROBIN}, which selects output item $i$ from {\it
+stream$_{1+i~mod~n}$}.  That is, the outputs are alternately selected
+from each stream, starting with the first one.
+
+\item {\tt WEIGHTED\_ROUND\_ROBIN} (weight$_1$, weight$_2$, \dots,
+weight$_n$), which operates like ROUND\_ROBIN, except that weight$_i$
+items are drawn from the $i$'th stream before moving on to the next
+one.  If stream $i$ does not have an ouput channel, then weight$_i$
+must be 0.
+
+\item {\tt NULL}, which is syntactic sugar for {\tt
+WEIGHTED\_ROUND\_ROBIN}(0, 0, ..., 0).  That is, all of the streams
+contain a sink and produce no output for the joiner.
+
+\end{enumerate}
+
+\subsubsection{FeedbackLoop}
+
+The {\tt FeedbackLoop} construct provides a means for introducing
+loops into the stream structure.  However, we impose the restriction
+that there can be no channel connections between blocks inside the
+loop and blocks outside the loop.  This results in a flow of data that
+is similar to the flow of control in the loop nests of traditional
+programs.  The syntax is as follows:
+
+\begin{tabbing}
+\hspace{0.2in} \= \hspace{0.2in} \= \hspace{0.2in} \= \hspace{0.2in} \= \\
+
+{\tt FeedbackLoop} \{ \\
+\> {\it FeedbackFilter} \\
+\> \{ {\tt body} {\it stream$_{body}$} \}+ \\
+\> \{ {\tt loop} {\it stream$_{loop}$} \}+ \\
+\}
+\end{tabbing}
+
+The {\tt FeedbackLoop} passes the input stream through a ``feedback
+filter'' (see below), whose output is connected to {\it
+stream$_{body}$}, the body of the loop.  The output of {\it
+stream$_{body}$} is the output of the entire construct.  However, this
+output is also passed back through {\it stream$_{loop}$} and connected
+as a second input to the feedback filter, thereby introducing a
+backwards path of data movement in the stream.
+
+Both {\it stream$_{body}$} and {\it stream$_{loop}$} are optional.
+If they are ommitted, they are assumed to be {\tt Filter}s which simply
+copy their input to their output (do no useful work).
+
+\medskip
+\noindent {\bf FeedbackFilter}
+\medskip
+
+The {\tt FeedbackLoop} utilizes a special kind of filter called a {\tt
+FeedbackFilter}.  A {\tt FeedbackFilter} is identical to a {\tt
+Filter} except that it has an extra input channel for the feedback
+loop.  This channel is declared as {\tt feedback-input} in the body of
+the filter, such that the beginnig of a {\tt FeedbackFilter}
+declaration looks like this:
+
+\begin{tabbing}
+\hspace{0.2in} \= \hspace{0.2in} \= \hspace{0.2in} \= \hspace{0.2in} \= \\
+
+{\tt FeedbackFilter} filter-name (type$_1$ param$_1$, type$_2$ param$_2$,
+... , type$_n$ param$_n$) \{ \\ \\
+
+\> {\tt feedback-input} feedback-input-type feedback-input-name; \\
+\> {\tt input} input-type input-name; \\
+\> {\tt output} output-type output-name; \\ \\
+
+\> \dots \\
+\}
+\end{tabbing}
+
+We would like to provide a mechanism for the {\tt FeedbackFilter} to
+specify the {\it delay} of the feedback loop.  That is, suppose
+that--in the steady state--item $i$ of {\tt input} and item $j$ of
+{\tt feedback-input} are being read from within the work function.
+Then we could
+characterize the delay as the smallest $d$ for which {\tt
+feedback-input[j]} depends on the value of {\tt input[i-d]}.
+Intuitively, the delay is the offset of causal time fronts between the
+inputs of the {\tt FeedbackFilter}, measured in the units of the
+original stream.  Note that the delay is not necessarily equal to the
+number of items that are in transit around the loop, since the item
+count could vary if there are rate changes between blocks.
+
+To allow the {\tt FeedbackFilter} to control the loop delay, as well
+as to control which initial values are propagated around the feedback
+path, we make a further restriction on the {\tt feedback-input}
+channel: it can not be read from within the initialization code.
+Instead, the {\tt FeedbackFilter} initializer should read {\it delay}
+elements from the original {\tt input} channel and fabricate initial
+outputs accordingly.  These outputs will propagate around the loop and
+accumulate on the {\tt feedback-input} channel.  Then, when the
+initializer exits and we enter the steady state, the {\tt
+feedback-input} channel will be exactly $delay$ items ``behind'' the
+{\tt input} channel, as desired.  Additionally, channels throughout
+the feedback loop are initialized as a natural consequence of each
+block's instantiation.  The compiler will signal an error if the
+initializers do not output enough items to reach the {\tt
+feedback-input} channel.
+
+
