@@ -22,8 +22,8 @@
 #include <VrGuppiSource.h>
 #include <VrFakeGuppiSource.h>
 #include <VrRealFIRfilter.h>
-#include "VrComplexFIRfilter.h"
-#include "VrQuadratureDemod.h"
+#include <VrComplexFIRfilter.h>
+#include <VrQuadratureDemod.h>
 #include <VrConnect.h>
 #include <VrComplex.h>
 #include <VrMultiTask.h>
@@ -80,7 +80,7 @@ int main(void) {
       // Connect Modules
 
       CONNECT(sink[i], if_filter[i], audioRate, 16);
-      CONNECT(if_filter[i], demod[i], 1, 32);
+      CONNECT(if_filter[i], demod[i], audioRate, 32);
       CONNECTN(demod[i], channel_filter, i, quadRate, 64);
 
     }
