@@ -3,25 +3,51 @@
 
 \subsection{Dataflow Graphs}
 
-Strictly speaking, synchronous dataflow (SDF) refers to a class of
-graphs where
+Strictly speaking, synchronous dataflow (SDF) can refer to a class of
+dataflow graphs where the input rate and output rate of each node is
+constant from one invocation to the next~\cite{LM87-i,LM87-ii}.  For
+SDF graphs, it is straightforward to determine a legal steady state
+schedule using balance equations~\cite{leesdf} (see
+Section~\ref{sec:balance}).  The SDF scheduling community focusses on
+``single-appearnace schedules'' (SAS) which output each node at just
+one position (although that position might be enclosed in loops).  The
+interest in SAS is because the runtime overhead of a method call is
+prohibitive, so the code for each block is inlined.  However, code
+size is so important that they can't afford to duplicate the inlining,
+so it only ends up appearing once.  They have demonstrated that
+minimizing buffer size in general graphs is NP-complete, but they
+explore two heuristics to do it in acyclic graphs \cite{Bhatta97}.
 
-\begin{itemize}
+Cyclo-static dataflow (CSDF) is the generalization of SDF to the case
+where each node has a set of phases with different I/O rates that are
+cycled through repeatedly~\cite{BEPL96,Parks95}.  Compared to SFD,
+CSDF is more natural for the programmer for writing phased
+applications, can have lower latency, and more fine-grained
+parallelism.  However, current scheduling techniques for CSDF involve
+converting each phase to an SDF actor, which can cause deadlock even
+for legal graphs~\cite{BELP96}.
 
-\item Computation Graphs
+The computation graph {CG} was described by Karp and
+Miller~\cite{Karp67} as a model of computation that, unlike the above
+two, allows the nodes to {\it peek}.  By ``peek'' we mean that a node
+can read and use a value from a channel without consuming (popping) it
+from the channel; peeking is good for the programmer because it
+automates the buffer management for inputs items that are used on
+multiple firings, as in a FIR filter.  However, peeking complicates
+the schedule because an initialization schedule is needed to ensure
+that enough items are in the channel in order to fire~\cite{Gordo02}.
+In~\cite{Karp67}, conditions are given for when a computation graph
+terminates and when its data queues are bounded.
 
-\item The min-buffers for maximal-rate schedules stuff
-
-\item The ptolemy / SDF / CSDF guys.  Scheduling, buffer minimization,
-everything they tried to do.
-
-\item  check out this buffer minimization 
-  http://epubs.siam.org/sam-bin/dbq/article/29035
-
-\item uniformization of SARE's:
-  http://www.irisa.fr/bibli/publi/pi/2000/1350/1350.html
-
-\end{itemize}
+Govindarajan et. al develop a linear programming framework for
+determining the ``rate-optimal schedule'' with the minimal memory
+requirement.  A rate-optimal schedule is one that takes advantage of
+parallel resources to execute the graph with the maximal throughput.
+Though their formulation is attractive and bears weak likeness to
+ours, it is specific for rate-optimal schedules and does not directly
+relate to the polyhedral model.  It also can result in a code size
+blow up, as the same node could be executed in many different
+contexts.
 
 \subsection{Systems of Affine Recurrence Equations}
 
@@ -44,15 +70,12 @@ domain} of the equation ${\cal E}$.  Each equation for a variable $X$
 has a disjoint domain; the domain $D_X$ for variable $X$ is taken as
 the convex union of all domains over which $X$ is defined.
 
-\item ${\vec h}_{{\cal E}, Y}$ is a vector-valued affine\footnote{If
-the dependence function ${\vec h}$ is a translation (${\vec h}({\vec
-i}) = {\vec i} - {\vec k}$ for constant ${\vec k}$), then the SARE is
-{\it uniform}, and referred to as a SURE or SRE~\cite{karp67}.}
-function, giving the index of variable $Y$ that $X({\vec i})$ depends
-on.  A vector-valued function ${\vec h}$ is affine if it can be
-written as ${\vec h}({\vec i}) = C{\vec i} + {\vec d}$, where C is a
-constant array and ${\vec d}$ is a constant vector that do not vary
-with ${\vec i}$.
+\item ${\vec h}_{{\cal E}, Y}$ is a vector-valued affine function,
+giving the index of variable $Y$ that $X({\vec i})$ depends on.  A
+vector-valued function ${\vec h}$ is affine if it can be written as
+${\vec h}({\vec i}) = C{\vec i} + {\vec d}$, where C is a constant
+array and ${\vec d}$ is a constant vector that do not vary with ${\vec
+i}$.
 
 \item $f_{\cal E}$ is a strict function used to compute the elements
 of $X$.
@@ -62,9 +85,15 @@ of $X$.
 In the above definition, note that the index expression ${\vec i}$ on
 the left hand side must exactly match the input domain quantifier.
 Also, each index expression on the right-hand side must be an affine
-expresion of ${\vec i}$.  A SARE has no notion of internal state per
-se; however, state can be modeled by introducing a self-loop in the
-graph of variables.
+expresion of ${\vec i}$.  If the dependence function ${\vec h}$
+happens to be a translation (${\vec h}({\vec i}) = {\vec i} - {\vec
+k}$ for constant ${\vec k}$), then the SARE is {\it uniform}, and
+referred to as a SURE or SRE~\cite{Karp67}. SURE's can be used for
+systolic array synthesis~\cite{Quinton84}, and there are techniques to
+uniformize SARE's into SURE's~\cite{Manjun00}.
+
+A SARE has no notion of internal state per se; however, state can be
+modeled by introducing a self-loop in the graph of variables.
 
 SARE's became interesting from the standpoint of program analysis upon
 Feautrier's discovery~\cite{Feautrier92i,Feautrier92ii} that a SARE is
