@@ -77,13 +77,12 @@ schedule.\protect\label{fig:buffergraph}}
 \vspace{-6pt}
 \end{figure}
 
-Table \ref{tbl:results} presents the buffer and schedule sizes
-required by our hierarchical single appearance and minimum latency
-scheduling algorithms for our benchmark suite.  Note that the GSM
-application cannot be scheduled using a single appearance schedule,
-because it has a tightly constrained feedback loop (see
-Figure~\ref{fig:gsm}).  Thus, we omit GSM in
-Figures~\ref{fig:buffergraph} to~\ref{fig:sumgraph}.
+Table \ref{tbl:results} presents the code and buffer sizes required by
+our hierarchical single appearance and minimum latency scheduling
+algorithms for our benchmark suite.  Note that the GSM application
+cannot be scheduled using a single appearance schedule, because it has
+a tightly constrained feedback loop (see Figure~\ref{fig:gsm}).  Thus,
+we omit GSM in Figures~\ref{fig:buffergraph} to~\ref{fig:sumgraph}.
 
 Several applications show a very large improvement in buffer size
 necessary for execution (see Figure~\ref{fig:buffergraph}).  These
@@ -126,7 +125,7 @@ constraints. \protect\label{fig:sumgraph}}
 \vspace{-4pt}
 \begin{tabular}{|c|c|c|c|c|c|c|}
 \hline {\parbox{0.8in}{ \vspace{3pt} {\bf Benchmark}}} & \parbox{0.8in}{\centering \vspace{8pt}{\bf Number of Nodes}} & \parbox{0.8in}{\centering \vspace{16pt} {\bf Number of Node Executions}} & \multicolumn{2}{c|}{{\bf Single Appearance}} & \multicolumn{2}{c|}{{\bf Minimal Latency}} \\
-\cline{4-7} & & & \parbox{0.8in}{\centering ~ \\ \vspace{6pt} {\bf Schedule Size} ~ \\ } & \parbox{0.8in}{\centering ~ \\ \vspace{-3.3pt} {\bf Buffer Size} ~ \\ } & \parbox{0.8in}{\centering ~ \\ \vspace{6pt} {\bf Schedule Size} ~ \\ } & \parbox{0.8in}{\centering ~ \\ \vspace{-3.3pt} {\bf Buffer Size} ~ \\ } \\
+\cline{4-7} & & & \parbox{0.8in}{\centering ~ \\ \vspace{-3pt}{\bf Code Size} ~ \\ } & \parbox{0.8in}{\centering ~ \\ \vspace{-3.3pt} {\bf Buffer Size} ~ \\ } & \parbox{0.8in}{\centering ~ \\ \vspace{3pt} {\bf Code Size} ~ \vspace{6pt} \\ } & \parbox{0.8in}{\centering ~ \\ \vspace{-3.3pt} {\bf Buffer Size} ~ \\ } \\
 \hline SJPeek31 & 6 & 12063 & 8 & 19964 & 24 & 874 \\
 \hline HDTV & 170 & 390038 & 230 & 550692 & 1190 & 28300 \\
 \hline CD-DAT & 6 & 612 & 6 & 1021 & 64 & 72 \\
