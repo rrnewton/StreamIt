@@ -1,0 +1,17 @@
+// Given that <s> is a linear stream, returns estimated execution time
+// if it is implemented in the time domain.
+int getDirectCost(Stream s)
+-------------------------------------------------------------------------
+<A, b> = getLinearRepresentation(s)
+return 1 + 3 * numMultiplies(A, b) + numAdds(A, b)
+
+// Given that <s> is a linear stream, returns estimated execution time
+// if it is implemented in the frequency domain.
+int getDirectCost(Stream s)
+-------------------------------------------------------------------------
+<A, b> = getLinearRepresentation(s)
+// the factor by which the frequency implementation is more efficient
+FREQUENCY_BENEFIT = 50
+return 4 * numElements(A, b) / FREQUENCY_BENEFIT
+
+

@@ -1,0 +1,77 @@
+\begin{figure}[t]
+  \psfig{figure=images/part-algorithm.eps,width=3.5in}
+  \caption{Algorithm for optimization selection.
+  \protect\label{fig:part-alg}}
+\end{figure}
+
+\begin{figure}[t]
+  \psfig{figure=images/part-algorithm2.eps,width=3.5in}
+  \caption{Type declarations for code in Figure~\ref{fig:part-alg}.}
+\end{figure}
+
+\begin{figure}[t]
+  \psfig{figure=images/part-algorithm3.eps,width=3.5in}
+  \caption{Cost functions for optimization selection.}
+\end{figure}
+
+\section{Optimization Selection}
+
+MOTIVATION
+
+- only beneficial to combine certain filters
+
+  - further, there could be two filters that are less efficient when
+    combined, but combining them allows for larger combinations that
+    enable more savings
+
+- can only combine some parts of certain structures
+- can only go to frequency if the pop rate is 1
+
+  - thus, have to weight the tradeoff between greater linear savings
+    if combined (and raised pop rate), vs. frequency savings if
+    transformed at a given node
+
+- further, some matrix multiplies are more or less expensive than
+  others.  for example, if there are many zeros, they can be factored
+  out.  If there is symmetry, something might be more efficient;
+  wouldn't want to lose that symmetry by combining with a higher node.
+
+  - differing sizes could be subjected to different cost functions on
+  a given architecture, and with a given matrix multiply routine
+
+- also, there is an overhead to different stream configurations.  For
+  examples, on some parallel architectures, there could be load
+  balancing issues involved with combining more streams
+
+- also note that in frequency, can't take advantage of zero entries of
+  matrix.
+
+ALGORITHM
+
+Ours takes into account the following aspects:
+
+cost function
+
+  - for linear nodes, the number of multiplies and adds (disregards
+    zero entries of matrix)
+
+  - for frequency nodes, a speedup over the linear node that was
+    obtained from profiling.  We show a factor of 50 improvement over
+    a linear node with no zero's in it.
+
+      - also incorporates knowledge on where a frequency
+        transformation is possible
+
+the way it works
+  - intuitively
+  - reference to pseudocode
+
+optimizations
+  - symmetery, etc.
+
+EXAMPLE
+
+- target detect or filterbank
+
+---
+
