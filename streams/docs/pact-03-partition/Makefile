@@ -175,34 +175,34 @@ fft:
 filterbank:
 	cd $(STREAMIT_HOME)/apps/benchmarks/filterbank/streamit && (rm results.all || echo) && make
 	cd $(STREAMIT_HOME)/apps/benchmarks/filterbank/streamit && echo ========== greedy 2 >> results.all
-	cd $(STREAMIT_HOME)/apps/benchmarks/filterbank/streamit && $(GREEDY) 2 LinkedFBTest.java && $(GATHER) || echo
+	cd $(STREAMIT_HOME)/apps/benchmarks/filterbank/streamit && $(GREEDY) 2 LinkedFBtest.java && $(GATHER) || echo
 	cd $(STREAMIT_HOME)/apps/benchmarks/filterbank/streamit && echo ========== greedy 3 >> results.all
-	cd $(STREAMIT_HOME)/apps/benchmarks/filterbank/streamit && $(GREEDY) 3 LinkedFBTest.java && $(GATHER) || echo
+	cd $(STREAMIT_HOME)/apps/benchmarks/filterbank/streamit && $(GREEDY) 3 LinkedFBtest.java && $(GATHER) || echo
 	cd $(STREAMIT_HOME)/apps/benchmarks/filterbank/streamit && echo ========== greedy 4 >> results.all
-	cd $(STREAMIT_HOME)/apps/benchmarks/filterbank/streamit && $(GREEDY) 4 LinkedFBTest.java && $(GATHER) || echo
+	cd $(STREAMIT_HOME)/apps/benchmarks/filterbank/streamit && $(GREEDY) 4 LinkedFBtest.java && $(GATHER) || echo
 	cd $(STREAMIT_HOME)/apps/benchmarks/filterbank/streamit && echo ========== greedy 5 >> results.all
-	cd $(STREAMIT_HOME)/apps/benchmarks/filterbank/streamit && $(GREEDY) 5 LinkedFBTest.java && $(GATHER) || echo
+	cd $(STREAMIT_HOME)/apps/benchmarks/filterbank/streamit && $(GREEDY) 5 LinkedFBtest.java && $(GATHER) || echo
 	cd $(STREAMIT_HOME)/apps/benchmarks/filterbank/streamit && echo ========== greedy 6 >> results.all
-	cd $(STREAMIT_HOME)/apps/benchmarks/filterbank/streamit && $(GREEDY) 6 LinkedFBTest.java && $(GATHER) || echo
+	cd $(STREAMIT_HOME)/apps/benchmarks/filterbank/streamit && $(GREEDY) 6 LinkedFBtest.java && $(GATHER) || echo
 	cd $(STREAMIT_HOME)/apps/benchmarks/filterbank/streamit && echo ========== greedy 7 >> results.all
-	cd $(STREAMIT_HOME)/apps/benchmarks/filterbank/streamit && $(GREEDY) 7 LinkedFBTest.java && $(GATHER) || echo
+	cd $(STREAMIT_HOME)/apps/benchmarks/filterbank/streamit && $(GREEDY) 7 LinkedFBtest.java && $(GATHER) || echo
 	cd $(STREAMIT_HOME)/apps/benchmarks/filterbank/streamit && echo ========== greedy 8 >> results.all
-	cd $(STREAMIT_HOME)/apps/benchmarks/filterbank/streamit && $(GREEDY) 8 LinkedFBTest.java && $(GATHER) || echo
+	cd $(STREAMIT_HOME)/apps/benchmarks/filterbank/streamit && $(GREEDY) 8 LinkedFBtest.java && $(GATHER) || echo
 
 	cd $(STREAMIT_HOME)/apps/benchmarks/filterbank/streamit && echo ========== dynprg 2 >> results.all
-	cd $(STREAMIT_HOME)/apps/benchmarks/filterbank/streamit && $(DYNPRG) 2 LinkedFBTest.java && $(GATHER) || echo
+	cd $(STREAMIT_HOME)/apps/benchmarks/filterbank/streamit && $(DYNPRG) 2 LinkedFBtest.java && $(GATHER) || echo
 	cd $(STREAMIT_HOME)/apps/benchmarks/filterbank/streamit && echo ========== dynprg 3 >> results.all
-	cd $(STREAMIT_HOME)/apps/benchmarks/filterbank/streamit && $(DYNPRG) 3 LinkedFBTest.java && $(GATHER) || echo
+	cd $(STREAMIT_HOME)/apps/benchmarks/filterbank/streamit && $(DYNPRG) 3 LinkedFBtest.java && $(GATHER) || echo
 	cd $(STREAMIT_HOME)/apps/benchmarks/filterbank/streamit && echo ========== dynprg 4 >> results.all
-	cd $(STREAMIT_HOME)/apps/benchmarks/filterbank/streamit && $(DYNPRG) 4 LinkedFBTest.java && $(GATHER) || echo
+	cd $(STREAMIT_HOME)/apps/benchmarks/filterbank/streamit && $(DYNPRG) 4 LinkedFBtest.java && $(GATHER) || echo
 	cd $(STREAMIT_HOME)/apps/benchmarks/filterbank/streamit && echo ========== dynprg 5 >> results.all
-	cd $(STREAMIT_HOME)/apps/benchmarks/filterbank/streamit && $(DYNPRG) 5 LinkedFBTest.java && $(GATHER) || echo
+	cd $(STREAMIT_HOME)/apps/benchmarks/filterbank/streamit && $(DYNPRG) 5 LinkedFBtest.java && $(GATHER) || echo
 	cd $(STREAMIT_HOME)/apps/benchmarks/filterbank/streamit && echo ========== dynprg 6 >> results.all
-	cd $(STREAMIT_HOME)/apps/benchmarks/filterbank/streamit && $(DYNPRG) 6 LinkedFBTest.java && $(GATHER) || echo
+	cd $(STREAMIT_HOME)/apps/benchmarks/filterbank/streamit && $(DYNPRG) 6 LinkedFBtest.java && $(GATHER) || echo
 	cd $(STREAMIT_HOME)/apps/benchmarks/filterbank/streamit && echo ========== dynprg 7 >> results.all
-	cd $(STREAMIT_HOME)/apps/benchmarks/filterbank/streamit && $(DYNPRG) 7 LinkedFBTest.java && $(GATHER) || echo
+	cd $(STREAMIT_HOME)/apps/benchmarks/filterbank/streamit && $(DYNPRG) 7 LinkedFBtest.java && $(GATHER) || echo
 	cd $(STREAMIT_HOME)/apps/benchmarks/filterbank/streamit && echo ========== dynprg 8 >> results.all
-	cd $(STREAMIT_HOME)/apps/benchmarks/filterbank/streamit && $(DYNPRG) 8 LinkedFBTest.java && $(GATHER) || echo
+	cd $(STREAMIT_HOME)/apps/benchmarks/filterbank/streamit && $(DYNPRG) 8 LinkedFBtest.java && $(GATHER) || echo
 
 mergesort:
 	cd $(STREAMIT_HOME)/docs/spaa-03-load/apps/mergesort && (rm results.all || echo)
