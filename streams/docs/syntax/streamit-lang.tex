@@ -62,6 +62,9 @@ comment=[l]//,comment=[s]{/*}{*/},%
 \def\note{\trivlist \small\item\relax\textbf{Note:}}
 \def\endnote{\endtrivlist}
 
+% Make picture sizes be sane:
+\setlength{\unitlength}{\baselineskip}
+
 \title{StreamIt Language Specification}
 
 \begin{document}
@@ -371,6 +374,31 @@ input type of the pipeline must match the input type of the first
 filter, and the output type of the pipeline must match the output type
 of the last filter.
 
+\begin{figure}[htbp]
+  \begin{center}
+    \begin{picture}(18,9)
+      \put(3,9){\vector(0,-1){1}}
+      \put(0,1){\framebox(6,7)[lt]{\lstinline|Pipeline|}}
+      \put(7,8){\makebox(9,1)[l]{\lstinline|float->float|}}
+      \put(7,7){\makebox(9,1)[l]{\lstinline|pipeline Pipeline \{|}}
+      \put(3,8){\vector(0,-1){1}}
+      \put(1,6){\framebox(4,1){\lstinline|Child1|}}
+      \put(7,6){\makebox(9,1)[l]{\lstinline|\ add Child1();|}}
+      \put(3,6){\vector(0,-1){1}}
+      \put(1,4){\framebox(4,1){\lstinline|Child2|}}
+      \put(7,4){\makebox(9,1)[l]{\lstinline|\ add Child2();|}}
+      \put(3,4){\vector(0,-1){1}}
+      \put(1,2){\makebox(4,1){$\cdots$}}
+      \put(7,2){\makebox(9,1)[l]{\lstinline|\ ...|}}
+      \put(3,2){\vector(0,-1){1}}
+      \put(7,1){\makebox(9,1)[l]{\lstinline|\}|}}
+      \put(3,1){\vector(0,-1){1}}
+    \end{picture}
+    \caption{Pipelines}
+    \label{fig:pipeline}
+  \end{center}
+\end{figure}
+
 
 \subsubsection{Split-Joins}
 
@@ -396,6 +424,33 @@ the second consumes two elements and subtracts them.  The resulting
 values are then pushed on to the output stream in a round-robin
 fashion, with values from alternating streams.
 
+\begin{figure}[htbp]
+  \begin{center}
+    \begin{picture}(29,5)
+      \put(6,5){\vector(0,-1){1}}
+      \put(0,1){\framebox(12,3)[tl]{\lstinline|SplitJoin|}}
+      \put(13,4){\makebox(16,1)[l]
+        {\lstinline|int->int splitjoin SplitJoin \{|}}
+      \put(6,4){\vector(-3,-1){3}}
+      \put(6,4){\vector(0,-1){1}}
+      \put(6,4){\vector(3,-1){3}}
+      \put(13,3){\makebox(16,1)[l]{\lstinline|\ split roundrobin(2);|}}
+      \put(1,2){\framebox(4,1){\lstinline|Child1|}}
+      \put(5,2){\makebox(2,1){$\cdots$}}
+      \put(7,2){\framebox(4,1){\lstinline|ChildN|}}
+      \put(13,2){\makebox(16,1)[l]
+        {\lstinline|\ add Child1(); ... add ChildN();|}}
+      \put(3,2){\vector(3,-1){3}}
+      \put(6,2){\vector(0,-1){1}}
+      \put(9,2){\vector(-3,-1){3}}
+      \put(13,1){\makebox(16,1)[l]{\lstinline|\ join roundrobin;|}}
+      \put(6,1){\vector(0,-1){1}}
+      \put(13,0){\makebox(16,1)[l]{\lstinline|\}|}}
+    \end{picture}
+    \caption{Split-Joins}
+    \label{fig:splitjoin}
+  \end{center}
+\end{figure}
 
 \subsubsection{Feedback Loops}
 
