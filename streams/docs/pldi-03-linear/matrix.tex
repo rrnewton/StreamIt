@@ -16,15 +16,15 @@ However, in actual applications, the output is typically some function of the in
 The type of function is not clear -- since a {\tt Filter} has state and can call
 external functions, the compiler is not, in general, going to be able to determine 
 the exact function that the filter computes. So far a rather bleak picture for 
-the possibilty of the compiler figuring out what is going on.
+the possibility of the compiler figuring out what is going on.
 
 However, we are saved by the fact that the output of a large subset of filters 
 in DSP applications compute linear functions of their input. We name
 such filters ``linear filters.'' To match notation with the existing DSP 
 literature, we will call the $peek_F$ items that filter $F$ uses as input
-each work fucnction $x[n]$, where  $n\in[0,peek_F]$. Similiarly, we  
+each work function $x[n]$, where  $n\in[0,peek_F]$. Similarly, we  
 define  $y[n]$ where  $n\in[0,push]$ is the output. For {\tt Filters} that
-compute linear functions of their input, we can succintly express their
+compute linear functions of their input, we can succinctly express their
 computation as $y[k] = (\sum_{i=0}^{N} a_{k,i}x[i])+b_{k}$ 
 where $a_{k,i}$ is a (possibly complex) constant weight and $C_{k}$ is some
 (possibly) constant value. For each output $y[k]$ produced by {\tt Filter}

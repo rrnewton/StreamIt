@@ -5,13 +5,13 @@ Each successive generation of applications requires ever more sophisticated algo
 on to ever more specialized digital signal processors (DSP). Since embedded computers have severe performance
 requirements placed on them, the mapping of algorithm to architecture is typically done by hand.
 
-Upwards of fifty percent of the code that runs a DSP in a modern cell phone is written in assembly
+Upward of fifty percent of the code that runs a DSP in a modern cell phone is written in assembly
 (the rest is written in C). The problem with these hand optimized assembly code is that one 
 has to implement the same algorithm time and time again whenever a new chip comes out. 
 This remapping by hand is costly arduous process that 
 slows the pace of advance because it forces engineers to spend time working out details rather 
 than focusing on new systems. This is exactly the problem that compilers were invented to solve
-fourty years ago. However, compilers have a very difficult time mapping a program written in 
+forty years ago. However, compilers have a very difficult time mapping a program written in 
 a general purpose language like C into the specialized instructions provided by DSPs. However,
 programmers demand the general purpose flexibility of C and almost equivalent performance
 or else they will write the darn thing by hand. 
@@ -67,11 +67,11 @@ Figure~\ref{fig:overview-filter} shows a schematic of how the various filter rat
 \center
 \epsfxsize=3.0in
 \epsfbox{images/streamit-structures.eps}
-\caption{StreamIt Structures: Pipeline, Splitjoin, and FeedbackLoop.}
+\caption{StreamIt Structures: Pipeline, SplitJoin, and FeedbackLoop.}
 \label{fig:structures}
 \end{figure}
 
-{\tt Filters} in Streamit are composed heirarchally using predefined structures to form
+{\tt Filters} in StreamIt are composed hierarchically using predefined structures to form
 a program. 
 
 \begin{enumerate}
@@ -82,7 +82,7 @@ a program.
 
 {\tt Filters}, {\tt Pipelines}, {\tt SplitJoins} and {\tt FeedbackLoops} 
 are {\tt Streams} and each {\tt Stream} can be used as a subcomponent in 
-a struture. Figure~\ref{fig:structures} illustrates the three structures provided by StreamIt.
+a structure. Figure~\ref{fig:structures} illustrates the three structures provided by StreamIt.
 StreamIt programs can also be represented as a connected graph of filters 
 which we will refer to as the stream graph. It is also important to note
 {\tt Streams} have exactly one input and one output tape.
@@ -104,14 +104,14 @@ an introductory text such as\cite{oppenheim-discrete} or \cite{lyons-understandi
 There are a few very widely used building blocks of most DSP systems, and their output 
 can be formulated as a simply a linear combination of their inputs. Examples are
 finite impulse response (FIR) filters, compressors, expanders and signal transforms
-(most notably the discrete time Fourier transform (DTFT) -- 
+(most notably the discrete Fourier transform (DFT) -- 
 see \cite{oppenheim-discrete} for a detailed discussion).
 
 Electrical engineers who concentrate on DSP applications spend a large percentage of their 
 time designing an appropriate implementation for a particular design. Choosing
-the appropriate implemention structure is a highly non trivial task, and sometimes determining the 
+the appropriate implementation structure is a highly non trivial task, and sometimes determining the 
 the right choice is more of an art than a science. There are many systems that allow design choices
-to be explored, for example Matlab\cite{matlab} is a (dare we say rediculously) widely used package 
+to be explored, for example Matlab\cite{matlab} is a (dare we say ridiculously) widely used package 
 in both academia and in industry. There are also research projects such as \cite{covell-ade} 
 and those described in \cite{oppenheim-symbolic} aimed at allowing a DSP designer to explore
 various implementation choices.(XXXXXXXXXXXXx -- Are there other things we should reference here?) 
@@ -119,6 +119,6 @@ various implementation choices.(XXXXXXXXXXXXx -- Are there other things we shoul
 Given that a product called Matlab (as in  MATrix LAB) is used extensively
 in signal processing applications, it probably comes as no  that 
 matrices often provide a convenient way of working with
-digital data and describing digitial filters. If we can determine that StreamIt {\tt Filter}'s
+digital data and describing digital filters. If we can determine that StreamIt {\tt Filter}'s
 {\tt work} function is doing matrix computation, we can take advantage of the huge body
 of knowledge in DSP and in linear algebra.

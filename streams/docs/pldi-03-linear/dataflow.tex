@@ -90,11 +90,11 @@ some polynomial function in the input.
 {\tt if} statements are handled just like for constant propagation. The confluence operator
 is set intersection, which only propagates variable to linear form mappings that are
 maintained along both branches of control flow. We also have to impose the special restriction that the
-same number of {\tt pops()} occured along both branches or we don't know what the current offset
+same number of {\tt pops()} occurred along both branches or we don't know what the current offset
 for generating linear forms from {\tt peek(i)} and {\tt pop()} expressions is. 
 We currently only handle loops that can be unrolled in the 
 compiler (eg those loops whose bounds are determinable at compile time). 
-A loop can't be unrolled at compile time only if its terminiation condition is data 
+A loop can't be unrolled at compile time only if its termination condition is data 
 dependent, and data dependent loops probably don't compute linear 
 functions of the data anyways.
 
@@ -106,7 +106,7 @@ and we copy $c$ to the appropriate column in the linear representation's constan
 The first {\tt push()} expression places the linear form in the last column of $A$. The second
 {\tt push()} the second to last column of $A$, etc. The last column of $A$ represents 
 the calculations necessary for the first output item produced by the filter. The second to last
-column represents the calculatons for the second output item of the filter, etc.
+column represents the calculations for the second output item of the filter, etc.
 The same positions are chosen for the linear forms' constants in the constant vector $a$.
 
 If all the {\tt push} expressions in a filter have linear forms as arguments, 
