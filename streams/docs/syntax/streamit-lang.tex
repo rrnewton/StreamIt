@@ -6,6 +6,9 @@
 \usepackage{tabularx}
 \usepackage{streamit}
 
+\newif\ifprerel
+\prereltrue
+
 \def\note{\trivlist \small\item\relax\textbf{Note:}}
 \def\endnote{\endtrivlist}
 
@@ -14,10 +17,12 @@
 
 % Please look the other way, this is a little gross.
 \catcode`\$=12
-\title{StreamIt Language Specification\thanks{
+\title{StreamIt Language Specification\\
+Version 2.0\ifprerel\thanks{
 This is a pre-release version of this document.\hfil\break\ttfamily
-\hbox{$Id: streamit-lang.tex,v 1.12 2002-12-06 21:20:58 dmaze Exp $}
-}}
+\hbox{$Id: streamit-lang.tex,v 1.13 2003-01-22 20:34:05 dmaze Exp $}
+}\fi}
+\author{\texttt{streamit@cag.lcs.mit.edu}}
 \catcode`\$=3
 
 \begin{document}
@@ -330,6 +335,12 @@ int->int filter BlockReader {
 }
 \end{lstlisting}
 
+\paragraph{Pre-work functions.}  A filter may specify an additional
+work function that is run in place of the normal work function the
+first time the filter executes.  This function uses the
+\lstinline|prework| keyword, and is otherwise identical to the normal
+work function.
+
 \paragraph{Helper functions.}  A helper function performs some
 auxiliary bit of computation, and may be called from the init function
 or the work function.  A helper function has a list of zero or more
@@ -537,6 +548,40 @@ code.  In this case, the syntax might look like
 
 The input and output types of anonymous streams are determined by the
 compiler.
+
+\subsection{Execution Model}
+
+StreamIt does not explicitly assume sequential or parallel hardware.
+A component of the stream graph may \emph{fire}, possibly in parallel
+with other firings, if its conditions to execute are met.  The
+scheduler in the compiler chooses an order to execute filters such
+that the firing conditions are met.  A particular back-end may place
+additional restrictions on firings; a uniprocessor back-end may
+require that only one stream object executes at a time, or a parallel
+back-end might add the constraint that two objects may not both be
+executing if the output of one is an input of another.  These
+constraints are transparent to the programmer, however.
+
+\begin{itemize}
+\item A filter may fire when its input has at least as many items as
+  its peek rate.  It pops its pop rate from the input, and pushes its
+  push rate on to its output.
+\item A phased filter has a current phase.  Phases are executed in
+  order according to the static control flow in the work function.
+  Code between phase invocations may be executed any time between the
+  preceding and succeeding phases.  The current phase may execute
+  under the same conditions listed above for a filter; execution of
+  the phased filter then may pause until the next phase may fire.
+\item A joiner in a feedback loop or split-join may fire when the
+  specified number of items are available on each of its inputs.  It
+  pushes the sum of the input weights on to its output.
+\item A round-robin splitter may fire when the sum of the number of
+  output items is available on its input, and produces the specified
+  number of items on each output.
+\item A duplicate splitter may fire when at least the specified number
+  of items is available on its input.  It pops this number of items
+  from its input and pushes this number of items to each output.
+\end{itemize}
 
 \section{Statements}
 
