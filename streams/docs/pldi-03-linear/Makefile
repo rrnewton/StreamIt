@@ -30,7 +30,20 @@ images/part-algorithm3.eps: part-algorithm3.tex
 	ps2epsi images/part-algorithm3.ps
 	mv part-algorithm3.epsi images/part-algorithm3.eps
 
-main.dvi: main.tex references.bib *.tex images/*.eps images/part-algorithm.eps images/part-algorithm2.eps images/part-algorithm3.eps
+stream-graphs: streamgraphs/*.dot
+	dot -Tps streamgraphs/FIRProgram-linear-linear-simple.dot > streamgraphs/fir.ps
+	dot -Tps streamgraphs/SamplingRateConverter-linear-linear-simple.dot > streamgraphs/sample.ps
+	dot -Tps streamgraphs/TargetDetect-linear-linear-simple.dot > streamgraphs/target.ps
+#	dot -Tps streamgraphs/LinkedFMTest-linear-linear-simple.dot > streamgraphs/fm.ps
+	dot -Tps streamgraphs/CoarseSerializedBeamFormer-linear-linear-simple.dot > streamgraphs/bf.ps
+	dot -Tps streamgraphs/FilterBank-linear-linear-simple.dot > streamgraphs/fb.ps
+	dot -Tps streamgraphs/ChannelVocoder-linear-linear-simple.dot > streamgraphs/vocoder.ps
+	dot -Tps streamgraphs/Oversampler-linear-linear-simple.dot > streamgraphs/oversampler.ps
+	dot -Tps streamgraphs/OneBitDToA-linear-linear-simple.dot > streamgraphs/onebit.ps
+
+
+
+main.dvi: main.tex references.bib *.tex images/*.eps images/part-algorithm.eps images/part-algorithm2.eps images/part-algorithm3.eps stream-graphs
 	latex main
 	bibtex main
 	latex main
