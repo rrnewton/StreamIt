@@ -199,42 +199,163 @@ phase for a balanced steady-state execution cycle of the entire graph.
 
 For each channel $c = (n_a, n_b)$, do the following:
 \begin{itemize}
-\item Introduce a variable $\mt{BUF}_c$ with the following domain:
+
+\item Introduce variables $\mt{IBUF}_c$ and $\mt{SBUF}_c$ with the following domains:
 \begin{align*}
-{\cal D}_{\mt{BUF}_c} = \{~i~|~0 \le i \le \sum_{p=0}^{\mt{num}(n_a,
-\mt{initial})-1} U(c, \mt{initial}, p) + N * S(n_a) *
-\sum_{p=0}^{\mt{num}(n_a, \mt{steady-state})-1} U(c,
-\mt{steady-state}, p)
+{\cal D}_{\mt{IBUF}_c} = \{~i~|~0 \le i \le A(c) +
+\sum_{p=0}^{\mt{num}(n_a, \mt{initial})-1} U(c, \mt{initial}, p) - 1\} \\ ~ \\
+%
+{\cal D}_{\mt{SBUF}_c} = \{~(i,j)~|~0 \le i \le \frac{N *
+S(n_a)}{\mt{Period}(c)} * \sum_{p=0}^{\mt{num}(n_a,
+\mt{steady-state})-1} U(c, \mt{steady-state}, p) \\
+\wedge~0 \le j \le Period(c) \} \\ ~ \\
+%
+\mt{where Period}(c) = \mt{LCM}(\sum_{p=0}^{\mt{num}(n_a,
+\mt{steady-state})-1} U(c, \mt{steady-state}, p), \\
+\sum_{p=0}^{\mt{num}(n_b, \mt{steady-state})-1} O(c,
+\mt{steady-state}, p)) \\
 \end{align*}
-\item For each $t \in \{\mt{initial}, \mt{steady-state}\}$ and for
-each $p \in [0, num(n_b, t)-1]$, introduce variables $\mt{READ}_{c, t,
-p}$ and $\mt{WRITE}_{c, t, p}$ with the following domains:
+
+\item For each $p \in [0, num(n_a, \mt{initial})-1]$, introduce
+variable $\mt{IWRITE}_{c, p}$ with this domain:
 \begin{align*}
-{\cal D}_{\mt{READ}_{c, t, p}} = \{~(i,j)~|~0 \le i \le N * S(n_b) ~\wedge~ 0 \le j \le E(c, t, p)\} \\
-{\cal D}_{\mt{WRITE}_{c, t, p}} = \{~(i,j)~|~0 \le i \le N * S(n_a) ~\wedge~ 0 \le j \le U(c, t, p)\} \\
+{\cal D}_{\mt{IWRITE}_{c, p}} = \{~i~|~0 \le i \le U(c, \mt{initial}, p) - 1\} \\
 \end{align*}
-\item Introduce this equation:
+
+\item For each $p \in [0, num(n_b, \mt{initial})-1]$, introduce
+variable $\mt{IREAD}_{c, p}$ with this domain:
 \begin{align*}
-\forall i \in [0,A(c)-1],~{\mt{BUF}_c}(i) = I(c)[i]
+{\cal D}_{\mt{IREAD}_{c, p}} = \{~i~|~0 \le i \le E(c, \mt{initial}, p) - 1\} \\
 \end{align*}
+
+\item For each $p \in [0, num(n_a, \mt{steady-state})-1]$, introduce
+variable $\mt{SWRITE}_{c, p}$ with this domain:
+\begin{align*}
+{\cal D}_{\mt{SWRITE}_{c, p}} = \{~(i,j)~|~0 \le i \le N * S(n_a) - 1 ~\wedge~ 0 \le j \le U(c, \mt{steady-state}, p) - 1\} \\
+\end{align*}
+
+\item For each $p \in [0, num(n_b, \mt{steady-state})-1]$, introduce
+variable $\mt{SREAD}_{c, p}$ with this domain:
+\begin{align*}
+{\cal D}_{\mt{SREAD}_{c, p}} = \{~(i,j)~|~0 \le i \le N * S(n_b) - 1 ~\wedge~ 0 \le j \le E(c, \mt{steady-state}, p) - 1\} \\
+\end{align*}
+
+\item Introduce this equation (I to IBUF):
+\begin{align*}
+\forall i \in [0,A(c)-1],~\mt{IBUF}_{c}(i) = I(c)[i] \\
+\end{align*}
+
+\item For each $p \in [0, num(n_a, \mt{initial})-1]$, introduce this
+equation (IWRITE to IBUF):
+\begin{align*}
+\forall i \in [\mt{InitOffset}(c,p), \mt{WriteOffset}(c,p)+U(c, \mt{initial}, p)-1],
+\mt{IBUF}_{c}(i) = \mt{IWRITE}_{c, p}(i - \mt{WriteOffset}(c,p)) \\
+\mt{where WriteOffset}(c,p) = A(c) + \sum_{r=0}^{p-1} U(c, \mt{initial}, r)
+\end{align*}
+
 \end{itemize}
 For each node $n$, do the following:
 \begin{itemize}
-\item For each $t \in \{\mt{initial}, \mt{steady-state}\}$, for each
-$p \in [0, num(n, t)-1]$, and for each $c \in \mt{chan-in}(n)$,
-introduce this equation:
+
+\item For each $c \in \mt{chan-out}(n)$, and for each $p \in [0,
+num(n, \mt{initial})-1]$, introduce this equation (IREAD to IWRITE):
+
 \begin{align*}
-\forall (i,j) \in {\cal D}_{\mt{READ}_{c,t,p}}, \mt{READ}_{c, t, p}(i, j) = \mt{BUF}_{c}(\mt{ReadOffset}(c,t,p) + (i-1)*O(c, t, p) + j) \\
-\mt{where ReadOffset}(c,\mt{initial},p) = \sum_{k=0}^{p-1} O(c, \mt{initial}, k)\\ \mt{and ReadOffset}(c, \mt{steady-state}, p) = \sum_{k=0}^{p-1} O(c, \mt{steady-state}, k) + \mt{ReadOffset}(c,\mt{initial},\mt{num}(n,\mt{initial}))
+\forall i \in {\cal D}_{\mt{IWRITE}_{c, p}},~\mt{IWRITE}_{c,p}(i) = W(n, \mt{initial}, p)(\mt{Input-Arrays})[\mt{pos-out}(n, c)][i] \\
+\mt{where Input-Arrays} = \{\mt{IREAD}_{\mt{chan-in}(n)[1], p}(*), \dots, \mt{IREAD}_{\mt{chan-in}(n)[\mt{num-in}(n)], p}(*) \}
 \end{align*}
-\item For each $t \in \{\mt{initial}, \mt{steady-state}\}$, for each
-$p \in [0, num(n, t)-1]$, and for each $c \in \mt{chan-out}(n)$,
-introduce these equations:
+
+\item For each $c \in \mt{chan-out}(n)$, and for each $p \in [0,
+num(n, \mt{steady-state})-1]$, introduce this equation (SREAD to SWRITE):
+
 \begin{align*}
-\forall (i,j) \in {\cal D}_{\mt{WRITE}_{c,t,p}}, \mt{BUF}_{c}(A(c) + \mt{WriteOffset}(c,t,p) + (i-1)*U(c, t, p) + j) = \mt{WRITE}_{c, t, p}(i, j) \\ \mt{where WriteOffset}(c,\mt{initial},p) = \sum_{k=0}^{p-1} U(c, \mt{initial}, k)\\ \mt{and WriteOffset}(c, \mt{steady-state}, p) = \sum_{k=0}^{p-1} U(c, \mt{steady-state}, k) + \mt{WriteOffset}(c,\mt{initial},\mt{num}(n,\mt{initial})) \\ ~ \\
-\forall (i, j) \in {\cal D}_{\mt{WRITE}_{c, t, p}},~\mt{WRITE}_{c,t,p}(i,j) = W(n, t, p)(\mt{Input-Arrays})[\mt{pos-out}(n, c)][j] \\
-\mt{where Input-Arrays} = \{\mt{READ}_{\mt{chan-in}(n)[1], t, p}(i, *), \dots, \mt{READ}_{\mt{chan-in}(n)[\mt{num-in}(n)], t, p}(i, *) \}
+\forall (i, j) \in {\cal D}_{\mt{SWRITE}_{c, p}},~\mt{SWRITE}_{c,p}(i,j) = W(n, \mt{steady-state}, p)(\mt{Input-Arrays})[\mt{pos-out}(n, c)][j] \\
+\mt{where Input-Arrays} = \{\mt{SREAD}_{\mt{chan-in}(n)[1], p}(i, *), \dots, \mt{SREAD}_{\mt{chan-in}(n)[\mt{num-in}(n)], p}(i, *) \}
 \end{align*}
+
+\item For each $c \in \mt{chan-out}(n)$, for each $p \in [0,
+\mt{num}(n, \mt{steady-state})-1]$, and for each $q \in [0,
+\frac{\mt{Period}(c)}{\sum_{r=0}^{\mt{num}(n, \mt{steady-state})-1}
+U(c, \mt{steady-state}, r)}-1]$, introduce this equation (SWRITE to
+SBUF):
+\begin{align*}
+\forall (i,j) \in {\cal D}_{\mt{SW} \rightarrow \mt{SB}}(c,p,q), \mt{SBUF}_{c}(i,j) = \mt{SWRITE}_{c, p}(i * \frac{\mt{Period}(c)}{U(c, \mt{steady-state},p)} + q, j) \\
+\mt{where } {\cal D}_{\mt{SW} \rightarrow \mt{SB}}(c,p,q) = {\cal D}_{\mt{SBUF}_{c}} \cap \\
+\{ (i,j) | q*\mt{WriteCycle}(n,c) + \mt{WritePhase}(c,p) \\ \le j \le \\ q*\mt{WriteCycle}(n,c) + \mt{WritePhase}(c,p) + U(c, \mt{steady-state}, p) - 1 \} \\
+\mt{and } \mt{WriteCycle}(n,c) = \sum_{r=0}^{\mt{num}(n, \mt{steady-state})-1} U(c, \mt{steady-state}, r) \\
+\mt{and } \mt{WritePhase}(c,p) = \sum_{r=0}^{p-1} U(c, \mt{steady-state}, r)
+\end{align*}
+
+\item For each $c \in \mt{chan-in}(n)$, and for each phase $p \in
+[0, \mt{num}(n, \mt{initial})-1]$, introduce this equation (IBUF to IREAD):
+\begin{align*}
+\forall i \in {\cal D}_{IB \rightarrow IR}(c,p), 
+\mt{IREAD}_{c, p}(i) = \mt{IBUF}_{c}(\mt{ReadOffset}(c, \mt{initial}, p) + i) \\
+\mt{where ReadOffset}(c,t,p) = \sum_{r=0}^{p-1} O(c, \mt{initial}, r) \\
+\mt{and }{\cal D}_{IB \rightarrow IR}(c,p) = 
+  \{ i | i \in {\cal D}_{\mt{IREAD}_{c,p}} ~\wedge~ 
+         i + \mt{ReadOffset}(c, \mt{initial}, p) \in {\cal D}_{\mt{IBUF}_{c}} \}
+\end{align*}
+
+\item For each $c \in \mt{chan-in}(n)$, for each phase $p \in [0,
+\mt{num}(n, \mt{initial})-1]$, and for \\ each $q \in [0, \lfloor
+\frac{\mt{max}_{\mt{p}'} \left( \mt{ReadOffset}(\mt{c}, \mt{initial},
+\mt{p}') + \mt{E}(\mt{c}, \mt{initial}, \mt{p}') \right)
+}{\mt{Steady}(\mt{c})} \rfloor ]$, introduce this equation (SBUF to
+IREAD):
+\begin{align*}
+\forall i \in {\cal D}_{SB \rightarrow IR}(c,p), 
+\mt{IREAD}_{c,p}(i) = 
+    \mt{SBUF}_{c}(q,
+      \mt{ReadOffset}(c, \mt{initial}, p) + i - 
+            |{\cal D}_{\mt{IBUF}_{c}}| - q * \mt{Steady}(c)) \\
+\mt{where }{\cal D}_{SB \rightarrow IR}(c,p) = 
+  \{ i | i \in {\cal D}_{\mt{IREAD}_{c,p}} ~\wedge~ 
+         \mt{ReadOffset}(c, \mt{initial}, p) + i \notin {\cal D}_{\mt{IBUF}_{c}} \}
+%  \{ i | \mt{ReadOffset}(c, \mt{initial}, \mt{num}(n, \mt{initial})) +
+%         \mt{ReadOffset}(c, \mt{steady-state}, p) \le i \le
+%         \mt{ReadOffset}(c, \mt{initial}, \mt{num}(n, \mt{initial})) +
+%         \mt{ReadOffset}(c, \mt{steady-state}, p) + E(c, \mt{steady-state}, p) \\
+%         ~\wedge~ i \in {\cal D}_{\mt{IREAD}_{c}} \}
+\end{align*}
+
+\item For each $c \in \mt{chan-in}(n)$, and for each phase $p \in [0,
+\mt{num}(n, \mt{steady-state})-1]$, introduce this equation (IBUF to
+SREAD):
+\begin{align*}
+\forall i \in {\cal D}_{IB \rightarrow SR}(n,c,p), 
+\mt{SREAD}_{c, p}(i) = 
+    \mt{IBUF}_{c}(\mt{ReadIndex}(n,c,p)) \\
+\mt{where ReadIndex}(n,c,p) = \mt{ReadOffset}(c, \mt{initial}, \mt{num}(n, \mt{initial}))
+                \\ + \mt{ReadOffset}(c, \mt{steady-state}, p) + i) \\
+\mt{where ReadOffset}(c,t,p) \mt{ is defined as above} \\
+\mt{and }{\cal D}_{IB \rightarrow SR}(n,c,p) = 
+  \{ i | \mt{ReadIndex}(n,c,p) \in {\cal D}_{\mt{IBUF}_{c}} \} \\
+\end{align*}
+
+\item For each $c \in \mt{chan-in}(n)$, for each phase $p \in [0,
+\mt{num}(n, \mt{steady-state})-1]$, and for each $q \in [0,
+\frac{\mt{Period}(c)}{\sum_{r=0}^{\mt{num}(n, \mt{steady-state})-1}
+O(c, \mt{steady-state}, r)}-1]$ introduce this equation (SBUF to
+SREAD):
+\begin{align*}
+\forall (i,j) \in {\cal D}_{SB \rightarrow SR}(n,c,p), 
+\mt{SREAD}_{c, p}(i,j) = 
+    \mt{SBUF}_{c}(q,i*\mt{ReadCycle}(n,c) + \mt{ReadPhase}(c,p) + j) \\
+%
+\mt{where ReadCycle}(n,c) = \sum_{r=0}^{\mt{num}(n, \mt{steady-state})-1} O(c, \mt{steady-state}, r) \\
+\mt{and ReadPhase}(c,p) = \sum_{r=0}^{p-1} O(c, \mt{steady-state}, r)
+\end{align*}
+
+%\item For each $t \in \{\mt{initial}, \mt{steady-state}\}$, for each
+%$p \in [0, num(n, t)-1]$, and for each $c \in \mt{chan-in}(n)$,
+%introduce this equation (SBUF to SREAD):
+%
+%\begin{align*}
+%\forall (i,j) \in {\cal D}_{\mt{READ}_{c,t,p}}, \mt{READ}_{c, t, p}(i, j) = \mt{BUF}_{c}(\mt{ReadOffset}(c,t,p) + (i-1)*O(c, t, p) + j) \\
+%\mt{where ReadOffset}(c,\mt{initial},p) = \sum_{k=0}^{p-1} O(c, \mt{initial}, k)\\ \mt{and ReadOffset}(c, \mt{steady-state}, p) = \sum_{k=0}^{p-1} O(c, \mt{steady-state}, k) + \mt{ReadOffset}(c,\mt{initial},\mt{num}(n,\mt{initial}))
+%\end{align*}
+
 \end{itemize}
 
 
