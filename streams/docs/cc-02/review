@@ -1,0 +1,195 @@
+Return-Path: <cc2002@connessione.cs.UVic.CA>
+Received: from pacific-carrier-annex.mit.edu by po10.mit.edu (8.9.2/4.7) id VAA12897; Sat, 15 Dec 2001 21:35:19 -0500 (EST)
+Received: from connessione.cs.UVic.CA (connessione.cs.UVic.CA [142.104.100.102])
+	by pacific-carrier-annex.mit.edu (8.9.2/8.9.2) with ESMTP id VAA03949
+	for <thies@mit.edu>; Sat, 15 Dec 2001 21:35:19 -0500 (EST)
+Received: from yin.cs.UVic.CA (yin [142.104.100.104])
+	by connessione.cs.UVic.CA (8.9.3+Sun/8.9.3) with ESMTP id SAA07178
+	for <thies@mit.edu>; Sat, 15 Dec 2001 18:35:18 -0800 (PST)
+Received: (from cc2002@localhost)
+	by yin.cs.UVic.CA (8.9.3+Sun/8.9.3) id SAA20594;
+	Sat, 15 Dec 2001 18:35:17 -0800 (PST)
+Date: Sat, 15 Dec 2001 18:35:17 -0800 (PST)
+Message-Id: <200112160235.SAA20594@yin.cs.UVic.CA>
+From: cc2002@cs.uvic.ca
+To: thies@mit.edu
+Subject: Your CC 2002 Paper (Number 5)
+
+Dear Bill Thies:
+
+On behalf of the CC 2002 Program Committee, I am delighted to inform
+you that the following paper has been accepted to appear at the
+conference:
+
+     StreamIt: A Language for Streaming Applications
+
+The Program Committee worked very hard to thoroughly review
+all the submitted papers.  Please repay their efforts, by following 
+their suggestions when you revise your paper.
+
+But please work fast.  The camera ready-version is due on
+
+    18 Jan 2002
+
+The final copy is limited to 15 two-column pages in the
+Springer-Verlag conference proceedings format.  The format is
+explained at this website:
+        http://www.springer.de/comp/lncs/authors.html
+As the web page says, Springer prefers papers prepared with
+their LaTeX2e macros, which can be downloaded.  Otherwise, you may
+use other word-processing software and imitate the Springer style
+as closely as possible.
+
+You should send your completed paper as an e-mail attachment
+to this account: cc2002 AT cs.uvic.ca
+
+Note that you must also print out and sign the Springer-Verlag
+copyright form.  I MUST receive a paper copy or faxed copy of the
+copyright form before your paper can be published.
+If sending a fax, please make sure my name is clearly marked as
+the recipient and send it to +1 250 721 7292.
+If sending a paper copy, my postal address is:
+    Department of Computer Science
+    University of Victoria
+    P.O. Box 3055
+    Victoria, BC
+    Canada  V8W 3P6
+
+The reviews and comments are attached below.  Again, try to follow
+their advice when you revise your paper. 
+
+Congratulations on your fine work.  If you have any additional 
+questions, please feel free to get in touch with me.
+
+
+Best Regards,
+
+Nigel Horspool 
+PC Chair, CC 2002 
+
+============================================================================ 
+CC 2002 Reviews for Paper #5
+============================================================================ 
+
+Title: StreamIt: A Language for Streaming Applications
+
+Authors: Bill Thies, David Maze, Michal Karczmarek, Michael Gordon, and Saman Amarasinghe
+============================================================================
+                            REVIEWER #1
+============================================================================ 
+
+                           Numerical Scores
+                           ----------------
+
+              Relevance to Conference: 1
+                          Originality: 4
+                   Technical Strength: 4
+                         Presentation: 4
+                   Overall Evaluation: 1
+
+
+---------------------------------------------------------------------------
+                          Detailed Comments
+---------------------------------------------------------------------------
+
+ This paper is not appropriate for a Compiler Construction conference. It is a
+paper about a language, and would do well in PLDI rather.  The language is
+currently implemented via libraries (see section 6). Few other references to
+implementation details exist 
+
+- page 7, column 1, para 1 re-initialisation can be recognised by the compiler
+- page 6 column 2 para 1 mixing control and data complicates compiler analysis
+
+Because there is no compiler, there are no performance statistics. 
+
+Publishing this paper in a CC conference is premature. The authors should try
+again once the compiler has been built and they have experience with its
+operation.
+
+============================================================================
+                            REVIEWER #2
+============================================================================ 
+
+                           Numerical Scores
+                           ----------------
+
+              Relevance to Conference: 3
+                          Originality: 4
+                   Technical Strength: 4
+                         Presentation: 4
+                   Overall Evaluation: 5
+
+
+---------------------------------------------------------------------------
+                          Detailed Comments
+---------------------------------------------------------------------------
+
+ The paper presents a design of a streaming programming language.  The
+goal--motivated by emerging applications for both handhelds and desktops--is to
+make it both easier to write streaming applications and possible to
+autimatically optimize them in a compiler.
+
+The paper is very easy to read and, thanks to the carefully structured design
+rationale and plentiful examples, makes a convincing case for the new language
+features.  The paper, in fact, serves as a very good tutorial for the field of
+streaming languages.
+
+My comments are minor and represent more wishes than suggestions:
+
+- The desired properties of a streaming language given in Section 2, although
+believable, are not uniformly supported with examples from practice.  As a
+result, the reader is wondering if you are listing theseproperties merely
+because that's what your language supports (or because that's what you know how
+to express).
+
+- Although you may not have space to discuss this in the final version of the
+paper, I would appreciate a section on limitations of StreamIt.  Assuming you
+have experience with actually deploying the language (in a lab environment), it
+would be great to summarize the experience for the reader.
+
+- While elaborating on compilation isssues in detail is beyond the scope of the
+paper, a brief discussion is in order, primarily because it is not clear that
+the novel features of your language are particularly implementation friendly.
+
+============================================================================
+                            REVIEWER #3
+============================================================================ 
+
+                           Numerical Scores
+                           ----------------
+
+              Relevance to Conference: 5
+                          Originality: 2
+                   Technical Strength: 3
+                         Presentation: 2
+                   Overall Evaluation: 3
+
+
+---------------------------------------------------------------------------
+                          Detailed Comments
+---------------------------------------------------------------------------
+
+ This paper, "StreamIt," describes a programming language design, but has scant
+detail about its implementation.  The language's domain is "streaming"
+applications, and the language incorporates a small number of primitives for
+"structured" stream communication between filters.  The abstractions seem
+reasonable, and the idea of using structured constructs has appeal.
+
+The current design/implementation has one significant drawback: it can only
+handle streams that "flow" at a constant rate.	(I.e., the language could not
+handle a filter for compression or decompression that uses LZ compression
+because it would be impossible to predict the rate of output.)	The authors
+acknowledge this drawback and say that it will be fixed in the future, but give
+no details.
+
+Another drawback is that the language is not declarative regarding the flow
+rate of the various filters---the programmer must hardcode these constants into
+other filters that might anticipate input.  This lack of separation of concerns
+seems doomed to create hard-to-find timing bugs.
+
+The design seems concise and powerful, and they claim useful real applications
+(e.g., software radio) which makes it an interesting piece of work.  What's
+difficult to assess from the paper is what sort of compiler techniques are used
+to translate the programs into efficient operations.  Without this, it is
+difficult to assess whether the language is interesting from a compilation
+point of view, or just syntactic sugar for known techniques.
