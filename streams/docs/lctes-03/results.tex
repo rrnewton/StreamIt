@@ -1,14 +1,6 @@
 \section{Results}
 \label{chpt:results}
 
-\begin{figure}[t]
-\psfig{figure=gsmfl.eps,width=3.5in}
-\end{figure}
-
-\begin{figure*}[t]
-\psfig{figure=gsmfl-sched.eps,width=7in}
-\end{figure*}
-
 This section presents results of creating schedules using
 techniques described in Sections \ref{chpt:hierarchical} and
 \ref{chpt:phased}.
@@ -53,6 +45,8 @@ The last two applications (SJ\_PEEK\_1024 and SJ\_PEEK\_31) are
 synthetic benchmarks. They were introduced in
 \cite{karczma-thesis}.
 
+\begin{comment}
+
 \subsection{Methodology}
 \label{sec:results:methodology}
 
@@ -62,26 +56,9 @@ for pseudo single appearance and minimal latency schedules.
 
 \subsubsection{Schedule Compression}
 
-The size of schedules for minimal latency technique contains two
-numbers. The first one is an uncompressed schedule, while the
-second is a compressed schedule. During testing it was found that
-in some applications some operators had many phases that were
-identical to other phases of the operator. Instead of including
-these phases in the final schedule multiple times, they were
-listed only once, and references to the duplicate phases have been
-replaced with references to the one copy.
+\end{comment} 
 
-This optimization lead to improvements in schedule size for two
-reasons. First, operators now had less phases, so their schedules
-took up less space. Second, applications using the phased
-schedules could now execute the same phase multiple times in a
-row, which was optimized out using run length encoding.
-
-This compression has no negative effects on speed of execution,
-and never increases the size of a schedule. This compression has
-no effect on the pseudo single-appearance schedules, thus is not
-included in the results as a separate value.
-
+\begin{comment}
 \subsubsection{Sinks}
 
 Any application in {\StreamIt} must receive its data from outside,
@@ -97,7 +74,6 @@ some of the benefit of using phased scheduling. The technique
 used for scheduling {\pipeline} sinks has been discussed in
 \cite{karczma-thesis}.
 
-\begin{comment}
 This problem has been alleviated by detecting sinks at the end of
 a {\pipeline} and scheduling them in a unique way. Namely, a simple
 attempt is made to minimize the amount of storage necessary to

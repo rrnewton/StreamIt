@@ -66,7 +66,7 @@ minimal latency schedule without undue code requirements.
 %%
 %% \end{itemize}
 This paper is organized as follows.  The remainder of this Section
-gives a motivating example and describes relevant {\StreamIt}
+gives a illustrating example and describes relevant {\StreamIt}
 constructs; Section \ref{chpt:sched-basic} explains basic concepts in
 scheduling {\StreamIt} graphs; Section \ref{chpt:hierarchical}
 describes a hierarchical single-appearance scheduling technique;
@@ -84,7 +84,7 @@ strategies.\protect\label{fig:trace}}
 \vspace{-12pt}
 \end{figure}
 
-\subsection{Motivating Example}
+\subsection{Example}
 \label{sec:sched-vs-buffer}
 
 \begin{comment}
@@ -128,7 +128,7 @@ size by 48\% but increases code size by 325\% over the SAS schedule.
 
 In this paper, we develop a phased scheduling algorithm that offers a
 flexible alternative between the extremes of SAS and push scheduling.
-Shown in Figure~\ref{fig:trace}(b) is the minimum latency phased
+Shown in Figure~\ref{fig:trace}(b) is the phased minimum latency
 schedule.  It consists of three ``phases'', each of which is a
 single-appearance sub-schedule that results in a single output item
 being produced from the pipeline.  The schedule has the same latency
