@@ -8,10 +8,30 @@
    <title>StreamIt - Registration</title>
 
    <style fprolloverstyle>A:hover {color: #000099}</style>
+
+   <script language=javascript>
+   function validate(formCheck) {
+       if (formCheck.name.value =="") {
+               alert("Please provide your name."); 
+	       formCheck.name.focus();
+	       return false;
+        }
+        var mail=formCheck.email.value
+        if (mail.indexOf("@") == -1 || mail.indexOf(".") == -1) {
+              alert("Please provide a valid email address.");
+              formCheck.email.focus(); 
+              return false;
+        }
+        return true;
+    }
+    </script>
 </head>
 
 <body>
 
+<table border="0" width="1000" cellpadding="0" align="center">
+
+<tr><td colspan=4>
 <table border="0" width="600" cellpadding="2" align="center">
   <tr>
     <td valign="center" align="center">
@@ -32,8 +52,8 @@
     </td>
   </tr>
 </table>
+</td></tr>
 
-<table border="0" width="1000" cellpadding="0" align="center">
   <tr>
     <td width="130" valign="top" align="left"></td>
     <td width="20" valign="top" align="left"></td>
@@ -48,7 +68,7 @@
         registrants  of updates  to the  StreamIt  software, including
         future public releases.
 
-	  <form method=post action="http://cag.lcs.mit.edu/cgi-bin/streamit-reg">
+	  <form method=post name="regForm" action="http://cag.lcs.mit.edu/cgi-bin/streamit-reg">
 
 	    <table cellpadding="0" cellspacing="10" border="0" widt="30%">
             <tr>
@@ -82,7 +102,7 @@
 	      LL(k)</a> parser generator.</i>
 	    </p>
 
-	    <input type="submit" value="Submit">
+	    <input type="submit" value="Submit" onClick="return(validate(regForm))";>
 	    <input type="reset" value="Clear Form">
         </form>
 
