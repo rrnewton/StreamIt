@@ -1,12 +1,9 @@
 high priority
 ------------
 
-- layout!
-
 - FIGURES
   - add vocoder, target detect figure to partitioning section?
 
-  - a lot of them look big, black, ugly
   - make stream structure example look cleaner
   - make eps bounding box ratio constant
 
@@ -16,14 +13,10 @@ high priority
 
 - add those references to cousot, karr
 
-- add acknowledgements
-
 medium priority
 ---------------
 
 - highlight different keywords in the partitioning pseudocode
-
-- possibly move the reference the combination examples to further forward in the combination section?
 
 - the for loops in the frequency transformation -- half of them are in {\tt }, half of them are in math
 
@@ -31,26 +24,30 @@ medium priority
 
 - in freq, * figure for all of a matrix column shouldn't be the same as * figure for convolution!
 
-- add somewhere:  can detect fft and move things into frequency region
-  - or implement FFT the best way for architecture
+low priority
+------------
+- fix all overfull hboxes
+
+probably not doing
+------------------
+- possibly move the reference the combination examples to further forward in the combination section?
 
 - give feel for how much frequency conversoin is helping 
   - compare combined nodes vs. non-combined nodes
   - also how much FFTW is working
 
-low priority
-------------
-- not sure I like "for non-expert DSP programmer" in abstract
+- add somewhere:  can detect fft and move things into frequency region
+  - or implement FFT the best way for architecture
 
-- some absolute references, e.g. transformation 5
+- not sure I like "for non-expert DSP programmer" in abstract
 
 - make the bibliography consistent
 
-- fix all overfull hboxes
+- some absolute references, e.g. transformation 5
 
-- emphasize that we don't count zeros (and esp, this is important in
-  splitjoin combination.  could add to splitjoin combo section that
-  the zeros will disappear.
+- look at reviewer's comments again
+
+- make sure it's clear what multiplication removal means
 
 - Possibly add the comments of the fourth reviewer:
 	"More technically, what I found most interesting about the paper is
@@ -58,13 +55,6 @@ low priority
 	attempts to extract from the program a high-level model (in this case,
 	an affine transformer) which then serves as a clean representation for
 	the filter transformations."
-
-- look at reviewer's comments again
-
-- make sure it's clear what multiplication removal means
-
-probably not doing
-------------------
 
 - make it explicit somewhere that whenever we introduce \lambda_x, we
   also introduce A_x, b_x, e_x, o_x, u_x.
