@@ -1,4 +1,4 @@
-\section{A Delay}
+\section{An Echo}
 
 \begin{textpic}{\includegraphics{cookbook.5}}
 \begin{lstlisting}{}
@@ -36,6 +36,7 @@ them, and outputs the result.  The result is also scaled by the value
 
 Feedback loops have a specialized push-like statement,
 \lstinline|enqueue|.  Each enqueue statement pushes a single value on
-to the input to the joiner from the feedback path.  There must be at
-least as many values enqueued as are read by the joiner; values
-enqueued delay data from the feedback path.
+to the input to the joiner from the feedback path.  There must be
+enough values enqueued to prevent deadlock of the loop components;
+values enqueued delay data from the feedback path.
+
