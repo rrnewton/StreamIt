@@ -1,43 +1,38 @@
-\section{Optimizations}
-Linear analysis is good because it gives us precise relationships between input and output   
-that are hard to discern from normal imperative languages. For example, combining the action
-of {\tt streams} in a {\tt pipeline} is equivalent to doing algebraic simplification across
-sequential loops. 
+% this thing used to be about optimizations, now it is all about ``Translation to Frequency Domain''
 
-Also, as our linear analysis framework provides a compile time formulation of the 
-computation that a linear {\tt stream} is performing, we can also exploit well known 
-domain specific optimizations and transformations. We have implemented one such optimization
-whihc is implementing convolution using the discrete Fourier transform (DFT). 
+\section{Translation to Frequency Domain}
+Our linear analysis framework provides a compile time formulation of the 
+computation that a linear {\tt stream} is performing and we can use this information 
+to exploit well known domain specific optimizing transformations. 
+We have implemented one such optimization which is implementing
+convolution using a translation to the frequency domain.
 
+Calculating a convolution sum is a fundamental operation in discrete time signal processing 
+because it defines how to compute the output of a linear time invariant 
+(LTI) system from the inputs.
 
-\subsection{Frequency Implementation}
-There is a wealth of knowledge about DSP implementation optimizations. One in
-particularly wide use and of wide applicability is calculating a convolution sum 
-using the DFT. Calculating a convolution sum is a fundamental
-operation in discrete time signal processing as it describes how to compute the
-output of a linear time invariant (LTI) system from its inputs\cite{oppenheim-discrete}.
-
-$y[n]=\sum_{k=-\infty}^{\infty}x[k]h[n-k]$ is a convolution sum. 
-$h[n]$ for $n\in[0..L-1]$ are compile time known constants, a frequency transformation
-using the DFT can be employed to quickly calculate $y[n]$. 
-The transformation from convolution sum into a frequency implementation is currently
+The convolution sum $y[n]=x[n]*h[n]$ is defined as $y[n]=\sum_{k=-\infty}^{\infty}x[k]h[n-k]$. 
+If $h[n]$ for $n\in[0..L-1]$ are compile time known constants, 
+a frequency transformation using the DFT can be employed to quickly calculate $y[n]$. 
+The transformation from convolution sum into frequency multiplication is currently
 done explicity by the programmer because it is difficult for traditional compilers 
 to determine that a convolution sum is being computed and which program variables
 correspond to $x[n]$, $h[n]$ and $y[n]$.
 
 However, for StreamIt {\tt streams} we know that the input ($x[n]$) and output ($y[n]$)
-correspond exactly to our input and output tapes. Furthermore, our linear representation
-gives us exactly the values $h[n]$ which are the values in the columns of $A$. A filter
-$F$ that is calculating a convolution will have $o_F=1$.
+correspond exactly to our input and output tapes. Furthermore, the values $h[n]$ 
+are exactly in the columns of $A$. A filter $F$ that is calculating a convolution 
+will have $o_F=1$.
 
-The mathematics of transforming convolution in time to a multiplication in frequency 
-is well understood. It often requires fewer calculations to transform
+Fewer calculations are often required to transform
 the input signal to the frequency domain, do a multiplication, and then convert back 
 to time than it does to do the convolution directly. This seeming roundabout calculation
-is feasible because fast algorithms are known that convert to frequency and back,
-which are collectively known as the FFT. For a thorough treatment of the theory of
-the DFT and FFT, see \cite{oppenheim-discrete}.
+is feasible because a class of fast algorithms known as the FFT are known that convert
+to frequency and back again. For a thorough treatment of the theory of discrete time 
+signal processing, the DFT and FFT, see \cite{oppenheim-discrete}.
 
+% put something here about how you calculate a convolution withDFT
+% then talk about stupid implementation, then smaprt implementation.
 
 We define an filter computing a convolution sum as a FIR filter. An FIR filter $F$ has
 $e_F=M$, $o_F=1$ and $u_F=1$. To transform $F$ such that it uses and consumes $N+M-1$ input

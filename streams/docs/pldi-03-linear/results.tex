@@ -1,6 +1,9 @@
-\section{Results}
-
 \subsection{Algebraic Simplification from Combination}
+Linear analysis is good because it gives us precise relationships between input and output   
+that are hard to discern from normal imperative languages. For example, combining the action
+of {\tt streams} in a {\tt pipeline} is equivalent to doing algebraic simplification across
+sequential loops. 
+
 One result of combining linear representations in {\tt Pipelines} in the stream graph is that  
 the compiler can perform algebraic simplification {\textbf across} the execution of {\tt Streams}. 
 If the compiler simply replaces the {\tt Pipeline} structure with a {\tt Filter} that 
