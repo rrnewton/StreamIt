@@ -4,10 +4,22 @@
 
 
 \subsection{Future Work}
-We could extend linear analysis to incorporate the set of filters
-that has a state between executions. Our formulation would then be very
-much like a standard state space model. The current state would be a set of
-variables. Each iteration of the filter would update the new state to be
+Linear analysis is easily extended to incorporate a notion of linear state.
+Our formulation would then be very much like a standard state space model used 
+frequently in the area of control system analysis. A stateful linear node would
+be characterized by
+\begin{equation} \nonumber
+\lambda=(({\mathbf A}_x, {\mathbf A}_s), ({\mathbf C}_x, {\mathbf C}_s), 
+({\mathbf b}_x, {\mathbf b}_s))
+\end{equation}
+
+Each {\tt filter} in the streamgraph contains a state vector ${\mathbf s}$
+such that the output at time $i$ is given by 
+$y_i={\mathbf A}_o{\mathbf x} + {\mathbf A}_s{\mathbf s} + {\mathbf b}_x$
+and the state vector at time $i+1$ is given by
+$s_{i+1}={\mathbf C}_x{\mathbf x} + {\mathbf C}_s{\mathbf s} + {\mathbf b}_s$
+
+Each iteration of the filter would update the new state to be
 a linear combination of the input and the current state. The output of the 
 filter would also be some linear combination of the input and the current state.
 This representation would be able to capture the fundamental operation of
