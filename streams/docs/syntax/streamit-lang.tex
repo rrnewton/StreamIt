@@ -22,7 +22,7 @@
 \title{StreamIt Language Specification\\
 Version 2.0\ifprerel\thanks{
 This document is the latest working version of the language specification.\hfil\break\ttfamily
-\hbox{$Id: streamit-lang.tex,v 1.23 2003-10-17 10:49:35 thies Exp $}
+\hbox{$Id: streamit-lang.tex,v 1.24 2003-10-17 11:55:23 thies Exp $}
 }\fi}
 \author{\texttt{streamit@cag.lcs.mit.edu}}
 \catcode`\$=3
@@ -222,7 +222,7 @@ declaration like \lstinline|int->int| or \lstinline|float->complex|;
 the first type is the stream's input type, the second its output type.
 Either type may be \lstinline|void|; in this case, the stream has no
 input or output, as appropriate.  If it is a filter, it must not
-declare a peek, pop, keep, or push rate.  The top-level stream in a
+declare a peek, pop, or push rate.  The top-level stream in a
 program has type \lstinline|void->void|; no other streams of this type
 are allowed.
 
@@ -240,6 +240,14 @@ of the stream.  For example:
 float->float filter MatrixMatrixMultiply(int A,
                  int B, int C) { ... }
 add MatrixMatrixMultiply(3, 5, 4);
+\end{lstlisting}
+
+Note that is is also possible to pass a parameterized-length array as
+a parameter to a stream, so long as the length is also passed as a
+parameter. For example, the following is a legal filter declaration:
+
+\begin{lstlisting}{}
+int->int filter FIR (int N, int[N] weights) { ... }
 \end{lstlisting}
 
 \paragraph{Compile-time constants.}  Several things in StreamIt must
@@ -270,10 +278,13 @@ extension.
 
 All computation in StreamIt takes place within filters.  Filters must
 explicitly declare their initialization code if present, but also have
-the option of omitting it.  A filter has a single work function; it
-may also declare other phase functions.  Each work or phase function
-must declare its \emph{I/O rates}, the number of items one call to the
-function removes, examines, or places on its tape.  A basic filter
+the option of omitting it.  A filter has a single work function.
+%; it may also declare other phase functions.  Each
+The work
+%or phase 
+function must declare its \emph{I/O rates}, the number of items 
+%one call to the function 
+it removes, examines, or places on its tape.  A basic filter
 declaration looks like this:
 
 \begin{lstlisting}{}
@@ -281,19 +292,47 @@ int->int filter IntAvgFilter {
   init {
     // empty
   }
-  work pop 1 peek 2 push 1 keep 1 {
-    push(keep(0) + peek(1));
+  work pop 1 peek 2 push 1 {
+    push(peek(0) + peek(1));
     pop();
   }
 }
 \end{lstlisting}
 
-This filter is named \lstinline|IntAvgFilter|; it reads integers off
-of its input tape, and writes integers to its output tape.  Each
-execution of the work function removes exactly one item from the input
-tape and examines at most two items; it causes exactly one item to be
-pushed on to the output tape, and looks at the item pushed on the
-previous iteration.
+This filter is named \lstinline|IntAvgFilter|; it reads integers off of its
+input tape, and writes integers to its output tape.  Each execution of
+the work function removes exactly one item from the input tape and
+examines at most two items; it causes exactly one item to be pushed on
+to the output tape.
+
+%% Commenting out because of keep.
+%%
+%% All computation in StreamIt takes place within filters.  Filters must
+%% explicitly declare their initialization code if present, but also have
+%% the option of omitting it.  A filter has a single work function; it
+%% may also declare other phase functions.  Each work or phase function
+%% must declare its \emph{I/O rates}, the number of items one call to the
+%% function removes, examines, or places on its tape.  A basic filter
+%% declaration looks like this:
+
+%% \begin{lstlisting}{}
+%% int->int filter IntAvgFilter {
+%%   init {
+%%     // empty
+%%   }
+%%   work pop 1 peek 2 push 1 keep 1 {
+%%     push(keep(0) + peek(1));
+%%     pop();
+%%   }
+%% }
+%% \end{lstlisting}
+
+%% This filter is named \lstinline|IntAvgFilter|; it reads integers off
+%% of its input tape, and writes integers to its output tape.  Each
+%% execution of the work function removes exactly one item from the input
+%% tape and examines at most two items; it causes exactly one item to be
+%% pushed on to the output tape, and looks at the item pushed on the
+%% previous iteration.
 
 \paragraph{Init functions.}  Init functions are declared using the
 keyword \lstinline|init|.  They take no parameters.  They may initialize
@@ -302,53 +341,58 @@ tapes.
 
 \paragraph{Work functions.}  Work functions are declared using the
 keyword \lstinline|work|.  This keyword may be followed by rate
-declarations; if these are absent, the filter is a \emph{phased
-  filter}.  Rate declarations consist of \lstinline|push expr|,
-\lstinline|peek expr|, \lstinline|pop expr|, and
-\lstinline|keep expr|, in any order.  If the peek or keep rate is
-omitted, it is assumed to be equal to the pop rate; if the pop or push
-rate is omitted, it is assumed to be zero, and the corresponding input
-or output tape type must be \lstinline|void|.  The function must push
-and pop exactly the number of items specified, and may peek or keep up
-to the number of items specified.  As a special case, if there are no
-\lstinline|pop| calls at all in the function body (all access to the
-input tape is by peeking), the number of items declared as the pop
+declarations; 
+%if these are absent, the filter is a \emph{phased filter}.  
+Rate declarations consist of \lstinline|push expr|, \lstinline|peek expr|, 
+and \lstinline|pop expr|,
+%, and \lstinline|keep expr|, 
+in any order.  If the peek 
+%or keep 
+rate is omitted, it is assumed to be equal to the pop rate; if the pop
+or push rate is omitted, it is assumed to be zero, and the
+corresponding input or output tape type must be \lstinline|void|.  The
+function must push and pop exactly the number of items specified, and
+may peek 
+%or keep 
+up to the number of items specified.  As a special case, if there are
+no \lstinline|pop| calls at all in the function body (all access to
+the input tape is by peeking), the number of items declared as the pop
 rate will be automatically popped at the end of the work function.
-All of the rate expressions must be compile-time constant.
+All of the rate expressions must be compile-time constants.
 
-\paragraph{Phased filters.}  If the work function does not have rate
-declarations, it may not perform \lstinline|push| and \lstinline|pop|
-operations directly.  However, it may call \emph{phase functions},
-which are declared like work functions but begin with the keyword
-\lstinline|phase| and a name, and always have rate declarations.  The
-runtime system ensures that, when a phase function is called, its
-\lstinline|peek| and \lstinline|pop| rates are satisfiable, even if
-other filters need to run for later phases to execute.  Beyond this
-special use, phase functions may not be directly called.  For example:
+%% \paragraph{Phased filters.}  If the work function does not have rate
+%% declarations, it may not perform \lstinline|push| and \lstinline|pop|
+%% operations directly.  However, it may call \emph{phase functions},
+%% which are declared like work functions but begin with the keyword
+%% \lstinline|phase| and a name, and always have rate declarations.  The
+%% runtime system ensures that, when a phase function is called, its
+%% \lstinline|peek| and \lstinline|pop| rates are satisfiable, even if
+%% other filters need to run for later phases to execute.  Beyond this
+%% special use, phase functions may not be directly called.  For example:
 
-\begin{lstlisting}{}
-int->int filter BlockReader {
-  // Each block has a 4-int header, 24 ints of data,
-  // and a 4-int footer.
-  work {
-    readHeader();
-    for (int i = 0; i < 24; i++)
-      echoData();
-    readFooter();
-  }
-  phase readHeader pop 4
-     { pop(); pop(); pop(); pop(); }
-  phase echoData pop 1 push 1 { push(pop()); }
-  phase readFooter pop 4
-     { pop(); pop(); pop(); pop(); }
-}
-\end{lstlisting}
+%% \begin{lstlisting}{}
+%% int->int filter BlockReader {
+%%   // Each block has a 4-int header, 24 ints of data,
+%%   // and a 4-int footer.
+%%   work {
+%%     readHeader();
+%%     for (int i = 0; i < 24; i++)
+%%       echoData();
+%%     readFooter();
+%%   }
+%%   phase readHeader pop 4
+%%      { pop(); pop(); pop(); pop(); }
+%%   phase echoData pop 1 push 1 { push(pop()); }
+%%   phase readFooter pop 4
+%%      { pop(); pop(); pop(); pop(); }
+%% }
+%% \end{lstlisting}
 
-\paragraph{Pre-work functions.}  A filter may specify an additional
-work function that is run in place of the normal work function the
-first time the filter executes.  This function uses the
-\lstinline|prework| keyword, and is otherwise identical to the normal
-work function.
+%% \paragraph{Pre-work functions.}  A filter may specify an additional
+%% work function that is run in place of the normal work function the
+%% first time the filter executes.  This function uses the
+%% \lstinline|prework| keyword, and is otherwise identical to the normal
+%% work function.
 
 \paragraph{Helper functions.}  A helper function performs some
 auxiliary bit of computation, and may be called from the init function
@@ -358,11 +402,11 @@ declaration contains the return type, the name of the function, the
 parameter list, and the function body, just like a normal C or Java
 function.
 
-\paragraph{Message-handler functions.}  A message handler function
-changes the state of the filter in response to some external event,
-delivered via a message.  It is declared with the keyword
-\lstinline|handler|, the name of the message, the parameter list, and
-the function body.
+%% \paragraph{Message-handler functions.}  A message handler function
+%% changes the state of the filter in response to some external event,
+%% delivered via a message.  It is declared with the keyword
+%% \lstinline|handler|, the name of the message, the parameter list, and
+%% the function body.
 
 \paragraph{Filter state.}  The top level of the filter may include
 variable declarations.  These variables are visible to every function
@@ -385,11 +429,12 @@ float->complex pipeline FloatToComplexAdd {
 \end{lstlisting}
 
 The body of the pipeline declaration is the initialization code; no
-internal function declarations or message handlers are allowed.  In
-addition to the internal typing constraints mentioned previously, the
-input type of the pipeline must match the input type of the first
-filter, and the output type of the pipeline must match the output type
-of the last filter.
+internal function declarations 
+%or message handlers 
+are allowed.  In addition to the internal typing constraints mentioned
+previously, the input type of the pipeline must match the input type
+of the first filter, and the output type of the pipeline must match
+the output type of the last filter.
 
 \begin{figure}[htbp]
   \begin{center}
@@ -572,86 +617,6 @@ compile-time constant.  Fields of the containing stream cannot be
 accessed, and local variables and stream parameters in the containing
 code cannot be modified.
 
-\subsubsection{Messaging}
-\label{sec:messaging}
-
-It is sometimes necessary to send occasional messages outside of the
-normal stream data flow.  A radio application might contain an in-band
-signal requesting a change in the listening frequency, for example;
-this signal would happen infrequently, but it would be detected by a
-filter late in the application and require a change in a filter early
-in the application.  StreamIt provides an out-of-band messaging system
-to accomodate this sort of application.
-
-Only filters can receive messages.  The possible messages are defined
-by message handler functions; these functions have the keyword
-\lstinline|handler| in place of their return type.  A message is sent
-to a \emph{portal}, which can have multiple targets registered with
-it.
-
-\paragraph{Portals.}  A portal is a special type of variable.  It is
-associated with a single message receiver type; the full type name is
-\lstinline|portal<ReceiverType>|.  Unlike other variables in StreamIt,
-portals are passed by reference in stream parameters.  Declaring a
-portal as a local variable, and then passing that as a parameter to a
-child stream which adds a filter to the portal, results in the filter
-also being added to the portal in the original container.
-When a filter is created, it may be added to a portal by adding the
-keyword \lstinline|to| and the portal variable to the end of the
-declaration.
-
-\paragraph{Sending messages.}  A filter work function with a portal
-variable may send a message through the portal.  This looks like a
-function call in Java: the portal name is followed by a period, the
-message name, and a parenthesized parameter list.  This may,
-optionally, be followed by a message latency, which specifies the
-minimum and maximum delay to receive the message.  The latency
-specification is an open bracket, an optional minimum latency, a
-colon, an optional maximum latency, and a close bracket.  If the
-latency specification is omitted, it defaults to \lstinline|[:]|,
-allowing any latency.
-
-When specified, message latency is stated in terms of number of items
-pushed or popped by the sending filter.  If a message is sent with
-latency \lstinline|[10:12]|, it will be received by upstream targets
-immediately before a work function execution that would generate an
-item that would affect the tenth through twelfth next data item that
-would be received by the sender; downstream filters would receive the
-message after a work function execution that processes data derived
-from the tenth through twelfth pushed items.
-
-A typical message-handling application might use a message to change
-an amplification factor.  The following code demonstrates such an
-application.  The \lstinline|Volume| pipeline creates the portal,
-passes it as a parameter to the detector, and adds the actual
-amplifier to it.
-
-\begin{lstlisting}{}
-float->float filter VolumeControl {
-  float amplification;
-  init { amplification = 1.0; }
-  work pop 1 push 1 { push(pop() * amplification); }
-  handler setAmplification(float val)
-    { amplification = val; }
-}
-
-float->float filter VolDetect
-    (portal<VolumeControl> vol) {
-  work pop 1 push 1 {
-    float val = pop();
-    if (/* detected */)
-      vol.setAmplification(0.5) [10:12];
-    push(val);
-  }
-}
-
-float->float pipeline Volume {
-  portal<VolumeControl> vol;
-  add VolDetect(vol);
-  add VolumeControl() to vol;
-}
-\end{lstlisting}
-
 \subsection{Execution Model}
 
 StreamIt does not explicitly assume sequential or parallel hardware.
@@ -667,19 +632,21 @@ constraints are transparent to the programmer, however.
 
 \begin{itemize}
 \item A filter may fire when its input has at least as many items as
-  its peek rate, and if firing would not leave fewer items on its
-  input than its predecessor's keep rate.  It pops its pop rate from
-  the input, and pushes its push rate on to its output.
-\item If a filter has never fired, and it has a prework function, then
-  the prework function is executed in place of the work function, and
-  the I/O rates on the prework function are considered when deciding
-  if the filter may fire.  The prework function is called exactly once.
-\item A phased filter has a current phase.  Phases are executed in
-  order according to the static control flow in the work function.
-  Code between phase invocations may be executed any time between the
-  preceding and succeeding phases.  The current phase may execute
-  under the same conditions listed above for a filter; execution of
-  the phased filter then may pause until the next phase may fire.
+  its peek rate.
+%, and if firing would not leave fewer items on its
+%  input than its predecessor's keep rate.  
+  It pops its pop rate from the input, and pushes its push rate on to
+  its output.
+%% \item If a filter has never fired, and it has a prework function, then
+%%   the prework function is executed in place of the work function, and
+%%   the I/O rates on the prework function are considered when deciding
+%%   if the filter may fire.  The prework function is called exactly once.
+%% \item A phased filter has a current phase.  Phases are executed in
+%%   order according to the static control flow in the work function.
+%%   Code between phase invocations may be executed any time between the
+%%   preceding and succeeding phases.  The current phase may execute
+%%   under the same conditions listed above for a filter; execution of
+%%   the phased filter then may pause until the next phase may fire.
 \item A joiner in a feedback loop or split-join may fire when the
   specified number of items are available on each of its inputs.  It
   pushes the sum of the input weights on to its output.
@@ -763,9 +730,10 @@ statement takes a splitter specification; only \lstinline|duplicate| and
 
 \subsection{Work-only Statements}
 
-These statements may only appear within steady-state work code, and in
-particular, within a filter's \lstinline|prework|, \lstinline|work|
-and \lstinline|phase| function(s).
+These statements may only appear within the \lstinline|work| function.
+%steady-state work code, and in
+%particular, within a filter's \lstinline|prework|, \lstinline|work|
+%and \lstinline|phase| function(s).
 
 \subsubsection{\lstinline|push| Statement}
 
@@ -773,18 +741,18 @@ The \lstinline|push| statement takes a value expression and pushes its
 value on to the output tape of the current filter.  The type of the
 expression must match the output type of the filter.
 
-\subsubsection{Message-sending Statements}
+%% \subsubsection{Message-sending Statements}
 
-A message may be sent to a portal that is a stream parameter in the
-current filter.  The syntax of this is like a Java function call: the
-portal variable name is followed by a period, the name of the message
-function, and a parameter list.  This may optionally be followed by a
-latency specification, consisting of an open bracket, an optional
-minimum latency expression, a colon, an optional maximum latency
-expression, and a close bracket; if omitted, the message has
-best-effort delivery, equivalent to omitting both minimum and maximum
-latency.  For a syntax example and details on the meaning of the
-latency, see Section \ref{sec:messaging}.
+%% A message may be sent to a portal that is a stream parameter in the
+%% current filter.  The syntax of this is like a Java function call: the
+%% portal variable name is followed by a period, the name of the message
+%% function, and a parameter list.  This may optionally be followed by a
+%% latency specification, consisting of an open bracket, an optional
+%% minimum latency expression, a colon, an optional maximum latency
+%% expression, and a close bracket; if omitted, the message has
+%% best-effort delivery, equivalent to omitting both minimum and maximum
+%% latency.  For a syntax example and details on the meaning of the
+%% latency, see Section \ref{sec:messaging}.
 
 \subsection{General-use Statements}
 
@@ -904,45 +872,6 @@ This function pops one item and pushes 1.  It declares a peek rate of
 at the start of the function -- one is popped, and \lstinline|e|
 contains the second item beyond that.
 
-\subsubsection{\lstinline|keep|}
-
-The \lstinline|keep| expression looks at, but does not remove, items
-on the output tape of a filter.  \lstinline|keep(0)| returns the item
-that was most recently pushed, even if that was on a previous filter
-iteration.  Just as \lstinline|pop| affects indices for future
-\lstinline|peek| calls, \lstinline|push| adds another item to the
-output tape and hence changes the indices for future \lstinline|keep|
-calls.
-
-\lstinline|keep| can be used to implement IIR filters.  For example,
-given this LTI filter:
-
-\begin{eqnarray*}
-H(z) & = & \frac{1+z^{-1}}{1-z^{-1}} \\
-(1-z^{-1}) Y(z) & = & (1+z^{-1}) X(z) \\
-y[n] - y[n-1] & = & x[n] + x[n-1] \\
-y[n] & = & x[n] + x[n-1] + y[n-1] \\
-\end{eqnarray*}
-
-We can write equivalent StreamIt code:
-
-\begin{lstlisting}{}
-float->float filter IIRExample {
-  prework push 1 {
-    push(0);
-  }
-  work push 1 pop 1 peek 2 keep 1 {
-    // y[n] = x[n] + x[n-1] + y[n-1]
-    push(peek(0) + peek(1) + keep(0));
-    pop();
-  }
-}
-\end{lstlisting}
-
-Of note, since the work function can not fire unless there is at least
-one item on its output tape, there must be a prework function that
-pushes that item; otherwise, the program is unschedulable.
-
 \subsubsection{Function Calls}
 \label{sec:expr-funcall}
 
@@ -959,7 +888,7 @@ built-in math functions.  The math functions are listed in table
 
 \begin{note}
   As an implementation detail, any function name not optimized as a
-  built-in function in the front-end or recognized as a phase or
+  built-in function in the front-end or recognized as a %phase or
   helper function is treated as a call to a function in the Java
   package \lstinline|java.lang.Math|; see \emph{Java in a Nutshell} or
   another Java reference for details.  These get blindly translated
@@ -1127,11 +1056,212 @@ template<T> T->void filter FileWriter
   work pop 1 { /* Implementation defined */ }
 }
 \end{lstlisting}
+\vspace{-12pt}
     \caption{Built-in Stream Types}
     \label{fig:built-in-streams}
 \end{figure}
 
-\input{streamit-lang-future}
+\section{Future Additions}
+
+This section describes features that are likely to be present in a
+future release of the language.  In particular, parts of the compiler
+already have full support for pre-work functions, phased filters, and
+messaging.
+
+\subsection{Prework Functions}  
+
+A filter may specify an additional work function that is run in place
+of the normal work function the first time the filter executes.  This
+function uses the \lstinline|prework| keyword, and is otherwise
+identical to the normal work function.
+
+Prework functions can be very useful for setting up initial conditions
+based on the first set of inputs, or for pushing extra items on the
+first invocation.  For example, consider the following implementation
+of a Delay:
+
+\begin{lstlisting}{}
+float->float filter Delay(int N) {
+  prework push N {
+    for (int i=0; i<N; i++) {
+      push(0);
+    }
+  }
+
+  work push 1 pop 1{
+    push(pop());
+  }
+}
+\end{lstlisting}
+
+\subsection{Phased Filters}  
+
+If the work function does not have rate declarations, it may not
+perform \lstinline|push| and \lstinline|pop| operations directly.
+However, in a phased filter, it may call \emph{phase functions}, which
+are declared like work functions but begin with the keyword
+\lstinline|phase| and a name, and always have rate declarations.  The
+runtime system ensures that, when a phase function is called, its
+\lstinline|peek| and \lstinline|pop| rates are satisfiable, even if
+other filters need to run for later phases to execute.  Beyond this
+special use, phase functions may not be directly called.  For example:
+
+\begin{lstlisting}{}
+int->int filter BlockReader {
+  // Each block has a 4-int header, 24 ints of data,
+  // and a 4-int footer.
+  work {
+    readHeader();
+    for (int i = 0; i < 24; i++)
+      echoData();
+    readFooter();
+  }
+  phase readHeader pop 4
+     { pop(); pop(); pop(); pop(); }
+  phase echoData pop 1 push 1 { push(pop()); }
+  phase readFooter pop 4
+     { pop(); pop(); pop(); pop(); }
+}
+\end{lstlisting}
+
+\subsection{Messaging}
+\label{sec:messaging}
+
+It is sometimes necessary to send occasional messages outside of the
+normal stream data flow.  A radio application might contain an in-band
+signal requesting a change in the listening frequency, for example;
+this signal would happen infrequently, but it would be detected by a
+filter late in the application and require a change in a filter early
+in the application.  StreamIt provides an out-of-band messaging system
+to accomodate this sort of application.
+
+Only filters can receive messages.  The possible messages are defined
+by message handler functions; these functions have the keyword
+\lstinline|handler| in place of their return type.  A message is sent
+to a \emph{portal}, which can have multiple targets registered with
+it.
+
+\paragraph{Portals.}  A portal is a special type of variable.  It is
+associated with a single message receiver type; the full type name is
+\lstinline|portal<ReceiverType>|.  Unlike other variables in StreamIt,
+portals are passed by reference in stream parameters.  Declaring a
+portal as a local variable, and then passing that as a parameter to a
+child stream which adds a filter to the portal, results in the filter
+also being added to the portal in the original container.
+When a filter is created, it may be added to a portal by adding the
+keyword \lstinline|to| and the portal variable to the end of the
+declaration.
+
+\paragraph{Sending messages.}  A filter work function with a portal
+variable may send a message through the portal.  This looks like a
+function call in Java: the portal name is followed by a period, the
+message name, and a parenthesized parameter list.  This may,
+optionally, be followed by a message latency, which specifies the
+minimum and maximum delay to receive the message.  The latency
+specification is an open bracket, an optional minimum latency, a
+colon, an optional maximum latency, and a close bracket.  If the
+latency specification is omitted, it defaults to \lstinline|[:]|,
+allowing any latency.
+
+When specified, message latency is stated in terms of number of items
+pushed or popped by the sending filter.  If a message is sent with
+latency \lstinline|[10:12]|, it will be received by upstream targets
+immediately before a work function execution that would generate an
+item that would affect the tenth through twelfth next data item that
+would be received by the sender; downstream filters would receive the
+message after a work function execution that processes data derived
+from the tenth through twelfth pushed items.
+
+A typical message-handling application might use a message to change
+an amplification factor.  The following code demonstrates such an
+application.  The \lstinline|Volume| pipeline creates the portal,
+passes it as a parameter to the detector, and adds the actual
+amplifier to it.
+
+\begin{lstlisting}{}
+float->float filter VolumeControl {
+  float amplification;
+  init { amplification = 1.0; }
+  work pop 1 push 1 { push(pop() * amplification); }
+  handler setAmplification(float val)
+    { amplification = val; }
+}
+
+float->float filter VolDetect
+    (portal<VolumeControl> vol) {
+  work pop 1 push 1 {
+    float val = pop();
+    if (/* detected */)
+      vol.setAmplification(0.5) [10:12];
+    push(val);
+  }
+}
+
+float->float pipeline Volume {
+  portal<VolumeControl> vol;
+  add VolDetect(vol);
+  add VolumeControl() to vol;
+}
+\end{lstlisting}
+
+\subsection{The \lstinline|keep| Construct}
+
+The \lstinline|keep| function will look at, but not remove, items on
+the output tape of a filter.  \lstinline|keep(0)| returns the item
+that was most recently pushed, even if that was on a previous filter
+iteration.  Just as \lstinline|pop| affects indices for future
+\lstinline|peek| calls, \lstinline|push| adds another item to the
+output tape and hence changes the indices for future \lstinline|keep|
+calls.
+
+\lstinline|keep| can be used to implement IIR filters.  For example,
+given this LTI filter:
+
+\begin{eqnarray*}
+H(z) & = & \frac{1+z^{-1}}{1-z^{-1}} \\
+(1-z^{-1}) Y(z) & = & (1+z^{-1}) X(z) \\
+y[n] - y[n-1] & = & x[n] + x[n-1] \\
+y[n] & = & x[n] + x[n-1] + y[n-1] \\
+\end{eqnarray*}
+
+We can write equivalent StreamIt code:
+
+\begin{lstlisting}{}
+float->float filter IIRExample {
+  prework push 1 {
+    push(0);
+  }
+  work push 1 pop 1 peek 2 keep 1 {
+    // y[n] = x[n] + x[n-1] + y[n-1]
+    push(peek(0) + peek(1) + keep(0));
+    pop();
+  }
+}
+\end{lstlisting}
+
+Of note, since the work function can not fire unless there is at least
+one item on its output tape, there must be a prework function that
+pushes that item; otherwise, the program is unschedulable.
+
+\subsection{Helper Packages}
+
+In many cases the programmer would benefit from writing a set of
+stateless helper functions that can be used in multiple filters.  For
+example, the GSM encoder we have now uses the C preprocessor to
+include a set of functions to perform 16-bit arithmetic.  Syntax for
+this functionality does not yet exist, though we may create a
+\lstinline|static| keyword:
+
+\begin{lstlisting}{}
+static MyHelpers {
+  int square(int x) { return x * x; }
+}
+int->int filter SquareIt {
+  work pop 1 push 1 { push(MyHelpers.square(pop())); }
+}
+\end{lstlisting}
+
+%\input{streamit-lang-future}
 
 \section{Implementation Limits}
 
@@ -1158,10 +1288,11 @@ The first formal language specification for StreamIt documented
 StreamIt 2.0.  Version 2.0 of the language adds a completely new
 syntax with simplified constructs for declaring stream objects but
 keeping a Java-like syntax for the bodies of init and work functions.
-Other new features include \lstinline|prework| functions, phased
-filters, messaging, the \lstinline|keep| expression, and changing from
-delay functions to \lstinline|enqueue| statements in feedback loops.
-The \lstinline|null| splitter/joiner type was replaced with
+It also changes
+%Other new features include \lstinline|prework| functions, phased
+%filters, messaging, the \lstinline|keep| expression, and changing 
+from delay functions to \lstinline|enqueue| statements in feedback
+loops.  The \lstinline|null| splitter/joiner type was replaced with
 \lstinline|roundrobin(0)|.
 
 \subsection{StreamIt 1.0}
