@@ -459,7 +459,6 @@ typedef struct tape {
   int read_pos;
   int write_pos;
   int data_size;
-  int tape_length;
   int mask;
 } tape;
 @
@@ -490,25 +489,62 @@ mask.
 
 <<Low-level Tape Macros>>=
 <<Low-level Tape Macros (Bitwise)>>
-#define INCR_TAPE_WRITE(t) INCR_TAPE_POS(t, write_pos)
-#define INCR_TAPE_READ(t) INCR_TAPE_POS(t, read_pos)
+#define INCR_TAPE_WRITE(t, size) INCR_TAPE_POS(t, write_pos, size)
+#define INCR_TAPE_READ(t, size) INCR_TAPE_POS(t, read_pos, size)
 #define PUSH_TAPE(t, type, d) \
-  (((type *)((t)->data))[INCR_TAPE_WRITE(t)] = (d))
+  (*((type *)((t)->data+INCR_TAPE_POS(t, write_pos, sizeof(type))))=(d))
 #define POP_TAPE(t, type) \
-  (((type *)((t)->data))[INCR_TAPE_READ(t)])
+  (*((type *)((t)->data+INCR_TAPE_POS(t, read_pos, sizeof(type)))))
 @
 
 <<Low-level Tape Macros (Conservative)>>=
+#define ADVANCE_TAPE_POS(t, v, n) \
+  ((((t)->v += n) >= (t)->tape_length) ? (t)->v = 0 : (t)->v)
 #define INCR_TAPE_POS(t, v) \
   ((++((t)->v) >= (t)->tape_length) ? (t)->v = 0 : (t)->v)
 #define PEEK_TAPE(t, type, n) \
   (((type *)(t)->data)[((t)->read_pos+n+1)%(t)->tape_length])
 @
 
+For the bitwise macros, we also define a set of ``local'' macros,
+which act on local variables that aren't necessarily attached to a
+tape structure.
+
 <<Low-level Tape Macros (Bitwise)>>=
-#define INCR_TAPE_POS(t, v) ((t)->v = ((t)->v+1) & (t)->mask)
+#define INCR_TAPE_LOCALB(p, m, n) ((p) = ((p)+n) & (m))
+#define PUSH_TAPE_LOCALB(d, p, m, type, v) \
+  (*((type *)((d)+INCR_TAPE_LOCALB(p, m, sizeof(type))))=(v))
+#define POP_TAPE_LOCALB(d, p, m, type) \
+  (*((type *)((d)+INCR_TAPE_LOCALB(p, m, sizeof(type)))))
+#define PEEK_TAPE_LOCALB(d, p, m, type, n) \
+  (*((type *)((d)+(((p)+((n)+1)*sizeof(type))&(m)))))
+#define LOCALIZE_TAPE(rt, rd, rp, rm, wt, wd, wp, wm)\
+  ((rd=rt->data), (rp=rt->read_pos), (rm=rt->mask), \
+   (wd=wt->data), (wp=rt->write_pos), (wm=wt->mask))
+#define UNLOCALIZE_TAPE(rt, rp, wt, wp) \
+  ((rt->read_pos=rp), (wt->write_pos=wp))
+@
+
+If we define some standard variable names, then we can write quick
+macros to use local variables instead of the tape structures.
+Hopefully this should provide us with some performance improvement.
+
+<<Low-level Tape Macros (Bitwise)>>=
+#define PUSH_DEFAULTB(type, v) PUSH_TAPE_LOCALB(__wd, __wp, __wm, type, v)
+#define POP_DEFAULTB(type) POP_TAPE_LOCALB(__rd, __rp, __rm, type)
+#define PEEK_DEFAULTB(type, n) PEEK_TAPE_LOCALB(__rd, __rp, __rm, type, n)
+#define VARS_DEFAULTB() void *__rd, *__wd; int __rp, __rm, __wp, __wm;
+#define LOCALIZE_DEFAULTB(c) \
+  LOCALIZE_TAPE((c)->input_tape, __rd, __rp, __rm, \
+                (c)->output_tape, __wd, __wp, __wm)
+#define UNLOCALIZE_DEFAULTB(c) \
+  UNLOCALIZE_TAPE((c)->input_tape, __rp, (c)->output_tape, __wp)
+@
+
+<<Low-level Tape Macros (Bitwise)>>=
+#define INCR_TAPE_POS(t, v, n) INCR_TAPE_LOCALB((t)->v, (t)->mask, (n))
 #define PEEK_TAPE(t, type, n) \
-  (((type *)(t)->data)[((t)->read_pos+n+1)&(t)->mask])
+  (*((type *)((t)->data+(((n+1)*sizeof(type))&(t)->mask))))
 @
 
 [[COPY_TAPE_ITEM]] copies the most recent item read from the source
@@ -517,8 +553,8 @@ caller is responsible for advancing tape positions beforehand if
 necessary.
 
 <<[[COPY_TAPE_ITEM]] Macro>>=
-#define READ_ADDR(t) ((t)->data + (t)->read_pos * (t)->data_size)
-#define WRITE_ADDR(t) ((t)->data + (t)->write_pos * (t)->data_size)
+#define READ_ADDR(t) ((t)->data + (t)->read_pos)
+#define WRITE_ADDR(t) ((t)->data + (t)->write_pos)
 #define COPY_TAPE_ITEM(s, d) \
   (streamit_memcpy(WRITE_ADDR(d), READ_ADDR(s), (d)->data_size))
 @
