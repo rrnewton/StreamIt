@@ -1,39 +1,51 @@
-C code:
-Code lines	Comment lines	Total lines
-fft   92	57	 149
-fm    158	37	 195
-beamformer	2235	172	 2407
-vocoder		7215	772	 7987
-nokia		140	44	 184
-gsm		42711	10024	 52735
-fir		58	7	 65
-bitonic		55	31	 86
-filterbank	57	11	 68
+C code:				Streamit Code:				Filters/Pipelines/SplitJoins/Feedback Loops		
+	Code lines	Comment lines	Total lines	Code lines	Comment lines	Total lines	Filters	Pipelines	Splitjoins	Feebackloops
+fft	92	57	149	198	4	202	3	3	3	0
+fm	158	37	195	859	1042	1901	14	6	6	0
+beamformer	2235	172	2407	298	66	364	8	3	3	0
+vocoder	7215	772	7987	4587	1169	5756	55	8	8	1
+nokia	140	44	184	4811	641	5452	16	10	10	0
+gsm	42711	10024	52735	3609	158	3767	26	11	11	2
+fir	58	7	65	65	1	66	5	1	1	0
+bitonic	55	31	86	111	128	239	4	5	5	0
+filterbank	57	11	68	927	665	1592	9	3	3	1
 
 
-Streamit Code:
-Code lines	Comment lines	Total lines
-fft  198	4	 202
-fm   859	1042	 1901
-beamformer	298	66	 364
-vocoder		4587	1169	 5756
-nokia		4811	641	 5452
-gsm		3609	158	 3767
-fir		65	1	 66
-bitonic		111	128	 239
-filterbank	927	665	 1592
+C code:										
+	Code lines	Comment lines	Total lines							
+fft	92	57	149							
+fm	158	37	195
+beamformer	2235	172	2407
+vocoder	7215	772	7987
+nokia	140	44	184
+gsm	42711	10024	52735
+fir	58	7	65
+bitonic	55	31	86
+filterbank	57	11	68
+
+
+Streamit Code:			
+	Code lines	Comment lines	Total lines
+fft	198	4	202
+fm	859	1042	1901
+beamformer	298	66	364
+vocoder	4587	1169	5756
+nokia	4811	641	5452	
+gsm	3609	158	3767	
+fir	65	1	66	
+bitonic	111	128	239	
+filterbank	927	665	1592	
 
 
 
-Filters/Pipelines/SplitJoins/Feedback Loops
----------------------------------
-Filters\tPipelines\tSplitjoins\tFeebackloops
+Filters/Pipelines/SplitJoins/Feedback Loops				
+	Filters	Pipelines	Splitjoins	Feebackloops
 fft	3	3	3	0
 fm	14	6	6	0
 beamformer	8	3	3	0
-vocoder		55	8	8	1
-nokia		16	10	10	0
-gsm		26	11	11	2
-fir		5	1	1	0
-bitonic		4	5	5	0
+vocoder	55	8	8	1
+nokia	16	10	10	0
+gsm	26	11	11	2
+fir	5	1	1	0
+bitonic	4	5	5	0
 filterbank	9	3	3	1
