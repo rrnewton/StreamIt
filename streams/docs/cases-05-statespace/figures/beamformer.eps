@@ -1,0 +1,4820 @@
+%!PS-Adobe-3.0 EPSF-3.0
+%%Title: (beamformer.pdf)
+%%Version: 1 2
+%%DocumentData: Clean7Bit
+%%BoundingBox: 36 36 576 333
+%%Pages: 0
+%%DocumentProcessColors: Black
+%%DocumentNeededResources: (atend)
+%%DocumentSuppliedResources:
+%%+ procset (Adobe Acrobat - PDF operators) 1.2 0
+%%+ procset (Adobe Acrobat - type operators) 1.2 0
+%%EndComments
+36 36 moveto 576 36 lineto 576 333 lineto 36 333 lineto closepath clip newpath
+%%BeginProlog
+%%EndProlog
+%%BeginSetup
+%%BeginResource: file Pscript_CFF PSVER
+userdict/ct_CffDict 6 dict put ct_CffDict begin/F0Subr{systemdict/internaldict
+known{1183615869 systemdict/internaldict get exec/FlxProc known{save true}{
+false}ifelse}{userdict/internaldict known not{userdict/internaldict{count 0 eq
+{/internaldict errordict/invalidaccess get exec}if dup type/integertype ne{
+/internaldict errordict/invalidaccess get exec}if dup 1183615869 eq{pop 0}{
+/internaldict errordict/invalidaccess get exec}ifelse}dup 14 get 1 25 dict put
+bind executeonly put}if 1183615869 userdict/internaldict get exec/FlxProc
+known{save true}{false}ifelse}ifelse[systemdict/internaldict known not{100
+dict/begin cvx/mtx matrix/def cvx}if systemdict/currentpacking known{
+currentpacking true setpacking}if{systemdict/internaldict known{1183615869
+systemdict/internaldict get exec dup/$FlxDict known not{dup dup length exch
+maxlength eq{pop userdict dup/$FlxDict known not{100 dict begin/mtx matrix def
+dup/$FlxDict currentdict put end}if}{100 dict begin/mtx matrix def dup
+/$FlxDict currentdict put end}ifelse}if/$FlxDict get begin}if grestore/exdef{
+exch def}def/dmin exch abs 100 div def/epX exdef/epY exdef/c4y2 exdef/c4x2
+exdef/c4y1 exdef/c4x1 exdef/c4y0 exdef/c4x0 exdef/c3y2 exdef/c3x2 exdef/c3y1
+exdef/c3x1 exdef/c3y0 exdef/c3x0 exdef/c1y2 exdef/c1x2 exdef/c2x2 c4x2 def
+/c2y2 c4y2 def/yflag c1y2 c3y2 sub abs c1x2 c3x2 sub abs gt def/PickCoords{{
+c1x0 c1y0 c1x1 c1y1 c1x2 c1y2 c2x0 c2y0 c2x1 c2y1 c2x2 c2y2}{c3x0 c3y0 c3x1
+c3y1 c3x2 c3y2 c4x0 c4y0 c4x1 c4y1 c4x2 c4y2}ifelse/y5 exdef/x5 exdef/y4 exdef
+/x4 exdef/y3 exdef/x3 exdef/y2 exdef/x2 exdef/y1 exdef/x1 exdef/y0 exdef/x0
+exdef}def mtx currentmatrix pop mtx 0 get abs 1e-05 lt mtx 3 get abs 1e-05 lt
+or{/flipXY -1 def}{mtx 1 get abs 1e-05 lt mtx 2 get abs 1e-05 lt or{/flipXY 1
+def}{/flipXY 0 def}ifelse}ifelse/erosion 1 def systemdict/internaldict known{
+1183615869 systemdict/internaldict get exec dup/erosion known{/erosion get
+/erosion exch def}{pop}ifelse}if yflag{flipXY 0 eq c3y2 c4y2 eq or{false
+PickCoords}{/shrink c3y2 c4y2 eq{0}{c1y2 c4y2 sub c3y2 c4y2 sub div abs}ifelse
+def/yshrink{c4y2 sub shrink mul c4y2 add}def/c1y0 c3y0 yshrink def/c1y1 c3y1
+yshrink def/c2y0 c4y0 yshrink def/c2y1 c4y1 yshrink def/c1x0 c3x0 def/c1x1
+c3x1 def/c2x0 c4x0 def/c2x1 c4x1 def/dY 0 c3y2 c1y2 sub round dtransform
+flipXY 1 eq{exch}if pop abs def dY dmin lt PickCoords y2 c1y2 sub abs .001 gt{
+c1x2 c1y2 transform flipXY 1 eq{exch}if/cx exch def/cy exch def/dY 0 y2 c1y2
+sub round dtransform flipXY 1 eq{exch}if pop def dY round dup 0 ne{/dY exdef}{
+pop dY 0 lt{-1}{1}ifelse/dY exdef}ifelse/erode PaintType 2 ne erosion .5 ge
+and def erode{/cy cy .5 sub def}if/ey cy dY add def/ey ey ceiling ey sub ey
+floor add def erode{/ey ey .5 add def}if ey cx flipXY 1 eq{exch}if itransform
+exch pop y2 sub/eShift exch def/y1 y1 eShift add def/y2 y2 eShift add def/y3
+y3 eShift add def}if}ifelse}{flipXY 0 eq c3x2 c4x2 eq or{false PickCoords}{
+/shrink c3x2 c4x2 eq{0}{c1x2 c4x2 sub c3x2 c4x2 sub div abs}ifelse def/xshrink
+{c4x2 sub shrink mul c4x2 add}def/c1x0 c3x0 xshrink def/c1x1 c3x1 xshrink def
+/c2x0 c4x0 xshrink def/c2x1 c4x1 xshrink def/c1y0 c3y0 def/c1y1 c3y1 def/c2y0
+c4y0 def/c2y1 c4y1 def/dX c3x2 c1x2 sub round 0 dtransform flipXY -1 eq{exch}
+if pop abs def dX dmin lt PickCoords x2 c1x2 sub abs .001 gt{c1x2 c1y2
+transform flipXY -1 eq{exch}if/cy exch def/cx exch def/dX x2 c1x2 sub round 0
+dtransform flipXY -1 eq{exch}if pop def dX round dup 0 ne{/dX exdef}{pop dX 0
+lt{-1}{1}ifelse/dX exdef}ifelse/erode PaintType 2 ne erosion .5 ge and def
+erode{/cx cx .5 sub def}if/ex cx dX add def/ex ex ceiling ex sub ex floor add
+def erode{/ex ex .5 add def}if ex cy flipXY -1 eq{exch}if itransform pop x2
+sub/eShift exch def/x1 x1 eShift add def/x2 x2 eShift add def/x3 x3 eShift add
+def}if}ifelse}ifelse x2 x5 eq y2 y5 eq or{x5 y5 lineto}{x0 y0 x1 y1 x2 y2
+curveto x3 y3 x4 y4 x5 y5 curveto}ifelse epY epX}systemdict/currentpacking
+known{exch setpacking}if/exec cvx/end cvx]cvx executeonly exch{pop true exch
+restore}{systemdict/internaldict known not{1183615869 userdict/internaldict
+get exec exch/FlxProc exch put true}{1183615869 systemdict/internaldict get
+exec dup length exch maxlength eq{false}{1183615869 systemdict/internaldict
+get exec exch/FlxProc exch put true}ifelse}ifelse}ifelse{systemdict
+/internaldict known{1183615869 systemdict/internaldict get exec/FlxProc get
+exec}{1183615869 userdict/internaldict get exec/FlxProc get exec}ifelse}if}
+executeonly def/F1Subr{gsave currentpoint newpath moveto}bind def/F2Subr{
+currentpoint grestore gsave currentpoint newpath moveto}bind def/HSSubr{
+systemdict/internaldict known not{pop 3}{1183615869 systemdict/internaldict
+get exec dup/startlock known{/startlock get exec}{dup/strtlck known{/strtlck
+get exec}{pop 3}ifelse}ifelse}ifelse}bind def end
+%%EndResource
+/currentpacking where{pop currentpacking true setpacking}if
+%%BeginResource: procset pdfvars
+%%Copyright: Copyright 1987-2001 Adobe Systems Incorporated. All Rights Reserved.
+%%Version: 5.0 6
+%%Title: definition of dictionary of variables used by PDF & PDFText procsets
+userdict /PDF 160 dict put
+userdict /PDFVars 89 dict dup begin put
+/docSetupDone false def
+/InitAll 0 def
+/TermAll 0 def
+/DocInitAll 0 def
+/DocTermAll 0 def
+/_pdfEncodings 2 array def
+/_pdf_str1 1 string def
+/_pdf_i 0 def
+/_pdf_na 0 def
+/_pdf_showproc 0 def
+/_italMtx [1 0 .212557 1 0 0] def
+/_italMtx_WMode1 [1 -.212557 0 1 0 0] def
+/_italMtxType0 [1 0 .1062785 1 0 0] def
+/_italMtx_WMode1Type0 [1 -.1062785 0 1 0 0] def
+/_basefont 0 def
+/_basefonto 0 def
+/_pdf_oldCIDInit null def
+/_pdf_FontDirectory 30 dict def
+/_categories 10 dict def
+/_sa? true def
+/_ColorSep5044? false def
+/nulldict 0 dict def
+/_processColors 0 def
+/overprintstack null def
+/_defaulttransfer currenttransfer def
+/_defaultflatness currentflat def
+/_defaulthalftone null def
+/_defaultcolortransfer null def
+/_defaultblackgeneration null def
+/_defaultundercolorremoval null def
+/_defaultcolortransfer null def
+PDF begin
+[/c/cs/cm/d/d0/f/h/i/j/J/l/m/M/n/q/Q/re/ri/S/sc/sh/Tf/w/W
+/applyInterpFunc/applystitchFunc/domainClip/encodeInput
+/initgs/int/limit/rangeClip
+/defineRes/findRes/setSA/pl
+%% to keep CoolType entries in GlyphDirProcs safe from collisions with Win PS driver
+/? /! /| /: /+ /GetGlyphDirectory
+/pdf_flushFilters /pdf_readstring /pdf_dictOp /pdf_image /pdf_maskedImage
+/pdf_shfill /pdf_sethalftone
+] {null def} bind forall
+end
+end
+%%EndResource
+PDFVars begin PDF begin
+%%BeginResource: procset pdfutil
+%%Copyright: Copyright 1993-1999 Adobe Systems Incorporated. All Rights Reserved.
+%%Version: 4.0 2
+%%Title: Basic utilities used by other PDF procsets
+/bd {bind def} bind def
+/ld {load def} bd
+/bld {
+dup length dict begin
+{ null def } forall
+bind
+end
+def
+} bd
+/dd { PDFVars 3 1 roll put } bd
+/xdd { exch dd } bd
+/Level2?
+systemdict /languagelevel known
+{ systemdict /languagelevel get 2 ge } { false } ifelse
+def
+/Level1? Level2? not def
+/Level3?
+systemdict /languagelevel known
+{systemdict /languagelevel get 3 eq } { false } ifelse
+def
+/getifknown {
+2 copy known { get true } { pop pop false } ifelse
+} bd
+/here {
+currentdict exch getifknown
+} bd
+/isdefined? { where { pop true } { false } ifelse } bd
+%%EndResource
+%%BeginResource: l2compat
+%%Version: 5.0 9
+%%Copyright: Copyright 1987-2001 Adobe Systems Incorporated. All Rights Reserved.
+%%LanguageLevel: 1
+%%Title: Level 1 emulation of level 2 operators
+/setcmykcolor isdefined? not
+{
+/setcmykcolor {
+1 sub 4 1 roll
+3 {
+3 index add neg dup 0 lt { pop 0 } if
+3 1 roll
+} repeat
+setrgbcolor
+pop
+} bd
+} if
+/rectclip isdefined? not
+{
+/rectclip { newpath re clip newpath } bd
+} if
+/rectfill isdefined? not
+{
+/rectfill { gsave newpath re fill grestore } bd
+} if
+/sethalftone isdefined? not
+{
+/sethalftone {
+begin
+HalftoneType 1 eq
+{ Frequency Angle /SpotFunction load setscreen }
+if
+end
+} bd
+} if
+Level1?
+{
+/pdf_show {show} bd
+/xshow
+{
+PDFVars /_pdf_showproc /pdf_show load put
+pdf_xshow
+} bd
+/yshow
+{
+PDFVars /_pdf_showproc /pdf_show load put
+pdf_yshow
+} bd
+/xyshow
+{
+PDFVars /_pdf_showproc /pdf_show load put
+pdf_xyshow
+} bd
+} if
+%%EndResource
+%%BeginResource: procset pdf
+%%Version: 5.0 6
+%%Copyright: Copyright 1998-2001 Adobe Systems Incorporated. All Rights Reserved.
+%%Title: General operators for PDF, common to all Language Levels.
+/cm { matrix astore concat } bd
+/d /setdash ld
+/f /fill ld
+/h /closepath ld
+/i {dup 0 eq {pop _defaultflatness} if setflat} bd
+/j /setlinejoin ld
+/J /setlinecap ld
+/M /setmiterlimit ld
+/n /newpath ld
+/S /stroke ld
+/w /setlinewidth ld
+/W /clip ld
+/initgs {
+0 setgray
+[] 0 d
+0 j
+0 J
+10 M
+1 w
+false setSA
+/_defaulttransfer load settransfer
+0 i
+/RelativeColorimetric ri
+newpath
+} bd
+/int {
+dup 2 index sub 3 index 5 index sub div 6 -2 roll sub mul
+exch pop add exch pop
+} bd
+/limit {
+dup 2 index le { exch } if pop
+dup 2 index ge { exch } if pop
+} bd
+/domainClip {
+Domain aload pop 3 2 roll
+limit
+} [/Domain] bld
+/applyInterpFunc {
+0 1 DimOut 1 sub
+{
+dup C0 exch get exch
+dup C1 exch get exch
+3 1 roll
+1 index sub
+3 index
+N exp mul add
+exch
+currentdict /Range_lo known
+{
+dup Range_lo exch get exch
+Range_hi exch get
+3 2 roll limit
+}
+{
+pop
+}
+ifelse
+exch
+} for
+pop
+} [/DimOut /C0 /C1 /N /Range_lo /Range_hi] bld
+/encodeInput {
+NumParts 1 sub
+0 1 2 index
+{
+dup Bounds exch get
+2 index gt
+{ exit }
+{ dup
+3 index eq
+{ exit }
+{ pop } ifelse
+} ifelse
+} for
+3 2 roll pop
+dup Bounds exch get exch
+dup 1 add Bounds exch get exch
+2 mul
+dup Encode exch get exch
+1 add Encode exch get
+int
+} [/NumParts /Bounds /Encode] bld
+/rangeClip {
+exch dup Range_lo exch get
+exch Range_hi exch get
+3 2 roll
+limit
+} [/Range_lo /Range_hi] bld
+/applyStitchFunc {
+Functions exch get exec
+currentdict /Range_lo known {
+0 1 DimOut 1 sub {
+DimOut 1 add -1 roll
+rangeClip
+} for
+} if
+} [/Functions /Range_lo /DimOut] bld
+/pdf_flushfilters
+{
+aload length
+{ dup status
+1 index currentfile ne and
+{ dup flushfile closefile }
+{ pop }
+ifelse
+} repeat
+} bd
+/pdf_readstring
+{
+1 index dup length 1 sub get
+exch readstring pop
+exch pdf_flushfilters
+} bind def
+/pdf_dictOp
+{
+3 2 roll
+10 dict copy
+begin
+_Filters dup length 1 sub get def
+currentdict exch exec
+_Filters pdf_flushfilters
+end
+} [/_Filters] bld
+/pdf_image {{image} /DataSource pdf_dictOp} bd
+/pdf_imagemask {{imagemask} /DataSource pdf_dictOp} bd
+/pdf_shfill {{sh} /DataSource pdf_dictOp} bd
+/pdf_sethalftone {{sethalftone} /Thresholds pdf_dictOp} bd
+/pdf_maskedImage
+{
+10 dict copy begin
+/miDict currentdict def
+/DataDict DataDict 10 dict copy def
+DataDict begin
+/DataSource
+_Filters dup length 1 sub get
+def
+miDict image
+_Filters pdf_flushfilters
+end
+end
+} [/miDict /DataDict /_Filters] bld
+%%EndResource
+%%BeginResource: procset sep_ops
+%%Version: 4.0 1
+%%Copyright: Copyright 1987-1999 Adobe Systems Incorporated. All Rights Reserved.
+%%Title: Support for Separations in Level 1, following the conventions of Tech Note 5044
+userdict /sep_ops 50 dict dup begin put
+/bdef {bind def} bind def
+/xdef {exch def} bdef
+/colorimagebuffer {
+0 1 2 index length 1 sub {
+dup 2 index exch get 255 exch sub 2 index 3 1 roll put
+} for
+} bdef
+/addprocs {
+[ 3 1 roll
+/exec load
+dup 3 1 roll
+] cvx
+} bdef
+/L1? {
+systemdict /languagelevel known {
+systemdict /languagelevel get 2 lt
+}{
+true
+} ifelse
+} bdef
+/colorexists {
+statusdict /processcolors known {
+statusdict /processcolors get exec
+}{
+/deviceinfo where {
+pop deviceinfo /Colors known {
+deviceinfo /Colors get
+statusdict /processcolors {
+deviceinfo /Colors known {
+deviceinfo /Colors get
+}{
+1
+} ifelse
+} put
+}{
+1
+} ifelse
+}{
+1
+} ifelse
+} ifelse
+1 gt
+} bdef
+/colorplate colorexists { 0 } { 5 } ifelse def
+/negativecolorplate false def
+/setcmykcolor where {
+pop
+gsave
+1 0 0 0 setcmykcolor systemdict /currentgray get exec 1 exch sub
+0 1 0 0 setcmykcolor systemdict /currentgray get exec 1 exch sub
+0 0 1 0 setcmykcolor systemdict /currentgray get exec 1 exch sub
+0 0 0 1 setcmykcolor systemdict /currentgray get exec 1 exch sub
+4 {4 copy} repeat
+grestore
+1 dict begin
+/foureq {
+4 index eq 8 1 roll
+4 index eq 8 1 roll
+4 index eq 8 1 roll
+4 index eq 8 1 roll
+pop pop pop pop and and and
+} def
+1 0 0 0 foureq {/colorplate 1 store} if
+0 1 0 0 foureq {/colorplate 2 store} if
+0 0 1 0 foureq {/colorplate 3 store} if
+0 0 0 1 foureq {/colorplate 4 store} if
+0 0 0 0 foureq {/colorplate 6 store} if
+end
+} if
+0 systemdict /currenttransfer get exec exec
+1 systemdict /currenttransfer get exec exec
+2 copy
+eq
+{
+/colorplate 6 store
+pop
+/negativecolorplate exch 0.5 lt store
+}
+{
+gt /negativecolorplate exch store
+}
+ifelse
+/findcmykcustomcolor where { pop }
+{
+/findcmykcustomcolor {
+[ 6 1 roll ] readonly
+} bdef
+} ifelse
+/setoverprint where {
+pop
+}{
+/setoverprint {
+pop
+} bdef
+} ifelse
+/currentoverprint where {
+pop
+}{
+/currentoverprint {
+false
+} bdef
+} ifelse
+/setcustomcolor where {
+pop
+}{
+L1? {
+/setcustomcolor {
+exch
+aload pop pop
+4 { 4 index mul 4 1 roll } repeat
+5 -1 roll pop
+setcmykcolor
+} bdef
+}{
+/setcustomcolor {
+exch
+[ exch /Separation exch dup 4 get exch /DeviceCMYK exch
+0 4 getinterval
+[ exch /dup load exch cvx {mul exch dup}
+/forall load /pop load dup] cvx
+] setcolorspace setcolor
+} bdef
+} ifelse
+} ifelse
+/ik 0 def
+/iy 0 def
+/im 0 def
+/ic 0 def
+/imagetint {
+ic .3 mul
+im .59 mul
+iy .11 mul
+ik add add add dup
+1 gt {pop 1} if
+} bdef
+/setcmykcolor where {
+pop
+}{
+/setcmykcolor {
+/ik xdef /iy xdef /im xdef /ic xdef
+imagetint
+1 exch sub setgray
+} bdef
+} ifelse
+/customcolorimage where {
+pop
+}{
+L1? {
+/customcolorimage{
+gsave
+colorexists {
+aload pop pop
+/ik xdef /iy xdef /im xdef /ic xdef
+currentcolortransfer
+{ik mul ik sub 1 add} addprocs
+4 1 roll {iy mul iy sub 1 add} addprocs
+4 1 roll {im mul im sub 1 add} addprocs
+4 1 roll {ic mul ic sub 1 add} addprocs
+4 1 roll setcolortransfer
+/magentabuf 0 string def
+/yellowbuf 0 string def
+/blackbuf 0 string def
+{
+colorimagebuffer dup length magentabuf length ne
+{
+dup length dup dup
+/magentabuf exch string def
+/yellowbuf exch string def
+/blackbuf exch string def
+} if
+dup magentabuf copy yellowbuf copy
+blackbuf copy pop
+} addprocs
+{magentabuf}{yellowbuf}{blackbuf} true 4 colorimage
+}{
+aload pop pop /ik xdef /iy xdef /im xdef /ic xdef /tint
+imagetint def
+currenttransfer
+{tint mul 1 tint sub add} addprocs settransfer image
+} ifelse
+grestore
+} bdef
+}{
+/customcolorimage {
+gsave
+[ exch /Separation exch dup 4 get exch /DeviceCMYK exch
+0 4 getinterval
+[ exch /dup load exch cvx {mul exch dup}
+/forall load /pop load dup] cvx
+] setcolorspace
+10 dict begin
+/ImageType 1 def
+/DataSource exch def
+/ImageMatrix exch def
+/BitsPerComponent exch def
+/Height exch def
+/Width exch def
+/Decode [1 0] def
+currentdict end
+image
+grestore
+} bdef
+} ifelse
+} ifelse
+/setseparationgray where {
+pop
+}{
+L1? {
+/setseparationgray { 1 exch sub dup dup dup setcmykcolor } bdef
+}{
+/setseparationgray {
+[/Separation /All /DeviceCMYK {dup dup dup}] setcolorspace
+1 exch sub setcolor
+} bdef
+} ifelse
+} ifelse
+/separationimage where { pop }
+{
+/separationimage {
+gsave
+1 1 1 1 (All)
+findcmykcustomcolor customcolorimage
+grestore
+} bdef
+} ifelse
+currentdict readonly pop end
+%%EndResource
+%%BeginResource: procset pdflev15044
+%%Version: 5.0 12
+%%Copyright: Copyright 1987-2001 Adobe Systems Incorporated. All Rights Reserved.
+%%LanguageLevel: 1
+%%Title: PDF operators, Level 1, with emulated separations (TN 5044)
+/_ColorSep5044? true dd
+/docinitialize {
+PDF begin
+/_defaulthalftone
+/currenthalftone where
+{ pop currenthalftone }
+{ 4 dict dup begin
+currentscreen
+/SpotFunction exch def
+/Angle exch def
+/Frequency exch def
+/HalftoneType 1 def
+end }
+ifelse
+dd
+/currentcolortransfer where
+{ pop /_defaultcolortransfer [ currentcolortransfer ] dd }
+{ /_defaultcolortransfer [currenttransfer dup dup dup] dd }
+ifelse
+end
+} bd
+/initialize {
+/overprintstack null dd
+sep_ops begin
+50 dict begin
+_defaulthalftone sethalftone
+} bd
+/terminate {
+end end
+} bd
+/currentcolortransfer where
+{ pop }
+{
+/setcolortransfer
+{
+settransfer pop pop pop
+} bd
+} ifelse
+/pl {
+transform
+0.25 sub round 0.25 add exch
+0.25 sub round 0.25 add exch
+itransform
+} bd
+/m { _sa? { pl } if moveto } bd
+/l { _sa? { pl } if lineto } bd
+/c
+{
+_sa? {3 {pl 6 2 roll} repeat} if
+curveto
+} bd
+/ri/pop ld
+/setSA { /_sa? xdd } bd
+/re
+{
+_sa?
+{
+8 dict begin
+/:h exch def
+/:w exch def
+/:y exch def
+/:x exch def
+:x :y pl
+/:ymin exch def /:xmin exch def
+:x :w add :y :h add pl
+/:ymax exch def /:xmax exch def
+:xmin :ymin moveto
+:xmax :ymin lineto
+:xmax :ymax lineto
+:xmin :ymax lineto
+closepath
+end
+}
+{
+4 2 roll moveto
+1 index 0 rlineto
+0 exch rlineto
+neg 0 rlineto
+closepath
+} ifelse
+} bd
+/q
+{
+gsave
+[currentoverprint overprintstack] /overprintstack xdd
+}
+[/overprintstack] bld
+/Q
+{
+overprintstack aload pop /overprintstack xdd setoverprint
+grestore
+}
+[/overprintstack] bld
+/AlmostFull?
+{ dup maxlength exch length sub 2 le
+} bd
+/Expand
+{ 1 index maxlength mul cvi dict
+dup begin exch { def } forall end
+} bd
+/xput
+{ 3 2 roll
+dup 3 index known not
+{ dup AlmostFull? { 1.5 Expand } if
+} if
+dup 4 2 roll put
+} bd
+/defineRes
+{ _categories 1 index known not
+{ /_categories _categories 2 index 10 dict xput store
+} if
+_categories exch 2 copy get 5 -1 roll 4 index xput put
+} bd
+/findRes {
+_categories exch get exch get
+} bd
+/L1setcolor {
+aload length
+dup 0 eq
+{ pop .5 setgray }
+{ dup 1 eq
+{ pop setgray }
+{ 3 eq
+{ setrgbcolor }
+{ setcmykcolor }
+ifelse }
+ifelse }
+ifelse
+} bind dd
+/concattransferfuncs {
+[ 3 1 roll /exec load exch /exec load ] cvx
+} bd
+/concatandsettransfer {
+/_defaulttransfer load concattransferfuncs settransfer
+} bd
+/concatandsetcolortransfer {
+colorplate 0 eq
+{
+_defaultcolortransfer aload pop
+8 -1 roll 5 -1 roll concattransferfuncs 7 1 roll
+6 -1 roll 4 -1 roll concattransferfuncs 5 1 roll
+4 -1 roll 3 -1 roll concattransferfuncs 3 1 roll
+concattransferfuncs
+setcolortransfer
+} if
+colorplate 1 ge colorplate 4 le and
+{
+4 colorplate sub index 4 { exch pop } repeat
+concatandsettransfer
+} if
+colorplate 5 ge
+{
+0 index 4 { exch pop } repeat
+concatandsettransfer
+} if
+} bd
+/tn5044sethalftone
+{
+begin
+HalftoneType 5 eq
+{ [/Default /Cyan /Magenta /Yellow /Black /Default /Default /Default]
+colorplate get
+here not {
+/Default here not { currentdict } if
+} if
+}
+{ currentdict }
+ifelse
+end
+begin
+/TransferFunction here
+{
+concatandsettransfer
+currentdict dup length dict
+begin
+{
+1 index /TransferFunction ne { def } { pop pop } ifelse
+} forall
+currentdict
+end
+}
+{
+currentdict
+} ifelse
+end
+sethalftone
+} bd
+/paintimage
+{
+colorplate 0 eq
+{
+{ {currentfile cyanstr readstring pop}
+{currentfile magentastr readstring pop}
+{currentfile yellowstr readstring pop}
+{currentfile blackstr readstring pop
+currentfile graystr readstring pop pop}
+}
+{ {currentfile cyanstr readhexstring pop}
+{currentfile magentastr readhexstring pop}
+{currentfile yellowstr readhexstring pop}
+{currentfile blackstr readhexstring pop
+currentfile graystr readhexstring pop pop}
+} ifelse
+true 4 colorimage
+}
+{
+3 dict begin
+/binaryOK exch def
+[
+1 1 5 {
+dup
+/currentfile cvx
+[ /cyanstr /magentastr /yellowstr /blackstr /graystr ]
+3 -1 roll 1 sub get cvx
+binaryOK { /readstring } { /readhexstring } ifelse cvx
+/pop cvx
+5 -1 roll
+colorplate dup 5 gt { pop 5 } if
+eq not { /pop cvx } if
+} for
+] cvx bind
+end
+[
+colorplate 6 eq {
+/pop cvx
+negativecolorplate { 0 } { 1 } ifelse
+} if
+colorplate 4 le
+{
+1 /exch cvx /sub cvx
+} if
+colorplate 6 ne
+{
+systemdict /currenttransfer get exec
+aload pop
+} if
+] cvx
+gsave
+systemdict /settransfer get exec
+systemdict /image get exec
+grestore
+} ifelse
+} bd
+/getrampcolor {
+/indx exch def
+[
+0 1 NumComp 1 sub {
+dup
+Samples exch get
+dup type /stringtype eq { indx get } if
+exch
+Scaling exch get aload pop
+3 1 roll
+mul add
+} for
+]
+L1setcolor
+} bd
+/GenStrips {
+40 dict begin
+/background exch def
+/ext1 exch def
+/ext0 exch def
+/BBox exch def
+/y2 exch def
+/x2 exch def
+/y1 exch def
+/x1 exch def
+/rampdict exch def
+gsave
+BBox length 0 gt {
+BBox 0 get BBox 1 get
+BBox 2 get BBox 0 get sub
+BBox 3 get BBox 1 get sub
+rectclip
+} if
+x1 x2 eq
+{
+y1 y2 lt {/theta 90 def}{/theta 270 def} ifelse
+}
+{
+/slope y2 y1 sub x2 x1 sub div def
+/theta slope 1 atan def
+x2 x1 lt y2 y1 ge and { /theta theta 180 sub def} if
+x2 x1 lt y2 y1 le and { /theta theta 180 add def} if
+}
+ifelse
+gsave
+clippath
+x1 y1 translate
+theta rotate
+{ pathbbox } stopped
+{ 0 0 0 0 } if
+/yMax exch def
+/xMax exch def
+/yMin exch def
+/xMin exch def
+grestore
+xMax xMin eq yMax yMin eq or
+{
+grestore
+end
+}
+{
+rampdict begin
+20 dict begin
+background length 0 gt { background L1setcolor gsave clippath fill grestore } if
+gsave
+x1 y1 translate
+theta rotate
+/xStart 0 def
+/xEnd x2 x1 sub dup mul y2 y1 sub dup mul add 0.5 exp def
+/ySpan yMax yMin sub def
+/numsteps NumSamples def
+/rampIndxInc 1 def
+/subsampling false def
+xStart 0 transform
+xEnd 0 transform
+3 -1 roll
+sub dup mul
+3 1 roll
+sub dup mul
+add 0.5 exp 72 div
+0 72 matrix defaultmatrix dtransform dup mul exch dup mul add sqrt
+72 0 matrix defaultmatrix dtransform dup mul exch dup mul add sqrt
+1 index 1 index lt { exch } if pop
+mul
+/numpix exch def
+numpix 0 ne
+{
+NumSamples numpix div 0.5 gt
+{
+/numsteps numpix 2 div round cvi dup 1 le { pop 2 } if def
+/rampIndxInc NumSamples 1 sub numsteps div def
+/subsampling true def
+} if
+} if
+ext0 {
+0 getrampcolor
+xMin xStart lt
+{ xMin yMin xMin neg ySpan rectfill } if
+} if
+/xInc xEnd xStart sub numsteps div def
+/x xStart def
+0
+numsteps
+{
+dup
+subsampling { round cvi } if
+getrampcolor
+x yMin xInc ySpan rectfill
+/x x xInc add def
+rampIndxInc add
+}
+repeat
+pop
+ext1 {
+xMax xEnd gt
+{ xEnd yMin xMax xEnd sub ySpan rectfill } if
+} if
+grestore
+grestore
+end
+end
+end
+} ifelse
+} bd
+/RadialShade {
+40 dict begin
+/background exch def
+/ext1 exch def
+/ext0 exch def
+/BBox exch def
+/r2 exch def
+/c2y exch def
+/c2x exch def
+/r1 exch def
+/c1y exch def
+/c1x exch def
+/rampdict exch def
+gsave
+BBox length 0 gt {
+BBox 0 get BBox 1 get
+BBox 2 get BBox 0 get sub
+BBox 3 get BBox 1 get sub
+rectclip
+} if
+gsave
+clippath
+pathbbox
+/BByMax exch def
+/BBxMax exch def
+/BByMin exch def
+/BBxMin exch def
+grestore
+BBxMax BBxMin eq BByMax BByMin eq or
+{
+grestore
+end
+}
+{
+rampdict begin
+20 dict begin
+background length 0 gt { background L1setcolor gsave clippath fill grestore } if
+/areaOfConcern
+BBxMin BByMin BBxMax BByMax
+BBxMin BByMin
+BBxMax BBxMin sub 0
+0 BByMax BByMin sub
+BBxMin BBxMax sub 0
+12 packedarray
+< 0B 00 01 04 04 04 0A>
+2 packedarray
+def
+c1x c2x sub dup mul
+c1y c2y sub dup mul
+add 0.5 exp
+r1 add
+r2 sub
+abs
+0 dtransform
+dup mul exch dup mul add 0.5 exp 72 div
+0 72 matrix defaultmatrix dtransform dup mul exch dup mul add sqrt
+72 0 matrix defaultmatrix dtransform dup mul exch dup mul add sqrt
+1 index 1 index lt { exch } if pop
+/hires exch def
+hires mul
+/numpix exch def
+/numsteps NumSamples def
+/rampIndxInc 1 def
+/subsampling false def
+numpix 0 ne
+{
+NumSamples numpix div 0.5 gt
+{
+/numsteps numpix 2 div round cvi dup 1 le { pop 2 } if def
+/rampIndxInc NumSamples 1 sub numsteps div def
+/subsampling true def
+} if
+} if
+/xInc c2x c1x sub numsteps div def
+/yInc c2y c1y sub numsteps div def
+/rInc r2 r1 sub numsteps div def
+/cx c1x def
+/cy c1y def
+/radius r1 def
+newpath
+xInc 0 eq yInc 0 eq rInc 0 eq and and
+{
+0 getrampcolor
+cx cy radius 0 360 arc
+stroke
+NumSamples 1 sub getrampcolor
+cx cy radius 72 hires div add 0 360 arc
+0 setlinewidth
+stroke
+}
+{
+0
+numsteps
+{
+dup
+subsampling { round cvi } if
+getrampcolor
+cx cy radius 0 360 arc
+/cx cx xInc add def
+/cy cy yInc add def
+/radius radius rInc add def
+cx cy radius 360 0 arcn
+eofill
+rampIndxInc add
+}
+repeat
+pop
+} ifelse
+grestore
+end
+end
+end
+} ifelse
+} bd
+%%EndResource
+%%BeginResource: procset pdftext
+%%Version: 5.0 5
+%%Copyright: Copyright 1987-2001 Adobe Systems Incorporated. All Rights Reserved.
+%%Title: Text operators for PDF
+PDF /PDFText 78 dict dup begin put
+/docinitialize
+{
+/resourcestatus where {
+pop
+/CIDParams /ProcSet resourcestatus {
+pop pop
+false /CIDParams /ProcSet findresource /SetBuildCompatible get exec
+} if
+} if
+PDF begin
+PDFText /_pdfDefineIdentity-H known
+{ PDFText /_pdfDefineIdentity-H get exec}
+if
+end
+} bd
+/initialize {
+PDFText begin
+} bd
+/terminate { end } bd
+Level2?
+{
+/_safeput
+{
+3 -1 roll load 3 1 roll put
+}
+bd
+}
+{
+/_safeput
+{
+2 index load dup dup length exch maxlength ge
+{ dup length 5 add dict copy
+3 index xdd
+}
+{ pop }
+ifelse
+3 -1 roll load 3 1 roll put
+}
+bd
+}
+ifelse
+/pdf_has_composefont? systemdict /composefont known def
+/CopyFont {
+{
+1 index /FID ne 2 index /UniqueID ne and
+{ def } { pop pop } ifelse
+} forall
+} bd
+/Type0CopyFont
+{
+exch
+dup length dict
+begin
+CopyFont
+[
+exch
+FDepVector
+{
+dup /FontType get 0 eq
+{
+1 index Type0CopyFont
+/_pdfType0 exch definefont
+}
+{
+/_pdfBaseFont exch
+2 index exec
+}
+ifelse
+exch
+}
+forall
+pop
+]
+/FDepVector exch def
+currentdict
+end
+} bd
+Level2? {currentglobal true setglobal} if
+/cHexEncoding
+[/c00/c01/c02/c03/c04/c05/c06/c07/c08/c09/c0A/c0B/c0C/c0D/c0E/c0F/c10/c11/c12
+/c13/c14/c15/c16/c17/c18/c19/c1A/c1B/c1C/c1D/c1E/c1F/c20/c21/c22/c23/c24/c25
+/c26/c27/c28/c29/c2A/c2B/c2C/c2D/c2E/c2F/c30/c31/c32/c33/c34/c35/c36/c37/c38
+/c39/c3A/c3B/c3C/c3D/c3E/c3F/c40/c41/c42/c43/c44/c45/c46/c47/c48/c49/c4A/c4B
+/c4C/c4D/c4E/c4F/c50/c51/c52/c53/c54/c55/c56/c57/c58/c59/c5A/c5B/c5C/c5D/c5E
+/c5F/c60/c61/c62/c63/c64/c65/c66/c67/c68/c69/c6A/c6B/c6C/c6D/c6E/c6F/c70/c71
+/c72/c73/c74/c75/c76/c77/c78/c79/c7A/c7B/c7C/c7D/c7E/c7F/c80/c81/c82/c83/c84
+/c85/c86/c87/c88/c89/c8A/c8B/c8C/c8D/c8E/c8F/c90/c91/c92/c93/c94/c95/c96/c97
+/c98/c99/c9A/c9B/c9C/c9D/c9E/c9F/cA0/cA1/cA2/cA3/cA4/cA5/cA6/cA7/cA8/cA9/cAA
+/cAB/cAC/cAD/cAE/cAF/cB0/cB1/cB2/cB3/cB4/cB5/cB6/cB7/cB8/cB9/cBA/cBB/cBC/cBD
+/cBE/cBF/cC0/cC1/cC2/cC3/cC4/cC5/cC6/cC7/cC8/cC9/cCA/cCB/cCC/cCD/cCE/cCF/cD0
+/cD1/cD2/cD3/cD4/cD5/cD6/cD7/cD8/cD9/cDA/cDB/cDC/cDD/cDE/cDF/cE0/cE1/cE2/cE3
+/cE4/cE5/cE6/cE7/cE8/cE9/cEA/cEB/cEC/cED/cEE/cEF/cF0/cF1/cF2/cF3/cF4/cF5/cF6
+/cF7/cF8/cF9/cFA/cFB/cFC/cFD/cFE/cFF] def
+Level2? {setglobal} if
+/modEnc {
+/_enc xdd
+/_icode 0 dd
+counttomark 1 sub -1 0
+{
+index
+dup type /nametype eq
+{
+_enc _icode 3 -1 roll put
+_icode 1 add
+}
+if
+/_icode xdd
+} for
+cleartomark
+_enc
+} bd
+/trEnc {
+/_enc xdd
+255 -1 0 {
+exch dup -1 eq
+{ pop /.notdef }
+{ Encoding exch get }
+ifelse
+_enc 3 1 roll put
+} for
+pop
+_enc
+} bd
+/TE {
+/_i xdd
+StandardEncoding 256 array copy modEnc
+_pdfEncodings exch _i exch put
+} bd
+/TZ
+{
+/_usePDFEncoding xdd
+findfont
+dup length 6 add dict
+begin
+{
+1 index /FID ne { def } { pop pop } ifelse
+} forall
+/pdf_origFontName FontName def
+/FontName exch def
+currentdict /PaintType known
+{ PaintType 2 eq {/PaintType 0 def} if }
+if
+_usePDFEncoding 0 ge
+{
+/Encoding _pdfEncodings _usePDFEncoding get def
+pop
+}
+{
+_usePDFEncoding -1 eq
+{
+counttomark 0 eq
+{ pop }
+{
+Encoding 256 array copy
+modEnc /Encoding exch def
+}
+ifelse
+}
+{
+256 array
+trEnc /Encoding exch def
+}
+ifelse
+}
+ifelse
+pdf_EuroProcSet pdf_origFontName known
+{
+pdf_origFontName pdf_AddEuroGlyphProc
+} if
+Level2?
+{
+currentdict /pdf_origFontName undef
+} if
+FontName currentdict
+end
+definefont pop
+}
+bd
+Level2?
+{
+/TZG
+{
+currentglobal true setglobal
+2 index _pdfFontStatus
+{
+2 index findfont
+false setglobal
+3 index findfont
+true setglobal
+ne
+{
+2 index findfont dup rcheck
+{
+dup length dict begin
+{
+1 index /FID ne { def } { pop pop } ifelse
+} forall
+currentdict end
+}
+if
+3 index exch definefont pop
+}
+if
+} if
+setglobal
+TZ
+} bd
+}
+{
+/TZG {TZ} bd
+} ifelse
+Level2?
+{
+currentglobal false setglobal
+userdict /pdftext_data 5 dict put
+pdftext_data
+begin
+/saveStacks
+{
+pdftext_data
+begin
+/vmmode currentglobal def
+false setglobal
+count array astore /os exch def
+end
+countdictstack array dictstack pdftext_data exch /ds exch put
+cleardictstack pdftext_data /dscount countdictstack put
+pdftext_data /vmmode get setglobal
+} bind def
+/restoreStacks
+{
+pdftext_data /vmmode currentglobal put false setglobal
+clear cleardictstack
+pdftext_data /ds get dup
+pdftext_data /dscount get 1 2 index length 1 sub
+{ get begin dup } for
+pop pop
+pdftext_data /os get aload pop
+pdftext_data /vmmode get setglobal
+} bind def
+/testForClonePrinterBug
+{
+currentglobal true setglobal
+/undefinedCategory /Generic /Category findresource
+dup length dict copy /Category defineresource pop
+setglobal
+pdftext_data /saveStacks get exec
+pdftext_data /vmmode currentglobal put false setglobal
+/undefined /undefinedCategory { resourcestatus } stopped
+pdftext_data exch /bugFound exch put
+pdftext_data /vmmode get setglobal
+pdftext_data /restoreStacks get exec
+pdftext_data /bugFound get
+} bind def
+end
+setglobal
+/pdf_resourcestatus
+pdftext_data /testForClonePrinterBug get exec
+{
+{
+pdftext_data /saveStacks get exec
+pdftext_data /os get dup dup length 1 sub
+dup 1 sub dup 0 lt { pop 0 } if
+exch 1 exch { get exch dup } for
+pop pop
+{ resourcestatus }
+stopped
+{
+clear cleardictstack pdftext_data /restoreStacks get exec
+{ pop pop } stopped pop false
+}
+{
+count array astore pdftext_data exch /results exch put
+pdftext_data /restoreStacks get exec pop pop
+pdftext_data /results get aload pop
+}
+ifelse
+}
+}
+{ { resourcestatus } }
+ifelse
+bd
+}
+if
+Level2?
+{
+/_pdfUndefineResource
+{
+currentglobal 3 1 roll
+_pdf_FontDirectory 2 index 2 copy known
+{undef}
+{pop pop}
+ifelse
+1 index (pdf) exch _pdfConcatNames 1 index
+1 index 1 _pdfConcatNames 1 index
+5 index 1 _pdfConcatNames 1 index
+4
+{
+2 copy pdf_resourcestatus
+{
+pop 2 lt
+{2 copy findresource gcheck setglobal undefineresource}
+{pop pop}
+ifelse
+}
+{ pop pop}
+ifelse
+} repeat
+setglobal
+} bd
+}
+{
+/_pdfUndefineResource { pop pop} bd
+}
+ifelse
+Level2?
+{
+/_pdfFontStatus
+{
+currentglobal exch
+/Font pdf_resourcestatus
+{pop pop true}
+{false}
+ifelse
+exch setglobal
+} bd
+}
+{
+/_pdfFontStatusString 50 string def
+_pdfFontStatusString 0 (fonts/) putinterval
+/_pdfFontStatus
+{
+FontDirectory 1 index known
+{ pop true }
+{
+_pdfFontStatusString 6 42 getinterval
+cvs length 6 add
+_pdfFontStatusString exch 0 exch getinterval
+{ status } stopped
+{pop false}
+{
+{ pop pop pop pop true}
+{ false }
+ifelse
+}
+ifelse
+}
+ifelse
+} bd
+}
+ifelse
+Level2?
+{
+/_pdfCIDFontStatus
+{
+/CIDFont /Category pdf_resourcestatus
+{
+pop pop
+/CIDFont pdf_resourcestatus
+{pop pop true}
+{false}
+ifelse
+}
+{ pop false }
+ifelse
+} bd
+}
+if
+/_pdfString100 100 string def
+/_pdfComposeFontName
+{
+dup length 1 eq
+{
+0 get
+1 index
+type /nametype eq
+{
+_pdfString100 cvs
+length dup dup _pdfString100 exch (-) putinterval
+_pdfString100 exch 1 add dup _pdfString100 length exch sub getinterval
+2 index exch cvs length
+add 1 add _pdfString100 exch 0 exch getinterval
+exch pop
+true
+}
+{
+pop pop
+false
+}
+ifelse
+}
+{
+false
+}
+ifelse
+dup {exch cvn exch} if
+} bd
+/_pdfConcatNames
+{
+exch
+_pdfString100 cvs
+length dup dup _pdfString100 exch (-) putinterval
+_pdfString100 exch 1 add dup _pdfString100 length exch sub getinterval
+3 -1 roll exch cvs length
+add 1 add _pdfString100 exch 0 exch getinterval
+cvn
+} bind def
+/_pdfTextTempString 50 string def
+/_pdfRegOrderingArray [(Adobe-Japan1) (Adobe-CNS1) (Adobe-Korea1) (Adobe-GB1)] def
+/_pdf_CheckCIDSystemInfo
+{
+1 index _pdfTextTempString cvs
+(Identity) anchorsearch
+{
+pop pop pop pop true
+}
+{
+false
+_pdfRegOrderingArray
+{
+2 index exch
+anchorsearch
+{ pop pop pop true exit}
+{ pop }
+ifelse
+}
+forall
+exch pop
+exch /CIDFont findresource
+/CIDSystemInfo get
+3 -1 roll /CMap findresource
+/CIDSystemInfo get
+exch
+3 -1 roll
+{
+2 copy
+/Supplement get
+exch
+dup type /dicttype eq
+{/Supplement get}
+{pop 0 }
+ifelse
+ge
+}
+{ true }
+ifelse
+{
+dup /Registry get
+2 index /Registry get eq
+{
+/Ordering get
+exch /Ordering get
+dup type /arraytype eq
+{
+1 index type /arraytype eq
+{
+true
+1 index length 1 sub -1 0
+{
+dup 2 index exch get exch 3 index exch get ne
+{ pop false exit}
+if
+} for
+exch pop exch pop
+}
+{ pop pop false }
+ifelse
+}
+{
+eq
+}
+ifelse
+}
+{ pop pop false }
+ifelse
+}
+{ pop pop false }
+ifelse
+}
+ifelse
+} bind def
+pdf_has_composefont?
+{
+/_pdfComposeFont
+{
+2 copy _pdfComposeFontName not
+{
+2 index
+}
+if
+(pdf) exch _pdfConcatNames
+dup _pdfFontStatus
+{ dup findfont 5 2 roll pop pop pop true}
+{
+4 1 roll
+1 index /CMap pdf_resourcestatus
+{
+pop pop
+true
+}
+{false}
+ifelse
+1 index true exch
+{
+_pdfCIDFontStatus not
+{pop false exit}
+if
+}
+forall
+and
+{
+1 index 1 index 0 get _pdf_CheckCIDSystemInfo
+{
+3 -1 roll pop
+2 index 3 1 roll
+composefont true
+}
+{
+pop pop exch pop false
+}
+ifelse
+}
+{
+_pdfComposeFontName
+{
+dup _pdfFontStatus
+{
+exch pop
+1 index exch
+findfont definefont true
+}
+{
+pop exch pop
+false
+}
+ifelse
+}
+{
+exch pop
+false
+}
+ifelse
+}
+ifelse
+{ true }
+{
+dup _pdfFontStatus
+{ dup findfont true }
+{ pop false }
+ifelse
+}
+ifelse
+}
+ifelse
+} bd
+}
+{
+/_pdfComposeFont
+{
+_pdfComposeFontName not
+{
+dup
+}
+if
+dup
+_pdfFontStatus
+{exch pop dup findfont true}
+{
+1 index
+dup type /nametype eq
+{pop}
+{cvn}
+ifelse
+eq
+{pop false}
+{
+dup _pdfFontStatus
+{dup findfont true}
+{pop false}
+ifelse
+}
+ifelse
+}
+ifelse
+} bd
+}
+ifelse
+/_pdfStyleDicts 4 dict dup begin
+/Adobe-Japan1 4 dict dup begin
+Level2?
+{
+/Serif
+/HeiseiMin-W3-83pv-RKSJ-H _pdfFontStatus
+{/HeiseiMin-W3}
+{
+/HeiseiMin-W3 _pdfCIDFontStatus
+{/HeiseiMin-W3}
+{/Ryumin-Light}
+ifelse
+}
+ifelse
+def
+/SansSerif
+/HeiseiKakuGo-W5-83pv-RKSJ-H _pdfFontStatus
+{/HeiseiKakuGo-W5}
+{
+/HeiseiKakuGo-W5 _pdfCIDFontStatus
+{/HeiseiKakuGo-W5}
+{/GothicBBB-Medium}
+ifelse
+}
+ifelse
+def
+/HeiseiMaruGo-W4-83pv-RKSJ-H _pdfFontStatus
+{/HeiseiMaruGo-W4}
+{
+/HeiseiMaruGo-W4 _pdfCIDFontStatus
+{/HeiseiMaruGo-W4}
+{
+/Jun101-Light-RKSJ-H _pdfFontStatus
+{ /Jun101-Light }
+{ SansSerif }
+ifelse
+}
+ifelse
+}
+ifelse
+/RoundSansSerif exch def
+/Default Serif def
+}
+{
+/Serif /Ryumin-Light def
+/SansSerif /GothicBBB-Medium def
+{
+(fonts/Jun101-Light-83pv-RKSJ-H) status
+}stopped
+{pop}{
+{ pop pop pop pop /Jun101-Light }
+{ SansSerif }
+ifelse
+/RoundSansSerif exch def
+}ifelse
+/Default Serif def
+}
+ifelse
+end
+def
+/Adobe-Korea1 4 dict dup begin
+/Serif /HYSMyeongJo-Medium def
+/SansSerif /HYGoThic-Medium def
+/RoundSansSerif SansSerif def
+/Default Serif def
+end
+def
+/Adobe-GB1 4 dict dup begin
+/Serif /STSong-Light def
+/SansSerif /STHeiti-Regular def
+/RoundSansSerif SansSerif def
+/Default Serif def
+end
+def
+/Adobe-CNS1 4 dict dup begin
+/Serif /MKai-Medium def
+/SansSerif /MHei-Medium def
+/RoundSansSerif SansSerif def
+/Default Serif def
+end
+def
+end
+def
+/TZzero
+{
+/_wmode xdd
+/_styleArr xdd
+/_regOrdering xdd
+3 copy
+_pdfComposeFont
+{
+5 2 roll pop pop pop
+}
+{
+[
+0 1 _styleArr length 1 sub
+{
+_styleArr exch get
+_pdfStyleDicts _regOrdering 2 copy known
+{
+get
+exch 2 copy known not
+{ pop /Default }
+if
+get
+}
+{
+pop pop pop /Unknown
+}
+ifelse
+}
+for
+]
+exch pop
+2 index 3 1 roll
+_pdfComposeFont
+{3 -1 roll pop}
+{
+findfont dup /FontName get exch
+}
+ifelse
+}
+ifelse
+dup /WMode 2 copy known
+{ get _wmode ne }
+{ pop pop _wmode 1 eq}
+ifelse
+{
+exch _wmode _pdfConcatNames
+dup _pdfFontStatus
+{ exch pop dup findfont false}
+{ exch true }
+ifelse
+}
+{
+dup /FontType get 0 ne
+}
+ifelse
+{
+dup /FontType get 3 eq _wmode 1 eq and
+{
+_pdfVerticalRomanT3Font dup length 10 add dict copy
+begin
+/_basefont exch
+dup length 3 add dict
+begin
+{1 index /FID ne {def}{pop pop} ifelse }
+forall
+/Encoding Encoding dup length array copy
+dup 16#27 /quotesingle put
+dup 16#60 /grave put
+_regOrdering /Adobe-Japan1 eq
+{dup 16#5c /yen put dup 16#a5 /yen put dup 16#b4 /yen put}
+if
+def
+FontName
+currentdict
+end
+definefont
+def
+/Encoding _basefont /Encoding get def
+/_fauxfont true def
+}
+{
+dup length 3 add dict
+begin
+{1 index /FID ne {def}{pop pop} ifelse }
+forall
+FontType 0 ne
+{
+/Encoding Encoding dup length array copy
+dup 16#27 /quotesingle put
+dup 16#60 /grave put
+_regOrdering /Adobe-Japan1 eq
+{dup 16#5c /yen put}
+if
+def
+/_fauxfont true def
+} if
+} ifelse
+/WMode _wmode def
+dup dup /FontName exch def
+currentdict
+end
+definefont pop
+}
+{
+pop
+}
+ifelse
+/_pdf_FontDirectory 3 1 roll _safeput
+}
+bd
+Level2?
+{
+/Tf {
+_pdf_FontDirectory 2 index 2 copy known
+{get exch 3 -1 roll pop}
+{pop pop}
+ifelse
+selectfont
+} bd
+}
+{
+/Tf {
+_pdf_FontDirectory 2 index 2 copy known
+{get exch 3 -1 roll pop}
+{pop pop}
+ifelse
+exch findfont exch
+dup type /arraytype eq
+{makefont}
+{scalefont}
+ifelse
+setfont
+} bd
+}
+ifelse
+/cshow where
+{
+pop /pdf_cshow /cshow load dd
+/pdf_remove2 {pop pop} dd
+}
+{
+/pdf_cshow {exch forall} dd
+/pdf_remove2 {} dd
+} ifelse
+/pdf_xshow
+{
+/_pdf_na xdd
+/_pdf_i 0 dd
+currentpoint
+/_pdf_y xdd
+/_pdf_x xdd
+{
+pdf_remove2
+_pdf_str1 exch 0 exch put
+_pdf_str1 /_pdf_showproc load exec
+{_pdf_na _pdf_i get} stopped
+{ pop pop }
+{
+_pdf_x _pdf_y moveto
+0
+rmoveto
+}
+ifelse
+_pdf_i 1 add /_pdf_i xdd
+currentpoint
+/_pdf_y xdd
+/_pdf_x xdd
+}
+exch
+pdf_cshow
+} bd
+/pdf_yshow
+{
+/_pdf_na xdd
+/_pdf_i 0 dd
+currentpoint
+/_pdf_y xdd
+/_pdf_x xdd
+{
+pdf_remove2
+_pdf_str1 exch 0 exch put
+_pdf_str1 /_pdf_showproc load exec
+{_pdf_na _pdf_i get} stopped
+{ pop pop }
+{
+_pdf_x _pdf_y moveto
+0 exch
+rmoveto
+}
+ifelse
+_pdf_i 1 add /_pdf_i xdd
+currentpoint
+/_pdf_y xdd
+/_pdf_x xdd
+}
+exch
+pdf_cshow
+} bd
+/pdf_xyshow
+{
+/_pdf_na xdd
+/_pdf_i 0 dd
+currentpoint
+/_pdf_y xdd
+/_pdf_x xdd
+{
+pdf_remove2
+_pdf_str1 exch 0 exch put
+_pdf_str1 /_pdf_showproc load exec
+{_pdf_na _pdf_i get} stopped
+{ pop pop }
+{
+{_pdf_na _pdf_i 1 add get} stopped
+{ pop pop pop}
+{
+_pdf_x _pdf_y moveto
+rmoveto
+}
+ifelse
+}
+ifelse
+_pdf_i 2 add /_pdf_i xdd
+currentpoint
+/_pdf_y xdd
+/_pdf_x xdd
+}
+exch
+pdf_cshow
+} bd
+/pdfl1xs {/_pdf_showproc /show load dd pdf_xshow} bd
+/pdfl1ys {/_pdf_showproc /show load dd pdf_yshow} bd
+/pdfl1xys {/_pdf_showproc /show load dd pdf_xyshow} bd
+Level2? _ColorSep5044? not and
+{
+/pdfxs {{xshow} stopped {pdfl1xs} if} bd
+/pdfys {{yshow} stopped {pdfl1ys} if} bd
+/pdfxys {{xyshow} stopped {pdfl1xys} if} bd
+}
+{
+/pdfxs /pdfl1xs load dd
+/pdfys /pdfl1ys load dd
+/pdfxys /pdfl1xys load dd
+} ifelse
+/pdf_charpath {false charpath} bd
+/pdf_xcharpath {/_pdf_showproc /pdf_charpath load dd pdf_xshow} bd
+/pdf_ycharpath {/_pdf_showproc /pdf_charpath load dd pdf_yshow} bd
+/pdf_xycharpath {/_pdf_showproc /pdf_charpath load dd pdf_xyshow} bd
+/pdf_strokepath
+{
+{
+pdf_remove2
+_pdf_str1 exch 0 exch put
+_pdf_str1 false charpath
+currentpoint S moveto
+} bind
+exch pdf_cshow
+} bd
+/pdf_xstrokepath {/_pdf_showproc {pdf_charpath S} dd pdf_xshow} bd
+/pdf_ystrokepath {/_pdf_showproc {pdf_charpath S} dd pdf_yshow} bd
+/pdf_xystrokepath {/_pdf_showproc {pdf_charpath S} load dd pdf_xyshow} bd
+Level2? {currentglobal true setglobal} if
+/d0/setcharwidth ld
+/nND {{/.notdef} repeat} bd
+/T3Defs {
+/BuildChar
+{
+1 index /Encoding get exch get
+1 index /BuildGlyph get exec
+}
+def
+/BuildGlyph {
+exch begin
+GlyphProcs exch get exec
+end
+} def
+/_pdfT3Font true def
+} bd
+/_pdfBoldRomanWidthProc
+{
+stringwidth 1 index 0 ne { exch .03 add exch }if setcharwidth
+0 0
+} bd
+/_pdfType0WidthProc
+{
+dup stringwidth 0 0 moveto
+2 index true charpath pathbbox
+0 -1
+7 index 2 div .88
+setcachedevice2
+pop
+0 0
+} bd
+/_pdfType0WMode1WidthProc
+{
+dup stringwidth
+pop 2 div neg -0.88
+2 copy
+moveto
+0 -1
+5 -1 roll true charpath pathbbox
+setcachedevice
+} bd
+/_pdfBoldBaseFont
+11 dict begin
+/FontType 3 def
+/FontMatrix[1 0 0 1 0 0]def
+/FontBBox[0 0 1 1]def
+/Encoding cHexEncoding def
+/_setwidthProc /_pdfBoldRomanWidthProc load def
+/_bcstr1 1 string def
+/BuildChar
+{
+exch begin
+_basefont setfont
+_bcstr1 dup 0 4 -1 roll put
+dup
+_setwidthProc
+3 copy
+moveto
+show
+_basefonto setfont
+moveto
+show
+end
+}bd
+currentdict
+end
+def
+pdf_has_composefont?
+{
+/_pdfBoldBaseCIDFont
+11 dict begin
+/CIDFontType 1 def
+/CIDFontName /_pdfBoldBaseCIDFont def
+/FontMatrix[1 0 0 1 0 0]def
+/FontBBox[0 0 1 1]def
+/_setwidthProc /_pdfType0WidthProc load def
+/_bcstr2 2 string def
+/BuildGlyph
+{
+exch begin
+_basefont setfont
+_bcstr2 1 2 index 256 mod put
+_bcstr2 0 3 -1 roll 256 idiv put
+_bcstr2 dup _setwidthProc
+3 copy
+moveto
+show
+_basefonto setfont
+moveto
+show
+end
+}bd
+currentdict
+end
+def
+/_pdfDefineIdentity-H
+{
+/Identity-H /CMap PDFText /pdf_resourcestatus get exec
+{
+pop pop
+}
+{
+/CIDInit/ProcSet findresource begin 12 dict begin
+begincmap
+/CIDSystemInfo
+3 dict begin
+/Registry (Adobe) def
+/Ordering (Identity) def
+/Supplement 0 def
+currentdict
+end
+def
+/CMapName /Identity-H def
+/CMapVersion 1 def
+/CMapType 1 def
+1 begincodespacerange
+<0000> <ffff>
+endcodespacerange
+1 begincidrange
+<0000> <ffff> 0
+endcidrange
+endcmap
+CMapName currentdict/CMap defineresource pop
+end
+end
+} ifelse
+} def
+} if
+/_pdfVerticalRomanT3Font
+10 dict begin
+/FontType 3 def
+/FontMatrix[1 0 0 1 0 0]def
+/FontBBox[0 0 1 1]def
+/_bcstr1 1 string def
+/BuildChar
+{
+exch begin
+_basefont setfont
+_bcstr1 dup 0 4 -1 roll put
+dup
+_pdfType0WidthProc
+moveto
+show
+end
+}bd
+currentdict
+end
+def
+Level2? {setglobal} if
+/MakeBoldFont
+{
+dup /ct_SyntheticBold known
+{
+dup length 3 add dict begin
+CopyFont
+/ct_StrokeWidth .03 0 FontMatrix idtransform pop def
+/ct_SyntheticBold true def
+currentdict
+end
+definefont
+}
+{
+dup dup length 3 add dict
+begin
+CopyFont
+/PaintType 2 def
+/StrokeWidth .03 0 FontMatrix idtransform pop def
+/dummybold currentdict
+end
+definefont
+dup /FontType get dup 9 ge exch 11 le and
+{
+_pdfBoldBaseCIDFont
+dup length 3 add dict copy begin
+dup /CIDSystemInfo get /CIDSystemInfo exch def
+/_Type0Identity /Identity-H 3 -1 roll [ exch ] composefont
+/_basefont exch def
+/_Type0Identity /Identity-H 3 -1 roll [ exch ] composefont
+/_basefonto exch def
+currentdict
+end
+/CIDFont defineresource
+}
+{
+_pdfBoldBaseFont
+dup length 3 add dict copy begin
+/_basefont exch def
+/_basefonto exch def
+currentdict
+end
+definefont
+}
+ifelse
+}
+ifelse
+} bd
+/MakeBold {
+1 index
+_pdf_FontDirectory 2 index 2 copy known
+{get}
+{exch pop}
+ifelse
+findfont
+dup
+/FontType get 0 eq
+{
+dup /WMode known {dup /WMode get 1 eq }{false} ifelse
+version length 4 ge
+and
+{version 0 4 getinterval cvi 2015 ge }
+{true}
+ifelse
+{/_pdfType0WidthProc}
+{/_pdfType0WMode1WidthProc}
+ifelse
+_pdfBoldBaseFont /_setwidthProc 3 -1 roll load put
+{MakeBoldFont} Type0CopyFont definefont
+}
+{
+dup /_fauxfont known not 1 index /SubstMaster known not and
+{
+_pdfBoldBaseFont /_setwidthProc /_pdfBoldRomanWidthProc load put
+MakeBoldFont
+}
+{
+2 index 2 index eq
+{ exch pop }
+{
+dup length dict begin
+CopyFont
+currentdict
+end
+definefont
+}
+ifelse
+}
+ifelse
+}
+ifelse
+pop pop
+dup /dummybold ne
+{/_pdf_FontDirectory exch dup _safeput }
+{ pop }
+ifelse
+}bd
+/MakeItalic {
+_pdf_FontDirectory exch 2 copy known
+{get}
+{exch pop}
+ifelse
+dup findfont
+dup /FontInfo 2 copy known
+{
+get
+/ItalicAngle 2 copy known
+{get 0 eq }
+{ pop pop true}
+ifelse
+}
+{ pop pop true}
+ifelse
+{
+exch pop
+dup /FontType get 0 eq Level2? not and
+{ dup /FMapType get 6 eq }
+{ false }
+ifelse
+{
+dup /WMode 2 copy known
+{
+get 1 eq
+{ _italMtx_WMode1Type0 }
+{ _italMtxType0 }
+ifelse
+}
+{ pop pop _italMtxType0 }
+ifelse
+}
+{
+dup /WMode 2 copy known
+{
+get 1 eq
+{ _italMtx_WMode1 }
+{ _italMtx }
+ifelse
+}
+{ pop pop _italMtx }
+ifelse
+}
+ifelse
+makefont
+dup /FontType get 42 eq Level2? not or
+{
+dup length dict begin
+CopyFont
+currentdict
+end
+}
+if
+1 index exch
+definefont pop
+/_pdf_FontDirectory exch dup _safeput
+}
+{
+pop
+2 copy ne
+{
+/_pdf_FontDirectory 3 1 roll _safeput
+}
+{ pop pop }
+ifelse
+}
+ifelse
+}bd
+/MakeBoldItalic {
+/dummybold exch
+MakeBold
+/dummybold
+MakeItalic
+}bd
+Level2?
+{
+/pdf_CopyDict
+{1 index length add dict copy}
+def
+}
+{
+/pdf_CopyDict
+{
+1 index length add dict
+1 index wcheck
+{ copy }
+{ begin
+{def} forall
+currentdict
+end
+}
+ifelse
+}
+def
+}
+ifelse
+/pdf_AddEuroGlyphProc
+{
+currentdict /CharStrings known
+{
+CharStrings /Euro known not
+{
+dup
+/CharStrings
+CharStrings 1 pdf_CopyDict
+begin
+/Euro pdf_EuroProcSet 4 -1 roll get def
+currentdict
+end
+def
+/pdf_PSBuildGlyph /pdf_PSBuildGlyph load def
+/pdf_PathOps /pdf_PathOps load def
+/Symbol eq
+{
+/Encoding Encoding dup length array copy
+dup 160 /Euro put def
+}
+if
+}
+{ pop
+}
+ifelse
+}
+{ pop
+}
+ifelse
+}
+def
+Level2? {currentglobal true setglobal} if
+/pdf_PathOps 4 dict dup begin
+/m {moveto} def
+/l {lineto} def
+/c {curveto} def
+/cp {closepath} def
+end
+def
+/pdf_PSBuildGlyph
+{
+gsave
+8 -1 roll pop
+7 1 roll
+currentdict /PaintType 2 copy known {get 2 eq}{pop pop false} ifelse
+dup 9 1 roll
+{
+currentdict /StrokeWidth 2 copy known
+{
+get 2 div
+5 1 roll
+4 -1 roll 4 index sub
+4 1 roll
+3 -1 roll 4 index sub
+3 1 roll
+exch 4 index add exch
+4 index add
+5 -1 roll pop
+}
+{
+pop pop
+}
+ifelse
+}
+if
+setcachedevice
+pdf_PathOps begin
+exec
+end
+{
+currentdict /StrokeWidth 2 copy known
+{ get }
+{ pop pop 0 }
+ifelse
+setlinewidth stroke
+}
+{
+fill
+}
+ifelse
+grestore
+} def
+/pdf_EuroProcSet 13 dict def
+pdf_EuroProcSet
+begin
+/Courier-Bold
+{
+600 0 6 -12 585 612
+{
+385 274 m
+180 274 l
+179 283 179 293 179 303 c
+179 310 179 316 180 323 c
+398 323 l
+423 404 l
+197 404 l
+219 477 273 520 357 520 c
+409 520 466 490 487 454 c
+487 389 l
+579 389 l
+579 612 l
+487 612 l
+487 560 l
+449 595 394 612 349 612 c
+222 612 130 529 98 404 c
+31 404 l
+6 323 l
+86 323 l
+86 304 l
+86 294 86 284 87 274 c
+31 274 l
+6 193 l
+99 193 l
+129 77 211 -12 359 -12 c
+398 -12 509 8 585 77 c
+529 145 l
+497 123 436 80 356 80 c
+285 80 227 122 198 193 c
+360 193 l
+cp
+600 0 m
+}
+pdf_PSBuildGlyph
+} def
+/Courier-BoldOblique /Courier-Bold load def
+/Courier
+{
+600 0 17 -12 578 584
+{
+17 204 m
+97 204 l
+126 81 214 -12 361 -12 c
+440 -12 517 17 578 62 c
+554 109 l
+501 70 434 43 366 43 c
+266 43 184 101 154 204 c
+380 204 l
+400 259 l
+144 259 l
+144 270 143 281 143 292 c
+143 299 143 307 144 314 c
+418 314 l
+438 369 l
+153 369 l
+177 464 249 529 345 529 c
+415 529 484 503 522 463 c
+522 391 l
+576 391 l
+576 584 l
+522 584 l
+522 531 l
+473 566 420 584 348 584 c
+216 584 122 490 95 369 c
+37 369 l
+17 314 l
+87 314 l
+87 297 l
+87 284 88 272 89 259 c
+37 259 l
+cp
+600 0 m
+}
+pdf_PSBuildGlyph
+} def
+/Courier-Oblique /Courier load def
+/Helvetica
+{
+556 0 24 -19 541 703
+{
+541 628 m
+510 669 442 703 354 703 c
+201 703 117 607 101 444 c
+50 444 l
+25 372 l
+97 372 l
+97 301 l
+49 301 l
+24 229 l
+103 229 l
+124 67 209 -19 350 -19 c
+435 -19 501 25 509 32 c
+509 131 l
+492 105 417 60 343 60 c
+267 60 204 127 197 229 c
+406 229 l
+430 301 l
+191 301 l
+191 372 l
+455 372 l
+479 444 l
+194 444 l
+201 531 245 624 348 624 c
+433 624 484 583 509 534 c
+cp
+556 0 m
+}
+pdf_PSBuildGlyph
+} def
+/Helvetica-Oblique /Helvetica load def
+/Helvetica-Bold
+{
+556 0 12 -19 563 710
+{
+563 621 m
+537 659 463 710 363 710 c
+216 710 125 620 101 462 c
+51 462 l
+12 367 l
+92 367 l
+92 346 l
+92 337 93 328 93 319 c
+52 319 l
+12 224 l
+102 224 l
+131 58 228 -19 363 -19 c
+417 -19 471 -12 517 18 c
+517 146 l
+481 115 426 93 363 93 c
+283 93 254 166 246 224 c
+398 224 l
+438 319 l
+236 319 l
+236 367 l
+457 367 l
+497 462 l
+244 462 l
+259 552 298 598 363 598 c
+425 598 464 570 486 547 c
+507 526 513 517 517 509 c
+cp
+556 0 m
+}
+pdf_PSBuildGlyph
+} def
+/Helvetica-BoldOblique /Helvetica-Bold load def
+/Symbol
+{
+750 0 20 -12 714 685
+{
+714 581 m
+650 645 560 685 465 685 c
+304 685 165 580 128 432 c
+50 432 l
+20 369 l
+116 369 l
+115 356 115 347 115 337 c
+115 328 115 319 116 306 c
+50 306 l
+20 243 l
+128 243 l
+165 97 300 -12 465 -12 c
+560 -12 635 25 685 65 c
+685 155 l
+633 91 551 51 465 51 c
+340 51 238 131 199 243 c
+555 243 l
+585 306 l
+184 306 l
+183 317 182 326 182 336 c
+182 346 183 356 184 369 c
+614 369 l 644 432 l
+199 432 l
+233 540 340 622 465 622 c
+555 622 636 580 685 520 c
+cp
+750 0 m
+}
+pdf_PSBuildGlyph
+} def
+/Times-Bold
+{
+500 0 16 -14 478 700
+{
+367 308 m
+224 308 l
+224 368 l
+375 368 l
+380 414 l
+225 414 l
+230 589 257 653 315 653 c
+402 653 431 521 444 457 c
+473 457 l
+473 698 l
+444 697 l
+441 679 437 662 418 662 c
+393 662 365 700 310 700 c
+211 700 97 597 73 414 c
+21 414 l
+16 368 l
+69 368 l
+69 359 68 350 68 341 c
+68 330 68 319 69 308 c
+21 308 l
+16 262 l
+73 262 l
+91 119 161 -14 301 -14 c
+380 -14 443 50 478 116 c
+448 136 l
+415 84 382 40 323 40 c
+262 40 231 77 225 262 c
+362 262 l
+cp
+500 0 m
+}
+pdf_PSBuildGlyph
+} def
+/Times-BoldItalic
+{
+500 0 9 -20 542 686
+{
+542 686 m
+518 686 l
+513 673 507 660 495 660 c
+475 660 457 683 384 683 c
+285 683 170 584 122 430 c
+58 430 l
+34 369 l
+105 369 l
+101 354 92 328 90 312 c
+34 312 l
+9 251 l
+86 251 l
+85 238 84 223 84 207 c
+84 112 117 -14 272 -14 c
+326 -14 349 9 381 9 c
+393 9 393 -10 394 -20 c
+420 -20 l
+461 148 l
+429 148 l
+416 109 362 15 292 15 c
+227 15 197 55 197 128 c
+197 162 204 203 216 251 c
+378 251 l
+402 312 l
+227 312 l
+229 325 236 356 241 369 c
+425 369 l
+450 430 l
+255 430 l
+257 435 264 458 274 488 c
+298 561 337 654 394 654 c
+437 654 484 621 484 530 c
+484 516 l
+516 516 l
+cp
+500 0 m
+}
+pdf_PSBuildGlyph
+} def
+/Times-Italic
+{
+500 0 23 -10 595 692
+{
+399 317 m
+196 317 l
+199 340 203 363 209 386 c
+429 386 l
+444 424 l
+219 424 l
+246 514 307 648 418 648 c
+448 648 471 638 492 616 c
+529 576 524 529 527 479 c
+549 475 l
+595 687 l
+570 687 l
+562 674 558 664 542 664 c
+518 664 474 692 423 692 c
+275 692 162 551 116 424 c
+67 424 l
+53 386 l
+104 386 l
+98 363 93 340 90 317 c
+37 317 l
+23 279 l
+86 279 l
+85 266 85 253 85 240 c
+85 118 137 -10 277 -10 c
+370 -10 436 58 488 128 c
+466 149 l
+424 101 375 48 307 48 c
+212 48 190 160 190 234 c
+190 249 191 264 192 279 c
+384 279 l
+cp
+500 0 m
+}
+pdf_PSBuildGlyph
+} def
+/Times-Roman
+{
+500 0 10 -12 484 692
+{
+347 298 m
+171 298 l
+170 310 170 322 170 335 c
+170 362 l
+362 362 l
+374 403 l
+172 403 l
+184 580 244 642 308 642 c
+380 642 434 574 457 457 c
+481 462 l
+474 691 l
+449 691 l
+433 670 429 657 410 657 c
+394 657 360 692 299 692 c
+204 692 94 604 73 403 c
+22 403 l
+10 362 l
+70 362 l
+69 352 69 341 69 330 c
+69 319 69 308 70 298 c
+22 298 l
+10 257 l
+73 257 l
+97 57 216 -12 295 -12 c
+364 -12 427 25 484 123 c
+458 142 l
+425 101 384 37 316 37 c
+256 37 189 84 173 257 c
+335 257 l
+cp
+500 0 m
+}
+pdf_PSBuildGlyph
+} def
+end
+Level2? {setglobal} if
+currentdict readonly pop end
+%%EndResource
+PDFText begin
+[39/quotesingle 96/grave 128/Adieresis/Aring/Ccedilla/Eacute/Ntilde/Odieresis
+/Udieresis/aacute/agrave/acircumflex/adieresis/atilde/aring/ccedilla/eacute
+/egrave/ecircumflex/edieresis/iacute/igrave/icircumflex/idieresis/ntilde
+/oacute/ograve/ocircumflex/odieresis/otilde/uacute/ugrave/ucircumflex
+/udieresis/dagger/degree/cent/sterling/section/bullet/paragraph/germandbls
+/registered/copyright/trademark/acute/dieresis/.notdef/AE/Oslash
+/.notdef/plusminus/.notdef/.notdef/yen/mu/.notdef/.notdef
+/.notdef/.notdef/.notdef/ordfeminine/ordmasculine/.notdef/ae/oslash
+/questiondown/exclamdown/logicalnot/.notdef/florin/.notdef/.notdef
+/guillemotleft/guillemotright/ellipsis/space/Agrave/Atilde/Otilde/OE/oe
+/endash/emdash/quotedblleft/quotedblright/quoteleft/quoteright/divide
+/.notdef/ydieresis/Ydieresis/fraction/currency/guilsinglleft/guilsinglright
+/fi/fl/daggerdbl/periodcentered/quotesinglbase/quotedblbase/perthousand
+/Acircumflex/Ecircumflex/Aacute/Edieresis/Egrave/Iacute/Icircumflex
+/Idieresis/Igrave/Oacute/Ocircumflex/.notdef/Ograve/Uacute/Ucircumflex
+/Ugrave/dotlessi/circumflex/tilde/macron/breve/dotaccent/ring/cedilla
+/hungarumlaut/ogonek/caron
+0 TE
+[1/dotlessi/caron 39/quotesingle 96/grave 
+127/bullet/Euro/bullet/quotesinglbase/florin/quotedblbase/ellipsis
+/dagger/daggerdbl/circumflex/perthousand/Scaron/guilsinglleft/OE
+/bullet/Zcaron/bullet/bullet/quoteleft/quoteright/quotedblleft
+/quotedblright/bullet/endash/emdash/tilde/trademark/scaron
+/guilsinglright/oe/bullet/zcaron/Ydieresis/space/exclamdown/cent/sterling
+/currency/yen/brokenbar/section/dieresis/copyright/ordfeminine
+/guillemotleft/logicalnot/hyphen/registered/macron/degree/plusminus
+/twosuperior/threesuperior/acute/mu/paragraph/periodcentered/cedilla
+/onesuperior/ordmasculine/guillemotright/onequarter/onehalf/threequarters
+/questiondown/Agrave/Aacute/Acircumflex/Atilde/Adieresis/Aring/AE/Ccedilla
+/Egrave/Eacute/Ecircumflex/Edieresis/Igrave/Iacute/Icircumflex/Idieresis
+/Eth/Ntilde/Ograve/Oacute/Ocircumflex/Otilde/Odieresis/multiply/Oslash
+/Ugrave/Uacute/Ucircumflex/Udieresis/Yacute/Thorn/germandbls/agrave
+/aacute/acircumflex/atilde/adieresis/aring/ae/ccedilla/egrave/eacute
+/ecircumflex/edieresis/igrave/iacute/icircumflex/idieresis/eth/ntilde
+/ograve/oacute/ocircumflex/otilde/odieresis/divide/oslash/ugrave/uacute
+/ucircumflex/udieresis/yacute/thorn/ydieresis
+1 TE
+end
+currentdict readonly pop
+end end
+/currentpacking where {pop setpacking}if
+PDFVars/DocInitAll{[PDF PDFText]{/docinitialize get exec}forall }put
+PDFVars/InitAll{[PDF PDFText]{/initialize get exec}forall initgs}put
+PDFVars/TermAll{[PDFText PDF]{/terminate get exec}forall}put
+PDFVars begin PDF begin
+PDFVars/DocInitAll get exec PDFVars/InitAll get exec
+%%IncludeResource Times-Roman
+[/N9/Times-Roman -1 TZ
+PDFVars/TermAll get exec end end
+
+%%EndSetup
+PDFVars begin PDF begin PDFVars/InitAll get exec
+36 36 540 297 rectclip
+0.100006 0 0 0.100006 0 0 cm
+q
+Q
+q
+n
+350 350 m
+5760 350 l
+5760 3330 l
+350 3330 l
+h
+W
+n
+3.41299 w
+1 M
+n
+387.304 387.304 5344.76 2907.88 re
+0 setgray
+S
+n
+441.912 2107.46 5235.54 1160.42 re
+S
+n
+496.52 2353.19 395.908 668.948 re
+S
+n
+926.558 2353.19 395.908 668.948 re
+S
+n
+1356.6 2353.19 395.908 668.948 re
+S
+n
+1786.63 2353.19 395.908 668.948 re
+S
+n
+2216.67 2353.19 395.908 668.948 re
+S
+n
+2646.71 2353.19 395.908 668.948 re
+S
+n
+3076.75 2353.19 395.908 668.948 re
+S
+n
+3506.79 2353.19 395.908 668.948 re
+S
+n
+3936.82 2353.19 395.908 668.948 re
+S
+n
+4366.86 2353.19 395.908 668.948 re
+S
+n
+4796.9 2353.19 395.908 668.948 re
+S
+n
+5226.94 2353.19 395.908 668.948 re
+S
+n
+2162.06 633.04 1795.24 1406.16 re
+S
+n
+2216.67 878.776 395.908 914.684 re
+S
+n
+2646.71 878.776 395.908 914.684 re
+S
+n
+3076.75 878.776 395.908 914.684 re
+S
+n
+3506.79 878.776 395.908 914.684 re
+S
+n
+3151.83 3179.14 m
+3151.83 3213.07 3110.58 3240.57 3059.68 3240.57 c
+3008.79 3240.57 2967.53 3213.07 2967.53 3179.14 c
+2967.53 3145.21 3008.79 3117.7 3059.68 3117.7 c
+3110.58 3117.7 3151.83 3145.21 3151.83 3179.14 c
+S
+n
+865.124 2933.4 m
+865.124 2967.33 788.721 2994.84 694.474 2994.84 c
+600.227 2994.84 523.824 2967.33 523.824 2933.4 c
+523.824 2899.47 600.227 2871.97 694.474 2871.97 c
+788.721 2871.97 865.124 2899.47 865.124 2933.4 c
+S
+q
+10 0 0 10 0 0 cm
+55.7818 292.248 m
+/N9 4.7782 Tf
+(InputGenerate)
+[1.5911 2.3891 2.3891 2.3891 1.32834 3.44979 2.12145 2.3891 2.12145 1.5911 2.12145 
+1.32834 2.12145 ] pdfxs
+Q
+n
+2967.53 3172.31 m
+2595.51 3148.42 1216.66 3052.86 902.667 3022.14 c
+878.776 3018.73 848.059 3008.49 817.342 2994.84 c
+S
+n
+820.755 3005.07 m
+793.451 2984.6 l
+827.581 2991.42 l
+h
+S
+n
+820.755 3005.07 m
+793.451 2984.6 l
+827.581 2991.42 l
+f
+n
+1295.16 2933.4 m
+1295.16 2967.33 1218.76 2994.84 1124.51 2994.84 c
+1030.26 2994.84 953.862 2967.33 953.862 2933.4 c
+953.862 2899.47 1030.26 2871.97 1124.51 2871.97 c
+1218.76 2871.97 1295.16 2899.47 1295.16 2933.4 c
+S
+q
+10 0 0 10 0 0 cm
+98.7856 292.248 m
+/N9 4.7782 Tf
+(InputGenerate)
+[1.5911 2.3891 2.3891 2.3891 1.32834 3.44979 2.12145 2.3891 2.12145 1.5911 2.12145 
+1.32834 2.12145 ] pdfxs
+Q
+n
+2967.53 3172.31 m
+2684.25 3151.83 1810.52 3080.16 1332.7 3022.14 c
+1308.81 3018.73 1278.1 3008.49 1247.38 2994.84 c
+S
+n
+1250.79 3005.07 m
+1223.49 2984.6 l
+1257.62 2991.42 l
+h
+S
+n
+1250.79 3005.07 m
+1223.49 2984.6 l
+1257.62 2991.42 l
+f
+n
+1725.2 2933.4 m
+1725.2 2967.33 1648.8 2994.84 1554.55 2994.84 c
+1460.3 2994.84 1383.9 2967.33 1383.9 2933.4 c
+1383.9 2899.47 1460.3 2871.97 1554.55 2871.97 c
+1648.8 2871.97 1725.2 2899.47 1725.2 2933.4 c
+S
+q
+10 0 0 10 0 0 cm
+141.789 292.248 m
+/N9 4.7782 Tf
+(InputGenerate)
+[1.5911 2.3891 2.3891 2.3891 1.32834 3.44979 2.12145 2.3891 2.12145 1.5911 2.12145 
+1.32834 2.12145 ] pdfxs
+Q
+n
+2967.53 3168.9 m
+2735.45 3145.01 2107.46 3076.75 1762.74 3022.14 c
+1738.85 3015.31 1708.14 3005.07 1677.42 2994.84 c
+S
+n
+1680.83 3005.07 m
+1653.53 2984.6 l
+1687.66 2991.42 l
+h
+S
+n
+1680.83 3005.07 m
+1653.53 2984.6 l
+1687.66 2991.42 l
+f
+n
+2155.24 2933.4 m
+2155.24 2967.33 2078.84 2994.84 1984.59 2994.84 c
+1890.34 2994.84 1813.94 2967.33 1813.94 2933.4 c
+1813.94 2899.47 1890.34 2871.97 1984.59 2871.97 c
+2078.84 2871.97 2155.24 2899.47 2155.24 2933.4 c
+S
+q
+10 0 0 10 0 0 cm
+184.793 292.248 m
+/N9 4.7782 Tf
+(InputGenerate)
+[1.5911 2.3891 2.3891 2.3891 1.32834 3.44979 2.12145 2.3891 2.12145 1.5911 2.12145 
+1.32834 2.12145 ] pdfxs
+Q
+n
+2970.95 3165.49 m
+2796.88 3134.77 2411.21 3069.92 2192.78 3022.14 c
+2168.89 3015.31 2138.17 3005.07 2110.87 2991.42 c
+S
+n
+2114.28 3001.66 m
+2086.98 2981.18 l
+2121.11 2988.01 l
+h
+S
+n
+2114.28 3001.66 m
+2086.98 2981.18 l
+2121.11 2988.01 l
+f
+n
+2585.28 2933.4 m
+2585.28 2967.33 2508.87 2994.84 2414.63 2994.84 c
+2320.38 2994.84 2243.98 2967.33 2243.98 2933.4 c
+2243.98 2899.47 2320.38 2871.97 2414.63 2871.97 c
+2508.87 2871.97 2585.28 2899.47 2585.28 2933.4 c
+S
+q
+10 0 0 10 0 0 cm
+227.797 292.248 m
+/N9 4.7782 Tf
+(InputGenerate)
+[1.5911 2.3891 2.3891 2.3891 1.32834 3.44979 2.12145 2.3891 2.12145 1.5911 2.12145 
+1.32834 2.12145 ] pdfxs
+Q
+n
+2977.77 3151.83 m
+2882.21 3114.29 2721.8 3059.68 2622.82 3022.14 c
+2602.34 3015.31 2575.04 3001.66 2544.32 2991.42 c
+S
+n
+2551.15 3005.07 m
+2523.84 2981.18 l
+2557.97 2988.01 l
+h
+S
+n
+2551.15 3005.07 m
+2523.84 2981.18 l
+2557.97 2988.01 l
+f
+n
+3015.31 2933.4 m
+3015.31 2967.33 2938.91 2994.84 2844.66 2994.84 c
+2750.42 2994.84 2674.01 2967.33 2674.01 2933.4 c
+2674.01 2899.47 2750.42 2871.97 2844.66 2871.97 c
+2938.91 2871.97 3015.31 2899.47 3015.31 2933.4 c
+S
+q
+10 0 0 10 0 0 cm
+270.801 292.248 m
+/N9 4.7782 Tf
+(InputGenerate)
+[1.5911 2.3891 2.3891 2.3891 1.32834 3.44979 2.12145 2.3891 2.12145 1.5911 2.12145 
+1.32834 2.12145 ] pdfxs
+Q
+n
+3011.9 3124.53 m
+2984.6 3093.81 2950.47 3052.86 2919.75 3015.31 c
+S
+n
+2912.92 3022.14 m
+2895.86 2991.42 l
+2926.58 3008.49 l
+h
+S
+n
+2912.92 3022.14 m
+2895.86 2991.42 l
+2926.58 3008.49 l
+f
+n
+3445.35 2933.4 m
+3445.35 2967.33 3368.95 2994.84 3274.7 2994.84 c
+3180.45 2994.84 3104.05 2967.33 3104.05 2933.4 c
+3104.05 2899.47 3180.45 2871.97 3274.7 2871.97 c
+3368.95 2871.97 3445.35 2899.47 3445.35 2933.4 c
+S
+q
+10 0 0 10 0 0 cm
+313.805 292.248 m
+/N9 4.7782 Tf
+(InputGenerate)
+[1.5911 2.3891 2.3891 2.3891 1.32834 3.44979 2.12145 2.3891 2.12145 1.5911 2.12145 
+1.32834 2.12145 ] pdfxs
+Q
+n
+3107.46 3124.53 m
+3134.77 3093.81 3168.9 3052.86 3199.62 3015.31 c
+S
+n
+3192.79 3008.49 m
+3223.51 2991.42 l
+3206.44 3022.14 l
+h
+S
+n
+3192.79 3008.49 m
+3223.51 2991.42 l
+3206.44 3022.14 l
+f
+n
+3875.39 2933.4 m
+3875.39 2967.33 3798.99 2994.84 3704.74 2994.84 c
+3610.49 2994.84 3534.09 2967.33 3534.09 2933.4 c
+3534.09 2899.47 3610.49 2871.97 3704.74 2871.97 c
+3798.99 2871.97 3875.39 2899.47 3875.39 2933.4 c
+S
+q
+10 0 0 10 0 0 cm
+356.808 292.248 m
+/N9 4.7782 Tf
+(InputGenerate)
+[1.5911 2.3891 2.3891 2.3891 1.32834 3.44979 2.12145 2.3891 2.12145 1.5911 2.12145 
+1.32834 2.12145 ] pdfxs
+Q
+n
+3141.59 3151.83 m
+3240.57 3117.7 3400.98 3059.68 3496.55 3022.14 c
+3513.61 3015.31 3537.5 3005.07 3561.39 2994.84 c
+S
+n
+3561.39 2984.6 m
+3595.52 2981.18 l
+3568.22 3001.66 l
+h
+S
+n
+3561.39 2984.6 m
+3595.52 2981.18 l
+3568.22 3001.66 l
+f
+n
+4305.43 2933.4 m
+4305.43 2967.33 4229.03 2994.84 4134.78 2994.84 c
+4040.53 2994.84 3964.13 2967.33 3964.13 2933.4 c
+3964.13 2899.47 4040.53 2871.97 4134.78 2871.97 c
+4229.03 2871.97 4305.43 2899.47 4305.43 2933.4 c
+S
+q
+10 0 0 10 0 0 cm
+399.812 292.248 m
+/N9 4.7782 Tf
+(InputGenerate)
+[1.5911 2.3891 2.3891 2.3891 1.32834 3.44979 2.12145 2.3891 2.12145 1.5911 2.12145 
+1.32834 2.12145 ] pdfxs
+Q
+n
+3148.42 3165.49 m
+3325.9 3134.77 3711.57 3069.92 3926.58 3022.14 c
+3947.06 3018.73 3974.37 3008.49 3998.26 2998.25 c
+S
+n
+3998.26 2988.01 m
+4032.39 2984.6 l
+4005.08 3005.07 l
+h
+S
+n
+3998.26 2988.01 m
+4032.39 2984.6 l
+4005.08 3005.07 l
+f
+n
+4735.47 2933.4 m
+4735.47 2967.33 4659.06 2994.84 4564.82 2994.84 c
+4470.57 2994.84 4394.17 2967.33 4394.17 2933.4 c
+4394.17 2899.47 4470.57 2871.97 4564.82 2871.97 c
+4659.06 2871.97 4735.47 2899.47 4735.47 2933.4 c
+S
+q
+10 0 0 10 0 0 cm
+442.816 292.248 m
+/N9 4.7782 Tf
+(InputGenerate)
+[1.5911 2.3891 2.3891 2.3891 1.32834 3.44979 2.12145 2.3891 2.12145 1.5911 2.12145 
+1.32834 2.12145 ] pdfxs
+Q
+n
+3151.83 3168.9 m
+3387.33 3145.01 4015.32 3076.75 4356.62 3022.14 c
+4377.1 3018.73 4404.41 3008.49 4431.71 2998.25 c
+S
+n
+4431.71 2988.01 m
+4465.84 2984.6 l
+4438.53 3005.07 l
+h
+S
+n
+4431.71 2988.01 m
+4465.84 2984.6 l
+4438.53 3005.07 l
+f
+n
+5165.5 2933.4 m
+5165.5 2967.33 5089.1 2994.84 4994.85 2994.84 c
+4900.61 2994.84 4824.2 2967.33 4824.2 2933.4 c
+4824.2 2899.47 4900.61 2871.97 4994.85 2871.97 c
+5089.1 2871.97 5165.5 2899.47 5165.5 2933.4 c
+S
+q
+10 0 0 10 0 0 cm
+485.82 292.248 m
+/N9 4.7782 Tf
+(InputGenerate)
+[1.5911 2.3891 2.3891 2.3891 1.32834 3.44979 2.12145 2.3891 2.12145 1.5911 2.12145 
+1.32834 2.12145 ] pdfxs
+Q
+n
+3151.83 3172.31 m
+3438.53 3151.83 4312.25 3080.16 4786.66 3022.14 c
+4807.14 3018.73 4834.44 3011.9 4861.75 2998.25 c
+S
+n
+4861.75 2988.01 m
+4895.88 2984.6 l
+4868.57 3005.07 l
+h
+S
+n
+4861.75 2988.01 m
+4895.88 2984.6 l
+4868.57 3005.07 l
+f
+n
+5595.54 2933.4 m
+5595.54 2967.33 5519.14 2994.84 5424.89 2994.84 c
+5330.64 2994.84 5254.24 2967.33 5254.24 2933.4 c
+5254.24 2899.47 5330.64 2871.97 5424.89 2871.97 c
+5519.14 2871.97 5595.54 2899.47 5595.54 2933.4 c
+S
+q
+10 0 0 10 0 0 cm
+528.824 292.248 m
+/N9 4.7782 Tf
+(InputGenerate)
+[1.5911 2.3891 2.3891 2.3891 1.32834 3.44979 2.12145 2.3891 2.12145 1.5911 2.12145 
+1.32834 2.12145 ] pdfxs
+Q
+n
+3151.83 3172.31 m
+3523.85 3148.42 4906.12 3052.86 5216.7 3022.14 c
+5237.18 3018.73 5264.48 3011.9 5291.78 2998.25 c
+S
+n
+5291.78 2988.01 m
+5325.92 2984.6 l
+5298.61 3005.07 l
+h
+S
+n
+5291.78 2988.01 m
+5325.92 2984.6 l
+5298.61 3005.07 l
+f
+n
+3151.83 2196.19 m
+3151.83 2230.12 3110.58 2257.63 3059.68 2257.63 c
+3008.79 2257.63 2967.53 2230.12 2967.53 2196.19 c
+2967.53 2162.26 3008.79 2134.76 3059.68 2134.76 c
+3110.58 2134.76 3151.83 2162.26 3151.83 2196.19 c
+S
+n
+3182.55 1950.46 m
+3182.55 1984.39 3127.54 2011.89 3059.68 2011.89 c
+2991.82 2011.89 2936.81 1984.39 2936.81 1950.46 c
+2936.81 1916.53 2991.82 1889.02 3059.68 1889.02 c
+3127.54 1889.02 3182.55 1916.53 3182.55 1950.46 c
+S
+q
+10 0 0 10 0 0 cm
+297.21 193.954 m
+/N9 4.7782 Tf
+(duplicate)
+[2.3891 2.3891 2.3891 1.32834 1.32834 2.12145 2.12145 1.32834 2.12145 ] pdfxs
+Q
+n
+3059.68 2134.76 m
+3059.68 2107.46 3059.68 2076.74 3059.68 2046.02 c
+S
+n
+3052.86 2046.02 m
+3059.68 2011.89 l
+3069.92 2046.02 l
+h
+S
+n
+3052.86 2046.02 m
+3059.68 2011.89 l
+3069.92 2046.02 l
+f
+n
+865.124 2687.67 m
+865.124 2721.59 788.721 2749.1 694.474 2749.1 c
+600.227 2749.1 523.824 2721.59 523.824 2687.67 c
+523.824 2653.74 600.227 2626.23 694.474 2626.23 c
+788.721 2626.23 865.124 2653.74 865.124 2687.67 c
+S
+q
+10 0 0 10 0 0 cm
+55.9085 267.674 m
+/N9 4.7782 Tf
+(BeamFirFilter)
+[3.18702 2.12145 2.12145 3.71744 2.65668 1.32834 1.5911 2.65668 1.32834 1.32834 1.32834 
+2.12145 1.5911 ] pdfxs
+Q
+n
+694.474 2871.97 m
+694.474 2844.66 694.474 2813.95 694.474 2783.23 c
+S
+n
+687.648 2783.23 m
+694.474 2749.1 l
+704.713 2783.23 l
+h
+S
+n
+687.648 2783.23 m
+694.474 2749.1 l
+704.713 2783.23 l
+f
+n
+865.124 2441.93 m
+865.124 2475.86 788.721 2503.36 694.474 2503.36 c
+600.227 2503.36 523.824 2475.86 523.824 2441.93 c
+523.824 2408 600.227 2380.5 694.474 2380.5 c
+788.721 2380.5 865.124 2408 865.124 2441.93 c
+S
+q
+10 0 0 10 0 0 cm
+55.9085 243.101 m
+/N9 4.7782 Tf
+(BeamFirFilter)
+[3.18702 2.12145 2.12145 3.71744 2.65668 1.32834 1.5911 2.65668 1.32834 1.32834 1.32834 
+2.12145 1.5911 ] pdfxs
+Q
+n
+694.474 2626.23 m
+694.474 2598.93 694.474 2568.21 694.474 2537.49 c
+S
+n
+687.648 2537.49 m
+694.474 2503.36 l
+704.713 2537.49 l
+h
+S
+n
+687.648 2537.49 m
+694.474 2503.36 l
+704.713 2537.49 l
+f
+n
+790.038 2390.73 m
+830.994 2373.67 871.95 2356.6 902.667 2353.19 c
+1496.53 2291.76 2575.04 2223.5 2936.81 2203.02 c
+S
+n
+2933.4 2196.19 m
+2967.53 2203.02 l
+2933.4 2213.26 l
+h
+S
+n
+2933.4 2196.19 m
+2967.53 2203.02 l
+2933.4 2213.26 l
+f
+n
+1295.16 2687.67 m
+1295.16 2721.59 1218.76 2749.1 1124.51 2749.1 c
+1030.26 2749.1 953.862 2721.59 953.862 2687.67 c
+953.862 2653.74 1030.26 2626.23 1124.51 2626.23 c
+1218.76 2626.23 1295.16 2653.74 1295.16 2687.67 c
+S
+q
+10 0 0 10 0 0 cm
+98.9123 267.674 m
+/N9 4.7782 Tf
+(BeamFirFilter)
+[3.18702 2.12145 2.12145 3.71744 2.65668 1.32834 1.5911 2.65668 1.32834 1.32834 1.32834 
+2.12145 1.5911 ] pdfxs
+Q
+n
+1124.51 2871.97 m
+1124.51 2844.66 1124.51 2813.95 1124.51 2783.23 c
+S
+n
+1117.69 2783.23 m
+1124.51 2749.1 l
+1134.75 2783.23 l
+h
+S
+n
+1117.69 2783.23 m
+1124.51 2749.1 l
+1134.75 2783.23 l
+f
+n
+1295.16 2441.93 m
+1295.16 2475.86 1218.76 2503.36 1124.51 2503.36 c
+1030.26 2503.36 953.862 2475.86 953.862 2441.93 c
+953.862 2408 1030.26 2380.5 1124.51 2380.5 c
+1218.76 2380.5 1295.16 2408 1295.16 2441.93 c
+S
+q
+10 0 0 10 0 0 cm
+98.9123 243.101 m
+/N9 4.7782 Tf
+(BeamFirFilter)
+[3.18702 2.12145 2.12145 3.71744 2.65668 1.32834 1.5911 2.65668 1.32834 1.32834 1.32834 
+2.12145 1.5911 ] pdfxs
+Q
+n
+1124.51 2626.23 m
+1124.51 2598.93 1124.51 2568.21 1124.51 2537.49 c
+S
+n
+1117.69 2537.49 m
+1124.51 2503.36 l
+1134.75 2537.49 l
+h
+S
+n
+1117.69 2537.49 m
+1124.51 2503.36 l
+1134.75 2537.49 l
+f
+n
+1220.08 2390.73 m
+1261.03 2373.67 1301.99 2356.6 1332.7 2353.19 c
+1796.87 2295.17 2633.06 2226.91 2940.23 2206.43 c
+S
+n
+2933.4 2199.61 m
+2967.53 2203.02 l
+2933.4 2216.67 l
+h
+S
+n
+2933.4 2199.61 m
+2967.53 2203.02 l
+2933.4 2216.67 l
+f
+n
+1725.2 2687.67 m
+1725.2 2721.59 1648.8 2749.1 1554.55 2749.1 c
+1460.3 2749.1 1383.9 2721.59 1383.9 2687.67 c
+1383.9 2653.74 1460.3 2626.23 1554.55 2626.23 c
+1648.8 2626.23 1725.2 2653.74 1725.2 2687.67 c
+S
+q
+10 0 0 10 0 0 cm
+141.916 267.674 m
+/N9 4.7782 Tf
+(BeamFirFilter)
+[3.18702 2.12145 2.12145 3.71744 2.65668 1.32834 1.5911 2.65668 1.32834 1.32834 1.32834 
+2.12145 1.5911 ] pdfxs
+Q
+n
+1554.55 2871.97 m
+1554.55 2844.66 1554.55 2813.95 1554.55 2783.23 c
+S
+n
+1547.72 2783.23 m
+1554.55 2749.1 l
+1564.79 2783.23 l
+h
+S
+n
+1547.72 2783.23 m
+1554.55 2749.1 l
+1564.79 2783.23 l
+f
+n
+1725.2 2441.93 m
+1725.2 2475.86 1648.8 2503.36 1554.55 2503.36 c
+1460.3 2503.36 1383.9 2475.86 1383.9 2441.93 c
+1383.9 2408 1460.3 2380.5 1554.55 2380.5 c
+1648.8 2380.5 1725.2 2408 1725.2 2441.93 c
+S
+q
+10 0 0 10 0 0 cm
+141.916 243.101 m
+/N9 4.7782 Tf
+(BeamFirFilter)
+[3.18702 2.12145 2.12145 3.71744 2.65668 1.32834 1.5911 2.65668 1.32834 1.32834 1.32834 
+2.12145 1.5911 ] pdfxs
+Q
+n
+1554.55 2626.23 m
+1554.55 2598.93 1554.55 2568.21 1554.55 2537.49 c
+S
+n
+1547.72 2537.49 m
+1554.55 2503.36 l
+1564.79 2537.49 l
+h
+S
+n
+1547.72 2537.49 m
+1554.55 2503.36 l
+1564.79 2537.49 l
+f
+n
+1653.53 2390.73 m
+1691.07 2373.67 1732.03 2356.6 1762.74 2353.19 c
+2093.8 2298.58 2680.84 2237.15 2933.4 2209.85 c
+S
+n
+2933.4 2203.02 m
+2967.53 2206.43 l
+2933.4 2216.67 l
+h
+S
+n
+2933.4 2203.02 m
+2967.53 2206.43 l
+2933.4 2216.67 l
+f
+n
+2155.24 2687.67 m
+2155.24 2721.59 2078.84 2749.1 1984.59 2749.1 c
+1890.34 2749.1 1813.94 2721.59 1813.94 2687.67 c
+1813.94 2653.74 1890.34 2626.23 1984.59 2626.23 c
+2078.84 2626.23 2155.24 2653.74 2155.24 2687.67 c
+S
+q
+10 0 0 10 0 0 cm
+184.92 267.674 m
+/N9 4.7782 Tf
+(BeamFirFilter)
+[3.18702 2.12145 2.12145 3.71744 2.65668 1.32834 1.5911 2.65668 1.32834 1.32834 1.32834 
+2.12145 1.5911 ] pdfxs
+Q
+n
+1984.59 2871.97 m
+1984.59 2844.66 1984.59 2813.95 1984.59 2783.23 c
+S
+n
+1977.76 2783.23 m
+1984.59 2749.1 l
+1994.83 2783.23 l
+h
+S
+n
+1977.76 2783.23 m
+1984.59 2749.1 l
+1994.83 2783.23 l
+f
+n
+2155.24 2441.93 m
+2155.24 2475.86 2078.84 2503.36 1984.59 2503.36 c
+1890.34 2503.36 1813.94 2475.86 1813.94 2441.93 c
+1813.94 2408 1890.34 2380.5 1984.59 2380.5 c
+2078.84 2380.5 2155.24 2408 2155.24 2441.93 c
+S
+q
+10 0 0 10 0 0 cm
+184.92 243.101 m
+/N9 4.7782 Tf
+(BeamFirFilter)
+[3.18702 2.12145 2.12145 3.71744 2.65668 1.32834 1.5911 2.65668 1.32834 1.32834 1.32834 
+2.12145 1.5911 ] pdfxs
+Q
+n
+1984.59 2626.23 m
+1984.59 2598.93 1984.59 2568.21 1984.59 2537.49 c
+S
+n
+1977.76 2537.49 m
+1984.59 2503.36 l
+1994.83 2537.49 l
+h
+S
+n
+1977.76 2537.49 m
+1984.59 2503.36 l
+1994.83 2537.49 l
+f
+n
+2083.56 2390.73 m
+2121.11 2373.67 2162.06 2360.02 2192.78 2353.19 c
+2397.56 2305.41 2759.34 2243.98 2943.64 2213.26 c
+S
+n
+2933.4 2206.43 m
+2967.53 2209.85 l
+2933.4 2223.5 l
+h
+S
+n
+2933.4 2206.43 m
+2967.53 2209.85 l
+2933.4 2223.5 l
+f
+n
+2585.28 2687.67 m
+2585.28 2721.59 2508.87 2749.1 2414.63 2749.1 c
+2320.38 2749.1 2243.98 2721.59 2243.98 2687.67 c
+2243.98 2653.74 2320.38 2626.23 2414.63 2626.23 c
+2508.87 2626.23 2585.28 2653.74 2585.28 2687.67 c
+S
+q
+10 0 0 10 0 0 cm
+227.924 267.674 m
+/N9 4.7782 Tf
+(BeamFirFilter)
+[3.18702 2.12145 2.12145 3.71744 2.65668 1.32834 1.5911 2.65668 1.32834 1.32834 1.32834 
+2.12145 1.5911 ] pdfxs
+Q
+n
+2414.63 2871.97 m
+2414.63 2844.66 2414.63 2813.95 2414.63 2783.23 c
+S
+n
+2407.8 2783.23 m
+2414.63 2749.1 l
+2424.86 2783.23 l
+h
+S
+n
+2407.8 2783.23 m
+2414.63 2749.1 l
+2424.86 2783.23 l
+f
+n
+2585.28 2441.93 m
+2585.28 2475.86 2508.87 2503.36 2414.63 2503.36 c
+2320.38 2503.36 2243.98 2475.86 2243.98 2441.93 c
+2243.98 2408 2320.38 2380.5 2414.63 2380.5 c
+2508.87 2380.5 2585.28 2408 2585.28 2441.93 c
+S
+q
+10 0 0 10 0 0 cm
+227.924 243.101 m
+/N9 4.7782 Tf
+(BeamFirFilter)
+[3.18702 2.12145 2.12145 3.71744 2.65668 1.32834 1.5911 2.65668 1.32834 1.32834 1.32834 
+2.12145 1.5911 ] pdfxs
+Q
+n
+2414.63 2626.23 m
+2414.63 2598.93 2414.63 2568.21 2414.63 2537.49 c
+S
+n
+2407.8 2537.49 m
+2414.63 2503.36 l
+2424.86 2537.49 l
+h
+S
+n
+2407.8 2537.49 m
+2414.63 2503.36 l
+2424.86 2537.49 l
+f
+n
+2523.84 2394.15 m
+2557.97 2377.08 2595.51 2363.43 2622.82 2353.19 c
+2708.14 2319.06 2848.08 2267.87 2947.05 2233.74 c
+S
+n
+2943.64 2226.91 m
+2977.77 2223.5 l
+2947.05 2243.98 l
+h
+S
+n
+2943.64 2226.91 m
+2977.77 2223.5 l
+2947.05 2243.98 l
+f
+n
+3015.31 2687.67 m
+3015.31 2721.59 2938.91 2749.1 2844.66 2749.1 c
+2750.42 2749.1 2674.01 2721.59 2674.01 2687.67 c
+2674.01 2653.74 2750.42 2626.23 2844.66 2626.23 c
+2938.91 2626.23 3015.31 2653.74 3015.31 2687.67 c
+S
+q
+10 0 0 10 0 0 cm
+270.927 267.674 m
+/N9 4.7782 Tf
+(BeamFirFilter)
+[3.18702 2.12145 2.12145 3.71744 2.65668 1.32834 1.5911 2.65668 1.32834 1.32834 1.32834 
+2.12145 1.5911 ] pdfxs
+Q
+n
+2844.66 2871.97 m
+2844.66 2844.66 2844.66 2813.95 2844.66 2783.23 c
+S
+n
+2837.84 2783.23 m
+2844.66 2749.1 l
+2854.9 2783.23 l
+h
+S
+n
+2837.84 2783.23 m
+2844.66 2749.1 l
+2854.9 2783.23 l
+f
+n
+3015.31 2441.93 m
+3015.31 2475.86 2938.91 2503.36 2844.66 2503.36 c
+2750.42 2503.36 2674.01 2475.86 2674.01 2441.93 c
+2674.01 2408 2750.42 2380.5 2844.66 2380.5 c
+2938.91 2380.5 3015.31 2408 3015.31 2441.93 c
+S
+q
+10 0 0 10 0 0 cm
+270.927 243.101 m
+/N9 4.7782 Tf
+(BeamFirFilter)
+[3.18702 2.12145 2.12145 3.71744 2.65668 1.32834 1.5911 2.65668 1.32834 1.32834 1.32834 
+2.12145 1.5911 ] pdfxs
+Q
+n
+2844.66 2626.23 m
+2844.66 2598.93 2844.66 2568.21 2844.66 2537.49 c
+S
+n
+2837.84 2537.49 m
+2844.66 2503.36 l
+2854.9 2537.49 l
+h
+S
+n
+2837.84 2537.49 m
+2844.66 2503.36 l
+2854.9 2537.49 l
+f
+n
+2895.86 2383.91 m
+2926.58 2349.78 2960.71 2308.82 2991.42 2274.69 c
+S
+n
+2984.6 2271.28 m
+3011.9 2250.8 l
+2994.84 2281.52 l
+h
+S
+n
+2984.6 2271.28 m
+3011.9 2250.8 l
+2994.84 2281.52 l
+f
+n
+3445.35 2687.67 m
+3445.35 2721.59 3368.95 2749.1 3274.7 2749.1 c
+3180.45 2749.1 3104.05 2721.59 3104.05 2687.67 c
+3104.05 2653.74 3180.45 2626.23 3274.7 2626.23 c
+3368.95 2626.23 3445.35 2653.74 3445.35 2687.67 c
+S
+q
+10 0 0 10 0 0 cm
+313.931 267.674 m
+/N9 4.7782 Tf
+(BeamFirFilter)
+[3.18702 2.12145 2.12145 3.71744 2.65668 1.32834 1.5911 2.65668 1.32834 1.32834 1.32834 
+2.12145 1.5911 ] pdfxs
+Q
+n
+3274.7 2871.97 m
+3274.7 2844.66 3274.7 2813.95 3274.7 2783.23 c
+S
+n
+3267.88 2783.23 m
+3274.7 2749.1 l
+3284.94 2783.23 l
+h
+S
+n
+3267.88 2783.23 m
+3274.7 2749.1 l
+3284.94 2783.23 l
+f
+n
+3445.35 2441.93 m
+3445.35 2475.86 3368.95 2503.36 3274.7 2503.36 c
+3180.45 2503.36 3104.05 2475.86 3104.05 2441.93 c
+3104.05 2408 3180.45 2380.5 3274.7 2380.5 c
+3368.95 2380.5 3445.35 2408 3445.35 2441.93 c
+S
+q
+10 0 0 10 0 0 cm
+313.931 243.101 m
+/N9 4.7782 Tf
+(BeamFirFilter)
+[3.18702 2.12145 2.12145 3.71744 2.65668 1.32834 1.5911 2.65668 1.32834 1.32834 1.32834 
+2.12145 1.5911 ] pdfxs
+Q
+n
+3274.7 2626.23 m
+3274.7 2598.93 3274.7 2568.21 3274.7 2537.49 c
+S
+n
+3267.88 2537.49 m
+3274.7 2503.36 l
+3284.94 2537.49 l
+h
+S
+n
+3267.88 2537.49 m
+3274.7 2503.36 l
+3284.94 2537.49 l
+f
+n
+3223.51 2383.91 m
+3192.79 2349.78 3158.66 2308.82 3127.94 2274.69 c
+S
+n
+3124.53 2281.52 m
+3107.46 2250.8 l
+3134.77 2271.28 l
+h
+S
+n
+3124.53 2281.52 m
+3107.46 2250.8 l
+3134.77 2271.28 l
+f
+n
+3875.39 2687.67 m
+3875.39 2721.59 3798.99 2749.1 3704.74 2749.1 c
+3610.49 2749.1 3534.09 2721.59 3534.09 2687.67 c
+3534.09 2653.74 3610.49 2626.23 3704.74 2626.23 c
+3798.99 2626.23 3875.39 2653.74 3875.39 2687.67 c
+S
+q
+10 0 0 10 0 0 cm
+356.935 267.674 m
+/N9 4.7782 Tf
+(BeamFirFilter)
+[3.18702 2.12145 2.12145 3.71744 2.65668 1.32834 1.5911 2.65668 1.32834 1.32834 1.32834 
+2.12145 1.5911 ] pdfxs
+Q
+n
+3704.74 2871.97 m
+3704.74 2844.66 3704.74 2813.95 3704.74 2783.23 c
+S
+n
+3697.91 2783.23 m
+3704.74 2749.1 l
+3714.98 2783.23 l
+h
+S
+n
+3697.91 2783.23 m
+3704.74 2749.1 l
+3714.98 2783.23 l
+f
+n
+3875.39 2441.93 m
+3875.39 2475.86 3798.99 2503.36 3704.74 2503.36 c
+3610.49 2503.36 3534.09 2475.86 3534.09 2441.93 c
+3534.09 2408 3610.49 2380.5 3704.74 2380.5 c
+3798.99 2380.5 3875.39 2408 3875.39 2441.93 c
+S
+q
+10 0 0 10 0 0 cm
+356.935 243.101 m
+/N9 4.7782 Tf
+(BeamFirFilter)
+[3.18702 2.12145 2.12145 3.71744 2.65668 1.32834 1.5911 2.65668 1.32834 1.32834 1.32834 
+2.12145 1.5911 ] pdfxs
+Q
+n
+3704.74 2626.23 m
+3704.74 2598.93 3704.74 2568.21 3704.74 2537.49 c
+S
+n
+3697.91 2537.49 m
+3704.74 2503.36 l
+3714.98 2537.49 l
+h
+S
+n
+3697.91 2537.49 m
+3704.74 2503.36 l
+3714.98 2537.49 l
+f
+n
+3598.94 2394.15 m
+3561.39 2377.08 3523.85 2363.43 3496.55 2353.19 c
+3407.81 2319.06 3261.05 2264.45 3162.07 2230.32 c
+S
+n
+3172.31 2243.98 m
+3141.59 2223.5 l
+3175.72 2226.91 l
+h
+S
+n
+3172.31 2243.98 m
+3141.59 2223.5 l
+3175.72 2226.91 l
+f
+n
+4305.43 2687.67 m
+4305.43 2721.59 4229.03 2749.1 4134.78 2749.1 c
+4040.53 2749.1 3964.13 2721.59 3964.13 2687.67 c
+3964.13 2653.74 4040.53 2626.23 4134.78 2626.23 c
+4229.03 2626.23 4305.43 2653.74 4305.43 2687.67 c
+S
+q
+10 0 0 10 0 0 cm
+399.939 267.674 m
+/N9 4.7782 Tf
+(BeamFirFilter)
+[3.18702 2.12145 2.12145 3.71744 2.65668 1.32834 1.5911 2.65668 1.32834 1.32834 1.32834 
+2.12145 1.5911 ] pdfxs
+Q
+n
+4134.78 2871.97 m
+4134.78 2844.66 4134.78 2813.95 4134.78 2783.23 c
+S
+n
+4127.95 2783.23 m
+4134.78 2749.1 l
+4145.02 2783.23 l
+h
+S
+n
+4127.95 2783.23 m
+4134.78 2749.1 l
+4145.02 2783.23 l
+f
+n
+4305.43 2441.93 m
+4305.43 2475.86 4229.03 2503.36 4134.78 2503.36 c
+4040.53 2503.36 3964.13 2475.86 3964.13 2441.93 c
+3964.13 2408 4040.53 2380.5 4134.78 2380.5 c
+4229.03 2380.5 4305.43 2408 4305.43 2441.93 c
+S
+q
+10 0 0 10 0 0 cm
+399.939 243.101 m
+/N9 4.7782 Tf
+(BeamFirFilter)
+[3.18702 2.12145 2.12145 3.71744 2.65668 1.32834 1.5911 2.65668 1.32834 1.32834 1.32834 
+2.12145 1.5911 ] pdfxs
+Q
+n
+4134.78 2626.23 m
+4134.78 2598.93 4134.78 2568.21 4134.78 2537.49 c
+S
+n
+4127.95 2537.49 m
+4134.78 2503.36 l
+4145.02 2537.49 l
+h
+S
+n
+4127.95 2537.49 m
+4134.78 2503.36 l
+4145.02 2537.49 l
+f
+n
+4035.8 2390.73 m
+3998.26 2373.67 3957.3 2360.02 3926.58 2353.19 c
+3721.8 2305.41 3360.03 2243.98 3172.31 2213.26 c
+S
+n
+3182.55 2223.5 m
+3148.42 2209.85 l
+3182.55 2206.43 l
+h
+S
+n
+3182.55 2223.5 m
+3148.42 2209.85 l
+3182.55 2206.43 l
+f
+n
+4735.47 2687.67 m
+4735.47 2721.59 4659.06 2749.1 4564.82 2749.1 c
+4470.57 2749.1 4394.17 2721.59 4394.17 2687.67 c
+4394.17 2653.74 4470.57 2626.23 4564.82 2626.23 c
+4659.06 2626.23 4735.47 2653.74 4735.47 2687.67 c
+S
+q
+10 0 0 10 0 0 cm
+442.943 267.674 m
+/N9 4.7782 Tf
+(BeamFirFilter)
+[3.18702 2.12145 2.12145 3.71744 2.65668 1.32834 1.5911 2.65668 1.32834 1.32834 1.32834 
+2.12145 1.5911 ] pdfxs
+Q
+n
+4564.82 2871.97 m
+4564.82 2844.66 4564.82 2813.95 4564.82 2783.23 c
+S
+n
+4557.99 2783.23 m
+4564.82 2749.1 l
+4575.05 2783.23 l
+h
+S
+n
+4557.99 2783.23 m
+4564.82 2749.1 l
+4575.05 2783.23 l
+f
+n
+4735.47 2441.93 m
+4735.47 2475.86 4659.06 2503.36 4564.82 2503.36 c
+4470.57 2503.36 4394.17 2475.86 4394.17 2441.93 c
+4394.17 2408 4470.57 2380.5 4564.82 2380.5 c
+4659.06 2380.5 4735.47 2408 4735.47 2441.93 c
+S
+q
+10 0 0 10 0 0 cm
+442.943 243.101 m
+/N9 4.7782 Tf
+(BeamFirFilter)
+[3.18702 2.12145 2.12145 3.71744 2.65668 1.32834 1.5911 2.65668 1.32834 1.32834 1.32834 
+2.12145 1.5911 ] pdfxs
+Q
+n
+4564.82 2626.23 m
+4564.82 2598.93 4564.82 2568.21 4564.82 2537.49 c
+S
+n
+4557.99 2537.49 m
+4564.82 2503.36 l
+4575.05 2537.49 l
+h
+S
+n
+4557.99 2537.49 m
+4564.82 2503.36 l
+4575.05 2537.49 l
+f
+n
+4465.84 2390.73 m
+4428.3 2373.67 4387.34 2356.6 4356.62 2353.19 c
+4025.56 2298.58 3424.87 2233.74 3172.31 2209.85 c
+S
+n
+3182.55 2220.08 m
+3151.83 2206.43 l
+3185.96 2203.02 l
+h
+S
+n
+3182.55 2220.08 m
+3151.83 2206.43 l
+3185.96 2203.02 l
+f
+n
+5165.5 2687.67 m
+5165.5 2721.59 5089.1 2749.1 4994.85 2749.1 c
+4900.61 2749.1 4824.2 2721.59 4824.2 2687.67 c
+4824.2 2653.74 4900.61 2626.23 4994.85 2626.23 c
+5089.1 2626.23 5165.5 2653.74 5165.5 2687.67 c
+S
+q
+10 0 0 10 0 0 cm
+485.946 267.674 m
+/N9 4.7782 Tf
+(BeamFirFilter)
+[3.18702 2.12145 2.12145 3.71744 2.65668 1.32834 1.5911 2.65668 1.32834 1.32834 1.32834 
+2.12145 1.5911 ] pdfxs
+Q
+n
+4994.85 2871.97 m
+4994.85 2844.66 4994.85 2813.95 4994.85 2783.23 c
+S
+n
+4988.03 2783.23 m
+4994.85 2749.1 l
+5005.09 2783.23 l
+h
+S
+n
+4988.03 2783.23 m
+4994.85 2749.1 l
+5005.09 2783.23 l
+f
+n
+5165.5 2441.93 m
+5165.5 2475.86 5089.1 2503.36 4994.85 2503.36 c
+4900.61 2503.36 4824.2 2475.86 4824.2 2441.93 c
+4824.2 2408 4900.61 2380.5 4994.85 2380.5 c
+5089.1 2380.5 5165.5 2408 5165.5 2441.93 c
+S
+q
+10 0 0 10 0 0 cm
+485.946 243.101 m
+/N9 4.7782 Tf
+(BeamFirFilter)
+[3.18702 2.12145 2.12145 3.71744 2.65668 1.32834 1.5911 2.65668 1.32834 1.32834 1.32834 
+2.12145 1.5911 ] pdfxs
+Q
+n
+4994.85 2626.23 m
+4994.85 2598.93 4994.85 2568.21 4994.85 2537.49 c
+S
+n
+4988.03 2537.49 m
+4994.85 2503.36 l
+5005.09 2537.49 l
+h
+S
+n
+4988.03 2537.49 m
+4994.85 2503.36 l
+5005.09 2537.49 l
+f
+n
+4899.29 2390.73 m
+4861.75 2373.67 4817.38 2356.6 4786.66 2353.19 c
+4325.91 2295.17 3489.72 2226.91 3179.14 2206.43 c
+S
+n
+3185.96 2216.67 m
+3151.83 2203.02 l
+3185.96 2199.61 l
+h
+S
+n
+3185.96 2216.67 m
+3151.83 2203.02 l
+3185.96 2199.61 l
+f
+n
+5595.54 2687.67 m
+5595.54 2721.59 5519.14 2749.1 5424.89 2749.1 c
+5330.64 2749.1 5254.24 2721.59 5254.24 2687.67 c
+5254.24 2653.74 5330.64 2626.23 5424.89 2626.23 c
+5519.14 2626.23 5595.54 2653.74 5595.54 2687.67 c
+S
+q
+10 0 0 10 0 0 cm
+528.95 267.674 m
+/N9 4.7782 Tf
+(BeamFirFilter)
+[3.18702 2.12145 2.12145 3.71744 2.65668 1.32834 1.5911 2.65668 1.32834 1.32834 1.32834 
+2.12145 1.5911 ] pdfxs
+Q
+n
+5424.89 2871.97 m
+5424.89 2844.66 5424.89 2813.95 5424.89 2783.23 c
+S
+n
+5418.07 2783.23 m
+5424.89 2749.1 l
+5435.13 2783.23 l
+h
+S
+n
+5418.07 2783.23 m
+5424.89 2749.1 l
+5435.13 2783.23 l
+f
+n
+5595.54 2441.93 m
+5595.54 2475.86 5519.14 2503.36 5424.89 2503.36 c
+5330.64 2503.36 5254.24 2475.86 5254.24 2441.93 c
+5254.24 2408 5330.64 2380.5 5424.89 2380.5 c
+5519.14 2380.5 5595.54 2408 5595.54 2441.93 c
+S
+q
+10 0 0 10 0 0 cm
+528.95 243.101 m
+/N9 4.7782 Tf
+(BeamFirFilter)
+[3.18702 2.12145 2.12145 3.71744 2.65668 1.32834 1.5911 2.65668 1.32834 1.32834 1.32834 
+2.12145 1.5911 ] pdfxs
+Q
+n
+5424.89 2626.23 m
+5424.89 2598.93 5424.89 2568.21 5424.89 2537.49 c
+S
+n
+5418.07 2537.49 m
+5424.89 2503.36 l
+5435.13 2537.49 l
+h
+S
+n
+5418.07 2537.49 m
+5424.89 2503.36 l
+5435.13 2537.49 l
+f
+n
+5329.33 2390.73 m
+5291.78 2373.67 5247.42 2356.6 5216.7 2353.19 c
+4626.25 2291.76 3547.74 2223.5 3182.55 2203.02 c
+S
+n
+3185.96 2213.26 m
+3151.83 2203.02 l
+3185.96 2196.19 l
+h
+S
+n
+3185.96 2213.26 m
+3151.83 2203.02 l
+3185.96 2196.19 l
+f
+n
+2571.62 1704.72 m
+2571.62 1738.65 2507.45 1766.16 2428.28 1766.16 c
+2349.11 1766.16 2284.93 1738.65 2284.93 1704.72 c
+2284.93 1670.79 2349.11 1643.29 2428.28 1643.29 c
+2507.45 1643.29 2571.62 1670.79 2571.62 1704.72 c
+S
+q
+10 0 0 10 0 0 cm
+232.077 169.38 m
+/N9 4.7782 Tf
+(BeamForm)
+[3.18702 2.12145 2.12145 3.71744 2.65668 2.3891 1.5911 3.71744 ] pdfxs
+Q
+n
+2960.71 1916.33 m
+2861.73 1878.78 2714.97 1827.59 2622.82 1793.46 c
+2602.34 1786.63 2575.04 1772.98 2547.73 1759.33 c
+S
+n
+2554.56 1772.98 m
+2527.25 1749.09 l
+2561.39 1755.92 l
+h
+S
+n
+2554.56 1772.98 m
+2527.25 1749.09 l
+2561.39 1755.92 l
+f
+n
+3001.66 1704.72 m
+3001.66 1738.65 2937.48 1766.16 2858.32 1766.16 c
+2779.15 1766.16 2714.97 1738.65 2714.97 1704.72 c
+2714.97 1670.79 2779.15 1643.29 2858.32 1643.29 c
+2937.48 1643.29 3001.66 1670.79 3001.66 1704.72 c
+S
+q
+10 0 0 10 0 0 cm
+275.081 169.38 m
+/N9 4.7782 Tf
+(BeamForm)
+[3.18702 2.12145 2.12145 3.71744 2.65668 2.3891 1.5911 3.71744 ] pdfxs
+Q
+n
+3011.9 1892.44 m
+2988.01 1861.72 2953.88 1824.18 2926.58 1790.05 c
+S
+n
+2919.75 1796.87 m
+2906.1 1762.74 l
+2933.4 1786.63 l
+h
+S
+n
+2919.75 1796.87 m
+2906.1 1762.74 l
+2933.4 1786.63 l
+f
+n
+3404.4 1704.72 m
+3404.4 1738.65 3340.22 1766.16 3261.05 1766.16 c
+3181.88 1766.16 3117.7 1738.65 3117.7 1704.72 c
+3117.7 1670.79 3181.88 1643.29 3261.05 1643.29 c
+3340.22 1643.29 3404.4 1670.79 3404.4 1704.72 c
+S
+q
+10 0 0 10 0 0 cm
+315.354 169.38 m
+/N9 4.7782 Tf
+(BeamForm)
+[3.18702 2.12145 2.12145 3.71744 2.65668 2.3891 1.5911 3.71744 ] pdfxs
+Q
+n
+3107.46 1892.44 m
+3131.36 1861.72 3165.49 1824.18 3192.79 1790.05 c
+S
+n
+3185.96 1786.63 m
+3213.27 1762.74 l
+3199.62 1796.87 l
+h
+S
+n
+3185.96 1786.63 m
+3213.27 1762.74 l
+3199.62 1796.87 l
+f
+n
+3834.43 1704.72 m
+3834.43 1738.65 3770.26 1766.16 3691.09 1766.16 c
+3611.92 1766.16 3547.74 1738.65 3547.74 1704.72 c
+3547.74 1670.79 3611.92 1643.29 3691.09 1643.29 c
+3770.26 1643.29 3834.43 1670.79 3834.43 1704.72 c
+S
+q
+10 0 0 10 0 0 cm
+358.358 169.38 m
+/N9 4.7782 Tf
+(BeamForm)
+[3.18702 2.12145 2.12145 3.71744 2.65668 2.3891 1.5911 3.71744 ] pdfxs
+Q
+n
+3162.07 1916.33 m
+3261.05 1878.78 3407.81 1827.59 3496.55 1793.46 c
+3513.61 1786.63 3537.5 1776.4 3561.39 1766.16 c
+S
+n
+3561.39 1755.92 m
+3595.52 1749.09 l
+3568.22 1772.98 l
+h
+S
+n
+3561.39 1755.92 m
+3595.52 1749.09 l
+3568.22 1772.98 l
+f
+n
+3158.66 721.778 m
+3158.66 755.707 3117.4 783.212 3066.51 783.212 c
+3015.62 783.212 2974.36 755.707 2974.36 721.778 c
+2974.36 687.849 3015.62 660.344 3066.51 660.344 c
+3117.4 660.344 3158.66 687.849 3158.66 721.778 c
+S
+n
+3216.68 476.042 m
+3216.68 509.971 3149.45 537.476 3066.51 537.476 c
+2983.57 537.476 2916.34 509.971 2916.34 476.042 c
+2916.34 442.113 2983.57 414.608 3066.51 414.608 c
+3149.45 414.608 3216.68 442.113 3216.68 476.042 c
+S
+q
+10 0 0 10 0 0 cm
+295.236 46.512 m
+/N9 4.7782 Tf
+(FloatPrinter)
+[2.65668 1.32834 2.3891 2.12145 1.32834 2.65668 1.5911 1.32834 2.3891 1.32834 2.12145 
+1.5911 ] pdfxs
+Q
+n
+3066.51 660.344 m
+3066.51 633.04 3066.51 602.323 3066.51 571.606 c
+S
+n
+3059.68 571.606 m
+3066.51 537.476 l
+3076.75 571.606 l
+h
+S
+n
+3059.68 571.606 m
+3066.51 537.476 l
+3076.75 571.606 l
+f
+n
+2585.28 1458.99 m
+2585.28 1492.91 2508.87 1520.42 2414.63 1520.42 c
+2320.38 1520.42 2243.98 1492.91 2243.98 1458.99 c
+2243.98 1425.06 2320.38 1397.55 2414.63 1397.55 c
+2508.87 1397.55 2585.28 1425.06 2585.28 1458.99 c
+S
+q
+10 0 0 10 0 0 cm
+227.924 144.806 m
+/N9 4.7782 Tf
+(BeamFirFilter)
+[3.18702 2.12145 2.12145 3.71744 2.65668 1.32834 1.5911 2.65668 1.32834 1.32834 1.32834 
+2.12145 1.5911 ] pdfxs
+Q
+n
+2424.86 1643.29 m
+2421.45 1615.98 2421.45 1585.27 2421.45 1554.55 c
+S
+n
+2414.63 1554.55 m
+2418.04 1520.42 l
+2428.28 1554.55 l
+h
+S
+n
+2414.63 1554.55 m
+2418.04 1520.42 l
+2428.28 1554.55 l
+f
+n
+2568.21 1213.25 m
+2568.21 1247.18 2507.09 1274.68 2431.69 1274.68 c
+2356.29 1274.68 2295.17 1247.18 2295.17 1213.25 c
+2295.17 1179.32 2356.29 1151.82 2431.69 1151.82 c
+2507.09 1151.82 2568.21 1179.32 2568.21 1213.25 c
+S
+q
+10 0 0 10 0 0 cm
+232.817 120.233 m
+/N9 4.7782 Tf
+(Magnitude)
+[4.24778 2.12145 2.3891 2.3891 1.32834 1.32834 2.3891 2.3891 2.12145 ] pdfxs
+Q
+n
+2418.04 1397.55 m
+2421.45 1370.25 2421.45 1339.53 2424.86 1308.81 c
+S
+n
+2418.04 1308.81 m
+2428.28 1274.68 l
+2431.69 1308.81 l
+h
+S
+n
+2418.04 1308.81 m
+2428.28 1274.68 l
+2431.69 1308.81 l
+f
+n
+2564.8 967.514 m
+2564.8 1001.44 2512.84 1028.95 2448.76 1028.95 c
+2384.67 1028.95 2332.71 1001.44 2332.71 967.514 c
+2332.71 933.585 2384.67 906.08 2448.76 906.08 c
+2512.84 906.08 2564.8 933.585 2564.8 967.514 c
+S
+q
+10 0 0 10 0 0 cm
+236.65 95.6593 m
+/N9 4.7782 Tf
+(Detector)
+[3.44979 2.12145 1.32834 2.12145 2.12145 1.32834 2.3891 1.5911 ] pdfxs
+Q
+n
+2435.1 1151.82 m
+2438.52 1124.51 2438.52 1093.79 2441.93 1063.08 c
+S
+n
+2435.1 1063.08 m
+2445.34 1028.95 l
+2448.76 1063.08 l
+h
+S
+n
+2435.1 1063.08 m
+2445.34 1028.95 l
+2448.76 1063.08 l
+f
+n
+2530.67 923.145 m
+2561.39 906.08 2598.93 889.015 2622.82 878.776 c
+2711.56 844.646 2854.9 793.451 2953.88 759.321 c
+S
+n
+2950.47 752.495 m
+2984.6 749.082 l
+2953.88 769.56 l
+h
+S
+n
+2950.47 752.495 m
+2984.6 749.082 l
+2953.88 769.56 l
+f
+n
+3015.31 1458.99 m
+3015.31 1492.91 2938.91 1520.42 2844.66 1520.42 c
+2750.42 1520.42 2674.01 1492.91 2674.01 1458.99 c
+2674.01 1425.06 2750.42 1397.55 2844.66 1397.55 c
+2938.91 1397.55 3015.31 1425.06 3015.31 1458.99 c
+S
+q
+10 0 0 10 0 0 cm
+270.927 144.806 m
+/N9 4.7782 Tf
+(BeamFirFilter)
+[3.18702 2.12145 2.12145 3.71744 2.65668 1.32834 1.5911 2.65668 1.32834 1.32834 1.32834 
+2.12145 1.5911 ] pdfxs
+Q
+n
+2854.9 1643.29 m
+2851.49 1615.98 2851.49 1585.27 2851.49 1554.55 c
+S
+n
+2844.66 1554.55 m
+2848.08 1520.42 l
+2858.32 1554.55 l
+h
+S
+n
+2844.66 1554.55 m
+2848.08 1520.42 l
+2858.32 1554.55 l
+f
+n
+2998.25 1213.25 m
+2998.25 1247.18 2937.13 1274.68 2861.73 1274.68 c
+2786.33 1274.68 2725.21 1247.18 2725.21 1213.25 c
+2725.21 1179.32 2786.33 1151.82 2861.73 1151.82 c
+2937.13 1151.82 2998.25 1179.32 2998.25 1213.25 c
+S
+q
+10 0 0 10 0 0 cm
+275.821 120.233 m
+/N9 4.7782 Tf
+(Magnitude)
+[4.24778 2.12145 2.3891 2.3891 1.32834 1.32834 2.3891 2.3891 2.12145 ] pdfxs
+Q
+n
+2848.08 1397.55 m
+2851.49 1370.25 2851.49 1339.53 2854.9 1308.81 c
+S
+n
+2848.08 1308.81 m
+2858.32 1274.68 l
+2861.73 1308.81 l
+h
+S
+n
+2848.08 1308.81 m
+2858.32 1274.68 l
+2861.73 1308.81 l
+f
+n
+2994.84 967.514 m
+2994.84 1001.44 2942.88 1028.95 2878.79 1028.95 c
+2814.71 1028.95 2762.75 1001.44 2762.75 967.514 c
+2762.75 933.585 2814.71 906.08 2878.79 906.08 c
+2942.88 906.08 2994.84 933.585 2994.84 967.514 c
+S
+q
+10 0 0 10 0 0 cm
+279.654 95.6593 m
+/N9 4.7782 Tf
+(Detector)
+[3.44979 2.12145 1.32834 2.12145 2.12145 1.32834 2.3891 1.5911 ] pdfxs
+Q
+n
+2865.14 1151.82 m
+2868.55 1124.51 2868.55 1093.79 2871.97 1063.08 c
+S
+n
+2865.14 1063.08 m
+2875.38 1028.95 l
+2878.79 1063.08 l
+h
+S
+n
+2865.14 1063.08 m
+2875.38 1028.95 l
+2878.79 1063.08 l
+f
+n
+2923.16 909.493 m
+2947.05 875.363 2977.77 837.82 3005.07 803.69 c
+S
+n
+2998.25 800.277 m
+3025.55 776.386 l
+3011.9 810.516 l
+h
+S
+n
+2998.25 800.277 m
+3025.55 776.386 l
+3011.9 810.516 l
+f
+n
+3445.35 1458.99 m
+3445.35 1492.91 3368.95 1520.42 3274.7 1520.42 c
+3180.45 1520.42 3104.05 1492.91 3104.05 1458.99 c
+3104.05 1425.06 3180.45 1397.55 3274.7 1397.55 c
+3368.95 1397.55 3445.35 1425.06 3445.35 1458.99 c
+S
+q
+10 0 0 10 0 0 cm
+313.931 144.806 m
+/N9 4.7782 Tf
+(BeamFirFilter)
+[3.18702 2.12145 2.12145 3.71744 2.65668 1.32834 1.5911 2.65668 1.32834 1.32834 1.32834 
+2.12145 1.5911 ] pdfxs
+Q
+n
+3264.46 1643.29 m
+3267.88 1615.98 3267.88 1585.27 3267.88 1554.55 c
+S
+n
+3261.05 1554.55 m
+3271.29 1520.42 l
+3274.7 1554.55 l
+h
+S
+n
+3261.05 1554.55 m
+3271.29 1520.42 l
+3274.7 1554.55 l
+f
+n
+3394.16 1213.25 m
+3394.16 1247.18 3333.03 1274.68 3257.64 1274.68 c
+3182.24 1274.68 3121.12 1247.18 3121.12 1213.25 c
+3121.12 1179.32 3182.24 1151.82 3257.64 1151.82 c
+3333.03 1151.82 3394.16 1179.32 3394.16 1213.25 c
+S
+q
+10 0 0 10 0 0 cm
+315.412 120.233 m
+/N9 4.7782 Tf
+(Magnitude)
+[4.24778 2.12145 2.3891 2.3891 1.32834 1.32834 2.3891 2.3891 2.12145 ] pdfxs
+Q
+n
+3271.29 1397.55 m
+3267.88 1370.25 3267.88 1339.53 3264.46 1308.81 c
+S
+n
+3257.64 1308.81 m
+3261.05 1274.68 l
+3271.29 1308.81 l
+h
+S
+n
+3257.64 1308.81 m
+3261.05 1274.68 l
+3271.29 1308.81 l
+f
+n
+3353.2 967.514 m
+3353.2 1001.44 3301.25 1028.95 3237.16 1028.95 c
+3173.07 1028.95 3121.12 1001.44 3121.12 967.514 c
+3121.12 933.585 3173.07 906.08 3237.16 906.08 c
+3301.25 906.08 3353.2 933.585 3353.2 967.514 c
+S
+q
+10 0 0 10 0 0 cm
+315.49 95.6593 m
+/N9 4.7782 Tf
+(Detector)
+[3.44979 2.12145 1.32834 2.12145 2.12145 1.32834 2.3891 1.5911 ] pdfxs
+Q
+n
+3250.81 1151.82 m
+3247.4 1124.51 3247.4 1093.79 3243.98 1063.08 c
+S
+n
+3237.16 1063.08 m
+3243.98 1028.95 l
+3254.22 1063.08 l
+h
+S
+n
+3237.16 1063.08 m
+3243.98 1028.95 l
+3254.22 1063.08 l
+f
+n
+3196.2 909.493 m
+3175.72 878.776 3148.42 841.233 3124.53 807.103 c
+S
+n
+3117.7 813.929 m
+3104.05 779.799 l
+3131.36 803.69 l
+h
+S
+n
+3117.7 813.929 m
+3104.05 779.799 l
+3131.36 803.69 l
+f
+n
+3875.39 1458.99 m
+3875.39 1492.91 3798.99 1520.42 3704.74 1520.42 c
+3610.49 1520.42 3534.09 1492.91 3534.09 1458.99 c
+3534.09 1425.06 3610.49 1397.55 3704.74 1397.55 c
+3798.99 1397.55 3875.39 1425.06 3875.39 1458.99 c
+S
+q
+10 0 0 10 0 0 cm
+356.935 144.806 m
+/N9 4.7782 Tf
+(BeamFirFilter)
+[3.18702 2.12145 2.12145 3.71744 2.65668 1.32834 1.5911 2.65668 1.32834 1.32834 1.32834 
+2.12145 1.5911 ] pdfxs
+Q
+n
+3694.5 1643.29 m
+3697.91 1615.98 3697.91 1585.27 3697.91 1554.55 c
+S
+n
+3691.09 1554.55 m
+3701.33 1520.42 l
+3704.74 1554.55 l
+h
+S
+n
+3691.09 1554.55 m
+3701.33 1520.42 l
+3704.74 1554.55 l
+f
+n
+3824.19 1213.25 m
+3824.19 1247.18 3763.07 1274.68 3687.68 1274.68 c
+3612.28 1274.68 3551.16 1247.18 3551.16 1213.25 c
+3551.16 1179.32 3612.28 1151.82 3687.68 1151.82 c
+3763.07 1151.82 3824.19 1179.32 3824.19 1213.25 c
+S
+q
+10 0 0 10 0 0 cm
+358.416 120.233 m
+/N9 4.7782 Tf
+(Magnitude)
+[4.24778 2.12145 2.3891 2.3891 1.32834 1.32834 2.3891 2.3891 2.12145 ] pdfxs
+Q
+n
+3701.33 1397.55 m
+3697.91 1370.25 3697.91 1339.53 3694.5 1308.81 c
+S
+n
+3687.68 1308.81 m
+3691.09 1274.68 l
+3701.33 1308.81 l
+h
+S
+n
+3687.68 1308.81 m
+3691.09 1274.68 l
+3701.33 1308.81 l
+f
+n
+3783.24 967.514 m
+3783.24 1001.44 3731.29 1028.95 3667.2 1028.95 c
+3603.11 1028.95 3551.16 1001.44 3551.16 967.514 c
+3551.16 933.585 3603.11 906.08 3667.2 906.08 c
+3731.29 906.08 3783.24 933.585 3783.24 967.514 c
+S
+q
+10 0 0 10 0 0 cm
+358.494 95.6593 m
+/N9 4.7782 Tf
+(Detector)
+[3.44979 2.12145 1.32834 2.12145 2.12145 1.32834 2.3891 1.5911 ] pdfxs
+Q
+n
+3680.85 1151.82 m
+3677.44 1124.51 3677.44 1093.79 3674.02 1063.08 c
+S
+n
+3667.2 1063.08 m
+3674.02 1028.95 l
+3684.26 1063.08 l
+h
+S
+n
+3667.2 1063.08 m
+3674.02 1028.95 l
+3684.26 1063.08 l
+f
+n
+3588.7 923.145 m
+3554.57 906.08 3523.85 889.015 3496.55 878.776 c
+3414.64 844.646 3274.7 793.451 3179.14 759.321 c
+S
+n
+3179.14 769.56 m
+3148.42 749.082 l
+3182.55 752.495 l
+h
+S
+n
+3179.14 769.56 m
+3148.42 749.082 l
+3182.55 752.495 l
+f
+Q
+PDFVars/TermAll get exec end end
+%%PageTrailer
+%%EndPage
+%%Trailer
+%%DocumentNeededResources:
+%%+ font Times-Roman
+%%EOF

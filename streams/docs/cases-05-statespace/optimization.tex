@@ -1,0 +1,403 @@
+\section{Optimization}
+
+     There are multiple metrics used to analyze performance
+of a computer program - speed (throughput, or outputs per second),
+space, power consumption, etc. We focus on speed and attempt to
+minimize the computation performed to produce each output.
+Obviously, this type of optimization has positive effects on the
+other parameters. However, we are mainly concerned with speed
+because it is simple to track, and due to falling hardware costs,
+is frequently a program's bottleneck.
+
+    There are two types of optimizations we consider.  The first is to
+remove extraneous state variables from the linear state-space
+representation. This reduces the memory allocation for a program
+and reduces the number of loads and stores executed, which are
+typically time intensive operations. It also eliminates
+computations that involve the removed states.  The second
+optimization is to reduce the parametrization of a state-space
+representation, by changing the representation to one with more
+zero and one entries in its matrices. This directly eliminates
+computations, since all multiplications by zero or one are not
+processed by the replacement algorithm.
+
+\subsection{State-Space Transformations}
+
+    For any state-space equation pair, there are an infinite
+number of transformations to an equivalent state-space system.
+These transformations involve a change of basis of the state
+vector $\vec{\mathbf{x}}$ to $\mathbf{T} \vec{\mathbf{x}}$, where
+$\mathbf{T}$ is an invertible matrix. Consider the state-update
+equation $\vec{\dot{\mathbf{x}}} = \mathbf{A} \vec{\mathbf{x}} +
+\mathbf{B} \vec{\mathbf{u}}$. Multiplying the entire equation by
+$\mathbf{T}$ yields:
+\begin{eqnarray*}
+\mathbf{T} \vec{\dot{\mathbf{x}}} = \mathbf{TA} \vec{\mathbf{x}} +
+\mathbf{TB} \vec{\mathbf{u}}
+\end{eqnarray*}
+
+    Since $\mathbf{T}^{-1} \mathbf{T} = \mathbf{I}$, we can write:
+\begin{eqnarray*}
+\mathbf{T} \vec{\dot{\mathbf{x}}} & = & \mathbf{TA}
+(\mathbf{T}^{-1} \mathbf{T}) \vec{\mathbf{x}} + \mathbf{TB}
+\vec{\mathbf{u}} = \mathbf{TA}
+\mathbf{T}^{-1} (\mathbf{T} \vec{\mathbf{x}}) + \mathbf{TB} \vec{\mathbf{u}} \\
+\vec{\mathbf{y}} & = & \mathbf{C} (\mathbf{T}^{-1} \mathbf{T})
+\vec{\mathbf{x}} + \mathbf{D} \vec{\mathbf{u}} = \mathbf{C}
+\mathbf{T}^{-1} (\mathbf{T} \vec{\mathbf{x}}) + \mathbf{D}
+\vec{\mathbf{u}}
+\end{eqnarray*}
+
+    Where we have introduced the output equation as well. Let
+$\vec{\mathbf{z}} = \mathbf{T} \vec{\mathbf{x}}$.
+$\vec{\mathbf{z}}$ is a new state vector related to the old state
+vector $\vec{\mathbf{x}}$ by the change of basis $\mathbf{T}$.
+Substituting into the equations above we get:
+\begin{eqnarray*}
+\vec{\dot{\mathbf{z}}} & = & \mathbf{TA} \mathbf{T}^{-1} \vec{\mathbf{z}} + \mathbf{TB} \vec{\mathbf{u}} \\
+\vec{\mathbf{y}} & = & \mathbf{C} \mathbf{T}^{-1}\vec{\mathbf{z}}
++ \mathbf{D}\vec{\mathbf{u}}
+\end{eqnarray*}
+
+    These is precisely the original state-space equation pair,
+with $\mathbf{A}$, $\mathbf{B}$, and $\mathbf{C}$ transformed to
+$\mathbf{T} \mathbf{A} \mathbf{T}^{-1}$, $\mathbf{T} \mathbf{B}$,
+and $\mathbf{C} \mathbf{T}^{-1}$, respectively.
+
+    For a StreamIt state-space representation $\mathrm{R}$, we must
+determine how the other values change. The initialization state
+update equation is essentially the same as the regular state
+update equation, so $\mathbf{A_{pre}}$ and $\mathbf{B_{pre}}$ are
+transformed to $\mathbf{T} \mathbf{A_{pre}} \mathbf{T}^{-1}$ and
+$\mathbf{T} \mathbf{B}$ respectively. Since the old state vector
+$\vec{\mathbf{x}}$ is multiplied by $\mathbf{T}$, the old initial
+state vector is multiplied by $\mathbf{T}$. The number of states,
+inputs, and outputs is the same, so $s$, $o$, and $u$ are
+unchanged.
+
+\subsection{State Removal}
+
+    There are two types of states that can be removed from a state-space system
+without changing its behavior - unreachable and unobservable
+states. Informally, unreachable states are unaffected by inputs
+and unobservable states have no effect on outputs. More formally,
+the set of states in a system can be divided into reachable and
+unreachable states where:
+\begin{enumerate}
+\item The unreachable states are not updated by any of the
+reachable states.
+
+\item The unreachable states are not updated by any inputs.
+\end{enumerate}
+
+    In terms of the state-space equation pair, this means $\mathbf{A}[i,j] =
+0, \mathbf{B}[i,k] = 0$ where $i$ is the row of an unreachable
+state, $j$ is the column of a reachable state, and $k$ is any of
+the inputs.
+    If all the unreachable states are initially zero, they
+remain zero because they are not updated by a non-zero value
+(either a reachable state or an input). Therefore, all unreachable
+states that are not initialized can be removed from a
+representation, since they do not effect the reachable states or
+the outputs.
+
+    The set of states in a system can also be divided into
+observable and unobservable states where:
+\begin{enumerate}
+\item The observable states are not updated by any of the
+unobservable states.
+
+\item The outputs do not depend on the unobservable states.
+\end{enumerate}
+
+    In terms of the state-space equation pair, this means $\mathbf{C}[i,j] =
+0, \mathbf{D}[k,j] = 0$ where $j$ is the column of an observable
+state, $i$ is the row of an unobservable state, and $k$ is any of
+the outputs.
+    The unobservable states are not used to update the observable
+states and are not used to determine the outputs. Therefore, all
+unobservable states can be removed from a representation
+(regardless of their initial values).
+
+    A simple algorithm to isolate the unreachable and unobservable
+states in a system by use of transformations is explained in
+\cite{Mayne}. The algorithm works as follows: Perform row
+operations on the augmented matrix $\left [ \begin{array} {cc}
+\mathbf{A} & \mathbf{B} \end{array} \right ]$ to put it into a
+type of row-echelon form\footnote{A matrix is in standard
+row-echelon form if the first non-zero entry in each row is a 1
+(called the leading 1) and the leading 1 in a higher row is to the
+left of the leading 1 in a lower row. For our type of row-echelon
+form, the \emph{last} non-zero entry in each row is a 1 (call it
+the ending 1) and the ending 1 in a higher row is to the left of
+the ending 1 in a lower row.}, and perform the corresponding
+inverse column operations on $\mathbf{A}$ and $\mathbf{C}$ to keep
+the system equivalent to the original (Performing a row operation
+on a matrix is equivalent to left multiplying it by some
+invertible matrix, and performing a column operation on a matrix
+is equivalent to right multiplying it by some invertible matrix).
+Once the augmented matrix is in the desired form, row $i$ of the
+combined matrix represents an unreachable state if there are no
+non-zero entries past the $i^{th}$ column. For unobservable
+states, the combined matrix $\left [ \begin{array} {cc}
+\mathbf{A}^T & \mathbf{C}^T
+\end{array} \right ]$ is operated on instead.
+
+    Using this algorithm, we can find the entire set of unobservable
+states and remove them all. The only exceptions are those
+unobservable states that affect observable states in the
+initialization matrix $\matrix{A_{pre}}$. If $j$ is the column of
+an observable state then we must have $\mathbf{A_{pre}}[i,j] = 0$
+for all values of $i$, where $i$ is the row of an observable
+state. Otherwise, the unobservable state $j$ cannot be removed,
+because it affects at least one observable state, and therefore
+may affect the outputs.
+
+    More care must be taken when removing unreachable states. If an
+unreachable state has a non-zero starting value, or is affected by
+the initialization matrices, it cannot be removed. In either of
+these cases, the unreachable state may attain a non-zero value,
+and therefore may have an affect on the reachable states and/or
+outputs. Additionally, an unreachable state $x_1$ that is updated
+by a different unreachable state $x_2$ that cannot be removed may
+eventually have a non-zero value, even if it ($x_1$) is initially
+zero. Therefore, the unreachable state $x_1$ cannot be removed as
+well.
+
+    The last case may cause problems when trying to remove
+unreachable states. If an unreachable state $x_1$ is updated by
+unreachable states $x_2$ and $x_3$, we must check if those states
+can be removed before determining if state $x_1$ can be removed.
+If one of those states, say $x_2$, depends on $x_1$, we must
+determine if $x_1$ can be removed before determining whether $x_2$
+can be removed - resulting in an impossible `loop-like'
+determination. Clearly, a more robust approach is necessary.
+
+    Suppose we have found the set of unreachable states and they
+form the first $k$ states of the state vector (we can do both of
+these steps by isolating the unreachable states, then moving them
+to the top of the state vector if necessary). Consider the
+sub-matrix $\mathbf{A}[1:k;1:k]$ consisting of the first k rows
+and first k columns of $\mathbf{A}$. This sub-matrix represents
+how the unreachable states are updated based on each other.
+Suppose this sub-matrix is in upper-triangular form, which means
+that all entries below the main diagonal are zero. We can remove
+states in the following manner:
+\begin{enumerate}
+\item Check the states in reverse order, from state $k$ to state
+$1$.
+
+\item For the $i^{th}$ state, check whether the state has an
+initial value, is updated by the initialization matrices, or
+depends on a state with a higher index. If any of these are true,
+we cannot remove the state. Otherwise, we can remove the state.
+\end{enumerate}
+
+    Since the unreachable state sub-matrix is in upper-triangular
+form, all unreachable states can only have dependencies on states
+with a higher index. Furthermore, since we are working from the
+state with highest index first, at each step in the algorithm we
+can immediately determine whether or not a given state is
+removable. Therefore we have found our robust approach to remove
+unreachable states. What remains to be done is transforming the
+sub-matrix to upper-triangular form.
+
+    The QR algorithm, described in \cite{Trefethen}, is an iterative method of
+converting any square matrix $\mathbf{P}$ to upper-triangular
+form. The algorithm is essentially the following two step
+procedure, applied as many times as necessary.
+\begin{enumerate}
+\item $\mathbf{Q} \mathbf{R} = \mathbf{P}$   (QR factorization of
+P)
+
+\item $\mathbf{P} = \mathbf{R} \mathbf{Q}$
+\end{enumerate}
+
+    The QR factorization of a matrix $\mathbf{P}$ factors
+$\mathbf{P}$ into the product of an orthogonal matrix
+$\mathbf{Q}$\footnote{An orthogonal matrix has the property that
+its transpose is equal to its inverse} and an upper-triangular
+matrix $\mathbf{R}$. Since $\mathbf{R} = \mathbf{Q}^{-1}
+\mathbf{P}$, the QR algorithm is repeatedly transforming
+$\mathbf{P}$ to $\mathbf{Q}^{-1} \mathbf{P} \mathbf{Q}$.
+
+    Since $\mathbf{Q}$ is invertible, we can apply this
+transformation to the unreachable state sub-matrix, where the
+transformation matrix $\mathbf{T}$ is $\mathbf{Q}^{-1}$. Since we
+want to keep the other states unchanged, the full transformation
+matrix applied to $\mathbf{A}$, $\mathbf{B}$, $\mathbf{C}$ is
+$\mathbf{T} = \left [ \begin{array} {cc} \mathbf{Q}^{-1} &
+\mathbf{0} \\ \mathbf{0} & \mathbf{I} \end{array} \right ]$
+
+\subsection{Putting Inputs into States}
+
+    So far we have considered optimizations that affect $\mathbf{A}$,
+$\mathbf{B}$, and $\mathbf{C}$. Since the optimizations are
+entirely the result of state transformations, they do not affect
+$\mathbf{D}$, which is independent of the choice of state-space
+basis. By storing every input as a state, however, all the entries
+of $\mathbf{D}$ are moved into $\mathbf{A}$ and can then be
+changed by state optimizations.
+
+    We have already discussed how to store inputs as states. When
+every input is stored as a state, we find the new state-equation
+pair is:
+\begin{eqnarray*}
+\left [ \begin{array} {c} \vec{\dot{\mathbf{x}}} \\
+\vec{\dot{\mathbf{x_{inputs}}}} \end{array} \right ] & = & \left [
+\begin{array} {cc} \mathbf{A} & \mathbf{B} \\ \mathbf{0} &
+\mathbf{0} \end{array} \right ] \left [ \begin{array} {c}
+\vec{\mathbf{x}} \\ \vec{\mathbf{x_{inputs}}} \end{array} \right ]
++ \left [ \begin{array} {c} \mathbf{0} \\ \mathbf{I} \end{array}
+\right ] \vec{\mathbf{u}} \\
+\vec{\mathbf{y}} & = & \left [ \begin{array} {cc} \mathbf{C} &
+\mathbf{D} \end{array} \right ] \left [ \begin{array} {c}
+\vec{\mathbf{x}} \\ \vec{\mathbf{x_{inputs}}} \end{array} \right ]
++ \mathbf{0} \vec{\mathbf{u}}
+\end{eqnarray*}
+
+    These states should be added before state-removal is
+performed. It may seem counter-intuitive that we first add states,
+then seek to remove them. However, the added states represent
+computations involving $\mathbf{D}$, which were not considered
+before. Removing some of these states results in reducing
+computations involving $\mathbf{D}$.
+
+\subsection{Parameter Reduction}
+
+    After removing as many states as possible, including input
+states, we want to change the state-space system to one with the
+fewest number of non-zero, non-one entries (termed parameters). If
+$\mathbf{A}$, $\mathbf{B}$, and $\mathbf{C}$ are completely
+filled, there are $s*(s+o+u)$ parameters. Ackermann and Bucy
+\cite{Ackermann/Bucy} show a general form for $\mathbf{A}$ and
+$\mathbf{C}$ ($\mathbf{B}$ can be filled with parameters) to have
+at most $s*(o+u)$ parameters, assuming there are no unobservable
+or unreachable states. They derive this form using system impulse
+responses. We will achieve this same form using row operations on
+the augmented matrix $\left [
+\begin{array} {cc} \mathbf{A}^T & \mathbf{C}^T \end{array} \right
+]$. The form we want is:
+\begin{eqnarray*}
+\mathbf{A}^T & = & \left [ \begin{array} {ccccc} \mathbf{L_1} &
+\mathbf{A_{12}} & \mathbf{A_{13}} & ... & \mathbf{A_{1u}} \\
+\mathbf{0} & \mathbf{L_2} & \mathbf{A_{23}} & ... &
+\mathbf{A_{2u}} \\ \mathbf{0} & \mathbf{0} & \mathbf{L_3} & ... &
+\mathbf{A_{3u}} \\ ... & ... & ... & ... & ... \\ \mathbf{0} &
+\mathbf{0} & \mathbf{0} & ... & \mathbf{L_u} \end{array} \right ] \\
+\mathbf{C}^T & = & \left [ \begin{array} {ccccc} 1 & 0 & 0 & ... &
+0 \\ 0 & 0 & 0 & ... & 0 \\ ... & ... & ... & ... & ... \\ 0 & 1 &
+0 & ... & 0 \\ 0 & 0 & 0 & 0 & 0 \\ ... & ... & ... & ... & ... \\
+0 & 0 & 0 & ... & 1 \end{array} \right ]
+\end{eqnarray*}
+
+    The matrices $\mathbf{L_i}$ are rectangular, and the matrices
+$\mathbf{A_{ij}}$ are square, but do not necessarily have the same
+dimensions as each other. These matrices have the form:
+\begin{eqnarray*}
+\mathbf{L_i} & = & \left [ \begin{array} {ccccc} 0 & 0 & ...
+& 0 & * \\ 1 & 0 & ... & 0 & * \\ 0 & 1 & ... & 0 & * \\
+... & ... & ... & ... & ... \\ 0 & 0 & ... & 1 & * \end{array}
+\right ] \\
+\mathbf{A_{ij}} & = & \left [ \begin{array} {cccc} 0 & 0 & ... & *
+\\ ... & ... & ... & ... \\ 0 & 0 & ... & * \end{array} \right ]
+\end{eqnarray*}
+
+    The entries marked with a * are the parameters of the system.
+This is known as the observable canonical form of the system. In
+contrast, the reachable canonical form defines $\mathbf{A}$ and
+$\mathbf{B}$ instead of $\mathbf{A}^T$ and $\mathbf{C}$, and
+$\mathbf{C}$ may be filled with parameters instead of
+$\mathbf{B}$.
+
+    We present a simple algorithm, in pseudocode to attain the form
+above. We do not include the necessary inverse column operations
+that must go with all row operations.
+
+\begin{scriptsize}
+\begin{singlespace}
+\begin{verbatim}
+Reduce Parameters {
+  currRow = 0; colA = 0; colC = 0;
+
+  while(currRow < totalRows) {
+
+   -find a non-zero entry in column colC at or below row currRow of C{transpose}, and swap it with the
+    entry in row currRow;
+   -set C{transpose}[currRow,colC] = 1 by scaling the row appropriately;
+    make all entries above and below it zero by adding appropriate multiple of row currRow to other rows;
+
+    currRow = currRow + 1;
+    colC = colC + 1;
+
+    do {
+     -find a non-zero entry in column colA at or below row currRow of A{transpose}, and swap it with the
+      entry in row currRow;
+     -set A{transpose}[currRow,colA] = 1 by scaling the row appropriately;
+      make all entries below it zero by adding appropriate multiple of row currRow to other rows;
+
+      currRow = currRow + 1;
+      colA = colA + 1;
+    } while a non-zero entry in column colA is found
+
+    colA = colA + 1;
+  }
+}
+\end{verbatim}
+\end{singlespace}
+\end{scriptsize}
+
+    It is possible that one type of form has fewer parameters than the
+other. Therefore, we perform the above algorithm on $\left [
+\begin{array} {cc} \mathbf{A}^T & \mathbf{C}^T
+\end{array} \right ]$ as noted to produce the observable form, and on $\left [
+\begin{array} {cc} \mathbf{A} & \mathbf{B} \end{array} \right
+]$ to produce the reachable form, and check which one has fewer
+parameters.
+
+\subsection{Staged Execution}
+
+    Using input state variables corresponds to executing a state-space
+block in two stages:
+\begin{enumerate}
+\item Put inputs into input state variables.
+
+\item Execute the original block, using input states instead of
+actual inputs.
+\end{enumerate}
+
+    We can add additional stages by having multiple sets of input
+states - $\vec{\mathbf{x_{inputs1}}}$,
+$\vec{\mathbf{x_{inputs2}}}$, etc. The first set gets saved in the
+second set, the second set gets saved in the third set, etc.
+Suppose there are $k$ input sets. We can write our state-space
+equation pair as follows:
+\begin{eqnarray*}
+\left [ \begin{array} {c} \vec{\dot{\mathbf{x}}} \\ \vec{\dot{\mathbf{x_{inputsk}}}} \\
+... \\ \vec{\dot{\mathbf{x_{inputs2}}}} \\
+\vec{\dot{\mathbf{x_{inputs1}}}}
+\end{array} \right ] & = & \left [ \begin{array} {ccccc}
+\mathbf{A} & \mathbf{B} & \mathbf{0} & ... &
+\mathbf{0} \\ \mathbf{0} & \mathbf{0} & \mathbf{I} & ... & \mathbf{0} \\
+... & ... & ... & ... & ... \\ \mathbf{0} & \mathbf{0} &
+\mathbf{0} & ... & \mathbf{I} \\ \mathbf{0} & \mathbf{0} &
+\mathbf{0} & ... & \mathbf{0} \end{array} \right ] \left [
+\begin{array} {c} \vec{\mathbf{x}} \\ \vec{\mathbf{x_{inputsk}}} \\ ...
+\\ \vec{\mathbf{x_{inputs2}}} \\ \vec{\mathbf{x_{inputs1}}} \end{array} \right ]
++ \left [ \begin{array} {c} \mathbf{0} \\ \mathbf{0} \\ ... \\
+\mathbf{0} \\ \mathbf{I} \end{array} \right ]
+\vec{\mathbf{u}} \\
+\vec{\mathbf{y}} & = & \left [ \begin{array} {ccccc} \mathbf{C} &
+\mathbf{D} & ... & \mathbf{0} & \mathbf{0} \end{array} \right ]
+\left [ \begin{array} {c} \vec{\mathbf{x}}
+\\ \vec{\mathbf{x_{inputsk}}} \\ ... \\ \vec{\mathbf{x_{inputs2}}}
+\\ \vec{\mathbf{x_{inputs1}}} \end{array} \right ] + \mathbf{0} \vec{\mathbf{u}}
+\end{eqnarray*}
+
+    By itself, executing the work of a filter in stages does not
+result in any gain in performance. However, minimally
+parameterizing the resulting system may be more productive than
+minimally parameterizing the one or two execution stage system.
+The canonical forms of the previous section do not in general
+minimally parameterize the system; hence evaluating staged
+execution remains an area of future research.
