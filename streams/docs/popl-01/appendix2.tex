@@ -1,39 +1,165 @@
+unanswered questions:
+- how to have ROUND\_ROBIN be both a splitter and joiner.
+
 \clearpage
+
+\newcommand{\doc}[1]{{\bf {\tt #1}} \\ }
+\newcommand{\methods}[1]{\bf {\it Methods}}
+\newcommand{\fields}[1]{\bf {\it Fields}}
 
 \renewcommand{\theequation}{A-\arabic{equation}}
 % redefine the command that creates the equation no.
 \setcounter{equation}{0}  % reset counter 
+\setcounter{section}{0}
 
 \begin{center}
 {\bf APPENDIX:  Details on Java Syntax}
 \end{center}
 
-\begin{verbatim}
-- add semantic restrictions
-- add java restrictions
-- diagram with class hierarchy
-- add a method-summary diagram
+\section{Java Classes}
 
+\begin{figure}
+\centering
+\psfig{figure=hierarchy.eps,width=2.0in}
+\caption{\protect\small The StreaMIT class hierarchy.
+\protect\label{fig:hierarchy}}
+\end{figure}
 
-------------------------------------------------------------------------
-add these semantic restrictions:
+A diagram of the Java class hierarchy for StreaMIT is shown in
+Figure~\ref{fig:hierarchy}.  A summary of the methods in each class is
+as follows.
 
-1. round-robin split/join must be non-null
-2. must have static rates in work function (compiler-detectable)
+\subsubsection{Operator}
 
-3. must only call input.pop() once per statement.  otherwise it's
+The {\tt Operator} is the basic building block in the stream graph,
+mapping one or more input channels to one or more output channels.
+
+\fields
+
+\doc{TimeInterval BEST\_EFFORT}  This pre-defined time interval
+indicates that a message should be delivered on a ``best-effort''
+basis, without strict timing guarantees.
+
+\methods
+
+\doc{MAX\_LATENCY(Stream a, Stream b, int n)}  This directive
+constraints the schedule such that, at any given time, $a$ can only
+progress up to the wavefront of information that $b$ will see after
+$n$ invocations of its own work function.
+
+\doc{Stream Identity()} - This returns a {\tt Stream} that outputs
+exactly the items that it inputs.
+
+\subsubsection{Stream}
+
+void init(args of choice)
+
+Stream add(Stream stream) - adds to pipeline segment and returns it
+
+void run() - runs stream, can only be called from outside a stream
+class to get whole system going
+
+\subsubsection{Splitter}
+
+For now, the user cannot instantiate splitters; we only recognize
+compiler-defined splitters.
+
+\subsubsection{Joiner}
+
+For now, the user cannot instantiate joiners; we only recognize
+compiler-defined splitters.
+
+\subsubsection{FeedbackLoop}
+
+<any type> initPath(int index)
+
+void setJoiner(Joiner joiner)
+
+void setSplitter(Splitter splitter)
+
+void setBody(Stream stream)
+
+void setLoop(Stream stream)
+
+void setDelay(int delay)
+
+\subsubsection{Filter}
+
+A filter has some input and output types; call them input-type and
+output-type.  Must declare channels of appropriate type as first two
+fields in class.
+
+<input-type> drain(int index)
+
+void work()
+
+\subsubsection{SplitJoin}
+
+void setSplitter(Splitter splitter) - 
+
+void setJoiner(Joiner joiner) - 
+
+Stream add(Stream stream) - adds to parallel segment and returns it
+
+\subsubsection{Channel}
+
+Channels are polymorphic.
+
+<type> pop()
+
+<type> peek(int index)
+
+void push(<type> item)
+
+\subsubsection{Portal}
+
+Portals are polymorphic.
+
+void register(<type> receiver);
+
+(all methods implemented by <type>, with extra TimeInterval argument)
+
+\subsubsection{TimeInterval}
+
+Constructor (min-time, max-time)
+
+\section{Semantic restrictions}
+
+\subsection{StreaMIT restrictions}
+
+\begin{enumerate}
+
+\item feedback-loop split/join must be non-null
+
+\item the number of outputs on a split and input on a join must match the number of parallel streams in a splitjoin.
+
+\item the joiner and splitter on a feedback loop must have two inputs and outputs
+
+\item must have static rates in work function (compiler-detectable)
+
+\item must only call input.pop() once per statement.  otherwise it's
 ambiguous what value is being referenced.  similarly, a peek() can't
 appear in the same expression as a pop().
 
-4. same for nested add statements
+\item same for nested add statements
 
-------------------------------------------------------------------------
-add these java restrictions:
+\item the types of connected filters must match
 
-- no class libraries except for:
-	1. String
-	2. 
+\item the messaging and latency constraints must be satisfyable
 
-- no aliasing allowed.  what does this mean?
+\item there must be no deadlock in feedback loops, or overflow in feedback loops or splitjoins
 
-\end{verbatim}
+\end{enumerate}
+
+\subsection{Java restrictions}
+
+\begin{enumerate}
+
+\item no class libraries except for:  String,
+
+\item no aliasing allowed.  what does this mean?
+
+\end{enumerate}
+
+
+

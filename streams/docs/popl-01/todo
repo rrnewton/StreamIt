@@ -1,6 +1,6 @@
 - write appendix
 
-- rewrite everything that saman wrote (related, example, conclusions)
+- rewrite everything that saman wrote (related, example, conclusions, captions)
 
 * define latency for things other than filters.  same with messages!
 	- will need concept of first/last filters in a stream, which
@@ -41,7 +41,8 @@ it.  (Although we could detect commutativity, maybe...)
 * should checkQuality be in the freq domain?  We really want a booster
 if the frequency spectrum is even?  But we said that we expect low
 values at the hop positions for the hopping... maybe they shouldn't
-output anything at the hop positions?
+output anything at the hop positions?  it's also messed up because it
+sends every cycle when the stream starts up.
 
 * I'm going to let the init function push and pop, ok?  We still have
 to give semantics.
