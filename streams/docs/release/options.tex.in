@@ -12,7 +12,7 @@
 
 \noindent
 This is for the May 28, 2003 snapshot release (streamit-0.0.20030528).\\
-\verb|$Id: options.tex.in,v 1.6 2003-09-30 16:09:15 dmaze Exp $|
+\verb|$Id: options.tex.in,v 1.7 2003-10-04 23:33:54 thies Exp $|
 
 \section*{Basic Usage}
 
@@ -56,7 +56,7 @@ compiles and links this to produce a binary, \filename{a.out}.
 
 \begin{description}
 \item[-{}-unroll \metavar{n}, -u\metavar{n}]
-      Specify loop unrolling limit.  The default value is 16.
+      Specify loop unrolling limit.  The default value is 0.
 
 \item[-{}-linearreplacement]
       Domain-specific optimization: combine adjacent ``linear''
@@ -112,13 +112,13 @@ struct DestroyedStruct {
 
 \item[-O1]
   Perform basic optimizations that should improve performance in most
-  cases.  Adds \texttt{--unroll 256 --alt\-code\-gen
+  cases.  Adds \texttt{--unroll 16 --alt\-code\-gen
     --destroy\-field\-array --rate\-match --wbs}.
 
 \item[-O2]
   Perform extended optimizations that should improve performance in
   most cases, but may also cause the compiler to become unstable.
-  Adds \texttt{--unroll 4096 --alt\-code\-gen --destroy\-field\-array
+  Adds \texttt{--unroll 256 --alt\-code\-gen --destroy\-field\-array
     --rate\-match --remove\-globals --simulate\-work --wbs}.
 \end{description}
 
@@ -127,7 +127,7 @@ struct DestroyedStruct {
 \begin{description}
 \item[-{}-numbers \metavar{n}, -N\metavar{n}]
       Instrument code to gather performance statistics on simulated
-      code over \metavar{n} stady-state cycles.  The results are
+      code over \metavar{n} steady-state cycles.  The results are
       placed in \filename{results.out} in the current directory.
 
 \item[-{}-partition, -a]
@@ -211,8 +211,8 @@ struct DestroyedStruct {
   buffer lengths are examined at run time and a preceding filter is
   run if needed to provide enough data to run the current filter.
 
-\item[-{}-printdot]
-  Print a ``.'' to standard output after each steady-state execution.
+\item[-{}-marksteady]
+  Print a ``*'' to standard output after each steady-state execution.
 
 \item[-{}-printsched]
   Dump the program schedule.
