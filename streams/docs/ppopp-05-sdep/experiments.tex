@@ -1,6 +1,43 @@
 \subsection{Experimental Evaluation}
 \label{sec:evaluation}
 
+We have implemented teleport messaging in the StreamIt compiler
+infrastructure~\cite{streamit-asplos}, with a backend that targets a
+cluster of workstations.  A StreamIt program is compiled to a set of
+parallel threads; if two threads are allocated to different machines,
+they communicate via dedicated TCP/IP connections.  Teleport messaging
+is supported via auxilliary communication channels that transmit two
+kinds of signals from a message sender to receiver: 1) the contents of
+a control message, or 2) a {\it credit} that indicates the receiver
+can execute some number of iterations before checking for a message
+again.
+
+Each actor alternates between normal execution and checking for the
+exchange of credits.  This serves to throttle the message receiver as
+described in Section~\ref{sec:teleport}, as an actor will block
+waiting for credits until the sender has reached a given point in its
+execution.  The compiler calculates the $\sdep$ relation and
+automatically schedules the exchange of credits to make sure that the
+timing constraints are respected.  When a message is sent, it is
+tagged with the iteration number during which the sender should
+process it; this is also calculated using $\sdep$ in the compiler.
+
+%% In our implementation, each actor maintains an iteration number which
+%% serves to synchronize message delivery. A message from a sender $A$ to
+%% a receiver $B$ is tagged with the iteration number in $B$ when the
+%% message must be processed. The iteration number is calculated by the
+%% sender using the $\sdep$ relation and the specified message latency.
+
+%% The compiler automatically schedules the exchange of credits between
+%% actors when it derives an execution of the stream graph. Our
+%% communication layer guarantees that messages are received before
+%% credits and hence processed during the appropriate execution step.
+%% For messages sent downstream with zero or positive latencies, we do
+%% not use the credit system, and assume that the messages arrive as fast
+%% or faster than the data items exchanged between the two actors. This
+%% assumption is safe since, due to the data dependences, a downstream
+%% filter cannot get ahead of an upstream actor.
+
 We use a cluster of workstations as our evaluation testbed. Our
 StreamIt compiler automatically partitions an input program into a set
 of threads that are mapped to the workstations and then run concurrently.
@@ -19,7 +56,6 @@ as the number of outputs produced per unit of time, and communication
 overhead reflects the quantity of data transmitted between
 workstations.
 
-
 The teleport messaging-based implementation of the frequency hopping
 radio was compiled into 28 threads
 whereas the alternate version---relying on a feedback-loop---was
@@ -27,8 +63,7 @@ compiled into 32 threads.  Each thread implements a
 specific subset of the stream graph  and is assigned to one of
 sixteen 750Mhz Pentium~III workstations, each with a
 256~Kb cache.  The machines are interconnected using a fully switched
-high speed network, and the threads intercommunicate via
-dedicated  TCP/IP connections. 
+high speed network.
 
 Our compiler maps threads to workstations using an algorithm that aims
 to reduce the overall application bottleneck while
@@ -53,27 +88,3 @@ feedback-loop counterpart. Furthermore, a detailed analysis of the
 results shows that teleport messaging reduces the communication
 overhead by 35\%.
 
-The current teleport messaging implementations assumes that actors
-can only receive messages from a unique sender.
-In our implementation, each actor maintains an iteration number which
-serves to synchronize message delivery. A message from a sender $A$ to
-a receiver $B$ is tagged with the iteration number in $B$ when the
-message must be processed. The iteration number is calculated by the
-sender using the $\sdep$ and $\sdep^{-1}$ relations, and the specified
-message latency.
-
-Furthermore, actors that receive messages with negative latencies from
-an upstream sender, or positive latency messages from a downstream sender, 
-can only execute as many iterations as allowed by a
-{\it credit} received from the sender; the compiler automatically
-schedules the exchange  of credits between actors when it derives an
-execution of the stream graph. Our communication layer guarantees that
-messages are received before credits and hence processed during the
-appropriate execution step.
-For messages sent downstream with zero or positive latencies, we
-do not use the credit system, and assume that the messages arrive as fast or
-faster than the data items exchanged between the two actors. This
-assumption is reasonable since a downstream filter cannot get 
-ahead of an upstream actor.
-
-                                                                                                     
