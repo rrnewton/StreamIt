@@ -199,14 +199,14 @@ class CheckQuality extends Filter {
       ave_lo = 0;
    }
    void work() {
-      Complex val;
-      val = input.pop();
+      Complex val = input.pop();
       ave_hi = max(0.9*ave_hi, val);
-      ave_lo = min(0.9*ave_lo, val);
+      ave_lo = min(1.1*ave_lo, val);
       if(ave_hi - ave_lo < QUAL_BAD_TRASHOLD)
          send over(True);
       if(ave_hi - ave_lo > QUAL_GOOD_TRASHOLD)
          send over(False);
+      output.push(val);
    }
 }
 
