@@ -448,11 +448,48 @@ mergesort:
 	cd $(STREAMIT_HOME)/docs/spaa-03-load/apps/mergesort && $(GREEDYMAG) 8 MergeSort.java && $(GATHER) || echo
 
 paper:
+	enscript -Ejava -s 0.8 -f Courier2 -B -o algorithm.ps algorithm.tex || echo
+	ps2epsi algorithm.ps
+	mv algorithm.epsi algorithm.eps
+	enscript -Ejava -s 0.8 -f Courier2 -B -o algorithm2.ps algorithm2.tex  || echo
+	ps2epsi algorithm2.ps
+	mv algorithm2.epsi algorithm2.eps
+	enscript -Ejava -s 0.8 -f Courier2 -B -o algorithm3.ps algorithm3.tex || echo
+	ps2epsi algorithm3.ps
+	mv algorithm3.epsi algorithm3.eps
+	enscript -Ejava -s 0.8 -f Courier2 -B -o algorithm4.ps algorithm4.tex || echo
+	ps2epsi algorithm4.ps
+	mv algorithm4.epsi algorithm4.eps
+	enscript -Ejava -s 0.8 -f Courier2 -B -o algorithm5.ps algorithm5.tex || echo
+	ps2epsi algorithm5.ps
+	mv algorithm5.epsi algorithm5.eps
+	enscript -Ejava -s 0.8 -f Courier2 -B -o algorithm6.ps algorithm6.tex || echo
+	ps2epsi algorithm6.ps
+	mv algorithm6.epsi algorithm6.eps
+	dot -Tps refactor1.dot -o refactor1.ps
+	ps2epsi refactor1.ps
+	mv refactor1.epsi refactor1.eps
+	dot -Tps refactor2.dot -o refactor2.ps
+	ps2epsi refactor2.ps
+	mv refactor2.epsi refactor2.eps
+	dot -Tps sync1.dot -o sync1.ps
+	ps2epsi sync1.ps
+	mv sync1.epsi sync1.eps
+	dot -Tps sync2.dot -o sync2.ps
+	ps2epsi sync2.ps
+	mv sync2.epsi sync2.eps
+	dot -Tps matchsync1.dot -o matchsync1.ps
+	ps2epsi matchsync1.ps
+	mv matchsync1.epsi matchsync1.eps
+	dot -Tps matchsync2.dot -o matchsync2.ps
+	ps2epsi matchsync2.ps
+	mv matchsync2.epsi matchsync2.eps
 	latex paper
 	bibtex paper
 	latex paper
 	latex paper
 	dvips paper.dvi -o paper.ps
+	cp paper.ps /u/${USER}/public_html/
 
 clean:
 	rm -f paper.pdf paper.ps paper.dvi paper.log paper.aux paper.bbl paper.blg
