@@ -12,10 +12,10 @@ subject of future work.
 \subsection{Filters}
 
 The basic unit of computation in StreamIt is the {\tt Filter}.  An
-example of a Filter is the {\tt FloatAdder}, a component of our
+example of a Filter is the {\tt Adder}, a component of our
 software radio (see Figure \ref{fig:radiocode}).  Each {\tt Filter}
 contains an {\tt init} function that is called at initialization time;
-in this case, the {\tt FloatAdder} records {\tt N}, the number of
+in this case, the {\tt Adder} records {\tt N}, the number of
 items it should filter at once.  A user should instantiate a filter by
 using its constructor, and the {\tt init} function will be called
 implicitly with the same arguments that were passed to the
@@ -30,7 +30,7 @@ input} and {\tt output} channels, which are typed FIFO queues declared
 within the {\tt init} function.  These high-volume channels support
 the intuitive operations of {\tt push(value)}, {\tt pop()}, and {\tt
 peek(index)}, where {\tt peek} returns the value at position $index$
-without dequeueing the item.
+without dequeuing the item.
 
 \subsubsection{Rationale}
 

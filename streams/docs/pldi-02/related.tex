@@ -4,7 +4,7 @@
 A large number of programming languages have included a concept of a
 stream, with various semantic formalisms; see \cite{survey97} for a
 survey.  Those that are perhaps most related to the static-rate
-version of StreaMIT are synchronous dataflow languages such as
+version of StreamIt are synchronous dataflow languages such as
 LUSTRE~\cite{lustre} and ESTEREL~\cite{esterel92} which require a
 fixed number of inputs to arrive simultaneously before firing a stream
 node.  However, most special-purpose stream languages are functional
@@ -15,12 +15,12 @@ streams of StreamIt, which enable a suite of hierarchical compiler
 optimizations and a clean semantics for verifying program
 transformations.
 
-At an abstract level, the stream graphs of StreaMIT share a number of
+At an abstract level, the stream graphs of StreamIt share a number of
 properties with the synchronous dataflow (SDF) domain as considered by
 the Ptolemy project~\cite{ptolemyoverview}.  Each node in an SDF graph
 produces and consumes a given number of items, and there can be delays
 along the arcs between nodes (corresponding loosely to items that are
-peeked in StreaMIT). As in StreaMIT, SDF graphs are guaranteed to have
+peeked in StreamIt). As in StreamIt, SDF graphs are guaranteed to have
 a static schedule, testing for deadlock is decidable, and there have
 been many efforts to minimize their memory requirements~\cite{leesdf,
 murt2001x1, gov94, goddardmanaging}.  However, nodes such as round

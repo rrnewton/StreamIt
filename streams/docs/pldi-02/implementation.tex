@@ -51,14 +51,13 @@ GSM Decoder & 3050 & 11 & 21 \\
 \vspace{-6pt}
 \caption{\protect\small Application Characteristics}
 \label{tab:benchmarks}
+\vspace{-12pt}
 \end{center}
 \end{table}
 
-
-
 %% \subsection{GSM Decoder}
 
-%%   The decoder portion of the Streamit GSM Vocoder takes GSM encoded
+%%   The decoder portion of the StreamIt GSM Vocoder takes GSM encoded
 %% parameters as inputs, and uses these to synthesize audible speech.  This
 %% is accomplished by processing the parameters through four main filters.
 %% The RPE decoder filter produces some "pink noise" that very loosely
@@ -69,20 +68,19 @@ GSM Decoder & 3050 & 11 & 21 \\
 %% loop.  The resulting signal is then sent to the Short Term Synthesis
 %% filter, which decodes high frequency voice characteristics from the
 %% encoded parameters and applies these to the signal.  Finally, the
-%% Postprocessing filter identifies peaks in the signal to make it audible.
+%% Post-processing filter identifies peaks in the signal to make it audible.
 
 %% \subsection{PCA Demo}
 
 %% This application is representative of the core functionality needed by
 %% modern radar, sonar, and communications signal processors.
 
-In the Table~\ref{tab:performance}, we evaluate the performace of our
+In the Table~\ref{tab:performance}, we evaluate the performance of our
 compiler by comparing the StreamIt implementation against either the
-SpectrumWare implementation or (in the case of GSM) a hand-optimized
-C version.
-The StreamIt compiler is able to beat the SpectrumWare performance by
-a factor of two for the PCA Demo and FM Radio and come within xxx\%
-for hand-optimized perftest4.
+SpectrumWare implementation or (in the case of GSM) a hand-optimized C
+version.  The StreamIt compiler is able to beat the SpectrumWare
+performance by a factor of two for the PCA Demo and FM Radio and lose
+by a factor of two to the hand-optimized perftest4.
 
 For the GSM application, the extensively hand-optimized C version
 incorporates many transformations that rely on the high-level
@@ -95,7 +93,7 @@ new domain.  We plan to implement many of the important optimizations.
 Our code generation strategy currently has many inefficiencies. In the
 future, we plan to generate optimized assembly code by interfacing
 with a code generator.  We strongly believe that we can improve the
-current performance by at least an order of magniture on
+current performance by at least an order of magnitude on
 uniprocessors. And we have yet to take advantage of the inherent data
 and pipeline parallelism in StreamIt programs for parallel execution!
 
@@ -119,5 +117,6 @@ GSM Decoder & 4.88 & - & N/A & .47\\
 \vspace{-6pt}
 \caption{\protect\small Performance Results (in $\mu$sec/output)}
 \label{tab:performance}
+\vspace{-12pt}
 \end{center}
 \end{table}

@@ -69,8 +69,7 @@ We use the following notation:
   denote the input and output tapes of stream $S$, respectively, with
   numbering used to distinguish between multiple input or output tapes
   (see Figure \ref{fig:tapelabels}).  Finally, $n(T)$ represents the
-  number of items on tape $T$ at a given point of execution.  [should
-  we define $p(T)$ here or wait until we use it?  long time def-use!]
+  number of items on tape $T$ at a given point of execution.
 
 \item We say that a filter $A$ is {\it upstream} of filter $B$ (or,
   equivalently, $B$ is {\it downstream} $A$) if there is a directed
@@ -99,7 +98,7 @@ tape to satisfy all its internal references (we assume that each
 firing is atomic).  The $sdep$ function generalizes this dependence to
 answer a different question: how many items are needed on {\it
 another} filter's input tape before my filter can fire?  The following
-sections will provide some additional intution as to the meaning and
+sections will provide some additional intuition as to the meaning and
 applications of the $sdep$ function.
 
 \subsection{Information Flow}
@@ -129,7 +128,7 @@ The $sdep$ function can be used to give a precise definition to an
 information wavefront.  One interpretation of $y = \mi{a}{b}(x)$ is
 that the item at position $y$ of tape $a$ is the the latest item on
 tape $a$ to {\it affect} the item at position $x$ of tape $b$.  This
-is because item $x$ on tabe $b$ can be produced if and only if tape
+is because item $x$ on tape $b$ can be produced if and only if tape
 $a$ contains at least $y$ items.  Note that this effect might be via a
 control dependence rather than a data dependence--for instance, if
 item $y$ needs to pass through a round-robin joiner before some data
@@ -159,9 +158,9 @@ affected by some output of the $n$'th invocation of $A$'s {\tt work}
 function.  That is, $B$ is invoked when it sees the information
 wavefront that $A$ sees in $n$ execution steps.
 
-In some cases, the ability to synchrnoize a message with an
+In some cases, the ability to synchronize a message with an
 information wavefront can be very useful.  For instance, if the input
-port of a handheld computer detects a change in the networking
+port of a hand-held computer detects a change in the networking
 protocol, it can send a reconfiguration message to all downstream
 filters with latency 0.  This guarantees that each filter will
 reconfigure just in time to understand the new protocol, but will
