@@ -1,3 +1,14 @@
+\section{Detailed Example}
+This section describes the Trunked Radio example implementation in
+detail. The code for the trunked radio demonstrate many features of
+StreaMIT. 
+
+The high-level structure of the radio, graphically shown in
+Figure~\ref{fig:radiodiagram}, is implemented in the class {\tt TrunkedRadio}.
+
+
+
+
 \begin{figure}
 \centering
 \psfig{figure=fft-block.eps,width=3.2in}
@@ -46,10 +57,10 @@ class Butterfly extends Stream {
             weighted_round_robin(N, N);
             add (new Identity());
             add (new Filter() {
-               Complex weights[W];
+               Float weights[W];
                int curr;
-               Channel input = new ComplexChannel();
-               Channel output = new ComplexChannel();
+               Channel input = new FloatChannel();
+               Channel output = new FloatChannel();
                void init() {
                   for(int i=0; i<W; i++)
                      weights[i] = calc_weight(i, N, W);
@@ -66,15 +77,15 @@ class Butterfly extends Stream {
          void init() {
             duplicate();
             add (new Filter() {   
-               Channel input = new ComplexChannel();
-               Channel output = new ComplexChannel();
+               Channel input = new FloatChannel();
+               Channel output = new FloatChannel();
                void work() {
                   output.push(input.pop() + input.pop());
                }
             });
             add (new Filter() {   
-               Channel input = new ComplexChannel();
-               Channel output = new ComplexChannel();
+               Channel input = new FloatChannel();
+               Channel output = new FloatChannel();
                void work() {
                   output.push(input.pop() - input.pop());
                }
@@ -103,8 +114,8 @@ class FFT extends Stream {
 }}
 
 class FIR extends Filter {
-   Channel input = new ComplexChannel();
-   Channel output = new ComplexChannel();           
+   Channel input = new FloatChannel();
+   Channel output = new FloatChannel();           
    int N;
 
    void init(int N) {
@@ -112,7 +123,7 @@ class FIR extends Filter {
    }
 
    void work() {
-      Complex sum = 0;
+      Float sum = 0;
       for (int i=0; i<N; i++) {
          sum += input.peek(i)*fir_coeff[i][N];
       }
@@ -131,37 +142,43 @@ class FIR extends Filter {
 \scriptsize
 \begin{verbatim}
 class RFtoIF extends Filter {
-   Channel input = new ComplexChannel();
-   Channel output = new ComplexChannel();
+   Channel input = new FloatChannel();
+   Channel output = new FloatChannel();
    int sz, i;
-   Complex weight[];
-   void init(double f) {
-      i = 0;
-      sz = CarrierFreq/f*N;
-      weight = new Complex[sz];
-      for(int i=0; i<sz; i++)
-         weight[i] = sine(i*pi/sz);
+   Float weight[];
+   void init(Float f, FloatPortal fq_set) {
+      set_freq(f);
+      fq_set.register(set_freq());
    }
    void work() {
       output.push(input.pop()*weight[i++]);
       if(i==sz) i = 0;
    }
+   void set_freq(Float f) {
+      i = 0;
+      sz = CarrierFreq/f*N;
+      weight = new Float[sz];
+      for(int i=0; i<sz; i++)
+         weight[i] = sine(i*pi/sz);
+   }
 }
 
 class CheckFreqHop extends SplitJoin {
-   void init() {
+   FloatPortal freq_hop;
+   void init(FloatPortal fh) {
+      freq_hop = fh;
       weighted_round_robin(N/4-2,1,1,N/2,1,1,N/4-2);
       int k = 0;
       for(int i=0; i<4; i++) {
          if((i==0)||(i==2)) {
             for(int j=0; j<2; j++) {
                add(new Filter() {
-                  Channel input = new ComplexChannel();
-                  Channel output = new ComplexChannel();
+                  Channel input = new FloatChannel();
+                  Channel output = new FloatChannel();
                   void work() {
-                     Complex val = input.pop();
-                     if(val >= MIN_TRASHOLD)
-                        send init(Freq[k])
+                     Float val = input.pop();
+                     if(val >= MIN_TRASHOLD) 
+                        freq_hop.send(Freq[k], new TimeInterval(4*N, 6*N));
                      output.push(val);
                   }
                });
@@ -175,21 +192,23 @@ class CheckFreqHop extends SplitJoin {
 }
 
 class CheckQuality extends Filter {
-   Channel input = new ComplexChannel();
-   Channel output = new ComplexChannel();
-   Complex ave_hi, ave_lo;   
-   void init() {
+   Channel input = new FloatChannel();
+   Channel output = new FloatChannel();
+   Float ave_hi, ave_lo;   
+   BooleanPortal on_off_switch;
+   void init(BooleanPortal on_off) {
       ave_hi = 0;
       ave_lo = 0;
+      on_off_switch = on_off;
    }
    void work() {
-      Complex val = input.pop();
+      Float val = input.pop();
       ave_hi = max(0.9*ave_hi, val);
       ave_lo = min(1.1*ave_lo, val);
       if(ave_hi - ave_lo < QUAL_BAD_TRASHOLD)
-         send over(True);
+         on_off_switch.send(True);
       if(ave_hi - ave_lo > QUAL_GOOD_TRASHOLD)
-         send over(False);
+         on_off_switch.send(False);
       output.push(val);
    }
 }
@@ -201,13 +220,19 @@ class IncreaseSignalStrength extends Stream {
 }
 
 class TrunkedRadio extends Stream {
+   FloatPortal   freq_hop = new FloatPortal().
+   BooleanPortal onoff = new BooleanPortal().
    void init() {
       add(new ReadFromAtoD());
-      add(new RFtoIF(Freq[0]));
-      add(new IncreaseSignalStrength());
+      add(new RFtoIF(Freq[0], freq_hop));
+
+      Stream ISS = new IncreaseSignalStrength();
+      add(ISS);
+      onoff.register(ISS.init());
+ 
       add(new FFT());
-      add(new CheckFreqHop());
-      add(new CheckQuality());
+      add(new CheckFreqHop(freq_hop));
+      add(new CheckQuality(onoff));
       add(new AudioBackEnd());
    }
 }
