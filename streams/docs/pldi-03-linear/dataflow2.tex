@@ -1,49 +1,65 @@
+\subsection{Linear Extraction Algorithm}
 \label{sec:dataflow}
+
+Our linear extraction algorithm can identify a linear filter and
+construct a linear node $\lambda$ that fully captures its behavior.
+The technique, which appears as Algorithm~\ref{alg:dataflow} on the
+next page, is a forward dataflow analysis similar to constant
+propagation.  Unlike a standard dataflow analysis, we can afford to
+symbolically execute all loop iterations, since most loops within a
+filter's work function have small bounds that are known at compile
+time (if a loop has an unknown bound, the filter is unlikely to be
+linear and we disregard it).
+
+During symbolic execution, the algorithm maintains a mapping between
+each program variable $y$ and a linear form $({\vec v}, c)$.  In an
+actual execution, the value of $y$ would be given by $y = v \cdot x +
+c$, where $x$ represents the items at the front of the input tape.
+
+The algorithm applies the confluence operator $\sqcap$ over scalar
+constants, vectors, matrices, linear forms, and maps.  $c_1 \sqcap
+c_2$ is defined according to the lifted lattice constant$_{\bot}$.
+That is, $c_1 \sqcap c_2 = c_1$ if and only if $c_1 = c_2$; otherwise,
+$c_1 \sqcap c_2 = \bot$.  For vectors, matrices, and linear forms,
+$\sqcap$ is defined element-wise; for example, $A' = A_1 \sqcap A_2$
+is equivalent to $A'[i,j] = A_1[i,j] \sqcap A_2[i,j]$.  For maps, the
+meet is taken on the values: $\mt{map}_1 \sqcap \mt{map}_2$ $=$
+$\mt{map'}$, where $\mt{map'}.\mt{get}(x) = \mt{map}_1.\mt{get}(x)
+\sqcap \mt{map}_2.\mt{get}(x)$.
+
 \newcommand{\la}{$\leftarrow$}
 \newcommand{\IND}{\begin{ALC@g}}
 \newcommand{\UND}{\end{ALC@g}}
 \newcommand{\tup}[2]{\langle{#1}, {#2}\rangle}
 
-\begin{algorithm}
-{\bf Data Types}
+\begin{figure}[t]
 \begin{equation} \nonumber
 \begin{array}{rcl}
-x & \in & \mbox{program-variable} \\
+y & \in & \mbox{program-variable} \\
 c & \in & \mbox{constant}_{\bot} \\
 \vec v, \vec b & \in & \mbox{vector} \\
 A & \in & \mbox{matrix} \\
 \tup{\vec v}{c} & \in & \mbox{linear-form} \\
 map & \in & \mbox{program-variable} \rightarrow \mbox{linear-form  (a hashtable)} \\
 code & \in & \mbox{list of instructions, each of which can be:} \\
-~ & ~ & ~~~ (\mbox{{\tt loop}} ~N~ \mt{code}) \\
-~ & ~ & ~~~ (\mbox{{\tt branch}} ~\mt{code}_1~ \mt{code}_2) \\
-~ & ~ & ~~~ x_1 := x_2~\mt{op}~x_3 \\
-~ & ~ & ~~~ x_1 := \mt{const} \\
-~ & ~ & ~~~ x_1 := \mbox{\tt peek}(i) \\
-~ & ~ & ~~~ x_1 := \mbox{\tt pop}() \\
-~ & ~ & ~~~ \mbox{{\tt push}}(x_1)
+\multicolumn{3}{l}{\parbox{3in}{
+    \vspace{-6pt}
+    \begin{equation} \nonumber
+      \begin{array}{ll}
+	y_1 := \mt{const}  & y_1 := y_2~\mt{op}~y_3\\
+	y_1 := \mbox{\tt peek}(i) & y_1 := \mbox{\tt pop}() \\
+	\mbox{{\tt push}}(y_1) & (\mbox{{\tt loop}} ~N~ \mt{code}) \\
+	(\mbox{{\tt branch}} ~\mt{code}_1~ \mt{code}_2) & ~
+      \end{array}
+\end{equation}}}
 \end{array} 
 \end{equation}
-{\bf Confluence Operator} \\ 
-%
-We utilize the confluence operator $\sqcap$ over scalar constants,
-vectors, matrices, linear forms, and maps.  $c_1 \sqcap c_2$ is
-defined according to the lifted lattice constant$_{\bot}$.  That is,
-$c_1 \sqcap c_2 = c_1$ if and only if $c_1 = c_2$; otherwise, $c_1
-\sqcap c_2 = \bot$.  For vectors, matrices, and linear forms, $\sqcap$
-is defined element-wise; for example, $A' = A_1 \sqcap A_2$ is
-equivalent to $A'[i,j] = A_1[i,j] \sqcap A_2[i,j]$.  For maps, the
-meet is taken on the values: $\mt{map}_1 \sqcap \mt{map}_2$ $=$
-$\mt{map'}$, where $\mt{map'}.\mt{get}(x) = \mt{map}_1.\mt{get}(x)
-\sqcap \mt{map}_2.\mt{get}(x)$.
-%\end{algorithm} 
-~ \\ ~ \\
-{\bf Global Variables:} int Push, Pop, Peek \\
-\begin{tabular}{l}
-~\hspace{3in}~ \\
-\hline \\
-\end{tabular}
-%\begin{algorithm}
+\vspace{-18pt}
+\caption{Data types for the extraction analysis.\protect\label{fig:types}}
+\end{figure}
+
+\begin{algorithm}
+\caption{Pseudocode for linear extraction.\protect\label{alg:dataflow}}
 proc {\bf Toplevel}(filter $F$) returns linear node for $F$
 \begin{enumerate}
 \item Set Peek, Pop, Push equal to I/O rates of filter $F$.
@@ -57,18 +73,14 @@ proc {\bf Toplevel}(filter $F$) returns linear node for $F$
 \verb+ + {\it fail} \\
  {\bf endif}
 \end{enumerate}
-%\end{algorithm}
-\begin{tabular}{l}
-~\hspace{3in}~ \\
-\hline \\
-\end{tabular}
-%\begin{algorithm}
 proc {\bf BuildCoeff}(int $pos$) returns $\vec v$ for peek at index $pos$ \\ \vspace{-12pt}
 \begin{algorithmic}
 \STATE $\vec v = \vec 0_{Peek}$
 \STATE $\vec v[\mbox{Peek}-i] = 1$
 \STATE return $\vec v$
 \end{algorithmic}
+\vspace{6pt}
+{\bf Global Variables:} int Push, Pop, Peek
 \end{algorithm}
 
 \begin{algorithm}
@@ -87,63 +99,63 @@ proc {\bf Extract}($code$, $map$, $A$, $\vec b$, int $\mt{popcount}$, int $\mt{p
 \UND
 \UND
 \STATE \vspace{-6pt}
-\STATE $\mbox{\bf case}~ x_1 := x_2 + x_3$ or $x_1 := x_2 - x_3$
+\STATE $\mbox{\bf case}~ y_1 := y_2 + y_3$ or $y_1 := y_2 - y_3$
 \IND
-\STATE $\tup{\vec v_2}{c_2} \leftarrow \mt{map}.\mt{get}(x_2)$
-\STATE $\tup{\vec v_3}{c_3} \leftarrow \mt{map}.\mt{get}(x_3)$
-\STATE $\mt{map}.\mt{put}(x_1, \tup{\vec v_2+\vec v_3}{c_2+c_3})$
+\STATE $\tup{\vec v_2}{c_2} \leftarrow \mt{map}.\mt{get}(y_2)$
+\STATE $\tup{\vec v_3}{c_3} \leftarrow \mt{map}.\mt{get}(y_3)$
+\STATE $\mt{map}.\mt{put}(y_1, \tup{\vec v_2+\vec v_3}{c_2+c_3})$
 \UND
 \STATE \vspace{-6pt}
-\STATE $\mbox{\bf case}~x_1 := x_2 / x_3$
+\STATE $\mbox{\bf case}~y_1 := y_2 / y_3$
 \IND
-\STATE $\tup{\vec v_2}{c_2} \leftarrow \mt{map}.\mt{get}(x_2)$
-\STATE $\tup{\vec v_3}{c_3} \leftarrow \mt{map}.\mt{get}(x_3)$
-\IF {$\vec v_3 = \vec 0_{Peek} \wedge x_3 \ne 0$}
-\STATE $\mt{map}.\mt{put}(x_1, (\frac{1}{c_3}*\vec v_2, c_2/c_3))$
+\STATE $\tup{\vec v_2}{c_2} \leftarrow \mt{map}.\mt{get}(y_2)$
+\STATE $\tup{\vec v_3}{c_3} \leftarrow \mt{map}.\mt{get}(y_3)$
+\IF {$\vec v_3 = \vec 0_{Peek} \wedge y_3 \ne 0$}
+\STATE $\mt{map}.\mt{put}(y_1, (\frac{1}{c_3}*\vec v_2, c_2/c_3))$
 \ELSE
-\STATE $\mt{map}.\mt{put}(x_1, \bot)$
+\STATE $\mt{map}.\mt{put}(y_1, \bot)$
 \ENDIF
 \UND
 \STATE \vspace{-6pt}
-\STATE $\mbox{\bf case}~x_1 := x_2 * x_3$
+\STATE $\mbox{\bf case}~y_1 := y_2 * y_3$
 \IND
-\STATE $\tup{\vec v_2}{c_2} \leftarrow \mt{map}.\mt{get}(x_2)$
-\STATE $\tup{\vec v_3}{c_3} \leftarrow \mt{map}.\mt{get}(x_3)$
+\STATE $\tup{\vec v_2}{c_2} \leftarrow \mt{map}.\mt{get}(y_2)$
+\STATE $\tup{\vec v_3}{c_3} \leftarrow \mt{map}.\mt{get}(y_3)$
 \IF {$\vec v_2 = \vec 0_{Peek}$}
-\STATE $\mt{map}.\mt{put}(x_1, (c_2*\vec v_3, c_2*c_3))$
+\STATE $\mt{map}.\mt{put}(y_1, (c_2*\vec v_3, c_2*c_3))$
 \ELSIF {$\vec v_3=\vec 0_{Peek}$}
-\STATE $\mt{map}.\mt{put}(x_1, (c_3*\vec v_2, c_3*c_2))$
+\STATE $\mt{map}.\mt{put}(y_1, (c_3*\vec v_2, c_3*c_2))$
 \ELSE
-\STATE $\mt{map}.\mt{put}(x_1, \bot)$
+\STATE $\mt{map}.\mt{put}(y_1, \bot)$
 \ENDIF
 \UND
 \STATE \vspace{-6pt}
-\STATE $\mbox{\bf case}~x_1 := x_2 ~\mt{bitop}~ x_3$, for $\mt{bitop} \in \{\&, |, \wedge\}$
+\STATE $\mbox{\bf case}~y_1 := y_2 ~\mt{bitop}~ y_3$, for $\mt{bitop} \in \{\&, |, \wedge\}$
 \IND
-\STATE $\tup{\vec v_2}{c_2} \leftarrow \mt{map}.\mt{get}(x_2)$
-\STATE $\tup{\vec v_3}{c_3} \leftarrow \mt{map}.\mt{get}(x_3)$
-\STATE $\mt{map}.\mt{put}(x_1, (\vec 0_{Peek} \sqcap \vec v_2 \sqcap \vec v_3, c_2 ~\mt{bitop}~ c_3))$
+\STATE $\tup{\vec v_2}{c_2} \leftarrow \mt{map}.\mt{get}(y_2)$
+\STATE $\tup{\vec v_3}{c_3} \leftarrow \mt{map}.\mt{get}(y_3)$
+\STATE $\mt{map}.\mt{put}(y_1, (\vec 0_{Peek} \sqcap \vec v_2 \sqcap \vec v_3, c_2 ~\mt{bitop}~ c_3))$
 \UND
 \STATE \vspace{-6pt}
-\STATE $\mbox{\bf case}~x1 := \mt{const}$
+\STATE $\mbox{\bf case}~y_1 := \mt{const}$
 \IND
-\STATE $\mt{map}.\mt{put}(x_1, (\vec 0_{Peek}, \mt{const}))$
+\STATE $\mt{map}.\mt{put}(y_1, (\vec 0_{Peek}, \mt{const}))$
 \UND
 \STATE \vspace{-6pt}
-\STATE $\mbox{\bf case}~x_1 := \mbox{\tt peek}(i)$
+\STATE $\mbox{\bf case}~y_1 := \mbox{\tt peek}(i)$
 \IND
-\STATE $\mt{map}.\mt{put}(x_1, (\mbox{\bf BuildCoeff}(i + \mt{popcount}), 0))$
+\STATE $\mt{map}.\mt{put}(y_1, (\mbox{\bf BuildCoeff}(i + \mt{popcount}), 0))$
 \UND
 \STATE \vspace{-6pt}
-\STATE $\mbox{\bf case}~x_1 := \mbox{\tt pop}()$
+\STATE $\mbox{\bf case}~y_1 := \mbox{\tt pop}()$
 \IND
-\STATE $\mt{map}.\mt{put}(x_1, (\mbox{\bf BuildCoeff}(\mt{popcount}), 0))$
+\STATE $\mt{map}.\mt{put}(y_1, (\mbox{\bf BuildCoeff}(\mt{popcount}), 0))$
 \STATE $\mt{popcount}$\verb|++|
 \UND
 \STATE \vspace{-6pt}
-\STATE $\mbox{\bf case}~\mbox{\tt push}(x_1)$
+\STATE $\mbox{\bf case}~\mbox{\tt push}(y_1)$
 \IND
-\STATE $\tup{\vec v}{c} \leftarrow \mt{map}.\mt{get}(x_1)$
+\STATE $\tup{\vec v}{c} \leftarrow \mt{map}.\mt{get}(y_1)$
 \STATE $A[*, \mt{pushcount}] \leftarrow \vec v$
 \STATE $b[\mt{pushcount}] \leftarrow c$
 \STATE $\mt{pushcount}$\verb|--|
