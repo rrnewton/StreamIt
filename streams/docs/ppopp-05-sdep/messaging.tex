@@ -29,6 +29,7 @@ exactly in sync with the front of the packet itself; otherwise, valid
 data will be lost or invalid data will be allowed to pass.
 
 \subsection{Teleport Messaging}
+\label{sec:teleport}
 
 Teleport messaging is a language construct that makes use of $\sdep$
 to achieve precise timing of control messages.  It is included as part
@@ -111,6 +112,20 @@ $k$ additional executions.  The message is delivered immediately
 before the latest firing in $A$ during which tagging could start
 without violating this constraint.
 
+\begin{table*}[t]
+\begin{center}
+{\small
+\begin{tabular}{|r|c|c|} \hline
+~ & {\bf Negative latency} & {\bf Positive latency} \\ \hline
+{\bf Message travels downstream} & latency in schedule must not be too small & no constraint \\ \hline
+{\bf Message travels upstream} & illegal & latency in schedule must not be too big \\ \hline
+\end{tabular}}
+\caption{\small Scheduling constraints imposed by messages.}
+\label{tab:messcons}
+\end{center}
+\vspace{-12pt}
+\end{table*}
+
 The following definition leverages the $\sdep$ formalism to give a
 precise meaning to message timing.
 
@@ -144,42 +159,28 @@ ${\cal M}$ obeys the following constraints:
 \end{enumerate}
 \end{definition}
 
-\begin{table*}[t]
-\begin{center}
-{\small
-\begin{tabular}{|r|c|c|} \hline
-~ & {\bf Negative latency} & {\bf Positive latency} \\ \hline
-{\bf Message travels downstream} & latency in schedule must not be too small & no constraint \\ \hline
-{\bf Message travels upstream} & impossible & latency in schedule must not be too big \\ \hline
-\end{tabular}}
-\caption{\small Effect of message direction and latency on stream graph execution.}
-\label{tab:messcons}
-\end{center}
-\end{table*}
-
-It is instructive to note that there are distinct categories of
-message latencies, each of which poses a different constraint on the
-execution of the stream graph (see Figure~\ref{tab:messcons}).  A
-negative-latency downstream message has the effect of synchronizing
-the arrival of the message with some data that was previously output
-by the sender ({\it e.g.,} for the checksum example mentioned
-earlier).  The latency requires the downstream actor not to execute
-too far ahead, or else it might process the data before the message
-arrives.  This translates to a constraint on the minimum latency
-between the sender and receiver actors in the schedule of the program.
+It is instructive to note that messaging can place constraints on the
+execution schedule.  The different categories of constraints are
+illustrated in Figure~\ref{tab:messcons}.  A negative-latency
+downstream message has the effect of synchronizing the arrival of the
+message with some data that was previously output by the sender ({\it
+e.g.,} for the checksum example mentioned earlier).  The latency
+requires the downstream actor not to execute too far ahead, or else it
+might process the data before the message arrives.  This translates to
+a constraint on the minimum latency between the sender and receiver
+actors in the schedule of the program.
 
 Similarly, a positive latency upstream message places a constraint on
 the maximum latency between the sender and receiver.  Again the
-receiver must be throttled so that it doesn't get too far ahead before
-the message arrives; however, because the receiver is upstream of the
-sender, this constraint represents the need for a tight coupling
-between the two filters' executions.
+receiver must be throttled so that it does not get too far ahead
+before the message arrives.
 
 An upstream message with negative latency is impossible to deliver,
 because the data dependences imply that the target iteration has
-already passed when the message was sent.  Also, a downstream message
-with positive latency imposes no constraint, as it is not possible for
-the receiver to have executed yet.
+already passed when the message was sent.  Conversely, a downstream
+message with positive latency imposes no constraint on the schedule,
+as the sender has not yet produced the data that is synchronized with
+the message.
 
 %\input{constrained}
 
@@ -191,7 +192,7 @@ shown in Figure~\ref{fig:fhr-streamit}.  A frequency hopping radio is
 one in which the receiver switches between a set of known frequencies
 whenever it detects certain tones from the transmitter.  The frequency
 hopping is a good match for control messages because the hopping
-interval is dynamic (based on on the data in the stream); it spans a
+interval is dynamic (based on the data in the stream); it spans a
 large section of the stream graph (there is an FFT between the
 demodulator and the hop detector); and it requires precise delivery of
 messages.  The delivery must be precise both to meet real-time
@@ -202,7 +203,7 @@ Transform (FFT) stage, then the FFT will muddle the spectrum of the
 old and new frequency bands.
 
 A StreamIt version of the radio frontend with teleport messaging
-appears in Figure~\ref{fig:freq1}.  The Freq\_Hop-ping\_Radio pipeline
+appears in Figure~\ref{fig:freq1}.  The Freq\_Hopping\_Radio pipeline
 creates a portal and adds the RFtoIF actor as a receiver.  The portal
 is passed to the Check\_Freq\_Hop stage, where four parallel detectors
 send messages into the portal if they detect a hop to the frequency
@@ -269,6 +270,8 @@ execution so long as the message constraints are respected.  The
 actual message delivery can be implemented in the most efficient way
 for the given architecture.
 
+\input{code-examples}
+
 A final benefit of teleport messaging is the clean interface provided
 by the portals.  Since a portal can have multiple receivers, it is
 straightforward to send a message that is delivered synchronously to
@@ -283,4 +286,3 @@ Finally, portals are useful as an external programming interface; an
 application can export a portal based on an interface type without
 exposing the underlying actor implementation.
 
-\input{code-examples}

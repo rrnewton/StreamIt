@@ -56,6 +56,18 @@ repeating the pattern).
 %consumed from the channel, and the peek amount is known at compile
 %time (note that peeking is not part of CSDF).
 
+\begin{figure}[t]
+\begin{center}
+\psfig{figure=sdep-example-rates3.eps,height=1.5in}
+\caption{{\small Example stream graph. Nodes are annotated with their
+I/O rates. Nodes A and E have two phases; for example, the annotation
+``1, 0'' on the left output channel of A indicates that 1 item is
+produced during the first phase, and 0 items are produced during the second phase.
+\protect\label{fig:sdep-rates}}}
+\end{center}
+\vspace{-12pt}
+\end{figure}
+
 \section{Stream Dependence Function}
 \label{sec:sdep}
 
@@ -95,18 +107,6 @@ times, $\sdepf{A}{B}(n)$ is the minimum number of times that $A$
 fires.  An example of $\sdep$ for the stream graph in
 Figure~\ref{fig:sdep-rates} appears in Figure~\ref{fig:sdep1}.
 
-\begin{figure}[t]
-\begin{center}
-\psfig{figure=sdep-example-rates3.eps,height=1.5in}
-\caption{{\small Example stream graph. Nodes are annotated with their
-I/O rates. Nodes A and E have two phases; for example, the annotation
-``1, 0'' on the left output channel of A indicates that 1 item is
-produced during the first phase, and 0 items are produced during the second phase.
-\protect\label{fig:sdep-rates}}}
-\end{center}
-\vspace{-12pt}
-\end{figure}
-
 \begin{figure*}[t]
 \begin{center}
 \psfig{figure=sdep-example3.eps,width=7in}
@@ -133,8 +133,9 @@ fine-grained simulation of the stream graph.  Our approach is to
 construct an execution $\phi$ that provides the minimum value of
 $|\phi \wedge A|$ that is selected in Definition~\ref{eq:sdepdef}.  We
 construct $\phi$ by simulating the stream graph's execution of a
-``pull schedule'' with respect to actor $B$.
+``pull schedule'' with respect to actor $B$ (see Algorithm 1).
 
+\begin{figure}[t]
 \begin{center}
 \framebox{\parbox{3.25in}{
 \mbox{} \textsc{Algorithm 1.} {\it (Pull scheduling)} \vspace{6pt}\\
@@ -155,6 +156,9 @@ construct $\phi$ by simulating the stream graph's execution of a
 \mbox{} ~~~~\}
 }}
 \end{center}
+\vspace{-12pt}
+\end{figure}
+
 Intuitively, a pull schedule for $X$ is one that executes other nodes
 as few times as possible for each firing of $X$.  This is achieved by
 calculating the demand for data items on the input channels of $X$,
