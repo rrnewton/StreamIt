@@ -24,7 +24,7 @@ Figure~\ref{fig:beam-blood}). \protect\label{fig:beam-opt}}
 
 \begin{figure}
   \begin{center}
-    \psfig{figure=beam-blood-key.eps,width=3in} \\
+    \psfig{figure=beam-blood-key.eps,width=3.25in} \\
     \subfigure[\vspace{-6pt} Original.\label{fig:beam-blood1}]{\psfig{figure=beam-blood-orig.eps,width=3in}}
     \hspace{0.3in}
     \subfigure[\vspace{-6pt} Load-balanced.\label{fig:beam-blood2}]{\psfig{figure=beam-blood-opt.eps,width=3in} \vspace{-6pt}}
@@ -34,77 +34,121 @@ Figure~\ref{fig:beam-blood}). \protect\label{fig:beam-opt}}
     denotes time, and the $y$ axis denotes the processor.  The dark
     bands indicate periods where processors are blocked waiting to
     receive an input or send an output.  Light regions indicate
-    periods of useful work. \label{fig:beam-blood}}
+    periods of useful work. \protect\label{fig:beam-blood}}
 	\vspace{-6pt}
-\label{fig:beam-blood} \end{center}
+\end{center}
 \end{figure}
 
 \begin{figure}
 \centering
 \psfig{figure=fuse-pipeline.eps,width=6.5in}
-\vspace{-18pt}
+\vspace{-6pt}
 \caption{\protect\small Fusion of a Pipeline into a two-stage filter.
-\protect\label{fig:fuse-pipe}}
+In this example, the UpSampler pushes $K$ items on every step, while the
+MovingAverage filter peeks at $N$ items but only pops 1.  To accomodate
+this peeking behavior, the fused filter maintains a {\tt peek\_buffer}
+for the items that reside on the channel between the two filters.  In
+the initial work function, which is called only on the first
+invocation, the {\tt peek\_buffer} is filled with initial values from
+the UpSampler.  The steady work function implements a steady-state
+schedule in which $\mt{LCM}(N, K)$ items are transferred between the two
+original filters--these items are communicated through a local,
+temporary {\tt buffer}.  Before and after the execution of the
+MovingAverage code, the contents of the {\tt peek\_buffer} are
+transferred in and out of the temporary {\tt buffer}.  If the {\tt
+peek\_buffer} is small, this copying can be eliminated with loop
+unrolling and copy propagation.  Note that the {\tt peek\_buffer} is
+for storing items that are persistent from one firing to the next,
+while the local {\tt buffer} is just for communicating values during a
+single firing. \label{fig:fuse-pipe}}
 \vspace{-6pt}
 \end{figure}
 
 \begin{figure}
 \centering
 \psfig{figure=fuse-splitjoin.eps,width=4.93in}
-\vspace{-12pt}
-\caption{\protect\small Fusion of a Duplicate SplitJoin construct.
-\protect\label{fig:fuse-splitjoin1}}
+\caption{\protect\small Fusion of a Duplicate SplitJoin construct.  To
+fuse a SplitJoin with a Duplicate Splitter, the code of the component
+filters is inlined into a single filter with repetition according to
+the steady-state schedule.  However, there are some modifications: all
+{\tt pop} statements are converted to {\tt peek} statements, and the
+{\tt pop}'s are performed at the end of the fused work function.  This
+allows all the filters to see the data items before they are consumed.
+Finally, the RoundRobin Joiner is simulated by a ReorderRoundRobin
+filter that re-arranges the output of the fused filter according to
+the weights of the Joiner.  \protect\label{fig:fuse-splitjoin1}}
 \vspace{-6pt}
 \end{figure}
 
 \begin{figure}
 \centering
 \psfig{figure=fuse-splitjoin2.eps,width=4.93in}
-\vspace{-12pt}
 \caption{\protect\small Fusion of a RoundRobin SplitJoin construct.
-\protect\label{fig:fuse-splitjoin2}}
-\vspace{-6pt}
+The fusion transformation for SplitJoins containing RoundRobin
+Splitters is similar to those containing Duplicate Splitters.  One
+filter simulates the execution of a steady-state cycle in the
+SplitJoin by inlining the code from each filter.  This filter is
+surrounded by ReoderRoundRobin filters that recreate the reordering of
+the RoundRobin nodes.  In the above example, the difference the
+Splitter's weights, the Filter's I/O rates, and the Joiner's weights
+adds complexity to the reordering.  Though this transformation is
+fully automated in the StreamIt compiler, a general formulation is
+beyond the scope of this paper.  \protect\label{fig:fuse-splitjoin2}}
 \end{figure}
 
 \begin{figure}
 \centering
 \psfig{figure=duplicate-fission-2.eps,width=4.60in}
-\vspace{-12pt}
-\caption{\protect\small Fission of filter that does not peek.
-\protect\label{fig:fission-nopeek}}
+\caption{\protect\small Fission of a filter that does not peek.  For
+Filters such as a VectorMultiply that consumes every item they look
+at, horizontal fission consists of embedding copies of the filter in a
+$K$-way RoundRobin SplitJoin.  The weights of the Splitter and Joiner
+are set to match the $pop$ and $push$ rates of the filter,
+respectively.  \protect\label{fig:fission-nopeek}}
 \end{figure}
 
 \begin{figure}
 \centering
 \psfig{figure=duplicate-fission.eps,width=3.94in}
-\vspace{-12pt}
-\caption{\protect\small Fission of filter that peeks.
+\caption{\protect\small Fission of a filter that peeks.  Since the
+MovingAverage filter reads items that it does not consume, the
+duplicated versions of the filter need to access overlapping portions
+of the input stream.  For this reason, horizontal fission creates a
+Duplicate SplitJoin in which each component filter has additional code
+to filter out items that are irrelevant to a given path.  This
+decimation occurs in two places: once in the initial work function, to
+disregard items considered by previous filters on the first iteration
+of the SplitJoin, and once at the end of the steady work function, to
+account for items consumed by other components.
 \protect\label{fig:fission-peek}}
 \end{figure}
 
 \begin{figure}
 \centering
 \psfig{figure=filter-hoisting.eps,width=4.81in}
-\vspace{-12pt}
-\caption{\protect\small Filter hoisting.
+\caption{\protect\small Filter hoisting.  This transformation allows a
+stateless Filter to be moved across a Joiner node if its $push$ value
+evenly divides the weights of the Joiner.  This proved to be very
+useful in load balancing the FMRadio application.
 \protect\label{fig:filter-hoisting}}
-\end{figure}
-
-\begin{figure}
-\centering
+\vspace{12pt}
 \psfig{figure=splitjoin-split.eps,width=5.13in}
-\vspace{-12pt}
 \caption{\protect\small Breaking a SplitJoin into hierarchical units.
+Though our horizontal fusion algorithms work on the granularity of an
+entire SplitJoin, it is straightforward to transform a large SplitJoin
+into a number of smaller pieces, as shown here.  Following this
+transformation, the fusion algorithms can be applied to obtain an
+intermediate level of granularity.
 \protect\label{fig:splitjoin-split}}
-\vspace{-6pt}
-\end{figure}
-
-\begin{figure}
-\centering
+\vspace{12pt}
 \psfig{figure=sync-removal.eps,width=4.02in}
-\vspace{-18pt}
-\caption{\protect\small Synchronization removal.
-\protect\label{fig:sync-removal}}
+\caption{\protect\small Synchronization removal.  If a Splitter is
+bordering a Joiner with identical weights, the nodes can be removed
+and the component streams can be connected.  This is especially useful
+in the context of libraries--many distinct components can employ
+SplitJoins for processing interleaved data streams, and the modules
+can be composed without having to synchronize all the streams at each
+boundary.  \protect\label{fig:sync-removal}}
 \vspace{-6pt}
 \end{figure}
 

@@ -111,7 +111,7 @@ CRC & 336 & 47 & 35.1 & N/A & 5 & 52.4 & N/A\\
 
 We evaluate the StreamIt compiler for the set of applications shown in
 Table~\ref{tab:benchmarks}; results appear in
-Figure~\ref{fig:performance}.  We show the performance of the original
+Figure~\ref{tab:performance}.  We show the performance of the original
 application, which maps each Filter in the original program to a
 single Raw tile.  In some cases, we need to use an 8x8 Raw processor
 in order to have enough tiles for the Filters; otherwise, we target a
@@ -133,14 +133,14 @@ transformations on performance and tile utilization, respectively.
 \begin{minipage}{3.2in}
 \centering
 \psfig{figure=utilization-diagram.eps,width=3.2in}
-\caption{Utilization of a tile ofter load balancing normalized to the original utilization.}
+\caption{Utilization of a tile ofter load balancing normalized to the original utilization.\protect\label{fig:utilization-diagram}}
 \end{minipage}
 \end{figure}
 
 The results show that for programs with substantial computation
 requirements such as the BeamFormer, the StreamIt compiler is able to
 extract good performance out of the Raw processor.  The BeamFormer
-application shows a sustained 1.03 GFLOPS rate, after a 500\%
+application shows a sustained 1.03 GFLOPS rate, after a 400\%
 improvement due to our optimizations.  However, programs such as FFT,
 which was created to experiment with the language features of
 StreamIt, has very little work per filter. We were unable to amortize
