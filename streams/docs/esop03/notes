@@ -1,0 +1,92 @@
+Low Priority
+------------
+
+x I don't like the $m_n$, etc. notation.  Can we just leave them
+unbounded?  Or make the nodes something other than "n"'s so that these
+can be "n"'s.
+
+x Would it be clearer if push/pop/peek were an aspect of a node?  I think maybe.
+
+****************************************************************************
+
+NOTES
+-----
+
+First let's do SDF with peeking -- in this case, it's just a
+computation graph:
+
+operation O_k associated with each node n_k
+
+for every branch d_p from n_i to n_j
+
+initially have A_p items on the branch
+node n_k (dest) pops W_p items
+node n_k (dest) peeks T_p items
+node n_i (src)  pushes U_p items
+
+----------------
+
+so if there's static control flow in a node, then you can convert all
+nodes to a canonical form like this, for nodes k
+
+--
+
+for all p s.t. there exists d_p : n_j -> n_k:
+  for i = 1 to T_p
+    in_p[i] = peek(i)
+  for i = 1 to W_p
+    pop()
+
+// use <in>'s, write to <out>'s
+
+for all p s.t. there exists d_p : n_k -> n_j:
+  for i = 1 to U
+    push( out_p[i] )
+
+--
+
+assume that there are no name conflicts between the bodies of
+different filters.
+
+then you can convert this to as follows.  first, there is an initial
+configuration of each channel in the program:
+
+----
+for all p
+  for i = 1 to A_p
+    chan_p[i] = initial-value(p, i)
+----
+
+then, there is the code for each node:
+
+----
+for all p s.t. there exists d_p : n_j -> n_k:
+  last_p = A_p
+
+for m = 1 to steady_k
+
+  for all p s.t. there exists d_p : n_j -> n_k:
+    for i = 1 to T_p
+      in_p[i] = chan_p[(m-1)*W_p + i]
+
+  // use <in>'s, write to <out>'s
+
+  for all p s.t. there exists d_p : n_k -> n_j:
+    for i = 1 to U_p
+      chan_p[(m-1)*U_p + i] = out_p[i]
+----
+
+can solve balance equations to get steady_k: how many times node k
+executes in the steady state
+
+---
+
+new realizations:
+
+- even with a single affine schedule, you can do initialization with
+different start times
+
+- could do zero-one programming with different loop structures to see
+a single-appearance schedule?  (is there a way to guarantee
+single-appearance in what's generated from an affine schedule?  this
+would be useful for the affine scheduling community, too.)
