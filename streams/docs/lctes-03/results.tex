@@ -10,7 +10,7 @@ presents the applications used for evaluation, while Section
 \subsection{Benchmarks}
 \label{sec:results:apps}
 
-Our benchmark suite contains 17 applications. Out of those
+Our benchmark suite contains 17 applications. Out of these
 applications, 15 represent useful practical computation taken from
 real-life applications, while two were chosen to highlight the
 effectiveness of phased scheduling.
@@ -31,20 +31,19 @@ an equalizer; 3GPP is a 3GPP Radio Access Protocol application; Radar
 is a radar array front-end application with beamforming; Vocoder is a
 28 channel Vocoder.
 
-Two test applications (QMF and CD-DAT) are applications used in
-another publication on scheduling streaming applications
-(\cite{murt1999x3}). QMF is a filter bank application. CD-DAT is a
-sample rate conversion application. The code inside of the {\filters}
-has not been implemented. QMF is a filter bank application which uses
-a 1/2-1/2 split for the spectrum up to a depth of 3 (qmf12\_3d
-in~\cite{murt1999x3}).  It was slightly modified to use
+Two test applications (CD-DAT and QMF) are borrowed from
+\cite{murt2000x2}. We model only the communication properties of the
+graphs; the code inside of the {\filters} has not been implemented.
+CD-DAT performs sample rate conversion and is exactly the same as that
+described in \cite{murt2000x2}.  QMF is a filter bank application
+which uses a 1/2-1/2 split for the spectrum up to a depth of 3
+(qmf12\_3d in~\cite{murt2000x2}).  It was slightly modified to use
 {\StreamIt}'s pre-defined {\splitter} and {\joiner} constructs.  The
 high-pass and low-pass filtering in multiple-output blocks has been
 converted to a splitter followed by filters on each of the output
-channels. The low and highb pass filters have also been given a peek
+channels. The low and high pass filters have also been given a peek
 amount of 16 so they can perform their function in the way intended in
-{\StreamIt}.  CD-DAT is exactly the same application as that described
-in \cite{murt1999x3}.
+{\StreamIt}.
 
 The remaining 4 applications were chosen from our sample applications
 used for testing the StreamIt compiler. HDTV performs a HDTV signal
@@ -71,23 +70,32 @@ for pseudo single appearance and minimal latency schedules.
 
 \begin{figure}[t]
 \psfig{figure=buffer-graph.eps,width=3.35in}
-\caption{Buffer sizes.\protect\label{fig:buffergraph}}
+\caption{\small Buffer size required by a phased minimum latency schedule,
+normalized to buffer size of a hierarchical single appearance
+schedule.\protect\label{fig:buffergraph}}
 \end{figure}
 
 \begin{figure}[t]
 \psfig{figure=code-graph.eps,width=3.35in}
-\caption{Code sizes.\protect\label{fig:codegraph}}
+\caption{\small Code size required by a phased minimum latency schedule,
+normalized to code size of a hierarchical single appearance
+schedule.\protect\label{fig:codegraph}}
 \end{figure}
 
 \begin{figure}[t]
 \psfig{figure=total-size-graph.eps,width=3.35in}
-\caption{Sum of code size and buffer size.\protect\label{fig:sumgraph}}
+\caption{\small Sum of buffer and code size required by a phased
+minimum latency schedule, normalized to that of a hierarchical single
+appearance schedule.  We give equal weight to the code and buffer size
+only for illustration; in an actual system, the relative weights are
+complex and depend upon resource
+constraints. \protect\label{fig:sumgraph}}
 \end{figure}
 
 \begin{table*} \centering \small
 \begin{tabular}{|c|c|c|c|c|c|c|}
-\hline benchmark & \parbox{0.5in}{\centering number of nodes} & \parbox{0.5in}{\centering number of node executions} & \multicolumn{2}{c|}{pseudo single appearance} & \multicolumn{2}{c|}{minimal latency} \\
-\cline{4-7} & & & \parbox{0.5in}{\centering schedule size} & \parbox{0.5in}{\centering buffer size} & \parbox{0.5in}{\centering schedule size} & \parbox{0.5in}{\centering buffer size} \\
+\hline {\parbox{0.8in}{ \vspace{3pt} {\bf Benchmark}}} & \parbox{0.8in}{\centering \vspace{8pt}{\bf Number of Nodes}} & \parbox{0.8in}{\centering \vspace{16pt} {\bf Number of Node Executions}} & \multicolumn{2}{c|}{{\bf Single Appearance}} & \multicolumn{2}{c|}{{\bf Minimal Latency}} \\
+\cline{4-7} & & & \parbox{0.8in}{\centering ~ \\ \vspace{6pt} {\bf Schedule Size} ~ \\ } & \parbox{0.8in}{\centering ~ \\ \vspace{-3.3pt} {\bf Buffer Size} ~ \\ } & \parbox{0.8in}{\centering ~ \\ \vspace{6pt} {\bf Schedule Size} ~ \\ } & \parbox{0.8in}{\centering ~ \\ \vspace{-3.3pt} {\bf Buffer Size} ~ \\ } \\
 \hline SJPeek31 & 6 & 12063 & 8 & 19964 & 24 & 874 \\
 \hline HDTV & 170 & 390038 & 230 & 550692 & 1190 & 28300 \\
 \hline CD-DAT & 6 & 612 & 6 & 1021 & 64 & 72 \\
@@ -107,30 +115,10 @@ for pseudo single appearance and minimal latency schedules.
 \hline GSM & 47 & 3356 & - & - & 64 & 3900 \\
 \hline
 \end{tabular}
-\caption{Results of running pseudo single appearance and minimal
+\caption{\small Results of running single appearance and minimal
 latency scheduling algorithms on various applications.}
 \label{tbl:results}
 \end{table*}
-
-\begin{comment}
-\begin{figure}
-\centering \psfig{figure=kz-1.eps,width=6in} \caption[Buffer
-storage space savings of Phased Minimal Latency schedule vs.
-Hierarchical schedule.]{Buffer storage space savings of Phased
-Minimal Latency schedule vs. Hierarchical schedule. All data in
-all {\Channels} is assume to consume same amount of space.}
-\end{figure}
-
-\begin{figure}
-\centering \psfig{figure=kz-2.eps,width=6in} \caption[Storage
-usage comparison]{Storage usage for compressed Minimal Latency
-Phased schedule vs. Hierarchical schedule. Left bars are for
-Hierarchical schedules. Numbers are normalized to total storage
-required by Hierarchical schedule. Each entry in every schedule
-and data items in all {\Channels} are assumed to consume same
-amount of space.}
-\end{figure}
-\end{comment}
 
 Table \ref{tbl:results} presents the buffer and schedule sizes
 required by our hierarchical single appearance and minimum latency
@@ -144,18 +132,22 @@ necessary for execution (see Figure~\ref{fig:buffergraph}).  These
 improvements are usually coupled with an increase in code size
 (Figure~\ref{fig:codegraph}).  However, as shown in
 Figure~\ref{fig:sumgraph}, minimum latency scheduling never increases
-the sum of code size and data size for any application.
+the sum of code size and data size for any application.  In computing
+this sum, note that we give equal weight to the code size and data
+size only for the sake of illustration; in an actual system, the
+relative cost of each kind of storage would greatly depend on resource
+constraints and the implementation strategy.
 
-The CD-DAT benchmark exhibits a buffer size decreases from 1021 to 72,
-a 93\% improvement. \cite{murthy99buffer} reports a buffer size of 226
+The CD-DAT benchmark exhibits a decrease in buffer size from 1021 to
+72, a 93\% improvement. \cite{murt2000x2} reports a buffer size of 226
 after applying buffer merging techniques. Our improvement is due to
 reducing the combinatorial growth of the buffers using phased
-scheduling.  
+scheduling.
 
 For our synthetic benchmarks SJPeek31 and SJPeek1024, buffer sizes
 decrease by 95\% and 32\%, respectively. In the case of SJPeek1024,
 the improvement is due to creating fine grained phases which allow the
-initialization schedule to transfer smaller amount of data and allow
+initialization schedule to transfer smaller amounts of data and allow
 the children of a {\splitjoin} to drain their data before the
 {\splitter} provides them with more. This improvement is only evident
 in the presence of peeking. In the case of SJPeek31, the improvement
