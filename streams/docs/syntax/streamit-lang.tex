@@ -20,7 +20,7 @@
 \title{StreamIt Language Specification\\
 Version 2.0\ifprerel\thanks{
 This document is the latest working version of the language specification.\hfil\break\ttfamily
-\hbox{$Id: streamit-lang.tex,v 1.20 2003-06-30 19:25:00 dmaze Exp $}
+\hbox{$Id: streamit-lang.tex,v 1.21 2003-07-03 20:46:03 dmaze Exp $}
 }\fi}
 \author{\texttt{streamit@cag.lcs.mit.edu}}
 \catcode`\$=3
@@ -356,6 +356,12 @@ declaration contains the return type, the name of the function, the
 parameter list, and the function body, just like a normal C or Java
 function.
 
+\paragraph{Message-handler functions.}  A message handler function
+changes the state of the filter in response to some external event,
+delivered via a message.  It is declared with the keyword
+\lstinline|handler|, the name of the message, the parameter list, and
+the function body.
+
 \paragraph{Filter state.}  The top level of the filter may include
 variable declarations.  These variables are visible to every function
 in the filter, and may be used to carry state between iterations of
@@ -564,6 +570,86 @@ compile-time constant.  Fields of the containing stream cannot be
 accessed, and local variables and stream parameters in the containing
 code cannot be modified.
 
+\subsubsection{Messaging}
+\label{sec:messaging}
+
+It is sometimes necessary to send occasional messages outside of the
+normal stream data flow.  A radio application might contain an in-band
+signal requesting a change in the listening frequency, for example;
+this signal would happen infrequently, but it would be detected by a
+filter late in the application and require a change in a filter early
+in the application.  StreamIt provides an out-of-band messaging system
+to accomodate this sort of application.
+
+Only filters can receive messages.  The possible messages are defined
+by message handler functions; these functions have the keyword
+\lstinline|handler| in place of their return type.  A message is sent
+to a \emph{portal}, which can have multiple targets registered with
+it.
+
+\paragraph{Portals.}  A portal is a special type of variable.  It is
+associated with a single message receiver type; the full type name is
+\lstinline|portal<ReceiverType>|.  Unlike other variables in StreamIt,
+portals are passed by reference in stream parameters.  Declaring a
+portal as a local variable, and then passing that as a parameter to a
+child stream which adds a filter to the portal, results in the filter
+also being added to the portal in the original container.
+When a filter is created, it may be added to a portal by adding the
+keyword \lstinline|to| and the portal variable to the end of the
+declaration.
+
+\paragraph{Sending messages.}  A filter work function with a portal
+variable may send a message through the portal.  This looks like a
+function call in Java: the portal name is followed by a period, the
+message name, and a parenthesized parameter list.  This may,
+optionally, be followed by a message latency, which specifies the
+minimum and maximum delay to receive the message.  The latency
+specification is an open bracket, an optional minimum latency, a
+colon, an optional maximum latency, and a close bracket.  If the
+latency specification is omitted, it defaults to \lstinline|[:]|,
+allowing any latency.
+
+When specified, message latency is stated in terms of number of items
+pushed or popped by the sending filter.  If a message is sent with
+latency \lstinline|[10:12]|, it will be received by upstream targets
+immediately before a work function execution that would generate an
+item that would affect the tenth through twelfth next data item that
+would be received by the sender; downstream filters would receive the
+message after a work function execution that processes data derived
+from the tenth through twelfth pushed items.
+
+A typical message-handling application might use a message to change
+an amplification factor.  The following code demonstrates such an
+application.  The \lstinline|Volume| pipeline creates the portal,
+passes it as a parameter to the detector, and adds the actual
+amplifier to it.
+
+\begin{lstlisting}{}
+float->float filter VolumeControl {
+  float amplification;
+  init { amplification = 1.0; }
+  work pop 1 push 1 { push(pop() * amplification); }
+  handler setAmplification(float val)
+    { amplification = val; }
+}
+
+float->float filter VolDetect
+    (portal<VolumeControl> vol) {
+  work pop 1 push 1 {
+    float val = pop();
+    if (/* detected */)
+      vol.setAmplification(0.5) [10:12];
+    push(val);
+  }
+}
+
+float->float pipeline Volume {
+  portal<VolumeControl> vol;
+  add VolDetect(vol);
+  add VolumeControl() to vol;
+}
+\end{lstlisting}
+
 \subsection{Execution Model}
 
 StreamIt does not explicitly assume sequential or parallel hardware.
@@ -684,6 +770,19 @@ and \lstinline|phase| function(s).
 The \lstinline|push| statement takes a value expression and pushes its
 value on to the output tape of the current filter.  The type of the
 expression must match the output type of the filter.
+
+\subsubsection{Message-sending Statements}
+
+A message may be sent to a portal that is a stream parameter in the
+current filter.  The syntax of this is like a Java function call: the
+portal variable name is followed by a period, the name of the message
+function, and a parameter list.  This may optionally be followed by a
+latency specification, consisting of an open bracket, an optional
+minimum latency expression, a colon, an optional maximum latency
+expression, and a close bracket; if omitted, the message has
+best-effort delivery, equivalent to omitting both minimum and maximum
+latency.  For a syntax example and details on the meaning of the
+latency, see Section \ref{sec:messaging}.
 
 \subsection{General-use Statements}
 
@@ -943,6 +1042,10 @@ see section \ref{sec:anonymous-streams}.  A statement containing an
 anonymous stream declaration does not need to be terminated with a
 semicolon, since it ends with a close-brace.
 
+A stream constructor may be followed by the keyword \lstinline|to| and
+the name of a portal variable.  This causes the newly created stream
+to be registered with the named portal.
+
 \subsection{Splitters and Joiners}
 \label{sec:expr-splitters-joiners}
 
@@ -1081,61 +1184,14 @@ int->int filter SquareIt {
 }
 \end{lstlisting}
 
-\subsection{Messaging}
+\subsection{Messaging Extensions}
 
-The early StreamIt papers mentioned the ability to send messages from
-one filter to another stream object, and defines semantics for this.
-The new StreamIt syntax does not have support for messaging.  However,
-there are fundamentals that we clearly will want:
-
-\begin{itemize}
-
-\item \textbf{Portals.}  The template type syntax can be readily used
-  to implement portal types.  We'll need to add new syntax to register
-  objects with portals and to send messages.
-
-\item \textbf{Message handlers.}  These can use a \lstinline|handler|
-  keyword and have a syntax similar to work function declarations.
-  The most recent agreement is that message handlers can only be
-  installed in filters, avoiding a syntax problem with compound stream
-  initialization code.
-
-\item \textbf{Interfaces.}  It is possible multiple stream types may
-  implement the same set of functions.  An \lstinline|interface|
-  keyword can declare a message interface.  No objects of interface
-  types exist, but portals to these types can be created, and any
-  object that has message handlers matching the signatures in the
-  interface declaration can be added to the portal.
-
-\end{itemize}
-
-This might result in message-handling code that looks like this:
-
-\begin{lstlisting}{}
-float->float filter VolumeControl {
-  float amplification;
-  init { amplification = 1.0; }
-  work pop 1 push 1 { push(pop() * amplification); }
-  handler setAmplification(float val)
-    { amplification = val; }
-}
-
-float->float filter VolDetect
-    (Portal<VolumeControl> vol) {
-  work pop 1 push 1 {
-    float val = pop();
-    if (/* detected */)
-      send vol setAmplification(0.5);
-    push(val);
-  }
-}
-
-float->float pipeline Volume {
-  Portal<VolumeControl> vol;
-  add VolDetect(vol);
-  add_register vol VolumeControl();
-}
-\end{lstlisting}
+Future versions of StreamIt may have two extensions to the existing
+messaging system.  First, an \emph{interface}, much like a Java
+interface, may be declared, and filters may declare that they
+implement an interface.  Then a portal to an interface type may be
+declared, and filters of any implementing type may be added.  Second,
+we may lift the restriction that only filters may receive messages.
 
 \subsection{Reinitialization}
 
@@ -1236,9 +1292,9 @@ StreamIt 2.0.  Version 2.0 of the language adds a completely new
 syntax with simplified constructs for declaring stream objects but
 keeping a Java-like syntax for the bodies of init and work functions.
 Other new features include \lstinline|prework| functions, phased
-filters, the \lstinline|keep| expression, and changing from delay
-functions to \lstinline|enqueue| statements in feedback loops.  The
-\lstinline|null| splitter/joiner type was replaced with
+filters, messaging, the \lstinline|keep| expression, and changing from
+delay functions to \lstinline|enqueue| statements in feedback loops.
+The \lstinline|null| splitter/joiner type was replaced with
 \lstinline|roundrobin(0)|.
 
 \subsection{StreamIt 1.0}
