@@ -52,11 +52,16 @@ single-input, single-output; all computation happens in
 {\filters}; data is passed around between {\filters} using three
 streaming constructs: {\pipeline}, which allows stacking of
 {\filters} one after another, {\splitjoin}, which allows splitting
-and joining of data amongst multiple streams, and {{\feedbackloop}},
-which constructs cyclic streams.  In {\StreamIt}, every {\filter}
-must declare the rate at which it processes data: how much data is
-consumed and produced on every invocation of the {\filter}'s
-{\work} function.  This model of data passing is called
+and joining of data amongst multiple streams, and
+{{\feedbackloop}}, which constructs cyclic streams. {\StreamIt}
+programs are built hierarchically, using {\filters} as the inner
+building blocks and {\pipelines}, {\splitjoins} and
+{\feedbackloops} as outer building blocks.\footnote{We use the
+word {\stream} to refer to any instance of a {\filter},
+{\pipeline}, {\splitjoin}, or {\feedbackloop}.} In {\StreamIt},
+every {\filter} must declare the rate at which it processes data:
+how much data is consumed and produced on every invocation of the
+{\filter}'s {\work} function. This model of data passing is called
 Synchronous Data Flow ({\SDF}).
 
 \begin{comment}
