@@ -309,6 +309,16 @@ consistency checking: the splitter and joiner must have the same
 number of slots, and each input and output tape must have the same
 size.
 
+The work function of parent nodes must explicitly cause data to be
+pushed through splitters and joiners.  [[run_splitter]] and
+[[run_joiner]] move as much data as is available from a splitter or
+joiner's input(s) to its output(s).
+
+<<Split/Join Initializers>>=
+void run_splitter(stream_context *c);
+void run_joiner(stream_context *c);
+@
+
 \subsection{Messaging}
 
 Messages can be sent between filters.  Both senders and receivers must
@@ -394,11 +404,17 @@ from the reader end.
 
 \subsection{Filter Context}
 
+<<Stream Context>>=
+<<Context Internal Data>>
+<<One-To-Many Structures>>
+<<struct [[stream_context]]>>
+@
+
 A context structure is used to store data used by the run-time
 library.  Depending on the type of the stream, it may store some
 internal data.
 
-<<Stream Context>>=
+<<Context Internal Data>>=
 struct stream_context;
 
 typedef struct stream_context_list {
@@ -416,6 +432,26 @@ typedef union stream_type_data {
 } stream_type_data;
 @
 
+Split/join structures and feedback loops contain splitter and joiner
+structures.  Any block will contain either exactly one spliiter and
+one joiner, or zero splitters and zero joiners.  The splitter and
+joiner have similar structures: they have a ``one'' side (input to the
+splitter, output from the joiner) and a ``many'' side.  One connection
+to both the splitter and the joiner is connected to the exterior of
+the block (in a split/join, the input of the splitter and the output
+of the joiner; in a feedback loop, one input of the joiner and one
+output of the splitter).
+
+<<One-To-Many Structures>>=
+typedef struct one_to_many {
+  splitjoin_type type;
+  int fan;
+  int *ratio;
+  int slots;
+  tape **tape, **tcache;
+} one_to_many;
+@
+
 The actual context structure contains a [[stream_type_data]] union,
 along with quite a bit of other information.  This includes the object
 the stream is associated with, the type of the stream, the data
@@ -423,7 +459,7 @@ ratios, the work function, the parent context, and the input and
 output tapes.  Note that two objects should point to any given tape,
 one reading from it and one writing to it.
 
-<<Stream Context>>=
+<<struct [[stream_context]]>>=
 typedef struct stream_context {
   void *stream_data;
   stream_type type;
@@ -433,10 +469,7 @@ typedef struct stream_context {
   tape *input_tape;
   tape *output_tape;
   stream_type_data type_data;
-  int num_splits, num_joins;
-  splitjoin_type split_type, join_type;
-  int *split_ratio, *join_ratio;
-  tape **split_tape, **join_tape;
+  one_to_many splitter, joiner;
 } stream_context;
 @
 
