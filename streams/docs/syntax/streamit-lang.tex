@@ -16,6 +16,13 @@
 
 \begin{document}
 
+% Please look the other way, this is a little gross.
+\catcode`\$=12
+\footnotetext{This is a pre-release version of this document. \ttfamily
+$Id: streamit-lang.tex,v 1.8 2002-09-04 16:25:42 dmaze Exp $
+}
+\catcode`\$=3
+
 \maketitle
 \tableofcontents
 
@@ -610,6 +617,12 @@ block.  A declaration must appear before the variable is used.  The
 variable declaration may also contain an initialization, as in
 \lstinline|type name = expr;|  The initialization acts exactly as an
 initialization statement, above.
+
+Variables declared without initialization are initialized to 0 as best
+as possible.  \lstinline|complex| variables are initialized to
+\lstinline|0+0i|.  Each element of an array variable is initialized to
+0 as described here.  Similarly, each field of a structure variable is
+initialized to 0 in the same way.
 
 
 \section{Expressions}
