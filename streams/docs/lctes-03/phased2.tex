@@ -1,13 +1,6 @@
 \section{Phased Scheduling}
 \label{chpt:phased}
 
-\begin{figure}[t]
-\psfig{figure=pseudocode5.eps,width=3.5in}
-\vspace{-22pt}
-\caption{\small Phased Scheduling Algorithm.\protect\label{fig:phasealg}}
-\vspace{-18pt}
-\end{figure}
-
 A schedule for a given hierarchical node of a {\StreamIt} program is a
 list of the node's immediate children, specifying the order in which
 they should be executed.  More precisely, since filters (and, as we
@@ -51,8 +44,6 @@ scheduling technique, see~\cite{karczma-thesis}.
 
 \subsection{Algorithm Details}
 
-\input{example2}
-
 We now consider in more detail the pseudocode in
 Figure~\ref{fig:phasealg}; refer to Figure~\ref{fig:sjex} for an
 example.  The algorithm inputs a Stream {\tt s} and returns a
@@ -73,6 +64,13 @@ the stream, {\it i.e.,} the first child of a pipeline, the splitter of
 a splitjoin, or the joiner of a feedbackloop.  It then pushes live
 items as far forward as possible, only executing the entrance node
 again if the exit node could not fire.
+
+\begin{figure}[t]
+\psfig{figure=pseudocode5.eps,width=3.5in}
+\vspace{-30pt}
+\caption{\small Phased Scheduling Algorithm.\protect\label{fig:phasealg}}
+\vspace{-8pt}
+\end{figure}
 
 There are two subtleties in the {\tt pushSchedule} procedure.  First,
 note that it always flushes extra items from the stream: the exit node
@@ -109,6 +107,8 @@ all phases corresponding to a given stream are adjacent.  This is an
 attempt to provide a canonical form for a given series of executions,
 so that phases with the same form can be compressed in the resulting
 schedule~(see Section~\ref{sec:schedrep}).
+
+\input{example2}
 
 Note that the pseudocode given in Figure~\ref{fig:phasealg} specifies only
 the behavior of the algorithm, rather than the implementation.  In our
@@ -200,36 +200,6 @@ different streams in the same graph, depending on the constraints; the
 algorithm does not depend on the granularity of the children when it
 is scheduling a parent node.
 
-\begin{figure}[t]
-\begin{center}
-\psfig{figure=gsmfl.eps,width=2.2in}
-\caption{\small A tightly coupled feedback loop that appears as one component
-of our GSM benchmark.  Nodes are labeled with their pop and push
-rates.  \protect\label{fig:gsm}}
-\end{center}
-\vspace{-12pt}
-\end{figure}
-
-\begin{figure*}[t]
-\psfig{figure=gsmfl-sched.eps,width=7in}
-
-\hspace{43pt} 
-phase 1 \hspace{94pt}
-phase 2 \hspace{94pt}
-phase 3 \hspace{94pt}
-phase 4
-\caption{\small Phased schedule for feedback loop of Figure~\ref{fig:gsm}.
-No single appearance schedule exists for this
-loop.\protect\label{fig:gsm-phases}}
-\end{figure*}
-
-\begin{figure}[t]
-\psfig{figure=pseudocode6.eps,width=3.5in}
-\vspace{-16pt}
-\caption{\small Algorithm to detect the minimum number of phases required by
-a given feedback loop.\protect\label{fig:feedalg}}
-\end{figure}
-
 \subsection{Scheduling Feedback Loops}
 
 Some feedback loops require a minimum number of phases in order to
@@ -253,6 +223,29 @@ on items that it produced earlier in the same phase.  Note that the
 loop is impossible to schedule with the requested number of phases;
 thus, {\tt phasesForFeedback} should always be called first to see how
 many phases are needed.
+
+\begin{figure*}[t]
+\psfig{figure=gsmfl-sched.eps,width=7in}
+
+\hspace{43pt} 
+phase 1 \hspace{94pt}
+phase 2 \hspace{94pt}
+phase 3 \hspace{94pt}
+phase 4
+\caption{\small Phased schedule for feedback loop of Figure~\ref{fig:gsm}.
+No single appearance schedule exists for this
+loop.\protect\label{fig:gsm-phases}}
+\end{figure*}
+
+\begin{figure}
+\begin{center}
+\psfig{figure=gsmfl.eps,width=2.2in}
+\caption{\small A tightly coupled feedback loop that appears as one component
+of our GSM benchmark.  Nodes are labeled with their pop and push
+rates.  \protect\label{fig:gsm}}
+\end{center}
+\vspace{-12pt}
+\end{figure}
 
 \subsection{Schedule Representation}
 \label{sec:schedrep}
@@ -305,3 +298,10 @@ requiring them to call the same phases on those children.  However,
 proper evaluation of this technique would need to take into account
 the overhead of this indirection at runtime, and we do not evaluate it
 here.
+
+\begin{figure}
+\psfig{figure=pseudocode6.eps,width=3.5in}
+\vspace{-16pt}
+\caption{\small Algorithm to detect the minimum number of phases required by
+a given feedback loop.\protect\label{fig:feedalg}}
+\end{figure}

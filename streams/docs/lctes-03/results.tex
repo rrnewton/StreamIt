@@ -69,14 +69,40 @@ for pseudo single appearance and minimal latency schedules.
 \label{sec:results:results}
 
 \begin{figure}[t]
+\vspace{6pt}
 \psfig{figure=buffer-graph.eps,width=3.35in}
 \caption{\small Buffer size required by a phased minimum latency schedule,
 normalized to buffer size of a hierarchical single appearance
 schedule.\protect\label{fig:buffergraph}}
-\vspace{-8pt}
+\vspace{-6pt}
 \end{figure}
 
+Table \ref{tbl:results} presents the buffer and schedule sizes
+required by our hierarchical single appearance and minimum latency
+scheduling algorithms for our benchmark suite.  Note that the GSM
+application cannot be scheduled using a single appearance schedule,
+because it has a tightly constrained feedback loop (see
+Figure~\ref{fig:gsm}).
+
+Several applications show a very large improvement in buffer size
+necessary for execution (see Figure~\ref{fig:buffergraph}).  These
+improvements are usually coupled with an increase in code size
+(Figure~\ref{fig:codegraph}).  However, as shown in
+Figure~\ref{fig:sumgraph}, minimum latency scheduling never increases
+the sum of code size and data size for any application.  In computing
+this sum, note that we give equal weight to the code size and data
+size only for the sake of illustration; in an actual system, the
+relative cost of each kind of storage would greatly depend on resource
+constraints and the implementation strategy.
+
+The CD-DAT benchmark exhibits a decrease in buffer size from 1021 to
+72, a 93\% improvement. \cite{murt2000x2} reports a buffer size of 226
+after applying buffer merging techniques. Our improvement is due to
+reducing the combinatorial growth of the buffers using phased
+scheduling.
+
 \begin{figure}[t]
+\vspace{6pt}
 \psfig{figure=code-graph.eps,width=3.28in}
 \caption{\small Code size required by a phased minimum latency schedule,
 normalized to code size of a hierarchical single appearance
@@ -91,7 +117,7 @@ appearance schedule.  We give equal weight to the code and buffer size
 only for illustration; in an actual system, the relative weights are
 complex and depend upon resource
 constraints. \protect\label{fig:sumgraph}}
-\vspace{-6pt}
+\vspace{-4pt}
 \end{figure}
 
 \begin{table*} \centering \small
@@ -119,33 +145,9 @@ constraints. \protect\label{fig:sumgraph}}
 \end{tabular}
 \caption{\small Results of running single appearance and minimal
 latency scheduling algorithms on various applications.}
-\vspace{-8pt}
 \label{tbl:results}
+\vspace{-4pt}
 \end{table*}
-
-Table \ref{tbl:results} presents the buffer and schedule sizes
-required by our hierarchical single appearance and minimum latency
-scheduling algorithms for our benchmark suite.  Note that the GSM
-application cannot be scheduled using a single appearance schedule,
-because it has a tightly constrained feedback loop (see
-Figure~\ref{fig:gsm}).
-
-Several applications show a very large improvement in buffer size
-necessary for execution (see Figure~\ref{fig:buffergraph}).  These
-improvements are usually coupled with an increase in code size
-(Figure~\ref{fig:codegraph}).  However, as shown in
-Figure~\ref{fig:sumgraph}, minimum latency scheduling never increases
-the sum of code size and data size for any application.  In computing
-this sum, note that we give equal weight to the code size and data
-size only for the sake of illustration; in an actual system, the
-relative cost of each kind of storage would greatly depend on resource
-constraints and the implementation strategy.
-
-The CD-DAT benchmark exhibits a decrease in buffer size from 1021 to
-72, a 93\% improvement. \cite{murt2000x2} reports a buffer size of 226
-after applying buffer merging techniques. Our improvement is due to
-reducing the combinatorial growth of the buffers using phased
-scheduling.
 
 For our synthetic benchmarks SJPeek31 and SJPeek1024, buffer sizes
 decrease by 95\% and 32\%, respectively. In the case of SJPeek1024,
