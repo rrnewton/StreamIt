@@ -12,7 +12,7 @@
 
 \noindent
 This is for the May 28, 2003 snapshot release (streamit-0.0.20030528).\\
-\verb|$Id: readme.tex.in,v 1.5 2003-09-30 18:08:44 dmaze Exp $|
+\verb|$Id: readme.tex.in,v 1.6 2003-10-03 15:42:18 dmaze Exp $|
 
 \section{What is this?}
 
@@ -79,6 +79,12 @@ The source release only builds with IBM's Jikes Java compiler; see
 \url{http://www.jikes.org/}.  Otherwise, a Java virtual machine is
 required to run the compiler; see \url{http://java.sun.com/} for
 possibilities.
+
+The makefile infrastructure generally uses the GNU tools otherwise.
+In particular, GNU Make is required to build; this is the default
+\filename{make} on Linux machines, and may be available as
+\filename{gmake} on other Unix-like machines.  GNU Make can be
+downloaded from \url{http://www.gnu.org/}.
 
 \section{Caveats}
 
