@@ -32,13 +32,6 @@ specific reviewer comments
 --------------------------
 - How often did you perform frequency hops?
 
-- Section 6: I didn't understand the comparison of Pugh and Rosser. "..we
-  calculate the last interation of an actor which affects another."
-  What is "another" referring to? "..last invocation that was
-  relevant."  Is this the last invocation of the actor in question, or
-  one of its predecessors? Being a bit more precise might help to
-  clarify the connection here.
-
 - 4.3 The third paragraph. "The actual message delivery can be
   implemented in the most efficient way for the given architecture" I think
   that many readers, including me, are equally interested in the
@@ -50,6 +43,13 @@ specific reviewer comments
 n Section 4.1: After the bullet list, you might mention as you describe the
   semantics of message latency that this is much like a logical clock,
   well-known in distributed systems.
+
+x Section 6: I didn't understand the comparison of Pugh and Rosser. "..we
+  calculate the last interation of an actor which affects another."
+  What is "another" referring to? "..last invocation that was
+  relevant."  Is this the last invocation of the actor in question, or
+  one of its predecessors? Being a bit more precise might help to
+  clarify the connection here.
 
 x What is the impact in terms of bandwidth of sending less data
   (than the manual messaging model)? Why is parallelism so much more
