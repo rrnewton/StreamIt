@@ -12,7 +12,7 @@
 
 \noindent
 This is for the May 28, 2003 snapshot release (streamit-0.0.20030528).\\
-\verb|$Id: readme.tex.in,v 1.6 2003-10-03 15:42:18 dmaze Exp $|
+\verb|$Id: readme.tex.in,v 1.7 2003-10-07 15:02:12 dmaze Exp $|
 
 \section{What is this?}
 
@@ -102,18 +102,10 @@ research compiler; as such, it has several known shortcomings:
    and that all variables are declared before being used.  A semantic
    checker is currently in progress.
 
-\item For stream I/O types, arrays are not supported on the uniprocessor
-   backend.  Primitive types and structures are supported on both the
-   uniprocessor backend and RAW, and should work in the Java library.
-
 \item The compiler may have memory issues running on particularly
   large benchmarks.  The dynamic programming partitioner
   (\verb|--dppartition|) generally uses less memory than the default
   greedy partitioner.
-
-\item Multidimensional arrays may not work well, particularly as the
-   input or output type of a filter.  (Better performance is often
-   possible by destructuring arrays in any case.)
 
 \item Phased filter support differs between the compiler and library.  A
    work function that consists only of calls to phase functions should
