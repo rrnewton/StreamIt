@@ -391,7 +391,7 @@ are computed as follows:
 \begin{equation} \nonumber
 \begin{array}{rcl}
 \mt{vSum}_k & = & \sum_{i=0}^{k-1} v_i \\ ~ \vspace{-6pt} \\
-\mt{vTot} & = & \mt{vSum}_{n-1} \\ ~ \vspace{-4pt} \\
+\mt{vTot} & = & \mt{vSum}_n \\ ~ \vspace{-4pt} \\
 \multicolumn{3}{l}{\forall k \in [0, n-1]:} \\ ~ \vspace{-12pt} \\ 
 \multicolumn{3}{l}{\parbox{3in}{
     \begin{equation} \nonumber
@@ -401,7 +401,7 @@ are computed as follows:
 	\begin{array}{l}
 	  1 ~\mt{if}~ i=j ~\wedge~ \\ 
 	  ~\hspace{0.13in}~ vTot-vSum_{k+1} \le i ~\wedge~ \\
-	  ~\hspace{0.13in}~ i < vTot-vSum_{k+1} \\
+	  ~\hspace{0.13in}~ i < vTot-vSum_{k} \\
 	  0 ~\mt{otherwise}
 	\end{array}
 	\right.
