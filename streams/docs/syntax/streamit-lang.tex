@@ -653,6 +653,52 @@ Similarly, array references \lstinline|a[b]| are value expressions;
 \lstinline|a| must be an array variable, and \lstinline|b| must be an
 integer-valued value expression.
 
+\subsubsection{\lstinline|peek| and \lstinline|pop|}
+\label{sec:expr-peek-pop}
+
+The \lstinline|peek| and \lstinline|pop| expressions look at items on
+the incoming tape in a filter's work function; they are illegal in any
+other context.  \lstinline|peek(n)| examines the n-th item on the tape
+without removing it; \lstinline|peek(0)| returns the next incoming
+item, \lstinline|peek(1)| the one afterwards, and so on.
+\lstinline|pop()| returns the same item \lstinline|peek(0)| returns,
+but also removes it from the tape.
+
+\begin{note}
+There is not a guaranteed evaluation order for StreamIt expressions,
+and the implementation of \lstinline|pop()| in C doesn't give any
+guarantees for when the item is actually removed from the tape.  Thus,
+an expression should contain no more than one \lstinline|pop()|, and
+if there is one, there should be no \lstinline|peek()|s.
+\end{note}
+
+Note that \lstinline|pop()| removes an item from the tape, so
+\lstinline|peek()|s afterwards use different indices.  A work function
+must pop a fixed number of items, and declare the number of items in
+its rate declaration.  It may not peek at more items than it declares
+in its rate declaration, though it may peek at fewer.  The peek
+declaration declares the furthest position on the tape examined from
+the point of view of the beginning of the function.
+
+\begin{lstlisting}{}
+int->int filter PeekRates {
+  work pop 1 peek 3 push 1 {
+    int a, b, c, d, e;
+    a = peek(0);
+    b = peek(1);
+    c = pop();   // Same value as a
+    d = peek(0); // Same value as b
+    e = peek(1);
+    push(a + b + c + d + e);
+  }
+}
+\end{lstlisting}
+
+This function pops one item and pushes 1.  It declares a peek rate of
+3 because \lstinline|e| peeks at the third item that was on the tape
+at the start of the function -- one is popped, and \lstinline|e|
+contains the second item beyond that.
+
 \subsubsection{Function Calls}
 \label{sec:expr-funcall}
 
