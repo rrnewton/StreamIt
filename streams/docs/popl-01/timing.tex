@@ -85,7 +85,7 @@ To derive $\ma{I_A}{O_A}(x)$, observe that the filter can execute so
 long as it does not peek beyond the $x$'th item on the input tape,
 $I_A$.  After the $n$'th execution, it has popped $n$ items, peeked up
 to $n + (peek_A - pop_A)$, and popped $2 * n$ items.  Thus, it can
-execute $n = floor((x - (peek_A - pop_A)) / pop_A))$ times, leaving
+execute $n = \lfloor(x - (peek_A - pop_A)) / pop_A)\rfloor$ times, leaving
 the following expression for $\ma{I_A}{O_A}(x)$
 
 \[
