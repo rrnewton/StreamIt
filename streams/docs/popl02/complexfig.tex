@@ -114,8 +114,8 @@ num(n, \mt{steady})-1]$, introduce this equation (SREAD to SWRITE):
 %
 \begin{align}
 &\forall (i, j, k) \in {\cal D}_{{SWRITE}_{c, p}},~\mt{SWRITE}_{c,p}(i,j,k) =\\\nonumber
-&W(n, \mt{steady}, p)(\mt{Steady\_Inputs})[\mt{pos\_out}(n, c)][k], \mt{where}\\\nonumber
-&\mt{Steady\_Inputs} = [\mt{SREAD}_{{chan\_in}(n)[1], p}(i, j, *), \dots, \mt{SREAD}_{{chan\_in}(n)[\mt{num\_in}(n)], p}(i, j, *) ]
+&W(n, \mt{steady}, p)(\mt{Steady\_Inputs})[\mt{pos\_out}(n, c)][k], \mt{where}\\\nonumber&
+\mt{Steady\_Inputs} = [\mt{SREAD}_{{chan\_in}(n)[1], p}(i, j, *), \dots, \mt{SREAD}_{{chan\_in}(n)[\mt{num\_in}(n)], p}(i, j, *) ]
 \end{align}
 %
 \item For each $c \in \mt{chan\_out}(n)$, for each $p \in [0,
@@ -181,14 +181,14 @@ IREAD):
 \mt{num}(n, \mt{steady})-1]$, introduce this equation (IBUF to
 SREAD):
 \begin{align}
-\forall (i,j,k) \in {\cal D}_{IB {\small \rightarrow} SR}(n,c,p), 
+&\forall (i,j,k) \in {\cal D}_{IB {\small \rightarrow} SR}(n,c,p), 
 \mt{SREAD}_{c, p}(i,j,k) = 
     \mt{IBUF}_{c}(\mt{ReadIndex}(n,c,p,i,j,k)), \mt{where} \\ \nonumber
-\mt{ReadIndex}(n,c,p,i,j,k) = \mt{TotalRead}(n,c,\mt{init})
+&\mt{ReadIndex}(n,c,p,i,j,k) = \mt{TotalRead}(n,c,\mt{init})
                 + (i*S(n)+j)*\mt{TotalRead}(n,c,\mt{steady}) \\ \nonumber
                 &+ \mt{PartialRead}(c, \mt{steady}, p) 
                 + k) \\\nonumber
-\mt{and }{\cal D}_{IB {\small \rightarrow} SR}(n,c,p) = 
+&\mt{and }{\cal D}_{IB {\small \rightarrow} SR}(n,c,p) = 
   \{ (i,j,k) | \mt{ReadIndex}(n,c,p,i,j,k) \in {\cal D}_{{IBUF}_{c}} \}
 \end{align}
 %
@@ -198,49 +198,57 @@ SREAD):
 these equations (SBUF to SREAD):
 % two possible problems: sread has already been written to, or sbuf has already been read from
 \begin{align}
-\forall (i,j,k) \in {{\cal D}\mt{1}}_{SB {\small \rightarrow} SR}(c,p,q),\\ \nonumber
+&\forall (i,j,k) \in {{\cal D}\mt{1}}_{SB {\small \rightarrow} SR}(c,p,q),
 \mt{SREAD}_{c, p}(i,j,k) = 
     \mt{SBUF}_{c}(i+q+
                   \mt{Int\_Offset}(n,c,p),\\ \nonumber
-                  j*\mt{TotalRead}(n,c,\mt{steady}) + 
+                  &j*\mt{TotalRead}(n,c,\mt{steady}) + 
                     \mt{PartialRead}(c,\mt{steady},p) + k
-                   - q * \mt{Period}(c) + \mt{Mod\_Offset}(n,c,p)) \\ \nonumber
-\mt{where }{{\cal D}\mt{1}}_{SB {\small \rightarrow} SR}(c,p,q) = 
-  ({\cal D}_{{SREAD}_{c, p}} - \mt{PUSHED}(n,c,p)) \\
-                         \cap \{ (i,j,k) | q * \mt{Period}(c) - min(0, \mt{Mod\_Offset}(n,c,p))
+                   - q * \mt{Period}(c) + \mt{Mod\_Offset}(n,c,p)), \\ \nonumber
+&\mt{where }{{\cal D}\mt{1}}_{SB {\small \rightarrow} SR}(c,p,q) = 
+  ({\cal D}_{{SREAD}_{c, p}} - \mt{PUSHED}(n,c,p))
+                         \cap \\ \nonumber
+	&\{ (i,j,k) | q * \mt{Period}(c) - min(0, \mt{Mod\_Offset}(n,c,p))
                                 \le k 
-                                \le min((q+1)*\mt{Period}(c),  \\ \nonumber
-                                        E(c, \mt{steady}, p)) - 1 
-                                        - max(0, \mt{Mod\_Offset}(n,c,p)) \} \\ \nonumber &~
+                                \le \\ \nonumber
+	&min((q+1)*\mt{Period}(c),
+         E(c, \mt{steady}, p)) - 1 
+         - max(0, \mt{Mod\_Offset}(n,c,p)) \}\\ \nonumber\\
+%\end{align}
+%\begin{align}
 %
 %
-\forall (i,j,k) \in {{\cal D}\mt{2}}_{SB {\small \rightarrow} SR}(c,p,q), \\
-\mt{SREAD}_{c, p}(i,j,k) = 
-    \mt{SBUF}_{c}(i+q+
-                  \mt{sign(Offset)} + \mt{Int\_Offset}(n,c,p), \\ \nonumber
-                  j*\mt{TotalRead}(n,c,\mt{steady}) + 
-                    \mt{PartialRead}(c,\mt{steady},p) + k  \\ \nonumber
+&\forall (i,j,k) \in {{\cal D}\mt{2}}_{SB {\small \rightarrow} SR}(c,p,q),
+\mt{SREAD}_{c, p}(i,j,k) = \\ \nonumber
+    &\mt{SBUF}_{c}(i+q+
+                  \mt{sign(Offset)} + \mt{Int\_Offset}(n,c,p),
+                  j*\mt{TotalRead}(n,c,\mt{steady}) + \\ \nonumber
+                    &\mt{PartialRead}(c,\mt{steady},p)
+		+ k
                    - q * \mt{Period}(c) 
-                   - \mt{sign(Offset)} * \mt{Period}(c) + \mt{Mod\_Offset}(n,c,p)) \\ \nonumber
+                   - \mt{sign(Offset)} * \mt{Period}(c)
+ + \mt{Mod\_Offset}(n,c,p)),\\ \nonumber&
 \mt{where }{{\cal D}\mt{2}}_{SB {\small \rightarrow} SR}(c,p,q) = 
-  ({\cal D}_{{SREAD}_{c, p}} - \mt{PUSHED}(n,c,p)) \\ \nonumber
-                         \cap ( \{ (i,j,k) | q * \mt{Period}(c)
-                                      \le k 
-                                      \le min((q+1)*\mt{Period}(c),  \\ \nonumber
-                                              E(c, \mt{steady}, p)) - 1 \} - {{\cal D}\mt{1}}_{SB {\small \rightarrow} SR}(c,p,q) ) \\ \nonumber &~ \\ \nonumber
+  ({\cal D}_{{SREAD}_{c, p}} - \mt{PUSHED}(n,c,p)) \cap \\ \nonumber
+                         &( \{ (i,j,k) | q * \mt{Period}(c)
+                                \le k 
+                                \le min((q+1)*\mt{Period}(c),
+                                              E(c, \mt{steady}, p)) - 1 \} - {{\cal D}\mt{1}}_{SB {\small \rightarrow} SR}(c,p,q) )\\ \nonumber\\
+%\end{align}
+%\begin{align}
 %
 %
-\mt{where }\mt{PUSHED}(n,c,p) = {\cal D}_{IB {\small \rightarrow} SR}(n,c,p) \\ \nonumber
-\mt{and }\mt{Num\_Pushed}(n,c,p) = 
+&\mt{where }\mt{PUSHED}(n,c,p) = {\cal D}_{IB {\small \rightarrow} SR}(n,c,p) \\ \nonumber
+&\mt{and }\mt{Num\_Pushed}(n,c,p) = 
 % this is a dot product of (i,j,k) with something
   (max_{\preceq}\mt{PUSHED}(n,c,p)) \cdot (S(n) * \mt{TotalRead}(n,c,\mt{steady}), \\ \nonumber
-                                        \mt{TotalRead}(n,c,\mt{steady}), \\ \nonumber
-                                        1 ) + \mt{PartialRead}(c, \mt{steady}, p) \\ \nonumber
+                                        &\mt{TotalRead}(n,c,\mt{steady}),
+                                        1 ) + \mt{PartialRead}(c, \mt{steady}, p),
 \mt{and }\mt{PEEKED}(c,p) = {SB {\small \rightarrow} IR}(c,p) \\ \nonumber
-\mt{and }\mt{Num\_Popped}(c,p) = |\mt{PEEKED}(c,p)| + O(c,\mt{steady},p) - E(c,\mt{steady},p) \\ \nonumber
-\mt{and }\mt{Offset}(n,c,p) = \mt{Num\_Popped}(c,p)-\mt{Num\_Pushed}(n,c,p) \\ \nonumber
-\mt{and }\mt{Int\_Offset}(n,c,p) = \mt{sign(Offset)}*\lfloor \frac{abs(\mt{Offset}(n,c,p))}{\mt{Period}(c)} \rfloor) \\ \nonumber
-\mt{and }\mt{Mod\_Offset}(n,c,p) = \mt{sign(Offset)}*(abs(\mt{Offset}(n,c,p))~\mt{mod}~\mt{Period}(c)) \\ \nonumber
+&\mt{and }\mt{Num\_Popped}(c,p) = |\mt{PEEKED}(c,p)| + O(c,\mt{steady},p) - E(c,\mt{steady},p) \\ \nonumber
+&\mt{and }\mt{Offset}(n,c,p) = \mt{Num\_Popped}(c,p)-\mt{Num\_Pushed}(n,c,p) \\ \nonumber
+&\mt{and }\mt{Int\_Offset}(n,c,p) = \mt{sign(Offset)}*\lfloor \frac{abs(\mt{Offset}(n,c,p))}{\mt{Period}(c)} \rfloor) \\ \nonumber
+&\mt{and }\mt{Mod\_Offset}(n,c,p) = \mt{sign(Offset)}*(abs(\mt{Offset}(n,c,p))~\mt{mod}~\mt{Period}(c))
 %
 \end{align}
 %
