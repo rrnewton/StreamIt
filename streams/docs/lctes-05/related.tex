@@ -1,14 +1,46 @@
 \section{Related Work}
 \label{sec:related-work}
 
+There is a large body of literature on scheduling synchronous dataflow
+(SDF) graphs to optimize various
+metrics~\cite{bhattacharyya99synthesis,leesdf}.  The work most closely
+related to ours is a recent study by Kohli~\cite{kohli04} on cache-aware
+scheduling of SDF graphs.
 
-- need to make the point that while there is a lot of work on
-  scheduling SDF graphs that tradeoff buffer size and code size, they
-  are mostly geared toward minimizing them which is not a good
-  decision from the point of view of a cache based architecture
-  (compiling for on chip RAM and scratchpad memories is different).
-  here we are actualy scaling up code size and buffer size for better
-  performance. 
+It is recognized that there is a tradeoff between code size and buffer
+size when determining an SDF schedule.  Most techniques to date have
+focussed on ``single appearance schedules'' in which each filter
+appears at only one position in the loop nest denoting the schedule.
+Such schedules guarantee minimal code size and facilitate the inlining
+of filters.  There are a number of approaches to minimizing the buffer
+requirements for single-appearance schedules (see
+\cite{bhattacharyya99synthesis} for a review).  While it has been
+shown that obtaining the minimal memory requirements for general
+graphs is NP-complete~\cite{Bhatta97}, there are two complimentary
+heuristics, APGAN (Pairwise Grouping of Adjacent Nodes) and RPMC
+(Recursive Partitioning by Minimum Cuts), that have shown to be
+effective when applied together~\cite{Bhatta97}.  Buffer
+merging\cite{murt1999x3,murt2000x2} represents another technique for
+decreasing buffer sizes , which could be integrated with our approach
+in the future.
+
+Govindarajan et al. develop a linear programming framework for
+determining the ``rate-optimal schedule'' with the minimal memory
+requirement~\cite{GGD94}.  A rate-optimal schedule is one that takes
+advantage of parallel resources to execute the graph with the maximal
+throughput.  However, the technique is specific to rate-optimal
+schedules and can result in a code size explosion, as the same node
+could be executed in many different contexts.
+
+The work described above is related to ours in that minimizing buffer
+requirements can also improve caching behavior.  However, our goal is
+different in that we aim to improve spatial and temporal locality
+instead of simply decreasing the size of the live data set.  In fact,
+our scaling transformation actually {\it increases} the size of the
+data buffers, leading to higher performance across our benchmark
+suite.  Our transformations also take into account the size of the
+instruction and data caches to select an appropriate scaling and
+partitioning for the stream graph.
 
 Proebsting and Watterson \cite{pro96} give a fusion algorithm that
 interleaves the control flow graphs of adjacent filters.  However,
@@ -16,4 +48,17 @@ their algorithm only supports synchronous {\tt get} and {\tt put}
 operations; StreamIt's {\tt peek} operation necessitates buffer
 management between filters.
 
-(cache models?)
+There are a large number of stream programming languages; see
+\cite{survey97} for a review.  The Brook language~\cite{Buck04}
+extends C to include data-parallel kernels and multi-dimensional
+streams that can be manipulated via predefined operators.  Synchronous
+languages such as Esterel~\cite{esterel92} and LUSTRE~\cite{lustre}
+also target the embedded domain, but they are more control-oriented
+than StreamIt and are less amenable to compile-time optimizations.
+Benveniste et al.~\cite{benveniste93dataflow} also provides an
+overview of dataflow synchronous languages.  Sisal (Stream and
+Iteration in a Single Assignment Language) is a high-performance,
+implicitly parallel functional language~\cite{sisal}.  We are not
+aware of any cache-aware optimizations in these stream languages.
+
+%(cache models?)
