@@ -72,14 +72,9 @@ class FIR extends Stream {
                add(new Filter() {
                   Channel input = new ComplexChannel();
                   Channel output = new ComplexChannel();           
-		  Complex h;
-                  void init() {
-                     h = calc_fir_coeff(i, N);
-                     for(int j=0; j<i; j++) 
-                        output.push(0);
-                  }
                   void work() {
-                     output.push(input.pop()*h);
+                     output.push(input.peek(i)*fir_coeff[i][N]);
+		     input.pop();
                   }
                })
             round_robin();
