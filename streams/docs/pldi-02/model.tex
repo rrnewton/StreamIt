@@ -46,12 +46,12 @@ that are relative to a given filter in the graph, instead of being
 global characteristics of a program.
 
 We will arrive at this notion of relative timing and dependence via a
-single transfer function, $min$, that is defined for a given stream
-graph. In Section \ref{sec:notation} we provide a definition of $min$
-along with some notation.  We then motivate the $min$ function in
-\ref{sec:informationflow} by deriving a concept of relative time and a
-meaning for StreamIt's messaging system.  Only then, in Section
-\ref{sec:derivemin}, do we turn to deriving expressions for the $min$
+{\bf stream transfer function}, $sdep$, that is defined for a given
+stream graph. In Section \ref{sec:notation} we provide a definition of
+$sdep$ along with some notation.  We then motivate the $sdep$ function
+in \ref{sec:informationflow} by deriving a concept of relative time
+and a meaning for StreamIt's messaging system.  Only then, in Section
+\ref{sec:derivemin}, do we turn to deriving expressions for the $sdep$
 function itself; Sections \ref{sec:prog-verif}, \ref{sec:denotational}
 and \ref{sec:optimization} further employ the function in the
 respective contexts of program verification, denotational semantics,
@@ -85,27 +85,27 @@ We use the following notation:
 
 \end{itemize}
 
-Now, we are ready to give a definition of the $min$ function:
+Now, we are ready to give a definition of the $sdep$ function:
 \begin{definition}
 $\mi{a}{b}(x)$ is the minimum number of items that must appear on tape
 $a$ given that there are $x$ items on tape $b$, where $b$ is
 downstream of $a$.
 \end{definition}
-Thus, one can think of $min$ as an inter-filter data dependence
+Thus, one can think of $sdep$ as an inter-filter data dependence
 mapping.  Though the actual data references in a stream program appear
 from within the work functions, there is an aggregate dependence that
 restricts a filter from firing until it has enough items on its input
 tape to satisfy all its internal references (we assume that each
-firing is atomic).  The $min$ function generalizes this dependence to
+firing is atomic).  The $sdep$ function generalizes this dependence to
 answer a different question: how many items are needed on {\it
 another} filter's input tape before my filter can fire?  The following
 sections will provide some additional intution as to the meaning and
-applications of the $min$ function.
+applications of the $sdep$ function.
 
 \subsection{Information Flow}
 \label{sec:informationflow}
 
-Above, the $min$ function is described in terms of data dependences.
+Above, the $sdep$ function is described in terms of data dependences.
 However, we can also think of this function as defining a common
 timing mechanism that asynchronous filters can use to synchronize
 events.  We present this timing mechanism in terms of ``information
@@ -125,7 +125,7 @@ asynchronously without any notion of global time, two invocations of a
 work function occur at the same ``information-relative time'' if they
 operate on the same information wavefront.
 
-The $min$ function can be used to give a precise definition to an
+The $sdep$ function can be used to give a precise definition to an
 information wavefront.  One interpretation of $y = \mi{a}{b}(x)$ is
 that the item at position $y$ of tape $a$ is the the latest item on
 tape $a$ to {\it affect} the item at position $x$ of tape $b$.  This
@@ -140,7 +140,7 @@ concept.
 \subsubsection{Message Timing}
 \label{sec:messagesemantics}
 
-We can use the $min$ function to give a precise meaning to the message
+We can use the $sdep$ function to give a precise meaning to the message
 delivery guarantees in StreamIt.  Though we cannot give the details
 here due to space constraints (see \cite{streamittech} for a careful
 treatment), the general idea is as follows.
@@ -168,7 +168,7 @@ reconfigure just in time to understand the new protocol, but will
 still process previous elements in the pipeline according to the old
 protocol.
 
-\subsection{Deriving the Min Function}
+\subsection{The Stream Transfer Function}
 \label{sec:derivemin}
 
 We now turn to deriving $\mi{a}{b}$ for all pairs of tapes $a$ and $b$
@@ -191,7 +191,7 @@ must be present on the input is:
 \subsubsection{Pipelines}
 \label{sec:timepipe}
 
-Let us now derive an expression for $min$ in the case of a pipeline.
+Let us now derive an expression for $sdep$ in the case of a pipeline.
 In the base case, consider that two filters are connected, with the
 output of $A$ feeding into the input of $B$ (see
 Figure~\ref{fig:tapelabels}).  We are seeking $\mi{I_A}{O_B}(x)$: the
@@ -206,12 +206,12 @@ on $I_A$.  Using $\circ$ to denote function composition, we have:
 \end{align*}
 By identical reasoning, this composition law holds for pipelined
 streams as well as filters.  That is, a Pipeline of streams $S1 \dots
-Sn$ has the following $min$ function:
+Sn$ has the following $sdep$ function:
 \begin{align}
 \label{eq:composepipe}
 \mi{S1}{Sn} &= \mi{I_{S1}}{O_{S1}} \circ \dots \circ \mi{I_{Sn}}{O_{Sn}}
 \end{align}
-One might be tempted to define the $min$ function for any pair of
+One might be tempted to define the $sdep$ function for any pair of
 connected tapes as the composition of functions for the operators
 connecting those tapes.  However, such a definition turns out to be
 problematic for the SplitJoin and FeedbackLoop constructs, which
@@ -230,7 +230,7 @@ to a pipeline of streams $S_1 \dots S_n$, then:
 \subsubsection{SplitJoins}
 \label{sec:timesj}
 
-We now derive $min$ expressions for the components of a SplitJoin, and
+We now derive $sdep$ expressions for the components of a SplitJoin, and
 for the SplitJoin construct as a whole.  We denote the $n$ output
 tapes of the splitter $S$ by $O1_S \dots On_S$, and the $n$ input
 tapes of the joiner $J$ by $I1_J \dots In_J$ (see Figure
@@ -240,7 +240,7 @@ tapes of the joiner $J$ by $I1_J \dots In_J$ (see Figure
 $n$-way duplicating splitter.  Since the splitter duplicates each
 input item onto each output tape, there must be at least $x$ items on
 $I_S$ if there are $x$ items on $Oi_S$.  This yields a simple
-expression for $min$:
+expression for $sdep$:
 \begin{align*}
 \mi{I_S}{Oi_S}(x) = x
 \end{align*}
@@ -256,7 +256,7 @@ deposited on $Oi_S$ during the current cycle of the splitter, and
 $n(Oi_S)~mod~w_i + sum_{j=0}^{i-1}{w_j}$ items have been drawn from
 the input since the last complete cycle.  Summing the item count for
 the completed cycles and the current cycle gives the following
-expression for $min$:
+expression for $sdep$:
 \begin{align*}
 \mi{I_S}{Oi_S}(x) = \floor{n(On_S)}{w_n} * \sum_{i}{w_i} + x~mod~w_i +
 \sum_{j=0}^{i-1}{w_j}
@@ -270,14 +270,14 @@ $\floor{x}{W}$ complete cycles, each of which drew $w_i$ items from
 the $i$'th input tape.  Since the last complete cycle, the joiner has
 drawn $x~mod~W$ items from its inputs, and $MIN(0, x~mod~W -
 \sum_{j=0}^{i-1}{w_j})$ of these items were taken from input tape $j$.
-Thus, the $min$ function from the output of the joiner to the $i$'th
+Thus, the $sdep$ function from the output of the joiner to the $i$'th
 input tape is as follows:
 \begin{align*}
 \mi{Ii_J}{O_J}(x) = w_i * W + MIN(0, x~mod~W - \sum_{j=0}^{i-1}{w_j})
 \end{align*}
 
 {\bf SplitJoin construct.}  As with the Pipeline construct, we can
-derive the $min$ function across an entire SplitJoin as a composition
+derive the $sdep$ function across an entire SplitJoin as a composition
 of the component functions.  However, a SplitJoin differs from a
 Pipeline in that the joiner imposes a control dependence between the
 parallel streams.  That is, for there to be $x$ items on the output of
@@ -288,7 +288,7 @@ least at least $\mi{Oi_S}{Ii_J} \circ \mi{Ii_J}{O_J}(x)$ items on
 every output tape $Oi_S$ of the splitter.  Finally, the minimum number
 of items appearing on the input tape $I_S$ of the splitter is the {\it
 maximum} of the item requirement from any output tape $Oi_S$.  By this
-reasoning, the $min$ function for a SplitJoin is as follows:
+reasoning, the $sdep$ function for a SplitJoin is as follows:
 \begin{align}
 \mi{I_S}{O_J}(x) &= MAX_{i \in [1,n]}(\mi{I_S}{Oi_S} \circ
 \mi{Oi_S}{Ii_J} \circ \mi{Ii_J}{O_J})(x)
@@ -297,34 +297,34 @@ reasoning, the $min$ function for a SplitJoin is as follows:
 \subsubsection{FeedbackLoops}
 \label{sec:timefl}
 
-The $min$ function for a feedback loop requires extra care. Although
+The $sdep$ function for a feedback loop requires extra care. Although
 the feedback splitter $FS$ serves as a normal splitter, with the same
-$min$ function as derived above, the feedback joiner $FJ$ is slightly
+$sdep$ function as derived above, the feedback joiner $FJ$ is slightly
 different due to the initialization phase of the loop.  Also, the
-$min$ function does not compose across all components of the loop,
+$sdep$ function does not compose across all components of the loop,
 since otherwise there would be conflicting definitions for paths that
 circle the loop several times.
 
 {\bf Feedback joiner}.  For a feedback loop with delay $d$, the
 feedback joiner must fabricate its first $d$ input values, since no
 items have yet been pushed onto the loop tape $I2_{FJ}$.  This means
-that there must be an offset of $d$ in the $min$ function, since the
+that there must be an offset of $d$ in the $sdep$ function, since the
 first $d$ items are direct inputs to the joiner instead of appearing
 as items on the input tape.  Using $J$ to denote a weighted round
 robin joiner as considered above, we thus have the following
-expression for the $min$ function across the feedback path:
+expression for the $sdep$ function across the feedback path:
 \begin{align*}
 \mi{I2_{FJ}}{O_{FJ}}(x) = \mi{I2_J}{O_J}(x) - d
 \end{align*}
-However, the $min$ function remains unchanged with respect to the
+However, the $sdep$ function remains unchanged with respect to the
 input from the main stream:
 \begin{align*}
 \mi{I1_{FJ}}{O_{FJ}}(x) = \mi{I1_J}{O_J}(x)
 \end{align*}
 
-{\bf Feedback components}.  Within a feedback loop, the $min$ function
+{\bf Feedback components}.  Within a feedback loop, the $sdep$ function
 between tape $a$ and any downstream tape $b$ can be uniquely defined
-by composing the $min$ functions along the directed acyclic path
+by composing the $sdep$ functions along the directed acyclic path
 between $a$ and $b$.  We require an acyclic path to avoid successive
 passes around the loop, which would prevent a unique definition of the
 function.  Denoting this path of tapes by $(a, t_1, \dots , t_n, b)$,
@@ -338,8 +338,8 @@ relation between the loop tape $I2_{FJ}$ and a downstream pipeline (by
 application of Equation \ref{eq:composetape}).
 
 {\bf Feedback loop construct.}  As a special case of the equation
-above, we can see that the $min$ function for the feedback loop as a
-whole is the composition of the $min$ functions along the main path:
+above, we can see that the $sdep$ function for the feedback loop as a
+whole is the composition of the $sdep$ functions along the main path:
 \begin{align*}
 \mi{I1_{FJ}}{O_{FS}}(x) = \mi{I1_J}{O_J}(x) \circ \mi{I1_J}{O_J}(x) 
 \end{align*}
@@ -350,22 +350,17 @@ restriction only on the input tape of the feedback loop.
 
 \subsubsection{Summary}
 
-In the preceding sections, we have derived a $min$ function for the
+In the preceding sections, we have derived a $sdep$ function for the
 components of each stream construct, as well as for the stream
 construct as a whole.  By application of Equation
 \ref{eq:composetape}, this yields a function $\mi{a}{b}$ for every
 pair of tapes $a$ and $b$ where $b$ is downstream of $a$.
 
-[say some more profound stuff about the min function?  information
-  flow, NOT data dependence.  The data dependence is in the work
-  functions themselves; this is a property of the graphs.  distributed
-  time.]
-
 \subsection{Program Verification}
 \label{sec:prog-verif}
 
 A number of program analysis techniques are immediately afforded by
-the $min$ function.  In particular, it is very simple to compute 1)
+the $sdep$ function.  In particular, it is very simple to compute 1)
 whether or not the program will deadlock as a result of a starved
 input channel, and 2) whether or not any buffer will grow without
 bound during the steady-state execution of the program.
@@ -374,17 +369,17 @@ bound during the steady-state execution of the program.
 advantage of the fact that the only loops in our stream graph are part
 of a FeedbackLoop construct.  A stream graph will be deadlock-free if
 and only if every feedback loop produces enough data to satisfy its
-own feedback joiner.  This can be formulated in terms of the $min$
-function by considering $min_{t}{t}$, the data that a tape $t$ in a
+own feedback joiner.  This can be formulated in terms of the $sdep$
+function by considering $\mi{t}{t}$, the data that a tape $t$ in a
 feedback loop requires of itself.  However, since we didn't define
-$min$ across circular paths in the stream graph, we will denote this
-function by $minloop$ and define it at the loop input to the feedback
+$sdep$ across circular paths in the stream graph, we will denote this
+function by $sdeploop$ and define it at the loop input to the feedback
 joiner:
 \begin{align*}
-minloop(x) \equiv \mi{I2_{FJ}}{O_{FJ}} \circ \mi{O_{FJ}}{I2_{FJ}}
+sdeploop(x) \equiv \mi{I2_{FJ}}{O_{FJ}} \circ \mi{O_{FJ}}{I2_{FJ}}
 \end{align*}
 Now, the loop will be deadlock-free if and only if $\forall x \in N, x
-- minloop(x) > 0$.  This condition follows directly from
+- sdeploop(x) > 0$.  This condition follows directly from
 causality--the $x$'th item can be produced if and only if its
 production depends only on some subset of the $x-1$ items that are
 already on the channel.
@@ -392,9 +387,9 @@ already on the channel.
 {\bf Overflow detection.}  There are two places that a buffer can grow
 to an unbounded size in the stream graph.  The first is in a feedback
 loop, when\footnote{$f(x) = \omega(g(x))$ if $lim_{x \rightarrow
-\infty}\frac{f(x)}{g(x)} = \infty$}~$x - minloop(x) = \omega(1)$.
-That is, if $minloop(x)$ items on the feedback tape enables the
-production of an additional $x - minloop(x)$ items that grows
+\infty}\frac{f(x)}{g(x)} = \infty$}~$x - sdeploop(x) = \omega(1)$.
+That is, if $sdeploop(x)$ items on the feedback tape enables the
+production of an additional $x - sdeploop(x)$ items that grows
 asymptotically with the position $x$ on the tape, then the constant
 consumption rate will not keep up with the growing production rate,
 and the buffer will overflow.
@@ -442,7 +437,8 @@ domains rather than a program that is fit for execution.  Nonetheless,
 the LISP-like syntax allows us to think of the representation as a
 program that is amenable to straightforward transformation techniques.
 
-\begin{figure}
+\begin{figure}[t]
+\scriptsize
 \begin{align*}
 &Item = Real \\
 i~\in~&Index = N \\
@@ -476,8 +472,10 @@ s~\in~&Stream = Filter + Pipeline + SplitJoin + FeedbackLoop \\
 \begin{align*}
 &StreamTransform =  IndexTransform \ra (Tape \ra Tape)
 \end{align*}
+\vspace{-12pt}
 \caption{Semantic domains specific to the transform algebra.
 \protect\label{fig:transformdom}}
+\vspace{-12pt}
 \end{figure}
 
 The domains of the intermediate algebra are shown in
@@ -549,7 +547,7 @@ algebra to the transform algebra.  For a filter, we have:
 \end{align*}
 That is, the value that a filter pushes onto the $i$'th position of its
 output tape is calculated with its function at index $if~\%~push$.  By
-the definition of $min$, the index offset to the last value the filter
+the definition of $sdep$, the index offset to the last value the filter
 peeks is $\mi{I_F}{O_F}(i)$, where $I_F$ and $O_F$ denote the input and
 output tapes of the filter (as shown in Equation \ref{eq:minfilter},
 this is a pure function of $push$, $pop$, and $peek$).  Thus, the offset
