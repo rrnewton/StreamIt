@@ -1,7 +1,18 @@
-questions for karczma:
-- how about my replacement scheme
-- can we rename the package to "iterator"?
-- do we really need IteratorBase -- please move getObject into each indiv. one?  hmm.
+if a container is IMMUTABLE, then:
+ parent is: 		EITHER
+ children are: 		IMMUTABLE
+
+if a filter is IMMUTABLE, then:
+ parent is: 		EITHER
+ fields/methods are:	MUTABLE (deep-mutable)
+
+if a container is MUTABLE, then:
+ parent is: 		EITHER
+ children are: 		EITHER (can be mixed immutable / mutable - you set it manually)
+
+if a filter is IMMUTABLE, then:
+ parent is: 		EITHER
+ methods are:		IMMUTABLE
 
 ----------
 
@@ -18,15 +29,27 @@ Iterator finalize(Iterator i);
 
 ----------
 
-Then to implement:
+questions for karczma:
+- how about my replacement scheme
+- can we rename the package to "iterator"?
 
-* Change the children to be from the init function to be (stream,
-args) pairs within the construct, to make replacing easier.
+----------
 
-- eventually the call to setParent from kopi2sir will have to go.
+how do we deal with methods?  well, methods don't need to know about
+their parents, so it seems like we wouldn't need iterators for them.
+this would certainly simplify things.  maybe when you commit a filter
+iterator, it also commits all the methods, looking for identical
+methods to any of the ones you have, and replaces any that are
+identical.  does this cause problems for cloning?  I don't think so.
 
-- In all the mutator methods of the classes, make sure you're not
-finalized.
+----------
+
+Left to implement:
+
+- remove parent field of siroperator
+
+- in all the mutator methods of the classes, make sure you're not
+finalized (postpone and check with consistency check instead)
 
 - Go through the IR and start to patch things up.
 
