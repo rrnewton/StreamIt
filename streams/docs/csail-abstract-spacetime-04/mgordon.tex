@@ -37,19 +37,22 @@
 \index{Lin, Jasper}
 \index{Amarasinghe, Saman}
 
-\absection{What}
-We are developing compiler technology for the StreamIt programming
-language~\cite{streamitcc}, a high-level stream language that aims to
-be portable across communication-exposed machines.  StreamIt contains
-basic constructs that expose the parallelism and communication of
-streaming applications without depending on the topology or
-granularity of the underlying architecture.  Our previous work
-\cite{streamit-asplos} has focused on 
-implementing a {\it space-multiplexing} (see below) backend for
-MIT's Raw architecture \cite{raw}, a tiled architecture 
-with fine-grained, programmable communication between processors.
-Currently we are implementing a new backend targeting Raw that will
-incorporate the lessons learned from our previous work.
+\absection{What} We are developing compiler technology for
+StreamIt~\cite{streamitcc}, a high-level stream programming language
+that aims to be portable across communication-exposed machines.
+StreamIt contains basic constructs that expose the parallelism and
+communication of streaming applications without depending on the
+topology or granularity of the underlying architecture.  There are two
+methods for compiling stream programs to a parallel architecture: time
+multiplexing and space multiplexing.  Time multiplexing provides good
+load balancing by synchronizing operations through memory, while space
+multiplexing provides producer-consumer locality and scales with
+spatially-aware architectures.  In this work, we are developing a
+hybrid backend that uses time multiplexing to switch between several
+space-multiplexed phases, thereby leveraging the benefits of both
+execution models.  Our compiler targets the MIT Raw architecture
+\cite{raw}, a tiled machine with fine-grained, programmable
+communication between processors.
 
 \absection{Why}
 As we approach the billion-transistor era, a number of emerging
@@ -116,20 +119,20 @@ that the compiler targets for aggressive code generation.  This
 results in optimal usage of the tiles for each piece.
 
 \begin{figure}[tbh]
-  \vspace{-.1in}
+  \vspace{-.2in}
   \begin{minipage}{2.8in}
     \vspace{.2in}
     \centerline{\includegraphics[width=2.8in]{mgordon_figure1.pdf}}
-    \vspace{-.1in}
+    \vspace{-.2in}
     \caption{Stream graph for a channel vocoder.\protect\label{mgordon_streamgraph}}
   \end{minipage}
   ~~~
   \begin{minipage}{3.4in}
     \centerline{\includegraphics[width=3.4in]{mgordon_figure2.pdf}}
-    \vspace{-.1in}
+    \vspace{-.2in}
     \caption{Mapping the vocoder to a 4x4 Raw machine.\protect\label{mgordon_fig:mapping}}
   \end{minipage}
-  \vspace{-0.1in}
+  \vspace{-0.15in}
 \end{figure}
    
 We will now present a small example to solidify the reader's
@@ -184,7 +187,7 @@ source of many inefficiencies.
 \absection{Research Support}
 This work is supported in part by a grant from DARPA (PCA
 F29601-04-2-0166), awards from NSF (CISE EIA-0071841, ITR ACI-0325297,
-NGS CNS-0305453), and a fellowship from the MIT-Oxygen Project.
+NGS CNS-0305453) and the MIT-Oxygen Project.
 
 %% The abstract bibliographies should be done using bibtex.  Please
 %% compile your bibtex entries into a single file with a distinguishing
