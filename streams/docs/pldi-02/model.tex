@@ -1,14 +1,14 @@
-\begin{figure}
-\centering
-\psfig{figure=tapes.eps,width=2.5in}
-\caption{A filter's input and output tapes during an execution step.
-With each step, the filter pushes two items, pops two items, and peeks
-at three additional items.  The initial state of the input tape is
-shown at left.  The center shows the filter with both input and output
-tapes during the invocation of {\tt work}.  The final state of the
-output tape is shown at right.}
-\label{fig:tapes}
-\end{figure}
+%% \begin{figure}
+%% \centering
+%% \psfig{figure=tapes.eps,width=2.5in}
+%% \caption{A filter's input and output tapes during an execution step.
+%% With each step, the filter pushes two items, pops two items, and peeks
+%% at three additional items.  The initial state of the input tape is
+%% shown at left.  The center shows the filter with both input and output
+%% tapes during the invocation of {\tt work}.  The final state of the
+%% output tape is shown at right.}
+%% \label{fig:tapes}
+%% \end{figure}
 
 \begin{figure}
 \centering
@@ -23,8 +23,8 @@ output tape is shown at right.}
 \psfig{figure=feedback.eps,width=2.33in}
 
 (c) A FeedbackLoop. \\
-\vspace{8pt}
-\caption{Tape labeling for StreamIt structures.}
+\caption{StreamIt structures with labeling.}
+\vspace{-12pt}
 \label{fig:tapelabels}
 \end{figure}
 
@@ -57,13 +57,12 @@ We use the following notation:
 \begin{itemize}
 
 \item A {\it tape} is an infinite history of the values that have been
-  pushed onto a channel between two filters (see Figure
-  \ref{fig:tapes}).  We use $I_S$ and $O_S$ to denote the input and
-  output tapes of stream $S$, respectively, with numbering used to
-  distinguish between multiple input or output tapes (see Figure
-  \ref{fig:tapelabels}).  Finally, $n(T)$ represents the number of items
-  on tape $T$ at a given point of execution.  [should we define $p(T)$
-  here or wait until we use it?  long time def-use!]
+  pushed onto a channel between two filters. We use $I_S$ and $O_S$ to
+  denote the input and output tapes of stream $S$, respectively, with
+  numbering used to distinguish between multiple input or output tapes
+  (see Figure \ref{fig:tapelabels}).  Finally, $n(T)$ represents the
+  number of items on tape $T$ at a given point of execution.  [should
+  we define $p(T)$ here or wait until we use it?  long time def-use!]
 
 \item We say that a filter $A$ is {\it upstream} of filter $B$ (or,
   equivalently, $B$ is {\it downstream} $A$) if there is a directed
@@ -213,10 +212,8 @@ of items appearing on the input tape $I_S$ of the splitter is the {\it
 maximum} of the item requirement from any output tape $Oi_S$.  By this
 reasoning, the $min$ function for a SplitJoin is as follows:
 \begin{align}
-\label{eq:splitpath}
-\mi{I_S}{O_J}(x) &= MAX_{i \in [1,n]}~splitPath(S, J, i)(x) \\ where
-splitPath(S, J, i) &=\mi{I_S}{Oi_S} \circ \mi{Oi_S}{Ii_J} \circ
-\mi{Ii_J}{O_J}
+\mi{I_S}{O_J}(x) &= MAX_{i \in [1,n]}(\mi{I_S}{Oi_S} \circ
+\mi{Oi_S}{Ii_J} \circ \mi{Ii_J}{O_J})(x)
 \end{align}
 
 \subsubsection{FeedbackLoops}
@@ -374,6 +371,7 @@ data item effects another via a low-latency downstream message, then
 this effect could jump ahead of the wavefront.
 
 \subsubsection{Message Timing}
+\label{sec:messagesemantics}
 
 We now employ the $min$ function to give a precise meaning to the
 message delivery guarantees in StreamIt.  Suppose that filter $A$

@@ -83,9 +83,10 @@ limitations, we cannot describe them at the above level of detail.
 
 \subsection{Fission Transformations}
 
-It might also be advantageous to break filters up into smaller pieces if
-the machine target is more fine-grained than the stream graph.  We
-propose three fission transformations:
+When the machine target is more fine-grained than the stream graph, it
+is advantageous to break filters up into smaller pieces so that more
+hardware resources can be utilized.  We propose three fission
+transformations:
 \begin{enumerate}
 \item {\bf Parallelizing stateless filters.}  If a filter has no state,
   then we can gain data parallelism by duplicating the filter $n$ times

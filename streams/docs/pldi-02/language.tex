@@ -1,16 +1,209 @@
 \section{The StreamIt Language}
 
-StreamIt language 
--	Description
-o	Filters
-o	Connecting filters
-o	Messaging
-o	Reinitialization (just a pointer)
--	Language Limitations
-o	Static Rates
-o	Syntax 
-o	First class Streams / finite streams
--	Example
-o	Code
-o	Graph
+In this section we provide a very brief overview of the StreamIt
+language; please see \cite{streamittech} for a more detailed
+description.  The current version of StreamIt is legal Java syntax to
+simplify our presentation and implementation, and it is designed to
+support only streams with static input and output rates.  Designing a
+cleaner syntax and considering dynamically varying rates will be the
+subject of future work.
+
+\subsection{Filters}
+
+\subsubsection{StreamIt Approach}
+
+The basic unit of computation in StreamIt is the {\tt Filter}.  An
+example of a Filter is the {\tt FloatAdder}, a component of our
+software radio (see Figure \ref{fig:radiocode}).  Each {\tt Filter}
+contains an {\tt init} function that is called at initialization time;
+in this case, the {\tt FloatAdder} records {\tt N}, the number of
+items it should filter at once.  A user should instantiate a filter by
+using its constructor, and the {\tt init} function will be called
+implicitly with the same arguments that were passed to the
+constructor.
+
+The {\tt work} function describes the most fine grained execution step
+of the filter in the steady state.  Within the {\tt work} function,
+the filter can communicate with neighboring blocks using the {\tt
+input} and {\tt output} channels, which are typed FIFO queues declared
+within the {\tt init} function.  These high-volume channels support
+the intuitive operations of {\tt push(value)}, {\tt pop()}, and {\tt
+peek(index)}, where {\tt peek} returns the value at position $index$
+without dequeueing the item.
+
+\subsubsection{Rationale}
+
+StreamIt's representation of a filter is an improvement over
+general-purpose languages.  In a procedural language, the analog of a
+filter is a block of statements in a complicated loop nest.  There is
+no clear abstraction barrier between one filter and another, and
+high-volume stream processing is muddled with global variables and
+control flow. The loop nest must be re-arranged if the input or output
+ratios of a filter changes, and scheduling optimizations further
+inhibit the readability of the code.
+
+In an object-oriented language, one could implement a stream
+abstraction as a library.  This avoids some of the problems associated
+with a procedural loop nest, but the programming model is complicated
+by efficiency concerns--to optimize cache performance, the entire
+application processes blocks of data that complicate and obscure the
+underlying algorithm.
+
+In contrast to these alternatives, StreamIt places the filter in its
+own independent unit, making explicit the parallelism and inter-filter
+communication while hiding the grungy details of scheduling and
+optimization from the programmer.
+
+\subsection{Connecting Filters}
+\label{sec:connecting}
+
+\subsubsection{StreamIt Approach}
+
+The basic construct for composing filters into a communicating network
+is a {\tt Pipeline}, such as the FMRadio in Figure
+\ref{fig:radiocode}.  Like a {\tt Filter}, a {\tt Pipeline} has an
+{\tt init} function that is called upon its instantiation.  However,
+there is no {\tt work} function, and all input and output channels are
+implicit; instead, the stream behaves as the sequential composition of
+filters that are specified with successive calls to {\tt add} from
+within {\tt init}.
+
+There are two other stream constructors besides {\tt Pipeline}: {\tt
+SplitJoin} and {\tt FeedbackLoop} (see Figure \ref{fig:tapelabels}).
+The former is used to specify independent parallel streams that
+diverge from a common {\it splitter} and merge into a common {\it
+joiner}.  There are two kinds of splitters: 1) Duplicate, which
+replicates each data item and sends a copy to each parallel stream,
+and 2) RoundRobin($w_1, \dots, w_n$), which sends the first $w_1$
+items to the first stream, the next $i_2$ items to the second stream,
+and so on.  RoundRobin is also the only type of joiner that we
+support; its function is analogous to a round robin splitter.  If a
+RoundRobin is written without any weights, we assume that all $w_i =
+1$.
+
+The splitter and joiner type are specified with calls to {\tt
+setSplitter} and {\tt setJoiner}, respectively (see Figure
+\ref{fig:fft}); the parallel streams are specified by successive calls
+to {\tt add}, with the $i$'th call setting the $i$'th stream in the
+SplitJoin.  Note that a RoundRobin can function as an exclusive
+selector if one or more of the weights are zero.
+
+The last control construct provides a way to create cycles in the
+stream graph: the {\tt FeedbackLoop}.  It contains a joiner, a body
+stream, a splitter, and a loop stream, which are set with calls to
+{\tt setJoiner}, {\tt setBody}, {\tt setSplitter}, and {\tt setLoop},
+respectively.
+
+The feedback loop has a special semantics when the stream is first
+starting to run.  Since there are no items on the feedback path at
+first, the stream instead inputs items from an {\tt initPath} function
+defined by the {\tt FeedbackLoop}; {\tt initPath} is called with the
+number of the data item that is being fabricated.  With a call to {\tt
+setDelay} from within the {\tt init} function, the user can specify
+how many items should be calculated with {\tt initPath} before the
+joiner looks for data items from the feedback channel.
+
+Evident in all of these examples is another feature of the StreamIt
+syntax: {\it inlining}.  The definition of any stream or filter can be
+inlined at the point of its instantiation, thereby preventing the
+definition of many small classes that are used only once, and,
+moreover, providing a syntax that reveals the hierarchical structure
+of the streams from the indentation level of the code.  In our Java
+syntax, we make use of anonymous classes for inlining \cite{java}.
+
+\begin{figure}
+\scriptsize
+\begin{verbatim}
+class Adder extends Filter {
+  int N;
+
+  void init (int N) {
+    this.N = N;
+    input = new Channel(Float.TYPE, N);
+    output = new Channel(Float.TYPE, 1);
+  }
+  
+  void work() {
+    float sum = 0;
+    for (int i=0; i<N; i++) {
+      sum += input.popFloat();
+    }
+    output.pushFloat(sum);
+  }
+}
+
+public class Equalizer extends Pipeline {
+  void init(float samplingRate, int N) {
+    add(new SplitJoin() {
+      void init() {
+        int bottom = 2500;
+        int top = 5000;
+        setSplitter(DUPLICATE());
+        for (int i=0; i<N; i++, bottom*=2, top*=2) {
+          add(new BandPassFilter(samplingRate, bottom, top));
+        }
+        setJoiner(ROUND_ROBIN());
+    }});
+    add(new Adder(N));
+  }
+}
+  
+class FMRadio extends Pipeline {
+  void init() {
+    add(new DataSource());
+    add(new LowPassFilter(samplingRate, cutoffFrequency, numTaps));
+    add(new FMDemodulator(samplingRate, maxAmplitude, bandwidth));
+    add(new Equalizer(samplingRate, 4));
+    add(new Speaker());
+  }
+}
+\end{verbatim}
+\vspace{-12pt}
+\caption{Parts of an FM Radio in StreamIt.
+\protect\label{fig:radiocode}}
+\vspace{-12pt}
+\end{figure}
+
+\subsubsection{Rationale}
+
+StreamIt differs from other languages in that it imposes a
+well-defined structure on the streams; all stream graphs are built out
+of a hierarchical composition of Streams, SplitJoins, and
+FeedbackLoops.  This is in contrast to other environments, which
+generally regard a stream as a flat and arbitrary network of filters
+that are connected by channels.  However, arbitrary graphs are very
+hard for the compiler to analyze, and equally difficult for a
+programmer to describe.  Most programmers either resort to
+straight-line code that links one filter to another (thereby making it
+very hard to visualize the stream graph), or using an ad-hoc graphical
+programming environment that is awkward to use and admits no good
+textual representation.
+
+In contrast, StreamIt is a clean textual representation
+that--especially with inlined streams--makes it very easy to see the
+shape of the computation from the indentation level of the code.  The
+comparison of StreamIt's structure with arbitrary stream graphs could
+be likened to the difference between structured control flow and GOTO
+statements.  Though sometimes the structure restricts the
+expressiveness of the programmer, the gains in robustness,
+readability, and compiler analysis are immense.
+
+A final benefit of stream graph construction in StreamIt is the
+ability to do {\it scripting} to parameterize graphs.  For instance,
+the Equalizer in Figure \ref{fig:radio} inputs a parameter {\tt N}
+that controls the number of parallel streams that it contains.  This
+further improves readability and decreases code size.
+
+\subsection{Messages}
+
+StreamIt provides a dynamic messaging system for passing irregular,
+low-volume control information between filters and streams.  Messages
+are sent from within the body of a filter's {\tt work} function,
+perhaps to change a parameter in another filter.  The central aspect
+of the messaging system is a sophisticated timing mechanism that
+allows filters to specify when a message will be received relative to
+the flow of information between the sender and the receiver.  Due to
+space constraints, we do not describe the syntax for message
+statements, but we do consider the semantics of message timing in
+Section \ref{sec:messagesemantics}.
 
