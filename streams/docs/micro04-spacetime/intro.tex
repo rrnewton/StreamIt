@@ -28,6 +28,15 @@ such as C and FORTRAN.  While imperative languages were a good match
 for von-Neumann machines, they are obsolete for architectures
 containing multiple instruction streams and distributed memory banks.
 
+\begin{figure}[t]
+  \centering
+  \vspace{-18pt}
+  \psfig{figure=space-vs-time.eps,width=5.5in}
+  \vspace{-12pt}
+  \caption{Techniques for scheduling stream programs. \protect\label{fig:spacevstime}}
+  \vspace{-6pt}
+\end{figure}
+
 Hitherto, there have been two basic approaches for compiling a stream
 program to a communication-exposed architecture.  {\it Time
 multiplexing} utilizes the entire chip for each filter, switching
@@ -60,15 +69,6 @@ switch between different groups as execution progresses.  Space-time
 multiplexing affords the flexible load balancing of time multiplexing,
 while preserving the locality and latency benefits of space
 multiplexing.
-
-\begin{figure}[t]
-  \centering
-  \vspace{-18pt}
-  \psfig{figure=space-vs-time.eps,width=5.5in}
-  \vspace{-12pt}
-  \caption{Techniques for scheduling stream programs. \protect\label{fig:spacevstime}}
-  \vspace{-6pt}
-\end{figure}
 
 In this paper, we describe and evaluate a fully-automatic
 implementation of space-time multiplexing.  Our source language is
