@@ -70,6 +70,8 @@ blocks'', etc.
 \item Make it clear that FilterBlocks can contain streams, not just
 blocks.
 
+\item Add spec. for message delivery time with @ syntax.
+
 \end{enumerate}
 
 \section{Introduction}
@@ -395,16 +397,16 @@ SourceBlock MakeText() {
 
 StreaMIT provides a naming scheme for functional blocks that is useful
 for both dynamic events (see Section {\ref{sec:dynamic}}) and
-debugging.  Firstly, any instantiation of a {\tt Filter} or {\tt
-FilterBlock} can be bound to a variable of type {\tt FilterRef}.  We
-require each {\tt FilterRef} variable to be defined exactly once; that
-is, it functions less as a variable than as a static denotable label
-for a single block instantiation.  Accordingly, we allow {\tt
-FilterRef} variables to be used before they are defined (but not
-before they are declared, of course.)  {\tt FilterRef}'s can be passed
-as parameters to {\tt Filter}'s and {\tt FilterBlock}'s, just like any
-other data type.  The following example illustrates the syntax of
-assigning to {\tt FilterRef}'s:
+debugging.  Firstly, any instantiation of a block can be bound to a
+variable of type {\tt FilterRef}.  We require each {\tt FilterRef}
+variable to be defined exactly once; that is, it functions less as a
+variable than as a static denotable label for a single block
+instantiation.  Accordingly, we allow {\tt FilterRef} variables to be
+used before they are defined (but not before they are declared, of
+course.)  {\tt FilterRef}'s can be passed as parameters to {\tt
+Filter}'s and {\tt FilterBlock}'s, just like any other data type.  The
+following example illustrates the syntax of assigning to {\tt
+FilterRef}'s:
 
 \begin{verbatim}
 Filter MyFilter(FilterRef ref) {
@@ -697,34 +699,74 @@ feedback-input} channel.
 \subsection{Dynamic Constructs}
 \protect\label{sec:dynamic}
 
+Up until now, we have been considering only static definitions of
+blocks and streaming structures.  We now introduce two dynamic
+features of StreaMIT: message passing and re-initialization.  The
+messaging system allows blocks to communicate data outside of the
+primary input and output channels, perhaps to change some internal
+parameters elsewhere in the stream.  The re-initialization construct
+enables a filter to completely reset the internal state of a block in
+the stream; this feature motivates an advanced control structure
+called {\tt StreamSelect} that returns different stream structures
+based on the values of the initialization parameters.
+
+\subsubsection{Messages}
+
+A filter can send dynamic messages from within its {\tt work}
+function.  The syntax is as follows:
+
+{\it filter-ref-target}.{\tt handleMessage(}{\it msg}{\tt ) %[@ delay | [min-delay, ] max-delay]}
+
+Let us examine the different parts of this statement:
+
+\begin{itemize}
+
+\item The message {\it msg} is an instance of a user-defined type.
+This type can be a primitive or structure, so long as the structure
+does not contain pointers.
+
+\item The target of the message is given by {\it filter-ref-target},
+of type {\it FilterRef}.  In the event that {\it filter-ref-target} is
+a filter, the runtime system inspects the filter for a {\tt
+handleMessage} method with the appropriate parameter type.  If such a
+method exists, it is invoked with {\it msg} as the argument;
+otherwise, the message has no effect.  If the target is instead a
+filter block, then the above procedure is repeated in a top-down
+fashion for every filter within the block.
+
+\end{itemize}
+
+There are some additional constraints on message passing.  The only
+place that messages can be sent is from within the {\tt work} function
+of a filter; initialization code and message handlers can not send
+messages.  Also, a filter's message handlers are prohibited from doing
+I/O on its channels, although they are allowed to modify the filter's
+state.
+
+\subsubsection{Re-Initialization}
+
+\begin{verbatim}
+- ref.reset(<dynamic parameters>). static params do not need to be
+passed again because they don't change from one instantiation to the
+next
+- legal to initialize from within work function and message handlers
+of Filters, but not from within initialization code.
+- semantics of flushing streams?
+\end{verbatim}
+
+\subsubsection{StreamSelect}
+
+\begin{verbatim}
+- now that we have construct for re-initialization, might
+	want to dynamically change part of stream structure
+- switches on an enumerated type with cases
+- the enumerated variable is dynamic
+\end{verbatim}
+
 \section{Scripting Language}
 \label{sec:script}
 
 \begin{verbatim}
-
-		I. Using FilterRef's:  Initialization
-			- ref.reset(<dynamic parameters>)
-			- legal to initialize from within work function and
-				message handlers of Filters.  Not from 
-				initialization code anywhere.
-			- semantics of flushing streams
-
-		II. Using FilterRef's:  Message Passing
-			- ref.handleMessage(<message variable>) @ [min, max];
-			- legal to send messages from within work function, 
-				not from within message handlers or
-				initialization code.
-			- message types are typedef'd structures, no pointers
-			- filters can receive with ReceiveMessage(Type foo)
-			- message handlers can send messages and
-				   re-initialize, but not read i/o
-			- delivery is from top to bottom
-
-	D. advanced control flow:  StreamSelect
-		- now that we have construct for re-initialization, might
-			want to dynamically change part of stream structure
-		- switches on an enumerated type with cases
-		- the enumerated variable is dynamic
 
 2) scripting language
 
@@ -767,34 +809,6 @@ not explicitly going into user's guide:
 	- not implemented
 	- warning
 	- performance problem
-
-x need to define subset of c that we allow
-
-x messages
-	- delivery is from top to bottom
-	- filters can receive with ReceiveMessage(Type foo)
-	- message types are typedef'd structures, no pointers
-	- message handlers can send messages and re-initialize, but not
-		read i/o
-
-x scripting language
-  x script variable type
-    - all things of type script can be bdetermined at compile time
-    - i.e. other script variables, constant literals, pure funcs of these
-    - can only be assinged within scripting control flow
-    - script control flow is normal c control flow, but predicated by
-	an ``s''.  script control flow can't appear within normal 
-	control flow.
-    - regular constructs can use script variables just like they were normal
-
-x streamselect
-	- just goes on an enumerated type with cases
-	- the enumerated variable is dynamic
-
-x re-initialization
-	- do ref.reset(dynamic params...).  static params do not need to
-		be passed again because they don't change from one 
-		instantiation to the next
 
 \end{verbatim}
 
