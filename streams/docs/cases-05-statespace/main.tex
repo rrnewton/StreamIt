@@ -1,19 +1,23 @@
-\documentclass[11pt,twoside]{article}
+% double-spaced format
+%\documentclass[11pt,twoside]{article}
+%\usepackage{doublespace}
+
+% ACM format
+\documentclass{sig-alternate}
+\newcommand{\setstretch}[1]{}
+\newenvironment{singlespace}{}
 
 \usepackage{lgrind}
 \usepackage{simplemargins}
 \usepackage{times}
-\usepackage{doublespace}
 \usepackage{epsfig}
 
 %\title{Optimizing Stream Programs \\ Using a Linear State Space Representation}
 %\title{A Linear State Space Representation \\ for Optimizing Stream Programs}
-\title{~ \vspace{-60pt} \\ Optimizing Stream Programs Using Linear State Space Analysis}
-
-%% \author{Sitij Agrawal, William Thies, Rodric M. Rabbah, and Saman Amarasinghe \\
-%%   MIT Computer Science and Artificial Intelligence Laboratory \\
-%%   Cambridge, MA  02139\\ \\
-%%   \sffamily{\{sitij, thies, rabbah, saman\}@csail.mit.edu}}
+\title{Optimizing Stream Programs \\ Using Linear State Space Analysis}
+ \author{~ \vspace{-18pt} \\ Sitij Agrawal, William Thies, and Saman Amarasinghe \\[0.2Ex]
+   MIT Computer Science and Artificial Intelligence Laboratory \\[0.8Ex]
+   \normalsize\tt{\{sitij, thies, saman\}@csail.mit.edu}}
 
 % don't include the date
 \date{}
@@ -40,36 +44,44 @@
   
   % shrink the itemized lists
   \newlength{\itemshrink}
-  \setlength{\itemshrink}{-12pt}
+  %\setlength{\itemshrink}{-12pt}
+  \setlength{\itemshrink}{0pt}
 
   % shrink spacing of section titles
-  \newcommand{\mysection}[1]{\vspace{-22pt} \section{#1} \vspace{-12pt}}
-  \newcommand{\mysubsection}[1]{\vspace{-15pt} \subsection{#1} \vspace{-12pt}}
-  \newcommand{\mysubsubsection}[1]{\vspace{-9pt} \subsubsection{#1} \vspace{-12pt}}
+  %\newcommand{\mysection}[1]{\vspace{-22pt} \section{#1} \vspace{-12pt}}
+  %\newcommand{\mysubsection}[1]{\vspace{-15pt} \subsection{#1} \vspace{-12pt}}
+  %\newcommand{\mysubsubsection}[1]{\vspace{-9pt} \subsubsection{#1} \vspace{-12pt}}
+  \newcommand{\mysection}[1]{\section{#1}}
+  \newcommand{\mysubsection}[1]{\subsection{#1}}
+  \newcommand{\mysubsubsection}[1]{\subsubsection{#1}}
 
   % proper spacing of equations
-  \newlength{\topeqn}
-  \setlength{\topeqn}{-24pt}
-  \newlength{\boteqn}
-  \setlength{\boteqn}{-20pt}
-  \newcommand{\starteqnstar}[0]{\begin{singlespace}\vspace{\topeqn}\begin{eqnarray*}}
-  \newcommand{\doneeqnstar}[0]{\end{eqnarray*}\vspace{\boteqn}\end{singlespace}}
-  \newcommand{\starteqn}[0]{\begin{singlespace}\begin{eqnarray}\vspace{\topeqn}}
-  \newcommand{\doneeqn}[0]{\end{eqnarray}\vspace{\boteqn}\end{singlespace}}
+  \newcommand{\starteqnstar}[0]{\begin{eqnarray*}}
+  \newcommand{\doneeqnstar}[0]{\end{eqnarray*}}
+  \newcommand{\starteqn}[0]{\begin{eqnarray}}
+  \newcommand{\doneeqn}[0]{\end{eqnarray}}
+
+%%   \newlength{\topeqn}
+%%   \setlength{\topeqn}{0pt}
+%%   \newlength{\boteqn}
+%%   \setlength{\boteqn}{0pt}
+%%   \newcommand{\starteqnstar}[0]{\begin{singlespace}\vspace{\topeqn}\begin{eqnarray*}}
+%%   \newcommand{\doneeqnstar}[0]{\end{eqnarray*}\vspace{\boteqn}\end{singlespace}}
+%%   \newcommand{\starteqn}[0]{\begin{singlespace}\begin{eqnarray}\vspace{\topeqn}}
+%%   \newcommand{\doneeqn}[0]{\end{eqnarray}\vspace{\boteqn}\end{singlespace}}
+
   %\toappear{\centerline{\Large\bf MIT LCS Technical Memo,}
   %          \centerline{\Large\bf MIT-LCS-TM-6XX,}
   %          \centerline{\Large\bf November, 2001.}}
   
   \begin{singlespace}
     \maketitle
-    \vspace{-54pt}
     \begin{abstract}
       \input{abstract}
     \end{abstract}
-    \vspace{-12pt}
   \end{singlespace}
   
-  \advance\topmargin by -0.35in      % Correct for LaTeX gratuitousness
+%  \advance\topmargin by -0.35in      % Correct for LaTeX gratuitousness
 
   \input{intro}
   \input{background}
@@ -82,7 +94,6 @@
 
   \begin{small}
     \begin{singlespace}
-      \vspace{-12pt}
       \bibliographystyle{abbrv}
       \bibliography{main}
     \end{singlespace}

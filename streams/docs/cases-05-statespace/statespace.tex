@@ -1,7 +1,7 @@
 \mysection{State-Space Analysis}
 \label{sec:statespace}
 
-  We analyze StreamIt programs at the filter level. We create a data
+We analyze StreamIt programs at the filter level. We create a data
 structure representation that fully describes a state space filter. We
 parse the code of each StreamIt filter to determine whether or not it
 is state space; if so we initialize a data structure, fill it with the
@@ -9,20 +9,18 @@ appropriate values through a process called \emph{extraction}, and
 associate the structure with the filter. We provide a set of rules to
 combine state space representations of filters in higher StreamIt
 blocks---pipelines, splitjoins, and feedback loops. Such a process
-results in a single 
-\clearpage
-\noindent state space representation for the entire block.  We also describe how
-to \emph{expand} a representation so that it can be combined with
-blocks of mis-matching dimensions.
+results in a single state space representation for the entire block.
+We also describe how to \emph{expand} a representation so that it can
+be combined with blocks of mis-matching dimensions.
 
 \mysubsection{Representation}
 
-    Our first task is to create a data structure that fully captures
-the state space representation of a StreamIt filter.  We save a
-filter's number of states, push rate, and pop rate in variables
-which we term $s$, $u$, and $o$, respectively. Our data structure
-also contains the matrices $\mathbf{A}$, $\mathbf{B}$,
-$\mathbf{C}$, and $\mathbf{D}$ with dimensions $s \times s$, $s
+Our first task is to create a data structure that fully captures the
+state space representation of a StreamIt filter.  We save a filter's
+number of states, push rate, and pop rate in variables which we term
+$s$, $u$, and $o$, respectively. Our data structure also contains the
+matrices $\mathbf{A}$, $\mathbf{B}$, $\mathbf{C}$, and $\mathbf{D}$
+with dimensions $s \times s$, $s
 \times o$, $u \times s$, and $u \times o$, respectively. The
 inputs to a filter are denoted as $\vec{\mathbf{u}}$ (length $o$),
 the outputs as $\vec{\mathbf{y}}$ (length $u$), and the states as
@@ -37,23 +35,24 @@ states may have initial values other than zero, we store these
 values as the vector $\overrightarrow{\mathbf{initVec}}$ (length
 $s$).
 
-    Since we have not included a constant term in our model, we
-will set one of the state variables to be the constant $1$. This
-variable will not be updated by any of the states or inputs, and
+Since we have not included a constant term in our model, we will set
+one of the state variables to be the constant $1$. This variable will
+not be updated by any of the states or inputs, and
+\clearpage \noindent
 its initial value will be $1$, so it will always remain that
 value. Any state or output that depends on a constant term can now
 refer to a multiple of the constant state variable instead.
 
-    As long as a filter's peek rate (which we term $e$) equals its pop
-rate, the data structure as currently designed can fully represent
-the filter. We must include additional modifications for a filter
-with a peek rate greater than its pop rate. Note that such a
-filter still removes $o$ items from its input tape upon every
-execution, but it accesses $e-o$ additional items on its input
-tape. Therefore, our current data structure would work as long as
-there is some way to access these additional items.
+As long as a filter's peek rate (which we term $e$) equals its pop
+rate, the data structure as currently designed can fully represent the
+filter. We must include additional modifications for a filter with a
+peek rate greater than its pop rate. Note that such a filter still
+removes $o$ items from its input tape upon every execution, but it
+accesses $e-o$ additional items on its input tape. Therefore, our
+current data structure would work as long as there is some way to
+access these additional items.
 
-    We solve the problem of having a peek rate greater than a pop
+We solve the problem of having a peek rate greater than a pop
 rate by storing $e-o$ items from the input tape in the state
 vector $\vec{\mathbf{x}}$. Therefore, when a filter executes, it
 can access all $e$ items it needs, $o$ items from its input vector
@@ -63,14 +62,14 @@ in the next section. We store the number of states used for inputs
 as the variable $stored$. This will be useful when combining
 representations.
 
-    When the filter is executed for the first time, it will have access
-to the $o$ items in the input vector, but the $e-o$ states it
-needs will be uninitialized from the input tape. Therefore, we
-need to update the state vector before computing the output/state
-update equation pair for every filter execution. We introduce two
-new matrices, $\mathbf{A_{pre}}$ and $\mathbf{B_{pre}}$ to perform
-this initialization. Before the filter runs it will perform the
-state update $\vec{\dot{\mathbf{x}}} =
+When the filter is executed for the first time, it will have access to
+the $o$ items in the input vector, but the $e-o$ states it needs will
+be uninitialized from the input tape. Therefore, we need to update the
+state vector before computing the output/state update equation pair
+for every filter execution. We introduce two new matrices,
+$\mathbf{A_{pre}}$ and $\mathbf{B_{pre}}$ to perform this
+initialization. Before the filter runs it will perform the state
+update $\vec{\dot{\mathbf{x}}} =
 \mathbf{A_{pre}}\vec{\mathbf{x}} +
 \mathbf{B_{pre}}\vec{\mathbf{u_{pre}}}$. The initialization input
 vector, $\vec{\mathbf{u_{pre}}}$, has length $o_{pre} = e-o$. For
@@ -84,23 +83,22 @@ $\mathbf{A_{pre}}$ and $\mathbf{B_{pre}}$ is afterwards, when
 there are a sufficient number ($o_{pre}$) of items on the input
 tape.
 
-    Putting these pieces together, we find a full representation
-consists of the push and pop rates, the number of state variables,
-the number of stored inputs, the four state matrices, an initial
-state vector, and possibly an initial pop rate and two
-initialization state matrices. We define a state space
-representation $\mathrm{R}$ as the tuple $\langle$$u$, $o$, $s$,
-$stored$, $\mathbf{A}$, $\mathbf{B}$, $\mathbf{C}$, $\mathbf{D}$,
-$\overrightarrow{\mathbf{initVec}}$, $\mathbf{A_{pre}}$,
-$\mathbf{B_{pre}}$, $o_{pre}$$\rangle$. When we introduce a
-representation $\mathrm{R_i}$, each of its values in the ordered
-set will be denoted with the index $i$ (for example $u_i$,
-$\mathbf{A_i}$). For representations of filters that do not need
-the initialization matrices, we will write $\mathbf{A_{pre}} =
-null$, $\mathbf{B_{pre}} = null$, $o_{pre} = 0$. In this case, the
-filter will not have any stored inputs, so $stored = 0$ as well.
+Putting these pieces together, we find a full representation consists
+of the push and pop rates, the number of state variables, the number
+of stored inputs, the four state matrices, an initial state vector,
+and possibly an initial pop rate and two initialization state
+matrices. We define a state space representation $\mathrm{R}$ as the
+tuple $\langle$$u$, $o$, $s$, $stored$, $\mathbf{A}$, $\mathbf{B}$,
+$\mathbf{C}$, $\mathbf{D}$, $\overrightarrow{\mathbf{initVec}}$,
+$\mathbf{A_{pre}}$, $\mathbf{B_{pre}}$, $o_{pre}$$\rangle$. When we
+introduce a representation $\mathrm{R_i}$, each of its values in the
+ordered set will be denoted with the index $i$ (for example $u_i$,
+$\mathbf{A_i}$). For representations of filters that do not need the
+initialization matrices, we will write $\mathbf{A_{pre}} = null$,
+$\mathbf{B_{pre}} = null$, $o_{pre} = 0$. In this case, the filter
+will not have any stored inputs, so $stored = 0$ as well.
 
-    Representations are initially created from StreamIt filters and
+Representations are initially created from StreamIt filters and
 ultimately converted to StreamIt filters. Between these steps,
 however, representations of the higher StreamIt block types can be
 derived by combining the representations of their parts.  Therefore,
@@ -112,20 +110,20 @@ discuss how to create a representation from a StreamIt filter.
 
 \mysubsection{Extraction}
 
-    We use a simple dataflow analysis to extract the state space representation of
-a filter. We symbolically execute a single iteration of a filter's
-work function, maintaining a vector pair representation for each
-local variable and filter field variable that is encountered
+We use a simple dataflow analysis to extract the state space
+representation of a filter. We symbolically execute a single iteration
+of a filter's work function, maintaining a vector pair representation
+for each local variable and filter field variable that is encountered
 (together, these are termed program variables). If the outputs and
-field variables all have vector pair representations, then the
-filter is state space linear, and the vectors are used as rows of
-$\mathbf{A}$, $\mathbf{B}$, $\mathbf{C}$, and $\mathbf{D}$. 
+field variables all have vector pair representations, then the filter
+is state space linear, and the vectors are used as rows of
+$\mathbf{A}$, $\mathbf{B}$, $\mathbf{C}$, and $\mathbf{D}$.
 %See \cite{Lamb}
 %for a treatment of the linear case.
 
-    We attempt to find a vector pair
-($\vec{\mathbf{v}}$,$\vec{\mathbf{w}}$) for each program variable
-$y$ where $y = \vec{\mathbf{v}} \cdot \vec{\mathbf{u}} +
+We attempt to find a vector pair
+($\vec{\mathbf{v}}$,$\vec{\mathbf{w}}$) for each program variable $y$
+where $y = \vec{\mathbf{v}} \cdot \vec{\mathbf{u}} +
 \vec{\mathbf{w}} \cdot \vec{\mathbf{x}}$. $\vec{\mathbf{u}}$ is
 the filter input vector and $\vec{\mathbf{x}}$ is the filter state
 vector. When $y$ is on the left hand side of an assignment
@@ -136,7 +134,7 @@ fill the corresponding entries in $\vec{\mathbf{v}}$ and
 $\vec{\mathbf{w}}$, as long as they are constants. If any
 coefficient is not a constant, then $y$ is non-linear.
 
-    The input vector, $\vec{\mathbf{u}}$, is defined as $[peek(e-o)
+The input vector, $\vec{\mathbf{u}}$, is defined as $[peek(e-o)
 ~peek(e-o+1) ~... ~peek(o-1)]$. The state vector,
 $\vec{\mathbf{x}}$, holds $e-o$ variables from the input tape
 ($peek(0) ~... ~peek(e-o-1)$), every field variable, and a
@@ -150,32 +148,31 @@ pair ($\vec{\mathbf{0}}$,$\left [
 \begin{array} {ccccc} 0 & ... & 1 & ... & 0 \end{array} \right
 ]$), where the 1 corresponds to the field variable itself.
 
-    If the vector pair can be found, then the program variable $y$ can
-be written as a linear combination of the inputs and state
-variables, with the vector pair entries representing the weights.
-Then the final assignment to state variable $x_i$ by some program
-variable $y_i$ indicates that the $i^{th}$ rows of $\mathbf{A}$
-and $\mathbf{B}$ should be $\vec{\mathbf{w_i}}$ and
-$\vec{\mathbf{v_i}}$, respectively. Similarly, the $j^{th}$ push
-statement using program variable $y_j$ indicates that the $j^{th}$
-rows of $\mathbf{C}$ and $\mathbf{D}$ should be
-$\vec{\mathbf{w_j}}$ and $\vec{\mathbf{v_j}}$, respectively. For
-the constant state variable $1$, the corresponding rows of
-$\mathbf{A}$ and $\mathbf{B}$ are all zeros.
+If the vector pair can be found, then the program variable $y$ can be
+written as a linear combination of the inputs and state variables,
+with the vector pair entries representing the weights.  Then the final
+assignment to state variable $x_i$ by some program variable $y_i$
+indicates that the $i^{th}$ rows of $\mathbf{A}$ and $\mathbf{B}$
+should be $\vec{\mathbf{w_i}}$ and $\vec{\mathbf{v_i}}$,
+respectively. Similarly, the $j^{th}$ push statement using program
+variable $y_j$ indicates that the $j^{th}$ rows of $\mathbf{C}$ and
+$\mathbf{D}$ should be $\vec{\mathbf{w_j}}$ and $\vec{\mathbf{v_j}}$,
+respectively. For the constant state variable $1$, the corresponding
+rows of $\mathbf{A}$ and $\mathbf{B}$ are all zeros.
 
-    We use the same procedure in the init function to find the initial
+We use the same procedure in the init function to find the initial
 values for each field variable. However, we do not need a vector
 $\vec{\mathbf{v}}$ for the inputs, since there are no inputs to
 the init function. The initial value for each stored inputs is
 zero, and the initial value for the variable $1$ is one.
 
-    Finally, consider the stored input states (call them
+Finally, consider the stored input states (call them
 $\vec{\mathbf{x_s}}$). They are updated by the inputs; however if
-$stored > o$, then some of the input states must be updated by
-other input states. In particular, the first $stored-o$ input
-states are updated by the last $stored-o$ inputs, and the
-remaining $o$ input states are updated by the $o$ inputs. The
-update is described by the equation:
+$stored > o$, then some of the input states must be updated by other
+input states. In particular, the first $stored-o$ input states are
+updated by the last $stored-o$ inputs, and the remaining $o$ input
+states are updated by the $o$ inputs. The update is described by the
+equation:
 \starteqnstar
 \vec{\dot{\mathbf{x_s}}} = \left [
 \begin{array} {cc} \mathbf{0} & \mathbf{I} \\ \mathbf{0} &
@@ -184,14 +181,14 @@ update is described by the equation:
 \vec{\mathbf{u}}
 \doneeqnstar
 
-    We also create initialization matrices to put values from the
-input tape into the input states:
+We also create initialization matrices to put values from the input
+tape into the input states:
 \starteqnstar
 \vec{\dot{\mathbf{x_s}}} = \mathbf{0} \vec{\mathbf{x_s}} +
 \mathbf{I} \vec{\mathbf{u_{pre}}}
 \doneeqnstar
 
-\vspace{-9pt} Stored inputs are always updated as shown in the same manner.
+Stored inputs are always updated as shown in the same manner.
 Therefore, we will use $\mathbf{A_s}$ and $\mathbf{B_s}$ to
 describe this update, where the values of these two matrices are
 shown in (3.1).
@@ -203,7 +200,6 @@ Section~\ref{sec:background}, this filter uses peeking to read
 elements from the tape without consuming them.
 
 \begin{singlespace}
-\vspace{-12pt}
 \small
 \begin{verbatim}
 float->float filter IIR() {
@@ -217,11 +213,11 @@ float->float filter IIR() {
     }
 }
 \end{verbatim}
-\vspace{-36pt}
 \end{singlespace}
-    The input vector is $\left [ \begin{array} {c} peek(2) \end{array}
-\right ]$ and the state vector is $\left [ \begin{array} {c} \vspace{-36pt} \\ \vspace{-12pt} peek(0) \\ \vspace{-12pt}
-peek(1) \\ \vspace{-12pt} curr \\ \vspace{-12pt} 1 \vspace{12pt} \end{array} \right ]$. The first program
+\vspace{-16pt}
+
+\noindent The input vector is $\left [\begin{array} {c} peek(2) \end{array}
+\right]$ and the state vector is $\left [\begin{array} {c} peek(0) \\ peek(1) \\ curr \\ 1 \end{array} \right]$. The first program
 variable encountered is $temp$. It is given the vector pair
 ($\left [ \begin{array} {c} 1/6 \end{array} \right ]$, $\left [
 \begin{array} {cccc} 1/6 & 1/6 & 0 & 0 \end{array} \right ]$). The
@@ -238,7 +234,7 @@ pair. The final pair for $curr$ represents its state update. The
 stored inputs $peek(0)$, $peek(1)$ are updated as mentioned in
 (3.1), and the constant $1$ is not updated. Therefore, we have:
 
-\begin{minipage}{2.3in}
+\begin{minipage}{1.6in}
 \starteqnstar
 \mathbf{A} = \left [ \begin{array} {cccc} 0 & 1 & 0 & 0 \\ 0 &
 0 & 0 & 0 \\ 1/6 & 1/6 & 1/2 & 0 \\ 0 & 0 & 0 & 0 \end{array}
@@ -251,22 +247,27 @@ stored inputs $peek(0)$, $peek(1)$ are updated as mentioned in
 \end{array} \right ]
 \doneeqnstar
 \end{minipage}
-\begin{minipage}{2.3in}
+
+\begin{minipage}{1.6in}
 \starteqnstar
 \mathbf{C} = \left [ \begin{array} {cccc} 1/6 & 1/6 & 1/2 & 0
 \end{array} \right ]
 \doneeqnstar
+\end{minipage}
+\begin{minipage}{1.4in}
 \starteqnstar
-\mathbf{D} = \left [ \begin{array} {c} 1/6 \end{array} \right ] \\
+\mathbf{D} = \left [ \begin{array} {c} 1/6 \end{array} \right ]
 \doneeqnstar
 \end{minipage}
 
-\begin{minipage}{1.6in}
+\hspace{1in}
+\begin{minipage}{1in}
 \starteqnstar
 \overrightarrow{\mathbf{initVec}} = \left [ \begin{array} {c}
 0 \\ 0 \\ 0 \\ 1 \end{array} \right ]
 \doneeqnstar
 \end{minipage}
+
 \begin{minipage}{1.6in}
 \starteqnstar
 \mathbf{A_{pre}} = \left [ \begin{array} {cccc} 0 & 0 & 0 & 0 \\
@@ -274,20 +275,20 @@ stored inputs $peek(0)$, $peek(1)$ are updated as mentioned in
 \right ]
 \doneeqnstar
 \end{minipage}
-\begin{minipage}{2.5in}
+\begin{minipage}{1in}
 \starteqnstar
 \mathbf{B_{pre}} = \left [ \begin{array} {cc} 1 & 0 \\ 0 & 1
-\\ 0 & 0 \\ 0 & 0 \end{array} \right ] \\
+\\ 0 & 0 \\ 0 & 0 \end{array} \right ]
 \doneeqnstar
-\end{minipage}
+\end{minipage} ~\\
 
-    The pop and push rates are both one, and we have four states so $o
+The pop and push rates are both one, and we have four states so $o
 = 1, u = 1, s = 4$. We have two stored input states, so $o_{pre} =
 2, stored = 2$.
 
 \mysubsection{Combination}
 
-    If all blocks within a pipeline, splitjoin, or feedback loop have
+If all blocks within a pipeline, splitjoin, or feedback loop have
 state space representations, we can combine them into a single
 representation using the rules developed in this section. We combine
 blocks for two reasons.  First, combination can eliminate redundant
@@ -299,7 +300,7 @@ blocks by combining the blocks first.
 \mysubsubsection{Pipeline}
 \label{sec:pipeline}
 
-    Consider two blocks connected in a pipeline with representations
+Consider two blocks connected in a pipeline with representations
 $\mathrm{R_1}$ and $\mathrm{R_2}$. Let $\mathrm{R}$ denote the
 combined representation of the two blocks, which we are trying to
 derive. Suppose the output rate of $\mathrm{R_1}$ equals the input
@@ -313,16 +314,12 @@ write:
 \begin{minipage}{3in}
 \starteqnstar
 \vec{\dot{\mathbf{x_1}}} & = & \mathbf{A_1}\vec{\mathbf{x_1}} + \mathbf{B_1}\vec{\mathbf{u_1}} \\
-\vec{\dot{\mathbf{x_2}}} & = & \mathbf{A_2}\vec{\mathbf{x_2}} + \mathbf{B_2}\vec{\mathbf{y_1}}
-\doneeqnstar
-\end{minipage}
-\begin{minipage}{3in}
-\starteqnstar
+\vec{\dot{\mathbf{x_2}}} & = & \mathbf{A_2}\vec{\mathbf{x_2}} + \mathbf{B_2}\vec{\mathbf{y_1}} \\ ~ \\
 \vec{\mathbf{y_1}} & = & \mathbf{C_1}\vec{\mathbf{x_1}} + \mathbf{D_1}\vec{\mathbf{u_1}} \\
 \vec{\mathbf{y_2}} & = & \mathbf{C_2}\vec{\mathbf{x_2}} +
 \mathbf{D_2}\vec{\mathbf{y_1}}
 \doneeqnstar
-\end{minipage}
+\end{minipage} ~\\
 
 Substituting for $\vec{\mathbf{y_1}}$ we get:
 \starteqnstar
@@ -349,45 +346,47 @@ $\vec{\mathbf{u}}$, and $\vec{\mathbf{y}}$ are:
 \starteqnstar
 \vec{\dot{\mathbf{x}}} & = & \mathbf{A}\vec{\mathbf{x}} + \mathbf{B}\vec{\mathbf{u}} \\
 \vec{\mathbf{y}} & = & \mathbf{C}\vec{\mathbf{x}} + \mathbf{D}\vec{\mathbf{u}}
-\doneeqnstar
-\starteqnstar 
+\doneeqnstar ~ \\ \vspace{-36pt} ~ \\
+\starteqnstar
 \mathbf{A} = \left [ \begin{array} {cc} \mathbf{A_1} &
-\mathbf{0} \\ \mathbf{B_2}\mathbf{C_1} & \mathbf{A_2} \end{array} \right ] ~~~~~
-\mathbf{B} = \left [ \begin{array} {c} \mathbf{B_1} \\ \mathbf{B_2}\mathbf{D_1} \end{array} \right ] ~~~~~
-\mathbf{C} = \left [ \begin{array} {cc} \mathbf{D_2}\mathbf{C_1} & \mathbf{C_2} \end{array} \right ] ~~~~~
+\mathbf{0} \\ \mathbf{B_2}\mathbf{C_1} & \mathbf{A_2} \end{array} \right ] &~&
+\mathbf{B} = \left [ \begin{array} {c} \mathbf{B_1} \\ \mathbf{B_2}\mathbf{D_1} \end{array} \right ] \\ ~&~&~ \\
+\mathbf{C} = \left [ \begin{array} {cc} \mathbf{D_2}\mathbf{C_1} & \mathbf{C_2} \end{array} \right ] &~&
 \mathbf{D} = \mathbf{D_2}\mathbf{D_1}
 \doneeqnstar
 
-    The input to the pipeline is identical to the input to $\mathrm{R_1}$,
+The input to the pipeline is identical to the input to $\mathrm{R_1}$,
 and the output of the pipeline is identical to the output of
-$\mathrm{R_2}$. Furthermore, the states of the pipeline are the
-states of the first block appended to the states of the second
+$\mathrm{R_2}$. Furthermore, the states of the pipeline are the states
+of the first block appended to the states of the second
 block. Therefore, $u = u_2$, $o = o_1$, $s = s_1 + s_2$,
 $\overrightarrow{\mathbf{initVec}} = \left [ \begin{array} {c}
 \overrightarrow{initVec_1} \\ \overrightarrow{initVec_2}
 \end{array} \right ]$.
 
-    If both blocks do not have initialization matrices, then the entire
-pipeline does not need initialization matrices, so
-$\mathbf{A_{pre}} = null$, $\mathbf{B_{pre}} = null$, $o_{pre} =
-0$, $stored = 0$. If only the first block has initialization
-matrices, then we want to initialize the states in the pipeline
-corresponding to the first block while keeping the states
-corresponding to the second block unchanged. Therefore:
+If both blocks do not have initialization matrices, then the entire
+pipeline does not need initialization matrices, so $\mathbf{A_{pre}} =
+null$, $\mathbf{B_{pre}} = null$, $o_{pre} = 0$, $stored = 0$. If only
+the first block has initialization matrices, then we want to
+initialize the states in the pipeline corresponding to the first block
+while keeping the states corresponding to the second block
+unchanged. Therefore:
 \starteqnstar
 \mathbf{A_{pre}} = \left [ \begin{array} {cc}
 \mathbf{A_{pre1}} & \mathbf{0} \\ \mathbf{0} & \mathbf{I} \end{array} \right ] ~~~~~
-\mathbf{B_{pre}} = \left [ \begin{array} {c} \mathbf{B_{pre1}} \\ \mathbf{0} \end{array} \right ] ~~~~~
+\mathbf{B_{pre}} = \left [ \begin{array} {c} \mathbf{B_{pre1}} \\ \mathbf{0} \end{array} \right ]
+\doneeqnstar ~ \\ \vspace{-36pt} ~ \\
+\starteqnstar
 o_{pre} = o_{pre1} ~~~~~
 stored = stored_1
 \doneeqnstar
 
-    If the second block has initialization matrices, we must run the
-first block enough times to provide the necessary inputs to initialize
-the second block. However, this might result in the first block
-providing extra initial inputs to the second block. In that case, we
-must change the representation of the second block to increase its
-number of stored inputs.  A full description of this case appears
+If the second block has initialization matrices, we must run the first
+block enough times to provide the necessary inputs to initialize the
+second block. However, this might result in the first block providing
+extra initial inputs to the second block. In that case, we must change
+the representation of the second block to increase its number of
+stored inputs.  A full description of this case appears
 in~\cite{Agrawal04}.
 
 %%  (the way to do this is
@@ -411,10 +410,9 @@ in~\cite{Agrawal04}.
 %% stored & = & stored_1
 %% \doneeqnstar
 
-    If there are more than two blocks in a pipeline, we collapse
-the pipeline in the following manner: combine the first two blocks
-to get one block representation, combine this with the third
-block, etc.
+If there are more than two blocks in a pipeline, we collapse the
+pipeline in the following manner: combine the first two blocks to get
+one block representation, combine this with the third block, etc.
 
 \mysubsubsection{Splitjoin and Feedback Loop}
 
@@ -751,26 +749,25 @@ treatment of these cases appears in~\cite{Agrawal04}.
 \mysubsection{Expanding a Representation}
 \label{sec:expansion}
 
-    We may want to run a block multiple times in order to
-properly combine it with other blocks. For example, suppose block
-$B_1$ inputs three items and outputs two items, and block $B_2$
-inputs five items and outputs seven items. In order to combine
-these blocks in a pipeline, $B_1$ must run five times (in order to
-output ten items) and $B_2$ must run two times (in order to input
-ten items). Therefore, we need to have a method to expand a
-representation so that it models a block running multiple times,
-rather than once.
+We may want to run a block multiple times in order to properly combine
+it with other blocks. For example, suppose block $B_1$ inputs three
+items and outputs two items, and block $B_2$ inputs five items and
+outputs seven items. In order to combine these blocks in a pipeline,
+$B_1$ must run five times (in order to output ten items) and $B_2$
+must run two times (in order to input ten items). Therefore, we need
+to have a method to expand a representation so that it models a block
+running multiple times, rather than once.
 
-    Consider the state space equation pair, where $\vec{\mathbf{u_1}}$ and
+Consider the state space equation pair, where $\vec{\mathbf{u_1}}$ and
 $\vec{\mathbf{y_1}}$ are the first set of inputs and outputs, and
-$\vec{\mathbf{x}}$ is the original state vector: \vspace{-28pt}
+$\vec{\mathbf{x}}$ is the original state vector:
 \starteqnstar
 \vec{\dot{\mathbf{x}}} & = & \mathbf{A}\vec{\mathbf{x}} + \mathbf{B}\vec{\mathbf{u_1}} \\
 \vec{\mathbf{y_1}} & = & \mathbf{C}\vec{\mathbf{x}} +
 \mathbf{D}\vec{\mathbf{u_1}}
 \doneeqnstar
 
-\vspace{-6pt} If we run the block again, the equation pair in terms of the
+If we run the block again, the equation pair in terms of the
 original state vector $\vec{\mathbf{x}}$ and the next set of
 inputs and outputs ($\vec{\mathbf{u_2}}$ and $\vec{\mathbf{y_2}}$)
 is:
@@ -781,9 +778,7 @@ is:
 \vec{\mathbf{y_2}} & = & \mathbf{C}(\mathbf{A}\vec{\mathbf{x}} +
 \mathbf{B}\vec{\mathbf{u_1}}) + \mathbf{D}\vec{\mathbf{u_2}}
 \doneeqnstar
-
-~ \vspace{-36pt} \\ \noindent Simplifying yields: \vspace{-12pt} 
-
+\noindent Simplifying yields:
 \starteqnstar
 \vec{\dot{\mathbf{x}}} & = & \mathbf{A}^2\vec{\mathbf{x}} +
 \mathbf{AB}\vec{\mathbf{u_1}} + \mathbf{B}\vec{\mathbf{u_2}} \\
@@ -791,8 +786,8 @@ is:
 \mathbf{CB}\vec{\mathbf{u_1}} + \mathbf{D}\vec{\mathbf{u_2}}
 \doneeqnstar
 
-    Let $\vec{\mathbf{u}}$ be the combined input vector
-($\vec{\mathbf{u}} = \left [ \begin{array} {c} \vec{\mathbf{u_1}}
+Let $\vec{\mathbf{u}}$ be the combined input vector ($\vec{\mathbf{u}}
+= \left [ \begin{array} {c} \vec{\mathbf{u_1}}
 \\ \vec{\mathbf{u_2}} \end{array} \right ]$) and $\vec{\mathbf{y}}$ be the combined output vector
 ($\vec{\mathbf{y}} = \left [ \begin{array} {c} \vec{\mathbf{y_1}}
 \\ \vec{\mathbf{y_2}} \end{array} \right ]$). The representation in terms of these two
@@ -800,19 +795,18 @@ vectors is:
 \starteqnstar
 \vec{\dot{\mathbf{x}}} & = & \mathbf{A_2}\vec{\mathbf{x}} + \mathbf{B_2}\vec{\mathbf{u}} \\
 \vec{\mathbf{y}} & = & \mathbf{C_2}\vec{\mathbf{x}} + \mathbf{D_2}\vec{\mathbf{u}}
-\doneeqnstar
+\doneeqnstar ~ \\ \vspace{-36pt} ~ \\
 \starteqnstar
 \mathbf{A_2} = \mathbf{A}^2 ~~~~~
-\mathbf{B_2} = \left [ \begin{array} {cc} \mathbf{AB} & \mathbf{B} \end{array} \right ]  ~~~~~
+\mathbf{B_2} = \left [ \begin{array} {cc} \mathbf{AB} & \mathbf{B} \end{array} \right ]  \\ ~ \\
 \mathbf{C_2} = \left [ \begin{array} {c} \mathbf{C} \\
 \mathbf{CA} \end{array} \right ] ~~~~~
 \mathbf{D_2} = \left [ \begin{array} {cc} \mathbf{D} & \mathbf{0} \\
 \mathbf{CB} & \mathbf{D} \end{array} \right ]
 \doneeqnstar
-
-    This new representation corresponds to a block that upon
-every execution runs the old block twice. By induction, a general
-formula for running a block n times is:
+This new representation corresponds to a block that upon every
+execution runs the old block twice. By induction, a general formula
+for running a block n times is:
 \starteqnstar
 \mathbf{A_n} = \mathbf{A}^n ~~~~~
 \mathbf{B_n} = \left [ \begin{array} {ccccc} \mathbf{A}^{n-1}
@@ -824,34 +818,44 @@ formula for running a block n times is:
 \mathbf{CA} \\
 ... \\
 \mathbf{CA^{n-2}} \\
-\mathbf{CA^{n-1}} \end{array} \right ] ~~~~~
+\mathbf{CA^{n-1}} \end{array} \right ]~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \\
 \mathbf{D_n} = \left [ \begin{array} {ccccccc}
-\mathbf{D} & \mathbf{0} & \mathbf{0} & ... & \mathbf{0} & \mathbf{0} & \mathbf{0} \\
-\mathbf{CB} & \mathbf{D} & \mathbf{0} & ... & \mathbf{0} & \mathbf{0} & \mathbf{0} \\
-\mathbf{CAB} & \mathbf{CB} & \mathbf{D} & ... & \mathbf{0} & \mathbf{0} & \mathbf{0} \\
-... & ... & ... & ... & ... & ... & ... \\
-\mathbf{CA}^{n-4} \mathbf{B} & \mathbf{CA}^{n-5} \mathbf{B} &
-\mathbf{CA}^{n-6} \mathbf{B} & ... & \mathbf{D} & \mathbf{0} & \mathbf{0} \\
+\mathbf{D} & \mathbf{0} & \mathbf{0} & ... & \mathbf{0} & \mathbf{0} \\
+\mathbf{CB} & \mathbf{D} & \mathbf{0} & ... & \mathbf{0} & \mathbf{0} \\
+\mathbf{CAB} & \mathbf{CB} & \mathbf{D} & ... & \mathbf{0} & \mathbf{0} \\
+... & ... & ... & ... & ... & ... \\
 \mathbf{CA}^{n-3} \mathbf{B} & \mathbf{CA}^{n-4} \mathbf{B} &
-\mathbf{CA}^{n-5} \mathbf{B} & ... & \mathbf{CB} & \mathbf{D} & \mathbf{0} \\
+\mathbf{CA}^{n-5} \mathbf{B} & ... & \mathbf{D} & \mathbf{0} \\
 \mathbf{CA}^{n-2} \mathbf{B} & \mathbf{CA}^{n-3} \mathbf{B} &
-\mathbf{CA}^{n-4} \mathbf{B} & ... & \mathbf{CAB} & \mathbf{CB} &
+\mathbf{CA}^{n-4} \mathbf{B} & ... & \mathbf{CB} &
 \mathbf{D} \end{array} \right ]
+%% following version is same but with one extra column and row
+%% \mathbf{D_n} = \left [ \begin{array} {ccccccc}
+%% \mathbf{D} & \mathbf{0} & \mathbf{0} & ... & \mathbf{0} & \mathbf{0} & \mathbf{0} \\
+%% \mathbf{CB} & \mathbf{D} & \mathbf{0} & ... & \mathbf{0} & \mathbf{0} & \mathbf{0} \\
+%% \mathbf{CAB} & \mathbf{CB} & \mathbf{D} & ... & \mathbf{0} & \mathbf{0} & \mathbf{0} \\
+%% ... & ... & ... & ... & ... & ... & ... \\
+%% \mathbf{CA}^{n-4} \mathbf{B} & \mathbf{CA}^{n-5} \mathbf{B} &
+%% \mathbf{CA}^{n-6} \mathbf{B} & ... & \mathbf{D} & \mathbf{0} & \mathbf{0} \\
+%% \mathbf{CA}^{n-3} \mathbf{B} & \mathbf{CA}^{n-4} \mathbf{B} &
+%% \mathbf{CA}^{n-5} \mathbf{B} & ... & \mathbf{CB} & \mathbf{D} & \mathbf{0} \\
+%% \mathbf{CA}^{n-2} \mathbf{B} & \mathbf{CA}^{n-3} \mathbf{B} &
+%% \mathbf{CA}^{n-4} \mathbf{B} & ... & \mathbf{CAB} & \mathbf{CB} &
+%% \mathbf{D} \end{array} \right ]
 \doneeqnstar
 
-    Since initializations are not affected, $\overrightarrow{\mathbf{initVec}}$,
-$\mathbf{preA}$, $\mathbf{preB}$, $stored$, and $o_{pre}$ remain
-unchanged from the initial representation. Since the number of
-states is not changed, $s$ remains the same. The new
-representation runs the old representation $n$ times, so $u_{new}
-= n * u_{old}$, $o_{new} = n * o_{old}$.
+Since initializations are not affected,
+$\overrightarrow{\mathbf{initVec}}$, $\mathbf{preA}$, $\mathbf{preB}$,
+$stored$, and $o_{pre}$ remain unchanged from the initial
+representation. Since the number of states is not changed, $s$ remains
+the same. The new representation runs the old representation $n$
+times, so $u_{new} = n * u_{old}$, $o_{new} = n * o_{old}$.
 
-    As mentioned in Section~\ref{sec:pipeline}, we may need to
-run a block $n$ times, in addition to its initialization matrices, for
-the purpose of initializing a full pipeline.  In this case, the
-equations are very similar to above, but also include terms for
-$\mathbf{A_{pre}}$ and $\mathbf{B_{pre}}$.  Full details appear
-in~\cite{Agrawal04}.
+As mentioned in Section~\ref{sec:pipeline}, we may need to run a block
+$n$ times, in addition to its initialization matrices, for the purpose
+of initializing a full pipeline.  In this case, the equations are very
+similar to above, but also include terms for $\mathbf{A_{pre}}$ and
+$\mathbf{B_{pre}}$.  Full details appear in~\cite{Agrawal04}.
 
 %% We denoted the matrices for doing this as $\mathbf{A^e}$,
 %% $\mathbf{B^e}$, $\mathbf{C^e}$, and $\mathbf{D^e}$. If the block being
