@@ -1,0 +1,70 @@
+\section{Compiling StreamIt to Raw}
+\label{sec:phases}
+StreamIt language aims to be portable across communication-exposed
+machines.  StreamIt expose the parallelism and communication of
+streaming applications without depending on the topology or
+granularity of the underlying architecture.  have implemented a
+fully-functional prototype of the StreamIt compiler for
+Raw~\cite{raw}, a tiled architecture with fine-grained, programmable
+communication between processors.  However, the compiler employs three
+general techniques that can be applied to compile StreamIt to machines
+other than Raw: 1) partitioning, which adjusts the granularity of a
+stream graph to match that of a given target, 2) layout, which maps a
+partitioned stream graph to a given network topology, and 3)
+scheduling, which generates a fine-grained static communication
+pattern for each computational element.  We consider this work to be a
+first step towards a portable programming model for
+communication-exposed architectures.
+
+The front end is built on top of KOPI, an open-source compiler
+infrastructure for Java~\cite{kopi}; we use KOPI as our infrastructure
+because StreamIt has evolved from a Java-based syntax.  We translate
+the StreamIt syntax into the KOPI syntax tree, and then construct the
+StreamIt IR (SIR) that encapsulates the hierarchical stream graph.
+Since the structure of the graph might be parameterized, we propagate
+constants and expand each stream construct to a static structure of
+known extent.  At this point, we can calculate an execution schedule
+for the nodes of the stream graph.
+
+The StreamIt compiler is composed of the following stages that are
+specific for communication-exposed architectures: stream graph
+scheduling, stream graph partitioning, layout, and communication
+scheduling.  The next four sections provide a brief overview of these
+phases. For a detailed explanation see~\cite{Gordo02,Gordon-thesis,Karczma-thesis}.
+
+\subsection{Stream Graph Scheduling}
+The automatic scheduling of the stream graph is one of the primary
+benefits that StreamIt offers, and the subtleties of scheduling and
+buffer management are evident throughout all of the following phases
+of the compiler.  The scheduling is complicated by StreamIt's support
+for the {\tt peek} operation, which implies that some programs require
+a separate schedule for initialization and for the steady state.  The
+steady state schedule must be periodic--that is, its execution must
+preserve the number of live items on each channel in the graph (since
+otherwise a buffer would grow without bound.)  A separate
+initialization schedule is needed if there is a filter with $peek >
+pop$, by the following reasoning.  If the initialization schedule were
+also periodic, then after each firing it would return the graph to its
+initial configuration, in which there were zero live items on each
+channel.  But a filter with $peek > pop$ leaves $peek-pop$ (a positive
+number) of items on its input channel after {\it every} firing, and
+thus could not be part of this periodic schedule.  Therefore, the
+initialization schedule is separate, and non-periodic.
+
+In the StreamIt compiler, the initialization schedule is constructed
+via symbolic execution of the stream graph, until each filter has at
+least $peek-pop$ items on its input channel.  For the steady state
+schedule, there are many tradeoffs between code size, buffer size, and
+latency, and we are developing techniques to optimize different
+metrics \cite{streamittech2}.  Currently, we use a simple hierarchical
+scheduler that constructs a Single Appearance Schedule (SAS)
+\cite{leesdf} for each filter.  We plan to develop better scheduling
+heuristics in the future~\cite{Karczma-thesis}.  A SAS is a schedule
+where each node appears exactly once in the loop nest denoting the
+execution order.  We construct one such loop nest for each
+hierarchical stream construct, such that each component is executed a
+set number of times for every execution of its parent.  In later
+sections, we refer to the ``multiplicity'' of a filter as the number
+of times that it executes in one steady state execution of the entire
+stream graph.
+

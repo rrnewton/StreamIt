@@ -1,0 +1,40 @@
+\subsection{Communication Scheduler}
+\label{sec:communic}
+
+With the nodes of the stream graph assigned to computation nodes of
+the target, the next phase of the compiler must map the communication
+explicit in the stream graph to the interconnect of the target.  This
+is the task of the communication scheduler.  The communication
+scheduler maps the infinite FIFO abstraction of the stream channels to
+the limited resources of the target.  Its goal is to avoid deadlock
+and starvation while utilizing the parallelism explicit in the stream
+graph.
+
+The exact implementation of the communication scheduler is tied to the
+communication model of the target.  The simplest mapping would occur
+for targets implementing an end-to-end, infinite FIFO abstraction, in
+which the scheduler needs only to determine the sender and receiver of
+each data item.  This information is easily calculated from the
+weights of the splitters and joiners.  As the communication model
+becomes more constrained, the communication scheduler becomes more
+complex, requiring analysis of the stream graph. For targets
+implementing a finite, blocking nearest-neighbor communication model,
+the exact ordering of tile execution must be specified.
+
+Due to the static nature of StreamIt, the compiler can statically
+orchestrate the communication resources.  As described in
+Section~\ref{sec:phases}, we create an initialization schedule and a
+steady-state schedule that fully describe the execution of the stream
+graph.  The schedules can give us an order for execution of the graph
+if necessary.  One can generate orderings to minimize buffer length,
+maximize parallelism, or minimize latency.
+
+Deadlock must be carefully avoided in the communication
+scheduler. Each architecture requires a different deadlock avoidance
+mechanism and we will not go into a detailed explanation of deadlock
+here.  In general, deadlock occurs when there is a circular dependence
+on resources.  A circular dependence can surface in the stream graph
+or in the routing pattern of the layout.  If the architecture does not
+provide sufficient buffering, the scheduler must serialize all
+potentially deadlocking dependencies.
+

@@ -1,0 +1,78 @@
+%!
+%%BoundingBox: 52 352 224 631
+%%Title: fir-object
+%%CreationDate: Mon Jan 21 09:16:13 2002
+%%Creator: Tgif-3.0-p13 by William Chia-Wei Cheng (william@cs.UCLA.edu)
+
+/tgifdict 2 dict def
+tgifdict begin
+
+end
+
+%%PageBoundingBox: 52 352 224 631
+tgifdict begin
+/tgifsavedpage save def
+
+1 setmiterlimit
+1 setlinewidth
+
+0 setgray
+
+72 0 mul 72 11.00 mul translate
+72 128 div 100.000 mul 100 div dup neg scale
+
+gsave
+
+/tgiforigctm matrix currentmatrix def
+
+% TEXT
+0 setgray
+/Courier findfont [10 0 0 -10 0 0] makefont setfont
+   gsave
+      96 297 moveto (class FIRFilter {) show
+      96 309 moveto (  int N;) show
+      96 321 moveto (  float[] input;) show
+      96 333 moveto () show
+      96 345 moveto (  FIRFilter\(int N\) {) show
+      96 357 moveto (    this.N = N;) show
+      96 369 moveto (  }) show
+      96 381 moveto () show
+      96 393 moveto (  float[] getData\(float[] output,                 ) show
+      96 405 moveto (  int offset, int length\) {) show
+      96 417 moveto (    if \(input==null\) {) show
+      96 429 moveto (      input = new float[MAX_LENGTH];) show
+      96 441 moveto (      source.getData\(input, 0, N+length\);) show
+      96 453 moveto (    } else {) show
+      96 465 moveto (      source.getData\(input, N, length\);) show
+      96 477 moveto (    }) show
+      96 489 moveto () show
+      96 501 moveto (    for \(int i=0; i<length; i++\) {) show
+      96 513 moveto (      float sum = 0;) show
+      96 525 moveto (      for \(int j=0; j<N; j++\) {) show
+      96 537 moveto (        sum = sum + data1[i+j]*FIR_COEFF[j][N];) show
+      96 549 moveto (      }) show
+      96 561 moveto (      output[i+offset] = sum;) show
+      96 573 moveto (    }) show
+      96 585 moveto () show
+      96 597 moveto (    for \(int i=0; i<N; i++\) {) show
+      96 609 moveto (      input[i] = input[i+length];) show
+      96 621 moveto (    }) show
+      96 633 moveto (  }) show
+      96 645 moveto (}) show
+      96 657 moveto () show
+      96 669 moveto (void main\(\) {) show
+      96 681 moveto (  DataSource datasource = new DataSource\(\);) show
+      96 693 moveto (  FIRFilter filter = new FIRFilter\(5\);) show
+      96 705 moveto (  Display display = new Display\(\);) show
+      96 717 moveto () show
+      96 729 moveto (  filter.source = datasource;) show
+      96 741 moveto (  display.source = filter;) show
+      96 753 moveto () show
+      96 765 moveto (  display.run\(\);) show
+      96 777 moveto (}) show
+   grestore
+
+grestore
+tgifsavedpage restore
+end
+%MatchingCreationDate: Mon Jan 21 09:16:13 2002

@@ -1,0 +1,43 @@
+\documentclass[times]{sig-alternate}
+\usepackage{epsfig}
+\usepackage{subfigure}
+
+
+\textwidth 16.0cm \textheight 23.0cm
+\oddsidemargin -0.1in
+\evensidemargin -0.1in
+\topmargin -0.5in
+\parskip 0.25ex
+\parindent 1.5ex
+\sloppy
+\raggedbottom
+
+
+\def \ie {{\it i.e.}, }
+\def \eg {{\it e.g.}, }
+
+\newcommand{\tile}{tile}
+\newcommand{\Tile}{Tile}
+\newcommand{\tiles}{tiles}
+\newcommand{\Tiles}{Tiles}
+\newcommand{\ntiles}{16}
+
+\newlength{\itemhack}
+\setlength{\itemhack}{-0.088in}
+
+\newlength{\parhack}
+\setlength{\parhack}{-0.12in}
+
+
+\begin{document}
+
+
+%\input{introduction}
+\input{language}
+\input{rawbackend}
+\footnotesize
+\bibliographystyle{plain}
+\bibliography{raw,streamit,generaltex,lang-ref}
+\end{document}
+
+

@@ -1,0 +1,59 @@
+%!
+%%BoundingBox: 52 462 227 613
+%%Title: fib-streamit
+%%CreationDate: Mon Jan 21 09:16:50 2002
+%%Creator: Tgif-3.0-p13 by William Chia-Wei Cheng (william@cs.UCLA.edu)
+
+/tgifdict 2 dict def
+tgifdict begin
+
+end
+
+%%PageBoundingBox: 52 462 227 613
+tgifdict begin
+/tgifsavedpage save def
+
+1 setmiterlimit
+1 setlinewidth
+
+0 setgray
+
+72 0 mul 72 11.00 mul translate
+72 128 div 100.000 mul 100 div dup neg scale
+
+gsave
+
+/tgiforigctm matrix currentmatrix def
+
+% TEXT
+0 setgray
+/Courier findfont [10 0 0 -10 0 0] makefont setfont
+   gsave
+      96 329 moveto (class Fibonnacci extends FeedbackLoop {) show
+      96 341 moveto (  void init\(\) {) show
+      96 353 moveto (    setDelay\(2\);) show
+      96 365 moveto (    setJoiner\(RoundRobin\(0,1\)\);) show
+      96 377 moveto (    setBody\(new Filter\(\) {) show
+      96 389 moveto (       void init\(\) {) show
+      96 401 moveto (         setInput\(Integer.TYPE\); ) show
+      96 413 moveto (         setOutput\(Integer.TYPE\);) show
+      96 425 moveto (         setPush\(1\); setPop\(1\); setPeek\(2\);) show
+      96 437 moveto (       }) show
+      96 449 moveto (       void work\(\) {) show
+      96 461 moveto (          output.push\(input.peek\(0\)+input.peek\(1\)\);) show
+      96 473 moveto (          input.pop\(\);) show
+      96 485 moveto (       }) show
+      96 497 moveto (    }\);) show
+      96 509 moveto (    setSplitter\(Duplicate\(\)\);) show
+      96 521 moveto (  }) show
+      96 533 moveto () show
+      96 545 moveto (  int initPath\(int index\) {) show
+      96 557 moveto (    return index;) show
+      96 569 moveto (  }) show
+      96 581 moveto (}) show
+   grestore
+
+grestore
+tgifsavedpage restore
+end
+%MatchingCreationDate: Mon Jan 21 09:16:50 2002
