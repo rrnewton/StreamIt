@@ -4,120 +4,301 @@
 \label{sec:freq}
 
 Our linear analysis framework provides a compile time formulation of
-the computation that a linear stream is performing and we use this
+the computation that a linear node performs and we use this
 information to exploit well known domain specific optimizing
-transformations.  Using linear node information, our compiler
-identifies convolution regions that require substantially fewer
-computations when they are translated into the frequency domain.
+transformations. Using linear node information, our compiler
+identifies convolution operations that require substantially fewer
+computations if computed in the frequency domain.
 
 Calculating a convolution sum is a common and fundamental operation in
-discrete time signal processing.  If the convolution region is
+discrete time signal processing.  If the convolution size\footnote{
+defined in Section~\ref{sec:method-opt-notation}.} is
 sufficiently large, transforming the data to the frequency domain,
 performing a simple vector multiply and converting back to the time
-domain requires fewer operations than the straightforward convolution.
+domain requires fewer operations than the direct convolution.
 
-% modified the tense so that it's clear we aren't talking about OUR 
-% system.  --bft
 The transformation from convolution sum into frequency multiplication
-has always been done explicitly by the programmer because no compiler
-analysis has had the information to determine when a convolution sum
-is being computed.  As the complexity of DSP programs grow,
-determining the disparate regions across which these optimizations can
-be applied is an ever more daunting task. For example, individual
-filters may not perform sufficiently large convolutions to merit this
-transformation, but after a linear combination of multiple filters the
-transformation will be beneficial.  Furthermore, differing
-architectural features makes the task of portably implementing 
-computational transforms even more daunting.
+has always been done explicitly by a human algorithm designer because no 
+compiler analysis has had the information necessary to determine 
+when a convolution sum is computed. As the complexity of DSP 
+programs grow, determining the disparate regions across which 
+these optimizations can be applied is an ever more daunting task. 
+For example, several filters individually may not perform sufficiently large 
+convolutions to merit a frequency transformation, but after a linear 
+combination of multiple filters the transformation will be beneficial.
+Differing levels of architectural support for various convolution and 
+frequency operations makes the task of determining when to apply and 
+actually implementing specific optimizations even harder.
 
-\subsection{Transformation Overview}
-The convolution sum $y[n]=x[n]*h[n]$ is defined as
-$y[n]=\sum_{k=-\infty}^{\infty}x[k]h[n-k]$. In StreamIt, if a 
-stream is calculating a convolution sum the input
-($x[n]$) and output ($y[n]$) correspond exactly to the input and
-output tapes where where $n$ denotes an index in the time domain.  
-Furthermore, a stream will be computing a
-convolution sum when $o=1$ in which case we can identify the values
-$h[n]$ as exactly the columns of $A$ in the corresponding linear node.
+\subsection{Notation and Background}
+\label{sec:method-opt-notation}
 
-Calculating the convolution in the frequency domain is more efficient
-because of the existence of the Fast Fourier Transform (FFT) algorithm
-for quickly calculating the Discrete Fourier Transform (DFT) of a signal.
-Calculating a convolution takes $O(N^2)$ time, and performing an equivalent
-computation using an FFT takes only two $O(N lg(N))$
-time-frequency conversions coupled with an $O(N)$ frequency domain
-vector multiply.
+\begin{equation}
+\label{eqn:conv-sum-again}
+y[n]=x[n]*h[n]=\sum_{k=-\infty}^{\infty}x[k]h[n-k]
+\end{equation}
 
-%This seeming roundabout calculation
-%is feasible because a class of fast algorithms known as the FFT are known that convert
-%to frequency and back again. For a thorough treatment of the theory of discrete time 
-%signal processing, including using the DFT to implement convolution, see \cite{oppenheim-discrete}.
+This section explains the notation used in the rest of the section. 
+We choose the notation of the DSP literature because
+these transformations are due precisely to that body of knowledge.
 
-To compute the convolution of two discrete time signals, $x[n]*h[n]$,
-first the DFT of both sequences ($X[k]$ and $H[k]$) is calculated where
-$k$ denotes an index in the frequency domain.
-Multiplying $X[k]$ and $H[k]$ element-wise produces a new
-sequence $Y[k]$, and taking the inverse DFT (IDFT) of $Y[k]$ produces
-$y[n]$ which is precisely the same as $x[n]*h[n]$.
+A convolution sum is a vector operation on two vectors $x[n]$ and 
+$h[n]$ and is redefined in Equation~\ref{eqn:conv-sum-again} for
+convenience. In general, when talking about vectors, $n$ denotes 
+an index in the time domain, and $k$ represents an index in the 
+frequency domain. Filters which compute convolution sums are often called 
+Finite Impulse Response (FIR) filters. An FIR filter has a corresponding linear 
+node with unit pop rate ($o=1$) and ${\vec b} = {\vec 0}$. From 
+Equation~\ref{eqn:conv-sum-again} and Definition~\ref{def:linear-node},
+we can identify a column of $A$ with the vector $h[n]$
+in the convolution sum. We will sometimes refer to $h[n]$ as 
+{\it filter coefficients}. Because $A$ has $u$ columns,	
+then the filter is equivalent to $u$ FIR filters 
+executing in parallel with interleaved outputs.
+To complete the identification of a StreamIt filter with an FIR filter,
+we denote the input of a filter as $x[n]$ and the output of
+a filter as $y[n]$.
 
-When the compiler identifies a stream that computes a convolution sum,
-it generates a new filter which computes $H[k]$ at compile time. 
-The stream's {\tt work} function is changed to perform the following:
-\begin{enumerate}
-\item $X[k]$ is is calculated from the input tape using an FFT algorithm. 
-\vspace{-6pt}
-\item $X[k]$ is multiplied element-wise with $H[k]$ to produce $Y[k]$. 
-\vspace{-6pt}
-\item $y[n]$ is obtained by transforming $Y[k]$ back to the time domain using an inverse FFT.
-\vspace{-6pt}
-\item The appropriate values of $y[n]$ are pushed on to the output tape.
-\end{enumerate} 
+Calculating a convolution sum in the frequency domain is {\it much}
+more efficient because of a class of algorithms known collectively as 
+the Fast Fourier Transform (FFT) which quickly calculate 
+the Discrete Fourier Transform (DFT) of a signal\footnote{see 
+Section~\ref{sec:background-fft} for the general derivation.}. 
+
+To compute the convolution of two discrete time signals, $y[n]=x[n]*h[n]$,
+first the $N$-point DFT of $h[n]$, $H[k]$, is calculated.
+Second, the $N$-point DFT of $x[n]$, $X[k]$, is calculated.
+Note that both $X[k]$ and $H[k]$ are complex valued vectors, each with 
+length $N$. Multiplying $X[k]$ and $H[k]$ element-wise produces a new $N$ point
+vector, $Y[k]$. Taking the inverse DFT (IDFT) of $Y[k]$ produces 
+$y[n]$ which is exactly the same as $x[n]*h[n]$. See Oppenheim
+\cite{oppenheim-discrete} for a thorough treatment.
+
+The computational complexity of calculating a convolution in the time domain
+is $O(N^2)$ as each of the $N$ output values requires $O(N)$ operations.
+Doing the equivalent computation in the frequency domain 
+is only $O(N \lg(N))$ because we need to evaluate two FFTs at a cost of
+$O(N \lg(N))$ a piece coupled with an $O(N)$ vector multiplication.
+
+\begin{algorithm}
+  \caption{Convolution in the frequency domain.\label{alg:freq-overview}}
+  \begin{algorithmic}
+    \STATE $h[n] \leftarrow {\mathit column of}A$ extracted by the dataflow analysis
+    \STATE $H[k] \leftarrow FFT(h[n],N)$ 
+    \WHILE {true}
+      \STATE $X[k] \leftarrow FFT(x[n],N)$
+      \STATE $X[k] \leftarrow H[k] .* Y[k]$ Where $.*$ is element wise multiplication.
+      \STATE $y[n] \leftarrow IFFT(Y[k],N)$ (where $IFFT$ is the inverse FFT).
+      \STATE push($y[n]$)
+    \ENDWHILE
+  \end{algorithmic}
+\end{algorithm}
+
+The transformation to the frequency domain is straightforward in theory and 
+very common in practice. However, the detailed record keeping, transform size selection,
+and state management make actual implementation much more than a mindless
+exercise. Our compiler is capable of automatically determining all the necessary
+information and transforming the computation into the frequency domain. 
+When the compiler identifies a linear node that is acting as an FIR filter, 
+it replaces it with a new node with an implementation based on the FFT.
+Algorithm~\ref{alg:freq-overview} summarizes the conversion procedure
+at a very high level and the rest of this section describes the transformation in 
+(excruciating) detail. We assume an undergraduate level knowledge
+of signal processing (see Section~\ref{sec:crash-course} for a crash course).
 
 \subsection{Automatic Transformation}
-%this is where the fun starts.  
+\label{sec:method-opt-freq-details}
 
-To implement this transformation, the compiler needs to compute $H[k]$ at
-compile time. The compiler transforms FIR filters 
-which have $h[n]$ of length $e$ and push rate $u=1$, which 
-requires expanding the filter to overcome the constant overhead factors.
-Therefore, the transformed filter needs to produce more than one output on each
-execution of {\tt work}. The number of outputs, $N$, to produce on each 
-execution of {\tt work} is determined automatically by the compiler and set to 
-approximately $2e$, a number determined by empirical observations. $N$ is then rounded 
-up such that $N+2(e-1)$ is a power of two which results in the most efficient 
-FFT calculations.
+To automatically transform a computation expressed in the time domain 
+to calculation in the frequency domain, the compiler first needs to identify 
+which linear filters are computing convolution sums. Identification is 
+easy once armed with linear node information generated from the dataflow 
+analysis presented in Section~\ref{sec:method-dataflow}. The compiler 
+identifies FIR filters by identifying linear nodes with a peek rate of 
+one ($e=1$) and zero constant component (${\vec b} = {\vec 0}$).
 
-The frequency transformation generates a new filter that
-peeks $e'=N+e-1$ items each execution where the original stream used only $e$.
-The compiler automatically computes the complex values of
-$H[k]=FFT(N+2(e-1),h[n])$, the $N+2(e-1)$ point DFT of $h[n]$ at compile
-time and saves them as constants in the filter.
-A new compiler-generated {\tt work} function is generated that calculates the complex 
-valued $X[k]=DFT(N+2(e-1),x[n])$, the $N+2(e-1)$ DFT of the input and 
-then calculates $Y[k]$, the element-wise vector product 
-of $X[k]$ and $H[k]$. Finally, the new {\tt work} function performs
-the inverse FFT $y[n]=IFFT(N+2e-2,y[n])$.
+To realize the $\frac{O(N\lg(N))}{O(N^2)}$ complexity savings of the FFT
+we need to ensure that $N$, the problem size, is big enough. In this case,
+the problem size is related to the length FFT we want to calculate.
+From empirical observations we have determined that convolution sums with 
+$8$ or more coefficients gain actual algorithmic savings in our implementation.
 
-Using $N+e-1$ input items produces a length $N+2(e-1)$ convolution sum, 
-of which both the first and last $e-1$ values are incorrect. Since every output requires 
-the value of $e$ inputs to calculate, without filter state 
-only the middle $N$ items of $y[n]$ are actual output values. 
-In an {\it overlap-discard} implementation, the {\tt work} function simply
-uses the middle $N$ values of $y[n]$ and discards the 
-$e-1$ elements on both ends, and advances the input tape by $N$.
-The following $N+e-1$ input values are then used to produce the next $N$ outputs.
+Of critical importance is choosing the length of the FFT to perform. 
+Lengths that are powers of two result in the most efficient FFT implementations
+known\footnote{The radix-2 family.}. Fourier's theorem states that any 
+discrete sequence of $M$ numbers can be represented exactly recoverable from 
+an $M$ length DFT. In general, if $y[n]$ is the result of a convolution of 
+two sequences with lengths $e$ and $N$, $y[n]$ has length $e+N$.
+We wish to compute the element wise vector multiplication of
+$X[k]$ and $H[k]$ in the frequency domain which requires that $X[k]$ and $H[k]$ 
+be the same length. Therefore, to recover $y[n]$ from its transform, $Y[k]$, 
+$Y[k]$ must both be at least $e+N-1$ elements long.
 
-The {\it overlap and add} method ~\cite{oppenheim-discrete} is well
-known.  This algorithm exploits the fact that the overlapping values
-of $y[n]$ contain partial output computations due to both the previous
-and the next $N+e-1$ inputs.  The first $e-1$ of $y[n]$ are part of
-the computation from the previous invocation of the {\tt work}
-function and the last $e-1$ are part of the next invocation.  For the
-automatic frequency transformation, the compiler creates a filter
-which first pushes $y[n]+p[n]$ for $0 \le n \le (e-1)-1$, where $p[n]$
-contains partial results from the previous invocation. Then the filter
-pushes the values of $y[n]$ for $e-1 \le n \le N+(e-1)-1$.  Finally,
-$p[n]$ is updated such that $p[n]=y[n+(N+e-1)]$ for $0 \le n \le
-N+2(e-1)-1$ which are used on the next invocation of {\tt work}; the
-input tape is then advanced by $N+e-1$.
+Currently in the StreamIt language, filters operate on infinite input streams 
+and generate an infinite output streams.
+The FFT only makes sense on finite input. To use the FFT we need to
+generate discrete sections of the output using discrete sections of the input.
+There are many known ways of convolving a relatively
+short $h[n]$ and a relatively long\footnote{possibly infinite.} 
+$x[n]$ using a finite FFT by doing the calculation in sections. 
+For a good treatment, again see Oppenheim~\cite{oppenheim-discrete}. 
 
+As originally implemented, FIR filters in StreamIt consume one input and 
+produce one output while using $e$ input values. The high level goal for the compiler
+is to create a new filter which produces $N$ output values by using $N+e-1$ input
+values on each work function execution. 
+Using $N+x-1$ input values with an $e$ length FIR filter implies that we
+must use $N+2(e-1)$ point FFT in order to avoid aliasing.
+
+Following the algorithm sketched out in Algorithm~\ref{alg:freq-overview},
+a $N+2(e-1)$ point FFT and IFFT will result in $y[n]$ being of length $N+2(e-1)$.
+However, both the starting and ending $e-1$ points of $y[n]$ correspond
+the tails of the convolution sum where not all of the input values are used. 
+A naive implementation\footnote{like our original implementation.} would
+simply discard these tail values. Our implementation recognizes that these
+two $e-1$ length segments are partial results from the calculation
+of the previous window of data and the next window of data. This observation
+lets the replacement filter actually generate $N+e-1$ output points every execution
+by saving state between work function invocations.
+
+The FFT length is a function of both $N$ and $e$, and $e$ is defined in the
+original program. In order to reap the $\frac{O(\lg(N))}{N}$ savings, 
+$N \gg e$. The compiler is free to choose the value of $N$, 
+so we can reap arbitrarily large savings from the computational complexity 
+simply by increasing $N$. Increasing $N$ corresponds to amortizing the cost of 
+zero padding the input to the FFT length. In practice, we can't increase $N$ 
+arbitrarily because increasing $N$ increases the required inter work function
+firing buffers use by the transformed filter program. Buffer size explosion is
+not of particular concern for our Uniprocessor back end because of the large
+general memory available, though ensuring that the cache doesn't overflow is
+an important consideration for performance. For embedded processors 
+buffer size is much more important due to the constrained resources available.
+If we are willing to use a buffer to store the transformed filter coefficients,$H[k]$, 
+we can save the cost of computing $H[k]$ on each work function invocation.
+Although this doesn't change the asymptotic performance gains, it provides
+a considerable speedup in practice.
+
+\begin{algorithm}
+\caption{Frequency replacement size choice.\label{alg:freq-size}}
+\begin{algorithmic}
+\STATE $targetN \leftarrow (2*e)$
+\STATE $FFTSize \leftarrow 2^{\lceil \lg(targetN + 2*(e-1)) \rceil}$
+\STATE $N \leftarrow FFTSize - 2*(e-1)$ 
+\end{algorithmic}
+\end{algorithm}
+
+The parameter $N$, described above, is approximately the number of outputs to 
+produce on each execution of the new work function. $N$ is determined automatically according
+to the rules shown in Algorithm~\ref{alg:freq-size}.
+An initial target of $N=2e$ seems a reasonable compromise between increased efficiency from the
+FFT and the increase in buffer size. Because the most efficient FFT algorithms implement compute
+a DFT whose size is a power of two, Algorithm~\ref{alg:freq-size} revises $N$ such that
+$N+2(e-1)$ is a power of two.
+
+
+\begin{figure}[t]
+  \center
+  \begin{tabular}{c}
+    \begin{minipage}{1.9in}
+      \center
+      \epsfxsize=1.9in \epsfbox{images/fft-replacement-before.eps}
+      {\bf a)} Original FIR Filter.
+    \end{minipage} \\
+    \begin{minipage}{2.8in}
+      \center
+      \epsfxsize=2.8in \epsfbox{images/fft-replacement-after.eps}
+      {\bf b)} Frequency Implementation.
+    \end{minipage} \\
+  \end{tabular}
+  \caption{Automatically replacing an FIR filter with a frequency implementation.}
+\label{fig:fft-replacement}
+\end{figure}
+
+\begin{algorithm}
+  \caption{Frequency replaced filter init psuedo code.\label{alg:freq-init}}
+  \begin{algorithmic}
+    \STATE $partials[0 \dots e-1] \leftarrow 0$
+    \STATE $H[0 \dots N+2(e-1)] \leftarrow \mathbf{FFT}(N+2(e-1),h[n])$
+  \end{algorithmic}
+\end{algorithm}
+
+Figure~\ref{fig:fft-replacement} illustrates an FIR filter before
+and after the automatic frequency transformation.
+After the transformation, the filter peeks $e'=N+e-1$ 
+items on each execution whereas the original stream used only $e$.
+The new filter automatically computes the (complex valued) FFT of the filter coefficients
+$H[k]=FFT(N+2(e-1),h[n])$, in the {\tt init} function and saves them as state 
+for use in each subsequent {\tt work} function. Algorithm~\ref{alg:freq-init}
+contains the psuedo code generated in the new {\tt init} functions.
+A new {\tt work} function is generated by the compiler that calculates the 
+(complex valued) FFT of $N+e-1$ input values, $X[k]=DFT(N+2(e-1),x[n])$.
+$Y[k]$ is calculated as the element-wise vector product 
+of $X[k]$ and $H[k]$\footnote{The element-wise vector product of
+two vectors is defined as $Y[i]=X[i]H[i]:i\in [0 \cdots N]$.}. 
+Finally, the new {\tt work} function calculated the output values $y[n]$ with
+the inverse FFT such that $y[n]=IFFT(N+2e-2,y[n])$.
+
+The convolution of $N+e-1$ input items and an impulse response $h[n]$ of length $e$
+results in $N+2(e-1)$ output values. However, both the first and last $e-1$ values 
+are not values that the original filter would have calculated. These starting and
+ending values correspond to the output of the filter when the two signals
+do not overlap completely during the calculation of the convolution sum.
+In our initial implementation, the {\tt work} function simply
+discarded the beginning and trailing $e-1$ elements, and then advanced 
+the input tape by $N$ items. The next $N+e-1$ values on the tape were 
+used to produce the next $N$ outputs.
+
+\begin{algorithm}
+  \caption{Frequency replaced filter {\tt initWork} psuedo code 
+  ($e'_{i}=N+e-1$, $o'_{i}=N+e-1$ $u'_{i}=N$).\label{alg:freq-init-work}}
+  \begin{algorithmic}
+    \STATE $x[n] \leftarrow \mathbf{peek}(0 \dots (N+e-1))$
+    \STATE $pop(N+e-1)$
+    \STATE $X[0 \dots N+2(e-1)] \leftarrow \mathbf{FFT} (N+2(e-1), x[n])$
+    \STATE $Y[0 \dots N+2(e-1)] \leftarrow X[k] .* H[k]$
+    \STATE $y[n] \leftarrow \mathbf{IFFT}(N+2(e-1), Y[k])$
+    \STATE $\mathbf{push}(y[e-1 \dots N+e-1])$
+    \STATE $partials[0 \dots e-1] \leftarrow y[N+e-1 \dots N+2(e-1)]$
+  \end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}
+  \caption{Frequency replaced filter {\tt work} psuedo code. 
+    ($e'=N+e-1$, $o'=N+e-1$ $u'=N+e-1$)\label{alg:freq-work}}
+  \begin{algorithmic}
+    \STATE $x[n] \leftarrow \mathbf{peek}(0 \dots (N+e-1))$
+    \STATE $pop(N+e-1)$
+    \STATE $X[0 \dots N+2(e-1)] \leftarrow \mathbf{FFT} (N+2(e-1), x[n])$
+    \STATE $Y[0 \dots N+2(e-1)] \leftarrow X[k] .* H[k]$
+    \STATE $y[n] \leftarrow \mathbf{IFFT}(N+2(e-1), Y[k])$
+    \STATE $\mathbf{push}(y[0 \dots e-1] + partials[0 \dots e-1])$
+    \STATE $\mathbf{push}(y[e-1 \dots N+e-1])$
+    \STATE $partials[0 \dots e-1] \leftarrow y[N+e-1 \dots N+2(e-1)]$
+  \end{algorithmic}
+\end{algorithm}
+
+
+The transformed filters now exploit the well known fact that the 
+beginning and trailing values of $y[n]$ contain partial results 
+that can be harnessed to improve efficiency.
+The first $e-1$ items of $y[n]$ are part of the computation from 
+the previous invocation of {\tt work}, and the final $e-1$ are part of the 
+calculation in the next invocation.
+In the automatic replacement, the compiler creates a filter
+which first pushes $y[i]+p[i]$ for $0 \le i \le (e-1)-1$, where $p[n]$
+contains partial results from the previous invocation of {\tt work}. 
+Then the filter pushes $y[i]$ for $e-1 \le i \le N+(e-1)-1$.
+$p[n]$ is updated with final $e-1$ values of $y[n]$ such that $p[i]=y[i+(N+e-1)]$ 
+for $0 \le i \le N+2(e-1)-1$, and the input tape is then advanced by $N+e-1$ items.
+Overall, this leads to peek, pop and push rates of 
+$e'=N+(e-1)$, $o'=N+(e-1)$ and $u'=N+(e-1)$.
+
+We need one slight modification to get the initial conditions correct. 
+The first {\tt work} function invocation, {\tt initWork}, 
+needs to be slightly different from every other execution. 
+Initially, the partial results field doesn't contain any information about past calculations 
+so the first $e-1$ elements of $y[n]$ are completely ignored.
+The middle $N$ elements of $y[n]$ are pushed and the final $e-1$ elements are
+saved in $p[n]$ as normal. This implies that the peek, pop and
+push rates for {\tt initWork} are $e'_{i} = N+(e-1)$, $o'_{i}=N+(e-1)$ and 
+$u'_{i}=N$, respectively.
