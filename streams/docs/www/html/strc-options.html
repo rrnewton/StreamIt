@@ -85,7 +85,7 @@
 	      Use the StreamIt Java library to execute.<br>
 	  <br>
 
-	  <dt><b>--memory &lt;<em>size</em>&gt;, -Mmx&lt;<em>size</em>&gt;</b><dd>
+	  <dt><b>--memory &lt;<em>size</em>&gt;, -Mmx &lt;<em>size</em>&gt;</b><dd>
 	      Set maximum Java runtime heap size. The default heap size is 1700Mb.<br>
 	  <br>
 
@@ -93,15 +93,19 @@
 	      Displays a summary of advanced options.<br>
 	  <br>
 
+	  <dt><b>-O0</b><dd>
+	      Disable all optimizations.<br>
+	  <br>
+
 	  <dt><b>-O1</b><dd>
 	      Perform basic optimizations that should improve performance in most
-		cases. Adds <tt>--unroll 256 --destroyfieldarray --ratematch --wbs</tt>.<br>
+		cases. Adds <tt>--unroll 16 --destroyfieldarray --ratematch --wbs</tt>.<br>
 	  <br>
 
 	  <dt><b>-O2</b><dd>
 	       Perform extended optimizations that should improve performance in
 		 most cases, but may also cause the compiler to become unstable.
-		 Adds <tt>--unroll 4096 --destroyfieldarray --ratematch --removeglobals --simulatework --wbs</tt>.<br>
+		 Adds <tt>--unroll 256 --destroyfieldarray --ratematch --removeglobals --simulatework --wbs</tt>.<br>
 	  <br> 
 
 	  <dt><b>--output &lt;<em>filename</em>&gt;</b><dd>
@@ -180,7 +184,7 @@
 	  <br>
 
 	  <dt><b>--unroll &lt;<em>n</em>&gt;, -u&lt;<em>n</em>&gt;</b><dd>
-            Specify loop unrolling limit. The default value is 16.<br>
+            Specify loop unrolling limit. The default value is 0.<br>
 	  <br>
 
 	  <dt><b>--verbose</b><dd>
