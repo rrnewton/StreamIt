@@ -106,10 +106,11 @@ the cookbook.  -->
 
 	<h2><hr>strc Options Available for All Backends<hr></h2>
 	<dl compact=compact>
+<!-- as this flag does not do anything, hide it for now
 	  <dt><b>-O0</b><dd>
-	      Perform no optimizations (default).<br>
+	      Do not optimize (default).<br>
 	  <br>
-
+-->
 	  <dt><b>-O1</b><dd>
 	      Perform basic optimizations that should improve performance in most
 		cases. Adds <tt>--unroll 16 --destroyfieldarray --partition --ratematch --wbs</tt>.<br>
@@ -212,6 +213,10 @@ the cookbook.  -->
 	     to infinity.<br>
 	  <br>
 
+	  <dt><b>--marksteady</b><dd>
+	     Print "*" to standard output after each steady-state execution.<br>
+	  <br>
+
 	  <dt><b>--norun</b><dd>
 	     Perform the library setup and schedule the stream graph, but don't
 	     actually run the program.<br>
@@ -226,9 +231,7 @@ the cookbook.  -->
 	  <dt><b>--printsched</b><dd>
 	     Print out the minimal-latency schedule for the program.
 	</dl>
-	  <dt><b>--marksteady</b><dd>
-	     Print "*" to standard output after each steady-state execution.<br>
-	  <br>
+
       </p>
     </td>
     <td width="150" valign="top" align="left"></td>
