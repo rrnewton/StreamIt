@@ -1,10 +1,8 @@
-all: mgordon.ps
-mgordon.dvi:	mgordon.tex *.tex *.bib
+all: mgordon.pdf
+mgordon.pdf:	mgordon.tex *.tex *.bib
 		rm -f mgordon.toc
-		latex mgordon
+		pdflatex mgordon
 		run-bibtex
-		latex mgordon
-		latex mgordon
+		pdflatex mgordon
+		pdflatex mgordon
 
-mgordon.ps:	mgordon.dvi
-		dvips -o mgordon.ps mgordon
