@@ -36,19 +36,18 @@
 (READ to WRITE):
 %
 \begin{align}
-\forall (i, j, k) \in {\cal D}_{{WRITE}_{c}},~\mt{WRITE}_{c}(i,j,k) = W(n)(\mt{Steady\_Inputs})[\mt{pos\_out}(n, c)][j] \\ \nonumber
+\forall (i, j, k) \in {\cal D}_{{WRITE}_{c}},~\mt{WRITE}_{c}(i,j,k) = W(n)(\mt{Steady\_Inputs})[\mt{pos\_out}(n, c)][k] \\ \nonumber
 \mt{where Steady\_Inputs} = [\mt{READ}_{{chan\_in}(n)[1]}(i, j, *), \dots, 
                              \mt{READ}_{{chan\_in}(n)[\mt{num\_in}(n)]}(i, j, *) ]
 \end{align}
 %
 \item For each $c \in \mt{chan\_out}(n)$, and for each $q \in
-[0,\frac{\mt{Period(c)}}{\mt{U(n)}}-\mt{1}]$,
+[0,S(n)-\mt{1}]$,
 introduce this equation (WRITE to BUF):
 \begin{align}
 \forall (i,j) \in {\cal D}_{SW {\small \rightarrow} SB}(c,q), \\ \nonumber
 \mt{BUF}_{c}(i,j) = 
-  \mt{WRITE}_{c}(i * \frac{\mt{Period}(c)}{O(c)} + \lfloor \frac{q}{S(n)} \rfloor, q~mod~S(n),
-                     j - q * U(c) \\ \nonumber
+  \mt{WRITE}_{c}(i, q, j - q * U(c) \\ \nonumber
 \mt{where } {\cal D}_{SW {\small \rightarrow} SB}(c,q) = 
   {\cal D}_{{BUF}_{c}} \cap 
   \{ (i,j) | q*U(c) \le j \le (q+1)*U(c) - 1 \}
@@ -58,7 +57,7 @@ introduce this equation (WRITE to BUF):
 READ):
 \begin{align}
 \forall (i,j,k) \in {\cal D}_{{READ}_{c}},
-\mt{READ}_{c}(i,j,k) = j*O(n) + k
+\mt{READ}_{c}(i,j,k) = \mt{BUF}_{c}(i,j*O(n) + k)
 \end{align}
 \end{itemize}
 
