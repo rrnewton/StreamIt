@@ -8,8 +8,6 @@ Figure~\ref{fig:radiodiagram}, is implemented in the class {\tt
 TrunkedRadio}.
 
 
-
-
 \begin{figure}
 \centering
 \psfig{figure=fft-block.eps,width=3.2in}
@@ -164,8 +162,8 @@ class RFtoIF extends Filter {
 }
 
 class CheckFreqHop extends SplitJoin {
-   FloatPortal freq_hop;
-   void init(FloatPortal fh) {
+   RFtoIFPortal freq_hop;
+   void init(RFtoIFPortal fh) {
       freq_hop = fh;
       weighted_round_robin(N/4-2,1,1,N/2,1,1,N/4-2);
       int k = 0;

@@ -258,16 +258,44 @@ further improves readability and decreases code size.
 
 \subsubsection{StreaMIT Approach}
 
+class CheckFreqHop extends SplitJoin {
+   FloatPortal freq_hop;
+   void init(FloatPortal fh) {
+      freq_hop = fh;
+      weighted_round_robin(N/4-2,1,1,N/2,1,1,N/4-2);
+      int k = 0;
+      for(int i=0; i<4; i++) {
+         if((i==0)||(i==2)) {
+            for(int j=0; j<2; j++) {
+               add(new Filter() {
+                  Channel input = new FloatChannel();
+                  Channel output = new FloatChannel();
+                  void work() {
+                     Float val = input.pop();
+                     if(val >= MIN_TRASHOLD) 
+                        freq_hop.set_freq(Freq[k], new TimeInterval(4*N, 6*N)); 
+                     output.push(val);
+                  }
+               });
+               k++;
+            }
+         } else
+            add(new Identity());
+      }
+      weighted_round_robin(N/4-2,1,1,N/2,1,1,N/4-2);
+   }
+}
+
 StreaMIT provides a dynamic messaging system for passing irregular,
 low-volume control information between filters and streams.  The key
 feature is a sophisticated timing system that allows filters to
-specify when a message will be received in terms of wavefronts of
-information.
+specify when a message will be received in terms of the ``wavefront''
+of data that it sees during the execution of its own work function.  
 
-Messages
-are sent from within the body of a filter's {\tt work} function,
-perhaps to change a parameter in another filter (see Figure
-??).  StreaMIT 
+
+Messages are sent from within the body of a filter's {\tt work}
+function, perhaps to change a parameter in another filter (see Figure
+??).  
 
 Message delivery is asynchronous in that a filter can continue to
 execute while the message is en route; however, StreaMIT provides a
