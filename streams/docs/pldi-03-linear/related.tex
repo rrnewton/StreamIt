@@ -43,18 +43,31 @@ generation and whole-program development.  In addition to ADE, other
 work on DSP algorithm development is surveyed
 in~\cite{oppenheim-symbolic}.
 
-A number of other programming languages are oriented around a notion
-of a stream (see \cite{survey97} for a survey.)  Synchronous languages
-such as LUSTRE~\cite{lustre}, Esterel~\cite{esterel92}, and
-Signal~\cite{signal} target the embedded domain, while languages such
-as Occam~\cite{occammanual}, SISAL~\cite{sisal} and StreamC~\cite{Rix98}
-target parallel and vector targets.  However, none of the compilers
-for these languages have coarse-grained, DSP-specific analyses such as
-linear filter detection.
+Karr~\cite{karr76} and Cousot and Halbwachs~\cite{cousot78} describe
+general methods for detecting linear relationships among program
+variables.  Karr maintains an affine representation (similar to ours)
+for each program variable, while Cousot and Halbwachs use a polyhedral
+model in which each dimension corresponds to a program variable.  For
+general programs, the analyses described by these authors is more
+general than ours.  In fact, the novelty of our linear dataflow
+analysis is in its specialization for the streaming domain.  Rather
+than tracking general relationships, we only track relationships to
+items on the input tape.  This restriction---in combination with the
+atomic, fine-grained nature of filter work functions---makes it
+feasible to symbolically execute all loops, thereby obtaining more
+precise linearity information.
 
-Note that the ``linear data flow analysis'' of Ryan~\cite{ryan92} is
-completely unrelated to our work; it aims to do program analysis in
-linear time.
+A number of other programming languages are oriented around a notion
+of a stream; see \cite{survey97} for a survey.  Also note that the
+``linear data flow analysis'' of Ryan~\cite{ryan92} is completely
+unrelated to our work; it aims to do program analysis in linear time.
+
+%% Synchronous languages such as LUSTRE~\cite{lustre},
+%% Esterel~\cite{esterel92}, and Signal~\cite{signal} target the embedded
+%% domain, while languages such as Occam~\cite{occammanual},
+%% SISAL~\cite{sisal} and StreamC~\cite{Rix98} target parallel and vector
+%% targets.  However, none of the compilers for these languages have
+%% coarse-grained, DSP-specific analyses such as linear filter detection.
 
 % Something should be said about other stream projects and their attempts at optimizations...
 % which I know very little about.
