@@ -1,0 +1,133 @@
+% -*-latex-*-
+% $Log: not supported by cvs2svn $
+% Revision 1.5  2002/10/04 19:52:01  Administrator
+% added acknowledgments. made one of the graphs have a real
+% short caption
+%
+% Revision 1.4  2002/10/04 14:37:47  Administrator
+% adding graphs, modified the files.
+%
+% Revision 1.3  2002/10/03 16:57:47  Administrator
+% adding figures for the thesis.
+%
+% Revision 1.2  2002/09/29 00:46:14  karczma
+% working on the constrained scheduling chapter.  changed the thesis format
+% a little to get it to do drafthead well.
+%
+% Revision 1.1.1.1  2002/08/03 21:24:01  karczma
+% Thesis start
+%
+% Revision 1.6  1999/10/21 14:49:31  boojum
+% changed comment referring to documentstyle
+%
+% Revision 1.5  1999/10/21 14:39:04  boojum
+% *** empty log message ***
+%
+% Revision 1.4  1997/04/18  17:54:10  othomas
+% added page numbers on abstract and cover, and made 1 abstract
+% page the default rather than 2.  (anne hunter tells me this
+% is the new institute standard.)
+%
+% Revision 1.4  1997/04/18  17:54:10  othomas
+% added page numbers on abstract and cover, and made 1 abstract
+% page the default rather than 2.  (anne hunter tells me this
+% is the new institute standard.)
+%
+% Revision 1.3  93/05/17  17:06:29  starflt
+% Added acknowledgements section (suggested by tompalka)
+%
+% Revision 1.2  92/04/22  13:13:13  epeisach
+% Fixes for 1991 course 6 requirements
+% Phrase "and to grant others the right to do so" has been added to
+% permission clause
+% Second copy of abstract is not counted as separate pages so numbering works
+% out
+%
+% Revision 1.1  92/04/22  13:08:20  epeisach
+\title{Constrained and Phased Scheduling of Synchronous Data Flow Graphs for StreamIt Language}
+
+\author{Michal Karczmarek}
+%\prevdegrees{M.A.Sc., University of Toronto, 2000}
+\department{Department of Electrical Engineering and Computer Science}
+% If the thesis is for two degrees simultaneously, list them both
+% separated by \and like this:
+% \degree{Doctor of Philosophy \and Master of Science}
+\degree{Master of Science in Computer Science and Engineering}
+\degreemonth{December}
+\degreeyear{2002}
+\thesisdate{\today}
+
+%% By default, the thesis will be copyrighted to MIT.  If you need to copyright
+%% the thesis to yourself, just specify the `vi' documentclass option.  If for
+%% some reason you want to exactly specify the copyright notice text, you can
+%% use the \copyrightnoticetext command.
+%\copyrightnoticetext{\copyright IBM, 1990.  Do not open till Xmas.}
+%\copyrightnoticetext{\copyright Michal Karczmarek, 2002}
+
+% If there is more than one supervisor, use the \supervisor command
+% once for each.
+\supervisor{Saman Amarasinghe}{Associate Professor}
+
+% This is the department committee chairman, not the thesis committee
+% chairman.  You should replace this with your Department's Committee
+% Chairman.
+\chairman{Arthur C. Smith}{Chairman, Department Committee on Graduate Students}
+
+% Make the titlepage based on the above information.  If you need
+% something special and can't use the standard form, you can specify
+% the exact text of the titlepage yourself.  Put it in a titlepage
+% environment and leave blank lines where you want vertical space.
+% The spaces will be adjusted to fill the entire page.  The dotted
+% lines for the signatures are made with the \signature command.
+\maketitle
+
+% The abstractpage environment sets up everything on the page except
+% the text itself.  The title and other header material are put at the
+% top of the page, and the supervisors are listed at the bottom.  A
+% new page is begun both before and after.  Of course, an abstract may
+% be more than one page itself.  If you need more control over the
+% format of the page, you can use the abstract environment, which puts
+% the word "Abstract" at the beginning and single spaces its text.
+
+%% You can either \input (*not* \include) your abstract file, or you can put
+%% the text of the abstract directly between the \begin{abstractpage} and
+%% \end{abstractpage} commands.
+
+% First copy: start a new page, and save the page number.
+\newpage
+% Uncomment the next line if you do NOT want a page number on your
+% abstract and acknowledgments pages.
+% \pagestyle{empty}
+\setcounter{savepage}{\thepage}
+\begin{abstractpage}
+\input{abstract}
+\end{abstractpage}
+
+% Additional copy: start a new page, and reset the page number.  This way,
+% the second copy of the abstract is not counted as separate pages.
+% Uncomment the next 6 lines if you need two copies of the abstract
+% page.
+% \setcounter{page}{\thesavepage}
+% \begin{abstractpage}
+% \input{abstract}
+% \end{abstractpage}
+
+\newpage
+
+\subsection*{Acknowledgments}
+
+I would like to thank my advisor for infinite patience and guidance. The {\StreamIt} team has been invaluable
+in both the research and writing. Bill Thies helped me with many initial ideas and literature search. Michael Gordon
+provided the best testing environment by writing the front end for our compiler and embedding the scheduler in his 
+RAW backend. David Maze contributed to the internal compiler framework, and help with our printing of program graphs.
+Jasper Lin hacked our compiler to no end. Chris Leger, Ali Meli, Andrew Lamb and Jeremy Wong wrote scores of
+applications which I could use for testing.
+
+I want to thank my officemates and friends for putting up with me and convincing me that there is an end to writing.
+They were right.
+
+Most importantly, I want to thank my all my family and friends, for helping me get here in the first place, 
+and providing constant support.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% -*-latex-*-

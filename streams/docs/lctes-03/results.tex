@@ -1,0 +1,207 @@
+\section{Results}
+\label{chpt:results}
+
+In this chapter we present results of creating schedules using
+techniques described in Chapters \ref{chpt:hierarchical} and
+\ref{chpt:phased}. No results are presented for latency
+constrained scheduling, as no applications have been written to
+exploit the usefulness of messaging.
+
+Section \ref{sec:results:apps} presents the applications used for
+testing.  Section \ref{sec:results:methodology} presents the
+methodology used for testing. Section \ref{sec:results:results}
+presents the results and analysis.
+
+\subsection{Applications}
+\label{sec:results:apps}
+
+Our benchmark suite contains 13 applications. Out of those
+applications, 11 represent useful practical computation taken from
+real-life applications, while two were chosen to highlight
+effectiveness of phasing scheduling.
+
+Nine test applications (bitonic sort, FFT, filter bank, FIR,
+radio, GSM, 3GPP, radar and vocoder) used are code-complete and
+perform the computations intended. Some results of compiling these
+applications can be found in \cite{Gordo02}.
+
+Two test applications (QMF and CD-DAT) are applications used in
+another publication on scheduling streaming applications
+(\cite{murthy99buffer}). The code inside of the {\filters} has not
+been implemented.
+
+The QMF application is a qmf12\_3d.  It had to be modified
+slightly to account for {\StreamIt} {\splitters} and {\joiners} not
+allowing any computation. The high-pass and low-pass filtering in
+the {\splitters} has been moved to just after data been separated
+into two channels. The re-combining of data in the {\joiners} has
+been moved to a {\filter} just after the {\joiners}. The low and high
+pass filters have also been given a peek amount of 16 so they can
+perform their function in the way intended in {\StreamIt}.
+
+CD-DAT is exactly the same application as that described in
+\cite{murthy99buffer}.
+
+The last two applications (SJ\_PEEK\_1024 and SJ\_PEEK\_31) are a
+synthetic benchmarks.
+
+Figures illustrating the layout of all of the applications are
+available in Appendix \ref{apx:apps}.
+
+
+\subsection{Methodology}
+\label{sec:results:methodology}
+
+The following data has been collected: number of nodes, number of
+node executions per steady state, schedule size and buffer size
+for pseudo single appearance and minimal latency schedules.
+
+\subsubsection{Schedule Compression}
+
+The size of schedules for minimal latency technique contains two
+numbers. The first one is an uncompressed schedule, while the
+second is a compressed schedule. During testing it was found that
+in some applications some streams had many phases that were
+identical to other phases of the stream. Instead of including
+these phases in the final schedule multiple, they were listed only
+once, and references to the duplicate phases have been replaced
+with references to their copies.
+
+This optimization lead to improvements in schedule size for two
+reasons. First, streams now had less phases, so their schedules
+took up less space. Second, applications using the phasing
+schedules could now execute the same phase multiple times in a
+row, which was optimized out using run length encoding.
+
+This compression has no negative effects on speed of execution,
+and never increases the size of a schedule. This compression has
+no effect on the pseudo single-appearance schedules, thus is not
+included in the results as a separate value.
+
+\subsubsection{Sinks}
+
+Any application in {\StreamIt} must receive its data from somewhere,
+and its data must be sent somewhere. {\filters} that perform these
+functions are called sinks and sources. In particular, sinks have
+the property of having $u_f = 0$ while sources have $e_f = o_f =
+0$. In other words, sinks do not push any data out and sources do
+not consume any data.
+
+Sinks are problematic for minimal latency scheduling purposes,
+because they do not produce any data. Remember that a minimal
+latency schedule will execute a bottom-most {\filter} of a {\pipeline}
+in every phase as many times as is necessary to produce some data.
+Since sinks do not produce any data, the sinks are executed their
+steady state number of executions. This leads to the minimal
+latency schedule of the outer-most {\pipeline} becoming a single
+appearance schedule, thus destroying some of the benefit of using
+phasing scheduling.
+
+This problem has been alleviated by detecting sinks at the end of
+a {\pipeline} and scheduling them in a unique way. Namely, a simple
+attempt is made to minimize the amount of storage necessary to
+store the phases of the {\pipeline}.
+
+Let the amount of storage necessary to store one data item in
+{\Input} {{\Channel}} to the sink be $x$, the amount of storage necessary
+to store a phase be $y$, the sink consume $a$ data per steady
+state execution of its parent {\pipeline} and $b$ be the number of
+phases of the parent pipeline, then we have that amount of storage
+necessary to store the phases and the buffer is
+$$ {ax \over b} + by $$ We want to minimize this amount, with $b$
+being the variable. We take a derrivative of the above expression,
+set it to zero and solve:
+
+\begin{displaymath}
+\begin{array}{rcl}
+-{ax \over b^2} + y & = & 0 \\
+yb^2 & = & ax \\
+b & = & \sqrt{ax \over y}
+\end{array}
+\end{displaymath}
+
+For simplicity, we set $x = y = 1$, thus obtaining that $b =
+\sqrt{a}$.
+
+Now, for every phase of the parent {\pipeline} of the sink, the sink
+is executed $\sqrt{a}$ times on the first step of scheduling a
+phase of the {\pipeline}.
+
+\subsection{Results}
+\label{sec:results:results}
+
+\begin{table} \centering \scriptsize
+\begin{tabular}{|c|c|c|c|c|c|c|c|}
+\hline benchmark & \parbox{0.5in}{\centering number of nodes} & \parbox{0.5in}{\centering number of node executions} & \multicolumn{2}{c|}{pseudo single appearance} & \multicolumn{3}{c|}{minimal latency} \\
+\cline{4-8} & & & \parbox{0.5in}{\centering schedule size} & \parbox{0.5in}{\centering buffer size} & \parbox{0.5in}{\centering schedule size} & \parbox{0.8in}{\centering compressed schedule size} & \parbox{0.5in}{\centering buffer size} \\
+\hline bitonic sort & 370 & 468 & 439 & 2112 & 448 & 448 & 2112 \\
+\hline CD-DAT & 6 & 612 & 7 & 1021 & 170 & 72 & 72 \\
+\hline FFT & 26 & 488 & 31 & 3584 & 31 & 31 & 3584 \\
+\hline filter bank & 53 & 312 & 166 & 2063 & 160 & 145 & 1991 \\
+\hline FIR & 132 & 152 & 133 & 1560 & 133 & 133& 1560 \\
+\hline radio & 30 & 43 & 58 & 1351 & 50 & 50 & 1351 \\
+\hline GSM & 47& 3356 & - & - & 724 & 78 & 3900 \\
+\hline 3GPP & 94 & 356 & 147 & 986 & 149 & 137 & 970 \\
+\hline QMF & 65 & 184 & 143 & 1225 & 132 & 122 & 1225 \\
+\hline radar & 68 & 161 & 100 & 332 & 100 & 100 & 332 \\
+\hline SJ\_PEEK\_1024 & 6 & 3081 & 11 & 7168 & 40 & 16 & 4864 \\
+\hline SJ\_PEEK\_31 & 6 & 12063 & 11 & 19964 & 250 & 24 & 12063 \\
+\hline vocoder & 117 & 415 & 172 & 1285 & 293 & 206 & 1094 \\
+\hline
+\end{tabular}
+\caption{Results of running pseudo single appearance and minimal
+latency scheduling algorithms on various applications.}
+\label{tbl:results}
+\end{table}
+
+\begin{figure}
+\centering \psfig{figure=kz-1.eps,width=6in} \caption[Buffer
+storage space savings of Phased Minimal Latency schedule vs.
+Hierarchical schedule.]{Buffer storage space savings of Phased
+Minimal Latency schedule vs. Hierarchical schedule. All data in
+all {\Channels} is assume to consume same amount of space.}
+\end{figure}
+
+\begin{figure}
+\centering \psfig{figure=kz-2.eps,width=6in} \caption[Storage
+usage comparison]{Storage usage for compressed Minimal Latency
+Phased schedule vs. Hierarchical schedule. Left bars are for
+Hierarchical schedules. Numbers are normalized to total storage
+required by Hierarchical schedule. Each entry in every schedule
+and data items in all {\Channels} are assumed to consume same
+amount of space.}
+\end{figure}
+
+Table \ref{tbl:results} presents buffer and schedule sizes
+necessary to execute various applications using the algorithms
+developed in this thesis.
+
+The GSM application cannot be scheduled using pseudo
+single-appearance algorithm, because it has a loop which is too
+tight for execution under the SAS.
+
+Several applications show a very large improvement in buffer size
+necessary for execution.  Namely, CD-DAT decreases from 1021 to
+72, a 93\% improvement. \cite{murthy99buffer} reports a buffer
+size of 226 after applying buffer merging techniques. Our
+improvement is due to reducing the combinatorial growth of the
+buffers using phasing scheduling.
+
+Our synthetic benchmarks decrease from 7168 to 4864 and from 19964
+to 12063, a 32\% and 40\% improvements. The first improvement is
+due to creating fine grained phases which allow the initialization
+schedule to transfer smaller amount of data and allow the children
+of the {\splitjoin} to drain their data before the {\splitter}
+provides them with more. This improvement is only created in
+presence of peeking. The second improvement is due to reducing
+combinatorial growth and due to finer grained schedules to deal
+with peeking.
+
+Other applications show no or little improvement in buffer
+requirements. As expected, no application requires more buffer
+space.
+
+It is interesting to note that the schedule sizes have decreased
+between the single appearance and compressed minimal latency
+phasing schedules. This is due to slightly different encoding
+technique of single appearance schedules.
