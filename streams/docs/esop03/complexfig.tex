@@ -138,11 +138,10 @@ num(n)-1]$:
 % two possible problems: read has already been written to, or buf has already been read from
 \begin{align}
 \label{buf2read0}
-&\forall (i,j,k) \in {{\cal D}\mt{1}}_{SB \rightarrow SR}(c,p,q):~~
-\mt{READ}_{c, p}(i,j,k) = 
-    \mt{BUF}_{c}(i,j*\mt{TotalRead}(n,c) + 
-                    \mt{PartialRead}(c,p) + k), \\
-&\mt{where }{{\cal D}\mt{1}}_{SB \rightarrow SR}(c,p,q) = {\cal D}_{{READ}_{c, p}}\\
+&\forall (i,j,k) \in {{\cal D}}_{{READ}_{c, p}}(c,p,q):~~
+\mt{READ}_{c, p}(i,j,k) = \\
+&~~~~~~\mt{BUF}_{c}(i,j*\mt{TotalRead}(n,c) + 
+                    \mt{PartialRead}(c,p) + k)
 %\end{align}
 %\begin{align}
 %
