@@ -1,20 +1,27 @@
 \section{A Band-Pass Filter}
 
+\begin{textpic}{\includegraphics{cookbook.3}}
 \begin{lstlisting}{}
-float->float pipeline BandPassFilter(float low, float high) {
+float->float pipeline BandPassFilter
+    (float low, float high) {
   add BPFCore(low, high);
   add Subtractor();
 }
-float->float splitjoin BPFCore(float low, float high) {
+float->float splitjoin BPFCore
+    (float low, float high) {
   split duplicate;
   add LowPassFilter(low);
   add LowPassFilter(high);
   join roundrobin;
 }
 float->float filter Subtractor {
-  work pop 2 push 1 { push(peek(0) - peek(1)); pop(); pop(); }
+  work pop 2 push 1 {
+    push(peek(0) - peek(1));
+    pop(); pop();
+  }
 }
 \end{lstlisting}
+\end{textpic}
 
 We implement a band-pass filter using two low-pass filters in a
 StreamIt structure called a \emph{split-join}.  This structure
