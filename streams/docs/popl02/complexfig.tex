@@ -98,14 +98,14 @@ equation (IWRITE to IBUF):
 \begin{align}
 &\forall i \in [A(c) + \mt{PartialWrite}(c,\mt{init},p), 
                A(c) + \mt{PartialWrite}(c,\mt{init},p+1)-1], \\ \nonumber
-&\mt{IBUF}_{c}(i) = \mt{IWRITE}_{c, p}(i - A(c) - \mt{PartialWrite}(c,\mt{init},p))
+&~~~~~~\mt{IBUF}_{c}(i) = \mt{IWRITE}_{c, p}(i - A(c) - \mt{PartialWrite}(c,\mt{init},p))
 \end{align}
 %
 \item For each $c \in \mt{chan\_out}(n)$, and for each $p \in [0,
 num(n, \mt{init})-1]$, introduce this equation (IREAD to IWRITE):
 %
 \begin{align}
-&\forall i \in {\cal D}_{{IWRITE}_{c, p}},~\mt{IWRITE}_{c,p}(i) = W(n, \mt{init}, p)(\mt{Init\_Inputs})[\mt{pos\_out}(n, c)][i] \\ \nonumber
+&\forall i \in {\cal D}_{{IWRITE}_{c, p}},~\mt{IWRITE}_{c,p}(i) = W(n, \mt{init}, p)(\mt{Init\_Inputs})[\mt{pos\_out}(n, c)][i], \\ \nonumber
 &\mt{where Init\_Inputs} = [\mt{IREAD}_{{chan\_in}(n)[1], p}(*), \dots, \mt{IREAD}_{{chan\_in}(n)[\mt{num\_in}(n)], p}(*) ]
 \end{align}
 %
@@ -113,8 +113,8 @@ num(n, \mt{init})-1]$, introduce this equation (IREAD to IWRITE):
 num(n, \mt{steady})-1]$, introduce this equation (SREAD to SWRITE):
 %
 \begin{align}
-&\forall (i, j, k) \in {\cal D}_{{SWRITE}_{c, p}},~\mt{SWRITE}_{c,p}(i,j,k) =\\\nonumber
-&W(n, \mt{steady}, p)(\mt{Steady\_Inputs})[\mt{pos\_out}(n, c)][k], \mt{where}\\\nonumber&
+&\forall (i, j, k) \in {\cal D}_{{SWRITE}_{c, p}},~\mt{SWRITE}_{c,p}(i,j,k) =\nonumber\\
+&~~~~~~W(n, \mt{steady}, p)(\mt{Steady\_Inputs})[\mt{pos\_out}(n, c)][k], \mt{where}\\\nonumber&
 \mt{Steady\_Inputs} = [\mt{SREAD}_{{chan\_in}(n)[1], p}(i, j, *), \dots, \mt{SREAD}_{{chan\_in}(n)[\mt{num\_in}(n)], p}(i, j, *) ]
 \end{align}
 %
@@ -123,10 +123,10 @@ num(n, \mt{steady})-1]$, introduce this equation (SREAD to SWRITE):
 introduce this equation (SWRITE to SBUF):
 \begin{align}
 &\forall (i,j) \in {\cal D}_{SW {\small \rightarrow} SB}(c,p,q),
-\mt{SBUF}_{c}(i,j) = \\
-&  \mt{SWRITE}_{c, p}(i, q,
+\mt{SBUF}_{c}(i,j) = \nonumber\\
+&~~~~~~\mt{SWRITE}_{c, p}(i, q,
                      j - \mt{Offset}_{SW {\small \rightarrow} SB}(q,n,c,p)),
-\mt{where } \nonumber\\&{\cal D}_{SW {\small \rightarrow} SB}(c,p,q) = 
+\mt{where } \\&{\cal D}_{SW {\small \rightarrow} SB}(c,p,q) = 
   {\cal D}_{{SBUF}_{c}} \cap 
   \{ (i,j) | \mt{Offset}_{SW {\small \rightarrow} SB}(q,n,c,p) \le j
              \le \mt{Offset}_{SW {\small \rightarrow} SB}(q,n,c,p+1) - 1 \} \nonumber\\\nonumber
@@ -183,10 +183,10 @@ SREAD):
 \begin{align}
 &\forall (i,j,k) \in {\cal D}_{IB {\small \rightarrow} SR}(n,c,p), 
 \mt{SREAD}_{c, p}(i,j,k) = 
-    \mt{IBUF}_{c}(\mt{ReadIndex}(n,c,p,i,j,k)), \mt{where} \\ \nonumber
+    \mt{IBUF}_{c}(\mt{ReadIndex}(n,c,p,i,j,k)), \mt{where} \nonumber\\
 &\mt{ReadIndex}(n,c,p,i,j,k) = \mt{TotalRead}(n,c,\mt{init})
                 + (i*S(n)+j)*\mt{TotalRead}(n,c,\mt{steady}) \\ \nonumber
-                &+ \mt{PartialRead}(c, \mt{steady}, p) 
+                &~~~~~~+ \mt{PartialRead}(c, \mt{steady}, p) 
                 + k) \\\nonumber
 &\mt{and }{\cal D}_{IB {\small \rightarrow} SR}(n,c,p) = 
   \{ (i,j,k) | \mt{ReadIndex}(n,c,p,i,j,k) \in {\cal D}_{{IBUF}_{c}} \}
@@ -201,17 +201,17 @@ these equations (SBUF to SREAD):
 &\forall (i,j,k) \in {{\cal D}\mt{1}}_{SB {\small \rightarrow} SR}(c,p,q),
 \mt{SREAD}_{c, p}(i,j,k) = 
     \mt{SBUF}_{c}(i+q+
-                  \mt{Int\_Offset}(n,c,p),\\ \nonumber
-                  &j*\mt{TotalRead}(n,c,\mt{steady}) + 
+                  \mt{Int\_Offset}(n,c,p),\nonumber\\ \nonumber
+                  &~~~~~~j*\mt{TotalRead}(n,c,\mt{steady}) + 
                     \mt{PartialRead}(c,\mt{steady},p) + k
-                   - q * \mt{Period}(c) + \mt{Mod\_Offset}(n,c,p)), \\ \nonumber
+                   - q * \mt{Period}(c) + \mt{Mod\_Offset}(n,c,p)), \\
 &\mt{where }{{\cal D}\mt{1}}_{SB {\small \rightarrow} SR}(c,p,q) = 
   ({\cal D}_{{SREAD}_{c, p}} - \mt{PUSHED}(n,c,p))
                          \cap \\ \nonumber
-	&\{ (i,j,k) | q * \mt{Period}(c) - min(0, \mt{Mod\_Offset}(n,c,p))
+	&~~~~~~\{ (i,j,k) | q * \mt{Period}(c) - min(0, \mt{Mod\_Offset}(n,c,p))
                                 \le k 
                                 \le \\ \nonumber
-	&min((q+1)*\mt{Period}(c),
+	&~~~~~~~~~~~~min((q+1)*\mt{Period}(c),
          E(c, \mt{steady}, p)) - 1 
          - max(0, \mt{Mod\_Offset}(n,c,p)) \}\\ \nonumber\\
 %\end{align}
@@ -219,18 +219,18 @@ these equations (SBUF to SREAD):
 %
 %
 &\forall (i,j,k) \in {{\cal D}\mt{2}}_{SB {\small \rightarrow} SR}(c,p,q),
-\mt{SREAD}_{c, p}(i,j,k) = \\ \nonumber
-    &\mt{SBUF}_{c}(i+q+
+\mt{SREAD}_{c, p}(i,j,k) = \nonumber\\
+    &~~~~~~\mt{SBUF}_{c}(i+q+
                   \mt{sign(Offset)} + \mt{Int\_Offset}(n,c,p),
-                  j*\mt{TotalRead}(n,c,\mt{steady}) + \\ \nonumber
-                    &\mt{PartialRead}(c,\mt{steady},p)
+                  j*\mt{TotalRead}(n,c,\mt{steady}) + \\\nonumber
+                    &~~~~~~~~~~~~\mt{PartialRead}(c,\mt{steady},p)
 		+ k
                    - q * \mt{Period}(c) 
                    - \mt{sign(Offset)} * \mt{Period}(c)
  + \mt{Mod\_Offset}(n,c,p)),\\ \nonumber&
 \mt{where }{{\cal D}\mt{2}}_{SB {\small \rightarrow} SR}(c,p,q) = 
   ({\cal D}_{{SREAD}_{c, p}} - \mt{PUSHED}(n,c,p)) \cap \\ \nonumber
-                         &( \{ (i,j,k) | q * \mt{Period}(c)
+                         &~~~~~~( \{ (i,j,k) | q * \mt{Period}(c)
                                 \le k 
                                 \le min((q+1)*\mt{Period}(c),
                                               E(c, \mt{steady}, p)) - 1 \} - {{\cal D}\mt{1}}_{SB {\small \rightarrow} SR}(c,p,q) )\\ \nonumber\\
@@ -238,14 +238,14 @@ these equations (SBUF to SREAD):
 %\begin{align}
 %
 %
-&\mt{where }\mt{PUSHED}(n,c,p) = {\cal D}_{IB {\small \rightarrow} SR}(n,c,p) \\ \nonumber
+&\mt{where }\mt{PUSHED}(n,c,p) = {\cal D}_{IB {\small \rightarrow} SR}(n,c,p) \nonumber\\ \nonumber
 &\mt{and }\mt{Num\_Pushed}(n,c,p) = 
 % this is a dot product of (i,j,k) with something
   (max_{\preceq}\mt{PUSHED}(n,c,p)) \cdot (S(n) * \mt{TotalRead}(n,c,\mt{steady}), \\ \nonumber
-                                        &\mt{TotalRead}(n,c,\mt{steady}),
+                                        &~~~~~~\mt{TotalRead}(n,c,\mt{steady}),
                                         1 ) + \mt{PartialRead}(c, \mt{steady}, p),
 \mt{and }\mt{PEEKED}(c,p) = {SB {\small \rightarrow} IR}(c,p) \\ \nonumber
-&\mt{and }\mt{Num\_Popped}(c,p) = |\mt{PEEKED}(c,p)| + O(c,\mt{steady},p) - E(c,\mt{steady},p) \\ \nonumber
+&\mt{and }\mt{Num\_Popped}(c,p) = |\mt{PEEKED}(c,p)| + O(c,\mt{steady},p) - E(c,\mt{steady},p) \\
 &\mt{and }\mt{Offset}(n,c,p) = \mt{Num\_Popped}(c,p)-\mt{Num\_Pushed}(n,c,p) \\ \nonumber
 &\mt{and }\mt{Int\_Offset}(n,c,p) = \mt{sign(Offset)}*\lfloor \frac{abs(\mt{Offset}(n,c,p))}{\mt{Period}(c)} \rfloor) \\ \nonumber
 &\mt{and }\mt{Mod\_Offset}(n,c,p) = \mt{sign(Offset)}*(abs(\mt{Offset}(n,c,p))~\mt{mod}~\mt{Period}(c))
@@ -257,4 +257,3 @@ these equations (SBUF to SREAD):
 \caption{Equations for the PCP to SARE translation.
 \protect\label{fig:pcptosare3}}
 \end{figure}
-
