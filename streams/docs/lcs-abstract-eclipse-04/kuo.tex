@@ -71,7 +71,7 @@ high-performance  systems such as  intelligent software  routers, cell
 phone base stations, and HDTV editing consoles.
 
 The  StreamIt  project  (see {\it www.cag.csail.mit.edu/streamit}  for  more
-information) provides natural language constructs and high-performance
+information) provides language constructs and high-performance
 compiler technology for modern  stream programming. It is designed for
 portability   across  machines   that  are   well-suited   for  stream
 processing,  including  the  emerging class  of  communication-exposed
@@ -109,12 +109,12 @@ counterpart that is easily edited  by a programmer.  As such, StreamIt
 affords modularity  and recursive program  definitions, whereby simple
 structures are composed to create large and complex graphs.
 
-The basic unit of computation in StreamIt is the {\tt Filter}, and the
-simplest construct  for filter  composition is the  {\tt Pipeline}---a
-sequential  composition of  filters.  In  addition, a  {\tt SplitJoin}
+The basic unit of computation in StreamIt is the {\tt filter}, and the
+simplest construct  for filter  composition is the  {\tt pipeline}---a
+sequential  composition of  filters.  In  addition, a  {\tt splitjoin}
 construct  is used  to specify  parallel streams  that diverge  from a
 common  splitter and  merge  into a  common  joiner. There  is also  a
-mechanism for introducing cycles in the graph via a {\tt FeedbackLoop}
+mechanism for introducing cycles in the graph via a {\tt feedbackloop}
 construct.
 
 % The  development  tool consists  of the following main components:
@@ -144,7 +144,7 @@ variables, including those within the communication channels.
 The  SDT largely relies  on the  exposed parallelism  and communication
 patterns to enable graphical application development and debugging. In
 the  context  of  the  latter,  the  ability  to  track  the  flow  of
-information along the  FIFOs---particularly within the {\tt SplitJoin}
+information along the  FIFOs---particularly within the {\tt splitjoin}
 construct---affords a frame of  reference for reasoning about ``time''
 when debugging parallel programs.
 
@@ -183,7 +183,7 @@ verify  the correctness  of StreamIt  applications?  We  are currently
 evaluating  various  options  for   conducting  a  set  of  controlled
 experiments  to   explicitly  quantify  the  SDT   impact  on  overall
 programmer productivity; we believe the advantages afforded by the SDT
-are significant when compared to conventional methodologies.
+are significant when compared to manually editing application source code.
 Second, we plan to thoroughly  evaluate the scalability of the SDT for
 massively  parallel  applications,   with  thousands  of  filters  and
 communication  edges.   In  particular,   we  would  like  to  explore
