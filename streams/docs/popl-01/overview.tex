@@ -422,54 +422,48 @@ high-volume data flow.
 \subsection{Re-Initialization}
 
 \subsubsection{StreaMIT Approach}
+
+One of the characteristics of a streaming application is the need for
+occaisional re-initialization of sub-regions of the stream graph.
+StreaMIT integrates re-initialization with its messaging model.  If a
+sender targets a message at the {\tt init} function of a stream or
+filter $S$, then when the message arrives, it re-executes the
+initialazation code and replaces $S$ with a new version of itself.
+However, the new version might have a different structure than the
+original if the arguments to the {\tt init} call on re-initialization
+were different than during the original initialization.
+
+When an init message arrives, it does not kill all of the data that is
+in the stream being re-initialized.  Rather, it {\it drains} the
+stream until the wavefront of information (as defined for the
+messaging model) from the top of the stream has reached the bottom.
+The draining occurs without consuming any data from the input channels
+to the re-initialized region.  Instead, a {\tt drain} function of each
+filter is invoked to provide input when its other input source is
+frozen.  (Each filter can override the {\tt drain} function as part of
+its definition.)  If the programmer prefers to kill the data in a
+stream segment instead of draining it, this can be indicated by
+sending an extra argument to the message portal with the
+re-initialization message.
+
 \subsubsection{Rationale}
 
+Re-initialization is a headache for stream programmers because--if
+done manually--the entire runtime system could be put on hold to
+re-initialize a portion of the stream.  The interface to starting and
+stopping streams could be complicated when there is not an explicit
+notion of initialization time vs. steady-state execution time.
+
+StreaMIT improves on this situation by abstracting the
+re-initialization process from the user.  Additionally, any
+hierarchical stream construct automatically becomes a possible
+candidate for re-initialization, due to the well-defined stream
+structure and the simple interface with the {\tt init} function.
+Finally, it is easy for the compiler to recognize stream
+re-initialization possibilities and to account for all possible
+configurations of the stream flow graph during analysis and optimization.
+
 \subsection{Realtime Constraints}
-
-\begin{verbatim}
-
----------------------------------------------------------------------------
-- integrated support for re-initialization sections of a stream
-- others:	
-	- ad-hoc halting of whole stream's data flow so that some
-		restructuring can take place
-		
-		- complicated programming to interface between the time of
-			reinitialization and starting/stopping the stream
-
-- us:
-	- re-invoke the original initialization routine with different 
-		parameters.
-
-		- talk about draining the pipeline.  the compiler
-                  worries about doing the reinitialization at the
-                  right time so that the re-initialized segment drains
-                  completely.  but the re-init message is delivered
-                  just like a message, and a warning is given if the
-                  message delivery schedule does not encompass a clean
-                  draining point.
-
-		- (alternatively, could destroy the pipeline.)
-
-		- so improvement #1 is that the interface to the user is 
-			cleaner.  Also it's easier for the compiler to 
-			analyze.
-
-		- improvement #2: very clear targets of
-			re-initiailization.  Can reinitialize any
-			block in the hierarchy in a very well-defined
-			way.
-
-		- improvement #3 is that the draining analysis is done
-                  automatically, which otherwise is very complicated
-                  for the programmer to deal with.
-
-- syntax presented:  special reset method
-
-\end{verbatim}
-
-
-
 
 
 
