@@ -44,7 +44,6 @@ scheduling. For a more detailed description of algorithms introduced
 here, see \cite{karczma-thesis}.
 
 \formatsection{Hierarchy}
-
 StreamIt introduces a novel concept of structure to streaming
 programming. The structures used by StreamIt programs map the
 flow of streaming data into simple to understand patterns. These
@@ -56,7 +55,6 @@ learn of its children's properties in order to produce a valid
 schedule. No global view of flow of data is required.
 
 \formatsection{Phased Scheduling}
-
 The dominant technique used for scheduling streaming programs is
 called Single Appearance Scheduling. In this technique, every
 node in the stream program appears only once in every schedule.
@@ -73,7 +71,6 @@ interleaved in order to produce schedules that are small, but do not
 require lots of data buffering.
 
 \formatsection{Scheduling Strategies}
-
 \begin{table} \centering \small
 \begin{tabular}{|c|c|c|c|c|c|c|c|}
 \hline benchmark & \parbox{0.5in}{\centering number of nodes} & \parbox{0.5in}{\centering number of node executions} & \multicolumn{2}{c|}{pseudo single appearance} & \multicolumn{3}{c|}{minimal latency} \\
@@ -116,7 +113,6 @@ by an average of 14.5\% on a variety of benchmarks, with a peak
 savings of 93\%.
 
 \formatsection{Future Work}
-
 The current results of our scheduling techniques are promising, but
 require much more work. We are planning on designing techniques which
 will be able to conform to hard constraints, such as very limited amount
