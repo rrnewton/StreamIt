@@ -1,0 +1,171 @@
+Immutable Iterators Spec
+Version 1.0
+---------------------------------------------------------------------------
+
+OVERVIEW
+
+This is the way that the immutable IR will work.  At some level, every
+construct in the IR is immutable.  However, to simplify the model for
+the programmer, we will allow a mutable programming interface to every
+IR construct that is finer grained than the stream constructs--i.e.,
+Filter, SplitJoin, Pipline, and FeedbackLoop (these will subsequently
+be referred to as "stream constructs" or "stream structures".)
+Memoization will be done at the level of stream constructs, which
+requires a set of iterators for stream constructs, and names for all
+transformations that are performed on stream constructs.
+
+IMMUTABLE HIGH-LEVEL INTERFACE
+
+Every stream construct is strictly immutable, meaning that a reference
+to a given stream construct is guaranteed to always have the same set
+of fields, methods, and child streams (if applicable.)  Thus, to
+obtain a modified stream structure, one calls a mutator with an
+iterator of the old stream construct, and obtains as the result an
+iterator that points at the new stream construct.  This brings us to
+iterators.
+
+ITERATORS
+
+The fundamental purpose of iterators is to add a context to a
+reference to a given immutable stream construct.  That is, since
+immutable constructs can be memoized, a given construct could have
+multiple parents in the tree.  However, an iterator has a unique set
+of parents that traces the position of the construct from the root to
+the position of its instantiation.  Thus, iterators have parents for
+advancing UP the tree, while the stream constructs themselves can have
+methods for going DOWN the tree (which the iterators can mirror, of
+course.)
+
+It was our design decision to also make iterators completely
+immutable.  Thus, iterators will not be "patched" when, for instance,
+their component stream changes.  However, there is a mutable element
+in our design, and that is the ROOT WRAPPER (called during discussion
+a "streamit program".)
+
+ROOT WRAPPER
+
+There is one root wrapper per stream tree.  The identity of the
+wrapper remains constant despite all additions / subtractions /
+deletions / modifications to the tree, and it keeps track of the
+current root of the tree.  In the event that the tree is merged with
+another (e.g. added to a low level of a different tree) then the
+low-level root wrapper will be annhilated in favor of the top-most
+root wrapper.  The root wrapper keeps track of it's version, such that
+any change to the tree results in new version tracking in the wrapper.
+
+All iterators hold a reference to the root wrapper that identifies the
+tree they are associated with.  Iterators also hold the version of the
+tree to which they apply.  By comparing the version of the iterator
+with that of the root wrapper, we can easily detect obsolete iterators
+when they are accessed.  This is the fundamental purpose of the root
+wrapper.
+
+MODIFYING PIPELINES, SPLITJOINS, FEEDBACKLOOPS
+
+The high-level stream constructs are strictly immutable.  This is to
+preserve some semblance of a clean, immutable programming model in
+cases where we think we can handle the complexity introduced as a
+consequence in our IR programming.
+
+MUTABLE LOW-LEVEL INTERFACE
+
+We like the idea of an immutable IR the whole way through to tiny IR
+elements like types and literals, but we think it'd complicate the
+programming model too much to have strict immutability the whole way
+down.  For instance, if you wanted to have both a handle on a for loop
+and the statements that you're iterating over in that loop, the for
+loop handle would go stale whenever you modified a component.  This
+would introduce either a lot of bugs or a lot of complexity... e.g. it
+makes it harder to write helper functions to do some sets of IR
+construction.
+
+So instead, all IR constructs have two stages:  they are created
+MUTABLE and are changed into IMMUTABLE by a call to finalize() (or
+setImmutable() or something.)  This is probably implemented with a
+field in the base class of the IR constructs.  So newly-created IR
+constructs are mutable.
+
+But to modify existing constructs, you need to CLONE the stream
+construct containing it.  Cloning will work as it currently does,
+duplicating everything within a given scope.  The stream constructs
+can be finalized() also to make everything they contain immutable.  We
+can't think of a great way to implement this, but it will probably
+just be with some kind of visitor that descends the whole way through
+and makes everything immutable.
+
+MEMOIZATION
+
+For the sake of memoization, all stream constructs must be "committed"
+to a global store once they have been finalized.  This is done with a
+name for the transformation that was applied to the construct, as well
+ast he identity of the original construct, and ALL PARAMETERS that
+could have affected the transformation.  The memoizer will then use
+this information to judge the "identity" of the committed construct,
+and will replace all future instances of this identity with the one
+being committed.  Thus it is critical that the name reflect the EXACT
+transformation applied -- all transformations must be functional, and
+not rely on global program state that could change between different
+transformations of the same base class.
+
+***************************************************************************
+
+Immutable Iterators Spec
+Version 0.9
+---------------------------------------------------------------------------
+
+The purpose of this architectural re-write is to provide a single framework
+within which we will manage traversing and modifying the StreamIt tree.  The
+main reason for doing this now is that we are having some major problems
+with memory leaks (mp3 overflows 1.8 GB of RAM) which are difficult to track
+down.  Immutable trees should alleviate any such problems.
+
+Immutability
+
+At the crux of the new system are immutable trees.  We haven't discussed in
+detail how deep the immutability will be (SIRFilter, Method, statement, etc)
+butit could be as deep as necessary.
+
+Modifications mechanism
+
+If the tree is immutable, then making changes will require making a new copy
+of the tree.  This is not as bad as it seems, because we can still reference
+the old, unmodified branches, so we only need to trace and rebuild the vine
+leading to the root.  Note, that every modification will result in a
+different (new) root!
+
+Reusability
+
+As an optimization, we want to introduce the idea of a 'type' and instance
+of a SIRStream.  The purpose of this is that for example in a program with
+many FIRFilters, we would like to only really keep one copy of the FIRFilter
+code, and use it for all instances.
+
+Iterators
+
+In order to traverse the tree we will need a uniform framework of iterators.
+These iterators will know how to traverse elements of their type.  (Details
+are to come - I have some prototype interfaces that will need to be
+implemented).  It will be up to the implementor's choice (guess Dave or
+Gordo) whether iterators will be a single type that will be able to traverse
+the entire tree, or if it will be many smaller types specialized toward a
+particular tree node type (SIRFilter vs SIRSplitJoin).
+
+An iterator points to a particular INSTANCE of a Stream.  One can request
+from the iterator its parent, and it will return an iterator that points to
+an INSTANCE of another stream (the actual instance parent of the original
+iterator).
+
+Memoization
+
+Any optimization we implement should be applied to a particular instance of
+a stream.  This includes even such things as propagating constants for
+variable initialization.  Doing this in a naive way will lead to creating
+multiple copies of the same stream type, when the same optimization is
+applied to multiple instances.
+
+For this purpose we will memoize results of an optimization on a stream
+type.  Every new (modified) type will receive a new name.  The name will
+reference the old type (by its name) and an optimization applied to it.
+Note, that this means that parents of a node X will get new names when X is
+modified, and that the new names will have to somehow specify that it was X
+that was modified and how.
