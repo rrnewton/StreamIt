@@ -1,0 +1,151 @@
+% Name your report <group>-<unique-name>.tex, (e.g., sls-jupiter.tex)
+% to avoid name collisions.  For \label{} entries within a file,
+% please use \<group>-<unique-name>-<your label} (e.g.,
+% \label{sls-jupiter-figure}), again to avoid name collisions.  There
+% is no need to use unique names with \cite{} since each report has
+% its own citation namespace.
+
+% You can also use \formattitle{Title}{Authors} to gain formatting
+% control (e.g., footnotes on author names or controlling line breaks
+% with \\) and \formatcontents{Title}{Authors}.  Since we did not need
+% such control, we simply used \formattitlecontents{Title}{Authors}
+% here.  Please do not put any special formatting in
+% \formattitlecontents or \formatcontents as this will disturb the
+% table of contents.
+
+\formattitlecontents
+{A Finite-State Transducer Representation of Phonological Rules}%
+{Lee Hetherington}
+
+% My own macros start with <group name><report name> to keep them
+% distinct from macros used in other reports.
+
+\newenvironment{slsilhrules}%
+  {\begin{center}\begin{tabular}{cccclc}}%
+  {\end{tabular}\end{center}}
+
+\newcommand{\slsilhrule}[4]{%
+  \{\textit{#1}\}&\textit{#2}&\{\textit{#3}\}&$\Rightarrow$&\textit{#4}&;\\}
+
+
+% Please use the following \formatsection entries unless they are
+% inappropriate: Introduction, Approach, Progress, Future, Research
+% Support.
+%
+% Do not put a blank line after a \formatsection, as this affects the
+% formatting.
+
+\formatsection{Introduction}
+In our SUMMIT speech recognition system, we have always used
+phonological rules to model pronunciation variability.  We use such
+rules to transform word phonemic baseforms to graphs of alternate
+pronunciations at the phonetic level.  These rules account for many
+different phonological phenomena such as place assimilation,
+gemination, epenthetic silence insertion, alveolar stop flapping, and
+schwa deletion.  These rules primarily depend on input-level phonemic
+context, but phonetic realizations may also depend on adjacent
+realizations.
+
+Kaplan and Kay \cite{Kaplan94} provide a comprehensive treatment of
+phonological rewrite rules where the target, replacement, left
+context, and right context are all regular expressions.  Mohri and
+Sproat \cite{Mohri96} present an alternative compilation of such rules
+that is more efficient, but each rule is still compiled into no less
+than five transducers, with the transducers for the individual rules
+composed together to implement the entire set of rules.  In this work
+we have formulated a simpler phonological rule system that we can
+compile into finite-state transducers (FSTs) much more efficiently.
+
+\formatsection{Approach}
+Our rules are of the form
+\begin{slsilhrules}
+  \slsilhrule{$\lambda_1\ldots\lambda_m$}{$\phi$}{$\rho_1\ldots\rho_n$}{$\psi$}
+\end{slsilhrules}
+Here the left and right contexts $\lambda$ and $\rho$, respectively,
+consist of the set of immediately adjacent phonemic contexts that must
+be satisfied in order for the rule to apply, transforming target
+phoneme $\phi$ to replacement phonetic realization $\psi$.  Here, only
+replacement is a regular expression.  Furthermore, if there is a set
+of rules with the same target phoneme $\phi$, only the \emph{first}
+that matches its context will fire.  Finally, our rules are batch
+rules in that all applicable rules are applied simultaneously across
+all input positions in one batch.  Rules are also obligatory, meaning
+that if a rule matches, the rule will be applied.  Altogether, this
+results in rule application that is deterministic.
+
+We also have the ability to place constraints on the realization of
+rules $\psi$ so that they can depend on the specific replacements of
+adjacent phonemes.  Consider the set of rules:
+\begin{slsilhrules}
+  \slsilhrule{}{d}{y}{dcl $($d $|$ jh$)$}
+  \slsilhrule{}{t}{y}{tcl $($t $|$ ch$)$}
+  \slsilhrule{d t}{y}{}{y $|$ $<$\{ch jh\}}
+\end{slsilhrules}
+Together, these rules can model the palatalization of the stops in
+``would you'' and ``hit you'' by mapping a phonemic sequence /d y/ to
+a phonetic realization [dcl jh], as well as the non-palatalized
+realization [dcl d y].  Here, $<$\{ch jh\} denotes an explicit
+reference to a phonetic realization [ch] or [jh] on the left.
+Similarly, the notation \{\ldots\}$>$ can be used to specify a surface
+phonetic constraint on the right.  See
+Figure~\ref{sls-ilh-rules-figure} for a graphical depiction of the
+effect of phonological rule application on the phrase ``would you.''
+
+To compile our phonological rules into a transducer $P$, we factor it
+into three component transducers such that $P = I \circ R \circ S$.
+$I$ enforces input contextual constraints and outputs the particular
+rule to apply to each input symbol.  $R$ performs replacement for each
+particular rule.  Finally, $S$ enforces surface contextual constrains
+such as those specified with the $<$\{\ldots\} and \{\ldots\}$>$
+notation.  Please see \cite{Hetherington01} for a complete description
+of the rule compilation algorithm.
+
+\formatsection{Progress}
+Within our SUMMIT recognition system, we currently use about 200
+phonological rules to map from baseform phonemic pronunciations to a
+variety of allowable phonetic realizations.  We have 63 phonemic input
+symbols, with variations including deletable stop releases, flappable
+stops, and silence.  The rules output 71 phonetic output symbols.
+Compiling these rules takes about 2.0s on an 866MHz Pentium III and
+produces a minimized transducer P containing 294 states and 21,009
+transitions.  After compilation, these rules can be applied very
+rapidly to a lexicon.  This new phonological rule application system
+is about 100 times faster than our previous, non-FST-based approach.
+
+\formatsection{Future}
+In the future, we plan to train probabilities on the various
+phonological rule realizations.  We will most likely use the EM
+algorithm starting from a set of phonetically and orthographically
+labelled training utterances.
+
+\formatsection{Research Support}
+This research was supported by DARPA under Contract N66001-99-1-8904
+monitored through the Naval Command, Control, and Ocean Surveillance
+Center.
+
+% Please use \includegraphics to include Encapsulated PostScript figures.
+
+\begin{figure}
+\includegraphics[width=\textwidth]{sls-ilh-rules.eps}
+
+\caption{The graph of possible phonetic realizations produced by
+	applying our phonological rules to the word sequence
+	``would you'' with phonemic pronunciations
+	/w uh d y (uw $|$ ax)/.}
+\label{sls-ilh-rules-figure}
+\end{figure}
+
+% Although the use of BibTeX is highly recommended, you can manually
+% format your references as follows:
+%
+% \begin{thebibliography}{1}
+%
+% \bibitem{Zue00}
+% V.~Zue, S.~Seneff, J.~R. Glass, J.~Polifroni, C.~Pao, T.~J. Hazen, and
+% L.~Hetherington, ``\textsc{Jupiter}: A telephone-based conversational
+% interface for weather information,'' \textit{IEEE Transactions on
+% Speech and Audio Processing}, vol. 8, no.  1, pp. 85--96, Jan. 2000.
+% 
+% \end{thebibliography}
+
+\bibtex{sls-ilh}
