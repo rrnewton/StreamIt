@@ -1,103 +1,46 @@
 \section{Optimizations}
-The goal of linear analysis and combination is to allow us to do optimizations
-that are hard to formulate in imperative languages. For example, combining the action
-of {\tt Streams} in a {\tt Pipeline} is equivalent to doing algebraic simplification across
-sequential loops. Combining the action of {\tt Streams} in a {\tt SplitJoin} is equivalent
-to combining the action of multiple inner loops of a larger enclosing loop.
+Linear analysis is good because it gives us precise relationships between input and output   
+that are hard to discern from normal imperative languages. For example, combining the action
+of {\tt streams} in a {\tt pipeline} is equivalent to doing algebraic simplification across
+sequential loops. 
 
-Also, as our linear analysis framework gives us a complete compile time formulation of the 
-computation that a {\tt Stream} is doing, we can exploit well known domain specific optimizations
-such as implementing discrete time convolution using the discrete Fourier transform (DFT). 
- 
-
-
-\subsection{Algebraic Simplification from Combination}
-One result of combining linear representations in {\tt Pipelines} in the stream graph is that  
-the compiler can perform algebraic simplification {\textbf across} the execution of {\tt Streams}. 
-If the compiler simply replaces the {\tt Pipeline} structure with a {\tt Filter} that 
-directly computes the overall vector matrix product, performance can be significantly improved.
-For instance, instead of implementing a band pass filter as a back to back combination
-of a low pass filter and a high pass filter, a clever programmer could determine the coefficients 
-of a single FIR filter back to back in a pipeline. However, given the ubiquity of high and 
-low pass filters, it is typically more convenient to understand and implement the action
-of a bandpass filter as a the two separate pieces.
-
-Another example of a processing block which is implemented in a different way than
-usually represented is a FIR filter followed by a compressor block 
-(see \cite{oppenheim-discrete}) decimates the input by a factor $M$ (eg only every $M$th 
-input sample is passed on to the output filter). 
-Obviously there is no need to calculate all of the outputs. 
-Instead you should only calculate every $M$th sample.
-Therefore, we end up with an FIR {\tt Filter} that pops $M$ instead of poping one. While
-this is a transformation that is certainly worth doing (it reduces the computational
-requirements by a factor of $\frac{M-1}{M}$ the system is almost always represented
-as a filter followed by the compressor in system design diagrams. The inefficient
-implementation is represented because it is easier to understand the operation of the
-two fundamental processing blocks in cascade than it is to understand the combined system.
-Given the linear representations for both blocks, when such a pipeline is combined into an
-overall representation the efficient implementation is automatically derived. Therefore,
-our compiler with the linear analysis can perform the transformation automatically, 
-letting the programmer express the system in the most natural way (separate filter and compressor).
-
-Another example is a multi band equalizer (such as is found in the FMRadio benchmark). 
-The overall purpose of such an equalizer is to filter $N$ different frequency bands 
-separately (like the graphic equalizer found on stereos). 
-The system diagram that best describes the operation of the multi band equalizer
-passes the input signal though the $N$ different filters, and then combines the $N$
-different outputs into the final output signal.
-This obvious design calls for $N$ filters, but if the filters do not vary with time, 
-a single filter which has the overall response that matches the action of all the 
-different individual filters. However, designing this single combined filter is 
-difficult, and subsequent changes to any of the sub filters will necessitate a
-redesign of the overall filter. Ideally, the designer would specify the system as
-the combination of multiple filters and then let the compiler combine them. 
-This automatic combination can is exactly what happens as a result of combining
-linear representations as described above. Because the linear analysis can
-figure out what is happening across the execution of multiple sub components, 
-it can do implementation optimizations that normally must be done by hand.
+Also, as our linear analysis framework provides a compile time formulation of the 
+computation that a linear {\tt stream} is performing, we can also exploit well known 
+domain specific optimizations and transformations. We have implemented one such optimization
+whihc is implementing convolution using the discrete Fourier transform (DFT). 
 
 
 \subsection{Frequency Implementation}
 There is a wealth of knowledge about DSP implementation optimizations. One in
 particularly wide use and of wide applicability is calculating a convolution sum 
-using the discrete Fourier transform. Calculating a convolution sum is a fundamental
-operation in discrete time signal processing as it allows one to calculate the output
-of an LTI system given its response to single initial impulse.
+using the DFT. Calculating a convolution sum is a fundamental
+operation in discrete time signal processing as it describes how to compute the
+output of a linear time invariant (LTI) system from its inputs\cite{oppenheim-discrete}.
 
-For our compiler, if a {\tt Stream} is implementing an FIR digital filter as a direct 
-convolution sum (eg it is calculating exactly $\sum_{i=0}^{N-1}a_{i}x[i]$ for each output)
-we can automatically improve its performance by moving the calculation to the frequency
-domain. 
+$y[n]=\sum_{k=-\infty}^{\infty}x[k]h[n-k]$ is a convolution sum. 
+$h[n]$ for $n\in[0..L-1]$ are compile time known constants, a frequency transformation
+using the DFT can be employed to quickly calculate $y[n]$. 
+The transformation from convolution sum into a frequency implementation is currently
+done explicity by the programmer because it is difficult for traditional compilers 
+to determine that a convolution sum is being computed and which program variables
+correspond to $x[n]$, $h[n]$ and $y[n]$.
+
+However, for StreamIt {\tt streams} we know that the input ($x[n]$) and output ($y[n]$)
+correspond exactly to our input and output tapes. Furthermore, our linear representation
+gives us exactly the values $h[n]$ which are the values in the columns of $A$. A filter
+$F$ that is calculating a convolution will have $o_F=1$.
 
 The mathematics of transforming convolution in time to a multiplication in frequency 
-is well understood. The main idea is that it requires fewer calculations to transform
-the input signal to a different basis, do a multiplication, and then convert back 
-to time than it does to do the convolution directly . This sequence is faster because 
-fast algorithms collectively known as FFT are known that efficiently convert transform
-signals to different bases. For a thorough treatment of the theory, see
-\cite{oppenheim-discrete}.
+is well understood. It often requires fewer calculations to transform
+the input signal to the frequency domain, do a multiplication, and then convert back 
+to time than it does to do the convolution directly. This seeming roundabout calculation
+is feasible because fast algorithms are known that convert to frequency and back,
+which are collectively known as the FFT. For a thorough treatment of the theory of
+the DFT and FFT, see \cite{oppenheim-discrete}.
 
-\begin{figure}
-\center
-\epsfxsize=2.0in
-\epsfbox{images/frequency-conversion-convolution.eps}
-\caption{A filter directly implementing the convolution sum.}
-\label{fig:frequency-conversion-convolution}
-\end{figure}
 
-\begin{figure}
-\center
-\epsfxsize=2.0in
-\epsfbox{images/frequency-conversion-frequency.eps}
-\caption{A filter computing the convolution in the frequency domain.}
-\label{fig:frequency-conversion-frequency}
-\end{figure}
-
-Given our linear analysis information, we can recognize filters that are
-computing convolution sums and we can take advantage of the frequency transformation 
-outlined above. We define an FIR filter as a {\tt Stream} that uses $M$ input elements,
-consumes $1$ input element and produces $1$ output item per {\tt work} function execution.
-We can transform such an FIR {\tt Stream} such that it uses and consumes $N+M-1$ input
+We define an filter computing a convolution sum as a FIR filter. An FIR filter $F$ has
+$e_F=M$, $o_F=1$ and $u_F=1$. To transform $F$ such that it uses and consumes $N+M-1$ input
 elements to produce $N+M-1$ outputs per {\tt work} function execution. We use the 
 following notation in the rest of this section to remain consistent with DSP terminology.
 $h[n]$ is the filters ``impulse response'' and consists of the values in the linear 

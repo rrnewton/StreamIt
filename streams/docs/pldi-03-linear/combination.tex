@@ -43,7 +43,7 @@ The rates of $F'$ are $e_{F'}=e_F + (f-1)o_F$, $o_{F'}=fo_F$, and $u_{F'}=fu_F$.
 \center
 \epsfxsize=3.0in
 \epsfbox{images/expanding-a-matrix.eps}
-\caption{Expanding a linear form $(A,b)$ by a factor $f$}
+\caption{Expanding a linear form by factor $f$.}
 \label{fig:expanding-a-matrix}
 \vspace{-12pt}
 \end{figure}
@@ -52,7 +52,7 @@ Thus the linear form of $F'=expand(F, f)$ describes the formula for computing
 exactly $fu_F$ output elements from $e_F + (f-1)o_F$ input elements.
 Figure~\ref{fig:expanding-a-matrix} shows the result of expanding the linear 
 form $lf = (A,b)$ by a factor $f$ such that $lf' = expand(lf, f) = (A',b')$. 
-$A'$ is created by starting with a zero matrix with $e_F+(f-1)*o_F$ rows 
+$A'$ is created by starting with a zero matrix with $e_F+(f-1)o_F$ rows 
 and $fu_F$. $A$ is then copied $f$ times along the
 diagonal. Starting at the top left, each copy of $A$ is offset from the previous copy 
 by $u_F$ columns and $o_F$ rows. To expand the constant vector $b$ to $b'$ we 
@@ -72,32 +72,34 @@ create a row vector with $fu_F$ rows containing $f$ adjacent copies of $b$.
 Serial combinations of {\tt streams} are formed with {\tt pipelines}.
 Combining a {\tt pipeline} with an arbitrary number of linear forms can be accomplished 
 by continually combining adjacent pairs until a single linear form remains. 
-The method for combining a single pair of linear forms, $lf_1=(A,b)$ and $lf_2=(C,d)$ follows
+The method for combining a single pair of linear forms, $l_1=(A_1,b_1)$ and $l_2=(A_2,b_2)$ follows
 directly from the equations relating the inputs and the outputs of the 
-two linear forms. Defining our notation: $lf_1$ takes $x$ as input and produces 
-$y_1[n]$ as output. $lf_2$ inputs $y_1$ and produces $y_2$ as output. 
-Using our linear input to output equations from above, $y_1 = xA + b$ 
-and $y_2 = y_1C + d$. Combining the two previous equations, it is clear 
-that $y_2 = xAC + (bC + d)$  which corresponds to a new linear form $lf'=(AC, bC+d)$
-that takes $x$ directly to $y_2$.
+two linear forms. Defining our notation: $l_1$ takes $x$ as input and produces 
+$y_1[n]$ as output. $l_2$ inputs $y_1$ and produces $y_2$ as output. 
+Using our linear input to output equations from above, $y_1 = xA_1 + b_1$ 
+and $y_2 = y_1A_2 + b_2$. Combining the two previous equations, $y_2 = xA_1A_2 + (b_1A_2 + b_2)$ 
+which corresponds to a new linear form $l'=(A_1A_2, b_1A_2+b_2)$ which computes
+$y_2$ directly from $x$.
 
-Because the expressions for $lf'$ are matrix equations, the dimensions of 
-$A$ and $C$ might not be compatible for general programs.
+Because the expressions for $l'$ are matrix equations, the dimensions of 
+$A_1$ and $A_2$ might not be compatible for general programs.
 The problem of incompatible matrix sizes is the same problem of scheduling execution 
 such that the first {\tt stream} produces enough data for the second {\tt stream} 
 to read. To make the dimensions match up, we use the $expand$ operation. We choose
-expansions factors $f_1$ and $f_2$ such that $lf_1' = expand(lf_1,f_1) = (A',b')$ and 
-$lf_2' = expand(lf_2,f_2) = (C',d')$. Once we have determined $f_1$ and $f_2$ such 
+expansions factors $f_1$ and $f_2$ such that $l_1' = expand(l_1,f_1) = (A_1',b_1')$ and 
+$l_2' = expand(l_2,f_2) = (A_2',b_2')$. 
+The equation $f_1u_{l_1}$ = $e_{l_2} + (f_2-1)o_{lf_2}$ must hold, where $u_{lf_1}$, $e_{lf_2}$, and $o_{lf_2}$
+are program defined. For most pairs of linear forms encountered in real programs, 
+there are multiple pairs of $f_1$ and $f_2$ that satisfy the constraint, from which
+we choose the smallest.
+
+
+Once we have determined $f_1$ and $f_2$ such 
 that we can multiply $A'C'$, we are guaranteed the be able to multiply $b'C'$.
 
 Figure~\ref{fig:combining-pipeline} shows graphically the process of expanding
 two linear forms in a {\tt pipeline} so that they can be combined into a single linear filter.
 
-To multiply $A'C'$, the equation
-$f_1u_{lf_1}$ = $e_{lf_2} + (f_2-1)o_{lf_2}$ must hold, where $u_{lf_1}$, $e_{lf_2}$, and $o_{lf_2}$
-are program defined. For most pairs of linear forms encountered in real programs, 
-there are multiple pairs of $f_1$ and $f_2$ that satisfy the constraint, from which
-we choose the smallest.
 
 However, in general problems, this constraint is not always satisfiable. For instance if
 $u_{lf_1}=2$, $e_{lf_2}=3$ and $o_{lf_2}=2$, there are pair of integers $f_1$ and $f_2$ to 
@@ -133,18 +135,9 @@ $w_1$ elements are taken from the second leftmost {\tt stream} and so on.
 Again, the process repeats itself after one complete set of $\sum_{k=0}^{N-1} w_k$ 
 elements has been pushed.
 
-\begin{figure}
-\center
-\epsfxsize=3.0in
-\epsfbox{images/splitjoin-combine.eps}
-\caption{Combining a {\tt splitjoin}.}
-\label{fig:splitjoin-combine}
-\vspace{-12pt}
-\end{figure}
-
 If we know that all subcomponents of a {\tt splitjoin} 
 have linear representations, then we can describe the action of the entire {\tt splitjoin} 
-with a single linear representation as is shown in Figure~\ref{fig:splitjoin-combine}.
+with a single linear representation.
 {\tt splitjoin}s containing all linear components are not as infrequenct as they might seem -- 
 most {\tt splitjoin} sub {\tt streams} often perform very similar computations, so when one 
 is linear there is a high probability that all linear.
@@ -166,7 +159,7 @@ a roundrobin splitter {\tt splitjoin} into a duplicate splitter {\tt splitjoin}.
 \center
 \epsfxsize=3.0in
 \epsfbox{images/splitjoin-duplicate-ratematch.eps}
-\caption{Expanding sub {\tt Streams} to match their output rates in a linear {\tt SplitJoin}.}
+\caption{Expanding sub {\tt streams} to match their output rates in a linear {\tt SplitJoin}.}
 \label{fig:splitjoin-duplicate-ratematch}
 \end{figure}
 
@@ -175,90 +168,76 @@ The operations for the constant vector $a$ occur in a very similar way.
 
 Each row in the matrix $A$ of a linear form corresponds to the
 weight associated with a particular input item. For a duplicate splitter,
-the same rows in the matrices of each of the sub {\tt streams} correspond to the same
-input as long as each linear form has the same number of rows becasue the same data items 
-are being used by each sub {\tt stream}.
+the same rows in the sub matrices correspond to the same
+input so long as the number of rows in the sub matries are the same.
 
-We wish to produce an overall representation by simply determining the correct 
-ordering the columns of the sub {\tt stream}' linear representations. In order to
-do this, we need to ensure that the number of rows in each sub {\tt Stream} is the same.
-We are also faced with the additional constraint that the total number of columns 
-from all the sub linear representations must equal some multiple of the sum of the
-joiner weights $\sum_{i=0}^{N-1}v_i$. In order to correctly describe the calculation
-of the overall {\tt SplitJoin} with a linear representation, we need to figure out 
-how the overall output is related to the overall input. We can't fully describe the
-the transformation from output to input if we don't model an integer number of overall
-executions, which means that all the sub pieces (splitter, joiner, and {\tt Streams})
-need to execute an integer number of times.
+We wish to produce an overall representation by determining the correct
+ordering the columns of the sub {\tt stream}' linear representations. We
+need the number of rows to be the same, the total number of columns 
+from all the sub matrices to equal some multiple of $\sum_{i=0}^{N-1}w_i$
+and we need all of the sub linear forms to have the same $o$. 
 
-We want to ensure that we ``run'' the joiner an integer number of times so that it 
-consumes exactly the number of items produced by an integer number of firings of
-each sub {\tt Stream}. Therefore we might need to expand the sub {\tt Streams}
-to make the rates work out.
+If the joiner is ``run'' an integer number of times it needs to consume in aggregate
+the exact number of items produced by an integer number of firings of
+each sub {\tt stream}. To guarantee that there are never any ``spare'' columns,
+we expand each of the sub {\tt streams} $F_i$ by a factor $f_i$.
 
-We let $x=lcm(\forall k, lcm(push(F_k),w_k))$, eg the
-$lcm$ of the $lcm$s of the push rates and the joiner weights.
-$x$ can be interpreted as the total number of elements that will be 
-produced by the expanded {\tt SplitJoin} for one overall firing.
-We then expand {\tt Stream} $S_i$ by a factor $f_i$ to produce $S''_i$.
-We can see that $f_i=\frac{x}{push(F_i)}$ implying that the expanded {\tt Stream} $S''_i$ will
-produce $f_i*push(S_i)$ items, and it will take exactly $f_{w_i}=\frac{x}{w_i}$ firings of the 
-joiner, with each of the firings consuming $w_i$ elements, to consume all $f_{i}push_{S_i}$ items.
-It is important to note that in order for the {\tt SplitJoin} to be valid in StreamIt
-(eg have a schedule that does not require infinite buffer space, see \cite{karczma-thesis} for
-all of the the gory details) all of the $f_{w_i}$'s must be equal, and we call this value $f_w$.
-Figure~\ref{fig:splitjoin-duplicate-ratematch} depicts the process described above graphically for
-expanding the sub {\tt Streams} so that their rates are matched.
+Let $x=lcm(\forall k, lcm(u_{F_k},w_k))$, which is the $lcm$ of the $lcm$s of 
+the push rates and the joiner weights. $x$ is the total number of elements that 
+produced by a {\tt splitjoin} whose output is the same as the original but each 
+of its sub {\tt streams} can be executed an integer number of times so that 
+the joiner executes an integer number of times.
+
+Therefore the appropriate expansion factors are  $f_i=\frac{x}{u_{F_i}}$ 
+$F''_i = expand(F_i,f_i)$ will produce $f_i*u_{F_i}$ items, and it will take 
+exactly $f_{w_i}=\frac{x}{w_i}$ firings of the 
+joiner (each of which consumes $w_i$ elements), to consume all $f_iu_i$ items produced by $F''_i$.
+It is important to note that we require that the {\tt splitjoin} does not need
+infinite buffer space to schedule see \cite{karczma-thesis} for an explination of schedules. 
+For valid {\tt splitjoin}s $f_w=f_{w_i}$ is constant for all $i$. We also require that $o=o_{F''_i}$
+constant for all $i$. Figure~\ref{fig:splitjoin-duplicate-ratematch} depicts the 
+combination process graphically.
 
 \begin{figure}
 \center
 \epsfxsize=3.0in
 \epsfbox{images/splitjoin-duplicate-matrix.eps}
-\caption{Matrix resulting from combining a {\tt SplitJoin} with rate matched sub {\tt Streams}.}
+\caption{Matrix resulting from combining a {\tt splitjoin} of rate matched sub {\tt streams}.}
 \label{fig:splitjoin-duplicate-matrix}
 \end{figure}
 
 After the rates are matched as described above, we are guaranteed to have the same number of rows
-in each of the expanded sub {\tt Streams} representations. In order to construct the overall matrix,
-$A'''$, all that remains is to order the columns of the expanded representations appropriately. 
-First we create $A'''$ which has $peek_{S''_i}$ rows (which is the same for all $S''_i$ because 
-of the above machinations) and has $f_w(\sum_{i=0}^{N-1}w_i)$ columns. Next, we know that 
-the first $w_1$ output elements of the overall {\tt SplitJoin} will be the first $w_1$ output elements
-from $S''_1$. Therefore we place the $w_1$ rightmost columns of $A'_1$ as the $w_1$ rightmost 
-columns of $A'''$. We then place the $w_2$ rightmost columns of $A'_2$ into the next $w_2$ columns 
-of $A'''$, and so forth. When we have placed $\sum_{i=0}^{N}w_{i}$ (the number of outputs resulting from 
-executing the joiner once completely), we start the process again from the beginning, taking the remaining
-right most $w_1$ columns from $A'_1$, etc. until all of the columns from the expanded representations have
-been fitted into the overall linear representation. Figure~\ref{fig:splitjoin-duplicate-matrix} 
-graphically depicts the process of creating $A'''$ from the smaller $A'_i$s.
+in each of the expanded sub representations. To construct the overall matrix, $A'''$, 
+all that remains is to order the columns of the expanded representations appropriately. 
+First we create $A'''$ which has $e_{F''_i}$ rows (which is the same for all $i$) and has 
+$f_w(\sum_{i=0}^{N-1}w_i)$ columns. 
+%We know that the first $w_0$ output elements of the overall {\tt splitjoin} will be the first $w_0$ output elements from $F''_1$. 
+We place the $w_0$ rightmost columns of $A''_0$ as the $w_0$ rightmost 
+columns of $A'''$. We then place the $w_1$ rightmost columns of $A''_1$ into the next $w_1$ columns 
+of $A'''$, and so forth. When we have placed $\sum_{i=0}^{N-1}w_{i}$ (the number of outputs resulting from 
+completly executing the joiner once), we start the process again from the beginning (taking the remaining
+rightmost $w_0$ columns from $A''_0$, etc) until all of the columns from the expanded representations have
+been fitted into $A'''$. Figure~\ref{fig:splitjoin-duplicate-matrix} graphically depicts the process of 
+creating the overall $A'''$ from the smaller $A''_i$s.
 
 
 
 \subsubsection{Roundrobin Splitter}
 
-\begin{figure}
-\center
-\epsfxsize=3.0in
-\epsfbox{images/splitjoin-roundrobin-to-duplicate.eps}
-\caption{Converting a {\tt SplitJoin} with a roundrobin splitter to a {\tt SplitJoin} with a duplicate splitter.}
-\label{fig:splitjoin-roundrobin-to-duplicate}
-\end{figure}
+In the case of roundrobin splitters, data is directed to the various sub {\tt streams} 
+according to weights $v_i$: the first $v_0$ input elements are directed to $F_0$, the next
+$v_1$ elements are directed to $F_1$, etc. If the sub {\tt streams} are
+all linear, we can determine an overall linear representation given the same
+assumptions of finite buffer requirements, and uniform $o_i$.
+Our strategy is to transform the splitter from roundrobin to duplicate by
+modifying the sub {\tt stream}s' linear representations. 
 
-For {\tt SplitJoin}s that have roundrobin splitters, data is directed to the various sub {\tt Streams} 
-according to weights $v_i$. The first $v_1$ input elements are directed to {\tt Stream} $S_1$, the next
-$v_2$ elements are directed to {\tt Stream} $S_2$, etc. If the {\tt SplitJoin}'s sub {\tt Streams} are
-all linear, we can determine an overall linear representation, though it takes some massaging to
-get things right. The overall strategy is to transform the splitter from roundrobin to duplicate, 
-and modify the sub {\tt Streams}' linear representations accordingly. 
-
-To accomplish this task, each of the sub {\tt Streams} is first expanded to match output rates rates 
-as described above and shown in Figure~\ref{fig:splitjoin-duplicate-ratematch}. 
-After each of the {\tt Streams}' linear representation has been expanded to $S'_i$, the number of
-columns is correct for column combination as described above. However, because the splitter is a 
-roundrobin and not a duplicate, the rows of the expanded representations' matrices do not represent the
-same input elements. That the rows don't represent the same data is obvious because each {\tt Stream} 
-doesn't see any of the data directed to the other {\tt Streams}. Therefore simply copying columns 
-as described above isn't going to produce a correct overall linear representation. 
+Because the splitter is a roundrobin and not a duplicate, the same rows of the sub 
+{\tt stream}s' representation matrices do not represent the same input elements 
+even when the sub {\tt stream}s' representations are the same size. 
+The same rows don't represent the same data because each {\tt stream} 
+doesn't see any of the data directed to any other {\tt stream}. Therefore simply 
+arranging columns as described above will not produce a correct overall linear representation. 
 
 \begin{figure}
 \center
@@ -268,16 +247,17 @@ as described above isn't going to produce a correct overall linear representatio
 \label{fig:splitjoin-roundrobin-matrix}
 \end{figure}
 
-To allow us to leverage the above combination, we transform the {\tt SplitJoin} with a roundrobin
-splitter into a {\tt SplitJoin} with a duplicate splitter as illustrated in 
-Figure~\ref{fig:splitjoin-roundrobin-to-duplicate}. To perform this transformation, we need the rows
-of each sub {\tt Stream}'s matrix, $A'_i$, to represent the same data items. Changing from splitjoin to 
-duplicate will mean that data is going to sub {\tt Streams} that they do not use in calculating their
-result. Therefore, we need to represent the fact that {\tt Stream} $S'_i$'s output does not depend in any way on 
-the input originally bound for another {\tt Stream} $S'_j$. 
-In our linear representation framework, a non dependence is easily represented with a zero in the 
-corresponding row of the overall representation. Therefore, we transform $S'_i$ to $S''_i$ by insert rows of $0$s 
-into the expanded representations for each row that represents data originally bound for another {\tt Stream}. The
-total number of rows in the new matrices for $S''_i$ have exactly $\sum_{i=0}^{N}v_i$ rows and the same number
-of columns of $S'_i$. Figure~\ref{fig:splitjoin-roundrobin-matrix} illustrates how the new matrix is constructed.
-We can then combine the columns of the sub {\tt Streams} exactly as described above.
+To perform the transformation from roundrobin to duplicate, the same rows
+in each sub {\tt Stream}'s matrix must represent the same data items. Changing from splitjoin to 
+duplicate implies that each sub {\tt streams} will be fed all of the input data. All data
+that was nor originally bound for other {\tt stream}s needs to be ignored, which requires
+changing the original {\tt stream}s $F_i$ to $F'_i$. In our linear
+framework, we represent the independence of an output from an input as a zero in the appropriate
+element of the linear representation matrix. Therefore, we transform $F_i$ to $F'_i$ by inserting
+rows of zeros into linear representation of the sub {\tt streams} at positions such that
+the data bound for another sub {\tt stream} is ignored. Each of the new matrices $F'_i$ 
+has exactly $\sum_{i=0}^{N-1}v_i$ rows and the same number of columns of $F_i$, and 
+$o_{F'_i}=o_{F_i}$.
+Figure~\ref{fig:splitjoin-roundrobin-matrix} illustrates how the new matrix is constructed.
+We have now transformed our {\tt splitjoin} with a roundrobin splitter into a {\tt splitjoin}
+with a duplicate splitter which we know how to combine already.

@@ -1,4 +1,51 @@
 \section{Results}
+
+\subsection{Algebraic Simplification from Combination}
+One result of combining linear representations in {\tt Pipelines} in the stream graph is that  
+the compiler can perform algebraic simplification {\textbf across} the execution of {\tt Streams}. 
+If the compiler simply replaces the {\tt Pipeline} structure with a {\tt Filter} that 
+directly computes the overall vector matrix product, performance can be significantly improved.
+For instance, instead of implementing a band pass filter as a back to back combination
+of a low pass filter and a high pass filter, a clever programmer could determine the coefficients 
+of a single FIR filter back to back in a pipeline. However, given the ubiquity of high and 
+low pass filters, it is typically more convenient to understand and implement the action
+of a bandpass filter as a the two separate pieces.
+
+Another example of a processing block which is implemented in a different way than
+usually represented is a FIR filter followed by a compressor block 
+(see \cite{oppenheim-discrete}) decimates the input by a factor $M$ (eg only every $M$th 
+input sample is passed on to the output filter). 
+Obviously there is no need to calculate all of the outputs. 
+Instead you should only calculate every $M$th sample.
+Therefore, we end up with an FIR {\tt Filter} that pops $M$ instead of poping one. While
+this is a transformation that is certainly worth doing (it reduces the computational
+requirements by a factor of $\frac{M-1}{M}$ the system is almost always represented
+as a filter followed by the compressor in system design diagrams. The inefficient
+implementation is represented because it is easier to understand the operation of the
+two fundamental processing blocks in cascade than it is to understand the combined system.
+Given the linear representations for both blocks, when such a pipeline is combined into an
+overall representation the efficient implementation is automatically derived. Therefore,
+our compiler with the linear analysis can perform the transformation automatically, 
+letting the programmer express the system in the most natural way (separate filter and compressor).
+
+Another example is a multi band equalizer (such as is found in the FMRadio benchmark). 
+The overall purpose of such an equalizer is to filter $N$ different frequency bands 
+separately (like the graphic equalizer found on stereos). 
+The system diagram that best describes the operation of the multi band equalizer
+passes the input signal though the $N$ different filters, and then combines the $N$
+different outputs into the final output signal.
+This obvious design calls for $N$ filters, but if the filters do not vary with time, 
+a single filter which has the overall response that matches the action of all the 
+different individual filters. However, designing this single combined filter is 
+difficult, and subsequent changes to any of the sub filters will necessitate a
+redesign of the overall filter. Ideally, the designer would specify the system as
+the combination of multiple filters and then let the compiler combine them. 
+This automatic combination can is exactly what happens as a result of combining
+linear representations as described above. Because the linear analysis can
+figure out what is happening across the execution of multiple sub components, 
+it can do implementation optimizations that normally must be done by hand.
+
+\subsection{Measurement Methodology}
 We chose to measure the strength of our optimizations in terms of 
 floating point instruction reduction. The StreamIt compiler currently
 has two code generation backends. The uniprocessor backend generates sequential C code
@@ -13,7 +60,6 @@ be easily differentiated from differences in placement, routing and fusion that 
 from modifying the program's stream graph (as is the case for linear replacement). 
 Therefore we chose to use the uniprocessor backend for our measurements.
 
-\subsection{Measurement Methodology}
 As always, the appropriate metric to measure performance is not totally clear. 
 Running time is complicated by the multitasking environment offered by 
 modern operating systems. Also, given that the uniprocessor backend for
