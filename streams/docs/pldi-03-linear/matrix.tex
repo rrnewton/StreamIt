@@ -50,7 +50,7 @@ Finally, $o$ items are popped from the input tape.
 \vspace{-12pt}
 \caption{Linear filter as a vector-matrix operation}
 \label{fig:overview-matrix}
-\vspace{-12pt}
+\vspace{-6pt}
 \end{figure}
 
 %% To use DSP notation for {\tt streams} in StreamIt, we will call the
@@ -84,3 +84,15 @@ input element when computing each output.  The values in column
 $u-j-1$ of $A$ and column $u-j-1$ of ${\vec b}$ ({\it
 i.e.} the $j$th column from the right) represent the formula to
 compute the $j$th output.
+Figure~\ref{fig:linear-node-example} shows the code for a simple
+streamit filter and its corresponding linear node, $\lambda$.
+
+\begin{figure}
+\center
+\epsfxsize=2.0in
+\epsfbox{images/linear-node-example.eps}
+\vspace{-12pt}
+\caption{Filter-linear node correspondence.}
+\label{fig:linear-node-example}
+\vspace{-12pt}
+\end{figure}
