@@ -30,7 +30,15 @@ parser correctly.
 \item \lstinline|pop| and \lstinline|peek| expressions can only appear
   in work and phase functions in filters.
 \item If a work function does not declare I/O rates, it may not use
-  \lstinline|push|, \lstinline|pop|, or \lstinline|peek|.
+  \lstinline|push|, \lstinline|pop|, or \lstinline|peek|.  If it
+  declares a push rate, though, it must call
+  \lstinline|push|.\footnote{Declaring a nonzero peek rate affects the
+    scheduling but not correctness, so you're not obligated to peek;
+    if you don't pop, you automatically pop your pop rate at the end
+    of the work function.}
+\item Every filter must have a work function.
+\item Every stream object that is not a filter must have an init
+  function, but may have no other functions.
 \end{enumerate}
 
 \subsection{Control Flow and Initialization Code}
@@ -110,7 +118,9 @@ there is no implicit type promotion across tapes.
   operator can accept.  The type of the first part of the ternary
   expression must be promotable to \lstinline|int|, and the second and
   third parts must be promotable to a common type; the resulting type
-  is the common type.
+  is the common type.  In all cases, the types of child expressions
+  must conform to the acceptable types for the operator listed in the
+  language specification.
 \item For a field reference \lstinline|a.b|, \lstinline|a| must be of
   some structure type \lstinline|A|, which must have a field named
   \lstinline|b|.  The type of the expression is the type of
@@ -194,11 +204,6 @@ compiler.  They should be able to be removed when the compiler is
 improved.
 
 \begin{enumerate}
-\item A statement cannot contain more than one \lstinline|pop()|
-  expression; if it contains any \lstinline|pop()| expressions, it can
-  contain no \lstinline|peek()| expressions.  This can be removed once
-  the ordering of these expressions is established in the language
-  specification and enforced appropriately in the compiler.
 \item All child-constructing statements in initialization code must
   have consistent types.  While the front-end can perform minimal
   data-flow analysis to check that the types of pipelines, control
