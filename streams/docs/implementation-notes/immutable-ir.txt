@@ -23,6 +23,8 @@ Then to implement:
 * Change the children to be from the init function to be (stream,
 args) pairs within the construct, to make replacing easier.
 
+- eventually the call to setParent from kopi2sir will have to go.
+
 - In all the mutator methods of the classes, make sure you're not
 finalized.
 
