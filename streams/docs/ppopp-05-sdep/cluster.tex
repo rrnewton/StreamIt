@@ -1,44 +1,100 @@
+\section{Cluster Backend}
 
-The cluster backend compiles the StreamIt code to a set of threads that can be executed on a single computer or a networked cluster. In order to exchange data threads establish TCP/IP connections. A set of connections is created that represents the flow of data between filters, splitters and joiners. A separate set of connections is established between message sender and message receivers in each portal.
+The cluster backend compiles the StreamIt code to a set of threads
+that can be executed on a single computer or a networked cluster. In
+order to exchange data threads establish TCP/IP connections. A set of
+connections is created that represents the flow of data between
+filters, splitters and joiners. A separate set of connections is
+established between message sender and message receivers in each
+portal.
 
-The connections between message sender and receivers are used for both transmitting the messages and also for sending credits. Credits represent the number of iterations that a filter is allowed to execute and this enforces that messages can be executed at given latency.
+The connections between message sender and receivers are used for both
+transmitting the messages and also for sending credits. Credits
+represent the number of iterations that a filter is allowed to execute
+and this enforces that messages can be executed at given latency.
 
 If a message is sent following data is written to a socket:
 
+{\scriptsize
+\begin{verbatim}
 int size; // size of message in bytes including size field
 int index; // index of handler
 int iteration_to_execute_at; // -1 for best effort messages, target iteration number otherwise
 int and float parameters;
+\end{verbatim}}
 
 Example:
 
+{\scriptsize
+\begin{verbatim}
 (16, 0, -1, 1000)
-A best effort message for handler Nr. 0 with one integer parameter set to 1000. 
+\end{verbatim}}
 
+A best effort message for handler Nr. 0 with one integer parameter set
+to 1000.
+
+{\scriptsize
+\begin{verbatim}
 (16, 0, 8, 1000)
-A message for handler Nr. 0 that has to be executed before work function is invoked 8th time. Message has one integer parameter equal to 1000.
+\end{verbatim}}
+
+A message for handler Nr. 0 that has to be executed before work
+function is invoked 8th time. Message has one integer parameter equal
+to 1000.
 
 If a credit is being sent following data is written to a socket:
 
+{\scriptsize
+\begin{verbatim}
 int -1; int credit; 
+\end{verbatim}}
 
 Example:
 
 (-1, 8) Node can execute only up to first 8 iterations before receiving additional credit.
 
-To calculate the iteration at which to execute the message the SDEP structure is embedded in the code for the thread sending the message. Any sdep and reverse sdep value can be calculated from few parameters and information about the first steady state cycle dependency.
+To calculate the iteration at which to execute the message the SDEP
+structure is embedded in the code for the thread sending the
+message. Any sdep and reverse sdep value can be calculated from few
+parameters and information about the first steady state cycle
+dependency.
 
-Currently each message is scheduled exactly at the latest possible latency and the rest of information is discarded. If one does take the latency interval into account one could work out a way of sending less credit messages and still maintaining feasibility. However this is not implemented for the first version of cluster backend. This could be implemented in future versions.
+Currently each message is scheduled exactly at the latest possible
+latency and the rest of information is discarded. If one does take the
+latency interval into account one could work out a way of sending less
+credit messages and still maintaining feasibility. However this is not
+implemented for the first version of cluster backend. This could be
+implemented in future versions.
 
-If a message is being sent downstream and maximum latency is non-negative then no credits need to be sent. If a message is being sent downstream at negative maximum latency or is being sent upstream then one needs to coordinate the execution of filters by sending credits. The nodes that are receiving credits are called restricted execution nodes and only execute up to the maximum credit they have received so far.
+If a message is being sent downstream and maximum latency is
+non-negative then no credits need to be sent. If a message is being
+sent downstream at negative maximum latency or is being sent upstream
+then one needs to coordinate the execution of filters by sending
+credits. The nodes that are receiving credits are called restricted
+execution nodes and only execute up to the maximum credit they have
+received so far.
 
-In case of a message being sent downstream with negative latency, during compile time we use the sdep information to calculate following information:
-1. Number of iterations upstream node can execute before sending any credits,
-2. The schedule of sending credits during a steady state cycle after initial number of iterations.
-We use the information about credits to send during a steady cycle to figure out number of credits to send during subsequent steady cycles. This data is embedded into the message sender thread.
+In case of a message being sent downstream with negative latency,
+during compile time we use the sdep information to calculate following
+information:
 
-In case of a message being sent upstream, during compile time we use the sdep information to calculate following information:
-1. The initial credit that downstream node sends upstream before executing any cycle,
-2. The schedule of sending credits during a steady state cycle.
-We use the information about credits to send during a steady cycle to figure out number of credits to send during subsequent steady cycles. This data is embedded into the message sender thread.
+\begin{enumerate}
+\item Number of iterations upstream node can execute before sending any credits,
+\item The schedule of sending credits during a steady state cycle after initial number of iterations.
+\end{enumerate}
 
+We use the information about credits to send during a steady cycle to
+figure out number of credits to send during subsequent steady
+cycles. This data is embedded into the message sender thread.
+
+In case of a message being sent upstream, during compile time we use
+the sdep information to calculate following information:
+
+\begin{enumerate}
+\item The initial credit that downstream node sends upstream before executing any cycle,
+\item The schedule of sending credits during a steady state cycle.
+\end{enumerate}
+
+We use the information about credits to send during a steady cycle to
+figure out number of credits to send during subsequent steady
+cycles. This data is embedded into the message sender thread.
