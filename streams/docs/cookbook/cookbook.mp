@@ -1,7 +1,7 @@
 %
 % cookbook.mp: MetaPost diagrams for StreamIt Cookbook
 % David Maze <dmaze@cag.lcs.mit.edu>
-% $Id: cookbook.mp,v 1.1 2003-03-05 23:44:13 dmaze Exp $
+% $Id: cookbook.mp,v 1.2 2003-03-06 19:43:39 dmaze Exp $
 %
 % MetaPost is a drawing language based on Knuth's METAFONT that can
 % produce embedded PostScript figures, with TeX strings embedded in it.
@@ -98,6 +98,63 @@ vardef pipeline(expr name)(text t) =
   boxed(name, 0, _p)
 enddef;
 
+% Usage:
+%  draw splitjoin("sj", "dup", "rr")
+%    (filter("foo"), filter("bar"))("","")("1","2")
+% ...where the parameters are name, split type, join type; children;
+% splitter weights; joiner weights.  Returns a picture expression.
+vardef splitjoin(expr name, split, join)(text children)(text sws)(text jws) =
+  save _p, _h, _x, _i, _n, _w, _q, _r, _y, _xc, _path;
+  picture _p; _p=nullpicture;
+  path _path;
+  % Draw each of the children.
+  _i := 0; _w := 0;
+  for v=children:
+    _i := _i + 1;
+    picture _q; _q=v;
+    % Goal: left side at _w, vertical center at 0.
+    picture _r; _r = _q shifted (_w-(xleft _q),-(ybot _q)-(height _q)/2);
+    addto _p also _r;
+    _h[_i] := (height _q) / 2;
+    _x[_i] := _w + (width _q) / 2;
+    _w := _w + (width _q) + u;
+  endfor;
+  _n := _i;
+  % Draw arrows for splitter/joiner.
+  _xc := ((xleft _p) + (xright _p)) / 2;
+  _y := (ytop _p) + u;
+  _i := 0;
+  for v=sws:
+    _i := _i + 1;
+    exitif _i > _n;
+    _path := (_xc,_y)--(_x[_i],_h[_i]);
+    % NB: this assumes the linear path above.
+    addto _p also thelabel.top(v, .3[(_x[_i],_h[_i]),(_xc,_y)]);
+    addto _p doublepath _path withpen currentpen;
+    addto _p contour arrowhead _path withpen currentpen;
+  endfor;
+  % Splitter, and entry arrow:
+  addto _p also thelabel.top(split, (_xc,_y));
+  addto _p doublepath (_xc,_y+2u)--(_xc,_y+u) withpen currentpen;
+  addto _p contour arrowhead (_xc,_y+2u)--(_xc,_y+u) withpen currentpen;
+  _y := (ybot _p) - u;
+  _i := 0;
+  for v=jws:
+    _i := _i + 1;
+    exitif _i > _n;
+    _path := (_x[_i],-_h[_i])--(_xc,_y);
+    % NB: this assumes the linear path above.
+    addto _p also thelabel.bot(v, .3[(_x[_i],-_h[_i]),(_xc,_y)]);
+    addto _p doublepath _path withpen currentpen;
+    addto _p contour arrowhead _path withpen currentpen;
+  endfor;
+  % Joiner, and exit arrow:
+  addto _p also thelabel.bot(join, (_xc,_y));
+  addto _p doublepath (_xc,_y-u)--(_xc,_y-2u) withpen currentpen;
+  addto _p contour arrowhead (_xc,_y-u)--(_xc,_y-2u) withpen currentpen;
+  boxed(name, 0, _p)
+enddef;
+
 % End of macro section.
 
 beginfig(1);
@@ -111,6 +168,13 @@ beginfig(2);
     filter("IntSource"),
     filter("Averager"),
     filter("IntPrinter"));
+endfig;
+
+beginfig(3);
+  draw pipeline("BandPassFilter",
+    splitjoin("BPFCore", "DUP", "RR")
+    (filter("LowPass"),filter("LowPass"))("","")("1","1"),
+    filter("Subtractor"));
 endfig;
 
 end
