@@ -23,11 +23,12 @@ The concept of information flow is central to the streaming domain.
 When an item enters a stream, it carries with it some new information.
 As execution progresses, this information cascades through the stream,
 effecting the state of filters and the values of new data items which
-are produced.  We refer to an ``information wavefront'' as the sequence
-of filter executions that first sees the effects of a given input item.
-This wavefront is well-defined even in the presence of rate-changing
-filters that peek, pop, and push differing number of items in each
-invocation of their work function.
+are produced.  We refer to an ``information wavefront'' as the
+sequence of filter executions that first sees the effects of a given
+input item.  This wavefront is well-defined even in the presence of
+rate-changing filters that peek, pop, and push differing number of
+items in each invocation of their work function. {\bf Unclear--makes
+it sound like it changes from one invocation to the next?}
 
 \begin{figure}[t]
 \begin{verbatim}
@@ -46,76 +47,81 @@ labeling the regions.
 To formalize the wavefront, we introduce some new representations for
 the state of the stream graph.  Consider that in place of each data
 channel there is an infinite ``tape'' which contains the history of
-values that have been pushed onto the channel.  For a given filter $A$,
-let $in_A$ and $out_A$ denote the number of items appearing on its input
-and output tapes, respectively, during a point of the stream's
-execution.  Now consider the following functions:
+values that have been pushed onto the channel.  Now consider the
+following functions:
 
 \begin{itemize}
 
-\item Given that there are $x$ items on the input tape of filter $A$,
-the maximum number of items on the output tape of filter $B$ is
-$f_{AB}(x)$.  That is, $f_{AB}(x) = max(out_B | in_A = x)$.
+\item Given that there are $x$ items on tape $a$, the maximum number
+of items that can appear on tape $b$ is $\ma{a}{b}(x)$.
 
-\item Given that there are $x$ items on the output tape of filter $B$,
-the minimum number of items on the input tape of filter $A$ is
-$g_{AB}(x)$.  That is, $g_{AB}(x) = min(in_A | out_B = x)$.
+\item Given that there are $x$ items on tape $b$, the minimum number
+of items that must appear on tape $a$ is $\mi{a}{b}(x)$.
 
 \end{itemize}
 
-We now derive $f_AB$ and $g_AB$ for certain pairs of nodes $(A, B)$ in
-the stream graph.  Doing so will allow us to express the semantics of
-messaging, latency, and re-initialization.
+Note that these functions are only defined over pairs of tapes $(a,
+b)$ where $a$ is ``upstream'' of $b$ in the stream graph, as will
+become clear below.  We now turn to deriving expressions for
+$\ma{a}{b}$ and $\mi{a}{b}$ as a step towards formalizing the
+semantics of messaging, latency, and re-initialization.
 
 \subsubsection{Filters}
 
 Consider a filter $A$ that peeks $peek_A$, pops $pop_A$, and pushes
-$push_A$ data items on every execution step.  To derive $f_AA(x)$,
-observe that the filter can execute so long as it does not peek beyond
-the $x$'th item on the input tape.  After the $n$'th execution, it has
-popped $n$ items, peeked up to $n + (peek_A - pop_A)$, and popped $2 *
-n$ items.  Thus, it can execute $n = floor((x - (peek_A - pop_A)) /
-pop_A))$ times, leaving the following expression for $f_{AA}(x)$:
+$push_A$ data items on every execution step.  Further, let us denote
+the input and output tapes of $A$ by $I_A$ and $O_A$, respectively.
+We now turn our attention to finding $\ma{I_A}{O_A}$ and
+$\mi{I_A}{O_A}$, describing the transfer of information across the
+filter $A$.
+
+To derive $\ma{I_A}{O_A}(x)$, observe that the filter can execute so
+long as it does not peek beyond the $x$'th item on the input tape,
+$I_A$.  After the $n$'th execution, it has popped $n$ items, peeked up
+to $n + (peek_A - pop_A)$, and popped $2 * n$ items.  Thus, it can
+execute $n = floor((x - (peek_A - pop_A)) / pop_A))$ times, leaving
+the following expression for $\ma{I_A}{O_A}(x)$
 \begin{eqnarray*}
-f_{AA}(x)&= push_A*floor((x-(peek_A-pop_A))/pop_A) if x \ge (peek_A-pop_A) \\
-         &= push_A*floor((x-(peek_A-pop_A))/pop_A) if x <  (peek_A-pop_A)
+\ma{I_A}{O_A}(x)& \\ = push_A&*floor((x-(peek_A-pop_A))/pop_A) if x \ge (peek_A-pop_A) \\
+         = push_A&*floor((x-(peek_A-pop_A))/pop_A) if x <  (peek_A-pop_A)
 \end{eqnarray*}
 Similarly, the reader can verify that:
 \begin{eqnarray*}
-g_{AA}(x)&= ceil(x/push_A)*pop_A+(peek_A-pop_A)
+\mi{I_A}{O_A}(x)&= ceil(x/push_A)*pop_A+(peek_A-pop_A)
 \end{eqnarray*}
 
 \subsubsection{Pipelines}
 
-Let us now derive expressions for $f$ and $g$ in the case of pipelined
-filters.  In the base case, consider that two filters are connected,
-with the output of $A$ feeding the input of $B$.  We are seeking
-$f_{AB}(x)$, the maximum number of items that can appear on $out_B$
-given that there are $x$ items on $in_A$.  Observing that a maximum of
-$f_{AA}(x)$ items can appear on $out_A$, and that $out_A$ must equal
-$in_B$ since the filters are connected, we see that a maximum of
-$f_{BB}(f_{AA}(x))$ items can appear on $out_B$:
+Let us now derive expressions for $min$ and $max$ in the case of
+pipelined filters.  In the base case, consider that two filters are
+connected, with the output of $A$ feeding the input of $B$.  We are
+seeking $\ma{I_A}{O_B}(x)$: the maximum number of items that can
+appear on tape $O_B$ given that there are $x$ items on tape $I_A$.
+Observing that a maximum of $\ma{I_A}{O_A}(x)$ items can appear on
+tape $O_A$, and that $O_A$ must equal $I_B$ since the filters are
+connected, we see that a maximum of
+$\ma{I_B}{O_B}(\ma{I_A}{O_A}(x))$ items can appear on $O_B$:
 \begin{equation*}
-f_{AB} = f_{BB} \circ f_{AA}
+\ma{I_A}{O_B} = \ma{I_B}{O_B} \circ \ma{I_A}{O_A}
 \end{equation*}
-In the case of $g_{AB}(x)$, the order of composition is reversed:
-given that there are $x$ items on $out_B$, a minimum of $g_{BB}(x)$
-are on $in_B$, and since $out_B = in_A$, we have that a minimum of
-$g_{AA}(g_{BB}(x))$ items appear on $in_A$, leaving:
+In the case of $\mi{I_A}{O_B}(x)$, the order of composition is
+reversed: given that there are $x$ items on tape $O_B$, a minimum of
+$\mi{I_B}{O_B}(x)$ are on tape $I_B$, and since $O_B = I_A$, we have
+that a minimum of $\mi{I_A}{O_A}(\mi{I_B}{O_B}(x))$ items appear on
+$I_A$, leaving:
 \begin{equation*}
-g_{AB} = g_{AA} \circ f_{BB}
+\mi{I_A}{O_B} = \mi{I_A}{O_A} \circ \mi{I_B}{O_B}
 \end{equation*}
 By identical reasoning, these composition laws hold for pipelined
-streams as well as filters.  That is, if filter $B$ is connected in a
-pipeline to filter $C$, then for any filters $A$ and $B$ for which
-$f_{AB}$, $f_{CD}$, $g_{AB}$, and $g_{CD}$ are well defined, we have that:
+streams as well as filters.  That is, for any tapes $x$, $y$, and $z$
+such that $\ma{x}{y}$, $\ma{y}{z}$, $\mi{x}{y}$, and $\mi{y}{z}$ are
+well-defined, we have:
 \begin{eqnarray*}
-f_{AD} = f_{CD} \circ f_{AB} \\
-g_{AD} = g_{AB} \circ g_{CD}
+\ma{x}{z} = \ma{y}{z} \circ \ma{x}{y} \\
+\mi{x}{z} = \mi{x}{y} \circ \mi{y}{z}
 \end{eqnarray*}
 
 \subsubsection{SplitJoins}
-
 \begin{figure}[t]
 \scriptsize
 \begin{verbatim}
@@ -127,11 +133,6 @@ S               J
   \           /
     A1 ... An
 
-but I want the splitter and joiner split up into 3 ports, that look
-like differen filters but are grouped together into one.  This will
-ease the semantic definitions.  Label the import port S0, the bottom
-S1 and the top S2; same for joiner.  
-
 \end{verbatim}
 \vspace{-12pt}
 \caption{\protect\small SplitJoin labeling.
@@ -139,40 +140,59 @@ S1 and the top S2; same for joiner.
 \vspace{-12pt}
 \end{figure}
 
-We now derive $f$ and $g$ in the case of a SplitJoin, as pictured in
-Figure {\ref:splitjoin}.  Since the splitter has two output tapes and
-the joiner has two input tapes, we need to modify slightly our
-definitions of $f$ and $g$:
+We now derive $min$ and $max$ in the case of a SplitJoin, as pictured
+in Figure {\ref:splitjoin}.  For the splitter $S$ there are two output
+tapes; let us denote them by $O1_S$ and $O2_S$.  Similarly, let us
+denote the two input tapes of the joiner $J$ by $I1_J$ and $I2_J$.  We
+now derive the transfer functions for round robin and
+duplicate/combine nodes.
 
-\begin{itemize}
+{\bf Round robin splitter.}  In the case of a round-robin splitter, the
+items from the input tape are alternately routed to the output tapes,
+with the first item going onto tape $O1_S$.  By this definition, we
+can see that the splitter's $max$ is defined as follows:
+\begin{eqnarray*}
+\ma{I_S}{O1_S}(x) = ceil(x/2) \\
+\ma{I_S}{O2_S}(x) = floor(x/2)
+\end{eqnarray*}
+To derive the $min$ function across a splitter, observe that the input
+tape need only progress so far as to produce the items on the emptier
+output tape.  That is, we need to consider the number of items on both
+of the splitter's output to determine the minimum number of items that
+are needed at its input.  Thus, our $min$ function has two arguments:
+the first corresponding to $O1_S$ and the second corresponding to
+$O2_S$.  The equation is as follows:
+\begin{eqnarray*}
+\mi{I_S}{(O1_S, O2_S)}(x_1, x_2) = min(2*x_1-1, 2*x_2)
+\end{eqnarray*}
+{\bf Round robin joiner.}  The rules for a round robin joiner are in
+some sense dual to those of the round robin splitter.  Again assuming
+that items are alternately drawn from the input tapes, starting with
+$I1_J$, we have that:
+\begin{eqnarray*}
+\mi{I1_J}{O_J}(x) = ceil(x/2) \\
+\mi{I2_J}{O_J}(x) = floor(x/2) 
+\end{eqnarray*}
+Again, the $max$ function takes two arguments, corresponding to the
+number of items on $I1_J$ and $I2_J$, respectively:
+\begin{eqnarray*}
+\ma{(I1_J, I2_J)}{O_J}(x_1, x_2) = max(2*x_1-1, 2*x_2)
+\end{eqnarray*}
+{\bf Duplicate splitter}.  Clearly, the $max$ function of a duplicate
+splitter is simply the identity function, since it maps each element
+on the input tape to the same location on the output tapes:
+\begin{eqnarray*}
+\ma{I_S}{O1_S}(x) = x \\
+\ma{I_S}{O2_S}(x) = x
+\begin{eqnarray*}
+The $min$ function is similar, except that
 
-\item Given that there are $x$ items on the input tape of splitter
-$S$, then $f_{SAB}(x)$ is a pair of values $(y_1, y_2)$ where $y_1$
-and $y_2$ are the maximum number of items on the output tapes of $A$
-and $B$, respectively.  That is, $f_{SAB}(x) = max( (out_A, out_B) |
-in_S = x)$ where max operates component-wise.  Similarly, for a joiner
-$J$, $g_{ABJ}(x) = min( (in_A, in_B) | out_J = x)$
-
-\item Given that there are $(y_1, y_2)$ items on the output tapes of a
-filters $A$ and $B$, respectively, then $g_{SAB}(y_1, y_2)$ is the
-minimum number of items on the input tape of $S$.  That is,
-$g_{SAB}(y_1, y_2) = min(in_S | out_A = y_1 \wedge out_B = y_2)$,
-where min operates component-wise.  Similarly, for a joiner $J$,
-$f_{ABJ}(y_1) = max( out_J | in_A = y_1 \wedge in_B = y_2)$.
-
-\end{itemize}
-
-To simplify the equations, the splitters and joiners have been
-decomposed into three ports, which will be regarded as separate
-filters in the semantics.  However, each split and join node can still
-be regarded as a single filter from the user's standpoint.
-
-{\bf Round robin.}  We first give derivations for round-robin
-splitters and joiners.  At a round-robin splitter, items are
-alternately dispatched from the input port $S_0$ to the output ports
-$S_
-
-to two different filters.  We define $f_{SSS}(x)$
+{\bf Combine joiner.} The derivations for a duplicating
+splitter and combining joiner are simply the identity function, since
+each element on the input tape(s) is mapped to the same index position
+on the output tape(s).  That is, in the case of duplicate/combine,
+$\ma{I1_J}{O_J}(x) = \ma{I2_J}{O_J}(x) = \mi{I1_J}{O_J}(x) =
+\mi{I2_J}{O_J}(x) = x$.
 
 \begin{verbatim}
 
@@ -186,23 +206,6 @@ to two different filters.  We define $f_{SSS}(x)$
 
 - Semantics of the functions
 	- in terms of messages and latency
-
-let's try some new definitions:
-
-given that there are exactly x items on your input tape, the maximum
-number of items you can have on your output tape is h(x)
-
-the inverse is now well-defined: given that there are exactly x items
-on your output tape, the minimum number of items you need on your
-input tape is p(x)
-
-filter:		h(x) = push*max(0, floor((x-(peek-pop))/pop))
-split:		h(x) = (ceil(x/2), floor(x/2))
-join:		h(x1, x2) = min(2*x1-1, 2*x2)
-
-filter:		p(x) = ceil(x/push)*pop+(peek-pop)
-split:		p(x1, x2) = min(2*x1-1, 2*x2)
-join:		p(x) = (ceil(x/2), floor(x/2))
 
 --
 
