@@ -8,10 +8,11 @@
 % Make picture sizes be sane:
 \setlength{\unitlength}{\baselineskip}
 
-\title{MIT-PCA Morphware Stream Module Language}
+\title{A Stream Kernel Abstraction for the PCA Morphware Stream
+  Virtual Machine Representation}
 \author{David Maze \and William Thies \and Michael Gordon \and Michael
   Karczmarek \and Saman Amarasinghe}
-\date{October 1, 2002}
+\date{October 15, 2002}
 
 \begin{document}
 
@@ -20,11 +21,12 @@
 
 \section{Introduction}
 
-This document describes the stream kernel language for the DARPA PCA
-Morphware project.  High-performance computing is increasingly
-demanding a streaming model of computation, in which incoming data is
-processed incrementally as a ``stream'', taking a possibly infinite
-series of inputs and producing a similar stream of outputs.
+This document describes the stream kernel language for the stream
+virtual machine proposal in the Morphware forum.  High-performance
+computing is increasingly demanding a streaming model of computation,
+in which incoming data is processed incrementally as a ``stream'',
+taking a possibly infinite series of inputs and producing a similar
+stream of outputs.
 
 A stream kernel is a self-contained section of a larger system that
 does streaming computation.  Within a kernel, the programmer
@@ -38,7 +40,7 @@ The kernel language is vaguely reminiscent of other imperative
 languages such as C or Java.  In particular, the bodies of filter work
 functions and stream initialization code is generally legal Java
 code.  This provides a straightforward mapping from the kernel
-language to the PCA VM ISA.
+language to the SAAL ISA.
 
 \section{Types}
 
@@ -776,14 +778,14 @@ template<T> T->void filter StreamWriter(int n) {
     \label{fig:built-in-streams}
 \end{figure}
 
-\section{Mapping to the Morphware Virtual Machine}
+\section{Mapping to the Morphware Stream Virtual Machine}
 
 This section describes the general flow of the compiler and how a
-stream kernel might be compiled to run on the PCA Morphware Virtual
-Machine.  The compiler will ultimately generate C code using the
-\texttt{\_IN}, \texttt{\_OUT\_INORDER}, and \texttt{\_PEEK} macros to
-perform stream I/O; a program can be fused into a single kernel, or
-transformed into multiple kernels that communicate using these macros.
+stream kernel interacts with the Morphware stream virtual machine.
+The compiler will ultimately generate C code using the \texttt{\_IN},
+\texttt{\_OUT\_INORDER}, and \texttt{\_PEEK} macros to perform stream
+I/O; a program can be fused into a single kernel, or transformed into
+multiple kernels that communicate using these macros.
 
 \paragraph{\texttt{StreamInput} and \texttt{StreamOutput} filters.}
 The stream kernel language provides two built-in filters,
