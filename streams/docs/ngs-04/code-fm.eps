@@ -1,0 +1,1232 @@
+%!PS-Adobe-3.0 EPSF-3.0
+%%BoundingBox: 34 104 532 755
+%%Title: code-fm
+%%CreationDate: Thu Jan 15 04:08:23 2004
+%%Creator: Tgif-4.1.42 written by William Chia-Wei Cheng (bill.cheng@acm.org)
+%%ProducedBy: (unknown)
+%%Pages: 1
+%%DocumentFonts: (atend)
+%%EndComments
+%%BeginProlog
+
+/tgifdict 53 dict def
+tgifdict begin
+
+/tgifarrowtipdict 8 dict def
+tgifarrowtipdict /mtrx matrix put
+
+/TGAT % tgifarrowtip
+ { tgifarrowtipdict begin
+      /dy exch def
+      /dx exch def
+      /h exch def
+      /w exch def
+      /y exch def
+      /x exch def
+      /savematrix mtrx currentmatrix def
+      x y translate
+      dy dx atan rotate
+      0 0 moveto
+      w neg h lineto
+      w neg h neg lineto
+      savematrix setmatrix
+   end
+ } def
+
+/TGMAX
+ { exch dup 3 1 roll exch dup 3 1 roll gt { pop } { exch pop } ifelse
+ } def
+/TGMIN
+ { exch dup 3 1 roll exch dup 3 1 roll lt { pop } { exch pop } ifelse
+ } def
+/TGSW { stringwidth pop } def
+
+/bd { bind def } bind def
+
+/GS { gsave } bd
+/GR { grestore } bd
+/NP { newpath } bd
+/CP { closepath } bd
+/CHP { charpath } bd
+/CT { curveto } bd
+/L { lineto } bd
+/RL { rlineto } bd
+/M { moveto } bd
+/RM { rmoveto } bd
+/S { stroke } bd
+/F { fill } bd
+/TR { translate } bd
+/RO { rotate } bd
+/SC { scale } bd
+/MU { mul } bd
+/DI { div } bd
+/DU { dup } bd
+/NE { neg } bd
+/AD { add } bd
+/SU { sub } bd
+/PO { pop } bd
+/EX { exch } bd
+/CO { concat } bd
+/CL { clip } bd
+/EC { eoclip } bd
+/EF { eofill } bd
+/IM { image } bd
+/IMM { imagemask } bd
+/ARY { array } bd
+/SG { setgray } bd
+/RG { setrgbcolor } bd
+/SD { setdash } bd
+/W { setlinewidth } bd
+/SM { setmiterlimit } bd
+/SLC { setlinecap } bd
+/SLJ { setlinejoin } bd
+/SH { show } bd
+/FF { findfont } bd
+/MS { makefont setfont } bd
+/AR { arcto 4 {pop} repeat } bd
+/CURP { currentpoint } bd
+/FLAT { flattenpath strokepath clip newpath } bd
+/TGSM { tgiforigctm setmatrix } def
+/TGRM { savematrix setmatrix } def
+
+end
+
+%%EndProlog
+%%Page: 1 1
+
+%%PageBoundingBox: 34 104 532 755
+tgifdict begin
+/tgifsavedpage save def
+
+1 SM
+1 W
+
+0 SG
+
+72 0 MU 72 11 MU TR
+72 128 DI 100.000 MU 100 DI DU NE SC
+
+GS
+
+/tgiforigctm matrix currentmatrix def
+
+% TEXT
+NP
+0 SG
+   GS
+      1 W
+      64 80 M
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (float->float filter RFtoIF\(int N, float freq\) {) SH
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (  int size, count;) SH
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (  float[N*4] weight;) SH
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (  init {) SH
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (    setFreq\(freq\);) SH
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (  }) SH
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (  work pop 1 push 1 {) SH
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (    push\(pop\(\) * weight[count++]\);) SH
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (    if \(count == size\)) SH
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (      count = 0;) SH
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (  }) SH
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (  void setFreq\(float freq\) {) SH
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (    count = 0;) SH
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (    size = CARRIER_FREQ/freq*N;) SH
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (    for\(int i=0; i<size; i++\)) SH
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (      weight[i] = sin\(i*pi/size\);) SH
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (  }) SH
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (}) SH
+      GR
+      0 16 RM
+      GS
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (float->float splitjoin CheckFreqHop) SH
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (    \(int N, Portal<RFtoIF> freqPortal\) {) SH
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (  split roundrobin\(N/4-2,1,1,N/2,1,1,N/4-2\);) SH
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (  int k = 0;) SH
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (  for\(int i=1; i<=5; i++\) {) SH
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (    if\(\(i==2\)||\(i==4\)\) {) SH
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (      add float->float filter {) SH
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (        work pop 1 push 1 {) SH
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (          float val = pop\(\);) SH
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (          if \(val >= MIN_THRESHOLD\)) SH
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (            freqPortal.setFreq\(FREQ[k]\)) SH
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (              after 4*n...6*N;) SH
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (          push\(val\);) SH
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (        }) SH
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (      };) SH
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (      k++;) SH
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (    }) SH
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (    else) SH
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (      add Identity<float>\(\);) SH
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (  }) SH
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (  join roundrobin\(N/4-2,1,1,N/2,1,1,N/4-2\);) SH
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (}) SH
+      GR
+      0 16 RM
+      GS
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (float->float filter CheckQuality) SH
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (    \(boolean on, Portal<Booster> bp\) {) SH
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (  float aveHi, aveLo;) SH
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (  boolean boosterOn;) SH
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (  init {) SH
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (    aveHi = 0;) SH
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (    aveLo = 1;) SH
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (    boosterOn = on;) SH
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (  }) SH
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (  work pop 1 push 1 {) SH
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (    float val = pop\(\);) SH
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (    aveHi = max\(0.9*aveHi, val\);) SH
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (    aveLo = max\(1.1*aveLo, val\);) SH
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (    if \(aveHi - aveLo < FAIL_QUAL &&) SH
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (        !boosterOn\) {) SH
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (      bp.init\(true\);) SH
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (      boosterOn = true;) SH
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (    }) SH
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (    if \(aveHi - aveLo > PASS_QUAL &&) SH
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (        boosterOn\) {) SH
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (      bp.init\(false\);) SH
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (      boosterOn = false;) SH
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (    }) SH
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (    push\(val\);) SH
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (  }) SH
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (}) SH
+      GR
+      0 16 RM
+      GS
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (float->float pipeline Booster\(boolean on\) {) SH
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (  if \(on\) add FIRFilter\(BOOST_WEIGHTS\);) SH
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (}) SH
+      GR
+   GR
+
+% TEXT
+NP
+0 SG
+   GS
+      1 W
+      512 80 M
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (float->float pipeline TrunkedRadio {) SH
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (  int N = 64;) SH
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (  Portal<Booster> boosterPortal;) SH
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (  Portal<RFtoIF> freqPortal;) SH
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (  add ReadFromAtoD\(\);) SH
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (  add RFtoIF\(N, START_FREQ\)) SH
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (    register freqPortal;) SH
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (  add Booster\(N, false\)) SH
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (    register boosterPortal;) SH
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (  add FFT\(N\);) SH
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (  add CheckFreqHop\(freqPortal\);) SH
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (  add CheckQuality\(boosterPortal, false\);) SH
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (  add AudioBackEnd\(\);) SH
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (}) SH
+      GR
+      0 16 RM
+      GS
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (float->float pipeline FFT\(int N\) {) SH
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (  add splitjoin {) SH
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (    split roundrobin\(N/2\);) SH
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (    for \(int i=0; i<2; i++\)) SH
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (      add splitjoin {) SH
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (        split roundrobin;) SH
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (        add Identity<float>\(\);) SH
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (        add Identity<float>\(\);) SH
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (        join roundrobin\(N/4\);) SH
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (      };) SH
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (    join roundrobin;) SH
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (  };) SH
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (  for \(int i=2; i<N; i*=2\)) SH
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (    add Butterfly\(i, N\);) SH
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (}) SH
+      GR
+      0 16 RM
+      GS
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (float->float filter Adder {) SH
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (  work pop 2 push 1 {) SH
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (    push\(peek\(0\) + peek\(1\)\);) SH
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (    pop\(\); pop\(\);) SH
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (  }) SH
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (}) SH
+      GR
+      0 16 RM
+      GS
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (float->float filter Subtractor {) SH
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (  work pop 2 push 1 {) SH
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (    push\(peek\(0\) - peek\(1\)\);) SH
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (    pop\(\); pop\(\);) SH
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (  }) SH
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (}) SH
+      GR
+      0 16 RM
+      GS
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (float->float pipeline Butterfly) SH
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (    \(int N, int W\) {) SH
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (  add splitjoin {) SH
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (    split roundrobin\(N\);) SH
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (    add float->float filter {) SH
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (      float[W] weight;) SH
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (      int curr;) SH
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (      init {) SH
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (        for \(int i=0; i<W; i++\)) SH
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (          weight[i] = calcWeight\(i, N, W\);) SH
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (        curr = 0;) SH
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (      }) SH
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (      work pop 1 push 1 {) SH
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (        push\(pop\(\) * weight[curr++]\);) SH
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (        if \(curr>=W\) curr = 0;) SH
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (      }) SH
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (    };) SH
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (    add Identity<float>\(\);) SH
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (    join roundrobin;) SH
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (  };) SH
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (  add splitjoin {) SH
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (    split duplicate;) SH
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (    add Subtractor\(\);) SH
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (    add Adder\(\);) SH
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (    join roundrobin\(N\);) SH
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (  };) SH
+      GR
+      0 16 RM
+      GS
+            0 SG
+            /Courier FF [14 0 0 -14 0 0] MS
+            (}) SH
+      GR
+   GR
+
+% POLY/OPEN-SPLINE
+0 SG
+GS
+   NP
+      416 528 M
+      448 528 L
+      458.67 528.00 464.00 522.67
+      464 512 CT
+      464 192 L
+      464.00 181.33 469.33 176.00
+      480 176 CT
+      528 176 L
+      0 48 atan DU cos 8.000 MU 528 exch SU
+      exch sin 8.000 MU 176 exch SU L
+   TGSM
+   1 W
+   S
+GR
+GS
+   TGSM
+   NP
+      528 176 8.000 3.000 48 0 TGAT
+   1 SG CP F
+   0 SG
+   NP
+      528 176 8.000 3.000 48 0 TGAT
+   CP F
+GR
+
+% TEXT
+NP
+0 SG
+   GS
+      1 W
+      464 272 M
+      GS
+        GS
+        0
+            /Helvetica-Oblique FF [14 0 0 -14 0 0] MS
+            (Frequency-Hop ) TGSW 
+        AD
+        GR
+      NE 0 RM
+            0 SG
+            /Helvetica-Oblique FF [14 0 0 -14 0 0] MS
+            (Frequency-Hop ) SH
+      GR
+      0 17 RM
+      GS
+        GS
+        0
+            /Helvetica-Oblique FF [14 0 0 -14 0 0] MS
+            (Message ) TGSW 
+        AD
+        GR
+      NE 0 RM
+            0 SG
+            /Helvetica-Oblique FF [14 0 0 -14 0 0] MS
+            (Message ) SH
+      GR
+   GR
+
+% POLY/OPEN-SPLINE
+0 SG
+GS
+   NP
+      832 304 M
+      842.67 304.00 848.00 309.33
+      848 320 CT
+      848 400 L
+      848.00 410.67 853.33 416.00
+      864 416 CT
+      853.33 416.00 848.00 421.33
+      848 432 CT
+      848 528 L
+      848.00 538.67 842.67 544.00
+      832 544 CT
+   TGSM
+   1 W
+   S
+GR
+
+% TEXT
+NP
+0 SG
+   GS
+      1 W
+      944 416 M
+      GS
+        GS
+        0
+            /Helvetica-Oblique FF [14 0 0 -14 0 0] MS
+            (See Fig. 9) TGSW 
+        AD
+        GR
+      NE 0 RM
+            0 SG
+            /Helvetica-Oblique FF [14 0 0 -14 0 0] MS
+            (See Fig. 9) SH
+      GR
+      0 17 RM
+      GS
+        GS
+        0
+            /Helvetica-Oblique FF [14 0 0 -14 0 0] MS
+            (for diagram) TGSW 
+        AD
+        GR
+      NE 0 RM
+            0 SG
+            /Helvetica-Oblique FF [14 0 0 -14 0 0] MS
+            (for diagram) SH
+      GR
+   GR
+
+% POLY/OPEN-SPLINE
+0 SG
+GS
+   NP
+      256 992 M
+      464 992 L
+      474.67 992.00 480.00 986.67
+      480 976 CT
+      480 224 L
+      480.00 213.33 485.33 208.00
+      496 208 CT
+      528 208 L
+      0 32 atan DU cos 8.000 MU 528 exch SU
+      exch sin 8.000 MU 208 exch SU L
+   TGSM
+   1 W
+   S
+GR
+GS
+   TGSM
+   NP
+      528 208 8.000 3.000 32 0 TGAT
+   1 SG CP F
+   0 SG
+   NP
+      528 208 8.000 3.000 32 0 TGAT
+   CP F
+GR
+
+% POLY/OPEN-SPLINE
+0 SG
+GS
+   NP
+      256 1072 M
+      464 1072 L
+      474.67 1072.00 480.00 1066.67
+      480 1056 CT
+      480 976 L
+   TGSM
+   1 W
+   S
+GR
+
+% TEXT
+NP
+0 SG
+   GS
+      1 W
+      480 896 M
+      GS
+        GS
+        0
+            /Helvetica-Oblique FF [14 0 0 -14 0 0] MS
+            (Booster ) TGSW 
+        AD
+        GR
+      NE 0 RM
+            0 SG
+            /Helvetica-Oblique FF [14 0 0 -14 0 0] MS
+            (Booster ) SH
+      GR
+      0 17 RM
+      GS
+        GS
+        0
+            /Helvetica-Oblique FF [14 0 0 -14 0 0] MS
+            (Re-Initialization ) TGSW 
+        AD
+        GR
+      NE 0 RM
+            0 SG
+            /Helvetica-Oblique FF [14 0 0 -14 0 0] MS
+            (Re-Initialization ) SH
+      GR
+      0 17 RM
+      GS
+        GS
+        0
+            /Helvetica-Oblique FF [14 0 0 -14 0 0] MS
+            (Messate ) TGSW 
+        AD
+        GR
+      NE 0 RM
+            0 SG
+            /Helvetica-Oblique FF [14 0 0 -14 0 0] MS
+            (Messate ) SH
+      GR
+   GR
+
+% POLY/OPEN-SPLINE
+0 SG
+GS
+   NP
+      464 240 M
+      464.00 250.67 458.67 256.00
+      448 256 CT
+      336 256 L
+      0 -112 atan DU cos 8.000 MU 336 exch SU
+      exch sin 8.000 MU 256 exch SU L
+   TGSM
+   1 W
+   S
+GR
+GS
+   TGSM
+   NP
+      336 256 8.000 3.000 -112 0 TGAT
+   1 SG CP F
+   0 SG
+   NP
+      336 256 8.000 3.000 -112 0 TGAT
+   CP F
+GR
+
+% POLY/OPEN-SPLINE
+0 SG
+GS
+   NP
+      480 1056 M
+      480 1168 L
+      480.00 1178.67 474.67 1184.00
+      0 -16 atan DU cos 8.000 MU 464 exch SU
+      exch sin 8.000 MU 1184 exch SU CT
+   TGSM
+   1 W
+   S
+GR
+GS
+   TGSM
+   NP
+      464 1184 8.000 3.000 -16 0 TGAT
+   1 SG CP F
+   0 SG
+   NP
+      464 1184 8.000 3.000 -16 0 TGAT
+   CP F
+GR
+
+GR
+tgifsavedpage restore
+end
+showpage
+
+%%Trailer
+%MatchingCreationDate: Thu Jan 15 04:08:23 2004
+%%DocumentFonts: Helvetica-Oblique
+%%+ Courier
+%%EOF
