@@ -59,7 +59,7 @@ variable $\mt{WRITE}_{c, p}$ with this domain:
 variable $\mt{READ}_{c, p}$ with this domain:
 \begin{align}
 \label{eq:read}
-{\cal D}_{{READ}_{c, p}} = \{~(i,j,k)~|~0 \le i \le N-1 ~\wedge~ 0 \le j \le S(n_b) - 1 ~\wedge~ 0 \le k \le E(c, p) - 1\}
+{\cal D}_{{READ}_{c, p}} = \{~(i,j,k)~|~0 \le i \le N-1 ~\wedge~ 0 \le j \le S(n_b) - 1 ~\wedge~ 0 \le k \le O(c, p) - 1\}
 \end{align}
 %
 \end{itemize}
@@ -71,39 +71,39 @@ variable $\mt{READ}_{c, p}$ with this domain:
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\begin{figure}[ht]
-\framebox[6.5in]{
-\begin{minipage}{6.3in}
-\begin{center}
-{\bf Equations (1 of 2)}
-\end{center}
-\noindent For each node $n$, introduce the following equations:
-\begin{itemize}
+%\begin{figure}[ht]
+%\framebox[6.5in]{
+%\begin{minipage}{6.3in}
+%\begin{center}
+%{\bf Equations (1 of 2)}
+%\end{center}
+%\noindent For each node $n$, introduce the following equations:
+%\begin{itemize}
 %
-\item {\bf(I to READ)} For each $c \in \mt{chan\_in}(n)$, and for each phase $p \in [0,
-\mt{num}(n)-1]$:
-\begin{align}
-\label{i2read}
-&\forall (i,j,k) \in {\cal D}_{I \rightarrow SR}(n,c,p):~~
-\mt{READ}_{c, p}(i,j,k) = 
-    \mt{I}(c)[\mt{ReadIndex}(n,c,p,i,j,k)], \mt{where} \nonumber\\
-&\mt{ReadIndex}(n,c,p,i,j,k) = (i*S(n)+j)*\mt{TotalRead}(n,c) \\ \nonumber
-                &~~~~~~+ \mt{PartialRead}(c,p) + k \\\nonumber
-&\mt{and }{\cal D}_{I \rightarrow SR}(n,c,p) = 
-  \{ (i,j,k)~|~\mt{ReadIndex}(n,c,p,i,j,k) \in [0, A(c) - 1] \}
-\end{align}
+%\item {\bf(I to READ)} For each $c \in \mt{chan\_in}(n)$, and for each phase $p \in [0,
+%\mt{num}(n)-1]$:
+%\begin{align}
+%\label{i2read}
+%&\forall (i,j,k) \in {\cal D}_{I \rightarrow SR}(n,c,p):~~
+%\mt{READ}_{c, p}(i,j,k) = 
+%    \mt{I}(c)[\mt{ReadIndex}(n,c,p,i,j,k)], \mt{where} \nonumber\\
+%&\mt{ReadIndex}(n,c,p,i,j,k) = (i*S(n)+j)*\mt{TotalRead}(n,c) \\ \nonumber
+%                &~~~~~~+ \mt{PartialRead}(c,p) + k \\\nonumber
+%&\mt{and }{\cal D}_{I \rightarrow SR}(n,c,p) = 
+%  \{ (i,j,k)~|~\mt{ReadIndex}(n,c,p,i,j,k) \in [0, A(c) - 1] \}
+%\end{align}
 %
-\end{itemize}
-\end{minipage}}
-\caption{Equations for PCP to SARE translation.
-\protect\label{fig:pcptosare2}}
-\end{figure}
+%\end{itemize}
+%\end{minipage}}
+%\caption{Equations for PCP to SARE translation.
+%\protect\label{fig:pcptosare2}}
+%\end{figure}
 
 \begin{figure}[ht]
 \framebox[6.5in]{
 \begin{minipage}{6.3in}
 \begin{center}
-{\bf Equations (2 of 2)}
+%{\bf Equations (2 of 2)}
 \end{center}
 \noindent For each node $n$, introduce the following equations:
 \begin{itemize}
@@ -134,8 +134,7 @@ num(n)-1]$:
 \end{align}
 % here is the simple, base case of the BUF -> READ function
 \item {\bf(BUF to READ)} For each $c \in \mt{chan\_in}(n)$, for each phase $p \in [0,
-\mt{num}(n)-1]$, and for each $q \in [0, \lfloor
-\frac{\mt{E(c, p)}}{\mt{Period(c)}} \rfloor]$:
+\mt{num}(n)-1]$:
 % two possible problems: read has already been written to, or buf has already been read from
 \begin{align}
 \label{buf2read0}
@@ -153,7 +152,7 @@ num(n)-1]$:
                                 \le k 
                                 \le \\ \nonumber
 	&~~~~~~~~~~~~min((q+1)*\mt{Period}(c),
-         E(c, p)) - 1 
+         O(c, p)) - 1 
          - \mt{Mod\_Offset}(n,c,p) \}\\ \nonumber\\
 \label{buf2read1}
 %\end{align}
@@ -175,7 +174,7 @@ num(n)-1]$:
                          &~~~~~~( \{ (i,j,k)~|~q * \mt{Period}(c)
                                 \le k 
                                 \le min((q+1)*\mt{Period}(c),
-                                E(c, p)) - 1 \} - {{\cal D}\mt{1}}_{SB \rightarrow SR}(c,p,q) )\\ \nonumber \\
+                                O(c, p)) - 1 \} - {{\cal D}\mt{1}}_{SB \rightarrow SR}(c,p,q) )\\ \nonumber \\
 \label{buf2read2}
 %\end{align}
 %\begin{align}
@@ -186,7 +185,7 @@ num(n)-1]$:
 % this is a dot product of (i,j,k) with something
   (max_{\preceq}\mt{PUSHED}(n,c,p)) \cdot (S(n) * \mt{TotalRead}(n,c), \\ \nonumber
                                         &~~~~~~\mt{TotalRead}(n,c), 1 ) + \mt{PartialRead}(c, p) \\ \nonumber
-&\mt{and }\mt{Offset}(n,c,p) = \mt{Num\_Pushed}(n,c,p) + E(c,p)-O(c,p) \\ \nonumber
+&\mt{and }\mt{Offset}(n,c,p) = \mt{Num\_Pushed}(n,c,p) + O(c,p)-O(c,p) \\ \nonumber
 &\mt{and }\mt{Int\_Offset}(n,c,p) = - \lfloor \frac{\mt{Offset}(n,c,p)}{\mt{Period}(c)} \rfloor 
 ~~\mt{and }\mt{Mod\_Offset}(n,c,p) = - \mt{Offset}(n,c,p)~\mt{mod}~\mt{Period}(c) \nonumber
 %
