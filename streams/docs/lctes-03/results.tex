@@ -123,6 +123,7 @@ constraints. \protect\label{fig:sumgraph}}
 \end{figure}
 
 \begin{table*} \centering \small
+\vspace{-4pt}
 \begin{tabular}{|c|c|c|c|c|c|c|}
 \hline {\parbox{0.8in}{ \vspace{3pt} {\bf Benchmark}}} & \parbox{0.8in}{\centering \vspace{8pt}{\bf Number of Nodes}} & \parbox{0.8in}{\centering \vspace{16pt} {\bf Number of Node Executions}} & \multicolumn{2}{c|}{{\bf Single Appearance}} & \multicolumn{2}{c|}{{\bf Minimal Latency}} \\
 \cline{4-7} & & & \parbox{0.8in}{\centering ~ \\ \vspace{6pt} {\bf Schedule Size} ~ \\ } & \parbox{0.8in}{\centering ~ \\ \vspace{-3.3pt} {\bf Buffer Size} ~ \\ } & \parbox{0.8in}{\centering ~ \\ \vspace{6pt} {\bf Schedule Size} ~ \\ } & \parbox{0.8in}{\centering ~ \\ \vspace{-3.3pt} {\bf Buffer Size} ~ \\ } \\
@@ -174,5 +175,5 @@ the stream graph provides a set granularity at which the leaf nodes of
 the graph can be interleaved---for example, in a hierarchical
 single-appearance schedule, two consecutive executions of a pipeline
 construct would execute all of its nodes once before executing all of
-the nodes again.  We are currently exploring other interleaving
-strategies for the nodes within a given phase.
+the nodes again.  We are exploring other interleaving strategies for
+the nodes within a given phase.
