@@ -34,15 +34,14 @@ that expose the parallelism and communication of streaming
 applications without depending on the granularity of the underlying
 architecture.  Our current backend is for Raw~\cite{raw}, a tiled
 architecture with fine-grained, programmable communication between
-processors.  However, the compiler consists of three general
-techniques that can be applied to compile StreamIt to machines other
-than Raw: 1) partitioning, which adjusts the granularity of a stream
-graph to match that of a given target, 2) layout, which maps a
-partitioned stream graph to a given network topology, and 3)
-scheduling, which generates a fine-grained static communication
-pattern for each computational element.  We consider this work to be a
-first step towards a portable programming model for
-communication-exposed architectures.
+processors.  However, the compiler employs three general techniques
+that can be applied to compile StreamIt to machines other than Raw: 1)
+partitioning, which adjusts the granularity of a stream graph to match
+that of a given target, 2) layout, which maps a partitioned stream
+graph to a given network topology, and 3) scheduling, which generates
+a fine-grained static communication pattern for each computational
+element.  We consider this work to be a first step towards a portable
+programming model for communication-exposed architectures.
 
 %% This paper makes the following contributions:
 %% \begin{itemize}

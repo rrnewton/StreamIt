@@ -32,11 +32,11 @@ are satisfied by the partitioning phase described above.
 
 The layout phase of the StreamIt compiler is implemented using
 simulated annealing \cite{simanneal}.  We choose simulated annealing
-for its combination of performance and flexibly.  To adapt the layout
-phase for a given architecture, we supply the simulated annealing
-algorithm with three architecture-specific parameters: a cost
-function, a perturbation function, and the set of legal layouts.  To
-change the compiler to target one tiled architecture instead of
+for its combination of performance and flexibility.  To adapt the
+layout phase for a given architecture, we supply the simulated
+annealing algorithm with three architecture-specific parameters: a
+cost function, a perturbation function, and the set of legal layouts.
+To change the compiler to target one tiled architecture instead of
 another, these parameters should require only minor modifications.
 
 % To retarget the layout phase of the compiler, we simply supply the
@@ -92,13 +92,13 @@ After some experimentation, we arrived at the following cost function
 to guide the layout on Raw.  We let $channels$ denote the pairs of
 nodes $\{(src_1, dst_1) \dots (src_N, dst_N)\}$ that are connected by
 a channel in the stream graph; $layout(n)$ denote the placement of
-node $n$ on the Raw grid; and $route(src, dst)$ denote the path of
+node $n$ on the Raw grid; and \\ $route(src, dst)$ denote the path of
 tiles through which a data item is routed in traveling from tile $src$
 to tile $dst$.  In our implementation, the $route$ function is a
 simple dimension-ordered router that traces the path from $src$ to
 $dst$ by first routing in the X dimension and then routing in the Y
-dimension.  Our cost function evaluates a given layout of the stream
-graph, for a fixed value of $channels$ and $route$:
+dimension.  Given fixed values of $channels$ and $route$, our cost
+function evaluates a given layout of the stream graph:
 \begin{align*}
 cost(layout) =  \sum_{(src,dst) \in channels}
  {\bf items}(src,dst)
@@ -109,14 +109,45 @@ cost(layout) =  \sum_{(src,dst) \in channels}
 \mt{routing-path} = route(layout(src), layout(dst))
 \end{align*}
 
+\begin{figure}
+\centering
+\psfig{figure=joiner-buffer-dead.eps,width=2in}
+\caption{\protect\small Example of deadlock in a splitjoin.  As the
+joiner is reading items from the stream on the left, items accumulate
+in the channels on the right.  On Raw, senders will block once a
+channel has four items in it.  Thus, once 10 items have passed through
+the joiner, the system is deadlocked, as the joiner is trying to read
+from the left, but the stream on the right is blocked.  The Identity
+filter is blocking on the send of item \#10, and the splitter is
+blocking on the send of item \#20.  If the weights on the joiner were
+(10, 10), the system would be deadlock-free.
+\protect\label{fig:joiner-dead}}
+
+\vspace{48pt}
+
+\psfig{figure=joiner-buffer-live.eps,width=3.2in}
+\caption{\protect\small Fixing the deadlock with a buffering joiner.
+The buffering-roundrobin is an internal StreamIt construct (it is not
+part of the language) which reads items from its input channels in the
+order in which they arrive, rather than in the order specified by its
+weights.  The order of arrival is determined by a simulation of the
+stream graph's execution; thus, the system is guaranteed to be
+deadlock-free, as the order given by the simulation is feasible for
+execution on Raw.  To preserve the semantics of the joiner, the items
+are written to the output channel from the internal buffers in the
+order specified by the joiner's weights.  The ordered items are sent
+to the output as soon as they become available.
+\protect\label{fig:joiner-live}}
+\end{figure}
+
 In this equation, ${\bf items}(src, dst)$ gives the number of data
 items that are transfered from $src$ to $dst$ during each steady state
 execution, ${\bf hops}(p)$ gives the number of intermediate tiles
 traversed on the path $p$, and ${\bf sync}(p)$ estimates the cost of
 the synchronization imposed by the path $p$.  We calculate ${\bf
 sync}(p)$ as the number of tiles along the route that are assigned a
-stream node, plus the number of tiles along the route that are
-involved in routing {\it other} channels.
+stream node plus the number of tiles along the route that are involved
+in routing {\it other} channels.
 
 With the above cost function, we heavily weigh the added
 synchronization imposed by the layout.  For Raw, this metric is far

@@ -1,34 +1,3 @@
-\begin{figure}
-\centering
-\psfig{figure=joiner-buffer-dead.eps,width=4.59in}
-\parbox{6in}{\caption{\protect\small Example of deadlock in a
-splitjoin.  As the joiner is reading items from the stream on the
-left, items accumulate in the channels on the right.  On Raw, senders
-will block once a channel has four items in it.  Thus, once 10 items
-have passed through the joiner, the system is deadlocked, as the
-joiner is trying to read from the left, but the stream on the right is
-blocked.  The Identity filter is blocking on the send of item \#10,
-and the splitter is blocking on the send of item \#20.  If the weights
-on the joiner were (10, 10), the system would be deadlock-free.
-\protect\label{fig:joiner-dead}}}
-
-\vspace{48pt}
-
-\psfig{figure=joiner-buffer-live.eps,width=3.97in}
-\caption{\protect\small Fixing the deadlock with a buffering joiner.
-The buffering-roundrobin is an internal StreamIt construct (it is not
-part of the language) which reads items from its input channels in the
-order in which they arrive, rather than in the order specified by its
-weights.  The order of arrival is determined by a simulation of the
-stream graph's execution; thus, the system is guaranteed to be
-deadlock-free, as the order given by the simulation is feasible for
-execution on Raw.  To preserve the semantics of the joiner, the items
-are written to the output channel from the internal buffers in the
-order specified by the joiner's weights.  The ordered items are sent
-to the output as soon as they become available.
-\protect\label{fig:joiner-live}}
-\end{figure}
-
 \section{Communication Scheduler}
 \label{sec:communic}
 

@@ -9,6 +9,77 @@ computation code that executes on a computation node of the target.
 The communication code of the program is generated from the schedules
 produced by the communication scheduler.
 
+\begin{table*}[t]
+\begin{center}
+\scriptsize
+\begin{tabular}{|l|l|} \hline
+{\bf Benchmark} & {\bf Description}\\
+\hline \hline
+FM Radio & A software-based FM Radio with equalizer.\\
+\hline
+GSM & A GSM decoder.\\
+\hline
+\Radar & A core component of modern radar, sonar, and communications signal processors. \cite{pca}\\
+\hline
+FFT & A 64-element FFT. \\
+\hline
+CRC & A 32-bit Cyclic Redundancy Check (CRC) Encoder/Decoder. \\
+\hline
+\end{tabular}
+\vspace{-6pt}
+\caption{\protect\small Application Descriptions.}
+\label{tab:benchmarks}
+\vspace{-12pt}
+\end{center}
+\end{table*}
+
+\begin{table*}[t]
+\begin{center}
+\scriptsize
+\begin{tabular}{|l|c|c|c|c|c|c|c|} \hline
+& \hspace{-5pt} {\bf Lines} \hspace{-5pt} & \multicolumn{3}{|c|}{\hspace{-5pt} {\bf Unoptimized} \hspace{-5pt} } & \multicolumn{3}{|c|}{\hspace{-5pt} {\bf Optimized} \hspace{-5pt}}\\
+\cline{3-8}
+\hspace{-5pt} {\bf Benchmark} \hspace{-5pt} &
+\begin{tabular}{c} 
+\hspace{-5pt} {\bf of} \hspace{-5pt} \\ \hspace{-5pt} {\bf code} \hspace{-5pt}
+\end{tabular} &    
+\begin{tabular}{c} 
+\hspace{-5pt} {\bf \# of} \hspace{-5pt} \\ \hspace{-5pt} {\bf tiles} \hspace{-5pt}
+\end{tabular} &    
+\begin{tabular}{c}\hspace{-5pt} {\bf Throughput} \hspace{-5pt}\\
+\hspace{-5pt} {\bf (per 10$^5$ cycles)} \hspace{-5pt}
+\end{tabular} &    
+\hspace{-5pt} {\bf MFLOPS} \hspace{-5pt} & 
+\begin{tabular}{c} 
+\hspace{-5pt} {\bf \# of} \hspace{-5pt} \\ \hspace{-5pt} {\bf tiles} \hspace{-5pt}
+\end{tabular} &    
+\begin{tabular}{c}\hspace{-5pt} {\bf Throughput} \hspace{-5pt} \\
+\hspace{-5pt} {\bf (per 10$^5$ cycles)} \hspace{-5pt}
+\end{tabular}  &
+{\bf MFLOPS}
+\\
+\hline \hline
+\Radar (12x4) & 596 & 53 & 1.1 & 619 & 15 & 2.7 & 1470 \\
+\hline
+\Radar (48x16) & 596 & 209 & N/A & N/A & 15 & 0.3 & 836\\
+\hline
+FM Radio & 511 & 14 & 34 & 107 & 13 & 81 & 258\\
+\hline
+FFT & 174 & 37 & 669 & 12.5 & 16 & 657 & 12.3 \\
+\hline
+GSM Decoder & 1925 & 16 & 107 & N/A & 15 & 107 & N/A\\
+\hline
+CRC & 336 & 47 & 35.1 & N/A & 5 & 52.4 & N/A\\
+\hline
+%%Matrix & \\
+%%\hline
+\end{tabular}
+\vspace{-6pt}
+\caption{\protect\small Performance Results.}
+\label{tab:performance}
+\end{center}
+\vspace{-12pt}
+\end{table*}
 
 \subsection{Code Generation for Raw}
 
@@ -48,7 +119,7 @@ scheduler computes an internal buffer schedule for each collapsed
 Joiner node.  This schedule exactly describes the order in which to
 send and receive data items from within the Joiner.  The schedule is
 annotated with the destination buffer of the receive instruction and
-the source buffer of send instruction.  Also, the communication
+the source buffer of the send instruction.  Also, the communication
 scheduler calculates the maximum size of each buffer.  With this
 information the code generation phase can produce the code necessary
 to realize the internal buffer schedule on the tile processor.

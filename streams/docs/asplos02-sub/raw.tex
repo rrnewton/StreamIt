@@ -1,8 +1,9 @@
 \begin{figure}
 \centering
-\psfig{figure=raw-diagram.eps,width=3.5in}
+\psfig{figure=raw-diagram.eps,width=3.2in}
 \caption{A block diagram of the Raw architecture.
 \protect\label{fig:raw-diagram}}
+\vspace{-20pt}
 \end{figure}
 
 \section{The Raw Architecture}
@@ -40,6 +41,36 @@ are blocking and flow-controlled, which allows for the computation to
 remain unperturbed by unpredictable timing variations such as cache
 misses and interrupts.
 
+\begin{table*}[t]
+\begin{center}
+\scriptsize
+\begin{tabular}{|l|l|} \hline
+{\bf Phase} & {\bf Function} \\
+\hline \hline
+KOPI Front-end & Parses syntax into a Java-like abstract syntax tree. \\
+\hline
+SIR Conversion & Converts the AST to the StreamIt IR (SIR). \\
+\hline
+Graph Expansion & Expands all parameterized structures in the stream graph. \\
+\hline
+Scheduling & Calculates initialization and steady-state execution orderings for filter firings. \\
+\hline
+Partitioning & Performs fission and fusion transformations for load balancing. \\
+\hline
+Layout & Determines minimum-cost placement of filters on grid of Raw tiles. \\
+\hline
+Communication Scheduling & Orchestrates fine-grained communication between tiles via simulation of the stream graph. \\
+\hline
+Code generation & Generates code for the tile and switch processors. \\
+\hline
+\end{tabular}
+\vspace{-6pt}
+\caption{\protect\small Phases of the StreamIt compiler.
+\label{tab:phases}}
+\vspace{-12pt}
+\end{center}
+\end{table*}
+
 Each tile's static router has a virtualized instruction memory to
 control the crossbars of the two static networks. Collectively, the
 static routers can reconfigure the communication pattern across these
@@ -59,7 +90,7 @@ To route a word from one tile to another, the compiler inserts a route
 instruction on every intermediate static router \cite{lee98spacetime}.
 Because the routers are pipelined and compile-time scheduled, they can
 deliver a value from the ALU of one tile to the ALU of a neighboring
-tile in 3 cycles, or more generally, 2+N hops for a inter-tile
+tile in 3 cycles, or more generally, 2+N cycles for an inter-tile
 distance of N hops.
 
 The results of this paper were generated using btl, a cycle-accurate

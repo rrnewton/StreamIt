@@ -1,28 +1,29 @@
 \begin{figure}
-  \psfig{figure=beam-blood-key.eps,width=3.25in} \\
+  \psfig{figure=beam-blood-key.eps,width=3.2in} \\
   \subfigure[\vspace{-6pt}
-    Original.\label{fig:beam-blood1}]{\psfig{figure=beam-blood-orig.eps,width=3in}}
+    Original.\label{fig:beam-blood1}]{\psfig{figure=beam-blood-orig.eps,width=3.2in}}
   \hspace{0.3in} \subfigure[\vspace{-6pt}
-    Load-balanced.\label{fig:beam-blood2}]{\psfig{figure=beam-blood-opt.eps,width=3in}
+    Load-balanced.\label{fig:beam-blood2}]{\psfig{figure=beam-blood-opt.eps,width=3.2in}
     \vspace{-6pt}} \vspace{-6pt} \caption{Execution traces for the (a)
-    original and (b) load-balanced partitionings of the \Radar application.
-    The $x$ axis denotes time, and the $y$ axis denotes the processor.
-    The dark bands indicate periods where processors are blocked
-    waiting to receive an input or send an output.  Light regions
-    indicate periods of useful work.  The thin stripes in the light
-    regions represent pipeline stalls. \protect\label{fig:beam-blood}}
+    original and (b) load-balanced partitionings of the \Radar~
+    application.  The $x$ axis denotes time, and the $y$ axis denotes
+    the processor.  The dark bands indicate periods where processors
+    are blocked waiting to receive an input or send an output.  Light
+    regions indicate periods of useful work.  The thin stripes in the
+    light regions represent pipeline
+    stalls. \protect\label{fig:beam-blood}}
 \end{figure}
 
 \begin{figure}
-\psfig{figure=beam-graph-orig.eps,width=6.5in}
-\caption{\protect\small Stream graph of the original 12x4 \Radar
+\psfig{figure=beam-graph-orig.eps,width=2.5in}
+\caption{\protect\small Stream graph of the original 12x4 \Radar~
 application.  The 12x4 \Radar application has 12 channels and 4 beams;
 it is the largest version that fits onto 64 tiles without filter
 fusion.  \protect\label{fig:beam-orig}}
 \vspace{36pt}
-\psfig{figure=beam-graph-opt.eps,width=6.5in}
+\psfig{figure=beam-graph-opt.eps,width=2.5in}
 \caption{\protect\small Stream graph of the load-balanced 12x4
-\Radar application.  Vertical fusion is applied to collapse each pipeline
+\Radar~ application.  Vertical fusion is applied to collapse each pipeline
 into a single filter, and horizontal fusion is used to transform the
 4-way splitjoin into a 2-way splitjoin.  Figure~\ref{fig:beam-blood}
 shows the benefit of these
@@ -97,12 +98,12 @@ fused.  Currently, a simple greedy algorithm is used to automatically
 select the targets of fusion and fission, based on the estimate of the
 work in each node.
 
-For example, in the case of the \Radar application, the original stream graph
-(Figure~\ref{fig:beam-orig}) contains 52 nodes.  These nodes have
-unbalanced amounts of computation, as evidenced by the execution trace
-in Figure~\ref{fig:beam-blood1}.  The partitioner fuses all of the
-pipelines in the graph, and then fuses the bottom 4-way splitjoin into
-a 2-way splitjoin, yielding the stream graph in
+For example, in the case of the \Radar~ application, the original
+stream graph (Figure~\ref{fig:beam-orig}) contains 52 nodes.  These
+nodes have unbalanced amounts of computation, as evidenced by the
+execution trace in Figure~\ref{fig:beam-blood1}.  The partitioner
+fuses all of the pipelines in the graph, and then fuses the bottom
+4-way splitjoin into a 2-way splitjoin, yielding the stream graph in
 Figure~\ref{fig:beam-opt}.  As illustrated by the execution trace in
 Figure~\ref{fig:beam-blood2}, the partitioned graph has much better
 load balancing.  In the following sections, we describe in more detail
@@ -155,11 +156,33 @@ the following sections.
 
 \begin{figure}
 \centering
-\psfig{figure=fuse-pipeline.eps,width=6.5in}
+\psfig{figure=fuse-pipeline-a.eps,width=1in}
+\subfigure{\label{fig:fuse-pipe-a}}
+\psfig{figure=fuse-pipeline-b.eps,width=2.2in}
+\subfigure{\label{fig:fuse-pipe-b}}
 \vspace{-6pt}
 \caption{\protect\small Vertical fusion with buffer localization and
 modulo-division optimizations. \label{fig:fuse-pipe}}
-\vspace{-6pt}
+\vspace{12pt}
+\psfig{figure=fuse-splitjoin-a.eps,width=3in}
+\subfigure{\label{fig:fuse-splitjoin-a}}
+\psfig{figure=fuse-splitjoin-b.eps,width=3in}
+\subfigure{\label{fig:fuse-splitjoin-b}}
+\caption{\protect\small Horizontal fusion of a duplicate splitjoin
+construct with buffer sharing optimization. \protect\label{fig:fuse-splitjoin}}
+%% \vspace{18pt}
+%% \psfig{figure=fuse-splitjoin2.eps,width=4.93in}
+%% \caption{\protect\small Fusion of a roundrobin splitjoin construct.
+%% The fusion transformation for splitjoins containing roundrobin
+%% splitters is similar to those containing duplicate splitters.  One
+%% filter simulates the execution of a steady-state cycle in the
+%% splitjoin by inlining the code from each filter.  This filter is
+%% surrounded by Reorderroundrobin filters that recreate the reordering of
+%% the roundrobin nodes.  In the above example, the difference the
+%% splitter's weights, the filter's I/O rates, and the joiner's weights
+%% adds complexity to the reordering.  Though this transformation is
+%% fully automated in the StreamIt compiler, a general formulation is
+%% beyond the scope of this paper.  \protect\label{fig:fuse-splitjoin2}}
 \end{figure}
 
 \subsubsection{Optimizing Vertical Fusion}
@@ -191,25 +214,6 @@ Note that the {\tt peek\_buffer} is for storing items that are
 persistent from one firing to the next, while the local {\tt buffer}
 is just for communicating values during a single firing.
 
-\begin{figure}
-\psfig{figure=fuse-splitjoin.eps,width=4.93in}
-\caption{\protect\small Horizontal fusion of a duplicate splitjoin
-construct with buffer sharing optimization. \protect\label{fig:fuse-splitjoin}}
-%% \vspace{18pt}
-%% \psfig{figure=fuse-splitjoin2.eps,width=4.93in}
-%% \caption{\protect\small Fusion of a roundrobin splitjoin construct.
-%% The fusion transformation for splitjoins containing roundrobin
-%% splitters is similar to those containing duplicate splitters.  One
-%% filter simulates the execution of a steady-state cycle in the
-%% splitjoin by inlining the code from each filter.  This filter is
-%% surrounded by Reorderroundrobin filters that recreate the reordering of
-%% the roundrobin nodes.  In the above example, the difference the
-%% splitter's weights, the filter's I/O rates, and the joiner's weights
-%% adds complexity to the reordering.  Though this transformation is
-%% fully automated in the StreamIt compiler, a general formulation is
-%% beyond the scope of this paper.  \protect\label{fig:fuse-splitjoin2}}
-\end{figure}
-
 \subsubsection{Optimizing Horizontal Fusion}
 
 The naive fusion algorithm maintains a separate input buffer for each
@@ -231,15 +235,18 @@ filter that represents the entire splitjoin.
 
 \begin{figure}
 \centering
-\psfig{figure=duplicate-fission-2.eps,width=4.60in}
-\caption{\protect\small Fission of a filter that does not peek.
+%\psfig{figure=duplicate-fission-2.eps,width=3.2in}
+%\caption{\protect\small Fission of a filter that does not peek.
 %For filters such as a VectorMultiply that consumes every item they look
 %at, horizontal fission consists of embedding copies of the filter in a
 %$K$-way roundrobin splitjoin.  The weights of the splitter and joiner
 %are set to match the $pop$ and $push$ rates of the filter, respectively.  
-\protect\label{fig:fission-nopeek}}
-\vspace{18pt}
-\psfig{figure=duplicate-fission.eps,width=3.94in}
+%\protect\label{fig:fission-nopeek}}
+%\vspace{18pt}
+\psfig{figure=duplicate-fission-a.eps,width=1.2in}
+\subfigure{\label{fig:fission-peek-a}}
+\psfig{figure=duplicate-fission-b.eps,width=2in}
+\subfigure{\label{fig:fission-peek-b}}
 \caption{\protect\small Fission of a filter that peeks.  
 %Since the MovingAverage filter reads items that it does not consume, the
 %duplicated versions of the filter need to access overlapping portions
@@ -287,12 +294,12 @@ that is being parallelized into an $K$-way splitjoin.  There are two
 cases to consider:
 \begin{enumerate}
 \item If {\bf $peek = pop$}, then $F$ can simply be duplicated $K$
-ways in the splitjoin (see Figure~\ref{fig:fission-nopeek}).  The
-splitter is a roundrobin that routes $pop$ elements to each copy of
-$F$, and the joiner is a roundrobin that reads $push$ elements from
-each component.  Since $F$ does not peek at any items which it does
-not consume, its code does not need to be modified in the component
-streams--we are just distributing the invocations of $F$.
+ways in the splitjoin.  The splitter is a roundrobin that routes $pop$
+elements to each copy of $F$, and the joiner is a roundrobin that
+reads $push$ elements from each component.  Since $F$ does not peek at
+any items which it does not consume, its code does not need to be
+modified in the component streams--we are just distributing the
+invocations of $F$.
 
 \item If {\bf $peek > pop$}, then a different transformation is
 applied (see Figure~\ref{fig:fission-peek}).  In this case, the
@@ -309,23 +316,23 @@ joiner is a roundrobin that has a weight of $push$ for each stream.
 
 \begin{figure}
 \centering
-\psfig{figure=filter-hoisting.eps,width=4.81in}
+\psfig{figure=filter-hoisting.eps,width=3.2in}
 \caption{\protect\small Filter hoisting.  This transformation allows a
 stateless filter to be moved across a joiner node if its $push$ value
 evenly divides the weights of the joiner.
 \protect\label{fig:filter-hoisting}}
 \vspace{12pt}
-\psfig{figure=splitjoin-split.eps,width=5.13in}
+\psfig{figure=splitjoin-split.eps,width=3.2in}
 \caption{\protect\small Breaking a splitjoin into hierarchical units.
 Though our horizontal fusion algorithms work on the granularity of an
 entire splitjoin, it is straightforward to transform a large splitjoin
 into a number of smaller pieces, as shown here.  Following this
 transformation, the fusion algorithms can be applied to obtain an
 intermediate level of granularity.  This technique was employed to
-help load-balance the \Radar application (see Section~\ref{sec:results}).
+help load-balance the \Radar~ application (see Section~\ref{sec:results}).
 \protect\label{fig:splitjoin-split}}
 \vspace{12pt}
-\psfig{figure=sync-removal.eps,width=4.02in}
+\psfig{figure=sync-removal.eps,width=3.2in}
 \caption{\protect\small Synchronization removal.  If a splitter is
 bordering a joiner with identical weights, the nodes can be removed
 and the component streams can be connected.  This is especially useful
@@ -374,7 +381,7 @@ If the stream graph contains more nodes than the target architecture,
 then the partitioner works in the opposite direction and repeatedly
 fuses the least demanding stream construct until the graph will fit on
 the target.  The work estimates of the filters are tabulated
-hierarchically and each construct ({\it i.e.,} pipieline, splitjoin,
+hierarchically and each construct ({\it i.e.,} pipeline, splitjoin,
 and feedbackloop) is ranked according to the sum of its children's
 computational requirements.  At each step of the algorithm, an entire
 stream construct is collapsed into a single filter.  The only

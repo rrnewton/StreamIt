@@ -1,36 +1,6 @@
 \section{Compiling StreamIt to Raw}
 \label{sec:phases}
 
-\begin{table}[t]
-\begin{center}
-\scriptsize
-\begin{tabular}{|l|l|} \hline
-{\bf Phase} & {\bf Function} \\
-\hline \hline
-KOPI Front-end & Parses syntax into a Java-like abstract syntax tree. \\
-\hline
-SIR Conversion & Converts the AST to the StreamIt IR (SIR). \\
-\hline
-Graph Expansion & Expands all parameterized structures in the stream graph. \\
-\hline
-Scheduling & Calculates initialization and steady-state execution orderings for filter firings. \\
-\hline
-Partitioning & Performs fission and fusion transformations for load balancing. \\
-\hline
-Layout & Determines minimum-cost placement of filters on grid of Raw tiles. \\
-\hline
-Communication Scheduling & Orchestrates fine-grained communication between tiles via simulation of the stream graph. \\
-\hline
-Code generation & Generates code for the tile and switch processors. \\
-\hline
-\end{tabular}
-\vspace{-6pt}
-\caption{\protect\small Phases of the StreamIt compiler.
-\label{tab:phases}}
-\vspace{-12pt}
-\end{center}
-\end{table}
-
 The phases of the StreamIt compiler are described in
 Table~\ref{tab:phases}.  The front end is built on top of KOPI, an
 open-source compiler infrastructure for Java~\cite{kopi}.  We
@@ -66,11 +36,11 @@ schedule, there are many tradeoffs between code size, buffer size, and
 latency, and we are developing techniques to optimize different
 metrics \cite{streamittech2}.  In this paper, we use a simple
 hierarchical scheduler that constructs a Single Appearance Schedule
-(SAS) \cite{leesdf} for each filter.  An SAS is one where each node
-appears exactly once in the loop nest denoting the schedule.  We
-construct one such loop nest for each hierarchical stream construct,
-such that each component is executed a set number of times for every
-execution of its parent.  In later sections, we refer to the
+(SAS) \cite{leesdf} for each filter.  An SAS is a schedule where each
+node appears exactly once in the loop nest denoting the execution
+order.  We construct one such loop nest for each hierarchical stream
+construct, such that each component is executed a set number of times
+for every execution of its parent.  In later sections, we refer to the
 ``multiplicity'' of a filter as the number of times that it executes
 in one steady state execution of the entire stream graph.
 

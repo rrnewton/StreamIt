@@ -54,25 +54,24 @@ void->void pipeline FMRadio {
 \end{figure}
 
 \begin{figure}[t]
+\begin{center}
 \hspace{0.1in}
-\psfig{figure=radio-ascoded.eps, width=3in}
+\psfig{figure=radio-ascoded.eps, width=3.2in}
+\vspace{-36pt}
 \caption{Block diagram of the FM Radio.
 \protect\label{fig:radio-ascoded}}
-\vspace{0.8in}
 \vspace{10pt}
-  \psfig{figure=pipeline.eps,width=1.8in}
-
-(a) A pipeline. \\
-\vspace{10pt}
-  \psfig{figure=splitjoin.eps,width=1.8in}
-
-(b) A splitjoin. \\
-\vspace{10pt}
-  \psfig{figure=feedback.eps,width=1.8in}
+  \psfig{figure=pipeline.eps,width=1in} ~~~~~~~~ \psfig{figure=splitjoin.eps,width=1.8in}
+\end{center}
+~~~~(a) A pipeline. ~~~~~~~~~~~~~~~~~~~~~~ (b) A splitjoin. \\
+\vspace{-10pt}
+\begin{center}
+  \psfig{figure=feedback.eps,width=1.4in}
 
 (c) A feedbackloop. \\
 \caption{Stream structures supported by StreamIt.
 \protect\label{fig:structures}}
+\end{center}
 \end{figure}
 
 \section{The StreamIt Language}
@@ -147,7 +146,7 @@ who's output is connected to {\tt FMDemodulator}, and so on.  The {\tt
 add} statements can be mixed with regular imperative code to
 parameterize the construction of the stream graph.
 
-There are two other stream constructors besides pipeline: {\it
+There are two other stream constructs besides pipeline: {\it
 splitjoin} and {\it feedbackloop} (see Figure \ref{fig:structures}).
 From now on, we use the word {\it stream} to refer to any instance of
 a filter, pipeline, splitjoin, or feedbackloop.
@@ -181,7 +180,7 @@ that are connected by channels.  However, arbitrary graphs are very
 hard for the compiler to analyze, and equally difficult for a
 programmer to describe.  The comparison of StreamIt's structure with
 arbitrary stream graphs could be likened to the difference between
-structured control flow and GOTO statements; though the programmer
+structured control flow and GOTO statements: though the programmer
 might have to re-design some code to adhere to the structure, the
 gains in robustness, readability, and compiler analysis are immense.
 
