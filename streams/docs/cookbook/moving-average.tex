@@ -29,10 +29,10 @@ particular item off of the input stream, with \lstinline|peek(0)|
 returning the next item that would normally be popped.  The work
 function must declare a peek rate if it peeks at all, but this peek
 rate is a maximum, rather than an exact, rate; it would be valid for
-the \lstinline|Averager| filter to only look at \lstinline|n-1| of its
-inputs, but not for it to look at \lstinline|n+1|.  Note that mixing
-peeking and popping is valid, but that popping an item shifts the
-index of future peeks.
+the \lstinline|Averager| filter to \lstinline|peek(n-1)| and never
+\lstinline|peek(n)|, but \lstinline|peek(n+1)| is illegal.  Note that
+mixing peeking and popping is valid, but that popping an item shifts
+the index of future peeks.
 
 \lstinline|Averager| also has a \emph{stream parameter}.  The number
 \lstinline|n| is the number of items to average.  This is passed like
