@@ -17,11 +17,11 @@ slicing analyses for general procedural languages; $\sdep$ is
 decidable, exact, and admits a compact representation in terms of the
 steady state schedule.
 
-Pugh and Rosser present an iteration-based slicing~\cite{pugh97slice}
-which identifies the dynamic instances of statements (in terms of
-their loop iteration) which effect a given value.  This also bears
+Pugh and Rosser present an iteration-based slicing algorithm~\cite{pugh97slice}
+to identify the dynamic instances of statements (in terms of
+their loop iteration) that effect a given value.  This also bears
 some similarity to $\sdep$, as we calculate the last iteration of an
-actor which affects another.  However,~\cite{pugh97slice} focuses on the
+actor that affects another.  However,~\cite{pugh97slice} focuses on the
 problem of computing the transitive closure of dependences in loops.
 We are not interested in this question, as we assume that all actor
 invocations depend on their previous invocations; $\sdep$ addresses
@@ -64,8 +64,8 @@ functional languages; see Stephens~\cite{survey97} for a review.
 Languages of recent interest include Occam~\cite{occammanual},
 Sisal~\cite{sisal}, Parallel Haskell~\cite{ph}, StreamC /
 KernelC~\cite{imagine03ieee}, and Spidle~\cite{spidle02}.  The
-principle differences between StreamIt and these languages is the
+principle differences between StreamIt and these languages is $(i)$ the
 single-input, single-output hierarchical structure that StreamIt
-imposes on the stream graph; StreamIt's support for a ``peek''
-construct that inspects data without consuming it from a channel; and
+imposes on the stream graph, $(ii)$ StreamIt's support for a ``peek''
+construct that inspects data without consuming it from a channel, and $(iii)$
 the low-bandwidth messaging system described in this paper.

@@ -33,7 +33,7 @@ provide simple and precise event handling in stream programs.  Second,
 we define a stream dependence function, $\sdep$, which describes the
 ordering constraints of actor firings in an SDF graph.  This
 dependence information is similar to a program slice, which has a rich
-body of work surrounding it~\cite{tip95slice,hrb88pdg,pugh97slice}.
+body of work surrounding it~\cite{hrb88pdg,pugh97slice,tip95slice}.
 Like program slicing, $\sdep$ can also facilitate debugging and
 program analysis.  However, unlike program slicing, one can leverage
 the static properties of SDF to provide an exact, complete, and
@@ -44,7 +44,7 @@ for precise event handling.  Via a case study of a frequency hopping
 radio, we argue that the construct is a significant improvement over
 the existing implementation practice.  We also present a fully
 automatic implementation of precise event handling as part of the
-StreamIt compiler infrastructure~\cite{streamitcc,streamit-asplos},
+StreamIt compiler infrastructure~\cite{streamit-asplos, streamitcc},
 with a backend that targets a cluster of workstations.  We demonstrate
 an average speedup of 48\% over StreamIt programs that do not utilize
 the messaging feature.  As a result, we believe that the $\sdep$
@@ -56,7 +56,7 @@ define the stream dependence function and show how to calculate it
 efficiently.  Section 4 describes our language support for precise
 event handling, including a case study and implementation results.
 Other applications for $\sdep$ appear in Section 5, related work in
-Section 6, and Conclusions in Section 7.
+Section 6, and conclusions in Section 7.
 
 %% This paper makes two contributions towards this goal.  First, we
 %% formulate a stream dependence function, $\sdep$, which describes the

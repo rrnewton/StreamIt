@@ -40,12 +40,12 @@ of communication between filters during steady state execution: 1)
 high-bandwidth dataflow over the FIFO channels in the graph, and 2)
 low-bandwidth messaging between pairs of filters\footnote{Messaging
 is possible whenever there is a downstream path from either filter to
-the other.  Filters running in parallel cannot send messages}.  In
+the other.  Filters running in parallel cannot send messages.}.  In
 order for filter $A$ to send a message to filter $B$, the following
 steps need to be taken:
 \begin{itemize}
 
-\item $B$ declares a message handler that will be invoked when the
+\item $B$ declares a message handler that is invoked when a
 message arrives.  For example:
 {\small
 \begin{verbatim}
@@ -57,14 +57,15 @@ handler increaseGain(float amount) {
 Message handlers are akin to normal functions, except that they
 cannot access the input/output channels and they do not return values.
 
-\item A parent stream which contains $A$ and $B$ declares a variable
-of type {\tt portal<} $T_B$ {\tt >} which can forward messages to
-actors of type $T_B$.  The parent adds $B$ to the portal and passes
+\item A parent stream containing $A$ and $B$ declares a variable
+of type {\tt portal<} $T_B$ {\tt >} that can forward messages to
+any actor of type $T_B$.  The parent adds $B$ to the portal and passes
 the portal to $A$ during initialization.
 
 \item To send a message, $A$ invokes the handler method on the portal
-from within its steady state work function.  It includes a range of
-latencies at which the message should be delivered.  For example:
+from within its steady state work function. The handler invocation
+includes a range of latencies specifying when the message should be
+delivered.  For example:
 {\small
 \begin{verbatim}
 work pop 1 {
@@ -76,9 +77,9 @@ work pop 1 {
 \end{verbatim}}
 
 \end{itemize}
-The most interesting aspect of the messaging system is the semantics
-for message latency.  Because there are many legal orderings of actor
-executions, there is no notion of ``global time'' in a stream graph.
+The most interesting aspects of the messaging system are the semantics
+for the message latency.  Because there are many legal orderings of actor
+executions, there does not exist a notion of ``global time'' in a stream graph.
 The only common frame of reference between concurrently executing
 actors is the series of data items that is passed between them.  The
 $\sdep$ function captures the data dependences in the graph and
@@ -474,7 +475,7 @@ messages between actors.
 
 In order to perform the thread-to-machine allocation, our {\it
 clustering} backend, part of the StreamIt
-compiler~\cite{streamit-asplos} infrastructure, applies a partitioning
+compiler infrastructure~\cite{streamit-asplos}, applies a partitioning
 algorithm~\cite{thies-msp} to reduce the overall application
 bottleneck while maximizing the throughput of the output filter in the
 stream dependence graph. For the purpose of this paper, throughput is
