@@ -1,0 +1,62 @@
+%
+% streamit.sty: declare a `streamit' language for listings
+% David Maze <dmaze@cag.lcs.mit.edu>
+% $Id: streamit.sty,v 1.1 2002-08-21 17:44:50 dmaze Exp $
+%
+
+% Cause the `listings' package to exist, and define a `streamit'
+% language for it...
+\RequirePackage{listings}
+
+% listings.sty has gratuitous incompatibilities between versions.
+% Sigh.  At least version 0.21 fixes some formatting issues
+% (adds whitespace around listings, and \par\lstinline|...| doesn't
+% result in an extra linebreak after the inline).
+%
+% What should basicstyle be set to here?  Its default value doesn't
+% cause inline code segments to be highlighted at all.  \sffamily
+% gets around this, but computer modern sans serif bold is too heavy
+% compared to the rest of the text (this seems odd to me).  \ttfamily
+% doesn't have bold.  We might experiment with PS fonts, or with using
+% \sffamily but also setting keywordstyle to empty.
+%
+% ...experimenting with postscript fonts: \usepackage{palatino} or
+% \usepackage{times} gets us Helvetica for \sffamily, which is fine,
+% but it looks bad and is just too big besides.  \ttfamily then is
+% Courier, though, which has bold and arguably looks better than
+% anything else we've looked at.  Courier bold is noticably heavier
+% than not-bold, though.
+%
+% Combinations that seem to work reasonably:
+% -- CM, basicstyle=\sffamily,keywordstyle={}
+% -- CM, basicstyle=\ttfamily (no boldness)
+% -- PS, basicstyle=\ttfamily
+%
+% The literate option also looks better if we're using
+% \sffamily, but isn't strictly speaking correct.  Listings 0.21
+% introduces space before and after listings so the indent looks bad.
+\def\temp@ver{0.20}\ifx\lst@version\temp@ver
+\lstdefinelanguage{StreamIt}%
+{keywords={filter,pipeline,splitjoin,int,float,complex,void,struct,%
+init,work,push,pop,peek,feedbackloop,enqueue,add,loop,body,%
+split,join,duplicate,roundrobin,template,string,continue,%
+break,do,handler,for,while},%
+commentline=//,singlecomment={/*}{*/},%
+%literate={->}{$\rightarrow$}1%
+}
+\lstset{indent=3ex}
+\else\def\temp@ver{0.21}\ifx\lst@version\temp@ver
+\lstdefinelanguage{StreamIt}%
+{keywords={filter,pipeline,splitjoin,int,float,complex,void,struct,%
+init,work,push,pop,peek,feedbackloop,enqueue,add,loop,body,%
+split,join,duplicate,roundrobin,template,string,continue,%
+break,do,handler,for,while},%
+comment=[l]//,comment=[s]{/*}{*/},%
+%literate={->}{$\rightarrow$}1%
+}
+\else
+\errmessage{Unrecognized version of listings package \lst@version}
+\fi\fi
+\lstset{language=StreamIt,flexiblecolumns=true,basicstyle=\ttfamily,%
+  keywordstyle={},commentstyle=\slshape}
+
