@@ -227,8 +227,8 @@ the tape object sizes to be consistent, and creates a tape at least
 large enough to handle steady-state execution.
 
 <<Initialization Functions>>=
-tape *create_tape(stream_context *a, stream_context *b,
-                  int data_size, int tape_length);
+void create_tape(stream_context *a, stream_context *b,
+                 int data_size, int tape_length);
 @
 
 Every object should have a ``canonical form''.  Internally, fast-path
@@ -380,14 +380,14 @@ from the reader end.
 #define PUSH(c, type, d) \
   { if (++((c)->output_tape->write_pos) >= (c)->output_tape->tape_length ) \
        (c)->output_tape->write_pos = 0; \
-    ((type *)(c)->output_tape->data)[(c)->output_tape->write_pos] = (d); }
+    ((type *)((c)->output_tape->data))[(c)->output_tape->write_pos] = (d); }
 #define PEEK(c, type, n) \
   (((type *)(c)->input_tape->data) \
    [((c)->input_tape->read_pos+n)%(c)->input_tape->tape_length])
 #define POP(c, type) \
   ((((++((c)->input_tape->read_pos)) >= (c)->input_tape->tape_length) \
     ? ((c)->input_tape->read_pos = 0) : 0), \
-   ((type *)(c)->input_tape->data)[(c)->input_tape->read_pos])
+   ((type *)((c)->input_tape->data))[(c)->input_tape->read_pos])
 @
 
 \subsection{Filter Context}
