@@ -100,13 +100,11 @@ $dst$ by first routing in the X dimension and then routing in the Y
 dimension.  Given fixed values of $channels$ and $route$, our cost
 function evaluates a given layout of the stream graph:
 \begin{align*}
-cost(layout) =  \sum_{(src,dst) \in channels}
- {\bf items}(src,dst)
-\cdot  \left( {\bf hops}(\mt{routing-path}) + 
-  \left( 2 \cdot
-{\bf sync}(\mt{routing-path}) \right) ^{3} \right)  
-\mbox{where } 
-\mt{routing-path} = route(layout(src), layout(dst))
+& cost(layout) = & ~ \\ 
+& ~~~~~~~~~\sum ~ {\bf items}(src,dst) \cdot \left( {\bf hops}(\mt{path})
+   + 10 \cdot {\bf sync}(\mt{path}) \right) \\
+  & \raisebox{4pt}[4pt]{\scriptsize {\it (src,dst)} $\in$ {\it channels}} \\
+  & ~~~~~~~~~~~~\mbox{where } \mt{path} = route(layout(src), layout(dst))
 \end{align*}
 
 \begin{figure}
@@ -141,7 +139,7 @@ to the output as soon as they become available.
 \end{figure}
 
 In this equation, ${\bf items}(src, dst)$ gives the number of data
-items that are transfered from $src$ to $dst$ during each steady state
+words that are transfered from $src$ to $dst$ during each steady state
 execution, ${\bf hops}(p)$ gives the number of intermediate tiles
 traversed on the path $p$, and ${\bf sync}(p)$ estimates the cost of
 the synchronization imposed by the path $p$.  We calculate ${\bf
