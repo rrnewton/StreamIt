@@ -121,24 +121,24 @@ results in optimal usage of the tiles for each piece.
     \vspace{.2in}
     \centerline{\includegraphics[width=2.8in]{mgordon_figure1.pdf}}
     \vspace{-.1in}
-    \caption{Stream graph for a channel vocoder.\protect\label{streamgraph}}
+    \caption{Stream graph for a channel vocoder.\protect\label{mgordon_streamgraph}}
   \end{minipage}
   ~~~
   \begin{minipage}{3.4in}
     \centerline{\includegraphics[width=3.4in]{mgordon_figure2.pdf}}
     \vspace{-.1in}
-    \caption{Mapping the vocoder to a 4x4 Raw machine.\protect\label{fig:mapping}}
+    \caption{Mapping the vocoder to a 4x4 Raw machine.\protect\label{mgordon_fig:mapping}}
   \end{minipage}
   \vspace{-0.1in}
 \end{figure}
    
 We will now present a small example to solidify the reader's
-understanding of our work.  In Figure \ref{streamgraph} we show the
+understanding of our work.  In Figure \ref{mgordon_streamgraph} we show the
 stream graph for a simple channel vocoder.  The dark ovals denote the
 linear filters of the application.  The white ovals are non-linear but
 stateless filters and thus can be data-parallelized.
 
-An example mapping of this application (Figure~\ref{fig:mapping})
+An example mapping of this application (Figure~\ref{mgordon_fig:mapping})
 first executes the top low-pass filter slice, occupying the entire Raw
 chip and executing enough times to supply the subsequent slices. Next,
 each band-pass slice will occupy a quarter of the chip, executing the
