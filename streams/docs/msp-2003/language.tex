@@ -1,0 +1,90 @@
+\begin{figure}[t]
+\begin{minipage}{3.5in}
+\begin{minipage}{0.46in}
+\centering
+\psfig{figure=pipeline.eps,width=0.46in} \\
+\end{minipage} 
+~
+\begin{minipage}{1.3in}
+\centering
+\psfig{figure=splitjoin.eps,width=1.3in} \\
+\end{minipage}
+\begin{minipage}{1.02in}
+\centering
+\psfig{figure=feedback.eps,width=1.02in} \\
+\end{minipage} 
+\\ ~ \\ {\protect\small (a) A pipeline. ~~(b) A splitjoin. ~~(c) A feedbackloop.}
+\caption{\protect\small Stream structures supported by StreamIt.
+\protect\label{fig:structures}}
+\end{minipage}
+~~
+\begin{minipage}{3in}
+\hspace{0.1in}
+\psfig{figure=radio-ascoded.eps, width=2.8in}
+\vspace{-20pt}
+\caption{\protect\small Block diagram of an FM Radio.
+\protect\label{fig:radio-ascoded}}
+\end{minipage}
+\end{figure}
+
+\section{The StreamIt Language}
+\label{sec:streamit}
+
+StreamIt is a portable programming language for high-performance
+signal processing applications.  Below, we briefly describe the
+high-level structure of StreamIt, version 2.0 A more detailed
+description of the design and rationale for StreamIt can be found
+in~\cite{streamitcc}, which describes version 1.0; the most up-to-date
+syntax specification can always be found on our
+website~\cite{streamitweb}.
+
+The basic unit of computation in StreamIt is the {\it filter}.  A
+filter is a single-input, single-output block with a user-defined {\it
+work} function for translating input items to output items.  Within
+the {\it work} function, the filter can communicate with its neighbors
+via FIFO queues, using {\tt push}, {\tt pop}, and {\tt peek}
+operations.  Each execution of {\it work} must produce and consume a
+constant number of items.
+
+There are three constructs for composing filters into a communicating
+network (see Figure~\ref{fig:structures}).  A {\it pipeline}
+constructs a sequence of streams, a {\it splitjoin} constructs streams
+that operate in parallel, while a {\it feedbackloop} provides a means
+to introduce a loop into the stream graph.  Note that all stream
+structures are single-input and single-output, such that they can be
+composed hierarchically into a larger application ({\it e.g.,} the FM
+Radio in Figure~\ref{fig:radio-ascoded}).
+
+%% StreamIt's representation of a filter is an improvement over
+%% general-purpose languages.  In a procedural language, the analog of a
+%% filter is a block of statements in a complicated loop nest.  There is
+%% no clear abstraction barrier between one filter and another, and
+%% high-volume stream processing is muddled with global variables and
+%% control flow. The loop nest must be re-arranged if the input or output
+%% ratios of a filter changes, and scheduling optimizations further
+%% inhibit the readability of the code.
+
+%% In an object-oriented language, one could implement a stream
+%% abstraction as a library.  This avoids some of the problems associated
+%% with a procedural loop nest, but the programming model is complicated
+%% by efficiency concerns--to optimize cache performance, the entire
+%% application processes blocks of data that complicate and obscure the
+%% underlying algorithm.
+
+%% In contrast to these alternatives, StreamIt places the filter in its
+%% own independent unit, making explicit the parallelism and inter-filter
+%% communication while hiding the grungy details of scheduling and
+%% optimization from the programmer.
+
+%% \subsection{Messages}
+
+%% StreamIt provides a dynamic messaging system for passing irregular,
+%% low-volume control information between filters and streams.  Messages
+%% are sent from within the body of a filter's {\tt work} function,
+%% perhaps to change a parameter in another filter.  The central aspect
+%% of the messaging system is a sophisticated timing mechanism that
+%% allows filters to specify when a message will be received relative to
+%% the flow of data items between the sender and the receiver.  With the
+%% messaging system, StreamIt is equipped to support full application
+%% development--not just high-bandwidth data channels, but also events,
+%% control, and re-initialization.

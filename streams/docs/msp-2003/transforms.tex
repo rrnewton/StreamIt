@@ -1,0 +1,17 @@
+\section{Graph Transformations}
+\label{sec:transforms}
+
+We have developed a large suite of graph transformations that can be
+used to adjust the hierarchy and communication patterns of a
+structured stream graph.  These transformations--which include filter
+fusion, filter fission, horizontal cuts, vertical cuts, and aggressive
+synchronization removal--serve two distinct purposes.  Firstly, they
+provide a means of deriving a canonical form: a program representation
+that is insensitive to changes in the source code and is easily
+analyzed by the compiler (for example, the hierarchical ragged arrays
+of the partitioner).  Secondly, they serve as the implementation
+mechanism by which the compiler arrives at an efficient executable
+once it has analyzed the canonical form (for example, the
+partitioner's traceback function).  In our final paper, we will
+describe these transformations in detail, as well as their role in the
+structured partitioning algorithm.

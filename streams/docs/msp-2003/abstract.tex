@@ -1,0 +1,9 @@
+We present a dynamic programming algorithm that partitions a static stream
+graph for load-balanced execution on a parallel target.  Our work is done in
+the context of StreamIt, a high-level stream programming language in which
+filters are connected using a set of hierarchical primitives.  Our algorithm
+exploits the hierarchy of the stream graph to define overlapping
+sub-problems, thereby allowing us to explore a large space of alternate
+partitionings in polynomial time.  We have implemented the algorithm in the
+StreamIt compiler for the Raw architecture, and we demonstrate performance
+improvements over a greedy load-balancing strategy.

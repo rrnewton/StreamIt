@@ -1,0 +1,57 @@
+\begin{table*}[t]
+\vspace{-12pt}
+\vspace{-4pt}
+\begin{center}
+\scriptsize
+\begin{tabular}{|l|l||c||c||c||} \hline
+{\bf Benchmark} & {\bf Description} & {\bf \# Tiles} & {\bf Speedup} & {\bf Ave Speedup}
+\\\hline
+BitonicSort & Bitonic Sort & 2x2 & 1.22x & 1.74x
+\\\hline
+BitonicSort & & 2x4 & 2.00x &
+\\\hline
+BitonicSort & & 3x4 & 1.40x&
+\\\hline
+BitonicSort & & 4x4 & 2.33x&
+\\\hline
+FMRadio & Software Radio & 2x2 & .333x & 2.53x
+\\\hline
+FMRadio & & 2x4 &3.83x&
+\\\hline
+FMRadio & & 3x4 & 2.88x&
+\\\hline
+FMRadio & & 4x4 & 3.09x&
+\\\hline
+MergeSort & Merge Sort & 2x2 & 1.18x & 1.72x
+\\\hline
+MergeSort & & 2x4 &1.89x&
+\\\hline
+MergeSort & & 3x4 & n/a&
+\\\hline
+MergeSort & & 4x4 & 2.08x&
+\\\hline
+FIR & Finite Impulse Response & 2x2 & .947x & .859x
+\\\hline
+FIR & & 2x4 &1.05x&
+\\\hline
+FIR & & 3x4 & .667x&
+\\\hline
+FIR & &4x4 & .771x&
+\\\hline
+Radar & Radar Array FrontEnd & 2x2 & 2.25x & 1.30x
+\\\hline
+Radar & & 2x4 & 1.15x&
+\\\hline
+Radar & & 3x4 & 1.15x&
+\\\hline
+Radar & & 4x4 & .667x&
+\\\hline
+{\bf OVERALL} & & & & {\bf 1.63x}
+\\\hline
+\end{tabular}
+\vspace{-6pt}
+\caption{Speedup of the dynamic programming partitioner over a greedy partitioner.}
+\label{tab:benchmarks}
+\vspace{-20pt}
+\end{center}
+\end{table*}

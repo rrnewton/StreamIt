@@ -1,0 +1,43 @@
+\section{Results}
+
+We implemented the dynamic programming partitioner in our StreamIt
+compiler, which targets Raw: a scalable tiled
+architecture~\cite{raw-micro}. We evaluate the partitioner by
+comparing it to a greedy partitioner (which was used
+in~\cite{streamit-asplos}). The greedy partitioner simply identifies the
+two nodes with the least work, and fuses them together before
+proceeding. Both partitioning algorithms output a partition of filters
+for each tile on the Raw machine.
+
+Results appear in Table 1. We measured our benchmarks across a range
+of rectangular Raw configurations (2x2, 2x4, 3x4, and 4x4) with both
+the greedy and dynamic programming partitioner. The dynamic
+programming partitioner achieves an average speedup of 63\%.
+
+One reason that the dynamic programming partitioner performs better
+than greedy is that it can perform both filter fission and filter
+fusion in the same partitioning operation, since it knows the extent
+to which it should fuse or split things. In fact, we believe that this
+is a characteristic which separates our partitioner from general
+scientific partitioners, and could hold the greatest promise in its
+applications to other problems.
+
+In some cases, the greedy algorithm performs better than dynamic
+programming. This is due to communication overhead on the Raw
+machine. Currently, the dynamic programming algorithm is not conscious
+of communication costs, and can sometimes introduce extra
+communication when restructuring the graph.  A future version of the
+algorithm could incorporate communication costs as part of a more
+accurate performance model. Also, on the FIR benchmark (which is
+simply a long pipeline), the greedy algorithm has an advantage because
+it re-evaluates the overhead in fusing filters after each step of the
+transformation, while the dynamic programming algorithm calculates a
+global solution beforehand and then carries it out without the benefit
+of monitoring the overhead incurred. This effect is most pronounced
+for FIR because it has the longest cascade of adjacent fusion
+operations.
+
+We have also implemented this partitioning algorithm to decide when it
+is beneficial to combine linear sections of a stream graph, and/or to
+them to the frequency domain~\cite{lamb03}. The partitioner
+demonstrates significant savings over a naive replacement strategy.

@@ -1,0 +1,49 @@
+\section{Related Work}
+
+%\begin{verbatim}
+
+%Compile-Time Partitioning and Scheduling of Parallel Programs
+%http://delivery.acm.org/10.1145/20000/13313/p17-sarkar.pdf?key1=13313&key2=0398809401&coll=Portal&dl=Portal&CFID=9316306&CFTOKEN=51649022
+
+%Partitioning Parallel Programs for Macro Dataflow (somewhat subsumed by above)
+%http://delivery.acm.org/10.1145/320000/319863/p202-sarkar.pdf?key1=319863&key2=5697809401&coll=portal&dl=ACM&CFID=9315645&CFTOKEN=28761144
+
+%Efficient load balancing for wide-area divide-and-conquer
+%applications, PPoPP 1999.
+
+%Look at topic 3 in load balancing from previous years of europar:
+%http://link.springer.de/link/service/series/0558/tocs/t2400.htm
+
+%\end{verbatim}
+
+The idea of structuring a language hierarchically to aid analysis is
+not a new concept. IF1 is an example of a language that is based
+heavily on structure~\cite{Sked}. At the lowest level, IF1 has around
+50 different types of primitive nodes that can be combined together to
+form a hierarchy of acyclic data flow graphs. The compound nodes Select,
+TagCase, ForAll, While, and Until link together subgraphs. Taking
+advantage of this hierarchal structure, algorithms have been developed
+that effectively partition IF1 programs with low order polynomial
+running times~\cite{Sarker}. The StreamIt language is designed to be a
+language that is both easy to analyze and lends itself well to
+programming within the streaming domain. The parameterizable nature of
+stream graphs allow the compiler to immediately detect most symmetries
+and cut down the amount of redundant analysis.
+
+Precise communication estimation is becoming increasingly important to
+effectively compile for next generation architectures. Sophisticated
+algorithms have been developed that can handle simple topologies such as
+clique, uniform, and ring structures~\cite{Tao}. However, more complex
+topologies that minimize wire delays are becoming more prevalent.
+Simple communication estimation functions such as wormhole routing
+breaks down in these topologies. Dynamic programming was designed to
+handle two dimension tile based architectures well. The techniques
+used in dynamic programming can potentially generalize to more complex
+topologies as well.
+
+Code duplication can be an effective way of reducing the bottleneck
+of an application. Most existing partitioning algorithms either ignore
+the possibility of code duplication or only duplicate code when it is
+absolutely clear it would help. The dynamic partitioner is intelligent
+enough to duplicate stateless filters if it reduces bottleneck
+of the program.

@@ -1,0 +1,54 @@
+\documentclass[10pt]{article}
+\usepackage{doublespace}
+\setstretch{1.5}
+\usepackage{amsmath}
+\usepackage{fullpage}
+\usepackage{epsfig}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+
+\title{Partitioning a Structured Stream Graph \\ Using Dynamic Programming}
+
+\author{William Thies, Jasper Lin and Saman Amarasinghe \\
+  MIT Computer Science and Artificial Intelligence Laboratory\\
+  Cambridge, MA  02139\\ \\
+  \texttt{\symbol{`\{}thies, jasperln, saman\symbol{`\}}@csail.mit.edu}}
+
+\date{}
+
+\begin{document}
+
+  \newtheorem{definition}{Definition}
+  \newtheorem{transformation}{Transformation}
+  \newcommand{\mt}[1]{\mbox{\it #1}}
+  \newcommand{\todo}[1]{\framebox{\bf #1}}
+  
+\begin{singlespace}
+  \maketitle
+  
+  \begin{abstract}
+    \input{abstract}
+  \end{abstract}
+\end{singlespace}
+
+  \input{intro}
+  \input{language}
+  \input{dynprg}
+  \input{transforms}
+  \input{results}
+  \input{table}
+  \input{related}
+  \vspace{-8pt}
+  \input{conclusion}
+  % Bibliography -- whee!
+
+\begin{singlespace}
+  \small
+  \vspace{-8pt}
+  \bibliographystyle{abbrv}
+  \bibliography{references}
+\end{singlespace}
+
+\input{figures}
+  
+\end{document}
