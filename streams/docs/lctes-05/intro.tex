@@ -72,8 +72,7 @@ destroy the arrays used to buffer data between the actors and replace
 the corresponding array references with scalars.  It also allows for
 various competing implementations for managing the buffers between the
 fused actors.  This paper evaluates several implementation
-alternatives (for buffer management) and introduces a formal model for
-estimating their impact on performance.
+alternatives (for buffer management) and evaluates their performance.
 
 The methodology for fusing actors leverages a distinguishing StreamIt
 characteristic, namely, the hierarchical organization of
@@ -85,7 +84,7 @@ items in its input buffer without consuming them until some future
 execution. While peeking is a powerful language feature, it does pose
 some challenges to the compiler and the cache optimizations. Peeking
 also impacts the choice for the best buffer management strategy, as our
-model will show.
+study will show.
 
 %% the comment about p3 and itanium not being embedded architectures
 %% is out of the blue! need a better transition.
@@ -124,13 +123,28 @@ XXX\% on average for the Pentium~3, and XXX\% for the Itanium~2.
 
 This paper makes the following contributions:
 \begin{itemize}
-\item XXX cache-model for stream computing
-\item XXX cache-aware scheduling
-\item XXX cache-aware graph partitioning
-\item XXX fusion model
-\item XXX fusion optimizations
-\item XXX full implementation 
-\item XXX analysis and results
+
+\item A cache model for stream computing that provides a quantitative
+estimate of the caching performance for any sequence of actor
+executions.
+
+\item A cache-aware scheduling heuristic that judiciously increases
+the multiplicity of actors, improving instruction and data locality
+while not exceeding the data cache.
+
+\item A cache-aware partitioning policy that judiciously fuses
+adjacent actors into a single component, enabling local optimizations
+while not exceeding the instruction cache.
+
+\item An optimized buffer management policy, termed ``copy-shift with
+execution scaling'', which out-performs a traditional rotating buffer
+in a detailed micro-benchmark analysis.
+
+\item A fully automatic implementation of the above techniques in the
+StreamIt compiler.
+
+\item An experimental evaluation across XXX streaming benchmarks,
+demonstrating performance improvements of up to XXX\%.
 \end{itemize}
 
 \subsection{Paper Roadmap}
