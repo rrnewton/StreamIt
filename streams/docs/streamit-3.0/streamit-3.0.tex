@@ -1,0 +1,720 @@
+\documentclass{tr}
+\usepackage{pslatex} \usepackage{subfigure} \usepackage{epsfig}
+
+\title{StreamIt 3.0}
+
+\author{Massachusetts Institute of Technology}
+
+\begin{document}
+
+\maketitle
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Document Overview}
+
+This  document describes  language  extensions to  StreamIt. The  core
+emphasis  is  on  language  features  that enable  variable  I/O  rate
+declarations,  stream  graph  re-initialization, and  dynamic  control
+flow.  In general, this document follows the structure of the StreamIt
+2.0  language  specification,  and  only describes  the  new  language
+features (with  references to the  existing syntax and  runtime system
+where necessary).
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Variable Input/Output Rate}
+
+All  computation  in  StreamIt  occurs within  filters.   Each  filter
+consists  of an initialization  (init) function  and a  work function.
+The work function  must declare its I/O rate  consisting of
+\begin{itemize}
+\item {\it peek}~\texttt{expression}\\the number of items---per
+  iteration---the work function may examine from its input tape,
+\item {\it pop }~\texttt{expression}\\the number of items---per
+  iteration---the work function  removes from its input tape,
+\item {\it push}~\texttt{expression}\\the number of items---per
+  iteration---the work function places on its  output tape.
+\end{itemize}
+The {\it peek} expression represents  the maximum number of items that
+a filter may inspect, whereas the {\it pop} and {\it push} expressions
+are binding  in that  the work function  must consume and  produce the
+exact number of items specified in the rate declaration.
+
+Alternative,  a work function  may declare  an I/O  rate that  spans a
+range  of  values  (i.e.,  if a  filter  inspects/consumes/produces  a
+different number of items per iteration of the work function):
+\begin{itemize}
+\item {\it peek}~\texttt{[min, max]:avg}
+\item {\it pop }~\texttt{[min, max]:avg}
+\item {\it push}~\texttt{[min, max]:avg}
+\end{itemize}
+where  \texttt{min}, \texttt{max},  and  \texttt{avg} are  expressions
+that respectively represent the {\it minimum}, {\it maximum}, and {\it
+average}  I/O  rates\footnote{Note  the   brackets  are  part  of  the
+syntax. Also note that the  syntax for specifying a message latency is
+similar,  and  uses  a  colon  instead  of a  comma  to  separate  the
+\texttt{min}  and \texttt{max}  expressions;  should we  use the  same
+syntax  here for  consistency?}.  A  $*$  may replace  the minimum  or
+maximum  peek/pop/push rate  expressions to  respectively  indicate an
+unbound lower  limit or an  unbound upper limit\footnote{Lets  not use
+left and  right parentheses when  indicating an unbound  limit.  Also,
+note that  a range of  [$*$, $*$] is  allowed, as in  {\it push}~[$*$,
+$*$] but  this is really equivalent  to {\it push}~$*$  and perhaps we
+want to allow that syntax as a special case, with say {\it push}~$*$:5
+implying an unbound I/O rate with an average of five items produced.}.
+
+The following relation  must hold when appropriate: 0  $\le$ {\it min}
+$\le$ {\it avg}  $\le$ {\it max}. If a rate  expression evaluates to a
+negative value, the system may  raise an exception and the behavior of
+the  application  is undefined.   Furthermore,  if  the work  function
+violates its I/O  rate declaration---that is, it pops  or pushes fewer
+items than  its declared  minimum rate, or  more items than  a bounded
+maximum rate---the system may raise  an exception, and the behavior of
+the application is undefined.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Alternate Syntax for Variable Input/Output Rate}
+
+Alternatively, a  work function may declare  an I/O rate  that spans a
+range of values as follows:
+\begin{itemize}
+\item {\it peek}~\texttt{min:avg:max}
+\item {\it pop }~\texttt{min:avg:max}
+\item {\it push}~\texttt{min:avg:max}
+\end{itemize}
+where  \texttt{min}, \texttt{max},  and  \texttt{avg} are  expressions
+that respectively represent the {\it minimum}, {\it maximum}, and {\it
+average} I/O  rates.  The average  rate (and encapsulating  colons) is
+optional.  A $*$ may replace the maximum peek/pop/push rate expression
+if  a  filter  inspects/consumes/produces  any  number  of  items  per
+iteration, and in this case  the minimum rate expression and colon are
+optional---if  specified, the peek/pop/push  rate is  considered bound
+from below, and the  work function inspects/consumes/produces at least
+\texttt{min} items per iteration.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Splitters and Joiners}
+
+In addition  to \texttt{duplicate} and  \texttt{roundrobin} splitters,
+there are  three new splitters  that are geared toward  dynamic stream
+behaviors.   The three  new types  of splitters  are \texttt{exclusive
+switch},    \texttt{multiple   switch},    and    \texttt{set}.    The
+\texttt{exclusive switch} splitter channels  input data to only one of
+its  static  sibling streams.  The  \texttt{multioke switch}  splitter
+channels  input data  to any  number of  its statically  defined child
+streams,   and   it   may   operate   as   a   \texttt{duplicate}   or
+\texttt{roundrobin} splitter.
+
+{\bf Note:}  need to define how  the new splitters  interact with user
+defined splitters, and joiners.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection {\texttt{exclusive switch} Splitters}
+
+An \texttt{exclusive  switch} splitter has  a single input of  a given
+type and multiple  outputs of the same type. However,  only one of the
+output  tapes is enabled  at any  given time\footnote{Not  quite true!
+While the  switch from one active  tape to another  is underway, there
+are two  active tapes.}.  An \texttt{exclusive  switch} splitter takes
+each incoming item  and pushes the same item to  the active or enabled
+output tape.  The  following examples illustrate two \texttt{exclusive
+switch} splitter definitions.
+\begin{verbatim}
+   float->float splitjoin Radio() {
+     split exclusive switch(string mode);
+     add FMradio() as switch(``fm'' :: disable);
+     add AMradio() as switch(``am'' :: enable);
+     join inorder;
+   }
+\end{verbatim}
+
+\begin{verbatim}
+   float->float splitjoin ChannelBoosters(int channels, int lowFrequency, int frequencyStep) {
+     split exclusive switch(int frequency);
+     for (int i = 0; i < channels; i++) {
+        int frequency = lowFrequency + (i * frequencyStep);
+        add Booster(frequency) as switch(frequency :: (frequency == lowFrequency) ? enable : disable);
+     }
+     join inorder;
+   }
+\end{verbatim}
+
+In the first example,  a \verb+splitjoin+ with two static alternatives
+is    defined.    The   two    children    are   \verb+FMradio+    and
+\verb+AMradio+. The \texttt{exculsive switch} keywords are followed by
+an  argument list  that defines  the naming  convention for  the child
+streams  that are added.  In this  case, the  child streams  are named
+using strings.
+
+Each child  stream that is  added {\it registers} itself  according to
+the name specified as a parameter to \verb+switch+. The \verb+FMradio+
+stream  is  thus registered  as  the ``fm''  stream.  At  the time  of
+initialization,  the stream  is not  active, indicated  by  the double
+colons  and  the keyword  \verb+disable+  following  the arguments  to
+\verb+switch+.   In  this  example,  the ``am''  stream  is  initially
+active. A \verb+switch+ splitter may only declare one stream as active
+(using the \verb+enable+ keyword).
+
+To  toggle the  switch, or  in other  words to  deactivate a  tape and
+enable  another,  a {\it  reinitialization  message}  is  sent to  the
+\verb+splitjoin+\footnote{The message is sent  to the splitter and the
+joiner since both  must respond to a switch  request.} by invoking the
+\verb+switch()+  method  on a  portal  where  the \verb+splitjoin+  is
+registered:\\
+\verb+  radioPortal.switch(``fm'' :: enable)+.\\
+The \texttt{switch} invocation  must specify the appropriate parameter
+expression  which is  a string  in this  case.  When  a new  stream is
+enabled,  the previously  active stream  is automatically  drained and
+then deactivated.
+
+In  the  second  example,  an \texttt{exclusive  switch}  splitter  is
+declared with several streams that are named using integer expressions
+corresponding to the \verb+frequency+ variable, and the default active
+stream is the  \verb+lowFrequency+ stream. 
+
+The names assigned  to each stream must by  mutually exclusive: no two
+streams can have the same name. If this naming convention is violated,
+the system may raise an exception, and the behavior of the application
+is undefined.
+
+{\bf Note: If a default active stream is not specified, then the first
+added stream is automatically activated after initialization.}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection {\texttt{multiple switch} Splitters}
+
+A \texttt{multiple switch} splitter has a single input of a given type
+and multiple  outputs of the  same type. Unlike  the \texttt{exclusive
+switch} splitter where only one of  the output tapes is enabled at any
+given time, the \texttt{multiple switch} channels its incoming data to
+any number  of active  child streams. The  data may be  duplicated, or
+distributed   in  a   roundrobin  fashion.    The   following  example
+illustrates a \texttt{multiple switch} splitter definition.
+\begin{verbatim}
+   float->float splitjoin GraphicsEffects(int Npixels) {
+     split roundrobin(Npixels)  multiple switch(string mode);
+     add Shade()      as switch(``shader''      :: enable);
+     add Fog()        as switch(``fogger''      :: enable);
+     add Blur()       as switch(``blur''        :: disable);
+     add Illuminate() as switch(``illuminater'' :: disable);
+     join inorder;
+   }
+\end{verbatim}
+
+The splitter in the  example is a \texttt{roundrobin} \texttt{multiple
+switch}.  It operates as a roundrobin splitter, passing \verb+Npixels+
+at  a time to  each active  streams. A  stream that  is not  active is
+ignored.  Here,  the   \texttt{multiple  switch}  defines  the  naming
+convention,  and as  each child  stream is  added, it  is  either {\it
+enabled} or  {\it disabled} using the  \verb+enable+ or \verb+disable+
+modifier  following  the  naming  expression  in  the  \texttt{switch}
+argument list. To enable or disable a stream dynamically, a message is
+sent to the \verb+splitjoin+ that invokes the \texttt{switch} handler,
+specifying          which         stream          to         toggle:\\
+\verb+ graphicsPortal.switch(``blur'' :: enable)+.
+
+A  \texttt{duplicate} \texttt{multiple switch}  is also  possible; the
+following  reiterates  the previous  example  as a  \texttt{duplicate}
+\texttt{multile switch} splitter.
+\begin{verbatim}
+   float->float splitjoin GraphicsEffects(int Npixels) {
+     split duplicate multiple switch(string mode);
+     add Shade()      as switch(``shader''      :: enable);
+     add Fog()        as switch(``fogger''      :: enable);
+     add Blur()       as switch(``blur''        :: disable);
+     add Illuminate() as switch(``illuminater'' :: disable);
+     join inorder;
+   }
+\end{verbatim}
+
+Note that unlike in the  \texttt{exclusive switch}, here names are not
+required to  be mutually  exclusive. This allows  for the  grouping of
+multiple  streams into  a common  name, and  the entire  group  can be
+enabled or disabled  simultaneously. During initialization, subsets of
+the group may be enabled or disabled, but at runtime, the entire group
+is toggled and the fine grain control is lost.
+
+% {\bf Note:} shall we allow roundrobin weights to change dynamically?
+% we have to support this for the \texttt{set} splitter anyway. A
+% suggested syntax is
+% \verb+multiswitch(parameter list :: weight, enable | disable)+.
+
+% {\bf Alternative Syntax:} Rather than introduce a new keyword
+% (\texttt{multiswitch}), we could unique the syntax with the exclusive
+% switch. The latter can be declared as follows:\\
+% \verb+split exclusive switch(...);+\\
+% and the former can be declared as:\\
+% \verb+split mutliple switch(...);+\\
+% Then to toggle a stream, both splitters use the same message
+% handler:\\
+% \verb+portal.switch(stream :: enable | disable);\\
+% with syntactic sugar for the exclusive switch where the enable/disable
+% qualifier is optional (and by default the qualifier is to enable the
+% specified stream). I like this syntax
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Compiler Hints}
+
+A programmer  may pass hints to  the compiler to  allow for aggressive
+optimizations or automatic specialization. The hints describe the {\it
+alias} set  or the  set of streams  that may be  simultaneously active
+within the \verb+splitjoin+. The alias  set is also annotated with the
+aliasing probability. In the following example:
+\begin{verbatim}
+   float->float splitjoin GraphicsEffects(int Npixels) {
+     split duplicate multiple switch(string mode);
+     add Shade()      as switch(``shader''      :: enable)  aliases(``fogger''    : 1);
+     add Fog()        as switch(``fogger''      :: enable)  aliases(``shader''    : 1);
+     add Blur()       as switch(``blur''        :: disable) aliases(``luminater'' : 1);
+     add Illuminate() as switch(``luminater''   :: disable) aliases(``blur''      : 0.5, ``fogger'' : 0);
+     join inorder;
+   }
+\end{verbatim}
+the programmer  indicates that  the ``shader'' and  ``fogger'' streams
+operate in tandem:  if one is active,  so is the other, and  if one is
+not active,  neither is the other.  Also, when the  ``blur'' stream is
+active, the  ``luminater'' is also active, but  when the ``luminater''
+is active,  the ``blur'' stream is  only active 50\% of  the time, and
+the ``fogger'' is never active.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection {\texttt{set} Splitters}
+
+There are still some issues to sort out.\\
+1) i think all streams in a set should be of the same ``type''
+(instances of the same stream class). but if we're pushing to define a
+standard, why should we be restrictive. fine, if we try to go for the
+more ``general'' language extension, the syntax gets less clean. i'm
+still hashing through different ideas on paper.\\
+2) if we go with the more restricted scheme, then a set splitter can
+define the name of the stream it is intended for, just as with
+portals. for example
+\verb+split set<SomeStream(dynamic parameters)>(naming convention)+. Then to add a
+new stream,
+\verb+portal.set<SomeStream(parameters)>(name)+ and to delete a
+stream,
+\verb+portal.set(name)+. To retrieve the name of a stream, we provide
+a special function that returns a list of name, along with an iterator
+to process the list. Alternatively, we can go with the dynamic memory
+allocation scheme (which i think we should provide regardless).\\
+3) in the more general scheme, the splitter declaration could just be
+\verb+split set(naming convention)+ and to add or delete a stream, we
+can use the same syntax as in (2).
+
+
+
+\section{In progress/Todo}
+\begin{itemize}
+\item heap allocation
+\item joiner semantics
+\item dynamic blocks
+\item string operators
+\item bit operators
+\item syntax for user-programmable splitters and joiners (how to
+push/pop, and I/O rate declaration)
+\item black-box interoperability
+\item variable rate compiler-hints and annotations
+\end{itemize}
+
+\end{document}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The \texttt{set} splitter offers  unbounded parallelism as streams can
+be  added   (and  deleted)  at  runtime.   The  \texttt{set}  splitter
+duplicates  its input  data to  all of  its  child streams\footnote{To
+allow a \texttt{roundrobin} splitter,  the addition of stream requires
+a  position directive.  Will  this be  necessary  for our  application
+domain?}.
+
+\begin{verbatim}
+   float->float splitjoin CellPhoneBaseStation(int lowFrequency, int highFrequency) {
+     split set(newCalls<int frequency);
+     add someStream(lowFrequency) as set(lowFrequency);
+     join inorder;
+   }
+\end{verbatim}
+
+As with the other dynamic splitters, the \texttt{set} splitter defines
+the naming conventions for streams that are added to the
+\verb+splitjoin+. That is, \verb+set(int)+ defines a set of streams
+that are named using integers. The stream order is arbitrary within
+the \verb+splitjoin+.
+
+To add a stream, a special handler is invoked on the
+portal where the \verb+splitjoin+ is registered:
+\verb+baseStationPortal.set.add(newCall(frequency, callType), frequency)
+
+The \texttt{set} splitter also affords a mechanism for reinitializing
+streams.
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{\texttt{inorder} Joiners}
+
+An \texttt{inorder}  joiner means that the wavefronts  arrive in order
+following  a switch.
+
+
+\section{Dynamic Stream Blocks}
+
+Within  initialization  code of containers and 
+filter  init functions,  access to  dynamic variables  and stream
+parameters  (i.e., variables  with  values that  cannot be  statically
+resolved)  is restricted  to 1)  the dynamic  argument lists  of child
+streams,  and  2) explicit  {\it  dynamic} $\{$~$\ldots$~$\}$  blocks.
+Dynamic blocks may not be nested, and further, within a dynamic block,
+there can not  exist any modification to variables  or parameters that
+are  visible outside the  dynamic block;  variables declared  within a
+dynamic block are not visible  beyond the scope of the block.  Dynamic
+variables and stream  arguments may appear in a  filter work function,
+including  the I/O  rate declaration.   The following  illustrate some
+examples.
+
+\begin{figure}[h]
+%%  \begin{center}
+%%    \leavevmode
+  \vspace{-10pt}
+%%    \framebox{
+	\parbox{\textwidth}{
+	  \begin{tabbing}
+	    00. \=blah\=blah\=blah\=blah\=blah\=blah\kill	    
+          void$\rightarrow$void pipeline encrypt\\
+	    $\{$\\
+	    \>add source;\\
+	    \>dynamic $\{$\\
+          \>\>float key = generateRandomKey();\\
+          \>\>add encryptCoder(; key);\\
+	    \>$\}$\\
+	    \>add transmitterAtFrequency(10000);\\
+	    $\}$\\
+	    \\
+	    void$\rightarrow$void pipeline raytracer(; String filename)\\
+	    $\{$\\
+	    \>dynamic $\{$\\
+	    \>\>int[][] triangles = readFromFile(filename);\\
+	    \>\>for (int i = 0; i $<$ triangles.length; i++) $\{$\\
+          \>\>\>add triangleIntersector(triangles[i]);\\
+          \>\>$\}$\\
+	    \>$\}$\\
+	    $\}$\\
+	  \end{tabbing}
+	}
+%%  }
+%%  \end{center}
+  \vspace{-10pt}
+\end{figure}
+
+{\it Rationale.}   The use of a  dynamic block is in  keeping with the
+structured format  of the StreamIt  language.  It also  avoids dynamic
+type  and  inference  rules.   The  feature  allows  the  compiler  to
+readily  interpret  static   initialization  code,  and  defer  the
+evaluation of dynamic blocks to the runtime system.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% \newpage
+%% \subsection{Dynamic Stream Parameters}
+
+%% The  declaration  of a  dynamic  stream  parameter  may be  optionally
+%% followed by  an annotation that decsribes  the {\it set}  of values the
+%% parameter  may have  while the  program  executes. The  syntax for  an
+%% annotation  is $\{ v_0  (p_0), v_1  (p_1), ...,  v_n (p_n)  \}$, where
+%% $v_i$  represents  a  unique   value  for  the  parameter,  and  $p_i$
+%% represents  the   probability  of  occurance  for   value  $v_i$;  the
+%% probabilty   attribute---and   its   encasing   parenthesis---may   be
+%% omitted. Each  value ($v_i$) in  the annotation must be  a statically
+%% resolved expression of the same type as the parameter.  Similarly, the
+%% probability attribute  must be a statically  resolved expression, such
+%% that $0 \le p_i \le 1$, and  furthermore, the sum of all $p_i$ is $\le
+%% 1$. The following illustrates an example.
+
+%% \begin{figure}[h]
+%% %%  \begin{center}
+%%   \vspace{-10pt}
+%% %%    \leavevmode
+%% %%    \framebox{
+%% 	\parbox{\textwidth}{
+%% 	  \begin{tabbing}
+%% 	    00. \=blah\=blah\=blah\=blah\=blah\=blah\kill
+%% 	    float$\rightarrow$float pipeline foo (int $static\_parm_1$; int $dynamic\_parm_1$$\{$0~($\frac{1}{3}$), 1~($\frac{2}{3}$)$\}$, int $dynamic\_parm_2$)
+%% 	    $\{$\\
+%% 	    \>$\ldots$\\
+%% 	    $\}$
+%% 	  \end{tabbing}
+%% 	}
+%% %%  }
+%% %%  \end{center}
+%%   \vspace{-10pt}
+%% \end{figure}
+
+%% {\it Rationale.}   Annotation of  dynamic stream parameters  may allow
+%% the  compiler to  specialize  a stream  in  the set  of  of values  is
+%% manageable. It  may even be desirable  to allow the  annotation of any
+%% variable,  thereby  allowing the  programmer  to formally  communicate
+%% potentially important information to the compiler.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% \section{Variable Rate Annotations}
+
+%% In  order  to  assist  the  compiler with  scheduling,  the  following
+%% annotations  of a  streaming  rate  are allowed:  1)  an average  rate
+%% attribute,  or 2)  a  set  of rates  and  associated probabilities  of
+%% occurrence.    The  syntax   for   the  former   attribute  is   simply
+%% $\{$\texttt{expr}$\}$ following the rate declaration. For example {\it
+%% push}\texttt{[2:6]$\{$4$\}$} declares a  dynamic push rate between two
+%% and  six  items, with  an  average rate  of  four  writes per  filter
+%% iteration.
+
+%% The syntax  for the  more elaborate annotation  is $\{r_0  (p_0), r_1
+%% (p_1), ...,  r_n (p_n)\}$, where  $r_i$ represents a unique  rate, and
+%% $p_i$  represents the  probability of  occurrence for  rate  $r_i$; the
+%% probability attribute---and its encasing parenthesis---may be omitted.
+%% Each  rate ($r_i$)  in the  annotation must  be a  statically resolved
+%% expression, not less than the  declared minimum rate, nor greater than
+%% the declared maximum  rate.  The probability attribute must  also be a
+%% statically  resolved expression,  such that  $0  \le p_i  \le 1$,  and
+%% furthermore,  the  sum  of  all   $p_i$  is  $\le  1$.  The  following
+%% illustrates an example.
+
+%% \begin{figure}[h]
+%% %%  \begin{center}
+%%   \vspace{-10pt}
+%% %%    \leavevmode
+%% %%    \framebox{
+%% 	\parbox{\textwidth}{
+%% 	  \begin{tabbing}
+%% 	    00. \=blah\=blah\=blah\=blah\=blah\=blah\kill
+%% 	    float$\rightarrow$float filter foo\\
+%% 	    $\{$\\
+%% 	    \>work pop [2:6]$\{$2~$(\frac{1}{3})$, 4~$(\frac{1}{3})$, 6~$(\frac{1}{3})$$\}$ push[2:6]$\{$4$\}$ $\{$\\
+%% 	    \>\>$\ldots$\\
+%% 	    \>$\}$\\
+%% 	    $\}$
+%% 	  \end{tabbing}
+%% 	}
+%% %%  }
+%% %%  \end{center}
+%%   \vspace{-10pt}
+%% \end{figure}
+
+%% {\it Rationale.} The annotation  is intended to provide the programmer
+%% with  a  methodology  for  communicating information  about  a  stream
+%% component  to the  compiler.  Such  information may  potentially guide
+%% optimizations,  in particular  scheduling, work  estimation,  and load
+%% balancing.  The same  approach to annotation may also  be desirable in
+%% the  context  of  dynamic  stream  parameters and  arguments,  as  the
+%% information   may   allow  the   compiler   to  perform   control-flow
+%% specialization.
+
+%% Add proposal for procedural rate specifications.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% \section{User-Programmable SplitJoins}
+
+%% User-defined splitters and joiners.  I'll take David Maze's example
+%% from before:
+
+%% \begin{verbatim}
+%%      float->float joiner DotProductJoiner(int M, int N) {
+%%        work pop roundrobin(N) push 1 {
+%%          float sum = 0.0;
+%%          for (int i = 0; i < N; i++) {
+%%            float prod = 1.0;
+%%            for (int j = 0; j < M; j++) {
+%%              prod *= pop(j);
+%%            }
+%%            sum += prod;
+%%          }
+%%          push(sum);
+%%        }
+%%      }
+%% \end{verbatim}
+
+%% He introduces a pop(j), peek(j, index) and push(j, value) functions to
+%% pop, peek, or push on a given output tape.  I think this is ok.
+
+%% Open questions:
+
+%% - how to specify range of rates on multiple-input joiners?  Can you
+%%   specify that you read i items from the i'th tape?  Or just that all
+%%   have the same value?
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\end{document}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Stream Parameters}
+
+A  stream may  be parameterized  using a  list of  variables  that are
+specified when the stream  is created or reinitialized. The parameters
+may  be static---with  values resolved  at compile  time---or dynamic,
+with values that are not known to the compiler. The syntax for
+declaring a parameter list is dependent on the nature of
+arguments. Specifically,
+\begin{enumerate}
+\item
+  Static parameters are delimited with $\<$ and $\>$.
+\item 
+  Dynamic  parameters are delimited with parentheses following the
+  list of static parameters.
+\end{enumerate}
+
+\begin{figure}[h]
+  \vspace{-10pt}
+  \begin{center}
+    \framebox{
+	\parbox{\textwidth}{
+	  \begin{tabbing}
+	    00. \=blah\=blah\=blah\=blah\=blah\=blah\kill
+	    // stream with static parameters\\
+	    float$\rightarrow$float pipeline foo $\<$int $static\_parm_1$, int $static\_parm_2$\> $\{ \ldots \}$\\ \\
+	    // stream with dynamic parameters\\
+	    float$\rightarrow$float pipeline foo $($int $dynamic\_parm_1$, int $dynamic\_parm_2$) $\{ \ldots \}$\\ \\
+	    // stream with static and dynamic parameters\\
+	    float$\rightarrow$float pipeline foo $<$int $static\_parm_1$, int $static\_parm_2$$>$ (int $dynamic\_parm_1$, int $dynamic\_parm_2$) $\{ \ldots \}$
+	  \end{tabbing}
+	}
+  }
+  \end{center}
+  \vspace{-10pt}
+  \caption{Scenarios for declaring static and dynamic stream parameters.}
+  \label{fig:stream-params}
+\end{figure}
+
+The syntax is not backward-compatible, but we can release a simple
+converter to translate existing StreamIt programs to the new syntax.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Statements}
+
+The keyword {\bf mutable}  must follow any initialization statements
+that  add  a  child   stream  with  dynamic  arguments  (i.e.,  stream
+constructors); if the stream may undergo reinitialization.  
+The keyword will create a switch splitter whose first child stream is
+the added container, and it is by default the activate
+stream. Mutable containers must be registered with a portal.
+
+\begin{figure}[h]
+  \vspace{-10pt}
+  \begin{center}
+    \framebox{
+	\parbox{\textwidth}{
+	  \begin{tabbing}
+	    00. \=blah\=blah\=blah\=blah\=blah\=blah\kill	    
+          void$\rightarrow$void pipeline encrypt\\
+	    $\{$\\
+	    \>$\ldots$\\
+	    \>// add a stream with a static argument\\
+	    \>add source<int $static\_parameter$>;\\ \\
+	    \>// add a stream with a dynamic argument\\
+	    \>add {\bf mutable} encode (int $dynamic\_parameter$) in portal;\\ \\
+	    \>// add a stream with static and dynamic arguments\\
+	    \>add {\bf mutable} compress $<$int $static\_parameter$$>$ (int $dynamic\_parameter$); in portal\\
+	    \>$\ldots$\\
+	    $\}$
+	  \end{tabbing}
+	}
+  }
+  \vspace{-10pt}
+  \end{center}
+  \caption{Stream constructor examples.}
+  \label{fig:statements}
+\end{figure}
+
+Mutable containers have a default message handler \texttt{mutate} with a signature
+that is the same as the added stream less any static parameters (i.e.,
+only dynamic parameters are allowed to change). To mutate a container,
+the \texttt{mutate} method is invoked as if it were a message. The
+mutation rexecutes the stream initialization code, and the new stream
+is added to the switch splitter created in the parent container (!!!
+certain portals must not have more than one registered component
+now!!!), and the switch splitter toggles the active stream to the new
+component (the semantics of the switch splitter apply for draining the
+active stream, etc.)
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Additional Primitive Types}
+
+In addition to  the existing primitive types, the following new types
+are introduced:
+\begin{itemize}
+\item {\bf String} type is introduced. The String type is  only in parameter and
+argument lists (for stream components and functions) and .
+
+To express a variable I/O rate 
+A rate  expression is {\it static}  if it is  a compile-time constant,
+and it is {\it dynamic} otherwise.
+
+
+The example in Figure~\ref{fig:rates}  illustrates an example I/O rate
+using the new  language syntax. The work function  may inspect between
+three and  $N$ items, and  it consumes an  average of three  items per
+iteration.  The work function may not always produce an output and may
+write an unspecified number of data items to its output tape, although
+it averages three outputs per iteration.
+
+\begin{figure}[h]
+  \vspace{-10pt}
+  \begin{center}
+    \framebox{
+	\parbox{\textwidth}{
+	  \begin{tabbing}
+	    00. \=blah\=blah\=blah\=blah\=blah\=blah\kill	    
+	    float$\rightarrow$float filter findConvexHull (int N)\\
+	    $\{$\\
+	    \>work peek 3:N pop 3:N:3 push *:3 $\{ \ldots \}$\\
+	    $\}$
+	  \end{tabbing}
+	}
+  }
+  \vspace{-10pt}
+  \end{center}
+  \caption{Example variable I/O rate declaration.}
+  \label{fig:rates}
+\end{figure}
+
