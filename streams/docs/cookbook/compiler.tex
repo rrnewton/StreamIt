@@ -5,12 +5,35 @@ following directory:
 \begin{verbatim}
 cd $STREAMIT_HOME/apps/benchmarks/fm/streamit
 \end{verbatim}
-The benchmark is in {\tt FMRadio.str}.  Note that it differs slightly
-from the version developed in this cookbook.
+%$
+\noindent The benchmark is in {\tt FMRadio.str}. The following
+sections describe the compilation of {\tt FMRadio} using the
+uniprocessor backend, the Raw backend, and the Java library.  A
+summary of the compiler's command-line options can be found in
+Appendix~\ref{ap:options}, or by typing {\tt strc --help} at the
+command line.
 
 \subsection{Compiling for a Uniprocessor}
 
-To compile 
+There are two ways to compile a StreamIt program for execution on a
+general-purpose processor.  Both methods compile StreamIt to a C
+program that can be further compiled with a C compiler.  The first
+method (the default) preserves the hierarchical structure of the
+original program and relies on a C runtime library to do buffer
+management.  The second method (``standalone'') produces a
+self-contained file where the entire stream graph has been collapsed
+into a single function, with buffer management embedded into the code.
+The default output is more readable and provides some flexibility (by
+exposing the runtime library interface).  The standalone output might
+be useful for groups interested in compiling C programs to new
+architectures; however, the size of the main work function might grow
+very large.  We recommend using the default backend with the C runtime
+library.
+
+To compile {\tt FMRadio} 
+
+
+\subsection{Compiling for a Uniprocessor}
 
 
 library
@@ -20,14 +43,12 @@ standalone
 
 raw
 rawcol
+mention optimizations
 numbers
 magic\_net (?)
 simulatework
-partition  (+greedy?)
 
 linearpartition
-
-standalone
 
 -----
 
