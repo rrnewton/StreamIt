@@ -8,7 +8,7 @@
 \noindent
 This is for the October 17, 2003 release of the StreamIt compiler and
 runtime system, version 2.0.\\
-\verb|$Id: install.tex.in,v 1.7 2003-10-17 15:59:39 dmaze Exp $|
+\verb|$Id: install.tex.in,v 1.8 2003-10-20 15:42:32 dmaze Exp $|
 
 \section{Compilation}
 
@@ -22,26 +22,55 @@ them before continuing; a list of programs required is included in the
 
 \subsection{Source Release}
 
-The  release comes  with  provided dotfiles  that  set up  all of  the
-possible environment variables.  Note that the settings in these files
-\textsl{must} be customized according to your local infrastructure. If
-you use bash, add to your \textsf{.bashrc} file:
+For the source release, you need to add several directories to your
+Java \verb|CLASSPATH|; these include the jar file for the ANTLR
+LL($k$) parser generator, a tree for various third-party packages used
+by the compiler, and the StreamIt compiler and runtime proper.  You
+also need to add the top-level StreamIt directory to your
+\verb|PATH|.  If you use bash, add to your \textsf{.bashrc} file:
 
 \begin{verbatim}
-. $STREAMIT_HOME/include/dot-bashrc
+### Location of unpacked StreamIt tree
+STREAMIT_HOME=$HOME/streams
+
+### Location of ANTLR jar file (test: 'java antlr.tool')
+ANTLRJAR=/usr/share/java/antlr.jar
+
+CLASSPATH=$CLASSPATH:$ANTLRJAR
+CLASSPATH=$CLASSPATH:$STREAMIT_HOME/src
+CLASSPATH=$CLASSPATH:$STREAMIT_HOME/3rdparty
+PATH=$PATH:$STREAMIT_HOME
+
+export STREAMIT_HOME CLASSPATH PATH
 \end{verbatim}
 %$
 
 \noindent or if you use tcsh, add to your \textsf{.cshrc} file
 
 \begin{verbatim}
-source ${STREAMIT_HOME}/include/dot-cshrc
+### Location of unpacked StreamIt tree
+setenv STREAMIT_HOME ${HOME}/streams
+
+### Location of ANTLR jar file (test: 'java antlr.tool')
+setenv ANTLRJAR /usr/share/java/antlr.jar
+
+setenv CLASSPATH ${CLASSPATH}:${ANTLRJAR}
+setenv CLASSPATH ${CLASSPATH}:${STREAMIT_HOME}/src
+setenv CLASSPATH ${CLASSPATH}:${STREAMIT_HOME}/3rdparty
+setenv PATH ${PATH}:${STREAMIT_HOME}
 \end{verbatim}
 %$
 
-If you want to override the settings the provided scripts set (for
-example, the Raw StarSearch directory), set the relevant variables
-after reading the \textsf{dot-bashrc} or \textsf{dot-cshrc} file.
+Alternatively, the release comes with provided dotfiles that set up
+all of the possible environment variables.  Note that the settings in
+these files \textsl{must} be customized according to your local
+infrastructure.  In this case, you can ``source''
+\verb|$STREAMIT_HOME/include/dot-bashrc| or
+\verb|${STREAMIT_HOME}/include/dot-cshrc|, as appropriate, after
+editing the files.  If you want to override the settings the provided
+scripts set (for example, the Raw StarSearch directory), set the
+relevant variables after reading the \textsf{dot-bashrc} or
+\textsf{dot-cshrc} file.
 
 If you are trying to install both StreamIt and the Raw tools, set up
 Raw first; the setup process requires that the \verb|TOPDIR| environment
@@ -51,29 +80,37 @@ to have the correct setting for \verb|TOPDIR|.
 
 You need to reload your shell's dotfiles; an easy way to do this is to
 log out and log in again.  You can compile the source tree: run
-\texttt{make} from the top-level directory of the StreamIt release.
-After this completes, you should be able to run the compiler.
+\texttt{./configure}, then \texttt{make}, from the top-level directory
+of the StreamIt release.  After this completes, you should be able to
+run the compiler.
 
 \subsection{Binary release}
 
-Add the StreamIt jar file to your Java \verb|CLASSPATH|.  If you use
+Add the StreamIt jar file to your Java \verb|CLASSPATH|, and the
+top-level StreamIt directory to your \verb|PATH|.  If you use
 bash, add to your \textsf{.bashrc} file
 
 \begin{verbatim}
+STREAMIT_HOME=$HOME/streams
+PATH=$PATH:$STREAMIT_HOME
 CLASSPATH=$CLASSPATH:$STREAMIT_HOME/streamit.jar
 \end{verbatim}
+%$
 
 \noindent or if you use tcsh, add to your \textsf{.cshrc} file
 
 \begin{verbatim}
+setenv STREAMIT_HOME ${HOME}/streams
+setenv PATH ${PATH}:${STREAMIT_HOME}
 setenv CLASSPATH ${CLASSPATH}:${STREAMIT_HOME}/streamit.jar
 \end{verbatim}
+%$
 
 Compilation for the various backends requires extra setup.  If you are
 compiling for Raw, you need to set up the Raw tools separately.  The
 uniprocessor backend requires a runtime library, which can be compiled
-by running \texttt{make} from the top-level directory of the StreamIt
-release.
+by running \texttt{./configure} and then \texttt{make} from the
+top-level directory of the StreamIt release.
 
 After you complete these steps, you should be able to run the compiler.
 
