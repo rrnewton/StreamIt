@@ -14,10 +14,9 @@ computation~\cite{LM87-i} that  is well suited for  streaming
 codes. In this model, computation is represented  as a graph consisting of
 {\it  actors} connected by FIFO communication channels.
 Each actor follows a set of execution steps, or phases, that consume
-a constant number of items from the input channels and produce s a
-constant number of items onto the
-output channels.  
-The  ordering of phases is known at
+a constant number of items from the input channels and produce a
+constant number of items onto the output channels.  
+The number and ordering of phases is known at
 compile time, and their execution is cyclic (that is, after executing
 the last phase, the first phase is executed again).
 SDF is appealing because every actor has a fixed input and output rate
@@ -28,7 +27,7 @@ Figure~\ref{fig:sdep-rates} illustrates an example stream graph. The
 nodes represent the actors, and the numbers within the nodes represent
 the I/O rate of each actor. For example, actor $C$  consumes 3 input
 items and produces 2 output times with every execution step. Actors
-with a single input and multiple output channels are known as splitters, and on
+with a single input and multiple output channels are known as {\it splitters}, and on
 every execution step, they can distribute their output to any one of
 their children. For example, actor $A$ writes the output of its first
 execution to its left child ($C$), and the output of its second
@@ -36,10 +35,11 @@ execution to its right child ($D$). This type of a splitter is a
 round-robin splitter with one I/O rate per output edge. A duplicate
 splitter is also possible but is not illustrated. A counterpart to splitters
 are the joiners which have multiple input channels but only one output
-channel. The joiner assemble the data from their predecessors
+channel. The joiner assembles the data from their predecessors
 in a round-robin manner. In Figure~\ref{fig:sdep-rates}, actor $E$ is
-a joiner which reads one item from $C$ then another from $D$ in a
-repeating pattern. 
+a joiner which reads one item from $C$ in its first phase, then
+another from $D$ in its second phase (before cycling back and 
+repeating the pattern).
 
 %The actors consume
 %and produce a constant number  of items from their input and output
@@ -55,6 +55,9 @@ repeating pattern.
 %time (note that peeking is not part of CSDF).
 
 \section{Stream Dependence Function}
+
+In this section we formally define the stream dependence function,
+$\sdep$.
 
 An execution $\phi$ of a dataflow graph is an ordered sequence of
 actor firings.  Each firing represents the execution of a single phase
