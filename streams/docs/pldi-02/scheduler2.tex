@@ -106,11 +106,5 @@ Another responsibility of the scheduler in StreamIt is to satisfy the
 message delivery guarantees.  Each downstream message with a negative
 latency imposes a lower bound on the buffer size between the source
 and target filter.  Likewise, an upstream message with a positive
-latency imposes an upper bound on this buffer size.  Generally
-speaking, these constraints can be satisfied by adopting a
-hierarchical scheduling technique in which an initial coarse-grained
-schedule (such as our SAS) is incrementally refined at increasing
-depths until the message constraints are satisfid.  The
-refinement--which could be either a simulated pull model or a phased
-schedule--can be targetted to sub-structures of the graph in which a
-message constraint is violated.
+latency imposes an upper bound on this buffer size.
+
