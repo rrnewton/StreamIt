@@ -16,7 +16,7 @@
 \catcode`\$=12
 \title{StreamIt Language Specification\thanks{
 This is a pre-release version of this document.\hfil\break\ttfamily
-\hbox{$Id: streamit-lang.tex,v 1.9 2002-09-04 16:48:30 dmaze Exp $}
+\hbox{$Id: streamit-lang.tex,v 1.10 2002-11-19 17:26:37 dmaze Exp $}
 }}
 \catcode`\$=3
 
@@ -302,7 +302,31 @@ function must push and pop exactly the number of items specified, and
 may peek up to the number of items specified.  All of the rate
 expressions must be compile-time constant.
 
-\paragraph{Helper functions.}
+\paragraph{Helper functions.}  A helper function performs some
+auxiliary bit of computation, and may be called from the init function
+or the work function.  A helper function has a list of zero or more
+parameters, and returns zero or one values.  A helper function
+declaration contains the return type, an optional keyword
+\lstinline|const|, the \lstinline|helper| keyword, the name of the
+function, the parameter list, and the function body:
+
+\begin{lstlisting}{}
+float const helper add_and_limit(float a, float b) {
+  float c = a + b;
+  if (c > limit) return limit;
+  if (c < -limit) return -limit;
+  return c;
+}
+\end{lstlisting}
+
+A helper function is \lstinline|const| if it has no side effects, such
+as changing the value of a filter field or calling a
+non-\lstinline|const| helper function.  The compiler may inline calls
+to helper functions, and may remove calls to \lstinline|const|
+functions if it finds it appropriate.  For example,
+\lstinline|(0 * constHelper(foo))| can be replaced with a constant
+zero, since the return value of the helper is irrelevant and it has no
+side effects.
 
 \paragraph{Filter state.}  The top level of the filter may include
 variable declarations.  These variables are visible to every function
@@ -472,7 +496,10 @@ causes a delay in the feedback loop.
 It is possible to declare a stream object without a name, if it is
 used in exactly one place in the program.  In general anonymous stream
 declarations look exactly like the corresponding normal stream
-declaration, except that the stream type and name are omitted.
+declaration, except that the stream type is optional and the name is
+omitted.  The semicolon that normally ends the \lstinline|add|,
+\lstinline|body|, or \lstinline|loop| statement is optional in this
+case.
 
 \begin{lstlisting}{}
 complex->float feedbackloop FeedbackMagnitude(float scaling)
@@ -706,11 +733,20 @@ built-in math functions.  The math functions are listed in table
 \ref{tab:math-functions}.
 
 \begin{note}
-As an implementation detail, any function name not optimized as a
-built-in function in the front-end is treated as a call to a function
-in the Java package \lstinline|java.lang.Math|; see \emph{Java in a
-  Nutshell} or another Java reference for details.  These get blindly
-translated again to calls to the C math library.
+  As an implementation detail, any function name not optimized as a
+  built-in function in the front-end or recognized as a helper
+  function is treated as a call to a function in the Java package
+  \lstinline|java.lang.Math|; see \emph{Java in a Nutshell} or another
+  Java reference for details.  These get blindly translated again to
+  calls to the C math library.
+\end{note}
+
+\begin{note}
+  It is conceivable that calls to \lstinline|const| functions with
+  compile-time constant parameters return compile-time constant
+  results.  This is not the case for non-built-in functions in the
+  current implementation of the compiler; adding this involves
+  inlining helper functions.
 \end{note}
 
 \begin{table}[htbp]
@@ -747,7 +783,9 @@ parameters for the stream type.  The parameters must all be
 compile-time constant.
 
 An anonymous stream declaration is also a valid stream constructor;
-see section \ref{sec:anonymous-streams}.
+see section \ref{sec:anonymous-streams}.  A statement containing an
+anonymous stream declaration does not need to be terminated with a
+semicolon, since it ends with a close-brace.
 
 \subsection{Splitters and Joiners}
 \label{sec:expr-splitters-joiners}
@@ -876,7 +914,7 @@ we may create a \lstinline|static| keyword:
 
 \begin{lstlisting}{}
 static MyHelpers {
-  int square(int x) { return x * x; }
+  int const helper square(int x) { return x * x; }
 }
 int->int filter SquareIt {
   work pop 1 push 1 { push(MyHelpers.square(pop())); }
@@ -890,37 +928,13 @@ functions, but it is unspecified how one is chosen.  The intent is
 that the init function will use an \lstinline|exec| keyword or
 something similar to pick a named work function.  Work functions can
 then use the same \lstinline|exec| keyword to change to a different
-``phase'' of execution.  This might be used to parse a somewhat
-complicated file:
+``phase'' of execution.
 
-\begin{lstlisting}{}
-void->float pipeline WaveReader(string filename) {
-  add FileReader<byte>(filename);
-  add filter {
-    int wordsleft;
-    init { exec readHeader; }
-    work readHeader pop 16 {
-      int i;
-      for (i = 0; i < 12; i++) pop();
-      wordsleft = /* function of next four pop()s */;
-      exec readData;
-    }
-    work readData pop 4 push 4 {
-      for (int i = 0; i < 4; i++) push(pop());
-      wordsleft--;
-      if (wordsleft == 0) exec readFooter;
-    }
-    work readFooter pop 4 {
-      for (int i = 0; i < 4; i++) push(pop());
-      exec readHeader;
-    }
-  }
-  add ByteToFloat();
-}
-\end{lstlisting}
-
-Note that the different phases have different I/O rates; the scheduler
-will deal appropriately to cause a consistent schedule to appear.
+The exact syntax of phased filters is currently under discussion.  It
+is considered desirable to have both statically-scheduled phases,
+where each phase executes a fixed number of times, and
+dynamically-scheduled phases, where the number of executions can
+depend on the input.
 
 \subsection{Messaging}
 
@@ -976,9 +990,43 @@ float->float pipeline Volume {
 }
 \end{lstlisting}
 
+\subsection{Variable Rates}
+
+Certain types of applications, such as those involving compression
+algorithms, do not have a fixed ratio of outputs to inputs.  StreamIt
+does not currently support variable rates.  The current proposal is
+that variable rates will be accomodated by phased filters: one phase
+reads the input, and then runs another phase for a certain number of
+executions that writes the output, with the number of executions being
+variable.
+
+It is still possible that dedicated syntax for variable rates will be
+added.  This will likely accomodate bounds on the I/O rates of the
+filter, since a filter might read four bytes of input and produce
+between two and sixteen bytes of output; having this information can
+assist the scheduler.
+
 \subsection{Reinitialization}
 
 Nobody understands how this should work at all, but it seems like it
 should be mentioned.
+
+\section{Implementation Limits}
+
+The following limits apply to the current implementation of StreamIt:
+
+\begin{itemize}
+\item There is no guaranteed order of evaluation.  In particular, a
+  statement in a work function should not contain more than a single
+  \lstinline|pop()|, and if contains any \lstinline|pop()|s at all, it
+  should contain no \lstinline|peek()|s.
+
+\item The names \lstinline|SplitJoin|, \lstinline|FeedbackLoop|,
+  \lstinline|Filter|, \lstinline|Pipeline|, \lstinline|StreamIt|,
+  \lstinline|Complex|, and \lstinline|data| are reserved.  Certain
+  variable names beginning with underscores may cause conflicts if
+  used as local variables.
+
+\end{itemize}
 
 \end{document}
