@@ -40,7 +40,7 @@ use Socket;
 $username = $ENV{"CVS_USER"} || getlogin || (getpwuid($<))[0] || "nobody";
 $envcvsroot = $ENV{'CVSROOT'};
 $cvsroot = $envcvsroot;
-$flag_debug = 1;
+$flag_debug = 0;
 $flag_tagcmd = 0;
 $repository = '';
 $repository_tag = '';
@@ -273,7 +273,7 @@ sub mail_notification {
     if ($port =~ /\D/) { $port = getservbyname($port, 'tcp') }
     die "No port" unless $port;
     $iaddr   = inet_aton($remote)               || die "no host: $remote";
-	printf("port: $port iaddr: $iaddr");
+	#printf("port: $port iaddr: $iaddr");
     $paddr   = sockaddr_in($port, $iaddr);
 
     $proto   = getprotobyname('tcp');
