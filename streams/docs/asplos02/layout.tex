@@ -19,7 +19,7 @@ encountered.  Iterative improvement starts with an initial random
 layout and repeatedly perturbs the placement in order to minimize the
 cost function.
 
-The layout phase of the streamit compiler is implemented using
+The layout phase of the StreamIt compiler is implemented using
 simulated annealing \cite{simanneal}, a type of
 iterative improvement.  A detailed explanation of simulated annealing
 is beyond the scope of this paper, but we will mention the following.
@@ -53,15 +53,15 @@ Depending on the communication model of the target architecture, these
 metrics can be extremely important in generating a good layout.  For
 architectures with non-uniform communication, the layout phase can use
 this knowledge to take advantage of the specific properties of the
-architecture.  For example, in a Smart Memories architecture [ref], we
-would like to place the nodes that communicate over an expensive
-channel on the same quad.
+architecture.  For example, in a Smart Memories architecture
+\cite{smartmemories}, we would like to place the nodes that
+communicate over an expensive channel on the same quad.
 
 \subsection{Layout on Raw}
 
 The layout phase of our StreamIt compiler maps nodes in the stream
 graph to the tile processors on Raw.  Each tile processor looks very
-much likes a MIPS R4000[ref].  The tile processor uses a MIPS
+much likes a MIPS R4000.  The tile processor uses a MIPS
 instruction set with some slight modifications for inter-tile
 communication.  The layout phase does not assign each node in the
 stream graph to a processor.  Splitter nodes are folded into their

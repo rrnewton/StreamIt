@@ -1,9 +1,54 @@
 \begin{figure}[t]
 \centering
-\psfig{figure=raw-diagram.eps,width=6inpt}
+\psfig{figure=raw-diagram.eps,width=6in}
 \caption{A block diagram of the Raw architecture.
 \protect\label{fig:raw-diagram}}
 \end{figure}
 
 \section{The Raw Architecture}
 \label{sec:raw}
+The Raw Processor is a general-purpose microprocessor being developed
+in the Computer Architecture Group at The Massachusetts Institute of
+Technology.
+
+The general organization of the Raw Processor is as a chip
+multiprocessor with multiple fine-grain, first-class, register mapped
+communication networks \cite{raw}.  The processor contains a 2-D mesh
+of identical tiles, see figure \ref{fig:raw-diagram}.  A tile consists
+of a tile processor, memory, two dynamic network routers, two static
+switch crossbars and a static switch processor.  Tiles are connected
+to each of their four nearest neighbors by the two sets of static
+network interconnect and two sets of dynamic network interconnect.
+The tile processor uses a 32-bit MIPS-like instruction set with 32K
+SRAM data memory and 32K SRAM instruction memory.
+
+The StreamIt Compiler maps the infinite, FIFO channels of the language
+to Raw's static networks.  Each static network routes single-word
+quantities of data (with no header) between the switch processor of
+nearest neighbors.  The tile processor communicates with the switch
+processor using buffered, blocking sends and receives.  The switch
+processors communicate using the same mechanism. Each tile must know
+in advance to whom it is sending data and from whom it is receiving
+data.  It is the task of the compiler to generate the appropriate
+route instructions at compiler time.  The static network allows
+3-cycle nearest neighbor ALU to ALU communication latency.
+
+The switch processor controls the static networks of the chip.  The
+switch processor uses a stripped down MIPS-like instruction set
+containing only moves and branches.  The switch processor has 4
+registers, an 8096-instruction instruction memory, and no data
+memory. Each switch instruction has a ROUTE component, executed in
+parallel, that specifies the transfer of values on the static network
+between the switch and its neighboring switches.  Each switch
+instruction can execute multiple moves in parallel using a VLIW-like
+instruction encoding for the ROUTE component.  The Raw instruction set
+architecture (ISA) works together with this parallel architecture by
+exposing both the computational and communication resources up to the
+software.
+
+Currently, the StreamIt Compiler generates code that executes on Raw's
+cycle accurate simulator. The simulator can model Raw configurations
+of up to 8 tiles per side.  During the summer of 2002, a prototype 4x4
+tile Raw chip will be available.  With a target clock rate of 225MHz,
+the chip will support 16 OPS/FLOPS per cycle, 3.6 GLOPS per second,
+and a bisection bandwidth of 230 Gb/sec.
