@@ -70,3 +70,48 @@ tile can accommodate both an off-chip application input stream and
 output stream.
 
 \subsubsection{Software Pipelining of Traces}
+
+\section{Trace Extraction}
+Trace extraction refers to the process of assigning each filter of the
+stream graph to a trace.  As stated above, a trace is a contiguous
+section of the stream graph that is scheduled for execution as a
+group. The trace will occupy a portion of the chip as it executes and
+then be swapped out when it completes execution.  Each filter in the
+stream graph is a member of exactly one trace.
+
+Our initial algorithm for trace extraction is rather straightforward
+and a brief description of the algorithm should suffice.  Due to the
+restrictions of the current low-level implementation, as we traverse
+the stream graph, trace boundaries are produced {\it before} a filter
+with multiple inputs and {\it after} a filter with multiple outputs,
+thus restricting the traces to pipelines of filters. We introduce a
+new trace when within a pipeline a non-linear filter directly
+communicates to a linear filter and vice versa. Finally, as we are
+adding filters to the trace, we must introduce a trace boundary if the
+size of the trace is equal to the number of tiles in the Raw
+configuration.
+
+%%what about linear filters, are they restricted to being pipelines???
+
+Additionally, we try to coax the generation of load-balanced traces.
+For each filter, we calculate a static work estimation of the filter
+based on an analysis of the {\tt work} function.  Because of the
+static I/O (push, pop, and peek) rates in this version of StreamIt,
+most loops within {\tt work} can be unrolled, allowing a close
+approximation of the actual cycle count.  This estimate is multiplied
+by the number of times the filter executes in the steady-state.
+
+As we are adding filters to the trace, we compare the work estimation
+of the current filter we are examining to the work estimation for the
+first filter of the trace.  If the ratio of the work in the current
+filter to the work in the first filter is within a predefined
+threshold, termed the {\it work threshold}, then we proceed to add the
+filter to the trace.  Otherwise, begin a new trace with the current
+filter as the first filter in this new trace.  After experimentation,
+we found that smaller, well-balanced traces are preferable.  The
+results given in Section \ref{sec:results} were generating using a
+work threshold of 0.80, meaning that each filter of the trace has a
+workload that is within 80-125\% of the workload of the first filter
+of the trace.
+
+\section{Trace Scheduling}
