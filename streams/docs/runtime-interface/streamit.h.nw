@@ -413,7 +413,9 @@ integers greater than or equal to [[0]] and strictly less than
 [[len]], and point to [[size]]-byte offsets into [[data]].  In
 particular, they point to the last item read or written to the tape,
 such that [[PUSH]], [[POP]], and [[PEEK(0)]] will all use the
-following item.
+following item.  If the length of the tape is a power of two, the
+[[mask]] field is a bitmask for the significant bits of a valid tape
+position.
 
 <<struct [[tape]]>>=
 typedef struct tape {
@@ -422,6 +424,7 @@ typedef struct tape {
   int write_pos;
   int data_size;
   int tape_length;
+  int mask;
 } tape;
 @
 
@@ -442,19 +445,34 @@ couple of cases where just having a context is insufficient.
 [[INCR_TAPE_READ]] and [[INCR_TAPE_WRITE]] increment the tape position
 by exactly one, wrapping around if needed.
 
+There are two versions of these macros.  The ``conservative'' version
+accomodates any tape length, but is slower (each position increment
+involves a comparison, and seeking requires a MOD).  The ``bitwise''
+version is faster (increments and seeks both require an AND) but
+requires tape lengths to be an exact power of two, with a valid length
+mask.
+
 <<Low-level Tape Macros>>=
-#define INCR_TAPE_WRITE(t) \
-  ((++((t)->write_pos) >= (t)->tape_length) ? \
-    (t)->write_pos = 0 : (t)->write_pos)
-#define INCR_TAPE_READ(t) \
-  ((++((t)->read_pos) >= (t)->tape_length) ? \
-    (t)->read_pos = 0 : (t)->read_pos)
+<<Low-level Tape Macros (Bitwise)>>
+#define INCR_TAPE_WRITE(t) INCR_TAPE_POS(t, write_pos)
+#define INCR_TAPE_READ(t) INCR_TAPE_POS(t, read_pos)
 #define PUSH_TAPE(t, type, d) \
   (((type *)((t)->data))[INCR_TAPE_WRITE(t)] = (d))
-#define PEEK_TAPE(t, type, n) \
-  (((type *)(t)->data)[((t)->read_pos+n+1)%(t)->tape_length])
 #define POP_TAPE(t, type) \
   (((type *)((t)->data))[INCR_TAPE_READ(t)])
+@
+
+<<Low-level Tape Macros (Conservative)>>=
+#define INCR_TAPE_POS(t, v) \
+  ((++((t)->v) >= (t)->tape_length) ? (t)->v = 0 : (t)->v)
+#define PEEK_TAPE(t, type, n) \
+  (((type *)(t)->data)[((t)->read_pos+n+1)%(t)->tape_length])
+@
+
+<<Low-level Tape Macros (Bitwise)>>=
+#define INCR_TAPE_POS(t, v) ((t)->v = ((t)->v+1) & (t)->mask)
+#define PEEK_TAPE(t, type, n) \
+  (((type *)(t)->data)[((t)->read_pos+n+1)&(t)->mask])
 @
 
 [[COPY_TAPE_ITEM]] copies the most recent item read from the source
