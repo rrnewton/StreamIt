@@ -434,7 +434,8 @@ argument to the stream initialization functions above.
 popping does not return elements in the same order that the elements
 were pushed.  This might enable improved routing or instruction
 scheduling, {\it e.g., } for applications dealing on unordered network
-packets.  Peek cannot be used if this flag is set.\\}
+packets.  If this flag is set, then peek can only be used with an
+index of 0 (to examine the next item).\\}
 
 \decl{  svm\_Stream\_Unaliased\_RAM = 0x2,}
 
