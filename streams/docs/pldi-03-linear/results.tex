@@ -76,15 +76,15 @@ detection in parallel.
 \center
 \begin{minipage}{3.4 in}
 \center
-\epsfxsize=2.2in
+\epsfxsize=3.2in
 \epsfbox{images/frequency-win-theory.eps} \\
 {\bf (a): Theoretical}
 \end{minipage} 
 \begin{minipage}{3.4 in}
 \center
-\epsfxsize=2.2in
+\epsfxsize=3.2in
 \epsfbox{images/frequency-win-empirical.eps} \\
-{\bf (b): Emphirical}
+{\bf (b): Empirical}
 \end{minipage}
 \caption{Plots showing the theoretical and emphirical multiplication reduction factor as a function of the size of the FIR ($M$) and the number of outputs produced ($N$). The dark regions denote an increase in the required number of multiplications.}
 \label{fig:frequency-win-theory}
@@ -92,30 +92,29 @@ detection in parallel.
 \end{figure*}
 
 
-
-
 Direct convolution requires $O(MN)$ multiplies to generate $N$ output
-values.  Implementing convolution using an FFT algorithm to calculate
-the DFT requires $O((M+N)lg(M+N))$ multiplications for both the
-conversion to and from the frequency domain and $O(M+N)$
-multiplications in the frequency domain and produces $M+N$ outputs.
-We define the multiplication savings factor as the number of
-multiplies per output using direct convolution over the number of
-multiplies per output using the frequency transformation. The
-reduction factor $f(M,N)=\frac{O(M(M+N))}{O(M+N)lg(M+N))+(M+N))}$.
-Figure~\ref{fig:frequency-win-theory} shows a plot of this function in
-normalized $M$, $N$ space.
+values.  The FFT requires $O(N+2(M-1))lg(N+(M-1))$ multiplications for both the
+conversion to and from the frequency domain, and multiplying two $N+2(M-1)$
+vectors in the frequency domain requires $O(N+2(M-1))$. The frequency transformation 
+produced $N+M-1$ outputs every execution.
+We define the multiplication reduction factor as the number of
+multiplies required per output using convolution over the 
+the number of multiplies per output using the frequency transformation. 
+%The reduction factor in theory is roughly $f(M,N)=\frac{M(M-1+N)}{2(4(2(M-1)+N))log(4(2(M-1)+N))+4(2(M-1)+N))}$.
+Figure~\ref{fig:frequency-win-theory} shows a plot of the theoretical multiplication savings
+in $M$, $N$ space taking into account the fact that it requires 4 floating point 
+multiplies to multiply complex numbers.
+
 
 We also performed experiments to measure the actual multiplication reduction
 as a function of $M$ (filter size) and output size ($N$).
 Figure~\ref{fig:frequency-win-empirical} shows the empirically measured
-multiplication savings factor per output.
+multiplication savings factor per output. Our experimental results have the same basic 
+shape as the theoretical predictions except that we don't see the falloff as 
+FIR size grows. This is due to the fact that
+our FFT algorithm requires that $N+2(M-1)$ be a power of two, and the compiler
+automatically adjusts $N$ upwards to meet this requirement.
 
-
-Our experimental results have the same shape, however we don't get the same
-speedup because of constant factors hidden by the assymptotic notation. For instance,
-elementwise multiplication of the complex values in $H[k]$ and $X[k]$ require
-four floating point operations for a straightforward implementation.
 
 \subsection{Simplification from Combination}
 Linear analysis is valuable because it provides a precise relationship
@@ -172,22 +171,22 @@ rather than a manual redesign.
 
 \subsection{Overall optimization performance}
 
-\begin{figure}
-\center
-\epsfxsize=3.2in
-\epsfbox{images/overlap-add-savings.eps}
-\vspace{-12pt}
-\caption{Multiplication savings from using the overlap and add method compared to overlap and discard method.}
-\label{fig:overlap-add-savings}
-\vspace{-12pt}
-\end{figure}
+%\begin{figure}
+%\center
+%\epsfxsize=3.2in
+%\epsfbox{images/overlap-add-savings.eps}
+%\vspace{-12pt}
+%\caption{Multiplication savings from using the overlap and add method compared to overlap and discard method.}
+%\label{fig:overlap-add-savings}
+%\vspace{-12pt}
+%\end{figure}
 
-Figure~\ref{fig:overlap-add-savings} shows the required computation differences for
-the overlap-add method and the overlap-discard method. 
-In all cases, the overlap-add method performs better than the overlap-discard method.
-The performance difference declines as the number of outputs($N$) increases because
-the ratio of the amount of data discarded by the overlap-discard method to the 
-amount of data produced grows smaller. 
+%Figure~\ref{fig:overlap-add-savings} shows the required computation differences for
+%the overlap-add method and the overlap-discard method. 
+%In all cases, the overlap-add method performs better than the overlap-discard method.
+%The performance difference declines as the number of outputs($N$) increases because
+%the ratio of the amount of data discarded by the overlap-discard method to the 
+%amount of data produced grows smaller. 
 
 \begin{figure}
 \center
