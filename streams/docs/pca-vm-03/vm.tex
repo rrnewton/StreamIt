@@ -473,7 +473,7 @@ of tracking a set of EOS tokens.\\}
 %%%%%%%%%%%%%%%%%%%%%%%%%
 \makeline
 \name{streamPushMulticast}
-\decl{void svm\_streamPushMulticast(void* element, svm\_Stream* s0, svm\_Stream* s1, ...)}
+\decl{void svm\_streamPushMulticast(int n, void* element, svm\_Stream* s1, svm\_Stream* s2, ...)}
 
 \spec{Pushes an item onto the end of the given streams, in any order
 (or simultaneously.)  Will not return until an item has been pushed
@@ -493,10 +493,11 @@ series of calls to {\tt svm\_streamPush}.  It is included in the API in
 order to give the Low Level Compiler an opportunity to optimize
 broadcast messages.}
 
-\param{{\tt s0, s1, ...} - streams to push onto.\\
+\param{{\tt n} - number of streams.\\
+  {\tt s1, s2, ..., sn} - streams to push onto.\\
   {\tt element} - value to push.}
 
-\req{{\tt s0}, {\tt s1}, etc. have been initialized.}
+\req{{\tt s1}, {\tt s2}, etc. have been initialized.}
 
 \callkc
 %%%%%%%%%%%%%%%%%%%%%%%%%
@@ -560,16 +561,17 @@ there is space to push the element.}
 \makeline
 \name{streamPushMulticastWithEOS}
 
-\decl{void svm\_streamPushMulticastWithEOS(void* element, svm\_Stream* s0, svm\_Stream* s1, ...)}
+\decl{void svm\_streamPushMulticastWithEOS(int n, void* element, svm\_Stream* s1, svm\_Stream* s2, ...)}
 
 \spec{Pushes an item with EOS tag attached onto the given streams, in any
 order (or simultaneously.)  Will not return until an item has been
 pushed onto all streams.  See {\tt svm\_streamPushMulticast} for an example.}
 
-\param{{\tt s0, s1, ...} - streams to push onto.\\
+\param{{\tt n} - number of streams.\\
+  {\tt s1, s2, ..., sn} - streams to push onto.\\
   {\tt element} - value to push.}
 
-\req{{\tt s0}, {\tt s1}, etc. have been initialized.}
+\req{{\tt s1}, {\tt s2}, etc. have been initialized.}
 
 \callkc
 %%%%%%%%%%%%%%%%%%%%%%%%%
@@ -854,8 +856,10 @@ or {\tt Finished}.}
 
 \spec{Executes a pre-defined kernel on a multiplexed processor,
 yielding every N iterations or when unable to perform a peek, pop, or
-push.  The kernel continues to run until its status is {\tt Paused} or
-{\tt Finished}.}
+push (for a precise definition of ``iteration'', see
+Section~\ref{sec:predef} and Appendix~\ref{sec:referenceimpl}.)  The
+kernel continues to run until its status is {\tt Paused} or {\tt
+Finished}.}
 
 \param{
   {\tt k} - kernel to run.\\
@@ -1240,15 +1244,17 @@ listed in Figure~\ref{fig:restrict}.
 
 Special pre-defined kernels are used to move data between streams and
 blocks. These kernels are typically executed by DMA processors, but
-may be executed by stream processors on some architectures.
+may be executed by stream processors on some architectures.  A
+reference implementation of the pre-defined kernels can be found in
+Appendix~\ref{sec:referenceimpl}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%
 \makeline
 \name{Constants}
 \decl{const int svm\_Stream\_Length\_All = -1;}
 
-\spec{Indicates that a pre-defined kernel should execute through the
-entire length of one of its inputs.}
+\spec{Indicates that a pre-defined kernel should execute until it
+finds an EOS in its input stream.}  
 \makeline
 %%%%%%%%%%%%%%%%%%%%%%%%%
 \clearpage
@@ -1268,8 +1274,9 @@ void svm_moveInit(svm_Move* move, mm_Proc location, svm_IStream* srcStr,
 \spec{The primary use of this kernel is for moving elements between
 streams in different memory banks, though it can also be used for
 moving between streams in a single memory.  A given number of elements
-are popped off of {\tt srcStr} and pushed onto {\tt destStr}, with an
-EOS tag added to the last element if desired.\\}
+are popped off of {\tt srcStr} and pushed onto {\tt destStr}, with EOS
+tags preserved.  If desired, an EOS tag is also added to the last
+element pushed.  Each iteration of this kernel moves a single item.\\}
 
 \spec{Note that {\tt svm\_moveInit} function is only the initialization
 routine (as in setting up a DMA processor); it does not do the data
@@ -1289,8 +1296,9 @@ move itself.}
 
 \req{
   {\tt move} is {\tt Unstarted}, {\tt Finished}, or uninitialized.\\
-  {\tt srcStr} and {\tt destStr} have been initialized.}
-
+  {\tt srcStr} and {\tt destStr} have been initialized.\\
+  {\tt length} $>$ 0 or {\tt length} = {\tt svm\_Stream\_Length\_All}.}
+      
 \callc
 \makeline
 %%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1312,7 +1320,8 @@ continuous input stream to strided locations of a destination block.
 The distance between strides in the destination ({\tt destStride})
 might be greater than the number of elements moved with each stride
 ({\tt elementsPerStride}), in which case the elements moved appear at
-the beginning of each stride.}
+the beginning of each stride.  Each iteration of this kernel
+processes a single stride.}
 
 \param{
   {\tt scatter} - kernel to initialize.\\
@@ -1326,7 +1335,9 @@ the beginning of each stride.}
 
 \req{
   {\tt scatter} is {\tt Unstarted}, {\tt Finished}, or uninitialized.\\
-  {\tt srcStr} and {\tt destBlock} have been initialized.}
+  {\tt srcStr} and {\tt destBlock} have been initialized.\\
+  {\tt length} $>$ 0 or {\tt length} = {\tt svm\_Stream\_Length\_All}.\\
+  All accesses to {\tt destBlock} are within its capacity.}
 
 \callc
 %%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1349,21 +1360,23 @@ locations of an input block to a continuous destination stream.  The
 distance between strides ({\tt srcStride}) might be greater than the
 number of elements copied from each stride ({\tt elementsPerStride}),
 in which case the elements are copied from the beginning of the
-stride.}
+stride.  Each iteration of this kernel processes a single stride.}
 
 \param{
   {\tt gather} - kernel to initialize.\\
   {\tt location} - processor resource on which to execute the kernel (from PCA Machine Model.)\\
   {\tt srcBlock} - source block, from which elements are copied.\\
   {\tt destStr} - destination stream, onto which elements are pushed.\\
-  {\tt length} - total number of elements to copy; {\tt svm\_Stream\_Length\_All} considers all elements of {\tt srcBlock}.\\
+  {\tt length} - total number of elements to copy; {\tt svm\_Stream\_Length\_All} considers all elements of \\\mbox{~~~~~}{\tt srcBlock}.\\
   {\tt srcStride} - number of elements between the start of adjacent strides in {\tt srcBlock}.\\
   {\tt elementsPerStride} - number of elements that are copied from start of each stride.\\
    {\tt setEOS} - if true, then the last element pushed onto {\tt destStr} is given an EOS tag.  Otherwise \\\mbox{~~~~~}no element pushed is tagged with an EOS.}
 
 \req{
   {\tt gather} is {\tt Unstarted}, {\tt Finished}, or uninitialized.\\
-  {\tt srcBlock} and {\tt destStr} have been initialized.}
+  {\tt srcBlock} and {\tt destStr} have been initialized.\\
+  {\tt length} $>$ 0 or {\tt length} = {\tt svm\_Stream\_Length\_All}.\\
+  All accesses to {\tt srcBlock} are within its capacity.}
 
 \callc
 %%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1387,7 +1400,8 @@ the locations where elements are written.  For each element of the
 index stream, {\tt elementsPerIndex} elements of the source stream are
 moved to successive locations of the destination block (starting at
 the given index).  Elements are popped from both the source and index
-streams as they are scattered.}
+streams as they are scattered.  Each iteration of this kernel
+processes a single index.}
 
 \param{
   {\tt scatter} - kernel to initialize.\\
@@ -1400,7 +1414,9 @@ streams as they are scattered.}
 
 \req{
   {\tt scatter} is {\tt Unstarted}, {\tt Finished}, or uninitialized.\\
-  {\tt srcStr}, {\tt indexStr}, and {\tt destBlock} have been initialized.}
+  {\tt srcStr}, {\tt indexStr}, and {\tt destBlock} have been initialized.\\
+  {\tt length} $>$ 0 or {\tt length} = {\tt svm\_Stream\_Length\_All}. \\
+  All accesses to {\tt destBlock} are within its capacity.}
 
 \callc
 %%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1423,7 +1439,8 @@ block to an output stream, using an index stream to determine the
 locations where elements are read.  For each element of the index
 stream, {\tt elementsPerIndex} successive elements of the source block
 (starting at the given index) are copied into the destination stream.
-Elements are popped from the index stream as they are gathered.}
+Elements are popped from the index stream as they are gathered.  Each
+iteration of this kernel processes a single index.}
 
 \param{
   {\tt gather} - kernel to initialize.\\
@@ -1438,7 +1455,9 @@ Elements are popped from the index stream as they are gathered.}
 
 \req{
   {\tt gather} is {\tt Unstarted}, {\tt Finished}, or uninitialized.\\
-  {\tt srcBlock}, {\tt indexStr} and {\tt destStr} have been initialized.}
+  {\tt srcBlock}, {\tt indexStr} and {\tt destStr} have been initialized.\\
+  {\tt length} $>$ 0 or {\tt length} = {\tt svm\_Stream\_Length\_All}. \\
+  All accesses to {\tt srcBlock} are within its capacity.}
 
 \callc
 \makeline
@@ -1956,93 +1975,286 @@ can be constructed using the primitives in the SVM.  The High Level
 Compiler should employ similar mechanisms in other scenarios to ensure
 that it always has a consistent view of FIFO contents.
 
-%% \makeline
-%% \name{Move}
-%% {\small
-%% \begin{verbatim}
-%%   typedef struct {
-%%     svm_Kernel kernel;
-%%     svm_IStream* srcStr,
-%%     svm_OStream* destStr,
-%%     int elementSize,
-%%     int length,
-%%     boolean setEOS
-%%   } Move;
+\clearpage
+\section{Pre-Defined Kernels:  Reference Implementation}  % use *-form to suppress numbering
+\label{sec:referenceimpl}
 
-%%   void svm_moveInit(svm_Move* move, mm_Proc location, svm_IStream* _srcStr, 
-%%                     svm_OStream* _destStr, int _length, boolean _setEOS);
-%%     kernelInit(&move->kernel, location, 0, move, sizeof(Move), (ExtKernelWork)&moveWork);
-%%     move->srcStr = _srcStr;
-%%     move->destStr = _destStr;
-%%     move->elementSize = _elementSize;
-%%     move->length = _length;
-%%     move->setEOS = _setEOS;
-%%   }
+This section provides a reference implementation for pre-defined
+kernels, with the intent of clarifying any ambiguities in the
+specification of Section~\ref{sec:predef}.  Towards this end,
+high-level SVM primitives are used to provide a legal
+implementation\footnote{This implementation also uses dynamic memory
+allocation within the work functions of kernels, which is prohibited
+by the SVM.  A Low Level Compiler can avoid dynamic allocation by
+inferring the {\tt elementSize} of the streams and blocks in a given
+application.} for each pre-defined kernel.  This is only for the sake
+of illustration; in most cases, pre-defined kernels should be
+implemented natively by the Low Level Compiler to target DMA engines
+or other specialized hardware.
 
-%%   void moveWork(Move* move) {
-%%     int iteration;
-%%     void* buffer = malloc(elementSize);
-%%     for (iteration=0; iteration<move->length || move->length == svm_Stream_Length_All; iteration++) {
-%%       boolean eos = svm_streamPeekEOS(move->srcStr, 0);
-%%       svm_streamPop(move->srcStr, buffer);
-%%       if (!eos) {
-%% 	// push normal item
-%%         svm_streamPush(move->destStr, buffer);
-%%       } else {
-%% 	// push EOS item
-%%         svm_streamPushEOS(move->destStr, buffer);
-%% 	if (move->length == svm_Stream_Length_All) {
-%% 	  // if we're set to all, quit after pushing an EOS item
-%% 	  break;
-%% 	}
-%%       }
-%%     }
-%%     free(buffer);
-%%   }
-%% }
+Note also that the following implementation gives a precise definition
+of the ``iteration'' for each pre-defined kernel, as referenced by the
+{\tt svm\_kernelRunMultiplexed} function.  In each kernel's work
+function, the {\tt iteration} variable marks the current iteration.
 
-%% \makeline
-%% \name{StridedScatter}
-%% {\small
-%% \begin{verbatim}
-%%   typedef struct {
-%%     svm_Kernel kernel;
-%%     svm_IStream* srcStr,
-%%     svm_OBlock* destBlock,
-%%     int length,
-%%     int destStride,
-%%     int elementsPerStride,
-%%   } StridedScatter;
+\makeline
+\name{Move}
+{\small
+\begin{verbatim}
+  typedef struct {
+    svm_Kernel kernel;
+    svm_IStream* srcStr,
+    svm_OStream* destStr,
+    int elementSize,
+    int length,
+    boolean setEOS
+  } svm_Move;
 
-%%   void svm_stridedScatterInit(svm_StridedScatter* scatter, mm_Proc location, 
-%%                               svm_IStream* _srcStr, svm_OBlock* _destBlock, int _length,
-%%                               int _destStride, int _elementsPerStride)
-%%     kernelInit(&scatter->kernel, location, 0, move, sizeof(StridedScatter), (ExtKernelWork)&stridedScatterWork);
-%%     move->srcStr = _srcStr;
-%%     move->destBlock = _destBlock;
-%%     move->length = _length;
-%%     move->destStride = _destStride;
-%%     move->elementsPerStride = _elementsPerStride;
-%%   }
+  void svm_moveInit(svm_Move* move, mm_Proc location, svm_IStream* _srcStr, 
+                    svm_OStream* _destStr, int _length, boolean _setEOS);
+    kernelInit(&move->kernel, location, 0, move, sizeof(svm_Move), (ExtKernelWork)&moveWork);
+    move->srcStr = _srcStr;
+    move->destStr = _destStr;
+    move->elementSize = _elementSize;
+    move->length = _length;
+    move->setEOS = _setEOS;
+  }
 
-%%   void stridedScatterWork(StridedScatter* scatter) {
-%%     int iteration, j;
-%%     void* buffer = malloc(elementSize);
-%%     for (iteration=0; iteration<move->length || move->length == svm_Stream_Length_All; iteration++) {
-%%       boolean eos = svm_streamPeekEOS(move->srcStr, 0);
-%%       svm_streamPop(move->srcStr, buffer);
-%%       if (!eos) {
-%% 	// push normal item
-%%         svm_streamPush(move->destStr, buffer);
-%%       } else {
-%% 	// push EOS item
-%%         svm_streamPushEOS(move->destStr, buffer);
-%% 	if (move->length == svm_Stream_Length_All) {
-%% 	  // if we're set to all, quit after pushing an EOS item
-%% 	  break;
-%% 	}
-%%       }
-%%     }
-%%     free(buffer);
-%%   }
-%% }
+  void moveWork(svm_Move* move) {
+    int iteration;
+    void* element = malloc(move->elementSize);
+    for (iteration=0; iteration<move->length; iteration++) {
+      boolean eos = svm_streamPeekEOS(move->srcStr, 0);
+      svm_streamPop(move->srcStr, element);
+      // push item with EOS tag if source has tag, or if setEOS and at end of stream
+      if (eos || (move->setEOS && iteration==move->length-1)) {
+        svm_streamPushEOS(move->destStr, element);
+        if (move->length == svm_Stream_Length_All) {
+          // if we're set to all, quit after pushing an EOS item
+          break;
+        }
+      } else {
+        svm_streamPush(move->destStr, element);
+      }
+    }
+    free(element);
+  }
+\end{verbatim}}
+
+\clearpage
+\makeline
+\name{StridedScatter}
+{\small
+\begin{verbatim}
+  typedef struct {
+    svm_Kernel kernel;
+    svm_IStream* srcStr,
+    svm_OBlock* destBlock,
+    int length,
+    int destStride,
+    int elementsPerStride
+  } svm_StridedScatter;
+
+  void svm_stridedScatterInit(svm_StridedScatter* scatter, mm_Proc location, 
+                              svm_IStream* _srcStr, svm_OBlock* _destBlock, int _length,
+                              int _destStride, int _elementsPerStride)
+    kernelInit(&scatter->kernel, location, 0, scatter, sizeof(svm_StridedScatter), 
+               (ExtKernelWork)&stridedScatterWork);
+    scatter->srcStr = _srcStr;
+    scatter->destBlock = _destBlock;
+    scatter->length = _length;
+    scatter->destStride = _destStride;
+    scatter->elementsPerStride = _elementsPerStride;
+  }
+
+  void stridedScatterWork(svm_StridedScatter* scatter) {
+    int iteration, j, num_items = 0;
+    boolean done_stream_all = false;
+    void* element = malloc(scatter->elementSize);
+    for (iteration=0; num_items<scatter->length && !done_stream_all; iteration++) {
+      for (j=0; 
+           j<scatter->elementsPerStride && num_items<scatter->length && !done_stream_all; 
+           j++) {
+        done_stream_all = scatter->length == svm_Stream_Length_All && 
+                          svm_streamPeekEOS(scatter->srcStr, 0);
+        svm_streamPop(scatter->srcStr, element);
+        svm_blockWrite(scatter->destBlock, iteration*scatter->destStride + j, element);
+        num_items++;
+      }
+    }
+    free(element);
+  }
+\end{verbatim}}
+
+\clearpage
+\makeline
+\name{StridedGather}
+{\small
+\begin{verbatim}
+  typedef struct {
+    svm_Kernel kernel;
+    svm_IBlock* srcBlock,
+    svm_OStream* destStr,
+    int length,
+    int srcStride,
+    int elementsPerStride,
+    boolean setEOS
+  } svm_StridedGather;
+
+  void svm_stridedGatherInit(svm_StridedGather* gather, mm_Proc location, 
+                             svm_IBlock* _srcBlock, svm_OStream* _destStr, int _length,
+                             int _srcStride, int _elementsPerStride, boolean setEOS)
+    kernelInit(&gather->kernel, location, 0, gather, sizeof(svm_StridedGather), 
+               (ExtKernelWork)&stridedGatherWork);
+    gather->srcBlock = _srcBlock;
+    gather->destStr = _destStr;
+    gather->length = _length;
+    gather->srcStride = _srcStride;
+    gather->elementsPerStride = _elementsPerStride;
+    gather->setEOS = _setEOS;
+  }
+
+  void stridedGatherWork(svm_StridedGather* gather) {
+    int iteration, j, num_items = 0;
+    boolean done_stream_all = false;
+    void* element = malloc(gather->elementSize);
+
+    for (iteration=0; num_items<gather->length && !done_stream_all; iteration++) {
+      for (j=0; 
+           j<gather->elementsPerStride && num_items<gather->length && !done_stream_all; 
+           j++) {
+        done_stream_all = gather->length == svm_Stream_Length_All && 
+                          iteration*gather->srcStride + j >= gather->srcBlock->capacity-1;
+        svm_blockRead(gather->srcBlock, iteration*gather->srcStride + j, element);
+        num_items++;
+        if (gather->setEOS && (done_stream_all || num_items==gather->length-1)) {
+          svm_streamPushEOS(gather->destStr, element);
+        } else {
+          svm_streamPush(gather->destStr, element);
+        }
+      }
+    }
+
+    free(element);
+  }
+\end{verbatim}}
+
+\clearpage
+\makeline
+\name{IndexedScatter}
+{\small
+\begin{verbatim}
+  typedef struct {
+    svm_Kernel kernel;
+    svm_IStream* srcStr,
+    svm_IStream* indexStr,
+    svm_OBlock* destBlock,
+    int length,
+    int elementsPerIndex
+  } svm_IndexedScatter;
+
+  void svm_indexedScatterInit(svm_IndexedScatter* scatter, mm_Proc location, 
+                              svm_IStream* _srcStr, svm_IStream* _indexStr, 
+                              svm_OBlock* _destBlock, int _length, int _elementsPerIndex)
+    kernelInit(&scatter->kernel, location, 0, scatter, sizeof(svm_IndexedScatter), 
+               (ExtKernelWork)&indexedScatterWork);
+    scatter->srcStr = _srcStr;
+    scatter->indexStr = _indexStr;
+    scatter->destBlock = _destBlock;
+    scatter->length = _length;
+    scatter->elementsPerIndex = _elementsPerIndex;
+  }
+
+  void indexedScatterWork(svm_IndexedScatter* scatter) {
+    int iteration, j;
+    boolean done_stream_all = false;
+    void* element = malloc(scatter->srcStr->elementSize);
+    void* index = malloc(scatter->indexStr->elementSize);
+    for (iteration=0; iteration<scatter->length && !done_stream_all; iteration++) {
+      done_stream_all = scatter->length == svm_Stream_Length_all && 
+                        svm_streamPeekEOS(scatter->indexStr, 0);
+      svm_streamPop(scatter->indexStr, index);
+      size_t full_index = unpack_index((int8_t*)index, scatter->indexStr->elementSize);
+      for (j=0; j<scatter->elementsPerIndex; j++) {
+        svm_streamPop(scatter->srcStr, element);
+        svm_blockWrite(scatter->destBlock, full_index+j, element);
+      }
+    }
+    free(element);
+    free(index);
+  }
+
+  // unpacks a generic index of <indexSize> bytes for a given architecture
+  size_t unpack_index(int8_t* index, int indexSize) {
+    size_t result = 0;
+    int8_t temp;
+    int i;
+    for (i=0; i<indexSize; i++) {
+      if (mm_BigEndian) {
+        result = (result << 8) + (*(index+i));
+      } else {
+        result = (result << 8) + (*(index+indexSize-i-1));
+      }
+    }
+    return result;
+  }
+\end{verbatim}}
+
+\clearpage
+\makeline
+\name{IndexedGather}
+{\small
+\begin{verbatim}
+  typedef struct {
+    svm_Kernel kernel;
+    svm_IBlock* srcBlock,
+    svm_IStream* indexStr,
+    svm_OStream* destStr,
+    int length,
+    int elementsPerIndex,
+    boolean setEOS
+  } svm_IndexedGather;
+
+  void svm_indexedGatherInit(svm_IndexedGather* gather, mm_Proc location, 
+                              svm_IBlock* _srcBlock, svm_IStream* _indexStr, svm_OStream* _destStr,
+                              int _length, int _elementsPerIndex, boolean _setEOS)
+    kernelInit(&gather->kernel, location, 0, gather, sizeof(svm_IndexedGather), 
+               (ExtKernelWork)&indexedGatherWork);
+    gather->srcBlock = _srcBlock;
+    gather->indexStr = _indexStr;
+    gather->destStr = _destStr;
+    gather->length = _length;
+    gather->elementsPerIndex = _elementsPerIndex;
+    gather->setEOS = _setEOS;
+  }
+
+  void indexedGatherWork(svm_IndexedGather* gather) {
+    int iteration, j;
+    boolean done_stream_all = false;
+    void* element = malloc(gather->srcBlock->elementSize);
+    void* index = malloc(gather->indexStr->elementSize);
+    for (iteration=0; iteration<gather->length && !done_stream_all; iteration++) {
+      done_stream_all = gather->length == svm_Stream_Length_all && 
+                        svm_streamPeekEOS(gather->indexStr, 0);
+      svm_streamPop(gather->indexStr, index);
+      size_t full_index = unpack_index((int8_t*)index, gather->indexStr->elementSize);
+      for (j=0; j<gather->elementsPerIndex-1; j++) {
+        svm_blockRead(gather->srcBlock, full_index+j, element);
+        // detect the last item pushed, since we might need to include an EOS tag
+        if (gather->setEOS && 
+            j==gather->elementsPerIndex-1 && (done_stream_all || iteration==gather->length-1)) {
+          svm_streamPushEOS(gather->destStr, element);
+        } else {
+          svm_streamPush(gather->destStr, element);
+        }
+      }
+    }
+    free(element);
+    free(index);
+  }
+
+  // unpacks a generic index of <indexSize> bytes for a given architecture
+  size_t unpack_index(int8_t* index, int indexSize) {
+    // as in IndexedScatter
+  }
+\end{verbatim}}
