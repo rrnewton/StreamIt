@@ -39,7 +39,7 @@ show a cone collapsing a region of some input tape into the output tape,
 labeling the regions.
 \end{verbatim}
 \vspace{-12pt}
-\caption{\protect\small FIR / FFT Filters.
+\caption{\protect\small FIR / FFT Filters.}
 \vspace{-12pt}
 \end{figure}
 
@@ -82,11 +82,63 @@ f_{AA}(x)&= push_A*floor((x-(peek_A-pop_A))/pop_A) if x \ge (peek_A-pop_A) \\
 \end{eqnarray*}
 Similarly, the reader can verify that:
 \begin{eqnarray*}
-g_{AA}(x)&= ceil(x/push_A)*pop+(peek_A-pop_A)
+g_{AA}(x)&= ceil(x/push_A)*pop_A+(peek_A-pop_A)
 \end{eqnarray*}
 
 \subsubsection{Pipelines}
 
+Let us now derive expressions for $f$ and $g$ in the case of pipelined
+filters.  In the base case, consider that two filters are connected,
+with the output of $A$ feeding the input of $B$.  We are seeking
+$f_{AB}(x)$, the maximum number of items that can appear on $out_B$
+given that there are $x$ items on $in_A$.  Observing that a maximum of
+$f_{AA}(x)$ items can appear on $out_A$, and that $out_A$ must equal
+$in_B$ since the filters are connected, we see that a maximum of
+$f_{BB}(f_{AA}(x))$ items can appear on $out_B$:
+\begin{equation*}
+f_{AB} = f_{BB} \circ f_{AA}
+\end{equation*}
+In the case of $g_{AB}(x)$, the order of composition is reversed:
+given that there are $x$ items on $out_B$, a minimum of $g_{BB}(x)$
+are on $in_B$, and since $out_B = in_A$, we have that a minimum of
+$g_{AA}(g_{BB}(x))$ items appear on $in_A$, leaving:
+\begin{equation*}
+g_{AB} = g_{AA} \circ f_{BB}
+\end{equation*}
+By identical reasoning, these composition laws hold for pipelined
+streams as well as filters.  That is, if filter $B$ is connected in a
+pipeline to filter $C$, then for any filters $A$ and $B$ for which
+$f_{AB}$, $f_{CD}$, $g_{AB}$, and $g_{CD}$ are well defined, we have that:
+\begin{eqnarray*}
+f_{AD} = f_{CD} \circ f_{AB} \\
+g_{AD} = g_{AB} \circ g_{CD}
+\end{eqnarray*}
+
+\subsubsection{SplitJoins}
+
+\begin{figure}[t]
+\scriptsize
+\begin{verbatim}
+Here I want a splitjoin diagram, labelled as:
+
+    A1 ... An 
+  /           \
+S               J
+  \           /
+    B1 ... Bn
+
+\end{verbatim}
+\vspace{-12pt}
+\caption{\protect\small SplitJoin labeling.
+\protect\label{splitjoin}}
+\vspace{-12pt}
+\end{figure}
+
+We now derive $f$ and $g$ in the case of a SplitJoin, as pictured in .
+Figure {\ref:splitjoin}.  There are two sets of transfer functions to
+Figure {\ref:splitjoin}define in 
+
+\begin{verbatim}
 
 --------------------------------------------------------------------------
 
@@ -98,8 +150,6 @@ g_{AA}(x)&= ceil(x/push_A)*pop+(peek_A-pop_A)
 
 - Semantics of the functions
 	- in terms of messages and latency
-
-\begin{verbatim}
 
 let's try some new definitions:
 
@@ -169,4 +219,5 @@ aha, if coming from common sender or going to common receiver, the wavefront
 	wavefront shifts
 
 \end{verbatim}
+
 
