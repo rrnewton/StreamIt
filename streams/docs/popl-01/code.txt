@@ -80,16 +80,24 @@ class FIR extends Stream {
             round_robin();
          }
       })
-      add(new Filter() { 
-         Channel input = new ComplexChannel();
-         Channel output = new ComplexChannel();
-         void work() {
-	    Complex val = 0;
-            for(int i=0; i<N; i++)
-               val += input.pop();
-            output.push(val);
-         }
-      })
+      add(new ComplexAdder(N));
+   }
+}
+
+class ComplexAdder extends Filter {
+   Channel input = new ComplexChannel();
+   Channel output = new ComplexChannel();
+   int N;
+
+   void init(int N) {
+      this.N = N;
+   }
+      
+   void work() {
+      Complex val = 0;
+      for(int i=0; i<N; i++)
+        val += input.pop();
+      output.push(val);
    }
 }
 

@@ -3,49 +3,154 @@
 \begin{figure*}
 \centering
 \psfig{figure=Radio.eps,width=5.2in}
-\caption{ fig1}
-\label{fig:data_structs}
+\caption{A block diagram of a software radio.  A detailed
+implementation in StreaMIT appears in the Appendix.}
+\label{fig:radiodiagram}
 \end{figure*}
 
-In this section, we give an overview of the StreaMIT language.
+StreaMIT includes stream-specific abstractions and representations
+that are designed to improve programmer productivity for the domain of
+programs described above.  In this paper, we present StreaMIT in legal
+Java syntax for ease of presentation.  Though this syntax can express
+the fundamental ideas of StreaMIT, in the longer term we plan to
+develop a cleaner and more abstract syntax that is designed
+specifically for stream programs.
+
+In the Appendix we have included a detailed example of a software
+radio implemented in StreaMIT; a block diagram of the system appears
+in Figure \ref{fig:radiodiagram}.  In the following sections, we draw
+on different components of this example to describe and justify the
+major features of StreaMIT.
+
+\subsection{Filters}
+
+\begin{figure}
+\scriptsize
+\begin{verbatim}
+class FIR extends Filter {
+   Channel input = new ComplexChannel();
+   Channel output = new ComplexChannel();           
+   int N;
+
+   void init(int N) {
+      this.N = N;
+   }
+
+   void work() {
+      Complex sum = 0;
+      for (int i=0; i<N; i++) {
+         sum += input.peek(i)*fir_coeff[i][N];
+      }
+      input.pop();
+      output.push(sum);
+   }
+}
+\end{verbatim}
+\vspace{-12pt}
+\caption{\protect\small An FIR filter in StreaMIT.
+\protect\label{fig:firfilter}}
+\vspace{-12pt}
+\end{figure}
+
+\subsubsection{StreaMIT Approach}
+
+The basic unit of computation in StreaMIT is the {\tt Filter}.  An
+example of a Filter is the {\tt FIRFilter}, a component of our
+software radio (see Figure \ref{fig:firfilter}).  Each {\tt Filter}
+contains an {\tt init} function that is called at initialization time;
+in this case, the {\tt FIRFilter} records {\tt N}, the number of items
+it should filter at once.
+
+The {\tt work} function describes the most fine grained execution step
+fo the filter in the steady state.  Within the {\tt work} function,
+the filter can communicate with neighboring blocks using the {\tt
+input} and {\tt output} channels, which are typed FIFO queue's
+declared as fields at the top of the class.  These high-volume
+channels support the three intuitive operations: 1) {\tt pop} removes
+an item from the end of the channel and returns its value, 2) {\tt
+peek(i)} returns the value of the item $i$ spaces from the end of the
+channel without removing it, and 3) {\tt push(v)} writes the value $v$
+to the front of the channel.  For now, we require that the number of
+items popped, peeked, and pushed by each filter is constant from one
+invocation of the {\tt work} function to the next.
+
+\subsubsection{Rationale}
+
+This representation of a filter is an improvement over general-purpose
+languages.  In a procedural language, the analog of a filter is a
+block of statements in a complicated loop nest.  This representation
+is unnatural for expressing the feedback and parallelism that is
+inherent in streaming systems.  Also, there is no clear abstraction
+barrier between one filter and another, and high-volume stream
+processing is muddled with global variables and control flow.  The
+loop nest must be re-arranged if the input or output ratios of a
+filter changes, and scheduling optimizations further inhibit the
+readability of the code.  In contrast, StreaMIT places the filter in
+its own independent unit, making explicit the parallelism and
+inter-filter communication while hiding the grungy details of
+scheduling and optimization from the programmer.
+
+One could also use an object-oriented language to implement a stream
+abstraction.  This avoids some of the problems associated with a
+procedural loop nest, but the programming model is again complicated
+by efficiency concerns.  That is, a runtime library might exectute
+filters according to a pull model, where a filter operates on a block
+of data that it retrieves from the input channel.  The block size is
+often optimized for the cache size of a given architecture, which
+hampers portability.  Moreover, operating on large-grained blocks
+obscures the fundamental fine-grained algorithm that is visible in a
+StreaMIT filter.  Thus, the absence of a runtime model in favor of
+automated scheduling and optimization again distinguishes StreaMIT.
+
+\subsection{Connecting Filters}
+
+\subsubsection{StreaMIT Approach}
+
+\begin{figure}
+\scriptsize
+\begin{verbatim}
+
+\end{verbatim}
+\vspace{-12pt}
+\caption{\protect\small A Finite Input Response (FIR) filter in StreaMIT.
+\protect\label{fig:}}
+\vspace{-12pt}
+\end{figure}
+
+The basic construct for composing filters into a communicating network
+is a {\tt Stream}.  The FIR filter in Figure \ref{fig:firfilter} is an
+example of a {\tt Stream} that appears in our software radio; it
+contains a {\tt ComplexAdder} as one of its components.  Like a {\tt
+Filter}, a {\tt Stream} has an {\tt init} function that is called upon
+its instantiation.  However, there is no {\tt work} function, and all
+input and output channels are implicit; instead, the stream behaves as
+the sequential composition of filters that are specified with
+successive calls to {\tt add} from within {\tt init}.  That is, {\tt
+Stream} creates a single pipeline.
+
+There are two other stream constructors besides {\tt Stream}: {\tt
+SplitJoin} and {\tt FeedbackLoop}.  The former is used to specify
+independent parallel streams that diverge from a common {\it splitter}
+and merge into a common {\it joiner}.  In the case of the FIR filter, 
+
+The {\tt FeedbackLoop} is the only means of inserting loops in the
+stream network; it contains a round robin joiner, body stream, round
+robin splitter, and loop stream.
+
+\subsubsection{Rationale}
+
+- scripting
+- inlining
+
+\subsection{Messages}
+
+\subsection{Re-Initialization}
+
+\subsection{Realtime Constraints}
 
 \begin{verbatim}
 
-- motivated by properties above
-- this is interface language; developing higher-level streamit
-- legal java syntax for now, to ease development cycle
-- assume static push, pop, peek
-
-- point to example, talk through major features
-
 ---------------------------------------------------------------------------
-- representing filters 
-- others:
-	- procedural language
-		- complicated loops that don't express well the feedback,
-			parallelism in streaming systems
-		-> loop overhead dominates, data leaves the cache
-
-	- object oriented language
-		- complicated runtime-model, pulling data and trying to 
-			get block size right for machine configuration
-			(scheduling is complicated)
-
-- us: only define base-level blocks, leave the rest to language/compiler
-	- init, work, message handlers
-
-	- define in init function anything that has to be set up when
-          the block is first defined.
-
-	- define in work function the finest-grained step of
-          execution, expressing the simple transfer function of one
-          stream into another
-
-	- no global data or global time
-
-- syntax presented:  filter/channel declarations, init & work functions
----------------------------------------------------------------------------
-- representing streams (how to ``connect the blocks together'')
 - others:
 	- straight-line code declaring & connecting blocks
 		problem: can't see the structure.

@@ -102,38 +102,24 @@ class FFT extends Stream {
         add(new Butterfly(i, N));
 }}
 
-class FIR extends Stream {
-   void init(int N) {
-      add(new SplitJoin() {
-         void init() {
-            duplicate();
-            for(int i=0; i<N; i++)
-               add(new Filter() {
-                  Channel input = new ComplexChannel();
-                  Channel output = new ComplexChannel();           
-                  Complex h;
-                  void init() {
-                     h = calc_fir_coeff(i, N);
-                  }
-                  void work() {
-                     output.push(input.peek(i)*h);
-                     input.pop();
-                  }
-               });
-            round_robin();
-      }});
-      add(new Filter() { 
-         Channel input = new ComplexChannel();
-         Channel output = new ComplexChannel();
-         void work() {
-	    Complex val = 0;
-            for(int i=0; i<N; i++)
-               val += input.pop();
-            output.push(val);
-         }
-      });
-}}
+class FIR extends Filter {
+   Channel input = new ComplexChannel();
+   Channel output = new ComplexChannel();           
+   int N;
 
+   void init(int N) {
+      this.N = N;
+   }
+
+   void work() {
+      Complex sum = 0;
+      for (int i=0; i<N; i++) {
+         sum += input.peek(i)*fir_coeff[i][N];
+      }
+      input.pop();
+      output.push(sum);
+   }
+}
 \end{verbatim}
 \vspace{-12pt}
 \caption{\protect\small Example stuff.
