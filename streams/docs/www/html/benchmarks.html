@@ -1,0 +1,290 @@
+<html>
+
+<head>
+   <meta http-equiv="Content-Type" content="text/html;charset=iso-8859-1">
+   <meta NAME="author" CONTENT="rodric m. rabbah">
+   <meta NAME="keywords" CONTENT="saman amarasinghe, streaming, programming languages, compilers">
+   <meta NAME="description" CONTENT="StreamIT">
+   <title>StreamIt - Benchmarks</title>
+
+   <style fprolloverstyle>A:hover {color: #FF0000}</style>
+</head>
+
+<body>
+
+<table border="0" width="600" cellpadding="2" align="center">
+  <tr>
+    <td valign="center" align="left">
+      <img src="../images/streamit-logo.jpg" height="90" width="90">
+    </td>
+    <td valign="center" align="center">
+      <font color="#444A50">
+        <br><br><br>
+        <nobr><b>
+            <a href="../index.html"><font color="#FF0000">home</font></a>
+          | <a href="../html/news.html"><font color="#FF0000">news</font></a>
+          | <a href="../html/research.html"><font color="#FF0000">research</font></a>
+          | <a href="../html/people.html"><font color="#FF0000">people</font></a> 
+          | <a href="../html/documentation.html"><font color="#FF0000">documentation</font></a>
+          | <a href="../html/download.html"><font color="#FF0000">download</font></a>
+          | <a href="../html/contact.html"><font color="#FF0000">contact</font></a>
+        </nobr></b>
+        <hr>
+      </font>
+    </td>
+  </tr>
+  <tr>
+    <td></td>
+    <td valign="top" align="right"><h3>BENCHMARKS</h3></td>
+  </tr>
+</table>
+
+<table border="0" width="1000" cellpadding="0" align="center">
+  <tr>
+    <td width="130" valign="top" align="left"></td>
+    <td width="20" valign="top" align="left"></td>
+    <td width="700" valign="top" align="left">
+	<br><br><br>
+
+	<table width="100%" border="1" align="center"><thead><tr><th colspan="2" bgcolor="#C0C0C0" align="left">beamformer -  </th></tr></thead><tbody>
+	<tr>
+  	  <td width="15%" valign="center" align="left"><b>Description</b></td>
+	  <td align="justify">
+	  </td>
+	</tr>
+	<tr>
+	  <td><b>Reference</b></td>
+	  <td>(none)</td>
+	</tr>
+	<tr>
+	  <td><b>StreamIt</b></td>
+	  <td><a href="../files/benchmarks/TemplateBeamFormer.str">TemplateBeamFormer.str</a> </td>
+	</tr>
+	</tbody></table>
+
+	<br>
+	<table width="100%" border="1" align="center"><thead><tr><th colspan="2" bgcolor="#C0C0C0" align="left">cfar -  </th></tr></thead><tbody>
+	  <tr>
+	    <td width="15%" valign="center" align="left"><b>Description</b></td>
+	    <td align="justify">
+	    </td>
+	  </tr>
+	  <tr>
+	    <td><b>Reference</b></td>
+	    <td>(none)</td>
+	  </tr>
+	  <tr>
+	    <td><b>StreamIt</b></td>
+	    <td><a href="../files/benchmarks/CFARtest.str">CFARtest.str</a> </td>
+	  </tr>
+	</tbody></table>
+
+	<br>
+      <table width="100%" border="1" align="center"><thead><tr><th colspan="2" bgcolor="#C0C0C0" align="left">fft - Fast Fourier Transform kernel</th></tr></thead><tbody>
+        <tr>
+          <td width="15%" valign="center" align="left"><b>Description</b></td>
+          <td align="justify">
+            A medium-grained implementation of the fast Fourier transform.  There
+            is a reordering stage, followed by a series of DFT stages.  Each DFT
+            is implemented as a single StreamIt filter.
+          </td>
+        </tr>
+        <tr>
+          <td><b>Reference</b></td>
+          <td>(none)</td>
+        </tr>
+        <tr>
+          <td><b>C</b></td>
+          <td><a href="../files/benchmarks/c/driver.c">driver.c</a> <a href="../files/benchmarks/c/fft.c">fft.c</a> </td>
+        </tr>
+        <tr>
+          <td><b>StreamIt</b></td>
+          <td><a href="../files/benchmarks/streamit/FFT.str">FFT.str</a> </td>
+        </tr>
+      </tbody></table>
+
+	<br>
+	<table width="100%" border="1" align="center"><thead><tr><th colspan="2" bgcolor="#C0C0C0" align="left">fft - Fast Fourier Transform kernel</th></tr></thead><tbody>
+	  <tr>
+	    <td width="15%" valign="center" align="left"><b>Description</b></td>
+	    <td align="justify">
+	      A medium-grained implementation of the fast Fourier transform.  There
+		is a reordering stage, followed by a series of DFT stages.  Each DFT
+		is implemented as a single StreamIt filter.
+	    </td>
+	  </tr>
+	  <tr>
+	    <td><b>Reference</b></td>
+	    <td>(none)</td>
+	  </tr>
+	  <tr>
+	    <td><b>C</b></td>
+	    <td><a href="../files/benchmarks/c/driver.c">driver.c</a> <a href="../files/benchmarks/c/fft.c">fft.c</a> </td>
+	  </tr>
+	  <tr>
+	    <td><b>StreamIt</b></td>
+	    <td><a href="../files/benchmarks/streamit/FFT.str">FFT.str</a> </td>
+	  </tr>
+	</tbody></table>
+
+	<br>
+	<table width="100%" border="1" align="center"><thead><tr><th colspan="2" bgcolor="#C0C0C0" align="left">filterbank - Passes a signal through a filterbank</th></tr></thead><tbody>
+	  <tr>
+	    <td width="15%" valign="center" align="left"><b>Description</b></td>
+	    <td align="justify">
+	    </td>
+	  </tr>
+	  <tr>
+	    <td><b>Reference</b></td>
+	    <td>(none)</td>
+	  </tr>
+	  <tr>
+	    <td><b>StreamIt</b></td>
+	    <td><a href="../files/benchmarks/FilterBankNew.str">FilterBankNew.str</a></td>
+	  </tr>
+	  </tbody></table>
+
+	  <br>
+	  <table width="100%" border="1" align="center"><thead><tr><th colspan="2" bgcolor="#C0C0C0" align="left">fir - Fine-grained finite impulse response kernel</th></tr></thead><tbody>
+	    <tr>
+	      <td width="15%" valign="center" align="left"><b>Description</b></td>
+		<td align="justify">
+		  A fine-grained finite impulse response kernel.  While it is possible
+		  to implement an FIR filter as a single StreamIt filter, this
+		  implementation uses a series of simple filters, one per tap, to expose
+		  more parallelism to the compiler.
+		</td>
+          </tr>
+	    <tr>
+	      <td><b>Reference</b></td>
+		<td>(none)</td>
+	    </tr>
+	    <tr>
+	      <td><b>C</b></td>
+		<td><a href="../files/benchmarks/c/firref.c">firref.c</a></td>
+          </tr>
+	    <tr>
+	      <td><b>StreamIt</b></td>
+		<td><a href="../files/benchmarks/streamit/FIR.str">FIR.str</a> <a href="../files/benchmarks/streamit/FIRfine.out">FIRfine.out</a> </td>
+	    </tr>
+	  </tbody></table>
+
+	  <br>
+	  <table width="100%" border="1" align="center"><thead><tr><th colspan="2" bgcolor="#C0C0C0" align="left">fm - Software FM radio with equalizer</th></tr></thead><tbody>
+	    <tr>
+	      <td width="15%" valign="center" align="left"><b>Description</b></td>
+		<td align="justify">
+		  FM radio with multi-band equalizer.  The input passes through a demodulator
+		  to produce an audio signal, and then an equalizer.  The equalizer is
+		  implemented as a split-join with a number of band-pass filters; each band-pass
+		  filter is in turn the difference of a pair of low-pass filters.
+		</td>
+          </tr>
+	    <tr>
+	      <td><b>Reference</b></td>
+	      <td>(none)</td>
+	    </tr>
+	    <tr>
+	      <td><b>C</b></td>
+	      <td><a href="../files/benchmarks/c/fmref.c">fmref.c</a></td>
+	    </tr>
+	    <tr>
+	    <td><b>StreamIt</b></td>
+	    <td><a href="../files/benchmarks/streamit/FMRadio.str">FMRadio.str</a></td>
+	    </tr>
+	  </tbody></table>
+
+	  <br>
+	  <table width="100%" border="1" align="center"><thead><tr><th colspan="2" bgcolor="#C0C0C0" align="left">matmul-block - Matrix Multiplication</th></tr></thead><tbody>
+	    <tr>
+	      <td width="15%" valign="center" align="left"><b>Description</b></td>
+	      <td align="justify">
+		  Matrix Multiplication.
+  	      </td>
+	    </tr>
+	    <tr>
+	      <td><b>Reference</b></td>
+	      <td>(none)</td>
+	    </tr>
+    	    <tr>
+	      <td><b>StreamIt</b></td>
+	      <td><a href="../files/benchmarks/MatrixMultBlock.str">MatrixMultBlock.str</a></td>
+	    </tr>
+	  </tbody></table>
+
+	  <br>
+	  <table width="100%" border="1" align="center"><thead><tr><th colspan="2" bgcolor="#C0C0C0" align="left">mp3decoder - MP3 decoder</th></tr></thead><tbody>
+	    <tr>
+	      <td width="15%" valign="center" align="left"><b>Description</b></td>
+	      <td align="justify">
+  	      </td>
+	    </tr>
+	    <tr>
+	      <td><b>Reference</b></td>
+	      <td>(none)</td>
+	    </tr>
+    	    <tr>
+	      <td><b>StreamIt</b></td>
+	      <td><a href="../files/benchmarks/MP3.str">MP3.str</a></td>
+	    </tr>
+  	  </tbody></table>
+
+	  <br>
+	  <table width="100%" border="1" align="center"><thead><tr><th colspan="2" bgcolor="#C0C0C0" align="left">nokia -  </th></tr></thead><tbody>
+	    <tr>
+	      <td width="15%" valign="center" align="left"><b>Description</b></td>
+	      <td align="justify">
+  	      </td>
+	    </tr>
+	    <tr>
+	      <td><b>Reference</b></td>
+	      <td>(none)</td>
+	    </tr>
+    	    <tr>
+	      <td><b>StreamIt</b></td>
+	      <td><a href="../files/benchmarks/dcalc.str">dcalc.str</a></td>
+	    </tr>
+  	  </tbody></table>
+
+	  <br>
+	  <table width="100%" border="1" align="center"><thead><tr><th colspan="2" bgcolor="#C0C0C0" align="left">perftest4 -  </th></tr></thead><tbody>
+	    <tr>
+	      <td width="15%" valign="center" align="left"><b>Description</b></td>
+	      <td align="justify">
+  	      </td>
+	    </tr>
+	    <tr>
+	      <td><b>Reference</b></td>
+	      <td>(none)</td>
+	    </tr>
+    	    <tr>
+	      <td><b>StreamIt</b></td>
+	      <td><a href="../files/benchmarks/perftest.str">perftest.str</a></td>
+	    </tr>
+  	  </tbody></table>
+
+	  <br>
+	  <table width="100%" border="1" align="center"><thead><tr><th colspan="2" bgcolor="#C0C0C0" align="left">vocoder - Vocoder for bitrate reduction in speech</th></tr></thead><tbody>
+	    <tr>
+	      <td width="15%" valign="center" align="left"><b>Description</b></td>
+	      <td align="justify">
+  	      </td>
+	    </tr>
+	    <tr>
+	      <td><b>Reference</b></td>
+	      <td>(none)</td>
+	    </tr>
+    	    <tr>
+	      <td><b>StreamIt</b></td>
+	      <td><a href="../files/benchmarks/VocoderTopLevel.str">VocoderTopLevel.str</a></td>
+	    </tr>
+  	  </tbody></table>
+
+      </p>
+    </td>
+    <td width="150" valign="top" align="left"></td>
+  </tr>
+</table>
+
+</body>
+</html>
