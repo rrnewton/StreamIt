@@ -1,0 +1,25 @@
+We formulate a stream dependence function, $\sdep$, which describes
+the ordering constraints between node executions in a concurrent
+stream graph. This dependence information is similar to a program
+slice in procedural programs and carries with it many of the
+applications of slicing, including debugging and program analysis.
+However, unlike slicing, we restrict our input domain to a Synchronous
+Dataflow (SDF) graph, which is a natural representation for many
+signal processing applications.  We leverage the static properties of
+SDF to compute $\sdep$ exactly at compile time and to store the
+dependence information compactly.
+
+Using $\sdep$, we develop a novel language construct for precise event
+handling in stream programs.  The construct uses the dependence
+information to provide a common notion of time across distributed
+components.  Based on a case study of a software radio, we argue that
+the language feature significantly improves programmer
+productivity. We have also implemented fully-automatic support for
+this feature in the StreamIt compiler infrastructure, with a backend
+for a cluster of workstations.  We demonstrate that for our case
+study, incorporating precise event handling into the language improves
+performance by an average of 48\%.
+
+%% This paper makes two contributions towards this goal.  First, we
+%% formulate a stream dependence function, $\sdep$, which describes the
+%% ordering constraints of node executions in a concurrent stream graph.
