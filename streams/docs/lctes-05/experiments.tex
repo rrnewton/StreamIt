@@ -14,13 +14,13 @@ outputs an functionally equivalent C program that is compiled with the
 then run five times, and the median user time is recorded.
 
 \begin{figure}
-  \psfig{figure=beam-mult.eps,  scale=.4}
+  \psfig{figure=p3-caf.eps, width=3.4in}
   \caption{Performance results for a Pentium~3.}
   \label{fig:results-p3}
 \end{figure}
 
 \begin{figure}
-  \psfig{figure=beam-mult.eps,  scale=.4}
+  \psfig{figure=itanium-caf.eps, width=3.4in}
   \caption{Performance results for an Itanium~2.}
   \label{fig:results-ipf}
 \end{figure}
@@ -45,7 +45,8 @@ labeled \texttt{CAF+buffer+scaling}, applies all three optimizations.
 In general, scaling improves performance, with speedups ranging for
 XXX-XXX\% compared to the baseline on the Petium. In the case of
 \texttt{matmult} and \texttt{ofmd}, there is a slight degradation
-(nearly 5\%) due to XXX. By comparsion, the scaling resutls on the
+(nearly 5\%) due to poor code size estimation. By comparsion, the
+scaling resutls on the 
 Itanium are more uniform, and in fact, scaling does not degrade the
 performance of any of the benchmarks in suite. The discrepancy between
 the Pentium and Itanium results is likely due to the in-order
