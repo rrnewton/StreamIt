@@ -5,15 +5,17 @@
 
 A primary benefit of linear filter analysis is that neighboring
 filters can be collapsed into a single matrix representation if both
-of the filters are linear.  This transformation automatically
-eliminates redundant computations in linear sections of the stream
+of the filters are linear.  This transformation can automatically
+eliminate redundant computations in linear sections of the stream
 graph, thereby allowing the programmer to write simple, modular
 filters and leaving the combination to the compiler.  In this section,
-we first describe a {\it linear expansion} operation that serves as a
-building block for the combination techniques.  We then give rules for
-collapsing {\tt pipeline}s and {\tt splitjoin}s into linear nodes; we
-do not yet deal with {\tt feedbackloop}s as they require the notion of
-``linear state'' which we do not describe here.
+we first describe a {\it linear expansion} operation that is needed to 
+match the sizes of $A$ and $\vec{b}$ of different linear nodes and 
+is therefore an essential building block for the other combination 
+techniques.  We then give rules for collapsing pipelines and 
+splitjoins into linear nodes; we do not deal with feedbackloops 
+as they require the notion of ``linear state'' which we do 
+not describe here.
 
 \subsection{Linear Expansion}
 
@@ -25,7 +27,7 @@ do not yet deal with {\tt feedbackloop}s as they require the notion of
 \vspace{-12pt}
 \caption{Expanding a linear node to rates $(e', o', u')$.  }
 \label{fig:expanding-a-matrix}
-\vspace{-24pt}
+\vspace{-18pt}
 \end{figure}
 
 In StreamIt programs, the input and output rate of each filter in the

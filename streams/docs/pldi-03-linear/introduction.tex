@@ -1,4 +1,4 @@
-%% Upward of fifty percent of the code that runs the DSP(s) in a modern
+`%% Upward of fifty percent of the code that runs the DSP(s) in a modern
 %% cell phone is coded in assembly with the rest written in C. Hand
 %% optimized assembly code typically makes the best use of the available
 %% resources such as power, specialized coprocessors, and specialized
@@ -25,7 +25,7 @@
 %% the available DSP resources.
 
 \section{Introduction}
-Digital computation is becoming an increasingly ubiquitous element of
+Digital computation is becoming a ubiquitous element of
 modern life.  Everything from cell phones to GPS systems to satellite
 radios require increasingly sophisticated algorithms.  Optimization is
 especially important for this domain, as embedded devices often have
@@ -42,13 +42,13 @@ consistently reduce to efficient low-level code.
 In this paper, we demonstrate that a domain-specific stream language
 can enable novel high-level DSP optimizations that would otherwise be
 intractable in a general-purpose language.  Our source language is
-StreamIt, which is specifically designed for high-performance signal
-processing applications~\cite{streamit-asplos,streamitcc}; our
-analysis focuses on filters that are {\it linear}.  StreamIt is
+StreamIt~\cite{streamit-asplos,gordon-thesis,streamitcc}, which is 
+specifically designed for high-performance signal processing applications; 
+our analysis focuses on filters that are linear.  StreamIt is
 distinguished from a general purpose language in that it makes
 explicit the large-scale parallelism and regular communication
 patterns that are characteristic of streaming programs.  By analyzing
-the primitive building block in StreamIt---the filter---our analysis
+the primitive building block in StreamIt---the {\it filter}---our analysis
 can detect large portions of the application that produce outputs as a
 linear combination of the inputs; we can exploit this linearity for a
 number of large-scale optimizations.  Though each filter is programmed
@@ -73,9 +73,13 @@ the frequency domain in order to optimize computationally intensive
 linear nodes.
 \vspace{-6pt}
 
+\item An automated selection algorithm that optimally determines 
+which optimizations to apply to which sections of a program.
+\vspace{-6pt}
+
 \item An implementation of the above techniques in the StreamIt
 compiler that automatically improves performance by a factor of
-five on average and by a factor of $6.5$ in the best case.
+XXXX  on average and by a factor of $XXXXXX$ in the best case.
 
 \end{itemize}
 
@@ -99,6 +103,7 @@ present results (Section~\ref{sec:results}), related work
 \epsfbox{images/motivating-example.eps}
 \vspace{-5pt}
 \caption{Block diagram of two FIR filters.}
+\label{fig:motivating-fig}
 \scriptsize
 \begin{verbatim}
 /* perform N-element FIR filter with weights and data */
@@ -221,9 +226,10 @@ float->float pipeline FreqTwoPipe(int L) {
 
 To illustrate the program transformations that our technique is
 designed to automate, consider a sequence of finite impulse response
-(FIR) filters as shown in Figure~\ref{fig:motivating-example}. The
+(FIR) filters as shown in Figure~\ref{fig:motivating-fig}. The
 imperative C style code that implements this simple DSP application is
-also shown. The program largely defies many standard compiler analysis
+shown in Figure~\ref{fig:motivating-example}. 
+The program largely defies many standard compiler analysis
 and optimization techniques because of its use of circular buffers and
 the muddled relationship between {\tt data}, {\tt buffer} and the
 output.
@@ -264,8 +270,9 @@ compiler for combination and transformation.
 %% \end{figure}
 
 StreamIt is a language and compiler for high-performance signal
-processing~\cite{gordon-thesis,streamit-asplos,streamitcc}.  In a
-streaming application, each data item is in the system for only a
+processing.
+%~\cite{gordon-thesis,streamit-asplos,streamitcc} -- it was already cited earlier in intro.
+In a streaming application, each data item is in the system for only a
 small amount of time, as opposed to scientific applications where the
 data set is used extensively over the entire execution.  Also, stream
 programs have abundant parallelism and regular communication patterns.
@@ -295,8 +302,8 @@ resolvable at compile time and constant from one invocation of {\tt
 work} to the next. 
 
 A program in StreamIt consists of a hierarchical graph of 
-filters.  Filters can be connected using one of three predefined
-structures (see Figure~\ref{fig:structures}): 1) {\it pipelines}
+filters.  Filters can be connected using one of the three predefined
+structures shown in Figure~\ref{fig:structures}: 1) {\it pipelines}
 represent the serial computation of one filter after another, 2) {\it
 splitjoins} represent explicitly parallel computation, and 3) {\it
 feedbackloops} allow cycles to be introduced into the stream graph.
