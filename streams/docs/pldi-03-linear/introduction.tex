@@ -11,7 +11,7 @@ because it forces engineers to spend time working out details rather than focusi
 \subsection{StreamIt}
 \begin{figure}
 \center
-\epsfxsize=4.5in
+\epsfxsize=2.5in
 \epsfbox{images/streamit-structures.eps}
 \caption{StreamIt Structures: Pipeline, Splitjoin, and FeedbackLoop.}
 \label{fig:structures}
@@ -34,13 +34,37 @@ between {\tt Filters} and as such not every stream graph is expressable. Most re
 can be fit into the structured stream model, even if it takes some extra manipulation. We believe
 that benefits of structure outweigh and costs associated with it.
 
-\subsection{Matrices and Digital Signal Processing}  
+\subsection{Matrices and Digital Signal Processing}
 We take advantage of StreamIt's one input one output computation blocks and 
 our observations that a large class of likely StreamIt programs are performing
 digital signal processing functions (eg filtering of the data) to do domain specific
-optimizations on the program.
+optimizations on programs.
 
-Remember to cite \cite{xiong-thesis,xiong01spl,johnson01searching,egner01automatic} about
-past work on automatic matrix factorization and automatic code generation within the 
-SPIRAL\cite{spiral} project. Also interesting to note is the work done at UTenn Knoxville 
-with the ATLAS package\cite{whaley01automated}.
+The is an entire area of electrical engineering devoted to digital signal processing. The
+theory and the implementation of systems to process digital signals is well developed (see
+an introductory text such as\cite{oppenheim-discrete} or \cite{lyons-understanding} for 
+a flavor of the work that is done in this field. Many of the operations used for digital 
+processing produce output that is a linear combinations of input values such as FIR filters and
+the discrete time Fourier transform (see \cite{oppenheim-discrete} for detailed discussion
+analysis).
+
+Electrical engineers who do DSP spend a large portion of their time in implementation. Choosing
+the appropriate structure to implement a digital system is a highly non trivial task, and sometimes
+the right choice is more of an art than a science. There are many systems that allow design choices
+to be explored, for example Matlab\cite{matlab} is a (dare we say rediculously) widely used package 
+in both academia and in industry. There are also research projects such as \cite{covell-ade} 
+and those described in \cite{oppenheim-symbolic}. 
+
+As you might imagine given that a product called Matlab (like Matrix Lab) is used extensively
+in signal processing applications, matrices often provide a convenient way of working with
+digital data and digitial filters. Casting the work of StreamIt {\tt Filters} in terms 
+of matrix operations is a good thing because it allows us to use the existing large body
+of theory and knowledge about this area. 
+
+Several interesting projects are underway to determine how to generate efficient programs
+for computing DSP transforms that are expressed as matrices. For instance, the SPIRAL
+project\cite{spiral} aims to determine the fastest implementation for various transforms
+using several techniques ranging from group theory to stochastic search algorithms. See
+ \cite{xiong-thesis,xiong01spl,johnson01searching,egner01automatic}.
+Similiarly, the ATLAS project \cite{whaley01automated} aims to automatically produce fast
+performance tuned libraries for linear algebra manipulations.
