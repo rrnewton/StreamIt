@@ -1,7 +1,7 @@
 \section{SARE}
 
 A System of Affine Recurrence Equations (SARE) is a set of equations
-${\cal E}_1 \dots {\cal E}_p$ of the following form~\cite{DRV00}:
+${\cal E}_1 \dots {\cal E}_{m_{\cal E}}$ of the following form~\cite{DRV00}:
 \begin{equation}
 \forall i \in {\cal D_{\cal E}}, X(i) = f_{\cal E}(\dots, Y(h_{{\cal
 E}, Y}(i)), \dots)
@@ -57,10 +57,10 @@ each of which contains a number of {\it phases}.  Formally, a PCG is a
 directed graph with the following components:
 \begin{itemize}
 
-\item Nodes $n_1 \dots n_l$.
+\item Nodes $n_1 \dots n_{m_n}$.
 
-\item Channels $c_1 \dots c_m$, where each channel is directed from a
-  given node $n_i$ to a given node $n_j$.
+\item Channels $c_1 \dots c_{m_c}$, where each channel is directed
+from a given node $n_i$ to a given node $n_j$.
 
 \item A non-negative integer $A(c)$ indicating the number of items
   that are initially present on channel $c$.
@@ -90,7 +90,7 @@ items.
 
 Let us consider a node $n$ that is in phase $p$ within a graph that is
 in epoch $t$.  It is legal for $n$ to fire if $p \in [0, \mt{num}(n,
-t))$ and, for each channel $c_{in}$ directed into $n$, there are at
+t)-1]$ and, for each channel $c_{in}$ directed into $n$, there are at
 least $E(c_{in}, t, p)$ items on $c_{in}$.  The effect of this firing
 is to consume $O(c_{in}, t, p)$ items from each channel $c_{in}$
 directed into $n$, to produce $U(c_{out}, t, p)$ new items on each
@@ -114,35 +114,70 @@ The PCG described above is a representation for a graph, treating each
 node and channel as a black box.  Here we introduce some notation for
 the internals of the nodes, as well as the ordering of items on the
 channels.  We refer to the aggregate model as a Phased Computation
-Program (PCP).  A PCP consists of the following:
+Program (PCP).  Before describing a PCP, we will need some additional
+notation:
 \begin{itemize}
 
-\item A Phased Computation Graph $G = (n_1 \dots n_l, c_1 \dots c_m,
-A, \mt{num}, U, O, E)$ describing the nodes, channels, and I/O rates
-of the program (see Section~\ref{sec:pcg}).  Each channel $c = (n_i,
-n_j)$ is a FIFO queue; $n_i$ pushes items onto the back of $c$ and
-$n_j$ consumes items from the front of $c$.
+\item We assume that all items passed over channels are drawn from the
+same domain of values ${\cal V}$.
 
-\item An initialization procedure $I(c)$ that returns an array of
-length $A(c)$, the elements of which are enqueued onto channel $c$ at
-the start of execution.  The procedure $I(c)$ takes no arguments.
+\item An array type\footnote{To simplify the presentation, we allow
+ourselves a slight abuse of notation by using arrays in some cases
+instead of enumerating each element.  Our definitions could be
+expanded into strict element-wise SARE's without any fundamental
+change to the technique.} of length $n$ and element type $\tau$ is
+denoted by $\tau[n]$.  Given a two-dimensional array $A$ of type
+$\tau[n][m]$, $A[i][*]$ denotes the $m$-element array comprising the
+$i$'th row of $A$.
 
-\item A work procedure $W(n, t, p)$ that represents the computation of
-node $n$ in phase $p$ and epoch $t$.  This procedure has an argument
-$input_c$ for each channel $c$ that is directed into $n$.  Each
-$input_c$ is an array of values that the node $n$ reads from the
-channel $c$ during its firing; thus, $input_c$ has $E(c, t, p)$
-elements.  The procedure returns an array $output_c$ for each channel
-$c$ that is directed out of $n$; $output_c$ is of length $U(c, t, p)$
-and represents the items written by $n$ onto $c$.
+\item $\mt{num-in}(n)$ (resp. $\mt{num-out}(n)$) denotes the number of
+channels that are directed into (resp. out of) node $n$.
+
+\item $\mt{chan-in}(n)$ (resp. $\mt{chan-out}(n)$) denotes the list of
+channels that are directed into (resp. out of) node $n$.
+
+\item $\mt{pos-in}(n, c)$ (resp. $\mt{pos-out}(n, c)$) denotes the
+position of channel $c$ in the input (resp. output) of node $n$.
 
 \end{itemize}
 
-The components $I$ and $W$ above are referred to as ``procedures''
-rather than mathematical functions because we expect them to be
-represented as blocks of source code for an actual procedure
-declaration, thereby allowing a straightforward conversion to a PCG
-from a dataflow program.
+A PCP consists of the following:
+\begin{itemize}
+
+\item A Phased Computation Graph $G = (\{n_1 \dots n_{m_n}\}, \{c_1
+\dots c_{m_c}\}, A, \mt{num}, U, O, E)$ describing the nodes,
+channels, and I/O rates of the program (see Section~\ref{sec:pcg}).
+Each channel $c = (n_a, n_b)$ is a FIFO queue; $n_a$ pushes items onto
+the back of $c$ and $n_b$ consumes items from the front of $c$.
+
+\item The initial values $I(c)$ that are enqueued onto channel $c$ at
+the start of execution.  Since there are $A(c)$ initial values on
+channel $c$, $I(c)$ has type ${\cal V}[A(c)]$.
+
+%An initialization function $I(c)$ that returns an array of
+%length $A(c)$, the elements of which are enqueued onto channel $c$ at
+%the start of execution.  The procedure $I(c)$ takes no arguments; its
+%signature is $\mt{void} \rightarrow {\cal V}[A(c)]$.
+
+\item A work function $W(n, t, p)$ that represents the computation of
+node $n$ in phase $p$ and epoch $t$.  The signature of $W(n, t, p)$ is
+$\{{\cal V}[E(chan-in(n)[1], t, p)], \dots, {\cal
+V}[E(chan-in(n)[\mt{num-in}(n)], t, p)]\} \rightarrow {\cal
+V}[U(chan-out(n)[1], t, p)], \dots, {\cal
+V}[U(chan-out(n)[\mt{nun-out}(n)], t, p)]\}$.  That is, the function
+inputs a list of arrays, each of which corresponds to an incoming
+channel $c$ and contains the $E(c,t,p)$ values that $n$ reads from $c$
+in a given firing.  The procedure returns a list of arrays, each of
+which corresponds to an outgoing channel $c$ and contains the
+$U(c,t,p)$ values that $n$ writes to $c$ in a given firing.
+
+\end{itemize}
+
+%The components $I$ and $W$ above are referred to as ``procedures''
+%rather than mathematical functions because we expect them to be
+%represented as blocks of source code for an actual procedure
+%declaration, thereby allowing a straightforward conversion to a PCG
+%from a dataflow program.  However, 
 
 \section{Example}
 
@@ -162,40 +197,44 @@ phase for a balanced steady-state execution cycle of the entire graph.
 
 \subsection{The Translation}
 
-For each channel $c = (n_a, n_b)$, do following:
+For each channel $c = (n_a, n_b)$, do the following:
 \begin{itemize}
-
-\item Introduce a variable $BUF_c$ with the following domain ${\cal
-D}_{BUF_c}$:
+\item Introduce a variable $\mt{BUF}_c$ with the following domain:
 \begin{align*}
-{\cal D}_{BUF_c} = \{~i~|~0 \le i \le \sum_{p=0}^{\mt{num}(n_a,
+{\cal D}_{\mt{BUF}_c} = \{~i~|~0 \le i \le \sum_{p=0}^{\mt{num}(n_a,
 \mt{initial})-1} U(c, \mt{initial}, p) + N * S(n_a) *
 \sum_{p=0}^{\mt{num}(n_a, \mt{steady-state})-1} U(c,
 \mt{steady-state}, p)
 \end{align*}
-
-\item For each $t \in \{\mt{initial}, \mt{steady-state}\}$ and
-for each $p \in [0, num(n_b, t))$, introduce a variable $READ_{c, t,
-p}$ with the following domain ${\cal D}_{READ_{c, t, p}}$:
-
+\item For each $t \in \{\mt{initial}, \mt{steady-state}\}$ and for
+each $p \in [0, num(n_b, t)-1]$, introduce variables $\mt{READ}_{c, t,
+p}$ and $\mt{WRITE}_{c, t, p}$ with the following domains:
 \begin{align*}
-{\cal D}_{READ_{c, t, p}} = \{~(i,j)~|~0 \le i \le S(n_b) ~\wedge~ 0 \le j \le E(c, t, p)\}
+{\cal D}_{\mt{READ}_{c, t, p}} = \{~(i,j)~|~0 \le i \le N * S(n_b) ~\wedge~ 0 \le j \le E(c, t, p)\} \\
+{\cal D}_{\mt{WRITE}_{c, t, p}} = \{~(i,j)~|~0 \le i \le N * S(n_a) ~\wedge~ 0 \le j \le U(c, t, p)\} \\
 \end{align*}
-
-\item For each $t \in \{\mt{initial}, \mt{steady-state}\}$ and
-for each $p \in [0, num(n_a), t))$, introduce a variable $WRITE_{c, t,
-p}$ with the following domain ${\cal D}_{WRITE_{c, t, p}}$:
-
+\item Introduce this equation:
 \begin{align*}
-{\cal D}_{WRITE_{c, t, p}} = \{~(i,j)~|~0 \le i \le S(n_a) ~\wedge~ 0 \le j \le U(c, t, p)\}
+\forall i \in [0,A(c)-1],~{\mt{BUF}_c}(i) = I(c)[i]
 \end{align*}
-
-\item Equation ${\cal E}$ for BUF in terms of WRITE.
-
-\item Equation ${\cal E}$ for READ in terms of BUF
-
-\item Equation ${\cal E}$ for WRITE in terms of READ.
-
+\end{itemize}
+For each node $n$, do the following:
+\begin{itemize}
+\item For each $t \in \{\mt{initial}, \mt{steady-state}\}$, for each
+$p \in [0, num(n, t)-1]$, and for each $c \in \mt{chan-in}(n)$,
+introduce this equation:
+\begin{align*}
+\forall (i,j) \in {\cal D}_{\mt{READ}_{c,t,p}}, \mt{READ}_{c, t, p}(i, j) = \mt{BUF}_{c}(\mt{ReadOffset}(c,t,p) + (i-1)*O(c, t, p) + j) \\
+\mt{where ReadOffset}(c,\mt{initial},p) = \sum_{k=0}^{p-1} O(c, \mt{initial}, k)\\ \mt{and ReadOffset}(c, \mt{steady-state}, p) = \sum_{k=0}^{p-1} O(c, \mt{steady-state}, k) + \mt{ReadOffset}(c,\mt{initial},\mt{num}(n,\mt{initial}))
+\end{align*}
+\item For each $t \in \{\mt{initial}, \mt{steady-state}\}$, for each
+$p \in [0, num(n, t)-1]$, and for each $c \in \mt{chan-out}(n)$,
+introduce these equations:
+\begin{align*}
+\forall (i,j) \in {\cal D}_{\mt{WRITE}_{c,t,p}}, \mt{BUF}_{c}(A(c) + \mt{WriteOffset}(c,t,p) + (i-1)*U(c, t, p) + j) = \mt{WRITE}_{c, t, p}(i, j) \\ \mt{where WriteOffset}(c,\mt{initial},p) = \sum_{k=0}^{p-1} U(c, \mt{initial}, k)\\ \mt{and WriteOffset}(c, \mt{steady-state}, p) = \sum_{k=0}^{p-1} U(c, \mt{steady-state}, k) + \mt{WriteOffset}(c,\mt{initial},\mt{num}(n,\mt{initial})) \\ ~ \\
+\forall (i, j) \in {\cal D}_{\mt{WRITE}_{c, t, p}},~\mt{WRITE}_{c,t,p}(i,j) = W(n, t, p)(\mt{Input-Arrays})[\mt{pos-out}(n, c)][j] \\
+\mt{where Input-Arrays} = \{\mt{READ}_{\mt{chan-in}(n)[1], t, p}(i, *), \dots, \mt{READ}_{\mt{chan-in}(n)[\mt{num-in}(n)], t, p}(i, *) \}
+\end{align*}
 \end{itemize}
 
 

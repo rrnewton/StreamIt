@@ -53,12 +53,15 @@ OUTLINE
 TODO
 ----
 
-- fix push/pop/peek notation to correspond with the computation graph paper.
-
 - We should model state in the SARE's somehow.  With the current
 notation, they're strictly stateless.
 
 - Change (n_i, n_j) to (n_a, n_b) in the original place where it occurs.
+
+- would it be clearer if push/pop/peek were an aspect of a node?  I think maybe.
+
+- change "n" notation for nodes to "m" notation?  Then all the upper
+bounds can be n's.
 
 ****************************************************************************
 
