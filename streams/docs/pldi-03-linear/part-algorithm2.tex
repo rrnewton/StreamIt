@@ -3,7 +3,7 @@ enum Transform { ANY, LINEAR, FREQ, NONE }
 
 // a tuple representing a cost and a stream
 class Config {
-  int cost          : the cost of this configuration
+  int cost          : the cost of the configuration
   Stream str        : the Stream corresponding to the lowest cost
 }
 
@@ -11,5 +11,5 @@ class Config {
 class Stream {
   int height        : the height of container
   int width[y]      : the width of y'th row
-  int child[x][y]   : the child of this in position (x, y)  [column x, row y]
+  int child[x][y]   : the child in position (x, y)  [column x, row y]
 }

@@ -15,14 +15,14 @@ to determine the arrangement of the stream graph that will give the
 highest performance overall.  In this section, we explain the
 relevance of each of these problems, and we present an effective
 selection algorithm that relies on dynamic programming to quickly
-explore a large space of possible configurations.
+explore a large space of configurations.
 
 \subsection{The Selection Problem}
 
 First, the selection of optimizations for a given stream graph can
 have a large impact on performance.  As alluded to in
 Section~\ref{sec:combine}, linear combination can increase the number
-of arithmetic operations required, {\it e.g.} if combining a
+of arithmetic operations required, {\it e.g.,} if combining a
 two-element pipeline where the second filter pushes more items than it
 peeks.  However, such a combination might be justified if it enables
 further combination with other components and leads to a benefit
@@ -30,8 +30,9 @@ overall.  Another consideration is that as the pop rate grows, the
 benefit of converting to frequency diminishes; thus, it might be
 preferable to transform smaller sections of the graph to frequency, or
 to perform linear combination only.  This occurs in our Vocoder and
-FMRadio benchmarks, in which selection algorithm improves performance
-by choosing plain linear combination over frequency translation.
+FMRadio benchmarks, in which the selection algorithm improves
+performance by choosing plain linear combination over frequency
+translation.
 
 Second, the arrangement of the stream graph can dictate which
 transformations are possible to apply.  Since our transformations
@@ -42,14 +43,15 @@ horizontally and collapse the top piece before converting to the
 frequency domain, thereby amortizing the cost of the FFT on the input
 items.
 % (see Figure~\ref{fig:horizcut}).  
-In our Vocoder benchmark, we cut a splitjoin vertically and combine
-all of the filters on the right into a single linear node.
+In our Vocoder benchmark, we cut a splitjoin vertically in order to
+separate the non-linear filters on the left and combine all of the
+filters on the right into a single linear node.
 % (seeFigure~\ref{fig:vertcut}).
 
 \subsection{Dynamic Programming Solution}
 
 Our optimization selection algorithm, shown in
-Figures~\ref{fig:part-alg} and \ref{fig:part-decl}, automatically
+Figures~\ref{fig:part-decl} and \ref{fig:part-alg}, automatically
 derives the example transformations described above.  Intuitively, the
 algorithm works by estimating the minimum cost for each structure in
 the stream graph. The minimum cost represents the best of three
@@ -74,14 +76,15 @@ or vertical cut.
 %(Figure~\ref{fig:vertcut}).  
 This approach works well in practice, because splitjoins often have
 symmetrical child streams in which linear components can be separated
-by a horizontal line.  Moreover, as the child splitjoins are
-decomposed and evaluated, there are overlapping sub-problems that
-enable us to search the space of child configurations in polynomial
-time, using dynamic programming.
+by a straight line.  Moreover, as the child splitjoins are decomposed
+and evaluated, there are overlapping sub-problems that enable us to
+search the space of child configurations in polynomial time, using
+dynamic programming.
 
 \begin{figure}[t]
-\psfig{figure=images/part-algorithm2.eps,width=3.5in}
-  \vspace{-16pt}
+\vspace{-12pt}
+\psfig{figure=images/part-algorithm12.eps,width=3.05in}
+  \vspace{-10pt}
   \caption{Type declarations for code in Figure~\ref{fig:part-alg}.
   \protect\label{fig:part-decl}}
   \vspace{-22pt}
@@ -90,25 +93,26 @@ time, using dynamic programming.
 \end{figure}
 
 \begin{figure}[t]
-  \psfig{figure=images/part-algorithm.eps,width=3.5in}
-  \vspace{-12pt}
+  \vspace{-4pt}
+  \psfig{figure=images/part-algorithm10.eps,width=3.5in}
+  \vspace{-16pt}
   \caption{Algorithm for optimization selection.
-  \vspace{-12pt}
+  \vspace{-22pt}
   \protect\label{fig:part-alg}}
 \end{figure}
 
 %Pseudocode for our optimization selection algorithm appears in
 %Figures~\ref{fig:part-alg} and~\ref{fig:part-decl}.  
-There is one subtlety in the pseudocode of Figure~\ref{fig:part-alg}.
-First is the translation procedure from a StreamIt graph to a set of
-hierarchical {\it Stream} objects.  In particular, each Stream
-corresponds only to a pipeline; adjacent splitjoin objects are wrapped
-in a pipeline and their children are considered as direct children of
-the pipeline. This enables different parts of neighboring splitjoins
-to be combined.  However, it implies that a {\tt Stream} might have a
-different width at different points (since neighboring splitjoins
-could have differing widths); this necessitates the addition of the
-{\tt width} array to the algorithm.
+A subtlety in the pseudocode of Figure~\ref{fig:part-alg} is with
+regards to the translation from a StreamIt graph to a set of
+hierarchical {\it Stream} objects.  In the pseudocode, each {\tt
+Stream} corresponds only to a pipeline; adjacent splitjoin objects are
+wrapped in a pipeline and their children are considered as direct
+children of the pipeline. This enables different parts of neighboring
+splitjoins to be combined.  However, it implies that a {\tt Stream}
+might have a different width at different points (since neighboring
+splitjoins could have differing widths); this necessitates the
+addition of the {\tt width} array to the algorithm.
 
 \subsection{Cost Functions}
 \label{sec:cost}
@@ -121,9 +125,9 @@ architecture and code generation strategy.  For example, if there is
 architecture-level support for convolution operations (such as the the
 {\tt FIRS} instruction in the TMS320C54x~\cite{ti-dsp-manual}), then
 this would effect the cost for certain dimensions of matrices;
-similarly, if a matrix multiplication algorithm was available that
-exploited symmetry or sparsity in a matrix, then this benefit could be
-detected where it would apply.  In our implementation, we use the
+similarly, if a matrix multiplication algorithm is available that
+exploits symmetry or sparsity in a matrix, then this benefit could be
+accounted for where it applies.  In our implementation, we use the
 following versions of the cost functions (let
 $\lambda=(A,\vec{b},e,o,u)$ be the linear node corresponding to stream
 $s$):
@@ -138,7 +142,7 @@ $s$):
 \[
 \mt{getDirectCost}(s) = \left\{ \begin{array}{l}
 \infty ~~~~~~~~~ \mbox{(if }s\mbox{~is roundrobin splitjoin)} \\ ~ \\ \vspace{-8pt} \\
-100 + 2*u + ~~~~~~~~~~~~~~~~\mbox{(otherwise)} \\ \vspace{-8pt} ~ \\
+185 + 2*u + ~~~~~~~~~~~~~~~~\mbox{(otherwise)} \\ \vspace{-8pt} ~ \\
 ~~~|\{ i~s.t.~{\vec b}_i \ne 0 \}|~+ \\ \vspace{-8pt} ~ \\
 ~~~3 * |\{ (i,j)~s.t.~A_{i,j} \ne 0\}| \\ 
 \end{array} \right.
@@ -146,17 +150,59 @@ $s$):
 \[
 % trial and error with the ~, can't get it to move over :(
 \mt{getFrequencyCost}(s) = ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
-\vspace{-10pt}
+\vspace{-8pt}
 \]
 \[
-~~~\left[100 + 2*u + u * \mt{ln}\left(\frac{1 + 4*e}{1 + \frac{2^{\lceil lg(2*e) \rceil}}{50}}\right)\right] * \mt{max}(o, 1) + \mt{dec}(s)
+~~~\left[185 + 2*u + u * \mt{ln}\left(\frac{1 + 4*e}{1 + \frac{2^{\lceil lg(2*e) \rceil}}{50}}\right)\right] * \mt{max}(o, 1) + \mt{dec}(s)
 \]
-\[
+~ \vspace{-11pt} \\
+\[ 
 % trial and error with the ~, can't get it to move over :(
-\mt{dec}(s) = (o-1) * (100 + 4 * u) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+\mt{dec}(s) = (o-1) * (185 + 4 * u) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 \]
-
 \clearpage
+
+\begin{table}[t]
+\begin{minipage}{7in}
+\vspace{-8pt}
+\begin{center}
+{\small
+\begin{tabular}{|l|c|c|c||c||c|c|c|} 
+\hline
+& \multicolumn{3}{|c||}{{\bf Originally}}  &             & \multicolumn{3}{|c|}{{\bf After Optimizations}} \\
+\hline
+{\bf Benchmark}  & {\bf Filters} & {\bf Pipelines} & {\bf SplitJoins} & {\bf Average}     & {\bf Filters}      & {\bf Pipelines}         & {\bf SplitJoins} \\
+           & {\bf (linear)}& {\bf (linear)} & {\bf (linear)}   & {\bf vector size} &              &                   &            \\
+\hline
+FIR        & 3 (1)   & 1(0)     & 0 (0)      & 256         & 3            & 1                 & 0 \\
+\hline
+RateConvert& 5 (3)   & 2 (1)    & 0 (0)      & 102         & 4            & 1                 & 0 \\
+\hline
+TargetDetect& 10 (4) & 6 (0)    & 1 (0)      & 300         & 7            & 1                 & 1 \\
+\hline
+FMRadio    & 26 (22) & 11 (9)   & 2 (2)      & 40          & 5            & 1                 & 0 \\
+\hline
+Radar      & 76 (60) & 17 (0)   & 2 (0)      & 4412        & 38           & 17                & 2 \\
+\hline
+FilterBank & 27 (24) & 17 (9)   & 4 (4)      & 52          & 3            & 1                 & 0 \\
+\hline
+Vocoder    & 17 (13) & 10 (8)   & 2 (1)      & 60          & 6            & 2                 & 1 \\
+\hline
+Oversampler& 10 (8) & 1 (1)     & 0 (0)      & 33          & 3            & 1                 & 0 \\
+\hline
+DToA       & 14 (10) & 3 (1)    & 0 (0)      & 52          & 7            & 2                 & 0 \\
+\hline
+\end{tabular}}
+\vspace{-3pt}
+\caption{Characteristics of benchmarks before and after running optimizations with automatic selection.
+\protect\label{fig:benchmark-statistics}}
+\end{center}
+\vspace{-20pt}
+\makeline
+\vspace{-12pt}
+\end{minipage}
+\end{table}
+
 For the direct cost, we consider the cost to be infinite for
 splitjoins with roundrobin splitters.  This is because the splitjoin
 combination does not eliminate any arithmetic operations, and for the
@@ -166,18 +212,18 @@ other streams, we count the number of multiplies and adds required to
 perform the matrix multiplication, giving more weight to the
 multiplies since they are more expensive.  We do not count the zero
 entries of the arrays, since our matrix multiply routines take
-advantage of the sparsity of the matrix.  We add $100+2u$ to all costs
-in order to represent the overhead of the node's execution.
+advantage of the sparsity of the matrix.  We add $185+2*u$ to all
+costs as a measure of the overhead of the node's execution.
 
 For the frequency cost, our cost curve is guided by profiler feedback.
 The speedup gained by translating to the frequency domain depends on
 the peek rate of the filter.  To obtain an $n$-fold speedup of the
-frequency code over the direct code, the filter has to peek $50*n$
+frequency code over the direct code, the filter has to peek $64*n$
 items.  Mathematically, this translates to a logarithmic expression
 for the cost of the frequency node in terms of the number of items $e$
 (we actually use the next power of two above $e$, as that is the size
 of the FFT).  We multiply the above cost by the number of items pushed,
-add the constant offset of $100+2u$ for a node, and then multiply by
+add the constant offset of $185+2*u$ for a node, and then multiply by
 $\mt{max}(o, 1)$ because only one out of $o$ items represents a valid
 output from the frequency domain.  Finally, we add $\mt{dec}(s)$, the
 cost of the decimator for the frequency node.  We estimate an extra
@@ -188,8 +234,7 @@ position.
 
 Of course, both cost functions are undefined if $s$ is non-linear
 ({\it i.e.}, if there is no corresponding $\lambda_s$). If this is the
-case, then the optimization selection algorithm assigns an infinite
-cost.
+case, then the selection algorithm assigns an infinite cost.
 
 %% OPTIMIZING EXECUTION
 

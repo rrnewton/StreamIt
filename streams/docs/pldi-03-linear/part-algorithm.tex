@@ -33,13 +33,13 @@ Config getNodeCost(Stream s, Transform t)
 
   if (t==Transform.LINEAR)
     if (isLinear(s))
-      return Config(scalingFactor * getDirectCost(s), makeLinearImplementation(s))
+      return Config(scalingFactor*getDirectCost(s), makeLinearImplementation(s))
     else
       return Config(INFINITY, s)
 
   if (t==Transform.FREQ)
     if (isLinear(s) && canConvertToFrequency(s))
-      return Config(scalingFactor * getFrequencyCost(s), makeFreqImplementation(s))
+      return Config(scalingFactor*getFrequencyCost(s), makeFreqImplementation(s))
     else 
       return Config(INFINITY, s)
 
@@ -73,20 +73,20 @@ Config getContainerCost(stream s, Transform t, int x1, int x2, int y1, int y2)
     result = Cost(INFINITY, s)
     // try horizontal cut
     for yPivot = y1 to y2-1
-      // evaluate cost of 2-element Pipeline; remember Config if it is best so far
+      // get cost of 2-element Pipeline; remember Config if it is best so far
       child1 = getCost(s, Transform.ANY, x1, x2, y1, yPivot)
       child2 = getCost(s, Transform.ANY, x1, x2, yPivot+1, y2)
       if (child1.cost + child2.cost < result.cost)
-        result = Cost(child1.cost + child2.cost, Pipeline(child1.str, child2.str))
+        result = Cost(child1.cost+child2.cost, Pipeline(child1.str, child2.str))
 
-    // can only do a vertical cut if all child streams belong to the same splitjoin
+    // can only do vertical cut if all child streams belong to same splitjoin
     if (sameSplitJoinParent(s.child[x1][y1], s.child[x2][y2]))
       for xPivot = x1 to x2-1
-        // evaluate cost of 2-element SplitJoin; remember Config if it is best so far
+        // get cost of 2-element SplitJoin; remember Config if it is best so far
         child1 = getCost(s, Transform.ANY, x1, xPivot, y1, y2)
         child2 = getCost(s, Transform.ANY, xPivot+1, x2, y1, y2)
         if (child1.cost + child2.cost < result.cost)
-          result = Cost(child1.cost + child2.cost, SplitJoin(child1.str, child2.str))
+          result = Cost(child1.cost+child2.cost, SplitJoin(child1.str,child2.str))
 
   memoTable[s][t][x1][x2][y1][y2] = result;
   return result
