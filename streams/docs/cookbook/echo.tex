@@ -1,10 +1,16 @@
 \section{A Delay}
 
+\begin{textpic}{\includegraphics{cookbook.5}}
 \begin{lstlisting}{}
-float->float feedbackloop Echo(int n, float f) {
+float->float feedbackloop Echo
+    (int n, float f) {
   join roundrobin(1,1);
   body FloatAdder();
-  loop float->float filter { work pop 1 push 1 { push(pop() * f); } };
+  loop float->float filter {
+    work pop 1 push 1 {
+      push(pop() * f);
+    }
+  };
   split duplicate;
   for (int i = 0; i < n; i++)
     enqueue(0);
@@ -17,6 +23,7 @@ float->float filter FloatAdder {
   }
 }
 \end{lstlisting}
+\end{textpic}
 
 This example uses a StreamIt \emph{feedback loop} to implement an echo
 effect.  In a sense, a feedback loop is like an inverted split-join:
