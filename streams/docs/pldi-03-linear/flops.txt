@@ -1,0 +1,93 @@
+Flop?	Opcode			Description
+---------------------------------------------------------------------------
+  *	FABS			Absolute Value
+  *	FADD			Add
+  *	  FADDP
+  *	  FIADD	
+	FBLD			Load Binary Coded Decimal
+	FBSTP			Store BCD Integer and Pop
+  *	FCHS			Change Sign
+	FCLEX			Clear Exceptions
+	  FNCLEX		
+  	FCMOVcc			Floating-Point Conditional Move
+  *	FCOM			Compare Floating Point Values
+  *	  FCOMP
+  *	  FCOMPP	
+  *	FCOMI			Compare Floating Point Values and Set EFLAGS
+  *	  FCOMIP
+  *	  FUCOMI
+  *	  FUCOMIP			
+  *	FCOS			Cosine
+	FDECSTP			Decrement Stack-Top Pointer
+  *	FDIV			Divide
+  *	  FDIVP
+  *	  FIDIV	
+  *	FDIVR			Reverse Divide
+  *	  FDIVRP
+  *	  FIDIVR	
+	FFREE			Free Floating-Point Register
+  *	FICOM			Compare Integer
+  *	  FICOMP		
+	FILD			Load Integer
+	FINCSTP			Increment Stack-Top Pointer
+	FINIT			Initialize Floating-Point Unit
+	  FNINIT		
+	FIST			Store Integer
+	  FISTP		
+	FLD			Load Floating Point Value
+	FLD1			Load Constant
+	  FLDL2T
+	  FLDL2E
+	  FLDPI
+	  FLDLG2
+	  FLDLN2
+	  FLDZ			
+	FLDCW			Load x87 FPU Control Word
+	FLDENV			Load x87 FPU Environment
+  *	FMUL			Multiply
+  *	  FMULP
+  *	  FIMUL	
+	FNOP			No Operation
+  *	FPATAN			Partial Arctangent
+  *	FPREM			Partial Remainder
+  *	FPREM1			Partial Remainder
+  *	FPTAN			Partial Tangent
+  *	FRNDINT			Round to Integer
+	FRSTOR			Restore x87 FPU State
+	FSAVE			Store x87 FPU State
+	  FNSAVE		
+  *	FSCALE			Scale
+  *	FSIN			Sine
+  *	FSINCOS			Sine and Cosine
+  *	FSQRT			Square Root
+	FST			Store Floating Point Value
+	  FSTP		
+	FSTCW			Store x87 FPU Control Word
+	  FNSTCW		
+	FSTENV			Store x87 FPU Environment
+	  FNSTENV		
+	FSTSW			Store x87 FPU Status Word
+	  FNSTSW		
+  *	FSUB			Subtract
+  *	  FSUBP
+  *	  FISUB	
+  *	FSUBR			Reverse Subtract
+  *	  FSUBRP
+  *	  FISUBR	
+  *	FTST			TEST (compares with 0.0)
+  *	FUCOM			Unordered Compare Floating Point Values
+  *	  FUCOMP
+  *	  FUCOMPP	
+	FWAIT			Wait
+  * (?)	FXAM			Examine
+	FXCH			Exchange Register Contents
+	FXRSTOR			Restore x87 FPU, MMX, SSE, and SSE2 State
+	FXSAVE			Save x87 FPU, MMX, SSE, and SSE2 State
+  * (?)	FXTRACT			Extract Exponent and Significand
+  *	FYL2X			Compute y * log2x
+  *	FYL2XP1			Compute y * log2(x +1)
+
+---------------------------------------------------------------------------
+
+reference: http://courses.ece.uiuc.edu/ece291/resources/instructionref.pdf
+

@@ -25,40 +25,52 @@
 %% the available DSP resources.
 
 \section{Introduction}
-Digital computation is becoming a ubiquitous element of
-modern life.  Everything from cell phones to GPS systems to satellite
-radios require increasingly sophisticated algorithms.  Optimization is
-especially important for this domain, as embedded devices often have
-high performance requirements and tight resource constraints.  Even
-with the best available C compilers for DSP chips, programmers still
-turn to assembly code to implement critical parts of embedded
-applications.  This process is time-consuming, error-prone and
-costly, and must be repeated for each generation of the target
-architecture.  As algorithms and applications continue to grow in
-complexity, these factors will become unmanageable.  There is a
-pressing need for high-level DSP abstractions that a compiler can
-consistently reduce to efficient low-level code.
+Digital computation is becoming a ubiquitous element of modern life.
+Everything from cell phones to GPS systems to satellite radios require
+increasingly sophisticated algorithms for digital signal processing.
+Optimization is especially important in this domain, as embedded
+devices commonly have high performance requirements and tight resource
+constraints.  Consequently, there are often two stages to the
+development process: first, the algorithm is designed and simulated at
+a high level of abstraction, and second, it is optimized and
+re-implemented at a low level by an expert DSP programmer.  In order
+to achieve high performance, the DSP programmer needs to take
+advantage of architecture-specific features and constraints (usually
+via extensive use of assembly code) as well as global properties of
+the application that could be exploited to obtain algorithmic
+speedups.  Apart from requiring expert knowledge, this effort is
+time-consuming, error-prone, and costly, and must be repeated for
+every change in the target architecture and every adjustment to the
+high-level system design.  As embedded applications continue to grow
+in complexity, these factors will become unmanageable.  There is a
+pressing need for high-level DSP abstractions that can be compiled
+without any performance penalty.
 
-In this paper, we demonstrate that a domain-specific stream language
-can enable novel high-level DSP optimizations that would otherwise be
-intractable in a general-purpose language.  Our source language is
-StreamIt~\cite{streamit-asplos,gordon-thesis,streamitcc}, which is 
-specifically designed for high-performance signal processing applications; 
-our analysis focuses on filters that are linear.  StreamIt is
-distinguished from a general purpose language in that it makes
-explicit the large-scale parallelism and regular communication
-patterns that are characteristic of streaming programs.  By analyzing
-the primitive building block in StreamIt---the {\it filter}---our analysis
-can detect large portions of the application that produce outputs as a
-linear combination of the inputs; we can exploit this linearity for a
-number of large-scale optimizations.  Though each filter is programmed
-using imperative C-like code, the separation of filters into
-autonomous units of the stream graph enables our analysis to be far
-more effective and efficient than it could be on an equivalent
-implementation in C alone.
+In this paper, we develop a set of optimizations that lower the entry
+barrier for high-performance stream programming.  Our work is done in
+the context of StreamIt~\cite{streamit-asplos,streamitcc}, which is a
+high-level language for signal processing applications.  A program in
+StreamIt is comprised of a set of concurrently executing filters, each
+of which contains its own address space and communicates with its
+neighbors using FIFO queues.  Our analysis focusses on filters which
+are {\it linear}: that is, each of their outputs can be expressed as
+an affine combination of their inputs.  Linear filters are common in
+DSP applications; examples include FIR filters, expanders,
+compressors, FFTs and DCTs.
 
-This paper makes the following contributions:
-
+In practice, there are a host of optimizations that are applied to
+linear portions of a stream graph.  In particular, neighboring linear
+nodes can be combined into one, and large linear nodes can benefit
+from translation into the frequency domain.  However, these
+optimizations require detailed mathematical analysis and are tedious
+and complex to implement.  They are only beneficial under certain
+conditions---conditions that might change with the next version of the
+system, or that might depend on neighboring components that are being
+written by other developers.  To improve the modularity, portability,
+and extensibility of stream programs, we believe that the compiler
+should be responsible for identifying linear nodes and performing the
+appropriate optimizations.  Towards this end, we make the following
+contributions:
 \begin{itemize}
 \vspace{-6pt}
 
@@ -71,8 +83,7 @@ single linear representation.
 \vspace{-6pt}
 
 \item An automated procedure for translating a stream computation into
-the frequency domain in order to optimize computationally intensive
-linear nodes.
+the frequency domain.
 \vspace{-6pt}
 
 \item An optimization selection algorithm that automatically
@@ -80,23 +91,21 @@ determines which transformations are most beneficial to apply.
 \vspace{-6pt}
 
 \item An implementation of the above techniques in the StreamIt
-compiler that automatically improves performance by a factor of
-$XXXX$ on average and by a factor of $XXXXXX$ in the best case.
+compiler that automatically improves performance by a factor of 450\%
+on average and by a factor of 800\% in the best case.
 \vspace{-6pt}
 
 \end{itemize}
-
-In the rest of this section, we give an illustrative example and
-background information on StreamIt.  Then we present our linear
-node representation (Section~\ref{sec:linearrep}) and our 
-supporting dataflow analysis (Section~\ref{sec:dataflow}).  
-Next we describe structural transformations on linear nodes 
-(Section~\ref{sec:combine}), a frequency domain optimization 
-(Section~\ref{sec:freq}) and an automated optimization selection 
-algorithm (Section~\ref{sec:partitioning}). Finally, we
-present results (Section~\ref{sec:results}), related work
-(Section~\ref{sec:related}) and conclusions
-(Section~\ref{sec:conclusion}).
+In the rest of this section, we give a motivating example and
+background information on StreamIt.  Then we present our linear node
+representation (Section~\ref{sec:linearrep}) and our supporting
+dataflow analysis (Section~\ref{sec:dataflow}).  Next we describe
+structural transformations on linear nodes
+(Section~\ref{sec:combine}), a frequency domain optimization
+(Section~\ref{sec:freq}) and an optimization selection algorithm
+(Section~\ref{sec:partitioning}). Finally, we present results
+(Section~\ref{sec:results}), related work (Section~\ref{sec:related})
+and conclusions (Section~\ref{sec:conclusion}).
 
 \subsection{Motivating Example}
 \begin{figure}[t]
