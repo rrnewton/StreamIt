@@ -68,13 +68,12 @@ incorporate the lessons learned while investigating our previous work.
 Given a stream graph, composed of filters (actors) and FIFO,
 uni-directional arcs connecting the filter, what is the best way to
 execute it?  If we are targeting a uniprocessor, the most obvious
-technique would be {\it time multiplexing} where we run one filter at a time
-on the processor.  Load balancing is not an issue and the memory
-interface provides synchronization.  Unfortunately, this approach
-leads to long latency and lots of memory traffic (possibly with bad cache
-behavior).  Furthermore, if we were to target a multiprocessor, 
-time multiplexing would require data-parallel filters for full
-utilization. 
+technique would be {\it time multiplexing} where we run one filter at
+a time on the processor.  Load balancing is not an issue and the
+memory interface provides synchronization.  Problems arise if we
+target a multiprocessor.  Time multiplexing leads to long latency,
+lots of memory traffic (possibly with bad cache behavior), and it
+would require data-parallel filters for full utilization.
 
 Another approach would be to run all the filters in parallel, each on
 its own tile.  We call this {\it space multiplexing}.  Our first 
@@ -89,20 +88,28 @@ elements, proved difficult, with many factors coming into play.
 Finally, for chip configurations with relatively few processors, merging filters
 can lead to coarse-grained operations in each processing element. 
 
-cThe technique employed by our new backend for Raw is to merge the
+The technique employed by our new backend for Raw is to merge the
 advantages of space multiplexing and time multiplexing.  This hybrid
-approach will run groups of filters in parallel, executing different
-groups at different times.  We call each group a space-time slice or
-just a slice.  Hybrid space-time multiplexing allows space
+approach will time multiplex different groups of filters and space
+multiplex the filters within a group. We call each group a space-time
+slice or just a slice.  Hybrid space-time multiplexing allows space
 multiplexing for fine-grained, systolic sections of the stream graph
 (see the paragraph on linear code generation below) and time
 multiplexing for improved load balancing.  Furthermore, we use
 software pipelining techniques to allow arbitrary ordering of slices
 during steady-state execution.
 
-
-
-Linear stuff (Linear paper citation)
+In \cite{lamb03} a linear analysis framework for StreamIt is
+introduced.  We define a {\it linear} section of a stream graph as
+groups of filters that compute a linear combination of their inputs.
+Using this framework we can discover the linear sections of a
+streaming application.  Many ubiquitous DSP kernels are linear
+including FIR, low and high-pass filters, and DFT.  This linear
+computation can be represented as a matrix multiplication and
+efficiently mapped to Raw.  Currently, linear slices of the stream
+graph are space multiplexed across tiles of the chip using
+parameterized computation and communication code.  In steady-state,
+our parameterized code is near-optimal...jasp?
  
 \absection{Progress}
 Currently, we have completed a first version of our hybrid space-time
@@ -116,7 +123,7 @@ parameterized code generation for linear filters.
 
 As for the high-level algorithms, we have implemented a greedy
 algorithm to partition the stream graph into slices.  This algorithm
-produces can produce an arbitrary ordering of slices and it is the
+produces an arbitrary ordering of slices and it is the
 task of the software pipeliner to ensure correct execution of the
 graph. 
 
@@ -124,16 +131,16 @@ graph.
 In the near future we would like to explore more advanced (possibly global
 and exhaustive) partitioning and layout algorithms.  Additionally, we
 will further expand space multiplexing by investigating
-different parallelism schemes such as filter fission (breaking a
-filter into multiple, smaller filters). 
+additional parallelism schemes such as filter fission (breaking a
+filter into multiple, smaller filters), investigating additional filter
+representations such as state-space, and implementing linear code
+generation for sparse matrices.  
 
-
-
-linear code gen for sparse mat
-
-
-
-other representations for filters (other than linear)
+In the long-term, we are working on a new intermediate representation
+for our compiler that will allow us to generate assembly code for
+Raw's compute processors (currently we compile our generated C code
+with Raw's GCC port).  Generating our stream code in a procedural
+framework is a source of many inefficiencies.  
 
 \absection{Research Support}
 This work is supported in part by a grant from DARPA (PCA
