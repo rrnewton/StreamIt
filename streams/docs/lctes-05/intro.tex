@@ -22,7 +22,7 @@ levels, including the register file. In this paper, we present a
 methodology for compiling streaming codes to general purpose,
 cache-based architectures. We first introduce a simple model for
 reasoning effectively about the caching behavior of streaming
-workloads. This models serves as a foundation for several {\it cache-aware
+workloads. This model serves as a foundation for several {\it cache-aware
 optimizations} that are geared toward the concomitant increase of instruction
 and data {\it temporal locality}. These
 optimization lead to significantly better utilization of the memory
@@ -34,7 +34,7 @@ language that is engineered for streaming
 applications~\cite{streamitcc}. It adopts the 
 Cyclo-Static Dataflow~\cite{BELP96} model of computation which is a
 generalization of Synchronous Dataflow~\cite{LM87-i} (SDF).  
-SDF is a popular  modelthat  is well suited for
+SDF is a popular  model that  is well suited for
 streaming codes. In SDF, computation is represented as a graph
 consisting of {\it  actors} connected by communication channels; the
 actors consume  and produce a constant number  of items from their
@@ -51,9 +51,9 @@ compiler must make sure the actor's code size is not
 greater than the instruction cache. Furthermore, we must {\it scale}
 the execution of the actor so that it runs several times before we move
 on to some other actor in the stream 
-graph. This serves to amortize the cost of fetching the actor's
-instructions into the cache from memory (an expensive operation), and
-improves the instruction temporal locality, leading to better overall
+graph. This serves to $(i)$ amortize the cost of fetching the actor's
+instructions into the cache from memory (an expensive operation), $(ii)$
+improve the instruction temporal locality, and $(iii)$ improve overall
 performance. However, as our cache model will show, we 
 cannot arbitrarily scale the execution frequency of an actor. This
 is because actors produce data that must be buffered, and therefore,
@@ -89,7 +89,7 @@ model will show.
 
 %% the comment about p3 and itanium not being embedded architectures
 %% is out of the blue! need a better transition.
-Fusion alone delivers significant performance gains, although our
+Cache-aware fusion alone delivers significant performance gains, although our
 evaluation shows that fusion with scaling leads to the best
 performance on a general purpose, cache-based architecture. For our
 experiments, we use two different processors: a superscalar out-of-order
@@ -99,10 +99,10 @@ particularly suited for an embedded system, they do exhibit some
 properties that are worthy of investigation. Furthermore, that we can
 demonstrate measurable performance gains on real systems is far more
 convincing than using a simulation-based environment. We chose the
-Pentium~3 processor because it has very few registers in its ISA
-(instruction set architecture). The Itanium by contrast has a much
+Pentium~3 processor because it has very few registers in its
+instruction set architecture. The Itanium by contrast has a much 
 larger and richer repertoire of registers. The two architectures serve
-to validate our fusion optimizations, in that we expect an
+to validate our cache-aware optimizations, in that we expect an
 architecture with more register to benefit more from optimization such
 as scalar replacement. On average, fusion leads to a XXX\% improvement
 on the Pentium~3, and XXX\% on the Itanium~2.
