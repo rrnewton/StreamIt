@@ -66,7 +66,14 @@ directed path in the stream graph from the filter following $a$ to the
 filter preceding $b$.
 
 The $max$ and $min$ functions are related to the information wavefront
-in the following sense.  If there are $x$ items on tape $a$
+in the following sense.  The item at position $y = \mi{a}{b}(x)$ of
+tape $a$ is the latest item on tape $a$ to {\it affect} the item at
+position $x$ of tape $b$.  This is because item $x$ on tape $b$ can be
+produced if and only if tape $a$ contains at least $y$ items.  Note
+that this effect might be via a control dependence rather than a data
+dependence--for instance, if item $y$ needed to pass through a
+round-robin joiner before some data from another stream could be
+routed to tape $b$.
 
 We now turn to deriving expressions for $\ma{a}{b}$ and $\mi{a}{b}$ as
 a step towards formalizing the semantics of messaging, latency, and
@@ -211,53 +218,8 @@ as follows:
 
 \subsubsection{FeedbackLoops}
 
-\begin{figure}[t]
-\scriptsize
-\begin{verbatim}
-Here I want a feedback diagram, labelled as:
-
-         LOOP  
-      /        \
-
-A - FJ - BODY - FS - ->
-
-\end{verbatim}
-\vspace{-12pt}
-\caption{\protect\small  FeedbackLoop labeling.
-\protect\label{looplabel}}
-\vspace{-12pt}
-\end{figure}
-
-We have to be careful when defining the transfer functions for
-feedback loops (see Figure {\ref:looplabel}).  The feedback splitter
-$FS$ serves as a normal splitter, and has the same $min$ and $max$
-functions as defined above.  However, the feedback joiner $FJ$ is
-slightly different than a standard joiner, since on starting up it
-fabricates values from the loop body before they appear on the input
-tape.  The transfer function must take special count of these initial
-values, since they are not included in the count of the number of
-items on the input tape from the loop body.
-
-Recall that if the feedback loop specifies a wavefront latency of $n$,
-then $n$ initial values are provided to the feedback joiner before
-values from the feedback loop are read.  Assume that the round robin
-feedback joiner first draws from the data stream $I1_J$, and then from
-the feedback loop $I2_J$.  
-
-The $min$ function for the main stream is
-as before:
-\begin{eqnarray*}
-\mi{I1_J}{O_J}(x) = ceil(x/2) \\
-\end{eqnarray*}
-However, the equation must include the initial $n$ values for the
-$min$ function of the loop:
-\begin{eqnarray*}
-\mi{I2_J}{O_J}(x) = floor((x+n)/2) 
-\end{eqnarray*}
-The $max$ function must be similarly shifted for the input from the loop:
-\begin{eqnarray*}
-\ma{(I1_J, I2_J)}{O_J}(x_1, x_2) = max(2*x_1-1, 2*(x_2+n))
-\end{eqnarray*}
+The feedback splitter and feedback joiner have the same transfer
+functions as a normal round-robin splitter or joiner.
 
 \subsubsection{Summary}
 
@@ -273,14 +235,53 @@ reading from tape $a$ to the filter writing to tape $b$.
 \subsection{Semantics}
 
 Equipped with definitions of $\ma{a}{b}$ and $\mi{a}{b}$, we can now
-address the semantics of StreaMIT's message delivery timing and
-latency guarantees. 
+address the semantics of StreaMIT's message delivery and latency
+guarantees.
 
 \subsubsection{Messages}
 
+Suppose that filter $A$ sends a message to filter $B$ with latency
+$n$, where $n$ could is any integer.  In $n$ invocations of $A$'s {\tt
+work} function, $A$ will produce one or more data items $d$.  Now, the
+messaging system guarantees that:
 
+\begin{enumerate}
 
-\subsubsection{Latency}
+\item If $B$ is upstream of $A$, then $B$ will receive the message
+immediately following the last invocation of its {\tt work} function
+which produces items that affect $d$.
+
+\item If $B$ is downstream of $A$, then $B$ will receive the message
+immediately preceding the first invocation of its {\tt work} function
+which produces items that are effected by $d$.
+
+\item If $B$ runs in parallel with $A$, then the message is in terms
+of a shared set of splitters and joiners.  {\bf Flesh out details.}
+
+\end{enumerate}
+
+These guarantees can be expressed more formally as a set of
+constraints on the number of items on certain tapes in the system.
+Again, suppose that filter $A$ sends a message to filter $B$ with
+latency $n$, where $n$ could is any integer.  Let $n(a)$ denote the
+number of items on tape $a$.  For the message to be able to be
+delivered on time, we have that:
+
+\begin{enumerate}
+
+\item If $B$ is upstream of $A$:
+\begin{eqnarray*}
+n(O_B) \le \mi{O_B}{O_A}(n(O_A) + push_A * n)
+\end{eqnarray*}
+That is, $n(O_A) + push_A * n$ is the number of items on $A$'s output
+tape after producing the data of interest.  Then, $y =
+\mi{O_B}{O_A}(n(O_A) + push_A * n)$ is the latest item on $B$'s output
+tape that affects the data of interest.  The message should be
+delivered immediately after the work funtion producing this item,
+which is only possible if the item count $n(O_B)$ does not exceed $y$,
+as specified by the constraint.
+
+\end{enumerate}
 
 \subsection{Scheduling Constraints}
 
