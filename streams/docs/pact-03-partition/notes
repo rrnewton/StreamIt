@@ -1,3 +1,8 @@
+- something interesting is that symmetry sharing doesn't really work
+with 2-D divisions.  or at least not with something much more
+sophisticated -- like dynamically inferring which other streams would
+have to be identical when you're recursing
+
 * another thing you could do with partitioner: try to minimize
 communication in some way, e.g. by making the cuts where the
 communication is the lowest.
