@@ -11,9 +11,16 @@ output of the compiler at runtime, or may be useful as sample code.
 These parts of the release may be used, modified, and distributed,
 either in source or binary form, without restriction, and you may
 combine these files or binaries generated from these files with other
-code without any restriction coming from the use of the included
+programs without any restriction coming from the use of the included
 files.  The affected files include:
 
 -- All of the sample code in the 'apps' directory;
--- The .bc files in the 'include' directory; and
--- The StreamIt uniprocessor C library in the 'library/c' directory.
+-- The .bc files in the 'include' directory;
+-- The StreamIt uniprocessor C library in the 'library/c' directory;
+-- Sample code in the documentation provided in the 'docs' directory,
+   and child directories;
+-- All of the code in the 'compiler/streamit' directory of the source
+   release, and child directories, including the StreamIt-to-Java
+   converter and the scheduler; and
+-- The StreamIt Java library in the 'library/java' directory of the
+   source release.
