@@ -1,5 +1,137 @@
 \section{Streaming Virtual Machine API}
 
+Recent trends in both applications and architectures point to the
+streaming model of computation as a cornerstone for the next
+generation of high-performance computing.  On the applications side,
+there is a growing class of programs that fall within the streaming
+domain, encompassing areas such as signal processing, graphics,
+networks, and scientific computing.  Streaming applications are
+distinguished from others by their large degree of task and data
+parallelism, as well as regular patterns of communication between
+concurrently executing modules.  On the architecture side, there is an
+emerging class of communication-exposed machines that contain
+distributed memories and replicated processing units, sometimes
+including high-performance ``stream co-processors''.  Because
+resources in these machines are orchestrated by a software layer, the
+compiler can leverage the widespread parallelism and regular
+communication patterns of stream programs to obtain high performance.
+
+A number of communication-exposed architectures are being developed as
+part of the Polymorphic Computing Architecture (PCA) initiative.  In
+addition to providing good support for streams, these machines offer
+alternate modes of operation, called ``morphs'', that can be toggled to
+meet the demands of the application and the constraints of the
+environment.  Not surprisingly, it is a challenging compiler problem
+to map a stream program to a PCA architecture.  To obtain good
+performance, the compiler needs to detect data, task, and pipeline
+parallelism in the source program and calculate a load-balanced
+mapping onto the processor resources, all the while taking into
+account the large array of morph possibilities.  With a naive
+approach, this effort would have to be duplicated every time a given
+PCA architecture wants to support a given stream language.
+
+In order to mitigate the implementation complexity for each
+architecture team, the PCA program has adopted a two-level compilation
+strategy.  Collectively referred to as the Morphware Stable Interface
+(MSI), this scheme divides the compilation process into two compilers:
+a High Level Compiler (HLC) and a Low Level Compiler (LLC) as shown in
+Figure~\ref{fig:msi}.  The HLC inputs a stream language ({\it e.g.,}
+Brook or StreamIt) as well as the description of a PCA architecture,
+and it outputs a high-performance mapping of logical stream constructs
+to the physical resources of the given architecture.  This mapping is
+expressed in terms of the Streaming Virtual Machine (SVM), which is
+currently an API that is written in C.  The LLC inputs the SVM code
+for a given architecture and outputs a binary that is fit for
+execution on that architecture.
+
+This two-stage compilation process offers several benefits.  First,
+many of the difficult compilation problems are tackled by the HLC and
+do not need to be repeated for each architecture (we envision there
+being many more LLC's than HLC's.)  The responsibilities of the HLC
+include parallelism detection, load balancing, coarse-grained
+scheduling of stream computations, and memory management for streaming
+data. In turn, the LLC is responsible for generating code for a given
+architecture, 
+\begin{figure}[h]
+\begin{center}
+\psfig{figure=msi.eps,width=4in}
+\caption{Streaming components of the Morphware Stable Interface.\protect\label{fig:msi}}
+\end{center}
+\vspace{-6pt}
+\end{figure}
+which includes software pipelining, detailed routing of data items,
+management of instruction memory, and interfacing between stream
+processors and control processors.  An additional benefit of this
+approach is that the HLC is focused on developing general solutions to
+the fundamental issues at hand, rather than over-specializing the
+compiler for the idiosyncratic features of any particular
+architecture.  It is our expectation that future architectures (and
+accompanying LLC's) could effectively reuse an HLC developed in this
+program and attain high performance without any modifications to the
+HLC.
+
+The Streaming Virtual Machine (SVM) is the interface between the HLC
+and the LLC.  Its goal is to provide a means for the HLC to express a
+high-performance mapping from the computational elements of the
+application to the physical resources of a given architecture.  In
+order to enable high performance, it is critical for the SVM to expose
+all of the stream-specific information that was available to the HLC,
+so that the LLC can take advantage of it while generating code.
+Towards this end, the SVM API embodies the following design features:
+\begin{itemize}
+
+\item {\bf Separation of control and data-intensive code}, so that
+data-intensive code can be explicitly compiled to stream processors.
+The SVM provides the {\it kernel} abstraction as a unit of computation
+that should execute on a stream processor.  Kernels consist of a
+restricted subset of C; they operate on a set of input and output
+streams and may contain local state.  Kernels can be asynchronously
+executed and monitored from a control thread running on a different
+processor.
+
+\item {\bf Explicit communication via streams.}  The SVM exposes the
+streaming nature of the computation by embracing a {\it stream}
+abstraction.  A stream is a queue of data items through which
+different threads and kernels can communicate.  Streams are mapped
+either to memories or to hardware FIFOs that provide primitive support
+for stream operations.  By mapping streams to FIFOs, the SVM can
+express direct processor-to-processor communication (as well as I/O
+devices that do not operate via memory.)
+
+\item {\bf Explicit memory management for streaming data.}  The SVM
+manages the size and placement of memory-mapped streams, orchestrating
+data movement with explicit DMA operations rather than hardware
+caching.  This functionality is essential for data-intensive codes
+that operate out of local compiler-controlled memories ({\it e.g.,} a
+Stream Register File), as stream data must be fetched ahead of time to
+keep the execution unit busy.  The SVM also introduces the notion of
+streaming DMA, which offers continuous data movement rather than
+pre-blocked structures.
+
+\end{itemize} 
+In its current instantiation, the SVM implements the above
+functionality in terms of an API that is written in C.  Many of the
+details of the API reflect the principal design goal of simplifying
+the translation process for the LLC.  While the resulting API is
+readable and comprehensible by a human, this was only a secondary
+consideration; the SVM is not intended as a programming language, but
+rather as a detailed compiler-generated mapping.  Also, since the API
+is valid C, it can be compiled by a standard C compiler with a simple
+runtime library for testing and debugging purposes.
+
+The rest of this document gives a detailed specification for the
+Streaming Virtual Machine API.  We review the terminology for the API
+in Section~\ref{sec:terminology}.  Then, we describe the API for
+streams in Section~\ref{sec:streams}, the API for blocks in
+Section~\ref{sec:blocks}, the API for kernels in
+Section~\ref{sec:kernel}, and the API for control in
+Section~\ref{sec:control}.  We conclude with a discussion of error
+handling (Section~\ref{sec:errors}) and a concept of operations
+(Section~\ref{sec:conops}).
+
+\subsection{Terminology}
+\label{sec:terminology}
+
 The Streaming Virtual Machine (SVM) describes logical and physical
 entities recognized by the High Level Compiler (HLC) and Low Level
 Compiler (LLC) as a description of a streaming PCA program.  The SVM
@@ -13,6 +145,7 @@ HLC source program.  The mapping to physical entities reflects the HLC
 resource mapping.  The LLC translates the logical structures to
 executable machine code for a specific PCA architecture.
 
+\clearpage
 \sss{Logical Entities}
 
 The SVM contains the following logical entities:
@@ -113,24 +246,6 @@ described above:
 
 \end{itemize}
 
-\sss{SVM Overview}
-
-The Streaming Virtual Machine API is a set of data types and functions
-used to express the streaming portion of an application mapped to a
-specific VM by the High Level Compiler. It includes streams and blocks
-which specify how data is mapped to memory, kernels which specify how
-computation and data-movement functions are mapped to processors, and
-control functions which are used by threaded code to control kernel
-execution.
-
-The Streaming Virtual Machine API is a strict C subset, and can be
-compiled by a standard C compiler with a simple library for testing
-and debugging purposes.  We describe the API for streams in
-Section~\ref{sec:streams}, the API for blocks in
-Section~\ref{sec:blocks}, the API for kernels in
-Section~\ref{sec:kernel}, and the API for control in
-Section~\ref{sec:control}.
-
 \subsection{Streams}
 \label{sec:streams}
 
@@ -174,7 +289,6 @@ However, in cases where the data layout is inconsequential, the High
 Level Compiler can use the {\tt STREAM\_UNALIASED\_RAM} flag to allow
 layout optimizations by the Low Level Compiler.
 
-\clearpage
 In order to improve the readability of kernel code, there are several
 aliases for the Stream type:
 {\small
@@ -205,11 +319,13 @@ a stream, while the I/O functions allow data to be transferred in and
 out of a stream.  A stream must be initialized before being used for
 I/O.  These functions are described in detail below:
 %%%%%%%%%%%%%%%%%%%%%%%%%
+\clearpage
+~ \\ \vspace{-24pt} 
 \makeline
 \name{streamInitRAM}
 {\small
 \begin{verbatim}
-void streamInitRAM(Stream* s, VM_NODE_MEM ramLocation, int address, 
+void streamInitRAM(Stream* s, MM_ELMT_MEM ramLocation, int address, 
                    int capacity, int elementSize, int maxBuffering, int flags)
 \end{verbatim}}
 
@@ -242,14 +358,12 @@ upper bound for message sizes, thereby amortizing the messaging
 overhead.}
 
 \callc
-\makeline
 %%%%%%%%%%%%%%%%%%%%%%%%%
-\clearpage
 \makeline
 \name{streamInitWithDataRAM}
 {\small
 \begin{verbatim}
-void streamInitWithDataRAM(Stream* s, VM_NODE_MEM ramLocation, int address, 
+void streamInitWithDataRAM(Stream* s, MM_ELMT_MEM ramLocation, int address, 
                            int capacity, int elementSize, int initLength, 
                            boolean initEOS, int maxBuffering, int flags)
 \end{verbatim}}
@@ -275,11 +389,13 @@ streamInitRAM}.}
 
 \callc
 %%%%%%%%%%%%%%%%%%%%%%%%%
+\clearpage
+~ \\ \vspace{-24pt}
 \makeline
 \name{streamInitFIFO}
 {\small
 \begin{verbatim}
-void streamInitFIFO(Stream* s, VM_NODE_MEM fifoLocation, 
+void streamInitFIFO(Stream* s, MM_ELMT_MEM fifoLocation, 
                     int elementSize, int maxBuffering, int flags)
 \end{verbatim}}
 
@@ -301,9 +417,7 @@ by the size of the FIFO.}
   {\tt s} is not used for input or output in a kernel that is currently {\tt WAITING}, {\tt RUNNING}, or {\tt PAUSED}.}
 
 \callc
-\makeline
 %%%%%%%%%%%%%%%%%%%%%%%%%
-\clearpage
 \makeline
 \name{Stream Flags \medskip}
 
@@ -344,7 +458,9 @@ the Low Level Compiler to implement EOS with a single pointer instead
 of tracking a set of EOS tokens.\\}
 
 \decl{\} STREAM\_FLAGS;}
+\makeline
 %%%%%%%%%%%%%%%%%%%%%%%%%
+\clearpage
 \makeline
 \name{streamPush}
 \decl{void streamPush(Stream* s, void* element)}
@@ -353,10 +469,7 @@ of tracking a set of EOS tokens.\\}
   {\tt element} - value to push.}
 \req{{\tt s} has been initialized.}
 \callkc
-\makeline
 %%%%%%%%%%%%%%%%%%%%%%%%%
-\clearpage
-\vspace{6pt}
 \makeline
 \name{streamPushMulticast}
 \decl{void streamPushMulticast(void* element, Stream* s0, Stream* s1, ...)}
@@ -402,6 +515,8 @@ the EOS information is no longer accessible.}
 
 \callkc
 %%%%%%%%%%%%%%%%%%%%%%%%%
+\makeline
+\clearpage
 \makeline
 \name{streamPeek}
 \decl{void streamPeek(Stream* s, int n, void* element)}
@@ -458,7 +573,8 @@ pushed onto all streams.  See {\tt streamPushMulticast} for an example.}
 \callkc
 %%%%%%%%%%%%%%%%%%%%%%%%%
 \makeline
-
+\clearpage
+\makeline
 \name{streamPeekEOS}
 
 \decl{boolean streamPeekEOS(Stream* s, int n)}
@@ -488,7 +604,6 @@ are available.}
 %% to random-access memory or hardware FIFOs. Blocks are only mapped to
 %% random-access memory.
 
-\clearpage
 \subsection{Blocks}
 \label{sec:blocks}
 
@@ -528,8 +643,9 @@ address} and {\tt capacity} might be dynamically calculated at runtime.}
     {\tt b} is not used for input or output in a kernel that is currently {\tt WAITING}, {\tt RUNNING}, or {\tt PAUSED}.}
 
 \callc
-
+\makeline
 %%%%%%%%%%%%%%%%%%%%%%%%%
+\clearpage
 \makeline
 \name{blockWrite}
 
@@ -650,7 +766,7 @@ have a well-defined status.\\}
 \name{kernelInit}
 {\small
 \begin{verbatim}
-void kernelInit(Kernel* k, VM_NODE_PROC procLocation, IOBlock* scratch,
+void kernelInit(Kernel* k, MM_ELMT_PROC procLocation, IOBlock* scratch,
                 void* extKernelData, int extKernelDataSize, ExtKernelWork extKernelWork)
 \end{verbatim}}
 
@@ -674,7 +790,9 @@ is in the {\tt UNSTARTED} state.}
   {\tt k} is {\tt UNSTARTED}, {\tt FINISHED}, or uninitialized.}
 
 \callc
+\makeline
 %%%%%%%%%%%%%%%%%%%%%%%%%
+\clearpage
 \makeline
 \name{kernelAddDependence}
 
@@ -698,9 +816,7 @@ and run again while {\tt k} is still waiting for other kernels.}
   {\tt k} can read from a memory that {\tt dependsOnKernel} can write to.  That is, the processor executing\\ \mbox{~~~~~} {\tt k} and the processor executing {\tt dependsOnKernel} must both be connected to some common \\ \mbox{~~~~~} memory.  (This allows {\tt dependsOnKernel} to notify {\tt k} when the dependence is satisfied.)}
 
 \callc
-\makeline
 %%%%%%%%%%%%%%%%%%%%%%%%%
-\clearpage
 \makeline
 \name{kernelReady}
 \decl{void kernelReady(Kernel* k)}
@@ -808,7 +924,9 @@ its work function.}
 \req{{\tt k} is {\tt RUNNING}, {\tt PAUSED}, or {\tt FINISHED}.}
 
 \callkc
+\makeline
 %%%%%%%%%%%%%%%%%%%%%%%%%
+\clearpage
 \makeline
 \name{kernelWait}
 \decl{void kernelWait(Kernel* k)}
@@ -839,6 +957,26 @@ as any concurrently running kernel has paused.}
 
 \param{
   {\tt k0, k1, etc.} - kernels to wait for.}
+
+\req{{\tt k0, k1, etc.} have been initialized.}
+
+\callc
+%%%%%%%%%%%%%%%%%%%%%%%%%
+\makeline
+\name{kernelGetStatus}
+\decl{KERNEL\_STATUS kernelGetStatus(Kernel* k)}
+
+\spec{Returns the status of the kernel as best known by the control thread.}
+
+\param{
+  {\tt k} - kernel to inspect.}
+
+\req{{\tt k} has been initialized.}
+
+\callc
+\makeline
+
+%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%  BEGIN FIGURE
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -870,24 +1008,6 @@ as any concurrently running kernel has paused.}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%  END FIGURE
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\req{{\tt k0, k1, etc.} have been initialized.}
-
-\callc
-%%%%%%%%%%%%%%%%%%%%%%%%%
-\makeline
-\name{kernelGetStatus}
-\decl{KERNEL\_STATUS kernelGetStatus(Kernel* k)}
-
-\spec{Returns the status of the kernel as best known by the control thread.}
-
-\param{
-  {\tt k} - kernel to inspect.}
-
-\req{{\tt k} has been initialized.}
-
-\callc
-\makeline
-%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \sss{Kernel Execution Model}
 
@@ -897,19 +1017,19 @@ while a timeline for a sample interaction with a kernel appears in
 Figure~\ref{fig:kernel-timeline}.
 
 A kernel is initially {\tt UNSTARTED}.  The control thread calls {\tt
-kernelRun}, and the kernel becomes {\tt WAITING}.  When all kernels
-it depends on (as explicitly indicated by the {\tt
-kernelAddDependence} function) are {\tt FINISHED}, the kernel becomes
-{\tt RUNNING}. The kernel executes its {\tt work} function.  If
-either the control thread or the work function calls {\tt
-kernelPause}, the kernel pauses in executing the work function and
-becomes {\tt PAUSED}. It remains {\tt PAUSED} until the control thread
-calls {\tt kernelRun} again. If either the control thread or the
-work function calls {\tt kernelEnd} at any time when the kernel is
-not {\tt FINISHED}, the kernel stops executing the work function and
-becomes {\tt FINISHED}. The kernel implicitly calls {\tt kernelEnd}
-when the work function returns. If control flow causes a kernel to be
-initialized again, it becomes {\tt UNSTARTED}.
+kernelRun}, and the kernel becomes {\tt WAITING}.  When all kernels it
+depends on (as explicitly indicated by the {\tt kernelAddDependence}
+function) are {\tt FINISHED}, the kernel becomes {\tt RUNNING}. The
+kernel executes its {\tt work} function.  If either the control thread
+or the work function calls {\tt kernelPause}, the kernel pauses in
+executing the work function and becomes {\tt PAUSED}. It remains {\tt
+PAUSED} until the control thread calls {\tt kernelRun} again. If
+either the control thread or the work function calls {\tt kernelEnd}
+at any time when the kernel is not {\tt FINISHED}, the kernel stops
+executing the work function and becomes {\tt FINISHED}. The kernel
+implicitly calls {\tt kernelEnd} when the work function returns. If
+control flow causes a kernel to be initialized again, it becomes {\tt
+UNSTARTED}.
 
 Section~\ref{sec:control} gives a detailed explanation of how kernels
 should be controlled.  However, we also give some brief examples here
@@ -1003,40 +1123,6 @@ these concepts:
   }
 \end{verbatim}}
 
-\begin{figure}[t]
-\framebox[6.5in]{
-\begin{minipage}{6in}
-\begin{enumerate}
-
-\item No pointers, except for those directly passed to stream, block,
-and kernel functions as described in this document.
-
-\item No dynamic memory allocation.
-
-\item No accesses to global variables.
-
-\item No GOTO statements (all control flow is structured).
-
-\item No recursive functions (all function calls have inline semantics).
-
-\item No calls to functions that violate any of these restrictions.
-
-\item Supported opcodes are only the logical, arithmetic, and boolean
-operations found in C (no special-purpose DSP operations at this
-time\footnote{DSP operations may be added at a future date pending
-further discussion by the forum.}).
-
-\item Supported primitive types are indicated by the set of {\tt
-MM\_PROC\_SUPPORTS} fields in the machine model; there is also support
-for arrays with a fixed (int literal) length and {\tt struct}'s
-containing members of any other type.
-
-\end{enumerate}
-
-\caption{Restrictions on C code within kernels.\protect\label{fig:restrict}}
-\end{minipage}}
-\end{figure}
-
 \subsubsection{User-Defined Kernels}
 \label{sec:kernelhlc}
 
@@ -1059,7 +1145,7 @@ For example, a kernel for a simple amplifier could be as follows:
 
   void amplifierWork(Amplifier* amp);
 
-  void amplifierInit(Amplifier* amp, VM_NODE_PROC procLocation, IOBlock* scratch, 
+  void amplifierInit(Amplifier* amp, MM_ELMT_PROC procLocation, IOBlock* scratch, 
                      IStream* _in, OStream* _out, int _N) {
       kernelInit(&amp->kernel, procLocation, scratch, 
         amp, sizeof(Amplifier), (ExtKernelWork)&amplifierWork);
@@ -1096,7 +1182,41 @@ function can be simplified as follows:
   }
 \end{verbatim}}
 
-\clearpage
+\begin{figure}[t]
+\vspace{-12pt}
+\framebox[6.5in]{
+\begin{minipage}{6in}
+\begin{enumerate}
+
+\item No pointers, except for those directly passed to stream, block,
+and kernel functions as described in this document.
+
+\item No dynamic memory allocation.
+
+\item No accesses to global variables.
+
+\item No GOTO statements (all control flow is structured).
+
+\item No recursive functions (all function calls have inline semantics).
+
+\item No calls to functions that violate any of these restrictions.
+
+\item Supported opcodes are only the logical, arithmetic, and boolean
+operations found in C (no special-purpose DSP operations at this
+time\footnote{DSP operations may be added at a future date pending
+further discussion by the forum.}).
+
+\item Supported primitive types are indicated by the set of {\tt
+MM\_PROC\_SUPPORTS} fields in the machine model; there is also support
+for arrays with a fixed (int literal) length and {\tt struct}'s
+containing members of any other type.
+
+\end{enumerate}
+
+\caption{Restrictions on C code within kernels.\protect\label{fig:restrict}}
+\end{minipage}}
+\end{figure}
+
 \sss{User-defined Kernel Restrictions}
 
 The initialization function must statically associate the input and
@@ -1125,7 +1245,9 @@ may be executed by stream processors on some architectures.
 
 \spec{Indicates that a pre-defined kernel should execute through the
 entire length of one of its inputs.}
+\makeline
 %%%%%%%%%%%%%%%%%%%%%%%%%
+\clearpage
 \makeline
 \name{Move}
 {\small
@@ -1135,7 +1257,7 @@ typedef struct {
   // not exposed
 } Move;
 
-void moveInit(Move* move, VM_NODE_PROC location, IStream* srcStr, 
+void moveInit(Move* move, MM_ELMT_PROC location, IStream* srcStr, 
               OStream* destStr, int length, boolean setEOS);
 \end{verbatim}}
 
@@ -1168,8 +1290,6 @@ move itself.}
 \callc
 \makeline
 %%%%%%%%%%%%%%%%%%%%%%%%%
-\clearpage
-\makeline
 \name{StridedScatter}
 {\small
 \begin{verbatim}
@@ -1178,7 +1298,7 @@ typedef struct {
   // not exposed
 } StridedScatter;
 
-void stridedScatterInit(StridedScatter* scatter, VM_NODE_PROC location, 
+void stridedScatterInit(StridedScatter* scatter, MM_ELMT_PROC location, 
                         IStream* srcStr, OBlock* destBlock, int length,
                         int destStride, int elementsPerStride)
 \end{verbatim}}
@@ -1215,7 +1335,7 @@ typedef struct {
   // not exposed
 } StridedGather;
 
-void stridedGatherInit(StridedGather* gather, VM_NODE_PROC location, 
+void stridedGatherInit(StridedGather* gather, MM_ELMT_PROC location, 
                        IBlock* srcBlock, OStream* destStr, int length,
                        int srcStride, int elementsPerStride, boolean setEOS)
 \end{verbatim}}
@@ -1252,7 +1372,7 @@ typedef struct {
   // not exposed
 } IndexedScatter;
 
-void indexedScatterInit(IndexedScatter* scatter, VM_NODE_PROC location,
+void indexedScatterInit(IndexedScatter* scatter, MM_ELMT_PROC location,
                         IStream* srcStr, IStream* indexStr, OBlock* destBlock, 
                         int length, int elementsPerIndex)
 \end{verbatim}}
@@ -1269,7 +1389,9 @@ streams as they are scattered.}
   {\tt scatter} - kernel to initialize.\\
   {\tt location} - processor resource on which to execute the kernel (from PCA Machine Model.)\\
   {\tt srcStr} - source stream, from which elements are moved.\\
-  {\tt indexStr} - index stream, containing the locations of {\tt destBlock} to which elements should be written.\\
+  {\tt indexStr} - index stream, containing the locations of {\tt destBlock} to which elements should be written.}
+
+\paramcont{
   {\tt destBlock} - destination block, into which elements are written.\\
   {\tt length} - total number of elements to copy; {\tt STREAM\_LENGTH\_ALL} executes until an element with \\ \mbox{~~~~~} an EOS tag is  popped from {\tt indexStr}.\\
   {\tt elementsPerIndex} - number of elements to move from {\tt srcStr} for each element of {\tt indexStr}.}
@@ -1289,7 +1411,7 @@ typedef struct {
   // not exposed
 } IndexedGather;
 
-void indexedGatherInit(IndexedGather* gather, VM_NODE_PROC location, 
+void indexedGatherInit(IndexedGather* gather, MM_ELMT_PROC location, 
                        IBlock* srcBlock, IStream* indexStr, OStream* destStr, 
                        int length, int elementsPerIndex, boolean setEOS)
 \end{verbatim}}
@@ -1335,6 +1457,7 @@ kernel, the High Level Compiler guarantees that it will not merge
 black-box kernels with other kernels, or rename a black-box kernel so
 that it would become unrecognizable to the Low Level Compiler.
 
+\clearpage
 \subsection{Control}
 \label{sec:control}
 
@@ -1347,14 +1470,14 @@ stream, kernel, and block variables must be declared as static
 variables.
 
 An example follows:
+
 {\small
 \begin{verbatim}
   int length1, length2;
   static Stream s0, s1, s2, s4;
   static Block scratch;
-  static Move move01;
+  static Move move01, move24;
   static RLE rle;
-  static Move move24;
 
   // read file into memory location of s0 (not part of API)
   length1 = readFile("input.dat", GLOBALMEM1, 0x1000, 1024);
@@ -1401,7 +1524,6 @@ An example follows:
   moveInit(&move24, DMA1, &s2, &s4, STREAM_LENGTH_ALL, TRUE);
   kernelRun(&move24.kernel);
   kernelWait(&move24.kernel);
-
   // store the result from memory to "output.dat" (not part of API)
   writeFile("output.dat", GLOBALMEM1, 0x2000, length2); 
 \end{verbatim}}
@@ -1460,7 +1582,7 @@ For example:
 
   void sumKernelWork();
   
-  sumInit(SumKernel* k, VM_NODE_PROC procLocation, IOBlock* scratch, IStream* _in) {
+  sumInit(SumKernel* k, MM_ELMT_PROC procLocation, IOBlock* scratch, IStream* _in) {
     kernelInit(&k->kernel, procLocation, scratch,
       k, sizeof(SumKernel), (ExtKernelWork)&sumKernelWork); 
     k->in = _in;
@@ -1500,7 +1622,7 @@ For example:
 \label{sec:fifoclean}
 
 It is the responsibility of the High Level Compiler to ensure that all
-elements are drained from FIFO's before a fresh set of streams and
+elements are drained from FIFOs before a fresh set of streams and
 kernels are mapped to the resources.  In the common case, a FIFO is
 empty when the neighboring kernels terminate, as the kernels execute
 until they push or pop an item with an EOS tag.  However, in
@@ -1554,6 +1676,7 @@ FIFO.  The state is empty if there are no data elements in the FIFO.
 
 \end{enumerate}
 
+\clearpage
 \noindent In order to facilitate static analysis in the Low Level
 Compiler, there are a number of restrictions:
 
@@ -1585,6 +1708,7 @@ kernel it is controlling.
 \end{enumerate}
 
 \subsection{Error Handling}
+\label{sec:errors}
 
 If any of the above restrictions are violated, or if there is an
 operation that is disallowed by the API ({\it e.g.,} peeking beyond
@@ -1602,6 +1726,7 @@ sake of performance.  If each architecture was required to verify the
 restrictions above, the overhead would be prohibitive.
 
 \subsection{Concept of Operations}
+\label{sec:conops}
 
 The following is an incomplete list of SVM/HLC/LLC expectations:
 
@@ -1662,11 +1787,11 @@ estimation will be addressed in the future.
 \section{FIFO Cleanup Example}  % use *-form to suppress numbering
 \label{sec:fifocleanexample}
 As described in Section~\ref{sec:fifoclean}, the High Level Compiler
-is responsible for draining FIFO's before a fresh set of streams and
-kernels are mapped to the resources.  In the common case, FIFO's will
+is responsible for draining FIFOs before a fresh set of streams and
+kernels are mapped to the resources.  In the common case, FIFOs will
 be drained by the kernels themselves.  However, if a kernel terminates
 before consuming the EOS, the control thread will have to take
-additional steps to ensure that the FIFO's are clear before additional
+additional steps to ensure that the FIFOs are clear before additional
 kernels can be run.
 
 For instance, consider a producer kernel {\tt k1} that communicates
@@ -1763,7 +1888,7 @@ stream is drained.
 
   void popKernelWork();
   
-  pushInit(PopKernel* k, VM_NODE_PROC procLocation, IStream* _in, int _capacity, boolean _boundedRemainder) {
+  pushInit(PopKernel* k, MM_ELMT_PROC procLocation, IStream* _in, int _capacity, boolean _boundedRemainder) {
     kernelInit(&k->kernel, procLocation, 0, k, sizeof(PopKernel), (ExtKernelWork)&popKernelWork); 
     k->in = _in;
     k->capacity = _capacity;
@@ -1805,7 +1930,7 @@ stream is drained.
 
   void pushKernelWork();
   
-  sumInit(PushKernel* k, VM_NODE_PROC procLocation, OStream* _out, int _capacity) {
+  sumInit(PushKernel* k, MM_ELMT_PROC procLocation, OStream* _out, int _capacity) {
     kernelInit(&k->kernel, procLocation, 0, k, sizeof(PushKernel), (ExtKernelWork)&pushKernelWork); 
     k->out = _out;
     k->capacity = _capacity;
@@ -1844,7 +1969,7 @@ that it always has a consistent view of FIFO contents.
 %%     boolean setEOS
 %%   } Move;
 %%
-%%   void moveInit(Move* move, VM_NODE_PROC location, IStream* _srcStr, OStream* _destStr,
+%%   void moveInit(Move* move, MM_ELMT_PROC location, IStream* _srcStr, OStream* _destStr,
 %%                 int _elementSize, int _length, boolean _setEOS) {
 %%     kernelInit(&move->kernel, location, 0, move, sizeof(Move), (ExtKernelWork)&moveWork);
 %%     move->srcStr = _srcStr;
