@@ -1,7 +1,7 @@
 \documentclass[twocolumn, draft]{article}
 \usepackage{psfig, wide, verbatim}
-\title{StreaMIT Intermediate Representation \\ Version 0.0.6}
-\author{Perl Monkeys Inc.}
+\title{StreaMIT Intermediate Representation \\ Version 0.0.7}
+\author{Speed Typing Inc.}
 
 
 \begin{document}
@@ -129,12 +129,11 @@ is accessed as an array.  For input, element 0 is first new element of input,
 element 1 is second new element of input, etc.  Element -1 is the first seen
 element of input.
 
-\subsection{Init}
+\subsection{Initialization}
 
-When a filter is being initialized or reinitialized, a constructor 
-(called Init) is called.  This constructor has a chance to initialize 
-the filter with some initial data (passed as arguments to the filter).
-Init does not accept any parameters of its own.
+When a filter is being initialized or reinitialized, the body of the
+Filter is executed again (including all variable declarations, default
+values, etc).
 
 Because of the difference between the script and dynamic parameters,
 we may want to preserve some of the properties of the script variables.
@@ -150,17 +149,12 @@ constructs.
 \begin{verbatim}
 Filter FooType<script FilterRef p> (float a)
 {
-  script FilterRef parent;
-  float amplification;
-  Init ()
-  {
-    parent = p;
-    amplification = a;
-  }
+  script FilterRef parent = p;
+  float amplification = a;
 };
 \end{verbatim}
 
-Init is not allowed to send messages or initialize other blocks.
+Initialization is not allowed to send messages or initialize other blocks.
 
 \subsection{Message}
 
@@ -199,14 +193,16 @@ represented by the function will be placed at the point of the function
 call.  Functions do not return values.
 
 Just like Filters, functions accept two types of parameters, script
-and dynamic.  All of the rules for filter Init functions apply to the
+and dynamic.  All of the rules for filter init bodies apply to the
 scripting functions.
 
 The begining of the filter structure is described in the 'main' function.
 This function accepts no script or dynamic parameters.
+Functions are defined just as in C, except we insert FilterBlock
+keyword in front of them.
 
 \begin{verbatim}
-main ()
+FilterBlock main ()
 {
   FMRadio (99.9, RockNRoll, 1.5);
 }
@@ -216,9 +212,9 @@ The above function calls the FMRadio function with some parameters.
 Here is a possible body of FMRadio:
 
 \begin{verbatim}
-FMRadio (float fmFreq,
-         MusicType mType,
-         float amp)
+FilterBlock FMRadio (float fmFreq,
+                     MusicType mType,
+                     float amp)
 {
   FilterRef ampRef;
   FMRadioSource (fmFreq);
@@ -245,9 +241,9 @@ This construct will be very useful when dealing with SplitJoins,
 and other, more complex constructs:
 
 \begin{verbatim}
-BandPassFilter<script float amp, 
-               script float fLow, 
-               script float fHigh> ()
+FilterBlock BandPassFilter<script float amp, 
+                           script float fLow, 
+                           script float fHigh> ()
 {
   Pipe
   {
@@ -266,9 +262,9 @@ In order to allow for splitting of single streams into multiples,
 we define a SplitJoin construct:
 
 \begin{verbatim}
-Equalizer<script FileterRef filterRef,
-          script SourceType sType>
-          (MusicType mType)
+FilterBlock Equalizer<script FileterRef filterRef,
+                      script SourceType sType>
+                    (MusicType mType)
 {
   SplitJoin
   {
@@ -303,11 +299,46 @@ SplitJoin
 The number of weights listed in the WeighterRoundRobin definition must
 match the number of filters providied in the SplitJoin.
 
+\subsection{Inlined Filters}
+
+In order to allow for easy declaration of filters inside of function
+bodies, we provide a simple method for inlining these filters:
+
+\begin{verbatim}
+FilterBlock func (float a)
+{
+  Filter1 foo;
+  Filter<script int delay = 3> (float amp = a)
+  {
+    input float in;
+    output float out;
+    float data [delay];
+    int pos;
+    sfor (pos = 0; pos < delay; pos++)
+    {
+      data [pos] = 0;
+    }
+    pos = 0;
+
+    Work ()
+    {
+       out[0] = amp * data[pos];
+       data[pos] = in[0];
+       pos = (pos + 1) % delay;
+    }
+  };
+  Filter3 bar;
+}
+\end{verbatim}
+
+The above filter has been inlined into the function body.  It delays
+the output by 3 data packets and amplifies it by amp.
+
 \subsection{StreamSelect and FilterBlock}
 
 StreamSelect allows us to dynamically change the configuration
 of the stream graph.  This is done through reinitialization of 
-a part of the streams.  We define a FilterBlock construct, which
+a part of the streams.  We use a FilterBlock construct, which
 is essentially an object, which can have a reference taken.
 A reference to a FilterBlock is of type FilterRef.  FilterRef behaves similarly
 to a C++ reference, except that it can be assigned a value after it's been
@@ -330,10 +361,10 @@ AudioEqualizer<script FilterRef blockRef,
                script SourceType sType>
           (MusicType mType)
 {
-  FilterBlock<script SourceType sType>
+  blockRef = FilterBlock<script SourceType sType>
           (Musictype mType)
   {
-    blockRef = StreamSelect (mType)
+    StreamSelect (mType)
     {
       case Vocal:
         // Vocal music sounds good without 
@@ -351,17 +382,21 @@ AudioEqualizer<script FilterRef blockRef,
 }
 \end{verbatim}
 
+Note, that since a function definition also uses
+the FilterBlock construct, we can take a refrence
+to a function call (though not an actual function).
+Furthermore,  Filter, Source and Sink (described below) also can have
+references taken.  Because of this, the above example
+seems a little contrived...
+
 Here is a filter that might send a message to the FilterBlock in 
 the AudioEqualizer:
 
 \begin{verbatim}
 Filter VoiceControl<script FilterRef voiceBlock>
 {
-  script FilterRef vBlock;
-  Init ()
-  {
-    vBlock = voiceBlock;
-  }
+  script FilterRef vBlock  = voiceBlock;
+
   // on some message, switch to Vocal music:
   VoiceMsgHandler (Msg msg)
   {
@@ -402,8 +437,6 @@ Filter Demultiplexer
 Source Microphone
 {
   output StereoSignal audio;
-  Init ()
-  { }
   Work ()
   {
     audio [0] = GetValueFromMic ();
@@ -417,8 +450,6 @@ Filter<script int left> SeparateStereo
 {
   input StereoSignal sAudio;
   output float mAudio;
-  Init ()
-  { }
   Work ()
   {
     if (left)
@@ -433,7 +464,7 @@ Filter<script int left> SeparateStereo
 Sink Speaker
 { ... }
 
-Karaoke ()
+FilterBlock Karaoke ()
 {
   {
     Microphone ();
@@ -496,7 +527,6 @@ FeedbackFilter NegFeedbackAmplifierFilter
     float result = - negFeed * gain;
     audioOut [0] = result;
   }
-  Init () { }
 };
 
 Filter NegFeedbackBuffer<int delay>
@@ -508,16 +538,15 @@ Filter NegFeedbackBuffer<int delay>
     in [0] = out [0];
   }
 
-  Init ()
+  // insert data into the buffer so the
+  // feedback can work
+  sfor (static int i = 0; i < delay; i++)
   {
-    sfor (static int i = 0; i < delay; i++)
-    {
-      out [i] = 0;
-    }
+    out [i] = 0;
   }
 };
 
-NegFeedbackAmplifier ()
+FilterBlock NegFeedbackAmplifier ()
 {
   FeedbackLoop
   {
