@@ -38,8 +38,21 @@ Linear Code Generation for Raw}
 \index{Lin, Jasper}
 \index{Amarasinghe, Saman}
 
+\absection{What}
+We are developing compiler technology for the StreamIt programming
+language~\cite{streamitcc}, a high-level stream language that aims to
+be portable across communication-exposed machines.  StreamIt contains
+basic constructs that expose the parallelism and communication of
+streaming applications without depending on the topology or
+granularity of the underlying architecture.  Our previous work,
+\cite{streamit-asplos}, has focused on 
+implementing a {\it space-multiplexing} (see below) backend for
+MIT's Raw architecture \cite{raw}, a tiled architecture 
+with fine-grained, programmable communication between processors.
+Currently we are implementing a new backend targeting Raw that will
+incorporate the lessons learned while investigating our previous work.
 
-\absection{Introduction}
+\absection{Why}
 As we approach the billion-transistor era, a number of emerging
 architectures are addressing the wire delay problem by replicating the
 basic processing unit and exposing the communication between units to
@@ -51,20 +64,7 @@ machines are to be widely used, it is imperative that one be able to
 write a program once, in a high-level language, and rely on a compiler
 to produce an efficient executable on any of the candidate targets.
 
-We are developing compiler technology for the StreamIt programming
-language~\cite{streamitcc}, a high-level stream language that aims to
-be portable across communication-exposed machines.  StreamIt contains
-basic constructs that expose the parallelism and communication of
-streaming applications without depending on the topology or
-granularity of the underlying architecture.  Our previous work,
-\cite{streamit-asplos} and \cite{mgordon-thesis}, has focused on 
-implementing a {\it space-multiplexing} (see below) backend for
-MIT's Raw architecture \cite{raw}, a tiled architecture 
-with fine-grained, programmable communication between processors.
-Currently we are implementing a new backend targeting Raw that will
-incorporate the lessons learned while investigating our previous work.
-
-\absection{Approach} 
+\absection{How} 
 
 Given a stream graph, composed of filters (actors) and FIFO,
 uni-directional arcs connecting the filters, what is the best way to
@@ -115,6 +115,30 @@ representations of the linear filters are broken into pieces
 that the compiler targets for aggressive code generation.  The
 aggressive code generation results in optimal usage of the tiles
 for each piece.
+
+\begin{figure}[tbh]
+  \centerline{\includegraphics[width=3.0in]{streamgraph.pdf}}
+  \caption{The Stream Graph for the Channel Vocoder.  The ovals
+represent filters and the arrows are the arcs.}
+  \label{streamgraph}
+\end{figure}
+ 
+We will now present a small example to solidify the reader's
+understanding of our work.  In Figure \ref{streamgraph}, we show the
+stream graph for a simple channel vocoder.  The dark ovals denote
+the linear filters of the application.  The white ovals are non-linear
+but stateless filters and thus can be data-parallelized.  
+
+An example mapping of this application would first execute the top
+low-pass filter slice, occupying the entire Raw chip executing enough
+times to supply the subsequent slices. Next, each band slice will
+occupy a quarter of the chip, executing 4 bands in parallel.  Remember
+that each of the above slices are linear and our parameterized linear
+code generation provides near-optimal utilization. Finally, the
+non-linear, stateless pitch detector slice is data-parallelized across
+the entire Raw chip, reading its input from DRAM and writing its
+output to DRAM.  Each slice reads its input from and writes its output
+to off-chip DRAM.
  
 \absection{Progress}
 Currently, we have completed a first version of our hybrid space-time
