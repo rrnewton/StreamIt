@@ -297,7 +297,7 @@ $\mathbf{o',}$ $\mathbf{u'\}}$ represents an equivalent node that can
 replace the entire stream $s$.  Its components are as follows:
 \begin{equation} \nonumber
 \begin{array}{rcl}
-\mt{joinRep} & = & \mt{lcm}(\frac{\mt{lcm}(u_1,w_1)}{w_1}, \dots, \frac{\mt{lcm}(u_n,w_n)}{w_n}) \\
+\mt{joinRep} & = & \mt{lcm}(\frac{\mt{lcm}(u_0,w_0)}{w_0}, \dots, \frac{\mt{lcm}(u_{n-1},w_{n-1})}{w_{n-1}}) \\
 \mt{maxPeek} & = & \mt{max}_i (o_i * \mt{rep}_i + e_i - o_i) \\ ~ \vspace{-2pt} \\
 \multicolumn{3}{l}{\forall k \in [0, n-1]:} \\ ~ \vspace{-6pt} \\
 \mt{wSum}_k & = & \sum_{i=0}^{k-1} w_i \\ ~ \vspace{-6pt} \\
