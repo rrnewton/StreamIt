@@ -69,14 +69,14 @@ class Butterfly extends Stream {
                Channel input = new ComplexChannel();
                Channel output = new ComplexChannel();
                void work() {
-                  putput.push(input.pop() + input.pop());
+                  output.push(input.pop() + input.pop());
                }
             });
             add (new Filter() {   
                Channel input = new ComplexChannel();
                Channel output = new ComplexChannel();
                void work() {
-                  putput.push(input.pop() - input.pop());
+                  output.push(input.pop() - input.pop());
                }
             });
             weighted_round_robin(N, N);
