@@ -1,7 +1,7 @@
 \documentclass[twocolumn, draft]{article}
-\usepackage{psfig, wide}
+\usepackage{psfig, wide, verbatim}
 \title{StreaMIT Language Description \\ Version 0.3-pre}
-\author{Stream Worshipers Inc.}
+\author{Insomniac Streams Anonymous}
 
 
 \begin{document}
@@ -15,15 +15,16 @@ on a 2D surface with no intersections.  The graph is almost a DAG, except
 we allow feedback loops in arrangement of filters.
 
 All blocks can be aggregated into larger superblocks:  Pipes, StreamSelects,
-FeedbackLoops, Splits and FilterBlocks.  
-All of these superblocks can be named.  Every 
-(super)block has a StreamID associated with it.  A message can be sent 
-to a StreamID, which will cause all highest-level blocks prepared to
-receive messages contained in within the named block
-to receive this msg.
+and SplitsJoins.  The arrangement of these superblocks and
+Filters is created in our scripting language.
 
-A named (super)block can also be reinitialized.  This will cause all the 
-in/outflowing buffers to be purged.
+Every Filter can send and receive messages through MessagePipes.  A filter 
+accepts a MessagePipe for its Init function.  It can then bind itself
+to this pipe as a sender or a receiver.  This allows us to set up a one-one,
+one-many, many-one and many-many communication between filters.
+
+There is another construct, ResetWire, for triggering reinitalization of 
+filters/superblocks (through calling a function of the scripting language).
 
 \section{Filters}
 A new filter type is defined as follows:
@@ -50,9 +51,10 @@ Most of the work done by a filter is described in a Work function:
 \begin{verbatim}
 Work ()
 {
-  fooOutput [0] = fooInput [0] + fooInput [1];
-  fooInput.release (2);
-  fooInput.advance (2);
+  // essentially a low pass filter:
+  fooOutput [0] = fooInput [0] + fooInput [-1];
+  fooInput.release (1);
+  fooInput.advance (1);
   fooOutput.push (1);
 }
 \end{verbatim}
@@ -73,11 +75,9 @@ data (passed as arguments):
 \begin{verbatim}
 type FooType is Filter
 {
-  StreamID parent;
   float amplification;
-  Init (float a, StreamID p)
+  Init (float a)
   {
-    parent = p;
     amplification = a;
   }
 };
@@ -90,7 +90,7 @@ Init is not allowed to send messages or initialize other blocks.
 Each filter is allowed to receive messages:
 
 \begin{verbatim}
-Message (Msg fooMsg)
+MessageHandler (Msg fooMsg)
 {
 // .. handle msg here
 }
@@ -101,104 +101,191 @@ A message is defined as follows:
 \begin{verbatim}
 struct Msg
 {
-  StreamID source;
-  int type;
   int length;
   void *data;
 };
 \end{verbatim}
 
-Message is allowed to send other messages and/or reinitialize blocks.
-Message is not allowed to read stream input or output any stream data.
+Message handlers are allowed to send other messages and/or reinitialize blocks.
+Message handlers are not allowed to read stream input or output any stream data.
 Initialization of a filter causes this filter's message queue to be emptied.
-A filter is guaranteed that all of its appropriate predecessors (in the graph)
-will have received the msg before it does.
 
-\section{FilterBlock}
-
-FilterBlock is used to aggregate filters and superblocks.  It is a 
-single input/single output structure.  It is allowed to have Init and Message
-functions, but it is not allowed to have a Work function, nor define its
-input or output.
-
-\subsection{Init}
-
-Init function for a FilterBlock is similar to Init function of a Filter.
-FilterBlock, however, can also contain Filters/superblocks:
+In order to sign up for receiving messages, a Filter needs to bind a
+handler function to a MessagePipe.
 
 \begin{verbatim}
-Init (float amp, float fLow, float fHigh, StreamID p)
+type FooFilter is Filter
 {
-  LowPass lowPassFilter (aLow);
-  HighPass highPassFilter (aHigh);
-  Amplifier amplifier (amp);
-  parent = p;
-}
+  Init (MessagePipe pipe)
+  {
+    BindReceiver (MessageHandler, pipe);
+  }
+  MessageHandler(Msg x)
+  {
+  }
+
+};
 \end{verbatim}
 
-The above creates three filters connected in series.
-
-\subsection{Message}
-
-The Message function for a FilterBlock looks/works
-identically to Filter's Message function.
-
-\section{StreamID}
-
-As seen before, StreamID is used to keep track of other blocks in the 
-program.  They can only be assigned values in Init function, only 
-values from parameters and/or internal blocks can be used to assign
-to a StreamID variable, and a value of a StreamID variable must be
-static for every invocation of the Init function (this is somewhat
-clumsy - can we fix this somehow?).
-
-StreamID is used to call Init function on a particular block and for
-sending messages.  There are several exaples of StreamID in this document.
-
-\section{Pipe}
-
-The above Init function aggregates three filters into one.  While this is
-useful, we define another construct to do essentially the same thing
-without having to define an all new type.  This new construct will
-allow us to aggregate an arbitrary serial connection of fileters/superblocks:
+Similarly, to sign up for sending messages, a Filter needs to store the
+MessagePipe and send a message to it.
 
 \begin{verbatim}
-Init (float amp, float fLow, float fHigh, StreamID p)
+type BarFilter is Filter
 {
-  Pipe BandPassFilter
+  MessagePipe myPipe;
+  Init (MessagePipe pipe)
   {
-    LowPass lowPassFilter (aLow);
-    HighPass highPassFilter (aHigh);
-  } 
-  Amplifier amplifier (amp);
-  parent = p;
-}
-\end{verbatim}
-
-Pipe allows us only to connect single input/single output blocks.
-
-\section{Split}
-
-In order to allow for splitting of single streams into multiples,
-we define a Split construct:
-
-\begin{verbatim}
-Init ()
-{
-  Split(RoundRobin, RoundRobin)
+    mypipe = pipe;
+  }
+  Work ()
   {
-    LeftAudioFilter leftAudio;
-    RightAudioFilter rightAudio;
+    ...
+    SendMessage (myPipe, msg);
+    ...
   }
 }
 \end{verbatim}
 
-The first field passed to Split is the type of splitting (RoundRobin,
-Duplicate).  Second field passed to Split is type of merge (RoundRobin)
-[shouldn't there be more?!!].  The body of Split defines all single input/
-single output filters which are part of the Split.
+\section{Scripting Language}
 
-\section{Custom Split/Merge}
+\subsection{Intro}
+
+The scripting language is designed to allow for easy arrangement of 
+filter structures.  The scripting language is procedural;  when a filter
+variable is defined, it is considered inserted into the filter graph.
+We define splits and joins that allow us to separate a stream into multiple
+streams and then join them back together.
+
+\subsection{Functions}
+
+The script language is arranged into functions.  Calling a function is
+equivalent to copying the function's body.  Thus the filter structure 
+represented by the function will be placed at the point of the function
+call.  Functions do not return values.  All of their parameters must
+be constant (dependent only on their own parameters) to allow the compiler 
+to determine the correct configuration of a given stream.
+
+Functions are allowed to perform their own computation, but none of the
+filters and/or other filter control sturctures may lay on paths that are
+dependent on parameter inputs.  StreamSelect (described later) is used
+for determining the particular structure of a stream graph.
+
+The begining of the structure is described in the main function.
+
+\begin{verbatim}
+main ()
+{
+  FMRadio (99.9, RockNRoll, 1.5);
+}
+\end{verbatim}
+
+In the example above, RockNRoll is a constant, probably defined through
+an enum.
+
+\subsection{Pipe}
+
+Pipe is used for aggregating several filters together in a serial connection.
+
+\begin{verbatim}
+FMRadio (float fmFreq, MusicType mType, float loudness)
+{
+  Pipe
+  {
+    FMRadioSource (fmFreq);
+    Equalizer (mType);
+    Amplifier (loudness);
+    Speaker ();
+  }
+}
+\end{verbatim}
+
+All filters and/or function calls have to accept a single input and result
+in a single output (except for sources and sinks, described below).
+All input/outputs are type-checked to make sure that
+all types agree.
+
+\subsection{Split}
+
+In order to allow for splitting of single streams into multiples,
+we define a SplitJoin construct:
+
+\begin{verbatim}
+Equalizer (MusicType mType)
+{
+  SplitJoin
+  {
+    RoundRobin;
+    LeftAudioEqualizer leftAudio;
+    RightAudioEqualizer rightAudio;
+    RoundRobin;
+  }
+}
+\end{verbatim}
+
+The first entry of a SplitJoin must be the type of splitting performed
+by this SplitJoin.  There are two types allowed:  RoundRobin and Duplicate.
+The last field is the method for joining the streams.  Currently only
+RoundRobin is allowed.
+
+\subsection{StreamSelect}
+
+StreamSelect allows us to switch configurations of the stream graph.
+We define a StreamSelectSwitch, which can be activated by Work and message
+handler functions of Filters. 
+
+\begin{verbatim}
+enum MusicType {
+  Vocal,
+  RockNRoll,
+  HeavyMetal
+}
+
+Equalizer (MusicType mType)
+{
+  StreamSelectSwitch switch;
+  StreamSelectSwitch (mType) = switch
+  {
+     case Vocal:
+       // Vocal music sounds good without 
+       // any modifications,
+       // so don't do anything
+     case RockNRoll:
+       // want to amplify bass and treble
+       LowPassFilter (0.5); // amplify
+       HighPassFilter (0.5);
+     case HeavyMetal:
+       // only amplify the base
+       LowPassFilter (0.5);
+  }
+}
+
+type VoiceControl is Filter
+{
+  StreamSelectSwitch switch;
+  Init (StreamSelectSwitch musicSwitch, 
+        MessagePipe voiceMsgPipe)
+  {
+    switch = musicSwitch;
+    BindReceiver (VoiceMsgHandler, voiceMsgPipe);
+  }
+  // on some message, switch to Vocal music:
+  VoiceMsgHandler (Msg msg)
+  {
+    // process the msg
+    ..
+    // and switch
+    switch.Set (Vocal);
+  }
+}
+\end{verbatim}
+
+Note, that parameter to the Set function of StreamSelectSwitch must be
+a constant.  As a result the compiler can analyze possible combinations
+of the stream and initialize them all.
+
+\begin{comment}
+\subsection{Split/Merge}
 
 The predefined Split construct does not allow for much flexability in
 creating interesting designs of stream flow.  Following two base types
@@ -266,113 +353,113 @@ When using CustomSplit/CustomMerge, we simply declare the Split, followed
 by appropriate number of singe input/single output blocks, followed by
 a CustomMerge of appropriate number of inputs.
 
-\section{Sources/Sinks}
+\end{comment}
+
+\subsection{Sources/Sinks}
 
 Sources and Sinks are very similar to Filters, except they either have
 no inputs or outputs.  They are defined just like Filters (without
-input/output), and used just like Filters.  A FilterBlock can begin/end
-its Init function with a Source/Sink.  This will cause it to have
+input/output), and used just like Filters.  A macro function can begin/end
+with a Source/Sink.  This will cause it to have
 no inputs/outputs.
 
-A block with no input/output can be used in the middle of a FilterBlock (or
+The first block defined by calling the main function should have
+no sources.  The last one should have no sinks.
+
+A block with no input/output can be used in the middle of a macro function  (or
 other appropriate structure).  The constraint is that after/before block(s) 
-with no input/output, a Merge/Join is required.  These can be either
-custom or defined as a part of Split construct.
+with no input/output, a Merge/Join is required.
 
 \begin{verbatim}
+
+type Demultiplexer is Filter
+{
+  input StereoSignal rrAudio;
+  output StereoSignal audioOut;
+  Work ()
+  {
+    audioOut [0] = rrAudio [0] + rrAudio [1];
+
+    rrAudio.release (2);
+    rrAudio.advance (2);
+    audioOut.push (1);
+  }
+};
+
 type Microphone is Source
 {
-  float vol;
-  output float audio;
-  Init (float freq, float v)
+  output StereoSignal audio;
+  Init ()
+  { }
+  Work ()
   {
-    vol = v;
-    InitHardwareMic (freq);
-  }
-  Work()
-  {
-    audio [0] = vol * GetInputFromMic ();
+    audio [0] = GetValueFromMic ();
     audio.push (1);
   }
 };
 
-type Speaker is Sink
+type TapePlayer is Source 
+{ ... }
+
+type SeparateStereo
 {
-  float vol;
-  input float audio;
-  Init (float v)
+  input StereoSignal sAudio;
+  output float mAudio;
+  int left;
+  Init (int l)
   {
-    vol = v;
+    left = l;
   }
   Work ()
   {
-    SendToSpeaker (vol * audio[0]);
-  }
-};
-
-type Karaoke
-{
-  StreamID me;
-  Init (float micVol, float speakerVol)
-  {
-    // first RoundRobin is unnecesary..
-    Split (RoundRobin, RoundRobin)
+    if (left)
     {
-      Microphone left (micVol);
-      Microphone right (micVol);
+      mAudio [0] = sAudio [0].left;
+    } else {
+      mAudio [0] = sAudio [0].right;
     }
-
-    // would give strange sound effect here
-    LeftHeavySplit customSplit; 
-    Speaker left;
-    Speaker right;
-    me = this.GetID ();
-  }
-  Message(Msg volume)
-  {
-    me.Init (float (thisvolume.type));
   }
 };
 
+type Speaker is Sink
+{ ... }
+
+Karaoke ()
+{
+  Pipe
+  {
+    {
+      Microphone ();
+      TapePlayer ();
+      // merge 2 streams using RoundRobin merging
+      // note: if we specify that we want to merge 3 streams,
+      // Merge would also expect to get an input to Kareoke
+    } Merge (2, RoundRobin);
+
+    Demultiplexer ();
+    // split into 2 streams using Duplicate splitting;
+    Split (2, Duplicate)
+    {
+      Pipe
+      {
+        SeparateStereo (0); // get left audio
+        Speaker left ();
+      }
+      Pipe
+      {
+        SeparateStereo (1); // get right audio
+        Speaker right ();
+      }
+    }
+  }
+}
 \end{verbatim}
 
-\section{StreamSelect}
+\subsection{FeedbackBlock}
 
-StreamSelect allows us to switch configurations of the stream graph.
-The syntax is as follows:
+We're still looking for good syntax for feedback blocks.
 
-\begin{verbatim}
-enum AudioType { Classical, Vocal, Heavy };
-
-Init (AudioType preset, float volume)
-{
-  Microphone (1);
-  Pipe control
-  {
-    StreamSelect equalizer (preset)
-    {
-      case Classical:
-        FilterBass (0.5);
-        FilterTreble (1);
-      case Vocal:
-        // do nothing here...
-        // Vocal can be played 
-        // on speaker as is...
-      case Heavy:
-        FilterBass (1.5);
-        FilterTreble (0.75);
-    }
-    Amplifier (volume);
-  }
-  Speaker (1);
-};
-\end{verbatim}
-
-There is a restriction on parameters allowed to control StreamSelect - they
-must all be constants computable at compile time.
-
-\section{FeedbackBlock}
-
+\begin{comment}
 Some stream applications require feedback loops for data processing.
 Here we define a type that allows us to create feedback loops
 in our stream graph.
@@ -464,18 +551,23 @@ type NegFeedbackAmplifier is NegFeedbackAmp
 
 \end{verbatim}
 
+\end{comment}
 
-%\begin{figure}[t]
-%\centerline{\psfig{figure=block.ps}}
-%\vspace{-24pt}
-%\caption{\protect\small The block construct.}
-%\end{figure}
+\begin{comment}
 
-%\section{old stuff}
+\begin{figure}[t]
+\centerline{\psfig{figure=block.ps}}
+\vspace{-24pt}
+\caption{\protect\small The block construct.}
+\end{figure}
 
-%\begin{lgrind}
-%\input{code.tex}
-%\end{lgrind}
+\section{old stuff}
+
+\begin{lgrind}
+\input{code.tex}
+\end{lgrind}
+
+\end{comment}
 
 
 \end{document}
