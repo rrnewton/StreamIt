@@ -185,7 +185,7 @@ of a steady state is the total number of executions of all the
 nodes in the steady state, and is represented by $\sum_i m_i$.
 
 Next we will summarize the properties of schedules presented in
-\cite{lee87static}. Detailed proof of these properties are
+\cite{lee87static}. Detailed proofs of these properties are
 presented in \cite{karczma-thesis}.
 
 \begin{theorem}[Minimal Steady State Uniqueness]
@@ -340,17 +340,17 @@ S_{sj_0, N} \circ S_{sj_1, N} \circ \{sj_s, sj_j\}, \\
 \subsection{Initialization for Peeking}
 \label{sec:init-peeking}
 
-Consider a {\filter} $f$, with peek amount of 2 and a pop amount of
-1.  When a {\StreamIt} program is first run, there is no data
-present on any of the {{\Channels}}.  This means that for the first
-execution, filter $f$ requires that two data items be pushed onto
-its {\Input} {{\Channel}}.  After the first execution of $f$, it will
+Consider a {\filter} $f$, with $e_f = 2$ and a $o = 1$. When a
+{\StreamIt} program is first run, there is no data present on any
+of the {{\Channels}}.  This means that for the first execution,
+\filter $f$ requires that two data items be pushed onto its
+{\Input} {{\Channel}}.  After the first execution of $f$, it will
 have consumed one data item, and left at least one data item on
-its {\Input} {{\Channel}}.  Thus in order to execute $f$ for the second
-time, at most one extra data item needs to be pushed onto $f$'s
-{\Input} {{\Channel}}.  The same situation persists for all subsequent
-executions of $f$ - at most one additional data item is required
-on $f$'s {\Input} {{\Channel}} in order to execute $f$.
+its {\Input} {{\Channel}}.  Thus in order to execute $f$ for the
+second time, at most one extra data item needs to be pushed onto
+$f$'s {\Input} {{\Channel}}.  The same situation persists for all
+subsequent executions of $f$ - at most one additional data item is
+required on $f$'s {\Input} {{\Channel}} in order to execute $f$.
 
 This example illustrates that first execution of a {\filter} may
 require special treatment.  Namely, the source for {\filter}'s data
@@ -384,7 +384,7 @@ to be computed. The steady states computed above do not indicate
 the ordering of execution of the nodes, only how many times the
 nodes need to be executed.
 
-A schedule is an ordering of nodes in a {\StreamIt} streams. In
+A schedule is an ordering of nodes in a {\StreamIt} stream. In
 order to execute the schedule, we iterate through all of its nodes
 in order of appearance and execute them one by one.  For example
 in order to execute schedule $\{ABBCCBBBCC\}$ we would execute

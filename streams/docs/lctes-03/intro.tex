@@ -1,15 +1,15 @@
 \section{Introduction}
 
-Applications that are structured around some notion of a "stream"
-are becoming increasingly important and widespread.  There is
-evidence that streaming media applications are already consuming
-most of the cycles on consumer machines \cite{Rix98}, and their
-use is continuing to grow.  In the embedded domain, applications
-for hand-held computers, cell phones, and DSP's are centered
-around stream of voice or video data.  The stream abstraction is
-also fundamental to high-performance applications such as
-intelligent software routers, cell phone base stations and HDTV
-editing consoles.
+Applications structured around some notion of a ``stream'' are
+becoming increasingly important and widespread. There is evidence
+that streaming media applications are already consuming most of
+the cycles on consumer machines \cite{Rix98}, and their use is
+continuing to grow.  In the embedded domain, applications for
+hand-held computers, cell phones, and DSP's are centered around
+stream of voice or video data.  The stream abstraction is also
+fundamental to high-performance applications such as intelligent
+software routers, cell phone base stations and HDTV editing
+consoles.
 
 Despite the prevalence of these applications, there is
 surprisingly little language and compiler for practical,
@@ -85,7 +85,13 @@ grows, the amount of memory required to execute the program
 increases.  This increase comes from two sources: the schedule
 size increases, as well as amount of data needed for buffering
 increases.  These two sources are closely coupled. There exist
-tradeoffs between the schedule size and the buffer size.
+tradeoffs between the schedule size and the buffer size. The
+smallest schedules (Single Appearance schedules) may require
+buffer space which grows combinatorially with number of components
+and their declared data throughput rates. The general rule is that
+very small schedules result in very large buffering requirements.
+Similarly, very large schedules can require very little buffering
+space.
 
 \begin{comment}
 This problem is further complicated by message latency constraints
@@ -99,10 +105,22 @@ challenging task.
 This paper develops a novel technique for scheduling execution of
 {\StreamIt} programs. The technique takes advantage of structure
 of {\StreamIt} to create compact schedules. These schedules will
-be purely hierarchical in nature. The concept of a phasing
-schedule will be introduced to reduce the requirement for
-buffering data between {\filters} without overly increasing the
-size of the schedule.
+be purely hierarchical in nature. The concept of a phased schedule
+(which is also hierarchical) will be introduced to reduce the
+requirement for buffering data between {\filters} without overly
+increasing the size of the schedule. Phased scheduling is meant to
+to reduce the severity of tradeoffs the compiler needs to make
+between schedule size and buffer requirements, thus allowing
+compilation of programs to more resource constrained
+architectures. It can also help to allocate resources more
+appropriately between resources necessary for execution of the
+program and resources necessary to store data.
+
+Hierarchical schedules are also useful, because they allow for
+separate compilation of program components. This enables creation
+of standardized libraries and their distribution in binary form,
+rather than source code. This ability may become important as
+streaming languages become more widely used.
 
 \begin{comment}
 The contributions of this thesis are:

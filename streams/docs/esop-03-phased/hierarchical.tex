@@ -295,11 +295,10 @@ single appearance schedule for the {\pipeline} or {\splitjoin}. This
 means that we schedule each child of the {\pipeline} or {\splitjoin}
 exactly once.
 
-\subsubsection{Initialization Schedule}
-
-In order for a {\pipeline} or {\splitjoin} to be initialized, all
-their children must have executed their own initialization
-schedules. That means being fed at least $e_s$ data.
+\subsubsubsection{Initialization Schedule} In order for a
+{\pipeline} or {\splitjoin} to be initialized, all their children
+must have executed their own initialization schedules. That means
+being fed at least $e_s$ data.
 
 Constructing an initialization schedule for a {\pipeline} is done in
 two steps. The first step traverses all the children of the
@@ -443,8 +442,7 @@ peeked by the {\pipeline} for initialization is $e^i_p = (e^i_{p_0}
 * o_{p_0}$.
 \end{comment}
 
-\subsubsection{Steady State Schedule}
-
+\subsubsubsection{Steady State Schedule}
 \begin{comment}
 The steady state state schedule is calculated as a
 single-appearance schedule.
@@ -514,15 +512,13 @@ S_{sj} = \left\{ \left[
 \end{array}\right]\right\}
 \end{displaymath}
 
-\subsubsubsection{Initialization}
-
-In order to initialize a {\splitjoin}, all its children must execute
-their initialization schedules.  The only requirement for
-executing those schedules is that they have been provided with
-sufficient data on their {\Input} {{\Channels}}.  Since the {\splitter}
-provides data for all the children of a {\splitjoin}, it is the only
-element of a {\splitjoin} that must execute its steady state
-schedule.
+\subsubsubsection{Initialization} In order to initialize a
+{\splitjoin}, all its children must execute their initialization
+schedules.  The only requirement for executing those schedules is
+that they have been provided with sufficient data on their
+{\Input} {{\Channels}}.  Since the {\splitter} provides data for
+all the children of a {\splitjoin}, it is the only element of a
+{\splitjoin} that must execute its steady state schedule.
 
 For $k$th child of a {\splitjoin}, the {\splitter} must provide
 $e^i_{sj_k}$ data items.  One execution of the {\splitter} causes
@@ -563,12 +559,10 @@ is never executed, thus the push amount is 0.
 Thus for our example, $e^i_{sj} = u^i_{sj} = 1 * 3 = 3$ and
 $u^i_{s} = 0$.
 
-\subsubsubsection{Steady State}
-
-Similarly to the algorithm for {\pipeline}, the steady state is
-constructed by using $S_{sj,v}$ to concatenate the executions of
-the {\splitter}, all children of the {\splitjoin} and the {\joiner}
-together.
+\subsubsubsection{Steady State} Similarly to the algorithm for
+{\pipeline}, the steady state is constructed by using $S_{sj,v}$
+to concatenate the executions of the {\splitter}, all children of
+the {\splitjoin} and the {\joiner} together.
 
 For our example, the steady state schedule is simply $$T_{sj} =
 \{\{2\ split\}\{2T_A\}T_B\{2\ join\}\}$$
@@ -593,14 +587,13 @@ I_A\ I_B\}, \left[
 \subsubsection{{\feedbackloops}}
 \label{sec:sas-fl}
 
-\subsubsection{Initialization Schedule}
-
-Initialization of a {\feedbackloop} is similar to initializing a
-{\pipeline}. First the children are iterated over to find out how
-many times they need to execute to initialize the {\feedbackloop},
-and then they are iterated in reverse and their executions
-concatenated appropriately. The order of original traversal is
-loop child, {\splitter}, body child and {\joiner}. The loop child only
+\subsubsubsection{Initialization Schedule} Initialization of a
+{\feedbackloop} is similar to initializing a {\pipeline}. First
+the children are iterated over to find out how many times they
+need to execute to initialize the {\feedbackloop}, and then they
+are iterated in reverse and their executions concatenated
+appropriately. The order of original traversal is loop child,
+{\splitter}, body child and {\joiner}. The loop child only
 executes its initialization schedule, while other children may
 need to execute their steady state schedules.
 
@@ -664,14 +657,13 @@ this {{\feedbackloop}} is
 \end{array} \right\}
 \end{displaymath}
 
-\subsubsubsection{Initialization Schedule}
-
-Initialization for the {{\feedbackloop}} is calculated in a similar
-way to initialization of a {\pipeline}.  The number of steady
-state executions of the children of the {{\feedbackloop}} is denoted
-$l_B$ and $l_L$ for the body child and the loop child,
-respectively. The number of executions of the {\splitter} is
-denoted $l_s$ and the {\joiner} is denoted $l_j$.
+\subsubsubsection{Initialization Schedule} Initialization for the
+{{\feedbackloop}} is calculated in a similar way to initialization
+of a {\pipeline}.  The number of steady state executions of the
+children of the {{\feedbackloop}} is denoted $l_B$ and $l_L$ for
+the body child and the loop child, respectively. The number of
+executions of the {\splitter} is denoted $l_s$ and the {\joiner}
+is denoted $l_j$.
 
 Since the initial data is inserted into the buffer between the
 loop child and the {\joiner} (as explained in \ref{sec:explain-fl}),
@@ -759,11 +751,10 @@ out^i_L = & delay_{fl} + u^i_{fl_L} + l_L * u_{fl_L} - l_j * w_{j,1} \\
 \end{displaymath}
 \end{comment}
 
-\subsubsection{Steady State Schedule}
-
-Computing the steady state schedule for a {{\feedbackloop}} is more
-complicated than for the other streams.  The reason for this is
-that {{\feedbackloops}} may require a non single-appearance schedule
+\subsubsubsection{Steady State Schedule} Computing the steady
+state schedule for a {{\feedbackloop}} is more complicated than
+for the other streams.  The reason for this is that
+{{\feedbackloops}} may require a non single-appearance schedule
 due to small $delay_{fl}$ value, while other {\StreamIt} construct
 can always be scheduled using single-appearance schedules.
 

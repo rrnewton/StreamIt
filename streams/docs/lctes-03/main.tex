@@ -49,8 +49,8 @@ Laboratory for Computer Science \\
 \vspace{0.1in}
 
 \begin{abstract}
-Applications that are structured around some notion of a "stream"
-are becoming increasingly important and widespread. \cite{Rix98}
+Applications structured around some notion of a "stream" are
+becoming increasingly important and widespread. \cite{Rix98}
 provides evidence that streaming media applications are already
 consuming most of the cycles on consumer machines, and their use
 is continuing to grow. The streaming computation model is
@@ -64,11 +64,11 @@ properties, such as programs written in {\StreamIt}. {\StreamIt}
 programs consist of a number of Streams, which are single-input,
 single-output constructs. Streams are constructed from smaller
 Streams using hierarchical components, called {\pipeline},
-{\splitjoin} and {\feedbackloop}, all of which are Streams themselves.
-The smallest computational element of a {\StreamIt} program is a
-{\filter}. {\StreamIt} uses a static rate computational model, meaning
-that every {\filters} rate of consumption and production of data is
-known at compile time.
+{\splitjoin} and {\feedbackloop}, all of which are Streams
+themselves. The smallest computational element of a {\StreamIt}
+program is a {\filter}. {\StreamIt} uses a static rate
+computational model, meaning that every {\filter}'s rate of
+consumption and production of data is known at compile time.
 %
 The technique presented here focuses on producing schedules that
 are optimized for the amount of space required for buffering and
