@@ -12,7 +12,7 @@
 
 \noindent
 This is for the May 28, 2003 snapshot release (streamit-0.0.20030528).\\
-\verb|$Id: options.tex.in,v 1.4 2003-09-22 19:31:21 dmaze Exp $|
+\verb|$Id: options.tex.in,v 1.5 2003-09-22 19:40:40 dmaze Exp $|
 
 \section*{Basic Usage}
 
@@ -97,6 +97,18 @@ float->float filter ScaleBySquare(float v) {
       When performing linear replacement or frequency replacement, do
       not collapse adjacent linear filters into a single filter; only
       operate on individual filters.
+
+\item[-{}-destroyfieldarray]
+  Break down arrays in structures to their component elements.
+
+\begin{verbatim}
+struct OriginalStruct {
+  float[2] p;
+}
+struct DestroyedStruct {
+  float p1, p2;
+}
+\end{verbatim}
 
 \item[-O1]
   Perform basic optimizations that should improve performance in most
