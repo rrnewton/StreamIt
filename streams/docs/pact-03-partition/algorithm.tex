@@ -96,7 +96,7 @@ endif
 // try making vertical cut (in case s is a splitjoin)
 int min = infinity
 for xPivot = x1 to x2 - 1
-  for nPivot = 0 to n-1
+  for nPivot = 1 to n-1
     int cost = max(getContCost(s, x1, xPivot, y1, y2, nPivot),
                    getContCost(s, xPivot+1, x2, y1, y2, n-nPivot));
     if (cost < min)
@@ -107,7 +107,7 @@ endfor
 
 // try making horizontal cut (for splitjoin, pipeline, feedbackloop)
 for yPivot = y1 to y2 - 1
-  for nPivot = 0 to n-1
+  for nPivot = 1 to n-1
     int cost = max(getContCost(s, x1, x2, y1, yPivot, nPivot),
                    getContCost(s, x1, x2, yPivot+1, y2, n-nPivot));
     if (cost < min)
@@ -177,7 +177,7 @@ endfor
 
 // try making horizontal cut (for splitjoin, pipeline, feedbackloop)
 for yPivot = y1 to y2 - 1
-  for nPivot = 0 to n-1
+  for nPivot = 1 to n-1
     int cost = max(getContCost(s, x1, x2, y1, yPivot, nPivot),
                    getContCost(s, x1, x2, yPivot+1, y2, n-nPivot));
     if (cost==A[x1][x2][y1][y2][n]) {

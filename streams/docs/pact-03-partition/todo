@@ -1,3 +1,12 @@
+* need to add a horizontal cut mechanism for Pipelines
+
+- extending non-rectangular splitjoins with identities to make them
+rectangular
+
+- think about application to feedbackloops
+
+--------------------------------------------------------------
+
 paper:
 
 - add 2-stage filters to the fission descriptions?
@@ -33,8 +42,6 @@ order.)  But I guess our framework doesn't support this.
 - how to deal with gordo's new joiner elimination stuff
 
 implementation:
-
- * estimate number gathering
 
  - 2D partitioning
  - 2-stage pipeline fusion (Jasper)  (vocoder/nokia waiting on it)
@@ -74,5 +81,3 @@ bugs:
 * on bitonic sort with --raw 4, partitioner is off-by-one.
 
 - blocked matrix multiply causes deadlock when fission is turned on
-
-

@@ -1,3 +1,9 @@
+* another thing you could do with partitioner: try to minimize
+communication in some way, e.g. by making the cuts where the
+communication is the lowest.
+
+-----
+
 - vertical fission
 
   - what would you need to add to model for vertical filter fission to
@@ -185,29 +191,4 @@ directions from Andrew:
   getCost() method, which returns a LinearCost object, which simply
   contains the number of adds and the number of multiplies that are
   necessary to directly implement the vector-matrix multiplication.
-
-changes I'd like to make to CVS:
---------------------------------
-
-- remove streams/scheduler directory (empty)
-- remove streams/library/java/streamit/scheduler directory (empty)
-- remove streams/misc/java directory (empty)
-- remove streams/router directory (gleb has his own copy)
-- remove streams/click directory (gleb has his own copy)
-- make streams/compiler/3rdparty directory to hold compiler/{gnu, java_cup, JFlex, lpsolve}
-- move streams/compiler/kopi/3rdparty/cplex into compiler/3rdparty
-  - adjust classpath to use cplex.jar in case we ever have to
-- remove streams/compiler/frontend, as I don't think it's being used
-- remove streams/compiler/kopi, retaining start-cplex-server under streams/compiler
-- there are some OLD example programs in streams/library.  Move these into
-  apps/tests if they compile or apps/old/orig otherwise
-
-- update the README and README.source in the streams directory
-
-- for someone else to do:
--  add a README or some documentation to streams/misc/c/ regarding file2raw.cpp
-   (does this just translate a binary, e.g. compiled with gcc, to run on raw?
-   what do you need to do before and after for it to run on raw?)
-
-
 
