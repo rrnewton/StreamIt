@@ -1,7 +1,7 @@
 \documentclass[twocolumn, draft]{article}
 \usepackage{psfig, wide, verbatim}
-\title{StreaMIT Language Description \\ Version 0.0.5}
-\author{Insomniac Streams Anonymous}
+\title{StreaMIT Intermediate Representation \\ Version 0.0.6}
+\author{Perl Monkeys Inc.}
 
 
 \begin{document}
@@ -14,27 +14,93 @@ All of these blocks are put together to form a graph, which can be drawn
 on a 2D surface with no intersections.  The graph is almost a DAG, except
 we allow feedback loops in arrangement of filters.
 
-All blocks can be aggregated into larger superblocks:  Pipes, StreamSelects,
-and SplitJoins.  The arrangement of these superblocks and
-Filters is created in our scripting language.
+The layout of the filters is defined using a scripting language.  The scripting
+language allows us to collect filters into structures such as Pipe,
+StreamSelect, FeedbackLoop, SplitJoin and FilterBlock.  FilterBlock and 
+SplitJoin are two constructs which work together to allow us to dynamically
+change the flow of the stream.
 
-Every Filter can send and receive messages through MessagePipes.  A filter 
-can accept a MessagePipe in its Init function.  It can then bind itself
-to this pipe as a receiver.  This allows us to set up a one-one,
-one-many, many-one and many-many communication between filters.
+Any FilterBlock can have its reference taken.  This reference can be passed
+around, to functions and filters.  Filters can in turn send messages to
+the reference and/or change its dynamic parameters.  Messages get delivered
+from the top to the bottom (a filter will receive its message once its
+predecessors have received this message).
 
-There is another construct, ResetWire, for triggering reinitalization of 
-filters/superblocks (through calling a function of the scripting language).
+\section{Script Type Modifier and Control Constructs}
 
-\section{Filters}
-A new filter class is defined as follows:
+In order to allow the programmer to express the difference between
+script variables and dynamic variables, we introduce a new type modifier
+and control constructs.  The purpose of script types is to allow the compiler
+to figure out the exact flow of the streams.  Values of script variables
+can be determined at compile time.
+
+\subsection{Script Types}
+
+A script type is also called a script type (to differentiate from C static
+variables).  A script type can only be assigned a constant value, and can
+only be modified within script control constructs.
 
 \begin{verbatim}
-class FooType is Filter
+script int foo;
+foo = 42;
+\end{verbatim}
+
+\subsection{Script Control Constructs}
+
+A script control construct is a control construct that operates only on
+script and constant (textually, as in '3') values.  Otherwise these
+control constructs behave exactly as regular C constrcuts.  Their names
+are same as their C equivalents, except we add an 's' in front of all
+script constructs ('s' as in script).
+
+\begin{verbatim}
+script int foo;
+foo = 42;
+int bar;
+bar = 13;
+sif (foo == 3) // legal
+{ }
+sif (bar == 17) // illegal
+{ }
+\end{verbatim}
+
+Script control constructs are only allowed at the top level of a
+script function or inside other script constructs:
+
+\begin{verbatim}
+sif (foo > 3)
+  sif (foo < 10) // legal
+    { }
+
+if (foo < 3)
+  sif (foo < 10) // illegal
+    { }
+\end{verbatim}
+
+Regular C constructs are allowed to use script variables, as if they were
+just regular C variables.
+
+
+\section{Filters}
+A new filter type is defined as follows:
+
+\begin{verbatim}
+Filter FooType<script params> (dynamic params)
 {
 // insert data/functions here
 };
 \end{verbatim}
+
+\subsection{Parameters}
+
+Upon instantiation, a filter can receive some parameters.  There are two
+types of parameters:  script and dynamic.
+
+Both types of parameters behave just like const parameters passed to a C 
+function.  They can be copied to other variables, but cannot be modified
+themselves.  The difference between them is that script parameters are
+guaranteed to remain unchanged across multiple initializations of the
+filter, while the dynamic variables are free to change between initializations.
 
 \subsection{Input/Output}
 
@@ -51,13 +117,13 @@ Most of the work done by a filter is described in a Work function:
 \begin{verbatim}
 Work ()
 {
-  // essentially a low pass filter:
-  fooOutput [0] = fooInput [0] + fooInput [-1];
+  fooOutput [0] = fooInput [0] + fooInput [1];
 }
 \end{verbatim}
 
 Work accepts no parameters.  It is allowed to send messages.  It is also
-allowed to re-initialize other blocks.
+allowed to re-initialize other blocks, using stored references to
+FilterBlocks.
 Input/output
 is accessed as an array.  For input, element 0 is first new element of input,
 element 1 is second new element of input, etc.  Element -1 is the first seen
@@ -65,90 +131,59 @@ element of input.
 
 \subsection{Init}
 
-When a new filter is being constructed, a constructor (called Init) is called.
-This constructor has a chance to initialize the filter with some initial
-data (passed as arguments):
+When a filter is being initialized or reinitialized, a constructor 
+(called Init) is called.  This constructor has a chance to initialize 
+the filter with some initial data (passed as arguments to the filter).
+Init does not accept any parameters of its own.
+
+Because of the difference between the script and dynamic parameters,
+we may want to preserve some of the properties of the script variables.
+We have added a 'script' modifier to indicate that a given variable's
+value is purely a function of script variables.  We also add new control
+flow constructs (identical to C's constructs in function) for the same purpose.
+These are explained later.
+
+All distinctions between script and dynamic parameters and variables
+are done in order to help the programmer to be expressive in choice of
+constructs.
 
 \begin{verbatim}
-class FooClass is Filter
+Filter FooType<script FilterRef p> (float a)
 {
+  script FilterRef parent;
   float amplification;
-  Init (float a)
+  Init ()
   {
+    parent = p;
     amplification = a;
   }
 };
 \end{verbatim}
 
-Init is allowed to send messages and push data into output blocks,
-but is not allowed to read inputs or switch StreamSelects (described later).
+Init is not allowed to send messages or initialize other blocks.
 
 \subsection{Message}
 
 Each filter is allowed to receive messages:
 
 \begin{verbatim}
-MessageHandler (Msg fooMsg)
+ReceiveMessage (MyMsgType fooMsg)
 {
 // .. handle msg here
 }
 \end{verbatim}
 
-A message is defined as follows:
+MyMsgType is a custom type defined by the user (obviously it does not need
+to be called MyMsgType).  A message is sent by calling a function on a
+FilterRef.  Every Filter lying underneath the FilterBlock and containing
+a function with an appropriate name will be called.  The function called
+must accept at most one parameter, and the parameters received and passed
+must match in type.
 
-\begin{verbatim}
-struct Msg
-{
-  int length;
-  void *data;
-};
-\end{verbatim}
-
-Message handlers are allowed to send other messages and/or reinitialize blocks.
-Message handlers are not allowed to read stream input but they are allowed
-to output to a stream.
-Initialization of a filter causes this filter's message queue to be emptied.
-
-In order to sign up for receiving messages, a Filter needs to bind a
-handler function to a MessagePipe.
-
-\begin{verbatim}
-class FooFilter is Filter
-{
-  Init (MessagePipe pipe)
-  {
-    BindReceiver (MessageHandler, pipe);
-  }
-  MessageHandler(Msg x)
-  {
-  }
-
-};
-\end{verbatim}
-
-Similarly, to sign up for sending messages, a Filter needs to store the
-MessagePipe and send a message to it.
-
-\begin{verbatim}
-class BarFilter is Filter
-{
-  MessagePipe myPipe;
-  Init (MessagePipe pipe)
-  {
-    mypipe = pipe;
-  }
-  Work ()
-  {
-    ...
-    SendMessage (myPipe, msg);
-    ...
-  }
-}
-\end{verbatim}
+The function being called is allowed to send other messages and/or reinitialize
+FilterBlocks.  It is not allowed to read stream input/output.
 
 \section{Scripting Language}
-
-\subsection{Intro}
 
 The scripting language is designed to allow for easy arrangement of 
 filter structures.  The scripting language is procedural;  when a filter
@@ -156,21 +191,19 @@ variable is defined, it is considered inserted into the filter graph.
 We define splits and joins that allow us to separate a stream into multiple
 streams and then join them back together.
 
-\subsection{Functions}
+\subsection{Script Functions}
 
 The script language is arranged into functions.  Calling a function is
 equivalent to copying the function's body.  Thus the filter structure 
 represented by the function will be placed at the point of the function
-call.  Functions do not return values.  All of their parameters must
-be constant (dependent only on their own parameters) to allow the compiler 
-to determine the correct configuration of a given stream.
+call.  Functions do not return values.
 
-Functions are allowed to perform their own computation, but none of the
-filters and/or other filter control sturctures may lay on paths that are
-dependent on parameter inputs.  StreamSelect (described later) is used
-for determining the particular structure of a stream graph.
+Just like Filters, functions accept two types of parameters, script
+and dynamic.  All of the rules for filter Init functions apply to the
+scripting functions.
 
-The begining of the structure is described in the main function.
+The begining of the filter structure is described in the 'main' function.
+This function accepts no script or dynamic parameters.
 
 \begin{verbatim}
 main ()
@@ -179,44 +212,69 @@ main ()
 }
 \end{verbatim}
 
-In the example above, RockNRoll is a constant, probably defined through
-an enum.
-
-\subsection{Pipe}
-
-Pipe is used for aggregating several filters together in a serial connection.
+The above function calls the FMRadio function with some parameters.
+Here is a possible body of FMRadio:
 
 \begin{verbatim}
-FMRadio (float fmFreq, MusicType mType, float loudness)
+FMRadio (float fmFreq,
+         MusicType mType,
+         float amp)
 {
-  Pipe
-  {
-    FMRadioSource (fmFreq);
-    Equalizer (mType);
-    Amplifier (loudness);
-    Speaker ();
-  }
+  FilterRef ampRef;
+  FMRadioSource (fmFreq);
+  Equalizer<ampRef, RadioSettings> (mType);
+  Amplifier<ampRef> (loudness);
+  Speaker ();
 }
 \end{verbatim}
 
-All filters and/or function calls have to accept a single input and result
-in a single output (except for sources and sinks, described below).
-All inputs/outputs are type-checked to make sure that
-all types agree.
+Here the Equalizer filter accepts not only the music type to be played
+(which is passed as a dynamic parameter, as it can potentially be
+changed when the user flips a switch on the real radio), but also
+a script parameter, which tells it that it will be processing a radio
+signal.  This can describe the frequency of the signal passing through,
+relative amplitude of the signal and other signal properties.
 
-\subsection{Split}
+\subsection{Pipe}
+
+The above FMRadio function aggregates four filters into one.  While this is
+useful, we define another construct to do essentially the same thing.
+This new construct will
+allow us to aggregate an arbitrary serial connection of fileters/blocks.
+This construct will be very useful when dealing with SplitJoins, 
+and other, more complex constructs:
+
+\begin{verbatim}
+BandPassFilter<script float amp, 
+               script float fLow, 
+               script float fHigh> ()
+{
+  Pipe
+  {
+    LowPass lowPassFilter (fLow);
+    HighPass highPassFilter (fHigh);
+  } 
+  Amplifier amplifier (amp);
+}
+\end{verbatim}
+
+Pipe allows us only to connect single input/single output blocks.
+
+\subsection{SplitJoin}
 
 In order to allow for splitting of single streams into multiples,
 we define a SplitJoin construct:
 
 \begin{verbatim}
-Equalizer (MusicType mType)
+Equalizer<script FileterRef filterRef,
+          script SourceType sType>
+          (MusicType mType)
 {
   SplitJoin
   {
     RoundRobin;
-    LeftAudioEqualizer leftAudio;
-    RightAudioEqualizer rightAudio;
+    AudioEqualizer<filterRef, sType> leftAudio (mType);
+    AudioEqualizer<filterRef, sType> rightAudio (mType);
     RoundRobin;
   }
 }
@@ -245,11 +303,21 @@ SplitJoin
 The number of weights listed in the WeighterRoundRobin definition must
 match the number of filters providied in the SplitJoin.
 
-\subsection{StreamSelect}
+\subsection{StreamSelect and FilterBlock}
 
-StreamSelect allows us to switch configurations of the stream graph.
-We define a StreamSelectSwitch, which can be activated by Work and message
-handler functions of Filters. 
+StreamSelect allows us to dynamically change the configuration
+of the stream graph.  This is done through reinitialization of 
+a part of the streams.  We define a FilterBlock construct, which
+is essentially an object, which can have a reference taken.
+A reference to a FilterBlock is of type FilterRef.  FilterRef behaves similarly
+to a C++ reference, except that it can be assigned a value after it's been
+declared (though each FilterRef must be assigned exactly one value).
+A FilterBlock puts up a scope wall between it and the function it
+resides in.  The only way to pass it parameters is through the
+script and dynamic parameters, which are set up identically to
+those of a function.
+
+FilterBlock is also used for sending messages to a block of Filters.
 
 \begin{verbatim}
 enum MusicType {
@@ -258,33 +326,41 @@ enum MusicType {
   HeavyMetal
 }
 
-
+AudioEqualizer<script FilterRef blockRef,
+               script SourceType sType>
+          (MusicType mType)
 {
-  StreamSelectSwitch switch;
-  StreamSelectSwitch (mType) = switch
+  FilterBlock<script SourceType sType>
+          (Musictype mType)
   {
-     case Vocal:
-       // Vocal music sounds good without 
-       // any modifications,
-       // so don't do anything
-     case RockNRoll:
-       // want to amplify bass and treble
-       LowPassFilter (0.5); // amplify
-       HighPassFilter (0.5);
-     case HeavyMetal:
-       // only amplify the base
-       LowPassFilter (0.5);
+    blockRef = StreamSelect (mType)
+    {
+      case Vocal:
+        // Vocal music sounds good without 
+        // any modifications,
+        // so don't do anything
+      case RockNRoll:
+        // want to amplify bass and treble
+        LowPassFilter (0.5); // amplify
+        HighPassFilter (0.5);
+      case HeavyMetal:
+        // only amplify the base
+        LowPassFilter (0.5);
+    }
   }
 }
+\end{verbatim}
 
-class VoiceControl is Filter
+Here is a filter that might send a message to the FilterBlock in 
+the AudioEqualizer:
+
+\begin{verbatim}
+Filter VoiceControl<script FilterRef voiceBlock>
 {
-  StreamSelectSwitch switch;
-  Init (StreamSelectSwitch musicSwitch, 
-        MessagePipe voiceMsgPipe)
+  script FilterRef vBlock;
+  Init ()
   {
-    switch = musicSwitch;
-    BindReceiver (VoiceMsgHandler, voiceMsgPipe);
+    vBlock = voiceBlock;
   }
   // on some message, switch to Vocal music:
   VoiceMsgHandler (Msg msg)
@@ -292,14 +368,10 @@ class VoiceControl is Filter
     // process the msg
     ..
     // and switch
-    switch.Set (Vocal);
+    voiceBlock.Reset (Vocal);
   }
 }
 \end{verbatim}
-
-Note, that parameter to the Set function of StreamSelectSwitch must be
-a constant.  As a result the compiler can analyze possible combinations
-of the stream and initialize them all.
 
 \subsection{Sources/Sinks}
 
@@ -317,8 +389,7 @@ other appropriate structure).  The constraint is that after/before block(s)
 with no input/output, a Split/Join is required.
 
 \begin{verbatim}
-
-class Demultiplexer is Filter
+Filter Demultiplexer
 {
   input StereoSignal rrAudio;
   output StereoSignal audioOut;
@@ -328,7 +399,7 @@ class Demultiplexer is Filter
   }
 };
 
-class Microphone is Source
+Source Microphone
 {
   output StereoSignal audio;
   Init ()
@@ -339,18 +410,15 @@ class Microphone is Source
   }
 };
 
-class TapePlayer is Source 
+Source TapePlayer 
 { ... }
 
-class SeparateStereo is Filter
+Filter<script int left> SeparateStereo
 {
   input StereoSignal sAudio;
   output float mAudio;
-  int left;
-  Init (int l)
-  {
-    left = l;
-  }
+  Init ()
+  { }
   Work ()
   {
     if (left)
@@ -362,38 +430,35 @@ class SeparateStereo is Filter
   }
 };
 
-class Speaker is Sink
+Sink Speaker
 { ... }
 
 Karaoke ()
 {
-  Pipe
   {
-    {
-      Microphone ();
-      TapePlayer ();
-      // merge 2 streams using RoundRobin
-      // merging.  Note: if we specify that
-      // we want to merge 3 streams, Join
-      // would also expect to get an input
-      // to Kareoke
-    } Join (2, RoundRobin);
+    Microphone ();
+    TapePlayer ();
+    // merge 2 streams using RoundRobin
+    // merging.  Note: if we specify that
+    // we want to merge 3 streams, Join
+    // would also expect to get an input
+    // to Kareoke
+  } Join (2, RoundRobin);
 
-    Demultiplexer ();
-    // split into 2 streams using Duplicate
-    // splitting;
-    Split (2, Duplicate)
+  Demultiplexer ();
+  // split into 2 streams using Duplicate
+  // splitting;
+  Split (2, Duplicate)
+  {
+    Pipe
     {
-      Pipe
-      {
-        SeparateStereo (0); // get left audio
-        Speaker left ();
-      }
-      Pipe
-      {
-        SeparateStereo (1); // get right audio
-        Speaker right ();
-      }
+      SeparateStereo<0> (); // get left audio
+      Speaker left ();
+    }
+    Pipe
+    {
+      SeparateStereo<1> (); // get right audio
+      Speaker right ();
     }
   }
 }
@@ -413,13 +478,12 @@ Since the first filter in a FeedbackLoop accepts
 two inputs, this filter must be of FeedbackFilter type.
 
 \begin{verbatim}
-class NegFeedbackAmplifierFilter is FeedbackFilter
+FeedbackFilter NegFeedbackAmplifierFilter
+        (float amp, float gain)
 {
   input float audioIn;
   feedbackinput float feedback;
   output float audioOut;
-  float ampGain;
-  float amplification;
   Work ()
   {
     // this basically implements a negative feedback
@@ -428,20 +492,14 @@ class NegFeedbackAmplifierFilter is FeedbackFilter
     float in = audioIn [0];
     float out = feedback [0];
     float negFeed = in + 
-      (in + out) / (-amplification + 1);
-    float result = - negFeed * ampGain;
+      (in + out) / (amp + 1);
+    float result = - negFeed * gain;
     audioOut [0] = result;
   }
-
-  // note: here a is the POSITIVE amplification
-  Init (float a, float gain)
-  {
-    ampGain = gain;
-    amplification = -a;
-  }
+  Init () { }
 };
 
-class NegFeedbackBuffer is Filter
+Filter NegFeedbackBuffer<int delay>
 {
   input float in;
   output float out;
@@ -450,9 +508,9 @@ class NegFeedbackBuffer is Filter
     in [0] = out [0];
   }
 
-  Init (int delay)
+  Init ()
   {
-    for (int i = 0; i < delay; i++)
+    sfor (static int i = 0; i < delay; i++)
     {
       out [i] = 0;
     }
@@ -464,12 +522,14 @@ NegFeedbackAmplifier ()
   FeedbackLoop
   {
     NegFeedbackAmplifierFilter (10, 1000);
-    FeedbackPath NegFeedbackFilter (2);
+    FeedbackPath NegFeedbackFilter<2>;
   }
 }
 \end{verbatim}
 
+\begin{comment}
 \include{grammar}
+\end{comment}
 
 \begin{comment}
 
@@ -486,7 +546,6 @@ NegFeedbackAmplifier ()
 \end{lgrind}
 
 \end{comment}
-
 
 \end{document}
 
