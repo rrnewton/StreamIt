@@ -385,15 +385,6 @@ is the case, then the pop rates must be equivalent for all the
 expanded streams; otherwise, some outputs of the splitter would
 accumulate infinitely on the input channel of some stream.
 
-\begin{figure}[t]
-\center
-\epsfxsize=2.2in
-\epsfbox{images/example-splitjoin-combination.eps}
-\caption{Splitjoin combination example.}
-\protect\label{fig:example-splitjoin-combination}
-\vspace{-28pt}
-\end{figure}
-
 These input and output rates,in combination with the values of $A'$
 and $\vec{b}'$define a linear node that exactly represents the
 parallel combination of child nodes that are fed by a duplicate
@@ -469,6 +460,15 @@ items, which is the number of items processed in one cycle of the
 roundrobin joiner.  Those items intended for stream $i$ are copied
 with a coefficient of $1$, while all others are eliminated with a
 coefficient of $0$.
+
+\begin{figure}[t]
+\center
+\epsfxsize=2.2in
+\epsfbox{images/example-splitjoin-combination.eps}
+\caption{Splitjoin combination example.}
+\protect\label{fig:example-splitjoin-combination}
+\vspace{-12pt}
+\end{figure}
 
 %% \begin{figure}
 %% \center
