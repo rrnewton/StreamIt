@@ -44,7 +44,7 @@ can enable novel high-level DSP optimizations that would otherwise be
 intractable in a general-purpose language.  Our source language is
 StreamIt, which is specifically designed for high-performance signal
 processing applications~\cite{streamit-asplos,streamitcc}; our
-analysis focusses on filters that are {\it linear}.  StreamIt is
+analysis focuses on filters that are {\it linear}.  StreamIt is
 distinguished from a general purpose language in that it makes
 explicit the large-scale parallelism and regular communication
 patterns that are characteristic of streaming programs.  By analyzing
@@ -75,7 +75,7 @@ linear nodes.
 
 \item An implementation of the above techniques in the StreamIt
 compiler that automatically improves performance by a factor of
-\todo{Add performance result}
+five on average and $6.5$ in the best cast.
 
 \end{itemize}
 
@@ -231,7 +231,7 @@ output.
 
 Figure~\ref{fig:example-streamit} shows the same filtering process
 implemented in StreamIt. The StreamIt version is more abstract than
-the C version.  It indicates the communcation pattern between filters;
+the C version.  It indicates the communication pattern between filters;
 it shows the structure of the original block diagram; and it leaves
 the complexities of buffer management and scheduling to the compiler.
 

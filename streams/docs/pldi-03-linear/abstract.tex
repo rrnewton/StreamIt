@@ -1,6 +1,6 @@
 As DSP programming is becoming more complex, there is an increasing
 need for high-level abstractions that can be efficiently compiled.
-Towards this end, we present a set of aggressive optimizations that
+Toward this end, we present a set of aggressive optimizations that
 target linear sections of a stream program.  Our input language is
 StreamIt, which represents programs as a hierarchical graph of
 autonomous filters.  A filter is linear if each of its outputs can be
@@ -17,6 +17,6 @@ automatically translating linear nodes into the frequency domain,
 thereby yielding algorithmic savings for convolutional filters.
 
 We have completed a fully-automatic implementation of the above
-techniques as part of the StreamIt compiler.  \todo{Performance
-number.}
+techniques as part of the StreamIt compiler and we demonstrate
+a factor of five improvement in execution time on average.
 
