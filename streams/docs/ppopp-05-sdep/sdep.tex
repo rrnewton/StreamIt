@@ -32,8 +32,9 @@ every execution step, they can distribute their output to any one of
 their children. For example, actor $A$ writes the output of its first
 execution to its left child ($C$), and the output of its second
 execution to its right child ($D$). This type of a splitter is a
-round-robin splitter with one I/O rate per output edge. A duplicate
-splitter is also possible but is not illustrated. A counterpart to splitters
+round-robin splitter with one I/O rate per output edge. 
+%A duplicate splitter is also possible but is not illustrated. 
+A counterpart to splitters
 are the joiners which have multiple input channels but only one output
 channel. The joiner assembles the data from their predecessors
 in a round-robin manner. In Figure~\ref{fig:sdep-rates}, actor $E$ is
@@ -96,7 +97,10 @@ Figure~\ref{fig:sdep-rates} appears in Figure~\ref{fig:sdep1}.
 \begin{center}
 \psfig{figure=sdep-example-rates3.eps,height=1.5in}
 \caption{{\small Example stream graph. Nodes are annotated with their
-I/O rates; nodes A and E have two phases. \protect\label{fig:sdep-rates}}}
+I/O rates. Nodes A and E have two phases; for example, the annotation
+``1, 0'' on the left output channel of A indicates that 1 item is
+produced during phase 1, and 0 items are produced during phase 2.
+\protect\label{fig:sdep-rates}}}
 \end{center}
 \vspace{-12pt}
 \end{figure}
