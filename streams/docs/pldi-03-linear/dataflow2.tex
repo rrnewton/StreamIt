@@ -1,9 +1,33 @@
+\begin{algorithm}[t]
+\caption{Linear extraction analysis.\protect\label{alg:dataflow}}
+proc {\bf Toplevel}(filter $F$) returns linear node for $F$
+\begin{enumerate}
+\item Set globals Peek, Pop, Push to I/O rates of filter $F$.
+\item Let $A_{0} \leftarrow \mbox{new float[Peek, Push] with each entry =~} \bot$
+\item Let ${\vec b_{0}} \leftarrow \mbox{new float[Push] with each entry =~} \bot$
+\item $(\mt{map}, A, {\vec b}, \mt{popcount}, \mt{pushcount}) \leftarrow$ \\
+\verb+      +{\bf Extract}$(F_{work}, (\lambda x . \bot), A_{0}, {\vec b_{0}}, 0, 0)$
+\item {\bf if} $A$ and ${\vec b}$ contain no $\top$ or $\bot$ entries {\bf then} \\
+\verb+ + return linear node $\lambda = \{A, {\vec b}, \mbox{Peek}, \mbox{Pop}, \mbox{Push}\}$ \\
+ {\bf else} \\
+\verb+ + {\it fail} \\
+ {\bf endif}
+\end{enumerate}
+proc {\bf BuildCoeff}(int $pos$) returns $\vec v$ for peek at index $pos$ \\ \vspace{-12pt}
+\begin{algorithmic}
+\STATE $\vec{v} = \vec{0}$
+\STATE $\vec{v}[\mbox{Peek}-1-\mt{pos}] = 1$
+\STATE return $\vec{v}$
+\end{algorithmic}
+\end{algorithm}
+
 \newcommand{\la}{$\leftarrow$}
 \newcommand{\IND}{\begin{ALC@g}}
 \newcommand{\UND}{\end{ALC@g}}
 \newcommand{\tup}[2]{\langle{#1}, {#2}\rangle}
 
 \begin{figure}[t]
+\vspace{-12pt}
 \begin{equation} \nonumber
 \begin{array}{rcl}
 y & \in & \mbox{program-variable} \\
@@ -30,117 +54,6 @@ code & \in & \mbox{list of instructions, each of which can be:} \\
 \vspace{-14pt}
 \end{figure}
 
-\section{Linear Extraction Algorithm}
-\label{sec:dataflow}
-
-Our linear extraction algorithm can identify a linear filter and
-construct a linear node $\lambda$ that fully captures its behavior.
-The technique, which appears as Algorithm~\ref{alg:dataflow} on the
-next page, is a flow-sensitive, forward dataflow analysis similar to
-constant propagation.  Unlike a standard dataflow analysis, we can
-afford to symbolically execute all loop iterations, since most loops
-within a filter's work function have small bounds that are known at
-compile time (if a bound is statically unresolvable, the filter is
-unlikely to be linear and we disregard it).
-
-During symbolic execution, the algorithm computes the following for
-each point of the program (refer to Figure~\ref{fig:types} for
-notation):
-\begin{itemize}
-
-\vspace{-6pt}
-\item A $\mt{map}$ between each program variable $y$ and a linear form
-$\tup{\vec{v}}{c}$ where $\vec{v}[0 \cdots Peek]$ is a column vector 
-and $c$ is a scalar constant. In an actual execution, the value of $y$ would
-be given by $y = \vec{v} \cdot \vec{x} + c$, where $\vec{x}$ 
-represents the input items.
-\vspace{-6pt}
-
-\item Matrix $A$ and vector $\vec b$, which will represent the linear node.
-These values are constructed during the operation of the algorithm.
-\vspace{-6pt}
-
-\item $\mt{pushcount}$, which indicates how many items have been
-pushed so far.  This is used to determine which column of $A$ and
-$\vec{b}$ correspond to a given push statement.
-\vspace{-6pt}
-
-\item $\mt{popcount}$, which indicates how many items have been popped
-so far.  This is used to determine the row in $\vec{v}$ that a 
-given peek or pop expression refers to.
-\vspace{-6pt}
-
-\end{itemize}
-
-We now briefly discuss the operation of {\bf Extract} at each program
-node.  The algorithm is formulated in terms of a simplified set of
-instructions, which appear in Figure~\ref{fig:types}.  First are the
-nodes that generate fresh linear forms.  A constant assignment $y = c$
-creates a form $\tup{\vec 0}{c}$ for $y$, since $y$ has constant part
-$c$ and does not yet depend on the input.  A pop operation
-creates a form $\tup{\mbox{\bf BuildCoeff}(\mt{popcount})}{0}$, where
-{\bf BuildCoeff} introduces a coefficient of $1$ for the current index
-on the input stream.  A peek$(i)$ operation is similar, but
-offset by the index $i$.
-
-Next are the instructions which combine linear forms.  In the case of
-addition or subtraction, we simply add the components of the linear
-forms.  In the case of multiplication, the result is still a linear
-form if either of the terms is a known constant ({\it e.g.}
-$\vec{v}=\vec{0}$).  For division, the result is linear only if the
-divisor is a non-zero constant\footnote{{\small Note that if the
-dividend is zero and the divisor has a non-zero coefficients vector,
-we cannot conclude that the result is zero, since certain runtime
-inputs might cause a singularity.}} and for non-linear operations ({\it
-e.g.,} bit-level and boolean), both operands must be known constants.
-If any of these conditions are not met, then the LHS is assigned a
-value of $\top$, which will mark the filter as non-linear if the value
-is ever pushed.
-
-The final set of instructions deal with control flow.  For loops, we
-resolve the bounds at compile time and execute the body an appropriate
-number of times.  For branches, we have to ensure that all the linear
-state is modified consistently on both sides of the branch.  For this
-we apply the confluence operator $\sqcup$, which we define for scalar
-constants, vectors, matrices, linear forms, and maps.  $c_1 \sqcup
-c_2$ is defined according to the lattice constant$^{\top}$.  That is,
-$c_1 \sqcup c_2 = c_1$ if and only if $c_1 = c_2$; otherwise, $c_1
-\sqcup c_2 = \top$.  For vectors, matrices, and linear forms, $\sqcup$
-is defined element-wise; for example, $A' = A_1 \sqcup A_2$ is
-equivalent to $A'[i,j] = A_1[i,j] \sqcup A_2[i,j]$.  For maps, the
-join is taken on the values: $\mt{map}_1 \sqcup \mt{map}_2$ $=$
-$\mt{map'}$, where $\mt{map'}.\mt{get}(x) = \mt{map}_1.\mt{get}(x)
-\sqcup \mt{map}_2.\mt{get}(x)$.
-
-Our implementation of linear extraction is also interprocedural.  It
-is straightforward to transfer the linear state across a call site,
-although we omit this from the pseudocode for the sake of
-presentation.  Also implicit in the algorithm description is the fact
-that all variables are local to the work function.  If a filter
-has persistent state, all accesses to that state are marked as $\top$.
-
-\begin{algorithm}[t]
-\caption{Linear extraction analysis.\protect\label{alg:dataflow}}
-proc {\bf Toplevel}(filter $F$) returns linear node for $F$
-\begin{enumerate}
-\item Set globals Peek, Pop, Push to I/O rates of filter $F$.
-\item Let $A_{0} \leftarrow \mbox{new float[Peek, Push] with each entry =~} \bot$
-\item Let ${\vec b_{0}} \leftarrow \mbox{new float[Push] with each entry =~} \bot$
-\item $(\mt{map}, A, {\vec b}, \mt{popcount}, \mt{pushcount}) \leftarrow$ \\
-\verb+      +{\bf Extract}$(F_{work}, (\lambda x . \bot), A_{0}, {\vec b_{0}}, 0, 0)$
-\item {\bf if} $A$ and ${\vec b}$ contain no $\top$ or $\bot$ entries {\bf then} \\
-\verb+ + return linear node $\lambda = \{A, {\vec b}, \mbox{Peek}, \mbox{Pop}, \mbox{Push}\}$ \\
- {\bf else} \\
-\verb+ + {\it fail} \\
- {\bf endif}
-\end{enumerate}
-proc {\bf BuildCoeff}(int $pos$) returns $\vec v$ for peek at index $pos$ \\ \vspace{-12pt}
-\begin{algorithmic}
-\STATE $\vec{v} = \vec{0}$
-\STATE $\vec{v}[\mbox{Peek}-1-\mt{pos}] = 1$
-\STATE return $\vec{v}$
-\end{algorithmic}
-\end{algorithm}
 
 \begin{algorithm}
 proc {\bf Extract}($code$, $map$, $A$, $\vec b$, int $\mt{popcount}$, int $\mt{pushcount}$) \\
@@ -246,3 +159,92 @@ proc {\bf Extract}($code$, $map$, $A$, $\vec b$, int $\mt{popcount}$, int $\mt{p
 \STATE return ($\mt{map}$, $A$, ${\vec b}$, $\mt{popcount}$, $\mt{pushcount}$)
 \end{algorithmic}
 \end{algorithm}
+
+\section{Linear Extraction Algorithm}
+\label{sec:dataflow}
+
+Our linear extraction algorithm can identify a linear filter and
+construct a linear node $\lambda$ that fully captures its behavior.
+The technique, which appears as Algorithm~\ref{alg:dataflow} on the
+next page, is a flow-sensitive, forward dataflow analysis similar to
+constant propagation.  Unlike a standard dataflow analysis, we can
+afford to symbolically execute all loop iterations, since most loops
+within a filter's work function have small bounds that are known at
+compile time (if a bound is statically unresolvable, the filter is
+unlikely to be linear and we disregard it).
+
+During symbolic execution, the algorithm computes the following for
+each point of the program (refer to Figure~\ref{fig:types} for
+notation):
+\begin{itemize}
+
+\vspace{-6pt}
+\item A $\mt{map}$ between each program variable $y$ and a linear form
+$\tup{\vec{v}}{c}$ where $\vec{v}[0 \cdots Peek]$ is a column vector 
+and $c$ is a scalar constant. In an actual execution, the value of $y$ would
+be given by $y = \vec{v} \cdot \vec{x} + c$, where $\vec{x}$ 
+represents the input items.
+\vspace{-6pt}
+
+\item Matrix $A$ and vector $\vec b$, which will represent the linear node.
+These values are constructed during the operation of the algorithm.
+\vspace{-6pt}
+
+\item $\mt{pushcount}$, which indicates how many items have been
+pushed so far.  This is used to determine which column of $A$ and
+$\vec{b}$ correspond to a given push statement.
+\vspace{-6pt}
+
+\item $\mt{popcount}$, which indicates how many items have been popped
+so far.  This is used to determine the row in $\vec{v}$ that a 
+given peek or pop expression refers to.
+\vspace{-6pt}
+
+\end{itemize}
+
+We now briefly discuss the operation of {\bf Extract} at each program
+node.  The algorithm is formulated in terms of a simplified set of
+instructions, which appear in Figure~\ref{fig:types}.  First are the
+nodes that generate fresh linear forms.  A constant assignment $y = c$
+creates a form $\tup{\vec 0}{c}$ for $y$, since $y$ has constant part
+$c$ and does not yet depend on the input.  A pop operation
+creates a form $\tup{\mbox{\bf BuildCoeff}(\mt{popcount})}{0}$, where
+{\bf BuildCoeff} introduces a coefficient of $1$ for the current index
+on the input stream.  A peek$(i)$ operation is similar, but
+offset by the index $i$.
+
+Next are the instructions which combine linear forms.  In the case of
+addition or subtraction, we simply add the components of the linear
+forms.  In the case of multiplication, the result is still a linear
+form if either of the terms is a known constant ({\it e.g.}
+$\vec{v}=\vec{0}$).  For division, the result is linear only if the
+divisor is a non-zero constant\footnote{{\small Note that if the
+dividend is zero and the divisor has a non-zero coefficients vector,
+we cannot conclude that the result is zero, since certain runtime
+inputs might cause a singularity.}} and for non-linear operations ({\it
+e.g.,} bit-level and boolean), both operands must be known constants.
+If any of these conditions are not met, then the LHS is assigned a
+value of $\top$, which will mark the filter as non-linear if the value
+is ever pushed.
+
+The final set of instructions deal with control flow.  For loops, we
+resolve the bounds at compile time and execute the body an appropriate
+number of times.  For branches, we have to ensure that all the linear
+state is modified consistently on both sides of the branch.  For this
+we apply the confluence operator $\sqcup$, which we define for scalar
+constants, vectors, matrices, linear forms, and maps.  $c_1 \sqcup
+c_2$ is defined according to the lattice constant$^{\top}$.  That is,
+$c_1 \sqcup c_2 = c_1$ if and only if $c_1 = c_2$; otherwise, $c_1
+\sqcup c_2 = \top$.  For vectors, matrices, and linear forms, $\sqcup$
+is defined element-wise; for example, $A' = A_1 \sqcup A_2$ is
+equivalent to $A'[i,j] = A_1[i,j] \sqcup A_2[i,j]$.  For maps, the
+join is taken on the values: $\mt{map}_1 \sqcup \mt{map}_2$ $=$
+$\mt{map'}$, where $\mt{map'}.\mt{get}(x) = \mt{map}_1.\mt{get}(x)
+\sqcup \mt{map}_2.\mt{get}(x)$.
+
+Our implementation of linear extraction is also interprocedural.  It
+is straightforward to transfer the linear state across a call site,
+although we omit this from the pseudocode for the sake of
+presentation.  Also implicit in the algorithm description is the fact
+that all variables are local to the work function.  If a filter
+has persistent state, all accesses to that state are marked as $\top$.
