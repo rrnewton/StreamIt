@@ -1,0 +1,46 @@
+digraph streamit {
+subgraph cluster_node1 {
+ label="TargetDetect";
+node2 [ label="TargetSource" ]
+subgraph cluster_node3 {
+ label="TargetDetectSplitJoin";
+node4 [ label="DUPLICATE(1,1,1,1)" ]
+node5 [ label="WEIGHTED_ROUND_ROBIN(1,1,1,1)" ]
+subgraph cluster_node6 {
+ label="Pipeline";
+node7 [ color=cornflowerblue, style=filled, label="MatchedFilterOne" ]
+node8 [ label="ThresholdDetector" ]
+node7 -> node8
+}
+node4 -> node7
+node8 -> node5
+subgraph cluster_node9 {
+ label="Pipeline";
+node10 [ color=cornflowerblue, style=filled, label="MatchedFilterTwo" ]
+node11 [ label="ThresholdDetector" ]
+node10 -> node11
+}
+node4 -> node10
+node11 -> node5
+subgraph cluster_node12 {
+ label="Pipeline";
+node13 [ color=cornflowerblue, style=filled, label="MatchedFilterThree" ]
+node14 [ label="ThresholdDetector" ]
+node13 -> node14
+}
+node4 -> node13
+node14 -> node5
+subgraph cluster_node15 {
+ label="Pipeline";
+node16 [ color=cornflowerblue, style=filled, label="MatchedFilterFour" ]
+node17 [ label="ThresholdDetector" ]
+node16 -> node17
+}
+node4 -> node16
+node17 -> node5
+}
+node2 -> node4
+node18 [ label="FloatPrinter" ]
+node5 -> node18
+}
+}

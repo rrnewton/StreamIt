@@ -1,0 +1,72 @@
+digraph streamit {
+subgraph cluster_node1 {
+ label="ChannelVocoder";
+node2 [ label="DataSource" ]
+node3 [ color=cornflowerblue, style=filled, label="LowPassFilter" ]
+node2 -> node3
+subgraph cluster_node4 {
+ label="MainSplitjoin";
+node5 [ label="DUPLICATE(1,1,1,1,1)" ]
+node6 [ label="WEIGHTED_ROUND_ROBIN(1,1,1,1,1)" ]
+subgraph cluster_node7 {
+ label="PitchDetector";
+node8 [ label="CenterClip" ]
+node9 [ label="CorrPeak" ]
+node8 -> node9
+}
+node5 -> node8
+node9 -> node6
+subgraph cluster_node10 {
+ color=pink2;
+ style=filled;
+ label="FilterDecimate\n";
+node11 [ color=cornflowerblue, style=filled, label="LowPassFilter" ]
+node12 [ color=cornflowerblue, style=filled, label="HighPassFilter" ]
+node11 -> node12
+node13 [ color=cornflowerblue, style=filled, label="Compressor" ]
+node12 -> node13
+}
+node5 -> node11
+node13 -> node6
+subgraph cluster_node14 {
+ color=pink2;
+ style=filled;
+ label="FilterDecimate\n";
+node15 [ color=cornflowerblue, style=filled, label="LowPassFilter" ]
+node16 [ color=cornflowerblue, style=filled, label="HighPassFilter" ]
+node15 -> node16
+node17 [ color=cornflowerblue, style=filled, label="Compressor" ]
+node16 -> node17
+}
+node5 -> node15
+node17 -> node6
+subgraph cluster_node18 {
+ color=pink2;
+ style=filled;
+ label="FilterDecimate\n";
+node19 [ color=cornflowerblue, style=filled, label="LowPassFilter" ]
+node20 [ color=cornflowerblue, style=filled, label="HighPassFilter" ]
+node19 -> node20
+node21 [ color=cornflowerblue, style=filled, label="Compressor" ]
+node20 -> node21
+}
+node5 -> node19
+node21 -> node6
+subgraph cluster_node22 {
+ color=pink2;
+ style=filled;
+ label="FilterDecimate\n";
+node23 [ color=cornflowerblue, style=filled, label="LowPassFilter" ]
+node24 [ color=cornflowerblue, style=filled, label="HighPassFilter" ]
+node23 -> node24
+node25 [ color=cornflowerblue, style=filled, label="Compressor" ]
+node24 -> node25
+}
+node5 -> node23
+node25 -> node6
+}
+node3 -> node5
+node26 [ label="FloatPrinter" ]
+node6 -> node26
+}
+}
