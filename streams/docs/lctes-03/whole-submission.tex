@@ -1,0 +1,1722 @@
+% Michal Karczmarek
+
+
+%\documentclass[times,11pt,twoside,oneandahalfspace]{mitthesis}
+%\documentclass[times,11pt,twoside,draft,oneandahalfspace]{mitthesis}
+%\documentclass[10pt,oneandahalfspace,twoside,openany]{mitthesis} %\pagestyle{drafthead}
+%\documentclass[10pt,oneandahalfspace,twoside,openany,draft]{mitthesis} \pagestyle{drafthead}
+%\documentclass[10pt,singlespace,twoside,openany,largemargin]{mitthesis} \pagestyle{drafthead}
+%\pagestyle{drafthead}
+
+\documentclass{sig-alt-full}
+
+%\usepackage{lgrind}
+\usepackage{verbatim}
+\usepackage{epsfig, graphicx}
+\usepackage{enumerate}
+%\usepackage{fullpage}
+%\usepackage{doublespace}
+%\setstretch{1.05}
+%\usepackage{algorithm}
+%\usepackage{algorithmic}
+
+  \toappear{
+  %\raisebox{2pt}[2pt]{\underline{~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}} \\
+  %$^*$ More information on the StreamIt project is available from
+  %\texttt{http://compiler.lcs.mit.edu/streamit} \\
+%    \rule{0cm}{0cm}\\\hrule\rule{0cm}{0cm} ~ \\ \vspace{-6pt} ~ \\
+  \parbox[b]{20pc}{\baselineskip 9pt
+  Permission to make digital or hard copies of all or part of this work
+  for personal or classroom use is granted without fee provided that
+  copies are not made or distributed for profit or commercial advantage
+  and that copies bear this notice and the full citation on the first
+  page.  To copy otherwise, to republish, to post on servers or to
+  redistribute to lists, requires prior specific permission and/or a
+  fee.} \par
+  {\it LCTES'03}, June 11--13, 2003, San Diego, California, USA. \par
+  Copyright 2003 ACM 1-58113-647-1/03/0006 ...\$5.00 \\ ~ \\ ~ \\
+ }
+
+\conferenceinfo{LCTES'03,} {June 11--13, 2003, San Diego,California, USA.}
+\CopyrightYear{2003}
+\crdata{1-58113-647-1/03/0006}
+
+%\pagestyle{plain}
+\newtheorem{theorem}{Theorem}
+%\newtheorem{proof}{Proof}
+\newtheorem{lemma}{Lemma}
+\newtheorem{corollary}{Corollary}
+\newtheorem{definition}{Definition}
+
+
+%\pagestyle{headings}
+
+%\mainmatter
+
+\title{Phased Scheduling of Stream Programs}
+\numberofauthors{1}
+\author{
+\alignauthor \vspace{-18pt}
+Michal Karczmarek, William Thies and Saman Amarasinghe \\
+	\vspace{8pt}
+	\large\texttt{\{karczma, thies, saman\}@lcs.mit.edu} \\
+	\vspace{8pt}
+	Laboratory for Computer Science \\
+	Massachusetts Institute of Technology}
+
+\date{}
+
+\begin{document}
+\maketitle
+
+\newcommand{\Signed}{\emph{signed}}
+\newcommand{\Unsigned}{\emph{unsigned}}
+\newcommand{\Byte}{\emph{byte}}
+\newcommand{\Char}{\emph{char}}
+\newcommand{\Short}{\emph{short}}
+\newcommand{\Int}{\emph{int}}
+\newcommand{\Long}{\emph{long}}
+\newcommand{\Float}{\emph{float}}
+\newcommand{\Double}{\emph{double}}
+\newcommand{\LongDouble}{\emph{long double}}
+\newcommand{\Void}{\emph{void}}
+\newcommand{\Struct}{\emph{struct}}
+\newcommand{\Union}{\emph{union}}
+\newcommand{\Reference}{\emph{reference}}
+\newcommand{\New}{\emph{new}}
+\newcommand{\Class}{\emph{class}}
+\newcommand{\Malloc}{\emph{malloc}}
+\newcommand{\Vastart}{\emph{va\_start}}
+\newcommand{\Vaarg}{\emph{va\_arg}}
+\newcommand{\Vaend}{\emph{va\_end}}
+\newcommand{\Goto}{\emph{goto}}
+\newcommand{\For}{\emph{for}}
+\newcommand{\Printf}{\emph{printf}}
+\newcommand{\NULL}{\textbf{NULL}}
+\newcommand{\ANSIC}{\textbf{ANSI C}}
+\newcommand{\SUIF}{\textbf{SUIF}}
+\newcommand{\IEEE}{\textbf{IEEE}}
+\newcommand{\Lod}{\textbf{lod}}
+\newcommand{\Str}{\textbf{str}}
+\newcommand{\Cal}{\textbf{cal}}
+
+\newcommand{\Null}{\emph{null}}
+\newcommand{\Tableswitch}{\emph{tableswitch}}
+\newcommand{\Lookupswitch}{\emph{lookupswitch}}
+
+\newcommand{\StreamIt}{StreamIt}
+\newcommand{\filter}{{filter}}
+\newcommand{\filters}{{\filter}s}
+\newcommand{\pipeline}{{pipeline}}
+\newcommand{\pipelines}{{\pipeline}s}
+\newcommand{\splitjoin}{{splitjoin}}
+\newcommand{\splitjoins}{{\splitjoin}s}
+\newcommand{\feedbackloop}{{feedbackloop}}
+\newcommand{\feedbackloops}{{\feedbackloop}s}
+\newcommand{\splitter}{{splitter}}
+\newcommand{\splitters}{{\splitter}s}
+\newcommand{\joiner}{{joiner}}
+\newcommand{\joiners}{{\joiner}s}
+\newcommand{\duplicate}{{duplicate}}
+\newcommand{\roundrobin}{{roundrobin}}
+\newcommand{\work}{{work}}
+\newcommand{\infwavefront}{{infromation wavefront}}
+\newcommand{\Input}{{input}}
+\newcommand{\Output}{{output}}
+\newcommand{\Channel}{{channel}}
+\newcommand{\Channels}{{channel}s}
+\newcommand{\stream}{{stream}}
+\newcommand{\streams}{{stream}s}
+\newcommand{\operator}{{operator}}
+\newcommand{\SDF}{{SDF}}
+\newcommand{\C}{{C}}
+
+\newcommand{\subsubsubsection}[1]{\vspace{10pt}\noindent{\bf{#1}:}}
+
+\newcommand{\myitem}{\vspace{-6pt} \item}
+
+\newcommand{\todo}[1]{\framebox{\bf #1}}
+\newcommand{\mt}[1]{\mbox{\it #1}}
+
+
+\vspace{0.1in}
+
+\begin{abstract}
+As embedded DSP applications become more complex, it is increasingly
+important to provide high-level stream abstractions that can be
+compiled without sacrificing efficiency.  In this paper, we describe
+scheduler support for StreamIt, a high-level language for signal
+processing applications.  A StreamIt program consists of a set of
+autonomous filters that communicate with each other via FIFO queues.
+As in Synchronous Dataflow (SDF), the input and output rates of each
+filter are known at compile time.  However, unlike SDF, the stream
+graph is represented using hierarchical structures, each of which has
+a single input and a single output.
+
+We describe a scheduling algorithm that leverages the structure of
+StreamIt to provide a flexible tradeoff between code size and buffer
+size.  The algorithm describes the execution of each hierarchical unit
+as a set of phases.  A complete cycle through the phases represents a
+single steady-state execution.  By varying the granularity of a phase,
+our algorithm provides a continuum between single appearance schedules
+and minimum latency schedules.  We demonstrate that a minimal latency
+schedule is effective in decreasing buffer requirements for some
+applications, while the phased representation mitigates the associated
+increase in code size.
+
+%% Applications structured around some notion of a ``stream'' are
+%% becoming increasingly important and widespread. \cite{Rix98} provides
+%% evidence that streaming media applications are already consuming most
+%% of the cycles on consumer machines, and their use is continuing to
+%% grow. The streaming computation model is pervasive and ranges from
+%% small, embedded systems (ex. cell phones) to large, computationally
+%% powerful machines (ex. cell base stations). In this paper, we describe
+%% a novel technique for scheduling execution of synchronous data flow
+%% streaming applications exhibiting hierarchical properties. A vital
+%% aspect in compiling such programs is finding an efficient
+%% schedule. The technique presented here focuses on producing schedules
+%% that are optimized for the amount of space required for buffering and
+%% storing the schedule. A wide variety of real-life applications and a
+%% few synthetic applications are surveyed. Applications benefit from an
+%% average 14.5\% decrease in buffer requirements, with a peak of 93\%
+%% savings in buffer size. No application requires more space than the
+%% most popular technique used today (Single Appearance Scheduling).
+
+\end{abstract}
+
+\category{D.3.4}{Programming Languages}{Processors}
+\category{D.3.2}{Programming Languages}{Language Classifications}
+\category{D.3.3}{Programming Languages}{Language Constructs and Features}
+%\category{D.2.2}{Software Engineering}{Software Architectures}
+%\category{D.2.2}{Software Engineering}{Design Tools and Techniques}
+
+\begin{terms}
+Algorithms, Languages, Performance, Experimentation
+\end{terms}
+
+\begin{keywords}
+Phased Scheduling, StreamIt, Synchronous Dataflow, Cyclo-Static Dataflow, Buffer Size, Code Size, Stream Programming, DSP
+\end{keywords}
+\vspace{6pt}
+
+%\input{cover}
+%\input{contents}
+\section{Introduction}
+
+%% Applications targetting embedded devices are becoming increasingly
+%% large and complex.  
+From handheld computers to cell phones to sensor networks, there has
+been a surge of embedded applications that demand high-performance
+digital signal processing.  These programs constitute a new and
+important class of applications: those that are centered around {\it
+streams} of data.  Despite the widespread parallelism and regular
+communication patterns that are inherit in stream programs,
+application development in the streaming domain is still very
+labor-intensive and error-prone.  In order to optimize critical loops,
+DSP programmers are often forced to resort to assembly code, thereby
+sacrificing portability and robustness for the sake of performance.
+As the complexity of embedded software grows, this practice will
+become infeasible.  There is a pressing need to provide high-level
+stream abstractions that can be compiled without sacrificing
+efficiency.
+
+The goal of the StreamIt project is to provide language and compiler
+support for high-level stream programming.  A StreamIt program
+consists of a set of autonomous filters that communicate using FIFO
+queues.  Filters can be combined into single-input, single-output
+modules by using a set of hierarchical primitives, thereby imposing a
+structure on the stream graph that is akin to structured control flow
+in a mainstream language.  In order to facilitate static scheduling,
+the input and output rates of each filter are known at compile time.
+
+In this paper, we present techniques for scheduling stream graphs such
+as those found in StreamIt.  The StreamIt representation has much in
+common with Synchronous Dataflow (SDF) graphs~\cite{lee87static}, for
+which there is a large body of literature devoted to scheduling (see
+\cite{bhattacharyya99synthesis} for a review).  There are two aspects
+of StreamIt programs that distinguish our scheduling problem from a
+general SDF graph: 1) StreamIt graphs are hierarchical, with each node
+having only a single input and single output, and 2) StreamIt allows a
+``peek'' operation whereby nodes can operate on items that they do not
+consume until a future invocation.  In this context, this paper makes
+the following contributions:
+\begin{itemize}
+\item Fundamental techniques for constructing a hierarchical schedule
+from a hierarchical stream graph.
+
+\item A method for computing an initialization schedule, which is a
+unique requirement of graphs supporting the peek construct.
+
+\item A parameterized phased scheduling algorithm that leverages the
+structure of a StreamIt graph to give a flexible tradeoff between code
+size and data size.
+
+\item An instance of the phased scheduling algorithm that computes a
+minimal latency schedule, guaranteed to avoid deadlock in any valid
+feedback loop.
+\end{itemize}
+%% This paper makes the following contributions:
+%% \begin{itemize}
+%%
+%% \item hieararhical scheduling of a streamig app hierarchical scheduling of
+%% streaming application, a concept enabled by the {\StreamIt} language
+%%
+%% \item first formal handling of {\SDF} graphs with peeking
+%%
+%% \item a novel phased scheduling technique, giving a tradeoff between
+%% code size and data size
+%%
+%% \item a minimum latency scheduler that uses hierarchical phases
+%%
+%% \end{itemize}
+This paper is organized as follows.  The remainder of this section
+gives an illustrating example and describes relevant {\StreamIt}
+constructs; Section \ref{chpt:sched-basic} explains basic concepts in
+scheduling {\StreamIt} graphs; Section \ref{chpt:phased} describes the
+phased scheduling technique and presents a minimum latency scheduling
+algorithm; Section \ref{chpt:results} presents experimental results;
+Section \ref{chpt:related} describes related work and Section
+\ref{chpt:conclusion} presents conclusions and planned future work.
+
+\begin{figure}[t]
+\psfig{figure=sched-diag2.eps,width=3.35in}
+\caption{\small Execution trace of three different scheduling
+strategies for one steady state execution of a simple pipeline.
+Channels are annotated with the number of live data items that they
+contain; shaded nodes represent those that fire on a given time
+step.\protect\label{fig:trace}}
+\end{figure}
+
+\subsection{Example}
+\label{sec:sched-vs-buffer}
+
+A classic problem in the scheduling of synchronous dataflow graphs is
+the tradeoff between code size and data size~\cite{bhat1999x1}.  Code
+size refers to the space needed to represent the schedule, while data
+size refers to the buffering of items during execution.  Generally
+speaking, smaller schedules contain loops that require coarse-grained
+execution of nodes, thereby leading to larger buffer requirements.
+
+Consider the example stream graph depicted in Figure~\ref{fig:trace}.
+Even given a simple pipeline of filters, there is a large space of
+different schedules, each with different requirements for code and
+buffer size.  Figure~\ref{fig:trace} illustrates two extreme
+scheduling policies.  First is Single Appearance Scheduling (SAS),
+which gives the minimal code size: the schedule is a loop nest with
+each node appearing at a single position.  SAS is generally the method
+of choice in the DSP community, as the contents of each node can be
+inlined without duplicating code.  There are many different SAS
+schedules for a given stream graph; the one shown in
+Figure~\ref{fig:trace} is the best SAS schedule for this case.
+%Even within sas schedules, it
+%np-hard to determine the one that gives the smallest buffers.
+
+At the other end of the spectrum is a push schedule, which results in
+the minimal buffer size at the expense of code size
+(Figure~\ref{fig:trace}(c)).  A push schedule starts by executing the
+top-most node, and then pushes the items produced through the rest of
+the graph, always executing the most downstream node possible.  When
+no further node can fire, the top node is executed again.  In this
+case, the push schedule reduces the buffer size by 48\% but increases
+code size by 325\% over the SAS schedule.
+%However, since the code was originally smaller than the buffers, the
+%total amount of space required decreases slightly (see
+%Figure~\ref{fig:codedata}).
+
+In this paper, we develop a phased scheduling algorithm that offers a
+flexible alternative between the extremes of SAS and push scheduling.
+Shown in Figure~\ref{fig:trace}(b) is the phased minimum latency
+schedule.  It consists of three ``phases'', each of which is a
+single-appearance sub-schedule that results in a single output item
+being produced from the pipeline.  The schedule has the same latency
+as the push schedule, but has reduced code size due the
+single-appearance property of the phases and the collapse of phases 2
+and 3 into a single representation ``E''.
+
+Figure~\ref{fig:codedata} illustrates the tradeoff between code size
+and data size for the scheduling schemes.  It shows that there can be
+a large tradeoff between code size and buffer size, with phased
+scheduling striking a compromise between extremes.  In
+Section~\ref{chpt:phased}, we give a flexible version of our phased
+scheduling algorithm, and we also demonstrate that it can handle tight
+feedback loops for which there does not exist a valid single
+appearance schedule.
+
+\begin{comment}
+We can compare the storage efficiency of these two schedules by
+assuming that one data item in a buffer requires $x$ amount of memory
+and each entry in a schedule requires $y$ amount of memory.  Thus the
+two schedules will require the same amount of storage to store
+themselves and execute if $11 x + 18 y = 39 x + 4 y$.
+
+\begin{displaymath}
+\begin{array}{rcl}
+11 x + 18 y & = & 39 x + 4 y \\
+14 y & = & 28 x \\
+y & = & 2x
+\end{array}
+\end{displaymath}
+
+Thus the smaller schedule is more efficient if every data item
+requires less than twice the amount of storage than every entry in
+the schedule.
+
+One of the difficulties in scheduling {\StreamIt} programs lies in
+finding a good set of trade-offs between schedule size and
+buffering requirements.
+\end{comment}
+
+\begin{comment}
+
+\subsection{Minimum Buffer Size between {\filters}}
+
+As illustrated above, the amount of buffering in a {\pipeline} can
+be affected greatly by the order of executions of {\filters} in the
+{\pipeline}.  The following equation calculates the minimal buffer
+size required in order for two {\filters} to be able to push data
+between each other indefinitely in the most buffer-efficient way.
+Buffers this size cannot always be achieved, because some
+components require that data be buffered up for execution (ex.
+{\feedbackloops} require data to exist internally in order to
+execution to advance) or because extra latency constrains require
+additional buffering.
+
+\begin{equation}
+buffer_{A \to B} = \left\lceil {{peek_B} \over {\gcd(push_A,
+pop_B)}} - 1 \right\rceil \gcd (push_A, pop_B) + push_A
+\end{equation}
+
+\emph{I can explain this equation, but I cannot prove it.  what
+should I do with this?  it's not necessary for the thesis, but it
+is a neat result we never published (PLDI submission), nor have I
+seen it in any other papers (nobody does peeking, so it can't be
+anywhere else)}
+
+\end{comment}
+
+\begin{figure}[t]
+\psfig{figure=codedata.eps,width=3.35in}
+\caption{\small Buffer and code sizes for the execution traces of
+Figure~\ref{fig:trace}.  For brevity, we show these figures on the
+same graph, even though a unit of storage might have a different cost
+for code and data.\protect\label{fig:codedata}}
+\end{figure}
+
+%\input{streamit}
+
+\subsection{The {\StreamIt} Language}
+\label{sec:streamit}
+
+The source language for our scheduler is {\StreamIt}: an
+architecture-independent programming language for high-performance
+streaming applications.  This section contains a very brief overview
+of the semantics of {\StreamIt}.  We do not concern ourselves with the
+syntax of the language, as it is not relevant to scheduling stream
+graphs. A more detailed description of the design and rationale for
+{\StreamIt} can be found in~\cite{thies02streamit} or on our
+website~\cite{streamitweb}.
+
+\subsubsection{Language Constructs}
+
+The basic unit of computation in {\StreamIt} is the {\filter}. A
+{\filter} is a single-input, single-output block with a user-defined
+procedure for translating input items to output items.  Every
+{\filter} contains a {\work} function, which is comprised of one or
+more atomic phases that the filter cycles through during its
+steady-state execution. A filter can optionally declare a {\tt
+prework} function that executes instead of {\tt work} on the first
+invocation of the filter, if special startup behavior is desired.
+Filters communicate with their neighbors via FIFO queues, called
+{\Channels}, using the intuitive operations of {\tt push(value)}, {\tt
+pop()}, and {\tt peek(index)}, where {\tt peek} returns the value at
+position {\tt index} without dequeuing the item.  The number of items
+that are pushed, popped, and peeked\footnote{{\small We define $peek$
+as the total number of items read, including the items popped.  Thus,
+we always have that $peek \ge pop$.}} on each invocation are declared
+with each phase of the {\work} function.
+
+\begin{figure}
+\begin{center}
+
+\begin{minipage}{0.7in}
+\centering \psfig{figure=pipeline-buffers.eps,width=0.4049in}
+\end{minipage}
+~~~~~~
+\begin{minipage}{0.8in}
+\centering \psfig{figure=splitjoin-steady-state.eps,width=0.6in}
+\end{minipage}
+~~~~~~
+\begin{minipage}{0.8in}
+\centering \psfig{figure=feedback-steady-state.eps,width=0.79in}
+\end{minipage}
+
+\vspace{0.1in}
+
+{\small ~~~~(a) a pipeline ~~~~~~~ (b) a splitjoin ~~~~ (c) a feedbackloop~~~~}
+
+\caption{\small Sample {\StreamIt} operators.  Each node is labeled
+with its peek, pop rates (at top) and push rate (at bottom).  The $L$
+{\filter} has been flipped upside-down for clarity.
+\label{fig:steady-state}}
+\vspace{-18pt}
+\end{center}
+\end{figure}
+
+%% {\StreamIt}'s representation of a filter is an improvement over
+%% general-purpose languages.  In a procedural language, the analog of a
+%% filter is a block of statements in a complicated loop nest.  There is
+%% no clear abstraction barrier between one filter and another, and
+%% high-volume stream processing is muddled with global variables and
+%% control flow. The loop nest must be re-arranged if the input or output
+%% ratios of a filter changes, and scheduling optimizations further
+%% inhibit the readability of the code.
+
+%% In an object-oriented language, one could implement a stream
+%% abstraction as a library.  This avoids some of the problems associated
+%% with a procedural loop nest, but the programming model is complicated
+%% by efficiency concerns--to optimize cache performance, the entire
+%% application processes blocks of data that complicate and obscure the
+%% underlying algorithm.
+
+%% In contrast to these alternatives, {\StreamIt} places the filter in its
+%% own independent unit, making explicit the parallelism and inter-filter
+%% communication while hiding the grungy details of scheduling and
+%% optimization from the programmer.
+
+{\StreamIt} provides three primitives for composing {\filters} into
+hierarchical streams (see Figure~\ref{fig:steady-state}).  The
+{\pipeline} construct cascades a set of filters in sequence, with the
+output of one connected to the input of the next.  The {\splitjoin}
+construct is used to specify independent parallel streams that diverge
+from a common {\splitter} and merge into a common {\joiner}---for
+example, in the Equalizer of Figure~\ref{fig:radio-ascoded}.  StreamIt
+currently supports two types of splitters: duplicate, which broadcasts
+its input items to each parallel stream, and round-robin, which
+distributes items cyclically to one child after another according to
+an array of weights.  The joiner node must be a roundrobin.
+
+The last control construct provides a means for creating cycles in the
+stream graph: the {\feedbackloop}. A {\feedbackloop} contains a
+{\joiner}, a body operator, a {\splitter}, and a loop operator.  A
+{\feedbackloop} has an additional feature to allow it to begin
+computation: since there are no data items on the feedback path at
+first, the stream needs to enqueue initial values onto the channel.
+The number of items pushed onto the feedback path is called the delay,
+denoted $delay_{fl}$, for a {\feedbackloop} $fl$.
+
+\subsubsection{Design Rationale}
+
+{\StreamIt} differs from other stream languages in the single-input,
+single-output hierarchical structure that it imposes on streams.  This
+structure aims to help the programmer by defining clean, composable
+modules that admit a linear textual representation.  In addition, it
+helps the compiler by restricting certain analyses to a local level
+rather than dealing with global properties of the graph.  In the
+context of scheduling, hierarchy is also useful because it allows for
+the separate compilation of program components.  This enables the
+creation of standardized libraries and their distribution in binary
+form, rather than source code.  This ability may become important as
+streaming languages become more widely used for larger applications.
+
+Another important feature of StreamIt---and one that requires special
+support from the scheduler---is the peek construct.  By using the peek
+command, a filter can examine an input item at a given index without
+removing it from the channel.  This exposes to the compiler the reuse
+of input items between successive invocations of a filter's work
+function.  A primary example is an FIR filter, which pops 1 item but
+peeks N items.  Without the capability to peek, the programmer would
+have to maintain a persistent circular buffer within the filter to
+retain previous input items.  Apart from being difficult to implement
+and understand, this would greatly complicate compiler analysis.  In
+particular, the linear analysis and optimization passes within the
+StreamIt compiler benefit greatly from analyzing peek statements
+directly instead of reverse-engineering internal filter
+state~\cite{lamb03}.
+
+\begin{figure}[t]
+\begin{center}
+\hspace{0.1in} \psfig{figure=radio-ascoded.eps, width=2.8in}
+\vspace{-24pt} \caption{\protect\small Block diagram of an FM
+Radio. \protect\label{fig:radio-ascoded}}
+\vspace{-18pt}
+%% \begin{minipage}{0.46in}
+%% \centering
+%% \psfig{figure=pipeline.eps,width=0.46in} \\
+%% \end{minipage}
+%% ~
+%% \begin{minipage}{1.0in}
+%% \centering
+%% \psfig{figure=splitjoin.eps,width=0.57in} \\
+%% \end{minipage}
+%% ~
+%% \begin{minipage}{1.02in}
+%% \centering
+%% \psfig{figure=feedback.eps,width=1.02in} \\
+%% \end{minipage}
+%% \\ ~ \\ {\bf \protect\small (a) \pipeline ~~~~ (b) \splitjoin ~~~~ (c) \feedbackloop}
+%% \caption{\protect\small Stream structures supported by {\StreamIt}.
+%% \protect\label{fig:structures}} \vspace{-12pt}
+\end{center}
+\end{figure}
+
+%% \subsection{Messages}
+
+%% {\StreamIt} provides a dynamic messaging system for passing irregular,
+%% low-volume control information between filters and other stream
+%% operators.  Messages
+%% are sent from within the body of a filter's {\tt work} function,
+%% perhaps to change a parameter in another filter.  The central aspect
+%% of the messaging system is a sophisticated timing mechanism that
+%% allows filters to specify when a message will be received relative to
+%% the flow of data items between the sender and the receiver.  With the
+%% messaging system, {\StreamIt} is equipped to support full application
+%% development--not just high-bandwidth data channels, but also events,
+%% control, and re-initialization.
+
+
+\section{StreamIt Scheduling Concepts}
+\label{chpt:sched-basic}
+
+This section introduces the general concepts used for scheduling
+{\StreamIt} programs.  Concepts presented here are common with other
+systems \cite{ptolemyoverview}.  Section \ref{sec:exec-model} presents
+the {\StreamIt} execution model. Section \ref{sec:steady-state}
+introduces the concept of a steady state and shows how to calculate
+it. Section \ref{sec:init-peeking} explains the need for
+initialization of a {\StreamIt} program.
+% these languages don't have static scheduling
+% \cite{esterel92} \cite{lustre}.
+
+\subsection{{\StreamIt} Execution Model}
+\label{sec:exec-model}
+
+A {\StreamIt} program is represented by a hierarchical graph, where
+the leaf nodes are filters, splitters, and joiners, and the composite
+nodes are pipelines, splitjoins, and feedbackloops.  Edges in the
+graph represent data channels, which operate as FIFO queues.
+
+In order for a {\filter} $f$ to execute, it must have at least
+$\mt{peek}_f$ items on its input channel.  Execution will decrease the
+amount of data on its input channel by $\mt{pop}_f$ and increase the
+amount of data on its output channel by $\mt{push}_f$. Similarly, a
+{\splitter} $s$ will consume $\mt{pop}_s$ data from its {\Input}
+{\Channel} and push $\mt{push}_{s,i}$ data onto its $i$th output
+channel, while a joiner $j$ will consume $\mt{pop}_{j,i}$ items from
+its $i$th input channel and push $\mt{push}_j$ onto its {\Output}
+{\Channel}.
+
+Each filter, splitter, and joiner in the graph has two epochs of
+execution: one for initialization, and one for the steady state.
+Within each epoch, a given filter can have any number of phases, each
+of which is an atomic execution step with its own input and output
+rates.  At the start of the program, each node starts in phase $0$ of
+the initial epoch.  It then advances through its initialization
+phases, executing each a single time before transitioning to phase $0$
+of the steady state epoch.  Within the steady state, a filter executes
+its steady state phases cyclically.
+% (just as in a cyclo-static dataflow graph~\cite{BELP96}).
+
+\subsection{Steady State Schedule}
+\label{sec:steady-state}
+
+One of the most important concepts in scheduling streaming
+applications is the steady state schedule.  A steady state schedule is
+a schedule that the program can repeatedly execute forever.  It has
+the property that the amount of data buffered up between any two nodes
+does not change from before to after its execution.
+
+A ``steady state'' of a program is a collection of number of times
+that every node in the program needs to execute in a steady state
+schedule.  It does not impose an order of execution on the nodes in
+the program.
+\begin{comment}
+Not every {\StreamIt} program has a steady state schedule.  It is
+possible for a program to have unbalanced production and
+consumption of data in {\splitjoins} and {\feedbackloops}. The
+amount of data buffered continually increases, and cannot be
+reduced, thus making it impossible to create a steady state
+schedule for them.  It is also possible that a {\feedbackloop}
+does not have enough data buffered up internally in order to
+complete execution of a full steady state, and thus deadlocks.
+Programs without a valid steady state schedule are not considered
+valid {\StreamIt} programs. In other words, all valid {\StreamIt}
+programs have a steady state schedule.
+\end{comment}
+
+\subsubsection{Minimal Steady State}
+
+We now summarize some of the key properties of steady states, which
+are presented in~\cite{lee87static}.  Detailed proofs of these
+properties in the context of StreamIt can be found in
+\cite{karczma-thesis}.
+
+%% The size of a steady state is defined as the sum of all executions
+%% of all the nodes in the program per iteration of the steady state.
+
+%% \begin{definition}
+%% A steady state of a stream operator $s$ is represented by vector
+%% $m$ of non-negative integers. Each of the elements in $m$
+%% represents the number of times a corresponding node in $s$ must be
+%% executed in the steady state.
+%% \end{definition}
+
+%% Note that $m$ does not impose an order of execution of nodes. Size
+%% of a steady state is the total number of executions of all the
+%% nodes in the steady state.
+
+The first property concerns the size of a steady state.  The size is
+defined to be the sum of the repetitions of all nodes in the schedule.
+
+\begin{theorem}[Minimal Steady State Uniqueness]
+A {\StreamIt} program that has a valid steady state, has a unique
+minimal steady state.
+\end{theorem}
+
+This means that for every valid {\StreamIt} program, there is a unique
+set of steady state multiplicities that fires as few nodes as
+possible.  Our scheduler will produce schedules that execute exactly
+the minimal steady state of a program.
+
+\begin{comment}
+\begin{proof}[Minimal Steady State Uniqueness]
+Assume that there are two different minimal steady states with
+same size.  Let $m$ and $q$ denote vectors representing the two
+steady states. Let $\sum_i m_i$ denote size of schedule $m$ and
+$\sum_i q_i$ denote size of schedule $q$. Note that since both $m$
+and $q$ are minimal steady states, $\sum_i m_i = \sum_i q_i$.
+Since the schedules are different, there must be some $j$ for
+which $m_j \ne q_j$. Assume without loss of generality that $m_j <
+q_j$. Since a steady state does not change the amount of data
+buffered between nodes, the node producing data for node $i$ must
+also execute less times than corresponding node in $q$. Similarly,
+the node consuming data produced by node $j$ also must execute
+less times than the corresponding node in schedule $q$. Since a
+{\StreamIt} program describes a connected graph, it follows that
+$\forall i, m_i < q_i$.  Thus $\sum_i m_i \ne \sum_i q_i$, which
+is a contradiction. Thus there cannot be two different minimal
+steady state.
+\end{proof}
+
+\begin{corollary}[Minimal Steady State Uniqueness]
+\label{corollary:minimal-state}
+The additional property we have from the above proof is that if
+$m$ represents a minimal steady and $q$ any other steady state,
+then $\forall i, m_i < q_i$.
+\end{corollary}
+
+\begin{lemma}[Composition of Steady Schedules]
+\label{lemma:composition}
+If $m$ and $q$ are two steady states for a {\StreamIt} program, then
+$m + q$ is also a steady state.
+\end{lemma}
+
+The above lemma is true because neither $m$ nor $q$ change the
+amount of data buffered in the {\Channels}.  Thus a composition of
+the steady states does not change the amount of data buffered in
+the {\Channels}, which makes the composition also a steady schedule.
+
+\begin{corollary}[Composition of Steady Schedules]
+\label{corollary:composition}
+If $m$ and $q$ are two steady states, and $\forall i, m_i > q_i$,
+then $w = m - q$ is also a steady state.
+\end{corollary}
+
+If $q$ is a steady state and $m = w + q$ is a steady state, then
+$w$ must not change the amount of data buffered in {\Channels}. Thus
+$w$ must be a steady state.
+\end{comment}
+
+\begin{theorem}[Multiplicity of Steady States] If a
+{\StreamIt} program has a valid steady state, then all its steady
+states are strict multiples of its minimal steady state.
+\label{thm:multiplicity}
+\end{theorem}
+
+\begin{comment}
+\begin{proof}[Multiplicity of Minimal Steady State]
+Assume that there exists a steady state that is not a multiple of
+the minimal steady state.  Let $m$ denote the minimal steady
+state. Let $q$ denote the other steady state.  Note that $w = q -
+m$ is still a steady state, as long as all elements of $w$ remain
+non-negative (by Corollary \ref{corollary:composition}).  Repeat
+subtracting $m$ from $q$ until no more subtractions can be
+performed without generating at least one negative element in
+vector $w$.  Since $q$ is not a multiple of $m$, $w \ne 0$. But
+since we cannot subtract $m$ from $w$ any further, $\exists i, m_i
+> w_i$.  Since $m$ is a minimal steady state and $w$ is a steady
+state, this is impossible due to Corollary
+\ref{corollary:minimal-state}. Thus there are no steady states
+that are not multiples of the minimal steady schedule.
+\end{proof}
+\end{comment}
+
+This property means that in order to find a minimal steady state
+schedule of a stream operator, we can find any of its steady states
+and divide it by the $gcd$ of executions of all its children to find
+the minimal steady state schedule.
+
+\subsubsection{Calculating Minimal Steady States}
+\label{sec:calc-min-steady}
+
+For a general stream graph, the minimal steady state can be calculated
+in a linear algebra framework by formulating a set of balance
+equations~\cite{lee87static}.  However, with StreamIt we leverage the
+structure of the stream graph to calculate steady states in a
+hierarchical manner.  That is, a minimal steady state is calculated
+for all child operators of a {\pipeline}, {\splitjoin} and
+{\feedbackloop}, and then the schedule is computed for the actual
+parent operator using these minimal states as atomic executions.  This
+approach is useful in the context of separate compilation, where the
+entire graph might not be available at compile time; additionally, the
+steady state multiplicity of a given node in relation to its parent is
+useful for our scheduling algorithms.
+
+For brevity, we omit the equations for finding the minimal steady
+states.  The steady states are calculated hierarchically; filters with
+multiple phases are represented by a single, coarser phase for the
+sake of the steady-state schedule.  Details can be found
+in~\cite{karczma-thesis}.  For example, the minimal steady states of
+the stream graphs in Figure~\ref{fig:steady-state} are as follows:
+
+\mbox{}
+~ \vspace{-20pt} \\
+\begin{equation*}
+\begin{tabular}{ll}
+\mbox{Sample Pipeline}: & \mt{steady}(A) = 4 \\
+~ & \mt{steady}(B) = 6 \\
+~ & \mt{steady}(C) = 9 \\
+~ & \mt{steady}(D) = 3 \\
+~ & ~ \\
+\mbox{Sample SplitJoin}: & \mt{steady}(splitter) = 2 \\
+~ & \mt{steady}(A) = 2 \\
+~ & \mt{steady}(B) = 1 \\
+~ & \mt{steady}(joiner) = 2 \\
+~ & ~ \\
+\mbox{Sample FeedbackLoop}: & \mt{steady}(joiner) = 6 \\
+~ & \mt{steady}(B) = 15 \\
+~ & \mt{steady}(splitter) = 5 \\
+~ & \mt{steady}(L) = 3 \\
+\end{tabular}
+\end{equation*}
+Note that these numbers represent the multiplicity of each node in one
+steady state execution of its parent.  In Section~\ref{chpt:phased},
+we consider how to order these executions to form a valid schedule.
+
+%% Executing a full steady state of an operator is referred to as
+%% ``executing an operator". The notation for $peek$, $pop$ and $push$ is
+%% is extended to mean entire operators in their minimal steady state
+%% execution.  That is, a {\pipeline} $p$ will consume $o_p$ data,
+%% produce $u_p$ data and peek $e_p$ data on every execution of its
+%% steady state.  Again, in the hierarchical view of {\StreamIt}
+%% programs, a child operator of a {\pipeline} will execute its steady
+%% state atomically.
+
+%% A steady state of a stream operator $s$ is represented by an
+%% ordered set $S_s$ of elements, $S_s = \{m, N, c, v\}$. The set
+%% includes a vector $m$, which describes how many times each
+%% {\StreamIt} node of the operator will be executed in the steady
+%% state, a corresponding ordered set $N$ which stores all the nodes
+%% of the operator, a vector $c$, which holds values $[e_s, o_s,
+%% u_s]$ for stream operator $s$, and a vector $v$ which holds number
+%% of steady state executions of all direct children of $s$. $m$ and
+%% $v$ are not the same vector, because $m$ refers to nodes in the
+%% subgraph, while $v$ refers only to the direct children, which may
+%% be {\filters}, {\pipelines}, {\splitters} and {\feedbackloops}.
+%% For a stream operator $s$, set $S$ is denoted as $S_s$ and the
+%% elements of $S_s$ are denoted as $S_{s,m}$, $S_{s,N}$, $S_{s,c}$
+%% and $S_{s,v}$.
+
+%% Note, that a steady state does not say anything about the ordering
+%% of the execution of nodes, only how many times each node needs to
+%% be executed to preserve amount of data buffered by the operator.
+
+%% We omit the equations for calculating the minimal steady states
+%% for brevity. Details can be found in Appendix \ref{apx:eqs}. As an
+%% example, the {\splitjoin} from Figure \ref{fig:steady-state}(b) has
+%% the following steady state:
+
+%% \begin{displaymath}
+%% S_{sj} = \left\{
+%% \begin{array}{c}
+%% 2 * S_{sj_0, m} \circ 1 * S_{sj_1, m} \circ [2\ 2], \\
+%% S_{sj_0, N} \circ S_{sj_1, N} \circ \{sj_s, sj_j\}, \\
+%% \left[
+%% \begin{array}{c}
+%% 2 * 3 \\ 2 * 3 \\ 2 * 4
+%% \end{array}
+%% \right], \left[
+%% \begin{array}{c}
+%% 2 \\ 1 \\ 2 \\ 2
+%% \end{array}\right]
+%% \end{array} \right\}
+%% \end{displaymath}
+
+\subsection{Initialization Schedule}
+\label{sec:init-peeking}
+
+Unlike traditional SDF graphs, StreamIt programs may require a
+separate schedule for initialization.  This is for two reasons.
+First, each filter might contain an initialization stage, where the
+input and output rates are different than in the steady state.  But
+even without the initialization epoch, an initialization schedule is
+necessary if any filter makes use of StreamIt's $peek$ construct, in
+which input items can be examined without being consumed.
+
+To understand the impact of peeking on scheduling, consider a filter
+$f$, with $\mt{peek}_f = 2$ and a $\mt{pop}_f = 1$. When a {\StreamIt}
+program is first run, there is no data present on any of the
+{\Channels} (ignoring the case of a feedbackloop delay).  This means
+that for the first execution, {\filter} $f$ requires that two data
+items be pushed onto its {\Input} {\Channel}.  After the first
+execution of $f$, it will have consumed one data item, and left at
+least one data item on its {\Input} {\Channel}.  Thus in order to
+execute $f$ for the second time, no more than one extra data item
+needs to be pushed onto $f$'s {\Input} {\Channel}.  The same situation
+persists for all subsequent executions of $f$ -- no more than one
+additional data item is required on $f$'s {\Input} {\Channel} in order
+to execute $f$.
+
+This example illustrates that the first execution of a {\filter} may
+require special treatment.  Namely, some nodes will need to push extra
+items at the start of execution so that downstream filters can fire
+for the first time.  Due to this condition, a {\StreamIt} node may
+need to be initialized before it can enter steady state execution.
+
+%% \subsection{Schedules}
+%% \label{sec:general:schedules}
+
+%% Once a program has been initialized, it is ready to execute its
+%% steady state. In order to do this, a steady state schedule needs
+%% to be computed. The steady states computed above do not indicate
+%% the ordering of execution of the nodes, only how many times the
+%% nodes need to be executed.
+
+%% A schedule is an ordering of nodes in a {\StreamIt} operator. In
+%% order to execute the schedule, we iterate through all of its nodes
+%% in order of appearance and execute them one by one.  For example
+%% in order to execute schedule $\{ABBCCBBBCC\}$ we would execute
+%% node A once, node B twice, node C two times, node B three times
+%% and node C twice again, in that order. In order to shorten the
+%% above schedule we can run-length encode it.  The schedule becomes
+%% $\{A \{2B\}\{2C\}\{3B\}\{2C\}\}$.
+
+
+\section{Phased Scheduling}
+\label{chpt:phased}
+
+A schedule for a given hierarchical node of a {\StreamIt} program is a
+list of the node's immediate children, specifying the order in which
+they should be executed.  More precisely, since filters (and, as we
+will see, hierarchical nodes as well) can have multiple phases, a
+schedule is a list of phases of child nodes.  In order for a schedule
+to be legal, it must satisfy two conditions: first, for every
+execution of a node, a sufficient amount of data must be present on
+its {\Input} {\Channel}(s); second, in the case of the steady state,
+an infinite repetition of the schedule must require a finite amount of
+memory.  The second condition is ensured by using the steady state
+multiplicities calculated in the previous section, while the first
+condition is one that we must respect when choosing an ordering for
+the nodes.
+
+Our phased scheduling algorithm, shown in Figure~\ref{fig:phasealg},
+operates in a hierarchical fashion.  That is, it constructs a schedule
+for a given pipeline, splitjoin, or feedbackloop as a sequence of the
+schedules of its children.  A schedule is represented as a sequence of
+phases.  In the base case of a filter, these phases are specified by
+the StreamIt program (with one small modification, described below),
+while at hierarchical nodes they are computed by our algorithm.  To
+schedule an entire StreamIt program, our algorithm should be applied
+as a post-order traversal of the stream graph.
+
+Intuitively, our algorithm is based on the observation that a
+hierarchical stream displays cyclic behavior as it executes its
+components.  At the coarsest level of granularity, these cycles are
+evident in the steady state schedule: each iteration of the steady
+state is exactly the same.  The aim of our algorithm is to exploit a
+finer level of granularity in execution behavior---the basic unit
+being a phase of the push schedule for the stream.  Generally
+speaking, a phase of the push schedule holds the smallest sequence of
+filter executions that will both consume input and produce output for
+the stream.  Our algorithm allows a parameterized level of granularity
+by collapsing some of these fine-grained phases together and shuffling
+the resulting schedule so that the phases of a given child stream are
+all adjacent.  As we demonstrate below, a single appearance schedule
+and minimum latency schedule are both special cases of a parameterized
+phased schedule.  For a more mathematical description of the phased
+scheduling technique, see~\cite{karczma-thesis}.
+
+\subsection{Algorithm Details}
+
+We now consider in more detail the pseudocode in
+Figure~\ref{fig:phasealg}; refer to Figures~\ref{fig:sjex}
+and~\ref{fig:sjexlabel} for an example.  The algorithm inputs a Stream
+{\tt s} and returns a sequences of phases that represent the schedule
+for that stream.  It also inputs two additional parameters: {\tt
+maxPhases}, which specifies the maximum number of phases in the
+resulting schedule, and {\tt mode}, which indicates whether we are
+scheduling for the initial or steady-state epoch.  The algorithm
+starts by assembling a series of fine-grained phases, each of which
+corresponds to a push schedule as built by the {\tt pushSchedule}
+routine.
+
+The {\tt pushSchedule} routine simulates a push schedule until the
+bottom node is fired at least once (in most cases, this will
+correspond to an output being produced).  A push schedule is one in
+which downstream nodes are fired as much as possible before upstream
+nodes are considered.  The routine starts with the entrance node of
+the stream, {\it i.e.,} the first child of a pipeline, the splitter of
+a splitjoin, or the joiner of a feedbackloop.  It then pushes live
+items as far forward as possible, only executing the entrance node
+again if the exit node could not fire.
+
+\begin{figure}[t]
+\psfig{figure=pseudocode5.eps,width=3.5in}
+\vspace{-30pt}
+\caption{\small Phased Scheduling Algorithm.\protect\label{fig:phasealg}}
+\vspace{-8pt}
+\end{figure}
+
+There are two subtleties in the {\tt pushSchedule} procedure.  First,
+note that it always flushes extra items from the stream: the exit node
+might fire multiple times, even though all firings were caused by a
+single execution of the entrance node.  Second, in the case of a
+feedbackloop, it is careful to push items around the feedback path
+even after the splitter (the exit node) has fired.  That is, the
+ranking of nodes in a feedback loop is $(\mt{joiner}, \mt{body},
+\mt{splitter}, \mt{loop})$, and pushing of items through the loop node
+is necessary to ensure a correct steady-state schedule.
+
+The {\tt phasedSchedule} routine builds up a maximal list of phases
+from the push schedule.  In the steady state, this list is complete
+when each node has completed its steady state repetitions, while in
+the initialization mode, simulation is finished when each node has
+executed its initial phases.  To ensure that the initialization
+schedule provides enough data items for the peeking requirements of
+the steady state, we add an extra initialization phase to each filter
+before running the algorithm.  For filter $f$, this phase has rates
+$\mt{peek'}=\mt{peek}_f - \mt{pop}_f, \mt{pop'}=\mt{push'}=0$.  Since
+this phase must execute in the initial schedule, it ensures that there
+will be $\mt{peek}-\mt{pop}$ items present at the start of the steady
+state.  A steady state schedule is then possible to construct, since
+the filter can return the buffer to this state by firing once with
+$\mt{peek}$ items on the channel.
+
+Once it has gathered the list of maximally fine-grained phases, the
+{\tt phasedSchedule} algorithm makes two modifications.  First, it
+combines some adjacent phases so that only {\tt maxPhases} are
+returned.  Combination works simply by concatenating the sequence of
+child executions from the given phases.  Second, even if no phases are
+combined, the algorithm re-arranges the order of child phases so that
+all phases corresponding to a given stream are adjacent.  This is an
+attempt to provide a canonical form for a given series of executions,
+so that phases with the same form can be compressed in the resulting
+schedule~(see Section~\ref{sec:schedrep}).
+
+\begin{figure*}[t]
+\psfig{figure=splitjoin-sample-tiny2.eps,width=7in}
+\caption{{\small Example construction of phased schedules for the
+splitjoin of Figure~\ref{fig:sjexlabel}.  First, execution is
+simulated for one steady state according to a push schedule; the
+stream graph is labeled with the number of items on each channel
+following the firing of a shaded node.  Then, fine-grained phases are
+formed that include executions of both the entry (A) and exit (D)
+nodes.  Finally, the fine-grained phases are combined into
+$\mt{maxPhases}$ phases, each of which is factored into a single
+appearance schedule.  Note that buffer size increases with the
+granularity of the phases, as shown at right.\protect\label{fig:sjex}}}
+\vspace{-12pt}
+\end{figure*}
+
+\begin{figure}
+\vspace{6pt}
+\begin{minipage}{1.3in}
+\begin{center}
+\psfig{figure=splitjoin-sample2.eps,width=0.8in} 
+\end{center}
+\end{minipage}
+\begin{minipage}{1.75in}
+\caption{\small Example splitjoin to illustrate phased scheduling.
+Each node is annotated with its input and output
+rates.\protect\label{fig:sjexlabel}}
+\end{minipage}
+\vspace{-6pt}
+\end{figure}
+
+
+Note that the pseudocode given in Figure~\ref{fig:phasealg} specifies only
+the behavior of the algorithm, rather than the implementation.  In our
+implementation, we avoid symbolic execution of the entire steady state
+by calculating, from the bottom-up, the number of node firings that
+will be required in each phase.  If upstream nodes produce more data
+than is necessary, then we drain this data through the stream by
+firing downstream nodes again.  In this technique, each child is
+visited no more than twice per calculation of a parent phase.
+
+%% \begin{table*}[t] \centering  \scriptsize
+%% \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+%% \hline
+%% \multicolumn{4}{|c|}{data in {\Channel}} & \multicolumn{4}{c|}{\parbox{1in}{\centering phase executions left}} & \parbox{0.5in}{\centering child considered} & \parbox{0.6in}{\centering phases executed} & \parbox{0.6in}{\centering {\pipeline} consumption} \\
+%% \cline{1-8} $in_A$ & $out_A$ & $in_B$ & $out_B$ & split & A & B & join & & & \\
+%% \hline 0 (0) & 0 (0) & 0 (0) & 0 (0) & 0 & 0 & 1 & 0 & join & - & $[0\ 0\ 0]$ \\
+%% \hline 0 (0) & 0 (0) & 0 (0) & 0 (0) & 0 & 0 & 1 & 0 & A & - & $[0\ 0\ 0]$ \\
+%% \hline 0 (0) & 0 (0) & 0 (0) & 0 (0) & 0 & 0 & 1 & 0 & B & $A^i_{B,0}$ & $[0\ 0\ 0]$ \\
+%% \hline 0 (0) & 0 (0) & 0 (1) & 0 (0) & 0 & 0 & 0 & 0 & split & split & $[3\ 3\ 0]$ \\
+%% \hline 2 (0) & 0 (0) & 1 (0) & 0 (0) & 0 & 0 & 0 & 0 & A & $A^i_{A,0}$ & $[0\ 0\ 0]$ \\
+%% \hline 0 (0) & 1 (0) & 1 (0) & 0 (0) & 0 & 0 & 0 & 0 & B & - & $[0\ 0\ 0]$ \\
+%% \hline 0 (0) & 1 (0) & 1 (0) & 0 (0) & 0 & 0 & 0 & 0 & join & - & $[0\ 0\ 0]$ \\
+%% \hline 0 (0) &  1 (0) &  1 (0) &  0 (0) & \multicolumn{7}{|c|}{init phase 0 done, init done} \\
+%% \hline 0 (0) & 1 (0) & 1 (0) & 0 (0) & 2 & 2 & 1 & 2 & join & join & $[0\ 0\ 4]$ \\
+%% \hline 0 (0) & 0 (0) & 1 (0) & -3 (3) & 2 & 2 & 1 & 2 & A & - & $[0\ 0\ 0]$ \\
+%% \hline 0 (0) & 0 (0) & 1 (0) & -3 (3) & 2 & 2 & 1 & 1 & B & $A_{B,0}$ & $[0\ 0\ 0]$ \\
+%% \hline 0 (0) & 0 (0) & -1 (2) & 3 (0) & 2 & 2 & 0 & 2 & split & $\{2split\}$ & $[6\ 6\ 0]$ \\
+%% \hline 4 (0) & 0 (0) & 1 (0) & 3 (0) & 0 & 2 & 0 & 2 & A & $\{2A_{A,0}\}$ & $[0\ 0\ 0]$ \\
+%% \hline 0 (0) & 2 (0) & 1 (0) & 3 (0) & 0 & 0 & 0 & 0 & B & - & $[0\ 0\ 0]$ \\
+%% \hline 0 (0) & 2 (0) & 1 (0) & 3 (0) & 0 & 0 & 0 & 1 & join & join  & $[0\ 0\ 4]$ \\
+%% \hline 0 (0) &  1 (0) &  1 (0) &  0 (0) & \multicolumn{7}{|c|}{phase 0 done, steady state schedule done} \\
+%% \hline
+%% \end{tabular}
+%% \caption[Execution of Minimal Latency Scheduling Algorithm on a
+%% {\splitjoin}]{Execution of Minimal Latency Scheduling Algorithm on
+%% {\splitjoin} from Figure \ref{fig:steady-state}(b). In the ``data
+%% in {\Channel}'' columns, the first value represents the actual
+%% number of data in the {\Channel}, which can be negative due to
+%% data borrowing. The second value is the minimal number of data
+%% items borrowed from the {\Channel}.}
+%% \label{tbl:min-lat-sj}
+%% \end{table*}
+
+%% Table \ref{tbl:min-lat-sj} contains a trace of execution of our
+%% algorithm on the sample {\splitjoin} from Figure
+%% \ref{fig:steady-state}(b). Below is the phased schedule for the
+%% {\splitjoin}. Note that this example produces a phased single
+%% appearance schedule.
+
+%% \begin{displaymath} \scriptsize
+%% P_{sj} = \left\{
+%% \begin{array}{c}
+%% T_{sj} = \left\{
+%% \begin{array}{c}
+%% A_{sj,0} = \left\{ \{\{2 split\}\{2A\}B\{2 join\}\}, \left[\begin{array}{c} 6 \\ 6 \\ 8 \end{array}\right]\right\} \\
+%% \end{array}\right\}, \\
+%% I_{sj} = \left\{ A^i_{sj,0} = \left\{
+%% \{split\ A^i_{A,0}\ A^i_{B,0}\}, \left[\begin{array}{c} 3 \\ 3 \\ 0 \\
+%% \end{array}\right]\right\}
+%% \right\}, \\
+%% c_{sj} = \left[ \begin{array}{c} 6 \\ 6 \\ 8 \end{array} \right],
+%% c^i_{sj} = \left[ \begin{array}{c} 3 \\ 3 \\ 0 \end{array}
+%% \right],
+%% \end{array}
+%% \right\}
+%% \end{displaymath}
+
+\subsection{Generalizing Other Techniques}
+
+As alluded to above, single appearance scheduling and minimum latency
+scheduling are special cases of our parameterized phased scheduling
+algorithm.  A single appearance schedule is defined as a schedule
+where each node appears in one position of the loop nest denoting the
+schedule.  Because the nodes within a phase are sorted by child
+stream, this is equivalent to a phased schedule with a single phase:
+\[
+\small
+\begin{array}{rcl}
+\mt{singleAppSchedule}[s]  & = & \langle \mt{phasedSchedule}(s, 1, \mbox{INIT}), \\
+                         ~ & ~ & ~ \mt{phasedSchedule}(s, 1, \mbox{STEADY}) \rangle
+\end{array}
+\]
+
+A minimum latency schedule exhibits the following property: if $i$
+input items have been consumed by a hierarchical node when it produces
+its $j$th output item, then there does not exist a schedule which
+produces $j$ output items while consuming less than $i$ input items.
+This condition is necessary and sufficient for a schedule to be
+minimum latency.  We can construct a minimum latency schedule as a
+phased schedule with an unlimited number of phases:
+\[
+\small
+\begin{array}{rcl}
+\mt{minLatencySchedule}[s] & = & \langle \mt{phasedSchedule}(s, \infty, \mbox{INIT}), \\
+                         ~ & ~ & ~ \mt{phasedSchedule}(s, \infty, \mbox{STEADY}) \rangle
+\end{array}
+\]
+This schedule is guaranteed to be minimum latency, since it is
+comprised of push phases that do not fire the entrance node once the
+exit node has been fired (see {\tt pushSchedule} in
+Figure~\ref{fig:phasealg}).
+
+Thus, single appearance and minimum latency schedules represent
+extreme values of the {\tt maxPhases} parameter.  Other values of {\tt
+maxPhases} indicate compromises between these two extremes.  Also,
+note that different levels of granularity could be applied to
+different streams in the same graph, depending on the constraints; the
+algorithm does not depend on the granularity of the children when it
+is scheduling a parent node.
+
+\subsection{Scheduling Feedback Loops}
+
+Some feedback loops require a minimum number of phases in order to
+construct a valid schedule.  This is because if the latency of child
+streams is too high, then a node could deadlock waiting for its own
+(upcoming) output to propagate through the loop.  For example, in our
+GSM benchmark, there is a tightly constrained feedback loop (see
+Figure~\ref{fig:gsm}).  While it is impossible to schedule this loop
+with a single appearance schedule, a minimum latency schedule results
+in a legal ordering (see~Figure~\ref{fig:gsm-phases}).
+
+Figure~\ref{fig:feedalg} provides an algorithm for calculating the
+minimum number of phases that are required to schedule a feedback
+loop.  The routine's functionality is similar to the phased scheduler,
+except for one key difference: the joiner is executed as much as
+possible before the items that it pushes are propagated around the
+loop.  This ensures that the reshuffling step of the phased scheduling
+algorithm will be legal, since no element in the schedule will depend
+on items that it produced earlier in the same phase.  Note that the
+{\tt phasedSchedule} algorithm gives an undefined result if a given
+loop is impossible to schedule with the requested number of phases;
+thus, {\tt phasesForFeedback} should always be called first to see how
+many phases are needed.
+
+\begin{figure*}[t]
+\centering
+\psfig{figure=gsmfl-sched.eps,width=5.2in}
+\vspace{-4pt}
+\caption{\small Phased minimum latency schedule for one steady state
+execution of the feedback loop of Figure~\ref{fig:gsm}.  Nodes are
+labeled with the number of times they fire in a given phase.  No
+single appearance schedule exists for this
+loop.\protect\label{fig:gsm-phases}}
+\vspace{-3pt}
+\end{figure*}
+
+\begin{figure}
+\begin{center}
+\vspace{-6pt}
+\psfig{figure=gsmfl.eps,width=2in}
+\vspace{-6pt}
+\caption{\small A tightly coupled feedback loop that appears as one component
+of our GSM benchmark.  Nodes are labeled with their pop and push
+rates.  \protect\label{fig:gsm}}
+\end{center}
+\vspace{-12pt}
+\end{figure}
+
+\subsection{Schedule Representation}
+\label{sec:schedrep}
+
+In the discussion above, a schedule is represented simply as a
+sequence of phases for child nodes.  However, since this
+representation can become large for some programs, our implementation
+employs compression to keep code size to a minimum.  
+
+We compress the schedule in three simple ways.  First, we collect
+repetitions of identical phases into a loop.  For example, if {\tt A}
+is a phase:
+\[
+\mbox{{\tt A=BBB}} ~\rightarrow~ \mbox{{\tt A=\{3B\}}}
+\]
+Second, if a hierarchical phase contains only one execution of a
+child, we substitute all occurrences of the parent with a direct call
+to the child:
+\[
+\mbox{{\tt A=BCD, C=E}} ~\rightarrow~ \mbox{{\tt A=BED}}
+\]
+Finally, if a phase is used only once, then it can be replaced by its
+child phases, even if there are multiple children:
+\[
+\mbox{{\tt A=BCD, C=EFG, C}}~\mt{used}~\mt{only}~\mt{once}~ ~\rightarrow~ \mbox{{\tt A=BEFGD}}
+\]
+To improve the compression of the schedule, we repeatedly apply the
+above three transformations until no further changes can be made.
+
+%% During testing it was found that in some applications some operators
+%% had many phases that were identical to other phases of the
+%% operator. Instead of including these phases in the final schedule
+%% multiple times, they were listed only once, and references to the
+%% duplicate phases have been replaced with references to the one copy.
+
+%% This optimization lead to improvements in schedule size for two
+%% reasons. First, operators now have fewer phases, so their schedules
+%% take up less space. Second, applications using the phased schedules
+%% can now execute the same phase multiple times in a row, which was
+%% optimized out using run length encoding.
+
+In the future, an additional optimization could be explored regarding
+schedule compression.  Instead of representing different phases for a
+given stream by distinct entries in the schedule, we could record only
+the name of the stream in the schedule and postpone the resolution of
+the current phase number until runtime.  This would allow more
+opportunities for schedule compression, as two different phases would
+be considered equal if they call the same child streams, rather than
+requiring them to call the same phases on those children.  However,
+proper evaluation of this technique would need to take into account
+the overhead of this indirection at runtime, and we do not evaluate it
+here.
+
+\begin{figure}
+\psfig{figure=pseudocode6.eps,width=3.5in}
+\vspace{-16pt}
+\caption{\small Algorithm to detect the minimum number of phases required by
+a given feedback loop.\protect\label{fig:feedalg}}
+\end{figure}
+
+%\input{hierarchical}
+%\input{phased}
+%\input{constrained}
+
+\section{Results}
+\label{chpt:results}
+
+We have implemented the phased single appearance and minimum latency
+scheduling algorithms as part of the StreamIt compiler, and we
+evaluate them in this section.  Section \ref{sec:results:apps}
+presents the applications used for evaluation, while Section
+\ref{sec:results:results} presents the results and analysis.
+
+\subsection{Benchmarks}
+\label{sec:results:apps}
+
+Our benchmark suite contains 17 applications. Out of these
+applications, 15 represent meaningful computations taken from
+real-life applications, while two were chosen to highlight the
+effectiveness of phased scheduling.
+
+SJPeek1024 and SJPeek31 are synthetic benchmarks, designed to
+highlight the strengths of phased schedules~\cite{karczma-thesis}.
+SJPeek1024 requires an initialization schedule which benefits from the
+finer granularity of minimum latency scheduling. SJPeek31 contains a
+push/pop mismatch which causes a combinatorial blow-up using single
+appearance scheduling.
+
+Nine test applications (BitonicSort, FFT, FilterBank, FIR, Radio, GSM,
+3GPP, Radar and Vocoder) are also used in \cite{Gordo02}. BitonicSort
+performs a 32 element bitonic sort; FFT performs a 64-element FFT;
+FilterBank is an 8 channel filter bank; FIR is a 64-tap fine-grained
+FIR filter; Radio is an FM radio decoder with an equalizer; 3GPP is a
+3GPP Radio Access Protocol application; Radar is a radar array
+front-end application with beamforming; Vocoder is a 28 channel
+Vocoder.
+
+Two test applications (CD-DAT and QMF) are borrowed from
+\cite{murt2000x2}. We model only the communication properties of the
+graphs; the code inside of the {\filters} has not been implemented.
+CD-DAT performs sample rate conversion and is exactly the same as that
+described in \cite{murt2000x2}.  QMF is a filter bank application
+which uses a 1/2-1/2 split for the spectrum up to a depth of 3
+(qmf12\_3d in~\cite{murt2000x2}).  It was slightly modified to use
+{\StreamIt}'s pre-defined {\splitter} and {\joiner} constructs.  The
+high-pass and low-pass filtering in multiple-output blocks has been
+converted to a splitter followed by filters on each of the output
+channels. The low and high pass filters have also been given a peek
+amount of 16 so they can perform their function in the way intended by
+{\StreamIt}.
+
+The remaining 4 applications were chosen from our sample applications
+used for testing the StreamIt compiler. HDTV performs a HDTV signal
+decoding/encoding. CFAR implements PCA Constant False Alarm Rate
+detection. Block Matrix Mult performs a blocked matrix multiplication
+- it multiplies a 12x12 matrix by a 9x12 matrix in blocks of 3x3
+sub-matrices. Trellis performs trellis encoding/decoding.
+
+\begin{comment}
+
+\subsection{Methodology}
+\label{sec:results:methodology}
+
+The following data has been collected: number of nodes, number of
+node executions per steady state, schedule size and buffer size
+for pseudo single appearance and minimal latency schedules.
+
+\subsubsection{Schedule Compression}
+
+\end{comment}
+
+\subsection{Results}
+\label{sec:results:results}
+
+\begin{figure}[t]
+\vspace{6pt}
+\psfig{figure=buffer-graph.eps,width=3.35in}
+\caption{\small Buffer size required by a phased minimum latency schedule,
+normalized to buffer size of a hierarchical single appearance
+schedule.\protect\label{fig:buffergraph}}
+\vspace{-6pt}
+\end{figure}
+
+Table \ref{tbl:results} presents the code and buffer sizes required by
+our hierarchical single appearance and minimum latency scheduling
+algorithms for our benchmark suite.  Note that the GSM application
+cannot be scheduled using a single appearance schedule, because it has
+a tightly constrained feedback loop (see Figure~\ref{fig:gsm}).  Thus,
+we omit GSM in Figures~\ref{fig:buffergraph} to~\ref{fig:sumgraph}.
+
+Several applications show a very large improvement in buffer size
+necessary for execution (see Figure~\ref{fig:buffergraph}).  These
+improvements are usually coupled with an increase in code size
+(Figure~\ref{fig:codegraph}).  However, as shown in
+Figure~\ref{fig:sumgraph}, minimum latency scheduling never increases
+the sum of code size and data size for any application.  In computing
+this sum, note that we give equal weight to the code size and data
+size only for the sake of illustration; in an actual system, the
+relative cost of each kind of storage would greatly depend on resource
+constraints and the implementation strategy.
+
+The CD-DAT benchmark exhibits a decrease in buffer size from 1021 to
+72, a 93\% improvement. \cite{murt2000x2} reports a buffer size of 226
+after applying buffer merging techniques. Our improvement is due to
+reducing the combinatorial growth of the buffers using phased
+scheduling.
+
+\begin{figure}[t]
+\vspace{6pt}
+\centering
+\psfig{figure=code-graph.eps,width=3.28in}
+\caption{\small Code size required by a phased minimum latency schedule,
+normalized to code size of a hierarchical single appearance
+schedule.\protect\label{fig:codegraph}}
+\end{figure}
+
+\begin{figure}[t]
+\psfig{figure=total-size-graph.eps,width=3.35in}
+\caption{\small Sum of buffer and code size required by a phased
+minimum latency schedule, normalized to that of a hierarchical single
+appearance schedule.  We give equal weight to the code and buffer size
+only for illustration; in an actual system, the relative weights are
+complex and depend upon resource
+constraints. \protect\label{fig:sumgraph}}
+\vspace{-4pt}
+\end{figure}
+
+\begin{table*} \centering \small
+\vspace{-4pt}
+\begin{tabular}{|c|c|c|c|c|c|c|}
+\hline {\parbox{0.8in}{ \vspace{3pt} {\bf Benchmark}}} & \parbox{0.8in}{\centering \vspace{8pt}{\bf Number of Nodes}} & \parbox{0.8in}{\centering \vspace{16pt} {\bf Number of Node Executions}} & \multicolumn{2}{c|}{{\bf Single Appearance}} & \multicolumn{2}{c|}{{\bf Minimal Latency}} \\
+\cline{4-7} & & & \parbox{0.8in}{\centering ~ \\ \vspace{-3pt}{\bf Code Size} ~ \\ } & \parbox{0.8in}{\centering ~ \\ \vspace{-3.3pt} {\bf Buffer Size} ~ \\ } & \parbox{0.8in}{\centering ~ \\ \vspace{3pt} {\bf Code Size} ~ \vspace{6pt} \\ } & \parbox{0.8in}{\centering ~ \\ \vspace{-3.3pt} {\bf Buffer Size} ~ \\ } \\
+\hline SJPeek31 & 6 & 12063 & 8 & 19964 & 24 & 874 \\
+\hline HDTV & 170 & 390038 & 230 & 550692 & 1190 & 28300 \\
+\hline CD-DAT & 6 & 612 & 6 & 1021 & 64 & 72 \\
+\hline CFAR & 4 & 193 & 7 & 193 & 9 & 129 \\
+\hline SJPeek1024 & 6 & 3081 & 8 & 7168 & 13 & 4864 \\
+\hline Block Matrix Mult & 43 & 1956 & 48 & 4212 & 56 & 3132 \\
+\hline Vocoder & 117 & 415 & 156 & 1285 & 205 & 1094 \\
+\hline Radar & 68 & 161 & 68 & 332 & 68 & 332 \\
+\hline BitonicSort & 370 & 468 & 370 & 2112 & 370 & 2112 \\
+\hline 3GPP & 94 & 356 & 104 & 986 & 108 & 970 \\
+\hline Trellis & 14 & 301 & 14 & 538 & 17 & 499 \\
+\hline FIRfine & 132 & 152 & 132 & 1560 & 132 & 1560 \\
+\hline FilterBank & 53 & 312 & 95 & 2063 & 116 & 1991 \\
+\hline QMF & 65 & 184 & 85 & 1225 & 85 & 1225 \\
+\hline Radio & 30 & 43 & 35 & 1351 & 35 & 1351 \\
+\hline FFT & 26 & 448 & 26 & 3584 & 26 & 3584 \\
+\hline GSM & 47 & 3356 & - & - & 64 & 3900 \\
+\hline
+\end{tabular}
+\caption{\small Results of running single appearance and minimal
+latency scheduling algorithms on various applications.}
+\label{tbl:results}
+\vspace{-4pt}
+\end{table*}
+
+For our synthetic benchmarks SJPeek31 and SJPeek1024, buffer sizes
+decrease by 95\% and 32\%, respectively. In the case of SJPeek1024,
+the improvement is due to creating fine grained phases which allow the
+initialization schedule to transfer smaller amounts of data and allow
+the children of a {\splitjoin} to drain their data before the
+{\splitter} provides them with more. This improvement is only evident
+in the presence of peeking. In the case of SJPeek31, the improvement
+reflects reduced combinatorial growth in addition to the fine-grained
+benefit with peeking.
+
+It is important to note that the schedules we consider in our
+evaluation have the elements of a hierarchical phase sorted as
+described in Section~\ref{chpt:phased}: all of the phases of a given
+child stream are executed before advancing to the next child.  For
+both single-appearance and minimum latency scheduling, this represents
+only one possible execution order for child phases; in particular, a
+more fine-grained interleaving of children could reduce buffer
+requirements.  While we do not explore the range of possible
+interleavings within a hierarchical node, note that the hierarchy of
+the stream graph provides a set granularity at which the leaf nodes of
+the graph can be interleaved---for example, in a hierarchical
+single-appearance schedule, two consecutive executions of a pipeline
+construct would execute all of its nodes once before executing all of
+the nodes again.  We are exploring other interleaving strategies for
+the nodes within a given phase.
+
+
+\section{Related Work}
+\label{chpt:related}
+
+There has been a wealth of research on scheduling dataflow graphs.
+This section introduces some of the other projects.
+
+Ptolemy \cite{ptolemyoverview} is a simulation environment for
+heterogeneous embedded systems, including Synchronous Data Flow, the
+domain that is most similar to {\StreamIt}. {\SDF} programs, however,
+do not include the peeking constructs of {\StreamIt}.  The {\SDF}
+computation model does not impose structure on the program.  All
+actors (the SDF equivalent of filters) are allowed to have multiple
+input and output channels.  \cite{benveniste93dataflow} provides an
+overview of dataflow synchronous languages.
+
+There are many results on the scheduling of {\SDF} programs
+\cite{bhattacharyya99synthesis,leesdf}.  While the tradeoff between
+data size and code size is well recognized, most projects focus on
+minimizing memory requirements while maintaining minimal code size in
+the form of a single appearance schedule.  A single appearance
+schedule is attractive because filters can be inlined into the
+schedule without effecting the size of the code.  In this paper, we
+assume that the schedule and the filter code are stored separately,
+and that non-single appearance schedules are supported with function
+calls. \cite{bhat1999x1} considers a hybrid model between these two
+extremes, in which actor invocations are inlined unless the resulting
+code grows too large.
+
+There are a number of approaches to minimizing the buffer requirements
+for single-appearance schedules (see \cite{bhattacharyya99synthesis}
+for a review).  APGAN (Pairwise Grouping of Adjacent Nodes) and RPMC
+(Recursive Partitioning by Minimum Cuts) are two complementary
+heuristics that have shown to be effective when applied together,
+taking the best result~\cite{Bhatta97}.  Another technique for
+reducing buffering requirements is buffer merging
+\cite{murt1999x3,murt2000x2}, which could be explored for use in
+{\StreamIt} in the future.  Yet another approach is the GASAS system,
+which uses genetic algorithms to minimize buffer size~\cite{GASAS}.
+
+Buffer minimization has also been done in the context of a
+multiprocessor implementation \cite{govindarajan-minimizing}. Using a
+linear programming framework, they minimize the buffer size across
+schedules that have optimal throughput.
+
+There are some streaming computation models which are less constrained
+than {\SDF}. The most relevant is Cyclo-Static Data Flow (CSDF)
+\cite{BELP96,parks95comparison}.  CSDF actors have multiple {\work}
+functions, each of which can produce/consume a different number of
+data items.  Phased scheduling could be viewed as a generalization of
+CSDF to the case where hierarchical stream containers -- not just leaf
+nodes -- have cyclic phases.  In addition, incorporating child phases
+into parent schedules allows the phase information in a CSDF graph to
+be fully utilized, {\it e.g.,} for decreasing latency and for
+scheduling tightly constrained feedback loops.
+
+\cite{wauters96cyclodynamic} proposes a model where the flow of data
+is not static, but may depend on data being processed. The model is
+called Cyclo-Dynamic Data Flow (CDDF). This greatly improves the
+flexibility of programming, but prevents fully static scheduling of
+programs. The U.S. Navy Processing Graph Method (PGM) uses a version
+of {\SDF} with an equivalent of peeking \cite{goddard00navy}.  The
+paper is focused on real-time execution and provides analysis and
+verification of latency of data flow through their system.
+
+A large number of programming languages have included a concept of a
+stream; see \cite{survey97} for a survey.  Synchronous languages such
+as LUSTRE~\cite{lustre}, Esterel~\cite{esterel92}, and
+Signal~\cite{signal} also target the embedded domain, but they are
+more control-oriented than StreamIt and are less amenable to static
+scheduling.  Sisal (Stream and Iteration in a Single Assignment
+Language) is a high-performance, implicitly parallel functional
+language~\cite{sisal}.  The Distributed Optimizing Sisal
+Compiler~\cite{sisal} considers compiling Sisal to distributed memory
+machines, although it is implemented as a coarse-grained master/slave
+runtime system instead of a fine-grained static schedule.
+
+% http://www.cis.ohio-state.edu/~gb/cis888.12g/Papers/bhattacharyya99software.pdf, page 14, reviews related work for buffer stuff
+
+\section{Conclusion and Future Work}
+\label{chpt:conclusion}
+
+This paper presents a general phased scheduling algorithm for
+structured Synchronous Dataflow Graphs as used by the StreamIt
+language.  Unlike other languages, StreamIt enforces a hierarchical,
+single-input single-output structure on the stream graph, thus
+allowing a variety of new approaches to stream scheduling.
+
+A hierarchical approach to scheduling of streaming applications allows
+for very simple algorithms. Program graphs do not have to be
+considered globally, thus less data needs to be kept track of.  In
+the hierarchical approaches presented here, we only need to consider
+immediate children of a given stream operator.
+
+The phased approach to scheduling allows the scheduling of arbitrarily
+tight {\feedbackloops} and allows for more fine-grained control of
+buffer requirements. The fine-grained control of buffer requirements
+can provide dramatic reduction of buffer sizes when scheduling
+streaming applications, as has been presented here. Furthermore,
+phased schedules lend themselves to some easy forms of compression,
+thus further reducing the schedule size.
+
+Future work will concentrate on expanding phased scheduling to
+implement schedules that have some real-life constraints put upon
+them. For example, a program may need to keep all its data in
+processor caches to provide high performance.  Adapting buffer sharing
+to phased scheduling will also be explored, as it promises further
+reduction in buffer requirements.
+
+
+\section{Acknowledgements}
+
+Many people have contributed to the StreamIt infrastructure that was
+utilized in this paper, including Michael Gordon, David Maze, Jasper
+Lin, and Andrew Lamb.  We also thank Ali Meli, Chris Leger, and Jeremy
+Wong for implementing some of the applications.  The StreamIt project
+is supported by grants from DARPA, NSF, and the MIT Oxygen Alliance.
+%\input{pseudocode}
+{\small
+\begin{thebibliography}{10}
+
+\bibitem{benveniste93dataflow}
+Albert Benveniste, Paul Caspi, Paul~Le Guernic, and Nicolas Halbwachs.
+\newblock {Data-Flow Synchronous Languages}.
+\newblock In {\em {REX} School/Symposium}, pages 1--45, 1993.
+
+\bibitem{esterel92}
+Gerard Berry and Georges Gonthier.
+\newblock {The Esterel Synchronous Programming Language: Design, Semantics,
+  Implementation}.
+\newblock {\em Science of Computer Programming}, 19(2):87--152, 1992.
+
+\bibitem{Bhatta97}
+Chuvra~S. Bhattacharyya, Praveen~K. Murthy, and Edward~A. Lee.
+\newblock {APGAN and RPMC: Complementary Heuristics for Translating DSP Block
+  Diagrams into Efficient Software Impelementations}.
+\newblock {\em {Journal of Design Automation for Embedded Systems}}, January
+  1997.
+
+\bibitem{bhattacharyya99synthesis}
+S.~Bhattacharyya, P.~Murthy, and E.~Lee.
+\newblock Synthesis of embedded software from synchronous dataflow
+  specifications.
+\newblock {\em Journal of VLSI Signal Processing Systems}, 21(2), June 1999.
+
+\bibitem{bhat1999x1}
+S.~S. Bhattacharyya.
+\newblock {Optimization Trade-offs in the Synthesis of Software for Embedded
+  {DSP}}.
+\newblock In {\em CASES}, October 1999.
+\newblock Washington, D. C.
+
+\bibitem{leesdf}
+S.~S. Bhattacharyya, P.~K. Murthy, and E.~A. Lee.
+\newblock {\em {Software Synthesis from Dataflow Graphs}}.
+\newblock Kluwer Academic Publishers, 1996.
+
+\bibitem{BELP96}
+Greet Bilsen, Marc Engels, Rudy Lauwereins, and Jean Peperstraete.
+\newblock {Cyclo-Static Dataflow}.
+\newblock {\em IEEE Trans. on Signal Processing}, pages 397--408, February
+  1996.
+
+\bibitem{signal}
+Thierry Gautier, Paul~Le Guernic, and Loic Besnard.
+\newblock Signal: A declarative language for synchronous programming of
+  real-time systems.
+\newblock {\em Springer Verlag Lecture Notes in Computer Science},
+  274:257--277, 1987.
+
+\bibitem{goddard00navy}
+S.~Goddard and K.~Jeffay.
+\newblock {Analyzing the Real-Time Properties of a U.S. Navy Singer Processing
+  System}.
+\newblock {\em International Journal of Reliability. Quality and Safety
+  Engineering}, 7(4), 2000.
+
+\bibitem{Gordo02}
+Michael Gordon, William Thies, Michal Karczmarek, Jeremy Wong, Henry Hoffmann,
+  David Maze, and Saman Amarasinghe.
+\newblock {A Stream Compiler for Communication-Exposed Architectures}.
+\newblock In {\em ASPLOS}, pages 75--86, October 2002.
+
+\bibitem{govindarajan-minimizing}
+R.~Govindarajan, Guang~R. Gao, and Palash Desai.
+\newblock Minimizing memory requirements in rate optimal schedules.
+\newblock In {\em Proc. of the 1994 International Conference on Application
+  Specific Array Processors}, pages 75--86. IEEE Computer Society, August 1994.
+
+\bibitem{lustre}
+N.~Halbwachs, P.~Caspi, P.~Raymond, and D.~Pilaud.
+\newblock {The synchronous data-flow programming language LUSTRE}.
+\newblock {\em Proc. of the IEEE}, 79(9):1305--1320, September 1991.
+
+\bibitem{streamitweb}
+StreamIt Homepage.
+\newblock \texttt{http://compiler.lcs.mit.edu/streamit}.
+
+\bibitem{sisal}
+{J. Gaudiot and W. Bohm and T. DeBoni and J. Feo and P. Mille}.
+\newblock {The Sisal Model of Functional Programming and its Implementation}.
+\newblock In {\em Proc. of the Second Aizu International Symposium on Parallel
+  Algorithms/Architectures Synthesis}, 1997.
+
+\bibitem{karczma-thesis}
+Michal Karczmarek.
+\newblock {Constrained and Phased Scheduling of Synchronous Data Flow Graphs
+  for StreamIt Language}.
+\newblock S.M. Thesis, Massachusetts Instititue of Technology, Laboratory for
+  Computer Science, 2002.
+
+\bibitem{lamb03}
+Andrew Lamb, William Thies, and Saman Amarasinghe.
+\newblock {Linear Analaysis and Optimization of Stream Programs}.
+\newblock In {\em {PLDI}}, 2003.
+
+\bibitem{lee87static}
+E.~Lee and D.~Messershmitt.
+\newblock {Static Scheduling of Synchronous Data Flow Programs for Digital
+  Signal Processing}.
+\newblock {\em IEEE Trans. on Computers}, C-36(1):24--35, January 1987.
+
+\bibitem{ptolemyoverview}
+Edward~A. Lee.
+\newblock {Overview of the Ptolemy Project}.
+\newblock UCB/ERL Technical Memorandum UCB/ERL M01/11, Dept. EECS, UC Berkeley,
+  CA, March 2001.
+
+\bibitem{murt1999x3}
+P.~K. Murthy and S.~S. Bhattacharyya.
+\newblock {A Buffer Merging Technique for Reducing Memory Requirements of
+  Synchronous Dataflow Specifications}.
+\newblock In {\em International Symposium on System Synthesis}, 1999.
+
+\bibitem{murt2000x2}
+P.~K. Murthy and S.~S. Bhattacharyya.
+\newblock {Buffer Merging --- A Powerful Technique for Reducing Memory
+  Requirements of Synchronous Dataflow Specifications}.
+\newblock Technical report, Inst. for Adv. Computer Studies, UMD College Park,
+  2000.
+
+\bibitem{parks95comparison}
+T.~Parks, J.~Pino, and E.~Lee.
+\newblock {A Comparison of Synchronous and CycloStatic Dataflow}.
+\newblock In {\em IEEE Asilomar Conference on Signals, Systems, and Computers},
+  1995.
+
+\bibitem{survey97}
+Robert Stephens.
+\newblock {A Survey of Stream Processing}.
+\newblock {\em Acta Informatica}, 34(7):491--541, 1997.
+
+\bibitem{thies02streamit}
+William Thies, Michal Karczmarek, and Saman Amarasinghe.
+\newblock {StreamIt: A Language for Streaming Applications}.
+\newblock In {\em {Proc. of the International Conference on Compiler
+  Construction}}, 2002.
+
+\bibitem{wauters96cyclodynamic}
+P.~Wauters, M.~Engels, R.~Lauwereins, and J.~Peperstraete.
+\newblock Cyclo-dynamic dataflow.
+\newblock In {\em 4th EUROMICRO Workshop on Parallel and Distributed
+  Processing}, January 1996.
+
+\bibitem{GASAS}
+Eckart Zitzler, Jurgen Teich, and Shuvra~S. Bhattacharyya.
+\newblock {Evolutionary Algorithms for the Synthesis of Embedded Software}.
+\newblock {\em {IEEE Trans. on Very Large Scale Integration (VLSI) Systems}},
+  8(4), August 2000.
+
+\end{thebibliography}
+}
+%\appendix
+%\input{appeqs}
+
+%\input{appfigs}
+
+\end{document}
