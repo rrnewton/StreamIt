@@ -228,52 +228,31 @@ syntax, we make use of anonymous classes for inlining \cite{java}.
 
 StreaMIT differs from other languages in that it imposes a
 well-defined structure on the streams; all stream graphs are built out
-of a composition of Streams, SplitJoins, and FeedbackLoops.  This is
-in contrast to other environments, which generally regard a stream as
-an arbitrary network of filters connected by channels.  However,
-arbitrary graphs are very hard for the compiler to analyze, and
-equally difficult for a programmer to describe.  Most programmers
-either resort to straight-line code that links one filter to another
-(thereby making it very hard to visualize the stream graph), or using
-an ad-hoc graphical programming environment that is awkward to use and
-admits no good textual representation.  
+of a hierarchical composition of Streams, SplitJoins, and
+FeedbackLoops.  This is in contrast to other environments, which
+generally regard a stream as a flat and arbitrary network of filters
+that are connected by channels.  However, arbitrary graphs are very
+hard for the compiler to analyze, and equally difficult for a
+programmer to describe.  Most programmers either resort to
+straight-line code that links one filter to another (thereby making it
+very hard to visualize the stream graph), or using an ad-hoc graphical
+programming environment that is awkward to use and admits no good
+textual representation.
 
 In contrast, StreaMIT is a clean textual representation
 that--especially with inlined streams--makes it very easy to see the
-shape of the computation from the indentation level of the code.The
-order that StreaMIT imposes on streaming computations could be
-compared to the effect that structured 
+shape of the computation from the indentation level of the code.  The
+comparison of StreaMIT's structure with arbitrary stream graphs could
+be likened to the difference between structured control flow and GOTO
+statements.  Though sometimes the structure restricts the
+expressiveness of the programmer, the gains in robustness,
+readability, and compiler analysis are immense.
 
-StreaMIT 
-
-- scripting
-- inlining
-
-- others:
-	- straight-line code declaring & connecting blocks
-		problem: can't see the structure.
-			 easy to make mistakes
-	- ad-hoc graph languages for declaring & connecting blocks
-		problem: awkward to use
-			 no good textual representation
-
-	  generally, arbitrary connections are too hard to think
-		about. and too hard for compiler to analyze.
-		make connection with unstructured control flow
-
-- us: structured streams.
-	- compose out of simple structures:  
-		pipe, feedbackloop, splitjoin
-
-	   advantages: can see structure in code, with indentation
-		level corresponding to hierarchical stream
-		depth (pointer to natural syntax argument?)
-
-		- can have clean abstractions about *hierarchical*
-		structure.  Provides better abstraction and
-		modularity than *flat* layout of blocks.
-
-- syntax presented:  stream, feedbackloop, splitjoin.  inlining.
+A final benefit of stream graph construction in StreaMIT is the
+ability to do {\it scripting} to parameterize graphs.  For instance,
+both the FFT stream in Figure \ref{fig:fft} inputs a parameter {\tt N}
+and adjusts the number of butterfly stages appropriately.  This
+further improves readability and decreases code size.
 
 \subsection{Messages}
 
@@ -283,32 +262,6 @@ StreaMIT
 
 \begin{verbatim}
 
----------------------------------------------------------------------------
-- others:
-	- straight-line code declaring & connecting blocks
-		problem: can't see the structure.
-			 easy to make mistakes
-	- ad-hoc graph languages for declaring & connecting blocks
-		problem: awkward to use
-			 no good textual representation
-
-	  generally, arbitrary connections are too hard to think
-		about. and too hard for compiler to analyze.
-		make connection with unstructured control flow
-
-- us: structured streams.
-	- compose out of simple structures:  
-		pipe, feedbackloop, splitjoin
-
-	   advantages: can see structure in code, with indentation
-		level corresponding to hierarchical stream
-		depth (pointer to natural syntax argument?)
-
-		- can have clean abstractions about *hierarchical*
-		structure.  Provides better abstraction and
-		modularity than *flat* layout of blocks.
-
-- syntax presented:  stream, feedbackloop, splitjoin.  inlining.
 ---------------------------------------------------------------------------
 - integrated support for infrequent, low-bandwidh messages
 - others:
