@@ -1,5 +1,6 @@
 \section{A Moving Average Filter}
 
+\begin{textpic}{\includegraphics{cookbook.2}}
 \begin{lstlisting}{}
 void->void pipeline MovingAverage {
   add IntSource();
@@ -16,6 +17,7 @@ int->int filter Averager(int n) {
   }
 }
 \end{lstlisting}
+\end{textpic}
 
 Most of a typical StreamIt program consists of filters that produce
 some output from their input.  The \lstinline|Averager| filter shown

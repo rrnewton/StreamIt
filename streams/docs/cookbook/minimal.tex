@@ -1,5 +1,6 @@
 \section{A Minimal Program}
 
+\begin{textpic}{\includegraphics{cookbook.1}}
 \begin{lstlisting}{}
 void->void pipeline Minimal {
   add IntSource();
@@ -14,6 +15,7 @@ int->void filter IntPrinter {
   work pop 1 { print(pop()); }
 }
 \end{lstlisting}
+\end{textpic}
 
 This is the minimal interesting StreamIt program.  \lstinline|Minimal|
 is a StreamIt \emph{pipeline}: the output of its first child is
