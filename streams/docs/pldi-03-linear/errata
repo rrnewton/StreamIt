@@ -1,0 +1,6 @@
+This is a list of errata for the PLDI paper that I found when editing my thesis
+
+Page 4, middle of left column:
+x = v*x + c
+should be
+x = x*v + c
