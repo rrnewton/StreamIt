@@ -1,4 +1,4 @@
-\begin{figure}[t]
+\begin{figure}[ht]
 \framebox[6.5in]{
 \begin{minipage}{6.3in}
 \begin{center}
@@ -60,8 +60,9 @@
 &~~~~~\forall (i,j,k) \in {\cal D}_{B \rightarrow R}:~~
 \mt{READ}_{c}(i,j,k) = \mt{BUF}_{c}(i+q,j*O(n) + k - q * \mt{Period}(c)) \\ \nonumber
 &\mt{where }{\cal D}_{B \rightarrow R} = 
-  {\cal D}_{READ_{c}} \cap \{ (i,j,k)~|~q * \mt{Period}(c) \le k \le \mt{min}((q+1)*\mt{Period}(c), E(c)) - 1 \}
+  {\cal D}_{READ_{c}} \cap \{ (i,j,k)~|~q * \mt{Period}(c) \le k \le \mt{min}((q+1)*\mt{Period}(c), E(c)) - 1 \} 
 \end{align}
+\vspace{-12pt}
 \end{itemize}
 \end{minipage}}
 \caption{Procedure for generating a SARE from a simplifed PCP:  one that has only one epoch, one phase, and no initial tokens.

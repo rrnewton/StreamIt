@@ -10,11 +10,11 @@ Our basic translation operates on computation graphs with all of the
 channels initially empty.  That is, we assume that:
 \begin{enumerate}
 
-\item No items appear on the channels at the beginning:  $\forall c:~~A(c) = 0$.
+\item No items appear on the channels at the beginning:  $\forall c,~A(c) = 0$.
 
-\item There are no initialization phases: $\forall n:~~\mt{num}(n, \mt{init}) = 0$.
+\item There are no initialization phases: $\forall n,~\mt{num}(n, \mt{init}) = 0$.
 
-\item Each node has only one steady-state phase: $\forall n:~~\mt{num}(n, \mt{steady}) = 1$.
+\item Each node has only one steady-state phase: $\forall n,~\mt{num}(n, \mt{steady}) = 1$.
 
 \end{enumerate}
 
@@ -24,6 +24,8 @@ phase of each node, we can omit some arguments to any function that
 requires an epoch $t$ or a phase $p$.  For instance, the push and pop
 rates of a channel $c$ are now just $U(c)$ and $O(c)$, respectively;
 the work function for a node $n$ is simply $W(n)$.
+
+\input{simplefig}
 
 \subsection{Calculating the Steady-State Period}
 \label{sec:balance}
@@ -49,6 +51,7 @@ channel $c = (n_a, n_b)$:
 That is, $\mt{Period}(c)$ denotes the number of items that are passed
 over channel $c$ during a single steady-state execution of the graph.
 
+\clearpage
 \subsection{Generating a SARE}
 \label{sec:simplesare}
 
@@ -60,8 +63,6 @@ variables or equations in the SARE, as that would require a separate
 compilation and analysis for each value of $N$.  It is a key benefit
 of the SARE representation that $N$ can be incorporated as a symbolic
 parameter in the schedule.
-
-\input{simplefig}
 
 The procedure for generating the SARE appears in
 Figure~\ref{fig:sdftosare}.  The basic idea is to introduce a variable

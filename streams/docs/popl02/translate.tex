@@ -22,13 +22,6 @@ others appears in Figure~\ref{fig:communic}.  Due to space
 limitations, we discuss only the most interesting parts of the
 translation below.
 
-\begin{figure}[t]
-\centering
-\psfig{figure=communic.eps,width=3.2in}
-\parbox{4in}{\caption{Flow of data between SARE variables.  Data flows from the base of each arrow to the tip.  Dotted lines indicate communication that might not occur for a given channel.}
-\protect\label{fig:communic}}
-\end{figure}
-
 Equation~\ref{i2ibuf} writes the initial values of the initial tokens
 on $\mt{IBUF}$, the initial buffer.  Equation~\ref{iwrite2ibuf}
 transfers values from the initial epoch of a node to the initial
@@ -72,8 +65,8 @@ tackled in Equation~\ref{eq:b2r}: the fact that the read array might
 peek beyond the limits of the buffer, which requires us to slice the
 domain in increments of one period.  The second complication is that
 there could be an offset--an initial buffer might have written into
-the beginning of the read array, or an initial read array might have
-read from the beginning of the steady-state
+\clearpage \noindent the beginning of the read array, or an initial
+read array might have read from the beginning of the steady-state
 buffer\footnote{Fundamentally, this complication ended up in this
 equation because we chose to define the initial buffer ($\mt{IBUF}$)
 to be the same length as its associated initial write array
@@ -86,6 +79,6 @@ determine the offset for Equations~\ref{sbuf2sread0}
 and~\ref{sbuf2sread1}.  The result is a number $\mt{Offset}$ that the
 domain needs to shift.  Unfortunately this involves splitting the
 original equation into two pieces, since after the shift the original
-domain will be split between two different periods (with different $i$
-indices in $\mt{SBUF}$).  Each of these equations is clever about the
-sign of the offset to adjust the indices in the right direction.
+domain could be split between two different periods (with different
+$i$ indices in $\mt{SBUF}$).  Each of these equations is clever about
+the sign of the offset to adjust the indices in the right direction.

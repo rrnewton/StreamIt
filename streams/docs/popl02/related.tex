@@ -21,7 +21,7 @@ graphs~\cite{Bhatta97}.
 
 Cyclo-static dataflow (CSDF) is the generalization of SDF to the case
 where each node has a set of phases with different I/O rates that are
-cycled through repeatedly~\cite{BELP96,Parks95}.  Compared to SFD,
+cycled through repeatedly~\cite{BELP96,Parks95}.  Compared to SDF,
 CSDF is more natural for the programmer for writing phased filters,
 since periodic tasks can be separated.  For instance, consider a
 channel decoder that inputs a large matrix of coefficients at regular
@@ -94,8 +94,8 @@ element at a known index $\vec i$, the SARE gives the set of arrays
 and indices that this element depends on.  Furthermore, each index
 expression on the right hand side is an affine expression of $\vec i$.
 Note that in order to map directly from an array element to the
-elements that it depends on, the index expression $\vec i$ on the left
-hand side must exactly match the input domain quantifier.
+elements that it depends on, the index expression on the left hand
+side must exactly match the domain quantifier $\vec i$.
 
 A SARE has no notion of internal state per se; however, state can be
 modeled by introducing a self-loop in the graph of variables.  If the
