@@ -1,4 +1,4 @@
-\section{Linear Representations}
+\section{Linear Nodes}
 \begin{figure}
 \center
 \epsfxsize=3.0in
@@ -15,35 +15,33 @@ since a {\tt filter} has state and can call external functions.
 
 However, we note that a large subset of DSP operations produce outputs
 that are some affine function of their input, and we call {\tt filters} that 
-implement such operations ``linear.'' To use standard DSP notation to talk about
-StreamIt programs, we will call the $e_F$ items that {\tt filter} $F$ uses as input
-$x[n]$, where  $n\in[0,e_F-1]$. Similarly, we  
-define the output of a {\tt filter} as $y[n]$ where  $n\in[0,push]$. For 
-linear {\tt filter}, the output can be related to the input by 
-$y[k] = (\sum_{i=0}^{e_F-1} a_{k,i}x[i])+b_k$.
-where $a_{k,i}$ and $b_{k}$ are constants with complex values. 
+implement such operations ``linear.'' To use DSP notation for {\tt streams} in
+StreamIt, we will call the items that are peeked and used as input
+$x[n]$, where  $n\in[0,e-1]$. Similarly, we define the output of 
+a {\tt stream} as $y[n]$ where  $n\in[0,u]$. For a linear {\tt stream}, 
+the output is related to the input by $y[k] = (\sum_{i=0}^{e-1} a_{k,i}x[i])+b_k$.
+where $a_{k,i}$ and $b_{k}$ are comlpex valued constants. 
 
-Each $y[k]$ can be represented as the dot product of two vectors, plus a scalar constant. 
-Thus, we can represent the action of the entire linear {\tt filter} 
-in an affine matrix-vector equation as illustrated in 
-Figure~\ref{fig:overview-matrix}.
+Each output element can be represented as the dot product of two vectors 
+plus a scalar constant.  Thus, we can represent the action of the 
+entire linear {\tt stream} in the affine matrix-vector equation ${\mathbf x} {\mathbf A} + {\mathbf b}$ 
+as illustrated in Figure~\ref{fig:overview-matrix}.
 
-The input data is a row vector $x$ of length $e_F$
-and the output data is a row vector $y$ of length $u_F$. The {\tt work} function
-of $F$ is represented as a weight matrix $A$ and a constant row vector $b$. 
-$A$ has $e_F$ rows and $u_F$ columns while $b$ has $1$ row and $u_F$ columns. 
-$x$ and $y$ are related by $y$ = $xA + b$. To fully characterize the computation of $F$ 
-we need only to store the triple ($A$, $b$, $o_F$) which we call 
-the ``linear representation'' of $F$.
+The input is a row vector ${\mathbf x}$ of length $e$
+and the output is a row vector ${\mathbf y}$ of length $u$. The {\tt work} function
+is characterized by a matrix ${\mathbf A}$ and a constant vector ${\mathbf b}$. 
+${\mathbf A}$ has $e$ rows and $u$ columns and $b$ has $1$ row and $u$ columns. 
+${\mathbf x}$ and ${\mathbf y}$ are related by ${\mathbf y} = {\mathbf x}{\mathbf A} + {\mathbf b}$. 
+We characterize the computation of a linear {\tt stream} with the tuple 
+$\lambda = ({\mathbf A},{\mathbf b},e,o,u)$ which we call a linear node.
 
-It is instructive to interpret the the linear representations of a {\tt filter}
-in the following way. The values in column $i$ of $A$ and column $i$ of $b$ 
-represent the formula to compute the $(u_F-i)$th output. 
-Row $j$ of $A$ represents the weights given to the $(e_F-j)$ input element 
-when computing each output. The rightmost column of $A$ represents the first output element 
-that is produced (eg the value of the first {\tt push()} statement). The bottom row 
-of $A$ represents the weight use for the first input 
-(eg {\tt peek(0)}), the second to bottom row the second input ({\tt peek(1)}) and so forth.
+The intuition of the computation represented by a linear node is simply
+that specific columns generate specific outputs and specfic rows 
+correspond to using specific inputs.
+The values in column $u-i-1$ of ${\mathbf A}$ and column $u-i-1$ of ${\mathbf b}$ 
+(ie the $i$th column from the right) represent the formula to compute the $i$th output.
+The values found in row $e-j-1$ of ${\mathbf A}$ represents the weights given to the $j$th 
+input element when computing each output.
 
 
 

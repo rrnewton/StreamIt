@@ -18,7 +18,7 @@ in the compiler
 - update the combination figures to be consistent with the description
 (expand by k, do padding of zero's at top, individual columns at left)
 
-- add definition of linear node to the "linear representation" section 
+(aal done) add definition of linear node to the "linear representation" section 
 
 - say more about when linear combination is a good thing?  I think the
 statement with the sum of non-zero elements is not entirely accurate.
@@ -29,15 +29,16 @@ low priority
 - push/pop/peek could be explained under the streamit section, not the
 dataflow section
 
-- do we need the LPF defined in fig 8 anymore?  Seems redundant with
+(aal - removed) do we need the LPF defined in fig 8 anymore?  Seems redundant with
 the FIR Filter at the beginning.  If we have the LPF for the sake of
 the init function, you could still add an FIR as a child perhaps.
 
-- instead of dataflow analysis, how about "detecting linear filters"?
+(aal - saman said leave) instead of dataflow analysis, how about "detecting linear filters"?
 
-- I would recommend adding a vector symbol to b everywhere, or putting
+(aal - started) I would recommend adding a vector symbol to b everywhere, or putting
 A and b in bold everywhere, to note that they're vectors and
 distinguish them from constants like e, o, and u.
+
 
 - push / pop letters are backwards in figure 9
 
