@@ -21,7 +21,6 @@ execution and the volume of communication. It uses a search technique
 to map multiple filters onto a single processor for load balancing and
 communication reduction. 
 
-
 The Imagine architecture is specifically designed for the streaming
 application domain.  It operates on streams by applying a computation
 kernel to multiple data items off the stream register file.  The
@@ -38,6 +37,11 @@ transformations at compile-time while Stream-C interprets each basic
 block at runtime and performs local optimizations such as stream
 register allocation in order to map the current set of stream
 computations onto Imagine.
+
+A large number of programming languages have included a concept of a
+stream; see \cite{survey97} for a survey. However, the compilers for
+these languages has focused on efficient sequential executiion of the
+program.
 
 % 
 % mention iWarp?  Is Mike Taylor writing a section?
