@@ -1,7 +1,7 @@
 all: main.ps
 
 main.ps: main.dvi
-	dvips -Ppdf -o main.ps main.dvi
+	dvips -P cmz -t letter -o main.ps main.dvi
 #	cp main.ps ${HOME}/public_html/pldi.ps
 
 main.pdf: main.ps
