@@ -28,21 +28,22 @@ FIR             ?           ?             ?          ?       ?          Doesn't 
 Comparison Numbers
 =======================================================================================================
 
-Application     C Code, 1 Tile   Hand-coded RAW     Date     Who        Status
+Application     C Code, 1 Tile     C Code, PIII       C Code, rawcc       Date     Who        Status
+               (Throughput/FLOPS) (Throughput/FLOPS) (Throughput/FLOPS)
 -------------------------------------------------------------------------------------------------------
-FFT                 ?                ?	             ?	     Chris      C Code written.
-FMRadio             ?		     ?		     ?	     ?	        C Code written.
-BeamFormer          ?		     ?		     ?	     ?	        C Code written?  (Hank?)
-Vocoder             ?		     ?		     ?	     ?	        C Code supplied.
-Nokia               ?		     ?		     ?	     Ali        C Code in progress.
-GSM                 ?		     ?		     ?	     ?          C Code supplied.
-MatrixMultiply      ?		     ?		     ?	     ?          C Code written.
-MP3                 ?		     ?		     ?	     ?	        ?
-CRC                 ?		     ?		     ?	     ?	        Optimized C supplied.
-HDTV                ?		     ?		     ?	     ?	        ?
-Lincoln Labs        ?		     ?		     ?	     Ali	C Code in progress.
-perftest4           ?		     ?		     ?	     ?	        Spectrumware C Code?
-Lattice             ?		     ?		     ?	     ?	        ?
+FFT                 ?                      ?	             ?	                   Chris        C Code written.
+FMRadio             ?		           ?		     ?	                   ?	        C Code written.
+BeamFormer          ?		           ?		     ?	                   ?	        C Code written?  (Hank?)
+Vocoder             ?		           ?		     ?	                   ?	        C Code supplied.
+Nokia               ?		           ?		     ?	                   Ali          C Code in progress.
+GSM                 ?		           ?		     ?	                   ?            C Code supplied.
+MatrixMultiply      ?		           ?		     ?	                   Andrew       C Code written.
+MP3                 ?		           ?		     ?	                   ?	        ?
+CRC                 ?		           ?		     ?	                   ?	        Optimized C supplied.
+HDTV                ?		           ?		     ?	                   ?	        ?
+Lincoln Labs        ?		           ?		     ?	                   Ali	        C Code in progress.
+perftest4           ?		           ?		     ?	                   ?	        Spectrumware C Code?
+Lattice             ?		           ?		     ?	                   ?	        ?
 				     		     	      						
 FilterBank          ?		     ?		     ?	     ?	        ?
 MergeSort           ?		     ?		     ?	     ?	        ?
