@@ -30,15 +30,18 @@ is a primary goal. Our measurement platform was a Dual Intel 2.2 GHz P4 Xenon pr
 running Linux. We compiled programs using StreamIt's uniprocessor
 and generated executables from the resulting C using {\tt gcc} with {\tt -O2} optimizations.
 
-To measure the number of FLOPs executed at runtime we used the RIO\cite{rio-webpage}
+To measure the number of FLOPs executed at runtime we used the DynamoRIO\cite{rio-webpage}
 runtime introspection and optimization infrastructure. Using a simple DynamoRIO application 
 we instrumented each benchmark program at runtime to count the number of FLOPs.
 
 We define the following three opcode classes for the Intel x86 instruction set:
 \begin{itemize}
 \item[flops] Any opcode whose name that begins with {\tt f} in the x86 instruction set.
+\vspace{-6pt}
 \item[fadds] Any of ({\tt fadd faddp fiaddp fsub fsubp fisubp fsubr fsubrp fisubr}).
+\vspace{-6pt}
 \item[fadds] Any of ({\tt fmul fmulp fimulp fdiv fdivp fidivp fdivr fdivrp fidivr}).
+\vspace{-6pt}
 \end{itemize}
 
 There are no standard benchmark written for StreamIt, so we had to assemble
@@ -47,11 +50,17 @@ real world applications. We settled on the following set of six.
 
 \begin{enumerate}
 \item FilterBank: Implements a multi-rate signal decomposition processing block common in communications and image processing.
+\vspace{-6pt}
 \item FIR: A single 100 point rectangularly windowed low pass FIR filter ($\omega_c=\frac{\pi}{3}$).
+\vspace{-6pt}
 \item FMRadio: Implements an FM software radio.
+\vspace{-6pt}
 \item RateConverter: Downsamples an audio signal by an non integer factor ($\frac{3}{2}$).
+\vspace{-6pt}
 \item TargetDetect: Four matched filters performing threshold target detection in parallel.
+\vspace{-6pt}
 \item Radar: radar frontend, beamformer and target detection.
+\vspace{-6pt}
 \end{enumerate}
 
 
@@ -73,9 +82,9 @@ and $O(M+N)$ multiplications in the frequency domain and produces $M+N$ outputs.
 We define the multiplication savings factor as the number of multiplies per output
 using direct convolution over the number of multiplies per output using the 
 frequency transformation. The reduction factor 
-$f(M,N)=\frac{O(M(M+N))}{O(M+N)lg(M+N))+(M+N))}$. 
+$f(M,N)=\frac{O(M(M+N))}{O(M+N)lg(M+N))+(M+N))}$.
 Figure~\ref{fig:frequency-win-theory} shows a plot of this function in normalized 
-$M$, $N$ space. 
+$M$, $N$ space.
 
 We also performed experiments to measure the actual multiplication reduction
 as a function of $M$ (filter size) and output size ($N$).
