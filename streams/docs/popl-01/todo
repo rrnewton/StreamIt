@@ -28,6 +28,10 @@ todo later this afternoon
 questions for saman
 -------------------
 
+* what to do about targeting stream messaging?
+
+* what to do about round robin naming?
+
 * order of evaluation of input.pop() in statements that contain more
 than 1?  I modified your function to input on different lines.  If we
 can have clean semantics, then let's change it back... but I think
@@ -71,6 +75,9 @@ similar equaionts are placed next to each other.
 
 future things to think about
 ----------------------------
+
+* to properly deal with messages to streams with null splits & joins,
+do we need to define the min/max functions across null splits & joins?
 
 * we need to specify default values for functions like drain(),
 initPath, etc
