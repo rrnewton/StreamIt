@@ -1,3 +1,97 @@
+From Bill 1/04:
+---------------
+
+- why does the reference VM allocate VM_WORD for element size instead
+of bytes?  also, shouldn't it clear it's memory?  and why does it
+allocate a word for every single thing it pushes?  it should be copied
+by the svm_push.
+
+- note inconsistency in Move: if a given number of items are
+specified, what happens if EOS encountered in flight?  The EOS tag is
+transferred?  I'm assuming yes.
+
+- should we remove bool's in favor of ints?
+
+- add T_SIZE?  SIZE_T?  what is it?
+
+- add n argument on the pushMulticast, waitMultiple?
+
+From Dennis 1/04:
+-----------------
+
+x page 4, Physical Entities, third bullet: Add "and controls" to the
+  end of the paragraph.
+
+x p6, streamInitRAM: In the second paragraph,
+  "svm_Stream_Unaliased_RAM" is in the wrong font.
+
+x p6, streamInitWithDataRAM: The parameter description for initEOS
+  should describe the position of the initial item not at "initLength"
+  but at "address + initLength - 1".
+
+   --> The location in memory that is tagged would actually start at
+       elementSize*(initLength-1) + address.  But I think this is
+       complicating the description, because really it is the whole
+       item that is conceptually tagged.
+
+       However, I see the off-by-one confusion; will change to read as
+       follows:
+
+       "whether or not the initial item at position initLength-1
+       should be tagged with an EOS tag.  That is, indicates the
+       initial value of streamPeekEOS(s, initLength-1)."
+
+x p7, streamInitFIFO: The first word in the Requires section should be
+  "fifoLocation" rather than "ramLocation".
+
+x p7, svm_Stream_Unordered: The restriction that peek can't be used if
+  this flag is set also means that you can't use EOS with this stream,
+  since peek is the only way you can look at the EOS flag.  Though
+  sort of obvious, I think this point is important enough to state
+  explicitly here.
+
+   --> addressing by adjusting the requires clauses of streamPeek and
+       streamPeekEOS to read:
+
+   if {\tt n} $>$ 0, then {\tt svm\_Stream\_Unordered} flag has NOT been set.
+
+   So, you can still use EOS on unordered streams, you just can't look ahead.
+
+- p13/14, kernelRunMultiplexed: The phrase "N iterations" is used, but
+  the term "iteration" is not defined.  From the outside, a kernel
+  runs until finished.  Is there a call to use from within a kernel to
+  indicate that it has come to a possible yield point?
+
+- p20, StridedScatter: The last phrase in the first paragraph, "in
+  which case the elements moved appear at the beginning of each
+  stride", doesn't make sense to me.  The same phrase is used in the
+  StridedGather description on the next page.
+
+- p20/21, IndexedScatter and IndexedGather: What happens if there are
+  not enough elements in the source to account for all the index
+  entries?  What if there are too many?  Should this document specify
+  what happens in those cases?
+
+x p21: There are minor formatting problems after the parameters
+  IndexedScatter/indexStr (a blank line) and IndexedGather/length (a
+  strange line break).
+
+x p23: In the example, I spent a little time looking for the
+  definition of RLE and Zip typenames.  These are apparently either
+  black box kernels or user kernels for which this example doesn't
+  have the code.  A comment on the two variable declaration lines
+  would save some confusion.
+
+x p25, Managing Kernel Instruction Memory: The term "IMEM" is not
+  defined; replace it with "the processor's instruction memory".
+
+x p26, Error Handling, last line: change "was" to "were" -- it's
+  future perfect tense.
+
+x p28, third line: Change "consuming the EOS" to "consuming all data
+  elements in the FIFO".  There may not be an EOS.
+
+
 big things
 ----------
 

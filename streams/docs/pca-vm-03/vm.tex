@@ -199,7 +199,7 @@ pointing to the data element to be read or written.
 out an independent execution.  It has internal state.  It can be
 independently started or stopped.  A given processor can support a
 certain set of pre-defined and black-box kernels, and may support
-user-defined kernels.
+user-defined kernels and controls.
 
 \item {\it Network links}. Network links pass data elements between
 the physical entities.  Links connect processors to memories,
@@ -334,12 +334,12 @@ void svm_streamInitRAM(svm_Stream* s, mm_Mem ramLocation, int address,
 specified location, size, and performance hints.  The {\tt address}
 and {\tt capacity} might be dynamically calculated at runtime.\\}
 
-\spec{Unless the svm\_Stream\_Unaliased\_RAM flag is set, the stream must
-be implemented as a circular buffer that stores items in consecutive
-locations starting at {\tt address} and wrapping around once more than
-{\tt capacity} elements have been pushed.  That is, items 0, {\tt
-capacity}, {\tt 2*capacity}, etc., are all stored at location {\tt
-address}.}
+\spec{Unless the {\tt svm\_Stream\_Unaliased\_RAM} flag is set, the
+stream must be implemented as a circular buffer that stores items in
+consecutive locations starting at {\tt address} and wrapping around
+once more than {\tt capacity} elements have been pushed.  That is,
+items 0, {\tt capacity}, {\tt 2*capacity}, etc., are all stored at
+location {\tt address}.}
 
 \param{
   {\tt s} - stream to initialize.\\
@@ -348,7 +348,7 @@ address}.}
   {\tt capacity} - maximum number of elements in stream.\\
   {\tt elementSize} - number of bytes per element.\\
   {\tt maxBuffering} - performance hint, indicates the maximum number of items that can be buffered at\\ \mbox{~~~~~}the producer for this stream without causing deadlock\footnotemark[2].\\
-  {\tt flags} - performance hints to Low Level Compiler (see below).  These can be ignored (assumed to\\ \mbox{~~~~~} be 0) without sacrificing correctness; they are only for the sake of optimization.}
+  {\tt flags} - performance hints to Low Level Compiler (see below).  These can be ignored (assumed to\\ \mbox{~~~~~}be 0) without sacrificing correctness; they are only for the sake of optimization.}
 
 \req{
   {\tt ramLocation}, {\tt elementSize}, {\tt maxBuffering}, and {\tt flags} are literals, and are constant across\\ \mbox{~~~~~}all calls to initialization functions for {\tt s}.\\
@@ -380,7 +380,7 @@ svm\_streamInitRAM}.}
 
 \param{
   {\tt initLength} - number of items already in place at {\tt address} that should be pushed onto {\tt s} initially.\\
-  {\tt initEOS} - whether or not the initial item at position {\tt initLength} should be tagged with an EOS tag.\\
+  {\tt initEOS} - whether or not the initial item at position {\tt initLength-1} should be tagged with an EOS \\ \mbox{~~~~~}tag.  That is, indicates the initial value of {\tt streamPeekEOS(s, initLength-1)}.\\
   Other parameters as above.}
 \req{
   {\tt initLength} $>$ 0.\\
@@ -410,10 +410,10 @@ by the size of the FIFO.}
   {\tt fifoLocation} - FIFO resource in which to hold stream (from PCA Machine Model).\\
   {\tt elementSize} - number of bytes per element.\\
   {\tt maxBuffering} - performance hint, indicates the maximum number of items that can be buffered at\\ \mbox{~~~~~}the producer for this stream without causing deadlock.\\
-  {\tt flags} - performance hints to Low Level Compiler (see below).  These can be ignored (assumed to\\ \mbox{~~~~~} be 0) without sacrificing correctness; they are only for the sake of optimization.}
+  {\tt flags} - performance hints to Low Level Compiler (see below).  These can be ignored (assumed to\\ \mbox{~~~~~}be 0) without sacrificing correctness; they are only for the sake of optimization.}
 
 \req{
-  {\tt ramLocation}, {\tt elementSize}, {\tt maxBuffering}, and {\tt flags} are literals, and are constant across\\ \mbox{~~~~~}all calls to initialization functions for {\tt s}.\\
+  {\tt fifoLocation}, {\tt elementSize}, {\tt maxBuffering}, and {\tt flags} are literals, and are constant across\\ \mbox{~~~~~}all calls to initialization functions for {\tt s}.\\
   {\tt fifoLocation} represents an empty FIFO (no other stream is retaining state in it.)\\
   {\tt s} is not used for input or output in a kernel that is currently {\tt Waiting}, {\tt Running}, or {\tt Paused}.}
 
@@ -534,7 +534,7 @@ until {\tt n+1} elements are available.}
   {\tt element} - location in which to store the peeked value.}
 
 \req{
-  {\tt svm\_Stream\_Unordered} flag has NOT been set.\\
+  if {\tt n} $>$ 0, then {\tt svm\_Stream\_Unordered} flag has NOT been set.\\
   {\tt n} $<$ {\tt capacity} of {\tt s}.\\
   {\tt s} has been initialized.}
 
@@ -588,7 +588,7 @@ are available.}
   {\tt n} - index at which to peek (zero-based and starting from front of stream).}
 \ret{True if there is an EOS tag at index {\tt n}.}
 \req{
-  {\tt svm\_Stream\_Unordered} flag has NOT been set.\\
+  if {\tt n} $>$ 0, then {\tt svm\_Stream\_Unordered} flag has NOT been set.\\
   {\tt n} $<$ {\tt capacity} of {\tt s}.\\
   {\tt s} has been initialized.}
 \callkc
@@ -811,7 +811,7 @@ and run again while {\tt k} is still waiting for other kernels.}
 \req{
   {\tt k} is {\tt Unstarted}.\\
   {\tt dependsOnKernel} has been initialized.\\
-  {\tt k} can read from a memory that {\tt dependsOnKernel} can write to.  That is, the processor executing\\ \mbox{~~~~~} {\tt k} and the processor executing {\tt dependsOnKernel} must both be connected to some common \\ \mbox{~~~~~} memory.  (This allows {\tt dependsOnKernel} to notify {\tt k} when the dependence is satisfied.)}
+  {\tt k} can read from a memory that {\tt dependsOnKernel} can write to.  That is, the processor executing\\ \mbox{~~~~~}{\tt k} and the processor executing {\tt dependsOnKernel} must both be connected to some common \\ \mbox{~~~~~}memory.  (This allows {\tt dependsOnKernel} to notify {\tt k} when the dependence is satisfied.)}
 
 \callc
 %%%%%%%%%%%%%%%%%%%%%%%%%
@@ -843,7 +843,7 @@ or {\tt Finished}.}
 \req{
   {\tt k} is {\tt Unstarted} or {\tt Paused}.\\
   Of the kernels that are currently {\tt Waiting}, {\tt Running}, or
-  {\tt Paused}, none of them write to an output \\ \mbox{~~~~~} stream
+  {\tt Paused}, none of them write to an output \\ \mbox{~~~~~}stream
   of {\tt k} or read from an input stream of {\tt k}.}
 
 \callc
@@ -865,7 +865,7 @@ push.  The kernel continues to run until its status is {\tt Paused} or
   {\tt k} is a pre-defined kernel.\\
   {\tt k} is {\tt Unstarted} or {\tt Paused}.\\
   Of the kernels that are currently {\tt Waiting}, {\tt Running}, or
-  {\tt Paused}, none of them write to an output \\ \mbox{~~~~~} stream
+  {\tt Paused}, none of them write to an output \\ \mbox{~~~~~}stream
   of {\tt k} or read from an input stream of {\tt k}.}
 
 \callc
@@ -1281,10 +1281,10 @@ move itself.}
   {\tt srcStr} - source stream, from which elements are popped.\\
   {\tt destStr} - destination stream, onto which elements are pushed.\\
   {\tt length} - number of elements to move; {\tt svm\_Stream\_Length\_All}
-  executes until an element with an \\ \mbox{~~~~~} EOS tag is popped from {\tt
+  executes until an element with an \\ \mbox{~~~~~}EOS tag is popped from {\tt
   srcStr}.\\
    {\tt setEOS} - if true, then the last element pushed onto {\tt
-   destStr} is given an EOS tag.  Otherwise \\ \mbox{~~~~~} no element pushed is
+   destStr} is given an EOS tag.  Otherwise \\ \mbox{~~~~~}no element pushed is
    tagged with an EOS.}
 
 \req{
@@ -1319,7 +1319,7 @@ the beginning of each stride.}
   {\tt location} - processor resource on which to execute the kernel (from PCA Machine Model.)\\
   {\tt srcStr} - source stream, from which elements are popped.\\
   {\tt destBlock} - destination block, into which elements are written.\\
-  {\tt length} - total number of elements to move; {\tt svm\_Stream\_Length\_All} executes until an \\ \mbox{~~~~~} element with an EOS tag is
+  {\tt length} - total number of elements to move; {\tt svm\_Stream\_Length\_All} executes until an \\ \mbox{~~~~~}element with an EOS tag is
   popped from {\tt srcStr}.\\
   {\tt destStride} - number of elements between the start of adjacent strides in {\tt destBlock}.\\
   {\tt elementsPerStride} - number of elements that are moved from {\tt srcStr} for each stride in {\tt destBlock}.}
@@ -1359,7 +1359,7 @@ stride.}
   {\tt length} - total number of elements to copy; {\tt svm\_Stream\_Length\_All} considers all elements of {\tt srcBlock}.\\
   {\tt srcStride} - number of elements between the start of adjacent strides in {\tt srcBlock}.\\
   {\tt elementsPerStride} - number of elements that are copied from start of each stride.\\
-   {\tt setEOS} - if true, then the last element pushed onto {\tt destStr} is given an EOS tag.  Otherwise \\ \mbox{~~~~~} no element pushed is tagged with an EOS.}
+   {\tt setEOS} - if true, then the last element pushed onto {\tt destStr} is given an EOS tag.  Otherwise \\\mbox{~~~~~}no element pushed is tagged with an EOS.}
 
 \req{
   {\tt gather} is {\tt Unstarted}, {\tt Finished}, or uninitialized.\\
@@ -1393,11 +1393,9 @@ streams as they are scattered.}
   {\tt scatter} - kernel to initialize.\\
   {\tt location} - processor resource on which to execute the kernel (from PCA Machine Model.)\\
   {\tt srcStr} - source stream, from which elements are moved.\\
-  {\tt indexStr} - index stream, containing the locations of {\tt destBlock} to which elements should be written.}
-
-\paramcont{
+  {\tt indexStr} - index stream, containing the locations of {\tt destBlock} to which elements should be written.\\
   {\tt destBlock} - destination block, into which elements are written.\\
-  {\tt length} - total number of elements to copy; {\tt svm\_Stream\_Length\_All} executes until an element with \\ \mbox{~~~~~} an EOS tag is  popped from {\tt indexStr}.\\
+  {\tt length} - total number of elements to copy; {\tt svm\_Stream\_Length\_All} executes until an element with \\ \mbox{~~~~~}an EOS tag is  popped from {\tt indexStr}.\\
   {\tt elementsPerIndex} - number of elements to move from {\tt srcStr} for each element of {\tt indexStr}.}
 
 \req{
@@ -1433,10 +1431,10 @@ Elements are popped from the index stream as they are gathered.}
   {\tt srcBlock} - source block, from which elements are copied.\\
   {\tt indexStr} - index stream, containing the locations of {\tt srcBlock} from which elements should be read.\\
   {\tt destStr} - destination stream, onto which elements are pushed.\\
-  {\tt length} - total number of elements to copy; {\tt svm\_Stream\_Length\_All} executes until an element with an \\ \mbox{~~~~~} EOS tag is popped from {\tt indexStr}.\\
+  {\tt length} - total number of elements to copy; {\tt svm\_Stream\_Length\_All} executes until an element with \\ \mbox{~~~~~}an EOS tag is popped from {\tt indexStr}.\\
   {\tt elementsPerIndex} - number of elements to copy from {\tt
   srcBlock} for each element of {\tt indexStr}.\\
-   {\tt setEOS} - if true, then the last element pushed onto {\tt destStr} is given an EOS tag.  Otherwise \\ \mbox{~~~~~} no element pushed is tagged with an EOS.}
+  {\tt setEOS} - if true, then the last element pushed onto {\tt destStr} is given an EOS tag.  Otherwise \\ \mbox{~~~~~}no element pushed is tagged with an EOS.}
 
 \req{
   {\tt gather} is {\tt Unstarted}, {\tt Finished}, or uninitialized.\\
@@ -1480,7 +1478,7 @@ An example follows:
   static svm_Stream s0, s1, s2, s4;
   static svm_Block scratch;
   static svm_Move move01, move24;
-  static RLE rle;
+  static RLE rle; // source code for the user-defined RLE kernel is not included in this example
 
   // read file into memory location of s0 (not part of API)
   length1 = readFile("input.dat", GLOBALMEM1, 0x1000, 1024);
@@ -1494,7 +1492,7 @@ An example follows:
   svm_moveInit(&move01, DMA1, &s0, &s1, svm_Stream_Length_All, TRUE);
   svm_kernelRun(&move01.kernel);
   
-  // run rle
+  // run rle (source for rleInit not included in this example)
   rleInit(&rle, PROC1, &scratch, &s1, &s2);
   svm_kernelRun(&rle.kernel);
 
@@ -1506,12 +1504,12 @@ An example follows:
   if (length2 > SIZE_THRESHOLD) {
     static svm_Stream s3;
     static svm_Block scratch2;
-    static Zip zip;
+    static Zip zip; // source code for the user-defined Zip kernel is not included in this example
 
     svm_streamInitRAM(&s3, LOCALMEM1, 0x100, 128, 4, 128, svm_Stream_Never_Wraps);
     svm_blockInit(&scratch2, LOCALMEM1, 0x180, 32, 1);
 
-    // run zip kernel
+    // run zip kernel (source for zipInit not included in this example)
     zipInit(&zip, PROC1, &scratch2, &s2, &s3);
     svm_kernelRun(&zip.kernel);
     
@@ -1642,7 +1640,8 @@ in-depth example appears in Appendix~\ref{sec:fifocleanexample}.
 The High Level Compiler might anticipate upcoming kernel
 executions. The {\tt svm\_kernelReady} function allows this
 information to be transferred to the Low Level Compiler so that the
-kernel can be loaded into IMEM ahead of time.
+kernel can be loaded into the processor's instruction memory ahead of
+time.
 
 \subsubsection{Restrictions on Stream Control}
 
@@ -1724,7 +1723,7 @@ off to obtain high performance if the Low Level Compiler trusts that
 the High Level Compiler generated safe code.
 
 Note that the potential for undefined behavior is introduced for the
-sake of performance.  If each architecture was required to verify the
+sake of performance.  If each architecture were required to verify the
 restrictions above, the overhead would be prohibitive.
 
 \subsection{Concept of Operations}
@@ -1793,9 +1792,9 @@ As described in Section~\ref{sec:fifoclean}, the High Level Compiler
 is responsible for draining FIFOs before a fresh set of streams and
 kernels are mapped to the resources.  In the common case, FIFOs will
 be drained by the kernels themselves.  However, if a kernel terminates
-before consuming the EOS, the control thread will have to take
-additional steps to ensure that the FIFOs are clear before additional
-kernels can be run.
+before consuming all data elements in the FIFOs, the control thread
+will have to take additional steps to ensure that the FIFOs are clear
+before additional kernels can be run.
 
 For instance, consider a producer kernel {\tt k1} that communicates
 through a FIFO stream {\tt s} to a consumer kernel {\tt k2}.  The
@@ -1956,3 +1955,94 @@ The above procedure is an example of a basic draining operation that
 can be constructed using the primitives in the SVM.  The High Level
 Compiler should employ similar mechanisms in other scenarios to ensure
 that it always has a consistent view of FIFO contents.
+
+%% \makeline
+%% \name{Move}
+%% {\small
+%% \begin{verbatim}
+%%   typedef struct {
+%%     svm_Kernel kernel;
+%%     svm_IStream* srcStr,
+%%     svm_OStream* destStr,
+%%     int elementSize,
+%%     int length,
+%%     boolean setEOS
+%%   } Move;
+
+%%   void svm_moveInit(svm_Move* move, mm_Proc location, svm_IStream* _srcStr, 
+%%                     svm_OStream* _destStr, int _length, boolean _setEOS);
+%%     kernelInit(&move->kernel, location, 0, move, sizeof(Move), (ExtKernelWork)&moveWork);
+%%     move->srcStr = _srcStr;
+%%     move->destStr = _destStr;
+%%     move->elementSize = _elementSize;
+%%     move->length = _length;
+%%     move->setEOS = _setEOS;
+%%   }
+
+%%   void moveWork(Move* move) {
+%%     int iteration;
+%%     void* buffer = malloc(elementSize);
+%%     for (iteration=0; iteration<move->length || move->length == svm_Stream_Length_All; iteration++) {
+%%       boolean eos = svm_streamPeekEOS(move->srcStr, 0);
+%%       svm_streamPop(move->srcStr, buffer);
+%%       if (!eos) {
+%% 	// push normal item
+%%         svm_streamPush(move->destStr, buffer);
+%%       } else {
+%% 	// push EOS item
+%%         svm_streamPushEOS(move->destStr, buffer);
+%% 	if (move->length == svm_Stream_Length_All) {
+%% 	  // if we're set to all, quit after pushing an EOS item
+%% 	  break;
+%% 	}
+%%       }
+%%     }
+%%     free(buffer);
+%%   }
+%% }
+
+%% \makeline
+%% \name{StridedScatter}
+%% {\small
+%% \begin{verbatim}
+%%   typedef struct {
+%%     svm_Kernel kernel;
+%%     svm_IStream* srcStr,
+%%     svm_OBlock* destBlock,
+%%     int length,
+%%     int destStride,
+%%     int elementsPerStride,
+%%   } StridedScatter;
+
+%%   void svm_stridedScatterInit(svm_StridedScatter* scatter, mm_Proc location, 
+%%                               svm_IStream* _srcStr, svm_OBlock* _destBlock, int _length,
+%%                               int _destStride, int _elementsPerStride)
+%%     kernelInit(&scatter->kernel, location, 0, move, sizeof(StridedScatter), (ExtKernelWork)&stridedScatterWork);
+%%     move->srcStr = _srcStr;
+%%     move->destBlock = _destBlock;
+%%     move->length = _length;
+%%     move->destStride = _destStride;
+%%     move->elementsPerStride = _elementsPerStride;
+%%   }
+
+%%   void stridedScatterWork(StridedScatter* scatter) {
+%%     int iteration, j;
+%%     void* buffer = malloc(elementSize);
+%%     for (iteration=0; iteration<move->length || move->length == svm_Stream_Length_All; iteration++) {
+%%       boolean eos = svm_streamPeekEOS(move->srcStr, 0);
+%%       svm_streamPop(move->srcStr, buffer);
+%%       if (!eos) {
+%% 	// push normal item
+%%         svm_streamPush(move->destStr, buffer);
+%%       } else {
+%% 	// push EOS item
+%%         svm_streamPushEOS(move->destStr, buffer);
+%% 	if (move->length == svm_Stream_Length_All) {
+%% 	  // if we're set to all, quit after pushing an EOS item
+%% 	  break;
+%% 	}
+%%       }
+%%     }
+%%     free(buffer);
+%%   }
+%% }
