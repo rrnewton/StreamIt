@@ -33,13 +33,13 @@ Config getNodeCost(Stream s, Transform t)
 
   if (t==Transform.LINEAR)
     if (isLinear(s))
-      return Config(scalingFactor * getDirectCost(s), s)
+      return Config(scalingFactor * getDirectCost(s), makeLinearImplementation(s))
     else
       return INFINITY
 
   if (t==Transform.FREQ)
     if (isLinear(s) && canConvertToFrequency(s))
-      return Config(scalingFactor * getFrequencyCost(s), s)
+      return Config(scalingFactor * getFrequencyCost(s), makeFreqImplementation(s))
     else 
       return Config(INFINITY, s)
 
@@ -77,7 +77,7 @@ Config getContainerCost(stream s, Transform t, int x1, int x2, int y1, int y2)
       child1 = getCost(s, Transform.ANY, x1, x2, y1, yPivot)
       child2 = getCost(s, Transform.ANY, x1, x2, yPivot+1, y2)
       if (child1.cost + child2.cost < result.cost)
-        result = Cost(child1.cost + child2.cost, Pipeline(child1.str, chidl2.str))
+        result = Cost(child1.cost + child2.cost, Pipeline(child1.str, child2.str))
 
     // can only do a vertical cut if all child streams belong to the same splitjoin
     if (sameSplitJoinParent(s.child[x1][y1], s.child[x2][y2]))
@@ -86,7 +86,7 @@ Config getContainerCost(stream s, Transform t, int x1, int x2, int y1, int y2)
         child1 = getCost(s, Transform.ANY, x1, xPivot, y1, y2)
         child2 = getCost(s, Transform.ANY, xPivot+1, x2, y1, y2)
         if (child1.cost + child2.cost < result.cost)
-          result = Cost(child1.cost + child2.cost, SplitJoin(child1.str, chidl2.str))
+          result = Cost(child1.cost + child2.cost, SplitJoin(child1.str, child2.str))
 
   memoTable[s][t][x1][x2][y1][y2] = result;
   return result
