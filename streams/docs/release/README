@@ -3,7 +3,7 @@ StreamIt Snapshot Release
 
 This is for the March 21, 2003 snapshot release (streamit-0.0.20030321).
 
-$Id: README,v 1.10 2003-03-21 15:24:53 dmaze Exp $
+$Id: README,v 1.11 2003-03-21 16:54:32 dmaze Exp $
 
 1. What is this?
 2. Dependencies
@@ -57,6 +57,12 @@ FFTW should be installed somewhere in your default compiler search
 path if you are using the uniprocessor compiler backend.  You need to
 build single-precision versions of the library, such that you have an
 srfftw.h and a libsrfftw.a.
+
+Compilation for RAW depends on the most recent released RAW build
+environment (as of this release, raw_dist_2003_03_18).  The TOPDIR
+environment variable needs to point to your StarSearch directory; this
+may be the reduced 'workdir' tree from the RAW distribution, or the
+full 'starsearch' tree.
 
 
 3. Caveats
