@@ -1,5 +1,6 @@
 ------------------------------------------------------------------------
 Big things to think about
+
 1. operational semantics
 2. message sending syntax
 3. letting init codes cause an offset (do push() on output)
@@ -17,23 +18,34 @@ to the output or input?
 messaging.  If they're parallel pieces of split/join, do you
 synchronize from above or below?  I think theres's a difference.
 
-
 ------------------------------------------------------------------------
 Little things to think about
-1. would it help to outlaw aliasing?
 
+1. would it help to outlaw aliasing?
+2. should we rename filter to block?  to operator?
 
 ------------------------------------------------------------------------
 Future things to think about
+
 1. any notion of exceptions?  error handling?
 
 2. any concept of filters ignoring items?  would affect wavefront (a
 select filter, for example.)
 
+3. real-time constraints
+
 ------------------------------------------------------------------------
 Things to write about
+
 1. latency
 2. drain/destroy initialization semantics
 3. feedback loop initialization
 4. portals - let's just adopt templated java lists for the sake of presentation
+5. exact restrictions on java?
+6. semantic restrictions of streamit
+
+7. the scripting component - having a pipeline of n blocks at runtime
+isn't supported in all langs.
+
+8. diagram with class hierarchy?
 
