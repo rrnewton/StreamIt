@@ -10,6 +10,10 @@
   here we are actualy scaling up code size and buffer size for better
   performance. 
 
-- filter fusion and interleaving
+Proebsting and Watterson \cite{pro96} give a fusion algorithm that
+interleaves the control flow graphs of adjacent filters.  However,
+their algorithm only supports synchronous {\tt get} and {\tt put}
+operations; StreamIt's {\tt peek} operation necessitates buffer
+management between filters.
 
 (cache models?)

@@ -1,0 +1,164 @@
+\clearpage
+\begin{figure*}
+\begin{minipage}{3.4in}
+\psfig{figure=fusion-p3.eps,width=3.4in}
+
+\caption{Performance of buffer management strategies on a Pentium 3.\protect\label{fig:buf-p3}}
+\end{minipage}
+\hspace{0.1in}
+\begin{minipage}{3.4in}
+\psfig{figure=fusion-itanium.eps,width=3.4in}
+
+\caption{Performance of buffer management strategies on an Itanium.\protect\label{fig:buf-itanium}}
+\end{minipage}
+\vspace{18pt}
+\hrule
+\begin{minipage}[t]{2.1in}
+%% copy-shift
+{\scriptsize
+\begin{verbatim}
+
+
+void->void pipeline BufferTest {
+  int PEEK = 4;
+  float[3] BUFFER;
+
+  prework {
+    for (int i=0; i<PEEK-1; i++) {
+      BUFFER[i] = random();
+    }
+  }
+
+  work {
+    float[4] TEMP_BUFFER;
+    int push_index = 3;
+    int pop_index = 0;
+
+    // copy from BUFFER to TEMP_BUFFER
+    for (int i=0; i<3; i++) {
+      TEMP_BUFFER[i] = BUFFER[i];
+    }
+
+    // run Source
+    TEMP_BUFFER[push_index++] = random();
+    
+    // run FIR
+    float result = 0;
+    for (int i=1; i<PEEK; i++) {
+      result += i*TEMP_BUFFER[pop_index+i];
+    }
+    pop_index++;
+    print(result);
+
+    // copy from TEMP_BUFFER to BUFFER
+    for (int i=0; i<3; i++) {
+      BUFFER[i] = TEMP_BUFFER[i+1];
+    }
+  }
+}
+\end{verbatim}}
+
+\caption{Copy-shift strategy.\protect\label{fig:copy-shift}}
+\end{minipage}
+~~\vrule~~
+\begin{minipage}[t]{2in}
+%% copy-shift + scalar-replacement
+{\scriptsize
+\begin{verbatim}
+
+
+void->void pipeline BufferTest {
+  int PEEK = 4;
+  float[3] BUFFER;
+
+  prework {
+    for (int i=0; i<PEEK-1; i++) {
+      BUFFER[i] = random();
+    }
+  }
+
+  work {
+    float TEMP_BUFFER_0;
+    float TEMP_BUFFER_1;
+    float TEMP_BUFFER_2;
+    float TEMP_BUFFER_3;
+
+    // copy from BUFFER to TEMP_BUFFER
+    TEMP_BUFFER_0 = BUFFER[0];
+    TEMP_BUFFER_1 = BUFFER[1];
+    TEMP_BUFFER_2 = BUFFER[2];
+
+    // run Source
+    TEMP_BUFFER_3 = random();
+    
+    // run FIR
+    float result = 0;
+    result += 1*TEMP_BUFFER_1;
+    result += 2*TEMP_BUFFER_2;
+    result += 3*TEMP_BUFFER_3;
+    print(result);
+
+    // copy from TEMP_BUFFER to BUFFER
+    BUFFER[0] = TEMP_BUFFER_1;
+    BUFFER[1] = TEMP_BUFFER_2;
+    BUFFER[2] = TEMP_BUFFER_3;
+  }
+}
+\end{verbatim}}
+
+\caption{Copy-shift with scalar-replacement.\protect\label{fig:code-scalar-replace}}
+\end{minipage}
+~~\vrule~~
+\begin{minipage}[t]{2.1in}
+%% copy-shift + scaling
+{\scriptsize
+\begin{verbatim}
+
+
+void->void pipeline BufferTest {
+  int PEEK = 4;
+  float[3] BUFFER;
+
+  prework {
+    for (int i=0; i<PEEK-1; i++) {
+      BUFFER[i] = random();
+    }
+  }
+
+  work {
+    float[32] TEMP_BUFFER;
+    int push_index = 3;
+    int pop_index = 0;
+
+    // copy from BUFFER to TEMP_BUFFER
+    for (int i=0; i<3; i++) {
+      TEMP_BUFFER[i] = BUFFER[i];
+    }
+
+    // run Source 16 times
+    for (int k=0; k<16; k++) {
+      TEMP_BUFFER[push_index++] = random();
+    }
+    
+    // run FIR 16 times
+    for (int k=0; k<16; k++) {
+      float result = 0;
+      for (int i=1; i<PEEK; i++) {
+        result += i*TEMP_BUFFER[pop_index+i];
+      }
+      pop_index++;
+      print(result);
+    }
+      
+    // copy from TEMP_BUFFER to BUFFER
+    for (int i=0; i<3; i++) {
+      BUFFER[i] = TEMP_BUFFER[i+16];
+    }
+  }
+}
+\end{verbatim}}
+
+\caption{Copy-shift with scaling.\protect\label{fig:code-scaling}}
+\end{minipage}
+\end{figure*}
+\clearpage
