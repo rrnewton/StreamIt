@@ -12,6 +12,8 @@ library, to perform the necessary basis conversions.  Our optimization
 selection algorithm automatically determines which transformations
 should be applied.  Below we describe experiments and results that
 demonstrate substantial performance improvements due to our methods.
+Full results, benchmarks and source can be viewed at
+{\tt http://cag.lcs.mit.edu/linear/}
 
 \subsection{Measurement Methodology}
 %We chose to measure the strength of our optimizations in terms of 
@@ -41,7 +43,8 @@ demonstrate substantial performance improvements due to our methods.
 \epsfxsize=3.2in
 \epsfbox{images/multiplications-remaining.eps}
 \vspace{-6pt}
-\caption{Percent of multiplication operations remaining after performing linear replacement, frequency replacement, and both.}
+\caption{Percent of multiplication operations remaining after 
+  linear replacement, frequency replacement, both and automatic selection.}
 \label{fig:linear-freq-both}
 \vspace{-12pt}
 \end{figure}
@@ -50,15 +53,17 @@ demonstrate substantial performance improvements due to our methods.
 %in the IA-32 instruction set are defined to be any of ({\tt fmul fmulp fimulp fdiv fdivp fidivp fdivr fdivrp fidivr}).
 %We measure execution time normalized to the number of program outputs generated. 
 
-Our measurement platform is a Dual Intel 2.2 GHz P4 Xeon processor
-system with 2GB of memory running GNU/Linux. We compile our benchmarks
+%Our measurement platform is a Dual Intel 2.2 GHz P4 Xeon processor
+%system with 2GB of memory running GNU/Linux. 
+Our measurement platform is a Dual Intel P4 Xeon
+system with 2GB of memory running GNU/Linux. 
+We compile our benchmarks
 using StreamIt's uniprocessor backend and generate executables from
 the resulting C files using {\tt gcc -O2}.  To measure the number of
 runtime multiplications, we use an instruction counting
 DynamoRIO\cite{dynamo99} client.  Since there are no external sources
 of benchmarks written in StreamIt, we assembled a set of
-representative programs\footnote{Stream graphs appear in Appendix A
-XXXXXXXXXXXXXXXXXXXXXX.} which perform computations that are commonly
+representative programs which perform computations that are commonly
 found in streaming applications: 1) {\bf FIR}, a single 256 point low
 pass FIR filter; 2) {\bf RateConvert}, an audio down sampler that
 converts the sampling rate by a non-integral factor ($\frac{2}{3}$);
@@ -72,14 +77,14 @@ processing; 7) {\bf Vocoder}, a channel voice coder, commonly used for
 speech analysis and compression; 8) {\bf Oversample}, a $16x$
 oversampler, a function found in many CD players, 9) {\bf DToA}, an
 audio post-processing stage prior to a 1-bit D/A converter with
-oversampler and first order noise shaper.
+an oversampler and a first order noise shaper.
 
 \subsection{Performance}
 To determine the effects of our linear replacement and frequency
 replacement optimizations, we compiled each benchmark program with
 linear replacement, with frequency replacement, with a back to back
-application of frequency replacement and linear replacement, and with
-automatic optimization selection.  Figure~\ref{fig:linear-freq-both}
+application of frequency replacement and linear replacement and with
+automatic optimization selection. Figure~\ref{fig:linear-freq-both}
 shows the reduction in the number of floating point multiplications
 that our optimizations achieve.  For each benchmark, our optimizations
 reduce the number of multiplications considerably. For FIR and
@@ -102,8 +107,9 @@ algorithm.
 \epsfxsize=3.2in
 \epsfbox{images/execution-speedup.eps}
 \vspace{-6pt}
-\caption{Execution speedup for each of the benchmarks with 
-  frequency replacement, linear replacement, both and partitioning.}
+\caption{Execution speedup after 
+  frequency replacement, linear replacement, both 
+  and automatic selection.}
 \label{fig:execution-speedup}
 \vspace{-6pt}
 \end{figure}
@@ -118,22 +124,22 @@ $XXXXXXX$ in the best case.  Our performance improvements are due only
 in part to to the efficiency of FFTW.  Multiplications are decreased
 and execution time is improved in RateConvert, FM, FilterBank and
 Vocoder with only linear replacement. Linear replacement improvements
-are due to removing redundant computations -- in essence, it performs
+are due to removing redundant computations --- in essence, it performs
 algebraic simplification across filter boundaries.
 
 There are two cases in which the multiplication reduction is not a
 good predictor of execution speedup.  For Vocoder, the optimization
 selection algorithm achieves the same number of multiplications as
 applying both linear and frequency replacement; however, the speedup
-is higher with automatic selection.  This is because the selection
+is higher with automatic selection because the selection
 algorithm refactors and combines a linear splitjoin where the plain
-optimizations do not.  While this has no effect on the number of
-multiplications required, it lowers the execution time by decreasing
-the runtime overhead in the execution of the stream graph.  FilterBank
-illustrates similar behavior -- the selection algorithm determines a
-clever refactoring that reduces the number of multiplications compared
-to applying both linear and frequency replacement, but the additional
-overhead of more filters actually causes the execution time to
+optimizations do not. The refactoring has no effect on the number of
+multiplications required, but it increases the execution time because
+it increases the runtime overhead in the execution of the stream graph.  
+FilterBank illustrates similar behavior --- the selection algorithm 
+determines a clever refactoring that reduces the number of 
+multiplications compared to applying both linear and frequency replacement, but the additional
+overhead required actually causes the execution time to
 increase. A more accurate cost model that takes into account costs
 other than multiplications could help the selection algorithm improve
 its choice of stream graph arrangements.
