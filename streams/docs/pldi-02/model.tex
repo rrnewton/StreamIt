@@ -122,8 +122,8 @@ minimum number of items that must appear on tape $I_A$ given that
 there are $x$ items on tape $O_B$.  Observing that a minimum of
 $\mi{I_B}{O_B}(x)$ items must appear on tape $I_B$, and that $I_B$
 must equal $O_A$ since the filters are connected, we see that a
-minimum of $\mi{I_A}{O_A}(\ma{I_B}{O_B}(x))$ items must appear on
-$I_A$:
+minimum of $(\mi{I_A}{O_A} \circ \ma{I_B}{O_B})(x)$ items must appear
+on $I_A$:
 \begin{align*}
 \mi{I_A}{O_B} = \mi{I_A}{O_A} \circ \mi{I_B}{O_B}
 \end{align*}
@@ -192,11 +192,11 @@ items on the output tape $O_J$, then the joiner must have executed
 $\floor{x}{W}$ complete cycles, each of which drew $w_i$ items from
 the $i$'th input tape.  Since the last complete cycle, the joiner has
 drawn $x~mod~W$ items from its inputs, and $MIN(0, x~mod~W -
-\sum{j=0}^{i-1}{w_j})$ of these items were taken from input tape $j$.
+\sum_{j=0}^{i-1}{w_j})$ of these items were taken from input tape $j$.
 Thus, the $min$ function from the output of the joiner to the $i$'th
 input tape is as follows:
 \begin{align*}
-\mi{Ii_J}{O_J}(x) = w_i * W + MIN(0, x~mod~W - \sum{j=0}^{i-1}{w_j})
+\mi{Ii_J}{O_J}(x) = w_i * W + MIN(0, x~mod~W - \sum_{j=0}^{i-1}{w_j})
 \end{align*}
 
 {\bf SplitJoin construct.}  As with the Pipeline construct, we can
@@ -213,7 +213,8 @@ of items appearing on the input tape $I_S$ of the splitter is the {\it
 maximum} of the item requirement from any output tape $Oi_S$.  By this
 reasoning, the $min$ function for a SplitJoin is as follows:
 \begin{align*}
-\mi{I_S}{O_J}(x) = MAX_{i \in [1,n]}~\mi{I_S}{Oi_S}(\mi{Oi_S}{Ii_J}(\mi{Ii_J}{O_J}(x)))
+\mi{I_S}{O_J}(x) = MAX_{i \in [1,n]}~(\mi{I_S}{Oi_S} \circ
+\mi{Oi_S}{Ii_J} \circ \mi{Ii_J}{O_J})(x)
 \end{align*}
 
 \subsubsection{FeedbackLoops}
@@ -245,13 +246,12 @@ input from the main stream:
 \end{align*}
 
 {\bf Feedback components}.  Within a feedback loop, the $min$ function
-between tape $a$ and any distinct downstream tape $b$ can be uniquely
-defined by composing the $min$ functions along the directed acyclic
-path between $a$ and $b$.  We require an acyclic path to avoid
-successive passes around the loop, which would prevent a unique
-definition of the function.  Denoting this path of tapes by $(a, t_1,
-\dots , t_n, b)$, the composition follows the form of Equation
-\ref{eq:composepipe}:
+between tape $a$ and any downstream tape $b$ can be uniquely defined
+by composing the $min$ functions along the directed acyclic path
+between $a$ and $b$.  We require an acyclic path to avoid successive
+passes around the loop, which would prevent a unique definition of the
+function.  Denoting this path of tapes by $(a, t_1, \dots , t_n, b)$,
+the composition follows the form of Equation \ref{eq:composepipe}:
 \begin{align*}
 \mi{a}{b}(x) = \mi{a}{t_1} \circ \mi{t_1}{t_2} \circ \dots \mi{t_n}{b}
 \end{align*}
@@ -277,14 +277,61 @@ In the preceding sections, we have derived a $min$ function for the
 components of each stream construct, as well as for the stream
 construct as a whole.  By application of Equation
 \ref{eq:composetape}, this yields a function $\mi{a}{b}$ for every
-pair of tapes $a$ and $b$ where $a$ is downstream of $b$.
+pair of tapes $a$ and $b$ where $b$ is downstream of $a$.
 
 [say some more profound stuff about the min function?  information
-  flow, not just data dependence.  distributed time.]
+  flow, NOT data dependence.  The data dependence is in the work
+  functions themselves; this is a property of the graphs.  distributed
+  time.]
 
 \subsection{Program Verification}
 
-Borrow from program verification section of last paper.
+A number of program analysis techniques are immediately afforded by
+the $min$ function.  In particular, it is very simple to compute 1)
+whether or not the program will deadlock as a result of a starved
+input channel, and 2) whether or not any buffer will grow without
+bound during the steady-state execution of the program.
+
+{\bf Deadlock detection.}  The deadlock detection algorithm takes
+advantage of the fact that the only loops in our stream graph are part
+of a FeedbackLoop construct.  A stream graph will be deadlock-free if
+and only if every feedback loop produces enough data to satisfy its
+own feedback joiner.  This can be formulated in terms of the $min$
+function by considering $min_{t}{t}$, the data that a tape $t$ in a
+feedback loop requires of itself.  However, since we didn't define
+$min$ across circular paths in the stream graph, we will denote this
+function by $minloop$ and define it at loop input to the feedback
+joiner:
+\begin{align*}
+minloop(x) \equiv \mi{I2_{FJ}}{O_{FJ}} \circ \mi{O_{FJ}}{I2_{FJ}}
+\end{align*}
+Now, the loop will be deadlock-free if and only if $\forall x \in N, x
+- minloop(x) > 0$.  This condition follows directly from
+causality--the $x$'th item can be produced if and only if its
+production depends only on some subset of the $x-1$ items that are
+already on the channel.
+
+{\bf Overflow detection.}  There are two places that a buffer can grow
+to an unbounded size in the stream graph.  The first is in a feedback
+loop, when\footnote{$f(x) = \omega(g(x))$ if $lim_{x \rightarrow
+\infty}\frac{f(x)}{g(x)} = \infty$}~$x - minloop(x) = \omega(1)$.
+That is, if $minloop(x)$ items on the feedback tape enables the
+production of an additional $x - minloop(x)$ items that grows
+asymptotically with the position $x$ on the tape, then the constant
+consumption rate will not keep up with the growing production rate,
+and the buffer will overflow.
+
+The second case of buffer overflow is when the parallel streams of a
+SplitJoin have asymptotically different production rates.  For a given
+stream $i$ in a SplitJoin construct, the buffer corresponding to the
+joiner input tape $Ii_J$ will overflow if and only if there is a
+stream $j$ in the SplitJoin for which:
+\begin{align*}
+(\mi{I_S}{Oi_S}& \circ \mi{Oi_S}{Ii_J} \circ \mi{Ii_J}{O_J})(x) - \\
+(\mi{I_S}{Oj_S}& \circ \mi{Oj_S}{Ij_J} \circ \mi{Ij_J}{O_J})(x) = \omega(1)
+\end{align*}
+Both of these cases could be detected by a compiler to verify that no
+buffers will overflow during steady-state execution.
 
 \subsection{Message Timing}
 
