@@ -15,6 +15,17 @@ execution of the join as producing exactly one element. (unless the
 corresponding stream doesn't produce/consume any data, then it should not
 do anything on a particular execution)
 
+Convention:
+
+buff (o) - amount of data buffered on the input to operator o
+push (f) - amount of data pushed by filter f
+pop (f) - amount of data popped by filter f
+peek (f) - amount of data peeked by filter f
+first (s) - first operator of stream s
+last (s) - last operator of stream s
+child\_n (s) - nth child of stream (pipeline or splitjoin) s
+nchildren (s) - # of children in a stream
+
 \section{Scheduling and Buffering}
 
 Depending on the scheduling technique, the amount of buffering required in a 
@@ -62,6 +73,9 @@ or not at all.  Higher-level streams use their children's cyclic schedules
 to construct their own cyclic schedules.  Each stream computes a schedule 
 the size of its minimal steady execution schedule.
 
+The kth phase of a cyclic schedule of stream s, consumes pop(phase_k (s))
+data.  The current phase # of a given stream s is k (s).
+
 \subsubsection{Filters}
 
 A cyclic schedule for a filter is quite simple - it has a single phase,
@@ -84,6 +98,18 @@ schedule, an appropriate number of upstream component's phase schedules is
 inserted into the pipeline's phase schedule.  This process continues until
 either no data is consumed by a given component in its execution(s), or
 there is no more upstream pipeline components.
+
+So, if nexec (s) is # of cyclic schedules stream s needs to run, and p is
+the pipeline we're processing, we have:
+
+nexec (child_{nchildren(p)}) = 1
+nexec (child_n (p)) = ceil (
+                             (   sum (pop (phase_k (nchild_{n+1})))
+     			       + peek (first(nchild_{n+1})) - pop (first (nchild_{n+1}))
+                               - buff (nchild_{n+1})
+		             ) 
+			     / push (child_n (p))
+			   )
 
 This produces a single phase of the cyclic schedule.  It is repeated until
 enough cyclic schedules are computed for an entire steady execution
