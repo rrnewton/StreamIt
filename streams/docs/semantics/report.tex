@@ -1,6 +1,6 @@
 \documentclass[twocolumn, draft]{article}
 \usepackage{psfig, wide, verbatim}
-\title{StreaMIT Language Description \\ Version 0.3-pre}
+\title{StreaMIT Language Description \\ Version 0.0.5}
 \author{Insomniac Streams Anonymous}
 
 
@@ -15,22 +15,22 @@ on a 2D surface with no intersections.  The graph is almost a DAG, except
 we allow feedback loops in arrangement of filters.
 
 All blocks can be aggregated into larger superblocks:  Pipes, StreamSelects,
-and SplitsJoins.  The arrangement of these superblocks and
+and SplitJoins.  The arrangement of these superblocks and
 Filters is created in our scripting language.
 
 Every Filter can send and receive messages through MessagePipes.  A filter 
-accepts a MessagePipe for its Init function.  It can then bind itself
-to this pipe as a sender or a receiver.  This allows us to set up a one-one,
+can accept a MessagePipe in its Init function.  It can then bind itself
+to this pipe as a receiver.  This allows us to set up a one-one,
 one-many, many-one and many-many communication between filters.
 
 There is another construct, ResetWire, for triggering reinitalization of 
 filters/superblocks (through calling a function of the scripting language).
 
 \section{Filters}
-A new filter type is defined as follows:
+A new filter class is defined as follows:
 
 \begin{verbatim}
-type FooType is Filter
+class FooType is Filter
 {
 // insert data/functions here
 };
@@ -53,9 +53,6 @@ Work ()
 {
   // essentially a low pass filter:
   fooOutput [0] = fooInput [0] + fooInput [-1];
-  fooInput.release (1);
-  fooInput.advance (1);
-  fooOutput.push (1);
 }
 \end{verbatim}
 
@@ -73,7 +70,7 @@ This constructor has a chance to initialize the filter with some initial
 data (passed as arguments):
 
 \begin{verbatim}
-type FooType is Filter
+class FooClass is Filter
 {
   float amplification;
   Init (float a)
@@ -83,7 +80,8 @@ type FooType is Filter
 };
 \end{verbatim}
 
-Init is not allowed to send messages or initialize other blocks.
+Init is allowed to send messages and push data into output blocks,
+but is not allowed to read inputs or switch StreamSelects (described later).
 
 \subsection{Message}
 
@@ -107,14 +105,15 @@ struct Msg
 \end{verbatim}
 
 Message handlers are allowed to send other messages and/or reinitialize blocks.
-Message handlers are not allowed to read stream input or output any stream data.
+Message handlers are not allowed to read stream input but they are allowed
+to output to a stream.
 Initialization of a filter causes this filter's message queue to be emptied.
 
 In order to sign up for receiving messages, a Filter needs to bind a
 handler function to a MessagePipe.
 
 \begin{verbatim}
-type FooFilter is Filter
+class FooFilter is Filter
 {
   Init (MessagePipe pipe)
   {
@@ -131,7 +130,7 @@ Similarly, to sign up for sending messages, a Filter needs to store the
 MessagePipe and send a message to it.
 
 \begin{verbatim}
-type BarFilter is Filter
+class BarFilter is Filter
 {
   MessagePipe myPipe;
   Init (MessagePipe pipe)
@@ -202,7 +201,7 @@ FMRadio (float fmFreq, MusicType mType, float loudness)
 
 All filters and/or function calls have to accept a single input and result
 in a single output (except for sources and sinks, described below).
-All input/outputs are type-checked to make sure that
+All inputs/outputs are type-checked to make sure that
 all types agree.
 
 \subsection{Split}
@@ -224,9 +223,27 @@ Equalizer (MusicType mType)
 \end{verbatim}
 
 The first entry of a SplitJoin must be the type of splitting performed
-by this SplitJoin.  There are two types allowed:  RoundRobin and Duplicate.
-The last field is the method for joining the streams.  Currently only
-RoundRobin is allowed.
+by this SplitJoin.  There types allowed are:  RoundRobin, WeightedRoundRobin
+and Duplicate.  The last field is the method for joining the streams.  
+Currently only RoundRobin and WeightedRoundRobin are allowed.
+
+WeightedRoundRobin requires extra information which indicates how many
+pieces of data should go to each subsequent filter.  The syntax for it
+is as follows:
+
+\begin{verbatim}
+SplitJoin
+{
+  WeightedRoundRobin = {1, 2, 1};
+  Filter1 foo;
+  Filter2 bar;
+  Filter3 foobar;
+  WeightedRoundRobin = {1, 2, 1};
+}
+\end{verbatim}
+
+The number of weights listed in the WeighterRoundRobin definition must
+match the number of filters providied in the SplitJoin.
 
 \subsection{StreamSelect}
 
@@ -241,7 +258,7 @@ enum MusicType {
   HeavyMetal
 }
 
-Equalizer (MusicType mType)
+
 {
   StreamSelectSwitch switch;
   StreamSelectSwitch (mType) = switch
@@ -260,7 +277,7 @@ Equalizer (MusicType mType)
   }
 }
 
-type VoiceControl is Filter
+class VoiceControl is Filter
 {
   StreamSelectSwitch switch;
   Init (StreamSelectSwitch musicSwitch, 
@@ -284,77 +301,6 @@ Note, that parameter to the Set function of StreamSelectSwitch must be
 a constant.  As a result the compiler can analyze possible combinations
 of the stream and initialize them all.
 
-\begin{comment}
-\subsection{Split/Merge}
-
-The predefined Split construct does not allow for much flexability in
-creating interesting designs of stream flow.  Following two base types
-are used for defining custom splits and merges:
-
-\begin{verbatim}
-type LeftHeavySplit is CustomSplit
-{
-  input float audio;
-  output float leftAudio;
-  output float rightAudio;
-  Work ()
-  {
-    leftAudio[0] = audio[0];
-    leftAudio[1] = audio[1];
-    rightAudio[0] = audio[2];
-
-    audio.release (3);
-    audio.advance (3);
-    leftAudio.push (2);
-    rightAudio.push (1);
-  }
-};
-
-type LeftHeavyMerge is CustomMerge
-{
-  input float leftAudio;
-  input float rightAudio;
-  output float audio;
-  Work ()
-  {
-    audio[0] = leftAudio [0];
-    audio[1] = leftAudio [1];
-    audio[2] = rightAudio [2];
-
-    leftAudio.release (2);
-    leftAudio.advance (2);
-    rightAudio.release (1);
-    rightAudio.advance (1);
-    audio.push (3);
-  }
-};
-
-type LeftHeavyFilter is FilterBlock
-{
-  input float inAudio;
-  output float outAudio;
-  Init ()
-  {
-    LeftHeavySplit s;
-    LeftAudioFilter l;
-    RightAudioFilter r;
-    LeftHeavyMerge m;
-  }
-};
-\end{verbatim}
-
-Both CustomMerge and CustomSplit are allowed to have Init and Message
-functions.  Their functionality and definition syntax is overall very
-similar to that of Filter, except Filter is allowed only single input/
-single output, where as CustomSplit can have multiple outputs and 
-CustomMerge can have multiple inputs.
-
-When using CustomSplit/CustomMerge, we simply declare the Split, followed
-by appropriate number of singe input/single output blocks, followed by
-a CustomMerge of appropriate number of inputs.
-
-\end{comment}
-
 \subsection{Sources/Sinks}
 
 Sources and Sinks are very similar to Filters, except they either have
@@ -368,25 +314,21 @@ no sources.  The last one should have no sinks.
 
 A block with no input/output can be used in the middle of a macro function  (or
 other appropriate structure).  The constraint is that after/before block(s) 
-with no input/output, a Merge/Join is required.
+with no input/output, a Split/Join is required.
 
 \begin{verbatim}
 
-type Demultiplexer is Filter
+class Demultiplexer is Filter
 {
   input StereoSignal rrAudio;
   output StereoSignal audioOut;
   Work ()
   {
     audioOut [0] = rrAudio [0] + rrAudio [1];
-
-    rrAudio.release (2);
-    rrAudio.advance (2);
-    audioOut.push (1);
   }
 };
 
-type Microphone is Source
+class Microphone is Source
 {
   output StereoSignal audio;
   Init ()
@@ -394,14 +336,13 @@ type Microphone is Source
   Work ()
   {
     audio [0] = GetValueFromMic ();
-    audio.push (1);
   }
 };
 
-type TapePlayer is Source 
+class TapePlayer is Source 
 { ... }
 
-type SeparateStereo
+class SeparateStereo is Filter
 {
   input StereoSignal sAudio;
   output float mAudio;
@@ -421,7 +362,7 @@ type SeparateStereo
   }
 };
 
-type Speaker is Sink
+class Speaker is Sink
 { ... }
 
 Karaoke ()
@@ -431,13 +372,16 @@ Karaoke ()
     {
       Microphone ();
       TapePlayer ();
-      // merge 2 streams using RoundRobin merging
-      // note: if we specify that we want to merge 3 streams,
-      // Merge would also expect to get an input to Kareoke
-    } Merge (2, RoundRobin);
+      // merge 2 streams using RoundRobin
+      // merging.  Note: if we specify that
+      // we want to merge 3 streams, Join
+      // would also expect to get an input
+      // to Kareoke
+    } Join (2, RoundRobin);
 
     Demultiplexer ();
-    // split into 2 streams using Duplicate splitting;
+    // split into 2 streams using Duplicate
+    // splitting;
     Split (2, Duplicate)
     {
       Pipe
@@ -455,31 +399,24 @@ Karaoke ()
 }
 \end{verbatim}
 
-\subsection{FeedbackBlock}
+\subsection{FeedbackLoop}
 
-We're still looking for good syntax for feedback blocks.
-
-\begin{comment}
 Some stream applications require feedback loops for data processing.
 Here we define a type that allows us to create feedback loops
 in our stream graph.
 
-A FeedbackBlock type is very similar to FilterBlock, but it uses two inputs 
-and one output.  The first input
-is from the outside stream.  The second input is the feedback input.
-The feedback input is defined using FeedbackPath construct.  FeedbackPath
-allows us to specify in the Init function what type of FeedbackPath will
-be used.  FeedbackPath must be used exactly once per Init function, and
-may only be used in FeedbackBlock.
-
-A FeedbackBlock does not have a Work function, but its first non-source
-block must be a Merge.
+A FeedbackLoop construct is very similar to Pipe.  It connects
+several blocks in a serial connection, but it also allows to connect
+the output of the pipe to the first block of the FeedbackLoop through
+a FeedbackPath (which must be the last statement of the FeedbackLoop).
+Since the first filter in a FeedbackLoop accepts
+two inputs, this filter must be of FeedbackFilter type.
 
 \begin{verbatim}
-type NegFeedbackAmplifierMerge is CustomMerge
+class NegFeedbackAmplifierFilter is FeedbackFilter
 {
   input float audioIn;
-  input float feedback;
+  feedbackinput float feedback;
   output float audioOut;
   float ampGain;
   float amplification;
@@ -494,12 +431,6 @@ type NegFeedbackAmplifierMerge is CustomMerge
       (in + out) / (-amplification + 1);
     float result = - negFeed * ampGain;
     audioOut [0] = result;
-	
-    audioIn.release (1);
-    audioIn.advance (1);
-    feedback.release (1);
-    feedback.advance (1);
-    audioOut.push (1);
   }
 
   // note: here a is the POSITIVE amplification
@@ -510,17 +441,13 @@ type NegFeedbackAmplifierMerge is CustomMerge
   }
 };
 
-type NegFeedbackBuffer is Filter
+class NegFeedbackBuffer is Filter
 {
   input float in;
   output float out;
   Work ()
   {
     in [0] = out [0];
-
-    in.release (1);
-    in.advance (1);
-    out.push (1);
   }
 
   Init (int delay)
@@ -529,29 +456,20 @@ type NegFeedbackBuffer is Filter
     {
       out [i] = 0;
     }
-    out.push (delay);
   }
 };
 
-type NegFeedbackAmplifier is NegFeedbackAmp
+NegFeedbackAmplifier ()
 {
-  input float in;
-  input float feedback;
-  output float out;
-
-  Init(float amp)
+  FeedbackLoop
   {
-    // gain = amp * 10 should be sufficient
-    NegFeedbackAmplifierMerge (amp, amp * 10);
-
-    // feedback will be delayed by 2 
-    FeedbackPath NegFeedbackBufffer myBuffer (2);
+    NegFeedbackAmplifierFilter (10, 1000);
+    FeedbackPath NegFeedbackFilter (2);
   }
-};
-
+}
 \end{verbatim}
 
-\end{comment}
+\include{grammar}
 
 \begin{comment}
 

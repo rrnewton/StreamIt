@@ -1,6 +1,7 @@
 all: report.dvi
 
 report.dvi : report.tex \
+   grammar.tex \
 #	block.ps \
 #	feedback.ps \
 #	split-join.ps \
