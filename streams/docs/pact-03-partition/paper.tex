@@ -8,42 +8,71 @@
 \author{
 \alignauthor \vspace{-18pt}
 William Thies,
-Jasper Lin,
-David Maze,
-Andrew Lamb, 
-Michael Gordon, and 
+Jasper Lin, and
 Saman Amarasinghe \\
 	\vspace{8pt}
-	\{thies, jasperln, dmaze, aalamb, mgordon, saman\}@lcs.mit.edu \\
+	\{thies, jasperln, saman\}@lcs.mit.edu \\
 	\vspace{8pt}
 	Laboratory for Computer Science \\
 	Massachusetts Institute of Technology}
 
 \begin{document}
 
-\newtheorem{definition}{Definition}
-\newtheorem{transformation}{Transformation}
+  \newtheorem{definition}{Definition}
+  \newtheorem{transformation}{Transformation}
+  
+  \maketitle
+  
+  \newcommand{\mt}[1]{\mbox{\it #1}}
+  \newcommand{\todo}[1]{\framebox{\bf #1}}
+  
+  \begin{abstract}
+    \input{abstract}
+  \end{abstract}
 
-\maketitle
+  \input{intro}
+  \input{language}
+  \input{transforms}
+%  \input{algorithm}
+  \input{results}
+  \input{nonhier-transforms}
 
-\newcommand{\mt}[1]{\mbox{\it #1}}
-\newcommand{\todo}[1]{\framebox{\bf #1}}
+  \begin{figure}[t]
+    \psfig{figure=algorithm4.eps,width=3.5in}
+    \caption{Refactoring hierarchical splitjoin children.}
+  \end{figure}
+  
+  \begin{figure}[t]
+    \psfig{figure=algorithm5.eps,width=3.5in}
+    \caption{Adding and removing splitjoin synchronization.}
+  \end{figure}
+  
+  \begin{figure}[t]
+    \psfig{figure=algorithm6.eps,width=3.5in}
+    \caption{Aggressive synchronization removal.}
+  \end{figure}
+  
+  \clearpage
+  \begin{figure*}[t]
+    \begin{tabular}{ll}
+    \psfig{figure=algorithm.eps,width=3.5in}
+    &
+    \psfig{figure=algorithm2.eps,width=3.5in}
+    \end{tabular}
+    \caption{Search phase of the partitioning algorithm.  The traceback phase appears in the appendix.
+      \protect\label{code:partition}}
+  \end{figure*}
 
-\begin{abstract}
-\input{abstract}
-\end{abstract}
-
-\input{intro}
-\input{language}
-\input{transforms}
-\input{algorithm}
-\input{results}
-\input{nonhier-transforms}
-
-% Bibliography -- whee!
-\begin{small}
-  \bibliographystyle{abbrv}
-  \bibliography{references}
-\end{small}
-
+  \section*{Appendix}
+  \clearpage
+  \begin{figure}[t]
+    \psfig{figure=algorithm3.eps,width=3.5in}
+  \end{figure}
+  
+  % Bibliography -- whee!
+  \begin{small}
+    \bibliographystyle{abbrv}
+    \bibliography{references}
+  \end{small}
+  
 \end{document}

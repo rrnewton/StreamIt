@@ -1,0 +1,75 @@
+// Return whether or not a vertical cut is possible on stream <s>
+// within the given bounds.  This is true if: 1) There are at least
+// two streams to cut bewteen, 2) all rows of this have equal width,
+// and 3) it is possible to remove synchronization between rows.
+boolean canCutVertically(stream s, int x1, int x2, int y1, int y2)
+------------------------------------------------------------------
+return x1<x2 && (width[y1]==...==width[y2]) && canRemoveSync(y1,y2)
+
+// returns cost of node <s> assigned to <n> tiles
+int getNodeCost(stream s, int n)
+-------------------------------------------------------------------------
+if (isFissable(s))
+  return work / n
+else
+  return work
+endif
+
+int getContCost(stream s, int x1, int x2, int y1, int y2, int n)
+-------------------------------------------------------------------------
+// if we've exceeded the width of this node, then trim down to actual width
+if (x2>maxWidth[y1][y2]-1)
+    x2 = maxWidth[y1][y2]-1;
+
+// if value is memoized, return it
+if (A_s[x1][x2][y1][y2][n] != -1)
+  return A_s[x1][x2][y1][y2][n]
+
+// if down to one child, descend into it
+if (x1==x2 && y1==y2)
+  int cost = getCost(s.get(x1, y1), n)
+  A_s [x1][x2][y1][y2][n] = cost
+  return cost;
+endif
+
+// if n is 1, just sum the work of components
+if (n==1)
+  int sum = getContCost(x1, x1, y1, y1, tileLimit, nextToJoiner);
+  sum += (x1<x2 && x1+1<width[y1]) ? 
+         getContCost(s, x1+1, x2, y1, y1, tileLimit) : 0;
+  sum += (y1<y2 && x1<width[y1+1]) ? 
+         getContCost(s, x1, x1, y1+1, y2, tileLimit) : 0;
+  sum += (x1<x2 && y1<y2 && x1+1<width[y1+1]) ? 
+         getContCost(s, x1+1, x2, y1+1, y2, tileLimit) : 0;
+  A_s[x1][x2][y1][y2][tileLimit] = sum;
+  A_s[x1][x2][y1][y2][tileLimit] = sum;
+  return sum
+endif
+
+int min = infinity
+// try making vertical cut (in case s is a splitjoin)
+if (tryVertical) {
+  for xPivot = x1 to x2 - 1
+    for nPivot = 1 to n-1
+      int cost = max(getContCost(s, x1, xPivot, y1, y2, nPivot),
+                     getContCost(s, xPivot+1, x2, y1, y2, n-nPivot));
+      if (cost < min)
+        min = cost
+      endif
+    endfor
+   nendfor
+}
+
+// try making horizontal cut (for splitjoin, pipeline, feedbackloop)
+for yPivot = y1 to y2 - 1
+  for nPivot = 1 to n-1
+    int cost = max(getContCost(s, x1, x2, y1, yPivot, nPivot),
+                   getContCost(s, x1, x2, yPivot+1, y2, n-nPivot));
+    if (cost < min)
+      min = cost
+    endif
+  endfor
+endfor
+
+A[x1][x2][y1][y2][n] = min;
+return min

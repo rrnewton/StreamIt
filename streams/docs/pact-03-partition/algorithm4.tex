@@ -1,0 +1,66 @@
+// Refactors children <begin>...<start> of <sj> into their own 
+// sub-splitjoin.
+splitjoin lowerChildren(splitjoin sj, int begin, int end)
+------------------------------------------------------------------
+// make hierarchical sub-splitjoin
+subChild = { sj.child[begin], ... , sj.child[end] }
+if (sj.splitter is duplicate)
+  subSplit = duplicate
+else
+  subJoin = roundrobin( sj.split.w[begin], ... , sj.split.w[end] )
+endif
+subJoin = roundrobin( sj.join.w[begin], ... , sj.join.w[end] )
+subSJ = splitjoin( subSplit, subJoin, subChild )
+
+// make new splitjoin to return
+newChild = {sj.child[0], ... , sj.child[begin-1], subSJ,
+            sj.child[end+1], ... , sj.child[sj.size-1]}
+if (sj.split is duplicate)
+  newSplit = duplicate
+else
+  newSplit = roundrobin ( sj.split.w[0], ... , sj.split.w[begin-1],
+               sj.split.w[begin] + ... + sj.split.w[end],
+               sj.split.w[end+1], ... , sj.split.w[sj.size-1] )
+endif
+newJoin = roundrobin( sj.join.w[0], ... , sj.join.w[begin-1],
+            sj.join.w[begin] + ... + sj.join.w[end],
+            sj.join.w[end+1], ... , sj.join.w[sj.size-1] )
+return splitjoin ( newSplit, newJoin, newChild )
+
+
+// Opposite trasnformation as lowerChildren.  Given a splitjoin
+// <sj> and a  position <pos> of a child with aligned joiner weights
+// and matching split type, raise the children of the child into <sj>.
+splitjoin raiseChildren(splitjoin sj, int pos)
+------------------------------------------------------------------
+sj2 = sj.child[pos]
+// must have "aligned rates" as follows
+sumJoin = sj2.join.w[0] + ... + sj2.join.w[sj2.size-1]
+if (count != sj.join.w[pos]) 
+  return sj
+endif
+// build new new split... split types/weights must match
+if (sj.split is duplicate)
+  if (!sj2.split is dupliate)
+    return sj
+  else 
+    newSplit = dupliate
+  endif
+else
+  sumSplit = sj2.split.w[0] + ... + sj2.split.w[sj2.size-1]
+  if (sumSplit!=sj.split.w[pos])
+    return sj
+  else
+    newSplit = roundrobin( sj.split.w[0], ... , sj.split.w[pos-1], 
+                 sj2.split.w[0], ... , sj2.split.w[sj2.size-1], 
+                 sj.split.w[pos+1], ... , sj.split.w[sj.size-1] )
+  endif
+endif
+// otherwise we can definately raise the child...
+newChild = {  sj.child[0], ... , sj.child[pos-1], 
+              sj2.child[0], ... , sj2.child[sj2.size-1], 
+              sj.child[pos+1], ... , sj.child[sj.size-1] );
+newJoin = roundrobin( sj.join.w[0], ... , sj.join.w[pos-1], 
+            sj2.join.w[0], ... , sj2.join.w[sj2.size-1], 
+            sj.join.w[pos+1], ... , sj.join.w[sj.size-1] )
+return splitjoin( duplicate, newJoin, newChild )

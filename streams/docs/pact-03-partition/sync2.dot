@@ -1,0 +1,68 @@
+digraph streamit {
+subgraph cluster_node1 {
+ label="";
+node2 [ label="" ]
+subgraph cluster_node3 {
+ label="splitjoin";
+node4 [ label="duplicate" ]
+node5 [ label="roundrobin(2,1,2)" ]
+subgraph cluster_node6 {
+ label="pipeline";
+node7 [ label="A" ]
+subgraph cluster_node8 {
+ label="splitjoin";
+node9 [ label="roundrobin(1,1)" ]
+node10 [ label="roundrobin(1,1)" ]
+node11 [ label="E" ]
+node9 -> node11
+node11 -> node10
+node12 [ label="F" ]
+node9 -> node12
+node12 -> node10
+}
+node7 -> node9
+}
+node4 -> node7
+node10 -> node5
+subgraph cluster_node13 {
+ label="pipeline";
+subgraph cluster_node14 {
+ label="splitjoin";
+node15 [ label="duplicate" ]
+node16 [ label="roundrobin(2,2)" ]
+node17 [ label="B" ]
+node15 -> node17
+node17 -> node16
+node18 [ label="C" ]
+node15 -> node18
+node18 -> node16
+}
+node19 [ label="G" ]
+node16 -> node19
+}
+node4 -> node15
+node19 -> node5
+subgraph cluster_node20 {
+ label="pipeline";
+node21 [ label="D" ]
+subgraph cluster_node22 {
+ label="splitjoin";
+node23 [ label="roundrobin(1,1)" ]
+node24 [ label="roundrobin(1,1)" ]
+node25 [ label="H" ]
+node23 -> node25
+node25 -> node24
+node26 [ label="I" ]
+node23 -> node26
+node26 -> node24
+}
+node21 -> node23
+}
+node4 -> node21
+node24 -> node5
+}
+node2 -> node4
+node27 [ label="" ]
+node5 -> node27
+}
+}

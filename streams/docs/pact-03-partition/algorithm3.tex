@@ -1,0 +1,65 @@
+// traceback and construct a mapping <map> from nodes to partitions.
+// <assigned> represents the number of partitions assigned so far.
+void traceback(stream s, list-of (stream,int) map, int assigned, int n)
+---------------------------------------------------------------
+if (s is Node)
+  tracebackNode(s, map, assigned, n)
+if (s is Container)
+  tracebackCont(s, map, assigned, 0, s.width()-1, 0, s.length()-1, n)
+
+
+// traceback for node
+void tracebackNode(stream s, list-of (stream,int) map, int assigned, int n)
+---------------------------------------------------------------
+for i = 0 to n-1
+  map.append(s, assigned+i)
+endfor
+
+// traceback for container
+void tracebackCont(stream s, list-of (stream,int) map, int assigned, 
+                   int x1, int x2, int y1, int y2, int n)
+---------------------------------------------------------------
+// if we've exceeded the width of this node, then trim down to actual width
+if (x2>maxWidth[y1][y2]-1) {
+    x2 = maxWidth[y1][y2]-1;
+}
+
+// if we only have one partition left, or if we are only
+// looking at one child, then just recurse into children
+if (tileLimit==1 || (x1==x2 && y1==y2))
+  for i = x1 to x2
+    for j = y1 to y2
+      traceback(s.get(i,j), map, assigned, n);
+
+// otherwise, see if we made a vertical cut (in case s is a splitjoin)
+int min = infinity
+if (canCutVertically(s, x1, x2, y1, y2) {
+  for xPivot = x1 to x2-1
+    for nPivot = 1 to n-1
+      int cost = max(getContCost(s, x1, xPivot, y1, y2, nPivot),
+                     getContCost(s, xPivot+1, x2, y1, y2, n-nPivot));
+      if (cost==A[x1][x2][y1][y2][n]) {
+        // found best cost, so there's a division at this <xPivot>.  Recurse
+        // left and right, incrementing assignment count after partition.
+        traceback(s, map, assigned, x1, xPivot, y1, y2, nPivot)
+        traceback(s, map, assigned+nPivot, xPivot+1, x2, y1, y2, n-nPivot);
+        return
+      endif
+    endfor
+  endfor
+}
+
+// try making horizontal cut (for splitjoin, pipeline, feedbackloop)
+for yPivot = y1 to y2 - 1
+  for nPivot = 1 to n-1
+    int cost = max(getContCost(s, x1, x2, y1, yPivot, nPivot),
+                   getContCost(s, x1, x2, yPivot+1, y2, n-nPivot));
+    if (cost==A[x1][x2][y1][y2][n]) {
+      // found best cost, so there's a division at this <yPivot>.  Recurse
+      // left and right, incrementing assignment count after partition.
+      traceback(s, map, assigned, x1, x2, y1, yPivot, nPivot)
+      traceback(s, map, assigned+nPivot, x1, x2, yPivot+1, y2, n-nPivot);
+      return
+    endif
+  endfor
+endfor

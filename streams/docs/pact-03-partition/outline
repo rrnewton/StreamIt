@@ -1,4 +1,66 @@
 - intro
+  - general framework for answering many questions
+  - fast execution time
+  - takes advantage of structure of streamit for compiler
+  - performance (load/linear)
+
+- streamit language
+  - scheduling, two phases
+
+- example of need for dynamic programming partitioner
+
+- helper functions - graph transformations
+  - sync removal / addition
+    - structured and unstructured (get from Jasper)
+  - adding / removing pipeline children
+  - adding / removing splitjoin children
+  - reference to asplos paper for fusion, fission
+    - but note we do 1) two-stage stuff, 2) fuse any two neighbors
+
+- partitioning algorithm
+  - work estimation
+  - say that glossing over details of joiner
+  - the subtelty with how much to weight things
+  - optimizing performance / symmtery (both aliasing and children)
+
+- results
+  - note that we also tried ILP, to no avail
+
+- other applications
+  - linear
+  - code/data size explosion
+  - heterogeneous targets
+  - time multiplexing
+
+  - note that equally good for figuring out, e.g., the minimum number of nodes
+    that you need to compute something without violating some property
+
+- limitations
+  - nonhierarchical graph transforms
+    - pipeline fission
+    - unstructured sync removal
+    - splitjoin fission
+    - for duplicate splitters, re-arranging children
+    - pushing filter in/out of pipeline
+  - nonhierarchical cost functions
+    - layout
+
+- extensions
+
+  - vertical fission, done as prepass or as parameterized region with
+    overlapping memo tables
+
+  - some kind of network/communication model or costs
+  - including with layout pass
+
+- related work - jasper
+  - diffs include fission, fission at same time as fusion, etc
+
+- conclusions
+
+------------------------------------------------------------------------------
+
+- intro
 
    - we find optimal partitioning of graph with respect to a cost
 	function, given set of allowable transformations

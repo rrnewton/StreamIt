@@ -1,0 +1,53 @@
+void->void pipeline Refactor {
+    add foo();
+    add splitjoin {
+	split roundrobin(2, 10);
+	add A;
+	add splitjoin {
+	    split roundrobin(4, 6);
+	    add B;
+	    add C;
+	    join roundrobin(2, 3);
+	}
+	join roundrobin(1, 5);
+    }
+    add bar();
+}
+
+void->int filter foo() {
+    init {}
+    work push 1 {
+ 	push(1);
+    }
+}
+
+int->int filter A() {
+    init{}
+    work push 1 pop 1 peek 2 {
+	push(peek(0)+peek(1));
+	pop();
+    }
+}
+
+int->int filter B() {
+    init{}
+    work push 1 pop 1 peek 2 {
+	push(peek(0)+peek(1));
+	pop();
+    }
+}
+
+int->int filter C() {
+    init{}
+    work push 1 pop 1 peek 2 {
+	push(peek(0)+peek(1));
+	pop();
+    }
+}
+
+int->void filter bar() {
+    init {}
+    work pop 1 {
+	print(pop());
+    }
+}

@@ -1,0 +1,28 @@
+digraph streamit {
+ label="";
+node2 [ label="" ]
+subgraph cluster_node3 {
+ label="splitjoin";
+node4 [ label="roundrobin(2,10)" ]
+node5 [ label="roundrobin(1,5)" ]
+node6 [ label="A" ]
+node4 -> node6
+node6 -> node5
+subgraph cluster_node7 {
+ label="                     splitjoin";
+node8 [ label="roundrobin(4,6)" ]
+node9 [ label="roundrobin(2,3)" ]
+node10 [ label="B" ]
+node8 -> node10
+node10 -> node9
+node11 [ label="C" ]
+node8 -> node11
+node11 -> node9
+}
+node4 -> node8
+node9 -> node5
+}
+node2 -> node4
+node12 [ label="" ]
+node5 -> node12
+}

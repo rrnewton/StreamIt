@@ -1,0 +1,50 @@
+// More aggressive synchronization removal.  Given a pipeline of two
+// splitjoins with different widths and weights, return a
+// new pipeline that contains factored splitjoins with as little
+// synchronization as possible.
+pipeline removeStructuredSyncPoints(pipeline pipe)
+------------------------------------------------------------------
+// get the splitjoins
+sj1 = pipe.child[0];
+sj2 = pipe.child[1];
+// if either has only one stream, give up
+if (sj1.size==1 || sj2.size==1) return pipe
+// if different sum of weights, give up
+sum1 = sum(sj1.join.weight[0] + ... + sj1.join.weight[sj1.size])
+sum2 = sum(sj2.join.weight[0] + ... + sj2.join.weight[sj1.size])
+if (sum1 != sum2)
+ return pipe
+endif
+// otherwise, symbollically execute one iteration of communication
+// between the splitjoins, mapping consumer/producer streams...
+int-list part1 = {0}, part2 = {0}  // indices to divide up splitjoins
+int items1, items2                 // items transferred through each sj
+int child1, child2                 // current child executing in each sj
+while (items1!=sum1 || items2!=sum2) do
+  // increment the lesser node
+  if (items1<items2) {
+    items1 += sj1.join.weight[child1]
+    child1++
+  } else {
+    items2 += sj2.split.weight[child2]
+    child2++
+  }
+  // if we found an alignment between sums, add to places to partition each
+  if (s1==s2)
+    part1.append(child1);
+    part2.append(child2);
+  endif
+enddo
+// if we only ended up with one partition, then we're done
+if (part1.size == 1)
+  return pipe
+endif
+// otherwise, factor the uppper and lower splitjoins according to our partitioning, using
+// matching sync removal to take care of the details
+for i = 0 to part1.size-2
+  sj1 = lowerChildren(sj1, part[i], part[i+1])
+endfor
+for i = 0 to part2.size-2
+  sj2 = lowerChildren(sj2, part[i], part[i+1])
+endfor
+return removeMatchingSyncPoints( pipeline( sj1, sj2 ) )

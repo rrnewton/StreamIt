@@ -1,0 +1,107 @@
+void->void pipeline Sync {
+    add foo();
+    add splitjoin {
+	split duplicate;
+	add A;
+	add B;
+	add C;
+	add D;
+	join roundrobin(2,2,2,2);
+    }
+    add splitjoin {
+	split roundrobin(1,1,4,1,1);
+	add E;
+	add F;
+	add G;
+	add H;
+	add I;
+	join roundrobin;
+    }
+    add bar();
+}
+
+void->int filter foo() {
+    init {}
+    work push 1 {
+ 	push(1);
+    }
+}
+
+int->int filter A() {
+    init{}
+    work push 1 pop 1 peek 2 {
+	push(peek(0)+peek(1));
+	pop();
+    }
+}
+
+int->int filter B() {
+    init{}
+    work push 1 pop 1 peek 2 {
+	push(peek(0)+peek(1));
+	pop();
+    }
+}
+
+int->int filter C() {
+    init{}
+    work push 1 pop 1 peek 2 {
+	push(peek(0)+peek(1));
+	pop();
+    }
+}
+
+int->int filter D() {
+    init{}
+    work push 1 pop 1 peek 2 {
+	push(peek(0)+peek(1));
+	pop();
+    }
+}
+
+int->int filter E() {
+    init{}
+    work push 1 pop 1 peek 2 {
+	push(peek(0)+peek(1));
+	pop();
+    }
+}
+
+int->int filter F() {
+    init{}
+    work push 1 pop 1 peek 2 {
+	push(peek(0)+peek(1));
+	pop();
+    }
+}
+
+int->int filter G() {
+    init{}
+    work push 1 pop 1 peek 2 {
+	push(peek(0)+peek(1));
+	pop();
+    }
+}
+
+int->int filter H() {
+    init{}
+    work push 1 pop 1 peek 2 {
+	push(peek(0)+peek(1));
+	pop();
+    }
+}
+
+int->int filter I() {
+    init{}
+    work push 1 pop 1 peek 2 {
+	push(peek(0)+peek(1));
+	pop();
+    }
+}
+
+int->void filter bar() {
+    init {}
+    work pop 1 {
+	print(pop());
+    }
+}

@@ -1,0 +1,43 @@
+// Given that all the children of <sj> are pipelines of the same
+// length n, refactor <sj> into a series of n splitjoins, each of
+// which contains children of unit length.
+pipeline addMatchingSyncPoints(splitjoin sj)
+------------------------------------------------------------------
+int n = sj.child[0].size
+// each new sj draws its children from distinct pipelines of <sj>
+for i = 0 to n-1
+  newChild[i] = { sj.child[0].child[i], ... , 
+                  sj.child[sj.size-1].child[i] }
+endfor
+// in the end cases, new splits and joins are same as <sj>
+newSplit[0] = sj.split
+newJoin[n-1] = sj.join
+// in the middle, make weights of split and join according to
+// steady-state I/O rates of the stream they are connected to
+for i = 1 to n-1
+  newSplit[i] = roundrobin( getSteadyStatePush(sj.child[0].child[i]), 
+                  ... ,
+                  getSteadyStatePush(sj.child[sj.size-1].child[i]) )
+endfor
+for i = 0 to n-2
+  newJoin[i] = roundrobin( getSteadyStatePop(sj.child[0].child[i]), ... , 
+                getSteadyStatePop(sj.child[sj.size-1].child[i] )
+endfor
+return pipeline( splitjoin(newSplit[0], newJoin[0], newChild[0]), ... ,
+                 splitjoin(newSplit[n-1], newJoin[n-1], newChild[n-1]) )
+
+
+// Opposite transformation as addMatchingSyncPoints.  Given a pipeline
+// in which all the children are splitjoins of width n, and each
+// adjacent splitjoin has exactly matching weights, returns a single
+// splitjoin containing n child pipelines.
+splitjoin removeMatchingSyncPoints(pipeline pipe)
+------------------------------------------------------------------
+int n = pipe.child[0].size
+newSplit = pipe.child[0].split
+newJoin = pipe.child[pipe.size-1].join
+newChild = { pipeline( pipe.child[0].child[0], ..., 
+             pipe.child[n].child[0] ),  ... ,
+             pipeline( pipe.child[0].child[pipe.size-1], ..., 
+             pipe.child[n].child[pipe.size-1] ) }
+return splitjoin( newSplit, newJoin, newChild )
