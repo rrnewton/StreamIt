@@ -1,3 +1,147 @@
-\section{Fusion Optimizations}
-\label{sec:fusion-opt}
+\section{Buffer Management}
+\label{sec:buffer}
 
+\input{fusion-fig1}
+\input{fusion-fig2}
+
+%% modulation
+%% copy-shift
+%% scaling
+%% scalar replacement
+
+%% - peek scaling amortizes costs of copies
+%%   - this is to scale a given filter's execution within a fusion unit
+
+%% - why can't do scalar replacement between filters
+
+%% 2. filter fusion
+%%  - for a general class of filters and topologies
+%%    - peeking
+%%    - parallel composition, not just sequential
+%%    --> that was shown in asplos paper
+
+%%  - optimizations
+%%    - converting buffers to scalar variables
+%%      - also eliminates modulo operations
+%%      - not too much new after asplos
+
+%%    - peek scaling
+%%      - 
+
+%%    - stack space reuse
+%%      - 
+
+%% ----------
+
+%% questions:
+%% - have we even compared to a rotating buffer?
+
+%% ------------------------------------------------------------
+
+%% The default implementation of intermediate value buffers
+%% in code generated for a StreamIt program is an array.
+%% However, array acesses are not very efficient because 
+%% of wasted instructions to increment index counter and 
+%% to add index counter to the base of the array address 
+%% to calculate the memory location.
+
+%% An optimization would be to replace an array of size N with 
+%% N scalar variables. In this case we do not need to increment 
+%% index variable or add the index variable to the base address, 
+%% since target memory location would be fixed for each
+%% instruction that accesses the buffer. This optimization
+%% allso allows the intermediate variables to be
+%% register allocated.
+
+%% Such an optimization is important to improve 
+%% performance of fine grained stream programs where each actor
+%% performs little amount of work and most of the code just moves 
+%% the items betwwen actors (high communication / computation ratio).
+
+%% However, this optimization can not be done if array is accessed in a loop 
+%% and array access index is calculated using the loop variable.
+
+%% \begin{verbatim}
+%% for (i = 0; i < 5; i++) {
+%%    array[index++] = x++;
+%% }
+%% \end{verbatim}
+
+%% If we fully unroll all such loops for a given array then we 
+%% can replace the array with scalar variables.
+
+%% \begin{verbatim}
+%% array[0] = x++;          var_0 = x++;
+%% array[1] = x++;          var_1 = x++;
+%% array[2] = x++;   ====>  var_2 = x++;
+%% array[3] = x++;          var_3 = x++;
+%% array[4] = x++;          var_4 = x++;
+%% \end{verbatim}
+
+%% If we want to replace many arrays then we will have to unroll
+%% many loops, this leads to dramatic increase in code size.
+
+%% Despite getting rid of unnecesary instructions we might see
+%% an overall performance degradation if we do not schedule
+%% actors in a cache aware manner.
+
+%% ------------------------------------
+
+%% \subsection{Peek Optimization}
+
+%% Because of Streamit language having a peek feature, one needs
+%% a separate initialization schedule to fill in the peek
+%% buffers with data. [ASPLOS'02-Gordon]
+
+%% There are two alternatives for peek implementation. Use a rotating
+%% buffer with head and tail pointers or use a peek buffer.
+
+%% Consider a filter that consumes 1 item, peeks 10 (including
+%% the one it consumes) and source produces 1.
+
+%% An Example of code generated:
+
+%% \begin{verbatim}
+%% item_type PEEK_BUFFER[9];
+%% item_type POP_BUFFER[10];
+
+%% 1. Source puts produced item into POP_BUFFER[0];
+%% 2. Copy PEEK_BUFFER[0..8] to POP_BUFFER[1..9];
+%% 3. Execute the Filter
+%% 4. Copy POP_BUFFER[0..8] to PEEK_BUFFER[0..8]
+
+%% \end{verbatim}
+
+%% If $peek rate >> pop$ rate then each item is copied many times.
+%% Consider a case where filter has pop rate 1 and peek rate 64,
+%% in this case each item has to be copied 128 times to / from PEEK\_BUFFER.
+
+%% We increase filters multiplicity by executing it multiple times.
+%% If we execute the above filter $N$ times, then it's pop rate is $N$ 
+%% and peek rate is $N+63$ items. If $N=16$ then $poprate=16$ $peekrate=79$
+%% and each item is copied to / from PEEK\_BUFFER at most 10 times.
+
+%% Scaling individual filters can result in increase of the buffer 
+%% requirements for a single steady state cycyle. 
+
+%% $<$INSERT EXAMPLE$>$
+
+%% Results show that to achieve high performance it is more important to
+%% reduce number of item copy operations than reduce buffer size as long
+%% as all of the persistent buffers fit into main memory or low speed
+%% off-chip cache.
+
+%% \subsection{Reusing Intermediate Storage Variables}
+
+%% Once loops have been unrolled, filters have been fused into a
+%% partition and arrays have been replaced with scalar variables we can
+%% find approximations of live ranges for the new variables and use this
+%% information to reduce stack space required by the partition's work
+%% function.
+
+%% We replace the scalar variables that have been created as a result of
+%% destroying arrays with a minimal number of variables, where minimal
+%% number is the maximum number of overlapping live ranges at any point
+%% in the work function of the fused partition.
+
+%% The above optimization improves data access locality.

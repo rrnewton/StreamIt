@@ -1,0 +1,79 @@
+\begin{figure*}[t]
+\begin{minipage}{1.7in}
+\centering
+\psfig{figure=fusion-pipeline.eps,width=0.7in}
+
+\caption{Stream graph for a synthetic buffer test.\protect\label{fig:code-graph}}
+\end{minipage}
+\hspace{0.3in}
+\begin{minipage}{2.2in}
+\centering
+{\scriptsize
+\begin{verbatim}
+void->void pipeline BufferTest {
+  add Source();
+  add FIR();
+}
+
+void->float filter Source {
+  work push 1 {
+    push(random());
+  }
+}
+
+float->void filter FIR {
+  int PEEK = 4;
+  work pop 1 peek PEEK {
+    float result = 0;
+    for (int i=1; i<PEEK; i++) {
+      result += i*peek(i);
+    }
+    pop();
+    print(result);
+  }
+}
+\end{verbatim}}
+
+\caption{Original StreamIt code for the buffer test.\protect\label{fig:code-orig}}
+\end{minipage}
+\hspace{0.3in}
+%
+\begin{minipage}{2.2in}
+\centering
+%% modulation
+{\scriptsize
+\begin{verbatim}
+void->void pipeline BufferTest {
+  int PEEK = 4;
+  float[4] BUFFER;
+  int push_index = 0;
+  int pop_index = 0;
+
+  prework {
+    for (int i=0; i<PEEK-1; i++) {
+      BUFFER[push_index++] = random();
+    }
+  }
+
+  work {
+    // run Source
+    BUFFER[push_index] = random();
+    push_index = (push_index + 1) & 3;
+    
+    // run FIR
+    float result = 0;
+    for (int i=1; i<PEEK; i++) {
+      result += i*BUFFER[(pop_index + i) & 3];
+    }
+    pop_index = (pop_index + 1) & 3;
+    print(result);
+  }
+}
+\end{verbatim}}
+
+\caption{Fused buffer test using modulation buffer management strategy.\protect\label{fig:code-modulation}}
+\end{minipage}
+\vspace{6pt}
+\hrule
+\vspace{6pt}
+\end{figure*}
