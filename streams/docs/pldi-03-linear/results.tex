@@ -1,6 +1,17 @@
 \section{Results}
 \label{sec:results}
 
+Our compiler currently has two linear analysis optimizations. The first,
+{\it linear replacement}, replaces the largest linear heirarchal {\tt streams} 
+possible with filters that directly compute the calculation specified by 
+the associated linear node. The second optimization, called 
+{\it frequency replacement}, replaces all {\tt streams} which implement 
+a convolution using the frequency transformation described in 
+\ref{sec:freq}. Below we describe experiements and results which measure the
+performance of these two optimizations.
+
+
+
 \subsection{Measurement Methodology}
 %We chose to measure the strength of our optimizations in terms of 
 %floating point instruction reduction. The StreamIt compiler currently
@@ -23,15 +34,15 @@
 %library is anything but optimized. Therefore, measuring running time is
 %probably not an appropriate metric.
 
-The fundamental metric of processing performance that we chose to measure is the 
-amount of computation. Most of the applications that are and will
-be written in StreamIt process floating point data so reducing FLOPs
-is a primary goal. Our measurement platform was a Dual Intel 2.2 GHz P4 Xenon processor system 
-running Linux. We compiled programs using StreamIt's uniprocessor
-and generated executables from the resulting C using {\tt gcc} with {\tt -O2} optimizations.
 
-To measure the number of FLOPs executed at runtime we used the DynamoRIO\cite{rio-webpage}
-runtime introspection and optimization infrastructure. Using a simple DynamoRIO application 
+Both linear replacement and frequency replacement increase performance primarily by 
+decreasing the number of floating point multiplications required per output.
+Our measurement platform was a Dual Intel 2.2 GHz P4 Xenon processor system 
+with 2GB of memory running Linux. We compiled programs using StreamIt's uniprocessor backend
+and generated executables from the resulting C using {\tt gcc} with {\tt -O2} optimization.
+
+To measure the number of FLOPs executed at runtime we used the DynamoRIO\cite{rio-webpage, dynamo99}
+infrastructure. Using a simple DynamoRIO application 
 we instrumented each benchmark program at runtime to count the number of FLOPs.
 
 We define the following three opcode classes for the Intel x86 instruction set:
@@ -44,9 +55,9 @@ We define the following three opcode classes for the Intel x86 instruction set:
 \vspace{-6pt}
 \end{itemize}
 
-There are no standard benchmark written for StreamIt, so we had to assemble
-a set of programs which perform computations that are likely to be representative
-real world applications. We settled on the following set of six.
+There are no standard benchmarks written for StreamIt, so we use
+a set of representative programs which perform computations that 
+are found in actual applications: 
 
 \begin{enumerate}
 \item FilterBank: Implements a multi-rate signal decomposition processing block common in communications and image processing.
@@ -67,7 +78,6 @@ detection in parallel.
 \vspace{-6pt}
 
 \item Radar: A radar frontend with beamformer and target detection.
-\vspace{-6pt}
 \end{enumerate}
 
 \subsection{Frequency Replacement Scaling}
@@ -87,60 +97,50 @@ detection in parallel.
 {\bf (b): Empirical}
 \end{minipage}
 \caption{Plots showing the theoretical and emphirical multiplication reduction factor as a function of the size of the FIR ($M$) and the number of outputs produced ($N$). The dark regions denote an increase in the required number of multiplications.}
-\label{fig:frequency-win-theory}
+\label{fig:frequency-win}
 \vspace{-12pt}
 \end{figure*}
 
-
 Direct convolution requires $O(MN)$ multiplies to generate $N$ output
-values.  The FFT requires $O(N+2(M-1))lg(N+(M-1))$ multiplications for both the
+values. The FFT requires $O(N+2(M-1))lg(N+2(M-1))$ multiplications for both the
 conversion to and from the frequency domain, and multiplying two $N+2(M-1)$
-vectors in the frequency domain requires $O(N+2(M-1))$. The frequency transformation 
-produced $N+M-1$ outputs every execution.
-We define the multiplication reduction factor as the number of
-multiplies required per output using convolution over the 
+vectors in the frequency domain requires $O(N+2(M-1))$. After the frequency transformation,
+$N+M-1$ outputs are produced every execution. We define the multiplication reduction factor
+as the number of multiplies required per output using convolution divided by the 
 the number of multiplies per output using the frequency transformation. 
-%The reduction factor in theory is roughly $f(M,N)=\frac{M(M-1+N)}{2(4(2(M-1)+N))log(4(2(M-1)+N))+4(2(M-1)+N))}$.
-Figure~\ref{fig:frequency-win-theory} shows a plot of the theoretical multiplication savings
-in $M$, $N$ space taking into account the fact that it requires 4 floating point 
-multiplies to multiply complex numbers.
 
-
-We also performed experiments to measure the actual multiplication reduction
-as a function of $M$ (filter size) and output size ($N$).
-Figure~\ref{fig:frequency-win-empirical} shows the empirically measured
-multiplication savings factor per output. Our experimental results have the same basic 
-shape as the theoretical predictions except that we don't see the falloff as 
-FIR size grows. This is due to the fact that
-our FFT algorithm requires that $N+2(M-1)$ be a power of two, and the compiler
-automatically adjusts $N$ upwards to meet this requirement.
-
+Figure~\ref{fig:frequency-win}~(a) shows a plot of the theoretical multiplication savings
+in $M$, $N$ space and Figure~\ref{fig:frequency-win}~(b) shows our empirically 
+measured savings. The roughness of both the theory and the data is due to the fact that
+our FFT algorithm requires $N+2(M-1)$ to be a power of two, and the compiler
+automatically adjusts $N$ upwards to satisfy this requirement. The theoretical 
+reduction numbers account for the fact that our implementation requires four 
+floating point muliplication operations to perform a complex valued multiply 
+in the frequency domain.
 
 \subsection{Simplification from Combination}
 Linear analysis is valuable because it provides a precise relationship
 between input and output that is nearly impossible to extract from
 general-purpose imperative programs. By combining the actions of
-StreamIt structures we can do optimizations that are not feasible for
-a standard compiler.
+StreamIt structures by combining their linear nodes we can do 
+optimizations that are impossible for a standard compiler.
 
-Combining the action of {\tt streams} in a {\tt pipeline} is an
-equivalent optimization to algebraic simplification across sequential
-loops in an imperative program.  Once an overall linear form for the
-{\tt pipeline} has been determined, our compiler simply replaces the
-original {\tt pipeline} with a {\tt filter} that computes the combined
-linear form. Since the compiler can perform this transformation
-automatically, the the programmer can now express the computation in
-the most convenient manner.
+Combining the action of {\tt streams} in a {\tt pipeline} is equivalent 
+to algebraic simplification between the bodies of sequential loops in 
+an imperative program. Once an overall linear node for the
+{\tt pipeline} has been determined, our compiler can perform this highly non-trivial 
+transformation automatically, leaving the the programmer to express 
+the computation in the most convenient manner.
 
-For instance, although a bandpass filter can be implemented with a low
-pass filter followed by a high pass filter, real implementations
-determine the coefficients of a single filter that computes the same
-values. While a simple bandpass filter is easy to combine manually, in
-an actual design several different filters might be designed by
-several different people which would be much harder to integrate into
-a single design.
+For example, although a bandpass filter can be implemented with a low
+pass filter followed by a high pass filter, actual implementations
+tend to determine the coefficients of a single combined filter that 
+performs the same computation. While a simple bandpass filter is 
+easy to combine manually, in an actual design several different 
+filters might be designed and implemented by several different people 
+which would be much harder to integrate into a single design.
 
-A common operation in discrete time signal processing is downsampling.
+Another common operation in discrete time signal processing is downsampling.
 Downsampling is most often implemented as a low pass filter followed
 by an $M$ compressor which passes every $M$th input sample to the
 output.  For every output of the downsampler, $M-1$ outputs from the
