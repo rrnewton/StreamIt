@@ -1,3 +1,14 @@
+\begin{figure}
+\centering
+\psfig{figure=joiner-buffer-dead.eps,width=4in}
+\caption{\protect\small Example of deadlock in a SplitJoin.
+\protect\label{fig:joiner-dead}}
+\vspace{36pt}
+\psfig{figure=joiner-buffer-live.eps,width=4in}
+\caption{\protect\small Fixing the deadlock with a buffering joiner.
+\protect\label{fig:joiner-live}}
+\end{figure}
+
 \section{Communication Scheduler}
 \label{sec:communic}
 
@@ -12,22 +23,22 @@ explicit in the stream graph.
 
 The exact implementation of the communication scheduler is tied to the
 communication model of the target.  The simplest mapping would occur
-for targets implementing an end-to-end, infinite FIFO abstraction, the
-scheduler needs only to decide to whom to send an item and from whom
-to receive an item.  Information easily calculated from the weights of
-the Splitters and Joiners.  As the communication model becomes more
-constrained, the communication scheduler becomes more complex,
-requiring analysis of the stream graph. For targets implementing a
-finite, blocking nearest-neighbor communication model, the exact
-ordering of tile execution must be specified. 
+for targets implementing an end-to-end, infinite FIFO abstraction, in
+which the scheduler needs only to determine the sender and receiver of
+each data item.  This information is easily calculated from the
+weights of the Splitters and Joiners.  As the communication model
+becomes more constrained, the communication scheduler becomes more
+complex, requiring analysis of the stream graph. For targets
+implementing a finite, blocking nearest-neighbor communication model,
+the exact ordering of tile execution must be specified.
 
 Due to the static nature of StreamIt, the compiler can statically
-orchestrate the communication resources.  We can create an
-initialization schedule and a steady-state schedule that fully
-describe the execution of the stream graph.  The schedules can give us
-an order for execution of the graph if necessary.  We can generate
-ordering to minimize buffer length, maximize parallelism, or minimize
-latency.  
+orchestrate the communication resources.  As described in
+Section~\ref{sec:phases}, we create an initialization schedule and a
+steady-state schedule that fully describe the execution of the stream
+graph.  The schedules can give us an order for execution of the graph
+if necessary.  We can generate ordering to minimize buffer length,
+maximize parallelism, or minimize latency.
 
 %Thus, we can create a communication scheduler of arbitrary
 %detail.  If the architecture must statically orchestrate all aspects
@@ -50,58 +61,70 @@ potentially deadlocking dependencies.
 %descibe the potential for deadlock introduced by Joiner nodes.  A
 %solution to this problem is described below.
 
-\subsection{Raw's Communication Scheduler}
+\subsection{Communication Scheduler for Raw}
 \label{sec:rawcommunic}
 
-The communication scheduling phase of the StreamIt Compiler maps
+The communication scheduling phase of the StreamIt compiler maps
 StreamIt's channel abstraction to Raw's static network.  As mentioned
-in Section \ref{sec:raw}, Raw's static network provides optimized, nearest
-neighbor communication.  Tiles communicate using buffered, blocking
-sends and receives.  It is the compiler's responsibility to statically
-orchestrate the explicit communication of the stream graph while
-preventing deadlock.
+in Section \ref{sec:raw}, Raw's static network provides optimized,
+nearest neighbor communication.  Tiles communicate using buffered,
+blocking sends and receives.  It is the compiler's responsibility to
+statically orchestrate the explicit communication of the stream graph
+while preventing deadlock.
 
 To statically orchestrate the communication of the stream graph, the
 communication scheduler simulates the firing of nodes in the stream
 graph, recording the communication as it simulates.  The simulation
-does not model the code of each Filter, instead it assumes that each
-Filter fires instantaneously.  The flow-control of the static network
-allows this relaxation.  Instead the simulator operates on the
-granularity of a data item.  Modeling the path each data item follows.
+does not model the code inside each Filter; instead it assumes that
+each Filter fires instantaneously.  This relaxation is possible
+because of the flow control of the static network--since sends block
+when a channel is full and receives block when a channel is empty, the
+compiler needs only to determine the ordering of the sends and
+receives rather than arranging for a precise rendezvous between sender
+and receiver.
 
 We simulate the graph for both an initialization schedule and a steady
-state schedule, both are described in Section \ref{sec:phases}.  A push model
-schedule is used for both phases.  We define a push model schedule as
-a schedule that advances computation on the furthest downstream node
-in the stream graph at each step.  The push model schedule allows the
-implementationto disregard the FIFO buffers that connect each neighboring
-node in the stream graph.  This is because data items will not be
-accumulating at the source, dest, or intermediate nodes.  
-Each destination will consume the data
-item as it is produced (modulo the latency of routing).
+state schedule (see Section \ref{sec:phases}).  A ``push schedule'' is
+used for both phases.  We define a push schedule as one that always
+fires the node that is the furthest downstream (among those that have
+enough inputs to fire).  
+% DON'T UNDERSTAND -- GORDO?
+% 
+% A push schedule allows the implementation to
+% disregard the FIFO buffers that connect each neighboring node in the
+% stream graph.  This is because data items will not be accumulating at
+% the source, dest, or intermediate nodes.  Each destination will
+% consume the data item as it is produced (modulo the latency of
+% routing).
 
-To assure deadlock free execution of Joiner nodes, we must allow the
-Joiner nodes to receive data in the firing order of its upstream
-Filters. So, the Joiner must buffer data until it can fire
-in the order specified by its incoming weights.  First, remember that
-we collapse all neighboring Joiners into a single Joiner node.
-We create an internal buffer for each
-incoming channel of the collapsed Joiner.  During execution of the
-simulation, we record the order of receives to and send from these
-internal buffers.
+Special care is required in the communication scheduler to avoid
+deadlock in SplitJoin constructs.  Figure~\ref{fig:joiner-dead}
+illustrates a case where the naive implementation of a SplitJoin would
+cause deadlock in Raw's static network.  The fundamental problem is
+that some SplitJoins require a buffer of values at the Joiner
+node--that is, the Joiner outputs values in a different order than it
+receives them.  This can cause deadlock on Raw because the buffers
+between channels can hold only four elements; once a channel is full,
+the sender will block when it tries to write to the channel.  If this
+blocking propagates the whole way from the Joiner to the Splitter,
+then the entier SplitJoin is blocked and can make no progress.
 
-To create this Joiner buffer schedule, the simulator must keep track
-which internal buffer can send data.  The order can be calculated from
-the weights of the joiner (as each buffer corresponds to an upstream
-Filter).  When the current buffer in this order has more than one item
-in it, the Joiner can fire.  The simulator can then determines the
-next internal buffer to send data.  To faciliate code generation
-(Section \ref{sec:codegen}), the maximum buffer size of each internal
-buffer is recorded.
+To avoid this problem, the communication scheduler implements internal
+buffers in the Joiner node instead of exposing the buffers on the Raw
+network (see Figure~\ref{fig:joiner-live}).  As the execution of the
+stream graph is simulated, the scheduler records the order in which
+items arrive at the Joiner, and the Joiner is programmed to fill its
+internal buffers accordingly.  At the same time, the Joiner outputs
+items according to the ordering given by the weights of the
+RoundRobin.  That is, the sending code is interleaved with the
+receiving code in the Joiner; no additional items are input if a
+buffered item can be written to the output stream.  To faciliate code
+generation (Section \ref{sec:codegen}), the maximum buffer size of
+each internal buffer is recorded.
 
 Our current implemenation of the communication scheduler is overly
 cautious in its deadlock avoidance.  All Feedbackloops are serialized
-by the communication scheduler to prevent deadlock.  More precisely, 
+by the communication scheduler to prevent deadlock.  More precisely,
 the loop and body streams of the FeedBackLoop cannot execute in
 parallel.  Crossed routes in the layout of the graph are serialized as
 well, forcing each path to wait its turn at the contention point.

@@ -4,18 +4,18 @@
 The Transputer architecture~\cite{transputer88} shares many
 similarities with Raw.  A Transputer system is either an array or a
 grid of tiles, where neighbors are interconnected with unbuffered
-point-to-point links. The programming language used for the
-Transputer, Occam, is a streaming language similar to CSP.  However,
-unlike StreamIt filters, Occam concurrent processes are not statically
-load-balanced, scheduled and bound to a processor. Occam processes are
-run off a very efficient runtime scheduler implemented in
-microcode~\cite{may87communicating}.
+point-to-point links. The programming language used for the Transputer
+is Occam \cite{occammanual}: a streaming language similar to CSP
+\cite{Hoare78}.  However, unlike StreamIt filters, Occam concurrent
+processes are not statically load-balanced, scheduled and bound to a
+processor. Occam processes are run off a very efficient runtime
+scheduler implemented in microcode~\cite{may87communicating}.
 
 DSPL is a language with simple filters interconnected in a flat acyclic
 graph using unbuffered channels~\cite{Thiel93}.  Unlike the Occam
 compiler for the Transputer, the DSPL compiler automatically maps the
 graph into the available resouces of the Transputer. The DSPL language
-does not expose a cyclic schedule, thus the compiler models the
+does not expose a cyclic schedule, thus the compisiler models the
 possible executions of each filter to determine the possible cost of
 execution and the volume of communication. It uses a search technique
 to map multiple filters onto a single processor for load balancing and
@@ -41,23 +41,19 @@ order to map the current set of stream computations onto Imagine.
 The iWarp system \cite{iwarp} is a scalable multiprocessor with
 configurable communication between nodes.  In iWarp, one can set up
 FIFO channels for communicating between non-neighboring tiles.
-However, the reconfiguration is more coarse-grained and has a higher
-cost than on Raw, where each cycle can be route items to a different
-location.  ASSIGN \cite{assign} is a tool for building large-scale
-applications on multiprocessors, especially iWarp.  ASSIGN starts with
-a coarse-grained flow graph that is written as fragments of C code.
-Like StreamIt, it performs partitioning, placement, and routing of the
-nodes in the graph.  However, ASSIGN is implemented as a runtime
-system instead of a full language and compiler such as StreamIt.
-Consequently, it has more limited opportunities for global
-transformations such as fission and reordering as in StreamIt.
+However, reconfiguring the communication channels is more
+coarse-grained and has a higher cost than on Raw, where each cycle can
+be route items to a different location.  ASSIGN \cite{assign} is a
+tool for building large-scale applications on multiprocessors,
+especially iWarp.  ASSIGN starts with a coarse-grained flow graph that
+is written as fragments of C code.  Like StreamIt, it performs
+partitioning, placement, and routing of the nodes in the graph.
+However, ASSIGN is implemented as a runtime system instead of a full
+language and compiler such as StreamIt.  Consequently, it has more
+limited opportunities for global transformations such as fission and
+reordering as in StreamIt.
 
 A large number of programming languages have included a concept of a
 stream; see \cite{survey97} for a survey. However, the compilers for
-these languages have focused on efficient sequential execution of the
-program.
-
-
-% 
-% mention iWarp?  Is Mike Taylor writing a section?
-%
+these languages have focused only on efficient sequential execution of
+the program.

@@ -3,35 +3,33 @@
 
 We have implemented a fully-functional prototype of the StreamIt
 compiler for the Raw architecture; the compiler phases are described
-in Table~\ref{tab:stages}. We have implemented all the phases of the
-compiler as well as the optimizations except for the optimization
-selection, which is currently done by the programmer.
+in Section~\ref{sec:phases}.  We have implemented all of the phases of
+the compiler as well as the optimizations, but the decision of which
+optimizations to apply is currently guided by the programmer.
 
 \begin{table}[t]
 \begin{center}
 \scriptsize
 \begin{tabular}{|l|l|} \hline
-Benchmark & Description\\
+{\bf Benchmark} & {\bf Description}\\
 \hline \hline
-FM Radio & A software-based FM Radio with equalizer\\
+FM Radio & A software-based FM Radio with equalizer.\\
 \hline
-GSM & A GSM Decoder\\
+GSM & A GSM decoder.\\
 \hline
-Beamformer & core of modern radar, sonar, and communications signal processors \cite{pca}\\
+BeamFormer & A core component of modern radar, sonar, and communications signal processors. \cite{pca}\\
 \hline
-FFT & A 64-element FFT filter \\
+FFT & A 64-element FFT. \\
 \hline
-CRC & A 32-bit Cyclic Redundancy Check (CRC) Encoder/Decoder\\
+CRC & A 32-bit Cyclic Redundancy Check (CRC) Encoder/Decoder. \\
 \hline
 \end{tabular}
 \vspace{-6pt}
-\caption{\protect\small Application Description}
+\caption{\protect\small Application Descriptions.}
 \label{tab:benchmarks}
 \vspace{-12pt}
 \end{center}
 \end{table}
-
-
 
 %We have evaluated our compiler with StreamIt versions applications: 
 %\begin{itemize}
@@ -69,58 +67,58 @@ CRC & A 32-bit Cyclic Redundancy Check (CRC) Encoder/Decoder\\
 \begin{center}
 \scriptsize
 \begin{tabular}{|l|c|r|r|r|r|r|r|} \hline
-& Lines & \multicolumn{3}{|c|}{Unoptimized} & \multicolumn{3}{|c|}{Optimized}\\
+& {\bf Lines} & \multicolumn{3}{|c|}{{\bf Unoptimized}} & \multicolumn{3}{|c|}{{\bf Optimized}}\\
 \cline{3-8}
-Benchmark & 
+{\bf Benchmark} &
 \begin{tabular}{c} 
-of \\ code
+{\bf of} \\ {\bf code}
 \end{tabular} &    
 \begin{tabular}{c} 
-\# of \\ filters
+{\bf \# of} \\ {\bf filters}
 \end{tabular} &    
-\begin{tabular}{c} Throughput \\
-cycles / output 
+\begin{tabular}{c} {\bf Throughput} \\
+{\bf (output / 100,000 cycles)}
 \end{tabular} &    
-MFLOPS & 
+{\bf MFLOPS} & 
 \begin{tabular}{c} 
-\# of \\ filters
+{\bf \# of} \\ {\bf filters}
 \end{tabular} &    
-\begin{tabular}{c} Throughput \\
-cycles / output 
+\begin{tabular}{c} {\bf Throughput} \\
+{\bf (output / 100,000 cycles)}
 \end{tabular}  &
-MFLOPS
+{\bf MFLOPS}
 \\
 \hline \hline
-BeamFormer & 596 & 15 & 125000 & 248 & 16 & 35714 & 775\\
+BeamFormer & 596 & 15 & 0.8 & 248 & 16 & 2.8 & 775\\
 \hline
-FM Radio & 511 & 14 & 4466 & 141.5 & 14 & 1742 & 363.5\\
+FM Radio & 511 & 14 & 22.4 & 141.5 & 14 & 57.4 & 363.5\\
 \hline
-FFT & 174 & 31 & 156 & 35.75 & 15 & 3601 & 4.25\\
+FFT & 174 & 31 & 641 & 35.75 & 15 & 27.8 & 4.25\\
 \hline
-GSM Decoder & 1925 & 14 & 1706 & N/A & 16 & 1656 & N/A\\
+GSM Decoder & 1925 & 14 & 58.6 & N/A & 16 & 60.4 & N/A\\
 \hline
-CRC & 336 & 47 & 2847 & N/A & 5 & 1909 & N/A\\
+CRC & 336 & 47 & 35.1 & N/A & 5 & 52.4 & N/A\\
 \hline
 %%Matrix & \\
 %%\hline
 \end{tabular}
 \vspace{-6pt}
-\caption{\protect\small Performance Results}
+\caption{\protect\small Performance Results.}
 \label{tab:performance}
 \vspace{-21pt}
 \end{center}
 \end{table}
 
-
-In the Table~\ref{tab:performance}, we evaluate the effectiveness of
-StreamIt compiler by compiling the above applications on to the Raw
-processor. The executables are simulated on either a 4x4 or an 8x8 Raw
-processor using Raw's cycle accurate simulator. We show the
-performance of the original application, which is run on a processor
-configuration with sufficent tiles so that each filter can be mapped
-to an individual tile. Next we perform a series of fusion, fisson and
-reindexing transformations to create a load balanced set of filters
-that can be mapped onto a 4x4 Raw processor.
+We evaluate the StreamIt compiler for the set of applications shown in
+Table~\ref{tab:benchmarks}; results appear in
+Figure~\ref{fig:performance}.  We show the performance of the original
+application, which maps each Filter in the original program to a
+single Raw tile.  In some cases, we need to use an 8x8 Raw processor
+in order to have enough tiles for the Filters; otherwise, we target a
+4x4 configuration of Raw.  To obtain the ``optimized'' numbers, we
+perform a series of fusion, fission and reordering transformations to
+create an load-balanced set of filters that can be mapped onto a 4x4
+Raw processor.
 
 \begin{figure}
 \begin{minipage}{3.2in}
@@ -137,13 +135,14 @@ that can be mapped onto a 4x4 Raw processor.
 \end{minipage}
 \end{figure}
 
-The results show that for program with substantial computation
+The results show that for programs with substantial computation
 requirements such as the BeamFormer, the StreamIt compiler is able to
-extract good performance out of the Raw processor. A
-sustained 755 MFLOPS rate after 350\% improvement due to our
-optimizations. However programs such as FFT, which was created to
-experiment with the language features of StreamIt, has very little
-work per filter. We were unable to amortize the communication
-overhead for FFT, leading to a slowdown. Better tile code generation
-and traditional optimizations may help in this. 
+extract good performance out of the Raw processor.  The BeamFormer
+application shows a sustained 755 MFLOPS rate, after a 350\%
+improvement due to our optimizations.  However, programs such as FFT,
+which was created to experiment with the language features of
+StreamIt, has very little work per filter. We were unable to amortize
+the communication overhead for FFT, leading to a slowdown.  Better
+tile code generation and traditional optimizations may help improve
+the performance.
 

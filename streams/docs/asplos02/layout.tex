@@ -7,8 +7,8 @@ communication and synchronization present in the final layout.  The
 final layout assigns exactly one node in the stream graph to one
 computation node in the target.  The layout phase assumes that the
 given stream graph will fit onto the computation fabric of the target
-and that each Filter is load balanced.  Both of these requirements are
-satisfied by the partitioning phase described above.
+and that the Filters are load balanced.  Both of these requirements
+are satisfied by the partitioning phase described above.
 
 %Classically, layout (or placement) algorithms have fallen into two
 %categories: constructive initial placement and iterative improvement
@@ -31,12 +31,18 @@ satisfied by the partitioning phase described above.
 %simulation proceeds, the probability of climbing uphill decreases.
 
 The layout phase of the StreamIt compiler is implemented using
-simulated annealing \cite{simanneal}.
-We chose to use simulated annealing for its combination of performance and
-flexibly.  To retarget the layout phase of the compiler, we simply
-supply the annealing algorithm with three elements: the cost function,
-a perturbation function, and the set of legal layouts.  Furthermore,
-for most tiled targets these three functions could be reused.
+simulated annealing \cite{simanneal}.  We choose simulated annealing
+for its combination of performance and flexibly.  To adapt the layout
+phase for a given architecture, we supply the simulated annealing
+algorithm with three architecture-specific parameters: a cost
+function, a perturbation function, and the set of legal layouts.  To
+change the compiler to taget one tiled architecture instead of
+another, these parameters should require only minor modifications.
+
+% To retarget the layout phase of the compiler, we simply supply the
+% annealing algorithm with three elements: the cost function, a
+% perturbation function, and the set of legal layouts.  Furthermore, for
+% most tiled targets these three functions could be reused.
 
 %Clearly, the choice of cost function will greatly determine the
 %performance of the generated layout. 
@@ -48,72 +54,75 @@ knowledge of the communication properties of the stream graph.  The
 cost function can calculate the number of items that travel over a
 channel during each execution of the steady state.  Furthermore, with
 knowledge of the routing algorithm, the cost function can determine
-the intermediate hops for each channel.  These properties can be used
-to tailor the cost function to target architecture.
+the intermediate hops for each channel.  For architectures with
+non-uniform communication, the cost of certain hops might be weighted
+more than others.  In general, the cost function can be tailored to
+suit a given architecture.
 
-
-Depending on the communication model of the target architecture, these
-metrics can be extremely important in generating a good layout.  For
-architectures with non-uniform communication, the layout phase can use
-this knowledge to take advantage of the specific properties of the
-architecture.  
+% Depending on the communication model of the target architecture, these
+% metrics can be extremely important in generating a good layout.  For
+% architectures with non-uniform communication, the layout phase can use
+% this knowledge to take advantage of the specific properties of the
+% architecture.
 
 %For example, in a Smart Memories architecture
 %\cite{smartmemories}, we would like to place the nodes that
 %communicate over an expensive channel on the same quad.
 
-\subsection{Layout on Raw}
+\subsection{Layout for Raw}
 
-For Raw, the layout phase maps nodes in the stream
-graph to the tile processors.
-%Each tile processor looks very
-%much likes a MIPS R4000.  The tile processor uses a MIPS
-%instruction set with some slight modifications for inter-tile
-%communication.  
-The layout phase does not assign each node in the
-stream graph to a processor.  Splitter nodes are folded into their
-neighboring upstream Filter and neighboring joiners are collapsed
-into a single tile (see Section \ref{sec:rawcommunic}).  
-%This mapping will be explained in more depth in
-%the next section.  
-Again, all nodes needing assignment are mapped to
-exactly one tile processor.
+For Raw, the layout phase maps nodes in the stream graph to the tile
+processors.  Each Filter is assigned to exactly one tile, and no tile
+holds more than one Filter.  However, the ends of a SplitJoin
+construct are treated differently; each splitter node is folded into
+its upstream neighbor, and neighboring joiner nodes are collapsed into
+a single tile (see Section \ref{sec:rawcommunic}).  Thus, joiners
+occupy their own tile, but splitters are integrated into the tile of
+another Filter or joiner.
 
 Due to the properties of the static network and the communication
-scheduler (Section \ref{sec:rawcommunic}), the layout phase does not have to worry
-about deadlock.  All assignments of nodes to tiles are legal.  This
-gives simulated annealing the flexibility to search many possibilities
-and simplifies the layout phase.  The perturbation function used in
-simulated annealing simply swaps the assignment of two randomly chosen
-tile processors.
+scheduler (Section \ref{sec:rawcommunic}), the layout phase does not
+have to worry about deadlock.  All assignments of nodes to tiles are
+legal.  This gives simulated annealing the flexibility to search many
+possibilities and simplifies the layout phase.  The perturbation
+function used in simulated annealing simply swaps the assignment of
+two randomly chosen tile processors.
 
-%The cost function is the most important parameter of the simulated
-%annealing algorithm.  
-After some experimentation, we arrived at
-the following cost function: 
-\[
-cost(channels) = \sum _{c \in channels} items(c) \cdot \left( hops(c) + \left( 2 \cdot
-synch(c) \right) ^{3} \right)
-\]
-%%Sum over channels (items(channel) *
-%%(hops(channel) + (num_assigned(channel) * 2)^3) 
-Where \(items(c)\) gives the number of data items that traverse the
-channel \(c\) for each steady state execution.  \(hops(c)\) gives the
-number of intermediate tiles traversed on the route of the channel.
-Finally, \(synch(c)\) attempts to give a cost to the added
-synchronization imposed by this channel assignment.  \(synch(c)\)
-calculates the number of tiles that are assigned to Filters plus the
-number of tiles involved in routing \emph{other} channels on the route.
+After some experimentation, we arrived at the following cost function
+to guide the layout on Raw.  We let $channels$ denote the pairs of
+nodes $\{(src_1, dst_1) \dots (src_N, dst_N)\}$ that are connected by
+a channel in the stream graph; $layout(n)$ denote the placement of
+node $n$ on the Raw grid; and $route(src, dst)$ denote the path of
+tiles through which a data item is routed in traveling from tile $src$
+to tile $dst$.  In our implementation, the $route$ function is a
+simple dimension-ordered router that traces the path from $src$ to
+$dst$ by first routing in the X dimension and then routing in the Y
+dimension.  Our cost function evaluates a given layout of the stream
+graph, for a given value of $channels$ and $route$:
+\begin{align*}
+cost(layout) = \sum _{(src,dst) \in channels} {\bf items}(src,dst)
+\cdot & \left( {\bf hops}(\mt{routing-path}) + \left( 2 \cdot
+{\bf synch}(\mt{routing-path}) \right) ^{3} \right) \\ \mbox{where} &~
+\mt{routing-path} = route(layout(src), layout(dst))
+\end{align*}
+In this equation, ${\bf items}(src, dst)$ gives the number of data
+items that are transfered from $src$ to $dst$ during each steady state
+execution, ${\bf hops}(p)$ gives the number of intermediate tiles
+traversed on the path $p$, and ${\bf synch}(p)$ estimates the cost of
+the synchronization imposed by the path $p$.  We calculate ${\bf
+synch}(p)$ as the number of tiles along the route that are assigned a
+stream node, plus the number of tiles along the route that are
+involved in routing {\it other} channels.
 
 With the above cost function, we heavily weigh the added
 synchronization imposed by the layout.  For Raw, this metric is far
 more important than the length of the route because neighbor
 communication over the static network is cheap.  If a tile that is
 assigned a Filter must route data items through it, then it must
-synchronize the routing of these items with the execution of its
-work().  Also, a tile that is involved in the routing of many channels
-must serialize the routes running through it.  Both limit the amount
-of parallelism in the layout and need to be avoided.
+synchronize the routing of these items with the execution of its {\tt
+work} function.  Also, a tile that is involved in the routing of many
+channels must serialize the routes running through it.  Both limit the
+amount of parallelism in the layout and need to be avoided.
 
 %Using the parameters described above, simulated annealing calculates
 %highly optimized assignments.  In figure ??

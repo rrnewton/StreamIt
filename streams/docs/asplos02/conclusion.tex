@@ -5,33 +5,33 @@ In this paper, we describe the StreamIt compiler for the Raw
 architecture.  The stream graph of a StreamIt program exposes the data
 communication pattern to the compiler while the lack of global
 synchronization frees the compiler to radically reoganize the program
-for efficient execution on the underline architecture. The StreamIt
+for efficient execution on the underlying architecture. The StreamIt
 compiler demonstrates the power of this flexibility by totally
 reoganizing large programs for better load balance. We were able to
-map many of programs on to the Raw processor and obtain good
+map many of programs on to the Raw processor and to obtain good
 performance.
 
-We introduce a collection of optimizations, vertical and horizontal
-filter fusion, vertical and horizontal filter fission and filter
-reordering transformations, that can be used to restructure stream
-graphs.  We show that by applying these transformations we can map a
-high-level stream program, written to reflect the composition of the
-application, onto Raw and achieve good processor utilization and load
-balance, leading to a factor of three speedup on two applications.
+We introduce a collection of optimizations--vertical and horizontal
+filter fusion, vertical and horizontal filter fission, and filter
+reordering--that can be used to restructure stream graphs.  We show
+that by applying these transformations we can map a high-level stream
+program, written to reflect the composition of the application, onto
+Raw and achieve good processor utilization and load balance, leading
+to a factor of three speedup on two applications.
 
 Unlike all previous streaming languages, the structured streams of
 StreamIt makes it possible for us to approach the optimization and
-parallelization problems in a very systermatic manner. It enables us
-to define multiple optimizations -- targetting different constructs
-and requirements -- and to compose them them in a hirearchical manner.
+parallelization problems in a very systematic manner. It enables us to
+define multiple optimizations--targetting different constructs and
+requirements--and to compose them in a hierarchical manner.
 
 The ability to do global transformations across multiple filters, that
 may have originated from very different parts of the application,
 makes it possible for the compiler to find optimization opportunities
-that may ellude even an experience programmer.  Such capabilities
-enables the programmers to write protable streaming applications and
+that may ellude even an experienced programmer.  Such capabilities
+enable the programmers to write portable streaming applications and
 map them efficiently onto any given architecture. This has the
 potential of creating a programming standard for emerging
-communication exposed architectures.  The StreamIt compiler takes a
+communication-exposed architectures.  The StreamIt compiler takes a
 fist step towards this goal.
 
