@@ -1,10 +1,61 @@
-- By the way, for the tech report, we should get a small example and
-write it using C, an OO library and StreaMIT. And also add few
-example. One thing we did not do is list current limitations we may
-fix soon such as rate changing filters, a type dispatch splitter, any
-joiner, etc. etc. Current class can be named something lime "static
-rates" and some of these extensions as "dynamic rates". Your java
-class diagram should go in too.
+questions for saman:
+
+1. would it be ok to pipeline the procedural code?  it makes it look
+much prettier, but why would you want the blocked structure (display?)
+
+2. should the object-oriented code reuse the arrays in the function
+calls so it's not blatently wasting memory?
+
+------------------------------------------------------------------------
+processor simulator
+
+
+
+------------------------------------------------------------------------
+add these semantic restrictions:
+
+1. round-robin split/join must be non-null
+2. must have static rates in work function (compiler-detectable)
+
+------------------------------------------------------------------------
+add these java restrictions:
+
+- no class libraries except for:
+	1. String
+	2. 
+
+- no aliasing allowed.  what does this mean?
+
+------------------------------------------------------------------------
+from meeting w/ saman
+
+- emphasize in title or abstract that this is for static rates
+
+- make it more clear in words what the semantics are of message
+sending, etc.
+
+- make an example that makes use of portals for portal's sake
+	1. library notion (unknown receiver / sender)
+	2. broadcast messaging
+	3. send up and down the stream
+
+	-> like an example w/ completely messaging stuff
+	- very simple & artificial
+
+- think about processor simulator?
+
+- messaging first (in this doc), then re-initialization
+
+- add to intro:  timing emphasis
+
+------------------------------------------------------------------------
+from Saman's emails
+
+- One thing we did not do is list current limitations we may fix soon
+such as rate changing filters, a type dispatch splitter, any joiner,
+etc. etc. Current class can be named something lime "static rates" and
+some of these extensions as "dynamic rates". Your java class diagram
+should go in too.
 
 - Figure 4, two set splitters, second should be a joiner...
 
@@ -13,9 +64,6 @@ class diagram should go in too.
 - In Figure 7 don't put all the code of TrunkedRadio, also put parts of code
 from Booster and Check Quality to show message delivery. (Copy the class,
 eliminate extraneous stuff and put dots)
-
-- The message window is 4N to 6N, your description is for 4 to 6, you missed
-the N!
 
 - IN 3.3.2 having a messaging system reduces the number of channels since only
 high bandwidth comm. need a channel, making most programs easier to fit into
@@ -63,10 +111,8 @@ description I e-mailed to you yesterday?)
 ------------------------------------------------------------------------
 Big things to think about
 
-0. how exactly to define the latency of a feedback loop in terms of
-wavefronts and stuff, hmm.
+0. realtime constraints
 
-1. operational semantics
 2. message sending syntax
 3. letting init codes cause an offset (do push() on output)
 4. verifying round-robin's are legal by having same rate on both sides
@@ -79,21 +125,10 @@ to the output or input?
 
 7. exact semantics of initialization when combining with tapes/messaging.
 
-8. define the path you take in non-i/o connected streams for
-messaging.  If they're parallel pieces of split/join, do you
-synchronize from above or below?  I think theres's a difference.
+8. define exactly the w-behavior if you're sending messages or adding
+constraints between disjoint pieces
 
-9. problem: it's legal to run nothing but a source.  oh, unless
-there's latency.
-
-10. I'm coping out on the feedback loop wavefront delay because I
-don't know what to do.  
-
-------------------------------------------------------------------------
-Little things to think about
-
-1. would it help to outlaw aliasing?
-2. should we rename filter to block?  to operator?
+9. add a pre-made reordering filter?
 
 ------------------------------------------------------------------------
 Future things to think about
@@ -103,12 +138,9 @@ Future things to think about
 2. any concept of filters ignoring items?  would affect wavefront (a
 select filter, for example.)
 
-3. real-time constraints
-
 ------------------------------------------------------------------------
 Things to write about
 
-1. latency
 2. drain/destroy initialization semantics
 3. feedback loop initialization
 4. portals - let's just adopt templated java lists for the sake of presentation
@@ -152,7 +184,10 @@ some other joiner function so that I can still use duplicate, etc there.
 
 ** add some latency constraints to the example
 
+- get rid of caching in some of the examples?
 
+- make it clear that latency constraints with a portal apply to all
+elements of the portal
 
 
 

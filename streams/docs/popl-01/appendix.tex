@@ -1,0 +1,208 @@
+\clearpage
+
+\begin{figure}[h]
+\scriptsize
+\begin{verbatim}
+class Butterfly extends Stream {
+   void init(int N, int W) {
+      add(new SplitJoin() {
+         void init() {
+            setSplitter(WEIGHTED_ROUND_ROBIN(N, N));
+            add (new Identity());
+            add (new Filter() {
+               float weights[W];
+               int curr;
+               Channel input = new FloatChannel();
+               Channel output = new FloatChannel();
+               void init() {
+                  for(int i=0; i<W; i++)
+                     weights[i] = calcWeight(i, N, W);
+                  curr = 0;
+               }
+               void work() {
+                  output.push(input.pop()*weights[curr++]);
+                  if(curr>= W) curr = 0;
+               }    
+            });
+            setJoiner(ROUND_ROBIN);
+      }});
+      add(new SplitJoin() {
+         void init() {
+            setSplitter(DUPLICATE);
+            add (new Filter() {   
+               Channel input = new FloatChannel();
+               Channel output = new FloatChannel();
+               void work() {
+                  output.push(input.pop() + input.pop());
+               }
+            });
+            add (new Filter() {   
+               Channel input = new FloatChannel();
+               Channel output = new FloatChannel();
+               void work() {
+                  output.push(input.pop() - input.pop());
+               }
+            });
+            setJoiner(WEIGHTED_ROUND_ROBIN(N, N));
+      }});
+}}
+
+class FFT extends Stream {
+   void init(int N) {
+      add(new SplitJoin() {
+         void init() {
+            setSplitter(WEIGHTED_ROUND_ROBIN(N/2, N/2));
+            for(int i=0; i<2; i++) 
+               add(new SplitJoin() {
+                  void init() {
+                     setSplitter(ROUND_ROBIN);
+                     add (new Identity());
+                     add (new Identity());
+                     setJoiner(WEIGHTED_ROUND_ROBIN(N/4, N/4));
+               }});
+            setJoiner(ROUND_ROBIN);
+      }});
+      for(int i=2; i<=N/2; i *= 2)
+        add(new Butterfly(i, N));
+}}
+
+class FIR extends Filter {
+   Channel input = new FloatChannel();
+   Channel output = new FloatChannel();           
+   int N;
+   void init(int N) {
+      this.N = N;
+   }
+   void work() {
+      float sum = 0;
+      for (int i=0; i<N; i++) {
+         sum += input.peek(i)*FIR_COEFF[i][N];
+      }
+      input.pop();
+      output.push(sum);
+   }
+}
+
+class Booster extends Stream {
+   void init(boolean adds) {
+      if(adds) add(new FIR(N));
+   }
+}
+\end{verbatim}
+\vspace{-12pt}
+\caption{\protect\small The StreaMIT program for the Trunked Radio Receiver.
+\protect\label{fig:radiocode}}
+\vspace{-12pt}
+\end{figure}
+
+\begin{figure}[h]
+\scriptsize
+\begin{verbatim}
+class RFtoIF extends Filter {
+   Channel input = new FloatChannel();
+   Channel output = new FloatChannel();
+   int sz, i;
+   float weight[];
+   void init(float f) {
+      setf(f);
+   }
+   void work() {
+      output.push(input.pop()*weight[i++]);
+      if(i==sz) i = 0;
+   }
+   void setf(float f) {
+      i = 0;
+      sz = CarrierFreq/f*N;
+      weight = new float[sz];
+      for(int i=0; i<sz; i++)
+         weight[i] = sine(i*PI/sz);
+   }
+}
+
+class CheckFreqHop extends SplitJoin {
+   RFtoIFPortal fh;
+   void init(RFtoIFPortal fh) {
+      this.fh = fh;
+      setSplitter(WEIGHTED_ROUND_ROBIN(N/4-2,1,1,N/2,1,1,N/4-2));
+      int k = 0;
+      for(int i=0; i<4; i++) {
+         if((i==0)||(i==2)) {
+            for(int j=0; j<2; j++) {
+               add(new Filter() {
+                  Channel input = new FloatChannel();
+                  Channel output = new FloatChannel();
+                  void work() {
+                     float val = input.pop();
+                     if(val >= MIN_THRESHOLD) 
+                        fh.setf(Freq[k], new TimeInterval(4*N, 6*N)); 
+                     output.push(val);
+                  }
+               });
+               k++;
+            }
+         } else add(new Identity());
+      }
+      setJoiner(WEIGHTED_ROUND_ROBIN(N/4-2,1,1,N/2,1,1,N/4-2));
+   }
+}
+
+class CheckQuality extends Filter {
+   Channel input = new FloatChannel();
+   Channel output = new FloatChannel();
+   float aveHi, aveLo;   
+   BoosterPortal onOffSwitch;
+   void init(BoosterPortal onOffSwitch) {
+      aveHi = 0; aveLo = 1;
+      this.onOffSwitch = onOffSwitch;
+   }
+   void work() {
+      float val = input.pop();
+      aveHi = max(0.9*aveHi, val);
+      aveLo = min(1.1*aveLo, val);
+      if(aveHi - aveLo < QUAL_BAD_THRESHOLD)
+         onOffSwitch.init(true, BEST_EFFORT);
+      if(aveHi - aveLo > QUAL_GOOD_THRESHOLD)
+         onOffSwitch.init(false, BEST_EFFORT);
+      output.push(val);
+   }
+}
+
+class TrunkedRadio extends Stream {
+   RFtoIFPortal freqHop = new RFtoIFPortal();
+   BoosterPortal onOff = new BoosterPortal().
+   void init() {
+      add(new ReadFromAtoD());
+      RFtoIF rf2if = new RFtoIF(STARTFREQ);
+      add(rf2if);
+      freqHop.register(rf2if);
+      Booster iss = new Booster(false);
+      add(iss);
+      onOff.register(iss);
+      add(new FFT());
+      add(new CheckFreqHop(freqHop));
+      add(new CheckQuality(onOff));
+      add(new AudioBackEnd());
+   }
+}
+\end{verbatim}
+\vspace{-12pt}
+\end{figure}
+
+\newpage
+
+\begin{figure*}[h]
+\centering
+\psfig{figure=fft-pre-tape.eps,width=4.8in}
+\caption{The bit reverse order filter in FFT. The tapes at each
+channel illustrates the data re-shuffling when N=8. }
+\label{fig:bitreverseorder}
+\end{figure*}
+
+\begin{figure*}[h]
+\centering
+\psfig{figure=fft-butterfly-tape.eps,width=5.8in}
+\caption{The 4x4 butterfly stage in the FFT. The tapes at each channel illustrates the data transformation and computation. }
+\label{fig:butterfly}
+\end{figure*}
+
+

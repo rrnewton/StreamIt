@@ -48,7 +48,7 @@ major features of StreaMIT.
 \begin{verbatim}
 class FIR extends Filter {
    Channel input = new FloatChannel();
-   Channel output = new FloatChannel();           
+   Channel output = new FloatChannel();
    int N;
 
    void init(int N) {
@@ -58,16 +58,149 @@ class FIR extends Filter {
    void work() {
       float sum = 0;
       for (int i=0; i<N; i++) {
-         sum += input.peek(i)*fir_coeff[i][N];
+         sum += input.peek(i)*FIR_COEFF[i][N];
       }
       input.pop();
       output.push(sum);
    }
 }
+
+class Main extends Stream {
+   void init() {
+      add(new DataSource());
+      add(new FIR(N));
+      add(new Display());
+   }
+}
 \end{verbatim}
 \vspace{-12pt}
-\caption{\protect\small A Finite Input Response (FIR) filter in StreaMIT.
-\protect\label{fig:firfiltercode}}
+\caption{\protect\small An FIR filter in StreaMIT.
+\protect\label{fig:firstreamit}}
+\vspace{-12pt}
+\end{figure}
+
+\begin{figure}
+\scriptsize
+\begin{verbatim}
+int N = 5;
+int BLOCK_SIZE = 200;
+
+void main() {
+
+   float data1[] = new float[BLOCK_SIZE+N];
+   float data2[] = new float[BLOCK_SIZE+N];
+   int pos;
+
+   for (pos=0; pos<N; pos++) {
+      data1[pos] = getData();
+   }
+
+   while (true) {
+
+      for (int i=0; i<BLOCK_SIZE; i++) {
+         data1[(i+pos)\%(BLOCK_SIZE+N)] = getData();
+      }
+
+      for (int i=0; i<BLOCK_SIZE; i++) {
+         float sum = 0;
+         for (int j=0; j<N; j++) {
+            sum = sum + data1[(i+pos+j)\%(BLOCK_SIZE+N)]*FIR_COEFF[j][N];
+         }
+         data2[(i+pos)\%(BLOCK_SIZE+N)] = sum;
+      }
+
+      displayBlock(data2);
+
+      pos = (pos+BLOCK_SIZE)\%(BLOCK_SIZE+N);
+
+   }
+}
+\end{verbatim}
+\vspace{-12pt}
+\caption{\protect\small An FIR filter in a procedural language.
+\protect\label{fig:firprocedural}}
+\vspace{-12pt}
+\end{figure}
+
+% Here is some pipelined procedural code, without the block
+%
+%int N = 5;
+%
+%void main() {
+%
+%   float data[] = new float[N];
+%   int pos;
+%
+%   for (int pos=0; pos<N; pos++) {
+%      data[pos] = getData();
+%   }
+%
+%   while (true) {
+%      pos = (pos+1)\%N;
+%
+%      float sum = 0;
+%      for (int i=0; i<N; i++) {
+%         sum = data[(i+pos)\%N]*FIR_COEFF[j][N];
+%      }
+%
+%      display(sum);
+%
+%      data[pos] = getData();
+%   }
+%}
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{figure}
+\scriptsize
+\begin{verbatim}
+class FIRFilter {
+   int N;
+   float data1[];
+
+   FIRFilter(int N) {
+      this.N = N;
+   }
+
+   float[] getData(int BLOCK_SIZE) {
+      if (data1==null) {
+         data1 = input.getData(BLOCK_SIZE+N);
+       } else {
+         for (int i=0; i<N; i++) {
+            data1[i] = data1[BLOCK_SIZE+i];
+         }
+         float[] newData = input.getData(BLOCK_SIZE);
+         for (int i=0; i<BLOCK_SIZE; i++) {
+            data1[i+N] = newData[i];
+         }
+      }
+
+      float data2 = new float[BLOCK_SIZE];
+      for (int i=0; i<BLOCK_SIZE; i++) {
+         float sum = 0;
+         for (int j=0; j<N; j++) {
+            sum = sum + data1[i+j]*FIR_COEFF[j][N];
+         }
+         data2[i] = sum;
+      }
+      return data2;
+   }
+}
+
+void main() {
+
+   DataSource source = new DataSource();
+   FIRFilter filter = new FIRFilter();
+   Display display = new Display();
+   filter.input = source;
+   display.input = filter;
+   display.run();
+
+}
+\end{verbatim}
+\vspace{-12pt}
+\caption{\protect\small An FIR filter in an object oriented language.
+\protect\label{fig:firobject}}
 \vspace{-12pt}
 \end{figure}
 
@@ -75,7 +208,7 @@ class FIR extends Filter {
 
 The basic unit of computation in StreaMIT is the {\tt Filter}.  An
 example of a Filter is the {\tt FIRFilter}, a component of our
-software radio (see Figure \ref{fig:firfiltercode}).  Each {\tt Filter}
+software radio (see Figure \ref{fig:firstreamit}).  Each {\tt Filter}
 contains an {\tt init} function that is called at initialization time;
 in this case, the {\tt FIRFilter} records {\tt N}, the number of items
 it should filter at once.
@@ -89,37 +222,44 @@ the three intuitive operations: 1) {\tt pop()} removes an item from the
 end of the channel and returns its value, 2) {\tt peek(i)} returns the
 value of the item $i$ spaces from the end of the channel without
 removing it, and 3) {\tt push(v)} writes the value $v$ to the front of
-the channel.  For now, we require that the number of items popped,
-peeked, and pushed by each filter is constant from one invocation of
-the {\tt work} function to the next.
+the channel.  
+
+A major restriction of the current version of StreaMIT is that it
+requires filters to have static input and output rates.  That is, the
+number of items peeked, popped, and pushed by each filter must be
+constant from one invocation of the {\tt work} function to the next.
+We plan to support dynamically changing rates in a future version of
+StreaMIT.
 
 \subsubsection{Rationale}
 
 StreaMIT's representation of a filter is an improvement over
 general-purpose languages.  In a procedural language, the analog of a
-filter is a block of statements in a complicated loop nest.  This
-representation is unnatural for expressing the feedback and
-parallelism that is inherent in streaming systems.  Also, there is no
-clear abstraction barrier between one filter and another, and
-high-volume stream processing is muddled with global variables and
-control flow.  The loop nest must be re-arranged if the input or
-output ratios of a filter changes, and scheduling optimizations
-further inhibit the readability of the code.  In contrast, StreaMIT
-places the filter in its own independent unit, making explicit the
-parallelism and inter-filter communication while hiding the grungy
-details of scheduling and optimization from the programmer.
+filter is a block of statements in a complicated loop nest (see Figure
+\ref{fig:firprocedural}).  This representation is unnatural for expressing
+the feedback and parallelism that is inherent in streaming systems.
+Also, there is no clear abstraction barrier between one filter and
+another, and high-volume stream processing is muddled with global
+variables and control flow.  The loop nest must be re-arranged if the
+input or output ratios of a filter changes, and scheduling
+optimizations further inhibit the readability of the code.  In
+contrast, StreaMIT places the filter in its own independent unit,
+making explicit the parallelism and inter-filter communication while
+hiding the grungy details of scheduling and optimization from the
+programmer.
 
 One could also use an object-oriented language to implement a stream
-abstraction.  This avoids some of the problems associated with a
-procedural loop nest, but the programming model is again complicated
-by efficiency concerns.  That is, a runtime library usually exectutes
-filters according to a pull model, where a filter operates on a block
-of data that it retrieves from the input channel.  The block size is
-often optimized for the cache size of a given architecture, which
-hampers portability.  Moreover, operating on large-grained blocks
-obscures the fundamental fine-grained algorithm that is visible in a
-StreaMIT filter.  Thus, the absence of a runtime model in favor of
-automated scheduling and optimization again distinguishes StreaMIT.
+abstraction (see Figure \ref{fig:firobject}).  This avoids some of the
+problems associated with a procedural loop nest, but the programming
+model is again complicated by efficiency concerns.  That is, a runtime
+library usually exectutes filters according to a pull model, where a
+filter operates on a block of data that it retrieves from the input
+channel.  The block size is often optimized for the cache size of a
+given architecture, which hampers portability.  Moreover, operating on
+large-grained blocks obscures the fundamental fine-grained algorithm
+that is visible in a StreaMIT filter.  Thus, the absence of a runtime
+model in favor of automated scheduling and optimization again
+distinguishes StreaMIT.
 
 \subsection{Connecting Filters}
 
@@ -183,7 +323,7 @@ Similarly, there are three kinds of joiners:
 \begin{enumerate}
 \item WEIGHTED\_ROUND\_ROBIN($i_1$, $i_2$, $\dots$, $i_k)$, which reads the
 first $i_1$ data items from the first stream, the next $i_2$ data
-items to the second stream, and so on
+items to the second stream, and so on.
 \item ROUND\_ROBIN, which is just a weighted round robin where all
 weights are 1.
 \item COMBINE, which reads from all the streams in parallel and
@@ -192,7 +332,18 @@ combines the results in a structure which is passed on.
 and there is no output to join together.
 \end{enumerate}
 The splitter and joiner type are specified with calls to {\tt
-setSplitter} and {\tt setJoiner}, respectively (see Figure \ref{fig:fft}).
+setSplitter} and {\tt setJoiner}, respectively (see Figure
+\ref{fig:fft}).  Note that a WEIGHTED\_ROUND\_ROBIN can function as an
+exclusive selector if one or more of the weights are zero.  Also,
+there are additional splitters and joiners that we plan to add when
+StreaMIT supports filters with dynamically changing rates, including:
+\begin{enumerate}
+\item TYPE\_DISPATCH, which sends an item to one of multiple streams
+depending on its type.
+\item ANY, which sends items to any parallel stream that has space on
+its input, or reads items from any parallel stream that has output
+available.
+\end{enumerate}
 
 \begin{figure}
 \scriptsize
@@ -350,22 +501,22 @@ CheckFreqHop} example of Figure \ref{fig:mess}, the sender indicates
 an interval of latencies between $4N$ and $6N$.  This means that the
 receiver will receive the message immediately following the last
 invocation of its own {\tt work} function which produces an item
-affecting the output of the {\it sender's} 4'th, 5'th, or 6'th work
-functions, counting the sender's current work function as number 0.
-Defining this notion precisely is the subject of Section
+affecting the output of the {\it sender's} $4N$'th, $5N$'th, or
+$6N$'th work functions, counting the sender's current work function as
+number 0.  Defining this notion precisely is the subject of Section
 \ref{sec:time}, but the general idea is simple:  the receiver is
 invoked when it sees the information wavefront that the sender sees in
-4-6 execution steps.  
+$4N-6N$ execution steps.  
 
 In some cases, the ability to synchronize the arrival of a message
 with some element of the data stream is very important.  For example,
 {\tt CheckFreqHop} knows that the transmitter will change the
-frequency between 4 and 6 steps later, in terms of the frame that {\tt
-CheckFreqHop} is inputting.  To ensure that the radio changes
-frequencies at the same time--so as not to lose any data at the old or
-new frequency--{\tt CheckFreqHop} instructs the receiver to switch
-frequencies when the {\it receiver} sees one of the last data items at
-the old frequency.
+frequency between $4N$ and $6N$ steps later, in terms of the frame
+that {\tt CheckFreqHop} is inputting.  To ensure that the radio
+changes frequencies at the same time--so as not to lose any data at
+the old or new frequency--{\tt CheckFreqHop} instructs the receiver to
+switch frequencies when the {\it receiver} sees one of the last data
+items at the old frequency.
 
 {\bf Portals for broadcast messaging.}  StreaMIT also has support for
 modular broadcast messaging.  When a sender wants to send a message
