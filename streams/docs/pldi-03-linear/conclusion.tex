@@ -1,6 +1,8 @@
 \section{conclusion}
 
 
+
+
 \subsection{Future Work}
 We could extend linear analysis to incorporate the set of filters
 that has a state between executions. Our formulation would then be very
@@ -16,3 +18,16 @@ a feed back loop that we determine is IIR would be to calculate enough of its
 frequency response so that its behavior could be captured in a FFT, multiplie,
 IFFT sequence. Another possible use would be to remove a feedback loop that was
 performing IIR filtering and convert it into a single linear state filter.  
+
+
+
+
+\subsection{Related Works}
+Several interesting projects are underway to determine how to generate efficient programs
+for computing DSP transforms that are expressed as matrices. For instance, the SPIRAL
+project\cite{spiral} aims to determine the fastest implementation for various transforms
+using several techniques ranging from group theory to stochastic search algorithms. See
+ \cite{xiong-thesis,xiong01spl,johnson01searching,egner01automatic}.
+Similiarly, the ATLAS project \cite{whaley01automated} aims to automatically produce fast
+performance tuned libraries for linear algebra manipulations.
+

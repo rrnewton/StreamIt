@@ -1,0 +1,206 @@
+\section{Container Combination(propagation)}
+Merely determining that a single filter computes a linear combination of its input is not
+all that interesting or useful. There is significant savings to be reaped if we can
+find $A$ and $b$ for combinations of filters. Obviously, all of the child filters need
+to be linear filters for this combinations to work. We restrict our attention to combining
+{\tt Pipelines} and {\tt SplitJoins} because those constructs combine to form a new linear filter. 
+{\tt FeedbackLoops} retain state between executions, so the overall construct 
+does not compute a linear operation as we have defined it. 
+
+To combine filters, we must deal with rate matching. For instance, if there are two
+filters in a pipeline and the first one produces (pushes) 2 elements but the second one
+needs 4 elements to produce any output, we need the equivaluet of two firings of the
+first filter's {\tt work} function to produce output for the combined filter. 
+
+\begin{figure}
+\center
+\epsfxsize=3.0in
+\epsfbox{images/expanding-a-filter.eps}
+\caption{Expanding filter $F$ by a factor $f_{A}$}
+\label{fig:expanding-a-filter}
+\end{figure}
+
+
+Therefore, there is a need for a fundamental operation on our representation for 
+linear filters to represent producing data from multiple invocations of the work
+function. When a linear filter's form is ``expanded'' by a factor $F_{A}$ 
+we produce the matrix that describes the output from executing the filter's work
+function $f_{A}$ times. Figure~\ref{fig:expanding-a-filter} shows how the {\tt peek},
+{\tt pop} and  {\tt push} rates are affected by expanding by factor $f_{A}$.
+
+\begin{figure}
+\center
+\epsfxsize=3.0in
+\epsfbox{images/expanding-a-matrix.eps}
+\caption{Expanding a linear form $(A,b)$ by a factor $f_{A}$}
+\label{fig:expanding-a-matrix}
+\end{figure}
+
+Figure~\ref{fig:expanding-a-matrix} shows the matrix corresponding to expanding 
+a filter represented by $(A,b)$ by a factor $f_{A}$. The expansion is done by 
+making a new matrix with $f_{A}*push_{F}$ columns and $peek_{F}+(f_{A}-1)*pop_{F}$
+rows. The original matrix $A$ is then copied $f_{A}$ times and placed along the
+diagonal. Each copy is offset by $push_{F}$ columns and $pop_{F}$ rows.
+
+\subsection{Pipelines}
+
+\begin{figure}
+\center
+\epsfxsize=3.0in
+\epsfbox{images/pipeline-combination.eps}
+\caption{Combining a pipeline of two filters.}
+\label{fig:combining-pipeline}
+\end{figure}
+
+{\tt Pipelines} are serial combinations of filters, one followed directly after 
+another. To combine two filters in a pipeline, $F_{1}$ followed by $F_{2}$, we can
+simply write down the equations. $F_{1}$ inputs $x$ to prodcue $y_1$ and $F_{2}$
+inputs $y_1$ to produce $y_2$. Using our linear filter equations from above,
+we can see that $y_1 = xA_1 + b_1$ and $y_2 = y_1A_2 + b_2$. Combining the
+two previous equations, it is clear that $y_2 = xA_1A_2 + (A_2b_1 + b_2)$ 
+which corresponds to the linear form $(A_1A_2, A_1b_2+b_2)$. 
+
+The above math equations look very simple, but it is not necessairly the case
+that you can actually perform the calculation $A_1A_2$ because the dimensions of 
+$A_1$ and $A_2$ might not be compatible. For most pairs of linear filters, there
+is a choice of scaling factors $f_1$ and $F_2$ that makes the number of columns 
+of $A_1$ equal the number of rows of $A_2$.
+
+In general, to make the rates of two filters match, one needs to satisfy
+$push_{F_{1}'} = push_{F_{2}'}$ which means that 
+$f_1push_{F_1}=peek_{F_2}+(f_2-1)pop_{F_2}$, where $push_{F_1}$,
+$peek_{F_2}$ and $pop_{F_2}$ are all arbitrary integers and 
+$f_1$ and $f_2$ are integers that must be determined by the compiler.
+This constraint is not always satisfiable. For instance if
+$push_{F_1}=2$, $peek_{F_2}=3$ and $pop_{F_2}=2$, you can not
+choose $f_a$ and $f_2$ to satisfy the above equation.
+
+Figure~\ref{fig:combining-pipeline} shows graphically the process of combining
+a pipeline of two filters into a single linear filter.
+
+\subsection{SplitJoins}
+{\tt SplitJoins} are the StreamIt construct that allow a programmer to describe explicitly 
+parallel computation. Data elements come into the top of the {\tt SplitJoin} and are directed
+to the parallel {\tt Filters} by a {\tt Splitter} element. Currently, there are two types of
+{\tt Splitters}: a duplicate splitter that merely sends a copy of each data element to each
+of the parallel {\tt Filters}. A roundrobin splitter which has $N$ weights, $w_k$ for $k\in[1..N]$
+where $N$ is the number of parallel {\tt Filters} in the {\tt SplitJoin}. The first $w_1$ elements
+from the input data stream are sent to the leftmost {\tt Filter}. The next $w_2$ elements
+are directed to the second leftmost {\tt Filter} and so on. When $sum_{k=0}^{N} w_k$ elements
+have been seen, then the pattern starts again from the beginning.
+
+The data from the parallel {\tt Filters} are combined back into a single stream by means of
+a roundrobin joiner characterized by weights $v_k$ for $k\in[1..N]$ where $N$ is the number
+of parallel streams in the {\tt SplitJoin}. First, $v_1$ items from the leftmost filter
+are placed onto the output tape. Then $v_2$ elements from the second leftmost filter are placed
+onto the output tape and so on. Again, the process repeats itself after $sum_{k=0}^{N} v_k$
+elements have been produced at the output.
+
+
+\begin{figure}
+\center
+\epsfxsize=3.0in
+\epsfbox{images/splitjoin-combine.eps}
+\caption{Combining a {\tt SplitJoin} that is composed of linear streams.}
+\label{fig:splitjoin-combine}
+\end{figure}
+
+In our linear framework, we can produce a linear representation from any valid {\tt SplitJoin}
+given that each of the child streams is linear. If that is the case, then we can describe the
+action of the entire {\tt SplitJoin} as a linear operation represented by a new linear form
+as shown in Figure~\ref{fig:splitjoin-combine}.
+
+One can think of the joiner of a {\tt SplitJoin} as simply reordering the output data from
+the parallel stream blocks. Remembering that each column of a linear form represents the 
+formula for calculating a single output of the filter, then it is easy to see the overall form
+of a {\tt SplitJoin} is going to consist of a particular order of the columns in the parallel
+program streams.
+
+\subsubsection{Duplicate Splitter}
+
+\begin{figure}
+\center
+\epsfxsize=3.0in
+\epsfbox{images/splitjoin-duplicate-ratematch.eps}
+\caption{Expanding substreams to match their rates in a {\tt SplitJoin}.}
+\label{fig:splitjoin-duplicate-ratematch}
+\end{figure}
+
+Combining a {\tt SplitJoin} where the splitter is duplicate is relatively straightforward
+since each of the rows in the sub streams refer to the same input items given that the
+linear representations of the sub streams have the same number of rows. The same rows in
+different linear representations correspond to the same data items because each the 
+same data item is copied to each sub stream.
+
+To produce an overall representation by simply ordering the columns of the sub streams'
+linear representations, we need to ensure that we could run the joiner
+an integer number of times and consume exactly the correct number of items from one
+expanded firing from each of the sub streams. To match the output rates we calculate
+$x=lcm(\forall k, lcm(push(F_k),w_k))$. One can interpret x as the total number of elements
+produced by all of the sub filters. Then we expand each filter $F_i$ by a factor
+$f_i=\frac{x}{push(F_i)}$ which means that expanded it will produce $f_i*push(F_i)$ items, and
+it will take $f_{w_i}=\frac{x}{w_i}$ firings of the joiner, with each of the firings consuming
+$w_i$ elements. It is important to note that in order for the {\tt SplitJoin} to be valid
+(eg have a schedule that does not result in an infinite buffer, see \cite{karczma-thesis} for
+all of the the gory details) all of the $f_{w_i}$'s must be the same integer.
+Figure~\ref{fig:splitjoin-duplicate-ratematch} graphically depicts the process of expanding
+the sum linear forms so that the rates are matched. 
+
+\begin{figure}
+\center
+\epsfxsize=3.0in
+\epsfbox{images/splitjoin-duplicate-matrix.eps}
+\caption{Matrix resulting from combining a {\tt SplitJoin} with rate matched substreams.}
+\label{fig:splitjoin-duplicate-matrix}
+\end{figure}
+
+After the rates are matched as described above, we are garenteed to have the same number of rows
+in each of the sub streams expanded representations. In order to construct the overall matrix, 
+all that remains is to order the columns of the expanded representations appropriately. 
+Since we know that the the first $w_1$ output elements will be the first $w_1$ elements 
+produced from filter $F_1$ we put the $w_1$ rightmost columns of $A_1$ as the rightmost
+columns of the overall representation matrix. We then place the $w_2$ rightmost columns of $A_2$ 
+into the next columns of the overall representation matrix, and so forth until
+we have determined all of the elements that would have been produced from one firing of 
+the joiner ($\sum_{i=0}^{N} w_{i}$). If $f_{w_i}$ is greater than one 
+(eg the joiner has to be executed more than once) then we go back and take rightmost
+$w_1$ remaining columns from $A_1$, then the rightmost remaining columns from $A_2$, and
+so forth. This process repreats until all of the columns from the expanded representations have
+been fitted into the overall linear representation. Figure~\ref{fig:splitjoin-duplicate-matrix} 
+shows graphically the process of creating the overall matrix.
+
+
+\subsubsection{Roundrobin Splitter}
+
+\begin{figure}
+\center
+\epsfxsize=3.0in
+\epsfbox{images/splitjoin-roundrobin-to-duplicate.eps}
+\caption{Converting a {\tt SplitJoin} with a roundrobin splitter to a {\tt SplitJoin} with a duplicate splitter.}
+\label{fig:splitjoin-roundrobin-to-duplicate}
+\end{figure}
+
+In some applications, the incoming data to the {\tt SplitJoin} is directed to various sub streams 
+by a roundrobin splitter with weights $v_i$. In this case, first we expand the sub streams of the
+{\tt SplitJoin} to match the rates as described above and shown in 
+Figure~\ref{fig:splitjoin-duplicate-ratematch}. However, after we have expanded, the number of
+columns is correct, but the rows of each filter's expanded representation do not represent the
+same input elements (because each filter doesn't see data bound to other filters). Therefore,
+the matrices aren't necessairly going to have the same number of rows, and so merely
+copying columns in the order described above isn't going to work because the columns will be 
+of different sizes. To handle the case with a roundrbin splitter, we transform the {\tt SplitJoin} 
+into a {\tt SplitJoint} with a duplicate splitter as illustrated in 
+Figure~\ref{fig:splitjoin-roundrobin-to-duplicate}. To affect this transformation, we need the rows
+of each sub filter's matrix to represent the same data items. By sending all of the data to each filter,
+we need to tell each linear representation that its output doesn't depend in any way on the data that 
+was originally bound for another filter. We insert rows of $0$s into the expanded representions
+for each row that was originally bound for another subfilter. Figure~\ref{fig:splitjoin-roundrobin-matrix}
+illustrates how the new matrix is constructed.
+
+\begin{figure}
+\center
+\epsfxsize=3.0in
+\epsfbox{images/splitjoin-roundrobin-matrix.eps}
+\caption{Corresponding matrix for splitter conversion from roundrobin to duplicate.}
+\label{fig:splitjoin-roundrobin-matrix}
+\end{figure}

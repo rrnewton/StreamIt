@@ -1,0 +1,114 @@
+\section{Dataflow Analysis}
+\begin{figure}[t]
+\scriptsize
+\begin{verbatim}
+float->float filter LowPassFilter(float g, float cutoffFreq, int N) {
+  float[N] h;
+
+  /* since the impulse response is symmetric, 
+   * don't worry about reversing h[n]. */
+  init {
+    int OFFSET = N/2;
+    for (int i=0; i<N; i++) {
+      int idx = i + 1;
+      // generate real part
+      if (idx == OFFSET) 
+	/* take care of div by 0 error 
+	(lim x->oo of sin(x)/x actually equals 1)*/
+	h[i] = g * cutoffFreq / pi; 
+      else 
+	h[i] = g * sin(cutoffFreq * (idx-OFFSET)) / (pi*(idx-OFFSET));
+    }
+  }
+
+  /* implement the FIR filtering operation 
+   * as the convolution sum. */
+  work peek N pop 1 push 1 {
+    float sum = 0;
+    for (int i=0; i<N; i++) { 
+      sum += h[i]*peek(i);
+    }
+    push(sum);
+    pop();
+  }
+}
+
+\end{verbatim}
+\vspace{-12pt}
+\caption{\protect\small StreamIt code for a low pass filter.
+\protect\label{fig:lowpasscode}}
+\vspace{-12pt}
+\end{figure}
+
+
+To understand the dataflow analysis used to extract the linear representation from
+a {\tt Filter}'s {\tt work} function, one needs to understand what the code of a 
+{\tt work} function contains. Most of the code is arbitrary C-like code that would
+be very familiar to a C programmer. There are three function calls that have special 
+meaning in a {\tt work} function.
+
+\begin{enumerate}
+\item {\tt pop()}: Consumes one data item from the input tape and returns its value.
+\item {\tt peek(i)}: Returns the value of the $i$th value on the input tape.
+\item {\tt push(v)}: pushes the value of {\tt v} on to the output tape.
+\end{enumerate}
+
+
+Figure~\ref{fig:lowpasscode} contains the code to implement a rectangularly windowed 
+low pass filter. Note that the {\tt init} function gets called once when the program
+starts up.
+ 
+The central idea of the data analysis pass is very much like constant propagation
+except that we keep mappings from variables to linear forms instead of variables to
+constants. Linear forms are pairs ($v$, $c$) of column vectors $v$ of size $peek_{F}$ 
+and a constant $c$. A linear form represents a formula for computing a value from a
+linear combination of the {\tt Filter}'s inputs such that the value of a 
+linear form at runtime would be $xv + c$.
+
+A linear form can be created in one of three ways. 
+\begin{enumerate}
+\item A constant $r$ generates a linear form with $v=0$ and $c=r$. 
+\item A {\tt peek(i)} statement generates a linear form with $v$ a column vector of all zeros with 
+a one in the $i$th row from the bottom and $c=0$. 
+\item A {\tt pop()} expression generates a linear form with a one in the row that is associated with 
+the current input element. 
+\end{enumerate}
+
+Of course, there is record keeping to calculate how many {\tt pop()}s
+the {\tt work} function has performed up to a particular point so that the correct
+row can be set to one when we encounter {\tt pop()}s and {\tt peeks(i)}s.
+
+Linear forms propagate through the dataflow graph much like constants are propagated
+during a standard constant propagation pass. Two linear forms $l_{1}$ and $l_{2}$ can
+be added together by adding their vectors element wise and adding their constants, eg 
+$l_1+l_2=(v_1+v_2, c_1+c_2)$. Linear forms can only be multiplied by constants $r$, 
+the result of which is simply a scaling of all the elements of $v$ and of $c$ by a factor
+$r$. Eg $l*r = (rv,rc)$. If two linear forms are multiplied together 
+then the result is not a linear combination of the {\tt Filter}'s input, rather it is
+some polynomial function in the input.
+
+{\tt if} statements are handled just like for constant propagation. The confluence operator
+is set intersection, which only propagates variable to linear form mappings that are
+maintained along both branches of control flow. We also have to impose the special restriction that the
+same number of {\tt pops()} occured along both branches or we don't know what the current offset
+for generating linear forms from {\tt peek(i)} and {\tt pop()} expressions is. 
+We currently only handle loops that can be unrolled in the 
+compiler (eg those loops whose bounds are determinable at compile time). 
+A loop can't be unrolled at compile time only if its terminiation condition is data 
+dependent, and data dependent loops probably don't compute linear 
+functions of the data anyways.
+
+
+The final piece of generating a linear representation from a linear form is to 
+When the {\tt expr} in a {\tt push(expr)} expression is a linear form $l=(v,c)$, 
+we copy $v$ to the appropriate column in the {\tt Filter}'s linear representation matrix $A$ 
+and we copy $c$ to the appropriate column in the linear representation's constant vector $a$.
+The first {\tt push()} expression places the linear form in the last column of $A$. The second
+{\tt push()} the second to last column of $A$, etc. The last column of $A$ represents 
+the calculations necessary for the first output item produced by the filter. The second to last
+column represents the calculatons for the second output item of the filter, etc.
+The same positions are chosen for the linear forms' constants in the constant vector $a$.
+
+If all the {\tt push} expressions in a filter have linear forms as arguments, 
+then we have determined that the filter is linear and remember the mapping from 
+filter to linear representation.
