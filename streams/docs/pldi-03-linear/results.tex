@@ -1,18 +1,17 @@
 \section{Results}
 \label{sec:results}
 
-Our compiler currently has two linear analysis optimizations. The
-first, {\it linear replacement}, transforms linear streams (either
-filter, splitjoin or pipeline) by replacement with a filter that
-directly computes the calculation of the corresponding linear node.
-The second optimization, {\it frequency replacement}, applies the
-transformation described in Section \ref{sec:freq}.  The
-transformation takes advantage of the machine tuned FFT package
-FFTW~\cite{frigo99fast}, to perform the necessary basis conversions.
-The partitioner automatically determines to which subsections of the
-overall program to apply each of the transformations. Below we
-describe experiments and results that demonstrate substantial
-performance improvements due to our methods.
+Our compiler currently has two linear optimizations. The first, {\it
+linear replacement}, transforms linear streams ({\it i.e.,} filters,
+splitjoins and pipelines) by replacement with a filter that directly
+implements the corresponding linear node.  The second optimization,
+{\it frequency replacement}, converts a linear node into a filter that
+performs the computation in the frequency domain.  This transformation
+uses FFTW~\cite{frigo99fast}, an adaptive and high-performance FFT
+library, to perform the necessary basis conversions.  Our optimization
+selection algorithm automatically determines which transformations
+should be applied.  Below we describe experiments and results that
+demonstrate substantial performance improvements due to our methods.
 
 \subsection{Measurement Methodology}
 %We chose to measure the strength of our optimizations in terms of 
@@ -51,44 +50,51 @@ performance improvements due to our methods.
 %in the IA-32 instruction set are defined to be any of ({\tt fmul fmulp fimulp fdiv fdivp fidivp fdivr fdivrp fidivr}).
 %We measure execution time normalized to the number of program outputs generated. 
 
-Our measurement platform is a Dual Intel 2.2 GHz P4 Xenon processor system 
-with 2GB of memory running GNU/Linux. We compile our benchmarks using StreamIt's uniprocessor backend
-and generate executables from the resulting C files using {\tt gcc -O2}.
-To measure the number of runtime multiplications we use an instruction counting 
-DynamoRIO\cite{dynamo99} client.
-There are no standard benchmarks written yet for StreamIt, so we use
-a set of representative programs\footnote{Stream graphs appear in Appendix A XXXXXXXXXXXXXXXXXXXXXX.}
-which perform computations that are commonly found in streaming applications:
-1) {\bf FIR}, a single 256 point low pass FIR filter; 
-2) {\bf RateConvert}, an audio down sampler that converts the 
-sampling rate by a non-integral factor ($\frac{2}{3}$); 
-3) {\bf TargetDetect}, four matched filters in parallel with threshold target detection; 
-4) {\bf FMRadio}, an FM software radio with equalizer;
-5) {\bf Radar}, the core functionality in modern radar signal processors, based on a system from the Polymorphic Computing Architecture (PCA);
-6) {\bf FilterBank}, a multi-rate signal decomposition 
-processing block common in communications and image processing;
-7) {\bf Vocoder}, a channel voice coder, commonly used for speech analysis and compression;
-8) {\bf Oversample}, a $16x$ oversampler, a function found in many CD players,
-9) {\bf DToA}, an audio post-processing stage prior to a 1-bit D/A converter 
-with oversampler and first order noise shaper.
+Our measurement platform is a Dual Intel 2.2 GHz P4 Xeon processor
+system with 2GB of memory running GNU/Linux. We compile our benchmarks
+using StreamIt's uniprocessor backend and generate executables from
+the resulting C files using {\tt gcc -O2}.  To measure the number of
+runtime multiplications, we use an instruction counting
+DynamoRIO\cite{dynamo99} client.  Since there are no external sources
+of benchmarks written in StreamIt, we assembled a set of
+representative programs\footnote{Stream graphs appear in Appendix A
+XXXXXXXXXXXXXXXXXXXXXX.} which perform computations that are commonly
+found in streaming applications: 1) {\bf FIR}, a single 256 point low
+pass FIR filter; 2) {\bf RateConvert}, an audio down sampler that
+converts the sampling rate by a non-integral factor ($\frac{2}{3}$);
+3) {\bf TargetDetect}, four matched filters in parallel with threshold
+target detection; 4) {\bf FMRadio}, an FM software radio with
+equalizer; 5) {\bf Radar}, the core functionality in modern radar
+signal processors, based on a system from the Polymorphic Computing
+Architecture~\cite{pca}; 6) {\bf FilterBank}, a multi-rate signal
+decomposition processing block common in communications and image
+processing; 7) {\bf Vocoder}, a channel voice coder, commonly used for
+speech analysis and compression; 8) {\bf Oversample}, a $16x$
+oversampler, a function found in many CD players, 9) {\bf DToA}, an
+audio post-processing stage prior to a 1-bit D/A converter with
+oversampler and first order noise shaper.
 
 \subsection{Performance}
 To determine the effects of our linear replacement and frequency
 replacement optimizations, we compiled each benchmark program with
-linear replacement, with frequency replacement, with a back to back application of
-frequency replacement and linear replacement and with the partitioner.
-Figure~\ref{fig:linear-freq-both} shows the reduction in the number
-of multiplications that our optimizations achieve.
-For each benchmark, our optimizations reduce the number of multiplications
-considerably. For FIR and TargetDetect, the reduction comes from 
-frequency replacement, but in other benchmarks linear replacement
-reduces the multiplications as well. For TargetDetect, Radar and Vocoder,
-combining both optimizations using the partitioner decreases mulitplications
-more than either alone. Linear replacement increases the number of multiplications
-required because it ``unfactors'' some of the computation that the original
-programmer had expressed in the program's structure. With the partitioner,
-only beneficial combinations are performed which reduces the number of 
-multiplications required.
+linear replacement, with frequency replacement, with a back to back
+application of frequency replacement and linear replacement, and with
+automatic optimization selection.  Figure~\ref{fig:linear-freq-both}
+shows the reduction in the number of floating point multiplications
+that our optimizations achieve.  For each benchmark, our optimizations
+reduce the number of multiplications considerably. For FIR and
+TargetDetect, the reduction comes from frequency replacement, but in
+other benchmarks linear replacement reduces the multiplications as
+well. For TargetDetect, Radar and Vocoder, combining both
+optimizations using the selection algorithm decreases mulitplications
+more than either alone. Naive linear replacement increases the number
+of multiplications required because it ``unfactors'' some of the
+computation that the original programmer had expressed in the
+program's structure. With automatic selection, only beneficial
+combinations are performed, thereby reducing the number of
+multiplications required.  This is especially important in the case of
+Radar, in which execution actually slows down without the selection
+algorithm.
 % AAL-is there anything else interesting that we would like to point out?
 
 \begin{figure}[t]
@@ -102,33 +108,35 @@ multiplications required.
 \vspace{-6pt}
 \end{figure}
 
-In general, reducing computation does not necessarily translate into a
-faster program, but it is often a useful indication.  As
-Figure~\ref{fig:execution-speedup} demonstrates, our benchmarks
+%% In general, reducing the number of floating point multiplies does not
+%% necessarily translate into a faster program, but the two statistics
+%% are usually correlated.  
+
+As Figure~\ref{fig:execution-speedup} demonstrates, our benchmarks
 speedup on average by a factor of {\bf XXXXX} and by a factor of
 $XXXXXXX$ in the best case.  Our performance improvements are due only
 in part to to the efficiency of FFTW.  Multiplications are decreased
-and execution is sped up in RateConvert, FM, FilterBank and Vocoder
-with only linear replacement. Linear replacement improvements are due
-to removing redundant computations -- in essence we do algebraic
-simplification across filer boundaries.
+and execution time is improved in RateConvert, FM, FilterBank and
+Vocoder with only linear replacement. Linear replacement improvements
+are due to removing redundant computations -- in essence, it performs
+algebraic simplification across filter boundaries.
 
-With the exception of FilterBank and Vocoder, execution speed
-increases when multiplications are decreased. For Vocoder, the
-difference between the back to back application of the individual
-optimizations and the partitioned application is that the partitioner
-refactors and combines a linear splitjoin where the back to back
-application did not. As Figure~\ref{fig:linear-freq-both} shows, this
-collapsing has no effect on the number of multiplications required but
-it does change the execution scheduling.  The difference in execution
-speed is due to a difference in the runtime overhead of this different
-structure. FilterBank is the same -- the partitioner determines a
+There are two cases in which the multiplication reduction is not a
+good predictor of execution speedup.  For Vocoder, the optimization
+selection algorithm achieves the same number of multiplications as
+applying both linear and frequency replacement; however, the speedup
+is higher with automatic selection.  This is because the selection
+algorithm refactors and combines a linear splitjoin where the plain
+optimizations do not.  While this has no effect on the number of
+multiplications required, it lowers the execution time by decreasing
+the runtime overhead in the execution of the stream graph.  FilterBank
+illustrates similar behavior -- the selection algorithm determines a
 clever refactoring that reduces the number of multiplications compared
-to the back to back application, but the additional overhead of more
-filters actually causes the execution time to increase. A more
-accurate cost model that takes into account costs other than
-multiplications could help the partitioner make a better choice
-between possible partitions.
+to applying both linear and frequency replacement, but the additional
+overhead of more filters actually causes the execution time to
+increase. A more accurate cost model that takes into account costs
+other than multiplications could help the selection algorithm improve
+its choice of stream graph arrangements.
 
 \begin{table*}[t]
 \vspace{-6pt}
