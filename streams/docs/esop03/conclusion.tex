@@ -1,0 +1,27 @@
+\section{Conclusion}
+
+This paper shows that the inter-node dependences of a very broad class
+of synchronous dataflow graphs can be cleanly represented as a System
+of Affine Recurrence Equations.  In combination with Feautrier's array
+dataflow analysis~\cite{Feautrier01} for deducing intra-node
+dependences, this establishes the SARE as a unified analysis and
+optimization framework for the high-level DSP programming model.
+
+Our analysis inputs a Phased Computation Graph, which we originally
+formulated as a model of computation for StreamIt~\cite{streamitcc}.
+Phased Computation Graphs are a generalization of synchronous dataflow
+graphs, cyclo-static dataflow graphs, and computation graphs; they
+also include a novel notion of initial and steady-state epochs, which
+are an appealing abstraction for programmers.  To the best of our
+knowledge, even the translation from a synchronous dataflow graph to a
+SARE has not been published before.
+
+We believe that the precise affine dependence framework provided by
+the SARE representation will enable a powerful suite of node
+optimizations in dataflow graphs.  The SARE is a robust and
+well-established framework within the systolic and scientific
+communities, with methods for graph parameterization, automatic
+parallelization, and storage optimization.  We propose optimizations
+such as decimation propagation, node fission, and steady-state
+invariant code motion that are our first applications of these
+techniques to the signal processing domain.

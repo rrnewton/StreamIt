@@ -1,0 +1,124 @@
+\section{Basic Translation: CG to SARE}
+\label{sec:simple}
+
+In order to familiarize the reader with the basics of our technique,
+we present in this section the translation procedure for a simplified
+input domain.  The translation rules for the general case can be found
+in Section~\ref{sec:translate}.
+
+Our basic translation operates on computation graphs with all of the
+channels initially empty.  That is, we assume that:
+\begin{enumerate}
+
+\item No items appear on the channels at the beginning:  $\forall c,~A(c) = 0$.
+
+\item There are no initialization phases: $\forall n,~\mt{num}(n, \mt{init}) = 0$.
+
+\item Each node has only one steady-state phase: $\forall n,~\mt{num}(n, \mt{steady}) = 1$.
+
+\end{enumerate}
+
+Given these restrictions, we can simplify our notation considerably.
+Since we are only concerned with the steady-state epoch and the 0'th
+phase of each node, we can omit some arguments to any function that
+requires an epoch $t$ or a phase $p$.  For instance, the push and pop
+rates of a channel $c$ are now just $U(c)$ and $O(c)$, respectively;
+the work function for a node $n$ is simply $W(n)$.
+
+\input{simplefig}
+
+\subsection{Calculating the Steady-State Period}
+\label{sec:balance}
+
+Let $S(n)$ denote the number of times that node $n$ fires its first
+phase for a periodic steady-state execution of the entire graph. A
+{\it periodic} schedule is one that does not change the number of
+items on the channels in the graph after executing; in other words, it
+is legal to execute in the steady state.  For an SDF graph, there is a
+unique and minimal periodic schedule, of which all other periodic
+schedules are a multiple~\cite{leesdf}.  It is straightforward to use
+a set of balance equations to solve for $S(n)$ given the declared
+rates of filters in the graph.  If the graph is invalid (i.e., it
+would lead to deadlock or an unbounded buffer size) then the balance
+equations will have no solution.  See~\cite{leesdf} for details.
+
+We will use the following helper function in our analysis.  Given
+channel $c = (n_a, n_b)$:
+\begin{align*}
+\mt{Period}(c) \equiv S(n_a) * U(c) = S(n_b) * O(c)
+\end{align*}
+
+That is, $\mt{Period}(c)$ denotes the number of items that are passed
+over channel $c$ during a single steady-state execution of the graph.
+
+\subsection{Generating a SARE}
+\label{sec:simplesare}
+
+We now generate a SARE for the simplified instance of a PCP.  The {\it
+domains} of the SARE will be parameterized by $N$, the number of
+steady-state cycles that one wishes to execute in the PCP.  However,
+it is important to note that $N$ does not affect the number of
+variables or equations in the SARE, as that would require a separate
+compilation and analysis for each value of $N$.  It is a key benefit
+of the SARE representation that $N$ can be incorporated as a symbolic
+parameter in the schedule.
+
+The procedure for generating the SARE appears in
+Figure~\ref{fig:sdftosare}.  The basic idea is to introduce a variable
+$\mt{BUF}_c$ for each channel $c$ which keeps track of the entire
+history of values that are transmitted over $c$ (we keep track of the
+entire history since all elements in a SARE must be assigned only
+once.)  The $i$ dimension of $\mt{BUF}$ counts over steady-state
+periods, while the $j$ dimension holds elements that were written
+during a given period.  We also introduce variables $\mt{WRITE}_c$ and
+$\mt{READ}_c$ that write and read from channel $c$.  For reasons that
+become clear below, these variables have a $k$ dimension to index the
+values that are pushed on a given firing, while the $j$ dimension
+counts firings of a node and the $i$ dimension counts steady-state
+periods, as before.
+
+Equation~\ref{eq:r2w} expresses the computation internal to each node,
+whereas Equations~\ref{eq:w2b} and~\ref{eq:b2r} expresses the
+communication of the nodes with the channels.  In
+Equation~\ref{eq:r2w}, the node's work function is used to calculate
+all of the $\mt{WRITE}$ values from all of the $\mt{READ}$ values,
+during a given firing $(i,j)$. 
+%The $k$ dimension was added to
+%$\mt{READ}$ and $\mt{WRITE}$ so that a given $(i,j)$ index pair would
+%uniquely identify the read and write operations of a given firing.
+
+Equation~\ref{eq:w2b} shows the communication from the $\mt{WRITE}$
+array to the $\mt{BUF}$ array for a given channel.  To understand this
+equation, it might help to consider a simpler version which expresses
+the correct relationship but is not a legal SARE:
+\begin{align*}
+&\forall (i,j,k) \in {\cal D}_{\mt{WRITE}_c}:~~
+\mt{BUF}_{c}(i,j*U(c)+k) = \mt{WRITE}_{c}(i, j, k)
+\end{align*}
+The equation above is simply copying the contents of $\mt{WRITE}$ into
+$\mt{BUF}$ while accounting for the differing array dimensions.
+However, this equation is not valid for a SARE, since there is an
+affine expression indexing the array on the left hand side.
+
+To deal with this issue, we split up the equation into several pieces,
+each of which assigns to a different portion of the $\mt{BUF}$ array.
+In Equation~\ref{eq:w2b}, we introduce a variable $q$ that counts up
+to $S(n)$, which is the extent of the $j$ dimension of $\mt{WRITE}_c$.
+For each of these $q$, we copy over $U(c)$ values from the appropriate
+section of the $\mt{WRITE}$ array; the domain ${\cal D}_{W \rightarrow
+B}(c,q)$ represents the $q$'th slice of $\mt{BUF}$ into which the
+section should be written.  This equation is a valid component of our
+SARE, as the boundaries on each equation's domain are fully resolvable
+at compile time.
+
+\clearpage
+Equation~\ref{eq:b2r} is similar to Equation~\ref{eq:w2b} regarding
+the slicing technique that is used to parameterize the domain of the
+equation.  However, here the motivation is different: the extent of
+the $k$ dimension of $\mt{READ}$ might exceed the length of the period
+in $\mt{BUF}$ (this is because nodes are allowed to peek more than
+they pop.)  Thus, the $q$ variable is used to slice the peek amount
+$E(c)$ into $\mt{Period}(c)$-sized chunks so as to resolve the proper
+source location in $\mt{BUF}$.  Again, all the variables in the index
+expressions are compile-time constants (except, of course, for the
+index quantifiers $i$, $j$, and $k$.)

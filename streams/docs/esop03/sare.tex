@@ -1,0 +1,165 @@
+\section{Phased Computation Graphs}
+\label{sec:pcg}
+
+\begin{table}[t]
+\small
+\begin{center}
+\begin{tabular}{|c|c|c|c|c|c|} \hline
+Model of Computation & Items on Channels & Nodes with & Nodes with & Cyclic Steady & Initialization \\
+                     & at Start & Pop $\ne$ Push & Peek $>$ Pop & State Phases & Phases \\
+\hline \hline
+Synchronous Dataflow~\cite{LM87-i} & X & X & & & \\
+\hline
+Cyclo-Static Dataflow~\cite{BELP96} & X & X & & X & \\
+\hline
+Computation Graphs~\cite{KM66} & X & X & X & & \\
+\hline
+Phased Computation Graphs & X & X & X & X & X \\
+\hline
+\end{tabular}
+\vspace{-6pt}
+\caption{\protect\small Models of Computation for Dataflow Graphs.}
+\label{tab:models}
+\vspace{-12pt}
+\end{center}
+\end{table}
+
+We introduce the Phased Computation Graph (PCG) as a model of
+computation for dataflow languages; specifically, we designed the PCG
+as a model for StreamIt~\cite{streamitcc}.  A PCG is a generalization
+of the Computation Graph (CG) of Karp and Miller~\cite{KM66} to the
+case where each node has both an initial and steady-state execution
+epoch, each of which contains a number of {\it phases}.  It is also a
+generalization of other popular representations for dataflow graphs,
+such as synchronous dataflow (SDF) and cyclo-static dataflow (CSDF)
+(see Table~\ref{tab:models}).  Phases are attractive constructs for
+the reasons given in describing CSDF in Section~\ref{sec:related};
+also, an initial epoch is critical for applications such as a WAV file
+decoder that adjusts its parameters based on the data it finds in the
+header of the stream.
+
+Formally, a PCG is a directed graph with the following components:
+\begin{itemize}
+
+\item Nodes $n_1 \dots n_{m_n}$.
+
+\item Channels $c_1 \dots c_{m_c}$, where each channel is directed
+from a given node $n_a$ to a given node $n_b$.
+
+\item A non-negative integer $A(c)$ indicating the number of items
+  that are initially present on channel $c$.
+
+\item The number of phases $\mt{num}(n, t)$ that node $n$ exhibits
+during epoch $t$.  Here $t$ indicates the type of epoch, which is
+either initial ($\mt{init}$) or steady-state ($\mt{steady}$).  For all
+$n$, $\mt{num}(n, \mt{init}) \ge 0$ and $\mt{num}(n, \mt{steady}) \ge
+1$.
+
+\item Non-negative integers $U(c, t, p)$, $O(c, t, p)$, and $E(c, t,
+p)$, which give the number of items pushed, popped, and peeked,
+respectively, over channel $c$ during the $p$'th phase of epoch $t$.
+
+\end{itemize}
+
+\subsection{Execution Model}
+
+We give an informal description of the execution semantics of a PCG,
+which is an intuitive extension to that of a CG.  An execution
+consists of a sequence of atomic {\it firings} of nodes in the graph.
+The effect of firing a given node depends on its epoch and its phase,
+which are both local states of the node.  At the start of execution,
+each node is in phase 0 of the initial epoch, and each channel $c$
+contains $A(c)$ items.
+
+Let us consider a node $n$ that is in phase $p$ of epoch $t$.  It is
+legal for $n$ to fire if $p \in [0, \mt{num}(n, t)-1]$ and, for each
+channel $c_{in}$ directed into $n$, there are at least $E(c_{in}, t,
+p)$ items on $c_{in}$.  The effect of this firing is to consume
+$O(c_{in}, t, p)$ items from each channel $c_{in}$ directed into $n$;
+to produce $U(c_{out}, t, p)$ new items on each channel $c_{out}$
+directed out of $n$; and to advance the phase $p$ of $n$ to
+$\mt{next}(t, p)$.  In the initial epoch, each phase executes only
+once and $\mt{next}(\mt{init}, p) = p + 1$; in the steady-state epoch,
+the phases execute cyclically and $\mt{next}(\mt{steady}, p) = (p +
+1)~\mt{mod}~\mt{num}(n, t)$.  If a node $n$ is in phase $\mt{num}(n,
+\mt{init})$ of the initial epoch, then it transitions to the
+steady-state epoch and resets its phase to 0.
+
+From the starting state of the graph, execution proceeds via an
+infinite sequence of node firings.  The order of node firings is
+constrained only by the conditions given above.
+
+\section{Phased Computation Programs}
+
+The PCG described above is a representation for a graph, treating each
+node and channel as a black box.  Here we introduce some notation for
+the internals of the nodes, as well as the ordering of items on the
+channels.  We refer to the aggregate model as a Phased Computation
+Program (PCP).  Before describing a PCP, we will need some additional
+notation:
+\begin{itemize}
+
+\item We assume that all items passed over channels are drawn from the
+same domain of values ${\cal V}$.
+
+\item An array type\footnote{To simplify the presentation, we allow
+ourselves a slight abuse of notation by sometimes using arrays instead
+of enumerating individual elements.  Our definitions could be expanded
+into strict element-wise SARE's without any fundamental change to the
+technique.} of length $n$ and element type $\tau$ is denoted by
+$\tau[n]$.  Given a two-dimensional array $A$ of type $\tau[n][m]$,
+$A[i][*]$ denotes the $m$-element array comprising the $i$'th row of
+$A$.
+
+\item $\mt{num\_in}(n)$ (resp. $\mt{num\_out}(n)$) denotes the number of
+channels that are directed into (resp. out of) node $n$.
+
+\item $\mt{chan\_in}(n)$ (resp. $\mt{chan\_out}(n)$) denotes the list of
+channels that are directed into (resp. out of) node $n$.
+
+\item $\mt{pos\_in}(n, c)$ (resp. $\mt{pos\_out}(n, c)$) denotes the
+position of channel $c$ in $\mt{chan\_in}(n)$
+(resp. $\mt{chan\_out}(n)$.  That is, $\mt{chan\_out}(n)[\mt{pos\_out(n,
+c)}] = c$.
+
+\end{itemize}
+
+\noindent A PCP consists of the following:
+\begin{itemize}
+
+\item A Phased Computation Graph $G = (\{n_1 \dots n_{m_n}\}, \{c_1
+\dots c_{m_c}\}, A, \mt{num}, U, O, E)$ describing the nodes,
+channels, and I/O rates of the program (see Section~\ref{sec:pcg}).
+Each channel $c = (n_a, n_b)$ is a FIFO queue; $n_a$ pushes items onto
+the back of $c$ and $n_b$ consumes items from the front of $c$.
+
+\item The initial values $I(c)$ that are enqueued onto channel $c$ at
+the start of execution.  Since there are $A(c)$ initial values on
+channel $c$, $I(c)$ has type ${\cal V}[A(c)]$.
+
+%An initialization function $I(c)$ that returns an array of
+%length $A(c)$, the elements of which are enqueued onto channel $c$ at
+%the start of execution.  The procedure $I(c)$ takes no arguments; its
+%signature is $\mt{void} {\small \rightarrow} {\cal V}[A(c)]$.
+%
+\item A work function $W(n, t, p)$ that represents the computation of
+node $n$ in phase $p$ and epoch $t$.  The signature of $W(n, t, p)$ is
+$[{\cal V}[E(\mt{chan\_in}(n)[1], t, p)], \dots, {\cal
+V}[E(\mt{chan\_in}(n)[\mt{num\_in}(n)], t, p)]]$ $\rightarrow$ \\ $[
+{\cal V}[U(\mt{chan\_out}(n)[1], t, p)], \dots, {\cal
+V}[U(\mt{chan\_out}(n)[\mt{num\_out}(n)], t, p)]]$.  That is, the
+function inputs a list of arrays, each of which corresponds to an
+incoming channel $c_{in}$ and contains the $E(c_{in},t,p)$ values that
+$n$ reads from $c_{in}$ in a given firing.  The procedure returns a
+list of arrays, each of which corresponds to an outgoing channel
+$c_{out}$ and contains the $U(c_{out},t,p)$ values that $n$ writes to
+$c_{out}$ in a given firing.
+
+\end{itemize}
+
+%The components $I$ and $W$ above are referred to as ``procedures''
+%rather than mathematical functions because we expect them to be
+%represented as blocks of source code for an actual procedure
+%declaration, thereby allowing a straightforward conversion to a PCP
+%from a dataflow program.  However, 
+
