@@ -1,32 +1,20 @@
 high priority
 ------------
 
-- to strengthen intro and conclusion:  say there's no need for expert DSP programmer
-  - fix intro to be less language-centric, and more linear-centric
+- layout!
 
-- add new cost functions, as they appear in the compiler
+- FIGURES
+  - add vocoder, target detect figure to partitioning section
 
-- take care of whatever needs to change for the implementation of the new multiple-pop strategy
-  - either that, or say that we only implement the pop==1 case
-
-- have a pass at the results section
-
-- typesetting of figures:
   - a lot of them look big, black, ugly
   - make stream structure example look cleaner
   - make eps bounding box ratio constant
 
-- in splitjoin and pipeline combo figures, we should label the (a)
-  original, (b) expanded, and (c) collapsed versions.  Also label
-  generally what's going on (could use andrew's commented out in combination2.tex)
-
-- add figures to partitioning section
-  - places where partitioning does much better
-  - illustrate vertical, horizontal cuts?
+  - in splitjoin and pipeline combo figures, we should label the (a)
+    original, (b) expanded, and (c) collapsed versions.  Also label
+    generally what's going on (could use andrew's commented out in combination2.tex)
 
 - add acknowledgements
-
-- at beginning of results, say what we have implemented on the compiler side (also the place to say the pop restriction)
 
 medium priority
 ---------------
@@ -44,15 +32,14 @@ medium priority
 - add somewhere:  can detect fft and move things into frequency region
   - or implement FFT the best way for architecture
 
-- say somewhere what method we use for the implementation of the
-  matrix multiplies?
-
 - give feel for how much frequency conversoin is helping 
   - compare combined nodes vs. non-combined nodes
   - also how much FFTW is working
 
 low priority
 ------------
+- not sure I like "for non-expert DSP programmer" in abstract
+
 - some absolute references, e.g. transformation 5
 
 - make the bibliography consistent
@@ -88,5 +75,6 @@ probably not doing
 
 todo after PLDI
 ---------------
+- some of commenting in LinearCost is obsolete
 - remove linearreplacecalculator -- calls childcost.plus, which is wrong
 

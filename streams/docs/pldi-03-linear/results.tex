@@ -1,19 +1,55 @@
+\begin{figure*}[t]
+\begin{table}{ll}
+\psfig{figure=images/flops-removed.eps,width=3.5in}
+&
+\psfig{figure=images/execution-speedup.eps,width=3.5in} \\
+\vspace{-6pt}
+\caption{Elimination of floating point operations.}
+\label{fig:flops}
+\vspace{-12pt}
+\end{table}
+\end{figure*}
+
+%% \begin{figure}[t]
+%% \vspace{-6pt}
+%% \caption{Execution speedup for maximal linear replacement, maximal frequency replacement, and automatic selection of optimizations.}
+%% \label{fig:execution-speedup}
+%% \vspace{-6pt}
+%% \end{figure}
+
 \section{Results}
 \label{sec:results}
 
-Our compiler currently has two linear optimizations. The first, {\it
-linear replacement}, transforms linear streams ({\it i.e.,} filters,
-splitjoins and pipelines) by replacement with a filter that directly
-implements the corresponding linear node.  The second optimization,
-{\it frequency replacement}, converts a linear node into a filter that
-performs the computation in the frequency domain.  This transformation
-uses FFTW~\cite{frigo99fast}, an adaptive and high-performance FFT
-library, to perform the necessary basis conversions.  Our optimization
-selection algorithm automatically determines which transformations
-should be applied.  Below we describe experiments and results that
-demonstrate substantial performance improvements due to our methods.
-Full results, benchmarks and source can be viewed at
-{\tt http://cag.lcs.mit.edu/linear/}
+We have completed a fully automatic implementation of the linear
+combination, frequency replacement, and optimization selection
+algorithms described in the previous sections.  The implementation is
+part of the StreamIt compiler, and works for both the uniprocessor and
+Raw~\cite{raw-micro} backends.  In this section, we evaluate three
+configurations of linear optimizations for the uniprocessor backend:
+\begin{itemize}
+
+\item {\it Linear replacement}, which transforms maximal linear
+sections of the stream graph into a single linear node, which we
+implement as a matrix multiply.  For small nodes (less than 256
+operations), this takes the form of an unrolled arithmetic expression,
+whereas for large nodes we implement an indexed matrix multiply that
+avoids zero entries at the top and bottom of each column.
+
+\item {\it Frequency replacement}, which transforms maximal linear
+sections of the stream graph into a single node in the frequency
+domain.  To implement the necessary basis conversions, we use
+FFTW~\cite{frigo99fast}, which is an adaptive and high-performance FFT
+library.
+
+\item {\it Automatic selection}, which employs both of the previous
+transformations judiciously in order to obtain the maximal benefit.
+This works according to the algorithm in
+Section~\ref{sec:partitioning}.
+\end{itemize}
+Below we describe experiments and results that demonstrate substantial
+performance improvements due to our methods.  For full results, stream
+graphs, and source code, please visit {\tt
+http://cag.lcs.mit.edu/linear/}.
 
 \subsection{Measurement Methodology}
 %We chose to measure the strength of our optimizations in terms of 
@@ -37,18 +73,6 @@ Full results, benchmarks and source can be viewed at
 %library is anything but optimized. Therefore, measuring running time is
 %probably not an appropriate metric.
 
-\begin{figure}[t]
-%\vspace{-6pt}
-\center
-\epsfxsize=3.2in
-\epsfbox{images/multiplications-remaining.eps}
-\vspace{-6pt}
-\caption{Percent of multiplication operations remaining after 
-  linear replacement, frequency replacement, both and automatic selection.}
-\label{fig:linear-freq-both}
-\vspace{-12pt}
-\end{figure}
-
 %Floating point multiplication instructions 
 %in the IA-32 instruction set are defined to be any of ({\tt fmul fmulp fimulp fdiv fdivp fidivp fdivr fdivrp fidivr}).
 %We measure execution time normalized to the number of program outputs generated. 
@@ -58,92 +82,106 @@ Full results, benchmarks and source can be viewed at
 Our measurement platform is a Dual Intel P4 Xeon system with 2GB of
 memory running GNU/Linux.  We compile our benchmarks using StreamIt's
 uniprocessor backend and generate executables from the resulting C
-files using {\tt gcc -O2}.  To measure the number of runtime
-multiplications, we use an instruction counting
-DynamoRIO\cite{dynamo99} client.  Since StreamIt is a new language,
-there are no external sources of benchmarks.  Thus, we have assembled
-the following set of representative streaming components and have
-rewritten them in StreamIt: 1) {\bf FIR}, a single 256 point low pass
-FIR filter; 2) {\bf RateConvert}, an audio down sampler that converts
-the sampling rate by a non-integral factor ($\frac{2}{3}$); 3) {\bf
-TargetDetect}, four matched filters in parallel with threshold target
-detection; 4) {\bf FMRadio}, an FM software radio with equalizer; 5)
-{\bf Radar}, the core functionality in modern radar signal processors,
-based on a system from the Polymorphic Computing
-Architecture~\cite{pca}; 6) {\bf FilterBank}, a multi-rate signal
-decomposition processing block common in communications and image
-processing; 7) {\bf Vocoder}, a channel voice coder, commonly used for
-speech analysis and compression; 8) {\bf Oversample}, a $16x$
-oversampler, a function found in many CD players, 9) {\bf DToA}, an
-audio post-processing stage prior to a 1-bit D/A converter with an
-oversampler and a first order noise shaper.
+files using {\tt gcc -O2}.  To measure the number of floating point
+operations, we use an instruction counting DynamoRIO\cite{dynamo99}
+client.
+
+Since StreamIt is a new language, there are no external sources of
+benchmarks.  Thus, we have assembled the following set of
+representative streaming components and have rewritten them in
+StreamIt: 1) {\bf FIR}, a single 256 point low pass FIR filter; 2)
+{\bf RateConvert}, an audio down sampler that converts the sampling
+rate by a non-integral factor ($\frac{2}{3}$); 3) {\bf TargetDetect},
+four matched filters in parallel with threshold target detection; 4)
+{\bf FMRadio}, an FM software radio with equalizer; 5) {\bf Radar},
+the core functionality in modern radar signal processors, based on a
+system from the Polymorphic Computing Architecture~\cite{pca}; 6) {\bf
+FilterBank}, a multi-rate signal decomposition processing block common
+in communications and image processing; 7) {\bf Vocoder}, a channel
+voice coder, commonly used for speech analysis and compression; 8)
+{\bf Oversampler}, a $16x$ oversampler, a function found in many CD
+players, 9) {\bf DToA}, an audio post-processing stage prior to a
+1-bit D/A converter with an oversampler and a first order noise
+shaper.
 
 \subsection{Performance}
-To determine the effects of our linear replacement and frequency
-replacement optimizations, we compiled each benchmark program with
-linear replacement, with frequency replacement, with a back to back
-application of frequency replacement and linear replacement and with
-automatic optimization selection. Figure~\ref{fig:linear-freq-both}
-shows the reduction in the number of floating point multiplications
-that our optimizations achieve.  For each benchmark, our optimizations
-reduce the number of multiplications considerably. For FIR and
-TargetDetect, the reduction comes from frequency replacement, but in
-other benchmarks linear replacement reduces the multiplications as
-well. For TargetDetect, Radar and Vocoder, combining both
-optimizations using the selection algorithm decreases multiplications
-more than either alone. Naive linear replacement increases the number
-of multiplications required because it ``unfactors'' some of the
-computation that the original programmer had expressed in the
-program's structure. With automatic selection, only beneficial
-combinations are performed, thereby reducing the number of
-multiplications required.  This is especially important in the case of
-Radar, in which execution actually slows down without the selection
-algorithm.
-% AAL-is there anything else interesting that we would like to point out?
 
-\begin{figure}[t]
-\center
-\epsfxsize=3.2in
-\epsfbox{images/execution-speedup.eps}
-\vspace{-6pt}
-\caption{Execution speedup after 
-  frequency replacement, linear replacement, both 
-  and automatic selection.}
-\label{fig:execution-speedup}
-\vspace{-6pt}
-\end{figure}
+One interesting aspect of our optimizations is that they eliminate
+floating point operations (FLOPS) from the program, as shown in Figure
+Figure~\ref{fig:flops}.  The removal of FLOPS represents fundamental
+computation savings that is independent of the streaming runtime
+system and other (FLOPS-preserving) optimizations in the compiler.  As
+shown in the figure, all of our benchmarks illustrate pronounced
+reduction in the number of FLOPS.  For FIR and TargetDetect, the
+reduction comes only from frequency replacement, but in other
+benchmarks linear replacement reduces the count as well.  
 
-%% In general, reducing the number of floating point multiplies does not
-%% necessarily translate into a faster program, but the two statistics
-%% are usually correlated.  
+The automatic selection option eliminates more FLOPS than either of
+the other options for TargetDetect, FMRadio, Radar, and Vocoder.  The
+effect is especially pronounced in Radar, where linear and frequency
+replacement increase the number of FLOPS, but automatic selection
+decreases FLOPS; the selection algorithm chose to combine only some of
+the filters in Radar, transforming none to the frequency domain.
+Automatic selection always performs at least as well as the other two
+options, which implies that our cost functions have some level of
+accuracy.
 
-As Figure~\ref{fig:execution-speedup} demonstrates, our benchmarks
-speedup on average by a factor of {\bf XXXXX} and by a factor of
-$XXXXXXX$ in the best case.  
-%Our performance improvements are due only in part to to the efficiency
-%of FFTW.
-Multiplications are decreased and execution time is improved in
-RateConvert, FM, FilterBank and Vocoder with only linear
-replacement. Linear replacement improvements are due to removing
-redundant computations --- in essence, it performs algebraic
-simplification across filter boundaries.
+Execution speedups are shown in Figure~\ref{fig:execution-speedup}.
+With automatic selection, our benchmarks speed up by an average factor
+of 450\% and by a factor of 800\% in the best case.  While the graph
+suggests that frequency replacement almost always performs better than
+linear replacement, this is not strictly the case; in FMRadio, Radar,
+and Vocoder, the automatic selection algorithm obtains its speedup by
+using linear replacement instead of frequency replacement for part of
+the stream graph.  However, linear replacement does reduce performance
+for FIR, TargetDetect, and DToA despite reducing the number of FLOPS.
+We believe that this is due to inefficiencies in our implementation of
+the matrix multiplication routine, as well as auxillary effects on the
+runtime overhead in the StreamIt library.  If we use the machine-tuned
+ATLAS library for the matrix multiply~\cite{whaley01automated},
+performance for the linear replacement optimization varies widely:
+linear replacement with ATLAS performs anywhere from -36\% (on
+FMRadio) to 58\% (on Oversampler) better than with our own matrix
+multiply routine, with an average of -4.3\% improvement.  Note that
+these numbers reflect our overhead in calling ATLAS in addition to
+ATLAS itself.  In the future, we plan to explore how best to perform
+the matrix multiply.
 
-There are two cases in which the multiplication reduction is not a
-good predictor of execution speedup.  For Vocoder, the optimization
-selection algorithm achieves the same number of multiplications as
-applying both linear and frequency replacement; however, the speedup
-is higher with automatic selection because the selection algorithm
-refactors and combines a linear splitjoin where the plain
-optimizations do not. The refactoring has no effect on the number of
-multiplications required, but it increases the execution time because
-it increases the runtime overhead in the execution of the stream
-graph.  FilterBank illustrates similar behavior --- the selection
-algorithm determines a clever refactoring that reduces the number of
-multiplications compared to applying both linear and frequency
-replacement, but the additional overhead required actually causes the
-execution time to increase. A more accurate cost model that takes into
-account costs other than multiplications could help the selection
-algorithm improve its choice of stream graph arrangements.
+Perhaps the most interesting benchmark is Radar\footnote{\small This
+is the same Radar application as in~\cite{streamit-asplos}, with some
+filters adjusted to work at a coarser level of granularity.  This
+eliminates persistent state in exchange for increased I/O rates.
+Also, frequency replacement caused an internal error in gcc for this
+program, so we used egcs 2.91 instead.}.  Maximal linear and frequency
+replacement lead to abysmal performance on Radar, due to a
+vector-vector multiply called Beamform at the top of a pipeline
+construct.  The Beamform filter pushes 2 items, but pops and peeks 24;
+thus, when the replacement algorithms combine it with a downstream FIR
+filter, much of its work is duplicated.  Moreover, the frequency
+replacement option suffers from the large pop rates in the application
+(as high as 128 for some filters), thereby increasing FLOPS and
+execution time by more than a factor of 30.  The automatic selection
+algorithm is essential in this case; it averts the
+performance-degrading combination and benefits from linear
+combinations elsewhere in the program, resulting in a significant
+reduction in FLOPS and a 5\% performance gain.
+
+%% There are two cases in which the multiplication reduction is not a
+%% good predictor of execution speedup.  For Vocoder, the optimization
+%% selection algorithm achieves the same number of multiplications as
+%% applying both linear and frequency replacement; however, the speedup
+%% is higher with automatic selection because the selection algorithm
+%% refactors and combines a linear splitjoin where the plain
+%% optimizations do not. The refactoring has no effect on the number of
+%% multiplications required, but it increases the execution time because
+%% it increases the runtime overhead in the execution of the stream
+%% graph.  FilterBank illustrates similar behavior --- the selection
+%% algorithm determines a clever refactoring that reduces the number of
+%% multiplications compared to applying both linear and frequency
+%% replacement, but the additional overhead required actually causes the
+%% execution time to increase. A more accurate cost model that takes into
+%% account costs other than multiplications could help the selection
+%% algorithm improve its choice of stream graph arrangements.
 
 \begin{table*}[t]
 \vspace{-6pt}
@@ -151,7 +189,7 @@ algorithm improve its choice of stream graph arrangements.
 \small
 \begin{tabular}{|l|c|c|c||c||c|c|c|} 
 \hline
-& \multicolumn{3}{|c||}{Originally}  &             & \multicolumn{3}{|c|}{After Optimizations} \\
+& \multicolumn{3}{|c||}{Originally}  &             & \multicolumn{3}{|c|}{After Optimizations (using Automatic Selection)} \\
 \hline
 Benchmark  & Filters & Pipelines& SplitJoins & Average     & Filters      & Pipelines         & SplitJoins \\
            & (linear)& (linear) & (linear)   & vector size &              &                   &            \\
@@ -160,19 +198,19 @@ FIR        & 3 (1)   & 1(0)     & 0 (0)      & 256         & 3            & 1   
 \hline
 RateConvert& 5 (3)   & 2 (1)    & 0 (0)      & 102         & 4            & 1                 & 0 \\
 \hline
-TargetDetect& 10 (4) & 6 (0)    & 1 (0)      & 300         & 7            & 2                 & 1 \\
+TargetDetect& 10 (4) & 6 (0)    & 1 (0)      & 300         & 7            & 1                 & 1 \\
 \hline
 FMRadio    & 26 (22) & 11 (9)   & 2 (2)      & 40          & 5            & 1                 & 0 \\
 \hline
-Radar      & 76 (60) & 17 (0)   & 2 (0)      & 4412        & 21           & 1                 & 2 \\
+Radar      & 76 (60) & 17 (0)   & 2 (0)      & 4412        & 38           & 17                & 2 \\
 \hline
-FilterBank & 27 (24) & 17 (9)   & 4 (4)      & 52          & 10           & 1                 & 2 \\
+FilterBank & 27 (24) & 17 (9)   & 4 (4)      & 52          & 3            & 1                 & 0 \\
 \hline
-Vocoder    & 17 (13) & 10 (8)   & 2 (1)      & 60          & 7            & 2                 & 1 \\
+Vocoder    & 17 (13) & 10 (8)   & 2 (1)      & 60          & 6            & 2                 & 1 \\
 \hline
 Oversampler& 10 (8) & 1 (1)     & 0 (0)      & 33          & 3            & 1                 & 0 \\
 \hline
-DToA       & 14 (10) & 3 (1)    & 0 (0)      & 52          & 6            & 2                 & 0 \\
+DToA       & 14 (10) & 3 (1)    & 0 (0)      & 52          & 7            & 2                 & 0 \\
 \hline
 
 \end{tabular}
