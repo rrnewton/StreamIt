@@ -4,8 +4,22 @@
 There is a large body of literature on scheduling synchronous dataflow
 (SDF) graphs to optimize various
 metrics~\cite{bhattacharyya99synthesis,leesdf}.  The work most closely
-related to ours is a recent study by Kohli~\cite{kohli04} on cache-aware
-scheduling of SDF graphs.
+related to ours is a recent study by Kohli~\cite{kohli04} on
+cache-aware scheduling of SDF graphs, implemented as part of the
+Ptolemy framework for simulating heterogeneous embedded
+systems~\cite{ptolemy03overview}.  Kohli develops a Cache-Aware
+Scheduling (CAS) heuristic for an embedded target with a
+software-managed scratchpad instruction cache.  His algorithm greedily
+decides how many times to execute a given actor based on estimates of
+the data cache and instruction cache penalties associated with
+switching to the next actor.  In contrast, our algorithm considers the
+buffering requirements of all filters in a given container and
+increases the multiplicity so long as 90\% of buffers are contained
+within the data cache.  Kohli does not consider buffer management
+strategies, and the evaluation is limited to one 6-filter pipeline and
+an assortment of random SDF graphs.  An empirical comparison of our
+heuristics on a common architectural target would be an interesting
+direction for future work.
 
 It is recognized that there is a tradeoff between code size and buffer
 size when determining an SDF schedule.  Most techniques to date have
