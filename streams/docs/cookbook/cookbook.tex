@@ -4,11 +4,13 @@
 \usepackage{graphicx}
 \usepackage[sf,bf]{streamit}
 \usepackage{url}
+\usepackage{hyperref}
 
 \title{StreamIt Cookbook}
 \author{David Maze\\\texttt{dmaze@cag.lcs.mit.edu}}
 
 % Make a parbox, and put some text to the right of it.
+%BEGIN LATEX
 \newsavebox\thepic
 \newlength\boxlen
 \newenvironment{textpic}[1]{\savebox\thepic{#1}%
@@ -16,6 +18,7 @@
   \addtolength\boxlen{-\wd\thepic}
   \minipage[c]{\boxlen}}{\endminipage%
   \parbox[c]{\wd\thepic}{\usebox\thepic}}
+%END LATEX
 
 \begin{document}
 \maketitle
