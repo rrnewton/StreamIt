@@ -44,8 +44,8 @@ language~\cite{streamitcc}, a high-level stream language that aims to
 be portable across communication-exposed machines.  StreamIt contains
 basic constructs that expose the parallelism and communication of
 streaming applications without depending on the topology or
-granularity of the underlying architecture.  Our previous work,
-\cite{streamit-asplos}, has focused on 
+granularity of the underlying architecture.  Our previous work
+\cite{streamit-asplos} has focused on 
 implementing a {\it space-multiplexing} (see below) backend for
 MIT's Raw architecture \cite{raw}, a tiled architecture 
 with fine-grained, programmable communication between processors.
@@ -78,7 +78,7 @@ utilization would depend on the presence of data-parallel filters that
 could be spread across the chip.
 
 A second approach would be to run all the filters in parallel, each on
-its own tile.  We call this {\it space multiplexing}.  Our first 
+its own tile.  This is termed {\it space multiplexing}.  Our first 
 StreamIt compiler for Raw uses this technique.  Space multiplexing
 affords no filter swapping overhead, reduced memory traffic,
 localized communication, and tighter latencies.  Due to these
@@ -117,9 +117,11 @@ aggressive code generation results in optimal usage of the tiles
 for each piece.
 
 \begin{figure}[tbh]
+	\vspace{-.2in}
   \centerline{\includegraphics[width=3.0in]{mgordon_figure1.pdf}}
-  \caption{The Stream Graph for the Channel Vocoder.  The ovals
-represent filters and the arrows are the arcs.}
+	\vspace{-.1in}
+  \caption{The Stream Graph for the Channel Vocoder.}
+	\vspace{-.2in}
   \label{streamgraph}
 \end{figure}
 
