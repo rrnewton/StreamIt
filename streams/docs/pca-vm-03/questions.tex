@@ -2,14 +2,13 @@
 
 \begin{enumerate}
 
-\item Is the hardware model for virtual channels realistic?
+\item Not clear what {\tt stream.length()} means if a stream object is
+written to by multiple graphs, or especially if it's being
+over-written while being read.
 
-\item Is the {\tt ostream.of()} (output full) method really needed?
+\item Is the hardware model for virtual channels realistic?
 
 \item Need to specify the exact function calls for retrieving graph
 structure of metadata description.
-
-\item Could improve precision of draining semantics when kernel has a
-mixture of static and dynamic rates.
 
 \end{enumerate}

@@ -34,9 +34,6 @@ proposal appears in Figure~\ref{fig:archdiff}.
 
 \item {\bf Architecture description is a graph rather than a tree.}
 
-\item {\bf Memory nodes are simplified.}  There is only one type of
-memory, with much fewer properties.
-
 \item {\bf Network properties are expressed pairwise,} as edges
 between nodes, instead of as an interface at the nodes themselves.
 
@@ -73,14 +70,14 @@ proposal: \\
 
   \entry{VM\_PROP\_PROC\_SIMD} {int32 - SIMD/Vector speedup factor.}
     {The amount by which the processor will speed up (over that
-    specified by the ILP property) if the input is data parallel.}
+    specified by the ILP property) if the computation is data parallel.}
 
   \entry{VM\_PROP\_PROC\_REGS} {int32 - Number of registers} {The
     number of registers on the processor (possibly to include
     scratchpad or cache space?)}
 
-  \entry{VM\_PROP\_PROC\_IMEM} {int32 - Number of RISC ops} {The size
-    of the instruction memory.}
+  \entry{VM\_PROP\_PROC\_IMEM} {VM\_NODE\_TYPE\_MEM} {The instruction
+    memory node for this processor.}
 
 }
 
@@ -151,24 +148,7 @@ As before.
 
 \subsection{Memory Nodes}
 
-We propose greatly simplifying the representation of memory resources.
-Our simplifications are as follows:
-
-\begin{itemize}
-
-\item There is only one type of memory.
-
-\item There are only three memory properties: size, latency, and
-bandwidth (as defined by the previous proposal).
-
-\item Nodes for caches and instruction memory are omitted from the
-graph.  Thus, the graph contains only data memory nodes (including
-SRF's).
-
-\end{itemize}
-
-For the retained memory properties, the configuration settings are as
-before.  The memory node statistics are also unchanged.
+As before.
 
 \subsection{Edges}
 
@@ -210,11 +190,11 @@ Each edge in the architectural graph has the following properties: \\
   {The minimum number of words that must be sent at once to fully
   utilize the bandwidth.}
 
-  \entry{VM\_PROP\_CHAN\_WINDOW\_SIZE} {int32 - Number of words} {The
-  maximum number of words that can be in flight before the sender
+  \entry{VM\_PROP\_CHAN\_OUTPUT\_WINDOW} {int32 - Number of words}
+  {The maximum number of words that can be in flight before the sender
   blocks.}
 
-  \entry{VM\_PROP\_CHAN\_VISIBLE\_RANGE} {int32 - Number of words}
+  \entry{VM\_PROP\_CHAN\_INPUT\_WINDOW} {int32 - Number of words}
   {The maximum number of words that the receiver can see for
   out-of-order access (i.e., the maximum peek amount at receiver.)}
 
