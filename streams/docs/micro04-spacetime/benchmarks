@@ -1,0 +1,55 @@
+I looked at the benchmarks and made a table of some possible parameter
+changes.  I think 6 is actually a more natural number than 4 for all
+of them.  If we can get the scripts working, we should have no
+problems gathering numbers.
+
+If this looks ok to you, I can start implementing the versions.
+
+-Bill
+
+----------------------------------------------------
+
+beamformer
+   numChannels	numSamples	numBeams
+1. 12		1024		4
+2. 12		256		4
+3. 8		1024		4
+4. 8		256		4
+5. 8		1024		2
+6. 8		256		2
+
+filterbank
+   M (currently "3")	numTaps (currently "100", appears in 2 places)
+1. 2			128
+2. 4			128
+3. 8			128
+4. 2			256
+5. 4			256
+6. 8			256
+
+fm
+    bands                numberOfTaps (currently "64", multiple places)
+1. 4                    64
+2. 6                    64
+3. 8                    64
+4. 4                    128
+5. 6                    128
+6. 8			128
+
+fft	
+	N
+1.	32
+2.	64
+3.	128
+4.	256
+5.	512
+6.	1024
+
+channelvocoder
+	numTaps (currently "64")	N (# filters in VocoderFilterBank)
+1. 	64				4
+2. 	64				8
+3. 	64				12
+4. 	128				4
+5. 	128				8
+6. 	128				12
