@@ -23,26 +23,41 @@
 #include "VrFMDemodulator.h"
 #include "VrTestSource.h"
 #include "VrFloatSink.h"
+#include "VrDuplicateSplitter.h"
+#include "VrRoundRobinJoiner.h"
+#include "VrSimpleFilterSplit.h"
+#include "VrSimpleFilterJoin.h"
+
+#include "VrFloatSubtract.h"
+#include "VrFloatAdder.h"
 
 int main(void) {
-  
+
   // Create Modules
   VrTestSource* source = new VrTestSource();
-  VrFloatSink* sink = new VrFloatSink();
+  VrFloatSink* sink = new VrFloatSink(6);
+  
+  VrSimpleFilterSplit<float, float>* f1 = new VrSimpleFilterSplit<float, float>(3, 1);
+  VrSimpleFilter<float, float>* f2 = new VrSimpleFilter<float, float>(2);
+  VrSimpleFilter<float, float>* f3 = new VrSimpleFilter<float, float>(3);
+  VrSimpleFilter<float, float>* f4 = new VrSimpleFilter<float, float>(4); 
+  VrSimpleFilterJoin<float, float>* f5 = new VrSimpleFilterJoin<float, float>(3, 5); 
+ 
+  
+  CONNECT(sink, f5, 1, 32);
+  CONNECT(f5, f4, 1, 32);
+  CONNECT(f5, f3, 1, 32);
+  CONNECT(f5, f2, 1, 32);
+  CONNECTN(f4, f1, 2, 1, 32);
+  CONNECTN(f3, f1, 1, 1, 32);
+  CONNECTN(f2, f1, 0, 1, 32);
+  CONNECT(f1, source, 1, 32);
 
-  VrLowPassFilter* lowpass = new VrLowPassFilter(200000, 108000000, 100, 4);
-  VrFMDemodulator* FMDemod = new VrFMDemodulator(200000, 27000, 10000);
-
-  CONNECT(sink, FMDemod, 1, 32);
-  CONNECT(FMDemod, lowpass, 1, 32);
-  CONNECT(lowpass, source, 1, 32);
 
   // Start System
   sink->setup();
   sink->start(-1);
 }
-
-
 
 
 
