@@ -36,7 +36,7 @@ have a large impact on performance.  As alluded to in
 Section~\ref{sec:combine}, linear combination can increase the number
 of arithmetic operations required, {\it e.g.} if combining a
 two-element pipeline where the second filter pushes more items than it
-peeks.  However, such a combination could be justified if it enables
+peeks.  However, such a combination might be justified if it enables
 further combination with other components and leads to a benefit
 overall.  Another consideration is that as the pop rate grows,
 the benefit of converting to frequency diminishes; thus, excessive combination
@@ -57,7 +57,8 @@ of the FFT on the input items (see Figure~\ref{fig:targetgraph}).
 
 \subsection{Dynamic Programming Solution}
 
-Our optimization selection algorithm, shown in Figure~\ref{fig:part-alg}
+Our optimization selection algorithm, shown in Figures~\ref{fig:part-alg} 
+and \ref{fig:part-decl}
 automatically derives both of the example transformations described above.  
 The algorithm works by estimating the minimum cost for each structure 
 in the stream graph. The minimum cost represents the best
@@ -86,8 +87,9 @@ decomposed and evaluated, there are overlapping sub-problems that
 enable us to search the space of child configurations in polynomial
 time, using dynamic programming.
 
-Pseudocode for our optimization selection algorithm appears in
-Figures~\ref{fig:part-alg} and~\ref{fig:part-decl}.  The algorithm
+%Pseudocode for our optimization selection algorithm appears in
+%Figures~\ref{fig:part-alg} and~\ref{fig:part-decl}.  
+The algorithm
 works as described above, using the {\tt memoTable} array to keep
 track of the lowest-cost configuration for each rectangular section of
 a hierarchical stream.  An important aspect of the algorithm that is
