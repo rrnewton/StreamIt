@@ -5,9 +5,10 @@ The CAG group has a bunch of Linux machines where StreamIt development
 occurs on. You can probably set up a local development environment but
 that is your own problem. The machines are named {\tt
 cagfarm-01.lcs.mit.edu} to {\tt cagfarm-49.lcs.mit.edu}. For StreamIt
-development, it is probably best to use numbers 40-49, as these are
-fast dual-processor machines.  Next best are cagfarms 20-39, and then
-cagfarms 01-19.
+development, it is probably best to use numbers 27-49, as these are
+fast dual-processor machines.  Next best are cagfarms 11-26, which are
+slower dual-processor machines.  Cagfarms 01-10 are used for a
+job-queueing system.
 
 All the cagfarm's are accessible via ssh and they run X so you can
 forward X packets and run an X server on your local machine if you so
@@ -45,14 +46,13 @@ Section~\ref{sec:checkout}. Then you can use {\tt
 streams/include/dot-cshrc} by putting the following command in your
 {\tt .cscrc}
 \begin{verbatim}
-source $\STREAMIT_HOME}/include/dot-cshrc
+source ${STREAMIT_HOME}/include/dot-cshrc
 \end{verbatim}
 
 \noindent or by putting the following command in your {\tt .bashrc}
 
 \begin{verbatim}
 . $STREAMIT_HOME/include/dot-bashrc
-export STREAMIT_HOME
 \end{verbatim}
 
 \subsubsection{Example section of {\tt .cshrc}}
@@ -63,10 +63,6 @@ source ${STREAMIT_HOME}/include/dot-cshrc
 
 ## cvsroot for streams stuff
 setenv CVSROOT /projects/raw/cvsroot
-
-## for dot
-setenv LEFTYPATH /u/diego/bin/gv1.7c/lib/lefty/
-
 \end{verbatim}
 
 
@@ -97,7 +93,7 @@ Here's how to set up eclipse:
 This is the release build from November.  To run it with your own
 workspace, issue this command from the above directory:
 
-\noindent {\tt ./eclipse -data \~/workspace}
+\noindent {\tt ./eclipse -data \~{}/workspace}
 
 We've found that you actually have to be in the eclipse directory when
 you give this command, otherwise it dies.  Also if you try to run
@@ -107,7 +103,7 @@ on the default workspace directory.)
 If you'd prefer to run a more recent and/or less stable build of
 eclipse, please put it in 
 
-\noindent {\tt /home/bits7/NO\_BACUP/streamit} 
+\noindent {\tt /home/bits7/NO\_BACKUP/streamit} 
 
 \noindent and notify the group so that we can share.
 
@@ -134,11 +130,12 @@ auto-detect classes.
 filter'', then ``Edit'', ``Add'', and enter ``cplex/*''.  Then ok.
 
 \item ``Add folder'' library/java.
-
+  
 \item Go to Libraries tab, click ``add external jar's''.  Add your
-    {\tt \$STREAMIT\_HOME/compiler/3rdparty/cplex/cplex.jar}.  (Don't
-    literally use {\tt "\$STREAMIT\_HOME"}, but replace with your
-    value.)
+  {\tt \$STREAMIT\_HOME/compiler/3rdparty\slash{}cplex/cplex.jar}.
+  % That \slash can break the line.
+  (Don't literally use {\tt "\$STREAMIT\_HOME"}, but replace with your
+  value.)
 
 \item Add another ``external jar'' to point to {\tt
 /usr/uns/java/antlr.jar}
@@ -178,13 +175,10 @@ list of the load on cagfarm machines.
 
 \paragraph{dot}
 \label{sec:dot}
-{\tt dot} is a useful graph making tool. For some reason, most of us use
-the version of dot installed in {\tt /u/diego}. To use that install
-of dot, you need to add {\tt /u/diego/bin} to your path and set
-the LEFTYPATH environment variable to {\tt /u/diego/bin/gv1.7c/lib/lefty/}
-Once {\tt dot}
-has been installed, you can convert {\tt .dot} files into {\tt .ps}
-files by using the command {\tt dot -Tps filename.dot > filename.ps}.
+{\tt dot} is a useful graph making tool. You can convert {\tt .dot}
+files into {\tt .ps} files by using the command {\tt dot -Tps
+  filename.dot > filename.ps}, and then view the resulting file by
+running {\tt gv filename.ps}.
 
 \paragraph{.forward}
 Mail typically gets sent to you at your account at {\tt cag.lcs.mit.edu}. 
@@ -207,27 +201,28 @@ If you want to have files available via the web on the cagfarms, make
 a directory called {\tt public\_html} in your home directory. The contents
 of this directory are available at the website \\
 \begin{verbatim}
-http://cag.lcs.mit.edu/\~username
+http://cag.lcs.mit.edu/~username
 \end{verbatim}
  where (obviously) {\tt username} is your username.
 
 \paragraph{Filesystems}
 There are several filesystems for use if you need to store large
-files.  {\tt /home/bits6/} and {\tt home/bits7} are good
-locations. They are automounted, so to use one, you should go to {\tt
-home/bits6} and make a temp directory and just go wild.  If you're not
-storing sensitive data, use the {\tt /home/bits6/NO\_BACKUP} or {\tt
-/home/bits7/NO\_BACKUP} directory to help with storage space.
+files.  {\tt /home/bits6/} and {\tt home/bits7} are good locations.
+They are automounted, so to use one, you should go to {\tt
+  home/bits6}, make a directory for your usename, and just go wild.
+If you're not storing sensitive data, use the {\tt
+  /home/bits6\slash{}NO\_BACKUP} or {\tt /home/bits7/NO\_BACKUP}
+directory to help with storage space.
 
 \paragraph{Access via Windows}
 If you want access to the cag filesystems via windows
 (which is very convenient) you can use
 \begin{verbatim}
-\\catfish\u\username
+\\cag-server\cag\u\username
 \end{verbatim}
 to get at your home directory and 
 \begin{verbatim}
-\\catfish\home\bits6
+\\cag-server\cag\home\bits6
 \end{verbatim}
  to get at {\tt home/bits6}, etc.
 
