@@ -1,0 +1,566 @@
+\section{Details of Calculating Minimal Steady States}
+\label{apx:eqs}
+
+This appendix presents equations used for calculating minimal
+steady states.  Minimal steady states are calculated recursively
+in a hierarchical manner. That is, a minimal steady state is
+calculated for all children streams of {\pipeline}, {\splitjoin}
+and {\feedbackloop}, and then the schedule is computed for the
+actual parent stream using these minimal states as atomic
+executions. This yields a minimal steady state because all child
+streams must execute their steady states (to avoid buffering
+changes), and all steady states are multiples of the minimal
+steady states (per Theorem \ref{thm:multiplicity}).  Executing a
+full steady state of a stream is referred to as ``executing a
+stream.''
+
+\begin{figure}
+\begin{center}
+
+\begin{minipage}{1.5in}
+\centering \psfig{figure=pipeline-steady-state.eps,width=0.6in} \\
+{\protect\small (a) A sample {\pipeline}}
+\end{minipage}
+~
+\begin{minipage}{1.5in}
+\centering \psfig{figure=splitjoin-steady-state.eps,width=1.2in} \\
+{\protect\small (b) A sample {\splitjoin}}
+\end{minipage}
+~
+\begin{minipage}{2in}
+\centering \psfig{figure=feedback-steady-state.eps,width=1.0in} \\
+{\protect\small (c) A sample {\feedbackloop}.  The $L$ {\filter}
+has been flipped upside-down for clarity.\\$peek_L = pop_L = 5,
+push_L = 6$}
+\end{minipage}
+
+\caption{Sample {\StreamIt} streams. Except for the \pipeline,
+these are identical to streams in Figure \ref{fig:steady-state}}
+\label{fig:app:steady-state}
+
+\end{center}
+\end{figure}
+
+\subsection{\filter}
+
+Since {\filters} do not have any internal buffering, their minimal
+steady state is to execute the {\filter}'s {\work} function once.
+This is the smallest amount of execution a {\filter} can have.
+
+Thus, for a {\filter} $f$,
+
+\begin{displaymath}
+S_f = \left\{[1], \{f\}, { \left[
+\begin{array}{c}e_f\\o_f\\u_f
+\end{array}
+\right]}, [] \right\}
+\end{displaymath}
+
+Notice that $S_{f,v}$ is empty, because a {\filter} does not have
+any children.
+
+\subsection{\pipeline}
+
+Let the {\pipeline} $p$ have $n$ children and let $p_i$ denote the
+$i$th child of the {\pipeline} (counting from {\Input} to
+{\Output}, starting with 0, the children may be streams, not
+necessarily {\filters}). We must find $S_p$.
+
+We start with calculating all $S_{p_i}, i \in \{0, \dots, n-1\}$.
+This task is achieved recursively.
+
+Next we find a fractional vector $v''$ such that executing each
+$p_i$ $v_i''$ times will not change the amount of data buffered in
+the {\pipeline} and the first child is executed exactly once.
+Since the children streams are executed fractional amount of
+times, we calculate the amount of data they produce and consume
+during this execution by multiplying $S_{p_i,c_o}$ and
+$S_{p_i,c_u}$ by $v_i''$. Thus $v''$ must have the following
+property
+
+\begin{displaymath}
+v_0'' = 1, \forall i \in \{0,\dots,n-2\}, v_i'' * u_{p_i} =
+v_{i+1}'' * o_{p_{i+1}}
+\end{displaymath}
+
+We compute $v''$ as follows.  The first child executes once, thus
+$v_0'' = 1$.  The second child must execute $v_1'' = {u_{p_0}
+\over {o_{p_1}}}$ times to ensure that all data pushed on the the
+first {{\Channel}} is consumed by the second child.  The third
+child must execute $v_2'' = v_1'' {u_{p_1} \over o_{p_2}} =
+{u_{p_0} \over o_{p_1}} {u_{p_1} \over o_{p_2}}$ times to ensure
+that it consumes all the data produced by the second child. Thus,
+
+\begin{displaymath}
+\forall i \in \{1,\dots,n-1\}\ v_i'' = {\prod_{j = 0}^{i-1}
+u_{p_j} \over \prod_{j=1}^i o_{p_j}}
+\end{displaymath}
+
+Next we will find an integral vector $v'$ such that executing each
+$p_i$ $v_i'$ times will not change the amount of data buffered in
+the {\pipeline}.  $v'$ will be a valid steady state of the
+{\pipeline}.
+
+In order to calculate $v'$ we multiply $v''$ by $\prod_{j=1}^{n-1}
+o_{p_j}$.  Thus
+
+\begin{displaymath}
+v'_i = \left({\prod_{j = 0}^{i-1} u_{p_j} \over \prod_{j=1}^i
+o_{p_j}} \right) \left(\prod_{j=1}^{n-1} o_{p_j} \right) = \left(
+\prod_{j=0}^{i-1} u_{p_j} \right) \left( \prod_{j=i+1}^{n-1}
+o_{p_j} \right)
+\end{displaymath}
+
+Now we find an integral vector $v$, such that, for some positive
+integer $g$, $v' = g * v$, and $\sum_i v_i$ is minimal.  In other
+words, we find the greatest integer $g$, such that $v' = g * v$,
+with $v$ consisting of integers.  $v$ represents the minimal
+steady state for pipeline $p$.
+
+This is achieved by finding the $\gcd$ of all elements in $v'$,
+and dividing $v'$ by $g$.  Thus
+
+\begin{displaymath}
+v = {v' \over \gcd(v'_0,\dots,v'_{n-1})}
+\end{displaymath}
+
+$v$ represents the number of times each child of $p$ will need to
+execute its steady state in order to execute the minimal steady
+state of $p$, thus $S_{p,v} = v$.  $v$ holds a steady state
+because amount of data buffered in $p$ does not change, and it is
+a minimal steady state, because $\sum_i v_i$ is minimal.
+
+We construct set $S_p$ as follows:\footnote{Here we use symbol
+$\circ$ to denote concatenation of vectors and sets.  Thus $[1\ 2\
+3] \circ [4\ 5\ 6] = [1\ 2\ 3\ 4\ 5\ 6]$ and $\{A\ B\ C\} \circ
+\{D\ E\ F\} = \{A\ B\ C\ D\ E\ F\}$.}
+
+\begin{displaymath}
+S_p = \left\{ \begin{array}{c} v_0 * S_{p_0,m} \circ \dots \circ
+v_{n-1}
+* S_{p_{n-1}, m}, S_{p_0, N} \circ \dots \circ S_{p_{n-1}, N}, \\
+\left[
+\begin{array}{c}
+e_{p_0} + (v_0 - 1) * o_{p_0} \\
+v_0 * o_{p_0} \\
+v_{n-1} * u_{p_{n-1}}
+\end{array}\right], v \end{array} \right\}
+\end{displaymath}
+
+An example is presented in Figure \ref{fig:app:steady-state} (a).
+For this {\pipeline}, we have the following steady states for all
+children of the {\pipeline}:
+
+\begin{displaymath}
+\begin{array}{lrlr}
+S_A = & \left\{[1], \{A\}, { \left[
+\begin{array}{c} 1 \\ 1 \\ 3
+\end{array}
+\right]}, [] \right\}, &
+
+S_B = & \left\{[1], \{B\}, { \left[
+\begin{array}{c} 3 \\ 2 \\ 3
+\end{array}
+\right]}, [] \right\} \\ \\
+
+S_C = & \left\{[1], \{D\}, { \left[
+\begin{array}{c} 2 \\ 2 \\ 1
+\end{array}
+\right]}, [] \right\}, &
+
+S_D = & \left\{[1], \{D\}, { \left[
+\begin{array}{c} 5 \\ 3 \\ 1
+\end{array}
+\right]}, [] \right\} \\
+
+\end{array}
+\end{displaymath}
+
+Using the steady states above, we get the following vector $v'$:
+
+\begin{displaymath}
+v' = \left[
+\begin{array}{c}
+(2 * 2 * 3)\\
+(3) (2 * 3) \\
+(3 * 3) (3) \\
+(3 * 3 * 1)
+\end{array}
+\right] = \left[
+\begin{array}{c}
+12\\ 18\\ 27\\ 9
+\end{array}
+\right]
+\end{displaymath}
+
+We now calculate $g = \gcd(v') = \gcd(12,18,27,9) = 3$.  We thus
+have
+
+\begin{displaymath}
+v = {v' \over 3} = {1 \over 3} \left[
+\begin{array}{c}
+12\\ 18\\ 27\\ 9
+\end{array}
+\right] = \left[
+\begin{array}{c}
+4\\ 6\\ 9\\ 3
+\end{array}
+\right]
+\end{displaymath}
+
+Finally, we construct $S_p$:
+
+\begin{displaymath}
+S_p = \left\{
+\begin{array}{c}
+4 S_{A,m} \circ 6 S_{B,m} \circ 9 S_{C,m} \circ 3
+S_{D,m}, S_{A,N} \circ S_{B,N} \circ S_{C,N} \circ S_{D,N} \\
+\left[
+\begin{array}{c}
+1 + (4-1) * 1 \\
+4 * 1 \\
+3 * 1
+\end{array}\right],
+\left[ \begin{array}{c} 4\\ 6\\ 9\\ 3 \end{array} \right]
+\end{array}
+\right\}
+\end{displaymath}
+
+\subsection{\splitjoin}
+
+Let the {\splitjoin} have $n$ children and let $sj_i$ denote the
+$i$th child of the {\splitjoin} (counting from left to right,
+starting with 0).  Let $sj_s$ and $sj_j$ denote the {\splitter}
+and the {\joiner} of the {\splitjoin}, respectively. Let $w_{s,i}$
+denote the number of items sent by the {\splitter} to $i$th child
+on {\splitter}'s every execution. Let $w_{j,i}$ denote the number
+of items consumed by the {\joiner} from the $i$th child on
+{\joiner}'s every execution.  We are computing $S_{sj}$.
+
+We start by calculating all $S_{sj_i}, i \in \{0, \dots, n-1\}$.
+
+Next we compute a fraction vector $v''$ and a fraction $a_j''$
+such that executing the {\splitter} exactly once, each child
+$sj_i$ $v_i''$ times and the {\joiner} $a_j''$ times does not
+change the amount of data buffered on any \Channel in the
+{\splitjoin}. Again, since $v''$ and $a_j''$ are fractions, we
+multiply the steady-state pop and push amounts by appropriate
+fractions to obtain the amount of data pushed and popped.  For
+convenience we define $a_s''$ to be the number of executions of
+the {\splitter} and set it to 1.
+
+\begin{comment}
+\begin{displaymath}
+v'', a_j'', a_s'' \ne 0, \forall i \in \{0,\dots,n-1\}, a_s'' *
+w_{s, i} = v_i'' * o_{sj_i}, v_i'' * u_{sj_i} = a_j'' * w_{j, i}
+\end{displaymath}
+\end{comment}
+
+We thus have that each child $sj_i$ must execute $v_i'' = {w_{s,i}
+\over o_{sj_i}}$ times. To compute the number of executions of the
+{\joiner}, $a_j''$, we select an arbitrary $k$th child ($0 \le k <
+n$) and have that the {\joiner} executes $a_j'' = {{w_{s,k} \over
+o_{s_k}}{u_{sj_k} \over w_{j,k}}}$ times.
+
+Next we compute integer vector $v'$ and integers $a_s$ and $a_j$
+such that executing the {\splitter} $a_s$ times, each child $sj_i$
+$v_i'$ times and the {\joiner} $a_j$ times still does not change
+the amount of data buffered on any \Channel in the {\splitjoin}.
+We do this by multiplying $a_s''$, $v''$ and $a_j''$ by $w_{j,k}
+\left(\prod_{r=0}^{n-1}o_{sj_r}\right)$. Thus we get
+
+\begin{displaymath}
+\begin{array}{rl}
+a_s' = & w_{j,k} \left(\prod_{r=0}^{n-1}o_{sj_r}\right) \\
+v_i' = & w_{j,k} \left(\prod_{r=0}^{n-1}o_{sj_r}\right) * {w_{s,i}
+\over o_{sj_i}} = w_{s,i} * w_{j_k} \left( \prod_{r=0}^{i-1}
+o_{s_r} \right) \left( \prod_{r=i+1}^{n-1} o_{s_r} \right)
+\\
+a_j' = & w_{j,k} \left(\prod_{r=0}^{n-1}o_{sj_r}\right) *
+{{w_{s,k} \over o_{s_k}}{u_{sj_k} \over w_{j,k}}} = w_{s,k} *
+u_{sj_k} * \left( \prod_{r=0}^{k-1} o_{s_r} \right)
+\left( \prod_{r=k+1}^{n-1} o_{s_r} \right) \\
+\end{array}
+\end{displaymath}
+
+Now we use $v'$, $a_s'$ and $a_j'$ to compute minimal steady state
+of the {\splitjoin}.  Since $v'$, $a_s'$ and $a_j'$ represent a
+steady state, they represent a strict multiple of the minimal
+steady state.  Thus we find the multiplier by computing $g$, the
+$\gcd$ of all elements in $v'$ and integers $a_s'$ and $a_j'$, and
+dividing $v'$, $a_s'$ and $a_j'$ by $g$.  We have that
+
+\begin{displaymath}
+\begin{array}{rl}
+g = & \gcd(v', a_s', a_j') \\
+v = & v' \over g \\
+a_s = &  a_s' \over g \\
+a_j = & a_j' \over g
+\end{array}
+\end{displaymath}
+
+Finally, we use $v$, $a_s$ and $a_j$ to construct $S_{sj}$:
+
+\begin{displaymath}
+S_{sj} = \left\{
+\begin{array}{c}
+v_0 * S_{sj_0,m} \circ \dots \circ v_{n-1} * S_{sj_{n-1}, m} \circ
+\left[\begin{array}{c}a_s\\a_j\end{array}\right] , \\
+S_{sj_0, N} \circ \dots \circ S_{sj_{n-1}, N} \circ \{sj_s,
+sj_j\},
+\\ \left[
+\begin{array}{c}
+n_s * o_{s} \\
+n_s * o_{s} \\
+n_j * u_{j} \\
+\end{array}\right], \\
+v \circ [a_s] \circ [a_j]
+\end{array}\right\}
+\end{displaymath}
+
+Figure \ref{fig:steady-stat}e (b) depicts a sample {\splitjoin}.
+The following are the steady states of the {\splitjoin}'s
+children: $$
+\begin{array}{lrlr} S_A = & \left\{[1], \{A\}, { \left[
+\begin{array}{c} 2 \\ 2 \\ 1
+\end{array}
+\right]}, [] \right\}, & S_B = & \left\{[1], \{B\}, { \left[
+\begin{array}{c} 3 \\ 2 \\ 6
+\end{array}
+\right]}, [] \right\}
+\end{array}
+$$ For this {\splitjoin}, we select $k = 0$ (we use the left-most child
+to compute $a_j'$).  We get the following $v'$, $a_s'$ and $a_j'$
+
+\begin{displaymath}
+\begin{array}{rl}
+v' = & \left[
+\begin{array}{c}
+2 * 2 (2)\\
+1 * 2 (2)
+\end{array}
+\right] = \left[
+\begin{array}{c}
+8 \\ 4
+\end{array}
+\right] \\
+a_s' = & 1 * 2 (2 * 2) = 8 \\
+a_j' = & 2 * 1 (2 * 2) = 8
+\end{array}
+\end{displaymath}
+
+Thus $\gcd(u', a_s', a_j') = \gcd(8,4,8,8) = 4$.  Now we obtain
+
+\begin{displaymath}
+\begin{array}{rl}
+v = & {v \over 4} = {1 \over 4} \left[
+\begin{array}{c}
+8 \\ 4
+\end{array}
+\right] =  \left[
+\begin{array}{c}
+2 \\ 1
+\end{array}
+\right]\\
+a_s = & {a_s' \over 4} = {8 \over 4} = 2 \\
+a_j' = & {a_j' \over 4} = {8 \over 4} = 2
+\end{array}
+\end{displaymath}
+
+Finally, we construct $S_{sj}$:
+
+\begin{displaymath}
+S_{sj} = \left\{
+\begin{array}{c}
+2 * S_{sj_0, m} \circ 1 * S_{sj_1, m} \circ \left[\begin{array}{c}2\\2\end{array}\right], \\
+S_{sj_0, N} \circ S_{sj_1, N} \circ \{sj_s, sj_j\}, \\
+\left[
+\begin{array}{c}
+2 * 3 \\ 2 * 3 \\ 2 * 4
+\end{array}
+\right], \left[
+\begin{array}{c}
+2 \\ 1 \\ 2 \\ 2
+\end{array}\right]
+\end{array} \right\}
+\end{displaymath}
+
+\begin{figure}\begin{center}
+\begin{minipage}{1in}
+\centering \psfig{figure=splitjoin-illegal.eps,width=2in}
+\end{minipage}
+\end{center}
+\caption{An illegal {\splitjoin}} \label{fig:splitjoin-illegal}
+\end{figure}
+
+It is important to note, that it is not always possible to compute
+a unique $v''$ for all possible {\splitjoins}. The reason is that
+unbalanced production/consumption ratios between different
+children of a {\splitjoin} can cause data to buffer up infinitely.
+
+\begin{definition}[Valid {\splitjoin}] A {\splitjoin} is valid
+{\emph iff} $\forall k, 0 \le k < n-1, o_{sj_k}, u_{sj_k},
+o_{sj_{k+1}}, u_{sj_{k+1}} \ne 0$ we have $a_{j,k}'' =
+a''_{j,k+1}$, using notation of $a_{j,k}''$ to indicate that $k$th
+child of the {\splitjoin} was used to compute the value of
+$a_j''$.
+\end{definition}
+
+An example of an illegal {\splitjoin} is depicted in Figure
+\ref{fig:splitjoin-illegal}.  The rates of throughput of data for
+the left child mean that for every execution of the {\splitter},
+the {\joiner} needs to be executed exactly once to drain all data
+entering the {\splitjoin}.  The rates of throughput of data for
+the right child mean that for every execution of the {\splitter},
+the {\joiner} needs to be executed exactly twice to drain all data
+entering the {\splitjoin}. That means that consumption of data by
+the {\joiner} will be relatively slower on the right side, causing
+data to buffer up. This means that the given {\splitjoin} does not
+have a steady state.
+
+If a {\splitjoin} is such that it does not have a steady state, it
+is considered an illegal {\splitjoin}.  It cannot be executed
+repeatedly without infinite buffering, so a practical target for
+{\StreamIt} cannot execute it.  The calculations presented here
+assume that the {\splitjoin} is legal.  In order to check if a
+given {\splitjoin} is legal, we test if selecting a different
+child for calculation of $a_j''$ yields a different $a_j''$. If it
+does, then the two paths tested have different
+production/consumption rates, and the {\splitjoin} does not have a
+steady state.
+
+\subsection{\feedbackloop}
+
+Let {\feedbackloop} $fl$ have children $B$ (the body child) and
+$L$ (the feedback loop child). Let the {\joiner} and the
+{\splitter} of the {\feedbackloop} be denoted $fl_j$ and $fl_s$.
+Let $w_{j,I}$ and $w_{j,L}$ denote the number of data items
+consumed by the {\joiner} from the {\Input} {{\Channel}} to the
+{\feedbackloop} and from $fl_L$, respectively.  Let $w_{s,O}$ and
+$w_{s,F}$ denote the number of data items pushed by the
+{\splitter} onto the {\feedbackloop}'s {\Input} {{\Channel}} and
+to $fl_L$ respectively.  We are computing $S_{fl}$.
+
+First we calculate $S_{B}$ and $S_{L}$.
+
+Now we compute a fractional vector $v'' = [a_B''\ a_L''\ a_s''\
+a_j'']$ such that executing the body child $a_B''$ times, the
+{\splitter} $a_s''$ times, the loop child $a_L''$ times and the
+{\joiner} $a_j''$ times will not change the amount of data
+buffered up in any \Channel in the {\feedbackloop}.  Thus
+
+\begin{displaymath}
+\begin{array}{rcl}
+a_B'' * u_B & = & a_s'' * o_s \\
+a_L'' * u_B & = & a_j'' * w_{j, L} \\
+a_s'' * w_{s, F} & = & a_L'' * o_B \\
+a_j'' * u_j & = & a_B'' * o_B \\
+\end{array}
+\end{displaymath}
+
+We begin with setting $a_j'' = 1$. $B$ needs to be executed $a_B''
+= u_j \over o_B$ times, the {\splitter} needs to be executed
+$a_s'' = {u_j \over o_B}{u_B \over o_s}$ times and $L$ needs to be
+executed $a_L'' = {u_j \over o_B}{u_B \over o_s}{w_{s,L} \over
+o_L}$ times. Furthermore, in order to assure that the
+{\feedbackloop} has a valid steady state, we continue going around
+the loop, the {\joiner} must require ${u_j \over o_B}{u_B \over
+o_s}{w_{s,L} \over o_L}{u_L \over w_{j,L}} = 1$.  If this
+condition is not satisfied, the {\feedbackloop} does not have a
+steady state. This is a necessary, but not a sufficient condition
+for a {\feedbackloop} to be valid.
+
+Next we compute an integer vector $v' = [a_B'\ a_L'\ a_s'\ a_j']$
+such that executing B $a_B'$ times, {\splitter} $a_s'$ times, L
+$a_L'$ times and {\joiner} $a_j'$ times will not change the amount
+of data buffered in the {\splitjoin}. We do this by multiplying
+$v''$ by $o_B * o_s * o_L$.
+
+\begin{displaymath}
+\begin{array}{rl}
+a_B' = & u_j * o_s * o_L \\
+a_L' = & u_j * u_B * w_{s,L} \\
+a_j = & o_B * o_s * o_L \\
+a_s = & u_j * u_B * o_L
+\end{array}
+\end{displaymath}
+
+We now use $v'$ to compute $v = [a_B\ a_L\ a_s\ a_j]$, a minimal
+steady state for the {\feedbackloop}.  We do this by finding an
+integer $g$, the $\gcd$ of all elements in $v'$ and computing $v =
+{v' \over g}$.
+
+Finally, we construct $S_{fj}$ as follows:
+
+\begin{displaymath}
+S_{fj} = \left\{
+\begin{array}{c}
+a_B * S_{B,m} \circ a_L * S_{L,m} \circ [a_s \ a_j], \\
+S_{B,N} \circ S_{L,N} \circ \{fl_s, fl_j\}, \\
+\left[\begin{array}{c}
+a_j * w_{j,I} \\
+a_j * w_{j,I} \\
+a_s * w_{s,O}
+\end{array} \right], v
+\end{array} \right\}
+\end{displaymath}
+
+Figure \ref{fig:app:steady-state}(c) depicts a sample
+{\feedbackloop}. The following are the steady states of the
+{\splitjoin}'s children:
+$$
+\begin{array}{lrlr} S_B = & \left\{[1], \{B\}, { \left[
+\begin{array}{c} 2 \\ 2 \\ 1
+\end{array}
+\right]}, [] \right\}, & S_L = & \left\{[1], \{L\}, { \left[
+\begin{array}{c} 5 \\ 5 \\ 6
+\end{array}
+\right]}, [] \right\}
+\end{array}
+$$ We compute $v'$ for this {\feedbackloop}:
+
+\begin{displaymath}
+v' = \left[
+\begin{array}{c}
+5 * 3 * 5 \\
+5 * 1 * 3 \\
+5 * 1 * 5 \\
+2 * 3 * 5
+\end{array}\right] = \left[
+\begin{array}{c}
+75 \\
+15 \\
+25 \\
+30
+\end{array}\right]
+\end{displaymath}
+
+Thus $g = \gcd(75,15,25,30) = 5$ and
+
+\begin{displaymath}
+v = {1 \over 5} \left[
+\begin{array}{c}
+15 \\
+3 \\
+5 \\
+6
+\end{array}\right]
+\end{displaymath}
+
+Finally, we construct $S_{fl}$
+
+\begin{displaymath}
+S_{fl} = \left\{
+\begin{array}{c}
+15 * S_{B, m} \circ 3 * S_{L, m} \circ [5\ 6], \\
+S_{B, N} \circ S_{L, N} \circ \{fl_s, fl_j\}, \\
+\left[
+\begin{array}{c}
+6 * 2 \\ 6 * 2 \\ 5 * 3
+\end{array}
+\right], \left[
+\begin{array}{c}
+15 \\ 3 \\ 5 \\ 6
+\end{array}\right]
+\end{array} \right\}
+\end{displaymath}
