@@ -1,4 +1,4 @@
-\documentstyle[psfig,lgrind]{article}
+\documentstyle[psfig,lgrind,wide]{article}
 \title{StreaMIT Intermediate Representation \\ Version 2.2}
 
 
@@ -327,51 +327,57 @@ type Karaoke
 
 \end{verbatim}
 
+\section{StreamSelect}
 
-\section{Basic Constructs}
-
-The stream representation is composed of a number of basic building
-blocks.  Though all of these components could be templated to deal with
-different types of data, for now we ignore typing issues and assume
-everything is of type {\tt int}.
-
-\subsection{Block}
-
-The {\em block} is the basic unit of a stream (see Figure 1.)  It has
-one input channel and one output channel, as well as a {\em step}
-function that performs a unit of computation.  The block's specification
-includes how many items it requires on its input channel to guarantee
-that it will execute one complete step, as well as the maximum number of
-items that it could produce on its output channel as a result of that
-step.  One of our first compiler analyses will be to automatically
-detect these input and output paremeters, although they could be
-user-declared at first.
-
-A block could be represented with the following syntax:
+StreamSelect allows us to switch configurations of the stream graph.
+The syntax is as follows:
 
 \begin{verbatim}
-Block sum_pairs {
-   // blocks can have private member fields that are visible only
-   // to the member functions of this block
-   int x, y;
+enum AudioType { Classical, Vocal, Heavy };
 
-   // the initialization function is called when the block is 
-   // instantiated.
-   init(int _x, int _y) {
-     x = _x;
-     y = _y;
-   }
-
-   // each step of this block will input at 
-   // most two items and output at most one
-   step (input 2, output 1) {
-     int i1, i2;
-     i1 = input(0);               // get newest item
-     i2 = input(1);               // get next item in channel
-     output(0) = i1 + i2;         // put sum in output channel
-   }
-}
+Init (AudioType preset, float volume)
+{
+  Microphone (1);
+  Pipe control
+  {
+    StreamSelect equalizer (preset)
+    {
+      case Classical:
+        FilterBass (0.5);
+        FilterTreble (1);
+      case Vocal:
+        // do nothing here - Vocal can be played on speaker as is...
+      case Heavy:
+        FilterBass (1.5);
+        FilterTreble (0.75);
+    }
+    Amplifier (volume);
+  }
+  Speaker (1);
+};
 \end{verbatim}
+
+There is a restriction on parameters allowed to control StreamSelect - they
+must all be constants computable at compile time.
+
+\section{Feedback}
+
+Some stream applications require feedback loops for data processing.
+Here we define a type that allows us to create feedback loops
+in our stream graph.
+
+A Feedback type uses two inputs and one output.  The first input
+is from the outside stream.  The second input is the feedback input.
+The last block of the Init function in a Feedback block defines
+the feedback filter.  [Finish this!]
+
+\section{StreamID}
+
+StreamID is an internal data type which allows for refering
+to filter blocks.  Data of StreamID type has an unusual restriction on its
+use, which is that every time a variable of StreamID type is being
+accessed, it should have exactly one reaching definition for all
+paths of the program.
 
 \begin{figure}[t]
 \centerline{\psfig{figure=block.ps}}
@@ -379,246 +385,7 @@ Block sum_pairs {
 \caption{\protect\small The block construct.}
 \end{figure}
 
-\subsection{Pipe}
-
-The pipeline construct is used to cascade single-input blocks (see
-Figure 2.)  Since it has one output and one input, a pipeline is a
-subclass of the Block type. Its syntax could be as follows:
-
-\begin{verbatim}
-Block my_pipe = pipe {
-  // member fields
-  int x, y;
-
-  // initialization function
-  init() {}
-
-  block_1();
-  block_2();
-  ...
-  block_n();
-}
-\end{verbatim}
-
-\begin{figure}[t]
-\centerline{\psfig{figure=pipe.ps}}
-\vspace{-24pt}
-\caption{\protect\small The pipe construct.}
-\end{figure}
-
-\subsection{Split-Join}
-
-The split-join construct is the only means of obtaining parallelism in
-our representation (see Figure 3.)  It consists of three parts: 1) a
-{\em splitter} that inputs from single channel and outputs to $n$
-channels (not necessarily all at once), 2) a {\em joiner} that inputs
-from $n$ channels (not necessarily all at once) and outputs to a single
-channel, and 3) $n$ 1-to-1 blocks in the middle.
-
-For now, we are only considering pre-defined splitters and joiners,
-though user-defined ones could follow.  The kinds we are considering
-are:
-
-\begin{enumerate}
-
-\item {\em Round-Robin (splitter/joiner)}.  The round-robin block gets
-(or puts) an item to each of the input (or output) channels in sequence.
-
-\item {\em Null (splitter/joiner)}.  The null block serves as a
-placeholder in constructs that do not require input from the splitter or
-do not pass any output to the joiner.
-
-\item {\em Duplicator (splitter)}.  The duplicator sends a copy of its
-input to each of the output channels.
-
-\end{enumerate}
-
-The split-join construct could be used with the following syntax:
-
-\begin{verbatim}
-// construct a split-join out of n parallel blocks with a duplicating
-// splitter and a round-robin joiner
-Block my_split = split-join (DUPLICATE, ROUND_ROBIN) {
-  block_1();
-  block_2();
-  ...
-  block_n();
-}
-\end{verbatim}
-
-\begin{figure}[t]
-\centerline{\psfig{figure=split-join.ps}}
-\vspace{-24pt}
-\caption{\protect\small The split-join construct.}
-\end{figure}
-
-\subsection{Feedback Loop}
-
-The feedback loop provides a structured way to introduce cylces into
-streams (see Figure 4.)  Given a block $B$ that comprises the body of
-the loop, this construct feeds the output from $B$ into the second input
-channel of a joiner $J$ at the head of the loop.  There is a buffer
-between $B$ and $J$ whose length can be specified; also, an initializer
-must be indicated to setup the contents of the buffer.
-
-The syntax of the looping construct could be as follows.  We haven't
-throught through the way to specify the custom joiner at the head of the
-loop.
-
-\begin{verbatim}
-// specify a loop with a CUSTOM_JOINER at the top, an instance of
-// my_pipe in the body, a buffer of size 10 and an instance of the 
-// loop initializer defined below
-Block my_loop = feedback_loop (CUSTOM_JOINER, my_pipe(), 10, my_init());
-
-// here we specify a loop initializer that sets all the contents of the
-// buffer to zero.
-LoopInitializer my_init {
-   // initializes the contents of the buffer to be zero.
-   do_work(int* buffer, int delay) {
-      for i = 1 to delay {
-         buffer(i) = 0;
-      }
-   }
-}
-
-\end{verbatim}
-
-\begin{figure}[t]
-\centerline{\psfig{figure=feedback.ps}}
-\caption{\protect\small The feedback-loop construct.}
-\end{figure}
-
-\section{Control Constructs}
-
-The building blocks above are all intended for steady-state processing
-of stream data.  There are also constructs for dynamic modification of
-stream components and for dynamic message passing between blocks.  
-
-A block can send a message from inside the body of its {\em step}
-function.  When a message is sent, the message travels up the hierarchy
-of block declarations until it reaches a {\em message ceiling} block
-that catches the given type of message (see below.)  The recipients of
-the message will be all blocks contained within the message ceiling that
-are listening for the given type of message.  However, the message will
-never appear in the data stream; rather, special handlers will be
-invoked in the target blocks.
-
-The block must instantiate a message, and indicate whether the message
-will be delivered directly to other blocks (DIRECT\_NOTIFICATION), or
-will be delivered through the data stream (STREAM\_NOTIFICATION).  In
-direct delivery, the message recipients will be notified in any order,
-whereas with stream notification, the message will enter the data stream
-and will be processed in the same order as other data items.  Thus, the
-syntax for sending messages could be as follows:
-
-\begin{verbatim}
-// this block sends a pre-defined StreamSelect message type, with
-// in-order notification of recipients
-Block sending_block {
-  step (input n, ouput m) {
-    ...
-    send(StreamSelect(``fm''), STREAM_NOTIFICATION);
-    ...
-  }
-}
-\end{verbatim}
-
-For receiving messages, we consider the following constructs:
-
-\subsection{Stream Select}
-
-The stream select construct is a mechanism for dynamically enabling and
-disabling stream components (see Figure 5.)  Unlike the composition
-constructs above, stream select is a {\em control} construct in that it
-listens for StreamSelect messages to dictate its behavior.  The
-construct has a pre-defined splitter and joiner, and requires $n$ input
-streams to select from.  At any given time, only one of these streams
-will be active, and all of the incoming data will be directed to the
-active stream.  The active stream can be toggled via StreamSelect
-messages that are tagged by the name of the active stream.
-
-We still have to work out the exact semantics of stream initialization
-when a new stream becomes active.  The syntax could be as follows:
-
-\begin{verbatim}
-// create a stream selector between fm and am streams that can be 
-// toggled by StreamSelect messages with tags ``fm'' and ``am'', respectively
-Block my_select = stream-select(fm_stream(), am_stream(), ``fm'', ``am'');
-\end{verbatim}
-
-\begin{figure}[t]
-\centerline{\psfig{figure=stream-select.ps}}
-\vspace{-24pt}
-\caption{\protect\small The stream-select construct.}
-\end{figure}
-
-\subsection{Message Ceiling}
-
-The message ceiling construct specifies the scope of given kinds of
-messages (see Figure 6.)  It is constructed from 1) a block, which is
-the stream enclosed by the ceiling, and 2) the message types that are
-caught by the ceiling.  Then, whenever any block under the ceiling
-throws a message of a recognized type, the message notification process
-is initiated for all sub-components.
-
-The syntax could be as follows:
-
-\begin{verbatim}
-// create a message ceiling over my_block for messages of type
-// StreamSelect and UserMessage1
-Block my_ceiling = message-ceiling(my_block(), StreamSelect, UserMessage1)
-\end{verbatim}
-
-\begin{figure}[t]
-\centerline{\psfig{figure=ceiling.ps}}
-\vspace{-24pt}
-\caption{\protect\small The message-ceiling construct.}
-\end{figure}
-
-\section{C++ Interface}
-
-It should be easy to design a scripting facility in C++ that will
-automatically generate the structures of our intermediate lanaguage.
-One method for doing this would be via ``descriptors'', which are
-immutable, composable descriptions of a stream instantiation.  The
-lowest-level descriptor requires specifying the type and primitive
-arguments (chars, ints, strings, etc.) to a constructor of that type,
-and higher-level descriptors are composed using the pipe, split-join,
-and feedback-loop constructs.  Then, a descriptor can be instantiated
-into a stream class that can then be executed.  The code fragment below
-follows this approach.
-
-Here are some nice aspects of using a scripting language to build up the
-representation like this:
-
-\begin{enumerate}
-
-\item Allows you to pass initialization information to a given instance
-of a type of block without allowing that instance to be named and used
-in other parts of the program.
-
-\item The descriptors are immutable, so it doesn't matter if you share
-them in different parts of a definition.  That is, you can reuse a
-descriptor as if it described a type, even though it describes a set of
-instances.
-
-\item Allows a good continuum between static and dynamic compilation (or
-just conservative static analysis.)  When all the descriptor
-construction can be analyzed, the stream object can be layed out at
-compile time; otherwise it can be done at runtime.  Also, we can check
-at compile time whether the construction is a semantically correct
-stream representation.
-
-\item When a stream is instantiated, it contains descriptions for all
-the low-level components, too.  So optimization can be as global and
-deep as desired.
-
-\item Easy debugging when you're building up your program as a string.
-
-\end{enumerate}
-
-Now for the code: \\ \\
+\section{old stuff}
 
 \begin{lgrind}
 \input{code.tex}
