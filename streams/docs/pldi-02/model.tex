@@ -245,7 +245,7 @@ expression for $sdep$:
 \mi{I_S}{O_{i,S}}(x) = x
 \end{align*}
 
-{\bf Weighted round robin splitter.}  Let us consider an $n$-way
+{\bf Round robin splitter.}  Let us consider an $n$-way
 splitter with weights $w_1 \dots w_n$.  Observe that if there are
 $n(O_{n,S})$ items on the $n$'th output tape, then the splitter must have
 executed $\floor{n(O_{n,S})}{w_n}$ complete cycles in distributing items
@@ -262,7 +262,7 @@ expression for $sdep$:
 \sum_{j=0}^{i-1}{w_j}
 \end{align*}
 
-{\bf Weighted round robin joiner.}  The reasoning is similar for an
+{\bf Round robin joiner.}  The reasoning is similar for an
 $n$-way joiner with weights $w_1 \dots w_n$.  Let us use $W$ to denote
 the sum of the weights: $W = \sum{i=1}^{n}{w_i}$.  If there are $x$
 items on the output tape $O_J$, then the joiner must have executed
@@ -289,10 +289,10 @@ every output tape $O_{i,S}$ of the splitter.  Finally, the minimum number
 of items appearing on the input tape $I_S$ of the splitter is the {\it
 maximum} of the item requirement from any output tape $O_{i,S}$.  By this
 reasoning, the $sdep$ function for a SplitJoin is as follows:
-\begin{align}
-\mi{I_S}{O_J}(x) &= MAX_{i \in [1,n]}(\mi{I_S}{O_{i,S}} \circ
+\begin{align*}
+&\mi{I_S}{O_J}(x) = \\ &~~~~~\fn{MAX}_{i \in [1,n]}(\mi{I_S}{O_{i,S}} \circ
 \mi{O_{i,S}}{I_{i,J}} \circ \mi{I_{i,J}}{O_J})(x)
-\end{align}
+\end{align*}
 
 \subsubsection{FeedbackLoops}
 \label{sec:timefl}
@@ -310,9 +310,9 @@ feedback joiner must fabricate its first $d$ input values, since no
 items have yet been pushed onto the loop tape $I_{2,FJ}$.  This means
 that there must be an offset of $d$ in the $sdep$ function, since the
 first $d$ items are direct inputs to the joiner instead of appearing
-as items on the input tape.  Using $J$ to denote a weighted round
-robin joiner as considered above, we thus have the following
-expression for the $sdep$ function across the feedback path:
+as items on the input tape.  Using $J$ to denote a round robin joiner
+as considered above, we thus have the following expression for the
+$sdep$ function across the feedback path:
 \begin{align*}
 \mi{I_{2,FJ}}{O_{FJ}}(x) = \mi{I_{2,J}}{O_J}(x) - d
 \end{align*}
@@ -440,15 +440,15 @@ program that is amenable to straightforward transformation techniques.
 \begin{figure}[t]
 \scriptsize
 \begin{align*}
-&Item = Real \\
-i~\in~&Index = N \\
+&Item = \mathcal{R} \\
+i~\in~&Index = \mathcal{N} \\
 g~\in~&IndexTransform = Index \ra Index \\
 t~\in~&Tape = Index \ra Item \\
-&Pop, Peek, Push = N \\ 
+&Pop, Peek, Push = \mathcal{N} \\ 
 f~\in~&WorkStatement = IndexTransform \ra (Tape \ra Item) \\ 
 &WorkFunction = WorkStatement^{+} \\
-S~\in~&SplitType = \{Duplicate, WeightedRR\} \\ 
-J~\in~&JoinType = \{WeightedRR\}
+S~\in~&SplitType = \{Duplicate, RoundRobin\} \\ 
+J~\in~&JoinType = \{RoundRobin\}
 \end{align*}
 \vspace{-18pt}
 \caption{Semantic domains that are shared between the intermediate and
@@ -585,7 +585,7 @@ $\mi{I_S}{O_{p(i),S}}(i_{local})$ for the input tape of the splitter:
 &{\cal S} [(SplitJoin~S~s_1~s_2~\dots~s_n~J)] = \la~g~t~i~.~ \\
 &(({\cal S}[s_{p(i)}])(\la~i_{local}~.~g(\mi{I_S}{O_{p(i),S}}(i_{local}))))(\mi{I_{p(i),J}}{O_J}(i))
 \end{align*}
-This completes our formulation of the transform algebra, as we have
+This completes our description of the transform algebra, as we have
 not yet formulated the valuation function for FeedbackLoops.  Given
 the valuation functions above, however, we express the meaning of any
 combination of Pipelines and SplitJoins as a mathematical

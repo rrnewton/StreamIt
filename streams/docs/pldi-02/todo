@@ -1,31 +1,19 @@
-things to do with paper:
-------------------------
-
-- note that push_A and pop_A have different tapes
+not going to happen:
+--------------------
 
 - do \mbox{ } around words in math.
 
-- remove most of the message-constrained scheduling in favor of something
-	that's honest but short.
-
----
-
-- change the "denotational semantics" heading so as not to attract
-	denotational semanticists
-
 - include picture of the equalizer in the intro?
-
-- be consistent about RoundRobin vs. Weighted Round Robin
 
 - be consistent about SplitJoin / split-join / split join / splitjoin,
 plus capitalization of all stream constructs.
 
 - modify the tape-labeling diagram to have $n$ streams in a parallel split-join
 
-- get correct typesetting for natural numbers N
+things to do with paper:
+------------------------
 
-- add note that the message delivery constraints sometimes specify a
-minimum buffer size, sometimes specify a maximum buffer size?
+- note that push_A and pop_A have different tapes
 
 things i'm not likely to do in paper
 ------------------------------------
@@ -37,24 +25,13 @@ just for the sake of making the explanation clearer (and defining the
 max function, so that other people can use it in other papers, and
 think about the concept even.)
 
-things to figure out / solve:
------------------------------
-
 *** Can we figure out the denotational semantics for a feedback loop?
 
 *** Can we show that fusion preserves the min function across its
 inputs?
 
-* Add the meaning of the whole program to the denotational semantics.
-
 - Add a figure for the feedback loop transformation?  The fusion
 transformation?
-
-- Eliminate round robin / weighted round robin (watchout for WeightedRR
-in model.tex, too) in favor of just "round robin" that is assumed to
-have some weights.
-
-- Introduce comma notation for O1_S => O_1,S, etc.
 
 - Improve the translation from the abstract syntax back to a work function
 
@@ -67,6 +44,11 @@ Should probably look at this and see if there's a way to fix it.
 - Also, message constraints are violated when things are empty, since
 if you require a certain amount of buffering between two filters, then
 there won't be that data until initialization time.  hmm.
+
+things to figure out / solve:
+-----------------------------
+
+* Add the meaning of the whole program to the denotational semantics.
 
 - Add this reference to VSIPL, the C comparison code for the PCA demo:
 

@@ -48,7 +48,7 @@ Let us denote the weights of the joiner $J$ by $w_1 \dots w_n$ with $W =
 \begin{align*}
 Merge[(S~s1~\dots&~sn~J)] = (Filter~push_{sc}~pop_{sc}~peek_{sc}~work_{sc}) \\
 where: {\bf push_{sc}} &= totalRounds * W \\
-       {\bf pop_{sc}} &= totalPop ~~~~~~~~~if~S~=~WeightedRR \\
+       {\bf pop_{sc}} &= totalPop ~~~~~~~~~if~S~=~RoundRobin \\
                 &= totalPop / n ~~~~~if~S~=~Duplicate \\
        {\bf peek_{sc}} &= MAX_{j \in [1,push_{sc}]}(shift_j(peek_{sj})) \\
        {\bf work_{sc}} &= f_{sc, 1} \dots f_{sc, push_{sc}} \\
