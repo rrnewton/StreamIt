@@ -10,7 +10,7 @@ eliminate redundant computations in linear sections of the stream
 graph, thereby allowing the programmer to write simple, modular
 filters and leaving the combination to the compiler.  In this section,
 we first describe a {\it linear expansion} operation that is needed to
-match the sizes of $A$ and $\vec{b}$ of different linear nodes and is
+match the sizes of $A$ and $\vec{b}$ for different linear nodes and is
 therefore an essential building block for the other combination
 techniques.  We then give rules for collapsing pipelines and
 splitjoins into linear nodes; we do not deal with feedbackloops as
@@ -18,18 +18,6 @@ they require a notion of ``linear state'', which we do not describe
 here.
 
 \subsection{Linear Expansion}
-
-\begin{figure}[t]
-\center
-\vspace{-12pt}
-\epsfxsize=3.2in
-\epsfbox{images/filter-expand.eps}
-\vspace{-12pt}
-\caption{Expanding a linear node to rates $(e', o', u')$.  }
-\label{fig:expanding-a-matrix}
-\makeline
-\vspace{-12pt}
-\end{figure}
 
 In StreamIt programs, the input and output rate of each filter in the
 stream graph is known at compile time.  The StreamIt compiler
@@ -104,8 +92,20 @@ $u'$-element row vector:
 \end{equation}
 \end{transformation}
 
+\begin{figure}[t]
+\center
+\vspace{-12pt}
+\epsfxsize=3.2in
+\epsfbox{images/filter-expand.eps}
+\vspace{-12pt}
+\caption{Expanding a linear node to rates $(e', o', u')$.  }
+\label{fig:expanding-a-matrix}
+\makeline
+\vspace{-12pt}
+\end{figure}
+
 The intuition behind linear expansion is straightforward (see
-Figure~\ref{fig:expanding-a-matrix}.)  Linear expansion aims to scale
+Figure~\ref{fig:expanding-a-matrix}).  Linear expansion aims to scale
 the peek, pop and push rates of a linear node while preserving the
 functional relationship between the values pushed and the values
 peeked on a given execution. To do this, we construct a new matrix
@@ -117,8 +117,8 @@ due to the end cases.  If the new push rate $u'$ is not a multiple of
 the old push rate $u$, then the last copy of $A$ includes only some of
 its columns.  Similarly, if the new peek rate $e'$ exceeds that which
 is needed by the diagonal of $A$s, then $A'$ needs to be padded with
-zero's at the top (since it peeks at some values without using them in
-the computation.)
+zeros at the top (since it peeks at some values without using them in
+the computation).
 
 Note that a sequence of executions of an expanded node $\lambda'$
 might not be equivalent to any sequence of executions of the original
@@ -187,7 +187,7 @@ which complicate the equations for the general case.  First, the
 dimensions of $A_1$ and $A_2$ must match for the matrix multiplication
 to be well-defined.  If $u_1 \ne e_2$, this will require constructing
 expanded nodes $\lambda_1^e$ and $\lambda_2^e$ in which the push and
-peek rates match (and thus $A_1^e$ and $A_2^e$ can be multiplied.)
+peek rates match (and thus $A_1^e$ and $A_2^e$ can be multiplied).
 
 The second complication is with regards to peeking.  If the downstream
 node $\lambda_2$ peeks at items which it does not consume ({\it i.e.},
@@ -235,15 +235,14 @@ Section~\ref{sec:partitioning}).
 \vspace{-14pt}
 \end{figure}
 
-Figure~\ref{fig:example-pipeline-combination} illustrates the 
-combination of back to back FIR filters. Since
-the push rate of the first filter, ($u_1=1$) is not the same as
-the peek rate of the second ($e_2=3$, the first filter
-must be expanded to $\lambda_1^e = \mt{expand}(\lambda_1,4,1,3)$.
-There is no need to expand the second filter so 
-$\lambda_2^e = \lambda_2$. By construction, we can now form the
-matrix product of $A_1^e$ and $A_2^e$ which corresponds to the
-overall linear node matrix.
+Figure~\ref{fig:example-pipeline-combination} illustrates the
+combination of back to back FIR filters. Since the push rate of the
+first filter ($u_1=1$) differs from the peek rate of the second
+($e_2=3$), the first filter must be expanded to $\lambda_1^e =
+\mt{expand}(\lambda_1,4,1,3)$.  There is no need to expand the second
+filter, so $\lambda_2^e = \lambda_2$. By construction, we can now form
+the matrix product of $A_1^e$ and $A_2^e$, which corresponds to the
+matrix for the overall linear node.
 
 \subsection{Collapsing Linear SplitJoins}
 
@@ -348,36 +347,37 @@ described above, $\lambda_k^e$ is the expansion of the $k$th node by
 a factor of $\mt{rep}_k$, with the peek value set to the maximum peek
 across all of the expanded children.  Following the expansion, each
 $\lambda_i^e$ has the same number of rows, as the peek uniformization
-caused shorter matrices to be padded with rows of zero's at the top.
+causes shorter matrices to be padded with rows of zeros at the top.
 
 \begin{figure}[t]
 \center
 \epsfxsize=3.2in
 \epsfbox{images/splitjoin-combination.eps}
-\caption{Matrix resulting from combining a splitjoin of rate matched sub streams.
+\vspace{-6pt}
+\caption{Matrix resulting from combining a splitjoin of rate-matched children.
 \protect\label{fig:splitjoin-duplicate-matrix}}
-\vspace{-4pt}
+\vspace{-2pt}
 \makeline
-\vspace{-18pt}
+\vspace{-14pt}
 \end{figure}
 
 The final phase of the transformation is to re-arrange the columns of
 the child matrices into the columns of $A'$ and $\vec{b}'$ such that
-the order of the columns of $A$ generates the correct output value
-order.  Though the equations are somewhat cumbersome, the concept is
-simple (see Figure~\ref{fig:splitjoin-duplicate-matrix}): for the
-$k$th child and the $m$th cycle of the joiner, the $p$th item that is
-pushed by child $k$ will appear at a certain location on the joiner's
-output tape.  This location (relative to the start of the node's
-execution) is $p + m * \mt{wSum}_n + \mt{wSum}_k$, as the reader can
-verify.  But since the right-most column of each array $A$ holds the
-formula to compute the first item pushed, we need to subtract this
-location from the width of $A$ when we are re-arranging the
-columns. The width of $A$ is the total number of items pushed---$u'$
-in the case of $A'$ and $u_k^e$ in the case of $A_k^e$.  Hence the
-equation as written above: we copy all items in a given column from
-$A_k^e$ to $A'$, defining each location in $A'$ exactly once.  The
-procedure for $\vec{b}$ is analogous.
+they generate the correct order of outputs.  Though the equations are
+somewhat cumbersome, the concept is simple (see
+Figure~\ref{fig:splitjoin-duplicate-matrix}): for the $k$th child and
+the $m$th cycle of the joiner, the $p$th item that is pushed by child
+$k$ will appear at a certain location on the joiner's output tape.
+This location (relative to the start of the node's execution) is $p +
+m * \mt{wSum}_n + \mt{wSum}_k$, as the reader can verify.  But since
+the right-most column of each array $A$ holds the formula to compute
+the first item pushed, we need to subtract this location from the
+width of $A$ when we are re-arranging the columns. The width of $A$ is
+the total number of items pushed---$u'$ in the case of $A'$ and
+$u_k^e$ in the case of $A_k^e$.  Hence the equation as written above:
+we copy all items in a given column from $A_k^e$ to $A'$, defining
+each location in $A'$ exactly once.  The procedure for $\vec{b}$ is
+analogous.
 
 It remains to calculate the peek, pop and push rates of the combined
 node.  The peek rate $e'$ is simply $maxPeek$, which we defined to be
@@ -391,7 +391,7 @@ expanded streams; otherwise, some outputs of the splitter would
 accumulate infinitely on the input channel of some stream.
 
 These input and output rates, in combination with the values of $A'$
-and $\vec{b}'$define a linear node that exactly represents the
+and $\vec{b}'$, define a linear node that exactly represents the
 parallel combination of child nodes that are fed by a duplicate
 splitter. Figure~\ref{fig:example-splitjoin-combination} provides an
 example of splitjoin combination.
@@ -443,7 +443,7 @@ are computed as follows:
 \multicolumn{3}{l}{\parbox{3in}{
     \begin{equation} \nonumber
       \begin{array}{l}
-      ~~~~\mt{decimate}[k] ~\mt{is a linear node}~ \{A, \vec 0, \mt{vTot}, \mt{vTot}, v_{k}\} \\
+      ~~~~\mt{decimate}[k] ~\mt{is a linear node}~ \{A, \vec 0, \mt{vTot}, \mt{vTot}, v_{k}\} \\ \vspace{-8pt} \\
 	~~~~~~~\mt{where}~A[i,j] = \left\{
 	\begin{array}{l}
 	  1 ~\mt{if}~ i=\mt{vTot}-\mt{vSum}_{k+1}+j \\
@@ -459,12 +459,12 @@ are computed as follows:
 
 In the above translation, we utilize the linear pipeline combinator
 $\mt{pipeline}$ to construct each new child node $\lambda_i^e$ as a
-composition of a decimator and the original node $\lambda_i$.  Each
-decimator is a square matrix that produces and consumes $\mt{vTot}$
-items, which is the number of items processed in one cycle of the
-roundrobin joiner.  Those items intended for stream $i$ are copied
-with a coefficient of $1$, while all others are eliminated with a
-coefficient of $0$.
+composition of a decimator and the original node $\lambda_i$.  The
+$k$th decimator consists of a $\mt{vTot} \times v_k$ matrix that
+consumes $\mt{vTot}$ items, which is the number of items processed in
+one cycle of the roundrobin splitter.  The $v_k$ items that are
+intended for stream $k$ are copied with a coefficient of $1$, while
+all others are eliminated with a coefficient of $0$.
 
 \begin{figure}[t]
 \center

@@ -23,9 +23,9 @@ notation):
 
 \vspace{-6pt}
 \item A $\mt{map}$ between each program variable $y$ and a linear form
-$\tup{\vec{v}}{c}$ where $\vec{v}[0 \cdots Peek]$ is a column vector 
-and $c$ is a scalar constant. In an actual execution, the value of $y$ would
-be given by $y = \vec{v} \cdot \vec{x} + c$, where $\vec{x}$ 
+$\tup{\vec{v}}{c}$ where $\vec{v}$ is a $Peek$-element column vector
+and $c$ is a scalar constant. In an actual execution, the value of $y$
+would be given by $y = \vec{v} \cdot \vec{x} + c$, where $\vec{x}$
 represents the input items.
 \vspace{-6pt}
 
@@ -39,8 +39,8 @@ $\vec{b}$ correspond to a given push statement.
 \vspace{-6pt}
 
 \item $\mt{popcount}$, which indicates how many items have been popped
-so far.  This is used to determine the row in $\vec{v}$ that a 
-given peek or pop expression refers to.
+so far.  This is used to determine the input item that a given peek or
+pop expression refers to.
 \vspace{-6pt}
 
 \end{itemize}
@@ -217,16 +217,16 @@ proc {\bf Extract}($code$, $map$, $A$, $\vec b$, int $\mt{popcount}$, int $\mt{p
 Next are the instructions which combine linear forms.  In the case of
 addition or subtraction, we simply add the components of the linear
 forms.  In the case of multiplication, the result is still a linear
-form if either of the terms is a known constant ({\it e.g.}
-$\vec{v}=\vec{0}$).  For division, the result is linear only if the
-divisor is a non-zero constant\footnote{{\small Note that if the
+form if either of the terms is a known constant ({\it i.e.,} a linear
+form $\tup{\vec 0}{c}$).  For division, the result is linear only if
+the divisor is a non-zero constant\footnote{{\small Note that if the
 dividend is zero and the divisor has a non-zero coefficients vector,
 we cannot conclude that the result is zero, since certain runtime
-inputs might cause a singularity.}} and for non-linear operations ({\it
-e.g.,} bit-level and boolean), both operands must be known constants.
-If any of these conditions are not met, then the LHS is assigned a
-value of $\top$, which will mark the filter as non-linear if the value
-is ever pushed.
+inputs might cause a singularity.}} and for non-linear operations
+({\it e.g.,} bit-level and boolean), both operands must be known
+constants.  If any of these conditions are not met, then the LHS is
+assigned a value of $\top$, which will mark the filter as non-linear
+if the value is ever pushed.
 
 The final set of instructions deal with control flow.  For loops, we
 resolve the bounds at compile time and execute the body an appropriate

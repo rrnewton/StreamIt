@@ -8,13 +8,13 @@ not always clear since a filter has state and can call external
 functions.
 
 However, we note that a large subset of DSP operations produce outputs
-that are some affine function of their input, and we call
-filters that implement such operations {\it linear}. Examples of such
-filters are finite impulse response (FIR) filters, compressors,
-expanders and signal processing transforms such as the discrete
-Fourier transform (DFT) and discrete cosine transformation (DCT).  Our
-formal definition of a linear node is as follows (refer to
-Figure~\ref{fig:overview-matrix} for an illustration). 
+that are some affine function of their input, and we call filters that
+implement such operations {\it linear}. Examples of such filters are
+finite impulse response (FIR) filters, compressors, expanders and
+signal processing transforms such as the discrete Fourier transform
+(DFT) and discrete cosine transformation (DCT).  Our formal definition
+of a linear node is as follows (refer to
+Figure~\ref{fig:linear-node-example} for an illustration).
 \vspace{-4pt}
 \begin{definition}(Linear node)
 A linear node $\lambda$ $=$ $\{A,$ $\vec{b},$ $e,$ $o,$ $u\}$
@@ -47,8 +47,8 @@ Finally, $o$ items are popped from the input tape.
 The intuition of the computation represented by a linear node is
 simply that specific columns generate specific outputs and specific
 rows correspond to using specific inputs.  The values found in row
-$e-1-i$ of $A$ ({\it i.e.} the $i$th row from the bottom) and 
-column $u-1-j$ of $A$ ({\it i.e.} the $j$th column from the right) 
+$e-1-i$ of $A$ ({\it i.e.,} the $i$th row from the bottom) and 
+column $u-1-j$ of $A$ ({\it i.e.,} the $j$th column from the right) 
 represents a term in the formula to compute the $j$th output item using 
 the value of peek($i$). The value in column $u-1-j$ of 
 $\vec{b}$ is a constant offset added to output $j$.

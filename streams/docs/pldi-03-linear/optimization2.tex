@@ -47,10 +47,10 @@ convolution of the input tape with the coefficients $A$.  The
 significance of this fact is that a convolution operation can be
 implemented very efficiently by using the Fast Fourier Transform (FFT)
 to translate into the frequency domain.  To compute the convolution,
-two $N$-point FFTs of $\vec{in}$ and $A[*,0]$ are calculated to obtain
-$\vec{X}$ and $\vec{\cal A}$, each of which is a complex-valued vector
-of length $N$.  Element-wise multiplication of $\vec X$ and
-$\vec{\cal A}$ yields a vector $\vec{Y}$, to which the inverse
+the $N$-point FFTs of $\vec{in}$ and $A[*,0]$ are calculated to obtain
+$\vec{{\cal I}}$ and $\vec{\cal A}$, each of which is a complex-valued
+vector of length $N$.  Element-wise multiplication of $\vec{\cal I}$
+and $\vec{\cal A}$ yields a vector $\vec{Y}$, to which the inverse
 transform (IFFT) is applied to obtain $\vec{y}$.  Convolution in the
 frequency domain requires $O(N \lg(N))$ operations, as each FFT and
 IFFT has a cost of $O(N \lg (N))$ and the vector multiplication is
@@ -75,25 +75,25 @@ can exactly represent any discrete sequence of $N$ numbers, so the
 only constraint on $N$ and $m$ is that $N \ge m+2e-1$.  For
 performance reasons, $N$ should be a power of two and as large as
 possible.  In our implementation, we set $N$ to the first power of two
-that is larger than $2e$, which strikes a reasonable compromise
-between storage space and performance for our uniprocessor
-benchmarking platform.  The choice of $N$ should be adjusted for the
-particular resource constraints of the target architecture.
+that is greater than or equal to $2e$, and then set $m = N-2e+1$.
+This strikes a reasonable compromise between storage space and
+performance for our uniprocessor benchmarking platform; the choice of
+$N$ should be adjusted for the particular resource constraints of the
+target architecture.
 
-The transformation below gives a {\naive} translation of a linear node to
-the frequency domain.  In addition, it relaxes all of the assumptions
-that we made above.  The algorithm allows for a non-zero value of
-${\vec b}$ by simply adding $\vec{b}$ after returning from the
-frequency domain.  To accommodate a push rate greater than one, the
-algorithm generates $\vec{Y}$ and $\vec{y}$ {\it matrices} and
+The transformation below gives a {\naive} translation of a linear node
+to the frequency domain.  In addition, it relaxes all of the
+assumptions that we made above.  The algorithm allows for a non-zero
+value of ${\vec b}$ by simply adding $\vec{b}$ after returning from
+the frequency domain.  To accommodate a push rate greater than one,
+the algorithm generates {\it matrices} for $\vec{Y}$ and $\vec{y}$ and
 alternates pushing values from each column of $\vec{y}$ in turn.
 Finally, to accommodate a pop rate greater than one, the algorithm
 proceeds as if the pop rate was one and adds a special decimator node
 that discards the extra outputs.  Though this introduces inefficiency
 by calculating values that are never used, it still leaves room for
-large performance improvements, as the frequency transformation
-improves performance by an average factor of 50 (in the case where
-$\mbox{pop}=1$.)
+large performance improvements, as the frequency transformation can
+improve performance by a large factor (see Section~\ref{sec:results}).
 
 \begin{transformation} ({\Naive} frequency implementation)
 Given a linear node $\lambda = \{A, {\vec b}, e, o, u\}$, the
@@ -113,7 +113,7 @@ frequency domain:
     ~~~~{\tt \}} \\
     \\
     ~~~~{\tt work}~{\tt peek}~m+e-1~{\tt pop}~m~{\tt push}~u*m~{\tt \{} \\
-    ~~~~~~\vec{x} \leftarrow {\tt peek}(0 \dots m+e-1 ) \\
+    ~~~~~~\vec{x} \leftarrow {\tt peek}(0 \dots m+e-2 ) \\
     ~~~~~~\vec{X} \leftarrow \mathbf{FFT} (N, \vec{x}) \\
     ~~~~~~{\tt for}~j=0~{\tt to}~u-1\\
     ~~~~~~~~\vec{Y}[*,j] \leftarrow \vec{X} .* \vec{H}[*,j] \\
@@ -140,7 +140,6 @@ frequency domain:
   \end{array}}
 \end{equation}
 \vspace{-6pt}
-\label{trans:freq1}
 \end{transformation}
 
 \subsection{Optimized Frequency Implementation}
@@ -148,15 +147,15 @@ frequency domain:
 The {\naive} frequency implementation discards $e-1$ elements from the
 beginning and end of each column of ${\vec y}$ that it computes.
 These values represent partial sums in which some of the coefficients
-of $A$ are excluded. However, for $i \in [0, e-1-1]$, ${\vec
+of $A$ are excluded. However, for $i \in [0, e-2]$, ${\vec
 y}\hspace{1pt}[i,j]$ in one iteration contains the missing terms from
 ${\vec y}\hspace{1pt}[m+e-1+i,j]$ in the previous iteration.  The sum
-gives the correct output value.  This symmetry arises from the
-convolution of $A$ ``off the edges'' of the input block that we
-consider in a given iteration. Reusing the partial sums---which is
-exploited in the transformation below---is one of several methods that
-use blocking to efficiently convolve a short filter with a large
-amount of input~\cite{oppenheim-discrete}.
+of these two elements gives a valid output for the filter.  This
+symmetry arises from the convolution of $A$ ``off the edges'' of the
+input block that we consider in a given iteration. Reusing the partial
+sums---which is exploited in the transformation below---is one of
+several methods that use blocking to efficiently convolve a short
+filter with a large amount of input~\cite{oppenheim-discrete}.
 %% Recall that $A$ is of length $e$ and the input tape is given in blocks
 %% of length $m$.  Then, consider element $m+i$ of the first execution.
 %% Following equation~\ref{eq:linconv}, we have:
@@ -171,7 +170,7 @@ amount of input~\cite{oppenheim-discrete}.
 %% iteration can peek at values in the range of $[m,2m-1]$, we have (by
 %% the same reasoning as above) that $k \in [$.
 
-\begin{transformation} \label{trans:freq1}
+\begin{transformation}
 (Optimized frequency implementation)
 Given a linear node $\lambda = \{A, {\vec b}, e, o, u\}$, the
 following stream is an optimized implementation of $\lambda$ in the
@@ -183,17 +182,8 @@ frequency domain:
     ~~{\tt add~float \rightarrow float~filter~\{}\\
     ~~~~N \leftarrow 2^{\lceil \lg(2e) \rceil} \\
     ~~~~m \leftarrow N-2e+1 \\
-    ~~~~\vec{partials} \leftarrow {\tt new~array}[0 \dots (e-1)-1, 0\dots u-1] \\
+    ~~~~\vec{partials} \leftarrow {\tt new~array}[0 \dots e-2, 0\dots u-1] \\
     ~~~~r \leftarrow m+e-1 \\
-\end{array}
-}
-\end{equation}
-\end{transformation}
-
-\begin{equation} \nonumber 
-\small{
-\begin{array}{ll}
-\vspace{-24pt}
     \\
     ~~~~{\tt init}~{\tt \{} \\
     ~~~~~~{\tt for}~j=0~{\tt to}~u-1\\
@@ -224,6 +214,7 @@ frequency domain:
     ~~~~~~~~{\tt for}~j=0~{\tt to}~u-1\\
     ~~~~~~~~~~{\tt push}(\vec{y}\hspace{1pt}[i,j] + \vec{partials}[i,j])\\
     ~~~~~~~~~~\vec{partials}[i,j] \leftarrow \vec{y}\hspace{1pt}[m+e-1+i,j]\\
+    ~~~~~~~~{\tt \}} \\
     ~~~~~~{\tt for}~i=0~{\tt to}~m-1\\
     ~~~~~~~~{\tt for}~j=0~{\tt to}~u-1\\
     ~~~~~~~~~~{\tt push}(\vec{y}\hspace{1pt}[i+e-1,j] + {\vec b}[j])\\
@@ -233,6 +224,7 @@ frequency domain:
     {\tt \}} \\
   \end{array}}
 \end{equation}
+\end{transformation}
 
 \subsection{Applications of Frequency Transformation}
 
