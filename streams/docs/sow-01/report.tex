@@ -1,0 +1,233 @@
+\documentclass[10pt]{article}
+\usepackage{oxygen2001}
+\usepackage{epsf}
+\usepackage{oxyapa}
+\usepackage{times}
+
+\begin{document} 
+
+\oxytitleblock{
+\oxytitle{The Representation of Streams in the StreaMIT Compiler}
+ 
+\oxyauthor{Bill Thies}{thies@lcs.mit.edu}
+\oxyauthor{Michal Karczmarek}{karczma@lcs.mit.edu}
+\oxyaddress{MIT-LCS Computer Architecture Group}
+}
+
+%\begin{abstract}
+%\end{abstract} 
+
+\section{Introduction}
+
+Applications that have a ``streaming'' structure are becoming
+increasingly prevalent, especially within small, mobile devices that
+provide the foundation for the pervasive computing environment
+envisioned by the Oxygen project.  Fundamentally, streaming programs
+differ from traditional ones in their high degree of data reuse.  They
+are structured around a series of stages that perform a small amount
+of computation on a very large (or virtually infinite) stream of data,
+each element of which is manipulated for a short period of time before
+being discarded.  There is evidence that streaming media applications
+are already dominating the machine cycles of today's processors
+\cite{Rix98}, and applications such as software radio \cite{Bos99} are
+explicitly stream-based.
+
+Streaming applications represent a new challenge for compiler writers,
+as typical compiler analysis and optimization is geared towards
+scientific codes that have array accesses in loop nests instead of
+cascaded stream operations.  Orthogonally, streaming applications
+demand new advances in software engineering, as the languages and
+idioms that are most useful in scientific or pointer-based programming
+are not as convenient for implementing stream-based codes.  For
+instance, DSP's contain critical software-timed loops that must be
+re-timed and re-implemented for different architectures and memory
+configurations; it would be more natural (from a software engineering
+perspective) to express their computation as a series of operations on
+a stream, and (for performance reasons, as well) to let the compiler
+worry about efficient memory management.
+
+The aim of the StreaMIT compiler project is thus two-fold.  Firstly,
+we aim to develop a programming environment that enables intuitive,
+clean, and modular implementation of streaming applications.
+Secondly, we plan to develop novel stream-specific optimizations that
+improve the performance of streaming programs.  In order to achieve
+these goals, it is essential to have the right representation of
+streams--one that is flexible enough to allow natural program
+development, but structured enough to enable straightforward compiler
+analysis.  This paper describes such a representation, in the form of
+a Java-based intermediate language.  Though we are also in the process
+of specifying a new high-level language that includes special
+abstractions for stream programming, the representation described here
+will serve as an interface language that could be the target of the
+first phase of compilation.
+
+\section{Stream Representation}
+
+While many other programming languages have incorporated the notion of
+a stream (see \singleemcite{survey97} for a review), the StreaMIT intermediate
+representation is distinguished by 1) the well-defined structure that
+it imposes on streams, 2) an integrated notion of different {\it
+times} for initialization, steady-state processing, and dynamic
+events, 3) a distinction between high-volume channels for steady-state
+data transfer and low-volume connections for control messages, 4) a
+capacity for modular program development, and 5) a textual syntax that
+reflects the natural layout of the streams.  These characteristics
+will be illustrated in the context of two examples: an edge detector
+and an oscilloscope.
+
+\subsection{Example: An Edge Detector}
+
+The edge detector (see Figure \ref{fig1}) is an example of a {\tt
+Filter}: the basic unit of computation in StreaMIT.  Each {\tt Filter}
+contains an {\tt init} function that is called at {\it initialization
+time}; in this case, the {\tt EdgeDetector} records the {\tt
+Oscilloscope} that contains it.  The {\tt work} function describes the
+most fine grained execution step of the filter in the {\it steady
+state}.  Within the {\tt work} function, the filter can communicate
+with neighboring blocks using the {\tt input} and {\tt output}
+channels, which are typed FIFO queue's declared as fields within the
+class.  These {\it high-volume} channels support the intuitive
+operations of pop, peek, and push.
+
+\begin{figure}[t]
+\scriptsize
+\begin{verbatim}
+class EdgeDetector extends Filter {
+  Channel input = new FloatChannel();
+  Channel output = new FloatChannel();
+  
+  Oscilloscope scope;
+
+  void init(Oscilloscope scope) {
+    this.scope = scope;
+  }
+
+  void work() {
+    float x1 = input.pop();
+    float x2 = input.peek(0);
+    if (x2 - x1 > THRESHOLD) {
+      // freeze display within 2-5 firings of work()
+      sendMessage(scope.reset(FREEZE_DISPLAY), 2, 5);
+    } else {
+      output.push(x1);
+    }
+  }
+}
+\end{verbatim}
+\vspace{-12pt}
+\caption{\protect\small An edge detector.  If two successive input
+values differ by more than the threshold, a message is sent to freeze
+the display.  Otherwise, the items pass through the filter.
+\protect\label{fig1}}
+\vspace{-12pt}
+\end{figure}
+
+The {\tt sendMessage} call demonstrates StreaMIT's support for {\it
+low-volume} control messages.  A filter can send a dynamic message to
+another stream or filter from within its {\tt work} function.  The
+message differs from a function call in that it is asynchronous--the
+filter can continue processing before the message is received--and
+there must be no return value.  Generally, messages are useful for
+control signals that are occasionally sent to adjust stream parameters
+or to re-initialize a portion of the stream (a call to {\tt init} can
+be evoked by the pre-defined {\tt reset} function.)  The compiler
+guarantees delivery of the message within a user-specified time range,
+where ``time'' is local and measured in the number of invocations of
+the sender's {\tt work} function (see Figure \ref{fig1}.)  This notion
+of relative time is important in distributed environments where each
+processor has its own clock.
+
+\subsection{Example: An Oscilloscope}
+
+The oscilloscope (see Figure \ref{fig2}) is an example of a {\tt
+Stream}: the basic construct for composing filters into a
+communicating network.  Like a {\tt Filter}, a {\tt Stream} has an
+{\tt init} function that is called upon its instantiation.  However,
+there is no {\tt work} function, and the input and output channels are
+implicit; instead, the stream behaves as the sequential composition of
+filters that are specified with successive calls to {\tt add} from
+within {\tt init}.  That is, {\tt Stream} creates a single pipeline.
+
+There are two other stream constructors besides {\tt Stream}: {\tt
+SplitJoin} and {\tt FeedbackLoop}.  The former is used to specify
+independent parallel streams that diverge from a common {\it splitter}
+and/or merge into a common {\it joiner}, as for the two sources of
+input in the oscilloscope's external trigger mode (see Figure
+\ref{fig2}).  The {\tt FeedbackLoop} is the only means of inserting
+loops in the stream network; it contains a loop header, loop body, and
+feedback body, with items from the end of the loop body implicitly
+feeding back through the feedback body into the loop header.  One can
+also specify the {\it delay} of a feedback loop, controlling the
+number of items that are within the loop at any time.
+
+\begin{figure}[t]
+\scriptsize
+\begin{verbatim}
+class Oscilloscope extends Stream {
+  void init(int mode) {
+    switch(mode) {
+      case CONTINUOUS_DISPLAY:
+        add(new DataSource());
+        add(new ContinuousDisplay());
+        break;
+      case FREEZE_DISPLAY:
+        // do nothing--display is unchanged
+        break;
+      case EDGE_TRIGGER:
+        add(new DataSource());
+        add(new EdgeDetector(this));
+        add(new ContinuousDisplay());
+        break;
+      case EXTERNAL_TRIGGER:
+        add(new SplitJoin() {
+          void init() {
+            add(new DataSource());
+            add(new TriggerSource());
+            joiner(ROUND_ROBIN);
+          }
+        });
+        add(new ExternalEdgeDetector(this));
+        add(new ContinuousDisplay());
+        break;
+    }  
+  }
+}
+\end{verbatim}
+\vspace{-12pt}
+\caption{\protect\small An oscilloscope that behaves
+as a composition of other streams, and depends on the mode that is
+passed to {\tt init}.
+\protect\label{fig2}}
+\vspace{-12pt}
+\end{figure}
+
+The code fragment for the external trigger mode of the oscilloscope
+also illustrates StreaMIT's support for {\it inlining} stream
+definitions.  For small stream definitions such as the {\tt SplitJoin}
+in Figure \ref{fig2}, a separate class definition renders the source
+code cluttered and incomprehensible.  But with an anonymous class (see
+\singleemcite{java}, p.135), the stream definition can be inlined, and the
+indentation naturally corresponds to the depth of the stream
+hierarchy.  This syntax makes it possible to see the structure of a
+stream from the shape of the code, which is an improvement over ad-hoc
+graphical programming environments or unreadable straight-line code
+making arbitrary connections between filters.
+
+\section{Future Work}
+
+We are in the process of implementing a runtime library for the
+interface language described here, as well as a compiler
+infrastructure for transforming StreaMIT programs.  Soon we plan to
+turn our attention to optimization, where we hope to develop methods
+akin to dependence analysis and register allocation for the domain of
+streaming programs.  The ultimate goal is to raise the level of
+abstraction in stream programming without sacrificing performance.
+
+\bibliography{references}
+\bibliographystyle{oxyapa}
+
+\end{document} 
+
+
+
+
