@@ -1,0 +1,241 @@
+This document provides an overview of the organization of the StreamIt
+compiler.  The compiler is build on top of version 1 of the Kopi Java
+compiler, which is an open-source Java compiler that is written in
+Java.  It is available from:
+
+http://www.dms.at/kopi/
+
+Kopi 2 has been released, to support Java generics and ASSERT
+statements, but we haven't seen it necessary to incorporate their
+changes as of yet.  
+
+Compiler Flow
+-------------
+
+Here's the general flow of the compiler as it stands now:
+
+1. The Kopi scanner/parser reads in a source file.
+
+2. The Kopi system type-checks the code and resolves object references
+   to point to actual objects instead of just symbolic names.
+
+3. We translate the Kopi IR into a StreamIt high ir (SIR) consisting
+   of a stream graph of filters, pipelines, splitjoins, and
+   feedbackloops.  The class that does this translation is kjc/Kopi2SIR.
+
+4. We have some passes that operate on the sir code, such as:
+
+   Constant Propagation / Loop Unrolling    kjc/sir/lowering/ConstantProp.java
+   Field Propagation			    kjc/sir/lowering/FieldProp
+   
+   The constant prop. and loop unrolling is used to expand the
+   parameterized structure of the IR into a static graph.
+
+   Horizontal Fission	kjc/sir/lowering/fission/StatelessDuplicate.java
+   Horizontal Fusion	kjc/sir/lowering/fusion/FuseSplit.java
+   Vertical Fusion	kjc/sir/lowering/fusion/FusePipe.java
+   Lifting (if pipeline contains just one filter, remove pipeline wrapper)   
+			kjc/sir/lowering/fusion/Lifter.java
+
+   These phases are used for partitioning and optimization, discussed below.
+
+-----
+
+Then the flow splits up into two parts, one for RAW and one for the
+uniprocessor backend.
+
+RAW Backend
+-----------
+
+The RAW side of the project (in kjc/raw) does partitioning, layout,
+and communication scheduling for a RAW backend.  This generally works
+by conversion to a flat, unstructured graph, and then simulation of
+the execution according to a legal schedule.  The toplevel controller
+for the raw backend is kjc/raw/RawBackend.java.  You can trace the
+modules that it calls in the backend from there.
+
+The partitioning can be either manual or automatic:
+
+  - manual partitioning in kjc/sir/lowering/AdjustGranularity.java
+  - automatic partitioning in kjc/sir/lowering/Partitioner.java
+
+To use the manual partitioner, you have to pass the name of the
+application to the java VM, like this:
+
+java -Dapp=fm -Xmx512M at.dms.kjc.Main -s -raw 4 FMRadio.java
+
+To compile for RAW with the automatic partitoiner, you'd type
+something like:
+
+s -raw 4 -a FMRadio.java
+
+Here, 4 is the width of the raw machine.  We support widths from 1-8,
+I think.
+
+The RAW backend will output a series of tile and switch files that you
+can compile for the raw simulator by typing "make".  For this to work,
+you first need to checkout the "starsearch" package from CVS, and set
+your STARSEARCH_HOME variable to point to the installation directory.
+(We recommend that you do this from /home/bits6/$USER instead of your
+main directory, since starsearch is big and there's more space on
+bits6.)  You can do "make debug" to run the simulator, and "make run"
+to just run it.
+
+Uniprocessor Backend
+--------------------
+
+The uniprocessor backend differs from the RAW backend in that the
+entire filter graph is scheduled to run in serial, and the resulting
+code is linked with a runtime library to do the scheduling at runtime.
+In the long run, we could adjust the model to be more like raw's by
+fusing the entire stream graph into one node and then just executing
+that node; however, the runtime system of the C library also provides
+more flexibility for things like message delivery, where you might
+want to have some runtime control of the scheduling.
+
+In order to compile to C for the uniprocessor, the stream graph is
+lowered into a "low ir" or LIR, with supporting files in kjc/lir.  The
+original purpose of the "lowering" package (kjc/sir/lowering) was to
+lower the SIR to the LIR, although it now includes some files that are
+somewhat broader in scope.  The toplevel controller for the
+uniprocessor path is in kjc/sir/lowering/Flattener.java.  As is
+visible from the code, there are a number of passes in the lowering,
+and they are in this order:
+
+kjc/sir/lowering/Structurer: this deals with the fact that there are
+			     no objects in C.  Thus, all fields of a
+			     given stream class need to be packaged
+			     into a structure, and passed around to
+			     each method that operates on the
+			     structure.  So the Structurer modifies
+			     all methods to take an additional
+			     argument, and to pass the state of the
+			     stream through this argument.
+
+kjc/sir/lowering/SIRScheduler: this class interfaces with the
+			       scheduler (see below) to build a set of
+			       hierarchical work functions for all the
+			       stream containers (pipelines,
+			       splitjoins, and feedbackloops) in the
+			       graph.  Then, the resulting runtime
+			       system can execute the entire stream by
+			       calling the toplevel work function,
+			       with all the components scheduled
+			       accordingly.
+
+kjc/sir/lowering/LowerInitFunctions: this adds LIR hooks to the init
+				functions to pass information to the C
+				library about the properties of each
+				stream (e.g., it's I/O types, rates, etc.)
+
+kjc/sir/lowering/LowerWorkFunctions: just marks the entries and exits
+				of work functions with LIR nodes.
+
+So, the LIR basically consists of a set of hooks for our C runtime
+system.  It is not a "low-level IR" in the traditional
+sense--i.e. there is no 3-address form, or low-level optimizations.
+If you wanted to implement a different backend for StreamIt, the LIR
+might be useful if you had library support in the backend, but not
+otherwise.
+
+The Directory Structure
+-----------------------
+
+At this point an explanation of our directory structure is long
+overdue.  From under streams/compiler, it looks like this:
+
+|-- frontend		For now this contains an obsolete frontend.	   
+`-- kopi
+    |-- 3rdparty	This came with KOPI and we haven't touched it.
+    |-- JFlex		This came with KOPI and we haven't touched it.
+    |-- bytecode	This came with KOPI and we haven't touched it.
+    |-- compiler	This came with KOPI and we haven't touched it.
+    |-- drivers		This came with KOPI and we haven't touched it.
+    |-- gnu		This came with KOPI and we haven't touched it.
+    |-- java_cup	This came with KOPI and we haven't touched it.
+
+    |-- classes		The "classes" directory is Kopi's target for
+			all of the compilation; it sets up its
+			directory structure in a tree that is
+			DIFFERENT from its package hierarchy, and
+			dumps all of the classes to a "classes"
+			directory.  We found this to be very
+			confusing, so we duplicated the entire package
+			hierarchy with a set of symbolic links from
+			underneath "classes" that points to the actual
+			location of the source file.  Thus, you can
+			start from the "classes" directory and follow
+			the package tree of a given source file, and
+			eventaully arrive at the real directory where
+			the source is stored.  Never mind this
+			discussion if you got confused -- using the
+			"compile" script everything should be okay.
+    
+		
+    |-- docs		The original KOPI documentation.
+    |-- kjc		This is the compiler section of Kopi, that
+			we're using.
+
+    |   |-- lir		The LIR is the low-ir for the uniprocessor
+	                backend discussed above.
+
+    |   |-- raw		This is where all the RAW backend stuff lives.
+
+    |   `-- sir		This holds our representation of the high IR.
+
+    |       `-- lowering  Originally intended for lowering SIR to LIR,
+	                this generally contains anything related to
+	                preparing the SIR for a backend stage.
+		
+    |           |-- fission - Contains fission transformations on SIR nodes.
+    
+    |           `-- fusion - Contains fusion transformations on SIR nodes.
+
+    `-- util - Miscellaneous utilities for use in different packages.
+
+The above directories all belong to what we could strictly call the
+"compiler".  There is another set of streamit classes that derive from
+the "streamit" package instead of the "kopi" package.  Eventually we
+will merge all of these streamit packages into a single directory
+structure, but right now they are in some of their own directories
+(e.g., "misc", "library", "scheduler" off of the main CVS repo.) to
+help facilitate some major changes that are in the works right now.
+
+So this structure is as follows:
+
+|-- streamit
+    |-- library		The Java runtime library for executing
+			StreamIt files under Java.
+
+    |-- scheduler	The scheduler that is used by both the
+			compiler and the library to represent a legal 
+			execution ordering of nodes.
+
+    |-- frontend	(Not currently checked in?)  Will convert a
+			java program in the new syntax to one in the
+			old syntax, so that it can be run through the
+			compiler and/or Java library.
+
+    |-- misc		Shared misc. stuff.
+
+
+The Scheduler
+-------------
+
+The component above that we haven't touched upon is the scheduler.
+The role of the scheduler is to calculate/choose an execution ordering
+for the filters in some graph or sub-graph, given all of their I/O
+rates.  Right now our scheduler is a simple hierarchical scheduler
+that schedules each stream container independent of its neighbors, but
+we are working on a "phased scheduler" that is more fine-grained and
+results in smaller buffer sizes between filters.
+
+The scheduler can be used in several contexts.  It is used by the
+fusion algorithm to statically schedule the components of a pipeline
+or splitjoin. It is used by the RAW backend to simulate the execution
+of the stream graph so that the routing instructions can be generated
+for the switches on RAW.  It is used by the uniprocessor path to build
+the work functions of stream containers when the SIR is being lowered
+to the LIR.  And it is used for the work estimation phase of the
+automatic partitioner, to determine how many times a given stream
+segment executes in a steady-state execution of the graph.
