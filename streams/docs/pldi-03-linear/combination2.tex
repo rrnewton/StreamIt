@@ -343,12 +343,12 @@ replace the entire stream $s$.  Its components are as follows:
 
 The above formulation is derived as follows.  The $\mt{joinRep}$
 variable represents how many cycles the joiner completes in an
-execution of the splitjoin's steady-state schedule; $\mt{joinRep}$ is
+execution of the splitjoin's steady-state schedule; it is
 the minimal number of cycles required for each child node to execute
 an integral number of times and for all of their output to be consumed
-by the joiner.  Similarly, $\mt{rep}_k$ gives the execution count for
+by the joiner. Similarly, $\mt{rep}_k$ gives the execution count for
 child $k$ in the steady state.  Then, in keeping with the procedure
-described above, $\lambda_k^e$ is the expansion of the $k$'th node by
+described above, $\lambda_k^e$ is the expansion of the $k$th node by
 a factor of $\mt{rep}_k$, with the peek value set to the maximum peek
 across all of the expanded children.  Following the expansion, each
 $\lambda_i^e$ has the same number of rows, as the peek uniformization
@@ -357,22 +357,22 @@ caused shorter matrices to be padded with rows of zero's at the top.
 The final phase of the transformation is to re-arrange the columns of
 the child matrices into the columns of $A'$ and $\vec{b}'$ such that
 the order of the columns of $A$ generates the correct output value
-order.  Though the equation is somewhat cumbersome, the concept is
-simple (see Figure~\ref{fig:splitjoin-duplicate-matrix}).  The
-equation can be understood as follows: for the $k$th child and the
+order.  Though the equations are somewhat cumbersome, the concept is
+simple (see Figure~\ref{fig:splitjoin-duplicate-matrix}):
+for the $k$th child and the
 $m$th cycle of the joiner, the $p$th item that is pushed by child $k$
 will appear at a certain location on the joiner's output tape.  This
 location (relative to the start of the node's execution) is $p + m *
 \mt{wSum}_n + \mt{wSum}_k$, as the reader can verify.  But since the
-right-most column of each array $A$ holds the first item to be pushed,
-we need to subtract this location from the width of $A$ when we are
-re-arranging the columns.  The width of $A$ is the total number of
-items pushed---$u'$ in the case of $A'$ and $u_k^e$ in the case of
-$A_k^e$.  Hence the equation as written above: we copy all items in a
-given column from $A_k^e$ to $A'$, defining each location in $A'$
-exactly once.  The procedure for $b$ is analogous.
+right-most column of each array $A$ holds the formula to compute the 
+first item pushed, we need to subtract this location from the width 
+of $A$ when we are re-arranging the columns. The width of $A$ is the 
+total number of items pushed---$u'$ in the case of $A'$ and $u_k^e$ 
+in the case of $A_k^e$.  Hence the equation as written above: we copy 
+all items in a given column from $A_k^e$ to $A'$, defining each location 
+in $A'$ exactly once.  The procedure for $\vec{b}$ is analogous.
 
-Finally, it remains to calculate the peek, pop, and push rates of the
+Finally, it remains to calculate the peek, pop and push rates of the
 combined node.  The peek rate $e'$ is simply $maxPeek$, which we
 defined to be equivalent for all the expanded child nodes.  The push
 rate $\mt{joinRep}*\mt{wSum}_n$ is equivalent to the number of items
@@ -383,12 +383,6 @@ is the case, then the pop rates must be equivalent for all the
 expanded streams; otherwise, some outputs of the splitter would
 accumulate infinitely on the input channel of some stream.  
 
-These input and output rates---in combination with the values of $A'$
-and ${\vec b}'$---define a linear node that exactly represents the
-parallel combination of child nodes that are fed by a duplicate
-splitter. Figure~\ref{fig:example-splitjoin-combination} provides an
-example of linear splitjoin combination.
-
 \begin{figure}[t]
 \center
 \epsfxsize=2.8in
@@ -397,6 +391,12 @@ example of linear splitjoin combination.
 \protect\label{fig:example-splitjoin-combination}
 \vspace{-12pt}
 \end{figure}
+
+These input and output rates,in combination with the values of $A'$
+and $\vec{b}'$define a linear node that exactly represents the
+parallel combination of child nodes that are fed by a duplicate
+splitter. Figure~\ref{fig:example-splitjoin-combination} provides an
+example of splitjoin combination.
 
 %The node on the left pushes four items per work function 
 %whereas the node on the right pushes one item per work function. In order
@@ -425,7 +425,7 @@ these matrices are operating on disjoint sections of the input.
 
 Instead, we collapse linear splitjoins with a roundrobin splitter by
 converting the splitjoin to use a duplicate splitter.  In order to
-maintain correctness, this involves adding a decimator on each branch
+maintain correctness, we add a decimator on each branch
 of the splitjoin that eliminates items which were intended for other
 streams.
 
@@ -445,13 +445,11 @@ are computed as follows:
 \multicolumn{3}{l}{\parbox{3in}{
     \begin{equation} \nonumber
       \begin{array}{l}
-      ~~~~\mt{decimate}[k] ~\mt{is a linear node}~ \{A, \vec 0, \mt{vTot}, \mt{vTot}, \mt{vTot}\} \\
+      ~~~~\mt{decimate}[k] ~\mt{is a linear node}~ \{A, \vec 0, \mt{vTot}, \mt{vTot}, v_{k}\} \\
 	~~~~~~~\mt{where}~A[i,j] = \left\{
 	\begin{array}{l}
-	  1 ~\mt{if}~ i=j ~\wedge~ \\ 
-	  ~\hspace{0.13in}~ vTot-vSum_{k+1} \le i ~\wedge~ \\
-	  ~\hspace{0.13in}~ i < vTot-vSum_{k} \\
-	  0 ~\mt{otherwise}
+	  1 ~\mt{if}~ i=\mt{vTot}-\mt{vSum}_{k+1}+j \\
+	  0 ~\mt{otherwise} \\
 	\end{array}
 	\right.
       \end{array}
@@ -497,7 +495,7 @@ coefficient of $0$.
 There are numerous instances where the linear combination
 transformation could benefit a programmer.  For example, although a
 bandpass filter can be implemented with a low pass filter followed by
-a high pass filter, actual implementations tend to determine the
+a high pass filter, actual implementations determine the
 coefficients of a single combined filter that performs the same
 computation. While a simple bandpass filter is easy to combine
 manually, in an actual system several different filters might be
@@ -507,10 +505,10 @@ overall filter combination infeasible.
 Another common operation in discrete time signal processing is
 downsampling to reduce the computational requirements of a system.
 Downsampling is most often implemented as a low pass filter followed
-by an $M$ compressor which passes every $M$th input sample to the
+by an $M$ compressor which passes every $M$th input item to the
 output.  In practice, the filters are combined to avoid computing dead
 items in the low pass filter.  However, the system specification
-contains both filters for the sake of understanding.  Our analysis can
+contains both elements for the sake of understanding.  Our analysis can
 start with the specification and derive the efficient version automatically.
 
 A final example is a multi-band equalizer, in which $N$ different
