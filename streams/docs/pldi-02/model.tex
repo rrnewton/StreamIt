@@ -556,8 +556,8 @@ t~\in~&Tape = Index \ra Item \\
 &Pop, Peek, Push = N \\ 
 f~\in~&WorkStatement = IndexTransform \ra (Tape \ra Item) \\ 
 &WorkFunction = WorkStatement^{+} \\
-S~\in~&SplitType = {Duplicate, RoundRobin} \\ 
-J~\in~&JoinType = {RoundRobin}
+S~\in~&SplitType = \{Duplicate, WeightedRR\} \\ 
+J~\in~&JoinType = \{WeightedRR\}
 \end{align*}
 \vspace{-18pt}
 \caption{Semantic domains that are shared between the intermediate and
@@ -586,7 +586,7 @@ s~\in~&Stream = Filter + Pipeline + SplitJoin + FeedbackLoop \\
 \end{figure}
 
 The domains of the intermediate algebra are shown in
-Figures~\ref{fig:interdom}~and~\ref{fig:shareddom}.  The algebra
+Figures~\ref{fig:shareddom}~and~\ref{fig:interdom}.  The algebra
 represents tapes as an infinite mapping from an index to an item.
 Generally, stream constructs are represented as a list of their
 component streams, and filters' work functions are encoded as a list of
@@ -599,11 +599,10 @@ to generate an expression in the intermediate algebra that reflects
 the meaning of a given StreamIt program.  Due to space limitations, we
 consider here only the translation of the work functions.
 
-The translation of a filter's work function contains two steps.
-First, the function should be arranged in a {\it canonical form}, in
-which each pushed item is given as a direct function of peeked items,
-and all of the pop statements are at the end of the function.  For
-example: \\
+The translation of a filter's work function contains two steps.  First,
+the function is arranged in a {\it canonical form}, in which each pushed
+item is given as a direct function of the peeked items, and all of the
+pop statements are at the end of the function.  For example: \\
 \vspace{0.2in}
 \begin{scriptsize}
 \begin{tabular}{l}
@@ -616,27 +615,25 @@ example: \\
 \vspace{-12pt}
 \end{tabular}
 \end{scriptsize}
-Here we model the computation of the work function as pure
+Above, we model the computation of the work function as pure
 mathematical functions that can be injected into the semantic domain.
-The algebraic work function, then, is the alternate application of
-each push statement's function $f$, with the index expressions offset
-by a parameter that signifies the filter's position on the input tape.
-This index will reference the $latest$ item peeked by a given filter
-execution, so we subtract the local indices from the index:
+The algebraic work function, then, is the alternate application of each
+push statement's function $f$, with the index expressions transformed
+from their local index $x$ to a global index $g(x)$ on the input tape.
 \begin{align*}
-{\cal W}&[{\tt void work() \{...\}}]: {\tt StreamIt Work} \ra
+{\cal W}&[{\tt void~work() \{...\}}]: {\tt StreamIt Work} \ra
 WorkFunction = \\
-(&g \ra (t \ra f_1(t(g(1)), \dots , t(g(PEEK)))), \\
+(&g \ra (t \ra f_1(t(g(0)), \dots , t(g(PEEK-1)))), \\
 \dots \\
-&g \ra (t \ra f_{PUSH}(t(g(1)), \dots , t(g(PEEK)))))
+&g \ra (t \ra f_{PUSH}(t(g(0)), \dots , t(g(PEEK-1)))))
 \end{align*}
 
 {\bf Converting from the intermediate algebra}.  To convert back to
 StreamIt, we can perform the inverse of the translation shown above,
-with a push statement for each function and a local index expression
-$x$ in place of the argument $i-x$.  Common sub-expression elimination
-can be used to eliminate duplicate peek statements or shared portions
-of the $f_i$'s.
+with a push statement for each function and a local index expression $x$
+in place of the global index $g(x)$.  Common sub-expression elimination
+can be used to eliminate duplicate peek statements or shared portions of
+the $f_i$'s.
 
 \subsubsection{Transform Algebra}
 
@@ -648,18 +645,24 @@ Stream \ra StreamTransform$ for converting from the intermediate
 algebra to the transform algebra.  For a filter, we have:
 \begin{align*}
 &{\cal S} [(Filter~push~pop~peek~(f_1~\dots~f_{push}))] = g \ra (t \ra
-(i \ra \\ &(f_{i~\%~push})(i_{local} \ra g(\mi{I_F}{O_F}(i) - peek +
+(i \ra \\ &(f_{i~\%~push})(i_{local} \ra g(\mi{I_F}{O_F}(i) - peek + 1 + 
 i_{local}))(i)))
 \end{align*}
-That is, the value that a filter pushes onto the $i$'th position of
-its output tape is calculated with its function at index $i~\%~push$.
-The index offset to the latest value the filter peeks is
-$\mi{I_F}{O_F}(i)$, where $I_F$ and $O_F$ denote the input and output
-tapes of the filter (as shown in Equation \ref{eq:minfilter}, this is
-a pure function of $push$, $pop$, and $peek$).
+That is, the value that a filter pushes onto the $i$'th position of its
+output tape is calculated with its function at index $i~\%~push$.  By
+the definition of $min$, the index offset to the last value the filter
+peeks is $\mi{I_F}{O_F}(i)$, where $I_F$ and $O_F$ denote the input and
+output tapes of the filter (as shown in Equation \ref{eq:minfilter},
+this is a pure function of $push$, $pop$, and $peek$).  Thus, the offset
+to the first value the filter peeks is $\mi{I_F}{O_F}(i) - peek + 1$,
+and we obtain the global index by adding this offset to the local index
+$i_{local}$. 
 
-For a pipeline, the transform function is simply the composition of
-the transforms of component streams:
+For a pipeline, the transform function is simply the composition of the
+transforms of component streams.  At the internal connections of the
+pipeline, the index transform is the identity function, but at the start
+of the pipeline we apply the transform $g$ to interface the pipeline to
+its outside connection.
 \begin{align*}
 {\cal S} [(Pipeline~s_1~s_2~\dots~s_n)] = \\
 g \ra ({\cal S}[s_n]({\cal I}) \circ \dots \circ {\cal S}[s_2]({\cal I}) \circ {\cal S}[s_1](g)) \\

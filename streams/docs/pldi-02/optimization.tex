@@ -1,13 +1,13 @@
 \section{Optimization}
 
-We now turn our attention to the problem of optimizing a stream
-program.  Unlike other program domains, where the principle aim of
-compiler optimization is to shorten the total execution time, there
-are many distinct optimization metrics for streaming applications,
-including throughput, latency, data size, and code size.  The latter
-two of these are especially important in embedded domains, where
-memory is in short supply; latency can be critical for real-time
-applications, and throughput is always of interest.
+We now turn our attention to the problem of optimizing a stream program.
+Unlike other program domains, where the principle aim of compiler
+optimization is to shorten the total execution time, there are many
+distinct optimization metrics for streaming applications, including
+throughput, latency, data size, and code size.  The latter two of these
+are especially important in embedded domains, where memory is in short
+supply; latency can be critical for real-time applications, and
+throughput is always of interest.
 
 % here's a more verbose version...
 %
@@ -53,8 +53,8 @@ where: {\bf push_{sc}} &= totalRounds * W \\
        {\bf work_{sc}} &= f_{sc, 1} \dots f_{sc, push_{sc}} \\
        totalRounds &= lcm(lcm(push_{s1}, w_1), \dots, lcm(push_{sn},
        w_n)) \\
-       totalPop &= \sum_{i=1}^{n}(totalRounds * w_i *pop_i / push_{si}) \\
-       shift_j(x) &= \mi{I_S}{I_{sj}}(g(i_{local})+ \\ &~~~~~(\mi{I_{sj}}{O_{sj}} \circ \mi{O_{sj}}{O_J})(j)-peek_{sj}) \\
+       totalPop &= \sum_{i=1}^{n}(totalRounds * w_i * pop_{si} / push_{si}) \\
+       shift_j(x) &= \mi{I_S}{I_{sj}}(x + \\ &~~~~~(\mi{I_{sj}}{O_{sj}} \circ \mi{O_{sj}}{O_J})(j)-peek_{sj}) \\
        f_{sc, j} &= g \ra f_{s~p(j)}(i_{local} \ra shift_j(g(i_{local})))
 \end{align*}
 We have proven that this transformation preserves the meaning of the
@@ -70,7 +70,7 @@ the machine target is more fine-grained than the stream graph.  We
 propose three fission transformations:
 \begin{enumerate}
 \item {\bf Parallelizing stateless filters.}  If a filter has no state,
-  then we can gain task parallelism by duplicating the filter $n$ times
+  then we can gain data parallelism by duplicating the filter $n$ times
   and embedding it in an $n$-way SplitJoin with a round robin splitter
   and joiner.
 \item {\bf Parallelizing stateless feedback loops.}  If the body of a
@@ -93,6 +93,17 @@ compiler detects to be constant during the execution of {\tt work} can
 be assigned to fields in the {\tt init} function and then referenced
 from {\tt work}.
 
+\subsection{Induction Variable Detection}
+
+The {\tt work} function can also be analyzed as would the body of a loop
+to see if there are induction variables from one steady-state execution
+to the next.  This analysis is useful both for strength reduction, which
+{\it adds} a dependence between invocations by converting an expensive
+operation to a cheaper, incremental one, as well as for data
+parallelization, which {\it removes} a dependence from one invocation to
+the next by changing incremental operations on filter state to
+equivalent operations on privatized variables.
+
 \subsection{Decimation Propagation}
 
 Decimation refers to the regular discarding of a fraction of a filter's
@@ -111,10 +122,4 @@ the joiner of $s_1$ and the splitter of $s_2$ are both round robins with
 equal weights, then this node can be eliminated in favor of a single
 SplitJoin $s_c$ with the $i$'th parallel stream in $s_c$ is a pipeline
 of the corresponding streams in $s_1$ and $s_2$.  [model with language!]
-
-\subsection{Data Parallelization}
-
-Data Parallelization
--	MMX
--	Raw
 
