@@ -49,13 +49,12 @@ class Combine_optDFT extends Filter
 		    w_i = w_i_next;
 		}
 	}
-	for (int k=0; k<nMax/nWay; k++) {
+	for (int k=0; k<nMax/nWay; k++)
 	    for (i = 0; i < 2 * nWay; i++)
-		{
 		    input.popFloat ();
+	for (int k=0; k<nMax/nWay; k++)
+	    for (i = 0; i < 2 * nWay; i++)
 		    output.pushFloat(results[k*2*nWay+i]);
-		}
-	}
     }
 }
 
