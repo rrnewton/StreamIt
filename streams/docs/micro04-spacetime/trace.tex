@@ -68,11 +68,29 @@ output stream.
 
 \subsubsection{Support for Software Pipelining of Traces}
 \label{sec:softpipe}
-what is this analogous to?
-prologue stage
-one copy of each filter
-at most one iteration difference between connected nodes
-all downstream/upstream of node must be in same state
+Currently, the hybrid space-time multiplexing backend does not support
+full software-pipelining of traces, in the tradition sense.  The trace
+scheduling algorithm (see Section \ref{sec:scheduling}) is limited
+when scheduling traces because of the underlying implementation.
+
+The scheduler is free to schedule a trace for execution as long as in
+the final schedule, for each trace $t$:
+\begin{itemize}
+\item all directly connected downstream traces of $t$ are either {\it all}
+scheduled before or {\it all} scheduled after $t$.
+\item all directly connected upstream traces of $t$ are either {\it all}
+scheduled before or {\it all} scheduler after $t$.
+\end{itemize}
+These restrictions limited the freedom of the scheduler and we have
+plans increase the flexibility of the implementation.
+
+We must properly fill the input buffers of any trace that is scheduled
+before its upstream neighbor.  This is analogous to the prologue of a
+software-pipelined loop.  In the compiler we calculate a schedule of
+traces that will perform this function.  This schedule is executed
+once, prior to the steady-state execution.  We call this schedule the
+{\it prologue schedule}; calculating the prologue schedule is
+described in Section \ref{sec:prologue}.
 
 \section{Trace Extraction}
 \label{sec:extraction}	
