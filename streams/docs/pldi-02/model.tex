@@ -426,20 +426,92 @@ next set of data from $A$ might not be sufficient to calculate the
 next set on $B$'s output, but it could affect it nonetheless.)  The
 message must be delivered immediately before this effected data
 appears on $B$'s output, so the number of items $n(O_B)$ is as given
-above.  We do not need a ceiling function as in (\label{eq:msgup})
-because we are guaranteed to have the maximum $x$ at a multiple of
-$push_B$.
+above.  We do not need a ceiling function as in (1) because we are
+guaranteed to have the maximum $x$ at a multiple of $push_B$.
 
 \end{enumerate}
 
 \subsubsection{Latency Constraints}
 
-The same framework can be used to give a semantics to the latency
-constraints in StreamIt.  Each directive MAX\_LATENCY(A, B, n) has the
-same effect as defining a message from filter $B$ to upstream filter
-$A$ with latency $n$.
+The framework describe above can be used to give a semantics to the
+latency constraints in StreamIt.  Each directive MAX\_LATENCY(A, B, n)
+has the same effect as defining a message from filter $B$ to upstream
+filter $A$ with latency $n$.
 
 \subsection{Operational Semantics}
+
+We can fully define the possible sequences of filter executions as a
+set of constraints on the number of items on each tape in the stream
+graph.  This is useful not only from the perspective of semantics, but
+for compiler analysis of the space of valid schedules.  To begin the
+analysis, we formulate the constraints imposed by message delivery
+guarantees on the number of items on each tape.
+
+Suppose that a filter $A$ might send a message to filter $B$ with a
+maximum latency of $\lambda$ during any invocation of its work
+function.  Then we must constrain the execution of $B$ to make sure
+that it is not too far ahead to receive the message with the given
+latency.  That is, we can only execute $B$ so long as $n(O_B)$--the
+item count on its output tape--does not exceed the count when a
+message would be delivered.  Recalling the expression for message
+delivery time (Equations \ref{eq:msgup} and \ref{eq:msgdown}), this
+constraint is as follows if $B$ is upstream of $A$:
+\begin{align}
+\label{eq:mc1}
+n(O_B) \le push_B * \ceil{\mi{O_B}{O_A}(n(O_A) + push_A * \lambda)}{push_B}
+\end{align}
+and as follows if $B$ is downstream of $A$:
+\begin{align}
+\label{eq:mc2}
+n(O_B) \le MAX(x~s.t.~\mi{O_A}{O_B}(x) = n(O_A) + push_A * (\lambda-1))
+\end{align}
+The guarantees for latency are treated identically to message
+guarantees, as fitting with the semantics of latency as described
+above.
+
+{\bf Defining the schedule.}  We now have a set of constraints
+expressing whether or not a given set of tapes respects the latency
+and message delivery guarantees in a program.  We will now
+incorporate these constraints into an operational semantics that
+defines a legal sequences of filter executions.
+
+We represent a stream graph as a configuration $(\langle p(t_1),
+n(t_1) \rangle,$ $\langle p(t_2), n(t_2) \rangle,$ $\dots,$ $\langle
+p(t_k), n(t_k) \rangle)$, where $t_1 \dots t_k$ are the tapes in the
+stream graph, and $p(t)$ represents the number of items that have been
+popped from tape $t$.  Obviously, we have the constraint that $p(t)
+\le n(t)$ for each tape $t$, since a filter can only pop as many items
+as have appeared on its input tape.
+
+When the program begins, no items have been pushed or popped from any
+data channels.  Thus, each tape is empty, and the starting
+configuration $C_0$ is simply the zero vector.  It is possible that
+the initial configuration violates some of the constraints imposed by
+the messaging and latency constructs, in which case the compiler can
+inform the programmer that the delivery constraints requested in the
+program are unsatisfiable.
+
+Let ${\cal P}(C)$ denote whether or not the constraints in
+Equations~\ref{eq:mc1} and~\ref{eq:mc2} are satisfied for all filters
+in a stream graph with configuration $C$.  We can then write the
+transition function between configurations as follows:
+\[
+\begin{scriptsize}
+\begin{array}{c}
+n(I_A) - p(I_A) \ge peek_A; \\ (\dots , \langle p(I_A), n(I_A) \rangle, \dots,
+\langle p(O_A), n(O_A) \rangle, \dots); \\ {\cal P}((\dots , \langle p(I_A)+pop_A, n(I_A) \rangle, \dots,
+\langle p(O_A), n(O_A)+push_A \rangle, \dots)); \\ \hline (\dots , \langle p(I_A)+pop_A,
+n(I_A) \rangle, \dots, \langle p(O_A), n(O_A)+push_A \rangle, \dots)
+\end{array}
+\end{scriptsize}
+\]
+There are two components of this rule.  On the first line, we state
+that, for filter $A$ to fire, there must be at least $peek_A$ items on
+$A$'s input tape that have not yet been popped.  Secondly, we express
+that once $A$ has fired, the new configuration must satisfy the
+messaging and latency constraints ${\cal P}$.  The new configuration differs
+from the original only in that $pop_A$ items have been popped from
+$A$'s input and $push_A$ items have been pushed to $A$'s output.
 
 \subsection{Denotational Semantics}
 
