@@ -8,15 +8,16 @@ single sink, with an array or matrix generated and passed between
 them.
   </description>
   <implementations>
-    <impl lang="StreamIt">
+    <impl lang="StreamIt" id="arraytest">
       <desc>MIT, test passing float[1][1] between source and sink</desc>
-      <file>ArrayTest.str</file>
+      <file class="source">ArrayTest.str</file>
+      <file class="output">ArrayTest.out</file>
     </impl>
-    <impl lang="StreamIt">
+    <impl lang="StreamIt" id="arraytest2">
       <desc>MIT, test passing float[4][4] and float[3][3]</desc>
       <file>ArrayTest2.str</file>
     </impl>
-    <impl lang="StreamIt">
+    <impl lang="StreamIt" id="arraytest3">
       <desc>MIT, test involving a splitjoin</desc>
       <file>ArrayTest3.str</file>
     </impl>
