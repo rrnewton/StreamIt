@@ -198,6 +198,7 @@ typedef message_fn *interface_table;
 <<Initialization Functions>>
 <<Split/Join Initializers>>
 <<Messaging Functions>>
+<<Pre-Built Filters>>
 <<Run Function>>
 @
 
@@ -367,6 +368,30 @@ needs to pass a [[malloc]]'d pointer to the parameter structure to
 void send_message(portal p, int msgid, latency l, void *params);
 @
 
+\subsection{Pre-Built Filters}
+
+The StreamIt library includes a small number of pre-built filters that
+can be instantiated directly by the code.
+
+<<Pre-Built Filters>>=
+<<I/O Filters>>
+@
+
+There are filters to read and write from files.  These filters can be
+created with the relevant [[create]] function; they return a
+[[stream_context]] that can be used as any other context would be.
+All of the filter's state is contained inside the filter, so no extra
+state beyond the context pointer needs to be stored in the containing
+object.  The filters also have a normal work function that takes the
+context as a parameter.
+
+<<I/O Filters>>=
+stream_context *streamit_filereader_create(char *filename);
+void streamit_filereader_work(stream_context *c);
+stream_context *streamit_filewriter_create(char *filename);
+void streamit_filewriter_work(stream_context *c);
+@
+
 \subsection{Starting the System}
 
 [[connect_tapes]] makes necessary tape connections between objects;
@@ -481,10 +506,10 @@ caller is responsible for advancing tape positions beforehand if
 necessary.
 
 <<[[COPY_TAPE_ITEM]] Macro>>=
+#define READ_ADDR(t) ((t)->data + (t)->read_pos * (t)->data_size)
+#define WRITE_ADDR(t) ((t)->data + (t)->write_pos * (t)->data_size)
 #define COPY_TAPE_ITEM(s, d) \
-  (streamit_memcpy((d)->data + (d)->write_pos * (d)->data_size, \
-                   (s)->data + (s)->read_pos * (s)->data_size, \
-                   (d)->data_size))
+  (streamit_memcpy(WRITE_ADDR(d), READ_ADDR(s), (d)->data_size))
 @
 
 (This particular implementation is to accomodate duplicating
