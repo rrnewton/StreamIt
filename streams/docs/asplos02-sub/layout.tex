@@ -100,11 +100,15 @@ $dst$ by first routing in the X dimension and then routing in the Y
 dimension.  Our cost function evaluates a given layout of the stream
 graph, for a fixed value of $channels$ and $route$:
 \begin{align*}
-cost(layout) = \sum _{(src,dst) \in channels} {\bf items}(src,dst)
-\cdot & \left( {\bf hops}(\mt{routing-path}) + \left( 2 \cdot
-{\bf synch}(\mt{routing-path}) \right) ^{3} \right) \\ \mbox{where} &~
+cost(layout) =   \sum _{(src,dst) \in channels}
+ {\bf items}(src,dst)
+\cdot  \left( \parbox{2in}{{\bf hops}(\mt{routing-path})\\ + 
+  \left( 2 \cdot
+{\bf synch}(\mt{routing-path}) \right) ^{3} }\right)  
+\mbox{where } 
 \mt{routing-path} = route(layout(src), layout(dst))
 \end{align*}
+
 In this equation, ${\bf items}(src, dst)$ gives the number of data
 items that are transfered from $src$ to $dst$ during each steady state
 execution, ${\bf hops}(p)$ gives the number of intermediate tiles
