@@ -23,8 +23,6 @@
 #include "VrFMDemodulator.h"
 #include "VrTestSource.h"
 #include "VrFloatSink.h"
-#include "VrDuplicateSplitter.h"
-#include "VrRoundRobinJoiner.h"
 #include "VrSimpleFilterSplit.h"
 #include "VrSimpleFilterJoin.h"
 
