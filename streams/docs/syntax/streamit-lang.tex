@@ -22,7 +22,7 @@
 \title{StreamIt Language Specification\\
 Version 2.0\ifprerel\thanks{
 This document is the latest working version of the language specification.\hfil\break\ttfamily
-\hbox{$Id: streamit-lang.tex,v 1.24 2003-10-17 11:55:23 thies Exp $}
+\hbox{$Id: streamit-lang.tex,v 1.25 2003-12-19 00:18:31 rabbah Exp $}
 }\fi}
 \author{\texttt{streamit@cag.lcs.mit.edu}}
 \catcode`\$=3
@@ -253,9 +253,9 @@ int->int filter FIR (int N, int[N] weights) { ... }
 \paragraph{Compile-time constants.}  Several things in StreamIt must
 be \emph{compile-time constant}; for example, the I/O rates of a
 filter must be determined at compile-time, and the compiler must be
-able to statically create the expanded stream graph.  An expression is
+able to statically create the expanded stream graph.  An expression is a
 compile-time constant if it is a literal, a stream parameter, or an
-expression whose components are entirely compile-time constant.
+expression whose components are compile-time constants.
 
 \subsubsection{Parameterized Stream Types}
 
