@@ -20,8 +20,8 @@ control messages. Consider for example a frequency hopping (FHR) radio
 which mirrors how  CDMA-based cell phone technology works.   In FHR, a
 transmitter  and  a receiver  change  between  a  set of  known  radio
 frequencies, and they must do so in synchrony with respect to a stream
-boundary. That is,  if a received changes its  radio frequency between
-streams,  then it  can  properly  process its  incoming  data.  It  is
+boundary. That is,  if a receiver changes its  radio frequency between
+streams,  then it  cannot  properly  process its  incoming  data.  It  is
 therefore imperative  for streaming programs  to properly synchronize
 their  control messages; in  FHR, the  receiver must  change to  a new
 frequency when it  has finished processing the current  stream, if and
