@@ -1,0 +1,52 @@
+\section{Introduction}
+
+A {\it common machine language} is an essential abstraction that
+allows programmers to express an algorithm in a way that can be
+efficiently executed on a variety of architectures.  The key
+properties of a common machine language (CML) are: 1) it abstracts
+away the idiosyncratic differences between one architecture and
+another so that a programmer doesn't have to worry about them, and 2)
+it encapsulates the common properties of the architectures such that a
+compiler for any given target can still produce an efficient
+executable.
+
+For von-Neumann architectures, the canonical CML is C: instructions
+consist of basic arithmetic operations, executed sequentially, which
+operate on either local variables or values drawn from a global block
+of memory.  C has been implemented efficiently on a wide range of
+architectures, and it saves the programmer from having to adapt to
+each kind of register layout, cache configuration, and instruction
+set.
+
+However, recent years have seen the emergence of a class of grid-based
+architectures \cite{smartmemories, raw, trips} for which the
+von-Neumann model no longer holds, and for which C is no longer an
+adequate CML.  The design of these processors is fundamentally
+different in that they are conscious of wire delays--instead of just
+arithmetic computations--as the barriers to performance.  Accordingly,
+grid-based architectures support fine-grained, reconfigurable
+communication between replicated processing units.  Rather than a
+single instruction stream with a monolithic memory, these machines
+contain multiple instruction streams with distributed memory banks.
+
+Though C can still be used to write efficient programs on these
+machines, doing so either requires architecture-specific directives or
+a very smart compiler that can extract the parallelism and
+communication from the C semantics.  Both of these options renders C
+obsolete as a CML, since it fails to hide the architectural details
+from the programmer and it imposes abstractions which are a mismatch
+for the domain.
+
+To bridge this gap, we propose a new common machine language for
+grid-based processors: StreamIt.  The StreamIt language makes explicit
+the large-scale parallelism and regular communication patterns that
+these architectures were designed to exploit.  A program is
+represented not as a monolithic memory and instruction stream, but
+rather as a composition of autonomous filters, each of which contains
+its own memory and can only communicate with its immediate neighbors
+via high-bandwidth data channels.  In addition, StreamIt provides a
+low-bandwidth messaging system that filters can use for non-local
+communication.  We believe that StreamIt abstracts away the variations
+in grid-based processors while encapsulating their common properties,
+thereby enabling compilers to efficiently map a single source program
+to a variety of modern processors.
