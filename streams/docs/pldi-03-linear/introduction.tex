@@ -48,13 +48,13 @@ analysis focuses on filters that are {\it linear}.  StreamIt is
 distinguished from a general purpose language in that it makes
 explicit the large-scale parallelism and regular communication
 patterns that are characteristic of streaming programs.  By analyzing
-the primitive building block in StreamIt--the filter--our analysis can
-detect large portions of the application that produce outputs as a
-linear combination of the inputs; we can exploit this linearity
-for a number of large-scale optimizations.  Though each filter is
-programmed using imperative C-like code, the separation of filters
-into autonomous units of the stream graph enables our analysis to be
-far more effective and efficient than it could be on an equivalent
+the primitive building block in StreamIt---the filter---our analysis
+can detect large portions of the application that produce outputs as a
+linear combination of the inputs; we can exploit this linearity for a
+number of large-scale optimizations.  Though each filter is programmed
+using imperative C-like code, the separation of filters into
+autonomous units of the stream graph enables our analysis to be far
+more effective and efficient than it could be on an equivalent
 implementation in C alone.
 
 This paper makes the following contributions:

@@ -225,7 +225,7 @@ computes Algorithm~\ref{alg:freq-overview}.
     ~targetN        \leftarrow (2*e) \\
     ~FFTSize        \leftarrow 2^{\lceil \lg(targetN + 2*(e-1)) \rceil} \\
     ~N              \leftarrow FFTSize - 2*(e-1) \\ 
-    ~\vec{partials} \leftarrow {\tt new~float}[0\cdots e-1] \\
+    ~\vec{partials} \leftarrow {\tt new~float}[e] \\
     \\
     ~{\tt init}~{\tt \{} \\
     ~~~\vec{partials} \leftarrow \vec{\mathbf{0}} \\
@@ -235,7 +235,7 @@ computes Algorithm~\ref{alg:freq-overview}.
     ~~~\vec{x} \leftarrow {\tt pop}(0 \dots (N+e-1)) \\
     ~~~\vec{X} \leftarrow \mathbf{FFT} (N+2(e-1), \vec{x}) \\
     ~~~\vec{Y} \leftarrow \vec{X} .* \vec{H} \\
-    ~~~\vec{y} \leftarrow \mathbf{IFFT}(N+2(e-1), \vec{Y} \\
+    ~~~\vec{y} \leftarrow \mathbf{IFFT}(N+2(e-1), \vec{Y}) \\
     ~~~{\tt push}(\vec{y}[e-1 \dots N+e-1]) \\
     ~~~\vec{partials} \leftarrow \vec{y}[N+e-1 \dots N+2(e-1)]~{\tt \}} \\
     \\

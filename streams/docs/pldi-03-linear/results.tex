@@ -2,16 +2,17 @@
 \label{sec:results}
 
 Our compiler currently has two linear analysis optimizations. The
-first, {\it linear replacement}, transforms linear streams 
-(either filter, splitjoin or pipeline) by replacement with a filter 
-that directly computes the calculation of the corresponding linear node. 
-The second optimization, {\it frequency replacement}, applies the 
-transformation described in Section \ref{sec:freq}. 
-The transformation takes advantage of the machine tuned FFT package 
-FFTW~\cite{frigo99fast}),  to perform the necessary basis conversions.
-The partitioner automatically determines to which subsections of the overall program to apply
-each of the transformations. Below we describe experiments and results 
-that demonstrate substantial performance improvements due to our methods.
+first, {\it linear replacement}, transforms linear streams (either
+filter, splitjoin or pipeline) by replacement with a filter that
+directly computes the calculation of the corresponding linear node.
+The second optimization, {\it frequency replacement}, applies the
+transformation described in Section \ref{sec:freq}.  The
+transformation takes advantage of the machine tuned FFT package
+FFTW~\cite{frigo99fast}, to perform the necessary basis conversions.
+The partitioner automatically determines to which subsections of the
+overall program to apply each of the transformations. Below we
+describe experiments and results that demonstrate substantial
+performance improvements due to our methods.
 
 \subsection{Measurement Methodology}
 %We chose to measure the strength of our optimizations in terms of 
@@ -63,8 +64,7 @@ which perform computations that are commonly found in streaming applications:
 sampling rate by a non-integral factor ($\frac{2}{3}$); 
 3) {\bf TargetDetect}, four matched filters in parallel with threshold target detection; 
 4) {\bf FMRadio}, an FM software radio with equalizer;
-5) {\bf Radar}, the core functionality in modern radar signal processors 
--- modeled after a system from the Polymorphic Computing Architecture (PCA);
+5) {\bf Radar}, the core functionality in modern radar signal processors, based on a system from the Polymorphic Computing Architecture (PCA);
 6) {\bf FilterBank}, a multi-rate signal decomposition 
 processing block common in communications and image processing;
 7) {\bf Vocoder}, a channel voice coder, commonly used for speech analysis and compression;
@@ -102,31 +102,33 @@ multiplications required.
 \vspace{-6pt}
 \end{figure}
 
-In general, reducing computation does not necessarily translate into 
-a faster program, but it is often a useful indication.
-As Figure~\ref{fig:execution-speedup} 
-demonstrates, our benchmarks speedup on average by a factor of {\bf XXXXX} 
-and by a factor of $XXXXXXX$ in the best case. 
-Our performance improvements are due only in part to to the efficiency of FFTW. 
-Multiplications are decreased and execution is sped up in RateConvert, FM, FilterBank and
-Vocoder with only linear replacement. Linear replacement improvements are
-due to removing redundant computations -- in essence we do algebriac simplification
-across filer boundaries.
+In general, reducing computation does not necessarily translate into a
+faster program, but it is often a useful indication.  As
+Figure~\ref{fig:execution-speedup} demonstrates, our benchmarks
+speedup on average by a factor of {\bf XXXXX} and by a factor of
+$XXXXXXX$ in the best case.  Our performance improvements are due only
+in part to to the efficiency of FFTW.  Multiplications are decreased
+and execution is sped up in RateConvert, FM, FilterBank and Vocoder
+with only linear replacement. Linear replacement improvements are due
+to removing redundant computations -- in essence we do algebraic
+simplification across filer boundaries.
 
-With the exception of FilterBank and Vocoder, execution speed increases
-when multiplications are decreased. For Vocoder, the difference between the
-back to back application of the individual optimizations
-and the partitioned application is that the partitioner refactors and combines
-a linear splitjoin where the back to back application did not. As 
-Figure~\ref{fig:linear-freq-both} shows, this collapsing has no effect on the number
-of multiplications required but it does change the execution scheduling.
-The difference in execution speed is due to a difference in the runtime overhead of 
-this different structure. FilterBank is the same -- the partitioner 
-determines a clever refactoring that reduces the number of multiplications
-compared to the back to back application, but the additional overhead of more filters
-actually causes the execution time to increase. A more accurate cost
-model that takes into account costs other than multiplications
-could help the partitioner make a better choice between possible partitions.
+With the exception of FilterBank and Vocoder, execution speed
+increases when multiplications are decreased. For Vocoder, the
+difference between the back to back application of the individual
+optimizations and the partitioned application is that the partitioner
+refactors and combines a linear splitjoin where the back to back
+application did not. As Figure~\ref{fig:linear-freq-both} shows, this
+collapsing has no effect on the number of multiplications required but
+it does change the execution scheduling.  The difference in execution
+speed is due to a difference in the runtime overhead of this different
+structure. FilterBank is the same -- the partitioner determines a
+clever refactoring that reduces the number of multiplications compared
+to the back to back application, but the additional overhead of more
+filters actually causes the execution time to increase. A more
+accurate cost model that takes into account costs other than
+multiplications could help the partitioner make a better choice
+between possible partitions.
 
 \begin{table*}[t]
 \vspace{-6pt}

@@ -30,7 +30,7 @@ do not yet deal with {\tt feedbackloop}s as they require the notion of
 
 In StreamIt programs, the input and output rate of each filter in the
 stream graph is known at compile time.  The StreamIt compiler
-leverages this information to compute a static schedule--that is, an
+leverages this information to compute a static schedule---that is, an
 ordering of the node executions such that each filter will have enough
 data available to atomically execute its {\tt work} function, and no
 buffer in the stream graph will grow without bound in the steady
@@ -285,7 +285,7 @@ splitjoin into a linear node.  Since the combined node will represent
 a steady-state execution of the splitjoin construct, we first need to
 expand each child node according to its multiplicity in the schedule.
 Secondly, we need to ensure that each child's matrix representation
-has the same number of rows--that is, that each child peeks at the
+has the same number of rows---that is, that each child peeks at the
 same number of items.  Once these conditions are satisfied, we can
 construct a matrix representation for the splitjoin by simply
 arranging the columns from child streams in the order specified by the
@@ -351,15 +351,15 @@ the child matrices into the columns of $A'$ and $\vec{b}'$ such that
 the order of the columns of $A$ generates the correct output value order.
 Figure~\ref{fig:splitjoin-duplicate-matrix} elucidates the column ordering.
 %though its notation is somewhat cumbersome.  
-The equation can be understood as follows: for the $k$th child and 
-the $m$th cycle of the joiner, the $n$th item that is pushed by child $k$ will
-appear at a certain location on the joiner's output tape.  This
+The equation can be understood as follows: for the $k$th child and the
+$m$th cycle of the joiner, the $n$th item that is pushed by child $k$
+will appear at a certain location on the joiner's output tape.  This
 location (relative to the start of the node's execution) is $n + m *
 \mt{wSum}_n + \mt{wSum}_k$, as the reader can verify.  But since the
 right-most column of each array $A$ holds the first item to be pushed,
 we need to subtract this location from the width of $A$ when we are
 re-arranging the columns.  The width of $A$ is the total number of
-items pushed--$u'$ in the case of $A'$ and $u_k^e$ in the case of
+items pushed---$u'$ in the case of $A'$ and $u_k^e$ in the case of
 $A_k^e$.  Hence the equation as written above: we copy all items in a
 given column from $A_k^e$ to $A'$, defining each location in $A'$
 exactly once.  The procedure for $b$ is analogous.
@@ -375,8 +375,8 @@ is the case, then the $\mt{pop}$ rates must be equivalent for all the
 expanded streams; otherwise, some outputs of the splitter would
 accumulate infinitely on the input channel of some stream.  
 
-These input and output rates--in combination with the values of $A'$
-and ${\vec b}'$--define a linear node that exactly represents
+These input and output rates---in combination with the values of $A'$
+and ${\vec b}'$---define a linear node that exactly represents
 the parallel combination of child nodes that are fed by a duplicate
 splitter. Figure~\ref{fig:example-splitjoin-combination} illustrates
 the combination and collapse of a linear splitjoin. 
