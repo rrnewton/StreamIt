@@ -69,12 +69,12 @@
 	    requirements</a> before proceeding.
 	  </p>
 	  <li><p align="justify">
-	    If you downloaded the binary release, see the instructions
-	    at the <a href="../html/install.html#binary">end of this page</a>.
+	    If you downloaded the binary release, skip
+	    to <a href="../html/install.html#binary">1b</a>.
 	  </p>
       </ul>
 
-	<h2><hr>Setting the Shell Enviroment<hr></h2>
+	<h2><hr><a name="1">1a) Setting the Shell Enviroment (Source Release)</a><hr></h2>
       <p align="justify">
 	The following environment variables must be set appropriately to
 	build (and subsequently use) the StreamIt compiler.<br>
@@ -82,69 +82,118 @@
 	<ul>
 	  <li>If you are using bash (customize to your system)<br>
 	  <pre>
+	  ##Customize to system
+
+	  #Where streamit was untarred to
 	  export STREAMIT_HOME=/home/quaker/streams
+
+	  #Jikes location
 	  export JIKES_BIN_PATH=/usr/bin
+
+	  #Java location
 	  export JAVA_BIN_PATH=/usr/java/bin
+
+	  #Java lib locations (where rt.jar is)
 	  export JAVA_LIB_PATH=/usr/java/lib
+
+	  #Antlr location
 	  export ANTLR_LIB_PATH=/opt/antlr
 
-	  export CLASSPATH=.:${JAVA_LIB_PATH}/rt.jar: \
-                             ${ANTLR_LIB_PATH}/antlr.jar \
-                             ${STREAMIT_HOME}/src \
-                             ${STREAMIT_HOME}/3rdparty \
-                             ${STREAMIT_HOME}/3rdparty/cplex/cplex.jar \
-                             ${STREAMIT_HOME}/3rdparty/jgraph/jgraph.jar
+	  ##Copy rest as is
+	  export CLASSPATH=.:${JAVA_LIB_PATH}/rt.jar:${ANTLR_LIB_PATH}/antlr.jar:${STREAMIT_HOME}/src:${STREAMIT_HOME}/3rdparty:${STREAMIT_HOME}/3rdparty/cplex/cplex.jar
 
           export PATH=$PATH:${STREAMIT_HOME}/bin:${JIKES_BIN_PATH}:${JAVA_BIN_PATH}
+
+	  alias strc=${STREAMIT_HOME}/strc
 	  </pre>
 
 	  <li>If you are using tcsh (customize to your system)<br>
 	  <pre>
+	  ##Customize to system
+
+	  #Where streamit was untarred to
 	  setenv STREAMIT_HOME  /home/quaker/streams
+
+	  #Jikes location
 	  setenv JIKES_BIN_PATH /usr/bin
+
+	  #Java location
 	  setenv JAVA_BIN_PATH  /usr/java/bin
+
+	  #Java lib locations (where rt.jar is)
 	  setenv JAVA_LIB_PATH  /usr/java/lib
+
+	  #Antlr location
 	  setenv ANTLR_LIB_PATH /opt/antlr
 
-	  setenv CLASSPATH .:${JAVA_LIB_PATH}/rt.jar: \
-                             ${ANTLR_LIB_PATH}/antlr.jar \
-                             ${STREAMIT_HOME}/src \
-                             ${STREAMIT_HOME}/3rdparty \
-                             ${STREAMIT_HOME}/3rdparty/cplex/cplex.jar \
-                             ${STREAMIT_HOME}/3rdparty/jgraph/jgraph.jar
+	  ##Copy rest as is
+	  setenv CLASSPATH .:${JAVA_LIB_PATH}/rt.jar:${ANTLR_LIB_PATH}/antlr.jar:${STREAMIT_HOME}/src:${STREAMIT_HOME}/3rdparty:${STREAMIT_HOME}/3rdparty/cplex/cplex.jar
 
           set path = ($path ${STREAMIT_HOME}/bin ${JIKES_BIN_PATH} ${JAVA_BIN_PATH})
+
+	  alias strc ${STREAMIT_HOME}/strc
 	  </pre>
 	</ul>
 
-	<h2><hr>Configuring the Compiler<hr></h2>
+	<h2><hr><a name="binary">1b) Setting the Shell Enviroment (Binary Release)</a><hr></h2>
+      <p align="justify">
+	  If you downloaded the binary release, setup your environment
+        as follows and then test the compiler as shown above:
+
+	<ul>
+	  <li>If you are using bash (customize to your system)<br>
+	  <pre>
+	  #Where streamit was untarred to
+	  export STREAMIT_HOME=/home/quaker/streams
+
+	  export CLASSPATH=.:${STREAMIT_HOME}/streamit.jar
+
+          export PATH=$PATH:${STREAMIT_HOME}
+
+	  alias strc=${STREAMIT_HOME}/strc
+	  </pre>
+
+	  <li>If you are using tcsh (customize to your system)<br>
+	  <pre>
+	  #Where streamit was untarred to
+	  setenv STREAMIT_HOME  /home/quaker/streams
+
+	  setenv CLASSPATH .:${STREAMIT_HOME}/streamit.jar
+
+          set path = ($path ${STREAMIT_HOME})
+
+	  alias strc ${STREAMIT_HOME}/strc
+	  </pre>
+	</ul>
+
+	<h2><hr><a name="2a">2a) Configuring the Compiler (Source and Binary)</a><hr></h2>
       <p align="justify">
         An     autoconfiguration     script     is    available     in
-        ${STREAMIT_HOME}/bin.  To  configure the compiler,  launch the
+        ${STREAMIT_HOME}.  To  configure the compiler,  launch the
         script from the top level StreamIt directory as follows:
 
 	<ul>
 	  <pre>
         cd ${STREAMIT_HOME}
-        ./bin/configure
+        ./configure
 	  </pre>
       </ul>
+        If you downloaded the binary release, skip
+	    to <a href="../html/install.html#binary2">3</a>.
 
-	<h2><hr>Natively Building the StreamIt Compiler<hr></h2>
+	<h2><hr><a name="2b">2b) Building the StreamIt Compiler (Source)</a><hr></h2>
       <p align="justify">
         Once your system is configured, compile StreamIt as follows:
 
 	<ul>
 	  <pre>
-        cd ${STREAMIT_HOME}/src
-        make
-        cd ${STREAMIT_HOME}/library/c
+	cd ${STREAMIT_HOME}
         make
 	  </pre>
       </ul>
 
 
-	<h2><hr>Testing the StreamIt Compiler<hr></h2>
+	<h2><hr><a name="binary2">3) Testing the StreamIt Compiler (Source and Binary)</a><hr></h2>
       <p align="justify">
         Once your system is built, run the following simple test:
 
@@ -159,43 +208,6 @@
 
 	The <tt>a.out</tt> program should print the numbers 0 through 9,
 	in order, on your screen.<br>
-
-	<h2><hr><a name="binary">Using the Binary Release</a><hr></h2>
-      <p align="justify">
-	  If you downloaded the binary release, setup your environment
-        as follows and then test the compiler as shown above:
-
-	<ul>
-	  <li>If you are using bash (customize to your system)<br>
-	  <pre>
-	  export STREAMIT_HOME=/home/quaker/streams
-	  export JIKES_BIN_PATH=/usr/bin
-	  export JAVA_BIN_PATH=/usr/java/bin
-	  export JAVA_LIB_PATH=/usr/java/lib
-	  export ANTLR_LIB_PATH=/opt/antlr
-
-	  export CLASSPATH=.:${JAVA_LIB_PATH}/rt.jar: \
-                             ${ANTLR_LIB_PATH}/antlr.jar \
-                             ${STREAMIT_HOME}/lib/streamit.jar
-
-          export PATH=$PATH:${STREAMIT_HOME}/bin:${JIKES_BIN_PATH}:${JAVA_BIN_PATH}
-	  </pre>
-
-	  <li>If you are using tcsh (customize to your system)<br>
-	  <pre>
-	  setenv STREAMIT_HOME  /home/quaker/streams
-	  setenv JIKES_BIN_PATH /usr/bin
-	  setenv JAVA_BIN_PATH  /usr/java/bin
-	  setenv JAVA_LIB_PATH  /usr/java/lib
-	  setenv ANTLR_LIB_PATH /opt/antlr
-
-	  setenv CLASSPATH .:${JAVA_LIB_PATH}/rt.jar: \
-                             ${ANTLR_LIB_PATH}/antlr.jar \
-                             ${STREAMIT_HOME}/lib/streamit.jar
-
-          set path = ($path ${STREAMIT_HOME}/bin ${JIKES_BIN_PATH} ${JAVA_BIN_PATH})
-	  </pre>
-	</ul>
 
       </p>
     </td>
