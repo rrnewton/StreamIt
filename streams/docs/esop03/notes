@@ -1,3 +1,24 @@
+thinking of parameterization now...
+
+- problem in plain dimension is that mapping of dependences between
+filters when they have non-unary weights is not an affine function
+
+  - if just one variable, could just link dependence of first firing
+    and last firing and be guaranteed that in between are okay?
+
+  - could factor out a list of phases, keeping track of how many
+    firings of each in filter in each phase.  but i'm worried about
+    how could this could get.
+
+  - could split the domain the way we do in the current esop paper.
+    not sure how practical this is though, since it adds S(n) dependences
+    for filter N
+
+  - could replace multiple i/o rates with splitjoins of unary weights
+   - this wouldn't introduce an extra dimension because the child
+     dimension would be a rate (constant).  but if you wanted to treat
+     it in a parameterized way then it would be a new dimension, I think.
+
 Low Priority
 ------------
 
