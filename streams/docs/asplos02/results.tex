@@ -73,14 +73,14 @@ CRC & A 32-bit Cyclic Redundancy Check (CRC) Encoder/Decoder. \\
 \hspace{-5pt} {\bf of} \hspace{-5pt} \\ \hspace{-5pt} {\bf code} \hspace{-5pt}
 \end{tabular} &    
 \begin{tabular}{c} 
-\hspace{-5pt} {\bf \# of} \hspace{-5pt} \\ \hspace{-5pt} {\bf filters} \hspace{-5pt}
+\hspace{-5pt} {\bf \# of} \hspace{-5pt} \\ \hspace{-5pt} {\bf tiles} \hspace{-5pt}
 \end{tabular} &    
 \begin{tabular}{c}\hspace{-5pt} {\bf Throughput} \hspace{-5pt}\\
 \hspace{-5pt} {\bf (per 10$^5$ cycles)} \hspace{-5pt}
 \end{tabular} &    
 \hspace{-5pt} {\bf MFLOPS} \hspace{-5pt} & 
 \begin{tabular}{c} 
-\hspace{-5pt} {\bf \# of} \hspace{-5pt} \\ \hspace{-5pt} {\bf filters} \hspace{-5pt}
+\hspace{-5pt} {\bf \# of} \hspace{-5pt} \\ \hspace{-5pt} {\bf tiles} \hspace{-5pt}
 \end{tabular} &    
 \begin{tabular}{c}\hspace{-5pt} {\bf Throughput} \hspace{-5pt} \\
 \hspace{-5pt} {\bf (per 10$^5$ cycles)} \hspace{-5pt}
@@ -88,15 +88,15 @@ CRC & A 32-bit Cyclic Redundancy Check (CRC) Encoder/Decoder. \\
 {\bf MFLOPS}
 \\
 \hline \hline
-BeamFormer (12x4) & 596 & 53 & 0.9 & 573 & 15 & 1.8 & 1120\\
+BeamFormer (12x4) & 596 & 53 & 1.1 & 619 & 15 & 2.7 & 1470 \\
 \hline
-BeamFormer (48x16) & 596 & 209 & N/A & N/A & 15 & 0.3 & 840\\
+BeamFormer (48x16) & 596 & 209 & N/A & N/A & 15 & 0.3 & 836\\
 \hline
-FM Radio & 511 & 14 & 107 & 141 & 11 & 41 & 258\\
+FM Radio & 511 & 14 & 34 & 107 & 13 & 81 & 258\\
 \hline
-FFT & 174 & 31 & 641 & 35.75 & 15 & 27.8 & 4.25\\
+FFT & 174 & 37 & 669 & 12.5 & 16 & 657 & 12.3 \\
 \hline
-GSM Decoder & 1925 & 14 & 58.6 & N/A & 16 & 60.4 & N/A\\
+GSM Decoder & 1925 & 16 & 107 & N/A & 15 & 107 & N/A\\
 \hline
 CRC & 336 & 47 & 35.1 & N/A & 5 & 52.4 & N/A\\
 \hline
@@ -142,17 +142,17 @@ The results show that for programs with substantial computation
 requirements, the StreamIt compiler is able to extract good
 performance out of the Raw processor.  For example, the BeamFormer
 application (see Figure~\ref{fig:beamcode} for source code) shows a
-sustained 1.12 GFLOPS rate, after a 95\% improvement due to our
+sustained 1.47 GFLOPS rate, after a 145\% improvement due to our
 optimizations.  Figures~\ref{fig:beam-orig} and~\ref{fig:beam-opt}
 give the original and optimized configurations of the BeamFormer's
 stream graph, and Figure~\ref{fig:beam-blood} illustrates the impact
 of our load balancing optimizations .
-
-However, programs such as FFT, which was created to experiment with
-the language features of StreamIt, have very little work per
-filter. We were unable to amortize the communication overhead for FFT,
-leading to a slowdown.  Better tile code generation and traditional
-optimizations may help improve the performance.
+%
+%However, programs such as FFT, which was created to experiment with
+%the language features of StreamIt, have very little work per
+%filter. We were unable to amortize the communication overhead for FFT,
+%leading to a slowdown.  Better tile code generation and traditional
+%optimizations may help improve the performance.
 
 \begin{figure}
   \begin{center} \psfig{figure=beam-blood-key.eps,width=3.25in} \\

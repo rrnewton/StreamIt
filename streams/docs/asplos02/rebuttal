@@ -5,7 +5,7 @@ preparation was rushed and we had little time to proofread.  However,
 we have since posted a revised technical report with many corrections
 and updated results:
 
-   http://compiler.lcs.mit.edu/streamit/papers/streamit-627.pdf
+  http://compiler.lcs.mit.edu/streamit/papers/streamit-627-v2.pdf
 
 We believe that the paper's primary contribution is from a systems
 perspective: it demonstrates what is needed to obtain end-to-end
@@ -32,18 +32,19 @@ Two issues were of interest to many reviewers:
    the scope of this paper, and even orthogonal to our other results.
 
 2. Performance of FFT.  Our submission indicated a 20-fold decrease in
-   the performance of FFT due to our "optimizations".  
+   the performance of FFT due to our "optimizations".  Two
+   clarifications are in order.  Firstly, the primary aim of our
+   fusion transformations is to reduce the granularity of the stream
+   graph so that it will fit on a 16-tile target.  This is why we did
+   not "turn off" the transformation for FFT, as the original program
+   required 37 tiles and would not fit on RAW.
 
-   Many clarifications are in order here.  Firstly, the primary aim of
-   our fusion transformations is to reduce the granularity of the
-   stream graph so that it will fit on a 16-tile target.  This is why
-   we did not "turn off" the transformation for FFT, as the original
-   program would not fit on RAW.  Secondly, this version of FFT
-   (reference #21 contains the code) was intended as a stress-test for
-   the StreamIt language rather than for high performance.
-
-   ... the latest results are in the above tech report.
-
+   Moreover, we have since obtained a better partitioning of FFT that
+   fuses the 37-tile version into a 16-tile version while losing only
+   2% of the performance (tile utilization improves by more than a
+   factor of two.)  This result also reflects some recent improvements
+   in our fusion algorithm; our latest numbers appear in the technical
+   report cited above.
 
 Finally, in the context of our results, we ommitted to mention that
 the RAW processor contains 16 tiles that run at 250 MHz; the peak
@@ -112,11 +113,12 @@ have random-access memory, so long as it is local to the filter.
 
 Review #473 
 -----------
-We plan to emphasize more the benefits of having a structured
+We plan to place more emphasize on the benefits of having a structured
 language.  For instance, fission and fusion transformations would be
 more complicated in an unstructured realm where local changes have
-global consequences for scheduling and buffer management.  Structured
-streams also simplify our algorithms for scheduling and routing.
+global consequences for scheduling and buffer management.  The stream
+structures also simplify scheduling and simulation, and having
+single-input, single-output blocks simplifies code generation.
 
 Regarding who wrote the applications that we used for our experiments:
 we had to write them ourselves, since there are no other sources of

@@ -44,7 +44,7 @@ The loop and the body cannot execute in parallel.  We are
 investigating methods for relaxing the serialization.
 
 As described in Section \ref{sec:rawcommunic}, the communication
-scheduler computes a internal buffer schedule for each collapsed
+scheduler computes an internal buffer schedule for each collapsed
 Joiner node.  This schedule exactly describes the order in which to
 send and receive data items from within the Joiner.  The schedule is
 annotated with the destination buffer of the receive instruction and
