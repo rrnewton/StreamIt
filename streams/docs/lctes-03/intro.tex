@@ -1,151 +1,204 @@
 \section{Introduction}
 
-Applications structured around some notion of a ``stream'' are
-becoming increasingly important and widespread. There is evidence
-that streaming media applications are already consuming most of
-the cycles on consumer machines \cite{Rix98}, and their use is
-continuing to grow.  In the embedded domain, applications for
-hand-held computers, cell phones, and DSP's are centered around
-streams of voice or video data.  The stream abstraction is also
-fundamental to high-performance applications such as intelligent
-software routers, cell phone base stations and HDTV editing
-consoles.
+%% Applications targetting embedded devices are becoming increasingly
+%% large and complex.  
+From handheld computers to cell phones to sensor networks, there has
+been a surge of embedded applications that demand high-performance
+digital signal processing.  These programs constitute a new and
+important class of applications: those that are centered around {\it
+streams} of data.  Despite the widespread parallelism and regular
+communication patterns that are inherit in stream programs,
+application development in the streaming domain is still very
+labor-intensive and error-prone.  In order to optimize critical loops,
+DSP programmers are often forced to resort to assembly code, thereby
+sacrificing portability and robustness for the sake of performance.
+As the complexity of embedded software grows, this practice will
+become infeasible.  There is a pressing need to provide high-level
+stream abstractions that can be compiled without sacrificing
+efficiency.
 
-Despite the prevalence of these applications, there is
-surprisingly little language and compiler support for practical,
-large-scale stream programming.  The notion of a stream as a
-programming abstraction has been around for decades \cite{SICP},
-and a number of special-purpose stream languages have been
-designed (see \cite{survey97} for a review). Many of these
-languages and representations are elegant and theoretically sound,
-but often they are designed with neither practical use nor
-efficiency in mind. Consequently most programmers turn to
-general-purpose languages such as C or C++ to implement stream
-programs.
+The goal of the StreamIt project is to provide language and compiler
+support for high-level stream programming.  A StreamIt program
+consists of a set of autonomous filters that communicate using FIFO
+queues.  Filters can be combined into single-input, single-output
+groups by using a set of hierarchical primitives, thereby imposing a
+struture on the stream graph that is akin to structured control flow
+in a mainstream language.  In order to facilitate static scheduling,
+the input and output rates of each filter are known at compile time.
 
-\begin{comment}
-There are two reasons that general-purpose languages are
-inappropriate for stream programming.  Firstly, they are a
-mismatch for the application domain.  That is they do not provide
-a natural or intuitive representation of streams thereby having a
-negative effect on readability, robustness, and programmer
-productivity.  Furthermore, general-purpose languages do not
-communicate well the inherent parallelism of stream computations.
- Secondly, general-purpose languages are a mismatch for the
-emerging class of grid-based architectures
-\cite{smartmemories,rawshort,trips}.
-\end{comment}
+In this paper, we present techniques for scheduling stream graphs such
+as those found in StreamIt.  The StreamIt representation has much in
+commmon with Synchronous Dataflow (SDF) graphs~\cite{lee87static}, for
+which there is a large body of literature devoted to scheduling
+\todo{citations}.  There are two aspects of StreamIt programs that
+distinguish our scheduling problem from a general SDF graph: 1)
+StreamIt graphs are hierarchical, with each node having only a single
+input and single output, and 2) StreamIt allows a ``peek'' operation
+whereby nodes can operate on items that they do not consume until a
+future invocation.  In this context, this paper makes the following
+contributions:
+\begin{itemize}
+\item Fundamental techniques for constructing a hierarchical schedule
+from a hierarchical stream graph.
 
-{\StreamIt} is a language and a compiler specifically designed for
-modern stream programming.  The main goal of the {\StreamIt}
-langauge is to provide high-level stream abstractions that improve
-programmer productivity and program robustness within the
-streaming domain.  At the same time, the {\StreamIt} compiler aims
-to perform stream-specific optimizations to achieve the
-performance of an expert programmer.
+\item A method for computing an initialization schedule, which is a
+unique requirement of graphs supporting the peek construct.
 
-In order to achieve these goals, {\StreamIt} provides a number of
-features, designed to allow the programmer to easily and naturally
-express the required computation, while keeping the program easy
-to analyze by a compiler: all {\StreamIt} streaming constructs are
-single-input, single-output; all computation happens in
-{\filters}; data is passed around between {\filters} using three
-streaming constructs: {\pipeline}, which allows stacking of
-{\filters} one after another, {\splitjoin}, which allows splitting
-and joining of data amongst multiple streams, and {\feedbackloop},
-which constructs cyclic streams. {\StreamIt} programs are built
-hierarchically, using {\filters} as the inner building blocks and
-{\pipelines}, {\splitjoins} and {\feedbackloops} as outer building
-blocks.\footnote{We use the term {\stream} {\operator} or just
-{\operator} to refer to any instance of a {\filter}, {\pipeline},
-{\splitjoin}, or {\feedbackloop}.} In {\StreamIt}, every {\filter}
-must declare the rate at which it processes data: how much data is
-consumed and produced on every invocation of the {\filter}'s
-{\work} function. This model of data passing is called Synchronous
-Data Flow ({\SDF}).
+\item A parameterized phased scheduling algorithm that leverages the
+structure of a StreamIt graph to give a flexible tradeoff between code
+and data size.
 
-\begin{comment}
-In addition to {\SDF}, {\StreamIt} allows the programmer to pass
-data between {\filters} in an asynchronous manner, similar to a
-combination of message passing and function calls. Timing of such
-data delivery is expressed in terms of amount of information
-wavefronts - the programmer can specify a delay between message
-delivery and destination {\filter}'s processing of data currently
-being produced or consumed by the source {\filter}.  Such timing
-mechanism introduces latency and buffering constraints on
-execution of {\StreamIt} programs.
-\end{comment}
-
-Using the features present in {\StreamIt}, the programmer can
-express complex algorithms and computation models.  One of the
-challenges faced in compiling {\StreamIt} programs is scheduling.
-Since {\StreamIt} uses the {\SDF} computation model it is possible
-to schedule the order of execution of {\filters} at compile time.
-Scheduling {\SDF} programs presents a difficult challenge to the
-compiler:  as the complexity of the program grows, the amount of
-memory required to execute the program increases.  This increase
-comes from two sources: the schedule size increases, as well as
-amount of data needed for buffering increases.  These two sources
-are closely coupled. There exist tradeoffs between the schedule
-size and the buffer size. The smallest schedules (Single
-Appearance schedules) require buffer space that may in the worst
-case grow exponentially with the number of components. The general
-rule is that very small schedules result in very large buffering
-requirements, and vice versa.
-
-\begin{comment}
-This problem is further complicated by message latency constraints
-placed on the program by the programmer.  While {\StreamIt}
-programs are meant to provide relatively lax latency requirements,
-it is possible to write programs with latency constraints so tight
-that very few valid schedules exist. Finding these schedules is a
-challenging task.
-\end{comment}
-
-This paper develops a novel technique for scheduling execution of
-{\StreamIt} programs. The technique takes advantage of the
-structure of {\StreamIt} to create compact schedules. These
-schedules will be purely hierarchical in nature. The concept of a
-phased schedule (which is also hierarchical) will be introduced to
-reduce the requirement for buffering data between {\filters}
-without overly increasing the size of the schedule. Phased
-scheduling is meant to to reduce the severity of tradeoffs the
-compiler needs to make between schedule size and buffer
-requirements, thus allowing compilation of programs to more
-resource constrained architectures. It can also help allocate the
-usage resources more appropriately between resources necessary for
-execution of the program and resources necessary to store data.
-
-Hierarchical schedules are also useful, because they allow for
-separate compilation of program components. This enables creation
-of standardized libraries and their distribution in binary form,
-rather than source code. This ability may become important as
-streaming languages become more widely used for larger
-applications.
-
-\begin{comment}
-The contributions of this thesis are:
-\begin{itemize} \item
-hierarchical scheduling of streaming application, a concept
-enabled by {\StreamIt} language, \item first formal handling of
-{\SDF} graphs with peeking, \item novel phased scheduling
-technique, \item a minimal latency schedule using hierarchical
-phases, \item novel {\SDF} program abstraction called the
-information buffering model that simplifies information latency
-analysis, \item a solution to scheduling of {\StreamIt} programs
-with latency constraints.
+\item An instance of the phased scheduling algorithm that computes a
+minimal latency schedule without undue code requirements.
 \end{itemize}
-\end{comment}
-
-The remainder of this paper is organized as follows: Section
-\ref{sec:streamit} describes relevant {\StreamIt} constructs;
-Section \ref{chpt:sched-basic} explains basic concepts in
+%% This paper makes the following contributions:
+%% \begin{itemize}
+%%
+%% \item hieararhical scheduling of a streamig app hierarchical scheduling of
+%% streaming application, a concept enabled by the {\StreamIt} language
+%%
+%% \item first formal handling of {\SDF} graphs with peeking
+%%
+%% \item a novel phased scheduling technique, giving a tradeoff between
+%% code size and data size
+%%
+%% \item a minimum latency scheduler that uses hierarchical phases
+%%
+%% \end{itemize}
+This paper is organized as follows.  The remainder of this Section
+gives a motivating example and describes relevant {\StreamIt}
+constructs; Section \ref{chpt:sched-basic} explains basic concepts in
 scheduling {\StreamIt} graphs; Section \ref{chpt:hierarchical}
 describes a hierarchical single-appearance scheduling technique;
-Section \ref{chpt:phased} describes the phased scheduling
-technique and presents a minimum-latency scheduling algorithm;
-Section \ref{chpt:results} presents results of scheduling
-applications using the phased scheduling algorithm; Section
-\ref{chpt:related} presents related work and Section
-\ref{chpt:conclusion} presents conclusions and planned future
-work.
+Section \ref{chpt:phased} describes the phased scheduling technique
+and presents a minimum-latency scheduling algorithm; Section
+\ref{chpt:results} presents results of scheduling applications using
+the phased scheduling algorithm; Section \ref{chpt:related} presents
+related work and Section \ref{chpt:conclusion} presents conclusions
+and planned future work.
+
+\begin{figure}[t]
+\psfig{figure=sched-diag2.eps,width=3.5in}
+\caption{Execution trace for three different scheduling
+strategies.\protect\label{fig:trace}}
+\vspace{-12pt}
+\end{figure}
+
+\subsection{Motivating Example}
+\label{sec:sched-vs-buffer}
+
+\begin{comment}
+\begin{figure}
+\begin{center}
+\psfig{figure=pipeline-buffers.eps,width=0.6in} \caption[4 {\filter}
+{\pipeline}]{Sample 4 {\filter} {\pipeline}.  This {\pipeline} is
+the same as one in Figure \ref{fig:steady-state} (a), except that
+its children do not peek extra data} \label{fig:pipeline-buffers}
+\end{center}
+\end{figure}
+\end{comment}
+
+A classic problem in the scheduling of synchronous dataflow graphs is
+the tradeoff between code size and data size.  Code size refers to the
+space needed to represent the schedule, while data size refers to the
+buffering of items during execution.  Generally speaking, smaller
+schedules contain loops that require coarse-grained execution of
+nodes, thereby leading to larger buffer requirements.
+
+Consider the example stream graph depicted in Figure~\ref{fig:trace}.
+Even given a simple pipeline of filters, there is a large space of
+different schedules, each with different requirements for code and
+buffer size.  Figure~\ref{fig:trace} illustrates two extreme
+scheduling policies.  First is Single Appearance Scheduling (SAS),
+which gives the minimal code size: the schedule is a loop nest with
+each node appearing at a single position.  SAS is generally the method
+of choice in the DSP community, as the contents of each node can be
+inlined without duplicating code.  Even within SAS schedules, it
+NP-hard to determine the one that gives the smallest buffers
+\todo{citation}.  The schedule shown in Figure~\ref{fig:trace} is the
+best SAS schedule for this case.
+
+At the other end of the spectrum is a push schedule, which results in
+the minimal buffer size at the expense of code size.  A push schedule
+starts by executing the top-most node, and then pushes the items
+produced through the rest of the graph, always executing the most
+downstream node possible.  When no further node can fire, the top node
+is executed again.  In this case, the push schedule reduces the buffer
+size by 48\% but increases code size by 325\% over the SAS schedule.
+
+In this paper, we develop a phased scheduling algorithm that offers a
+flexible alternative between the extremes of SAS and push scheduling.
+Shown in Figure~\ref{fig:trace}(b) is the minimum latency phased
+schedule.  It consists of three ``phases'', each of which is a
+single-appearance sub-schedule that results in a single output item
+being produced from the pipeline.  The schedule has the same latency
+as the push schedule, but has reduced code size due the
+single-appearance property of the phases and the collapse of phases 2
+and 3 into a single representation ``E''.
+
+Figure~\ref{fig:codedata} illustrates the tradeoff between code size
+and data size for the scheduling schemes.  It shows that, while all
+three techniques require approximately the same amount of memory, the
+allocation of that memory between code and data is variable with
+phased scheduling striking a compromise between extremes.
+
+\begin{comment}
+We can compare the storage efficiency of these two schedules by
+assuming that one data item in a buffer requires $x$ amount of memory
+and each entry in a schedule requires $y$ amount of memory.  Thus the
+two schedules will require the same amount of storage to store
+themselves and execute if $11 x + 18 y = 39 x + 4 y$.
+
+\begin{displaymath}
+\begin{array}{rcl}
+11 x + 18 y & = & 39 x + 4 y \\
+14 y & = & 28 x \\
+y & = & 2x
+\end{array}
+\end{displaymath}
+
+Thus the smaller schedule is more efficient if every data item
+requires less than twice the amount of storage than every entry in
+the schedule.
+
+One of the difficulties in scheduling {\StreamIt} programs lies in
+finding a good set of trade-offs between schedule size and
+buffering requirements.
+\end{comment}
+
+\begin{comment}
+
+\subsection{Minimum Buffer Size between {\filters}}
+
+As illustrated above, the amount of buffering in a {\pipeline} can
+be affected greatly by the order of executions of {\filters} in the
+{\pipeline}.  The following equation calculates the minimal buffer
+size required in order for two {\filters} to be able to push data
+between each other indefinitely in the most buffer-efficient way.
+Buffers this size cannot always be achieved, because some
+components require that data be buffered up for execution (ex.
+{\feedbackloops} require data to exist internally in order to
+execution to advance) or because extra latency constrains require
+additional buffering.
+
+\begin{equation}
+buffer_{A \to B} = \left\lceil {{peek_B} \over {\gcd(push_A,
+pop_B)}} - 1 \right\rceil \gcd (push_A, pop_B) + push_A
+\end{equation}
+
+\emph{I can explain this equation, but I cannot prove it.  what
+should I do with this?  it's not necessary for the thesis, but it
+is a neat result we never published (PLDI submission), nor have I
+seen it in any other papers (nobody does peeking, so it can't be
+anywhere else)}
+
+\end{comment}
+
+\begin{figure}[t]
+\psfig{figure=codedata.eps,width=3.5in}
+\caption{Code and data sizes for the execution traces of
+Figure~\ref{fig:trace}.  A simple buffer implementation would hold
+both live and dead items, while a shared buffer implementation would
+hold only live items.  \protect\label{fig:codedata}}
+\vspace{-12pt}
+\end{figure}

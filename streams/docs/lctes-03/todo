@@ -1,0 +1,51 @@
+high priority
+-------------
+
+- don't cut-and-paset intro from CC, streamit section from ASPLOS
+
+- still have refs to appendix
+
+- I would remove {\tt } for all StreamIt, peek, pop, etc. keywwords
+
+medium priority
+---------------
+
+- Figure 3, label which numbers are peek, pop, push
+
+- make all the figures scale by the same amount when they're inserted
+  into document (can do this by examining EPS bounding box size).  For
+  example, feedbackloop is in bigger print than splitjoin in Figure 2.
+
+low priority
+------------
+
+things missing / to fix
+-----------------------
+
+- don't like the notation for steady state
+  - esp., why have S_{s,c} = {e_s, o_s, u_s} if e_s, o_s, and u_s are already defined?
+    --> oh, I see, because they're not defined in general.
+
+- steady state vs. steady state schedule is still confusing
+
+- initialization for peeking section, I think those rates can be
+symoblic.
+
+- more graphics!  instead of tables highlighting things, have figures,
+and instead (or in addition to) results table, have a graph
+
+- need to integrate the description of phasing and of single apparance
+
+- important distinction: the steady state in relation to the entire
+program, or in relation to your immediate parent
+
+- redo the "sample stream operators".  They look like they're typeset
+in illustrator slightly differently than the FM Radio.
+
+
+---
+
+- move execution model into streamit section
+- keep section 3 as scheduling basics, but make it include all the initialization details
+  - say how to calculate steady state; note that schedule could just be steady-state multiplicities
+- then next section in phases, with two special cases

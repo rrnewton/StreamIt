@@ -1,6 +1,10 @@
 \section{Phased Scheduling}
 \label{chpt:phased}
 
+\begin{figure}[t]
+\psfig{figure=pseudocode2.eps,width=3in}
+\end{figure}
+
 We now propose Phased Scheduling, a technique which allows us to
 schedule all valid {\StreamIt} programs, and which allows for
 better control of the trade-off between schedule size and buffer
@@ -42,7 +46,7 @@ allow the {\feedbackloop} to execute.
 
 \subsubsection{Notation}
 
-A phasing schedule of a stream operator $s$ is an ordered set
+A phased schedule of a stream operator $s$ is an ordered set
 $P_s$ of elements, $P_s = \{T_s, I_s, c_s, c^i_s\}$.  The first
 element, $T_s$ denotes the phases used for the steady state
 schedule of $s$. $I_s$ denotes the phases used for the
@@ -94,7 +98,7 @@ of the filter's {\work} function.  Although in principle, a
 {\filter} does not need to be executed to be initialized, it may
 require some data to be buffered up for its steady state
 execution. This means that if $e_f > o_f$, we insert an artificial
-initialization phase to phasing schedules of {\filters}:
+initialization phase to phased schedules of {\filters}:
 
 \begin{displaymath} \small
 P_p = \left\{
@@ -263,7 +267,7 @@ items borrowed from the {\Channel}.}
 
 Table \ref{tbl:min-lat-sj} contains a trace of execution of our
 algorithm on the sample {\splitjoin} from Figure
-\ref{fig:steady-state}(b). Below is the phasing schedule for the
+\ref{fig:steady-state}(b). Below is the phased schedule for the
 {\splitjoin}. Note that this example produces a phased single
 appearance schedule.
 

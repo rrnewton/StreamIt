@@ -27,35 +27,6 @@ Figure \ref{fig:structure} contains examples of various
 {\StreamIt} streams.  The restrictions on arrangement of streams
 enforces the structure imposed by {\StreamIt}.
 
-\begin{figure}\begin{center}
-\begin{minipage}{2in}
-\centering
-\psfig{figure=filter.eps,width=0.7in} \\
-{\protect\small (a) A {\filter}}
-\end{minipage}
-~
-\begin{minipage}{2in}
-\centering
-\psfig{figure=pipeline.eps,width=0.7in} \\
-{\protect\small (b) A {\pipeline} with $n$ children.}
-\end{minipage}
-~
-\begin{minipage}{2in}
-\centering
-\psfig{figure=splitjoin.eps,width=2in} \\
-{\protect\small (c) A {\splitjoin} with $n$ children}
-\end{minipage}
-~
-\begin{minipage}{2in}
-\centering
-\psfig{figure=feedback.eps,width=1.5in} \\
-{\protect\small (d) A {\feedbackloop}}
-\end{minipage}
-\end{center}
-\caption{All {\StreamIt} streams}
-\label{fig:structure}
-\end{figure}
-
 \subsubsection{\filters}
 
 The basic unit of computation in {\StreamIt} is the {\filter}. The
@@ -137,6 +108,35 @@ the feedback path at first, the stream instead inputs data from a
 special function defined by the {\feedbackloop}.  The amount of
 data pushed onto the feedback path is called delay amount, denoted
 $delay_{fl}$, for a {\feedbackloop} $fl$.
+
+\begin{figure}\begin{center}
+\begin{minipage}{2in}
+\centering
+\psfig{figure=filter.eps,width=0.7in} \\
+{\protect\small (a) A {\filter}}
+\end{minipage}
+~
+\begin{minipage}{2in}
+\centering
+\psfig{figure=pipeline.eps,width=0.7in} \\
+{\protect\small (b) A {\pipeline} with $n$ children.}
+\end{minipage}
+~
+\begin{minipage}{2in}
+\centering
+\psfig{figure=splitjoin.eps,width=2in} \\
+{\protect\small (c) A {\splitjoin} with $n$ children}
+\end{minipage}
+~
+\begin{minipage}{2in}
+\centering
+\psfig{figure=feedback.eps,width=1.5in} \\
+{\protect\small (d) A {\feedbackloop}}
+\end{minipage}
+\end{center}
+\caption{All {\StreamIt} streams}
+\label{fig:structure}
+\end{figure}
 
 \subsection{Messages}
 \label{sec:streamit:messages}
