@@ -1,49 +1,27 @@
 high priority
 -------------
 
-- say: streamit is better because compiler worries about buffer
-managment AND SCHEDULING
-
-- shouldn't have psuedo-streamit, as it's kind of confusing.  I'd
-prefer block diagrams of some sort instead.
-
-- probably want to show FIR code in the C version; otherwise the
-streamit version looks unnecessarily long in comparison.
-
-- under "linear representations", should explain how popping is done
-in the compiler
+- note that we require a certain minimum value of e in the expansion
+process!
 
 - make sure it's xA + b everywhere instead of xA + a.
-
-- update the combination figures to be consistent with the description
-(expand by k, do padding of zero's at top, individual columns at left)
-
-(aal done) add definition of linear node to the "linear representation" section 
-
-- say more about when linear combination is a good thing?  I think the
-statement with the sum of non-zero elements is not entirely accurate.
 
 low priority
 ------------
 
-- push/pop/peek could be explained under the streamit section, not the
-dataflow section
-
-(aal - removed) do we need the LPF defined in fig 8 anymore?  Seems redundant with
-the FIR Filter at the beginning.  If we have the LPF for the sake of
-the init function, you could still add an FIR as a child perhaps.
-
-(aal - saman said leave) instead of dataflow analysis, how about "detecting linear filters"?
-
-(aal - started) I would recommend adding a vector symbol to b everywhere, or putting
-A and b in bold everywhere, to note that they're vectors and
-distinguish them from constants like e, o, and u.
-
-- push / pop letters are backwards in figure 9
-
-- note that we require a certain minimum value of e in the expansion
-process?  *** I think it might be clearer if the zero-padding were a
-separate operation.
+- do we need a word other than dataflow analysis to describe what
+we're doing?  It's not really a dataflow analysis.
 
 - make it explicit somewhere that whenever we introduce \lambda_x, we
 also introduce A_x, b_x, e_x, o_x, u_x.
+
+(aal - started) I would recommend adding a vector symbol to b
+everywhere, or putting A and b in bold everywhere, to note that
+they're vectors and distinguish them from constants like e, o, and u.
+
+probably not doing
+------------------
+
+- say more about when linear combination is a good thing?  I think the
+statement with the sum of non-zero elements is not entirely accurate.
+

@@ -93,39 +93,52 @@ giving results (Section~\ref{sec:results}), related work
 \epsfbox{images/motivating-example.eps}
 \scriptsize
 \begin{verbatim}
-float data[N]; /* input data buffer */
-float buffer[N]; /* inter-filter buffer */
+/* perform N-element FIR filter with weights and data */
+float filter(float* weights, float* data, int pos, int N) {
+  int i;
+  float sum = 0;
 
-/* initialize inter-filter buffer */
-for (i=0; i<N; i++) {
-  /* filter starting at index i of input data, wrap around */
-  buffer[i] = filter(weights1, data, i, N);
-  data[i] = get_next_input();
+  /* perform weighted sum, starting at index pos */
+  for (i=0; i<N; i++, pos++) {
+    sum += weights[pos] * data[pos];
+    pos = (pos+1)%N;
+  }
+  return sum;
 }
 
-i = 0;
-while(true) {
-  push_output(filter(weights2, buffer, i, N));
-  /* get next data item */
-  data[i] = get_next_input();
-  /* generate the next element in the inter filter buffer */
-  buffer[i] = filter(weights1, data, i, N);
-  /* update current start of buffer */
-  i = (i+1)%N
+void main() {
+  int i;
+  float data[N];   /* input data buffer */
+  float buffer[N]; /* inter-filter buffer */
+  
+  /* initialize the input data buffer */
+  for (i=0; i<N; i++) {
+    data[i] = get_next_input();
+  }
+  
+  /* initialize inter-filter buffer */
+  for (i=0; i<N; i++) {
+    buffer[i] = filter(weights1, data, i, N);
+    data[i] = get_next_input();
+  }
+  
+  i = 0;
+  while(true) {
+    /* generate next output item */
+    push_output(filter(weights2, buffer, i, N));
+    /* generate the next element in the inter-filter buffer */
+    buffer[i] = filter(weights1, data, i, N);
+    /* get next data item */
+    data[i] = get_next_input();
+    /* update current start of buffer */
+    i = (i+1)%N;
+  }
 }
 \end{verbatim}
-\caption{FIR filtering with back to back filters in C. Note the use of circular buffers.}
+\caption{Two consecutive FIR filters in C.  Channels are represented
+as circular buffers, and the scheduling is done by hand.}
 \label{fig:motivating-example}
 \end{figure}
-
-As an example of the types of program transformation that our
-optimization allows, consider a sequence of finite impulse response
-(FIR) filters as shown in Figure~\ref{fig:motivating-example}. The
-imperative C style code that implements this simple DSP application is
-also shown. The program largely defies many standard compiler analysis
-and optimization techniques because of its use of circular buffers and
-the muddled relationship between {\tt data}, {\tt buffer} and the
-output.
 
 \begin{figure}
 \scriptsize
@@ -145,21 +158,22 @@ float->float filter FIRFilter(float[N] weights) {
     pop();
 }
 \end{verbatim}
-\caption{StreamIt program to implement the same processing as the program in Figure~\ref{fig:motivating-example}}
+\caption{Two consecutive FIR filters in StreamIt.  Buffer management
+and scheduling are handled by the compiler.}
 \label{fig:example-streamit}
 \end{figure}
-
-
-Figure~\ref{fig:example-streamit} shows the same filtering process implemented in 
-StreamIt. The StreamIt program is better because it uses explicit input/output channels,
-lets the compiler worry about buffer management and shows the structure of the original
-block diagram. 
-
 
 \begin{figure}
 \scriptsize
 \begin{verbatim}
-float->float filter LinearTwoPipe() {
+float->float filter CollapsedTwoPipe() {
+  float[N] combined_weights;
+
+  init {
+    /* calculate combined_weights as combination of 
+       weights1 and weights2 */
+  }
+
   work push 1 pop 1 peek N {
     float sum = 0;
     for (int i=0; i<N; i++) {
@@ -170,41 +184,78 @@ float->float filter LinearTwoPipe() {
   }
 }
 \end{verbatim}
-\caption{Program after combination in psuedo-StreamIt.}
+\caption{Combined version of the two FIR filters.  Since each FIR
+filter is linear, the weights can be combined into a single {\tt
+combined\_weights} array.}
 \label{fig:example-combine}
 \end{figure}
 
-Our data analysis provides a complete relationship between input and output for
-each filter, and furthermore can combine the actions of the two filters as shown
-in Figure~\ref{fig:example-combine}. The new combined filter's {\tt combined\_weights}
-array contains elements such that the overall output is the same.
-
 \begin{figure}
 \scriptsize
+%% float->float filter FreqTwoPipe() {
+%%   complex[N] H;
+%%   init {
+%%     H = FFT(combined_weights);
+%%   }
+%%   work push L pop L peek N+L {
+%%     float[N] X = FFT(peek(0..N+L-1)); /* input FFT */
+%%     float[N] Y =  X .* H; /* element wise mult */
+%%     float[N] y = IFFT(Y); /* inverse FFT */
+%%     push(y[0..L-1]); /* push first L elts of y */
+%%   }
+%% }
 \begin{verbatim}
-float->float filter FreqTwoPipe() {
-  complex[N] H;
-  init {
-    H = FFT(combined_weights);
-  }
-  work push L pop L peek N+L {
-    float[N] X = FFT(peek(0..N+L-1)); /* input FFT */
-    float[N] Y =  X .* H; /* element wise mult */
-    float[N] y = IFFT(Y); /* inverse FFT */
-    push(y[0..L-1]); /* push first L elts of y */
-  }
+float->float pipeline FreqTwoPipe(int L) {
+  /* calculate combined weights */
+  float[N] combined_weights = ... ;
+  /* take FFT of weights */
+  complex[N] H = fft(combined_weights);
+  /* add FFT stage to stream */
+  add FFT(N+L);
+  /* add stage to multiply by H */
+  add ElementMultiply(H);
+  /* add inverse FFT */
+  add IFFT(N+L);
 }
 \end{verbatim}
-\caption{Program after using the FFT to implement the filter in psuedo-StreamIt.}
+\caption{Combined version of two FIR filters in the frequency domain.}
 \label{fig:example-frequency}
 \end{figure}
 
-Out compiler can actually go one step farther and apply a well known 
-optimization to calculate the output values using a frequency transformation
-as is outlined in psuedo code in Figure~\ref{fig:example-frequency}.
+To illustrate the program transformations that our technique is
+designed to automate, consider a sequence of finite impulse response
+(FIR) filters as shown in Figure~\ref{fig:motivating-example}. The
+imperative C style code that implements this simple DSP application is
+also shown. The program largely defies many standard compiler analysis
+and optimization techniques because of its use of circular buffers and
+the muddled relationship between {\tt data}, {\tt buffer} and the
+output.
 
+Figure~\ref{fig:example-streamit} shows the same filtering process
+implemented in StreamIt. The StreamIt version is more abstract than
+the C version.  It indicates the communcation pattern between filters;
+it shows the structure of the original block diagram; and it leaves
+the complexities of buffer management and scheduling to the compiler.
 
+Two optimized versions of the FIR program are shown in
+Figures~\ref{fig:example-combine} and~\ref{fig:example-frequency}.  In
+Figure~\ref{fig:example-combine}, the programmer has combined the {\tt
+weights} arrays from the two filters into a single, equivalent array.
+This reduces the number of multiply operations by a factor of two.  In
+Figure~\ref{fig:example-frequency}, the programmer has done the
+filtering in the frequency domain, using the FFT and IFFT to translate
+between time and frequency.  Some computationally intensive
+convolutional filters and streams are more efficient when done in
+frequency instead of time.
 
+Our linear analysis can automatically derive both of the
+implementations in Figures~\ref{fig:example-combine}
+and~\ref{fig:example-frequency}, starting with the code in
+Figure~\ref{fig:example-streamit}.  These optimizations free the
+programmer from the burden of combining and optimizing linear filters
+by hand.  Instead, the programmer can design modular filters at the
+natural granularity for the algorithm in question, relying on the
+compiler to do the analysis and combination.
 
 \subsection{StreamIt}
 
@@ -216,46 +267,33 @@ as is outlined in psuedo code in Figure~\ref{fig:example-frequency}.
 \label{fig:overview-filter}
 \end{figure}
 
+StreamIt is a language and compiler for high-performance signal
+processing~\cite{gordon-thesis,streamit-asplos,streamitcc}.  In a
+streaming application, each data item is in the system for only a
+small amount of time, as opposed to scientific applications where the
+data set is used extensively over the entire execution.  Also, stream
+programs have abundant parallelism and regular communication patterns.
+The StreamIt language aims to expose these properties to the compiler
+while maintaining a high level of abstraction for the programmer.
 
-The StreamIt\cite{streamitcc, streamit-asplos, gordon-thesis} language
-aims to provide a language and compiler for streaming applications. Streaming applications 
-are characterized by data streaming in and out of the application. Each data element (both
-input and output) is in the system for only a small amount of time as opposed to scientific
-applications where the data set is typically used extensively over the execution time.
-
-StreamIt programs are composed of processing blocks called {\tt filters} which
-contain an input tape from which they can read values and an output tape to which
-they can write. Each {\tt filter} contains a {\tt work} function which describes 
-a steady state computation that consumes input and produces output.
-{\tt filters } can examine data items  on the input tape without consuming them 
-via {\tt peek} expressions. {\tt pop} expressions consume data from the input
-tape. A {\tt filter} calls {\tt push} to add values to the output tape.
-{\tt filters} can contain stateful fields that persist between calls to {\tt work}. 
-The {\tt work} function is C-like imperative code, 
-which can access {\tt filter} state, call external routines and produce and consume data. 
-There are few restrictions on a {\tt work} function other than the requirement that
-it consume input and produce output at the stated rates.
-
-Most of a {\tt work} function's code would be instantly familiar to 
-a C or Java programmer with the addition of the following three primitive function 
-calls that have special meaning.
-
-\begin{enumerate}
-\item {\tt pop()}:   Returns the first item on the input tape and advnaces the tape by one item.
-\item {\tt peek(i)}: Returns the value of the $i$th value on the input tape.
-\item {\tt push(v)}: pushes the value of {\tt v} on to the output tape.
-\end{enumerate}
-
-All {\tt filters} in StreamIt declare the number of elements they
-will {\tt peek} at, the number of elements they will {\tt pop} and the number
-of elements that they will {\tt push}. A {\tt Filter} $F$ can examine up to $e_F$ 
-items from its input tape, consumes exactly $o_F$ items and produces exactly
-$u_F$ items. Currently StreamIt requires that each filter has declared $e_F$, $o_F$ 
-and $u_F$ that are statically determinable at compile time. 
-Figure~\ref{fig:overview-filter} shows how $e_F$, $o_F$ and $u_F$ are related.
-
-
-
+StreamIt programs are composed of processing blocks called {\tt
+filters} which contain an input tape from which they can read values
+and an output tape to which they can write. Each {\tt filter} contains
+a {\tt work} function which describes its atomic execution step in the
+steady state.  The {\tt work} function contains C-like imperative
+code, which can access {\tt filter} state, call external routines and
+produce and consume data.  The input and output channels are treated
+as FIFO queues, which can be accessed with three primitive operations:
+1) {\tt pop()}, which returns the first item on the input tape and
+advances the tape by one item, 2) {\tt peek(i)}, which returns the
+value at the $i$th position on the input tape, and 3) {\tt push(v)},
+which pushes value {\tt v} onto the output tape.  Each {\tt filter}
+must declare the maximum element it will {\tt peek} at, the number of
+elements it will {\tt pop}, and the number of elements that it will
+{\tt push} during an execution of {\tt work}.  These rates must be
+resolvable at compile time and constant from one invocation of {\tt
+work} to the next.  Figure~\ref{fig:overview-filter} gives our
+notation these input/ouput rates.
 
 \begin{figure}
 \center
@@ -265,56 +303,21 @@ Figure~\ref{fig:overview-filter} shows how $e_F$, $o_F$ and $u_F$ are related.
 \label{fig:structures}
 \end{figure}
 
-{\tt filters} in StreamIt are composed hierarchically using predefined structures to form
-a program. 
+A program in StreamIt consists of a hierarchical graph of {\tt
+filters}.  Filters can be connected using one of three predefined
+structures (see Figure~\ref{fig:structures}): 1) {\tt pipelines}
+represent the serial computation of one filter after another, 2) {\tt
+splitjoins} represent explicitly parallel computation, and 3) {\tt
+feedbackloops} allow cycles to be introduced into the stream graph.
+{\tt filters}, {\tt pipelines}, {\tt splitjoins} and {\tt
+feedbackloops} are all {\tt streams} and each {\tt stream} can be used
+as a subcomponent in a structure.  Note that all {\tt streams} have
+exactly one input tape and exactly one output tape.
 
-\begin{enumerate}
-\item {\tt pipelines} represent the serial computation of one filter after another.
-\item {\tt splitjoins} represent explicitly parallel computation. 
-\item {\tt feedbackloops} allow cycles to be introduced into the stream graph. 
-\end{enumerate}
-
-{\tt filters}, {\tt pipelines}, {\tt splitjoins} and {\tt feedbackloops} 
-are all {\tt streams} and each {\tt stream} can be used as a subcomponent in 
-a structure. Figure~\ref{fig:structures} illustrates the three structures 
-provided as primitives in StreamIt.
-StreamIt programs can therefore be represented as a connected graph of filters 
-which we will refer to as the stream graph. It is also important to note
-{\tt streams} have exactly one input tape and one exactly one output tape.
-
-Most real world programs can be fit into StreamIt's structured stream model, 
-though the fit sometimes requires extra manipulation. We believe
-that benefits of structure to both the programmer and the compiler outweigh the
-costs of imposing structure on the programmer.
-
-
-
-
-\subsection{Matrices and DSP}
-We take advantage of StreamIt's explicit input and output tapes and
-our knowledge that a large class of StreamIt programs will be performing
-standard digital signal processing (DSP) operations to generate useful
-optimizations.
-
-There is an entire research area in Electrical Engineering devoted to DSP. The
-theory and the implementation of systems to process digital signals is well developed (see
-an introductory text such as\cite{oppenheim-discrete} or \cite{lyons-understanding}). 
-There are a few fundamental primitives used to describe most DSP systems, and the output of 
-most of these primitives can be expressed as a linear combination of their inputs. Examples are
-finite impulse response (FIR) filters, compressors, expanders and signal processing transforms
-such as the discrete Fourier transform (DFT) and discrete cosine transformation (DCT).
-
-Electrical engineers who concentrate on DSP applications spend a large percentage of their 
-time designing an appropriate implementation given a particular design. Choosing
-the appropriate implementation structure is a highly non trivial task, and sometimes determining the 
-the ``right'' choice is often more of an art than a science. There are many systems that allow a
-designer to explore design choices such as Matlab\cite{matlab} which is used extensively in
-both academia and industry.  There are also research projects such as \cite{covell-ade} 
-and those described in \cite{oppenheim-symbolic} aimed at allowing a DSP designer to explore
-various implementation choices.
-
-Given that a product called Matlab (as in  MATrix LAB) is used extensively
-in DSP applications, it is probably not surprising that matrices often provide 
-a convenient way of working with digital data and for describing digital filters. 
-If a {\tt work} function is doing matrix computation, by recognizing this fact
-we can take advantage of the huge body of existing knowledge.
+It has been our experience that most practical applications can be
+represented using StreamIt's hierarchical structures.  Though
+sometimes a program needs to be reorganized to fit into the structured
+paradigm, there are benefits for both the programmer and the compiler
+in having a structured language~\cite{streamit-cc}.  In particular,
+linear analysis relies heavily on the structure of StreamIt to express
+stream transformations at a local and hierarchical level.

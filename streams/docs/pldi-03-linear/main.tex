@@ -1,5 +1,7 @@
 \documentclass{sig-alternate}
 \usepackage{epsfig}
+\usepackage{algorithm}
+\usepackage{algorithmic}
 
 \title{Linear Analysis and Optimization of Stream Programs}
 \numberofauthors{1}
@@ -40,14 +42,16 @@ and Saman Amarasinghe\\
 \input{conclusion}
 
 % Bibliography -- whee!
-\bibliographystyle{abbrv}
-\bibliography{references}
+\begin{small}
+  \bibliographystyle{abbrv}
+  \bibliography{references}
+\end{small}
 
 \clearpage
 
 \appendix
+\input{dataflow2}
+\clearpage
 \input{streamgraphs}
-
-
 
 \end{document}

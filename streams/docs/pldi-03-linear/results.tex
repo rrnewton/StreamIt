@@ -55,19 +55,20 @@ real world applications. We settled on the following set of six.
 \item FIR: A single 100 point rectangularly windowed low pass FIR filter ($\omega_c=\frac{\pi}{3}$).
 \vspace{-6pt}
 
-\item FMRadio: Implements an FM software radio.
+\item FMRadio: An FM software radio with equalizer.
 \vspace{-6pt}
 
-\item RateConverter: Downsamples an audio signal by an non integer factor ($\frac{3}{2}$).
+\item RateConverter: A downsampler for an audio signal that converts
+the rate by a non-integral factor ($\frac{3}{2}$).
 \vspace{-6pt}
 
-\item TargetDetect: Four matched filters performing threshold target detection in parallel.
+\item TargetDetect: Four matched filters performing threshold target
+detection in parallel.
 \vspace{-6pt}
 
-\item Radar: radar frontend, beamformer and target detection.
+\item Radar: A radar frontend with beamformer and target detection.
 \vspace{-6pt}
 \end{enumerate}
-
 
 \subsection{Frequency Replacement Scaling}
 
@@ -110,49 +111,57 @@ speedup because of constant factors hidden by the assymptotic notation. For inst
 elementwise multiplication of the complex values in $H[k]$ and $X[k]$ require
 four floating point operations for a straightforward implementation.
 
+\subsection{Simplification from Combination}
+Linear analysis is valuable because it provides a precise relationship
+between input and output that is nearly impossible to extract from
+general-purpose imperative programs. By combining the actions of
+StreamIt structures we can do optimizations that are not feasible for
+a standard compiler.
 
+Combining the action of {\tt streams} in a {\tt pipeline} is an
+equivalent optimization to algebraic simplification across sequential
+loops in an imperative program.  Once an overall linear form for the
+{\tt pipeline} has been determined, our compiler simply replaces the
+original {\tt pipeline} with a {\tt filter} that computes the combined
+linear form. Since the compiler can perform this transformation
+automatically, the the programmer can now express the computation in
+the most convenient manner.
 
-\subsection{Simplificaton from Combination}
-Linear analysis is valuable because it provides a precise relationship between input and output   
-that are impossible for normal compilers to discern from imperative programs. By 
-combining the actions of StreamIt structures we can do optimizations that are 
-not feasible for a standard compiler.
+For instance, although a bandpass filter can be implemented with a low
+pass filter followed by a high pass filter, real implementations
+determine the coefficients of a single filter that computes the same
+values. While a simple bandpass filter is easy to combine manually, in
+an actual design several different filters might be designed by
+several different people which would be much harder to integrate into
+a single design.
 
-Combining the action of {\tt streams} in a {\tt pipeline} is an equivalent optimization 
-to algebraic simplification across sequential loops in an imperative program.
-Once an overall linear form for the {\tt pipeline} has been determined, our compiler 
-can simply replaces the original {\tt pipeline} with a {\tt filter} that computes the 
-combined linear form. Since the compiler can perform this transformation automatically,
-the the programmer can now express the computation in the most convenient manner. 
-
-For instance, although a bandpass filter can be implemented with a 
-low pass filter followed by a high pass filter, real implementations determine the coefficients 
-of a single filter that computes the same values. While a simple bandpass filter is easy to combine
-manually, in an actual design several different filters might be designed by 
-several different people which would be much harder to integrate into a single design.
-
-A common operation in discrete time signal processing is downsampling
-Downsampling is most often implemented as a low pass filter followed by a 
-an $M$ compressor which passes every $M$th input sample to the output.
-For every output of the downsampler, $M-1$ outputs from the low pass filter
-are ignored, so only every $Mth$ sample needs be computed.
-While this optimization is almost always done in actual system implementations because it reduces 
-the computational requirements by a factor of $\frac{M-1}{M}$, in the system specifications
-very often both the filter and the compressor will appear. The inefficient
-implementation is represented because it is conceptually easier to understand. 
-Our linear analysis covers this case, and thus our compiler can implement the transformation
+A common operation in discrete time signal processing is downsampling.
+Downsampling is most often implemented as a low pass filter followed
+by an $M$ compressor which passes every $M$th input sample to the
+output.  For every output of the downsampler, $M-1$ outputs from the
+low pass filter are ignored, so only every $M$th sample needs be
+computed.  While this optimization is almost always done in actual
+system implementations because it reduces the computational
+requirements by a factor of $\frac{M-1}{M}$, in the system
+specifications very often both the filter and the compressor will
+appear. The inefficient implementation is represented because it is
+conceptually easier to understand.  Our linear analysis covers this
+case, and thus our compiler can implement the transformation
 automatically.
 
-Another example is a multi band equalizer (such as is found in the FMRadio benchmark). 
-The purpose of such an equalizer is to filter $N$ different frequency bands 
-separately (like the graphic equalizer found on stereos). The intuitive system specification 
-of an equalizer consists of $N$ bandpass filters operating in parallel whose output 
-is combined to produce the equalized signal. However, if the filters do not vary with time, 
-a single filter which performs the equivalent computation can be substituted instead. 
-However, designing this single combined filter is difficult, and any subsequent changes to 
-any one of the sub filters will necessitate a redesign of the overall filter. 
-Out compiler can automatically derive the equivalent filter, and any subsequent design changes
-will only necessitate a recompile rather than a manual redesign.
+Another example is a multi-band equalizer (such as is found in the
+FMRadio benchmark).  The purpose of such an equalizer is to filter $N$
+different frequency bands separately (like the graphic equalizer found
+on stereos). The intuitive system specification of an equalizer
+consists of $N$ bandpass filters operating in parallel whose output is
+combined to produce the equalized signal. However, if the filters do
+not vary with time, a single filter which performs the equivalent
+computation can be substituted instead.  However, designing this
+single combined filter is difficult, and any subsequent changes to any
+one of the sub filters will necessitate a redesign of the overall
+filter.  Out compiler can automatically derive the equivalent filter,
+and any subsequent design changes will only necessitate a recompile
+rather than a manual redesign.
 
 
 \subsection{Overall optimization performance}
@@ -205,10 +214,11 @@ synthesis pipelines can be combined. Unfortunately, after
 linear replacement, the frequency translation doesn't reduce computation 
 because our current implementation only works for one column linear filters.
 
-The RateConverter also benefits greatly from the frequency transformation
-due to the fact that it has contains a large FIR filter. Our implementation
-currently doesn't support the full range of pipeline combination rules so
-we miss potential savings from linear combination.
+The RateConverter also benefits greatly from the frequency
+transformation due to the fact that it contains a large FIR
+filter. Our implementation currently doesn't support the full range of
+pipeline combination rules so we miss potential savings from linear
+combination.
 
 Similairly, FMRadio contains a multiband equalizer whose gain stages are collapsed
 into a single filter during linear combination.
