@@ -32,44 +32,48 @@ and from the memory modules via the static network.  Inter-trace
 communication utilizes these off-chip memory modules.  This means that
 all trace end-point filters must be mapped to the border tiles of the
 Raw chip.  These tiles directly communicate to the memory modules via
-their I/O ports.  Trace end-points read their inputs from the memory
-attached to the I/O of tile, expecting that the data has already been
-correctly reordered if the filter has multiple inputs.  Trace
-end-point filters write their outputs to the memory attached to the
-I/O of the tile as the output is generated. For traces that
-communicate to or from multiple traces, the static network is used to
-perform the necessary data-reordering.
+their I/O ports.  
 
-For traces that output to multiple traces, the data is read from the
-memory in the order it was produced by the last filter of the trace
-and communicated over the static network to the memory modules that
-are connected to the tiles mapped to the first filter of the
-downstream traces. The switch is programmed to correctly communicate
-the data, adhering to the duplication and routing calculated by the
-synchronization removal pass.
+The first filter of a trace reads its input from the memory attached
+to the I/O its tile, If a trace has multiple inputs, the data is
+reordered prior to execution of the trace.  Before the
+first filter of the trace is executed, the input to the trace is
+gathered from the various memory modules and written to the memory
+module attached to the tile to which the first filter of the trace was
+mapped.  The static network switches are programmed to
+correctly order the data as calculated by the synchronization removal
+stage.
 
-For traces whose input originates from more than one trace, a similar
-mechanism is used.  Before the first filter of the trace is executed,
-the input to the trace is gathered from the various memory modules
-and written to the memory module attached to the tile to which the
-first filter of the trace was mapped.  Again, the static network
-switches are programmed to correctly order the data as calculated by
-the synchronization removal stage.   
+The last filter of a trace writes its output to the memory attached to
+the I/O of the tile as the output is generated. For traces that output
+to multiple traces, the data is read from the memory in the order it
+was produced by the last filter of the trace and communicated over the
+static network to the memory modules that are connected to the tiles
+mapped to the first filter of the downstream traces. Again, the switch
+is programmed to correctly communicate the data, adhering to the
+duplication and routing calculated by the synchronization removal
+pass.
 
 Restrictions are placed on the assignment of filters to tiles. From
-above we can see that filter endpoints of traces must be mapped to the
+above we can see that filter endpoints of traces are mapped to the
 border tiles of the Raw chip. We must also take special care when
 dealing with application input and output streaming to and from I/O
 ports on the Raw chip.  As mentioned in Section \ref{sec:raw} an I/O
 port is multiplexed between its streaming memory module, an input
 stream originating off-chip, and an output stream whose final
-destination is off-chip.  Only one trace with an off-chip application
+destination is off-chip.  Only one trace with an off-chip, application
 input stream can be mapped to a tile.  The same is true for a trace
-that writes to an off-chip application output stream.  But a single
-tile can accommodate both an off-chip application input stream and
+that writes to an off-chip, application output stream.  But a single
+tile can accommodate both an off-chip, application input stream and
 output stream.
 
-\subsubsection{Software Pipelining of Traces}
+\subsubsection{Support for Software Pipelining of Traces}
+\label{sec:softpipe}
+ what is this analogous to 
+prologue stage
+one copy of each filter
+at most one iteration difference between connected nodes
+all downstream/upstream of node must be in same state
 
 \section{Trace Extraction}
 Trace extraction refers to the process of assigning each filter of the
@@ -82,7 +86,7 @@ stream graph is a member of exactly one trace.
 Our initial algorithm for trace extraction is rather straightforward
 and a brief description of the algorithm should suffice.  Due to the
 restrictions of the current low-level implementation, as we traverse
-the stream graph, trace boundaries are produced {\it before} a filter
+the stream graph, we introduce trace boundaries {\it before} a filter
 with multiple inputs and {\it after} a filter with multiple outputs,
 thus restricting the traces to pipelines of filters. We introduce a
 new trace when within a pipeline a non-linear filter directly
@@ -114,4 +118,67 @@ work threshold of 0.80, meaning that each filter of the trace has a
 workload that is within 80-125\% of the workload of the first filter
 of the trace.
 
+After the trace extraction stage, we can build a {\it trace graph}
+where nodes of the graph represent traces and an edge between $n$ and
+$m$ denotes that a channel exists between the last filter of trace $n$
+and the first filter of trace $m$. This graph describes the flow of data
+between traces and is used by subsequent passes.
+
 \section{Trace Scheduling}
+In the trace scheduling pass of our compiler, we calculate a relative
+execution ordering of the traces and assign each filter of each trace
+to a tile on the Raw chip.  The current implementation of the trace
+scheduling pass implements a modified list scheduler. The scheduler
+attempts to optimize for occupancy and chip utilization.  At each
+iteration, the scheduler will traverse the list until it finds a trace
+to schedule, if it cannot, the current time will be incremented.  The
+scheduler maintains a block reservation table with entries for each
+tile of the Raw chip.  The reservation table stores the next cycle in
+which the tile is available for the assignment of a filter.  At the
+end of the trace scheduling phase we will have an execution ordering of
+traces and for each tile, an ordered list of the filters that execute
+on it, each filter from a different trace. Note that the linear
+ordering of traces calculated does not preclude the parallel execution
+of traces, as traces may execute on distinct Raw tiles and communicate
+to their neighbors through distinct memory modules.
+
+The scheduler begins by ordering the traces based on a given priority
+function, ignoring the data-flow dependencies inherent in the stream
+graph.  It then attempts to schedule the traces in order of decreasing
+priority.  When attempting to schedule a trace, the scheduler will
+check if the trace can be legally scheduled at this time (see Section
+\ref{sec:softpipe}) and attempt to find a set of tiles for which to
+assign the filters of this trace. If the trace is currently
+schedulable, update the reservation table entry for each tile assigned
+by adding the work estimation for the filter assigned to the tile to
+the current schedule time. Then remove the trace from the list.
+If the current trace cannot be scheduled, attempt to schedule the next
+trace in the list and so on.  If no trace can be scheduled, increment the
+current time to the earliest time that a busy tile will become
+available.
+
+When trying to schedule a trace, the scheduler will exhaustively
+search the chip for a possible layout, using the first legal layout
+encountered. Of course, at the current scheduling time-step, the
+scheduler may not be able to find tile assignments for the filters of
+the trace due to the lack of free (non-busy) tiles.  It will then move
+on to the next trace in the list. In the current version of the
+backend, each trace is composed of a pipeline of filters and each
+filter must be directly connected to its downstream consumer filter.
+Again, the endpoints of traces must be assigned to the border tiles of
+the chip.  There are numerous tile assignment heuristics that are
+included in the current version of the compiler, but their discussion
+will provide little benefit to the reader.
+
+For the performance results in Section \ref{sec:results}, we use the
+{\it bottleneck workload} of each trace as the priority function of
+the scheduler. The bottleneck workload for a trace is defined to be
+the maximum work estimation of the filters that compose the trace.
+This priority function was not chosen arbitrarily, we initially tried
+multiple orderings including a height-based priority function and a
+communication-based priority function.
+% and priority functions that
+%concurrently modeled communication, workload, and height.  
+The bottleneck workload consistently achieved the greatest
+performance. After trace scheduling, we are ready to generate code for
+both the compute processor and switch processor of each tile.
