@@ -10,16 +10,7 @@ intro
 
 paper contributions:
 
-1. filter fusion
- - for a general class of filters and topologies
-   - peeking
-   - parallel composition, not just sequential
- - optimizations
-   - converting buffers to scalar variables
-   - peek scaling
-   - stack space reuse
-
-2. cache optimizations
+1. cache optimizations
  - limit fusion to avoid cache problems
    - greedy partitioning algorithm
    - fuse so long as:
@@ -28,28 +19,55 @@ paper contributions:
  - after fusion, schedule order of filter firings for improved locality
    - scale up until 90% of filters have their data fit in cache
 
-example
--------
-- fusion (w/ optimizations)
-- cache opt (partitioning / multiplicity)
+2. filter fusion
+ - for a general class of filters and topologies
+   - peeking
+   - parallel composition, not just sequential
+ - optimizations
+   - converting buffers to scalar variables
+   - peek scaling
+   - stack space reuse
 
+Cache Optimizations
+-------------------
+- example
+- formal model
+- multiplicity algorithm
+- forward reference to results --------------------  Rodric here and above
+
+- partitioning algorithm ------------------------- Bill here and below
 - forward reference to results
 
-algorithm details
------------------
-- fusion -- is there any formal model?
-- cache opt
-  - formal model
-  - partitioning algorithm
+Fusion Optimizations
+--------------------
+- example
+- algorithm
+- forward reference to results
 
-results
+Results
 -------
-- isolate effects of each optimization as much as possible
+- summary graph four bars:
+  - baseline: no fusion, best unrolling
+  - only fusion + partitioning
+  - only multiplicity
+  - fusion + multiplicity (best cacheopt line)
 
-related work
+- cacheopt details
+  - try different unrolling factors as baseline
+  - should demonstrate that cacheopt + full unrolling does as well as
+    any baseline unrolling factor
+  - argue that this demonstrates robustness re: choosing an unrolling factor
+
+- fusion details (time permitting)
+  - separate effects of:
+     - stack reuse
+     - scalar replacement
+     - peek scaling
+
+Related work
 ------------
 - filter fusion
 - berkely cache optimizations thesis
 
-conclusion
+Conclusion
 ----------
