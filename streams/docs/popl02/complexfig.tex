@@ -85,7 +85,7 @@ variable $\mt{SREAD}_{c, p}$ with this domain:
 \begin{center}
 {\bf Equations (Part 1)}
 \end{center}
-\noindent For each channel $c = (n, n_b)$, introduce the following equations:
+\noindent For each channel $c = (n_a, n_b)$, introduce the following equations:
 \begin{itemize}
 %
 \item {\bf(I to IBUF)}:
@@ -93,7 +93,9 @@ variable $\mt{SREAD}_{c, p}$ with this domain:
 \forall i \in [0,A(c)-1],~\mt{IBUF}_{c}(i) = I(c)[i]
 \label{i2ibuf}
 \end{align}
-
+\end{itemize}
+\noindent For each node n, introduce the following equations:
+\begin{itemize}
 \item {\bf(IWRITE to IBUF)} For each $p \in [0, num(n, \mt{init})-1]$:
 \begin{align}
 \label{iwrite2ibuf}
@@ -179,7 +181,7 @@ num(n, \mt{steady})-1]$:
 \begin{center}
 {\bf Equations (Part 2)}
 \end{center}
-\noindent For each channel $c = (n, n_b)$, introduce the following equations:
+\noindent For each node n, introduce the following equations:
 \begin{itemize}
 \item {\bf(IBUF to SREAD)} For each $c \in \mt{chan\_in}(n)$, and for each phase $p \in [0,
 \mt{num}(n, \mt{steady})-1]$:
