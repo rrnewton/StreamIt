@@ -74,6 +74,9 @@ similar equaionts are placed next to each other.
 future things to think about
 ----------------------------
 
+* we need to specify default values for functions like drain(),
+initPath, etc
+
 * a quasi-problem with the operational semantics is that it doesn't
 indicate when the splits and joins execute (it assumes they execute
 immediately), which might give us less scheduling control than we'd
