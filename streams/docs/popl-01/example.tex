@@ -52,6 +52,14 @@ multi-stage butterfly in the FFT. As shown in
 Figure~\ref{fig:butterfly}, the Butterfly filter is also implemented
 using a combination of SplitJoin constructs.
 
+\begin{figure}[t]
+\centering
+\psfig{figure=fft-block.eps,width=3.2in}
+\caption{The multi-stage FFT algorithm}
+\vspace{-12pt}
+\label{fig:fftfilter}
+\end{figure}
+
 The StreaMIT implementation of the FFT filter is clean and
 intuitive. It already has a large amount of pipelined parallelism. Due
 to the simple and straightforward mapping from the algorithm to the
@@ -72,16 +80,3 @@ the stage assumes that the signal-to-noise ratio is low and sends a
 message to activate the {\tt Booster}. This message is sent using
 best-effort delivery.
 
-\begin{figure}[t]
-\centering
-\psfig{figure=fir-block.eps,width=3.2in}
-\caption{A block diagram of a five tap FIR filter.}
-\label{fig:firfilter}
-\end{figure}
-
-\begin{figure}[t]
-\centering
-\psfig{figure=fft-block.eps,width=3.2in}
-\caption{The multi-stage FFT algorithm}
-\label{fig:fftfilter}
-\end{figure}

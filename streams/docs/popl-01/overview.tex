@@ -2,49 +2,6 @@
 \label{sec:overview}
 
 \begin{figure}
-\centering
-\psfig{figure=basic-pipeline.eps,width=3.0in}
-
-(a) A Stream. \\
-\vspace{8pt}
-\psfig{figure=basic-splitjoin.eps,width=3.0in}
-
-(b) A SplitJoin. \\
-\vspace{8pt}
-\psfig{figure=basic-feedback.eps,width=3.0in}
-
-(c) A FeedbackLoop. \\
-\vspace{8pt}
-\caption{Stream structures supported by StreaMIT.}
-\label{fig:structuresp}
-\end{figure}
-
-StreaMIT includes stream-specific abstractions and representations
-that are designed to improve programmer productivity for the domain of
-programs described above.  In this paper, we present StreaMIT in legal
-Java syntax for ease of presentation.  Though this syntax can express
-the fundamental ideas of StreaMIT, in the longer term we plan to
-develop a cleaner and more abstract syntax that is designed
-specifically for stream programs.
-
-\begin{figure*}
-\centering
-\psfig{figure=Radio.eps,width=5.2in}
-\caption{A block diagram of a software radio.  A detailed StreaMIT
-implementation appears in Figure \ref{fig:radiocode}.}
-\label{fig:radiodiagram}
-\end{figure*}
-
-Figure \ref{fig:radiocode} contains a detailed example of a software
-radio implemented in StreaMIT; a block diagram of the system appears
-in Figure \ref{fig:radiodiagram}.  In the following sections, we draw
-on different components of this example to describe and justify the
-major features of StreaMIT.  A more detailed guide to the syntax of
-StreaMIT can be found in the Appendix.
-
-\subsection{Filters}
-
-\begin{figure}
 \scriptsize
 \begin{verbatim}
 class FIR extends Filter {
@@ -58,9 +15,8 @@ class FIR extends Filter {
 
    void work() {
       float sum = 0;
-      for (int i=0; i<N; i++) {
+      for (int i=0; i<N; i++) 
          sum += input.peek(i)*FIR_COEFF[i][N];
-      }
       input.pop();
       output.push(sum);
    }
@@ -80,7 +36,7 @@ class Main extends Stream {
 \vspace{-12pt}
 \end{figure}
 
-\begin{figure}
+\begin{figure}[t]
 \scriptsize
 \begin{verbatim}
 int N = 5;
@@ -88,13 +44,10 @@ int BLOCK_SIZE = 100;
 
 void step(float[] input, float[] output, int numIn, int numOut) {
    float sum = 0;
-   for (int k=0; k<numIn; k++) {
+   for (int k=0; k<numIn; k++)
       sum = sum + input[k]*FIR_COEFF[k+numIn][N];
-   }
-   for (int k=numIn; k<N; k++) {
+   for (int k=numIn; k<N; k++) 
       sum = sum + input[k]*FIR_COEFF[k-numIn][N];
-   }
-
    output[numOut] = sum;
    input[numIn] = getData();
 }
@@ -104,26 +57,21 @@ void main() {
    float output[] = new float[BLOCK_SIZE];
    int numIn, numOut;
 
-   for (numIn=0; numIn<N; numIn++) {
+   for (numIn=0; numIn<N; numIn++)
       input[numIn] = getData();
-   }
 
    while (true) {
 
-      for (out=0; numIn<N; numIn++, numOut++) {
+      for (out=0; numIn<N; numIn++, numOut++)
          step(input, output, numIn, numOut);
-      }
 
       int wholeSteps = (BLOCK_SIZE-numOut)/N;
       for (int k=0; k<wholeSteps; k++) {
-         for (numIn=0; numIn<N; numIn++, numOut++) {
+         for (numIn=0; numIn<N; numIn++, numOut++)
             step(input, output, numIn, numOut);
-         }
-      }
 
-      for (numIn=0; numOut<BLOCK_SIZE; numIn++, numOut++) {
+      for (numIn=0; numOut<BLOCK_SIZE; numIn++, numOut++)
          step(input, output, numIn, numOut);
-      }
 
       displayBlock(output);
    }
@@ -139,7 +87,7 @@ void main() {
 \vspace{-12pt}
 \end{figure}
 
-\begin{figure}
+\begin{figure}[t]
 \scriptsize
 \begin{verbatim}
 class FIRFilter {
@@ -154,7 +102,7 @@ class FIRFilter {
       if (input==null) {
          input = new float[MAX_LENGTH];
          source.getData(input, 0, N+length);
-       } else {
+      } else {
          source.getData(input, N, length);
       }
 
@@ -191,6 +139,23 @@ another.
 \protect\label{fig:firobject}}
 \vspace{-12pt}
 \end{figure}
+
+StreaMIT includes stream-specific abstractions and representations
+that are designed to improve programmer productivity for the domain of
+programs described above.  In this paper, we present StreaMIT in legal
+Java syntax for ease of presentation.  Though this syntax can express
+the fundamental ideas of StreaMIT, in the longer term we plan to
+develop a cleaner and more abstract syntax that is designed
+specifically for stream programs.
+
+Figure \ref{fig:radiocode} contains a detailed example of a software
+radio implemented in StreaMIT; a block diagram of the system appears
+in Figure \ref{fig:radiodiagram}.  In the following sections, we draw
+on different components of this example to describe and justify the
+major features of StreaMIT.  A more detailed guide to the syntax of
+StreaMIT can be found in the Appendix.
+
+\subsection{Filters}
 
 \subsubsection{StreaMIT Approach}
 
@@ -262,7 +227,7 @@ distinguishes StreaMIT.
 
 \subsubsection{StreaMIT Approach}
 
-\begin{figure}
+\begin{figure}[t]
 \scriptsize
 \begin{verbatim}
 class FFT extends Stream {
@@ -343,6 +308,24 @@ depending on its type.
 its input, or reads items from any parallel stream that has output
 available.
 \end{enumerate}
+
+\begin{figure}
+\centering
+\psfig{figure=basic-pipeline.eps,width=3.0in}
+
+(a) A Stream. \\
+\vspace{8pt}
+\psfig{figure=basic-splitjoin.eps,width=3.0in}
+
+(b) A SplitJoin. \\
+\vspace{8pt}
+\psfig{figure=basic-feedback.eps,width=3.0in}
+
+(c) A FeedbackLoop. \\
+\vspace{8pt}
+\caption{Stream structures supported by StreaMIT.}
+\label{fig:structuresp}
+\end{figure}
 
 \begin{figure}
 \scriptsize
