@@ -132,23 +132,3 @@ which makes our technique much less effective. Figure~\ref{frequency-example} sh
 the basic idea of what is going on.
 
 
-\begin{figure}
-\center
-\epsfxsize=3.0in
-\epsfbox{images/frequency-win.eps}
-\caption{Plot showing where frequency transformation will results in an overall savings versus M (filter size) and N(input block size)}
-\label{fig:frequency-win}
-\end{figure}
-
-
-Below we provide a simple justification and analysis about why we expect a performance
-improvement using this frequency transformation. Direct convolution requires $O(MN)$ multiplies
-to generate $N$ output values. Convolution using the frequency transformation requires
-$O((M+N)lg(M+N))$ multiplications for both the FFT and IFFT and $O(M+N)$ time for the 
-multiplication in frequency. Figure~\ref{fig:frequency-win} shows the differences between
-$O(MN)$ and $O((M+N)lg(M+N)+M+N)$. Values above $1$ indicate that the frequency transformation
-will result in less computation and values below $1$ indicate that the freqency transformation
-will result in more computation.
-
-
-

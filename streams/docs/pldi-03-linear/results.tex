@@ -60,35 +60,45 @@ real world applications. We settled on a set of six, which we describe below.
 \end{enumerate}
 
 
-\subsection{Linear Replacement}
-
-\begin{figure}
-x\center
-\epsfxsize=3.0in
-\epsfbox{images/combination-graph.eps}
-\caption{Performance gains realized by replacing structures with direct linear forms.}
-\label{fig:combination-graph}
-\end{figure}
-
-
-\subsection{Frequency Replacement}
+\subsection{Frequency Replacement Scaling}
 \begin{figure}
 \center
 \epsfxsize=3.0in
-\epsfbox{images/freq-scaling.eps}
-\caption{Results of scaling the target FIR size versus number of multiplies for the FIR kernel.}
-\label{fig:freq-scaling}
+\epsfbox{images/frequency-win.eps}
+\caption{Plot showing number of multplications for the frequency transformation over the number of multiplications for direct convolution per output as a function of $M$ and $N$. $N$ and $M$ are the normalized size of the FIR filter and output window size, respectively. Numbers less than one indicate a multiplication reduction, and numbers more than one indicate an increase in multiplication.}
+\label{fig:frequency-win}
 \end{figure}
 
-As mentioned above, even though we are converting an $O(N^2)$ implementation into an
-$O(N lg N)$ algorithm, the hidden constant hidden $O(N lg N)$ is non trivial. In
-Figure~\ref{fig:freq-scaling} we show the results of choosing different target sizes
-for the frequency implementation. The X axis shows the various sizes chosen, and 
-the Y axis shows the number of multiplies required per output compared to the normal
-implementation. A number less than one means that fewer multiplies were required after
-our transformation, and a number more than one means that more multiplies were required.
+In this section we describe the results we expect for the frequency transformation. We
+define $M$ as the number of FIR coefficients, and $N$ as the number of outputs produced. Direct 
+convolution requires $O(MN)$ multiplies to generate $N$ output values 
+(eg $M$ multiplies per output). To produce $N$ output values using the frequency transformation 
+requires $O((M+N)lg(M+N))$ multiplications for both the FFT and IFFT and $O(M+N)$ 
+multiplications to implement the complex coefficient multiplication in the frequency domain.
+Therefore, the number of multiplications per output for the frequency transformation
+normalized the the number of multiplications per output with direct convolution is
+$f(M,N)=\frac{O((M+N)lg(M+N))}{O(MN)}$. Figure~\ref{fig:frequency-win} plots this function
+in normalized $M$, $N$ space. It is interesting to note that if $M$ or $N$ is held constant 
+and the other is increased, $F(M,N)$ first decreases and then increases. Given that our compiler
+can choose $N$, we need to choose an $M$ that is roughly the correct size.
 
-(discuss specific results)
+\begin{figure}
+\center
+\epsfxsize=3.0in
+\epsfbox{images/frequency-win-empirical.eps}
+\caption{Empirically measured multiplication reduction for the FIR benchmark. $N$ represents the number of samples for the response of the FIR, and target size represents the target size (approximately $M$). The vertical axis represents the multiplication reduction that is achieved by performing the frequency replacement optimization over the original program. Numbers greater than one represent increased computation and numbers less than one represent a reduction in computation. }
+\label{fig:frequency-win-empirical}
+\end{figure}
+
+
+We also performed empirical experiments to measure the multiplication reduction
+as a function of both filter size ($N$) and output size ($M$). 
+Figure~\ref{fig:freq-win-empirical} shows empirically measured normalized 
+multiplication savings per output. The results match those predicted by the 
+above analysis fairly closely.
+
+
+\subsection{Overall optimization performance}
 
 \begin{figure}
 \center
@@ -98,12 +108,28 @@ our transformation, and a number more than one means that more multiplies were r
 \label{fig:linear-freq-both}
 \end{figure}
 
-We can also hope to get performance gains by combining our two optimizations. 
-If the compiler can figure out that several filters are all doing linear operations
-and combine them together we already probably win. If, however, we can then tranform
-the overall representation into the frequency domain, we can win big. 
-Figure~\ref{fig:linear-freq-both} shows the normalized number of multiplications
-required per output when linear replacement is applied, when the frequency transformation 
-is applied, and when both are applied, frequency tranformation following linear replacement.
+The FIR scaling investigation is interesting because FIR filtering is a kernel
+operation for most DSP applications. To determine the effects of our linear
+replacement and frequency replacement optimizations on overall programs, we ran
+each benchmark with the linear replacement optimization, the frequency replacement
+optimization, and with linear replacement followed by frequency replacement. 
+Figure~\ref{fig:linear-freq-both} shows the normalized number of 
+multiplications as defined in the last section, required for each 
+benchmarks to execute $10000$ steady state iterations for each optimization choice.
 
-(discuss specific results)
+For the FIR filter, all of the multiplication reduction comes from the frequency
+replacement optimization. As the entire application is comprised of a single
+{\tt Filter} calculating a convolution sum, there is nothing to combine.
+The target detection program experiences a small decrease in multiplications 
+for linear replacement, but it experiences a large boost from frequency replacement.
+The main work of the target detector system occurs in the four FIR filters, whose
+results can not be combined.
+
+However, FilterBank gets a huge boost from linear replacement because its
+parallel analysis and synthesis pipelines can be combined into a single filter.
+Our sampling rate converter also benefits greatly from the frequency transformation
+due to the fact that it has contains a large FIR filter. The FMRadioApp
+benefits from linear replacement because its parallel gain stages are collapsed
+into a single filter during linear combination. The number of multiplies in the
+Radar app actually increases because our compiler does not take into account the
+fact that combined linear structures might actually increase computation.
