@@ -2,25 +2,35 @@ Copyright and License for the StreamIt Release
 ----------------------------------------------
 
 StreamIt is copyright 2003 by the Massachusetts Institute of
-Technology.  This release is under the terms of the GNU General Public
-License, version 2 or (at your option) any later version; see the
-COPYING.GPL file for details.
+Technology.  This entire release is under the terms of the GNU General
+Public License, version 2 or (at your option) any later version; see
+the COPYING.GPL file for details.
 
 Additionally, certain parts of this release are necessary to use the
 output of the compiler at runtime, or may be useful as sample code.
-These parts of the release may be used, modified, and distributed,
-either in source or binary form, without restriction, and you may
-combine these files or binaries generated from these files with other
-programs without any restriction coming from the use of the included
-files.  The affected files include:
+These parts of the release are subject to the following license:
+
+  Copyright 2003 by the Massachusetts Institute of Technology.
+
+  Permission to use, copy, modify, and distribute this
+  software and its documentation for any purpose and without
+  fee is hereby granted, provided that the above copyright
+  notice appear in all copies and that both that copyright
+  notice and this permission notice appear in supporting
+  documentation, and that the name of M.I.T. not be used in
+  advertising or publicity pertaining to distribution of the
+  software without specific, written prior permission.
+  M.I.T. makes no representations about the suitability of
+  this software for any purpose.  It is provided "as is"
+  without express or implied warranty.
+
+Files which may be used under this license include:
 
 -- All of the sample code in the 'apps' directory;
 -- The .bc files in the 'include' directory;
 -- The StreamIt uniprocessor C library in the 'library/c' directory;
 -- Sample code in the documentation provided in the 'docs' directory,
-   and child directories;
--- All of the code in the 'compiler/streamit' directory of the source
+   and child directories; and
+-- All of the code in the 'src/streamit' directory of the source
    release, and child directories, including the StreamIt-to-Java
-   converter and the scheduler; and
--- The StreamIt Java library in the 'library/java' directory of the
-   source release.
+   converter, the StreamIt Java runtime library, and the scheduler.
