@@ -19,7 +19,7 @@
  publisher = {ACM Press},
  }
 
-@TechReport{xiong-thesis,
+@TechReport{xiong-thesis-tr,
   author = 	 {Jianxin Xiong},
   title = 	 {Automatic Optimization of DSP Algorithms},
   institution =  {University of Illinois at Urbana-Champaign},
@@ -28,18 +28,32 @@
   number = 	 {UIUCDCS-R-2001-224},
 }
 
+@PhdThesis{xiong-thesis,
+  author = 	 {Jianxin Xiong},
+  title = 	 {Automatic Optimization of DSP Algorithms},
+  school = 	 {Univ. of Illinois at Urbana-Champaign},
+  year = 	 {2001},
+  OPTkey = 	 {},
+  OPTtype = 	 {},
+  OPTaddress = 	 {},
+  OPTmonth = 	 {},
+  OPTnote = 	 {},
+  OPTannote = 	 {}
+}
+
 @inproceedings{xiong01spl,
     author = "Jianxin Xiong and Jeremy Johnson and Robert W. Johnson and David A. Padua",
     title = "{SPL}: A Language and Compiler for {DSP} Algorithms",
-    booktitle = "{SIGPLAN} Conference on Programming Language Design and Implementation",
-    pages = "298-308",
+    OPTbooktitle = "{SIGPLAN} Conference on Programming Language Design and Implementation",
+    booktitle = "PLDI",
+    OPTpages = "298-308",
     year = "2001",
     url = "citeseer.nj.nec.com/xiong01spl.html" }
 
 @article{johnson01searching,
     author = "Jeremy Johnson and Robert W. Johnson and David A. Padua and Jianxin Xiong",
     title = "Searching for the Best {FFT} Formulas with the {SPL} Compiler",
-    journal = "Lecture Notes in Computer Science",
+    journal = "LNCS",
     volume = "2017",
     pages = "112--??",
     year = "2001",
@@ -48,7 +62,8 @@
 @article{egner01automatic,
     author = "S. Egner and J. Johnson and D. Padua and M. P{\"u}schel and J. Xiong",
     title = "Automatic Derivation and Implementation of Signal Processing Algorithms",
-    journal = "SIGSAM Bulletin (ACM Special Interest Group on Symbolic and Algebraic Manipulation)",
+    OPTjournal = "SIGSAM Bulletin (ACM Special Interest Group on Symbolic and Algebraic Manipulation)",
+    journal = "SIGSAM Bulletin",
     volume = "35",
     number = "2",
     pages = "1--19",
@@ -83,11 +98,9 @@
 
 @misc{ spiral,
   author = "Jeremy Johnson and Robert W. Johnson and David A. Padua and Jianxin Xiong",
-  title = "Home Page of the SPIRAL Project",
-  howPublished   = "http://www.ece.cmu.edu/~spiral/"}
+  title = "{SPIRAL Home Page.}",
+  howPublished   = "\verb+http://www.ece.cmu.edu/~spiral/+"}
   url   = "http://www.ece.cmu.edu/~spiral/"}
-
-
 
 @article{ whaley01automated,
     author = "R. Clint Whaley and Antoine Petitet and Jack J. Dongarra",
@@ -109,11 +122,11 @@
   year = "1998",
   url = "citeseer.nj.nec.com/frigo98fftw.html" }
 
-@inproceedings{ frigo99fast,
+@inproceedings{frigo99fast,
     author = "M. Frigo",
     title = "{A Fast Fourier Transform Compiler}",
-    booktitle = "{PLDI}'99 --- Conference on Programming Language Design and Implementation",
-    address = "Atlanta, GA",
+    organization = "{PLDI}",
+    OPTaddress = "Atlanta, GA",
     year = "1999",
     url = "citeseer.nj.nec.com/frigo99fast.html" }
 
@@ -122,11 +135,6 @@
   title = "Home Page of FFTW",
   howPublished   = "http://www.fftw.org"}
   url   = "http://www.fftw.org"}
-
-
-
-
-
 
 @article{ waingold97baring,
     author = "Elliot Waingold and Michael Taylor and Devabhaktuni Srikrishna and Vivek Sarkar and Walter Lee and Victor Lee and Jang Kim and Matthew Frank and Peter Finch and Rajeev Barua and Jonathan Babb and Saman Amarasinghe and Anant Agarwal",
@@ -154,24 +162,24 @@
 @inproceedings{streamitcc,
  author = "William Thies and Michal Karczmarek and Saman Amarasinghe",
  title = "{StreamIt:  A Language for Streaming Applications}",
- booktitle = "{Proceedings of the International Conference on Compiler Construction}",
+ booktitle = "{Proc. of the Int. Conf. on Compiler Construction (CC)}",
  year = "{2002}",
- address = "{Grenoble, France}",
+ OPTaddress = "{Grenoble, France}",
 }
 
 @InProceedings{streamit-asplos,
   author = 	 {Michael Gordon and William Thies and Michal Karczmarek and Jasper Lin and Ali S. Meli and Andrew A. Lamb and Chris Leger and Jeremy Wong and Henry Hoffmann and David Maze and Saman Amarasinghe},
-  title = 	 {A Stream Compiler for Communication-Exposed Architectures},
-  pages = 	 {291-303},
+  title = 	 "{A Stream Compiler for Communication-Exposed Architectures}",
+  OPTpages = 	 {291-303},
   year = 	 {2002},
-  month = 	 {October},
-  organization = {ASPLOS-X Proceedings},
+  OPTmonth = 	 {October},
+  organization = {ASPLOS}
 }
 
 @MastersThesis{karczma-thesis,
   author = 	 {Michael A. Karczmarek},
   title = 	 {Constrained and phased scheduling of synchronous data flow graphs for the StreamIt language},
-  school = 	 {MIT Laboratory for Computer Science},
+  school = 	 {MIT LCS},
   month =        {October},
   year = 	 {2002},
 }
@@ -195,7 +203,7 @@
   title = 	 {Discrete-Time Signal Processing},
   publisher = 	 {Prentice Hall},
   year = 	 {1999},
-  edition =      {second}
+  OPTedition =      {second}
 }
 @Book{lyons-understanding,
   author = 	 {Richard G. Lyons},
@@ -204,13 +212,26 @@
   year = 	 {2001},
 }
 
-@Book{covell-ade,
+@Book{covell-ade-book,
   author = 	 {Michele Mae Covell},
   title = 	 {An Algorithm Design Environment for Signal Processing},
   publisher = 	 {Research Lab for Electronics, Massachusetts Institute of Technology},
   year = 	 {1989},
   number = 	 {RLE Technical Report No. 549},
   note = 	 {PhD thesis, Alan V. Oppenheim supervisor},
+}
+
+@PhdThesis{covell-ade,
+  author = 	 {Michele Mae Covell},
+  title = 	 {An Algorithm Design Environment for Signal Processing},
+  school = 	 {MIT},
+  year = 	 {1989},
+  OPTkey = 	 {},
+  OPTtype = 	 {},
+  OPTaddress = 	 {},
+  OPTmonth = 	 {},
+  OPTnote = 	 {},
+  OPTannote = 	 {}
 }
 
 @Book{dragon-book,
@@ -258,7 +279,7 @@
 @article{esterel92,
     author = "Gerard Berry and Georges Gonthier",
     title = "{The Esterel Synchronous Programming Language: Design, Semantics, Implementation}",
-    journal = "Science of Computer Programming",
+    journal = "Science of Computer Prog.",
     volume = "19",
     number = "2",
     OPTpages = "87-152",
@@ -275,10 +296,9 @@
 @InProceedings{dynamo99,
   author = 	 {Vasanth Bala and Evelyn Duesterwald and Sanjeev Banerjia},
   title = 	 {Dynamo: A Transparent Dynamic Optimization System},
-  year = 	 {2000},
-  month = 	 {June},
-  booktitle = "{PLDI}'99 --- Conference on Programming Language Design and Implementation",
-  address =     "{Vancouver, Canada}",
+  year = 	 {1999},
+  OPTmonth = 	 {June},
+  booktitle = "{PLDI}",
 }
 
 @misc{cell-webpage,
@@ -303,7 +323,7 @@
 @Article{signal,
   author = 	 {Thierry Gautier and Paul Le Guernic and Loic Besnard},
   title = 	 {Signal: A declarative language for synchronous programming of real-time systems},
-  journal = 	 {Springer Verlag Lecture Notes in Computer Science},
+  journal = 	 {Springer Verlag LNCS},
   year = 	 {1987},
   OPTkey = 	 {},
   volume = 	 {274},
