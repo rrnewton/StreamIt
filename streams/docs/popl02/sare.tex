@@ -209,8 +209,7 @@ integer $i$ are given by $sign(i)$ and $abs(i)$, respectively.
 
 \item Given channel $c = (n_a, n_b)$:
 \begin{align*}
-\mt{Period}(c) \equiv S(n_a) * \mt{TotalWrite}(n_a, c, \mt{steady})
-\equiv 
+\mt{Period}(c) \equiv S(n_a) * \mt{TotalWrite}(n_a, c, \mt{steady}) = 
 S(n_b) * \mt{TotalRead}(n_b, c, \mt{steady})
 \end{align*}
 
@@ -276,7 +275,7 @@ equation (IWRITE to IBUF):
 
 \end{itemize}
 
-For each node $n$, do the following:
+\noindent For each node $n$, do the following:
 \begin{itemize}
 %
 \item For each $c \in \mt{chan\_out}(n)$, and for each $p \in [0,
@@ -307,7 +306,7 @@ introduce this equation (SWRITE to SBUF):
                      q~mod~S(n),
                      j - \mt{Offset}_{SW {\small \rightarrow} SB}(q,n,c,p)) \\
 \mt{where } {\cal D}_{SW {\small \rightarrow} SB}(c,p,q) = 
-  {\cal D}_{{SBUF}_{c}} \cap \\
+  {\cal D}_{{SBUF}_{c}} \cap 
   \{ (i,j) | \mt{Offset}_{SW {\small \rightarrow} SB}(q,n,c,p) \le j
              \le \mt{Offset}_{SW {\small \rightarrow} SB}(q,n,c,p+1) - 1 \} \\ 
 \mt{and } \mt{Offset}_{SW {\small \rightarrow} SB}(q,n,c,r) = q*\mt{TotalWrite}(n,c,\mt{steady}) + \mt{PartialWrite}(c,\mt{steady},r))
@@ -327,17 +326,19 @@ introduce this equation (SWRITE to SBUF):
 \mt{num}(n, \mt{init})-1]$, and for \\ each $q \in [0, \lfloor
 \frac{\mt{argmax}_{\mt{p}'} \left( \mt{PartialRead}(\mt{c}, \mt{init},
 \mt{p}') + \mt{E}(\mt{c}, \mt{init}, \mt{p}') \right)
-}{\mt{TotalRead(n,c,steady)}} \rfloor ]$, introduce this equation (SBUF to
+}{\mt{Period(c)}} \rfloor ]$, introduce this equation (SBUF to
 IREAD):
 \begin{align*}
 \forall i \in {\cal D}_{SB {\small \rightarrow} IR}(c,p), 
 \mt{IREAD}_{c,p}(i) = 
     \mt{SBUF}_{c}(q,
-      \mt{PartialRead}(c, \mt{init}, p) + i - 
-            |{\cal D}_{{IBUF}_{c}}| - q * \mt{TotalRead}(n,c,\mt{steady})) \\
+      i + \mt{PartialRead}(c, \mt{init}, p) - 
+            |{\cal D}_{{IBUF}_{c}}| - q * \mt{Period}(c)) \\
 \mt{where }{\cal D}_{SB {\small \rightarrow} IR}(c,p) = 
   \{ i | i \in {\cal D}_{{IREAD}_{c,p}} ~\wedge~ 
-         \mt{PartialRead}(c, \mt{init}, p) + i \notin {\cal D}_{{IBUF}_{c}} \}
+         \mt{PartialRead}(c, \mt{init}, p) + i \notin {\cal D}_{{IBUF}_{c}} ~\wedge~ \\
+         q * \mt{Period}(c) \le i 
+         \le \mt{Period}(c) + |{\cal D}_{{IBUF}_c}| - \mt{PartialRead}(c,\mt{init},p) \}
 \end{align*}
 %
 \item For each $c \in \mt{chan\_in}(n)$, and for each phase $p \in [0,
@@ -408,9 +409,9 @@ these equations (SBUF to SREAD):
 \mt{where }\mt{PUSHED}(n,c,p) = {\cal D}_{IB {\small \rightarrow} SR}(n,c,p) \\
 \mt{and }\mt{Num\_Pushed}(n,c,p) = 
 % this is a dot product of (i,j,k) with something
-  max_{\preceq}\mt{PUSHED} \cdot \{S(n) * \mt{TotalRead}(n,c,\mt{steady}), \\
+  max_{\preceq}\mt{PUSHED} \cdot (S(n) * \mt{TotalRead}(n,c,\mt{steady}), \\
                                         \mt{TotalRead}(n,c,\mt{steady}), \\
-                                        1 \} + \mt{PartialRead}(c, \mt{steady}, p) \\
+                                        1 ) + \mt{PartialRead}(c, \mt{steady}, p) \\
 \mt{and }\mt{PEEKED}(c,p) = {SB {\small \rightarrow} IR}(c,p) \\
 \mt{and }\mt{Num\_Popped}(c,p) = |\mt{PEEKED}| - (E(c,\mt{steady},p) - O(c,\mt{steady},p)) \\
 \mt{and }\mt{Offset}(n,c,p) = \mt{Num\_Popped}(c,p)-\mt{Num\_Pushed}(n,c,p) \\
