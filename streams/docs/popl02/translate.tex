@@ -18,9 +18,17 @@ translation.  These are very similar as in the simple case, except
 that now there are separate variables for initialization and steady
 state, as well as variables for each phase.
 
+\begin{figure}
+\centering
+\psfig{figure=communic.eps,width=3.2in}
+\parbox{4in}{\caption{Flow of data between SARE variables.  Data flows from the base of each arrow to the tip.  Dotted lines indicate communication that might not occur for a given channel.}
+\protect\label{fig:communic}}
+\end{figure}
+
 The equations for the translation appear in
-Figures~\ref{fig:pcptosare2} and~\ref{fig:pcptosare3}.  Due to space
-limitations, we discuss only the most interesting parts below.
+Figures~\ref{fig:pcptosare2} and~\ref{fig:pcptosare3}.  A diagram of
+which variables depend on others Due to space limitations, we discuss
+only the most interesting parts below.
 
 Equation~\ref{i2ibuf} writes the initial values of the initial tokens
 on $\mt{IBUF}$, the initial buffer.  Equation~\ref{iwrite2ibuf}

@@ -1,2 +1,24 @@
 \section{Conclusion}
 
+This paper shows that a very broad class of synchronous dataflow
+graphs can be cleanly represented as a System of Affine Recurrence
+Equations, thereby making them amenable to all of the scheduling and
+optimization techniques that have been developed within the polyhedral
+model.  The polyhedral model is a robust and well-established
+framework within the scientific community, with methods for graph
+parameterization, automatic parallelization, and storage optimization
+that are very relevant to the current challenges within the signal
+processing domain.  
+
+Our analysis inputs a Phased Computation Graph, which we originally
+formulated as a model of computation for StreamIt~\cite{streamitcc}.
+Phased Computation Graphs are a generalization of synchronous dataflow
+graphs, cyclo-static dataflow graphs, and computation graphs; they
+also include a novel notion of initial and steady-state epochs, which
+are an appealing abstraction for programmers.
+
+We believe that the precise affine dependence framework provided by
+the SARE representation will enable a powerful suite of intra-node
+optimizations in dataflow graphs.  We proposed optimizations such as
+decimation propagation, node fission, and steady-state invariant code
+motion that are a first step in this direction.
