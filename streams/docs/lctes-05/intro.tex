@@ -112,10 +112,10 @@ instruction set architecture. The Itanium by contrast has a much
 larger and richer repertoire of registers. The two architectures serve
 to validate our cache-aware optimizations, in that we expect an
 architecture with more registers to benefit more from optimization such
-as scalar replacement. Fusion leads to a 77\% speedup for
-the benchmark suite on the Pentium~3, and 88\% speedup on the Itanium~2.  
-On average, scaling gives a 40\% speedup for our benchmark suite
-on the Pentium~3 and 37\% speedup on the Itanium~2.
+as scalar replacement. Fusion with scalar replacenet leads to a 
+77\% speedup for our benchmark suite on the Pentium~3, and 88\% speedup 
+on the Itanium~2. Scaling gives a 40\% speedup over baseline for our 
+benchmark suite on the Pentium~3 and 37\% speedup on the Itanium~2.
 
 While both scaling and fusion lead to modest performance gains, we
 combine the two to deliver the best possible performance. When we
@@ -174,4 +174,6 @@ demonstrating performance improvements of up to 6577\%.
 % our evaluation methodology and present our experimental
 % analysis. Sections~\ref{sec:related-work}~and~\ref{sec:conclusion}
 % discuss related work and concludes the paper.
+
+
 
