@@ -164,11 +164,11 @@ locality and amoritize the cost of the accesses to lower levels of the
 memory hierarchy. This of course assumes that the total code size for
 the filters in the steady state exceeds the capacity of the
 instruction cache (which is commonly the case;). In
-Figure~\ref{fig:ssi-all} we show the code size for the steady states
-from our benchmark suite, and in Figure~\ref{fig:ssi-single} we
-show a representative breakdown of the code size per filter in a
-steady state execution of a StreamIt implementation of FFT. The
-figures provide evidence that while individual filters may have a
+Figure~\ref{fig:ssi-single} we show a representative breakdown of the
+code size per filter in a steady state execution of a StreamIt
+implementation of FFT. In all, the total code size for a steady state
+ranges from 16~Kb to over 60~Kb for our benchmarks. These results
+provide evidence that while individual filters may have a
 small instruction footprint, the total footprint of the filters in a
 steady state exceeds a typical instruction cache size.
 From these observations, it is evident that we must {\it scale} the
