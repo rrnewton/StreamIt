@@ -571,24 +571,28 @@ restricting the compiler's freedom to reorder filter executions.
 
 We feel that the StreaMIT messaging model is an advance in that it
 separates the notions of low-volume and high-volume data
-transfer--both for the programmer and the compiler-- without losing a
+transfer--both for the programmer and the compiler--without losing a
 well-defind semantics where messages are {\it timed} relative to the
-high-volume data flow.
+high-volume data flow.  Further, by separating message communication
+into its own category, fewer connections are needed for steady-state
+data transfer and the resulting stream graphs are more amenable to
+structured stream programming.
 
 \subsection{Re-Initialization}
 \label{sec:reinit}
 
 \subsubsection{StreaMIT Approach}
 
-One of the characteristics of a streaming application is the need for
-occaisional re-initialization of sub-regions of the stream graph.
-StreaMIT integrates re-initialization with its messaging model.  If a
-sender targets a message at the {\tt init} function of a stream or
-filter $S$, then when the message arrives, it re-executes the
-initialazation code and replaces $S$ with a new version of itself.
-However, the new version might have a different structure than the
-original if the arguments to the {\tt init} call on re-initialization
-were different than during the original initialization.
+One of the characteristics of a streaming application is the need to
+occaisionally modify the structure of part of the stream graph.
+StreaMIT allows these changes through a re-initialization mechanism
+that is integrated with its messaging model.  If a sender targets a
+message at the {\tt init} function of a stream or filter $S$, then
+when the message arrives, it re-executes the initialazation code and
+replaces $S$ with a new version of itself.  However, the new version
+might have a different structure than the original if the arguments to
+the {\tt init} call on re-initialization were different than during
+the original initialization.
 
 When an init message arrives, it does not kill all of the data that is
 in the stream being re-initialized.  Rather, it {\it drains} the
@@ -609,7 +613,9 @@ Re-initialization is a headache for stream programmers because--if
 done manually--the entire runtime system could be put on hold to
 re-initialize a portion of the stream.  The interface to starting and
 stopping streams could be complicated when there is not an explicit
-notion of initialization time vs. steady-state execution time.
+notion of initialization time vs. steady-state execution time, and
+ad-hoc draining techniques could risk losing data or deadlocking the
+system.
 
 StreaMIT improves on this situation by abstracting the
 re-initialization process from the user.  That is, no auxillary

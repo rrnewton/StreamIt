@@ -1,47 +1,6 @@
-------------------------------------------------------------------------
-
-- emphasize in title or abstract that this is for static rates
-
-- make it more clear in words what the semantics are of message
-sending, etc.
-
-- add to intro:  timing emphasis
-
-- In Figure 7 don't put all the code of TrunkedRadio, also put parts of code
-from Booster and Check Quality to show message delivery. (Copy the class,
-eliminate extraneous stuff and put dots)
-
-- IN 3.3.2 having a messaging system reduces the number of channels since only
-high bandwidth comm. need a channel, making most programs easier to fit into
-a structured streaming model.
-
-- 3.4.1 Justify reinitializatoin by need to change a part of the stream graph.
-
-- Adhoc reinitialization can easily loose data or deadlock the system.
-
-- Need to note somewhere that sending a message does not affect the info
-wavefront. I.e. can go "back to the future" using messages.
-
-- Just before 4.1.1 The formalism is not only used for define messaging and
-latency but also to prove program correctness (deadlock etc.)
-
-- 4.1.1 Where is min?
-
-- Figure 10 has J and S not FJ and FS is that consistent??
-
-- 4.2.3 We can do something cool on for scheduling, we can bound the
-total number of buffer space!  Find the number of items that must be
-on a tape, sum them up, and say it has to be less than MAXBUFFERSIZE
-
-- We should say something in intro/abstract about how easy for us to
-prove/show deadlock freedom etc.
-
-- Section 6 needs a description about the TrunkedRadio (how about the
-description I e-mailed to you yesterday?)
-
-------------------------------------------------------------------------
-
 - write appendix
+
+- rewrite everything that saman wrote (related, example, conclusions)
 
 * define latency for things other than filters.  same with messages!
 	- will need concept of first/last filters in a stream, which
@@ -58,11 +17,8 @@ description I e-mailed to you yesterday?)
 
 	- also have re-initialization an draining in some example?
 
-todo in windows
----------------
-
 - expand the messaging diagram into a nice picture with the source,
-destination, portal, and connecting code.
+destination, portal, and connecting code.  (do this in windows!)
 
 todo later this afternoon
 -------------------------
@@ -90,6 +46,13 @@ output anything at the hop positions?
 * I'm going to let the init function push and pop, ok?  We still have
 to give semantics.
 
+* should there be a semantic restriction that you can't send messages
+ahead of the wavefront?  I guess not.  But we could.
+
+- how do you center the components of an equation?
+
+-> can you please switch J to FJ and S to FS on feedback.eps?
+
 -> note: I'm using semantics of add so that it returns what it adds.
 this leads to a nicer syntax.
 
@@ -109,6 +72,11 @@ similar equaionts are placed next to each other.
 
 future things to think about
 ----------------------------
+
+* a quasi-problem with the operational semantics is that it doesn't
+indicate when the splits and joins execute (it assumes they execute
+immediately), which might give us less scheduling control than we'd
+like.
 
 * realtime constraints.  can we say a filter fires once per time interval?
 

@@ -1,7 +1,15 @@
 \section{Detailed Example}
 \label{sec:example}
 This section describes the Trunked Radio example implementation in
-Figure~\ref{fig:radiocode}. The code for the trunked radio
+Figure~\ref{fig:radiocode}. The trunked radio is a frequency hopping
+system. The transition points between the set frequencies is indicated
+to the receiver by transmitting a preset tone. Our radio also has a
+FIR filter to increase the gain of a weak signal. However, in order to
+save power, this filter is activated only when the signal signal to
+noice ratio is low.  This implementation relies on transforming the
+signal into the frequency domain for processing using a FFT. For
+brevity, we have not shown the RF processing in the front-end and the
+audio processing in the back-end.  The code for the trunked radio
 demonstrates many features of StreaMIT.
 
 The high-level structure of the radio, graphically shown in

@@ -36,9 +36,17 @@ stream programming.  Its goals are two-fold: first, to raise the
 abstraction level in stream programming, thereby improving programmer
 productivity and program robustness, and second, to provide a compiler
 that performs stream-specific optimizations to achieve the performance
-of an expert assembly programmer.  To address the first of these
-goals, this paper presents a high-level language specifically designed
-for streaming applications.
+of an expert assembly programmer.  
+
+To address the first of these goals, this paper describes the first
+version of the StreaMIT language.  The first version is special in
+that it concentrates on streams with static input and output rates;
+applications such as compression that have dynamic flow rates will be
+the focus of the next version of StreaMIT.  This paper also presents a
+notion of ``information flow'' that we believe is fundamental to the
+streaming domain.  Using this notion, we give a clear semantics to
+StreaMIT's messaging system and describe simple algorithms for static
+deadlock and overflow detection.
 
 The paper is organized as follows. In Section {\ref{sec:domain}}, we
 characterize the domain of streaming programs that motivates the
@@ -46,8 +54,8 @@ design of StreaMIT.  In Section~\ref{sec:overview}, we provide a
 detailed description of StreaMIT, and in Section~\ref{sec:time} we
 formally define the semantics of StreaMIT using a notion of
 ``information flow''. We describe related work in
-Section~\ref{sec:related} and a detailed example of a software radio
-in Section~\ref{sec:example}.  Section~\ref{sec:conc} contains our
-conclusions.
+Section~\ref{sec:related} and present a detailed example of a software
+radio in Section~\ref{sec:example}.  Section~\ref{sec:conc} contains
+our conclusions.
 
 
