@@ -15,7 +15,7 @@
 
 \formattitlecontents 
 {Linear Analysis and Optimization of Stream Programs}
-{Andrew Lamb, Bill Thies, Saman Amarasinghe}
+{Andrew Lamb, William Thies, Saman Amarasinghe}
 
 
 % Please use the following \formatsection entries unless they are
@@ -42,33 +42,50 @@ high-level automatic DSP optimizations that are generally impossible
 to do in a general-purpose language.
 
 \formatsection{Approach}
-Linear analysis and optimization\cite{pldi-03-linear}
-focuses on filters which compute {\it linear} 
-functions of their inputs. A filter computes a linear function if
-the computation it does can be described by a vector-matrix operation. 
-Many fundamental DSP operations such as filtering, the Discrete Fourier 
-Transform (DFT), up sampling and down sampling, can be described 
-as vector-matrix operations. The foundation of this project is
-a simple dataflow algorithm that can determine which filters in a 
-StreamIt program perform linear computations and the specific matrices
-which describe that computation.
+
+Linear analysis and optimization\cite{pldi-03-linear} focuses on
+filters which compute {\it linear} functions of their inputs. A filter
+computes a linear function if the computation it does can be described
+by a vector-matrix multiplication.  Many fundamental DSP operations
+such as filtering, the Discrete Fourier Transform (DFT), up sampling
+and down sampling, can be described as a vector-matrix
+multiplication. The foundation of this project is a simple dataflow
+algorithm that can determine which filters in a StreamIt program
+perform linear computations and the specific matrices which describe
+that computation.
+
+%% \begin{figure}
+%%   \begin{minipage}{2.95in}
+%%     \includegraphics[width=2.8in]{cag-commit-streamit-linear-expand.eps}
+    
+%% 		    ~~~~~~~{\bf (a) Expanding rates to $(e', o', u')$.}
+%%     \end{minipage}
+%%     \begin{minipage}{3.3in}
+%%       \vspace{0.53in}
+%%       \includegraphics[width=3.25in]{cag-commit-streamit-linear-sjcombo.eps}
+%%       \vspace{3pt} \\ 
+%%       {\bf (b) Combining a {\tt splitjoin} of linear sub streams.}
+%%     \end{minipage}
+%%     \caption{Graphical depictions of linear combination algorithms.}
+%%     \label{fig:linear-combo}
+%%     \vspace{-12pt}
+%% \end{figure}
 
 \begin{figure}
-  \center
-  \begin{tabular}{cc}
-    \begin{minipage}{2.3in}
-      \includegraphics[height=1.5in]{cag-commit-streamit-linear-expand.eps} \\
-      \noindent
-      {\bf (a) Expanding rates to $(e', o', u')$.}
-    \end{minipage} &
+\vspace{-12pt}
+    \begin{minipage}{2.5in}
+      \includegraphics[height=1.6in]{cag-commit-streamit-linear-expand.eps}
+      \vspace{-6pt}
+      \noindent \caption{Expanding rates to $(e', o', u')$.
+        \label{fig:cag-commit-streamit-linear-combo-a}}
+    \end{minipage}
     \begin{minipage}{3.5in}
-      \includegraphics[height=1.5in]{cag-commit-streamit-linear-sjcombo.eps} \\
-      \noindent
-      {\bf (b) Combining a {\tt splitjoin} of linear sub streams.}
-    \end{minipage} \\
-  \end{tabular}
-  \caption{Graphical depictions of linear combination algorithms.}
-  \label{fig:cag-commit-streamit-linear-combo}
+      \includegraphics[height=1.6in]{cag-commit-streamit-linear-sjcombo.eps}
+      \vspace{-6pt}
+      \noindent \protect\hspace{1in}\caption{Combining a {\tt splitjoin} of linear sub streams.
+        \label{fig:cag-commit-streamit-linear-combo-b}}
+    \end{minipage}
+  %%\caption{Graphical depictions of linear combination algorithms.}
   \vspace{-12pt}
 \end{figure}
 
@@ -76,12 +93,14 @@ A primary benefit of linear filter analysis is that neighboring
 filters can be collapsed into a single matrix representation if both
 of the filters are linear. These transformations automatically
 eliminate redundant computations in linear sections of the stream
-graph. Automating the optimization allows DSP programmers to write simple, 
-modular filters and leave complex combination and optimizations 
-to the compiler. We have developed algorithms for a {\it linear expansion} operation 
-(Figure~\ref{fig:cag-commit-streamit-linear-combo} (a)), and for collapsing 
-{\tt pipeline}s and {\tt splitjoin}s into overall linear nodes
-(Figure~\ref{fig:cag-commit-streamit-linear-combo} (b)).
+graph. Automating the optimization allows DSP programmers to write
+simple, modular filters and leave complex combination and
+optimizations to the compiler. Figure~\ref{fig:cag-commit-streamit-linear-combo-a}
+illustrates a {\it linear expansion} operation that allows nodes with
+mismatching input and output rates to be made compatible before
+combining into a single matrix.  Figure~\ref{fig:cag-commit-streamit-linear-combo-b}
+depicts the procedure for collapsing $n$ children of a {\tt splitjoin}
+construct into a single matrix representation.
 
 To take advantage of the linear analysis framework, our compiler
 has two linear analysis optimizations. The first, {\it linear replacement},
@@ -92,32 +111,36 @@ which implement digital filtering using a standard conversion to the
 frequency domain.
 
 \formatsection{Progress}
-We have developed a fully automatic implementation for linear analysis 
-and optimization as part of the StreamIt compiler. Our preliminary results
-are very promising. In our suite of benchmark applications, the optimizations
-increased execution speed by an average factor of five and a factor of $6.5$ 
-in the best case. Figure~\ref{fig:cag-commit-streamit-linear-speedup} (a) shows
-the speed up for each of the benchmarks. 
-Both optimizations significantly reduce the amount of computation required
-which is reflected by a reduction in the number of floating 
-point multiplications, shown in Figure~\ref{fig:cag-commit-streamit-linear-speedup} (b).
+We have developed a fully automatic implementation for linear analysis
+and optimization as part of the StreamIt compiler. Our preliminary
+results are very promising. For our benchmarks, the optimizations
+increased execution speed by an average factor of 5 and a factor of
+$6.5$ in the best
+case. Figure~\ref{fig:cag-commit-streamit-linear-speedup-a} shows the
+speed up for each of the benchmarks.  Both optimizations significantly
+reduce the amount of computation required which is reflected by a
+reduction in the number of floating point multiplications, shown in
+Figure~\ref{fig:cag-commit-streamit-linear-speedup-b}.
 
 \begin{figure}
   \center
   \begin{tabular}{cc}
     \begin{minipage}{3.0in}
-      \includegraphics[height=2in]{cag-commit-streamit-linear-speedup.eps} \\
-      \noindent {\bf (a) Execution speedup for each of the benchmarks with both linear 
-	replacement and frequency replacement optimizations.}
+      \includegraphics[height=2in]{cag-commit-streamit-linear-speedup.eps}
+      \vspace{-12pt}
+      \noindent \caption{Execution speedup for each of the benchmarks with both linear 
+	replacement and frequency replacement optimizations.
+        \protect\label{fig:cag-commit-streamit-linear-speedup-a}}
     \end{minipage} &
     \begin{minipage}{3.0in}
-      \includegraphics[height=2in]{cag-commit-streamit-linear-mults.eps} \\
-      \noindent {\bf (b) Percent of multiplication operations remaining after performing 
-	linear replacement, frequency replacement, and both.}
+      \includegraphics[height=2in]{cag-commit-streamit-linear-mults.eps}
+      \vspace{-6pt}
+      \noindent \caption{Percent of multiplication operations remaining after performing 
+	linear replacement, frequency replacement, and both.
+        \protect\label{fig:cag-commit-streamit-linear-speedup-b}}
     \end{minipage}
   \end{tabular}
-  \caption{Benchmark performance for linear optimizations.}
-  \label{fig:cag-commit-streamit-linear-speedup}
+  %\caption{Benchmark performance for linear optimizations.}
   %\vspace{-12pt}
 \end{figure}
 
@@ -125,8 +148,8 @@ To determine if frequency replacement can fully realize the theoretical maximum
 savings, we measured multiplication reduction as a function
 of both filter size and FFT size. It turns out that the theory and the implementation
 are very similar. The multiplication reduction predicted by theory are shown in
-Figure~\ref{fig:cag-commit-streamit-linear-freq} (a) and the reduction that
-we measured are shown in Figure~\ref{fig:cag-commit-streamit-linear-freq} (b).
+Figure~\ref{fig:cag-commit-streamit-linear-freq-a} and the reduction that
+we measured are shown in Figure~\ref{fig:cag-commit-streamit-linear-freq-b}.
 
 \formatsection{Future}
 For future research, we are developing new optimizations which make use
@@ -151,20 +174,25 @@ take advantage of the specialized instructions offered.
   \center
   \begin{tabular}{cc}
     \begin{minipage}{3.0in}
-      {\center \includegraphics[height=2in]{cag-commit-streamit-linear-freq-theory.eps}} \\
-      \noindent {\bf (a) Theoretical multiplication reduction.}
+    \begin{center}
+      \includegraphics[height=2in]{cag-commit-streamit-linear-freq-theory.eps}
+      \vspace{-6pt}
+      \noindent \caption{Theoretical multiplication reduction.
+        \label{fig:cag-commit-streamit-linear-freq-a}}
+      \end{center}
     \end{minipage} &
     \begin{minipage}{3.0in}
-      {\center \includegraphics[height=2in]{cag-commit-streamit-linear-freq-measure.eps}} \\
-      \noindent {\bf (b) Measured multiplication reduction.}
+    \begin{center}
+      \includegraphics[height=2in]{cag-commit-streamit-linear-freq-measure.eps}
+      \vspace{-6pt}
+      \noindent \caption{Measured multiplication reduction.
+        \label{fig:cag-commit-streamit-linear-freq-b}}
+	\end{center}
     \end{minipage}
   \end{tabular}
-  \caption{Theoretical vs. Empirical multiplication reduction.}
-  \label{fig:cag-commit-streamit-linear-freq}
+  %%\caption{Theoretical vs. Empirical multiplication reduction.}
   \vspace{-12pt}
 \end{figure}
-
-
 
 \formatsection{Research Support}
 This work is supported by DARPA (PCA F29601-04-2-0166),
