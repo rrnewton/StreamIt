@@ -20,9 +20,9 @@ components:
 \item A constructor, which receives the following:
 
 \begin{itemize}
-\item The input and output streams for the kernel.
 \item The architecture resource where the kernel will execute.
 \item A block of memory for spilling local variables.
+\item The inputs and outputs for the kernel.
 \item Any other kernel-specific initialization data.
 \end{itemize}
 
@@ -48,15 +48,15 @@ are preserved between invocations of {\it work}.
 \noindent For example, a kernel for a simple amplifier could be as follows:
 {\small
 \begin{verbatim}
-  class AmplifierKernel : Kernel {
-    IStreamUnordered<float> in;
-    OStreamUnordered<float> out;
+  class AmplifierKernel : public Kernel {
+    IStream<float> in;
+    OStream<float> out;
     int N;
 
   public:
     AmplifierKernel(int _N, VM_NODE location, IOBlock<byte> scratch, 
-                    IStreamUnordered<float> _in, OStreamUnordered<float> _out) : 
-                    Kernel (location, scratch, _in, _out) {
+                    IStream<float> _in, OStream<float> _out) : 
+                    public Kernel (location, scratch, _in, _out) {
       in = _in;
       out = _out;
       N = _N;
@@ -82,15 +82,16 @@ are preserved between invocations of {\it work}.
 As evident in the example, input and output streams are represented by
 objects that support {\tt push} and {\tt pop} operations.  In the
 following sections, we describe the API for streams
-(Section~\ref{sec:kerstreams}) and the API for kernels
+(Section~\ref{sec:kerstreams}), the API for blocks
+(Section~\ref{sec:blocks}), and the API for kernels
 (Section~\ref{sec:kernels}).
 
 \begin{figure}[t]
 \begin{center}
-\psfig{figure=inherit-stream.eps,width=3in}
+\psfig{figure=inherit.eps,width=6in}
 \end{center}
 \vspace{-12pt}
-\caption{Class hierarchy diagram for streams.\protect\label{fig:inherit}}
+\caption{Class hierarchy diagram for streams and blocks.\protect\label{fig:inherit}}
 \end{figure}
 
 \input{declgrid}
@@ -254,6 +255,128 @@ the capacity of the buffer, then the return value is undefined.
   }
 \end{verbatim}}
 
+
+%% \begin{figure}[t]
+%% \begin{tabular}{c|c|c|c}
+%% ~ & Input & Output & Input and Output
+%% \\ \hline
+%% \lefttab{Block}
+%% &
+%% \begin{minipage}{1.9in}
+%%   \scriptsize
+%%   \begin{verbatim}
+
+%% template <class T>
+%% class IBlock {
+%%   IBlock(StreamBuffer<T> &s);
+%%   T read(int index);
+%% }
+
+
+%%   \end{verbatim}
+%% \end{minipage}
+%% &
+%% \begin{minipage}{1.6in}
+%%   \scriptsize
+%%   \begin{verbatim}
+
+%% template <class T>
+%% class OBlock {
+%% public:
+%%   OBlock(StreamBuffer<T> &s);
+%%   void write(int index, T &val);
+%% }
+
+%%   \end{verbatim}
+%% \end{minipage}
+%% &
+%% \begin{minipage}{1.8in}
+%%   \scriptsize
+%%   \begin{verbatim}
+
+%% template <class T>
+%% class IOBlock : 
+%%        IBlock<T>, 
+%%        OBlock<T> {
+%% public:
+%%   IOBlock(StreamBuffer<T> &s);
+%% }
+%%   \end{verbatim}
+%% \end{minipage}
+%% \end{tabular}
+%% \caption{Class declarations for blocks.\protect\label{fig:declgrid}}
+%% \end{figure}
+
+\subsubsection{Blocks}
+\label{sec:blocks}
+
+Streams are intended for sequential production and consumption of data
+items.  For kernels that require random access to a fixed set of
+elements, the API provides the {\it block} abstraction.  A block is
+simply a contiguous region of memory; it is constructed with a
+capacity, a memory node, and an address.  Since some kernels use a
+given block only for input or only for output, we divide the block
+classes into {\tt IBlock} and {\tt OBlock}, with {\tt IOBlock}
+extending both (see Figure~\ref{fig:inherit}).
+
+The {\tt OBlock} class implements the {\tt write} and {\tt
+getCapacity} functions:
+
+{\small
+\begin{verbatim}
+  template<class T>
+  class OBlock {
+  public:
+    // construct block of size <capacity>, at <address> of <memLocation>
+    OBlock(int capacity, VM_NODE_TYPE_MEM memLocation, int address);
+
+    // construct block of size <capacity>, in registers of <procLocation>
+    OBlock(int capacity, VM_NODE_TYPE_PROC procLocation);
+
+    // write <val> to <index> of this.  Requires that index < capacity.
+    void write(int index, T& val);
+
+    // return capacity of this
+    int getCapacity();
+  }
+\end{verbatim}}
+
+\noindent The {\tt IBlock} class provides an interface to the {\tt
+read} and {\tt getCapacity} functions:
+
+{\small
+\begin{verbatim}
+  template<class T>
+  class IBlock {
+  public:
+    // construct block of size <capacity>, at <address> of <memLocation>
+    IBlock(int capacity, VM_NODE_TYPE_MEM memLocation, int address);
+
+    // construct block of size <capacity>, in registers of <procLocation>
+    IBlock(int capacity, VM_NODE_TYPE_PROC procLocation);
+
+    // read element <index> from this.  Requires that index < capacity.
+    T read(int index);
+
+    // return capacity of this
+    int getCapacity();
+  }
+\end{verbatim}}
+
+\noindent The {\tt IOBlock} class extends both {\tt IBlock} and {\tt OBlock}:
+
+{\small
+\begin{verbatim}
+  template<class T>
+  class IOBlock : public IBlock, public OBlock {
+  public:
+    // construct block of size <capacity>, at <address> of <memLocation>
+    IOBlock(int capacity, VM_NODE_TYPE_MEM memLocation, int address);
+
+    // construct block of size <capacity>, in registers of <procLocation>
+    IOBlock(int capacity, VM_NODE_TYPE_PROC procLocation);
+\end{verbatim}}
+
 \subsubsection{Kernels}
 \label{sec:kernels}
 
@@ -270,29 +393,29 @@ Each kernel is described as a subclass of the basic kernel class:
     }
   protected:
     // construct a kernel on <location> that uses <scratch> to spill local variables,
-    // and is connected to streams (or blocks) <s1>, <s2>, ... .  Also, set private 
+    // and is connected to streams or blocks <sb1>, <sb2>, ... .  Also, set private 
     // <status> to UNSTARTED.
-    Kernel(VM_NODE location, IOBlock<byte> scratch, void* s1, void* s2=0, ... );
+    Kernel(VM_NODE location, IOBlock<byte> scratch, BaseMemory sb1, BaseMemory sb2=0, ... );
 
     // steady-state execution step.  Returns the new status of the kernel.
     virtual STATUS work();
 
     // (optional) Called before first invocation of work.  Returns status of kernel.
-    virtual STATUS prework(IStream<I1> in1, IStream<I2> in2, OStream<O1> out1);
+    virtual STATUS prework();
 
-    // (optional) Called after last invocation of work.  Returns status of kernel.
-    virtual void postwork(IStream<I1> in1, IStream<I2> in2, OStream<O1> out1);
+    // (optional) Called after last invocation of work.
+    virtual void postwork();
 
     // annotations for work, prework, and postwork functions
-    virtual void workInfo(IStream<I1> in1, IStream<I2> in2, OStream<O1> out1);
-    virtual void preworkInfo(IStream<I1> in1, IStream<I2> in2, OStream<O1> out1);
-    virtual void postworkInfo(IStream<I1> in1, IStream<I2> in2, OStream<O1> out1);
+    virtual void workInfo();
+    virtual void preworkInfo();
+    virtual void postworkInfo();
    
   public:
     // non-blocking method that starts or resumes execution of this kernel.  If there are 
     // predecessors that this execution depends on, then it waits for them to finish before 
     // starting to run.  The kernel continues to run until its status is SUSPENDED or FINISHED.
-    void run(Kernel predecessor1 = 0, Kernel predecessor2 = 0, ...);
+    void run(Kernel& predecessor1 = 0, Kernel& predecessor2 = 0, ...);
 
     // blocking method that waits until the kernel's status is something other than RUNNING,
     // at which point it returns the status.
@@ -304,6 +427,10 @@ Each kernel is described as a subclass of the basic kernel class:
     // non-blocking method that changes the status of the kernel to FINISHED.  If the
     // current status is RUNNING, then the execution will be interrupted on a best-effort basis.
     // To ensure that the kernel has finished, this should be followed by a call to wait().
+
+    // non-blocking method that interrupts execution of a kernel on a best-effort basis 
+    // to ensure that the kernel's status is FINISHED.  This should be followed by a call to 
+    // wait() if the control thread wants to ensure that the kernel is finished.
     void terminate();
 
   private:
@@ -348,7 +475,7 @@ The {\tt run} function is the external interface for executing a
 kernel.  It operates as follows: 
 {\small
 \begin{verbatim}
-  void Kernel::run(Kernel predecessor1 = 0, Kernel predecessor2 = 0, ...) {
+  void Kernel::run(Kernel& predecessor1 = 0, Kernel& predecessor2 = 0, ...) {
     // wait for dependent kernels to finish
     waitForPredecessors(predecessor1, predecessor2);
 
@@ -419,7 +546,7 @@ dynamic (with an estimate of 0.5 items per stream on average) because
 they depend on values from the input streams:
 {\small
 \begin{verbatim}
-  class MergeKernel : Kernel {
+  class MergeKernel : public Kernel {
     IStream<int> in1;
     IStream<int> in2;
     OStream<int> out;
@@ -461,7 +588,7 @@ they depend on values from the input streams:
       return RUNNING;
     }
 
-    void workInfo(IStream<int> in1, IStream<int> in2, OStream<int> out) {
+    void workInfo() {
       KernelInfo.setDynamicPush(in1, 0.5);
       KernelInfo.setDynamicPop(in2, 0.5);
       KernelInfo.setPush(out, 1);
@@ -553,11 +680,12 @@ An example of the stream control API is as follows:
   // set up a graph to do some audio filtering and compression
   Kernel copy = new Copy<float>(s0, s1, PROC1);
   Kernel compress1  = new RunLengthEncode(PROC1, scratch2, s1, s2);
-  Graph g1(copy, rle);
+  Graph g1(copy, compress1);
 
   // run the kernels
   copy.run();
   compress1.run();
+  compress1.wait();
 
   // if the output is still too large, run additional compression, 
   // overwriting s2 in place
@@ -579,9 +707,8 @@ An example of the stream control API is as follows:
 
 The above code fragment illustrates several aspects of the stream
 control API.  In the following, Section~\ref{sec:procstreams}
-describes the {\tt StreamBuffer} class; Section~\ref{sec:blocks}
-describes the {\tt IOBlock} class; Section~\ref{sec:streamgraph}
-explains the construction of graphs from kernels and stream buffers;
+describes the {\tt StreamBuffer} class; Section~\ref{sec:streamgraph}
+explains the construction and execution of stream graphs;
 Section~\ref{sec:predef} describes a pre-defined set of kernels for
 dealing with memory and network operations (such as the {\tt Copy}
 kernel above); and Section~\ref{sec:library} describes support for
@@ -622,7 +749,7 @@ space for the contents of a stream:
     // clears the elements of the buffer, as well as totalLength
     void reset();
 
-    // default copy operation, making element-wise copy of data array
+    // default copy operation
     StreamBuffer(StreamBuffer& _s);
 
     // private data and friends included only for benefit of reference implementation (see text)
@@ -634,7 +761,7 @@ space for the contents of a stream:
     int totalLength;
     friend IStream; friend IStreamUnordered;
     friend OStream; friend OStreamUnordered;
-    friend IOStream; friend IOStreamUnordered;
+    friend Stream; friend StreamUnordered;
   }
 \end{verbatim}}
 
@@ -692,128 +819,6 @@ guarantees that no operation will access the locations allocated to
 the buffer.  This gives the low-level compiler the freedom to
 implement buffers with an architecture-specific representation if
 their contents are never aliased.
-
-%% \begin{figure}[t]
-%% \begin{tabular}{c|c|c|c}
-%% ~ & Input & Output & Input and Output
-%% \\ \hline
-%% \lefttab{Block}
-%% &
-%% \begin{minipage}{1.9in}
-%%   \scriptsize
-%%   \begin{verbatim}
-
-%% template <class T>
-%% class IBlock {
-%%   IBlock(StreamBuffer<T> &s);
-%%   T read(int index);
-%% }
-
-
-%%   \end{verbatim}
-%% \end{minipage}
-%% &
-%% \begin{minipage}{1.6in}
-%%   \scriptsize
-%%   \begin{verbatim}
-
-%% template <class T>
-%% class OBlock {
-%% public:
-%%   OBlock(StreamBuffer<T> &s);
-%%   void write(int index, T &val);
-%% }
-
-%%   \end{verbatim}
-%% \end{minipage}
-%% &
-%% \begin{minipage}{1.8in}
-%%   \scriptsize
-%%   \begin{verbatim}
-
-%% template <class T>
-%% class IOBlock : 
-%%        IBlock<T>, 
-%%        OBlock<T> {
-%% public:
-%%   IOBlock(StreamBuffer<T> &s);
-%% }
-%%   \end{verbatim}
-%% \end{minipage}
-%% \end{tabular}
-%% \caption{Class declarations for blocks.\protect\label{fig:declgrid}}
-%% \end{figure}
-
-\subsubsection{Blocks}
-\label{sec:blocks}
-
-\begin{figure}[t]
-\begin{center}
-\psfig{figure=inherit-block.eps,width=1.38in}
-\end{center}
-\vspace{-12pt}
-\caption{Class hierarchy diagram for blocks.\protect\label{fig:inherit-block}}
-\end{figure}
-
-Stream buffers are intended for sequential production and consumption
-of data items.  For kernels that require random access to a fixed set
-of elements, the API provides the {\it block} abstraction.  A block is
-simply a contiguous region of memory.
-
-Since some kernels use a given block only for input or only for
-output, we divide the block interface into {\tt IBlock} and {\tt
-OBlock}, with {\tt IOBlock} implementing both (see
-Figure~\ref{fig:inherit-block}).  Like the {\tt StreamBuffer} class,
-each block is constructed with a capacity, location and address.  The
-rest of the functionality is described below:
-
-{\small
-\begin{verbatim}
-  template<class T>
-  class IOBlock : IBlock, OBlock {
-  public:
-    // construct block of size <capacity>, at <address> of <memLocation>
-    IOBlock(int capacity, VM_NODE_TYPE_MEM memLocation, int address);
-
-    // construct block of size <capacity>, in registers of <procLocation>
-    IOBlock(int capacity, VM_NODE_TYPE_PROC procLocation);
-
-    // read element <index> from this.  Requires that index < capacity.
-    T read(int index);
-
-    // write <val> to <index> of this.  Requires that index < capacity.
-    void write(int index, T& val);
-
-    // return capacity of this
-    int getCapacity();
-  }
-\end{verbatim}}
-
-\noindent The {\tt OBlock} class provides an interface to the {\tt
-write} and {\tt getCapacity} functions:
-
-{\small
-\begin{verbatim}
-  template<class T>
-  class OBlock {
-  public:
-    void write(int index, T& val) = 0;
-    int getCapacity() = 0;
-  }
-\end{verbatim}}
-
-\noindent The {\tt IBlock} class provides an interface to the {\tt
-read} and {\tt getCapacity} functions:
-
-{\small
-\begin{verbatim}
-  template<class T>
-  class IBlock {
-  public:
-    T read(int index) = 0;
-    int getCapacity() = 0;
-  }
-\end{verbatim}}
 
 \subsubsection{Stream Graphs}
 \label{sec:streamgraph}
@@ -915,7 +920,7 @@ inside a kernel.  For example:
 {\small
 \begin{verbatim}
   // --- kernel code ---
-  class SumKernel : Kernel {
+  class SumKernel : public Kernel {
   public:
     IStreamUnordered<int> in;
     int sum;
@@ -977,8 +982,10 @@ are passed to stream, kernel, or graph functions.  That is, constants
 denoting processor nodes, memory nodes, memory addresses, stream
 capacities, connections, and channels must be passed to API functions
 directly, rather than passing the value in a variable.  Similarly,
-each argument to a kernel's {\tt run} method must be the identifier of
-another kernel.
+identifiers of objects can only be used in two kinds of expressions:
+1) as the direct target of a method call, and 2) as an argument to a
+function.  This ensures that all references to streams, kernels, and
+graphs are resolvable by the low-level compiler.
 
 \item There are no references to templates or objects besides the
 classes described in this document.
@@ -1004,16 +1011,13 @@ for copying between streams in a single memory.
 {\small
 \begin{verbatim}
   template <class T>
-  class Copy : Kernel {
+  class Copy : public Kernel {
   public:
-    Copy(IStream<T> srcStr, OStream<T> destStr, VM_NODE location, 
-         int length = ENTIRE_STREAM, int srcOffset = 0, int destOffset = 0);
+    Copy(VM_NODE location, IStream<T> srcStr, OStream<T> destStr, int length = ENTIRE_STREAM);
   }
 \end{verbatim}}
 The {\tt length} indicates how many words should be transferred; by
-default, all elements in the {\tt srcStr} are copied.  The {\tt
-srcOffset} and {\tt destOffset} arguments can be used for shifting all
-accesses by an offset in the source or destination streams.
+default, all elements in the {\tt srcStr} are copied.
 
 \ssss{Scatter/Gather} A set of scatter and gather kernels allow copies
 between non-contiguous elements of streams.  The strided kernels are
@@ -1021,69 +1025,68 @@ for copying regularly spaced chunks into or out of a block:
 {\small
 \begin{verbatim}
   template <class T>
-  class StridedScatter : Kernel {
+  class StridedScatter : public Kernel {
   public:
-    // processes all items from <srcStr>; requires that capacity of <destBlock>
-    // is big enough to hold results.
-    Scatter(IStream<T> srcStr, OBlock<T> destBlock, VM_NODE location, 
-            int destStride = 1, int itemsPerChunk = 1);
+    StridedScatter(VM_NODE location, IStream<T> srcStr, OBlock<T> destBlock, int length,
+                   int destStride = 1, int itemsPerChunk = 1);
   }
 
   template <class T>
-  class StridedGather : Kernel {
+  class StridedGather : public Kernel {
   public:
-    // processes all items from <srcBlock>.
-    Gather(IBlock<T> srcBlock, OStream<T> destStr, VM_NODE location, 
-           int srcStride = 1, int itemsPerChunk = 1);
+    StridedGather(VM_NODE location, IBlock<T> srcBlock, OStream<T> destStr, int length,
+                  int srcStride = 1, int itemsPerChunk = 1);
   }  
 \end{verbatim}}
 The above kernels copy items in segments of {\tt itemsPerChunk} items.
 The {\tt srcStride} or {\tt destStride} indicates the number of items
-between the start of adjacent chunks.
+between the start of adjacent chunks, while {\tt length} represents
+the number of items that should be copied.
 
 The indexed scatter and gather kernels allow irregular accesses to a
 source or destination block:
 {\small
 \begin{verbatim}
   template <class T>
-  class IndexedScatter : Kernel {
+  class IndexedScatter : public Kernel {
   public:
-    Scatter(IStream<T> srcStr, IStream<int> indexStr, OBlock<T> destBlock, 
-            VM_NODE location, int itemsPerChunk = 1);
+    IndexedScatter(VM_NODE location, IStream<T> srcStr, IStream<int> indexStr, OBlock<T> destBlock, 
+                   int length, int itemsPerChunk = 1);
   }
 
   template <class T>
-  class IndexedGather : Kernel {
+  class IndexedGather : public Kernel {
   public:
-    Gather(IBlock<T> srcBlock, IStream<int> indexStr, OStream<T> destStr,
-           VM_NODE location, int itemsPerChunk = 1);
+    IndexedGather(VM_NODE location, IBlock<T> srcBlock, IStream<int> indexStr, OStream<T> destStr, 
+                  int length, int itemsPerChunk = 1);
   }  
 \end{verbatim}}
-In the {\tt Scatter} kernel, the {\tt indexStr} indicates the
+In the {\tt IndexedScatter} kernel, the {\tt indexStr} indicates the
 positions in the output stream at which the records should be written;
-in the {\tt Gather} kernel, the {\tt indexStr} indicates the positions
-in the input stream at which the records should be read.  There must
-be enough items in the source and destination to process all items of
-{\tt indexStr}.
+in the {\tt IndexedGather} kernel, the {\tt indexStr} indicates the
+positions in the input stream at which the records should be read.
+The {\tt length} argument indicates the number of items that should be
+copied.
 
 \subsubsection*{Network Kernels}
 
-The network kernels are for processor-processor communication.
+The network kernels are for synchronized communication between
+resources.
 
 \ssss{Send} The {\tt Send} kernel sends a stream from one processor to
 another, subject to the connection protocol described below.
 {\small
 \begin{verbatim}
   template <class T>
-  class Send : Kernel {
+  class Send : public Kernel {
   public:
     // send <srcStr> on <channel> of <connection>
-    Send(IStream<T> srcStr,  VM_EDGE connection, int channel);
+    Send(VM_NODE location, IStream<T> srcStr,  VM_EDGE connection, int channel);
   }
 \end{verbatim}}
-
-Given that the kernel is executing on processor $P$, we require that
-{\tt connection} is an edge from $P$ to a neighboring processor.
+Since the kernel is executing on processor {\tt location}, we require
+that {\tt connection} is an edge from {\tt location} to a neighboring
+processor.
 
 \ssss{Receive} The {\tt Receive} kernel receives a stream from a
 neighboring processor, subject to the connection protocol described
@@ -1091,15 +1094,15 @@ below.
 {\small
 \begin{verbatim}
   template <class T>
-  class Receive : Kernel {
+  class Receive : public Kernel {
   public:
     // receive <destStr> from <channel> of <connection>.
-    Receive(OStream<T> destStr,  VM_EDGE connection, int channel);
+    Receive(VM_NODE location, OStream<T> destStr,  VM_EDGE connection, int channel);
   }  
 \end{verbatim}}
-
-Given that the kernel is executing on processor $P$, we require that
-{\tt connection} is an edge into $P$ from a neighboring processor.
+Since the kernel is executing on processor {\tt location}, we require
+that {\tt connection} is an edge into {\tt location} from a
+neighboring processor.
 
 \ssss{Send/Receive Protocol} We refer to channel number $n$ of
 connection $c$ as the pair $(c, n)$.  Note that $n$ is a virtual
