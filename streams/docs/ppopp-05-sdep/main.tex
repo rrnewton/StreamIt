@@ -1,0 +1,71 @@
+\documentclass{sig-alternate}
+\usepackage{epsfig}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+
+%%  \toappear{
+%%  %\raisebox{2pt}[2pt]{\underline{~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}} \\
+%%  %$^*$ More information on the StreamIt project is available from
+%%  %\texttt{http://compiler.lcs.mit.edu/streamit} \\
+%%    \rule{0cm}{0cm}\\\hrule\rule{0cm}{0cm} ~ \\ \vspace{-6pt} ~ \\
+%%  \parbox[b]{20pc}{\baselineskip 9pt
+%%  Permission to make digital or hard copies of all or part of this work
+%%  for personal or classroom use is granted without fee provided that
+%%  copies are not made or distributed for profit or commercial advantage
+%%  and that copies bear this notice and the full citation on the first
+%%  page.  To copy otherwise, to republish, to post on servers or to
+%%  redistribute to lists, requires prior specific permission and/or a
+%%  fee.} \par
+%%  {\it PLDI'03}, June 9--11, 2003, San Diego, California, USA. \par
+%%  Copyright 2003 ACM 1-58113-662-5/03/0006 ...\$5.00 \\ ~ \\ ~ \\
+%% }
+
+%%  \conferenceinfo{PLDI'03}{June 9---11, 2003, San Diego, California, USA.}
+%%  \CopyrightYear{2003}
+%%  \crdata{1-58113-662-5/03/0006}
+
+\title{Stream Dependence Analysis and its Applications}
+\numberofauthors{1}
+\author{
+\alignauthor \vspace{-18pt}
+Michal Karczmarek, Janis Sermulins, William Thies and Rodric Rabbah \\
+	\vspace{8pt}
+	{\large \raisebox{1pt}[0pt]{\{}}karczma, janiss, thies, rabbah{\large \raisebox{1pt}[0pt]{\}}}@csail.mit.edu \\
+	\vspace{8pt}
+	Computer Science and Artificial Intelligence Laboratory \\
+	Massachusetts Institute of Technology}
+
+
+\begin{document}
+\newtheorem{definition}{Definition}
+
+\maketitle
+
+\newcommand{\mt}[1]{\mbox{\it #1}}
+\newcommand{\todo}[1]{\framebox{\bf #1}}
+\newcommand{\naive}[0]{na\"{\i}ve}
+\newcommand{\Naive}[0]{Na\"{\i}ve}
+\newcommand{\makeline}[0]{\rule{0cm}{0cm}\\\hrule\rule{0cm}{0cm}}
+
+\begin{abstract}
+\input{abstract}
+\end{abstract}
+
+\input{intro}
+\input{sdep}
+\input{apps}
+% implementation goes here -- cluster and constrained
+\input{related}
+\input{conclusion}
+
+{\small
+  \bibliographystyle{abbrv}
+  \bibliography{references}
+}
+
+%\appendix
+\clearpage
+%\input{streamgraphs}
+\clearpage
+%\input{firscaling}
+\end{document}
