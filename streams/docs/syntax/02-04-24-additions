@@ -1,0 +1,195 @@
+As a consequence of the 4/21 meeting of Gordo, Karczma, Bill, & Dave,
+here are some proposals for the syntax, all of high enough priority to
+be done before summer UROP's arrive:
+
+0. No type specifiers on pop/push/peek
+--------------------------------------
+
+Everyone agrees we should do away with popFloat, pushFloat, peekFloat,
+etc. in favor of pop / push / peek -- it's just an implementation
+issue.
+
+1. Shortened class creation
+---------------------------
+
+We didn't talk about this at the meeting, but we did a while ago so
+I'll throw it in here.  Instead of saying "class MyFilter extends
+Filter {", let's just say "Filter MyFilter {" and likewise with
+Pipelines, SplitJoins, & FeedbackLoops.  
+
+2. No new keyword?
+------------------
+
+We discussed eliminating the "new" keyword completely from the code.
+So you'd see things like this:
+
+	add(MyFilter());
+	add(SignalBoostingPipeline());
+	MySplit s = MySplit(i, j);
+	add(s);
+
+Somehow I don't like the way this looks now... "new" looked too
+familiar.  Maybe we should vote.
+
+3. Arguments visible to an entire Filter
+----------------------------------------
+
+A definate drawback of the current syntax is that if you want to just
+have a parameter be visible in the work function of a filter, then you
+have to pass that parameter to init, store it in a field, and then
+acces that field from work.  This is a lot of extra code (init
+parameter, assign statement in init, and declaration of a field) and
+is pretty tedious.  Also complicates compiler's life if you have to
+constant prop through fields and such.
+
+So the proposed solution is to have TWO paremeter lists for every
+instantiation of a stream construct.  One is visible throughout the
+entire construct, and one is visible only in the init function.  For
+example, you could have:
+
+Filter LowPassFilter<int N> {
+	float[] weights;
+
+	void init(float cutOff) {
+		weights = calcWeights(N, cutOFf);
+	}
+
+	void work() {
+		for (int i=0; i<N; i++) {
+			val += weights[i] * pop();
+		}
+	}
+}
+
+Then you'd instantiate by saying something like:
+
+Pipeline Radio {
+	void init() {
+		add(FIRFilter<100>(10000.0));
+	}
+}
+
+We didn't agree on what delimiter should be used in place of < > .
+There are some parsing issues with < >.  Noe that the parameters
+within < > become part of the state of the filter, and can be modified
+from work() -- they don't need to just be constants.
+
+The reason to have two separate parameter lists is so that you can
+have multiple init functions -- e.g. if you want to instantiate
+something with either complex coords or with cartesian coords.  The
+init function that matches the signature of the call is the one that's
+invoked.  You might also want multiple init functions for
+re-initialization (call a different init function when re-initializing.)
+
+4. New inlining syntax
+----------------------
+
+Here's a radical proposal for inlining that simplifies the syntax at
+the expense of some expressibility.  Basically, the observation is
+that the common-case inlining is way too tedious.  So this inlining
+scheme imposes the following restrictions:
+
+ - filter definitions can't be inlined
+ - other inlined stream constructs can have no fields, no helper
+   methods, only one init function, and no arguments to that init function
+
+With these restrictions, we can eliminate the declaration of the init
+function in each construct, and just treat the body of all the inlined
+constructs as the body of the init function.  For example, here's how
+a bitreverse filter looks in this way:
+
+        add(SplitJoin {
+          setSplitter(RoundRobin((int)N/2, (int)N/2));
+	  for (int i=0; i<2; i++)
+            add(SplitJoin {
+              setSplitter(RoundRobin());
+              add(Identity());
+              add(Identity());
+              setJoiner(RoundRobin((int)N/4, (int)N/4));
+            });
+          setJoiner(RoundRobin());
+        });
+
+Here's the old version:
+
+        add(new SplitJoin() {
+          public void init() {
+            setSplitter(RoundRobin((int)N/2, (int)N/2));
+            for (int i=0; i<2; i++)
+              add(new SplitJoin() {
+                public void init() {
+                  setSplitter(RoundRobin());
+                  add(Identity());
+                  add(Identity());
+                  setJoiner(RoundRobin((int)N/4, (int)N/4));
+                }});
+              setJoiner(RoundRobin());
+          }});
+
+This scheme prevents inlining filters since you need both an init and
+work function in a filter, so you'd have to declare them in the
+inlined code, and then have inconsistency between filters and other
+constructs.  But I don't think that filters belong in inlined code,
+anyway... doesn't take much more code to name them, and it's more
+readable when they're named since they have some declared purpose,
+then.  But this could cost us some extra arguments to a filter's init
+function that would otherwise have been visible around an enclosing
+scope.
+
+5. Polymorphic identity filters
+-------------------------------
+
+Karczma realized that right now an empty pipeline serves as a
+polymorphic identity filter, so we should probably just support
+built-in compiler-recognizable polymorphic identities, added with a
+call:
+
+	add(Identity());
+
+If we prefer declaring the I/O types specifically, that's fine (could
+lead to easier error reporting), but we should somehow disallow empty
+pipelines (or splitjoins) since they provide equivalent functionality
+(but break the scheduler as it is right now.)
+
+-------------------------------------------------------------------------
+
+Finally, here are a few extra changes I'm bringing up off the top of
+my head:
+
+1. No access modifiers
+----------------------
+
+Shouldn't have to say "PUBLIC void init", since all functions and
+fields should be private by default.  Instead, I think we should tag
+message handlers with a different keyword, maybe something other than
+void, like "handler setValue()" -- this is a function that has to be
+void (no return value), and is also visible from the outside.
+
+-------------------------------------------------------------------------
+
+Also, we brought up the following issues but didn't settle completely
+on them:
+
+1. Custom Joiners
+-----------------
+
+We discussed a syntax where you could provide code for the internals
+of a joiner, like by accessing input1.pop() and input2.pop() to refer
+to multiple input tapes.  The advantage would be that you wouldn't
+have to worry about interleaving these values on a channel, and that
+you could process different types from different tapes.  However, I
+think we decided to settle for a COMBINE joiner once structured tapes
+come along -- then a given number of inputs from each tape are
+packaged together into a structure and can be accessed by the next tape.
+
+Open questions:  
+
+ - How do filters declare that they input the type of structure
+   produced by a combine joiner?
+
+2. Structured Tapes
+-------------------
+
+We all agree that we need structured tapes, although the syntax
+doesn't seem to present major hurdles.  Open to specification by David
+when he turns to implementing it.
