@@ -16,7 +16,7 @@ parser correctly.
 
 \section{Statement Placement}
 
-\subsection{Init and Work Functions}
+\subsection{Init, Work, and Phase Functions}
 
 \begin{enumerate}
 \item \lstinline|add| statements can only appear in init functions in
@@ -25,10 +25,12 @@ parser correctly.
   appear in init functions in split-joins and feedback loops;
 \item \lstinline|loop|, \lstinline|body|, and \lstinline|enqueue|
   statements can only appear in init functions in feedback loops;
-\item \lstinline|push| statements can only appear in work functions in
-  filters.
+\item \lstinline|push| statements can only appear in work and phase
+  functions in filters.
 \item \lstinline|pop| and \lstinline|peek| expressions can only appear
-  in work functions in filters.
+  in work and phase functions in filters.
+\item If a work function does not declare I/O rates, it may not use
+  \lstinline|push|, \lstinline|pop|, or \lstinline|peek|.
 \end{enumerate}
 
 \subsection{Control Flow and Initialization Code}
@@ -44,18 +46,11 @@ statements are sensitive to the order in which they are executed.
 \item For purposes of type-checking for pipelines, a data-flow
   analysis must be able to determine the exact type of the pipeline at
   each point in the initialization code.
-\end{enumerate}
-
-\subsection{Helper Functions}
-
-\begin{enumerate}
-\item A \lstinline|helper| function may not use any StreamIt statement
-  only allowed in work functions or in init functions.
-\item Within a \lstinline|const helper| function, no calls may be made
-  to helper functions that are not built-in or also declared
-  \lstinline|const|.
-\item A \lstinline|const helper| function may not modify fields of its
-  containing filter.
+\item A data-flow analysis must be able to determine the number and
+  sequence of phases, along with any intermediate code, for a phased
+  filter.
+\item Nothing other than a work function which does not declare I/O
+  rates may call a phase function.
 \end{enumerate}
 
 \section{Typing}
@@ -125,6 +120,8 @@ there is no implicit type promotion across tapes.
   is the input type of the filter.
 \item The parameter of a \lstinline|peek()| expression and the index
   of an array must both be of type \lstinline|int|.
+\item The type of a call to a helper function is the return type of
+  that function.
 \end{enumerate}
 \item The type of the parameter of a \lstinline|push()| statement must
   be the output type of the filter.
@@ -146,9 +143,9 @@ there is no implicit type promotion across tapes.
 \item Stream parameters within a single stream must have distinct
   names from each other and from all stream and structure names.
 \item Functions declared within a filter must have unique names; these
-  include named work functions, message handlers, and helper
-  functions.  The name of a function must be distinct from stream and
-  structure names.
+  include phase functions, message handlers, and helper functions.
+  The name of a function must be distinct from stream and structure
+  names.
 \item A variable may not be declared with the same name as a stream
   parameter.  (Other variable hiding is legal.)  The name of a
   variable must be distinct from stream, structure, and function
@@ -182,6 +179,8 @@ questionable code:
 \item The compiler may need to guess at the I/O types of anonymous
   streams.  If the type isn't clear from context a warning should be
   issued.
+\item A warning should be issued if a phase function is declared which
+  is not used.
 \end{enumerate}
 
 \section{Temporary Checks}
@@ -232,8 +231,7 @@ void->int feedbackloop SketchyLoop(int p) {
   section of the language specification should be used.  These include
   the capitalized names \lstinline|SplitJoin|,
   \lstinline|FeedbackLoop|, \lstinline|Filter|, \lstinline|Pipeline|,
-  \lstinline|StreamIt|, and \lstinline|Complex|, along with the work
-  function parameter \lstinline|data|.
+  \lstinline|StreamIt|, and \lstinline|Complex|.
 \end{enumerate}
 
 \end{document}
