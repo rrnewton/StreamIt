@@ -1,3 +1,11 @@
+status of numbers:
+
+fft, fm:  broken on scheduler
+filterbank: needs sim-cycles removed (for cases that aren't broken by scheduler)
+beamformer: inconsistent
+
+-----
+
 - open question: is there any way to work sync removal into the
 partitioning algorithm?  something like, being called not with
 needsJoiner boolean, but with some conditional on when the
