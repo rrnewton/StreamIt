@@ -6,13 +6,14 @@ general
   - explain "actor" , "I/O rate" and "phase" of actor
 * explain numbers in figure 1 (separated by commas)
 * Figure 2: explain how to follow chart, what each line means
-x define what "simulateCurrentPhase" means in Figure 1
-  - fixed by comment and renaming of call
-* explain what [n:m] notation means 
+* describe how messaging is actually implemented (credits, SDEP, etc)
+x explain what [n:m] notation means 
   x added explanation to example when first introduced
   - could still be more explicit somewhere:
     "Message sends are annotated with a range [n:m] that means..."
 x fix "automatic" wraparound in figure caption
+x define what "simulateCurrentPhase" means in Figure 1
+  - fixed by comment and renaming of call
 
 technical things
 ----------------
@@ -104,7 +105,7 @@ a bit more precise might help to clarify the connection here.
 
 original submission todo list
 -----------------------------
-- change A and B to {S}ender and {R}eceiver
+x change A and B to {S}ender and {R}eceiver
 - mention complexity of scheduling algorithm
 - describe structured streams in streamit
 - mention inverse SDEP in the latency section
