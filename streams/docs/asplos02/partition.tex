@@ -1,3 +1,153 @@
 \section{Partitioning}
 
-The partitioning section.
+StreamIt provides the Filter construct as the basic abstract unit of
+autonomous stream computation.  The programmer should decide the
+boundaries of each Filter according to what is most natural for the
+algorithm under consideration.  While one could envision each Filter
+running on a separate machine in a parallel system, StreamIt hides the
+granularity of the target machine from the programmer.  Thus, it is
+the responsibility of the compiler to adapt the granularity of the
+stream graph for efficient execution on a particular architecture.
+
+We use the word {\it partitioning} to refer to the process of dividing
+a stream program into a set of balanced computation units.  Given a
+number $N$, which represents the maximum number of computation units
+that can be supported, the partitioning stage transforms a stream
+graph into a set of no more than $N$ filters, each of which performs
+approximately the same amount of work during the execution of the
+program.  Following this stage, each filter can be run on a separate
+machine to obtain a load-balanced executable.  
+
+Load balancing is particularly important in the streaming domain,
+since the throughput of a stream graph is equal to the {\it minimum}
+throughput of each of its stages.  This is in contrast to scientific
+programs, which often contain a number of stages which process a given
+data set; the running time is the {\it sum} of the running times of
+the phases, such that a high-performance, parallel phase can partially
+compensate for an inefficient phase.  However, in a stream program,
+the most burdened node is the bottleneck for the entire computation,
+and the other nodes sit idle while the low-throughput node is working.
+
+\subsection{Overview}
+
+\begin{figure}[t]
+\vspace{-6pt}
+\begin{minipage}{3.1in}
+\psfig{figure=orig-blood.eps,width=3in}
+\vspace{-12pt}
+\caption{\protect\small Blocking diagram for the naive partitioning of
+ FM Radio.
+\protect\label{fig:fmblood1}}
+\end{minipage}
+\hspace{0.3in}
+\vspace{-12pt}
+\begin{minipage}{3.1in}
+\psfig{figure=adjust-2-blood.eps,width=3in}
+\caption{\protect\small Blocking diagram for the optimized
+partitioning of FM Radio.
+\protect\label{fig:fmblood2}}
+\end{minipage}
+\vspace{-6pt}
+\end{figure}
+
+Our partitioner employs a set of fusion, fission, and reordering
+transformations to incrementally adjust the stream graph to the
+desired granularity.  To achieve load balancing, the compiler
+estimates the number of instructions that are executed by each filter
+in one steady-state cycle of the entire program; then, computationally
+intensive filters can be split, and less demanding filters can be
+fused.  Currently, the decision of which transformations to apply is
+done by hand, but the transformations themselves are fully automated.
+
+We return to our software radio example to illustrate the partitioning
+process.  Figure~\ref{fig:fmblood1} illustrates a blocking diagram for
+the original partitioning of the radio (which appears in
+Figure~\ref{fig:??}).  The dark bands indicate where a processor is
+waiting to send or receive an item, while the light areas indicate
+periods of useful work.  With the filters partitioned in the original
+configuration, most of the processors spend their time waiting for the
+input from the first LowPassFilter.
+
+Figure~\ref{fig:??} illustrates a sequence of transformations that
+improve the load balancing for the radio, resulting in the blocking
+diagram shown in Figure~\ref{fig:fmblood2}.  \todo{Describe the
+transformations} In the following sections, we describe these
+transformations in more detail.
+
+% note that sometimes you have to fuse and then later fizz, if you
+% want partial multiplication of a given work function
+
+\subsection{Fusion Transformations}
+
+  - motivation
+    - decreases granularity of stream graph to fit on a given target
+    - opens up opportunities for further optimization
+      . comparably to loop fusion
+      . like keeping working set in cache the whole way through a set of
+        filters, even though each stage would overflow cache (or registers)
+	if run to completion as a unit.
+
+  - examples
+    . pipeline fusion algorithm
+      - could use Filter Fusion ala Proebsting
+        . but code blowup possible
+      - we use simple hierarchical scheduling
+    . split-join fusion algorithm
+      - for taking something with explicit parallelism and start/end
+        synchronization and sequentializing it
+      - determining the order of interleaving will have effect on
+        memory requirements of fused region.
+
+  - implementation
+    - two-stage filters ??
+    - involves some simulation of the scheduling, then serializing
+      code to match
+
+\subsection{Fission Transformations}
+
+  - motivation
+    - fission not typically considered as an ``optimization'', but
+           it is the analog of parallelization for the stream domain
+      . can split the heaviest filters to distribute the load
+
+  - examples
+    . stateless filter into splitjoin
+    . stateless filter into pipeline
+       - communicate partial results across the pipe
+       - can be stateful if all state is written on top and read on bottom
+    . feedback loop into splitjoin (?? is there a case this really helps?)
+       - if all components of the loop are stateless, then can extract
+         parallel streams
+       - ?? need to define real transformation here
+    . a stateless feedback loop can be ``unrolled'' into a splitjoin with
+       multiple instances of the the feedbackloop on different parts of
+       the splitjoin.  how realistic are stateless feedback loops?  well,
+       you could apply this transformation to do stateful fission.  just
+       put all the state in the loop, with delay one, then unroll... and
+       you ... maybe this doesn't work after all.
+
+  -> using induction variable analysis to eliminate some state
+
+  - implementation
+    . stateless duplication algorithm
+
+\subsection{Reordering Transformations}
+
+- re-arrangement ('hoisting'? 'simplification'? 'refactoring'?)
+
+  - can sometimes change granularity of graph by re-arranging nodes
+     . eg to remove duplicate / redundant operations
+
+  - examples
+     . pushing a stateless filter through a round-robin and adjusting weights
+     . making a big split-join into a hierarchical split-join, or vice versa
+     . synchronization removal at split-joins
+
+  - can eliminate pipelines that are used only for packaging
+     . pipeline that contains a pipeline
+     . pipeline that contains only one filter
+
+\end{verbatim}
+
+
+

@@ -1,0 +1,27 @@
+The Transputer architecture shares many similarities with Raw.  A
+Transputer system is either an array or a grid of tiles, where
+neighbors are interconnected with unbuffered point-to-point links. The
+programming language used for the Transputer, Occam, is a streaming
+language similar to CSP.
+%However, Occam programs were exposed to the
+%low-level details of the machine. Each sequential computation unit was
+%explicitly mapped to a single node. Since no buffering was provided,
+%the users had to hand compute the schedule and perform load balancing
+%and buffer management.
+
+The Imagine architecture is specifically designed for the streaming
+application domain.  It operates on streams by applying a computation
+kernel to multiple data items off the stream register file.  The
+compute kernels are written in Kernel-C while the applications
+stitching the kernels are written in Stream-C.  Unlike StreamIt, with
+Imagine the user has to manually extract the computation kernels that
+fit the machine resources in order to get good steady state
+performance for the execution of the kernel.  On the other hand,
+StreamIt uses fission and fusion transformations to create
+load-balanced computation units and filters are replicated to create
+more data parallelism when needed.  Furthermore, the StreamIt compiler
+is able to use global knowledge of the program for layout and
+transformations at compile-time while Stream-C interprets each basic
+block at runtime and performs local optimizations such as stream
+register allocation in order to map the current set of stream
+computations onto Imagine.

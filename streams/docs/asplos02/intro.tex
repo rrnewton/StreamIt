@@ -1,3 +1,51 @@
 \section{Introduction}
 
 This is the intro.  I will cite some people \cite{pca}.
+
+---
+
+- as wire delay comes to dominate the performance of architectures, a
+	number of machines have software-exposed communication between
+	replicated processing units (imagine, raw, trips, grid,
+	smartmemories).  
+
+These processors have replicated processing units, and are
+especially good for regular streaming applications.
+
+For these architectures to gain wide-scale acceptance, there needs to
+be a high-level portable language that can be efficiently compiled to
+differing targets and differing granularities.
+
+- we present streamit as the language, and demonstrate a compiler that
+	maps to differing granularities of the RAW architecture, which
+	is a scalable tiled architecture.  
+
+StreamIt presents the computation as a set of communicating filters in
+a hierarchical stream graph.
+
+- streamit as language we've developed for exposing parallelism and
+	communication, especially good for static stream programs
+
+	streamit is high-level language and should be independent of
+	any architecture.  the language expresses a computation that
+	can be mapped to any number of communication-exposed architctures.
+
+- suite of fission/fusion transformations to adjust the granularity of
+	a stream graph to match the granularity of a target, and for
+	load balancing between different components of the architecture.
+
+- this load balancing is especially important in streaming
+	computations since the overall throughput depends on the
+	slowest stage; the program is only as fast as its weakest link
+
+- then, a layout generator that maps the layout to an architecture,
+	avoiding deadlock.
+
+- then, a communication scheduler that schedules the network inteface
+	between the computational elements.  relies on a simulation of
+	the execution of the graph in order to know how to schedule
+	the communication code.
+
+- results - show we can effectively utilize parallel computation
+	resources on the RAW architecture for a different application
+	granularities and architecture granularities
