@@ -38,10 +38,25 @@ block at runtime and performs local optimizations such as stream
 register allocation in order to map the current set of stream
 computations onto Imagine.
 
+The iWarp system \cite{iwarp} is a scalable multiprocessor with
+configurable communication between nodes.  In iWarp, one can set up
+FIFO channels for communicating between non-neighboring tiles.
+However, the reconfiguration is more coarse-grained and has a higher
+cost than on Raw, where each cycle can be route items to a different
+location.  ASSIGN \cite{assign} is a tool for building large-scale
+applications on multiprocessors, especially iWarp.  ASSIGN starts with
+a coarse-grained flow graph that is written as fragments of C code.
+Like StreamIt, it performs partitioning, placement, and routing of the
+nodes in the graph.  However, ASSIGN is implemented as a runtime
+system instead of a full language and compiler such as StreamIt.
+Consequently, it has more limited opportunities for global
+transformations such as fission and reordering as in StreamIt.
+
 A large number of programming languages have included a concept of a
 stream; see \cite{survey97} for a survey. However, the compilers for
-these languages has focused on efficient sequential executiion of the
+these languages have focused on efficient sequential execution of the
 program.
+
 
 % 
 % mention iWarp?  Is Mike Taylor writing a section?
