@@ -7,7 +7,7 @@
 \\ \hline
 \lefttab{{\small Unordered \\ Stream}}
 &
-\begin{minipage}{1.95in}
+\begin{minipage}{1.8in}
   \scriptsize
   \begin{verbatim}
 
@@ -15,26 +15,13 @@ template <class T>
 class IStreamUnordered :
       public BaseStream {
 public:
-  IStreamUnordered(int capacity,
-          VM_NODE_TYPE_MEM loc,
-          int addr,
-          int initLength=0,
-          boolean aliased=true,
-          boolean wraps=true);
-  IStreamUnordered(int capacity,
-          VM_NODE_TYPE_PROC loc,
-          int addr,
-          int initLength=0,
-          boolean aliased=true,
-          boolean wraps=true);
-
-  T pop();
-  boolean canPop(int n);
+  virtual T pop();
+  virtual boolean canPop(int n);
 }
   \end{verbatim}
 \end{minipage}
 &
-\begin{minipage}{2.0in}
+\begin{minipage}{2.1in}
   \scriptsize
   \begin{verbatim}
 
@@ -42,21 +29,8 @@ template <class T>
 class OStreamUnordered :
       public BaseStream {
 public:
-  OStreamUnordered(int capacity,
-          VM_NODE_TYPE_MEM loc,
-          int addr,
-          int initLength=0,
-          boolean aliased=true,
-          boolean wraps=true);
-  OStreamUnordered(int capacity,
-          VM_NODE_TYPE_PROC loc,
-          int addr,
-          int initLength=0,
-          boolean aliased=true,
-          boolean wraps=true);
-
-  void push(T& val);
-  boolean canPush(int n);
+  virtual void push(T& val);
+  virtual boolean canPush(int n);
 }
   \end{verbatim}
 \end{minipage}
@@ -69,26 +43,13 @@ template <class T>
 class StreamUnordered : 
       public IStreamUnordered<T>, 
       public OStreamUnordered<T> {
-public:
-  StreamUnordered(int capacity,
-          VM_NODE_TYPE_MEM loc,
-          int addr,
-          int initLength=0,
-          boolean aliased=true,
-          boolean wraps=true);
-  StreamUnordered(int capacity,
-          VM_NODE_TYPE_PROC loc,
-          int addr,
-          int initLength=0,
-          boolean aliased=true,
-          boolean wraps=true);
 }
   \end{verbatim}
 \end{minipage}
 \\ \hline
 \lefttab{{\small Ordered \\ Stream}}
 &
-\begin{minipage}{1.95in}
+\begin{minipage}{1.8in}
   \scriptsize
   \begin{verbatim}
 
@@ -96,44 +57,18 @@ template <class T>
 class IStream : 
       public IStreamUnordered<T> {
 public:
-  IStream(int capacity,
-          VM_NODE_TYPE_MEM loc,
-          int addr,
-          int initLength=0,
-          boolean aliased=true,
-          boolean wraps=true);
-  IStream(int capacity,
-          VM_NODE_TYPE_PROC loc,
-          int addr,
-          int initLength=0,
-          boolean aliased=true,
-          boolean wraps=true);
-
-  T peek(int index);
+  virtual T peek(int index);
 }
   \end{verbatim}
 \end{minipage}
 &
-\begin{minipage}{2.0in}
+\begin{minipage}{2.1in}
   \scriptsize
   \begin{verbatim}
 
 template <class T>
 class OStream : 
       public OStreamUnordered<T> {
-public:
-  OStream(int capacity,
-          VM_NODE_TYPE_MEM loc,
-          int addr,
-          int initLength=0,
-          boolean aliased=true,
-          boolean wraps=true);
-  OStream(int capacity,
-          VM_NODE_TYPE_PROC loc,
-          int addr,
-          int initLength=0,
-          boolean aliased=true,
-          boolean wraps=true);
 }
   \end{verbatim}
 \end{minipage}
@@ -146,26 +81,13 @@ template <class T>
 class Stream : 
       public IStream<T>, 
       public OStream<T> {
-public:
-  Stream(int capacity,
-         VM_NODE_TYPE_MEM loc,
-         int addr,
-         int initLength=0,
-         boolean aliased=true,
-         boolean wraps=true);
-  Stream(int capacity,
-         VM_NODE_TYPE_PROC loc,
-         int addr,
-         int initLength=0,
-         boolean aliased=true,
-         boolean wraps=true);
 }
   \end{verbatim}
 \end{minipage}
 \\ \hline
 \lefttab{\small Block}
 &
-\begin{minipage}{1.95in}
+\begin{minipage}{1.8in}
   \scriptsize
   \begin{verbatim}
 
@@ -173,18 +95,12 @@ template <class T>
 class IBlock : 
       public BaseBlock {
 public:
-  IBlock(int capacity, 
-         VM_NODE_TYPE_MEM loc, 
-         int addr);
-  IBlock(int capacity, 
-         VM_NODE_TYPE_PROC loc);
-
-  T read(int index);
+  virtual T read(int index);
 }
   \end{verbatim}
 \end{minipage}
 &
-\begin{minipage}{2.0in}
+\begin{minipage}{2.1in}
   \scriptsize
   \begin{verbatim}
 
@@ -192,13 +108,7 @@ template <class T>
 class OBlock :
       public BaseBlock {
 public:
-  OBlock(int capacity, 
-         VM_NODE_TYPE_MEM loc, 
-         int addr);
-  OBlock(int capacity, 
-         VM_NODE_TYPE_PROC loc);
-
-  void write(int index, T& val);
+  virtual void write(int index, T& val);
 }
   \end{verbatim}
 \end{minipage}
@@ -211,17 +121,11 @@ template <class T>
 class Block : 
       public IBlock<T>, 
       public OBlock<T> {
-public:
-  Block(int capacity, 
-        VM_NODE_TYPE_MEM loc, 
-        int addr);
-  Block(int capacity, 
-        VM_NODE_TYPE_PROC loc);
 }
   \end{verbatim}
 \end{minipage}
 \end{tabular}
 \end{minipage}
-\caption{Partial class declarations for streams and blocks.  Each stream and block also contains constructors with the same signature as those in {\tt BaseStream} and {\tt BaseBlock}, respectively, but these are ommitted for the sake of brevity.\protect\label{fig:declgrid}}
+\caption{Class declarations for streams and blocks, with constructors ommitted for sake of brevity.  The constructors for each stream and block have the same signatures as those in {\tt BaseStream} and {\tt BaseBlock}, respectively.\protect\label{fig:declgrid}}
 \vspace{-6pt}
 \end{figure}

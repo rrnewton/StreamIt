@@ -54,7 +54,7 @@ are preserved between invocations of {\it work}.
     int N;
 
   public:
-    AmplifierKernel(int _N, VM_NODE location, IOBlock<byte> scratch, 
+    AmplifierKernel(int _N, VM_NODE location, Block<byte> scratch, 
                     IStream<float> _in, OStream<float> _out) : 
                     public Kernel (location, scratch, _in, _out) {
       in = _in;
@@ -112,33 +112,119 @@ streams are useful when a pool of data needs to be processed in any
 order, {\it e.g.}, for network packets.
 
 \end{enumerate}
-All combinations of these attributes represent a valid kind of stream,
-and thus there are six stream types (see Figure~\ref{fig:declgrid}).
-For the sake of clarifying the specification and the implementation of
-the runtime system, this proposal uses inheritance to describe these
-types\footnote{However, nothing in the specification relies on the
-inheritance relationships for correctness, so these could be expanded
-into six stand-alone types if desired.}(see Figure~\ref{fig:inherit}).
+All six combinations of these attributes represent a valid interface
+from a kernel to a stream, and we define a separate stream type for
+each (see Figure~\ref{fig:declgrid}).  For the sake of clarifying the
+specification and the implementation of the runtime system, this
+proposal uses inheritance to describe these types\footnote{However,
+nothing in the specification relies on the inheritance relationships
+for correctness, so these could be expanded into six stand-alone types
+if desired.}(see Figure~\ref{fig:inherit}).  From the control code,
+all streams will be instantiated using the {\tt Stream} class at the
+bottom of the hierarchy.  The other classes are strictly for the
+purpose of allowing kernels to specify their relationship to a given
+stream.
 
-Each stream is based on a template type {\tt T} to allow type-safe
-access to its data elements.  This type must have a fixed size.
-Variable sized stream records can be supported at the language-level
+The inheritance tree for streams starts with {\tt BaseStorage}, which
+represents a contiguous region of storage space.  This space can
+either be in memory, or in the registers of a processor.  {\small
+\begin{verbatim}
+  template<class T>
+  class BaseStorage {
+  public:
+    // make a stream buffer that can hold at most <capacity> elements,
+    // allocated at <address> of memory node <memLocation>.
+    BaseStorage(int capacity, VM_NODE_TYPE_MEM memLocation, int address);
+
+    // same as above, but held in registers of a processor
+    StreamBuffer(int capacity, VM_NODE_TYPE_PROC procLocation);
+
+    // returns capacity of the storage
+    int getCapacity();
+  }
+\end{verbatim}}
+
+Each {\tt BaseStorage} is based on a template type {\tt T} to allow
+type-safe access to its data elements.  This type must have a fixed
+size.  Variable sized records can be supported at the language-level
 and compiled into the fixed size scheme using a data encoding.
 
-The rest of this section gives details for each of the functions
-supported by a stream.  It refers to the {\tt StreamBuffer} class,
-which is described in Section~\ref{sec:procstreams} as a structure
-that is allocated in the stream control code in order to store the
-items that appear in streams.  The pseudocode below gives a reference
-implementation of each stream method, assuming that each {\tt
-StreamBuffer} {\it s} is implemented as a circular buffer with an
-array {\it data} of length {\it capacity}, a {\it start} pointer, and
-an {\it end} pointer.
+The base type of all streams is {\tt BaseStream}:
+{\small
+\begin{verbatim}
+  template<class T>
+  class BaseStream : public BaseStorage {
+  public:
+    // make a stream buffer that can hold at most <capacity> elements,
+    // allocated at <address> of memory node <memLocation>, with <initLength>
+    // items already in place.  The last two arguments are optional hints to
+    // the low-level compiler:  <aliased> is true if some other stream buffer 
+    // might overlap this in memory, and <wraps> is true if more than <capacity>
+    // elements might be pushed to the stream during its lifetime.
+    StreamBuffer(int capacity, VM_NODE_TYPE_MEM memLocation, int address, 
+                 int initLength=0, boolean compact=false);
 
-\ssss{constructor} Each stream provides a constructor with a single
-argument of type {\tt StreamBuffer}.  The constructor saves this {\tt
-StreamBuffer} in a field {\tt s} for other functions to use as the
-interface to the storage space for the stream.
+    // same as above, for stream held in registers of a processor
+    StreamBuffer(int capacity, VM_NODE_TYPE_PROC procLocation, int initLength=0);
+
+    // returns number of live items the stream
+    int getLength();
+
+    // returns total number of items that were pushed onto this since
+    // construction or last reset
+    int getTotalLength();
+
+    // clears the elements of the stream, and resets totalLength
+    void reset();
+
+    // protected data included only for benefit of reference implementation (see text)
+  protected:
+    T* data;
+    int capacity;
+    int start;
+    int end;
+    int totalLength;
+  }
+\end{verbatim}}
+
+Each memory-based stream {\tt s} makes an important guarantee on its
+data layout: it is implemented as a circular buffer of length {\tt
+capacity} that starts at the specified {\tt address} of memory and
+wraps around to the beginning when more than {\tt capacity} elements
+have been pushed.  This guarantee is important for allowing reuse of
+memory space between streams, as well as for transfering data between
+threaded code and streaming code.  However, there is no contract on
+data layout at any time if the {\tt aliased} parameter is false in the
+{\tt StreamBuffer}'s constructor, as this represents a case where the
+high-level compiler guarantees that no operation will access the
+locations allocated to the buffer.  This gives the low-level compiler
+the freedom to implement buffers with an architecture-specific
+representation if their contents are never aliased.
+
+The constructor's {\tt initLength} parameter indicates how many items
+are already in place at {\tt address} that should be pushed onto the
+stream initially. Thus, the stream should increment its own {\tt
+length} and {\tt totalLength} by {\tt initLength} during construction.
+
+The {\tt getTotalLength} method returns how many items have been
+pushed onto the buffer since the last call to {\tt reset}.  In other
+words, {\tt getTotalLength} returns how many elements would be in the
+buffer if no storage was ever reused, and it was implemented as a
+acyclic list instead of a wrap-around array.  Note that this measure
+is unrelated to the capacity of the buffer.  It is also unrelated to
+how many items will be written to the buffer in the future; if this
+quantity is predictable, then it can be calculated as a function of
+the {\tt totalLength} of other buffers.
+
+The values of {\tt getLength()} and {\tt getTotalLength()} are
+undefined when a stream is being accessed by a kernel that is in the
+RUNNING state.
+
+We now turn our attention to the other stream functions, which are
+implemented in derived classes (see Figure~\ref{fig:declgrid}).
+
+\ssss{constructors} Each stream provides two constructors, which have
+the same signatures as those in {\tt BaseStream}.
 
 \ssss{push} For output streams, the {\tt push} method enqueues a value
 onto the end of the stream.  If the stream cannot hold any more items
@@ -149,15 +235,15 @@ undefined.
 \begin{verbatim}
   template <class T>
   void OStreamUnordered<T> :: push(T& val) {
-    if (s->getLength() == s->capacity) {
+    if (getLength() == capacity) {
       waitForDrain();
     }
-    if (s->end == s->capacity) {
-      s->end = 0;
+    if (end == capacity) {
+      end = 0;
     }
-    s->data[s->end++] = val;
+    data[end++] = val;
     // keep count of items pushed for use by StreamBuffer.getTotalLength()
-    s->totalLength++;
+    totalLength++;
   }
 \end{verbatim}}
 
@@ -169,13 +255,13 @@ from the front of the stream.  If the stream has ended ({\it i.e.}, if
 \begin{verbatim}
   template <class T>
   T IStreamUnordered<T> :: pop() {
-    if (s->getLength() < 1) {
+    if (getLength() < 1) {
       waitForFill();
     }
-    if (s->start == s->capacity) {
+    if (start == capacity) {
       start = 0;
     }
-    T result = s->data[s->start++];
+    T result = data[start++];
     return result;
   }
 \end{verbatim}}
@@ -197,12 +283,12 @@ items are currently available.
 \begin{verbatim}
   template <class T>
   boolean OStreamUnordered<T> :: canPush(int n) {
-    if (s->capacity - s->getLength() >= n) {
+    if (capacity - getLength() >= n) {
       return true;
     } else {
       if (graphCanDrain()) {
         waitForDrain();
-        return (s->capacity - s->getLength() >= n);
+        return (capacity - getLength() >= n);
       } else {
         return false;
       }
@@ -220,12 +306,12 @@ at some point in the future.
 \begin{verbatim}
   template <class T>
   boolean IStreamUnordered<T> :: canPop(int n) {
-    if (s->getLength() >= n) {
+    if (getLength() >= n) {
       return true;
     } else {
       if (graphCanFill()) {
         waitForFill();
-        return (s->getLength() >= n);
+        return (getLength() >= n);
       } else {
         return false;
       }
@@ -244,14 +330,14 @@ the capacity of the buffer, then the return value is undefined.
 \begin{verbatim}
   template <class T>
   T IStream<T> :: peek(int index) {
-    if (s->getLength() < index+1) {
+    if (getLength() < index+1) {
       waitForFill();
     }
-    int i = s->start+index;
-    if (i >= s->capacity) {
-      i -= s->capacity;
+    int i = start+index;
+    if (i >= capacity) {
+      i -= capacity;
     }
-    return s->data[i];
+    return data[i];
   }
 \end{verbatim}}
 
@@ -295,11 +381,11 @@ the capacity of the buffer, then the return value is undefined.
 %%   \begin{verbatim}
 
 %% template <class T>
-%% class IOBlock : 
+%% class Block : 
 %%        IBlock<T>, 
 %%        OBlock<T> {
 %% public:
-%%   IOBlock(StreamBuffer<T> &s);
+%%   Block(StreamBuffer<T> &s);
 %% }
 %%   \end{verbatim}
 %% \end{minipage}
@@ -313,69 +399,32 @@ the capacity of the buffer, then the return value is undefined.
 Streams are intended for sequential production and consumption of data
 items.  For kernels that require random access to a fixed set of
 elements, the API provides the {\it block} abstraction.  A block is
-simply a contiguous region of memory; it is constructed with a
-capacity, a memory node, and an address.  Since some kernels use a
-given block only for input or only for output, we divide the block
-classes into {\tt IBlock} and {\tt OBlock}, with {\tt IOBlock}
-extending both (see Figure~\ref{fig:inherit}).
+simply a region of memory that can be read and written to.  Since some
+kernels use a given block only for input or only for output, we divide
+the block classes into {\tt IBlock} and {\tt OBlock}, with {\tt
+Block} extending both (see Figures~\ref{fig:inherit}
+and~\ref{fig:declgrid}).
 
-The {\tt OBlock} class implements the {\tt write} and {\tt
-getCapacity} functions:
-
+\ssss{write} For output blocks, the {\tt write} function stores an
+item into memory.  It requires that the {\tt index} written to is less
+than the block's {\tt capacity}.  
 {\small
 \begin{verbatim}
   template<class T>
-  class OBlock {
-  public:
-    // construct block of size <capacity>, at <address> of <memLocation>
-    OBlock(int capacity, VM_NODE_TYPE_MEM memLocation, int address);
-
-    // construct block of size <capacity>, in registers of <procLocation>
-    OBlock(int capacity, VM_NODE_TYPE_PROC procLocation);
-
-    // write <val> to <index> of this.  Requires that index < capacity.
-    void write(int index, T& val);
-
-    // return capacity of this
-    int getCapacity();
+  void OBlock<T> :: write(int index, T& val) {
+    data[index] = val;
   }
 \end{verbatim}}
 
-\noindent The {\tt IBlock} class implements the {\tt read} and {\tt
-getCapacity} functions:
-
+\ssss{read} For input blocks, the {\tt read} function reads a loction
+in memory.  It requires that the {\tt index} read is less than the
+block's {\tt capacity}.
 {\small
 \begin{verbatim}
   template<class T>
-  class IBlock {
-  public:
-    // construct block of size <capacity>, at <address> of <memLocation>
-    IBlock(int capacity, VM_NODE_TYPE_MEM loc, int addr);
-
-    // construct block of size <capacity>, in registers of <procLocation>
-    IBlock(int capacity, VM_NODE_TYPE_PROC procLocation);
-
-    // read element <index> from this.  Requires that index < capacity.
-    T read(int index);
-
-    // return capacity of this
-    int getCapacity();
+  T IBlock<T> :: read(int index) {
+    return data[index];
   }
-\end{verbatim}}
-
-\noindent The {\tt IOBlock} class extends both {\tt IBlock} and {\tt OBlock}:
-
-{\small
-\begin{verbatim}
-  template<class T>
-  class IOBlock : public IBlock, public OBlock {
-  public:
-    // construct block of size <capacity>, at <address> of <memLocation>
-    IOBlock(int capacity, VM_NODE_TYPE_MEM memLocation, int address);
-
-    // construct block of size <capacity>, in registers of <procLocation>
-    IOBlock(int capacity, VM_NODE_TYPE_PROC procLocation);
-}
 \end{verbatim}}
 
 \subsubsection{Kernels}
@@ -396,7 +445,7 @@ Each kernel is described as a subclass of the basic kernel class:
     // construct a kernel on <location> that uses <scratch> to spill local variables,
     // and is connected to streams or blocks <sb1>, <sb2>, ... .  Also, set private 
     // <status> to UNSTARTED.
-    Kernel(VM_NODE location, IOBlock<byte> scratch, BaseMemory sb1, BaseMemory sb2=0, ... );
+    Kernel(VM_NODE location, Block<byte> scratch, BaseStorage sb1, BaseStorage sb2=0, ... );
 
     // steady-state execution step.  Returns the new status of the kernel.
     virtual STATUS work();
@@ -444,7 +493,7 @@ location}, which indicates which processor resource should be used to
 execute the kernel.  The second is a {\tt scratch} space, which is a
 block of memory in which the low-level compiler can store local
 variables if they overflow the registers of the kernel processor.  The
-scratch space is always of type {\tt IOBlock<byte>}.  
+scratch space is always of type {\tt Block<byte>}.
 
 Also, in any subclass of {\tt Kernel}, the input and output streams
 are received in the constructor and must be directly stored as fields
@@ -554,7 +603,7 @@ they depend on values from the input streams:
     IStream<int> in2;
     OStream<int> out;
   public:
-    MergeKernel(VM_NODE location, IOBlock<byte> scratch,
+    MergeKernel(VM_NODE location, Block<byte> scratch,
                 IStream<int> _in1, IStream<int> _in2, OStream<int> _out) :
                 Kernel (location, scratch, _in1, _in2, _out) {
       in1 = _in1;
@@ -678,7 +727,7 @@ An example of the stream control API is as follows:
   StreamBuffer<float> s0(length1, MEM1, 0x1000, length1), 
                       s1(128, SRF1, 0x200), 
                       s2(1024, SRF1, 0x280);
-  IOBlock<byte> scratch2(32, SRF1, 0x680);
+  Block<byte> scratch2(32, SRF1, 0x680);
 
   // set up a graph to do some audio filtering and compression
   Kernel copy = new Copy<float>(s0, s1, PROC1);
@@ -694,7 +743,7 @@ An example of the stream control API is as follows:
   int length2 = s2.getTotalLength();
   if (length2 > SIZE_THRESHOLD) {
     StreamBuffer<float> s3(1024, SRF1, 0x280);
-    IOBlock<byte> scratch3(32, SRF1, 0x680);
+    Block<byte> scratch3(32, SRF1, 0x680);
     
     Kernel zip = new ZipCompress(PROC2, scratch3, s2, s3)
     Graph compress2(zip);
@@ -706,7 +755,6 @@ An example of the stream control API is as follows:
   // store the result from memory to "output.dat" (not part of SVM API)
   writeFile("output.dat", length2, MEM1, 0x280);
 \end{verbatim}}
-
 The above code fragment illustrates several aspects of the stream
 control API.  In the following, Section~\ref{sec:procstreams}
 describes the {\tt StreamBuffer} class; Section~\ref{sec:streamgraph}
@@ -719,107 +767,13 @@ architecture specific black-box kernels.
 \subsubsection{Stream Buffers}
 \label{sec:procstreams}
 
-The control API uses the {\tt StreamBuffer} class to allocate storage
-space for the contents of a stream:
-{\small
-\begin{verbatim}
-  template<class T>
-  class StreamBuffer {
-  public:
-    // make a stream buffer that can hold at most <capacity> elements,
-    // allocated at <address> of memory node <memLocation>, with <initLength>
-    // items already in place.  The last argument is an optional hint to the
-    // the low-level compiler:  <compact> is true if no more than <capacity>
-    // elements will be pushed to the stream.
-    StreamBuffer(int capacity, VM_NODE_TYPE_MEM memLocation, int address, 
-                 int initLength=0, boolean compact=false);
-
-    // same as above, for stream held in registers of a processor
-    StreamBuffer(int capacity, VM_NODE_TYPE_PROC procLocation, int initLength=0);
-
-    // returns capacity of the buffer
-    int getCapacity();
-
-    // returns number of live items the buffer
-    int getLength();
-
-    // returns total number of items that were pushed onto this since
-    // construction or last reset
-    int getTotalLength();
-
-    // clears the elements of the buffer, as well as totalLength
-    void reset();
-
-    // default copy operation
-    StreamBuffer(StreamBuffer& _s);
-
-    // private data and friends included only for benefit of reference implementation (see text)
-  private:
-    T* data;
-    int capacity;
-    int start;
-    int end;
-    int totalLength;
-    friend IStream; friend IStreamUnordered;
-    friend OStream; friend OStreamUnordered;
-    friend IOStream; friend IOStreamUnordered;
-  }
-\end{verbatim}}
-
-A {\tt StreamBuffer} is constructed with a {\tt capacity}, which
-indicates the maximum number of items it can hold at a given time.  It
-is also constructed with a {\tt location}, which indicates the memory
-bank in which the buffer is held for its entire lifetime.  The {\tt
-address} indicates where the buffer begins in the memory node.  Using
-the second constructor, a buffer can also be assigned to a processor,
-which means that it is buffered in the processor's registers.  The
-{\tt initLength} parameter specifies how many items from memory it
-should push into its own representation initially (thereby
-incrementing {\tt length} and {\tt totalLength} by {\tt initLength}
-during construction).
-
-The {\tt getTotalLength} method returns how many items have been
-pushed onto the buffer since the last call to {\tt reset}.  In other
-words, {\tt getTotalLength} returns how many elements would be in the
-buffer if no storage was ever reused, and it was implemented as a
-acyclic list instead of a wrap-around array.  Note that this measure
-is unrelated to the capacity of the buffer.  It is also unrelated to
-how many items will be written to the buffer in the future; if this
-quantity is predictable, then it can be calculated as a function of
-the {\tt totalLength} of other buffers.  The reference implementation
-of streams in Section~\ref{sec:kerstreams} maintains a totalLength
-field that could be directly returned from {\tt StreamBuffer}{\tt
-.}{\tt getTotalLength()}.
-
-The values of {\tt getLength()} and {\tt getTotalLength()} are
-undefined when a stream buffer is being accessed by a kernel that is
-in the RUNNING state.
-
-\sss{Moving Data In and Out of Stream Buffers}
-\label{sec:movestream}
-
-For stream buffers to be useful, they need to be initialized with
-(possibly non-streaming) data from general-purpose threaded code.
-Likewise, the results of a streaming computation need to be used in
-the threaded code.  Both of these transfers are done through memory,
-via the interface defined by the threaded API.  In particular, device
-I/O such as file handling is done using the threaded API, and then
-made available to streams through memory.
-
-To enable the threaded-streaming interface to work via memory, each
-memory-based stream buffer {\tt s} makes an important guarantee on its
-data layout: if {\tt s.getTotalLength()} $\le$ {\tt s.getCapacity()},
-then all data items are stored consecutively from the {\tt address} of
-the {\tt memLocation} with which the buffer was constructed.  If {\tt
-s.getTotalLength()} $>$ {\tt s.getCapacity()}, then there must have
-been some reuse of storage, and there is no contract on the data
-layout.  Also, there is no contract on data layout at any time if the
-{\tt aliased} parameter is false in the {\tt StreamBuffer}'s
-constructor, as this represents a case where the high-level compiler
-guarantees that no operation will access the locations allocated to
-the buffer.  This gives the low-level compiler the freedom to
-implement buffers with an architecture-specific representation if
-their contents are never aliased.
+For streams to be useful, they need to be initialized with (possibly
+non-streaming) data from general-purpose threaded code.  Likewise, the
+results of a streaming computation need to be used in the threaded
+code.  Both of these transfers are done through memory, via the
+interface defined by the threaded API.  In particular, device I/O such
+as file handling is done using the threaded API, and then made
+available to streams through memory.
 
 \subsubsection{Stream Graphs}
 \label{sec:streamgraph}
@@ -939,7 +893,7 @@ inside a kernel.  For example:
     IStreamUnordered<int> in;
     int sum;
 
-    SumKernel(IStreamUnordered<int> _in, VM_NODE location, IOBlock<byte> scratch) : 
+    SumKernel(IStreamUnordered<int> _in, VM_NODE location, Block<byte> scratch) : 
               Kernel (_in, location, scratch) {
       in = _in;
       sum = 0;
@@ -962,7 +916,7 @@ inside a kernel.  For example:
 
   // --- control code ---
   StreamBuffer<int> s1(128, SRF, 0x100);
-  IOBlock<byte> scratch1(16, SRF, 0x180);
+  Block<byte> scratch1(16, SRF, 0x180);
 
   SumKernel sk(s1, PROC1, scratch1);
   Graph g(sk);
@@ -1190,11 +1144,11 @@ extracted segments to provide a smooth transition between them.
     // allocate overlapping stream in memory for raw data
     StreamBuffer<float> rawStr(fileLength, MEM1, 0x1000, fileLength), 
     // also allocate block for gather operation
-    IOBlock<float> rawBlock(fileLength, MEM1, 0x1000), 
+    Block<float> rawBlock(fileLength, MEM1, 0x1000), 
 
     // allocate other streams
     StreamBuffer<float> segIndices(10, PROC1), sumData(10, PROC1);
-    IOBlock<byte> scratch1(128, MEM1, 0x4000);
+    Block<byte> scratch1(128, MEM1, 0x4000);
 
     Kernel k1 = new ExtractSegments(PROC1, scratch1,               // make indices of summary segments
                                     rawStr, segIndices);
