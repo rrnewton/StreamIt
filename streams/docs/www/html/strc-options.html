@@ -1,0 +1,282 @@
+<html>
+
+<head>
+   <meta http-equiv="Content-Type" content="text/html;charset=iso-8859-1">
+   <meta NAME="author" CONTENT="rodric m. rabbah">
+   <meta NAME="keywords" CONTENT="saman amarasinghe, streaming, programming languages, compilers">
+   <meta NAME="description" CONTENT="StreamIT">
+   <title>StreamIt - Quick Start Guide to the StreamIt Compiler</title>
+
+   <style fprolloverstyle>A:hover {color: #FF0000}</style>
+</head>
+
+<!--body BGCOLOR="#444A50" TEXT="#FFFFFF" LINK="#FFCC00" VLINK="#FFCC00" ALINK="#FFCC00"-->
+
+<table border="0" width="600" cellpadding="2" align="center">
+
+  <tr>
+    <td width="17%" valign="center" align="left">
+      <img src="../images/streamit-logo.jpg" height="90" width="90">
+    </td>
+    <td valign="center" align="center">
+      <font color="#444A50">
+        <br><br><br>
+        <nobr><b>
+            <a href="../index.html"><font color="#FF0000">home</font></a>
+          | <a href="../html/news.html"><font color="#FF0000">news</font></a>
+          | <a href="../html/research.html"><font color="#FF0000">research</font></a>
+          | <a href="../html/people.html"><font color="#FF0000">people</font></a> 
+          | <a href="../html/documentation.html"><font color="#FF0000">documentation</font></a>
+          | <a href="../html/download.html"><font color="#FF0000">download</font></a>
+          | <a href="../html/contact.html"><font color="#FF0000">contact</font></a>
+        </nobr></b>
+        <hr>
+      </font>
+    </td>
+    <td width="17%" valign="top" align="left"></td>
+  </tr>
+
+  <tr>
+    <td width="17%" valign="top" align="left"></td>
+    <td valign="top" align="right"><h3>QUICK START GUIDE</h3></td>
+    <td width="17%" valign="top" align="left"></td>
+  </tr>
+
+</table>
+
+<table border="0" width="1000" cellpadding="0" align="center">
+
+  <tr>
+    <td width="130" valign="top" align="left"></td>
+    <td width="20" valign="top" align="left"></td>
+
+    <td width="700" valign="top" align="left">
+      <br><br><br>
+      <p align="justify">
+	The StreamIt compiler is invoked via the <b>strc</b> script.
+	<pre><img src="../images/bullet.gif"> <b>strc <font color=purple>foo.str</font></b></pre>
+	reads   <font    color=purple>foo.str</font>,   produces   <font
+	color=purple>foo.java</font>  as an intermediate  file, compiles
+	this down to  <font color=purple>foo.c</font>, and then compiles
+	and    links     this    to    produce     a    binary,    <font
+	color=purple>a.out</font>.<br>
+
+	<h2><hr>strc Command Line Parameters<hr></h2>
+	<dl compact=compact>
+	  <dt><b>--help</b><dd>
+	      Displays a summary of available options.<br>
+
+	  <br>
+	  <dt><b>--output &lt;<em>filename</em>&gt;</b><dd>
+	      Places the resulting binary in &lt;<em>filename</em>&gt;.<br>
+	  <br>
+
+	  <dt><b>--java</b><dd>
+	      Used to compile files in "old" syntax (written in
+	      Java). This s added automatically if all of the input file names
+	      end in <font color=purple>.java</font>.<br>
+	  <br>
+
+	  <dt><b>--raw &lt;<em>n</em>&gt;</b><dd>
+	      Compile for an &lt;<em>n</em>&gt;-by-&lt;<em>n</em>&gt; RAW processor.<br>
+	  <br>
+
+	  <dt><b>--raw &lt;<em>n</em>&gt; --rawcol &lt;<em>m</em>&gt;</b><dd>
+	      Compile for an &lt;<em>n</em>&gt;-by-&lt;<em>m</em>&gt; RAW processor.<br>
+	  <br>
+
+	  <dt><b>--verbose</b><dd>
+	      Show intermediate commands as they are executed.<br>
+	  <br>
+
+	  <dt><b>--library</b><dd>
+	      Produce a Java file compatible with the StreamIt Java library,
+	      and compile and run it.<br>
+	  <br>
+
+	  <dt><b>--unroll &lt;<em>n</em>&gt;, -u&lt;<em>n</em>&gt;</b><dd>
+            Specify loop unrolling limit. The default value is 16.<br>
+	  <br>
+
+	  <dt><b>--linearreplacement</b><dd>
+	      Domain-specific optimization: combine adjacent "linear"
+	      filters in the program into a single matrix multiplication
+	      operation wherever possible.<br>
+	  <br>
+
+	  <dt><b>--sjtopipe, -J</b><dd>
+	      Convert   split-joins  to   pipelines.   This   works  by
+	      converting   an  <I>n</I>-way   split-join   to  <I>n</I>
+	      <I>n</I>-way split-joins in series, where each split-join
+	      has (<I>n</I>-1) identity filters and one of the children
+	      of  the   original  split-join,  and   then  fusing  each
+	      splitjoin  into  a  single  filter.  This  could  improve
+	      performance  for  large  splitjoins by  reducing  network
+	      contention.<br>
+	  <br>
+
+	  <dt><b>--sync, -k</b><dd>
+	      Perform   aggressive   synchronization   removal.   The
+	      simplest  case  of  this  involves two  split-joins  in  a
+	      pipeline, where  the joiner of the first  and the splitter
+	      of  the second have  identical weights  and the  number of
+	      children  is the  same; then  the two  split-joins  can be
+	      combined into one. This  case is performed by default, but
+	      --sync   enables  more   aggressive   (and  less   stable)
+	      transformations.<br>
+	  <br>
+
+	  <dt><b>--nofieldprop, -L</b><dd>
+	      Avoid propagating constant values from a filter's init function
+		to its work function, as in:
+		<pre>              float-&gt;float filter ScaleBySquare(float v) {
+                float v2;
+                init { v2 = v * v; }
+                work pop 1 push 1 { push(v2*pop()); }
+              }</pre>
+
+        <dt><b>--nolinearcollapse, -H</b><dd>
+	      When performing linear replacement or frequency replacement, do
+	      not collapse adjacent linear filters into a single filter; only
+		operate on individual filters.<br>
+	  <br>
+
+	  <dt><b>--destroyfieldarray</b><dd>
+	      Break down arrays in structures to their component elements.
+	      <pre>              struct OriginalStruct {
+                float[2] p;
+              }
+		  struct DestroyedStruct {
+                float p1, p2;
+              }</pre>
+
+	  <dt><b>-O1</b><dd>
+	      Perform basic optimizations that should improve performance in most
+		cases. Adds <tt>--unroll 256 --altcodegen --destroyfieldarray --ratematch --wbs</tt>.<br>
+	  <br>
+
+	  <dt><b>-O2</b><dd>
+	       Perform extended optimizations that should improve performance in
+		 most cases, but may also cause the compiler to become unstable.
+		 Adds <tt>--unroll 4096 --altcodegen --destroyfieldarray --ratematch --removeglobals --simulatework --wbs</tt>.
+      </dl>
+
+
+	<h2><hr>strc Parameters Specific to RAW Backend<hr></h2>
+	<dl compact=compact>
+	  <dt><b>--numbers &lt;<em>n</em>&gt;, -N&lt;<em>n</em>&gt;</b><dd>
+	     Instrument code to gather performance statistics on simulated
+	     code over &lt;<em>n</em>&gt; stady-state cycles. The results are
+	     placed in <font color=purple>results.out</font> in the current directory.<br>
+	  <br>
+
+	  <dt><b>--partition, -a</b><dd>
+	     Partition the stream graph, performing either filter fission or
+	     fusion until the number of filters is approximately equal to the
+	     number of tiles. This is required if the number of filters in
+	     the expanded stream graph is greater than the number of tiles.<br>
+	  <br>
+
+	  <dt><b>--dppartition, -y</b><dd>
+	     Use a partitioner based on dynamic programming, rather than the
+	     default greedy partitioner. On some benchmarks this gets better
+	     results; performance is generally comparable.<br>
+	  <br>
+
+	  <dt><b>--simulatework, -T</b><dd>
+	     Use the RAW simulator to calculate the amount of time required
+	     to execute a work function, rather than using an estimator.
+	     This makes the compiler substantially slower; it may result in
+	     better partitioning.<br>
+	  <br>
+
+	  <dt><b> --magic_net, -M</b><dd>
+	     Compile to a "magic" network in which the buffer sizes between
+	     Raw tiles are conceptually unbounded (the sender never blocks),
+	     and the communication time has a constant overhead and per-hop
+	     latency. These parameters can be varied by editing the
+	     auto-generated <font color=purple>Makefile.streamit</font> file, which contains
+	     a string <tt>-magic_crossbar C1H1</tt>. The number after the
+	     "C" refers to the constant overhead; after the "H" refers to
+	     the per-hop latency.<br>
+	  <br>
+
+	  <dt><b>--raw-uni, -U</b><dd>
+	     Use the RAW backend, but fuse to a single tile and output code
+	     that can be run on a uniprocessor as a standalone C program
+	     (without depending on the StreamIt C library).<br>
+	  <br>
+
+	  <dt><b>--wbs</b><dd>
+	     When laying out communication instructions, use the work-based
+	     simulator.
+	</dl>
+
+	<h2><hr>strc Parameters Specific to Uniprocessor Backend<hr></h2>
+	<dl compact=compact>
+
+	  <dt><b>--linearpartition, -B</b><dd>
+	     Domain-specific optimization: perform linear replacement and
+	     frequency replacement selectively, based on an estimate of where
+	     it is most beneficial.<br>
+	  <br>
+
+	  <dt><b>--frequencyreplacement, -F</b><dd>
+	     Domain-specific optimization: combine adjacent "linear"
+	     filters in the program and convert them to the frequency domain
+	     wherever possible.<br>
+	  <br>
+
+	  <dt><b>--poptopeek, -P</b><dd>
+	     Convert pop expressions into peeks, and pop only at the end of 
+	     the work function.<br>
+	  <br>
+
+	  <dt><b>--profile</b><dd>
+	     Compile C code with profiling information. This requires that
+	     your system have profiling versions of the standard C and math
+	     libraries (<font color=purple>libc_p.a</font> and <font color=purple>libm_p.a</font>), along
+	     with a profiling version of the StreamIt library; invoke <tt>make
+	     profile</tt> in <font color=purple>$STREAMIT_HOME/library/c</font>. Profiling
+	     results can be analyzed using <font color=purple>gprof</font>.
+	</dl>
+
+
+	<h2><hr>strc Parameters Specific to Java Library<hr></h2>
+	<dl compact=compact>
+	  <dt><b>--iterations &lt;<em>n</em>&gt;, -i&lt;<em>n</em>&gt;</b><dd>
+	     Run the program for &lt;<em>n</em>&gt; steady-state iterations. Defaults
+	     to infinity.<br>
+	  <br>
+
+	  <dt><b>--norun</b><dd>
+	     Perform the library setup and schedule the stream graph, but don't
+	     actually run the program.<br>
+	  <br>
+
+	  <dt><b>--nosched</b><dd>
+	     Don't run the scheduler; instead, run in a pull mode, where the
+	     buffer lengths are examined at run time and a preceding filter is
+	     run if needed to provide enough data to run the current filter.<br>
+	  <br>
+
+	  <dt><b>--printdot</b><dd>
+	     Print a "." to standard output after each steady-state execution.<br>
+	  <br>
+
+	  <dt><b>--printsched</b><dd>
+	     Dump the program schedule.
+	</dl>
+
+      </p>
+    </td>
+
+    <td width="150" valign="top" align="left"></td>
+  </tr>
+
+</table>
+
+</body>
+
+
+</html>
