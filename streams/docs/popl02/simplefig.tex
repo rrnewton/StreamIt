@@ -29,11 +29,10 @@
 \begin{center}
 {\bf Equations}
 \end{center}
-\noindent For each node $n$, do the following:
+\noindent For each node $n$, introduce the following equations:
 \begin{itemize}
 %
-\item For each $c \in \mt{chan\_out}(n)$, introduce this equation
-{\bf(READ to WRITE)}:
+\item {\bf(READ to WRITE)} For each $c \in \mt{chan\_out}(n)$:
 %
 \begin{align}
 &\forall (i, j, k) \in {\cal D}_{{WRITE}_{c}},~\mt{WRITE}_{c}(i,j,k) = W(n)(\mt{Steady\_Inputs})[\mt{pos\_out}(n, c)][k] \\ \nonumber
@@ -41,9 +40,8 @@
                              \mt{READ}_{{chan\_in}(n)[\mt{num\_in}(n)]}(i, j, *) ]
 \end{align}
 %
-\item For each $c \in \mt{chan\_out}(n)$, and for each $q \in
-[0,S(n)-\mt{1}]$,
-introduce this equation {\bf(WRITE to BUF)}:
+\item {\bf(WRITE to BUF)} For each $c \in \mt{chan\_out}(n)$, and for each $q \in
+[0,S(n)-\mt{1}]$:
 \begin{align}
 &\forall (i,j) \in {\cal D}_{SW {\small \rightarrow} SB}(c,q),
 \mt{BUF}_{c}(i,j) = 
@@ -53,8 +51,7 @@ introduce this equation {\bf(WRITE to BUF)}:
   \{ (i,j) | q*U(c) \le j \le (q+1)*U(c) - 1 \}
 \end{align}
 % here is the simple, base case of the BUF -> READ function
-\item For each $c \in \mt{chan\_in}(n)$, introduce this equation {\bf(BUF to
-READ)}:
+\item {\bf(BUF to READ)} For each $c \in \mt{chan\_in}(n)$:
 \begin{align}
 \forall (i,j,k) \in {\cal D}_{{READ}_{c}},
 \mt{READ}_{c}(i,j,k) = \mt{BUF}_{c}(i,j*O(n) + k)

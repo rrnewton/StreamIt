@@ -85,32 +85,31 @@ variable $\mt{SREAD}_{c, p}$ with this domain:
 \begin{center}
 {\bf Equations (Part 1)}
 \end{center}
-\noindent For each channel $c = (n_a, n_b)$, do the following:
+\noindent For each channel $c = (n_a, n_b)$, introduce the following equations:
 \begin{itemize}
 %
-\item Introduce this equation {\bf(I to IBUF)}:
+\item {\bf(I to IBUF)}:
 \begin{align}
 \forall i \in [0,A(c)-1],~\mt{IBUF}_{c}(i) = I(c)[i]
 \end{align}
 
-\item For each $p \in [0, num(n_a, \mt{init})-1]$, introduce this
-equation {\bf(IWRITE to IBUF)}:
+\item {\bf(IWRITE to IBUF)} For each $p \in [0, num(n_a, \mt{init})-1]$:
 \begin{align}
 &\forall i \in [A(c) + \mt{PartialWrite}(c,\mt{init},p), 
                A(c) + \mt{PartialWrite}(c,\mt{init},p+1)-1], \\ \nonumber
 &~~~~~~\mt{IBUF}_{c}(i) = \mt{IWRITE}_{c, p}(i - A(c) - \mt{PartialWrite}(c,\mt{init},p))
 \end{align}
 %
-\item For each $c \in \mt{chan\_out}(n)$, and for each $p \in [0,
-num(n, \mt{init})-1]$, introduce this equation {\bf(IREAD to IWRITE)}:
+\item {\bf(IREAD to IWRITE)} For each $c \in \mt{chan\_out}(n)$, and for each $p \in [0,
+num(n, \mt{init})-1]$:
 %
 \begin{align}
 &\forall i \in {\cal D}_{{IWRITE}_{c, p}},~\mt{IWRITE}_{c,p}(i) = W(n, \mt{init}, p)(\mt{Init\_Inputs})[\mt{pos\_out}(n, c)][i], \\ \nonumber
 &\mt{where Init\_Inputs} = [\mt{IREAD}_{{chan\_in}(n)[1], p}(*), \dots, \mt{IREAD}_{{chan\_in}(n)[\mt{num\_in}(n)], p}(*) ]
 \end{align}
 %
-\item For each $c \in \mt{chan\_out}(n)$, and for each $p \in [0,
-num(n, \mt{steady})-1]$, introduce this equation {\bf(SREAD to SWRITE)}:
+\item {\bf(SREAD to SWRITE)} For each $c \in \mt{chan\_out}(n)$, and for each $p \in [0,
+num(n, \mt{steady})-1]$:
 %
 \begin{align}
 &\forall (i, j, k) \in {\cal D}_{{SWRITE}_{c, p}},~\mt{SWRITE}_{c,p}(i,j,k) =\nonumber\\
@@ -118,9 +117,8 @@ num(n, \mt{steady})-1]$, introduce this equation {\bf(SREAD to SWRITE)}:
 \mt{Steady\_Inputs} = [\mt{SREAD}_{{chan\_in}(n)[1], p}(i, j, *), \dots, \mt{SREAD}_{{chan\_in}(n)[\mt{num\_in}(n)], p}(i, j, *) ]
 \end{align}
 %
-\item For each $c \in \mt{chan\_out}(n)$, for each $p \in [0,
-\mt{num}(n, \mt{steady})-1]$, and for each $q \in [0,S(n)-1]$,
-introduce this equation {\bf(SWRITE to SBUF)}:
+\item {\bf(SWRITE to SBUF)} For each $c \in \mt{chan\_out}(n)$, for each $p \in [0,
+\mt{num}(n, \mt{steady})-1]$, and for each $q \in [0,S(n)-1]$:
 \begin{align}
 &\forall (i,j) \in {\cal D}_{SW {\small \rightarrow} SB}(c,p,q),
 \mt{SBUF}_{c}(i,j) = \nonumber\\
@@ -133,8 +131,8 @@ introduce this equation {\bf(SWRITE to SBUF)}:
 &\mt{and } \mt{Offset}_{SW {\small \rightarrow} SB}(q,n,c,p') = q*\mt{TotalWrite}(n,c,\mt{steady}) + \mt{PartialWrite}(c,\mt{steady},p'))
 \end{align}
 %
-\item For each $c \in \mt{chan\_in}(n)$, and for each phase $p \in
-[0, \mt{num}(n, \mt{init})-1]$, introduce {\bf(IBUF to IREAD)}:
+\item {\bf(IBUF to IREAD)} For each $c \in \mt{chan\_in}(n)$, and for each phase $p \in
+[0, \mt{num}(n, \mt{init})-1]$:
 \begin{align}
 &\forall i \in {\cal D}_{IB {\small \rightarrow} IR}(c,p), 
 \mt{IREAD}_{c, p}(i) = \mt{IBUF}_{c}(\mt{PartialRead}(c, \mt{init}, p) + i) \\ \nonumber
@@ -143,11 +141,11 @@ introduce this equation {\bf(SWRITE to SBUF)}:
          i + \mt{PartialRead}(c, \mt{init}, p) \in {\cal D}_{{IBUF}_{c}} \}
 \end{align}
 %
-\item For each $c \in \mt{chan\_in}(n)$, for each phase $p \in [0,
+\item {\bf(SBUF to IREAD)} For each $c \in \mt{chan\_in}(n)$, for each phase $p \in [0,
 \mt{num}(n, \mt{init})-1]$, and for each \\$q \in [0, \lfloor
 \frac{\mt{argmax}_{\mt{p}'} \left( \mt{PartialRead}(\mt{c}, \mt{init},
 \mt{p}') + \mt{E}(\mt{c}, \mt{init}, \mt{p}') \right)
-}{\mt{Period(c)}} \rfloor ]$, introduce {\bf(SBUF to IREAD)}:
+}{\mt{Period(c)}} \rfloor ]$:
 \begin{align}
 &\forall i \in {\cal D}_{SB {\small \rightarrow} IR}(c,p), 
 \mt{IREAD}_{c,p}(i) = 
@@ -174,11 +172,10 @@ introduce this equation {\bf(SWRITE to SBUF)}:
 \begin{center}
 {\bf Equations (Part 2)}
 \end{center}
-\noindent For each node $n$, do the following:
+\noindent For each node $n$, introduce the following equations:
 \begin{itemize}
-\item For each $c \in \mt{chan\_in}(n)$, and for each phase $p \in [0,
-\mt{num}(n, \mt{steady})-1]$, introduce this equation {\bf(IBUF to
-SREAD)}:
+\item {\bf(IBUF to SREAD)} For each $c \in \mt{chan\_in}(n)$, and for each phase $p \in [0,
+\mt{num}(n, \mt{steady})-1]$:
 \begin{align}
 &\forall (i,j,k) \in {\cal D}_{IB {\small \rightarrow} SR}(n,c,p), 
 \mt{SREAD}_{c, p}(i,j,k) = 
@@ -191,10 +188,9 @@ SREAD)}:
   \{ (i,j,k) | \mt{ReadIndex}(n,c,p,i,j,k) \in {\cal D}_{{IBUF}_{c}} \}
 \end{align}
 %
-\item For each $c \in \mt{chan\_in}(n)$, for each phase $p \in [0,
+\item {\bf(SBUF to SREAD)} For each $c \in \mt{chan\_in}(n)$, for each phase $p \in [0,
 \mt{num}(n, \mt{steady})-1]$, and for each $q \in [0, \lfloor
-\frac{\mt{E(c, steady, p)}}{\mt{Period(c)}} \rfloor]$, introduce
-these equations {\bf(SBUF to SREAD)}:
+\frac{\mt{E(c, steady, p)}}{\mt{Period(c)}} \rfloor]$:
 % two possible problems: sread has already been written to, or sbuf has already been read from
 \begin{align}
 &\forall (i,j,k) \in {{\cal D}\mt{1}}_{SB {\small \rightarrow} SR}(c,p,q),
