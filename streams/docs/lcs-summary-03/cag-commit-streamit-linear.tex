@@ -24,7 +24,6 @@
 %
 % Do not put a blank line after a \formatsection, as this affects the
 % formatting.
-
 \formatsection{Introduction}
 More than fifty percent of the code that runs the Digital Signal Processors
 (DSPs) in a modern cell phone is written in assembly language and the 
@@ -43,7 +42,8 @@ high-level automatic DSP optimizations that are generally impossible
 to do in a general-purpose language.
 
 \formatsection{Approach}
-Our analysis and optimizations focus on filters which compute {\it linear} 
+Linear analysis and optimization\cite{pldi-03-linear}
+focuses on filters which compute {\it linear} 
 functions of their inputs. A filter computes a linear function if
 the computation it does can be described by a vector-matrix operation. 
 Many fundamental DSP operations such as filtering, the Discrete Fourier 
@@ -167,9 +167,10 @@ take advantage of the specialized instructions offered.
 
 
 \formatsection{Research Support}
-This work is supported in part by a grant from DARPA (PCA F29601-04-2-0166), 
-an award from NSF (CISE EIA-0071841), and fellowships from the
+This work is supported by DARPA (PCA F29601-04-2-0166),
+the NSF (CISE EIA-0071841), and fellowships from the
 Singapore-MIT Alliance and the MIT-Oxygen Project.
+
 % Although the use of BibTeX is highly recommended, you can manually
 % format your references as follows:
 %
