@@ -1,41 +1,35 @@
 \begin{figure}
 \centering
-\psfig{figure=beam-graph-orig.eps,width=1.97in}
-\caption{\protect\small Stream graph of the original BeamFormer, in
+\psfig{figure=radio-graph-orig.eps,width=4in}
+\caption{\protect\small Stream graph of the original FM Radio, in
 which the Filters are at a granularity that is natural for the
-algorithm.  This stream graph is a condensed version of the BeamFormer
-described in \cite{pca}, which has 48 parallel channels instead of 2.
-\protect\label{fig:beam-orig}}
+algorithm. \protect\label{fig:fm-orig}}
 \vspace{36pt}
-\psfig{figure=beam-graph-opt.eps,width=6in}
-\caption{\protect\small Stream graph of the load-balanced BeamFormer.
-In this case, $\mbox{FIRFilter}_3$ is the most computationally
-demanding node, and the aim of the load balancing phase is to
-distribute its work.  To do this, we first perform vertical fusion of
-$\mbox{FIRFilter}_3$ with three of its neighbors so as to avoid
-devoting an entire tile to a lighter Filter.  Then, the fused filter
-is parallelized five ways in each branch of the SplitJoin via a
-horizontal fission transformation.  Finally, the InputGenerate
-$\mbox{FIRFilter}_1$ nodes are fused into a filter $F$ to free up
-additional tiles.  After these transformations, the bottleneck is $F$
-rather than $\mbox{FIRFilter}_3$ (see
-Figure~\ref{fig:beam-blood}). \protect\label{fig:beam-opt}}
+\psfig{figure=radio-graph-opt.eps,width=4in}
+\caption{\protect\small Stream graph of the load-balanced FM Radio.
+Since the first LowPassFilter was the most demanding node, it was
+duplicated across a 2-way SplitJoin.  Then, to conserve tiles, the
+Subtract node was moved across a downstream Joiner via the Filter
+Hoisting transformation.  The Subtract, Add, and Printer nodes were
+then fused into a single Filter.  This configuration of the stream
+graph displays much better load balancing than the original (see
+Figure~\ref{fig:fm-blood}).  \protect\label{fig:fm-opt}}
 \end{figure}
 
 \begin{figure}
-  \begin{center}
-    \psfig{figure=beam-blood-key.eps,width=3.25in} \\
-    \subfigure[\vspace{-6pt} Original.\label{fig:beam-blood1}]{\psfig{figure=beam-blood-orig.eps,width=3in}}
-    \hspace{0.3in}
-    \subfigure[\vspace{-6pt} Load-balanced.\label{fig:beam-blood2}]{\psfig{figure=beam-blood-opt.eps,width=3in} \vspace{-6pt}}
-	\vspace{-6pt}
-    \caption{Execution traces for the (a) original and (b)
-    load-balanced partitionings of the BeamFormer.  The $x$ axis
-    denotes time, and the $y$ axis denotes the processor.  The dark
-    bands indicate periods where processors are blocked waiting to
-    receive an input or send an output.  Light regions indicate
-    periods of useful work. \protect\label{fig:beam-blood}}
-	\vspace{-6pt}
+  \begin{center} \psfig{figure=beam-blood-key.eps,width=3.25in} \\
+    \subfigure[\vspace{-6pt}
+    Original.\label{fig:radio-blood1}]{\psfig{figure=radio-blood-orig.eps,width=3in}}
+    \hspace{0.3in} \subfigure[\vspace{-6pt}
+    Load-balanced.\label{fig:radio-blood2}]{\psfig{figure=radio-blood-opt.eps,width=3in}
+    \vspace{-6pt}} \vspace{-6pt} \caption{Execution traces for the (a)
+    original and (b) load-balanced partitionings of the FM Radio.  The
+    $x$ axis denotes time, and the $y$ axis denotes the processor.
+    The dark bands indicate periods where processors are blocked
+    waiting to receive an input or send an output.  Light regions
+    indicate periods of useful work.  The thin stripes in the light
+    regions represent pipeline stalls.  \protect\label{fig:fm-blood}}
+    \vspace{-6pt}
 \end{center}
 \end{figure}
 
@@ -221,19 +215,19 @@ done by hand, but the transformations themselves are fully automated.
 We use the BeamFormer application \cite{pca} to illustrate the
 partitioning process (see Section~\ref{sec:results} for more
 information about the BeamFormer).  The original partitioning of the
-BeamFormer (Figure~\ref{fig:beam-orig}) is highly unbalanced, as the
+BeamFormer (Figure~\ref{fig:fm-orig}) is highly unbalanced, as the
 $\mbox{FIRFilter}_3$ nodes constitute most of the work in the stream
-graph.  Figure~\ref{fig:beam-blood1} provides an execution trace of
-the original partitioning and demonstrates that these two filters are
-the bottleneck for the entire computation.  The StreamIt compiler
-performs four vertical fusion transformations and two five-way
-horizontal fission transformations to obtain the load-balanced stream
-graph given in Figure~\ref{fig:beam-opt}.  As illustrated by the
-execution trace in Figure~\ref{fig:beam-blood2}, the optimized graph
-achieves approximately five times as much processor utilization as the
-original, since the computationally intensive nodes have been split
-and the lighter nodes have been combined. In the following sections,
-we describe these transformations in more detail.
+graph.  Figure~\ref{fig:fm-blood1} provides an execution trace of the
+original partitioning and demonstrates that these two filters are the
+bottleneck for the entire computation.  The StreamIt compiler performs
+four vertical fusion transformations and two five-way horizontal
+fission transformations to obtain the load-balanced stream graph given
+in Figure~\ref{fig:fm-opt}.  As illustrated by the execution trace in
+Figure~\ref{fig:fm-blood2}, the optimized graph achieves approximately
+five times as much processor utilization as the original, since the
+computationally intensive nodes have been split and the lighter nodes
+have been combined. In the following sections, we describe these
+transformations in more detail.
 
 \subsection{Fusion Transformations}
 

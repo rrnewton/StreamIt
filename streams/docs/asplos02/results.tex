@@ -89,9 +89,11 @@ CRC & A 32-bit Cyclic Redundancy Check (CRC) Encoder/Decoder. \\
 {\bf MFLOPS}
 \\
 \hline \hline
-BeamFormer & 596 & 15 & 0.7 & 443 & 15 & 3.5 & 1030\\
+BeamFormer (12x4) & 596 & 53 & 0.9 & 573 & 15 & 1.8 & 1124\\
 \hline
-FM Radio & 511 & 14 & 22.4 & 141.5 & 14 & 57.4 & 363.5\\
+BeamFormer (48x16) & 596 & 209 & N/A & N/A & 15 & 0.3 & 840\\
+\hline
+FM Radio & 511 & 14 & 107 & 141 & 11 & 41 & 258\\
 \hline
 FFT & 174 & 31 & 641 & 35.75 & 15 & 27.8 & 4.25\\
 \hline
@@ -148,3 +150,27 @@ the communication overhead for FFT, leading to a slowdown.  Better
 tile code generation and traditional optimizations may help improve
 the performance.
 
+\begin{figure}
+\centering
+\psfig{figure=beam-graph-orig.eps,width=1.97in}
+\caption{\protect\small Stream graph of the original 12x4 BeamFormer.  The 12x4 BeamFormer has 12 channels and 4 beams; it is the largest version that fits onto 64 tiles without filter fusion.  \protect\label{fig:beam-orig}}
+\vspace{36pt}
+\psfig{figure=beam-graph-opt.eps,width=6in}
+\caption{\protect\small Stream graph of the load-balanced 12x4 BeamFormer.  Vertical fusion is applied to collapse each pipeline into a single filter, and horizontal fusion is used to transform the 4-way SplitJoin into a 2-way SplitJoin.
+Figure~\ref{fig:beam-blood} shows the benefit of these
+transformations. \protect\label{fig:beam-opt}}
+\end{figure}
+
+\begin{figure}
+  \begin{center} \psfig{figure=beam-blood-key.eps,width=3.25in} \\
+    \subfigure[\vspace{-6pt}
+    Original.\label{fig:beam-blood1}]{\psfig{figure=beam-blood-orig.eps,width=3in}}
+    \hspace{0.3in} \subfigure[\vspace{-6pt}
+    Load-balanced.\label{fig:beam-blood2}]{\psfig{figure=beam-blood-opt.eps,width=3in}
+    \vspace{-6pt}} \vspace{-6pt} \caption{Execution traces for the (a)
+    original and (b) load-balanced partitionings of the BeamFormer.
+    Graphs are colored as in
+    Figure~\ref{fig:fm-blood}. \protect\label{fig:beam-blood}}
+    \vspace{-6pt}
+\end{center}
+\end{figure}
