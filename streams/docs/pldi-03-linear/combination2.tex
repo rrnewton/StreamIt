@@ -134,7 +134,7 @@ The following transformation describes how to collapse two linear
 nodes in a {\tt pipeline}; it can be applied repeatedly to collapse
 any number of neighboring linear nodes.
 
-\begin{combination} (Linear pipeline)
+\begin{transformation} (Pipeline combination)
 Given two linear nodes $\lambda_1$ and $\lambda_2$ where the output of
 $\lambda_1$ is connected to the input of $\lambda_2$ in a pipeline
 construct, the combination $\mbox{\bf pipe}(\lambda_1, \lambda_2)$ $=$
@@ -153,7 +153,7 @@ L & = & \mt{lcm}(u_1, o_2) \\
 \mathbf{u'} & = & u_2^e
 \end{array}
 \end{equation}
-\end{combination}
+\end{transformation}
 
 It is straightforward to derive the equations above.  Let $x_i$ and
 $y_i$ be the input and output channels, respectively, for $\lambda_i$.
@@ -211,44 +211,56 @@ $A_1^e$ and $A_2^e$.
 % when the pop/peek rate is varied, etc.
 
 \subsection{Collapsing Linear SplitJoins}
-{\tt splitjoin}s allow a StreamIt programmer to express explicitly
-parallel computation.  Data elements that arrive at the {\tt
-splitjoin} are directed to the parallel sub {\tt streams} in one of
-two ways.  The simpler of the two is to send copy of each data element
-to the each of the sub {\tt streams}.  The second of the two is
-specified by $N$ weights, $v_k$ for $k\in[0..N-1]$, where $N$ is the
-number of sub {\tt streams} in the {\tt splitjoin}. The first $v_0$
-data elements are sent to the leftmost {\tt Stream}. The next $v_1$
-elements are sent to the next {\tt stream} and so on. When all
-$\sum_{k=0}^{N-1} v_k$ elements have been seen, the splitter starts
-the same pattern over again.
 
-The data from the parallel {\tt streams} are combined back into a single stream by means of
-a joiner specified by weights $w_k$ for $k\in[0..N-1]$. First, $w_0$ items from the output tape of the 
-leftmost {\tt stream} are placed onto the overall output tape, then 
-$w_1$ elements are taken from the second leftmost {\tt stream} and so on. 
-Again, the process repeats itself after one complete set of $\sum_{k=0}^{N-1} w_k$ 
-elements has been pushed.
+The {\tt splitjoin} construct allows the StreamIt programmer to
+express explicitly parallel computations.  Data elements that arrive
+at the {\tt splitjoin} are directed to the parallel child streams
+using one of two pre-defined {\tt splitter} constructs: 1) duplicate,
+which sends a copy of each data item to all of the child streams, and
+2) roundrobin, which distributes items cyclically according to an
+array of weights.  The data from the parallel {\tt streams} are
+combined back into a single stream by means of a roundrobin {\tt
+joiner} with an array of weights $w$.  First, $w_0$ items from the
+output tape of the leftmost child are placed onto the overall output
+tape, then $w_1$ elements are taken from the second leftmost child,
+and so on.  The process repeats itself after one complete set of
+$\sum_{i=0}^{N-1} w_i$ elements has been pushed.
 
-If we know that all subcomponents of a {\tt splitjoin} 
-have linear representations, then we can describe the action of the entire {\tt splitjoin} 
-with a single linear representation.
-{\tt splitjoin}s containing all linear components are not as infrequent as they might seem -- 
-most {\tt splitjoin} sub {\tt streams} often perform very similar computations, so when one 
-is linear there is a high probability that all linear.
+In this section, we demonstrate how to collapse a {\tt splitjoin} into
+a single linear node when all of its children are linear nodes.  Since
+the children of {\tt splitjoin}s in StreamIt can be parameterized, it
+is often the case that all sibling streams are linear if any one of
+them is linear.  However, if a {\tt splitjoin} contains only a few
+adjacent streams that are linear, then these streams can be combined
+by wrapping them in a hierarchical splitjoin and then collapsing the
+wrapper completely.  Our technique also assumes that each {\tt
+splitjoin} admits a valid steady-state schedule; this property is
+verified by the StreamIt semantic checker.
 
-The joiner of a {\tt splitjoin} specifies a specific order of the output data 
-that is produced by the parallel {\tt stream} blocks. Because each column 
-of a linear representation's matrix represents the formula for calculating a single output value, 
-the overall linear representation of a combined {\tt splitjoin} will be exactly 
-the same columns of the parallel {\tt streams} in an ordering that depends on the joiner weights $w_i$.
-
-Below we will describe the combination rules for a {\tt splitjoin}
-with a duplicate splitter. Then we will describe how we can transform 
-a roundrobin splitter {\tt splitjoin} into a duplicate splitter {\tt splitjoin}. 
-
+Our analysis distinguishes between two cases.  For duplicate
+splitters, we directly construct a linear node from the child streams.
+For roundrobin splitters, we translate the {\tt splitjoin} to use a
+duplicate splitter and then rely on the first analysis to construct a
+linear node.  We describe these translations below.
 
 \subsubsection{Duplicate Splitter}
+
+Intuitively, there are three main steps to combining a duplicate
+splitjoin into a linear node.  Since the combined node will represent
+a steady-state execution of the splitjoin construct, we first need to
+expand each child node according to its multiplicity in the schedule.
+Secondly, we need to ensure that each child's matrix representation
+has the same number of rows--that is, that each child peeks at the
+same number of items.  Once these conditions are satisfied, we can
+construct a matrix representation for the splitjoin by simply
+arranging the columns from child streams in the order specified by the
+roundrobin joiner (see Figure~\ref{fig:splitjoin-duplicate-matrix}).
+This third step is simplified by the fact that, with a duplicate
+splitter, each row of a child's linear representation refers to the
+same input element to the splitjoin.
+
+The following transformation describes splitjoin combination in
+mathematical terms.
 
 \begin{figure}
 \center
@@ -258,41 +270,6 @@ a roundrobin splitter {\tt splitjoin} into a duplicate splitter {\tt splitjoin}.
 \label{fig:splitjoin-duplicate-ratematch}
 \end{figure}
 
-In the following discussion, we focus on the matrix $A$ of a linear representation.
-The operations for the constant vector $a$ occur in a very similar way.
-
-Each row in the matrix $A$ of a linear form corresponds to the
-weight associated with a particular input item. For a duplicate splitter,
-the same rows in the sub matrices correspond to the same
-input so long as the number of rows in the sub matrices are the same.
-
-We wish to produce an overall representation by determining the correct
-ordering the columns of the sub {\tt stream}' linear representations. We
-need the number of rows to be the same, the total number of columns 
-from all the sub matrices to equal some multiple of $\sum_{i=0}^{N-1}w_i$
-and we need all of the sub linear forms to have the same $o$. 
-
-If the joiner is ``run'' an integer number of times it needs to consume in aggregate
-the exact number of items produced by an integer number of firings of
-each sub {\tt stream}. To guarantee that there are never any ``spare'' columns,
-we expand each of the sub {\tt streams} $F_i$ by a factor $f_i$.
-
-Let $x=lcm(\forall k, lcm(u_{F_k},w_k))$, which is the $lcm$ of the $lcm$s of 
-the push rates and the joiner weights. $x$ is the total number of elements that 
-produced by a {\tt splitjoin} whose output is the same as the original but each 
-of its sub {\tt streams} can be executed an integer number of times so that 
-the joiner executes an integer number of times.
-
-Therefore the appropriate expansion factors are  $f_i=\frac{x}{u_{F_i}}$ 
-$F''_i = expand(F_i,f_i)$ will produce $f_i*u_{F_i}$ items, and it will take 
-exactly $f_{w_i}=\frac{x}{w_i}$ firings of the 
-joiner (each of which consumes $w_i$ elements), to consume all $f_iu_i$ items produced by $F''_i$.
-It is important to note that we require that the {\tt splitjoin} does not need
-infinite buffer space to schedule see \cite{karczma-thesis} for an explanation of schedules. 
-For valid {\tt splitjoin}s $f_w=f_{w_i}$ is constant for all $i$. We also require that $o=o_{F''_i}$
-constant for all $i$. Figure~\ref{fig:splitjoin-duplicate-ratematch} depicts the 
-combination process graphically.
-
 \begin{figure}
 \center
 \epsfxsize=3.0in
@@ -301,58 +278,142 @@ combination process graphically.
 \label{fig:splitjoin-duplicate-matrix}
 \end{figure}
 
-After the rates are matched as described above, we are guaranteed to have the same number of rows
-in each of the expanded sub representations. To construct the overall matrix, $A'''$, 
-all that remains is to order the columns of the expanded representations appropriately. 
-First we create $A'''$ which has $e_{F''_i}$ rows (which is the same for all $i$) and has 
-$f_w(\sum_{i=0}^{N-1}w_i)$ columns. 
-%We know that the first $w_0$ output elements of the overall {\tt splitjoin} will be the first $w_0$ output elements from $F''_1$. 
-We place the $w_0$ rightmost columns of $A''_0$ as the $w_0$ rightmost 
-columns of $A'''$. We then place the $w_1$ rightmost columns of $A''_1$ into the next $w_1$ columns 
-of $A'''$, and so forth. When we have placed $\sum_{i=0}^{N-1}w_{i}$ (the number of outputs resulting from 
-completely executing the joiner once), we start the process again from the beginning (taking the remaining
-rightmost $w_0$ columns from $A''_0$, etc) until all of the columns from the expanded representations have
-been fitted into $A'''$. Figure~\ref{fig:splitjoin-duplicate-matrix} graphically depicts the process of 
-creating the overall $A'''$ from the smaller $A''_i$s.
+\begin{transformation} (Duplicate splitjoin combination)
+Given a splitjoin $s$ containing a duplicate splitter, children that
+are linear nodes $\lambda_0 \dots \lambda_{n-1}$, and a roundrobin
+joiner with weights $w_0 \dots w_{n-1}$, the combination $\mbox{\bf
+splitjoin}(s)$ $=$ $\mathbf{ \{A', b', e', o', u'\}}$ represents an
+equivalent node that can replace the entire stream $s$.  Its
+components are as follows: \\
+\begin{equation} \nonumber
+\begin{array}{rcl}
+\mt{joinRep} & = & \mt{lcm}(\frac{\mt{lcm}(u_1,w_1)}{w_1}, \dots, \frac{\mt{lcm}(u_n,w_n)}{w_n}) \\
+\mt{maxPeek} & = & \mt{max}_i (o_i * \mt{rep}_i + e_i - o_i) \\ ~ \vspace{-2pt} \\
+\multicolumn{3}{l}{\forall k \in [0, n-1]:} \\ ~ \vspace{-6pt} \\
+\mt{wSum}_k & = & \sum_{i=0}^{k-1} w_i \\ ~ \vspace{-6pt} \\
+\mt{rep}_k & = & \frac{w_k * \mt{joinRep}}{u_k} \\ ~ \vspace{-6pt} \\
+\lambda_k^e & = & \mt{expand}(\lambda_k, \mt{maxPeek}, 
+                              o_k * \mt{rep}_k, u_k * \mt{rep}_k) \\ ~ \vspace{-2pt} \\
+\multicolumn{3}{l}{\forall k \in [0, n-1], \forall m \in [0, joinRep-1], \forall n \in [0, u_k-1]:} \\ ~ \vspace{-6pt} \\
+\multicolumn{3}{l}{\mathbf{A'}[*, u'-1-n - m * \mt{wSum}_{n}-\mt{wSum}_{k}] = 
+  A_{k}^e [*,u_k^e-1-n]} \\ ~ \vspace{-6pt} \\
+\multicolumn{3}{l}{\mathbf{b'}[u'-1-n - m * \mt{wSum}_{n}-\mt{wSum}_{k}] = 
+  b_{k}^e [u_k^e-1-n]} \\ ~ \vspace{-2pt} \\
+\mathbf{e'} & = & e_0^e = \dots = e_{n-1}^e \\
+\mathbf{o'} & = & o_0^e = \dots = o_{n-1}^e \\
+\mathbf{u'} & = & \mt{joinRep} * \mt{wSum}_n \\
+\end{array}
+\end{equation}
+\end{transformation}
 
+The above formulation is derived as follows.  The $\mt{joinRep}$
+variable represents how many cycles the joiner completes in an
+execution of the splitjoin's steady-state schedule; $\mt{joinRep}$ is
+the minimal number of cycles required for each child node to execute
+an integral number of times and for all of their output to be consumed
+by the joiner.  Similarly, $\mt{rep}_k$ gives the execution count for
+child $k$ in the steady state.  Then, in keeping with the procedure
+described above, $\lambda_k^e$ is the expansion of the $k$'th node by
+a factor of $\mt{rep}_k$, with the peek value set to the maximum peek
+across all of the children.  Following the expansion, each
+$\lambda_i^e$ has the same number of rows, as the peek uniformization
+caused shorter matrices to be padded with rows of zero's at the top.
 
+The final phase of the transformation is to re-arrange the columns of
+the child matrices into the columns of $A'$ and $b'$.
+Figure~\ref{fig:splitjoin-duplicate-matrix} elucidates this process,
+though the notation is somewhat cumbersome.  The equation can be
+understood as follows: for the $k$'th child and the $m$'th cycle of
+the joiner, the $n$'th item that is pushed by child $k$ will appear
+appear at a certain location on the joiner's output tape.  This
+location (relative to the start of the node's execution) is $n + m *
+\mt{wSum}_n + \mt{wSum}_k$, as the reader can verify.  But since the
+right-most column of each array $A$ holds the first item to be pushed,
+we need to subtract this location from the width of $A$ when we are
+re-arranging the columns.  The width of $A$ is the total number of
+items pushed--$u'$ in the case of $A'$ and $u_k^e$ in the case of
+$A_k^e$.  Hence the equation as written above: we copy all items in a
+given column from $A_k^e$ to $A'$, defining each location in $A'$
+exactly once.  The procedure for $b$ is analogous.
+
+Finally, it remains to calculate the peek, pop, and push rates of the
+combined node.  The peek rate $e'$ is simply $maxPeek$, which we
+defined to be equivalent for all the expanded child nodes.  The push
+rate $\mt{joinRep}*\mt{wSum}_m$ is equivalent to the number of items
+processed through the joiner in one steady-state execution.  Finally,
+for the pop rate we rely on the fact that the splitjoin is well-formed
+and admits a schedule in which no buffer grows without bound.  If this
+is the case, then the $\mt{pop}$ rates must be equivalent for all the
+expanded streams; otherwise, some outputs of the splitter would
+accumulate infinitely on the input channel of some stream.  
+
+These input and output rates--in combination with the values of $A'$
+and $b'$ defined above--define a linear node that exactly represents
+the parallel combination of child nodes that are fed by a duplicate
+splitter.
 
 \subsubsection{Roundrobin Splitter}
 
-In the case of roundrobin splitters, data is directed to the various sub {\tt streams} 
-according to weights $v_i$: the first $v_0$ input elements are directed to $F_0$, the next
-$v_1$ elements are directed to $F_1$, etc. If the sub {\tt streams} are
-all linear, we can determine an overall linear representation given the same
-assumptions of finite buffer requirements, and uniform $o_i$.
-Our strategy is to transform the splitter from roundrobin to duplicate by
-modifying the sub {\tt stream}s' linear representations. 
+In the case of a roundrobin splitter, items are directed to each child
+stream $s_i$ according to weight $v_i$: the first $v_0$ items are sent
+to $s_0$, the next $v_1$ items are sent to $s_1$, and so on.  Since a
+child never sees the items that are sent to sibling streams, the items
+that are seen by a given child form a periodic but non-contiguous
+segment of the splitjoin's input tape.  Thus, in collapsing the
+splitjoin, we are unable to directly use the columns of child matrices
+as we did with a duplicate splitter, since with a roundrobin splitter
+these matrices are operating on disjoint sections of the input.
 
-Because the splitter is a roundrobin and not a duplicate, the same rows of the sub 
-{\tt stream}s' representation matrices do not represent the same input elements 
-even when the sub {\tt stream}s' representations are the same size. 
-The same rows don't represent the same data because each {\tt stream} 
-doesn't see any of the data directed to any other {\tt stream}. Therefore simply 
-arranging columns as described above will not produce a correct overall linear representation. 
+Instead, we collapse linear splitjoins with a roundrobin splitter by
+converting the splitjoin to use a duplicate splitter.  In order to
+maintain correctness, this involves adding a decimator on each branch
+of the splitjoin that eliminates items which were intended for other
+streams.
 
-\begin{figure}
-\center
-\epsfxsize=3.0in
-\epsfbox{images/splitjoin-roundrobin-matrix.eps}
-\caption{Corresponding matrix for splitter conversion from roundrobin to duplicate.}
-\label{fig:splitjoin-roundrobin-matrix}
-\end{figure}
+\begin{transformation} (Roundrobin to duplicate)
+Given a splitjoin $s$ containing a roundrobin splitter with weights
+$v_0 \dots v_{n-1}$, children that are linear nodes $\lambda_0 \dots
+\lambda_{n-1}$, and a roundrobin joiner $j$, the transformed
+$\mbox{\bf rr-to-dup}(s)$ is a splitjoin with a duplicate splitter,
+linear child nodes $\mathbf{\lambda_0'} \dots
+\mathbf{\lambda_{n-1}'}$, and roundrobin joiner $j$.  The child nodes
+are computed as follows: \\
+\begin{equation} \nonumber
+\begin{array}{rcl}
+\mt{wSum}_k & = & \sum_{i=0}^{k-1} w_i \\ ~ \vspace{-6pt} \\
+\mt{wTot} & = & \mt{wSum}_{n-1} \\ ~ \vspace{-4pt} \\
+\multicolumn{3}{l}{\forall k \in [0, n-1]:} \\ ~ \vspace{-12pt} \\ 
+\multicolumn{3}{l}{\parbox{3in}{
+    \begin{equation} \nonumber
+      \begin{array}{l}
+      ~~~~\mt{decimate}[k] ~\mt{is a linear node}~ \{A, \vec 0, \mt{wTot}, \mt{wTot}, \mt{wTot}\} \\
+	~~~~~~~\mt{where}~A[i,j] = \left\{
+	\begin{array}{l}
+	  1 ~\mt{if}~ i=j ~\wedge~ \\ 
+	  ~\hspace{0.13in}~ wSum_{k} < i < wSum_{k+1} \\
+	  0 ~\mt{otherwise}
+	\end{array}
+	\right.
+      \end{array}
+    \end{equation}}} \\
+\mathbf{\lambda_k'} & = & \mt{pipe}(\mt{decimate}[k], \lambda_k)
+\end{array}
+\end{equation}
+\end{transformation}
 
-To perform the transformation from roundrobin to duplicate, the same rows
-in each sub {\tt Stream}'s matrix must represent the same data items. Changing from splitjoin to 
-duplicate implies that each sub {\tt streams} will be fed all of the input data. All data
-that was nor originally bound for other {\tt stream}s needs to be ignored, which requires
-changing the original {\tt stream}s $F_i$ to $F'_i$. In our linear
-framework, we represent the independence of an output from an input as a zero in the appropriate
-element of the linear representation matrix. Therefore, we transform $F_i$ to $F'_i$ by inserting
-rows of zeros into linear representation of the sub {\tt streams} at positions such that
-the data bound for another sub {\tt stream} is ignored. Each of the new matrices $F'_i$ 
-has exactly $\sum_{i=0}^{N-1}v_i$ rows and the same number of columns of $F_i$, and 
-$o_{F'_i}=o_{F_i}$.
-Figure~\ref{fig:splitjoin-roundrobin-matrix} illustrates how the new matrix is constructed.
-We have now transformed our {\tt splitjoin} with a roundrobin splitter into a {\tt splitjoin}
-with a duplicate splitter which we know how to combine already.
+In the above translation, we utilize the linear pipeline combinator
+$\mt{pipe}$ to construct each new child node $\lambda_i^e$ as a
+composition of a decimator and the original node $\lambda_i$.  Each
+decimator is a square matrix that produces and consumes $\mt{wTot}$
+items, which is the number of items processed in one cycle of the
+roundrobin joiner.  Those items intended for stream $i$ are copied
+with a coefficient of $1$, while all others are eliminated with a
+coefficient of $0$.
+
+%% \begin{figure}
+%% \center
+%% \epsfxsize=3.0in
+%% \epsfbox{images/splitjoin-roundrobin-matrix.eps}
+%% \caption{Corresponding matrix for splitter conversion from roundrobin to duplicate.}
+%% \label{fig:splitjoin-roundrobin-matrix}
+%% \end{figure}
