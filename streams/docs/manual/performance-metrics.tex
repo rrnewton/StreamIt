@@ -1,4 +1,4 @@
-% $Id: performance-metrics.tex,v 1.4 2003-02-19 11:03:25 thies Exp $
+% $Id: performance-metrics.tex,v 1.5 2003-02-19 15:34:33 aalamb Exp $
 \section{Measuring StreamIt Performance}
 \subsection{Introduction}
 {\huge This section is slightly out of date -- there is a new number
@@ -70,7 +70,8 @@ Output from the simulator should look something like the following:
 [03: 000050b08]: 2
 \end{verbatim}
 
-I honestly have no idea what the first number (03) represents. The next number 
+The first number (03) represents the fact that the tile at row 0, column 3
+issued the print command. The next number 
 (eg 000034de8) is the cycle count (in hexadecimal) at which the third number was produced. The 
 third number is the output value that is produced by your program.
 
