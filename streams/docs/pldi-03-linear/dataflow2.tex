@@ -1,3 +1,61 @@
+\newcommand{\la}{$\leftarrow$}
+\newcommand{\IND}{\begin{ALC@g}}
+\newcommand{\UND}{\end{ALC@g}}
+\newcommand{\tup}[2]{\langle{#1}, {#2}\rangle}
+
+\section{Linear Extraction Algorithm}
+\label{sec:dataflow}
+
+Our linear extraction algorithm can identify a linear filter and
+construct a linear node $\lambda$ that fully captures its behavior.
+The technique, which appears as Algorithm~\ref{alg:dataflow} on the
+next page, is a flow-sensitive, forward dataflow analysis similar to
+constant propagation.  Unlike a standard dataflow analysis, we can
+afford to symbolically execute all loop iterations, since most loops
+within a filter's work function have small bounds that are known at
+compile time (if a bound is statically unresolvable, the filter is
+unlikely to be linear and we disregard it).
+
+During symbolic execution, the algorithm computes the following for
+each point of the program (refer to Figure~\ref{fig:types} for
+notation):
+\begin{itemize}
+
+\vspace{-6pt}
+\item A $\mt{map}$ between each program variable $y$ and a linear form
+$\tup{\vec{v}}{c}$ where $\vec{v}[0 \cdots Peek]$ is a column vector 
+and $c$ is a scalar constant. In an actual execution, the value of $y$ would
+be given by $y = \vec{v} \cdot \vec{x} + c$, where $\vec{x}$ 
+represents the input items.
+\vspace{-6pt}
+
+\item Matrix $A$ and vector $\vec b$, which will represent the linear node.
+These values are constructed during the operation of the algorithm.
+\vspace{-6pt}
+
+\item $\mt{pushcount}$, which indicates how many items have been
+pushed so far.  This is used to determine which column of $A$ and
+$\vec{b}$ correspond to a given push statement.
+\vspace{-6pt}
+
+\item $\mt{popcount}$, which indicates how many items have been popped
+so far.  This is used to determine the row in $\vec{v}$ that a 
+given peek or pop expression refers to.
+\vspace{-6pt}
+
+\end{itemize}
+
+We now briefly discuss the operation of {\bf Extract} at each program
+node.  The algorithm is formulated in terms of a simplified set of
+instructions, which appear in Figure~\ref{fig:types}.  First are the
+nodes that generate fresh linear forms.  A constant assignment $y = c$
+creates a form $\tup{\vec 0}{c}$ for $y$, since $y$ has constant part
+$c$ and does not yet depend on the input.  A pop operation
+creates a form $\tup{\mbox{\bf BuildCoeff}(\mt{popcount})}{0}$, where
+{\bf BuildCoeff} introduces a coefficient of $1$ for the current index
+on the input stream.  A peek$(i)$ operation is similar, but
+offset by the index $i$.
+
 \begin{algorithm}[t]
 \caption{Linear extraction analysis.\protect\label{alg:dataflow}}
 proc {\bf Toplevel}(filter $F$) returns linear node for $F$ \vspace{-4pt}
@@ -20,11 +78,6 @@ proc {\bf BuildCoeff}(int $pos$) returns $\vec v$ for peek at index $pos$ \\ \vs
 \STATE return $\vec{v}$
 \end{algorithmic}
 \end{algorithm}
-
-\newcommand{\la}{$\leftarrow$}
-\newcommand{\IND}{\begin{ALC@g}}
-\newcommand{\UND}{\end{ALC@g}}
-\newcommand{\tup}[2]{\langle{#1}, {#2}\rangle}
 
 \begin{figure}[t]
 \vspace{-12pt}
@@ -53,7 +106,6 @@ code & \in & \mbox{list of instructions, each of which can be:} \\
 \caption{Data types for the extraction analysis.\protect\label{fig:types}}
 \vspace{-14pt}
 \end{figure}
-
 
 \begin{algorithm}
 proc {\bf Extract}($code$, $map$, $A$, $\vec b$, int $\mt{popcount}$, int $\mt{pushcount}$) \\
@@ -159,59 +211,6 @@ proc {\bf Extract}($code$, $map$, $A$, $\vec b$, int $\mt{popcount}$, int $\mt{p
 \STATE return ($\mt{map}$, $A$, ${\vec b}$, $\mt{popcount}$, $\mt{pushcount}$)
 \end{algorithmic}
 \end{algorithm}
-
-\section{Linear Extraction Algorithm}
-\label{sec:dataflow}
-
-Our linear extraction algorithm can identify a linear filter and
-construct a linear node $\lambda$ that fully captures its behavior.
-The technique, which appears as Algorithm~\ref{alg:dataflow} on the
-next page, is a flow-sensitive, forward dataflow analysis similar to
-constant propagation.  Unlike a standard dataflow analysis, we can
-afford to symbolically execute all loop iterations, since most loops
-within a filter's work function have small bounds that are known at
-compile time (if a bound is statically unresolvable, the filter is
-unlikely to be linear and we disregard it).
-
-During symbolic execution, the algorithm computes the following for
-each point of the program (refer to Figure~\ref{fig:types} for
-notation):
-\begin{itemize}
-
-\vspace{-6pt}
-\item A $\mt{map}$ between each program variable $y$ and a linear form
-$\tup{\vec{v}}{c}$ where $\vec{v}[0 \cdots Peek]$ is a column vector 
-and $c$ is a scalar constant. In an actual execution, the value of $y$ would
-be given by $y = \vec{v} \cdot \vec{x} + c$, where $\vec{x}$ 
-represents the input items.
-\vspace{-6pt}
-
-\item Matrix $A$ and vector $\vec b$, which will represent the linear node.
-These values are constructed during the operation of the algorithm.
-\vspace{-6pt}
-
-\item $\mt{pushcount}$, which indicates how many items have been
-pushed so far.  This is used to determine which column of $A$ and
-$\vec{b}$ correspond to a given push statement.
-\vspace{-6pt}
-
-\item $\mt{popcount}$, which indicates how many items have been popped
-so far.  This is used to determine the row in $\vec{v}$ that a 
-given peek or pop expression refers to.
-\vspace{-6pt}
-
-\end{itemize}
-
-We now briefly discuss the operation of {\bf Extract} at each program
-node.  The algorithm is formulated in terms of a simplified set of
-instructions, which appear in Figure~\ref{fig:types}.  First are the
-nodes that generate fresh linear forms.  A constant assignment $y = c$
-creates a form $\tup{\vec 0}{c}$ for $y$, since $y$ has constant part
-$c$ and does not yet depend on the input.  A pop operation
-creates a form $\tup{\mbox{\bf BuildCoeff}(\mt{popcount})}{0}$, where
-{\bf BuildCoeff} introduces a coefficient of $1$ for the current index
-on the input stream.  A peek$(i)$ operation is similar, but
-offset by the index $i$.
 
 Next are the instructions which combine linear forms.  In the case of
 addition or subtraction, we simply add the components of the linear
