@@ -1,0 +1,464 @@
+Table of Contents:
+
+* overview
+* dynamic rates
+* splitter/joiner types
+* messaging
+* pausing and re-initialization
+* open issues
+* applications
+* appendix: example messaging code
+
+---------------------------------------------------------------------------------------
+
+* overview
+
+- dynamic rate declarations as envisioned
+
+- new splitters/joiners
+  - "custom" type that can do computation, with parameterized rates and accessors
+  - inorder, ratio joiners
+    - ratio(*) can emulate "any"
+
+- messaging is hierarchical
+  - still can be reduced to SDEP concepts, but more modular specification
+  - resembles exception handling, with "sends" and "receives" instead of "throws"
+  - there are no portals, only handles
+    - support multicast with arrays:  target[*].sendMessage()
+    - note that type of array can be interface; elements can be instances
+
+- dynamic behavior allowed:  pausing/resuming, deallocating, re-initializing
+  - there is no dynamically sized containers, or dynamic add/delete
+  - add/delete behavior can be emulated by:
+    - enabling/disabling fixed set
+    - re-initializing last element to be hierarchical extension
+  - having no add/delete really simplified:
+    - dynamic memory allocation
+    - naming and static resolution of message targets
+
+- still several open issues, and details to work out
+
+---------------------------------------------------------------------------------------
+
+* dynamic rate declarations
+
+- the syntax is: work push [min,average,max]
+  - brackets are required to give intuition of range
+    - abandon min:average:max notation because it conflicts with custom splitters/joiners (see below)
+  - any element can appear as * to indicate wildcard
+  - if only two numbers appear, assume it is [min,max]
+    - this is equivalent to [min,*,max]
+  - if only one item appears, brackets must be removed
+    - can still have wildcard
+
+---------------------------------------------------------------------------------------
+
+* custom splitters / joiners
+
+- the syntax is:
+  int A[N], char B[M] -> int joiner (int N, int M) {
+    // pop variable range from A[i], 2 from each B[i]
+    work pop A[i]:[0,1,i], 2 push 1 {
+      A[i].pop();
+      B[i].pop();
+    }
+  }
+
+- notes:
+  - this allows compile-time type checking if there are different types on input
+  - for parameterizing rates: the A[i]: clause introduces a new variable i that 
+    takes the scope of the declaration.  You could have said A[j]:[0,1,j].
+  - similarly applies to splitters
+  - you have to declare "joiner" or "splitter" to help error checking (not just "filter")
+  - filters can now also declare names for their inputs, though they should be scalars, e.g.
+     int in -> int out filter foo(int G) {
+       out.push(in.pop());
+     }
+
+- reconfiguring custom splitters/joiners if child streams are paused
+  - programmer must manage timing manually
+  - shouldn't be hard, just send message with same latency as disable message
+
+* new joiner type:  ratio
+- ratio(N,M) takes N items from left, M items from right, but in any order
+  - guarantees that for every N+M items output: N from left, M from right
+- an ANY joiner is ratio(*,*)
+- example application: IP routing from multiple sources
+
+* new joiner type:  inorder
+- takes wavefronts in order from incoming streams
+- formal semantics to be specified
+
+---------------------------------------------------------------------------------------
+
+* messaging
+
+- messaging is now hierarchical, akin to exception handling
+  - each stream specifies:
+    - message signatures it sends
+    - message signatures it receives
+  - possible syntax:
+    - "pipeline Foo() {
+        sends handleMessage(int a, int b), handleMess2(float f);
+	receives messageIReceive(int a);
+    - more compact:  collapse message signatures into interface:
+       "pipeline Foo() sends SendingInterface receives ReceivingInterface {"
+       where:
+       interface SendingInterface { handler handleMessage(int a, int b); handler handleMess2(float f); }
+       interface ReceivingInterface { handler messageIReceive(int a); }
+  - intent with hierarchy:
+    - filters should send lots of messages, think of them like events
+    - parents pay attention to the ones they care about
+    - parents possibly initiate new messages to other children in reaction to message
+
+- syntax designed to allow parent to see which child is sending message
+  - example:
+    void->void pipeline Equalizer(int N) sends SignalError(float freq) {
+      LowPassFilter filter[N];
+
+      init { ... }
+
+      // the i'th equalizer component encountered error
+      handler filter[i].numericalError() @ 0 { // receive at latency 0
+          // indicate to parent that we have problem at given frequency
+          send SignalError(freq[i]);
+      }
+    }
+
+  - children stored in fields, called "handles"
+  - portals are replaced by arrays of handles; can send message to target[*].handleMessage()
+  - message handlers declared in terms of which handle sent message
+    - rationale: 
+       - avoids children passing handles up
+       - can have different handlers for different children of same type
+  - if stream declares handler without handle as prefix, then that handler 
+    is public, to be invoked by stream's *parent*
+     - note that this naming allows different handlers to be visible to 
+       children and parents (good thing)
+
+  - bigger example:  see Appendix 1.
+
+- clocks
+  - as part of hierarchical messaging, we will need a notion for what it 
+    means to "execute one step" of a container
+     - containers are timed with respect to a "clock"
+     - each tick of the clock corresponds to k executions of one of their children
+     - the container specifies k and the child (at init time and possibly in handler, see below)
+     - hierarchically, a series of clocks will translate to some number of executions of single filter
+        - an atomic step of a filter is a single execution (even with dynamic rates this is well-defined)
+     - default clocks:
+        - filter: the filter itself (has atomic step)
+        - splitjoin: the splitter
+        - pipeline: top-most stream
+
+- timing is still SDEP in compiler, but new way of specifying it hierarchically
+  - message latencies are specified in two places:
+     - in a parent handler declaration as it receives message from child
+     - in a parent send statement when it sends message to child
+     - (note that a child does NOT specify the latency when sending to parent)
+        - rationale:  children only raise events; parents know how to deal with them
+
+  - message latencies are measured using SDEP from the sender of the message to a "clock"
+     e.g., "handler filter[i].error() @ L clock MyUpstreamFilter { ... }
+      - this means that the handler will execute when a message arrives
+        at myUpstreamFilter, traveling from child[i] with SDEP latency L
+
+  - a clock indicates a execution step of a container, and is useful as a 1) a metric
+    when a parent is counting child executions, and 2) a well-timed message target
+  - corresponding to above, there are two places to specify clocks:
+    1. a clock for a whole container
+       - specified in init function, e.g. with "clock MyFilter" syntax
+       - if none specified, then defaults are:
+           - filter:  the filter itself (has atomic step)
+           - splitjoin:  the splitter
+           - pipeline: top-most stream
+           - feedback loop: the joiner 
+    2. a clock associated with each message handler
+      - a handler can declare a clock, e.g.:
+        handler child[i].setVolume() @ 0 clock myUpstreamFilter { ... }
+      - a handler can use a default clock (no "clock" in declaration):
+        - default clock for handler of child message is the child itself (the sender)
+        - default clock for handler of parent message is the clock of stream declaring handler
+          - rationale:  would actually prefer child message targets to be clock, but
+            there might be a fan-out, or there might not be any messages sent to children.
+
+  - note that clocks declared with a message handler in stream s are used to count 
+    atomic executions for s in parent handling of any messages that s *sends*.
+     - this serves as a temporary overriding of a stream's default clock for the
+       purposes of a given message
+     - rationale: the common case is using the sender as the clock for messaging
+
+  - note that in common case, we think that this scheme translates to a few SDEP constraints
+    - by default, all of upstream paths collapsed into single sender's constraint
+    - unfortunately, there are multiple messaging hops while going down on the receiver side
+      - if receiver specifies target as clock, then there will be single end-to-end SDEP constraint
+
+- delivery to/from disabled components is still well-timed
+  - if in a splitjoin, time with respect to splitter
+  - if in a pipeline, time with respect to identity
+  - if the component is freed / deallocated at time of arrival, message is ignored
+
+- to support messaging, a few extensions to container syntax:
+  1. a field can be declared "public"
+    - then its parent can tell you to disable a certain one of your children
+    - if a handle is declared public, it must be final:  assigned only once, and
+      from init function
+        - this allows compile-time resolution of message targets
+    - if handle is passed as argument to message, it must be passed as literal
+      - this allows compile-time resolution of targets
+      - also prevents type of grandchild from escaping, if that's desirable (?)
+  2. have separate "init" function declaration
+    - since containers now declare functions, can't have init be implicit
+    - if no other functions in container, can still keep old syntax for initialization
+
+---------------------------------------------------------------------------------------
+
+* pausing and re-initialization
+
+- there are two types of dynamic things you can do to stream (or it can do to itself):
+  1. pause/resume - suspends execution, preserving state of channels and filters
+  2. kill (or say "free"?) / init - suspends execution, deallocating resources for filters and channels
+
+  --> all of these are done with predefined message handlers by the given name
+   - i.e., predefined "pause", "resume", "kill", and "init"
+   - rationale for handler in child, rather than keyword from parent:
+     - might want to override (or prohibit) the behavior
+     - might want to re-initialize yourself
+     - might not want to depend on your parent to turn you off at the right time
+
+- init:  re-runs initializer for stream
+   - note that we now allow multiple init functions, though their argument
+     types have to be unambiguous so that the correct one can be selected
+     automatically
+   - if only one init function declared, can keep arguments in stream 
+   - note that call to "init" can also come when stream is running or paused
+     - in this case, there is an implicit "kill" sent with same latency
+
+- overriding:
+  - if you don't declare any of the methods, there is public no-argument version by default
+  - if you declare any methods with arguments, the default one disappears
+  - if it is overridden, it is called at the time of the pause/kill/resume/init event
+    - note: makes no difference if event is at "beginning" or "end" of call, as no
+      items flowing during message handler
+
+* draining
+- following pausing event at splitter, each filter in the paused segment
+is executed as much as possible so long as it can complete **atomically**
+
+- do atomic firing at filter level
+  - drains everyone as much as possible, atomically
+  - you might have to do rollback, but wouldn't be hard to implement
+    - one implementation would be suspension + double-buffering
+  - why not consider atomicity for containers?
+    - it is undefined in the presence of dynamic rates
+    - might never have a time when noone in the stream is executing
+
+- if custom joiner tries to read from empty, drained channel:
+  - the joiner is rolled back (does not fire)
+  - no error thrown to programmer (would be inconsistent w/ draining strategy)
+
+* filling
+- timing of the enable message: is with respect to the first new data
+item starting the 1) re-initialization OR 2) normal operation of
+the re-enabled stream.  Case 1) is if the channels were cleared when
+the stream was disabled; case 2) is if the channels were not cleared.
+
+- the fill depends on how the stream was drained:
+ 1. KILL: data killed, filter state killed:  requires "init" call as follow-up
+    --> run plain initialization schedule, including calls to prework
+ 2. PAUSE: data kept, filter state kept:
+    --> just resume steady-state schedule where it left off
+
+* semantics of "illegal" graphs after pausing or re-initializing
+- there is a compile-time error if there is a mismatching static rate in the graph
+  - i.e., if the rate declarations imply that there would be deadlock, buffer
+    overflow, or part of the stream would never execute (e.g., push 0 / pop 1 junction
+    in pipeline)
+
+- if a graph is re-initialized and the runtime structure contains a
+  rate-declaration error as in above, then the behavior is undefined
+
+- otherwise, execution is best-effort: a filter will fire whenever it
+  can do so atomically
+  - note that this means that a child can enable/disable itself even with custom splitter/joiner
+  - also, this means that burden is on compiler to fire anyone who can, atomically; should be
+    deterministic behavior between everyone supporting this contract
+
+---------------------------------------------------------------------------------------
+
+* open issues 1 (major)
+- what are restrictions on assigning, passing around stream handles?
+  - can you take one as an argument and then send message to it?  I guess.
+  - but you can't store an argument that you received as a local, right?
+    - do all message targets need to be resolved at compile time?
+- how to implement message timing across dynamic rates
+
+* open issues 2 (minor, with way I chose to resolve them)
+- can you push to paused stream? [Bill: yes, will not change answer]
+  - driving app: buffering up low-pririoty network packets
+  - but then, can you push to a killed stream?  hmm.
+- illegal graphs
+  - can you pause a joiner? [Bill: yes, scheduling adjusts]
+  - at one point we decided to make it illegal to disable sink, (if
+    it's not in splitjoin with other children) as it would be an
+    illegal stream graph.
+    [Bill: this is not illegal graph, it is just paused stream]
+  - we also decided to throw runtime error whenever there was "mismatching
+    rates" in graph.  Is there a difference between this and pausing?
+    [Bill: yes.  Illegal graph is mismatch between declared push rate 
+     of 0 and declared pop rate of strictly greater than 0.]
+- what is atomic execution step of ratio(N,M)?  [Bill: it is 1 item transfer]
+  - though this implies that compiler will have to remember where ratio was across a pause
+  - if atomic step is N+M instead, that is very coarse-grained (why not just do round-robin(N,M))
+- a lot of messaging corner cases
+  - stream sends message to parent, but before it arrives to parent, stream
+    is deallocated.  Should parent still receive it?  etc.
+  - target enables/disables itself while messages in flight
+  - cascaded messages, make sure all timing makes sense
+  - [Bill: leave these unspecified for now.  Practically speaking, who cares?]
+- send message to killed/freed region? [Bill: message ignored]
+- what to name primitive that kills channel contents, keeps filter state?
+  [Bill: eliminate this functionality, for reasons described above]
+
+* open issues 3 (details to attend to)
+- messaging syntax
+  - compact syntax for declaring what you send
+  - compact syntax for forwarding messages across containers
+    - want to forward both up/down, and possibly with varying clocks
+  - syntax for declaring clocks
+  - formalize typing rules: you must send what your children send and you don't receive from children
+    - but we don't currently force you to declare what you receive from children, so how do you report error?
+- formal writeup of inorder joiner semantics 
+  - consider null splitter, or some weights 0 on roundrobin
+- what happens if stream is killed/freed and then resumed w/o re-init?
+  - runtime error thrown?
+  - undefined?
+- does re-initializing a stream automatically start it running again, or do you have to explicitly enable()?
+
+* possible extensions
+- allow variable amount passed around feedback loop
+- reconfigurable splitters/joiners?
+  - currently no way for a splitjoin to reconfigure roundrobin to
+    duplicate without totally replacing the whole splitjoin
+- external interface to C
+- allow dynamic memory allocation within filters
+  - possibly support as dynamic arrays
+- union / tagged union type
+  - tag the items coming through a ratio joiner with their source?
+- teleport filters (to circumvent structure problems)
+- some better way of dealing with multi-dimensional data
+- templates
+
+* probably defunct ideas
+- type modifier to indicate that whole container is static rate
+  - documentation to user, esp. in the context of messaging
+  - allows atomicicity definition
+  - could help desugar teleport filters
+- allow ranges in a roundrobin, e.g., roundrobin(1-3, 2-4) which would
+allow some freedom in scheduling based on available items.  could also
+do roundrobin(*) for ANY joiner.
+
+---------------------------------------------------------------------------------------
+
+* applications (to follow up on)
+
+1. User-defined splitter
+
+- This video compression algorithm I think we can support with a
+user-defined splitter that does a lookup, deciding if unit is old or
+new:
+
+http://www.micsymposium.org/mics_2003/Nguyen.PDF
+
+Could also use messaging to register resulting units in table?
+
+2. Messaging
+
+- Constant Bit Rate (CBR). The output bit rate of the encoder is held
+constant by means of a feedback loop control. As soon as the output
+exceeds a given limit, the coding quality is reduced to decrease the
+number of bits per frame.
+
+http://www.stat.fi/isi99/proceedings/arkisto/varasto/rose0083.pdf
+
+3. MPEG encoder
+
+http://www.see.ed.ac.uk/~s0238762/research.activity/MSc.Dissertation-ISLI.2003-Ioannis.Nousias.pdf
+
+p. 36, good explanation
+also 150 pages of code
+
+---------------------------------------------------------------------------------------
+
+Appendix 1:  Example Messaging Code
+
+void->float pipeline Channel {
+
+  // declare the messages we throw, with their signatures
+  sends callEnded();
+
+  ...
+
+}
+
+void->float pipeline AMPSBaseStation(int N) {
+  receives disableBooster(), enableBooster();
+  // we send this message if there is no room for a channel
+  sends NoRoomForChannel();
+
+  Channel[N] channel;
+  boolean[N] active;
+  Booster booster;
+
+  init {
+    add splitjoin {
+      split roundrobin(0);
+      // start with N/2 channels
+      for (int i=0; i<N/2; i++) {
+        channel[i] = add Channel();
+        active[i] = true;
+      }
+      join roundrobin;
+    }
+    booster = add Booster();
+    // start with booster disabled
+    booster.pause();
+  }
+
+  // handle a call ended message from channel[i].
+  handler channel[i].callEnded() @ 0 {
+    // disable the channel immediately
+    channel[i].kill() @ 0;
+    // mark that this channel is unused
+    active[i] = false;
+  }
+
+  // this is a handler that we export to parent, since it is not in
+  // terms of a child field
+  handler startChannel() {
+    int i;
+    for (i=0; i<N; i++) {
+      if (!active[i]) {
+        // re-initialize free channel
+        channel[i].init() @ 0;
+        active[i] = true;
+        break;
+      }
+    }
+    // if we couldn't find a channel, throw error
+    if (i==N) {
+      send NoRoomForChannel();
+    }
+  }
+
+  // we can also export handlers addressing children
+  handler enableBooster() {
+    booster.resume() @ 0;
+  }
+  handler disableBooster() {
+    booster.pause() @ 0;
+  }
+}
+
+
+********************************************************************************
