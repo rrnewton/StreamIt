@@ -124,7 +124,7 @@ without violating this constraint.
 \caption{\small Scheduling constraints imposed by messages.}
 \label{tab:messcons}
 \end{center}
-\vspace{-12pt}
+\vspace{-20pt}
 \end{table*}
 
 The following definition leverages the $\sdep$ formalism to give a
@@ -273,14 +273,12 @@ Yet another way to approximate the behavior of messaging is with a
 direct function call from the detector to the RFtoIF stage.  (Though
 such a call is disallowed in StreamIt, it could be an option in a
 different programming model.)  While this approach is simple, it does
-not have any timing 
+not have any timing guarantees.  There is no way for the sender to
+know when in the course of the target's execution the message will be
+received.  This could cause problems both for algorithm development
+and for reliability / predictability of software.
 
 \input{code-examples}
-
-\noindent guarantees.  There is no way for the sender to know when in
-the course of the target's execution the message will be received.
-This could cause problems both for algorithm development and for
-reliability / predictability of software.
 
 \vspace{12pt}
 \subsection{Discussion}
