@@ -59,31 +59,31 @@ potentially deadlocking dependencies.
 \\
 \hline \hline
 FIR & 64 tap FIR & 
-125 & 5 & 1 & 1 & 0 & 132
+125 & 5 & 1 & 0 & 0 & 132
 \\ \hline
 Radar & Radar array front-end\cite{pca} & 
-549 & 8 & 3 & 3 & 0 & 52
+549 & 8 & 3 & 6 & 0 & 52
 \\ \hline
 Radio & FM Radio with an equalizer & 
-525 & 14 & 6 & 6 & 0 & 26
+525 & 14 & 6 & 4 & 0 & 26
 \\ \hline
 Sort & 32 element Bitonic Sort & 
-419 & 4 & 5 & 5 & 0 & 242
+419 & 4 & 5 & 6 & 0 & 242
 \\  \hline
 FFT & 64 element FFT & 
-200 & 3 & 3 & 3 & 0 & 24
+200 & 3 & 3 & 2 & 0 & 24
 \\  \hline
 Filterbank & 8 channel Filterbank & 
-650 & 9 & 3 & 3 & 1 & 51
+650 & 9 & 3 & 1 & 1 & 51
 \\  \hline
 GSM & GSM Decoder & 
-2261 & 26 & 11 & 11 & 2 & 46
+2261 & 26 & 11 & 7 & 2 & 46
 \\ \hline
 Vocoder & 28 channel Vocoder &  
-1964 & 55 & 8 & 8 & 1 & 101
+1964 & 55 & 8 & 12 & 1 & 101
 \\ \hline
 3GPP & 3GPP Radio Access Protocol &  
-1087 & 16 & 10 & 10 & 0 & 48
+1087 & 16 & 10 & 18 & 0 & 48
 \\ \hline
 \hline
 \end{tabular}
@@ -116,15 +116,15 @@ Vocoder & 28 channel Vocoder &
 \hspace{-5pt} {\bf (per 10$^5$ cycles)} \hspace{-5pt}
 \end{tabular} \\    
 \hline \hline
-FIR    & 86\% &  14 & 812 &  1094.9  & 293.5 & 445.6 \\ \hline
-Radar  & 79\% & 16 & 1,231 &     2.5  & {\it app. too large} & 0.041 \\ \hline
+FIR    & 86\% &  14 & 815 &  1188.1  & 293.5 & 445.6 \\ \hline
+Radar  & 79\% & 16 & 1,231 &     0.52  & {\it app. too large} & 0.041 \\ \hline
 Radio  & 73\% & 16 & 421 &    53.9  & 8.85 & 14.1 \\ \hline
 Sort   & 64\% & 16  & N/A &  2,664.4 & 225.6 & 239.4 \\ \hline
 FFT    & 42\% & 16  & 182 &  2,141.9 & 468.9 & 448.5  \\ \hline
 Filterbank & 
        41\% & 16  &  644 &   256.4  & 8.9 & 7.0   \\ \hline
 GSM    & 23\% & 16 & N/A &    80.9  & {\it app. too large} & 7.76 \\ \hline
-Vocoder& 23\% & 15  & 118 &     .31  & {\it app. too large} & 3.35  \\ \hline
+Vocoder& 23\% & 15  & 118 &     8.74  & {\it app. too large} & 3.35  \\ \hline
 3GPP   & 18\% & 16  & 44 &   119.6  & 17.3  & 65.7   \\ \hline \hline
 \end{tabular}
 \vspace{-6pt}
