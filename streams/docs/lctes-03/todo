@@ -22,10 +22,29 @@ medium priority
 high priority
 -------------
 
-- fix abstract, intro
+- fix abstract
+- change code, data graph to only show buffer size
 - cite michal's thesis
 - typeset the pseudocode, and split into different figures
 - add citations where needed
+- go through ptolemy directory on cag and see which papers are relevant
+  - also check p. 14 of bhatty's file
+  - add the APGAN/mincut paper to related work
+  - fix sentence in related work we were argueing about
 - check latex compilation errors
 - layout
 - spelling
+
+
+- fix the bibliography - especially some things that are completely
+missing journal names.  (comparison of synchronou s and cyclostatic
+dataflow; buffer merging; static scheduling of synchronous dataflow
+graphs; cyclo-dynamic dtaflow; minimizing buffer requirements under
+rate-optimal schedule; analyzing the realtime requireements; synthesis
+of embedded software
+
+- intuitive explanation of algorithm is confusing
+- say we iterate the compression step
+
+----
+

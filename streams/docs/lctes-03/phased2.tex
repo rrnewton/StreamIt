@@ -107,8 +107,10 @@ Note that the pseudocode given in Figure~\ref{fig:alg} specifies only
 the behavior of the algorithm, rather than the implementation.  In our
 implementation, we avoid symbolic execution of the entire steady state
 by calculating, from the bottom-up, the number of node firings that
-will be required in each phase.  In this technique, each child node is
-visited only once per phase calculation of the parent.
+will be required in each phase.  If upstream nodes produce more data
+than is necessary, then we drain this data through the stream by
+firing downstream nodes again.  In this technique, each child is
+visited no more than twice per calculation of a parent phase.
 
 %% \begin{table*}[t] \centering  \scriptsize
 %% \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
@@ -252,10 +254,6 @@ once in all executions of its parent, then its contents can be lifted
 into the parent (thereby eliminating a symbolic name.)  Finally, if
 there are adjacent invocations of the same phase, then we can run
 length encode the schedule and execute that phase in a loop.
-
-The compression has no negative effects on speed of execution, and
-never increases the size of a schedule.  Also, as expected, it has no
-effect on sigle appearance schedules
 
 %% During testing it was found that in some applications some operators
 %% had many phases that were identical to other phases of the

@@ -1,13 +1,14 @@
 \subsection{The {\StreamIt} Language}
 \label{sec:streamit}
 
-{\StreamIt} is an architecture-independent programming language for
-high-performance streaming applications.  This section contains a very
-brief overview of the semantics of {\StreamIt}.  We do not conncern
-ourselves with the syntax of the language, as it is not relevant to
-scheduling stream graphs. A more detailed description of the design
-and rationale for {\StreamIt} can be found in~\cite{thies02streamit}
-or on our website~\cite{streamitweb}.
+The source language for our scheduler is {\StreamIt}: an
+architecture-independent programming language for high-performance
+streaming applications.  This section contains a very brief overview
+of the semantics of {\StreamIt}.  We do not concern ourselves with the
+syntax of the language, as it is not relevant to scheduling stream
+graphs. A more detailed description of the design and rationale for
+{\StreamIt} can be found in~\cite{thies02streamit} or on our
+website~\cite{streamitweb}.
 
 \subsubsection{Language Constructs}
 
@@ -55,14 +56,11 @@ hierarchical streams (see Figure~\ref{fig:steady-state}).  The
 output of one connected to the input of the next.  The {\splitjoin}
 construct is used to specify independent parallel streams that diverge
 from a common {\splitter} and merge into a common {\joiner}--for
-example, in the Equalizer of Figure~\ref{fig:radio-ascoded}.  Within a
-{\splitjoin}, a {\splitter} collects $o_s$ data from its {\Input}
-{\Channel} and pushes $w_{s,i}$ data to its $i$th {\Output}
-{\Channel}.  Likewise, a {\joiner} collects $w_{j,i}$ items from its
-$i$th input {\Input}{\Channel} and pushes $u_j$ data to its
-{\Output}{\Channel}.  {\StreamIt} currently supports two types of
-{\splitters} ({\duplicate} and {\roundrobin}) and one type of
-{\joiner} (\roundrobin).
+example, in the Equalizer of Figure~\ref{fig:radio-ascoded}.  StreamIt
+currently supports two types of splitters: duplicate, which broadcasts
+its input items to each parallel stream, and roundrobin, which
+distributes items cyclically to one child after another according to
+an array of weights.  The joiner node must be a roundrobin.
 
 The last control construct provides a means for creating cycles in the
 stream graph: the {\feedbackloop}. A {\feedbackloop} contains a

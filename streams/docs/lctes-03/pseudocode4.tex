@@ -35,7 +35,7 @@ int phasesForFeedback(FeedbackLoop s, int mode) {
   do {
     phaseCount++
     dataAvail = # items on input tape of joiner(s)
-    for i = 1 to floor(dataAvail/joiner(s).weights[1])
+    for i = 1 to floor(dataAvail/joiner(s).pop[1])
       simulate(joiner(s))
     while (exists c \in s, c != joiner(s) and canFire(c) )
       simulate(c)
