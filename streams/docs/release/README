@@ -3,7 +3,7 @@ StreamIt Snapshot Release
 
 This is for the March 14, 2003 snapshot release (streamit-0.0.20030314).
 
-$Id: README,v 1.3 2003-03-13 19:42:57 dmaze Exp $
+$Id: README,v 1.4 2003-03-14 15:29:31 dmaze Exp $
 
 1. What is this?
 2. Dependencies
@@ -21,7 +21,7 @@ pieces.  See "caveats", below.  This compiler should produce
 functional code for both uniprocessor targets and the MIT RAW
 processor.
 
-There are three versions of this release.  These are:
+There are two versions of this release.  These are:
 
   streamit-src-0.0.20030314.tar.gz: "Source release."  This contains
   the full sources of the StreamIt compiler and runtime libraries, but
@@ -30,12 +30,6 @@ There are three versions of this release.  These are:
   streamit-0.0.20030314.tar.gz: "Full binary release."  This contains
   no sources, but does contain a Java jar file with the full
   compiler.
-
-  streamit-lib-0.0.20030314.tar.gz: "Library binary release."  This
-  contains a jar file with only the Java library version of StreamIt.
-  This package cannot be used to build uniprocessor or RAW binaries of
-  StreamIt programs, but it can run unoptimized StreamIt code under a
-  Java runtime.
 
 The StreamIt compiler is built on top of version 1.5B of the Kopi Java
 compiler from DMS Decision Management Systems GmbH.  Parts of the
@@ -55,14 +49,14 @@ http://cag.lcs.mit.edu/streamit/.
 The frontend depends on the ANTLR LL(k) parser generator; see
 http://www.antlr.org/.  If you are using the source release, the ANTLR
 classes must be in your Java CLASSPATH when compiling and running the
-StreamIt compiler.  If you are using one of the binary releases, the
-required ANTLR classes are already included in the StreamIt jar files.
+StreamIt compiler.  If you are using the binary release, the required
+ANTLR classes are already included in the StreamIt jar file.
 
 The C library depends on the FFTW library; see http://www.fftw.org/.
 FFTW should be installed somewhere in your default compiler search
-path if you are using the uniprocessor backend with either the source
-or full binary release.  You need to build single-precision versions
-of the library, such that you have an srfftw.h and a libsrfftw.a.
+path if you are using the uniprocessor compiler backend.  You need to
+build single-precision versions of the library, such that you have an
+srfftw.h and a libsrfftw.a.
 
 
 3. Caveats

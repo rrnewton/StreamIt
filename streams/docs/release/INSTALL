@@ -3,7 +3,7 @@ Installing the StreamIt Snapshot
 
 This is for the March 14, 2003 snapshot release (streamit-0.0.20030314).
 
-$Id: INSTALL,v 1.2 2003-03-12 22:41:12 dmaze Exp $
+$Id: INSTALL,v 1.3 2003-03-14 15:29:31 dmaze Exp $
 
 
 Unpack the StreamIt source tar file somewhere; this can be in your
@@ -14,7 +14,7 @@ shell's dotfiles).  If you have the source release, run:
   cd $STREAMIT_HOME/compiler
   make
 
-If you have either the source or compiler binary release, run:
+For either release, run:
 
   cd $STREAMIT_HOME/library/c
   make
@@ -26,10 +26,7 @@ You should now be able to run the compiler.  For a minimal test:
   knit HelloWorld6.str
   ./a.out -i10
 
-This should print the numbers 0 through 9, in order.  With the Java
-library release, running 'knit' should produce an infinite number of
-outputs, but you can run 'java HelloWorld6 -i10' afterwards to produce
-fewer outputs.
+This should print the numbers 0 through 9, in order.
 
 
 PER-USER SETUP: depends on the shell you use; you need to set the
@@ -72,9 +69,6 @@ You may also need to add $STREAMIT_HOME/include/tex to the TEXINPUTS
 environment variable to rebuild some of the documentation.  That
 variable should have a trailing colon to pick up the default search
 directories for LaTeX.
-
-LIBRARY RELEASE: Follow the instructions above under "Binary Release",
-but use streamit-lib.jar rather than streamit.jar.
 
 
 Local variables:
