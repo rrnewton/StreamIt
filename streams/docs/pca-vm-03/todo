@@ -18,6 +18,9 @@ transferred?  I'm assuming yes.
 - should we remove bool's in favor of ints?
 
 - did I add size_t correctly?
+  - do you think size_t needs to be explained in the document?
+  - why do you have an "int index" argument to blockRead / blockWrite instead of size_t?
+  - also the length on pre-defined kernel move?
 
 - I added n argument as FIRST one of pushMulticast, waitMultiple.  Is
 that correct?
@@ -42,7 +45,7 @@ within the bounds of their blocks.
 - in the reference implementation for indexed scatter/gather, why does
 the length have to be sizetype?  It could actually be larger than
 sizetype, as you could have an index repeated in multiple locations of
-the index stream
+the index stream.  is this a concern?
 
 - in indexed scatter/gather, there is an unpacking issue since the
 generic function doesn't know the type of the index stream.  i
@@ -59,7 +62,7 @@ strided kernels?  Can any DMA return overlapping strides?
 Extra Todo:
 -----------
 
-- add size_t where it appears in svm.c
+x add size_t where it appears in svm.c
 
   size_t is the unsigned integral type of the result of the sizeof
   operator.  it represents the size of the largest data object you can
@@ -157,6 +160,7 @@ x p26, Error Handling, last line: change "was" to "were" -- it's
 x p28, third line: Change "consuming the EOS" to "consuming all data
   elements in the FIFO".  There may not be an EOS.
 
+=============================================================================
 
 big things
 ----------
