@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#!/usr/uns/bin/perl -w
 use strict;
 require HTML::TreeBuilder;
 require HTML::FormatText;
