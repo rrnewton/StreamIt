@@ -2,9 +2,8 @@ all: main.ps
 
 main.ps: main.dvi 
 	dvips -P cmz -t letter -o main.ps main.dvi
-	cp main.ps ${HOME}/public_html/pldi.ps
-	rm ${HOME}/public_html/pldi.ps.gz
-	gzip ${HOME}/public_html/pldi.ps
+	ps2pdf main.ps
+	cp main.pdf ${HOME}/public_html/pldi.pdf
 
 main.pdf: main.ps
 	ps2pdf main.ps
