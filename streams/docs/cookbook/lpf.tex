@@ -6,23 +6,13 @@ float->float filter LowPassFilter(float rate, float cutoff, int taps) {
   init {
     int i;
     float m = taps - 1;
-    if (cutoff == 0.0) {
-      float total = 0;
-      for (i = 0; i < taps; i++) {
-        coeff[i] = 0.54 - 0.46 * cos(2*pi*i/m);
-        total += coeff[i];
-      }
-      for (i = 0; i < taps; i++)
-        coeff[i] /= total;
-    } else {
-      float w = 2 * pi * cutoff / rate;
-      for (i = 0; i < taps; i++) {
-        if (i - m/2 == 0)
-          coeff[i] = w/pi;
-        else
-          coeff[i] = sin(w*(i-m/2)) / pi / (i-m/2) *
-            (0.54 - 0.46 * cos(2*pi*i/m));
-      }
+    float w = 2 * pi * cutoff / rate;
+    for (i = 0; i < taps; i++) {
+      if (i - m/2 == 0)
+        coeff[i] = w/pi;
+      else
+        coeff[i] = sin(w*(i-m/2)) / pi / (i-m/2) *
+          (0.54 - 0.46 * cos(2*pi*i/m));
     }
   }
   work pop 1 push 1 peek taps {
