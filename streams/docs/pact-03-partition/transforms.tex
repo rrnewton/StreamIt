@@ -56,13 +56,13 @@ practice on interface boundaries where compound data streams are being
 interleaved at a static rate.
 
 A more aggressive transformation for synchronization removal is {\tt
-removeStructuredSyncPoints} (see Figures~\ref{code:sync1}
-and~\ref{code:sync2}).  This algorithm removes not only
-synchronization points with exactly matching weights, but it also
-expands any join/split pair where the set of incoming and outgoing
-streams can be partitioned such that no data item is passed between
-members of different partitions during a steady-state execution.  The
-only disadvantage of this transformation over {\tt
+removeStructuredSyncPoints} (see Figures~\ref{code:sync}
+and~\ref{ex:sync}).  This algorithm removes not only synchronization
+points with exactly matching weights, but it also expands any
+join/split pair where the set of incoming and outgoing streams can be
+partitioned such that no data item is passed between members of
+different partitions during a steady-state execution.  The only
+disadvantage of this transformation over {\tt
 removeMatchingSyncPoints} is that it has the potential to introduce
 non-adjacent joiners, which in the StreamIt compiler requiers
 additional processor resources.  However, like all transformations
