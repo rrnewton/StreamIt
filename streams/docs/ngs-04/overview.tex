@@ -64,7 +64,7 @@ graph.
 The basic unit of computation  in StreamIt is the \texttt{filter}.  An
 example   of  a   \texttt{filter}   from  our   software  radio   (see
 Figure~\ref{fig:radiodiagram})  is  the  \texttt{FIRFilter}, shown  in
-Figure~\ref{fig:firstreamit}.  Each  fitler has an  input channel from
+Figure~\ref{fig:firstreamit}.  Each  filter has an  input channel from
 which it  reads data, and an  output channel to which  it writes data.
 The filter also contains a \texttt{work} function, which describes the
 filter's most fine grained execution step in the steady state.  Within
@@ -78,7 +78,7 @@ argument $x$ is  passed by value; if it is an  object, a separate copy
 is enqueued  on the  channel. Currently, the  number of  items peeked,
 popped, and pushed by each filter must be constant from one invocation
 of the \texttt{work}  function to the next.  In  fact, as described in
-the sequal,  the input and  output rates are  declared as part  of the
+the sequel,  the input and  output rates are  declared as part  of the
 \texttt{work} function declaration; a  violation of the declared rates
 results in a runtime error  and the subsequent behavior of the program
 is undefined. We plan to support variables input and output rates in a
@@ -178,7 +178,7 @@ StreamIt provides three constructs for composing filters into a
 communicating network. They are \texttt{pipeline}, \texttt{splitjoin}, and
 \texttt{feedbackloop} (see Figure~\ref{fig:structuresp}).  Each
 structure  specifies a pre-defined  way of  connecting filters  into a
-single-input,  single-output   block,  henceforth  refered   to  as  a
+single-input,  single-output   block,  henceforth  refereed   to  as  a
 ``stream''.  That is, a stream is any instance of a \texttt{filter},
 \texttt{pipeline}, \texttt{splitjoin}, or \texttt{feedbackloop}. 
 Generally,  a  pipeline is  for  building  a  sequence of  streams,  a
@@ -266,7 +266,7 @@ one or more of the weights are zero.
 Similarly,  the joiner  is used  to indicate  how the  outputs  of the
 parallel  streams  are  interleaved  on  the  output  channel  of  the
 split-join.  The  only supported joiner  is \texttt{roundrobin}, which
-is analagous to a round-robin splitter.
+is analogous to a round-robin splitter.
 
 The   splitter  and  joiner   types  are   specified  with   calls  to
 \texttt{split}      and     \texttt{join},      respectively.      The
@@ -280,7 +280,7 @@ The \texttt{feedbackloop} construct provides a way to create cycles in
 the    stream    graph.      The    \texttt{Fibonacci}    stream    in
 Figure~\ref{fig:feed}  illustrates the  use of  this  construct.  Each
 feedback loop  contains: 1) a body  stream, which is  the block around
-which  a backwards  ``feedback  path''  is being  created,  2) a  loop
+which  a backward  ``feedback  path''  is being  created,  2) a  loop
 stream, which can perform some computation along the feedback path, 3)
 a splitter, which  distributes data between the feedback  path and the
 output  channel at  the bottom  of the  loop, and  4) a  joiner, which
@@ -301,7 +301,7 @@ respectively.
 %
 The splitters and joiners can  be any of those for \texttt{splitjoin},
 with   the   exception  of   \texttt{roundrobin(0)}.    The  call   to
-\texttt{loop} may be ommitted if no computation is performed along the
+\texttt{loop} may be omitted if no computation is performed along the
 feedback path.
 
 The  feedback loop  has special  semantics  when the  stream is  first
@@ -339,7 +339,7 @@ Furthermore, the  graphical programming environment  we have developed
 for StreamIt has the advantage  that every stream graph corresponds to
 a precise textual  counterpart that is easily edited  by a programmer.
 Further,  the hierarchical  structure of  the stream  graph simplifies
-visualization,  and  hence  the  graphical development  enviroment  is
+visualization,  and  hence  the  graphical development  environment  is
 better suited for large scale application development.
 
 %On first glance, the statements within StreamIt {\tt init} function
@@ -512,7 +512,7 @@ steady-state execution time, and ad-hoc draining techniques could risk
 losing data or deadlocking the system.
 
 StreamIt improves on this situation by abstracting the
-re-initialization process from the user.  That is, no auxillary
+re-initialization process from the user.  That is, no axillary
 control program is needed to drain the old streams and create the new
 structure; the user need only trigger the reinitialization process
 through a message.  Additionally, any hierarchical stream construct

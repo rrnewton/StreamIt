@@ -127,11 +127,14 @@ joins the parallel streams in a split-join.  These fusion
 optimizations are shown in Figures~\ref{fig:vert-fusion} and
 \ref{fig:horiz-fusion} respectively.
 
-The StreamIt compiler also contains an optimization that detects FIR
-filters in a program\cite{lamb03}.  If adjacent filters in a pipeline
-are both FIRs, they can be combined into a single equivalent FIR
-filter.  The compiler can also process larger FIRs in the frequency
-domain when this results in faster code.
+The  StreamIt   compiler  also  contains  a   set  of  domain-specific
+optimizations for linear  filters, in which each output  is a weighted
+sum of  the inputs (e.g.,  FIR, FFT, DCT). The  compiler automatically
+detects   linear   filters    and   performs   large-scale   algebraic
+simplification   of  adjacent   components,  as   well   as  automated
+translation into the frequency  domain when the transformation results
+in  faster  code \cite{lamb-pldi03}.  These  techniques yield  average
+speedups of 450\% for benchmarks for our evaluation suite.
 
 We have implemented a number of stream programs to test the
 performance of our compiler.  These are summarized in
