@@ -2,87 +2,91 @@
 // (x1..x2, y1..y2) of Stream s if Transform t is applied
 Config memoTable[s][t][x1][x2][y1][y2]
 
-// given original Stream <s>, return optimized stream
+/** 
+ * Given original Stream <s>, return optimized stream
+ */
 Stream toplevel(Stream s)
--------------------------------------------------------------------------
-initialize all entries of memoTable to Cost(-1, null)
-return getCost(s, Transform.ANY).str;
+  initialize all entries of memoTable to Cost(-1, null)
+  return getCost(s, Transform.ANY).str;
 
-// returns lowest-cost Config for Stream <s> under Transform <t>
+/**
+ * Returns lowest-cost Config for Stream <s> under Transform <t>
+ */
 Config getCost(Stream s, Transform t)
--------------------------------------------------------------------------
-if (t==Transform.ANY)
-  c1 = getCost(s, Transform.LINEAR);
-  c2 = getCost(s, Transform.FREQ);
-  c3 = getCost(s, Transform.NONE);
-  return ci s.t. ci.cost = min(c1.cost, c2.cost, c3.cost)
-if (s is Node)
-  return getNodeCost(s, t)
-if (s is Container)
-  maxWidth = max(s.width[0], ..., s.width[s.height-1])
-  return getContainerCost(s, t, 0, maxWidth-1, 0, s.height-1)
+  if (t==Transform.ANY)
+    c1 = getCost(s, Transform.LINEAR);
+    c2 = getCost(s, Transform.FREQ);
+    c3 = getCost(s, Transform.NONE);
+    return ci s.t. ci.cost = min(c1.cost, c2.cost, c3.cost)
+  if (s is Node)
+    return getNodeCost(s, t)
+  if (s is Container)
+    maxWidth = max(s.width[0], ..., s.width[s.height-1])
+    return getContainerCost(s, t, 0, maxWidth-1, 0, s.height-1)
 
-// returns lowest-cost Config for Node <s> under Transform <t>
+/**
+ * Returns lowest-cost Config for Node <s> under Transform <t>
+ */ 
 Config getNodeCost(Stream s, Transform t)
--------------------------------------------------------------------------
-// scale cost by the number of times <s> executes in the steady-state schedule
-scalingFactor = executionsPerSteadyState(s)
+  // scale cost by the number of times <s> executes in the steady-state schedule
+  scalingFactor = executionsPerSteadyState(s)
 
-if (t==Transform.LINEAR)
-  if (isLinear(s))
-    return Config(scalingFactor * getDirectCost(s), s)
-  else
-    return INFINITY
+  if (t==Transform.LINEAR)
+    if (isLinear(s))
+      return Config(scalingFactor * getDirectCost(s), s)
+    else
+      return INFINITY
 
-if (t==Transform.FREQ)
-  if (isLinear(s) && canConvertToFrequency(s))
-    return Config(scalingFactor * getFrequencyCost(s), s)
-  else 
-    return Config(INFINITY, s)
+  if (t==Transform.FREQ)
+    if (isLinear(s) && canConvertToFrequency(s))
+      return Config(scalingFactor * getFrequencyCost(s), s)
+    else 
+      return Config(INFINITY, s)
 
-if (t==Transform.NONE)
-  if (isLinear(s))
-    return Config(scalingFactor * getDirectCost(s), s)
-  else
-    return Config(0, s)
+  if (t==Transform.NONE)
+    if (isLinear(s))
+      return Config(scalingFactor * getDirectCost(s), s)
+    else
+      return Config(0, s)
 
-// returns lowest-cost Config for children (x1..x2, y1..y2) of
-// Container <s> under Transform <t>
+/** 
+ * Returns lowest-cost Config for children (x1..x2, y1..y2) of
+ * Container <s> under Transform <t>
+ */
 Config getContainerCost(stream s, Transform t, int x1, int x2, int y1, int y2)
--------------------------------------------------------------------------
-// if we've exceeded the width of this node, then trim down to actual width
-x2 = min (x2, max (width[y1], ..., width[y2]) - 1)
+  // if we've exceeded the width of this node, then trim down to actual width
+  x2 = min (x2, max (width[y1], ..., width[y2]) - 1)
 
-// if value is memoized, return it
-if (memoTable[s][t][x1][x2][y1][y2] != -1)
-  return memoTable[s][t][x1][x2][y1][y2]
+  // if value is memoized, return it
+  if (memoTable[s][t][x1][x2][y1][y2] != -1)
+    return memoTable[s][t][x1][x2][y1][y2]
 
-// if down to one child, descend into it
-if (x1==x2 && y1==y2)
-  result = getCost(s.child[x1][y1], t)
+  // if down to one child, descend into it
+  if (x1==x2 && y1==y2)
+    result = getCost(s.child[x1][y1], t)
 
-// if the transform will collapse children, then treat them as a single node
-if (t==Transform.LINEAR || t==Transform.FREQ)
-  result = getNodeCost(extractSubstream(s, x1, x2, y1, y2), t)
+  // if the transform will collapse children, then treat them as a single node
+  if (t==Transform.LINEAR || t==Transform.FREQ)
+    result = getNodeCost(extractSubstream(s, x1, x2, y1, y2), t)
 
-if (t==Transform.NONE)
-  result = Cost(INFINITY, s)
-  // try horizontal cut
-  for yPivot = y1 to y2-1
-    // evaluate cost of 2-element Pipeline; remember Config if it is best so far
-    child1 = getCost(s, Transform.ANY, x1, x2, y1, yPivot)
-    child2 = getCost(s, Transform.ANY, x1, x2, yPivot+1, y2)
-    if (child1.cost + child2.cost < result.cost)
-      result = Cost(child1.cost + child2.cost, Pipeline(child1.str, chidl2.str))
-
-  // can only do a vertical cut if all child streams belong to the same splitjoin
-  if (sameSplitJoinParent(s.child[x1][y1], s.child[x2][y2]))
-    for xPivot = x1 to x2-1
-      // evaluate cost of 2-element SplitJoin; remember Config if it is best so far
-      child1 = getCost(s, Transform.ANY, x1, xPivot, y1, y2)
-      child2 = getCost(s, Transform.ANY, xPivot+1, x2, y1, y2)
+  if (t==Transform.NONE)
+    result = Cost(INFINITY, s)
+    // try horizontal cut
+    for yPivot = y1 to y2-1
+      // evaluate cost of 2-element Pipeline; remember Config if it is best so far
+      child1 = getCost(s, Transform.ANY, x1, x2, y1, yPivot)
+      child2 = getCost(s, Transform.ANY, x1, x2, yPivot+1, y2)
       if (child1.cost + child2.cost < result.cost)
-        result = Cost(child1.cost + child2.cost, SplitJoin(child1.str, chidl2.str))
+        result = Cost(child1.cost + child2.cost, Pipeline(child1.str, chidl2.str))
 
-memoTable[s][t][x1][x2][y1][y2] = result;
-return result
+    // can only do a vertical cut if all child streams belong to the same splitjoin
+    if (sameSplitJoinParent(s.child[x1][y1], s.child[x2][y2]))
+      for xPivot = x1 to x2-1
+        // evaluate cost of 2-element SplitJoin; remember Config if it is best so far
+        child1 = getCost(s, Transform.ANY, x1, xPivot, y1, y2)
+        child2 = getCost(s, Transform.ANY, xPivot+1, x2, y1, y2)
+        if (child1.cost + child2.cost < result.cost)
+          result = Cost(child1.cost + child2.cost, SplitJoin(child1.str, chidl2.str))
+
+  memoTable[s][t][x1][x2][y1][y2] = result;
+  return result
