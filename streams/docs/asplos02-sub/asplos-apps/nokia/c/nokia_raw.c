@@ -68,7 +68,7 @@ doDecode() {
 	}
 
 	Decode(C,h,r);
-	print_string("done");
+	raw_test_pass_reg("done");
 
   return 0;
 }
