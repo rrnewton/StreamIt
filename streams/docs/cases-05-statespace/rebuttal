@@ -1,0 +1,81 @@
+We thank the reviewers for their comments.  We believe our paper is
+appropriate for CGO because it develops a rigorous framework for
+representing and optimizing stream programs.  As stream programs are
+becoming more common in both embedded and high-performance systems,
+optimizations for streams are of interest to much of the CGO audience.
+Our paper adapts well-known techniques in linear state space theory to
+the realm of programming languages and compilers.  We consider such
+"domain-specific optimizations" to be a new and promising avenue for
+optimizing compilers, and thus of central importance to CGO.
+
+Reviews 376 and 338 seek a better explanation for why DSP applications
+typically defy high-level analysis.  As detailed in a CC'02 paper
+(reference #18), languages such as C are nearly impossible to analyze
+due to: 1) complex modulo expressions for circular buffers, 2)
+possible aliasing between internal states of different filters, 3)
+scheduling is done by hand, obscuring parallelism, 4) atomic execution
+steps are muddled with global control flow, and 5) FIFO's between
+channels are muddled with global data.  Also, general programs differ
+from the Synchronous Dataflow model because they lack the explicit I/O
+rates exploited by our analysis.  For these reasons, we believe it is
+completely infeasible to perform linear state-space optimizations on a
+traditional IR.  We will expand on this point in the final version.
+
+Review 326 states that our results are significantly different from
+those reported in a PLDI'04 paper (reference #11).  There is no
+inconsistency.  In reference #11, the "linear" bar of Figure 15 shows
+the percentage of FLOPS *removed*.  In the current submission, Table 1
+shows the percentage of FLOPS *remaining*.  Thus, the numbers for FIR,
+FM, and ChannelVocoder are identical in the two papers.  FFT is not
+included in reference #11.  The only discrepancy is for FilterBank,
+which is due to a naming conflict: the two papers evaluate completely
+different filter bank applications.  We apologize for this confusion
+and will rename FilterBank to FilterBank2 in the final submission.
+
+Review 248 asks about our analysis for extracting linear state space
+representations.  Yes, one can construct cases where symbolic
+evaluation of multiple filter iterations is needed to detect that a
+filter is linear state space.  However, we believe that the
+overwhelming majority of practical instances exhibit the state space
+property on each iteration.  If desired, unrolling can be used to
+expose additional cases.  Regarding how the analysis infers peek and
+pop rates: they are declared with each work function (see Figure 3).
+
+Review 338 notes that the expanded version of this work (anonymous
+reference #1) should be made available as part of the final version.
+We agree; it is already available online (with a permanent URL).
+
+----------------------------------------
+
+x relevance
+  59 - should be evaluated by linear system optimization people
+
+- weak results
+  248 - only flops
+  286 - only compares to precursor.  Can't you generate machine code?
+  376 - no reference for evaluation
+
+x "DSP applications typicall defy high level compiler analysis"
+  338 - need nominal explanation
+
+  376 - you replicate representations to make interface issues
+        explicit.  If applied same techniques in traditional IR, how
+        would results compare?
+
+x specific: 248
+  - Is executing one iteration always sufficient? For example, if the
+    computation of iteration depends on the results from a number of
+    previous iterations, wouldn't one want to symbolically execute a
+    number of iterations to capture the steady state? 
+
+  - What is the program analysis to determine whether a peek rate is
+    greater than its pop rate?
+
+x specific: 326
+
+  - "significantly different results from those reported in their PLDI
+    paper."
+
+x specific: 338
+  - Master's thesis, referenced anonymously.
+   --> will be accessible.  It's already online in permanent place.
