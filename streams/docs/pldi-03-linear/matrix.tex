@@ -12,8 +12,8 @@
 \section{Representing Linear Nodes}
 \label{sec:linearrep}
 
-There is no general relationship that must hold between a {\tt
-filter}'s input data and its output data. In actual applications, the
+There is no general relationship that must hold between a
+filter's input data and its output data. In actual applications, the
 output is typically derived from the input, but the relationship is
 not always clear since a filter has state and can call external
 functions.
@@ -79,8 +79,8 @@ Finally, $o$ items are popped from the input tape.
 The intuition of the computation represented by a linear node is
 simply that specific columns generate specific outputs and specific
 rows correspond to using specific inputs.  The values found in row
-$e-i-1$ of ${\mathbf A}$ represents the weights given to the $i$th
+$e-i-1$ of $A$ represents the weights given to the $i$th
 input element when computing each output.  The values in column
-$u-j-1$ of ${\mathbf A}$ and column $u-j-1$ of ${\mathbf b}$ ({\it
+$u-j-1$ of $A$ and column $u-j-1$ of ${\vec b}$ ({\it
 i.e.} the $j$th column from the right) represent the formula to
 compute the $j$th output.

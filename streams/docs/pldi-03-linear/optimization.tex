@@ -34,7 +34,7 @@ computational transforms even more daunting.
 The convolution sum $y[n]=x[n]*h[n]$ is defined as
 $y[n]=\sum_{k=-\infty}^{\infty}x[k]h[n-k]$. In StreamIt, if a 
 stream is calculating a convolution sum the input
-($x[n]$) and output ($y[n]$), correspond exactly to the input and
+($x[n]$) and output ($y[n]$) correspond exactly to the input and
 output tapes where where $n$ denotes an index in the time domain.  
 Furthermore, a stream will be computing a
 convolution sum when $o=1$ in which case we can identify the values
@@ -77,15 +77,15 @@ The stream's {\tt work} function is changed to perform the following:
 %this is where the fun starts.  
 
 To implement this transformation, the compiler needs to compute $H[k]$ at
-compile time. Because the compiler is transforming an FIR filter 
-which has $h[n]$ of length $e$ and push rate $u=1$, the filter needs to be 
-expanded in order to overcome the constant factors hidden in the asymptotic savings.
-Therefore, the transformed filter needs to produce more that one output on each
+compile time. The compiler transforms FIR filters 
+which have $h[n]$ of length $e$ and push rate $u=1$, which 
+requires expanding the filter to overcome the constant overhead factors.
+Therefore, the transformed filter needs to produce more than one output on each
 execution of {\tt work}. The number of outputs, $N$, to produce on each 
-execution of {\tt work} is determined automatically by the compiler and set to be 
+execution of {\tt work} is determined automatically by the compiler and set to 
 approximately $2e$, a number determined by empirical observations. $N$ is then rounded 
 up such that $N+2(e-1)$ is a power of two which results in the most efficient 
-FFT calculation.
+FFT calculations.
 
 The frequency transformation generates a new filter that
 peeks $e'=N+e-1$ items each execution where the original stream used only $e$.
