@@ -1,0 +1,50 @@
+\section{Communication Scheduler}
+With the nodes of the stream graph assigned to computation nodes of
+the target, the next phase of the compiler must map the communication
+explicit in the stream graph to the interconnect of the target.  This
+is the task of the communication scheduler.  The communication
+scheduler maps the infinite FIFO abstraction of the stream channels to
+the limited resources of the target.  The communication scheduler must
+avoid deadlock and starvation while trying to utilize the parallelism
+explicit in the stream graph.
+
+The exact implementation of the communication scheduler is tied to the
+communication model of the target.  For targets implementing an
+end-to-end, infinite FIFO abstraction [are there any???], the
+scheduler only needs to decide to whom to send an item and from whom
+to receive an item.  As the communication model becomes more
+constrained, the communication scheduler become more complex,
+requiring analysis of the stream graph. For target implementing a
+finite, blocking near-neighbor communication model, the exact ordering
+of tile execution must be specified.  Raw's communication model falls
+under this category.
+
+Due to the static nature of StreamIt, the compiler can manage the
+communication resources statically.  We can create an initialization
+schedule and a steady-state schedule that fully describe the execution
+of the stream graph.  The schedules can give us an order for execution
+of the graph if necessary.  We can generate ordering to minimize
+buffer length, maximize parallelism, or minimize latency.  We can
+disregard the ordering and just use the execution counts of each node
+in the stream graph to decide when the job of the communication
+scheduler is complete.  Thus, we can create a communication scheduler
+of arbitrary detail.  If the architecture must statically orchestrate
+all aspects of communication, the streamit language provides this
+facility.
+
+Deadlock must be carefully avoided in the communication
+scheduler. Each architecture requires a different deadlock avoidance
+mechanism and we will not go into a detailed explanation of deadlock
+here.  In general, deadlock occurs when there is a circular dependence
+on resources.  A circular dependence can surface in the stream graph
+or in the routing pattern of the layout.  If the architecture does not
+provide sufficient buffering, the scheduler must serialize all
+potentially deadlocking dependencies.
+
+Two StreamIt language constructs that can lead to deadlock are
+FeedbackLoops and Joiners. Figure ?? describes the potential for
+deadlock in a FeedbackLoop.  One potential solution is to forbid
+filters of the FeedbackLoop to interleave sends and receives.  This
+has the effect of serializing the FeedbackLoop. In figure ?? we
+descibe the potential for deadlock introduced by Joiner nodes.  A
+solution to this problem is described below.

@@ -55,3 +55,58 @@ this knowledge to take advantage of the specific properties of the
 architecture.  For example, in a Smart Memories architecture [ref], we
 would like to place the nodes that communicate over an expensive
 channel on the same quad.
+
+\subsection{Layout on Raw}
+
+The layout phase of our StreamIt compiler maps nodes in the stream
+graph to the tile processors on Raw.  Each tile processor looks very
+much likes a MIPS R4000[ref].  The tile processor uses a MIPS
+instruction set with some slight modifications for inter-tile
+communication.  The layout phase does not assign each node in the
+stream graph to a processor.  Splitter nodes are folded into their
+neighboring up-stream filter and neighboring joiners are collapsed
+into a single tile.  This mapping will be explained in more depth in
+the next section.  Again, all nodes needing assignment are mapped to
+exactly one tile processor.
+
+Due to the properties of the static network and the communication
+scheduler (see next section), the layout phase does not have to worry
+about deadlock.  All assignments of nodes to tiles are legal.  This
+gives simulated annealing the flexibility to search many possibilities
+and simplifies the layout phase.  The perturbation function used in
+simulated annealing simply swaps the assignment of two randomly chosen
+tile processors.
+
+The cost function is the most important parameter of the simulated
+annealing algorithm.  After some experimentation, we have arrived at
+the following cost function: 
+
+%%Sum over channels (items(channel) *
+%%(hops(channel) + (num_assigned(channel) * 2)^3) 
+
+Where item(channel) gives the number of data items that traverse the
+channel for each steady state execution.  Hops(channel) gives the
+number of intermediate tiles traversed on the route of the channel.
+Finally, assigned attempts to give a cost to the added
+synchronization imposed by this channel assignment.  assigned
+calculates the number of tiles that are assigned to filters plus the
+number of tiles involved in routing other channels on the route.
+
+With the above cost function, we heavily weigh the added
+synchronization imposed by the layout.  For Raw this metric is far
+more important than the length of the route because neighbor
+communication over the static network is cheap.  If a tile that is
+assigned a filter must route data items through it, then it must
+synchronize the routing of these items with the execution of its
+work().  Also, a tile that is involved in the routing of many
+channels must serialize the routes running through it.  Both limit
+the amount of parallelism in the layout and need to be avoided.
+
+Using the parameters described above, simulated annealing calculates
+highly optimized assignments.  The layouts are generated rather
+quickly (about ?? minutes for the FMRadio application).  In figure ?? 
+we show the initial random placement for the load-balanced FMRadio and
+in figure ?? + 1 we show the layout annealing calculated.  Clearly,
+the optimized assignment is superior to the random placement.
+Importantly, the optimized placement minimizes the number of filters
+involved in routing data.
