@@ -171,11 +171,9 @@ class FIR extends Filter {
    Channel input = new FloatChannel();
    Channel output = new FloatChannel();           
    int N;
-
    void init(int N) {
       this.N = N;
    }
-
    void work() {
       Float sum = 0;
       for (int i=0; i<N; i++) {
@@ -183,6 +181,12 @@ class FIR extends Filter {
       }
       input.pop();
       output.push(sum);
+   }
+}
+
+class Booster extends Stream {
+   void init(boolean adds) {
+      if(adds) add(new FIR(N));
    }
 }
 \end{verbatim}
@@ -201,13 +205,13 @@ class RFtoIF extends Filter {
    int sz, i;
    Float weight[];
    void init(Float f) {
-      set_freq(f);
+      setf(f);
    }
    void work() {
       output.push(input.pop()*weight[i++]);
       if(i==sz) i = 0;
    }
-   void set_freq(Float f) {
+   void setf(Float f) {
       i = 0;
       sz = CarrierFreq/f*N;
       weight = new Float[sz];
@@ -217,9 +221,9 @@ class RFtoIF extends Filter {
 }
 
 class CheckFreqHop extends SplitJoin {
-   RFtoIFPortal freq_hop;
+   RFtoIFPortal fh;
    void init(RFtoIFPortal fh) {
-      freq_hop = fh;
+      this.fh = fh;
       weighted_round_robin(N/4-2,1,1,N/2,1,1,N/4-2);
       int k = 0;
       for(int i=0; i<4; i++) {
@@ -231,7 +235,7 @@ class CheckFreqHop extends SplitJoin {
                   void work() {
                      Float val = input.pop();
                      if(val >= MIN_TRASHOLD) 
-                        freq_hop.set_freq(Freq[k], new TimeInterval(4*N, 6*N)); 
+                        fh.setf(Freq[k], new TimeInterval(4*N, 6*N)); 
                      output.push(val);
                   }
                });
@@ -248,10 +252,9 @@ class CheckQuality extends Filter {
    Channel output = new FloatChannel();
    Float ave_hi, ave_lo;   
    BoosterPortal on_off_switch;
-   void init(BoosterPortal on_off) {
-      ave_hi = 0;
-      ave_lo = 0;
-      on_off_switch = on_off;
+   void init(BoosterPortal on_off_switch) {
+      ave_hi = 0; ave_lo = 0;
+      this.on_off_switch = on_off_switch;
    }
    void work() {
       Float val = input.pop();
@@ -265,21 +268,15 @@ class CheckQuality extends Filter {
    }
 }
 
-class Booster extends Stream {
-   void init(boolean adds) {
-      if(adds) add(new FIR(N));
-   }
-}
-
 class TrunkedRadio extends Stream {
    RFtoIFPortal freq_hop = new RFtoIFPortal();
    BoosterPortal onoff = new BoosterPortal().
    void init() {
       add(new ReadFromAtoD());
-      RFtoIF RF2IF = new RFtoIF();
+      RFtoIF RF2IF = new RFtoIF(STARTFREQ);
       add(RF2IF);
       freq_hop.register(RF2IF);
-      Booster ISS = new Booster();
+      Booster ISS = new Booster(false);
       add(ISS);
       onoff.register(ISS);
       add(new FFT());
@@ -288,10 +285,6 @@ class TrunkedRadio extends Stream {
       add(new AudioBackEnd());
    }
 }
-
 \end{verbatim}
-\vspace{-12pt}
-\caption{\protect\small Example stuff.
-\protect\label{fig1}}
 \vspace{-12pt}
 \end{figure}
