@@ -93,10 +93,7 @@ variable $\mt{SREAD}_{c, p}$ with this domain:
 \forall i \in [0,A(c)-1],~\mt{IBUF}_{c}(i) = I(c)[i]
 \label{i2ibuf}
 \end{align}
-\end{itemize}
-\noindent For each node n, introduce the following equations:
-\begin{itemize}
-\item {\bf(IWRITE to IBUF)} For each $p \in [0, num(n, \mt{init})-1]$:
+\item {\bf(IWRITE to IBUF)} For each $p \in [0, num(n_a, \mt{init})-1]$:
 \begin{align}
 \label{iwrite2ibuf}
 &\forall i \in [A(c) + \mt{PartialWrite}(c,\mt{init},p),
@@ -104,6 +101,9 @@ variable $\mt{SREAD}_{c, p}$ with this domain:
 &~~~~~~\mt{IBUF}_{c}(i) = \mt{IWRITE}_{c, p}(i - A(c) - \mt{PartialWrite}(c,\mt{init},p))\nonumber
 \end{align}
 %
+\end{itemize}
+\noindent For each node n, introduce the following equations:
+\begin{itemize}
 \item {\bf(IREAD to IWRITE)} For each $c \in \mt{chan\_out}(n)$, and for each $p \in [0,
 num(n, \mt{init})-1]$:
 %
