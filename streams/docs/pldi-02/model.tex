@@ -535,6 +535,7 @@ we assume that filters are stateless and that the stream program is
 semantically correct.
 
 \subsubsection{Intermediate Algebra}
+\label{sec:intalgebra}
 
 The intermediate algebra provides a common mathematical representation
 for manipulating stream programs.  Though we have referred to this
@@ -667,9 +668,10 @@ notation is slightly heavier.  Given that we have a round robin joiner
 with weights $w_1 \dots w_n$ and $W = \sum{w}$, we first represent the
 parallel stream $p(i)$ which computes the $i$'th output of the
 joiner:
-\begin{align*}
+\begin{align}
+\label{eq:p}
 p(i) = MIN(j~s.t.~\sum_{k=0}^{j-1}{w_i} \le i\%W) 
-\end{align*}
+\end{align}
 Now, the $i$'th tape position assumes the value that is produced along
 stream $p(i)$ in the SplitJoin, and the index offset is obtained by
 tracing back from the output of the joiner to the input of the
@@ -686,49 +688,5 @@ this formulation to prove that certain transformations of the stream
 graph preserve the meaning of the program.
 
 %% $\cal{S}$ 
-%%   [(FeedbackLoop (. S) $s_body$ $s_loop$ (. J) ($init_1 \dots init_n$))] =
-
-%% --
-
-%% Let's look at merging:
-
-%% 	$push_sc = 2*LCM(push_s1, push_s2)$
-%% 	$pop_sc = LCM(pop_s1, pop_s2)$
-%% 	$peek_sc = ???$
-%% 	$f_sc$ = $f_{sc_{j_(input, shift) for j = 1..push_sc-1}}:$
-	
-%%   if j is even:
-
-%% 	$f_sc_j(input, shift) = f_s1_(j/2 % push_s1))_
-%% 				(input,
-%% 				 i -> shift(i)+pop_s1*floor((j/2)/push_s1))$
-
-%%   if j is odd:
-
-%% 	$f_sc_j(input, shift) = f_s2_((j-1)/2 % push_s2)_
-%% 				(input,
-%% 				 i -> shift(i)+pop_s2*floor(((j-1)/2)/push_s2))$
-%% push = push_s
-%% pop = pop_s
-%% peek = peek_s
-
-%% canonical form:
-
-%% output.push(f_s_1(input.peek(0) \dots input.peek(peek_s - 1)))
-%% \dots
-%% output.push(f_s_push(input.peek(0) \dots input.peek(peek_s - 1)))
-
-%% input.pop()
-%% input.pop()  } x pop_s
-%% input.pop()
-
-%% --
-
-%% combined input:
-
-%% output.push(f_s1_1(input.peek(pop_s1*floor((j/2)/push_s1)),
-%%                    \dots
-%%                    input.peek(pop_s1*floor((j/2)/push_s1))))
-%% output.push(f_s2_1(input.peek(0) \dots input.peek(peek_s - 1)))
-%% \dots
-%% output.push(f_s_push(input.peek(0) \dots input.peek(peek_s - 1)))
+%%   [(FeedbackLoop (. S) $s_body$ $s_loop$ (. J) ($init_1 \dots
+%%   init_n$))] = ??????

@@ -1,13 +1,69 @@
 \section{Optimization}
 
-Optimization metrics
--	Performance (throughput) 
--	Latency
--	Data buffer size
--	Code size
+We now turn our attention to the problem of optimizing a stream
+program.  Unlike other program domains, where the principle aim of
+compiler optimization is to shorten the total execution time, there
+are many distinct optimization metrics for streaming applications,
+including throughput, latency, data size, and code size.  The latter
+two of these are especially important in embedded domains, where
+memory is in short supply; latency can be critical for real-time
+applications, and throughput is always of interest.
+
+% here's a more verbose version...
+%
+%These include: 1) {\bf Throughput}, the number of items passing
+%through the stream per unit time, 2) {\bf Latency}, the amount of
+%elapsed time (or consumed data) before the effects of an input item
+%are seen at the output, 3) {\bf Data size}, the buffer space required
+%to hold live items, and 4) {\bf Code size}, the space consumed by
+%instructions.
+
+In this section we present some transformations that improve a stream
+program by one or more of these metrics.  However, there is often a
+tradeoff between throughput and latency, or code size and data size,
+such that the optimality of a stream program depends on the metric of
+interest.
 
 \subsection{Fusion}
 
+A primary stream optimization is the fusion of multiple filters and
+streams into a single atomic unit.  This can be beneficial for
+throughput, latency, and data size, as data buffers are eliminated in
+favor of local variables with short live ranges.  Fusion is also
+important for adapting a fine-grained stream program to a
+coarse-grained target; the programmer benefits from dividing the
+program into many modular components without losing the performance of
+a single, integrated procedure.
+
+An algorithm for fusing a pipeline of two filters that contain only
+{\tt push} and {\tt pop} statements is given in \cite{pro96}.
+However, in a stream program, it pays to consider not only vertical
+fusion of pipeline constructs, but also horizontal fusion of parallel
+streams in a SplitJoin.  Here we present a transformation on the
+abstract syntax of Section \ref{sec:intalgebra} that merges $n$
+filters $s_1 \dots s_n$ that 
+filters in a 
+
+We give 
+
+Let's look at merging:
+
+$push_sc = 2*LCM(push_s1, push_s2)$
+$pop_sc = LCM(pop_s1, pop_s2)$
+$peek_sc = ???$
+$f_sc$ = $f_{sc_{j_(input, shift) for j = 1..push_sc-1}}:$
+	
+  if j is even:
+
+$f_sc_j(input, shift) = f_s1_(j/2 % push_s1))_
+			(input,
+			 i -> shift(i)+pop_s1*floor((j/2)/push_s1))$
+
+  if j is odd:
+
+$f_sc_j(input, shift) = f_s2_((j-1)/2 % push_s2)_
+			(input,
+			 i -> shift(i)+pop_s2*floor(((j-1)/2)/push_s2))$
 \subsection{Fission}
 
 filter fission with state propagation
