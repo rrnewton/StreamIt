@@ -1,0 +1,628 @@
+\documentclass[draft]{article}
+\usepackage{psfig, verbatim, fullpage}
+\title{The StreaMIT Programming Language \\ A Reference Manual \\ Version 1.0}
+
+\begin{document}
+\maketitle
+
+\section{Open questions}
+
+\begin{enumerate}
+
+\item If we're building on top of C, then how do we pass a string
+between filters without using pointers?  What is the exact restriction
+on pointers, then?
+
+\item More generally than above, what's the syntax of stuff that's not
+streaming?  Is it C, Java, something subset or combination thereof?
+
+\item Isn't it just a suggestion that {\tt input[0]} and {\tt
+output[0]} reference the first unread and unwritten items?  Can't the
+programmer manage the indices how he wants to using the {\tt advance}
+command?
+
+\item do we have a name for a {\tt FilterBlock} that is both a source
+and a sink?  A {\tt SourceSinkBlock}?  Maybe we should make that the
+top-level construct instead of {\tt Stream}?
+
+\end{enumerate}
+
+\section{Realizations / Changes}
+
+\begin{enumerate}
+
+\item When we're inlining filters, we don't need to provide the name
+of the filter.
+
+\item It's a misnomer to call the toplevel stream a {\tt FilterBlock},
+since it has no input and output.  Let's call it a {\tt Stream}
+instead?  Also, why name it, since there can be only one of them and
+it's not accepting parameters?  Let's just say {\tt Stream} at the
+toplevel.
+
+\end{enumerate}
+
+\section{To improve this document...}
+
+\begin{enumerate}
+
+\item Better / more clear distinction between initialization time and
+steady state streaming time.  And then scripting time, too.
+
+\item Better names for everything.  Especially control constructs
+(graph construction constructs instead?), filters, ``functional
+blocks'', etc.
+
+\end{enumerate}
+
+\section{Introduction}
+\label{sec:intro}
+
+The StreaMIT programming language is designed to enhance the
+programmability and performance of streaming applications.  In
+providing high-level constructs for building streams out of a number
+of simple blocks, the language provides a clean, expressive, and
+modular framework that programmers can use to reason about streaming
+computations.  At the same time, the language imposes a structure on
+the streams which can be exploited by a compiler to perform
+stream-specific optimizations.  Thus, the abstractions provided by the
+language serve not only to improve the programming model, but to
+facilitate performance improvements that motivate the language in
+their own right.
+
+The following example defines a stream that prints a continuous
+sequence of ``Hello World!'' messages to the screen.  It illustrates
+the main components of StreaMIT:
+
+\begin{verbatim}
+Stream {
+
+  Source {
+    output String myOutput;
+
+    work() {
+      output[0] = ``Hello '';
+      output.advance(1);
+    }
+  }
+
+  Filter {
+    input String myInput;
+    input String myOutput;
+
+    work() {
+      output[0] = input[0] + ``World!'';
+      input.advance(1);
+      output.advance(1);
+  }
+
+  Sink {
+    input String myInput;
+    
+    work() {
+      System.out.println(input[0]);
+      input.advance(1);
+    }
+  }
+}
+\end{verbatim}
+
+In StreaMIT, the basic processing unit is the {\tt Filter}, which
+reads items from an input channel and writes items to an output
+channel.  A filter that requires no input or output is called a {\tt
+Source} and a {\tt Sink}, respectively.  In the example above, a {\tt
+Source} generates the ``Hello'' string, a {\tt Filter} appends
+``World!'', and a {\tt Sink} prints the result to the screen.
+
+Each filter defines a {\tt work} function that represents the most
+fine-grained step of execution in transforming data from the input
+channel to the output channel.  This function is called automatically
+by the runtime system when the stream is running.  The input and
+output channels are referenced as arrays, with {\tt input[0]}
+representing the first unread input and {\tt output[0]} representing
+the first unwritten output.  The {\tt advance} command is used to
+shift the channel indices so that unprocessed elements (at positive
+indices) are shifted towards the 0'th position.  In the ``Hello
+World'' example, each filter reads or writes a single item before
+advancing the tape for the next step.
+
+Filters implicitly are connected together in the order of their
+definition.  Thus, in the ``Hello World!'' example, the three filters
+are pipelined together and enclosed within a {\tt Stream} construct,
+which denotes the top-level stream in the program.
+
+The following sections describe the StreaMIT language in more detail.
+First we present the {\it base language}, which encompasses all of the
+expressive power of StreaMIT.  Then we discuss the {\it scripting
+language}, a layer on top of the base language that simplifies stream
+construction via the use of compile-time macros.
+
+\section{The Base Language}
+
+The StreaMIT base language allows the programmer to define processing
+units and to arrange them into a stream.  Thus, the base language can
+be broken down into two levels: 1) the definition of {\it functional
+blocks} to transform one data stream into another, and 2) the use of
+{\it control constructs} to arrange the objects into a streaming
+structure.  Additionally, the language provides a set of dynamic
+constructs for passing messages, re-initializing stream components,
+and modifying the structure while the stream is executing.
+
+In the following sections, we describe the StreaMIT base language from
+the bottom up: functional blocks (Section \ref{sec:blocks}), control
+constructs (Section \ref{sec:control}), and dynamic constructs
+(Section \ref{sec:dynamic}).
+
+\subsection{Functional Blocks}
+\protect\label{sec:blocks}
+
+There are two kinds of functional blocks in StreaMIT.  The
+lowest-level block is the {\tt Filter}, which defines a leaf node;
+that is, the code within a filter is organized procedurally instead of
+as a stream.  The second construct, the {\tt FilterBlock}, represents
+a composition of other filters into a streaming structure.  Though a
+filter block does not contain procedural code like a filter, we'll see
+that filters and filter blocks can be treated as identical black-box
+abstractions during stream construction.
+
+\subsection{Filters}
+
+In many ways, filters correspond to the usual notion of an object in
+an object-oriented programming language.  Below we discuss their
+declaration and instantiation.
+
+\subsubsection{Filter Declaration}
+
+They are declared with the following syntax:
+
+\begin{tabbing}
+\hspace{0.2in} \= \hspace{0.2in} \= \hspace{0.2in} \= \hspace{0.2in} \= \\
+
+{\tt Filter} filter-name (type$_1$ param$_1$, type$_2$ param$_2$,
+... , type$_n$ param$_n$) \{ \\ \\
+
+\> {\tt input} input-type input-name; \\
+\> {\tt output} output-type output-name; \\ \\
+
+\> {\it data fields} \\ \\
+
+\> {\it initialization code} \\ \\
+
+\> {\tt work()} \{ \\ \\
+\> \} \\ \\
+
+\> {\it other functions} \\
+
+\}
+\end{tabbing}
+
+We discuss the implications of the above syntax in the order that it
+appears:
+
+\begin{itemize}
+
+\item {\it Type declaration.}  The {\tt Filter} type indicates that
+there is both an input and output channel for this block.  If there is
+only an output channel, the type should be {\tt Source}; if there is
+only an input channel, the type should be {\tt Sink}.
+
+\item {\it Naming filters.}  The ``filter-name'' denotes the name for
+the type of filter being defined.  This name is used to instantiate
+the filter (see below).
+
+\item {\it Fields, parameters, and scoping.}  Data fields can be
+declared as in C++ or Java.  All fields are implicitly private--they
+are not visible from outside the scope of the filter.  Symmetrically,
+no variables defined globally or in an enclosing scope are visible
+from within a filter.  However, the filter can reference globally
+visible functions that have no side effects and are only pure
+functions of their arguments.
+
+The filter can receive any number of parameters upon its
+initialization.  These parameters act like data fields that are
+initialized to the values that are passed as arguments to the filter.
+That is, they are visible to all functions within the filter, they are
+part of the filter's persistent state, and they can be modified like
+normal fields.
+
+\item {\it Input and output.}  The first field declarations are for
+the input and output channels, which represent the means for passing
+data through the filter during steady state stream operation.  Each
+channel must be typed and given a name for use within the filter.  All
+items within a channel are passed by value (with semantics equivalent
+to copying each value before writing it to the channel), and no
+pointers to global structures can be communicated through a channel.
+
+The input and output channels are referenced as arrays.  The first
+time the work function is called, {\tt input[0]} and {\tt output[0]}
+represent the front of the input and output queue, resepectively.  One
+can read or write the k'th item by referencing the k'th element of the
+array.  However, to simplify coding practice, we provide the {\tt
+advance} command to shift the indices of a channel.  Thus, after
+executing {\tt input.advance(k)}, the contents of {\tt intput[k]}
+should now be referenced at {\tt input[0]}.  Of course, the indexing
+scheme of the previous block's output is unaffected.
+
+\item {\it Initialization code.}  The initialization code is run when
+the filter is first instantiated, just like the constructor to an
+object.  The initialization code can modify data fields and
+parameters, as well as read input and write output.  We allow I/O from
+the initializer in case a filter needs to handle the first few data
+items differently than the steady state.
+
+\item {\it Work function.}  The work function holds the code that is
+invoked dynamically for a single execution step of the filter.  This
+function should be as fine-grained as possible--involving as few input
+and output items as possible--to promote program comprehensibility and
+to facilitate compiler optimization.  The function accepts no
+parameters, although (like every other function in a filter) it has
+access to the filter's fields and parameters.  Within the work
+function, input and output is done via the channels as described above.
+
+\item {\it Other functions.}  The filter is free to define other
+functions, just like objects can define methods in an object-oriented
+language.  However, all of these functions are implictly private, and
+can't be seen from outside the scope of the filter.
+
+\end{itemize}
+
+\subsubsection{Filter Instantiation}
+
+A filter can be instantiated into the stream graph by calling its name
+with some arguments, e.g. {\tt MyFilter(arg$_1$, arg$_2$, ...,
+arg$_n$)}.  This is equivalent to inlining the entire filter
+definition and supplying the arguments as initial values for the
+parameters.  That is, we can convert above call into:
+
+\begin{tabbing}
+\hspace{0.2in} \= \hspace{0.2in} \= \hspace{0.2in} \= \hspace{0.2in} \= \\
+
+{\tt Filter MyFilter(type$_1$ param$_1$ = arg$_1$, type$_2$ param$_2$
+= arg$_2$, ..., type$_n$ param$_n$ = arg$_n$)} \{ \\ \\
+
+\> {\it filter body} \\ \\
+\}
+\end{tabbing}
+
+In this inlined form, the name {\tt MyFilter} becomes optional; we
+could remove it if desired.  The inlined syntax is thus an equivalent
+way of declaring filters.  We could translate any inlined filter into
+a named filter that is explicitly instantiated.
+
+\subsection{FilterBlocks}
+
+The second kind of functional block, the {\tt FilterBlock}, is similar
+to a filter in that it transforms one data stream into another.
+However, a filter block manifests this transformation as an arrangment
+of other filters (and/or filter blocks) rather than as procedural code
+that deals explicitly with the input and output channels.
+FilterBlocks are instantiated just like filters.  However, their
+declaration is somewhat different:
+
+\begin{tabbing}
+\hspace{0.2in} \= \hspace{0.2in} \= \hspace{0.2in} \= \hspace{0.2in} \= \\
+
+{\tt FilterBlock} filter-block-name (type$_1$ param$_1$, type$_2$ param$_2$,
+... , type$_n$ param$_n$) \{ \\ \\
+
+\> {\it data fields} \\ \\
+
+\> {\it stream initialization code} \\ \\
+
+\}
+\end{tabbing}
+
+The differences between the {\tt FilterBlock} and {\tt Filter}
+declarations are as follows.  Firstly, the filter block lacks the
+input and output channels, as well as the work function and the
+capacity to define local methods.  However, the crucial difference is
+in the initialization code.  Whereas a filter's initialization code is
+for modifying fields and doing I/O, a filter block instantiates a
+series of filters (an/or filter blocks).  By default, the filters are
+connected in the order in which they are instantiated, although more
+complex structures can be obtained using control constructs (see
+Section {\ref{sec:control}}.  Thus, the filter block contains whatever
+graph of filters it initializes.  
+
+There are also {\tt FilterBlock} analogs for the {\tt Source} and {\tt
+Sink}.  A {\tt SourceBlock} is a filter block who's first filter is a
+{\tt Source}, and a {\tt SinkBlock} is a filter block who's last
+filter is a {\tt Sink}.  We modify the ``Hello World!''  program from
+Section {\ref{sec:intro}} to give a trivial example of a filter block:
+
+\begin{verbatim}
+Stream {
+
+  MakeText();
+
+  Sink {
+    input String myInput;
+    
+    work() {
+      System.out.println(input[0]);
+      input.advance(1);
+    }
+  }
+}
+
+SourceBlock MakeText() {
+
+  Source {
+    output String myOutput;
+
+    work() {
+      output[0] = ``Hello '';
+      output.advance(1);
+    }
+  }
+
+  Filter {
+    input String myInput;
+    input String myOutput;
+
+    work() {
+      output[0] = input[0] + ``World!'';
+      input.advance(1);
+      output.advance(1);
+  }
+}
+
+\end{verbatim}
+
+\subsection{Control Constructs}
+\protect\label{sec:control}
+
+So far we have focussed on building the objects that do the
+steady-state processing of stream data.  We now turn our attention to
+the constructs that are used to connect the functional blocks into a
+streaming structure.  Here it is important to emphasize that the graph
+structure is created at {\it initialization time}, whereas the {\tt
+work} functions of the filters are executed during the {\it steady
+state} operation of the stream.  The initialization code is run only
+once for any given period of steady state operation.  Thus, we have
+two distinct times of execution in our language (we will introduce yet
+another time in Section {\ref{sec:script}}.)
+
+There are three basic control constructs in StreaMIT: 1) Pipe, for
+connecting filters into a linear chain, 2) SplitJoin, for splitting a
+stream into parallel components, and 3) FeedbackLoop, for
+incorporating loops into the graph.  Note that while these constructs
+are very expressive, they can not express all arbitrary connections of
+filters.  However, the philosophy is that structured streams compare
+to arbitrarily connected streams as structured control flow compares
+to goto statements: the loss of expressive power will be more than
+offset by improved readability and opportunity for optimization.
+
+\subsection{Pipe}
+
+The {\tt Pipe} construct is used for 
+
+\subsection{Dynamic Constructs}
+\protect\label{sec:dynamic}
+
+\section{Scripting Language}
+\label{sec:script}
+
+\begin{verbatim}
+
+	B. control constructs
+		- toplevel is Stream construct
+			- first is source, last is sink
+		- already seen flow of control is implicitly linear inside
+			filterblocks
+	
+		I. SplitJoin
+		- for splitting / merging streams
+		- split: RoundRobin, WeightedRoundRobin (+ syntax), Dupliate
+		- join: RoundRobin, WeightedRoundRobin
+		- for WeightedRoundRobin, must have zero for sources/sinks?
+
+		II. Pipe
+		- explicit way of grouping 1-to-1 units to form larger blocks
+		- compared to FilterBlock construct, can't be bound to 
+			variable, doesn't create a scoping barrier
+
+		III. Feedback
+		- specify time in loop (number of elements in delay)
+		- need to flesh out rest of details
+
+	C. referencing filters:  FilterRef's
+
+		- whenever a filter/filterblock is instantiated (or inlined),
+			the result can be bound to a FilterRef variable
+		- FilterRef's can only be assigned once, and (unlike normal
+			variables) they can be used before they're defined
+
+		I. Using FilterRef's:  Initialization
+			- ref.reset(<dynamic parameters>)
+			- legal to initialize from within work function and
+				message handlers of Filters.  Not from 
+				initialization code anywhere.
+			- semantics of flushing streams
+
+		II. Using FilterRef's:  Message Passing
+			- ref.handleMessage(<message variable>) @ [min, max];
+			- legal to send messages from within work function, 
+				not from within message handlers or
+				initialization code.
+			- message types are typedef'd structures, no pointers
+			- filters can receive with ReceiveMessage(Type foo)
+			- message handlers can send messages and
+				   re-initialize, but not read i/o
+			- delivery is from top to bottom
+
+		III. naming FilterRef's
+			- ref.getName() returns hierarchical name
+			- can assign names after equals sign of
+                          assignments to references
+			- if no name given, then default name assigned
+                          based on name of filter/filterblock and
+                          position in parent
+
+	D. advanced control flow:  StreamSelect
+		- now that we have construct for re-initialization, might
+			want to dynamically change part of stream structure
+		- switches on an enumerated type with cases
+		- the enumerated variable is dynamic
+
+2) scripting language
+
+	- to ease construction of the filter graph
+	- the script that is implemented on top of the basic language can
+		always be ``compiled out'' to leave a (possibly larger) 
+		graph in the basic language.
+
+	A. script variable type
+		- all things of type script can be determined at
+                  compile time (i.e.other script variables, constant
+                  literals, pure funcs of these)
+		- graph structure can depend only on script control
+                  flow, but all other constructs can reference script
+                  variables, too
+		- can only be assigned within scripting control flow
+			- sfor, sdo, etc (open to negotiation)
+			- can only appear within scripting control flow
+		- a function can return a script variable if its parameters
+			are script variables and it references no global
+			dynamic variables.  
+
+	A. scripting parameters to filters and filterblocks
+		- parameters of type script, denoted by < >
+		- don't change across all instantiations, for a given 
+			compilation.
+
+---------------------------------------------------------------------------
+
+not explicitly going into user's guide:
+
+- four language levels:
+	1. code implementing filters
+	2. static connection of the filters to form supergraph
+	3. scripting to make (2) simple
+	4. dynamic invocation / reinitialization
+
+- four levels of semantic checking:
+	- incorrect
+	- not implemented
+	- warning
+	- performance problem
+
+x outline
+
+  pipe - inlined
+  filter - inlined
+  splitjoin
+  feedback
+  functions
+  sources & sinks
+  whole program (main, etc)
+  script vs dynamic
+  filter block
+  stream select
+  messaging system
+
+x need to define subset of c that we allow
+
+x messages
+	- delivery is from top to bottom
+	- filters can receive with ReceiveMessage(Type foo)
+	- message types are typedef'd structures, no pointers
+	- message handlers can send messages and re-initialize, but not
+		read i/o
+
+x scripting language
+  x procedural; upon instantiating filter, it's put into graph.
+  x two means of abstraction: filter & filterblock
+  x outermost filterblock is called main, takes no paramters
+	x first thing is source, last is sink
+
+  x filterref's
+    - can have use before def.
+    - require exactly one assignment
+
+  x script variable type
+    - all things of type script can be bdetermined at compile time
+    - i.e. other script variables, constant literals, pure funcs of these
+    - can only be assinged within scripting control flow
+    - script control flow is normal c control flow, but predicated by
+	an ``s''.  script control flow can't appear within normal 
+	control flow.
+    - regular constructs can use script variables just like they were normal
+
+x filterblocks
+   - also take parameters & have variables scoped
+   - no functions, no message handlers, no explicit input/output
+   - instantiation equivalent to copying body
+   - scope wall between it and enclosing
+
+x pipe
+	- somehow implicit in filter blocks
+	- for connecting single input, single output blocks
+
+x splitjoin (?? - what's the verdict on joins/splits?)
+	- split: roundrobin, weightedroundrobin (+ syntax), duplicate
+	- join: roundrobin, weightedroundrobin
+
+	- for w.r.r., must have zero for sources/sinks
+
+x streamselect
+	- just goes on an enumerated type with cases
+	- the enumerated variable is dynamic
+
+x sources/sinks
+	- defined just like filters, but with either no input or no output
+	- have special keywords for types, source & sink
+
+x feedback loop
+	- specify time in loop (number of elements in delay)
+	- need to flesh out rest of details
+
+x naming
+	- ref.getName() returns name
+	- can assign names after equals sign of assignments to references
+
+x filters 
+
+    x defined as ``Filter FooType<script params>(dynamic params)'' {
+	// data members
+	// initialization statements
+	Work()
+	// other functions, message handlers
+	}
+
+    x distinction between script and dynamic parameters - script don't
+	change across multiple instantiations.
+
+    x single input and output, declared with ``input'', ``output'' with
+	name and type.
+
+    x work function
+	- no parameters
+	- can send messages and re-initialize
+	- input/output accessed as an array.  each is advanced with advance
+		statement
+	- things going through i/o are passed by value.  no pointers to 
+		global data structures.
+
+    x initialization
+	- no messages, initialization of other blocks
+	- but can read i/o to get stuff going
+
+    x re-initialization
+	- do ref.reset(dynamic params...).  static params do not need to
+		be passed again because they don't change from one 
+		instantiation to the next
+
+    x inlined by copying body and having default values for all parameters
+
+\end{verbatim}
+
+
+\end{document}
+
+
+
+
+
+
+

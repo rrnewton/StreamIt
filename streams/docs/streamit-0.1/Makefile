@@ -1,0 +1,2 @@
+all:
+	latex report.tex
