@@ -48,22 +48,27 @@ each point of the program (refer to Figure~\ref{fig:types} for
 notation):
 \begin{itemize}
 
+\vspace{-6pt}
 \item A $\mt{map}$ between each program variable $y$ and a linear form
 $\tup{\vec{v}}{c}$ where $\vec{v}[0 \cdots Peek]$ is a column vector 
 and $c$ is a scalar constant. In an actual execution, the value of $y$ would
-be given by $y = {\vec v} \cdot {\vec x} + c$, where ${\vec x}$ 
+be given by $y = \vec{v} \cdot \vec{x} + c$, where $\vec{x}$ 
 represents the input items.
+\vspace{-6pt}
 
 \item Matrix $A$ and vector $\vec b$, which will represent the linear node.
 These values are constructed during the operation of the algorithm.
+\vspace{-6pt}
 
 \item $\mt{pushcount}$, which indicates how many items have been
 pushed so far.  This is used to determine which column of $A$ and
-$\vec b$ correspond to a given {\tt push} statement.
+$\vec{b}$ correspond to a given push statement.
+\vspace{-6pt}
 
 \item $\mt{popcount}$, which indicates how many items have been popped
 so far.  This is used to determine the row in $\vec{v}$ that a 
-given {\tt peek} or {\tt pop} statement refers to.
+given peek or pop expression refers to.
+\vspace{-6pt}
 
 \end{itemize}
 
@@ -72,10 +77,10 @@ node.  The algorithm is formulated in terms of a simplified set of
 instructions, which appear in Figure~\ref{fig:types}.  First are the
 nodes that generate fresh linear forms.  A constant assignment $y = c$
 creates a form $\tup{\vec 0}{c}$ for $y$, since $y$ has constant part
-$c$ and does not yet depend on the input.  A {\tt pop} operation
+$c$ and does not yet depend on the input.  A pop operation
 creates a form $\tup{\mbox{\bf BuildCoeff}(\mt{popcount})}{0}$, where
 {\bf BuildCoeff} introduces a coefficient of $1$ for the current index
-on the input stream.  A {\tt peek}$(i)$ operation is similar, but
+on the input stream.  A peek$(i)$ operation is similar, but
 offset by the index $i$.
 
 Next are the instructions which combine linear forms.  In the case of
@@ -110,7 +115,7 @@ Our implementation of linear extraction is also interprocedural.  It
 is straightforward to transfer the linear state across a call site,
 although we omit this from the pseudocode for the sake of
 presentation.  Also implicit in the algorithm description is the fact
-that all variables are local to the {\tt work} function.  If a filter
+that all variables are local to the work function.  If a filter
 has persistent state, all accesses to that state are marked as $\top$.
 
 \begin{algorithm}[t]
@@ -130,9 +135,9 @@ proc {\bf Toplevel}(filter $F$) returns linear node for $F$
 \end{enumerate}
 proc {\bf BuildCoeff}(int $pos$) returns $\vec v$ for peek at index $pos$ \\ \vspace{-12pt}
 \begin{algorithmic}
-\STATE $\vec v = \vec 0_{Peek}$
-\STATE $\vec v[\mbox{Peek}-1-\mt{pos}] = 1$
-\STATE return $\vec v$
+\STATE $\vec{v} = \vec{0}$
+\STATE $\vec{v}[\mbox{Peek}-1-\mt{pos}] = 1$
+\STATE return $\vec{v}$
 \end{algorithmic}
 \vspace{6pt}
 {\bf Global Variables:} int Peek, Pop, Push

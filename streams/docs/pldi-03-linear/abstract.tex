@@ -9,12 +9,12 @@ are common in DSP applications; examples include FIR filters,
 expanders, compressors, FFTs and DCTs.
 
 We present a linear extraction analysis that automatically detects
-linear filters based on the C-like code in their {\tt work} function.
+linear filters based on the C-like code in their work function.
 Once linear filters are identified, we show how neighboring nodes can
 be collapsed into a single linear representation, thereby eliminating
 many redundant computations.  Also, we describe a method for
 translating linear nodes into the frequency domain, and an automated 
-optimization selection algorithm that maximizes algorithmic savings.
+optimization selection algorithm that increases algorithmic savings.
 
 We have completed a fully-automatic implementation of the above
 techniques as part of the StreamIt compiler, and we demonstrate
