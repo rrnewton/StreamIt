@@ -390,6 +390,7 @@ void streamit_run(stream_context *c);
 <<struct [[tape]]>>
 <<Low-level Tape Macros>>
 <<High-level Tape Macros>>
+<<Feedback Loop Path Initialization>>
 @
 
 Data is passed between streams on tapes.  The tape structure can be
@@ -456,6 +457,28 @@ This implementation also requires the GNU C compiler, which treats
   (memcpy((d)->data + (d)->write_pos * (d)->data_size, \
           (s)->data + (s)->read_pos * (s)->data_size, \
           (d)->data_size))
+@
+
+There is an important special case for feedback loops.  At
+initialization time, the code can push items on to the feedback input
+of a feedback loop's joiner.  We need some special magic to make this
+work properly, and we need the tapes to have already been created.
+This can still happen late in the init function, though.
+
+[[FEEDBACK_DELAY]] is a macro that deals with this initialization.  It
+takes four parameters: the context, the number of items to push on to
+the tape, the type of the items to push, and the function to call to
+get those items.  In addition to the tape macros above, it relies on
+the internal structure of the context, particularly
+[[<<One-To-Many Structures>>]].
+
+<<Feedback Loop Path Initialization>>=
+#define FEEDBACK_DELAY(d, c, n, t, f) { \
+  int i; \
+  for (i = 0; i < (n); i++) { \
+    PUSH_TAPE((c)->type_data.splitjoin_data.joiner.tape[1], t, f((d), i)); \
+  } \
+}
 @
 
 \subsection{Filter Context}
