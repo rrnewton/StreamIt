@@ -1,0 +1,53 @@
+struct Phase {
+  Stream str
+  int push, pop, peek
+  Phase child[]
+}
+
+Phase[] schedule (Stream s, int maxPhases) {
+  result = {}
+  totalPushed = 0
+  forall c \in s:  phase[c] = 0
+  forall c \in s:  sched[c] = schedule(c, pushPerPhase)
+  i = 0
+  do {
+    i++
+    curPhase = Phase(s, 0, 0, 0, {})
+    do {
+      // simulate top node
+      top = getEntrance(s)
+      child = sched[top][phase[top]++ \% numPhases(top)]
+      simulate(child)
+      if (s is feedbackloop)
+        curPhase.child = curPhase.child o child
+      else 
+        curPhase.child = insertSorted (curPhase.child, child)
+      curPhase.peek = max (curPhase.peek, curPhase.pop + child.peek)
+      curPhase.pop += child.pop
+      // execute other nodes as much as possible
+      while (exists c \in s, c != top and canFire(c) ) {
+        while (canFire(c)) {
+          child = sched[c][phase[c]++ \% numPhases(c)]
+          simulate(child)
+          if (s is feedbackloop)
+            curPhase.child = curPhase.child o child
+          else 
+            curPhase.child = insertSorted (curPhase.child, child)
+          if (c==getExit(top)) {
+            curPhase.push += child.push
+            totalPushed += child.push
+          }
+        }
+      }
+    } while (totalPushed<s.steadyPush*i/maxPhases)
+    result = result o curPhase
+  } while (totalPushed<s.steadyPush)
+  return result
+}
+
+Phase[] insertSorted (Phase[N] list, Phase child) {
+  for i = N-1 downto 0
+    if (list[i].str==child.str)
+      return list[0...i] o child o list[i+1...N-1]
+  return list o child
+}
