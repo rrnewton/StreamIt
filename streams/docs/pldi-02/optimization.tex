@@ -59,9 +59,27 @@ where: {\bf push_{sc}} &= totalRounds * W \\
 \end{align*}
 We have proven that this transformation preserves the meaning of the
 program with respect to our transform algebra for the case when $n = 2$,
-$w_1 = w_2 = 1$, and $S$ is a duplicate splitter.  The proof is by
-straightforward algebra, but we omit it due to space constraints; we
-expect that the general proof is also straightforward.
+$w_1 = w_2 = 1$, and $S$ is a duplicate splitter.  The proof involves
+only straightforward algebra, but we omit it due to space constraints.
+
+This transformation is very powerful--it allows us to fuse any set of
+parallel filters in a SplitJoin construct into a single filter,
+regardless of the splitter/joiner types and the push/pop/peek
+requirements.  We have implemented this transformation in the StreamIt
+compiler for cases with a duplicate splitter and filters with output
+rates matching the joiner's weights; performance improves significantly
+(see Section \ref{sec:results}) due to decreased channel operations.
+
+In the sections that follow, we give an overview of other optimizations
+that we are implementing in the StreamIt compiler.  Due to space
+limitations, we cannot describe them at the above level of detail.
+
+% We've implemented:  collapse $n$ filters, if:
+%
+% The splitter is a duplicate and the joiner is some form of
+% round-robin.  Each child stream pops 1, and pushes the same
+% number as the round-robin ratio.  I think we also require
+% the child streams to be filters.
 
 \subsection{Fission Transformations}
 
@@ -74,9 +92,14 @@ propose three fission transformations:
   and embedding it in an $n$-way SplitJoin with a round robin splitter
   and joiner.
 \item {\bf Parallelizing stateless feedback loops.}  If the body of a
-  feedback loop is stateless [then with more conditions on peek/pop/push
-  ratios, you can duplicate it and shrink the delay... do we have space
-  to explain this?]
+  feedback loop is stateless and its input/output rates evenly divide
+  the delay of the loop, then the entire loop can be replicated and
+  parallelized as in (1), with the quantity and delay of the new loops
+  being (approximately) equal to the quotient of the old delay and the
+  body stream's I/O rates.  This exploits the fact that for certain
+  feedback loops there are interleaved subsequences of the input stream
+  that are transformed completely independently by the loop.
+
 \item {\bf Splitting stateful filters.}  If a filter has persistent
   state, we can still gain pipeline parallelism by breaking the the
   filter into an $n$-stage pipeline in which the state is communicated
@@ -110,16 +133,16 @@ Decimation refers to the regular discarding of a fraction of a filter's
 input items, perhaps to reduce the sampling rate in a stream.  In the
 streaming domain, the analog of dead code elimination is the propagation
 of this decimation up through the stream graph, thereby eliminating the
-computations that produce the unused items.  [give some formula's?]
+computations that produce the unused items.
 
 \subsection{Synchronization Removal}
 
-In a StreamIt graph, the SplitJoin construct allows a way to define
+In a StreamIt graph, the SplitJoin construct provides a way to define
 independent units of parallel computation.  However, when two SplitJoins
 $s_1$ and $s_2$ are connected in a pipeline, there is a joiner/splitter
 pair that serializes all of the items passing from $s_1$ to $s_2$.  If
 the joiner of $s_1$ and the splitter of $s_2$ are both round robins with
 equal weights, then this node can be eliminated in favor of a single
-SplitJoin $s_c$ with the $i$'th parallel stream in $s_c$ is a pipeline
-of the corresponding streams in $s_1$ and $s_2$.  [model with language!]
+SplitJoin $s_c$ with the $i$'th parallel stream in $s_c$ being a
+pipeline of the corresponding streams in $s_1$ and $s_2$.
 

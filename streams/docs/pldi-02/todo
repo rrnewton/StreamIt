@@ -32,6 +32,13 @@ inputs?
 
 * Add the meaning of the whole program to the denotational semantics.
 
+- Add a figure for the feedback loop transformation?  The fusion
+transformation?
+
+- Eliminate round robin / weighted round robin (watchout for WeightedRR
+in model.tex, too) in favor of just "round robin" that is assumed to
+have some weights.
+
 - Introduce comma notation for O1_S => O_1,S, etc.
 
 - Improve the translation from the abstract syntax back to a work function
