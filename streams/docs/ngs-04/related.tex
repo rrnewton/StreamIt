@@ -1,0 +1,36 @@
+\section{Related Work}
+\label{sec:related}
+A large number of programming languages have included a concept of a
+stream; see \cite{survey97} for a survey.  Those that are perhaps most
+related to StreamIt 1.0 are synchronous dataflow languages such as
+LUSTRE~\cite{lustre} and ESTEREL~\cite{esterel92}, which require a fixed
+number of inputs to arrive simultaneously before firing a stream node.
+However, most special-purpose stream languages do not contain features
+such as messaging and support for modular program development that are
+essential for modern stream applications.  Also, most of these languages
+are so abstract and unstructured that the compiler cannot perform enough
+analysis and optimization to result in an efficient implementation.
+
+At an abstract level, the stream graphs of StreamIt share a number of
+properties with the synchronous dataflow (SDF) domain as considered by
+the Ptolemy project~\cite{ptolemyoverview}.  Each node in an SDF graph
+produces and consumes a given number of items, and there can be delays
+along the arcs between nodes (corresponding loosely to items that are
+peeked in StreamIt).  As in StreamIt, SDF graphs are guaranteed to
+have a static schedule and there are a number of nice scheduling
+results incorporating code size and execution time~\cite{leesdf}.
+However, previous results on SDF scheduling do not consider
+constraints imposed by point-to-point messages, and do not include a
+notion of StreamIt's information wavefronts, re-initialization, and
+programming language support.
+
+A specification package used in industry bearing some likeness to
+StreamIt is SDL: Specification and Description Language~\cite{sdlrec}.
+SDL is a formal, object-oriented language for describing the structure
+and behavior of large, real-time systems, especially for
+telecommunications applications.  It includes a notion of asynchronous
+messaging based on queues at the receiver, but does not incorporate
+wavefront semantics as does StreamIt.  Moreover, its focus is on
+specification and verification whereas StreamIt aims to produce an
+efficient implementation.
+

@@ -1,0 +1,192 @@
+%TGIF 4.1.42
+state(0,37,100.000,0,256,0,16,1,9,1,1,0,0,1,0,1,0,'Courier',0,57600,0,0,0,10,1,0,1,1,0,16,0,0,1,1,1,0,1088,1408,0,0,2880,0).
+%
+% @(#)$Header: /afs/csail.mit.edu/group/commit/reps/projects/streamit/cvsroot/streams/docs/ngs-04/fir-object.obj,v 1.1 2004-01-15 08:59:18 rabbah Exp $
+% %W%
+%
+unit("1 pixel/pixel").
+color_info(11,65535,0,[
+	"magenta", 65535, 0, 65535, 65535, 0, 65535, 1,
+	"red", 65535, 0, 0, 65535, 0, 0, 1,
+	"green", 0, 65535, 0, 0, 65535, 0, 1,
+	"blue", 0, 0, 65535, 0, 0, 65535, 1,
+	"yellow", 65535, 65535, 0, 65535, 65535, 0, 1,
+	"pink", 65535, 49344, 52171, 65535, 49344, 52171, 1,
+	"cyan", 0, 65535, 65535, 0, 65535, 65535, 1,
+	"CadetBlue", 24415, 40606, 41120, 24415, 40606, 41120, 1,
+	"white", 65535, 65535, 65535, 65535, 65535, 65535, 1,
+	"black", 0, 0, 0, 0, 0, 0, 1,
+	"DarkSlateGray", 12079, 20303, 20303, 12079, 20303, 20303, 1
+]).
+script_frac("0.6").
+fg_bg_colors('black','white').
+dont_reencode("FFDingbests:ZapfDingbats").
+page(1,"",1,'').
+text('black',96,288,33,0,1,354,395,0,9,2,0,1,0,0,2,354,395,0,0,"",0,0,0,0,297,'',[
+minilines(354,395,0,0,0,1,0,[
+mini_line(102,9,2,0,0,0,[
+str_block(0,102,9,2,0,-1,0,0,0,[
+str_seg('black','Courier',0,57600,102,9,2,0,-1,0,0,0,0,0,
+	"class FIRFilter {")])
+]),
+mini_line(48,9,2,0,0,0,[
+str_block(0,48,9,2,0,-3,0,0,0,[
+str_seg('black','Courier',0,57600,48,9,2,0,-3,0,0,0,0,0,
+	"  int N;")])
+]),
+mini_line(96,9,2,0,0,0,[
+str_block(0,96,9,2,0,-3,0,0,0,[
+str_seg('black','Courier',0,57600,96,9,2,0,-3,0,0,0,0,0,
+	"  float[] input;")])
+]),
+mini_line(0,9,2,0,0,0,[
+str_block(0,0,9,2,0,0,0,0,0,[
+str_seg('black','Courier',0,57600,0,9,2,0,0,0,0,0,0,0,
+	"")])
+]),
+mini_line(120,9,2,0,0,0,[
+str_block(0,120,9,2,0,-1,0,0,0,[
+str_seg('black','Courier',0,57600,120,9,2,0,-1,0,0,0,0,0,
+	"  FIRFilter(int N) {")])
+]),
+mini_line(90,9,2,0,0,0,[
+str_block(0,90,9,2,0,-3,0,0,0,[
+str_seg('black','Courier',0,57600,90,9,2,0,-3,0,0,0,0,0,
+	"    this.N = N;")])
+]),
+mini_line(18,9,2,0,0,0,[
+str_block(0,18,9,2,0,-2,0,0,0,[
+str_seg('black','Courier',0,57600,18,9,2,0,-2,0,0,0,0,0,
+	"  }")])
+]),
+mini_line(0,9,2,0,0,0,[
+str_block(0,0,9,2,0,0,0,0,0,[
+str_seg('black','Courier',0,57600,0,9,2,0,0,0,0,0,0,0,
+	"")])
+]),
+mini_line(354,9,2,0,0,0,[
+str_block(0,354,9,2,0,-1,0,0,0,[
+str_seg('black','Courier',0,57600,354,9,2,0,-1,0,0,0,0,0,
+	"  float[] getData(float[] output, int offset, int length) {")])
+]),
+mini_line(132,9,2,0,0,0,[
+str_block(0,132,9,2,0,-1,0,0,0,[
+str_seg('black','Courier',0,57600,132,9,2,0,-1,0,0,0,0,0,
+	"    if (input==null) {")])
+]),
+mini_line(216,9,2,0,0,0,[
+str_block(0,216,9,2,0,-3,0,0,0,[
+str_seg('black','Courier',0,57600,216,9,2,0,-3,0,0,0,0,0,
+	"      input = new float[MAX_LENGTH];")])
+]),
+mini_line(246,9,2,0,0,0,[
+str_block(0,246,9,2,0,-3,0,0,0,[
+str_seg('black','Courier',0,57600,246,9,2,0,-3,0,0,0,0,0,
+	"      source.getData(input, 0, N+length);")])
+]),
+mini_line(60,9,2,0,0,0,[
+str_block(0,60,9,2,0,-1,0,0,0,[
+str_seg('black','Courier',0,57600,60,9,2,0,-1,0,0,0,0,0,
+	"    } else")])
+]),
+mini_line(234,9,2,0,0,0,[
+str_block(0,234,9,2,0,-3,0,0,0,[
+str_seg('black','Courier',0,57600,234,9,2,0,-3,0,0,0,0,0,
+	"      source.getData(input, N, length);")])
+]),
+mini_line(204,9,2,0,0,0,[
+str_block(0,204,9,2,0,-1,0,0,0,[
+str_seg('black','Courier',0,57600,204,9,2,0,-1,0,0,0,0,0,
+	"    for (int i=0; i<length; i++) {")])
+]),
+mini_line(120,9,2,0,0,0,[
+str_block(0,120,9,2,0,-3,0,0,0,[
+str_seg('black','Courier',0,57600,120,9,2,0,-3,0,0,0,0,0,
+	"      float sum = 0;")])
+]),
+mini_line(174,9,2,0,0,0,[
+str_block(0,174,9,2,0,-2,0,0,0,[
+str_seg('black','Courier',0,57600,174,9,2,0,-2,0,0,0,0,0,
+	"      for (int j=0; j<N; j++)")])
+]),
+mini_line(282,9,2,0,0,0,[
+str_block(0,282,9,2,0,-3,0,0,0,[
+str_seg('black','Courier',0,57600,282,9,2,0,-3,0,0,0,0,0,
+	"        sum = sum + data1[i+j]*FIR_COEFF[j][N];")])
+]),
+mini_line(174,9,2,0,0,0,[
+str_block(0,174,9,2,0,-3,0,0,0,[
+str_seg('black','Courier',0,57600,174,9,2,0,-3,0,0,0,0,0,
+	"      output[i+offset] = sum;")])
+]),
+mini_line(30,9,2,0,0,0,[
+str_block(0,30,9,2,0,-2,0,0,0,[
+str_seg('black','Courier',0,57600,30,9,2,0,-2,0,0,0,0,0,
+	"    }")])
+]),
+mini_line(162,9,2,0,0,0,[
+str_block(0,162,9,2,0,-2,0,0,0,[
+str_seg('black','Courier',0,57600,162,9,2,0,-2,0,0,0,0,0,
+	"    for (int i=0; i<N; i++)")])
+]),
+mini_line(198,9,2,0,0,0,[
+str_block(0,198,9,2,0,-3,0,0,0,[
+str_seg('black','Courier',0,57600,198,9,2,0,-3,0,0,0,0,0,
+	"      input[i] = input[i+length];")])
+]),
+mini_line(18,9,2,0,0,0,[
+str_block(0,18,9,2,0,-2,0,0,0,[
+str_seg('black','Courier',0,57600,18,9,2,0,-2,0,0,0,0,0,
+	"  }")])
+]),
+mini_line(6,9,2,0,0,0,[
+str_block(0,6,9,2,0,-2,0,0,0,[
+str_seg('black','Courier',0,57600,6,9,2,0,-2,0,0,0,0,0,
+	"}")])
+]),
+mini_line(0,9,2,0,0,0,[
+str_block(0,0,9,2,0,0,0,0,0,[
+str_seg('black','Courier',0,57600,0,9,2,0,0,0,0,0,0,0,
+	"")])
+]),
+mini_line(78,9,2,0,0,0,[
+str_block(0,78,9,2,0,-1,0,0,0,[
+str_seg('black','Courier',0,57600,78,9,2,0,-1,0,0,0,0,0,
+	"void main() {")])
+]),
+mini_line(258,9,2,0,0,0,[
+str_block(0,258,9,2,0,-3,0,0,0,[
+str_seg('black','Courier',0,57600,258,9,2,0,-3,0,0,0,0,0,
+	"  DataSource datasource = new DataSource();")])
+]),
+mini_line(228,9,2,0,0,0,[
+str_block(0,228,9,2,0,-3,0,0,0,[
+str_seg('black','Courier',0,57600,228,9,2,0,-3,0,0,0,0,0,
+	"  FIRFilter filter = new FIRFilter(5);")])
+]),
+mini_line(204,9,2,0,0,0,[
+str_block(0,204,9,2,0,-3,0,0,0,[
+str_seg('black','Courier',0,57600,204,9,2,0,-3,0,0,0,0,0,
+	"  Display display = new Display();")])
+]),
+mini_line(174,9,2,0,0,0,[
+str_block(0,174,9,2,0,-3,0,0,0,[
+str_seg('black','Courier',0,57600,174,9,2,0,-3,0,0,0,0,0,
+	"  filter.source = datasource;")])
+]),
+mini_line(156,9,2,0,0,0,[
+str_block(0,156,9,2,0,-3,0,0,0,[
+str_seg('black','Courier',0,57600,156,9,2,0,-3,0,0,0,0,0,
+	"  display.source = filter;")])
+]),
+mini_line(96,9,2,0,0,0,[
+str_block(0,96,9,2,0,-3,0,0,0,[
+str_seg('black','Courier',0,57600,96,9,2,0,-3,0,0,0,0,0,
+	"  display.run();")])
+]),
+mini_line(6,9,2,0,0,0,[
+str_block(0,6,9,2,0,-2,0,0,0,[
+str_seg('black','Courier',0,57600,6,9,2,0,-2,0,0,0,0,0,
+	"}")])
+])
+])]).

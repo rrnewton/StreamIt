@@ -1,0 +1,65 @@
+\documentclass[10pt,twocolumn]{article}
+\usepackage{latex8}
+\usepackage{times}
+\usepackage{cite}
+\usepackage{fancyvrb}
+\usepackage{graphicx}
+\usepackage{url}
+\usepackage{epsfig}
+\usepackage{subfigure}
+
+
+\urldef\streamiturl\url{http://www.cag.csail.mit.edu/streamit/}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\begin{document}
+
+\title{StreamIt: A Language for Streaming Applications%
+\thanks{For more information about StreamIt, see \streamiturl.}}
+
+\author{Michael~I.~Gordon, Michal~Karczmarek, Jasper~Lin, William~Thies\\
+  David~Maze, Rodric~M.~Rabbah~and~Saman~Amarasinghe\\
+  Computer Science and Artificial Intelligence Laboratory\\
+  Massachusetts Institute of Technology\\
+  \{mgordon, karczma, jasperln, thies, dmaze, rabbah, saman\}@csail.mit.edu}
+
+\maketitle
+
+\newcommand{\makeline}[0]{\rule{0cm}{0cm}\\\hrule\rule{0cm}{0cm}}
+
+
+\thispagestyle{empty}
+
+\begin{abstract}
+\input{abstract.tex}
+\end{abstract}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\input{intro.tex}
+\input{domain.tex}
+\input{overview.tex}
+%\input{timing.tex}
+%\input{appendix.tex}
+%\input{example.tex}
+\input{results.tex}
+\input{related.tex}
+\input{conclusion.tex}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\bibliographystyle{latex8}
+\bibliography{references}
+%\input{appendix2.tex}
+
+\end{document}
