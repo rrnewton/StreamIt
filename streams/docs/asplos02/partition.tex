@@ -24,6 +24,28 @@
 \vspace{-6pt}
 \end{minipage}
 \\
+\begin{minipage}{2.75in}
+\centering
+\vspace{48pt}
+\centering
+\psfig{figure=splitjoin-split.eps,width=3.25in}
+\vspace{-12pt}
+\caption{\protect\small Breaking a SplitJoin into hierarchical units.
+\protect\label{fig:splitjoin-split}}
+\vspace{-6pt}
+\end{minipage}
+\begin{minipage}{3.75in}
+\vspace{-6pt}
+\centering
+\psfig{figure=fuse-splitjoin.eps,width=3.75in}
+\vspace{-12pt}
+\caption{\protect\small Fusion of a SplitJoin construct.
+\protect\label{fig:fuse-splitjoin}}
+\vspace{-6pt}
+\end{minipage}
+\end{figure}
+
+\begin{figure}
 \begin{minipage}{3in}
 \vspace{-6pt}
 \centering
@@ -34,33 +56,10 @@
 \vspace{-6pt}
 \end{minipage}
 \begin{minipage}{3.5in}
-\vspace{-6pt}
-\centering
-\psfig{figure=splitjoin-split.eps,width=3.5in}
-\vspace{-12pt}
-\caption{\protect\small Breaking a SplitJoin into a hierarchical unit.
-\protect\label{fig:splitjoin-split}}
-\vspace{-6pt}
-\end{minipage}
-\end{figure}
-
-\begin{figure}
-\begin{minipage}{3.2in}
-\vspace{40pt}
-\centering
 \psfig{figure=filter-hoisting.eps,width=3.5in}
 \vspace{-12pt}
 \caption{\protect\small Filter hoisting.
-\protect\label{fig:splitjoin-split}}
-\vspace{-6pt}
-\end{minipage}
-\begin{minipage}{3.2in}
-\vspace{-6pt}
-\centering
-\psfig{figure=fuse-splitjoin.eps,width=3.5in}
-\vspace{-12pt}
-\caption{\protect\small Fusion of a SplitJoin construct.
-\protect\label{fig:fuse-splitjoin}}
+\protect\label{fig:filter-hoisting}}
 \vspace{-6pt}
 \end{minipage}
 \end{figure}
@@ -204,7 +203,7 @@ with scalar variables to facilitate optimization.
 A subtlety of our algorithm is that the fused filter differs from the
 originals in that it has two distinct execution phases: one for
 initialization, and one for steady-state execution (see
-Figure~\ref{fig:?3}).  If any of the component filters peek at
+Figure~\ref{fig:fuse-pipe}).  If any of the component filters peek at
 elements that they do not consume, then a separate initialization
 schedule is required to fill all the ``peek buffers'' in the pipeline.
 During this initialization, the pipeline as a whole will consume some
@@ -247,13 +246,14 @@ computationally intensive node for improved load balancing.
 There are many types of fission transformations.  We have implemented
 a data-parallel transformation for stateless filters that places a
 duplicate of the filter on each path of an $n$-way SplitJoin (see
-Figure~\ref{fig:?4}).  By ``stateless'' we mean that the filter
-contains no fields that are written on one invocation of {\tt work}
-and read on later invocations--let us consider such a filter $F$ with
-I/O rates of $peek$, $pop$, and $push$.  Our transformation produces a
-SplitJoin that has a set of two-stage filters as its components.  The
-$i$'th component has a steady-state work function that is exactly the
-same as in $F$, and an initialization work function that simply pops
+Figures~\ref{fig:duplicate-fission}-\ref{fig:duplicate-fission2}).  By
+``stateless'' we mean that the filter contains no fields that are
+written on one invocation of {\tt work} and read on later
+invocations--let us consider such a filter $F$ with I/O rates of
+$peek$, $pop$, and $push$.  Our transformation produces a SplitJoin
+that has a set of two-stage filters as its components.  The $i$'th
+component has a steady-state work function that is exactly the same as
+in $F$, and an initialization work function that simply pops
 $(i-1)*pop$ items from the input stream (to account for the
 consumption of previous filters).  If $peek=pop$, the splitter is a
 RoundRobin that routes $pop$ elements to each component stream.
@@ -264,16 +264,15 @@ a weight of $push$ for each input.
 
 Instead of duplicating the entire contents of a filter, some filters
 can be split into a pipeline, with each stage performing some part of
-the work function (see Figure~\ref{fig:?5}).  In addition to the
-original input data, these pipelined stages might need to communicate
-intermediate results from within {\tt work}, as well as fields within
-the filter.  This scheme could apply to filters with state if all
-modifications to the state appear at the top of the pipeline (they
-could be sent over the data channels), or if changes are infrequent
-(they could be sent via StreamIt's messaging system.)  Also, some
-state can be identified as induction variables, in which case their
-values can be reconstructed from the {\tt work} function instead of
-stored as fields.
+the work function.  In addition to the original input data, these
+pipelined stages might need to communicate intermediate results from
+within {\tt work}, as well as fields within the filter.  This scheme
+could apply to filters with state if all modifications to the state
+appear at the top of the pipeline (they could be sent over the data
+channels), or if changes are infrequent (they could be sent via
+StreamIt's messaging system.)  Also, some state can be identified as
+induction variables, in which case their values can be reconstructed
+from the {\tt work} function instead of stored as fields.
 % no space to talk about stateless feedback loop fission
 
 \subsection{Reordering Transformations}
@@ -282,9 +281,9 @@ There are a multitude of ways to reorder the elements of a stream
 graph so as to facilitate fission and fusion transformations.  For
 instance, identical stateless filters can be pushed through a splitter
 or joiner node if the weights are adjusted accordingly
-(Figure~\ref{fig:?6}); a SplitJoin construct can be divided into a
-hierarchical set of SplitJoins to enable a finer granularity of fusion
-(Figure~\ref{fig:?7}); neighboring splitters and joiners with matching
-weights can be eliminated (Figure~\ref{fig:?8}); and nested pipelines
-can be flattened into one (Figure~\ref{fig:?9}).
+(Figure~\ref{fig:filter-hoisting}); a SplitJoin construct can be
+divided into a hierarchical set of SplitJoins to enable a finer
+granularity of fusion (Figure~\ref{fig:splitjoin-split}); and
+neighboring splitters and joiners with matching weights can be
+eliminated (Figure~\ref{fig:sync-removal}).
 
