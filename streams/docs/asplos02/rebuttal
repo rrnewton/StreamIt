@@ -1,0 +1,124 @@
+Firstly, we would like to thank the reviewers for their careful
+reviews and thoughtful suggestions to improve our paper.  We apologize
+for the typographical errors in the submission; indeed, our
+preparation was rushed and we had little time to proofread.  However,
+we have since posted a revised technical report with many corrections
+and updated results:
+
+   http://compiler.lcs.mit.edu/streamit/papers/streamit-627.pdf
+
+We believe that the paper's primary contribution is from a systems
+perspective: it demonstrates what is needed to obtain end-to-end
+performance in compiling a stream language to a communication-exposed
+architecture.  Due to space limitations, we are forced to choose
+breadth over depth even though there are many details that deserve
+further discussion and many avenues for further research.
+
+Two issues were of interest to many reviewers:
+
+1. Optimization Selection.  The paper states that, although the
+   load-balancing transformations were automated in the compiler, the
+   selection of which transformations to apply was done manually.  For
+   the submission, this was an iterative process where the authors
+   examined an execution trace and adjusted the targets of fission and
+   fusion in order to improve performance.
+
+   However, we have since implemented an automatic partitioner that is
+   based on a simple greedy algorithm.  This algorithm obtains
+   respectable performance (more than 2X speedup for two applications)
+   but we can construct cases in which a greedy strategy will fail.
+   We believe that a robust partitioner is an important goal for
+   future research, but the complexities introduced therein are beyond
+   the scope of this paper, and even orthogonal to our other results.
+
+2. Performance of FFT.  Our submission indicated a 20-fold decrease in
+   the performance of FFT due to our "optimizations".  
+
+   Many clarifications are in order here.  Firstly, the primary aim of
+   our fusion transformations is to reduce the granularity of the
+   stream graph so that it will fit on a 16-tile target.  This is why
+   we did not "turn off" the transformation for FFT, as the original
+   program would not fit on RAW.  Secondly, this version of FFT
+   (reference #21 contains the code) was intended as a stress-test for
+   the StreamIt language rather than for high performance.
+
+   ... the latest results are in the above tech report.
+
+
+Finally, in the context of our results, we ommitted to mention that
+the RAW processor contains 16 tiles that run at 250 MHz; the peak
+performance is 4 GOPS.  However, each processor is single-issue, such
+that there is no parallelism between integer and floating-point
+operations on the same tile.
+
+The following sections contain more detailed replies to each of the
+reviewers.
+
+Review #176
+-----------
+We agree that both time and space multiplexing can apply to stream
+programs, and we will adjust this section accordingly in the final
+submission.  Regarding the peek operation, we would like to emphasize
+that it is more than just a language construct--it simplifies the
+programming model since the compiler performs automated buffer
+management of items that are not consumed.  Also, peeking introduces
+considerable complexity in the compiler, with consequences that
+include two-stage filters, initialization schedules, and more careful
+deadlock avoidance techniques.
+
+Review #207
+-----------
+As you point out, there are some processors that are mostly idle even
+after our optimizations.  With our current set of transformations, we
+cannot achieve full utilization because: 1) currently, a joiner must
+occupy its own tile, 2) some filters cannot be split, 3) splitting
+filters horizontally involves introducing an extra node for the
+joiner, which might not be worth it, 4) splitting introduces
+synchronization overhead that can overwhelm the gains in parallelism,
+and 5) often there are several filters on the critical path, such that
+splitting only one does not improve the throughput (and there is not
+space to split them all).
+
+You mention that we should explain why fusion transformations are
+useful, e.g. compared to time multiplexing.  Fusion is preferable to
+time multiplexing because it enables additional optimizations on the
+combined filter code.  As for buffer size, we are working on improved
+scheduling techniques that minimize the size of large buffers so that
+they fit on a given tile.
+
+Thank you for noticing the bugs in our figures.  They were just
+typographical errors (not present in the implementation) and are
+corrected in the above tech report.  We will also reference SCORE in
+our final report.
+
+Review #304
+-----------
+You mention the problem of load-balancing given that there could be
+conditional statements.  StreamIt does allow conditionals, but only
+within the contents of each Filter.  All conditionals affecting the
+structure of the stream graph are resolved at compile-time.  Then, we
+estimate the average computation requirements per invocation of a
+filter's work function, and aim to distribute the filters so that they
+are balanced in the steady state.
+
+Thank you for the SISAL reference; we will include it in the final
+version.
+
+Review #375
+-----------
+Yes, each filter is a single-input, single-output construct.  Also, we
+do allow operations such as table lookups within a filter; they can
+have random-access memory, so long as it is local to the filter.
+
+Review #473 
+-----------
+We plan to emphasize more the benefits of having a structured
+language.  For instance, fission and fusion transformations would be
+more complicated in an unstructured realm where local changes have
+global consequences for scheduling and buffer management.  Structured
+streams also simplify our algorithms for scheduling and routing.
+
+Regarding who wrote the applications that we used for our experiments:
+we had to write them ourselves, since there are no other sources of
+applications written in StreamIt.  Of course, the algorithms used were
+based on reference implementations from third-party sources.
