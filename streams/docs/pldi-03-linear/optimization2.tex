@@ -15,12 +15,12 @@ transforming linear nodes to frequency.
 Our first goal is to show that the computation of a linear node can be
 represented as a convolution sum.  Consider executing $m$ iterations
 of a linear node $\lambda = \{A, {\vec 0}, e, 1, 1\}$---that is, a
-node with $\vec{b} = 0$ and $\mbox{push}=\mbox{pop}=1$ (these
+node with $\vec{b} = \vec{0}$ and $\mbox{push}=\mbox{pop}=1$ (these
 assumptions will be relaxed below).  Let $\vec{out}[i]$ represent the
 $i$th value that is pushed during execution, let $\vec{in}[i]$ hold
 the value of $peek(i)$ as seen before the execution begins, and let
 ${\vec y}$ be the convolution of the only column of $A$ with the
-vector $\vec{in}$ (that is, $y = A[*,0] * {\vec{in}}$).
+vector $\vec{in}$ (that is, $\vec{y} = A[*,0] * {\vec{in}}$).
 Note that $\vec{out}$ is an $m$-element vector, $A[*,0]$ is an
 $e$-element vector, ${\vec{in}}$ is an $(m+e-1)$-element vector, and
 ${\vec y}$ is an $(m+2e-2)$-element vector.
