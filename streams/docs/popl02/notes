@@ -1,66 +1,16 @@
 OUTLINE
 -------
 
-- Introduction
-
-- Motivation for Messaging / time in distributed system
-
-- Semantics of Time - informal description
-
-- Formal description via equivalence with SARE's
- . program domain is CCG's - generalization of popular dataflow frameworks
-  . motivation for peeking and phases? -- give an example in streamit syntax
-  . give notation for different phases, starting from streamit syntax
- . describe output domain, being SARE's / static control flow programs
- . give translation procedure from one to the other
-
-- SDEP for SARE's
-
-- SDEP for StreamIt graphs
- . note that since it's single-input, single-output, the max function
-	gives a single index into a one-dimensional array
- . show that it's more composable; allows separate compilation / 
-	modular thinking
- . also it's parameterizable - can have benefits of polyhedral model
-	with parameterized graphs.  this is something that you don't get
-	with an arbitrary SDF graph.
-
-- Applications of SDEP 
- . The semantics of messages - describe message sending syntax
- . Verification
-
-- Extensions
- . talk about using affine scheduling results applied to SDF scheduling
-   . get automatic fission of nodes, which is unconsidered in sdf community
-   . they talk a lot about single appearance schedules.  but they never
-	have conditionals governing the executions of loops; this is 
-	something that could come for free with affine scheduling
-   . can talk about affine scheduling being applied to multi-phase 
-	schedules -- the initialization phase is just that before each
-	filter has really started
-
 - Related Work
  . check out this buffer minimization 
   . http://epubs.siam.org/sam-bin/dbq/article/29035
  . uniformization of SARE's:
   . http://www.irisa.fr/bibli/publi/pi/2000/1350/1350.html
 
-- Conclusion
-
-
 ****************************************************************************
 
 TODO
 ----
-
-High Priority
--------------
-
-- Add note that it's important that N effects the domains, not the variables.
-
-- Say: Can model state in a SARE with a self-loop from one iter to the next.
-
-- Emphasize what is and is not resolvable at compile time.
 
 Low Priority
 ------------
@@ -147,53 +97,6 @@ executes in the steady state
 
 ---
 
-extensions / applications:
-
-- could formulate more coarse-grained constraints if you only wanted
-to do affine scheduling.  like basically just ignore the inner contents
-of the filters.
-
-- adding sdep as the transitive dependence.
-	- need to formulate it so that if there are multiple paths,
-	you only take the "earliest" dependence.  Could do this as the
-	minimum/maximum after the composition is done, and then prove
-	properties about the resulting function (like that it, also,
-	is compositional.)
-- can directly solve for minimal buffer sizes
-
-- is it possible to include CSDF?  Sure, as equations only give you
-balance equations for sum of stages.  So just expand stages in the
-steady state definition.  The only difference is that you'll want to
-input/output them in different places (to avoid deadlock), but this is
-no problem.
-
-- need to think about the affine schedule vs. a phased schedule
-
-- in the context of streamit, talk about extending to parameterized
-splitjoins, etc.  Then you can have a parameterized schedule for a
-stream graph.
-
-- 
-
----
-
-todo:
- - could optimize the in_p calculation
-
----
-
-- by the way, if single-appearance schedules are just because of the
-code bloat problem, why not just collapse similar iterations by having
-an if statement?  they think that that's too high overhead, too?
-
-- moreover, if there are duplicate nodes in the graph, then they
-schedule them many times, too.  this would give the advangtage of
-parameterizable graphs, if i can figure out how to do it.  shouldn't
-be hard at all... just add a dimension to each array's state variable
-in a splitjoin, and put the loop on that.
-
---
-
 new realizations:
 
 - even with a single affine schedule, you can do initialization with
@@ -203,9 +106,3 @@ different start times
 a single-appearance schedule?  (is there a way to guarantee
 single-appearance in what's generated from an affine schedule?  this
 would be useful for the affine scheduling community, too.)
-
-- the sdf community has taken for granted that you need SAS, but they
-haven't thought about the sci. community's approach of having
-conditionals inside loops.  this would be an easy way to improve the
-latency / buffer size, etc., without exploding the code.
-

@@ -1,3 +1,39 @@
+\section{Notes not to forget}
+
+\begin{itemize}
+
+\item it's important that N effects the domains, not the variables.
+
+\item can model state in a SARE with a self-loop from one iter to the next.
+
+\item emphasize what is and is not resolvable at compile time.
+
+\item motivation for peeking, phases, init/steady epochs.  Code
+example in StreamIt?
+
+\item more background on SARE's -- equivalent to static control flow
+programs.
+
+\item emphasize that with more fine-grained specifications of the work
+functions, you have powerful fine-grained analysis of whole program.
+
+\item fill in explanation for the equations, balance equations, etc.
+
+\item Need better typesetting - all the figures in a table?
+
+\end{itemize}
+
+\section{Introduction}
+
+\begin{itemize}
+
+\item Background on SDF/CSDF and SARE's; how they're comming from
+different communities that have been disconnected 'til now.  Review
+how landbreaking it was when Feautrier showed static control flow
+programs are equivalent to SARE's.
+
+\end{itemize}
+
 \section{SARE}
 
 A System of Affine Recurrence Equations (SARE) is a set of equations
@@ -30,14 +66,6 @@ of $X$.
 If each dependence function $h$ is a translation ($h(i) = i - k$ for
 constant $k$) then the SARE is {\it uniform}, and referred to as a
 SURE or SRE~\cite{karp67}.
-
-\section{\dep}
-
-\begin{align*}
-\DEP{X}{Y}(i) = max_{\preceq}~\{~ j ~|~ \exists ~&~ T_0 \dots T_n, ~ k_0 \dots k_n, ~ {\cal E}_1 \dots {\cal E}_n ~ s.t. ~ & ~ \\ 
-~ & T_0 = Y ~\wedge~ T_n = X ~\wedge~ k_0 = j ~\wedge~ k_n = i ~\wedge~ & ~ \\
-~ & \forall p \in 1 \dots n, ~ T_p(k_p) \equiv f_{{\cal E}_p}(\dots, T_{p-1}(h_{{{\cal E}_p}, T_{p-1}}(k_p)), \dots) ~ \} & ~ \\
-\end{align*}
 
 \section{Phased Computation Graphs}
 \label{sec:pcg}
@@ -174,10 +202,6 @@ $U(c,t,p)$ values that $n$ writes to $c$ in a given firing.
 %declaration, thereby allowing a straightforward conversion to a PCG
 %from a dataflow program.  However, 
 
-\section{Example}
-
-For example...
-
 \section{Translating a PCP to an SARE}
 
 In this section we give the formal translation of a Phased Computation
@@ -282,16 +306,16 @@ equation (IWRITE to IBUF):
 num(n, \mt{init})-1]$, introduce this equation (IREAD to IWRITE):
 %
 \begin{align*}
-\forall i \in {\cal D}_{{IWRITE}_{c, p}},~\mt{IWRITE}_{c,p}(i) = W(n, \mt{init}, p)(\mt{Input\_Arrays})[\mt{pos\_out}(n, c)][i] \\
-\mt{where Input\_Arrays} = [\mt{IREAD}_{{chan\_in}(n)[1], p}(*), \dots, \mt{IREAD}_{{chan\_in}(n)[\mt{num\_in}(n)], p}(*) ]
+\forall i \in {\cal D}_{{IWRITE}_{c, p}},~\mt{IWRITE}_{c,p}(i) = W(n, \mt{init}, p)(\mt{Init\_Inputs})[\mt{pos\_out}(n, c)][i] \\
+\mt{where Init\_Inputs} = [\mt{IREAD}_{{chan\_in}(n)[1], p}(*), \dots, \mt{IREAD}_{{chan\_in}(n)[\mt{num\_in}(n)], p}(*) ]
 \end{align*}
 %
 \item For each $c \in \mt{chan\_out}(n)$, and for each $p \in [0,
 num(n, \mt{steady})-1]$, introduce this equation (SREAD to SWRITE):
 %
 \begin{align*}
-\forall (i, j, k) \in {\cal D}_{{SWRITE}_{c, p}},~\mt{SWRITE}_{c,p}(i,j,k) = W(n, \mt{steady}, p)(\mt{Input\_Arrays})[\mt{pos\_out}(n, c)][j] \\
-\mt{where Input\_Arrays} = [\mt{SREAD}_{{chan\_in}(n)[1], p}(i, j, *), \dots, \mt{SREAD}_{{chan\_in}(n)[\mt{num\_in}(n)], p}(i, j, *) ]
+\forall (i, j, k) \in {\cal D}_{{SWRITE}_{c, p}},~\mt{SWRITE}_{c,p}(i,j,k) = W(n, \mt{steady}, p)(\mt{Steady\_Inputs})[\mt{pos\_out}(n, c)][j] \\
+\mt{where Steady\_Inputs} = [\mt{SREAD}_{{chan\_in}(n)[1], p}(i, j, *), \dots, \mt{SREAD}_{{chan\_in}(n)[\mt{num\_in}(n)], p}(i, j, *) ]
 \end{align*}
 %
 \item For each $c \in \mt{chan\_out}(n)$, for each $p \in [0,
@@ -421,4 +445,74 @@ these equations (SBUF to SREAD):
 \end{align*}
 %
 \end{itemize}
+
+\section{Applications}
+
+\subsection{Semantics of Time}
+
+\noindent {\bf \dep}
+
+\begin{align*}
+\DEP{X}{Y}(i) = max_{\preceq}~\{~ j ~|~ \exists ~&~ T_0 \dots T_n, ~ k_0 \dots k_n, ~ {\cal E}_1 \dots {\cal E}_n ~ s.t. ~ & ~ \\ 
+~ & T_0 = Y ~\wedge~ T_n = X ~\wedge~ k_0 = j ~\wedge~ k_n = i ~\wedge~ & ~ \\
+~ & \forall p \in 1 \dots n, ~ T_p(k_p) \equiv f_{{\cal E}_p}(\dots, T_{p-1}(h_{{{\cal E}_p}, T_{p-1}}(k_p)), \dots) ~ \} & ~ \\
+\end{align*}
+
+In StreamIt, this function is composable because of single-input,
+single-output blocks.  Since every junction is a one-dimensional
+array, it gives unique point in time for a given filter.  Can use this
+to think modularly/composably about time in components, too.
+
+Describe messaging semantics?  Is there space?
+
+\subsection{Scheduling}
+
+\subsubsection{Uniprocessor Scheduling}
+
+\subsubsection{Parallel Scheduling}
+
+\subsubsection{Conditional-Appearance Scheduling}
+
+- Like SAS, but you wrap a conditional around a loop.  Automatic
+  outcome of affine scheduling.
+
+\subsection{Node Fission}
+
+Just specify the relations within a node, and you have a complete view
+of program.
+
+\subsection{Node Fusion}
+
+\subsection{Buffer Minimization}
+
+\subsection{Code Size}
+
+\subsection{Parameterized Graphs}
+
+Don't need to duplicate code for nodes that are repeated.  Can also
+parameterize the schedule along these dimensions.  Especially
+well-tailored to StreamIt.  Compare to PSDF.
+
+\subsection{Verification}
+
+Buffer overrun, no exploding schedules, etc.
+
+\section{Related Work}
+
+\begin{itemize}
+
+\item SURE's and Computation Graphs
+
+\item SARE/Feautrier, affine dependences, static control flow programs.
+
+\item Lim/Lam; affine scheduling.
+
+\item The min-buffers for maximal-rate schedules stuff
+
+\item The ptolemy / SDF / CSDF guys.  Scheduling, buffer minimization,
+everything they tried to do.
+
+\end{itemize}
+
+\section{Conclusion}
 
