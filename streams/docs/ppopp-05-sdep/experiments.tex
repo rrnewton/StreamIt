@@ -1,18 +1,18 @@
-\section{Experimental Evaluation}
+\subsection{Experimental Evaluation}
 \label{sec:evaluation}
 
-We use a cluster of workstations as our evluation testbed. Our
+We use a cluster of workstations as our evaluation testbed. Our
 StreamIt compiler automatically partitions an input program into a set
-of threads that are mapped to the workstations and then run concurently.
-We chose a cluster-based evlauation for two reasons. First, clusters
-provides a practical environment for analyzing the effects of
-synchronization between concurrent proceses running on different
-machines with independent clocks. Second, clusters provide a
-simple abstraction for distrbuted computing---multiple program
+of threads that are mapped to the workstations and then run concurrently.
+We chose a cluster-based evaluation for two reasons. 
+First, a number of streaming applications run on the server side
+(e.g., cell phone base stations, radar processing, HDTV editing) and
+require large computational resources. Second, clusters provide a
+simple abstraction for distributed and parallel computing---multiple program
 counters, and distributed memories---which 
 is at the heart of emerging multi-core and tile-based architectures
 for embedded, desktop, and server computing.
-In our experiments, we are primarly interested in quantifying two
+In our experiments, we are primarily interested in quantifying two
 performance metrics: throughput and communication overhead.
 For the purpose of this paper, throughput is defined
 as the number of outputs produced per unit of time, and communication
@@ -52,3 +52,25 @@ messaging achieves a maximal throughput that is 49.8\% better than its
 feedback-loop counterpart. Furthermore, a detailed analysis of the
 results shows that teleport messaging reduces the communication
 overhead by 35\%.
+
+
+Each message has contains an iteration number, this number tells at which
+iteration the receiver should act upon the message. Sender calculates this
+iteration given the current iteration of the sender and the latency of the
+message. The sender has access to an SDEP or SDEP^(-1) function that has been
+compiled into the executable code.
+                                                                                                     
+Nodes that receive negative latency messages from an upstream sender or a
+positive latency messages from downstream sender are called restricted
+execution nodes and can only execute as many iterations as it has received in a
+credit message from the message sender. A schedule at which credit messages
+should be sent by the message sender is calculated during compile time and
+embedded in sender?s code. Note that after some initialization period the
+schedule becomes cyclic and repeats during subsequent steady state cycles only
+the credits have increased by a fixed offset.
+                                                                                                     
+The implementation assumes that for each node that receives messages there is no
+more than one message sender. We also assume that messages arrive as fast or
+faster than data items, since otherwise we would need to synchronize execution
+for 0 and small positive latency downstream messages.
+                                                                                                     
