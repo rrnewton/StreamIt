@@ -272,7 +272,7 @@ Each kernel is described as a subclass of the basic kernel class:
     // construct a kernel on <location> that uses <scratch> to spill local variables,
     // and is connected to streams (or blocks) <s1>, <s2>, ... .  Also, set private 
     // <status> to UNSTARTED.
-    Kernel(VM_NODE location, IORandomStream<byte> scratch, void* s1, void* s2=0, ... );
+    Kernel(VM_NODE location, IOBlock<byte> scratch, void* s1, void* s2=0, ... );
 
     // steady-state execution step.  Returns the new status of the kernel.
     virtual STATUS work();
@@ -975,7 +975,7 @@ constructor is invoked for a given variable name.
 \item Architecture resources must be specified by literals when they
 are passed to stream, kernel, or graph functions.  That is, constants
 denoting processor nodes, memory nodes, memory addresses, stream
-capcities, connections, and channels must be passed to API functions
+capacities, connections, and channels must be passed to API functions
 directly, rather than passing the value in a variable.  Similarly,
 each argument to a kernel's {\tt run} method must be the identifier of
 another kernel.
