@@ -82,7 +82,7 @@ hierarchical streams (see Figure~\ref{fig:steady-state}).  The
 {\pipeline} construct cascades a set of filters in sequence, with the
 output of one connected to the input of the next.  The {\splitjoin}
 construct is used to specify independent parallel streams that diverge
-from a common {\splitter} and merge into a common {\joiner}--for
+from a common {\splitter} and merge into a common {\joiner}---for
 example, in the Equalizer of Figure~\ref{fig:radio-ascoded}.  StreamIt
 currently supports two types of splitters: duplicate, which broadcasts
 its input items to each parallel stream, and round-robin, which
