@@ -1,3 +1,105 @@
+general
+-------
+** rewrite abstract and intro
+  - explain about SDF, StreamIt
+  - explain roundrobin splitters, joiners
+  - explain "actor" , "I/O rate" and "phase" of actor
+* explain numbers in figure 1 (separated by commas)
+* Figure 2: explain how to follow chart, what each line means
+* define what "simulateCurrentPhase" means in Figure 1
+* explain what [n:m] notation means 
+  - (``Message sends are annotated with a range [n:m] that means...'')
+- fix "automatic" wraparound in figure caption
+
+technical things
+----------------
+** resolve timing issue in radio, as raised by reviewer
+** fix jasper's off-by-one errors.  Might be the same as reviewer comment:
+ 3 There are two equations in the paragraph after Theorem 1. The second
+   term of the RHS of the first equation is "SDEP A<-E (n-1 mod |S ^ E|)",
+   but this should be written as "SDEP A<-E (n mod |S ^ E|)"? The same
+   goes for the second equation.
+** resolve SDEP bugs suggested by reviewer below
+* say something about determining whether message constraints are feasible
+- see if there is anything worth integrating in constrained.tex (on constrained messaging)
+
+specific reviewer comments
+--------------------------
+3 The last paragraph. "so we would conclude that SDEP A<-B (1) = 4." I
+think that SDEP A<-B (1) = 5.
+
+4.1 Definition 2. In Case 2,
+  "SDEP A<-B (n+k_1)" -> "SDEP B<-A (n+k_1)" 
+  "SDEP A<-B (n+k_2)" -> "SDEP B<-A (n+k_2)"
+
+4.2 Figure 4. Where is the latency rage [4:6] specified in the code?
+
+4.2 Figure 4. To make the paper self-contained, I think that you should
+explain a bit about StreamIt, in particlar, the roundrobin construct for
+splitter and joiner.
+
+4.3 The third paragraph. "The actual message delivery can be
+implemented in the most efficient way for the given architecture" I think
+that many readers, including me, are equally interested in the
+implementation of the portal. Thus, it is very instructive if you
+describe (perhaps in a separate section rather than here) things like
+how the portal is implemented in the system you used in 4.4 and what
+code is generated to satisfy the latency range specified.
+
+ - Figure 1: the labels at the top and bottom of each node are not adequately
+explained. 
+
+ - Algorithm 1 has several problems. The recursive call to pullSchedule only
+has one actual parameter, yet the procedure itself has 2 parameters. Moreover,
+the auxiliary procedure simulateCurrentPhase(X) is not explained, and the
+semantics of the "o" operator are left unspecified. The two occurrences of "o"
+look slightly different, which is probably the result of a typo.
+
+ - section 4.2: What does the term FFT refer to? 
+
+ - section 4.3: What is a vocoder?
+
+- Address concern: why should frequency-hopping radio app be tested on
+a high-performance distributed cluster. Wouldn't embedded hardware be
+more appropriate?  This makes me wary of the possible performance
+gains on realistic hardware (i.e. lower-speed, less parallelism).
+
+Section 3: It would be useful to point out initially that \mathcal{S} \in
+\Phi. Also, in Algorithm 1, you are missing the n parameter to the
+recursive call of pullSchedule(). I presume this should be the number of
+tokens needed to on c_i.
+
+Section 4.1: After the bullet list, you might mention as you describe the
+semantics of message latency that this is much like a logical clock,
+well-known in distributed systems.
+
+Also in 4.1, I was confused for a while about whether or not out-of-band
+messages would affect the scheduling of synchronous streams. I came to
+believe the answer is yes, but I'm not sure how this would work, since the
+definition of SDEP relied on a particular pull schedule---how is this
+schedule affected by possible changes due to required latencies? Some
+stronger clarifications on the relation of message delivery and SDF
+scheduling would be helpful. Finally, the last sentence of 4.1 feels a
+little misleading: I believe you are meaning to say that a positive latency
+will not impact SDF scheduling, but not that positive latencies for
+downstream messages are illegal (while negative ones are for upstream
+messages).
+
+Section 4.4: Why was this cluster chosen as the benchmarking platform? I'd
+think you'd want to look at embedded hardware. More analysis please! In
+particular, what is the impact in terms of bandwidth of sending less data
+(than the manual messaging model)? Why is parallelism so much more
+important for your out-of-band messaging? How often did you perform
+frequency hops? Etc.
+
+Section 6: I didn't understand the comparison of Pugh and Rosser. "..we
+calculate the last interation of an actor which affects another." What is
+"another" referring to? "..last invocation that was relevant." Is this the
+last invocation of the actor in question, or one of its predecessors? Being
+a bit more precise might help to clarify the connection here.
+
+original submission todo list
+-----------------------------
 - change A and B to {S}ender and {R}eceiver
 - mention complexity of scheduling algorithm
 - describe structured streams in streamit
