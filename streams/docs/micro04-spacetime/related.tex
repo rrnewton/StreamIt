@@ -11,7 +11,7 @@ to execute a single filter at a time across all of the parallel
 clusters.  While this provides perfect load balancing and high
 arithmetic utilization when there is abundant data parallelism, it
 suffers when a filter has retained state or data-dependences between
-iterations.  Moreoever, architectures based solely on
+iterations.  Moreover, architectures based solely on
 time-multiplexing do not scale spatially, as there are global wires
 orchestrating the parallel execution units.  There is also a large
 amount of memory traffic due to the prolonged execution of each
