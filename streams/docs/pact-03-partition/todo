@@ -1,4 +1,7 @@
-* understand why dp is performing worse than greedy on beamformer 7
+- the whole thing with sometims returning the new result and sometimes
+mutating the parent instead is misleading, esp. for toplevel parents
+where something should be returned but often it is assumed that it is
+mutated (e.g. lifter)
 
 * actually look at the applications and speculate where dynamic
 programming would fundamentally help over something greedy
