@@ -1,0 +1,387 @@
+StreaMIT Compiler Flow
+======================
+
+1. Kopi scanner/parser reads in source file
+2. Kopi internal translation to associate objects with objects, rather
+   than names
+3. Kopi to StreaMIT high IR converter
+4. (High IR optimization)
+5. StreaMIT high IR to low IR converter
+6. StreaMIT low IR to C converter
+7. (Back-end)
+8. Link against run-time system
+
+A lot of the hard work happens in (5), which reduces everything from
+high IR constructs to function calls.
+
+The run-time system has two components: a fast system, which tries to
+shuffle data around as fast as it can but doesn't have good messaging
+semantics, and a slow system with precise messaging semantics.  The
+assumption is that messages are infrequent, so the compiler (in 5)
+combines blocks such that less time is spent in the scheduler and
+run-time system.
+
+(This isn't actually quite true.  The "slow system" is actually just
+the scheduler calling into finer-grained blocks, such that it can
+dispatch to one block, send a message, and then call another block,
+rather than running a combination block that does the subblocks
+without interruption.)
+
+
+Fast and Slow State
+-------------------
+
+Bottom-level filters will often have a small amount of persistent
+state, such as the frequency for an audio filter.  It is possible for
+the compiler to try to optimize the fast-path code through a larger
+filter, using a different representation of that state to try to
+perform faster calculations (for example, instead of doing four
+separate multiplies inside a four-way split/join, using a single
+four-way SIMD multiply).
+
+The problem here is transferring state between faster and slower
+systems.  There should be a canonical representation of data, perhaps
+even in the form indicated in the source code.  A larger problem is
+tape state trapped inside a fast block: if, for example, the second
+filter in a pipeline peeks at more data than it pops, the first filter
+is required to generate enough data to satisfy the peeks, resulting in
+extra data sitting on the intermediate tape between iterations of the
+fast filter.
+
+It seems reasonable to assume that all of the data will be statically
+allocated.  In this case, there are a couple of possibilities:
+
+-- Literally everything is statically allocated.  The compiler inserts
+   correct addresses and offsets into the generated code.  There are
+   functions to move fast code state into canonical form, and
+   canonical state into fast code form.
+
+-- Many to all pieces are statically allocated, but the encode/decode
+   functions return pointers to important bits.
+
+The latter approach is actually more reasonable if blocks can be
+reconfigured at runtime.  This might be something we want to do
+eventually.  So let's go with that approach, which is somewhat similar
+to what the notes have.  We probably want to rewrite the
+canonicalization code so as to be useful, taking some other structures
+with us as we go.
+
++-A-------------------------+
+| +-B-----------+   +-E---+ |
+| | +-C-+ +-D-+ |   |     | |
+| | |   |>|   | |-->|     | |
+| | +---+ +---+ |   |     | |
+| +-------------+   +-----+ |
++---------------------------+
+
+A has been running as fast code.  A message gets passed in, and the
+runtime system decides to decompose A into B and E.  Assume for the
+sake of complexity that both the C->D and B->E tapes have state that
+needs to be saved.  (Bill says this isn't a problem, since the runtime
+system will only consider (A) or (C->D->E) as possibilities.  Save
+that thought.)  (But that means that the B box here is completely
+irrelevant, since either (CDE) will be run as fast code within A or
+(C->D->E) will be run as slow code.)
+
+Here there are four tapes.  So the data structures look like:
+A: in 1, out 4, children B, E
+B: in 1, out 3, children C, D
+C: in 1, out 2
+D: in 2, out 3
+E: in 3, out 4
+
+There are three modes we can run in.  One is definitively the "slow
+mode" and allows the scheduler to call filters as necessary to ensure
+correct message semantics.  The other two are "fast modes" where some
+state might be hidden.  It is possible to switch back and forth
+between a given fast mode and the slow mode, but not between separate
+fast modes.  It is also possible that higher-level modules will have
+state that comes into play during message handling but that doesn't
+directly affect data flow.
+
+             1 +---+ 2 +---+ 3 +---+ 4    (As) (Bs)
+Canonical:  -->| C |-->| D |-->| E |-->
+               +---+   +---+   +---+
+              
+       1 +---+ 4              1 +---+ 3 +---+ 4   (As)
+Fast: -->| A |-->      Fast: -->| B |-->| E |-->
+         +---+                  +---+   +---+
+
+
+
+Messaging
+---------
+
+Messages are sent through portals.  An arbitrary number of receiver
+objects can be registered with a particular portal; a message sent
+through the portal is sent to all of the receivers.  A portal has a
+type associated with it, but this may be an interface type rather than
+the type of any particular object.  An interface defines a set of
+messages that may be passed through the portal.
+
+Interface implementation works much like function calls in
+object-oriented languages.  Each type provides a static
+virtual-function table which it makes available.  The table associates
+slots in an instance table with functions that should be called to
+handle a method.
+
+Both senders and receivers must register with the run-time system.
+This allows the run-time system to obey the timing constraints on
+messages.  Instances of objects do not have to perform any special
+processing, aside from possibly initializing the virtual-function
+table.  (This can probably just be static, though.)
+
+void register_sender(portal p, void *sender, latency l1, latency l2);
+void register_receiver(portal p, void *receiver,
+                       void (**vtbl)(void *));
+
+Example:
+--------
+
+Let's have a simple filter that amplifies its input by a constant,
+changeable factor.
+
+class AmplifyByN extends Filter
+{
+  int N;
+  void init(int Nval)
+  {
+    input = new IntChannel();
+    output = new IntChannel();
+    N = Nval;
+  }
+  void work()
+  {
+    output.push(input.pop() * N);
+  }
+  void setN(int Nval)
+  {
+    N = Nval;
+  }
+}
+
+For the sake of example, we might chain two of these together to get a
+larger amplifier.
+
+class AmplifyByMN extends Stream
+{
+  AmplifyByNPortal mPort = new AmplifyByNPortal();
+  AmplifyByNPortal nPort = new AmplifyByNPortal();
+  void init(int M, int N)
+  {
+    AmplifyByN m, n;
+    add(m = new AmplifyByN(M));
+    mPort.register(m);
+    add(n = new AmplifyByN(N));
+    nPort.register(n);
+  }
+  void setM(int Nval)
+  {
+    mPort.setN(Nval);
+  }
+  void setN(int Nval)
+  {
+    nPort.setN(Nval);
+  }
+  void setSquare(int Nval)
+  {
+    mPort.setN(Nval);
+    nPort.setN(Nval);
+  }
+}
+
+The compiler would generate fast code for both classes.  In the slow
+system, the run-time library would call the work function for each of
+the AmplifyByN filters separately.  However, the compiler would also
+generate a work function for the AmplifyByMN filter which would do
+all of the work itself (without calling on the AmplifyByN filter).
+
+So.  Getting back to the original problem.  We want data structures
+for AmplifyByN and AmplifyByMN.  These would look like:
+
++-MN----------+
+| +-N-+ +-N-+ |
+| |   |>|   | |
+| +---+ +---+ |
++-------------+
+
+struct AmplifyByN_data
+{
+  filter_context c;
+  int N;
+};
+
+struct AmplifyByMN_data
+{
+  filter_context c;
+  struct AmplifyByN_data child_1;
+  struct AmplifyByN_data child_2;
+};
+
+(AmplifyByMN_data could, as a possibility, have a cached data member
+for M*N, so the fast-path code only needs to do one multiply; we won't
+do that for now.)
+
+We also need to create interfaces for the message receivers.  Each of
+the two classes has a separate set of functions:
+
+#define MSG_AMPLIFYBYN_SETN 0
+void (*AmplifyByN_vtbl[])(void *) = { AmplifyByN_setN };
+
+#define MSG_AMPLIFYBYMN_SETM 0
+#define MSG_AMPLIFYBYMN_SETN 1
+#define MSG_AMPLIFYBYMN_SETSQUARE 2
+void (*AmplifyByMN_vtbl[])(void *) = { AmplifyByMN_setM,
+                                       AmplifyByMN_setN,
+                                       AmplifyByMN_setSquare };
+
+As a bottom-level filter, AmplifyByN is fairly straightforward.
+
+void AmplifyByN_init(AmplifyByN_data *c, int N)
+{
+  set_stream_type(c, FILTER);
+  set_pop(c, 1);
+  set_peek(c, 0);
+  set_push(c, 1);
+  set_work(c, AmplifyByN_work);
+  set_teardown(c, AmplifyByN_teardown);
+  c->N = N;
+}
+
+void AmplifyByN_teardown(AmplifyByN_data *d)
+{
+}
+
+void AmplifyByN_work(AmplifyByN_data *d, void *input, void *output)
+{
+  int *itape = input;
+  int *otape = output;
+  otape[0] = d->N * itape[0];
+}
+
+void AmplifyByN_setN(AmplifyByN_data *d, int N)
+{
+  c->N = N;
+}
+
+AmplifyByMN's code needs to be a superset of the AmplifyByN code; this
+might be the simplest translation.
+
+void AmplifyByMN_init(AmplifyByMN_data *d, int M, int N)
+{
+  set_stream_type(d, PIPELINE);
+  set_pop(d, 1);
+  set_peek(d, 0);
+  set_push(d, 1);
+  set_work(d, AmplifyByMN_work);
+  set_teardown(d, AmplifyByMN_teardown);
+  canon_info(d, AmplifyByMN_canon_info);
+  encode_data(d, AmplifyByMN_to_canon);
+  decode_data(d, AmplifyByMN_from_canon);
+  register_children(d, 2, &d->child1, &d->child2);
+
+  d->p1 = create_portal();
+  AmplifyByN_init(&d->child1, M);
+  register_receiver(d->p1, &d->child1, AmplifyByN_vtbl, LATENCY_BESTEFFORT);
+  register_sender(d->p1, d, LATENCY_BESTEFFORT);
+
+  d->p2 = create_portal();
+  AmplifyByN_init(&d->child2, N, d->p2);
+  register_receiver(d->p2, &d->child2, AmplifyByN_vtbl, LATENCY_BESTEFFORT);
+  register_sender(d->p2, d, LATENCY_BESTEFFORT);
+}
+
+void AmplifyByMN_teardown(AmplifyByMN_data *d)
+{
+}
+
+void AmplifyByMN_work(AmplifyByMN_data *d, void *input, void *output)
+{
+  int *itape = input;
+  int *otape = output;
+  int tape1[1];
+  tape1[0] = itape[0] * d->child1.N;
+  otape[0] = tape1[0] * d->child2.N;
+}
+
+void AmplifyByMN_canon_info(AmplifyByMN_data *d, sched_canon_state *s)
+{
+  s->child[0] = &d->child1;
+  s->child[1] = &d->child2;
+  s->tape[0] = &d->tape1;
+  s->tapelen[0] = 1;
+}
+
+void AmplifyByMN_to_canon(AmplifyByMN_data *d)
+{
+  /* Nothing to do */
+}
+
+void AmplifyByMN_from_canon(AmplifyByMN_data *d)
+{
+  /* Nothing to do */
+}
+
+void AmplifyByMN_setM(AmplifyByMN_data *d, int M)
+{
+  send_message(d->p1, MSG_AMPLIFYBYN_SETN, M);
+}
+
+void AmplifyByMN_setN(AmplifyByMN_data *d, int N)
+{
+  send_message(d->p2, MSG_AMPLIFYBYN_SETN, N);
+}
+
+void AmplifyByMN_setSquare(AmplifyByMN_data *d, int N)
+{
+  send_message(d->p1, MSG_AMPLIFYBYN_SETN, N);
+  send_message(d->p2, MSG_AMPLIFYBYN_SETN, N);
+}
+
+Having written this, it now seems reasonable to try to define what's
+in sched_canon_state, the scheduler's idea of the canonical state.
+This needs the set of child objects and tapes that are available; the
+scheduler should take responsibility for draining tapes if necessary.
+
+typedef struct
+{
+  void **child;
+  void **tape;
+  int *tapelen;
+} sched_canon_state;
+
+void canon_info(void(*info)(void *d, sched_canon_state *s));
+void encode_data(void(*encoder)(void *d));
+void decode_data(void(*decoder)(void *d));
+
+canon_info() allows an init function to register a function to tell
+the runtime system how to get at the canonical data.  child is an
+array of pointers to child objects in some specified order, and tape
+and tapelen are arrays of tapes and tape lengths, again in some
+specified order.  encode_data() and decode_data() register functions
+to populate/depopulate the canonical state information.  If we had an
+AmplifyByNSquared filter, this might store the base value in response
+to messages, and then set:
+
+AmplifyByNSquared_to_canon(AmplifyByNSquared_data *d)
+{
+  d->child1.N = d->N;
+  d->child2.N = d->N;
+}
+
+AmplifyByNSquared_from_canon(AmplifyByNSquared_data *d)
+{
+  d->N = d->child1.N;
+}
+
+As a side thought, tack on a structure that might be used by the
+run-time scheduler to define a filter's context.
+
+typedef struct
+{
+  int peeks;
+  int pops;
+  int pushes;
+  work_fn work;
+} filter_context;
+
