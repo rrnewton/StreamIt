@@ -1,0 +1,11 @@
+- results:  did we  only apply  scalar replacement  in  CAF+buffer and
+CAF+buffer+optimizations? we should be more specific.
+
+> other things to consider adding:
+
+- results with modulation
+- evidence that our cache model makes sense
+- at least a cursory investigation with/comparison to phased scheduling
+- better explanation of results, especially scalar replacement and 
+register allocation impact (need to verify our hypothesis)
+

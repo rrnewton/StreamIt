@@ -64,7 +64,8 @@ transfered between the filters, a {\tt push\_index} to indicate the
 buffer location that will be written next, and a {\tt pop\_index} to
 indicate the buffer location that will be read next (i.e., the
 location corresponding to {\tt peek(0)}).  The communication
-primitives are translated as follows: {\small
+primitives are translated as follows: 
+{\small
 \begin{verbatim}
 push(val); ==>  BUFFER[push_index] = val;
                 push_index = (push_index + 1) % BUF_SIZE;
