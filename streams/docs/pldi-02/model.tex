@@ -333,12 +333,111 @@ stream $j$ in the SplitJoin for which:
 Both of these cases could be detected by a compiler to verify that no
 buffers will overflow during steady-state execution.
 
-\subsection{Message Timing}
+\subsection{Information Flow}
 
-in the previous description of streamit, the messaging system was left
-unspecified.  here we use the min function to give a precise semantics
-to message delivery timing in streamit.  this will yield an
-operational semantics to the scheduling of streamit programs.
+In the above sections, the $min$ function is mostly described in terms
+of data dependences.  However, we can also think of this function as
+defining a common timing mechanism that asynchronous filters can use
+to synchronize events.  We present this timing mechanism in terms of
+``information flow'', which we believe is a central concept of the
+streaming domain.  Using this concept, we give a precise semantics to
+message delivery timing in in StreamIt.
+
+\subsubsection{Information Wavefronts}
+
+When an item enters a stream, it carries with it some new information.
+As execution progresses, this information cascades through the stream,
+effecting the state of filters and the values of new data items which
+are produced.  We refer to an ``information wavefront'' as the set of
+filter executions that first sees the effects of a given input item.
+Thus, although each filter's {\tt work} function is invoked
+asynchronously without any notion of global time, two invocations of a
+work function occur at the same ``information-relative time'' if they
+operate on the same information wavefront.
+
+The $min$ function can be used to give a precise definition to an
+information wavefront.  One interpretation of $y = \mi{a}{b}(x)$ is
+that the item at position $y$ of tape $a$ is the the latest item on
+tape $a$ to {\it affect} the item at position $x$ of tape $b$.  This
+is because item $x$ on tabe $b$ can be produced if and only if tape
+$a$ contains at least $y$ items.  Note that this effect might be via a
+control dependence rather than a data dependence--for instance, if
+item $y$ needs to pass through a round-robin joiner before some data
+from another stream can be routed to tape $b$.  This is why we choose
+``information flow'' instead of ``data flow'' to describe the timing
+concept.  Also, when speaking of the information wavefront, we only
+consider information that is passed through the data streams; if a
+data item affects another via a low-latency downstream message, then
+this effect could jump ahead of the wavefront.
+
+\subsubsection{Message Timing}
+
+We now employ the $min$ function to give a precise meaning to the
+message delivery guarantees in StreamIt.  Suppose that filter $A$
+sends a message to filter $B$ with latency $\lambda$, where $\lambda$
+is any integer.  After $\lambda$ invocations of $A$'s {\tt work}
+function, $A$ will produce (or has produced) one or more data items
+$d$.  Now, the messaging system guarantees that:
+\begin{enumerate}
+
+\item If $B$ is upstream of $A$, then $B$ will receive the message
+immediately following the last invocation of its {\tt work} function
+which produces items that affect $d$.
+
+\item If $B$ is downstream of $A$, then $B$ will receive the message
+immediately preceding the first invocation of its {\tt work} function
+which produces items that are effected by $d$.
+
+\end{enumerate}
+Now let us express these constraints in terms of the $min$ function.
+Letting $s$ be equal to $n(O_A)$ at the time that the message was
+sent, we have that:
+\begin{enumerate}
+
+\item If $B$ is upstream of $A$, the message will be delivered when:
+\begin{align}
+\label{eq:msgup}
+n(O_B) = push_B * \ceil{\mi{O_B}{O_A}(s + push_A * \lambda)}{push_B}
+\end{align}
+That is, $s + push_A * \lambda$ is the number of items on $A$'s output
+tape after producing the data of interest.  Then, $y = \mi{O_B}{O_A}(s
++ push_A * \lambda)$ is the latest item on $B$'s output tape that
+affects the data of interest.  The message should be delivered
+immediately after the work function producing this item, which occurs
+when the item count $n(O_B)$ equals $push_B * \ceil{y}{push_B}$, as
+specified by the constraint.
+
+\item If $B$ is downstream of $A$, the message will be delivered when:
+\begin{align}
+\label{eq:msgdown}
+n(O_B) = MAX(x~s.t.~\mi{O_A}{O_B}(x) = s + push_A * (\lambda-1))
+\end{align}
+That is, $z = s + push_A * (\lambda - 1)$ is the number of items on
+$A$'s output tape before pushing the data of interest.  The message
+should be delivered when $B$ has executed as far as possible given
+that there are $z$ items on $O_A$.  That is, $B$ should push $x$ items
+on its output tape for the maximum $x$ that still depends on some of
+the $z$ items, which is given by the condition $\mi{O_A}{O_B}(x) = z$
+above.
+
+Thus, when $A$ pushes the next set of data, it could affect the data
+that will be pushed next onto the output tape of $B$.  (Note that the
+next set of data from $A$ might not be sufficient to calculate the
+next set on $B$'s output, but it could affect it nonetheless.)  The
+message must be delivered immediately before this effected data
+appears on $B$'s output, so the number of items $n(O_B)$ is as given
+above.  We do not need a ceiling function as in (\label{eq:msgup})
+because we are guaranteed to have the maximum $x$ at a multiple of
+$push_B$.
+
+\end{enumerate}
+
+\subsubsection{Latency Constraints}
+
+The same framework can be used to give a semantics to the latency
+constraints in StreamIt.  Each directive MAX\_LATENCY(A, B, n) has the
+same effect as defining a message from filter $B$ to upstream filter
+$A$ with latency $n$.
 
 \subsection{Operational Semantics}
 
