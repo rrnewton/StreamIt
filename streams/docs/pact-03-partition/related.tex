@@ -16,16 +16,16 @@
 
 %\end{verbatim}
 
-The idea of structuring a language hierarchically to aid analysis is not
-a new concept. IF1 is an example of a language that is based heavily on
-structure~\cite{Sked}. At the lowest level, IF1 has around 50 different
-types of primitive nodes that can be combined together to form a hierachy
-of acyclic dataflow graphs. The compound nodes Select, TagCase, ForAll,
-While, and Until link together subgraphs. Taking advantage of this
-hierarchal structure, algorithms have
-been developed that effectively partition IF1 programs with low order
-polynomial running times~\cite{Sarker}. The StreamIt language is designed
-to be a language that is both easy to analyze and lends itself well to
+The idea of structuring a language hierarchically to aid analysis is
+not a new concept. IF1 is an example of a language that is based
+heavily on structure~\cite{Sked}. At the lowest level, IF1 has around
+50 different types of primitive nodes that can be combined together to
+form a hierachy of acyclic dataflow graphs. The compound nodes Select,
+TagCase, ForAll, While, and Until link together subgraphs. Taking
+advantage of this hierarchal structure, algorithms have been developed
+that effectively partition IF1 programs with low order polynomial
+running times~\cite{Sarker}. The StreamIt language is designed to be a
+language that is both easy to analyze and lends itself well to
 programming within the streaming domain. The parameterizable nature of
 stream graphs allow the compiler to immediately detect most symmetries
 and cut down the amount of redundant analysis.

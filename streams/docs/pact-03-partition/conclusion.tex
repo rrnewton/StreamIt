@@ -1,5 +1,20 @@
 \section{Conclusion}
 
+We have implemented 
+
+\item A general dynamic programming algorithm for partitioning a
+structured stream graph.  The algorithm exploits many aspects of the
+graph's structure to improve its efficiency and effectiveness.
+
+\item An implementation of the partitioner in the context of load
+balancing StreamIt programs on Raw~\cite{raw-micro}, where we
+demonstrate improvements over a greedy algorithm by an average of
+24\%.
+
+\item A suite of refactoring transformations that can be performed on
+a structured stream graph, which are critical for the implementation
+of the above algorithms.
+
 - two thrusts: that structure actually SUPPORTS powerful ways of
 program reasoning, and that we are flexible enough to manipulate
 structured programs into a number of isomorphic forms.  can consider
