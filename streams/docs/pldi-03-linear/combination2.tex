@@ -384,7 +384,7 @@ splitter.
 
 \begin{figure}[t]
 \center
-\epsfxsize=3.0in
+\epsfxsize=2.8in
 \epsfbox{images/example-splitjoin-combination.eps}
 \caption{Splitjoin combination example.}
 \protect\label{fig:example-splitjoin-combination}
@@ -393,6 +393,17 @@ splitter.
 
 Figure~\ref{fig:example-splitjoin-combination} shows an example of
 the combination and collapse of a linear splitjoin. 
+The node on the left pushes four items per work function 
+whereas the node on the right pushes one item per work function. In order
+to match the output rates to the rate of the roundrobin joiner
+the right filter needs to be expanded to 
+$\lambda_2^e=\mt{expand}(\lambda_2,2,2,2)$. The columns of the
+two linear nodes are then interleaved into the overall
+linear node $\lambda'$.
+% I don't know if this is useful or if it is enough information
+% concievably, we could walk though the entire algorithm and the 
+% calculation of the intermediate variables. Somehoe, however, I think 
+% that this is best done in my thesis -- AAL
 
 
 \subsubsection{Roundrobin Splitter}
