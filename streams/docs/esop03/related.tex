@@ -51,10 +51,10 @@ A dependence graph (DG) is often presented as an alternate
 representation for a System of Uniform Recurrence
 Equations~\cite{Karp67,DRV00}.  Sometimes a DG is collapsed into a
 reduced dependence graph (RDG) in which there is only one node per
-variable.  Of course, these graphs have (by definition) a one-to-one
-correspondence with a set of recurrence equations, but they are more
-trivial than the graphs described above, in that they only produce and
-consume one item per firing and do not have a concept of phases or
+variable~\cite{DRV00}.  Of course, these graphs have (by definition) a
+one-to-one correspondence with a set of recurrence equations, but they
+are more trivial than the graphs described above: they only produce
+and consume one item per firing and do not have a concept of phases or
 peeking.
 
 Govindarajan et al. develop a linear programming framework for
@@ -137,5 +137,5 @@ partitioning algorithm that maximizes the degree of parallelism while
 minimizing the degree of synchronization.  Affine partitioning--which
 subsumes loop fusion, reversal, permutation, and reindexing--operates
 on a form that is equivalent to a SARE.  Affine representations of
-scientific programs have have also been utilized for powerful storage
+scientific programs have also been utilized for powerful storage
 optimizations~\cite{Lim01,Quillere,Thies01,Lefebvre98}.
