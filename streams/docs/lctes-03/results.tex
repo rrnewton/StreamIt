@@ -29,13 +29,14 @@ another publication on scheduling streaming applications
 been implemented.
 
 The QMF application is a qmf12\_3d.  It had to be modified
-slightly to account for {\StreamIt} {\splitters} and {\joiners} not
-allowing any computation. The high-pass and low-pass filtering in
-the {\splitters} has been moved to just after data been separated
-into two channels. The re-combining of data in the {\joiners} has
-been moved to a {\filter} just after the {\joiners}. The low and high
-pass filters have also been given a peek amount of 16 so they can
-perform their function in the way intended in {\StreamIt}.
+slightly to account for {\StreamIt} {\splitters} and {\joiners}
+not allowing any computation. The high-pass and low-pass filtering
+in the {\splitters} has been moved to just after data has been
+separated into two channels. The re-combining of data in the
+{\joiners} has been moved to a {\filter} just after the
+{\joiners}. The low and high pass filters have also been given a
+peek amount of 16 so they can perform their function in the way
+intended in {\StreamIt}.
 
 CD-DAT is exactly the same application as that described in
 \cite{murthy99buffer}.
@@ -58,9 +59,9 @@ numbers. The first one is an uncompressed schedule, while the
 second is a compressed schedule. During testing it was found that
 in some applications some streams had many phases that were
 identical to other phases of the stream. Instead of including
-these phases in the final schedule multiple, they were listed only
-once, and references to the duplicate phases have been replaced
-with references to their copies.
+these phases in the final schedule multiple times, they were
+listed only once, and references to the duplicate phases have been
+replaced with references to the one copy.
 
 This optimization lead to improvements in schedule size for two
 reasons. First, streams now had less phases, so their schedules
@@ -85,7 +86,7 @@ schedule of a sink stream is a minimal latency schedule. This
 leads to the minimal latency schedule of the outer-most
 {\pipeline} becoming a single appearance schedule, thus destroying
 some of the benefit of using phasing scheduling. The technique
-used here for scheduling {\pipeline} sinks has been discussed in
+used for scheduling {\pipeline} sinks has been discussed in
 \cite{karczma-thesis}.
 
 \begin{comment}
@@ -186,7 +187,7 @@ Our synthetic benchmarks decrease from 7168 to 4864 and from 19964
 to 12063, a 32\% and 40\% improvements. The first improvement is
 due to creating fine grained phases which allow the initialization
 schedule to transfer smaller amount of data and allow the children
-of the {\splitjoin} to drain their data before the {\splitter}
+of a {\splitjoin} to drain their data before the {\splitter}
 provides them with more. This improvement is only created in
 presence of peeking. The second improvement is due to reducing
 combinatorial growth and due to finer grained schedules to deal

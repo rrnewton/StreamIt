@@ -1,11 +1,11 @@
 \section{Conclusion and Future Work}
 
-This thesis presents two techniques used for scheduling
-Synchronous Data Flow Graphs as used by the {\StreamIt} language.
-Unlike other langauge, {\StreamIt} enforces a structure on the
-stream graph, thus allowing a variety of new approaches to
-scheduling execution. Algorithms presented here improve current
-current scheduling techniques in multiple ways.
+This paper presents two techniques used for scheduling Synchronous
+Data Flow Graphs as used by the {\StreamIt} language. Unlike other
+langauges, {\StreamIt} enforces a structure on the stream graph,
+thus allowing a variety of new approaches to stream scheduling.
+Algorithms presented here improve current scheduling techniques in
+multiple ways.
 
 Hierarchical approach to scheduling of streaming applications
 allows for very simple algorithms. Program graphs do not have to
@@ -14,15 +14,15 @@ In hierarchical approaches presented here, we only need to
 consider immediate children of a given stream.
 
 Phasing approach to scheduling allows to schedule arbitrarily
-tight {{\feedbackloops}} and allows for more fine-grained control of
-buffering requirements. The fine-grained control of buffering
-requirements can provide dramatic improvements in buffer
-requirements when scheduling streaming applications, as has been
-presented here. Furthermore, phased schedules lend themselves to
-some easy forms of compression, thus reducing the schedule size.
-Future work will concentrate on expanding phasing scheduling to
-implement schedules that have some real-life constraints put upon
-them. For example, a program may want to keep all its data in
-processor caches to provide high performance. Adapting buffer
-sharing to phased scheduling will also be explored, as it promises
-further reduction in buffer requirements.
+tight {{\feedbackloops}} and allows for more fine-grained control
+of buffering requirements. The fine-grained control of buffering
+requirements can provide dramatic reduction of buffer sizes when
+scheduling streaming applications, as has been presented here.
+Furthermore, phased schedules lend themselves to some easy forms
+of compression, thus further reducing the schedule size. Future
+work will concentrate on expanding phasing scheduling to implement
+schedules that have some real-life constraints put upon them. For
+example, a program may need to keep all its data in processor
+caches to provide high performance. Adapting buffer sharing to
+phased scheduling will also be explored, as it promises further
+reduction in buffer requirements.

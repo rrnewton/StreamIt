@@ -26,8 +26,8 @@ single appearance schedule. Every stream uses only the schedule of
 its immediate child streams to create its own schedule. Phased
 schedules, however, consist of several steps, called phases. All
 of the phases must be executed in order to guarantee correctness.
-Once all of the phases have been executed, the schedule has been
-executed. A parent stream can interleave execution of its
+Once all of the phases have been executed, the complete schedule
+has been executed. A parent stream can interleave execution of its
 children's phases in its own schedule, to provide any level of
 granularity desired.
 
@@ -74,10 +74,7 @@ different granularities of execution.  In principle, the parent
 should not need to know the scheduling granularity of its
 children. The only exception to this rule are {{\feedbackloops}},
 which can have children which are not scheduled tightly enough to
-allow the {{\feedbackloop}} to execute. An example of that may be a
-pseudo single-appearance hierarchical scheduling algorithm
-described in Section \ref{sec:sas} implemented using phase
-scheduling.
+allow the {{\feedbackloop}} to execute.
 
 \begin{comment}
 One important observation to make is that it makes little sense to
@@ -105,7 +102,7 @@ schedule, leading to deadlock. Phasing scheduling can alleviate
 this problem by allowing the program to be scheduled in a more
 fine-grained manner. Minimal latency scheduling is an example of a
 specific scheduling strategy that solves the problem of deadlock.
-Minimal latency schedule is a schedule that requires a minimal
+Minimal latency schedule is a schedule that consumes a minimal
 amount of input data in order to output data. In other words, a
 minimal latency schedule only buffers as much data as is
 absolutely necessary. This means that if a {\feedbackloop} can be
@@ -161,9 +158,10 @@ $T_s$ and $I_s$ are defined by identical structures.  Both are
 defined as sets of phases. The only real difference between $T_s$
 and $I_s$ is that $T_s$ will be executed indefinitely, while $I_s$
 will be executed only once. A phase $A$ is defined as $A = \{E,
-c\}$.  $E$ is an ordered list of phases and nodes that are to be
-executed in order to execute the phase.  $c$ is the consumption of
-the phase, with respect to its stream.
+c\}$.  $E$ is an ordered list of children's phases, {\splitters}
+and {\joiners} that are to be executed in order to execute the
+phase. $c$ is the consumption of the phase, with respect to its
+stream.
 
 \begin{comment}
 As an example, here is a minimal latency schedule for the sample
@@ -263,9 +261,10 @@ restrictions. If the node reading from a {\Channel} peeks more
 than it pops, the amount of data in the {\Channel} during real
 execution cannot fall below the $peek-pop$ amount.
 \end{comment}
-Since some {\filters} require a positive number of data items in the
-{\Channel} , we also need to keep track of amount of data needed
-from a {\Channel}, as can be seen in Table\ref{tbl:min-lat-sj}.
+Since some {\filters} require a positive number of data items in
+the {\Channel}, we also need to keep track of amount of data
+needed from a {\Channel}, as can be seen in
+Table\ref{tbl:min-lat-sj}.
 
 The initialization schedule starts with no internally buffered
 data (with exception of {{\feedbackloops}}) and executes as many
@@ -310,7 +309,7 @@ to bottom-most child).  This constitutes one complete phase of the
 
 For a {\splitjoin}, the process is similar, but the children are
 first executed bottom up starting with {\joiner}, then the stream
-children and finally the {\splitter}. After the children are
+children and finally the {\splitter}. After, the children are
 executed from top to bottom (excluding the {\splitter}), consuming
 only data already available to them in {\Channels}.
 
@@ -779,7 +778,7 @@ c_{fl} = \left[ \begin{array}{c} 12 \\ 12 \\ 15 \end{array}
 \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
 \hline
 \multicolumn{4}{|c|}{data in {{\Channel}}} & \multicolumn{4}{c|}{\parbox{1in}{\centering phase executions left}} & \parbox{0.5in}{\centering child considered} & \parbox{0.6in}{\centering phases executed} & \parbox{0.6in}{\centering {\pipeline} consumption} \\
-\cline{1-8} split & A & B & join & $in_A$ & $out_A$ & $in_B$ & $out_B$ & & & \\
+\cline{1-8} $in_A$ & $out_A$ & $in_B$ & $out_B$ & split & A & B & join & & & \\
 \hline 0 (0) & 0 (0) & 0 (0) & 0 (0) & 0 & 0 & 1 & 0 & join & - & $[0\ 0\ 0]$ \\
 \hline 0 (0) & 0 (0) & 0 (0) & 0 (0) & 0 & 0 & 1 & 0 & A & - & $[0\ 0\ 0]$ \\
 \hline 0 (0) & 0 (0) & 0 (0) & 0 (0) & 0 & 0 & 1 & 0 & B & $A^i_{B,0}$ & $[0\ 0\ 0]$ \\
@@ -800,8 +799,8 @@ c_{fl} = \left[ \begin{array}{c} 12 \\ 12 \\ 15 \end{array}
 \end{tabular}
 \caption[Execution of Minimal Latency Scheduling Algorithm on a
 {\splitjoin}]{Execution of Minimal Latency Scheduling Algorithm on
-{\splitjoin} from Figure \ref{fig:steady-state}(b). In the "data
-in {{\Channel}}" columns, the first value represents the actual
+{\splitjoin} from Figure \ref{fig:steady-state}(b). In the ``data
+in {{\Channel}}'' columns, the first value represents the actual
 number of data in the {{\Channel}}, which can be negative due to
 data borrowing. The second value is the minimal number of
 additional data items needed in the {\Channel}.}
@@ -811,7 +810,7 @@ additional data items needed in the {\Channel}.}
 Table \ref{tbl:min-lat-sj} contains a trace of execution of our
 algorithm on the sample {\splitjoin} from Figure
 \ref{fig:steady-state}(b). Below is the phasing schedule for the
-{\splitjoin}. Note that this example does produce a single
+{\splitjoin}. Note that this example produces a phased single
 appearance schedule.
 
 \begin{displaymath} \scriptsize

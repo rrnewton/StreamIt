@@ -169,12 +169,12 @@ component's direct children. For example, if a {\splitjoin} has a
 while the {\splitjoin} will have a steady schedule $T_{sj}$, which
 will include $T_p$.
 
-A hierarchical steady schedule for a stream $s$ will be denoted by
-$T_s$, while an initialization schedule for a stream $s$ will be
-denoted $I_s$. A {\splitter} of a {\splitjoin} $sj$ or a
-{{\feedbackloop}} $fl$ will be denoted as $split_{sj}$ or
-$split_{fl}$, while the {\joiner} will be denoted as $join_sj$ or
-$join_{fl}$.
+A hierarchical steady state schedule for a stream $s$ will be
+denoted by $T_s$, while an initialization schedule for a stream
+$s$ will be denoted $I_s$. A {\splitter} of a {\splitjoin} $sj$ or
+a {{\feedbackloop}} $fl$ will be denoted as $split_{sj}$ or
+$split_{fl}$, while the {\joiner} will be denoted as $join_{sj}$
+or $join_{fl}$.
 
 This section will continue using the notation for $e$, $o$ and $u$
 extended to streams.
@@ -194,10 +194,13 @@ order to execute the initialization schedule for $s$; $o^i_s$
 represents the amount of data consumed by $s$ from its {\Input}
 {{\Channel}} during its initialization schedule; and $u^i_s$
 denotes the amount of data pushed by $s$ onto its {\Output}
-{{\Channel}} during execution of its initialization schedule.  The
-initialization schedules are created in such a way, that after all
-streams have executed their initialization schedules, the program
-is ready to enter its steady state execution.
+{{\Channel}} during execution of its initialization schedule. We
+also use notation of $c_s$ denoting vector holding appropriate
+values of $e_s$, $o_s$ and $u_s$, and $c^i_s$ holding $e^i_s$,
+$o^i_s$ and $u^i_s$. The initialization schedules are created in
+such a way, that after all streams have executed their
+initialization schedules, the program is ready to enter its steady
+state execution.
 
 \begin{comment}
 Note, that it is possible that a stream $s$ has $u^i_s \ne
@@ -243,7 +246,7 @@ is that they are very small. The disadvantage of single appearance
 schedules is that they can require large amount of buffering
 between {\filters}. Not all valid {\StreamIt} programs can be
 scheduled using single appearance schedules. This is because a
-{\feedbackloop} may provide not enough data in its feedback path.
+{\feedbackloop} may not provide enough data in its feedback path.
 Pseudo single appearance scheduling allows a large number of
 applications to be scheduled, while keeping the size of the
 schedule small. There still exist applications which cannot be
@@ -276,7 +279,7 @@ Sample streams for techniques described here are taken from Figure
 \subsubsection{\filter}
 
 An execution of a {\filter} is an atomic operation.  Thus a steady
-state schedule for a {\filter} $f$ is simply $T_f = (f)$.
+state schedule for a {\filter} $f$ is simply $T_f = \{f\}$.
 
 A {\filter} has no internal buffering.  Thus there is no need to
 initialize a {\filter} for its steady state.  {\filters} may,
@@ -292,8 +295,6 @@ e_f-o_f\\0\\0\end{array}\right] \right\}
 $$
 
 \subsubsection{{\pipelines} and {\splitjoins}}
-
-{\large \bf put some math here}
 
 Scheduling {\pipelines} and {\splitjoin} consists of computing a
 single appearance schedule for the {\pipeline} or {\splitjoin}.
@@ -601,9 +602,9 @@ I_A\ I_B\}, \left[
 {\feedbackloop} is similar to initializing a {\pipeline}. First
 the children are iterated over to find out how many times they
 need to execute to initialize the {\feedbackloop}, and then they
-are iterated in reverse and their executions concatenated
-appropriately. The order of original traversal is loop child,
-{\splitter}, body child and {\joiner}. The loop child only
+are iterated in reverse order and their executions concatenated
+appropriately. The order of first traversal is (loop child,
+{\splitter}, body child and {\joiner}). The loop child only
 executes its initialization schedule, while other children may
 need to execute their steady state schedules.
 
@@ -765,8 +766,9 @@ out^i_L = & delay_{fl} + u^i_{fl_L} + l_L * u_{fl_L} - l_j * w_{j,1} \\
 state schedule for a {{\feedbackloop}} is more complicated than
 for the other streams.  The reason for this is that
 {{\feedbackloops}} may require a non single-appearance schedule
-due to small $delay_{fl}$ value, while other {\StreamIt} construct
-can always be scheduled using single-appearance schedules.
+due to small $delay_{fl}$ value, while other {\StreamIt}
+constructs can always be scheduled using single-appearance
+schedules.
 
 \begin{comment}
 The algorithm used for creating of a steady state schedule
