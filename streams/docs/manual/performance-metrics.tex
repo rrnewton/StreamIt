@@ -1,11 +1,18 @@
-% $Id: performance-metrics.tex,v 1.3 2003-02-18 22:35:51 aalamb Exp $
+% $Id: performance-metrics.tex,v 1.4 2003-02-19 11:03:25 thies Exp $
 \section{Measuring StreamIt Performance}
 \subsection{Introduction}
-{\huge This section is slightly out of date -- there is a 
-new number gathering infrastructure that Gordo made. You 
-might find some of the {\tt btl} commands useful...}
+{\huge This section is slightly out of date -- there is a new number
+gathering infrastructure that Gordo made.} 
 
-Andrew Lamb 8/6/2002
+To use the new infrastructure, run the compiler with the {\tt
+--numbers <n>} option, where {\tt <n>} represents the number of
+steady-state cycles that should be measured.  Then find your results
+in the {\tt results.out} file.  For manual number gathering, you might find
+use for some of the {\tt btl} commands described in this section.
+
+\vspace{12pt}
+
+\noindent Andrew Lamb 8/6/2002
 
 This section is intended to introduce people how to measure the performance
 of StreamIt programs.

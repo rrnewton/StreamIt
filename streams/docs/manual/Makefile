@@ -2,6 +2,8 @@ all: ps
 
 dvi: *.tex
 	latex manual.tex
+	latex manual.tex
+	latex manual.tex
 ps: dvi
 	dvips manual.dvi -o manual.ps
 pdf: ps

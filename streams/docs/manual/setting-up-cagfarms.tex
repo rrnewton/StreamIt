@@ -2,23 +2,29 @@
 
 \subsection{Introduction}
 The CAG group has a bunch of Linux machines where StreamIt development
-occurs on. You can probably set up a local development environment
-but that is your own problem. The machines are named {\tt cagfarm-1.lcs.mit.edu} to 
-{\tt cagfarm-49.lcs.mit.edu}. For StreamIt development,
-it is probably best to use numbers 40-49. These machines are accessible via ssh
-and they run X so you can forward X packets and run an X server on
-your local machine if you so desire. Most of the file systems on the 
-cagfarms are remote mounted via NFS
-so your home directory and most other directories of interest are
-always the same.
+occurs on. You can probably set up a local development environment but
+that is your own problem. The machines are named {\tt
+cagfarm-01.lcs.mit.edu} to {\tt cagfarm-49.lcs.mit.edu}. For StreamIt
+development, it is probably best to use numbers 40-49, as these are
+fast dual-processor machines.  Next best are cagfarms 20-39, and then
+cagfarms 01-19.
+
+All the cagfarm's are accessible via ssh and they run X so you can
+forward X packets and run an X server on your local machine if you so
+desire. Most of the file systems on the cagfarms are remote mounted
+via NFS so your home directory and most other directories of interest
+are always the same.
 
 \subsection{Setting up Environment Variables}
 There are two environment variables that you absolutely need to set up
-in order to checkout and compile the StreamIt compiler. It is probably
-a good idea to use your {\tt .cshrh} or {\tt .bashrc} files to set
-the values each time you log in. Unless you change it, your account
-on the cagfarm will use {\tt csh} for your shell, and so you should
-edit the {\tt .cshrc} file to do things each login.
+in order to checkout and compile the StreamIt compiler\footnote{If you
+lose this document, the latest bare-bones guide to getting started
+with StreamIt is maintained in {\tt /home/streamit/cag-streamit.txt}
+on the CAG machines.}. It is probably a good idea to use your {\tt
+.cshrh} or {\tt .bashrc} files to set the values each time you log
+in. Unless you change it, your account on the cagfarm will use {\tt
+csh} for your shell, and so you should edit the {\tt .cshrc} file to
+do things each login.
 
 \paragraph{CVSROOT}
 This environment variable tells cvs where the root repository is 
@@ -31,18 +37,18 @@ you check out of CVS. It is used by various scripts and programs
 to find out the StreamIt installation path.
 
 \paragraph{CLASSPATH}
-Back in the day, you had to set up your class path manually.
-Now there are two files which will do it for you, depending
-on your choice of shell. Since they both live in the CVS
-repository, you first need to check out the {\tt streams} project,
-as described in Section~\ref{sec:checkout}. Then you can
-use {\tt streams/include/dot-cshrc} by putting the following
-command in your {\tt .cscrc}
+Back in the day, you had to set up your class path manually.  Now
+there are two files which will do it for you, depending on your choice
+of shell. Since they both live in the CVS repository, you first need
+to check out the {\tt streams} project, as described in
+Section~\ref{sec:checkout}. Then you can use {\tt
+streams/include/dot-cshrc} by putting the following command in your
+{\tt .cscrc}
 \begin{verbatim}
 source $\STREAMIT_HOME}/include/dot-cshrc
 \end{verbatim}
 
-or by putting the following command in your {\tt .basrc}
+\noindent or by putting the following command in your {\tt .bashrc}
 
 \begin{verbatim}
 . $STREAMIT_HOME/include/dot-bashrc
@@ -54,10 +60,6 @@ export STREAMIT_HOME
 ## Set up class path (by using the classpath in include/dot-cshrc)
 setenv STREAMIT_HOME $HOME/streams
 source ${STREAMIT_HOME}/include/dot-cshrc
-
-## for starsearch / raw streamit
-setenv STARSEARCH_HOME /home/bits6/NO_BACKUP/streamit/starsearch
-setenv TOPDIR /home/bits6/NO_BACKUP/streamit/starsearch
 
 ## cvsroot for streams stuff
 setenv CVSROOT /projects/raw/cvsroot
@@ -82,11 +84,72 @@ will take several minutes.
 
 
 \subsection{Eclipse}
-There is a graphical IDE that you can use to work on the compiler called
-Eclipse\footnote{Emacs, however, is the bomb.}. You can probably use other 
-IDEs too, but we know how to set up
-Eclipse. If you are interested, you should talk to one of the grad
-students and they can help you set it up. 
+There is a graphical IDE that you can use to work on the compiler
+called Eclipse\footnote{Emacs, however, is the bomb.}. You can
+probably use other IDEs too, but we know how to set up Eclipse.
+Here's how to set up eclipse:
+\begin{enumerate}
+
+\item There is a shared copy of eclipse in:
+
+\noindent {\tt /home/bits7/NO\_BACKUP/streamit/eclipse-2.0.2}
+
+This is the release build from November.  To run it with your own
+workspace, issue this command from the above directory:
+
+\noindent {\tt ./eclipse -data \~/workspace}
+
+We've found that you actually have to be in the eclipse directory when
+you give this command, otherwise it dies.  Also if you try to run
+without the -data flag, it will die (since you won't have permissions
+on the default workspace directory.)
+
+If you'd prefer to run a more recent and/or less stable build of
+eclipse, please put it in 
+
+\noindent {\tt /home/bits7/NO\_BACUP/streamit} 
+
+\noindent and notify the group so that we can share.
+
+\item Checkout streams and run make (following directions later in
+ this document).  I don't know how to make eclipse use antlr to
+ generate stuff yet.)
+
+\item Run eclipse and do file/new/project.
+
+\item Java Project.
+
+\item Name it ``streamit'' or something and point directory to your
+{\tt STREAMIT\_HOME}.  Click ``Next'' and say ``No'' so it doesn't
+auto-detect classes.
+
+\item Add folder, named ``compiler''.
+
+\item Click ``yes'' to replace project folder.
+
+\item ``Add folder'' compiler/3rdparty.  It will tell you it added an
+   exclusion.
+
+\item Open tab for 3rdparty directory and click on ``Exclusion
+filter'', then ``Edit'', ``Add'', and enter ``cplex/*''.  Then ok.
+
+\item ``Add folder'' library/java.
+
+\item Go to Libraries tab, click ``add external jar's''.  Add your
+    {\tt \$STREAMIT\_HOME/compiler/3rdparty/cplex/cplex.jar}.  (Don't
+    literally use {\tt "\$STREAMIT\_HOME"}, but replace with your
+    value.)
+
+\item Add another ``external jar'' to point to {\tt
+/usr/uns/java/antlr.jar}
+
+\item Click ``finish''.
+\end{enumerate}
+
+Everything should compile -- you'll get hundreds of ``problems'' but
+these should all be warnings (yellow flags instead of red ones).  Then
+you're all set and can run/debug, etc... e.g. go to Run/Debug... and
+set up a test case.
 
 \subsection{Useful Things Andrew would have Liked to Know}
 
@@ -108,7 +171,13 @@ cagfarm-48: 2:14pm up 50 days, 15:51, 4 users, load average: 0.00, 0.03, 0.00
 cagfarm-49: 2:14pm up 50 days, 15:51, 1 user, load average: 0.00, 0.00, 0.00
 \end{verbatim}
 
+\paragraph{cagload}
+
+You can also use {\tt /home/streamit/tools/cagload} to get a sorted
+list of the load on cagfarm machines.
+
 \paragraph{dot}
+\label{sec:dot}
 {\tt dot} is a useful graph making tool. For some reason, most of us use
 the version of dot installed in {\tt /u/diego}. To use that install
 of dot, you need to add {\tt /u/diego/bin} to your path and set
@@ -138,15 +207,17 @@ If you want to have files available via the web on the cagfarms, make
 a directory called {\tt public\_html} in your home directory. The contents
 of this directory are available at the website \\
 \begin{verbatim}
-http://cag.lcs.mit.edu/~username
+http://cag.lcs.mit.edu/\~username
 \end{verbatim}
  where (obviously) {\tt username} is your username.
 
 \paragraph{Filesystems}
-There are several filesystems for use if you need to store large files.
-{\tt /home/bits6/} and {\tt home/bits7} are good locations. They are
-automounted, so to use one, you should go to {\tt home/bits6} and make 
-a temp directory and just go wild. 
+There are several filesystems for use if you need to store large
+files.  {\tt /home/bits6/} and {\tt home/bits7} are good
+locations. They are automounted, so to use one, you should go to {\tt
+home/bits6} and make a temp directory and just go wild.  If you're not
+storing sensitive data, use the {\tt /home/bits6/NO\_BACKUP} or {\tt
+/home/bits7/NO\_BACKUP} directory to help with storage space.
 
 \paragraph{Access via Windows}
 If you want access to the cag filesystems via windows

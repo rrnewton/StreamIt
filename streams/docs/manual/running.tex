@@ -26,6 +26,13 @@ The knit script does the following three things for you:
   \item Compile {\tt HelloWorld6.c} to {\tt a.out} using gcc and linking against the C library.
 \end{enumerate}
 
+\subsection{Viewing the Stream Graph}
+Following the execution of the compiler, you can see graphs of various
+views of the program in the {\tt .dot} files in the directory.  For
+example, the original stream graph of the application is in {\tt
+before.dot}.  These dot files can be viewed following the directions
+in Section~\ref{sec:dot}.
+
 \subsection{Running Compiled StreamIt Programs}
 StreamIt programs are infinite loops -- if you simply execute the {\tt a.out} 
 program generated from HelloWorld6, you will see a counter increasing 
@@ -82,9 +89,8 @@ application for 10 iterations.
 \begin{verbatim}
 java streamit.frontend.ToJava HelloWorld6.str > HelloWorld6.java
 jikes HelloWorld6.java
-java HelloWorld6 - 10
+java HelloWorld6 -i 10
 \end{verbatim}
-
 
 \subsection{StreamIt Compiler}
 You can run the StreamIt compiler by issuing the following command
