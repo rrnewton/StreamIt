@@ -1,0 +1,54 @@
+     1  float->float filter RFtoIF(int N, float START_FREQ) {
+     2    float[N] weights;
+     3    int size, count;
+     4
+     5    init { set_frequency(START_FREQ); }
+     6
+     7    work pop 1 push 1 {
+     8      push(pop() * weights[count++]);
+     9      count = count % size;
+    10    }
+    11
+    12    handler set_frequency(float freq) {
+    13      count = 0;
+    14      size  = (int) (N * START_FREQ / freq);
+    15      for (int i = 0; i < size; i++)
+    16        weights[i] = sin(i * pi / size);
+    17    }
+    18  }
+    19
+    20  float->float splitjoin Check_Freq_Hop(int N,
+    21                                        float START_FREQ,
+    22                                        portal<RFtoIF> port) {
+    23    split roundrobin(N/4-2, 1, 1, N/2, 1, 1, N/4-2);
+    24    for (int i=1; i<=7; i++) {
+    25      if (i==1 || i==4 || i==7) {
+    26        add Identity<float>;
+    27      } else {
+    28        add float->float filter {
+    29          work pop 1 push 1 {
+    30            float val = pop();
+    31            push(val);
+    32            if (val > hop_threshold)
+    33              port.set_frequency(START_FREQ +
+    34                                i/7*Constants.BANDWIDTH) [4:4]
+    35          }
+    36        }
+    37      }
+    38    }
+    39    join roundrobin(N/4-2, 1, 1, N/2, 1, 1, N/4-2);
+    40  }
+    41
+    42  void->void pipeline Freq_Hopping_Radio {
+    43    int   N          = 32;
+    44    float START_FREQ = 2402000000;
+    45    portal <RFtoIF> port;
+    46
+    47    add Read_From_AtoD(N);
+    48    add RFtoIF(N, START_FREQ) to port;
+    49    add FFT(N);
+    50    add Magnitude();
+    51    add Check_Freq_Hop(N, START_FREQ, port);
+    52    add Output()
+    53  }
+
