@@ -49,4 +49,4 @@ main.dvi: main.tex references.bib *.tex images/*.eps images/part-algorithm.eps i
 
 clean:
 	rm -f main.pdf main.ps main.dvi main.log main.aux main.bbl main.blg
-	rm -rf sub streamgraphs/*.ps images/part-algorithm*.eps images/part-algorithm*.ps
+	rm -rf sub streamgraphs/*.ps images/*.ps
