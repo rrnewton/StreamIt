@@ -3,7 +3,7 @@
 The Streaming Virtual Machine API is a set of data types and functions used to express the streaming portion of an application mapped to a specific VM by the high-level compiler. It includes streams and blocks which specify how data is mapped to memory, kernels which specify how computation and data-movement functions are mapped to processors, and control functions which are used by threaded code to control kernel execution.
 
 The Streaming Virtual Machine API is a strict C subset, and can be compiled by a standard C compiler with 
-a simple library for debugging and testing purposes.
+a simple library for testing and debugging purposes.
 
 We describe the API for streams and blocks in Section~\ref{sec:memory}, the API for kernels in Section~\ref{sec:kernel}, and the API for control in Section~\ref{sec:control}.
 
@@ -25,9 +25,10 @@ The elements must have a fixed size. Variable sized elements can be supported at
   } Stream;
 
   // aliases used by high-level compiler to indicate how a kernel uses a stream
-  // to the low-level compiler
+  // to the low-level compiler: for input only, output only, or both
   typedef Stream IStream;
   typedef Stream OStream;
+  typedef Stream IOStream;
 
   //
   // stream initialization functions:
@@ -40,10 +41,10 @@ The elements must have a fixed size. Variable sized elements can be supported at
                      int capacity, int elementSize, int flags);
 
   // as above with <initLength> elements already in place and
-  // EOS set if <initSetEOS>
+  // EOS set if <initEOS>
   void streamInitWithDataRAM(Stream* s, VM_NODE_MEM ramLocation, int address, 
                              int capacity, int elementSize, int initLength, 
-                             int initSetEOS, int flags);
+                             int initEOS, int flags);
 
   // make a stream mapped to hardware FIFO <fifoLocation> that contains
   // elements of size <elementSize>
@@ -83,7 +84,7 @@ The elements must have a fixed size. Variable sized elements can be supported at
   // stalls if less than n+1 elements are available
   void streamPeek(Stream* s, int n, void* element);
 
-  // sets the end of stream for the stream,
+  // sets the end of stream,
   // indicating that no more elements will be pushed  
   void streamSetEOS(Stream* s);
 
@@ -92,6 +93,10 @@ The elements must have a fixed size. Variable sized elements can be supported at
   // less than n+1 elements are available;
   // otherwise stalls until one of the above is true
   int streamGetEOS(Stream* s, int n);
+
+  // may only be called when streamGetEOS(s,0) is true,
+  // clears the end of stream
+  void streamClearEOS(Stream* s);
 \end{verbatim}}
 
 \ssss{initialization functions} The stream initialization functions declare the location and size of the stream, and specify flags which give performance hints to the low level compiler. The {\tt streamInitRAMWithData} initialization function is used to initialize a stream which aliases RAM that already contains data.
@@ -120,14 +125,14 @@ operations with the same argument but provides an opportunity for optimization b
 \ssss{streamPeek} For ordered input streams, the {\tt streamPeek} function returns the element at position {\it index}, where {\it index} is zero-indexed (such that {\tt streamPeek(0)} gives the same value as {\tt streamPop()}).  If there are fewer than $\mt{index}+1$ elements in the stream, then streamPeek stalls until $\mt{index}+1$ elements are available. If $\mt{index}+1$ exceeds the capacity of the stream, then the 
 return value is undefined.
 
-\ssss{streamSetEOS and streamGetEOS} In some cases the number of elements which can 
+\ssss{streamSetEOS, streamGetEOS, and streamClearEOS} In some cases the number of elements which can 
 be popped from a stream is variable and determined by the producing kernel. 
 The producing kernel can encode this information directly in the data stream, 
-but doing so often ignores hardware support and incurs overhead for each element. For this reason, the Stream API provides the {\tt streamSetEOS} and {\tt streamGetEOS} 
+but doing so often ignores hardware support and incurs overhead for each element. For this reason, the Stream API provides the {\tt streamSetEOS}, {\tt streamGetEOS}, and {\tt streamClearEOS}
 functions. After pushing the last element onto a stream, the producing kernel can call 
-{\tt streamSetEOS} to indicate that no more elements will be pushed. The 
+{\tt streamSetEOS} to indicate that no more elements will be pushed until after {\tt streamClearEOS} is called. The 
 consuming kernel can call {\tt streamGetEOS} at any time. {\tt streamGetEOS} with argument  
-{\it index} stalls until either index + 1 elements are available or {\tt streamSetEOS} is called. It then returns false if index + 1 elements are available, true otherwise. 
+{\it index} stalls until either index + 1 elements are available or {\tt streamSetEOS} is called. It then returns false if index + 1 elements are available, true otherwise. {\tt streamClearEOS} may only be called when {\tt streamGetEOS(s, 0)} is true. It clears the end of stream, allowing more elements to be pushed by a later kernel.
 
 \subsubsection{Blocks}
 \label{sec:blocks}
@@ -239,7 +244,8 @@ supporting functions are declared as follows:
 
   // non-blocking function that indicates that kernel <k> should not 
   // execute the work function until kernel <dependsOnKernel> is FINISHED.  
-  // This function can only be called when <k> is in the UNSTARTED state.
+  // This function can only be called when <k> is in the UNSTARTED state,
+  // and is ignored if dependsOnKernel is in the UNSTARTED state.
   void addDependence(Kernel* k, Kernel* dependsOnKernel);
 
   // hint to low-level compiler to ready the kernel in the ICache.
@@ -262,13 +268,14 @@ supporting functions are declared as follows:
   void kernelEnd(Kernel* k);
 
   // waits for the status of the kernel to be PAUSED or FINISHED.
+  // ignored for UNSTARTED kernels.
   void kernelWait(Kernel* k);
 
-  // waits for at least one kernel to be PAUSED or all kernels to be FINISHED
+  // waits for at least one kernel to be PAUSED or all kernels to be FINISHED.
+  // ignores UNSTARTED kernels.
   void kernelWaitMultiple(Kernel* k0, Kernel* k1, ...);
 
-  // returns the current status of the kernel as last known by the control
-  // thread
+  // returns the status of the kernel as best known by the control thread
   KERNEL_STATUS kernelGetStatus(Kernel* k);
 \end{verbatim}}
 
@@ -279,24 +286,34 @@ supporting functions are declared as follows:
 \framebox[6.5in]{
 \begin{minipage}{6in}
 \begin{center}
-\psfig{figure=state.eps,width=5in}
+\psfig{figure=State.eps,width=5in}
 \end{center}
 \caption{Legal transitions of a kernel's {\tt status} \protect\label{fig:kernel-status}}
 \end{minipage}}
 \end{figure}
 
-Kernels have a simple execution model. A kernel is initially {\tt UNSTARTED}. 
+Kernels have a simple execution model. A transition diagram for the legal states of a kernel appears in Figure~\ref{fig:kernel-status}.
+
+A kernel is initially {\tt UNSTARTED}. 
 The control thread calls {\tt kernelRun()}, the kernel becomes {\tt WAITING}. When all kernels it depends on (as explicitly indicated by 
 the {\tt kernelAddDependence} function) are {\tt FINISHED}, the kernel becomes {\tt RUNNING}. The kernel executes its {\tt work()} function. 
-If either the control thread or the work function calls {\tt kernelPause()}, the kernel pauses in executing the work function and becomes {\tt PAUSED}. It remains {\tt PAUSED} until the control thread calls {\tt kernelRun()} again. If either the control thread or the work function calls {\tt kernelEnd()} at any time when the kernel is not {\tt FINISHED}, the kernel stops executing the work function and becomes {\tt FINISHED}. The kernel implicitly calls {\tt kernelEnd()} when the work function returns. A transition diagram for the legal states of a kernel appears in Figure~\ref{fig:kernel-status}.
+If either the control thread or the work function calls {\tt kernelPause()}, the kernel pauses in executing the work function and becomes {\tt PAUSED}. It remains {\tt PAUSED} until the control thread calls {\tt kernelRun()} again. If either the control thread or the work function calls {\tt kernelEnd()} at any time when the kernel is not {\tt FINISHED}, the kernel stops executing the work function and becomes {\tt FINISHED}. The kernel implicitly calls {\tt kernelEnd()} when the work function returns. If control flow causes a kernel to be initialized again, it becomes {\tt UNSTARTED}.
 
-Kernels can occur inside loops, and so can be executed multiple times. If the kernelAddDependence function is called to make kernel {\tt k1} dependent on kernel {\tt k2}, but {\tt kernelRun()} is called on {\tt k1} before {\tt kernelRun()} is called on {\tt k2}, the result is to make {\tt k1} dependent on the previous execution of {\tt k2}. If there is no such execution, the dependence is ignored. For instance:
+Kernels may occur inside loops, and therefore may be executed multiple times.  The {\tt kernelAddDependence} function called with arguments {\tt k2} and {\tt k1} makes {\tt k2} dependent on the last execution of {\tt k1}, whenever it occured. If {\tt k1} is {\tt UNSTARTED}, the {\tt kernelAddDependence} call is ignored. The following code illustates these concepts:
 
 {\small
 \begin{verbatim}
   while (...) {
+    static K1 k1;
+    static K2 k2;
+
+    kernelWait(&k1);
+    kernelInit(&k1.kernel, ...);
     kernelAddDependence(&k1.kernel, &k2.kernel);
     kernelRun(&k1.kernel);
+
+    kernelWait(&k2);
+    kernelInit(&k2.kernel, ...);
     kernelAddDependence(&k2.kernel, &k1.kernel);
     kernelRun(&k2.kernel);
   }
@@ -341,6 +358,8 @@ For example, a kernel for a simple amplifier could be as follows:
         x = x * amp->N;
         streamPush(amp->out, &x);
       }
+      streamClearEOS(amp->in);
+      streamSetEOS(amp->out);
   }
 \end{verbatim}}
 
@@ -385,22 +404,22 @@ stream, block, and kernel functions as described in this document.
 
 Special pre-defined kernels are used to move streams and blocks between memories. These kernels are typically executed by DMA processors, but may be executed by stream processors on some architectures.
 
-\ssss{Copy} The primary use of this kernel is for copying elements between streams in different memory banks, though it can also be used for copying between streams in a single memory. 
+\ssss{Move} The primary use of this kernel is for moving elements between streams in different memory banks, though it can also be used for moving between streams in a single memory. 
 {\small \begin{verbatim}
   typedef struct {
     Kernel kernel;
     // not exposed
-  } Copy;
+  } Move;
   
   const int STREAM_LENGTH_ALL = -1;
   
-  void copyInit(Copy* copy, VM_NODE_PROC location, IStream* srcStr, 
+  void moveInit(Move* move, VM_NODE_PROC location, IStream* srcStr, 
                 OStream* destStr, int length);
 \end{verbatim}}
 
-The {\tt length} argument indicates how many elements should be transferred. Passing a length of {\tt STREAM\_LENGTH\_ALL} indicates that all elements in the {\tt srcStr} are copied. Use of {\tt STREAM\_LENGTH\_ALL} requires use of {\tt setEOS} to set the end of {\tt srcStr} and results in the {\tt Copy} calling {\tt setEOS} on {\tt destStr} after all elements have been transferred.
+The {\tt length} argument indicates how many elements should be popped from {\tt srcStr} and pushed to {\tt destStr}. Passing a length of {\tt STREAM\_LENGTH\_ALL} indicates that all elements in the {\tt srcStr} are moved. Use of {\tt STREAM\_LENGTH\_ALL} requires use of {\tt streamSetEOS} to set the end of {\tt srcStr} and results in the {\tt Move} calling {\tt streamClearEOS} on {\tt srcStr} and {\tt streamSetEOS} on {\tt destStr} after all elements have been transferred.
 
-\ssss{Scatter/Gather} A set of scatter and gather kernels allow copies between non-contiguous elements within blocks and streams.  The strided kernels are for copying regularly spaced chunks into or out of a block: 
+\ssss{Scatter/Gather} A set of scatter and gather kernels allow copies between non-contiguous elements within blocks and streams.  The strided kernels are for moving regularly spaced chunks into or out of a block: 
 {\small \begin{verbatim}
   typedef struct {
     Kernel kernel;
@@ -421,7 +440,7 @@ The {\tt length} argument indicates how many elements should be transferred. Pas
                          int srcStride, int elementsPerStride);
 \end{verbatim}}
 
-The above kernels copy elements in segments of {\tt elementsPerStride} elements. The {\tt srcStride} or {\tt destStride} indicates the number of elements between the start of adjacent segments, while {\tt length} represents the total number of elements that should be copied ({\tt STREAM\_LENGTH\_ALL} may be used as with copy, indicates up to end of block for gather).
+The above kernels move elements in segments of {\tt elementsPerStride} elements. The {\tt srcStride} or {\tt destStride} indicates the number of elements between the start of adjacent segments, while {\tt length} represents the total number of elements that should be moved ({\tt STREAM\_LENGTH\_ALL} may be used as with move, indicates up to end of block for gather).
 
 The indexed scatter and gather kernels allow irregular accesses to a source or destination block: 
 {\small \begin{verbatim}
@@ -444,7 +463,7 @@ The indexed scatter and gather kernels allow irregular accesses to a source or d
                          int length, int elementsPerIndex);
 \end{verbatim}}
 
-In the {\tt IndexedScatter} kernel, the {\tt indexStr} indicates the positions in the output stream at which the records should be written; in the {\tt IndexedGather} kernel, the {\tt indexStr} indicates the positions in the input stream at which the records should be read. The {\tt length} argument indicates the number of elements that should be copied ({\tt STREAM\_LENGTH\_ALL} may be used as with copy, indicates up to end of indices for gather).
+In the {\tt IndexedScatter} kernel, the {\tt indexStr} indicates the positions in the output stream at which the records should be written; in the {\tt IndexedGather} kernel, the {\tt indexStr} indicates the positions in the input stream at which the records should be read. The number of data elements must be equal to the number of indices times {\tt elementsPerIndex}. The {\tt length} argument indicates the number of elements that should be moved ({\tt STREAM\_LENGTH\_ALL} may be used as with move, indicates up to end of indices for gather).
 
 \subsubsection{Black-Box Library Kernels}
 \label{sec:kernelllc}
@@ -458,22 +477,21 @@ To ensure that the low-level compiler can recognize a black-box kernel, the high
 \subsection{Control}
 \label{sec:control}
 
-Threaded code is used to declare streams, blocks, and kernels and control the execution of kernels.
+Threaded code is used to declare streams, blocks, and kernels and control the execution of kernels. All stream, kernel, and block variables must be declared as static variables.
 
 An example follows:
 {\small
 \begin{verbatim}
   int length1;
   int length2;
-  Stream s0;
-  Stream s1;
-  Stream s2;
-  Stream s4;
-  Stream s5;
-  Block scratch2;
-  Copy copy01;
-  RLE rle;
-  Copy copy45;
+  static Stream s0;
+  static Stream s1;
+  static Stream s2;
+  static Stream s4;
+  static Block scratch;
+  static Move move01;
+  static RLE rle;
+  static Move move24;
 
   // read file into memory location of s0 (not part of API)
   length1 = readFile("input.dat", GLOBALMEM1, 0x1000, 1024);
@@ -481,42 +499,47 @@ An example follows:
   streamInitWithDataRAM(&s0, GLOBALMEM1, 0x1000, 1024, 4, length1, 1, STREAM_NEVER_WRAPS);
   streamInitRAM(&s1, LOCALMEM1, 0x0, 256, 4, STREAM_UNALIASED_RAM);
   streamInitRAM(&s2, LOCALMEM1, 0x100, 128, 4, STREAM_NEVER_WRAPS);
+  blockInit(&scratch, LOCALMEM1, 0x180, 32, 1);
+
+  // move from memory
+  moveInit(&move01, DMA1, &s0, &s1, STREAM_LENGTH_ALL);
+  kernelRun(&move01.kernel);
   
-  blockInit(&scratch2, LOCALMEM1, 0x180, 32, 1);
-
-  // copy data from  main memory to local memory
-  copyInit(&copy01, DMA1, &s0, &s1, STREAM_LENGTH_ALL);
-  // rle encode it as it is loaded
-  rleInit(&rle, PROC1, &scratch2, &s1, &s2);
-
-  // run the kernels
-  kernelRun(&copy01.kernel);
+  // run rle
+  rleInit(&rle, PROC1, &scratch, &s1, &s2);
   kernelRun(&rle.kernel);
-  kernelWait(&rle.kernel);
 
+  // get output length
+  kernelWait(&rle.kernel);
+  length2 = rle.outputLength;
+  
   // if the output is still too large, run additional compression, 
   // overwriting s2 in place
-  length2 = rle.outputLength;
   if (length2 > SIZE_THRESHOLD) {
-    Stream s3;
-    Block scratch3;
-    Zip zip;
+    static Stream s3;
+    static Block scratch2;
+    static Zip zip;
 
     streamInitRAM(&s3, LOCALMEM1, 0x100, 128, 4, STREAM_NEVER_WRAPS);
-    blockInit(&scratch3, LOCALMEM1, 0x180, 32, 1);
-    
-    zipInit(&zip, PROC1, &scratch3, &s2, &s3);
+    blockInit(&scratch2, LOCALMEM1, 0x180, 32, 1);
+
+    // run zip kernel
+    zipInit(&zip, PROC1, &scratch2, &s2, &s3);
     kernelRun(&zip.kernel);
+    
+    // get output length
     kernelWait(&zip.kernel);
     length2 = zip.outputLength;
+
+    streamInitWithDataRAM(&s2, LOCALMEM1, 0x100, 128, 4, length2, 1, STREAM_NEVER_WRAPS);
   }
   
-  // copy data from  local memory to main memory
-  streamInitWithDataRAM(&s4, LOCALMEM1, 0x100, 128, 4, length2, 1, STREAM_NEVER_WRAPS);
-  streamInitRAM(&s5, GLOBALMEM1, 0x2000, 1024, 4, STREAM_NEVER_WRAPS),
-  copyInit(&copy45, DMA1, &s4, &s5, STREAM_LENGTH_ALL),
-  kernelRun(&copy45.kernel);
-  kernelWait(&copy45.kernel);
+  streamInitRAM(&s4, GLOBALMEM1, 0x2000, 1024, 4, STREAM_NEVER_WRAPS),
+  
+  // move to memory
+  moveInit(&move24, DMA1, &s2, &s4, STREAM_LENGTH_ALL),
+  kernelRun(&move24.kernel);
+  kernelWait(&move24.kernel);
 
   // store the result from memory to "output.dat" (not part of API)
   writeFile("output.dat", GLOBALMEM1, 0x2000, length2); \end{verbatim}}
@@ -531,7 +554,8 @@ There are two ways to transfer the outputs of one kernel to the inputs of anothe
 \sss{Transferring Data Between Threaded Code and Kernels}
 
 Before kernel execution, streams can be initialized with (possibly
-non-streaming) data from general-purpose threaded code.  Likewise, the results of a streaming computation can be used in the threaded code following the kernel's execution.  Both of these transfers are done through memory, either using memory management kernels as in the example  or by directly accessing the memory assigned to a stream.  The control thread can rely on the sequential data layout guaranteed by streams when managing this communication (see Section~\ref{sec:streams}). 
+non-streaming) data from general-purpose threaded code.  Likewise, the results of a streaming computation can be used in the threaded code following the kernel's execution.  Both of these transfers are done through memory, either by directly accessing the memory assigned to a stream then using memory management kernels (as in the example), or by calling stream io functions from the control code. 
+The control thread can rely on the sequential data layout guaranteed by streams when managing this communication (see Section~\ref{sec:streams}). 
 Also note that most device I/O (such as file handling and terminal interaction) is done 
 by threaded code, and then made available to streams through memory.  
 For direct interaction with streams, I/O devices can be described as 
@@ -566,22 +590,24 @@ values from a kernel.  For example:
           streamPop(k->in, &x);
           k->sum += x;
       }
+      streamClearEOS(k->in);
   }
 
   // --- control code ---
-  Stream s1;
-  Block scratch1;
-  SumKernel sk;
+  static Stream s1;
+  static Block scratch1;
+  static SumKernel sk;
   int finalSum;
 
-  streamInitRAM(&s1, LOCALMEM1, 0x100, 128, 4, 0);
-  
-  // data is pushed to s1
-  // ...
+  // assumes prior code initializes data in RAM
+  streamInitWithDataRAM(&s1, LOCALMEM1, 0x100, 128, 4, 128, 1, 0);
 
-  blockInit(&scratch1, LOCALMEM1, 0x180, 16, 1);
+  // run sum kernel
   sumInit(&sk, PROC1, &scratch1, &s1);
+  blockInit(&scratch1, LOCALMEM1, 0x180, 16, 1);
   kernelRun(&sk.kernel);
+
+  // get output sum
   kernelWait(&sk.kernel);
   finalSum = sk.sum;
 }\end{verbatim}}
@@ -598,17 +624,21 @@ In order to represent a valid hardware mapping, there are several restrictions:
 
 \begin{enumerate}
 
-\item More than one kernel may read or write a stream over the course of a program but only one {\tt WAITING}, {\tt RUNNING}, or {\tt PAUSED} kernel may be reading a stream at any given time and only one {\tt WAITING}, {\tt RUNNING}, or {\tt PAUSED} kernel may be writing a stream at any given time.
+\item An initialization function may not be called on a {\tt WAITING}, {\tt RUNNING}, or {\tt PAUSED} kernel.
 
-\item A kernel may only read from or write to streams that are mapped to memories directly connected to the processor executing the kernel (there must exist a series of connections with no intervening 
-processors or memories that connects the processor running the kernel to 
-the memory that contains the stream.)
+\item An initialization function may not be called on a stream or block that is being read/written by a {\tt WAITING}, {\tt RUNNING}, or {\tt PAUSED} kernel.
 
-\item Only one stream mapped to a hardware FIFO may contain data at any given time.
+\item Initialization functions, and all kernel control functions except kernelPause() may only be called in control code.
 
 \item Only one user-defined kernel may be {\tt RUNNING} or {\tt PAUSED} on a stream processor at any given time.
 
 \item Any number of pre-defined memory management kernels may be {\tt RUNNING} or {\tt PAUSED} on a DMA processor at any given time.
+
+\item A kernel may only read from or write to streams that are mapped to memories directly connected to the processor executing the kernel (there must exist a series of connections with no intervening processors or memories that connects the processor running the kernel to the memory that contains the stream.)
+
+\item More than one kernel may read or write a stream over the course of a program but only one {\tt WAITING}, {\tt RUNNING}, or {\tt PAUSED} kernel may be reading a stream at any given time and only one {\tt WAITING}, {\tt RUNNING}, or {\tt PAUSED} kernel may be writing a stream at any given time. 
+
+\item Only one stream mapped to a hardware FIFO may retain state at any given time. The SVM code should ensure that the state is empty with a cleared EOS before calling an initialization function that maps any stream to the FIFO.
 
 \end{enumerate}
 
@@ -617,20 +647,20 @@ low-level compiler, there are a number of restrictions:
 
 \begin{enumerate}
 
-\item There may only be one call to an initialization function for a given stream, block, or kernel variable. That call must precede any use of the variable. This exposes exactly which initialization function is invoked for a given variable name.
+\item A call to an initialization function must precede any use of the kernel, block, or stream, variable, except for kernels being used as the first argument of {\tt kernelWait()} or the second argument to {\tt kernelAddDependence()}. 
+
+\item Hardware resource locations (e.g. processor nodes and memory nodes), element sizes, and stream performance hint flags, must be specified by literals when they are passed to the initialization functions for a stream, block, or kernel variable. Those literals must be the same for all initialization functions for a given variable.
+
+\item The same stream and block arguments must be passed to all initialization functions for a kernel.
 
 \item It is illegal to take the address of a stream, block,
-or kernel variable, except to pass it directly to a function declared in this document. Thus, these variables cannot be aliased other than streams and blocks within extensions of the kernel base data type.
+or kernel variable, except to pass it directly to a function described in this document. Thus, these variables cannot be aliased other than streams and blocks within extensions of the kernel base data type.
 
 \item Stream, block, and kernel variables may not be part
 of structures except for extensions of the kernel base data type.
 
 \item Any function that contains a stream, block, or kernel variable 
 must NOT be called recursively or through a function pointer, even indirectly (e.g. cannot be called from a recursive function, 
-or a function called from a recursive function, etc.).
-
-\item Architecture resources must be specified by literals when they are passed to stream, block, or kernel functions.  That is, constants denoting processor nodes, memory nodes, connections, and channels must be passed to API functions directly, rather than passing the value in a variable.
-
-\item Element sizes and flags must be specified by literals when they are passed to stream and block functions.
+or called from a function called from a recursive function, etc.).
 
 \end{enumerate}
