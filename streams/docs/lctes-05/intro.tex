@@ -56,7 +56,8 @@ on to some other actor in the stream
 graph. This serves to $(i)$ amortize the cost of fetching the actor's
 instructions into the cache from memory (an expensive operation), $(ii)$
 improve the instruction temporal locality, and $(iii)$ improve overall
-performance. However, as our cache model will show (Section~\ref{sec:cache-model}, we
+performance. However, as our cache model will show
+(Section~\ref{sec:cache-model}), we 
 cannot arbitrarily scale the execution frequency of an actor. This
 is because actors produce data that must be buffered, and therefore,
 we must also consider the amount of data an actor produces and
