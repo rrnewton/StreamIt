@@ -1,7 +1,7 @@
 %
 % cookbook.mp: MetaPost diagrams for StreamIt Cookbook
 % David Maze <dmaze@cag.lcs.mit.edu>
-% $Id: cookbook.mp,v 1.6 2003-03-10 21:25:23 thies Exp $
+% $Id: cookbook.mp,v 1.7 2003-03-10 21:32:28 thies Exp $
 %
 % MetaPost is a drawing language based on Knuth's METAFONT that can
 % produce embedded PostScript figures, with TeX strings embedded in it.
@@ -204,7 +204,7 @@ vardef feedbackloop(expr name, join, split, cb, cl, jx, jl, sx, sl) =
   addto _p doublepath (_xb,-_hb)--(_xb,_y)--(xleft _label,_y)
   withpen currentpen;
   addto _p contour arrowhead (_xb,_y)--(xleft _label,_y) withpen currentpen;
-  addto _p doublepath (xright _label,_y)--(_xl,_y)--(_xl,_hl)
+  addto _p doublepath (xright _label,_y)--(_xl,_y)--(_xl,-_hl)
   withpen currentpen;
   addto _p contour arrowhead (_xl,_y)--(_xl,-_hl) withpen currentpen;
   addto _p also thelabel.bot(sl, ((_xl+xright _label)/2,_y));
