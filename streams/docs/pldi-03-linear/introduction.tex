@@ -1,29 +1,41 @@
 \section{Introduction}
-As more and more parts of modern life use digital computation, from cell phones to GPS systems
-and satellite radios, the importance of processing digital signals is growing.
+As more and more parts of modern life use digital computation, everything from cell phones, GPS systems
+and satellite radios, require ever more complicated processing of digital signals. 
 Each successive generation of applications requires ever more sophisticated algorithms mapped 
-on to ever more specialized digital signal processors (DSP). Since embedded computers have severe performance
-requirements placed on them, the mapping of algorithm to architecture is typically done by hand.
+on to ever more specialized digital signal processors (DSP). As 
+embedded devices have severe performance requirements placed on them,
+the mapping of algorithm to architecture is typically done by hand at great cost and great expense.
 
-Upward of fifty percent of the code that runs a DSP in a modern cell phone is written in assembly
-(the rest is written in C). The problem with these hand optimized assembly code is that one 
-has to implement the same algorithm time and time again whenever a new chip comes out. 
-This remapping by hand is costly arduous process that 
-slows the pace of advance because it forces engineers to spend time working out details rather 
-than focusing on new systems. This is exactly the problem that compilers were invented to solve
-forty years ago. However, compilers have a very difficult time mapping a program written in 
-a general purpose language like C into the specialized instructions provided by DSPs. However,
-programmers demand the general purpose flexibility of C and almost equivalent performance
-or else they will write the darn thing by hand. 
+Upward of fifty percent of the code that runs the DSP(s) in a modern cell phone is coded in assembly
+with the rest written in C. Hand optimized assembly code typically makes the best use of the 
+available resources such as power, specialized coprocessors, and specialized instructions.
+The problem with assembly code is that the same algorithm must be mapped time and time again 
+whenever a new chip comes out. The life cycle of a typical DSP is much shorter than the life
+cycle of a general purpose microprocessor -- each new generation is separated by months rather
+than years.
+ 
+Therefore frequenctly reimplementing algorithms by hand is a costly arduous process that 
+increases cost and slows the pace of advances. Engineers must spend time working out details rather 
+than focusing on solving harder problems. Compilers were invented fourty years ago 
+exactly to let engineers focus on the problem at hand rather than spend time with 
+machine specific details. Compilers for DSP architectures have a difficult job, and are not
+very good at mapping a program written in a general purpose language like C into the specialized 
+instructions provided by DSPs. Many of the instructions provided by a DSP are targeted 
+for a very specific application (like FIR filtering), but most general purpose languages have
+no way to describe higher level behavior other than functionally. If you don't express
+your algorithm in the same way that the compiler expects to encounter it, the resulting
+program will not take best advantage of the available DSP resources.
 
-We have solved this problem by introducing a new domain specific language which
-allows for imperative C like code to describe computation, and 
-specific analysis and optimization passes that can determine if a program is
-executing portions common to DSP applications. We can then leverage
-the existing work on DSP algorithm optimization to perform compiler transformation
+We are attempting to solve this problem by introducing a new domain specific language which
+supports imperative {\tt C} like code to describe computation. By imposing structure and
+explicitly identifying the input and the output of different program sub components
+we can run analyses that determine if a program is performing a common DSP task.  
+We can then use this information to take advantage of special purpose DSP hardware
+or we can even apply standard signal processing algorithm optimizations to 
+We can then leverage the existing work on DSP algorithm optimization to perform compiler transformation
 at a fairly sophisticated level. Our system lets programmers describe the
-computation to be performed at a high level and the compiler takes care of optimizing
-using known DSP tricks.
+computation to be performed at an appropriate level and the compiler takes care of 
+
 
 \subsection{StreamIt}
 
