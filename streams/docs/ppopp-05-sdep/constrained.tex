@@ -1,0 +1,36 @@
+\begin{figure}[t]
+\begin{center}
+\psfig{figure=constrained-example.eps,height=1.5in}
+\caption{{\small Example of construction of a constrained schedule. The $\sdepf{R}{S}$ function for filters $R$ and $S$ is given in Table \ref{tab:sdepconst}. The blob between filters $R$ and $S$ illustrates other possible stream elements. $R$ sends a message to $S$ with latency $[1,2]$. Executions of the blob are ommitted, it is assumed that at the point $S$ executes, the blob has drained data provided by $R$.}}
+\end{center}
+\vspace{-12pt}
+\label{fig:sdepconst}
+\end{figure}
+
+\begin{table*}[t]
+{\small
+\begin{tabular}{|c|c|} \hline
+{\bf $sdepf{R}{S}$} & {\bf Execs of S} \\ \hline
+$9n+2$ & $8n+1$ \\ \hline
+$9n+3$ & $8n+2$ \\ \hline
+$9n+5$ & $8n+3$ \\ \hline
+$9n+5$ & $8n+4$ \\ \hline
+$9n+6$ & $8n+5$ \\ \hline
+$9n+8$ & $8n+6$ \\ \hline
+$9n+9$ & $8n+7$ \\ \hline
+$9n+9$ & $8n+8$ \\ \hline
+\end{tabular}}
+\caption{\small $sdepf{R}{S}$ function for example in Figure \ref{fig:sdepconst}. This particular $\sdep$ function was obtained by setting $push_R=2$, $pop_S=3$ and making the blob between $R$ and $S$ into a filter that pops 3 and pushes 4 every iteration of its work function. No initialization due to peeking is necessary in this example.}
+\label{tab:sdepconst}
+\end{table*}
+
+
+Explanation of working of the example:
+
+The example in Figure \ref{fig:sdepconst} illustrates scheduling of a single constraint. The constraint is a message sent upstream with latency $[1,2]$. The resulting schedule consists of two parts, an initialization schedule and a steady state schedule. The initialization schedule is necessary to initialize the constraint, to ensure that the steady schedule can be executed repeatedly forever. Notation used here is: $lastReceived$ denotes the execution of S which sent the last message to be received by R; $n_S$ indicates number of executions of $S$ and $n_R$ indicates number of executions of $R$.
+
+Initialization schedule is computed by executing R $SDEP(minLatency)-1$ number of times, and executing S as many times as possible, given data provided by R. This assures that when the steady schedule starts, all executions of filters will contribute to new message sending and receiving, thus allowing the steady state schedule to execute forever. The initialization schedule does not need to send or receive messages here.
+
+The steady state schedule is computed by executing the receiver R as far as possible without going beyond the boundary of beeing able to receive message sent by S on execution $lastReceived+1$ (indicated by "Oldest msg to receive" in the figure). Now the sender S is executed as many times as possible, given data provided by R. Now S can receive messages sent by S in its executions $[lastReceived+1 ... \min(n_S, $"Newest msg to receive"$)]$.
+
+"Oldest msg to receive" is equal to $iSDEP(n_R)-maxLatency$. "Newest msg to receive" is equal to $m-minLatency$ with $m$ being the greatest integer such that $SDEP(m) \le n_R$.
