@@ -25,28 +25,30 @@ applications: 1) A GSM Decoder, which takes GSM-encoded parameters as
 inputs, and uses these to synthesize audible speech, 2) A system from
 the Polymorphic Computing Architecture (PCA) \cite{pca} which
 encapsulates the core functionality of modern radar, sonar, and
-communications signal processors, 3) A software-based FM Radio, and 4)
-A performance test from the SpectrumWare system \cite{spectrumware}.
-
-[add performance table, number of lines of benchmarks?, discussion]
+communications signal processors, 3) A software-based FM Radio with
+equalizer, and 4) A performance test from the SpectrumWare system that
+implements an Orthogonal Frequency Division Multiplexor (OFDM)
+\cite{spectrumware}.  Table \ref{tab:benchmarksy} gives characteristics
+of the above applications including the number of filters and the size
+of the stream graph.
 
 \begin{table}[t]
 \begin{center}
 \scriptsize
 \begin{tabular}{|l|r|r|r|} \hline
-Benchmark       & Lines   & Filters & Graph Size\\
+Benchmark & Lines & Filters & Graph Size\\
 \hline \hline
-GSM Decoder      & 3050       & 11  & 21 \\
-\hline
 PCA Demo & 484 & 5 & 7\\
 \hline
 FM Radio & 411 & 5 & 27\\
 \hline
 perftest4 & 347 & 5 & 20\\
 \hline
+GSM Decoder & 3050 & 11 & 21 \\
+\hline
 \end{tabular}
 \vspace{-6pt}
-\caption{\protect\small Benchmark characteristics}
+\caption{\protect\small Application Characteristics}
 \label{tab:benchmarks}
 \end{center}
 \end{table}
@@ -73,23 +75,29 @@ perftest4 & 347 & 5 & 20\\
 %% This application is representative of the core functionality needed by
 %% modern radar, sonar, and communications signal processors.
 
+[add performance table, number of lines of benchmarks?, discussion]
+
+
+
 \begin{table}[t]
 \begin{center}
 \scriptsize
-\begin{tabular}{|l|r|r|r|} \hline
-Benchmark       & Baseline & Fusion & SpectrumWare \\
+\begin{tabular}{|l|r|r|r|r|} \hline
+& \multicolumn{2}{|c|}{StreamIt} &  \multicolumn{2}{|c|}{Hand Coded}\\
+\hline 
+Benchmark & Baseline & Fusion & Spectra & C \\
 \hline \hline
-GSM Decoder      & & & \\
+PCA Demo & & & 1.7 &\\
 \hline
-PCA Demo &  &  & 1.7\\
+FM Radio & & & 9.9&\\
 \hline
-FM Radio &  &  & 9.9\\
+perftest4 & & & 320&\\
 \hline
-perftest4 &  &  & 320\\
+GSM Decoder  & & & &\\
 \hline
 \end{tabular}
 \vspace{-6pt}
 \caption{\protect\small Performance Results (in $\mu$sec/output)}
-\label{tab:benchmarks}
+\label{tab:performance}
 \end{center}
 \end{table}
