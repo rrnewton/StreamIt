@@ -4,6 +4,9 @@ high:
 
 * figure out what we're saying about loops
 
+* in the pseudocode, it doesn't allocate a rugged array -- allocates a
+rectangle (and with wrong notation)
+
 - sort out between pipeline.size and sj.size, which I think is
 confusing.
 
@@ -13,6 +16,15 @@ low:
 terms of adding hierarchical children, etc.  or, moreoever, get a more
 uniform way of describing them (do they input two things, output two,
 input n, input a number of which one to do, etc etc.)
+
+************************************************************************
+
+to implement:
+
+- write workestimate.getcontainerwork
+
+- vertical cuts don't need same width actually... esp. could do widths
+that are divisible by each other, e.g. for bitonic sort
 
 ************************************************************************
 
