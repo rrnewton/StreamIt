@@ -377,12 +377,17 @@ to the writer end of the tape; [[PEEK]] and [[POP]] both read data
 from the reader end.
 
 <<Tapes>>=
-#define PUSH(c, type, d) { if (++(c)->output_tape->write_pos >= (c)->output_tape->tape_length ) \
-                             (c)->output_tape->write_pos = 0; \
-                           ((type *)(c)->output_tape->data)[(c)->output_tape->write_pos] = (d); }
-#define PEEK(c, type, n) (((type *)c->input_tape->data)[(c->input_tape->read_pos+n)%c->input_tape->tape_length])
-#define POP(c, type) ((((++c->input_tape->read_pos) >= c->input_tape->tape_length) ? (c->input_tape->read_pos = 0) : 0), \
-                      ((type *)c->input_tape->data)[c->input_tape->read_pos])
+#define PUSH(c, type, d) \
+  { if (++((c)->output_tape->write_pos) >= (c)->output_tape->tape_length ) \
+       (c)->output_tape->write_pos = 0; \
+    ((type *)(c)->output_tape->data)[(c)->output_tape->write_pos] = (d); }
+#define PEEK(c, type, n) \
+  (((type *)(c)->input_tape->data) \
+   [((c)->input_tape->read_pos+n)%(c)->input_tape->tape_length])
+#define POP(c, type) \
+  ((((++((c)->input_tape->read_pos)) >= (c)->input_tape->tape_length) \
+    ? ((c)->input_tape->read_pos = 0) : 0), \
+   ((type *)(c)->input_tape->data)[(c)->input_tape->read_pos])
 @
 
 \subsection{Filter Context}
@@ -426,6 +431,9 @@ typedef struct stream_context {
   tape *input_tape;
   tape *output_tape;
   stream_type_data type_data;
+  splitjoin_type split_type, join_type;
+  int *split_ratio, *join_ratio;
+  tape **split_tape, **join_tape;
 } stream_context;
 @
 
