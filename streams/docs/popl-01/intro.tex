@@ -1,0 +1,45 @@
+\section{Introduction}
+
+Applications that are structured around some notion of a ``stream''
+are becoming increasingly important and widespread.  There is evidence
+that streaming media applications are already consuming most of the
+cycles on consumer machines \cite{Rix98}, and their use is continuing
+to grow {\cite someone}.  In the embedded domain, applications for
+handheld computers, cell phones, and DSP's are centered around a
+stream of voice or video data.  The stream abstraction is also
+fundamental to high-performance applicatins such as intelligent
+software routers, cell phone base stations, and HDTV editing consoles.
+
+Despite the prevalence of these applications, there is suprisingly
+little language and compiler support for practical, large-scale stream
+programming.  Of course, the notion of a stream as a programming
+abstraction has been around for decades \cite{SICP}, and a number of
+special-purpose stream languages have been designed (see
+\cite{survey97} for a review).  Many of these languages and
+representations are elegant and theoretically sound, but they often
+lack features and are too inflexible to support straightforward
+development of modern stream applications, or their implementations
+are too inefficient to use in practice.
+
+Consequently, most programmers turn to general-purpose languages such
+as C++ to implement stream programs, resorting to low-level assembly
+codes for performance-critical loops.  This practice is
+labor-intensive, error-prone, and very costly, since the
+performance-critical sections must be re-implemented for each target
+architecture.  Moreover, general purpose languages do not provide a
+natural and intuitive representation of streams, thereby having a
+negative effect on readability, robustness, and programmer
+productivity.
+
+StreaMIT is a language and compiler specifically designed for modern
+stream programming.  Its goals are two-fold: first, to raise the
+abstraction level in stream programming, thereby improving programmer
+productivity and program robustness, and second, to provide a compiler
+that performs stream-specific optimizations to achieve the performance
+of an expert assembly programmer.  To address the first of these
+goals, this paper presents a high-level language specifically designed
+for streaming applications.  In Section {\ref{sec:domain}}, we
+characterize the domain of streaming programs for which StreaMIT is
+intended.
+
+

@@ -1,25 +1,19 @@
 \section{Streaming Application Domain}
+\label{sec:domain}
 
-Applications that are structured around some notion of a ``stream''
-are becoming increasingly important and widespread.  For example,
-embedded programs on cell phones and handheld computers often spend
-most of their time dealing with streams of voice or video data.  The
-stream abstraction is also fundemantal to high-performance
-applications such as intelligent software routers, cell phone base
-stations, and HDTV editing consoles.  We have observed a number of
-properties that these programs have in common--enough so as to
-characterize them as belonging to a distinct class of programs, which
-we will refer to as {\it streaming applications.}  The following are
-the salient properties of a streaming application, independent of its
-implementation:
+We have observed a number of properties that these programs have in
+common--enough so as to characterize them as belonging to a distinct
+class of programs, which we will refer to as {\it streaming
+applications.}  The following are the salient properties of a
+streaming application, independent of its implementation:
 
 \begin{enumerate}
 
 \item {\it Large streams of data.}  Perhaps the most fundamental
 aspect of a streaming application is that it operates on a large (or
 virtually infinite) sequence of data items, hereafter referred to as a
-{\it data stream}.  The data streams generally enter the program from
-some external source, and each item is processed for a limited time
+{\it data stream}.  Data streams generally enter the program from some
+external source, and each data item is processed for a limited time
 before being discarded.  This is in contrast to scientific
 applications, in which a fixed input set is manipulated with a large
 degree of data reuse.
@@ -32,7 +26,7 @@ more items from an input stream, performs some computation, and writes
 one or more items to an output stream.  Filters are generally
 independent and self-contained, without references to global variables
 or other filters.  A stream program is the composition of filters into
-a {\it stream graph}, in which the output of some filters are
+a {\it stream graph}, in which the outputs of some filters are
 connected to the inputs of others.
 
 \item {\it A stable computation pattern.}  The structure of the stream
