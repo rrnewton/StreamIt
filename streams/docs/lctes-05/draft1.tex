@@ -1,0 +1,558 @@
+\documentclass{sig-alternate}		
+%\usepackage{fancyheadings} %,doublespace}% ,psbox}
+
+
+\title{Cache Aware Optimization of Stream Programs}
+\author{}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+
+We argue that in order to generate efficient 
+code for StreamIt programs it is important to reduce number 
+of wasted instructions that are executed to store and retrieve 
+items that are in flight between actors in combination with 
+improving instruction and data locality to take advantage of 
+high-speed on chip caches.
+
+We propose a heuristic that allows full unrolling of
+most of the loops and replacement of most of the arrays that are
+used to store intermediate items with scalar variables.
+The heuristic also produces a schedule with low miss rates for 
+high-speed on chip instruction and data cache. The achieved 
+speedup for fine grained StreamIt programs by using the 
+heuristic is up to 50\%.
+
+We also show how to improve peek buffer management if a filter 
+peeks at items in the input stream. An improved peek buffer 
+management gives up to 5\% speedup for real life applications 
+and up to more than 50\% speedup for synthetic benchmarks.
+
+We also propose an optimization that reuses variables used for 
+storing buffered items that gives up to 35\% speedup. 
+
+\end{abstract}
+
+\section{DISCUSSION}
+
+\subsection{Importance of Cache Aware Scheduling}
+
+There are many ways to schedule StreamIt program.
+
+[LCTES'03-Kraczma] describes a phased scheduling mechanism
+which can be used to generate single apperance and
+minimum latency schedules as special cases of phased schedule.
+It is shown that single appearance schedule provides
+minimum code size, while a minimum latency schedule provides
+minimum buffer requirement.
+
+While minimizing code and / or buffer size is important to make
+sure that code and buffers fit into memory our results show that
+for an architecture with multiple levels of caches and
+large primary memory it makes sense to increase code
+size and buffer size in order to allow high level optimizations
+and cache efficient scheduling of the actors.
+
+\subsection{Replacing arrays with scalar variables}
+
+The default implementation of intermediate value buffers
+in code generated for a StreamIt program is an array.
+However, array acesses are not very efficient because 
+of wasted instructions to increment index counter and 
+to add index counter to the base of the array address 
+to calculate the memory location.
+
+An optimization would be to replace an array of size N with 
+N scalar variables. In this case we do not need to increment 
+index variable or add the index variable to the base address, 
+since target memory location would be fixed for each
+instruction that accesses the buffer. This optimization
+allso allows the intermediate variables to be
+register allocated.
+
+Such an optimization is important to improve 
+performance of fine grained stream programs where each actor
+performs little amount of work and most of the code just moves 
+the items betwwen actors (high communication / computation ratio).
+
+However, this optimization can not be done if array is accessed in a loop 
+and array access index is calculated using the loop variable.
+
+\begin{verbatim}
+for (i = 0; i < 5; i++) {
+   array[index++] = x++;
+}
+\end{verbatim}
+
+If we fully unroll all such loops for a given array then we 
+can replace the array with scalar variables.
+
+\begin{verbatim}
+array[0] = x++;          var_0 = x++;
+array[1] = x++;          var_1 = x++;
+array[2] = x++;   ====>  var_2 = x++;
+array[3] = x++;          var_3 = x++;
+array[4] = x++;          var_4 = x++;
+\end{verbatim}
+
+If we want to replace many arrays then we will have to unroll
+many loops, this leads to dramatic increase in code size.
+
+Despite getting rid of unnecesary instructions we might see
+an overall performance degradation if we do not schedule
+actors in a cache aware manner.
+
+
+\subsection{Cache Aware Scheduling Heuristic}
+
+Our solution fully unrolls all loops that contain accesses to
+intermediate value buffers and then partitions the actors such 
+that code for each partition fits into high-speed on chip 
+instruction cache and all fields and intermediate 
+buffers of the partition fit into a certain fraction 
+of high-speed on chip data cache.
+
+In order to reduce instruction and data cache misses we increase
+the multiplicity of steady state schedule see [ASPLOS'02-Gordon] such 
+that 90\% of partitions can have their input, output, fields
+and buffers fit into high-speed on chip data cache.
+
+\subsubsection{Greedy Partitioning Algorithm}
+
+We calculate partitions using a greedy heirarchical 
+algorithm, that first caclulates partitions for children
+of a container before considering a container.
+We have to handle Pipelines and SplitJoins.
+
+We make sure that each partition can have it's code fit into
+L1 instruction cache and data fit into a given fraction (1/2)
+of L1 data cache.
+
+We calculate this in a hierarchical way. See Figure~\ref{fig:greedy}
+for pseudocode.
+
+\begin{figure*}[t]
+\begin{verbatim}
+Pipeline:
+
+Calculate number of partitions required for each child.
+If for any child this is >1 then remember those partitions.
+
+For each sequence (i..j) of children where for each child 
+number of partitions is 1.
+
+Interval(i,j) = "
+    Find maximum bandwidth connection between children. (k, k+1)
+    Consider partition (k..k+1) 
+    If partition (k..k+1) does not satisfy the requirement then
+        Call Interval(i,k) and Interval(k+1,j) to find two sets of partitions.
+
+    Else Start with (k, k+1) fused try fusing up or down
+        until can not fuse up and down let this be (l, m)
+        Remember (l..m) as a partition.
+        Use Interval(i,l) and Interval(m,j) to find partitions."
+
+SplitJoin:
+
+Consider splitter/joiner and all branches in a single partition.
+If this satisfies requirements then return a single partion
+else remember partitions corresponding to each branch as final
+partitions.
+\end{verbatim}
+\caption{Pseudocode of a greedy algorithm to find partitions}
+\label{fig:greedy}
+\end{figure*}
+
+
+\subsubsection{Estimating code size}
+
+We have implemented an estimator that estimates code size and
+data and buffer requirement of a partition with high accuracy, 
+given information about actors in a partition.
+
+As an alternative we could actually generate an itermediate 
+representation of each partition considered and estimate its
+code, data and buffer size.
+
+\subsubsection{Increasing Multiplicity of Partitions}
+
+Once the greedy partitioning algorithm has produced partitions
+we need to increase their multiplicity such that each partition
+is executed multiple times.
+
+One would like each parition to have all of its data
+as well as input and output fit into high-speed cache, such that
+when we switch to the subsequent partition it would find its
+input (the output of previous partition) in the cache.
+
+Our approach is to find a single number (multiplicity) for scaling
+all partitions. A data working set for a partition is given
+by a following equation:
+\begin{equation}
+data_i + input_i * mult + output_i * mult
+\end{equation}
+
+Where $data_i$ is size of both persistent and non-persistent
+fields and buffers required by partition i, 
+$input_i$ is input size that the partition would consume during a 
+single steady state cycle if we do not increase multiplicity, 
+$output_i$ is the size of output the partition would produce 
+during a single steady state cycle if we do not increase the 
+multiplicity
+and $mult$ is the multiplicity increase.
+
+We want as many partitions as possible to have their entire
+data working set in high-speed data cache, however we also
+want a high multiplicity to allow amortization of load times
+and better data locality.
+
+To make sure that few partitions with huge input or output
+do not force a low multiplicity we have the 90\% heuristic.
+The heuristic makes sure 90\% of partitions can have their entire 
+data working set in high-speed cache. This heuristic is 
+supported by experimental data.
+
+Example: See beamformer with many sources and many detectors.
+The joiner and the splitter become bottlenecks with huge
+input and output, therefore we need the 90% heuristic,
+to make generated code run faster, since most of
+the computation is in the sources and the detectors. 
+
+\subsection{Peek Optimization}
+
+Because of Streamit language having a peek feature, one needs
+a separate initialization schedule to fill in the peek
+buffers with data. [ASPLOS'02-Gordon]
+
+There are two alternatives for peek implementation. Use a rotating
+buffer with head and tail pointers or use a peek buffer.
+
+Consider a filter that consumes 1 item, peeks 10 (including
+the one it consumes) and source produces 1.
+
+An Example of code generated:
+
+\begin{verbatim}
+item_type PEEK_BUFFER[9];
+item_type POP_BUFFER[10];
+
+1. Source puts produced item into POP_BUFFER[0];
+2. Copy PEEK_BUFFER[0..8] to POP_BUFFER[1..9];
+3. Execute the Filter
+4. Copy POP_BUFFER[0..8] to PEEK_BUFFER[0..8]
+
+\end{verbatim}
+
+If $peek rate >> pop$ rate then each item is copied many times.
+Consider a case where filter has pop rate 1 and peek rate 64,
+in this case each item has to be copied 128 times to / from PEEK\_BUFFER.
+
+We increase filters multiplicity by executing it multiple times.
+If we execute the above filter $N$ times, then it's pop rate is $N$ 
+and peek rate is $N+63$ items. If $N=16$ then $poprate=16$ $peekrate=79$
+and each item is copied to / from PEEK\_BUFFER at most 10 times.
+
+Scaling individual filters can result in increase of the buffer 
+requirements for a single steady state cycyle. 
+
+$<$INSERT EXAMPLE$>$
+
+Results show
+that to achieve high performance it is more important to 
+reduce number of item copy operations than reduce buffer size
+as long as all of the persistent buffers fit into main memory 
+or low speed off-chip cache.
+
+\subsection{Reusing Intermediate Storage Variables}
+
+Once loops have been unrolled, filters have been fused
+into a partition and arrays have been replaced with scalar
+variables we can find approximations of live ranges for
+the new variables and use this information to reduce stack
+space required by the partition's work function.
+
+We replace the scalar variables that have been created
+as a result of destroying arrays with a minimal number
+of variables, where minimal number is the maximum number 
+of overlapping live ranges at any point in the work 
+function of the fused partition.
+
+The above optimization improves data access locality.
+
+\subsection{Fusion vs Method Calls}
+
+A problem of making method calls to work functions of actors
+is the method call overhead.
+A solution would be to replace the method call 
+with statements corresponding to the method body.
+
+We can combine adjacent actors to produce a new actor.
+This is called Fusion.
+We can combine actors of a split-join to produce a new actor.
+Fusion in combination with unrolling can lead to code explosion.
+
+Our heuristic only fuses partially, such that 
+each fused partition fits into L1 instruction cache
+and it's data and buffers fit into 1/2 of L1 data
+cache. Make method calls to the work functions of 
+the fused partitions for better cache performance.
+
+
+\subsection{Full Optimization Plan}
+
+\begin{verbatim}
+       *(all backends)
+  * Move filed initializations into init functions
+  * Constant propagate and unroll
+  * Add init path functions
+  * construct SIR tree
+  * Raise Variable Declarations
+  * Constant Field Proagation
+
+  ---- new code ----
+
+  1. OPTIMZER for each filter:
+    1.a. do until  nothing to unroll {  
+           do until nothing to unroll { unroll } 
+           propagate, 
+           unroll 
+         }
+    1.b. flatten
+    1.c. propagate
+    1.d. dead code eliminate
+  2. Estimate Code Size
+  
+  3. Increase mult of Peek Filter to enforce 25%
+    (allow unrolling of new loop if mult <=4 or 
+        estimated_code_size * mult < 1/2 cache)
+
+  4. OPTIMIZER for each filter: (see 1. above)
+  5. Estimate Code Size
+    
+  6. (up to 2x)  Partition, 
+         Decrease mult where no benefit
+  7. Compute final partitions
+
+  8. Increase multiplicity of partitions
+  9. Rename scalar variables to reuse stack space
+
+\end{verbatim}
+
+\subsection{Formal Model}
+
+How to efficiently execute a program that does not fit into
+high-speed on chip instruction cache?
+
+Let $IM$ - average time to access an instruction from memory
+or low speed off chip cache.
+
+Let $IC$ - average time to access an instruction from high-speed
+on chip cache.
+
+Let $DM$ - average time to access data item from memory
+or low speed off chip cache.
+
+Let $IC$ - average time to access data item from high-speed
+on chip cache.
+
+Let $I$ be the number of instrictions. 
+
+Let $D$ be the number of data items accesed.
+
+Each data item $i$ accessed $A_i$ times.
+Let $N$ be the number of times code executed.
+
+If $I < L1InstructionCache$ and $D < L1DataCache$ then average
+time to load data and instructions for N executions is:
+
+\begin{equation}
+\frac{I (IM + (N-1) IC)}{N} + \frac{\sum_i{DM + (A_i-1) DC}}{N}
+\end{equation}
+
+if $I > L1InstructionCache$ and almost all of the loops have
+been unrolled then first term can be approximated as:
+
+\begin{equation}
+\frac{I * N * IM}{N} > \frac{I (IM + (N-1) IC)}{N}
+\end{equation}
+
+if $D > L1DataCache$ and let $P_i$ be the probability that 
+an item $i$ is in high-speed cache, then second term
+can be approximated as: 
+
+\begin{equation}
+\frac{\sum_i{DM + (A_i-1)((1-P_i) DM + P_i DC)}}{N}
+\end{equation}
+
+
+%Assume that code fits into L1 cache, then average 
+%execution time is:
+
+%\begin{equation}
+%\frac{(load\_time) + N * (execution\_time)}{N}
+%\end{equation}
+
+%If number of times code executed is large then 
+%(Load Time) / (N) tends to zero.
+
+%What If $Code Size > L1 Cache Size$
+
+%Processor implicityly partitoins program into partitions 1 to N such that
+%each partition fits into high-speed cache. And executiontime time
+%becomes:
+
+%\begin{equation}
+%{\sum_i [(load\_time_i) + 
+%(execution\_time_i)] * N}
+%\end{equation}
+
+%Instead compiler should partition into $N$ partitions such that 
+%each fit into high-speed instruction cache and execute each partition
+%multiple times. Such approach not only effectively amortizes the 
+%load time but also increases data locality and reduces data
+%cache misses.
+
+
+
+\begin{figure}
+\begin{verbatim}
+void->void pipeline Program {
+    add Source();
+    add Printer();
+}
+
+void->int filter Source {
+    int i;
+    init { i = 0; }
+    work push 2 { push(i++); push(i++); } 
+}
+
+void->int filter Printer {
+    work pop 3 { print(pop() + pop() + pop()); } 
+}
+\end{verbatim}
+\caption{An example StreamIt program}
+\end{figure}
+
+
+
+\begin{figure}
+\begin{verbatim}
+int __i;
+int POP_BUFFER[6];
+int PUSH_INDEX = 0;
+int POP_INDEX = 0;
+
+init_1() { 
+    __i = 0; 
+}
+
+work_1() {
+    POP_BUFFER[PUSH_INDEX++] = __i++;
+    POP_BUFFER[PUSH_INDEX++] = __i++;
+}
+
+work_2() {
+    int tmp;
+    tmp = POP_BUFFER[POP_INDEX++];
+    tmp += POP_BUFFER[POP_INDEX++];
+    tmp += POP_BUFFER[POP_INDEX++];
+    printf("%d\n", tmp);
+}
+
+main () {
+    init_1();
+    do {
+        POP_INDEX = 0;
+        PUSH_INDEX = 0;
+        for (i = 0; i < 3; i++) { work_1(); }
+        for (i = 0; i < 2; i++) { work_2(); }
+    }
+}
+\end{verbatim}
+\caption{Generated code with method calls}
+\end{figure}
+
+
+
+\begin{figure}
+\begin{verbatim}
+int __i;
+
+init_1() {
+    __i = 0;
+}
+
+init {
+    init_1();
+}
+
+work {
+    int POP_BUFFER[6];
+    int PUSH_INDEX = 0;
+    int POP_INDEX = 0;
+    for (i = 0; i < 3; i++) {  
+        POP_BUFFER[PUSH_INDEX++] = __i++; 
+        POP_BUFFER[PUSH_INDEX++] = __i++; 
+    }
+    for (i = 0; i < 2; i++) {
+        int tmp;
+        tmp = POP_BUFFER[POP_INDEX++];
+        tmp = tmp + POP_BUFFER[POP_INDEX++];
+        tmp = tmp + POP_BUFFER[POP_INDEX++];
+        print(tmp);
+    }
+}
+\end{verbatim}
+\caption{Generated code with inlining (fusion)}
+\end{figure}
+
+
+\begin{figure}
+\begin{verbatim}
+int __i;
+
+init_1() {
+    __i = 0;
+}
+
+init {
+    init_1();
+}
+
+work {
+    int POP_BUFFER_0;
+    int POP_BUFFER_1;
+    int POP_BUFFER_2;
+    int POP_BUFFER_3;
+    int POP_BUFFER_4;
+    int POP_BUFFER_5;
+    POP_BUFFER_0 = __i++; 
+    POP_BUFFER_1 = __i++; 
+    POP_BUFFER_2 = __i++; 
+    POP_BUFFER_3 = __i++; 
+    POP_BUFFER_4 = __i++; 
+    POP_BUFFER_5 = __i++; 
+    int tmp;
+    tmp = POP_BUFFER_0;
+    tmp += POP_BUFFER_1;
+    tmp += POP_BUFFER_2;
+    print(tmp);
+    tmp = POP_BUFFER_3;
+    tmp += POP_BUFFER_4;
+    tmp += POP_BUFFER_5;
+    print(tmp);
+}
+\end{verbatim}
+\caption{Generated code with inlining (fusion), unrolling and
+array replacement with scalar varaibles}
+\end{figure}
+
+\end{document}
+
+
+
+
+

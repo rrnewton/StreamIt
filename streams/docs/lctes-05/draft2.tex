@@ -1,0 +1,275 @@
+\documentclass{sig-alternate}		
+\usepackage{fancyheadings,pstricks} %,doublespace}% ,psbox}
+
+\title{Cache Aware Optimization of Stream Programs}
+\author{}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+
+$<$Insert abstract here.$>$
+
+\end{abstract}
+
+\section{Introduction}
+
+\subsection{Introduction of StreamIt}
+
+$<$Insert introduction of StreamIt here.$>$
+
+\section{Generating Cache Aware Code}
+
+\subsection{Fusion Example}
+
+Consider a StreamIt program shown
+in Figure \ref{f1} consisting of two filters IntSource
+and IntPrinter. IntSource filter pushes two integers onto
+its output queue. IntPrinter filter pops three integers 
+from its input queue and displays their sum.
+
+\begin{figure}[tbh]
+\begin{verbatim}
+void->void pipeline Program {
+    add IntSource();
+    add IntPrinter();
+}
+
+void->int filter IntSource {
+    int i;
+    init { i = 0; }
+    work push 2 { push(i++); push(i++); } 
+}
+
+void->int filter IntPrinter {
+    work pop 3 { print(pop() + pop() + pop()); } 
+}
+\end{verbatim}
+\psframe(-0.1in,-0.1in)(3.4in,2.3in)
+\caption{An example StreamIt program}
+\label{f1}
+\end{figure}
+
+
+\begin{figure}[tbh]
+\begin{verbatim}
+int __i;
+
+void init_1() { 
+    __i = 0; 
+}
+
+void work_1() {
+    POP_BUFFER[PUSH_INDEX++] = __i++;
+    POP_BUFFER[PUSH_INDEX++] = __i++;
+}
+\end{verbatim}
+\psframe(-0.1in,-0.1in)(3.4in,1.8in)
+\caption{Generated C code corresponding to IntSource filter}
+\label{f2}
+\end{figure}
+
+
+\begin{figure}[tbh]
+\begin{verbatim}
+void work_2() {
+    int tmp;
+    tmp = POP_BUFFER[POP_INDEX++];
+    tmp += POP_BUFFER[POP_INDEX++];
+    tmp += POP_BUFFER[POP_INDEX++];
+    printf("%d\n", tmp);
+}
+\end{verbatim}
+\psframe(-0.1in,-0.1in)(3.4in,1.3in)
+\caption{Generated C code corresponding to IntPrinter filter}
+\label{f3}
+\end{figure}
+
+Figures \ref{f2} and \ref{f3} show
+generated C code corresponding
+to filters IntSource and IntPrinter. 
+Variables POP\_BUFFER, PUSH\_INDEX and
+POP\_INDEX are defined at global scope.
+Note that IntPrinter does not have any state and
+therefore does not need an initialization
+function. The C code that would manage the
+execution of the two filters is shown in
+Figure \ref{f4}. The problems with this
+approach is that there are too many variables defined 
+at global scope and there is a method call overhead.
+
+A solution is to use fusion transformation
+that transforms the two filters into a
+new filter that simulates the execution
+of both original filters. The code generated
+is shown in Figure \ref{f5}.
+
+\begin{figure}[tbh]
+\begin{verbatim}
+int POP_BUFFER[6];
+int PUSH_INDEX = 0;
+int POP_INDEX = 0;
+
+void main() {
+    int i,j;
+    init_1();
+    for (i = 0; i < NUM_ITERS; i++) {
+        POP_INDEX = 0;
+        PUSH_INDEX = 0;
+        for (j = 0; j < 3; j++) { work_1(); }
+        for (j = 0; j < 2; j++) { work_2(); }
+    }
+}
+\end{verbatim}
+\psframe(-0.1in,-0.1in)(3.4in,2.3in)
+\caption{Generated C code to manage the execution of the two filters}
+\label{f4}
+\end{figure}
+
+
+\begin{figure}
+\begin{verbatim}
+int __i;
+
+init_fused() {
+    __i = 0;
+}
+
+work_fused() {
+    int POP_BUFFER[6];
+    int PUSH_INDEX = 0;
+    int POP_INDEX = 0;
+    for (i = 0; i < 3; i++) {  
+        POP_BUFFER[PUSH_INDEX++] = __i++; 
+        POP_BUFFER[PUSH_INDEX++] = __i++; 
+    }
+    for (i = 0; i < 2; i++) {
+        int tmp;
+        tmp = POP_BUFFER[POP_INDEX++];
+        tmp = tmp + POP_BUFFER[POP_INDEX++];
+        tmp = tmp + POP_BUFFER[POP_INDEX++];
+        print(tmp);
+    }
+}
+\end{verbatim}
+\psframe(-0.1in,-0.1in)(3.4in,3.5in)
+\caption{Generated C code corresponding to the fused filter}
+\label{f5}
+\end{figure}
+
+
+\subsection{Unrolling to Allow Replacement of Arrays With Scalars}
+
+A way to optimize the code of a fused filter is to fully unroll
+the for loops and replace the intermediate value arrays with 
+a set of scalar variables. This way we can 
+get rid of the index variable update instructions and 
+instructions that have to add an offset to the base of the 
+array address. The array replacement with scalars also allows 
+the C compiler to register allocate the intermediate values.
+See Figure \ref{f6} for an example of the generated C code
+for the fused filter with unrolling and array replacement.
+
+\subsection{Cache Aware Fusion Heuristic}
+
+The more filters are fused the more instructions can be
+eliminated with unroll/replace arrays optimization.
+However in some cases if we combine too many filters
+and perform full unrolling the generated code runs
+slower because of worse instruction and data cache 
+performance.
+
+To solve this problem we only fuse some of the filters
+before performing the unroll/replace arrays optimization
+and execute each fused filter multiple times before 
+switching to the next fused filter to improve cache
+performance.
+
+\begin{figure}
+\begin{verbatim}
+int __i;
+
+init_fused() {
+    __i = 0;
+}
+
+work_fused() {
+    int POP_BUFFER_0;
+    int POP_BUFFER_1;
+    int POP_BUFFER_2;
+    int POP_BUFFER_3;
+    int POP_BUFFER_4;
+    int POP_BUFFER_5;
+    POP_BUFFER_0 = __i++; 
+    POP_BUFFER_1 = __i++; 
+    POP_BUFFER_2 = __i++; 
+    POP_BUFFER_3 = __i++; 
+    POP_BUFFER_4 = __i++; 
+    POP_BUFFER_5 = __i++; 
+    int tmp;
+    tmp = POP_BUFFER_0;
+    tmp += POP_BUFFER_1;
+    tmp += POP_BUFFER_2;
+    print(tmp);
+    tmp = POP_BUFFER_3;
+    tmp += POP_BUFFER_4;
+    tmp += POP_BUFFER_5;
+    print(tmp);
+}
+\end{verbatim}
+\psframe(-0.1in,-0.1in)(3.4in,4.5in)
+\caption{Generated C code with inlining (fusion), unrolling and
+array replacement with scalar varaibles}
+\label{f6}
+\end{figure}
+
+
+\subsection{Peek Optimization}
+
+
+\begin{figure}[tbh]
+\begin{verbatim}
+void->void pipeline Program {
+    add IntSource();
+    add IntPrinter();
+}
+
+void->int filter IntSource {
+    int i;
+    init { i = 0; }
+    work push 1 { push(i++); } 
+}
+
+void->int filter IntPrinter {
+    work peek 10 pop 1 { 
+      int sum = 0;
+      for (int i = 0; i < 10; i++) sum += peek(i);
+      print(sum);
+      pop();
+    }
+}
+\end{verbatim}
+\psframe(-0.1in,-0.1in)(3.4in,3.0in)
+\caption{An example StreamIt program}
+\label{peek1}
+\end{figure}
+
+
+
+\subsection{Reusing Temporary Variables}
+
+
+\subsection{Optimization Plan}
+
+
+\section{Results}
+
+\section{Conclusion}
+
+\end{document}
+
+
+
+
+
