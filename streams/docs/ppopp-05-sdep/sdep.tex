@@ -3,33 +3,38 @@
 In this section, we describe our model of computation for streams and
 define the stream dependence function, $\sdep$.
 
-Our model of computation is Synchronous Dataflow~\cite{LM87-i}.  A
-Synchronous Dataflow graph is a directed graph where nodes represent
-filters and edges represent FIFO communication channels.  Each filter
-has an atomic execution step where it consumes some items from its
-input channels and produces some items on its output channels.  The
-number of items produced or consumed on each channel is fixed and
-known at compile time.
+Our model of computation is Cyclo-Static Dataflow~\cite{BELP96}.  In
+this model, the stream graph is a directed graph where nodes represent
+actors and edges represent FIFO communication channels.  Each actor
+has a set of execution steps, or phases, which consume some items from
+the input channels and produce some items on the output channels.  The
+number and ordering of phases is known at compile time, and their
+execution is cyclic (after executing the last phase, the first phase
+is executed again).  Also, for each phase, the number of items
+produced and consumed from the channels is fixed and known at compile
+time.  Cyclo-Static Dataflow is a generalization of Synchronous
+Dataflow~\cite{LM87-i}, which requires each actor to have only a
+single phase.
 
-An exection $\phi$ of a dataflow graph is an ordered sequence of
-filter firings.  Let $\phi[i]$ denote the $i$th filter appearing in
-execution $\phi$, and let $|\phi \wedge F|$ denote the number of times
-that filter $F$ appears in $\phi$.
-
-An execution is legal if the dataflow requirements are respected; that
-is, for all $i$, the sequential firing of filters $\phi[0]$ through
-$\phi[i-1]$ leaves enough items on the communication channels for
-$\phi[i]$ to fire atomically.  Let $\Phi$ denote the set of legal
-executions.  Note that while $\Phi$ is infinite, each $\phi \in \Phi$
-is finite.
+An exection $\phi$ of a dataflow graph is an ordered sequence of actor
+firings.  Each firing represents the execution of a single phase of
+the actor.  Let $\phi[i]$ denote the $i$th actor appearing in
+execution $\phi$, and let $|\phi \wedge A|$ denote the number of times
+that actor $A$ appears in $\phi$.  An execution is legal if the
+dataflow requirements are respected; that is, for all $i$, the
+sequential firing of actors $\phi[0]$ through $\phi[i-1]$ leaves
+enough items on the communication channels for $\phi[i]$ to fire its
+next phase atomically.  Let $\Phi$ denote the set of legal executions.
+Note that while $\Phi$ is an infinite set, each $\phi \in \Phi$ is a
+finite sequence.
 
 The stream dependence function, $\sdep$, describes the dependences
-between filter firings in the graph.  Informally, $\sdepf{A}{B}(n)$
-represents the minimum number of times that filter $A$ must execute to
-make it possible for filter $B$ to execute $n$ times.  This dependence
+between actor firings in the graph.  Informally, $\sdepf{A}{B}(n)$
+represents the minimum number of times that actor $A$ must execute to
+make it possible for actor $B$ to execute $n$ times.  This dependence
 is meaningful only if there is a directed path in the stream graph
 from $A$ to $B$; otherwise, $\sdep$ will have a value of zero.
-Because the I/O rates of each filter in the stream graph are known at
+Because the I/O rates of each actor in the stream graph are known at
 compile time, $\sdep$ is also a static relation.  The following is a
 formal definition of $\sdep$ using the notations from above:
 \begin{definition}(SDEP)
@@ -48,32 +53,73 @@ Figure~\ref{fig:sdep}. \todo{Example}.
 
 $\sdep$ function for a given graph $G$:
 
+{\bf Unoptimized}
+
+{\scriptsize
+\begin{verbatim}
+int SDEP_{A<-B} (n) {
+  if no path from A to B in G then
+    return 0
+  else 
+    countA = 0
+    countB = 0
+    do {
+      child <- most downstream actor of G that can fire
+      simulatePhase(child)
+      if child = A then
+        countA++;
+      else if child = B then
+        countB++;
+      endif
+    } loop until (countB = n)
+  endif
+  return countA
+}
+\end{verbatim}}
+
+The most ``downstream'' actor is the one reachable via the longest
+acyclic path from a source node (a node that consumes zero items).
+
+{\bf Optimized}
+
+The result of sdepTable should be cached for quick lookups with SDEP.
+
 {\scriptsize
 \begin{verbatim}
 int SDEP_{A<-B} (n) {
   if no path from A to B in G then
     return 0
   else
-    cycles = floor(steady(B) / n)
-    return cycles * steady(A) + sdepCore(A,B)[n mod steady(B)]
+    <sdepInit, sdepSteady> = sdepTable(A,B)
+    if n<|sdepInit| then
+      return sdepInit[n]
+    else
+      nAfterInit = n - |sdepInit|
+      cycles = floor(steady(B) / nAfterInit)
+      return cycles * steady(A) + sdepSteady[nAfterInit mod steady(B)]
+    endif
   endif
 }
 
-int[] sdepCore(A,B) {
-  result = { 0 }
-  count = 0
+<int[], int[]> sdepTable(A,B) {
+  sdepInit = { 0 }
+  sdepSteady = { }
+  countA = 0
+  countB = 0
   do {
-    child <- most downstream filter of G that can fire
-    simulate(child)
+    child <- most downstream actor of G that can fire
+    simulatePhase(child)
     if child = A then
-      count++;
+      countA++
     else if child = B then
-      result = result o count
+      if (countB<init(B) || countA<init(A)) then
+        sdepInit = sdepInit o countA
+      else
+        sdepSteady = sdepSteady o countA
+      endif
+      countB++
     endif
-  } loop until (all filters f \in G have fired steady(f) times)
-  return result
+  } loop until |sdepSteady| = steady(B)
+  return <sdepInit, sdepSteady>
 }
 \end{verbatim}}
-
-The most ``downstream'' filter is the one reachable via the longest
-acyclic path from a source node (a node that consumes zero items).
