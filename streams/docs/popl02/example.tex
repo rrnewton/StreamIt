@@ -6,7 +6,6 @@ StreamIt takes on a slightly different approach than allowing arbitrary graphs t
 Streams use an input tape and output tape to communicate with other Streams, which is analogous to channels in a Phased Computational Graph. Pipelines allow Streams to be connected in series, one after the other, by connecting the output tape of a Stream to the input tape of the Stream immediately following it in the Pipeline. SplitJoins allow an input tape to be shared among several parallel Streams. The SplitJoin can use a programmer specifiable splitter and joiner to demultiplex the one input tape of the SplitJoin into the the many input tapes of the parallel Streams and then multiplex the output from the many output tapes of the parallel Streams into one output tape of the SplitJoin. Finally, FeedBackLoops allow loops in the stream graph. A FeedBackLoop has a main forward Stream and feedback Stream which data cycles through an the way around. A programmer specifiable splitter selects which data from the output tape of the main Stream is to be fed into the input tape of the feedback Stream and which date is to leave through the FeedBackLoops output tape. Likewise, the specifiable splitter selects whether data from the input tape of the FeedBackLoop or the output tape of feedback Stream is fed into the input tape of the forward Stream.
 
 StreamIt supports a sizable subset of the Phased Computational Program model. StreamIt is still under development and more time has been given to the correctness and efficiency of the common cases than developing a fully general framework. Both the initial and steady-state epochs are supported. Further, both epochs support arbitrary phases.
-
 \begin{figure}[t]
 \begin{verbatim}
 // this filter performs both a FIR operation over an array	    
@@ -40,3 +39,5 @@ complex[N_arr]->complex[N_arr] filter arrayFIR(int N_arr, int N_lp, complex[] h)
 \caption{Fir Code
 \protect\label{fig:fir}}
 \end{figure}
+
+Figure \ref{fig:fir} is a fairly simple example of Filter code. The core syntax is similar to Java, but it is augmented in ways to make stream programming more natural. The class declaration includes ``complex$[$N\_arr$]$-$>$complex$[$N\_arr$]$'' to show that this filter takes in a complex array and outputs a complex arry. More interesting is the ``push 1 pop 1 peek 0'' part of the work function that specify that this Filter pushes 1, pops 1, and peeks 0 at steady state. This corresponds to U(out,steady-state,0)=1, O(in,steady-state,0)=1, E(in,steady-state,0)=0, where in and out are the input and output tapes, respectively.
