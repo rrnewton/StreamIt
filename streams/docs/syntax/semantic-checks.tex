@@ -172,6 +172,22 @@ there is no implicit type promotion across tapes.
   structure.
 \end{enumerate}
 
+\subsection{Messaging}
+
+\begin{enumerate}
+\item A portal type must name a top-level stream structure containing
+  at least one message handler.
+\item A message-sending statement must call a function present in the
+  receiver type of its portal.
+\item The types of the parameters of a message-sending statement must
+  be promotable to the types of the parameters in the receiving
+  function.
+\item Message latencies must be of integer type.
+\item When a stream structure is added to a portal, the type of the
+  stream structure must be the same as the receiver type of the
+  portal.
+\end{enumerate}
+
 \section{Naming}
 
 \subsection{Object Names}
