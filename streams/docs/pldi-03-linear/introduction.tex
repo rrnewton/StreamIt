@@ -1,40 +1,86 @@
 \section{Introduction}
-As more and more parts of modern life use digital computation, everything from cell phones, GPS systems
-and satellite radios, require ever more complicated processing of digital signals. 
-Each successive generation of applications requires ever more sophisticated algorithms mapped 
-on to ever more specialized digital signal processors (DSP). As 
-embedded devices have severe performance requirements placed on them,
-the mapping of algorithm to architecture is typically done by hand at great cost and great expense.
+Digital computation is becoming an increasingly ubiquitous element of
+modern life.  Everything from cell phones to GPS systems to satellite
+radios require increasingly sophisticated algorithms and increasingly
+specialized digital signal processors (DSP's).  As embedded devices
+often have high performance requirements and tight resource
+constraints, optimization is particularly important in this domain.
+However, even given the aggressive optimizations of C compilers for
+DSP chips, programmers still turn to assembly code to implement
+critical parts of embedded applications.  This process is
+time-consuming, error-prone, and costly, as it must be repeated for
+each generation of the target architecture.  There is a pressing need
+for high-level DSP abstractions that a compiler can consistently
+reduce to efficient low-level code.
 
-Upward of fifty percent of the code that runs the DSP(s) in a modern cell phone is coded in assembly
-with the rest written in C. Hand optimized assembly code typically makes the best use of the 
-available resources such as power, specialized coprocessors, and specialized instructions.
-The problem with assembly code is that the same algorithm must be mapped time and time again 
-whenever a new chip comes out. The life cycle of a typical DSP is much shorter than the life
-cycle of a general purpose microprocessor -- each new generation is separated by months rather
-than years.
+%% Upward of fifty percent of the code that runs the DSP(s) in a modern
+%% cell phone is coded in assembly with the rest written in C. Hand
+%% optimized assembly code typically makes the best use of the available
+%% resources such as power, specialized coprocessors, and specialized
+%% instructions.  The problem with assembly code is that the same
+%% algorithm must be mapped time and time again whenever a new chip comes
+%% out. The life cycle of a typical DSP is much shorter than the life
+%% cycle of a general purpose microprocessor -- each new generation is
+%% separated by months rather than years.
  
-Therefore frequently reimplementing algorithms by hand is a costly arduous process that 
-increases cost and slows the pace of advances. Engineers must spend time working out details rather 
-than focusing on solving harder problems. Compilers were invented forty years ago 
-exactly to let engineers focus on the problem at hand rather than spend time with 
-machine specific details. Compilers for DSP architectures have a difficult job, and are not
-very good at mapping a program written in a general purpose language like C into the specialized 
-instructions provided by DSPs. Many of the instructions provided by a DSP are targeted 
-for a very specific application (like FIR filtering), but most general purpose languages have
-no way to describe higher level behavior other than functionally. If you don't express
-your algorithm in the same way that the compiler expects to encounter it, the resulting
-program will not take best advantage of the available DSP resources.
+%% Therefore frequently reimplementing algorithms by hand is a costly,
+%% arduous process that increases cost and slows the pace of
+%% advances. Engineers must spend time working out details rather than
+%% focusing on solving harder problems. Compilers were invented forty
+%% years ago exactly to let engineers focus on the problem at hand rather
+%% than spend time with machine specific details. Compilers for DSP
+%% architectures have a difficult job, and are not very good at mapping a
+%% program written in a general purpose language like C into the
+%% specialized instructions provided by DSPs. Many of the instructions
+%% provided by a DSP are targeted for a very specific application (like
+%% FIR filtering), but most general purpose languages have no way to
+%% describe higher level behavior other than functionally. If you don't
+%% express your algorithm in the same way that the compiler expects to
+%% encounter it, the resulting program will not take best advantage of
+%% the available DSP resources.
 
-We are attempting to solve this problem by introducing a new domain specific language which
-supports imperative C like code to describe computation. By imposing structure and
-explicitly identifying the input and the output of different program sub components
-we can run an analysis that determine if a program is performing a common DSP task.  
-We can then use this information to take advantage of special purpose DSP hardware
-or we can even apply standard signal processing algorithm optimizations to 
-We can then leverage the existing work on DSP algorithm optimization to perform compiler transformation
-at a fairly sophisticated level. Our system lets programmers describe the
-computation to be performed at an appropriate level and the compiler takes care of 
+In this paper, we demonstrate that a domain-specific stream language
+can enable novel high-level DSP optimizations that would otherwise be
+intractable in a general-purpose language.  Our source language is
+StreamIt, which is specifically designed for high-performance signal
+processing applications~\cite{streamit-asplos,streamitcc}; our
+analysis focusses on filters that are {\it linear}.  StreamIt is
+distinguished from a general purpose language in that it makes
+explicit the large-scale parallelism and regular communication
+patterns that are characteristic of streaming programs.  By analyzing
+the primitive building block in StreamIt--the filter--our analysis can
+detect large portions of the application that are producing outputs as
+a linear combination of the inputs; then, we can exploit this
+linearity for a number of large-scale optimizations.  Though each
+filter is programmed using imperative C-like code, the separation of
+filters into autonomous units of the stream graph enables our analysis
+to be far more effective and efficient than it could be on an
+equivalent implementation in C alone.
+
+This paper makes the following contributions:
+\begin{itemize}
+
+\item A linear dataflow analysis that can extract a linear transfer
+function from the imperative code within a StreamIt filter.
+
+\item Combination rules for collapsing neighboring linear nodes into a
+single linear representation.
+
+\item An automated procedure for translating a stream computation into
+the frequency domain in order to optimize computationally intensive
+linear nodes.
+
+\end{itemize}
+
+In the rest of this section, we give a motivating example and some
+background information on StreamIt.  Then we present our linear
+representation (Section~\ref{sec:linearrep}) and linear dataflow
+analysis (Section~\ref{sec:dataflow}).  Next we describe the
+combination of linear filters (Section~\ref{sec:combine}) and the
+translation to the frequency domain (Section~\ref{sec:freq}) before
+giving results (Section~\ref{sec:results}), related work
+(Section~\ref{sec:related}), and conclusions
+(Section~\ref{sec:conclusion}).
 
 \subsection{Motivating Example}
 \begin{figure}
@@ -68,12 +114,14 @@ while(true) {
 \label{fig:motivating-example}
 \end{figure}
 
-As an example of the types of program transformation that our optimization allows,
-consider a sequence of finite impulse response (FIR) filters as shown in 
-Figure~\ref{fig:motivating-example}. The imperative C style code that implements
-this simple DSP application is also shown. The program largely defies many
-standard compiler analysis and optimization techniques because of its use of circular
-buffers and the muddled relationship between {\tt data}, {\tt buffer} and the output.
+As an example of the types of program transformation that our
+optimization allows, consider a sequence of finite impulse response
+(FIR) filters as shown in Figure~\ref{fig:motivating-example}. The
+imperative C style code that implements this simple DSP application is
+also shown. The program largely defies many standard compiler analysis
+and optimization techniques because of its use of circular buffers and
+the muddled relationship between {\tt data}, {\tt buffer} and the
+output.
 
 \begin{figure}
 \scriptsize

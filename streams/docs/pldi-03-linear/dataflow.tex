@@ -1,4 +1,6 @@
 \section{Linear Dataflow Analysis}
+\label{sec:dataflow}
+
 %\begin{figure}[t]
 %\scriptsize
 %\begin{verbatim}
@@ -92,7 +94,7 @@ $(zerov(u-1-popcount),0)$
 \end{enumerate}
 
 Linear forms propagate through the control flow graph much as constants do
-duirng constant propagation. The value of two expressions with linear forms $l_1$ 
+during constant propagation. The value of two expressions with linear forms $l_1$ 
 and $l_2$ is a new linear form $l'=l_1+l_2=({\mathbf v}_1+{\mathbf v}_2, c_1+c_2)$.
 
 The product of a linear form with a constant $r$, is a new linear form 
@@ -104,9 +106,9 @@ Data is propagated through forward control flow as in standard dataflow analysis
 The confluence operator is set intersection, so mappings that are retained are the same 
 along all paths of control flow. Since $popcount$ and $pushcount$ must be single
 valued at all possible program points, an inconsistent $popcount$ at the
-confluence point means that any future {\tt pop} and {\tt peek} operations can
+confluence point means that any future {\tt pop} and {\tt peek} operations
 do not generate linear forms, and an inconsistent $pushcount$ results in
-terminating the analysis.
+terminating the analysis (concluding the filter is non-linear).
 
 Backwards edges in control flow are handled currently by the symbolic execution
 of loops. We are currently investigating the use of parameterized generator matrices 
@@ -121,5 +123,6 @@ $({\mathbf v},c)$, we modify ${\mathbf A}$ and ${\mathbf b}$ of the candidate li
 ${\mathbf v}$ is copied to the $u-1-pushcount$ column in ${\mathbf A}$,
 $c$ is copied to the $u-1-pushcount$ column in $a$, and $pushcount$ is incremented.
 
-If all every {\tt push} expression in a {\tt filter} has a linear form as an argument,
-then candidate linear node $\lambda$ is the linear node for the {\tt filter}.
+If every {\tt push} expression in a {\tt filter} has a linear form as
+an argument, then candidate linear node $\lambda$ is the linear node
+for the {\tt filter}.

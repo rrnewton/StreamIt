@@ -1,4 +1,24 @@
-\section{conclusion}
+\section{Related Work}
+\label{sec:related}
+
+Several interesting projects are underway to determine how to generate
+efficient programs for DSP applications. The SPIRAL
+project\cite{spiral,xiong-thesis,xiong01spl,johnson01searching,egner01automatic}
+aims to determine the fastest implementation for various transforms
+DSP transforms using several techniques such as group theory and
+stochastic search algorithms. SPIRAL requires the user to enter a
+matrix corresponding to the desired transform, whereas our system does
+this automatically.  The ATLAS project \cite{whaley01automated} aims
+to automatically produce fast libraries for linear algebra
+manipulations, focusing on adaptive library generation.  FFTW
+\cite{frigo99fast, fftw} is a runtime tuned library for computing the
+FFT as fast as possible.
+
+% Something should be said about other stream projects and their attempts at optimizations...
+% which I know very little about.
+
+\section{Conclusion}
+\label{sec:conclusion}
 
 (this is the conclusion)
 
@@ -37,20 +57,4 @@ large compuatations such as DSP transforms.
 To increase the class of programs that would fit into our linear framework, 
 the entries of the ${\mathbf A}$ and ${\mathbf b}$ of linear nodes could contain symbolic
 runtime resolvable information.
-
-
-\subsection{Related Works}
-Several interesting projects are underway to determine how to generate efficient programs
-for DSP applications. The SPIRAL project\cite{spiral, xiong-thesis,xiong01spl,johnson01searching,egner01automatic} 
-aims to determine the fastest implementation for various transforms DSP transforms
-using several techniques such as group theory and stochastic search algorithms. SPIRAL
-requires the user to enter a matrix corresponding to the desired transform, whereas our
-system does this automatically. 
-The ATLAS project \cite{whaley01automated} aims to automatically produce fast
-libraries for linear algebra manipulations, focusing on adaptive library generation. 
-FFTW \cite{frigo99fast, fftw} is a runtime tuned library for computing the FFT as
-fast as possible.
-
-% Something should be said about other stream projects and their attempts at optimizations...
-% which I know very little about.
 
