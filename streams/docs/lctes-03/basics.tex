@@ -24,9 +24,10 @@ $\mt{peek}_f$ items on its input channel.  Execution will decrease the
 amount of data on its input channel by $\mt{pop}_f$ and increase the
 amount of data on its output channel by $\mt{push}_f$. Similarly, a
 {\splitter} $s$ will consume $\mt{pop}_s$ data from its {\Input}
-{\Channel} and push $w_{s,i}$ data onto its $i$th output channel,
-while a joiner $j$ will consume $w_{j,i}$ items from its $i$th input
-channel and push $\mt{push}_j$ onto its {\Output} {\Channel}.
+{\Channel} and push $\mt{push}_{s,i}$ data onto its $i$th output
+channel, while a joiner $j$ will consume $\mt{pop}_{j,i}$ items from
+its $i$th input channel and push $\mt{push}_j$ onto its {\Output}
+{\Channel}.
 
 Each filter, splitter, and joiner in the graph has two epochs of
 execution: one for initialization, and one for the steady state.
@@ -95,7 +96,7 @@ programs have a steady state schedule.
 \subsubsection{Minimal Steady State}
 
 We now summarize some of the key properties of steady states, which
-were first presented in~\cite{lee87static}.  Detailed proofs of these
+are presented in~\cite{lee87static}.  Detailed proofs of these
 properties in the context of StreamIt can be found in
 \cite{karczma-thesis}.
 
@@ -114,7 +115,7 @@ properties in the context of StreamIt can be found in
 %% nodes in the steady state.
 
 The first property concerns the size of a steady state.  The size is
-defined to be sum of the repetitions of all nodes in the schedule.
+defined to be the sum of the repetitions of all nodes in the schedule.
 
 \begin{theorem}[Minimal Steady State Uniqueness]
 A {\StreamIt} program that has a valid steady state, has a unique
@@ -206,8 +207,8 @@ to find the minimal steady state schedule.
 \subsubsection{Calculating Minimal Steady States}
 \label{sec:calc-min-steady}
 
-For a general stream graph, the minimal steady state can calculated in
-a linear algebra framework by formulating a set of balance
+For a general stream graph, the minimal steady state can be calculated
+in a linear algebra framework by formulating a set of balance
 equations~\cite{lee87static}.  However, with StreamIt we leverage the
 structure of the stream graph to calculate steady states in a
 hierarchical manner.  That is, a minimal steady state is calculated

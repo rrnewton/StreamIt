@@ -21,7 +21,7 @@ The goal of the StreamIt project is to provide language and compiler
 support for high-level stream programming.  A StreamIt program
 consists of a set of autonomous filters that communicate using FIFO
 queues.  Filters can be combined into single-input, single-output
-groups by using a set of hierarchical primitives, thereby imposing a
+modules by using a set of hierarchical primitives, thereby imposing a
 struture on the stream graph that is akin to structured control flow
 in a mainstream language.  In order to facilitate static scheduling,
 the input and output rates of each filter are known at compile time.
@@ -29,14 +29,14 @@ the input and output rates of each filter are known at compile time.
 In this paper, we present techniques for scheduling stream graphs such
 as those found in StreamIt.  The StreamIt representation has much in
 commmon with Synchronous Dataflow (SDF) graphs~\cite{lee87static}, for
-which there is a large body of literature devoted to scheduling
-\todo{citations}.  There are two aspects of StreamIt programs that
-distinguish our scheduling problem from a general SDF graph: 1)
-StreamIt graphs are hierarchical, with each node having only a single
-input and single output, and 2) StreamIt allows a ``peek'' operation
-whereby nodes can operate on items that they do not consume until a
-future invocation.  In this context, this paper makes the following
-contributions:
+which there is a large body of literature devoted to scheduling (see
+\cite{bhattacharyya99synthesis} for a review).  There are two aspects
+of StreamIt programs that distinguish our scheduling problem from a
+general SDF graph: 1) StreamIt graphs are hierarchical, with each node
+having only a single input and single output, and 2) StreamIt allows a
+``peek'' operation whereby nodes can operate on items that they do not
+consume until a future invocation.  In this context, this paper makes
+the following contributions:
 \begin{itemize}
 \item Fundamental techniques for constructing a hierarchical schedule
 from a hierarchical stream graph.
@@ -49,7 +49,8 @@ structure of a StreamIt graph to give a flexible tradeoff between code
 and data size.
 
 \item An instance of the phased scheduling algorithm that computes a
-minimal latency schedule without undue code requirements.
+minimal latency schedule, guaranteed to avoid deadlock in any valid
+feedback loop.
 \end{itemize}
 %% This paper makes the following contributions:
 %% \begin{itemize}
@@ -65,14 +66,13 @@ minimal latency schedule without undue code requirements.
 %% \item a minimum latency scheduler that uses hierarchical phases
 %%
 %% \end{itemize}
-This paper is organized as follows.  The remainder of this Section
-gives a illustrating example and describes relevant {\StreamIt}
+This paper is organized as follows.  The remainder of this section
+gives an illustrating example and describes relevant {\StreamIt}
 constructs; Section \ref{chpt:sched-basic} explains basic concepts in
-scheduling {\StreamIt} graphs; Section \ref{chpt:phased} describes
-the phased scheduling technique and presents a minimum-latency
-scheduling algorithm; Section \ref{chpt:results} presents results of
-scheduling applications using the phased scheduling algorithm; Section
-\ref{chpt:related} presents related work and Section
+scheduling {\StreamIt} graphs; Section \ref{chpt:phased} describes the
+phased scheduling technique and presents a minimum-latency scheduling
+algorithm; Section \ref{chpt:results} presents experimental results;
+Section \ref{chpt:related} describes related work and Section
 \ref{chpt:conclusion} presents conclusions and planned future work.
 
 \begin{figure}[t]
@@ -97,11 +97,11 @@ its children do not peek extra data} \label{fig:pipeline-buffers}
 \end{comment}
 
 A classic problem in the scheduling of synchronous dataflow graphs is
-the tradeoff between code size and data size.  Code size refers to the
-space needed to represent the schedule, while data size refers to the
-buffering of items during execution.  Generally speaking, smaller
-schedules contain loops that require coarse-grained execution of
-nodes, thereby leading to larger buffer requirements.
+the tradeoff between code size and data size~\cite{bhat1999x1}.  Code
+size refers to the space needed to represent the schedule, while data
+size refers to the buffering of items during execution.  Generally
+speaking, smaller schedules contain loops that require coarse-grained
+execution of nodes, thereby leading to larger buffer requirements.
 
 Consider the example stream graph depicted in Figure~\ref{fig:trace}.
 Even given a simple pipeline of filters, there is a large space of
@@ -111,10 +111,11 @@ scheduling policies.  First is Single Appearance Scheduling (SAS),
 which gives the minimal code size: the schedule is a loop nest with
 each node appearing at a single position.  SAS is generally the method
 of choice in the DSP community, as the contents of each node can be
-inlined without duplicating code.  Even within SAS schedules, it
-NP-hard to determine the one that gives the smallest buffers
-\todo{citation}.  The schedule shown in Figure~\ref{fig:trace} is the
-best SAS schedule for this case.
+inlined without duplicating code.  There are many different SAS
+schedules for a given stream graph; the one shown in
+Figure~\ref{fig:trace} is the best SAS schedule for this case.
+%Even within sas schedules, it
+%np-hard to determine the one that gives the smallest buffers.
 
 At the other end of the spectrum is a push schedule, which results in
 the minimal buffer size at the expense of code size.  A push schedule
@@ -123,6 +124,9 @@ produced through the rest of the graph, always executing the most
 downstream node possible.  When no further node can fire, the top node
 is executed again.  In this case, the push schedule reduces the buffer
 size by 48\% but increases code size by 325\% over the SAS schedule.
+However, since the code was originally smaller than the buffers, the
+total amount of space required decreases slightly (see
+Figure~\ref{fig:codedata}).
 
 In this paper, we develop a phased scheduling algorithm that offers a
 flexible alternative between the extremes of SAS and push scheduling.
@@ -137,8 +141,12 @@ and 3 into a single representation ``E''.
 Figure~\ref{fig:codedata} illustrates the tradeoff between code size
 and data size for the scheduling schemes.  It shows that, while all
 three techniques require approximately the same amount of memory, the
-allocation of that memory between code and data is variable with
-phased scheduling striking a compromise between extremes.
+allocation of that memory between code and data is variable, with
+phased scheduling striking a compromise between extremes.  In
+Section~\ref{chpt:phased}, we give a flexible version of our phased
+scheduling algorithm, and we also demonstrate that it can handle tight
+feedback loops for which there does not exist a valid single
+appearance schedule.
 
 \begin{comment}
 We can compare the storage efficiency of these two schedules by

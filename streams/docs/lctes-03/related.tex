@@ -15,7 +15,7 @@ actors are allowed to have multiple input and output channels.
 synchronous languages.
 
 There are many results of scheduling {\SDF} programs
-\cite{leesdf}. Many of these results concentrate on reducing buffering
+\cite{leesdf}. Many of these results concentrate on reducing buffer
 requirements. Many of the systems inline all actor code into a single
 function, and try to minimize the code and buffer size at once
 \cite{bhattacharyya99synthesis}.  This approach leads to a strong
@@ -31,8 +31,8 @@ inlined unless the resulting code grow too large. If inlining is
 not performed, actors are invoked through a function call.
 
 Other approaches to reducing the buffering requirements use buffer
-merging \cite{murthy99buffer}, a technique which will be explored
-for {\StreamIt} in the future.
+merging \cite{murthy99buffer}, a technique which will be explored for
+{\StreamIt} in the future.
 
 Many publications focus on synthesis for hardware systems.  Such
 systems can execute multiple actors at once

@@ -65,53 +65,6 @@ for pseudo single appearance and minimal latency schedules.
 
 \end{comment}
 
-\begin{comment}
-\subsubsection{Sinks}
-
-Any application in {\StreamIt} must receive its data from outside,
-and its data must be sent to outside. {\filters} that receive and
-send data to outside are called sinks and sources. In particular,
-sinks have the property of having $u_f = 0$ while sources have
-$e_f = o_f = 0$. Sinks are problematic for minimal latency
-scheduling, because they do not produce any data. Thus any
-schedule of a sink operator is a minimal latency schedule. This
-leads to the minimal latency schedule of the outer-most
-{\pipeline} becoming a single appearance schedule, thus destroying
-some of the benefit of using phased scheduling. The technique
-used for scheduling {\pipeline} sinks has been discussed in
-\cite{karczma-thesis}.
-
-This problem has been alleviated by detecting sinks at the end of
-a {\pipeline} and scheduling them in a unique way. Namely, a simple
-attempt is made to minimize the amount of storage necessary to
-store the phases of the {\pipeline}.
-
-Let the amount of storage necessary to store one data item in
-{\Input} {\Channel} to the sink be $x$, the amount of storage necessary
-to store a phase be $y$, the sink consume $a$ data per steady
-state execution of its parent {\pipeline} and $b$ be the number of
-phases of the parent pipeline, then we have that amount of storage
-necessary to store the phases and the buffer is
-$$ {ax \over b} + by $$ We want to minimize this amount, with $b$
-being the variable. We take a derrivative of the above expression,
-set it to zero and solve:
-
-\begin{displaymath}
-\begin{array}{rcl}
--{ax \over b^2} + y & = & 0 \\
-yb^2 & = & ax \\
-b & = & \sqrt{ax \over y}
-\end{array}
-\end{displaymath}
-
-For simplicity, we set $x = y = 1$, thus obtaining that $b =
-\sqrt{a}$.
-
-Now, for every phase of the parent {\pipeline} of the sink, the sink
-is executed $\sqrt{a}$ times on the first step of scheduling a
-phase of the {\pipeline}.
-\end{comment}
-
 \subsection{Results}
 \label{sec:results:results}
 
