@@ -1,14 +1,15 @@
 \section{Results}
 \label{sec:results}
 
-Our compiler currently has two linear analysis optimizations. The first,
-{\it linear replacement}, replaces the largest linear hierarchal streams 
-possible with filters that directly compute the calculation specified by 
-the streams associated linear node. The second optimization, 
-{\it frequency replacement}, replaces all streams which implement 
-a sufficiently long convolution using the frequency transformation described in 
-Section \ref{sec:freq}. Below we describe experiments and results that demonstrate
-performance improvements due to these two optimizations.
+Our compiler currently has two linear analysis optimizations. The
+first, {\it linear replacement}, replaces the largest linear
+hierarchical streams possible with filters that directly compute the
+calculation specified by the corresponding linear nodes. The second
+optimization, {\it frequency replacement}, replaces all streams which
+implement a sufficiently long convolution using the frequency
+transformation described in Section \ref{sec:freq}. Below we describe
+experiments and results that demonstrate performance improvements due
+to these two optimizations.
 
 \subsection{Measurement Methodology}
 %We chose to measure the strength of our optimizations in terms of 
@@ -33,12 +34,12 @@ performance improvements due to these two optimizations.
 %probably not an appropriate metric.
 
 \begin{figure}[t]
-\vspace{-6pt}
+%\vspace{-6pt}
 \center
 \epsfxsize=3.2in
 \epsfbox{images/linear-freq-both-new.eps}
 \vspace{-6pt}
-\caption{Multiplication reduction factors for each of the benchmarks with linear replacement, frequency replacement, and both.}
+\caption{Percent of multiplication operations remaining after performing linear replacement, frequency replacement, and both.}
 \label{fig:linear-freq-both}
 \vspace{-12pt}
 \end{figure}
@@ -55,7 +56,7 @@ program written using the DynamoRIO\cite{dynamo99} infrastructure.
 %in the IA-32 instruction set are defined to be any of ({\tt fmul fmulp fimulp fdiv fdivp fidivp fdivr fdivrp fidivr}).
 %We measure execution time normalized to the number of program outputs generated. 
 There are no standard benchmarks written yet for StreamIt, so we use
-a set of representative programs\footnote{Stream graphs appear in Appendix A}
+a set of representative programs\footnote{Stream graphs appear in Appendix A.}
 which perform computations that 
 are found in actual streaming applications: 1) {\bf FIR}, a single 256
 point rectangularly windowed low pass FIR filter
@@ -85,34 +86,35 @@ factor; 5) {\bf FMRadio}, an FM software radio with equalizer.
 %the ratio of the amount of data discarded by the overlap-discard method to the 
 %amount of data produced grows smaller. 
 
-To determine the effects of our linear replacement and frequency replacement 
-optimizations, we compiled each benchmark program with linear 
-replacement, with frequency replacement and with both linear 
-replacement and frequency replacement. 
-Figure~\ref{fig:linear-freq-both} shows the multiplication reduction factor 
-achieved for each set of optimizations.
+To determine the effects of our linear replacement and frequency
+replacement optimizations, we compiled each benchmark program with
+linear replacement, with frequency replacement and with both linear
+replacement and frequency replacement.
+Figure~\ref{fig:linear-freq-both} shows the reduction of
+multiplications due to our optimizations.
 
-For the FIR filter, all of the multiplication reduction comes from the frequency
-replacement optimization because the entire application is comprised of a single
-filter calculating a convolution sum so there is nothing to combine.
-The reduction multiplication reduction in TargetDetect is also solely due to 
-the frequency transformation because threshold detection is non-linear which
-makes the parallel computation blocks uncollapsible. Finally, RateConvert contains
-a large low pass filter which also benefits from frequency replacement. 
+For the FIR filter, all of the multiplication reduction comes from the
+frequency replacement optimization because the entire application is
+comprised of a single filter calculating a convolution sum so there is
+nothing to combine.  The multiplication reduction in TargetDetect is
+also solely due to the frequency transformation because threshold
+detection is non-linear which makes the parallel computation blocks
+uncollapsible. Finally, RateConvert contains a large low pass filter
+which also benefits from frequency replacement.
 
 %A complete
 %implementation of the linear combination rules will allow linear replacement 
 %to improve performance as well.
 
 \begin{figure}[t]
-\vspace{-6pt}
+%\vspace{-6pt}
 \center
 \epsfxsize=3.2in
 \epsfbox{images/execution-speedup.eps}
 \vspace{-6pt}
 \caption{Execution speedup for each of the benchmarks with both linear replacement and frequency replacement optimizations.}
 \label{fig:execution-speedup}
-\vspace{-12pt}
+\vspace{-6pt}
 \end{figure}
 
 All of the multiplication reduction in the FMRadio benchmark is due to
@@ -136,7 +138,7 @@ The benchmarks where multiplication reduction is due only to linear replacement 
 also show a large speedup.
 
 \begin{table*}[t]
-\vspace{-6pt}
+%\vspace{-6pt}
 \centering
 \small
 \begin{tabular}{|l|c|c|c||c||c|c|c|} 

@@ -382,8 +382,8 @@ streams.
 
 \begin{transformation} (Roundrobin to duplicate)
 Given a splitjoin $s$ containing a roundrobin splitter with weights
-$v_0 \dots v_{n-1}$, children that are linear nodes $\lambda_0 \dots
-\lambda_{n-1}$, and a roundrobin joiner $j$, the transformed
+$v_0 \dots$ $v_{n-1}$, children that are linear nodes $\lambda_0 \dots
+\lambda_{n-1}$, and a round-robin joiner $j$, the transformed
 $\mbox{\bf rr-to-dup}(s)$ is a splitjoin with a duplicate splitter,
 linear child nodes $\mathbf{\lambda_0'} \dots
 \mathbf{\lambda_{n-1}'}$, and roundrobin joiner $j$.  The child nodes
@@ -414,7 +414,7 @@ are computed as follows:
 In the above translation, we utilize the linear pipeline combinator
 $\mt{pipe}$ to construct each new child node $\lambda_i^e$ as a
 composition of a decimator and the original node $\lambda_i$.  Each
-decimator is a square matrix that produces and consumes $\mt{wTot}$
+decimator is a square matrix that produces and consumes $\mt{vTot}$
 items, which is the number of items processed in one cycle of the
 roundrobin joiner.  Those items intended for stream $i$ are copied
 with a coefficient of $1$, while all others are eliminated with a

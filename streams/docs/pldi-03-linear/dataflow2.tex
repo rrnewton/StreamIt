@@ -41,7 +41,7 @@ propagation.  Unlike a standard dataflow analysis, we can afford to
 symbolically execute all loop iterations, since most loops within a
 filter's work function have small bounds that are known at compile
 time (if a bound is statically unresolvable, the filter is unlikely to
-be linear and we disregard it.)
+be linear and we disregard it).
 
 Figure~\ref{fig:types} contains an overview of our notation for the
 pseudocode.  During symbolic execution, the algorithm maintains a
@@ -158,11 +158,11 @@ proc {\bf Extract}($code$, $map$, $A$, $\vec b$, int $\mt{popcount}$, int $\mt{p
 \STATE $\mt{pushcount}$\verb|--|
 \UND
 \STATE \vspace{-6pt}
-\STATE $\mbox{\bf case}~ y_1 := y_2 + y_3$ or $y_1 := y_2 - y_3$
+\STATE $\mbox{\bf case}~ y_1 := y_2 \mt{~op~} y_3$, for $\mt{~op~} \in \{+, -\}$
 \IND
 \STATE $\tup{\vec v_2}{c_2} \leftarrow \mt{map}.\mt{get}(y_2)$
 \STATE $\tup{\vec v_3}{c_3} \leftarrow \mt{map}.\mt{get}(y_3)$
-\STATE $\mt{map}.\mt{put}(y_1, \tup{\vec v_2+\vec v_3}{c_2+c_3})$
+\STATE $\mt{map}.\mt{put}(y_1, \tup{\vec v_2 \mt{~op~} \vec v_3}{c_2 \mt{~op~} c_3})$
 \UND
 \STATE \vspace{-6pt}
 \STATE $\mbox{\bf case}~y_1 := y_2 * y_3$
