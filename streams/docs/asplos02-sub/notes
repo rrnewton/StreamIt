@@ -6,9 +6,9 @@ StreamIt Numbers
 
 Application     MFLOPS     % Util.    Throughput**    Date     Who        Status
 -------------------------------------------------------------------------------------------------------
-FFT             181.6       41.7%         2141.9     7/26     Andrew    Mostly done (for N=64; could do others too)
+FFT             181.6       41.7%         2141.9     7/26    Andrew     Mostly done (for N=64; could do others too)
 FMRadio         421         73            53.85      7/29    David      Done, I think
-BeamFormer      1231        79            2.54       7/29     Chris     Done
+BeamFormer      1231        79            2.54       7/29    Chris      Done
 Vocoder         ?           ?             ?          ?       ?          Needs 2-stage fusion.
 Nokia           ?           ?             ?          ?       Jasper     Being optimized.
 GSM             0           10.5          ?          7/29    David      Code sucks, will refine later
@@ -22,7 +22,6 @@ CRC             ?           ?             ?          ?       ?          Not look
 HDTV            ?           ?             ?          ?       ?          Needs fusion support.
 perftest4       ?           ?             ?          ?       ?          Not looked at.
 Lattice         ?           ?             ?          ?       ?          Not looked at.
-FilterBank      ?           ?             ?          ?       Ali        Not written yet.
 MergeSort       ?           ?             ?          ?       ?          Would need iterative rewrite.
 BitonicSort     ?           ?             ?          ?       ?          Could be looked at.
 FIR             ?           ?             ?          ?       ?          Doesn't exist, but why not just do a plain FIR?
@@ -34,16 +33,18 @@ Application     C Code, 1 Tile       C Code, PIV         C Code, rawcc       Dat
 (MFLOPS/Throughput**/Utilization)     (Tput**/Utilization)
 -------------------------------------------------------------------------------------------------------
 FFT(64)             33.5/150.48/97.7%      257.0/99.9%	     ?	              7/26    Andrew    C Code written.
-FMRadio             29.3/2.47/97.7%        4.8/99.9%       ?	              7/29    Andrew    C Code written.
-BeamFormer          ?		           ?		     ?	              ?       ?	        C Code written?  (Hank?)
+FMRadio             29.3/2.47/97.7%        4.8/99.9%         ?	              7/29    Andrew    C Code written.
+BeamFormer          ?		           1.95/99.7%        ?	              7/29    Andrew    C Code written?  (Hank?)
 Vocoder             ?		           ?		     ?	              ?       ?	        C Code supplied.
 Nokia(4/5/10/7)*    1.22/15.55/97.8%       ?		     ?	              7/29    Andrew    C Code written?.
-Nokia(4/5/10/7)*    1.22/15.55/97.8%       ?		     ?	              7/29    Andrew    C Code written?.
+Nokia(4/20/15/7)*   ?                      .061/99.9%	     ?	              7/29    Andrew    C Code written?.
 GSM                 ?		           ?		     ?	              ?       ?         C Code supplied.
+Fir-fine            ?		           ?		     ?	              7/29    Andrew    C Code supplied.
+Filterbank          ?		           .0069/99.9%       ?	              7/29    Andrew    C Code supplied.
 
 
 CRC                 ?		           ?		     ?	              ?       ?	        Optimized C supplied.
-HDTV                ?		           ?		     ?	              ?       ?	        ?
+HDTV                ?		           ?		     	              ?       ?	        ?
 Lincoln Labs        ?		           ?		     ?	              ?       Ali	        C Code in progress.
 MatrixMultiply 122.4/20.2	           ?		     ?	            7/26      Andrew      C Code written.
 MP3                 ?		           ?		     ?	              ?       ?	        ?
