@@ -1,1 +1,71 @@
 \section{Related Work}
+
+The work most closely related to ours comes from the fields of program
+slicing, heterogeneous modeling, and domain-specific languages.
+
+Program slicing identifies the set of statements in a program that a
+given statement might depend on.  There is a rich history of work in
+program slicing; see Tip~\cite{tip95slice} for a comprehensive review.
+Many program slicing techniques rely on the Program Dependence Graph
+as described by Horwitz et al.~\cite{hrb88pdg}.  Program slicing has
+been applied for debugging, testing, and program analysis.  In many
+respects, $\sdep$ analysis can be thought of as a slicing technique
+for Synchronous Dataflow graphs.  Because the input domain is
+restricted (in particular, because of the absence of control flow and
+recursion), the $\sdep$ calculation can make stronger guarantees than
+slicing analyses for general procedural languages; $\sdep$ is
+decidable, exact, and admits a compact representation in terms of the
+steady state schedule.
+
+Pugh and Rosser present an iteration-based slicing~\cite{pughslice}
+which identifies the dynamic instances of statements (in terms of
+their loop iteration) which effect a given value.  This also bears
+some similarity to $\sdep$, as we calculate the last iteration of an
+actor which affects another.  However,~\cite{pughslic} focusses on the
+problem of computing the transitive closure of dependences in loops.
+We are not interested in this question, as we assume that all actor
+invocations depend on their previous invocations; $\sdep$ addresses
+the question of finding the last invocation that was relevant.
+Moreover, our motivation differs from the slicing community, as we
+apply $\sdep$ to enrich the semantics of language features.  To the
+best of our knowledge, slicing has not been applied in this way
+before.
+
+The models of computation in our system are closely related to those
+explored in the Ptolemy project for heterogeneous
+design~\cite{ptolemy03overview}.  As part of this effort, Lee et
+al. have established the Synchronous Dataflow (SDF)
+paradigm~\cite{LM87-i} and have developed hybrid models that
+incorporate Dynamic Dataflow (DDF, in which the I/O rates of actors
+are fully dynamic).  Boolean Dataflow (BDF)~\cite{ha97profile} is a
+compromise between these two extremes; it computes a parameterized
+schedule of the graph at compile time, and substitutes runtime
+conditions to decide which paths are taken.  The performance is nearly
+that of SDF while keeping some flexibility of DDF.  
+
+The messaging system described in this paper shares the motivation of
+BDF, but is different in its approach.  We believe that control
+messages represent a distinct and well-behaved class of dynamic
+communication in which a parameter is ``pushed'' into the receiver
+actor in an asynchronous way.  Because the message handlers do not
+access the input and output tapes of the receiving filter, their
+irregular invocations do not affect the multiplicity of the
+steady-state schedule.  Instead, the schedule is constrained only by
+the latency of control messages; if a message doesn't show up in the
+allotted window, then the receiving actor can go ahead with its
+high-bandwidth schedule.  This is the distinction in the computational
+model.  In addition, the static/dynamic integration offered by our
+system is integrated with language features that support the model.
+
+There are many domain-specific stream languages in addition to
+StreamIt.  Streams have a long history in the programming languages
+community, with influences from dataflow, CSP, synchronous and
+functional languages; see Stephens~\cite{survey97} for a review.
+Languages of recent interest include Occam~\cite{occammanual},
+Sisal~\cite{sisal}, Parallel Haskell~\cite{ph},
+StreamC/KernelC~\cite{imagine03ieee}, and Spidle~\cite{spidle02}.  The
+principle differences between StreamIt and these languages is the
+single-input, single-output hierarchical structure that StreamIt
+imposes on the stream graph; StreamIt's support for a ``peek''
+construct that inspects data without consuming it from a channel; and
+the low-bandwidth messaging system described in this paper.
