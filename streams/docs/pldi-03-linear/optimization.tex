@@ -4,9 +4,9 @@
 \label{sec:freq}
 
 Our linear analysis framework provides a compile time formulation of
-the computation that a linear {\tt stream} is performing and we can
+the computation that a linear {\tt stream} is performing and we
 use this information to exploit well known domain specific optimizing
-transformations.  Using our linear information, our compiler
+transformations.  Using the linear node information from, our compiler
 identifies convolution regions that require substantially fewer
 computations if they are translated into the frequency domain.
 
@@ -14,8 +14,7 @@ Calculating a convolution sum is a common and fundamental operation in
 discrete time signal processing.  If the convolution region is
 sufficiently large, transforming the data to the frequency domain,
 performing a simple vector multiply and converting back to the time
-domain requires fewer operations than the original convolution
-computation.
+domain requires fewer operations than the straightforward convolution.
 
 % modified the tense so that it's clear we aren't talking about OUR 
 % system.  --bft
@@ -25,26 +24,27 @@ analysis has had the information to determine when a convolution sum
 is being computed.  As the complexity of DSP programs grow,
 determining the disparate regions across which these optimizations can
 be applied is an ever more daunting task. For example, individual
-filters may not have sufficiently large convolutions to merit this
+filters may not perform sufficiently large convolutions to merit this
 transformation, but after a liner combination of multiple filters the
 transformation will be beneficial.  Furthermore, differing
-architectural features makes the task of portable program
-transformations even harder.
+architectural features makes the task of portably implementing 
+computation transforms even harder.
 
 \subsection{Transformation Overview}
 The convolution sum $y[n]=x[n]*h[n]$ is defined as
-$y[n]=\sum_{k=-\infty}^{\infty}x[k]h[n-k]$.  In StreamIt, if a {\tt
-stream} is calculating a convolution sum we know that the input
-($x[n]$) and output ($y[n]$) correspond exactly to the input and
-output tapes.  Furthermore, a {\tt stream} will be computing a
+$y[n]=\sum_{k=-\infty}^{\infty}x[k]h[n-k]$. In StreamIt, if a 
+{\tt stream} is calculating a convolution sum the input
+($x[n]$) and output ($y[n]$), correspond exactly to the input and
+output tapes where where $n$ denotes an index in the time domain.  
+Furthermore, a {\tt stream} will be computing a
 convolution sum when $o=1$ in which case we can identify the values
-$h[n]$ as exactly the columns of $A$.
+$h[n]$ as exactly the columns of $A$ in the corresponding linear node.
 
 Calculating the convolution in the frequency domain is more efficient
 because of the existence of the Fast Fourier Transform (FFT) algorithm
-to calculate the Discrete Fourier Transform (DFT). Calculating a
-convolution takes $O(N^2)$ time, and performing the equivalent
-frequency computation domain using an FFT takes only two $O(N lg(N))$
+for quickly calculating the Discrete Fourier Transform of a signal.
+Calculating a convolution takes $O(N^2)$ time, and performing an equivalent
+computation using an FFT takes only two $O(N lg(N))$
 time-frequency conversions coupled with an $O(N)$ frequency domain
 vector multiply.
 
@@ -54,61 +54,68 @@ vector multiply.
 %signal processing, including using the DFT to implement convolution, see \cite{oppenheim-discrete}.
 
 To compute the convolution of two discrete time signals, $x[n]*h[n]$,
-one can calculate the DFT of both sequences to produce $X[k]$ and
-$H[k]$. Multiplying $X[k]$ and $H[k]$ element-wise produces a new
+first the DFT of both sequences ($X[k]$ and $H[k]$) is calculated where
+$k$ denotes in index in the frequency domain.
+Multiplying $X[k]$ and $H[k]$ element-wise produces a new
 sequence $Y[k]$, and taking the inverse DFT (IDFT) of $Y[k]$ produces
-$y[n]$ which is exactly the same as $x[n]*h[n]$.
+$y[n]$ which is precisely the same as $x[n]*h[n]$.
 
-When we identify a {\tt stream} that computes a convolution sum, the
-compiler computes $H[k]$ at compile time and stores it during runtime. 
-The {\tt stream}'s {\tt work} function is changed so that first $X[k]$ is 
-$x[n]$ is calculated using an FFT algorithm. Then the {\tt work} function 
-multiplies $X[k]$ with $H[k]$, to produce $Y[k]$. Finally $y[n]$ is obtained by
-transforming $Y[k]$ back to the time domain using an inverse FFT.
+When the compiler identifies a {\tt stream} that computes a convolution sum,
+it generates a new {\tt filter} which computes $H[k]$ at compile time. 
+The {\tt stream}'s {\tt work} function is changed to perform the following:
+\begin{enumerate}
+\item $X[k]$ is is calculated from the input tape using an FFT algorithm. 
+\vspace{-6pt}
+\item $X[k]$ is multiplied $H[k]$, to produce $Y[k]$. 
+\vspace{-6pt}
+\item $y[n]$ is obtained by transforming $Y[k]$ back to the time domain using an inverse FFT.
+\vspace{-6pt}
+\item The appropriate values of $y[n]$ are pushed on to the output tape.
+\end{enumerate} 
 
 \subsection{Automatic Transformation}
 %this is where the fun starts.  
 
 To implement this transformation, the compiler needs to compute $H[k]$ at
-compile time. The compiler is transforming an FIR filter which has $h[n]$ of length $e$
-and push rate $u=1$.
-In order to overcome the constant factors hidden in the asymptotic savings
-the transformed $F$ needs to produce more than the original $1$ output on each
+compile time. Because the compiler is transforming an FIR filter 
+which has $h[n]$ of length $e$ and push rate $u=1$, the filter needs to be 
+expanded in order to overcome the constant factors hidden in the asymptotic savings.
+Therefore, the transformed filter needs to produce more $1$ output each
 execution of {\tt work}. The number of outputs, $N$, to produce on each 
-execution of {\tt work} is set to be approximately $2e$, a number determined
-by empirical observations. $N$ is then rounded up so that $N+2(e-1)$ is a power of two 
-because our FFT algorithm only works on powers of two sized inputs. 
+execution of {\tt work} is determined automatically by the compiler and set to be 
+approximately $2e$, a number determined by empirical observations. $N$ is then rounded 
+up such that the FFT size, $N+2(e-1)$, is a power of 
+two which is required by the FFT algorithm we employ.
 
 The frequency transformation generates a new {\tt stream} that
-uses $N+e-1$ items each execution where the original {\tt stream} used only $e$.
-Using $N+e-1$ input items results in a complete convolution results in 
-$N+2e-2$ values, of which both the first and last $e_F-1$ values 
-are incorrect. Without state, the transformed filter can at most produce 
-the next $N$ items because any additonal output requires more than $N+e-1$ inputs.
-
+peeks $e'=N+e-1$ items each execution where the original {\tt stream} used only $e$.
 The compiler automaticalls computes the complex values of
-$H[k]=FFT(N+2e-2,h[n])$, the $N+2e-2$ point DFT of $h[n]$ at compile
-time and saves them as filter state.  A new compiler-generated {\tt
-work} function calculates the complex valued $X[k]=DFT(N+2e-2,x[n])$,
-the $N+2e-2$ DFT of the input and then calculates $Y[k]$ as the
-element-wise vector product of $X[k]$ and $H[k]$. Finally, it performs
+$H[k]=FFT(N+2(e-1),h[n])$, the $N+2(e-1)$ point DFT of $h[n]$ at compile
+time and saves them as constants in the filter.
+A new compiler-generated {\tt work} function is generated that calculates the complex 
+valued $X[k]=DFT(N+2(e-1),x[n])$, the $N+2(e-1)$ DFT of the input and 
+then calculates $Y[k]$, the element-wise vector product 
+of $X[k]$ and $H[k]$. Finally, the new {\tt work} function performs
 the inverse FFT $y[n]=IFFT(N+2e-2,y[n])$.
 
-In the overlap-discard implementation, the {\tt work} function simply
-uses the middle $N$ values of $y[n]$ and discards the overlapping
-$2e-2$ on either end. Then the $N$ values are used to produce the next
-$N$ outputs.
+Using $N+e-1$ input items produces a length $N+2(e-1)$ convolution sum, 
+of which both the first and last $e-1$ values. Since every output requires 
+the value of $e$ inputs to calculate, without containing state 
+only the middle $N$ items of $y[n]$ are actual output values. 
+In the {\it overlap-discard} implementation, the {\tt work} function simply
+uses the middle $N$ values of $y[n]$ and discards the 
+$e-1$ elements on both ends. The input tape is advanced by $N$ and the next 
+$N+e-1$ values are used to produce the next $N$ outputs.
 
-The overlap-add method saves the overlaping values of $y[n]$ because they contain partial
-outputs due to both the previous and the next $N+e-1$ inputs.
-The first $e-1$ are part of the computation from the previous invocation of the 
-{\tt work} function and the last $e-1$ are part of the computation that will be done
-by the next invocation. 
-The reuse of partial results from previous frequency calculations is known 
-as the ``overlap and add'' method ~\cite{oppenheim-discrete} and used widely.
-On each {\tt work} function exection, the filter pushes the first $e-1$ items 
-of $y[n]$ plus the partial results from the previous invocation. Then the middle 
-$N$ elements of $y[n]$ are produced. Finally, last $e-1$ elements 
-of $y[n]$ are stored in as the partial results to be used on the next 
-invocation of {\tt work}.
+The {\it overlap and add} method ~\cite{oppenheim-discrete} is well known and and widely used.
+The overlap-add method exploits the fact that the overlaping values of $y[n]$ contain partial
+output computations due to both the previous and the next $N+e-1$ inputs.
+The first $e-1$ of $y[n]$ are part of the computation from the previous invocation of the 
+{\tt work} function and the last $e-1$ are part of the next invocation. 
+For our current frequency transformation, the compiler creates a filter which first pushes 
+$y[n]+p[n]$ for $0 \le n \le (e-1)-1$, where $p[n]$ contains partial results from the 
+previous invocation. Then the filter pushes the values of $y[n]$ for $e-1 \le n \le N+(e-1)-1$.
+Finally, $p[n]$ is updated such that $p[n]=y[n+(N+e-1)]$ for 
+$0 \le n \le N+2(e-1)-1$ which are used on the next invocation of {\tt work}.
+Finally, the input tape is advanced by $N+e-1$.
 
