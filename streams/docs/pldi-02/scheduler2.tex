@@ -33,7 +33,7 @@ channel.
 
 For graphs without peeking, one can find a unique and minimal set of
 multiplicities for a periodic schedule, and all other periodic
-schedules will be a multiple of these \cite{ptolemy}.  Thus, the
+schedules will be a multiple of these \cite{bhat1996x1}.  Thus, the
 challenge in scheduling is to impart an {\it order} on the steady
 state execution set so that a given metric is optimized.  In what
 follows, we consider three approaches to this problem.
@@ -43,15 +43,16 @@ follows, we consider three approaches to this problem.
 A schedule with minimal code size is a Single Appearance Schedule
 (SAS): one where each node appears exactly once in the loop nest
 denoting the schedule (e.g., (4A)(6B)(9C)(3D) in Figure
-\ref{fig:sched}).  A large community \cite{ptolemy} has studied SAS's
-because their minimal code size allows extensive function inlining,
-which enables compiler optimizations and improves performance.  In the
-StreamIt compiler, we compute a simple SAS with hierarchical ordering
-according to the original stream structure.  The problem with this and
-other SAS's is that the data buffer size can grow quite large, which
-motivates other techniques.  Moreover, the inlining benefits afforded
-by SAS's are less important in StreamIt, where the compiler itself can
-consider inter-procedural optimizations.
+\ref{fig:sched}).  There has been a lot of attention (e.g.,
+\cite{bhattamurtlee97, bhat1996x1}) on SAS's because their minimal
+code size allows extensive function inlining, which enables compiler
+optimizations and improves performance.  In the StreamIt compiler, we
+compute a simple SAS with hierarchical ordering according to the
+original stream structure.  The problem with this and other SAS's is
+that the data buffer size can grow quite large, which motivates other
+techniques.  Moreover, the inlining benefits afforded by SAS's are
+less important in StreamIt, where the compiler itself can consider
+inter-procedural optimizations.
 
 \subsection{Minimizing Buffer Size}
 
