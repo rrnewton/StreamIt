@@ -85,7 +85,7 @@ construct is used to specify independent parallel streams that diverge
 from a common {\splitter} and merge into a common {\joiner}--for
 example, in the Equalizer of Figure~\ref{fig:radio-ascoded}.  StreamIt
 currently supports two types of splitters: duplicate, which broadcasts
-its input items to each parallel stream, and roundrobin, which
+its input items to each parallel stream, and round-robin, which
 distributes items cyclically to one child after another according to
 an array of weights.  The joiner node must be a roundrobin.
 
