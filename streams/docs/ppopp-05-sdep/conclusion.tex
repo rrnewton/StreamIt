@@ -1,1 +1,32 @@
 \section{Conclusions}
+
+This paper makes two contributions.  First, it formulates $\sdep$,
+which we believe is a fundamental dependence representation for the
+streaming domain.  We outlined several possible applications of
+$\sdep$, including latency constraints, debugging, speculation, and
+program analyis, and we look forward to pursueing these directions in
+the future.
+
+Second, this paper employs $\sdep$ to define a powerful language
+construct allowing for precise message delivery between any two nodes
+of a stream graph.  In comparison with other methods to implement
+messaging functionality in a Synchronous Dataflow model, we believe
+that our language construct is more readable, more robust, and easier
+to maintain.  In addition, our implementation of messaging in the
+StreamIt compiler resulted in a 48\% improvement in performance for a
+frequency hopping radio running on a cluster of workstations.  We
+achieved this speedup because the messaging construct exposes the true
+dependences to the compiler and allows it to optimize the
+communication.
+
+Our work can also be viewed as the integration of dynamic behavior
+into a static dataflow language.  Our insight is that there is a class
+of control messages which only adjust a parameter in the target actor;
+they do not otherwise affect the input or output channels upon
+delivery.  This model enables a hybrid scheduling scheme in which the
+steady-state dataflow is exactly orchestrated at compile time, but
+there are windows in which a message could adjust an internal field of
+a filter between its execution steps.  We consider this to be a modest
+but promising step towards a unified development environment that
+captures all aspects of stream application development without
+sacrificing either performance or programmability.
