@@ -1,10 +1,76 @@
 Things to bring to front of intro:
 
+- structure of morpwhare flow (hlc, llc, etc.)
+
+  - reason this is interesting -- in streaming domain, much more opportunity for HLC orchestration of resources, etc.
+
+  - responsibilities for each
+
+  - expect that there will be some kind of feedback from llc
+
+  - machine model diagram where SVM is function of machine model
+
+- then machine model -> svm.  svm is specified as set of API calls.
+
+- goals of svm?  Express high-performance mapping for multiple applications and architectures.  this means:
+
+  - separate control and data-intensive code, so that data-intensive code can be explicitly compiled to stream processors
+  - explicitly manage memory for data-intensive codes (DMA instead of caches)
+  - expose streaming nature of computation (for communication-exposed architectures)
+    - in many cases can be mapped onto FIFO's
+    - i/o devices are also represented as black-box kernels; can be
+      streamed directly into architecture without going through memory
+
+- easy to translate by low-level compiler
+- human comprehensible and writable
+- includes performance hints where it can
+
+-----
+
 - (Peter) SVM describes mapping, is not intended as a programming language
+
+  - all information relevant to the mapping is encoded in programming
+    language terms, but there are certain restrictions to ensure that
+    mapping is easy to extract
+
 - (Peter) streaming and kernels are separate abstractions
 - (Peter) spec introduces the notion of streaming DMA -- continuous data movement, not pre-blocked
 
+- notion of machine model, SVM being a function of machine model (DIAGRAM)
 
+- expect that there will have to be some kind of feedback for llc
+
+- notion of pre-defined and black box kernels
+  - for I/O, DMA, library functions
+  - move, scatter/gather
+
+- streams
+  - init
+  - peek, pop, push (with EOS)
+
+- blocks
+  - init, read, write
+
+- kernels
+  - init
+  - dependences
+  - run, pause, end
+
+
+HLC responsibilities
+ - parallelization for data, task, pipeline parallelism
+ - does load balancing (fusion/splitting of stream language kernels)
+ - assignes SVM kernels to particular processor resources
+ - schedules order of execution of SVM kernels on processors
+ - assigns svm/blocks to particular rams or fifo's
+ - also manages compiler-controlled memories (SRF)
+ * give performance hints in code
+
+LLC responsibilities
+ - code generation
+ - routing
+ - manages instruction memory on stream processors
+ - manages communication between kernels and controls
 
 *********************************************************************************
 
