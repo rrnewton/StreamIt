@@ -1,10 +1,72 @@
 to add to paper:
 ---------------
 
+possibly for Andrew to do:
+------
+
+- give example of a linear node.  Could go in one of two ways: give
+  streamit code and then the matrix, or give general streamit code
+  that implements an abstract matrix.  I think the first would be
+  better.
+
+- add to fig 7, xA + b = y.  (The b is missing)
+
+- fig 9, some of the fonts are too small [esp. the (e'- (e+o*....) section]
+
+- looks like the vector symbol goes funky (looks curvy) on b when it
+  is in bold.
+
+- should add vector symobls to x and y in all transformations and
+everywhere where they're used as vectors
+
+- some bugs in fig. 10:
+
+   - in second line of matrices, add "e" superscript to A_1 (in label above)
+
+   - in lamba_1^e, the push and pop rates are reversed (should be pop=1, push=3)
+
+   - the vector sign is missing from b
+
+- in figure 12:
+   - in the second splitjoin, we have lambda_1^e but A_1.  Should add
+     e in both cases or neither (same with actual matrix inside the node).
+
+   - vector signs missing from b.
+   
+   - I would expand "duplicate" and "roundrobin" in the splitters and
+     joiners.  We have room for the labels and other people might not
+     understand.
+
+- Figs 1 and 10 draw stream graphs horizontally, while figs. 6, 12,
+  and appendices are vertically.  Do you think it'd make sense to
+  always be vertical?  Not a big deal.
+
+- I would remove titles of the graphs from excel.
+
+- In results, I think we should move the description of the benchmarks
+  into a table like in ASPLOS, which is "program characteristics" --
+  lines of code, number of filters orig, number of filters expanded,
+  and then possibly the results (mult. reduction and execution time
+  with differnent options), if there's room in the same table.
+
+- This is a low-priority pain, but bibliography could use some
+  uniformizing.  For example, we reference PLDI in three completely
+  different ways.
+
+- I'm unclear about a number of things in the frequency section.  I
+  think we need to make it more clear what class of filters we
+  transform, and why.  Should define "convolutional filter" if that
+  word has any meaning.  It'd be nice to describe the algorithm for 
+  transforming matrices, not just column vectors, if possible.
+
+------
+
+- make clear what domain of inputs the frequency conversion will work
+  on (what is a convolutinoal filter?  use it a lot w/o definition.)
+
 - describe partitioning stuff (Bill)
 - updated numbers (with new benchmarks?)
   - resolve Beamformer numbers
-
 - editing / proofreading
 
 Andrew's distallation of todo items (that are not already fixed) from reviewers:
