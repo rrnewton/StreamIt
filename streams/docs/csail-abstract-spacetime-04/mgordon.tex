@@ -116,31 +116,37 @@ that the compiler targets for aggressive code generation.  This
 results in optimal usage of the tiles for each piece.
 
 \begin{figure}[tbh]
-	\vspace{-.2in}
-  \centerline{\includegraphics[width=3.0in]{mgordon_figure1.pdf}}
-	\vspace{-.2in}
-  \caption{The Stream Graph for the Channel Vocoder.}
-	\vspace{-.2in}
-  \label{streamgraph}
+  \vspace{-.1in}
+  \begin{minipage}{2.8in}
+    \vspace{.2in}
+    \centerline{\includegraphics[width=2.8in]{mgordon_figure1.pdf}}
+    \vspace{-.1in}
+    \caption{Stream graph for a channel vocoder.\protect\label{streamgraph}}
+  \end{minipage}
+  ~~~
+  \begin{minipage}{3.4in}
+    \centerline{\includegraphics[width=3.4in]{mgordon_figure2.pdf}}
+    \vspace{-.1in}
+    \caption{Mapping the vocoder to a 4x4 Raw machine.\protect\label{fig:mapping}}
+  \end{minipage}
+  \vspace{-0.1in}
 \end{figure}
-
-
    
 We will now present a small example to solidify the reader's
 understanding of our work.  In Figure \ref{streamgraph} we show the
-stream graph for a simple channel vocoder.  The dark ovals denote
-the linear filters of the application.  The white ovals are non-linear
-but stateless filters and thus can be data-parallelized.  
+stream graph for a simple channel vocoder.  The dark ovals denote the
+linear filters of the application.  The white ovals are non-linear but
+stateless filters and thus can be data-parallelized.
 
-An example mapping of this application first executes the top low-pass
-filter slice, occupying the entire Raw chip executing enough times to
-supply the subsequent slices. Next, each band slice will occupy a
-quarter of the chip, executing the 4 bands in parallel.  Remember that
-each of the above slices are linear and our parameterized linear code
-generation provides near-optimal utilization. Finally, the non-linear,
-stateless pitch detector slice is data-parallelized across the entire
-Raw chip. Each slice reads its input from and writes its output to
-off-chip DRAM.
+An example mapping of this application (Figure~\ref{fig:mapping})
+first executes the top low-pass filter slice, occupying the entire Raw
+chip and executing enough times to supply the subsequent slices. Next,
+each band-pass slice will occupy a quarter of the chip, executing the
+4 bands in parallel.  Remember that each of the above slices are
+linear and our parameterized linear code generation provides
+near-optimal utilization. Finally, the non-linear, stateless pitch
+detector slice is data-parallelized across the entire Raw chip. Each
+slice reads its input from and writes its output to off-chip DRAM.
  
 \absection{Progress}
 Currently, we have completed a first version of our hybrid space-time
