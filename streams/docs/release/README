@@ -3,7 +3,7 @@ StreamIt Snapshot Release
 
 This is for the March 14, 2003 snapshot release (streamit-0.0.20030314).
 
-$Id: README,v 1.7 2003-03-14 19:54:27 dmaze Exp $
+$Id: README,v 1.8 2003-03-14 20:16:41 dmaze Exp $
 
 1. What is this?
 2. Dependencies
@@ -98,14 +98,11 @@ research compiler; as such, it has several known shortcomings:
    automated number gathering for RAW is not available for this
    release.
 
--- The Java infrastructure may not allow particular combinations of
-   stream parameters.  In particular, each stream object type has a
-   corresponding class in library/java/streamit, and stream parameters
-   that do not match a constructor in the relevant class will be
-   rejected by the Java frontend.  If you have the source release and
-   run across a missing constructor, you should feel free to add it.
-   Otherwise, please send us email if you need a parameter combination
-   that is not currently supported.
+-- The Java library infrastructure may not allow particular
+   combinations of stream parameters.  This should not be a problem
+   with the compiler; if you run into it, see
+   docs/implementation-notes/library-init-functions.txt for how to fix
+   it.
 
 -- Most of our development is done under Linux; some aspects of the
    compiler may be specific to gcc and/or Linux.
