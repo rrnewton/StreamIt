@@ -10,10 +10,10 @@ class Butterfly extends Stream {
             setSplitter(WEIGHTED_ROUND_ROBIN(N, N));
             add (new Identity());
             add (new Filter() {
-               float weights[W];
-               int curr;
                Channel input = new FloatChannel();
                Channel output = new FloatChannel();
+               float weights[] = new float[W];
+               int curr;
                void init() {
                   for(int i=0; i<W; i++)
                      weights[i] = calcWeight(i, N, W);

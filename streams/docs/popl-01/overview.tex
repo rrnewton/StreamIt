@@ -83,80 +83,51 @@ class Main extends Stream {
 \scriptsize
 \begin{verbatim}
 int N = 5;
-int BLOCK_SIZE = 200;
+int BLOCK_SIZE = 100;
 
 void main() {
 
    float data1[] = new float[BLOCK_SIZE+N];
-   float data2[] = new float[BLOCK_SIZE+N];
-   int pos;
+   float data2[] = new float[BLOCK_SIZE];
 
-   for (pos=0; pos<N; pos++) {
-      data1[pos] = getData();
+   for (int i=0; i<N; i++) {
+      data1[i] = getData();
    }
 
    while (true) {
 
       for (int i=0; i<BLOCK_SIZE; i++) {
-         data1[(i+pos)\%(BLOCK_SIZE+N)] = getData();
+         data1[i+N] = getData();
       }
 
       for (int i=0; i<BLOCK_SIZE; i++) {
          float sum = 0;
          for (int j=0; j<N; j++) {
-            sum = sum + data1[(i+pos+j)\%(BLOCK_SIZE+N)]*FIR_COEFF[j][N];
+            sum = sum + data1[i+j]*FIR_COEFF[j][N];
          }
-         data2[(i+pos)\%(BLOCK_SIZE+N)] = sum;
+         data2[i] = sum;
       }
 
       displayBlock(data2);
 
-      pos = (pos+BLOCK_SIZE)\%(BLOCK_SIZE+N);
-
+      for (int i=0; i<N; i++) {
+         data1[i] = data1[i+BLOCK_SIZE];
+      }
    }
 }
 \end{verbatim}
 \vspace{-12pt}
-\caption{\protect\small An FIR filter in a procedural language.
+\caption{\protect\small An unoptimized FIR filter in a procedural language.
 \protect\label{fig:firprocedural}}
 \vspace{-12pt}
 \end{figure}
-
-% Here is some pipelined procedural code, without the block
-%
-%int N = 5;
-%
-%void main() {
-%
-%   float data[] = new float[N];
-%   int pos;
-%
-%   for (int pos=0; pos<N; pos++) {
-%      data[pos] = getData();
-%   }
-%
-%   while (true) {
-%      pos = (pos+1)\%N;
-%
-%      float sum = 0;
-%      for (int i=0; i<N; i++) {
-%         sum = data[(i+pos)\%N]*FIR_COEFF[j][N];
-%      }
-%
-%      display(sum);
-%
-%      data[pos] = getData();
-%   }
-%}
-%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{figure}
 \scriptsize
 \begin{verbatim}
 class FIRFilter {
    int N;
-   float data1[];
+   float[] data1;
 
    FIRFilter(int N) {
       this.N = N;
@@ -166,9 +137,6 @@ class FIRFilter {
       if (data1==null) {
          data1 = input.getData(BLOCK_SIZE+N);
        } else {
-         for (int i=0; i<N; i++) {
-            data1[i] = data1[BLOCK_SIZE+i];
-         }
          float[] newData = input.getData(BLOCK_SIZE);
          for (int i=0; i<BLOCK_SIZE; i++) {
             data1[i+N] = newData[i];
@@ -183,7 +151,10 @@ class FIRFilter {
          }
          data2[i] = sum;
       }
-      return data2;
+
+      for (int i=0; i<N; i++) {
+         data1[i] = data1[i+BLOCK_SIZE];
+      }
    }
 }
 
@@ -199,7 +170,7 @@ void main() {
 }
 \end{verbatim}
 \vspace{-12pt}
-\caption{\protect\small An FIR filter in an object oriented language.
+\caption{\protect\small An unoptimized FIR filter in an object oriented language.
 \protect\label{fig:firobject}}
 \vspace{-12pt}
 \end{figure}
