@@ -14,10 +14,10 @@ call this stage the {\it peek initialization} stage and its schedule
 of execution, the {peek initialization schedule}.
 
 A more detailed discussion of the peek initialization schedule is
-beyond the scope of this paper, see \ref{streamitcc} for a more
+beyond the scope of this paper, see \cite{streamitcc} for a more
 detailed discussion.  But it suffices to know that there is
 need for a peek initialization schedule because the steady-state schedule
-must be periodic, that is it must preserve the number of live items on
+must be periodic, that is, it must preserve the number of live items on
 each channel in the graph.  The peek initialization is needed if there
 is a filter with $peek > pop$ because such a filter leaves $peek -
 pop$ items on its input channel after every firing, and thus the
@@ -38,3 +38,39 @@ Schedule} to ensure that the...
 
 \subsection{Prologue Schedule}
 \label{sec:prologue}
+The prologue schedule is executed before the steady-state of the
+application to make sure that each trace that is scheduled to execute
+{\it before} its upstream neighbor has input to execute on the first
+iteration in the steady-state.  The prologue schedule is calculated as
+follows.  We iterate over the steady-state schedule, $S$, as
+calculated by the trace scheduler.  For each trace $t$, call {\tt
+incrementUpstream(}$t${\tt,}$S${\tt )} listed below.
+
+\begin{algorithm}
+\caption{IncrementUpstream} \label{alg:incrementUpstream}
+{\tt incrementUpStream(}$t${\tt ,}$S${\tt )}. Given a trace $t$, and a
+schedule $S$ that allows us to query whether a trace is scheduled
+before another trace, $\mt{trace}.\mt{prologue}$ is
+the multiplicity of a trace in the prologue schedule, and
+$\mt{upstream}(t)$ are the upstream neighbors of $t$:
+\begin{algorithmic}
+\FORALL {$u \in \mt{upstream}(t)$}
+\IF {$u$ scheduled before $t$}
+\STATE $u.prologue = t.prologue$
+\ELSE
+\STATE $u.prologue = t.prologue + 1$ 
+\ENDIF 
+\STATE {\tt incrementUpStream(}$s${\tt ,}$S${\tt )}
+\ENDFOR
+\end{algorithmic}
+\end{algorithm}
+
+For each trace $t$, {\tt incrementUpstream()} makes sure that $t$ has
+enough items to fire by setting the prologue multiplicity of its
+upstream filters equal to itself if $t$ is scheduled after its
+upstream filters.  If $t$ is scheduled before its upstream traces, set
+the multiplicity of the upstream traces to $t$'s prologue multiplicity
+plus 1.  This is done so $t$ can fire before its upstream neighbors
+for the first iteration of the steady-state.  Then the function
+recursively calls itself to make sure that $t$'s upstream neighbors
+can fire enough times to feed $t$.
