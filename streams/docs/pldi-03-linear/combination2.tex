@@ -149,7 +149,7 @@ can replace the original two.  Its components are as follows:
 \begin{array}{rcl}
 \mt{chanPop} & = & \mt{lcm}(u_1, o_2) \\ ~ \vspace{-8pt} \\
 \mt{chanPeek} & = & \mt{chanPop} + e_2 - o_2 \\ ~ \vspace{-8pt} \\
-\lambda_1^e & = & \mt{expand}(\lambda_1, \mt{chanPeek} * \frac{o_1}{u_1} + e_1 - o_1, \\
+\lambda_1^e & = & \mt{expand}(\lambda_1, (\left \lceil \frac{\mt{chanPeek}}{u_1} \right \rceil - 1) * o_1 + e_1, \\
 ~ & ~ & ~\hspace{0.32in}~ \mt{chanPop} * \frac{o_1}{u_1}, \mt{chanPeek}) \\ ~ \vspace{-8pt} \\
 \lambda_2^e & = & \mt{expand}(\lambda_2, \mt{chanPeek}, \\
 ~ & ~ & ~\hspace{0.32in}~ \mt{chanPop}, \mt{chanPop} * \frac{u_2}{o_2}) \\
