@@ -31,7 +31,9 @@ initialization code.  From the sampling rate, cutoff frequency, and
 number of taps, coefficients for an FIR filter can be statically
 calculated.  This is done once, in the init function, and saved in the
 \lstinline|coeff| array; the work function then effectively does a
-convolution.
+convolution.  StreamIt provides a number of built-in mathematical
+functions, such as the call to \lstinline|sin()| here, along with
+the constant \lstinline|pi|.
 
 StreamIt's array syntax is more C-like than Java-like.  Every array
 has a fixed length; this length can be a numeric constant or stream
