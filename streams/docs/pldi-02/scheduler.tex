@@ -37,13 +37,14 @@ periodic schedule.
 
 \subsection{Initialization Schedule}
 
-Before we can execute any periodic schedule on a program, the program may
-require intialization.  This is because we allow filters with $peek_A$ values
-greater than their $pop_A$ values.  If the program is not initialized, a filter
-that peeks more than it pops would not be able to consume all the input 
-provided for it during the first execution of a periodic schedule.  The
-subsequent executions would force the filter to consume the exact same amount
-of data, eventually causing buffer overflow.
+Before we can execute any periodic schedule on a program, the program
+may require intialization.  This is because we allow filters with
+$peek_A$ values greater than their $pop_A$ values.  If the program is
+not initialized, a filter that peeks more than it pops would not be
+able to consume all the input provided for it during the first
+execution of a periodic schedule.  The subsequent executions would
+force the filter to consume the exact same amount of data, eventually
+causing buffer overflow.
 
 The initialization schedule is computed by ensuring that every filter $A$ has
 at least $peek_A - pop_A$ unread data on its input tape available after 

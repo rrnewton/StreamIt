@@ -1,0 +1,112 @@
+\section{Scheduling}
+
+\begin{figure}
+\centering
+\psfig{figure=sched_diag.eps,width=3.4in}
+\caption{Three different scheduling schemes.}
+\label{fig:sched}
+\end{figure}
+
+The tradeoffs between different optimization criteria are particularly
+pronounced in the scheduling stage of a streaming compiler.  As shown
+in Figure \ref{fig:sched}, at the extreme ends of the optimization
+space are schedules which minimize code size (at the expense of
+latency and buffer size) and which minimize buffer size and latency
+(at the expense of code size).  We give an overview of this scheduling
+space, and present a new phased scheduling technique that takes
+advantage of the structured streams in StreamIt to obtain a minimum
+latency schedule without a large increase in code size.
+
+\subsection{Initialization vs. Steady State}
+
+Firstly, one must note that StreamIt programs can require a separate
+schedule for initialization and for the steady state.  The steady
+state schedule must be periodic--that is, its execution must preserve
+the number of live items on each channel in the graph.  We need a
+separate initialization schedule if there is a filter with $peek >
+pop$, since no periodic schedule could eliminate all of the live items
+on the filter's input channel (which would be needed to return the
+graph to its initial configuration).  In the StreamIt compiler, this
+initialization schedule is constructed via symbolic execution of the
+stream graph, until each filter has $peek-pop$ items on its input
+channel.
+
+For graphs without peeking, one can find a unique and minimal set of
+multiplicities for a periodic schedule, and all other periodic
+schedules will be a multiple of these \cite{ptolemy}.  Thus, the
+challenge in scheduling is to impart an {\it order} on the steady
+state execution set so that a given metric is optimized.  In what
+follows, we consider three approaches to this problem.
+
+\subsection{Minimizing Code Size}
+
+A schedule with minimal code size is a Single Appearance Schedule
+(SAS): one where each node appears exactly once in the loop nest
+denoting the schedule (e.g., (4A)(6B)(9C)(3D) in Figure
+\ref{fig:sched}).  A large community \cite{ptolemy} has studied SAS's
+because their minimal code size allows extensive function inlining,
+which enables compiler optimizations and improves performance.  In the
+StreamIt compiler, we compute a simple SAS with hierarchical ordering
+according to the original stream structure.  The problem with this and
+other SAS's is that the data buffer size can grow quite large, which
+motivates other techniques.  Moreover, the inlining benefits afforded
+by SAS's are less important in StreamIt, where the compiler itself can
+consider inter-procedural optimizations.
+
+\subsection{Minimizing Buffer Size}
+
+On the other end of the spectrum, one can minimize buffer size by
+implementing a ``pull schedule'', in which filters are executed in
+demand-driven order to fire the output node of the stream.  A pull
+schedule guarantees the minimal static buffer size (assuming each
+filter has its own input buffer), with each channel not exceeding
+$\frac{push_A + pop_B}{gcd~(push_A, pop_B)}$.  However, a pull
+schedule is very irregular, and could require an exponential number of
+instructions to encode.
+
+\subsection{Minimizing Latency}
+
+The pull schedule also minimizes the average latency of the stream,
+which could be important for real-time applications.  We define the
+latency of an output item as the number of work functions that were
+executed within the stream before the item was output; the stream's
+average latency is taken over all of its output items.  While the pull
+schedule is sufficient to minimize latency, it is possible to factor
+more of the schedule into shared loop nests.  For this we present the
+notion of a ``phased schedule''.
+
+\subsection{Phased Schedules}
+
+We invented phased schedules--which rely heavily on the structured
+streams of StreamIt--to achieve a minimum-latency schedule without
+risking the code explosion of a pull schedule (see Figure
+\ref{fig:sched}).  A phase is a (possibly non-periodic) schedule for a
+stream structure in which the bottom-most filter in that structure
+fires exactly once.  There could be several phases for a given stream
+component, and each phase has an associated push, pop, and peek count.
+In the base case, a filter has just one phase with its own push, pop,
+and peek.  For stream constructs, the list of phases is determined by
+simulating a ``phased pull''--that is, just like a pull schedule,
+except that child streams must execute in steps of their own phases.
+
+Due to space limitations, we cannot give a more detailed description
+of the phased scheduling algorithm.  However, it is the case that
+phased schedules have minimum latency because they invoke the same set
+of filters as the pull model for a given output item; only the {\it
+ordering} of those filter executions can be rearranged to improve the
+code size.
+
+\subsection{Respecting Message Constraints}
+
+Another responsibility of the scheduler in StreamIt is to satisfy the
+message delivery guarantees.  Each downstream message with a negative
+latency imposes a lower bound on the buffer size between the source
+and target filter.  Likewise, an upstream message with a positive
+latency imposes an upper bound on this buffer size.  Generally
+speaking, these constraints can be satisfied by adopting a
+hierarchical scheduling technique in which an initial coarse-grained
+schedule (such as our SAS) is incrementally refined at increasing
+depths until the message constraints are satisfid.  The
+refinement--which could be either a simulated pull model or a phased
+schedule--can be targetted to sub-structures of the graph in which a
+message constraint is violated.
