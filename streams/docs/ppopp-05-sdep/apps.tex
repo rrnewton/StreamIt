@@ -1,10 +1,402 @@
-\section{Applications}
+\section{Precise Control Messages}
 
-SDEP applications go here.
+In this section we describe how $\sdep$ information can be
+incorporated into the semantics of a language feature that provides
+precise delivery of control messages in stream programs.  Our goal is
+to improve both programmer productivity and performance.
 
-1. Messaging
-2. Latency constraints
-3. Debugging
-4. Speculation
-5. transformations?
-6. program validation?  (probably not, since it's unclear how we would have calculated SDEP in the first place)
+The Synchronous Dataflow (SDF) domain is well-suited for applications
+that have regular, high-bandwidth communication patterns.  However, in
+realistic streaming applications there are also irregular,
+low-bandwidth control messages that are used to adjust parameters in
+various parts of the stream.  For example, a downstream actor might
+detect a high signal-to-noise ratio and send a message to the
+communications frontend to increase the amplification.  Or, an actor
+at the top of the stream graph might detect an invalid checksum for a
+packet, and send a message downstream to invalidate the effects of
+what has been processed.  Other examples of control messages include:
+periodic channel characterization; adaptive beamforming; initiating a
+handoff ({\it e.g.,} to a new network protocol); marking the end of a
+large data segment; invalidating data that has propagated downstream
+({\it e.g.,} if an upstream filter finds that the CRC does not match);
+and responding to user inputs, environmental conditions, or
+exceptional states.
+
+Generally speaking, control messages are sent at infrequent and
+irregular intervals; however, once they are generated there might be
+tight constraints on their delivery.  For example, the message
+invalidating the effects of a given packet has to be delivered exactly
+in sync with the front of the packet itself; otherwise, valid data
+will be lost or invalid data will be allowed to pass.
+
+In the rest of this section, we describe language support for control
+messages that makes use of $\sdep$ to achieve precise delivery timing.
+We first describe the semantics of the language feature, and then we
+compare it against other means of implementing messages for a
+frequency hopping radio application.
+
+\subsection{Messaging with SDEP}
+
+The messaging system we describe is included as part of the StreamIt
+language~\cite{streamitcc}.  In StreamIt, there are two distinct kinds
+of communication between filters during steady state execution: 1)
+high-bandwidth dataflow over the FIFO channels in the graph, and 2)
+low-bandwidth messaging between pairs of filters\footnote{Messaging
+is possible whenever there is a downstream path from either filter to
+the other.  Filters running in parallel cannot send messages}.  In
+order for filter $A$ to send a message to filter $B$, the following
+steps need to be taken:
+\begin{itemize}
+
+\item $B$ declares a message handler that will be invoked when the
+message arrives, for example:
+{\small
+\begin{verbatim}
+handler increaseGain(float amount) {
+  this.gain += amount;
+}
+\end{verbatim}
+}
+Message handlers are just like normal functions, except that they
+cannot access the input/output channels and they have no return value.
+
+\item A parent stream declares a variable of type {\tt portal<} $T_B$
+{\tt >} which can forward messages to anything of type $T_B$.  The
+parent adds $B$ to the portal and passes the portal to $A$ during
+initialization.
+
+\item To send a message, $A$ invokes the handler method on the portal
+from within its steady state work function.  It includes a range of
+latencies at which the message should be delivered.  For example:
+{\small
+\begin{verbatim}
+work pop 1 {
+  float val = pop();
+  if (val < THRESHOLD) {
+    portalToB.increaseGain(0.1) [2:3];
+  }
+}
+\end{verbatim}}
+
+\end{itemize}
+The central aspect of the messaging system is the semantics for
+message latency.  Because there are many legal orderings of actor
+executions, there is no notion of ``global time'' in a stream graph.
+The only common frame of reference between concurrently executing
+actors is the series of data items that is passed between them.  The
+$\sdep$ function captures the data dependences in the graph and
+provides a natural means of defining a rendezvous point between two
+actors.
+
+Intuitively, the message semantics can be thought of in terms of
+attaching tags to data items.  If $A$ sends a message to downstream
+filter $B$ with a latency $k$, then this could be implemented by
+tagging the items that $A$ outputs $k$ iterations later.  These tags
+propagate through the stream graph; whenever an actor inputs an item
+that is tagged, all of its subsequent outputs are tagged.  Then, the
+message handler of $B$ is invoked immediately after the first
+invocation of $B$ that inputs a tagged item.  In this sense, the
+message has the semantics of traveling ``with the data'' through the
+stream graph, even though it does not have to be implemented this way.
+
+The intuition for upstream messages is similar.  Consider that $B$ is
+sending a message with latency $k$ to upstream message $A$ in the
+stream graph.  This means that $A$ will receive the message
+immediately following the last invocation of its work function which
+produces an item affecting the output of $B$'s $k$th firing, counting
+the current firing as 0.  As before, we can also think of this in
+terms of $A$ tagging items and $B$ observing the tags.  In this case,
+the latency constraint says that $B$ must input a tagged item before
+it finishes $k$ additional executions.  The message is delivered
+immediately following the latest firing in $A$ during which tagging
+could start without violating this constraint.
+
+The following definition leverages the $\sdep$ formalism to give a
+precise meaning to message timing.
+
+\begin{definition}(Message delivery)
+Consider that $A$ sends a message to $B$ with latency range
+$[k_1:k_2]$ and that the message is sent during the $n$th invocation
+of $A$'s work function.  Then the message handler can be invoked in
+$B$ immediately after its work function has fired ${\cal M}(A, B, k_1,
+k_2, n)$ times, where ${\cal M}$ is constrained as follows.
+
+There are two cases\footnote{In a feedback path, both cases might apply.  In this event, we assume the message is being sent upstream.}:
+\begin{enumerate}
+
+\item There is a path in the stream graph from $A$ to $B$.  Then
+${\cal M}$ obeys the following constraints:
+\[
+\begin{array}{l}
+\sdepf{A}{B}({\cal M}(A, B, k_1, k_2, n)) \ge n+k_1\\
+\sdepf{A}{B}({\cal M}(A, B, k_1, k_2, n)) \le n+k_2
+\end{array}
+\]
+
+\item There is a path in the stream graph from $B$ to $A$.  Then
+${\cal M}$ obeys the following constraints:
+\[
+\begin{array}{l}
+{\cal M}(A, B, k_1, k_2, n) \ge \sdepf{A}{B}(n + k_1)\\
+{\cal M}(A, B, k_1, k_2, n) \le \sdepf{A}{B}(n + k_2)
+\end{array}
+\]
+\end{enumerate}
+\end{definition}
+
+It is instructive to note that there are distinct categories of
+message latencies, each of which poses a different constraint on the
+execution of the stream graph (see Figure~\ref{tab:messcons}).  A
+negative-latency downstream message has the effect of synchronizing
+the arrival of the message with some data that was previously output
+by the sender ({\it e.g.,} for the checksum example used above).  The
+latency requires the downstream actor not to execute too far ahead, or
+else it might process the data before the message arrives.  This
+implies a minimum on the latency between the actors in the schedule of
+the program. 
+
+... explain other cases 
+
+\begin{table*}
+\begin{tabular}{|r|c|c|} \hline
+~ & {\bf Negative latency} & {\bf Positive latency} \\ \hline
+{\bf Message travels downstream} & latency in schedule must not be too small & no constraint \\ \hline
+{\bf Message travels upstream} & impossible & latency in schedule must not be too big \\ \hline
+\end{tabular}
+\caption{\small Effect of message latency and direction on stream graph execution.}
+\label{tab:messcons}
+\end{table*}
+
+Note that a latency range can be negative if the message is sent
+downstream.  This has the effect of synchronizing the arrival of the
+message with some data that was previously output by the sender.  For
+example, a negative latency would be necessary for the checksum
+invalidation mentioned above.
+
+-in freq hopper, benefits of messaging:
+  - multiple sources, multiple sinks of a portal [library reference]
+     - updates to parallel streams at the same time
+      - different channels of vocoder
+     - packetized computations
+      - don't want to interrupt except on packet boundaries
+
+  - dynamic rate note required, a push model
+
+------------------------
+
+timing might be important
+x no notion of distributed time -- only thing you have is data dependences
+- sometimes want to synchronize with something in stream
+
+semantics of message timing in terms of SDEP
+- looks like method call, but timing precise
+- our example:  frequency-hopping radio
+
+- portals: for broadcast messaging.  multiple people can subscribe to
+  a portal.  a portal can be constructed on an interface and then
+  passed into a library; it just forwards on whatever messages it has.
+
+Alternative implementations:
+
+1. threading through stream graph (embed in stream)
+ plus:  timing
+ problems:
+ - to maintian static rates, have to send dummy items when no message is sent
+    - the receiver has to check this every time -- sacrificing common case for uncommon case
+    - also sender has to generate these
+      - in case of FHR, even non-messaging filters end up having to generate data to maintain static rates
+ - for upstream messages, introduces new feedback path in stream graph 
+ - introduces new implicit interleaving on some tapes -- have to thread out the message to the same hierarchy level as the receiver
+ - to maintain atomic   
+ - complicates compiler analysis -- compiler can't immediately infer the real dependences
+
+2. immediate / best-effort method call
+ - could just invoke receiver whenever sender wants (either directly or via RPC, etc.)
+ - problem is timing -- unpredictable
+   - both from applications standpoint, and debugging, etc.
+
+summary:
+
+- better for both programmer and compiler
+ - programmer:
+   - simplicity of method call, precision of embedding in stream, avoid manual methods
+ - compiler:
+   - program easier to analyze
+      - no code for timing / embedding.  no dummy items.
+      - no control channels in stream graph
+   - can reorder filter firings, respecting constraints
+   - implement in most efficient way for architecture
+
+\clearpage
+\begin{figure}[t]
+\psfig{figure=fhr-streamit.eps,width=3.5in}
+\end{figure}
+
+\begin{figure}[t]
+\scriptsize
+\begin{verbatim}
+float->float filter RFtoIF(int N, float START_FREQ) {
+  float[N] weights;
+  int size, count;
+  
+  init { set_frequency(START_FREQ); }
+  
+  work pop 1 push 1 {
+    push(pop() * weights[count++]);
+    count = count % size;
+  }
+  
+  handler set_frequency(float freq) {
+    count = 0;
+    size  = (int) (N * START_FREQ / freq);
+    for (int i = 0; i < size; i++)
+      weights[i] = sin(i * pi / size);
+  }
+}
+
+float->float splitjoin Check_Freq_Hop(int N, 
+                                      float START_FREQ, 
+                                      portal<RFtoIF> port) {
+  split roundrobin(N/4-2, 1, 1, N/2, 1, 1, N/4-2);
+  for (int i=1; i<=7; i++) {
+    if (i==1 || i==4 || i==7) {
+      add Identity<float>;
+    } else {
+      add float->float filter {
+        work pop 1 push 1 {
+          float val = pop();
+          push(val);
+          if (val > hop_threshold)
+            port.set_frequency(START_FREQ + 
+                               i/7*Constants.BANDWIDTH)
+        }
+      }
+    }
+  }
+  join roundrobin(N/4-2, 1, 1, N/2, 1, 1, N/4-2);
+}
+
+void->void pipeline Freq_Hopping_Radio {
+  int   N          = 32;
+  float START_FREQ = 2402000000;
+  portal <RFtoIF> port;
+
+  add Read_From_AtoD(N);
+  add RFtoIF(N, START_FREQ) to port;
+  add FFT(N);
+  add Magnitude();
+  add Check_Freq_Hop(N, START_FREQ, port);
+  add Output()
+}
+\end{verbatim}
+\vspace{-12pt}
+\caption{\small Frequency hopping radio with language support for event handling. \protect\label{fig:freq1}}
+\end{figure}
+
+\clearpage
+\begin{figure}[t]
+\psfig{figure=fhr-feedback.eps,width=3.5in}
+\end{figure}
+
+\begin{figure}[t]
+\scriptsize
+\begin{verbatim}
+ float->float filter RFtoIF(int N, float START_FREQ) {
+   float[N] weights;
+   int size, count;
+   
+   init { set_frequency(START_FREQ); }
+   
+*  work pop 3*N push 2*N {
+*    // manual loop to 2*N.  Factor of N because messages 
+*    // for given time slice come in groups of N; factor 
+*    // of 2 for data-rate conversion of Magnitude filter
+*    for (int i=0; i<2*N; i++) {
+*      push(pop() * weights[count++]);
+*      count = count % size;
+*    }
+*    // manually check for messages; 
+*    // special value of 0 encodes no message
+*    for (int i=0; i<N; i++) {
+*      float freqHop = pop();
+*      if (freqHop!=0)
+*        set_frequency(freqHop);
+*    }
+*  }
+   
+   handler set_frequency(float freq) {
+     count  = 0;
+     size   = (int) (N * START_FREQ / freq);
+     for (int i = 0; i < size; i++)
+       weights[i] = sin(i * pi / size);
+   }
+ }
+
+ float->float splitjoin Check_Freq_Hop(int N, 
+                                       float START_FREQ) {
+   split roundrobin(N/4-2, 1, 1, N/2, 1, 1, N/4-2);
+   for (int i=1; i<=7; i++) {
+     if (i==1 || i==4 || i==7) {
+       add float->float filter {
+*        work pop 1 push 2 {
+           push(pop());
+*          push(0);
+         }
+       }
+     } else {
+       add float->float filter {
+*        work pop 1 push 2 {
+           float val = pop();
+           push(val);
+*          if (val > hop_threshold) {
+*            push(val);
+*          } else {
+*            push(0);
+*          }
+         }
+       }
+     }
+   }
+*  join roundrobin(2*(N/4-2), 2, 2, 2*(N/2), 2, 2, 2*(N/4-2));
+ }
+
+ void->void pipeline Freq_Hopping_Radio {
+   int   N             = 32;
+   float START_FREQ    = 2402000000;
+   
+   add Read_From_AtoD(N);
+*  add float->float feedbackloop {
+*    // adjust joiner rates to match data rates in loop
+*    join roundrobin(2*N,N);
+*    body pipeline {
+*      add RFtoIF(N, START_FREQ);
+*      add FFT(N);
+*      add Magnitude();
+*      add Check_Freq_Hop(N, START_FREQ);
+*    }
+*    split roundrobin();
+*    // number of items on loop path = latency * N
+*    for (int i=0; i<6*N; i++)
+*      enqueue(0);
+*  }
+   add Output()
+ }
+\end{verbatim}
+\vspace{-12pt}
+\caption{\small Frequency hopping radio with manual feedback loop for
+event handling.  Lines that differ from Figure~\ref{fig:freq1} are
+marked with an asterisk. \protect\label{fig:freq2}}
+\end{figure}
+\clearpage
+
+\section{Other SDEP Applications}
+
+\subsection{Latency Constraints}
+
+\subsection{Debugging}
+
+\subsection{Speculation}
+
+\subsection{Program Transformation}
+
+and validation?
