@@ -1,135 +1,236 @@
 \section{Buffer Management}
 \label{sec:buffer}
 
+A salient characteristic of stream programs is the use of FIFO
+channels to communicate between parallel components.  Such channels
+make explicit the communication between filters, allowing execution to
+proceed in parallel or out-of-order so long as items are produced
+before they are consumed.  FIFO channels also provide a natural
+abstraction for the programmer, as complex modules can be assembled
+from a set of small, reusable components.  For these reasons, it is
+important to optimize the performance of communication channels.  An
+efficient implementation enables a high-level abstraction for
+composing filters without sacrificing performance.
+
+Buffer management in StreamIt is more involved than some other stream
+languages, due to the {\tt peek} operation.  The {\tt peek} operation
+allows a filter to access an item on its input channel without
+removing the item from the channel (removal is done via the {\tt pop}
+operation).  The {\tt peek} functionality is very important for
+components such as FIR (Finite Impulse Response) filters that access
+data over a sliding window.  Because a given data item is accessed by
+multiple iterations of the filter, there must be a persistent buffer
+that stores items across executions.  In the context of a
+uniprocessor, efficient buffer management translates to efficient
+maintenance and addressing of this buffer in memory.  On a parallel
+system, buffers can also be implemented using network links.
+
 \input{fusion-fig1}
+
+In this section, we explore two basic strategies for buffer management
+in stream programs.  The first strategy, termed {\it modulation},
+implements a traditional circular buffer that is indexed by wraparound
+head and tail pointers.  The second strategy, termed {\it copy-shift},
+is a new approach that elides modulo operations by shifting the buffer
+contents after each operation.  We demonstrate that, while a naive
+implementation of copy-shift can be up to 2X slower than modulation,
+optimizations that utilize execution scaling can boost the performance
+of copy-shift to be roughly 50\% faster than modulation.
+
+Our study is done in the context of a synthetic benchmark, shown in
+Figure~\ref{fig:code-orig}.  As depicted in
+Figure~\ref{fig:code-graph}, the benchmark is a pipeline consisting of
+a simple source and an FIR filter.  On each iteration, the source
+pushes a single item.  The FIR filter calculates a weighted sum over
+{\tt PEEK} items of the input, then pops a single item from the
+channel.  In our experiments, we vary the {\tt PEEK} value from 1 to
+121 items.
+
+\subsection{Modulation}
+
+Figure~\ref{fig:code-modulation} illustrates a fused version of the
+benchmark using modulation for buffer management.  For simplicity, we
+illustrate each buffer management strategy as a source-to-source
+transformation in StreamIt.  Each fused filter contains a {\tt
+prework} function in which the source filter executes several times to
+prime the communication channel with initial items, as well as a {\tt
+work} function that represents the steady-state execution.
+
+The modulation scheme uses a traditional circular-buffer approach.
+Three variables are introduced: a {\tt BUFFER} to hold all items
+transfered between the filters, a {\tt push\_index} to indicate the
+buffer location that will be written next, and a {\tt pop\_index} to
+indicate the buffer location that will be read next (i.e., the
+location corresponding to {\tt peek(0)}).  The communication
+primitives are translated as follows: {\small
+\begin{verbatim}
+push(val); ==>  BUFFER[push_index] = val;
+                push_index = (push_index + 1) % BUF_SIZE;
+
+pop();     ==>  pop_index = (pop_index + 1) % BUF_SIZE;
+
+peek(i)    ==>  BUFFER[(pop_index + i) % BUF_SIZE]
+\end{verbatim}}
+\noindent The StreamIt compiler converts the modulo operations to
+bitwise-and operations by scaling the buffer to a power of two.  Note
+that if there are no {\tt peek} operations, then the buffer will be
+empty following each execution of the downstream filter.  In this
+case, the indices can be reset to zero at the start of each execution
+and the modulo operations can be eliminated.  However, in our example
+the FIR filter does perform peeking, so the modulo operations are
+needed.
+
+{\bf Experimental setup.}  Figures~\ref{fig:buf-p3}
+and~\ref{fig:buf-itanium} illustrate the performance of various buffer
+management strategies on a Pentium 3 and an Itanium, respectively.
+The figures illustrate the execution time per output for the synthetic
+benchmark (Figure~\ref{fig:code-orig}) across a range of {\tt PEEK}
+values.  Performance is normalized to the modulation strategy with
+{\tt PEEK=1}.  To ensure a fair comparison with the scalar replacement
+optimization (Section~\ref{sec:scalar-replacement}), all loops in the
+original filter are fully unrolled.
+
+{\bf Evaluation.}  The time required for the modulation strategy
+increases linearly with the peek rate.  This is expected, as there is
+a constant overhead per peek operation.
+
 \input{fusion-fig2}
 
-%% modulation
-%% copy-shift
-%% scaling
-%% scalar replacement
+\subsection{Copy-Shift}
 
-%% - peek scaling amortizes costs of copies
-%%   - this is to scale a given filter's execution within a fusion unit
+The copy-shift strategy, illustrated in Figure~\ref{fig:copy-shift},
+is a novel approach that shifts the live items to the front of the
+buffer at the beginning of each execution.  Because each execution
+starts writing and reading to the buffer at the same location, there
+is no need for the indices to wraparound and the modulo operations can
+be eliminated.  This savings is compounded by additional optimizations
+enabled by the copy-shift approach, as described in the subsequent
+sections.
 
-%% - why can't do scalar replacement between filters
+However, the cost of this strategy comes in the copying operations: at
+the start of each execution, $(\mbox{\it peek} - \mbox{\it pop})$
+items are copied from the persistent {\tt BUFFER} to the beginning of
+a local {\tt TEMP\_BUFFER}.  All subsequent operations reference the
+{\tt TEMP\_BUFFER}, and the live items are copied back to the {\tt
+BUFFER} upon completion.  While these two variables could also be
+combined into a single buffer, keeping them separate results in a
+smaller live data set when the filter is not executing.
 
-%% 2. filter fusion
-%%  - for a general class of filters and topologies
-%%    - peeking
-%%    - parallel composition, not just sequential
-%%    --> that was shown in asplos paper
+The communication primitives are translated as follows:
+{\small
+\begin{verbatim}
+push(val); ==>  TEMP_BUFFER[push_index] = val;
+                push_index = push_index + 1;
 
-%%  - optimizations
-%%    - converting buffers to scalar variables
-%%      - also eliminates modulo operations
-%%      - not too much new after asplos
+pop();     ==>  pop_index = pop_index + 1;
 
-%%    - peek scaling
-%%      - 
+peek(i)    ==>  TEMP_BUFFER[pop_index + i]
+\end{verbatim}}
+\noindent Compared to the modulation scheme, the copy-shift strategy
+references the {\tt TEMP\_BUFFER} and does not perform modulo
+operations.
 
-%%    - stack space reuse
-%%      - 
+{\bf Evaluation.}  As shown in Figures~\ref{fig:buf-p3}
+and~\ref{fig:buf-itanium}, the unoptimized copy-shift strategy is the
+slowest strategy that we evaluate.  Though the cost per peek operation
+is smaller than the modulation scheme, the copying overhead per
+iteration also grows with the peek rate and cancels out any savings;
+overall, copy-shift performs up to 2X slower than modulation.  The
+following sections describe optimizations that can justify taking the
+copy-shift approach.
 
-%% ----------
+\subsection{Copy-Shift with Scalar Replacement}
+\label{sec:scalar-replacement}
 
-%% questions:
-%% - have we even compared to a rotating buffer?
+The first optimization enabled the copy-shift scheme is dubbed {\it
+scalar replacement}.  In contrast to the modulation scheme, the
+copy-shift approach can result in array operations that access the
+same location on every execution of the filter.  The idea behind
+scalar replacement is to fully unroll the loops in the filter, thereby
+resolving each array index to an integer literal.  Then, since each
+location is fully resolved at compile time, an $n$-length array can be
+replaced by a set of $n$ scalar variables: one for each item in the
+buffer.  This transformation is illustrated in
+Figure~\ref{fig:code-scalar-replace}.
 
-%% ------------------------------------------------------------
+Scalar replacement offers several performance benefits.  Scalar
+variables can be register allocated, and as local variables they are
+subject to a range of dataflow optimizations (constant propagation,
+copy propagation, dead code elimination, etc.).  Replacing array
+operations with scalars also eliminates array index calculations.
+Despite these benefits, scalar replacement is nearly impossible to do
+in a general-purpose language such as C because array contents might
+be aliased with other pointers.  StreamIt arrays represent values that
+are independent in memory, thereby facilitating this optimization.
 
-%% The default implementation of intermediate value buffers
-%% in code generated for a StreamIt program is an array.
-%% However, array acesses are not very efficient because 
-%% of wasted instructions to increment index counter and 
-%% to add index counter to the base of the array address 
-%% to calculate the memory location.
+Note that scalar replacement can only be applied when array indicices
+can be resolved to compile-time constants.  If there is unpredictable
+control flow within a filter, or if the loops are too large to unroll,
+then scalar replacement does not apply.
 
-%% An optimization would be to replace an array of size N with 
-%% N scalar variables. In this case we do not need to increment 
-%% index variable or add the index variable to the base address, 
-%% since target memory location would be fixed for each
-%% instruction that accesses the buffer. This optimization
-%% allso allows the intermediate variables to be
-%% register allocated.
+{\bf Evaluation.}  Compared to an unoptimized copy-shift strategy,
+Figures~\ref{fig:buf-p3} and~\ref{fig:buf-itanium} illustrate that
+scalar replacement offers modest gains on our synthetic benchmark.  On
+the Pentium 3, improvements range from 14\% to 26\%, while on the
+Itanium, improvements range from 3\% to 38\% (depending on the peek
+rate).  We conjecture that scalar replacement is more critical for
+small filters that perform only a few operations.  Due to the high
+communication-to-computation ratio in such filters, there could be
+large gains from register-allocating and copy-propagating the
+temporary variables.
 
-%% Such an optimization is important to improve 
-%% performance of fine grained stream programs where each actor
-%% performs little amount of work and most of the code just moves 
-%% the items betwwen actors (high communication / computation ratio).
+\subsection{Copy-Shift with Execution Scaling}
 
-%% However, this optimization can not be done if array is accessed in a loop 
-%% and array access index is calculated using the loop variable.
+A final optimization of the copy-shift strategy uses execution scaling
+to dramatically decrease the overhead associated with copying the
+buffer contents on each iteration.  In any filter, the number of items
+inspected on one execution that need to be saved for the next
+execution is $(\mbox{\it peek} - \mbox{\it pop})$.  This represents
+the number of items copied by the copy-shift scheme.  However, this
+cost can be amortized by scaling the number of executions of the
+downstream filter in the fused code.  By enclosing the body of the
+filter in a loop, the $\mbox{\it peek}$ and $\mbox{\it pop}$ rates can
+be made arbitrarily large, while $(\mbox{\it peek} - \mbox{\it pop})$
+remains constant.
 
-%% \begin{verbatim}
-%% for (i = 0; i < 5; i++) {
-%%    array[index++] = x++;
-%% }
-%% \end{verbatim}
+Thus, execution scaling reduces the fraction of time spent copying to
+an arbitrarily small level.  In our study, we scale the executions of
+a filter until $(\mbox{\it peek} - \mbox{\it pop}) \leq (1/4)
+\mbox{\it pop}$.  In the synthetic benchmark, this implies that each
+filter body executes 16 times before the buffer contents are shifted.
+The code resulting from this transformation is shown in
+Figure~\ref{fig:code-scaling}.
 
-%% If we fully unroll all such loops for a given array then we 
-%% can replace the array with scalar variables.
+Note that due to the large loops introduced by execution scaling, it
+cannot be used in combination with scalar replacement.  If the loops
+were unrolled to resolve the array indices, there could be a negative
+impact on the instruction cache.
 
-%% \begin{verbatim}
-%% array[0] = x++;          var_0 = x++;
-%% array[1] = x++;          var_1 = x++;
-%% array[2] = x++;   ====>  var_2 = x++;
-%% array[3] = x++;          var_3 = x++;
-%% array[4] = x++;          var_4 = x++;
-%% \end{verbatim}
+{\bf Evaluation.}  As shown in Figure~\ref{fig:buf-p3}, the copy-shift
+approach with execution scaling performs significantly better than
+modulation on the Pentium 3.  Speedups range from 38\% to 65\%, with a
+geometric mean of 52\%.  This makes sense, as each peek operation is
+cheaper due to the eliminated modulo operations (implemented as
+bitwise-and in the modulation scheme), while the overhead from copying
+is reduced to a fraction of the original copy-shift approach.  
 
-%% If we want to replace many arrays then we will have to unroll
-%% many loops, this leads to dramatic increase in code size.
+The gains are also sizable on the Itanium, as shown in
+Figure~\ref{fig:buf-itanium}.  Speedups range from 11\% to 86\% (where
+{\tt PEEK=1}), with a geometric mean of 34\%.  Keep in mind that these
+are speedups of copy-shift with scaling over modulation; the speedups
+over unoptimized copy-shift are even greater.
 
-%% Despite getting rid of unnecesary instructions we might see
-%% an overall performance degradation if we do not schedule
-%% actors in a cache aware manner.
+\subsection{Summary}
 
-%% ------------------------------------
-
-%% \subsection{Peek Optimization}
-
-%% Because of Streamit language having a peek feature, one needs
-%% a separate initialization schedule to fill in the peek
-%% buffers with data. [ASPLOS'02-Gordon]
-
-%% There are two alternatives for peek implementation. Use a rotating
-%% buffer with head and tail pointers or use a peek buffer.
-
-%% Consider a filter that consumes 1 item, peeks 10 (including
-%% the one it consumes) and source produces 1.
-
-%% An Example of code generated:
-
-%% \begin{verbatim}
-%% item_type PEEK_BUFFER[9];
-%% item_type POP_BUFFER[10];
-
-%% 1. Source puts produced item into POP_BUFFER[0];
-%% 2. Copy PEEK_BUFFER[0..8] to POP_BUFFER[1..9];
-%% 3. Execute the Filter
-%% 4. Copy POP_BUFFER[0..8] to PEEK_BUFFER[0..8]
-
-%% \end{verbatim}
-
-%% If $peek rate >> pop$ rate then each item is copied many times.
-%% Consider a case where filter has pop rate 1 and peek rate 64,
-%% in this case each item has to be copied 128 times to / from PEEK\_BUFFER.
-
-%% We increase filters multiplicity by executing it multiple times.
-%% If we execute the above filter $N$ times, then it's pop rate is $N$ 
-%% and peek rate is $N+63$ items. If $N=16$ then $poprate=16$ $peekrate=79$
-%% and each item is copied to / from PEEK\_BUFFER at most 10 times.
-
-%% Scaling individual filters can result in increase of the buffer 
-%% requirements for a single steady state cycyle. 
-
-%% $<$INSERT EXAMPLE$>$
-
-%% Results show that to achieve high performance it is more important to
-%% reduce number of item copy operations than reduce buffer size as long
-%% as all of the persistent buffers fit into main memory or low speed
-%% off-chip cache.
+We conclude that copy-shift with execution scaling is the best buffer
+management strategy for filters that utilize peeking.  This is
+somewhat surprising because the unoptimized copy-shift strategy has
+large overheads that result in a slowdown relative to a circular
+buffer with modulation.  However, by leveraging the flexibility of the
+parallel stream graph to perform execution scaling, the overheads are
+amortized and there are significant speedups (geometric means of 52\%
+on the P3 and 34\% on the Itanium) over a plain circular buffer
+strategy.
 
 %% \subsection{Reusing Intermediate Storage Variables}
 
