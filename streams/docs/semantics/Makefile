@@ -17,3 +17,6 @@ report.dvi : report.tex \
 %.ps : %.dot
 	dot -Tps $< > $@
 
+%.ps : %.dvi
+	dvips -o $@ $<
+
