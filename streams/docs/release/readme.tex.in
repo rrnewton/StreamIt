@@ -11,40 +11,40 @@
 \maketitle
 
 \noindent
-This is for the May 28, 2003 snapshot release (streamit-0.0.20030528).\\
-\verb|$Id: readme.tex.in,v 1.10 2003-10-15 10:50:06 thies Exp $|
+This is for the October 16 2003 snapshot release (streamit-0.0.20031016).\\
+\verb|$Id: readme.tex.in,v 1.11 2003-10-15 23:22:17 rabbah Exp $|
 
 \section{What is this?}
 
 This is a \emph{snapshot} release of the StreamIt compiler.  The
 compiler is still under active development; if it breaks, you get to
 keep both pieces.  See "caveats", below.  This compiler should produce
-functional code for both uniprocessor targets and the MIT RAW
+functional code for both uniprocessor targets and the MIT Raw
 processor.
 
 There are two versions of this release.  These are:
 
 \begin{description}
-\item[streamit-src-0.0.20030528.tar.gz] "Source release."  This contains
-  the full sources of the StreamIt compiler and runtime libraries, but
-  no binaries.  Build instructions are included in the INSTALL file.
+\item[streamit-src-0.0.20031016.tar.gz]    "Source   release."    This
+  contains  the full  sources  of the  StreamIt  compiler and  runtime
+  libraries, but no binaries.   Build instructions are included in the
+  INSTALL file.
 
-\item[streamit-0.0.20030528.tar.gz] "Full binary release."  This contains
-  no sources, but does contain a Java jar file with the full
-  compiler.
+\item[streamit-0.0.20031016.tar.gz]  "Binary release."   This contains
+  no sources, but does contain a Java jar file with the full compiler.
 \end{description}
 
 The StreamIt compiler is built on top of version 1.5B of the Kopi Java
-compiler from DMS Decision Management Systems GmbH.  Parts of the
-system (the scheduler, Java runtime library, C library, and frontend)
-are independent code.  However, this entire release is under the terms
-of the GNU General Public License, Version 2, with some exceptions for
-freely modifiable and redistributable runtime libraries; see the
-\filename{COPYING} file for details.  The binary release also include
-class files from the ANTLR LL($k$) parser generator.
+compiler from  DMS Decision  Management Systems GmbH.  The independent
+components  of  the  system,  including the  scheduler,  Java  runtime
+library,  C library,  and the  frontend, are  released subject  to the
+terms of the MIT license agreement. Other components of the system are
+released under  the terms of the  GNU General Public  License; see the
+\filename{COPYING} file for details.   The binary release also include
+class files from the ANTLR LL(k) parser generator.
 
-Several documents on StreamIt are in the \filename{docs} directory.
-You can find more information on our Web page, at
+Several documents  on StreamIt  are in the  \filename{docs} directory.
+You   can    find   more   information    on   our   Web    page,   at
 \url{http://cag.lcs.mit.edu/streamit/}.
 
 
@@ -68,11 +68,11 @@ single-precision versions of the library, such that you have an
 FFTW from source, use the \texttt{--enable-float} and
 \texttt{--enable-type-prefix} options when compiling.
 
-Compilation for RAW depends on the most recent released RAW build
+Compilation for Raw depends on the most recent released Raw build
 environment (as of this release, \verb|raw_dist_2003_03_18|).  The
 \envar{TOPDIR} environment variable needs to point to your StarSearch
 directory; this may be the reduced \filename{workdir} tree from the
-RAW distribution, or the full \filename{starsearch} tree.
+Raw distribution, or the full \filename{starsearch} tree.
 
 The source release only builds with IBM's Jikes Java compiler; see
 \url{http://www.jikes.org/}.  Otherwise, a Java virtual machine is
