@@ -1,3 +1,68 @@
 \section{Introduction}
 
+Applications that are structured around streams of data are becoming
+increasingly pervasive.  Stream programs include embedded systems for
+sensor nets and cell phones, desktop applications such as streaming
+media and networking, as well as high-performance servers such as HDTV
+editing consoles and hyper-spectral imaging.  Performance is still a
+critical factor in all of these domains, and programmers often
+sacrifice readability, robustness, and maintainability of their code
+in order to achieve it.  It is an important problem to improve the
+programmability of stream programs without sacrificing performance.
+
+This paper makes two contributions towards this goal.  First, we
+formulate a stream dependence function, $\sdep$, which describes the
+ordering constraints of node executions in a concurrent stream graph.
+This dependence information is similar to a program
+slice~\cite{tip95slice,hrb88pdg} in procedural programs and carries
+with it many of the applications of slicing, including debugging and
+program analysis.  However, unlike slicing, we restrict our input
+domain to a Synchronous Dataflow (SDF) ~\cite{LM87-i} graph, which is
+a natural representation for many signal processing applications.  We
+leverage the static properties of SDF to compute $\sdep$ exactly at
+compile time and to store the dependence information compactly.
+
+The second contribution of this paper is a novel language construct
+that uses $\sdep$ to provide simple and precise event handling in
+stream programs.  In addition to the high-bandwidth data flow of
+streaming applications, there are also low-bandwidth control messages
+that adjust parameters in the stream graph; for example, toggling the
+gain to suite the signal-to-noise ratio, or steering a microphone
+array to follow a moving target.  Control messages are dynamic and
+irregular, which makes them hard to integrate with a Synchronous
+Dataflow model.  Most of all, they often have a constraint on the
+timing of their delivery, which further complicates the programming
+model because concurrent actors have no common frame of reference with
+respect to time.
+
+We define a messaging construct that utilizes data dependences 
+
+
+Since stream programs have abundant parallelism, it is
+often 
+
+ this restriction, we can compute $\sdep$ exactly for any
+filter in the program, and we
+
+can be seen as a form of slicing for the streaming domain
+
+
+set of filter in a concurrent stream graph that affect the output of a
+given filter.
+
+stream dependence function, $\sdep$, that describes the
+
+we believe there are many applications of the sdep function.  in here
+we focus on precise event handling.  concurrently executing programs
+have no notion of time, but they often want to send things
+precisely. in a synchronous dataflow model, current solutions to this
+are grungy and do not mesh well with the static part.  we implement
+language support for control messages and argue that it improves
+programmability.  we also demonstrate a XXX performance improvement on
+a cluster backend.
+
+<informal outline of paper>
+we use streamit (cite streamit) which is sdf language, single in
+single out.  in the next section, describe our 
+
 \cite{streamitcc}
