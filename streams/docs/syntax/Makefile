@@ -23,7 +23,7 @@ all: $(DVI) $(PS) $(PDF) $(HTML) $(TEXT)
 	$(PS2PDF) $< $@
 
 %.ps: %.dvi
-	$(DVIPS) -o $@ $<
+	$(DVIPS) -P cmz -o $@ $<
 
 #%.dvi %.aux %.log: %.tex %.mp
 %.dvi %.aux %.log: %.tex
