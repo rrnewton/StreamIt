@@ -89,7 +89,7 @@ Here's how to set up eclipse:
 
 \item There is a shared copy of eclipse in:
 
-\noindent {\tt /home/bits7/NO\_BACKUP/streamit/eclipse-2.0.2}
+\noindent {\tt /home/bits7/NO\_BACKUP/streamit/eclipse-2.1.0}
 
 This is the release build from November.  To run it with your own
 workspace, issue this command from the above directory:
@@ -120,35 +120,18 @@ eclipse, please put it in
 {\tt STREAMIT\_HOME}.  Click ``Next'' and say ``No'' so it doesn't
 auto-detect classes.
 
-\item Add folder, named ``compiler''.
-
-\item Click ``yes'' to replace project folder.
-
 \item ``Add folder'' compiler/3rdparty.  It will tell you it added an
    exclusion.
-
-\item Open tab for 3rdparty directory and click on ``Exclusion
-filter'', then ``Edit'', ``Add'', and enter ``cplex/*''.  Then ok.
-
-\item ``Add folder'' library/java.
-  
-\item Go to Libraries tab, click ``add external jar's''.  Add your
-  {\tt \$STREAMIT\_HOME/compiler/3rdparty\slash{}cplex/cplex.jar}.
-  % That \slash can break the line.
-  (Don't literally use {\tt "\$STREAMIT\_HOME"}, but replace with your
-  value.)
-
-\item Add another ``external jar'' to point to {\tt
-/usr/uns/java/antlr.jar}
 
 \item Click ``finish''.
 \end{enumerate}
 
 Everything should compile -- you'll get hundreds of ``problems'' but
-these should all be warnings (yellow flags instead of red ones).  Then
+these should all be warnings (yellow flags instead of red ones).
+There might even be some red flags that are okay for classes that are
+not needed by the main compiler (e.g., in the misc directory).  Then
 you're all set and can run/debug, etc... e.g. go to Run/Debug... and
 set up a test case.
-
 
 \subsection{RT}
 We use a trouble ticketing system called RT. This is (at least
