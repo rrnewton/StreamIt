@@ -1,18 +1,3 @@
-\section{Introduction}
-Digital computation is becoming an increasingly ubiquitous element of
-modern life.  Everything from cell phones to GPS systems to satellite
-radios require increasingly sophisticated algorithms and increasingly
-specialized digital signal processors (DSP's).  As embedded devices
-often have high performance requirements and tight resource
-constraints, optimization is particularly important in this domain.
-However, even given the aggressive optimizations of C compilers for
-DSP chips, programmers still turn to assembly code to implement
-critical parts of embedded applications.  This process is
-time-consuming, error-prone, and costly, as it must be repeated for
-each generation of the target architecture.  There is a pressing need
-for high-level DSP abstractions that a compiler can consistently
-reduce to efficient low-level code.
-
 %% Upward of fifty percent of the code that runs the DSP(s) in a modern
 %% cell phone is coded in assembly with the rest written in C. Hand
 %% optimized assembly code typically makes the best use of the available
@@ -39,6 +24,21 @@ reduce to efficient low-level code.
 %% encounter it, the resulting program will not take best advantage of
 %% the available DSP resources.
 
+\section{Introduction}
+Digital computation is becoming an increasingly ubiquitous element of
+modern life.  Everything from cell phones to GPS systems to satellite
+radios require increasingly sophisticated algorithms.  Optimization is
+especially important for this domain, as embedded devices often have
+high performance requirements and tight resource constraints.  Even
+with the best available C compilers for DSP chips, programmers still
+turn to assembly code to implement critical parts of embedded
+applications.  This process is time-consuming, error-prone, and
+costly, and must be repeated for each generation of the target
+architecture.  As algorithms and applications continue to grow in
+complexity, these factors will become unmanageable.  There is a
+pressing need for high-level DSP abstractions that a compiler can
+consistently reduce to efficient low-level code.
+
 In this paper, we demonstrate that a domain-specific stream language
 can enable novel high-level DSP optimizations that would otherwise be
 intractable in a general-purpose language.  Our source language is
@@ -49,13 +49,13 @@ distinguished from a general purpose language in that it makes
 explicit the large-scale parallelism and regular communication
 patterns that are characteristic of streaming programs.  By analyzing
 the primitive building block in StreamIt--the filter--our analysis can
-detect large portions of the application that are producing outputs as
-a linear combination of the inputs; then, we can exploit this
-linearity for a number of large-scale optimizations.  Though each
-filter is programmed using imperative C-like code, the separation of
-filters into autonomous units of the stream graph enables our analysis
-to be far more effective and efficient than it could be on an
-equivalent implementation in C alone.
+detect large portions of the application that produce outputs as a
+linear combination of the inputs; then, we can exploit this linearity
+for a number of large-scale optimizations.  Though each filter is
+programmed using imperative C-like code, the separation of filters
+into autonomous units of the stream graph enables our analysis to be
+far more effective and efficient than it could be on an equivalent
+implementation in C alone.
 
 This paper makes the following contributions:
 \begin{itemize}
@@ -69,6 +69,10 @@ single linear representation.
 \item An automated procedure for translating a stream computation into
 the frequency domain in order to optimize computationally intensive
 linear nodes.
+
+\item An implementation of the above techniques in the StreamIt
+compiler that automatically improves performance by a factor of
+\todo{Add performance result}
 
 \end{itemize}
 
