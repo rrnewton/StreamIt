@@ -1,5 +1,5 @@
 \section{Implementation}
-\label{sec:traces}
+\label{sec:implementation}
 After synchronization removal, we are left with a flat stream graph
 composed of filters.  Conceptually, we break away from the notion that
 filters are single input and single output as all splitters and
@@ -75,6 +75,7 @@ at most one iteration difference between connected nodes
 all downstream/upstream of node must be in same state
 
 \section{Trace Extraction}
+\label{sec:extraction}	
 Trace extraction refers to the process of assigning each filter of the
 stream graph to a trace.  As stated above, a trace is a contiguous
 section of the stream graph that is scheduled for execution as a
