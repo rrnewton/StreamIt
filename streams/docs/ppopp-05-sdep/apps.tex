@@ -1,5 +1,4 @@
 \section{Precise Control Messages}
-
 In this section we describe how $\sdep$ information can be
 incorporated into the semantics of a language feature that provides
 precise delivery of control messages in stream programs.  Our goal is
@@ -144,6 +143,17 @@ ${\cal M}$ obeys the following constraints:
 \end{enumerate}
 \end{definition}
 
+\begin{table*}[t]
+{\small
+\begin{tabular}{|r|c|c|} \hline
+~ & {\bf Negative latency} & {\bf Positive latency} \\ \hline
+{\bf Message travels downstream} & latency in schedule must not be too small & no constraint \\ \hline
+{\bf Message travels upstream} & impossible & latency in schedule must not be too big \\ \hline
+\end{tabular}}
+\caption{\small Effect of message direction and latency on stream graph execution.}
+\label{tab:messcons}
+\end{table*}
+
 It is instructive to note that there are distinct categories of
 message latencies, each of which poses a different constraint on the
 execution of the stream graph (see Figure~\ref{tab:messcons}).  A
@@ -152,84 +162,132 @@ the arrival of the message with some data that was previously output
 by the sender ({\it e.g.,} for the checksum example used above).  The
 latency requires the downstream actor not to execute too far ahead, or
 else it might process the data before the message arrives.  This
-implies a minimum on the latency between the actors in the schedule of
-the program. 
+translates to a constraint on the minimum latency between the sender
+and receiver actors in the schedule of the program.
 
-... explain other cases 
+Similarly, a positive latency upstream message places a constraint on
+the maximum latency between the sender and receiver.  Again the
+receiver must be throttled so that it doesn't get too far ahead before
+the message arrives; however, because the receiver is upstream of the
+sender, this constraint represents the need for a tight coupling
+between the two filters' executions.
 
-\begin{table*}
-\begin{tabular}{|r|c|c|} \hline
-~ & {\bf Negative latency} & {\bf Positive latency} \\ \hline
-{\bf Message travels downstream} & latency in schedule must not be too small & no constraint \\ \hline
-{\bf Message travels upstream} & impossible & latency in schedule must not be too big \\ \hline
-\end{tabular}
-\caption{\small Effect of message latency and direction on stream graph execution.}
-\label{tab:messcons}
-\end{table*}
+An upstream message with negative latency is impossible to deliver,
+because the data dependences imply that the target iteration has
+already passed when the message was sent.  Also, a downstream message
+with positive latency imposes no constraint, as it is not possible for
+the receiver to have executed yet.
 
-Note that a latency range can be negative if the message is sent
-downstream.  This has the effect of synchronizing the arrival of the
-message with some data that was previously output by the sender.  For
-example, a negative latency would be necessary for the checksum
-invalidation mentioned above.
+\subsection{Case Study}
 
--in freq hopper, benefits of messaging:
-  - multiple sources, multiple sinks of a portal [library reference]
-     - updates to parallel streams at the same time
-      - different channels of vocoder
-     - packetized computations
-      - don't want to interrupt except on packet boundaries
+To illustrate the pros and cons of the messaging system, we
+implemented a spread-spectrum frequency hopping radio
+frontend~\cite{harada02} as appears in Figure~\ref{fig:fhr-streamit}.
+A frequency hopping radio is one in which the receiver switches
+between a set of known frequencies whenever it hears certain tones
+from the transmitter.  The frequency hop is a good match for control
+messages because the hopping interval is dynamic (based on on the data
+in the stream); it spans a large section of the stream graph (there is
+an FFT between the demodulator and the hop detector); and it requires
+precise delivery of messages.  The delivery must be precise both to
+meet real-time requirements (as the tranceiver will leave the current
+frequency soon), and to ensure that the message falls at a logical
+packet boundary; if the frequency change is out of sync with the FFT
+stage, then the FFT will muddle the spectrum of the old and new
+frequency bands.
 
-  - dynamic rate note required, a push model
+A StreamIt version of the radio frontend with language support for
+messaging appears in Figure~\ref{fig:freq1}.  The Freq\_Hopping\_Radio
+pipeline creates a portal and adds the RFtoIF actor as a receiver.
+The portal is passed to the Check\_Freq\_Hop stage, where four
+parallel detectors send messages into the portal if they detect a hop
+to the frequency they are monitoring.  The messages are sent with a
+small latency (4-6) to ensure a timely transition.  To make sense of
+the latency, note that $\sdepf{RFtoIF}{D}(n) = 64*n$ for each of the
+detector actors $D$.  This comes about because the FFT stage consumes
+and produces 64 items; each detector fires once per set of outputs
+from the FFT, but RFtoIF fires 64 times to fill the FFT input.
+Because of this $\sdep$ relationship, messages sent from the detectors
+to RFtoIF are guaranteed to arrive only at iterations that are a
+multiple of 64.  This satisfies the design criterion that a given FFT
+stage will not operate on data that was demodulated at two separate
+frequencies.
 
-------------------------
+Another version of the frequency hopping radio appears in
+Figures~\ref{fig:fhr-streamit} and~\ref{fig:freq2}.  This version is
+functionality equivalent to the first, except that the control
+messages are implemented manually by embedding them in the data stream
+and introducing a feedback loop.  Because the number of items
+transfered around the loop must be constant from one iteration to the
+next, a data item is sent whether or not there is a message as part of
+the algorithm; a special value of 0 represents that there is no
+message on the given iteration (in some other programs, no special
+value is available, in which case a structure can be passed through
+the stream with a boolean flag indicating whether or not a message is
+present).  Then, the RFtoIF filter checks the values from the loop on
+every iteration and processes them as a message if they are non-zero.
+The I/O rate of the RFtoIF filter has been scaled up to ensure that
+the messaging information is received at intervals of 64 iterations
+(as in the version with portals).  To achieve the desired messaging
+latency, a number of items are enqueued on the feedback path prior to
+execution.
 
-timing might be important
-x no notion of distributed time -- only thing you have is data dependences
-- sometimes want to synchronize with something in stream
+Yet another way to approximate the behavior of messaging is with a
+direct function call from the detector to the RFtoIF stage.  (Though
+such a call is disallowed in StreamIt, it could be an option in a
+different programming model.)  While this approach is simple, it does
+not have any timing guarantees.  There is no way for the sender to
+know when in the course of the target's execution the message will be
+received.  This could cause problems both for algorithm development
+and for reliability / predictability of software.
 
-semantics of message timing in terms of SDEP
-- looks like method call, but timing precise
-- our example:  frequency-hopping radio
+\subsection{Discussion}
 
-- portals: for broadcast messaging.  multiple people can subscribe to
-  a portal.  a portal can be constructed on an interface and then
-  passed into a library; it just forwards on whatever messages it has.
+We believe that the StreamIt messaging system offers several benefits
+compared to a manual implementation of equivalent functionality.
+While embedding messages in the data stream is equally precise, this
+involves several tedious and error-prone changes, not only to the
+stream graph but also to the steady state execution code within the
+actors.  In particular, the manual derivation of the loop delay,
+adjustment of the actor I/O rates, and implicit interleaving of data
+items with control messages has a negative impact on the readability
+and maintainability of the code.  The messaging construct in StreamIt
+provides the same level of precision, but with the simplicity of a
+method call.
 
-Alternative implementations:
+The messaging construct also has advantages from a compiler
+standpoint.  By separating the data-intensive code from the
+control-oriented code, the common case of the steady state actor
+execution is not sacrificed for the uncommon case of message
+processing.  There are no ``dummy items'' serving as placeholders in
+on the static-rate channels.  In addition, by exposing the message
+latency as part of the language, the compiler can infer the true
+dependences between filter firings and reorder the execution so long
+as the message constraints are respected.  The actual message delivery
+can be implemented in the most efficient way for the given
+architecture.
 
-1. threading through stream graph (embed in stream)
- plus:  timing
- problems:
- - to maintian static rates, have to send dummy items when no message is sent
-    - the receiver has to check this every time -- sacrificing common case for uncommon case
-    - also sender has to generate these
-      - in case of FHR, even non-messaging filters end up having to generate data to maintain static rates
- - for upstream messages, introduces new feedback path in stream graph 
- - introduces new implicit interleaving on some tapes -- have to thread out the message to the same hierarchy level as the receiver
- - to maintain atomic   
- - complicates compiler analysis -- compiler can't immediately infer the real dependences
-
-2. immediate / best-effort method call
- - could just invoke receiver whenever sender wants (either directly or via RPC, etc.)
- - problem is timing -- unpredictable
-   - both from applications standpoint, and debugging, etc.
-
-summary:
-
-- better for both programmer and compiler
- - programmer:
-   - simplicity of method call, precision of embedding in stream, avoid manual methods
- - compiler:
-   - program easier to analyze
-      - no code for timing / embedding.  no dummy items.
-      - no control channels in stream graph
-   - can reorder filter firings, respecting constraints
-   - implement in most efficient way for architecture
+A final benefit of the messaging system is the clean interface
+provided by the portals.  Since a portal can have multiple receivers,
+it is straightforward to send a message that is delivered
+synchronously to two actors in parallel streams.  For example,
+consider a vocoder that is separately manipulating the magnitude and
+phase components of a signal.  If something triggers an adjusment to
+the speech transformation ({\it e.g., the speaker requests a change of
+pitch) then the mask needs to be updated at the same data-relative
+time in both parallel streams.  A portal that contains both components
+seamlessly provides this functionality.  Finally, portals are useful
+as an external programming interface; an application can export a
+portal based on an interface type without exposing the underlying
+actor implementation.
 
 \clearpage
 \begin{figure}[t]
 \psfig{figure=fhr-streamit.eps,width=3.5in}
+\caption{\small Stream graph of frequency-hopping radio with language
+support for messaging.  A messaging portal delivers point-to-point
+latency-constrained messsages from the detectors to the RFtoIF stage.
+\protect\label{fig:fhr-streamit}}
 \end{figure}
 
 \begin{figure}[t]
@@ -296,6 +354,13 @@ void->void pipeline Freq_Hopping_Radio {
 \clearpage
 \begin{figure}[t]
 \psfig{figure=fhr-feedback.eps,width=3.5in}
+\caption{\small Stream graph of frequency-hopping radio with control
+messages implemented manually.  A feedback loop connects the detectors
+with the RFtoIF stage, and an item is sent on every invocation to
+indicate whether or not a message is present.  The latency and
+periodicity of message delivery are governed by the data rates and the
+number of items on the feedback
+path. \protect\label{fig:fhr-streamit}}
 \end{figure}
 
 \begin{figure}[t]
