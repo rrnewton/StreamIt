@@ -18,11 +18,10 @@ programming abstraction has been around for decades \cite{SICP},
 and a number of special-purpose stream languages have been
 designed (see \cite{survey97} for a review). Many of these
 languages and representations are elegant and theoretically sound,
-but they often lack features and are too inflexible to support
-straightforward development of modern stream applications, or
-their implementations are too inefficient to use in practice.
-Consequently most programmers turn to general-purpose languages
-such as C or C++ to implement stream programs.
+but they often are not designed with neither practical use nor
+efficient in mind. Consequently most programmers turn to
+general-purpose languages such as C or C++ to implement stream
+programs.
 
 \begin{comment}
 There are two reasons that general-purpose languages are
@@ -38,13 +37,12 @@ emerging class of grid-based architectures
 \end{comment}
 
 {\StreamIt} is a language and compiler specifically designed for
-modern stream programming.  The {\StreamIt} langauge holds two
-goals: first, to provide high-level stream abstractions that
-improve programmer productivity and program robustness within the
-streaming domain; second, to serve as a common machine language
-for grid-based processors.  At the same time, {\StreamIt} compiler
-aims to perform stream-specific optimizations to achieve the
-performance of an expert programmer.
+modern stream programming.  The main goal of the {\StreamIt}
+langauge is to provide high-level stream abstractions that improve
+programmer productivity and program robustness within the
+streaming domain.  At the same time, {\StreamIt} compiler aims to
+perform stream-specific optimizations to achieve the performance
+of an expert programmer.
 
 In order to achieve these goals, {\StreamIt} provides a number of
 features, designed to allow the programmer to easily and naturally
@@ -75,23 +73,21 @@ execution of {\StreamIt} programs.
 
 Using the features present in {\StreamIt}, the programmer can
 express complex algorithms and computation models.  One of the
-difficulties faced by {\StreamIt} is scheduling of the execution
-of the program.  Since {\StreamIt} uses {\SDF} computation model
-%with latency constraints,
-it is possible to schedule the order of execution of {\filters} at
-compile time.  Scheduling {\SDF} programs presents a difficult
-challenge to the compiler:  as the complexity of the program
-grows, the amount of memory required to execute the program
-increases.  This increase comes from two sources: the schedule
-size increases, as well as amount of data needed for buffering
-increases.  These two sources are closely coupled. There exist
-tradeoffs between the schedule size and the buffer size. The
-smallest schedules (Single Appearance schedules) may require
-buffer space which grows combinatorially with number of components
-and their declared data throughput rates. The general rule is that
-very small schedules result in very large buffering requirements.
-Similarly, very large schedules can require very little buffering
-space.
+challenges faced in compiling {\StreamIt} programs is scheduling.
+Since {\StreamIt} uses {\SDF} computation model it is possible to
+schedule the order of execution of {\filters} at compile time.
+Scheduling {\SDF} programs presents a difficult challenge to the
+compiler:  as the complexity of the program grows, the amount of
+memory required to execute the program increases.  This increase
+comes from two sources: the schedule size increases, as well as
+amount of data needed for buffering increases.  These two sources
+are closely coupled. There exist tradeoffs between the schedule
+size and the buffer size. The smallest schedules (Single
+Appearance schedules) require buffer space may in the worst case
+grow exponentially with number of components. The general rule is
+that very small schedules result in very large buffering
+requirements. On the other hand, reducing buffering requirements
+can lead to substantially larger schedule sizes.
 
 \begin{comment}
 This problem is further complicated by message latency constraints
@@ -120,7 +116,8 @@ Hierarchical schedules are also useful, because they allow for
 separate compilation of program components. This enables creation
 of standardized libraries and their distribution in binary form,
 rather than source code. This ability may become important as
-streaming languages become more widely used.
+streaming languages become more widely used for larger
+applications.
 
 \begin{comment}
 The contributions of this thesis are:

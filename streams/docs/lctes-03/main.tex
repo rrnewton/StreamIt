@@ -49,29 +49,19 @@ Laboratory for Computer Science \\
 \vspace{0.1in}
 
 \begin{abstract}
-Applications structured around some notion of a "stream" are
+Applications structured around some notion of a ``stream'' are
 becoming increasingly important and widespread. \cite{Rix98}
 provides evidence that streaming media applications are already
 consuming most of the cycles on consumer machines, and their use
 is continuing to grow. The streaming computation model is
 pervasive and ranges from small, embedded systems (ex. cell
 phones) to large, computationally powerful machines (ex. cell base
-stations).
-%
-In this paper, we describe a novel technique for scheduling
-execution of streaming applications exhibiting hierarchical
-properties, such as programs written in {\StreamIt}. {\StreamIt}
-programs consist of a number of Streams, which are single-input,
-single-output constructs. Streams are constructed from smaller
-Streams using hierarchical components, called {\pipeline},
-{\splitjoin} and {\feedbackloop}, all of which are Streams
-themselves. The smallest computational element of a {\StreamIt}
-program is a {\filter}. {\StreamIt} uses a static rate
-computational model, meaning that every {\filter}'s rate of
-consumption and production of data is known at compile time.
-%
-The technique presented here focuses on producing schedules that
-are optimized for the amount of space required for buffering and
+stations). In this paper, we describe a novel technique for
+scheduling execution of synchronous data flow streaming
+applications exhibiting hierarchical properties. A vital aspect in
+compiling such programs is finding an efficient schedule. The
+technique presented here focuses on producing schedules that are
+optimized for the amount of space required for buffering and
 storing the schedule. A wide variety of real-life applications and
 a few synthetic applications are surveyed. Applications benefit
 from an average 14.5\% decrease in buffer requirements, with a

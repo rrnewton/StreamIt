@@ -249,6 +249,9 @@ applications to be scheduled, while keeping the size of the
 schedule small. There still exist applications which cannot be
 scheduled.
 
+Due to space constraints, algorithms presented below are not
+detailed. Refer to \cite{karczma-thesis} for details.
+
 \begin{comment}
 This section will develop hierarchical scheduling techniques to
 create initialization and steady state schedules. A simple
@@ -290,37 +293,44 @@ $$
 
 \subsubsection{{\pipelines} and {\splitjoins}}
 
+{\large \bf put some math here}
+
 Scheduling {\pipelines} and {\splitjoin} consists of computing a
-single appearance schedule for the {\pipeline} or {\splitjoin}. This
-means that we schedule each child of the {\pipeline} or {\splitjoin}
-exactly once.
+single appearance schedule for the {\pipeline} or {\splitjoin}.
+This means that the resulting schedule contains each child of the
+{\pipeline} or {\splitjoin} exactly once.
 
 \subsubsubsection{Initialization Schedule} In order for a
 {\pipeline} or {\splitjoin} to be initialized, all their children
-must have executed their own initialization schedules. That means
-being fed at least $e_s$ data.
+must have executed their own initialization schedules.
 
-Constructing an initialization schedule for a {\pipeline} is done in
-two steps. The first step traverses all the children of the
-{\pipeline}, starting at the bottom and  moving up, and calculates
-how many times the child needs to execute to feed the child below,
-thus much data the child needs itself. The bottom most child does
-not need to execute its steady state schedule, only its
-initialization schedule, and may need some data to do so. The
-second step traverses the children of the {\pipeline} from top to
-bottom, and concatenates executions of their initialization and
-steady state schedules, as calculated in first step.
+The initialization schedule for a {\pipeline} is calculated as
+follows. For every child stream of the {\pipeline}, the amount of
+data necessary to initialize all the streams below it is
+calculated. For $k$th stream, that amount is denoted $init_k$. If
+the {\pipeline} has $n$ children, then for the bottom-most child,
+$p_{n-1}$, that amount is $init_{n-1} = e^i_{p_{n-1}}$. The data
+to the $k$th child is provided by the $k-1$ child, during its
+initialization and subsequent execution of its steady state
+schedule. Thus the $k-1$ child must execute its steady state
+schedule $l_{k-1} = \left\lceil init_k - u^i_{p_{k-1}} \over
+u_{p_{k-1}} \right\rceil$ times.  The amount of data required for
+initialization of the {\pipeline} by the $k-1$ child is
+$init_{k-1} = e^i_{p_{k-1}} + l_{k-1} * o_{p_{k-1}}$.
+
+Now, the initialization schedule is simply constructed by
+iterating over all children of the {\pipeline}, from top to
+bottom, and concatenating all initialization and appropriate
+steady state schedules.
 
 Constructing an initialization schedule for a {\splitjoin} is
 similar to the {\pipeline}. Every stream child will execute only
-their initialization schedule. The {\splitter} will execute as many
-times as necessary to provide enough data for all the children to
-initialize. The {\joiner} will not execute. The schedule is created
-by concatenating executions of the {\splitter}, followed by
-initialization schedules of all the children.
-
-Calculation of the initialization schedule starts with computing
-hierarchical schedules for all children of the {\pipeline}.
+their initialization schedule. The {\splitter} will execute as
+many times as necessary to provide enough data for all the
+children to initialize. The {\joiner} will not execute. The
+schedule is created by concatenating executions of the
+{\splitter}, followed by initialization schedules of all the
+children.
 
 \begin{comment}
 In order to create an initialization schedule of a
@@ -476,9 +486,9 @@ I_B\\ I_C\\ I_D\end{array}\right\},\end{array} \left[
 \begin{array}{c}
 0\\0\\0
 \end{array}\right] \right\}, &
-H_{sj} = \left\{\begin{array}{c}\left\{\begin{array}{c}\{2\
-split\}\\ \{2T_A\} T_B \\ \{2\ join\}\end{array}\right\},\\
-\{split\ I_A\ I_B\}, \end{array}\left[
+H_{sj} = \left\{\left\{\begin{array}{c}\{2\ split\}\\ \{2T_A\} T_B
+\\ \{2\ join\}\end{array}\right\}, \left\{\begin{array}{c}split\\I_A\\I_B\end{array}\right\},
+\left[
 \begin{array}{c}
 6\\6\\8
 \end{array}\right], \left[

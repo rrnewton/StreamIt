@@ -152,20 +152,19 @@ accumulating, requiring an infinite amount of buffering space.
 A steady state of a program is a collection of number of times
 that every node in the program needs to execute in a steady state
 schedule.  It does not impose an order of execution of the nodes
-in the program. Not every {\StreamIt} program has a steady state
-schedule.  It is possible for a program to have unbalanced
-production and consumption of data in {\splitjoins} and
-{{\feedbackloops}}.
+in the program.
 \begin{comment}
-The amount of data buffered
-continually increases, and cannot be reduced, thus making it
-impossible to create a steady state schedule for them.  It is also
-possible that a {{\feedbackloop}} does not have enough data buffered
-up internally in order to complete execution of a full steady
-state, and thus deadlocks. Programs without a valid steady state
-schedule are not considered valid {\StreamIt} programs. In other
-words, all valid {\StreamIt} programs have a steady state
-schedule.
+Not every {\StreamIt} program has a steady state schedule.  It is
+possible for a program to have unbalanced production and
+consumption of data in {\splitjoins} and {{\feedbackloops}}. The
+amount of data buffered continually increases, and cannot be
+reduced, thus making it impossible to create a steady state
+schedule for them.  It is also possible that a {{\feedbackloop}}
+does not have enough data buffered up internally in order to
+complete execution of a full steady state, and thus deadlocks.
+Programs without a valid steady state schedule are not considered
+valid {\StreamIt} programs. In other words, all valid {\StreamIt}
+programs have a steady state schedule.
 \end{comment}
 
 \subsubsection{Minimal Steady State}
@@ -182,7 +181,7 @@ the steady state.
 
 Note that $m$ does not impose an order of execution of nodes. Size
 of a steady state is the total number of executions of all the
-nodes in the steady state, and is represented by $\sum_i m_i$.
+nodes in the steady state.
 
 Next we will summarize the properties of schedules presented in
 \cite{lee87static}. Detailed proofs of these properties are
@@ -388,8 +387,8 @@ A schedule is an ordering of nodes in a {\StreamIt} stream. In
 order to execute the schedule, we iterate through all of its nodes
 in order of appearance and execute them one by one.  For example
 in order to execute schedule $\{ABBCCBBBCC\}$ we would execute
-node A once, then node B, node B again, C two times, B three times
-and C twice again, in that order.
+node A once, node B twice, node C two times, node B three times
+and node C twice again, in that order.
 
 In order to shorten the above schedule we can run-length encode
 it.  The schedule becomes $\{A \{2B\}\{2C\}\{3B\}\{3C\}\}$. The
@@ -438,8 +437,8 @@ all buffers require the same amount of space. The schedule itself
 has 18 entries.
 
 To compare, writing the schedule in the most compact method we get
-$$\{4A\}\{6B\}\{9C\}\{3D\}$$  This schedule requires a buffer for
-12 data items between {\filters} $A$ and $B$, 18 items between $B$
+$\{4A\}\{6B\}\{9C\}\{3D\}$  This schedule requires a buffer for 12
+data items between {\filters} $A$ and $B$, 18 items between $B$
 and $C$, and 9 data items between $C$ and $D$, resulting in total
 buffers size 39.  The schedule has 4 entries.
 
