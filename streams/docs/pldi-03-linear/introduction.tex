@@ -274,7 +274,11 @@ StreamIt programs are composed of processing blocks called {\it
 filters} which contain an input tape from which they can read values
 and an output tape to which they can write. Each filter contains
 a {\tt work} function which describes its atomic execution step in the
-steady state.  The {\tt work} function contains C-like imperative
+steady state. If the first invocation of the {\tt work} function needs
+different behavior than other executions, a special {\tt initwork} 
+function is defined.
+
+The {\tt work} function contains C-like imperative
 code, which can access filter state, call external routines and
 produce and consume data.  The input and output channels are treated
 as FIFO queues, which can be accessed with three primitive operations:
@@ -286,8 +290,7 @@ must declare the maximum element it will {\tt peek} at, the number of
 elements it will {\tt pop}, and the number of elements that it will
 {\tt push} during an execution of {\tt work}.  These rates must be
 resolvable at compile time and constant from one invocation of {\tt
-work} to the next.  
-%Figure~\ref{fig:overview-filter} gives our notation these input/ouput rates.
+work} to the next. 
 
 A program in StreamIt consists of a hierarchical graph of {\tt
 filters}.  Filters can be connected using one of three predefined
