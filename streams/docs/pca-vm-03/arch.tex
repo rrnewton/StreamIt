@@ -20,14 +20,10 @@
 
 An architecture is represented as a directed graph, where each node
 represents a processor or memory unit and each edge represents a
-uni-directional communication channel.  To simplify the compiler, the
-graph must be {\it planar}--that is, it can be drawn in two dimensions
-without any intersecting edges.
-
-In the following, we describe the essential properties of a processor
-node, a memory node, and a communication channel.  An outline of the
-changes from the previous proposal appears in
-Figure~\ref{fig:archdiff}.
+uni-directional communication channel.  In the following, we describe
+the essential properties of a processor node, a memory node, and a
+communication channel.  An outline of the changes from the previous
+proposal appears in Figure~\ref{fig:archdiff}.
 
 \begin{figure}[t]
 \begin{center}
@@ -36,8 +32,7 @@ Figure~\ref{fig:archdiff}.
 
 \begin{itemize}
 
-\item {\bf Architecture description is a graph rather than a tree,} to
-support architectures such as Raw.
+\item {\bf Architecture description is a graph rather than a tree.}
 
 \item {\bf Memory nodes are simplified.}  There is only one type of
 memory, with much fewer properties.
@@ -207,6 +202,9 @@ Each edge in the architectural graph has the following properties: \\
   \entry{VM\_PROP\_CHAN\_BANDWIDTH} {float - Bandwidth bytes/sec}
   {Bandwidth for one active channel; scaling to multiple channels
   depends on type, as described above.}
+
+  \entry{VM\_PROP\_CHAN\_SETUP\_COST} {float - nanoseconds} {The time
+  required to setup a new connection between two nodes.}
 
   \entry{VM\_PROP\_CHAN\_BLOCKING\_FACTOR} {int32 - Number of words}
   {The minimum number of words that must be sent at once to fully

@@ -1,6 +1,11 @@
 todo
 ----
 
+- more precise draining semantics in the case of dynamic rates.  e.g.,
+are dynamic interrupted?  are static-rate kernels atomic?  do you stop
+a static-rate kernel in the middle if it will exceed the length
+declared?
+
 - deal with loops and initPath
 
 - work out metadata description for Raw
