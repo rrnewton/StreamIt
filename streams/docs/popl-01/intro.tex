@@ -38,15 +38,15 @@ productivity and program robustness, and second, to provide a compiler
 that performs stream-specific optimizations to achieve the performance
 of an expert assembly programmer.  
 
-To address the first of these goals, this paper describes a version of
-the static rate version of the StreaMIT language.  The first version
-is special in that it concentrates on streams with static input and
-output rates; applications such as compression that have dynamic flow
-rates will be the focus of the next version of StreaMIT.  This paper
-also presents a notion of ``information flow'' that we believe is
-fundamental to the streaming domain.  Using this notion, we give a
-clear semantics to StreaMIT's messaging system and describe simple
-algorithms for static deadlock and overflow detection.
+To address the first of these goals, this paper motivates, describes,
+and justifies StreaMIT's high-level language features.  The version of
+StreaMIT described in this paper requires static flow rates in the
+streams; applications such as compression that have dynamic flow rates
+will be the subject of future work.  This paper also presents a notion
+of ``information flow'' that we believe is fundamental to the
+streaming domain.  Using this notion, we give a clear semantics to
+StreaMIT's messaging system and describe simple algorithms for static
+deadlock and overflow detection.
 
 The paper is organized as follows. In Section {\ref{sec:domain}}, we
 characterize the domain of streaming programs that motivates the

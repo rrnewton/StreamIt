@@ -23,7 +23,7 @@ class Butterfly extends Stream {
                   if(curr>= W) curr = 0;
                }    
             });
-            add(new Identity());
+            add(IDENTITY());
             setJoiner(ROUND_ROBIN);
       }});
       add(new SplitJoin() {
@@ -33,16 +33,14 @@ class Butterfly extends Stream {
                Channel input = new FloatChannel();
                Channel output = new FloatChannel();
                void work() {
-                  float val = input.pop();
-                  output.push(val - input.pop());
+                  output.push(input.pop() - input.pop());
                }
             });
             add(new Filter() {   
                Channel input = new FloatChannel();
                Channel output = new FloatChannel();
                void work() {
-                  float val = input.pop();
-                  output.push(val + input.pop());
+                  output.push(input.pop() + input.pop());
                }
             });
             setJoiner(WEIGHTED_ROUND_ROBIN(N, N));
@@ -58,8 +56,8 @@ class FFT extends Stream {
                add(new SplitJoin() {
                   void init() {
                      setSplitter(ROUND_ROBIN);
-                     add(new Identity());
-                     add(new Identity());
+                     add(IDENTITY());
+                     add(IDENTITY());
                      setJoiner(WEIGHTED_ROUND_ROBIN(N/4, N/4));
                }});
             setJoiner(ROUND_ROBIN);
@@ -142,7 +140,7 @@ class CheckFreqHop extends SplitJoin {
                });
                k++;
             }
-         } else add(new Identity());
+         } else add(IDENTITY());
       }
       setJoiner(WEIGHTED_ROUND_ROBIN(N/4-2,1,1,N/2,1,1,N/4-2));
    }

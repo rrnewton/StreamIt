@@ -216,7 +216,9 @@ the three intuitive operations: 1) {\tt pop()} removes an item from
 the end of the channel and returns its value, 2) {\tt peek(i)} returns
 the value of the item $i$ spaces from the end of the channel without
 removing it, and 3) {\tt push(v)} writes the value $v$ to the front of
-the channel.
+the channel.  A filter can also push, pop, and peek items from within
+the {\tt init} function if it needs to set up some initial state on
+its channels, although this usually is not necessary.
 
 A major restriction of the current version of StreaMIT is that it
 requires filters to have static input and output rates.  That is, the
@@ -272,8 +274,8 @@ class FFT extends Stream {
                add(new SplitJoin() {
                   void init() {
                      setSplitter(ROUND_ROBIN);
-                     add (new Identity());
-                     add (new Identity());
+                     add(IDENTITY());
+                     add(IDENTITY());
                      setJoiner(WEIGHTED_ROUND_ROBIN(N/4, N/4);
                }});
             setJoiner(ROUND_ROBIN);
@@ -431,54 +433,9 @@ further improves readability and decreases code size.
 \subsubsection{StreaMIT Approach}
 
 \begin{figure}
-\scriptsize
-\begin{verbatim}
-class TrunkedRadio extends Stream {
-   RFtoIFPortal freqHop = new RFtoIFPortal();
-   ...
-   void init() {
-      ...
-      RFtoIF rf2if;
-      add(rf2if = new RFtoIF(STARTFREQ));
-      freqHop.register(rf2if);
-      ...
-      add(new CheckFreqHop(freqHop));
-      ...
-   }
-}
-
-class RFtoIF extends Filter {
-   ...
-   // sets frequency to <f>
-   void setf(float f) {
-      ...
-   }
-}
-
-class CheckFreqHop extends SplitJoin {
-   RFtoIFPortal freqHop;
-
-   void init(RFtoIFPortal freqHop) {
-      this.freqHop = freqHop;
-      ...
-      add(new Filter() {
-         ...
-         void work() {
-            ... 
-            if(val >= MIN\_THRESHOLD) 
-               freqHop.setf(Freq[k], new TimeInterval(4*N, 6*N)); 
-            ...
-          }
-      });
-      ...
-   }
-}
-\end{verbatim}
-\vspace{-12pt}
-\caption{\protect\small The CheckFreqHop stream from our software
-   radio provides an example of the messaging system in StreaMIT.
-\protect\label{fig:mess}}
-\vspace{-12pt}
+\psfig{figure=portal-code.eps,width=3.0in}
+\caption{The CheckFreqHop stream from our software radio provides an example of the messaging system in StreaMIT.  Messages are sent through a Portal that is configured in the toplevel stream.}
+\label{fig:portal-code}
 \end{figure}
 
 StreaMIT provides a dynamic messaging system for passing irregular,
@@ -515,7 +472,7 @@ work functions, counting the sender's current work function as number
 0.  Defining this notion precisely is the subject of Section
 \ref{sec:time}, but the general idea is simple:  the receiver is
 invoked when it sees the information wavefront that the sender sees in
-$4N-6N$ execution steps.
+$4N-6N$ execution steps.  
 
 In some cases, the ability to synchronize the arrival of a message
 with some element of the data stream is very important.  For example,
@@ -526,6 +483,14 @@ changes frequencies at the same time--so as not to lose any data at
 the old or new frequency--{\tt CheckFreqHop} instructs the receiver to
 switch frequencies when the {\it receiver} sees one of the last data
 items at the old frequency.
+
+If the receiver of a message is a stream instead of a filter, then the
+message delivery is timed with respect to the first (most upstream)
+filter in the stream.  We are still formalizing the message delivery
+semantics in cases where the receiver is a stream that has no unique
+first filter (e.g., a SplitJoin with NULL splitter).  Note that the
+stream itself can receive a message even though the timing is in terms
+of filter-to-filter communication.
 
 {\bf Portals for broadcast messaging.}  StreaMIT also has support for
 modular broadcast messaging.  When a sender wants to send a message
@@ -638,5 +603,13 @@ an information wavefront in traveling from the input of one filter to
 the output of a downstream filter.  Issueing the directive {\tt
 MAX\_LATENCY(A, B, n)} from within an {\tt init} means that $A$ can
 only execute up to the wavefront of information that $B$ will see
-after $n$ invocations of its own work function.  More detailed
-semantics are described in the next section.
+after $n$ invocations of its own work function.
+
+In the case that $A$ is a stream instead of a filter, then the latency
+is with regards to the most upstream filter of $A$; likewise, if $B$
+is a stream, then the latency is with regards to the most downstream
+filter in $B$.  We are still in the process of formalizing the
+semantics in cases when there is no unique upstream or downstream
+filter in these streams.
+
+

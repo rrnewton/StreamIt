@@ -448,6 +448,19 @@ n(t_k), D)$, with $C_O$ again being the zero-vector, as there are no
 live items at initialization time.  Then, if the max number of live
 items is $MAXITEMS$, the following transition rule defines a valid
 schedule:
+%
+% this code should do the centering right, but then it shrinks it :(
+%
+%\[
+%\begin{array}{c}
+%(n(t_1), \dots , n(out_A), \dots, n(t_k), D); \\
+%{\cal P}((n(t_1), \dots , n(out_A + push_A), \dots, n(t_k), D)); \\
+%\frac{D - pop_A + push_A \le MAXITEMS}{(n(t_1),
+%\dots , n(out_A + push_A),
+%\dots, n(t_k), D - pop_A + push_A)}
+%\end{array}
+%\]
+%
 \begin{align*}
 & \hspace{0.7in} (n(t_1), \dots , n(out_A), \dots, n(t_k), D); \\ &
 \hspace{0.4in} {\cal P}((n(t_1), \dots , n(out_A + push_A), \dots,

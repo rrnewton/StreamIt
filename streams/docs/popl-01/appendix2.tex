@@ -26,10 +26,12 @@ A diagram of the Java class hierarchy for StreaMIT is shown in
 Figure~\ref{fig:hierarchy}.  A summary of the methods in each class is
 as follows.
 
-\subsection{Operator}
+\subsection{StreamObject}
 
-The {\tt Operator} is the basic building block in the stream graph,
-mapping one or more input channels to one or more output channels.
+A {\tt StreamObject} contains static fields and methods that are
+useful for all classes in the stream.  The other classes extend this
+type simply so that they can share the same namespace as the constants
+and methods that it defines.
 
 \subsubsection{Fields}
 
@@ -37,17 +39,32 @@ mapping one or more input channels to one or more output channels.
 indicates that a message should be delivered on a ``best-effort''
 basis, without strict timing guarantees.
 
+\doc{SplitJoinType ROUND\_ROBIN}  This is used to specify a round robin splitter or joiner.
+
+\doc{SplitJoinType NULL}  This is used to specify a splitter or joiner
+that is null (it processes no items).
+
+\doc{SplitJoinType DUPLICATE}  This specifies a duplicating splitter.
+
+\doc{SplitJoinType COMBINE}  This specifies a combining joiner.
+
 \subsubsection{Methods}
+
+\doc{SplitJoinType WEIGHTED\_ROUND\_ROBIN(int w1, int w2, ...)}  This
+specifies a weighted round robin with the given weights.  This
+function does not take a variable number of arguments, but rather is
+defined for all numbers of arguments that would be likely to occur in
+a StreaMIT program.
+
+\doc{Filter IDENTITY()} This returns a {\tt Filter} that outputs
+exactly the items that it inputs.
 
 \doc{MAX\_LATENCY(Stream a, Stream b, int n)}  This directive
 constraints the schedule such that, at any given time, $a$ can only
 progress up to the wavefront of information that $b$ will see after
 $n$ invocations of its own work function.
 
-\doc{Stream Identity()} This returns a {\tt Stream} that outputs
-exactly the items that it inputs.
-
-\subsection{Stream}
+\subsection{Stream extends StreamObject}
 
 The {\tt Stream} represents a portion of the stream graph that inputs
 has exactly one input channel and exactly one output channel.
@@ -60,7 +77,9 @@ receives as its arguments the same arguments that were passed to the
 constructor.  Additionally, the {\tt init} function can be called
 again with a message at runtime to trigger a re-initialization of this
 stream.  The purpose of the function is to initialize child streams
-and to set parameters used with this stream.
+and to set parameters used with this stream.  The filter can also
+push, pop, and peek items from its channels from within the {\tt init}
+function, although this usually isn't necessary.
 
 \doc{Stream add(Stream child)}  The {\tt add} function appends {\tt
 child} to the current pipeline of blocks comprising this stream and
@@ -71,7 +90,7 @@ function.
 interface for starting the stream.  No component of any stream may
 call {\tt run}.
 
-\subsection{Filter}
+\subsection{Filter extends Stream}
 
 The {\tt Filter} is the most basic kind of stream.  It contains no
 child streams, and thus calling {\tt add} is forbidden from within its
@@ -107,47 +126,34 @@ region into the drain, so the {\tt drain} function is invoked instead
 to fabricate data.  The {\tt drain} function is successively called
 with indices 0, 1, 2, $\dots$ until the downstream region has drained.
 
-\subsection{Splitter}
+\subsection{SplitJoinType}
 
-A {\tt Splitter} has one input channel and more than one output
-channel.  For now, the user cannot define splitters; instead, there
-are a series of compiler-defined splitters.
+A {\tt SplitJoinType} represents a compiler-defined configuration for
+the splitter or joiner in a SplitJoin.  For now, the user cannot
+define custom {\tt SplitJoinType}'s, and the only ones available are
+those that are constant fields in {\tt StreamObject}.
 
-\subsubsection{Fields}
-
-\doc{RoundRobin} etc etc
-
-\subsection{Joiner}
-
-A {\tt Joiner} has one output channel and more than one input channel.
-For now, the user cannot define joiners; instead, there are a series
-of compiler-defined joiners.
-
-\subsubsection{Fields}
-
-\doc{RoundRobin} etc etc
-
-\subsection{SplitJoin}
+\subsection{SplitJoin extends Stream}
 
 A {\tt SplitJoin} is a set of independent, parallel streams that are
-contained between a {\tt Splitter} and {\tt Joiner}.
+contained between a splitter and a joiner.
 
-\doc{Splitter setSplitter(Splitter splitter)}  This command sets the splitter within a {\tt SplitJoin} and returns its argument.  It must be called in the {\tt init} function of the {\tt SplitJoin}.
+\doc{Splitter setSplitter(SplitJoinType splitter)}  This command sets the splitter within a {\tt SplitJoin} and returns its argument.  It must be called in the {\tt init} function of the {\tt SplitJoin}.
 
-\doc{Joiner setJoiner(Joiner joiner)} This command sets the joiner within a {\tt SplitJoin} and returns its argument.  It must be called in the {\tt init} function of the {\tt SplitJoin}.
+\doc{Joiner setJoiner(SplitJoinType joiner)} This command sets the joiner within a {\tt SplitJoin} and returns its argument.  It must be called in the {\tt init} function of the {\tt SplitJoin}.
 
 \doc{Stream add(Stream child)} This {\tt add} function overrides the {\tt add} function of {\tt Stream} to append {\tt child} as a parallel component within the {\tt SplitJoin.}  The first stream to be added is connected to the first port of the splitter and joiner, and likewise with the rest of the streams.  This function returns its argument.
 
-\subsection{FeedbackLoop}
+\subsection{FeedbackLoop extends Stream}
 
 The FeedbackLoop provides the means for creating cycles in the stream
 graph.
 
 \subsubsection{Methods}
 
-\doc{Joiner setJoiner(Joiner joiner)}
+\doc{Joiner setJoiner(SplitJoinType joiner)}
 \doc{Stream setBody(Stream stream)}
-\doc{Splitter setSplitter(Splitter splitter)}
+\doc{Splitter setSplitter(SplitJoinType splitter)}
 \doc{Stream setLoop(Stream stream)} These methods set the joiner, body
 stream, splitter, and loop streamfor the feedback loop; they each
 return their argument.  Each of them must be called from within the
@@ -235,14 +241,12 @@ requirements of StreaMIT.  We outline these constraints as follows:
 function must peek, pop, and push a constant number of items.  Dynamic
 rates will be the subject of future work.
 
-\item If {\tt pop} appears in an expression, then no other call to
-{\tt pop} or {\tt peek} can appear in the same expression.  This
-avoids ambiguous semantics with regards to the order in which items
-are read and removed from a channel.
-
 \item If two filters are connected, then their corresponding input and
 output types must match.  We postpone a formal treatment of types
 until a future paper.
+
+\item A given instance of a stream or filter must not appear more than
+once in the stream graph.
 
 \item There must be no deadlock or buffer overflow in the program.  We
 have developed a simple algorithm to verify that feedback loops and
@@ -266,5 +270,3 @@ and two inputs, respectively, and must be something other than NULL.
 \item ???
 
 \end{enumerate}
-
-

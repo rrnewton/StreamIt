@@ -1,63 +1,6 @@
-- rewrite everything that saman wrote (related, example, conclusions, captions)
-
-* define latency for things other than filters.  same with messages!
-	- will need concept of first/last filters in a stream, which
-		could get complicated
-	- ability to send to other targets?
-
-- make an example that makes use of portals for portal's sake
-	1. library notion (unknown receiver / sender)
-	2. broadcast messaging
-	3. send up and down the stream
-
-	-> like an example w/ completely messaging stuff
-	- very simple & artificial
-
-	- also have re-initialization an draining in some example?
-
-- expand the messaging diagram into a nice picture with the source,
-destination, portal, and connecting code.  (do this in windows!)
-
-todo later this afternoon
--------------------------
-
-- should this be manuscript format instead of two-column?
-
 - add the Tech Report #
 
-questions for saman
--------------------
-
-* what to do about targeting stream messaging?
-
-* what to do about round robin naming?
-
-* order of evaluation of input.pop() in statements that contain more
-than 1?  I modified your function to input on different lines.  If we
-can have clean semantics, then let's change it back... but I think
-this is a mess we don't want to get into.  In fact, let's disallow
-it.  (Although we could detect commutativity, maybe...)
-
-* checkFreqHop had a messed up for loop, right?  changed to 1-5, ==2, ==4
-
-* should checkQuality be in the freq domain?  We really want a booster
-if the frequency spectrum is even?  But we said that we expect low
-values at the hop positions for the hopping... maybe they shouldn't
-output anything at the hop positions?  it's also messed up because it
-sends every cycle when the stream starts up.
-
-* I'm going to let the init function push and pop, ok?  We still have
-to give semantics.
-
-* should there be a semantic restriction that you can't send messages
-ahead of the wavefront?  I guess not.  But we could.
-
-- how do you center the components of an equation?
-
--> can you please switch J to FJ and S to FS on feedback.eps?
-
--> note: I'm using semantics of add so that it returns what it adds.
-this leads to a nicer syntax.
+- rewrite everything that saman wrote (related, example, conclusions, captions)
 
 changes we decided against making?
 ----------------------------------
@@ -76,8 +19,22 @@ similar equaionts are placed next to each other.
 future things to think about
 ----------------------------
 
+- make an example that makes use of portals for portal's sake
+	1. library notion (unknown receiver / sender)
+	2. broadcast messaging
+	3. send up and down the stream
+
+	-> like an example w/ completely messaging stuff
+	- very simple & artificial
+
+	- also have re-initialization an draining in some example?
+
+* get the centering right on the inference rule instead of using \hspace
+
 * to properly deal with messages to streams with null splits & joins,
 do we need to define the min/max functions across null splits & joins?
+how do you send message to stream (like you'd want to for
+re-initialization) if there's no unique upper or lower filter?
 
 * we need to specify default values for functions like drain(),
 initPath, etc
@@ -105,4 +62,9 @@ select filter, for example.)
 
 - I still vote for a reordering filter that lets you reorder chunks
 without a complicated round-robin with identitity functions.
+
+
+
+
+
 
