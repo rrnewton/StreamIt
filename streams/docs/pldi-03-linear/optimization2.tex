@@ -16,27 +16,28 @@ start by formulating the computation that the node performs.  To
 simplify the derivation, assume that we are given a node $\lambda$
 with $\vec{b} = 0$ and $\mt{push}=\mt{pop}=1$ (we will relax these
 restrictions below).  As usual, let $e$ denote the peek rate for
-$\lambda$; also let ${\vec x}_0$ denote the input items and $y_0$
-denote the output item.  Then, by Definition 1, we have the following:
+$\lambda$; also let $p_0$ denote the item that is pushed.  Then, by
+Definition 1, we have the following:
 \begin{equation}
-  y_0 = \vec{x} A + {\vec b} = \sum_{k=0}^{e-1} A[k] \mbox{\tt peek}(e-1-k)
+  p_0 = \vec{x} A + {\vec b} = \sum_{k=0}^{e-1} A[k] \mbox{\tt peek}(e-1-k)
 \end{equation}
-Note that in this case, $y_0$ is a scalar since $\mt{push}=1$ (e.g. $A$
-has a single column).  Now
-let us consider the values that appear on the output tape over time,
-which we denote by $\vec{y}_1$.  On the $n$th iteration, the
-computation is exactly as above, except that the input and output
-tapes are offset by $n$:
+Note that in this case, $p_0$ is a scalar since $\mt{push}=1$ (and
+thus $A$ has a single column).  Now let us consider $m$ executions of
+the node, with the $i$th output being pushed to location ${\vec
+p}[i]$.  This computation is exactly as above, except that the input
+and output tapes are offset by $i$:
 \begin{equation}
   \protect\label{eq:linconv}
-  \vec{y}_1[n] = \sum_{k=0}^{e-1} A[k] \mbox{\tt peek}(n+e-1-k) 
+  \forall i \in [0, m-1]:~~\vec{p}[i] = \sum_{k=0}^{e-1} A[k] \mbox{\tt peek}(i+e-1-k)
 \end{equation}
-At this point, our equation is in the same form as a convolution sum
-from digital signal processing: given two vectors $\vec{h}$ and
+At this point, our equation is very similar in form as a convolution
+sum from digital signal processing.  Given two vectors $\vec{h}$ and
 $\vec{x}$, their convolution is defined as:
 \begin{equation}
-  \vec{x} * \vec{h} = \sum_{k=-\infty}^{\infty} \vec{x}[k] \vec{h}[n-k]
+  {\vec y}[n] = \vec{x} * \vec{h} = \sum_{k=-\infty}^{\infty} \vec{x}[k] \vec{h}[n-k]
 \end{equation}
+
+
 The calculation of a convolution is much more efficient in the
 frequency domain due to the Fast Fourier Transform (FFT).  To compute
 the convolution, two $N$-point FFTs of $\vec{x}$ and $\vec{h}$ are
@@ -107,13 +108,14 @@ frequency domain: \\
     ~~{\tt add~float \rightarrow float~filter~\{}\\
     ~~~~N \leftarrow 2^{\lceil \lg(2e) \rceil} \\
     ~~~~m \leftarrow N-(e-1) \\
+    ~~~~r \leftarrow u * (m-(e-1)) \\
     \\
     ~~~~{\tt init}~{\tt \{} \\
     ~~~~~~{\tt for}~j=0~{\tt to}~u-1\\
     ~~~~~~~~\vec{H}[*,j] \leftarrow \mathbf{FFT}(N,A[*,u-1-j]) \\
     ~~~~{\tt \}} \\
     \\
-    ~~~~{\tt work}~{\tt peek}~u*(m-(e-1))~{\tt pop}~u*(m-(e-1))~{\tt push}~u*(m-(e-1))~{\tt \{} \\
+    ~~~~{\tt work}~{\tt peek}~r~{\tt pop}~r~{\tt push}~r~{\tt \{} \\
     ~~~~~~\vec{x} \leftarrow {\tt pop}(0 \dots m - (e-1)) \\
     ~~~~~~\vec{X} \leftarrow \mathbf{FFT} (N, \vec{x}) \\
     ~~~~~~{\tt for}~j=0~{\tt to}~u-1\\
