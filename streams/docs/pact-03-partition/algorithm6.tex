@@ -39,8 +39,8 @@ enddo
 if (part1.size == 1)
   return pipe
 endif
-// otherwise, factor the uppper and lower splitjoins according to our partitioning, using
-// matching sync removal to take care of the details
+// otherwise, factor the uppper and lower splitjoins according to our 
+// partitioning, using matching sync removal to take care of the details
 for i = 0 to part1.size-2
   sj1 = lowerChildren(sj1, part[i], part[i+1])
 endfor
