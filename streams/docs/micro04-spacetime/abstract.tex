@@ -1,0 +1,23 @@
+With the continued miniaturization of the transistor, microprocessor
+performance is increasingly dominated by wire delays.  Several
+architectures are addressing this problem by replicating processing
+units and exposing the communication between units to a software
+layer.  There are two basic approaches for compiling to a
+communication-exposed target.  A "time multiplexing" approach utilizes
+the entire chip for each computation unit, and switches between units
+over time.  A "space multiplexing" approach distributes computation
+units across the entire chip, running them continuously and in
+parallel.
+
+In this paper, we describe a hybrid space-time multiplexing scheme
+that provides the flexible load-balancing of time multiplexing while
+preserving the locality and latency benefits of space multiplexing.
+Our work is done in the context of StreamIt, a high-level stream
+programming language, with a backend that targets the Raw
+architecture.  Our compiler extracts fine-grained "traces" from a
+concurrent stream graph; it then uses space multiplexing for code
+within a trace, but time multiplexing to switch between traces.  We
+also describe software pipelining of traces and near-optimal code
+generation for traces that compute a linear function.  We give
+performance results that demonstrate the efficacy of space-time
+multiplexing in compiling StreamIt to Raw.
