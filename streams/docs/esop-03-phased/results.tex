@@ -75,12 +75,12 @@ included in the results as a separate value.
 
 \subsubsection{Sinks}
 
-Any application in {\StreamIt} must receive its data from
-somewhere, and its data must be sent somewhere. {\filters} that
-perform these functions are called sinks and sources. In
-particular, sinks have the property of having $u_f = 0$ while
-sources have $e_f = o_f = 0$. Sinks are problematic for minimal
-latency scheduling, because they do not produce any data. Thus any
+Any application in {\StreamIt} must receive its data from outside,
+and its data must be sent to outside. {\filters} that receive and
+send data to outside are called sinks and sources. In particular,
+sinks have the property of having $u_f = 0$ while sources have
+$e_f = o_f = 0$. Sinks are problematic for minimal latency
+scheduling, because they do not produce any data. Thus any
 schedule of a sink stream is a minimal latency schedule. This
 leads to the minimal latency schedule of the outer-most
 {\pipeline} becoming a single appearance schedule, thus destroying
@@ -123,7 +123,7 @@ phase of the {\pipeline}.
 \subsection{Results}
 \label{sec:results:results}
 
-\begin{table} \centering \small
+\begin{table} \centering  
 \begin{tabular}{|c|c|c|c|c|c|c|c|}
 \hline benchmark & \parbox{0.5in}{\centering number of nodes} & \parbox{0.5in}{\centering number of node executions} & \multicolumn{2}{c|}{pseudo single appearance} & \multicolumn{3}{c|}{minimal latency} \\
 \cline{4-8} & & & \parbox{0.5in}{\centering schedule size} & \parbox{0.5in}{\centering buffer size} & \parbox{0.5in}{\centering schedule size} & \parbox{0.8in}{\centering compressed schedule size} & \parbox{0.5in}{\centering buffer size} \\
