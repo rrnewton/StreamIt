@@ -87,8 +87,9 @@ and simplifies the layout phase.  The perturbation function used in
 simulated annealing simply swaps the assignment of two randomly chosen
 tile processors.
 
-The cost function is the most important parameter of the simulated
-annealing algorithm.  After some experimentation, we have arrived at
+%The cost function is the most important parameter of the simulated
+%annealing algorithm.  
+After some experimentation, we arrived at
 the following cost function: 
 \[
 cost(channels) = \sum _{c \in channels} items(c) \cdot \left( hops(c) + \left( 2 \cdot

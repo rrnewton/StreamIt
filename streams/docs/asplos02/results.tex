@@ -17,7 +17,7 @@ FM Radio & A software-based FM Radio with equalizer\\
 \hline
 GSM & A GSM Decoder\\
 \hline
-Beamformer & code of modern radar, sonar, and communications signal processors \cite{pca}\\
+Beamformer & core of modern radar, sonar, and communications signal processors \cite{pca}\\
 \hline
 FFT & A 64-element FFT filter \\
 \hline
@@ -25,7 +25,7 @@ CRC & A 32-bit Cyclic Redundancy Check (CRC) Encoder/Decoder\\
 \hline
 \end{tabular}
 \vspace{-6pt}
-\caption{\protect\small Application Characteristics}
+\caption{\protect\small Application Description}
 \label{tab:benchmarks}
 \vspace{-12pt}
 \end{center}
@@ -91,7 +91,7 @@ cycles / output
 MFLOPS
 \\
 \hline \hline
-BeamFormer & 596 & 15 & 125000 & 525 & 16 & 35714 & 2300\\
+BeamFormer & 596 & 15 & 125000 & 248 & 16 & 35714 & 775\\
 \hline
 FM Radio & 511 & 14 & 4466 & 141.5 & 14 & 1742 & 363.5\\
 \hline
@@ -139,10 +139,10 @@ that can be mapped onto a 4x4 Raw processor.
 
 The results show that for program with substantial computation
 requirements such as the BeamFormer, the StreamIt compiler is able to
-extract exteremly good performance out of the Raw processor. A
-sustained 2.3 GFLOPS rate after 438% improvement due to our
+extract good performance out of the Raw processor. A
+sustained 755 MFLOPS rate after 350\% improvement due to our
 optimizations. However programs such as FFT, which was created to
-experiment with the languatge features of StreamIt, has very little
+experiment with the language features of StreamIt, has very little
 work per filter. We were unable to amortize the communication
 overhead for FFT, leading to a slowdown. Better tile code generation
 and traditional optimizations may help in this. 

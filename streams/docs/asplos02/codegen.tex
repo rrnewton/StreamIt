@@ -25,7 +25,7 @@ require more care.
 
 In the translation, each Filter collects the data necessary to fire in
 an internal buffer.  Before each Filter is allowed to fire, it must
-receive pop items from its switch processor (peek items for the
+receive \emph{pop} items from its switch processor (\emph{peek} items for the
 initial firing).  The buffer is managed circularly and the size of the
 buffer is equal to the number of items peeked by this Filter.  {\tt
 peek(i)} and {\tt pop()} are translated into accesses of the buffer,
@@ -44,7 +44,7 @@ FeedbackLoops from deadlocking by serializing the loop and the body.
 The loop and the body cannot execute in parallel.  We are
 investigating methods for relaxing the serialization.
 
-Next, we generate code for the collapsed Joiner nodes.  As described
+As described
 in Section \ref{sec:rawcommunic}, the communication scheduler computes
 a internal buffer schedule for each collapsed Joiner.  This schedule
 exactly describes the order in which to send and receive data items
@@ -55,8 +55,7 @@ maximum size of each buffer.  With this information the code
 generation phase can produce the code necessary to realize the
 internal buffer schedule on the tile processor.
 
-Lastly, to generate the in
-structions for the switch processor, we
+Lastly, to generate the instructions for the switch processor, we
 directly translate the switch schedules computed by the communication
 scheduler.  The initialization switch schedule is followed by the steady
 state switch schedule, with the steady state schedule looped infinitely.
