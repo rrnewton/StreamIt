@@ -30,7 +30,7 @@ will come to represent the linear node.
 We briefly discuss the operation of {\bf Extract} at each program
 node.  The algorithm is formulated in terms of a simplified set of
 instructions, which appear in Figure~\ref{fig:types}.  First are the
-nodes that generate new linear forms.  A constant assignment $y = c$
+nodes that generate fresh linear forms.  A constant assignment $y = c$
 creates a form $\tup{\vec 0}{c}$ for $y$, since $y$ has constant part
 $c$ and does not yet depend on the input.  A {\tt pop} operation
 creates a form $\tup{\mbox{\bf BuildCoeff}(\mt{popcount})}{0}$, where
@@ -38,9 +38,25 @@ creates a form $\tup{\mbox{\bf BuildCoeff}(\mt{popcount})}{0}$, where
 on the input stream.  A {\tt peek}$(i)$ operation is similar, but
 offset by the index $i$.
 
-Next are the instructions which combine linear forms.
+Next are the instructions which combine linear forms.  In the case of
+addition or subtraction, we simply add the components of the linear
+forms.  In the case of multiplication, the result is still a linear
+form if either of the terms is a known constant (that is, if either
+term has a zero vector of input coefficients.)  For division, the
+result is linear only if the divisor is a non-zero
+constant\footnote{Note that if the dividend is zero and the divisor
+has a non-zero coefficients vector, we still cannot conclude that the
+result is zero, since certain values of the inputs might cause a
+singularity.} and for non-linear operations ({\it e.g.,} bit-level and
+boolean), both operands must be known constants.  If any of these
+conditions are not met, then the LHS is assigned a value of $\bot$,
+which will mark the filter as non-linear if the value is ever pushed.
 
-The algorithm applies the confluence operator $\sqcap$ over scalar
+The final set of instructions deal with control flow.  For loops, we
+resolve the bounds at compile time and execute the body an appropriate
+number of times.  For branches, we have to ensure that all the linear
+state is modified consistently on both sides of the branch.  For this
+we apply the confluence operator $\sqcap$, which we define for scalar
 constants, vectors, matrices, linear forms, and maps.  $c_1 \sqcap
 c_2$ is defined according to the lifted lattice constant$_{\bot}$.
 That is, $c_1 \sqcap c_2 = c_1$ if and only if $c_1 = c_2$; otherwise,
@@ -51,7 +67,12 @@ meet is taken on the values: $\mt{map}_1 \sqcap \mt{map}_2$ $=$
 $\mt{map'}$, where $\mt{map'}.\mt{get}(x) = \mt{map}_1.\mt{get}(x)
 \sqcap \mt{map}_2.\mt{get}(x)$.
 
-We deal with function calls.
+Our implementation of linear extraction also deals with function
+calls.  It is straightforward to transfer the linear state across a
+call site, although we omit this from the pseudocode for the sake of
+presentation.  Also implicit in the algorithm description is the fact
+that all variables are local to the {\tt work} function.  If a filter
+has persistent state, all accesses to that state are marked as $\bot$.
 
 \begin{figure}[t]
 \begin{equation} \nonumber
@@ -87,7 +108,7 @@ proc {\bf Toplevel}(filter $F$) returns linear node for $F$
 \item Let $A_{0} \leftarrow \mbox{new float[Peek][Push] with each entry =~} \bot$
 \item Let ${\vec b_{0}} \leftarrow \mbox{new float[Push] with each entry =~} \bot$
 \item $(\mt{map}, A, {\vec b}, \mt{popcount}, \mt{pushcount}) \leftarrow$ \\
-\verb+      +{\bf Extract}$(F_{work}, (\lambda x . \bot), A_{0}, {\vec b_{0}}, 0, \mbox{Push})$
+\verb+      +{\bf Extract}$(F_{work}, (\lambda x . \bot), A_{0}, {\vec b_{0}}, 0, \mbox{Push}-1)$
 \item {\bf if} $A$ and ${\vec b}$ contain no $\bot$ entries {\bf then} \\
 \verb+ + return linear node $\lambda = \{A, {\vec b}, \mbox{Peek}, \mbox{Pop}, \mbox{Push}\}$ \\
  {\bf else} \\
@@ -97,7 +118,7 @@ proc {\bf Toplevel}(filter $F$) returns linear node for $F$
 proc {\bf BuildCoeff}(int $pos$) returns $\vec v$ for peek at index $pos$ \\ \vspace{-12pt}
 \begin{algorithmic}
 \STATE $\vec v = \vec 0_{Peek}$
-\STATE $\vec v[\mbox{Peek}-i] = 1$
+\STATE $\vec v[\mbox{Peek}-\mt{pos}] = 1$
 \STATE return $\vec v$
 \end{algorithmic}
 \vspace{6pt}
@@ -131,31 +152,39 @@ proc {\bf Extract}($code$, $map$, $A$, $\vec b$, int $\mt{popcount}$, int $\mt{p
 \IND
 \STATE $\tup{\vec v_2}{c_2} \leftarrow \mt{map}.\mt{get}(y_2)$
 \STATE $\tup{\vec v_3}{c_3} \leftarrow \mt{map}.\mt{get}(y_3)$
-\IF {$\vec v_3 = \vec 0_{Peek} \wedge y_3 \ne 0$}
+\STATE {\bf if} $~\vec v_3 = \vec 0_{Peek} \wedge y_3 \ne 0$ {\bf then}
+\IND
 \STATE $\mt{map}.\mt{put}(y_1, (\frac{1}{c_3}*\vec v_2, c_2/c_3))$
-\ELSE
+\UND
+\STATE {\bf else}
+\IND
 \STATE $\mt{map}.\mt{put}(y_1, \bot)$
-\ENDIF
+\UND
 \UND
 \STATE \vspace{-6pt}
 \STATE $\mbox{\bf case}~y_1 := y_2 * y_3$
 \IND
 \STATE $\tup{\vec v_2}{c_2} \leftarrow \mt{map}.\mt{get}(y_2)$
 \STATE $\tup{\vec v_3}{c_3} \leftarrow \mt{map}.\mt{get}(y_3)$
-\IF {$\vec v_2 = \vec 0_{Peek}$}
+\STATE {\bf if} $~\vec v_2 = \vec 0_{Peek}$ {\bf then}
+\IND
 \STATE $\mt{map}.\mt{put}(y_1, (c_2*\vec v_3, c_2*c_3))$
-\ELSIF {$\vec v_3=\vec 0_{Peek}$}
+\UND
+\STATE {\bf else if} $~\vec v_3=\vec 0_{Peek}$ {\bf then}
+\IND
 \STATE $\mt{map}.\mt{put}(y_1, (c_3*\vec v_2, c_3*c_2))$
-\ELSE
+\UND
+\STATE {\bf else}
+\IND
 \STATE $\mt{map}.\mt{put}(y_1, \bot)$
-\ENDIF
+\UND
 \UND
 \STATE \vspace{-6pt}
-\STATE $\mbox{\bf case}~y_1 := y_2 ~\mt{bitop}~ y_3$, for $\mt{bitop} \in \{\&, |, \wedge\}$
+\STATE $\mbox{\bf case}~y_1 := y_2 ~\mt{op}~ y_3$, for $\mt{op} \in \{\&, |, \wedge, \&\&, ||, !, \mt{etc.}\}$
 \IND
 \STATE $\tup{\vec v_2}{c_2} \leftarrow \mt{map}.\mt{get}(y_2)$
 \STATE $\tup{\vec v_3}{c_3} \leftarrow \mt{map}.\mt{get}(y_3)$
-\STATE $\mt{map}.\mt{put}(y_1, (\vec 0_{Peek} \sqcap \vec v_2 \sqcap \vec v_3, c_2 ~\mt{bitop}~ c_3))$
+\STATE $\mt{map}.\mt{put}(y_1, (\vec 0_{Peek} \sqcap \vec v_2 \sqcap \vec v_3, c_2 ~\mt{op}~ c_3))$
 \UND
 \STATE \vspace{-6pt}
 \STATE $\mbox{\bf case}~y := \mt{const}$
@@ -177,6 +206,7 @@ proc {\bf Extract}($code$, $map$, $A$, $\vec b$, int $\mt{popcount}$, int $\mt{p
 \STATE $\mbox{\bf case}~\mbox{\tt push}(y)$
 \IND
 \STATE $\tup{\vec v}{c} \leftarrow \mt{map}.\mt{get}(y)$
+\STATE {\bf if} $\mt{pushcount} = \bot$ {\bf then} $\mt{fail}$
 \STATE $A[*, \mt{pushcount}] \leftarrow \vec v$
 \STATE $b[\mt{pushcount}] \leftarrow c$
 \STATE $\mt{pushcount}$\verb|--|
