@@ -217,6 +217,19 @@ The number of multiplies in the Radar program actually increases because our
 compiler does not take into account the fact that combined linear structures 
 might actually increase computation. %this is bs, obviously...
 
+\begin{figure}
+\center
+\epsfxsize=3.2in
+\epsfbox{images/execution-speedup.eps}
+\vspace{-6pt}
+\caption{Execution time reduction for each of the benchmarks with both linear replacement and frequency replacement.}
+\label{fig:execution-speedup}
+\vspace{-12pt}
+\end{figure}
+
+Figure~\ref{fig:execution-speedup} shows the execution time decrease due to the back to back
+application of the linear replacment and frequency replacement options.
+
 
 \begin{table*}[t]
 \begin{tabular}{|l|c|c|c||c||c|c|c|} 
