@@ -1,3 +1,315 @@
+questions:
+
+1. can a stream be aliased if it's in a FIFO?  that is, can you
+declare another stream to be on the same fifo, and then pop items from
+that other stream?  I guess not.
+
+things to check with peter:
+
+- only a single thread can control a given kernel?
+
+- should we allow multiplexing of user kernels?
+
+- I'm a little concerned about requiring that there are no data
+  elements in the FIFO before you map a new stream there.  How would
+  you generate SVM code to verify this?  It would be a mess, at the
+  very least.  And on Raw it is fine to pipeline your use of FIFO's --
+  maybe Monarch was a different story?
+
+- I don't understand the supports_user_code property
+
+- Can a tile be its own master, or not?  It should be for the sake of
+morphing, I think (e.g., turning the whole Raw chip into a single
+processor.)
+
+done changes:
+
+2. cleaned up description of STREAM_UNALIASED_RAM
+
+3. Clarified STREAM_LENGTH_ALL for scatter/gather.
+
+4. removed setEOS tag to StridedScatter, IndexedScatter kernels
+
+5. clarified description of scatter/gather kernels
+
+6. adding IOBlock (why wasn't it there?)
+
+7. expanding documentation of API calls
+
+8. added maxBuffering parameter to streamInit
+
+9. removed "restrictions" that are covered by some requires clauses
+
+10. added restriction and note in text -- a given kernel can be
+controlled by only one thread.
+
+11. added example of clearing FIFO state using SVM primitives
+
+biggest changes:
+
+ - clarifications of API calls and predefined kernels
+ - updated to refer to new machine model
+ - additions:
+   - example of clearing FIfO state
+   - timeline of thread/kernel interaction
+   - performance flag for streams (maxBuffering)
+   - a striction:  only one thread can control a given kernel
+
+*********************************************************************************
+
+> EASY-4. Create timeline for thread kernel interoperation to show
+> efficiency of interaction
+
+This will just be a diagram, somewhat like your slide from the San Diego
+Morpwhare meeting, with calls going back and forth between the thread
+and kernel.
+
+*********************************************************************************
+NOT DOING
+
+- the business of access to 'global' variables?
+
+- a grungy open issue: what's the interface for saying with control
+codes run on which processors?  just have output of HLC that
+associates them.
+
+  - maybe a different file for each, with a mapping between them?  or
+    just have a mapping between which function goes to which processor.
+
+- implement reference versions of the predefined kernels
+
+- could make more clear that the reason you would want to map more
+than one stream to a fifo (thereby needing the "only one can retain
+state at once" restriction) is that they could differ in changing EOS,
+elementSize, flags, etc.
+
+*********************************************************************************
+DONE items.
+
+> MED-2. Define clear semantics for:
+>   - FIFO cleanup of any residual data after kernel termination
+>   - When an up stream kernel stalls and a down-stream kernel terminates,
+>    how does the up stream kernel, stream storage, etc. get cleaned up
+
+I think this should all be controlled by the HLC.  For the example
+given, the HLC will see that the downstream kernel can terminate
+randomly, and thus it should keep a count of the number of items that
+kernel has popped.  It also keeps track of how many items the upstream
+kernel has pushed.  When the downstream kernel terminates, it tries to
+terminate the upstream kernel, then uses a Drain kernel to get rid of
+the difference in the number of items.
+
+(That scenario would only be needed if the kernels are communicating
+through a FIFO; a memory stream might be left with random data in it.)
+
+But in all, there is no kind of complex draining or cascaded termination
+built into the LLC.
+
+> MED-6. Clarify control/kernel operation in multiprocessor environment
+>   x Access to data, synchronization,
+>   x Which functions are used by kernel vs. thread control
+>   x Define interaction of multiple master threads and role with
+>     streaming kernels
+
+I think this is a matter of annotating each function with THREAD or
+KERNEL.  There might be some issues in having multiple threads control a
+given kernel simultaneously... will have to think about that.
+
+x say that only a single thread can control a given kernel?
+
+? I have a proplem with A8 (only one stream mapped to a hardware fifo
+may retain state at any given time) as well as the general model for
+FIFO's and streams.  Should it be possible for a sender and receiver
+to use different stream objects?  hmm.
+
+  * why would you ever map more than one stream to a fifo?  wouldn't
+   it be simpler just to say that only one stream can be mapped to
+   a given fifo?
+
+    --> well, I guess if you were changing EOS, elementSize, flags, etc.
+
+  - how would HLC ever enforce the restriction that only one stream on
+    a given FIFO retains state at a given time?
+
+  - why not just say that all streams mapped to a given fifo share the
+    fifo semantics.  actually, why have streams when referring to a
+    fifo?  They are first-in, first-out ... gah, but maybe not on a FIFO.
+
+  - why can't you call streamInitWithDataRAM on a FIFO?  Apparently I
+    don't really understand the Monarch FIFO's.
+
+1. remove IStream/OStream/IOStream aliases.  This should remove the
+confusing writeup about IOStreams; instead we just have the constraint
+that each stream must have exactly one reader and exactly one writer,
+and the same kernel can be the reader and writer.
+
+  -- also remove IBlock/OBlock.  (Why wasn't there an IOBlock?)
+
+  --> gah, this will make documenting some things harder
+
+> 1. Items Bill Will Address
+> **************************
+>
+> EASY-1. Provide precise semantics of multicast push (also multicast push with EOS)
+
+Pushes an item onto the given streams, in any order (or simultaneously.)
+Will not return until an item has been pushed onto all streams.
+
+For example, if s1 is empty and s2 is full, then the following are
+all legal implementations of streamMulticastPush(x, s1, s2):
+
+  - Push x onto s1, wait until s2 is not full, then push x onto s2.
+  - Wait until s2 is not full, push x onto s2, then push x onto s1.
+  - Wait until s2 is not full, push x onto s1, then push x onto s2.
+
+- bad cases:
+
+  - a kernel is paused and then re-initialized when someone was
+    waiting for it to finish.  Does that count as satisfying the
+    dependence, or not?  no, it should go through kernelEnd.
+
+*********************************************************************************
+
+Promised changes due 8/17/03
+
+I can clarify the SVM document and produce a new draft within a few
+days.  However, some of the proposed revisions would need more
+initiative from other architecture teams, and I am comfortable letting
+them be for now.
+
+In what follows, I divided up all the SVM action items from the last
+Morphware meeting.  This represents my current plan for this revision.
+
+I categorized things as follows:
+
+  1. Items I plan to address.
+
+  2. Items that require changes to the metadata (Peter)
+
+  3. Items to discuss with Mike Vahey (and possibly others?).  I believe
+     these changes are not needed, but we need to reach a consensus.
+
+  4. Items I don't understand.
+
+  5. Items to let be for now.
+
+If an architecture team is particularly concerned about something in
+category (4) or (5), perhaps you could take the lead on that item.
+
+Also, I'd be happy to present this revision at the meeting, although I
+expect this should be a quick set of diffs and clarifications from the
+last revision rather than a full review of the SVM.
+
+-Bill
+
+------------------------------------------------------------------------
+
+1. Items Bill Will Address
+**************************
+
+EASY-1. Provide precise semantics of multicast push
+
+EASY-4. Create timeline for thread kernel interoperation to show
+efficiency of interaction
+
+MED-2. Define clear semantics for:
+  - FIFO cleanup of any residual data after kernel termination
+  - When an up stream kernel stalls and a down-stream kernel terminates,
+   how does the up stream kernel, stream storage, etc. get cleaned up
+
+MED-6. Clarify control/kernel operation in multiprocessor environment
+  - Access to data, synchronization,
+  - Which functions are used by kernel vs. thread control
+  - Define interaction of multiple master threads and role with
+    streaming kernels
+
+2. Items for Peter to Address in the Metadata
+*********************************************
+
+EASY-2. Add new meta data item to show required alignment of a data item
+within a memory (for correctness or performance)
+
+EASY-6. Add to meta data the number of kernels that can be run on a
+processor concurrently.
+
+NEW: I propose that we add in the metadata a list of types that a given
+processor supports.  This will fix all of the following items:
+
+  EASY-3. Include data type for signed and unsigned 8 bit data
+
+  MED-1. Define allowable implementation subsets of SVM API
+     - Define specific profiles if appropriate
+
+  MINUTES-1 adding signed 8 bit type.  Make 64-bit types optional.
+     Allow an SVM to implement some subset of the types.
+
+3. Items to Discuss with Mike Vahey (and others)
+************************************************
+
+- Do we need an "unloaded" state?  This covers:
+
+  EASY-5. Clarify kernel states, needs and transitions
+
+  MINUTES-2 adding "unloaded" state for kernels; effect how long kernel
+     values persist, useful in multiprocessor synchronization.
+
+MED-7. Clarify links / connections role in the SVM API.
+
+4. Items I don't understand
+***************************
+
+MED-3. SVM execution on a sequential processor
+
+MED-5. Define means of representing I/O functions in SVM and metadata
+
+5. Items to let be for now
+**************************
+
+MED-4. Provide means for timely notification to thread control of
+special event in stream kernel (e.g., exception or interrupt method)
+
+MED-8. Performance feedback
+ - HLC passes expected performance numbers as comments to LLC
+  (for development purposes)
+ - LLC may want to create data collection metric
+
+MED-9. Extend and refine concept of operations
+
+HARD-1. Real time or latency aspects of stream processing
+  - Define requirements
+  - Assess impact on SVM API and necessary changes
+
+HARD-2. Fault tolerance or morph controls for dynamic reassignment of
+kernels/communications to underlying resources
+  - Assess when logical resources should be bound to physical resources
+  - Determine how compile time constraints impact code relocation
+
+HARD-3. Determine type and use of cost functions for each SVM function
+
+> Bill,
+>
+> One of the action items out of the last Forum meeting was for the
+> architecture groups + Reservoir to update the SVM spec with the various
+> comments and clarifications from the last meeting.  We hoped to have an
+> update to re-post to the Forum by about now; and then to go over the
+> changes in Santa Fe.  Will there be an update available to post soon
+> (hopefully, very soon)?  And how about you leading the discussion of it at
+> the Forum this time?
+>
+> -- Mark R
+>
+>
+> _______________________________________________________________________
+> Dr. Mark A. Richards                                Voice: 404-894-2714
+> Principal Research Engineer & Adjunct Professor       FAX: 404-894-0560
+> School of Electrical & Computer Engineering
+> Georgia Institute of Technology
+> 777 Atlantic Drive                 e-mail: mark.richards@ece.gatech.edu
+> Atlanta, GA 30332-0250         web: http://www.ece.gatech.edu/~mrichard
+>
+
+*********************************************************************************
+
 Call with Peter on 4/23/03
 --------------------------
 

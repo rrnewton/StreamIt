@@ -2,6 +2,7 @@
 
 \usepackage{epsfig}
 \usepackage{amsmath}
+\usepackage{bold-extra}
 \usepackage{fullpage}
 
 \begin{document}
@@ -10,10 +11,10 @@
     \begin{center}
       {\LARGE
 	~ \\ ~ \\ ~ \\ ~ \\ ~ \\ ~ \\ ~ \\ ~ \\
-	{\bf PCA Morphware Virtual Machine Plan \\ ~ \\}
+	{\bf PCA Morphware Virtual Machine Specification \\ ~ \\}
       }
       {\Large
-	June 16, 2003 \\ ~ \\
+	August 28, 2003 \\ ~ \\
       }
       {\large
 	Georgia Institute of Technology \\
@@ -28,6 +29,67 @@
   \newcommand{\todo}[1]{\framebox{\bf #1}}
   \newcommand{\sss}[1]{\medskip \noindent {\bf #1} \smallskip}
   \newcommand{\ssss}[1]{\medskip \noindent {\bf #1:}}
+  \newcommand{\makeline}[0]{\rule{0cm}{0cm}\\\hrule\rule{0cm}{0cm}}
+
+  % for a ``long parameter'' that needs to wrap around
+  \newcommand{\lp}[2]{\raisebox{-6pt}{\parbox{#1}{#2 \vspace{2pt}}}}
+  \newcommand{\lpp}[2]{\raisebox{-13pt}{\parbox{#1}{#2 \vspace{2pt}}}}
+
+  % for method API:  name
+  \newcommand{\name}[1]{
+
+    \medskip \noindent {\bf #1}
+  }
+
+  % for method API:  declaration
+  \newcommand{\decl}[1]{
+
+    \medskip \noindent {\tt #1} \medskip
+  }
+
+  % for method API:  spec
+  \newcommand{\spec}[1]{
+
+    \noindent\hspace{0.2in}\begin{minipage}{6.3in}
+      #1
+    \end{minipage}
+  }
+
+  % generic field for a method
+  \newcommand{\field}[3]{
+    
+    \noindent\hspace{0.2in}\begin{minipage}{6.3in}
+
+      \medskip \noindent {\bf #1:} \vspace{#3}
+      
+      \noindent \hspace{0.2in}\begin{minipage}{6.1in}
+	#2
+      \end{minipage}
+    \end{minipage}
+  }
+
+  % short field for a method (stays on one line)
+  \newcommand{\shortfield}[2]{
+    
+    \noindent\hspace{0.2in}\begin{minipage}{6.3in}
+
+      \medskip \noindent {\bf #1:} #2
+
+    \end{minipage}
+  }
+
+  % fields to document methods with
+  \newcommand{\param}[1]{\field{Parameters}{#1}{4pt}}
+  \newcommand{\req}[1]{\field{Requires}{#1}{2pt}}
+  \newcommand{\ret}[1]{\field{Returns}{#1}{0pt}}
+  \newcommand{\call}[1]{\shortfield{Called by}{#1}}
+
+  % called by kernels
+  \newcommand{\callk}{\call{Kernels.\\}}
+  % called by controls
+  \newcommand{\callc}{\call{Controls.\\}}
+  % called by kernels and controls
+  \newcommand{\callkc}{\call{Kernels, Controls.\\}}
 
   \tableofcontents
 
