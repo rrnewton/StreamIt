@@ -12,8 +12,8 @@ float->float splitjoin BPFCore
     (float rate, float low, 
      float high, int taps) {
   split duplicate;
-  add LowPassFilter(rate, low, taps, 0);
-  add LowPassFilter(rate, high, taps, 0);
+  add LowPass(rate, low, taps, 0);
+  add LowPass(rate, high, taps, 0);
   join roundrobin;
 }
 float->float filter Subtracter {
