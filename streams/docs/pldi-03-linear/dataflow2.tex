@@ -1,106 +1,78 @@
-\newcommand{\maptype}{var$\rightarrow$linform~}
 \newcommand{\la}{$\leftarrow$}
 \newcommand{\IND}{\begin{ALC@g}}
 \newcommand{\UND}{\end{ALC@g}}
+\newcommand{\tup}[2]{\langle{#1}, {#2}\rangle}
 
 \begin{algorithm}
-{\bf Globals:} int Push, Pop, Peek \\ ~ \\
-%
 {\bf Data Types}
-\begin{algorithmic}
-\STATE $x \in \mbox{variable}$
-\STATE $(v, c) \in \mbox{linform}$
-\STATE $map \in $ \maptype
-\STATE $y \in \mbox{val}$
-\STATE $c \in \mbox{inst, which can be any of the following cases:}$
-\IND
-\STATE ({\tt loop} $N$ $\mt{code}$)
-\STATE ({\tt branch} $\mt{code}_1$ $\mt{code}_2$)
-\STATE $x_1 := x_2~\mt{op}~x_3$
-\STATE $x_1 := \mt{const}$
-\STATE $x_1 := \mbox{\tt peek}(i)$
-\STATE $x_1 := \mbox{\tt pop}()$
-\STATE {\tt push}$(x_1)$
-\UND
-\end{algorithmic}
-%\end{algorithm}
+\begin{equation} \nonumber
+\begin{array}{rcl}
+x & \in & \mbox{program-variable} \\
+c & \in & \mbox{constant}_{\bot} \\
+\vec v, \vec b & \in & \mbox{vector} \\
+A & \in & \mbox{matrix} \\
+\tup{\vec v}{c} & \in & \mbox{linear-form} \\
+map & \in & \mbox{program-variable} \rightarrow \mbox{linear-form  (a hashtable)} \\
+code & \in & \mbox{list of instructions, each of which can be:} \\
+~ & ~ & ~~~ (\mbox{{\tt loop}} ~N~ \mt{code}) \\
+~ & ~ & ~~~ (\mbox{{\tt branch}} ~\mt{code}_1~ \mt{code}_2) \\
+~ & ~ & ~~~ x_1 := x_2~\mt{op}~x_3 \\
+~ & ~ & ~~~ x_1 := \mt{const} \\
+~ & ~ & ~~~ x_1 := \mbox{\tt peek}(i) \\
+~ & ~ & ~~~ x_1 := \mbox{\tt pop}() \\
+~ & ~ & ~~~ \mbox{{\tt push}}(x_1)
+\end{array} 
+\end{equation}
+{\bf Confluence Operator} \\ 
+%
+We utilize the confluence operator $\sqcap$ over scalar constants,
+vectors, matrices, linear forms, and maps.  $c_1 \sqcap c_2$ is
+defined according to the lifted lattice constant$_{\bot}$.  That is,
+$c_1 \sqcap c_2 = c_1$ if and only if $c_1 = c_2$; otherwise, $c_1
+\sqcap c_2 = \bot$.  For vectors, matrices, and linear forms, $\sqcap$
+is defined element-wise; for example, $A' = A_1 \sqcap A_2$ is
+equivalent to $A'[i,j] = A_1[i,j] \sqcap A_2[i,j]$.  For maps, the
+meet is taken on the values: $\mt{map}_1 \sqcap \mt{map}_2$ $=$
+$\mt{map'}$, where $\mt{map'}.\mt{get}(x) = \mt{map}_1.\mt{get}(x)
+\sqcap \mt{map}_2.\mt{get}(x)$.
+%\end{algorithm} 
+~ \\ ~ \\
+{\bf Global Variables:} int Push, Pop, Peek \\
 \begin{tabular}{l}
 ~\hspace{3in}~ \\
 \hline \\
-~\hspace{3in}~ 
 \end{tabular}
 %\begin{algorithm}
-proc {\bf toplevel}(filter $F$) returns linear node
+proc {\bf Toplevel}(filter $F$) returns linear node for $F$
 \begin{enumerate}
 \item Set Peek, Pop, Push equal to I/O rates of filter $F$.
-\item Let $A_{0} \leftarrow \mbox{new float[Peek][Push] with each entry =} \bot$
-\item Let $b_{0} \leftarrow \mbox{new float[Push] with each entry =} \bot$
-\item $(\mt{popcount}, \mt{pushcount}, \mt{map}, A, b) \leftarrow$ \\
-{\bf extract}$(F_{work}, \mt{empty-map}, 0, \mbox{Push}, A_{0}, b_{0})$
-\item
-\begin{algorithmic}
-\IF {$A$ and $b$ contain no $\bot$ entries}
-\STATE return linear node $\lambda = \{A, b, \mbox{Peek}, \mbox{Pop}, \mbox{Push}\}$
-\ELSE
-\STATE {\it fail}
-\ENDIF
-\end{algorithmic}
+\item Let $A_{0} \leftarrow \mbox{new float[Peek][Push] with each entry =~} \bot$
+\item Let ${\vec b_{0}} \leftarrow \mbox{new float[Push] with each entry =~} \bot$
+\item $(\mt{map}, A, {\vec b}, \mt{popcount}, \mt{pushcount}) \leftarrow$ \\
+\verb+      +{\bf Extract}$(F_{work}, (\lambda x . \bot), A_{0}, {\vec b_{0}}, 0, \mbox{Push})$
+\item {\bf if} $A$ and ${\vec b}$ contain no $\bot$ entries {\bf then} \\
+\verb+ + return linear node $\lambda = \{A, {\vec b}, \mbox{Peek}, \mbox{Pop}, \mbox{Push}\}$ \\
+ {\bf else} \\
+\verb+ + {\it fail} \\
+ {\bf endif}
 \end{enumerate}
 %\end{algorithm}
 \begin{tabular}{l}
 ~\hspace{3in}~ \\
 \hline \\
-~\hspace{3in}~ 
 \end{tabular}
 %\begin{algorithm}
-proc {\bf intersect}(val $y_1$, val $y_2$) returns val
+proc {\bf BuildCoeff}(int $pos$) returns $\vec v$ for peek at index $pos$ \\ \vspace{-12pt}
 \begin{algorithmic}
-\IF {$y_1 = y_2$}
-\STATE return $y_1$
-\ELSE
-\STATE return $\bot$
-\ENDIF
-\end{algorithmic}
-%\end{algorithm}
-\begin{tabular}{l}
-~\hspace{3in}~ \\
-\hline \\
-~\hspace{3in}~ 
-\end{tabular}
-%\begin{algorithm}
-proc {\bf mergeMap}(\maptype $m_1$, \maptype $m_2$) returns \maptype
-\begin{algorithmic}
-\STATE \maptype $\mt{result}$
-\FORALL {$x \in m_1.\mt{keys}$}
-\STATE $\mt{result}$.put({\bf intersect}($m_1$.get($x$), $m_2$.get($x$)))
-\ENDFOR
-\STATE return $\mt{result}$
-\end{algorithmic}
-%\end{algorithm}
-\begin{tabular}{l}
-~\hspace{3in}~ \\
-\hline \\
-~\hspace{3in}~ 
-\end{tabular}
-%\begin{algorithm}
-proc {\bf buildCoeff}(int pos) returns int[Peek]
-\begin{algorithmic}
-\STATE int[Peek] $\mt{result}$
-\FOR {$i \leftarrow 0$ to Peek$-1$}
-\IF {i=pos}
-\STATE $\mt{result}$[i] \la 1
-\ELSE
-\STATE $\mt{result}$[i] \la 0
-\ENDIF
-\ENDFOR
-\STATE return $\mt{result}$
+\STATE $\vec v = \vec 0_{Peek}$
+\STATE $\vec v[\mbox{Peek}-i] = 1$
+\STATE return $\vec v$
 \end{algorithmic}
 \end{algorithm}
 
 \begin{algorithm}
-proc {\bf extract}(inst[] $code$, \maptype $map$, int $\mt{popcount}$, int $\mt{pushcount}$, 
-float[Push][Peek] $A$, float[Push] $b$) 
-returns ($\mt{popcount'}$, $\mt{pushcount'}$, $\mt{map'}$, $A'$, $b'$)
+proc {\bf Extract}($code$, $map$, $A$, $\vec b$, int $\mt{popcount}$, int $\mt{pushcount}$) \\
+\verb+   + returns udpated $\mt{map}$, $A$, ${\vec b}$, $\mt{popcount}$, and $\mt{pushcount}$ \\ \vspace{-12pt}
 \begin{algorithmic}
 \FOR {$i \leftarrow 1$ to $\mt{code}$.length}
 \STATE {\bf switch} $\mt{code}$[i]
@@ -109,23 +81,24 @@ returns ($\mt{popcount'}$, $\mt{pushcount'}$, $\mt{map'}$, $A'$, $b'$)
 \IND
 \STATE \bf{for} $j \leftarrow 1$ to $N$ {\bf do}
 \IND
-\STATE $(\mt{popcount}, \mt{pushcount}, \mt{map}, A, b)~\leftarrow~$ \bf{extract}$(\mt{code}, \mt{map}, \mt{popcount}, \mt{pushcount}, A, b)$
+\STATE $(\mt{map}, A, {\vec b}, \mt{popcount}, \mt{pushcount})~\leftarrow~$ \\
+\verb+   +\bf{Extract}$(\mt{code}, \mt{map}, A, {\vec b}, \mt{popcount}, \mt{pushcount})$
 \UND
 \UND
 \STATE \vspace{-6pt}
 \STATE $\mbox{\bf case}~ x_1 := x_2 + x_3$ or $x_1 := x_2 - x_3$
 \IND
-\STATE $(v_2, c_2) \leftarrow \mt{map}.\mt{get}(x_2)$
-\STATE $(v_3, c_3) \leftarrow \mt{map}.\mt{get}(x_3)$
-\STATE $\mt{map}.\mt{put}(x_1, (v_2+v_3, c_2+c_3))$
+\STATE $\tup{\vec v_2}{c_2} \leftarrow \mt{map}.\mt{get}(x_2)$
+\STATE $\tup{\vec v_3}{c_3} \leftarrow \mt{map}.\mt{get}(x_3)$
+\STATE $\mt{map}.\mt{put}(x_1, \tup{\vec v_2+\vec v_3}{c_2+c_3})$
 \UND
 \STATE \vspace{-6pt}
 \STATE $\mbox{\bf case}~x_1 := x_2 / x_3$
 \IND
-\STATE $(v_2, c_2) \leftarrow \mt{map}.\mt{get}(x_2)$
-\STATE $(v_3, c_3) \leftarrow \mt{map}.\mt{get}(x_3)$
-\IF {$v_3 = \vec 0_{Peek} \wedge x_3 \ne 0$}
-\STATE $\mt{map}.\mt{put}(x_1, (\frac{1}{c_3}*v_2, c_2/c_3))$
+\STATE $\tup{\vec v_2}{c_2} \leftarrow \mt{map}.\mt{get}(x_2)$
+\STATE $\tup{\vec v_3}{c_3} \leftarrow \mt{map}.\mt{get}(x_3)$
+\IF {$\vec v_3 = \vec 0_{Peek} \wedge x_3 \ne 0$}
+\STATE $\mt{map}.\mt{put}(x_1, (\frac{1}{c_3}*\vec v_2, c_2/c_3))$
 \ELSE
 \STATE $\mt{map}.\mt{put}(x_1, \bot)$
 \ENDIF
@@ -133,12 +106,12 @@ returns ($\mt{popcount'}$, $\mt{pushcount'}$, $\mt{map'}$, $A'$, $b'$)
 \STATE \vspace{-6pt}
 \STATE $\mbox{\bf case}~x_1 := x_2 * x_3$
 \IND
-\STATE $(v_2, c_2) \leftarrow \mt{map}.\mt{get}(x_2)$
-\STATE $(v_3, c_3) \leftarrow \mt{map}.\mt{get}(x_3)$
-\IF {$v_2 = \vec 0_{Peek}$}
-\STATE $\mt{map}.\mt{put}(x_1, (c_2*v_3, c_2*c_3))$
-\ELSIF {$v3=\vec 0_{Peek}$}
-\STATE $\mt{map}.\mt{put}(x_1, (c_3*v_2, c_3*c_2))$
+\STATE $\tup{\vec v_2}{c_2} \leftarrow \mt{map}.\mt{get}(x_2)$
+\STATE $\tup{\vec v_3}{c_3} \leftarrow \mt{map}.\mt{get}(x_3)$
+\IF {$\vec v_2 = \vec 0_{Peek}$}
+\STATE $\mt{map}.\mt{put}(x_1, (c_2*\vec v_3, c_2*c_3))$
+\ELSIF {$\vec v_3=\vec 0_{Peek}$}
+\STATE $\mt{map}.\mt{put}(x_1, (c_3*\vec v_2, c_3*c_2))$
 \ELSE
 \STATE $\mt{map}.\mt{put}(x_1, \bot)$
 \ENDIF
@@ -146,9 +119,9 @@ returns ($\mt{popcount'}$, $\mt{pushcount'}$, $\mt{map'}$, $A'$, $b'$)
 \STATE \vspace{-6pt}
 \STATE $\mbox{\bf case}~x_1 := x_2 ~\mt{bitop}~ x_3$, for $\mt{bitop} \in \{\&, |, \wedge\}$
 \IND
-\STATE $(v_2, c_2) \leftarrow \mt{map}.\mt{get}(x_2)$
-\STATE $(v_3, c_3) \leftarrow \mt{map}.\mt{get}(x_3)$
-\STATE $\mt{map}.\mt{put}(x_1, (\mbox{\bf intersect}(\vec 0_{Peek}, v_2, v_3), c_2 ~\mt{bitop}~ c_3))$
+\STATE $\tup{\vec v_2}{c_2} \leftarrow \mt{map}.\mt{get}(x_2)$
+\STATE $\tup{\vec v_3}{c_3} \leftarrow \mt{map}.\mt{get}(x_3)$
+\STATE $\mt{map}.\mt{put}(x_1, (\vec 0_{Peek} \sqcap \vec v_2 \sqcap \vec v_3, c_2 ~\mt{bitop}~ c_3))$
 \UND
 \STATE \vspace{-6pt}
 \STATE $\mbox{\bf case}~x1 := \mt{const}$
@@ -158,36 +131,38 @@ returns ($\mt{popcount'}$, $\mt{pushcount'}$, $\mt{map'}$, $A'$, $b'$)
 \STATE \vspace{-6pt}
 \STATE $\mbox{\bf case}~x_1 := \mbox{\tt peek}(i)$
 \IND
-\STATE $\mt{map}.\mt{put}(x_1, (\mbox{\bf buildCoeff}(i+\mt{popCount}), 0))$
+\STATE $\mt{map}.\mt{put}(x_1, (\mbox{\bf BuildCoeff}(i + \mt{popcount}), 0))$
 \UND
-\STATE
+\STATE \vspace{-6pt}
 \STATE $\mbox{\bf case}~x_1 := \mbox{\tt pop}()$
 \IND
-\STATE $\mt{map}.\mt{put}(x_1, (\mbox{\bf buildCoeff}(\mt{popcount}), 0))$
-\STATE $\mt{popcount}++$
+\STATE $\mt{map}.\mt{put}(x_1, (\mbox{\bf BuildCoeff}(\mt{popcount}), 0))$
+\STATE $\mt{popcount}$\verb|++|
 \UND
 \STATE \vspace{-6pt}
 \STATE $\mbox{\bf case}~\mbox{\tt push}(x_1)$
 \IND
-\STATE $(v, c) \leftarrow \mt{map}.\mt{get}(x_1)$
-\STATE $A[*, \mt{pushcount}] \leftarrow v$
+\STATE $\tup{\vec v}{c} \leftarrow \mt{map}.\mt{get}(x_1)$
+\STATE $A[*, \mt{pushcount}] \leftarrow \vec v$
 \STATE $b[\mt{pushcount}] \leftarrow c$
-\STATE $\mt{pushcount}--$
+\STATE $\mt{pushcount}$\verb|--|
 \UND
 \STATE \vspace{-6pt}
 \STATE \mbox{\bf case}~({\tt branch} $code_1~code_2)$
 \IND
-\STATE $(\mt{popcount}_1, \mt{pushcount}_1, \mt{map}_1, A_1, b_1) \leftarrow {\mbox{\bf extract}}(\mt{code}_1, \mt{map}, \mt{popcount}, \mt{pushcount}, A, b)$
-\STATE $(\mt{popcount}_2, \mt{pushcount}_2, \mt{map}_2, A_2, b_2) \leftarrow {\mbox{\bf extract}}(\mt{code}_2, \mt{map}, \mt{popcount}, \mt{pushcount}, A, b)$
-\STATE $\mt{popcount} \leftarrow {\mbox{\bf intersect}}(\mt{popcount}_1, \mt{popcount}_2)$
-\STATE $\mt{pushcount} \leftarrow {\mbox{\bf intersect}}(\mt{pushcount}_1, \mt{pushcount}_2)$
-\STATE $A \leftarrow \mbox{\bf intersect}( A_1, A_2 )$
-\STATE $b \leftarrow \mbox{\bf intersect}( b_1, b_2 )$
-\STATE $\mt{map} \leftarrow {\bf mergeMap}(\mt{map}_1, \mt{map}_2)$
+\STATE $(\mt{map}_1, A_1, {\vec b_1}, \mt{popcount}_1, \mt{pushcount}_1) \leftarrow$ \\
+\verb+   +${\mbox{\bf Extract}}(\mt{code}_1, \mt{map}, A, {\vec b}, \mt{popcount}, \mt{pushcount})$
+\STATE $(\mt{map}_2, A_2, {\vec b_2}, \mt{popcount}_2, \mt{pushcount}_2) \leftarrow$ \\ 
+\verb+   +${\mbox{\bf Extract}}(\mt{code}_2, \mt{map}, A, {\vec b}, \mt{popcount}, \mt{pushcount})$
+\STATE $\mt{popcount} \leftarrow \mt{popcount}_1 \sqcap \mt{popcount}_2$
+\STATE $\mt{pushcount} \leftarrow \mt{pushcount}_1 \sqcap \mt{pushcount}_2$
+\STATE $A \leftarrow A_1 \sqcap A_2$
+\STATE $b \leftarrow b_1 \sqcap b_2$
+\STATE $\mt{map} \leftarrow \mt{map}_1 \sqcap \mt{map}_2$
 \UND
 \UND %end case
 \ENDFOR
-\STATE return ($\mt{popcount}$, $\mt{pushcount}$, $\mt{map}$, $A$, $b$)
+\STATE return ($\mt{popcount}$, $\mt{pushcount}$, $\mt{map}$, $A$, ${\vec b}$)
 \end{algorithmic}
 \end{algorithm}
 
