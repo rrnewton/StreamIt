@@ -251,7 +251,9 @@ until a future paper.
 \item A given instance of a stream or filter must not appear more than
 once in the stream graph.
 
-\item A message handler 
+\item A message handler cannot push, pop, or peek items from the input
+and output channels of a filter.  However, a message handler can send
+another message.
 
 \item There must be no deadlock or buffer overflow in the program.  We
 have developed a simple algorithm to verify that feedback loops and

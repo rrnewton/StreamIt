@@ -443,7 +443,7 @@ low-volume control information between filters and streams.  Messages
 are sent from within the body of a filter's {\tt work} function,
 perhaps to change a parameter in another filter.  For example, in the
 {\tt CheckFreqHop} stream of our software radio example (Figure
-\ref{fig:mess}), a message is sent upstream to change the frequency of
+\ref{fig:portal-code}), a message is sent upstream to change the frequency of
 the receiver if the downstream component detects that the transmitter
 is about to change frequencies.  The sender can continue to execute
 while the message is en route, and the {\tt set\_freq} method will be

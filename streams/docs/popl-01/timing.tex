@@ -283,9 +283,10 @@ tapes $(a, b)$ where there is some directed path through the stream
 graph--that is, along the direction of data flow--from the filter
 reading from tape $a$ to the filter writing to tape $b$.  
 
-Ommitted from the above analysis are weighted round robin nodes and
-filters that push or pop items from within their {\tt init} functions.
-We hope to address these cases in a future document.
+Ommitted from the above analysis are: 1) weighted round robin nodes,
+2) filters that push or pop items from within their {\tt init}
+functions, and 3) message handlers that send messages themselves.  We
+hope to address these issues in a future document.
 
 \subsection{Semantics}
 

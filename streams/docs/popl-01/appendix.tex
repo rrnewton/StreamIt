@@ -14,7 +14,7 @@ class Butterfly extends Stream {
                float weights[] = new float[W];
                int curr;
                void init() {
-                  for(int i=0; i<W; i++)
+                  for (int i=0; i<W; i++)
                      weights[i] = calcWeight(i, N, W);
                   curr = 0;
                }
@@ -52,7 +52,7 @@ class FFT extends Stream {
       add(new SplitJoin() {
          void init() {
             setSplitter(WEIGHTED_ROUND_ROBIN(N/2, N/2));
-            for(int i=0; i<2; i++) 
+            for (int i=0; i<2; i++) 
                add(new SplitJoin() {
                   void init() {
                      setSplitter(ROUND_ROBIN);
@@ -62,7 +62,7 @@ class FFT extends Stream {
                }});
             setJoiner(ROUND_ROBIN);
       }});
-      for(int i=2; i<N; i*=2)
+      for (int i=2; i<N; i*=2)
         add(new Butterfly(i, N));
 }}
 
@@ -114,7 +114,7 @@ class RFtoIF extends Filter {
       count = 0;
       size = CARRIER_FREQ/f*N;
       weight = new float[size];
-      for(int i=0; i<size; i++)
+      for (int i=0; i<size; i++)
          weight[i] = sine(i*PI/size);
    }
 }
