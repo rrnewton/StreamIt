@@ -226,9 +226,9 @@ class TrunkedRadio extends Stream {
       add(new ReadFromAtoD());
       add(new RFtoIF(Freq[0], freq_hop));
 
-      Stream ISS = new IncreaseSignalStrength();
+      Stream ISS = new IncreaseSignalStrength(false);
       add(ISS);
-      onoff.register(ISS.init());
+      onoff.register(ISS);
  
       add(new FFT());
       add(new CheckFreqHop(freq_hop));
