@@ -273,10 +273,14 @@ Yet another way to approximate the behavior of messaging is with a
 direct function call from the detector to the RFtoIF stage.  (Though
 such a call is disallowed in StreamIt, it could be an option in a
 different programming model.)  While this approach is simple, it does
-not have any timing guarantees.  There is no way for the sender to
-know when in the course of the target's execution the message will be
-received.  This could cause problems both for algorithm development
-and for reliability / predictability of software.
+not have any timing 
+
+\input{code-examples}
+
+\noindent guarantees.  There is no way for the sender to know when in
+the course of the target's execution the message will be received.
+This could cause problems both for algorithm development and for
+reliability / predictability of software.
 
 \vspace{12pt}
 \subsection{Discussion}
@@ -302,8 +306,6 @@ infer the true dependences between filter firings and reorder the
 execution so long as the message constraints are respected.  The
 actual message delivery can be implemented in the most efficient way
 for the given architecture.
-
-\input{code-examples}
 
 A final benefit of teleport messaging is the clean interface provided
 by the portals.  Since a portal can have multiple receivers, it is
