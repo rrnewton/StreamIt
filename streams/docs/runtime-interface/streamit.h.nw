@@ -379,10 +379,11 @@ void connect_tapes(stream_context *c);
 @
 
 The [[streamit_run]] function is called with the context of the
-top-level object.  It runs the system continuously.
+top-level object and the command-line parameters from main().  It runs
+the system continuously.
 
 <<Run Function>>=
-void streamit_run(stream_context *c);
+void streamit_run(stream_context *c, int argc, char **argv);
 @
 
 \section{Internal Library Types}
