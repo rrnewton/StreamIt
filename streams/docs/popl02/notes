@@ -1,27 +1,11 @@
-OUTLINE
--------
-
-- Related Work
- . check out this buffer minimization 
-  . http://epubs.siam.org/sam-bin/dbq/article/29035
- . uniformization of SARE's:
-  . http://www.irisa.fr/bibli/publi/pi/2000/1350/1350.html
-
-****************************************************************************
-
-TODO
-----
-
 Low Priority
 ------------
 
-- I don't like the $m_n$, etc. notation.  Can we just leave them
+x I don't like the $m_n$, etc. notation.  Can we just leave them
 unbounded?  Or make the nodes something other than "n"'s so that these
 can be "n"'s.
 
-- Make ibuf/sbuf into buf_i, buf_s
-
-- Would it be clearer if push/pop/peek were an aspect of a node?  I think maybe.
+x Would it be clearer if push/pop/peek were an aspect of a node?  I think maybe.
 
 ****************************************************************************
 

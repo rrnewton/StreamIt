@@ -1,0 +1,68 @@
+\begin{figure}[t]
+\framebox[6.5in]{
+\begin{minipage}{6.3in}
+\begin{center}
+{\bf Variables}
+\end{center}
+\noindent For each channel $c = (n_a, n_b)$, do the following:
+\begin{itemize}
+%
+\item Introduce variable $\mt{BUF}_c$ with the following domain:
+\begin{align}
+{\cal D}_{{BUF}_c} = \{ ~(i,j)~|~0 \le i \le N - 1 ~\wedge~ 0 \le j \le \mt{Period}(c) - 1\}
+\end{align}
+%
+\item Introduce variable $\mt{WRITE}_{c}$ with this domain:
+\begin{align}
+{\cal D}_{{WRITE}_{c}} = \{~(i,j,k)~|~0 \le i \le N-1 ~\wedge~ 
+                                       0 \le j \le S(n_a) - 1 ~\wedge~ 0 \le k \le U(c) - 1\}
+\end{align}
+%
+\item Introduce variable $\mt{READ}_{c, p}$ with this domain:
+\begin{align}
+{\cal D}_{{READ}_{c}} = \{~(i,j,k)~|~0 \le i \le N-1 ~\wedge~ 
+                                      0 \le j \le S(n_b) - 1 ~\wedge~ 
+                                      0 \le k \le E(c) - 1\}
+\end{align}
+\end{itemize}
+%
+\begin{center}
+{\bf Equations}
+\end{center}
+\noindent For each node $n$, do the following:
+\begin{itemize}
+%
+\item For each $c \in \mt{chan\_out}(n)$, introduce this equation
+(READ to WRITE):
+%
+\begin{align}
+\forall (i, j, k) \in {\cal D}_{{WRITE}_{c}},~\mt{WRITE}_{c}(i,j,k) = W(n)(\mt{Steady\_Inputs})[\mt{pos\_out}(n, c)][j] \\ \nonumber
+\mt{where Steady\_Inputs} = [\mt{READ}_{{chan\_in}(n)[1]}(i, j, *), \dots, 
+                             \mt{READ}_{{chan\_in}(n)[\mt{num\_in}(n)]}(i, j, *) ]
+\end{align}
+%
+\item For each $c \in \mt{chan\_out}(n)$, and for each $q \in
+[0,\frac{\mt{Period(c)}}{\mt{U(n)}}-\mt{1}]$,
+introduce this equation (WRITE to BUF):
+\begin{align}
+\forall (i,j) \in {\cal D}_{SW {\small \rightarrow} SB}(c,q), \\ \nonumber
+\mt{BUF}_{c}(i,j) = 
+  \mt{WRITE}_{c}(i * \frac{\mt{Period}(c)}{O(c)} + \lfloor \frac{q}{S(n)} \rfloor, q~mod~S(n),
+                     j - q * U(c) \\ \nonumber
+\mt{where } {\cal D}_{SW {\small \rightarrow} SB}(c,q) = 
+  {\cal D}_{{BUF}_{c}} \cap 
+  \{ (i,j) | q*U(c) \le j \le (q+1)*U(c) - 1 \}
+\end{align}
+% here is the simple, base case of the BUF -> READ function
+\item For each $c \in \mt{chan\_in}(n)$, introduce this equation (BUF to
+READ):
+\begin{align}
+\forall (i,j,k) \in {\cal D}_{{READ}_{c}},
+\mt{READ}_{c}(i,j,k) = j*O(n) + k
+\end{align}
+\end{itemize}
+
+\end{minipage}}
+\caption{Basic Procedure for generating a SARE from an SDF graph with no initial tokens.
+\protect\label{fig:sdftosare}}
+\end{figure}
