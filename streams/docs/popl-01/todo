@@ -21,6 +21,9 @@ to the output or input?
 messaging.  If they're parallel pieces of split/join, do you
 synchronize from above or below?  I think theres's a difference.
 
+9. problem: it's legal to run nothing but a source.  oh, unless
+there's latency.
+
 ------------------------------------------------------------------------
 Little things to think about
 
@@ -57,3 +60,6 @@ split/join and stuff entering the split/join is together?  then the
 similar equaionts are placed next to each other.
 
 10. improve writing of feedbackloop section.
+
+11. talk to saman about changing example FIR so that it
+pushes(peek(i)); pop(); instead of pushing the dummy values.

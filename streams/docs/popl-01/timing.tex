@@ -63,9 +63,14 @@ of items that must appear on tape $a$ is $\mi{a}{b}(x)$.
 Note that these functions are only defined over pairs of tapes $(a,
 b)$ where $a$ is ``upstream'' of $b$--that is, where there is a
 directed path in the stream graph from the filter following $a$ to the
-filter preceding $b$.  We now turn to deriving expressions for
-$\ma{a}{b}$ and $\mi{a}{b}$ as a step towards formalizing the
-semantics of messaging, latency, and re-initialization.
+filter preceding $b$.
+
+The $max$ and $min$ functions are related to the information wavefront
+in the following sense.  If there are $x$ items on tape $a$
+
+We now turn to deriving expressions for $\ma{a}{b}$ and $\mi{a}{b}$ as
+a step towards formalizing the semantics of messaging, latency, and
+re-initialization.
 
 \subsubsection{Filters}
 
@@ -117,10 +122,11 @@ By identical reasoning, these composition laws hold for pipelined
 streams as well as filters.  That is, for any tapes $x$, $y$, and $z$
 such that $\ma{x}{y}$, $\ma{y}{z}$, $\mi{x}{y}$, and $\mi{y}{z}$ are
 well-defined, we have:
-\begin{eqnarray*}
+\begin{eqnarray}
+\label{eq:compose}
 \ma{x}{z} = \ma{y}{z} \circ \ma{x}{y} \\
 \mi{x}{z} = \mi{x}{y} \circ \mi{y}{z}
-\end{eqnarray*}
+\end{eqnarray}
 
 \subsubsection{SplitJoins}
 \begin{figure}[t]
@@ -236,7 +242,9 @@ Recall that if the feedback loop specifies a wavefront latency of $n$,
 then $n$ initial values are provided to the feedback joiner before
 values from the feedback loop are read.  Assume that the round robin
 feedback joiner first draws from the data stream $I1_J$, and then from
-the feedback loop $I2_J$.  The $min$ function for the main stream is
+the feedback loop $I2_J$.  
+
+The $min$ function for the main stream is
 as before:
 \begin{eqnarray*}
 \mi{I1_J}{O_J}(x) = ceil(x/2) \\
@@ -251,16 +259,34 @@ The $max$ function must be similarly shifted for the input from the loop:
 \ma{(I1_J, I2_J)}{O_J}(x_1, x_2) = max(2*x_1-1, 2*(x_2+n))
 \end{eqnarray*}
 
+\subsubsection{Summary}
+
+We have derived expressions for $\ma{a}{b}$ and $\mi{a}{b}$ for when
+$a$ and $b$ are the respective input and output to 1) a filter, 2) a
+pipeline, 3) a split or join, and 4) a feedback split or join.  By
+composing these expressions following Equation~\ref{eq:compose}, we
+can arrive at values of $\ma{a}{b}$ and $\mi{a}{b}$ for all pairs of
+tapes $(a, b)$ where there is some directed path through the stream
+graph--that is, along the direction of data flow--from the filter
+reading from tape $a$ to the filter writing to tape $b$.
+
 \subsection{Semantics}
 
-Equipped with definitions of $min$ and $max$ for tapes that are
-connected by some series of downstream or
+Equipped with definitions of $\ma{a}{b}$ and $\mi{a}{b}$, we can now
+address the semantics of StreaMIT's message delivery timing and
+latency guarantees. 
 
 \subsubsection{Messages}
+
+
 
 \subsubsection{Latency}
 
 \subsection{Scheduling Constraints}
+
+program checking 
+	- going around feedback loop gives same coefficient of x
+	- going through both paths of split-join gives same coeff. of x
 
 \begin{verbatim}
 
