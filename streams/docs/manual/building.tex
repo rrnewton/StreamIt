@@ -7,7 +7,7 @@ going to the {\tt streams/compiler} directory and typing
 parsers and fully compile the compiler.
 The compiler (mostly) resides in {\tt streams/compiler},
 but there are some dependencies on files from the Java 
-library in {\tt streams/library/java} as well as 
+library in {\tt streams/library\slash{}java} as well as 
 dependencies on the {\tt cplex} and {\tt antlr} packages.
 You shouldn't have to worry about these additional complications
 as the Makefile and {\tt dot-shell} should take care of things.
@@ -18,7 +18,7 @@ used to run StreamIt programs that are compiled into Java
 bytecodes. Since the compiler relies on some of the classes
 in the Java Library, building the compiler should have build
 the library as well. To make sure, or to rebuild the library,
-you can go to the {\tt streams/library/java/streamit} 
+you can go to the {\tt streams\slash{}library/java/streamit} 
 directory and run {\tt jikes *.java}.
 
 \subsection{Building the C Library}
