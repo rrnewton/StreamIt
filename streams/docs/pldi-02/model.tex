@@ -307,7 +307,7 @@ circle the loop several times.
 
 {\bf Feedback joiner}.  For a feedback loop with delay $d$, the
 feedback joiner must fabricate its first $d$ input values, since no
-items have yet been pushed onto the loop tape $I2_{FJ}$.  This means
+items have yet been pushed onto the loop tape $I_{2,FJ}$.  This means
 that there must be an offset of $d$ in the $sdep$ function, since the
 first $d$ items are direct inputs to the joiner instead of appearing
 as items on the input tape.  Using $J$ to denote a weighted round
@@ -319,7 +319,7 @@ expression for the $sdep$ function across the feedback path:
 However, the $sdep$ function remains unchanged with respect to the
 input from the main stream:
 \begin{align*}
-\mi{I1_{FJ}}{O_{FJ}}(x) = \mi{I_{1,J}}{O_J}(x)
+\mi{I_{1,FJ}}{O_{FJ}}(x) = \mi{I_{1,J}}{O_J}(x)
 \end{align*}
 
 {\bf Feedback components}.  Within a feedback loop, the $sdep$ function
@@ -334,14 +334,14 @@ the composition follows the form of Equation \ref{eq:composepipe}:
 \end{align*}
 Note that these functions can then be composed with those of
 constructs neighboring the feedback loop to obtain, for instance, the
-relation between the loop tape $I2_{FJ}$ and a downstream pipeline (by
+relation between the loop tape $I_{2,FJ}$ and a downstream pipeline (by
 application of Equation \ref{eq:composetape}).
 
 {\bf Feedback loop construct.}  As a special case of the equation
 above, we can see that the $sdep$ function for the feedback loop as a
 whole is the composition of the $sdep$ functions along the main path:
 \begin{align*}
-\mi{I1_{FJ}}{O_{FS}}(x) = \mi{I_{1,J}}{O_J}(x) \circ \mi{I_{1,J}}{O_J}(x) 
+\mi{I_{1,FJ}}{O_{FS}}(x) = \mi{I_{1,J}}{O_J}(x) \circ \mi{I_{1,J}}{O_J}(x) 
 \end{align*}
 Intuitively, this is because--in any semantically correct stream
 program--the loop itself is guaranteed to have enough inputs to feed
@@ -376,7 +376,7 @@ $sdep$ across circular paths in the stream graph, we will denote this
 function by $sdeploop$ and define it at the loop input to the feedback
 joiner:
 \begin{align*}
-sdeploop(x) \equiv \mi{I2_{FJ}}{O_{FJ}} \circ \mi{O_{FJ}}{I2_{FJ}}
+sdeploop(x) \equiv \mi{I_{2,FJ}}{O_{FJ}} \circ \mi{O_{FJ}}{I_{2,FJ}}
 \end{align*}
 Now, the loop will be deadlock-free if and only if $\forall x \in N, x
 - sdeploop(x) > 0$.  This condition follows directly from
