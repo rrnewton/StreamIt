@@ -3,7 +3,7 @@ Options to the StreamIt 'knit' Compiler Script
 
 This is for the May 28, 2003 snapshot release (streamit-0.0.20030528).
 
-$Id: OPTIONS,v 1.9 2003-05-28 17:46:43 thies Exp $
+$Id: OPTIONS,v 1.10 2003-05-28 21:15:55 thies Exp $
 
 
 Basic usage:
@@ -21,6 +21,9 @@ Options:
 
   --output <filename>
       Places the resulting binary in <filename>.
+
+  --java
+      Used to compile files in "old" syntax (written in Java)
 
   --raw <n>
       Compile for an <n>-by-<n> RAW processor.
