@@ -34,7 +34,7 @@ all: $(DVI) $(PS) $(PDF) $(HTML) $(TEXT)
 
 %.html: %.tex %.hva
 	$(HEVEA) $*.hva $*.tex
-#	imagen -png $*
+	if [ -f $*.image.tex ]; then imagen -png $*; fi
 	$(HEVEA) $*.hva $*.tex
 
 %.txt: %.tex

@@ -1,1 +1,6 @@
 \usepackage{listings}
+\let\toprule\hline
+\let\midrule\hline
+\let\bottomrule\hline
+\def\picture{\begin{toimage}\begin{picture}}
+\def\endpicture{\end{picture}\end{toimage}\imageflush}
