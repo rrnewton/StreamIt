@@ -217,35 +217,40 @@ reasonable trade off between state and performance.
 \begin{transformation} (Frequency implementation)
 Given a linear node $\lambda = \{A, {\vec b}, e, o, u\}$, 
 the frequency implementation is a two stage filter filter $f$ which
-computes Algorithm~\ref{alg:freq-overview}. $f$ has
-initWork rates of $e'_{i}=N+e-1$, $o'_{i}=N+e-1$ $u'_{i}=N$ and
-work rates of $e'=N+e-1$, $o'=N+e-1$ $u'=N+e-1$.
+computes Algorithm~\ref{alg:freq-overview}. 
 \\
 \begin{equation} \nonumber
-  \begin{array}{rccl}
+  \begin{array}{rcl}
     % perhaps we should condense the next few lines.
-    targetN & = &&  (2*e) \\
-    FFTSize & = &&  2^{\lceil \lg(targetN + 2*(e-1)) \rceil} \\
-    N       & = &&  FFTSize - 2*(e-1) \\ 
+    targetN & \leftarrow & (2*e) \\
+    FFTSize & \leftarrow & 2^{\lceil \lg(targetN + 2*(e-1)) \rceil} \\
+    N       & \leftarrow & FFTSize - 2*(e-1) \\ 
+  \end{array}
+\end{equation}
+\begin{equation} \nonumber
+  \begin{array}{l}
+    float->float~{\bf filter}~f~\{ \\
+    ~{\bf init}~\{ \\
+    ~~~\vec{partials} \leftarrow \vec{\mathbf{0}} \\
+    ~~~\vec{H} \leftarrow \mathbf{FFT}(N+2(e-1),h[n])~\} \\
     \\
-    f.init  & = &\{&\vec{partials} \leftarrow \vec{\mathbf{0}} \\
-%            &   &&  H[0 \dots N+2(e-1)] \leftarrow \mathbf{FFT}(N+2(e-1),h[n]) \\
-            &   &&  \vec{H} \leftarrow \mathbf{FFT}(N+2(e-1),h[n])~~\} \\
+    ~{\bf work}_{0}~peek~N+e-1~pop~N+e-1~push~N~\{\\
+    ~~~\vec{x} \leftarrow \mathbf{pop}(0 \dots (N+e-1)) \\
+    ~~~\vec{X} \leftarrow \mathbf{FFT} (N+2(e-1), \vec{x}) \\
+    ~~~\vec{Y} \leftarrow \vec{X} .* \vec{H} \\
+    ~~~\vec{y} \leftarrow \mathbf{IFFT}(N+2(e-1), \vec{Y} \\
+    ~~~\mathbf{push}(\vec{y}[e-1 \dots N+e-1]) \\
+    ~~~\vec{partials} \leftarrow \vec{y}[N+e-1 \dots N+2(e-1)]~\} \\
     \\
-    f.initWork & = &\{&\vec{x} \leftarrow \mathbf{pop}(0 \dots (N+e-1)) \\
-           &     &&\vec{X} \leftarrow \mathbf{FFT} (N+2(e-1), \vec{x}) \\
-           &     &&\vec{Y} \leftarrow \vec{X} .* \vec{H} \\
-           &     &&\vec{y} \leftarrow \mathbf{IFFT}(N+2(e-1), \vec{Y} \\
-           &     &&\mathbf{push}(\vec{y}[e-1 \dots N+e-1]) \\
-           &     &&\vec{partials} \leftarrow \vec{y}[N+e-1 \dots N+2(e-1)]~~\} \\
-    f.work &   & = &\{\vec{x} \leftarrow \mathbf{pop}(0 \dots (N+e-1)) \\
-           &     &&\vec{X} \leftarrow \mathbf{FFT} (N+2(e-1), \vec{x}) \\
-           &     &&\vec{Y} \leftarrow \vec{X} .* \vec{H} \\
-           &     &&\vec{y} \leftarrow \mathbf{IFFT}(N+2(e-1), \vec{Y}) \\
-           &     &&\mathbf{push}(\vec{y}[0 \dots e-1] + \vec{partials})\\
-           &     &&\mathbf{push}(\vec{y}[e-1 \dots N+e-1]) \\
-           &     &&\vec{partials} \leftarrow \vec{y}[N+e-1 \dots N+2(e-1)]~~\} \\
-    \end{array}
+    ~{\bf work}_{1 \rightarrow \infty}~peek~N+e-1~pop~N+e-1~push~N+e-1~\{ \\
+    ~~~\vec{x} \leftarrow \mathbf{pop}(0 \dots (N+e-1)) \\
+    ~~~\vec{X} \leftarrow \mathbf{FFT} (N+2(e-1), \vec{x}) \\
+    ~~~\vec{Y} \leftarrow \vec{X} .* \vec{H} \\
+    ~~~\vec{y} \leftarrow \mathbf{IFFT}(N+2(e-1), \vec{Y}) \\
+    ~~~\mathbf{push}(\vec{y}[0 \dots e-1] + \vec{partials})\\
+    ~~~\mathbf{push}(\vec{y}[e-1 \dots N+e-1]) \\
+    ~~~\vec{partials} \leftarrow \vec{y}[N+e-1 \dots N+2(e-1)]~\} \\
+  \end{array} \\
 \end{equation}
 \label{trans:freq}
 \end{transformation}
