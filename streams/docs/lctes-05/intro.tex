@@ -122,6 +122,17 @@ XXX\% on average for the Pentium~3, and XXX\% for the Itanium~2.
 
 \subsection{Summary of Contributions}
 
+This paper makes the following contributions:
+\begin{itemize}
+\item XXX cache-model for stream computing
+\item XXX cache-aware scheduling
+\item XXX cache-aware graph partitioning
+\item XXX fusion model
+\item XXX fusion optimizations
+\item XXX full implementation 
+\item XXX analysis and results
+\end{itemize}
+
 \subsection{Paper Roadmap}
 
 The remainder of the paper is organized as follows. Section~\ref{sec:streamit}
@@ -129,8 +140,8 @@ describes StreamIt and introduces our motivating example.
 Section~\ref{sec:cache-model} introduces our cache model for 
 reasoning about the performance of a streaming
 computation. Section~\ref{sec:cache-opt} describes our cache-aware
-optimizations, and Section~\ref{sec:buffer} describes our  
-buffer-management optimizations. Section~\ref{sec:evaluation} describes
+optimizations, and Section~\ref{sec:buffer} describes the 
+optimization enabled by fusion. Section~\ref{sec:evaluation} describes
 our evaluation methodology and present our experimental
 analysis. Sections~\ref{sec:related-work}~and~\ref{sec:conclusion}
 discuss related work and conclude the paper.
