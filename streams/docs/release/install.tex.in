@@ -7,14 +7,16 @@
 
 \noindent
 This is for the May 28, 2003 snapshot release (streamit-0.0.20030528).\\
-\verb|$Id: install.tex.in,v 1.1 2003-08-25 15:31:42 dmaze Exp $|
+\verb|$Id: install.tex.in,v 1.2 2003-09-26 19:20:54 dmaze Exp $|
 
 \section{Compilation}
 
 Unpack the StreamIt source tar file somewhere; this can be in your
-home directory, or in a shared directory.  Perform the steps listed in
-``per-user setup'' below, then log out and log in again (or reload your
-shell's dotfiles).  If you have the source release, run:
+home directory, or in a shared directory.  Run \verb|./configure| from
+the top-level directory, which will look for several programs needed
+to use the compiler.  Perform the steps listed in ``per-user setup''
+below, then log out and log in again (or reload your shell's
+dotfiles).  If you have the source release, run:
 
 \begin{verbatim}
 cd $STREAMIT_HOME/compiler
