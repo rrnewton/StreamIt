@@ -281,6 +281,21 @@ delivered immediately after the work funtion producing this item,
 which is only possible if the item count $n(O_B)$ does not exceed $y$,
 as specified by the constraint.
 
+\item If $B$ is downstream of $A$:
+\begin{eqnarray*}
+n(O_B) \le \ma{O_A}{O_B}(n(O_A) + push_A * (n-1))
+\end{eqnarray*}
+That is, $n(O_A) + push_A * (n - 1)$ is the number of items on $A$'s
+output tape before pushing the data of interest, and $z =
+\ma{O_A}{O_B}(n(O_A) + push_A * (n-1))$ is the maximum number of items
+on $B$'s output tape as a result of the outputs of $A$.  Thus, when
+$A$ pushes the next set of data, it could affect the data that will be
+pushed next onto the output tape of $B$.  (Note that the next set of
+data from $A$ might not be sufficient to calculate the next set on
+$B$'s output, but it could affect it nonetheless.)  The message must
+be delivered before this effected data appears on $B$'s output, so the
+number of items $n(O_B)$ on $B$'s output must not exceed $z$.
+
 \end{enumerate}
 
 \subsection{Scheduling Constraints}
