@@ -187,8 +187,8 @@ class FIR extends Filter {
 }
 \end{verbatim}
 \vspace{-12pt}
-\caption{\protect\small Example stuff.
-\protect\label{fig1}}
+\caption{\protect\small The StreaMIT program for the Trunked Radio Receiver.
+\protect\label{fig:radiocode}}
 \vspace{-12pt}
 \end{figure}
 
@@ -237,8 +237,7 @@ class CheckFreqHop extends SplitJoin {
                });
                k++;
             }
-         } else
-            add(new Identity());
+         } else add(new Identity());
       }
       weighted_round_robin(N/4-2,1,1,N/2,1,1,N/4-2);
    }
@@ -277,15 +276,12 @@ class TrunkedRadio extends Stream {
    BoosterPortal onoff = new BoosterPortal().
    void init() {
       add(new ReadFromAtoD());
-
       RFtoIF RF2IF = new RFtoIF();
       add(RF2IF);
       freq_hop.register(RF2IF);
-
       Booster ISS = new Booster();
       add(ISS);
       onoff.register(ISS);
- 
       add(new FFT());
       add(new CheckFreqHop(freq_hop));
       add(new CheckQuality(onoff));
