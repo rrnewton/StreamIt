@@ -36,13 +36,13 @@ optimizations that utilize execution scaling can boost the performance
 of copy-shift to be roughly 50\% faster than modulation.
 
 Our study is done in the context of a synthetic benchmark, shown in
-Figure~\ref{fig:code-orig}.  As depicted in
-Figure~\ref{fig:code-graph}, the benchmark is a pipeline consisting of
-a simple source and an FIR filter.  On each iteration, the source
-pushes a single item.  The FIR filter calculates a weighted sum over
-{\tt PEEK} items of the input, then pops a single item from the
-channel.  In our experiments, we vary the {\tt PEEK} value from 1 to
-121 items.
+Figure~\ref{fig:code-orig}.  
+%As depicted in Figure~\ref{fig:code-graph}, 
+The benchmark is a pipeline consisting of a simple source and an FIR
+filter.  On each iteration, the source pushes a single item.  The FIR
+filter calculates a weighted sum over {\tt PEEK} items of the input,
+then pops a single item from the channel.  In our experiments, we vary
+the {\tt PEEK} value from 1 to 121 items.
 
 \subsection{Modulation}
 
