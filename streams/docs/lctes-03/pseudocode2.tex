@@ -42,26 +42,6 @@ void schedule (Stream s, int maxPhases, Stream->int execCount, int initOrSteady)
   } while (exists c \in s, execCount[c] > 0)
 }
 
-int phasesForFeedback(FeedbackLoop s, Stream->int execCount) {
-  phaseCount = 0
-  totalPop = 0
-  do {
-    phaseCount++
-    dataAvail = # items on input tape of joiner(s)
-    for i = 1 to floor(dataAvail/joiner(s).weights[1]) {
-      simulate(joiner(s).currentPhase())
-      joiner(s).advancePhase()
-      execCount[joiner(s)]--
-    }
-    while (exists c \in s, c != joiner(s) and canFire(c) ) {
-      simulate(c.currentPhase())
-      c.advancePhase()
-      execCount[c]--
-    }
-  } while (exists c \in s, execCount[c] > 0)
-  return phaseCount
-}
-
 Phase[] insertSorted (Phase[N] list, Phase child) {
   for i = N-1 downto 0
     if (list[i].str==child.str)

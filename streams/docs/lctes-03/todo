@@ -45,7 +45,6 @@ in illustrator slightly differently than the FM Radio.
 
 ---
 
-- move execution model into streamit section
 - keep section 3 as scheduling basics, but make it include all the initialization details
   - say how to calculate steady state; note that schedule could just be steady-state multiplicities
 - then next section in phases, with two special cases
@@ -53,3 +52,10 @@ in illustrator slightly differently than the FM Radio.
 *** should really push that this allows scheduling of tight
     feedbackloops, with GSM as an example.  Single appearance
     scheduling won't allow this to be done.
+
+*** could also push this as a way of having cyclo-static dataflow go
+    up into hierarchical levels, to take advantage of same properties
+    it has at the node level.  also a way of taking advantage of
+    cyclo-static stuff at the node level.
+
+- need to think about figures that could really show what's going on 

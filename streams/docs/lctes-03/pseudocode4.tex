@@ -1,0 +1,52 @@
+struct Phase {
+  Stream str
+  Phase[] children
+}
+
+Phase pushSchedule (Stream s) {
+  result = Phase(s, {})
+  child = entrance(s)
+  do {
+    simulate(child)
+    result.children = result.children o child.currentPhase()
+    child = most downstream node in s that can fire
+  } loop until child==entrance(s) and exit(s) has fired at least once
+  return result
+}
+
+Phase[] phasedSchedule (Stream s, int maxPhases, int mode) {
+  // get maximally fine-grained phases
+  phases = {}
+  do {
+    phases = phases o pushSchedule(s)
+  } until {each node of s has fired all its init phases    (if mode==INIT)
+           each node of s has completed its steady state   (if mode==STEADY) }
+  // combine into <maxPhases> groups, with contents sorted by child stream
+  size = ceil(phases.length / maxPhases)
+  forall i in [0, min(phases.length, maxPhases) - 1] {
+    newChildren = phases[i*size].children o ... o phases[(i+1)*size
+    result[i] = Phase(s, sortByStream(newChildren))
+  }
+  return result
+}
+
+singleAppSchedule[s]  = <phasedSchedule(s, 1, INIT),
+                         phasedSchedule(s, 1, STEADY)>
+
+minLatencySchedule[s] = <phasedSchedule(s, \infty, INIT), 
+                         phasedSchedule(s, \infty, STEADY)>
+
+int phasesForFeedback(FeedbackLoop s, int mode) {
+  phaseCount = 0
+  do {
+    phaseCount++
+    dataAvail = # items on input tape of joiner(s)
+    for i = 1 to floor(dataAvail/joiner(s).weights[1])
+      simulate(joiner(s))
+    while (exists c \in s, c != joiner(s) and canFire(c) )
+      simulate(c)
+  } loop until {each node of s has fired all its init phases    (if mode==INIT)
+                each node of s has completed its steady state   (if mode==STEADY) }
+  return phaseCount
+}
+
