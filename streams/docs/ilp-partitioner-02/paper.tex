@@ -267,6 +267,82 @@
     Number of equations: {\it depends on structure, but linear in}$~num_n * num_t$
   \end{tabular}
 
+  \section{Symmetry Optimizations}
+
+  Here are some extra constraints we can add to the program to
+  (hopefully) make it run faster.  They all apply to splitjoins that
+  have some kind of symmetry.
+
+  \begin{itemize}  
+
+    \item {\bf Symmetrical fusion within parallel streams.}  This
+    applies to neighboring components of a splitjoin that have 1) the
+    same deep structure, and 2) the same amount of work for each
+    filter in the structure\footnote{Recall that since the amount of
+    work is calculated for a steady state execution, this condition
+    takes care of cases where you have identical components but with
+    different rates from a splitter or joiner.}.  
+
+    The idea is that since these two streams are identical and running
+    in parallel, they should be partitioned the same way.  We express
+    this constraint as follows.  Let the two parallel streams be $s_1$
+    and $s_2$.  If any adjacent children in $s_1$ belong to the same
+    tile, then the same two adjacent children in $s_2$ must belong to
+    the same tile.
+
+    As an optimization, we first constrain that the partitioning
+    assignment must be monotonic with respect to the nodes array.
+    This constraint helps the solution process without hindering the
+    power of the partitioner, since the partition numbers are
+    arbitrary at this point.
+
+    Then, we can introduce a zero/one variable $f_{x,y}$ for each pair
+    of adacent filters $x$ and $y$ in a given stream, that indicates
+    whether or not $x$ and $y$ are assigned to {\it different} tiles.
+    If they are, then the corresponding tiles in the adjacent stream
+    must also be assigned to different tiles.  We have:
+    \[
+    f_{x,y} = \sum_{i=1}^{num_t} i * P_{x,t_i} - \sum_{i=1}^{num_t} i * P_{y,t_i} 
+    \]
+    Then to guarantee that the adjacent streams $s_1$ and $s_2$
+    coincide (have symmetry), we introduce these constraints:
+    \[
+    \begin{array}{c}
+    \forall i \in [0, \mt{last}(s_1) - \mt{first}(s_1)-1]: \\
+    \raisebox{12pt}{~}
+    f_{L[first(s_1)+i+1], L[first(s_1)+i]} = f_{L[first(s_2)+i+1], L[first(s_2)+i]}
+    \end{array}
+    \]
+
+    \item {\bf Uniform grouping of parallel streams.}  If all of the
+    children of a splitjoin are equivalent and some of the children
+    happen to be fused with each other, then it should never be the
+    case that the size of these fused groups differs by more than one.
+    (If they did, then one could improve throughput by shifting one
+    from the bigger group into the smaller.)
+
+    To capture this constraint, we count (for each tile) the number of
+    filters (at the bottom of each parallel stream) that are assigned
+    to that tile.  Then we introduce two variables, $z_{max}$ and
+    $z_{min}$, which bound the number of filters on each tile from
+    above and below.  The difference between $z_{max}$ and $z_{min}$
+    should be at most 1.
+
+    Let $s_1 \dots s_n$ represent immediate children of a splitjoin.
+    We are given that all of these children are structurally
+    equivalent.  Then, introduce these constraints:
+    \[
+    \begin{array}{c}
+      z_{min} \le P_{L[last(s_1),1]} + \dots + P_{L[last(s_n),1]} \le z_{max} \\
+      \dots \\
+      z_{min} \le P_{L[last(s_1),num_t]} + \dots + P_{L[last(s_n),num_t]} \le z_{max} \\
+      ~ \\
+      z_{max} - z_{min} \le 1
+    \end{array}
+    \]
+
+\end{itemize}
+
   \section{Related Ideas}
 
   \begin{itemize}
