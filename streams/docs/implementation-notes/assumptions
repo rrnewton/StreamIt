@@ -34,5 +34,19 @@ Compiler / Runtime System
 	its children, and only after they're all done, it creates the tapes
 	that connect these children.
 
+10/09/01
+	The toplevel stream (entry point) is to be declared public with all
+	other streams having their access declaration absent (package
+	access).  This is also the case in Java, the important point is that
+	the toplevel stream has to be public.
+
+	Before stream x can be added to another stream, stream x must be
+	declared.  So the declaration of stream x must come before any class
+	declaration that adds x.  This assumption will be lifted later, but
+	it stands for now.  This restriction disallows all recursive
+	declarations.  Also, this forces the toplevel stream to be the last
+	declaration in the source text.
+
 10/23/01 The methods in a portal cannot be overloaded.  That is, there is
 	only one method with a given name in each portal.
+10/24/01 Cannot assign to/from stream variables.
