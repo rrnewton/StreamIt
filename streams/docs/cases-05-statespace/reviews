@@ -1,0 +1,296 @@
+Review #59 For Paper #88
+(review last modified Monday 18th of October 2004 08:56:09 AM)
+
+What is the strength of the paper? (1-3 sentences)
+--------------------------------------------------
+
+Optimizations were implemented within the StreamIt compiler and
+reduced operation counts were observed.
+
+What is the weakness of the paper? (1-3 sentences)
+--------------------------------------------------
+
+This paper does not treat material that is appropriate for the CGO
+conference.
+
+Provide a short summary of the paper
+--------------------------------------------------
+
+This paper describes a set of optimizations that can be used when a
+sequence of linear transforms are applied to a digital signal. Each
+linear transform is called a filter. When filters are composed,
+opportunities for optimization are created. Optimizations have been
+integrated into the StreamIt compiler.
+
+Provide comments for the author to address in the rebuttal
+--------------------------------------------------
+
+This paper does not treat material that is appropriate for the CGO
+conference. Although results are demonstrated as a decreased number of
+floating point operations in the StreamIt compiler, the paper is
+really about linear system optimization. The paper should be evaluated
+by criteria established within a more appropriate forum consisting of
+experts in the field of linear system optimization.
+
+Provide additional detailed comments to the author
+--------------------------------------------------
+
+none
+
+***********************************************************************
+
+Review #248 For Paper #88
+(review last modified Tuesday 19th of October 2004 12:26:57 AM)
+
+What is the strength of the paper? (1-3 sentences)
+--------------------------------------------------
+
+- Good formulation of the problem and solutions.
+- Interesting work on streaming model.
+
+What is the weakness of the paper? (1-3 sentences)
+--------------------------------------------------
+
+- Evaluation is a bit weak with only the count of floating-point
+operations.
+
+
+Provide a short summary of the paper
+--------------------------------------------------
+
+This paper proposes to represent a class of DSP filters using linear
+state space. Each of the filters has an input stream, an output
+stream, and a set of internal states. The authors then develop a set
+of optimizations, including state-space transformations, state
+removal, and parameter reduction. They have implemented the
+optimizations in the StreamIt compiler and demonstrate the reduction
+of floating-point operations.
+
+Provide comments for the author to address in the rebuttal
+--------------------------------------------------
+
+Using linear representations for program kernel computation is not a
+new idea and has been done in many different contexts. Such a
+representation is a good fit to DSP filters. The authors argue for a
+linear state space representation over a linear representation since
+the benefit is that feedback loops can be collapsed. Each DSP filter
+is represented as an input stream, an output stream, and a set of
+internal states. DSP applications are typical streaming computations.
+
+Sec 2.2 states that this scheme symbolically executes a single
+iteration of a filter.s work function to check whether program
+variables have vector pair representations and to decide whether the
+filter is state space linear. Is executing one iteration always
+sufficient? For example, if the computation of iteration depends on
+the results from a number of previous iterations, wouldn.t one want to
+symbolically execute a number of iterations to capture the steady
+state? What is the program analysis to determine whether a peek rate
+is greater than its pop rate?
+
+One weak point of this work is on its evaluation. The only metric used
+is to count the number of floating point operations. Although this is
+a good metric for DSP application, it would be nice if there is at
+least a simulation environment to validate these program
+transformations and measure the program performance
+
+Provide additional detailed comments to the author
+--------------------------------------------------
+
+none
+
+***********************************************************************
+
+Review #286 For Paper #88
+(review last modified Monday 18th of October 2004 04:29:29 PM)
+
+What is the strength of the paper? (1-3 sentences)
+--------------------------------------------------
+
+The paper describes an interesting application of linear state space
+analysis.
+
+What is the weakness of the paper? (1-3 sentences)
+--------------------------------------------------
+
+It is difficult to judge quality of the results. There is no
+comparisons to existing systems only a comparison against a precursor
+system.
+
+Provide a short summary of the paper
+--------------------------------------------------
+
+This paper describes the use of linear state space analysis for
+analyzing and optimizing a large and important class of DSP kernels
+(IIR, FIR, DCT, etc.). The techniques apply to languages that are
+based on the synchronous dataflow model of computation. The techniques
+have been implemented and evaluated using the StreamIt compiler.
+
+Provide comments for the author to address in the rebuttal
+--------------------------------------------------
+
+none.
+
+Provide additional detailed comments to the author
+--------------------------------------------------
+
+Is there any notion of optimality? There is an infinite number of
+state-space transformations possible. What criteria guides the
+compiler?
+
+One of the difficulties with compiling for DSPs is the need to deal
+with cross-cutting constraints: power, code size, execution
+performance. Can the technique be extended to handle such issues?
+
+Can you make comparisons to some existing systems/languages such as
+StreamC or Spiral? This would definitely make the work more
+interesting.
+
+Can't you generate actual machine code? I thought StreamIt had a x86
+code generator. You could then compare execution times with the
+transformation disabled and then enabled.
+
+
+***********************************************************************
+
+Review #326 For Paper #88
+(review last modified Monday 18th of October 2004 08:48:32 PM)
+
+What is the strength of the paper? (1-3 sentences)
+--------------------------------------------------
+
+(1) extend the linear analysis to cases that have persistent states
+and feedback loops in the the filters.
+
+What is the weakness of the paper? (1-3 sentences)
+--------------------------------------------------
+
+n/a
+
+
+Provide a short summary of the paper
+--------------------------------------------------
+
+This paper prposes a linear state space model for DSP filters. The
+program is considered as a set of filters with a set of internal
+states.  optimization techniques are proposed for optimizing the code
+and gain performance.
+
+Provide comments for the author to address in the rebuttal
+--------------------------------------------------
+
+If the paper is from the same group as [11], I would like to see the
+reason why the benchmark programs without state (first 5 in table 1)
+have significantly different results from those reported in their PLDI
+paper.
+
+Provide additional detailed comments to the author
+--------------------------------------------------
+
+As an extension from their previous linear analysis, it is an
+incremental paper for solving benchmark with feedback loops and
+persistent states. It is a nice work to complete the related research.
+
+The paper is written in a way that readers should have sufficient
+knowledge of their previous linear analysis work, it could be helpful
+if brief summary of [11] or comparison can be given in the example.
+
+***********************************************************************
+
+Review #338 For Paper #88
+(review last modified Monday 18th of October 2004 09:41:30 PM)
+
+What is the strength of the paper? (1-3 sentences)
+--------------------------------------------------
+
+This is considerably different from our usual compiler fare. It
+appears to be a solid, rigorous presentation, though some key pieces
+are relegated to an anonymous reference.
+
+What is the weakness of the paper? (1-3 sentences)
+--------------------------------------------------
+
+Some of the key optimization methods are described in a master's
+thesis, referenced anonymously. I'm not very concerned about its
+absence here -- there isn't space for it -- but I wonder how
+accessible it will be after publication.
+
+Provide a short summary of the paper
+--------------------------------------------------
+
+This paper describes a model for representing linear state space
+systems, as used for signal processing applications. It then describes
+a set of optimizations that can be applied to such systems, removing
+unnecessary states and reducing parameterization to minimize
+calculations.
+
+Provide comments for the author to address in the rebuttal
+--------------------------------------------------
+
+None.
+
+
+Provide additional detailed comments to the author
+--------------------------------------------------
+
+You assert in the second paragraph that "DSP applications typically
+defy high-level language compiler analysis," but give no hint as to
+why.  You need at least a nominal explanation. I'm left wondering how
+much of the problem is simply due to DSP processors not having decent
+compilers available because of unusual architectures.
+
+p. 14, halfway down: "effect" should be "affect."
+
+***********************************************************************
+
+Review #376 For Paper #88
+(review last modified Tuesday 19th of October 2004 11:09:01 AM)
+
+What is the strength of the paper? (1-3 sentences)
+--------------------------------------------------
+
+State-space representations appear to be a nice tool for handling
+simple DSP filter programs.
+
+What is the weakness of the paper? (1-3 sentences)
+--------------------------------------------------
+
+The paper fails to connect its results to any frame of reference that
+would allow me to evaluate it.
+
+Provide a short summary of the paper
+--------------------------------------------------
+
+The authors introduce a translation from code to state-space diagrams,
+a series of transformations on state-space diagrams, and a mechanism
+to go back to code. They argue that this set of tools is the right set
+to optimize DSP programs.
+
+Provide comments for the author to address in the rebuttal
+--------------------------------------------------
+
+The paper argues that "DSP optimizations typically defy highlevel
+langauge compiler analysis." In reading the paper, it appears that
+your system replicates representations to create larger contexts and
+to make interface issues (scheduling, argument alignment on the input
+tape, ...) explicit. If you applied these same techniques to create a
+single large IR representation in a traditional IR, and then optimized
+it, how would the results compare.
+
+I have a hard time convincing myself that the results are significant,
+because the paper provides no comparisons that are within my frame of
+reference. Instead, the paper tells me that these problems are somehow
+harder (in the introduction) but does nothing to convince me of the
+truth of that statement.
+
+Provide additional detailed comments to the author
+--------------------------------------------------
+
+Explain the syntax of your language; it took me quiet a while to work
+out an explanation of the example in Figure 3 that made sense.
+
+Compare the impact and the effect of your transformations against
+those of traditional optimizations that might be applied in a
+whole-program compiler that could perform code replication to match up
+the filter functions.
+
+***********************************************************************
