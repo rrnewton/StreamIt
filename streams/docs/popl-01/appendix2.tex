@@ -60,7 +60,7 @@ a StreaMIT program.
 exactly the items that it inputs.
 
 \doc{MAX\_LATENCY(Stream a, Stream b, int n)}  This directive
-constraints the schedule such that, at any given time, $a$ can only
+constrains the schedule such that, at any given time, $a$ can only
 progress up to the wavefront of information that $b$ will see after
 $n$ invocations of its own work function.
 
@@ -86,7 +86,7 @@ child} to the current pipeline of blocks comprising this stream and
 returns {\tt child}.  It can only be called from within the {\tt init}
 function.
 
-\doc{void run()} - The {\tt run} function provides an outside
+\doc{void run()} The {\tt run} function provides an outside
 interface for starting the stream.  No component of any stream may
 call {\tt run}.
 
@@ -97,7 +97,8 @@ child streams, and thus calling {\tt add} is forbidden from within its
 {\tt init} function.  Instead, the {\tt Filter} defines a {\tt work}
 function that explicitly describes the transfer of input items to
 output items.  A filter has some input and output type, hereafter
-referred to as <input-type> and <output-type>, respectively.
+referred to as {\tt <input-type>} and {\tt <output-type>},
+respectively.
 
 \subsubsection{Fields} 
 
@@ -135,6 +136,8 @@ those that are constant fields in {\tt StreamObject}.
 
 \subsection{SplitJoin extends Stream}
 
+\subsubsection{Methods}
+
 A {\tt SplitJoin} is a set of independent, parallel streams that are
 contained between a splitter and a joiner.
 
@@ -155,7 +158,7 @@ graph.
 \doc{Stream setBody(Stream stream)}
 \doc{Splitter setSplitter(SplitJoinType splitter)}
 \doc{Stream setLoop(Stream stream)} These methods set the joiner, body
-stream, splitter, and loop streamfor the feedback loop; they each
+stream, splitter, and loop stream for the feedback loop; they each
 return their argument.  Each of them must be called from within the
 {\tt init} function.
 
