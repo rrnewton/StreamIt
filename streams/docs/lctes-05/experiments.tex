@@ -36,7 +36,10 @@ different StreamIt applications. They are compiled with the StreamIt
 compiler which applies the optimizations described in this paper, and
 outputs an functionally equivalent C program that is compiled with the
 \texttt{gcc} (v3.4, -O3) on the Pentium and \texttt{ecc} 
-(v7.0, -O3) for the Itanium.
+(v7.0, -O3) for the Itanium. Please note that we were unable 
+to obtain results for \texttt{ofdm} on the Itanium because of its 
+large code size.
+
 % Each benchmark is
 % then run five times, and the median user time is recorded.
 
