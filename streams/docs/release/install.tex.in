@@ -7,7 +7,7 @@
 
 \noindent
 This is for the May 28, 2003 snapshot release (streamit-0.0.20030528).\\
-\verb|$Id: install.tex.in,v 1.2 2003-09-26 19:20:54 dmaze Exp $|
+\verb|$Id: install.tex.in,v 1.3 2003-09-29 19:46:08 dmaze Exp $|
 
 \section{Compilation}
 
@@ -19,7 +19,7 @@ below, then log out and log in again (or reload your shell's
 dotfiles).  If you have the source release, run:
 
 \begin{verbatim}
-cd $STREAMIT_HOME/compiler
+cd $STREAMIT_HOME/src
 make
 \end{verbatim}
 
