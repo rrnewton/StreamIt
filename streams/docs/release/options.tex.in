@@ -5,19 +5,19 @@
 \newcommand\filename[1]{\textsf{#1}}
 \newcommand\metavar[1]{$\langle$\emph{#1}$\rangle$}
 
-\title{Options to the StreamIt 'knit' Compiler Script}
+\title{Options to the StreamIt 'strc' Compiler Script}
 
 \begin{document}
 \maketitle
 
 \noindent
 This is for the May 28, 2003 snapshot release (streamit-0.0.20030528).\\
-\verb|$Id: options.tex.in,v 1.5 2003-09-22 19:40:40 dmaze Exp $|
+\verb|$Id: options.tex.in,v 1.6 2003-09-30 16:09:15 dmaze Exp $|
 
 \section*{Basic Usage}
 
 \begin{verbatim}
-knit Foo.str
+strc Foo.str
 \end{verbatim}
 
 Reads \filename{Foo.str}, produces \filename{Foo.java} as an
