@@ -43,18 +43,19 @@ describe a set of techniques developed to solve the problem of
 scheduling. For a more detailed description of algorithms introduced
 here, see \cite{karczma-thesis}.
 
-\formatsection{Hierarchy}
-StreamIt introduces a novel concept of structure to streaming
-programming. The structures used by StreamIt programs map the
-flow of streaming data into simple to understand patterns. These
-patterns introduce an inherent hierarchy to the flow of computation.
+\formatsection{Approach} StreamIt introduces a novel concept of
+structure to streaming programming. The structures used by StreamIt
+programs map the flow of streaming data into simple to understand
+patterns. These patterns introduce an inherent hierarchy to the flow
+of computation.
 
 Our scheduling algorithms take advantage of this hierarchy in order
 to simplify the task of scheduling: each structure only needs to
 learn of its children's properties in order to produce a valid 
 schedule. No global view of flow of data is required.
 
-\formatsection{Phased Scheduling}
+\noindent {\it Phased Scheduling}
+
 The dominant technique used for scheduling streaming programs is
 called Single Appearance Scheduling. In this technique, every
 node in the stream program appears only once in every schedule.
@@ -70,7 +71,7 @@ which works on a small dataset. These schedules are then grouped and
 interleaved in order to produce schedules that are small, but do not
 require lots of data buffering.
 
-\formatsection{Scheduling Strategies}
+\noindent {\it Scheduling Strategies}
 \begin{table} \centering \small
 \begin{tabular}{|c|c|c|c|c|c|c|c|}
 \hline benchmark & \parbox{0.5in}{\centering number of nodes} & \parbox{0.5in}{\centering number of node executions} & \multicolumn{2}{c|}{pseudo single appearance} & \multicolumn{3}{c|}{minimal latency} \\
@@ -97,20 +98,22 @@ latency scheduling algorithms on various applications.}
 
 The flexible approach to scheduling used by Phased Scheduling allows
 for a wide variety of methods for producing schedules for each
-hierarchical component in a StreamIt program as well as a wide
-variety of techniques for grouping and interleaving these schedules
+hierarchical component in a StreamIt program as well as a wide variety
+of techniques for grouping and interleaving these schedules
 together. The combination of this flexibility allows us to select
 whether emphasis should be put on minimizing resources necessary for
 storing streaming data, minimizing resources necessary for storing
-execution schedules, or finding an acceptable solution in between these two
-conflicting goals.
+execution schedules, or finding an acceptable solution in between
+these two conflicting goals.
 
-Our current results from using one such a technique (depicted in 
-Table \ref{tbl:results}) show we are able to consistently reduce the 
-combined amount of resources necessary for storage of the schedule 
-and buffer space.  We achieve this by reducing buffer requirements 
-by an average of 14.5\% on a variety of benchmarks, with a peak
-savings of 93\%.
+\formatsection{Progress}
+We have implemented Phased Scheduling as part of the StreamIt system.
+Our current results from using a certain scheduling strategy (depicted
+in Table~\ref{tbl:results}) show we are able to consistently reduce the
+combined amount of resources necessary for storage of the schedule and
+buffer space.  We achieve this by reducing buffer requirements by an
+average of 14.5\% on a variety of benchmarks, with a peak savings of
+93\%.
 
 \formatsection{Future Work}
 The current results of our scheduling techniques are promising, but
