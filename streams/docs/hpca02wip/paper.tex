@@ -111,7 +111,7 @@ to a variety of modern processors.
 \section{The StreamIt Language}
 
 In this section we provide a brief overview of the StreamIt language;
-please see \cite{streamittech} for a more detailed description.  The
+please see \cite{streamitcc} for a more detailed description.  The
 current version of StreamIt is legal Java syntax to simplify our
 presentation and implementation, and it is designed to support only
 streams with static input and output rates.
@@ -156,8 +156,8 @@ class Adder extends Filter {
   int N;
 
   void init(int N) {
-    input = new Channel(Float.TYPE, N);
-    output = new Channel(Float.TYPE, 1);
+    setInput(Float.TYPE); setOutput(Float.TYPE);
+    setPush(1); setPop(N);
     this.N = N;
   }
   
@@ -170,17 +170,17 @@ class Adder extends Filter {
   }
 }
 
-public class Equalizer extends Pipeline {
+class Equalizer extends Pipeline {
   void init(int BANDS) {
     add(new SplitJoin() {
       void init() {
         int bottom = 2500;
         int top = 5000;
-        setSplitter(DUPLICATE());
+        setSplitter(Duplicate());
         for (int i=0; i<BANDS; i++, bottom*=2, top*=2) {
           add(new BandPassFilter(bottom, top));
         }
-        setJoiner(ROUND_ROBIN());
+        setJoiner(RoundRobin());
     }});
     add(new Adder(BANDS));
   }
@@ -190,11 +190,11 @@ class CheckHop extends Filter {
    int DELAY;
    RFtoIFPortal portal;
 
-   void init(RFtoIF rf2if, int N) {
-      input = new Channel(Float.TYPE, N);
-      output = new Channel(Float.TYPE, N);
+   void init(RFtoIF rf2if, int DELAY) {
+      setInput(Float.TYPE); setOutput(Float.TYPE);
+      setPush(N); setPop(N);
       this.portal = new RFtoIFPortal(rf2if);
-      DELAY = 256/N;
+      this.DELAY = DELAY;
    }
 
    void work() {
@@ -207,14 +207,11 @@ class CheckHop extends Filter {
 }
 
 class Radio extends Stream {
-   int N = 64;
-   int BANDS = 10;
-
    void init() {
       add(new ReadFromAtoD());
-      RFtoIF rf2if = add(new RFtoIF(N));
-      add(new FFT(N));
-      add(new CheckHop(rf2if));
+      RFtoIF rf2if = add(new RFtoIF());
+      add(new SignalBooster());
+      add(new CheckHop(rf2if, 256));
       add(new Equalizer(10));
       add(new Speaker());
    }
@@ -299,8 +296,9 @@ receiver's time is done relative to data items in the stream.  This
 timing mechanism is important not only for portability, as it is
 independent of any architecture's clock or topology, but also for
 programmability, as it is often important to synchronize events with
-wavefronts of data in the stream.  Please see \cite{streamittech} for
-a precise definition of the message delivery semantics.
+wavefronts of data in the stream.  
+%Please see \cite{streamittech} for
+%a precise definition of the message delivery semantics.
 
 %% In StreaMIT, one can specify a range of latencies for a message to get
 %% delivered.  This latency is measured in terms of an information
@@ -361,11 +359,10 @@ a precise definition of the message delivery semantics.
 \section{Status and Conclusions}
 
 We have implemented a fully-functional prototype of the StreamIt
-optimizing compiler.  It generates code for a uniprocessor which
-performs comparably to SpectrumWare \cite{spectrumware}, a streaming
-runtime library implemented in C++.  We are currently implementing a
-backend for the Raw processor \cite{raw}, as well as developing a
-cleaner syntax for StreamIt.
+optimizing compiler that targets both uniprocessors and Raw
+\cite{streamitraw}.  The compiler exploits the structure of the stream
+graph to perform load-balancing transformations that can improve
+performance on Raw by over 300\%.
 
 We believe that StreamIt represents a viable common machine language
 for grid-based architectures.  It abstracts away the target's
@@ -378,7 +375,7 @@ for a given grid-based machine.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{small}
-\bibliographystyle{abbrv}
+\bibliographystyle{plain}
 \bibliography{references}
 \end{small}
 \end{document}
