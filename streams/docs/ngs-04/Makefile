@@ -28,9 +28,9 @@ all: $(PAPER_EPS) $(DVI) $(PS) $(PDF)
 	if egrep -q $(RERUNBIB) $*.log; then $(BIBTEX) $*; $(LATEX) $<; fi
 	while egrep -q $(RERUN) $*.log; do $(LATEX) $<; done
 
-%.eps: %.obj
-	tgif -print -eps $<
+#%.eps: %.obj
+#	tgif -print -eps $<
 
 clean:
 	rm -f *~ *.aux *.bbl *.log *.blg *.ps *.pdf *.dvi
-	rm -f $(PAPER_EPS)
+#	rm -f $(PAPER_EPS)

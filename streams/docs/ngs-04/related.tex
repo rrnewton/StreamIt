@@ -1,34 +1,38 @@
+\vspace{-5pt}
 \section{Related Work}
 \label{sec:related}
-A large number of programming languages have included a concept of a
-stream; see \cite{survey97} for a survey.  Those that are perhaps most
-related to StreamIt 1.0 are synchronous dataflow languages such as
-LUSTRE~\cite{lustre} and ESTEREL~\cite{esterel92}, which require a fixed
-number of inputs to arrive simultaneously before firing a stream node.
-However, most special-purpose stream languages do not contain features
-such as messaging and support for modular program development that are
-essential for modern stream applications.  Also, most of these languages
-are so abstract and unstructured that the compiler cannot perform enough
-analysis and optimization to result in an efficient implementation.
+\vspace{-5pt}
 
-At an abstract level, the stream graphs of StreamIt share a number of
+A large number  of programming languages have included  a concept of a
+stream; see \cite{survey97} for a survey.  Those that are perhaps most
+related  to StreamIt 1.0  are synchronous  dataflow languages  such as
+LUSTRE~\cite{lustre}  and  ESTEREL~\cite{esterel92},  which require  a
+fixed number of inputs to arrive simultaneously before firing a stream
+node.  However,  most special-purpose stream languages  do not contain
+features such as messaging and support for modular program development
+that  are essential  for modern  stream applications.   Also,  most of
+these  languages are so  abstract and  unstructured that  the compiler
+cannot  perform  enough analysis  and  optimization  to  result in  an
+efficient implementation.
+
+At an abstract level, the stream  graphs of StreamIt share a number of
 properties with the synchronous dataflow (SDF) domain as considered by
 the Ptolemy project~\cite{ptolemyoverview}.  Each node in an SDF graph
 produces and consumes a given number of items, and there can be delays
-along the arcs between nodes (corresponding loosely to items that are
-peeked in StreamIt).  As in StreamIt, SDF graphs are guaranteed to
-have a static schedule and there are a number of nice scheduling
-results incorporating code size and execution time~\cite{leesdf}.
-However, previous results on SDF scheduling do not consider
-constraints imposed by point-to-point messages, and do not include
+along the arcs between nodes  (corresponding loosely to items that are
+peeked in  StreamIt).  As  in StreamIt, SDF  graphs are  guaranteed to
+have  a static  schedule and  there are  a number  of  nice scheduling
+results  incorporating  code  size and  execution  time~\cite{leesdf}.
+However,  previous   results  on   SDF  scheduling  do   not  consider
+constraints  imposed by  point-to-point messages,  and do  not include
 StreamIt's level of programming language support.
 
-The Imagine architecture is specifically designed for the streaming
-application domain~\cite{rixner98bandwidthefficient}.  It operates on
-streams by applying a computation kernel to multiple data items off
+The Imagine  architecture is  specifically designed for  the streaming
+application domain~\cite{rixner98bandwidthefficient}.   It operates on
+streams by  applying a computation  kernel to multiple data  items off
 the stream register file.  The compute kernels are written in Kernel-C
-while the applications stitching the kernels are written in Stream-C.
-Unlike StreamIt, with Imagine the user has to manually extract the
-computation kernels that fit the machine resources in order to get
-good steady state performance for the execution of the
+while the applications stitching  the kernels are written in Stream-C.
+Unlike StreamIt,  with Imagine  the user has  to manually  extract the
+computation kernels  that fit  the machine resources  in order  to get
+good   steady   state   performance   for   the   execution   of   the
 kernel~\cite{kapasi:2001:ss}.
