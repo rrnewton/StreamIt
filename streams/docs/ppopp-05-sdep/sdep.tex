@@ -1,3 +1,8 @@
+\newcommand{\la}{$\leftarrow$}
+\newcommand{\IND}{\begin{ALC@g}}
+\newcommand{\UND}{\end{ALC@g}}
+\newcommand{\tup}[2]{\langle{#1}, {#2}\rangle}
+
 \section{Stream Dependence Function}
 
 In this section, we describe our model of computation for streams and
@@ -12,7 +17,11 @@ number and ordering of phases is known at compile time, and their
 execution is cyclic (after executing the last phase, the first phase
 is executed again).  Also, for each phase, the number of items
 produced and consumed from the channels is fixed and known at compile
-time.  Cyclo-Static Dataflow is a generalization of Synchronous
+time.
+%We also permit actors to ``peek'' at items that are not
+%consumed from the channel, and the peek amount is known at compile
+%time (note that peeking is not part of CSDF).
+Cyclo-Static Dataflow is a generalization of Synchronous
 Dataflow~\cite{LM87-i}, which requires each actor to have only a
 single phase.
 
@@ -41,85 +50,174 @@ formal definition of $\sdep$ using the notations from above:
 \begin{center}
 $\sdepf{A}{B}(n)~~ = ~~\mbox{MIN}~~|\phi \wedge A|$ \\
 ~~~~~~~~~~~~~\raisebox{5pt}[0pt]{$~_{\phi \in \Phi, |\phi \wedge B| = n}$}
+\label{eq:sdepdef}
 \end{center}
 \end{definition}
 This equation reads: over all legal executions in which $B$ fires $n$
-times, $\sdepf{A}{B}(n)$ is the minimum number of times that $A$ fires.
+times, $\sdepf{A}{B}(n)$ is the minimum number of times that $A$
+fires.  An example of $\sdep$ for the stream graph in
+Figure~\ref{fig:sdep-rates} appears in Figure~\ref{fig:sdep1}.
 
-An example of $\sdep$ appears in
-Figure~\ref{fig:sdep}. \todo{Example}.
+\begin{figure}[t]
+\begin{center}
+\psfig{figure=sdep-example-rates.eps,height=1.5in}
+\caption{{\small Example stream graph. Nodes are annotated with their
+I/O rates; node D has two phases. \protect\label{fig:sdep-rates}}}
+\end{center}
+\vspace{-12pt}
+\end{figure}
+
+\begin{figure*}[t]
+\begin{center}
+\begin{tabular}{lcr}
+\psfig{figure=sdep-example1.eps,width=7in}
+\end{tabular}
+\caption{\small Example \figsdep\ calculation for stream graph in
+Figure~\ref{fig:sdep-rates}.  The stream graphs illustrate a steady
+state cycle of a ``push schedule''; execution proceeds from left to
+right, and channels are annotated with the number of items present.
+Because a push schedule is as fine-grained as possible,
+$\figsdepf{A}{B}(n)$ can be calculated as the number of times that $A$
+executes before the $n$th execution of $B$.
+\protect\label{fig:sdep1}}
+\end{center}
+\vspace{-12pt}
+\end{figure*}
 
 \section{Calculating SDEP}
 
-$\sdep$ function for a given graph $G$:
+It is straightforward to calculate $\sdepf{A}{B}(n)$ via a
+fine-grained simulation of the stream graph.  Our approach is to
+construct an execution $\phi$ that provides the minimum value of
+$|\phi \wedge A|$ that is selected in Equation~\ref{eq:sdepdef}.  We
+construct $\phi$ by simulating a ``push schedule'' of the stream
+graph.
+\begin{definition}(Push schedule)
+An execution $\phi$ follows a {\it push schedule} at position $i$ if,
+for all actors $A \ne \phi[i]$:
+\[
+A~\mbox{is unable to fire at time i} ~\vee~ {\cal L}(A) \ge {\cal L}(\phi[i])
+\]
+where ${\cal L}(A)$ denotes the shortest acyclic path in the stream
+graph from a source node (a node that consumes no items) to the actor
+$A$.  An execution $\phi$ is a push schedule if the above property
+holds for all $i$.
+\end{definition}
+Intuitively, a push schedule is one that always executes the most
+downstream node possible.  This results in a fine-grained interleaving
+of filter firings.  The following theorem allows us to use a push
+schedule to calculate the $\sdep$ function.
+\begin{theorem}  If $\phi$ is a push schedule and $B$ is the last element 
+of $\phi$, then $|\phi \wedge A| = \sdepf{A}{B}(|\phi \wedge B|)$.
+\end{theorem}
+\begin{proof}
+This is actually FALSE.
+\end{proof}
 
-{\bf Unoptimized}
+naive calculation.
 
-{\scriptsize
-\begin{verbatim}
-int SDEP_{A<-B} (n) {
-  if no path from A to B in G then
-    return 0
-  else 
-    countA = 0
-    countB = 0
-    do {
-      child <- most downstream actor of G that can fire
-      simulatePhase(child)
-      if child = A then
-        countA++;
-      else if child = B then
-        countB++;
-      endif
-    } loop until (countB = n)
-  endif
-  return countA
-}
-\end{verbatim}}
+steady state repetition.
 
-The most ``downstream'' actor is the one reachable via the longest
-acyclic path from a source node (a node that consumes zero items).
-
-{\bf Optimized}
+reference to figure.
 
 The result of sdepTable should be cached for quick lookups with SDEP.
 
+%% {\scriptsize
+%% \begin{verbatim}
+%% int SDEP_{A<-B} (n) {
+%%   if no path from A to B in G then
+%%     return 0
+%%   else 
+%%     countA = 0
+%%     countB = 0
+%%     do {
+%%       child <- most downstream actor of G that can fire
+%%       simulatePhase(child)
+%%       if child = A then
+%%         countA++;
+%%       else if child = B then
+%%         countB++;
+%%       endif
+%%     } loop until (countB = n)
+%%   endif
+%%   return countA
+%% }
+%% \end{verbatim}}
+
+\begin{figure}[t]
 {\scriptsize
 \begin{verbatim}
 int SDEP_{A<-B} (n) {
-  if no path from A to B in G then
+  if (n <= 0) || (no path from A to B in G) then
     return 0
   else
-    <sdepInit, sdepSteady> = sdepTable(A,B)
-    if n<|sdepInit| then
-      return sdepInit[n]
-    else
-      nAfterInit = n - |sdepInit|
-      cycles = floor(steady(B) / nAfterInit)
-      return cycles * steady(A) + sdepSteady[nAfterInit mod steady(B)]
-    endif
+    cycles = floor(steady(B) / (n-1))
+    return cycles * steady(A) + steadySDEP_{A<-B}[(n-1) mod steady(B)]
   endif
 }
 
-<int[], int[]> sdepTable(A,B) {
-  sdepInit = { 0 }
-  sdepSteady = { }
+int[] steadySDEP_{A<-B} {
+  SDEP = { }
   countA = 0
-  countB = 0
   do {
     child <- most downstream actor of G that can fire
     simulatePhase(child)
     if child = A then
       countA++
     else if child = B then
-      if (countB<init(B) || countA<init(A)) then
-        sdepInit = sdepInit o countA
-      else
-        sdepSteady = sdepSteady o countA
-      endif
-      countB++
+      SDEP = SDEP o countA
     endif
-  } loop until |sdepSteady| = steady(B)
-  return <sdepInit, sdepSteady>
+  } loop until |SDEP| = steady(B)
+  return SDEP
 }
 \end{verbatim}}
+\vspace{-12pt}
+\caption{\small Algorithm for computing $\figsdepf{A}{B}$ in a
+dataflow graph $G$.  Because $\figsdep$ information is cyclic, a
+simulation of a single steady state (the $\mt{steadySDEP}$ table) is
+sufficient to answer all $\figsdep$
+queries. \protect\label{fig:sdep1}}
+\end{figure}
+
+%% \begin{figure}[t]
+%% {\scriptsize
+%% \begin{verbatim}
+%% int SDEP_{A<-B} (n) {
+%%   if (n <= 0) || (no path from A to B in G) then
+%%     return 0
+%%   else
+%%     cycles = floor(steady(B) / (n-1))
+%%     return cycles * steady(A) + steadySDEP_{A<-B}[(n-1) mod steady(B)]
+%%   endif
+%% }
+
+%% global targetCount;
+%% global targetActor;
+%% int[] steadySDEP_{A<-B} {
+%%   SDEP = { }
+%%   targetActor = A
+%%   targetCount = 0
+%%   for i = 1 to steady(B)
+%%     pullSchedule(B)
+%%     SDEP = SDEP o { countTarget }
+%%   endfor
+%%   return SDEP
+%% }
+
+%% pullSchedule(X) {
+%%   for all input channels c_i of X
+%%     while X needs more items on c_i for next phase
+%%       pullSchedule(source(c_i))
+%%   simulatePhase(X)
+%%   if X=targetActor then
+%%     targetCount++
+%%   endif
+%% }
+%% \end{verbatim}}
+%% \vspace{-12pt}
+%% \caption{\small Algorithm for computing $\figsdepf{A}{B}$ in a
+%% dataflow graph $G$.  Because $\figsdep$ information is cyclic, a
+%% simulation of a single steady state (the $\mt{steadySDEP}$ table) is
+%% sufficient to answer all $\figsdep$
+%% queries. \protect\label{fig:sdep1}}
+%% \end{figure}

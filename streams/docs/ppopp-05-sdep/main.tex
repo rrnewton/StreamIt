@@ -1,7 +1,5 @@
 \documentclass{sig-alternate}
 \usepackage{epsfig}
-\usepackage{algorithm}
-\usepackage{algorithmic}
 
 %%  \toappear{
 %%  %\raisebox{2pt}[2pt]{\underline{~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}} \\
@@ -38,9 +36,12 @@ Michal Karczmarek, Janis Sermulins, William Thies and Rodric Rabbah \\
 
 \begin{document}
 \newtheorem{definition}{Definition}
+\newtheorem{theorem}{Theorem}
 
 \maketitle
 
+\newcommand{\figsdep}[0]{\mt{SDEP}}
+\newcommand{\figsdepf}[2]{\mt{SDEP}_{#1 \small{\leftarrow} #2}}
 \newcommand{\sdep}[0]{\textsc{sdep}}
 \newcommand{\sdepf}[2]{\sdep_{#1 \small{\leftarrow} #2}}
 \newcommand{\floor}[2]{\left\lfloor\frac{#1}{#2}\right\rfloor}
