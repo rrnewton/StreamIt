@@ -1,0 +1,282 @@
+\section{Phased Scheduling}
+\label{chpt:phased}
+
+\begin{figure}[t]
+\psfig{figure=pseudocode4.eps,width=3in}
+\caption{Phased Scheduling Algorithm\protect\label{fig:alg}}
+\end{figure}
+
+A schedule for a given hierarchical node of a {\StreamIt} program is a
+list of the node's immediate children, specifying the order in which
+they should be executed.  More precisly, since filters (and, as we
+will see, hierarchical nodes as well) can have multiple phases, a
+schedule is a list of phases of child nodes.  In order for a schedule
+to be legal, it must satisfy two conditions: first, for every
+execution of a node, a sufficient amount of data must be present on
+its {\Input} {\Channel}(s); second, in the case of the steady state,
+an infinite repetition of the schedule must require a finite amount of
+memory.  The second condition is ensured by using the steady state
+multiplicities calculated in the previous section, while the first
+condition is one that we must respect when choosing an ordering for
+the nodes.
+
+Our phased scheduling algorithm, shown in Figure~\ref{fig:alg},
+operates in a hierarchical fashion.  That is, it constructs a schedule
+for a given pipeline, splitjoin, or feedbackloop as a sequence of the
+schedules of its children.  A schedule is represented as a sequence of
+phases.  In the base case of a filter, these phases are given by the
+stream graph (with one small modification, described below), while at
+hierarchical nodes they are computed by our algorithm.  To schedule an
+entire StreamIt program, our algorithm should be applied as a
+post-order traversal of the stream graph.
+
+Intuitively, our algorithm is based on the observation that a
+hierarchical stream displays cyclic behavior as it executes its
+components.  At the coarsest level of granularity, these cycles are
+evident in the steady state schedule: each iteration of the steady
+state is exactly the same.  The aim of our algorithm is to exploit a
+finer level of granularity in execution behavior---the basic unit
+being a phase of the push schedule for the stream.  Generally
+speaking, a phase of the push schedule holds the smallest sequence of
+filter executions that will both consume input and produce output for
+the stream.  Our algorithm allows a parameterized level of granularity
+by collapsing some of these fine-grained phases together and shuffling
+the resulting schedule so that the phases of a given child stream are
+all adjacent.  As we demonstrate below, a single appearance schedule
+and minimum latency schedule are both special cases of a parameterized
+phased schedule.
+
+\subsection{Algorithm Details}
+
+We now consider in more detail the pseudocode in Figure~\ref{fig:alg}.
+The algorithm inputs a Stream {\tt s} and returns a sequences of
+phases that represent the schedule for that stream.  It also inputs
+two additional parameters: {\tt maxPhases}, which specifies the
+maximum number of phases in the resulting schedule, and {\tt mode},
+which indicates whether we are scheduling for the initial or
+steady-state epoch.  The algorithm starts by assembling a series of
+fine-grained phases, each of which corresponds to a push schedule as
+built by the {\tt pushSchedule} routine.
+
+The {\tt pushSchedule} routine simulates a push schedule until at
+least one output is produced.  A push schedule is one in which
+downstream nodes are fired as much as possible before upstream nodes
+are considered.  The routine starts with the entrance node of the
+stream, {\it i.e.,} the first child of a pipeline, the splitter of a
+splitjoin, or the joiner of a feedbackloop.  It then pushes live items
+as far forward as possible, only executing the entrance node again if
+the exit node could not fire.  
+
+There are two subtleties in the {\tt pushSchedule} procedure.  First,
+note that it always flushes extra items from the stream: the exit node
+might fire multiple times, even though all firings were caused by a
+single execution of the entrance node.  Second, in the case of a
+feedbackloop, it is careful to push items around the feedback path
+even after the splitter (the exit node) has fired.  That is, the
+ranking of nodes in a feedback loop is $(\mt{joiner}, \mt{body},
+\mt{splitter}, \mt{loop})$, and pushing of items through the loop node
+is necessary to ensure a correct steady-state schedule.
+
+The {\tt phasedSchedule} routine builds up a maximal list of phases
+from the push schedule.  In the steady state, this list is complete
+when each node has completed its steady state repetitions, while in
+the initialization mode, simulation is finished when each node has
+executed its initial phases.  To ensure that the initialization
+schedule provides enough data items for the peeking requirements of
+the steady state, we add an extra initialization phase to each filter
+before running the algorithm.  For filter $f$, this phase has rates
+$\mt{peek'}=\mt{peek}_f - \mt{pop}_f, \mt{pop'}=\mt{push'}=0$.  Since
+this phase must execute in the initial schedule, it ensures that there
+will be $\mt{peek}-\mt{pop}$ items present at the start of the steady
+state.  A steady state schedule is then possible to construct, since
+the filter can return the buffer to this state by firing once with
+$\mt{peek}$ items on the channel.
+
+Once it has gathered the list of maximally fine-grained phases, the
+{\t pushSchedule} algorithm makes two modifications.  First, it
+combines some adjacent phases so that only {\tt maxPhases} are
+returned.  Combination works simply by concatanating the sequence of
+child executions from the given phases.  Second, even if no phases are
+combined, the algorithm re-arranges the order of child phases so that
+all phases corresponding to a given stream are adjacent.  This is an
+attempt to provide a canonical form for a given series of executions,
+so that phases with the same form can be compressed in the resulting
+schedule~(see Section~\ref{sec:schedrep}).
+
+Note that the pseudocode given in Figure~\ref{fig:alg} specifies only
+the behavior of the algorithm, rather than the implementation.  In our
+implementation, we avoid symbolic execution of the entire steady state
+by calculating, from the bottom-up, the number of node firings that
+will be required in each phase.  In this technique, each child node is
+visited only once per phase calculation of the parent.
+
+%% \begin{table*}[t] \centering  \scriptsize
+%% \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+%% \hline
+%% \multicolumn{4}{|c|}{data in {\Channel}} & \multicolumn{4}{c|}{\parbox{1in}{\centering phase executions left}} & \parbox{0.5in}{\centering child considered} & \parbox{0.6in}{\centering phases executed} & \parbox{0.6in}{\centering {\pipeline} consumption} \\
+%% \cline{1-8} $in_A$ & $out_A$ & $in_B$ & $out_B$ & split & A & B & join & & & \\
+%% \hline 0 (0) & 0 (0) & 0 (0) & 0 (0) & 0 & 0 & 1 & 0 & join & - & $[0\ 0\ 0]$ \\
+%% \hline 0 (0) & 0 (0) & 0 (0) & 0 (0) & 0 & 0 & 1 & 0 & A & - & $[0\ 0\ 0]$ \\
+%% \hline 0 (0) & 0 (0) & 0 (0) & 0 (0) & 0 & 0 & 1 & 0 & B & $A^i_{B,0}$ & $[0\ 0\ 0]$ \\
+%% \hline 0 (0) & 0 (0) & 0 (1) & 0 (0) & 0 & 0 & 0 & 0 & split & split & $[3\ 3\ 0]$ \\
+%% \hline 2 (0) & 0 (0) & 1 (0) & 0 (0) & 0 & 0 & 0 & 0 & A & $A^i_{A,0}$ & $[0\ 0\ 0]$ \\
+%% \hline 0 (0) & 1 (0) & 1 (0) & 0 (0) & 0 & 0 & 0 & 0 & B & - & $[0\ 0\ 0]$ \\
+%% \hline 0 (0) & 1 (0) & 1 (0) & 0 (0) & 0 & 0 & 0 & 0 & join & - & $[0\ 0\ 0]$ \\
+%% \hline 0 (0) &  1 (0) &  1 (0) &  0 (0) & \multicolumn{7}{|c|}{init phase 0 done, init done} \\
+%% \hline 0 (0) & 1 (0) & 1 (0) & 0 (0) & 2 & 2 & 1 & 2 & join & join & $[0\ 0\ 4]$ \\
+%% \hline 0 (0) & 0 (0) & 1 (0) & -3 (3) & 2 & 2 & 1 & 2 & A & - & $[0\ 0\ 0]$ \\
+%% \hline 0 (0) & 0 (0) & 1 (0) & -3 (3) & 2 & 2 & 1 & 1 & B & $A_{B,0}$ & $[0\ 0\ 0]$ \\
+%% \hline 0 (0) & 0 (0) & -1 (2) & 3 (0) & 2 & 2 & 0 & 2 & split & $\{2split\}$ & $[6\ 6\ 0]$ \\
+%% \hline 4 (0) & 0 (0) & 1 (0) & 3 (0) & 0 & 2 & 0 & 2 & A & $\{2A_{A,0}\}$ & $[0\ 0\ 0]$ \\
+%% \hline 0 (0) & 2 (0) & 1 (0) & 3 (0) & 0 & 0 & 0 & 0 & B & - & $[0\ 0\ 0]$ \\
+%% \hline 0 (0) & 2 (0) & 1 (0) & 3 (0) & 0 & 0 & 0 & 1 & join & join  & $[0\ 0\ 4]$ \\
+%% \hline 0 (0) &  1 (0) &  1 (0) &  0 (0) & \multicolumn{7}{|c|}{phase 0 done, steady state schedule done} \\
+%% \hline
+%% \end{tabular}
+%% \caption[Execution of Minimal Latency Scheduling Algorithm on a
+%% {\splitjoin}]{Execution of Minimal Latency Scheduling Algorithm on
+%% {\splitjoin} from Figure \ref{fig:steady-state}(b). In the ``data
+%% in {\Channel}'' columns, the first value represents the actual
+%% number of data in the {\Channel}, which can be negative due to
+%% data borrowing. The second value is the minimal number of data
+%% items borrowed from the {\Channel}.}
+%% \label{tbl:min-lat-sj}
+%% \end{table*}
+
+%% Table \ref{tbl:min-lat-sj} contains a trace of execution of our
+%% algorithm on the sample {\splitjoin} from Figure
+%% \ref{fig:steady-state}(b). Below is the phased schedule for the
+%% {\splitjoin}. Note that this example produces a phased single
+%% appearance schedule.
+
+%% \begin{displaymath} \scriptsize
+%% P_{sj} = \left\{
+%% \begin{array}{c}
+%% T_{sj} = \left\{
+%% \begin{array}{c}
+%% A_{sj,0} = \left\{ \{\{2 split\}\{2A\}B\{2 join\}\}, \left[\begin{array}{c} 6 \\ 6 \\ 8 \end{array}\right]\right\} \\
+%% \end{array}\right\}, \\
+%% I_{sj} = \left\{ A^i_{sj,0} = \left\{
+%% \{split\ A^i_{A,0}\ A^i_{B,0}\}, \left[\begin{array}{c} 3 \\ 3 \\ 0 \\
+%% \end{array}\right]\right\}
+%% \right\}, \\
+%% c_{sj} = \left[ \begin{array}{c} 6 \\ 6 \\ 8 \end{array} \right],
+%% c^i_{sj} = \left[ \begin{array}{c} 3 \\ 3 \\ 0 \end{array}
+%% \right],
+%% \end{array}
+%% \right\}
+%% \end{displaymath}
+
+\subsection{Generalizing Other Techniques}
+
+As alluded to above, single appearance scheduling and minimum latency
+scheduling are special cases of our parameterized phased scheduling
+algorithm.  The initial and steady state schedules for these cases can
+be constructed with the following calls:
+\[
+\small
+\begin{array}{rcl}
+\mt{singleAppSchedule}[s]  & = & \langle \mt{phasedSchedule}(s, 1, \mbox{INIT}), \\
+                         ~ & ~ & ~ \mt{phasedSchedule}(s, 1, \mbox{STEADY}) \rangle \\ ~ \\
+\mt{minLatencySchedule}[s] & = & \langle \mt{phasedSchedule}(s, \infty, \mbox{INIT}), \\
+                         ~ & ~ & ~ \mt{phasedSchedule}(s, \infty, \mbox{STEADY}) \rangle
+\end{array}
+\]
+That is, a single appearance schedule is the same as a phased schedule
+with a single phase, while a minimum latency schedule is a phased
+schedule with an unlimited number of phases.  Other values of the {\tt
+maxPhases} parameter indicate a compromise between these two extremes.
+Also, note that different levels of granularity could be applied to
+different streams in the same graph, depending on the constraints; the
+algorithm does not depend on the granularity of the children when it
+is scheduling a parent node.
+
+\begin{figure}[t]
+\begin{center}
+\psfig{figure=gsmfl.eps,width=2.2in}
+\caption{Tightly coupled feedback loop from our GSM benchmark.\protect\label{fig:gsm}}
+\end{center}
+\end{figure}
+
+\begin{figure*}[t]
+\psfig{figure=gsmfl-sched.eps,width=7in}
+
+\hspace{43pt} 
+phase 1 \hspace{94pt}
+phase 2 \hspace{94pt}
+phase 3 \hspace{94pt}
+phase 4
+\caption{Phased schedule for feedback loop of Figure~\ref{fig:gsm}.
+No single appearance schedule exists for this
+loop.\protect\label{fig:gsm-phases}}
+\end{figure*}
+
+\subsection{Scheduling Feedback Loops}
+
+Some feedback loops require a minimum number of phases in order to
+construct a valid schedule.  This is because if the latency of child
+streams is too high, then a node could deadlock waiting for its own
+(upcoming) output to propagate through the loop.  For example, in our
+GSM benchmark, there is a tightly constrainted feedback loop (see
+Figure~\ref{fig:gsm}).  While it is impossible to schedule this loop
+with a single appearance schedule, a minimum latency schedule
+(containing 4 phases) results in a legal ordering
+(see~Figure~\ref{fig:gsm-phases}).
+
+Figure~\ref{fig:alg} provides an algorithm for calculating the minimum
+number of phases that are required to schedule a feedback loop.  The
+routine's functionality is similar to the phased scheduler, except for
+one key difference: the joiner is executed as much as possible before
+the items that it pushes are propagated around the loop.  This ensures
+that the reshuffling step of the phased scheduling algorithm will be
+legal, since no element in the schedule will depend on items that it
+produced at an earlier time.  Note that the {\tt phasedSchedule}
+algorithm gives an undefined result if a given loop is impossible to
+schedule with the requested number of phases; thus, {\tt
+phasesForFeedback} should always be called first to see how many
+phases are needed.
+
+\subsection{Schedule Representation}
+\label{sec:schedrep}
+
+In the discussion above, a schedule is represented simply as a
+sequence of phases for child nodes.  However, since this
+representation can become large for some programs, our implementation
+employs compression to keep code size to a minimum.  
+
+We compress the schedule in three simple ways.  First, if a sequence
+of child phases occurs more than once during the exection of a parent
+node, then we denote this sequence by a new symbol and use the symbol
+in place of the sequence.  Second, if a given child phase is only used
+once in all executions of its parent, then its contents can be lifted
+into the parent (thereby eliminating a symbolic name.)  Finally, if
+there are adjacent invocations of the same phase, then we can run
+length encode the schedule and execute that phase in a loop.
+
+The compression has no negative effects on speed of execution, and
+never increases the size of a schedule.  Also, as expected, it has no
+effect on sigle appearance schedules
+
+%% During testing it was found that in some applications some operators
+%% had many phases that were identical to other phases of the
+%% operator. Instead of including these phases in the final schedule
+%% multiple times, they were listed only once, and references to the
+%% duplicate phases have been replaced with references to the one copy.
+
+%% This optimization lead to improvements in schedule size for two
+%% reasons. First, operators now have fewer phases, so their schedules
+%% take up less space. Second, applications using the phased schedules
+%% can now execute the same phase multiple times in a row, which was
+%% optimized out using run length encoding.
+
+In the future, an additional optimization could be explored regarding
+schedule compression.  Instead of representing different phases for a
+given stream by distinct entries in the schedule, we could record only
+the name of the stream in the schedule and postpone the resolution of
+the current phase number until runtime.  This would allow more
+opportunities for schedule compression, as two different phases would
+be considered equal if they call the same child streams, rather than
+requiring them to call the same phases on those children.  However,
+proper evaulation of this technique would need to take into account
+the overhead of this indirection at runtime, so we do not evaluate it
+here.

@@ -14,31 +14,14 @@ low priority
 things missing / to fix
 -----------------------
 
-- don't like the notation for steady state
-  - esp., why have S_{s,c} = {e_s, o_s, u_s} if e_s, o_s, and u_s are already defined?
-    --> oh, I see, because they're not defined in general.
+initialization
+  - note that there is more than one initialization schedule, as you
+    could advance partway into the steady state.  this would effect
+    the ordering of nodes in the steady state, but not the steady
+    state multiplicity.
 
-- steady state vs. steady state schedule is still confusing
+  - note that there is unique initialization schedule?
 
-- important distinction: the steady state in relation to the entire
-program, or in relation to your immediate parent
+scheduling algorithm
 
-- redo the "sample stream operators"?  They look like they're typeset
-in illustrator slightly differently than the FM Radio.
-
----
-
-- keep section 3 as scheduling basics, but make it include all the initialization details
-  - say how to calculate steady state; note that schedule could just be steady-state multiplicities
-- then next section in phases, with two special cases
-
-*** should really push that this allows scheduling of tight
-    feedbackloops, with GSM as an example.  Single appearance
-    scheduling won't allow this to be done.
-
-*** could also push this as a way of having cyclo-static dataflow go
-    up into hierarchical levels, to take advantage of same properties
-    it has at the node level.  also a way of taking advantage of
-    cyclo-static stuff at the node level.
-
-- 
+- maybe give other examples of traces of execution?
