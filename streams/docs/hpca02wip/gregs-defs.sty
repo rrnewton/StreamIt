@@ -1,0 +1,103 @@
+%% gregs-defs.sty -- Greg Sullivan
+%	$Id: gregs-defs.sty,v 1.1 2001-12-01 20:09:44 thies Exp $	
+
+\typeout{Document Style Option gregs-defs --  Greg Sullivan's customizations}
+
+%% Time macros from Mitch Wand
+% \thetime     Time in printable format   13:57
+% \hours       Number of hours past midnight
+% \minutes     Number of minutes past last hour
+
+\newcount\hours
+\newcount\minutes
+\newcount\hh
+\minutes=\time
+\hours=\time
+\divide\hours by60
+\hh=\hours
+\multiply\hh by60
+\advance\minutes by -\hh
+
+\def\thetime{\number\hours:\ifnum\minutes<10{0}\fi\number\minutes}
+
+%% Make abstract like normal \section*:
+%\def\abstract{\section*{Abstract}}
+%\def\endabstract{}
+
+\usepackage{verbatim}
+\newenvironment{tightverb}%
+  {\setlength{\parskip}{0pt}\verbatim}
+  {\endverbatim}
+
+\newcounter{tightenumctr}
+\newenvironment{tightenum}
+	{\begin{list}{\arabic{tightenumctr}.}{
+	  \usecounter{tightenumctr}
+	  \setlength{\topsep}{0pt}
+	  \setlength{\parsep}{0pt}
+	  \setlength{\parskip}{0pt}
+	  \setlength{\itemsep}{0pt}}}
+	{\end{list}}
+
+\newenvironment{tightitem}
+	{\begin{list}{$\bullet$}{
+	  \setlength{\topsep}{0pt}
+	  \setlength{\parsep}{0pt}
+	  \setlength{\parskip}{0pt}
+	  \setlength{\itemsep}{0pt}}}
+	{\end{list}}
+
+\newcommand{\mkbld}[1]{\mbox{\textbf{#1:}}\hfil}
+
+\newenvironment{tightdesc}
+	{\begin{list}{}{
+	  \renewcommand{\makelabel}{\mkbld}
+	  \setlength{\topsep}{0pt}
+	  \setlength{\parsep}{0pt}
+	  \setlength{\parskip}{0pt}
+	  \setlength{\itemsep}{0pt}}}
+	{\end{list}}
+
+\def\mdef#1#2{\def#1{\ensuremath{#2}}}
+
+\def\sembrack#1{\lbrack\!\lbrack #1 \rbrack\!\rbrack}
+\def\sems#1{\mathop{\sembrack{#1}}}
+
+\def\itbox#1{\mbox{\it #1}}
+\def\itop#1{\mathrel{\mbox{\it #1}}}
+\def\sfbox#1{\mbox{\sf #1}}
+\def\sfop#1{\mathrel{\mbox{\sf #1}}}
+\def\rmbox#1{\mbox{\rm #1}}
+\def\rmop#1{\mathrel{\mbox{\rm #1}}}
+
+\mdef\adot{\mathrel{.}}		% abstraction dot (the . in \x.M)
+\mdef\bottom{\perp}
+\mdef\d{\delta}
+\mdef\implies{\Rightarrow}
+\mdef\implies{\Rightarrow}
+\mdef\k{\kappa}
+\mdef\l{\lambda}
+\mdef\prod{\mathrel{::=}}
+\mdef\proves{\vdash}
+\mdef\r{\rho}
+\mdef\s{\sigma}
+\mdef\t{\tau}
+\mdef\ta{\mathord{\rightarrow}}		% type arrow
+\mdef\tc{\mathrel{:}}  			% type colon
+\def\vec#1{\ensuremath\langle#1\rangle}
+
+%% \newtheorem{proposition}{Proposition}[section]
+
+\def\drule#1#2{\ensuremath{
+	\renewcommand{\arraystretch}{1.5}
+	\begin{array}{c}
+	{#1}\\ \hline 
+	{#2}\end{array}}}
+
+\def\drulelab#1#2#3{\ensuremath{
+	\renewcommand{\arraystretch}{1.5}
+	\left. \begin{array}{c}
+	{#2}\\ \hline
+	{#3}\end{array} \quad \right\} \quad {\mbox{#1}}}}
+
+%% end of gregs-defs.sty

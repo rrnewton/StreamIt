@@ -1,0 +1,191 @@
+% uncomment this to use pubform
+%\documentstyle[psfig, amsmath]{pubform}
+
+\documentclass{sig-alternate}
+\usepackage{gregs-defs}
+
+\begin{document}
+
+\title{A Common Machine Language for Grid-Based Architectures}
+
+% uncomment this to use pubform
+%% \author{Bill Thies, Michal Karczmarek, Michael Gordon, David Maze, Jeremy Wong, \\ Henry Hoffmann, Matthew Brown, and Saman Amarasinghe \\
+%% \parbox{6in}{\centering{Laboratory For Computer Science\\
+%%     Massachusetts Institute of Technology\\
+%%     Cambridge, MA  02139\\
+%%     \tt{\{thies, karczma, mgordon, dmaze, jnwong, hank, morris, saman\}@lcs.mit.edu}}}}
+%% \date{\today}
+
+\numberofauthors{1}
+\author{
+\alignauthor \vspace{-18pt}
+Bill Thies, 
+Michal Karczmarek, 
+Michael Gordon, 
+David Maze, 
+Jeremy Wong,
+Henry Hoffmann, 
+Matthew Brown, 
+and Saman Amarasinghe\\
+	\vspace{6pt}
+	Laboratory for Computer Science \\
+	Massachusetts Institute of Technology \\
+	Cambridge, MA  02139 \\
+%	\vspace{6pt}
+%	{\tt \{thies, karczma, mgordon, dmaze, jnwong, hank, morris, saman\}@lcs.mit.edu} \\
+%	\vspace{12pt}
+%        \today
+}
+
+% for the arrow of a function def, etc.
+\newcommand{\ma}[2]{max_{#1 \rightarrow #2}}
+\newcommand{\mi}[2]{\textsc{sdep}_{#2 \small{\rightarrow} #1}}
+\newcommand{\floor}[2]{\left\lfloor\frac{#1}{#2}\right\rfloor}
+\newcommand{\ceil}[2]{\left\lceil\frac{#1}{#2}\right\rceil}
+\newcommand{\ra}[0]{\rightarrow}
+\newcommand{\la}[0]{\lambda}
+
+\def\fn#1{\mathop{\mbox{\it #1}}}
+\def\fun#1#2{\ensuremath{\mathop{\mbox{\it #1}}(#2)}} % function call
+
+\newtheorem{definition}{Definition}
+\newtheorem{theorem}{Theorem}
+
+\maketitle
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Introduction}
+
+A {\it common machine language} is an essential abstraction that
+allows programmers to express an algorithm in a way that can be
+efficiently executed on a variety of architectures.  The key
+properties of a common machine language (CML) are: 1) it abstracts
+away the idiosyncratic differences between one architecture and
+another so that a programmer doesn't have to worry about them, and 2)
+it encapsulates the common properties of the target architectures such
+that a compiler for any given target can still produce an efficient
+executable.  
+
+For von-Neumann architectures, the canonical CML is C: instructions
+consist of basic arithmetic operations, executed sequentially, which
+operate on either local variables or values drawn from a global block
+of memory.  The C language has been implemented efficiently on a wide
+range of architectures, and it saves the programmer from having to
+adapt to each kind of register layout, cache configuration, and
+instruction set.
+
+However, recent years have seen the emergence of a class of grid-based
+architectures \cite{raw, trips, smartmemories} for which the
+von-Neumann model no longer holds, and for which C is no longer an
+adequate CML.  The design of these processors is fundamentally
+different in that they are conscious of wire delays--instead of just
+arithmetic computations--as the barriers to performance.  Accordingly,
+grid-based architectures support fine-grained, reconfigurable
+communication between replicated processing units.  Rather than a
+single instruction stream with a monolithic memory, these machines
+contain multiple instruction streams with distributed memory banks.
+
+Though C can still be used to program these machines, doing so either
+requires architecture-specific directives 
+
+We propose the StreamIt language as a new CML for grid-based
+processors.  
+
+\section{StreamIt Language}
+
+\subsection{Status}
+
+\section{Conclusions}
+
+\begin{figure}
+\psfig{figure=radio.ps,height=2in}
+\vspace{-6pt}
+\caption{Block diagram of a software radio.
+\protect\label{fig:radiodiagram}}
+%\vspace{-6pt}
+%\end{figure}
+
+%\begin{figure}
+\scriptsize
+\begin{verbatim}
+class Adder extends Filter {
+  int N;
+
+  void init(int N) {
+    input = new Channel(Float.TYPE, N);
+    output = new Channel(Float.TYPE, 1);
+    this.N = N;
+  }
+  
+  void work() {
+    float sum = 0;
+    for (int i=0; i<N; i++) {
+      sum += input.popFloat();
+    }
+    output.pushFloat(sum);
+  }
+}
+
+public class Equalizer extends Pipeline {
+  void init(int BANDS) {
+    add(new SplitJoin() {
+      void init() {
+        int bottom = 2500;
+        int top = 5000;
+        setSplitter(DUPLICATE());
+        for (int i=0; i<N; i++, bottom*=2, top*=2) {
+          add(new BandPassFilter(bottom, top));
+        }
+        setJoiner(ROUND_ROBIN());
+    }});
+    add(new Adder(N));
+  }
+}
+  
+class CheckFreqHop extends Filter {
+   int DELAY;
+   RFtoIFPortal portal;
+
+   void init(RFtoIF rf2if, int N) {
+      input = new Channel(Float.TYPE, N);
+      output = new Channel(Float.TYPE, N);
+      this.portal = new RFtoIFPortal(rf2if);
+      DELAY = 256/N;
+   }
+
+   void work() {
+      boolean hopped = /* calculate if hopped */
+      float newFreq =  /* detect new frequency */
+      if (hopped) {
+         portal.setFreq(newFreq, DELAY);
+      }
+   }
+}
+
+class TrunkedRadio extends Stream {
+   int N = 64;
+   int BANDS = 10;
+
+   void init() {
+      add(new ReadFromAtoD());
+      RFtoIF rf2if = add(new RFtoIF(N));
+      add(new FFT(N));
+      add(new CheckFreqHop(rf2if));
+      add(new Equalizer(10));
+      add(new Speaker());
+   }
+}
+\end{verbatim}
+\vspace{-16pt}
+\caption{StreamIt code for a software radio.
+\protect\label{fig:radiocode}}
+\end{figure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{small}
+\bibliographystyle{abbrv}
+\bibliography{references}
+\end{small}
+\end{document}
