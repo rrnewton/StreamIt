@@ -68,10 +68,10 @@ point as the number of {\tt pops} encountered along all possible
 execution paths.  $pushcount$ is defined to be the number of push
 expressions already seen at a particular program point.  If different
 execution paths could cause $pushcount$ or $popcount$ to take
-inconsitent values, then the appropriate variable becomes undefined.
+inconsistent values, then the appropriate variable becomes undefined.
 At each point in the program, we keep a candidate linear node
 $\lambda=({\mathbf A}, {\mathbf b}, e,o,u)$ that represents the
-computations necesary to produce the output generated up to that
+computations necessary to produce the output generated up to that
 point.
 
 We define ${\mathbf v} = zerov(k)$ a row vector of size $e$ such that
@@ -111,7 +111,7 @@ point implies that any future {\tt pop} and {\tt peek} operations do
 not generate linear forms, and an inconsistent $pushcount$ results in
 terminating the analysis (concluding the filter is non-linear).
 
-Backwards edges in control flow are handled currently by the symbolic
+Backward edges in control flow are handled currently by the symbolic
 execution of loops. We are investigating the use of parameterized
 generator matrices to describe the action of loops without requiring
 symbolic execution.

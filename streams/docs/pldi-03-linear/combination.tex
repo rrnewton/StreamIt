@@ -1,6 +1,6 @@
 \section{Container Combination(propagation)}
 We can use our knowledge of the linear representations of individual filters
-to determine linear representations for the StreamIt's heirarchal structures.
+to determine linear representations for the StreamIt's hierarchical structures.
 To determine a structure's overall linear representation, we require that all 
 of the structure's sub {\tt streams} have linear representations. 
 In the following discussion we discuss methods for determining overall representations for 
@@ -192,7 +192,7 @@ $F''_i = expand(F_i,f_i)$ will produce $f_i*u_{F_i}$ items, and it will take
 exactly $f_{w_i}=\frac{x}{w_i}$ firings of the 
 joiner (each of which consumes $w_i$ elements), to consume all $f_iu_i$ items produced by $F''_i$.
 It is important to note that we require that the {\tt splitjoin} does not need
-infinite buffer space to schedule see \cite{karczma-thesis} for an explination of schedules. 
+infinite buffer space to schedule see \cite{karczma-thesis} for an explanation of schedules. 
 For valid {\tt splitjoin}s $f_w=f_{w_i}$ is constant for all $i$. We also require that $o=o_{F''_i}$
 constant for all $i$. Figure~\ref{fig:splitjoin-duplicate-ratematch} depicts the 
 combination process graphically.
@@ -214,7 +214,7 @@ $f_w(\sum_{i=0}^{N-1}w_i)$ columns.
 We place the $w_0$ rightmost columns of $A''_0$ as the $w_0$ rightmost 
 columns of $A'''$. We then place the $w_1$ rightmost columns of $A''_1$ into the next $w_1$ columns 
 of $A'''$, and so forth. When we have placed $\sum_{i=0}^{N-1}w_{i}$ (the number of outputs resulting from 
-completly executing the joiner once), we start the process again from the beginning (taking the remaining
+completely executing the joiner once), we start the process again from the beginning (taking the remaining
 rightmost $w_0$ columns from $A''_0$, etc) until all of the columns from the expanded representations have
 been fitted into $A'''$. Figure~\ref{fig:splitjoin-duplicate-matrix} graphically depicts the process of 
 creating the overall $A'''$ from the smaller $A''_i$s.
