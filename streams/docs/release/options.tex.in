@@ -12,7 +12,7 @@
 
 \noindent
 This is for the May 28, 2003 snapshot release (streamit-0.0.20030528).\\
-\verb|$Id: options.tex.in,v 1.2 2003-09-22 16:16:45 dmaze Exp $|
+\verb|$Id: options.tex.in,v 1.3 2003-09-22 16:37:14 dmaze Exp $|
 
 \section*{Basic Usage}
 
@@ -100,13 +100,14 @@ float->float filter ScaleBySquare(float v) {
 
 \item[-O1]
   Perform basic optimizations that should improve performance in most
-  cases.  Adds \texttt{--unroll 256 --altcodegen --ratematch --wbs}.
+  cases.  Adds \texttt{--unroll 256 --alt\-code\-gen
+    --destroy\-field\-array --rate\-match --wbs}.
 
 \item[-O2]
   Perform extended optimizations that should improve performance in
   most cases, but may also cause the compiler to become unstable.
-  Adds \texttt{--unroll 4096 --removeglobals --simulatework
-    --altcodegen --ratematch --wbs}.
+  Adds \texttt{--unroll 4096 --alt\-code\-gen --destroy\-field\-array
+    --rate\-match --remove\-globals --simulate\-work --wbs}.
 \end{description}
 
 \subsection*{Options specific to RAW backend}
