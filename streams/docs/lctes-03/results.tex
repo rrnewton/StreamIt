@@ -11,25 +11,25 @@ presents the applications used for evaluation, while Section
 \label{sec:results:apps}
 
 Our benchmark suite contains 17 applications. Out of these
-applications, 15 represent useful practical computation taken from
+applications, 15 represent meaningful computations taken from
 real-life applications, while two were chosen to highlight the
 effectiveness of phased scheduling.
 
 SJPeek1024 and SJPeek31 are synthetic benchmarks, designed to
-highlight the strengths of phased schedules.  SJPeek 1024 requires an
-initialization schedule which benefits from the finer granularity of
-minimum latency scheduling. SJPeek31 contains a push/pop mismatch
-which causes a combinatorial blow-up using single appearance
-scheduling.
+highlight the strengths of phased schedules~\cite{karczma-thesis}.
+SJPeek1024 requires an initialization schedule which benefits from the
+finer granularity of minimum latency scheduling. SJPeek31 contains a
+push/pop mismatch which causes a combinatorial blow-up using single
+appearance scheduling.
 
 Nine test applications (BitonicSort, FFT, FilterBank, FIR, Radio, GSM,
-3GPP, Radar and Vocoder) are applications used in
-\cite{Gordo02}. BitonicSort performs a 32 element bitonic sort; FFT
-performs a 64-element FFT; FilterBank is an 8 channel filter bank; FIR
-is a 64-tap fine-grained FIR filter; Radio is an FM radio decoder with
-an equalizer; 3GPP is a 3GPP Radio Access Protocol application; Radar
-is a radar array front-end application with beamforming; Vocoder is a
-28 channel Vocoder.
+3GPP, Radar and Vocoder) are also used in \cite{Gordo02}. BitonicSort
+performs a 32 element bitonic sort; FFT performs a 64-element FFT;
+FilterBank is an 8 channel filter bank; FIR is a 64-tap fine-grained
+FIR filter; Radio is an FM radio decoder with an equalizer; 3GPP is a
+3GPP Radio Access Protocol application; Radar is a radar array
+front-end application with beamforming; Vocoder is a 28 channel
+Vocoder.
 
 Two test applications (CD-DAT and QMF) are borrowed from
 \cite{murt2000x2}. We model only the communication properties of the
@@ -42,7 +42,7 @@ which uses a 1/2-1/2 split for the spectrum up to a depth of 3
 high-pass and low-pass filtering in multiple-output blocks has been
 converted to a splitter followed by filters on each of the output
 channels. The low and high pass filters have also been given a peek
-amount of 16 so they can perform their function in the way intended in
+amount of 16 so they can perform their function in the way intended by
 {\StreamIt}.
 
 The remaining 4 applications were chosen from our sample applications
@@ -82,7 +82,8 @@ required by our hierarchical single appearance and minimum latency
 scheduling algorithms for our benchmark suite.  Note that the GSM
 application cannot be scheduled using a single appearance schedule,
 because it has a tightly constrained feedback loop (see
-Figure~\ref{fig:gsm}).
+Figure~\ref{fig:gsm}).  Thus, we omit GSM in
+Figures~\ref{fig:buffergraph} to~\ref{fig:sumgraph}.
 
 Several applications show a very large improvement in buffer size
 necessary for execution (see Figure~\ref{fig:buffergraph}).  These
@@ -103,6 +104,7 @@ scheduling.
 
 \begin{figure}[t]
 \vspace{6pt}
+\centering
 \psfig{figure=code-graph.eps,width=3.28in}
 \caption{\small Code size required by a phased minimum latency schedule,
 normalized to code size of a hierarchical single appearance

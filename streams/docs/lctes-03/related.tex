@@ -7,12 +7,11 @@ This section introduces some of the other projects.
 Ptolemy \cite{ptolemyoverview} is a simulation environment for
 heterogeneous embedded systems, including Synchronous Data Flow, the
 domain that is most similar to {\StreamIt}. {\SDF} programs, however,
-do not include the peeking constructs of {\StreamIt}.  In {\SDF}
-languages, actors are the active computational elements ({\filters}).
-The {\SDF} computation model does not impose structure on the program.
-All actors are allowed to have multiple input and output channels.
-\cite{benveniste93dataflow} provides an overview of dataflow
-synchronous languages.
+do not include the peeking constructs of {\StreamIt}.  The {\SDF}
+computation model does not impose structure on the program.  All
+actors (the SDF equivalent of filters) are allowed to have multiple
+input and output channels.  \cite{benveniste93dataflow} provides an
+overview of dataflow synchronous languages.
 
 There are many results on the scheduling of {\SDF} programs
 \cite{bhattacharyya99synthesis,leesdf}.  While the tradeoff between
@@ -34,9 +33,9 @@ for a review).  APGAN (Pairwise Grouping of Adjacent Nodes) and RPMC
 heuristics that have shown to be effective when applied together,
 taking the best result~\cite{Bhatta97}.  Another technique for
 reducing buffering requirements is buffer merging
-\cite{murt1999x3,murt2000x2}, which will be explored for use in {\StreamIt}
-in the future.  Yet another approach is the GASAS system, which uses
-genetic algorithms to minimize buffer size~\cite{GASAS}.
+\cite{murt1999x3,murt2000x2}, which could be explored for use in
+{\StreamIt} in the future.  Yet another approach is the GASAS system,
+which uses genetic algorithms to minimize buffer size~\cite{GASAS}.
 
 Buffer minimization has also been done in the context of a
 multiprocessor implementation \cite{govindarajan-minimizing}. Using a
@@ -56,12 +55,12 @@ scheduling tightly constrained feedback loops.
 
 \cite{wauters96cyclodynamic} proposes a model where the flow of data
 is not static, but may depend on data being processed. The model is
-called Cyclo-Dynamic Data Flow (CDDF). This greatly helps flexibility
-of programming, but prevents fully static scheduling of programs. The
-U.S. Navy Processing Graph Method (PGM) uses a version of {\SDF} with
-an equivalent of peeking \cite{goddard00navy}.  The paper is focused
-on real-time execution and provides analysis and verification of
-latency of data flow through their system.
+called Cyclo-Dynamic Data Flow (CDDF). This greatly improves the
+flexibility of programming, but prevents fully static scheduling of
+programs. The U.S. Navy Processing Graph Method (PGM) uses a version
+of {\SDF} with an equivalent of peeking \cite{goddard00navy}.  The
+paper is focused on real-time execution and provides analysis and
+verification of latency of data flow through their system.
 
 A large number of programming languages have included a concept of a
 stream; see \cite{survey97} for a survey.  Synchronous languages such

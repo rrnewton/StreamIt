@@ -45,15 +45,16 @@ scheduling technique, see~\cite{karczma-thesis}.
 \subsection{Algorithm Details}
 
 We now consider in more detail the pseudocode in
-Figure~\ref{fig:phasealg}; refer to Figure~\ref{fig:sjex} for an
-example.  The algorithm inputs a Stream {\tt s} and returns a
-sequences of phases that represent the schedule for that stream.  It
-also inputs two additional parameters: {\tt maxPhases}, which
-specifies the maximum number of phases in the resulting schedule, and
-{\tt mode}, which indicates whether we are scheduling for the initial
-or steady-state epoch.  The algorithm starts by assembling a series of
-fine-grained phases, each of which corresponds to a push schedule as
-built by the {\tt pushSchedule} routine.
+Figure~\ref{fig:phasealg}; refer to Figures~\ref{fig:sjex}
+and~\ref{fig:sjexlabel} for an example.  The algorithm inputs a Stream
+{\tt s} and returns a sequences of phases that represent the schedule
+for that stream.  It also inputs two additional parameters: {\tt
+maxPhases}, which specifies the maximum number of phases in the
+resulting schedule, and {\tt mode}, which indicates whether we are
+scheduling for the initial or steady-state epoch.  The algorithm
+starts by assembling a series of fine-grained phases, each of which
+corresponds to a push schedule as built by the {\tt pushSchedule}
+routine.
 
 The {\tt pushSchedule} routine simulates a push schedule until the
 bottom node is fired at least once (in most cases, this will
@@ -180,22 +181,41 @@ visited no more than twice per calculation of a parent phase.
 
 As alluded to above, single appearance scheduling and minimum latency
 scheduling are special cases of our parameterized phased scheduling
-algorithm.  The initial and steady state schedules for these cases can
-be constructed with the following calls:
+algorithm.  A single appearance schedule is defined as a schedule
+where each node appears in one position of the loop nest denoting the
+schedule.  Because the nodes within a phase are sorted by child
+stream, this is equivalent to a phased schedule with a single phase:
 \[
 \small
 \begin{array}{rcl}
 \mt{singleAppSchedule}[s]  & = & \langle \mt{phasedSchedule}(s, 1, \mbox{INIT}), \\
-                         ~ & ~ & ~ \mt{phasedSchedule}(s, 1, \mbox{STEADY}) \rangle \\ ~ \\
+                         ~ & ~ & ~ \mt{phasedSchedule}(s, 1, \mbox{STEADY}) \rangle
+\end{array}
+\]
+
+A minimum latency schedule exhibits the following property: if $i$
+input items have been consumed by a hierarchical node when it produces
+its $j$'th output item, then there does not exist a schedule which
+produces $j$ output items while consuming less than $i$ input items.
+This condition is necessary and sufficient for a schedule to be
+minimum latency.  We can construct a minimum latency schedule as a
+phased schedule with an unlimited number of phases:
+\[
+\small
+\begin{array}{rcl}
 \mt{minLatencySchedule}[s] & = & \langle \mt{phasedSchedule}(s, \infty, \mbox{INIT}), \\
                          ~ & ~ & ~ \mt{phasedSchedule}(s, \infty, \mbox{STEADY}) \rangle
 \end{array}
 \]
-That is, a single appearance schedule is the same as a phased schedule
-with a single phase, while a minimum latency schedule is a phased
-schedule with an unlimited number of phases.  Other values of the {\tt
-maxPhases} parameter indicate compromises between these two extremes.
-Also, note that different levels of granularity could be applied to
+This schedule is guaranteed to be minimum latency, since it is
+comprised of push phases that do not fire the entrance node once the
+exit node has been fired (see {\tt pushSchedule} in
+Figure~\ref{fig:phasealg}).
+
+Thus, single appearance and minimum latency schedules represent
+extreme values of the {\tt maxPhases} parameter.  Other values of {\tt
+maxPhases} indicate compromises between these two extremes.  Also,
+note that different levels of granularity could be applied to
 different streams in the same graph, depending on the constraints; the
 algorithm does not depend on the granularity of the children when it
 is scheduling a parent node.
@@ -226,15 +246,19 @@ many phases are needed.
 
 \begin{figure*}[t]
 \psfig{figure=gsmfl-sched.eps,width=7in}
-
+\vspace{-3pt}
 \hspace{43pt} 
 phase 1 \hspace{94pt}
 phase 2 \hspace{94pt}
 phase 3 \hspace{94pt}
 phase 4
-\caption{\small Phased schedule for feedback loop of Figure~\ref{fig:gsm}.
-No single appearance schedule exists for this
+\vspace{-1pt}
+\caption{\small Phased minimum latency schedule for one steady state
+execution of the feedback loop of Figure~\ref{fig:gsm}.  Nodes are
+labeled with the number of times they fire in a given phase.  No
+single appearance schedule exists for this
 loop.\protect\label{fig:gsm-phases}}
+\vspace{-4pt}
 \end{figure*}
 
 \begin{figure}
@@ -262,8 +286,8 @@ is a phase:
 \mbox{{\tt A=BBB}} ~\rightarrow~ \mbox{{\tt A=\{3B\}}}
 \]
 Second, if a hierarchical phase contains only one execution of a
-child, then we substitute all occurrences of the parent with a direct
-call to the child:
+child, we substitute all occurrences of the parent with a direct call
+to the child:
 \[
 \mbox{{\tt A=BCD, C=E}} ~\rightarrow~ \mbox{{\tt A=BED}}
 \]
