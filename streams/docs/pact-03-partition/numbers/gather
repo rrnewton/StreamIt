@@ -1,6 +1,6 @@
 #!/bin/csh
 #
-# USAGE:  "gather <extra-ops> <number to append for input/output files>"
+# USAGE:  "gather <extra-options> <number to append for input/output files> <label>"
 #
 
-$STREAMIT_HOME/misc/scripts/number-gathering/FarmLocal 2 5 "-N 10 -u 0 $1" "bench_$2" "results_dp_$2" "$STREAMIT_HOME/docs/spaa-03-load/numbers/blood"
+$STREAMIT_HOME/misc/scripts/number-gathering/FarmLocal 2 4 "-N 15 -O1 $1" "bench_$2" "results_$3" "$STREAMIT_HOME/docs/pact-03-partition/numbers/blood"
