@@ -1,0 +1,69 @@
+\begin{figure*}[ht]
+\centering
+\framebox[6.5in]{
+\begin{minipage}{6in}
+\begin{center}
+{\bf Variables}
+\end{center}
+\noindent For each channel $c = (n_a, n_b)$, do the following:
+\begin{itemize}
+%
+\item Introduce variable $\mt{BUF}_c$ with the following domain:
+\begin{align}
+{\cal D}_{{BUF}_c} = \{ ~(i,j)~|~0 \le i \le N - 1 ~\wedge~ 0 \le j \le \mt{Period}(c) - 1\}
+\end{align}
+%
+\item Introduce variable $\mt{WRITE}_{c}$ with this domain:
+\begin{align}
+{\cal D}_{{WRITE}_{c}} = \{~(i,j,k)~|~0 \le i \le N-1 ~\wedge~ 
+                                       0 \le j \le S(n_a) - 1 ~\wedge~ 0 \le k \le U(c) - 1\}
+\end{align}
+%
+\item Introduce variable $\mt{READ}_{c}$ with this domain:
+\begin{align}
+{\cal D}_{{READ}_{c}} = \{~(i,j,k)~|~0 \le i \le N-1 ~\wedge~ 
+                                      0 \le j \le S(n_b) - 1 ~\wedge~ 
+                                      0 \le k \le O(c) - 1\}
+\end{align}
+\end{itemize}
+%
+\begin{center}
+{\bf Equations}
+\end{center}
+\noindent For each node $n$, introduce the following equations:
+\begin{itemize}
+%
+\item {\bf(READ to WRITE)} For each $c \in \mt{chan\_out}(n)$:
+%
+\begin{align}
+\label{eq:r2w}
+&\forall (i, j, k) \in {\cal D}_{{WRITE}_{c}}:~~\mt{WRITE}_{c}(i,j,k) = W(n)(\mt{Steady\_Inputs})[\mt{pos\_out}(n, c)][k] \\ \nonumber
+&\mt{where Steady\_Inputs} = [\mt{READ}_{{chan\_in}(n)[0]}(i, j, *), \dots, 
+                             \mt{READ}_{{chan\_in}(n)[{num\_in}(n)-1]}(i, j, *) ]
+\end{align}
+%
+\item {\bf(WRITE to BUF)} For each $c \in \mt{chan\_out}(n)$, and for each $q \in
+[0,S(n)-1]$:
+\begin{align}
+\label{eq:w2b}
+&\forall (i,j) \in {\cal D}_{W \rightarrow B}(c,q):~~
+\mt{BUF}_{c}(i,j) = 
+  \mt{WRITE}_{c}(i, q, j - q * U(c)) \\ \nonumber
+&\mt{where } {\cal D}_{W \rightarrow B}(c,q) = 
+  {\cal D}_{{BUF}_{c}} \cap 
+  \{ (i,j)~|~q*U(c) \le j \le (q+1)*U(c) - 1 \}
+\end{align}
+% here is the simple, base case of the BUF -> READ function
+\item {\bf(BUF to READ)} For each $c \in \mt{chan\_in}(n)$:
+\begin{align}
+\label{eq:b2r}
+&~~~~~\forall (i,j,k) \in {\cal D}_{READ_{c}}:~~
+\mt{READ}_{c}(i,j,k) = \mt{BUF}_{c}(i,j*O(c) + k) \\ \nonumber
+\end{align}
+\vspace{-12pt}
+\end{itemize}
+\end{minipage}}
+\caption{Procedure for generating a SARE from a plain Synchronous
+Dataflow Graph.  \protect\label{fig:sdftosare}}
+\end{figure*}
+

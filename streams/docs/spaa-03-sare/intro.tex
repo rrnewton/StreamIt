@@ -1,0 +1,83 @@
+\section{Introduction}
+
+Synchronous dataflow graphs have become a powerful and widespread
+programming abstraction for DSP environments.  Originally proposed by
+Lee and Messerchmitt in 1987~\cite{LM87-i}, synchronous dataflow has
+since evolved into a number of
+varieties~\cite{BELP96,Bhatt00,Murthy2002,Buck93} which provide a
+natural framework for developing modular processing blocks and
+composing them into a concurrent network.  A dataflow graph consists
+of a set of nodes with channels running between them; data values are
+passed as streams over the channels.  The {\it synchronous} assumption
+is that a node will not fire until all of its inputs are ready.  Also,
+the input/output rates of the nodes are known at compile time, such
+that a static schedule can be computed for the steady-state execution.
+Synchronous dataflow graphs have been shown to successfully model a
+large class of DSP applications, including speech coding,
+auto-correlation, voice band modulation, and a number of filters.  A
+significant industry has emerged to provide dataflow design
+environments; leading products include COSSAP from Synopsys, SPW from
+Cadence, ADS from Hewlett Packard, and DSP Station from Mentor
+Graphics.  Academic projects include prototyping environments such as
+Ptolemy~\cite{Lee01} and Grape-II~\cite{Lauw95} as well as languages
+such as Lustre~\cite{lustre}, Signal~\cite{Gaut87}, and
+StreamIt~\cite{Gordo02}.
+
+One of the primary attractions of synchronous dataflow is that it
+offers two different models of computation to the programmer.  Within
+each processing node, programmers can write fine-grained imperative
+code as they would in a scientific application.  However, outside of
+the node, they can construct a graph in which all of the scheduling
+and buffer management is performed automatically.
+
+Up until now, this two-stage programming model has also implied a
+two-stage optimization strategy.  That is, the internal contents of
+each node are heavily optimized (often with hand-written C or assembly
+code), and then the scheduling and buffer management of the entire
+graph is done as a second pass.  Due to the tight resource constraints
+in the embedded domain, these graph-level optimizations have been an
+intense research focus--e.g., minimizing buffer size while restricting
+code size~\cite{murt1997x1}, minimizing buffer size while maintaining
+parallelism~\cite{GGD94}, resynchronization~\cite{Bhatta2000}, and
+buffer sharing~\cite{murt2001x1}.  However, these optimizations
+unilaterally regard each node as a black box that is invisible to the
+compiler.  Due to the differing models of computation within the node
+and outside the node, they are not able to perform any inter-node
+optimizations that leverage the structure of the graph to improve the
+computation of the nodes themselves.
+
+In this paper, we give a technique whereby a System of Affine
+Recurrence Equations (SARE) can serve as a unifying analysis framework
+for inter-node and intra-node optimization in a dataflow graph.  The
+SARE is a powerful representation with a mature body of literature
+surrounding it.  It has its roots in the systolic community, where
+Karp et al. proposed Uniform Recurrence Equations in 1967 as a model
+for parallel computation~\cite{Karp67}.  More recently, Feautrier has
+shown that a SARE can exactly represent the flow of data in a certain
+class of scientific programs~\cite{Feautrier91,Feautrier01}.  This
+provides one component of our method: translating each node's internal
+computation into a SARE.
+
+Our main contribution is a translation which encapsulates the
+inter-node dependences: from a dataflow graph to a SARE.  The input of
+our analysis is a Cyclo-Static Dataflow Graph, which is one of the
+more flexible representations in the DSP domain. Once a SARE has been
+constructed that captures both inter-node and intra-node dependences,
+we demonstrate how affine techniques could be employed to perform
+novel optimizations such as node splitting and decimation propagation
+that exploit both the structure of the dataflow graph as well as the
+internal contents of each node.  We also discuss the potential of
+affine techniques for scheduling parameterized dataflow graphs, as
+well as offering new approaches to classic problems in the dataflow
+domain.
+
+The rest of this paper is organized as follows.  We begin by
+describing background information and related work on dataflow graphs
+and SARE's (Section 2).  Then we give our notation for Cyclo-Static
+Dataflow (Section 3), and give the procedure for translating a simple
+synchronous dataflow graph to a SARE (Section 5).  Next, we give the
+full details for the general translation (Section 6), describe a range
+of applications for the technique (Section 7), and conclude (Section
+8).  
+%A detailed example that illustrates our technique appears in the
+%Appendix.

@@ -1,0 +1,179 @@
+\section*{Appendix: Alpha Code}
+\scriptsize
+\begin{verbatim}
+system FileReader:{L, KxRATE | L, KxRATE>0}() 
+          returns (R:{i,j | 1<=i<=L; 1<=j<=KxRATE} of real);
+let
+  R[i,j] = 1[];
+tel;
+
+system DoCosineDist: {S | S>0}
+                     (A:real;
+                      B:real)
+            returns (R: real);
+let
+  R = A * B;
+tel;
+
+system SimMat: {L,S | L>0; S>0}
+               (A:{i| 1<=i<=L} of real)
+       returns (R:{i,j| 1<=i,j<=L} of real);
+let
+  use {i,j| 0<=i<=L; 0<=j<=L} DoCosineDist[S] (A[i], A[j]) returns (R);
+tel;
+
+system ExtractDiagonal1: {L,W | L>0; W>0}
+                        (A:{i,j| 1<=i<=W/2; 1<=j<=L} of real)
+       returns (R:{i,j| 1<=i<=W/2; 1<=j<=W} of real);
+let
+  R[i,j] = A[i,j];
+tel;
+
+system ExtractDiagonal2: {L,W | L>0; W>0}
+                        (A:{i,j| 1<=i<=L-W; 1<=j<=L} of real)
+       returns (R:{i,j| 1<=i<=L-W; 1<=j<=W} of real);
+let
+  R[i,j] = A[i,j+i];
+tel;
+
+system ExtractDiagonal3: {L,W | L>0; W>0}
+                        (A:{i,j| 1<=i<=W/2; 1<=j<=L} of real)
+       returns (R:{i,j| 1<=i<=W/2; 1<=j<=W} of real);
+let
+  R[i,j] = A[i,j+L-W];
+tel;
+
+system DoFFT: {S, N | S>0,N>0}
+              (A:{i| 1<=i<=N} of real)
+       returns (R: real);
+var c:{i | 1<=i<=N} of real;
+let
+  c[i] =
+    case
+      {|i=1}  : 0[];
+      {|i>1}  : A[i] * c[i-1];
+    esac;
+  R = c[N];
+tel;
+
+system STFT: {S, KxRATE | S>0; KxRATE>0}
+             (A:{i| 1<=i<=KxRATE} of real)
+       returns (R: real);
+let
+  use DoFFT[S, KxRATE] (A) returns (R);
+tel;
+
+system DoCorrelate: {L, W | L>0; W>0}
+             (A:{i,j| 1<=i<=L; 1<=j<=W} of real)
+       returns (R:{i| 1<=i<=L} of real);
+var c:{i,j | 1<=i<=L; 1<=j<=W} of real;
+let
+  c[i,j] = 
+    case
+     {|i=1; j=1} : 0[];
+     {|i>1; j=1} : c[i-1,W];
+     {|i>1; j>1} : c[i,j-1] * A[i,j];
+    esac;
+  R[i] = c[L,W];
+tel;
+
+system Correlate: {L, W | L>0; W>0}
+             (A:{i,j| 1<=i<=L, 1<=j<=W} of real)
+       returns (R:{i| 1<=i<=L} of real);
+let
+  use DoCorrelate[L, W] (A) returns (R);
+tel;
+
+system DisplaySegments: {K, W, RATE, S, L, N, LxW, KxRATE, LxL |
+          K,W,RATE,S,L,N, LxW,KxRATE,KxRATE,LxL>0} ()
+       returns (R:{i| 1<=i<=L} of real);
+var 
+  BUF_c1:{i,j,k | 1<=i<=N; 1<=j<=L; 1<=k<=KxRATE } of real;
+  BUF_c2:{i,j | 1<=i<=N; 1<=j<=L } of real;
+  BUF_c3:{i,j,k | 1<=i<=N; 1<=j<=L; 1<=k<=L } of real;
+  BUF_c4:{i,j,k | 1<=i<=N; 1<=j<=L; 1<=k<=W } of real;
+
+  WRITE_c1:{i,j,k,l | 1<=i<=N; j=1; 1<=k<=L, 1<=l<=KxRATE} of real;
+  WRITE_c2:{i,j,k | 1<=i<=N; 1<=j<=L; k=1} of real;
+  WRITE_c3:{i,j,k,l | 1<=i<=N; j=1; 1<=k<=L; 1<=l<=L} of real;
+  WRITE_c4_0:{i,j,k,l | 1<=i<=N; j=1; 1<=k<=W/2; 1<=l<=W} of real;
+  WRITE_c4_1:{i,j,k,l | 1<=i<=N; j=1; 1<=k<=L-W; 1<=l<=W} of real;
+  WRITE_c4_2:{i,j,k,l | 1<=i<=N; j=1; 1<=k<=W/2; 1<=l<=W} of real;
+  WRITE_c5:{i,j,k | 1<=i<=N; j=1; 1<=k<=L} of real;
+
+  READ_c1:{i,j,k | 1<=i<=N; 1<=j<=L; 1<=k<=KxRATE} of real;
+  READ_c2:{i,j,k | 1<=i<=N; j=1; 1<=k<=L} of real;
+  READ_c3_0:{i,j,k,l | 1<=i<=N; j=1; 1<=k<=W/2; 1<=l<=L} of real;
+  READ_c3_1:{i,j,k,l | 1<=i<=N; j=1; 1<=k<=L-W; 1<=l<=L} of real;
+  READ_c3_2:{i,j,k,l | 1<=i<=N; j=1; 1<=k<=W/2; 1<=l<=L} of real;
+  READ_c4:{i,j,k,l | 1<=i<=N; j=1; 1<=k<=L; 1<=l<=W} of real;
+
+  temp1:{k,l | 1<=k<=L; 1<=l<=KxRATE} of real;
+
+let
+  -- generate WRITE_c1
+  use FileReader[L, KxRATE]() returns (temp1);
+  WRITE_c1[i,j,k,l] = temp1[k,l];
+
+  --READ_c1 to WRITE_c2
+  use {i,j| 1<=i<=N; 1<=j<=L} STFT[S,KxRATE] (READ_c1[i,j]) 
+        returns (WRITE_c2);
+
+  -- READ_c2 to WRITE_c3
+  use {i,j| 1<=i<=N; j=1} SimMat[L,S](READ_c2[i,1]) returns (WRITE_c3);
+
+  -- READ_c3_0 to WRITE_c4_0
+  use {i,j| 1<=i<=N; j=1} ExtractDiagonal1[L,W](READ_c3_0[i,j]) 
+        returns (WRITE_c4_0);
+
+  -- READ_c3_1 to WRITE_c4_1
+  use {i,j| 1<=i<=N; j=1} ExtractDiagonal2[L,W](READ_c3_1[i,j]) 
+        returns (WRITE_c4_1);
+
+  -- READ_c3_2 to WRITE_c4_2
+  use {i,j| 1<=i<=N; j=1} ExtractDiagonal3[L,W](READ_c3_2[i,j]) 
+        returns (WRITE_c4_2);
+
+  -- READ_c4 to WRITE_c5
+  use {i,j | 1<=i<=N; j=1} Correlate[L,LxW](READ_c4[i,j]) 
+        returns (WRITE_c5);
+
+  -- WRITE_c1 to BUF_c1
+  BUF_c1[i,j,k] = WRITE_c1[i,1,j,k];
+
+  -- WRITE_c2 to BUF_c2
+  BUF_c2[i,j] = WRITE_c2[i,j,1];
+
+  -- WRITE_c3 to BUF_c3
+  BUF_c3[i,j,k] = WRITE_c3[i,j,1,k];
+
+  -- WRITE_c4_0, WRITE_c4_1, WRITE_c4_2 to BUF_c4
+  BUF_c4[i,j,k] =
+    case
+      {|j<W/2}  : WRITE_c4_0[i,1,j,k];
+      {|W/2<=j<L-W/2}  : WRITE_c4_1[i,1,j-W/2,k];
+      {|L-W/2<=j}  : WRITE_c4_2[i,1,j-(L-W/2),k];
+    esac;
+
+  -- BUF_c1 to READ_c1
+  READ_c1[i,j,k] = BUF_c1[i,j,k];
+
+  -- BUF_c2 to READ_c2
+  READ_c2[i,j,k] = BUF_c2[i,k];
+
+  -- BUF_c3_0 to READ_c3_0
+  READ_c3_0[i,j,k,l] = BUF_c3[i,k,l];
+
+  -- BUF_c3_1 to READ_c3_1
+  READ_c3_1[i,j,k,l] = BUF_c3[i,W/2+k,l];
+
+  -- BUF_c3_2 to READ_c3_2
+  READ_c3_2[i,j,k,l] = BUF_c3[i,L-W/2+k,l];
+
+  -- BUF_c4 to READ_c4
+  READ_c4[i,j,k,l] = BUF_c4[i,k,l];
+
+  -- return values written to c5
+  R[k] = WRITE_c5[N,1,k];
+tel;
+\end{verbatim}

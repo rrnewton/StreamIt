@@ -1,0 +1,20 @@
+\section{General Translation: CSDP to SARE}
+\label{sec:translate}
+
+In this section we give the formal translation of a Cyclo-Static
+Dataflow Program to a System of Affine Recurrence Equations.  Again,
+the SARE will be parameterized by $N$, the number of steady-state
+cycles that one wishes to execute in the CSDP.  The translation will
+use the helper functions shown in Figure~\ref{fig:helper}.  We also
+make use of the $S(n)$ function giving the number of steady-state
+executions of node $n$ (see Section~\ref{sec:balance}).  
+%Please refer
+%to the Appendix for a concrete illustration of the techniques
+%described below.
+
+\input{complexfig}
+
+Figure~\ref{fig:csdptosare1} illustrates the variables used for the
+translation.  These are very similar to those in the simple case,
+except that now there are separate variables for each phase.  The
+equations for the translation appear in Figure~\ref{fig:csdptosare3}.
