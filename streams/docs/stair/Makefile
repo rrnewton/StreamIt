@@ -1,4 +1,4 @@
-DOCS := design issues
+DOCS := design example issues related
 DVI := $(DOCS:%=%.dvi)
 PS := $(DOCS:%=%.ps)
 PDF := $(DOCS:%=%.pdf)
