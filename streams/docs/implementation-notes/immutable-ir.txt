@@ -1,3 +1,167 @@
+questions for karczma:
+- how about my replacement scheme
+- can we rename the package to "iterator"?
+- do we really need IteratorBase -- please move getObject into each indiv. one?  hmm.
+
+----------
+
+Interface:
+
+Iterator getMutableCopy(Iterator i);
+  - does cloning
+  - replaces in parents by shallowclone and replacement
+
+Iterator finalize(Iterator i);
+  - does finalization of contained stream structures
+  - does structural equality test
+  - replaces in parents by shallowclone and replacement
+
+----------
+
+Then to implement:
+
+* Change the children to be from the init function to be (stream,
+args) pairs within the construct, to make replacing easier.
+
+- In all the mutator methods of the classes, make sure you're not
+finalized.
+
+- Go through the IR and start to patch things up.
+
+----------
+
+NOTES for when I announce it to people:
+
+1. Beware that you can never have any backward pointers in the
+top-level of the IR, or the reflection will break.  If we really need
+to add one, we could special-case the reflection not to follow the
+fields.
+
+---------
+
+Random notes:
+
+- for tracing up to the root, probably want a shallowClone method that
+instantiates a new stream construct and copies over all fields into it.
+
+- what to do with fields of stream constructs?  do you need to check
+  out a separate copy for them, too, or do they just come with their
+  parent?  I think I'd prefer to have them come with their parent.
+
+- Also, an easier way to implement the whole immutable thing might be
+  to replace the copy in all of your parents when you check out an
+  immutable version.  Although I guess doing when you finalize might
+  also be okay... but the iterator is a little bit weird then, 'cause
+  it doesn't really know all of its parents.
+
+- I guess you need to finalize each individual filter?  This is again
+  an advantage of doing the replacement when you ask for the
+  modification, maybe, since after the parser it could be a little bit
+  messy to go straight to modifying.  So I guess if you ask to
+  finalize a pipeline, you first have to finalize its pieces.  Sure.
+  But I don't feel like writing field modifiers, so let's just make
+  them part of the filter.  (when a filter becomes immutable, so does
+  the field.)
+
+- So I like a model where you start with an iterator, and you ask for
+  an iterator that's a new (modifyable) branch of the tree.  This will
+  already be replaced in all its parents; all you need to do is
+  finalize it.  Then you can get the object from the iterator and
+  finalize it.  Whenever you finalize an object, it finalizes all of
+  its children as well.
+
+  --> oh, but the idea is that when you finalize, you might want a
+      different object (one that's already been modified) so you
+      really shouldn't do the replacing 'til then.
+
+----
+
+so this design would be kind of segmented / cliff-oriented /
+two-parted (ugh what's the word) in that you have iterator support for
+objects up through what you're modifying, and from there under it is
+completely just object references.  So for instance there's no way to
+commit a filter if you haven't committed it's parent yet, since you
+won't have an iterator to that filter (since there's no iterator for
+the parent, because the parent is being modified and is not part of
+the tree yet.)
+
+// get a mutable copy of the object <o>, which will happen by normal
+// cloning
+ Object getMutableCopy(object o);
+
+// replace object pointed to by <i> with <o> and return a new pointer
+// to that object.
+Iterator finalize(object o, iterator i);  
+
+#2: I guess a different way to go would be, when you ask for a mutable
+copy, to REPLACE the tree already, and then to give you an iterator.
+Then when you finalize things, if you get a different object, you
+replace the tree again.  This could lead to redundant root
+modifications, but this is probably okay.  I like this because then
+you can have an iterator interface for children.  This would have this
+kind of interface:
+
+Iterator getMutableCopy(Iterator i);
+
+Iterator finalize(Iterator i);
+
+--> now you can actually finalize things and keeping things above them
+    mutable.  and it shouldn't really change anyone else's
+    view... yeah, this is pretty good.
+
+also need an interface for cloning other objects... guess that can
+still be the deep cloner.
+
+- how are iterators implemented?  As a sequence of object identities,
+  or as an index in the child list?  Need to be able to get the "next"
+  object somehow.  especially when there could be multiple occurrences
+  of a given object in a list - that's why you DO need to keep the
+  index.  Then the thing will become stale upon addition/deletion.
+  Could just keep track from root, with all of the indices along the
+  way, yeah... and keep the version of root you're going off of, to
+  warn for stale iterators.
+
+- note that no stream constructs can really have iterators as fields...
+
+things to be careful about:
+
+- what about this toplevel root thing?
+
+- will have to revisit the visitor implementation.  but probably not
+very seriously, actually... the replacing visitor is at a low level.
+
+--
+
+- rethink the replacement in parent deal -- if we're replacing in
+parent, should probably rewrite all the children stuff to be an array
+that is indexed by a static int instead of indexing the actual object
+in an sirinitstatement.
+
+- the cloning stuff should all operate on iterators
+
+- what about fields that are java objects?  how do we enforce that
+they're immutable?  maybe we don't.  but in all of our IR classes, we
+have a field in the base class that indicates whether or not it's
+immutable.
+
+- right, no sharing of components below the method level.  if it's the
+same method, then it's cached to the same thing; otherwise there is no
+sharing between methods.  this gets away from the cloning problems, i
+think.
+
+- checkout/in is at the level of a field/method, as well as pipeline/filter/etc
+
+- naming was a speed optimization; it could be added for debugging
+purposes.  so there's no naming going on in our model
+
+- eventually generating different functions to access data in filters
+that have different layouts.
+
+- first hash the whole structure, then compare deeply
+
+---------------------------------------------------------------------------
+
+
 Immutable Iterators Spec
 Version 1.0
 ---------------------------------------------------------------------------
