@@ -1,0 +1,346 @@
+% -*- LaTeX -*-
+% This is a noweb source file.  To produce a LaTeX file from it:
+%   noweave -delay -x streamit.h.nw > streamit.tex
+% To produce the C header file:
+%   notangle -Rstreamit.h > streamit.h
+
+\documentclass{article}
+\usepackage{fullpage}
+\usepackage{noweb}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{1.2ex plus 0.3ex minus 0.2ex}
+\pagestyle{noweb}
+
+\title{StreaMIT C Runtime Interface}
+\author{ComMIT Streams Group}
+
+\begin{document}
+\maketitle
+
+%
+
+\section{Preliminaries}
+
+This document describes a C interface for compiling StreaMIT programs
+against a runtime library.  The StreaMIT compiler processes its input
+file and eventually produces a C source file, which is compiled with
+this header file and linked against the runtime library.  The compiler
+generates a set of functions, including a top-level init function for
+the entire program.  This function in turn calls lower-level init
+functions, causing the entire system to be initialized.  During
+initialization the runtime system is informed of the connectivity
+between modules and the layout of objects in memory.
+
+\subsection{Assumptions}
+
+This definition makes a number of assumptions about the StreaMIT
+language, which may be relaxed or removed in later versions of the
+system.  These currently include:
+
+\begin{description}
+
+\item[No re-initialization.]
+
+\item[Canonical ordering.]  Several parts of this document refer to a
+  ``canonical ordering''; that ordering is just a lexicographical
+  ordering of eligible names.  For ordering tapes, the canonical order
+  is a left-to-right reading across blocks.
+
+\item[Message timing.]  StreaMIT currently only does best-effort
+  message delivery; the latencies requested in message functions are
+  not necessarily respected.
+
+\end{description}
+
+\subsection{Outstanding Questions}
+
+\begin{itemize}
+
+\item The compiler will need to determine the exact number of items
+  that can reasonably be assumed to exist on a tape.  This requires a
+  full analysis of init functions' peeking behavior.  Otherwise, the
+  correct push/pop ratios could be established for steady-state
+  behavior, but the runtime system couldn't set the system up properly
+  because it wouldn't know how many residual items need to exist on
+  the tapes.
+
+\item What do you think about a traversal order for sub-streams that
+  is used to declare contents and minimum firing contents of tapes
+  implicitly, without a naming convention?  Also used to go from order
+  of declaration to stream structure.  We could do something
+  heirarchical instead of flat, but I'm guessing that flat might be
+  easier inside the compiler.  We'll want to translate to heirarchical
+  inside the runtime system, anyways.
+
+\item How do splitters and joiners fit into the scheme?  A split/join
+  structure consists of split-body-join, and a feedback loop has
+  join-body-split.  Splitters and joiners are the only things that
+  violate the one-input/one-output rule, and need to be implemented in
+  the library.
+
+\end{itemize}
+
+
+\section{Basic Types}
+
+<<Basic Types>>=
+<<Enumerations>>
+<<Record Types>>
+<<Other Types>>
+@
+
+\subsection{Enumerations}
+
+There are a couple of simple enumerations that are needed to describe
+the types of objects in the StreaMIT system.  The compiler needs to
+know the type of a stream structure:
+
+<<Enumerations>>=
+typedef enum stream_type {
+  FILTER,
+  PIPELINE,
+  SPLIT_JOIN,
+  FEEDBACK_LOOP
+} stream_type;
+@
+
+For split/join structures, there also need to be constants for the
+types of splitters and joiners.
+
+<<Enumerations>>=
+typedef enum splitjoin_type {
+  ROUND_ROBIN,
+  DUPLICATE,
+  COMBINE,
+  NULL_SJ
+} splitjoin_type;
+@
+
+\subsection{Record Types}
+
+These are simple types that will be manipulated directly by the
+generated code.
+
+Latencies can be expressed as a linked list of discrete values or a
+continuous range of possible values.  There are also special-case
+values that can be used in certain circumstances (for example,
+requesting best-effort delivery).
+
+<<Record Types>>=
+typedef struct latency_list {
+  int val;
+  struct latency_list *next;
+} latency_list;
+
+typedef struct latency_range {
+  int min_val;
+  int max_val;
+} latency_range;
+
+typedef enum latency_special {
+  _BEST_EFFORT
+} latency_special;
+
+typedef union latency {
+  latency_list list;
+  latency_range range;
+  latency_special special;
+} latency;
+
+/* TODO: define LATENCY_BEST_EFFORT as a special case */
+@
+
+\subsection{Other Types}
+
+Some miscellaneous types are needed by other parts of the runtime
+system.  Several functions take callback functions as parameters, so
+we define a standard type for those:
+
+<<Other Types>>=
+typedef void (*streamit_handler)(void *);
+@
+
+There are more specialized types of handler functions for work
+functions.
+
+<<Other Types>>=
+typedef void (*work_fn)(void *, tape *in, tape *out);
+@
+
+Interface tables are used for message handling.  An interface defines
+a set of functions that can be called as message targets.  Each class
+that implements an interface needs to provide a mapping between
+interface message numbers and functions to be called.
+
+<<Other Types>>=
+typedef streamit_handler *interface_table;
+@
+
+\section{Function-Call Interface}
+
+<<Interface Functions>>=
+<<Initialization Functions>>
+<<Messaging Functions>>
+@
+
+\subsection{Initialization}
+
+An initialization function is called for each filter.  The
+initialization function, in turn, needs to call several functions to
+inform the run-time library of the internal structure of the filter.
+[[set_stream_type]] tells the run-time library the type of the current
+stream object; [[set_peek]], [[set_pop]], and [[set_push]] tell the
+library the number of items examined and removed from the input tape
+and added to the output tape on each iteration.
+
+<<Initialization Functions>>=
+void set_stream_type(stream_context *c, stream_type type);
+void set_peek(stream_context *c, int peeks);
+void set_pop(stream_context *c, int pops);
+void set_push(stream_context *c, int pushes);
+@
+
+Several handler functions can be registered with the run-time
+library.  Every filter should call [[set_work]] to register its work
+function.
+
+<<Initialization Functions>>=
+void set_work(stream_context *c, work_fn f);
+void set_teardown(stream_context *c, streamit_handler f);
+@
+
+Children also need to be registered with the library, so that the
+library can determine the layout of the stream.
+
+<<Initialization Functions>>=
+void register_child(stream_context *c, stream_context *child);
+stream_context *get_parent(stream_context *c);
+@
+
+Every object should have a ``canonical form''.  Internally, fast-path
+code might want to grab parameters of its children to perform SIMD
+operations between parallel streams, or perform other optimizations.
+However, when blocks are deconstructed and reconstructed, data needs
+to exist in the canonical form.
+
+Two functions perform this translation between canonical format and
+optimized format.  [[set_to_canon]] registers a function that ensures
+that required state is available in canonical form.
+[[set_from_canon]] takes state in canonical form, and prepares for
+continued steady-state execution.
+
+<<Initialization Functions>>=
+void set_to_canon(stream_context *c, streamit_handler f);
+void set_from_canon(stream_context *c, streamit_handler f);
+@
+
+\subsection{Messaging}
+
+Messages can be sent between filters.  Both senders and receivers must
+register with the run-time library.  Messages are referenced by
+indices into a list of canonically-ordered handler functions.  Each
+object type should export a list of function pointers for each
+handler.
+
+Messages are sent through a portal; see the StreaMIT language
+documentation for how this works.
+
+<<Messaging Functions>>=
+portal *create_portal(void);
+void register_receiver(portal *p, stream_context *receiver,
+                       interface_table *vtbl, latency *l);
+void register_sender(portal *p, stream_context *sender, latency *l);
+@
+
+To send a message, you need to know the message number, the portal,
+the required latency, and the parameters to send on.  It's unclear at
+the moment how parameters will get packaged up.
+
+<<Messaging Functions>>=
+void send_message(portal *p, int msgid, latency *l, ...);
+@
+
+\section{Internal Library Types}
+
+<<Opaque Types>>=
+<<Stream Context>>
+<<Portal>>
+<<Tapes>>
+@
+
+\subsection{Filter Context}
+
+A context structure is used to store data used by the run-time
+library.  It may not need to be explicitly defined here, but we'll
+leave an empty definition in for now.
+
+<<Stream Context>>=
+typedef struct stream_context {
+} stream_context;
+@
+
+Contexts are created by [[create_context]], which takes a pointer to
+the data object the context is relevant for.
+
+<<Stream Context>>=
+stream_context *create_context(void *p);
+@
+
+\subsection{Portals}
+
+<<Portal>>=
+typedef struct portal {
+} portal;
+@
+
+\subsection{Tapes}
+
+Data is passed between streams on tapes.  The tape structure can be
+manipulated directly by work functions if need be.  The [[data]] is
+allocated by the creator of the tape, and its size is exactly
+[[len * size]] bytes.  [[read_pos]] and [[write_pos]] are both
+integers greater than or equal to [[0]] and strictly less than
+[[len]], and point to [[size]]-byte offsets into [[data]].
+
+<<Tapes>>=
+typedef struct tape {
+  void *data;
+  int read_pos;
+  int write_pos;
+  int len;
+  int size;
+} tape;
+@
+
+There are macros defined to manipulate tapes.  [[PUSH]] adds an item
+to the writer end of the tape; [[PEEK]] and [[POP]] both read data
+from the reader end.
+
+<<Tapes>>=
+#define PUSH(t, type, d) { if (++(t)->write_pos >= (t)->len ) \
+                             (t)->write_pos = 0; \
+                           ((type *)(t)->data)[(t)->write_pos] = (d); }
+#define PEEK(t, type, n) (((type *)t->data)[(t->read_pos+n)%t->len])
+#define POP(t, type) ((((++t->read_pos) >= t->len) ? (t->read_pos = 0) : 0), \
+                      ((type *)t->data)[t->read_pos])
+@
+
+\section{Header File}
+
+<<streamit.h>>=
+#ifndef STREAMIT_H
+#define STREAMIT_H
+
+<<Opaque Types>>
+<<Basic Types>>
+<<Interface Functions>>
+
+#endif /* STREAMIT_H */
+@
+
+\end{document}
+
+%%% Local variables:
+%%% mmm-classes: noweb-c
+%%% End:
