@@ -157,7 +157,7 @@ typedef enum latency_special {
 } latency_special;
 
 typedef union latency {
-  latency_list list;
+  latency_list *list;
   latency_range range;
   latency_special special;
 } latency;
@@ -351,10 +351,10 @@ Messages are sent through a portal; see the StreaMIT language
 documentation for how this works.
 
 <<Messaging Functions>>=
-portal *create_portal(void);
-void register_receiver(portal *p, stream_context *receiver,
-                       interface_table *vtbl, latency *l);
-/* void register_sender(portal *p, stream_context *sender, latency *l); */
+portal create_portal(void);
+void register_receiver(portal p, stream_context *receiver,
+                       interface_table *vtbl, latency l);
+/* void register_sender(portal p, stream_context *sender, latency l); */
 @
 
 To send a message, you need to know the message number, the portal,
@@ -364,7 +364,7 @@ needs to pass a [[malloc]]'d pointer to the parameter structure to
 [[send_message]].
 
 <<Messaging Functions>>=
-void send_message(portal *p, int msgid, latency *l, void *params);
+void send_message(portal p, int msgid, latency l, void *params);
 @
 
 \subsection{Starting the System}
@@ -610,7 +610,7 @@ Currently the portal just carries a list of receivers.
 <<Portal>>=
 typedef struct portal {
   portal_receiver *receiver;
-} portal;
+} _portal, *portal;
 @
 
 \section{Header File}
