@@ -1,0 +1,632 @@
+%!PS-Adobe-2.0 EPSF-1.2
+%%Title: Enscript Output
+%%Creator: GNU enscript 1.6.1
+%%CreationDate: Fri Apr 11 22:22:51 2003
+%%For: William Thies
+%%Pages: 1
+%%DocumentFonts: F-gs-font
+%%BoundingBox: 29 645 115 764
+%%BeginPreview: 86 119 1 119
+% 0fde73efbe31e5bedbfc00
+% 0000000000100a00000000
+% 0000000000000000000000
+% 0facfb8cbe7be7fff3cc00
+% 0100000400000084000000
+% 079efbefeebf8000000000
+% 0000000000020000000000
+% 4200080100522000000000
+% fe9ff9df7ffee800000000
+% a000014002102000000000
+% 0000004000000000000000
+% efbefbefbefbefbefbee00
+% 0000000000000000000000
+% 0010804000000000000000
+% 6236f2c800000000000000
+% 0010120000000000000000
+% 0000000000000000000000
+% 0f3bb9efbf7def16fb3800
+% 0400800000000028000800
+% e40e600000000000000000
+% 0000000000000000000000
+% 0084010802100000000000
+% 1fbe136f2ef80000000000
+% 000a010120280000000000
+% 0000010824008400000000
+% 0000036facf3ee80000000
+% 0000010120100a00000000
+% 0000000000000000000000
+% ae00000000000000000000
+% 0000000000000000000000
+% 0000000000000000000000
+% 0fbe7f73bedfefbf300000
+% 0100208100100000100000
+% 6fa86bc000000000000000
+% 0428220000000000000000
+% 0200128000000000000000
+% 6e9c33a000000000000000
+% 0084120000000000000000
+% 0000000000000000000000
+% 0fbef3e7be7ae7dff9c000
+% 0000000100200400080000
+% 0000000000000000000000
+% 0f9ee3ef9efbf3dff9c000
+% 0020000000000800000000
+% 0420000000000800000000
+% e42e600000000000000000
+% 0024000400000022004200
+% 1fbe1efd3efbefaee9ef80
+% 010a000020100020280500
+% 0000000000100000000000
+% 0000000000000000000000
+% 0000000000000000000000
+% 0000000000022088010800
+% 000003efbefaef9aebee80
+% 0000020100020280202400
+% 0000000100000000000000
+% ae00000000000000000000
+% 0000000000000000000000
+% 0400000000000000000000
+% e40e600000000000000000
+% 0088000800000108010800
+% 1f9c39fafefbff3eabee00
+% 0014000080200900a02400
+% 0000000000210480108000
+% 00001befbfebed9e7bc800
+% 0000100402202402014000
+% 0000000400000000000000
+% ae00000000000000000000
+% 0000000000000000000000
+% 002200a400800200080000
+% e6fe6bed7ee86e91fba800
+% 009002200428009000a000
+% 000000a400800080004000
+% 00000bed7eeb1f968bedb4
+% 0000022004210010800420
+% 0000000000000000000000
+% 0000000000000000000000
+% 0000000000000000000000
+% 0000000000000000000000
+% 0000000000000000000000
+% 0000000000000000000000
+% 0ffefbefbefbefbc7f9bb8
+% 060000000000a000002400
+% 0000000000002000000000
+% 0ebadbefdefbf63cdee800
+% 0000000000420000000000
+% 0000000000000000000000
+% 0fbb7befbc7bc7baffbfc0
+% 0200880002004100000200
+% 0fbefbe7bbbbc000000000
+% 0420002002400000000000
+% 0a80004008108200000000
+% ef9ffbdebaffa7a0000000
+% 4200000a00280500000000
+% 0000000200000000000000
+% efbefbefbefbefbefbee00
+% 0000000000000000000000
+% 0010200800000000000000
+% 623cfaaa00000000000000
+% 0028028000000000000000
+% 0102020020000000000000
+% 6f86dbcbb0000000000000
+% 0604886980500000000000
+% 6e8fbbed9e740000000000
+% 000a00c802400000000000
+% 0200420408010000000000
+% 6f84facf3eabe400000000
+% 0000a00a00a02400000000
+% 0000408010000000000000
+% 0000f3eabe500000000000
+% 0000a00a02400000000000
+% 0000420408010410000000
+% 0000facf3eabef36c00000
+% 0000a00a00a02a00400000
+% 0000408010410000000000
+% 0000f3eabef36d20000000
+% 000ae00e02a02400000000
+% e6bed1fe1fa7ed00000000
+% 0022002000000000000000
+%%EndImage
+%%EndPreview
+save countdictstack mark newpath /showpage {} def /setpagedevice {pop} def
+%%EndProlog
+%%Page 1 1
+%
+% Procedures.
+%
+
+/_S {	% save current state
+  /_s save def
+} def
+/_R {	% restore from saved state
+  _s restore
+} def
+
+/S {	% showpage protecting gstate
+  gsave
+  showpage
+  grestore
+} bind def
+
+/MF {	% fontname newfontname -> -	make a new encoded font
+  /newfontname exch def
+  /fontname exch def
+
+  /fontdict fontname findfont def
+  /newfont fontdict maxlength dict def
+
+  fontdict {
+    exch
+    dup /FID eq {
+      % skip FID pair
+      pop pop
+    } {
+      % copy to the new font dictionary
+      exch newfont 3 1 roll put
+    } ifelse
+  } forall
+
+  newfont /FontName newfontname put
+
+  % insert only valid encoding vectors
+  encoding_vector length 256 eq {
+    newfont /Encoding encoding_vector put
+  } if
+
+  newfontname newfont definefont pop
+} def
+
+/SF { % fontname width height -> -	set a new font
+  /height exch def
+  /width exch def
+
+  findfont
+  [width 0 0 height 0 0] makefont setfont
+} def
+
+/SUF { % fontname width height -> -	set a new user font
+  /height exch def
+  /width exch def
+
+  /F-gs-user-font MF
+  /F-gs-user-font width height SF
+} def
+
+/M {moveto} bind def
+/s {show} bind def
+
+/Box {	% x y w h -> -			define box path
+  /d_h exch def /d_w exch def /d_y exch def /d_x exch def
+  d_x d_y  moveto
+  d_w 0 rlineto
+  0 d_h rlineto
+  d_w neg 0 rlineto
+  closepath
+} def
+
+/bgs {	% x y height blskip gray str -> -	show string with bg color
+  /str exch def
+  /gray exch def
+  /blskip exch def
+  /height exch def
+  /y exch def
+  /x exch def
+
+  gsave
+    x y blskip sub str stringwidth pop height Box
+    gray setgray
+    fill
+  grestore
+  x y M str s
+} def
+
+% Highlight bars.
+/highlight_bars {	% nlines lineheight output_y_margin gray -> -
+  gsave
+    setgray
+    /ymarg exch def
+    /lineheight exch def
+    /nlines exch def
+
+    % This 2 is just a magic number to sync highlight lines to text.
+    0 d_header_y ymarg sub 2 sub translate
+
+    /cw d_output_w cols div def
+    /nrows d_output_h ymarg 2 mul sub lineheight div cvi def
+
+    % for each column
+    0 1 cols 1 sub {
+      cw mul /xp exch def
+
+      % for each rows
+      0 1 nrows 1 sub {
+        /rn exch def
+        rn lineheight mul neg /yp exch def
+        rn nlines idiv 2 mod 0 eq {
+	  % Draw highlight bar.  4 is just a magic indentation.
+	  xp 4 add yp cw 8 sub lineheight neg Box fill
+	} if
+      } for
+    } for
+
+  grestore
+} def
+
+% Line highlight bar.
+/line_highlight {	% x y width height gray -> -
+  gsave
+    /gray exch def
+    Box gray setgray fill
+  grestore
+} def
+
+% Column separator lines.
+/column_lines {
+  gsave
+    .1 setlinewidth
+    0 d_footer_h translate
+    /cw d_output_w cols div def
+    1 1 cols 1 sub {
+      cw mul 0 moveto
+      0 d_output_h rlineto stroke
+    } for
+  grestore
+} def
+
+% Column borders.
+/column_borders {
+  gsave
+    .1 setlinewidth
+    0 d_footer_h moveto
+    0 d_output_h rlineto
+    d_output_w 0 rlineto
+    0 d_output_h neg rlineto
+    closepath stroke
+  grestore
+} def
+
+% Do the actual underlay drawing
+/draw_underlay {
+  ul_style 0 eq {
+    ul_str true charpath stroke
+  } {
+    ul_str show
+  } ifelse
+} def
+
+% Underlay
+/underlay {	% - -> -
+  gsave
+    0 d_page_h translate
+    d_page_h neg d_page_w atan rotate
+
+    ul_gray setgray
+    ul_font setfont
+    /dw d_page_h dup mul d_page_w dup mul add sqrt def
+    ul_str stringwidth pop dw exch sub 2 div ul_h_ptsize -2 div moveto
+    draw_underlay
+  grestore
+} def
+
+/user_underlay {	% - -> -
+  gsave
+    ul_x ul_y translate
+    ul_angle rotate
+    ul_gray setgray
+    ul_font setfont
+    0 0 ul_h_ptsize 2 div sub moveto
+    draw_underlay
+  grestore
+} def
+
+% Page prefeed
+/page_prefeed {		% bool -> -
+  statusdict /prefeed known {
+    statusdict exch /prefeed exch put
+  } {
+    pop
+  } ifelse
+} def
+
+% Wrapped line markers
+/wrapped_line_mark {	% x y charwith charheight type -> -
+  /type exch def
+  /h exch def
+  /w exch def
+  /y exch def
+  /x exch def
+
+  type 2 eq {
+    % Black boxes (like TeX does)
+    gsave
+      0 setlinewidth
+      x w 4 div add y M
+      0 h rlineto w 2 div 0 rlineto 0 h neg rlineto
+      closepath fill
+    grestore
+  } {
+    type 3 eq {
+      % Small arrows
+      gsave
+        .2 setlinewidth
+        x w 2 div add y h 2 div add M
+        w 4 div 0 rlineto
+        x w 4 div add y lineto stroke
+
+        x w 4 div add w 8 div add y h 4 div add M
+        x w 4 div add y lineto
+	w 4 div h 8 div rlineto stroke
+      grestore
+    } {
+      % do nothing
+    } ifelse
+  } ifelse
+} def
+
+% EPSF import.
+
+/BeginEPSF {
+  /b4_Inc_state save def    		% Save state for cleanup
+  /dict_count countdictstack def	% Count objects on dict stack
+  /op_count count 1 sub def		% Count objects on operand stack
+  userdict begin
+  /showpage { } def
+  0 setgray 0 setlinecap
+  1 setlinewidth 0 setlinejoin
+  10 setmiterlimit [ ] 0 setdash newpath
+  /languagelevel where {
+    pop languagelevel
+    1 ne {
+      false setstrokeadjust false setoverprint
+    } if
+  } if
+} bind def
+
+/EndEPSF {
+  count op_count sub { pos } repeat	% Clean up stacks
+  countdictstack dict_count sub { end } repeat
+  b4_Inc_state restore
+} bind def
+
+% Check PostScript language level.
+/languagelevel where {
+  pop /gs_languagelevel languagelevel def
+} {
+  /gs_languagelevel 1 def
+} ifelse
+/encoding_vector [
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/space        	/exclam       	/quotedbl     	/numbersign   	
+/dollar       	/percent      	/ampersand    	/quoteright   	
+/parenleft    	/parenright   	/asterisk     	/plus         	
+/comma        	/hyphen       	/period       	/slash        	
+/zero         	/one          	/two          	/three        	
+/four         	/five         	/six          	/seven        	
+/eight        	/nine         	/colon        	/semicolon    	
+/less         	/equal        	/greater      	/question     	
+/at           	/A            	/B            	/C            	
+/D            	/E            	/F            	/G            	
+/H            	/I            	/J            	/K            	
+/L            	/M            	/N            	/O            	
+/P            	/Q            	/R            	/S            	
+/T            	/U            	/V            	/W            	
+/X            	/Y            	/Z            	/bracketleft  	
+/backslash    	/bracketright 	/asciicircum  	/underscore   	
+/quoteleft    	/a            	/b            	/c            	
+/d            	/e            	/f            	/g            	
+/h            	/i            	/j            	/k            	
+/l            	/m            	/n            	/o            	
+/p            	/q            	/r            	/s            	
+/t            	/u            	/v            	/w            	
+/x            	/y            	/z            	/braceleft    	
+/bar          	/braceright   	/tilde        	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/space        	/exclamdown   	/cent         	/sterling     	
+/currency     	/yen          	/brokenbar    	/section      	
+/dieresis     	/copyright    	/ordfeminine  	/guillemotleft	
+/logicalnot   	/hyphen       	/registered   	/macron       	
+/degree       	/plusminus    	/twosuperior  	/threesuperior	
+/acute        	/mu           	/paragraph    	/bullet       	
+/cedilla      	/onesuperior  	/ordmasculine 	/guillemotright	
+/onequarter   	/onehalf      	/threequarters	/questiondown 	
+/Agrave       	/Aacute       	/Acircumflex  	/Atilde       	
+/Adieresis    	/Aring        	/AE           	/Ccedilla     	
+/Egrave       	/Eacute       	/Ecircumflex  	/Edieresis    	
+/Igrave       	/Iacute       	/Icircumflex  	/Idieresis    	
+/Eth          	/Ntilde       	/Ograve       	/Oacute       	
+/Ocircumflex  	/Otilde       	/Odieresis    	/multiply     	
+/Oslash       	/Ugrave       	/Uacute       	/Ucircumflex  	
+/Udieresis    	/Yacute       	/Thorn        	/germandbls   	
+/agrave       	/aacute       	/acircumflex  	/atilde       	
+/adieresis    	/aring        	/ae           	/ccedilla     	
+/egrave       	/eacute       	/ecircumflex  	/edieresis    	
+/igrave       	/iacute       	/icircumflex  	/idieresis    	
+/eth          	/ntilde       	/ograve       	/oacute       	
+/ocircumflex  	/otilde       	/odieresis    	/divide       	
+/oslash       	/ugrave       	/uacute       	/ucircumflex  	
+/udieresis    	/yacute       	/thorn        	/ydieresis    	
+] def
+/HFpt_w 10 def
+/HFpt_h 10 def
+/Courier-Bold /HF-gs-font MF
+/HF /HF-gs-font findfont [HFpt_w 0 0 HFpt_h 0 0] makefont def
+/Courier /F-gs-font MF
+/F-gs-font 2 2 SF
+/#copies 1 def
+% Pagedevice definitions:
+gs_languagelevel 1 gt {
+  <<
+    /PageSize [612 792] 
+  >> setpagedevice
+} if
+/d_page_w 564 def
+/d_page_h 744 def
+/d_header_x 0 def
+/d_header_y 744 def
+/d_header_w 564 def
+/d_header_h 0 def
+/d_footer_x 0 def
+/d_footer_y 0 def
+/d_footer_w 564 def
+/d_footer_h 0 def
+/d_output_w 564 def
+/d_output_h 744 def
+/cols 1 def
+_S
+24 24 translate
+/pagenum 1 def
+/fname (algorithm5.tex) def
+/fdir () def
+/ftail (algorithm5.tex) def
+/user_header_p false def
+/Courier-Oblique 2 2 SUF
+5 739.2 M
+(// Given that all the children of <sj> are pipelines of the same) s
+/F-gs-font 2 2 SF
+/Courier-Oblique 2 2 SUF
+5 736.4 M
+(// length n, refactor <sj> into a series of n splitjoins, each of) s
+/F-gs-font 2 2 SF
+/Courier-Oblique 2 2 SUF
+5 733.6 M
+(// which contains children of unit length.) s
+/F-gs-font 2 2 SF
+5 730.8 M
+(pipeline addMatchingSyncPoints\(splitjoin sj\)) s
+5 728 M
+(------------------------------------------------------------------) s
+/Courier-Bold 2 2 SUF
+5 725.2 M
+(int) s
+/F-gs-font 2 2 SF
+8.6 725.2 M
+( n = sj.child[0].size) s
+/Courier-Oblique 2 2 SUF
+5 722.4 M
+(// each new sj draws its children from distinct pipelines of <sj>) s
+/F-gs-font 2 2 SF
+/Courier-Bold 2 2 SUF
+5 719.6 M
+(for) s
+/F-gs-font 2 2 SF
+8.6 719.6 M
+( i = 0 to n-1) s
+5 716.8 M
+(  newChild[i] = { sj.child[0].child[i], ... , ) s
+5 714 M
+(                  sj.child[sj.size-1].child[i] }) s
+5 711.2 M
+(endfor) s
+/Courier-Oblique 2 2 SUF
+5 708.4 M
+(// in the end cases, new splits and joins are same as <sj>) s
+/F-gs-font 2 2 SF
+5 705.6 M
+(newSplit[0] = sj.split) s
+5 702.8 M
+(newJoin[n-1] = sj.join) s
+/Courier-Oblique 2 2 SUF
+5 700 M
+(// in the middle, make weights of split and join according to) s
+/F-gs-font 2 2 SF
+/Courier-Oblique 2 2 SUF
+5 697.2 M
+(// steady-state I/O rates of the stream they are connected to) s
+/F-gs-font 2 2 SF
+/Courier-Bold 2 2 SUF
+5 694.4 M
+(for) s
+/F-gs-font 2 2 SF
+8.6 694.4 M
+( i = 1 to n-1) s
+5 691.6 M
+(  newSplit[i] = roundrobin\( getSteadyStatePush\(sj.child[0].child[i]\), ) s
+5 688.8 M
+(                  ... ,) s
+5 686 M
+(                  getSteadyStatePush\(sj.child[sj.size-1].child[i]\) \)) s
+5 683.2 M
+(endfor) s
+/Courier-Bold 2 2 SUF
+5 680.4 M
+(for) s
+/F-gs-font 2 2 SF
+8.6 680.4 M
+( i = 0 to n-2) s
+5 677.6 M
+(  newJoin[i] = roundrobin\( getSteadyStatePop\(sj.child[0].child[i]\), ... , ) s
+5 674.8 M
+(                getSteadyStatePop\(sj.child[sj.size-1].child[i] \)) s
+5 672 M
+(endfor) s
+/Courier-Bold 2 2 SUF
+5 669.2 M
+(return) s
+/F-gs-font 2 2 SF
+12.2 669.2 M
+( pipeline\( splitjoin\(newSplit[0], newJoin[0], newChild[0]\), ... ,) s
+5 666.4 M
+(                 splitjoin\(newSplit[n-1], newJoin[n-1], newChild[n-1]\) \)) s
+/Courier-Oblique 2 2 SUF
+5 658 M
+(// Opposite transformation as addMatchingSyncPoints.  Given a pipeline) s
+/F-gs-font 2 2 SF
+/Courier-Oblique 2 2 SUF
+5 655.2 M
+(// in which all the children are splitjoins of width n, and each) s
+/F-gs-font 2 2 SF
+/Courier-Oblique 2 2 SUF
+5 652.4 M
+(// adjacent splitjoin has exactly matching weights, returns a single) s
+/F-gs-font 2 2 SF
+/Courier-Oblique 2 2 SUF
+5 649.6 M
+(// splitjoin containing n child pipelines.) s
+/F-gs-font 2 2 SF
+5 646.8 M
+(splitjoin removeMatchingSyncPoints\(pipeline pipe\)) s
+5 644 M
+(------------------------------------------------------------------) s
+/Courier-Bold 2 2 SUF
+5 641.2 M
+(int) s
+/F-gs-font 2 2 SF
+8.6 641.2 M
+( n = pipe.child[0].size) s
+5 638.4 M
+(newSplit = pipe.child[0].split) s
+5 635.6 M
+(newJoin = pipe.child[pipe.size-1].join) s
+5 632.8 M
+(newChild = { pipeline\( pipe.child[0].child[0], ..., ) s
+5 630 M
+(             pipe.child[n].child[0] \),  ... ,) s
+5 627.2 M
+(             pipeline\( pipe.child[0].child[pipe.size-1], ..., ) s
+5 624.4 M
+(             pipe.child[n].child[pipe.size-1] \) }) s
+/Courier-Bold 2 2 SUF
+5 621.6 M
+(return) s
+/F-gs-font 2 2 SF
+12.2 621.6 M
+( splitjoin\( newSplit, newJoin, newChild \)) s
+_R
+S
+%%Trailer
+cleartomark countdictstack exch sub { end } repeat restore
+%%EOF

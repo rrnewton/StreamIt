@@ -1,0 +1,86 @@
+  \clearpage
+  \begin{figure*}[t]
+    \begin{tabular}{ll}
+      \begin{minipage}{6in}
+	\psfig{figure=filterbank1.eps,width=2.5in} %dp-before
+	(a) ~~
+	\psfig{figure=filterbank2.eps,width=2in} %dp-during
+	(b) ~~
+%	\psfig{figure=filterbank3.eps,width=2in} %dp-partitions
+%	(c)
+      \end{minipage}
+
+      \begin{minipage}{6in}
+	\psfig{figure=filterbank4.eps,width=2in} %dp-after
+	(c)~~
+	\psfig{figure=filterbank5.eps,width=2in} %greedy-after
+	(d)~~
+      \end{minipage}
+      %    \psfig{figure=filterbank6.eps,width=2.5in} %work-before
+    \end{tabular}
+
+    \caption{While compiling FilterBank to 16 partitions, this shows
+    the transitions from (a) the original program, as written by the
+    programmer, to (b) the representation used by the partitioner, to
+    (c) the final partitioning.  On this benchmark, the dynamic
+    programming partitioner demonstrates a 176\% improvement over the
+    greedy partitioner, whose final partitioning appears in
+    (d). \protect\label{fig:trans}}
+  \end{figure*}
+
+  \clearpage
+  \begin{figure*}[t]
+    \begin{tabular}{ll}
+    \psfig{figure=algorithm.eps,width=3.5in}
+    &
+    \psfig{figure=algorithm2.eps,width=3.5in}
+    \end{tabular}
+    \caption{Search phase of the partitioning algorithm.  The traceback phase appears in Figure~\ref{code:treace}.
+      \protect\label{code:partition}}
+  \end{figure*}
+
+  \clearpage
+  \begin{figure}[t]
+    \psfig{figure=algorithm3.eps,width=3.9in}
+    \caption{Traceback phase of the partitioning algorithm.
+      \protect\label{code:trace}}
+  \end{figure}
+  
+  \clearpage
+  \begin{figure}[t]
+    \psfig{figure=algorithm4.eps,width=3.3in}
+    \caption{Vertical cut algorithms.
+    \protect\label{code:vert}}
+  \end{figure}
+  \begin{figure}[t]
+    \psfig{figure=refactor2.eps,width=1.75in}
+    \psfig{figure=refactor1.eps,width=1.75in}
+    \caption{Vertical cut example.
+    \protect\label{ex:vert}}
+  \end{figure}
+  
+  \clearpage
+  \begin{figure}[t]
+    \psfig{figure=algorithm5.eps,width=3.5in}
+    \caption{Horizontal cut algorithms.
+    \protect\label{code:horiz}}
+  \end{figure}
+  \begin{figure}[t]
+    \psfig{figure=matchsync2.eps,width=1.75in}
+    \psfig{figure=matchsync1.eps,width=1.75in}
+    \caption{Horizontal cut example.
+      \protect\label{ex:horiz}}
+  \end{figure}
+  
+  \clearpage
+  \begin{figure}[t]
+    \psfig{figure=algorithm6.eps,width=3.5in}
+    \caption{Aggressive synchronization removal.
+    \protect\label{code:syc}}
+  \end{figure}
+  \begin{figure}[t]
+    \psfig{figure=sync2.eps,width=1.75in}
+    \psfig{figure=sync1.eps,width=1.75in}
+    \caption{Example of synchronization removal.
+    \protect\label{ex:sync}}
+  \end{figure}
