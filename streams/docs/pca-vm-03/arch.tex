@@ -76,23 +76,20 @@ proposal: \\
     number of registers on the processor (possibly to include
     scratchpad or cache space?)}
 
-  \entry{VM\_PROP\_PROC\_IMEM} {VM\_NODE\_TYPE\_MEM} {The instruction
-    memory node for this processor.}
+  \entry {VM\_PROP\_PROC\_DMEMBANK} {VM\_NODE\_TYPE\_MEM} {The default
+    memory node in which to hold data for this processor.  Though data
+    could possibly be held in several memory nodes, this gives the
+    compiler a clue as to the lowest-cost memory node that was
+    intended for this processor.}
 
+  \entry{VM\_PROP\_PROC\_IMEMBANK} {VM\_NODE\_TYPE\_MEM} {The default
+  memory node in which to hold instructions for this processor.}
+
+  \entry{VM\_PROP\_PROC\_ISIZE} {int32 - Number of words} {The number
+    of words required to store a RISC instruction for this processor.}
 }
 
-\sss{Processor Node Properties (Modified)}
-
-We retain the following properties with slight modifications: \\
-
-\enttable{
-  \entry {VM\_PROP\_PROC\_MEMBANK} {VM\_NODE\_TYPE\_MEM} {The default memory
-    node in which to hold data for this processor.  Though data could
-    possibly be held in several memory nodes, this gives the compiler a
-    clue as to the lowest-cost memory node that was intended for this
-    processor.}
-}
-
+\newpage
 \sss{Processor Node Properties (Unmodified)}
 
 We retain the following properties exactly as they appear in the
@@ -131,6 +128,9 @@ proposal: \\
     processor.} {Removed because network is encapsulated in
     connections.}
 
+  \just{VM\_PROP\_PROC\_MEMBANKS} {Dedicated memory structures for the
+    processor.} {Removed in favor of DMEMBANK and IMEMBANK properties.}
+
   \just {VM\_PROP\_PROC\_PROC\_NETIFS} {Dedicated network interfaces
     for this processor.}  {Removed because network is encapsulated in
     connections.}
@@ -148,7 +148,8 @@ As before.
 
 \subsection{Memory Nodes}
 
-As before.
+As before, except without the SRF node type.  SRF's can be modeled as
+``regular'' data memory.
 
 \subsection{Edges}
 
