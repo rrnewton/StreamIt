@@ -1,0 +1,34 @@
+given parameter: tryLinear, that will end up mapping each construct to
+what should be tried there
+
+int getSavings(stream s, int tryLinear) {
+  switch (tryLinear) {
+    case EITHER:  savings = MAX ( getSavings(s, FREQUENCY),
+                                  getSavings(s, COLLAPSED),
+                                  getSavings(s, NOT_COLLAPSED) );
+
+    case FREQUENCY:  savings = getAddedFreqBenefit(s) + getSavings(s, COLLAPSED);
+
+    case COLLAPSED:
+      if (this is not linear node) {
+        return -infinity;
+      } else {
+        savings = 0
+        forall children c {
+          savings += getSavings (c, COLLAPSED)
+        }
+        savings += (savings of this node over children)
+      }
+
+    case NOT_COLLAPSED:
+      savings = -infinity;
+      for all possible horiz and vertical cuts (child c1, child c2) {
+        savings = MAX( savings, 
+                       getSavings(c1, EITHER) + getSavings(c2, EITHER) )
+      }
+    }
+  }
+
+  return savings;
+}
+
