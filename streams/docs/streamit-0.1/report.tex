@@ -55,6 +55,10 @@ blocks'', etc.
 
 \item Get number layered 4 deep instead of boldface headings.
 
+\item Add a section on scheduling guarantees (or lack thereof.)
+
+\item Define terms earlier (blocks vs. 1-to-1 blocks, etc.)
+
 \end{enumerate}
 
 \section{Introduction}
@@ -400,9 +404,34 @@ to arbitrarily connected streams as structured control flow compares
 to goto statements: the loss of expressive power will be more than
 offset by improved readability and opportunity for optimization.
 
+Some terminology is in order to accurately describe the semantics of
+the control constructs.  We will use the word {\it block} to refer to
+any of a {\tt Filter}, {\tt Source}, {\tt Sink}, {\tt FilterBlock},
+{\tt SourceBlock}, or {\tt SinkBlock}.  A {\it 1-to-1 block} refers to
+only those blocks that have both an input and output: the {\tt Filter}
+and {\tt FilterBlock}.  A {\it stream} is either a 1-to-1 block or a
+composition of 1-to-1 blocks formed using the control constructs.  FIX
+THIS DEF OF STREAM--DO WE NEED SOURCESTREAM, SINKSTREAM?
+
 \subsubsection{Pipe}
 
-The {\tt Pipe} construct is used for 
+The simplest control construct is the {\tt Pipe}.  It connects a
+series of streams into a linear chain, using the following syntax:
+
+\begin{tabbing}
+\hspace{0.2in} \= \hspace{0.2in} \= \hspace{0.2in} \= \hspace{0.2in} \= \\
+
+{\tt Pipe} \{ \\ \\
+
+\> {\it stream$_1$} \\
+\> {\it stream$_2$} \\
+\> \dots
+\> {\it stream$_n$} \\
+
+\}
+\end{tabbing}
+
+Each stream in the pipeline can be a 
 
 \subsection{Dynamic Constructs}
 \protect\label{sec:dynamic}
