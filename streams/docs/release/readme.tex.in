@@ -12,7 +12,7 @@
 
 \noindent
 This is for the May 28, 2003 snapshot release (streamit-0.0.20030528).\\
-\verb|$Id: readme.tex.in,v 1.3 2003-09-24 17:27:54 dmaze Exp $|
+\verb|$Id: readme.tex.in,v 1.4 2003-09-30 13:46:22 dmaze Exp $|
 
 \section{What is this?}
 
@@ -75,6 +75,10 @@ environment (as of this release, \verb|raw_dist_2003_03_18|).  The
 directory; this may be the reduced \filename{workdir} tree from the
 RAW distribution, or the full \filename{starsearch} tree.
 
+The source release only builds with IBM's Jikes Java compiler; see
+\url{http://www.jikes.org/}.  Otherwise, a Java virtual machine is
+required to run the compiler; see \url{http://java.sun.com/} for
+possibilities.
 
 \section{Caveats}
 
