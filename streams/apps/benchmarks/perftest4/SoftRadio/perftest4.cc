@@ -18,7 +18,7 @@
 #include <VrSigSource.h>
 #include <VrGnuPlotSink.h>
 #include <VrAudioSink.h>
-#include <VrNullSink.h>
+#include "VrNullSink.h"
 #include <VrGuppiSource.h>
 #include <VrFakeGuppiSource.h>
 #include <VrRealFIRfilter.h>
@@ -28,6 +28,7 @@
 #include <VrComplex.h>
 #include <VrMultiTask.h>
 #include <VrPerfGraph.h>
+#include "VrTestSource.h"
 
 int main(void) {
 
@@ -57,7 +58,9 @@ int main(void) {
   int num_taps[] = {400, 400, 400, 400};
 
   // Create Modules
-  VrFakeGuppiSource<char>* source = new VrFakeGuppiSource<char>(200,gupRate);
+  //VrFakeGuppiSource<char>* source = new VrFakeGuppiSource<char>(200,gupRate);
+  VrTestSource* source = new VrTestSource();
+  
   VrComplexFIRfilter<char>* channel_filter =
     new VrComplexFIRfilter<char>(numChannels, CFIRdecimate, 
 					     num_taps, center_freq, gain);
@@ -89,7 +92,7 @@ int main(void) {
 
   // Start System
   multi->setup();
-  multi->start(seconds);
+  multi->start(-1);
 
 }
 
