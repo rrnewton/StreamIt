@@ -33,7 +33,9 @@ is a new approach that elides modulo operations by shifting the buffer
 contents after each operation.  We demonstrate that, while a naive
 implementation of copy-shift can be up to 2X slower than modulation,
 optimizations that utilize execution scaling can boost the performance
-of copy-shift to be roughly 50\% faster than modulation.
+of copy-shift to be significantly faster than modulation (geometric
+means of 110\% speedup on the Pentium~3 and 57\% speedup on the
+Itanium~2).
 
 \input{fusion-fig1}
 
@@ -172,8 +174,8 @@ then scalar replacement does not apply.
 {\bf Evaluation.}  Compared to an unoptimized copy-shift strategy,
 Figures~\ref{fig:buf-p3} and~\ref{fig:buf-itanium} illustrate that
 scalar replacement offers modest gains on our synthetic benchmark.  On
-the Pentium~3, improvements range from 14\% to 26\%, while on the
-Itanium~2, improvements range from 3\% to 38\% (depending on the peek
+the Pentium~3, improvements range from 16\% to 36\%, while on the
+Itanium~2, improvements range from 3\% to 62\% (depending on the peek
 rate).  We conjecture that scalar replacement is more critical for
 small filters that perform only a few operations.  Due to the high
 communication-to-computation ratio in such filters, there could be
@@ -209,17 +211,17 @@ impact on the instruction cache.
 
 {\bf Evaluation.}  As shown in Figure~\ref{fig:buf-p3}, the copy-shift
 approach with execution scaling performs significantly better than
-modulation on the Pentium~3.  Speedups range from 38\% to 65\%, with a
-geometric mean of 52\%.  This makes sense, as each peek operation is
+modulation on the Pentium~3.  Speedups range from 61\% to 189\%, with a
+geometric mean of 110\%.  This makes sense, as each peek operation is
 cheaper due to the eliminated modulo operations (implemented as
 bitwise-and in the modulation scheme), while the overhead from copying
 is reduced to a fraction of the original copy-shift approach.  
 
 The gains are also sizable on the Itanium~2, as shown in
-Figure~\ref{fig:buf-itanium}.  Speedups range from 11\% to 86\% (where
-{\tt PEEK=1}), with a geometric mean of 34\%.  Keep in mind that these
-are speedups of copy-shift with scaling over modulation; the speedups
-over unoptimized copy-shift are even greater.
+Figure~\ref{fig:buf-itanium}.  Speedups range from 11\% to 618\%
+(where {\tt PEEK=1}), with a geometric mean of 57\%.  Keep in mind
+that these are speedups of copy-shift with scaling over modulation;
+the speedups over unoptimized copy-shift are even greater.
 
 \subsection{Summary}
 
@@ -229,8 +231,8 @@ somewhat surprising because the unoptimized copy-shift strategy has
 large overheads that result in a slowdown relative to a circular
 buffer with modulation.  However, by leveraging the flexibility of the
 parallel stream graph to perform execution scaling, the overheads are
-amortized and there are significant speedups (geometric means of 52\%
-on the Pentium~3 and 34\% on the Itanium~2) over a plain circular buffer
+amortized and there are significant speedups (geometric means of 110\%
+on the Pentium~3 and 57\% on the Itanium~2) over a plain circular buffer
 strategy.
 
 %% \subsection{Reusing Intermediate Storage Variables}
