@@ -152,7 +152,7 @@ done by hand, but the transformations themselves are fully automated.
 We return to our software radio example to illustrate the partitioning
 process.  Figure~\ref{fig:fmblood1} illustrates a blocking diagram for
 the original partitioning of the radio (which appears in
-Figure~\ref{fig:?1}).  The dark bands indicate where a processor is
+Figure~\ref{fig:radio-ascoded}).  The dark bands indicate where a processor is
 waiting to send or receive an item, while the light areas indicate
 periods of useful work.  With the filters partitioned in the original
 configuration, most of the processors spend their time waiting for the
@@ -250,7 +250,7 @@ computationally intensive node for improved load balancing.
 There are many types of fission transformations.  We have implemented
 a data-parallel transformation for stateless filters that places a
 duplicate of the filter on each path of an $n$-way SplitJoin (see
-Figures~\ref{fig:duplicate-fission}-\ref{fig:duplicate-fission2}).  By
+Figures~\ref{fig:fission-peek}-\ref{fig:fission-nopeek}).  By
 ``stateless'' we mean that the filter contains no fields that are
 written on one invocation of {\tt work} and read on later
 invocations--let us consider such a filter $F$ with I/O rates of
