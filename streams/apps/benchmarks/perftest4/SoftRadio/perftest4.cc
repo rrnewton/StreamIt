@@ -22,7 +22,7 @@
 #include <VrGuppiSource.h>
 #include <VrFakeGuppiSource.h>
 #include <VrRealFIRfilter.h>
-#include <VrComplexFIRfilter.h>
+#include "VrComplexFIRfilter.h"
 #include <VrQuadratureDemod.h>
 #include <VrConnect.h>
 #include <VrComplex.h>
