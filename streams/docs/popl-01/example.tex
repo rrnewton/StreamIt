@@ -2,11 +2,11 @@
 \label{sec:example}
 This section describes the Trunked Radio example implementation in
 Figure~\ref{fig:radiocode}. The trunked radio is a frequency hopping
-system. The transition points between the set frequencies is indicated
-to the receiver by transmitting a preset tone. Our radio also has a
-FIR filter to increase the gain of a weak signal. However, in order to
-save power, this filter is activated only when the signal signal to
-noice ratio is low.  This implementation relies on transforming the
+system. The transition times between the preset frequencies is
+indicated to the receiver by transmitting a preset tone.  Our radio
+also has an FIR filter to increase the gain of a weak signal. However,
+in order to save power, this filter is activated only when the signal
+to noise ratio is low.  This implementation relies on transforming the
 signal into the frequency domain for processing using a FFT. For
 brevity, we have not shown the RF processing in the front-end and the
 audio processing in the back-end.  The code for the trunked radio
@@ -25,9 +25,6 @@ using a reinitialization message from the {\tt CheckQuality} stage. We
 also use a message from the {\tt CheckFreqHop} stage to the {\tt
 RFtoIF} stage to change the baseband when a frequency hop tone is
 present.
-
-In this example we will omit the implementation of first and the last
-stages, {\tt ReadFromAtoD} and {\tt AudioBackEnd}.
 
 The {\tt RFtoIF} stage modulates the input signal from RF to a
 frequency band around the current IF frequency. This stage is
@@ -72,8 +69,8 @@ frequency.
 The {\tt CheckQuality} stage checks if the signal has a distinct
 frequency spectrum. If all the frequencies have similar amplitudes,
 the stage assumes that the signal-to-noise ratio is low and sends a
-message to activate the {\tt Booster}. Note that this message is sent
-using best-effort delivery.
+message to activate the {\tt Booster}. This message is sent using
+best-effort delivery.
 
 \begin{figure}[t]
 \centering
