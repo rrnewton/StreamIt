@@ -1,3 +1,13 @@
+@MastersThesis{fenway,
+  author =	 {David Z. Maze},
+  title =	 {A Flexible Compilation Infrastructure for {VLIW} and
+                  {SIMD} Architectures},
+  school =	 {Massachusetts Institute of Technology},
+  year =	 2001,
+  address =	 {Cambridge, MA},
+  month =	 sep
+}
+
 @Manual{kopi,
   title =	 {Kopi Reference Manual},
   author =	 {Vincent Gay-Para and Thomas Graf and Andre-Guillaume
@@ -8,10 +18,62 @@
 }
 
 @Manual{machsuif,
-  title = 	 {The {Machine-SUIF} Documentation Set},
+  title =	 {The {Machine-SUIF} Documentation Set},
   author =	 {Glenn Holloway and Michael D. Smith},
   organization = {Harvard University},
   year =	 2000
+}
+
+@Article{pdg,
+  author =	 {Jeanne Ferrante and Karl J. Ottenstein and Joe
+                  D. Warren},
+  title =	 {The Program Dependence Graph and Its Use in
+                  Optimization},
+  journal =	 {{ACM} Transactions on Programming Languages and
+                  Systems},
+  year =	 1987,
+  volume =	 9,
+  number =	 3,
+  pages =	 {319--349},
+  month =	 jul
+}
+
+@InProceedings{pdg-regalloc,
+  author =	 {Cindy Norris and Lori L. Pollock},
+  title =	 {Register Allocation over the Program Dependence
+                  Graph},
+  crossref =	 {pldi-94},
+  pages =	 {266--277}
+}
+
+@Proceedings{pldi-94,
+  title =	 {Proceedings of the {ACM} {SIGPLAN} '94 Conference on
+                  Programming Language Design and Implementation},
+  booktitle =	 {Proceedings of the {ACM} {SIGPLAN} '94 Conference on
+                  Programming Language Design and Implementation},
+  year =	 1994,
+  editor =	 {Vivek Sarkar and Barbara Ryder and Mary Lou Soffa},
+  publisher =	 {{ACM} Press},
+  isbn =	 {0-89791-662-X}
+}
+
+@Misc{scale-umass,
+  author =	 {{Scale Compiler Group}},
+  organization = {University of Massachusetts},
+  title =	 {Scale: A Compiler Framework for Heterogeneous
+                  Systems},
+  howpublished = {Web page},
+  url =		 {http://www-ali.cs.umass.edu/Scale/},
+  year =	 2000
+}
+
+@Manual{streamit-cookbook,
+  title =	 {StreamIt Cookbook},
+  author =	 {David Z. Maze},
+  organization = {Massachusetts Institute of Technology},
+  address =	 {Cambridge, MA},
+  month =	 mar,
+  year =	 2003
 }
 
 @Article{suif,
@@ -35,23 +97,111 @@
   month =	 aug # {~29,}
 }
 
-@Misc{scale-umass,
-  author =	 {{Scale Compiler Group}},
-  organization = {University of Massachusetts},
-  title =	 {Scale: A Compiler Framework for Heterogeneous
-                  Systems},
-  howpublished = {Web page},
-  url =		 {http://www-ali.cs.umass.edu/Scale/},
-  year =	 2000
+@InProceedings{vdg,
+  author =	 {Daniel Weise and Roger F. Crew and Michael Ernst and
+                  Bjarne Steensgaard},
+  title =	 {Value Dependence Graphs: Representation Without
+                  Taxation},
+  booktitle =	 {Proceedings of the 21st {ACM} Symposium on
+                  Principles of Programming Languages},
+  pages =	 {297--310},
+  year =	 1994
 }
 
-@MastersThesis{fenway,
-  author =	 {David Z. Maze},
-  title =	 {A Flexible Compilation Infrastructure for {VLIW} and
-                  {SIMD} Architectures},
-  school =	 {Massachusetts Institute of Technology},
-  year =	 2001,
-  address =	 {Cambridge, MA},
-  month =	 sep
+@Book{whale-book,
+  author =	 {Steven S. Muchnick},
+  title =	 {Advanced Compiler Design and Implementation},
+  publisher =	 {Morgan Kaufmann},
+  year =	 1997,
+  address =	 {San Francisco}
 }
 
+@InProceedings{pdg-constprop,
+  author =	 {David Binkley},
+  title =	 {Interprocedural Constant Propagation using
+                  Dependence Graphs and a Data-Flow Model},
+  booktitle =	 {Proceedings of the Fifth International Conference on
+                  Compiler Construction},
+  pages =	 {374--388},
+  year =	 1994,
+  address =	 {Edinburgh, U.K.},
+  month =	 apr # {~7--9,}
+}
+
+@InProceedings{pdg-unique,
+  author =	 {Susan Horwitz and Jan Prins and Thomas Reps},
+  title =	 {On the Adequacy of Program Dependence Graphs for
+                  Representing Programs},
+  crossref =	 {popl-88},
+  pages =	 {146--157}
+}
+
+@Proceedings{popl-88,
+  title =	 {Proceedings of the 15th {ACM} {SIGPLAN}-{SIGACT}
+                  Symposium on Principles of Programming Languages},
+  booktitle =	 {Proceedings of the 15th {ACM} {SIGPLAN}-{SIGACT}
+                  Symposium on Principles of Programming Languages},
+  year =	 1988,
+  editor =	 {J. Ferrante and P. Mager},
+  publisher =	 {{ACM} Press},
+  isbn =	 {0-89791-252-7}
+}
+
+@TechReport{pdg-rest-of-us,
+  author =	 {Robert A. Ballance and Arthur B. Maccabe},
+  title =	 {Program Dependence Graphs for the Rest of Us},
+  institution =	 {Department of Computer Science, The University of
+                  New Mexico},
+  year =	 1992,
+  number =	 {92-10},
+  address =	 {Albequerque, NM},
+  month =	 aug
+}
+
+@TechReport{pdg-syntax,
+  author =	 {Mary Jean Harrold and Gregg Rothermel},
+  title =	 {Syntax-Directed Construction of Program Dependence
+                  Graphs},
+  institution =	 {Department of Computer and Information Science, The
+                  Ohio State University},
+  year =	 1996,
+  number =	 {OSU-CISRC-5/96-TR32},
+  address =	 {Columbus, OH},
+  month =	 may
+}
+
+@TechReport{pdw,
+  author =	 {Philip L. Campbell and Ksheerabdhi Krishna and
+                  Robert A. Ballance},
+  title =	 {Refining and Defining the Program Dependence Web},
+  institution =	 {Department of Computer Science, The University of
+                  New Mexico},
+  year =	 1993,
+  number =	 {93-6},
+  address =	 {Albuquerque, NM},
+  month =	 feb
+}
+
+@Manual{rtl-zephyr,
+  title =	 {Specifying Instructions' Semantics Using
+                  $\lambda$-RTL (Interim Report)},
+  author =	 {Norman Ramsey and Jack W. Davidson},
+  organization = {Department of Computer Science, University of
+                  Virginia},
+  address =	 {Charlottesville, VA},
+  month =	 jul # {~11,},
+  year =	 1999
+}
+
+@techreport{rtl-smalltalk,
+  author =	 "Ralph E. Johnson and Carl McConnell and J. Michael
+                  Lake",
+  title =	 "The {RTL} system: {A} framework for code
+                  optimization",
+  institution =	 "University of Illinois at Urbana-Champaign",
+  number =	 1698,
+  address =	 "Urbana, Illinois",
+  pages =	 18,
+  year =	 1991
+}
+ 

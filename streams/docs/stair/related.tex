@@ -1,0 +1,181 @@
+\documentclass[11pt]{article}
+
+\usepackage{cite}
+\usepackage[margin=1in]{geometry}
+\usepackage{palatino}
+\usepackage{url}
+\usepackage{xspace}
+
+\def\makeacro#1{\expandafter\def\csname#1\endcsname{\textsc{#1}\xspace}}
+\makeacro{cfg}
+\makeacro{gnu}
+\makeacro{ir}
+\makeacro{pdg}
+\makeacro{rtl}
+\makeacro{suif}
+\makeacro{vdg}
+
+% Predefine useful email addresses.
+\urldef\dmazemail\url{dmaze@cag.lcs.mit.edu}
+
+\title{Other Intermediate Representations}
+\author{David Maze\\\dmazemail}
+
+\begin{document}
+
+\maketitle
+\tableofcontents
+
+\section{Motivation}
+
+Immediate thoughts for a low-level intermediate representation led to
+a straightforward three-operand \ir along the lines of Machine \suif.
+However, a number of other intermediate representations have been
+proposed over the years, some of which may be more suitable for
+StreamIt compilation.
+
+\section{Graph-Based IRs}
+
+Graph-based intermediate representations are attractive for a number
+of reasons.  For example, two instructions can't be reordered if the
+second depends on the result of the first, and a dependence graph
+readily encapsulates this state.  Fine-grained load-balancing and
+other operations that need to deal with individual instructions can
+migrate them easier in a graph \ir than by moving them between lists
+of instructions on separate processors.
+
+\subsection{Program Dependence Graphs}
+
+The most common graph-based \ir is the program dependence
+graph\cite{pdg}.  Both data and control dependences are represented in
+this graph.  Nodes in the graph are statements; the graph is not
+intrinsically ordered beyond the dependence edges.
+
+Since many optimizations depend on having dependence information, the
+\pdg becomes a somewhat natural representation for actually performing
+optimization.  For example, a variable use has data-dependence edges
+on all of its reaching definitions, so a constant-propagation pass
+could simply use this information.  The original \pdg paper discusses
+the use of program dependence graphs for other straightforward
+optimizations, such as loop unrolling, parallelization detection, and
+code motion\cite{pdg}; other standard compiler chores such as register
+allocation\cite{pdg-regalloc} have also been explored, along with more
+ambitious optimizations such as interprocedural constant
+propagation\cite{pdg-constprop}.
+
+The main problem with program dependence graphs, as with other
+graph-based representations, is generating code.  In the case of
+structured code, the \pdg can be constructed so that it is possible to
+return to a control-flow graph, with code generation happening from
+there.  Other users of \pdg{}s have proposed annotating predicate
+nodes in the graph to indicate whether they are the header of an
+\emph{if} or \emph{while} statement, which presumably would allow code
+generation without explicitly constructing a \cfg.
+
+Much of the material on program dependence graphs concerns whether
+they are reasonable, and whether they can be usefully constructed.  
+Horwitz \emph{et al.} showed that the \pdg representation for a given
+program is unique\cite{pdg-unique}.  Two different groups have
+proposed approaches for constructing the \pdg directly from a parse
+tree, without constructing an intermediate
+\cfg\cite{pdg-rest-of-us,pdg-syntax}.
+
+\subsection{Program Dependence Webs}
+
+Program dependence webs\cite{pdw} are an extension of program
+dependence graphs.  Several node types are added that reflect specific
+cases of variable initialization, including initialization in a
+conditional (``if $P$ then $x=a$, else $x=b$'') and initialization
+with a loop-carried dependence.  The authors claim that this
+representation can adequately represent imperative programs along with
+data- and demand-driven execution models, and can translate a program
+to work on any of these models (so, for example, convert an imperative
+program to run on a data-flow machine).  This representation does not
+seem to be in widespread use, however.
+
+\subsection{Value Dependence Graphs}
+
+Value dependence graphs\cite{vdg} are, in a sense, inverted data-flow
+graphs, with loop bodies abstracted into functions.  The claim is that
+\vdg{}s completely escape control dependence wherever possible, and
+that most optimizations are fairly straightforward on it.
+
+Conversation with Michael Ernst suggests that \vdg{}s never really
+entered widespread use.  Alias analysis becomes a major problem: after
+computation, values are placed in a store which is passed around.
+Transformations try to pass around values instead of the entire store
+when possible, but this isn't always the case, particularly around
+pointer operations.  Transforming loops into function recursion (think
+6.001-style Scheme loops) is also non-obvious for analysis.  Finally,
+there's not a good technique for generating code directly from a \vdg;
+the paper describes transforming from a \vdg back into a control-flow
+graph, though this apparently can be tricky in the presence of certain
+sorts of control and aliasing.
+
+\section{List-of-Instruction IRs}
+
+Most compilers seem to use a list of instructions as their primary
+\ir.  There are a couple of ways to represent these: you can have a
+flat list of instructions, or transform the list into a control-flow
+graph.  Some compiler infrastructures, like Machine
+\suif{}\cite{machsuif}, have both; it is straightforward to convert
+from one representation to the other, provided that branch statements
+can be readily identified.
+
+These representations generally have the advantage of
+comprehensibility; an instruction is at a clear level between the
+original program source and the target machine assembly.  However,
+this representation isn't necessarily optimal for analysis, since the
+instruction ordering is somewhat arbitrary and can introduce anti and
+output dependences.  Also, having a single ordered list of
+instructions complicates representing code for parallel targets, where
+you might have multiple instruction streams running at once within a
+single original-source ``function''.
+
+\subsection{Register Transfer Lists}
+
+A register transfer list specifies, for a given instruction, what
+registers are read and written in parallel with an associated
+operation.  This is a very general representation; an actual
+instruction is a composition of \rtl{}s.  Register transfer lists are
+used by the \gnu C compiler, along with the Zephyr compiler
+infrastructure\cite{rtl-zephyr}.  There is also a SmallTalk
+implementation, with a reasonable description of the overall
+concepts\cite{rtl-smalltalk}.
+
+\rtl{}s build up a complete description of what an instruction does
+from basic building blocks; it is consequently possible to analyze the
+effects of code compiled for any target in platform-independent code.
+The flip side of this is that the representation is very verbose,
+which means that it's not necessarily particularly human-readable.
+The \rtl representation is also somewhat old, and consequently
+somewhat entrenched; it is unclear if it is suitable for parallel
+compilation, for example, though an instruction could readily be built
+that did four parallel adds if need be.
+
+\subsection{Machine SUIF}
+
+Machine \suif{}\cite{machsuif}, on its own, is not a particularly
+exciting \ir, though it is still in active development.  It has a
+generic input machine description, which is translated to
+target-specific instructions.  An instruction has an integer opcode,
+and a list of source and destination operands; the exact meaning of
+the instruction is specified by a backend object, which includes
+predicates to check if an instruction is a load, store, or move
+instruction.
+
+This \ir is interesting in that it uses a single representation for
+both target-independent and target-specific code.  However, its choice
+of representation is somewhat limiting, and describing code for
+parallel targets is difficult at best.  The set of predicates is
+dictated by later passes (so, ``is this a load'' or ``is this a
+store'' or ``is this a move'' are all needed by the register
+allocator); if an architecture can't describe its memory operations in
+terms of these predicates, or if it can't generate a basic spill
+instruction trivially, then using the backend requires modifying the
+register allocator.
+
+\bibliographystyle{plain}
+\bibliography{references}
+
+\end{document}
