@@ -24,7 +24,7 @@ int iteration_to_execute_at; // target iteration number or
 int and float parameters;
 \end{verbatim}}
 
-Example:
+Examples:
 
 {\scriptsize
 \begin{verbatim}
@@ -53,49 +53,53 @@ int credit;
 
 Example:
 
-(-1, 8) Node can execute only up to first 8 iterations before receiving additional credit.
 
-To calculate the iteration at which to execute the message the SDEP
-structure is embedded in the code for the thread sending the
-message. Any sdep and reverse sdep value can be calculated from few
-parameters and information about the first steady state cycle
-dependency.
+{\scriptsize
+\begin{verbatim}
+(-1, 8)
+\end{verbatim}}
 
-Currently each message is scheduled exactly at the latest possible
-latency and the rest of information is discarded. If one does take the
-latency interval into account one could work out a way of sending less
-credit messages and still maintaining feasibility. However this is not
-implemented for the first version of cluster backend. This could be
-implemented in future versions.
+Node can execute only up to first 8 iterations before receiving additional credit.
 
-If a message is being sent downstream and maximum latency is
-non-negative then no credits need to be sent. If a message is being
-sent downstream at negative maximum latency or is being sent upstream
+To calculate the iteration at which to execute the message $\sdep$
+function is embedded into the code for the thread sending the
+message. Any $\sdep$ function value can be calculated from few
+parameters and $\sdep$ values during the first steady state cycle.
+
+Currently in cluster backend each message is scheduled exactly at the 
+latest possible
+latency and the rest of latency information is discarded. Taking the
+latency interval into account would allow creation of a more efficient
+schedule for sending credit messages.
+
+If a message is being sent downstream at a negative maximum latency 
+or is being sent upstream with a positive maximum latency
 then one needs to coordinate the execution of filters by sending
-credits. Nodes that are receiving credits can only execute up 
-to the maximum credit they have received so far.
+credits to the message receiver threads. Nodes that are receiving 
+credits can only execute up to the maximum credit they have received so far.
 
-In case of a message being sent downstream with negative latency,
-during compile time we use the sdep information to calculate following
-information:
-
-\begin{enumerate}
-\item Number of iterations upstream node can execute before sending any credits,
-\item The schedule of sending credits during a steady state cycle after initial number of iterations.
-\end{enumerate}
-
-We use the information about credits to send during a steady cycle to
-figure out number of credits to send during subsequent steady
-cycles. This data is embedded into the message sender thread.
-
-In case of a message being sent upstream, during compile time we use
-the sdep information to calculate following information:
+In the case of a message being sent downstream with negative latency,
+$\sdep$ funcition is used to compute following information during compile 
+time:
 
 \begin{enumerate}
-\item The initial credit that downstream node sends upstream before executing any cycle,
-\item The schedule of sending credits during a steady state cycle.
+\item Number of iterations the upstream message sender can execute before sending any credits,
+\item The schedule of sending credits during the first steady state cycle after the initial iterations described in 1.
 \end{enumerate}
 
-We use the information about credits to send during a steady cycle to
-figure out number of credits to send during subsequent steady
+We use the information about credits to send during the first steady state 
+cycle to figure out the number of credits to send during subsequent steady
+state cycles. This data is embedded into the message sender thread.
+
+In the case of a message being sent upstream, 
+the $\sdep$ funcition is used to compute following information during compile 
+time:
+
+\begin{enumerate}
+\item The initial credit that downstream node sends during initialization,
+\item The schedule of sending credits during the first steady state cycle.
+\end{enumerate}
+
+We use the information about credits to send during the first steady state 
+cycle to figure out number of credits to send during subsequent steady
 cycles. This data is embedded into the message sender thread.
