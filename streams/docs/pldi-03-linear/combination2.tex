@@ -17,6 +17,16 @@ do not yet deal with {\tt feedbackloop}s as they require the notion of
 
 \subsection{Linear Expansion}
 
+\begin{figure}[t]
+\center
+\epsfxsize=3.0in
+\epsfbox{images/filter-expand.eps}
+\vspace{-6pt}
+\caption{Expanding a linear node to have I/O rates $(e', o', u')$.  }
+\label{fig:expanding-a-matrix}
+\vspace{-12pt}
+\end{figure}
+
 In StreamIt, the input and output rate of each {\tt filter} in the
 stream graph is known at compile time.  The StreamIt compiler
 leverages this information to compute a static schedule--that is, an
@@ -51,16 +61,6 @@ expansion can be done as follows.
 %% If we expand a linear node by a factor of $k$, then one execution of
 %% the new node will be exactly equivalent to $k$ executions of the
 %% original.
-
-\begin{figure}
-\center
-\epsfxsize=3.0in
-\epsfbox{images/filter-expand.eps}
-\caption{Expanding a linear node to have I/O rates $(e', o', u')$.  }
-\label{fig:expanding-a-matrix}
-\vspace{-12pt}
-\end{figure}
-
 
 \begin{transformation} (Linear expansion)
 % DOUBLE-CHECK whether we're assuming 0-indexed or 1-indexed matrices
@@ -145,7 +145,7 @@ Given two linear nodes $\lambda_1$ and $\lambda_2$ where the output of
 $\lambda_1$ is connected to the input of $\lambda_2$ in a pipeline
 construct, the combination $\mbox{\bf pipe}(\lambda_1, \lambda_2)$ $=$
 $\mathbf{ \{A', b', e', o', u'\}}$ represents an equivalent node that
-can replace the original two.  Its components are as follows: \\
+can replace the original two.  Its components are as follows:
 \begin{equation} \nonumber
 \begin{array}{rcl}
 \mt{chanPop} & = & \mt{lcm}(u_1, o_2) \\ ~ \vspace{-8pt} \\
@@ -281,8 +281,9 @@ mathematical terms.
 \center
 \epsfxsize=3.0in
 \epsfbox{images/splitjoin-combination.eps}
-\caption{Matrix resulting from combining a {\tt splitjoin} of rate matched sub {\tt streams}.}
-\label{fig:splitjoin-duplicate-matrix}
+\caption{Matrix resulting from combining a {\tt splitjoin} of rate matched sub {\tt streams}.
+\protect\label{fig:splitjoin-duplicate-matrix}}
+\vspace{-12pt}
 \end{figure}
 
 \begin{transformation} (Duplicate splitjoin combination)
@@ -291,7 +292,7 @@ are linear nodes $\lambda_0 \dots \lambda_{n-1}$, and a roundrobin
 joiner with weights $w_0 \dots w_{n-1}$, the combination $\mbox{\bf
 splitjoin}(s)$ $=$ $\mathbf{ \{A',}$ $\mathbf{b',}$ $\mathbf{e',}$
 $\mathbf{o',}$ $\mathbf{u'\}}$ represents an equivalent node that can
-replace the entire stream $s$.  Its components are as follows: \\
+replace the entire stream $s$.  Its components are as follows:
 \begin{equation} \nonumber
 \begin{array}{rcl}
 \mt{joinRep} & = & \mt{lcm}(\frac{\mt{lcm}(u_1,w_1)}{w_1}, \dots, \frac{\mt{lcm}(u_n,w_n)}{w_n}) \\
@@ -384,7 +385,7 @@ $v_0 \dots v_{n-1}$, children that are linear nodes $\lambda_0 \dots
 $\mbox{\bf rr-to-dup}(s)$ is a splitjoin with a duplicate splitter,
 linear child nodes $\mathbf{\lambda_0'} \dots
 \mathbf{\lambda_{n-1}'}$, and roundrobin joiner $j$.  The child nodes
-are computed as follows: \\
+are computed as follows:
 \begin{equation} \nonumber
 \begin{array}{rcl}
 \mt{vSum}_k & = & \sum_{i=0}^{k-1} v_i \\ ~ \vspace{-6pt} \\
@@ -425,56 +426,46 @@ coefficient of $0$.
 %% \label{fig:splitjoin-roundrobin-matrix}
 %% \end{figure}
 
-\subsection{Benefits of Linear Collapsing}
+\subsection{Benefits of Linear Combination}
 
-Linear analysis is valuable because it provides a precise relationship
-between input and output that is nearly impossible to extract from
-general-purpose imperative programs. By combining the actions of
-StreamIt structures by combining their linear nodes we can do 
-optimizations that are impossible for a standard compiler.
+%% Linear analysis is valuable because it provides a precise relationship
+%% between input and output that is nearly impossible to extract from
+%% general-purpose imperative programs.  While the combination of linear
+%% structures is analogous to algebraic simplification between loop
+%% bodies in an imperative program, it would be extremely difficult for a
+%% general-purpose compiler to extract the same information.
 
-Combining the action of {\tt streams} in a {\tt pipeline} is equivalent 
-to algebraic simplification between the bodies of sequential loops in 
-an imperative program. Once an overall linear node for the
-{\tt pipeline} has been determined, our compiler can perform this highly non-trivial 
-transformation automatically, leaving the the programmer to express 
-the computation in the most convenient manner.
+%% Combining the action of {\tt streams} in a {\tt pipeline} is analogous
+%% to algebraic simplification between the bodies of sequential loops in
+%% an imperative program.  Once an overall linear node for the {\tt
+%% pipeline} has been determined, our compiler can perform this
+%% transformation automatically, leaving the the programmer to express
+%% the computation in the most convenient manner.
 
-For example, although a bandpass filter can be implemented with a low
-pass filter followed by a high pass filter, actual implementations
-tend to determine the coefficients of a single combined filter that 
-performs the same computation. While a simple bandpass filter is 
-easy to combine manually, in an actual design several different 
-filters might be designed and implemented by several different people 
-which would be much harder to integrate into a single design.
+There are numerous instances where the linear combination
+transformation could benefit a programmer.  For example, although a
+bandpass filter can be implemented with a low pass filter followed by
+a high pass filter, actual implementations tend to determine the
+coefficients of a single combined filter that performs the same
+computation. While a simple bandpass filter is easy to combine
+manually, in an actual system several different filters might be
+designed and implemented by several different people which would be
+much harder to integrate into a single design.
 
-A common operation in discrete time signal processing is downsampling
-to reduce the computational requirements of a system.
+Another common operation in discrete time signal processing is
+downsampling to reduce the computational requirements of a system.
 Downsampling is most often implemented as a low pass filter followed
 by an $M$ compressor which passes every $M$th input sample to the
-output.  Therefore, $M$ outputs from the
-low pass filter are calculated for every overall output, when in actual fact
-only every $M$th sample needs be computed.  Almost all actual systems 
-do not calculate the $M-1$ unused outputs which decreases computational
-requirements by a factor of $\frac{M-1}{M}$. However, most often 
-the system's actual specification will include both the filter and the compressor. 
-This inefficient implementation appears because it is
-conceptually easier to understand. Our linear analysis and transformations
-can describe the computation well enough enough so that our compiler can
-derive the efficient transformation automatically.
+output.  In practice, the filters are combined to avoid computing dead
+items in the low pass filter.  However, the system specification
+contains both filters for the sake of understanding.  Our analysis can
+start with this and derive the efficient version automatically.
 
-Another example of how combining linear nodes can help overall performance
-is a multi-band equalizer (such as is found in the
-FMRadio benchmark).  The purpose of such an equalizer is to filter $N$
-different frequency bands separately, exactly like the graphic equalizer found
-on stereos. The intuitive system specification of an equalizer
-consists of $N$ bandpass filters operating in parallel whose output is
-combined to produce the equalized signal. However, if the filters do
-not vary with time, a single filter which performs the equivalent
-computation can be substituted instead. Designing this
-single overall filter is difficult, and any subsequent changes to any
-one of the sub filters will necessitate a total redesign of the
-filter. Using the linear analysis and combination presented,
-our compiler can automatically derive the equivalent filter from the
-intuitive specification. Therefore any subsequent design changes will 
-necessitate only a recompile rather than a manual redesign.
+A final example is a multi-band equalizer, in which $N$ different
+frequency bands are filtered in parallel (see our FMRadio benchmark).
+If these filters are time invariant, then they can be collapsed into a
+single node.  However, designing this single overall filter is
+difficult, and any subsequent changes to any one of the sub filters
+will necessitate a total redesign of the filter.  With our automated
+combination process, any subsequent design changes will necessitate
+only a recompile rather than a manual redesign.

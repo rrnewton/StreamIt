@@ -87,10 +87,12 @@ giving results (Section~\ref{sec:results}), related work
 (Section~\ref{sec:conclusion}).
 
 \subsection{Motivating Example}
-\begin{figure}
+\begin{figure}[t]
 \center
 \epsfxsize=2.0in
 \epsfbox{images/motivating-example.eps}
+\caption{Block diagram of two FIR filters.}
+\vspace{11pt}
 \scriptsize
 \begin{verbatim}
 /* perform N-element FIR filter with weights and data */
@@ -135,12 +137,14 @@ void main() {
   }
 }
 \end{verbatim}
+\vspace{-18pt}
 \caption{Two consecutive FIR filters in C.  Channels are represented
-as circular buffers, and the scheduling is done by hand.}
-\label{fig:motivating-example}
+as circular buffers, and the scheduling is done by hand.
+\protect\label{fig:motivating-example}}
+\vspace{-12pt}
 \end{figure}
 
-\begin{figure}
+\begin{figure}[t]
 \scriptsize
 \begin{verbatim}
 float->float pipeline TwoPipe {
@@ -158,13 +162,10 @@ float->float filter FIRFilter(float[N] weights) {
     pop();
 }
 \end{verbatim}
+\vspace{-18pt}
 \caption{Two consecutive FIR filters in StreamIt.  Buffer management
-and scheduling are handled by the compiler.}
-\label{fig:example-streamit}
-\end{figure}
-
-\begin{figure}
-\scriptsize
+and scheduling are handled by the compiler.\protect\label{fig:example-streamit}}
+\vspace{6pt}
 \begin{verbatim}
 float->float filter CollapsedTwoPipe() {
   float[N] combined_weights;
@@ -184,14 +185,11 @@ float->float filter CollapsedTwoPipe() {
   }
 }
 \end{verbatim}
+\vspace{-18pt}
 \caption{Combined version of the two FIR filters.  Since each FIR
 filter is linear, the weights can be combined into a single {\tt
-combined\_weights} array.}
-\label{fig:example-combine}
-\end{figure}
-
-\begin{figure}
-\scriptsize
+combined\_weights} array.\protect\label{fig:example-combine}}
+\vspace{6pt}
 %% float->float filter FreqTwoPipe() {
 %%   complex[N] H;
 %%   init {
@@ -206,20 +204,17 @@ combined\_weights} array.}
 %% }
 \begin{verbatim}
 float->float pipeline FreqTwoPipe(int L) {
-  /* calculate combined weights */
-  float[N] combined_weights = ... ;
-  /* take FFT of weights */
-  complex[N] H = fft(combined_weights);
-  /* add FFT stage to stream */
-  add FFT(N+L);
-  /* add stage to multiply by H */
-  add ElementMultiply(H);
-  /* add inverse FFT */
-  add IFFT(N+L);
+  float[N] combined_weights = ... ;     // calc. combined weights 
+  complex[N] H = fft(combined_weights); // take FFT of weights     
+  add FFT(N+L);                         // add FFT stage to stream 
+  add ElementMultiply(H);               // add multiplication by H 
+  add IFFT(N+L);                        // add inverse FFT         
 }
 \end{verbatim}
-\caption{Combined version of two FIR filters in the frequency domain.}
-\label{fig:example-frequency}
+\vspace{-12pt}
+\caption{Combined version of two FIR filters in the frequency domain.
+\protect\label{fig:example-frequency}}
+\vspace{-12pt}
 \end{figure}
 
 To illustrate the program transformations that our technique is
@@ -259,13 +254,13 @@ compiler to do the analysis and combination.
 
 \subsection{StreamIt}
 
-\begin{figure}
-\center
-\epsfxsize=3.0in
-\epsfbox{images/general-picture-filter.eps}
-\caption{Graphical illustration of $e_{F}$, $o_{F}$ and $u_{F}$}
-\label{fig:overview-filter}
-\end{figure}
+%% \begin{figure}
+%% \center
+%% \epsfxsize=3.0in
+%% \epsfbox{images/general-picture-filter.eps}
+%% \caption{Graphical illustration of $e_{F}$, $o_{F}$ and $u_{F}$}
+%% \label{fig:overview-filter}
+%% \end{figure}
 
 StreamIt is a language and compiler for high-performance signal
 processing~\cite{gordon-thesis,streamit-asplos,streamitcc}.  In a
@@ -292,15 +287,17 @@ must declare the maximum element it will {\tt peek} at, the number of
 elements it will {\tt pop}, and the number of elements that it will
 {\tt push} during an execution of {\tt work}.  These rates must be
 resolvable at compile time and constant from one invocation of {\tt
-work} to the next.  Figure~\ref{fig:overview-filter} gives our
-notation these input/ouput rates.
+work} to the next.  
+%Figure~\ref{fig:overview-filter} gives our notation these input/ouput rates.
 
-\begin{figure}
+\begin{figure}[t]
 \center
 \epsfxsize=3.0in
 \epsfbox{images/streamit-structures.eps}
-\caption{StreamIt structures: {\tt pipeline}, {\tt splitjoin}, and {\tt feedbackloop}.}
-\label{fig:structures}
+\vspace{-12pt}
+\caption{StreamIt structures: {\tt pipeline}, {\tt splitjoin}, and {\tt feedbackloop}.
+\protect\label{fig:structures}}
+\vspace{-12pt}
 \end{figure}
 
 A program in StreamIt consists of a hierarchical graph of {\tt

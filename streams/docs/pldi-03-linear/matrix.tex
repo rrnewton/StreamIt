@@ -1,15 +1,6 @@
 \section{Linear Nodes}
 \label{sec:linearrep}
 
-\begin{figure}
-\center
-\epsfxsize=3.0in
-\epsfbox{images/general-picture-matrix.eps}
-\caption{Linear filter as a vector-matrix operation}
-\label{fig:overview-matrix}
-\vspace{-12pt}
-\end{figure}
-
 There is no general relationship that must hold between a {\tt
 filter}'s input data and its output data. In actual applications,
 however, the output is typically derived from the input, but the
@@ -39,6 +30,16 @@ computes $y = x A + b$, and then pushes the $u$ elements of $y$ onto
 the output tape, starting with $y[u-1]$ and proceeding through $y[0]$.
 Finally, $o$ items are popped from the input tape.
 \end{definition}
+
+\begin{figure}[t]
+\center
+\epsfxsize=3.0in
+\epsfbox{images/general-picture-matrix.eps}
+\vspace{-12pt}
+\caption{Linear filter as a vector-matrix operation}
+\label{fig:overview-matrix}
+\vspace{-12pt}
+\end{figure}
 
 %% To use DSP notation for {\tt streams} in StreamIt, we will call the
 %% items that are peeked and used as input $x[n]$, where

@@ -50,11 +50,12 @@ Using linear state, our structure combination rules can be extended to include {
 Examples of programs that exhibit stateful linear nodes are control systems
 and infinite impulse response (IIR) filters.
 
-Another promising avenue of research is attempting to exploit work
-done on matrix factorizations in order to automatically derive fast
-implementations of large compuatations such as DSP transforms.  Also,
-to increase the class of programs that would fit into our linear
-framework, the entries of the ${\mathbf A}$ and ${\mathbf b}$ of
-linear nodes could contain symbolic constants that are resolved at
-runtime.
+Another promising avenue of research is to exploit matrix
+factorization in order to automatically derive fast implementations of
+large compuatations such as DSP transforms.  Matrix representations
+will also be useful for generating load-balanced parallel code in the
+StreamIt RAW backend~\cite{streamit-asplos}.  Finally, to increase the
+class of programs that would fit into our linear framework, the
+entries of the ${\mathbf A}$ and ${\mathbf b}$ of linear nodes could
+contain symbolic constants that are resolved at runtime.
 
