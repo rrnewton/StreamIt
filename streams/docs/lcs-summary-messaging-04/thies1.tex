@@ -18,7 +18,7 @@
 %% on the abstract file, and then latex on the abstract file twice.
 
 \documentclass{csailabstractbook}
-\usepackage{psfig}
+%\usepackage{psfig}
 
 \begin{document}
 
@@ -159,18 +159,18 @@ similar~\cite{sdep04}.
 
 \begin{figure}[t]
   \begin{center}
-    \psfig{figure=thies1-2.eps,width=6.25in}
-    %    \includegraphics[width=6.5in]{thies1-1.eps}
+    %\psfig{figure=thies1-2.eps,width=6.25in}
+    \includegraphics[width=6.25in]{thies1-2.pdf}
     %    \vspace{1.05in}
   \end{center}
-  \vspace{-30pt}
+  \vspace{-15pt}
   \caption{Semantics of teleport messaging from $S$ to $R$ with
   latency one.  $S$ fires once and then (conceptually) tags its next
   output with the message.  The message propagates through the stream
   and is delivered when $R$ first sees the effects of the tagged
   item.}
 
-  \vspace{-12pt}
+  \vspace{-6pt}
 \end{figure}
 
 \absection{Progress}
