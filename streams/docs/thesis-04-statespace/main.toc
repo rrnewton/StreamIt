@@ -1,0 +1,33 @@
+\contentsline {chapter}{\numberline {1}Introduction}{13}
+\contentsline {section}{\numberline {1.1}Problem Overview}{13}
+\contentsline {section}{\numberline {1.2}DSP Analysis}{14}
+\contentsline {section}{\numberline {1.3}Organization}{15}
+\contentsline {chapter}{\numberline {2}Background Information}{17}
+\contentsline {section}{\numberline {2.1}The StreamIt Programming Language}{17}
+\contentsline {section}{\numberline {2.2}Block Representations}{24}
+\contentsline {subsection}{\numberline {2.2.1}Linear Representations}{24}
+\contentsline {subsection}{\numberline {2.2.2}State-Space Representations}{25}
+\contentsline {chapter}{\numberline {3}State-Space Analysis}{27}
+\contentsline {section}{\numberline {3.1}Representation}{27}
+\contentsline {section}{\numberline {3.2}Extraction}{29}
+\contentsline {subsection}{\numberline {3.2.1}Example Procedure}{31}
+\contentsline {section}{\numberline {3.3}Combination}{33}
+\contentsline {subsection}{\numberline {3.3.1}Pipeline}{33}
+\contentsline {subsection}{\numberline {3.3.2}Splitjoin}{36}
+\contentsline {subsubsection}{Conversion from roundrobin to duplicate splitjoin}{36}
+\contentsline {subsubsection}{Collapsing duplicate splitjoins}{36}
+\contentsline {subsection}{\numberline {3.3.3}Feedback Loop}{40}
+\contentsline {section}{\numberline {3.4}Representation Changes}{43}
+\contentsline {subsection}{\numberline {3.4.1}Expansion}{43}
+\contentsline {subsection}{\numberline {3.4.2}Increasing the number of Stored Inputs}{46}
+\contentsline {section}{\numberline {3.5}Replacement}{49}
+\contentsline {chapter}{\numberline {4}Optimization}{51}
+\contentsline {section}{\numberline {4.1}State-Space Transformations}{51}
+\contentsline {section}{\numberline {4.2}State Removal}{52}
+\contentsline {section}{\numberline {4.3}Putting Inputs into States}{56}
+\contentsline {section}{\numberline {4.4}Parameter Reduction}{56}
+\contentsline {section}{\numberline {4.5}Staged Execution}{58}
+\contentsline {chapter}{\numberline {5}Results}{61}
+\contentsline {chapter}{\numberline {6}Related Work}{63}
+\contentsline {chapter}{\numberline {7}Conclusion}{65}
+\contentsline {chapter}{\numberline {A}Benchmark Source Code}{67}
