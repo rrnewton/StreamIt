@@ -1,7 +1,7 @@
 #
 # The CVS Modules File
 #
-#ident	"@(#)cvs/examples:$Name: not supported by cvs2svn $:$Id: modules,v 1.5 1997-08-25 20:37:46 beng Exp $"
+#ident	"@(#)cvs/examples:$Name: not supported by cvs2svn $:$Id: modules,v 1.6 1997-08-27 19:38:12 beng Exp $"
 #
 # Three different line formats are valid:
 #	key	-a    aliases...
@@ -46,3 +46,5 @@ taginfo		-i mkmodules CVSROOT taginfo
 #
 simplesim                       soft_cache/simplesim-2.0
 binutils                        soft_cache/binutils-2.5.2
+machbasesuif			machsuif/src/basesuif
+machsuif			machsuif/src/machsuif
