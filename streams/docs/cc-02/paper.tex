@@ -1,0 +1,44 @@
+% might need psfig, url, amsmath, amsfonts?
+\documentclass[psfig]{acm_proc_article-sp}
+
+\begin{document}
+
+\title{StreamIt: A Language for Streaming Applications}
+
+\numberofauthors{1}
+\author{
+\alignauthor \vspace{-18pt} Bill Thies, David Maze, Michal Karczmarek, Michael Gordon, and Saman Amarasinghe\\
+	\vspace{12pt}
+	Laboratory for Computer Science \\
+	Massachusetts Institute of Technology \\
+	Cambridge, MA  02139 \\
+	\vspace{12pt}
+	{\tt \{thies, dmaze, karczma, mgordon, saman\}@lcs.mit.edu} \\
+	\vspace{-6pt}
+%	\vspace{12pt}
+%        \today
+}
+
+% for the arrow of a function def, etc.
+\newcommand{\ma}[2]{max_{#1 \rightarrow #2}}
+\newcommand{\mal}[1]{maxloop_{#1 \rightarrow #1}}
+\newcommand{\mi}[2]{min_{#1 \leftarrow #2}}
+
+\maketitle
+
+\begin{abstract}
+\input{abstract.tex}
+\end{abstract}
+
+\input{intro.tex}
+\input{domain.tex}
+\input{overview.tex}
+%\input{timing.tex}
+\input{example.tex}
+\input{related.tex}
+\input{conclusion.tex}
+\bibliographystyle{abbrv}
+\bibliography{references,elliotw,thies}
+%\input{appendix2.tex}
+\input{appendix.tex}
+\end{document}
