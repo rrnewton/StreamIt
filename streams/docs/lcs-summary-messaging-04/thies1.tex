@@ -18,6 +18,7 @@
 %% on the abstract file, and then latex on the abstract file twice.
 
 \documentclass{csailabstractbook}
+\usepackage{psfig}
 
 \begin{document}
 
@@ -51,8 +52,8 @@ language that aims to improve programmer productivity within the
 streaming domain.  In StreamIt, a program is represented as a set of
 autonomous filters (actors) that run in parallel and communicate using
 FIFO channels.  Filters have an atomic ``work'' function that
-constitutes a single execution step; it is repeatedly invoked by the
-StreamIt runtime system.
+constitutes a single execution step; the work function is repeatedly
+invoked by the StreamIt runtime system.
 
 Teleport messaging provides a way for filters to exchange out-of-band
 messages--that is, dynamic control messages that travel outside of the
@@ -83,11 +84,12 @@ in order to achieve it.
 One difficult aspect of stream programming is reconciling regular,
 steady-state dataflow with irregular control messages.  For modeling
 data paths of signal processing applications, Synchronous Dataflow
-(SDF) is a popular model of computation~\cite{LM87-i}.  An SDF graph
-consists of actors connected by communication channels; on each
-execution, an actor must consume and produce a constant number of
-items from its input and output channels.  SDF is appealing because it
-can be statically scheduled and optimized.
+(SDF) is a popular model of computation.
+%~\cite{LM87-i}.  
+An SDF graph consists of actors connected by communication channels;
+on each execution, an actor must consume and produce a constant number
+of items from its input and output channels.  SDF is appealing because
+it can be statically scheduled and optimized.
 
 However, the challenge comes when there is a dynamic, unpredictable
 event in the stream; for instance, an actor detects a low
@@ -156,14 +158,19 @@ similar~\cite{sdep04}.
 %% constraint.
 
 \begin{figure}[t]
-  \vspace{-12pt}
   \begin{center}
-%    \includegraphics[width=1in]{example_figure2.pdf}
-    \vspace{0.9in}
+    \psfig{figure=thies1-1.eps,width=6.25in}
+    %    \includegraphics[width=6.5in]{thies1-1.eps}
+    %    \vspace{1.05in}
   \end{center}
-  \vspace{-6pt}
-  \caption{caption}
-\vspace{-12pt}
+  \vspace{-30pt}
+  \caption{Semantics of teleport messaging from $S$ to $R$ with
+  latency one.  $S$ fires once and then (conceptually) tags its next
+  output with the message.  The message propagates through the stream
+  and is delivered when $R$ first sees the effects of the tagged
+  item.}
+
+  \vspace{-12pt}
 \end{figure}
 
 \absection{Progress}
@@ -175,7 +182,7 @@ threads, each of which implements a component of the stream graph and
 is allocated to a machine in a networked computing cluster.
 Persistent, point-to-point TCP/IP channels are used for communication
 between machines.  The message timing constraints are implemented with
-a credit/acknowledgment system which maintains a loose
+a credit/acknowledegment system which maintains a loose
 synchronization between each sender and receiver, thereby ensuring
 that all messages sent can be received within the given time frame.
 
@@ -183,10 +190,9 @@ We have also performed a case study to evaluate the programmability
 and performance implications of teleport messaging.  The application
 of focus is a frequency hopping radio frontend, in which the receiver
 switches between a set of known frequencies whenever it detects
-certain tones from the transmitter.  The signal to change frequencies
-is indicated by an up-stream message with a tight latency.  For
-comparison, we also implemented a version that uses a feedback loop
-instead of messaging.
+certain tones from the transmitter.  A frequency change is indicated
+by an up-stream message with a tight latency.  For comparison, we also
+implemented a version that uses a feedback loop instead of messaging.
 
 Using the StreamIt compiler to target a cluster of 16 Pentium~III
 workstations, we obtain the following results.  The use of teleport
@@ -199,15 +205,15 @@ implementation of timing constraints via the feedback loop.
 
 There are three directions that we hope to explore in future work.
 First, we need to implement a set of benchmarks that utilizes teleport
-messaging, and to expand our evaluation of the system with our current
+messaging and to expand our evaluation of the system with our current
 backend.  Second, we plan to continue ongoing research that considers
 the scheduling constraints implied by messages for a uniprocessor
-backend such as a workstation or DSP~\cite{karczma-thesis}.  Finally,
-we aim to use messaging as a starting point for developing more
-powerful dynamic features, including morphing and re-initialization
-for sections of the stream graph.  We believe that teleport messaging
-could provide a good mechanism for filters to trigger a wide range of
-dynamic adjustments in adaptive stream programs.
+backend such as a DSP~\cite{karczma-thesis}.  Finally, we aim to use
+messaging as a starting point for developing more powerful dynamic
+features, including morphing and re-initialization for sections of the
+stream graph.  We believe that messaging could provide a good
+mechanism for filters to trigger a wide range of dynamic adjustments
+in adaptive stream programs.
 
 %% This section is the one of the most important ones.  Please check 
 %% with your research supervisor to make sure all the relevant funding
