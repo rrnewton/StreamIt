@@ -1,57 +1,16 @@
 \begin{figure}[t]
-\centering
-\scriptsize
-\begin{verbatim}
-class LowPassFilter extends Filter {,
-  float[] weights;
-
-  void init(int sampleRate, float cutOffFreq) {
-    setInput(Float.TYPE); setOutput(Float.TYPE);
-    setPush(N); setPop(1); setPeek(N); 
-    weights = calcWeights(sampleRate, cutOffFreq);
-  }
-
-  void work() {
-    float sum = 0;
-    for (int i=0; i<weights.length; i++) 
-      sum += input.peek(i)*weights[i];
-    input.pop();
-    output.push(sum);
-  }
-}
-
-public class Equalizer extends Pipeline {
-  void init(float samplingRate, int N) {
-    add(new SplitJoin() {
-      void init() {
-        int bottom = 2500;
-        int top = 5000;
-        setSplitter(DUPLICATE());
-        for (int i=0; i<N; i++, bottom*=2, top*=2) {
-          add(new BandPassFilter(sampleRate, bottom, top));
-        }
-        setJoiner(ROUND_ROBIN());
-    }});
-    add(new Adder(N));
-  }
-}
-  
-class FMRadio extends Pipeline {
-  void init() {
-    add(new DataSource());
-    add(new LowPassFilter(sampleRate, cutoffFreq));
-    add(new FMDemodulator(sampleRate, maxAmplitude, bandwidth));
-    add(new Equalizer(samplingRate, 4));
-    add(new Speaker());
-  }
-}
-\end{verbatim}
+\begin{minipage}{3.3in}
+\psfig{figure=radiocode.eps, width=3inpt}
 \caption{Parts of an FM Radio in StreamIt.
 \protect\label{fig:radiocode}}
-\end{figure}
-
-\begin{figure}[t]
+\end{minipage}
+\hspace{0.1in}
+\begin{minipage}{3.1in}
 \centering
+\psfig{figure=radio-ascoded.eps, width=3in}
+\caption{Block diagram of the FM Radio.
+\protect\label{fig:radio-ascoded}}
+
 \vspace{10pt}
   \psfig{figure=pipeline.eps,width=1.8in}
 
@@ -65,9 +24,61 @@ class FMRadio extends Pipeline {
 
 (c) A FeedbackLoop. \\
 \caption{\protect\small Stream structures supported by StreamIt.
-\protect\label{fig:structures}
-}
+\protect\label{fig:structures}}
+\end{minipage}
 \end{figure}
+
+% \begin{figure}[t]
+% \centering
+% \scriptsize
+% \begin{verbatim}
+% class LowPassFilter extends Filter {,
+%   float[] weights;
+
+%   void init(int sampleRate, float cutOffFreq) {
+%     setInput(Float.TYPE); setOutput(Float.TYPE);
+%     setPush(N); setPop(1); setPeek(N); 
+%     weights = calcWeights(sampleRate, cutOffFreq);
+%   }
+
+%   void work() {
+%     float sum = 0;
+%     for (int i=0; i<weights.length; i++) 
+%       sum += input.peek(i)*weights[i];
+%     input.pop();
+%     output.push(sum);
+%   }
+% }
+
+% public class Equalizer extends Pipeline {
+%   void init(float samplingRate, int N) {
+%     add(new SplitJoin() {
+%       void init() {
+%         int bottom = 2500;
+%         int top = 5000;
+%         setSplitter(DUPLICATE());
+%         for (int i=0; i<N; i++, bottom*=2, top*=2) {
+%           add(new BandPassFilter(sampleRate, bottom, top));
+%         }
+%         setJoiner(ROUND_ROBIN());
+%     }});
+%     add(new Adder(N));
+%   }
+% }
+  
+% class FMRadio extends Pipeline {
+%   void init() {
+%     add(new DataSource());
+%     add(new LowPassFilter(sampleRate, cutoffFreq));
+%     add(new FMDemodulator(sampleRate, maxAmplitude, bandwidth));
+%     add(new Equalizer(samplingRate, 4));
+%     add(new Speaker());
+%   }
+% }
+% \end{verbatim}
+% \caption{Parts of an FM Radio in StreamIt.
+% \protect\label{fig:radiocode}}
+% \end{figure}
 
 \section{The StreamIt Language}
 \label{sec:streamit}
