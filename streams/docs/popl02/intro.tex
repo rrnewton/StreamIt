@@ -42,19 +42,21 @@ explicit parallelism and communication of a dataflow graph.  Out of
 this community has come a number of general methods for precise,
 fine-grained program analysis and optimization.  In the context of
 array dataflow analysis and automatic parallelization, one such
-technique is affine scheduling; in recent years, it has been shown
-that affine dependences can exactly represent the flow dependences in
-certain classes of programs~\cite{Feautrier92i}, and that affine
-partitioning can subsume loop fusion, reversal, permutation, and
-reindexing as a scheduling technique~\cite{Lim98}.  Moreover, affine
-scheduling can operate on a parameterized version of the input
-program, avoiding the need to expand a graph for varying parameters
-and problem sizes, and it can often reduce to a linear program for
-flexible and efficient optimization.  Affine representations have also
-been utilized for storage optimization~\cite{Lim01,Quillere,Thies01}.
+framework is the polyhedral model~\cite{RV00}, which represents
+programs as sets of affine relations over polyhedral domains. In
+recent years, it has been shown that affine dependences can exactly
+represent the flow of data in certain classes of
+programs~\cite{Feautrier92i}, and that affine partitioning can subsume
+loop fusion, reversal, permutation, and reindexing as a scheduling
+technique~\cite{Lim98}.  Moreover, affine scheduling can operate on a
+parameterized version of the input program, avoiding the need to
+expand a graph for varying parameters and problem sizes, and it can
+often reduce to a linear program for flexible and efficient
+optimization.  Polyhedral representations have also been utilized for
+powerful storage optimizations~\cite{Lim01,Quillere,Thies01,Lefebvre98}.
 
-In this paper, we aim to bridge the gap and bring to bear the affine
-analysis techniques of the scientific community on the synchronous
+In this paper, we aim to bridge the gap and employ the polyhedral
+representations of the scientific community to analyze the synchronous
 dataflow graphs of the DSP community.  Towards this end, we present a
 translation from a dataflow graph to a System of Affine Recurrence
 Equations (SARE), which are equivalent to a certain class of
@@ -70,4 +72,11 @@ also discuss the potential of affine techniques for scheduling
 parameterized dataflow graphs, as well as offering new approaches to
 classic problems in the dataflow domain.
 
-The rest of this paper is organized as follows. \todo{fill this in}
+The rest of this paper is organized as follows.  We begin by
+describing background information and related work on dataflow graphs
+and SARE's (Section 2).  Then we define a Phased Computation Graph
+(Section 3) and Phased Compuatation Program (Section 4), and give the
+procedure for translating a simple, restricted PCG to an SARE (Section
+5).  Next, we give the full details for the general translation
+(Section 6), describe a range of applications for the technique
+(Section 7), and conclude (Section 8).

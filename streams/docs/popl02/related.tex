@@ -1,10 +1,14 @@
 \section{Background and Related Work}
+\label{sec:related}
 
-\section{Dataflow Graphs}
+\subsection{Dataflow Graphs}
+
+Strictly speaking, synchronous dataflow (SDF) refers to a class of
+graphs where
 
 \begin{itemize}
 
-\item SURE's and Computation Graphs
+\item Computation Graphs
 
 \item The min-buffers for maximal-rate schedules stuff
 
@@ -19,14 +23,10 @@ everything they tried to do.
 
 \end{itemize}
 
-\section{Systems of Affine Recurrence Equations}
-
-SARE/Feautrier, affine dependences, static control flow programs.
-
-Lim/Lam; affine scheduling.
+\subsection{Systems of Affine Recurrence Equations}
 
 A System of Affine Recurrence Equations (SARE) is a set of equations
-${\cal E}_1 \dots {\cal E}_{m_{\cal E}}$ of the following form~\cite{DRV00}:
+${\cal E}_1 \dots {\cal E}_{m_{\cal E}}$ of the following form~\cite{DRV00,Feautrier92i}:
 \begin{equation}
 \forall {\vec i} \in {\cal D_{\cal E}}, X({\vec i}) = f_{\cal E}(\dots, Y({\vec h}_{{\cal
 E}, Y}({\vec i})), \dots)
@@ -58,3 +58,27 @@ with ${\vec i}$.
 of $X$.
 
 \end{itemize}
+
+In the above definition, note that the index expression ${\vec i}$ on
+the left hand side must exactly match the input domain quantifier.
+Also, each index expression on the right-hand side must be an affine
+expresion of ${\vec i}$.  A SARE has no notion of internal state per
+se; however, state can be modeled by introducing a self-loop in the
+graph of variables.
+
+SARE's became interesting from the standpoint of program analysis upon
+Feautrier's discovery~\cite{Feautrier92i,Feautrier92ii} that a SARE is
+mathematically equivalent to a ``static control flow program''.  A
+program has static control flow if the entire path of control can be
+determined at compile time (see~\cite{Feautrier92i,FV00} for details).
+Feautrier showed that using a SARE, one can use linear programming to
+produce a {\it parameterized} schedule for a program.  That is, if a
+loop bound is unknown at compile time, then the symbolic bound enters
+the schedule and it does not affect the complexity of the technique.
+Feautrier's framework is very flexible in that it allows you to select
+a desirable affine schedule by any linear heuristic.
+
+Lim and Lam~\cite{Lim01} build on Feautrier's technique with an affine
+partitioning algorithm that maximizes the degree of parallilism while
+minimizing the degree of synchronization.  It also operates on a form
+that is equivalent to a SARE.
