@@ -4,45 +4,62 @@ struct Phase {
   Phase child[]
 }
 
-Phase[] schedule (Stream s, int maxPhases) {
-  result = {}
-  totalPushed = 0
-  forall c \in s:  phase[c] = 0
-  forall c \in s:  sched[c] = schedule(c, pushPerPhase)
-  i = 0
+// s: the stream to build schedule for
+// maxPhases:  the maximum number of phases to build for <s>
+// execCount:  how many times each child stream should execute
+// initOrSteady:  the stage of the schedule we're building
+void schedule (Stream s, int maxPhases, Stream->int execCount, int initOrSteady) {
+  if (s is feedbackloop and maxPhases < phasesForFeedback(s, execCount))
+    fail()
+  top = getEntrance(s)
+  bot = getExit(s)
+  phasesLeft = maxPhases
   do {
-    i++
-    curPhase = Phase(s, 0, 0, 0, {})
+    phase = Phase(s, 0, 0, 0, {})
+    for c in {top, bot}, start[c] = execCount[c]
     do {
       // simulate top node
-      top = getEntrance(s)
-      child = sched[top][phase[top]++ \% numPhases(top)]
-      simulate(child)
-      if (s is feedbackloop)
-        curPhase.child = curPhase.child o child
-      else 
-        curPhase.child = insertSorted (curPhase.child, child)
-      curPhase.peek = max (curPhase.peek, curPhase.pop + child.peek)
-      curPhase.pop += child.pop
+      childPhase = top.currentPhase()
+      top.advancePhase()
+      simulate(childPhase)
+      execCount[top]--
+      phase.child = insertSorted (phase.child, childPhase)
+      phase.peek = max (phase.peek, phase.pop + childPhase.peek)
+      phase.pop += childPhase.pop
       // execute other nodes as much as possible
       while (exists c \in s, c != top and canFire(c) ) {
-        while (canFire(c)) {
-          child = sched[c][phase[c]++ \% numPhases(c)]
-          simulate(child)
-          if (s is feedbackloop)
-            curPhase.child = curPhase.child o child
-          else 
-            curPhase.child = insertSorted (curPhase.child, child)
-          if (c==getExit(top)) {
-            curPhase.push += child.push
-            totalPushed += child.push
-          }
-        }
+        childPhase = c.currentPhase()
+        c.advancePhase()
+        simulate(childPhase)
+        execCount[c]--
+        phase.child = insertSorted (phase.child, childPhase)
+        if (c==bot)
+          phase.push += childPhase.push
       }
-    } while (totalPushed<s.steadyPush*i/maxPhases)
-    result = result o curPhase
-  } while (totalPushed<s.steadyPush)
-  return result
+    } while (exists c \in {top, bot}, start[c] - execCount[c] < max(1, floor(start[c] / phasesLeft)))
+    phasesLeft--
+    s.addPhase(phase, initOrSteady)
+  } while (exists c \in s, execCount[c] > 0)
+}
+
+int phasesForFeedback(FeedbackLoop s, Stream->int execCount) {
+  phaseCount = 0
+  totalPop = 0
+  do {
+    phaseCount++
+    dataAvail = # items on input tape of joiner(s)
+    for i = 1 to floor(dataAvail/joiner(s).weights[1]) {
+      simulate(joiner(s).currentPhase())
+      joiner(s).advancePhase()
+      execCount[joiner(s)]--
+    }
+    while (exists c \in s, c != joiner(s) and canFire(c) ) {
+      simulate(c.currentPhase())
+      c.advancePhase()
+      execCount[c]--
+    }
+  } while (exists c \in s, execCount[c] > 0)
+  return phaseCount
 }
 
 Phase[] insertSorted (Phase[N] list, Phase child) {
