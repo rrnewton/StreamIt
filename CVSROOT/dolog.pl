@@ -273,6 +273,7 @@ sub mail_notification {
     if ($port =~ /\D/) { $port = getservbyname($port, 'tcp') }
     die "No port" unless $port;
     $iaddr   = inet_aton($remote)               || die "no host: $remote";
+	printf("port: $port iaddr: $iaddr");
     $paddr   = sockaddr_in($port, $iaddr);
 
     $proto   = getprotobyname('tcp');
