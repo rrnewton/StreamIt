@@ -1,3 +1,16 @@
+- open question: is there any way to work sync removal into the
+partitioning algorithm?  something like, being called not with
+needsJoiner boolean, but with some conditional on when the
+synchronization could be removed.
+
+- idea: shouldn't really expand the graph in places that don't have
+state.  This is because it's somewhat easier to duplicate something
+stateless during partitioning than to rececognize that something
+stateful can be collapsed.  The only trouble is sync removal.
+Alternatively, maybe you could annotate nodes that were equivalent in
+the graph at first, and then collapse them in the partitioner if you
+want.
+
 - something interesting is that symmetry sharing doesn't really work
 with 2-D divisions.  or at least not with something much more
 sophisticated -- like dynamically inferring which other streams would
