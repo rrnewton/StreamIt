@@ -1,2 +1,72 @@
 \section{Related Work}
 \label{sec:related}
+
+The Imagine stream processor~\cite{rixner98bandwidthefficient}
+supports a time multiplexed execution model.  The architecture
+contains 48 parallel ALU's organized into 6 VLIW clusters.  The
+programming model requires the programmer to write computation filters
+in Kernel-C and stitch them together using Stream-C.  Because the
+execution unit is data-parallel, the compiler uses time multiplexing
+to execute a single filter at a time across all of the parallel
+clusters.  While this provides perfect load balancing and high
+arithmetic utilization when there is abundant data parallelism, it
+suffers when a filter has retained state or data-dependences between
+iterations.  Moreoever, architectures based solely on
+time-multiplexing do not scale spatially, as there are global wires
+orchestrating the parallel execution units.  There is also a large
+amount of memory traffic due to the prolonged execution of each
+time-multiplexed stage; Imagine addresses this challenge by
+introducing a compiler-controlled buffer called the ``stream register
+file'' to prefetch data streams from memory and arrange them for
+processing.
+
+Previous work in compiling StreamIt to Raw has taken a purely space
+multiplexed approach~\cite{streamit-asplos}.  In this model, a single
+filter was mapped to each execution tile.  To support applications
+with more filters than execution tiles, a partitioning algorithm was
+employed to adjust the granularity of the graph by fusing adjacent
+filters into one.  While filter fusion can be regarded as a restricted
+form of time multiplexing (as the fused filter simulates the execution
+of the originals, in turn), the approach given in the current paper is
+much more general, as a given tile participates in multiple traces
+that can be drawn from non-adjacent sections of the stream graph.  The
+current paper also advances over previous work in its software
+pipelining of traces and template code generation for linear filters.
+
+Our fine-grained execution model for linear portions of the stream
+graph is closely related to the large body of work on systolic
+architectures~\cite{systolic78,systolic82}.  A systolic architecture
+is arranged as an array of cells with local neighbor-to-neighbor
+communication.  Each cell has limited storage, and computation is
+arranged as data streaming through the array.  A large number of
+algorithms have been recast in a systolic
+context~\cite{leighton-book}, including others that focus on linear
+operations~\cite{wu87systolic}.  The algorithm underlying our template
+code generation is based on Hoffmann's stream
+algorithms~\cite{hoffmann-streams}, which provide a framework for
+decoupling memory accesses from computation for several scientific
+applications on tiled processors.
+
+The Transputer architecture~\cite{transputer88} is an array of
+processors, where neighboring processors are connected with unbuffered
+point-to-point channels.  The programming language used for the
+Transputer is Occam \cite{occammanual}: a streaming language similar
+to CSP \cite{Hoare78}.  However, Occam concurrent processes are not
+statically load-balanced, scheduled and bound to a processor. Occam
+processes are run off a very efficient runtime scheduler implemented
+in microcode~\cite{may87communicating}.  
+
+A number of emerging architectures are incorporating a notion of
+polymorphic execution modes that include support for
+streams~\cite{trips-isca03,smartmemories,m3t}.  Such hardware support
+is complementary to space-time multiplexing, as the mode of a given
+resource could be toggled on the granularity of a trace to best
+accommodate the computation pattern therein.
+
+% \cite{cheops-thesis}
+%   http://web.media.mit.edu/~kung/publication/thesis.pdf
+%
+% other possible things to cite:
+%  http://portal.acm.org/citation.cfm?id=801721&dl=ACM&coll=portal
+%  http://www.csrl.unt.edu/~kavi/Research/ica3pp156.pdf
+%  http://cdmetcalf.home.comcast.net/papers/cop/node1.html#SECTION00010000000000000000
