@@ -175,10 +175,11 @@ typedef void (*streamit_handler)(void *);
 @
 
 There are more specialized types of handler functions for work
-functions.
+functions and message-handler functions.
 
 <<Other Types>>=
 typedef void (*work_fn)(void *);
+typedef void (*message_fn)(void *data, void *params);
 @
 
 Interface tables are used for message handling.  An interface defines
@@ -187,7 +188,7 @@ that implements an interface needs to provide a mapping between
 interface message numbers and functions to be called.
 
 <<Other Types>>=
-typedef streamit_handler *interface_table;
+typedef message_fn *interface_table;
 @
 
 \section{Function-Call Interface}
@@ -355,11 +356,13 @@ void register_sender(portal *p, stream_context *sender, latency *l);
 @
 
 To send a message, you need to know the message number, the portal,
-the required latency, and the parameters to send on.  It's unclear at
-the moment how parameters will get packaged up.
+the required latency, and the parameters to send on.  Each message
+must create a structure to package its parameters in, and the sender
+needs to pass a [[malloc]]'d pointer to the parameter structure to
+[[send_message]].
 
 <<Messaging Functions>>=
-void send_message(portal *p, int msgid, latency *l, ...);
+void send_message(portal *p, int msgid, latency *l, void *params);
 @
 
 \subsection{Starting the System}
@@ -556,12 +559,23 @@ stream_context *create_context(void *p);
 
 \subsection{Portals}
 
-Messages are sent to portals.  Portals currently only track the list
-of receiving contexts.
+Messages are sent to portals.  A portal needs to keep track of a list
+of receiver objects, and their corresponding interface function
+tables.
+
+<<Portal>>=
+typedef struct portal_receiver {
+  struct portal_receiver *next;
+  stream_context *context;
+  interface_table *vtbl;
+} portal_receiver;
+@
+
+Currently the portal just carries a list of receivers.
 
 <<Portal>>=
 typedef struct portal {
-  stream_context_list *destinations;
+  portal_receiver *receiver;
 } portal;
 @
 
