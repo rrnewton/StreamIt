@@ -1,7 +1,8 @@
 \section{Streaming Virtual Machine API}
 
-The SVM describes logical and physical entities recognized by the HLC
-and LLC as a description of a streaming PCA program.  The SVM
+The Streaming Virtual Machine (SVM) describes logical and physical
+entities recognized by the High Level Compiler (HLC) and Low Level
+Compiler (LLC) as a description of a streaming PCA program.  The SVM
 describes the valid operations on each entity and the constraints for
 mapping logical entities onto physical entities.  During compilation,
 the HLC creates a structure or set of structures containing the
@@ -19,50 +20,50 @@ The SVM contains the following logical entities:
 \begin{itemize}
 
 \item {\it Streams}.  A stream is a data type that represents a
-sequence of data elements of a given type.  The elements must have a
-fixed size. Variable sized elements can be supported at the
-language-level and compiled into the fixed size scheme using a data
-encoding.  Streams are used for sequential production and consumption
-of elements.
+sequence of data elements of a given type.  Streams are used for
+sequential production and consumption of elements.
 
 \item {\it Blocks}. Blocks provide indexed (random) access to a fixed
 set of data elements.
 
-\item {\it Kernel (slave)}. Kernels are a logical entity that
+\item {\it Kernels (slaves)}. Kernels are a logical entity that
 describes a locus of computation consuming 0 or more input streams and
 producing 0 or more output streams.  Kernels contain an execution
 state (unstarted, waiting, paused, running, or finished).  Kernels are
 described with a subset of C code and SVM API commands.
 
-\item {\it Control (master)}. Controls are a logical entity that
-describes the locus of computation within a processor.  Controls are
-described with a subset of C code and SVM API commands.
+\item {\it Controls (masters)}. Controls are a logical entity that
+describes the locus of computation within a processor.  Control code
+can initiate, monitor, and terminate the execution of kernels.
+Controls are described with a subset of C code and SVM API commands.
 
-\item {\it Data elements}. Data elements must have a fixed
-size. Supported types include 64-bit {\tt double}, 64-bit signed and
-unsigned {\tt long}, 32-bit {\tt float}, 32-bit signed and unsigned
-{\tt int}, 16-bit signed and unsigned {\tt short}, 8-bit {\tt byte},
-{\tt boolean}, arrays with a fixed (int literal) length, and {\tt
-struct}'s containing members of any other type.
+\item {\it Data elements}. Data elements of streams and blocks must
+have a fixed size.  Variable sized elements can be supported at the
+language-level and compiled into the fixed size scheme using a data
+encoding.  Supported types include 64-bit {\tt double}, 64-bit signed
+and unsigned {\tt long}, 32-bit {\tt float}, 32-bit signed and
+unsigned {\tt int}, 16-bit signed and unsigned {\tt short}, 8-bit {\tt
+byte}, {\tt boolean}, arrays with a fixed (int literal) length, and
+{\tt struct}'s containing members of any other type.
 
 \end{itemize}
 
 \sss{Physical Entities}
 
-Physical entities contained within the metadata and referenced in the
-SVM are:
+The following physical entities are contained within the metadata and referenced by
+the SVM:
 
 \begin{itemize}
 
-\item {\it FIFO}.  A FIFO is a first in first out buffer.  The FIFO
+\item {\it FIFOs}.  A FIFO is a first-in first-out buffer.  The FIFO
 state includes the data elements stored in the FIFO and the number of
 items stored in the FIFO which includes the empty state.  The valid
 FIFO operations are Peek(n), Pop, and Push.
 
-\item {\it Memory}. A memory is random access storage with an index
+\item {\it Memories}. A memory is random access storage with an index
 pointing to the data element to be read or written.
 
-\item {\it Processor}. A processor is logic with the ability to carry
+\item {\it Processors}. A processor is logic with the ability to carry
 out an independent execution.  It has internal state.  It can be
 independently started or stopped.  A given processor can support a
 certain set of black box kernels, and may support user-defined
@@ -76,13 +77,13 @@ and links to other links.
 
 \sss{Processor Properties}
 
-The following processor properties in the VM metadata are relevant to
-the operation of the SVM:
+The following processor properties in the metadata are relevant to the
+operation of the SVM:
 
 \begin{itemize}
 
 \item {\it MASTER}.  This property indicates one or more processors
-that controls a given processor.  A MASTER is capable of controlling a
+that control a given processor.  A MASTER is capable of controlling a
 kernel's execution on a corresponding slave processor, as well as
 issuing a morph command for the slave.  A processor may be its own
 MASTER.
@@ -140,13 +141,6 @@ of a given type.  The elements must have a fixed size. Variable sized
 elements can be supported at the language-level and compiled into the
 fixed size scheme using a data encoding. The stream type and
 supporting enumerations and functions are declared as follows:
-
-Note in following sections an address to a memory is the full address
-required by the architecture metadata description, may be node, offset
-or other.  Address and capacity are not static at compile time, they
-may be an expression determined at run time.  Element size is static
-at compile time.
-
 
 {\small
 \begin{verbatim}
@@ -232,21 +226,27 @@ at compile time.
 
 \end{verbatim}}
 
+\ssss{Stream types} The IStream, OStream, and IOStream aliases for the
+Stream type are intended to make the code more readable, as they
+indicate the relationship between a kernel and a stream.  Note that
 IOStreams are used by a single kernel to both pop and push elements.
 The IOStream is not used between kernels since such use would be
 output for one kernel and input for the other. The primary use of the
 IOStream is to share a single physical resource for both an output and
 input stream.  Data pushed onto the stream can be popped.  When the
-resource is full the push stalls.  When the resource is empty pop
-stalls.  IOStreams are a first in and first out structure.
+resource is full, {\tt push} stalls.  When the resource is empty, {\tt
+pop} stalls.  IOStreams are a first-in and first-out structure.
 
-\ssss{initialization functions} The stream initialization functions
+\ssss{Initialization functions} The stream initialization functions
 declare the location and size of the stream, and specify flags which
-give performance hints to the low level compiler.  Note that the flags
-can be ignored (assumed to have a value of zero) without sacrificing
-correctness; they are only for the sake of optimization.  The {\tt
-streamInitRAMWithData} initialization function is used to initialize a
-stream which aliases RAM that already contains data.
+give performance hints to the low level compiler.  Note that an
+address to a memory is the full address required by the architecture
+metadata description; it may be the node, offset or other.  Address
+and capacity are not static at compile time; they may be an expression
+determined at run time.  Element size is static at compile time.  Note
+also that the flags can be ignored (assumed to have a value of zero)
+without sacrificing correctness; they are only for the sake of
+optimization.
 
 Each stream mapped to random access memory for which the
 STREAM\_UNALIASED\_RAM flag is not set makes an important guarantee on
@@ -261,40 +261,42 @@ set. This gives the low-level compiler the freedom to implement
 streams with an architecture-specific representation if their contents
 are never aliased.
 
-The initialization function's {\tt initLength} parameter indicates how
-many elements are already in place at {\tt address} that as though
-they were already should be pushed onto the stream initially. It
-requires the STREAM\_UNALIASED\_RAM flag not be set.
+The {\tt streamInitRAMWithData} initialization function is used to
+initialize a stream which aliases RAM that already contains data.  The
+{\tt initLength} parameter indicates how many elements are already in
+place at {\tt address} as though they were pushed onto the stream
+initially. The STREAM\_UNALIASED\_RAM flag must NOT be set with this
+initializer.
 
-\sss{Stream IO Functions}
+\sss{Stream I/O Functions}
 
 We now turn our attention to the other stream functions, which are
-used by kernels to write and read the stream.
+used to write and read the stream.
 
 \ssss{streamPush} For output streams, the {\tt streamPush} function
 enqueues a value onto the end of the stream.  If the stream cannot
-hold any more elements then streamPush stalls until there is space
-available.
+hold any more elements, then {\tt streamPush} stalls until there is
+space available.
 
-\ssss{streamPushMulticast} The streamPushMulticast function pushes the
-same data onto multiple streams, and is equivalent to a series of
-streamPush operations with the same argument but provides an
-opportunity for optimization by the low-level compiler.  Note: this
-also has the effect of synchronizing the streams when one or more of
-the stream buffers is unable to accept more inputs.
+\ssss{streamPushMulticast} The {\tt streamPushMulticast} function
+pushes the same data item onto multiple streams, and is equivalent to
+a series of {\tt streamPush} operations with the same argument but
+provides an opportunity for optimization by the low-level compiler.
+Note: this also has the effect of synchronizing the streams when one
+or more of the stream buffers is unable to accept more inputs.
 
 \ssss{streamPop} For input streams, the {\tt streamPop} function
 dequeues a value from the front of the stream.  If there are no
-elements in the stream, then streamPop stalls until an element is
-available.
+elements in the stream, then {\tt streamPop} stalls until an element
+is available.
 
 \ssss{streamPeek} For ordered input streams, the {\tt streamPeek}
 function returns the element at position {\it index}, where {\it
 index} is zero-indexed (such that {\tt streamPeek(0)} gives the same
 value as {\tt streamPop()}).  If there are fewer than $\mt{index}+1$
-elements in the stream, then streamPeek stalls until $\mt{index}+1$
-elements are available. If $\mt{index}+1$ exceeds the capacity of the
-stream, then the return value is undefined.
+elements in the stream, then {\tt streamPeek} stalls until
+$\mt{index}+1$ elements are available. If $\mt{index}+1$ exceeds the
+capacity of the stream, then the return value is undefined.
 
 \ssss{streamPushWithEOS, streamPushMulticastWithEOS, and
 streamPeekEOS} In some cases the number of elements which can be
@@ -308,11 +310,12 @@ there is an EOS tag for a given item.  A producing kernel should use
 {\tt streamPushWithEOS} for the last element that it produces onto a
 given stream.  The consuming kernel can call {\tt streamPeekEOS} at
 any time; if called with argument {\tt index}, it will stall until
-{\tt index + 1} elements are available (just like streamPeek).  Note
-that the {\tt streamPop} function will pop both a data item and any
-associated EOS tag.  Also, multiple items in a given stream can have
-an EOS tag (unless the STREAM\_ONE\_EOS flag is passed to the stream
-initializer, indicating that only a single EOS will appear at once.)
+{\tt index + 1} elements are available (just like {\tt streamPeek}).
+Note that the {\tt streamPop} function will pop both a data item and
+any associated EOS tag.  Also, multiple items in a given stream can
+have an EOS tag (unless the STREAM\_ONE\_EOS flag is passed to the
+stream initializer, indicating that only a single EOS will appear at a
+given time.)
 
 %% \subsection{Memory}
 %% \label{sec:memory}
@@ -343,9 +346,8 @@ supporting functions are declared as follows:
   typedef Block IBlock;
   typedef Block OBlock;
 
-  // make a block mapped to memory node <ramLocation>, 
-  // allocated at <address> that can hold at most <capacity> elements
-  // of size <elementSize>
+  // make a block mapped to memory node <ramLocation>, allocated at <address> 
+  // that can hold at most <capacity> elements of size <elementSize>
   void blockInit(Block* b, VM_NODE_MEM ramLocation, int address, 
                  int capacity, int elementSize);
 
@@ -362,7 +364,7 @@ supporting functions are declared as follows:
 \ssss{initialization functions} The block initialization function
 declares the location and size of the block.
 
-\sss{Block IO Functions}
+\sss{Block I/O Functions}
 
 \ssss{blockWrite} For output blocks, the {\tt write} function stores
 an element into memory.  It requires that the {\tt index} written to
@@ -375,7 +377,7 @@ than the block's {\tt capacity}.
 \subsection{Kernels}
 \label{sec:kernel}
 
-Kernels are used to map computation to processors.  The API has
+Kernels can be used to map computation to processors.  The API has
 support for three kinds of kernels. Section~\ref{sec:kernelhlc}
 describes general user-defined kernels whose behavior is explicitly
 described by the high-level compiler; Section~\ref{sec:kernelsvm}
@@ -384,9 +386,9 @@ supported on every architecture; and Section~\ref{sec:kernelllc}
 describes library kernels that appear as a black box to the high-level
 compiler.
 
-All three types of kernels share a base data type that specifies where
-the kernel is executed and is passed to functions that control kernel
-execution, and a common execution model.
+All three types of kernels share a common execution model, as well as
+a base data type that specifies the location for kernel execution and
+is passed to functions that control kernel execution.
 
 Kernels have the following components:
 
@@ -420,7 +422,6 @@ declared as follows:
 
 {\small
 \begin{verbatim}
-
   typedef struct {
     // not exposed
   } Kernel;
@@ -454,8 +455,7 @@ declared as follows:
   // and is ignored if dependsOnKernel is in the UNSTARTED state.
   void kernelAddDependence(Kernel* k, Kernel* dependsOnKernel);
 
-
-  // hint to low-level compiler to ready the kernel in the ICache.
+  // hint to low-level compiler to ready the kernel for execution.
   void kernelReady(Kernel* k);
 
   // non-blocking function that starts or resumes execution of this kernel. 
@@ -551,35 +551,35 @@ explicit dependences are needed.  For example:
   kernelWait(&k2.kernel);
 \end{verbatim}}
 
-Thus, the dependence tracking mechanism is not needed to synchronize
-the transfer of data elements through a stream object.  Instead, it is
-intended for cases in which there is a memory dependence that is not
-captured by the stream semantics.  This can occur in two cases: 1) a
-kernel writes to a block that a subsequent kernel reads from, and 2)
-two kernels are reading/writing to streams or blocks that point to
-overlapping regions in memory.  It would be possible to use {\tt
-kernelWait} to enforce these dependences from the control thread, but
-the dependence tracking mechanism is added for performance reasons;
-with stream processing, a round-trip communication to the control
-thread is often too expensive.  A simple use of dependences is as
-follows:
+Thus, the {\tt kernelAddDependence} function does NOT need to be used
+to synchronize the transfer of data elements through a stream object.
+Instead, it is intended for cases in which there is a memory
+dependence that is not captured by the stream semantics.  This can
+occur in two cases: 1) a kernel writes to a block that a subsequent
+kernel reads from, and 2) two kernels are reading/writing to streams
+or blocks that point to overlapping regions in memory.  It would be
+possible to use {\tt kernelWait} to enforce these dependences from the
+control thread, but the dependence tracking mechanism is added for
+performance reasons; with stream processing, a round-trip
+communication to the control thread is often too expensive.  A simple
+use of dependences is as follows:
 
 {\small
 \begin{verbatim}
-static Block b;
-static MyKernel1 k1;   // k1 will write to b
-static MyKernel2 k2;   // k2 will read from b
+  static Block b;
+  static MyKernel1 k1;   // k1 will write to b
+  static MyKernel2 k2;   // k2 will read from b
 
-blockInit(&b, ...);
+  blockInit(&b, ...);
 
-kernelInit(&k1.kernel, ...);  
-kernelRun(&k1.kernel);
+  kernelInit(&k1.kernel, ...);  
+  kernelRun(&k1.kernel);
 
-kernelInit(&k2.kernel, ...);
-kernelAddDependence(&k2.kernel, &k1.kernel);
-kernelRun(&k2.kernel);
+  kernelInit(&k2.kernel, ...);
+  kernelAddDependence(&k2.kernel, &k1.kernel);
+  kernelRun(&k2.kernel);
 
-kernelWait(&k2.kernel);
+  kernelWait(&k2.kernel);
 \end{verbatim}}
 
 Finally, there is a subtle point: the specification supports the use
@@ -614,7 +614,7 @@ these concepts:
 The kernel base data type is extended to different kinds of kernels by
 declaring a new data type for each kernel which includes the kernel
 base data type, an initialization function that calls the kernel
-initialization function, and work function that operates on the new
+initialization function, and a work function that operates on the new
 data type.
 
 For example, a kernel for a simple amplifier could be as follows:
@@ -652,28 +652,11 @@ For example, a kernel for a simple amplifier could be as follows:
   }
 \end{verbatim}}
 
+\noindent If the input stream is known to be infinite, then the work
+function can be simplified as follows:
 
-An alternate representation for infinite stream.
 {\small
 \begin{verbatim}
-  typedef struct {
-    Kernel kernel;
-    IStream* in;
-    OStream* out;
-    int N;
-  } Amplifier;
-
-  void amplifierWork(Amplifier* amp);
-
-  void amplifierInit(Amplifier* amp, VM_NODE_PROC procLocation, Block* scratch, 
-                     IStream* _in, OStream* _out, int _N) {
-      kernelInit(&amp->kernel, procLocation, scratch, 
-        amp, sizeof(Amplifier), (ExtKernelWork)&amplifierWork);
-      amp->in = _in;
-      amp->out = _out;
-      amp->N = _N;
-  }
-
   void amplifierWork(Amplifier* amp) {
       while(true) {
         float x;
@@ -684,16 +667,17 @@ An alternate representation for infinite stream.
   }
 \end{verbatim}}
 
-
 \sss{User-defined Kernel Restrictions}
 
 The initialization function must statically associate the input and
 output streams with a one-to-one mapping from arguments to streams,
 and no surrounding control flow or condition statements that can
-change the assignment.  This allows {\tt work} to access the streams.
+change the assignment.  This ensures that the low-level compiler can
+statically calculate which streams are accessed from the work
+function.
 
-The {\tt work()} function only supports a subset of C; restrictions
-are listed in Figure~\ref{fig:restrict}.
+Also, the work function supports only a subset of C; restrictions are
+listed in Figure~\ref{fig:restrict}.
 
 \begin{figure}[t]
 \framebox[6.5in]{
@@ -756,14 +740,13 @@ for moving between streams in a single memory.
 \end{verbatim}}
 
 MoveInit is only the initialization routine (as in setting up a DMA
-processor).  It does not do the data move itself.
-
-The {\tt length} argument indicates how many elements should be popped
-from {\tt srcStr} and pushed to {\tt destStr}. Passing a length of
-{\tt STREAM\_LENGTH\_ALL} indicates that elements from {\tt srcStr}
-are moved up through the first one that has an EOS tag.  If {\tt
-setEOS} is true, then the last element pushed onto {\tt destStr} will
-have an EOS tag.
+processor); it does not do the data move itself.  The {\tt length}
+argument indicates how many elements should be popped from {\tt
+srcStr} and pushed to {\tt destStr}. Passing a length of {\tt
+STREAM\_LENGTH\_ALL} indicates that elements from {\tt srcStr} are
+moved up through the first one that has an EOS tag.  If {\tt setEOS}
+is true, then the last element pushed onto {\tt destStr} will have an
+EOS tag.
 
 \ssss{Scatter/Gather} A set of scatter and gather kernels allow copies
 between non-contiguous elements within blocks and streams.  The
@@ -849,19 +832,15 @@ that it would become unrecognizable to the low-level compiler.
 \subsection{Control}
 \label{sec:control}
 
-Threaded code is used to declare streams, blocks, and kernels and
+Threaded code is used to declare streams, blocks, and kernels and to
 control the execution of kernels. All stream, kernel, and block
 variables must be declared as static variables.
 
 An example follows:
 {\small
 \begin{verbatim}
-  int length1;
-  int length2;
-  static Stream s0;
-  static Stream s1;
-  static Stream s2;
-  static Stream s4;
+  int length1, length2;
+  static Stream s0, s1, s2, s4;
   static Block scratch;
   static Move move01;
   static RLE rle;
@@ -887,8 +866,7 @@ An example follows:
   kernelWait(&rle.kernel);
   length2 = rle.outputLength;
   
-  // if the output is still too large, run additional compression, 
-  // overwriting s2 in place
+  // if the output is still too large, run additional compression, overwriting s2 in place
   if (length2 > SIZE_THRESHOLD) {
     static Stream s3;
     static Block scratch2;
@@ -911,13 +889,14 @@ An example follows:
   streamInitRAM(&s4, GLOBALMEM1, 0x2000, 1024, 4, STREAM_NEVER_WRAPS),
   
   // move to memory
-  moveInit(&move24, DMA1, &s2, &s4, STREAM_LENGTH_ALL),
+  moveInit(&move24, DMA1, &s2, &s4, STREAM_LENGTH_ALL);
   kernelRun(&move24.kernel);
   kernelWait(&move24.kernel);
 
   // store the result from memory to "output.dat" (not part of API)
   writeFile("output.dat", GLOBALMEM1, 0x2000, length2); \end{verbatim}}
 
+\clearpage
 The above code fragment illustrates several aspects of the stream
 control API.  In the rest of this section, we describe the
 capabilities and limitations of the stream control API.
@@ -945,10 +924,10 @@ results of a streaming computation can be used in the threaded code
 following the kernel's execution.  Both of these transfers are done
 through memory, either by directly accessing the memory assigned to a
 stream then using memory management kernels (as in the example), or by
-calling stream io functions from the control code.  The control thread
-can rely on the sequential data layout guaranteed by streams when
-managing this communication (see Section~\ref{sec:streams}).  Also
-note that most device I/O (such as file handling and terminal
+calling stream I/O functions from the control code.  The control
+thread can rely on the sequential data layout guaranteed by streams
+when managing this communication (see Section~\ref{sec:streams}).
+Also note that most device I/O (such as file handling and terminal
 interaction) is done by threaded code, and then made available to
 streams through memory.
 
@@ -1026,6 +1005,8 @@ these statements can be arbitrarily complex threaded code.
 
 In order to represent a valid hardware mapping, there are several restrictions:
 
+\renewcommand{\labelenumi}{A\theenumi.}
+
 \begin{enumerate}
 
 \item An initialization function may not be called on an instance of a
@@ -1043,13 +1024,13 @@ PAUSED} on a stream processor at any given time.
 
 \item A number of pre-defined memory management kernels may be {\tt
 RUNNING} or {\tt PAUSED} on a DMA processor at any given time.  The
-maximum number is defined in the SVM Meta Data
+maximum number is defined in the metadata.
 
 \item A kernel may only read from or write to streams that are mapped
-to links memories or fifos directly connected to the processor
-executing the kernel (there must exist a series of links with no
-intervening processors or memories that connects the processor running
-the kernel to the memory that contains the stream.
+to memories or FIFOs directly connected to the processor executing the
+kernel (there must exist a series of links with no intervening
+processors or memories that connects the processor running the kernel
+to the memory or FIFO that contains the stream.)
 
 \item More than one kernel may read or write a stream over the course
 of a program but only one {\tt WAITING}, {\tt RUNNING}, or {\tt
@@ -1070,12 +1051,15 @@ is satisfied.
 
 \end{enumerate}
 
-In order to facilitate static analysis in the low-level compiler,
-there are a number of restrictions:
+\noindent In order to facilitate static analysis in the low-level
+compiler, there are a number of restrictions:
+
+\renewcommand{\labelenumi}{B\theenumi.}
 
 \begin{enumerate}
 
-\item A call to an initialization function must precede any use of the kernel, block, or stream, variable.
+\item A call to an initialization function must precede any use of the
+kernel, block, or stream variable.
 
 \item Hardware resource locations (e.g. processor nodes and memory
 nodes), element sizes, and stream performance hint flags, must be
@@ -1124,6 +1108,8 @@ restrictions above, the overhead would be prohibitive.
 
 The following is an incomplete list of SVM/HLC/LLC expectations:
 
+\renewcommand{\labelenumi}{\theenumi.}
+
 \begin{enumerate}
 
 \item One or more Thread processors may be working cooperatively on a
@@ -1133,7 +1119,7 @@ single program.
 or more input streams and produce zero or more output streams.  Stream
 functions can also be called from control code.
 
-\item Streams are sequence of data items, that may be stored in
+\item Streams are sequences of data items, that may be stored in
 memories or FIFOs.
 
 \item Multiple kernels can be assigned to a streaming processor, but
@@ -1141,14 +1127,14 @@ only one RUNNING kernel can be assigned.  The rest must be WAITING for
 a previous kernel to complete.
 
 \item At any given time, Streams have a single producer and a single
-consumer.  However, the contents of a stream stored in memory can be
-aliased such that several different streams can read the same values.
+consumer.  However, the contents of a Stream stored in memory can be
+aliased such that several different Streams can read the same values.
 
 \item The metadata file describes the available resource pool that the
 HLC can work with.  This may not be the hardware's full capability -
 some of the resources may be assigned to other programs outside the
-compiler's immediate purview.  The metadata file may describe a
-multichip environment.
+compiler's immediate view.  The metadata file may describe a multichip
+environment.
 
 \item Multiple programs may be running on the PCA hardware,
 concurrently.
@@ -1160,7 +1146,7 @@ used (i.e., which morph configuration was used for the specific
 compiled program)
 
 \item The HLC assesses the alternative morph configurations as defined
-in the Meta data file to choose the preferred set of resources to use
+in the metadata file to choose the preferred set of resources to use
 for the compilation.
 
 \item A cost function could be provided for each of the SVM APIs as
@@ -1169,5 +1155,4 @@ logical entities to assign to each resource.  The details of this cost
 estimation will be addressed in the future.
 
 \end{enumerate}
-
 
