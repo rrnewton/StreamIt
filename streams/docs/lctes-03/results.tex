@@ -15,8 +15,8 @@ presents the results and analysis.
 
 Our benchmark suite contains 13 applications. Out of those
 applications, 11 represent useful practical computation taken from
-real-life applications, while two were chosen to highlight
-effectiveness of phasing scheduling.
+real-life applications, while two were chosen to highlight the
+effectiveness of phased scheduling.
 
 Nine test applications (bitonic sort, FFT, filter bank, FIR,
 radio, GSM, 3GPP, radar and vocoder) used are code-complete and
@@ -41,9 +41,9 @@ intended in {\StreamIt}.
 CD-DAT is exactly the same application as that described in
 \cite{murthy99buffer}.
 
-The last two applications (SJ\_PEEK\_1024 and SJ\_PEEK\_31) are a
-synthetic benchmarks. They have been introduced in
-\cite{karczma-thesis}
+The last two applications (SJ\_PEEK\_1024 and SJ\_PEEK\_31) are
+synthetic benchmarks. They were introduced in
+\cite{karczma-thesis}.
 
 \subsection{Methodology}
 \label{sec:results:methodology}
@@ -57,14 +57,14 @@ for pseudo single appearance and minimal latency schedules.
 The size of schedules for minimal latency technique contains two
 numbers. The first one is an uncompressed schedule, while the
 second is a compressed schedule. During testing it was found that
-in some applications some streams had many phases that were
-identical to other phases of the stream. Instead of including
+in some applications some operators had many phases that were
+identical to other phases of the operator. Instead of including
 these phases in the final schedule multiple times, they were
 listed only once, and references to the duplicate phases have been
 replaced with references to the one copy.
 
 This optimization lead to improvements in schedule size for two
-reasons. First, streams now had less phases, so their schedules
+reasons. First, operators now had less phases, so their schedules
 took up less space. Second, applications using the phasing
 schedules could now execute the same phase multiple times in a
 row, which was optimized out using run length encoding.
@@ -82,7 +82,7 @@ send data to outside are called sinks and sources. In particular,
 sinks have the property of having $u_f = 0$ while sources have
 $e_f = o_f = 0$. Sinks are problematic for minimal latency
 scheduling, because they do not produce any data. Thus any
-schedule of a sink stream is a minimal latency schedule. This
+schedule of a sink operator is a minimal latency schedule. This
 leads to the minimal latency schedule of the outer-most
 {\pipeline} becoming a single appearance schedule, thus destroying
 some of the benefit of using phasing scheduling. The technique

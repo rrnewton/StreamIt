@@ -85,13 +85,15 @@ Radio. \protect\label{fig:radio-ascoded}} \vspace{10pt} ~~
 
 {\StreamIt} is a portable programming language for
 high-performance signal processing applications.  {\StreamIt} is
-tailored for static-rate streams: it requires that the input and
-output rates of each filter are known at compile time.  In this
-section, we provide a very brief overview of
+tailored for static-rate stream operators: it requires that the
+input and output rates of each filter are known at compile time.
+In this section, we provide a very brief overview of
 %the syntax and
-semantics of {\StreamIt}.  A more detailed description of the design
-and rationale for {\StreamIt} can be found in~\cite{thies02streamit} or
-on our website~\cite{streamitweb}.
+semantics of {\StreamIt}.  We do not concern ourselves with the
+syntax of the language, as it is not relevant to scheduling of
+execution of stream operators. A more detailed description of the
+design and rationale for {\StreamIt} can be found
+in~\cite{thies02streamit} or on our website~\cite{streamitweb}.
 
 \subsection{Language Constructs}
 
@@ -105,30 +107,18 @@ contains an {\tt init} function that is called at initialization
 time; in this case, the {\tt FIRFilter} calculates {\tt weights},
 which represents its impulse response.
 \end{comment}
-Every {\filter} contains a {\work} function which describes the most
-fine grained execution step of the {\filter}. Within the {\work}
-function, the {\filter} can communicate with its neighbors via FIFO
-queues, called {\Channels}, using the intuitive operations of {\tt
-push(value)}, {\tt pop()}, and {\tt peek(index)}, where {\tt peek}
-returns the value at position {\tt index} without dequeuing the
-item.  The number of items that are pushed, popped, and
-peeked\footnote{We define $peek$ as the total number of items
-read, including the items popped.  Thus, we always have that $peek
-\ge pop$.} on each invocation are declared with the {\work}
-function, and are referred to as $u_f$, $o_f$ and $e_f$
-respectively.
-
-\begin{comment}
-In addition to {\tt work}, a filter can contain a {\tt prework}
-function that is executed exactly once between initialization and
-the steady-state.  Like {\tt work}, {\tt prework} can access the
-input and output tapes of the filter; however, the I/O rates of
-{\tt work} and {\tt prework} can differ. In an {\tt FIRFilter}, a
-{\tt prework} function is essential for correctly filtering the
-beginning of the input stream.  The user never calls the {\tt
-init}, {\tt prework}, and {\tt work} functions--they are all
-called automatically.
-\end{comment}
+Every {\filter} contains a {\work} function which describes the
+most fine grained execution step of the {\filter}. Within the
+{\work} function, the {\filter} can communicate with its neighbors
+via FIFO queues, called {\Channels}, using the intuitive
+operations of {\tt push(value)}, {\tt pop()}, and {\tt
+peek(index)}, where {\tt peek} returns the value at position {\tt
+index} without dequeuing the item.  The number of items that are
+pUshed, pOpped, and pEeked\footnote{We define $peek$ as the total
+number of items read, including the items popped.  Thus, we always
+have that $peek \ge pop$.} on each invocation are declared with
+the {\work} function, and are referred to as $u_f$, $o_f$ and
+$e_f$ respectively.
 
 %% {\StreamIt}'s representation of a filter is an improvement over
 %% general-purpose languages.  In a procedural language, the analog of a
@@ -152,45 +142,31 @@ called automatically.
 %% optimization from the programmer.
 
 The basic construct for composing {\filters} into a communicating
-network is {\pipeline}.  A {\pipeline} behaves as the sequential
-composition of all its child streams.  For example, the output of
-{\tt DataSource} is implicitly connected to the input of {\tt
-FIRFilter}, whose output is connected to {\tt FMDemodulator}, and
-so on.
+network is a {\pipeline}.  A {\pipeline} behaves as the sequential
+composition of all of its child operators.  For example, in Figure
+\ref{fig:radio-ascoded}, the output of {\tt DataSource} is
+implicitly connected to the input of {\tt FIRFilter}, whose output
+is connected to {\tt FMDemodulator}, and so on.
 
 There are two other stream constructs besides pipeline:
 {\splitjoin} and {\feedbackloop} (see Figure
 \ref{fig:structures}).
 
-A {\splitjoin} is used to specify independent parallel {\streams}
+A {\splitjoin} is used to specify independent parallel streams
 that diverge from a common {\splitter} and merge into a common
 {\joiner}. A {\splitter} collects $o_s$ data from its {\Input}
 {\Channel} and pushes $w_{s,i}, i \in \{0,\dots,n-1\}$ data to its
 {\Output} {\Channels}. Similarly, a {\joiner} collects $w_{j,i}, i
 \in \{0,\dots,n-1\}$ data from its {\Input} {\Channel} and pushes
-$u_j$ data to its {\Output} {\Channel}. {\tt Equalizer} is a
-{\pipeline} containing a {\splitjoin} and an {\tt Adder} {\filter}.
-
-\begin{comment}
-There are two kinds of {\splitters}: 1) {\duplicate}, which replicates
-each data item and sends a copy to each parallel \stream, and 2)
-{\roundrobin}$(w_0, \dots, w_{n-1})$, which sends the first $w_0$
-items to the first \stream, the next $w_1$ items to the second
-\stream, and so on.  {\roundrobin} is also the only type of {\joiner}
-that we support; its function is analogous to a {\roundrobin}
-{\splitter}.  If a {\roundrobin} is written without any weights, we
-assume that all $w_i = 1$. The {\splitter} and {\joiner} type are
-specified with the keywords {\tt split} and {\tt join},
-respectively (see Figure \ref{fig:radiocode}); the parallel
-streams are specified by successive calls to {\tt add}, with the
-$i$'th call setting the $i$'th stream in the splitjoin.
-\end{comment}
+$u_j$ data to its {\Output} {\Channel}. Currently, {\StreamIt}
+defines two types of a {\splitter} ({\duplicate} and
+{\roundrobin}) and one type of a {\joiner} ({\roundrobin}).
 
 The last control construct provides a way to create cycles in the
 stream graph: the {\feedbackloop}.  {\feedbackloops} are used to
 create cycles in the stream graph. A {\feedbackloop} contains a
-{\joiner}, a body stream, a {\splitter}, and a loop stream. Figure
-\ref{fig:structures}(d) depicts a {\feedbackloop}.
+{\joiner}, a body operator, a {\splitter}, and a loop operator.
+Figure \ref{fig:structures}(d) depicts a {\feedbackloop}.
 
 A {\feedbackloop} has an additional feature required to allow a
 {\feedbackloop} to begin computation: since at first there is no
@@ -203,25 +179,27 @@ $delay_{fl}$, for a {\feedbackloop} $fl$.
 \begin{comment}
 \subsection{Design Rationale}
 
-{\StreamIt} differs from other \stream languages in that it imposes
-a well-defined structure on the \streams; all \stream graphs are
-built out of a hierarchical composition of {\filters}, {\pipelines},
-{\splitjoins}, and {\feedbackloops}.  This is in contrast to other
-environments, which generally regard a \stream as a flat and
-arbitrary network of {\filters} that are connected by {\Channels}.
-However, arbitrary graphs are very hard for the compiler to
-analyze, and equally difficult for a programmer to describe.  The
-comparison of {\StreamIt}'s structure with arbitrary \stream graphs
-could be likened to the difference between structured control flow
-and GOTO statements: though the programmer might have to re-design
-some code to adhere to the structure, the gains in robustness,
-readability, and compiler analysis are immense.
+{\StreamIt} differs from other stream languages in that it imposes
+a well-defined structure on the stream operators; all stream
+graphs are built out of a hierarchical composition of {\filters},
+{\pipelines}, {\splitjoins}, and {\feedbackloops}. This is in
+contrast to other environments, which generally regard a stream
+graph as a flat and arbitrary network of {\filters} that are
+connected by {\Channels}. However, arbitrary graphs are very hard
+for the compiler to analyze, and equally difficult for a
+programmer to describe.  The comparison of {\StreamIt}'s structure
+with arbitrary stream graphs could be likened to the difference
+between structured control flow and GOTO statements: though the
+programmer might have to re-design some code to adhere to the
+structure, the gains in robustness, readability, and compiler
+analysis are immense.
 \end{comment}
 
 %% \subsection{Messages}
 
 %% {\StreamIt} provides a dynamic messaging system for passing irregular,
-%% low-volume control information between filters and streams.  Messages
+%% low-volume control information between filters and other stream
+%% operators.  Messages
 %% are sent from within the body of a filter's {\tt work} function,
 %% perhaps to change a parameter in another filter.  The central aspect
 %% of the messaging system is a sophisticated timing mechanism that

@@ -1,18 +1,19 @@
-\section{Details of Calculating Minimal Steady States}
+\section{Details of Calculating Minimal Steady
+States}
 \label{apx:eqs}
 
 This appendix presents equations used for calculating minimal
 steady states.  Minimal steady states are calculated recursively
 in a hierarchical manner. That is, a minimal steady state is
-calculated for all children streams of {\pipeline}, {\splitjoin}
+calculated for all child operators of {\pipeline}, {\splitjoin}
 and {\feedbackloop}, and then the schedule is computed for the
-actual parent stream using these minimal states as atomic
+actual parent operator using these minimal states as atomic
 executions. This yields a minimal steady state because all child
-streams must execute their steady states (to avoid buffering
+operators must execute their steady states (to avoid buffering
 changes), and all steady states are multiples of the minimal
 steady states (per Theorem \ref{thm:multiplicity}).  Executing a
-full steady state of a stream is referred to as ``executing a
-stream.''
+full steady state of an operator is referred to as ``executing an
+operator.''
 
 \begin{figure}
 \begin{center}
@@ -34,9 +35,10 @@ has been flipped upside-down for clarity.\\$peek_L = pop_L = 5,
 push_L = 6$}
 \end{minipage}
 
-\caption{Sample {\StreamIt} streams. These are identical to
-streams in Figure \ref{fig:steady-state}, except for the
-{\pipeline}.} \label{fig:app:steady-state}
+\caption{Sample {\StreamIt} operators. These are identical to
+operators in Figure \ref{fig:steady-state}, except for the
+{\pipeline}.}
+\label{fig:app:steady-state}
 
 \end{center}
 \end{figure}
@@ -63,7 +65,7 @@ any children.
 
 Let the {\pipeline} $p$ have $n$ children and let $p_i$ denote the
 $i$th child of the {\pipeline} (counting from {\Input} to
-{\Output}, starting with 0, the children may be streams, not
+{\Output}, starting with 0, the children may be operators, not
 necessarily {\filters}). We must find $S_p$.
 
 We start with calculating all $S_{p_i}, i \in \{0, \dots, n-1\}$.
@@ -72,15 +74,16 @@ This task is achieved recursively.
 Next we find a fractional vector $v''$ such that executing each
 $p_i$ $v_i''$ times will not change the amount of data buffered in
 the {\pipeline} and the first child is executed exactly once.
-Since the children streams are executed fractional amount of
+Since the children operators are executed fractional amount of
 times, we calculate the amount of data they produce and consume
 during this execution by multiplying $S_{p_i,c_o}$ and
 $S_{p_i,c_u}$ by $v_i''$. Thus $v''$ must have the following
 property
 
 \begin{displaymath}
-v_0'' = 1, \forall i \in \{0,\dots,n-2\}, v_i'' * u_{p_i} =
-v_{i+1}'' * o_{p_{i+1}}
+\begin{array}{rclrr} v_0'' & = & 1 \\ v_i'' * u_{p_i}
+& = & v_{i+1}'' * o_{p_{i+1}}, & \forall i \in \{0,\dots,n-2\}
+\end{array}
 \end{displaymath}
 
 We compute $v''$ as follows.  The first child executes once, thus
@@ -138,7 +141,7 @@ $\circ$ to denote concatenation of vectors and sets.  Thus $[1\ 2\
 \begin{displaymath}
 S_p = \left\{ \begin{array}{c} v_0 * S_{p_0,m} \circ \dots \circ
 v_{n-1}
-* S_{p_{n-1}, m}, S_{p_0, N} \circ \dots \circ S_{p_{n-1}, N}, \\
+* S_{p_{n-1}, m}, \\ S_{p_0, N} \circ \dots \circ S_{p_{n-1}, N}, \\
 \left[
 \begin{array}{c}
 e_{p_0} + (v_0 - 1) * o_{p_0} \\
@@ -214,7 +217,7 @@ Finally, we construct $S_p$:
 S_p = \left\{
 \begin{array}{c}
 4 S_{A,m} \circ 6 S_{B,m} \circ 9 S_{C,m} \circ 3
-S_{D,m}, S_{A,N} \circ S_{B,N} \circ S_{C,N} \circ S_{D,N} \\
+S_{D,m}, \\ S_{A,N} \circ S_{B,N} \circ S_{C,N} \circ S_{D,N} \\
 \left[
 \begin{array}{c}
 1 + (4-1) * 1 \\
@@ -318,7 +321,7 @@ v \circ [a_s] \circ [a_j]
 \end{array}\right\}
 \end{displaymath}
 
-Figure \ref{fig:steady-stat}e (b) depicts a sample {\splitjoin}.
+Figure \ref{fig:steady-state} (b) depicts a sample {\splitjoin}.
 The following are the steady states of the {\splitjoin}'s
 children: $$
 \begin{array}{lrlr} S_A = & \left\{[1], \{A\}, { \left[
@@ -399,7 +402,7 @@ unbalanced production/consumption ratios between different
 children of a {\splitjoin} can cause data to buffer up infinitely.
 
 \begin{definition}[Valid {\splitjoin}] A {\splitjoin} is valid
-{\emph iff} $\forall k, 0 \le k < n-1, o_{sj_k}, u_{sj_k},
+$\emph{iff}\ \forall k, 0 \le k < n-1, o_{sj_k}, u_{sj_k},
 o_{sj_{k+1}}, u_{sj_{k+1}} \ne 0$ we have $a_{j,k}'' =
 a''_{j,k+1}$, using notation of $a_{j,k}''$ to indicate that $k$th
 child of the {\splitjoin} was used to compute the value of
@@ -507,7 +510,7 @@ a_s * w_{s,O}
 
 Figure \ref{fig:app:steady-state}(c) depicts a sample
 {\feedbackloop}. The following are the steady states of the
-{\splitjoin}'s children:
+{\feedbackloop}'s children:
 $$
 \begin{array}{lrlr} S_B = & \left\{[1], \{B\}, { \left[
 \begin{array}{c} 2 \\ 2 \\ 1

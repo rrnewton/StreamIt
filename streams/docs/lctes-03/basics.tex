@@ -17,17 +17,17 @@
 \begin{minipage}{1.5in}
 \centering \psfig{figure=feedback-steady-state.eps,width=1.0in} \\
 {\protect\small (c) A sample {\feedbackloop}.  The $L$ {\filter}
-has been flipped upside-down for clarity.\\$peek_L = pop_L = 5,
-push_L = 6$}
+has been flipped upside-down for clarity.\\ $peek_L = pop_L = 5$
+$push_L = 6, delay_{fl} = 9$}
 \end{minipage}
 
-\caption{Sample {\StreamIt} streams} \label{fig:steady-state}
+\caption{Sample {\StreamIt} operators} \label{fig:steady-state}
 
 \end{center}
 \end{figure}
 
 This section introduces the general concepts used for scheduling
-{\StreamIt} programs.  Concepts presented here are are common with
+{\StreamIt} programs.  Concepts presented here are common with
 other languages \cite{ptolemyoverview} \cite{esterel92}
 \cite{lustre}.
 
@@ -173,10 +173,10 @@ The size of a steady state is defined as the sum of all executions
 of all the nodes in the program per iteration of the steady state.
 
 \begin{definition}
-A steady state of stream $s$ is represented by vector $m$ of
-non-negative integers. Each of the elements in $m$ represents the
-number of times a corresponding node in $s$ must be executed in
-the steady state.
+A steady state of a stream operator $s$ is represented by vector
+$m$ of non-negative integers. Each of the elements in $m$
+represents the number of times a corresponding node in $s$ must be
+executed in the steady state.
 \end{definition}
 
 Note that $m$ does not impose an order of execution of nodes. Size
@@ -270,50 +270,53 @@ that are not multiples of the minimal steady schedule.
 \end{comment}
 
 This property means that in order to find a minimal steady state
-schedule of a \stream, we can find any steady state of the
-\stream, and divide it by the $gcd$ of executions of all nodes in
-the \stream to find the minimal steady state schedule.
+schedule of an operator we can find any of its steady states and
+divide it by the $gcd$ of executions of all nodes in the operator
+to find the minimal steady state schedule. A detailed explanation
+of minimal steady state schedules is presented in Appendix
+\ref{apx:eqs}.
 
-\subsubsection{Calculating Minimal Steady State}
+\subsubsection{Calculating Minimal Steady States}
 \label{sec:calc-min-steady}
 
 Minimal steady states are calculated recursively in a hierarchical
 manner. That is, a minimal steady state is calculated for all
-children streams of {\pipeline}, {\splitjoin} and {\feedbackloop},
-and then the schedule is computed for the actual parent stream
+child operators of {\pipeline}, {\splitjoin} and {\feedbackloop},
+and then the schedule is computed for the actual parent operator
 using these minimal states as atomic executions.
 \begin{comment}
-This yields a minimal steady state
-because all child streams must execute their steady states (to
-avoid buffering changes), and all steady states are multiples of
-the minimal steady states (per Theorem \ref{thm:multiplicity}).
+This yields a minimal steady state because all child operators
+must execute their steady states (to avoid buffering changes), and
+all steady states are multiples of the minimal steady states (per
+Theorem \ref{thm:multiplicity}).
 \end{comment}
-Executing a full steady state of a stream is referred to as
-"executing a stream". The notation for $peek$, $pop$ and $push$ is
-is extended to mean entire streams in their minimal steady state
-execution.  That is, a {\pipeline} $p$ will consume $o_p$ data,
-produce $u_p$ data and peek $e_p$ data on every execution of its
-steady state.  Again, in the hierarchical view of {\StreamIt}
-programs, a child stream of a {\pipeline} will execute its steady
-state atomically.
+Executing a full steady state of an operator is referred to as
+``executing an operator". The notation for $peek$, $pop$ and
+$push$ is is extended to mean entire operators in their minimal
+steady state execution.  That is, a {\pipeline} $p$ will consume
+$o_p$ data, produce $u_p$ data and peek $e_p$ data on every
+execution of its steady state.  Again, in the hierarchical view of
+{\StreamIt} programs, a child operator of a {\pipeline} will
+execute its steady state atomically.
 
-A steady state of a stream $s$ is represented by a set $S_s$ of
-elements, $S_s = \{m, N, c, v\}$. The set includes a vector $m$,
-which describes how many times each {\StreamIt} node of the stream
-will be executed in the steady state, a corresponding ordered set
-$N$ which stores all the nodes of the stream, a vector $c$, which
-holds values $[e_s, o_s, u_s]$ for stream $s$, and a vector $v$
-which holds number of steady state executions of all direct
-children of $s$. $m$ and $v$ are not the same vector, because $m$
-refers to nodes in the subgraph, while $v$ refers only to the
-direct children, which may be {\filters}, {\pipelines},
-{\splitters} and {\feedbackloops}. For a stream $s$, set $S$ is
-denoted as $S_s$ and the elements of $S_s$ are denoted as
-$S_{s,m}$, $S_{s,N}$, $S_{s,c} and S_{s,v}$.
+A steady state of a stream operator $s$ is represented by an
+ordered set $S_s$ of elements, $S_s = \{m, N, c, v\}$. The set
+includes a vector $m$, which describes how many times each
+{\StreamIt} node of the operator will be executed in the steady
+state, a corresponding ordered set $N$ which stores all the nodes
+of the operator, a vector $c$, which holds values $[e_s, o_s,
+u_s]$ for stream operator $s$, and a vector $v$ which holds number
+of steady state executions of all direct children of $s$. $m$ and
+$v$ are not the same vector, because $m$ refers to nodes in the
+subgraph, while $v$ refers only to the direct children, which may
+be {\filters}, {\pipelines}, {\splitters} and {\feedbackloops}.
+For a stream operator $s$, set $S$ is denoted as $S_s$ and the
+elements of $S_s$ are denoted as $S_{s,m}$, $S_{s,N}$, $S_{s,c}$
+and $S_{s,v}$.
 
 Note, that a steady state does not say anything about the ordering
 of the execution of nodes, only how many times each node needs to
-be executed to preserve amount of data buffered by the stream.
+be executed to preserve amount of data buffered by the operator.
 
 We omit the equations for calculating the minimal steady states
 for brevity. Details can be found in Appendix \ref{apx:eqs}. As an
@@ -339,7 +342,7 @@ S_{sj_0, N} \circ S_{sj_1, N} \circ \{sj_s, sj_j\}, \\
 \subsection{Initialization for Peeking}
 \label{sec:init-peeking}
 
-Consider a {\filter} $f$, with $e_f = 2$ and a $o = 1$. When a
+Consider a {\filter} $f$, with $e_f = 2$ and a $o_f = 1$. When a
 {\StreamIt} program is first run, there is no data present on any
 of the {\Channels}.  This means that for the first execution,
 {\filter} $f$ requires that two data items be pushed onto its
@@ -383,19 +386,14 @@ to be computed. The steady states computed above do not indicate
 the ordering of execution of the nodes, only how many times the
 nodes need to be executed.
 
-A schedule is an ordering of nodes in a {\StreamIt} stream. In
+A schedule is an ordering of nodes in a {\StreamIt} operator. In
 order to execute the schedule, we iterate through all of its nodes
 in order of appearance and execute them one by one.  For example
 in order to execute schedule $\{ABBCCBBBCC\}$ we would execute
 node A once, node B twice, node C two times, node B three times
-and node C twice again, in that order.
-
-In order to shorten the above schedule we can run-length encode
-it.  The schedule becomes $\{A \{2B\}\{2C\}\{3B\}\{3C\}\}$. The
-schedule can also be expressed as $\{A \{2 \{BC\}\}\{3\{BC\}\}\}$.
-Different levels of loop nests can be used to express the
-schedule. The more loop nests are used, the more hierarchical the
-schedule becomes.
+and node C twice again, in that order. In order to shorten the
+above schedule we can run-length encode it.  The schedule becomes
+$\{A \{2B\}\{2C\}\{3B\}\{2C\}\}$.
 
 \subsection{Schedule Size vs. Buffer Size}
 \label{sec:sched-vs-buffer}

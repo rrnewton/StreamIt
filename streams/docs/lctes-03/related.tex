@@ -1,7 +1,8 @@
 \section{Related Work}
+\label{chpt:related}
 
-There has been a wealth of research of various stream languages
-and projects.  This chapter will introduce some of the other
+There has been a wealth of research on various stream languages
+and projects.  This section will introduce some of the other
 projects.
 
 A large number of programming languages have included a concept of
@@ -27,14 +28,14 @@ actors are allowed to have multiple input and output channels.
 \cite{benveniste93dataflow} provides an overview of dataflow
 synchronous languages.
 
-There are many results of scheduling {\SDF} programs \cite{leesdf}.
-Many of these results concentrate on reducing buffering
-requirements. Many of the systems inline all actor code into a
-single function, and try to minimize the code and buffer size at
-once \cite{bhattacharyya99synthesis}.  This approach leads to a
-strong preference for single appearance schedules.  {\StreamIt}
-scheduler stores a the schedule and {\filter} code separately, thus
-allowing for more efficient schedule storage.
+There are many results of scheduling {\SDF} programs
+\cite{leesdf}. Many of these results concentrate on reducing
+buffering requirements. Many of the systems inline all actor code
+into a single function, and try to minimize the code and buffer
+size at once \cite{bhattacharyya99synthesis}.  This approach leads
+to a strong preference for single appearance schedules.
+{\StreamIt} scheduler stores the schedule and {\filter} code
+separately, thus allowing for more efficient schedule storage.
 
 Other publications focus on synthesis of software for embedded
 systems. \cite{bhat1999x1} recognizes that non single-appearance
@@ -43,9 +44,9 @@ growth.  A hybrid model is introduced, where actor invocations are
 inlined unless the resulting code grow too large. If inlining is
 not performed, actors are invoked through a function call.
 
-Other approaches include to reducing the buffering requirements
-use buffer merging \cite{murthy99buffer}, a technique which will
-be explored for {\StreamIt} in the future.
+Other approaches to reducing the buffering requirements use buffer
+merging \cite{murthy99buffer}, a technique which will be explored
+for {\StreamIt} in the future.
 
 Many publications focus on synthesis for hardware systems.  Such
 systems can execute multiple actors at once
