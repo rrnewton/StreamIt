@@ -31,8 +31,8 @@ particular item off of the input stream, with \lstinline|peek(0)|
 returning the next item that would normally be popped.  The work
 function must declare a peek rate if it peeks at all, but this peek
 rate is a maximum, rather than an exact, rate; it would be valid for
-the \lstinline|Averager| filter to \lstinline|peek(n-1)| and never
-\lstinline|peek(n)|, but \lstinline|peek(n+1)| is illegal.  Note that
+the \lstinline|Averager| filter to \lstinline|peek(n-2)| and never
+\lstinline|peek(n-1)|, but \lstinline|peek(n)| is illegal.  Note that
 mixing peeking and popping is valid, but that popping an item shifts
 the index of future peeks.
 
@@ -44,10 +44,10 @@ it is illegal for code to modify the parameter.  This allows parameter
 values to be used in expressions for \emph{e.g.} I/O rates, as in the
 peek rate here.
 
-This program also provides a minimal demonstration of StreamIt's
-filter scheduler.  There is a guarantee that the \lstinline|Averager|
-filter is not run until its input rates can be met, and in particular,
-that there are 10 inputs available so peeking can happen.  For this to
+This program also provides a basic demonstration of StreamIt's filter
+scheduler.  There is a guarantee that the \lstinline|Averager| filter
+is not run until its input rates can be met, and in particular, that
+there are 10 inputs available so peeking can happen.  For this to
 happen, the source needs to run nine additional times at the start of
 the program; there can then be steady-state exections of source,
 averager, printer.  The StreamIt compiler handles this automatically.
