@@ -1,39 +1,3 @@
-\section{Systems of Affine Recurrence Equations}
-
-A System of Affine Recurrence Equations (SARE) is a set of equations
-${\cal E}_1 \dots {\cal E}_{m_{\cal E}}$ of the following form~\cite{DRV00}:
-\begin{equation}
-\forall {\vec i} \in {\cal D_{\cal E}}, X({\vec i}) = f_{\cal E}(\dots, Y({\vec h}_{{\cal
-E}, Y}({\vec i})), \dots)
-\label{eq:sare}
-\end{equation}
-In this equation, our notation is as follows:
-\begin{itemize}
-
-\item $\{X, Y, \dots\}$ is the set of {\it variables} defined by the
-SARE.  Variables can be considered as multi-dimensional arrays mapping
-a vector of indices ${\vec i}$ to a value in some space ${\cal V}$.
-
-\item ${\cal D_{\cal E}}$ is a polyhedron representing the {\it
-domain} of the equation ${\cal E}$.  Each equation for a variable $X$
-has a disjoint domain; the domain $D_X$ for variable $X$ is taken as
-the convex union of all domains over which $X$ is defined.
-
-\item ${\vec h}_{{\cal E}, Y}$ is a vector-valued affine\footnote{If
-the dependence function ${\vec h}$ is a translation (${\vec h}({\vec
-i}) = {\vec i} - {\vec k}$ for constant ${\vec k}$), then the SARE is
-{\it uniform}, and referred to as a SURE or SRE~\cite{karp67}.}
-function, giving the index of variable $Y$ that $X({\vec i})$ depends
-on.  A vector-valued function ${\vec h}$ is affine if it can be
-written as ${\vec h}({\vec i}) = C{\vec i} + {\vec d}$, where C is a
-constant array and ${\vec d}$ is a constant vector that do not vary
-with ${\vec i}$.
-
-\item $f_{\cal E}$ is a strict function used to compute the elements
-of $X$.
-
-\end{itemize}
-
 \section{Phased Computation Graphs}
 \label{sec:pcg}
 
@@ -44,7 +8,7 @@ of $X$.
 Model of Computation & Items on Channels & Nodes with & Nodes with & Cyclic Steady & Initialization \\
                      & at Start & Pop $\ne$ Push & Peek $>$ Pop & State Phases & Phases \\
 \hline \hline
-Synchronous Dataflow \cite{LM87} & X & X & & & \\
+Synchronous Dataflow \cite{LM87-i} & X & X & & & \\
 \hline
 Cyclo-Static Dataflow \cite{BELP96} & X & X & & X & \\
 \hline
@@ -122,9 +86,9 @@ steady state epoch and the phases of all nodes are reset to 0.
 Execution then continues by a (possibly infinite) sequence of
 steady-state firings.
 
-\section{Phased Computation Program}
+\section{Phased Computation Programs}
 
-The PCG described above is a representation for a graph, treating each
+The PCP described above is a representation for a graph, treating each
 node and channel as a black box.  Here we introduce some notation for
 the internals of the nodes, as well as the ordering of items on the
 channels.  We refer to the aggregate model as a Phased Computation
@@ -162,7 +126,7 @@ A PCP consists of the following:
 
 \item A Phased Computation Graph $G = (\{n_1 \dots n_{m_n}\}, \{c_1
 \dots c_{m_c}\}, A, \mt{num}, U, O, E)$ describing the nodes,
-channels, and I/O rates of the program (see Section~\ref{sec:pcg}).
+channels, and I/O rates of the program (see Section~\ref{sec:pcp}).
 Each channel $c = (n_a, n_b)$ is a FIFO queue; $n_a$ pushes items onto
 the back of $c$ and $n_b$ consumes items from the front of $c$.
 
@@ -194,6 +158,6 @@ $U(c,t,p)$ values that $n$ writes to $c$ in a given firing.
 %The components $I$ and $W$ above are referred to as ``procedures''
 %rather than mathematical functions because we expect them to be
 %represented as blocks of source code for an actual procedure
-%declaration, thereby allowing a straightforward conversion to a PCG
+%declaration, thereby allowing a straightforward conversion to a PCP
 %from a dataflow program.  However, 
 

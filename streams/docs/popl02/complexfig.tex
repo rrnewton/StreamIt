@@ -26,7 +26,7 @@ S(n_b) * \mt{TotalRead}(n_b, c, \mt{steady})
 \end{itemize}
 %
 \end{minipage}}
-\caption{Helper functions for the PCG to SARE translation.
+\caption{Helper functions for the PCP to SARE translation.
 \protect\label{fig:helper}}
 \end{figure}
 
@@ -75,8 +75,8 @@ variable $\mt{SREAD}_{c, p}$ with this domain:
 \end{itemize}
 %
 \end{minipage}}
-\caption{Variables for the PCG to SARE translation.
-\protect\label{fig:pcgtosare1}}
+\caption{Variables for the PCP to SARE translation.
+\protect\label{fig:pcptosare1}}
 \end{figure}
 
 \begin{figure}[t]
@@ -148,8 +148,8 @@ introduce this equation (SWRITE to SBUF):
 %
 \end{itemize}
 \end{minipage}}
-\caption{Equations for the PCG to SARE translation.
-\protect\label{fig:pcgtosare2}}
+\caption{Equations for the PCP to SARE translation.
+\protect\label{fig:pcptosare2}}
 \end{figure}
 
 \begin{figure}[t]
@@ -240,7 +240,7 @@ these equations (SBUF to SREAD):
                                         \mt{TotalRead}(n,c,\mt{steady}), \\ \nonumber
                                         1 ) + \mt{PartialRead}(c, \mt{steady}, p) \\ \nonumber
 \mt{and }\mt{PEEKED}(c,p) = {SB {\small \rightarrow} IR}(c,p) \\ \nonumber
-\mt{and }\mt{Num\_Popped}(c,p) = |\mt{PEEKED}(c,p)| - (E(c,\mt{steady},p) - O(c,\mt{steady},p)) \\ \nonumber
+\mt{and }\mt{Num\_Popped}(c,p) = |\mt{PEEKED}(c,p)| + O(c,\mt{steady},p) - E(c,\mt{steady},p) \\ \nonumber
 \mt{and }\mt{Offset}(n,c,p) = \mt{Num\_Popped}(c,p)-\mt{Num\_Pushed}(n,c,p) \\ \nonumber
 \mt{and }\mt{Int\_Offset}(n,c,p) = \mt{sign(Offset)}*\lfloor \frac{abs(\mt{Offset}(n,c,p))}{\mt{Period}(c)} \rfloor) \\ \nonumber
 \mt{and }\mt{Mod\_Offset}(n,c,p) = \mt{sign(Offset)}*(abs(\mt{Offset}(n,c,p))~\mt{mod}~\mt{Period}(c)) \\ \nonumber
@@ -249,7 +249,7 @@ these equations (SBUF to SREAD):
 %
 \end{itemize}
 \end{minipage}}
-\caption{Equations for the PCG to SARE translation.
-\protect\label{fig:pcgtosare3}}
+\caption{Equations for the PCP to SARE translation.
+\protect\label{fig:pcptosare3}}
 \end{figure}
 

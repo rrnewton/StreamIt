@@ -1,43 +1,112 @@
 \section{Applications}
 
-\subsection{Semantics of Time}
-
-\noindent {\bf \dep}
-
-\begin{align*}
-\DEP{X}{Y}(i) = max_{\preceq}~\{~ j ~|~ \exists ~&~ T_0 \dots T_n, ~ k_0 \dots k_n, ~ {\cal E}_1 \dots {\cal E}_n ~ s.t. ~ & ~ \\ 
-~ & T_0 = Y ~\wedge~ T_n = X ~\wedge~ k_0 = j ~\wedge~ k_n = i ~\wedge~ & ~ \\
-~ & \forall p \in 1 \dots n, ~ T_p(k_p) \equiv f_{{\cal E}_p}(\dots, T_{p-1}(h_{{{\cal E}_p}, T_{p-1}}(k_p)), \dots) ~ \} & ~ \\
-\end{align*}
-
-In StreamIt, this function is composable because of single-input,
-single-output blocks.  Since every junction is a one-dimensional
-array, it gives unique point in time for a given filter.  Can use this
-to think modularly/composably about time in components, too.
-
-Describe messaging semantics?  Is there space?
+\subsection{Inter-Node Optimization}
 
 \subsection{Scheduling}
 
-\subsubsection{Uniprocessor Scheduling}
+Perhaps most attractive feature, as there is a large body of work on
+scheduling and automatic parallelization for affine dependences
+(lim/lam, feautrier, darte/vivien etc.)  It can identify what filters
+can run in parallel, and optimize for different metrics
+(synchronization, communication, etc.)  Hasn't been addressed as
+thoroughly in the SDF community.
 
-\subsubsection{Parallel Scheduling}
+Also scheduling for other optimization metrics is interesting.
 
-\subsubsection{Conditional-Appearance Scheduling}
+\subsection{Inter-Node Optimization}
 
-- Like SAS, but you wrap a conditional around a loop.  Automatic
-  outcome of affine scheduling.
+Attractive because there's a unified mathematical model for expressing
+constraints.
 
-\subsection{Node Fission}
+\subsubsection{Buffer Minimization}
+
+Data buffer size is important to the DSP community.  There's a large
+body of work on minimizing buffer requirements in their community as
+well as in the scientific community.  This lets the results of the
+whole scientific community apply the dataflow community.
+
+Not just scheduling - also collapsing, reusing, detecting live ranges,
+sharing buffers, etc.
+
+\subsubsection{Code Size}
+
+Cody size is also very important.  While this has perhaps received
+less attention in the context of SARE's, there are interesting
+advantages that affine scheduling could offer to the DSP community.
+For instance, most DSP schedules abide by a ``single appearance
+schedule'' where the execution of each filter is in a perfect loop
+nest.  However, often times an affine schedule will lead to a case
+where a filter is nested in a given loop, but only executes on every
+other invocation; it's execution is governed by a conditional.  To our
+knowledge, this kind of schedule hasn't been explored by the DSP
+community, and could be promising.
+
+Also not just scheduling - how do you arrange things.
+
+\subsubsection{Partitioning}
+
+Provides a good framework for distributing a streaming computation
+across an architecture.
+
+\subsection{Intra-Node Optimization}
+
+Unlike other program domains, where the principle aim of compiler
+optimization is to shorten the total execution time, there are many
+distinct optimization metrics for streaming applications, including
+throughput, latency, data size, and code size.  The latter two of these
+are especially important in embedded domains, where memory is in short
+supply; latency can be critical for real-time applications, and
+throughput is always of interest.
+
+\subsection{Fission Transformations}
 
 Just specify the relations within a node, and you have a complete view
 of program.
 
-\subsection{Node Fusion}
+When the machine target is more fine-grained than the stream graph, it
+is advantageous to break filters up into smaller pieces so that more
+hardware resources can be utilized.  We propose two fission
+transformations:
 
-\subsection{Buffer Minimization}
+Split in Half
+Data Parallel Duplication
 
-\subsection{Code Size}
+\subsection{Fusion Transformations}
+
+e.g. Just doing constant prop on a node.
+
+\subsection{Steady-State Invariant Code Motion}
+
+With the dependence analysis, the compiler can detect items that are
+constant during the work epoch, and can move their computation to the
+init epoch, letting the data flow through in a feedback loop afterwards.
+
+In the streaming domain, the analog of loop-invariant code motion is
+the motion of code from a steady-state work function to an
+initialization function if it does not depend on any quantity that is
+changing during the steady-state execution of a node.  Quantities that
+the compiler detects to be constant during the execution of a work can
+be computed from within init, with the results being passed through a
+feedback loop for availability on future executions of work.
+
+\subsection{Induction Variable Detection}
+
+The {\tt work} function can also be analyzed as would the body of a loop
+to see if there are induction variables from one steady-state execution
+to the next.  This analysis is useful both for strength reduction, which
+{\it adds} a dependence between invocations by converting an expensive
+operation to a cheaper, incremental one, as well as for data
+parallelization, which {\it removes} a dependence from one invocation to
+the next by changing incremental operations on filter state to
+equivalent operations on privatized variables.
+
+\subsection{Decimation Propagation}
+
+Decimation refers to the regular discarding of a fraction of a filter's
+input items, perhaps to reduce the sampling rate in a stream.  In the
+streaming domain, the analog of dead code elimination is the propagation
+of this decimation up through the stream graph, thereby eliminating the
+computations that produce the unused items.
 
 \subsection{Parameterized Graphs}
 
@@ -45,7 +114,25 @@ Don't need to duplicate code for nodes that are repeated.  Can also
 parameterize the schedule along these dimensions.  Especially
 well-tailored to StreamIt.  Compare to PSDF.
 
-\subsection{Verification}
+\subsection{Semantics}
 
-Buffer overrun, no exploding schedules, etc.
+%% \subsection{Verification}
 
+%% Buffer overrun, no exploding schedules, etc.
+
+%% \subsection{Semantics of Time}
+
+%% \noindent {\bf \dep}
+
+%% \begin{align*}
+%% \DEP{X}{Y}(i) = max_{\preceq}~\{~ j ~|~ \exists ~&~ T_0 \dots T_n, ~ k_0 \dots k_n, ~ {\cal E}_1 \dots {\cal E}_n ~ s.t. ~ & ~ \\ 
+%% ~ & T_0 = Y ~\wedge~ T_n = X ~\wedge~ k_0 = j ~\wedge~ k_n = i ~\wedge~ & ~ \\
+%% ~ & \forall p \in 1 \dots n, ~ T_p(k_p) \equiv f_{{\cal E}_p}(\dots, T_{p-1}(h_{{{\cal E}_p}, T_{p-1}}(k_p)), \dots) ~ \} & ~ \\
+%% \end{align*}
+
+%% In StreamIt, this function is composable because of single-input,
+%% single-output blocks.  Since every junction is a one-dimensional
+%% array, it gives unique point in time for a given filter.  Can use this
+%% to think modularly/composably about time in components, too.
+
+%% Describe messaging semantics?  Is there space?

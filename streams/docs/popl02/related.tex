@@ -1,12 +1,10 @@
-\section{Related Work}
+\section{Background and Related Work}
+
+\section{Dataflow Graphs}
 
 \begin{itemize}
 
 \item SURE's and Computation Graphs
-
-\item SARE/Feautrier, affine dependences, static control flow programs.
-
-\item Lim/Lam; affine scheduling.
 
 \item The min-buffers for maximal-rate schedules stuff
 
@@ -21,3 +19,42 @@ everything they tried to do.
 
 \end{itemize}
 
+\section{Systems of Affine Recurrence Equations}
+
+SARE/Feautrier, affine dependences, static control flow programs.
+
+Lim/Lam; affine scheduling.
+
+A System of Affine Recurrence Equations (SARE) is a set of equations
+${\cal E}_1 \dots {\cal E}_{m_{\cal E}}$ of the following form~\cite{DRV00}:
+\begin{equation}
+\forall {\vec i} \in {\cal D_{\cal E}}, X({\vec i}) = f_{\cal E}(\dots, Y({\vec h}_{{\cal
+E}, Y}({\vec i})), \dots)
+\label{eq:sare}
+\end{equation}
+In this equation, our notation is as follows:
+\begin{itemize}
+
+\item $\{X, Y, \dots\}$ is the set of {\it variables} defined by the
+SARE.  Variables can be considered as multi-dimensional arrays mapping
+a vector of indices ${\vec i}$ to a value in some space ${\cal V}$.
+
+\item ${\cal D_{\cal E}}$ is a polyhedron representing the {\it
+domain} of the equation ${\cal E}$.  Each equation for a variable $X$
+has a disjoint domain; the domain $D_X$ for variable $X$ is taken as
+the convex union of all domains over which $X$ is defined.
+
+\item ${\vec h}_{{\cal E}, Y}$ is a vector-valued affine\footnote{If
+the dependence function ${\vec h}$ is a translation (${\vec h}({\vec
+i}) = {\vec i} - {\vec k}$ for constant ${\vec k}$), then the SARE is
+{\it uniform}, and referred to as a SURE or SRE~\cite{karp67}.}
+function, giving the index of variable $Y$ that $X({\vec i})$ depends
+on.  A vector-valued function ${\vec h}$ is affine if it can be
+written as ${\vec h}({\vec i}) = C{\vec i} + {\vec d}$, where C is a
+constant array and ${\vec d}$ is a constant vector that do not vary
+with ${\vec i}$.
+
+\item $f_{\cal E}$ is a strict function used to compute the elements
+of $X$.
+
+\end{itemize}
