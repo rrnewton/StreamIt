@@ -1,0 +1,149 @@
+\section{Partitioning Algorithm}
+
+In this section we describe our partitioning algorithm, which operates
+on an abstract representation of the stream graph and is well-suited
+for many interesting problems.
+
+\subsection{Problem Definition}
+
+In this paper we focus on a static load-balancing problem, which we
+define as follows.  We are given the following:
+\begin{itemize}
+
+\item A StreamIt stream graph $\mt{str}$ in which each filter $filter$
+has a certain amount of steady-state $\mt{work}$ and can be run in
+data parallel (to an arbitrary degree) if $\mt{isFissable(f)}$ is
+true.
+
+\item An integer $N$ denoting the number of available partitions.
+
+\end{itemize}
+
+The goal is to produce a mapping $\mt{map}$ from nodes to partitions
+that minimizes the cost of the bottleneck node {\it while maintaining
+a structured stream graph}.  Formally, this could be posed as:
+
+\begin{singlespace}
+\begin{center}
+  \framebox{
+  \begin{minipage}{6in}
+    {\bf Minimize} $MAX_{i}  (\sum_{d~s.t.~map(d)=i\}} d.work)$
+    ~~~Subject to:
+    \begin{enumerate}
+    \item Every node is assigned to a legal partition:
+      \[
+      \forall d \in s:~~ 0 < \mt{map}(d) < n
+      \]
+    \item There exists a structured stream graph with the same
+    semantics as $\mt{str}$ in which there exists a container that
+    exactly corresponds to each partition.  That is:
+      \[
+      \begin{array}{c}
+      \forall d \in s,~\exists s' \in s,~\forall d' \in s: \\ ~ \\
+      \left( \mt{map}(d')==map(d) \implies s' \in s' \right)
+      \end{array}
+      \]
+    \end{enumerate}
+  \end{minipage}}
+\end{center}
+\end{singlespace}
+
+Of course, it is difficult to infer whether condition (2) holds above,
+as there are a large (if not infinite) number of possible
+configurations of a given stream graph.  Thus, practically speaking,
+the algorithm must also output a sequence of transformations on the
+original graph that will yield a structured stream graph with the
+desired partitioning.
+
+\subsection{Dynamic Programming Solution}
+
+The main insight behind our solution is this: most of the useful and
+efficient partitionings of a {\it structured} stream graph {\tt s}
+follow from either a vertical or a horizontal division of {\tt s}.  In
+other words, a large percentage of the structured configurations for a
+given stream program can be represented as a series of straight,
+rectangular divisions the toplevel node.  And because the rectangular
+sub-sections are overlapping, we can search this space very
+efficiently by memoizing values that we have already seen, thereby
+utilizing dynamic programming.  The details of the algorithm follow
+below.
+
+The partitioning algorithm is given in Figure~\ref{code:partition}.
+The stream representation is simplified over StreamIt: there are only
+two types of structures, a container and a leaf node.  Each leaf node
+represents a filter, with a {\tt work} function for the steady-state
+work and an {\tt isFissable} function to detect data parallelism.
+Each stream container {\tt s} is represented as a ragged array, with a
+fixed height {\tt s.height} and a varying width; the width at row {\tt
+y} is given by {\tt s.width}[y].  Intuitively, a stream container
+represents a pipeline that contains splitjoins of varying widths; in
+this representation, the children of the splitjoins are viewed as
+children of a two-dimensional ragged pipeline, so that the partitioner
+can cut across the initial splitjoin boundaries.
+
+For each stream {\tt s} in the graph, the search finds the minimum
+cost if {\tt s} were assigned to {\tt n} tiles, where {\tt n} ranges
+from {\tt 1} to {\tt N}, the maximum number of tiles available.  In
+the base case, {\tt s} is a node, and its cost is given by {\tt
+getNodeCost}, which simply parallelizes {\tt s} as much as
+possible\footnote{In the actual implementation, we maintain an upper
+limit on the parallelization factor, as communication costs quickly
+outweigh the benefits of distributing the computation.}.  Otherwise,
+{\tt s} is a container, and optimal cost is exhibited under some
+partitioning of the children (see {\tt getContainerCost}.)
+
+This is where the algorithm's assumption of rectangular partitions
+makes the problem tractable.  If it is looking for the optimal cost of
+{\tt s} when allocated to {\tt n} tiles, then it considers dividing
+the problem in half, in all possible ways: splitting vertically at
+every possible {\tt x} coordinate, splitting horizontally at every
+every possible {\tt y} coordinate, and, further, allocating any
+division of the {\tt n} tiles to the two children in every case.  This
+strategy is the essence of the partitioning algorithm; it is
+implemented by the two doubly-nested loops at the end of the {\tt
+getContainerCost} function.
+
+\subsection{Taking Advantage of Symmetry}
+
+The rectangular approach of the dynamic programming partitioner
+reveals many overlapping sub-problems beyond the memoized cost of the
+configurations.  In particular, it is a common pattern in stream
+programs to have a single filter repeated several times, either in a
+splitjoin (e.g., filterbanks, sensor arrays, cell phone servers) or in
+a pipeline (e.g., fine-grained FIR filters, network routers, graphics
+shaders).  
+
+We detect structurally identical filters based on a hash value related
+to the similarity we want to exploit.  For instance, we have
+implemented the following optimizations:
+\begin{enumerate}
+
+\item {\bf Amortized work estimation.}  Typically, we infer the work
+of each filter as a compile-time estimate of the average-case
+performance of its work work function.  However, we also support
+profile-guided feedback where the work function is timed on native
+hardware.  Though too expensive to support across a graph with
+hundreds of elements, a hash of the filter's control flow and
+arithmetic operations reveals uniform structures that make this
+operation vastly cheaper.  For instance, the expanded version of our
+Radar application contains 52 filters, and though each has its own
+parameters, all shared one of 7 structures, allowing us to get the
+full benefit of profiling at only a fraction of the cost.
+
+\item {\bf Aliasing of children and memo tables.}  Similarly, for
+adjacent regions of stream containers that all share the same pattern
+of work estimate, the entries of the memo table can be aliased to save
+on computations.  Further, children themselves can be aliased when
+they are structurally equivalent.  Almost all of our benchmarks
+benefit from this optimization.
+
+\item {\bf Automatically computing the best partitions.}  In certain
+cases, such as a wide splitjoin filled with equally costly filters, it
+is possible to calculate the best partition in a closed form without
+recursing through the hierarchy.
+\end{enumerate}
+
+We believe that these are strong benefits of having a structured
+stream programming model, as well as using a partitioner that
+understands the symmetry encapsulated by the programming model, as
+well as the application class itself.

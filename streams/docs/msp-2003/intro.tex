@@ -1,0 +1,58 @@
+\section{Introduction}
+
+Recent trends in both software and hardware are accentuating the need for
+high-level distributed stream programming.  On the software side,
+applications centered around streams of data are becoming increasingly
+important and widespread.  The stream abstraction is central to
+embedded applications for hand-held computers, cell phones, and sensor
+networks, as well as for high-performance applications such as cell
+phone base stations, radar image processing, and hyper-spectral image
+analysis.  
+
+At the same time, with the wire delay problem looming ahead, there is
+emerging a class of communication-exposed
+architectures~\cite{raw-micro,trips,smartmemories}.  With replicated
+processing units and distributed memory, these architectures are a
+good match for the abundant parallelism and regular communication
+patterns that are prevalent in stream programs.  However, if these
+architectures are to be fully utilized, there needs to exist a
+portable, high-level programming model that can be efficiently
+compiled onto tomorrow's generation of machines.
+
+This is the motivation of the StreamIt language and compiler.  The
+StreamIt language provides high-level stream abstractions that aim to
+improve the lives of both programmers and compiler writers.  One of
+the novelties in StreamIt is the use of ``structured streams'': a
+program consists of a set of concurrently executing filters that are
+connected using a few hierarchical primitives.  We believe that
+structured streams will offer critical benefits to software engineers,
+just as structured control flow did many years ago.
+
+In this paper, we explore the compiler side of structured stream
+programming.  Though structure's restrictions on the programmer may be
+beneficial, these restrictions on the compiler could become a curse
+without proper analysis and optimizations.  Toward this end, we make
+three contributions:
+\begin{itemize}
+
+\item A general dynamic programming algorithm for partitioning a
+structured stream graph.  The algorithm exploits many aspects of the
+graph's structure to improve its efficiency and effectiveness.
+
+\item An implementation of the partitioner in the context of load
+balancing StreamIt programs on Raw~\cite{raw-micro}, where we
+demonstrate improvements over a greedy algorithm by an average of
+63\%.
+
+\item A suite of refactoring transformations that can be performed on
+a structured stream graph, which are critical for the implementation
+of the above algorithms.
+\end{itemize}
+
+The rest of this paper is organized as follows.  We first give
+background information on the StreamIt language
+(Section~\ref{sec:streamit}), and then give the abstract view of the
+partitioning algorithm (Section 3).  We then describe a suite of graph
+transformations for interfacing with the partitioner (Section 4)
+before presenting experimental results (Section 5).  We then discuss
+related work (Section 6) and conclude (Section 7).
