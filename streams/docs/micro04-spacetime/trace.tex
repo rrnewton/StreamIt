@@ -17,7 +17,7 @@ in the Raw chip to which we are targeting.  Traces are homogeneous,
 meaning that traces are composed of either completely linear or
 completely non-linear filters.  Currently, traces are restricted to
 straight pipelines of filters.  More specifically, only the end-points
-of traces can communicate with more than one filter, inner filters are
+of traces can communicate with more than one filter; inner filters are
 restricted to single input and single output.  All intra-trace
 communication is handled on-chip through Raw's static network.  An
 upstream filter simply sends its output to its downstream filter that
@@ -35,14 +35,13 @@ Raw chip.  These tiles directly communicate to the memory modules via
 their I/O ports.  
 
 The first filter of a trace reads its input from the memory attached
-to the I/O its tile, If a trace has multiple inputs, the data is
-reordered prior to execution of the trace.  Before the
-first filter of the trace is executed, the input to the trace is
-gathered from the various memory modules and written to the memory
-module attached to the tile to which the first filter of the trace was
-mapped.  The static network switches are programmed to
-correctly order the data as calculated by the synchronization removal
-stage.
+to the I/O port of its tile.  If a trace has multiple inputs, the data
+is reordered prior to execution of the trace.  Before the first filter
+of the trace is executed, the input to the trace is gathered from the
+various memory modules and written to the memory module attached to
+the tile to which the first filter of the trace was mapped.  The
+static network switches are programmed to correctly order the data as
+calculated by the synchronization removal stage.
 
 The last filter of a trace writes its output to the memory attached to
 the I/O of the tile as the output is generated. For traces that output
@@ -101,7 +100,7 @@ Additionally, we try to coax the generation of load-balanced traces.
 For each filter, we calculate a static work estimation of the filter
 based on an analysis of the {\tt work} function.  Because of the
 static I/O (push, pop, and peek) rates in this version of StreamIt,
-most loops within {\tt work} can be unrolled, allowing a close
+most loop bounds within {\tt work} can be resolved, allowing a close
 approximation of the actual cycle count.  This estimate is multiplied
 by the number of times the filter executes in the steady-state.
 
@@ -113,8 +112,8 @@ threshold, termed the {\it work threshold}, then we proceed to add the
 filter to the trace.  Otherwise, begin a new trace with the current
 filter as the first filter in this new trace.  After experimentation,
 we found that smaller, well-balanced traces are preferable.  The
-results given in Section \ref{sec:results} were generating using a
-work threshold of 0.80, meaning that each filter of the trace has a
+results given in Section \ref{sec:results} were generated using a work
+threshold of 0.80, meaning that each filter of the trace has a
 workload that is within 80-125\% of the workload of the first filter
 of the trace.
 
