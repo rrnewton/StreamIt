@@ -26,7 +26,7 @@ push rates, respectively. \\
 ~ \vspace{-6pt} \\
 A ``firing'' of a linear node $\lambda$ corresponds to the following
 series of abstract execution steps.  First, an $e$-element row vector
-$\vec{x}$ is constructed with $\vec{x}[e-1-i] = \mbox{peek}(i)$.  The node
+$\vec{x}$ is constructed with $\vec{x}[i] = \mbox{peek}(e-1-i)$.  The node
 computes $\vec{y} = \vec{x} A + \vec{b}$, and then pushes the $u$ elements 
 of $\vec{y}$ onto the output tape, starting with $\vec{y}\hspace{1pt}[u-1]$ 
 and proceeding through $\vec{y}\hspace{1pt}[0]$.
