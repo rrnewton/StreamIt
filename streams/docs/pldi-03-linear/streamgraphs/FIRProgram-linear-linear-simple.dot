@@ -1,0 +1,10 @@
+digraph streamit {
+subgraph cluster_node1 {
+ label="FIRProgram";
+node2 [ label="FloatSource" ]
+node3 [ color=cornflowerblue, style=filled, label="LowPassFilter" ]
+node2 -> node3
+node4 [ label="FloatPrinter" ]
+node3 -> node4
+}
+}
