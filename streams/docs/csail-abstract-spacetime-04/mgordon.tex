@@ -39,12 +39,12 @@
 
 \absection{What} We are developing compiler technology for
 StreamIt~\cite{streamitcc}, a high-level stream programming language
-that aims to be portable across communication-exposed machines.
+that aims for portability across communication-exposed machines.
 StreamIt contains basic constructs that expose the parallelism and
-communication of streaming applications without depending on the
-topology or granularity of the underlying architecture.  There are two
+communication of streaming applications, independent of
+the topology or granularity of the underlying architecture.  There are two
 methods for compiling stream programs to a parallel architecture: time
-multiplexing and space multiplexing.  Time multiplexing provides good
+multiplexing and space multiplexing.  Time multiplexing provides efficient
 load balancing by synchronizing operations through memory, while space
 multiplexing provides producer-consumer locality and scales with
 spatially-aware architectures.  In this work, we are developing a
@@ -53,6 +53,7 @@ space-multiplexed phases, thereby leveraging the benefits of both
 execution models.  Our compiler targets the MIT Raw architecture
 \cite{raw}, a tiled machine with fine-grained, programmable
 communication between processors.
+
 
 \absection{Why}
 As we approach the billion-transistor era, a number of emerging
@@ -82,16 +83,17 @@ across the chip.
 A second approach is to run all the filters in parallel, each on its
 own tile.  This is termed {\it space multiplexing}.  Our first
 StreamIt compiler for Raw uses this technique~\cite{streamit-asplos}.
-Space multiplexing affords no filter swapping overhead, reduced memory
-traffic, localized communication, and tighter latencies.  Due to these
-properties, space multiplexing scales extremely well.  Load balancing
-is the performance focal point of space multiplexing.  Merging and
-splitting filters of the stream graph until the graph is composed of
+Space multiplexing affords $(i)$ filter-swapping without any overhead,
+$(ii)$ reduced memory traffic, $(iii)$ localized communication, and
+$(iv)$ tighter latencies.  Due to these properties, space multiplexing
+scales extremely well, although it is subject to effective load balancing 
+techniques. Toward that end, merging and
+splitting components of the stream graph until it is composed of
 $n$ load balanced filters, where $n \le$ the number of processing elements,
-proved difficult with many factors coming into play.  Further,
-constraining ourselves to space multiplexing forced us to support
-arbitrarily complex communication patterns that did not map
-efficiently to Raw's 2-D mesh.
+proved difficult, as the optimization technique is constrained by
+several competing factors.  Further, the use of space multiplexing
+alone forced us to support arbitrarily complex communication patterns 
+that did not map efficiently to the 2-D mesh in Raw.
 
 The technique employed by our new backend for Raw is to merge the
 advantages of space multiplexing and time multiplexing.  This hybrid
@@ -104,19 +106,20 @@ multiplexing for improved load balancing.  Furthermore, we use
 software pipelining techniques to allow arbitrary ordering of slices
 during steady-state execution.
 
-In \cite{lamb03} a linear analysis framework for StreamIt is
-introduced.  We define a {\it linear} section of a stream graph as
-groups of filters that compute a linear combination of their inputs.
-Using this framework we can discover the linear sections of a
-streaming application.  Many ubiquitous DSP kernels are linear
-including FIR, low and high-pass filters, and DFT.  These linear
-computations can be represented as a matrix multiplication and
-efficiently mapped to Raw.  Linear slices of the stream
-graph are space multiplexed across tiles of the chip using
+An integral part of our technique is to recognize parts of the stream
+graph that can be space-multiplexed in a fine-grained, systolic
+fashion.  Using our linear analysis framework \cite{lamb03}, we can
+discover the linear sections of a streaming application.  We define a
+linear section of a stream graph as groups of filters that
+compute a linear combination of their inputs.  Many ubiquitous DSP
+kernels are linear including FIR, low and high-pass filters, and DFT.
+These linear computations can be represented as a matrix
+multiplication and efficiently mapped to Raw.  Linear slices of the
+stream graph are space-multiplexed across tiles of the chip using
 parameterized computation and communication code.  The matrix
-representations of the linear filters are broken into pieces
-that the compiler targets for aggressive code generation.  This
-results in optimal usage of the tiles for each piece.
+representations of the linear filters are broken into pieces that the
+compiler targets for aggressive code generation.  This results in
+optimal usage of the tiles for each piece.
 
 \begin{figure}[tbh]
   \vspace{-.2in}
@@ -160,29 +163,28 @@ streaming memory interface.  For intra-slice communication, we exploit
 Raw's static network and translate StreamIt's filter code into C
 code to be executed on the compute processors.  We have completed
 parameterized code generation for linear filters that generates
-assembly directly.   
-
+assembly directly.  
+ 
 As for the high-level algorithms, we have implemented a greedy
 algorithm to partition and schedule the stream graph into ordered slices.
 This algorithm has the freedom of producing an arbitrary ordering of slices
-to best distribute the work evenly. It is the task of the software
-pipelining algorithm to take in this schedule and produce a valid
-execution by determining what executions are needed in the initialization
-stage to prime the pipeline.
+to best distribute the work evenly, while the software
+pipelining algorithm is responsible for mapping the schedule and
+producing a valid execution---by determining what initialization steps
+are necessary for steady-state execution.
+
 
 \absection{Future}
 In the near future we would like to explore more advanced partitioning
 and layout algorithms.  Additionally, we will further expand space
-multiplexing by investigating additional parallelism schemes such as
+multiplexing as we investigate additional parallelism schemes such as
 filter fission (breaking a filter into multiple, smaller filters),
-investigating optimizing additional filter representations such as a
-state-space representation, and implementing optimized linear code
-generation targeting sparse matrices.  We are working on a new
+state-space filter representations, and optimized linear code
+generation for sparse matrices.  We are also working on a new
 intermediate representation for our compiler that will allow us to
 directly generate assembly code for Raw's compute
-processors. Generating our stream code in a procedural framework is a
-source of many inefficiencies.
- 
+processors. This will overcome some of the inefficiencies in generating
+stream code via a procedural framework.
 
 \absection{Research Support}
 This work is supported in part by a grant from DARPA (PCA
