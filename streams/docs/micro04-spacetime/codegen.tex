@@ -2,24 +2,44 @@
 \label{sec:codegen}
 In this section we consider low-level code generation for the Raw
 microprocessor. Each Raw tile is an amalgam of the filters that
-execute on it. To 
+execute on it. To generate the execution code for the entire
+application, we traverse the schedule for each phase of computation:
+first the peek initialization stage, then prologue stage, and finally
+the steady-state.  As we traverse each schedule, we generate the
+computation and communication code as we visit each trace.  For the
+initialization and stage stages, we traverse a breadth-first traversal
+of the trace graph to maintain the data-dependencies stipulated by the
+stream graph. For the steady-state we traverse the schedule as
+calculated by the trace scheduling algorithm of Section
+\ref{sec:scheduling}.
 
-As we step through the schedule for each stage of
-execution, we append the communication and computation code to the
-compute and switch processors considering the multiplicity of the
-filter in each stage.
+When we visit a trace, we first generate DRAM requests and
+communication code to gather its input.  Next, we generate
+computation and communication code for each filter of the trace.
+Finally, we generate DRAM requests and communication code to scatter
+its outputs.  The following sections investigates the steps
+in more detail.
 
-Talk about the need for an initialization stage...
+\subsection{Trace Data Reordering}
+Before the first filter of a trace can execute, its single input
+stream must be assembled in the order stipulated by the round-robin
+weights on its incoming channels. To achieve this, the various input
+streams of the traces are collected into the memory module attached to
+the tile to which the first filter of the trace is mapped. Streaming
+DRAM requests are generated to read each input channel and to write
+the final, reassemble input.  Code is generated for the static
+routers, as they enforce the ordering of the final input stream.
 
-* For the initialization and priming stage iteration over the stream
-graph preserving the data-dependencies of the graph.
+After the last filter of a trace executes, its single output stream is
+split into memory ports for recollection into the memory ports of the
+downstream filters (described in the paragraph above). The choice of
+memory port for each {\it intermediate} stream is beyond the scope
+of this paper. Streaming DRAM requests are generated to read
+the output of the last filter and requests generated to write the
+split (and possible duplicated) output to the memory ports assigned to
+the intermediate streams.
 
-* For the steady-state: iterate over the schedule as calculated by the trace scheduling
-algorithm of Section \ref{sec:scheduling}.
-
-* static network!
-
-\subsection{Intra-Trace Code Generation}
+\subsection{Filter Code Generation}
 When we visit a trace in the schedule for each execution phase, we
 iterate over the filters that compose the trace generating 
 communication and computation code necessary to execute the trace.
@@ -28,14 +48,18 @@ communication and computation code necessary to execute the trace.
 For linear traces, we generate parameterized, template assembly code
 for both computation and communication as described in Section
 \ref{sec:linear}.  As for non-linear traces we generate C code that is
-compiled using Raw's GCC 3.3 port.  Each compute processor begins by
-calling the {\tt init} function of all the filters mapped to it.
-Next, it executes the {\tt work} of each filter in the sequence
-determined by the traversal of the schedule of each execution phase.
-The translation of the {\tt init} function, {\tt work} functions, and
-any helper function is, for the large part, straightforward.  Most
-StreamIt expressions have direct analogs in C except for the channel
-expressions {\tt push()}, {\tt peek(index)} and {\tt pop()}.
+compiled using Raw's GCC 3.3 port.  
+
+ADD description!!
+
+Consequently, each compute processor begins by calling the {\tt init}
+function of all the filters mapped to it.  Next, it executes the {\tt
+work} of each filter in the sequence determined by the traversal of
+the schedule of each execution phase.  The translation of the {\tt
+init} function, {\tt work} functions, and any helper function is, for
+the large part, straightforward.  Most StreamIt expression have direct
+analogs in C except for the channel expressions {\tt push()}, {\tt
+peek(index)} and {\tt pop()}.
 
 One major benefit of StreamIt over other streaming languages is that
 the StreamIt compiler is responsible for input buffer management.  The
@@ -45,12 +69,13 @@ buffer's index variable after each execution of the work function.
 Currently, we classify filters as one of three types with respect to
 buffer management: 
 \begin{enumerate}
-\item If a filter does not peek and there does not exist
-control-flow dependent channel expressions, then a buffer is not needed
+\item If a filter $i$ does not contain any {\tt peek} statments, $ii$
+does not contain any control-flow dependent channel expressions, and
+$iii$ has peek rate equals to pop rate, then a buffer is not needed
 and {\tt pop()} statements are translated directly into static network
-receives.  There exists other initialization considerations which are
+receives.  There exist other initialization considerations which are
 beyond the scope of this paper.
-\item If there exists peek statements, but $peek = pop$ then we can
+\item If a filter contains peek statements, but $peek = pop$ then we can
 use a simple linear buffer that is reset after each work function execution.
 \item Otherwise, when $peek > pop$, we use a circular buffer to
 account for the data remaining on the channel after the work function
@@ -60,13 +85,13 @@ Each {\tt push()} statement is translated directly into a static
 network send.  
 
 \subsubsection{Switch Processor}
-The intra-trace computation code is rather simple.  As mentioned in
-Section \ref{sec:traces}, individual traces are limited to pipelines,
-thus we do not have to worry about data-reorganization within a trace.
-While executing a trace a tile receives its data from the
-neighboring tile mapped to its upstream filter and sends data to the
-neighboring tile mapped to its downstream filter.  The end-points of a
-trace send or receive their data to or from off-chip.  We route the
-items off the side of the chip and generate the necessary port
-multiplexing and/or DRAM instructions as described above.
+As mentioned in Section \ref{sec:traces}, individual traces are
+limited to pipelines, thus we do not have to worry about
+
+ADD something here...
+
+The end-points of a trace send or receive their data to or
+from off-chip.  We route the items off the side of the chip and
+generate the necessary port multiplexing and/or DRAM instructions as
+described above.
 

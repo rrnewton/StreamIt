@@ -14,6 +14,10 @@ acceptance, there must exist a high-level, portable programming
 language that can be compiled efficiently to any of the candidate
 targets.  
 
+
+A number of efforts have looked to Stream Programming as an  to
+produce a portable language for wire-exposed archic
+
 Imperative programming languages such as C and FORTRAN served
 von-Neumann machines well.  They abstracted away the idiosyncrasies of
 a machine while encapsulating the common properties (such as a single
@@ -23,26 +27,13 @@ targets that contain multiple instruction streams and distributed
 memory banks, a language such as C is obsolete.  One can
 still produce efficient code for a single wire-exposed target using C,
 but doing so would require either an impossibly smart compiler or the use
-of architecture specific directives.  
-
-%Short description of Streamit 
-In this paper we present a compiler for the StreamIt programming
-language \cite{streamitcc}.  StreamIt is a high-level stream
-programming language that aims to be portable across next-generation
-communication-exposed architectures.  StreamIt contains basic
-constructs that expose the parallelism and communication of streaming
-applications without depending on the topology or granularity of the
-target architecture \cite{streamit-asplos}. In StreamIt the basic unit
-of computation is a {\it filter}, a single-input, single-output block.
-Filters are composed into a communication network using hierarchical,
-structured constructs (introduced below).  A {\it stream graph},
-composed of filters and uni-directional FIFO channels connecting the
-filters, describes the resulting computation. The StreamIt compiler
-currently targets the Raw microprocessor, a tiled architecture with
-fine-grained, programmable communication between processors.
+of architecture specific directives.
+Unlike imperative languages, stream programming natural choice for
+memory banks....
+Two concrete examples of stream languages include streamit, brook
 
 Hitherto, there existed two basic approaches for compiling a
-computation graph to a communication-exposed architecture.  
+stream program to a communication-exposed architecture.  
 {\it Time multiplexing} utilizes the entire chip for each computation unit,
 switching between these units over time.  Time multiplexing's efficacy
 extends from its freedom from having to balance the workload between
@@ -67,16 +58,34 @@ The approach outlined in this paper is to merge the advantages of
 space multiplexing and time multiplexing.  This hybrid approach will
 time multiplex different groups of filters and space multiplex the
 filters within a group.  We call each group a {\it space-time trace}
-or just a {\it trace}.  We show that this technique achieves high
-performance on the Raw microprocessor, providing the flexible load
-balancing of time multiplexing, while preserving the locality and
-latency benefits of space multiplexing.  Furthermore, we can recognize
-traces that can be executed in a fine-grained, systolic fashion.
-Currently, our compiler identifies traces that compute a linear
-function of their inputs and produces parameterized, template assembly
-code for such traces.
+or just a {\it trace}. Each traces can be considered an atomic
+execution unit for scheduling.  Traces can be scheduled using
+techniques traditionally limited to individual instructions in a given
+loop nest (such as software pipelining). Our approach extends these
+techniques to a coarser level of granularity across the whole program.
+This technique provides the flexible load balancing of time
+multiplexing, while preserving the locality and latency benefits of
+space multiplexing.  Furthermore, one can recognize traces that can be
+executed in a fine-grained, systolic fashion.  For example, our
+compiler identifies traces that compute a linear function of their
+inputs and produces parameterized, template assembly code for such
+traces.
 
-Hybrid space-time multiplexing differs from other techniques by...
+%talk bout what I did in streamit
+In this paper we present a compiler for the StreamIt programming
+language \cite{streamitcc}.  StreamIt is a high-level stream
+programming language that aims to be portable across next-generation
+communication-exposed architectures.  StreamIt contains basic
+constructs that expose the parallelism and communication of streaming
+applications without depending on the topology or granularity of the
+target architecture \cite{streamit-asplos}. In StreamIt the basic unit
+of computation is a {\it filter}, a single-input, single-output block.
+Filters are composed into a communication network using hierarchical,
+structured constructs (introduced below).  A {\it stream graph},
+composed of filters and uni-directional FIFO channels connecting the
+filters, describes the resulting computation. The StreamIt compiler
+currently targets the Raw microprocessor, a tiled architecture with
+fine-grained, programmable communication between processors.
 
 Neglecting the irrelevant initial passes, the flow of the compiler is
 as follows.  The compiler reaches the space-time backend with a
