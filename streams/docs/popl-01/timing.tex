@@ -96,7 +96,6 @@ peeked up to $n*pop_A + (peek_A - pop_A)$, and pushed $n*push_A$
 items.  Thus, it can execute $n = \lfloor(x - (peek_A - pop_A)) /
 pop_A)\rfloor$ times, leaving the following expression for
 $\ma{I_A}{O_A}(x)$:
-
 \[
 \begin{array}{l}
 \ma{I_A}{O_A}(x) = \\ \\
@@ -108,14 +107,11 @@ push_A*\left\lfloor\frac{x-(peek_A-pop_A)}{pop_A}\right\rfloor & if & x \ge (pee
 \end{array} \right.
 \end{array}
 \]
-
 By identical reasoning, the reader can verify the following
 expression for $\mi{I_A}{O_A}(x)$:
-
 \begin{align*}
 \mi{I_A}{O_A}(x) = \left\lceil\frac{x}{push_A}\right\rceil*pop+(peek_A-pop_A)
 \end{align*}
-
 \subsubsection{Pipelines}
 
 Let us now derive expressions for $min$ and $max$ in the case of
