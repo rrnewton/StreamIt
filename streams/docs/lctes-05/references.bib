@@ -283,8 +283,15 @@ year="2003"}
   OPTpages = 	 {291-303},
   year = 	 {2002},
   OPTmonth = 	 {October},
-  organization = {ASPLOS},
+  booktitle = {ASPLOS},
 }
+
+@InProceedings(karczma-lctes03,
+  author = "Michal Karczmarek and William Thies and Saman Amarasinghe",
+  title = "Phased Scheduling of Stream Programs",
+  year = {2003},
+  booktitle = "LCTES"
+)
 
 @MastersThesis{karczma-thesis,
   author = 	 {Michael A. Karczmarek},
@@ -401,7 +408,13 @@ year="2003"}
   edition = 	 {first},
 }
 
-
+@misc{wss,
+ title ="Workshop on Streaming Systems",
+ howpublished="{\tt http://www.cag.lcs.mit.edu/wss03/}",
+ url = "{\tt http://www.cag.lcs.mit.edu/wss03/}",
+ year="2003",
+ key="Workshop on Streaming Systems"
+}
 
 @misc{ matlab,
   author = "The MathWorks, Inc.",
@@ -421,6 +434,22 @@ year="2003"}
     url = "citeseer.nj.nec.com/stephens95survey.html"
 }
 
+@InProceedings{sisal,
+  author =       "{J. Gaudiot and W. Bohm and T. DeBoni and J. Feo and P. Mille}",
+  title =        "{The Sisal Model of Functional Programming and its Implementation}",
+  booktitle = {Proc. of the Second Aizu International Symposium on Parallel Algorithms/Architectures Synthesis},
+  year =         {1997},
+  OPTmonth =     {March},
+}
+
+@inproceedings{ benveniste93dataflow,
+    author = "Albert Benveniste and Paul Caspi and Paul Le Guernic and Nicolas Halbwachs",
+    title = "{Data-Flow Synchronous Languages}",
+    booktitle = "{REX} School/Symposium",
+    pages = "1-45",
+    year = "1993",
+    url = "citeseer.nj.nec.com/benveniste93dataflow.html" }
+
 @article{esterel92,
     author = "Gerard Berry and Georges Gonthier",
     title = "{The Esterel Synchronous Programming Language: Design, Semantics, Implementation}",
@@ -436,6 +465,123 @@ year="2003"}
   title = "Homepage of the RIO project",
   howPublished   = "http://www.cag.lcs.mit.edu/rio/",
   url   = "http://www.cag.lcs.mit.edu/rio/"
+}
+
+@InProceedings{Buck04,
+  author = 	 {Ian Buck and Tim Foley and Daniel Horn and Jeremy Sugerman and Kayvon Fatahalian and Mike Houston and Pat Hanrahan},
+  title = 	 {Brook for GPUs: Stream Computing on Graphics Hardware},
+  OPTcrossref =  {},
+  OPTkey = 	 {},
+  booktitle = {SIGGRAPH},
+  OPTpages = 	 {},
+  year = 	 {2004},
+  OPTeditor = 	 {},
+  OPTvolume = 	 {},
+  OPTnumber = 	 {},
+  OPTseries = 	 {},
+  OPTaddress = 	 {},
+  OPTmonth = 	 {},
+  OPTorganization = {},
+  OPTpublisher = {},
+  OPTnote = 	 {},
+  OPTannote = 	 {}
+}
+
+@Book{leesdf,
+  author = {S. S. Bhattacharyya and P. K. Murthy and E. A. Lee},
+  title = "{Software Synthesis from Dataflow Graphs}",
+  publisher = {Kluwer Academic Publishers},
+  isbn = {0-7923-9722-3},
+  year = {1996},
+  url = {http://www.wkap.nl/book.htm/0-7923-9722-3}
+}
+
+@Article{GASAS,
+  author = {Eckart Zitzler and Jurgen Teich and Shuvra S. Bhattacharyya},
+  title = "{Evolutionary Algorithms for the Synthesis of Embedded Software}",
+  journal = "{IEEE Trans. on Very Large Scale Integration (VLSI) Systems}",
+  year = {2000},
+  volume = {8},
+  number = {4},
+  month = {August}
+}
+
+@Article{bhattacharyya99synthesis,
+  author = {S. Bhattacharyya and P. Murthy and E. Lee},
+  title = {Synthesis of embedded software from synchronous dataflow specifications},
+  journal = {Journal of VLSI Signal Processing Systems},
+  year = {1999},
+  volume = {21},
+  number = {2},
+  month = {June},
+}
+
+@InProceedings{GGD94,
+  author =       {R. Govindarajan and G.R. Gao and P. Desai},
+  title =        {Minimizing Memory Requirements in Rate-Optimal Schedules},
+  OPTcrossref =  {},
+  OPTkey =       {},
+  booktitle = {Proceedings of the 1994 Int. conference on Application Specific Array Processors},
+  pages =        {75--86},
+  year =         {1994},
+  OPTeditor =    {},
+  OPTvolume =    {},
+  OPTnumber =    {},
+  OPTseries =    {},
+  OPTaddress =   {},
+  month =        {August},
+  OPTorganization = {},
+  OPTpublisher = {},
+  OPTnote =      {},
+  OPTannote =    {}
+}
+
+@InProceedings{murt1999x3,
+  author = {P. K. Murthy and S. S. Bhattacharyya},
+  title = "{A Buffer Merging Technique for Reducing Memory Requirements of
+  Synchronous Dataflow Specifications}",
+  booktitle = {International Symposium on System Synthesis},
+  year = {1999},
+  OPTmonth = {November},
+  OPTpages = {78--84},
+  OPTaddress = {San Jose, California},
+}
+
+@TechReport{murt2000x2,
+  author = {P. K. Murthy and S. S. Bhattacharyya},
+  title = "{Buffer Merging --- A Powerful Technique for Reducing Memory
+  Requirements of Synchronous Dataflow Specifications}",
+  year = {2000},
+  OPTmonth = {April},
+  institution = {Inst. for Adv. Computer Studies, UMD College Park},
+}
+
+@Article{Bhatta97,
+  author =       {Chuvra S. Bhattacharyya and Praveen K. Murthy and Edward A. Lee},
+  title =        {APGAN and RPMC:  Complementary Heuristics for Translating DSP Block Diagrams into Efficient Software Impelementations},
+  journal =      {Journal of Design Automation for Embededded Systems.},
+  year =         {1997},
+  OPTkey =       {},
+  OPTvolume =    {},
+  OPTnumber =    {},
+  pages =        {33--60},
+  month =        {January},
+  OPTnote =      {},
+  OPTannote =    {}
+}
+
+@TechReport{kohli04,
+  author = 	 {Sanjeev Kohli},
+  title = 	 {Cache Aware Scheduling of Synchronous Dataflow Programs},
+  institution =  {UC Berkeley},
+  year = 	 {2004},
+  OPTkey = 	 {},
+  type = 	 {Master's Report Technical Memorandum},
+  number = 	 {UCB/URL M04/03},
+  OPTaddress = 	 {},
+  OPTmonth = 	 {},
+  OPTnote = 	 {},
+  OPTannote = 	 {}
 }
 
 @InProceedings{dynamo99,
@@ -510,26 +656,6 @@ volume={6}}
   OPTnumber = 	 {},
   OPTaddress = 	 {},
   OPTmonth = 	 {},
-  OPTnote = 	 {},
-  OPTannote = 	 {}
-}
-
-@InProceedings{sisal,
-  author = 	 {J. Gaudiot and W. Bohm and T. DeBoni and J. Feo and P. Mille},
-  title = 	 {The Sisal Model of Functional Programming and its Implementation},
-  OPTcrossref =  {},
-  OPTkey = 	 {},
-  booktitle = {Proceedings of the 2nd Aizu International Symposium on Parallel Algorithms/Architecture Synthesis},
-  OPTOPTpages = 	 {},
-  year = 	 {1997},
-  OPTeditor = 	 {},
-  OPTvolume = 	 {},
-  OPTnumber = 	 {},
-  OPTseries = 	 {},
-  OPTaddress = 	 {},
-  OPTmonth = 	 {},
-  OPTorganization = {},
-  OPTpublisher = {},
   OPTnote = 	 {},
   OPTannote = 	 {}
 }
