@@ -7,15 +7,15 @@ $\sdep$, including latency constraints, debugging, speculation, and
 program analysis, and we look forward to pursuing these directions in
 the future.
 
-Second, this paper employs $\sdep$ to define a powerful language
-construct allowing for precise message delivery between any two nodes
-of a stream graph.  In comparison with other methods to implement
-messaging functionality in a Synchronous Dataflow model, we believe
-that our language construct is more readable, more robust, and easier
-to maintain.  In addition, our implementation of messaging in the
-StreamIt compiler resulted in a 49\% improvement in performance for a
+Second, this paper uses $\sdep$ for teleport messaging: a powerful
+language construct enabling precise message delivery between any two
+nodes of a stream graph.  In comparison with other methods to
+implement messaging functionality in a Synchronous Dataflow model, we
+believe that teleport messaging is more readable, more robust, and
+easier to maintain.  In addition, our implementation of messaging in
+the StreamIt compiler resulted in a 49\% performance improvement for a
 frequency hopping radio running on a cluster of workstations.  We
-achieved this speedup because the messaging construct exposes the true
+achieved this speedup because teleport messaging exposes the true
 dependences to the compiler and allows it to optimize the
 communication.
 

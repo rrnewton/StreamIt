@@ -43,19 +43,19 @@ schedule of the graph at compile time, and substitutes runtime
 conditions to decide which paths are taken.  The performance is nearly
 that of SDF while keeping some flexibility of DDF.  
 
-The messaging system described in this paper shares the motivation of
-BDF, but is different in its approach.  We believe that control
-messages represent a distinct and well-behaved class of dynamic
-communication in which a parameter is ``pushed'' into the receiver
-actor in an asynchronous way.  Because the message handlers do not
-access the input and output tapes of the receiving filter, their
-irregular invocations do not affect the multiplicity of the
-steady-state schedule.  Instead, the schedule is constrained only by
-the latency of control messages; if a message doesn't show up in the
-allotted window, then the receiving actor can go ahead with its
-high-bandwidth schedule.  This is the distinction in the computational
-model.  In addition, the static/dynamic integration offered by our
-system is integrated with language features that support the model.
+Teleport messaging shares the motivation of BDF, but is different in
+its approach.  We believe that control messages represent a distinct
+and well-behaved class of dynamic communication in which a parameter
+is ``pushed'' into the receiver actor in an asynchronous way.  Because
+the message handlers do not access the input and output tapes of the
+receiving filter, their irregular invocations do not affect the
+multiplicity of the steady-state schedule.  Instead, the schedule is
+constrained only by the latency of control messages; if a message
+doesn't show up in the allotted window, then the receiving actor can
+go ahead with its high-bandwidth schedule.  This is the distinction in
+the computational model.  In addition, the static/dynamic integration
+offered by our system is integrated with language features that
+support the model.
 
 There are many domain-specific stream languages in addition to
 StreamIt.  Streams have a long history in the programming languages
@@ -64,8 +64,8 @@ functional languages; see Stephens~\cite{survey97} for a review.
 Languages of recent interest include Occam~\cite{occammanual},
 Sisal~\cite{sisal}, Parallel Haskell~\cite{ph}, StreamC /
 KernelC~\cite{imagine03ieee}, and Spidle~\cite{spidle02}.  The
-principle differences between StreamIt and these languages is $(i)$ the
-single-input, single-output hierarchical structure that StreamIt
+principle differences between StreamIt and these languages is $(i)$
+the single-input, single-output hierarchical structure that StreamIt
 imposes on the stream graph, $(ii)$ StreamIt's support for a ``peek''
-construct that inspects data without consuming it from a channel, and $(iii)$
-the low-bandwidth messaging system described in this paper.
+construct that inspects data without consuming it from a channel, and
+$(iii)$ teleport messaging as described in this paper.

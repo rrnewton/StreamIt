@@ -26,23 +26,22 @@ message invalidating the effects of a given packet has to be delivered
 exactly in sync with the front of the packet itself; otherwise, valid
 data will be lost or invalid data will be allowed to pass.
 
-In the rest of this section, we describe language support for control
-messages that makes use of $\sdep$ to achieve precise delivery timing.
-We first describe the semantics of the language feature, and then we
-compare it against other means of implementing messages for a
-frequency hopping radio application.
+\subsection{Teleport Messaging}
 
-\subsection{Messaging with SDEP}
+Teleport messaging is a language construct that makes use of $\sdep$
+to achieve precise timing of control messages.  It is included as part
+of the StreamIt language~\cite{streamitcc}.  This section describes
+the semantics of teleport messaging; the next section compares it
+against other means of implementing messages for a frequency hopping
+radio application.
 
-The messaging system we describe is included as part of the StreamIt
-language~\cite{streamitcc}.  In StreamIt, there are two distinct kinds
-of communication between filters during steady state execution: 1)
-high-bandwidth dataflow over the FIFO channels in the graph, and 2)
-low-bandwidth messaging between pairs of filters\footnote{Messaging
-is possible whenever there is a downstream path from either filter to
-the other.  Filters running in parallel cannot send messages.}.  In
-order for filter $A$ to send a message to filter $B$, the following
-steps need to be taken:
+In StreamIt, there are two distinct kinds of communication between
+filters during steady state execution: 1) high-bandwidth dataflow over
+the FIFO channels in the graph, and 2) low-bandwidth messaging between
+pairs of filters\footnote{\small Messaging is possible whenever there
+is a downstream path from either filter to the other.  Filters running
+in parallel cannot send messages.}.  In order for filter $A$ to send a
+message to filter $B$, the following steps need to be taken:
 \begin{itemize}
 
 \item $B$ declares a message handler that is invoked when a
@@ -75,17 +74,17 @@ work pop 1 {
 }
 \end{verbatim}}
 This code sends an {\tt increaseGain} message to {\tt portalToB} with
-minimum latency 2 and maximum latency 3:
+minimum latency 2 and maximum latency 3.
 
 \end{itemize}
-The most interesting aspects of the messaging system are the semantics
-for the message latency.  Because there are many legal orderings of actor
-executions, there does not exist a notion of ``global time'' in a stream graph.
-The only common frame of reference between concurrently executing
-actors is the series of data items that is passed between them.  The
-$\sdep$ function captures the data dependences in the graph and
-provides a natural means of defining a rendezvous point between two
-actors.
+The most interesting aspect of teleport messaging are the semantics
+for the message latency.  Because there are many legal orderings of
+actor executions, there does not exist a notion of ``global time'' in
+a stream graph.  The only common frame of reference between
+concurrently executing actors is the series of data items that is
+passed between them.  The $\sdep$ function captures the data
+dependences in the graph and provides a natural means of defining a
+rendezvous point between two actors.
 
 Intuitively, the message semantics can be thought of in terms of
 attaching tags to data items.  If $A$ sends a message to downstream
@@ -93,7 +92,7 @@ filter $B$ with a latency $k$, then this could be implemented by
 tagging the items that $A$ outputs $k$ iterations later.  These tags
 propagate through the stream graph; whenever an actor inputs an item
 that is tagged, all of its subsequent outputs are tagged.  Then, the
-message handler of $B$ is invoked immediately after the first
+message handler of $B$ is invoked immediately before the first
 invocation of $B$ that inputs a tagged item.  In this sense, the
 message has the semantics of traveling ``with the data'' through the
 stream graph, even though it does not have to be implemented this way.
@@ -101,43 +100,43 @@ stream graph, even though it does not have to be implemented this way.
 The intuition for upstream messages is similar.  Consider that $B$ is
 sending a message with latency $k$ to upstream actor $A$ in the stream
 graph.  This means that $A$ will receive the message immediately
-following the last invocation of its work function that produces an
-item affecting the output of $B$'s $k$th firing, counting the current
+before the last invocation of its work function that produces an item
+affecting the output of $B$'s $k$th firing, counting the current
 firing as 0.  As before, we can also think of this in terms of $A$
 tagging items and $B$ observing the tags.  In this case, the latency
 constraint says that $B$ must input a tagged item before it finishes
 $k$ additional executions.  The message is delivered immediately
-following the latest firing in $A$ during which tagging could start
+before the latest firing in $A$ during which tagging could start
 without violating this constraint.
 
 The following definition leverages the $\sdep$ formalism to give a
 precise meaning to message timing.
 
 \begin{definition}(Message delivery)
-Consider that $A$ sends a message to $B$ with latency range
+Consider that $S$ sends a message to receiver $R$ with latency range
 $[k_1:k_2]$ and that the message is sent during the $n$th invocation
-of $A$'s work function.  Then the message handler can be invoked in
-$B$ immediately after its work function has fired ${\cal M}(A, B, k_1,
-k_2, n)$ times, where ${\cal M}$ is constrained as follows.
+of $S$'s work function.  Then the message handler can be invoked in
+$R$ immediately before its work function has fired ${\cal M}(S, R,
+k_1, k_2, n)$ times, where ${\cal M}$ is constrained as follows.
 
 There are two cases\footnote{In a feedback path, both cases might apply.  In this event, we assume the message is being sent upstream.}:
 \begin{enumerate}
 
-\item There is a path in the stream graph from $A$ to $B$.  Then
+\item There is a path in the stream graph from $S$ to $R$.  Then
 ${\cal M}$ obeys the following constraints:
 \[
 \begin{array}{l}
-\sdepf{A}{B}({\cal M}(A, B, k_1, k_2, n)) \ge n+k_1\\
-\sdepf{A}{B}({\cal M}(A, B, k_1, k_2, n)) \le n+k_2
+\sdepf{S}{R}({\cal M}(S, R, k_1, k_2, n)) \ge n+k_1\\
+\sdepf{S}{R}({\cal M}(S, R, k_1, k_2, n)) \le n+k_2
 \end{array}
 \]
 
-\item There is a path in the stream graph from $B$ to $A$.  Then
+\item There is a path in the stream graph from $R$ to $S$.  Then
 ${\cal M}$ obeys the following constraints:
 \[
 \begin{array}{l}
-{\cal M}(A, B, k_1, k_2, n) \ge \sdepf{B}{A}(n + k_1)\\
-{\cal M}(A, B, k_1, k_2, n) \le \sdepf{B}{A}(n + k_2)
+{\cal M}(S, R, k_1, k_2, n) \ge \sdepf{R}{S}(n + k_1)\\
+{\cal M}(S, R, k_1, k_2, n) \le \sdepf{R}{S}(n + k_2)
 \end{array}
 \]
 \end{enumerate}
@@ -184,38 +183,37 @@ the receiver to have executed yet.
 
 \subsection{Case Study}
 
-To illustrate the pros and cons of the messaging system, we
-implemented a spread-spectrum frequency hopping radio
-frontend~\cite{harada02} as shown in Figure~\ref{fig:fhr-streamit}.  A
-frequency hopping radio is one in which the receiver switches between
-a set of known frequencies whenever it detects certain tones from the
-transmitter.  The frequency hopping is a good match for control
-messages because the hopping interval is dynamic (based on on the data
-in the stream); it spans a large section of the stream graph (there is
-an FFT between the demodulator and the hop detector); and it requires
-precise delivery of messages.  The delivery must be precise both to
-meet real-time requirements (as the transceiver will leave the current
-frequency soon), and to ensure that the message falls at a logical
-packet boundary; if the frequency change is out of sync with the FFT
-stage, then the FFT will muddle the spectrum of the old and new
-frequency bands.
+To illustrate the pros and cons of teleport messaging, we implemented
+a spread-spectrum frequency hopping radio frontend~\cite{harada02} as
+shown in Figure~\ref{fig:fhr-streamit}.  A frequency hopping radio is
+one in which the receiver switches between a set of known frequencies
+whenever it detects certain tones from the transmitter.  The frequency
+hopping is a good match for control messages because the hopping
+interval is dynamic (based on on the data in the stream); it spans a
+large section of the stream graph (there is an FFT between the
+demodulator and the hop detector); and it requires precise delivery of
+messages.  The delivery must be precise both to meet real-time
+requirements (as the transceiver will leave the current frequency
+soon), and to ensure that the message falls at a logical packet
+boundary; if the frequency change is out of sync with the Fast Fourier
+Transform (FFT) stage, then the FFT will muddle the spectrum of the
+old and new frequency bands.
 
-A StreamIt version of the radio frontend with language support for
-messaging appears in Figure~\ref{fig:freq1}.  The
-Freq\_Hop-ping\_Radio pipeline creates a portal and adds the RFtoIF
-actor as a receiver.  The portal is passed to the Check\_Freq\_Hop
-stage, where four parallel detectors send messages into the portal if
-they detect a hop to the frequency they are monitoring.  The messages
-are sent with a small latency of 4 to ensure a timely transition.  To
-make sense of the latency, note that $\sdepf{RFtoIF}{D}(n) = 64*n$ for
-each of the detector actors $D$.  This comes about because the FFT
-stage consumes and produces 64 items; each detector fires once per set
-of outputs from the FFT, but RFtoIF fires 64 times to fill the FFT
-input.  Because of this $\sdep$ relationship, messages sent from the
-detectors to RFtoIF are guaranteed to arrive only at iterations that
-are a multiple of 64.  This satisfies the design criterion that a
-given FFT stage will not operate on data that was demodulated at two
-separate frequencies.
+A StreamIt version of the radio frontend with teleport messaging
+appears in Figure~\ref{fig:freq1}.  The Freq\_Hop-ping\_Radio pipeline
+creates a portal and adds the RFtoIF actor as a receiver.  The portal
+is passed to the Check\_Freq\_Hop stage, where four parallel detectors
+send messages into the portal if they detect a hop to the frequency
+they are monitoring.  The messages are sent with a latency of 4 to
+ensure a timely transition.  To make sense of the latency, note that
+$\sdepf{RFtoIF}{D}(n) = 64*n$ for each of the detector actors $D$.
+This comes about because the FFT stage consumes and produces 64 items;
+each detector fires once per set of outputs from the FFT, but RFtoIF
+fires 64 times to fill the FFT input.  Because of this $\sdep$
+relationship, messages sent from the detectors to RFtoIF are
+guaranteed to arrive only at iterations that are a multiple of 64.
+This satisfies the design criterion that a given FFT stage will not
+operate on data that was demodulated at two separate frequencies.
 
 Another version of the frequency hopping radio appears in
 Figures~\ref{fig:fhr-manual} and~\ref{fig:freq2}.  This version is
@@ -247,49 +245,47 @@ and for reliability / predictability of software.
 \vspace{12pt}
 \subsection{Discussion}
 
-We believe that the StreamIt messaging system offers several benefits
-compared to a manual implementation of equivalent functionality.
-While embedding messages in the data stream is equally precise, this
-involves several tedious and error-prone changes, not only to the
-stream graph but also to the steady state execution code within the
-actors.  In particular, the manual derivation of the loop delay,
-adjustment of the actor I/O rates, and implicit interleaving of data
-items with control messages has a negative impact on the readability
-and maintainability of the code.  The messaging construct in StreamIt
-provides the same level of precision, but with the simplicity of a
-method call.
+We believe that teleport messaging offers several benefits compared to
+a manual implementation of equivalent functionality.  While embedding
+messages in the data stream is equally precise, this involves several
+tedious and error-prone changes, not only to the stream graph but also
+to the steady state execution code within the actors.  In particular,
+the manual derivation of the loop delay, adjustment of the actor I/O
+rates, and implicit interleaving of data items with control messages
+has a negative impact on the readability and maintainability of the
+code.  Teleport messaging provides the same level of precision, but
+with the simplicity of a method call.
 
-The messaging construct also has advantages from a compiler
-standpoint.  By separating the data-intensive code from the
-control-oriented code, the common case of the steady state actor
-execution is not sacrificed for the uncommon case of message
-processing.  There are no ``dummy items'' serving as placeholders in
-the static-rate channels.  In addition, by exposing the message
-latency as part of the language, the compiler can infer the true
-dependences between filter firings and reorder the execution so long
-as the message constraints are respected.  The actual message delivery
-can be implemented in the most efficient way for the given
-architecture.
+Teleport messaging also has advantages from a compiler standpoint.  By
+separating the data-intensive code from the control-oriented code, the
+common case of the steady state actor execution is not sacrificed for
+the uncommon case of message processing.  There are no ``dummy items''
+serving as placeholders in the static-rate channels.  In addition, by
+exposing the message latency as part of the language, the compiler can
+infer the true dependences between filter firings and reorder the
+execution so long as the message constraints are respected.  The
+actual message delivery can be implemented in the most efficient way
+for the given architecture.
 
-A final benefit of the messaging system is the clean interface
-provided by the portals.  Since a portal can have multiple receivers,
-it is straightforward to send a message that is delivered
-synchronously to two actors in parallel streams.  For example,
-consider a vocoder that is separately manipulating the magnitude and
-phase components of a signal.  If something triggers an adjustment to
-the speech transformation ({\it e.g.,} the speaker requests a change
-of pitch) then the mask needs to be updated at the same data-relative
-time in both parallel streams.  A portal that contains both components
-seamlessly provides this functionality.  Finally, portals are useful
-as an external programming interface; an application can export a
-portal based on an interface type without exposing the underlying
-actor implementation.
+A final benefit of teleport messaging is the clean interface provided
+by the portals.  Since a portal can have multiple receivers, it is
+straightforward to send a message that is delivered synchronously to
+two actors in parallel streams.  For example, consider a vocoder (an
+encoder for voice signals) that is separately manipulating the
+magnitude and phase components of a signal.  If something triggers an
+adjustment to the speech transformation ({\it e.g.,} the speaker
+requests a change of pitch) then the mask needs to be updated at the
+same time relative to data in both parallel streams.  A portal that
+contains both components seamlessly provides this functionality.
+Finally, portals are useful as an external programming interface; an
+application can export a portal based on an interface type without
+exposing the underlying actor implementation.
 
 \input{code-examples}
 
 \subsection{Experimental Evaluation of Messaging}
 
-In order to evaluate our messaging methodology, we compile the two
+In order to evaluate teleport messaging, we compile the two
 implementations of the frequency hopping radio into a set of
 threads. The message-based implementation is compiled into 28 threads,
 whereas the alternate version---relying on a feedback-loop for
@@ -300,16 +296,16 @@ consists of sixteen 750Mhz Pentium~III workstations, each with a
 256~Kb cache.  The machines are interconnected using a fully switched
 high speed network, and the threads are allowed to communicate via
 dedicated channels. Specifically, every channel in the stream graph is
-assigned a unique TCP/IP connections for the exchange of data and
+assigned a unique TCP/IP connection for the exchange of data and
 messages between actors.
 
 In order to perform the thread-to-machine allocation, our {\it
-clustering} backend, part of the StreamIt
-compiler infrastructure~\cite{streamit-asplos}, applies a partitioning
-algorithm~\cite{thies-msp} to reduce the overall application
-bottleneck while maximizing the throughput of the output filter in the
-stream dependence graph. For the purpose of this paper, throughput is
-defined as the number of outputs produced per unit of time.
+clustering} backend, part of the StreamIt compiler
+infrastructure~\cite{streamit-asplos}, applies a partitioning
+algorithm to reduce the overall application bottleneck while
+maximizing the throughput of the output filter in the stream
+dependence graph. For the purpose of this paper, throughput is defined
+as the number of outputs produced per unit of time.
 
 \begin{figure}[t]
 \psfig{figure=throughput-graph.eps,width=3.3in}
@@ -339,7 +335,7 @@ potential applications below.
 
 \subsection{Specifying Latency Constraints}
 
-The latency range included in the messaging construct can be directly
+The latency range included in teleport messaging can be directly
 employed as a declarative way to specify latency constraints between
 actors.  For instance, our infrastructure can interpret a directive
 such as $\mt{maxLatency}(A, B, k)$ to indicate a maximum latency of
@@ -368,11 +364,11 @@ While the graph-level control flow in Synchronous Dataflow is known at
 compile time, there could be unpredictable control flow within the
 work function of each actor, and a compiler could attempt to improve
 performance by speculatively executing a given path.  However, if the
-prediction failed, the results of the speculation might have passed
-outside the boundaries of the actor and on to other actors in the
-graph.  In this case, $\sdep$ provides an exact count of how many
-iterations the downstream actors should roll back in order to arrive
-at the original state.
+prediction fails, the results of the speculation might pass outside
+the boundaries of the actor and on to other actors in the graph.  In
+this case, $\sdep$ provides an exact count of how many iterations the
+downstream actors should roll back in order to arrive at the original
+state.
 
 \subsection{Program Transformation}
 
