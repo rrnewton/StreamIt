@@ -1,0 +1,114 @@
+NOTE: This is not really a tex file, but we'll probably edit this file until 
+it becomes a real tex chapter, so I decided to just give it a tex extension..
+
+This document describes my thoughts on scheduling with minimum buffer sizes.
+Since our system is unlikely to be taking advantage of buffer sharing in the 
+near future, I'll disregard that possibility here.  Also, since I do not have 
+any information about how much space each piece of data in a buffer takes up, 
+I'll be simply counting the number of data in buffers.
+
+Also, I'm skipping explanation of the simple scheduling stuff.  I can add that
+quite quickly if necessary.
+
+I want to define an execution of a split as consuming exactly one element, and
+execution of the join as producing exactly one element. (unless the
+corresponding stream doesn't produce/consume any data, then it should not
+do anything on a particular execution)
+
+\section{Scheduling and Buffering}
+
+Depending on the scheduling technique, the amount of buffering required in a 
+given application varies.  The simple schedule (NOTE:probably discussed above?) 
+causes the buffers to grow between different stream components.  Aside from
+growing the amount of space necessary to store all the intermediate data,
+this has the undesired side effect of making some feedback loop unschedulable
+with this technique (although they are schedulable in general).  (NOTE:we might
+want to stick an example here).  The reason for this is that buffering
+introduces delay into the data processing, and a component of a loop might
+artificially grow its delay beyond what is provided by the \delay setting of 
+a feedback loop.  Finite delays in feedback loops are the only structures
+that may cause difficulties in producing valid schedules using the simple
+scheduling technique.
+
+\subsection{Fine Grained Scheduling}
+
+A technique that allows for more fine grained scheduling is required to
+ensure that all schedulable streams be scheduled without trouble.  Such a
+schedule would still process the same amount of data as the simple schedule,
+but it would use a more fine-grained interleaving of execution of stream
+operators in order to assure that data doesn't buffer up anywhere.
+An example of such a schedule would be a pull-method schedule: each of the
+sinks is executed an appropriate number of times (matching the steady schedule
+number of executions), with each upstream operator providing only as much 
+data as necessary to execute its immediate downstream consumer requires 
+for its single execution.
+
+A pull-method schedule does have one undesirable side-effect of growing the
+schedule to be quite large.  This section describes a technique that allows
+us to effectively reduce the size of the schedule, while still maintaining
+the pull-method ordering of execution of the program.  The technique 
+basically mimics a pull-model schedule computation, but on a more
+hierarchical level.
+
+(NOTE:I ignore initialization almost completely here)
+
+\subsubsection{Setup}
+
+Each stream component calculates a cyclic schedule for itself.  Unlike the
+simple schedule, this schedule consists of multiple phases.  Each phase has
+the property that it executes the last producer in the stream exactly once.
+It may, however, execute the first consumer in the stream more than once
+or not at all.  Higher-level streams use their children's cyclic schedules 
+to construct their own cyclic schedules.  Each stream computes a schedule 
+the size of its minimal steady execution schedule.
+
+\subsubsection{Filters}
+
+A cyclic schedule for a filter is quite simple - it has a single phase,
+which is a single execution of the filter.
+
+\subsubsection{Pipelines}
+
+A schedule for a pipeline is also quite simple to compute.  The
+computation starts with knowledge of how much data has been buffered
+between each component of the pipeline during initialization.  The
+computation proceeds from bottom of the pipeline going upwards, and each
+child phase schedule is inserted at the beggining of the current pipeline
+phase schedule.  This means that the phase schedule is being constructed
+from the end towards the beggining.
+
+A single execution of the last component of the pipeline is inserted into
+the phase schedule.  Depending on amount of data this component consumed
+and amount of data the next upstream component produces per its phase
+schedule, an appropriate number of upstream component's phase schedules is
+inserted into the pipeline's phase schedule.  This process continues until
+either no data is consumed by a given component in its execution(s), or
+there is no more upstream pipeline components.
+
+This produces a single phase of the cyclic schedule.  It is repeated until
+enough cyclic schedules are computed for an entire steady execution
+schedule.
+
+\subsection{SplitJoins}
+
+Scheduling of SplitJoins is also quite simple.  Following the pull-model
+of scheduling, the join is executed once, the child stream that provides
+the data for the join is executed an appropriate number of times as
+necessary, and the split is executed enough times to provide sufficient data
+for that stream.  If this produced a piece of data from the join, a single
+phase of the cyclic schedule is complete.  If not, the process is
+repeated, until the join does produce some data (this is necessary if the
+join contains a sink).
+
+This scheduling technique has the property that it can grow the buffers
+(and thus the data delay) between the split and the streams following
+them.  While different scheduling techniques can move the location of the
+buffering of data, it is not possible to eliminate it altogether - it is
+inherent in the structure of the graph.
+
+\subsection{Feedback Loops}
+
+Feedback loops are scheduled in a way very similar to SplitJoins.  The big
+difference is that the buffering (delay) of data is not very dependent on
+the order of scheduling.
+
