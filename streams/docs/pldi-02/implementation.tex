@@ -78,6 +78,18 @@ GSM Decoder & 3050 & 11 & 21 \\
 [add performance table, number of lines of benchmarks?, discussion]
 
 
+To evaluate the performace of our compiler, we compare the StreamIt implementation
+to two other implementations of the applications.  To facilitate
+comparison 
+
+The performance of the compiled code for the above applications is
+
+
+For the GSM
+application, we obtained a hand-coded implementation for comparis 
+given in Table \ref{tab:performance}.  We compare the StreamIt 
+
+
 
 \begin{table}[t]
 \begin{center}
@@ -87,13 +99,13 @@ GSM Decoder & 3050 & 11 & 21 \\
 \hline 
 Benchmark & Baseline & Fusion & Spectra & C \\
 \hline \hline
-PCA Demo & & & 1.7 &\\
+PCA Demo & 1.3 & & 3.4 & N/A\\
 \hline
-FM Radio & & & 9.9&\\
+FM Radio & 5.9 & & 9.9 & N/A\\
 \hline
-perftest4 & & & 320&\\
+perftest4 & 950 & & 320& N/A\\
 \hline
-GSM Decoder  & & & &\\
+GSM Decoder & & & N/A & \\
 \hline
 \end{tabular}
 \vspace{-6pt}
