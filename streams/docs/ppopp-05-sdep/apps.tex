@@ -190,7 +190,7 @@ messages because the hopping interval is dynamic (based on on the data
 in the stream); it spans a large section of the stream graph (there is
 an FFT between the demodulator and the hop detector); and it requires
 precise delivery of messages.  The delivery must be precise both to
-meet real-time requirements (as the tranceiver will leave the current
+meet real-time requirements (as the transceiver will leave the current
 frequency soon), and to ensure that the message falls at a logical
 packet boundary; if the frequency change is out of sync with the FFT
 stage, then the FFT will muddle the spectrum of the old and new
@@ -272,7 +272,7 @@ provided by the portals.  Since a portal can have multiple receivers,
 it is straightforward to send a message that is delivered
 synchronously to two actors in parallel streams.  For example,
 consider a vocoder that is separately manipulating the magnitude and
-phase components of a signal.  If something triggers an adjusment to
+phase components of a signal.  If something triggers an adjustment to
 the speech transformation ({\it e.g.,} the speaker requests a change
 of pitch) then the mask needs to be updated at the same data-relative
 time in both parallel streams.  A portal that contains both components
@@ -286,7 +286,7 @@ actor implementation.
 \psfig{figure=fhr-streamit.eps,width=3.5in}
 \caption{\small Stream graph of frequency-hopping radio with language
 support for messaging.  A messaging portal delivers point-to-point
-latency-constrained messsages from the detectors to the RFtoIF stage.
+latency-constrained messages from the detectors to the RFtoIF stage.
 \protect\label{fig:fhr-streamit}}
 \end{figure}
 
@@ -457,10 +457,10 @@ marked with an asterisk. \protect\label{fig:freq2}}
 \subsection{Experimental Evaluation of Messaging}
 
 In order  to evaluate  our messaging methodology,  we compile  the two
-implemenations      of      the      frequency      hopping      radio
+implementations      of      the      frequency      hopping      radio
 (Figures~\ref{}~and~\ref{}) into  a set of  threads. The message-based
 implementation  is compiled  into  28 threads,  whereas the  alternate
-version---relying on a feedback-loop for notificaition---results in 32
+version---relying on a feedback-loop for notification---results in 32
 threads.  Each  thread implements a  specific component of  the stream
 graph  (e.g., filter)  and is  allocated to  a specific  machine  in a
 networked computing  cluster.  The cluster consists  of sixteen 750Mhz
@@ -491,7 +491,7 @@ two applications along the $y$-axis.  Each data point corresponds to a
 specific allocation  of the  threads to the  number of  clusters shown
 along the $x$-axis.   Note that due to the  limited parallelism in the
 two implementations of the  frequency hopper, increasing the number of
-clusters beyond five workstations leads to negligle gains with respect
+clusters beyond five workstations leads to negligible gains with respect
 to throughput.   Nonetheless, the use of messaging  achieves a maximal
 throughput   that   is    49.8\%   better   than   its   feedback-loop
 counterpart. Furthermore, a detailed analysis of the results indicates
