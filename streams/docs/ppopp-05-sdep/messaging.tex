@@ -137,7 +137,7 @@ of $S$'s work function.  Then the message handler can be invoked in
 $R$ immediately before its work function has fired ${\cal M}(S, R,
 k_1, k_2, n)$ times, where ${\cal M}$ is constrained as follows.
 
-There are two cases\footnote{In a feedback path, both cases might apply.  In this event, we assume the message is being sent upstream.}:
+There are two cases\footnote{\small In a feedback path, both cases might apply.  In this event, we assume the message is being sent upstream.}:
 \begin{enumerate}
 
 \item There is a path in the stream graph from $S$ to $R$.  Then
@@ -184,13 +184,13 @@ as the sender has not yet produced the data that is synchronized with
 the message.
 
 Calculating a legal sequence of actor firings that respects all of the
-message constraints is an interesting problem.  In the case where
-there are no overlapping constraints (i.e., two sender/receiver pairs
-that span overlapping intervals of the stream graph), a simple
-modification to pull scheduling suffices to satisfy the constraints.
-First, note that a pull schedule will always satisfy constraints
-imposed by upstream messages; because upstream (receiving) actors
-execute as little as possible per execution of the downstream
+message constraints in a stream graph is an interesting problem.  In
+the case where there are no overlapping constraints (i.e., two
+sender/receiver pairs do not span overlapping intervals of the stream
+graph), a simple modification to pull scheduling suffices to satisfy
+the constraints.  First, note that a pull schedule will always satisfy
+constraints imposed by upstream messages; because upstream (receiving)
+actors execute as little as possible per execution of the downstream
 (sending) actor, a message can be forwarded to the receiver
 immediately after sending.  The receiver can then store the message
 and process it at the appropriate iteration.  For downstream messages,
@@ -209,11 +209,11 @@ choose to prohibit overlapping constraints altogether.  A discussion
 of the issues involved appears in a thesis~\cite{karczma-thesis} by
 one of the authors.
 
-As described in~\ref{sec:evaluation}, our compiler uses a simple
-implementation of messaging in which each sender or receiver executes
-in its own thread and waits for possible messages at appropriate
-iterations.  This approach eludes the need to produce a serial
-ordering of the actors at compile time.
+As described in Section~\ref{sec:evaluation}, our compiler uses a
+simple implementation of messaging in which each sender or receiver
+executes in its own thread and waits for possible messages at
+appropriate iterations.  This approach eludes the need to produce a
+serial ordering of the actors at compile time.
 
 %\input{constrained}
 
