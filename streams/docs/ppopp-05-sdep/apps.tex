@@ -452,6 +452,51 @@ marked with an asterisk. \protect\label{fig:freq2}}
 \end{figure}
 \clearpage
 
+\subsection{Experimental Evaluation of Messaging}
+
+In order  to evaluate  our messaging methodology,  we compile  the two
+implemenations      of      the      frequency      hopping      radio
+(Figures~\ref{}~and~\ref{}) into  a set of  threads. The message-based
+implementation  is compiled  into  28 threads,  whereas the  alternate
+version---relying on a feedback-loop for notificaition---results in 32
+threads.  Each  thread implements a  specific component of  the stream
+graph  (e.g., filter)  and is  allocated to  a specific  machine  in a
+networked computing  cluster.  The cluster consists  of sixteen 750Mhz
+Pentium~III workstations, each with  a 256~Kb cache.  The machines are
+interconnected  using a  fully switched  high speed  network,  and the
+threads     are    allowed     to     communicate    via     dedicated
+channels. Specifically, every channel  in the stream graph is assigned
+a  unique TCP/IP  connections for  the exchange  of data  and messages
+between actors.
+
+In  order  to  perform  the  thread-to-machine  allocation,  our  {\it
+clustering}       backend,       part       of      the       StreamIt
+compiler~\cite{streamit-compiler}     infrastructure,     applies    a
+partitioning   algorithm~\cite{thies-msp}   to   reduce  the   overall
+application bottleneck  while maximizing the throughput  of the output
+filter in the stream dependence  graph. For the purpose of this paper,
+throughput is  defined as the number  of outputs produced  per unit of
+time.
+
+\begin{figure}[t]
+\psfig{figure=throughput-graph.eps,width=3.5in}
+\caption{\small Throughput as a function of the number of clusters for
+the two implementations of the frequency hopping radio..
+\protect\label{fig:fhr-throughput}}
+\end{figure}
+
+In Figure~\ref{fig:fhr-throughput},  we report the  throughput for the
+two applications along the $y$-axis.  Each data point corresponds to a
+specific allocation  of the  threads to the  number of  clusters shown
+along the $x$-axis.   Note that due to the  limited parallelism in the
+two implementations of the  frequency hopper, increasing the number of
+clusters beyond five workstations leads to negligle gains with respect
+to throughput.   Nonetheless, the use of messaging  achieves a maximal
+throughput   that   is    49.8\%   better   than   its   feedback-loop
+counterpart. Furthermore, a detailed analysis of the results indicates
+a 35\%  reduction in  the total communication  when messaging  is used
+instead of a continuous feedback-loop.
+
 \section{Other SDEP Applications}
 
 We believe that there are many interesting applications for $\sdep$ in
