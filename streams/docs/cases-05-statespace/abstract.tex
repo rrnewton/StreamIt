@@ -1,0 +1,23 @@
+Digital Signal Processing (DSP) is becoming increasingly widespread in
+portable devices. Due to harsh constraints on power, latency, and
+throughput in embedded environments, developers often appeal to signal
+processing experts to hand-optimize algorithmic aspects of the
+application.  However, such DSP optimizations are tedious,
+error-prone, and very expensive, as they require sophisticated
+domain-specific knowledge.
+
+We present a general model for automatically representing and
+optimizing a large class of signal processing applications. The model
+is based on linear state space systems. A program is viewed as a set
+of filters, each of which has an input stream, an output stream, and a
+set of internal states. At each time step, the filter produces some
+outputs that are a linear combination of the inputs and the state
+values; the state values are also updated in a linear
+fashion. Examples of linear state space filters include IIR filters
+and linear difference equations.
+
+Using the state space representation, we describe a novel set of
+program transformations, including combination of adjacent filters,
+elimination of redundant states and minimal parameterization of the
+system. We have implemented the optimizations in the StreamIt compiler
+and demonstrate performance gains over previous techniques.

@@ -1,0 +1,67 @@
+\documentclass[11pt,twoside]{article}
+
+\usepackage{lgrind}
+\usepackage{fullpage}
+\usepackage{doublespace}
+\usepackage{epsfig}
+
+%\title{Optimizing Stream Programs \\ Using a Linear State Space Representation}
+%\title{A Linear State Space Representation \\ for Optimizing Stream Programs}
+\title{Domain-Specific Optimization of Stream Programs \\ Using a Linear State Space Representation}
+
+%% \author{Sitij Agrawal, William Thies, Rodric M. Rabbah, and Saman Amarasinghe \\
+%%   MIT Computer Science and Artificial Intelligence Laboratory \\
+%%   Cambridge, MA  02139\\ \\
+%%   \sffamily{\{sitij, thies, rabbah, saman\}@csail.mit.edu}}
+
+% don't include the date
+\date{}
+
+% this is the line spacing
+\setstretch{2}
+
+% \sloppy lets Latex be a little less anal about interword spacing.  It is
+% one way to eliminate those annoying Overfull hbox warnings.
+% Another way is to surround each offending paragraph with
+% \begin{sloppypar} ... \end{sloppypar}
+
+%\sloppy
+
+% See page 90 of the Latex book for info about vertical spacing probs.
+
+\begin{document}
+
+  \newcommand{\subsubsubsection}[1]{\medskip\noindent{\bf #1}\\\smallskip}
+  \newcommand{\mt}[1]{\mbox{\it #1}}
+  \newcommand{\todo}[1]{\framebox{#1}}
+
+  %\toappear{\centerline{\Large\bf MIT LCS Technical Memo,}
+  %          \centerline{\Large\bf MIT-LCS-TM-6XX,}
+  %          \centerline{\Large\bf November, 2001.}}
+  
+  \begin{singlespace}
+    \maketitle
+    \begin{abstract}
+      \input{abstract}
+    \end{abstract}
+  \end{singlespace}
+  
+  \advance\topmargin by -0.35in      % Correct for LaTeX gratuitousness
+
+  \input{intro}
+  \input{background}
+  \input{statespace}
+  \input{optimization}
+  \input{results}
+  \input{related}
+  \input{conclusion}
+  %\input{apps}
+
+  \begin{small}
+    \begin{singlespace}
+      \bibliographystyle{abbrv}
+      \bibliography{main}
+    \end{singlespace}
+  \end{small}
+  
+\end{document}
