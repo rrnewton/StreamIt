@@ -145,7 +145,7 @@ any number of neighboring linear nodes.
 \begin{transformation} (Pipeline combination)
 Given two linear nodes $\lambda_1$ and $\lambda_2$ where the output of
 $\lambda_1$ is connected to the input of $\lambda_2$ in a pipeline
-construct, the combination $\mbox{\bf pipe}(\lambda_1, \lambda_2)$ $=$
+construct, the combination $\mbox{\bf pipeline}(\lambda_1, \lambda_2)$ $=$
 $\{\mathbf{A}', \vec{\mathbf{b}}', \mathbf{e}', \mathbf{o}', \mathbf{u}'\}$ 
 represents an equivalent node that
 can replace the original two.  Its components are as follows:
@@ -214,9 +214,10 @@ However, it is the case that some collapsed linear nodes are always
 less efficient than the original pipeline sequence.  The worst case is
 when $A_1^e$ is a column vector and $A_2^e$ is a row vector, which
 requires $O(N)$ operations originally but $O(N^2)$ operations if
-combined (assuming vectors of length $N$).  In general, the
-compiler detects performance-degrading combinations by use of the
-automatic partitioning algorithm in Section~\ref{sec:partitioning}. 
+combined (assuming vectors of length $N$).  To avoid such
+performance-degrading combinations, we employ an automated selection
+algorithm that only performs beneficial transformations (see
+Section~\ref{sec:partitioning}).
 
 \begin{figure}[t]
 \center
@@ -350,10 +351,10 @@ caused shorter matrices to be padded with rows of zero's at the top.
 
 The final phase of the transformation is to re-arrange the columns of
 the child matrices into the columns of $A'$ and $\vec{b}'$ such that
-the order of the columns of $A$ generates the correct output value order.
-Figure~\ref{fig:splitjoin-duplicate-matrix} elucidates the column ordering.
-%though its notation is somewhat cumbersome.  
-The equation can be understood as follows: for the $k$th child and the
+the order of the columns of $A$ generates the correct output value
+order.  Though the equation is somewhat cumbersome, the concept is
+simple (see Figure~\ref{fig:splitjoin-duplicate-matrix}).  The
+equation can be understood as follows: for the $k$th child and the
 $m$th cycle of the joiner, the $n$th item that is pushed by child $k$
 will appear at a certain location on the joiner's output tape.  This
 location (relative to the start of the node's execution) is $n + m *
@@ -378,10 +379,10 @@ expanded streams; otherwise, some outputs of the splitter would
 accumulate infinitely on the input channel of some stream.  
 
 These input and output rates---in combination with the values of $A'$
-and ${\vec b}'$---define a linear node that exactly represents
-the parallel combination of child nodes that are fed by a duplicate
-splitter. Figure~\ref{fig:example-splitjoin-combination} illustrates
-the combination and collapse of a linear splitjoin. 
+and ${\vec b}'$---define a linear node that exactly represents the
+parallel combination of child nodes that are fed by a duplicate
+splitter. Figure~\ref{fig:example-splitjoin-combination} provides an
+example of linear splitjoin combination.
 
 \begin{figure}[t]
 \center
@@ -450,13 +451,13 @@ are computed as follows:
 	\right.
       \end{array}
     \end{equation}}} \\
-\mathbf{\lambda_k'} & = & \mt{pipe}(\mt{decimate}[k], \lambda_k)
+\mathbf{\lambda_k'} & = & \mt{pipeline}(\mt{decimate}[k], \lambda_k)
 \end{array}
 \end{equation}
 \end{transformation}
 
 In the above translation, we utilize the linear pipeline combinator
-$\mt{pipe}$ to construct each new child node $\lambda_i^e$ as a
+$\mt{pipeline}$ to construct each new child node $\lambda_i^e$ as a
 composition of a decimator and the original node $\lambda_i$.  Each
 decimator is a square matrix that produces and consumes $\mt{vTot}$
 items, which is the number of items processed in one cycle of the

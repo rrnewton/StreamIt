@@ -73,8 +73,8 @@ the frequency domain in order to optimize computationally intensive
 linear nodes.
 \vspace{-6pt}
 
-\item An automated selection algorithm that optimally determines 
-which optimizations to apply to which sections of a program.
+\item An optimization selection algorithm that automatically
+determines which transformations are most beneficial to apply.
 \vspace{-6pt}
 
 \item An implementation of the above techniques in the StreamIt
@@ -95,7 +95,7 @@ present results (Section~\ref{sec:results}), related work
 (Section~\ref{sec:related}) and conclusions
 (Section~\ref{sec:conclusion}).
 
-\subsection{Illustrating Example}
+\subsection{Motivating Example}
 \begin{figure}[t]
 \vspace{-6pt}
 \center
@@ -106,6 +106,34 @@ present results (Section~\ref{sec:results}), related work
 \label{fig:motivating-fig}
 \scriptsize
 \begin{verbatim}
+/* perform two consecutive FIR filters with weights w1, w2 */
+void two_filters(float* w1, float* w2, int N) {
+  int i;
+  float data[N];         /* input data buffer */
+  float buffer[N];       /* inter-filter buffer */
+  
+  for (i=0; i<N; i++) {  /* initialize the input data buffer */
+    data[i] = get_next_input();
+  }
+  
+  for (i=0; i<N; i++) {  /* initialize inter-filter buffer */
+    buffer[i] = filter(w1, data, i, N);
+    data[i] = get_next_input();
+  }
+  
+  i = 0;
+  while(true) {
+    /* generate next output item */
+    push_output(filter(w2, buffer, i, N));
+    /* generate the next element in the inter-filter buffer */
+    buffer[i] = filter(w1, data, i, N);
+    /* get next data item */
+    data[i] = get_next_input();
+    /* update current start of buffer */
+    i = (i+1)%N;
+  }
+}
+
 /* perform N-element FIR filter with weights and data */
 float filter(float* weights, float* data, int pos, int N) {
   int i;
@@ -117,33 +145,6 @@ float filter(float* weights, float* data, int pos, int N) {
     pos = (pos+1)%N;
   }
   return sum;
-}
-
-void main() {
-  int i;
-  float data[N];         /* input data buffer */
-  float buffer[N];       /* inter-filter buffer */
-  
-  for (i=0; i<N; i++) {  /* initialize the input data buffer */
-    data[i] = get_next_input();
-  }
-  
-  for (i=0; i<N; i++) {  /* initialize inter-filter buffer */
-    buffer[i] = filter(weights1, data, i, N);
-    data[i] = get_next_input();
-  }
-  
-  i = 0;
-  while(true) {
-    /* generate next output item */
-    push_output(filter(weights2, buffer, i, N));
-    /* generate the next element in the inter-filter buffer */
-    buffer[i] = filter(weights1, data, i, N);
-    /* get next data item */
-    data[i] = get_next_input();
-    /* update current start of buffer */
-    i = (i+1)%N;
-  }
 }
 \end{verbatim}
 \vspace{-18pt}
@@ -157,9 +158,9 @@ as circular buffers, and the scheduling is done by hand.
 \vspace{-6pt}
 \scriptsize
 \begin{verbatim}
-float->float pipeline TwoPipe {
-  add FIRFilter(weights1);
-  add FIRFilter(weights2);
+float->float pipeline TwoFilters(float[N] w1, float[N] w2) {
+  add FIRFilter(w1);
+  add FIRFilter(w2);
 }
 
 float->float filter FIRFilter(float[N] weights) {
@@ -177,11 +178,10 @@ float->float filter FIRFilter(float[N] weights) {
 \caption{Two consecutive FIR filters in StreamIt.  Buffer management
 and scheduling are handled by the compiler.\protect\label{fig:example-streamit}}
 \begin{verbatim}
-float->float filter CollapsedTwoPipe() {
+float->float filter CollapsedTwoFilters(float[N] w1, float[N] w2) {
   float[N] combined_weights;
 
-  init {  /* calculate combined_weights as 
-             combination of weights1 and weights2 */ }
+  init {  /* calculate combined_weights from w1 and w2 */  }
 
   work push 1 pop 1 peek N {
     float sum = 0;
@@ -197,7 +197,7 @@ float->float filter CollapsedTwoPipe() {
 \caption{Combined version of the two FIR filters.  Since each FIR
 filter is linear, the weights can be combined into a single {\tt
 combined\_weights} array.\protect\label{fig:example-combine}}
-%% float->float filter FreqTwoPipe() {
+%% float->float filter FreqTwoFilters() {
 %%   complex[N] H;
 %%   init {
 %%     H = FFT(combined_weights);
@@ -210,12 +210,12 @@ combined\_weights} array.\protect\label{fig:example-combine}}
 %%   }
 %% }
 \begin{verbatim}
-float->float pipeline FreqTwoPipe(int L) {
-  float[N] combined_weights = ... ;     // calc. combined weights 
-  complex[N] H = fft(combined_weights); // take FFT of weights     
-  add FFT(N+L);                         // add FFT stage to stream 
-  add ElementMultiply(H);               // add multiplication by H 
-  add IFFT(N+L);                        // add inverse FFT         
+float->float pipeline FreqTwoFilters(float[N] w1, float[N] w2) {
+  float[N] combined_weights = ... ;     // calc. combined weights
+  complex[N] H = fft(combined_weights); // take FFT of weights
+  add FFT(N+FFT_SIZE);                  // add FFT stage to stream
+  add ElementMultiply(H);               // add multiplication by H
+  add IFFT(N+FFT_SIZE);                 // add inverse FFT
 }
 \end{verbatim}
 \vspace{-18pt}
@@ -247,8 +247,8 @@ weights} arrays from the two filters into a single, equivalent array.
 This reduces the number of multiply operations by a factor of two.  In
 Figure~\ref{fig:example-frequency}, the programmer has done the
 filtering in the frequency domain, using the FFT and IFFT to translate
-between time and frequency.  Computationally intensive
-streams are more efficient in frequency than in time.
+between time and frequency.  Computationally intensive streams are
+more efficient in frequency than in time.
 
 Our linear analysis can automatically derive both of the
 implementations in Figures~\ref{fig:example-combine}
@@ -280,42 +280,41 @@ The StreamIt language aims to expose these properties to the compiler
 while maintaining a high level of abstraction for the programmer.
 
 StreamIt programs are composed of processing blocks called {\it
-filters}. Each filter contains two data tapes, one from which it can read values
-and one to which it can write values. Each filter contains
-a {\tt work} function which describes its atomic execution step in the
-steady state. If the first invocation of the {\tt work} function has
-different behavior than other executions, a special {\tt prework} 
-function is defined.
+filters}.  Each filter has an input tape from which it can read values
+and an output tape to which it can write values.  Each filter also
+contains a {\tt work} function which describes the filter's atomic
+execution step in the steady state.  If the first invocation of the
+{\tt work} function has different behavior than other executions, a
+special {\tt prework} function is defined.
 
-The {\tt work} function contains C-like imperative
-code, which can access filter state, call external routines and
-produce and consume data.  The input and output channels are treated
-as FIFO queues, which can be accessed with three primitive operations:
-1) {\tt pop()}, which returns the first item on the input tape and
-advances the tape by one item, 2) {\tt peek(i)}, which returns the
-value at the $i$th position on the input tape, and 3) {\tt push(v)},
-which pushes value {\tt v} onto the output tape.  Each filter
-must declare the maximum element it will {\tt peek} at, the number of
-elements it will {\tt pop}, and the number of elements that it will
-{\tt push} during an execution of {\tt work}.  These rates must be
-resolvable at compile time and constant from one invocation of {\tt
-work} to the next. 
+The {\tt work} function contains C-like imperative code, which can
+access filter state, call external routines and produce and consume
+data.  The input and output channels are treated as FIFO queues, which
+can be accessed with three primitive operations: 1) {\tt pop()}, which
+returns the first item on the input tape and advances the tape by one
+item, 2) {\tt peek(i)}, which returns the value at the $i$th position
+on the input tape, and 3) {\tt push(v)}, which pushes value {\tt v}
+onto the output tape.  Each filter must declare the maximum element it
+will {\tt peek} at, the number of elements it will {\tt pop}, and the
+number of elements that it will {\tt push} during an execution of {\tt
+work}.  These rates must be resolvable at compile time and constant
+from one invocation of {\tt work} to the next.
 
-A program in StreamIt consists of a hierarchical graph of 
-filters.  Filters can be connected using one of the three predefined
-structures shown in Figure~\ref{fig:structures}: 1) {\it pipelines}
-represent the serial computation of one filter after another, 2) {\it
-splitjoins} represent explicitly parallel computation, and 3) {\it
-feedbackloops} allow cycles to be introduced into the stream graph.
-A {\it stream} is defined to be either a filter, pipeline, 
-splitjoin or feedbackloop. Every subcomponent of a structure 
-is a stream, and all streams have exactly one input tape and 
-exactly one output tape.
+A program in StreamIt consists of a hierarchical graph of filters.
+Filters can be connected using one of the three predefined structures
+shown in Figure~\ref{fig:structures}: 1) {\it pipelines} represent the
+serial computation of one filter after another, 2) {\it splitjoins}
+represent explicitly parallel computation, and 3) {\it feedbackloops}
+allow cycles to be introduced into the stream graph.  A {\it stream}
+is defined to be either a filter, pipeline, splitjoin or
+feedbackloop. Every subcomponent of a structure is a stream, and all
+streams have exactly one input tape and exactly one output tape.
 
 It has been our experience that most practical applications can be
 represented using StreamIt's hierarchical structures.  Though
 sometimes a program needs to be reorganized to fit into the structured
 paradigm, there are benefits for both the programmer and the compiler
-in having a structured language~\cite{streamitcc}.  In particular,
-the transformations on linear nodes (see Section~\ref{sec:combine})
-can only be used when they are arranged hierarchally.
+in having a structured language~\cite{streamitcc}.  In particular, the
+linear analyses described in this paper rely heavily on the structure
+of StreamIt, as they can focus on each hierarchical primitive rather
+than dealing with the complexity of arbitrary graphs.
