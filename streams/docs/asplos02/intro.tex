@@ -5,9 +5,9 @@ generation of microprocessors will have to be conscious of wire delays
 as the fundamental barrier to performance.  Recently, a number of
 architectures have been emerging that address the problem of wire
 delay by replicating the basic processing unit and exposing the
-communication between units to a software layer ({\it e.g.}, iWarp
-\cite{??}, Raw \cite{rawshort}, SmartMemories \cite{smartmemories},
-TRIPS \cite{trips}).  These machines are especially well-suited for
+communication between units to a software layer ({\it e.g.}, Raw
+\cite{rawshort}, SmartMemories \cite{smartmemories}, TRIPS
+\cite{trips}).  These machines are especially well-suited for
 streaming applications that have regular communication patterns and
 widespread parallelism.
 
@@ -47,11 +47,12 @@ element.  We consider this work to be a first step towards a portable
 programming model for communication-exposed architectures.
 
 The rest of this paper is organized as follows.  Section
-\ref{sec:streamit} provides an introduction to StreamIt, and
-Section~\ref{sec:raw} contains an overview of Raw.  Sections
-\ref{sec:partition}, \ref{sec:layout}, and \ref{sec:communic} describe
-our algorithms for partitioning, layout, and communication scheduling,
-respectively.  Section~\ref{sec:results} presents our results from the
-cycle-accurate Raw simulator.  Section~\ref{sec:related} considers
-related work, and Section~\ref{sec:conclusion} contains our
-conclusions.
+\ref{sec:streamit} provides an introduction to StreamIt,
+Section~\ref{sec:raw} contains an overview of Raw, and
+Section~\ref{sec:phases} outlines our compiler for StreamIt on Raw.
+Sections \ref{sec:partition}, \ref{sec:layout}, and \ref{sec:communic}
+describe our algorithms for partitioning, layout, and communication
+scheduling, respectively.  Section~\ref{sec:results} presents our
+results from the cycle-accurate Raw simulator.
+Section~\ref{sec:related} considers related work, and
+Section~\ref{sec:conclusion} contains our conclusions.

@@ -163,12 +163,15 @@ be reordered.
 \subsection{Vertical Fusion}
 
 Vertical fusion describes the combination of sequential, pipelined
-filters into a single unit.  An algorithm for vertical filter fusion
-is given in \cite{pro96} that interleaves the control flow graphs of
-adjacent nodes, where each node communicates with its neighbors via
-synchronous {\tt get} and {\tt put} operations.  This is not
-sufficient for StreamIt filters, since {\tt peek} operations allow
-asynchronous communication between filters, with implicit buffering.
+filters into a single unit.  We have developed a vertical fusion
+algorithm for StreamIt filters that we describe below.  For the more
+limited domain of filters that do not contain peek statements,
+Proebsting and Watterson \cite{pro96} present a filter fusion
+algorithm that interleaves the control flow graphs of adjacent nodes.
+However, they assume that nodes communicate via synchronous {\tt get}
+and {\tt put} operations, such that StreamIt's asynchronous peek
+operations and implicit buffer management fall outside the scope of
+their model.
 
 Our algorithm relies on the static I/O rates of each filter to
 calculate a legal execution ordering for the filters being fused.

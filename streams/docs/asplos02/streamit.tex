@@ -87,11 +87,14 @@
 
 In this section we provide a very brief overview of the StreamIt
 language; a more detailed description can be found in
-\cite{streamitcc}.  The current version of StreamIt is legal Java
-syntax to simplify our presentation and implementation, and it is
-designed to support only streams with static input and output rates.
-Designing a cleaner syntax and considering dynamically varying rates
-will be the subject of future work.
+\cite{streamitcc}.  The current version of StreamIt has a syntax that
+is legal Java in order to simplify our presentation and
+implementation.  However, we have developed a complete compiler that
+is fully independent from the Java runtime system--our syntax should
+not be mistaken for a Java library.  Also, the current version of
+StreamIt is designed to support only streams with static input and
+output rates.  Designing a cleaner syntax and considering dynamically
+varying rates will be the subject of future work.
 
 The basic unit of computation in StreamIt is the {\tt Filter}.  An
 example of a Filter is the {\tt LowPassFilter}, a component of our
@@ -167,7 +170,7 @@ omit a detailed discussion of the {\tt FeedbackLoop}.
 
 \subsection{Rationale}
 
-StreamIt differs from other languages in that it imposes a
+StreamIt differs from other stream languages in that it imposes a
 well-defined structure on the streams; all stream graphs are built out
 of a hierarchical composition of Filters, Pipelines, SplitJoins, and
 FeedbackLoops.  This is in contrast to other environments, which
@@ -176,9 +179,9 @@ that are connected by channels.  However, arbitrary graphs are very
 hard for the compiler to analyze, and equally difficult for a
 programmer to describe.  The comparison of StreamIt's structure with
 arbitrary stream graphs could be likened to the difference between
-structured control flow and GOTO statements.  Though sometimes the
-structure restricts the expressiveness of the programmer, the gains in
-robustness, readability, and compiler analysis are immense.
+structured control flow and GOTO statements; though the programmer
+might have to re-design some code to adhere to the structure, the
+gains in robustness, readability, and compiler analysis are immense.
 
 \subsection{Messages}
 
@@ -188,4 +191,7 @@ are sent from within the body of a filter's {\tt work} function,
 perhaps to change a parameter in another filter.  The central aspect
 of the messaging system is a sophisticated timing mechanism that
 allows filters to specify when a message will be received relative to
-the flow of data items between the sender and the receiver.
+the flow of data items between the sender and the receiver.  With the
+messaging system, StreamIt is equipped to support full application
+development--not just high-bandwidth data channels, but also events,
+control, and re-initialization.
