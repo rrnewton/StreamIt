@@ -1,15 +1,28 @@
-todo
-----
+metadata
+--------
 
-- more precise draining semantics in the case of dynamic rates.  e.g.,
-are dynamic interrupted?  are static-rate kernels atomic?  do you stop
-a static-rate kernel in the middle if it will exceed the length
-declared?
-
-- deal with loops and initPath
+- do I need to define the actual API for accessing metadata stuff
 
 - work out metadata description for Raw
 
 - look at scalar operand networks for network characterization stuff
 
+streaming
+----------
 
+later
+-----
+
+- think about how to remove the speaker from the final example
+
+- note that when you call a method with something that's not it's
+type, it finds constructor taking arg
+
+- add special constructors for initializing fields of totalLength,
+end, start... er, how do you deal with reset in this case?  just
+dealing with length, totalLength returning capacity for a copy kernel.
+
+x decide what processor resource copy operations should execute on
+
+x think about graphs that contain kernels spread out across multiple
+processors

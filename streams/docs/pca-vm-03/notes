@@ -1,502 +1,226 @@
-mattson@reservoir.com
+going off chip from raw:
+- three connections multiplexed:
+  - memory dynamic network
+  - general dynamic network
+  - static network 1
 
-------------------------------------------------------------------------------
-VM CODE
+completely bi-directional
 
-- each processor has own instruction code and address space
-  - (possible shared constants)
-  - output code for a given processor (with name or index)
+14 ports on the chip in all
 
-- stream objects are variables, 
-  - 
-  - 
+************************************************************
+MY PLAN
 
-- need some interface for threaded code
+- write the new Streaming Virtual Machine section
+- write the new Metadata section
+  - include description of Raw
+  - will involve defining an actual API for accessing stuff.
 
-stream object s = nw so(1000);
+- send to Peter with dummy placeholders for other chapters, ask if I
+  should take care of integrating or if this should be left to UT
 
-s.setInput(mem1);
+************************************************************
+THINGS TO CHANGE
 
-for i= 1 ... 100
-  s.pop()
+old issue summary: 4468
+peter's update after talking to stanford: 4785
+most recent summary:  5013
 
-s.setOutput(port0);
+metadata
+--------
 
-for i = 1 ... 1000
-  s.push(val)
+* do we need notion of explicit DMA controllers?
+* how do you represent a bus?
 
----
+- need to write Raw in current metadata
+- allow multiple I/D per processor
 
----------------------------
+- add list of black-box function names, along with their SVM-style code code
 
-rbfs - receiving buffer streams
-sbfs - sending buffer stream
+streaming
+---------
 
-main() {
+x new stream buffer:
+  x follow peter's pseudocode
+  x 9 kinds (figure out some kind of inheritance)
+    x 3: input, output, both
+    x 3: inorder, outorder, random
+    x inorder inherits from out-of-order because of read/write
 
-  kernel (s1, s2  --> bfs(up1), 10) {
-    
-  }
+  x properties:
+    x capacity
+    x reset -- makes everything back to zero
+    x length
+      x how many "live items" in it
+      x if random, then just returns capacity
+      x this is updated after each return from start()
+    x totalLength
+      x how many items pushed onto it
+      ? if random, then just returns capacity
+    x has copy constructor for copying elements
+    x guaranteed of data layout if totalLength < capacity
+    x EOS tokens are below the level of the SVM. Control code should
+      abstractly know the length of a stream or (if it is being
+      produced/received) the number of elements available and if more are
+      expected. There are multiple ways to implement this abstraction for
+      different kinds of hardware.
+    x note that only allows fixed-size records.  Variable sized
+      records can be supported at language-level and compiled into
+      fixed size scheme with some kind of data encoding
 
-  kernel (s1, s2  --> bfs(up1), 10) {
-    
-  }
+x kernels
+  x take an argument for the resource where they should execute
+  x take an argument for random-access stream buffer that the LLC
+    can use to store temporaries that overflow local kernel mem.
+  x should include work_info, prework_info
+  x new restriction: work function must return
+  x for copy kernel, include src_stride and dst_stride
 
-  kernel (s1, s2  --> bfs(up1), 10) {
-    
-  }
+x graphs
+  x add dependence info to constructors.  must be literals.
+    x to avoid memory-based location analysis in low-level compiler
+  x add non-blocking start method
+    x does this call pre_work?
+    x can you call it on a given graph object even after you've terminated?
+      for running some graphs twice, etc.  Maybe call reset in between.
+  x add non-blocking terminate method
+    x does this call post_work?
+  x calls to start first calls wait on inputs first -- but calls
+    to start are asynchronous
+  x consistency is not guarnateed for parallel writes.  same with
+    reuse of internal buffers -- nothing is guaranteed
+  x use "finish" instead of "termination" throughout document
+  x doesn't run on a given resource anymore; resource assignment
+    is done at kernel level
+  x new restriction: must be connection in architecture graph for every
+    link in graph
+  x Send/receive protocol needs to be adjusted for output full on
+    receive side.
 
-}
+x stream control:
+  x allow support for compiler-managed imem - e.g. call kernelLoad(kernel)
+    to give hint that kernel should be loaded
+  x still can't inspect kernels while they're running, but can poll using
+    the start method
+  x embedded in normal GP/threaded code with streaming restrictions
+    only on streaming objects
+  x the control code does file I/O and such outside of a kernel space
+  x Add a 64 bit signed/unsigned integer type (also to within kernels)
 
+x library support
 
+   x for library support: add to metadata a list of kernels that the llc
+     implements, supply their SVM representation -- also specify the
+     annotation functions for everything, but leave out declaration of
+     work; the HLC guaranteest hat it won't muck with them (fuse them
+     or anything) and then LLC can implement how it wants
 
----
+   x OPEN ISSUE:  this will require having separate graph for each
+     library function.  will make it impossible to run graph in 
+     pieces and poll the pieces, since calling start calls terminate?
 
-function(stream object, 
+just the document
+-----------------
 
-------------------------------------------------------------------------------
-types of streams:
- - blocked
-   - don't require readers and writers at the same time
-   - size>=length
- - buffered
-   - requires reader and writer at the same time
-   - don't need size==length
- - memory
+x be consistent between _ and capitalization for delimiting
+multiple-word identifiers
 
-------------------------------------------------------------------------------
-MACHINE DESCRIPTION
+x KernelInfo class should remove static argument to setPush/pop/peek.
 
-- topology is planar graph 
-  - memories aren't connected to each other
-  - (usually a memory is connected to processor, or memory on edges of
-    tiled processor grid)
+x Say a given INSTANCE of a kernel can appear in only one graph.
 
-- (off-chip) memory elements
-  - size
-  - characteristics for memory channels
+******************************************************************************
+NOT DOING
 
-- processing elements
-  - by definition:  
-    - single program counter
-    - enough local memory to make control decisions (?)
-    - model work capacity as superscalar
+- come back to enumerating some kind of set of configurations, maybe
+  by an array that has rows and columns for different kinds of
+  config's
 
-  - parameters:
-    - clock rate
-    - number of ALU's
-    - number of registers
-    - instruction memory (number of RISC ops)
+- is it worthwhile to represent static rates, etc. for sub-segments of
+  a stream graph?  (some functions that are called inside a kernel?)
 
-    - SIMD/vector speedup factor if input is data-parallel (over the
-	number of ALU's you've specified)
+- Mike Vahey says "Pg 12, Not clear about 'only copy across one
+  connection'"
 
-    - a "stream object" represents a persistent finite piece of memory
-      allocated to a stream / the values in a piece of a the stream.
-      regarding stream objects:
+************************************************************
+RAW NOTES WITH PETER
 
-      - stream memory - sum of size of stream objects in a given processor
-      - channels of these types:
-         1. network channels
-         2. processor channels
-         3. off-chip memory channels
+in the afternoon
+----------------
 
-- a channel type consists of:
- - maximum # of active channels 
+length still returns how many items have been written to stream
+  - if it's random, then just returns size
+  -> length return how many items have been (pushed)
 
- - blocking factor - min # of words that must be sent at once
-   stream to fully utilize channel bandwidth
+StreamBuffers -> 
+  - capacity
+  - length
+  - totalLength
+  - reset - sets pointers to beginning, 
 
- - window size - maximum number of words in flight (before the
-   sender blocks)
+- you can copy them, read 
+- guaranteed of data layout if totalLength<capacity
 
- - visible range - maximum number of words receiver can see for
-   out-of-order access (maximum peek amount at receiver)
+- some inheritance order between 9 classes
 
- - bandwidth
+next day
+--------
 
--------------------------------------------------------
+- dependence information between graphs has to be literals as well
 
-things that I wrote in notebook:
+his current email:
+------------------
 
-SYNTAX
+- have outOfOrder Istream, outOfOrder ostream.  inorder inherits from
+out-of-order because of read/write methods
+
+- read/write and push/pop with optional argument to write into an output stream 
+
+- terminate is non-blocking
+
+- if you call start, then it does the equivalent of calling wait() on
+inputs first -- but call to start() is still asynchronous
+
+- the dependence annotations between graphs is because you don't want
+to do memory-based location analysis in the low-level compiler
+
+- for library support: add to metadata a list of kernels that the llc
+implements, supply their SVM representation -- also specify the
+annotation functions for everything, but leave out declaration of
+work; the HLC guaranteest hat it won't muck with them (fuse them or
+anything) and then LLC can implement how it wants
+
+- be sure to say that consistency is not guarnateed for parallel writes
+
+* still an open issue:  number of dma controllers in the metadata, etc
+  * need to describe in RAW
+
+as per old mail
+---------------
+
+- allow multiple I/D per processor
+
+- as per sharing memory space for internal buffers, should just be
+dealt with by the fusion of the high-level compiler (#3)
+
+- have "memory block" that is above stream, takes resource, pointer,
+size.  pass this as argument to constructor but nothing else -- just
+for storing locals if the lower-level stream needs to.
+
 ------
+finishing conversatoin at 6 p.m.
 
-- make it a subset of a known language (somthing like 
-  kernel C)
-  - support C opcodes as common operations
-    e.g. logical, boolean, arithmetic
-    float, 32, 16, 8 - bit numbers, boolean
-  
-- can't push/pop outside of kernel
-- communicate dependence info from high to low
-- scalar value communication - _just scalars_
-- functions allowed, but not recursive; inline semantics
-- no pointers
-- no dynamic memory allocation
-- allow _structured_ control flow outside kernels
-- scoping allowed w/ braces
-- have push/pop/peek for communicating within kernel
+- should use the word "finish" instead of "termination" throughout the
+document so that we don't confuse the fault-tolerance case
 
-annotate the VM code with the following in the 
-intermediate format:
-----
-- whether or not it's fit for SIMD execution (stateless,
-  data parallel)
-- whether or not it contains dynamic control flow
-  (if it does, then it can't be fit for SIMD)
-- should it be annotated with static rates?  (for streamit)
+- "components of kernel" should include work_info, prework_info.
 
-open issues:
-------------
-- virtualization of channels
-- cutting off when you read from a non-blocking stream
-  - can you switch to read from a different channel before
-    the end of the stream?
-
--------------------------------------------------------
-
-streamc / kernelc
------------------
-
-- kernels don't see global data or memory; to get memory addresses,
-send a stream of addresses to memory, and forward returned data to
-kernel
-
-- actually c++
-
-- kernelc, subset of c++
-
-  - lacks most control constructs of c++ (e.g. if, for)
-  - instead, variety of loop constructs and select operator (like C's ?)
-  - inputs and outputs with >>, <<
-
-- declare streams as, e.g. stream<complex> in, stream<complex>[10] in
-  - not sure what the length means (or what it means if it's absent)
-
-- within kernels, use "istream", "ostream"
-
-- you say in kapasi_iccd2002, "the only non-local data a kernel can
-reference at any time are the current head elements of its input
-streams and the current tail elements of its output streams."  
-
-- kernels in 2k x 576-bit RAM in the microcontroller
-
-  -> does this mean all head / tail elements, or what?
-
-- (serebrin_icd2002) streamc is c++ with library functions to create
-streams, transfer over network, call kernels, communicate with
-console, etc
-
-  - kernelc just has loops and select statements.
-
-  - allows 32-bit, 16-bit, 8-bit ints (each packed appropriately) and
-    single precision floating point
-  - allows record types
-
-- mattson thesis
-
-  - kernelc is more restrictive than c - no pointers, function calls,
-    global variables, or control flow constructs other than loops
-
-- places we'll want to differ from kernelc:
-  - allow control flow (data-dependent) instead of requiring select
-
-imagine architecture
---------------------
-
-128 kb srf
-256-word scratchpad 
-32-bit floating point / integer clusters, 
-kernel microcode stored in the microcontroller
-
-says can address a combination of 8 input or output streams; future
-  work is adding virtualized streams
-
-- addressing modes between srf and sdram:  strided, indexed, and bit-reversed
-
-- ports on the srf: 8 cluster (8 words wide), 4 memory, 8 network (2
-words wide), 1 host, and 1 microcontroller.
-
-- (serebrin_icd2002) "each virtual channel uses credit-based flow
-control"
-
-- 22 stream buffers.  each hold 2 blocks of a stream:
-
- - 8 cluster stream buffers (8 words / cycle)
- - 8 network stream buffers (2 words / cycle)
- - 4 memory system stream buffers (1 word / cycle)
- - 1 microcontroller stream buffer (1 word / cycle)
- - 1 stream buffer that interfaces to the host processor (1 word / cycle)
-
-* another partitioning problem: partitioning for SRF allocation.  But
-this does need to take space into account.
-
-1/1 conversation with saman
----------------------------
-
-questions
----------
-
-1. regarding my third question (why "streaming kernel abstraction" was
-  rejected) i still don't understand why structured/unstructured has
-  anything to do with it, since right now each streamc kernel is just
-  filter.  we're proposing, rather, to allow that to EXTEND to a
-  structured graph
-
-2. how hard do you think it would be to:
-
-   1. do dataflow analysis on their graph of kernel calls?  
-
-   2. reverse-engineer the schedule of filter firings that would be
-      present within their graph?
-
-  Is there any value in expressing it as an xplicit graph like I was
-  suggesting?  I'm not sure if it's any easier/harder for them to
-  construct this graph from their language input, or for us to construct
-  it from the VM code.  Presumably we'd have to arguet that the latter
-  is harder to really justify a change.
-
-3. Once we enter the dynamic domain, do you really envision compiling a
-  finite set of graphs each time that we compile?  (Or even a
-  parameterized set of graphs?)  Or is it the case instead that things
-  like load-balancing decisions will really need to be done at runtime
-  (maybe seeing which graph you have, and doing layout and stuff then.)
-
-  I'm just trying to figure out if the re-initialization / morphing
-  scheme allowed by the VM code above is too flexible for general
-  streamit.
-
-ARCH
 ----
 
-4A. In their document they express the architecture as a tree.  This is
-too limiting, right?
+- threaded processor can just map contents to physical locations of
+streams
 
-4B. Should we add some of their properties?
-  PROCESSOR
-   - instruction latency (OK)
-   - context switch (OK)
+- need to assign a required resource that executes a given kernel.
+Graph doesn't run on a single resource; a kernel runs on a resource.
+e.g. DMA controller.
 
-  NETWORK
-   - latency (in seconds?)
-   - something about how many processor cycles are required?
-
-4. (as in email) What do you think about the local memory nodes?  Should
-   they be abstracted a different way?
-
-5. (as in email) What about channels as pairwise relationships?
-
-GENERAL (and in relation to theirs)
------------------------------------
-
-- Do I need to write up an API as detailed as theirs?  (Properties /
-configuration?  Get/set?  Function names?)
-
-- They have many more kinds of memory nodes.  Is this okay?
-
-general notes for writeup #2
-----------------------------
-
-- hmm, at bottom of page 3 they talk as if the high-level compiler is
-  -invoking- the low-level compiler, and can use results returned from
-  it.
-
-- should add a parameter as to whether or not the architecture supports
-direct I/O from within kernel's -- they're assuming here that it is
-possible.
-
-thinking out loud
------------------
-
-x what should the interface be for loading/storing to memories from a
-processor?  is there a default local node, or are all memories
-explicitly named?
-
-x maybe processors have a list of channels that they can control?  or
-each channel has a processor that is in control of the flow along that
-channel?  but some channels need multiple processors, for
-processor-processor communication
-
-xx maybe only memory-memory channels should have a list of processors
-that can do the transaction between the two memories.
-
-- what do i need for network? 
-
- - starting up connection, naming a virtual channel, stopping connections
-
- - if you are going between memories, do you need a stream abstraction
-   to hold the results in between?  this would have to be asynchronous
-   if you wanted to.  othwerwise you need just a memory transfer
-   operation?  I guess with source and stride of both receiver and
-   sender along the memory channel.  Just indicate the channel,
-   source, stride, etc... and have some way to test for completion?
-
-- if doing processor-mem, can:
-
-   - (note that you can't hold a whole stream on a processor, so
-      stream-wide operations aren't supported)
-
-   - load or store scalar elements with an address
-
-   - append a network sink at the end of a stream that is executing.
-     these are special kinds of filters that can be constructed to
-     write to given address with a given stride, or to read from given
-     address with a given stride.  also don't need name for virtual
-     channel here since noone else will refer to it.
-
-- if doing processor-processor:
-
-  - open a connection for sending/receiving, with a virtual channel
-    name.  if there is currently a connection open on that virtual
-    channel name, then it blocks until that connection is closed.
-
-  - send/receive over that channel
-
-  - the sender always closes the connection when finished; receiver
-    can have blocking wait() call until it is closed?
-
-  - so both processors have to open; sender has to have send
-    statements and receiver has to have receive statements
-
-  - can also have filter made to send or receive over physical and
-    virtual channel.  a filter must connect to a filter.
-
-- need distinction between threaded and streaming here?
-
-- threaded can do:
-   - mem-mem
-   - proc-mem (not streamed)
-   - proc-proc (not streamed)
-
-- streaming can do:
-   - proc-mem (streamed)
-   - proc-proc (streamed)
-
-- should they be a stream or a filter?  seems like it should
-  definately be a filter.
-
-- say that all SCALAR memory is managed by low-level compiler.  So
-local variables of threaded code, for instance, should be kept in
-memory connected to a processor.
-
---
-
-- could say to associate each stream variable with a memory bank.
-  Then you can stream things in and out of outer-level memory in a
-  single graph, having a filter that does the communication over a
-  channel.  There could be syntactic sugar if you wanted to just do a
-  stream-based memory-memory communication otherwise.
-
-- so streams have lengths and a memory bank or processor that they
-live in.  Living in a processor means that they are in the registers
-or scratchpad space of that processor.
-
-Then special kinds of converter filters are:
-
-for mem-mem operations:
-  - scatter(src stream, index stream, dest stream)
-  - gather(src stream, index stream, dest stream)
-
-  - move(src stream, dest stream, stride, elts_per_record)
-
-for mem-proc operations
-  - store(dest stream)
-  - load(src stream)
-
-for proc-proc operations
-  - send(physical channel, virtual channel number)
-  - receive(physical channel, virtual channel number)
-
------
-
-How do you send/receive scalars instead of streams?  e.g. for
-messaging or other shared data.
-
--- by the way, the call to g.run should include an optional parameter
-for which processor to run it on.
-
-class globals {
-
- stream<int,mem1> str; -- can only be accessed by those connected to mem1
-
-}
-
-- allow threaded processor communication either by single-element
-stream copy, or by proposed VIA model... don't really care
-
--------------------
-
-vm in terms of their outline
-----------------------------
-
-Processor
----------
-
-Leave threaded API the way it is.
-
-stream processor api
---------------------
-
-old proposal had:
-
-load(stream *address_from_main, stream *address_to_srf, int #records, int recordsize, int stride)
-store(stream* address_from_srf, stream *address_to_main, int #records, int recordsize, int stride)
-
-call is asynchronous; returns DONE type which can be blocked or checked with other routines
-
-DIFF: don't allow "op" to be appended to storing; put this right in the stream graph
-
-gather(int dest_srf_number, stream *address_to_srf, ptr_stream *record_ptrs_srf, int source_region, int #records, 
-		int recordsize)
-
-scatter (int source_srf_number, stream *address_from_srf, ptr_stream *record_ptrs_srf, int dest_region, int #records, 
-		int recordsize)
-
-move (stream *address_from, stream *address_to, int #records, int recordsize)
-
-load (byte *address_from_main, byte *address_to_kmem, int kernelSize)
-
-kernelexecute (vm_node stream_processor, byte *kmem_start_address, stream_descriptor *ios);
-
-typedef struct {
-  stream *address_from;
-  int stream_length;
-}
-
-stream kernel api
------------------
-
-subset of C
-
-they allow direct SRF access -- we could allow such access to streams
-held within a memory node that is connected to a stream.  just give
-the name of a stream, and the index into that stream, and the number
-of bytes.
-
-just use push, pop, peek
-
-they allow SOS for size of stream within kernels -- should move this
-outside into processor API, and then pass it as a parameter (since the
-kernel won't know how long it is)
-
-but do allow vm_eos (end of stream) in kernel
-
-allow vm_of for output full
-
-memory api
-----------
-
-looks like refers to the threaded VM.
-
-note that all the addresses of stream objects are abstracted away --
-stream memory -allocation- is not done in high-level compiler.
-
-so, no proposed changes, so long as what's there can't affect any
-stream resources.
-
-network api
------------
-
-no comments.  the network model for streaming is completely covered by
-above, but a model like this could still apply to the threaded world.
