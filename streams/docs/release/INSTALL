@@ -3,16 +3,19 @@ Installing the StreamIt Snapshot
 
 This is for the March 14, 2003 snapshot release (streamit-0.0.20030314).
 
-$Id: INSTALL,v 1.1 2003-03-10 20:06:00 dmaze Exp $
+$Id: INSTALL,v 1.2 2003-03-12 22:41:12 dmaze Exp $
 
 
 Unpack the StreamIt source tar file somewhere; this can be in your
 home directory, or in a shared directory.  Perform the steps listed in
 "per-user setup" below, then log out and log in again (or reload your
-shell's dotfiles).  Then:
+shell's dotfiles).  If you have the source release, run:
 
   cd $STREAMIT_HOME/compiler
   make
+
+If you have either the source or compiler binary release, run:
+
   cd $STREAMIT_HOME/library/c
   make
 
@@ -23,7 +26,10 @@ You should now be able to run the compiler.  For a minimal test:
   knit HelloWorld6.str
   ./a.out -i10
 
-This should print the numbers 0 through 9, in order.
+This should print the numbers 0 through 9, in order.  With the Java
+library release, running 'knit' should produce an infinite number of
+outputs, but you can run 'java HelloWorld6 -i10' afterwards to produce
+fewer outputs.
 
 
 PER-USER SETUP: depends on the shell you use; you need to set the
@@ -31,21 +37,44 @@ STREAMIT_HOME environment variable and search paths for Java and
 LaTeX.  If you use bash, add to your .bashrc file
 
   export STREAMIT_HOME=$HOME/streamit-0.0.20030314 # or elsewhere
-  . $STREAMIT_HOME/include/dot-bashrc
 
 If you use tcsh, add to your .cshrc file
 
   setenv STREAMIT_HOME ${HOME}/streamit-0.0.20030314
-  source ${STREAMIT_HOME}/include/dot-cshrc
 
-Note that this is a snapshot release; in particular, the settings in
-the dot-bashrc and dot-cshrc files contain some paths specific to the
-MIT LCS CAG local infrastructure.  You may want to edit these files to
-set some of the paths to directories more appropriate to your site.
+SOURCE RELEASE: The release comes with provided dotfiles that set up
+all of the possible environment variables.  Note that the settings in
+these files as distributed contain some paths specific to the MIT LCS
+CAG local infrastructure.  You may want to edit these files to set
+some of the paths to directories more appropriate to your site.
+If you use bash, add to your .bashrc file
+
+  . $STREAMIT_HOME/include/dot-bashrc
+
+If you use tcsh, add to your .cshrc file
+
+  source ${STREAMIT_HOME}/include/dot-cshrc
 
 If you want to override the settings the provided scripts set (for
 example, the RAW StarSearch directory), set the relevant variables
 after reading the dot-bashrc or dot-cshrc file.
+
+BINARY RELEASE: Add the StreamIt jar file to your Java CLASSPATH.  If
+you use bash, add to your .bashrc file
+
+  CLASSPATH=$CLASSPATH:$STREAMIT_HOME/streamit.jar
+
+If you use tcsh, add to your .cshrc file
+
+  setenv CLASSPATH ${CLASSPATH}:${STREAMIT_HOME}/streamit.jar
+
+You may also need to add $STREAMIT_HOME/include/tex to the TEXINPUTS
+environment variable to rebuild some of the documentation.  That
+variable should have a trailing colon to pick up the default search
+directories for LaTeX.
+
+LIBRARY RELEASE: Follow the instructions above under "Binary Release",
+but use streamit-lib.jar rather than streamit.jar.
 
 
 Local variables:
