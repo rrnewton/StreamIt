@@ -312,14 +312,14 @@ define the name of the stream it is intended for, just as with
 portals. for example
 \verb+split set<SomeStream(dynamic parameters)>(naming convention)+. Then to add a
 new stream,
-\verb+portal.set<SomeStream(parameters)>(name)+ and to delete a
+\verb+portal.set<SomeStream(parameters)>(name :: create)+ and to delete a
 stream,
-\verb+portal.set(name)+. To retrieve the name of a stream, we provide
+\verb+portal.set(name :: destroy)+. To retrieve the name of a stream, we provide
 a special function that returns a list of name, along with an iterator
 to process the list. Alternatively, we can go with the dynamic memory
 allocation scheme (which i think we should provide regardless).\\
 3) in the more general scheme, the splitter declaration could just be
-\verb+split set(naming convention)+ and to add or delete a stream, we
+\verb+split set<>(naming convention)+ and to add or delete a stream, we
 can use the same syntax as in (2).
 
 
