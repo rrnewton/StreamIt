@@ -20,7 +20,7 @@
 \title{StreamIt Language Specification\\
 Version 2.0\ifprerel\thanks{
 This document is the latest working version of the language specification.\hfil\break\ttfamily
-\hbox{$Id: streamit-lang.tex,v 1.19 2003-05-14 18:51:38 dmaze Exp $}
+\hbox{$Id: streamit-lang.tex,v 1.20 2003-06-30 19:25:00 dmaze Exp $}
 }\fi}
 \author{\texttt{streamit@cag.lcs.mit.edu}}
 \catcode`\$=3
@@ -216,12 +216,13 @@ each time the filter executes.
 
 \paragraph{I/O types.}  Each stream declared at the top level must
 also explicitly declare its input and output types.  This is a
-declaration like \lstinline|int->int| or \lstinline|float->complex|; the first
-type is the stream's input type, the second its output type.  Either
-type may be \lstinline|void|; in this case, the stream has no input or
-output, as appropriate.  If it is a filter, it must not declare a
-peek/pop or push rate.  The top-level stream in a program has type
-\lstinline|void->void|; no other streams of this type are allowed.
+declaration like \lstinline|int->int| or \lstinline|float->complex|;
+the first type is the stream's input type, the second its output type.
+Either type may be \lstinline|void|; in this case, the stream has no
+input or output, as appropriate.  If it is a filter, it must not
+declare a peek, pop, keep, or push rate.  The top-level stream in a
+program has type \lstinline|void->void|; no other streams of this type
+are allowed.
 
 \subsubsection{Stream Parameters}
 
@@ -278,18 +279,19 @@ int->int filter IntAvgFilter {
   init {
     // empty
   }
-  work pop 1 peek 2 push 1 {
-    push(peek(0) + peek(1));
+  work pop 1 peek 2 push 1 keep 1 {
+    push(keep(0) + peek(1));
     pop();
   }
 }
 \end{lstlisting}
 
-This filter is named \lstinline|IntAvgFilter|; it reads integers off of its
-input tape, and writes integers to its output tape.  Each execution of
-the work function removes exactly one item from the input tape and
-examines at most two items; it causes exactly one item to be pushed on
-to the output tape.
+This filter is named \lstinline|IntAvgFilter|; it reads integers off
+of its input tape, and writes integers to its output tape.  Each
+execution of the work function removes exactly one item from the input
+tape and examines at most two items; it causes exactly one item to be
+pushed on to the output tape, and looks at the item pushed on the
+previous iteration.
 
 \paragraph{Init functions.}  Init functions are declared using the
 keyword \lstinline|init|.  They take no parameters.  They may initialize
@@ -300,16 +302,17 @@ tapes.
 keyword \lstinline|work|.  This keyword may be followed by rate
 declarations; if these are absent, the filter is a \emph{phased
   filter}.  Rate declarations consist of \lstinline|push expr|,
-\lstinline|peek expr|, and \lstinline|pop expr|, in any order.  If the
-peek rate is omitted, it is assumed to be equal to the pop rate; if
-the pop or push rate is omitted, it is assumed to be zero, and the
-corresponding input or output tape type must be \lstinline|void|.  The
-function must push and pop exactly the number of items specified, and
-may peek up to the number of items specified.  As a special case, if
-there are no \lstinline|pop| calls at all in the function body (all
-access to the input tape is by peeking), the number of items declared
-as the pop rate will be automatically popped at the end of the work
-function.  All of the rate expressions must be compile-time constant.
+\lstinline|peek expr|, \lstinline|pop expr|, and
+\lstinline|keep expr|, in any order.  If the peek or keep rate is
+omitted, it is assumed to be equal to the pop rate; if the pop or push
+rate is omitted, it is assumed to be zero, and the corresponding input
+or output tape type must be \lstinline|void|.  The function must push
+and pop exactly the number of items specified, and may peek or keep up
+to the number of items specified.  As a special case, if there are no
+\lstinline|pop| calls at all in the function body (all access to the
+input tape is by peeking), the number of items declared as the pop
+rate will be automatically popped at the end of the work function.
+All of the rate expressions must be compile-time constant.
 
 \paragraph{Phased filters.}  If the work function does not have rate
 declarations, it may not perform \lstinline|push| and \lstinline|pop|
@@ -576,8 +579,13 @@ constraints are transparent to the programmer, however.
 
 \begin{itemize}
 \item A filter may fire when its input has at least as many items as
-  its peek rate.  It pops its pop rate from the input, and pushes its
-  push rate on to its output.
+  its peek rate, and if firing would not leave fewer items on its
+  input than its predecessor's keep rate.  It pops its pop rate from
+  the input, and pushes its push rate on to its output.
+\item If a filter has never fired, and it has a prework function, then
+  the prework function is executed in place of the work function, and
+  the I/O rates on the prework function are considered when deciding
+  if the filter may fire.  The prework function is called exactly once.
 \item A phased filter has a current phase.  Phases are executed in
   order according to the static control flow in the work function.
   Code between phase invocations may be executed any time between the
@@ -794,6 +802,45 @@ This function pops one item and pushes 1.  It declares a peek rate of
 3 because \lstinline|e| peeks at the third item that was on the tape
 at the start of the function -- one is popped, and \lstinline|e|
 contains the second item beyond that.
+
+\subsubsection{\lstinline|keep|}
+
+The \lstinline|keep| expression looks at, but does not remove, items
+on the output tape of a filter.  \lstinline|keep(0)| returns the item
+that was most recently pushed, even if that was on a previous filter
+iteration.  Just as \lstinline|pop| affects indices for future
+\lstinline|peek| calls, \lstinline|push| adds another item to the
+output tape and hence changes the indices for future \lstinline|keep|
+calls.
+
+\lstinline|keep| can be used to implement IIR filters.  For example,
+given this LTI filter:
+
+\begin{eqnarray*}
+H(z) & = & \frac{1+z^{-1}}{1-z^{-1}} \\
+(1-z^{-1}) Y(z) & = & (1+z^{-1}) X(z) \\
+y[n] - y[n-1] & = & x[n] + x[n-1] \\
+y[n] & = & x[n] + x[n-1] + y[n-1] \\
+\end{eqnarray*}
+
+We can write equivalent StreamIt code:
+
+\begin{lstlisting}{}
+float->float filter IIRExample {
+  prework push 1 {
+    push(0);
+  }
+  work push 1 pop 1 peek 2 keep 1 {
+    // y[n] = x[n] + x[n-1] + y[n-1]
+    push(peek(0) + peek(1) + keep(0));
+    pop();
+  }
+}
+\end{lstlisting}
+
+Of note, since the work function can not fire unless there is at least
+one item on its output tape, there must be a prework function that
+pushes that item; otherwise, the program is unschedulable.
 
 \subsubsection{Function Calls}
 \label{sec:expr-funcall}
@@ -1163,34 +1210,6 @@ Note that the number of executions of the \lstinline|readData| and
 \lstinline|writeData| phases are data-dependent, as is the
 \lstinline|push| rate of \lstinline|writeData|.
 
-\subsection{Output Peeking}
-
-StreamIt's current \lstinline|peek| operator allows straightforward
-construction of FIR filters, but a \lstinline|feedbackloop| is
-necessary for IIR filters.  A simple IIR filter might have a transfer
-function of
-
-\begin{eqnarray*}
-H(z) & = & \frac{1}{1-0.5z^{-1}} \\
-(1-0.5z^{-1})Y(z) & = & X(z) \\
-y[n] - 0.5y[n-1] & = & x[n] \\
-y[n] & = & x[n] + 0.5y[n-1] \\
-\end{eqnarray*}
-
-Implementing causal filters like this requires an operator like
-\lstinline|peek|, but that peeks at values on the output tape of a
-filter.  Implementation of this operator is mostly waiting on a name.
-If it were named \lstinline|peer|, the above filter could be
-implemented as
-
-\begin{lstlisting}{}
-float->float filter OutputPeeking {
-  work pop 1 push 1 peer 1 {
-    push(pop() + 0.5 * peer(0));
-  }
-}
-\end{lstlisting}
-
 \section{Implementation Limits}
 
 The following limits apply to the current implementation of StreamIt:
@@ -1217,9 +1236,10 @@ StreamIt 2.0.  Version 2.0 of the language adds a completely new
 syntax with simplified constructs for declaring stream objects but
 keeping a Java-like syntax for the bodies of init and work functions.
 Other new features include \lstinline|prework| functions, phased
-filters, and changing from delay functions to \lstinline|enqueue|
-statements in feedback loops.  The \lstinline|null| splitter/joiner
-type was replaced with \lstinline|roundrobin(0)|.
+filters, the \lstinline|keep| expression, and changing from delay
+functions to \lstinline|enqueue| statements in feedback loops.  The
+\lstinline|null| splitter/joiner type was replaced with
+\lstinline|roundrobin(0)|.
 
 \subsection{StreamIt 1.0}
 
