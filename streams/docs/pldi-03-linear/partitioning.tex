@@ -40,9 +40,11 @@ needs to be refactored to put linear nodes in their own hierarchical
 unit.  For example, in our TargetDetect benchmark, we cut a splitjoin
 horizontally and collapse the top piece before converting to the
 frequency domain, thereby amortizing the cost of the FFT on the input
-items (see Figure~\ref{fig:horizcut}).  In our Vocoder benchmark, we
-cut a splitjoin vertically and combine all of the filters on the right
-into a single linear node (see Figure~\ref{fig:vertcut}).
+items.
+% (see Figure~\ref{fig:horizcut}).  
+In our Vocoder benchmark, we cut a splitjoin vertically and combine
+all of the filters on the right into a single linear node.
+% (seeFigure~\ref{fig:vertcut}).
 
 \subsection{Dynamic Programming Solution}
 
@@ -66,17 +68,19 @@ The key to the algorithm's efficiency is the manner in which it
 considers refactoring the children of hierarchical nodes.  Instead of
 considering arbitrary arrangements of the stream graph, it considers
 only {\it rectangular} partitions, in which a given splitjoin is
-divided into two child splitjoins by either a horizontal cut
-(Figure~\ref{fig:horizcut}) or a vertical cut
-(Figure~\ref{fig:vertcut}).  This approach works well in practice,
-because splitjoins often have symmetrical child streams in which
-linear components can be separated by a horizontal line.  Moreover, as
-the child splitjoins are decomposed and evaluated, there are
-overlapping sub-problems that enable us to search the space of child
-configurations in polynomial time, using dynamic programming.
+divided into two child splitjoins by either a horizontal 
+%cut (Figure~\ref{fig:horizcut}) 
+or vertical cut.
+%(Figure~\ref{fig:vertcut}).  
+This approach works well in practice, because splitjoins often have
+symmetrical child streams in which linear components can be separated
+by a horizontal line.  Moreover, as the child splitjoins are
+decomposed and evaluated, there are overlapping sub-problems that
+enable us to search the space of child configurations in polynomial
+time, using dynamic programming.
 
 \begin{figure}[t]
-  \psfig{figure=images/part-algorithm2.eps,width=3.5in}
+\psfig{figure=images/part-algorithm2.eps,width=3.5in}
   \vspace{-14pt}
   \caption{Type declarations for code in Figure~\ref{fig:part-alg}.
   \protect\label{fig:part-decl}}
