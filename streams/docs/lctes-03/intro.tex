@@ -70,34 +70,23 @@ This paper is organized as follows.  The remainder of this section
 gives an illustrating example and describes relevant {\StreamIt}
 constructs; Section \ref{chpt:sched-basic} explains basic concepts in
 scheduling {\StreamIt} graphs; Section \ref{chpt:phased} describes the
-phased scheduling technique and presents a minimum-latency scheduling
+phased scheduling technique and presents a minimum latency scheduling
 algorithm; Section \ref{chpt:results} presents experimental results;
 Section \ref{chpt:related} describes related work and Section
 \ref{chpt:conclusion} presents conclusions and planned future work.
 
 \begin{figure}[t]
 \psfig{figure=sched-diag2.eps,width=3.35in}
-\caption{Execution trace of three different scheduling strategies for
-one steady state execution of a simple pipeline.  Channels are
-annotated with the number of live data items that they contain; shaded
-nodes represent those that are firing on a given time
+\caption{\small Execution trace of three different scheduling
+strategies for one steady state execution of a simple pipeline.
+Channels are annotated with the number of live data items that they
+contain; shaded nodes represent those that fire on a given time
 step.\protect\label{fig:trace}}
 \vspace{-12pt}
 \end{figure}
 
 \subsection{Example}
 \label{sec:sched-vs-buffer}
-
-\begin{comment}
-\begin{figure}
-\begin{center}
-\psfig{figure=pipeline-buffers.eps,width=0.6in} \caption[4 {\filter}
-{\pipeline}]{Sample 4 {\filter} {\pipeline}.  This {\pipeline} is
-the same as one in Figure \ref{fig:steady-state} (a), except that
-its children do not peek extra data} \label{fig:pipeline-buffers}
-\end{center}
-\end{figure}
-\end{comment}
 
 A classic problem in the scheduling of synchronous dataflow graphs is
 the tradeoff between code size and data size~\cite{bhat1999x1}.  Code
@@ -127,9 +116,9 @@ produced through the rest of the graph, always executing the most
 downstream node possible.  When no further node can fire, the top node
 is executed again.  In this case, the push schedule reduces the buffer
 size by 48\% but increases code size by 325\% over the SAS schedule.
-However, since the code was originally smaller than the buffers, the
-total amount of space required decreases slightly (see
-Figure~\ref{fig:codedata}).
+%However, since the code was originally smaller than the buffers, the
+%total amount of space required decreases slightly (see
+%Figure~\ref{fig:codedata}).
 
 In this paper, we develop a phased scheduling algorithm that offers a
 flexible alternative between the extremes of SAS and push scheduling.
@@ -142,10 +131,9 @@ single-appearance property of the phases and the collapse of phases 2
 and 3 into a single representation ``E''.
 
 Figure~\ref{fig:codedata} illustrates the tradeoff between code size
-and data size for the scheduling schemes.  It shows that, while all
-three techniques require approximately the same amount of memory, the
-allocation of that memory between code and data is variable, with
-phased scheduling striking a compromise between extremes.  In
+and data size for the scheduling schemes.  It shows that there can be
+a large tradeoff between code size and buffer size, with phased
+scheduling striking a compromise between extremes.  In
 Section~\ref{chpt:phased}, we give a flexible version of our phased
 scheduling algorithm, and we also demonstrate that it can handle tight
 feedback loops for which there does not exist a valid single
@@ -205,7 +193,7 @@ anywhere else)}
 
 \begin{figure}[t]
 \psfig{figure=codedata.eps,width=3.35in}
-\caption{Code and data sizes for the execution traces of
+\caption{\small Buffer and code sizes for the execution traces of
 Figure~\ref{fig:trace}.  For brevity, we show these figures on the
 same graph, even though a unit of storage might have a different cost
 for code and data.\protect\label{fig:codedata}}

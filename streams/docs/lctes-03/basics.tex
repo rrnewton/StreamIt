@@ -15,7 +15,7 @@ initialization of {\StreamIt} program.
 \label{sec:exec-model}
 
 A {\StreamIt} program is represented by a hierarchical graph, where
-the leaf nodes are filters, splitters, joiners, and the composite
+the leaf nodes are filters, splitters, and joiners, and the composite
 nodes are pipelines, splitjoins, and feedbackloops.  Edges in the
 graph represent data channels, which operate as FIFO queues.
 
@@ -40,45 +40,19 @@ of the steady state epoch.  Within the steady state, a filter executes
 its steady state phases cyclically.
 % (just as in a cyclo-static dataflow graph~\cite{BELP96}).
 
-\begin{figure}
-\begin{center}
-
-\begin{minipage}{0.7in}
-\centering \psfig{figure=pipeline-buffers.eps,width=0.4049in}
-\end{minipage}
-~~~~~~
-\begin{minipage}{0.8in}
-\centering \psfig{figure=splitjoin-steady-state.eps,width=0.6in}
-\end{minipage}
-~~~~~~
-\begin{minipage}{0.8in}
-\centering \psfig{figure=feedback-steady-state.eps,width=0.79in}
-\end{minipage}
-
-\vspace{0.1in}
-
-{\small ~~~~(a) a pipeline ~~~~~~~ (b) a splitjoin ~~~~ (c) a feedbackloop~~~~}
-
-\caption{\small Sample {\StreamIt} operators.  Each node is labelled
-with its peek, pop rates (at top) and push rate (at bottom).  The $L$
-{\filter} has been flipped upside-down for clarity.
-\label{fig:steady-state}}
-\end{center}
-\end{figure}
-
 \subsection{Steady State Schedule}
 \label{sec:steady-state}
 
 One of the most important concepts in scheduling streaming
 applications is the steady state schedule.  A steady state schedule is
-a schedule that the program can repeatedly execute forever.  It has a
-property that the amount of data buffered up between any two nodes
-does not change from before to after the execution of the steady state
-schedule.
+a schedule that the program can repeatedly execute forever.  It has
+the property that the amount of data buffered up between any two nodes
+does not change from before to after its execution.
 
-A steady state of a program is a collection of number of times that
-every node in the program needs to execute in a steady state schedule.
-It does not impose an order of execution of the nodes in the program.
+A ``steady state'' of a program is a collection of number of times
+that every node in the program needs to execute in a steady state
+schedule.  It does not impose an order of execution on the nodes in
+the program.
 \begin{comment}
 Not every {\StreamIt} program has a steady state schedule.  It is
 possible for a program to have unbalanced production and
@@ -122,9 +96,10 @@ A {\StreamIt} program that has a valid steady state, has a unique
 minimal steady state.
 \end{theorem}
 
-This means that every valid {\StreamIt} program has a unique minimal
-steady state. Our scheduler will produce schedules that execute
-exactly the minimal steady state of a program.
+This means that for every valid {\StreamIt} program, there is a unique
+set of steady state multiplicities that fires as few nodes as
+possible.  Our scheduler will produce schedules that execute exactly
+the minimal steady state of a program.
 
 \begin{comment}
 \begin{proof}[Minimal Steady State Uniqueness]
@@ -316,17 +291,16 @@ that for the first execution, {\filter} $f$ requires that two data
 items be pushed onto its {\Input} {\Channel}.  After the first
 execution of $f$, it will have consumed one data item, and left at
 least one data item on its {\Input} {\Channel}.  Thus in order to
-execute $f$ for the second time, at most one extra data item needs to
-be pushed onto $f$'s {\Input} {\Channel}.  The same situation persists
-for all subsequent executions of $f$ -- at most one additional data
-item is required on $f$'s {\Input} {\Channel} in order to execute $f$.
+execute $f$ for the second time, only one extra data item needs to be
+pushed onto $f$'s {\Input} {\Channel}.  The same situation persists
+for all subsequent executions of $f$ -- only one additional data item
+is required on $f$'s {\Input} {\Channel} in order to execute $f$.
 
 This example illustrates that the first execution of a {\filter} may
-require special treatment.  Namely, the source for {\filter}'s data
-may need to push more data onto {\filter}'s {\Input} {\Channel} for
-{\filter}'s first execution.  Due to this condition, a {\StreamIt}
-node may need to be initialized before it can enter steady state
-execution.
+require special treatment.  Namely, some nodes will need to push extra
+items at the start of execution so that downstream filters can fire
+for the first time.  Due to this condition, a {\StreamIt} node may
+need to be initialized before it can enter steady state execution.
 
 %% \subsection{Schedules}
 %% \label{sec:general:schedules}

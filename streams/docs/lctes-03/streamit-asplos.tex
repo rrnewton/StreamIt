@@ -65,12 +65,11 @@ an array of weights.  The joiner node must be a roundrobin.
 The last control construct provides a means for creating cycles in the
 stream graph: the {\feedbackloop}. A {\feedbackloop} contains a
 {\joiner}, a body operator, a {\splitter}, and a loop operator.  A
-{\feedbackloop} has an additional feature required to allow it to
-begin computation: since at first there is no data on any {\Channels},
-the program inserts data from a special function defined by the
-{\feedbackloop} onto the {\Channel} connecting the loop child and the
-{\joiner}. The amount of data pushed onto the feedback path is called
-delay amount, denoted $delay_{fl}$, for a {\feedbackloop} $fl$.
+{\feedbackloop} has an additional feature to allow it to begin
+computation: since there are no data items on the feedback path at
+first, the stream needs to enqueue initial values onto the channel.
+The number of items pushed onto the feedback path is called the delay,
+denoted $delay_{fl}$, for a {\feedbackloop} $fl$.
 
 \subsubsection{Design Rationale}
 
@@ -79,14 +78,52 @@ single-output hierarchical structure that it imposes on streams.  This
 structure aims to help the programmer by defining clean, composable
 modules that admit a linear textual representation.  In addition, it
 helps the compiler by restricting certain analyses to a local level
-rather than dealing with global properties of a graph.
+rather than dealing with global properties of the graph.  In the
+context of scheduling, hierarchy is also useful because it allows for
+the separate compilation of program componenets.  This enables
+creation of standardized libraries and their distribution in binary
+form, rather than source code.  This ability may become important as
+streaming languages become more widely used for larger applications.
 
-In the context of scheduling, hierarchy is also useful because it
-allows for the separate compilation of program componenets.  This
-enables creation of standardized libraries and their distribution in
-binary form, rather than source code.  This ability may become
-important as streaming languages become more widely used for larger
-applications.
+The peek construct is also an important feature of StreamIt, though it
+requires special support from the scheduler.  By using the peek
+command, a filter can examine input items at a given index without
+dequeing them from the channel.  This exposes to the compiler the
+reuse of input items between successive invocations of a filter's work
+function.  A primary example is an FIR filter, which pops 1 item but
+peeks N items.  Without the capability to peek, the programmer would
+have to maintain a persistent circular buffer within the filter to
+retain previous input items.  Apart from being difficult to program,
+this would greatly complicate compiler analysis.  In particular, the
+linear analysis and optimization passes within the StreamIt compiler
+benefit greatly from analyzing peek statements directly instead of
+reverse-engineering internal filter state~\cite{lamb03}.
+
+\begin{figure}
+\begin{center}
+
+\begin{minipage}{0.7in}
+\centering \psfig{figure=pipeline-buffers.eps,width=0.4049in}
+\end{minipage}
+~~~~~~
+\begin{minipage}{0.8in}
+\centering \psfig{figure=splitjoin-steady-state.eps,width=0.6in}
+\end{minipage}
+~~~~~~
+\begin{minipage}{0.8in}
+\centering \psfig{figure=feedback-steady-state.eps,width=0.79in}
+\end{minipage}
+
+\vspace{0.1in}
+
+{\small ~~~~(a) a pipeline ~~~~~~~ (b) a splitjoin ~~~~ (c) a feedbackloop~~~~}
+
+\caption{\small Sample {\StreamIt} operators.  Each node is labelled
+with its peek, pop rates (at top) and push rate (at bottom).  The $L$
+{\filter} has been flipped upside-down for clarity.
+\label{fig:steady-state}}
+\end{center}
+\end{figure}
 
 \begin{figure}[t]
 \begin{center}
