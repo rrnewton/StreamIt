@@ -5,7 +5,7 @@ void->void pipeline ArrayTest {
     add void->float[1][1] filter {
 	float val;
 	init {
-	    val = 1.0f;
+	    val = 1.0;
 	}
 	work push 1 {
 	    float[1][1] myArray;
@@ -16,7 +16,8 @@ void->void pipeline ArrayTest {
     }
     add float[1][1]->void filter {
 	work pop 1 {
-	    print(pop()[0][0]);
+            float[1][1] myArray = pop();
+	    print(myArray[0][0]);
 	}
     }
 }
