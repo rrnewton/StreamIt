@@ -5,33 +5,38 @@
 \newcommand\filename[1]{\textsf{#1}}
 \newcommand\envar[1]{\textsf{#1}}
 
-\title{StreamIt Snapshot Release}
+\title{StreamIt 2.0 Release}
 
 \begin{document}
 \maketitle
 
 \noindent
-This is for the October 16 2003 snapshot release (streamit-0.0.20031016).\\
-\verb|$Id: readme.tex.in,v 1.11 2003-10-15 23:22:17 rabbah Exp $|
+This is for the October 17, 2003 release of the StreamIt compiler and
+runtime system, version 2.0.\\
+\verb|$Id: readme.tex.in,v 1.12 2003-10-16 19:26:35 dmaze Exp $|
 
 \section{What is this?}
 
-This is a \emph{snapshot} release of the StreamIt compiler.  The
-compiler is still under active development; if it breaks, you get to
-keep both pieces.  See "caveats", below.  This compiler should produce
-functional code for both uniprocessor targets and the MIT Raw
-processor.
+StreamIt is a programming language designed for efficient
+implementation of streaming systems, particularly digital signal
+processing applications.  This is a public release of the StreamIt
+compiler.  While the compiler is still under active development, we
+believe this release should be useful for developing StreamIt
+applications.  See "caveats", below, and report bugs and feature
+requests to \texttt{streamit@cag.lcs.mit.edu}.  This compiler should
+produce functional code for both uniprocessor targets and the MIT RAW
+processor.  There is also a runtime library for testing programs
+through a Java compiler.
 
 There are two versions of this release.  These are:
 
 \begin{description}
-\item[streamit-src-0.0.20031016.tar.gz]    "Source   release."    This
-  contains  the full  sources  of the  StreamIt  compiler and  runtime
-  libraries, but no binaries.   Build instructions are included in the
-  INSTALL file.
-
-\item[streamit-0.0.20031016.tar.gz]  "Binary release."   This contains
-  no sources, but does contain a Java jar file with the full compiler.
+\item[streamit-src-2.0.tar.gz] "Source release."  This contains the
+  full sources of the StreamIt compiler and runtime libraries, but no
+  binaries.  Build instructions are included in the INSTALL file.
+  
+\item[streamit-2.0.tar.gz] "Binary release."  This contains no
+  sources, but does contain a Java jar file with the full compiler.
 \end{description}
 
 The StreamIt compiler is built on top of version 1.5B of the Kopi Java
@@ -69,10 +74,12 @@ FFTW from source, use the \texttt{--enable-float} and
 \texttt{--enable-type-prefix} options when compiling.
 
 Compilation for Raw depends on the most recent released Raw build
-environment (as of this release, \verb|raw_dist_2003_03_18|).  The
-\envar{TOPDIR} environment variable needs to point to your StarSearch
-directory; this may be the reduced \filename{workdir} tree from the
-Raw distribution, or the full \filename{starsearch} tree.
+environment (as of this release, \verb|raw_dist_2003_10_08|).  Please
+contact Paul Johnson, \verb|prj@cag.lcs.mit.edu|, for information on
+this release if you are developing for RAW.  The \envar{TOPDIR}
+environment variable needs to point to your StarSearch directory; this
+may be the reduced \filename{workdir} tree from the Raw distribution,
+or the full \filename{starsearch} tree.
 
 The source release only builds with IBM's Jikes Java compiler; see
 \url{http://www.jikes.org/}.  Otherwise, a Java virtual machine is
@@ -124,6 +131,12 @@ name=pipe_3
 
    Structures and complex should work as local variables and as the
    input or output types of filters.
+
+\item Arrays may not be used as the input or output types of streams.
+  This is largely a limitation in the uniprocessor runtime library;
+  you can get equivalent code by using streams of the base type of the
+  array, and constructing the array inside the work function if
+  necessary.
 
 \item The Java library infrastructure may not allow particular
    combinations of stream parameters.  This should not be a problem
