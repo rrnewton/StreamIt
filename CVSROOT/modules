@@ -1,7 +1,7 @@
 #
 # The CVS Modules File
 #
-#ident	"@(#)cvs/examples:$Name: not supported by cvs2svn $:$Id: modules,v 1.14 2003-03-17 23:13:06 wentzlaf Exp $"
+#ident	"@(#)cvs/examples:$Name: not supported by cvs2svn $:$Id: modules,v 1.15 2003-03-17 23:39:12 wentzlaf Exp $"
 #
 # Three different line formats are valid:
 #	key	-a    aliases...
@@ -28,23 +28,39 @@
 # spread out over the entire source repository.
 #
 btl	btl
+codeselect	codeselect
 crudo	crudo
+host_interface	host_interface
+icache	icache
 intravenous	intravenous
+landscaper	landscaper
+libwalt	libwalt
+medicare	medicare
+newlib	newlib
+rats	rats
 rawboards	rawboards
 rawcc-v2	rawcc-v2
+rawdoc	rawdoc
 rawlib	rawlib
 rawos	rawos
 rawpli	rawpli
+rawvideo	rawvideo
 rbarrier	rbarrier
 rbinutils	rbinutils
 rgcc	rgcc
-rpci_bridge	rpci_bridge
-starsearch	starsearch
-suif2	suif2
-landscaper	landscaper
+rgdb	rgdb
+rgdb_hostif	rgdb_hostif
 rilayout	rilayout
-rawvideo	rawvideo
-codeselect	codeselect
-medicare	medicare
+rloader	rloader
+rmpilib	rmpilib
+rpci_bridge	rpci_bridge
+span	span
+starbuild	starbuild
+starsearch	starsearch
 streams	streams
-BonsaiAll	-a btl crudo intravenous rawboards rawcc-v2 rawlib rawos rawpli rbarrier rbinutils rgcc rpci_bridge starsearch suif2 landscaper rilayout rawvideo codeselect medicare streams
+suif	suif
+suif1.3	suif1.3
+suif2	suif2
+veribuild	veribuild
+
+BonsaiAll	-a btl codeselect crudo host_interface icache intravenous landscaper libwalt medicare newlib rats rawboards rawcc-v2 rawdoc rawlib rawos rawpli rawvideo rbarrier rbinutils rgcc rgdb rgdb_hostif rilayout rloader rmpilib rpci_bridge span starbuild starsearch streams suif suif1.3 suif2 veribuild
