@@ -1,6 +1,7 @@
 % this thing used to be about optimizations, now it is all about ``Translation to Frequency Domain''
 
 \section{Translation to Frequency Domain}
+
 Our linear analysis framework provides a compile time formulation of the 
 computation that a linear {\tt stream} is performing and we can use this information 
 to exploit well known domain specific optimizing transformations. 
@@ -9,47 +10,81 @@ convolution using a translation to the frequency domain.
 
 Calculating a convolution sum is a fundamental operation in discrete time signal processing 
 because it defines how to compute the output of a linear time invariant 
-(LTI) system from the inputs.
+(LTI) system from the inputs. Convolution sums 
+can be implemented very efficiently be exploiting a transformation to the frequency domain.
 
-The convolution sum $y[n]=x[n]*h[n]$ is defined as $y[n]=\sum_{k=-\infty}^{\infty}x[k]h[n-k]$. 
-If $h[n]$ for $n\in[0..L-1]$ are compile time known constants, 
-a frequency transformation using the DFT can be employed to quickly calculate $y[n]$. 
 The transformation from convolution sum into frequency multiplication is currently
-done explicity by the programmer because it is difficult for traditional compilers 
-to determine that a convolution sum is being computed and which program variables
-correspond to $x[n]$, $h[n]$ and $y[n]$.
+done explicity by the programmer because no compiler analysis today has the information 
+to determine when a convolution sum is being computed and which program variables
+are acting as the input $x[n]$, the weights $h[n]$ and the output $y[n]$. As the 
+complexity of DSP programs grow, determining the disparate reigons across which these 
+optimizations can be applied is an ever more daunting task. Furthermore, the applicability 
+details of different architectures make the task even harder to do in a portable manner.
 
-However, for StreamIt {\tt streams} we know that the input ($x[n]$) and output ($y[n]$)
-correspond exactly to our input and output tapes. Furthermore, the values $h[n]$ 
-are exactly in the columns of $A$. A filter $F$ that is calculating a convolution 
-will have $o_F=1$.
+\subsection{Transformation Overview}
+The convolution sum $y[n]=x[n]*h[n]$ is defined 
+as $y[n]=\sum_{k=-\infty}^{\infty}x[k]h[n-k]$.
+In StreamIt, if a {\tt stream} is calculating a convolution sum we know that 
+the input ($x[n]$) and output ($y[n]$) correspond exactly to the input and output tapes. 
+Furthermore, a {\tt stream} will be computing a convolution sum when $o_F=1$ in which
+case we can identify the values $h[n]$ as exactly the columns of $A$.
 
-Fewer calculations are often required to transform
-the input signal to the frequency domain, do a multiplication, and then convert back 
-to time than it does to do the convolution directly. This seeming roundabout calculation
+Very often, fewer calculations are required to transform the input signal to the 
+frequency domain, do a multiplication, and then convert back to the time domain
+than for computing the convolution directly. This seeming roundabout calculation
 is feasible because a class of fast algorithms known as the FFT are known that convert
 to frequency and back again. For a thorough treatment of the theory of discrete time 
-signal processing, the DFT and FFT, see \cite{oppenheim-discrete}.
+signal processing, including using the DFT to implement convolution, see \cite{oppenheim-discrete}.
 
-% put something here about how you calculate a convolution withDFT
-% then talk about stupid implementation, then smaprt implementation.
+To compute the convolution of two discrete time signals, $x[n]$ and $h[n]$ 
+one can calculate the DFT of both sequences to produce 
+$X[k]$ and $H[k]$. Multiplying $X[k]$ and $H[k]$ elementwise
+produces a new sequence $Y[k]$, and taking the inverse DFT (IDFT) of $Y[k]$ 
+produces $y[n]$ which is exactly the same as $x[n]*h[n]$.
 
-We define an filter computing a convolution sum as a FIR filter. An FIR filter $F$ has
-$e_F=M$, $o_F=1$ and $u_F=1$. To transform $F$ such that it uses and consumes $N+M-1$ input
-elements to produce $N+M-1$ outputs per {\tt work} function execution. We use the 
-following notation in the rest of this section to remain consistent with DSP terminology.
-$h[n]$ is the filters ``impulse response'' and consists of the values in the linear 
-representation matrix. $x[n]$ is the next $N+M-1$ block of the input that the filter
-will process. $y[n]$ is is the $N+M-1$ values the filter produces.
+When we identify a {\tt stream} that computes a convolution sum, the compiler
+computes and stores $H[k]$ from $h[n]$ in a field. The {\tt stream}'s 
+{\tt work} function is changed so that $y[n]$ 
 
-Our compiler computes the complex values of $H[k]=H(e^{j\omega})|_{\omega=\frac{2{\pi}k}{L}}$, 
-the DFT of $h[n]$, at compile time. The filter is transformed 
-so that it  calculates $X[k]=X(e^{j\omega})|_{\omega=\frac{2{\pi}k}{L}}$, the DFT 
-of $x[n]$. Then it calculates $Y[k]=X[k]H[k]$, the DFT of $h[n]*x[n]$.
-Then the filter converts $Y[k]$ into $y[n]$ using the inverse DFT. Finally, 
-the appropriate values from $y[n]$ are pushed on to the output tape. The
-calculations of the DFT are implemented using the the well-known 
-``fast Fourier transform'' (FFT) algorithm.
+\subsection{Automatic Transformation}
+%this is where the fun starts.  
+
+The compiler can  $h[n]$ at compile time, we can implement this standard frequency 
+transformation automatically, but to do so we need to take care with the details.
+If $x[n]$ has length $P$ and $h[n]$ has length $L$, then the resulting convolution
+will be on length $P+L-1$ which implies a $P+L-1$ length DFT must be used.
+
+Each {\tt work} execution of an FIR filter in Streamit is going to be 
+producing one value of the output sequence. Matching the above terminology to StreamIt, 
+the length of $h[n]$ is $L=e_F$. Our transformation generates a new {\tt stream} that
+$N$ items each execution where the original {\tt stream} produced one. ($N$ is a value
+which is currently user specified but we are working on automating the choice.)
+Therefore the length of the input $y[n]$ is $P=N+e_F-1$, and an complete convolution results in 
+$P+L-1=(N+e_F-1)+e_f-1=N+2e_F-2$ values, of which both the first and last $e_F-1$ values 
+correspond to not using all of the input and are ignored. The original time domain 
+implementation doesn't calculate these extra $2e_F-2$ values but the DFT transformation does.
+
+For both versions of frequency transformation, the compiler creates a new {\tt filter} which
+implements the same calculation as the old {\tt stream} with a peek rate of $N+e_F-1$.
+The compiler automaticalls computes the complex values of $H[k]=DFT(N+2e_F-2,h[n])$, 
+the $N+2e_F-2$  point DFT of $h[n]$ at compile time and saves them in a field. On each {\tt work}
+function exection, the filter calculates $X[k]=DFT(N+2e_F-2,x[n])$, the DFT of the input.
+Then it calculates $Y[k]$ as the complex element wise product of $X[k]$ and $H[k]$ and
+then performs the inverse DFT to produce $y[n]$.
+
+For our initial implementation, the new filter simply outputted the middle $N$ values of
+$y[n]$ and ignored the other $2e_f-2$. Then $N$ values are popped from the input and 
+the process repeated to generate the next $N$ outputs.
+
+However, the discarded values of $y[n]$ are not meaningless. The first $e_F-1$ are part of the 
+computation from the previous invocation of the work function and the last $e_f-1$ are part
+of the computation from the next invocation of the work function. 
+
+We use this observation in our smarter implementation to exploit a method widely used 
+in the DSP community known as overlap and add. On each {\tt work} function exection, 
+the filter outputs the first $e_F-1$ items in $y[n]$ plus the partial results from 
+the previous invocation followed by the middle $N$ elements. Finally, it 
+and stores the last $e_f-1$ elements in $y[n]$ for the next invocation.
 
 \begin{figure}
 \center
@@ -58,15 +93,4 @@ calculations of the DFT are implemented using the the well-known
 \caption{Example of edge case in frequency results.}
 \label{fig:frequency-example}
 \end{figure}
-
-As always, the devil is in the details. We have not mentioned above either 
-the size of the DFT($L$), how to deal with initial conditions, or which 
-values of $y[n]$ to push on to the output tape. 
-Without going into detail, we use a simple overlap and add\cite{oppenheim-discrete} 
-method to calculate the values of $y[n]$ for each iteration. To do so 
-we need to introduce state into our filters. If the filters did not have state
-we would have to throw out partial values each execution of the {\tt work} function
-which makes our technique much less effective. Figure~\ref{fig:frequency-example} shows
-the basic idea of what is going on.
-
 
