@@ -50,9 +50,12 @@ $\tup{{\vec v}}{c}$. In an actual execution, the value of $y$ would be
 given by $y = {\vec v} \cdot {\vec x} + c$, where ${\vec x}$
 represents the input items.  The algorithm also maintains two
 variables $\mt{pushcount}$ and $\mt{popcount}$ that indicate how many
-items have been pushed and popped so far.  As it encounters {\tt push}
-operations, it builds up the matrix $A$ and vector ${\vec b}$ that
-will come to represent the linear node.
+items have been pushed and popped so far. As it encounters {\tt push}
+operations, it builds up the matrix $A$ and vector ${\vec b}$ that 
+will come to represent the linear node. The values of 
+$\mt{pushcount}$ and $\mt{popcount}$ when a push or pop is encountered
+are used to determine the appropriate locations within $A$ and ${\vec b}$.
+
 
 We briefly discuss the operation of {\bf Extract} at each program
 node.  The algorithm is formulated in terms of a simplified set of
