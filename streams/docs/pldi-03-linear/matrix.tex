@@ -1,16 +1,128 @@
 \section{Filter-Matrix Representations}
-In the 
+In general, a filter take some input and produce some output on
+each invocation of its work function. In actual applications, the output
+is typically some function of the input and possibly some additional 
+filter state. However, there is a large subset of filters in DSP applications
+which compute linear functions of the input, which we call ``linear filters.''
+If $x[n] n\in[0,peek]$ is the input on each work invocation, then we can 
+characterize the output as  $y[k] k\in[0,push] = (\sum_{i=0}^{N} a_{k,i}x[i])+b_{k}$ 
+where $w_{n,i}$ is weight of the linear combination of inputs and $C_{k}$ is some
+constant value.
 
+As the above equation looks much like the notation for a dot product, 
+it is not surprising that we can represent the action of linear filters 
+as a vector-matrix product. As figure~\ref{fig:overview-matrix} illustrates, 
+to represent a {\tt Filter} $F$'s action as a vector-matrix product, we 
+think of the input stream as a row vector $x$ of length $peek_{F}$
+and the output as a row vector $y$ of length $push_{F}$. The work function
+of $F$ can then be represented as matrix operations using a matrix $A$ and 
+a row vector $a$. We can then relate the the input $x$ with the output $y$
+with the matrix equation $y$ = $xA + a$. 
 
-\subsection{Extraction}
+$A$ has $peek_{F}$ rows and $push_{F}$ columns, and $a$ has $1$ row 
+and $push_{F}$ columns. The elements of $A$ are exactly the weights $a_{k,i}$ 
+and the elements of $a$ are exactly the $b_{k}$s.
+
 \begin{figure}
 \center
 \epsfxsize=2.5in
-\epsfbox{images/general-picture.eps}
-\caption{General Linear Filter Picture}
-\label{fig:overview}
+\epsfbox{images/general-picture-matrix.eps}
+\caption{Linear filter as a vector-matrix operation}
+\label{fig:overview-matrix}
+\end{figure}
+
+\subsection{Dataflow Analysis}
+The {\tt work} function in each {\tt Filter} can contain arbitrary c-like code, 
+and so therefore we ned to run a data analysis pass to determine which filters
+are actually computing linear functions of their inputs. The data analysis pass
+keeps mappings from variables to linear forms. Linear forms consist of column vectors
+of size $peek_{F}$ and a constant.
+
+(need to explain peek/pop/push expressions somewhere.....
+ Probably best done with an example)
+
+A linear form can be created in one of three ways. A constant $c$ generates a linear
+form with a column vector of zeros and $c$. A {\tt peek(i)} statement generates a linear form
+with a column vector with a 1 in the $i^th$ row from the bottom with a zero constant. A
+{\tt pop()} expression generates a linear form with a $1$ in the row that is associated with 
+the current input element. Of course, there is record keeping to calculate how many {\tt pop}s
+a program has performed up to a particular point in the program so that the correct
+row can be set to $1$ for {\tt pops} and {\tt peeks}.
+
+Linear forms propagate through the dataflow graph much like constants are propagated
+during a standard constant propagation pass. Two linear forms $lf_{1}$ and $lf_{2}$ can
+be added together by adding their vectors element wise and adding their constants. Similiarly, 
+linear forms can be subtracted. Linear forms can only be multiplied and divided by constants -- if
+two linear forms are multiplied together then the result is not a linear combination of the 
+filter's input.
+
+If statements are handled just like for constant propagation. The confluence operator that
+we use is set intersection, which only propagates variable to linear form mappings that are
+maintained along both branches of control flow. We also have to put the restriction that the
+same number of pops occured along both branches, or else we don't know what the current offset
+for generating peek and pop expressions is. We currently only handle loops that can be unrolled
+by a separate unrolling pass in the compiler. A loop can't be unrolled at compile time only if 
+its terminiation condition is data dependent. Data dependent loops probably don't compute linear 
+functions of the data, and so we declare any variables assigned values in a data dependant loop
+to be non linear.
+
+When the {\tt expr} in a {\tt push(expr)} expression is a linear form, we copy its column
+vector to the appropriate column in the overall filter's matrix $A$ and we copy the
+linear form's constant to the appropriate column in the filter's constant vector $b$.
+The first {\tt push} expression places the linear form in the last column of $A$. The second
+{\tt push} the second to last column of $A$, etc. The last column of $A$ represents the 
+calculations necessary for the first output item produced by the filter. The second to last
+column represents the calculatons for the second output item of the filter, etc.
+
+If all the {\tt push} expressions in a filter have linear forms as arguments, then we declare
+that the filter is linear and remember the mapping from filter to linear from.
+
+\subsection{Container Combination(propagation)}
+Merely determining that a single filter computes a linear combination of its input is not
+all that interesting or useful. There is significant savings to be reaped if we can
+find $A$ and $b$ for combinations of filters. Obviously, all of the child filters need
+to be linear filters for this combinations to work. We restrict our attention to combining
+{\tt Pipelines} and {\tt SplitJoins} because those constructs combine to form a new linear filter. 
+{\tt FeedbackLoops} retain state between executions, so the overall construct 
+does not compute a linear operation as we have defined it. 
+
+To combine filters, we must deal with rate matching. For instance, if there are two
+filters in a pipeline and the first one produces (pushes) 2 elements but the second one
+needs 4 elements to produce any output, we need the equivaluet of two firings of the
+first filter's {\tt work} function to produce output for the combined filter. 
+
+\begin{figure}
+\center
+\epsfxsize=2.5in
+\epsfbox{images/expanding-a-filter.eps}
+\caption{Expanding filter $F$ by a factor $f_{A}$}
+\label{fig:expanding-a-filter}
 \end{figure}
 
 
-\subsection{Container Combination(propagation)}
+Therefore, there is a need for a fundamental operation on our representation for 
+linear filters to represent producing data from multiple invocations of the work
+function. When a linear filter's form is ``expanded'' by a factor $F_{A}$ 
+we produce the matrix that describes the output from executing the filter's work
+function $f_{A}$ times. Figure~\ref{fig:expanding-a-filter} shows how the {\tt peek},
+{\tt pop} and  {\tt push} rates are affected by expanding by factor $f_{A}$.
 
+\begin{figure}
+\center
+\epsfxsize=2.5in
+\epsfbox{images/expanding-a-matrix.eps}
+\caption{Expanding a linear form $(A,b)$ by a factor $f_{A}$}
+\label{fig:expanding-a-matrix}
+\end{figure}
+
+Figure~\ref{fig:expanding-a-matrix} shows the matrix corresponding to expanding 
+a filter represented by $(A,b)$ by a factor $f_{A}$. The expansion is done by 
+making a new matrix with $f_{A}*push_{F}$ columns and $peek_{F}+(f_{A}-1)*pop_{F}$
+rows. The original matrix $A$ is then copied $f_{A}$ times and placed along the
+diagonal. Each copy is offset by $push_{F}$ columns and $pop_{F}$ rows.
+
+\subsubsection{Pipelines}
+{\tt Pipelines} are serial combiations of filters. 
+
+
+\subsubsection{SplitJoins}

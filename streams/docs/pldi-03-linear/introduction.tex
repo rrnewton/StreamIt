@@ -9,6 +9,30 @@ and time again. This remapping is costly arduous process that slows the pace of 
 because it forces engineers to spend time working out details rather than focusing on new technology.
 
 \subsection{StreamIt}
+
+\begin{figure}
+\center
+\epsfxsize=2.5in
+\epsfbox{images/general-picture-filter.eps}
+\caption{Filter F with $peek_{F}$, $pop_{F}$ and $push_{F}$}
+\label{fig:overview-filter}
+\end{figure}
+
+
+The StreamIt\cite{thies02streamit,thies01streamit,william-stream,michal-common} project
+aims to provide a common language and compiler for streaming computations. Streaming computations
+are characterized by data streaming in and out of the system while each data element (both
+input and output) is in the system for only a small amount of time. 
+StreamIt programs are composed of processing blocks called {\tt Filters} which
+contain an input tape from which they can read values and an output tape to which
+they can write values. Each filter executes a {\tt work} function periodically during which
+time input is consumed and output is produced. A {\tt Filter} $F$ can examine $peek_{F}$ items 
+from its input stream, of which it consumes $pop_{F}$ items and it puts $push_{F}$ items into
+its output stream. Currently StreamIt requires that each filter has $peek$, $pop$ and $push$ rates
+that are static and known at compile time. Figure~\ref{fig:overview-filter} illustrates how the
+various rates are related.
+
+
 \begin{figure}
 \center
 \epsfxsize=2.5in
@@ -17,15 +41,9 @@ because it forces engineers to spend time working out details rather than focusi
 \label{fig:structures}
 \end{figure}
 
-The StreamIt\cite{thies02streamit,thies01streamit,william-stream,michal-common} project
-aims to provide a common language and compiler for streaming computations. Streaming computations
-are characterized by data streaming in and out of the system while each data element (both
-input and output) is in the system for only a small amount of time. 
-StreamIt programs are composed of processing blocks called {\tt Filters} which
-contain an input tape from which they can read values and an output tape to which
-they can write values. {\tt Filters} are composed heirarchally into structures to form
-a Stream Graph representation of the program (*need to explain stream graph).
- 
+
+{\tt Filters} are composed heirarchally into structures to form
+a Stream Graph representation of the program (*need to explain stream graph). 
 {\tt Pipelines} represent the serial computation of one filter after another.
 {\tt SplitJoins} represent parallel computation. {\tt FeedbackLoops} allow cycles
 to be introduced into the stream graph. Figure~\ref{fig:structures} shows a {\tt Pipeline},
