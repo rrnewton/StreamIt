@@ -364,6 +364,12 @@ void streamit_run(stream_context *c);
 
 \subsection{Tapes}
 
+<<Tapes>>=
+<<struct [[tape]]>>
+<<Low-level Tape Macros>>
+<<High-level Tape Macros>>
+@
+
 Data is passed between streams on tapes.  The tape structure can be
 manipulated directly by work functions if need be.  The [[data]] is
 allocated by the creator of the tape, and its size is exactly
@@ -374,7 +380,7 @@ particular, they point to the last item read or written to the tape,
 such that [[PUSH]], [[POP]], and [[PEEK(0)]] will all use the
 following item.
 
-<<Tapes>>=
+<<struct [[tape]]>>=
 typedef struct tape {
   void *data;
   int read_pos;
@@ -387,23 +393,47 @@ typedef struct tape {
 There are macros defined to manipulate tapes.  [[PUSH]] adds an item
 to the writer end of the tape; [[PEEK]] and [[POP]] both read data
 from the reader end.  These macros take contexts as parameters, and
-are intended to be used by user-level code.  [[PUSH_TAPE]],
-[[PEEK_TAPE]], and [[POP_TAPE]] manipulate tape structures directly,
-and are used internally by the library in a couple of cases where just
-having a context is insufficient.
+are intended to be used by user-level code.
 
-<<Tapes>>=
-#define PUSH_TAPE(t, type, d) \
-  { if (++((t)->write_pos) >= (t)->tape_length) (t)->write_pos = 0; \
-    ((type *)((t)->data))[(t)->write_pos] = (d); }
-#define PEEK_TAPE(t, type, n) \
-  (((type *)(t)->data)[((t)->read_pos+n)%(t)->tape_length])
-#define POP_TAPE(t, type) \
-  ((((++((t)->read_pos)) >= (t)->tape_length) ? ((t)->read_pos = 0) : 0), \
-   ((type *)((t)->data))[(t)->read_pos])
+<<High-level Tape Macros>>=
 #define PUSH(c, type, d) PUSH_TAPE((c)->output_tape, type, d)
 #define PEEK(c, type, n) PEEK_TAPE((c)->input_tape, type, n)
 #define POP(c, type) POP_TAPE((c)->input_tape, type)
+@
+
+[[PUSH_TAPE]], [[PEEK_TAPE]], and [[POP_TAPE]] manipulate tape
+structures directly, and are used internally by the library in a
+couple of cases where just having a context is insufficient.
+[[INCR_TAPE_READ]] and [[INCR_TAPE_WRITE]] increment the tape position
+by exactly one, wrapping around if needed.  [[COPY_TAPE_ITEM]] copies
+the most recent item read from the source tape over the most recent
+item written to the destination tape; the caller is responsible for
+advancing tape positions beforehand if necessary.
+
+(This particular implementation is to accomodate duplicating
+splitters, which want to repeatedly copy one item from the input
+tape.  [[memcpy]] is implemented in inline assembly, at least using
+GNU libc on Linux, so it does not incur a function-call overhead.
+This implementation also requires the GNU C compiler, which treats
+[[sizeof(void)]] as 1 for purposes of pointer arithmetic.)
+
+<<Low-level Tape Macros>>=
+#define INCR_TAPE_WRITE(t) \
+  ((++((t)->write_pos) >= (t)->tape_length) ? \
+    (t)->write_pos = 0 : (t)->write_pos)
+#define INCR_TAPE_READ(t) \
+  ((++((t)->read_pos) >= (t)->tape_length) ? \
+    (t)->read_pos = 0 : (t)->read_pos)
+#define PUSH_TAPE(t, type, d) \
+  (((type *)((t)->data))[INCR_TAPE_WRITE(t)] = (d))
+#define PEEK_TAPE(t, type, n) \
+  (((type *)(t)->data)[((t)->read_pos+n+1)%(t)->tape_length])
+#define POP_TAPE(t, type) \
+  (((type *)((t)->data))[INCR_TAPE_READ(t)])
+#define COPY_TAPE_ITEM(s, d) \
+  (memcpy((d)->data + (d)->write_pos * (d)->data_size, \
+          (s)->data + (s)->read_pos * (s)->data_size, \
+          (d)->data_size))
 @
 
 \subsection{Filter Context}
