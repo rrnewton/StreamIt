@@ -3,7 +3,7 @@ Options to the StreamIt 'knit' Compiler Script
 
 This is for the May 28, 2003 snapshot release (streamit-0.0.20030528).
 
-$Id: OPTIONS,v 1.8 2003-05-28 17:35:39 dmaze Exp $
+$Id: OPTIONS,v 1.9 2003-05-28 17:46:43 thies Exp $
 
 
 Basic usage:
@@ -25,6 +25,9 @@ Options:
   --raw <n>
       Compile for an <n>-by-<n> RAW processor.
 
+  --raw <n> --rawcol <m>
+      Compile for an <n>-by-<m> RAW processor.
+
   --verbose
       Show intermediate commands as they are executed.
 
@@ -34,29 +37,14 @@ Options:
 
 Options available for all backends:
 
+  --unroll <n>, -u<n>
+      Specify loop unrolling limit.  The default value is 16.
+
   --linearreplacement
-      Analyze filters in the program, and possibly replace some of
-      them with matrix multiplies.  This can result in fewer filters
-      if adjacent filters can be combined into a single multiply.
-
-  --redundantreplacement, -t
-      If doing linear replacement, eliminate redundant multiplications
-      in the linear nodes.
-
-  --nofieldprop, -L
-      Avoid propagating constant values from a filter's init function
-      to its work function, as in:
-
-        float->float filter ScaleBySquare(float v) {
-          float v2;
-          init { v2 = v * v; }
-          work pop 1 push 1 { push(v2*pop()); }
-        }
-
-  --nolinearcollapse, -H
-      When performing linear replacement, do not collapse adjacent
-      linear filters into a single filter; only replace individual
-      filters with their linear equivalents.
+      Domain-specific optimization: combine adjacent "linear" filters
+      in the program into a single matrix multiplication operation
+      wherever possible.  Corresponds to the "linear" option in the
+      PLDI'03 paper.
 
   --sjtopipe, -J
       Convert split-joins to pipelines.  This works by converting an
@@ -75,8 +63,20 @@ Options available for all backends:
       by default, but --sync enables more aggressive (and less stable)
       transformations.
 
-  --unroll <n>, -u<n>
-      Specify loop unrolling limit.
+  --nofieldprop, -L
+      Avoid propagating constant values from a filter's init function
+      to its work function, as in:
+
+        float->float filter ScaleBySquare(float v) {
+          float v2;
+          init { v2 = v * v; }
+          work pop 1 push 1 { push(v2*pop()); }
+        }
+
+  --nolinearcollapse, -H
+      When performing linear replacement or frequency replacement, do
+      not collapse adjacent linear filters into a single filter; only
+      operate on individual filters.
 
 Options specific to RAW backend:
 
@@ -96,27 +96,43 @@ Options specific to RAW backend:
       default greedy partitioner.  On some benchmarks this gets better
       results; performance is generally comparable.
 
-  --raw-uni, -U
-      Use the RAW backend, but fuse to a single tile and output code
-      than can be run on a uniprocessor as a standalone C program
-      (without depending on the StreamIt C library).
-
   --simulatework, -T
       Use the RAW simulator to calculate the amount of time required
       to execute a work function, rather than using an estimator.
       This makes the compiler substantially slower; it may result in
       better partitioning.
 
+   --magic_net, -M
+      Compile to a "magic" network in which the buffer sizes between
+      Raw tiles are conceptually unbounded (the sender never blocks),
+      and the communication time has a constant overhead and per-hop
+      latency.  These parameters can be varied by editing the 
+      auto-generated Makefile.streamit file, which contains a string
+      "-magic_crossbar C1H1".  The number after the "C" refers to the
+      constant overhead; after the "H" refers to the per-hop latency.
+
+  --raw-uni, -U
+      Use the RAW backend, but fuse to a single tile and output code
+      that can be run on a uniprocessor as a standalone C program
+      (without depending on the StreamIt C library).
+
 Options specific to uniprocessor backend:
 
-  --frequencyreplacement (0-3)
-      Analyze filters in the program, and possibly replace some of
-      them with equivalent filters in the frequency domain.  The
-      parameter selects one of four algorithms, with '3' being the
-      most efficient.
+  --linearpartition, -B
+      Domain-specific optimization: perform linear replacement and
+      frequency replacement selectively, based on an estimate of
+      where it is most beneficial.  Corresponds to the "autosel"
+      option in the PLDI'03 paper.
+
+  --frequencyreplacement, -F
+      Domain-specific optimization: combine adjacent "linear" filters
+      in the program and convert them to the frequency domain
+      wherever possible.  Corresponds to the "freq" option in the
+      PLDI'03 paper.
 
   --poptopeek, -P
-      Convert all pop expressions into peeks.
+      Convert pop expressions into peeks, and pop only at the end of 
+      the work function.
 
   --profile
       Compile C code with profiling information.  This requires that
@@ -125,4 +141,3 @@ Options specific to uniprocessor backend:
       version of the StreamIt library; 'make profile' from
       $STREAMIT_HOME/library/c.  Profiling results can be analyzed
       using 'gprof'.
-
