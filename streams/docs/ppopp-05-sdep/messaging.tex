@@ -67,7 +67,8 @@ the portal to $A$ during initialization.
 \item To send a message, $A$ invokes the handler method on the portal
 from within its steady state work function. The handler invocation
 includes a range of latencies specifying when the message should be
-delivered: {\small
+delivered. The following illustrates an example.\\
+{\small
 \begin{verbatim}
 work pop 1 {
   float val = pop();
@@ -204,10 +205,10 @@ old and new frequency bands.
 
 A StreamIt version of the radio frontend with teleport messaging
 appears in Figure~\ref{fig:freq1}.  The Freq\_Hopping\_Radio pipeline
-creates a portal and adds the RFtoIF actor as a receiver.  The portal
+creates a portal and adds the RFtoIF actor as a receiver (lines 45 and 48 respectively).  The portal
 is passed to the Check\_Freq\_Hop stage, where four parallel detectors
 send messages into the portal if they detect a hop to the frequency
-they are monitoring.  The messages are sent with a latency of 4 to
+they are monitoring (lines 32-35).  The messages are sent with a latency of 4 to
 ensure a timely transition.  To make sense of the latency, note that
 $\sdepf{RFtoIF}{D}(n) = 64*n$ for each of the detector actors $D$.
 This comes about because the FFT stage consumes and produces 64 items;
