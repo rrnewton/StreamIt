@@ -1,4 +1,4 @@
-TEXFILES = *.tex
+TEXFILES = thies1.tex
 
 all:	${TEXFILES:.tex=.pdf}
 
