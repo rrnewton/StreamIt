@@ -1,0 +1,53 @@
+StreamIt: A Compiler Infrastructure for Stream Programs
+
+Applications that are structured around streams of data are becoming
+increasingly pervasive.  Stream programs include embedded systems for
+sensor nets and cell phones, desktop applications such as streaming
+media and networking, as well as high-performance servers such as HDTV
+editing consoles and hyper-spectral imaging.  Performance is still a
+critical factor in all of these domains, and programmers often
+sacrifice readability, robustness, and maintainability of their code
+in order to achieve it.
+
+Over the last three years, the StreamIt project at MIT has been
+developing programming abstractions and compiler optimizations to
+improve programmer productivity in the streaming domain.  The StreamIt
+language represents a program as a hierarchical graph of concurrent
+filters which communicate via FIFO queues.  By exposing the widespread
+parallelism and regular communication patterns inherent in stream
+programs, StreamIt allows aggressive compiler optimizations that are
+infeasible to perform using conventional languages.
+
+This talk provides an overview of the StreamIt compiler
+infrastructure, which was released publicly on our website in Fall,
+2003.  The release includes all of the StreamIt source code (in Java)
+as well as a set of benchmarks for the streaming domain.  We describe
+the compiler in the context of two research thrusts: targeting
+communication-exposed architectures and automating domain-specific DSP
+optimizations.
+
+First, we describe our backend support for the Raw machine, a tiled
+architecture with a fully programmable switch network.  To achieve
+good performance on Raw, the compiler includes phases for work
+estimation, load balancing, layout, and communication scheduling.  The
+load balancing stage utilizes a novel dynamic-programming algorithm
+that can be extended to consider a range of hierarchical cost
+functions.  The compiler achieves an average speedup of 9X for a
+16-tile Raw machine vs. a Pentium III.
+
+Second, we present a set of domain-specific optimizations for linear
+sections of the stream graph.  A filter is linear if each of its
+outputs can be represented as an affine combination of its inputs
+(e.g., FIR filters, expanders, compressors, FFTs).  The StreamIt
+compiler recognizes linear filters using a simple dataflow analysis.
+It then exploits the linear properties to perform algebraic
+simplification on adjacent filters and to translate linear
+computations into the frequency domain (when profitable).  These
+transformations yield an average speedup of 4.5X on a Pentium III.
+
+This is joint work with Michael Gordon, Michal Karczmarek, Jasper Lin,
+Andrew Lamb, David Maze, Rodric Rabbah and Saman Amarasinghe.  For
+more information, including our public release, please visit the
+StreamIt website:
+
+http://cag.csail.mit.edu/streamit
