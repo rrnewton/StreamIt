@@ -7,7 +7,7 @@
    <meta NAME="description" CONTENT="StreamIT">
    <title>StreamIt - Download</title>
 
-   <style fprolloverstyle>A:hover {color: #FF0000}</style>
+   <style fprolloverstyle>A:hover {color: #990000}</style>
 </head>
 
 <table border="0" width="600" cellpadding="2" align="center">
@@ -19,13 +19,13 @@
       <font color="#444A50">
         <br><br><br>
         <nobr><b>
-            <a href="../index.html"><font color="#FF0000">home</font></a>
-          | <a href="../html/news.html"><font color="#FF0000">news</font></a>
-          | <a href="../html/research.html"><font color="#FF0000">research</font></a>
-          | <a href="../html/people.html"><font color="#FF0000">people</font></a> 
-          | <a href="../html/documentation.html"><font color="#FF0000">documentation</font></a>
+            <a href="../index.html"><font color="#990000">home</font></a>
+          | <a href="../html/news.html"><font color="#990000">news</font></a>
+          | <a href="../html/research.html"><font color="#990000">research</font></a>
+          | <a href="../html/people.html"><font color="#990000">people</font></a> 
+          | <a href="../html/documentation.html"><font color="#990000">documentation</font></a>
           | download</a>
-          | <a href="../html/contact.html"><font color="#FF0000">contact</font></a>
+          | <a href="../html/contact.html"><font color="#990000">contact</font></a>
         </nobr></b>
         <hr>
       </font>
@@ -42,10 +42,10 @@
     <td width="130" valign="top" align="left">
       <!--
       <b><hr>
-	<a href="../html/systems-reqs.html"><font color="#FF0000">requirements</font></a><br><hr>
-	<a href="../html/systems-dwnl.html"><font	color="#FF0000">download    </font></a><br><hr>
-	<a href="../html/systems-faqs.html"><font color="#FF0000">faq         </font></a><br><hr>
- 	<a href="../html/systems-sprt.html"><font color="#FF0000">support     </font></a><br><hr>
+	<a href="../html/systems-reqs.html"><font color="#990000">requirements</font></a><br><hr>
+	<a href="../html/systems-dwnl.html"><font	color="#990000">download    </font></a><br><hr>
+	<a href="../html/systems-faqs.html"><font color="#990000">faq         </font></a><br><hr>
+ 	<a href="../html/systems-sprt.html"><font color="#990000">support     </font></a><br><hr>
       </b>
       -->
     </td>
@@ -116,16 +116,15 @@
 	      should work in the Java library.
           </p>
 	    <li><p align="justify">
-	      The   compiler   may  have   memory   issues  running   on
-	      particularly  large benchmarks.   The  dynamic programming
-	      partitioner  (<i>--partition-dp</i>)  generally uses  less
-	      memory than the default greedy partitioner.
-          </p>
-	    <li><p align="justify">
             Multidimensional arrays may not work well, particularly as
             the input or output  type of a filter. (Better performance
             is often possible by destructuring arrays in any case.)
           </p>
+	    <li><p align="justify">
+	      The   compiler   may  have   memory   issues  running   on
+	      particularly  large benchmarks.
+          </p>
+	  <!--
 	    <li><p align="justify">
 	      Phased  filter support  differs between  the  compiler and
 		library.  A  work function that consists only  of calls to
@@ -134,6 +133,7 @@
 		and static  control flow, would  work in the  compiler but
 		not  the  library.  The  intermediate  Java  code  differs
 		between the two compilation paths.
+		-->
           </p>
 	    <li><p align="justify">
 	      The Java  library infrastructure may  not allow particular

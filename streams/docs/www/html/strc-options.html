@@ -1,5 +1,10 @@
 <html>
 
+<!-- NOTE: DO NOTE EDIT THE OPTIONS LIST BY HAND!  Generate it from
+options.tex in ../release (by typing "make").  The HTML here has just
+minor visual cleanups of the Latex-to-HTML conversion, plus a link to
+the cookbook.  -->
+
 <head>
    <meta http-equiv="Content-Type" content="text/html;charset=iso-8859-1">
    <meta NAME="author" CONTENT="rodric m. rabbah">
@@ -7,7 +12,7 @@
    <meta NAME="description" CONTENT="StreamIT">
    <title>StreamIt - Quick Start Guide to the StreamIt Compiler</title>
 
-   <style fprolloverstyle>A:hover {color: #FF0000}</style>
+   <style fprolloverstyle>A:hover {color: #990000}</style>
 </head>
 
 <body>
@@ -21,13 +26,13 @@
       <font color="#444A50">
         <br><br><br>
         <nobr><b>
-            <a href="../index.html"><font color="#FF0000">home</font></a>
-          | <a href="../html/news.html"><font color="#FF0000">news</font></a>
-          | <a href="../html/research.html"><font color="#FF0000">research</font></a>
-          | <a href="../html/people.html"><font color="#FF0000">people</font></a> 
-          | <a href="../html/documentation.html"><font color="#FF0000">documentation</font></a>
-          | <a href="../html/download.html"><font color="#FF0000">download</font></a>
-          | <a href="../html/contact.html"><font color="#FF0000">contact</font></a>
+            <a href="../index.html"><font color="#990000">home</font></a>
+          | <a href="../html/news.html"><font color="#990000">news</font></a>
+          | <a href="../html/research.html"><font color="#990000">research</font></a>
+          | <a href="../html/people.html"><font color="#990000">people</font></a> 
+          | <a href="../html/documentation.html"><font color="#990000">documentation</font></a>
+          | <a href="../html/download.html"><font color="#990000">download</font></a>
+          | <a href="../html/contact.html"><font color="#990000">contact</font></a>
         </nobr></b>
         <hr>
       </font>
@@ -54,162 +59,87 @@
 	this down to  <font color=purple>foo.c</font>, and then compiles
 	and    links     this    to    produce     a    binary,    <font
 	color=purple>a.out</font>.<br>
-      <br>
 
-	<h2><hr>strc Command Line Parameters<hr></h2>
+      <p align="justify">
+      
+      The <a href="http://cag.lcs.mit.edu/streamit/papers/streamit-cookbook.pdf">StreamIt
+      Cookbook</a> provides a step-by-step tutorial for getting
+      started with the language and compiler.  For reference, the
+      command-line options to the compiler are also described below.<br>
+
+	<h2><hr>strc Command Line Options<hr></h2>
 	<dl compact=compact>
-	  <dt><b>--debug</b><dd>
-            Output debugging information in the compiler.<br>
-	  <br>
-
-	  <dt><b>--destroyfieldarray</b><dd>
-	      Break down arrays in structures to their component elements.
-	      <pre>              struct OriginalStruct {
-                float[2] p;
-              }
-		  struct DestroyedStruct {
-                float p1, p2;
-              }</pre>
-
 	  <dt><b>--help</b><dd>
 	      Displays a summary of common options.<br>
 	  <br>
 
-	  <dt><b>--java</b><dd>
-	      Used to compile files in "old" syntax (written in
-	      Java). This is added automatically if all of the input file names
-	      end in <font color=purple>.java</font>.<br>
-	  <br>
-
-	  <dt><b>--library</b><dd>
-	      Use the StreamIt Java library to execute.<br>
-	  <br>
-
-	  <dt><b>--memory &lt;<em>size</em>&gt;, -Mmx &lt;<em>size</em>&gt;</b><dd>
-	      Set maximum Java runtime heap size. The default heap size is 1700Mb.<br>
-	  <br>
-
 	  <dt><b>--more-help</b><dd>
-	      Displays a summary of advanced options.<br>
+	      Displays a summary of advanced options (which are not described below).<br>
 	  <br>
-
-	  <dt><b>-O0</b><dd>
-	      Disable all optimizations.<br>
-	  <br>
-
-	  <dt><b>-O1</b><dd>
-	      Perform basic optimizations that should improve performance in most
-		cases. Adds <tt>--unroll 16 --destroyfieldarray --ratematch --wbs</tt>.<br>
-	  <br>
-
-	  <dt><b>-O2</b><dd>
-	       Perform extended optimizations that should improve performance in
-		 most cases, but may also cause the compiler to become unstable.
-		 Adds <tt>--unroll 256 --destroyfieldarray --ratematch --removeglobals --simulatework --wbs</tt>.<br>
-	  <br> 
 
 	  <dt><b>--output &lt;<em>filename</em>&gt;</b><dd>
 	      Places the resulting binary in &lt;<em>filename</em>&gt;.<br>
 	  <br>
 
-	  <dt><b>--fission</b><dd>
-            XXX.Do vertical fission up to limit of argument.<br>
-	  <br>
-
-	  <dt><b>--fusion</b><dd>
-            Fuse entire program to a single filter.<br>
-	  <br>
-
-	  <dt><b>--linearreplacement, -l</b><dd>
-	      Domain-specific optimization: combine adjacent "linear"
-	      filters in the program into a single matrix multiplication
-	      operation wherever possible.<br>
-	  <br>
-
-	  <dt><b>--linearreplacement2</b><dd>
-            XXX.Do linear replacement using a level of indirection.<br>
-	  <br>
-
-	  <dt><b>--linearreplacement3</b><dd>
-            XXX.Do linear replacement using diagonal replacement.<br>
-	  <br>
-
-	  <dt><b>--nofieldprop</b><dd>
-	      Avoid propagating constant values from a filter's init function
-		to its work function, as in:
-		<pre>              float-&gt;float filter ScaleBySquare(float v) {
-                float v2;
-                init { v2 = v * v; }
-                work pop 1 push 1 { push(v2*pop()); }
-              }</pre>
-
-        <dt><b>--nolinearcollapse</b><dd>
-	      When performing linear replacement or frequency replacement, do
-	      not collapse adjacent linear filters into a single filter; only
-		operate on individual filters.<br>
-	  <br>
-
-        <dt><b>--print-partitioned-source</b><dd>
-            Print program source after partitioning.<br>
-	  <br>
-
-        <dt><b>--redundantreplacement</b><dd>
-            Create linear filters without redundant computation.<br>
-	  <br>
-
-	  <dt><b>--sjtopipe</b><dd>
-	      Convert   split-joins  to   pipelines.   This   works  by
-	      converting   an  <I>n</I>-way   split-join   to  <I>n</I>
-	      <I>n</I>-way split-joins in series, where each split-join
-	      has (<I>n</I>-1) identity filters and one of the children
-	      of  the   original  split-join,  and   then  fusing  each
-	      splitjoin  into  a  single  filter.  This  could  improve
-	      performance  for  large  splitjoins by  reducing  network
-	      contention.<br>
+	  <dt><b>--raw &lt;<em>n</em>&gt;, -r&lt;<em>n</em>&gt;</b><dd>
+	      Compile for an &lt;<em>n</em>&gt;-by-&lt;<em>n</em>&gt; Raw processor.<br>
 	  <br>
 
 	  <dt><b>--standalone, -S</b><dd>
 	      Generate C file without library dependencies.<br>
 	  <br>
 
-	  <dt><b>--sync</b><dd>
-	      Perform   aggressive   synchronization   removal.   The
-	      simplest  case  of  this  involves two  split-joins  in  a
-	      pipeline, where  the joiner of the first  and the splitter
-	      of  the second have  identical weights  and the  number of
-	      children  is the  same; then  the two  split-joins  can be
-	      combined into one. This  case is performed by default, but
-	      --sync   enables  more   aggressive   (and  less   stable)
-	      transformations.<br>
+	  <dt><b>--library</b><dd>
+	  Produce a Java file compatible with the StreamIt Java library,
+	  and compile and run it.<br>
 	  <br>
 
-	  <dt><b>--unroll &lt;<em>n</em>&gt;, -u&lt;<em>n</em>&gt;</b><dd>
-            Specify loop unrolling limit. The default value is 0.<br>
+	  <dt><b>--memory &lt;<em>size</em>&gt;, -Mmx &lt;<em>size</em>&gt;</b><dd>
+	      Set maximum Java runtime heap size. The default heap size is 1700Mb.<br>
 	  <br>
 
 	  <dt><b>--verbose</b><dd>
 	      Show intermediate commands as they are executed.<br>
 	  <br>
+
       </dl>
 
-
-	<h2><hr>strc Parameters Specific to Raw Backend<hr></h2>
+	<h2><hr>strc Options Available for All Backends<hr></h2>
 	<dl compact=compact>
-	  <dt><b>--partition, -p</b><dd>
-	     Partition the stream graph, performing either filter fission or
-	     fusion until the number of filters is approximately equal to the
-	     number of tiles. This is required if the number of filters in
-	     the expanded stream graph is greater than the number of tiles.<br>
+	  <dt><b>-O0</b><dd>
+	      Perform no optimizations (default).<br>
 	  <br>
 
-	  <dt><b>--partition-dp</b><dd>
-	     Use a partitioner based on dynamic programming, rather than the
-	     default greedy partitioner. On some benchmarks this yields better
-	     results; performance is generally comparable.<br>
+	  <dt><b>-O1</b><dd>
+	      Perform basic optimizations that should improve performance in most
+		cases. Adds <tt>--unroll 16 --destroyfieldarray --partition --ratematch --wbs</tt>.<br>
 	  <br>
 
-	  <dt><b>--partition-greedy</b><dd>
-	     Use a greedy based partitioner.<br>
+	  <dt><b>-O2</b><dd>
+	       Perform extended optimizations that should improve performance in
+		 most cases, but may also cause the compiler to become unstable.
+		 Adds <tt>--unroll 256 --destroyfieldarray --partition --ratematch --removeglobals --simulatework --wbs</tt>.<br>
+	  <br> 
+
+	  <dt><b>--linearreplacement, -l</b><dd> Domain-specific
+	      optimization: combine adjacent "linear" filters in the
+	      program into a single matrix multiplication operation
+	      wherever possible.  Corresponds to the "linear" option
+	      in the PLDI'03 paper.<br>
+	  <br>
+	  <dt><b>--unroll &lt;<em>n</em>&gt;, -u&lt;<em>n</em>&gt;</b><dd>
+            Specify loop unrolling limit. The default value is 0.<br>
+	  <br>
+	</dl>
+
+	<h2><hr>strc Options Specific to Raw Backend<hr></h2>
+	<dl compact=compact>
+	  <dt><b>--partition, -p</b><dd> Partition the stream graph,
+	     using a dynamic programming algorithm to divide the graph
+	     into load balanced units for execution on separate tiles.
+	     This is turned on by default if the number of filters in
+	     the expanded stream graph is greater than the number of
+	     tiles.<br>
 	  <br>
 
 	  <dt><b> --magic_net, -M</b><dd>
@@ -229,57 +159,39 @@
 	     placed in <font color=purple>results.out</font> in the current directory.<br>
 	  <br>
 
-	  <dt><b>--ptraccess</b><dd>
-	     Access buffers through a pointer.<br>
-	  <br>
-
-	  <dt><b>--ratematch</b><dd>
-	     Turn on rate matching.<br>
-	  <br>
-
-	  <dt><b>--raw &lt;<em>n</em>&gt;, -r&lt;<em>n</em>&gt;</b><dd>
-	      Compile for an &lt;<em>n</em>&gt;-by-&lt;<em>n</em>&gt; Raw processor.<br>
-	  <br>
-
 	  <dt><b>--rawcol &lt;<em>m</em>&gt;, -c&lt;<em>m</em>&gt;</b><dd>
 	      Specify number of columns in Raw processor; --raw specifies number of rows.<br>
 	  <br>
 
-	  <dt><b>--removeglobals</b><dd>
-	      Inline all functions and turn globals into locals.<br>
+	  <dt><b>--simulatework, -s</b><dd> Use the Raw simulator to
+	      calculate the amount of time required to execute a work
+	      function, rather than using an estimator.  This makes
+	      the compiler substantially slower; it may result in
+	      better partitioning.<br>
 	  <br>
 
-	  <dt><b>--simulatework, -s</b><dd>
-	     Use the Raw simulator to calculate the amount of time required
-	     to execute a work function, rather than using an estimator.
-	     This makes the compiler substantially slower; it may result in
-	     better partitioning.<br>
-	  <br>
-
-	  <dt><b>--wbs</b><dd>
-	     When laying out communication instructions, use the work-based
-	     simulator.
+	  <dt><b>--wbs</b><dd> When laying out communication
+	     instructions, use the work-based simulator to estimate
+	     exactly when items will be produced and consumed.  This
+	     improves the scheduling of routing instructions.
 	  <br>
 	</dl>
 
 
-	<h2><hr>strc Parameters Specific to Uniprocessor Backend<hr></h2>
+	<h2><hr>strc Options Specific to Uniprocessor Backend<hr></h2>
 	<dl compact=compact>
-	  <dt><b>--frequencyreplacement, -F</b><dd>
-	     Domain-specific optimization: combine adjacent "linear"
-	     filters in the program and convert them to the frequency domain
-	     wherever possible.<br>
+	  <dt><b>--frequencyreplacement, -F</b><dd> Domain-specific
+	     optimization: combine adjacent "linear" filters in the
+	     program and convert them to the frequency domain wherever
+	     possible.  Corresponds to the "freq" option in the
+	     PLDI'03 paper.<br>
 	  <br>
 
-	  <dt><b>--linearpartition, -L</b><dd>
-	     Domain-specific optimization: perform linear replacement and
-	     frequency replacement selectively, based on an estimate of where
-	     it is most beneficial.<br>
-	  <br>
-
-	  <dt><b>--poptopeek</b><dd>
-	     Convert pop expressions into peeks, and pop only at the end of 
-	     the work function.<br>
+	  <dt><b>--linearpartition, -L</b><dd> Domain-specific
+	     optimization: perform linear replacement and frequency
+	     replacement selectively, based on an estimate of where it
+	     is most beneficial. Corresponds to the "autosel" option
+	     in the PLDI'03 paper.<br>
 	  <br>
 
 	  <dt><b>--profile</b><dd>
@@ -293,15 +205,11 @@
 	</dl>
 
 
-	<h2><hr>strc Parameters Specific to Java Library<hr></h2>
+	<h2><hr>strc Options Specific to Java Library<hr></h2>
 	<dl compact=compact>
 	  <dt><b>--iterations &lt;<em>n</em>&gt;, -i&lt;<em>n</em>&gt;</b><dd>
 	     Run the program for &lt;<em>n</em>&gt; steady-state iterations. Defaults
 	     to infinity.<br>
-	  <br>
-
-	  <dt><b>--marksteady</b><dd>
-	     Print "*" to standard output after each steady-state execution.<br>
 	  <br>
 
 	  <dt><b>--norun</b><dd>
@@ -316,9 +224,11 @@
 	  <br>
 
 	  <dt><b>--printsched</b><dd>
-	     Print the program schedule.
+	     Print out the minimal-latency schedule for the program.
 	</dl>
-
+	  <dt><b>--marksteady</b><dd>
+	     Print "*" to standard output after each steady-state execution.<br>
+	  <br>
       </p>
     </td>
     <td width="150" valign="top" align="left"></td>
