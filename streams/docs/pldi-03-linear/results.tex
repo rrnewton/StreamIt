@@ -55,29 +55,28 @@ Full results, benchmarks and source can be viewed at
 
 %Our measurement platform is a Dual Intel 2.2 GHz P4 Xeon processor
 %system with 2GB of memory running GNU/Linux. 
-Our measurement platform is a Dual Intel P4 Xeon
-system with 2GB of memory running GNU/Linux. 
-We compile our benchmarks
-using StreamIt's uniprocessor backend and generate executables from
-the resulting C files using {\tt gcc -O2}.  To measure the number of
-runtime multiplications, we use an instruction counting
-DynamoRIO\cite{dynamo99} client.  Since there are no external sources
-of benchmarks written in StreamIt, we assembled a set of
-representative programs which perform computations that are commonly
-found in streaming applications: 1) {\bf FIR}, a single 256 point low
-pass FIR filter; 2) {\bf RateConvert}, an audio down sampler that
-converts the sampling rate by a non-integral factor ($\frac{2}{3}$);
-3) {\bf TargetDetect}, four matched filters in parallel with threshold
-target detection; 4) {\bf FMRadio}, an FM software radio with
-equalizer; 5) {\bf Radar}, the core functionality in modern radar
-signal processors, based on a system from the Polymorphic Computing
+Our measurement platform is a Dual Intel P4 Xeon system with 2GB of
+memory running GNU/Linux.  We compile our benchmarks using StreamIt's
+uniprocessor backend and generate executables from the resulting C
+files using {\tt gcc -O2}.  To measure the number of runtime
+multiplications, we use an instruction counting
+DynamoRIO\cite{dynamo99} client.  Since StreamIt is a new language,
+there are no external sources of benchmarks.  Thus, we have assembled
+the following set of representative streaming components and have
+rewritten them in StreamIt: 1) {\bf FIR}, a single 256 point low pass
+FIR filter; 2) {\bf RateConvert}, an audio down sampler that converts
+the sampling rate by a non-integral factor ($\frac{2}{3}$); 3) {\bf
+TargetDetect}, four matched filters in parallel with threshold target
+detection; 4) {\bf FMRadio}, an FM software radio with equalizer; 5)
+{\bf Radar}, the core functionality in modern radar signal processors,
+based on a system from the Polymorphic Computing
 Architecture~\cite{pca}; 6) {\bf FilterBank}, a multi-rate signal
 decomposition processing block common in communications and image
 processing; 7) {\bf Vocoder}, a channel voice coder, commonly used for
 speech analysis and compression; 8) {\bf Oversample}, a $16x$
 oversampler, a function found in many CD players, 9) {\bf DToA}, an
-audio post-processing stage prior to a 1-bit D/A converter with
-an oversampler and a first order noise shaper.
+audio post-processing stage prior to a 1-bit D/A converter with an
+oversampler and a first order noise shaper.
 
 \subsection{Performance}
 To determine the effects of our linear replacement and frequency
@@ -120,29 +119,31 @@ algorithm.
 
 As Figure~\ref{fig:execution-speedup} demonstrates, our benchmarks
 speedup on average by a factor of {\bf XXXXX} and by a factor of
-$XXXXXXX$ in the best case.  Our performance improvements are due only
-in part to to the efficiency of FFTW.  Multiplications are decreased
-and execution time is improved in RateConvert, FM, FilterBank and
-Vocoder with only linear replacement. Linear replacement improvements
-are due to removing redundant computations --- in essence, it performs
-algebraic simplification across filter boundaries.
+$XXXXXXX$ in the best case.  
+%Our performance improvements are due only in part to to the efficiency
+%of FFTW.
+Multiplications are decreased and execution time is improved in
+RateConvert, FM, FilterBank and Vocoder with only linear
+replacement. Linear replacement improvements are due to removing
+redundant computations --- in essence, it performs algebraic
+simplification across filter boundaries.
 
 There are two cases in which the multiplication reduction is not a
 good predictor of execution speedup.  For Vocoder, the optimization
 selection algorithm achieves the same number of multiplications as
 applying both linear and frequency replacement; however, the speedup
-is higher with automatic selection because the selection
-algorithm refactors and combines a linear splitjoin where the plain
+is higher with automatic selection because the selection algorithm
+refactors and combines a linear splitjoin where the plain
 optimizations do not. The refactoring has no effect on the number of
 multiplications required, but it increases the execution time because
-it increases the runtime overhead in the execution of the stream graph.  
-FilterBank illustrates similar behavior --- the selection algorithm 
-determines a clever refactoring that reduces the number of 
-multiplications compared to applying both linear and frequency replacement, but the additional
-overhead required actually causes the execution time to
-increase. A more accurate cost model that takes into account costs
-other than multiplications could help the selection algorithm improve
-its choice of stream graph arrangements.
+it increases the runtime overhead in the execution of the stream
+graph.  FilterBank illustrates similar behavior --- the selection
+algorithm determines a clever refactoring that reduces the number of
+multiplications compared to applying both linear and frequency
+replacement, but the additional overhead required actually causes the
+execution time to increase. A more accurate cost model that takes into
+account costs other than multiplications could help the selection
+algorithm improve its choice of stream graph arrangements.
 
 \begin{table*}[t]
 \vspace{-6pt}
