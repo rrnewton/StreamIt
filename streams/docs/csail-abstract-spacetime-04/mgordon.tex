@@ -58,6 +58,7 @@ basic constructs that expose the parallelism and communication of
 streaming applications without depending on the topology or
 granularity of the underlying architecture.  Our previous work,
 \cite{streamit-asplos} and \cite{mgordon-thesis}, has focused on 
+implementing a {\it space-multiplexing} (see below) backend for
 MIT's Raw architecture \cite{raw}, a tiled architecture 
 with fine-grained, programmable communication between processors.
 Currently we are implementing a new backend targeting Raw that will
@@ -66,16 +67,17 @@ incorporate the lessons learned while investigating our previous work.
 \absection{Approach} 
 
 Given a stream graph, composed of filters (actors) and FIFO,
-uni-directional arcs connecting the filter, what is the best way to
+uni-directional arcs connecting the filters, what is the best way to
 execute it?  If we are targeting a uniprocessor, the most obvious
 technique would be {\it time multiplexing} where we run one filter at
 a time on the processor.  Load balancing is not an issue and the
 memory interface provides synchronization.  Problems arise if we
 target a multiprocessor.  Time multiplexing leads to long latency,
 lots of memory traffic (possibly with bad cache behavior), and it
-would require data-parallel filters for full utilization.
+would require data-parallel filters for full utilization with the
+filters being spread across the entire chip.
 
-Another approach would be to run all the filters in parallel, each on
+A second approach would be to run all the filters in parallel, each on
 its own tile.  We call this {\it space multiplexing}.  Our first 
 StreamIt compiler for Raw uses this technique.  Space multiplexing
 affords no filter swapping overhead, reduced memory traffic,
@@ -85,7 +87,7 @@ Load balancing is the performance focal point of space multiplexing.  Merging
 and splitting filters of the stream graph until the graph is composed
 of $n$ load balanced filters, where $n <=$ \# of processing
 elements, proved difficult, with many factors coming into play.  
-Finally, for chip configurations with relatively few processors, merging filters
+For chip configurations with relatively few processors, merging filters
 can lead to coarse-grained operations in each processing element. 
 
 The technique employed by our new backend for Raw is to merge the
