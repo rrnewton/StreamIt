@@ -62,7 +62,7 @@ similar,  and  uses  a  colon  instead  of a  comma  to  separate  the
 \texttt{min}  and \texttt{max}  expressions;  should we  use the  same
 syntax  here for  consistency?}.  A  $*$  may replace  the minimum  or
 maximum  peek/pop/push rate  expressions to  respectively  indicate an
-unbound lower  limit or an  unbound upper limit\footnote{Lets  not use
+unbounded lower  limit or an  unbounded upper limit\footnote{Lets  not use
 left and  right parentheses when  indicating an unbound  limit.  Also,
 note that  a range of  [$*$, $*$] is  allowed, as in  {\it push}~[$*$,
 $*$] but  this is really equivalent  to {\it push}~$*$  and perhaps we
@@ -111,7 +111,7 @@ there are  three new splitters  that are geared toward  dynamic stream
 behaviors.   The three  new types  of splitters  are \texttt{exclusive
 switch},    \texttt{multiple   switch},    and    \texttt{set}.    The
 \texttt{exclusive switch} splitter channels  input data to only one of
-its  static  sibling streams.  The  \texttt{multioke switch}  splitter
+its  static  sibling streams.  The  \texttt{multiple switch}  splitter
 channels  input data  to any  number of  its statically  defined child
 streams,   and   it   may   operate   as   a   \texttt{duplicate}   or
 \texttt{roundrobin} splitter.
@@ -122,7 +122,9 @@ defined splitters, and joiners.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\subsection {\texttt{exclusive switch} Splitters}
+\subsection{Dynamic Splitters:  Option A}
+
+\subsubsection {\texttt{exclusive switch} Splitters}
 
 An \texttt{exclusive  switch} splitter has  a single input of  a given
 type and multiple  outputs of the same type. However,  only one of the
@@ -197,7 +199,7 @@ added stream is automatically activated after initialization.}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\subsection {\texttt{multiple switch} Splitters}
+\subsubsection {\texttt{multiple switch} Splitters}
 
 A \texttt{multiple switch} splitter has a single input of a given type
 and multiple  outputs of the  same type. Unlike  the \texttt{exclusive
@@ -219,7 +221,7 @@ illustrates a \texttt{multiple switch} splitter definition.
 
 The splitter in the  example is a \texttt{roundrobin} \texttt{multiple
 switch}.  It operates as a roundrobin splitter, passing \verb+Npixels+
-at  a time to  each active  streams. A  stream that  is not  active is
+at  a time to  each active  stream. A  stream that  is not  active is
 ignored.  Here,  the   \texttt{multiple  switch}  defines  the  naming
 convention,  and as  each child  stream is  added, it  is  either {\it
 enabled} or  {\it disabled} using the  \verb+enable+ or \verb+disable+
@@ -272,7 +274,7 @@ is toggled and the fine grain control is lost.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\subsection{Compiler Hints}
+\subsubsection{Compiler Hints}
 
 A programmer  may pass hints to  the compiler to  allow for aggressive
 optimizations or automatic specialization. The hints describe the {\it
@@ -296,10 +298,7 @@ active, the  ``luminater'' is also active, but  when the ``luminater''
 is active,  the ``blur'' stream is  only active 50\% of  the time, and
 the ``fogger'' is never active.
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\subsection {\texttt{set} Splitters}
+\subsubsection {\texttt{set} Splitters}
 
 There are still some issues to sort out.\\
 1) i think all streams in a set should be of the same ``type''
@@ -322,7 +321,285 @@ allocation scheme (which i think we should provide regardless).\\
 \verb+split set<>(naming convention)+ and to add or delete a stream, we
 can use the same syntax as in (2).
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+\subsection{Dynamic Splitters:  Option B}
+
+In this model, there is slightly less new syntax for dynamic
+splitters.  The two key ideas are:
+
+\begin{itemize}
+
+\item A switch or set splitter is indicated by an annotation on the
+split type. For example, \verb+split switch(N) roundrobin+ indicates a
+roundrobin splitter in which the components can be switched on and
+off; at any given time, there are at most N components enabled.  This
+generalizes our previous notion; an exclusive switch is
+\verb+switch(1)+ and an arbitrary multiswitch is \verb+switch(*)+.  In
+the case of a set splitter, the N argument indicates the maximum width
+of the set at any time.  Note that a roundrobin can be used with both
+a switch and a set type so long as it supports a width of N.
+
+\item All enabling and disabling of a stream $S$ is done by a method
+call from within the splitjoin containing $S$.  The methods available
+are:
+
+\begin{enumerate}
+
+\item \verb+enable stream+ -- turn on a stream
+\item \verb+disable stream+ -- turn off a stream
+\item \verb+add stream+ -- add a new stream
+\item \verb+delete stream+ -- delete a stream
+
+\end{enumerate}
+
+A splitjoin with a switch splitter can call enable/disable; a
+splitjoin with a set splitter can call all the methods.  The argument
+is a ``stream handle'': it represents either a new stream or a
+reference to a stream that was created earlier (and stored in a field,
+for example.)  If these methods are called from the init function,
+they go into effect before the stream starts running.  If they are
+called from within a message handler, they complete ``atomically'' in
+the message handler; this means that no items are processed through the
+splitter while the message handler is executing.
+
+If \verb+enable+ is called on a switch that supports at most N enabled
+streams, and there are already N streams enabled, then one of the
+currently enabled streams is turned off and the requested stream is
+turned on.  (This at least makes it easier to do the toggling in an
+exclusive switch; the compiler enforces that at most one is enabled at
+once.  Maybe it is less useful in a multi switch.)
+
+\end{itemize}
+
+\noindent Here are some example using this approach; afterwards are
+pros/cons, extensions, and open issues.
+
+\noindent {\bf Example:  Exclusive Switch}
+
+In these examples, we specify the splitter as \verb+split switch(1)+,
+ommitting any duplicate/roundrobin specifier.  This is syntactic
+sugar, as it is irrelevant what the policy is when there is only one
+active stream.
+
+\begin{verbatim}
+   float->float splitjoin Radio() {
+     FMradio fm;
+     AMradio am;
+     
+     init {
+       split switch(1);
+       fm = add FMradio();
+       am = add AMradio();
+       enable fm;
+       join inorder;
+     }
+
+     handler switchToFM() {
+       enable fm;
+     }
+
+     handler switchToAM() {
+       enable fm;
+     }
+
+   }
+\end{verbatim}
+
+\begin{verbatim}
+   float->float splitjoin ChannelBoosters(int channels, int lowFrequency, int frequencyStep) {
+     Booster[channels] boosters;
+
+     init {
+       split switch(1);
+       for (int i = 0; i < channels; i++) {
+         int frequency = lowFrequency + (i * frequencyStep);
+         boosters[i] = add Booster(frequency);
+       }
+       enable boosters[0];
+       join inorder;
+     }
+     
+     handler switchToBooster(int i) {
+       enable boosters[i];
+     }
+
+   }
+\end{verbatim}
+
+\noindent {\bf Example:  Multiple Switch}
+
+In the following example, note the declaration of the shade, fog,
+etc. variables as type ``Stream'' to avoid separate declarations for
+each one.  For turning things on and off, a Stream type is good
+enough.
+
+\begin{verbatim}
+   float->float splitjoin GraphicsEffects(int Npixels) {
+     Stream shade, fog, blur, illuminate;
+
+     init {
+       split switch(*) roundrobin(Npixels);
+       shade = add Shade();
+       fog = add Fog();
+       blur = add Blur();
+       illuminate = add Illuminate();
+       join inorder;
+     }
+
+     handler enableShade() {
+       enable shade;
+     }
+     handler disableShade() {
+       disable shade;
+     }
+
+     handler enableFog() {
+       enable fog;
+     }
+     handler disableFog() {
+       disable fog;
+     }
+
+     handler enableBlur() {
+       enable blur;
+     }
+     handler disableBlur() {
+       disable blur;
+     }
+
+     handler enableIlluminate() {
+       enable illuminate;
+     }
+     handler disableIlluminate() {
+       disable illuminate;
+     }
+
+   }
+\end{verbatim}
+
+\noindent {\bf Example: Set}
+
+To support sets, we discussed introducing a primitive data type for
+``growable arrays''.  For example, an array declared as \verb+A[*]+
+could have any number of elements; an array \verb-A[N+]- would have at
+least N elements.  The length could be extended (and contracted) by
+explicit mutation of the \verb+A.length+ field.  This was appealing
+since it is probably sufficient to implement the dynamic behaviors we
+want, and it is simple to implement efficiently.
+
+However, upon playing around with some examples, I think we should
+support primitive lists -- otherwise people will have to implement
+machinery for lists (starting from growable arrays) much too often.
+Here is an example using lists... we can discuss what other list
+primitives might be needed.
+
+The following code assumes that a stream deletes itself (presumably
+with a call like \verb+parent.delete(this)+).  Otherwise there needs
+to be a way to pass stream handles around once they are added, which
+isn't clear yet how to do.
+
+\begin{verbatim}
+   float->float splitjoin CellPhoneBaseStation(int lowFrequency, int highFrequency) {
+     list-of Stream channels;
+
+     init {
+       split set(*) roundrobin(0);
+       join inorder;
+     }
+     
+     handler addChannel(int freq) {
+       Channel chan = add Channel(freq);
+       channels.add(chan);
+     }
+
+     handler deleteChannel(Channel c) {
+       delete c;
+       channels.delete(c);
+     }
+
+   }
+\end{verbatim}
+
+\subsubsection {Pros/Cons}
+
+These are in relation to Option A.
+
+\noindent {\bf Pro:}
+
+\begin{itemize}
+
+\item There is full access control on the switch options.  Decouples
+implementation from the interface.
+
+\item The interface is type-safe: one can statically verify that the
+target of a switch exists, and it can be exported as part of the
+interface instead of requiring an examination of the implementation.
+
+\item It is perhaps more straightforward to address switch options as
+part of an array; for example, could add one switch option that is
+just a singleton (``FM decoder'') and then add an array of boosters.
+You can then address one as an array, one as a singleton when
+switching.
+
+\end{itemize}
+
+\noindent {\bf Con:}
+
+\begin{itemize}
+
+\item More verbose.  Have to name all of the switch options, keep them
+as state variables, and keep track of their array indices.  Also
+requires a separate init function with handlers separate.
+
+\item Puts the burden on compiler to figure out what handle a given
+enable/disable call corresponds to.
+
+\end{itemize}
+
+\subsubsection {Extensions}
+
+\begin{itemize}
+
+\item Need syntax for compiler hints, e.g., indicating modes of
+switches that are the common case, or the probability that they occur.
+
+\item Have compact syntax for auto-generating handler methods.
+
+\end{itemize}
+
+\subsubsection {Open Issues}
+
+\begin{itemize}
+
+\item We need to define very carefully what can and cannot be done
+with handles.  For instance, can a handle be made in the init function
+and then only added to the stream in a message handler?  Can someone
+downstream pass up a stream handle and then the splitjoin adds it to
+the stream?  Is state retained in a stream handle when it is deleted
+from a splitjoin?  (If so, can a stream migrate from one splitjoin to
+another?)
+
+I think the answer to all these questions should be no, but we need to
+define it carefully so that most behaviors are statically analyzable.
+
+Note that (for sets) we probably do want to support sending a stream
+handle as a message argument so that the stream can be deleted.
+
+\item It's not clear what an inorder joiner means if there is a null
+(roundrobin(0)) splitter.
+
+\item Saman suggested that it is probably not hard (in a space-time
+multiplexing backend) to support swapping streams to different
+locations in a set.  This would militate for having an
+\verb+add(stream, index)+ primitive in the set (hmm, might also be
+useful in plain init functions?)
+
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{In progress/Todo}
 \begin{itemize}
