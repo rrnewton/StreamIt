@@ -1,7 +1,7 @@
 %
 % cookbook.mp: MetaPost diagrams for StreamIt Cookbook
 % David Maze <dmaze@cag.lcs.mit.edu>
-% $Id: cookbook.mp,v 1.2 2003-03-06 19:43:39 dmaze Exp $
+% $Id: cookbook.mp,v 1.3 2003-03-06 19:49:45 dmaze Exp $
 %
 % MetaPost is a drawing language based on Knuth's METAFONT that can
 % produce embedded PostScript figures, with TeX strings embedded in it.
@@ -44,7 +44,7 @@ enddef;
 vardef filter(expr name) =
   save p; picture p; p=nullpicture;
   addto p doublepath (0,0)--(0,u)--(fw,u)--(fw,0)--cycle withpen currentpen;
-  addto p also thelabel.lrt(name, (0,u));
+  addto p also thelabel.bot(name, (fw/2,u));
   p
 enddef;
 
@@ -156,6 +156,16 @@ vardef splitjoin(expr name, split, join)(text children)(text sws)(text jws) =
 enddef;
 
 % End of macro section.
+
+beginfig(0);
+  draw toppipe("FMRadio",
+    filter("BandPass"),
+    filter("Demod"),
+    splitjoin("Equalizer","DUP","RR")
+    (filter("BandPass"),thelabel("...",(0,0)),filter("BandPass"))
+    ("","","")("1","","1"),
+    filter("Adder"));
+endfig;
 
 beginfig(1);
   draw toppipe("Minimal",
