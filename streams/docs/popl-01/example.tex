@@ -22,7 +22,7 @@ stages, {\tt ReadFromAtoD} and {\tt AudioBackEnd}.
 
 The {\tt RFtoIF} stage modulates the input signal from RF to a
 frequency band around the current IF frequency. This stage is
-implented as a filter that multiplies the current signal with a sine
+implemented as a filter that multiplies the current signal with a sine
 wave at the IF frequency.  To support a change in the IF frequency
 when frequency hopping occurs, the filter contains a {\tt set\_freq}
 method that can be invoked using a message.
@@ -40,15 +40,15 @@ in~\ref{fig:fftfilter}. The FFT is composed of a reordering filter and
 a multi-stage butterfly filter. The StreaMIT representation of the
 reordering filter (a bit reverse order filter) is given in
 Figure~\ref{fig:bitreverseorder}. Note that the complex data
-reshuffling is accomplished using a few splitjoin constructs.  A
+re-shuffling is accomplished using a few splitjoin constructs.  A
 parameterized Butterfly implementation is used to abstract the
 multi-stage butterfly in the FFT. As shown in
 Figure~\ref{fig:butterfly}, the Butterfly filter is also implemented
 using a combination of splitjoin constructs.
 
-StreaMIT implementation of the FFT filter is clean and intutive. It
+StreaMIT implementation of the FFT filter is clean and intuitive. It
 already has a large amount of pipelined parallelism. Due to the simple
-and straighforward mapping from the algorithm to implementation,
+and straightforward mapping from the algorithm to implementation,
 compiler analyses should be able to extract the parallel structure of
 the FFT when hardware resources are available.
 
@@ -78,14 +78,14 @@ using best effort delivery.
 \centering
 \psfig{figure=fft-pre-tape.eps,width=4.8in}
 \caption{The bit reverse order filter in FFT. The tapes at each
-channel illustrates the data reshuffling when N=8. }
+channel illustrates the data re-shuffling when N=8. }
 \label{fig:bitreverseorder}
 \end{figure*}
 
 \begin{figure*}
 \centering
 \psfig{figure=fft-butterfly-tape.eps,width=5.8in}
-\caption{The 4x4 butterfly stage in the FFT. The tapes at each channel illusrates the data transformation and computation. }
+\caption{The 4x4 butterfly stage in the FFT. The tapes at each channel illustrates the data transformation and computation. }
 \label{fig:butterfly}
 \end{figure*}
 

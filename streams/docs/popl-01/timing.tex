@@ -35,7 +35,7 @@ than they push.
 \psfig{figure=Tapes.eps,width=3.2in}
 \caption{The behavior of the tapes in a filter that pop two elements, peeks the next three from the input
 channel and pushes two elements to the output channel. The tape of the
-input channel before an invoation is denoted in the left. The state of
+input channel before an invocation is denoted in the left. The state of
 both input channel tape and output channel tape and the filter during
 execution is shown in the middle. The state of the output channel tape
 after completion of the filter invocation is given in the right.}
@@ -313,7 +313,7 @@ That is, $s + push_A * n$ is the number of items on $A$'s output tape
 after producing the data of interest.  Then, $y =
 \mi{O_B}{O_A}(s + push_A * n)$ is the latest item on $B$'s output
 tape that affects the data of interest.  The message should be
-delivered immediately after the work funtion producing this item,
+delivered immediately after the work function producing this item,
 which occurs when the item count $r$ equals $y$, as specified by the
 constraint.
 
@@ -405,7 +405,7 @@ $C_0$ is simply the zero-vector.  It is possible that the initial
 configuration violates some of the constraints imposed by the
 messaging and latency constructs, in which case the compiler can
 inform the programmer that the delivery constraints requested in the
-program are unsatisfyable.
+program are unsatisfiable.
 
 Let {\cal P}(C) denote whether or not the constraints for a stream
 graph are satisfied for a given configuration C.  We can then write

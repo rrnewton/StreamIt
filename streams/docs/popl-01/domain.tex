@@ -34,24 +34,24 @@ connected to the inputs of others.
 \item {\it A stable computation pattern.}  The structure of the stream
 graph is generally constant during the steady-state operation of a
 stream program.  That is, a certain set of filters are repeatedly
-applied in a regular, preditable order to produce an output stream
+applied in a regular, predictable order to produce an output stream
 that is a given function of the input stream.
 
-\item {\it Occaisional re-initialization.}  Even though each
+\item {\it Occasional re-initialization.}  Even though each
 arrangement of filters is executed for a long time, there are still
-dynamic modifications to the stream graph that occur on occaision.
+dynamic modifications to the stream graph that occur on occasion.
 For instance, if a wireless network interface is experiencing high
 noise on an input channel, it might react by adding some filters to
 clean up the signal; a software radio re-initializes a portion of the
 stream graph when a user switches from AM to FM.  Sometimes, these
-re-iniitializations are synchronized with some data in the stream--for
+re-initializations are synchronized with some data in the stream--for
 instance, when a network protocol changes from bluetooth to 802.11 at
-a certain point of a transmisison.  There are typically an ennumerable
+a certain point of a transmission.  There are typically an enumerable
 number of configurations that the stream graph can adopt in any one
-program, such that all of the possible arrangments of filters are
+program, such that all of the possible arrangements of filters are
 known at compile time.
 
-\item {\it Occaisional out-of-stream communication.}  In addition to
+\item {\it Occasional out-of-stream communication.}  In addition to
 the high-volume data streams passing from one filter to another,
 filters also communicate small amounts of control information on an
 infrequent and irregular basis.  Examples include changing the volume
