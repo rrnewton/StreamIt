@@ -21,6 +21,8 @@
 #include "VrCharToFloat.h"
 #include "VrFloatToChar.h"
 #include "VrAdderFour.h"
+#include "VrWeightedJoin.h"
+#include "VrWeightedSplit.h"
 
 int main(void) {
   
@@ -30,13 +32,14 @@ int main(void) {
 
   //need to add:
   // 1) something to combine chars into floats
-  
   VrCharToFloat* charToFloat = new VrCharToFloat();
   
   // 2) an initial lowpassfilter with parameters equal to streamit version DONE
 
   VrRealFIRfilter<float,float>* lowpass = 
     new VrRealFIRfilter<float,float>(5, 108000000, 100, 1);
+
+  VrWeightedSplit<float>* split = new VrWeightedSplit<float>();
 
   // 3) a demodulator of some kind
 
@@ -46,12 +49,17 @@ int main(void) {
 
   //make bandpass with (lowpassa-lowpassb) added four-way
   VrAdderFour* adder = new VrAdderFour();
+  VrWeightedJoin<float>* adderJoin = new VrWeightedJoin<float>();
 
   VrSubtractor* sub1 = new VrSubtractor();
   VrSubtractor* sub2 = new VrSubtractor();
   VrSubtractor* sub3 = new VrSubtractor();
   VrSubtractor* sub4 = new VrSubtractor();
-
+  VrWeightedJoin<float>* subJoin1 = new VrWeightedJoin<float>();
+  VrWeightedJoin<float>* subJoin2 = new VrWeightedJoin<float>();
+  VrWeightedJoin<float>* subJoin3 = new VrWeightedJoin<float>();
+  VrWeightedJoin<float>* subJoin4 = new VrWeightedJoin<float>();
+  
   VrRealFIRfilter<float,float>* lowpass1a = 
     new VrRealFIRfilter <float,float>(2500, 50, 1);
   VrRealFIRfilter<float,float>* lowpass1b = 
@@ -74,30 +82,38 @@ int main(void) {
   VrFloatToChar* floatToChar = new VrFloatToChar(); 
   
   // Connect Modules
+  
   CONNECT(sink, floatToChar, 1, 8);
   CONNECT(floatToChar, adder, 1, 32);
-  CONNECT(adder, sub1, 1, 32);
-  CONNECT(adder, sub2, 1, 32);
-  CONNECT(adder, sub3, 1, 32);
-  CONNECT(adder, sub4, 1, 32);
-  CONNECT(sub1, lowpass1a, 1, 32);
-  CONNECT(sub1, lowpass1b, 1, 32);
-  CONNECT(sub2, lowpass2a, 1, 32);
-  CONNECT(sub2, lowpass2b, 1, 32);
-  CONNECT(sub3, lowpass3a, 1, 32);
-  CONNECT(sub3, lowpass3b, 1, 32);
-  CONNECT(sub4, lowpass4a, 1, 32);
-  CONNECT(sub4, lowpass4b, 1, 32);
-  CONNECT(lowpass1a, lowpass, 1, 32);
-  CONNECT(lowpass1b, lowpass, 1, 32);
-  CONNECT(lowpass2a, lowpass, 1, 32);
-  CONNECT(lowpass2b, lowpass, 1, 32);
-  CONNECT(lowpass3a, lowpass, 1, 32);
-  CONNECT(lowpass3b, lowpass, 1, 32);
-  CONNECT(lowpass4a, lowpass, 1, 32);
-  CONNECT(lowpass4b, lowpass, 1, 32);
+  CONNECT(adder, adderJoin, 1, 32);
+  (*adderJoin).connect_dest(sub1, 1);
+  (*adderJoin).connect_dest(sub2, 1);
+  (*adderJoin).connect_dest(sub3, 1);
+  (*adderJoin).connect_dest(sub4, 1);
+  CONNECT(sub1, subJoin1, 1, 32);
+  CONNECT(sub2, subJoin2, 1, 32);
+  CONNECT(sub3, subJoin3, 1, 32);
+  CONNECT(sub4, subJoin4, 1, 32);
+  (*subJoin1).connect_dest(lowpass1a, 1);
+  (*subJoin1).connect_dest(lowpass1b, 1);
+  (*subJoin2).connect_dest(lowpass2a, 1);
+  (*subJoin2).connect_dest(lowpass2b, 1);
+  (*subJoin3).connect_dest(lowpass3a, 1);
+  (*subJoin3).connect_dest(lowpass3b, 1);
+  (*subJoin4).connect_dest(lowpass4a, 1);
+  (*subJoin4).connect_dest(lowpass4b, 1);
+  (*split).connect_dest(lowpass1a,1);
+  (*split).connect_dest(lowpass1b,1);
+  (*split).connect_dest(lowpass2a,1);
+  (*split).connect_dest(lowpass2b,1);
+  (*split).connect_dest(lowpass3a,1);
+  (*split).connect_dest(lowpass3b,1);
+  (*split).connect_dest(lowpass4a,1);
+  (*split).connect_dest(lowpass4b,1);
+  CONNECT(split, lowpass, 1, 32);
   CONNECT(lowpass, charToFloat, 1, 32);
   CONNECT(charToFloat, source, 1, 8);
+  
   
   // Start System
   sink->setup();
