@@ -1,8 +1,9 @@
-status of numbers:
+overview of numbers:
 
-fft, fm:  broken on scheduler
-filterbank: needs sim-cycles removed (for cases that aren't broken by scheduler)
-beamformer: inconsistent
+- well, as it's written now, it is just not a fair comparison.  should
+be fusing adjacent filters instead of whole structures; also need help
+on fission.  need two-stage filter fusion to do this in the general
+case, although for bitonic and fir it might work without as much work.
 
 -----
 
