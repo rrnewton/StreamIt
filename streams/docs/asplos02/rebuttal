@@ -10,9 +10,9 @@ and updated results:
 We believe that the paper's primary contribution is from a systems
 perspective: it demonstrates what is needed to obtain end-to-end
 performance in compiling a stream language to a communication-exposed
-architecture.  Due to space limitations, we are forced to choose
-breadth over depth even though there are many details that deserve
-further discussion and many avenues for further research.
+architecture.  In order to describe the entire system, we are forced
+to choose breadth over depth in most cases even though there are many
+details that deserve further discussion.
 
 Two issues were of interest to many reviewers:
 
@@ -48,12 +48,6 @@ Two issues were of interest to many reviewers:
    in our fusion algorithm; our latest numbers appear in the technical
    report cited above.
 
-Finally, in the context of our results, we ommitted to mention that
-the RAW processor contains 16 tiles that run at 250 MHz; the peak
-performance is 4 GOPS.  However, each processor is single-issue, such
-that there is no parallelism between integer and floating-point
-operations on the same tile.
-
 The following sections contain more detailed replies to each of the
 reviewers.
 
@@ -71,6 +65,9 @@ deadlock avoidance techniques.
 
 Review #207
 -----------
+The clock rate of each of the 16 RAW tiles is 250 MHz.  We apologize
+for this omission.
+
 As you point out, there are some processors that are mostly idle even
 after our optimizations.  With our current set of transformations, we
 cannot achieve full utilization because: 1) currently, a joiner must
@@ -103,6 +100,12 @@ structure of the stream graph are resolved at compile-time.  Then, we
 estimate the average computation requirements per invocation of a
 filter's work function, and aim to distribute the filters so that they
 are balanced in the steady state.
+
+The peak performance of RAW is 4 GOPS.  However, each processor is
+single-issue, such that there is no parallelism between integer and
+floating-point operations on the same tile.  Some applications
+(e.g. BeamFormer) are able to keep almost all of the tiles busy, as
+illustrated by Figure 21 of the report referenced above.
 
 Thank you for the SISAL reference; we will include it in the final
 version.
