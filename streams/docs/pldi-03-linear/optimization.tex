@@ -234,7 +234,7 @@ computes Algorithm~\ref{alg:freq-overview}.
     ~~~\vec{partials} \leftarrow \vec{\mathbf{0}} \\
     ~~~\vec{H} \leftarrow \mathbf{FFT}(N+2(e-1),h[n])~\} \\
     \\
-    ~{\bf work}_{0}~peek~N+e-1~pop~N+e-1~push~N~\{\\
+    ~{\bf prework}~peek~N+e-1~pop~N+e-1~push~N~\{\\
     ~~~\vec{x} \leftarrow \mathbf{pop}(0 \dots (N+e-1)) \\
     ~~~\vec{X} \leftarrow \mathbf{FFT} (N+2(e-1), \vec{x}) \\
     ~~~\vec{Y} \leftarrow \vec{X} .* \vec{H} \\
@@ -242,7 +242,7 @@ computes Algorithm~\ref{alg:freq-overview}.
     ~~~\mathbf{push}(\vec{y}[e-1 \dots N+e-1]) \\
     ~~~\vec{partials} \leftarrow \vec{y}[N+e-1 \dots N+2(e-1)]~\} \\
     \\
-    ~{\bf work}_{1 \rightarrow \infty}~peek~N+e-1~pop~N+e-1~push~N+e-1~\{ \\
+    ~{\bf work}~peek~N+e-1~pop~N+e-1~push~N+e-1~\{ \\
     ~~~\vec{x} \leftarrow \mathbf{pop}(0 \dots (N+e-1)) \\
     ~~~\vec{X} \leftarrow \mathbf{FFT} (N+2(e-1), \vec{x}) \\
     ~~~\vec{Y} \leftarrow \vec{X} .* \vec{H} \\
@@ -259,7 +259,9 @@ computes Algorithm~\ref{alg:freq-overview}.
 
 Transformation~\ref{trans:freq} shows how to generate a 
 filter which implements the computation of $\lambda$ using the
-frequency transformation described in this section. 
+frequency transformation described in this section. The
+{\tt initwork} function is executed exactly once before
+the {\tt work} function
 Transformation~\ref{trans:freq} as written applies only for
 linear nodes with unit push rate (so $A$ is a column vector).
 The general case for arbitrary columns is a trivial extension:
