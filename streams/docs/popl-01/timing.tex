@@ -126,14 +126,21 @@ $I_A$, leaving:
 \mi{I_A}{O_B} = \mi{I_A}{O_A} \circ \mi{I_B}{O_B}
 \end{equation*}
 By identical reasoning, these composition laws hold for pipelined
-streams as well as filters.  That is, for any tapes $x$, $y$, and $z$
-such that $\ma{x}{y}$, $\ma{y}{z}$, $\mi{x}{y}$, and $\mi{y}{z}$ are
-well-defined, we have:
+streams as well as filters.  That is, given tapes $x$, $y$, and $z$, 
+we have that:
 \begin{eqnarray}
 \label{eq:compose}
 \ma{x}{z} = \ma{y}{z} \circ \ma{x}{y} \\
 \mi{x}{z} = \mi{x}{y} \circ \mi{y}{z}
 \end{eqnarray}
+However, there are some restrictions on these definitions.  They only
+apply when there is a downstream path $P_1$ from the filter preceding
+$x$ to the filter following $y$, a downstream path $P_2$ from the
+filter preceding $y$ to the filter following $z$, and the paths $P_1$
+and $P_2$ are non-overlapping.  This restriction prevents the
+successive composition of transfer functions around feedback loops,
+thereby ensuring a unique definition for all pairs $(x, z)$ where
+there is a downstream path from $x$ to $z$. 
 
 \subsubsection{SplitJoins}
 \begin{figure}[t]
@@ -193,7 +200,7 @@ $I1_J$, we have that:
 Again, the $max$ function takes two arguments, corresponding to the
 number of items on $I1_J$ and $I2_J$, respectively:
 \begin{eqnarray*}
-\ma{(I1_J, I2_J)}{O_J}(x_1, x_2) = max(2*x_1-1, 2*x_2)
+\ma{(I1_J, I2_J)}{O_J}(x_1, x_2) = min(2*x_1-1, 2*x_2)
 \end{eqnarray*}
 {\bf Duplicate splitter}.  Clearly, the $max$ function of a duplicate
 splitter is simply the identity function, since it maps each element
@@ -211,15 +218,61 @@ split--the input need only progress as far as the lesser output:
 duplicate splitter, with transfer functions that the reader can verify
 as follows:
 \begin{eqnarray*}
-\ma{(I1_J, I2_J)}{O_J}(x_1, x_2) = max(x_1, x_2) \\
+\ma{(I1_J, I2_J)}{O_J}(x_1, x_2) = min(x_1, x_2) \\
 \mi{I1_J}{O_J}(x) = x \\
 \mi{I2_J}{O_J}(x) = x
 \end{eqnarray*}
 
 \subsubsection{FeedbackLoops}
 
-The feedback splitter and feedback joiner have the same transfer
-functions as a normal round-robin splitter or joiner.
+\begin{figure}[t]
+\scriptsize
+\begin{verbatim}
+Here I want a feedback diagram, labelled as:
+
+         LOOP  
+      /        \
+
+A - FJ - BODY - FS - ->
+
+\end{verbatim}
+\vspace{-12pt}
+\caption{\protect\small  FeedbackLoop labeling.
+\protect\label{looplabel}}
+\vspace{-12pt}
+\end{figure}
+
+We have to be careful when defining the transfer functions for
+feedback loops (see Figure {\ref:looplabel}).  The feedback splitter
+$FS$ serves as a normal splitter, and has the same $min$ and $max$
+functions as defined above.  However, the feedback joiner $FJ$ is
+slightly different than a standard joiner, since during the first few
+executions it fabricates values from the loop body before they appear
+on the input tape.  The transfer function must take special account of
+these initial values, since they are never appear on $I2_{FJ}$, the
+input tape from the loop body.  This is because we model the
+initialization of FeedbackLoops by feeding the joiner the initial
+values directly instead of pushing them onto a channel.
+
+Recall that if the feedback loop specifies a wavefront latency of $n$,
+then $n$ initial values are provided to the feedback joiner before
+values from the feedback loop are read.  Assume that the round robin
+feedback joiner first draws from the data stream $I1_J$, and then from
+the feedback loop $I2_J$.
+
+The $min$ function for the main stream is as before:
+\begin{eqnarray*}
+\mi{I1_J}{O_J}(x) = ceil(x/2)
+\end{eqnarray*}
+However, the equation must include the initial $n$ values for the
+$min$ function of the loop:
+\begin{eqnarray*}
+\mi{I2_J}{O_J}(x) = floor(x/2)-n
+\end{eqnarray*}
+The $max$ function must be similarly shifted for the input from the loop:
+\begin{eqnarray*}
+\ma{(I1_J, I2_J)}{O_J}(x_1, x_2) = min(2*x_1-1, 2*(x_2+n))
+\end{eqnarray*}
 
 \subsubsection{Summary}
 
@@ -397,24 +450,34 @@ of a FeedbackLoop construct.  A stream graph will be deadlock-free if
 and only if there is no net change of output rate in the feedback
 loop.  This can be formulated in terms of the $max$ function by
 requiring that the wavefront from the output of the feedback joiner
-$FJ$ unto itself is the identity function:
+$FJ$ unto itself is the identity function.  However, since we were
+careful to leave the $max$ function undefined over cycles in the
+stream graph, we define a new function $maxloop$ that maps a given
+feedback joiner to the information wavefront around the loop:
 \begin{eqnarray*}
-\ma{O_FJ}{O_FJ}(x) = x
+\mal{FJ}(x) \equiv \ma{I2_FJ}{O_FJ} \circ \ma{O_FJ}{I2_FJ}
 \end{eqnarray*}
-For the purposes of this calculation, one must assume that there are
-an infinite number of items on tape $I1_FJ$; that is, the join from
-the feedback loop is not limited by the external data source.  Given
-this stipulation, one can calculate $\ma{O_FJ}{O_FJ}(x)$ using the
-composition rules that we derived before, tracing a route around the
-feedback loop.  If $\ma{O_FJ}{O_FJ}(x)$ is less than $x$, then there
-will be deadlock in the program.
+The order of composition is as in Equation \ref{eq:compose} for the
+composition of pipelines. Also, for the purposes of calculating
+$\mal{FJ}$, one must assume that there are an infinite number of items
+on tape $I1_FJ$; that is, the join from the feedback loop is not
+limited by the external data source.  
+
+Finally, we can state the constraint that the feedback loop must
+respect.  For a loop with declared latency $n$, the loop will neither
+overflow nor deadlock if:
+\begin{eqnarray*}
+\mal{FJ}(x) = x + n
+\end{eqnarray*}
+If $\mal{FJ}(x)$ is less than $x + n$, then there will be deadlock in
+the program.
 
 {\bf Overflow detection.}  There are two places that a buffer can
 overflow in the stream graph.  The first is in a feedback loop, when
-$\ma{O_FJ}{O_FJ}(x)$ (calculated above) is more than $x$.  The second
-case is when the parallel streams of a split/join have different
-production rates.  For a splitter $S$ and a joiner $J$, the production
-rates will cause an overflow if and only if $\ma{O1_S}{I1_J}(x) -
+$\mal{FJ}(x)$ (calculated above) is more than $x$.  The second case is
+when the parallel streams of a split/join have different production
+rates.  For a splitter $S$ and a joiner $J$, the production rates will
+cause an overflow if and only if $\ma{O1_S}{I1_J}(x) -
 \ma{O2_S}{I2_J}(x)$ is not $O(1)$.  This difference could be analyzed
 by a compiler for every SplitJoin in the stream graph to verify that
 no buffers will overflow during steady-state execution.
