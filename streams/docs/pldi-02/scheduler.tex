@@ -102,11 +102,12 @@ filters, the more delay there is between when data enters the computation
 stream and when its results can be seen.  More importantly, however, buffer
 sizes can grow exponentially with size of streaming program.
 
-The buffer size requirement between any two filters is dictated solely by
-the sequence of execution of these two filters.  The minimum buffer size
-requirement is given by 
-$MinBuffer(A,B) = \over{push_A  pop_B}{gcd (push_A, pop_B}}$
-\cite{murthy94combined}
+The buffer size requirement between any two filters is dictated solely
+by the sequence of execution of these two filters.  The minimum buffer
+size requirement is given by 
+
+%$MinBuffer(A,B) = \frac{push_A pop_B}{gcd (push_A, pop_B)}}$ 
+Due to \cite{murthy94combined}.
 
 In our construction of a minimum buffer schedule, we again use the idea
 of a cyclic schedule.  Phases of this schedule, however, are computed in
