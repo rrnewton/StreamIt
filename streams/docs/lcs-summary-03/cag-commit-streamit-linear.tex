@@ -13,19 +13,9 @@
 % \formattitlecontents or \formatcontents as this will disturb the
 % table of contents.
 
-\formattitlecontents
-{A Finite-State Transducer Representation of Phonological Rules}%
-{Lee Hetherington}
-
-% My own macros start with <group name><report name> to keep them
-% distinct from macros used in other reports.
-
-\newenvironment{slsilhrules}%
-  {\begin{center}\begin{tabular}{cccclc}}%
-  {\end{tabular}\end{center}}
-
-\newcommand{\slsilhrule}[4]{%
-  \{\textit{#1}\}&\textit{#2}&\{\textit{#3}\}&$\Rightarrow$&\textit{#4}&;\\}
+\formattitlecontents 
+{Linear Analysis and Optimization of Stream Programs}
+{Andrew Lamb, Bill Thies, Saman Amarasinghe}
 
 
 % Please use the following \formatsection entries unless they are
@@ -36,105 +26,132 @@
 % formatting.
 
 \formatsection{Introduction}
-In our SUMMIT speech recognition system, we have always used
-phonological rules to model pronunciation variability.  We use such
-rules to transform word phonemic baseforms to graphs of alternate
-pronunciations at the phonetic level.  These rules account for many
-different phonological phenomena such as place assimilation,
-gemination, epenthetic silence insertion, alveolar stop flapping, and
-schwa deletion.  These rules primarily depend on input-level phonemic
-context, but phonetic realizations may also depend on adjacent
-realizations.
+More than fifty percent of the code that runs the Digital Signal Processors
+(DSPs) in a modern cell phone is written in assembly language and the 
+rest is written in annotated C\cite{gass-talk}. Clearly even the best 
+compilers that DSP companies can produce are utterly failing to produce
+optimizion necessary for programs that will run on the next generation
+of signal processors.
 
-Kaplan and Kay \cite{Kaplan94} provide a comprehensive treatment of
-phonological rewrite rules where the target, replacement, left
-context, and right context are all regular expressions.  Mohri and
-Sproat \cite{Mohri96} present an alternative compilation of such rules
-that is more efficient, but each rule is still compiled into no less
-than five transducers, with the transducers for the individual rules
-composed together to implement the entire set of rules.  In this work
-we have formulated a simpler phonological rule system that we can
-compile into finite-state transducers (FSTs) much more efficiently.
+The sheer volume of analysis required to make optimal use of the special 
+purpose instructions in DSPs leaves compilers for standard languages such 
+as C unable to perform many of the standard optimizations known to electrical 
+engineers. Using StreamIt~\cite{streamit-asplos,streamitcc}, a domain-specific 
+stream processing language, we have been exploring novel high-level automatic 
+DSP optimizations that are intractable in a general-purpose
+language.
 
 \formatsection{Approach}
-Our rules are of the form
-\begin{slsilhrules}
-  \slsilhrule{$\lambda_1\ldots\lambda_m$}{$\phi$}{$\rho_1\ldots\rho_n$}{$\psi$}
-\end{slsilhrules}
-Here the left and right contexts $\lambda$ and $\rho$, respectively,
-consist of the set of immediately adjacent phonemic contexts that must
-be satisfied in order for the rule to apply, transforming target
-phoneme $\phi$ to replacement phonetic realization $\psi$.  Here, only
-replacement is a regular expression.  Furthermore, if there is a set
-of rules with the same target phoneme $\phi$, only the \emph{first}
-that matches its context will fire.  Finally, our rules are batch
-rules in that all applicable rules are applied simultaneously across
-all input positions in one batch.  Rules are also obligatory, meaning
-that if a rule matches, the rule will be applied.  Altogether, this
-results in rule application that is deterministic.
-
-We also have the ability to place constraints on the realization of
-rules $\psi$ so that they can depend on the specific replacements of
-adjacent phonemes.  Consider the set of rules:
-\begin{slsilhrules}
-  \slsilhrule{}{d}{y}{dcl $($d $|$ jh$)$}
-  \slsilhrule{}{t}{y}{tcl $($t $|$ ch$)$}
-  \slsilhrule{d t}{y}{}{y $|$ $<$\{ch jh\}}
-\end{slsilhrules}
-Together, these rules can model the palatalization of the stops in
-``would you'' and ``hit you'' by mapping a phonemic sequence /d y/ to
-a phonetic realization [dcl jh], as well as the non-palatalized
-realization [dcl d y].  Here, $<$\{ch jh\} denotes an explicit
-reference to a phonetic realization [ch] or [jh] on the left.
-Similarly, the notation \{\ldots\}$>$ can be used to specify a surface
-phonetic constraint on the right.  See
-Figure~\ref{sls-ilh-rules-figure} for a graphical depiction of the
-effect of phonological rule application on the phrase ``would you.''
-
-To compile our phonological rules into a transducer $P$, we factor it
-into three component transducers such that $P = I \circ R \circ S$.
-$I$ enforces input contextual constraints and outputs the particular
-rule to apply to each input symbol.  $R$ performs replacement for each
-particular rule.  Finally, $S$ enforces surface contextual constrains
-such as those specified with the $<$\{\ldots\} and \{\ldots\}$>$
-notation.  Please see \cite{Hetherington01} for a complete description
-of the rule compilation algorithm.
-
-\formatsection{Progress}
-Within our SUMMIT recognition system, we currently use about 200
-phonological rules to map from baseform phonemic pronunciations to a
-variety of allowable phonetic realizations.  We have 63 phonemic input
-symbols, with variations including deletable stop releases, flappable
-stops, and silence.  The rules output 71 phonetic output symbols.
-Compiling these rules takes about 2.0s on an 866MHz Pentium III and
-produces a minimized transducer P containing 294 states and 21,009
-transitions.  After compilation, these rules can be applied very
-rapidly to a lexicon.  This new phonological rule application system
-is about 100 times faster than our previous, non-FST-based approach.
-
-\formatsection{Future}
-In the future, we plan to train probabilities on the various
-phonological rule realizations.  We will most likely use the EM
-algorithm starting from a set of phonetically and orthographically
-labelled training utterances.
-
-\formatsection{Research Support}
-This research was supported by DARPA under Contract N66001-99-1-8904
-monitored through the Naval Command, Control, and Ocean Surveillance
-Center.
-
-% Please use \includegraphics to include Encapsulated PostScript figures.
+Our analysis and optimizations focus on filters which compute {\it linear} 
+functions of their inputs. A filter computes a linear function if its
+the computation it does to convert input to output can be described by a 
+matrix operation. Many fundamental DSP operations such as filtering, the
+Discrete Fourier Transform (DFT), upsampling and downsampling, can be described 
+as linear functions. We have developed and implemented a simple dataflow 
+algorithm that can determine which filters in a StreamIt program compute 
+linear functions and the specific matrices which describe that computation.
+Figure~\ref{fig:overview} (top) shows a filter, and Figure~\ref{fig:overview}
+(bottom) shows how a matrix and a vector can be used to describe the same
+computation.
 
 \begin{figure}
-\includegraphics[width=\textwidth]{sls-ilh-rules.eps}
-
-\caption{The graph of possible phonetic realizations produced by
-	applying our phonological rules to the word sequence
-	``would you'' with phonemic pronunciations
-	/w uh d y (uw $|$ ax)/.}
-\label{sls-ilh-rules-figure}
+\center
+\begin{tabular}{cc}
+  \includegraphics[height=1in]{cag-commit-streamit-linear-filter.eps} &
+  \includegraphics[height=1in]{cag-commit-streamit-linear-matrix.eps} \\
+\end{tabular}
+\caption{
+  Top: StreamIt filter with I/O rates. 
+  Bottom: Linear filter as a vector-matrix operation.
+}
+\label{fig:overview}
 \end{figure}
 
+A primary benefit of linear filter analysis is that neighboring
+filters can be collapsed into a single matrix representation if both
+of the filters are linear.  This transformation automatically
+eliminates redundant computations in linear sections of the stream
+graph, thereby allowing the programmer to write simple, modular
+filters and leaving the combination to the compiler.  We have 
+developed algorithms for a {\it linear expansion} operation that serves as a
+building block for the combination techniques, collapsing {\tt pipeline}s 
+and {\tt splitjoin}s into linear nodes.
+
+To take advantage of our linear analysis framework, our compiler currently 
+has two linear analysis optimizations. The first, {\it linear replacement}, 
+replaces the largest possible linear sections of the program with filters 
+that directly compute the calculation specified by the corresponding 
+matrix representation. The second optimization, {\it frequency replacement}, 
+replaces all streams which implement a sufficiently long convolution sum
+using a standard frequency domain conversion.
+
+
+\formatsection{Progress}
+We have developed a fully automatic implementation of the linear analysis 
+and optimizations as passes in the StreamIt compiler. Our preliminary results
+are very promising. In our suite of benchmark applications, our optimizations
+increased execution speed by an average factor of five, $6.5$ in the best 
+case. Figure~\ref{fig:cag-commit-streamit-linear-speedup} (left) shows
+the execution time increase for our benchmarks. The source of these impressive
+speedups is shown in Figure~\ref{fig:cag-commit-streamit-linear-speedup}
+(right). Both optimizations significantly reduce the number of floating point multiplications
+in the benchmarks. 
+
+XXXXXXXXXX
+
+\begin{figure}
+  \center
+  \begin{tabular}{cc}
+    \includegraphics[height=2in]{cag-commit-streamit-linear-speedup.eps} &
+    \includegraphics[height=2in]{cag-commit-streamit-linear-mults.eps} \\
+  \end{tabular}
+  \caption{
+    Left: Execution speedup for each of the benchmarks with both linear 
+    replacement and frequency replacement optimizations.
+    Right: Percent of multiplication operations remaining after performing 
+    linear replacement, frequency replacement, and both.
+  }
+  \label{fig:cag-commit-streamit-linear-speedup}
+\end{figure}
+
+
+
+
+\formatsection{Future}
+For future research, we are developing new optimizations which make use
+of our Linear Analysis framework. For instance, we are investigating saving
+redundant partial results between filter executions in order to improve 
+program performace. This optimization is very much like standard common
+sub-expression eliminiation except that our optimization will remove common
+subexpressions that occur in subsequenct calls to the same function.
+
+Our current Linear Analysis framework requires that the only state
+filters are allowed to use is the input tape. However, recognizing state
+variables that are linear combinations of the input and previous state 
+variables would allow us to analyze many other classes of programs. This
+type of linear state is common in adaptive filters and in control 
+applications.
+
+Another area of potential research is in working with symbolic arrays. 
+Currently, our analysis can only extract arrays with constant valued
+entries. However, some applications actually perform linear operations
+at runtime, but the values of the corresponding matrix are not compile
+time constants. We can extend our framework to allow this sort of filter.
+This type of analysis would allow, for instance, an FIR filter whose 
+coefficients changed at runtime but at infrequent intervals. With an
+updated framework we could still do the frequency transformation, and
+we would know the approprate ways to updated the frequency coefficients
+at runtime.
+
+Additionally, we are planning on using the linearity information our
+analysis extracts to make more informed decisions in other parts of the compiler.
+For instance,  the StreamIt compiler is going to be extended to target 
+a DSP architecture and we can make use of the linear information to 
+take advantage of the specialized instructions that DSPs offer.
+
+
+\formatsection{Research Support}
+From DARPA and the Oxygen alliance (I don't know the details.....XXXXXXXXXXXXXXXXXXXX)
 % Although the use of BibTeX is highly recommended, you can manually
 % format your references as follows:
 %
@@ -148,4 +165,4 @@ Center.
 % 
 % \end{thebibliography}
 
-\bibtex{sls-ilh}
+\bibtex{cag-commit-streamit-linear}

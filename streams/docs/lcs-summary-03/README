@@ -1,0 +1,32 @@
+This directory contains two sample reports from the SLS group,
+contained in sls-toledano-eltiempo.tex and sls-ilh-rules.tex.  Both
+files contain comments intended to illustrate how to use the LaTeX
+class for the LCS Annual Report.
+
+There is also the file sls.tex, which is the master include file for
+the SLS group.  Each group (e.g., SLS, CAG, etc.) should have its own
+master include file that lists all the reports associated with it.
+Finally, add \input{<group name>} (e.g., \input{sls}) to the main.tex
+file to test out your group's reports.
+
+A simple makefile is included which runs latex, bibtex, latex, and
+latex again to produce a DVI file.  You can then use dvips or similar
+to produce a PostScript file if you wish.
+
+Please be careful with naming conventions.  We would like report names
+to be of the form <group name>-<report name>.tex, any included
+PostScript figures to be of the form <group name>-<report name>.eps,
+and BibTeX files to be of the form <group name>-<report name>.bib.
+Within your reports, please make \label{}s unique and of the form
+<group name>-<report name>-<label name> (e.g., sls-ilh-rules-table),
+again to avoid name collisions with other reports.  Finally, if you
+define macros in your reports, take care to choose names to minimize
+the chance of name collisions.
+
+If you absolutely need to have a \usepackage{} for your report, you
+will have to add the \usepackage to the preamble of the main.tex
+file.  When you submit your reports to Vicky Palay, please make a note
+of this and include the .sty file in your submission.
+
+Lee Hetherington <ilh@sls.lcs.mit.edu>
+5 February 2002
