@@ -140,59 +140,40 @@ num(n)-1]$:
 \label{buf2read0}
 &\forall (i,j,k) \in {{\cal D}\mt{1}}_{SB \rightarrow SR}(c,p,q):~~
 \mt{READ}_{c, p}(i,j,k) = 
-    \mt{BUF}_{c}(i+q+
-                  \mt{Int\_Offset}(n,c,p),\nonumber\\ \nonumber
-                  &~~~~~~j*\mt{TotalRead}(n,c) + 
-                    \mt{PartialRead}(c,p) + k
-                   - q * \mt{Period}(c) + \mt{Mod\_Offset}(n,c,p)), \\
-&\mt{where }{{\cal D}\mt{1}}_{SB \rightarrow SR}(c,p,q) = 
-  ({\cal D}_{{READ}_{c, p}} - \mt{PUSHED}(n,c,p))
-                         ~\cap~ \\ \nonumber
-	&~~~~~~\{ (i,j,k)~|~q * \mt{Period}(c)
-                                \le k 
-                                \le \\ \nonumber
-	&~~~~~~~~~~~~min((q+1)*\mt{Period}(c),
-         O(c, p)) - 1 
-         - \mt{Mod\_Offset}(n,c,p) \}\\ \nonumber\\
-\label{buf2read1}
+    \mt{BUF}_{c}(i,j*\mt{TotalRead}(n,c) + 
+                    \mt{PartialRead}(c,p) + k), \\
+&\mt{where }{{\cal D}\mt{1}}_{SB \rightarrow SR}(c,p,q) = {\cal D}_{{READ}_{c, p}}\\
 %\end{align}
 %\begin{align}
 %
 %
+%\label{buf2read1}
 &\forall (i,j,k) \in {{\cal D}\mt{2}}_{SB \rightarrow SR}(c,p,q):~~
 \mt{READ}_{c, p}(i,j,k) = \nonumber\\
-    &~~~~~~\mt{BUF}_{c}(i+q+
-                  1 + \mt{Int\_Offset}(n,c,p),
+    &~~~~~~\mt{BUF}_{c}(i,
                   j*\mt{TotalRead}(n,c) + \\\nonumber
                     &~~~~~~~~~~~~\mt{PartialRead}(c,p)
-		+ k
-                   - q * \mt{Period}(c) 
-                   - \mt{Period}(c)
- + \mt{Mod\_Offset}(n,c,p)),\\ \nonumber&
+		+ k - \mt{Period}(c)),\\ \nonumber&
 \mt{where }{{\cal D}\mt{2}}_{SB \rightarrow SR}(c,p,q) = 
-  ({\cal D}_{{READ}_{c, p}} - \mt{PUSHED}(n,c,p)) ~\cap~ \\ \nonumber
-                         &~~~~~~( \{ (i,j,k)~|~q * \mt{Period}(c)
-                                \le k 
-                                \le min((q+1)*\mt{Period}(c),
-                                O(c, p)) - 1 \} - {{\cal D}\mt{1}}_{SB \rightarrow SR}(c,p,q) )\\ \nonumber \\
-\label{buf2read2}
+  {\cal D}_{{READ}_{c, p}} - {{\cal D}\mt{1}}_{SB \rightarrow SR}(c,p,q)\\ \nonumber \\
+%\label{buf2read2}
 %\end{align}
 %\begin{align}
 %
 %
-&\mt{where }\mt{PUSHED}(n,c,p) = {\cal D}_{I \rightarrow SR}(n,c,p) \nonumber\\ \nonumber
-&\mt{and }\mt{Num\_Pushed}(n,c,p) = 
+%&\mt{where }\mt{PUSHED}(n,c,p) = {\cal D}_{I \rightarrow SR}(n,c,p) \nonumber\\ \nonumber
+%&\mt{and }\mt{Num\_Pushed}(n,c,p) = 
 % this is a dot product of (i,j,k) with something
-  (max_{\preceq}\mt{PUSHED}(n,c,p)) \cdot (S(n) * \mt{TotalRead}(n,c), \\ \nonumber
-                                        &~~~~~~\mt{TotalRead}(n,c), 1 ) + \mt{PartialRead}(c, p) \\ \nonumber
-&\mt{and }\mt{Offset}(n,c,p) = \mt{Num\_Pushed}(n,c,p) + O(c,p)-O(c,p) \\ \nonumber
-&\mt{and }\mt{Int\_Offset}(n,c,p) = - \lfloor \frac{\mt{Offset}(n,c,p)}{\mt{Period}(c)} \rfloor 
-~~\mt{and }\mt{Mod\_Offset}(n,c,p) = - \mt{Offset}(n,c,p)~\mt{mod}~\mt{Period}(c) \nonumber
+%  (max_{\preceq}\mt{PUSHED}(n,c,p)) \cdot (S(n) * \mt{TotalRead}(n,c), \\ \nonumber
+%                                        &~~~~~~\mt{TotalRead}(n,c), 1 ) + \mt{PartialRead}(c, p) \\ \nonumber
+%&\mt{and }\mt{Offset}(n,c,p) = \mt{Num\_Pushed}(n,c,p) + O(c,p)-O(c,p) \\ \nonumber
+%&\mt{and }\mt{Int\_Offset}(n,c,p) = - \lfloor \frac{\mt{Offset}(n,c,p)}{\mt{Period}(c)} \rfloor 
+%~~\mt{and }\mt{Mod\_Offset}(n,c,p) = - \mt{Offset}(n,c,p)~\mt{mod}~\mt{Period}(c) \nonumber
 %
 \end{align}
 \vspace{-12pt}
 \end{itemize}
 \end{minipage}}
-\caption{Equations for PCP to SARE translation.
+\caption{Equations for CSDP to SARE translation.
 \protect\label{fig:pcptosare3}}
 \end{figure}
