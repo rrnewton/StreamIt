@@ -148,7 +148,8 @@ typedef union latency {
   latency_special special;
 } latency;
 
-/* TODO: define LATENCY_BEST_EFFORT as a special case */
+extern latency _latency_best_effort;
+#define LATENCY_BEST_EFFORT (&_latency_best_effort)
 @
 
 \subsection{Other Types}
@@ -216,6 +217,18 @@ library can determine the layout of the stream.
 <<Initialization Functions>>=
 void register_child(stream_context *c, stream_context *child);
 stream_context *get_parent(stream_context *c);
+@
+
+Once children have been created, parents are responsible for creating
+tapes between them.  The actual tape structure is defined later in
+this document; initialization code should treat tapes as opaque.
+[[create_tape]] creates a tape between two simple stream objects; the
+tape is connected to [[a]]'s output and [[b]]'s input.  It requires
+the tape object sizes to be consistent, and creates a tape at least
+large enough to handle steady-state execution.
+
+<<Initialization Functions>>=
+tape *create_tape(stream_context *a, stream_context *b);
 @
 
 Every object should have a ``canonical form''.  Internally, fast-path
@@ -301,7 +314,10 @@ manipulated directly by work functions if need be.  The [[data]] is
 allocated by the creator of the tape, and its size is exactly
 [[len * size]] bytes.  [[read_pos]] and [[write_pos]] are both
 integers greater than or equal to [[0]] and strictly less than
-[[len]], and point to [[size]]-byte offsets into [[data]].
+[[len]], and point to [[size]]-byte offsets into [[data]].  In
+particular, they point to the last item read or written to the tape,
+such that [[PUSH]], [[POP]], and [[PEEK(0)]] will all use the
+following item.
 
 <<Tapes>>=
 typedef struct tape {
@@ -318,12 +334,14 @@ to the writer end of the tape; [[PEEK]] and [[POP]] both read data
 from the reader end.
 
 <<Tapes>>=
-#define PUSH(t, type, d) { if (++(t)->write_pos >= (t)->len ) \
-                             (t)->write_pos = 0; \
-                           ((type *)(t)->data)[(t)->write_pos] = (d); }
-#define PEEK(t, type, n) (((type *)t->data)[(t->read_pos+n)%t->len])
-#define POP(t, type) ((((++t->read_pos) >= t->len) ? (t->read_pos = 0) : 0), \
-                      ((type *)t->data)[t->read_pos])
+#define PUSH(t, type, d) \
+  ((((++(t)->write_pos) >= (t)->len) ? ((t)->write_pos = 0) : 0), \
+   ((type *)(t)->data[(t)->write_pos] = (d)))
+#define PEEK(t, type, n) \
+  (((type *)(t)->data)[((t)->read_pos+(n)+1)%(t)->len])
+#define POP(t, type) \
+  ((((++(t)->read_pos) >= (t)->len) ? ((t)->read_pos = 0) : 0), \
+   ((type *)(t)->data)[(t)->read_pos])
 @
 
 \section{Header File}
