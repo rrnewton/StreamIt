@@ -12,18 +12,38 @@ produced by the communication scheduler.
 \begin{table*}[t]
 \begin{center}
 \scriptsize
-\begin{tabular}{|l|l|} \hline
-{\bf Benchmark} & {\bf Description}\\
+\begin{tabular}{|l|l||r||r|r|r|r||r|} \hline
+ & & {\bf lines of} & \multicolumn{4}{|c||}{\bf \# of constructs in the program} & {\bf \# of nodes in the} \\ \cline{4-7}
+{\bf Benchmark} & {\bf Description} & {\bf code} & filters & pipelines & splitjoins & feedbackloops & {\bf expanded graph}
+\\
 \hline \hline
-FM Radio & A software-based FM Radio with equalizer.\\
-\hline
-GSM & A GSM decoder.\\
-\hline
-\Radar & A core component of modern radar, sonar, and communications signal processors. \cite{pca}\\
-\hline
-FFT & A 64-element FFT. \\
-\hline
-CRC & A 32-bit Cyclic Redundancy Check (CRC) Encoder/Decoder. \\
+FIR & 64 tap FIR & 
+65 & 5 & 1 & 1 & 0 & 132
+\\ \hline
+Radar & Radar array front-end\cite{pca} & 
+298 & 8 & 3 & 3 & 0 & 84
+\\ \hline
+Radio & FM Radio with an equalizer & 
+859 & 14 & 6 & 6 & 0 & 30
+\\ \hline
+Sort & 32-element Bitonic Sort & 
+111 & 4 & 5 & 5 & 0 & 350
+\\  \hline
+FFT & A 64-element FFT & 
+198 & 3 & 3 & 3 & 0 & 26
+\\  \hline
+Filterbank & & 
+927 & 9 & 3 & 3 & 1 & 
+\\  \hline
+GSM & GSM Decoder & 
+3609 & 26 & 11 & 11 & 2 &
+\\ \hline
+Vocoder & 24 channel vocoder &  
+4587 & 55 & 8 & 8 & 1 & 95
+\\ \hline
+3GPP & 3GPP Radio Access Protocol &  
+4811 & 16 & 10 & 10 & 0 & 27
+\\ \hline
 \hline
 \end{tabular}
 \vspace{-6pt}
@@ -36,43 +56,33 @@ CRC & A 32-bit Cyclic Redundancy Check (CRC) Encoder/Decoder. \\
 \begin{table*}[t]
 \begin{center}
 \scriptsize
-\begin{tabular}{|l|c|c|c|c|c|c|c|} \hline
-& \hspace{-5pt} {\bf Lines} \hspace{-5pt} & \multicolumn{3}{|c|}{\hspace{-5pt} {\bf Unoptimized} \hspace{-5pt} } & \multicolumn{3}{|c|}{\hspace{-5pt} {\bf Optimized} \hspace{-5pt}}\\
-\cline{3-8}
-\hspace{-5pt} {\bf Benchmark} \hspace{-5pt} &
-\begin{tabular}{c} 
-\hspace{-5pt} {\bf of} \hspace{-5pt} \\ \hspace{-5pt} {\bf code} \hspace{-5pt}
-\end{tabular} &    
-\begin{tabular}{c} 
-\hspace{-5pt} {\bf \# of} \hspace{-5pt} \\ \hspace{-5pt} {\bf tiles} \hspace{-5pt}
+\begin{tabular}{|l||r|r|r||r||r||} \hline
+& \multicolumn{4}{|c||}{\bf 250 MHz Raw processor} & {\bf C on a 2.2 GHz} \\ 
+\cline{2-5}
+{\bf Benchmark} & \multicolumn{3}{|c||}{\bf StreamIt on 16 tiles} & {\bf C on single tile} & {\bf Intel Pentium IV}\\ 
+\cline{2-6}
+ & {\bf MFLOPS} & 
+{\bf \% Utilizatoin} &
+\begin{tabular}{c}\hspace{-5pt} {\bf Throughput} \hspace{-5pt}\\
+\hspace{-5pt} {\bf (per 10$^5$ cycles)} \hspace{-5pt}
 \end{tabular} &    
 \begin{tabular}{c}\hspace{-5pt} {\bf Throughput} \hspace{-5pt}\\
 \hspace{-5pt} {\bf (per 10$^5$ cycles)} \hspace{-5pt}
 \end{tabular} &    
-\hspace{-5pt} {\bf MFLOPS} \hspace{-5pt} & 
-\begin{tabular}{c} 
-\hspace{-5pt} {\bf \# of} \hspace{-5pt} \\ \hspace{-5pt} {\bf tiles} \hspace{-5pt}
-\end{tabular} &    
-\begin{tabular}{c}\hspace{-5pt} {\bf Throughput} \hspace{-5pt} \\
+\begin{tabular}{c}\hspace{-5pt} {\bf Throughput} \hspace{-5pt}\\
 \hspace{-5pt} {\bf (per 10$^5$ cycles)} \hspace{-5pt}
-\end{tabular}  &
-{\bf MFLOPS}
-\\
+\end{tabular} \\    
 \hline \hline
-\Radar (12x4) & 596 & 53 & 1.1 & 619 & 15 & 2.7 & 1470 \\
-\hline
-\Radar (48x16) & 596 & 209 & N/A & N/A & 15 & 0.3 & 836\\
-\hline
-FM Radio & 511 & 14 & 34 & 107 & 13 & 81 & 258\\
-\hline
-FFT & 174 & 37 & 669 & 12.5 & 16 & 657 & 12.3 \\
-\hline
-GSM Decoder & 1925 & 16 & 107 & N/A & 15 & 107 & N/A\\
-\hline
-CRC & 336 & 47 & 35.1 & N/A & 5 & 52.4 & N/A\\
-\hline
-%%Matrix & \\
-%%\hline
+FIR    &   812 & 86\% & 1094.9  & 89.3 & 209.6 \\ \hline
+Radar  & 1,231 & 79\% &    2.5  & too large & 0.041 \\ \hline
+Radio  &   421 & 73\% &   53.9  & 2.47 & 4.8 \\ \hline
+Sort   &   N/A & 64\% & 2,664.4 & 93.0 & 148.9 \\ \hline
+FFT    &   182 & 42\% & 2,141.9 & 150.5 & 257.0  \\ \hline
+Filterbank & 
+           263 & 24\% &  131.9  & 32.0 & 69.0   \\ \hline
+GSM    &   N/A & 23\% &   80.9  & too large & 7.76 \\ \hline
+Vocoder&   106 & 23\% &    8.7  & too large & 3.35  \\ \hline
+3GPP   &    18 &  8\% &   51.3  & 17.3  & 16.2   \\ \hline
 \end{tabular}
 \vspace{-6pt}
 \caption{\protect\small Performance Results.}
