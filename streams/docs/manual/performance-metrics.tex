@@ -1,4 +1,4 @@
-% $Id: performance-metrics.tex,v 1.5 2003-02-19 15:34:33 aalamb Exp $
+% $Id: performance-metrics.tex,v 1.6 2003-02-19 16:12:25 dmaze Exp $
 \section{Measuring StreamIt Performance}
 \subsection{Introduction}
 {\huge This section is slightly out of date -- there is a new number
@@ -353,8 +353,10 @@ my $delta_one = ($dec_second_iter - $dec_first_iter);
 my $delta_two = ($dec_third_iter - $dec_second_iter);
 
 print "first  iteration done at $first_iter ($dec_first_iter cycles)\n";
-print "second iteration done at $second_iter ($dec_second_iter cycles) (delta=$delta_one)\n";
-print "third  iteration done at $third_iter ($dec_third_iter cycles) (delta=$delta_two)\n";
+print "second iteration done at $second_iter ($dec_second_iter cycles)".
+  " (delta=$delta_one)\n";
+print "third  iteration done at $third_iter ($dec_third_iter cycles)".
+  " (delta=$delta_two)\n";
 
 my $avg = ($delta_one + $delta_two) / 2;
 print "\n\n==> iter takes $delta_one/$delta_two cycles (average = $avg)\n";
@@ -374,9 +376,11 @@ third  iteration done at 0x00003a74a (239434 cycles) (delta=11414)
 
 ==> iter takes 11468/11414 cycles (average = 11441)
 
-we produce 1 output every 11441 cycles, so normalized to 10^5 cycles, 1*(100000/11441) = 8.7404947
+we produce 1 output every 11441 cycles, so normalized to 10^5 cycles,
+1*(100000/11441) = 8.7404947
 
-flops reported are 4867,4846=4856.5 flops, which is (4856.5/11441) * 250 = 106.12053 MFLOPS
+flops reported are 4867,4846=4856.5 flops, which is
+(4856.5/11441) * 250 = 106.12053 MFLOPS
 
 
 workCount = 733555 / 3464832 = 0.21171445
