@@ -1,10 +1,10 @@
-main.ps: clean main.dvi
+paper.ps: clean paper.dvi
 	dvips paper.dvi -o paper.ps
 
-main.pdf: clean main.dvi
+paper.pdf: clean paper.dvi
 	dvipdf paper.dvi paper.pdf
 
-main.dvi: $(FILES)
+paper.dvi: $(FILES)
 	latex paper
 	bibtex paper
 	latex paper

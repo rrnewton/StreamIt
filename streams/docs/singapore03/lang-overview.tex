@@ -28,32 +28,6 @@ resulting syntax can be cumbersome, and in the future we plan to
 develop a cleaner and more abstract syntax that is designed
 specifically for stream programs.
 
-\begin{figure}[htpb]
-\begin{minipage}{3in}
-\psfig{figure=fir-streamit.eps,width=61.42mm}
-\vspace{10pt}
-\caption{\protect\small An FIR filter in StreamIt.~~~~~
-\protect\label{fig:firstreamit}}
-\end{minipage}
-\begin{minipage}{3in}
-\centering
-\vspace{10pt}
-\psfig{figure=basic-pipeline.eps,width=1.8in}
-
-(a) A Pipeline. \\
-\vspace{10pt}
-\psfig{figure=basic-splitjoin.eps,width=1.8in}
-
-(b) A SplitJoin. \\
-\vspace{10pt}
-\psfig{figure=basic-feedback.eps,width=1.8in}
-
-(c) A FeedbackLoop. \\
-\caption{\protect\small Stream structures supported by StreamIt.
-\protect\label{fig:structuresp}
-}
-\end{minipage}
-\end{figure}
 
 \subsection{Filters}
 
@@ -133,6 +107,34 @@ count is the same as the pop count.
 %\protect\label{fig:firobject}}
 %\end{minipage}
 %\end{figure}
+
+
+\begin{figure}[!t]
+\begin{minipage}{3in}
+\psfig{figure=fir-streamit.eps,width=61.42mm}
+\vspace{10pt}
+\caption{\protect\small An FIR filter in StreamIt.~~~~~
+\protect\label{fig:firstreamit}}
+\end{minipage}
+\begin{minipage}{3in}
+\centering
+\vspace{10pt}
+\psfig{figure=basic-pipeline.eps,width=1.8in}
+
+(a) A Pipeline. \\
+\vspace{10pt}
+\psfig{figure=basic-splitjoin.eps,width=1.8in}
+
+(b) A SplitJoin. \\
+\vspace{10pt}
+\psfig{figure=basic-feedback.eps,width=1.8in}
+
+(c) A FeedbackLoop. \\
+\caption{\protect\small Stream structures supported by StreamIt.
+\protect\label{fig:structuresp}
+}
+\end{minipage}
+\end{figure}
 
 
 \subsection{Connecting Filters}

@@ -21,6 +21,30 @@ during the execution of the program.  Following this stage, each
 filter can be run on a separate processor to obtain a load-balanced
 executable.
 
+%\begin{figure}[htpb]
+\begin{figure}[!h]
+%\vspace{-.5in}
+\centering
+\begin{minipage}{3.0in}
+\centering
+\psfig{figure=beam-graph-orig.eps,width=2.5in}
+\caption{\protect\small Stream graph of the original 12x4 Radar
+application.  The 12x4 Radar application has 12 channels and 4 beams;
+it is the largest version that fits onto 64 tiles without filter
+fusion.  \protect\label{fig:beam-orig}}
+\end{minipage}
+\hspace{0.1in}
+\begin{minipage}{3.0in}
+\centering
+\psfig{figure=beam-graph-opt.eps,width=1.9in}
+\caption{\protect\small Stream graph of the load-balanced 12x4
+Radar application.  Vertical fusion is applied to collapse each pipeline
+into a single filter, and horizontal fusion is used to transform the
+4-way splitjoin into a 2-way splitjoin.  Figure~\ref{fig:beam-blood}
+shows the benefit of these
+transformations. \protect\label{fig:beam-opt}}
+\end{minipage}
+\end{figure}
 
 \begin{figure}[!h]
   \psfig{figure=beam-blood-key.eps,width=3.0in} \\
@@ -50,31 +74,6 @@ intensive filters can be split, and less demanding filters can be
 fused.  Currently, a simple greedy algorithm is used to automatically
 select the targets of fusion and fission, based on the estimate of the
 work in each node.
-
-%\begin{figure}[htpb]
-\begin{figure}[!h]
-%\vspace{-.5in}
-\centering
-\begin{minipage}{3.0in}
-\centering
-\psfig{figure=beam-graph-orig.eps,width=2.5in}
-\caption{\protect\small Stream graph of the original 12x4 Radar
-application.  The 12x4 Radar application has 12 channels and 4 beams;
-it is the largest version that fits onto 64 tiles without filter
-fusion.  \protect\label{fig:beam-orig}}
-\end{minipage}
-\hspace{0.1in}
-\begin{minipage}{3.0in}
-\centering
-\psfig{figure=beam-graph-opt.eps,width=1.9in}
-\caption{\protect\small Stream graph of the load-balanced 12x4
-Radar application.  Vertical fusion is applied to collapse each pipeline
-into a single filter, and horizontal fusion is used to transform the
-4-way splitjoin into a 2-way splitjoin.  Figure~\ref{fig:beam-blood}
-shows the benefit of these
-transformations. \protect\label{fig:beam-opt}}
-\end{minipage}
-\end{figure}
 
 
 For example, in the case of the Radar application, the original
@@ -120,6 +119,88 @@ be eliminated a splitjoin construct can be divided into a hierarchical
 set of splitjoins to enable a finer granularity of fusion and
 identical stateless filters can be pushed through a splitter or joiner
 node if the weights are adjusted accordingly.
+
+\begin{table*}[!t]
+\begin{center}
+\scriptsize
+\begin{tabular}{|l|l||r||r|r|r|r||r||} \hline
+ & & {\bf lines of} & \multicolumn{4}{|c||}{\bf \# of constructs in the program} & {\bf \# of filters in the} \\ \cline{4-7}
+{\bf Benchmark} & {\bf Description} & {\bf code} & filters & pipelines & splitjoins & feedbackloops & {\bf expanded graph}
+\\
+\hline \hline
+FIR & 64 tap FIR & 
+125 & 5 & 1 & 0 & 0 & 132
+\\ \hline
+Radar & Radar array front-end~\cite{pca} & 
+549 & 8 & 3 & 6 & 0 & 52
+\\ \hline
+Radio & FM Radio with an equalizer & 
+525& 14 & 6 & 4 & 0 & 26
+\\ \hline
+Sort & 32 element Bitonic Sort & 
+419 & 4 & 5 & 6 & 0 & 242
+\\  \hline
+FFT & 64 element FFT & 
+200 & 3 & 3 & 2 & 0 & 24
+\\  \hline
+Filterbank & 8 channel Filterbank & 
+650 & 9 & 3 & 1 & 1 & 51
+\\  \hline
+GSM & GSM Decoder & 
+2261 & 26 & 11 & 7 & 2 & 46
+\\ \hline
+Vocoder & 28 channel Vocoder~\cite{seneff80} &  
+1964 & 55 & 8 & 12 & 1 & 101
+\\ \hline
+3GPP & 3GPP Radio Access Protocol~\cite{3gpp} &  
+1087 & 16 & 10 & 18 & 0 & 48
+\\ \hline
+\hline
+\end{tabular}
+\caption{\protect\small Application Characteristics.}
+\label{tab:benchmarks}
+\end{center}
+\end{table*}
+
+\begin{table*}[!t]
+\begin{center}
+\scriptsize
+\begin{tabular}{|l||r|r|r|r||r||r||} \hline
+& \multicolumn{5}{|c||}{\bf 250 MHz Raw processor} & {\bf C on a 2.2 GHz} \\ 
+\cline{2-6} 
+{\bf Benchmark} & \multicolumn{4}{|c||}{\bf StreamIt on 16 tiles} & {\bf C on a single tile} & {\bf Intel Pentium IV}\\ 
+\cline{2-7}
+& {\bf Utilization} &
+\begin{tabular}{c}\hspace{-5pt} {\bf \# of tiles} \hspace{-5pt}\\
+\hspace{-5pt} {\bf used} \hspace{-5pt}
+\end{tabular} &    
+ {\bf MFLOPS} & 
+\begin{tabular}{c}\hspace{-5pt} {\bf Throughput} \hspace{-5pt}\\
+\hspace{-5pt} {\bf (per 10$^5$ cycles)} \hspace{-5pt}
+\end{tabular} &    
+\begin{tabular}{c}\hspace{-5pt} {\bf Throughput} \hspace{-5pt}\\
+\hspace{-5pt} {\bf (per 10$^5$ cycles)} \hspace{-5pt}
+\end{tabular} &    
+\begin{tabular}{c}\hspace{-5pt} {\bf Throughput} \hspace{-5pt}\\
+\hspace{-5pt} {\bf (per 10$^5$ cycles)} \hspace{-5pt}
+\end{tabular} \\    
+\hline \hline
+FIR    & 84\% &  14 & 815 &  1188.1  & 293.5 & 445.6 \\ \hline
+Radar  & 79\% & 16 & 1,231 &     0.52  & {\it app. too large} & 0.041 \\ \hline
+Radio  & 73\% & 16 & 421 &    53.9  & 8.85 & 14.1 \\ \hline
+Sort   & 64\% & 16  & N/A &  2,664.4 & 225.6 & 239.4 \\ \hline
+FFT    & 42\% & 16  & 182 &  2,141.9 & 468.9 & 448.5  \\ \hline
+Filterbank & 
+       41\% & 16  &  644 &   256.4  & 8.9 & 7.0   \\ \hline
+GSM    & 23\% & 16 & N/A &    80.9  & {\it app. too large} & 7.76 \\ \hline
+Vocoder& 17\% & 15  & 118 &     8.74  & {\it app. too large} & 3.35  \\ \hline
+3GPP   & 18\% & 16  & 44 &   119.6  & 17.3  & 65.7   \\ \hline \hline
+\end{tabular}
+\caption{\protect\small Performance Results.}
+\label{tab:performance}
+\vspace{-5pt}
+\end{center}
+\end{table*}
 
 \subsubsection{Automatic Partitioning}
 

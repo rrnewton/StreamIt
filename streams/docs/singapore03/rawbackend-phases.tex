@@ -1,9 +1,9 @@
 \section{Compiling StreamIt to Raw}
 \label{sec:phases}
-StreamIt language aims to be portable across communication-exposed
-machines.  StreamIt expose the parallelism and communication of
+The StreamIt language aims to be portable across communication-exposed
+machines.  StreamIt exposes the parallelism and communication of
 streaming applications without depending on the topology or
-granularity of the underlying architecture.  have implemented a
+granularity of the underlying architecture.  We have implemented a
 fully-functional prototype of the StreamIt compiler for
 Raw~\cite{raw}, a tiled architecture with fine-grained, programmable
 communication between processors.  However, the compiler employs three
@@ -35,8 +35,8 @@ phases. For a detailed explanation see~\cite{Gordo02,Gordon-thesis,Karczma-thesi
 \subsection{Stream Graph Scheduling}
 The automatic scheduling of the stream graph is one of the primary
 benefits that StreamIt offers, and the subtleties of scheduling and
-buffer management are evident throughout all of the following phases
-of the compiler.  The scheduling is complicated by StreamIt's support
+buffer management are evident throughout the phases
+of the compiler described below.  The scheduling is complicated by StreamIt's support
 for the {\tt peek} operation, which implies that some programs require
 a separate schedule for initialization and for the steady state.  The
 steady state schedule must be periodic--that is, its execution must
