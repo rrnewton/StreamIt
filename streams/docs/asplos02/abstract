@@ -4,7 +4,7 @@ With the increasing miniaturization of transistors, wire delays are
 becoming a dominant factor in microprocessor performance.  To address
 this issue, a number of emerging architectures contain replicated
 processing units with software-exposed communication between one unit
-and another (e.g., RAW, Imagine, SmartMemories, TRIPS).  However, for
+and another (e.g., RAW, iWarp, SmartMemories).  However, for
 their use to be widespread, it will be necessary to develop compiler
 technology that enables a portable, high-level language to execute
 efficiently across a range of wire-exposed architectures.
