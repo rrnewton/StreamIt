@@ -9,7 +9,6 @@ class Combine_optDFT extends Filter
     }
     float wn_r, wn_i;
     int nWay, nMax;
-    float results[];
     public void init(int n, int nmax)
     {
         nWay = n;
@@ -18,11 +17,11 @@ class Combine_optDFT extends Filter
         output = new Channel(Float.TYPE, 2 * nmax);
 	wn_r = (float) Math.cos(2 * 3.141592654 / ((double) n));
         wn_i = (float) Math.sin(2 * 3.141592654 / ((double) n));
-        results = new float[2 * nmax];
     }
 
     public void work()
     {
+        float[] results = new float[2 * nMax];
 	int i;
 	for (int k=0; k<nMax/nWay; k++) {
 	    float w_r = 1;
