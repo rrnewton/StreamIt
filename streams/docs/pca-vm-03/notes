@@ -1,3 +1,278 @@
+conference call with mike vahey, peter, francois
+------------------------------------------------
+
+- I/O devices just have input/output assembly instruction.  data
+  coming in will stream in forever.  if attached to file there is an
+  end-of-file signal.
+
+- different classes of memory in the processor.  use a PPC somewhere,
+  have DMA engines between memory and processor
+
+- have internal memories between the elements of the processing core.
+  these can stream in data from addresses, store to addresses.
+
+- ratio is ~1 memory unit for every pair of adder/multiplier combo's.
+
+- so we can represent core as N adders, N multipliers
+
+- can peek on the interconnect, up to about 4 items. the interconnect
+  between memories and functional units is also buffered.
+
+- want to assign a single op to a given functional unit
+
+- you can have cycles in the dataflow graph
+
+- the basic functional unit is both an adder and a multiplier
+
+- internal memories used for FIFO's on occaision, or FFT stuff, or
+  bit reversal on occaision; can have random access
+
+- minimum size of small memories is ~512 words
+
+- regarding threaded kernels... alternate mode of execution is in
+  threaded form, kind of doing SIMD stuff; have an actual register
+  file.  256-bit wide datapath, could operate in parallel.
+
+- in actual baseline chip, there are twice as many adders in dataflow
+  mode.  Also in dataflow, you can do both add and multiply, but in
+  threaded, you can do either add or multiply.  (So factor of two
+  automatically.)
+
+- can run up to 8 threaded kernels on a chip, all of them accessing
+  the FPCA in threaded mode.
+
+- can run part of the chip in dataflow, part of the chip in threaded
+  kernel mode.  e.g. 3/8'ths one and 5/8'ths the other.
+
+- can have tokens passed around like standard dataflow architecture,
+  e.g. for limited support for control flow, etc.
+
+- you can access leftover items in graph; there's a command to purge
+  them if you like.  can suspend the graph and then restart that
+  graph running, even if DMA was blocking or something.
+
+- usually think of a single stream being assigned to a resource; you
+  can multiplex multiple streams on a resource but they're still
+  in-order between them.
+
+- discussing canPush/canPop -- currently there is no ability to test
+  the availability of a given data item, or if a FIFO is full.  It's
+  the same problem on Raw, incidentally.
+
+  - maybe it's preferable to implement an EOS token instead of having
+    canPop, since on FIFO's there's not necessarily a way to test.
+ 
+  - But canPush could still be a little problematic, as there's no
+    backwards push in the dataflow graph; maybe the control thread
+    should detect a finished kernel downstream, and then explicitly
+    terminate everyone upstream.
+
+ - So we're going to go off and think about canPush/canPop to see if
+   there's a better solutoin than above, but we think we should
+   eliminate them.
+
+- can reset a given FIFO queue, if you wanted to.
+
+- can turn off individual functional units, e.g. for kernel.suspend
+
+- discussing unordered streams... decided to keep for data-parallel
+  conditionals and instruction scheduling by low-level compiler; can
+  always implement as ordered stream.
+
+- Calvin from UT will be in charge of streaming on TRIPS?  Will
+  contact him next.
+
+*******************************************************************
+
+- think about how to simplify routes
+
+ignore with monarchs:
+---------------------
+- how to represent raw
+
+with monarch:
+-------------
+- discuss with monarch:  infinite capacity on connections
+- whether or not contents of streams at a connection are persistent
+- can dataflow have loops?  definition of dataflow.
+
+talking with peter
+------------------
+
+- PC+MC+P
+
+- connections just have bandwidth and latency now.  connections can
+have direction.
+
+- have multi-tier connections for busses (e.g. connections mapped to
+other connections)
+
+- connections are stupid.  there is another memory fifo.  can have
+  0-capacity FIFO's.
+
+- estimated # cycles for prework/work/postwork, where prework and 
+  postwork represents startup and shutdown.  don't need to give times
+  for ones that it can't execute.
+
+- processor spec:  SIMD or dataflow.  Dataflow is SIMD without control flow.
+
+- come back to the multicast point.
+
+- eliminate register-based streams (BILL THINK ABOUT THIS)
+
+- axe all functions from stream: length, totalLength, getCapacity, reset
+  - but think about length
+
+  - best-effort suspend.  Next time (ASAP) that work() returns, if it
+    returns RUNNING then change status to SUSPENDED instead.  Also
+    applies to prework.
+
+bill's recommended changes
+--------------------------
+
+CONCEPTUAL
+
+- Things to add from Forum discussion:
+
+  - best-effort suspend.  Next time work() returns, if it returns
+    RUNNING then change status to SUSPENDED instead.  Also applies to
+    prework.
+
+  - support for multicast.
+
+    - decide if this is with pre-defined kernel or with plain sharing?
+      I think that plain sharing would be hard for the C++ runtime system
+      to support, so go with pre-defined kernel.
+
+     * Should it be allocated to resource, though?
+
+- Let's get rid of Send/Receive kernels.
+  - benefits:
+    - don't need them anyway since there's only one kernel on each processor
+    - no more double assignment of these kernels to raw tiles
+    - no more weird redundancy between send/receive and graphs links, esp.
+      with respect to termination semantics
+    - Raw can represent as a single graph that gets broken down into
+      synchronous pieces
+
+  - to deal with I/O, have black-box library kernels.
+
+- Metadata / VM Description
+
+  - indicate number of each kind of functional unit in a processor
+    - maybe with DATAFLOW type of machine??
+
+  - DMA controllers are another type of processor.  They are
+    associated with some set of memory-processor connections (there are
+    not explicit connection into and out of the DMA engine).  Their
+    capabilities only apply to this set; one transfer out of the entire
+    set is active at a time.
+
+  - Give in metadata a list of all kernels (pre-defined and block box)
+    that each processor can execute.  This is important for I/O kernels
+    that can only execute on some resources, and for DMA that can only do
+    certain types of memory operations.  (Alternatively, give estimated
+    cost / execution time for each of these kernels?)
+
+- The argument of BaseStorage is now a Location, which can be either:
+
+  - RegisterLocation:  registers of processor (processor node, capacity, initLength)
+  - MemoryLocation:    memory (processor node, address, capacity, initLength, aliased, wraps)
+  - ConnectLocation:   connection (connection, persistent)
+
+  - capacity could be infinite
+
+  - could define other types of locations if ever needed
+
+- Regarding stream functions:
+
+  - Let's delete stream.reset, since people will have to worry about
+    supporting it.  You can just construct a separate graph.  I don't
+    think reset() is important for the sake of performance.
+
+  - I think we can tell Mike Vahey that stream.length and
+   stream.totalLength can be implemented in other ways by the LLC when
+   they are needed by the HLC and not supported by the implementation
+   of stream.  (Just keep a counter somewhere... you can work
+   backwards from HLC calls to these functions to see where you should
+   put the counters.)
+
+CHANGES TO DOCUMENT
+
+- Should add prework to black-box kernels.
+
+- (Keckler) should have header for document, that this is just
+  syntactical expression
+
+- (Keckler) should add explicit list of everything the LLC should do
+
+---
+
+x maybe I don't understand how the DMA controller would usually work.
+What does it buffer into?
+
+x could declare streams in global namespace.  Then they could be
+attached to connections for Raw.  Could say that we guarantee only one
+stream per resource at a time?  Or I guess, if you try to run multiple
+at the same time, there are no guarantees on the behavior.
+
+x graph.wait is problematic for polling across multiple processors?
+
+x what do we do about pre-defined matrix multiply kernel across multiple processors?
+
+x I don't think we need addDependence if all kernels are pipelined
+when they're connected to a given stream object.  Well, maybe if one
+kernel on a different processor was picking up half of a streaming
+computation or something?
+
+x can you pipeline the end of one graph with the beginning of the next one?
+
+x maybe it's just that each kernel has a source/sink with network
+capabilities in between?  shouldn't necessarily have to store streams
+in between dma and kernel processor, etc.
+
+-----------------------------------------------------------------------------
+
+ideas:
+
+x eliminate graphs, eliminate send/receive, put istream/ostream in
+  control code
+
+x have send/receive bound to a given abstract identifier, use for
+  pipelining between separate graphs.
+
+  x what do you do about waiting for any kernel in a graph to suspend?
+    (or does this even make sense if they're on different processors?)
+
+    -> maybe wait() should just take a list of kernels and waits until
+       one of them suspends or finishes, returning which one of them did?
+
+  x how do you communicate between separate threads of control, e.g. on Raw?
+
+comments from Feb. PI meeting:
+------------------------------
+
+Big issues:
+
+- need dma controllers in metadata
+- need non-memory allocations of streams
+
+Mike Vahey's coments:
+
+- written from a storage perspective.  Should have other ways to store
+streams.
+
+- could think about other ways to transfer streams and blocks between
+stream processors and thread processors
+
+only bill's worries:
+
+- on Raw, might want custom matrix multiply kernel running across
+several tiles
+
+
+************************************************************
+
 regarding peter's new proposal:
 - what about still having iter argument to run()?
 
