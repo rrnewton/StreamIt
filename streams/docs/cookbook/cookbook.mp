@@ -1,7 +1,7 @@
 %
 % cookbook.mp: MetaPost diagrams for StreamIt Cookbook
 % David Maze <dmaze@cag.lcs.mit.edu>
-% $Id: cookbook.mp,v 1.3 2003-03-06 19:49:45 dmaze Exp $
+% $Id: cookbook.mp,v 1.4 2003-03-06 20:37:16 dmaze Exp $
 %
 % MetaPost is a drawing language based on Knuth's METAFONT that can
 % produce embedded PostScript figures, with TeX strings embedded in it.
@@ -29,6 +29,10 @@ def ytop expr p = ypart ulcorner bbox p enddef;
 def ybot expr p = ypart llcorner bbox p enddef;
 def xleft expr p = xpart llcorner bbox p enddef;
 def xright expr p = xpart lrcorner bbox p enddef;
+
+% Draw an arrowed line into a picture.
+def arrowline (expr p, pa) = addto p doublepath pa withpen currentpen;
+  addto p contour arrowhead pa withpen currentpen; enddef;
 
 % Returns p, but with name placed at its top left and a box around
 % the whole thing.  Add o distance above/below.
@@ -61,7 +65,6 @@ vardef toppipe(expr name)(text t) =
   for v=t:
     picture _q; _q=v;
     if _h <> 0:
-      addto _p contour makepath currentpen shifted (0,_h);
       addto _p doublepath (0,_h)--(0,_h-u) withpen currentpen;
       addto _p contour arrowhead (0,_h)--(0,_h-u) withpen currentpen;
       _h := _h - u;
@@ -155,6 +158,59 @@ vardef splitjoin(expr name, split, join)(text children)(text sws)(text jws) =
   boxed(name, 0, _p)
 enddef;
 
+% Usage:
+%  draw feedbackloop("feedback", "RR", "DUP",
+%    filter("foo"), filter("bar"), "1","1", "","")
+% ...where the parameters are name, join type, split type; children;
+% joiner weights; splitter weights.  Returns a picture expression.
+vardef feedbackloop(expr name, join, split, cb, cl, jx, jl, sx, sl) =
+  save _p, _q, _r, _path, _xb, _xl, _hb, _hl, _y, _label;
+  picture _p, _q, _r, _label; _p=nullpicture;
+  path _path;
+  % Draw the children.
+  _q := cb;
+  _r := _q shifted (-u/2-xright _q,-(ybot _q)-(height _q)/2);
+  _xb := -u/2-(width _q)/2;
+  _hb := (height _q)/2;
+  addto _p also _r;
+  _q := cl;
+  _r := _q shifted (u/2-xleft _q,(-ybot _q)-(height _q)/2);
+  _xl := u/2+(width _q)/2;
+  _hl := (height _q)/2;
+  addto _p also _r;
+  % Okay.  Joiner:
+  _y := (ytop _p) + u;
+  _label := thelabel(join, (0,_y));
+  addto _p also _label;
+  addto _p doublepath (xleft _label,_y)--(_xb,_y)--(_xb,_hb)
+  withpen currentpen;
+  addto _p contour arrowhead (_xb,_y)--(_xb,_hb) withpen currentpen;
+  addto _p doublepath (_xl,_hl)--(_xl,_y)--(xright _label,_y)
+  withpen currentpen;
+  addto _p contour arrowhead (_xl,_y)--(xright _label,_y) withpen currentpen;
+  addto _p also thelabel.top(jl, ((_xl+xright _label)/2,_y));
+  _y := (ytop _label);
+  addto _p doublepath (0,_y+u)--(0,_y) withpen currentpen;
+  addto _p contour arrowhead (0,_y+u)--(0,_y) withpen currentpen;
+  addto _p also thelabel.rt(jx, (0,_y+u/2));
+  % And splitter:
+  _y := (ybot _p) - u;
+  _label := thelabel(split, (0,_y));
+  addto _p also _label;
+  addto _p doublepath (_xb,-_hb)--(_xb,_y)--(xleft _label,_y)
+  withpen currentpen;
+  addto _p contour arrowhead (_xb,_y)--(xleft _label,_y) withpen currentpen;
+  addto _p doublepath (xright _label,_y)--(_xl,_y)--(_xl,_hl)
+  withpen currentpen;
+  addto _p contour arrowhead (_xl,_y)--(_xl,-_hl) withpen currentpen;
+  addto _p also thelabel.bot(sl, ((_xl+xright _label)/2,_y));
+  _y := (ybot _label);
+  addto _p doublepath (0,_y)--(0,_y-u) withpen currentpen;
+  addto _p contour arrowhead (0,_y)--(0,_y-u) withpen currentpen;
+  addto _p also thelabel.rt(sx, (0,_y-u/2));
+  boxed(name, 0, _p)
+enddef;
+
 % End of macro section.
 
 beginfig(0);
@@ -174,7 +230,7 @@ beginfig(1);
 endfig;
 
 beginfig(2);
-  draw toppipe("Minimal",
+  draw toppipe("MovingAverage",
     filter("IntSource"),
     filter("Averager"),
     filter("IntPrinter"));
@@ -185,6 +241,20 @@ beginfig(3);
     splitjoin("BPFCore", "DUP", "RR")
     (filter("LowPass"),filter("LowPass"))("","")("1","1"),
     filter("Subtractor"));
+endfig;
+
+beginfig(4);
+  picture c;
+  c := pipeline("", filter("BandPass"), filter("Scale"));
+  draw pipeline("Equalizer",
+    splitjoin("EqSplit", "DUP", "RR")
+    (c, thelabel("...", (0,0)), c)("","","")("1","","1"),
+    filter("+"));
+endfig;
+
+beginfig(5);
+  draw feedbackloop("Echo", "RR", "DUP")(filter("+"),filter("Scale"))
+  ("1","1")("","");
 endfig;
 
 end
