@@ -1,14 +1,15 @@
 \begin{figure*}[t]
 \psfig{figure=splitjoin-sample-tiny2.eps,width=7in}
 \caption{{\small Example construction of phased schedules for the
-splitjoin of Figure~\ref{fig:sjexlabel}.  First, the splitjoin's
-execution is simulated for one steady state according to a push
-schedule; the stream graph is labeled with the number of items on each
-channel following the firing of a shaded node.  Then, fine-grained
-phases are formed that include executions of both the entry (A) and
-exit (D) nodes.  Finally, the fine-grained phases are combined into
+splitjoin of Figure~\ref{fig:sjexlabel}.  First, execution is
+simulated for one steady state according to a push schedule; the
+stream graph is labeled with the number of items on each channel
+following the firing of a shaded node.  Then, fine-grained phases are
+formed that include executions of both the entry (A) and exit (D)
+nodes.  Finally, the fine-grained phases are combined into
 $\mt{maxPhases}$ phases, each of which is factored into a single
-appearance schedule.\protect\label{fig:sjex}}}
+appearance schedule.  Note that buffer size decreases with the number
+of phases, as shown on the right.\protect\label{fig:sjex}}}
 \vspace{-12pt}
 \end{figure*}
 
