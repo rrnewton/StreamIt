@@ -1,4 +1,8 @@
+\newpage
 
+\begin{figure}[t]
+\scriptsize
+\begin{verbatim}
 
 class Butterfly extends Stream {
    void init(int N, int W) {
@@ -100,6 +104,17 @@ class FIR extends Stream {
    }
 }
 
+\end{verbatim}
+\vspace{-12pt}
+\caption{\protect\small Example stuff.
+\protect\label{fig1}}
+\vspace{-12pt}
+\end{figure}
+
+\begin{figure}[t]
+\scriptsize
+\begin{verbatim}
+
 class RFtoIF extends Filter {
    Channel input = new ComplexChannel();
    Channel output = new ComplexChannel();
@@ -186,3 +201,10 @@ class Radio extends Stream {
       add(new AudioBackEnd());
    }
 }
+
+\end{verbatim}
+\vspace{-12pt}
+\caption{\protect\small Example stuff.
+\protect\label{fig1}}
+\vspace{-12pt}
+\end{figure}
