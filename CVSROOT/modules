@@ -1,7 +1,7 @@
 #
 # The CVS Modules File
 #
-#ident	"@(#)cvs/examples:$Name: not supported by cvs2svn $:$Id: modules,v 1.7 1997-09-08 23:51:42 beng Exp $"
+#ident	"@(#)cvs/examples:$Name: not supported by cvs2svn $:$Id: modules,v 1.8 1997-09-09 06:05:14 beng Exp $"
 #
 # Three different line formats are valid:
 #	key	-a    aliases...
@@ -26,21 +26,4 @@
 # character to interpose another module into the current module.  This
 # can be useful for creating a module that consists of many directories
 # spread out over the entire source repository.
-#
-
-# Convenient aliases
-world		-a .
-
-# CVSROOT support
-CVSROOT		-i mkmodules CVSROOT
-commitinfo	-i mkmodules CVSROOT commitinfo
-cvswrappers	-i mkmodules CVSROOT cvswrappers
-editinfo	-i mkmodules CVSROOT editinfo
-modules		-i mkmodules CVSROOT modules
-loginfo		-i mkmodules CVSROOT loginfo
-rcsinfo		-i mkmodules CVSROOT rcsinfo
-rcstemplate	-i mkmodules CVSROOT rcstemplate
-taginfo		-i mkmodules CVSROOT taginfo
-
-# Add more modules here 
 #
