@@ -84,6 +84,8 @@ there is no implicit type promotion across tapes.
   then the joiner must be a round-robin joiner that gives a zero
   weight to the external input.  Identical constraints hold for the
   output side of the feedback loop.
+\item Exactly one stream in the program has the stream type
+  \lstinline|void->void|.  This stream must be named.
 \end{enumerate}
 
 \subsection{Statements and Expressions}
