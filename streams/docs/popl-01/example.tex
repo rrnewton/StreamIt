@@ -1,47 +1,102 @@
 \section{Detailed Example}
 This section describes the Trunked Radio example implementation in
-detail. The code for the trunked radio demonstrate many features of
-StreaMIT. 
+Figure~\ref{fig:radiocode}. The code for the trunked radio demonstrate
+many features of StreaMIT.
 
 The high-level structure of the radio, graphically shown in
 Figure~\ref{fig:radiodiagram}, is implemented in the class {\tt
-TrunkedRadio}.
+TrunkedRadio}. It has 7 stages, where the first three stages operate
+in the time domain and the last three stages on the frequency domain.
+At this high level, the strcuture of the system is a pipeline of six
+or seven stream stages. The difference is due to the {\tt Booster}
+stage, which can be active or inactive. The switching on and off of
+the {\tt Booster} stage, which happens infrequently, is accomplished
+using a message from the {\tt CheckQuality} stage. We also use another
+message, from the {\tt CheckFreqHop} stage to {\tt RFtoIF} stage to
+change the baseband when a frequency hop tone is present.
+
+In the implementation we will omit the first and the last stages, {\tt
+ReadFromAtoD} and {\tt AudioBackEnd}. 
+
+The {\tt RFtoIF} stage modulates the input signal from RF to a
+frequency band around the current IF frequency. This stage is
+implented as a filter, which multiplies the current signal with the
+relevent component of a sine wave at the IF frequency. Since frequency
+hopping can change the IF frequency, we have created a method {\tt
+set\_freq} in the filter, which will be invoked using a message.
+
+The optional {\tt Booster} stage will be activated when the signal is
+hard to detect. However, to conserve power, it will get deactivated
+during normal operation. The booster is a FIR filter, implemented
+using a Filter. The turning on and off the filter is implemented using
+a Stream. When the Stream is reset, the control-flow of the init
+function will decide to or not to add the FIR filter.  The FIR filter,
+shown in Figure~\ref{fig:firfilter}, is implemented using peek
+to look at N elements.
+
+The {\tt FFT} stage converts the program from the time domain to the
+frequency domain using a multi-stage FFT. The FFT algorithm
+implemented is graphically presented in~\ref{fig:fftfilter}. The FFT
+is composed of a reordering filter and a multi-stage butterfly
+filters. The StreaMIT representation of the reordering filter (a bit
+reverse order filter) is given in
+Figure~\ref{fig:bitreverseorder}. Note that the complex data
+reshuffling is accomplished using few splitjoin constructs.  A
+parameterized Butterfly implementation is used to abstract the
+multi-stage butterfly in the FFT. As shown in
+Figure~\ref{fig:butterfly}, the Butterfly filter is also implemented
+using a combination of splitjoin constructs. 
+
+StreaMIT implementation of the FFT filter is clean and intutive. It
+already has a large amount of pipelined parallelism. Due to the simple
+and straighforward mapping from the algorithm to implementation,
+compiler analyses should be able to extract the parallel structure of
+the FFT when hardware resources are available.
+
+The next stage, {\tt CheckFreqHop}, checks four different frequencies
+for the change frequency tone. When this tone is detected, the
+frequency has to be changed within a time limit. Thus, a message is
+send to the {\tt RFtoIF} stage requiring it to be delivered such that 
+CheckFreqHop should receive at lest 4N and not more than 6N items
+using the old modulation.
+
+The {\tt CheckQuality} stage checks if the signal has a distinct
+frequency spectrum. If all the frequencies has similar amplitute, it
+assumes that the signal to noice ratio is low and send a message to
+activate the {\tt Booster}. Note that this message is send using best
+effort delivary.
+
 
 
 \begin{figure}
 \centering
 \psfig{figure=fft-block.eps,width=3.2in}
-\caption{ fig1}
-\label{fig:data_structs}
+\caption{The multi-stage FFT algorithm}
+\label{fig:fftfilter}
 \end{figure}
 
 \begin{figure*}
 \centering
 \psfig{figure=fft-pre-tape.eps,width=4.8in}
-\caption{ fig1}
-\label{fig:data_structs}
+\caption{The bit reverse order filter in FFT. The tapes at each
+channel illustrates the data reshuffling when N=8. }
+\label{fig:bitreverseorder}
 \end{figure*}
 
 \begin{figure*}
 \centering
 \psfig{figure=fft-butterfly-tape.eps,width=5.8in}
-\caption{ fig1}
-\label{fig:data_structs}
+\caption{A 4x4 butterfly stage in the FFT. The tapes at each channel illusrates the data transformation and computation. }
+\label{fig:butterfly}
 \end{figure*}
 
 \begin{figure}
 \centering
 \psfig{figure=fir-block.eps,width=3.2in}
-\caption{ fig1}
-\label{fig:data_structs}
+\caption{A block diagram of a five tap FIR filter.}
+\label{fig:firfilter}
 \end{figure}
 
-\begin{figure*}
-\centering
-\psfig{figure=fir-tape.eps,width=5.2in}
-\caption{ fig1}
-\label{fig:data_structs}
-\end{figure*}
 
 
 \newpage
@@ -163,7 +218,7 @@ class RFtoIF extends Filter {
 
 class CheckFreqHop extends SplitJoin {
    RFtoIFPortal freq_hop;
-   void init(RFtoIFPortal fh) {
+   void init(FloatPortal fh) {
       freq_hop = fh;
       weighted_round_robin(N/4-2,1,1,N/2,1,1,N/4-2);
       int k = 0;
