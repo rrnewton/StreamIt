@@ -53,10 +53,12 @@ has exactly one input channel and exactly one output channel.
 \subsubsection{Methods}
 
 \doc{void init(user-defined arguments)}  The {\tt init} function is
-called automatically when the stream is first instantiated, and can be
-called again with a message at runtime to trigger a re-initialization
-of this stream.  The purpose of the {\tt init} function is to
-initialize child streams and to set parameters used with this stream.
+called automatically when the {\tt Stream} is first instantiated; it
+receives as its arguments the same arguments that were passed to the
+constructor.  Additionally, the {\tt init} function can be called
+again with a message at runtime to trigger a re-initialization of this
+stream.  The purpose of the function is to initialize child streams
+and to set parameters used with this stream.
 
 \doc{Stream add(Stream child)}  The {\tt add} function appends {\tt
 child} to the current pipeline of blocks comprising this stream and
@@ -146,7 +148,9 @@ graph.
 \doc{Splitter setSplitter(Splitter splitter)}
 \doc{Stream setLoop(Stream stream)}
 
-These methods set the joiner, body stream, splitter, and loop stream for the feedback loop; they each return their argument.  Each of them must be called from within the {\init} function.
+These methods set the joiner, body stream, splitter, and loop stream
+for the feedback loop; they each return their argument.  Each of them
+must be called from within the {\tt init} function.
 
 \doc{<varying type> initPath(int index)}  The {\tt initPath} function provides inputs to the joiner at the head of the feedback loop during the initialization period when there are no items on the channels around the loop.  The function is called with the number of the item that is being requested, starting from 0.
 
@@ -187,47 +191,78 @@ the upper and lower time limits for a message delivery.
 
 \subsubsection{Methods}
 
-Constructor (min-time, max-time)
+\doc{TimeInterval(int maxTime)}  This constructs a time interval with maximum delivery time {\tt maxTime}.  The units of time are according to relative information wavefronts as described in the paper.
 
-Constructor (min-time, max-time)
+\doc{TimeInterval(int minTime, int maxTime)}  This constructs a time interval with minimum delivery time {\tt minTime} and maximum delivery time {\tt maxTime}.  The units of time are according to relative information wavefronts as described in the paper.
 
 \section{Semantic restrictions}
 
+\subsection{Java restrictions}
+\label{sec:javarestrict}
+
+Although this version of StreaMIT is expressed as legal Java syntax,
+it allows only a small subset of the features of Java.  Here we list
+some of the syntactical elements of Java that fall outside the domain
+of legal StreaMIT programs.
+\begin{enumerate}
+
+\item StreaMIT disallows any instantiation, subclassing, or method
+call to any object from the Java class libraries.  The only exception
+is {\tt Object} itself, which may be subclassed as the basic means of
+abstraction; however, no member functions of {\tt Object} may be
+called.  Note that this eliminates threads and exceptions from
+consideration because they require the instantiation of an object from
+the class library.
+
+\item StreaMIT does not support native method calls.
+
+\item ???
+
+\end{enumerate}
+
 \subsection{StreaMIT restrictions}
 
-\begin{enumerate}
-
-\item feedback-loop split/join must be non-null
-
-\item the number of outputs on a split and input on a join must match the number of parallel streams in a splitjoin.
-
-\item the joiner and splitter on a feedback loop must have two inputs and outputs
-
-\item must have static rates in work function (compiler-detectable)
-
-\item must only call input.pop() once per statement.  otherwise it's
-ambiguous what value is being referenced.  similarly, a peek() can't
-appear in the same expression as a pop().
-
-\item same for nested add statements
-
-\item the types of connected filters must match
-
-\item the messaging and latency constraints must be satisfyable
-
-\item there must be no deadlock in feedback loops, or overflow in feedback loops or splitjoins
-
-\end{enumerate}
-
-\subsection{Java restrictions}
+Though every legal StreaMIT program is a legal Java program, there are
+legal Java programs--even with the constraints of
+Section~\ref{sec:javarestrict}--that violate higher-level semantic
+requirements of StreaMIT.  We outline these constraints as follows:
 
 \begin{enumerate}
 
-\item no class libraries except for:  String,
+\item In this version of StreaMIT, each invocation of a filter's work
+function must peek, pop, and push a constant number of items.  Dynamic
+rates will be the subject of future work.
 
-\item no aliasing allowed.  what does this mean?
+\item If {\tt pop} appears in an expression, then no other call to
+{\tt pop} or {\tt peek} can appear in the same expression.  This
+avoids ambiguous semantics with regards to the order in which items
+are read and removed from a channel.
+
+\item If two filters are connected, then their corresponding input and
+output types must match.  We postpone a formal treatment of types
+until a future paper.
+
+\item There must be no deadlock or buffer overflow in the program.  We
+have developed a simple algorithm to verify that feedback loops and
+simple round-robin SplitJoins neither deadlock nor overflow.
+
+\item For weighted round robin SplitJoins, we are still developing our
+analysis.  For now, we can at least verify that if the first filter on
+a branch of a SplitJoin inputs zero items and the splitter is a
+weighted round robin, then the splitter must have a weight of 0
+assigned to the branch.  Similarly, if the last filter on a branch
+output zero items and the joiner is a weighted round robin, then the
+joiner must assign a weight of 0 to the branch.
+
+\item The numer of inputs and outputs on weighted round robin joiners
+and splitters must match the number of parallel streams in a
+SplitJoin.
+
+\item The splitter and joiner in a feedback loop must have two outputs
+and two inputs, respectively, and must be something other than NULL.
+
+\item ???
 
 \end{enumerate}
-
 
 
