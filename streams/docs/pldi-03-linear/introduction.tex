@@ -51,12 +51,12 @@ barrier for high-performance stream programming.  Our work is done in
 the context of StreamIt~\cite{streamit-asplos,streamitcc}, which is a
 high-level language for signal processing applications.  A program in
 StreamIt is comprised of a set of concurrently executing filters, each
-with its own address space, and each of which communicates with its
+of which contains its own address space and communicates with its
 neighbors using FIFO queues.  Our analysis focuses on filters which
-are {\it linear}: their outputs can be expressed as
-an affine combination of their inputs.  Linear filters are common in
-DSP applications; examples include FIR filters, expanders,
-compressors, FFTs and DCTs.
+are {\it linear}: their outputs can be expressed as an affine
+combination of their inputs.  Linear filters are common in DSP
+applications; examples include FIR filters, expanders, compressors,
+FFTs and DCTs.
 
 In practice, there are a host of optimizations that are applied to
 linear portions of a stream graph.  In particular, neighboring linear
@@ -111,7 +111,7 @@ and conclusions (Section~\ref{sec:conclusion}).
 \begin{figure}[t]
 \vspace{-6pt}
 \center
-\epsfxsize=3.0in
+\epsfxsize=2.2in
 \epsfbox{images/motivating-example.eps}
 \vspace{-5pt}
 \caption{Block diagram of two FIR filters.}
@@ -243,9 +243,9 @@ float->float pipeline FreqTwoFilters(float[N] w1, float[N] w2) {
 \vspace{-18pt}
 \caption{Combined version of two FIR filters in the frequency domain.
 \protect\label{fig:example-frequency}}
-\vspace{-10pt}
+\vspace{-7pt}
 \makeline
-\vspace{-10pt}
+\vspace{-13pt}
 \end{figure}
 
 To illustrate the program transformations that our technique is
@@ -258,11 +258,11 @@ and optimization techniques because of its use of circular buffers and
 the muddled relationship between {\tt data}, {\tt buffer} and the
 output.
 
-Figure~\ref{fig:example-streamit} shows the same filtering process
-in StreamIt. The StreamIt version is more abstract.  
-It indicates the communication pattern between
-filters, shows the structure of the original block diagram and leaves
-the complexities of buffer management and scheduling to the compiler.
+Figure~\ref{fig:example-streamit} shows the same filtering process in
+StreamIt. The StreamIt version is more abstract than the C version.
+It indicates the communication pattern between filters, shows the
+structure of the original block diagram and leaves the complexities of
+buffer management and scheduling to the compiler.
 
 Two optimized versions of the FIR program are shown in
 Figures~\ref{fig:example-combine} and~\ref{fig:example-frequency}.  In
