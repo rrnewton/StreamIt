@@ -12,7 +12,7 @@
 
 \noindent
 This is for the May 28, 2003 snapshot release (streamit-0.0.20030528).\\
-\verb|$Id: readme.tex.in,v 1.9 2003-10-15 01:30:51 rabbah Exp $|
+\verb|$Id: readme.tex.in,v 1.10 2003-10-15 10:50:06 thies Exp $|
 
 \section{What is this?}
 
@@ -106,13 +106,13 @@ research compiler; as such, it has several known shortcomings:
   (\verb|--partition-dp|) generally uses less memory than the default
   greedy partitioner.
 
-\item Phased filter support differs between the compiler and library.  A
-   work function that consists only of calls to phase functions should
-   work in both; a more complicated work function, possibly including
-   variable declarations and static control flow, would work in the
-   compiler but not the library.  The intermediate Java code differs
-   between the two compilation paths.
-
+%% \item Phased filter support differs between the compiler and library.  A
+%%    work function that consists only of calls to phase functions should
+%%    work in both; a more complicated work function, possibly including
+%%    variable declarations and static control flow, would work in the
+%%    compiler but not the library.  The intermediate Java code differs
+%%    between the two compilation paths.
+%%
 \item The compiler does not support passing structures or complex
   numbers as stream parameters.  This will result in an error such as
 
