@@ -40,7 +40,7 @@ use Socket;
 $username = $ENV{"CVS_USER"} || getlogin || (getpwuid($<))[0] || "nobody";
 $envcvsroot = $ENV{'CVSROOT'};
 $cvsroot = $envcvsroot;
-$flag_debug = 0;
+$flag_debug = 1;
 $flag_tagcmd = 0;
 $repository = '';
 $repository_tag = '';
