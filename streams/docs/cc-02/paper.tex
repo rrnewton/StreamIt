@@ -1,23 +1,56 @@
 % might need psfig, url, amsmath, amsfonts?
-\documentclass[psfig]{acm_proc_article-sp}
+\documentclass{llncs}
+
+\usepackage{psfig}
 
 \begin{document}
 
-\title{StreamIt: A Language for Streaming Applications}
+\pagestyle{headings}
+%In order to omit page numbers and running heads
+%please change this line to
+%\pagestyle{empty}
+%and change the first command line too, see above.
 
-\numberofauthors{1}
-\author{
-\alignauthor \vspace{-18pt} Bill Thies, David Maze, Michal Karczmarek, Michael Gordon, and Saman Amarasinghe\\
-	\vspace{12pt}
-	Laboratory for Computer Science \\
-	Massachusetts Institute of Technology \\
-	Cambridge, MA  02139 \\
-	\vspace{12pt}
-	{\tt \{thies, dmaze, karczma, mgordon, saman\}@lcs.mit.edu} \\
-	\vspace{-6pt}
-%	\vspace{12pt}
-%        \today
+\mainmatter
+
+\title{StreamIt:  A Language and Compiler for Streaming Applications}
+
+%\titlerunning{Lecture Notes in Computer Science}
+
+\author{William Thies \and 
+Michal Karczmarek \and 
+Michael Gordon \and 
+David Maze \and 
+Jeremy Wong \and
+Henry Hoffmann \and 
+Matthew Brown \and 
+and Saman Amarasinghe
 }
+
+%\authorrunning{Alfred Hofmann et al.}
+
+\institute{Laboratory for Computer Science \\
+	Massachusetts Institute of Technology \\
+	Cambridge, MA  02139 \\ \vspace{12pt}
+\email{\{thies, karczma, mgordon, dmaze, jnwong, hank, morris, saman\}@lcs.mit.edu} \vspace{-24pt}}
+
+%\texttt{http://compiler.lcs.mit.edu/streamit}
+
+%% \title{StreamIt: A Language for Streaming Applications}
+
+%% \numberofauthors{1}
+%% \author{
+%% \alignauthor \vspace{-18pt} Bill Thies, David Maze, Michal Karczmarek, Michael Gordon, and Saman Amarasinghe\\
+%% 	\vspace{12pt}
+%% 	Laboratory for Computer Science \\
+%% 	Massachusetts Institute of Technology \\
+%% 	Cambridge, MA  02139 \\
+%% 	\vspace{12pt}
+%% 	{\tt \{thies, dmaze, karczma, mgordon, saman\}@lcs.mit.edu} \\
+%% 	\vspace{-6pt}
+%% %	\vspace{12pt}
+%% %        \today
+%% }
 
 % for the arrow of a function def, etc.
 \newcommand{\ma}[2]{max_{#1 \rightarrow #2}}
