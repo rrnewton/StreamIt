@@ -47,7 +47,7 @@ class FIR extends Filter {
 }
 \end{verbatim}
 \vspace{-12pt}
-\caption{\protect\small An FIR filter in StreaMIT.
+\caption{\protect\small A Finite Input Response (FIR) filter in StreaMIT.
 \protect\label{fig:firfilter}}
 \vspace{-12pt}
 \end{figure}
@@ -109,29 +109,46 @@ automated scheduling and optimization again distinguishes StreaMIT.
 \begin{figure}
 \scriptsize
 \begin{verbatim}
-
+class FFT extends Stream {
+   void init(int N) {
+      add(new SplitJoin() {
+         void init() {
+            weighted_round_robin(N/2, N/2);
+            for(int i=0; i<2; i++) 
+               add(new SplitJoin() {
+                  void init() {
+                     round_robin();
+                     add (new Identity());
+                     add (new Identity());
+                     weighted_round_robin(N/4, N/4);
+               }});
+            round_robin();
+      }});
+      for(int i=2; i<=N/2; i *= 2)
+        add(new Butterfly(i, N));
+}}
 \end{verbatim}
 \vspace{-12pt}
-\caption{\protect\small A Finite Input Response (FIR) filter in StreaMIT.
+\caption{\protect\small .
 \protect\label{fig:}}
 \vspace{-12pt}
 \end{figure}
 
 The basic construct for composing filters into a communicating network
-is a {\tt Stream}.  The FIR filter in Figure \ref{fig:firfilter} is an
-example of a {\tt Stream} that appears in our software radio; it
-contains a {\tt ComplexAdder} as one of its components.  Like a {\tt
-Filter}, a {\tt Stream} has an {\tt init} function that is called upon
-its instantiation.  However, there is no {\tt work} function, and all
-input and output channels are implicit; instead, the stream behaves as
-the sequential composition of filters that are specified with
-successive calls to {\tt add} from within {\tt init}.  That is, {\tt
-Stream} creates a single pipeline.
+is a {\tt Stream}.  The FFT in Figure \ref{fig:firfilter} is an
+example of a {\tt Stream} that appears in our software radio.  Like a
+{\tt Filter}, a {\tt Stream} has an {\tt init} function that is called
+upon its instantiation.  However, there is no {\tt work} function, and
+all input and output channels are implicit; instead, the stream
+behaves as the sequential composition of filters that are specified
+with successive calls to {\tt add} from within {\tt init}.  That is,
+{\tt Stream} creates a single pipeline.
 
 There are two other stream constructors besides {\tt Stream}: {\tt
 SplitJoin} and {\tt FeedbackLoop}.  The former is used to specify
 independent parallel streams that diverge from a common {\it splitter}
-and merge into a common {\it joiner}.  In the case of the FIR filter, 
+and merge into a common {\it joiner}.  There are two kinds of
+splitters: 1) 
 
 The {\tt FeedbackLoop} is the only means of inserting loops in the
 stream network; it contains a round robin joiner, body stream, round
