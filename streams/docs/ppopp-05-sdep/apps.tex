@@ -65,8 +65,7 @@ the portal to $A$ during initialization.
 \item To send a message, $A$ invokes the handler method on the portal
 from within its steady state work function. The handler invocation
 includes a range of latencies specifying when the message should be
-delivered.  For example:
-{\small
+delivered: {\small
 \begin{verbatim}
 work pop 1 {
   float val = pop();
@@ -75,6 +74,8 @@ work pop 1 {
   }
 }
 \end{verbatim}}
+This code sends an {\tt increaseGain} message to {\tt portalToB} with
+minimum latency 2 and maximum latency 3:
 
 \end{itemize}
 The most interesting aspects of the messaging system are the semantics
@@ -135,8 +136,8 @@ ${\cal M}$ obeys the following constraints:
 ${\cal M}$ obeys the following constraints:
 \[
 \begin{array}{l}
-{\cal M}(A, B, k_1, k_2, n) \ge \sdepf{A}{B}(n + k_1)\\
-{\cal M}(A, B, k_1, k_2, n) \le \sdepf{A}{B}(n + k_2)
+{\cal M}(A, B, k_1, k_2, n) \ge \sdepf{B}{A}(n + k_1)\\
+{\cal M}(A, B, k_1, k_2, n) \le \sdepf{B}{A}(n + k_2)
 \end{array}
 \]
 \end{enumerate}
@@ -205,7 +206,7 @@ Freq\_Hop-ping\_Radio pipeline creates a portal and adds the RFtoIF
 actor as a receiver.  The portal is passed to the Check\_Freq\_Hop
 stage, where four parallel detectors send messages into the portal if
 they detect a hop to the frequency they are monitoring.  The messages
-are sent with a small latency [4:6] to ensure a timely transition.  To
+are sent with a small latency of 4 to ensure a timely transition.  To
 make sense of the latency, note that $\sdepf{RFtoIF}{D}(n) = 64*n$ for
 each of the detector actors $D$.  This comes about because the FFT
 stage consumes and produces 64 items; each detector fires once per set
