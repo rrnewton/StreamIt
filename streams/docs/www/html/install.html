@@ -14,12 +14,11 @@
 
 <table border="0" width="600" cellpadding="2" align="center">
   <tr>
-    <td valign="center" align="left">
-      <img src="../images/streamit-logo.jpg" height="90" width="90">
-    </td>
     <td valign="center" align="center">
+    <br>
+      <img src="../images/streamit-logo2.gif" width="400">
       <font color="#444A50">
-        <br><br><br>
+        <br><br> 
         <nobr><b>
             <a href="../index.html"><font color="#990000">home</font></a>
           | <a href="../html/news.html"><font color="#990000">news</font></a>
@@ -29,13 +28,8 @@
           | <a href="../html/download.html"><font color="#990000">download</font></a>
           | <a href="../html/contact.html"><font color="#990000">contact</font></a>
         </nobr></b>
-        <hr>
       </font>
     </td>
-  </tr>
-  <tr>
-    <td></td>
-    <td valign="top" align="right"><h3>INSTALLATION</h3></td>
   </tr>
 </table>
 
@@ -44,7 +38,9 @@
     <td width="130" valign="top" align="left"></td>
     <td width="20" valign="top" align="left"></td>
     <td width="700" valign="top" align="left">
-      <br><br><br>
+    <hr><br>
+      <h3>INSTALLATION</h3>
+      <br>
       <p align="justify">
 	  The   StreamIt  packages   are  distributed   as   gziped  tar
 	  files. Once download, unpack  the distributions in a directory
@@ -69,40 +65,38 @@
 	<ul>
 	  <li>If you are using bash, add the following to your <b>.bashrc</b><br>
 	  <pre>
-        ###Location of StreamIt
-        STREAMIT_HOME=$HOME/streams        
+###Location of StreamIt
+STREAMIT_HOME=$HOME/streams        
 
-        ###Location of Antlr jar
-        ANTLRJAR=/usr/share/java/antlr.jar 
+###Location of Antlr jar
+ANTLRJAR=/usr/share/java/antlr.jar 
 
-        ###Update CLASSPATH
-        CLASSPATH=$CLASSPATH:$ANTLRJAR     
-        CLASSPATH=$CLASSPATH:$STREAMIT_HOME/src
-        CLASSPATH=$CLASSPATH:$STREAMIT_HOME/3rdparty
-        CLASSPATH=$CLASSPATH:$STREAMIT_HOME/3rdparty/cplex/cplex.jar
+###Update CLASSPATH
+CLASSPATH=$CLASSPATH:$ANTLRJAR     
+CLASSPATH=$CLASSPATH:$STREAMIT_HOME/src
+CLASSPATH=$CLASSPATH:$STREAMIT_HOME/3rdparty
 
-        ###Update the shell path
-        PATH=$PATH:$STREAMIT_HOME
+###Update the shell path
+PATH=$PATH:$STREAMIT_HOME
 
-        export STREAMIT_HOME CLASSPATH
+export STREAMIT_HOME CLASSPATH
 	  </pre>
 
 	  <li>If you are using tcsh, add the following to your <b>.tcshrc</b><br>
 	  <pre>
-        ###Location of StreamIt
-        setenv STREAMIT_HOME $HOME/streams
+###Location of StreamIt
+setenv STREAMIT_HOME $HOME/streams
 
-        ###Location of Antlr jar
-        setenv ANTLRJAR      /usr/share/java/antlr.jar
+###Location of Antlr jar
+setenv ANTLRJAR      /usr/share/java/antlr.jar
 
-        ###Update CLASSPATH
-        setenv CLASSPATH     $CLASSPATH:${ANTLRJAR}
-        setenv CLASSPATH     $CLASSPATH:${STREAMIT_HOME}/src
-        setenv CLASSPATH     $CLASSPATH:${STREAMIT_HOME}/3rdparty
-        setenv CLASSPATH     $CLASSPATH:${STREAMIT_HOME}/3rdparty/cplex/cplex.jar
+###Update CLASSPATH
+setenv CLASSPATH     $CLASSPATH:${ANTLRJAR}
+setenv CLASSPATH     $CLASSPATH:${STREAMIT_HOME}/src
+setenv CLASSPATH     $CLASSPATH:${STREAMIT_HOME}/3rdparty
 
-        ###Update the shell path
-        setenv PATH          ${PATH}:${STREAMIT_HOME}
+###Update the shell path
+setenv PATH          ${PATH}:${STREAMIT_HOME}
 	  </pre>
 	</ul>
 
@@ -115,28 +109,28 @@
 	<ul>
 	  <li>If you are using bash, add the following to your <b>.bashrc</b><br>
 	  <pre>
-        ###Location of StreamIt
-        STREAMIT_HOME=$HOME/streams        
+###Location of StreamIt
+STREAMIT_HOME=$HOME/streams        
 
-        ###Update CLASSPATH
-        CLASSPATH=$CLASSPATH:$STREAMIT_HOME/streamit.jar
+###Update CLASSPATH
+CLASSPATH=$CLASSPATH:$STREAMIT_HOME/streamit.jar
 
-        ###Update the shell path
-        PATH=$PATH:$STREAMIT_HOME
+###Update the shell path
+PATH=$PATH:$STREAMIT_HOME
 
-        export STREAMIT_HOME CLASSPATH
+export STREAMIT_HOME CLASSPATH
 	  </pre>
 
 	  <li>If you are using tcsh, add the following to your <b>.tcshrc</b><br>
 	  <pre>
-        ###Location of StreamIt
-        setenv STREAMIT_HOME $HOME/streams
+###Location of StreamIt
+setenv STREAMIT_HOME $HOME/streams
 
-        ###Update CLASSPATH
-        setenv CLASSPATH     $CLASSPATH:${STREAMIT_HOME}/streamit.jar
+###Update CLASSPATH
+setenv CLASSPATH     $CLASSPATH:${STREAMIT_HOME}/streamit.jar
 
-        ###Update the shell path
-        setenv PATH          ${PATH}:${STREAMIT_HOME}
+###Update the shell path
+setenv PATH          ${PATH}:${STREAMIT_HOME}
 	  </pre>
 	</ul>
 
@@ -156,8 +150,8 @@
       </p>
 	<ul>
 	  <pre>
-        cd $STREAMIT_HOME
-        ./configure
+cd $STREAMIT_HOME
+./configure
 	  </pre>
       </ul>
 
@@ -169,8 +163,8 @@
       </p>
 	<ul>
 	  <pre>
-        cd $STREAMIT_HOME
-        make
+cd $STREAMIT_HOME
+make
 	  </pre>
       </ul>
 
@@ -182,10 +176,10 @@
       </p>
 	<ul>
 	  <pre>
-        cd /tmp
-        cp $STREAMIT_HOME/apps/examples/hello/HelloWorld6.str .
-        $STREAMIT_HOME/strc HelloWorld6.str
-        ./a.out -i10
+cd /tmp
+cp $STREAMIT_HOME/apps/examples/hello/HelloWorld6.str .
+$STREAMIT_HOME/strc HelloWorld6.str
+./a.out -i10
 	  </pre>
       </ul>
 
