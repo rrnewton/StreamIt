@@ -216,40 +216,38 @@ reasonable trade off between state and performance.
 
 \begin{transformation} (Frequency implementation)
 Given a linear node $\lambda = \{A, {\vec b}, e, o, u\}$, 
-the frequency implementation is a two stage filter filter $f$ which
+the frequency implementation is a filter $f$ which
 computes Algorithm~\ref{alg:freq-overview}. 
 \\
 \begin{equation} \nonumber
-  \begin{array}{rcl}
-    % perhaps we should condense the next few lines.
-    targetN & \leftarrow & (2*e) \\
-    FFTSize & \leftarrow & 2^{\lceil \lg(targetN + 2*(e-1)) \rceil} \\
-    N       & \leftarrow & FFTSize - 2*(e-1) \\ 
-  \end{array}
-\end{equation}
-\begin{equation} \nonumber
   \begin{array}{l}
-    float->float~{\bf filter}~f~\{ \\
-    ~{\bf init}~\{ \\
-    ~~~\vec{partials} \leftarrow \vec{\mathbf{0}} \\
-    ~~~\vec{H} \leftarrow \mathbf{FFT}(N+2(e-1),h[n])~\} \\
+    {\tt float \rightarrow float}~{\tt filter}~f~{\tt \{} \\
+    ~targetN        \leftarrow (2*e) \\
+    ~FFTSize        \leftarrow 2^{\lceil \lg(targetN + 2*(e-1)) \rceil} \\
+    ~N              \leftarrow FFTSize - 2*(e-1) \\ 
+    ~\vec{partials} \leftarrow {\tt new~float}[0\cdots e-1] \\
     \\
-    ~{\bf prework}~peek~N+e-1~pop~N+e-1~push~N~\{\\
-    ~~~\vec{x} \leftarrow \mathbf{pop}(0 \dots (N+e-1)) \\
+    ~{\tt init}~{\tt \{} \\
+    ~~~\vec{partials} \leftarrow \vec{\mathbf{0}} \\
+    ~~~\vec{H} \leftarrow \mathbf{FFT}(N+2(e-1),h[n])~{\tt \}} \\
+    \\
+    ~{\tt prework}~{\tt peek}~N+e-1~{\tt pop}~N+e-1~{\tt push}~N~{\tt \{}\\
+    ~~~\vec{x} \leftarrow {\tt pop}(0 \dots (N+e-1)) \\
     ~~~\vec{X} \leftarrow \mathbf{FFT} (N+2(e-1), \vec{x}) \\
     ~~~\vec{Y} \leftarrow \vec{X} .* \vec{H} \\
     ~~~\vec{y} \leftarrow \mathbf{IFFT}(N+2(e-1), \vec{Y} \\
-    ~~~\mathbf{push}(\vec{y}[e-1 \dots N+e-1]) \\
-    ~~~\vec{partials} \leftarrow \vec{y}[N+e-1 \dots N+2(e-1)]~\} \\
+    ~~~{\tt push}(\vec{y}[e-1 \dots N+e-1]) \\
+    ~~~\vec{partials} \leftarrow \vec{y}[N+e-1 \dots N+2(e-1)]~{\tt \}} \\
     \\
-    ~{\bf work}~peek~N+e-1~pop~N+e-1~push~N+e-1~\{ \\
-    ~~~\vec{x} \leftarrow \mathbf{pop}(0 \dots (N+e-1)) \\
+    ~{\tt work}~{\tt peek}~N+e-1~{\tt pop}~N+e-1~{\tt push}~N+e-1~{\tt \{} \\
+    ~~~\vec{x} \leftarrow {\tt pop}(0 \dots (N+e-1)) \\
     ~~~\vec{X} \leftarrow \mathbf{FFT} (N+2(e-1), \vec{x}) \\
     ~~~\vec{Y} \leftarrow \vec{X} .* \vec{H} \\
     ~~~\vec{y} \leftarrow \mathbf{IFFT}(N+2(e-1), \vec{Y}) \\
-    ~~~\mathbf{push}(\vec{y}[0 \dots e-1] + \vec{partials})\\
-    ~~~\mathbf{push}(\vec{y}[e-1 \dots N+e-1]) \\
-    ~~~\vec{partials} \leftarrow \vec{y}[N+e-1 \dots N+2(e-1)]~\} \\
+    ~~~{\tt push}(\vec{y}[0 \dots e-1] + \vec{partials})\\
+    ~~~{\tt push}(\vec{y}[e-1 \dots N+e-1]) \\
+    ~~~\vec{partials} \leftarrow \vec{y}[N+e-1 \dots N+2(e-1)]~{\tt \}} \\
+    {\tt \}}
   \end{array} \\
 \end{equation}
 \label{trans:freq}
@@ -259,9 +257,7 @@ computes Algorithm~\ref{alg:freq-overview}.
 
 Transformation~\ref{trans:freq} shows how to generate a 
 filter which implements the computation of $\lambda$ using the
-frequency transformation described in this section. The
-{\tt initwork} function is executed exactly once before
-the {\tt work} function
+frequency transformation described in this section. 
 Transformation~\ref{trans:freq} as written applies only for
 linear nodes with unit push rate (so $A$ is a column vector).
 The general case for arbitrary columns is a trivial extension:
