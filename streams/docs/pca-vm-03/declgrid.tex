@@ -15,7 +15,7 @@ class IStreamUnordered :
       public virtual BaseStream {
 public:
   T pop();
-  boolean canPop(int n);
+  boolean checkEOS(int n);
 }
   \end{verbatim}
 \end{minipage}
@@ -28,8 +28,7 @@ template <class T>
 class OStreamUnordered :
       public virtual BaseStream {
 public:
-  void push(T& val);
-  boolean canPush(int n);
+  void push(T& val, bool EOS = false);
 }
   \end{verbatim}
 \end{minipage}
