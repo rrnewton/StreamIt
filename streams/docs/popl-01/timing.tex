@@ -2,8 +2,93 @@
 
 In this section we develop a more formal semantics for the message
 delivery guarantees described above.  The timing model in StreaMIT is
-unique in that all time is relative to {\em information
-wavefronts}--that is, two filters can describe a time in terms of
+unique in that all time is relative to {\it information
+wavefronts}--that is, two independent filters can describe a common time
+only in terms of when the {\it effects} of one filter's execution are
+seen by another.  Thus, although each filter's {\tt work} function is
+invoked asynchronously without any notion of global time, two
+invocations of a work function occur at the same ``information-relative
+time'' if they operate on the same information wavefront.
+
+To define this notion more precisely, we present transfer functions that
+describe the flow of information across filters and streams.  Using
+these transfer functions, we translate message delivery constraints into
+a set of constraints on the execution schedule of the stream graph.
+Finally, we use these scheduling constraints to formulate an operational
+semantics for messaging, latency, and re-initialization in StreaMIT.
+
+\subsection{Information Flow}
+
+The concept of information flow is central to the streaming domain.
+When an item enters a stream, it carries with it some new information.
+As execution progresses, this information cascades through the stream,
+effecting the state of filters and the values of new data items which
+are produced.  We refer to an ``information wavefront'' as the sequence
+of filter executions that first sees the effects of a given input item.
+This wavefront is well-defined even in the presence of rate-changing
+filters that peek, pop, and push differing number of items in each
+invocation of their work function.
+
+\begin{figure}[t]
+\begin{verbatim}
+Diagram of some filters connected by infinite tapes, marking the regions
+that are were previously on the tape (but have been popped), the items
+that are currently under consideration (for popping & peeking), and the
+items that haven't shown up yet.  Similarly for pushing, somehow.  Maybe
+show a cone collapsing a region of some input tape into the output tape,
+labeling the regions.
+\end{verbatim}
+\vspace{-12pt}
+\caption{\protect\small FIR / FFT Filters.
+\vspace{-12pt}
+\end{figure}
+
+To formalize the wavefront, we introduce some new representations for
+the state of the stream graph.  Consider that in place of each data
+channel there is an infinite ``tape'' which contains the history of
+values that have been pushed onto the channel.  For a given filter $A$,
+let $in_A$ and $out_A$ denote the number of items appearing on its input
+and output tapes, respectively, during a point of the stream's
+execution.  Now consider the following functions:
+
+\begin{itemize}
+
+\item Given that there are $x$ items on the input tape of filter $A$,
+the maximum number of items on the output tape of filter $B$ is
+$f_{AB}(x)$.  That is, $f_{AB}(x) = max(out_B | in_A = x)$.
+
+\item Given that there are $x$ items on the output tape of filter $B$,
+the minimum number of items on the input tape of filter $A$ is
+$g_{AB}(x)$.  That is, $g_{AB}(x) = min(in_A | out_B = x)$.
+
+\end{itemize}
+
+We now derive $f_AB$ and $g_AB$ for certain pairs of nodes $(A, B)$ in
+the stream graph.  Doing so will allow us to express the semantics of
+messaging, latency, and re-initialization.
+
+\subsubsection{Filters}
+
+Consider a filter $A$ that peeks $peek_A$, pops $pop_A$, and pushes
+$push_A$ data items on every execution step.  To derive $f_AA(x)$,
+observe that the filter can execute so long as it does not peek beyond
+the $x$'th item on the input tape.  After the $n$'th execution, it has
+popped $n$ items, peeked up to $n + (peek_A - pop_A)$, and popped $2 *
+n$ items.  Thus, it can execute $n = floor((x - (peek_A - pop_A)) /
+pop_A))$ times, leaving the following expression for $f_AA(x)$:
+\begin{eqnarray*}
+f_{AA}(x)&= push_A*floor((x-(peek_A-pop_A))/pop_A) if x \ge (peek_A-pop_A) \\
+         &= push_A*floor((x-(peek_A-pop_A))/pop_A) if x <  (peek_A-pop_A)
+\end{eqnarray*}
+Similarly, the reader can verify that:
+\begin{eqnarray*}
+g_{AA}(x)&= ceil(x/push_A)*pop+(peek_A-pop_A)
+\end{eqnarray*}
+
+\subsubsection{Pipelines}
+
+
+--------------------------------------------------------------------------
 
 - Definition of wavefront stuff
 
