@@ -4,7 +4,7 @@ LATEST NUMBERS
 StreamIt Numbers
 =======================================================================================================
 
-Application     MFLOPS     % Util.    Throughput    Date     Who        Status
+Application     MFLOPS     % Util.    Throughput**    Date     Who        Status
 -------------------------------------------------------------------------------------------------------
 FFT             304         63            ?         7/24     Bill       Mostly done (for N=64; could do others too)
 FMRadio         ?           ?             ?          ?       ?          Not looked at.
@@ -12,14 +12,14 @@ BeamFormer      ?           ?             ?          ?       ?          Waiting 
 Vocoder         ?           ?             ?          ?       ?          Needs 2-stage fusion.
 Nokia           ?           ?             ?          ?       Jasper     Being optimized.
 GSM             ?           ?             ?          ?       ?          Not looked at.
-MatrixMultiply  ?           ?             ?          ?       ?          Not looked at.
+MatrixMultiply  15.4        42.5          161.6      7/26    Andrew     Not looked at.
 MP3             ?           ?             ?          ?       ?          Not looked at.
 CRC             ?           ?             ?          ?       ?          Not looked at.
 HDTV            ?           ?             ?          ?       ?          Needs fusion support.
 Lincoln Labs    ?           ?             ?          ?       ?          Stuck in frontend?
+
 perftest4       ?           ?             ?          ?       ?          Not looked at.
 Lattice         ?           ?             ?          ?       ?          Not looked at.
-
 FilterBank      ?           ?             ?          ?       Ali        Not written yet.
 MergeSort       ?           ?             ?          ?       ?          Would need iterative rewrite.
 BitonicSort     ?           ?             ?          ?       ?          Could be looked at.
@@ -28,27 +28,30 @@ FIR             ?           ?             ?          ?       ?          Doesn't 
 Comparison Numbers
 =======================================================================================================
 
-Application     C Code, 1 Tile     C Code, PIII       C Code, rawcc       Date     Who        Status
-               (Throughput/FLOPS) (Throughput/FLOPS) (Throughput/FLOPS)
+Application     C Code, 1 Tile       C Code, PIII         C Code, rawcc       Date     Who        Status
+               (Throughput**/FLOPS) (Throughput**/FLOPS) (Throughput**/FLOPS)
 -------------------------------------------------------------------------------------------------------
-FFT                 ?                      ?	             ?	                   Chris        C Code written.
-FMRadio             ?		           ?		     ?	                   ?	        C Code written.
-BeamFormer          ?		           ?		     ?	                   ?	        C Code written?  (Hank?)
-Vocoder             ?		           ?		     ?	                   ?	        C Code supplied.
-Nokia               ?		           ?		     ?	                   Ali          C Code in progress.
-GSM                 ?		           ?		     ?	                   ?            C Code supplied.
-MatrixMultiply      ?		           ?		     ?	                   Andrew       C Code written.
-MP3                 ?		           ?		     ?	                   ?	        ?
-CRC                 ?		           ?		     ?	                   ?	        Optimized C supplied.
-HDTV                ?		           ?		     ?	                   ?	        ?
-Lincoln Labs        ?		           ?		     ?	                   Ali	        C Code in progress.
-perftest4           ?		           ?		     ?	                   ?	        Spectrumware C Code?
-Lattice             ?		           ?		     ?	                   ?	        ?
-				     		     	      						
-FilterBank          ?		     ?		     ?	     ?	        ?
-MergeSort           ?		     ?		     ?	     ?	        ?
-BitonicSort         ?   	     ?   	     ?       ?          ?
-FIR                 ?   	     ?   	     ?       ?          ?
+FFT                 ?                      ?	             ?	              ?     Chris       C Code written.
+FMRadio             ?		           ?		     ?	              ?     ?	        C Code written.
+BeamFormer          ?		           ?		     ?	              ?     ?	        C Code written?  (Hank?)
+Vocoder             ?		           ?		     ?	              ?     ?	        C Code supplied.
+Nokia               ?		           ?		     ?	              ?     Ali         C Code in progress.
+GSM                 ?		           ?		     ?	              ?     ?           C Code supplied.
+MatrixMultiply 122.4/20.2	           ?		     ?	            7/26    Andrew      C Code written.
+CRC                 ?		           ?		     ?	              ?     ?	        Optimized C supplied.
+HDTV                ?		           ?		     ?	              ?     ?	        ?
+Lincoln Labs        ?		           ?		     ?	              ?     Ali	        C Code in progress.
+
+MP3                 ?		           ?		     ?	              ?     ?	        ?
+Lattice             ?		           ?		     ?	              ?     ?	        ?
+perftest4           ?		           ?		     ?	              ?     ?	        Spectrumware C Code?
+FilterBank          ?		           ?		     ?	              ?     ?	        ?
+MergeSort           ?		           ?		     ?	              ?     ?	        ?
+BitonicSort         ?   	           ?     	     ?                ?     ?           ?
+FIR                 ?   	           ?   	             ?                ?     ?           ?
+
+** Throughput is for 10^5 cycles.
+
 
 Notes
 =======================================================================================================
