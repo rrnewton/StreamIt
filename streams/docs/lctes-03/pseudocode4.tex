@@ -24,17 +24,11 @@ Phase[] phasedSchedule (Stream s, int maxPhases, int mode) {
   // combine into <maxPhases> groups, with contents sorted by child stream
   size = ceil(phases.length / maxPhases)
   forall i in [0, min(phases.length, maxPhases) - 1] {
-    newChildren = phases[i*size].children o ... o phases[(i+1)*size
+    newChildren = phases[i*size].children o ... o phases[(i+1)*size]
     result[i] = Phase(s, sortByStream(newChildren))
   }
   return result
 }
-
-singleAppSchedule[s]  = <phasedSchedule(s, 1, INIT),
-                         phasedSchedule(s, 1, STEADY)>
-
-minLatencySchedule[s] = <phasedSchedule(s, \infty, INIT), 
-                         phasedSchedule(s, \infty, STEADY)>
 
 int phasesForFeedback(FeedbackLoop s, int mode) {
   phaseCount = 0

@@ -3,35 +3,41 @@
 
 This section introduces the general concepts used for scheduling
 {\StreamIt} programs.  Concepts presented here are common with other
-languages \cite{ptolemyoverview} \cite{esterel92} \cite{lustre}.
+systems \cite{ptolemyoverview}.  Section \ref{sec:exec-model} presents
+the {\StreamIt} execution model. Section \ref{sec:steady-state}
+introduces the concept of a steady state and shows how to calculate
+it. Section \ref{sec:init-peeking} explains the need for
+initialization of {\StreamIt} program.
+% these languages don't have static scheduling
+% \cite{esterel92} \cite{lustre}.
 
-Section \ref{sec:exec-model} presents the {\StreamIt} execution
-model. Section \ref{sec:steady-state} introduces the concept of a
-steady state and shows how to calculate it. Section
-\ref{sec:init-peeking} explains the need for initialization of
-{\StreamIt} program. Section \ref{sec:general:schedules} introduces
-simple notation for expressing schedules while Section
-\ref{sec:sched-vs-buffer} presents the tradeoff between schedule
-and buffer storage requirements.
-
-\subsection{{\StreamIt} execution model}
+\subsection{{\StreamIt} Execution Model}
 \label{sec:exec-model}
 
-A {\StreamIt} program is represented by a directed graph, $G = (N,
-E)$.  A node in $G$ is either a {\filter}, a {\splitter} or a
-{\joiner}. Edges in $G$ represent data {\Channels}.  Each node in
-$G$ takes data from its {\Input} {\Channel}(s), processes this data,
-and puts the result on the {\Output} {\Channel}(s).  Each data
-{\Channel} is simply a FIFO queue.
+A {\StreamIt} program is represented by a hierarchical graph, where
+the leaf nodes are filters, splitters, joiners, and the composite
+nodes are pipelines, splitjoins, and feedbackloops.  Edges in the
+graph represent data channels, which operate as FIFO queues.
 
-In order for a {\filter} $f$ to execute, it must have at least $e_f$
-data on its {\Input} {\Channel}. After its execution it will decrease
-amount of data on its {\Input} {\Channel} by $o_f$ and increase the
-amount of data on its {\Output} {\Channel} by $u_f$. Similarly, a
-{\splitter} will consume $o_s$ data from its {\Input} {\Channel} and
-push $w_{s,i}$ data into each of its {\Output} {\Channels}, while a
-{\joiner} will consume $w_{j,i}$ data from its {\Input} {\Channels} and
-push $u_j$ onto its {\Output} {\Channel}.
+In order for a {\filter} $f$ to execute, it must have at least
+$\mt{peek}_f$ items on its input channel.  Execution will decrease the
+amount of data on its input channel by $\mt{pop}_f$ and increase the
+amount of data on its output channel by $\mt{push}_f$. Similarly, a
+{\splitter} $s$ will consume $\mt{pop}_s$ data from its {\Input}
+{\Channel} and push $w_{s,i}$ data onto its $i$th output channel,
+while a joiner $j$ will consume $w_{j,i}$ items from its $i$th input
+channel and push $\mt{push}_j$ onto its {\Output} {\Channel}.
+
+Each filter, splitter, and joiner in the graph has two epochs of
+execution: one for initialization, and one for the steady state.
+Within each epoch, a given filter can have any number of phases, each
+of which is an atomic execution step with its own input and output
+rates.  At the start of the program, each node starts in phase $0$ of
+the initial epoch.  It then advances through its initialization
+phases, executing each a single time before transitioning to phase $0$
+of the steady state epoch.  Within the steady state, a filter executes
+its steady state phases cyclically.
+% (just as in a cyclo-static dataflow graph~\cite{BELP96}).
 
 \begin{figure}
 \begin{center}
@@ -39,123 +45,39 @@ push $u_j$ onto its {\Output} {\Channel}.
 \begin{minipage}{0.7in}
 \centering \psfig{figure=pipeline-buffers.eps,width=0.45in}
 \end{minipage}
-~
+~~~~~~
 \begin{minipage}{0.8in}
 \centering \psfig{figure=splitjoin-steady-state.eps,width=0.6in}
 \end{minipage}
-~
+~~~~~~
 \begin{minipage}{0.8in}
 \centering \psfig{figure=feedback-steady-state.eps,width=0.6in}
 \end{minipage}
 
 \vspace{0.1in}
 
-\begin{minipage}{2in}
-\small (a) ~~~~~~~~~~~~~~~~~ (b) ~~~~~~~~~~~~~~~~~~ (c)
-\end{minipage}
+{\small ~~~~(a) a pipeline ~~~~~~~~~ (b) a splitjoin ~~~~~~ (c) a feedbackloop~~~~}
 
-\caption{\small Sample {\StreamIt} operators. (a) A sample
-{\pipeline} (b) A sample {\splitjoin} (c) A sample
-{\feedbackloop}.  The $L$ {\filter} has been flipped upside-down
-for clarity; $peek_L = pop_L = 5$ $push_L = 6$, $delay_{fl} = 9$}
-\label{fig:steady-state}
+\caption{\small Sample {\StreamIt} operators.  Each node is labelled
+with its peek, pop rates (at top) and push rate (at bottom).  The $L$
+{\filter} has been flipped upside-down for clarity.
+\label{fig:steady-state}}
 \end{center}
 \end{figure}
 
-\begin{comment}
-Each {\filter} node $n_f$ has exactly one incoming edge and one
-outgoing edge.  The incoming edge is referred to as an {\Input}
-{\Channel}, while the outgoing edge is called an {\Output}
-{\Channel}. A {\splitter} node $n_s$ has exactly one incoming edge
-({\Input} {\Channel}), but has multiple outgoing edges ({\Output}
-{\Channels}). A {\joiner} node has multiple incoming edges ({\Input}
-{\Channels}) but only one outgoing edge ({\Output} {\Channel}).
-
-Each node of graph $G$ can be executed.  An execution of a node
-causes some data to be collected from the node's {\Input}
-{\Channel}(s), the data to be processed and the result to be put on
-the {\Output} {\Channel}(s).  An execution of a node transfers the
-smallest amount of data across the node - it is an atomic
-operation.  {\StreamIt} uses a static data flow model, meaning
-that every execution of a node $n$ will require the same amount of
-data to be present on node's {\Input} {\Channel}(s) for consumption or
-inspection, same amount to be consumed from the {\Input} {\Channel}(s)
-and same amount of data to be pushed onto its {\Output} {\Channel}(s).
-
-Each {\filter} node $n_f$ is associated with a 3-tuple $(e_f, o_f,
-u_f)$. These three values represent the rate of data flow for the
-{\filter} for each execution.  The first value represents the
-amount of data necessary to be present in its {\Input} {\Channel} in
-order to execute the {\filter}.  This is also called the peek
-amount of the {\filter}.  The second value represents the amount
-of data which will be consumed by the {\filter} from its {\Input}
-{\Channel}. This is called the pop amount of the {\filter}.  Note,
-that $e_f \ge o_f$. The final value represents the amount of data
-that will be put on the {\Output} {\Channel} of the {\filter}. This is
-called the push amount of a {\filter}.  The amount of data present
-in the {\Input} {\Channel} of a {\filter} node $n_f$ is denoted
-$in_f$, while data present in the {\Output} {\Channel} is denoted
-$out_f$.
-
-Each {\splitter} node $n_s$ is associated with a tuple $(o_s,
-w_s)$. The first value represents the amount amount of data that
-will be consumed by $n_s$ from its {\Input} {\Channel}. Thus, in
-order to execute $n_s$, there must be at least $o_s$ data in its
-{\Input} {\Channel}. $w_s$ is a vector of integers, each
-representing the amount of data that will be pushed onto a
-corresponding {\Output} {\Channel} of $n_s$.  The amount of data
-present in the {\Input} {\Channel} of a {\splitter} node $n_s$
-is denoted $in_s$, while data present in the $i$th {\Output}
-{\Channel} is denoted $out_{s,j}$.
-
-Each {\joiner} node $n_j$ is associated with a tuple $(w_j, u_j)$.
-The first value is a vector of integers, each representing the
-amount of data that will be consumed by $n_j$ from its
-corresponding {\Input} {\Channels}.  In order to execute $n_j$,
-each of its {\Input} {\Channels} must have at least as much data
-in it as the corresponding value in $w_j$ indicates.  $u_j$
-represents the amount of data that will be pushed by $n_j$ onto
-its {\Output} {\Channel}. The amount of data present in the $i$th
-{\Input} {\Channel} of a {\joiner} node $n_j$ is denoted
-$in_{j,i}$, while data present in the {\Output} {\Channel} is
-denoted $in_s$.
-\end{comment}
-
-A schedule for a {\StreamIt} program is a list of executions of
-nodes of graph $G$.  The list describes the order in which these
-nodes are to be executed.  In order for a schedule to be legal, it
-must satisfy two conditions: first,for every execution of a node,
-a sufficient amount of data must be present on its {\Input}
-{\Channel}(s); second, the execution of the schedule must require
-a finite amount of memory.
-
-\subsection{Steady State}
+\subsection{Steady State Schedule}
 \label{sec:steady-state}
 
-A {\StreamIt} schedule is an ordered list of firings of nodes in the
-{\StreamIt} graph.  Every firing of a node consumes some data from
-{\Input} {\Channel}(s) and pushes data onto the {\Output} {\Channel}(s).
-
 One of the most important concepts in scheduling streaming
-applications is the steady state schedule.  A steady state
-schedule is a schedule that the program can repeatedly execute
-forever.  It has a property that the amount of data buffered up
-between any two nodes does not change from before to after the
-execution of the steady state schedule.
+applications is the steady state schedule.  A steady state schedule is
+a schedule that the program can repeatedly execute forever.  It has a
+property that the amount of data buffered up between any two nodes
+does not change from before to after the execution of the steady state
+schedule.
 
-\begin{comment}
-This property is important, because it allows the compiler to
-statically schedule the program at compile time, and simply repeat
-the schedule forever at runtime.  A schedule without this property
-cannot be repeated continuously.  This is because the delta in
-amount of data buffered up on between nodes will continue
-accumulating, requiring an infinite amount of buffering space.
-\end{comment}
-
-A steady state of a program is a collection of number of times
-that every node in the program needs to execute in a steady state
-schedule.  It does not impose an order of execution of the nodes
-in the program.
+A steady state of a program is a collection of number of times that
+every node in the program needs to execute in a steady state schedule.
+It does not impose an order of execution of the nodes in the program.
 \begin{comment}
 Not every {\StreamIt} program has a steady state schedule.  It is
 possible for a program to have unbalanced production and
@@ -172,23 +94,27 @@ programs have a steady state schedule.
 
 \subsubsection{Minimal Steady State}
 
-The size of a steady state is defined as the sum of all executions
-of all the nodes in the program per iteration of the steady state.
+We now summarize some of the key properties of steady states, which
+were first presented in~\cite{lee87static}.  Detailed proofs of these
+properties in the context of StreamIt can be found in
+\cite{karczma-thesis}.
 
-\begin{definition}
-A steady state of a stream operator $s$ is represented by vector
-$m$ of non-negative integers. Each of the elements in $m$
-represents the number of times a corresponding node in $s$ must be
-executed in the steady state.
-\end{definition}
+%% The size of a steady state is defined as the sum of all executions
+%% of all the nodes in the program per iteration of the steady state.
 
-Note that $m$ does not impose an order of execution of nodes. Size
-of a steady state is the total number of executions of all the
-nodes in the steady state.
+%% \begin{definition}
+%% A steady state of a stream operator $s$ is represented by vector
+%% $m$ of non-negative integers. Each of the elements in $m$
+%% represents the number of times a corresponding node in $s$ must be
+%% executed in the steady state.
+%% \end{definition}
 
-Next we will summarize the properties of schedules presented in
-\cite{lee87static}. Detailed proofs of these properties are
-presented in \cite{karczma-thesis}.
+%% Note that $m$ does not impose an order of execution of nodes. Size
+%% of a steady state is the total number of executions of all the
+%% nodes in the steady state.
+
+The first property concerns the size of a steady state.  The size is
+defined to be sum of the repetitions of all nodes in the schedule.
 
 \begin{theorem}[Minimal Steady State Uniqueness]
 A {\StreamIt} program that has a valid steady state, has a unique
@@ -248,9 +174,9 @@ $w$ must not change the amount of data buffered in {\Channels}. Thus
 $w$ must be a steady state.
 \end{comment}
 
-\begin{theorem}[Multiplicity of Minimal Steady States]
-If a {\StreamIt} program has a valid steady state, then all its
-steady states are strict multiples of its minimal steady state.
+\begin{theorem}[Multiplicity of Steady States] If a
+{\StreamIt} program has a valid steady state, then all its steady
+states are strict multiples of its minimal steady state.
 \label{thm:multiplicity}
 \end{theorem}
 
@@ -273,127 +199,149 @@ that are not multiples of the minimal steady schedule.
 \end{comment}
 
 This property means that in order to find a minimal steady state
-schedule of an operator we can find any of its steady states and
-divide it by the $gcd$ of executions of all nodes in the operator
-to find the minimal steady state schedule. A detailed explanation
-of minimal steady state schedules is presented in Appendix
-\ref{apx:eqs}.
+schedule of a stream operator, we can find any of its steady states
+and divide it by the $gcd$ of executions of all nodes in the operator
+to find the minimal steady state schedule.
 
 \subsubsection{Calculating Minimal Steady States}
 \label{sec:calc-min-steady}
 
-Minimal steady states are calculated recursively in a hierarchical
-manner. That is, a minimal steady state is calculated for all
-child operators of {\pipeline}, {\splitjoin} and {\feedbackloop},
-and then the schedule is computed for the actual parent operator
-using these minimal states as atomic executions.
-\begin{comment}
-This yields a minimal steady state because all child operators
-must execute their steady states (to avoid buffering changes), and
-all steady states are multiples of the minimal steady states (per
-Theorem \ref{thm:multiplicity}).
-\end{comment}
-Executing a full steady state of an operator is referred to as
-``executing an operator". The notation for $peek$, $pop$ and
-$push$ is is extended to mean entire operators in their minimal
-steady state execution.  That is, a {\pipeline} $p$ will consume
-$o_p$ data, produce $u_p$ data and peek $e_p$ data on every
-execution of its steady state.  Again, in the hierarchical view of
-{\StreamIt} programs, a child operator of a {\pipeline} will
-execute its steady state atomically.
+For a general stream graph, the minimal steady state can calculated in
+a linear algebra framework by formulating a set of balance
+equations~\cite{lee87static}.  However, with StreamIt we leverage the
+structure of the stream graph to calculate steady states in a
+hierarchical manner.  That is, a minimal steady state is calculated
+for all child operators of a {\pipeline}, {\splitjoin} and
+{\feedbackloop}, and then the schedule is computed for the actual
+parent operator using these minimal states as atomic executions.  This
+approach is useful in the context of separate compilation, where the
+entire graph might not be available at compile time; additionally, the
+steady state multiplicity of a given node in relation to its parent is
+useful for our scheduling algorithms.
 
-A steady state of a stream operator $s$ is represented by an
-ordered set $S_s$ of elements, $S_s = \{m, N, c, v\}$. The set
-includes a vector $m$, which describes how many times each
-{\StreamIt} node of the operator will be executed in the steady
-state, a corresponding ordered set $N$ which stores all the nodes
-of the operator, a vector $c$, which holds values $[e_s, o_s,
-u_s]$ for stream operator $s$, and a vector $v$ which holds number
-of steady state executions of all direct children of $s$. $m$ and
-$v$ are not the same vector, because $m$ refers to nodes in the
-subgraph, while $v$ refers only to the direct children, which may
-be {\filters}, {\pipelines}, {\splitters} and {\feedbackloops}.
-For a stream operator $s$, set $S$ is denoted as $S_s$ and the
-elements of $S_s$ are denoted as $S_{s,m}$, $S_{s,N}$, $S_{s,c}$
-and $S_{s,v}$.
+For brevity, we omit the equations for finding the minimal steady
+states.  The steady states are calculated hierarchically; filters with
+multiple phases are represented by a single, coarser phase for the
+sake of the steady-state schedule.  Details can be found
+in~\cite{karczma-thesis}.  For example, the minimal steady states of
+the stream graphs in Figure~\ref{fig:steady-state} are as follows:
+\[
+\begin{tabular}{ll}
+\mbox{Sample Pipeline}: & \mt{steady}(A) = 4 \\
+~ & \mt{steady}(B) = 6 \\
+~ & \mt{steady}(C) = 9 \\
+~ & \mt{steady}(D) = 3 \\
+~ & ~ \\
+\mbox{Sample SplitJoin}: & \mt{steady}(splitter) = 2 \\
+~ & \mt{steady}(A) = 2 \\
+~ & \mt{steady}(B) = 1 \\
+~ & \mt{steady}(joiner) = 2 \\
+~ & ~ \\
+\mbox{Sample FeedbackLoop}: & \mt{steady}(joiner) = 6 \\
+~ & \mt{steady}(B) = 15 \\
+~ & \mt{steady}(splitter) = 5 \\
+~ & \mt{steady}(L) = 3 \\
+\end{tabular}
+\]
+Note that these numbers represent the multiplicity of each node in one
+steady state execution of its parent.  In
+Section~\ref{chpt:hierarchical}, we consider how to order these
+executions to form a valid schedule.
 
-Note, that a steady state does not say anything about the ordering
-of the execution of nodes, only how many times each node needs to
-be executed to preserve amount of data buffered by the operator.
+%% Executing a full steady state of an operator is referred to as
+%% ``executing an operator". The notation for $peek$, $pop$ and $push$ is
+%% is extended to mean entire operators in their minimal steady state
+%% execution.  That is, a {\pipeline} $p$ will consume $o_p$ data,
+%% produce $u_p$ data and peek $e_p$ data on every execution of its
+%% steady state.  Again, in the hierarchical view of {\StreamIt}
+%% programs, a child operator of a {\pipeline} will execute its steady
+%% state atomically.
 
-We omit the equations for calculating the minimal steady states
-for brevity. Details can be found in Appendix \ref{apx:eqs}. As an
-example, the {\splitjoin} from Figure \ref{fig:steady-state}(b) has
-the following steady state:
+%% A steady state of a stream operator $s$ is represented by an
+%% ordered set $S_s$ of elements, $S_s = \{m, N, c, v\}$. The set
+%% includes a vector $m$, which describes how many times each
+%% {\StreamIt} node of the operator will be executed in the steady
+%% state, a corresponding ordered set $N$ which stores all the nodes
+%% of the operator, a vector $c$, which holds values $[e_s, o_s,
+%% u_s]$ for stream operator $s$, and a vector $v$ which holds number
+%% of steady state executions of all direct children of $s$. $m$ and
+%% $v$ are not the same vector, because $m$ refers to nodes in the
+%% subgraph, while $v$ refers only to the direct children, which may
+%% be {\filters}, {\pipelines}, {\splitters} and {\feedbackloops}.
+%% For a stream operator $s$, set $S$ is denoted as $S_s$ and the
+%% elements of $S_s$ are denoted as $S_{s,m}$, $S_{s,N}$, $S_{s,c}$
+%% and $S_{s,v}$.
 
-\begin{displaymath}
-S_{sj} = \left\{
-\begin{array}{c}
-2 * S_{sj_0, m} \circ 1 * S_{sj_1, m} \circ [2\ 2], \\
-S_{sj_0, N} \circ S_{sj_1, N} \circ \{sj_s, sj_j\}, \\
-\left[
-\begin{array}{c}
-2 * 3 \\ 2 * 3 \\ 2 * 4
-\end{array}
-\right], \left[
-\begin{array}{c}
-2 \\ 1 \\ 2 \\ 2
-\end{array}\right]
-\end{array} \right\}
-\end{displaymath}
+%% Note, that a steady state does not say anything about the ordering
+%% of the execution of nodes, only how many times each node needs to
+%% be executed to preserve amount of data buffered by the operator.
 
-\subsection{Initialization for Peeking}
+%% We omit the equations for calculating the minimal steady states
+%% for brevity. Details can be found in Appendix \ref{apx:eqs}. As an
+%% example, the {\splitjoin} from Figure \ref{fig:steady-state}(b) has
+%% the following steady state:
+
+%% \begin{displaymath}
+%% S_{sj} = \left\{
+%% \begin{array}{c}
+%% 2 * S_{sj_0, m} \circ 1 * S_{sj_1, m} \circ [2\ 2], \\
+%% S_{sj_0, N} \circ S_{sj_1, N} \circ \{sj_s, sj_j\}, \\
+%% \left[
+%% \begin{array}{c}
+%% 2 * 3 \\ 2 * 3 \\ 2 * 4
+%% \end{array}
+%% \right], \left[
+%% \begin{array}{c}
+%% 2 \\ 1 \\ 2 \\ 2
+%% \end{array}\right]
+%% \end{array} \right\}
+%% \end{displaymath}
+
+\subsection{Initialization Schedule}
 \label{sec:init-peeking}
 
-Consider a {\filter} $f$, with $e_f = 2$ and a $o_f = 1$. When a
-{\StreamIt} program is first run, there is no data present on any
-of the {\Channels}.  This means that for the first execution,
-{\filter} $f$ requires that two data items be pushed onto its
-{\Input} {\Channel}.  After the first execution of $f$, it will
-have consumed one data item, and left at least one data item on
-its {\Input} {\Channel}.  Thus in order to execute $f$ for the
-second time, at most one extra data item needs to be pushed onto
-$f$'s {\Input} {\Channel}.  The same situation persists for all
-subsequent executions of $f$ - at most one additional data item is
-required on $f$'s {\Input} {\Channel} in order to execute $f$.
+Unlike traditional SDF graphs, StreamIt programs may require a
+separate schedule for initialization.  This is for two reasons.
+First, each filter might contain an initialization stage, where the
+input and output rates are different than in the steady state.  But
+even without the initialization epoch, an initialization schedule is
+necessary if any filter makes use of StreamIt's $peek$ construct, in
+which input items can be examined without being consumed.
 
-This example illustrates that first execution of a {\filter} may
+To understand the impact of peeking on scheduling, consider a filter
+$f$, with $\mt{peek}_f = 2$ and a $\mt{pop}_f = 1$. When a {\StreamIt}
+program is first run, there is no data present on any of the
+{\Channels} (ignoring the case of a feedbackloop delay).  This means
+that for the first execution, {\filter} $f$ requires that two data
+items be pushed onto its {\Input} {\Channel}.  After the first
+execution of $f$, it will have consumed one data item, and left at
+least one data item on its {\Input} {\Channel}.  Thus in order to
+execute $f$ for the second time, at most one extra data item needs to
+be pushed onto $f$'s {\Input} {\Channel}.  The same situation persists
+for all subsequent executions of $f$ -- at most one additional data
+item is required on $f$'s {\Input} {\Channel} in order to execute $f$.
+
+This example illustrates that the first execution of a {\filter} may
 require special treatment.  Namely, the source for {\filter}'s data
 may need to push more data onto {\filter}'s {\Input} {\Channel} for
 {\filter}'s first execution.  Due to this condition, a {\StreamIt}
-program may need to be initialized before it can enter steady
-state execution.
+node may need to be initialized before it can enter steady state
+execution.
 
-\begin{comment}
-There are other constraints (latency constraints) which may
-require more complex initialization.  These will be discussed in
-Chapter \ref{chpt:constrained}.
+%% \subsection{Schedules}
+%% \label{sec:general:schedules}
 
-After an execution, a {\filter} $f$ must leave at least $e_f - o_f$
-data on its {\Input} {\Channel}.  Thus, if the only constraints on
-initialization are peek-related, it is a sufficient condition for
-entering steady state schedule that $\forall f \in {\filters}, in_f
-\ge e_f - o_f$.
+%% Once a program has been initialized, it is ready to execute its
+%% steady state. In order to do this, a steady state schedule needs
+%% to be computed. The steady states computed above do not indicate
+%% the ordering of execution of the nodes, only how many times the
+%% nodes need to be executed.
 
-Specific strategies for generating initialization schedules for
-peeking will be presented in Chapter \ref{chpt:hierarchical} and
-Chapter \ref{chpt:phased}.
-\end{comment}
-
-\subsection{Schedules}
-\label{sec:general:schedules}
-
-Once a program has been initialized, it is ready to execute its
-steady state. In order to do this, a steady state schedule needs
-to be computed. The steady states computed above do not indicate
-the ordering of execution of the nodes, only how many times the
-nodes need to be executed.
-
-A schedule is an ordering of nodes in a {\StreamIt} operator. In
-order to execute the schedule, we iterate through all of its nodes
-in order of appearance and execute them one by one.  For example
-in order to execute schedule $\{ABBCCBBBCC\}$ we would execute
-node A once, node B twice, node C two times, node B three times
-and node C twice again, in that order. In order to shorten the
-above schedule we can run-length encode it.  The schedule becomes
-$\{A \{2B\}\{2C\}\{3B\}\{2C\}\}$.
+%% A schedule is an ordering of nodes in a {\StreamIt} operator. In
+%% order to execute the schedule, we iterate through all of its nodes
+%% in order of appearance and execute them one by one.  For example
+%% in order to execute schedule $\{ABBCCBBBCC\}$ we would execute
+%% node A once, node B twice, node C two times, node B three times
+%% and node C twice again, in that order. In order to shorten the
+%% above schedule we can run-length encode it.  The schedule becomes
+%% $\{A \{2B\}\{2C\}\{3B\}\{2C\}\}$.

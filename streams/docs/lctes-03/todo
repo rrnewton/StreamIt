@@ -1,16 +1,8 @@
 high priority
 -------------
 
-- don't cut-and-paset intro from CC, streamit section from ASPLOS
-
-- still have refs to appendix
-
-- I would remove {\tt } for all StreamIt, peek, pop, etc. keywwords
-
 medium priority
 ---------------
-
-- Figure 3, label which numbers are peek, pop, push
 
 - make all the figures scale by the same amount when they're inserted
   into document (can do this by examining EPS bounding box size).  For
@@ -28,20 +20,11 @@ things missing / to fix
 
 - steady state vs. steady state schedule is still confusing
 
-- initialization for peeking section, I think those rates can be
-symoblic.
-
-- more graphics!  instead of tables highlighting things, have figures,
-and instead (or in addition to) results table, have a graph
-
-- need to integrate the description of phasing and of single apparance
-
 - important distinction: the steady state in relation to the entire
 program, or in relation to your immediate parent
 
-- redo the "sample stream operators".  They look like they're typeset
+- redo the "sample stream operators"?  They look like they're typeset
 in illustrator slightly differently than the FM Radio.
-
 
 ---
 
@@ -58,4 +41,4 @@ in illustrator slightly differently than the FM Radio.
     it has at the node level.  also a way of taking advantage of
     cyclo-static stuff at the node level.
 
-- need to think about figures that could really show what's going on 
+- 

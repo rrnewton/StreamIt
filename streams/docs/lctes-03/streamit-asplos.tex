@@ -48,24 +48,24 @@ are referred to as $u_f$, $o_f$ and $e_f$ respectively.
 %% optimization from the programmer.
 
 {\StreamIt} provides three primitives for composing {\filters} into
-hierarchical streams.  The {\pipeline} construct cascades a set of
-filters in sequence, with the output of one connected to the input of
-the next.  The {\splitjoin} construct is used to specify independent
-parallel streams that diverge from a common {\splitter} and merge into
-a common {\joiner}--for example, in the Equalizer of
-Figure~\ref{fig:radio-ascoded}.  Within a {\splitjoin}, a {\splitter}
-collects $o_s$ data from its {\Input} {\Channel} and pushes $w_{s,i}$
-data to its $i$th {\Output} {\Channel}.  Likewise, a {\joiner}
-collects $w_{j,i}$ items from its $i$th input {\Input}{\Channel} and
-pushes $u_j$ data to its {\Output}{\Channel}.  {\StreamIt} currently
-supports two types of {\splitters} ({\duplicate} and {\roundrobin})
-and one type of {\joiner} (\roundrobin).
+hierarchical streams (see Figure~\ref{fig:steady-state}).  The
+{\pipeline} construct cascades a set of filters in sequence, with the
+output of one connected to the input of the next.  The {\splitjoin}
+construct is used to specify independent parallel streams that diverge
+from a common {\splitter} and merge into a common {\joiner}--for
+example, in the Equalizer of Figure~\ref{fig:radio-ascoded}.  Within a
+{\splitjoin}, a {\splitter} collects $o_s$ data from its {\Input}
+{\Channel} and pushes $w_{s,i}$ data to its $i$th {\Output}
+{\Channel}.  Likewise, a {\joiner} collects $w_{j,i}$ items from its
+$i$th input {\Input}{\Channel} and pushes $u_j$ data to its
+{\Output}{\Channel}.  {\StreamIt} currently supports two types of
+{\splitters} ({\duplicate} and {\roundrobin}) and one type of
+{\joiner} (\roundrobin).
 
 The last control construct provides a means for creating cycles in the
 stream graph: the {\feedbackloop}. A {\feedbackloop} contains a
-{\joiner}, a body operator, a {\splitter}, and a loop operator (see
-Figure~\ref{fig:steady-state}(c).  Figure \ref{fig:steady-state}(c)).
-A {\feedbackloop} has an additional feature required to allow it to
+{\joiner}, a body operator, a {\splitter}, and a loop operator.  A
+{\feedbackloop} has an additional feature required to allow it to
 begin computation: since at first there is no data on any {\Channels},
 the program inserts data from a special function defined by the
 {\feedbackloop} onto the {\Channel} connecting the loop child and the
