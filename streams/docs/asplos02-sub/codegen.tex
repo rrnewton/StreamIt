@@ -13,7 +13,7 @@ produced by the communication scheduler.
 \begin{center}
 \scriptsize
 \begin{tabular}{|l|l||r||r|r|r|r||r|} \hline
- & & {\bf lines of} & \multicolumn{4}{|c||}{\bf \# of constructs in the program} & {\bf \# of nodes in the} \\ \cline{4-7}
+ & & {\bf lines of} & \multicolumn{4}{|c||}{\bf \# of constructs in the program} & {\bf \# of filters in the} \\ \cline{4-7}
 {\bf Benchmark} & {\bf Description} & {\bf code} & filters & pipelines & splitjoins & feedbackloops & {\bf expanded graph}
 \\
 \hline \hline
@@ -21,28 +21,28 @@ FIR & 64 tap FIR &
 125 & 5 & 1 & 1 & 0 & 132
 \\ \hline
 Radar & Radar array front-end\cite{pca} & 
-549 & 8 & 3 & 3 & 0 & 84
+549 & 8 & 3 & 3 & 0 & 52
 \\ \hline
 Radio & FM Radio with an equalizer & 
-525 & 14 & 6 & 6 & 0 & 30
+525 & 14 & 6 & 6 & 0 & 26
 \\ \hline
 Sort & 32 element Bitonic Sort & 
-419 & 4 & 5 & 5 & 0 & 370
+419 & 4 & 5 & 5 & 0 & 242
 \\  \hline
 FFT & 64 element FFT & 
-200 & 3 & 3 & 3 & 0 & 26
+200 & 3 & 3 & 3 & 0 & 24
 \\  \hline
 Filterbank & 8 channel Filterbank & 
-650 & 9 & 3 & 3 & 1 & 53
+650 & 9 & 3 & 3 & 1 & 51
 \\  \hline
 GSM & GSM Decoder & 
 2261 & 26 & 11 & 11 & 2 & 46
 \\ \hline
 Vocoder & 28 channel Vocoder &  
-1964 & 55 & 8 & 8 & 1 & 62
+1964 & 55 & 8 & 8 & 1 & 101
 \\ \hline
 3GPP & 3GPP Radio Access Protocol &  
-1087 & 16 & 10 & 10 & 0 & 94
+1087 & 16 & 10 & 10 & 0 & 48
 \\ \hline
 \hline
 \end{tabular}
