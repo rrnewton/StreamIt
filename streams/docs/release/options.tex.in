@@ -3,7 +3,6 @@
 \usepackage{hyperref}
 
 \newcommand\filename[1]{\textsf{#1}}
-\newcommand\metavar[1]{$\langle$\emph{#1}$\rangle$}
 
 \title{Options to the StreamIt 'strc' Compiler Script}
 
@@ -12,7 +11,7 @@
 
 \noindent
 This is for the May 28, 2003 snapshot release (streamit-0.0.20030528).\\
-\verb|$Id: options.tex.in,v 1.7 2003-10-04 23:33:54 thies Exp $|
+\verb|$Id: options.tex.in,v 1.8 2003-10-06 10:15:34 thies Exp $|
 
 \section*{Basic Usage}
 
@@ -26,196 +25,6 @@ compiles and links this to produce a binary, \filename{a.out}.
 
 \section*{Options}
 
-\begin{description}
-\item[-{}-help]
-      Displays a summary of available options.
-
-\item[-{}-output \metavar{filename}]
-      Places the resulting binary in \metavar{filename}.
-
-\item[-{}-java]
-      Used to compile files in ``old'' syntax (written in Java).  This
-      is added automatically if all of the input file names end in
-      \filename{.java}.
-
-\item[-{}-raw \metavar{n}]
-      Compile for an \metavar{n}-by-\metavar{n} RAW processor.
-
-\item[-{}-raw \metavar{n} -{}-rawcol \metavar{m}]
-      Compile for an \metavar{n}-by-\metavar{m} RAW processor.
-
-\item[-{}-verbose]
-      Show intermediate commands as they are executed.
-
-\item[-{}-library]
-      Produce a Java file compatible with the StreamIt Java library,
-      and compile and run it.
-\end{description}
-
-\subsection*{Options available for all backends}
-
-\begin{description}
-\item[-{}-unroll \metavar{n}, -u\metavar{n}]
-      Specify loop unrolling limit.  The default value is 0.
-
-\item[-{}-linearreplacement]
-      Domain-specific optimization: combine adjacent ``linear''
-      filters in the program into a single matrix multiplication
-      operation wherever possible.  Corresponds to the ``linear''
-      option in the PLDI'03 paper.
-
-\item[-{}-sjtopipe, -J]
-      Convert split-joins to pipelines.  This works by converting an
-      $n$-way split-join to $n$ $n$-way split-joins in series, where
-      each split-join has $(n-1)$ identity filters and one of the
-      children of the original split-join, and then fusing each
-      splitjoin into a single filter.  This could improve performance
-      for large splitjoins by reducing network contention.
-
-\item[-{}-sync, -k]
-      Perform aggressive synchronization removal.  The simplest case
-      of this involves two split-joins in a pipeline, where the joiner
-      of the first and the splitter of the second have identical
-      weights and the number of children is the same; then the two
-      split-joins can be combined into one.  This case is performed by
-      default, but -{}-sync enables more aggressive (and less stable)
-      transformations.
-
-\item[-{}-nofieldprop, -L]
-      Avoid propagating constant values from a filter's init function
-      to its work function, as in:
-
-\begin{verbatim}
-float->float filter ScaleBySquare(float v) {
-  float v2;
-  init { v2 = v * v; }
-  work pop 1 push 1 { push(v2*pop()); }
-}
-\end{verbatim}
-
-\item[-{}-nolinearcollapse, -H]
-      When performing linear replacement or frequency replacement, do
-      not collapse adjacent linear filters into a single filter; only
-      operate on individual filters.
-
-\item[-{}-destroyfieldarray]
-  Break down arrays in structures to their component elements.
-
-\begin{verbatim}
-struct OriginalStruct {
-  float[2] p;
-}
-struct DestroyedStruct {
-  float p1, p2;
-}
-\end{verbatim}
-
-\item[-O1]
-  Perform basic optimizations that should improve performance in most
-  cases.  Adds \texttt{--unroll 16 --alt\-code\-gen
-    --destroy\-field\-array --rate\-match --wbs}.
-
-\item[-O2]
-  Perform extended optimizations that should improve performance in
-  most cases, but may also cause the compiler to become unstable.
-  Adds \texttt{--unroll 256 --alt\-code\-gen --destroy\-field\-array
-    --rate\-match --remove\-globals --simulate\-work --wbs}.
-\end{description}
-
-\subsection*{Options specific to RAW backend}
-
-\begin{description}
-\item[-{}-numbers \metavar{n}, -N\metavar{n}]
-      Instrument code to gather performance statistics on simulated
-      code over \metavar{n} steady-state cycles.  The results are
-      placed in \filename{results.out} in the current directory.
-
-\item[-{}-partition, -a]
-      Partition the stream graph, performing either filter fission or
-      fusion until the number of filters is approximately equal to the
-      number of tiles.  This is required if the number of filters in
-      the expanded stream graph is greater than the number of tiles.
-
-\item[-{}-dppartition, -y]
-      Use a partitioner based on dynamic programming, rather than the
-      default greedy partitioner.  On some benchmarks this gets better
-      results; performance is generally comparable.
-
-\item[-{}-simulatework, -T]
-      Use the RAW simulator to calculate the amount of time required
-      to execute a work function, rather than using an estimator.
-      This makes the compiler substantially slower; it may result in
-      better partitioning.
-
-\item[ -{}-magic\_net, -M]
-      Compile to a "magic" network in which the buffer sizes between
-      Raw tiles are conceptually unbounded (the sender never blocks),
-      and the communication time has a constant overhead and per-hop
-      latency.  These parameters can be varied by editing the
-      auto-generated \filename{Makefile.streamit} file, which contains
-      a string \texttt{-magic\_crossbar C1H1}.  The number after the
-      ``C'' refers to the constant overhead; after the ``H'' refers to
-      the per-hop latency.
-
-\item[-{}-raw-uni, -U]
-      Use the RAW backend, but fuse to a single tile and output code
-      that can be run on a uniprocessor as a standalone C program
-      (without depending on the StreamIt C library).
-
-\item[-{}-wbs]
-  When laying out communication instructions, use the work-based
-  simulator.
-\end{description}
-
-\subsection*{Options specific to uniprocessor backend}
-
-\begin{description}
-\item[-{}-linearpartition, -B]
-      Domain-specific optimization: perform linear replacement and
-      frequency replacement selectively, based on an estimate of where
-      it is most beneficial.  Corresponds to the ``autosel'' option in
-      the PLDI'03 paper.
-
-\item[-{}-frequencyreplacement, -F]
-      Domain-specific optimization: combine adjacent ``linear''
-      filters in the program and convert them to the frequency domain
-      wherever possible.  Corresponds to the ``freq'' option in the
-      PLDI'03 paper.
-
-\item[-{}-poptopeek, -P]
-      Convert pop expressions into peeks, and pop only at the end of 
-      the work function.
-
-\item[-{}-profile]
-      Compile C code with profiling information.  This requires that
-      your system have profiling versions of the standard C and math
-      libraries (\filename{libc\_p.a} and \filename{libm\_p.a}), along
-      with a profiling version of the StreamIt library; \texttt{make
-      profile} from \filename{\$STREAMIT\_HOME/library/c}.  Profiling
-      results can be analyzed using \textsf{gprof}.
-\end{description}
-
-\subsection*{Options specific to the Java library}
-
-\begin{description}
-\item[-{}-iterations \metavar{n}, -i\metavar{n}]
-  Run the program for \metavar{n} steady-state iterations.  Defaults
-  to infinity.
-
-\item[-{}-norun]
-  Perform the library setup and schedule the stream graph, but don't
-  actually run the program.
-
-\item[-{}-nosched]
-  Don't run the scheduler; instead, run in a pull mode, where the
-  buffer lengths are examined at run time and a preceding filter is
-  run if needed to provide enough data to run the current filter.
-
-\item[-{}-marksteady]
-  Print a ``*'' to standard output after each steady-state execution.
-
-\item[-{}-printsched]
-  Dump the program schedule.
-\end{description}
+\input{options-list}
 
 \end{document}
