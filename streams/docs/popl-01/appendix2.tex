@@ -146,11 +146,10 @@ graph.
 \doc{Joiner setJoiner(Joiner joiner)}
 \doc{Stream setBody(Stream stream)}
 \doc{Splitter setSplitter(Splitter splitter)}
-\doc{Stream setLoop(Stream stream)}
-
-These methods set the joiner, body stream, splitter, and loop stream
-for the feedback loop; they each return their argument.  Each of them
-must be called from within the {\tt init} function.
+\doc{Stream setLoop(Stream stream)} These methods set the joiner, body
+stream, splitter, and loop streamfor the feedback loop; they each
+return their argument.  Each of them must be called from within the
+{\tt init} function.
 
 \doc{<varying type> initPath(int index)}  The {\tt initPath} function provides inputs to the joiner at the head of the feedback loop during the initialization period when there are no items on the channels around the loop.  The function is called with the number of the item that is being requested, starting from 0.
 
@@ -182,7 +181,7 @@ e.g., {\tt MyFilterPortal}.
 
 \doc{void register(<portal-type> receiver)}  The {\tt register} method adds {\tt receiver} to this portal as an object that will be the target of all messages passed to the portal.
 
-\doc{all void methods of by <portal-type>}  A portal automatically defines each of the void methods that is implemented by {\tt <portal-type>}.  Since these methods have no return value, their invocation can act as a message to the receiver object.  However, the signature of these methods is modified to accept an extra argument of type {\tt TimeInterval}, which specifies the timing of the message delivery.  When a method is called on the Portal, it is treated as a message and is forwarded to all registered receivers within the given time interval.
+\doc{all void methods of <portal-type>}  A portal automatically defines each of the void methods that is implemented by {\tt <portal-type>}.  Since these methods have no return value, their invocation can act as a message to the receiver object.  However, the signature of these methods is modified to accept an extra argument of type {\tt TimeInterval}, which specifies the timing of the message delivery.  When a method is called on the Portal, it is treated as a message and is forwarded to all registered receivers within the given time interval.
 
 \subsection{TimeInterval}
 
