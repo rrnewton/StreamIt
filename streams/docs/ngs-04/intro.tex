@@ -1,0 +1,71 @@
+\section{Introduction}
+
+Applications that  are structured around  some notion of  a ``stream''
+are increasingly prevalent to common computing practices, and there is
+evidence   that  streaming  media   applications  already   consume  a
+substantial fraction  of the  computation cycles on  consumer machines
+\cite{Rix98}. Furthermore, stream processing---of voice and video
+data---is  central  to  a  plethora  of  embedded  systems,  including
+hand-held computers, cell phones,  and DSPs. The stream abstraction is
+also  fundamental  to  high-performance  systems such  as  intelligent
+software routers, cell phone base stations, and HDTV editing consoles.
+
+Despite the  prevalence of  these applications, there  is surprisingly
+little language and compiler support for practical, large-scale stream
+programming.   Of course,  the notion  of  a stream  as a  programming
+abstraction was  established decades ago \cite{SICP}, and  a number of
+special-purpose stream languages  exist today (see \cite{survey97} for
+a review).   Many of these  languages and representations  are elegant
+and theoretically sound, but they  are often too inflexible to support
+straightforward  development of modern  stream applications,  or their
+implementations are too inefficient to use in practice.  Consequently,
+most programmers resort to general-purpose  languages such as C or C++
+to  implement  stream programs.  Yet  there  are  several reasons  why
+general-purpose languages are  inadequate for stream programming. Most
+notably, they do not provide  a natural or intuitive representation of
+streams,  thereby  reducing  readability, robustness,  and  programmer
+productivity.   Moreover,  because   the  widespread  parallelism  and
+regular communication  patterns of data  streams are left  implicit in
+general-purpose languages,  compilers are not  stream-conscious and do
+not   perform    stream-specific   optimizations.    As    a   result,
+performance-critical  loops  are   often  hand-coded  in  a  low-level
+assembly  language   and  must  be  re-implemented   for  each  target
+architecture.  This practice is labor-intensive, error-prone, and very
+costly. 
+
+General-purpose  languages are  also  poorly suited  for the  emerging
+class of  tile-based architectures \cite{smartmemories,rawshort,trips}
+that are  well-geared  for stream processing.   Perhaps the
+primary appeal of C is  that it provides a ``common machine language''
+for  von-Neumann  architectures.   That  is,  it  abstracts  away  the
+idiosyncratic  differences between  machines,  but encapsulates  their
+common  properties: a single  program counter,  arithmetic operations,
+and a monolithic memory.  However, the von-Neumann model does not hold
+in  the   context  of  tiled  architectures  as   there  are  multiple
+instruction streams and distributed  memory banks. Consequently, C can
+not serve  as a common machine  language, and in fact  it provides the
+wrong    abstraction     for    the    underlying     hardware,    and
+architecture-specific directives are often needed to obtain reasonable
+performance.   Thus   the  responsibilities  of   the  programmer  are
+artifically  complicated,   and  the  portabilty   of  applications  is
+hampered.
+
+In  this paper,  we describe  and  justify StreamIt  as a  high-level,
+architecture independent  programming language for  stream programming
+(Section~\ref{sec:overview}).  The  StreamIt  language is  designed  to
+provide  high-level   stream  abstractions  that   improve  programmer
+productivity   and    program   robustness   within    the   streaming
+domain.  Furthermore, it  is intended  to  serve as  a common  machine
+language for  tile-based processors.  At  the same time,  the StreamIt
+compiler  aims  to  perform  novel  stream-specific  optimizations  to
+achieve     the     performance     of    an     expert     programmer
+(Section~\ref{sec:compiler}). 
+
+In  the following  section, we  begin with  a characterization  of the
+streaming   domain  and   motivate   the  design   of  StreamIt.    
+% In
+% Section~\ref{sec:example},  we  present   an  in-depth  example  of  a
+% software     radio,     followed     by    relevant     results     in
+% Section~\ref{sec:results}.
+Section~\ref{sec:related} discusses related
+work, and Section~\ref{sec:conc} summarizes and concludes the paper.

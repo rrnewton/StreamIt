@@ -1,0 +1,75 @@
+\section{Streaming Application Domain}
+\label{sec:domain}
+
+The applications  that make use  of a stream abstraction  are diverse,
+with targets  ranging from embedded devices, to  consumer desktops, to
+high-performance servers.  Examples include  systems such as the Click
+modular router \cite{click} and the Spectrumware software radio
+\cite{spectrumware,softwareradio};   specifications    such   as   the
+Bluetooth communications protocol \cite{bluetooth}, the GSM Vocoder
+\cite{gsm}, and the AMPS cellular base station\cite{amps}; and almost
+any application developed with Microsoft's DirectShow library
+\cite{directshow}, Real Network's RealSDK \cite{realsdk} or Lincoln
+Lab's Polymorphous Computing Architecture \cite{pca}.
+
+
+We  have identified a  number of  properties that  are common  to such
+applications---enough  so as  to characterize  them as  belonging  to a
+distinct class of programs, which  we will refer to as \emph{streaming
+applications}.   We  believe that  the  salient  characteristics of  a
+streaming application are as follows:
+
+\begin{enumerate}
+\item \emph{Large streams of data.}  Perhaps the most fundamental
+  aspect of a streaming application is that it operates on a large (or
+  virtually infinite) sequence of data items, hereafter referred to as
+  a \emph{data stream}.  Data streams generally enter the program from
+  some external source, and each  data item is processed for a limited
+  time  before being  discarded.  This  is in  contrast  to scientific
+  codes, which  manipulate a  fixed input set  with a large  degree of
+  data reuse.
+
+\item \emph{Independent stream filters.}  Conceptually, a streaming
+  computation  represents a  sequence of  transformations on  the data
+  streams in  the program.  We  will refer to  the basic unit  of this
+  transformation  as  a  \emph{filter}:  an operation  that---on  each
+  execution  step---reads one  or  more items  from  an input  stream,
+  performs some computation, and writes one or more items to an output
+  stream.   Filters  are  generally  independent  and  self-contained,
+  without references  to global variables or other  filters.  A stream
+  program is the composition of filters into a \emph{stream graph}, in
+  which the  outputs of  some filters are  connected to the  inputs of
+  others.
+  
+\item \emph{A stable computation pattern.}  The structure of the
+  stream graph is generally constant during the steady-state operation
+  of  a  stream  program.  That  is,  a  certain  set of  filters  are
+  repeatedly  applied in a  regular, predictable  order to  produce an
+  output stream that is a given function of the input stream.
+  
+\item \emph{Occasional modification of stream structure.}  Even though
+  each arrangement of  filters is executed for a  long time, there are
+  occasional dynamic modifications to the stream graph.  For instance,
+  a software radio re-initializes a portion of the stream graph when a
+  user switches  from AM  to FM.  Sometimes,  these re-initializations
+  are synchronized  with some  data in the  stream, as when  a network
+  protocol changes  from Bluetooth to 802.11  at a certain  point of a
+  transmission.    There  is   typically  an   enumerable   number  of
+  configurations that the  stream graph can adopt in  any one program,
+  such that all  of the possible arrangements of  filters are known at
+  compile time.
+  
+\item \emph{Occasional out-of-stream communication.}  In addition to
+  the  high-volume data streams  passing from  one filter  to another,
+  filters also communicate small  amounts of control information on an
+  infrequent  and  irregular  basis.   Examples include  changing  the
+  volume on  a cell phone, printing  an error message to  a screen, or
+  changing a coefficient in an upstream FIR filter.
+  
+\item \emph{High performance expectations.}  Often there are real-time
+  constraints that must be  satisfied by streaming applications. Thus,
+  efficiency (in  terms of both  latency and throughput) is  a primary
+  concern.  Additionally, many  embedded applications are intended for
+  mobile  environments where  power consumption,  memory requirements,
+  and code size are also important.
+\end{enumerate}
