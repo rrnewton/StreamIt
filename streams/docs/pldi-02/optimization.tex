@@ -42,21 +42,28 @@ constructs, but also horizontal fusion of parallel streams in a
 SplitJoin.  Here we present a transformation on the abstract syntax of
 Section \ref{sec:intalgebra} that collapses a SplitJoin construct
 containing $n$ parallel filters $s_1 \dots s_n$ into a single filter
-$s_c$.  We require that all the filters peek ?????
+$s_c$.  Let us denote the weights of the joiner $J$ by $w_1 \dots w_n$
+with $W = \sum_{i=1}^{n}{w_i}$:
 \begin{align*}
-Merge[(S~s1~\dots~sn~J)] &= (Filter~push_{sc}~pop_{sc}~peek_{sc}~work_{sc}) \\
-where: push_{sc} &= n*LCM(push_{s1}, \dots, push_{sn}) \\
-       pop_{sc} &= LCM(pop_{s1}, \dots, pop_{sn}) \\
-       peek_{sc} &= 0\\
-       work_{sc} &= f_{sc, 1} \dots f_{sc, push_{sc} - 1} \\
-       f_{sc, j} &= t \ra (i \ra (f_{s~p(j)}(t))(i + splitPath(j)))
+Merge[(S~s1~\dots&~sn~J)] = (Filter~push_{sc}~pop_{sc}~peek_{sc}~work_{sc}) \\
+where: {\bf push_{sc}} &= totalRounds * W \\
+       {\bf pop_{sc}} &= totalPop ~~~~~~~~~if~S~=~WeightedRR \\
+                &= totalPop / n ~~~~~if~S~=~Duplicate \\
+       {\bf peek_{sc}} &= MAX_{i \in [1,push_{sc}]}(\mi{I_S}{Op(j)_S}(peek_{s~p(j)})) \\
+       {\bf work_{sc}} &= f_{sc, 1} \dots f_{sc, push_{sc}} \\
+       totalRounds &= lcm(lcm(push_{s1}, w_1), \dots, lcm(push_{sn},
+       w_n)) \\
+       rounds_i &= totalRounds * w_i  / push_{si} \\
+       totalPop &= \sum_{i=1}^{n}(rounds_i*pop_i) \\
+       f_{sc, j} &= g \ra (t \ra (i \ra \\ 
+~&~~((f_{s~p(j)})(i_{local} \ra g(\mi{I_S}{Ip(j)_J}(j) - peek) + \mi{I_S}{Op(j)_S}(i_{local})))) \\
+    ~&~~~(\mi{O_J}{Ip(j)_J}(i))))
 \end{align*}
-where $splitPath$ and $p(i)$ are defined as in Equations
-\ref{eq:splitpath} and \ref{eq:p}, respectively.  We have proven that
-this transformation preserves the meaning of the program with respect to
-our transform algebra for the case when $n = 2$, $w_1 = w_2 = 1$, and
-$S$ is a duplicate splitter.  The proof is by straightforward algebra,
-but we omit it due to space constraints.
+$p(i)$ is defined as in Equation \ref{eq:p}.  We have proven that this
+transformation preserves the meaning of the program with respect to our
+transform algebra for the case when $n = 2$, $w_1 = w_2 = 1$, and $S$ is
+a duplicate splitter.  The proof is by straightforward algebra, but we
+omit it due to space constraints.
 
 \subsection{Fission}
 

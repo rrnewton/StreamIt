@@ -550,10 +550,11 @@ program that is amenable to straightforward transformation techniques.
 \begin{figure}
 \begin{align*}
 &Item = Real \\
-i~\in~&Index, IndexOffset = N \\
+i~\in~&Index = N \\
+g~\in~&IndexTransform = Index \ra Index \\
 t~\in~&Tape = Index \ra Item \\
 &Pop, Peek, Push = N \\ 
-f~\in~&WorkStatement = IndexOffset \ra (Tape \ra Item) \\ 
+f~\in~&WorkStatement = IndexTransform \ra (Tape \ra Item) \\ 
 &WorkFunction = WorkStatement^{+} \\
 S~\in~&SplitType = {Duplicate, RoundRobin} \\ 
 J~\in~&JoinType = {RoundRobin}
@@ -578,7 +579,7 @@ s~\in~&Stream = Filter + Pipeline + SplitJoin + FeedbackLoop \\
 \protect\label{fig:interdom}}
 \vspace{-6pt}
 \begin{align*}
-&StreamTransform = Tape \ra Tape
+&StreamTransform = IndexTransform \ra (Tape \ra Tape)
 \end{align*}
 \caption{Semantic domains specific to the transform algebra.
 \protect\label{fig:transformdom}}
@@ -588,8 +589,8 @@ The domains of the intermediate algebra are shown in
 Figures~\ref{fig:interdom}~and~\ref{fig:shareddom}.  The algebra
 represents tapes as an infinite mapping from an index to an item.
 Generally, stream constructs are represented as a list of their
-component streams, and filters' work functions are encoded as a list
-of push statements that--given the offset of their local indexing to
+component streams, and filters' work functions are encoded as a list of
+push statements that--given the transform from their local indexing to
 the global tape position--returns a mapping from a tape to an output
 item.
 
@@ -607,9 +608,9 @@ example: \\
 \begin{scriptsize}
 \begin{tabular}{l}
 {\tt void work()}\{ \\
-\hspace{12pt} {\tt output.push(} $f_0$ {\tt (input.peek(0), ... , input.peek(PEEK-1) )} \\
+\hspace{12pt} {\tt output.push(} $f_1$ {\tt (input.peek(0), ... , input.peek(PEEK-1) )} \\
 \hspace{12pt} $\dots$ \\
-\hspace{12pt} {\tt output.push(} $f_{PUSH-1}$ {\tt (input.peek(0), ... , input.peek(PEEK-1) )} \\
+\hspace{12pt} {\tt output.push(} $f_{PUSH}$ {\tt (input.peek(0), ... , input.peek(PEEK-1) )} \\
 \hspace{12pt} {\tt for (int i=0; i$<$POP; i++) \{ input.pop(); \}} \\
 \}
 \vspace{-12pt}
@@ -625,10 +626,10 @@ execution, so we subtract the local indices from the index:
 \begin{align*}
 {\cal W}&[{\tt void work() \{...\}}]: {\tt StreamIt Work} \ra
 WorkFunction = \\
-(&i \ra (t \ra f_0(t(i - (PEEK-1)), \dots , t(index -
+(&g \ra (t \ra f_1(t(g(1)), \dots , t(g(PEEK)))
 0))), \\
 \dots \\
-&i \ra (t \ra f_{PUSH-1}(tape(i - (PEEK-1)), \dots , tape(i -
+&g \ra (t \ra f_{PUSH}(t(g(1)), \dots , t(g(PEEK))))
 0))))
 \end{align*}
 
@@ -648,8 +649,9 @@ semantic domains are given in Figures \ref{fig:interdom} and
 Stream \ra StreamTransform$ for converting from the intermediate
 algebra to the transform algebra.  For a filter, we have:
 \begin{align*}
-{\cal S} [(Filter~push~pop~peek~(f_0~\dots~f_{push-1}))] = \\
-t \ra (i \ra (f_(i~\%~push)(t))(\mi{I_F}{O_F}(i)))
+{\cal S} [(Filter~push~pop~peek~(f_1~\dots~f_{push}))] = \\ 
+g \ra (f_(i~\%~push))(i_local \ra g(\mi{I_F}{O_F}(i) - peek +
+i_local))
 \end{align*}
 That is, the value that a filter pushes onto the $i$'th position of
 its output tape is calculated with its function at index $i~\%~push$.
@@ -662,7 +664,8 @@ For a pipeline, the transform function is simply the composition of
 the transforms of component streams:
 \begin{align*}
 {\cal S} [(Pipeline~s_1~s_2~\dots~s_n)] = \\
-{\cal S}[s_n] \circ \dots \circ {\cal S}[s_1]
+g \ra ({\cal S}[s_n]({\cal I}) \circ \dots \circ {\cal S}[s_2]({\cal I}) \circ {\cal S}[s_1](g)) \\
+where {\cal I} denotes the identity function
 \end{align*}
 The valuation function for a SplitJoin follows the same idea, but the
 notation is slightly heavier.  Given that we have a round robin joiner
@@ -671,15 +674,14 @@ parallel stream $p(i)$ which computes the $i$'th output of the
 joiner:
 \begin{align}
 \label{eq:p}
-p(i) = MIN(j~s.t.~\sum_{k=0}^{j-1}{w_i} \le i\%W) 
+p(i) = MIN(j~s.t.~\sum_{k=0}^{j-1}{w_i} \le i\%W)
 \end{align}
 Now, the $i$'th tape position assumes the value that is produced along
 stream $p(i)$ in the SplitJoin, and the index offset is obtained by
-tracing back from the output of the joiner to the input of the splitter
-(using $splitPath$ from Equation \ref{eq:splitpath}):
+tracing back from the output of the joiner to the input of the splitter:
 \begin{align*}
 {\cal S} [(SplitJoin~S~s_1~s_2~\dots~s_n~J)] = \\
-t \ra (i \ra ({\cal S}[s_{p(i)}](t))(splitPath(S, J, p(i)))(i))
+g \ra (t \ra (i \ra (({\cal S}[s_{p(i)}])(i_local \ra g(\mi{I_S}{Op(i)_S}(i_local))))(\mi{O_J}{Ip(i)_J}(i))))
 \end{align*}
 This completes the formulation of the transform algebra.  Using this
 algebra, we can express the meaning of any StreamIt program as a
