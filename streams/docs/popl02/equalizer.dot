@@ -1,16 +1,14 @@
 digraph G {
 RadioSource [shape=box];
 Speaker [shape=box];
-
-"BandPassFilter(100000, 50)" [shape=box];
-"BandPassFilter(200000, 50)" [shape=box];
-"Adder(2)" [shape=box];
-duplicate -> "BandPassFilter(100000, 50)" [label="U(c2, steady) = 1                                           \nO(c2, steady) = 1                                           \nE(c2, init) = 49                                              \nE(c2, steady) = 50                                         "];
-duplicate -> "BandPassFilter(200000, 50)" [label="U(c3, steady) = 1     \nO(c3, steady) = 1     \nE(c3, init) = 49        \nE(c3, steady) = 50   "];
-"BandPassFilter(100000, 50)" -> roundrobin [label="U(c4, init) = 49                                                \nU(c4, steady) = 1                                             \nO(c4, steady, 0) = 1                                         \nO(c4, steady, 1) = 0                                         \n"];
-"BandPassFilter(200000, 50)" -> roundrobin [label="U(c5, init) = 49       \nU(c5, steady) = 1    \nO(c5, steady, 0) = 0\nO(c5, steady, 1) = 1\n"];
-roundrobin -> "Adder(2)" [label="U(c6, steady, 0) = 1\nU(c6, steady, 1) = 1\nO(c6, steady) = 2    "];
-RadioSource -> duplicate [label="U(c1, steady) = 1\nO(c1, steady) = 1"];
-
-"Adder(2)" -> Speaker [label="U(c7, steady) = 1\nO(c7, steady) = 1"];
+BPF1 [label="\nBandPassFilter (100000, 50)" shape=box];
+BPF2 [label="\nBandPassFilter (200000, 50)" shape=box];
+"Adder (2)" [shape=box];
+duplicate -> BPF1 [headlabel="\n\n\n(BPF1)   " taillabel="\n\n\n\n\n\n\n\n\n\nc2                                                                                        " label="U(c2, steady) = 1                                           \nO(c2, steady) = 1                                           \nE(c2, init) = 49                                              \nE(c2, steady) = 50                                         "];
+duplicate -> BPF2 [headlabel="\n\n\n(BPF2)   " taillabel="\n\n\n\n\n\n\n\n\n                                                              c3" label="U(c3, steady) = 1     \nO(c3, steady) = 1     \nE(c3, init) = 49        \nE(c3, steady) = 50   "];
+BPF1 -> roundrobin [taillabel="\n\n\n\n\n\nc4       " label="U(c4, init) = 49                                                \nU(c4, steady) = 1                                             \nO(c4, steady, 0) = 1                                         \nO(c4, steady, 1) = 0                                         \n"];
+BPF2 -> roundrobin [taillabel="\n\n\n\n\n\nc5          " label="U(c5, init) = 49       \nU(c5, steady) = 1    \nO(c5, steady, 0) = 0\nO(c5, steady, 1) = 1\n"];
+roundrobin -> "Adder (2)" [taillabel="\n\n\n\n\nc6      " label="U(c6, steady, 0) = 1\nU(c6, steady, 1) = 1\nO(c6, steady) = 2    "];
+RadioSource -> duplicate [taillabel="\n\n\n\nc1      " label="U(c1, steady) = 1\nO(c1, steady) = 1"];
+"Adder (2)" -> Speaker [taillabel="\n\n\n\nc7      " label="U(c7, steady) = 1\nO(c7, steady) = 1"];
 }

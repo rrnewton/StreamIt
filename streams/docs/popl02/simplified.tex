@@ -10,11 +10,11 @@ Our basic translation operates on computation graphs with all of the
 channels initially empty.  That is, we assume that:
 \begin{enumerate}
 
-\item No items appear on the channels at the beginning:  $\forall c, A(c) = 0$.
+\item No items appear on the channels at the beginning:  $\forall c:~~A(c) = 0$.
 
-\item There are no initialization phases: $\forall n, \mt{num}(n, \mt{init}) = 0$.
+\item There are no initialization phases: $\forall n:~~\mt{num}(n, \mt{init}) = 0$.
 
-\item Each node has only one steady-state phase: $\forall n, \mt{num}(n, \mt{steady}) = 1$.
+\item Each node has only one steady-state phase: $\forall n:~~\mt{num}(n, \mt{steady}) = 1$.
 
 \end{enumerate}
 
@@ -92,7 +92,7 @@ array to the $\mt{BUF}$ array for a given channel.  To understand this
 equation, it might help to consider a simpler version which expresses
 the correct relationship but is not a legal SARE:
 \begin{align*}
-&\forall (i,j,k) \in {\cal D}_{\mt{WRITE}_c},
+&\forall (i,j,k) \in {\cal D}_{\mt{WRITE}_c}:~~
 \mt{BUF}_{c}(i,j*U(c)+k) = \mt{WRITE}_{c}(i, j, k)
 \end{align*}
 The equation above is simply copying the contents of $\mt{WRITE}$ into

@@ -36,16 +36,16 @@
 %
 \begin{align}
 \label{eq:r2w}
-&\forall (i, j, k) \in {\cal D}_{{WRITE}_{c}},~\mt{WRITE}_{c}(i,j,k) = W(n)(\mt{Steady\_Inputs})[\mt{pos\_out}(n, c)][k] \\ \nonumber
-&\mt{where Steady\_Inputs} = [\mt{READ}_{{chan\_in}(n)[1]}(i, j, *), \dots, 
-                             \mt{READ}_{{chan\_in}(n)[{num\_in}(n)]}(i, j, *) ]
+&\forall (i, j, k) \in {\cal D}_{{WRITE}_{c}}:~~\mt{WRITE}_{c}(i,j,k) = W(n)(\mt{Steady\_Inputs})[\mt{pos\_out}(n, c)][k] \\ \nonumber
+&\mt{where Steady\_Inputs} = [\mt{READ}_{{chan\_in}(n)[0]}(i, j, *), \dots, 
+                             \mt{READ}_{{chan\_in}(n)[{num\_in}(n)-1]}(i, j, *) ]
 \end{align}
 %
 \item {\bf(WRITE to BUF)} For each $c \in \mt{chan\_out}(n)$, and for each $q \in
 [0,S(n)-1]$:
 \begin{align}
 \label{eq:w2b}
-&\forall (i,j) \in {\cal D}_{W \rightarrow B}(c,q),
+&\forall (i,j) \in {\cal D}_{W \rightarrow B}(c,q):~~
 \mt{BUF}_{c}(i,j) = 
   \mt{WRITE}_{c}(i, q, j - q * U(c)) \\ \nonumber
 &\mt{where } {\cal D}_{W \rightarrow B}(c,q) = 
@@ -57,7 +57,7 @@
        and for each $q \in [0, \lfloor \frac{E(c)}{\mt{Period}(c)} \rfloor ]$:
 \begin{align}
 \label{eq:b2r}
-&~~~~~\forall (i,j,k) \in {\cal D}_{B \rightarrow R},
+&~~~~~\forall (i,j,k) \in {\cal D}_{B \rightarrow R}:~~
 \mt{READ}_{c}(i,j,k) = \mt{BUF}_{c}(i+q,j*O(n) + k - q * \mt{Period}(c)) \\ \nonumber
 &\mt{where }{\cal D}_{B \rightarrow R} = 
   {\cal D}_{READ_{c}} \cap \{ (i,j,k)~|~q * \mt{Period}(c) \le k \le \mt{min}((q+1)*\mt{Period}(c), E(c)) - 1 \}

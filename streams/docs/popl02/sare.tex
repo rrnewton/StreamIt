@@ -66,31 +66,28 @@ respectively, over channel $c$ during the $p$'th phase of epoch $t$.
 We give an informal description of the execution semantics of a PCG,
 which is an intuitive extension to that of a CG.  An execution
 consists of a sequence of atomic {\it firings} of nodes in the graph.
-The effect of firing a given node depends on the epoch (which is a
-global state of the graph) and the phase (which is a local state of
-each node). At the start of execution, the graph is in the initial
-epoch, each node is in phase 0, and each channel $c$ contains $A(c)$
-items.
+The effect of firing a given node depends on its epoch and its phase,
+which are both local states of the node.  At the start of execution,
+each node is in phase 0 of the initial epoch, and each channel $c$
+contains $A(c)$ items.
 
-Let us consider a node $n$ that is in phase $p$ within a graph that is
-in epoch $t$.  It is legal for $n$ to fire if $p \in [0, \mt{num}(n,
-t)-1]$ and, for each channel $c_{in}$ directed into $n$, there are at
-least $E(c_{in}, t, p)$ items on $c_{in}$.  The effect of this firing
-is to consume $O(c_{in}, t, p)$ items from each channel $c_{in}$
-directed into $n$; to produce $U(c_{out}, t, p)$ new items on each
-channel $c_{out}$ directed out of $n$; and to advance the phase $p$ of
-$n$ to $\mt{next}(t, p)$.  In the initial epoch, each phase executes
-only once and $\mt{next}(\mt{init}, p) = p + 1$; in the
-steady-state epoch, the phases execute cyclically and
-$\mt{next}(\mt{steady}, p) = (p + 1)~\mt{mod}~\mt{num}(n, t)$.
+Let us consider a node $n$ that is in phase $p$ of epoch $t$.  It is
+legal for $n$ to fire if $p \in [0, \mt{num}(n, t)-1]$ and, for each
+channel $c_{in}$ directed into $n$, there are at least $E(c_{in}, t,
+p)$ items on $c_{in}$.  The effect of this firing is to consume
+$O(c_{in}, t, p)$ items from each channel $c_{in}$ directed into $n$;
+to produce $U(c_{out}, t, p)$ new items on each channel $c_{out}$
+directed out of $n$; and to advance the phase $p$ of $n$ to
+$\mt{next}(t, p)$.  In the initial epoch, each phase executes only
+once and $\mt{next}(\mt{init}, p) = p + 1$; in the steady-state epoch,
+the phases execute cyclically and $\mt{next}(\mt{steady}, p) = (p +
+1)~\mt{mod}~\mt{num}(n, t)$.  If a node $n$ is in phase $\mt{num}(n,
+\mt{init})$ of the initial epoch, then it transitions to the
+steady-state epoch and resets its phase to 0.
 
-From the starting state of the graph, execution proceeds through the
-initial epoch via a sequence of node firings.  The order of node
-firings is constrained only by the conditions given above.  When no
-further node can fire in the initial epoch, the graph enters the
-steady state epoch and the phases of all nodes are reset to 0.
-Execution then continues by a (possibly infinite) sequence of
-steady-state firings.
+From the starting state of the graph, execution proceeds via a
+sequence of node firings.  The order of node firings is constrained
+only by the conditions given above.
 
 \section{Phased Computation Programs}
 

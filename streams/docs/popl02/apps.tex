@@ -150,7 +150,7 @@ use for dataflow graphs.
 %% \begin{align*}
 %% \DEP{X}{Y}(i) = max_{\preceq}~\{~ j ~|~ \exists ~&~ T_0 \dots T_n, ~ k_0 \dots k_n, ~ {\cal E}_1 \dots {\cal E}_n ~ s.t. ~ & ~ \\ 
 %% ~ & T_0 = Y ~\wedge~ T_n = X ~\wedge~ k_0 = j ~\wedge~ k_n = i ~\wedge~ & ~ \\
-%% ~ & \forall p \in 1 \dots n, ~ T_p(k_p) \equiv f_{{\cal E}_p}(\dots, T_{p-1}(h_{{{\cal E}_p}, T_{p-1}}(k_p)), \dots) ~ \} & ~ \\
+%% ~ & \forall p \in 1 \dots n:~~T_p(k_p) \equiv f_{{\cal E}_p}(\dots, T_{p-1}(h_{{{\cal E}_p}, T_{p-1}}(k_p)), \dots) ~ \} & ~ \\
 %% \end{align*}
 
 %% In StreamIt, this function is composable because of single-input,

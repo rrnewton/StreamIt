@@ -97,14 +97,14 @@ variable $\mt{SREAD}_{c, p}$ with this domain:
 \item {\bf(I to IBUF)}:
 \vspace{-25pt}
 \begin{align}
-\forall i \in [0,A(c)-1],~\mt{IBUF}_{c}(i) = I(c)[i]
+\forall i \in [0,A(c)-1]:~~\mt{IBUF}_{c}(i) = I(c)[i]
 \label{i2ibuf}
 \end{align}
 \item {\bf(IWRITE to IBUF)} For each $p \in [0, num(n_a, \mt{init})-1]$:
 \begin{align}
 \label{iwrite2ibuf}
 &\forall i \in [A(c) + \mt{PartialWrite}(c,\mt{init},p),
-               A(c) + \mt{PartialWrite}(c,\mt{init},p+1)-1], \\ \nonumber
+               A(c) + \mt{PartialWrite}(c,\mt{init},p+1)-1]: \\ \nonumber
 &~~~~~~\mt{IBUF}_{c}(i) = \mt{IWRITE}_{c, p}(i - A(c) - \mt{PartialWrite}(c,\mt{init},p))\nonumber
 \end{align}
 %
@@ -116,8 +116,8 @@ num(n, \mt{init})-1]$:
 %
 \begin{align}
 \label{iread2iwrite}
-&\forall i \in {\cal D}_{{IWRITE}_{c, p}},~\mt{IWRITE}_{c,p}(i) = W(n, \mt{init}, p)(\mt{Init\_Inputs})[\mt{pos\_out}(n, c)][i], \\ \nonumber
-&\mt{where Init\_Inputs} = [\mt{IREAD}_{{chan\_in}(n)[1], p}(*), \dots, \mt{IREAD}_{{chan\_in}(n)[{num\_in}(n)], p}(*) ]
+&\forall i \in {\cal D}_{{IWRITE}_{c, p}}:~~\mt{IWRITE}_{c,p}(i) = W(n, \mt{init}, p)(\mt{Init\_Inputs})[\mt{pos\_out}(n, c)][i], \\ \nonumber
+&\mt{where Init\_Inputs} = [\mt{IREAD}_{{chan\_in}(n)[0], p}(*), \dots, \mt{IREAD}_{{chan\_in}(n)[{num\_in}(n)-1], p}(*) ]
 \end{align}
 %
 \item {\bf(SREAD to SWRITE)} For each $c \in \mt{chan\_out}(n)$, and for each $p \in [0,
@@ -125,16 +125,16 @@ num(n, \mt{steady})-1]$:
 %
 \begin{align}
 \label{sread2swrite}
-&\forall (i, j, k) \in {\cal D}_{{SWRITE}_{c, p}},~\mt{SWRITE}_{c,p}(i,j,k) =\nonumber\\
+&\forall (i, j, k) \in {\cal D}_{{SWRITE}_{c, p}}:~~\mt{SWRITE}_{c,p}(i,j,k) =\nonumber\\
 &~~~~~~W(n, \mt{steady}, p)(\mt{Steady\_Inputs})[\mt{pos\_out}(n, c)][k], \mt{where}\\\nonumber&
-\mt{Steady\_Inputs} = [\mt{SREAD}_{{chan\_in}(n)[1], p}(i, j, *), \dots, \mt{SREAD}_{{chan\_in}(n)[{num\_in}(n)], p}(i, j, *) ]
+\mt{Steady\_Inputs} = [\mt{SREAD}_{{chan\_in}(n)[0], p}(i, j, *), \dots, \mt{SREAD}_{{chan\_in}(n)[{num\_in}(n)-1], p}(i, j, *) ]
 \end{align}
 %
 \item {\bf(SWRITE to SBUF)} For each $c \in \mt{chan\_out}(n)$, for each $p \in [0,
 \mt{num}(n, \mt{steady})-1]$, and for each $q \in [0,S(n)-1]$:
 \begin{align}
 \label{swrite2sbuf}
-&\forall (i,j) \in {\cal D}_{SW \rightarrow SB}(c,p,q),
+&\forall (i,j) \in {\cal D}_{SW \rightarrow SB}(c,p,q):~~
 \mt{SBUF}_{c}(i,j) = \nonumber\\
 &~~~~~~\mt{SWRITE}_{c, p}(i, q,
                      j - \mt{Offset}_{SW \rightarrow SB}(q,n,c,p)),
@@ -149,7 +149,7 @@ num(n, \mt{steady})-1]$:
 [0, \mt{num}(n, \mt{init})-1]$:
 \begin{align}
 \label{ibuf2iread}
-&\forall i \in {\cal D}_{IB \rightarrow IR}(c,p), 
+&\forall i \in {\cal D}_{IB \rightarrow IR}(c,p):~~
 \mt{IREAD}_{c, p}(i) = \mt{IBUF}_{c}(\mt{PartialRead}(c, \mt{init}, p) + i) \\ \nonumber
 &\mt{where }{\cal D}_{IB \rightarrow IR}(c,p) = 
   \{ i~|~i \in {\cal D}_{{IREAD}_{c,p}} ~\wedge~ 
@@ -163,7 +163,7 @@ num(n, \mt{steady})-1]$:
 }{\mt{Period(c)}} \rfloor ]$:
 \begin{align}
 \label{sbuf2iread}
-&\forall i \in {\cal D}_{SB \rightarrow IR}(c,p), 
+&\forall i \in {\cal D}_{SB \rightarrow IR}(c,p):~~ 
 \mt{IREAD}_{c,p}(i) = 
     \mt{SBUF}_{c}(q,
       i - \mt{Offset}_{SB \rightarrow IR}(q,n,c,p)), \mt{where } \\ \nonumber
@@ -194,7 +194,7 @@ num(n, \mt{steady})-1]$:
 \mt{num}(n, \mt{steady})-1]$:
 \begin{align}
 \label{ibuf2sread}
-&\forall (i,j,k) \in {\cal D}_{IB \rightarrow SR}(n,c,p), 
+&\forall (i,j,k) \in {\cal D}_{IB \rightarrow SR}(n,c,p):~~
 \mt{SREAD}_{c, p}(i,j,k) = 
     \mt{IBUF}_{c}(\mt{ReadIndex}(n,c,p,i,j,k)), \mt{where} \nonumber\\
 &\mt{ReadIndex}(n,c,p,i,j,k) = \mt{TotalRead}(n,c,\mt{init})
@@ -211,7 +211,7 @@ num(n, \mt{steady})-1]$:
 % two possible problems: sread has already been written to, or sbuf has already been read from
 \begin{align}
 \label{sbuf2sread0}
-&\forall (i,j,k) \in {{\cal D}\mt{1}}_{SB \rightarrow SR}(c,p,q),
+&\forall (i,j,k) \in {{\cal D}\mt{1}}_{SB \rightarrow SR}(c,p,q):~~
 \mt{SREAD}_{c, p}(i,j,k) = 
     \mt{SBUF}_{c}(i+q+
                   \mt{Int\_Offset}(n,c,p),\nonumber\\ \nonumber
@@ -220,7 +220,7 @@ num(n, \mt{steady})-1]$:
                    - q * \mt{Period}(c) + \mt{Mod\_Offset}(n,c,p)), \\
 &\mt{where }{{\cal D}\mt{1}}_{SB \rightarrow SR}(c,p,q) = 
   ({\cal D}_{{SREAD}_{c, p}} - \mt{PUSHED}(n,c,p))
-                         \cap \\ \nonumber
+                         ~\cap~ \\ \nonumber
 	&~~~~~~\{ (i,j,k)~|~q * \mt{Period}(c) - min(0, \mt{Mod\_Offset}(n,c,p))
                                 \le k 
                                 \le \\ \nonumber
@@ -232,7 +232,7 @@ num(n, \mt{steady})-1]$:
 %\begin{align}
 %
 %
-&\forall (i,j,k) \in {{\cal D}\mt{2}}_{SB \rightarrow SR}(c,p,q),
+&\forall (i,j,k) \in {{\cal D}\mt{2}}_{SB \rightarrow SR}(c,p,q):~~
 \mt{SREAD}_{c, p}(i,j,k) = \nonumber\\
     &~~~~~~\mt{SBUF}_{c}(i+q+
                   \mt{sign(Offset)} + \mt{Int\_Offset}(n,c,p),
@@ -243,7 +243,7 @@ num(n, \mt{steady})-1]$:
                    - \mt{sign(Offset)} * \mt{Period}(c)
  + \mt{Mod\_Offset}(n,c,p)),\\ \nonumber&
 \mt{where }{{\cal D}\mt{2}}_{SB \rightarrow SR}(c,p,q) = 
-  ({\cal D}_{{SREAD}_{c, p}} - \mt{PUSHED}(n,c,p)) \cap \\ \nonumber
+  ({\cal D}_{{SREAD}_{c, p}} - \mt{PUSHED}(n,c,p)) ~\cap~ \\ \nonumber
                          &~~~~~~( \{ (i,j,k)~|~q * \mt{Period}(c)
                                 \le k 
                                 \le min((q+1)*\mt{Period}(c),
@@ -259,7 +259,7 @@ num(n, \mt{steady})-1]$:
   (max_{\preceq}\mt{PUSHED}(n,c,p)) \cdot (S(n) * \mt{TotalRead}(n,c,\mt{steady}), \\ \nonumber
                                         &~~~~~~\mt{TotalRead}(n,c,\mt{steady}),
                                         1 ) + \mt{PartialRead}(c, \mt{steady}, p),
-\mt{and }\mt{PEEKED}(c,p) = {SB \rightarrow IR}(c,p) \\ \nonumber
+\mt{and }\mt{PEEKED}(c,p) = {\cal D}_{{SB \rightarrow IR}(c,p)} \\ \nonumber
 &\mt{and }\mt{Num\_Popped}(c,p) = |\mt{PEEKED}(c,p)| + O(c,\mt{steady},p) - E(c,\mt{steady},p) \\
 &\mt{and }\mt{Offset}(n,c,p) = \mt{Num\_Popped}(c,p)-\mt{Num\_Pushed}(n,c,p) \\ \nonumber
 &\mt{and }\mt{Int\_Offset}(n,c,p) = \mt{sign(Offset)}*\lfloor \frac{abs(\mt{Offset}(n,c,p))}{\mt{Period}(c)} \rfloor) \\ \nonumber
