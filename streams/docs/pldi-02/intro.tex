@@ -1,10 +1,62 @@
 \section{Introduction}
 
+Recent years have seen the proliferation of applications that are
+based on some notion of a ``stream''.  There is evidence that
+streaming media applications are already consuming most of the cycles
+on consumer machines \cite{Rix98}, and their use is continuing to
+grow.  The stream abstraction is central to embedded applications for
+hand-held computers, cell phones, and DSP's, as well as for
+high-performance applications such as intelligent software routers,
+cell phone base stations, and HDTV editing consoles.
 
-A natural language for stream applications
-- Ability to built a great optimizing compiler
+Despite the prevalence of these applications, there is surprisingly
+little language and compiler support for practical, large-scale stream
+programming.  For example, a number of grid-based architectures have
+been emerging that are particularly well-suited for stream programming
+\cite{raw, smart memories, keckler}, but there is no common machine
+language that a programmer can use to exploit their common properties
+while hiding their differences.  Thus, most programmers turn to
+general-purpose languages such as C or C++ to implement stream
+programs, resorting to low-level assembly codes for
+performance-critical loops.  This practice is labor-intensive,
+error-prone, and very costly, since the performance-critical sections
+must be re-implemented for each target architecture.  Moreover,
+general purpose languages do not provide a natural and intuitive
+representation of streams, thereby having a negative effect on
+readability, robustness, and programmer productivity.
 
-A common machine language for grid architectures
-- Expose all the common properties and hide the differences between 
-architectures
+StreamIt is a language and compiler specifically designed for modern
+stream programming.  Its goal is to raise the abstraction level in the
+streaming domain, providing a natural, high-level syntax that conceals
+architectural details without sacrificing performance.  To accomplish
+this goal, the compiler needs to be ``stream-aware''--that is, it
+needs to be able to recognize, analyze, and manipulate data streams as
+would an expert assembly programmer in lowering an application to a
+given target.  Towards this end, this paper makes the following
+contributions:
+\begin{enumerate}
+
+\item ``Structured'' streams as a language construct for enabling
+  novel compiler analyses of stream programs.
+  
+\item A $min$ relationship within a stream graph that establishes a
+  notion of relative time and dependence information that is
+  fundamental to the streaming domain.
+
+\item A semantic model of structured stream programs that allows one
+  to formulate and validate stream transformations.
+
+\item A parallel fusion transformation that collapses several filters
+  into one.
+
+\item A suite of optimizations that are specific to the streaming
+  domain.
+
+\item A novel phased scheduling algorithm that finds a minimal latency
+schedule over a structured stream graph.
+
+\item A prototype implementation of the StreamIt optimizing compiler,
+  {\bf WITH RESULTS?}
+
+\end{enumerate}
 

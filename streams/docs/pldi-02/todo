@@ -8,6 +8,57 @@ things to do with figures:
 things to do with paper:
 ------------------------
 
+* add much more motivation for section 3 -- why you want min function,
+look at optimizations first, and then come back to prove them, etc.
+
+- inlining as textual substitution instead of optimization
+
+- i2 -> w2
+
+- not clear why calling init function instead of constructor.  either
+bring back footnote or obscure what's going on.
+
+- comma instead of arrow in min function
+
+-> min function stuff would be more clear if it was motivated with the
+use of the min function
+
+-> bring out that the min function 
+
+---
+
+-> message semantics not defining stuff
+
+- note that push_A and pop_A have different tapes
+
+- need to show that W has signature StreamIt -> work, not the
+application of it to the work function
+
+- suppose w_1 in the canonical form above before showing W
+
+- need to convert arrows to lambda's in definition
+
+- make clear that PEEK comes from work above
+
+- make clear that we're doing an example on a typical work function
+
+- do \mbox{ } around words in math.
+
+---
+
+- define the composition operator the first time you introduce
+it--otherwise it's not clear what the circle means
+
+* look for the max function
+
+------
+
+- change the "denotational semantics" heading so as not to attract
+	denotational semanticists
+
+- remove most of the message-constrained scheduling in favor of something
+	that's honest but short.
+
 - mention limitiation of first-class streams?
 
 - include picture of the equalizer in the intro?
@@ -73,5 +124,6 @@ P. Manley.  Vector, signal, and image processing library (VSIPL) 1.0
 application programmer's interface.  Technical report, Georgia Tech
 Research Corporation, March 200.
 
+- relationship to lazy functional languages
 
 
