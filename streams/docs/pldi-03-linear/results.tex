@@ -2,14 +2,14 @@
 \label{sec:results}
 
 Our compiler currently has two linear analysis optimizations. The
-first, {\it linear replacement}, replaces the largest linear
-hierarchical streams possible with filters that directly compute the
-calculation specified by the corresponding linear nodes. The second
-optimization, {\it frequency replacement}, replaces all streams which
-implement a sufficiently long convolution using the frequency
-transformation described in Section \ref{sec:freq}. Below we describe
-experiments and results that demonstrate performance improvements due
-to these two optimizations.
+first, {\it linear replacement}, transforms linear streams 
+(one of filter, splitjoin or pipeline) by replacement with a filter 
+that directly compute the calculation of the corresponding linear node. 
+The second optimization, {\it frequency replacement}, applies the 
+transformation described in Section \ref{sec:freq}. The partitioner 
+automatically determines which subsections of the overall program to apply
+each of the transformations to. Below we describe experiments and results 
+that demonstrate performance improvements due to our method.
 
 \subsection{Measurement Methodology}
 %We chose to measure the strength of our optimizations in terms of 
@@ -37,54 +37,45 @@ to these two optimizations.
 %\vspace{-6pt}
 \center
 \epsfxsize=3.2in
-\epsfbox{images/linear-freq-both-new.eps}
+\epsfbox{images/multiplications-remaining.eps}
 \vspace{-6pt}
 \caption{Percent of multiplication operations remaining after performing linear replacement, frequency replacement, and both.}
 \label{fig:linear-freq-both}
 \vspace{-12pt}
 \end{figure}
 
-Both linear replacement and frequency replacement increase performance by 
-decreasing the number of floating point computations (principally multiplications) required per output.
+Both linear replacement and frequency replacement increase performance primarily
+decreasing the number of floating point computations (principally multiplications) 
+required per output.
 Our measurement platform is a Dual Intel 2.2 GHz P4 Xenon processor system 
 with 2GB of memory running GNU/Linux. We compile our benchmarks using StreamIt's uniprocessor backend
 and generate executables from the resulting C files using {\tt gcc} with {\tt -O2} optimization.
 
 To measure the number of runtime multiplications we use a simple instruction counting 
-program written using the DynamoRIO\cite{dynamo99} infrastructure. 
+DynamoRIO\cite{dynamo99} client.
 %Floating point multiplication instructions 
 %in the IA-32 instruction set are defined to be any of ({\tt fmul fmulp fimulp fdiv fdivp fidivp fdivr fdivrp fidivr}).
 %We measure execution time normalized to the number of program outputs generated. 
 There are no standard benchmarks written yet for StreamIt, so we use
 a set of representative programs\footnote{Stream graphs appear in Appendix A.}
 which perform computations that 
-are found in actual streaming applications: 1) {\bf FIR}, a single 256
-point rectangularly windowed low pass FIR filter
-($\omega_c=\frac{\pi}{3}$); 2) {\bf TargetDetect}, four matched
-filters performing threshold target detection in parallel; 3) {\bf
-FilterBank}, a multi-rate signal decomposition processing block common
-in communications and image processing; 4) {\bf RateConvert}, an audio
-signal down sampler that converts the sampling rate by a non-integral
-factor; 5) {\bf FMRadio}, an FM software radio with equalizer.
+are found in actual streaming applications: 
+1) {\bf FIR}, a single 256 point rectangularly windowed low pass FIR filter; 
+2) {\bf RateConvert}, an audio down sampler that converts the 
+sampling rate by a non-integral factor ($\frac{2}{3}$); 
+3) {\bf TargetDetect}, four matched filters performing threshold target detection in parallel; 
+4) {\bf FMRadio}, an FM software radio with equalizer;
+5) {\bf Radar}, {\bf XXXXXX} core functionality of modern radar signal processors -- modeled after a 
+system from the Polymorphic Computing Architecture (PCA);
+6) {\bf FilterBank}, a multi-rate signal decomposition 
+processing block common in communications and image processing; 
+7) {\bf Vocoder} Channel voice coder, used for speech analysis and compression;
+8) {\bf Oversample} $16x$ oversampler, a function commonly found in audio applications 
+such as CD players;
+9) {\bf DToA} Audio post-processing stage prior to a 1-bit D/A converter 
+with oversampler and first order noise shaper.
 
 \subsection{Performance}
-
-%\begin{figure}
-%\center
-%\epsfxsize=3.2in
-%\epsfbox{images/overlap-add-savings.eps}
-%\vspace{-12pt}
-%\caption{Multiplication savings from using the overlap and add method compared to overlap and discard method.}
-%\label{fig:overlap-add-savings}
-%\vspace{-12pt}
-%\end{figure}
-
-%Figure~\ref{fig:overlap-add-savings} shows the required computation differences for
-%the overlap-add method and the overlap-discard method. 
-%In all cases, the overlap-add method performs better than the overlap-discard method.
-%The performance difference declines as the number of outputs($N$) increases because
-%the ratio of the amount of data discarded by the overlap-discard method to the 
-%amount of data produced grows smaller. 
 
 To determine the effects of our linear replacement and frequency
 replacement optimizations, we compiled each benchmark program with
@@ -93,18 +84,20 @@ replacement and frequency replacement.
 Figure~\ref{fig:linear-freq-both} shows the reduction of
 multiplications due to our optimizations.
 
-For the FIR filter, all of the multiplication reduction comes from the
-frequency replacement optimization because the entire application is
-comprised of a single filter calculating a convolution sum so there is
-nothing to combine.  The multiplication reduction in TargetDetect is
+
+%%%%%%%%% This paragraph is no longer accurate.
+% When we have the final numbers, we can explain some of them
+For FIR, all of the multiplication reduction comes from the
+frequency replacement optimization: the entire application is
+a single filter and so there is nothing to combine and no choice
+for the partitioner.
+For RateConvert{\bf XXXXX}.
+The multiplication reduction in TargetDetect is
 also solely due to the frequency transformation because threshold
 detection is non-linear which makes the parallel computation blocks
 uncollapsible. Finally, RateConvert contains a large low pass filter
 which also benefits from frequency replacement.
 
-%A complete
-%implementation of the linear combination rules will allow linear replacement 
-%to improve performance as well.
 
 \begin{figure}[t]
 %\vspace{-6pt}
