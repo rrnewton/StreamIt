@@ -12,7 +12,7 @@
 
 \noindent
 This is for the May 28, 2003 snapshot release (streamit-0.0.20030528).\\
-\verb|$Id: readme.tex.in,v 1.8 2003-10-07 20:28:16 dmaze Exp $|
+\verb|$Id: readme.tex.in,v 1.9 2003-10-15 01:30:51 rabbah Exp $|
 
 \section{What is this?}
 
@@ -68,7 +68,6 @@ single-precision versions of the library, such that you have an
 FFTW from source, use the \texttt{--enable-float} and
 \texttt{--enable-type-prefix} options when compiling.
 
-
 Compilation for RAW depends on the most recent released RAW build
 environment (as of this release, \verb|raw_dist_2003_03_18|).  The
 \envar{TOPDIR} environment variable needs to point to your StarSearch
@@ -104,7 +103,7 @@ research compiler; as such, it has several known shortcomings:
 
 \item The compiler may have memory issues running on particularly
   large benchmarks.  The dynamic programming partitioner
-  (\verb|--dppartition|) generally uses less memory than the default
+  (\verb|--partition-dp|) generally uses less memory than the default
   greedy partitioner.
 
 \item Phased filter support differs between the compiler and library.  A
