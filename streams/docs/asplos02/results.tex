@@ -1,2 +1,93 @@
 \section{Results}
 \label{sec:results}
+
+We have implemented a fully-functional prototype of the StreamIt
+compiler for the Raw architecture; the compiler phases are described
+in Table~\ref{tab:stages}. We have implemented all the phases of the
+compiler as well as the optimizations except for the optimization
+selection, which is currently done by the programmer.
+
+
+
+We have evaluated our compiler with StreamIt versions of the following
+applications: 
+\begin{itemize}
+
+\item A software-based FM Radio with
+equalizer, 
+
+\item A GSM Decoder, which takes GSM-encoded parameters as
+inputs, and uses these to synthesize audible speech, 
+
+\item A beamformer
+which encapsulates the core functionality of modern radar, sonar, and
+communications signal processors -- modeled after a system from the
+Polymorphic Computing Architecture (PCA) \cite{pca}
+
+\item A 64-element FFT filter implemented as a pipeline of a bit reversal 
+filter followed by multiple-stage butterfly filters.
+
+
+%\item A performance test from the SpectrumWare system that
+%implements an Orthogonal Frequency Division Multiplexor (OFDM)
+%\cite{spectrumware}.  Table \ref{tab:benchmarks} gives characteristics
+%of the above applications including the number of filters implemented
+%and the size of the stream graph as coded.
+
+\end{itemize}
+
+
+\begin{table}[t]
+\begin{center}
+\scriptsize
+\begin{tabular}{|l|c|r|r|r|r|r|r|} \hline
+& Lines & \multicolumn{3}{|c|}{Unoptimized} & \multicolumn{3}{|c|}{Optimized}\\
+\cline{3-8}
+Benchmark & 
+\begin{tabular}{c} 
+of \\ code
+\end{tabular} &    
+\begin{tabular}{c} 
+\# of \\ filters
+\end{tabular} &    
+\begin{tabular}{c} Throughput \\
+cycles / output 
+\end{tabular} &    
+FLOPS & 
+\begin{tabular}{c} 
+\# of \\ filters
+\end{tabular} &    
+\begin{tabular}{c} Throughput \\
+cycles / output 
+\end{tabular}  &
+FLOPS  
+\\
+\hline \hline
+PCA Demo &  & - & 3.4 & N/A\\
+\hline
+FM Radio & 5.8 & 4.9 & 9.9 & N/A\\
+\hline
+perftest4 & 330 & - & 330 & N/A\\
+\hline
+GSM Decoder & 4.88 & - & N/A & .47\\
+\hline
+\end{tabular}
+\vspace{-6pt}
+\caption{\protect\small Performance Results (in $\mu$sec/output)}
+\label{tab:performance}
+\vspace{-21pt}
+\end{center}
+\end{table}
+
+
+In the Table~\ref{tab:performance}, we evaluate the effectiveness of
+StreamIt compiler by compiling the above applications on to the Raw
+processor. The executables are simulated on either a 4x4 or an 8x8 Raw
+processor using Raw's cycle accurate simulator. We show the
+performance of the original application, which is run on a processor
+configuration with sufficent tiles so that each filter can be mapped
+to an individual tile. Next we perform a series of fusion, fisson and
+reindexing transformations to create a load balanced set of filters
+that can be mapped onto a 4x4 Raw processor.
+
+
