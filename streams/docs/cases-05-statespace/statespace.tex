@@ -1,21 +1,17 @@
 \mysection{State-Space Analysis}
+\label{sec:statespace}
 
-  We analyze StreamIt programs at the filter level. We create
-a data structure representation that fully describes a state-space
-filter. We parse the code of each StreamIt filter to determine
-whether or not it is state-space; if so we initialize a data
-structure, fill it with the appropriate values through a process
-called \emph{extraction}, and associate the structure with the
-filter.
-
-    We provide a set of rules to combine state-space representations
-of filters in higher StreamIt blocks---pipelines, splitjoins, and
-feedback loops. Such a process results in a single state-space
-representation for the entire block. Some representations may need
-to change so that they are properly combined. We detail what the
-changes are and when they need to be made. Finally, we describe
-how to convert a representation back to StreamIt code for a
-filter.
+  We analyze StreamIt programs at the filter level. We create a data
+structure representation that fully describes a state-space filter. We
+parse the code of each StreamIt filter to determine whether or not it
+is state-space; if so we initialize a data structure, fill it with the
+appropriate values through a process called \emph{extraction}, and
+associate the structure with the filter. We provide a set of rules to
+combine state-space representations of filters in higher StreamIt
+blocks---pipelines, splitjoins, and feedback loops. Such a process
+results in a single state-space representation for the entire block.
+We also describe how to \emph{expand} a representation so that it can
+be combined with blocks of mis-matching dimensions.
 
 \mysubsection{Representation}
 
@@ -105,25 +101,25 @@ filter will not have any stored inputs, so $stored = 0$ as well.
     Representations are initially created from StreamIt filters and
 ultimately converted to StreamIt filters. Between these steps,
 however, representations of the higher StreamIt block types can be
-derived by combining the representations of their parts.
-Therefore, from now on we will say that a representation refers to
-a block rather than a filter. The exception is in Section 3.2,
-where we discuss how to create a representation from a StreamIt
-filter. Hence we explicitly refer to a filter rather than block
-representation in that section.
+derived by combining the representations of their parts.  Therefore,
+from now on we will say that a representation refers to a block rather
+than a filter. The exception is in the following section, where we
+discuss how to create a representation from a StreamIt filter.
+% Hence we explicitly refer to a filter rather than block
+%representation in that section.
 
 \mysubsection{Extraction}
 
-    We write a module that extracts the state-space representation of
+    We use a simple dataflow analysis to extract the state-space representation of
 a filter. We symbolically execute a single iteration of a filter's
 work function, maintaining a vector pair representation for each
 local variable and filter field variable that is encountered
 (together, these are termed program variables). If the outputs and
 field variables all have vector pair representations, then the
 filter is state-space linear, and the vectors are used as rows of
-$\mathbf{A}$, $\mathbf{B}$, $\mathbf{C}$, and $\mathbf{D}$. This
-type of procedure is termed data flow analysis. See \cite{Lamb}
-for a treatment of the linear case.
+$\mathbf{A}$, $\mathbf{B}$, $\mathbf{C}$, and $\mathbf{D}$. 
+%See \cite{Lamb}
+%for a treatment of the linear case.
 
     We attempt to find a vector pair
 ($\vec{\mathbf{v}}$,$\vec{\mathbf{w}}$) for each program variable
@@ -198,16 +194,16 @@ Therefore, we will use $\mathbf{A_s}$ and $\mathbf{B_s}$ to
 describe this update, where the values of these two matrices are
 shown in (3.1).
 
-\mysubsubsection{Example Procedure}
+\mysubsubsection{Extraction Example}
 
-Consider the IIR filter from Section 2:
+Consider another IIR filter.  Unlike the example in
+Section~\ref{sec:background}, this filter uses peeking to read
+elements from the tape without consuming them.
 
 \begin{singlespace}
 \vspace{-12pt}
 \begin{scriptsize}
 \begin{verbatim}
-// This filter computes an infinite impulse response function.
-// It does not have a prework function.
 float->float filter IIR() {
     float curr;  // example of a field variable
     init {
@@ -293,25 +289,28 @@ stored inputs $peek(0)$, $peek(1)$ are updated as mentioned in
 
 \mysubsection{Combination}
 
-    If all blocks within a pipeline, splitjoin, or feedback loop have state-space
-representations, we can combine them into a single representation
-using the rules developed in this section. We combine blocks for
-two reasons. One reason is that it is easier to optimize a single
-block than multiple blocks. The second reason is that we may
-eliminate redundant computations across blocks.
+    If all blocks within a pipeline, splitjoin, or feedback loop have
+state-space representations, we can combine them into a single
+representation using the rules developed in this section. We combine
+blocks for two reasons.  First, combination can eliminate redundant
+computations across blocks.  Second, combination exposes optimization
+opportunities, as intra-block optimizations (described in
+Section~\ref{sec:optimization}) can effectively be applied across
+blocks by combining the blocks first.
 
 \mysubsubsection{Pipeline}
+\label{sec:pipeline}
 
     Consider two blocks connected in a pipeline with representations
 $\mathrm{R_1}$ and $\mathrm{R_2}$. Let $\mathrm{R}$ denote the
 combined representation of the two blocks, which we are trying to
 derive. Suppose the output rate of $\mathrm{R_1}$ equals the input
-rate of $\mathrm{R_2}$ ($u_1 = o_2$). If this is not the case, we
-must expand one or both blocks to have their input/output rates
-match ($u_{1\_new} = o_{2\_new} = lcm(u_1,o_2)$). Block expansion
-is covered in Section 3.4.1. Since the output of $\mathrm{R_1}$
-($y_1$) is equivalent to the input of $\mathrm{R_2}$ ($u_2$), we
-can write:
+rate of $\mathrm{R_2}$ ($u_1 = o_2$). If this is not the case, we must
+expand one or both blocks to have their input/output rates match
+($u_{1\_new} = o_{2\_new} = lcm(u_1,o_2)$). Block expansion is covered
+in Section~\ref{sec:expansion}. Since the output of $\mathrm{R_1}$
+($y_1$) is equivalent to the input of $\mathrm{R_2}$ ($u_2$), we can
+write:
 
 \begin{minipage}{3in}
 \starteqnstar
@@ -422,8 +421,11 @@ block, etc.
 \mysubsubsection{Splitjoin and Feedback Loop}
 
 The combination rules for splitjoins and feedback loops are somewhat
-involved, and we omit them due to space considerations.  A thorough
-treatment appears in~\cite{Agrawal04}.
+involved, and we omit them due to space considerations.  An important
+benefit of a linear state-space representation over a linear
+representation is that feedback loops can be collapsed; the items on
+the feedback path become states in the combined block.  A thorough
+treatment of these cases appears in~\cite{Agrawal04}.
 
 %%     There are two types of splitjoins - those with roundrobin and
 %% duplicate splitters. In order to collapse the branches of a
@@ -749,6 +751,7 @@ treatment appears in~\cite{Agrawal04}.
 %% initialization matrices.
 
 \mysubsection{Expanding a Representation}
+\label{sec:expansion}
 
     We may want to run a block multiple times in order to
 properly combine it with other blocks. For example, suppose block
@@ -845,9 +848,9 @@ states is not changed, $s$ remains the same. The new
 representation runs the old representation $n$ times, so $u_{new}
 = n * u_{old}$, $o_{new} = n * o_{old}$.
 
-    As mentioned in the pipeline combination section, we may need to
+    As mentioned in Section~\ref{sec:pipeline}, we may need to
 run a block $n$ times, in addition to its initialization matrices, for
-the purpose of initializing the full pipeline.  In this case, the
+the purpose of initializing a full pipeline.  In this case, the
 equations are very similar to above, but also include terms for
 $\mathbf{A_{pre}}$ and $\mathbf{B_{pre}}$.  Full details appear
 in~\cite{Agrawal04}.

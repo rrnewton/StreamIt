@@ -1,4 +1,5 @@
 \mysection{Background Information}
+\label{sec:background}
 
 \mysubsection{The StreamIt Language}
 
@@ -376,30 +377,34 @@ of linear state-space for conciseness.
 8 & 9 & 10 \end{array} \right ] \vec{\mathbf{u}}
 \doneeqnstar
 
-    It is exactly described by the following StreamIt filter:
 \begin{singlespace}
 \vspace{-12pt}
 \begin{scriptsize}
 \begin{verbatim}
-    int -> int filter stateSpaceFilter() {
+    int -> int pipeline Main() {
+      add Source();  // code for Source not shown
+      add IIR();
+      add Output();  // code for Output not shown
+    }
+
+    int -> int filter IIR() {
       int x1, x2;
       work push 1 pop 3 peek 3 {
         int x1_temp, x2_temp;
-        push(11*x1 + 12*x2 + 13*peek(0) + 14*peek(1) + 15*peek(2));
-        x1_temp = 1*x1 + 2*x2 + 3*peek(0) + 4*peek(1) + 5*peek(2);
-        x2_temp = 6*x1 + 7*x2 + 8*peek(0) + 9*peek(1) + 10*peek(2);
+	// pop inputs
+	int u1 = pop();
+	int u2 = pop();
+	int u3 = pop();
+	// push result
+        push(11*x1 + 12*x2 + 13*u1 + 14*u2 + 15*u3;
+	// update state
+        x1_temp = 1*x1 + 2*x2 + 3*u1 + 4*u2 + 5*u3;
+        x2_temp = 6*x1 + 7*x2 + 8*u1 + 9*u2 + 10*u3;
         x1 = x1_temp;
         x2 = x2_temp;
-        pop(); pop(); pop();
       }
-    }   
+    }
 \end{verbatim}
 \end{scriptsize}
 \vspace{-12pt}
 \end{singlespace}
-
-    Note we introduced two extra variables - $x1\_temp$ and $x2\_temp$.
-We do this because we do not want to overwrite the old values for
-$x1$ and $x2$ until all the new values are calculated. Also, we
-have made no provisions for constants as in the linear model. This
-issue is resolved in the next section.

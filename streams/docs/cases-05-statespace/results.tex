@@ -1,23 +1,30 @@
 \mysection{Results}
+\label{sec:results}
 
-    We have implemented the extraction, combination, and
-optimization (except multiple execution stages) procedures within
-the StreamIt compiler, which uses the KOPI java compiler
-infrastructure \cite{kopi}. We measure performance by counting the
-number of floating point operations (additions and
-multiplications) executed in a given benchmark. The program
-DynamoRIO \cite{dynamo} is used to count operations.
+We have implemented the extraction, combination, and optimization
+(except multiple execution stages) procedures within the StreamIt
+compiler, which uses the Kopi Java Compiler
+infrastructure~\cite{kopi}. We measure performance by counting the
+number of floating point operations (additions and multiplications)
+executed in a given benchmark. The DynamoRIO~\cite{dynamo} system is
+used to count operations.
 
-    We have collected the data for the base case (no replacement) and
-with state-space and linear replacement \cite{Lamb}. For each
-benchmark, values are expressed as a ratio of floating point
-operations with state-space or linear replacement\footnote{We do
-not consider frequency replacement in our comparison} over
-operations with no replacement.
+We compare linear state-space optimizations with linear
+optimizations~\cite{Lamb}.  For the state-space numbers, all linear
+state-space blocks are combined and then optimizations are applied.
+For applications of this size, it is primarily the combination that
+yields a performance boost; we have not characterized the individual
+contributions of state removal and minimal parameterization.  For the
+linear numbers, all linear blocks are combined.  We do not enable the
+``frequency translation'' optimization~\cite{Lamb} because it has no
+counterpart in the state-space domain.  A hybrid optimizer could apply
+frequency translation where appropriate, and linear state-space
+optimizations elsewhere.
+
 \begin{table}[tbp]
 \begin{center}
 \begin{tabular} {c|c|c}
-Application & Statespace & Linear \\ \hline
+{\bf Application} & \parbox{0.65in}{{\bf ~~~Linear} \\ {\bf Statespace}} & {\bf Linear} \\ \hline
 FM Radio & 0.1740 & 0.1692 \\
 FIR Program &  0.9961 & 0.9980 \\
 Channel Vocoder & 0.2601 & 0.2620 \\
@@ -31,42 +38,42 @@ IIR + FIR & 0.9413 & 1.000 \\
 FIR + IIR + IIR & 0.9214 & 1.000
 \end{tabular}
 \caption{Floating point operations with state-space and linear
-replacement normalized for no replacement}
+optimizations, normalized to no optimizations.\protect\label{tab:results}}
 \end{center}
 \vspace{-12pt}
 \end{table}
 
-    For the first 5 applications, which mainly have linear
-components without state, linear replacement and state-space
-replacement are equally effective. There is a huge performance
-downgrade for an FFT (Fast Fourier Transform) for both types of
-replacement. This is not surprising, since an FFT performs its
-computations sparsely across multiple filters. Combining these
-filters creates one filter densely packed with computations. This
-is exactly a conversion form an FFT to a DFT (Discrete Fourier
-Transform). We would need staged execution with minimal
-parameterization to convert the DFT back to an FFT.
+Results appear in Table~\ref{tab:results}.  For the first 5
+applications, which mainly have linear components without state,
+linear optimizations and state-space optimizations are equally
+effective. There is a huge performance downgrade for an FFT (Fast
+Fourier Transform) for both types of transformations. This is not
+surprising, since an FFT performs its computations sparsely across
+multiple filters. Combining these filters creates one filter densely
+packed with computations. This is exactly a conversion from an FFT to
+a DFT (Discrete Fourier Transform).  We would need staged execution
+with minimal parameterization to convert the DFT back to an FFT.
 
-    The remaining applications have filters with state, thus they
-cannot be analyzed linearly. Therefore we use the value 1.000 as
-the ratio in the linear column. For a simple standalone Linear
+The remaining applications have filters with state.  Thus, they are
+not handled by linear analysis, and there is a normalized performance
+of 1.0 in the linear column.  For a simple standalone Linear
 Difference Equation or IIR (Infinite Impulse Response) filter,
-state-space replacement shows a very slight degradation in
+state-space transformations show a very slight degradation in
 performance. The reason for this is that there are a few extra
-operations performed by the prework function. In terms of
-steady-state behavior, state-space replacement is equivalent to no
-replacement. There is no gain in performance because the filters
+operations performed by the prework function. In terms of steady-state
+behavior, state-space transformation is equivalent to no
+transformation. There is no gain in performance, because the filters
 are written optimally.
 
-    When we combine state filters with other filters, we notice a
-performance improvement using state-space replacement. For
-example, combining an IIR filter with a decimator that leaves 1
-out of every 16 values has a 66\% improvement. Combining an IIR
-filter with an FIR filter has a 6\% improvement. In the case of an
-IIR filter with a decimator, there are extraneous computations
-performed by the IIR filter that are thrown away by the decimator.
-Combining their respective matrices removes these computations. In
-the case of an IIR filter with an FIR filter, the computations in
-both filters can be merged to a single set of computations. This
-indicates that state-space replacement is more useful when applied
-to combined filters than when applied to individual filters.
+When we combine stateful filters with other filters, we notice a
+performance improvement using state-space optimizations. For example,
+combining an IIR filter with a decimator that leaves 1 out of every 16
+values has a 66\% improvement. Combining an IIR filter with an FIR
+filter has a 6\% improvement. In the case of an IIR filter with a
+decimator, there are extraneous computations performed by the IIR
+filter that are thrown away by the decimator.  Combining their
+respective matrices removes these computations. In the case of an IIR
+filter with an FIR filter, the computations in both filters can be
+merged to a single set of computations. This indicates that
+state-space optimizations are more useful when applied to combined
+filters than when applied to individual filters.
