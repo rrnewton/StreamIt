@@ -24,6 +24,9 @@ synchronize from above or below?  I think theres's a difference.
 9. problem: it's legal to run nothing but a source.  oh, unless
 there's latency.
 
+10. I'm coping out on the feedback loop wavefront delay because I
+don't know what to do.  
+
 ------------------------------------------------------------------------
 Little things to think about
 
@@ -83,3 +86,8 @@ the top.
 19. put a split/join in the radio example -- looks better and makes more sense
 
 20. change Complex to float for example
+
+21. somewhere in semantics, say what we don't do
+
+** put the feedbackloop joiner transfer functions as a composition of
+some other joiner function so that I can still use duplicate, etc there.

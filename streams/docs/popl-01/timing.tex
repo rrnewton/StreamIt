@@ -237,11 +237,10 @@ input tape from the loop body.  This is because we model the
 initialization of FeedbackLoops by feeding the joiner the initial
 values directly instead of pushing them onto a channel.
 
-Recall that if the feedback loop specifies a wavefront latency of $n$,
-then $n$ initial values are provided to the feedback joiner before
-values from the feedback loop are read.  Assume that the round robin
-feedback joiner first draws from the data stream $I1_J$, and then from
-the feedback loop $I2_J$.
+Let $n$ be the number of initial values are provided to the feedback
+joiner before values from the feedback loop are read.  Assume that the
+round robin feedback joiner first draws from the data stream $I1_J$,
+and then from the feedback loop $I2_J$.
 
 The $min$ function for the main stream is as before:
 \begin{eqnarray*}
