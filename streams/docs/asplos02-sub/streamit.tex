@@ -1,14 +1,60 @@
 \begin{figure}[t]
-\begin{minipage}{3.3in}
-\vspace{-12pt}
-\psfig{figure=radiocode.eps, width=3.6in}
-\vspace{-36pt}
+\scriptsize
+\begin{verbatim}
+float->float filter FIRFilter (float sampleRate, int N) {
+  float[N] weights;
+
+  init {
+    weights = calcImpulseResponse(sampleRate, N);
+  }
+
+  initWork push N-1 pop 0 peek N {
+    for (int i=1; i<N; i++) {
+      push(doFIR(i));
+    }
+  }
+
+  work push 1 pop 1 peek N {
+    push(doFIR(N));
+    pop();
+  }
+
+  float doFIR(int k) {
+    float val = 0;
+    for (int i=0; i<k; i++) {
+      val += weights[i] * peek(k-i-1);
+    }
+    return val;
+  }
+}
+
+float->float pipeline Equalizer (float samplingRate, int N) {
+  add splitjoin {
+    int bottom = 2500;
+    int top = 5000;
+    split duplicate;
+    for (int i=0; i<N; i++, bottom*=2, top*=2) {
+      add BandPassFilter(sampleRate, bottom, top);
+    }
+    join roundrobin;
+  }
+  add Adder(N);
+}
+
+void->void pipeline FMRadio {
+  add DataSource();
+  add FIRFilter(sampleRate, N);
+  add FMDemodulator(sampleRate, maxAmplitude);
+  add Equalizer(sampleRate, 4);
+  add Speaker();
+}
+\end{verbatim}
 \caption{Parts of an FM Radio in StreamIt.
 \protect\label{fig:radiocode}}
-\end{minipage}
+\end{figure}
+
+\begin{figure}[t]
 \hspace{0.1in}
-\begin{minipage}{3.1in}
-\centering
 \psfig{figure=radio-ascoded.eps, width=3in}
 \caption{Block diagram of the FM Radio.
 \protect\label{fig:radio-ascoded}}
@@ -27,91 +73,48 @@
 (c) A FeedbackLoop. \\
 \caption{Stream structures supported by StreamIt.
 \protect\label{fig:structures}}
-\end{minipage}
 \end{figure}
-
-% \begin{figure}[t]
-% \centering
-% \scriptsize
-% \begin{verbatim}
-% class LowPassFilter extends Filter {,
-%   float[] weights;
-
-%   void init(int sampleRate, float cutOffFreq) {
-%     setInput(Float.TYPE); setOutput(Float.TYPE);
-%     setPush(N); setPop(1); setPeek(N); 
-%     weights = calcWeights(sampleRate, cutOffFreq);
-%   }
-
-%   void work() {
-%     float sum = 0;
-%     for (int i=0; i<weights.length; i++) 
-%       sum += input.peek(i)*weights[i];
-%     input.pop();
-%     output.push(sum);
-%   }
-% }
-
-% public class Equalizer extends Pipeline {
-%   void init(float samplingRate, int N) {
-%     add(new SplitJoin() {
-%       void init() {
-%         int bottom = 2500;
-%         int top = 5000;
-%         setSplitter(DUPLICATE());
-%         for (int i=0; i<N; i++, bottom*=2, top*=2) {
-%           add(new BandPassFilter(sampleRate, bottom, top));
-%         }
-%         setJoiner(ROUND_ROBIN());
-%     }});
-%     add(new Adder(N));
-%   }
-% }
-  
-% class FMRadio extends Pipeline {
-%   void init() {
-%     add(new DataSource());
-%     add(new LowPassFilter(sampleRate, cutoffFreq));
-%     add(new FMDemodulator(sampleRate, maxAmplitude, bandwidth));
-%     add(new Equalizer(samplingRate, 4));
-%     add(new Speaker());
-%   }
-% }
-% \end{verbatim}
-% \caption{Parts of an FM Radio in StreamIt.
-% \protect\label{fig:radiocode}}
-% \end{figure}
 
 \section{The StreamIt Language}
 \label{sec:streamit}
 
-In this section we provide a very brief overview of the StreamIt
-language; a more detailed description can be found in
-\cite{streamitcc}.  The current version of StreamIt has a syntax that
-is legal Java in order to simplify our presentation and
-implementation.  However, we have developed a complete compiler that
-is fully independent from the Java runtime system--our syntax should
-not be mistaken for a Java library.  Also, the current version of
-StreamIt is designed to support only streams with static input and
-output rates.  
-%Designing a cleaner syntax and considering dynamically
-%varying rates will be the subject of future work.
+StreamIt is a portable programming language for high-performance
+signal processing applications.  The current version of StreamIt is
+tailored for static-rate streams: it requires that the input and
+output rates of each filter are known at compile time.  In this
+section, we provide a very brief overview of the syntax and semantics
+of StreamIt, version 1.1.  A more detailed description of the design
+and rationale for StreamIt can be found in~\cite{streamitcc}, which
+describes version 1.0; the most up-to-date syntax specificaiton can
+always be found on our website~\cite{streamitweb}.
 
-The basic unit of computation in StreamIt is the Filter.  An example
-of a Filter is the {\tt LowPassFilter}, a component of our software
-radio (see Figure \ref{fig:radiocode}).  Each Filter contains an {\tt
-init} function that is called at initialization time; in this case,
-the {\tt LowPassFilter} calculates {\tt weights}, the coefficients it
-should use for filtering.  The {\tt work} function describes the most
-fine grained execution step of the filter in the steady state.  Within
-the {\tt work} function, the filter can communicate with its neighbors
-using the {\tt input} and {\tt output} channels, which are FIFO queues
-with types as declared in the {\tt init} function.  These high-volume
-channels support the intuitive operations of {\tt push(value)}, {\tt
+The basic unit of computation in StreamIt is the {\it filter}.  A
+filter is a single-input, single-output block with a user-defined
+procedure for translating input items to output items.  An example of
+a filter is the {\tt FIRFilter}, a component of our software radio
+(see Figure \ref{fig:radiocode}).  Each filter contains an {\tt init}
+function that is called at initialization time; in this case, the {\tt
+FIRFilter} calculates {\tt weights}, which represents its impulse
+response.  The {\tt work} function describes the most fine grained
+execution step of the filter in the steady state.  Within the {\tt
+work} function, the filter can communicate with its neighbors via FIFO
+queues, using the intuitive operations of {\tt push(value)}, {\tt
 pop()}, and {\tt peek(index)}, where {\tt peek} returns the value at
-position {\tt index} without dequeuing the item.  The user never calls
-the {\tt init} and {\tt work} functions--they are called
-automatically.
+position {\tt index} without dequeuing the item.  The number of items
+that are pushed, popped, and peeked\footnote{We define $peek$ as the
+total number of items read, including the items popped.  Thus, we
+always have that $peek \ge pop$.} on each invocation are declared with
+the {\tt work} function.
+
+In addition to {\tt work}, a filter can contain an {\tt initWork}
+function that is executed exactly once between the initialization
+period and the steady-state.  Like {\tt work}, {\tt initWork} can
+access the input and output tapes of the filter; however, the I/O
+rates of {\tt work} and {\tt initWork} can differ.  In an {\tt
+FIRFilter}, an {\tt initWork} function is essential for correctly
+filtering the beginning of the input stream.  The user never calls the
+{\tt init}, {\tt initWork}, and {\tt work} functions--they are all
+called automatically.
 
 %% StreamIt's representation of a filter is an improvement over
 %% general-purpose languages.  In a procedural language, the analog of a
@@ -135,46 +138,44 @@ automatically.
 %% optimization from the programmer.
 
 The basic construct for composing filters into a communicating network
-is a Pipeline, such as the FM Radio in Figure \ref{fig:radiocode}.
-Like a Filter, a Pipeline has an {\tt init} function that is called
-upon its instantiation.  However, there is no {\tt work} function, and
-all input and output channels are implicit; instead, the stream
-behaves as the sequential composition of filters that are specified
-with successive calls to {\tt add} from within {\tt init}.  That is,
-the output of {\tt DataSource} is implicitly connected to the input of
-{\tt LowPassFilter}, who's output is connected to {\tt FMDemodulator},
-and so on.
+is a {\it pipeline}, such as the FM Radio in Figure
+\ref{fig:radiocode}.  A pipeline behaves as the sequential composition
+of all its child streams, which are specified with successive calls to
+{\tt add} from within the pipeline.  For example, the output of {\tt
+DataSource} is implicitly connected to the input of {\tt FIRFilter},
+who's output is connected to {\tt FMDemodulator}, and so on.  The {\tt
+add} statements can be mixed with regular imperative code to
+parameterize the construction of the stream graph.
 
-There are two other stream constructors besides Pipeline: SplitJoin
-and FeedbackLoop (see Figure \ref{fig:structures}).  From now on, we
-use the word {\it stream} to refer to any instance of a Filter,
-Pipeline, SplitJoin, or FeedbackLoop.
+There are two other stream constructors besides pipeline: {\it
+splitjoin} and {\it feedbackloop} (see Figure \ref{fig:structures}).
+From now on, we use the word {\it stream} to refer to any instance of
+a filter, pipeline, splitjoin, or feedbackloop.
 
-A SplitJoin is used to specify independent parallel streams that
-diverge from a common {\it Splitter} and merge into a common {\it
-Joiner}.  There are two kinds of Splitters: 1) Duplicate, which
+A splitjoin is used to specify independent parallel streams that
+diverge from a common {\it splitter} and merge into a common {\it
+joiner}.  There are two kinds of splitters: 1) $duplicate$, which
 replicates each data item and sends a copy to each parallel stream,
-and 2) RoundRobin($w_1, \dots, w_n$), which sends the first $w_1$
+and 2) $roundrobin(w_1, \dots, w_n)$, which sends the first $w_1$
 items to the first stream, the next $w_2$ items to the second stream,
-and so on.  RoundRobin is also the only type of Joiner that we
-support; its function is analogous to a RoundRobin Splitter.  If a
-RoundRobin is written without any weights, we assume that all $w_i =
-1$.  The Splitter and Joiner type are specified with calls to {\tt
-setSplitter} and {\tt setJoiner}, respectively (see Figure
-\ref{fig:radiocode}); the parallel streams are specified by successive
-calls to {\tt add}, with the $i$'th call setting the $i$'th stream in
-the SplitJoin.
+and so on.  roundrobin is also the only type of joiner that we
+support; its function is analogous to a roundrobin splitter.  If a
+roundrobin is written without any weights, we assume that all $w_i =
+1$.  The splitter and joiner type are specified with the keywords {\tt
+split} and {\tt join}, respectively (see Figure \ref{fig:radiocode});
+the parallel streams are specified by successive calls to {\tt add},
+with the $i$'th call setting the $i$'th stream in the splitjoin.
 
 The last control construct provides a way to create cycles in the
-stream graph: the FeedbackLoop.  Due to space constraints, we omit a
-detailed discussion of the FeedbackLoop.
+stream graph: the feedbackloop.  Due to space constraints, we omit a
+detailed discussion of the feedbackloop.
 
 \subsection{Rationale}
 
 StreamIt differs from other stream languages in that it imposes a
 well-defined structure on the streams; all stream graphs are built out
-of a hierarchical composition of Filters, Pipelines, SplitJoins, and
-FeedbackLoops.  This is in contrast to other environments, which
+of a hierarchical composition of filters, pipelines, splitjoins, and
+feedbackloops.  This is in contrast to other environments, which
 generally regard a stream as a flat and arbitrary network of filters
 that are connected by channels.  However, arbitrary graphs are very
 hard for the compiler to analyze, and equally difficult for a
