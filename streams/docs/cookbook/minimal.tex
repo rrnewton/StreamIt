@@ -3,8 +3,8 @@
 \begin{textpic}{\includegraphics{cookbook.1}}
 \begin{lstlisting}{}
 void->void pipeline Minimal {
-  add IntSource();
-  add IntPrinter();
+  add IntSource;
+  add IntPrinter;
 }
 void->int filter IntSource {
   int x;
@@ -23,8 +23,8 @@ connected to the input of its second child, and so on.  It has two
 children, a source and a sink.  Each of these are implemented as
 StreamIt \emph{filter} objects.
 
-A filter fundamentally has two functions, an \emph{init} function and
-a \emph{work} function.  Both of these are present in
+A filter has two special functions, an \emph{init} function and a
+\emph{work} function.  Both of these are present in
 \lstinline|IntSource|.  The init function runs once at the start of
 the program; the work function runs repeatedly forever.  If the init
 function is omitted, as it is in \lstinline|IntPrinter|, it is assumed
