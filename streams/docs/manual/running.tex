@@ -87,7 +87,7 @@ you could do the following steps to compile and run the HelloWorld
 application for 10 iterations.
 
 \begin{verbatim}
-java streamit.frontend.ToJava HelloWorld6.str > HelloWorld6.java
+java streamit.frontend.ToJava --library HelloWorld6.str > HelloWorld6.java
 jikes HelloWorld6.java
 java HelloWorld6 -i 10
 \end{verbatim}
@@ -118,7 +118,7 @@ you need to execute the following command to include the appropriate
 headers and link against the appropriate libraries.
 
 \begin{verbatim}
-gcc -O2 -I/u/username/streams/library/c -L/u/username/streams/library/c \
+gcc -O2 -I${STREAMIT_HOME}/library/c -L${STREAMIT_HOME}/library/c \
     HelloWorld6.c -lstreamit -lsrfftw -lsfftw -lm
 \end{verbatim}
 
