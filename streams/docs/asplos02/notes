@@ -4,27 +4,38 @@ Here's a list of things TODO:
 - add argument about compiling to different granularities, if we can
 demonstrate it.
 
+- add somewhere that the scheduling is automatic, which makes it
+difficult.  but it's for a given partitioning.  thus if we can split a
+filter with a lot of the work, we can have throughput improve by
+factor of two.
+
+- add the amdel's law vs. throughput law
+
 ---------------------------------------------------------------------------
 Here's a list of FIGURES we need to make:
-
-1. diagram of the software radio to accompany the code example
 
 2. sequence of transformations for the software radio that makes it
 load balanced.
 
-3. illustrating pipeline fusion with initWork and steadyWork
+--
+
+3. illustrating pipeline fusion with initWork and steadyWork         x
 
 4. illustrating data-parallel splitjoins
 
-5. illustrating splitting a filter into a pipline.
+5. illustrating horizontal fusion
 
-6. pushing filter through splitter or joiner node
+5. illustrating splitting a filter into a pipline.                   no
 
-7. hierarchical splitjoins
+--
 
-8. synchronization removal of splitters/joiners with same weights
+6. pushing filter through splitter or joiner node                    x
 
-9. nested pipeline removal
+7. hierarchical splitjoins                                           x
+
+8. synchronization removal of splitters/joiners with same weights    x
+
+9. nested pipeline removal                                           no
 
 ---------------------------------------------------------------------------
 HERE'S AN ABANDONED PARAGRAPH FROM THE OLD ABSTRACT
