@@ -1,0 +1,1192 @@
+%!PS-Adobe-2.0
+%%Creator: dot version gviz 1.7.3b (Mon Feb 26 14:10:22 EST 2001)
+%%For: (aalamb) Andrew Lamb
+%%Title: streamit
+%%Pages: (atend)
+%%BoundingBox: 36 36 1279 1697
+%%EndComments
+%%BeginProlog
+save
+/DotDict 200 dict def
+DotDict begin
+
+%%BeginResource: procset
+/coord-font-family /Times-Roman def
+/default-font-family /Times-Roman def
+/coordfont coord-font-family findfont 8 scalefont def
+
+/InvScaleFactor 1.0 def
+/set_scale {
+	dup 1 exch div /InvScaleFactor exch def
+	dup scale
+} bind def
+
+% styles
+/solid { } bind def
+/dashed { [9 InvScaleFactor mul dup ] 0 setdash } bind def
+/dotted { [1 InvScaleFactor mul 6 InvScaleFactor mul] 0 setdash } bind def
+/invis {/fill {newpath} def /stroke {newpath} def /show {pop newpath} def} bind def
+/bold { 2 setlinewidth } bind def
+/filled { } bind def
+/unfilled { } bind def
+/rounded { } bind def
+/diagonals { } bind def
+
+% hooks for setting color 
+/nodecolor { sethsbcolor } bind def
+/edgecolor { sethsbcolor } bind def
+/graphcolor { sethsbcolor } bind def
+/nopcolor {pop pop pop} bind def
+
+/beginpage {	% i j npages
+	/npages exch def
+	/j exch def
+	/i exch def
+	/str 10 string def
+	npages 1 gt {
+		gsave
+			coordfont setfont
+			0 0 moveto
+			(\() show i str cvs show (,) show j str cvs show (\)) show
+		grestore
+	} if
+} bind def
+
+/set_font {
+	findfont exch
+	scalefont setfont
+} def
+
+% draw aligned label in bounding box aligned to current point
+% alignfactor tells what fraction to place on the left.
+% -.5 is centered.
+/alignedtext {			% text labelwidth fontsz alignfactor
+	/alignfactor exch def
+	/fontsz exch def
+	/width exch def
+	/text exch def
+	gsave
+		% even if node or edge is dashed, don't paint text with dashes
+		[] 0 setdash
+		currentpoint newpath moveto
+		text stringwidth pop
+		alignfactor mul fontsz -.3 mul rmoveto
+		text show
+	grestore
+} def
+
+/boxprim {				% xcorner ycorner xsize ysize
+		4 2 roll
+		moveto
+		2 copy
+		exch 0 rlineto
+		0 exch rlineto
+		pop neg 0 rlineto
+		closepath
+} bind def
+
+/ellipse_path {
+	/ry exch def
+	/rx exch def
+	/y exch def
+	/x exch def
+	matrix currentmatrix
+	newpath
+	x y translate
+	rx ry scale
+	0 0 1 0 360 arc
+	setmatrix
+} bind def
+
+/endpage { showpage } bind def
+
+/layercolorseq
+	[	% layer color sequence - darkest to lightest
+		[0 0 0]
+		[.2 .8 .8]
+		[.4 .8 .8]
+		[.6 .8 .8]
+		[.8 .8 .8]
+	]
+def
+
+/setlayer {/maxlayer exch def /curlayer exch def
+	layercolorseq curlayer get
+	aload pop sethsbcolor
+	/nodecolor {nopcolor} def
+	/edgecolor {nopcolor} def
+	/graphcolor {nopcolor} def
+} bind def
+
+/onlayer { curlayer ne {invis} if } def
+
+/onlayers {
+	/myupper exch def
+	/mylower exch def
+	curlayer mylower lt
+	curlayer myupper gt
+	or
+	{invis} if
+} def
+
+/curlayer 0 def
+
+%%EndProlog
+%%BeginSetup
+14 default-font-family set_font
+1 setmiterlimit
+% /arrowlength 10 def
+% /arrowwidth 5 def
+
+% make sure pdfmark is harmless for PS-interpreters other than Distiller
+/pdfmark where {pop} {userdict /pdfmark /cleartomark load put} ifelse
+% make '<<' and '>>' safe on PS Level 1 devices
+/languagelevel where {pop languagelevel}{1} ifelse
+2 lt {
+    userdict (<<) cvn ([) cvn load put
+    userdict (>>) cvn ([) cvn load put
+} if
+
+%%EndResource
+%%EndSetup
+%%Page: 1 1
+%%PageBoundingBox: 36 36 1279 1697
+%%PageOrientation: Portrait
+gsave
+35 35 1244 1662 boxprim clip newpath
+36 36 translate
+0 0 1 beginpage
+0 0 translate 0 rotate
+[ /CropBox [36 36 1279 1697] /PAGES pdfmark
+0.000 0.000 0.000 graphcolor
+14.00 /Times-Roman set_font
+gsave 10 dict begin
+newpath 8 8 moveto
+1234 8 lineto
+1234 1652 lineto
+8 1652 lineto
+closepath
+stroke
+gsave 10 dict begin
+45 1645 moveto (FilterBank) 59 14.00 -0.50 alignedtext
+end grestore
+end grestore
+gsave 10 dict begin
+newpath 24 136 moveto
+1218 136 lineto
+1218 1528 lineto
+24 1528 lineto
+closepath
+stroke
+gsave 10 dict begin
+84 1521 moveto (FilterBankPipeline) 105 14.00 -0.50 alignedtext
+end grestore
+end grestore
+gsave 10 dict begin
+newpath 40 262 moveto
+1202 262 lineto
+1202 1504 lineto
+40 1504 lineto
+closepath
+stroke
+gsave 10 dict begin
+102 1497 moveto (FilterBankSplitJoin) 109 14.00 -0.50 alignedtext
+end grestore
+end grestore
+gsave 10 dict begin
+newpath 56 318 moveto
+458 318 lineto
+458 1436 lineto
+56 1436 lineto
+closepath
+stroke
+gsave 10 dict begin
+116 1429 moveto (ProcessingPipeline) 106 14.00 -0.50 alignedtext
+end grestore
+end grestore
+gsave 10 dict begin
+newpath 244 1008 moveto
+430 1008 lineto
+430 1412 lineto
+244 1412 lineto
+closepath
+stroke
+gsave 10 dict begin
+274 1405 moveto (Pipeline) 45 14.00 -0.50 alignedtext
+end grestore
+end grestore
+gsave 10 dict begin
+newpath 260 1136 moveto
+414 1136 lineto
+414 1388 lineto
+260 1388 lineto
+closepath
+stroke
+gsave 10 dict begin
+309 1381 moveto (BandPassFilter) 84 14.00 -0.50 alignedtext
+end grestore
+end grestore
+gsave 10 dict begin
+newpath 72 326 moveto
+442 326 lineto
+442 876 lineto
+72 876 lineto
+closepath
+stroke
+gsave 10 dict begin
+102 869 moveto (Pipeline) 45 14.00 -0.50 alignedtext
+end grestore
+end grestore
+gsave 10 dict begin
+newpath 88 334 moveto
+426 334 lineto
+426 752 lineto
+88 752 lineto
+closepath
+stroke
+gsave 10 dict begin
+138 745 moveto (BandStopFilter) 85 14.00 -0.50 alignedtext
+end grestore
+end grestore
+gsave 10 dict begin
+newpath 104 460 moveto
+410 460 lineto
+410 728 lineto
+104 728 lineto
+closepath
+stroke
+gsave 10 dict begin
+136 721 moveto (SplitJoin) 49 14.00 -0.50 alignedtext
+end grestore
+end grestore
+gsave 10 dict begin
+newpath 420 318 moveto
+822 318 lineto
+822 1436 lineto
+420 1436 lineto
+closepath
+stroke
+gsave 10 dict begin
+480 1429 moveto (ProcessingPipeline) 106 14.00 -0.50 alignedtext
+end grestore
+end grestore
+gsave 10 dict begin
+newpath 527 1008 moveto
+713 1008 lineto
+713 1412 lineto
+527 1412 lineto
+closepath
+stroke
+gsave 10 dict begin
+557 1405 moveto (Pipeline) 45 14.00 -0.50 alignedtext
+end grestore
+end grestore
+gsave 10 dict begin
+newpath 543 1136 moveto
+697 1136 lineto
+697 1388 lineto
+543 1388 lineto
+closepath
+stroke
+gsave 10 dict begin
+592 1381 moveto (BandPassFilter) 84 14.00 -0.50 alignedtext
+end grestore
+end grestore
+gsave 10 dict begin
+newpath 436 326 moveto
+806 326 lineto
+806 876 lineto
+436 876 lineto
+closepath
+stroke
+gsave 10 dict begin
+466 869 moveto (Pipeline) 45 14.00 -0.50 alignedtext
+end grestore
+end grestore
+gsave 10 dict begin
+newpath 452 334 moveto
+790 334 lineto
+790 752 lineto
+452 752 lineto
+closepath
+stroke
+gsave 10 dict begin
+502 745 moveto (BandStopFilter) 85 14.00 -0.50 alignedtext
+end grestore
+end grestore
+gsave 10 dict begin
+newpath 468 460 moveto
+774 460 lineto
+774 728 lineto
+468 728 lineto
+closepath
+stroke
+gsave 10 dict begin
+500 721 moveto (SplitJoin) 49 14.00 -0.50 alignedtext
+end grestore
+end grestore
+gsave 10 dict begin
+newpath 784 318 moveto
+1186 318 lineto
+1186 1436 lineto
+784 1436 lineto
+closepath
+stroke
+gsave 10 dict begin
+844 1429 moveto (ProcessingPipeline) 106 14.00 -0.50 alignedtext
+end grestore
+end grestore
+gsave 10 dict begin
+newpath 809 1008 moveto
+995 1008 lineto
+995 1412 lineto
+809 1412 lineto
+closepath
+stroke
+gsave 10 dict begin
+839 1405 moveto (Pipeline) 45 14.00 -0.50 alignedtext
+end grestore
+end grestore
+gsave 10 dict begin
+newpath 825 1136 moveto
+979 1136 lineto
+979 1388 lineto
+825 1388 lineto
+closepath
+stroke
+gsave 10 dict begin
+874 1381 moveto (BandPassFilter) 84 14.00 -0.50 alignedtext
+end grestore
+end grestore
+gsave 10 dict begin
+newpath 800 326 moveto
+1170 326 lineto
+1170 876 lineto
+800 876 lineto
+closepath
+stroke
+gsave 10 dict begin
+830 869 moveto (Pipeline) 45 14.00 -0.50 alignedtext
+end grestore
+end grestore
+gsave 10 dict begin
+newpath 816 334 moveto
+1154 334 lineto
+1154 752 lineto
+816 752 lineto
+closepath
+stroke
+gsave 10 dict begin
+866 745 moveto (BandStopFilter) 85 14.00 -0.50 alignedtext
+end grestore
+end grestore
+gsave 10 dict begin
+newpath 832 460 moveto
+1138 460 lineto
+1138 728 lineto
+832 728 lineto
+closepath
+stroke
+gsave 10 dict begin
+864 721 moveto (SplitJoin) 49 14.00 -0.50 alignedtext
+end grestore
+end grestore
+
+%	node2
+gsave 10 dict begin
+620 1582 60 45 ellipse_path
+stroke
+gsave 10 dict begin
+620 1607 moveto (DataSource_1) 79 14.00 -0.50 alignedtext
+620 1591 moveto (push=1) 41 14.00 -0.50 alignedtext
+620 1575 moveto (pop=0) 35 14.00 -0.50 alignedtext
+620 1559 moveto (peek=0) 41 14.00 -0.50 alignedtext
+end grestore
+end grestore
+
+%	node5
+gsave 10 dict begin
+620 1462 68 18 ellipse_path
+stroke
+gsave 10 dict begin
+620 1463 moveto (DUPLICATE\(1,1,1\)) 114 14.00 -0.50 alignedtext
+end grestore
+end grestore
+
+%	node2 -> node5
+newpath 620 1536 moveto
+620 1520 620 1502 620 1489 curveto
+stroke
+newpath 618 1490 moveto
+620 1480 lineto
+623 1490 lineto
+closepath
+gsave 0 setgray stroke grestore fill
+
+%	node10
+gsave 10 dict begin
+338 1318 67 45 ellipse_path
+stroke
+gsave 10 dict begin
+338 1343 moveto (LowPassFilter_1) 94 14.00 -0.50 alignedtext
+338 1327 moveto (push=1) 41 14.00 -0.50 alignedtext
+338 1311 moveto (pop=1) 35 14.00 -0.50 alignedtext
+338 1295 moveto (peek=100) 55 14.00 -0.50 alignedtext
+end grestore
+end grestore
+
+%	node5 -> node10
+newpath 572 1449 moveto
+559 1445 545 1441 536 1436 curveto
+497 1416 437 1379 393 1353 curveto
+stroke
+newpath 394 1357 moveto
+387 1349 lineto
+397 1352 lineto
+closepath
+gsave 0 setgray stroke grestore fill
+
+%	node26
+gsave 10 dict begin
+620 1318 67 45 ellipse_path
+stroke
+gsave 10 dict begin
+620 1343 moveto (LowPassFilter_3) 94 14.00 -0.50 alignedtext
+620 1327 moveto (push=1) 41 14.00 -0.50 alignedtext
+620 1311 moveto (pop=1) 35 14.00 -0.50 alignedtext
+620 1295 moveto (peek=100) 55 14.00 -0.50 alignedtext
+end grestore
+end grestore
+
+%	node5 -> node26
+newpath 620 1444 moveto
+620 1427 620 1399 620 1374 curveto
+stroke
+newpath 618 1374 moveto
+620 1364 lineto
+623 1374 lineto
+closepath
+gsave 0 setgray stroke grestore fill
+
+%	node42
+gsave 10 dict begin
+901 1318 67 45 ellipse_path
+stroke
+gsave 10 dict begin
+901 1343 moveto (LowPassFilter_5) 94 14.00 -0.50 alignedtext
+901 1327 moveto (push=1) 41 14.00 -0.50 alignedtext
+901 1311 moveto (pop=1) 35 14.00 -0.50 alignedtext
+901 1295 moveto (peek=100) 55 14.00 -0.50 alignedtext
+end grestore
+end grestore
+
+%	node5 -> node42
+newpath 668 1449 moveto
+681 1445 695 1441 704 1436 curveto
+744 1416 803 1380 846 1353 curveto
+stroke
+newpath 842 1352 moveto
+852 1349 lineto
+845 1357 lineto
+closepath
+gsave 0 setgray stroke grestore fill
+
+%	node6
+gsave 10 dict begin
+621 288 119 18 ellipse_path
+stroke
+gsave 10 dict begin
+621 289 moveto (WEIGHTED_ROUND_ROBIN\(1,1,1\)) 218 14.00 -0.50 alignedtext
+end grestore
+end grestore
+
+%	node55
+gsave 10 dict begin
+621 189 44 45 ellipse_path
+stroke
+gsave 10 dict begin
+621 214 moveto (Adder_4) 48 14.00 -0.50 alignedtext
+621 198 moveto (push=1) 41 14.00 -0.50 alignedtext
+621 182 moveto (pop=3) 35 14.00 -0.50 alignedtext
+621 166 moveto (peek=3) 41 14.00 -0.50 alignedtext
+end grestore
+end grestore
+
+%	node6 -> node55
+newpath 621 270 moveto
+621 263 621 254 621 245 curveto
+stroke
+newpath 619 244 moveto
+621 234 lineto
+624 244 lineto
+closepath
+gsave 0 setgray stroke grestore fill
+
+%	node11
+gsave 10 dict begin
+337 1190 69 45 ellipse_path
+stroke
+gsave 10 dict begin
+337 1215 moveto (HighPassFilter_1) 97 14.00 -0.50 alignedtext
+337 1199 moveto (push=1) 41 14.00 -0.50 alignedtext
+337 1183 moveto (pop=1) 35 14.00 -0.50 alignedtext
+337 1167 moveto (peek=100) 55 14.00 -0.50 alignedtext
+end grestore
+end grestore
+
+%	node10 -> node11
+newpath 338 1272 moveto
+338 1263 337 1254 337 1246 curveto
+stroke
+newpath 335 1246 moveto
+337 1236 lineto
+340 1246 lineto
+closepath
+gsave 0 setgray stroke grestore fill
+
+%	node12
+gsave 10 dict begin
+337 1062 61 45 ellipse_path
+stroke
+gsave 10 dict begin
+337 1087 moveto (Compressor_1) 81 14.00 -0.50 alignedtext
+337 1071 moveto (push=1) 41 14.00 -0.50 alignedtext
+337 1055 moveto (pop=3) 35 14.00 -0.50 alignedtext
+337 1039 moveto (peek=3) 41 14.00 -0.50 alignedtext
+end grestore
+end grestore
+
+%	node11 -> node12
+newpath 337 1144 moveto
+337 1135 337 1126 337 1118 curveto
+stroke
+newpath 335 1118 moveto
+337 1108 lineto
+340 1118 lineto
+closepath
+gsave 0 setgray stroke grestore fill
+
+%	node13
+gsave 10 dict begin
+336 934 64 45 ellipse_path
+stroke
+gsave 10 dict begin
+336 959 moveto (ProcessFilter_1) 87 14.00 -0.50 alignedtext
+336 943 moveto (push=1) 41 14.00 -0.50 alignedtext
+336 927 moveto (pop=1) 35 14.00 -0.50 alignedtext
+336 911 moveto (peek=1) 41 14.00 -0.50 alignedtext
+end grestore
+end grestore
+
+%	node12 -> node13
+newpath 337 1016 moveto
+337 1007 336 998 336 990 curveto
+stroke
+newpath 334 990 moveto
+336 980 lineto
+339 990 lineto
+closepath
+gsave 0 setgray stroke grestore fill
+
+%	node15
+gsave 10 dict begin
+335 806 54 45 ellipse_path
+stroke
+gsave 10 dict begin
+335 831 moveto (Expander_1) 67 14.00 -0.50 alignedtext
+335 815 moveto (push=3) 41 14.00 -0.50 alignedtext
+335 799 moveto (pop=1) 35 14.00 -0.50 alignedtext
+335 783 moveto (peek=1) 41 14.00 -0.50 alignedtext
+end grestore
+end grestore
+
+%	node13 -> node15
+newpath 336 888 moveto
+336 879 335 870 335 862 curveto
+stroke
+newpath 333 862 moveto
+335 852 lineto
+338 862 lineto
+closepath
+gsave 0 setgray stroke grestore fill
+
+%	node18
+gsave 10 dict begin
+333 686 62 18 ellipse_path
+stroke
+gsave 10 dict begin
+333 687 moveto (DUPLICATE\(1,1\)) 104 14.00 -0.50 alignedtext
+end grestore
+end grestore
+
+%	node15 -> node18
+newpath 334 760 moveto
+334 744 334 726 333 713 curveto
+stroke
+newpath 331 714 moveto
+333 704 lineto
+336 714 lineto
+closepath
+gsave 0 setgray stroke grestore fill
+
+%	node20
+gsave 10 dict begin
+179 586 67 45 ellipse_path
+stroke
+gsave 10 dict begin
+179 611 moveto (LowPassFilter_2) 94 14.00 -0.50 alignedtext
+179 595 moveto (push=1) 41 14.00 -0.50 alignedtext
+179 579 moveto (pop=1) 35 14.00 -0.50 alignedtext
+179 563 moveto (peek=100) 55 14.00 -0.50 alignedtext
+end grestore
+end grestore
+
+%	node18 -> node20
+newpath 308 669 moveto
+288 656 258 638 234 621 curveto
+stroke
+newpath 235 625 moveto
+228 617 lineto
+238 620 lineto
+closepath
+gsave 0 setgray stroke grestore fill
+
+%	node21
+gsave 10 dict begin
+333 586 69 45 ellipse_path
+stroke
+gsave 10 dict begin
+333 611 moveto (HighPassFilter_2) 97 14.00 -0.50 alignedtext
+333 595 moveto (push=1) 41 14.00 -0.50 alignedtext
+333 579 moveto (pop=1) 35 14.00 -0.50 alignedtext
+333 563 moveto (peek=100) 55 14.00 -0.50 alignedtext
+end grestore
+end grestore
+
+%	node18 -> node21
+newpath 333 668 moveto
+333 661 333 652 333 643 curveto
+stroke
+newpath 331 642 moveto
+333 632 lineto
+336 642 lineto
+closepath
+gsave 0 setgray stroke grestore fill
+
+%	node19
+gsave 10 dict begin
+288 486 114 18 ellipse_path
+stroke
+gsave 10 dict begin
+288 487 moveto (WEIGHTED_ROUND_ROBIN\(1,1\)) 207 14.00 -0.50 alignedtext
+end grestore
+end grestore
+
+%	node22
+gsave 10 dict begin
+327 387 44 45 ellipse_path
+stroke
+gsave 10 dict begin
+327 412 moveto (Adder_1) 48 14.00 -0.50 alignedtext
+327 396 moveto (push=1) 41 14.00 -0.50 alignedtext
+327 380 moveto (pop=2) 35 14.00 -0.50 alignedtext
+327 364 moveto (peek=2) 41 14.00 -0.50 alignedtext
+end grestore
+end grestore
+
+%	node19 -> node22
+newpath 295 468 moveto
+298 460 302 449 306 439 curveto
+stroke
+newpath 304 437 moveto
+310 429 lineto
+309 439 lineto
+closepath
+gsave 0 setgray stroke grestore fill
+
+%	node20 -> node19
+newpath 219 549 moveto
+233 536 249 522 262 510 curveto
+stroke
+newpath 259 509 moveto
+268 504 lineto
+263 513 lineto
+closepath
+gsave 0 setgray stroke grestore fill
+
+%	node21 -> node19
+newpath 313 542 moveto
+308 532 304 522 300 512 curveto
+stroke
+newpath 298 514 moveto
+296 504 lineto
+303 512 lineto
+closepath
+gsave 0 setgray stroke grestore fill
+
+%	node22 -> node6
+newpath 364 362 moveto
+389 345 422 326 445 318 curveto
+465 312 494 305 522 301 curveto
+stroke
+newpath 519 299 moveto
+529 300 lineto
+519 304 lineto
+closepath
+gsave 0 setgray stroke grestore fill
+
+%	node27
+gsave 10 dict begin
+620 1190 69 45 ellipse_path
+stroke
+gsave 10 dict begin
+620 1215 moveto (HighPassFilter_3) 97 14.00 -0.50 alignedtext
+620 1199 moveto (push=1) 41 14.00 -0.50 alignedtext
+620 1183 moveto (pop=1) 35 14.00 -0.50 alignedtext
+620 1167 moveto (peek=100) 55 14.00 -0.50 alignedtext
+end grestore
+end grestore
+
+%	node26 -> node27
+newpath 620 1272 moveto
+620 1263 620 1254 620 1246 curveto
+stroke
+newpath 618 1246 moveto
+620 1236 lineto
+623 1246 lineto
+closepath
+gsave 0 setgray stroke grestore fill
+
+%	node28
+gsave 10 dict begin
+620 1062 61 45 ellipse_path
+stroke
+gsave 10 dict begin
+620 1087 moveto (Compressor_2) 81 14.00 -0.50 alignedtext
+620 1071 moveto (push=1) 41 14.00 -0.50 alignedtext
+620 1055 moveto (pop=3) 35 14.00 -0.50 alignedtext
+620 1039 moveto (peek=3) 41 14.00 -0.50 alignedtext
+end grestore
+end grestore
+
+%	node27 -> node28
+newpath 620 1144 moveto
+620 1135 620 1126 620 1118 curveto
+stroke
+newpath 618 1118 moveto
+620 1108 lineto
+623 1118 lineto
+closepath
+gsave 0 setgray stroke grestore fill
+
+%	node29
+gsave 10 dict begin
+620 934 64 45 ellipse_path
+stroke
+gsave 10 dict begin
+620 959 moveto (ProcessFilter_2) 87 14.00 -0.50 alignedtext
+620 943 moveto (push=1) 41 14.00 -0.50 alignedtext
+620 927 moveto (pop=1) 35 14.00 -0.50 alignedtext
+620 911 moveto (peek=1) 41 14.00 -0.50 alignedtext
+end grestore
+end grestore
+
+%	node28 -> node29
+newpath 620 1016 moveto
+620 1007 620 998 620 990 curveto
+stroke
+newpath 618 990 moveto
+620 980 lineto
+623 990 lineto
+closepath
+gsave 0 setgray stroke grestore fill
+
+%	node31
+gsave 10 dict begin
+620 806 54 45 ellipse_path
+stroke
+gsave 10 dict begin
+620 831 moveto (Expander_2) 67 14.00 -0.50 alignedtext
+620 815 moveto (push=3) 41 14.00 -0.50 alignedtext
+620 799 moveto (pop=1) 35 14.00 -0.50 alignedtext
+620 783 moveto (peek=1) 41 14.00 -0.50 alignedtext
+end grestore
+end grestore
+
+%	node29 -> node31
+newpath 620 888 moveto
+620 879 620 870 620 862 curveto
+stroke
+newpath 618 862 moveto
+620 852 lineto
+623 862 lineto
+closepath
+gsave 0 setgray stroke grestore fill
+
+%	node34
+gsave 10 dict begin
+620 686 62 18 ellipse_path
+stroke
+gsave 10 dict begin
+620 687 moveto (DUPLICATE\(1,1\)) 104 14.00 -0.50 alignedtext
+end grestore
+end grestore
+
+%	node31 -> node34
+newpath 620 760 moveto
+620 744 620 726 620 713 curveto
+stroke
+newpath 618 714 moveto
+620 704 lineto
+623 714 lineto
+closepath
+gsave 0 setgray stroke grestore fill
+
+%	node36
+gsave 10 dict begin
+543 586 67 45 ellipse_path
+stroke
+gsave 10 dict begin
+543 611 moveto (LowPassFilter_4) 94 14.00 -0.50 alignedtext
+543 595 moveto (push=1) 41 14.00 -0.50 alignedtext
+543 579 moveto (pop=1) 35 14.00 -0.50 alignedtext
+543 563 moveto (peek=100) 55 14.00 -0.50 alignedtext
+end grestore
+end grestore
+
+%	node34 -> node36
+newpath 606 668 moveto
+598 658 588 645 578 632 curveto
+stroke
+newpath 577 636 moveto
+574 626 lineto
+582 633 lineto
+closepath
+gsave 0 setgray stroke grestore fill
+
+%	node37
+gsave 10 dict begin
+697 586 69 45 ellipse_path
+stroke
+gsave 10 dict begin
+697 611 moveto (HighPassFilter_4) 97 14.00 -0.50 alignedtext
+697 595 moveto (push=1) 41 14.00 -0.50 alignedtext
+697 579 moveto (pop=1) 35 14.00 -0.50 alignedtext
+697 563 moveto (peek=100) 55 14.00 -0.50 alignedtext
+end grestore
+end grestore
+
+%	node34 -> node37
+newpath 634 668 moveto
+641 658 650 647 660 635 curveto
+stroke
+newpath 658 634 moveto
+666 627 lineto
+662 637 lineto
+closepath
+gsave 0 setgray stroke grestore fill
+
+%	node35
+gsave 10 dict begin
+621 486 114 18 ellipse_path
+stroke
+gsave 10 dict begin
+621 487 moveto (WEIGHTED_ROUND_ROBIN\(1,1\)) 207 14.00 -0.50 alignedtext
+end grestore
+end grestore
+
+%	node38
+gsave 10 dict begin
+621 387 44 45 ellipse_path
+stroke
+gsave 10 dict begin
+621 412 moveto (Adder_2) 48 14.00 -0.50 alignedtext
+621 396 moveto (push=1) 41 14.00 -0.50 alignedtext
+621 380 moveto (pop=2) 35 14.00 -0.50 alignedtext
+621 364 moveto (peek=2) 41 14.00 -0.50 alignedtext
+end grestore
+end grestore
+
+%	node35 -> node38
+newpath 621 468 moveto
+621 461 621 452 621 443 curveto
+stroke
+newpath 619 442 moveto
+621 432 lineto
+624 442 lineto
+closepath
+gsave 0 setgray stroke grestore fill
+
+%	node36 -> node35
+newpath 575 546 moveto
+584 534 593 522 602 511 curveto
+stroke
+newpath 599 511 moveto
+607 504 lineto
+603 514 lineto
+closepath
+gsave 0 setgray stroke grestore fill
+
+%	node37 -> node35
+newpath 666 545 moveto
+657 534 648 521 640 511 curveto
+stroke
+newpath 639 514 moveto
+635 504 lineto
+643 511 lineto
+closepath
+gsave 0 setgray stroke grestore fill
+
+%	node38 -> node6
+newpath 621 342 moveto
+621 333 621 323 621 315 curveto
+stroke
+newpath 619 316 moveto
+621 306 lineto
+624 316 lineto
+closepath
+gsave 0 setgray stroke grestore fill
+
+%	node43
+gsave 10 dict begin
+902 1190 69 45 ellipse_path
+stroke
+gsave 10 dict begin
+902 1215 moveto (HighPassFilter_5) 97 14.00 -0.50 alignedtext
+902 1199 moveto (push=1) 41 14.00 -0.50 alignedtext
+902 1183 moveto (pop=1) 35 14.00 -0.50 alignedtext
+902 1167 moveto (peek=100) 55 14.00 -0.50 alignedtext
+end grestore
+end grestore
+
+%	node42 -> node43
+newpath 901 1272 moveto
+901 1263 902 1254 902 1246 curveto
+stroke
+newpath 900 1246 moveto
+902 1236 lineto
+905 1246 lineto
+closepath
+gsave 0 setgray stroke grestore fill
+
+%	node44
+gsave 10 dict begin
+902 1062 61 45 ellipse_path
+stroke
+gsave 10 dict begin
+902 1087 moveto (Compressor_3) 81 14.00 -0.50 alignedtext
+902 1071 moveto (push=1) 41 14.00 -0.50 alignedtext
+902 1055 moveto (pop=3) 35 14.00 -0.50 alignedtext
+902 1039 moveto (peek=3) 41 14.00 -0.50 alignedtext
+end grestore
+end grestore
+
+%	node43 -> node44
+newpath 902 1144 moveto
+902 1135 902 1126 902 1118 curveto
+stroke
+newpath 900 1118 moveto
+902 1108 lineto
+905 1118 lineto
+closepath
+gsave 0 setgray stroke grestore fill
+
+%	node45
+gsave 10 dict begin
+903 934 64 45 ellipse_path
+stroke
+gsave 10 dict begin
+903 959 moveto (ProcessFilter_3) 87 14.00 -0.50 alignedtext
+903 943 moveto (push=1) 41 14.00 -0.50 alignedtext
+903 927 moveto (pop=1) 35 14.00 -0.50 alignedtext
+903 911 moveto (peek=1) 41 14.00 -0.50 alignedtext
+end grestore
+end grestore
+
+%	node44 -> node45
+newpath 902 1016 moveto
+902 1007 903 998 903 990 curveto
+stroke
+newpath 901 990 moveto
+903 980 lineto
+906 990 lineto
+closepath
+gsave 0 setgray stroke grestore fill
+
+%	node47
+gsave 10 dict begin
+906 806 54 45 ellipse_path
+stroke
+gsave 10 dict begin
+906 831 moveto (Expander_3) 67 14.00 -0.50 alignedtext
+906 815 moveto (push=3) 41 14.00 -0.50 alignedtext
+906 799 moveto (pop=1) 35 14.00 -0.50 alignedtext
+906 783 moveto (peek=1) 41 14.00 -0.50 alignedtext
+end grestore
+end grestore
+
+%	node45 -> node47
+newpath 904 888 moveto
+904 879 905 870 905 862 curveto
+stroke
+newpath 903 862 moveto
+905 852 lineto
+908 862 lineto
+closepath
+gsave 0 setgray stroke grestore fill
+
+%	node50
+gsave 10 dict begin
+907 686 62 18 ellipse_path
+stroke
+gsave 10 dict begin
+907 687 moveto (DUPLICATE\(1,1\)) 104 14.00 -0.50 alignedtext
+end grestore
+end grestore
+
+%	node47 -> node50
+newpath 906 760 moveto
+907 744 907 726 907 713 curveto
+stroke
+newpath 905 714 moveto
+907 704 lineto
+910 714 lineto
+closepath
+gsave 0 setgray stroke grestore fill
+
+%	node52
+gsave 10 dict begin
+907 586 67 45 ellipse_path
+stroke
+gsave 10 dict begin
+907 611 moveto (LowPassFilter_6) 94 14.00 -0.50 alignedtext
+907 595 moveto (push=1) 41 14.00 -0.50 alignedtext
+907 579 moveto (pop=1) 35 14.00 -0.50 alignedtext
+907 563 moveto (peek=100) 55 14.00 -0.50 alignedtext
+end grestore
+end grestore
+
+%	node50 -> node52
+newpath 907 668 moveto
+907 661 907 652 907 643 curveto
+stroke
+newpath 905 642 moveto
+907 632 lineto
+910 642 lineto
+closepath
+gsave 0 setgray stroke grestore fill
+
+%	node53
+gsave 10 dict begin
+1061 586 69 45 ellipse_path
+stroke
+gsave 10 dict begin
+1061 611 moveto (HighPassFilter_6) 97 14.00 -0.50 alignedtext
+1061 595 moveto (push=1) 41 14.00 -0.50 alignedtext
+1061 579 moveto (pop=1) 35 14.00 -0.50 alignedtext
+1061 563 moveto (peek=100) 55 14.00 -0.50 alignedtext
+end grestore
+end grestore
+
+%	node50 -> node53
+newpath 932 669 moveto
+952 656 981 638 1005 622 curveto
+stroke
+newpath 1001 621 moveto
+1011 618 lineto
+1004 626 lineto
+closepath
+gsave 0 setgray stroke grestore fill
+
+%	node51
+gsave 10 dict begin
+954 486 114 18 ellipse_path
+stroke
+gsave 10 dict begin
+954 487 moveto (WEIGHTED_ROUND_ROBIN\(1,1\)) 207 14.00 -0.50 alignedtext
+end grestore
+end grestore
+
+%	node54
+gsave 10 dict begin
+915 387 44 45 ellipse_path
+stroke
+gsave 10 dict begin
+915 412 moveto (Adder_3) 48 14.00 -0.50 alignedtext
+915 396 moveto (push=1) 41 14.00 -0.50 alignedtext
+915 380 moveto (pop=2) 35 14.00 -0.50 alignedtext
+915 364 moveto (peek=2) 41 14.00 -0.50 alignedtext
+end grestore
+end grestore
+
+%	node51 -> node54
+newpath 947 468 moveto
+944 460 940 449 936 439 curveto
+stroke
+newpath 933 439 moveto
+932 429 lineto
+938 437 lineto
+closepath
+gsave 0 setgray stroke grestore fill
+
+%	node52 -> node51
+newpath 927 542 moveto
+932 532 937 522 941 512 curveto
+stroke
+newpath 938 512 moveto
+945 504 lineto
+943 514 lineto
+closepath
+gsave 0 setgray stroke grestore fill
+
+%	node53 -> node51
+newpath 1021 549 moveto
+1007 535 992 521 980 510 curveto
+stroke
+newpath 979 512 moveto
+973 504 lineto
+982 509 lineto
+closepath
+gsave 0 setgray stroke grestore fill
+
+%	node54 -> node6
+newpath 879 362 moveto
+854 345 821 326 797 318 curveto
+777 312 748 305 720 301 curveto
+stroke
+newpath 723 304 moveto
+713 300 lineto
+723 299 lineto
+closepath
+gsave 0 setgray stroke grestore fill
+
+%	node56
+gsave 10 dict begin
+621 62 60 45 ellipse_path
+stroke
+gsave 10 dict begin
+621 87 moveto (FloatPrinter_1) 80 14.00 -0.50 alignedtext
+621 71 moveto (push=0) 41 14.00 -0.50 alignedtext
+621 55 moveto (pop=1) 35 14.00 -0.50 alignedtext
+621 39 moveto (peek=1) 41 14.00 -0.50 alignedtext
+end grestore
+end grestore
+
+%	node55 -> node56
+newpath 621 144 moveto
+621 135 621 126 621 118 curveto
+stroke
+newpath 619 118 moveto
+621 108 lineto
+624 118 lineto
+closepath
+gsave 0 setgray stroke grestore fill
+endpage
+grestore
+%%PageTrailer
+%%EndPage: 1
+%%Trailer
+%%Pages: 1
+end
+restore
+%%EOF
