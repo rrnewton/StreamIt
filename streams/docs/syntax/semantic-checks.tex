@@ -38,7 +38,10 @@ parser correctly.
     of the work function.}
 \item Every filter must have a work function.
 \item Every stream object that is not a filter must have an init
-  function, but may have no other functions.
+  function, but may have no other functions.\footnote{This is
+    currently implicit in the language syntax.  The constraint and
+    syntax could both change due to reinitialization, or by adding
+    message handlers to composite streams.}
 \end{enumerate}
 
 \subsection{Control Flow and Initialization Code}
@@ -51,9 +54,6 @@ statements are sensitive to the order in which they are executed.
   \lstinline|loop| statements must be executed exactly once if they
   are allowed at all.  Every path of control through the
   initialization code must result in exactly one execution.
-\item For purposes of type-checking for pipelines, a data-flow
-  analysis must be able to determine the exact type of the pipeline at
-  each point in the initialization code.
 \item A data-flow analysis must be able to determine the number and
   sequence of phases, along with any intermediate code, for a phased
   filter.
@@ -63,37 +63,54 @@ statements are sensitive to the order in which they are executed.
 
 \section{Typing}
 
-\subsection{Streams}
+\subsection{Stream Connections}
 
 ``Match'' within this section means an \emph{exact} match in type;
 there is no implicit type promotion across tapes.
 
 \begin{enumerate}
-\item If the input type of a filter is \lstinline|void|, all of its
-  work functions must declare peek and pop rates of 0; if its output
-  type is \lstinline|void|, all of its work functions must have a push
-  rate of 0.
 \item For a pipeline, the input type must match the input type of the
   first child and the output type of the last child must match the
   output type of the pipeline.
 \item Within a pipeline, the output type of one child must match the
   input type of the next child.
-\item The input type of a split-join must match the input type of all
-  of its children.  If the input type is \lstinline|void|, the
-  splitter must be \lstinline|roundrobin(0)|.  Identical constraints
-  hold for the output.
+\item The input type of each of a split-join's children must be either
+  the input type of the split-join or \lstinline|void|.  Identical
+  constraints hold for the output.
 \item The output type of a feedback loop's loop stream must match the
-  input type of its body stream.  If this type is \lstinline|void|,
-  the input type of the feedback loop must also be \lstinline|void|
-  and the joiner must be \lstinline|roundrobin(0)|.  Otherwise, the
-  input type of the feedback loop must be either the same type as the
-  body input or \lstinline|void|.  If the feedback loop's input type
-  is \lstinline|void| but the input type of the body stream is not,
-  then the joiner must be a round-robin joiner that gives a zero
-  weight to the external input.  Identical constraints hold for the
-  output side of the feedback loop.
+  input type of its body stream.  The input type of the feedback loop
+  must be either the same type as the body input or \lstinline|void|.
+  Identical constraints hold for the output side of the feedback loop.
 \item Exactly one stream in the program has the stream type
   \lstinline|void->void|.  This stream must be named.
+\end{enumerate}
+
+\subsection{Implications of Stream Types}
+
+\begin{enumerate}
+\item The splitter of a split-join must be
+  \lstinline|roundrobin(0)| if the input type of the stream is
+  \lstinline|void|; it may not be \lstinline|roundrobin(0)| otherwise.
+  Identical constraints hold for the output.
+\item If a split-join has some children with \lstinline|void| inputs and
+  some children with non-\lstinline|void| inputs, the splitter must be
+  a round-robin splitter with a declared weight of 0 for each of the
+  \lstinline|void| children.  Identical constraints hold for the
+  output and the joiner.
+\item The splitter and joiner of a feedback loop must accomodate
+  exactly two children.  If the body and loop children have
+  non-\lstinline|void| input and output types, then the joiner must be
+  equivalent to \lstinline|roundrobin(0,1)| if the input of the loop
+  is \lstinline|void|, and similarly for the splitter and the output.
+\item If the input type of a feedback loop's body child is
+  \lstinline|void|, then the loop input type and loop child output
+  type must also be \lstinline|void|, and the joiner must be
+  \lstinline|roundrobin(0)|.  Identical constraints hold for the loop
+  output and splitter.
+\item If the input type of a filter is \lstinline|void|, all of its
+  work functions must declare peek and pop rates of 0; if its output
+  type is \lstinline|void|, all of its work functions must have a push
+  rate of 0.
 \end{enumerate}
 
 \subsection{Statements and Expressions}
@@ -143,6 +160,18 @@ there is no implicit type promotion across tapes.
   be promotable to the type of the left-hand side of the statement.
 \end{enumerate}
 
+\subsection{Using Names As Types}
+
+\begin{enumerate}
+\item A bare name may be used as a type in a variable declaration,
+  parameter list, stream type, and elsewhere.  The name must match the
+  name of a declared structure type.
+\item A bare name may be used as the target type of a
+  \lstinline|Portal| type.  The name must match the name of a declared
+  stream type; the target of a portal may not be a primitive type or
+  structure.
+\end{enumerate}
+
 \section{Naming}
 
 \subsection{Object Names}
@@ -174,6 +203,14 @@ there is no implicit type promotion across tapes.
   of  the the stream.
 \item A variable must be declared before it is used.
 \item A stream parameter may not be assigned to or otherwise modified.
+\item A function call must have a name matching a phase or helper
+  function in the current filter, and a parameter list matching the
+  parameter list of the target function.
+\item A message-sending statement must name a portal variable on the
+  left-hand side of the ``.'', and a message name on the right-hand
+  side.  The message name must match a message in the target type of
+  the portal, and the statement must have a parameter list matching
+  the parameter list of the message target.
 \end{enumerate}
 
 \section{Warnings}
@@ -195,6 +232,21 @@ questionable code:
   issued.
 \item A warning should be issued if a phase function is declared which
   is not used.
+\item A warning may be issued if the compiler cannot verify that
+  splitters and joiners for split-joins can accomodate the exact
+  number of children present.  Note that this may only be possible
+  with pattern-matching program text, or by fully unrolling init
+  functions, since the following code is legitimate but data-flow
+  wouldn't find an exact number of children:
+
+\begin{lstlisting}{}
+float->float splitjoin FiveChildren {
+  split roundrobin(1,2,3,4,5);
+  for (int i = 0; i < 5; i++)
+    add float->float filter { ... };
+  join roundrobin(5,4,3,2,1);
+}
+\end{lstlisting}
 \end{enumerate}
 
 \section{Temporary Checks}
