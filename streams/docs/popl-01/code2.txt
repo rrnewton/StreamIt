@@ -1,0 +1,94 @@
+class Oscilloscope extends Stream {
+   void init() {
+      add(new SplitJoin() {
+         void init() {
+            add (new ReadFromChannelA());
+            add (new ReadFromChannelB());
+            round_robin();
+      }});
+      add(FrequencySelect());
+      add(new SplitJoin() {
+         void init() {
+            round_robin();
+            for(int i=0; i<2; i++)
+               add(new Stream() {
+                  void init() {            
+                     if(autoOn) {
+                        Add(new AutoAdjust());  
+                     }
+                     Add(new AdjustAmplitude());  
+                     Add(new AdjustOffset());  
+               }});  
+             round_robin();
+       }});
+      
+      add(new SplitJoin() {
+         void init() {
+            duplicate();
+            add(new FindTrigger());
+            add(new Stream() {
+               void init() { 
+                  add(new SelectOutput());
+                  add(new DisplayBuffer());
+            }});
+      }});
+   }
+}
+
+Class AdjustAmplitude extends Filter {
+   Channel input = new DoubleChannel();
+   Channel output = new DoubleChannel();
+   double amp;  
+
+   void init() {
+      amp = 1.0;
+   }
+
+   void work() {
+      output.push(input.pop() * amp);
+   }
+
+   void adjust_amplitude(double x) {
+      amp = x;
+   }
+}
+
+
+Class AutoAdjust extends Filter {
+   Channel input = new DoubleChannel();
+   Channel output = new DoubleChannel();
+   double curr_ave, last_ave;  
+   double curr_lo, curr_hi, last_range;  
+
+   void init() {
+      curr_ave = 0.0;
+      last_ave = 0.0;
+      curr_hi =  0.5;
+      curr_lo = -0.5;
+      last_range = 1.0;
+   }
+
+   void work() {
+       double val;
+       val = input.pop();
+       curr_ave = curr_ave*0.9 + val*0.1;
+       curr_lo = min(0.9*curr_lo, val);
+       curr_hi = max(0.9*curr_hi, val);
+       if(abs(curr_ave + last_ave) > OFFSET_TRASHOLD) {
+          send(adjust_offset(-curr_ave));
+	  last_ave = -curr_ave;
+       }
+       if(curr_hi - curr_lo + last_range > AMPLIDUTE_HIGH_TRASHOLD) {
+          send(adjust_amplidude(curr_hi - curr_lo));
+	  last_range = curr_hi - curr_lo;
+       }
+   }
+
+   void adjust_amplitude(double x) {
+       last_range = x;
+   }
+
+   void adjust_offset(double x) {
+       last_ave = x;
+   }
+}
