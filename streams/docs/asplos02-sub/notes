@@ -16,6 +16,7 @@ FIR-fine        812         86.1          1094.9     7/29    David      Done
 
 FFT(old)        304         63            ?          7/24    Bill       Mostly done (for N=64; could do others too)
 MatrixMultiply  15.4        42.5          161.6      7/26    Andrew     Not looked at.
+BitonicSort     0           63.94         2664.4     7/29    David      Done
 Lincoln Labs    ?           ?             ?          ?       ?          Stuck in frontend?
 MP3             ?           ?             ?          ?       ?          Not looked at.
 CRC             ?           ?             ?          ?       ?          Not looked at.
@@ -23,7 +24,6 @@ HDTV            ?           ?             ?          ?       ?          Needs fu
 perftest4       ?           ?             ?          ?       ?          Not looked at.
 Lattice         ?           ?             ?          ?       ?          Not looked at.
 MergeSort       ?           ?             ?          ?       ?          Would need iterative rewrite.
-BitonicSort     ?           ?             ?          ?       ?          Could be looked at.
 FIR             ?           ?             ?          ?       ?          Doesn't exist, but why not just do a plain FIR?
 
 Comparison Numbers
