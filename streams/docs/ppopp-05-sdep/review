@@ -1,8 +1,8 @@
-Reviewer 1
+*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=
 
-Classification: C
+First reviewer's review:
 
- >>> Summary of the submission <<<
+          >>> Summary of the submission <<<
 
 This paper presents a way of reasoning about time across distributed
 components, and then shows how to integrate this into the StreamIt
@@ -36,13 +36,11 @@ you introduce the notation [n:m], but you never explicitly say:
 
 Typo: Section 4.1, ``...of the stream graph (see [Table] 1).''
 
----------------------------------------------------------------------------
+*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*
 
-Reviewer 2
+Second reviewer's review:
 
-Classification: C
-
-   >>> Summary of the submission <<<
+          >>> Summary of the submission <<<
 
 The authors define a stream dependence function, SDEP, which describes
 the dependence between actor firings in a stream graph, and calculate
@@ -59,7 +57,7 @@ the portal, and compare the two in terms of readability and efficiency.
 
 The paper provides a language construct for precise event handling, and
 defines the semantics using SDEP. However, it seems to me that
-Definition 2 in 4.1 has two crucial flaws.
+Definition 2 in 4.1 has two drawbacks.
 
 First, consider the case study in Section 4.2, The message from D to
 RFtoIF must fall at a logical packet boundary, since the FFT would
@@ -67,21 +65,31 @@ otherwise muddle the spectrum of two different frequency bands.
 Although the authors mention (in the second paragraph of 4.2) that
 "messages sent from the detectors to RFtoIF are guaranteed to arrive
 only at iterations that are a multiple of 64", Definition 2 does not
-give such a guarantee. From the definition, we only get
- M(D,RFtoIF,4,6,n) >= SDEP B<-A (n+4)
-and
- M(D,RFtoIF,4,6,n) <= SDEP B<-A (n+6),
-and the definition does not impose at all that it is a multiple of 64.
+give such a guarantee. From Definition 2 we get the following.
+
+ The message handler can be invoked in RFtoIF immediately
+ after the work function of RFtoIF has fired M(D,RFtoIF,4,6,n) times,
+ where
+  M(D,RFtoIF,4,6,n) >= SDEP RFtoIF<-D (n+4)
+ and 
+  M(D,RFtoIF,4,6,n) <= SDEP RFtoIF<-D (n+6).
+
+Since SDEP RFtoIF <-D (m) = 64*ceil(m/32), for n=27 we get
+64<=M(D,RFtoIF,4,6,27)<=128. Thus, when the message is sent during the
+27th invocation of D's work function, the message handler of RFtoIF to
+set a new frequency can be invoked immediately after the work function
+of RFtoIF has fired, say, 65 times, not a multiple of 64.
 
 Second, consider an example of messaging using Figure 1, Assume that
 messages MX are sent from E to A *and* messages MY are sent from B to A.
 Then, the delivery of MX is defined using SEP A <- E (n), while the
-delivery of MY is defined using SEP A <- B (n). However, as you
-mention in the last paragraph of Section 3, the pull scheele for
-calculating SEP A<-E is different from the schedule for calculating SEP
-A<-B. When multiple nodes send messages in a stream graph, can you
-construct a schedule satisfying all the delivery constraints defined by
-Definition 2?
+delivery of MY is defined using SEP A <- B (n). However, as you mention
+in the last paragraph of Section 3, the pull scheele for calculating SEP
+A<-E is different from the schedule for calculating SEP A<-B. When
+multiple nodes send messages in a stream graph, can you construct a
+schedule satisfying all the delivery constraints defined by Definition
+2? Unless I see the question dealt with in the paper and answered
+affirmatively, I do not think that the language design is feasible.
 
 Detailed comments
 
@@ -94,7 +102,7 @@ goes for the second equation.
 think that SDEP A<-B (1) = 5.
 
 4.1 Definition 2. In Case 2,
-  "SDEP A<-B (n+k_1)" -> "SDEP B<-A (n+k_1)"
+  "SDEP A<-B (n+k_1)" -> "SDEP B<-A (n+k_1)" 
   "SDEP A<-B (n+k_2)" -> "SDEP B<-A (n+k_2)"
 
 4.2 Figure 4. Where is the latency rage [4:6] specified in the code?
@@ -111,13 +119,11 @@ describe (perhaps in a separate section rather than here) things like
 how the portal is implemented in the system you used in 4.4 and what
 code is generated to satisfy the latency range specified.
 
----------------------------------------------------------------------------
+*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*
 
-Reviewer 3
+Third reviewer's review:
 
-Classification: D
-
-         >>> Summary of the submission <<<
+          >>> Summary of the submission <<<
 
 This paper presents a notion of dependence for stream-based programs. This
 dependence notion captures the number of times one actor must execute in order
@@ -137,7 +143,7 @@ exploit in an optimizing compiler.
 
 I had great difficulty understanding this paper. The paper is extremely vague,
 the target language and key concepts are never clearly defined, and the authors
-make use of domain terminology that I'm not familiar with.
+make use of domain terminology that I'm not familiar with. 
 
 Specific comments:
 
@@ -153,12 +159,12 @@ At a more fine-grained level, terms such as "actor" , "I/O rate" and the
 
 The authors also don't present their language feature very clearly. Despite a
 lot of informal discussion in the introduction and in section 4, the precise
-syntax of this feature does not become clear until the code example.
+syntax of this feature does not become clear until the code example. 
 
 Minor comments:
 
  - Figure 1: the labels at the top and bottom of each node are not adequately
-explained.
+explained. 
 
  - Algorithm 1 has several problems. The recursive call to pullSchedule only
 has one actual parameter, yet the procedure itself has 2 parameters. Moreover,
@@ -166,20 +172,18 @@ the auxiliary procedure simulateCurrentPhase(X) is not explained, and the
 semantics of the "o" operator are left unspecified. The two occurrences of "o"
 look slightly different, which is probably the result of a typo.
 
- - section 4.2: What does the term FFT refer to?
+ - section 4.2: What does the term FFT refer to? 
 
  - section 4.3: What is a vocoder?
 
 Summary: the paper is poorly organized, vague, and is not accessible enough to
 be of use to the general PLDI audience.
 
----------------------------------------------------------------------------
+*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*
 
-Reviewer 4
+Fourth reviewer's review:
 
-Classification: B
-
- >>> Summary of the submission <<<
+          >>> Summary of the submission <<<
 
 The paper defines SDEP (Stream Dependence Function), which qualifies the
 dependence between one actor in a Cyclo-static Synchronous Data Flow (SDF)
@@ -256,3 +260,6 @@ calculate the last interation of an actor which affects another." What is
 "another" referring to? "..last invocation that was relevant." Is this the
 last invocation of the actor in question, or one of its predecessors? Being
 a bit more precise might help to clarify the connection here.
+
+*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*
+
