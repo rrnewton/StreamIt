@@ -75,7 +75,7 @@ observe that the filter can execute so long as it does not peek beyond
 the $x$'th item on the input tape.  After the $n$'th execution, it has
 popped $n$ items, peeked up to $n + (peek_A - pop_A)$, and popped $2 *
 n$ items.  Thus, it can execute $n = floor((x - (peek_A - pop_A)) /
-pop_A))$ times, leaving the following expression for $f_AA(x)$:
+pop_A))$ times, leaving the following expression for $f_{AA}(x)$:
 \begin{eqnarray*}
 f_{AA}(x)&= push_A*floor((x-(peek_A-pop_A))/pop_A) if x \ge (peek_A-pop_A) \\
          &= push_A*floor((x-(peek_A-pop_A))/pop_A) if x <  (peek_A-pop_A)
@@ -121,11 +121,11 @@ g_{AD} = g_{AB} \circ g_{CD}
 \begin{verbatim}
 Here I want a splitjoin diagram, labelled as:
 
-    A1 ... An 
+    B1 ... Bn 
   /           \
 S               J
   \           /
-    B1 ... Bn
+    A1 ... An
 
 \end{verbatim}
 \vspace{-12pt}
@@ -134,9 +134,29 @@ S               J
 \vspace{-12pt}
 \end{figure}
 
-We now derive $f$ and $g$ in the case of a SplitJoin, as pictured in .
-Figure {\ref:splitjoin}.  There are two sets of transfer functions to
-Figure {\ref:splitjoin}define in 
+We now derive $f$ and $g$ in the case of a SplitJoin, as pictured in
+Figure {\ref:splitjoin}.  Since the splitter has two output tapes and
+the joiner has two input tapes, we need to modify slightly our
+definitions of $f$ and $g$:
+
+\begin{itemize}
+
+\item Given that there are $x$ items on the input tape of splitter
+$S$, then $f_{SAB}(x)$ is a pair of values $(y_1, y_2)$ where $y_1$
+and $y_2$ are the maximum number of items on the output tapes of $A$
+and $B$, respectively.  That is, $f_{SAB}(x) = max( (out_A, out_B) |
+in_S = x)$ where max operates component-wise.
+
+\item Given that there are $x$ items on the output tape of joiner
+$J$, then $g_{ABJ}(x)$ is a pair of values $(y_1, y_b2)$ where $y_1$
+and $y_2$ are the minimum number of items on the input tapes of $A$
+and $B$, respectively.  That is, $g_{SAB}(x) = min( (in_A, in_B) |
+in_S = x)$ where min operates component-wise.
+
+\end{itemize}
+
+{\bf Round robin.}  We first give derivations for round-robin
+splitters and joiners.  For a split, 
 
 \begin{verbatim}
 
