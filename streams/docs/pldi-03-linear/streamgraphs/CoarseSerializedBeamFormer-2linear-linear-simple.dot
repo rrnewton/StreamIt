@@ -1,0 +1,314 @@
+digraph streamit {
+subgraph cluster_node1 {
+ label="CoarseSerializedBeamFormer";
+subgraph cluster_node2 {
+ label="SplitJoin";
+node3 [ label="NULL_SJ(0,0,0,0,0,0,0,0,0,0,0,0)" ]
+node4 [ label="WEIGHTED_ROUND_ROBIN(2,2,2,2,2,2,2,2,2,2,2,2)" ]
+subgraph cluster_node5 {
+ label="Pipeline";
+node6 [ label="InputGenerate" ]
+subgraph cluster_node7 {
+ color=pink2;
+ style=filled;
+ label="LinearWrapper\n";
+node8 [ color=cornflowerblue, style=filled, label="Decimator" ]
+node9 [ color=cornflowerblue, style=filled, label="CoarseBeamFirFilter" ]
+node8 -> node9
+node10 [ color=cornflowerblue, style=filled, label="Decimator" ]
+node9 -> node10
+node11 [ color=cornflowerblue, style=filled, label="CoarseBeamFirFilter" ]
+node10 -> node11
+}
+node6 -> node8
+}
+node3 -> node6
+node11 -> node4
+subgraph cluster_node12 {
+ label="Pipeline";
+node13 [ label="InputGenerate" ]
+subgraph cluster_node14 {
+ color=pink2;
+ style=filled;
+ label="LinearWrapper\n";
+node15 [ color=cornflowerblue, style=filled, label="Decimator" ]
+node16 [ color=cornflowerblue, style=filled, label="CoarseBeamFirFilter" ]
+node15 -> node16
+node17 [ color=cornflowerblue, style=filled, label="Decimator" ]
+node16 -> node17
+node18 [ color=cornflowerblue, style=filled, label="CoarseBeamFirFilter" ]
+node17 -> node18
+}
+node13 -> node15
+}
+node3 -> node13
+node18 -> node4
+subgraph cluster_node19 {
+ label="Pipeline";
+node20 [ label="InputGenerate" ]
+subgraph cluster_node21 {
+ color=pink2;
+ style=filled;
+ label="LinearWrapper\n";
+node22 [ color=cornflowerblue, style=filled, label="Decimator" ]
+node23 [ color=cornflowerblue, style=filled, label="CoarseBeamFirFilter" ]
+node22 -> node23
+node24 [ color=cornflowerblue, style=filled, label="Decimator" ]
+node23 -> node24
+node25 [ color=cornflowerblue, style=filled, label="CoarseBeamFirFilter" ]
+node24 -> node25
+}
+node20 -> node22
+}
+node3 -> node20
+node25 -> node4
+subgraph cluster_node26 {
+ label="Pipeline";
+node27 [ label="InputGenerate" ]
+subgraph cluster_node28 {
+ color=pink2;
+ style=filled;
+ label="LinearWrapper\n";
+node29 [ color=cornflowerblue, style=filled, label="Decimator" ]
+node30 [ color=cornflowerblue, style=filled, label="CoarseBeamFirFilter" ]
+node29 -> node30
+node31 [ color=cornflowerblue, style=filled, label="Decimator" ]
+node30 -> node31
+node32 [ color=cornflowerblue, style=filled, label="CoarseBeamFirFilter" ]
+node31 -> node32
+}
+node27 -> node29
+}
+node3 -> node27
+node32 -> node4
+subgraph cluster_node33 {
+ label="Pipeline";
+node34 [ label="InputGenerate" ]
+subgraph cluster_node35 {
+ color=pink2;
+ style=filled;
+ label="LinearWrapper\n";
+node36 [ color=cornflowerblue, style=filled, label="Decimator" ]
+node37 [ color=cornflowerblue, style=filled, label="CoarseBeamFirFilter" ]
+node36 -> node37
+node38 [ color=cornflowerblue, style=filled, label="Decimator" ]
+node37 -> node38
+node39 [ color=cornflowerblue, style=filled, label="CoarseBeamFirFilter" ]
+node38 -> node39
+}
+node34 -> node36
+}
+node3 -> node34
+node39 -> node4
+subgraph cluster_node40 {
+ label="Pipeline";
+node41 [ label="InputGenerate" ]
+subgraph cluster_node42 {
+ color=pink2;
+ style=filled;
+ label="LinearWrapper\n";
+node43 [ color=cornflowerblue, style=filled, label="Decimator" ]
+node44 [ color=cornflowerblue, style=filled, label="CoarseBeamFirFilter" ]
+node43 -> node44
+node45 [ color=cornflowerblue, style=filled, label="Decimator" ]
+node44 -> node45
+node46 [ color=cornflowerblue, style=filled, label="CoarseBeamFirFilter" ]
+node45 -> node46
+}
+node41 -> node43
+}
+node3 -> node41
+node46 -> node4
+subgraph cluster_node47 {
+ label="Pipeline";
+node48 [ label="InputGenerate" ]
+subgraph cluster_node49 {
+ color=pink2;
+ style=filled;
+ label="LinearWrapper\n";
+node50 [ color=cornflowerblue, style=filled, label="Decimator" ]
+node51 [ color=cornflowerblue, style=filled, label="CoarseBeamFirFilter" ]
+node50 -> node51
+node52 [ color=cornflowerblue, style=filled, label="Decimator" ]
+node51 -> node52
+node53 [ color=cornflowerblue, style=filled, label="CoarseBeamFirFilter" ]
+node52 -> node53
+}
+node48 -> node50
+}
+node3 -> node48
+node53 -> node4
+subgraph cluster_node54 {
+ label="Pipeline";
+node55 [ label="InputGenerate" ]
+subgraph cluster_node56 {
+ color=pink2;
+ style=filled;
+ label="LinearWrapper\n";
+node57 [ color=cornflowerblue, style=filled, label="Decimator" ]
+node58 [ color=cornflowerblue, style=filled, label="CoarseBeamFirFilter" ]
+node57 -> node58
+node59 [ color=cornflowerblue, style=filled, label="Decimator" ]
+node58 -> node59
+node60 [ color=cornflowerblue, style=filled, label="CoarseBeamFirFilter" ]
+node59 -> node60
+}
+node55 -> node57
+}
+node3 -> node55
+node60 -> node4
+subgraph cluster_node61 {
+ label="Pipeline";
+node62 [ label="InputGenerate" ]
+subgraph cluster_node63 {
+ color=pink2;
+ style=filled;
+ label="LinearWrapper\n";
+node64 [ color=cornflowerblue, style=filled, label="Decimator" ]
+node65 [ color=cornflowerblue, style=filled, label="CoarseBeamFirFilter" ]
+node64 -> node65
+node66 [ color=cornflowerblue, style=filled, label="Decimator" ]
+node65 -> node66
+node67 [ color=cornflowerblue, style=filled, label="CoarseBeamFirFilter" ]
+node66 -> node67
+}
+node62 -> node64
+}
+node3 -> node62
+node67 -> node4
+subgraph cluster_node68 {
+ label="Pipeline";
+node69 [ label="InputGenerate" ]
+subgraph cluster_node70 {
+ color=pink2;
+ style=filled;
+ label="LinearWrapper\n";
+node71 [ color=cornflowerblue, style=filled, label="Decimator" ]
+node72 [ color=cornflowerblue, style=filled, label="CoarseBeamFirFilter" ]
+node71 -> node72
+node73 [ color=cornflowerblue, style=filled, label="Decimator" ]
+node72 -> node73
+node74 [ color=cornflowerblue, style=filled, label="CoarseBeamFirFilter" ]
+node73 -> node74
+}
+node69 -> node71
+}
+node3 -> node69
+node74 -> node4
+subgraph cluster_node75 {
+ label="Pipeline";
+node76 [ label="InputGenerate" ]
+subgraph cluster_node77 {
+ color=pink2;
+ style=filled;
+ label="LinearWrapper\n";
+node78 [ color=cornflowerblue, style=filled, label="Decimator" ]
+node79 [ color=cornflowerblue, style=filled, label="CoarseBeamFirFilter" ]
+node78 -> node79
+node80 [ color=cornflowerblue, style=filled, label="Decimator" ]
+node79 -> node80
+node81 [ color=cornflowerblue, style=filled, label="CoarseBeamFirFilter" ]
+node80 -> node81
+}
+node76 -> node78
+}
+node3 -> node76
+node81 -> node4
+subgraph cluster_node82 {
+ label="Pipeline";
+node83 [ label="InputGenerate" ]
+subgraph cluster_node84 {
+ color=pink2;
+ style=filled;
+ label="LinearWrapper\n";
+node85 [ color=cornflowerblue, style=filled, label="Decimator" ]
+node86 [ color=cornflowerblue, style=filled, label="CoarseBeamFirFilter" ]
+node85 -> node86
+node87 [ color=cornflowerblue, style=filled, label="Decimator" ]
+node86 -> node87
+node88 [ color=cornflowerblue, style=filled, label="CoarseBeamFirFilter" ]
+node87 -> node88
+}
+node83 -> node85
+}
+node3 -> node83
+node88 -> node4
+}
+subgraph cluster_node89 {
+ label="SplitJoin";
+node90 [ label="DUPLICATE(1,1,1,1)" ]
+node91 [ label="WEIGHTED_ROUND_ROBIN(1,1,1,1)" ]
+subgraph cluster_node92 {
+ label="Pipeline";
+subgraph cluster_node93 {
+ color=pink2;
+ style=filled;
+ label="LinearWrapper\n";
+node94 [ color=cornflowerblue, style=filled, label="Beamform" ]
+node95 [ color=cornflowerblue, style=filled, label="CoarseBeamFirFilter" ]
+node94 -> node95
+}
+node96 [ label="Magnitude" ]
+node95 -> node96
+node97 [ color=cornflowerblue, style=filled, label="Detector" ]
+node96 -> node97
+}
+node90 -> node94
+node97 -> node91
+subgraph cluster_node98 {
+ label="Pipeline";
+subgraph cluster_node99 {
+ color=pink2;
+ style=filled;
+ label="LinearWrapper\n";
+node100 [ color=cornflowerblue, style=filled, label="Beamform" ]
+node101 [ color=cornflowerblue, style=filled, label="CoarseBeamFirFilter" ]
+node100 -> node101
+}
+node102 [ label="Magnitude" ]
+node101 -> node102
+node103 [ color=cornflowerblue, style=filled, label="Detector" ]
+node102 -> node103
+}
+node90 -> node100
+node103 -> node91
+subgraph cluster_node104 {
+ label="Pipeline";
+subgraph cluster_node105 {
+ color=pink2;
+ style=filled;
+ label="LinearWrapper\n";
+node106 [ color=cornflowerblue, style=filled, label="Beamform" ]
+node107 [ color=cornflowerblue, style=filled, label="CoarseBeamFirFilter" ]
+node106 -> node107
+}
+node108 [ label="Magnitude" ]
+node107 -> node108
+node109 [ color=cornflowerblue, style=filled, label="Detector" ]
+node108 -> node109
+}
+node90 -> node106
+node109 -> node91
+subgraph cluster_node110 {
+ label="Pipeline";
+subgraph cluster_node111 {
+ color=pink2;
+ style=filled;
+ label="LinearWrapper\n";
+node112 [ color=cornflowerblue, style=filled, label="Beamform" ]
+node113 [ color=cornflowerblue, style=filled, label="CoarseBeamFirFilter" ]
+node112 -> node113
+}
+node114 [ label="Magnitude" ]
+node113 -> node114
+node115 [ color=cornflowerblue, style=filled, label="Detector" ]
+node114 -> node115
+}
+node90 -> node112
+node115 -> node91
+}
+node4 -> node90
+node116 [ label="FloatPrinter" ]
+node91 -> node116
+}
+}

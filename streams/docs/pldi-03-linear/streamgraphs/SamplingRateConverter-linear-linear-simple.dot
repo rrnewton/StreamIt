@@ -1,0 +1,19 @@
+digraph streamit {
+subgraph cluster_node1 {
+ label="SamplingRateConverter";
+node2 [ label="SampledSource" ]
+subgraph cluster_node3 {
+ color=pink2;
+ style=filled;
+ label="LinearWrapper\n";
+node4 [ color=cornflowerblue, style=filled, label="Expander" ]
+node5 [ color=cornflowerblue, style=filled, label="LowPassFilter" ]
+node4 -> node5
+node6 [ color=cornflowerblue, style=filled, label="Compressor" ]
+node5 -> node6
+}
+node2 -> node4
+node7 [ label="FloatPrinter" ]
+node6 -> node7
+}
+}
