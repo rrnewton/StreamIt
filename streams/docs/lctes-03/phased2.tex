@@ -2,8 +2,13 @@
 \label{chpt:phased}
 
 \begin{figure}[t]
-\psfig{figure=pseudocode4.eps,width=3in}
-\caption{Phased Scheduling Algorithm\protect\label{fig:alg}}
+\psfig{figure=pseudocode5.eps,width=3.5in}
+\caption{Phased Scheduling Algorithm\protect\label{fig:phasealg}}
+\end{figure}
+
+\begin{figure}[t]
+\psfig{figure=pseudocode6.eps,width=3.5in}
+\caption{Algorithm to detect granularity of feedback loop.\protect\label{fig:feedalg}}
 \end{figure}
 
 A schedule for a given hierarchical node of a {\StreamIt} program is a
@@ -20,15 +25,15 @@ multiplicities calculated in the previous section, while the first
 condition is one that we must respect when choosing an ordering for
 the nodes.
 
-Our phased scheduling algorithm, shown in Figure~\ref{fig:alg},
+Our phased scheduling algorithm, shown in Figure~\ref{fig:phasealg},
 operates in a hierarchical fashion.  That is, it constructs a schedule
 for a given pipeline, splitjoin, or feedbackloop as a sequence of the
 schedules of its children.  A schedule is represented as a sequence of
-phases.  In the base case of a filter, these phases are given by the
-stream graph (with one small modification, described below), while at
-hierarchical nodes they are computed by our algorithm.  To schedule an
-entire StreamIt program, our algorithm should be applied as a
-post-order traversal of the stream graph.
+phases.  In the base case of a filter, these phases are specified by
+the StreamIt program (with one small modification, described below),
+while at hierarchical nodes they are computed by our algorithm.  To
+schedule an entire StreamIt program, our algorithm should be applied
+as a post-order traversal of the stream graph.
 
 Intuitively, our algorithm is based on the observation that a
 hierarchical stream displays cyclic behavior as it executes its
@@ -49,24 +54,26 @@ scheduling technique, see~\cite{karczma-thesis}.
 
 \subsection{Algorithm Details}
 
-We now consider in more detail the pseudocode in Figure~\ref{fig:alg}.
-The algorithm inputs a Stream {\tt s} and returns a sequences of
-phases that represent the schedule for that stream.  It also inputs
-two additional parameters: {\tt maxPhases}, which specifies the
-maximum number of phases in the resulting schedule, and {\tt mode},
-which indicates whether we are scheduling for the initial or
-steady-state epoch.  The algorithm starts by assembling a series of
+We now consider in more detail the pseudocode in
+Figure~\ref{fig:phasealg}; refer to Figure~\ref{fig:sjex} for an
+example.  The algorithm inputs a Stream {\tt s} and returns a
+sequences of phases that represent the schedule for that stream.  It
+also inputs two additional parameters: {\tt maxPhases}, which
+specifies the maximum number of phases in the resulting schedule, and
+{\tt mode}, which indicates whether we are scheduling for the initial
+or steady-state epoch.  The algorithm starts by assembling a series of
 fine-grained phases, each of which corresponds to a push schedule as
 built by the {\tt pushSchedule} routine.
 
-The {\tt pushSchedule} routine simulates a push schedule until at
-least one output is produced.  A push schedule is one in which
-downstream nodes are fired as much as possible before upstream nodes
-are considered.  The routine starts with the entrance node of the
-stream, {\it i.e.,} the first child of a pipeline, the splitter of a
-splitjoin, or the joiner of a feedbackloop.  It then pushes live items
-as far forward as possible, only executing the entrance node again if
-the exit node could not fire.  
+The {\tt pushSchedule} routine simulates a push schedule until the
+bottom node is fired at least once (in most cases, this will
+correspond to an output being produced).  A push schedule is one in
+which downstream nodes are fired as much as possible before upstream
+nodes are considered.  The routine starts with the entrance node of
+the stream, {\it i.e.,} the first child of a pipeline, the splitter of
+a splitjoin, or the joiner of a feedbackloop.  It then pushes live
+items as far forward as possible, only executing the entrance node
+again if the exit node could not fire.
 
 There are two subtleties in the {\tt pushSchedule} procedure.  First,
 note that it always flushes extra items from the stream: the exit node
@@ -94,7 +101,7 @@ the filter can return the buffer to this state by firing once with
 $\mt{peek}$ items on the channel.
 
 Once it has gathered the list of maximally fine-grained phases, the
-{\t pushSchedule} algorithm makes two modifications.  First, it
+{\tt pushSchedule} algorithm makes two modifications.  First, it
 combines some adjacent phases so that only {\tt maxPhases} are
 returned.  Combination works simply by concatanating the sequence of
 child executions from the given phases.  Second, even if no phases are
@@ -104,7 +111,7 @@ attempt to provide a canonical form for a given series of executions,
 so that phases with the same form can be compressed in the resulting
 schedule~(see Section~\ref{sec:schedrep}).
 
-Note that the pseudocode given in Figure~\ref{fig:alg} specifies only
+Note that the pseudocode given in Figure~\ref{fig:phasealg} specifies only
 the behavior of the algorithm, rather than the implementation.  In our
 implementation, we avoid symbolic execution of the entire steady state
 by calculating, from the bottom-up, the number of node firings that
@@ -188,7 +195,7 @@ be constructed with the following calls:
 That is, a single appearance schedule is the same as a phased schedule
 with a single phase, while a minimum latency schedule is a phased
 schedule with an unlimited number of phases.  Other values of the {\tt
-maxPhases} parameter indicate a compromise between these two extremes.
+maxPhases} parameter indicate compromises between these two extremes.
 Also, note that different levels of granularity could be applied to
 different streams in the same graph, depending on the constraints; the
 algorithm does not depend on the granularity of the children when it
@@ -196,7 +203,7 @@ is scheduling a parent node.
 
 \begin{figure}[t]
 \begin{center}
-\psfig{figure=gsmfl.eps,width=2.2in}
+\psfig{figure=gsmfl.eps,width=1.8in}
 \caption{Tightly coupled feedback loop from our GSM benchmark.\protect\label{fig:gsm}}
 \end{center}
 \end{figure}
@@ -222,22 +229,21 @@ streams is too high, then a node could deadlock waiting for its own
 (upcoming) output to propagate through the loop.  For example, in our
 GSM benchmark, there is a tightly constrainted feedback loop (see
 Figure~\ref{fig:gsm}).  While it is impossible to schedule this loop
-with a single appearance schedule, a minimum latency schedule
-(containing 4 phases) results in a legal ordering
-(see~Figure~\ref{fig:gsm-phases}).
+with a single appearance schedule, a minimum latency schedule results
+in a legal ordering (see~Figure~\ref{fig:gsm-phases}).
 
-Figure~\ref{fig:alg} provides an algorithm for calculating the minimum
-number of phases that are required to schedule a feedback loop.  The
-routine's functionality is similar to the phased scheduler, except for
-one key difference: the joiner is executed as much as possible before
-the items that it pushes are propagated around the loop.  This ensures
-that the reshuffling step of the phased scheduling algorithm will be
-legal, since no element in the schedule will depend on items that it
-produced at an earlier time.  Note that the {\tt phasedSchedule}
-algorithm gives an undefined result if a given loop is impossible to
-schedule with the requested number of phases; thus, {\tt
-phasesForFeedback} should always be called first to see how many
-phases are needed.
+Figure~\ref{fig:feedalg} provides an algorithm for calculating the
+minimum number of phases that are required to schedule a feedback
+loop.  The routine's functionality is similar to the phased scheduler,
+except for one key difference: the joiner is executed as much as
+possible before the items that it pushes are propagated around the
+loop.  This ensures that the reshuffling step of the phased scheduling
+algorithm will be legal, since no element in the schedule will depend
+on items that it produced earlier in the same phase.  Note that the
+{\tt phasedSchedule} algorithm gives an undefined result if a given
+loop is impossible to schedule with the requested number of phases;
+thus, {\tt phasesForFeedback} should always be called first to see how
+many phases are needed.
 
 \subsection{Schedule Representation}
 \label{sec:schedrep}
