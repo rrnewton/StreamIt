@@ -73,9 +73,9 @@ technique would be {\it time multiplexing} where we run one filter at
 a time on the processor.  Load balancing is not an issue and the
 memory interface provides synchronization.  Problems arise if we
 target a multiprocessor.  Time multiplexing leads to long latency,
-lots of memory traffic (possibly with bad cache behavior), and it
-would require data-parallel filters for full utilization with the
-filters being spread across the entire chip.
+lots of memory traffic (possibly with bad cache behavior), and the
+utilization would depend on the presence of data-parallel filters that
+could be spread across the chip.
 
 A second approach would be to run all the filters in parallel, each on
 its own tile.  We call this {\it space multiplexing}.  Our first 
