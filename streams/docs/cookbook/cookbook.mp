@@ -1,7 +1,7 @@
 %
 % cookbook.mp: MetaPost diagrams for StreamIt Cookbook
 % David Maze <dmaze@cag.lcs.mit.edu>
-% $Id: cookbook.mp,v 1.7 2003-03-10 21:32:28 thies Exp $
+% $Id: cookbook.mp,v 1.8 2003-03-10 21:42:33 thies Exp $
 %
 % MetaPost is a drawing language based on Knuth's METAFONT that can
 % produce embedded PostScript figures, with TeX strings embedded in it.
@@ -102,7 +102,12 @@ vardef pipeline(expr name)(text t) =
   addto _p doublepath (0,_h)--(0,_h-u) withpen currentpen;
   addto _p contour arrowhead (0,_h)--(0,_h-u) withpen currentpen;
   _h := _h-u;
-  boxed(name, pipeBorder, 0, _p)
+  % leave off border for anonymous pipelines
+  if name="":
+    boxed(name, 0, 0, _p)
+  else:
+    boxed(name, pipeBorder, 0, _p)
+  fi
 enddef;
 
 % Usage:
