@@ -1,6 +1,9 @@
 S	= java -Xmx1700M at.dms.kjc.Main -s -N 3
+SJ	= $(S) -J
 GREEDY	= $(S) -a -raw
 DYNPRG  = $(S) -y -raw
+GREEDYJ	= $(SJ) -a -raw
+DYNPRGJ = $(SJ) -y -raw
 GATHER	= make -f Makefile.streamit run && (cat results.out >> results.all || echo) && rm -f results.out
 
 all: paper
@@ -8,7 +11,7 @@ all: paper
 scaling:
 	cd $(STREAMIT_HOME)/apps/benchmarks/beamformer/streamit && $(GREEDY) 2 -Y BeamFormer.java
 
-numbers: fir beamformer bitonic
+numbers: fm fir beamformer bitonic
 
 beamformer:
 	cd $(STREAMIT_HOME)/apps/benchmarks/beamformer/streamit && rm results.all && make
@@ -43,7 +46,7 @@ beamformer:
 	cd $(STREAMIT_HOME)/apps/benchmarks/beamformer/streamit && $(DYNPRG) 8 SerializedBeamFormer.java && $(GATHER) || echo
 
 bitonic:
-	cd $(STREAMIT_HOME)/apps/benchmarks/bitonic-sort/streamit && rm results.all
+	cd $(STREAMIT_HOME)/apps/benchmarks/bitonic-sort/streamit && rm results.all || echo
 	cd $(STREAMIT_HOME)/apps/benchmarks/bitonic-sort/streamit && echo ========== greedy 2 >> results.all
 	cd $(STREAMIT_HOME)/apps/benchmarks/bitonic-sort/streamit && $(GREEDY) 2 BitonicSort.java && $(GATHER) || echo
 	cd $(STREAMIT_HOME)/apps/benchmarks/bitonic-sort/streamit && echo ========== greedy 3 >> results.all
@@ -75,7 +78,7 @@ bitonic:
 	cd $(STREAMIT_HOME)/apps/benchmarks/bitonic-sort/streamit && $(DYNPRG) 8 BitonicSort.java && $(GATHER) || echo
 
 fir:
-	cd $(STREAMIT_HOME)/apps/benchmarks/fir/streamit && rm results.all
+	cd $(STREAMIT_HOME)/apps/benchmarks/fir/streamit && rm results.all || echo
 	cd $(STREAMIT_HOME)/apps/benchmarks/fir/streamit && echo ========== greedy 2 >> results.all
 	cd $(STREAMIT_HOME)/apps/benchmarks/fir/streamit && $(GREEDY) 2 FIRfine.java && $(GATHER) || echo
 	cd $(STREAMIT_HOME)/apps/benchmarks/fir/streamit && echo ========== greedy 3 >> results.all
@@ -105,6 +108,68 @@ fir:
 	cd $(STREAMIT_HOME)/apps/benchmarks/fir/streamit && $(DYNPRG) 7 FIRfine.java && $(GATHER) || echo
 	cd $(STREAMIT_HOME)/apps/benchmarks/fir/streamit && echo ========== dynprg 8 >> results.all
 	cd $(STREAMIT_HOME)/apps/benchmarks/fir/streamit && $(DYNPRG) 8 FIRfine.java && $(GATHER) || echo
+
+fm:
+	cd $(STREAMIT_HOME)/apps/benchmarks/fm/streamit && rm results.all || echo && make
+	cd $(STREAMIT_HOME)/apps/benchmarks/fm/streamit && echo ========== greedy 2 >> results.all
+	cd $(STREAMIT_HOME)/apps/benchmarks/fm/streamit && $(GREEDY) 2 LinkedFMTest.java && $(GATHER) || echo
+	cd $(STREAMIT_HOME)/apps/benchmarks/fm/streamit && echo ========== greedy 3 >> results.all
+	cd $(STREAMIT_HOME)/apps/benchmarks/fm/streamit && $(GREEDY) 3 LinkedFMTest.java && $(GATHER) || echo
+	cd $(STREAMIT_HOME)/apps/benchmarks/fm/streamit && echo ========== greedy 4 >> results.all
+	cd $(STREAMIT_HOME)/apps/benchmarks/fm/streamit && $(GREEDY) 4 LinkedFMTest.java && $(GATHER) || echo
+	cd $(STREAMIT_HOME)/apps/benchmarks/fm/streamit && echo ========== greedy 5 >> results.all
+	cd $(STREAMIT_HOME)/apps/benchmarks/fm/streamit && $(GREEDY) 5 LinkedFMTest.java && $(GATHER) || echo
+	cd $(STREAMIT_HOME)/apps/benchmarks/fm/streamit && echo ========== greedy 6 >> results.all
+	cd $(STREAMIT_HOME)/apps/benchmarks/fm/streamit && $(GREEDY) 6 LinkedFMTest.java && $(GATHER) || echo
+	cd $(STREAMIT_HOME)/apps/benchmarks/fm/streamit && echo ========== greedy 7 >> results.all
+	cd $(STREAMIT_HOME)/apps/benchmarks/fm/streamit && $(GREEDY) 7 LinkedFMTest.java && $(GATHER) || echo
+	cd $(STREAMIT_HOME)/apps/benchmarks/fm/streamit && echo ========== greedy 8 >> results.all
+	cd $(STREAMIT_HOME)/apps/benchmarks/fm/streamit && $(GREEDY) 8 LinkedFMTest.java && $(GATHER) || echo
+
+	cd $(STREAMIT_HOME)/apps/benchmarks/fm/streamit && echo ========== dynprg 2 >> results.all
+	cd $(STREAMIT_HOME)/apps/benchmarks/fm/streamit && $(DYNPRG) 2 LinkedFMTest.java && $(GATHER) || echo
+	cd $(STREAMIT_HOME)/apps/benchmarks/fm/streamit && echo ========== dynprg 3 >> results.all
+	cd $(STREAMIT_HOME)/apps/benchmarks/fm/streamit && $(DYNPRG) 3 LinkedFMTest.java && $(GATHER) || echo
+	cd $(STREAMIT_HOME)/apps/benchmarks/fm/streamit && echo ========== dynprg 4 >> results.all
+	cd $(STREAMIT_HOME)/apps/benchmarks/fm/streamit && $(DYNPRG) 4 LinkedFMTest.java && $(GATHER) || echo
+	cd $(STREAMIT_HOME)/apps/benchmarks/fm/streamit && echo ========== dynprg 5 >> results.all
+	cd $(STREAMIT_HOME)/apps/benchmarks/fm/streamit && $(DYNPRG) 5 LinkedFMTest.java && $(GATHER) || echo
+	cd $(STREAMIT_HOME)/apps/benchmarks/fm/streamit && echo ========== dynprg 6 >> results.all
+	cd $(STREAMIT_HOME)/apps/benchmarks/fm/streamit && $(DYNPRG) 6 LinkedFMTest.java && $(GATHER) || echo
+	cd $(STREAMIT_HOME)/apps/benchmarks/fm/streamit && echo ========== dynprg 7 >> results.all
+	cd $(STREAMIT_HOME)/apps/benchmarks/fm/streamit && $(DYNPRG) 7 LinkedFMTest.java && $(GATHER) || echo
+	cd $(STREAMIT_HOME)/apps/benchmarks/fm/streamit && echo ========== dynprg 8 >> results.all
+	cd $(STREAMIT_HOME)/apps/benchmarks/fm/streamit && $(DYNPRG) 8 LinkedFMTest.java && $(GATHER) || echo
+
+	cd $(STREAMIT_HOME)/apps/benchmarks/fm/streamit && echo ========== greedy -J 2 >> results.all
+	cd $(STREAMIT_HOME)/apps/benchmarks/fm/streamit && $(GREEDYJ) 2 LinkedFMTest.java && $(GATHER) || echo
+	cd $(STREAMIT_HOME)/apps/benchmarks/fm/streamit && echo ========== greedy -J 3 >> results.all
+	cd $(STREAMIT_HOME)/apps/benchmarks/fm/streamit && $(GREEDYJ) 3 LinkedFMTest.java && $(GATHER) || echo
+	cd $(STREAMIT_HOME)/apps/benchmarks/fm/streamit && echo ========== greedy -J 4 >> results.all
+	cd $(STREAMIT_HOME)/apps/benchmarks/fm/streamit && $(GREEDYJ) 4 LinkedFMTest.java && $(GATHER) || echo
+	cd $(STREAMIT_HOME)/apps/benchmarks/fm/streamit && echo ========== greedy -J 5 >> results.all
+	cd $(STREAMIT_HOME)/apps/benchmarks/fm/streamit && $(GREEDYJ) 5 LinkedFMTest.java && $(GATHER) || echo
+	cd $(STREAMIT_HOME)/apps/benchmarks/fm/streamit && echo ========== greedy -J 6 >> results.all
+	cd $(STREAMIT_HOME)/apps/benchmarks/fm/streamit && $(GREEDYJ) 6 LinkedFMTest.java && $(GATHER) || echo
+	cd $(STREAMIT_HOME)/apps/benchmarks/fm/streamit && echo ========== greedy -J 7 >> results.all
+	cd $(STREAMIT_HOME)/apps/benchmarks/fm/streamit && $(GREEDYJ) 7 LinkedFMTest.java && $(GATHER) || echo
+	cd $(STREAMIT_HOME)/apps/benchmarks/fm/streamit && echo ========== greedy -J 8 >> results.all
+	cd $(STREAMIT_HOME)/apps/benchmarks/fm/streamit && $(GREEDYJ) 8 LinkedFMTest.java && $(GATHER) || echo
+
+	cd $(STREAMIT_HOME)/apps/benchmarks/fm/streamit && echo ========== dynprg -J 2 >> results.all
+	cd $(STREAMIT_HOME)/apps/benchmarks/fm/streamit && $(DYNPRGJ) 2 LinkedFMTest.java && $(GATHER) || echo
+	cd $(STREAMIT_HOME)/apps/benchmarks/fm/streamit && echo ========== dynprg -J 3 >> results.all
+	cd $(STREAMIT_HOME)/apps/benchmarks/fm/streamit && $(DYNPRGJ) 3 LinkedFMTest.java && $(GATHER) || echo
+	cd $(STREAMIT_HOME)/apps/benchmarks/fm/streamit && echo ========== dynprg -J 4 >> results.all
+	cd $(STREAMIT_HOME)/apps/benchmarks/fm/streamit && $(DYNPRGJ) 4 LinkedFMTest.java && $(GATHER) || echo
+	cd $(STREAMIT_HOME)/apps/benchmarks/fm/streamit && echo ========== dynprg -J 5 >> results.all
+	cd $(STREAMIT_HOME)/apps/benchmarks/fm/streamit && $(DYNPRGJ) 5 LinkedFMTest.java && $(GATHER) || echo
+	cd $(STREAMIT_HOME)/apps/benchmarks/fm/streamit && echo ========== dynprg -J 6 >> results.all
+	cd $(STREAMIT_HOME)/apps/benchmarks/fm/streamit && $(DYNPRGJ) 6 LinkedFMTest.java && $(GATHER) || echo
+	cd $(STREAMIT_HOME)/apps/benchmarks/fm/streamit && echo ========== dynprg -J 7 >> results.all
+	cd $(STREAMIT_HOME)/apps/benchmarks/fm/streamit && $(DYNPRGJ) 7 LinkedFMTest.java && $(GATHER) || echo
+	cd $(STREAMIT_HOME)/apps/benchmarks/fm/streamit && echo ========== dynprg -J 8 >> results.all
+	cd $(STREAMIT_HOME)/apps/benchmarks/fm/streamit && $(DYNPRGJ) 8 LinkedFMTest.java && $(GATHER) || echo
 
 paper:
 	latex paper
