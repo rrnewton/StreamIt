@@ -69,7 +69,7 @@ efficiently by memoizing values that we have already seen, thereby
 utilizing dynamic programming.  The details of the algorithm follow
 below.
 
-The partitioning algorithm is given in Figure~\ref{code:part}.  The
+The partitioning algorithm is given in Figure~\ref{code:partition}.  The
 stream representation is simplified over StreamIt: there are only two
 types of structures, a container and a leaf node.  Each leaf node {\tt
 d} represents a filter, with a {\tt d.work} field for the steady-state
@@ -86,7 +86,7 @@ Like a standard dynamic programming algorithm, the partitioner has two
 phases.  The first phase searches the space of configurations and
 determines the best available cost, while the second phase descends
 again through the space and traces back along the optimal cost to
-construct the optimal partitions.  Shown in Figure~\ref{code:part} is
+construct the optimal partitions.  Shown in Figure~\ref{code:partition} is
 the first phase of the algorithm, which is the most important.
 
 For each stream {\tt s} in the graph, the search finds the minimum
@@ -118,7 +118,7 @@ partitions (because the implementation complexity of ragged partitions
 is too high.)  Thus, each time it recurses, it must check that there
 is still a contiguous rectangular region of child streams.  This is
 what the {\tt canCutVertically} function is for (see
-Figure~\ref{code:part}).
+Figure~\ref{code:partition}).
 
 The second subtlety is specific to our implementation of the StreamIt
 compiler.  It so happens that we can collapse all neighboring joiner
