@@ -174,7 +174,7 @@ Controls are described with a subset of C code and SVM API commands.
 have a fixed size.  Variable sized elements can be supported at the
 language-level and compiled into the fixed size scheme using a data
 encoding.  Supported primitive types are indicated by the set of {\tt
-MM\_PROC\_SUPPORTS} fields in the machine model; there is also support
+mm.Proc.Supports} fields in the machine model; there is also support
 for arrays with a fixed (int literal) length and {\tt struct}'s
 containing members of any other type.
 
@@ -190,7 +190,7 @@ Model and referenced by the SVM:
 \item {\it FIFOs}.  A FIFO is a first-in first-out buffer.  The FIFO
 state includes the data elements stored in the FIFO and the number of
 items stored in the FIFO which includes the empty state.  The valid
-FIFO operations are Peek(n), Pop, and Push.
+FIFO operations are peek(n), pop, and push.
 
 \item {\it Memories}. A memory is random access storage with an index
 pointing to the data element to be read or written.
@@ -214,18 +214,18 @@ relevant to the operation of the SVM:
 
 \begin{itemize}
 
-\item {\it MASTERS}.  This property indicates one or more processors
-that control a given processor.  A master is capable of controlling a
-kernel's execution on a corresponding slave processor.
+\item {\tt mm.Proc.Masters}.  This property is a list of zero or more
+processors that control a given processor.  A master is capable of
+controlling a kernel's execution on a corresponding slave processor.
 
 %A processor may be its own MASTER (???)
 
-\item {\it SUPPORTS\_KERNELS}.  This property indicates a list of
-pre-defined and black-box kernels that can execute on a given
+\item {\tt mm.Proc.SupportedKernels}.  This property indicates a list
+of pre-defined and black-box kernels that can execute on a given
 processor, along with performance metadata for each one.
 
-\item {\it SUPPORTS\_USER\_CODE}.  For a given slave processor, this
-property indicates whether user-defined kernels are supported.
+\item {\tt mm.Proc.SupportsUserCode}.  For a given slave processor,
+this property indicates whether user-defined kernels are supported.
 
 \end{itemize}
 
@@ -258,7 +258,7 @@ as a black box:
 \begin{verbatim}
   typedef struct {
     // not exposed
-  } Stream;
+  } svm_Stream;
 \end{verbatim}}
 The API for streams includes built-in support for end-of-stream (EOS)
 tags.  In some cases, the number of elements which are pushed onto a
@@ -269,14 +269,14 @@ a producer kernel to manually encode this information in the data
 stream, but doing so often ignores hardware support and incurs
 overhead for each element.  For this reason, the API provides the
 ability for producers to tag the last stream element with an EOS
-indicator ({\tt streamPushWithEOS}), and for consumers to check
-whether or not an element has an EOS tag ({\tt streamPeekEOS}).
+indicator ({\tt svm\_streamPushWithEOS}), and for consumers to check
+whether or not an element has an EOS tag ({\tt svm\_streamPeekEOS}).
 Representing the EOS as a tag rather than a separate element in the
 stream serves to simplify several aspects of the stream semantics.
 Note that there might be several EOS tags in the lifetime of a stream,
 or even at a given point in time; for example, EOS tags could be used
 as a boundary between successive lines of video data.  However, the
-{\tt STREAM\_ONE\_EOS} flag allows the High Level Compiler to indicate
+{\tt svm\_Stream\_One\_EOS} flag allows the High Level Compiler to indicate
 cases where only one EOS tag will exist at a given time.
 
 The API also requires the Low Level Compiler to implement memory-based
@@ -286,32 +286,33 @@ capacity has been filled (see below for details).  This guarantee is
 important for allowing reuse of memory space between streams, as well
 as for transferring data between threaded code and streaming code.
 However, in cases where the data layout is inconsequential, the High
-Level Compiler can use the {\tt STREAM\_UNALIASED\_RAM} flag to allow
+Level Compiler can use the {\tt svm\_Stream\_Unaliased\_RAM} flag to allow
 layout optimizations by the Low Level Compiler.
 
 In order to improve the readability of kernel code, there are several
-aliases for the Stream type:
+aliases for the {\tt svm\_Stream} type:
 {\small
 \begin{verbatim}
-  typedef Stream IStream;
-  typedef Stream OStream;
-  typedef Stream IOStream;
+  typedef svm_Stream svm_IStream;
+  typedef svm_Stream svm_OStream;
+  typedef svm_Stream svm_IOStream;
 \end{verbatim}}
-\noindent The IStream, OStream, and IOStream aliases indicate the
-relationship between a given kernel and a stream.  If a kernel
-declares a variable of type IStream, then that stream can only be used
-for input; likewise, an OStream can only be used for output, while an
-IOStream can be used for both input and output\footnote{Note that
-IOStreams are used by a single kernel to both pop and push elements.
-The IOStream is not used between kernels since such use would be
-output for one kernel and input for the other. The primary use of the
-IOStream is to share a single physical resource for both an output and
-input stream.  Data pushed onto the stream can be popped.  When the
-resource is full, {\tt push} stalls.  When the resource is empty, {\tt
-pop} stalls.  IOStreams are a first-in and first-out structure.}.
-Note that the use of these aliases is strictly optional; it is simply
-a way for the High Level Compiler to improve the readability of its
-output.
+\noindent The {\tt svm\_IStream}, {\tt svm\_OStream}, and {\tt
+svm\_IOStream} aliases indicate the relationship between a given
+kernel and a stream.  If a kernel declares a variable of type {\tt
+svm\_IStream}, then that stream can only be used for input; likewise,
+an {\tt svm\_OStream} can only be used for output, while an {\tt
+svm\_IOStream} can be used for both input and output\footnote{Note
+that {\tt svm\_IOStream}s are used by a single kernel to both pop and
+push elements.  The {\tt svm\_IOStream} is not used between kernels
+since such use would be output for one kernel and input for the
+other. The primary use of the {\tt svm\_IOStream} is to share a single
+physical resource for both an output and input stream.  Data pushed
+onto the stream can be popped.  When the resource is full, {\tt push}
+stalls.  When the resource is empty, {\tt pop} stalls.  {\tt
+svm\_IOStream}s are a first-in and first-out structure.}.  Note that
+the use of these aliases is strictly optional; it is simply a way for
+the High Level Compiler to improve the readability of its output.
 
 The API for streams consists of a set of initialization and I/O
 functions.  An initialization function gives the location and size of
@@ -325,15 +326,15 @@ I/O.  These functions are described in detail below:
 \name{streamInitRAM}
 {\small
 \begin{verbatim}
-void streamInitRAM(Stream* s, MM_ELMT_MEM ramLocation, int address, 
-                   int capacity, int elementSize, int maxBuffering, int flags)
+void svm_streamInitRAM(svm_Stream* s, mm_Mem ramLocation, int address, 
+                       int capacity, int elementSize, int maxBuffering, int flags)
 \end{verbatim}}
 
 \spec{Initializes an empty stream that resides in RAM with the
 specified location, size, and performance hints.  The {\tt address}
 and {\tt capacity} might be dynamically calculated at runtime.\\}
 
-\spec{Unless the STREAM\_UNALIASED\_RAM flag is set, the stream must
+\spec{Unless the svm\_Stream\_Unaliased\_RAM flag is set, the stream must
 be implemented as a circular buffer that stores items in consecutive
 locations starting at {\tt address} and wrapping around once more than
 {\tt capacity} elements have been pushed.  That is, items 0, {\tt
@@ -351,7 +352,7 @@ address}.}
 
 \req{
   {\tt ramLocation}, {\tt elementSize}, {\tt maxBuffering}, and {\tt flags} are literals, and are constant across\\ \mbox{~~~~~}all calls to initialization functions for {\tt s}.\\
-  {\tt s} is not used for input or output in a kernel that is currently {\tt WAITING}, {\tt RUNNING}, or {\tt PAUSED}.}
+  {\tt s} is not used for input or output in a kernel that is currently {\tt Waiting}, {\tt Running}, or {\tt Paused}.}
 
 \footnotetext[2]{In message-passing architectures, this provides a safe
 upper bound for message sizes, thereby amortizing the messaging
@@ -363,9 +364,9 @@ overhead.}
 \name{streamInitWithDataRAM}
 {\small
 \begin{verbatim}
-void streamInitWithDataRAM(Stream* s, MM_ELMT_MEM ramLocation, int address, 
-                           int capacity, int elementSize, int initLength, 
-                           boolean initEOS, int maxBuffering, int flags)
+void svm_streamInitWithDataRAM(svm_Stream* s, mm_Mem ramLocation, int address, 
+                               int capacity, int elementSize, int initLength, 
+                               boolean initEOS, int maxBuffering, int flags)
 \end{verbatim}}
 
 \spec{Initializes a stream in RAM with some elements already in place.
@@ -375,7 +376,7 @@ performance hints.  The {\tt address} and {\tt capacity} might be
 dynamically calculated at runtime.\\}
 
 \spec{The stream must be implemented as a circular buffer as in {\tt
-streamInitRAM}.}
+svm\_streamInitRAM}.}
 
 \param{
   {\tt initLength} - number of items already in place at {\tt address} that should be pushed onto {\tt s} initially.\\
@@ -383,9 +384,9 @@ streamInitRAM}.}
   Other parameters as above.}
 \req{
   {\tt initLength} $>$ 0.\\
-  {\tt STREAM\_UNALIASED} flag is NOT set.\\
+  {\tt svm\_Stream\_Unaliased\_RAM} flag is NOT set.\\
   {\tt ramLocation}, {\tt elementSize}, {\tt maxBuffering}, and {\tt flags} are literals, and are constant across\\ \mbox{~~~~~}all calls to initialization functions for {\tt s}.\\
-  {\tt s} is not used for input or output in a kernel that is currently {\tt WAITING}, {\tt RUNNING}, or {\tt PAUSED}.}
+  {\tt s} is not used for input or output in a kernel that is currently {\tt Waiting}, {\tt Running}, or {\tt Paused}.}
 
 \callc
 %%%%%%%%%%%%%%%%%%%%%%%%%
@@ -395,8 +396,8 @@ streamInitRAM}.}
 \name{streamInitFIFO}
 {\small
 \begin{verbatim}
-void streamInitFIFO(Stream* s, MM_ELMT_MEM fifoLocation, 
-                    int elementSize, int maxBuffering, int flags)
+void svm_streamInitFIFO(svm_Stream* s, mm_Mem fifoLocation, 
+                        int elementSize, int maxBuffering, int flags)
 \end{verbatim}}
 
 \spec{Initializes an empty stream mapped to a hardware FIFO with the
@@ -414,7 +415,7 @@ by the size of the FIFO.}
 \req{
   {\tt ramLocation}, {\tt elementSize}, {\tt maxBuffering}, and {\tt flags} are literals, and are constant across\\ \mbox{~~~~~}all calls to initialization functions for {\tt s}.\\
   {\tt fifoLocation} represents an empty FIFO (no other stream is retaining state in it.)\\
-  {\tt s} is not used for input or output in a kernel that is currently {\tt WAITING}, {\tt RUNNING}, or {\tt PAUSED}.}
+  {\tt s} is not used for input or output in a kernel that is currently {\tt Waiting}, {\tt Running}, or {\tt Paused}.}
 
 \callc
 %%%%%%%%%%%%%%%%%%%%%%%%%
@@ -427,7 +428,7 @@ argument to the stream initialization functions above.
 
 \decl{typedef enum \{}
 
-\decl{  STREAM\_UNORDERED = 0x1,}
+\decl{  svm\_Stream\_Unordered = 0x1,}
 
 \spec{This flag is true if FIFO semantics may be relaxed such that
 popping does not return elements in the same order that the elements
@@ -435,7 +436,7 @@ were pushed.  This might enable improved routing or instruction
 scheduling, {\it e.g., } for applications dealing on unordered network
 packets.  Peek cannot be used if this flag is set.\\}
 
-\decl{  STREAM\_UNALIASED\_RAM = 0x2,}
+\decl{  svm\_Stream\_Unaliased\_RAM = 0x2,}
 
 \spec{This flag is true if other streams/blocks are guaranteed NOT to
 be aliased with this stream.  Thus, the Low Level Compiler can use an
@@ -443,28 +444,28 @@ optimized, architecture-specific memory layout for this stream, rather
 than guaranteeing that it is implemented as an in-order circular
 buffer (as described above).\\}
 
-\decl{  STREAM\_NEVER\_WRAPS = 0x4,}
+\decl{  svm\_Stream\_Never\_Wraps = 0x4,}
 
 \spec{This flag is true if the number of elements pushed onto a given
 stream will never exceed the stream's capacity.  This allows the Low
 Level Compiler to treat the stream as a single-assignment block rather
 than a circular buffer.\\}
 
-\decl{  STREAM\_ONE\_EOS = 0x8}
+\decl{  svm\_Stream\_One\_EOS = 0x8}
 
 \spec{This flag is true if at most one element in the stream will ever
 have an EOS tag at any given time.  For memory streams, this allows
 the Low Level Compiler to implement EOS with a single pointer instead
 of tracking a set of EOS tokens.\\}
 
-\decl{\} STREAM\_FLAGS;}
+\decl{\} svm\_Stream\_Flags;}
 \makeline
 %%%%%%%%%%%%%%%%%%%%%%%%%
 \clearpage
 \makeline
 \name{streamPush}
-\decl{void streamPush(Stream* s, void* element)}
-\spec{Enqueues a value onto the end of a stream.  If the stream cannot hold any more elements, then {\tt streamPush} stalls until there is space available.}
+\decl{void svm\_streamPush(svm\_Stream* s, void* element)}
+\spec{Enqueues a value onto the end of a stream.  If the stream cannot hold any more elements, then {\tt svm\_streamPush} stalls until there is space available.}
 \param{{\tt s} - stream to push onto.\\
   {\tt element} - value to push.}
 \req{{\tt s} has been initialized.}
@@ -472,14 +473,14 @@ of tracking a set of EOS tokens.\\}
 %%%%%%%%%%%%%%%%%%%%%%%%%
 \makeline
 \name{streamPushMulticast}
-\decl{void streamPushMulticast(void* element, Stream* s0, Stream* s1, ...)}
+\decl{void svm\_streamPushMulticast(void* element, svm\_Stream* s0, svm\_Stream* s1, ...)}
 
 \spec{Pushes an item onto the end of the given streams, in any order
 (or simultaneously.)  Will not return until an item has been pushed
 onto all streams. \medskip }
 
 \spec{For example, if {\tt s1} is empty and {\tt s2} is full, then the
-following are all legal implementations of {\tt streamMulticastPush(\&x, \&s1,
+following are all legal implementations of {\tt svm\_streamMulticastPush(\&x, \&s1,
 \&s2)}:
 \begin{itemize}
 \item Push {\tt x} onto {\tt s1}, wait until {\tt s2} is not full, then push {\tt x} onto {\tt s2}.
@@ -488,7 +489,7 @@ following are all legal implementations of {\tt streamMulticastPush(\&x, \&s1,
 \end{itemize} \medskip }
 
 \spec{Aside from the stalling behavior, this method is equivalent to a
-series of calls to {\tt streamPush}.  It is included in the API in
+series of calls to {\tt svm\_streamPush}.  It is included in the API in
 order to give the Low Level Compiler an opportunity to optimize
 broadcast messages.}
 
@@ -501,10 +502,10 @@ broadcast messages.}
 %%%%%%%%%%%%%%%%%%%%%%%%%
 \makeline
 \name{streamPop}
-\decl{void streamPop(Stream* s, void* element)}
+\decl{void svm\_streamPop(svm\_Stream* s, void* element)}
 
 \spec{Dequeues an element from the front of the stream.  If the stream
-is empty, then {\tt streamPop} stalls until an item is present.  Note
+is empty, then {\tt svm\_streamPop} stalls until an item is present.  Note
 that if the popped element has an EOS tag, the tag is also popped, and
 the EOS information is no longer accessible.}
 
@@ -519,13 +520,13 @@ the EOS information is no longer accessible.}
 \clearpage
 \makeline
 \name{streamPeek}
-\decl{void streamPeek(Stream* s, int n, void* element)}
+\decl{void svm\_streamPeek(svm\_Stream* s, int n, void* element)}
 
 \spec{Retrieves the value at position {\tt n} from the front of the
 stream, without changing any state of the stream.  The index {\tt n}
-is zero-based, such that {\tt streamPeek(s, 0, \&x)} and {\tt
-streamPop(s, \&x)} both put the same value in {\tt x}.  If the stream
-contains less than {\tt n+1} elements, then {\tt streamPeek} stalls
+is zero-based, such that {\tt svm\_streamPeek(s, 0, \&x)} and {\tt
+svm\_streamPop(s, \&x)} both put the same value in {\tt x}.  If the stream
+contains less than {\tt n+1} elements, then {\tt svm\_streamPeek} stalls
 until {\tt n+1} elements are available.}
 
 \param{{\tt s} - stream to peek at.\\
@@ -533,7 +534,7 @@ until {\tt n+1} elements are available.}
   {\tt element} - location in which to store the peeked value.}
 
 \req{
-  {\tt STREAM\_UNORDERED} flag has NOT been set.\\
+  {\tt svm\_Stream\_Unordered} flag has NOT been set.\\
   {\tt n} $<$ {\tt capacity} of {\tt s}.\\
   {\tt s} has been initialized.}
 
@@ -543,7 +544,7 @@ until {\tt n+1} elements are available.}
 
 \name{streamPushWithEOS}
 
-\decl{void streamPushWithEOS(Stream* s, void* element)}
+\decl{void svm\_streamPushWithEOS(svm\_Stream* s, void* element)}
 
 \spec{Pushes an element onto the end of the stream with an EOS tag
 attached to the element.  If the stream is full, this stalls until
@@ -559,11 +560,11 @@ there is space to push the element.}
 \makeline
 \name{streamPushMulticastWithEOS}
 
-\decl{void streamPushMulticastWithEOS(void* element, Stream* s0, Stream* s1, ...)}
+\decl{void svm\_streamPushMulticastWithEOS(void* element, svm\_Stream* s0, svm\_Stream* s1, ...)}
 
 \spec{Pushes an item with EOS tag attached onto the given streams, in any
 order (or simultaneously.)  Will not return until an item has been
-pushed onto all streams.  See {\tt streamPushMulticast} for an example.}
+pushed onto all streams.  See {\tt svm\_streamPushMulticast} for an example.}
 
 \param{{\tt s0, s1, ...} - streams to push onto.\\
   {\tt element} - value to push.}
@@ -577,7 +578,7 @@ pushed onto all streams.  See {\tt streamPushMulticast} for an example.}
 \makeline
 \name{streamPeekEOS}
 
-\decl{boolean streamPeekEOS(Stream* s, int n)}
+\decl{boolean svm\_streamPeekEOS(svm\_Stream* s, int n)}
 
 \spec{Returns whether or not there is an EOS tag on element {\tt n}
 from the front of the stream; stalls if less than {\tt n+1} elements
@@ -587,7 +588,7 @@ are available.}
   {\tt n} - index at which to peek (zero-based and starting from front of stream).}
 \ret{True if there is an EOS tag at index {\tt n}.}
 \req{
-  {\tt STREAM\_UNORDERED} flag has NOT been set.\\
+  {\tt svm\_Stream\_Unordered} flag has NOT been set.\\
   {\tt n} $<$ {\tt capacity} of {\tt s}.\\
   {\tt s} has been initialized.}
 \callkc
@@ -616,18 +617,18 @@ given kernel:
 \begin{verbatim}
   typedef struct {
     // not exposed
-  } Block;
+  } svm_Block;
 
-  typedef Block IBlock;
-  typedef Block OBlock;
-  typedef Block IOBlock;
+  typedef svm_Block svm_IBlock;
+  typedef svm_Block svm_OBlock;
+  typedef svm_Block svm_IOBlock;
 \end{verbatim}}
 \noindent The API for blocks is as follows:
 %%%%%%%%%%%%%%%%%%%%%%%%%
 \makeline
 \name{blockInit}
 
-\decl{void blockInit(Block* b, VM\_NODE\_MEM ramLocation, int address, int capacity, int elementSize)}
+\decl{void svm\_blockInit(svm\_Block* b, mm\_Mem ramLocation, int address, int capacity, int elementSize)}
 
 \spec{Initializes a block with the given location and size.  The {\tt
 address} and {\tt capacity} might be dynamically calculated at runtime.}
@@ -639,8 +640,8 @@ address} and {\tt capacity} might be dynamically calculated at runtime.}
   {\tt capacity} - number of elements in block.\\
   {\tt elementSize} - number of bytes per element.}
 
-\req{{\tt ramLocation} and {\tt elementSize} are literals, and are constant across all calls to {\tt blockInit} on {\tt b}.\\
-    {\tt b} is not used for input or output in a kernel that is currently {\tt WAITING}, {\tt RUNNING}, or {\tt PAUSED}.}
+\req{{\tt ramLocation} and {\tt elementSize} are literals, and are constant across all calls to {\tt svm\_blockInit} on {\tt b}.\\
+    {\tt b} is not used for input or output in a kernel that is currently {\tt Waiting}, {\tt Running}, or {\tt Paused}.}
 
 \callc
 \makeline
@@ -649,7 +650,7 @@ address} and {\tt capacity} might be dynamically calculated at runtime.}
 \makeline
 \name{blockWrite}
 
-\decl{void blockWrite(Block* b, int index, void* element)}
+\decl{void svm\_blockWrite(svm\_Block* b, int index, void* element)}
 
 \spec{Stores an element into a memory block.}
 
@@ -667,7 +668,7 @@ address} and {\tt capacity} might be dynamically calculated at runtime.}
 \makeline
 \name{blockRead}
 
-\decl{void blockRead(Block* b, int index, void* element)}
+\decl{void svm\_blockRead(svm\_Block* b, int index, void* element)}
 
 \spec{Reads an element from a memory block.}
 
@@ -734,9 +735,9 @@ follows:
 \begin{verbatim}
   typedef struct {
     // not exposed
-  } Kernel;
+  } svm_Kernel;
 
-  typedef void (*ExtKernelWork) (void* extKernelData);
+  typedef void (*svm_ExtKernelWork) (void* extKernelData);
 \end{verbatim}}
 \spec{This is a function pointer to the work function of a kernel.
 The work function represents the entire execution of the kernel; it is
@@ -745,19 +746,19 @@ loops if some function is to be executed repeatedly.\\}
 {\small
 \begin{verbatim}
   typedef enum {
-      KERNEL_UNSTARTED,
-      KERNEL_WAITING,
-      KERNEL_RUNNING,
+      svm_Kernel_Unstarted,
+      svm_Kernel_Waiting,
+      svm_Kernel_Running,
 \end{verbatim}}
 {\small
 \begin{verbatim}
-      KERNEL_PAUSED,
-      KERNEL_FINISHED
-  } KERNEL_STATUS;
+      svm_Kernel_Paused,
+      svm_Kernel_Finished
+  } svm_Kernel_Status;
 \end{verbatim}}
 \spec{These are the status codes of a kernel.  In our terminology, the
 status codes refer to the state of a kernel that has been initialized
-(via a call to {\tt kernelInit}).  An uninitialized kernel does not
+(via a call to {\tt svm\_kernelInit}).  An uninitialized kernel does not
 have a well-defined status.\\}
 
 \noindent The API for controlling kernels is as follows:
@@ -766,16 +767,16 @@ have a well-defined status.\\}
 \name{kernelInit}
 {\small
 \begin{verbatim}
-void kernelInit(Kernel* k, MM_ELMT_PROC procLocation, IOBlock* scratch,
-                void* extKernelData, int extKernelDataSize, ExtKernelWork extKernelWork)
+void svm_kernelInit(svm_Kernel* k, mm_Proc procLocation, svm_IOBlock* scratch,
+                    void* extKernelData, int extKernelDataSize, svm_ExtKernelWork extKernelWork)
 \end{verbatim}}
 
 \spec{Initializes a kernel for execution on a given processor with a
 given scratch space for spilling local variables.  This function
 should be called from the initializer for an extension of the base
 kernel type; it inputs the state variables and work function of the
-extended kernel instance.  After calling {\tt kernelInit}, the kernel
-is in the {\tt UNSTARTED} state.}
+extended kernel instance.  After calling {\tt svm\_kernelInit}, the
+kernel is in the {\tt Unstarted} state.}
 
 \param{
   {\tt k} - kernel to be initialized.\\
@@ -786,8 +787,8 @@ is in the {\tt UNSTARTED} state.}
   {\tt extKernelWork} - work function to be executed for this kernel.}
 
 \req{
-  {\tt procLocation} is a literal, and is constant across all statements that call {\tt kernelInit} on {\tt k}.\\
-  {\tt k} is {\tt UNSTARTED}, {\tt FINISHED}, or uninitialized.}
+  {\tt procLocation} is a literal, and is constant across all statements that call {\tt svm\_kernelInit} on {\tt k}.\\
+  {\tt k} is {\tt Unstarted}, {\tt Finished}, or uninitialized.}
 
 \callc
 \makeline
@@ -796,22 +797,22 @@ is in the {\tt UNSTARTED} state.}
 \makeline
 \name{kernelAddDependence}
 
-\decl{void kernelAddDependence(Kernel* k, Kernel* dependsOnKernel)}
+\decl{void svm\_kernelAddDependence(svm\_Kernel* k, svm\_Kernel* dependsOnKernel)}
 
 \spec{Non-blocking function indicating that kernel {\tt k} should not
 execute its work function until kernel {\tt dependsOnKernel} has
-entered the {\tt FINISHED} state.  If {\tt dependsOnKernel} is {\tt
-UNSTARTED} or {\tt FINISHED}, then this function has no effect (it
+entered the {\tt Finished} state.  If {\tt dependsOnKernel} is {\tt
+Unstarted} or {\tt Finished}, then this function has no effect (it
 does nothing).  The dependence is satisfied as soon as {\tt
-dependsOnKernel} first enters the {\tt FINISHED} state, even if {\tt
-dependsOnKernel} leaves the {\tt FINISHED} state before {\tt k} can
+dependsOnKernel} first enters the {\tt Finished} state, even if {\tt
+dependsOnKernel} leaves the {\tt Finished} state before {\tt k} can
 execute; for instance, {\tt dependsOnKernel} could be re-initialized
 and run again while {\tt k} is still waiting for other kernels.}
 \param{
   {\tt k} - kernel that is dependent on another.\\
   {\tt dependsOnKernel} - kernel that must finish first.}
 \req{
-  {\tt k} is {\tt UNSTARTED}.\\
+  {\tt k} is {\tt Unstarted}.\\
   {\tt dependsOnKernel} has been initialized.\\
   {\tt k} can read from a memory that {\tt dependsOnKernel} can write to.  That is, the processor executing\\ \mbox{~~~~~} {\tt k} and the processor executing {\tt dependsOnKernel} must both be connected to some common \\ \mbox{~~~~~} memory.  (This allows {\tt dependsOnKernel} to notify {\tt k} when the dependence is satisfied.)}
 
@@ -819,7 +820,7 @@ and run again while {\tt k} is still waiting for other kernels.}
 %%%%%%%%%%%%%%%%%%%%%%%%%
 \makeline
 \name{kernelReady}
-\decl{void kernelReady(Kernel* k)}
+\decl{void svm\_kernelReady(svm\_Kernel* k)}
 
 \spec{This gives a hint to the Low Level Compiler to ready a kernel for execution.}
 
@@ -828,36 +829,36 @@ and run again while {\tt k} is still waiting for other kernels.}
 }
 
 \req{
-  {\tt k} is {\tt UNSTARTED}.}
+  {\tt k} is {\tt Unstarted}.}
 
 \callc
 %%%%%%%%%%%%%%%%%%%%%%%%%
 \makeline
 \name{kernelRun}
-\decl{void kernelRun(Kernel* k)}
+\decl{void svm\_kernelRun(svm\_Kernel* k)}
 
 \spec{Non-blocking function that starts or resumes execution of a
-kernel.  The kernel continues to run until its status is PAUSED or
-FINISHED.}
+kernel.  The kernel continues to run until its status is {\tt Paused}
+or {\tt Finished}.}
 
 \param{{\tt k} - kernel to run.}
 
 \req{
-  {\tt k} is {\tt UNSTARTED} or {\tt PAUSED}.\\
-  Of the kernels that are currently {\tt WAITING}, {\tt RUNNING}, or
-  {\tt PAUSED}, none of them write to an output \\ \mbox{~~~~~} stream
+  {\tt k} is {\tt Unstarted} or {\tt Paused}.\\
+  Of the kernels that are currently {\tt Waiting}, {\tt Running}, or
+  {\tt Paused}, none of them write to an output \\ \mbox{~~~~~} stream
   of {\tt k} or read from an input stream of {\tt k}.}
 
 \callc
 %%%%%%%%%%%%%%%%%%%%%%%%%
 \makeline
 \name{kernelRunMultiplexed}
-\decl{void kernelRunMultiplexed(Kernel* k, int N)}
+\decl{void svm\_kernelRunMultiplexed(svm\_Kernel* k, int N)}
 
 \spec{Executes a pre-defined kernel on a multiplexed processor,
 yielding every N iterations or when unable to perform a peek, pop, or
-push.  The kernel continues to run until its status is PAUSED or
-FINISHED.}
+push.  The kernel continues to run until its status is {\tt Paused} or
+{\tt Finished}.}
 
 \param{
   {\tt k} - kernel to run.\\
@@ -865,54 +866,54 @@ FINISHED.}
 
 \req{
   {\tt k} is a pre-defined kernel.\\
-  {\tt k} is {\tt UNSTARTED} or {\tt PAUSED}.\\
-  Of the kernels that are currently {\tt WAITING}, {\tt RUNNING}, or
-  {\tt PAUSED}, none of them write to an output \\ \mbox{~~~~~} stream
+  {\tt k} is {\tt Unstarted} or {\tt Paused}.\\
+  Of the kernels that are currently {\tt Waiting}, {\tt Running}, or
+  {\tt Paused}, none of them write to an output \\ \mbox{~~~~~} stream
   of {\tt k} or read from an input stream of {\tt k}.}
 
 \callc
 %%%%%%%%%%%%%%%%%%%%%%%%%
 \makeline
 \name{kernelPause}
-\decl{void kernelPause(Kernel* k)}
+\decl{void svm\_kernelPause(svm\_Kernel* k)}
 
 \spec{Non-blocking function that interrupts execution of a kernel and
-(if the kernel was {\tt RUNNING}) sets the kernel's status to {\tt
-PAUSED}.  If called from the control thread, the interruption is done
+(if the kernel was {\tt Running}) sets the kernel's status to {\tt
+Paused}.  If called from the control thread, the interruption is done
 on a best-effort basis, and the control thread should follow up with a
-call to {\tt kernelWait} to ensure that the kernel is paused.  If
+call to {\tt svm\_kernelWait} to ensure that the kernel is paused.  If
 called from within the kernel, the interruption is immediate ({\it
 i.e.,} no other statement of the kernel is executed before being
 paused.)  However, there is still a delay before the control thread
-can recognize the {\tt PAUSED} state.\\}
+can recognize the {\tt Paused} state.\\}
 
-\spec{If {\tt k} has a status of {\tt PAUSED} or {\tt FINISHED}, then
+\spec{If {\tt k} has a status of {\tt Paused} or {\tt Finished}, then
 this call has no effect.}
 
 \param{
   {\tt k} - kernel to pause.}
 
-\req{{\tt k} is {\tt RUNNING}, {\tt PAUSED}, or {\tt FINISHED}.}
+\req{{\tt k} is {\tt Running}, {\tt Paused}, or {\tt Finished}.}
 
 \callkc
 %%%%%%%%%%%%%%%%%%%%%%%%%
 \makeline
 \name{kernelEnd}
-\decl{void kernelEnd(Kernel* k)}
+\decl{void svm\_kernelEnd(svm\_Kernel* k)}
 
 \spec{Non-blocking function that interrupts execution of a kernel and
-(if the kernel was {\tt RUNNING}) sets the kernel's status to {\tt
-FINISHED}.  If called from the control thread, the interruption is
+(if the kernel was {\tt Running}) sets the kernel's status to {\tt
+Finished}.  If called from the control thread, the interruption is
 done on a best-effort basis, and the control thread should follow up
-with a call to {\tt kernelWait} to ensure that the kernel is finished.
+with a call to {\tt svm\_kernelWait} to ensure that the kernel is finished.
 If called from within the kernel, the interruption is immediate ({\it
 i.e.,} no other statement of the kernel is executed before becoming
 finished.)  However, there is still a delay before the control thread
-can recognize the {\tt FINISHED} state.\\}
+can recognize the {\tt Finished} state.\\}
 
-\spec{If the kernel is {\tt PAUSED}, then it is immediately changed to
-{\tt FINISHED} (without executing another statement from within the
-kernel.)  If the kernel is {\tt FINISHED}, then this call has no
+\spec{If the kernel is {\tt Paused}, then it is immediately changed to
+{\tt Finished} (without executing another statement from within the
+kernel.)  If the kernel is {\tt Finished}, then this call has no
 effect.\\}
 
 \spec{This function is implicitly called when a kernel returns from
@@ -921,7 +922,7 @@ its work function.}
 \param{
   {\tt k} - kernel to end.}
 
-\req{{\tt k} is {\tt RUNNING}, {\tt PAUSED}, or {\tt FINISHED}.}
+\req{{\tt k} is {\tt Running}, {\tt Paused}, or {\tt Finished}.}
 
 \callkc
 \makeline
@@ -929,10 +930,10 @@ its work function.}
 \clearpage
 \makeline
 \name{kernelWait}
-\decl{void kernelWait(Kernel* k)}
+\decl{void svm\_kernelWait(svm\_Kernel* k)}
 
 \spec{Blocking function that does not return until the kernel's status
-is {\tt UNSTARTED}, {\tt PAUSED} or {\tt FINISHED}.}
+is {\tt Unstarted}, {\tt Paused} or {\tt Finished}.}
 
 \param{
   {\tt k} - kernel to wait for.}
@@ -943,16 +944,16 @@ is {\tt UNSTARTED}, {\tt PAUSED} or {\tt FINISHED}.}
 %%%%%%%%%%%%%%%%%%%%%%%%%
 \makeline
 \name{kernelWaitMultiple}
-\decl{void kernelWaitMultiple(Kernel* k0, Kernel* k1, ...)}
+\decl{void svm\_kernelWaitMultiple(svm\_Kernel* k0, svm\_Kernel* k1, ...)}
 
 \spec{Considers the set $K$ of kernels in {\tt k0}, {\tt k1},
-etc. that have a status other than {\tt UNSTARTED}, and does not
+etc. that have a status other than {\tt Unstarted}, and does not
 return until one of the following is true: 1) at least one kernel in
-$K$ is {\tt PAUSED}, 2) all kernels in $K$ are {\tt FINISHED}, or 3)
+$K$ is {\tt Paused}, 2) all kernels in $K$ are {\tt Finished}, or 3)
 $K$ is empty.\\}
 
-\spec{Note that {\tt kernelWaitMultiple} cannot be emulated by a
-sequence of calls to {\tt kernelWait}, as the former returns as soon
+\spec{Note that {\tt svm\_kernelWaitMultiple} cannot be emulated by a
+sequence of calls to {\tt svm\_kernelWait}, as the former returns as soon
 as any concurrently running kernel has paused.}
 
 \param{
@@ -964,7 +965,7 @@ as any concurrently running kernel has paused.}
 %%%%%%%%%%%%%%%%%%%%%%%%%
 \makeline
 \name{kernelGetStatus}
-\decl{KERNEL\_STATUS kernelGetStatus(Kernel* k)}
+\decl{svm\_Kernel\_Status svm\_kernelGetStatus(svm\_Kernel* k)}
 
 \spec{Returns the status of the kernel as best known by the control thread.}
 
@@ -995,9 +996,9 @@ as any concurrently running kernel has paused.}
 \vspace{28pt}
 
 %\framebox[6.5in]{
-\begin{minipage}{6in}
+\begin{minipage}{6.5in}
 \begin{center}
-\psfig{figure=timeline.eps,width=6in}
+\psfig{figure=timeline.eps,width=6.5in}
 \end{center}
 \vspace{-16pt}
 \caption{Sample timeline for an interaction between the control thread and a kernel. \protect\label{fig:kernel-timeline}}
@@ -1016,20 +1017,20 @@ legal states of a kernel appears in Figure~\ref{fig:kernel-status},
 while a timeline for a sample interaction with a kernel appears in
 Figure~\ref{fig:kernel-timeline}.
 
-A kernel is initially {\tt UNSTARTED}.  The control thread calls {\tt
-kernelRun}, and the kernel becomes {\tt WAITING}.  When all kernels it
-depends on (as explicitly indicated by the {\tt kernelAddDependence}
-function) are {\tt FINISHED}, the kernel becomes {\tt RUNNING}. The
+A kernel is initially {\tt Unstarted}.  The control thread calls {\tt
+kernelRun}, and the kernel becomes {\tt Waiting}.  When all kernels it
+depends on (as explicitly indicated by the {\tt svm\_kernelAddDependence}
+function) are {\tt Finished}, the kernel becomes {\tt Running}. The
 kernel executes its {\tt work} function.  If either the control thread
-or the work function calls {\tt kernelPause}, the kernel pauses in
-executing the work function and becomes {\tt PAUSED}. It remains {\tt
-PAUSED} until the control thread calls {\tt kernelRun} again. If
-either the control thread or the work function calls {\tt kernelEnd}
-at any time when the kernel is not {\tt FINISHED}, the kernel stops
-executing the work function and becomes {\tt FINISHED}. The kernel
-implicitly calls {\tt kernelEnd} when the work function returns. If
+or the work function calls {\tt svm\_kernelPause}, the kernel pauses in
+executing the work function and becomes {\tt Paused}. It remains {\tt
+Paused} until the control thread calls {\tt svm\_kernelRun} again. If
+either the control thread or the work function calls {\tt svm\_kernelEnd}
+at any time when the kernel is not {\tt Finished}, the kernel stops
+executing the work function and becomes {\tt Finished}. The kernel
+implicitly calls {\tt svm\_kernelEnd} when the work function returns. If
 control flow causes a kernel to be initialized again, it becomes {\tt
-UNSTARTED}.
+Unstarted}.
 
 Section~\ref{sec:control} gives a detailed explanation of how kernels
 should be controlled.  However, we also give some brief examples here
@@ -1040,9 +1041,9 @@ control sequence for initializing and running a kernel is as follows:
 \begin{verbatim}
   static MyKernel k;
 
-  kernelInit(&k.kernel, ...);
-  kernelRun(&k.kernel);
-  kernelWait(&k.kernel);
+  svm_kernelInit(&k.kernel, ...);
+  svm_kernelRun(&k.kernel);
+  svm_kernelWait(&k.kernel);
 \end{verbatim}}
 
 In addition, multiple kernels can be run in parallel, with items being
@@ -1051,59 +1052,59 @@ explicit dependences are needed.  For example:
 
 {\small
 \begin{verbatim}
-  static Stream s;
+  static svm_Stream s;
   static MyKernel1 k1;   // k1 will write to s
   static MyKernel2 k2;   // k2 will read from s
 
-  streamInitRAM(&s, ...);
+  svm_streamInitRAM(&s, ...);
 
-  kernelInit(&k1.kernel, ...);  
-  kernelRun(&k1.kernel);
+  svm_kernelInit(&k1.kernel, ...);  
+  svm_kernelRun(&k1.kernel);
 
-  kernelInit(&k2.kernel, ...);
-  kernelRun(&k2.kernel);
+  svm_kernelInit(&k2.kernel, ...);
+  svm_kernelRun(&k2.kernel);
 
-  kernelWait(&k2.kernel);
+  svm_kernelWait(&k2.kernel);
 \end{verbatim}}
 
-Thus, the {\tt kernelAddDependence} function does NOT need to be used
-to synchronize the transfer of data elements through a stream object.
-Instead, it is intended for cases in which there is a memory
+Thus, the {\tt svm\_kernelAddDependence} function does NOT need to be
+used to synchronize the transfer of data elements through a stream
+object.  Instead, it is intended for cases in which there is a memory
 dependence that is not captured by the stream semantics.  This can
 occur in two cases: 1) a kernel writes to a block that a subsequent
 kernel reads from, and 2) two kernels are reading/writing to streams
 or blocks that point to overlapping regions in memory.  It would be
-possible to use {\tt kernelWait} to enforce these dependences from the
-control thread, but the dependence tracking mechanism is added for
-performance reasons; with stream processing, a round-trip
+possible to use {\tt svm\_kernelWait} to enforce these dependences
+from the control thread, but the dependence tracking mechanism is
+added for performance reasons; with stream processing, a round-trip
 communication to the control thread is often too expensive.  A simple
 use of dependences is as follows:
 
 {\small
 \begin{verbatim}
-  static Block b;
+  static svm_Block b;
   static MyKernel1 k1;   // k1 will write to b
   static MyKernel2 k2;   // k2 will read from b
 
-  blockInit(&b, ...);
+  svm_blockInit(&b, ...);
 
-  kernelInit(&k1.kernel, ...);  
-  kernelRun(&k1.kernel);
+  svm_kernelInit(&k1.kernel, ...);  
+  svm_kernelRun(&k1.kernel);
 
-  kernelInit(&k2.kernel, ...);
-  kernelAddDependence(&k2.kernel, &k1.kernel);
-  kernelRun(&k2.kernel);
+  svm_kernelInit(&k2.kernel, ...);
+  svm_kernelAddDependence(&k2.kernel, &k1.kernel);
+  svm_kernelRun(&k2.kernel);
 
-  kernelWait(&k2.kernel);
+  svm_kernelWait(&k2.kernel);
 \end{verbatim}}
 
 Finally, there is a subtle point: the specification supports the use
 of dependent kernels in a loop.  In this scenario, each kernel is run
-multiple times, and each call to {\tt kernelAddDependence(k2, k1)}
-makes {\tt k2} dependent on the last execution of {\tt k1}, whenever
-it occurred. If {\tt k1} is {\tt UNSTARTED}, the {\tt
-kernelAddDependence} call is ignored. The following code illustrates
-these concepts:
+multiple times, and each call to {\tt svm\_kernelAddDependence(k2,
+k1)} makes {\tt k2} dependent on the last execution of {\tt k1},
+whenever it occurred. If {\tt k1} is {\tt Unstarted}, the {\tt
+svm\_kernelAddDependence} call is ignored. The following code
+illustrates these concepts:
 
 {\small
 \begin{verbatim}
@@ -1111,15 +1112,15 @@ these concepts:
     static K1 k1;
     static K2 k2;
 
-    kernelWait(&k1);
-    kernelInit(&k1.kernel, ...);
-    kernelAddDependence(&k1.kernel, &k2.kernel);
-    kernelRun(&k1.kernel);
+    svm_kernelWait(&k1);
+    svm_kernelInit(&k1.kernel, ...);
+    svm_kernelAddDependence(&k1.kernel, &k2.kernel);
+    svm_kernelRun(&k1.kernel);
 
-    kernelWait(&k2);
-    kernelInit(&k2.kernel, ...);
-    kernelAddDependence(&k2.kernel, &k1.kernel);
-    kernelRun(&k2.kernel);
+    svm_kernelWait(&k2);
+    svm_kernelInit(&k2.kernel, ...);
+    svm_kernelAddDependence(&k2.kernel, &k1.kernel);
+    svm_kernelRun(&k2.kernel);
   }
 \end{verbatim}}
 
@@ -1137,18 +1138,18 @@ For example, a kernel for a simple amplifier could be as follows:
 {\small
 \begin{verbatim}
   typedef struct {
-    Kernel kernel;
-    IStream* in;
-    OStream* out;
+    svm_Kernel kernel;
+    svm_IStream* in;
+    svm_OStream* out;
     int N;
   } Amplifier;
 
   void amplifierWork(Amplifier* amp);
 
-  void amplifierInit(Amplifier* amp, MM_ELMT_PROC procLocation, IOBlock* scratch, 
-                     IStream* _in, OStream* _out, int _N) {
-      kernelInit(&amp->kernel, procLocation, scratch, 
-        amp, sizeof(Amplifier), (ExtKernelWork)&amplifierWork);
+  void amplifierInit(Amplifier* amp, mm_Proc procLocation, svm_IOBlock* scratch, 
+                     svm_IStream* _in, svm_OStream* _out, int _N) {
+      svm_kernelInit(&amp->kernel, procLocation, scratch, 
+        amp, sizeof(Amplifier), (svm_ExtKernelWork)&amplifierWork);
       amp->in = _in;
       amp->out = _out;
       amp->N = _N;
@@ -1157,13 +1158,13 @@ For example, a kernel for a simple amplifier could be as follows:
   void amplifierWork(Amplifier* amp) {
       float x;
       while (!streamPeekEOS(amp->in, 0)) {
-        streamPop(amp->in, &x);
+        svm_streamPop(amp->in, &x);
         x = x * amp->N;
-        streamPush(amp->out, &x);
+        svm_streamPush(amp->out, &x);
       }
-      streamPop(amp->in, &x);
+      svm_streamPop(amp->in, &x);
       x = x * amp->N;
-      streamPushWithEOS(amp->out, &x);
+      svm_streamPushWithEOS(amp->out, &x);
   }
 \end{verbatim}}
 
@@ -1175,9 +1176,9 @@ function can be simplified as follows:
   void amplifierWork(Amplifier* amp) {
       while(true) {
         float x;
-        streamPop(amp->in, &x);
+        svm_streamPop(amp->in, &x);
         x = x * amp->N;
-        streamPush(amp->out, &x);
+        svm_streamPush(amp->out, &x);
       }
   }
 \end{verbatim}}
@@ -1207,9 +1208,11 @@ time\footnote{DSP operations may be added at a future date pending
 further discussion by the forum.}).
 
 \item Supported primitive types are indicated by the set of {\tt
-MM\_PROC\_SUPPORTS} fields in the machine model; there is also support
-for arrays with a fixed (int literal) length and {\tt struct}'s
-containing members of any other type.
+mm.Proc.Supports} fields in the machine model (e.g., the {\tt
+mm.Proc.SupportsInt} field indicates whether or not integers are
+supported); there is also support for arrays with a fixed (int
+literal) length and {\tt struct}'s containing members of any other
+type.
 
 \end{enumerate}
 
@@ -1241,7 +1244,7 @@ may be executed by stream processors on some architectures.
 %%%%%%%%%%%%%%%%%%%%%%%%%
 \makeline
 \name{Constants}
-\decl{const int STREAM\_LENGTH\_ALL = -1;}
+\decl{const int svm\_Stream\_Length\_All = -1;}
 
 \spec{Indicates that a pre-defined kernel should execute through the
 entire length of one of its inputs.}
@@ -1249,16 +1252,16 @@ entire length of one of its inputs.}
 %%%%%%%%%%%%%%%%%%%%%%%%%
 \clearpage
 \makeline
-\name{Move}
+\name{svm\_Move}
 {\small
 \begin{verbatim}
 typedef struct {
-  Kernel kernel;
+  svm_Kernel kernel;
   // not exposed
-} Move;
+} svm_Move;
 
-void moveInit(Move* move, MM_ELMT_PROC location, IStream* srcStr, 
-              OStream* destStr, int length, boolean setEOS);
+void svm_moveInit(svm_Move* move, mm_Proc location, svm_IStream* srcStr, 
+                  svm_OStream* destStr, int length, boolean setEOS);
 \end{verbatim}}
 
 \spec{The primary use of this kernel is for moving elements between
@@ -1267,7 +1270,7 @@ moving between streams in a single memory.  A given number of elements
 are popped off of {\tt srcStr} and pushed onto {\tt destStr}, with an
 EOS tag added to the last element if desired.\\}
 
-\spec{Note that {\tt moveInit} function is only the initialization
+\spec{Note that {\tt svm\_moveInit} function is only the initialization
 routine (as in setting up a DMA processor); it does not do the data
 move itself.}
 
@@ -1276,7 +1279,7 @@ move itself.}
   {\tt location} - processor resource on which to execute the kernel (from PCA Machine Model.)\\
   {\tt srcStr} - source stream, from which elements are popped.\\
   {\tt destStr} - destination stream, onto which elements are pushed.\\
-  {\tt length} - number of elements to move; {\tt STREAM\_LENGTH\_ALL}
+  {\tt length} - number of elements to move; {\tt svm\_Stream\_Length\_All}
   executes until an element with an \\ \mbox{~~~~~} EOS tag is popped from {\tt
   srcStr}.\\
    {\tt setEOS} - if true, then the last element pushed onto {\tt
@@ -1284,7 +1287,7 @@ move itself.}
    tagged with an EOS.}
 
 \req{
-  {\tt move} is {\tt UNSTARTED}, {\tt FINISHED}, or uninitialized.\\
+  {\tt move} is {\tt Unstarted}, {\tt Finished}, or uninitialized.\\
   {\tt srcStr} and {\tt destStr} have been initialized.}
 
 \callc
@@ -1294,13 +1297,13 @@ move itself.}
 {\small
 \begin{verbatim}
 typedef struct {
-  Kernel kernel;
+  svm_Kernel kernel;
   // not exposed
-} StridedScatter;
+} svm_StridedScatter;
 
-void stridedScatterInit(StridedScatter* scatter, MM_ELMT_PROC location, 
-                        IStream* srcStr, OBlock* destBlock, int length,
-                        int destStride, int elementsPerStride)
+void svm_stridedScatterInit(svm_StridedScatter* scatter, mm_Proc location, 
+                            svm_IStream* srcStr, svm_OBlock* destBlock, int length,
+                            int destStride, int elementsPerStride)
 \end{verbatim}}
 
 \spec{Moves segments of {\tt elementsPerStride} elements from a
@@ -1315,13 +1318,13 @@ the beginning of each stride.}
   {\tt location} - processor resource on which to execute the kernel (from PCA Machine Model.)\\
   {\tt srcStr} - source stream, from which elements are popped.\\
   {\tt destBlock} - destination block, into which elements are written.\\
-  {\tt length} - total number of elements to move; {\tt STREAM\_LENGTH\_ALL} executes until an \\ \mbox{~~~~~} element with an EOS tag is
+  {\tt length} - total number of elements to move; {\tt svm\_Stream\_Length\_All} executes until an \\ \mbox{~~~~~} element with an EOS tag is
   popped from {\tt srcStr}.\\
   {\tt destStride} - number of elements between the start of adjacent strides in {\tt destBlock}.\\
   {\tt elementsPerStride} - number of elements that are moved from {\tt srcStr} for each stride in {\tt destBlock}.}
 
 \req{
-  {\tt scatter} is {\tt UNSTARTED}, {\tt FINISHED}, or uninitialized.\\
+  {\tt scatter} is {\tt Unstarted}, {\tt Finished}, or uninitialized.\\
   {\tt srcStr} and {\tt destBlock} have been initialized.}
 
 \callc
@@ -1331,13 +1334,13 @@ the beginning of each stride.}
 {\small
 \begin{verbatim}
 typedef struct {
-  Kernel kernel;
+  svm_Kernel kernel;
   // not exposed
-} StridedGather;
+} svm_StridedGather;
 
-void stridedGatherInit(StridedGather* gather, MM_ELMT_PROC location, 
-                       IBlock* srcBlock, OStream* destStr, int length,
-                       int srcStride, int elementsPerStride, boolean setEOS)
+void svm_stridedGatherInit(svm_StridedGather* gather, mm_Proc location, 
+                           svm_IBlock* srcBlock, svm_OStream* destStr, int length,
+                           int srcStride, int elementsPerStride, boolean setEOS)
 \end{verbatim}}
 
 \spec{Copies segments of {\tt elementsPerStride} elements from strided
@@ -1352,13 +1355,13 @@ stride.}
   {\tt location} - processor resource on which to execute the kernel (from PCA Machine Model.)\\
   {\tt srcBlock} - source block, from which elements are copied.\\
   {\tt destStr} - destination stream, onto which elements are pushed.\\
-  {\tt length} - total number of elements to copy; {\tt  STREAM\_LENGTH\_ALL} considers all elements of {\tt srcBlock}.\\
+  {\tt length} - total number of elements to copy; {\tt svm\_Stream\_Length\_All} considers all elements of {\tt srcBlock}.\\
   {\tt srcStride} - number of elements between the start of adjacent strides in {\tt srcBlock}.\\
   {\tt elementsPerStride} - number of elements that are copied from start of each stride.\\
    {\tt setEOS} - if true, then the last element pushed onto {\tt destStr} is given an EOS tag.  Otherwise \\ \mbox{~~~~~} no element pushed is tagged with an EOS.}
 
 \req{
-  {\tt gather} is {\tt UNSTARTED}, {\tt FINISHED}, or uninitialized.\\
+  {\tt gather} is {\tt Unstarted}, {\tt Finished}, or uninitialized.\\
   {\tt srcBlock} and {\tt destStr} have been initialized.}
 
 \callc
@@ -1368,13 +1371,13 @@ stride.}
 {\small
 \begin{verbatim}
 typedef struct {
-  Kernel kernel;
+  svm_Kernel kernel;
   // not exposed
-} IndexedScatter;
+} svm_IndexedScatter;
 
-void indexedScatterInit(IndexedScatter* scatter, MM_ELMT_PROC location,
-                        IStream* srcStr, IStream* indexStr, OBlock* destBlock, 
-                        int length, int elementsPerIndex)
+void svm_indexedScatterInit(svm_IndexedScatter* scatter, mm_Proc location,
+                            svm_IStream* srcStr, svm_IStream* indexStr, svm_OBlock* destBlock, 
+                            int length, int elementsPerIndex)
 \end{verbatim}}
 
 \spec{This kernel allows irregular scattering of elements from an
@@ -1393,11 +1396,11 @@ streams as they are scattered.}
 
 \paramcont{
   {\tt destBlock} - destination block, into which elements are written.\\
-  {\tt length} - total number of elements to copy; {\tt STREAM\_LENGTH\_ALL} executes until an element with \\ \mbox{~~~~~} an EOS tag is  popped from {\tt indexStr}.\\
+  {\tt length} - total number of elements to copy; {\tt svm\_Stream\_Length\_All} executes until an element with \\ \mbox{~~~~~} an EOS tag is  popped from {\tt indexStr}.\\
   {\tt elementsPerIndex} - number of elements to move from {\tt srcStr} for each element of {\tt indexStr}.}
 
 \req{
-  {\tt scatter} is {\tt UNSTARTED}, {\tt FINISHED}, or uninitialized.\\
+  {\tt scatter} is {\tt Unstarted}, {\tt Finished}, or uninitialized.\\
   {\tt srcStr}, {\tt indexStr}, and {\tt destBlock} have been initialized.}
 
 \callc
@@ -1407,13 +1410,13 @@ streams as they are scattered.}
 {\small
 \begin{verbatim}
 typedef struct {
-  Kernel kernel;
+  svm_Kernel kernel;
   // not exposed
-} IndexedGather;
+} svm_IndexedGather;
 
-void indexedGatherInit(IndexedGather* gather, MM_ELMT_PROC location, 
-                       IBlock* srcBlock, IStream* indexStr, OStream* destStr, 
-                       int length, int elementsPerIndex, boolean setEOS)
+void svm_indexedGatherInit(svm_IndexedGather* gather, mm_Proc location, 
+                           svm_IBlock* srcBlock, svm_IStream* indexStr, svm_OStream* destStr, 
+                           int length, int elementsPerIndex, boolean setEOS)
 \end{verbatim}}
 
 \spec{This kernel allows irregular gathering of elements from an input
@@ -1429,13 +1432,13 @@ Elements are popped from the index stream as they are gathered.}
   {\tt srcBlock} - source block, from which elements are copied.\\
   {\tt indexStr} - index stream, containing the locations of {\tt srcBlock} from which elements should be read.\\
   {\tt destStr} - destination stream, onto which elements are pushed.\\
-  {\tt length} - total number of elements to copy; {\tt STREAM\_LENGTH\_ALL} executes until an element with an \\ \mbox{~~~~~} EOS tag is popped from {\tt indexStr}.\\
+  {\tt length} - total number of elements to copy; {\tt svm\_Stream\_Length\_All} executes until an element with an \\ \mbox{~~~~~} EOS tag is popped from {\tt indexStr}.\\
   {\tt elementsPerIndex} - number of elements to copy from {\tt
   srcBlock} for each element of {\tt indexStr}.\\
    {\tt setEOS} - if true, then the last element pushed onto {\tt destStr} is given an EOS tag.  Otherwise \\ \mbox{~~~~~} no element pushed is tagged with an EOS.}
 
 \req{
-  {\tt gather} is {\tt UNSTARTED}, {\tt FINISHED}, or uninitialized.\\
+  {\tt gather} is {\tt Unstarted}, {\tt Finished}, or uninitialized.\\
   {\tt srcBlock}, {\tt indexStr} and {\tt destStr} have been initialized.}
 
 \callc
@@ -1474,56 +1477,56 @@ An example follows:
 {\small
 \begin{verbatim}
   int length1, length2;
-  static Stream s0, s1, s2, s4;
-  static Block scratch;
-  static Move move01, move24;
+  static svm_Stream s0, s1, s2, s4;
+  static svm_Block scratch;
+  static svm_Move move01, move24;
   static RLE rle;
 
   // read file into memory location of s0 (not part of API)
   length1 = readFile("input.dat", GLOBALMEM1, 0x1000, 1024);
 
-  streamInitWithDataRAM(&s0, GLOBALMEM1, 0x1000, 1024, 4, length1, TRUE, length1, STREAM_NEVER_WRAPS);
-  streamInitRAM(&s1, LOCALMEM1, 0x0, 256, 4, 256, STREAM_UNALIASED_RAM);
-  streamInitRAM(&s2, LOCALMEM1, 0x100, 128, 4, 128, STREAM_NEVER_WRAPS);
-  blockInit(&scratch, LOCALMEM1, 0x180, 32, 1);
+  svm_streamInitWithDataRAM(&s0, GLOBALMEM1, 0x1000, 1024, 4, length1, TRUE, length1, svm_Stream_Never_Wraps);
+  svm_streamInitRAM(&s1, LOCALMEM1, 0x0, 256, 4, 256, svm_Stream_Unaliased_Ram);
+  svm_streamInitRAM(&s2, LOCALMEM1, 0x100, 128, 4, 128, svm_Stream_Never_Wraps);
+  svm_blockInit(&scratch, LOCALMEM1, 0x180, 32, 1);
 
   // move from memory
-  moveInit(&move01, DMA1, &s0, &s1, STREAM_LENGTH_ALL, TRUE);
-  kernelRun(&move01.kernel);
+  svm_moveInit(&move01, DMA1, &s0, &s1, svm_Stream_Length_All, TRUE);
+  svm_kernelRun(&move01.kernel);
   
   // run rle
   rleInit(&rle, PROC1, &scratch, &s1, &s2);
-  kernelRun(&rle.kernel);
+  svm_kernelRun(&rle.kernel);
 
   // get output length
-  kernelWait(&rle.kernel);
+  svm_kernelWait(&rle.kernel);
   length2 = rle.outputLength;
   
   // if the output is still too large, run additional compression, overwriting s2 in place
   if (length2 > SIZE_THRESHOLD) {
-    static Stream s3;
-    static Block scratch2;
+    static svm_Stream s3;
+    static svm_Block scratch2;
     static Zip zip;
 
-    streamInitRAM(&s3, LOCALMEM1, 0x100, 128, 4, 128, STREAM_NEVER_WRAPS);
-    blockInit(&scratch2, LOCALMEM1, 0x180, 32, 1);
+    svm_streamInitRAM(&s3, LOCALMEM1, 0x100, 128, 4, 128, svm_Stream_Never_Wraps);
+    svm_blockInit(&scratch2, LOCALMEM1, 0x180, 32, 1);
 
     // run zip kernel
     zipInit(&zip, PROC1, &scratch2, &s2, &s3);
-    kernelRun(&zip.kernel);
+    svm_kernelRun(&zip.kernel);
     
     // get output length
-    kernelWait(&zip.kernel);
+    svm_kernelWait(&zip.kernel);
     length2 = zip.outputLength;
 
-    streamInitWithDataRAM(&s2, LOCALMEM1, 0x100, 128, 4, length2, TRUE, 128, STREAM_NEVER_WRAPS);
+    svm_streamInitWithDataRAM(&s2, LOCALMEM1, 0x100, 128, 4, length2, TRUE, 128, svm_Stream_Never_Wraps);
   }
-  streamInitRAM(&s4, GLOBALMEM1, 0x2000, 1024, 4, 1024, STREAM_NEVER_WRAPS),
+  svm_streamInitRAM(&s4, GLOBALMEM1, 0x2000, 1024, 4, 1024, svm_Stream_Never_Wraps),
   
   // move to memory
-  moveInit(&move24, DMA1, &s2, &s4, STREAM_LENGTH_ALL, TRUE);
-  kernelRun(&move24.kernel);
-  kernelWait(&move24.kernel);
+  svm_moveInit(&move24, DMA1, &s2, &s4, svm_Stream_Length_All, TRUE);
+  svm_kernelRun(&move24.kernel);
+  svm_kernelWait(&move24.kernel);
   // store the result from memory to "output.dat" (not part of API)
   writeFile("output.dat", GLOBALMEM1, 0x2000, length2); 
 \end{verbatim}}
@@ -1543,7 +1546,7 @@ The other way to transfer elements is by allocating a new input stream
 that overlaps with the output stream in memory.  In this case, the
 control code should indicate that the kernel reading the new stream is
 dependent on the kernel that wrote the original stream; this is done
-by use of the kernel's {\tt kernelAddDependence} function, thereby
+by use of the kernel's {\tt svm\_kernelAddDependence} function, thereby
 saving the Low Level Compiler from doing location-based memory
 analysis to discover dependences between kernels.
 
@@ -1566,8 +1569,8 @@ black-box kernel and hence I/O data does not need to move through
 memories.
 
 It is also possible for the control processor to inspect and modify
-the data members of a kernel when it is not in the {\tt WAITING} or
-{\tt RUNNING} states. Accesses to kernel fields are useful for passing
+the data members of a kernel when it is not in the {\tt Waiting} or
+{\tt Running} states. Accesses to kernel fields are useful for passing
 parameters to a kernel or retrieving reduction values from a kernel.
 For example:
 
@@ -1575,46 +1578,46 @@ For example:
 \begin{verbatim}
   // --- kernel code ---
   typedef struct {
-    Kernel kernel;
-    IStream* in;
+    svm_Kernel kernel;
+    svm_IStream* in;
     int sum;
   } SumKernel;
 
   void sumKernelWork();
   
-  sumInit(SumKernel* k, MM_ELMT_PROC procLocation, IOBlock* scratch, IStream* _in) {
-    kernelInit(&k->kernel, procLocation, scratch,
-      k, sizeof(SumKernel), (ExtKernelWork)&sumKernelWork); 
+  sumInit(SumKernel* k, mm_Proc procLocation, svm_IOBlock* scratch, svm_IStream* _in) {
+    svm_kernelInit(&k->kernel, procLocation, scratch,
+      k, sizeof(SumKernel), (svm_ExtKernelWork)&sumKernelWork); 
     k->in = _in;
     k->sum = 0;
   }
 
   void sumKernelWork(SumKernel* k) {
       int x;
-      while (!streamPeekEOS(k->in, 0)) {
-          streamPop(k->in, &x);
+      while (!svm_streamPeekEOS(k->in, 0)) {
+          svm_streamPop(k->in, &x);
           k->sum += x;
       }
-      streamPop(k->in, &x);
+      svm_streamPop(k->in, &x);
       k->sum += x;
   }
 
   // --- control code ---
-  static Stream s1;
-  static Block scratch1;
+  static svm_Stream s1;
+  static svm_Block scratch1;
   static SumKernel sk;
   int finalSum;
 
   // assumes prior code initializes data in RAM
-  streamInitWithDataRAM(&s1, LOCALMEM1, 0x100, 128, 4, 128, TRUE, 128, 0);
+  svm_streamInitWithDataRAM(&s1, LOCALMEM1, 0x100, 128, 4, 128, TRUE, 128, 0);
 
   // run sum kernel
   sumInit(&sk, PROC1, &scratch1, &s1);
-  blockInit(&scratch1, LOCALMEM1, 0x180, 16, 1);
-  kernelRun(&sk.kernel);
+  svm_blockInit(&scratch1, LOCALMEM1, 0x180, 16, 1);
+  svm_kernelRun(&sk.kernel);
 
   // get output sum
-  kernelWait(&sk.kernel);
+  svm_kernelWait(&sk.kernel);
   finalSum = sk.sum; 
 }\end{verbatim}}
 
@@ -1637,9 +1640,9 @@ in-depth example appears in Appendix~\ref{sec:fifocleanexample}.
 \sss{Managing Kernel Instruction Memory}
 
 The High Level Compiler might anticipate upcoming kernel
-executions. The {\tt kernelReady} function allows this information to
-be transferred to the Low Level Compiler so that the kernel can be
-loaded into IMEM ahead of time.
+executions. The {\tt svm\_kernelReady} function allows this
+information to be transferred to the Low Level Compiler so that the
+kernel can be loaded into IMEM ahead of time.
 
 \subsubsection{Restrictions on Stream Control}
 
@@ -1655,13 +1658,13 @@ In order to represent a valid hardware mapping, there are several restrictions:
 
 \begin{enumerate}
 
-\item Only one user-defined kernel may be {\tt RUNNING} or {\tt
-PAUSED} on a stream processor at any given time.
+\item Only one user-defined kernel may be {\tt Running} or {\tt
+Paused} on a stream processor at any given time.
 
 \item A number of pre-defined memory management kernels may be {\tt
-RUNNING} or {\tt PAUSED} on a DMA processor at any given time.  The
-maximum number is given by the {\tt MM\_PROC\_MULTIPLEXING} field in
-the PCA Machine Model.
+Running} or {\tt Paused} on a DMA processor at any given time.  The
+maximum number is given by the {\tt mm.Proc.Multiplexing} field in the
+PCA Machine Model.
 
 \item A kernel may only read from or write to streams that are mapped
 to memories or FIFOs connected to the processor executing the kernel
@@ -1745,15 +1748,16 @@ functions can also be called from control code.
 memories or FIFOs.
 
 \item Multiple user-defined kernels can be assigned to a streaming
-processor, but only one {\tt RUNNING} user-defined kernel can be
-assigned; the rest must be {\tt WAITING} for a previous kernel to
-complete.  However, multiple pre-defined kernels can be {\tt RUNNING}
+processor, but only one {\tt Running} user-defined kernel can be
+assigned; the rest must be {\tt Waiting} for a previous kernel to
+complete.  However, multiple pre-defined kernels can be {\tt Running}
 on the same processor, up to the limit specified by the {\tt
-MM\_PROC\_MULTIPLEXING} field in the PCA Machine Model.
+mm.Proc.Multiplexing} field in the PCA Machine Model.
 
-\item At any given time, Streams have a single producer and a single
-consumer.  However, the contents of a Stream stored in memory can be
-aliased such that several different Streams can read the same values.
+\item At any given time, each {\tt Stream} has a single producer and a
+single consumer.  However, the contents of a {\tt Stream} stored in
+memory can be aliased such that several different {\tt Stream}s can
+read the same values.
 
 \item The machine model describes the available resource pool that the
 HLC can work with.  This may not be the hardware's full capability -
@@ -1830,66 +1834,66 @@ stream is drained.
   static PopKernel popKernel;
 
   // start k1 and k2 running
-  kernelRun(&k1.kernel)
-  kernelRun(&k2.kernel)
+  svm_kernelRun(&k1.kernel)
+  svm_kernelRun(&k2.kernel)
 
   // wait for k2 to finish
-  kernelWait(&k2.kernel);
+  svm_kernelWait(&k2.kernel);
 
   // if k1 did not finish, run the drain procedure
-  if (kernelGetStatus(&k1.kernel)==KERNEL_RUNNING) {
+  if (svm_kernelGetStatus(&k1.kernel)==svm_Kernel_Running) {
 
-    kernelEnd(&k1.kernel);
+    svm_kernelEnd(&k1.kernel);
 
     // start PopKernel running in its "unbounded remainder mode", in which
     // it pauses itself after each item that it pops.
     PopKernelInit(&popKernel, P2, &s1, c, FALSE);
-    kernelRun(&popKernel.kernel);
+    svm_kernelRun(&popKernel.kernel);
 
     // pop one item at a time from s until k1 has finished
     do {
-      kernelWaitMultiple(&k1.kernel, &popKernel.kernel);
-      if (kernelGetStatus(&popKernel.kernel)==KERNEL_PAUSED) {
-        kernelRun(&popKernel.kernel);
+      svm_kernelWaitMultiple(&k1.kernel, &popKernel.kernel);
+      if (svm_kernelGetStatus(&popKernel.kernel)==svm_Kernel_Paused) {
+        svm_kernelRun(&popKernel.kernel);
       }
-      if (kernelGetStatus(&k1.kernel)==KERNEL_PAUSED) {
-        kernelRun(&k1.kernel);
+      if (svm_kernelGetStatus(&k1.kernel)==svm_Kernel_Paused) {
+        svm_kernelRun(&k1.kernel);
       }
-    } while (kernelGetStatus(&k1.kernel)!=KERNEL_FINISHED);
+    } while (svm_kernelGetStatus(&k1.kernel)!=svm_Kernel_Finished);
     
     // start PushKernel running
     PushKernelInit(&pushKernel, P1, &s1, c);
-    kernelRun(&pushKernel.kernel);
+    svm_kernelRun(&pushKernel.kernel);
 
 
     // change the PopKernel's state to be in "bounded remainder mode", in which
     // it will pop c items and then keep popping until it finds an EOS tag
-    kernelWait(&popKernel.kernel);
+    svm_kernelWait(&popKernel.kernel);
     popKernel.boundedRemainder = TRUE;
-    kernelRun(&popKernel.kernel);
+    svm_kernelRun(&popKernel.kernel);
 
     // wait for PopKernel to finish
-    kernelWait(&popKernel.kernel);
+    svm_kernelWait(&popKernel.kernel);
 
     // at this point, we are guaranteed that both kernels have finished, 
     // and that the stream s has been completely drained
-    ASSERT(kernelGetStatus(&popKernel.kernel)==KERNEL_FINISHED);
-    ASSERT(kernelGetStatus(&pushKernel.kernel)==KERNEL_FINISHED);
+    ASSERT(svm_kernelGetStatus(&popKernel.kernel)==svm_Kernel_Finished);
+    ASSERT(svm_kernelGetStatus(&pushKernel.kernel)==svm_Kernel_Finished);
   }
 
   // ------------- kernel code for PopKernel -------------
 
   typedef struct {
-    Kernel kernel;
-    IStream* in;
+    svm_Kernel kernel;
+    svm_IStream* in;
     int capacity;
     boolean boundedRemainder;
-  } PopKernel;
+  } svm_PopKernel;
 
   void popKernelWork();
   
-  pushInit(PopKernel* k, MM_ELMT_PROC procLocation, IStream* _in, int _capacity, boolean _boundedRemainder) {
-    kernelInit(&k->kernel, procLocation, 0, k, sizeof(PopKernel), (ExtKernelWork)&popKernelWork); 
+  pushInit(PopKernel* k, mm_Proc procLocation, svm_IStream* _in, int _capacity, boolean _boundedRemainder) {
+    svm_kernelInit(&k->kernel, procLocation, 0, k, sizeof(PopKernel), (svm_ExtKernelWork)&popKernelWork); 
     k->in = _in;
     k->capacity = _capacity;
     k->boundedRemainder = _boundedRemainder;
@@ -1904,18 +1908,18 @@ stream is drained.
         // as will fit in the stream, as these could be junk leftovers 
         // from the original upstream kernel.
         for (i = 0; i < k->capacity; i++) {
-          streamPop(&k->in, &x);
+          svm_streamPop(&k->in, &x);
         }
         done = FALSE;
         // then, pop until we find the EOS tag that the pushKernel output
         do {
-          done = streamPeekEOS(&k->in, 0);
-          streamPop(&k->in, &x);
+          done = svm_streamPeekEOS(&k->in, 0);
+          svm_streamPop(&k->in, &x);
         } while (!done);
       } else {
         // if we do not have a bounded remainder, then pop one item and pause
-        streamPop(&k->in, &x);
-        kernelPause(&k->kernel);
+        svm_streamPop(&k->in, &x);
+        svm_kernelPause(&k->kernel);
       }
     } while (!done);
   }
@@ -1923,15 +1927,15 @@ stream is drained.
   // ------------- kernel code for PushKernel -------------
 
   typedef struct {
-    Kernel kernel;
-    OStream* out;
+    svm_Kernel kernel;
+    svm_OStream* out;
     int capacity;
   } PushKernel;
 
   void pushKernelWork();
   
-  sumInit(PushKernel* k, MM_ELMT_PROC procLocation, OStream* _out, int _capacity) {
-    kernelInit(&k->kernel, procLocation, 0, k, sizeof(PushKernel), (ExtKernelWork)&pushKernelWork); 
+  sumInit(PushKernel* k, mm_Proc procLocation, svm_OStream* _out, int _capacity) {
+    svm_kernelInit(&k->kernel, procLocation, 0, k, sizeof(PushKernel), (svm_ExtKernelWork)&pushKernelWork); 
     k->out = _out;
     k->capacity = _capacity;
   }
@@ -1942,10 +1946,10 @@ stream is drained.
     // the original kernel did not leave any junk leftovers for PopKernel 
     // to consume
     for (i = 0; i < k->capacity; i++) {
-      streamPush(&k->kernel, &dummy);
+      svm_streamPush(&k->kernel, &dummy);
     }
     // push a single item with an EOS tag, indicating the true end of stream
-    streamPushEOS(&k->kernel, &dummy);
+    svm_streamPushEOS(&k->kernel, &dummy);
   }
 \end{verbatim}}
 
@@ -1953,47 +1957,3 @@ The above procedure is an example of a basic draining operation that
 can be constructed using the primitives in the SVM.  The High Level
 Compiler should employ similar mechanisms in other scenarios to ensure
 that it always has a consistent view of FIFO contents.
-
-%% \subsection*{Appendix A:  Reference Implementation of Pre-Defined Kernels}
-%%
-%% \makeline
-%% \name{Move}
-%% {\small
-%% \begin{verbatim}
-%%   typedef struct {
-%%     Kernel kernel;
-%%     IStream* srcStr,
-%%     OStream* destStr,
-%%     int _elementSize,
-%%     int length,
-%%     boolean setEOS
-%%   } Move;
-%%
-%%   void moveInit(Move* move, MM_ELMT_PROC location, IStream* _srcStr, OStream* _destStr,
-%%                 int _elementSize, int _length, boolean _setEOS) {
-%%     kernelInit(&move->kernel, location, 0, move, sizeof(Move), (ExtKernelWork)&moveWork);
-%%     move->srcStr = _srcStr;
-%%     move->destStr = _destStr;
-%%     move->elementSize = _elementSize;
-%%     move->length = _length;
-%%     move->setEOS = _setEOS;
-%%   }
-%%
-%%   void moveWork(Move* move) {
-%%     char[move->elementSize] buffer;
-%%     if (move->length == STREAM_LENGTH_ALL) {
-%%       while (!streamPeekEOS(move->srcStr, 0)) {
-%%         streamPop(move->srcStr, &buffer);
-%%         streamPush(move->destStr, &buffer);
-%%       }
-%%       streamPop(move->srcStr, &buffer);
-%%       streamPushWithEOS(move->destStr, &buffer);
-%%     } else {
-%%       int i;
-%%       for (i = 0; i < length; i++) {
-%%         streamPop(move->srcStr, &buffer);
-%%         streamPush(move->destStr, &buffer);
-%%       }
-%%     }
-%%   }
-%% }
