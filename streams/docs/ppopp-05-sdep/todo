@@ -6,12 +6,13 @@ general
   - explain "actor" , "I/O rate" and "phase" of actor
 * explain numbers in figure 1 (separated by commas)
 * Figure 2: explain how to follow chart, what each line means
-* define what "simulateCurrentPhase" means in Figure 1
+x define what "simulateCurrentPhase" means in Figure 1
+  - fixed by comment and renaming of call
 * explain what [n:m] notation means 
   x added explanation to example when first introduced
   - could still be more explicit somewhere:
     "Message sends are annotated with a range [n:m] that means..."
-- fix "automatic" wraparound in figure caption
+x fix "automatic" wraparound in figure caption
 
 technical things
 ----------------

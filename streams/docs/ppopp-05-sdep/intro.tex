@@ -4,32 +4,31 @@
 Applications that are structured around streams of data pervade common
 computing  practices,  and  there  is evidence  that  streaming  media
 applications already consume a substantial fraction of the computation
-cycles    on    consumer   machines~\cite{rixner98bandwidthefficient}.
+cycles    on    consumer   machines~\cite{Rix98}.
 Examples  of streaming  workloads  can be  found  in embedded  systems
 (e.g., sensor nets and mobile  phones), as well as in desktop machines
 (e.g., networking, and  multimedia) and high-performance servers (e.g.,
 HDTV editing consoles and hyper-spectral imaging). 
 
-The performance  of streaming  applications is evermore  critical, and
-programmers   often  sacrifice   the   readability,  robustness,   and
-maintainability  of their  code in  order to  deliver high-performance
-implementations.    One   especially   difficult  aspect   of   stream
-programming---that  commands considerable  and  tedious attention---is
-the  reconciliation  of regular  streaming  data  flow with  irregular
-control messages. Consider for example a frequency hopping (FHR) radio
-which mirrors how  CDMA-based cell phone technology works.   In FHR, a
-transmitter  and  a receiver  change  between  a  set of  known  radio
+The performance of streaming applications is evermore critical, and
+programmers often sacrifice the readability, robustness, and
+maintainability of their code in order to deliver high-performance
+implementations.  One especially difficult aspect of stream
+programming---that commands considerable and tedious attention---is
+the reconciliation of regular streaming data flow with irregular
+control messages. Consider for example a frequency hopping radio (FHR)
+which mirrors how CDMA-based cell phone technology works.  In FHR, a
+transmitter and a receiver change between a set of known radio
 frequencies, and they must do so in synchrony with respect to a stream
-boundary. That is,  if a receiver changes its  radio frequency between
-streams,  then it  cannot  properly  process its  incoming  data.  It  is
-therefore imperative  for streaming programs  to properly synchronize
-their  control messages; in  FHR, the  receiver must  change to  a new
-frequency when it  has finished processing the current  stream, if and
-only if  the transmitter has also changed  its transmission frequency.
-What makes this aspect of stream programming especially challenging is
-that it is difficult to reason about ``time'' in parallel (concurrent)
-and distributed systems.
-
+boundary. That is, a receiver must change its radio frequency at an
+exact point in the stream (as indicated by the transmitter) in order
+to follow the incoming signal.  Such a receiver is challenging to
+implement in a distributed environment because different processors
+might be responsible for the radio frontend and the frequency hop
+detection.  When a frequency hop is detected, the detector must send a
+message to the frontend that is timed precisely with respect to the
+data stream, even though the two components are running on different
+processors with independent clocks.
 
 In  this  paper,  we  make  two contributions  toward  improving  the
 programming model  for stream programming.  First, we  define a stream
@@ -45,7 +44,7 @@ to  provide   an  exact,  complete,  and   compact  representation  of
 dependencies between stream processing components.
 % $\sdep$ at compile time.  
 Second,  we define  {\it  teleport messaging}  as a  novel language
-construct  to provide  simple  and precise  event  handling of control
+construct  to provide  simple  and precise  handling of control
 messages in stream
 programs.
 % Our work  is presented  in the context  of Synchronous  Dataflow (SDF)
@@ -64,12 +63,12 @@ programs.
 % parallelism in stream programs, how can concurrent actors have a
 % common frame of reference with respect to time?
 The semantics of teleport  messaging are formalized using $\sdep$, and
-we  will  argue  that  is  a  significant  improvement  over  existing
-programming practices. Specifically, we  will describe a case study of
+we argue  that it is  a  significant  improvement  over  existing
+programming practices. Specifically, we describe a case study of
 a frequency  hopping radio using  a fully automatic  implementation of
-precise   event   handling   as   part  of   the   StreamIt   compiler
+teleport messaging  as   part  of   the   StreamIt   compiler
 infrastructure~\cite{streamit-asplos,  streamitcc}. Our implementation
-of FHR  in StreamIt using teleport  messaging is 48\%  faster than its
+of FHR  in StreamIt using teleport  messaging is 49\%  faster than its
 counterpart which does not use messaging. This is preliminary evidence
 that
 % with a backend that targets a cluster of workstations.  We demonstrate
