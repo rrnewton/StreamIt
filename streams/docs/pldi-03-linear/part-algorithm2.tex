@@ -1,0 +1,15 @@
+// types of transformations we consider for each stream
+enum Transform { ANY, LINEAR, FREQ, NONE }
+
+// a tuple representing a cost and a stream
+class Config {
+  int cost          : the cost of this configuration
+  Stream str        : the Stream corresponding to the lowest cost
+}
+
+// a hierarchical stream element
+class Stream {
+  int height        : the height of container
+  int width[y]      : the width of y'th row
+  int child[x][y]   : the child of this in position (x, y)  [column x, row y]
+}
