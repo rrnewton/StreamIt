@@ -1,0 +1,13 @@
+\chapter{Related Work}
+
+    This thesis builds directly on the work done to analyze and
+optimize linear components in StreamIt graphs \cite{Lamb}. We have
+extended the theoretical framework for linear analysis to
+state-space analysis in order to apply our optimizations to a
+wider class of applications.
+
+    Many other groups are researching methods for automated DSP
+application optimizations. SPIRAL \cite{} is a system developed to
+generate libraries of DSP transforms. These libraries are designed
+for specific architectures, and can be re-optimized when hardware
+is upgraded or replaced.

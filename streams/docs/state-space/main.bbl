@@ -1,0 +1,116 @@
+\newcommand{\noopsort}[1]{} \newcommand{\printfirst}[2]{#1}
+  \newcommand{\singleletter}[1]{#1} \newcommand{\switchargs}[2]{#2#1}
+\begin{thebibliography}{10}
+
+\bibitem{Ackermann/Bucy}
+J.E. Achermann and R.S. Bucy.
+\newblock Canonical minimal realization of a matrix of impulse response
+  sequences.
+\newblock {\em Information and Control}, pages 224--231, 1971.
+
+\bibitem{dynamo}
+Vasanth Bala, Evelyn Duesterwald, and Sanjeev Banerjia.
+\newblock {Dynamo: A transparent dynamic optimization system}.
+\newblock In {\em {Proceedings of the ACM SIG-PLAN 1999 Conference on
+  Programming Language Design and Implementation (PLDI)}}, {1999}.
+
+\bibitem{Esterel}
+Gerard Berry and Georges Gonthier.
+\newblock The esterel synchronous programming language: Design, semantics,
+  implementation.
+\newblock {\em Science of Computer Programming}, 19(2), 1992.
+
+\bibitem{Occam}
+Inmos Corporation.
+\newblock {\em Occam 2 Reference Manual}.
+\newblock Prentice Hall, 1988.
+
+\bibitem{fftw}
+M.~Frigo.
+\newblock {A Fast Fourier Transform Compiler}.
+\newblock In {\em {Proceedings of the ACM SIG-PLAN 1999 Conference on
+  Programming Language Design and Implementation (PLDI)}}, {1999}.
+
+\bibitem{sisal}
+J.~Gaudiot, W.~Bohm, T.~DeBoni, J.~Feo, and P.~Mille.
+\newblock {The Sisal Model of Functional Programming and its Implementation}.
+\newblock In {\em {Proceedings of the 2nd Aizu International Symposium on
+  Parallel Algorithms/Architecture Synthesis}}, {1997}.
+
+\bibitem{Signal}
+Thierry Gautier, Paul~Le Guernic, and Loic Besnard.
+\newblock Signal: A declarative language for synchronous programming of
+  real-time systems.
+\newblock {\em Springler Verlag Lecture Notes in Computer Science}, 274, 1987.
+
+\bibitem{kopi}
+Vincent Gay-Para, Thomas Graf, Andre-Guillaume Lemonnier, and Erhard Wais.
+\newblock {\em Kopi Reference Manual}.
+\newblock http//www.dms.at/kopi/docs/kopi.html, 2001.
+
+\bibitem{Lustre}
+N.~Halbwachs, P.~Caspi, P.~Raymond, and D.~Pilaud.
+\newblock The synchronous data flow language lustre.
+\newblock {\em Proceedings of the IEE}, 79(1), 1991.
+
+\bibitem{Karczmarek}
+Michael~A. Karczmarek.
+\newblock Constrained and phased scheduling of synchronous data flow graphs for
+  the streamit language.
+\newblock Master's thesis, Massachusetts Institute of Technology, October 2002.
+
+\bibitem{Lamb}
+Andrew~A. Lamb.
+\newblock Linear analysis and optimization of stream programs.
+\newblock Master's thesis, Massachusetts Institute of Technology, May 2003.
+
+\bibitem{Mayne}
+D.~Q. Mayne.
+\newblock An elementary derivation of rosenbrock's minimal realization
+  algorithm.
+\newblock {\em IEE Transactions on Automatic Control}, pages 306--307, 1973.
+
+\bibitem{Moore}
+B.~C. Moore.
+\newblock Principal component analysis in linear sytems: controllability,
+  observability, and model reduction.
+\newblock {\em IEE Transactions on Automatic Control}, 26(1):17--31, 1981.
+
+\bibitem{Spiral}
+M.~P$\ddot{u}$schel, B.~Singer, J.~Xiong, J.~M~.F. Moura, J.~Johnson, D.~Padua,
+  M.~M. Veloso, and R.~W. Johnson.
+\newblock Spiral: A generator for platform-adapted libraries of signal
+  processing algorithms.
+\newblock {\em Journal of High Performance Computing and Applications, special
+  issue on Automatic Performance Tuning}, 18(1):21--45, 2004.
+
+\bibitem{streamc}
+Scott Rixner, William~J. Dally, Ujval~J. Kapani, Brucek Khailany, Abelardo
+  Lopez-Lagunas, Peter~R. Manson, and John~D. Owens.
+\newblock {A Bandwidth-Efficient Architecture for Media Processing}.
+\newblock In {\em {International Symposium on High Performance Computer
+  Architecture}}, {Dallas, TX}, {1998}.
+
+\bibitem{Schutter}
+B.~De Schutter.
+\newblock Minimal state-space realization in linear system theory: An overview.
+\newblock {\em Journal of Computational and Applied Mathematics}, 121(1), 2000.
+
+\bibitem{streamitcc}
+William Thies, Michal Karczmarek, and Saman Amarasinghe.
+\newblock {StreamIt: A Language for Streaming Applications}.
+\newblock In {\em {Proceedings of the International Conference on Compiler
+  Construction}}, {Grenoble, France}, {2002}.
+
+\bibitem{Trefethen}
+Lloyd~N. Trefethen and David~Bau III.
+\newblock {\em Numerical Linear Algebra}.
+\newblock Society for Industrial and Applied Mathematics, Philadelphia, PA,
+  1997.
+
+\bibitem{Atlas}
+R.~Clint Whaley, Antoine Petitet, and Jack~J. Dongarra.
+\newblock Automated empirical optimizations of software and the atlas project.
+\newblock {\em Parallel Computing}, 27(1), 2001.
+
+\end{thebibliography}
