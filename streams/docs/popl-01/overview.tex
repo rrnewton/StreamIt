@@ -1,12 +1,22 @@
 \section{Language Overview}
 
-\begin{figure*}
+\begin{figure}
 \centering
-\psfig{figure=Radio.eps,width=5.2in}
-\caption{A block diagram of a software radio.  A detailed
-implementation in StreaMIT appears in the Appendix.}
-\label{fig:radiodiagram}
-\end{figure*}
+\psfig{figure=basic-pipeline.eps,width=3.0in}
+
+(a) A Stream. \\
+\vspace{8pt}
+\psfig{figure=basic-splitjoin.eps,width=3.0in}
+
+(b) A SplitJoin. \\
+\vspace{8pt}
+\psfig{figure=basic-feedback.eps,width=3.0in}
+
+(c) A FeedbackLoop. \\
+\vspace{8pt}
+\caption{Stream structures supported by StreaMIT.}
+\label{fig:structuresp}
+\end{figure}
 
 StreaMIT includes stream-specific abstractions and representations
 that are designed to improve programmer productivity for the domain of
@@ -16,6 +26,14 @@ the fundamental ideas of StreaMIT, in the longer term we plan to
 develop a cleaner and more abstract syntax that is designed
 specifically for stream programs.
 
+\begin{figure*}
+\centering
+\psfig{figure=Radio.eps,width=5.2in}
+\caption{A block diagram of a software radio.  A detailed
+implementation in StreaMIT appears in the Appendix.}
+\label{fig:radiodiagram}
+\end{figure*}
+
 In the Appendix we have included a detailed example of a software
 radio implemented in StreaMIT; a block diagram of the system appears
 in Figure \ref{fig:radiodiagram}.  In the following sections, we draw
@@ -23,6 +41,8 @@ on different components of this example to describe and justify the
 major features of StreaMIT.
 
 \subsection{Filters}
+
+
 
 \begin{figure}
 \scriptsize
@@ -464,7 +484,12 @@ Finally, it is easy for the compiler to recognize stream
 re-initialization possibilities and to account for all possible
 configurations of the stream flow graph during analysis and optimization.
 
-\subsection{Realtime Constraints}
+\subsection{Latency Constraints}
 
-
-
+Lastly, StreaMIT provides a simple way of restricting the latency of
+an information wavefront in traveling from the input of one filter to
+the output of a downstream filter.  Issueing the directive {\tt
+MAX\_LATENCY(A, B, n)} from within an {\tt init} means that $A$ can
+only execute up to the wavefront of information that $B$ will see
+after $n$ invocations of its own work function.  See section
+\ref{sec:time} for more detailed semantics.

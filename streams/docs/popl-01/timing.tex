@@ -336,6 +336,10 @@ output, so the number of items $r$ on $B$'s output must equal $y$.
 
 \subsubsection{Latency}
 
+Each directive {\tt MAX\_LATENCY(A, B, n)} has the same effect as
+defining a message from filter $B$ to upstream filter $A$ with latency
+$n$.
+
 \subsubsection{Scheduling}
 
 We can fully define the possible sequences of filter executions as a
@@ -380,7 +384,9 @@ and as follows if $B$ is downstream of $A$:
 n(O_B) \le \ma{O_A}{O_B}(n(O_A) + push_A * (n-1))
 \end{eqnarray*}
 
-\item {\it Latency guarantees.}
+\item {\it Latency guarantees.}  The guarantees for latency are
+treated identically to message guarantees, as fitting with the
+semantics of latency as described above.
 
 \end{enumerate}
 
