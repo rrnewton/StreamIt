@@ -1,13 +1,51 @@
+\begin{table*}[t]
+\vspace{-6pt}
+\centering
+\small
+\begin{tabular}{|l|c|c|c||c||c|c|c|} 
+\hline
+& \multicolumn{3}{|c||}{Originally}  &             & \multicolumn{3}{|c|}{After Optimizations (using Automatic Selection)} \\
+\hline
+Benchmark  & Filters & Pipelines& SplitJoins & Average     & Filters      & Pipelines         & SplitJoins \\
+           & (linear)& (linear) & (linear)   & vector size &              &                   &            \\
+\hline
+FIR        & 3 (1)   & 1(0)     & 0 (0)      & 256         & 3            & 1                 & 0 \\
+\hline
+RateConvert& 5 (3)   & 2 (1)    & 0 (0)      & 102         & 4            & 1                 & 0 \\
+\hline
+TargetDetect& 10 (4) & 6 (0)    & 1 (0)      & 300         & 7            & 1                 & 1 \\
+\hline
+FMRadio    & 26 (22) & 11 (9)   & 2 (2)      & 40          & 5            & 1                 & 0 \\
+\hline
+Radar      & 76 (60) & 17 (0)   & 2 (0)      & 4412        & 38           & 17                & 2 \\
+\hline
+FilterBank & 27 (24) & 17 (9)   & 4 (4)      & 52          & 3            & 1                 & 0 \\
+\hline
+Vocoder    & 17 (13) & 10 (8)   & 2 (1)      & 60          & 6            & 2                 & 1 \\
+\hline
+Oversampler& 10 (8) & 1 (1)     & 0 (0)      & 33          & 3            & 1                 & 0 \\
+\hline
+DToA       & 14 (10) & 3 (1)    & 0 (0)      & 52          & 7            & 2                 & 0 \\
+\hline
+
+\end{tabular}
+\vspace{-3pt}
+\caption{Statistics for benchmarks before and after optimizations.
+\protect\label{fig:benchmark-statistics}}
+\vspace{-4pt}
+\end{table*}
+
 \begin{figure}[t]
 \psfig{figure=images/flops-removed.eps,width=3.5in}
-\vspace{-6pt}
+\vspace{-12pt}
 \caption{Elimination of floating point operations by linear replacement, frequency replacement, and automatic optimization selection.}
 \label{fig:flops}
 \vspace{-12pt}
 \end{figure}
 
 \begin{figure}[t]
-\vspace{-6pt}
+\vspace{-12pt}
+\psfig{figure=images/flops-removed.eps,width=3.5in}
 \caption{Execution speedup for linear replacement, frequency replacement, and automatic optimization selection.}
 \label{fig:execution-speedup}
 \vspace{-6pt}
@@ -178,40 +216,3 @@ reduction in FLOPS and a 5\% performance gain.
 %% execution time to increase. A more accurate cost model that takes into
 %% account costs other than multiplications could help the selection
 %% algorithm improve its choice of stream graph arrangements.
-
-\begin{table*}[t]
-\vspace{-6pt}
-\centering
-\small
-\begin{tabular}{|l|c|c|c||c||c|c|c|} 
-\hline
-& \multicolumn{3}{|c||}{Originally}  &             & \multicolumn{3}{|c|}{After Optimizations (using Automatic Selection)} \\
-\hline
-Benchmark  & Filters & Pipelines& SplitJoins & Average     & Filters      & Pipelines         & SplitJoins \\
-           & (linear)& (linear) & (linear)   & vector size &              &                   &            \\
-\hline
-FIR        & 3 (1)   & 1(0)     & 0 (0)      & 256         & 3            & 1                 & 0 \\
-\hline
-RateConvert& 5 (3)   & 2 (1)    & 0 (0)      & 102         & 4            & 1                 & 0 \\
-\hline
-TargetDetect& 10 (4) & 6 (0)    & 1 (0)      & 300         & 7            & 1                 & 1 \\
-\hline
-FMRadio    & 26 (22) & 11 (9)   & 2 (2)      & 40          & 5            & 1                 & 0 \\
-\hline
-Radar      & 76 (60) & 17 (0)   & 2 (0)      & 4412        & 38           & 17                & 2 \\
-\hline
-FilterBank & 27 (24) & 17 (9)   & 4 (4)      & 52          & 3            & 1                 & 0 \\
-\hline
-Vocoder    & 17 (13) & 10 (8)   & 2 (1)      & 60          & 6            & 2                 & 1 \\
-\hline
-Oversampler& 10 (8) & 1 (1)     & 0 (0)      & 33          & 3            & 1                 & 0 \\
-\hline
-DToA       & 14 (10) & 3 (1)    & 0 (0)      & 52          & 7            & 2                 & 0 \\
-\hline
-
-\end{tabular}
-\vspace{-3pt}
-\caption{Statistics for benchmarks before and after optimizations.
-\protect\label{fig:benchmark-statistics}}
-\vspace{-4pt}
-\end{table*}

@@ -1,15 +1,3 @@
-\begin{figure}[t]
-  \psfig{figure=images/part-algorithm.eps,width=3.5in}
-  \caption{Algorithm for optimization selection.
-  \protect\label{fig:part-alg}}
-\end{figure}
-
-\begin{figure}[t]
-  \psfig{figure=images/part-algorithm2.eps,width=3.5in}
-  \caption{Type declarations for code in Figure~\ref{fig:part-alg}.
-  \protect\label{fig:part-decl}}
-\end{figure}
-
 %% \begin{figure}[t]
 %%   \psfig{figure=images/part-algorithm3.eps,width=3.5in}
 %%   \caption{Cost functions for optimization selection.}
@@ -87,6 +75,18 @@ the child splitjoins are decomposed and evaluated, there are
 overlapping sub-problems that enable us to search the space of child
 configurations in polynomial time, using dynamic programming.
 
+\begin{figure}[t]
+  \psfig{figure=images/part-algorithm2.eps,width=3.5in}
+  \caption{Type declarations for code in Figure~\ref{fig:part-alg}.
+  \protect\label{fig:part-decl}}
+\end{figure}
+
+\begin{figure}[t]
+  \psfig{figure=images/part-algorithm.eps,width=3.5in}
+  \caption{Algorithm for optimization selection.
+  \protect\label{fig:part-alg}}
+\end{figure}
+
 %Pseudocode for our optimization selection algorithm appears in
 %Figures~\ref{fig:part-alg} and~\ref{fig:part-decl}.  
 There is one subtlety in the pseudocode of Figure~\ref{fig:part-alg}.
@@ -116,6 +116,7 @@ detected where it would apply.  In our implementation, we use the
 following versions of the cost functions (let
 $\lambda=(A,\vec{b},e,o,u)$ be the linear node corresponding to stream
 $s$):
+\clearpage
 %% \[
 %% \begin{array}{rcl}
 %% \mt{getDirectCost}(s) \hspace{-6pt} & = \hspace{-6pt} & 1 + 3 * |\{ (i,j)~s.t.~A_{i,j} \ne 0\}| \vspace{3pt} \\ 
