@@ -1,5 +1,5 @@
 #
-#ident	"@(#)cvs/examples:$Name: not supported by cvs2svn $:$Id: loginfo,v 1.1 1997-01-15 07:46:17 jbabb Exp $"
+#ident	"@(#)cvs/examples:$Name: not supported by cvs2svn $:$Id: loginfo,v 1.2 1997-01-15 07:52:05 jbabb Exp $"
 #
 # The "loginfo" file is used to control where "cvs commit" log information
 # is sent.  The first entry on a line is a regular expression which is tested
@@ -36,4 +36,6 @@
 # without perl you could do this:
 #DEFAULT		(echo ""; who am i; date; cat) >> $CVSROOT/CVSROOT/commitlog
 #
-#DEFAULT			$CVSROOT/CVSROOT/log -f $CVSROOT/CVSROOT/commitlog  %s
+ALL			$CVSROOT/CVSROOT/log -f $CVSROOT/CVSROOT/commitlog  %s
+CVSROOT   mail -s "CVS log notification: CVSROOT"   jbabb@mit.edu
+benchmark mail -s "CVS log notification: benchmark" jbabb@mit.edu 
