@@ -12,10 +12,10 @@ Displays a summary of common options.
 \item [-{}-more-help]													
 Displays a summary of advanced options (which are not described below).
 
-\item[-{}-output \metavar{filename}]
+\item[-{}-output \metavar{filename}, -o \metavar{filename}]
 Places the resulting binary in \metavar{filename}.
 
-\item[-{}-raw \metavar{n}]
+\item[-{}-raw \metavar{n}, -r \metavar{n}]
 Compile for an \metavar{n}-by-\metavar{n} Raw processor.
 
 \item [-{}-standalone, -S]
