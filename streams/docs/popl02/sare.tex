@@ -333,7 +333,7 @@ introduce this equation (SWRITE to SBUF):
   {\cal D}_{{SBUF}_{c}} \cap 
   \{ (i,j) | \mt{Offset}_{SW {\small \rightarrow} SB}(q,n,c,p) \le j
              \le \mt{Offset}_{SW {\small \rightarrow} SB}(q,n,c,p+1) - 1 \} \\ 
-\mt{and } \mt{Offset}_{SW {\small \rightarrow} SB}(q,n,c,r) = q*\mt{TotalWrite}(n,c,\mt{steady}) + \mt{PartialWrite}(c,\mt{steady},r))
+\mt{and } \mt{Offset}_{SW {\small \rightarrow} SB}(q,n,c,p') = q*\mt{TotalWrite}(n,c,\mt{steady}) + \mt{PartialWrite}(c,\mt{steady},p'))
 \end{align*}
 %
 \item For each $c \in \mt{chan\_in}(n)$, and for each phase $p \in
@@ -356,13 +356,15 @@ IREAD):
 \forall i \in {\cal D}_{SB {\small \rightarrow} IR}(c,p), 
 \mt{IREAD}_{c,p}(i) = 
     \mt{SBUF}_{c}(q,
-      i + \mt{PartialRead}(c, \mt{init}, p) - 
-            |{\cal D}_{{IBUF}_{c}}| - q * \mt{Period}(c)) \\
+      i - \mt{Offset}_{SB {\small \rightarrow} IR}(q,n,c,p)) \\
 \mt{where }{\cal D}_{SB {\small \rightarrow} IR}(c,p) = 
   \{ i | i \in {\cal D}_{{IREAD}_{c,p}} ~\wedge~ 
          \mt{PartialRead}(c, \mt{init}, p) + i \notin {\cal D}_{{IBUF}_{c}} ~\wedge~ \\
-         q * \mt{Period}(c) \le i 
-         \le \mt{Period}(c) + |{\cal D}_{{IBUF}_c}| - \mt{PartialRead}(c,\mt{init},p) \}
+         \mt{Offset}_{SB {\small \rightarrow} IR}(q,n,c,p)
+         \le i \le
+         \mt{Offset}_{SB {\small \rightarrow} IR}(q+1,n,c,p) - 1 \} \\
+\mt{where }\mt{Offset}_{SB {\small \rightarrow} IR}(q',n,c,p) = 
+  q' * \mt{Period}(c) + |{\cal D}_{{IBUF}_c}| - \mt{PartialRead}(c,\mt{init},p)
 \end{align*}
 %
 \item For each $c \in \mt{chan\_in}(n)$, and for each phase $p \in [0,
