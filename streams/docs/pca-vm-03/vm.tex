@@ -1461,7 +1461,6 @@ kernel, the High Level Compiler guarantees that it will not merge
 black-box kernels with other kernels, or rename a black-box kernel so
 that it would become unrecognizable to the Low Level Compiler.
 
-\clearpage
 \subsection{Control}
 \label{sec:control}
 
@@ -1620,7 +1619,7 @@ For example:
   // get output sum
   svm_kernelWait(&sk.kernel);
   finalSum = sk.sum; 
-}\end{verbatim}}
+\end{verbatim}}
 
 \sss{FIFO Cleanup}
 \label{sec:fifoclean}
@@ -1680,7 +1679,6 @@ FIFO.  The state is empty if there are no data elements in the FIFO.
 
 \end{enumerate}
 
-\clearpage
 \noindent In order to facilitate static analysis in the Low Level
 Compiler, there are a number of restrictions:
 
