@@ -1,0 +1,63 @@
+\section{StreamIt Overview}
+
+StreamIt is a language for writing applications built around
+continuous streams of data.  A program consists of a set of filters
+that process conceptually infinite data streams; connections between
+filters are implicit in the structure of the source code.
+
+\subsection{Setting Up the Infrastructure}
+
+StreamIt has a number of dependencies.  You need a Java runtime
+environment.  The build system assumes IBM's Jikes compiler
+(\url{http://www.jikes.org}).  Additionally, the C library depends on
+the FFTW library (\url{http://www.fftw.org/}); you must build the
+single-precision version of the library and install it somewhere in
+the default compiler search path.
+
+Unpack the StreamIt source in a directory.  This document assumes it
+is unpacked in a directory named \textsf{streams} in your home
+directory, but this is not a requirement.  The \textsf{STREAMIT\_HOME}
+environment variable needs to be set to point to this directory.  Edit
+your shell's initialization files.  If you use \textsf{bash}, edit
+your \textsf{.bashrc} file and add
+
+\begin{verbatim}
+export STREAMIT_HOME=$HOME/streams
+. $STREAMIT_HOME/include/dot-bashrc
+\end{verbatim}
+
+If you use \textsf{tcsh}, edit your \textsf{.cshrc} file and add
+
+\begin{verbatim}
+setenv STREAMIT_HOME=${HOME}/streams
+source ${STREAMIT_HOME}/include/dot-cshrc
+\end{verbatim}
+
+Then log out and log in again, or reload your dotfiles.
+
+To build the compiler, change directories to
+\textsf{\$STREAMIT\_HOME\slash{}com\-pi\-ler} and run \textsf{make}.
+There is also a C library used for the uniprocessor backend; change to
+\textsf{\$STREAMIT\_HOME\slash{}library\slash{}c} and run
+\textsf{make}.  You also may need to explicitly compile the files in
+\textsf{\$STREAMIT\_HOME\slash{}library\slash{}java\slash{}streamit}.
+
+\subsection{Compiling StreamIt Programs}
+
+The \textsf{knit} script will compile a StreamIt program end-to-end.
+By default, it takes the name of a file containing code as a
+command-line parameter, and produces an executable called
+\textsf{a.out}.  Running the executable will run the program forever;
+a command-line parameter of \textsf{-i10} will run the program for ten
+steady-state executions.
+
+A StreamIt program can also be compiled and run against a Java runtime
+library.  This involves using a syntax converter, and then compiling
+and running the program:
+
+\begin{verbatim}
+java streamit.frontend.ToJava --library Hello.str \
+  --output Hello.java
+javac Hello.java
+java Hello -i10
+\end{verbatim}

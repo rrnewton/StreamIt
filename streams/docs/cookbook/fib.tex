@@ -1,0 +1,24 @@
+\section{Fibonacci}
+
+\begin{lstlisting}{}
+void->int feedbackloop Fib {
+  join roundrobin(0,1);
+  body int->int filter { 
+    work pop 1 push 1 peek 2 { push(peek(0) + peek(1)); pop(); }
+  };
+  loop Identity<int>;
+  split duplicate;
+  enqueue(0);
+  enqueue(1);
+}
+\end{lstlisting}
+
+Using a feedback loop for a Fibonacci number generator is slightly
+abusive but possible.  The joiner reads no items from the stream input
+(also declared of type \lstinline|void|), but reads items continuously
+from the feedback path.  Within a feedback loop, round-robin splitters
+and joiners address the external path first and the feedback path
+second.  This loop also uses the special \lstinline|Identity| filter
+on the loop path; this is equivalent to an empty filter that copies
+its input to its output, but occurs frequently enough that a shorthand
+is useful to both the programmer and the compiler.
