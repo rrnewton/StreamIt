@@ -16,13 +16,22 @@ pipelines, split-joins, and feedback loops.  Each of these structures
 also has a single input and a single output, so these blocks can be
 recursively composed.
 
-A typical streaming application might be a software FM radio.  The
-program receives its input from an antenna, and its output is
-connected to a speaker.  The main program is a pipeline with a
-band-pass filter for the desired frequency, a demodulator, and an
-equalizer; the equalizer in turn is made up of a split-join, where
-each child adjusts the gain over a particular frequency range, followed
-by a filter that adds together the outputs of each of the bands.
+A typical streaming application might be a software FM radio, as shown
+in Figure \ref{fig:fm-radio}.  The program receives its input from an
+antenna, and its output is connected to a speaker.  The main program
+is a pipeline with a band-pass filter for the desired frequency, a
+demodulator, and an equalizer; the equalizer in turn is made up of a
+split-join, where each child adjusts the gain over a particular
+frequency range, followed by a filter that adds together the outputs
+of each of the bands.
+
+\begin{figure}[htbp]
+  \begin{center}
+    \includegraphics{cookbook.0}
+    \caption{Stream graph for a software FM radio}
+    \label{fig:fm-radio}
+  \end{center}
+\end{figure}
 
 Our goal with choosing these constructs was to create a language with
 most of the expressiveness of a general data-flow graph structure, but
