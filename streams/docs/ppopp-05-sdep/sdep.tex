@@ -11,13 +11,13 @@ stream dependence function, $\sdep$.
 Our model of computation is Cyclo-Static Dataflow~\cite{BELP96}.  In
 this model, the stream graph is a directed graph where nodes represent
 actors and edges represent FIFO communication channels.  Each actor
-has a set of execution steps, or phases, which consume some items from
+has a set of execution steps, or phases, that consume some items from
 the input channels and produce some items on the output channels.  The
 number and ordering of phases is known at compile time, and their
-execution is cyclic (after executing the last phase, the first phase
-is executed again).  Also, for each phase, the number of items
-produced and consumed from the channels is fixed and known at compile
-time.
+execution is cyclic (that is, after executing the last phase, the
+first phase is executed again).  Also, for each phase, the number of
+items produced and consumed from the channels is fixed and known at
+compile time.
 %We also permit actors to ``peek'' at items that are not
 %consumed from the channel, and the peek amount is known at compile
 %time (note that peeking is not part of CSDF).
@@ -25,9 +25,9 @@ Cyclo-Static Dataflow is a generalization of Synchronous
 Dataflow~\cite{LM87-i}, which requires each actor to have only a
 single phase.
 
-An execution $\phi$ of a dataflow graph is an ordered sequence of actor
-firings.  Each firing represents the execution of a single phase of
-the actor.  Let $\phi[i]$ denote the $i$th actor appearing in
+An execution $\phi$ of a dataflow graph is an ordered sequence of
+actor firings.  Each firing represents the execution of a single phase
+of the actor.  Let $\phi[i]$ denote the $i$th actor appearing in
 execution $\phi$, and let $|\phi \wedge A|$ denote the number of times
 that actor $A$ appears in $\phi$.  An execution is legal if the
 dataflow requirements are respected; that is, for all $i$, the
@@ -45,7 +45,7 @@ is meaningful only if there is a directed path in the stream graph
 from $A$ to $B$; otherwise, $\sdep$ will have a value of zero.
 Because the I/O rates of each actor in the stream graph are known at
 compile time, $\sdep$ is also a static relation.  The following is a
-formal definition of $\sdep$ using the notations from above:
+formal definition of $\sdep$ using the notations introduced earlier:
 \begin{definition}(SDEP)
 \begin{center}
 $\sdepf{A}{B}(n)~~ = ~~\mbox{MIN}~~|\phi \wedge A|$ \\
@@ -164,17 +164,15 @@ two actors $X$ and $Y$, $\sdepf{X}{Y}(0) = 0$}:
 where ${\cal S}$ is a steady state execution.  In this example,
 $|{\cal S} \wedge A| = 6$, $|{\cal S} \wedge B| = 3$, and $|{\cal S}
 \wedge E| = 4$.  There are well-known techniques for computing steady
-state schedules~\cite{LM87-i}.
+state schedules~\cite{LM87-i}.  Thus, to calculate $\sdepf{X}{Y}(n)$,
+it is not necessary to simulate a pull schedule for $n$ iterations of
+$Y$ as described in Algorithm 1.  Instead, one can simulate $|{\cal S}
+\wedge Y|$ iterations as a pre-processing step and answer all future
+$\sdep$ queries in constant time.  In addition, the pull schedule for
+$Y$ can be reused to calculate $\sdep$ from $Y$ to any other actor
+({\it e.g.,} $\sdepf{W}{Y}$ in addition to $\sdepf{X}{Y}$).
 
-Thus, to calculate $\sdepf{X}{Y}(n)$, it is not necessary to simulate
-a pull schedule for $n$ iterations of $Y$ as described in Algorithm 1.
-Instead, one can simulate $|{\cal S} \wedge Y|$ iterations as a
-pre-processing step and answer all future $\sdep$ queries in constant
-time.  In addition, the pull schedule for $Y$ can be reused to
-calculate $\sdep$ from $Y$ to any other actor ({\it e.g.,}
-$\sdepf{W}{Y}$ in addition to $\sdepf{X}{Y}$).
-
-However, note that the pull schedule for $Y$ can NOT be used to
+However, note that the pull schedule for $Y$ can {\it not} be used to
 calculate $\sdep$ from any actor other than $Y$ ({\it e.g.,}
 $\sdepf{W}{X}$).  The guarantee provided by ${\bf pullSchedule}(X, n)$
 is only with respect to the base actor $X$. For other pairs of actors
