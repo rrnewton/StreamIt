@@ -1,4 +1,4 @@
-\section{Linear Dataflow Analysis}
+\clearpage
 
 \newcommand{\maptype}{var$\rightarrow$linform~}
 \newcommand{\la}{$\leftarrow$}
@@ -6,6 +6,8 @@
 \newcommand{\UND}{\end{ALC@g}}
 
 \begin{algorithm}
+{\bf Globals:} int Push, Pop, Peek \\ ~ \\
+%
 {\bf Data Types}
 \begin{algorithmic}
 \STATE $x \in \mbox{variable}$
@@ -16,18 +18,43 @@
 \IND
 \STATE ({\tt loop} $N$ $\mt{code}$)
 \STATE ({\tt branch} $\mt{code}_1$ $\mt{code}_2$)
-\STATE $v_1 := v_2~\mt{op}~v_3$
-\STATE $v_1 := \mt{const}$
-\STATE $v_1 := \mbox{\tt peek}(i)$
-\STATE $v_1 := \mbox{\tt pop}()$
-\STATE {\tt push}$(v_1)$
+\STATE $x_1 := x_2~\mt{op}~x_3$
+\STATE $x_1 := \mt{const}$
+\STATE $x_1 := \mbox{\tt peek}(i)$
+\STATE $x_1 := \mbox{\tt pop}()$
+\STATE {\tt push}$(x_1)$
 \UND
 \end{algorithmic}
-\end{algorithm}
-
-\begin{algorithm}
-{\bf globals} Push, Pop, Peek \\ ~ \\
-%
+%\end{algorithm}
+\begin{tabular}{l}
+~\hspace{3in}~ \\
+\hline \\
+~\hspace{3in}~ 
+\end{tabular}
+%\begin{algorithm}
+proc {\bf toplevel}(filter $F$) returns linear node
+\begin{enumerate}
+\item Set Peek, Pop, Push equal to I/O rates of filter $F$.
+\item Let $A_{0} \leftarrow \mbox{new float[Peek][Push] with each entry =} \bot$
+\item Let $b_{0} \leftarrow \mbox{new float[Push] with each entry =} \bot$
+\item $(\mt{popcount}, \mt{pushcount}, \mt{map}, A, b) \leftarrow$ \\
+{\bf extract}$(F_{work}, \mt{empty-map}, 0, \mbox{Push}, A_{0}, b_{0})$
+\item
+\begin{algorithmic}
+\IF {$A$ and $b$ contain no $\bot$ entries}
+\STATE return linear node $\lambda = \{A, b, \mbox{Peek}, \mbox{Pop}, \mbox{Push}\}$
+\ELSE
+\STATE {\it fail}
+\ENDIF
+\end{algorithmic}
+\end{enumerate}
+%\end{algorithm}
+\begin{tabular}{l}
+~\hspace{3in}~ \\
+\hline \\
+~\hspace{3in}~ 
+\end{tabular}
+%\begin{algorithm}
 proc {\bf intersect}(val $y_1$, val $y_2$) returns val
 \begin{algorithmic}
 \IF {$y_1 = y_2$}
@@ -36,9 +63,13 @@ proc {\bf intersect}(val $y_1$, val $y_2$) returns val
 \STATE return $\bot$
 \ENDIF
 \end{algorithmic}
-\end{algorithm}
-
-\begin{algorithm}
+%\end{algorithm}
+\begin{tabular}{l}
+~\hspace{3in}~ \\
+\hline \\
+~\hspace{3in}~ 
+\end{tabular}
+%\begin{algorithm}
 proc {\bf mergeMap}(\maptype $m_1$, \maptype $m_2$) returns \maptype
 \begin{algorithmic}
 \STATE \maptype $\mt{result}$
@@ -47,9 +78,13 @@ proc {\bf mergeMap}(\maptype $m_1$, \maptype $m_2$) returns \maptype
 \ENDFOR
 \STATE return $\mt{result}$
 \end{algorithmic}
-\end{algorithm}
-
-\begin{algorithm}
+%\end{algorithm}
+\begin{tabular}{l}
+~\hspace{3in}~ \\
+\hline \\
+~\hspace{3in}~ 
+\end{tabular}
+%\begin{algorithm}
 proc {\bf buildCoeff}(int pos) returns int[Peek]
 \begin{algorithmic}
 \STATE int[Peek] $\mt{result}$
@@ -70,80 +105,87 @@ float[Push][Peek] $A$, float[Push] $b$)
 returns ($\mt{popcount'}$, $\mt{pushcount'}$, $\mt{map'}$, $A'$, $b'$)
 \begin{algorithmic}
 \FOR {$i \leftarrow 1$ to $\mt{code}$.length}
-\STATE {\bf case} $\mt{code}$[i] of
+\STATE {\bf switch} $\mt{code}$[i]
 \IND
-\STATE ({\tt loop} N $code'$)
+\STATE \mbox{\bf case}~({\tt loop} N $code'$)
 \IND
-\STATE \bf{for} $i \leftarrow 1$ to $N$ {\bf do}
+\STATE \bf{for} $j \leftarrow 1$ to $N$ {\bf do}
 \IND
 \STATE $(\mt{popcount}, \mt{pushcount}, \mt{map}, A, b)~\leftarrow~$ \bf{extract}$(\mt{code}, \mt{map}, \mt{popcount}, \mt{pushcount}, A, b)$
 \UND
 \UND
-\STATE
-\STATE $x_1 := x_2 + x_3$ or $x_1 := x_2 - x_3$
+\STATE \vspace{-6pt}
+\STATE $\mbox{\bf case}~ x_1 := x_2 + x_3$ or $x_1 := x_2 - x_3$
 \IND
 \STATE $(v_2, c_2) \leftarrow \mt{map}.\mt{get}(x_2)$
 \STATE $(v_3, c_3) \leftarrow \mt{map}.\mt{get}(x_3)$
 \STATE $\mt{map}.\mt{put}(x_1, (v_2+v_3, c_2+c_3))$
 \UND
-\STATE
-\STATE $x_1 := x_2 / x_3$
-\STATE
-\STATE $x_1 := x_2 * x_3$
+\STATE \vspace{-6pt}
+\STATE $\mbox{\bf case}~x_1 := x_2 / x_3$
+\IND
+\STATE $(v_2, c_2) \leftarrow \mt{map}.\mt{get}(x_2)$
+\STATE $(v_3, c_3) \leftarrow \mt{map}.\mt{get}(x_3)$
+\IF {$v_3 = \vec 0_{Peek} \wedge x_3 \ne 0$}
+\STATE $\mt{map}.\mt{put}(x_1, (\frac{1}{c_3}*v_2, c_2/c_3))$
+\ELSE
+\STATE $\mt{map}.\mt{put}(x_1, \bot)$
+\ENDIF
+\UND
+\STATE \vspace{-6pt}
+\STATE $\mbox{\bf case}~x_1 := x_2 * x_3$
 \IND
 \STATE $(v_2, c_2) \leftarrow \mt{map}.\mt{get}(x_2)$
 \STATE $(v_3, c_3) \leftarrow \mt{map}.\mt{get}(x_3)$
 \IF {$v_2 = \vec 0_{Peek}$}
-\STATE $(v', c') \leftarrow (c_2*v_3, c_2*c_3)$
+\STATE $\mt{map}.\mt{put}(x_1, (c_2*v_3, c_2*c_3))$
 \ELSIF {$v3=\vec 0_{Peek}$}
-\STATE $(v', c') \leftarrow (c_3*v_2, c_3*c_2)$
+\STATE $\mt{map}.\mt{put}(x_1, (c_3*v_2, c_3*c_2))$
 \ELSE
-\STATE $(v', c') \leftarrow \bot$
+\STATE $\mt{map}.\mt{put}(x_1, \bot)$
 \ENDIF
-\STATE $\mt{map}.\mt{put}(x_1, (v', c'))$
 \UND
-\STATE
-\STATE $x_1 := x_2 \mt{bitop} x_3$, for $\mt{bitop} \in \{\&, |, \wedge\}$
+\STATE \vspace{-6pt}
+\STATE $\mbox{\bf case}~x_1 := x_2 ~\mt{bitop}~ x_3$, for $\mt{bitop} \in \{\&, |, \wedge\}$
 \IND
 \STATE $(v_2, c_2) \leftarrow \mt{map}.\mt{get}(x_2)$
 \STATE $(v_3, c_3) \leftarrow \mt{map}.\mt{get}(x_3)$
-\STATE $\mt{map}.\mt{put}(x_1, (\mbox{\bf intersect}(\vec 0_{Peek}, v_2, v_3), c_2 \mt{bitop} c_3))$
+\STATE $\mt{map}.\mt{put}(x_1, (\mbox{\bf intersect}(\vec 0_{Peek}, v_2, v_3), c_2 ~\mt{bitop}~ c_3))$
 \UND
-\STATE
-\STATE $x1 := \mt{const}$
+\STATE \vspace{-6pt}
+\STATE $\mbox{\bf case}~x1 := \mt{const}$
 \IND
 \STATE $\mt{map}.\mt{put}(x_1, (\vec 0_{Peek}, \mt{const}))$
 \UND
-\STATE
-\STATE $x_1 := \mbox{\tt peek}(i)$
+\STATE \vspace{-6pt}
+\STATE $\mbox{\bf case}~x_1 := \mbox{\tt peek}(i)$
 \IND
 \STATE $\mt{map}.\mt{put}(x_1, (\mbox{\bf buildCoeff}(i+\mt{popCount}), 0))$
 \UND
 \STATE
-\STATE $x_1 := \mbox{\tt pop}()$
+\STATE $\mbox{\bf case}~x_1 := \mbox{\tt pop}()$
 \IND
 \STATE $\mt{map}.\mt{put}(x_1, (\mbox{\bf buildCoeff}(\mt{popcount}), 0))$
 \STATE $\mt{popcount}++$
 \UND
-\STATE
-\STATE $\mbox{\tt push}(x_1)$
+\STATE \vspace{-6pt}
+\STATE $\mbox{\bf case}~\mbox{\tt push}(x_1)$
 \IND
 \STATE $(v, c) \leftarrow \mt{map}.\mt{get}(x_1)$
 \STATE $A[*, \mt{pushcount}] \leftarrow v$
 \STATE $b[\mt{pushcount}] \leftarrow c$
 \STATE $\mt{pushcount}--$
 \UND
-\STATE
-\STATE ({\tt branch} $code_1 code_2)$
+\STATE \vspace{-6pt}
+\STATE \mbox{\bf case}~({\tt branch} $code_1~code_2)$
 \IND
 \STATE $(\mt{popcount}_1, \mt{pushcount}_1, \mt{map}_1, A_1, b_1) \leftarrow {\mbox{\bf extract}}(\mt{code}_1, \mt{map}, \mt{popcount}, \mt{pushcount}, A, b)$
 \STATE $(\mt{popcount}_2, \mt{pushcount}_2, \mt{map}_2, A_2, b_2) \leftarrow {\mbox{\bf extract}}(\mt{code}_2, \mt{map}, \mt{popcount}, \mt{pushcount}, A, b)$
-\STATE
 \STATE $\mt{popcount} \leftarrow {\mbox{\bf intersect}}(\mt{popcount}_1, \mt{popcount}_2)$
 \STATE $\mt{pushcount} \leftarrow {\mbox{\bf intersect}}(\mt{pushcount}_1, \mt{pushcount}_2)$
 \STATE $A \leftarrow \mbox{\bf intersect}( A_1, A_2 )$
 \STATE $b \leftarrow \mbox{\bf intersect}( b_1, b_2 )$
-\STATE $\mt{map} \leftarrow \mt{mergeMap}(\mt{map}_1, \mt{map}_2)$
+\STATE $\mt{map} \leftarrow {\bf mergeMap}(\mt{map}_1, \mt{map}_2)$
 \UND
 \UND %end case
 \ENDFOR
@@ -151,23 +193,4 @@ returns ($\mt{popcount'}$, $\mt{pushcount'}$, $\mt{map'}$, $A'$, $b'$)
 \end{algorithmic}
 \end{algorithm}
 
-\begin{algorithm}
-proc {\bf toplevel}(filter $F$) returns linear node
-\begin{enumerate}
-\item Set Peek, Pop, Push equal to I/O rates of filter $F$.
-\item Let $A_{0} \leftarrow~$ new float[Peek][Push] with each entry = $\bot$
-\item Let $b_{0} \leftarrow~$ new float[Push] with each entry = $\bot$
-\item (popcount, pushcount, map, $A$, $b$) \la \\
-{\bf extract}($F_{work}$, empty-map, 0, Push, $A_{0}$, $b_{0}$)
-\item
-\begin{algorithmic}
-\IF {$A$ and $b$ contain no $\bot$ entries}
-\STATE return linear node $\lambda = \{A, b, \mbox{Peek}, \mbox{Pop}, \mbox{Push}\}$
-\ELSE
-\STATE {\it fail}
-\ENDIF
-\end{algorithmic}
-\end{enumerate}
-\end{algorithm}
-
-
+\clearpage
