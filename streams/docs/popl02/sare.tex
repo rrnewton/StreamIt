@@ -1,10 +1,10 @@
-\section{SARE}
+\section{Systems of Affine Recurrence Equations}
 
 A System of Affine Recurrence Equations (SARE) is a set of equations
 ${\cal E}_1 \dots {\cal E}_{m_{\cal E}}$ of the following form~\cite{DRV00}:
 \begin{equation}
-\forall i \in {\cal D_{\cal E}}, X(i) = f_{\cal E}(\dots, Y(h_{{\cal
-E}, Y}(i)), \dots)
+\forall {\vec i} \in {\cal D_{\cal E}}, X({\vec i}) = f_{\cal E}(\dots, Y({\vec h}_{{\cal
+E}, Y}({\vec i})), \dots)
 \label{eq:sare}
 \end{equation}
 In this equation, our notation is as follows:
@@ -12,34 +12,63 @@ In this equation, our notation is as follows:
 
 \item $\{X, Y, \dots\}$ is the set of {\it variables} defined by the
 SARE.  Variables can be considered as multi-dimensional arrays mapping
-an index to a value.
+a vector of indices ${\vec i}$ to a value in some space ${\cal V}$.
 
 \item ${\cal D_{\cal E}}$ is a polyhedron representing the {\it
 domain} of the equation ${\cal E}$.  Each equation for a variable $X$
 has a disjoint domain; the domain $D_X$ for variable $X$ is taken as
 the convex union of all domains over which $X$ is defined.
 
-\item $h_{{\cal E}, Y}$ is a vector-valued affine function, giving the
-index of variable $Y$ that $X(i)$ depends on.
+\item ${\vec h}_{{\cal E}, Y}$ is a vector-valued affine\footnote{If
+the dependence function ${\vec h}$ is a translation (${\vec h}({\vec
+i}) = {\vec i} - {\vec k}$ for constant ${\vec k}$), then the SARE is
+{\it uniform}, and referred to as a SURE or SRE~\cite{karp67}.}
+function, giving the index of variable $Y$ that $X({\vec i})$ depends
+on.  A vector-valued function ${\vec h}$ is affine if it can be
+written as ${\vec h}({\vec i}) = C{\vec i} + {\vec d}$, where C is a
+constant array and ${\vec d}$ is a constant vector that do not vary
+with ${\vec i}$.
 
 \item $f_{\cal E}$ is a strict function used to compute the elements
 of $X$.
 
 \end{itemize}
 
-If each dependence function $h$ is a translation ($h(i) = i - k$ for
-constant $k$) then the SARE is {\it uniform}, and referred to as a
-SURE or SRE~\cite{karp67}.
-
 \section{Phased Computation Graphs}
 \label{sec:pcg}
+
+\begin{table}[t]
+\small
+\begin{center}
+\begin{tabular}{|c|c|c|c|c|c|} \hline
+Model of Computation & Items on Channels & Nodes with & Nodes with & Cyclic Steady & Initialization \\
+                     & at Start & Pop $\ne$ Push & Peek $>$ Pop & State Phases & Phases \\
+\hline \hline
+Synchronous Dataflow \cite{LM87} & X & X & & & \\
+\hline
+Cyclo-Static Dataflow \cite{BELP96} & X & X & & X & \\
+\hline
+Computation Graphs \cite{KM66} & X & X & X & & \\
+\hline
+Phased Computation Graphs & X & X & X & X & X \\
+\hline
+\end{tabular}
+\vspace{-6pt}
+\caption{\protect\small Models of Computation for Dataflow Graphs.}
+\label{tab:models}
+\vspace{-12pt}
+\end{center}
+\end{table}
 
 We introduce the Phased Computation Graph (PCG) as a model of
 computation for dataflow languages.  A PCG is a generalization of the
 Computation Graphs (CG) of Karp and Miller~\cite{KM66} to the case
 where each node has both an initial and steady-state execution epoch,
-each of which contains a number of {\it phases}.  Formally, a PCG is a
-directed graph with the following components:
+each of which contains a number of {\it phases}.  It is also a
+generalization of other popular representations for dataflow graphs,
+such as synchronous dataflow (SDF) and cyclo-static dataflow (CSDF)
+(see Table~\ref{tab:models}).  Formally, a PCG is a directed graph
+with the following components:
 \begin{itemize}
 
 \item Nodes $n_1 \dots n_{m_n}$.
@@ -145,7 +174,7 @@ channel $c$, $I(c)$ has type ${\cal V}[A(c)]$.
 %length $A(c)$, the elements of which are enqueued onto channel $c$ at
 %the start of execution.  The procedure $I(c)$ takes no arguments; its
 %signature is $\mt{void} {\small \rightarrow} {\cal V}[A(c)]$.
-
+%
 \item A work function $W(n, t, p)$ that represents the computation of
 node $n$ in phase $p$ and epoch $t$.  The signature of $W(n, t, p)$ is
 $[{\cal V}[E(\mt{chan\_in}(n)[1], t, p)], \dots, {\cal

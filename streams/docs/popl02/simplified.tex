@@ -1,4 +1,5 @@
-\section{Basic Translation}
+\section{Basic Translation: SDF to SARE}
+\label{sec:simple}
 
 In order to familiarize the reader with the basics of our technique,
 we present in this section the translation procedure for a simplified
@@ -26,7 +27,7 @@ requires an epoch $t$ or a phase $p$.  For instance, the push and pop
 rates of a channel $c$ are now just $U(c)$ and $O(c)$, respectively;
 the work function for a node $n$ is simply $W(n)$.
 
-\subsection{Computing the Steady State Cycle}
+\subsection{Calculating the Steady-State Period}
 
 Let $S(n)$ denote the number of times that node $n$ fires its 0'th
 phase for a balanced steady-state execution cycle of the entire
@@ -47,20 +48,20 @@ cycles that one wishes to execute in the PCP.
 For each channel $c = (n_a, n_b)$, do the following:
 \begin{itemize}
 
-\item Introduce variable $\mt{SBUF}_c$ with the following domain:
+\item Introduce variable $\mt{BUF}_c$ with the following domain:
 \begin{align*}
-{\cal D}_{{SBUF}_c} = \{ ~(i,j)~|~0 \le i \le N - 1 ~\wedge~ 0 \le j \le \mt{Period}(c) - 1\}
+{\cal D}_{{BUF}_c} = \{ ~(i,j)~|~0 \le i \le N - 1 ~\wedge~ 0 \le j \le \mt{Period}(c) - 1\}
 \end{align*}
 
-\item Introduce variable $\mt{SWRITE}_{c}$ with this domain:
+\item Introduce variable $\mt{WRITE}_{c}$ with this domain:
 \begin{align*}
-{\cal D}_{{SWRITE}_{c}} = \{~(i,j,k)~|~0 \le i \le N-1 ~\wedge~ 
+{\cal D}_{{WRITE}_{c}} = \{~(i,j,k)~|~0 \le i \le N-1 ~\wedge~ 
                                        0 \le j \le S(n_a) - 1 ~\wedge~ 0 \le k \le U(c) - 1\}
 \end{align*}
 
-\item Introduce variable $\mt{SREAD}_{c, p}$ with this domain:
+\item Introduce variable $\mt{READ}_{c, p}$ with this domain:
 \begin{align*}
-{\cal D}_{{SREAD}_{c}} = \{~(i,j,k)~|~0 \le i \le N-1 ~\wedge~ 
+{\cal D}_{{READ}_{c}} = \{~(i,j,k)~|~0 \le i \le N-1 ~\wedge~ 
                                       0 \le j \le S(n_b) - 1 ~\wedge~ 
                                       0 \le k \le E(c) - 1\} \\
 \end{align*}
@@ -73,34 +74,41 @@ For each channel $c = (n_a, n_b)$, do the following:
 \begin{itemize}
 
 \item For each $c \in \mt{chan\_out}(n)$, introduce this equation
-(SREAD to SWRITE):
+(READ to WRITE):
 %
 \begin{align*}
-\forall (i, j, k) \in {\cal D}_{{SWRITE}_{c}},~\mt{SWRITE}_{c}(i,j,k) = W(n)(\mt{Steady\_Inputs})[\mt{pos\_out}(n, c)][j] \\
-\mt{where Steady\_Inputs} = [\mt{SREAD}_{{chan\_in}(n)[1]}(i, j, *), \dots, 
-                             \mt{SREAD}_{{chan\_in}(n)[\mt{num\_in}(n)]}(i, j, *) ]
+\forall (i, j, k) \in {\cal D}_{{WRITE}_{c}},~\mt{WRITE}_{c}(i,j,k) = W(n)(\mt{Steady\_Inputs})[\mt{pos\_out}(n, c)][j] \\
+\mt{where Steady\_Inputs} = [\mt{READ}_{{chan\_in}(n)[1]}(i, j, *), \dots, 
+                             \mt{READ}_{{chan\_in}(n)[\mt{num\_in}(n)]}(i, j, *) ]
 \end{align*}
 %
 \item For each $c \in \mt{chan\_out}(n)$, and for each $q \in
 [0,\frac{\mt{Period(c)}}{\mt{U(n)}}-\mt{1}]$,
-introduce this equation (SWRITE to SBUF):
+introduce this equation (WRITE to BUF):
 \begin{align*}
 \forall (i,j) \in {\cal D}_{SW {\small \rightarrow} SB}(c,q), \\
-\mt{SBUF}_{c}(i,j) = 
-  \mt{SWRITE}_{c}(i * \frac{\mt{Period}(c)}{O(c)} + \lfloor \frac{q}{S(n)} \rfloor, q~mod~S(n),
+\mt{BUF}_{c}(i,j) = 
+  \mt{WRITE}_{c}(i * \frac{\mt{Period}(c)}{O(c)} + \lfloor \frac{q}{S(n)} \rfloor, q~mod~S(n),
                      j - q * U(c) \\
 \mt{where } {\cal D}_{SW {\small \rightarrow} SB}(c,q) = 
-  {\cal D}_{{SBUF}_{c}} \cap 
+  {\cal D}_{{BUF}_{c}} \cap 
   \{ (i,j) | q*U(c) \le j \le (q+1)*U(c) - 1 \}
 \end{align*}
 
-% here is the simple, base case of the SBUF -> SREAD function
-\item For each $c \in \mt{chan\_in}(n)$, introduce this equation (SBUF to
-SREAD):
+% here is the simple, base case of the BUF -> READ function
+\item For each $c \in \mt{chan\_in}(n)$, introduce this equation (BUF to
+READ):
 \begin{align*}
-\forall (i,j,k) \in {\cal D}_{{SREAD}_{c}},
-\mt{SREAD}_{c}(i,j,k) = j*O(n) + k
+\forall (i,j,k) \in {\cal D}_{{READ}_{c}},
+\mt{READ}_{c}(i,j,k) = j*O(n) + k
 \end{align*}
 \end{itemize}
+
+\begin{figure}[t]
+\framebox[6.5in]{
+\begin{minipage}{6.5in}
+\end{minipage}
+}
+\end{figure}
 
 
