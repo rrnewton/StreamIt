@@ -11,25 +11,26 @@ identifies convolution operations that require substantially fewer
 computations if computed in the frequency domain and applies
 an automatic transformation.
 
-Calculating a convolution sum is a common and fundamental operation in
-discrete time signal processing.  If the convolution is
+Digital filters are most very often implemented using convolution sums
+and consequently calculating a convolution sum is a common and fundamental 
+operation in discrete time signal processing. If the convolution is
 sufficiently large, transforming the data to the frequency domain,
-performing a simple vector multiply and converting back to the time
+performing an element-wise vector multiply and converting back to the time
 domain requires fewer operations than the direct convolution.
 
 The transformation from convolution sum into frequency multiplication
-is typically done explicitly by a human algorithm designer because no 
-compiler analysis has had the information necessary to determine from 
-general purpose code when a transformation could be applied. As the complexity of DSP 
-programs grow, manually determining the disparate regions across which 
+is typically done explicitly by human algorithm designers because no 
+compiler analysis has had the information necessary to determine, from 
+general purpose code, when a transformation could be applied. 
+As the complexity of DSP programs continue to grow, manually 
+determining the disparate regions across which 
 to apply these optimizations is an ever more daunting task. 
 For example, several filters individually may not perform sufficiently large 
 convolutions to merit a frequency transformation, but after a linear 
 combination of multiple filters the transformation will be beneficial.
 Differing levels of architectural support for various convolution and 
 frequency operations further complicates the task of manually choosing
-the optimal transformation.
-
+the optimal transform.
 
 \subsection{Notation and Background}
 \label{sec:method-opt-notation}
@@ -39,7 +40,7 @@ the optimal transformation.
 y[n]=x[n]*h[n]=\sum_{k=-\infty}^{\infty}x[k]h[n-k]
 \end{equation}
 
-This following explains the notation used in the rest of the section. 
+We first explain the notation used in the rest of the section. 
 We choose the notation of the DSP literature because
 these transformations are due to that body of knowledge.
 
@@ -51,9 +52,9 @@ an index in the time domain, and $k$ represents an index in the
 frequency domain. Filters which compute convolution sums are often called 
 Finite Impulse Response (FIR) filters. An FIR filter has a corresponding linear 
 node with unit pop rate ($o=1$) and ${\vec b} = {\vec 0}$. From 
-Equation~\ref{eqn:conv-sum-again} and the definition of a linear node
+Equation~\ref{eqn:conv-sum-again} and the definition of a linear node,
 if $o=1$ then each column of $A$ is identified with a vector $h[n]$
-in a convolution sum. Because $A$ has $u$ columns,	
+in a convolution sum. If $A$ has $u$ columns,	
 the linear node is equivalent to $u$ FIR filters 
 executing in parallel with their outputs interleaved.
 To complete the identification of a linear node with an FIR filter,
@@ -75,11 +76,11 @@ vector, $Y[k]$. Taking the inverse DFT (IDFT) of $Y[k]$ produces
 $y[n]$ which is exactly the same as $x[n]*h[n]$. See Oppenheim
 \cite{oppenheim-discrete} for a thorough treatment.
 
-The computational complexity of calculating a convolution in the time domain
+The computational complexity of calculating $N$ outputs in the time domain
 is $O(N^2)$ as each of the $N$ output values requires $O(N)$ operations.
-Doing the equivalent computation in the frequency domain 
-is only $O(N \lg(N))$ because we need to evaluate two FFTs at a cost of
-$O(N \lg(N))$ a piece coupled with an $O(N)$ vector multiplication.
+Doing the equivalent computation in the frequency domain requires
+only $O(N \lg(N))$ because we need to evaluate two FFTs at a cost of
+$O(N \lg(N))$ coupled with an $O(N)$ vector multiplication.
 
 \begin{algorithm}
   \caption{Convolution in the Frequency Domain.\label{alg:freq-overview}}
@@ -177,7 +178,7 @@ general purpose memory available. For embedded processors
 buffer size is much more important due to the constrained resources available.
 Algorithm~\ref{alg:freq-size} selects a size $N$ that ensures 
 $N+2(e-1)$ is a power of two and that $N \approx 2e$ which is a 
-reasonable tradeoff between state and performance.
+reasonable trade off between state and performance.
 
 %Increasing $N$ corresponds to amortizing the cost of 
 %zero padding the input to the FFT length. 
@@ -234,8 +235,7 @@ reasonable tradeoff between state and performance.
   \caption{Frequency Replaced Filter {\tt initWork} Pseudo Code 
   ($e'_{i}=N+e-1$, $o'_{i}=N+e-1$ $u'_{i}=N$).\label{alg:freq-init-work}}
   \begin{algorithmic}
-    \STATE $x[n] \leftarrow \mathbf{peek}(0 \dots (N+e-1))$
-    \STATE $pop(N+e-1)$
+    \STATE $x[n] \leftarrow \mathbf{pop}(0 \dots (N+e-1))$
     \STATE $X[0 \dots N+2(e-1)] \leftarrow \mathbf{FFT} (N+2(e-1), x[n])$
     \STATE $Y[0 \dots N+2(e-1)] \leftarrow X[k] .* H[k]$
     \STATE $y[n] \leftarrow \mathbf{IFFT}(N+2(e-1), Y[k])$
@@ -248,8 +248,7 @@ reasonable tradeoff between state and performance.
   \caption{Frequency Replaced Filter {\tt work} Pseudo Code. 
     ($e'=N+e-1$, $o'=N+e-1$ $u'=N+e-1$)\label{alg:freq-work}}
   \begin{algorithmic}
-    \STATE $x[n] \leftarrow \mathbf{peek}(0 \dots (N+e-1))$
-    \STATE $pop(N+e-1)$
+    \STATE $x[n] \leftarrow \mathbf{pop}(0 \dots (N+e-1))$
     \STATE $X[0 \dots N+2(e-1)] \leftarrow \mathbf{FFT} (N+2(e-1), x[n])$
     \STATE $Y[0 \dots N+2(e-1)] \leftarrow X[k] .* H[k]$
     \STATE $y[n] \leftarrow \mathbf{IFFT}(N+2(e-1), Y[k])$
