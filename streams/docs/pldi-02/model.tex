@@ -58,16 +58,17 @@ We use the following notation:
 
 \item A {\it tape} is an infinite history of the values that have been
   pushed onto a channel between two filters (see Figure
-  \ref{fig:tapes}).  We use $I_A$ and $O_A$ to denote the input and
-  output tapes of filter $A$, respectively, with numbering used to
+  \ref{fig:tapes}).  We use $I_S$ and $O_S$ to denote the input and
+  output tapes of stream $S$, respectively, with numbering used to
   distinguish between multiple input or output tapes (see Figure
   \ref{tapelabels}).  Finally, $n(T)$ represents the number of items
   on tape $T$ at a given point of execution.  [should we define $p(T)$
   here or wait until we use it?  long time def-use!]
 
-\item We say that filter $A$ is {\it upstream} of filter $B$ (or,
+\item We say that a filter $A$ is {\it upstream} of filter $B$ (or,
   equivalently, $B$ is {\it downstream} $A$) if there is a directed
-  path in the stream graph from $O_A$ to $I_B$.
+  path in the stream graph from $O_A$ to $I_B$.  We use this
+  terminology for tapes as well as filters.
 
 \item The number of items that are pushed, popped, and peeked by
   filter $A$ during a single execution of its work function are
@@ -111,6 +112,7 @@ must be present on the input is:
 \end{align*}
 
 \subsubsection{Pipelines}
+\label{sec:timepipe}
 
 Let us now derive an expression for $min$ in the case of a pipeline.
 In the base case, consider that two filters are connected, with the
@@ -123,139 +125,166 @@ must equal $O_A$ since the filters are connected, we see that a
 minimum of $\mi{I_A}{O_A}(\ma{I_B}{O_B}(x))$ items must appear on
 $I_A$:
 \begin{align*}
-\ma{I_A}{O_B} = \mi{I_A}{O_A} \circ \mi{I_B}{O_B}
+\mi{I_A}{O_B} = \mi{I_A}{O_A} \circ \mi{I_B}{O_B}
 \end{align*}
 By identical reasoning, this composition law holds for pipelined
-streams as well as filters.  That is, given tapes $x$, $y$, and $z$,
-we have that:
+streams as well as filters.  That is, a Pipeline of streams $S1 \dots
+Sn$ has the following $min$ function:
 \begin{align}
-\label{eq:compose}
-\mi{x}{z} &= \mi{x}{y} \circ \mi{y}{z}
+\label{eq:composepipe}
+\mi{S1}{Sn} &= \mi{I_{S1}}{O_{S1}} \circ \dots \circ \mi{I_{Sn}}{O_{Sn}}
 \end{align}
-However, there is a restriction on this definition.  It only applies
-when there is a downstream path $P_1$ from the filter following $x$ to
-the filter preceding $y$, a downstream path $P_2$ from the filter
-following $y$ to the filter preceding $z$, and the paths $P_1$ and
-$P_2$ are non-overlapping.  This restriction prevents the successive
-composition of transfer functions around feedback loops, thereby
-ensuring a unique definition for all pairs $(x, z)$ where there is a
-downstream path from $x$ to $z$.
+One might be tempted to define the $min$ function for any pair of
+connected tapes as the composition of functions for the operators
+connecting those tapes.  However, such a definition turns out to be
+problematic for the SplitJoin and FeedbackLoop constructs, which
+require a slightly different composition law for their components (as
+shown below).  Instead, we can further extend our notation to include
+the {\it components} of streams that are connected in a pipeline.
+That is, if tapes $t_i$ and $t_j$ are contained within stream
+constructs $S_i$ and $S_j$, respectively, and $S_i$ and $S_j$ belong
+to a pipeline of streams $S_1 \dots S_n$, then:
+\begin{align}
+\label{eq:composetape}
+\mi{t_i}{t_j} &= \mi{t_i}{O_{S_i}} \circ \mi{I_{S_{i+1}}}{O_{S_{i+1}}}
+\circ \dots \circ \mi{I_{S_j}}{t_j}
+\end{align}
 
 \subsubsection{SplitJoins}
+\label{sec:timesj}
+
+We now derive $min$ expressions for the components of a SplitJoin, and
+for the SplitJoin construct as a whole.  We denote the $n$ output
+tapes of the splitter $S$ by $O1_S \dots On_S$, and the $n$ input
+tapes of the joiner $J$ by $I1_J \dots In_J$ (see Figure
+\ref{tapelabels}).
+
+{\bf Duplicate splitter.}  We consider the $i$'th output tape of an
+$n$-way duplicating splitter.  Since the splitter duplicates each
+input item onto each output tape, there must be at least $x$ items on
+$I_S$ if there are $x$ items on $Oi_S$.  This yields a simple
+expression for $min$:
+\begin{align*}
+\mi{I_S}{Oi_S}(x) = x
+\end{align*}
+
+{\bf Weighted round robin splitter.}  Let us consider an $n$-way
+splitter with weights $w_1 \dots w_n$.  Observe that if there are
+$n(On_S)$ items on the $n$'th output tape, then the splitter must have
+executed $\floor{n(On_S)}{w_n}$ complete cycles in distributing items
+to the output tapes; each cycle draws $sum_{i}{w_i}$ items from the
+input tape $I_S$.  Further, if there are $n(Oi_S)$ items on the $i$'th
+output tape, then $n(Oi_S) mod w_i$ additional items have been
+deposited on $Oi_S$ during the current cycle of the splitter, and
+$n(Oi_S)~mod~w_i + sum_{j=0}^{i-1}{w_j}$ items have been drawn from
+the input since the last complete cycle.  Summing the item count for
+the completed cycles and the current cycle gives the following
+expression for $min$:
+\begin{align*}
+\mi{I_S}{Oi_S}(x) = \floor{n(On_S)}{w_n} * \sum_{i}{w_i} + x~mod~w_i +
+\sum_{j=0}^{i-1}{w_j}
+\end{align*}
+
+{\bf Weighted round robin joiner.}  The reasoning is similar for an
+$n$-way joiner with weights $w_1 \dots w_n$.  Let us use $W$ to denote
+the sum of the weights: $W = \sum{i=1}^{n}{w_i}$.  If there are $x$
+items on the output tape $O_J$, then the joiner must have executed
+$\floor{x}{W}$ complete cycles, each of which drew $w_i$ items from
+the $i$'th input tape.  Since the last complete cycle, the joiner has
+drawn $x~mod~W$ items from its inputs, and $MIN(0, x~mod~W -
+\sum{j=0}^{i-1}{w_j})$ of these items were taken from input tape $j$.
+Thus, the $min$ function from the output of the joiner to the $i$'th
+input tape is as follows:
+\begin{align*}
+\mi{Ii_J}{O_J}(x) = w_i * W + MIN(0, x~mod~W - \sum{j=0}^{i-1}{w_j})
+\end{align*}
+
+{\bf SplitJoin construct.}  As with the Pipeline construct, we can
+derive the $min$ function across an entire SplitJoin as a composition
+of the component functions.  However, a SplitJoin differs from a
+Pipeline in that the joiner imposes a control dependence between the
+parallel streams.  That is, for there to be $x$ items on the output of
+the joiner, there must be at least $\mi{Ii_J}{O_J}(x)$ items on {\it
+every} input tape $Ii_J$.  Applying the composition law for pipelines
+(Equation \ref{eq:composepipe}), it follows that there must be at
+least at least $\mi{Oi_S}{Ii_J} \circ \mi{Ii_J}{O_J}(x)$ items on
+every output tape $Oi_S$ of the splitter.  Finally, the minimum number
+of items appearing on the input tape $I_S$ of the splitter is the {\it
+maximum} of the item requirement from any output tape $Oi_S$.  By this
+reasoning, the $min$ function for a SplitJoin is as follows:
+\begin{align*}
+\mi{I_S}{O_J}(x) = MAX_{i \in [1,n]}~\mi{I_S}{Oi_S}(\mi{Oi_S}{Ii_J}(\mi{Ii_J}{O_J}(x)))
+\end{align*}
 
 \subsubsection{FeedbackLoops}
+\label{sec:timefl}
 
-%% \subsubsection{SplitJoins}
+The $min$ function for a feedback loop requires extra care. Although
+the feedback splitter $FS$ serves as a normal splitter, with the same
+$min$ function as derived above, the feedback joiner $FJ$ is slightly
+different due to the initialization phase of the loop.  Also, the
+$min$ function does not compose across all components of the loop,
+since otherwise there would be conflicting definitions for paths that
+circle the loop several times.
 
-%% We now derive $min$ and $max$ in the case of a SplitJoin, as pictured
-%% in Figure \ref{splitjoin}.  For the splitter $S$ there are two output
-%% tapes; let us denote them by $O1_S$ and $O2_S$.  Similarly, let us
-%% denote the two input tapes of the joiner $J$ by $I1_J$ and $I2_J$.  We
-%% derive below the transfer functions the round robin and
-%% duplicate/combine nodes.  Note that the duplicate/combine nodes can be
-%% simulated with round robins and duplicating filters, but we provide
-%% the transfer functions anyways to simplify the semantic analysis of a
-%% program.  We have yet to derive these expressions for the weighted
-%% round robin nodes.
+{\bf Feedback joiner}.  For a feedback loop with delay $d$, the
+feedback joiner must fabricate its first $d$ input values, since no
+items have yet been pushed onto the loop tape $I2_{FJ}$.  This means
+that there must be an offset of $d$ in the $min$ function, since the
+first $d$ items are direct inputs to the joiner instead of appearing
+as items on the input tape.  Using $J$ to denote a weighted round
+robin joiner as considered above, we thus have the following
+expression for the $min$ function across the feedback path:
+\begin{align*}
+\mi{I2_{FJ}}{O_{FJ}}(x) = \mi{I2_J}{O_J}(x) - d
+\end{align*}
+However, the $min$ function remains unchanged with respect to the
+input from the main stream:
+\begin{align*}
+\mi{I1_{FJ}}{O_{FJ}}(x) = \mi{I1_J}{O_J}(x)
+\end{align*}
 
-%% {\bf Round robin splitter.}  In the case of a round-robin splitter, the
-%% items from the input tape are alternately routed to the output tapes,
-%% with the first item going onto tape $O1_S$.  By this definition, we
-%% can see that the splitter's $max$ is defined as follows:
-%% \begin{align*}
-%% \ma{I_S}{O1_S}(x) &= \left\lceil\frac{x}{2}\right\rceil \\
-%% \ma{I_S}{O2_S}(x) &= \left\lfloor\frac{x}{2}\right\rfloor
-%% \end{align*}
-%% To derive the $min$ function across a splitter, observe that the input
-%% tape need only progress so far as to produce the items on the emptier
-%% output tape.  That is, we need to consider the number of items on both
-%% of the splitter's output to determine the minimum number of items that
-%% are needed at its input.  Thus, our $min$ function has two arguments:
-%% the first corresponding to $O1_S$ and the second corresponding to
-%% $O2_S$.  The equation is as follows:
-%% \begin{align*}
-%% \mi{I_S}{(O1_S, O2_S)}(x_1, x_2) = MIN(2*x_1-1, 2*x_2)
-%% \end{align*}
-%% {\bf Round robin joiner.}  The rules for a round robin joiner are in
-%% some sense dual to those of the round robin splitter.  Again assuming
-%% that items are alternately drawn from the input tapes, starting with
-%% $I1_J$, we have that:
-%% \begin{align*}
-%% \mi{I1_J}{O_J}(x) &= \left\lceil\frac{x}{2}\right\rceil \\
-%% \mi{I2_J}{O_J}(x) &= \left\lfloor\frac{x}{2}\right\rfloor
-%% \end{align*}
-%% Again, the $max$ function takes two arguments, corresponding to the
-%% number of items on $I1_J$ and $I2_J$, respectively:
-%% \begin{align*}
-%% \ma{(I1_J, I2_J)}{O_J}(x_1, x_2) = MIN(2*x_1-1, 2*x_2)
-%% \end{align*}
-%% {\bf Duplicate splitter}.  Clearly, the $max$ function of a duplicate
-%% splitter is simply the identity function, since it maps each element
-%% on the input tape to the same location on the output tapes:
-%% \begin{align*}
-%% \ma{I_S}{O1_S}(x) &= x \\
-%% \ma{I_S}{O2_S}(x) &= x
-%% \end{align*}
-%% The $min$ function is similar, except that--like the round robin
-%% split--the input need only progress as far as the lesser output:
-%% \begin{align*}
-%% \mi{I_S}{(O1_S, O2_S)}(x_1, x_2) = MIN(x_1, x_2)
-%% \end{align*}
-%% {\bf Combine joiner.} The combine joiner is simply the dual of the
-%% duplicate splitter, with transfer functions that the reader can verify
-%% as follows:
-%% \begin{align*}
-%% \ma{(I1_J, I2_J)}{O_J}(x_1, x_2) &= MIN(x_1, x_2) \\
-%% \mi{I1_J}{O_J}(x) &= x \\
-%% \mi{I2_J}{O_J}(x) &= x
-%% \end{align*}
+{\bf Feedback components}.  Within a feedback loop, the $min$ function
+between tape $a$ and any distinct downstream tape $b$ can be uniquely
+defined by composing the $min$ functions along the directed acyclic
+path between $a$ and $b$.  We require an acyclic path to avoid
+successive passes around the loop, which would prevent a unique
+definition of the function.  Denoting this path of tapes by $(a, t_1,
+\dots , t_n, b)$, the composition follows the form of Equation
+\ref{eq:composepipe}:
+\begin{align*}
+\mi{a}{b}(x) = \mi{a}{t_1} \circ \mi{t_1}{t_2} \circ \dots \mi{t_n}{b}
+\end{align*}
+Note that these functions can then be composed with those of
+constructs neighboring the feedback loop to obtain, for instance, the
+relation between the loop tape $I2_{FJ}$ and a downstream pipeline (by
+application of Equation \ref{eq:composetape}).
 
-%% \subsubsection{FeedbackLoops}
+{\bf Feedback loop construct.}  As a special case of the equation
+above, we can see that the $min$ function for the feedback loop as a
+whole is the composition of the $min$ functions along the main path:
+\begin{align*}
+\mi{I1_{FJ}}{O_{FS}}(x) = \mi{I1_J}{O_J}(x) \circ \mi{I1_J}{O_J}(x) 
+\end{align*}
+Intuitively, this is because--in any semantically correct stream
+program--the loop itself is guaranteed to have enough inputs to feed
+the joiner, such that the output tape of the feedback loop places a
+restriction only on the input tape of the feedback loop.
 
-%% \begin{figure}
-%% \centering
-%% \psfig{figure=feedback.eps,width=3.2in}
-%% \caption{\protect\small  FeedbackLoop construct with labeling.
-%% \protect\label{looplabel}}
-%% \end{figure}
+\subsubsection{Summary}
 
-%% We have to be careful when defining the transfer functions for
-%% feedback loops (see Figure \ref{looplabel}).  The feedback splitter
-%% $FS$ serves as a normal splitter, and has the same $min$ and $max$
-%% functions as defined above.  However, the feedback joiner $FJ$ is
-%% slightly different than a standard joiner, since during the first few
-%% executions it fabricates values from the loop body before they appear
-%% on the input tape.  The transfer function must take special account of
-%% these initial values, since they never appear on $I2_{FJ}$, the input
-%% tape from the loop body.  This is because we model the initialization
-%% of FeedbackLoops by feeding the joiner the initial values directly
-%% instead of pushing them onto a channel.
+In the preceding sections, we have derived a $min$ function for the
+components of each stream construct, as well as for the stream
+construct as a whole.  By application of Equation
+\ref{eq:composetape}, this yields a function $\mi{a}{b}$ for every
+pair of tapes $a$ and $b$ where $a$ is downstream of $b$.
 
-%% Let $n$ be the number of initial values that are provided to the
-%% feedback joiner before values from the feedback loop are read.  Let
-%% $J$ be a normal COMBINE or ROUND\_ROBIN joiner as defined for
-%% SplitJoins.  Now, let us define the transfer functions for $FJ$, the
-%% feedback joiner.
+[say some more profound stuff about the min function?  information
+  flow, not just data dependence.  distributed time.]
 
-%% The $min$ function for the main stream is as before:
-%% \begin{align*}
-%% \mi{I1_{FJ}}{O_{FJ}} = \mi{I1_J}{O_J} 
-%% \end{align*}
-%% However, we must offset by $n$ when considering the $min$ function
-%% that draws from the loop's tape:
-%% \begin{align*}
-%% \mi{I2_{FJ}}{O_{FJ}}(x) = \mi{I2_J}{O_J}(x) - n
-%% \end{align*}
-%% Finally, the $max$ function must be similarly shifted for the input
-%% from the loop:
-%% \begin{align*}
-%% \ma{(I1_{FJ}, I2_{FJ})}{O_{FJ}}(x_1, x_2) = \ma{(I1_J, I2_J)}{O_J}(x_1,
-%% x_2 + n)
-%% \end{align*}
+\subsection{Program Verification}
 
-\subsubsection{Program Verification}
-
-Borrow from program verification section of last paper. 
+Borrow from program verification section of last paper.
 
 \subsection{Message Timing}
 
