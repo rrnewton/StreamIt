@@ -434,7 +434,7 @@ further improves readability and decreases code size.
 
 \begin{figure}
 \psfig{figure=portal-code.eps,width=3.0in}
-\caption{The CheckFreqHop stream from our software radio provides an example of the messaging system in StreaMIT.  Messages are sent through a Portal that is configured in the toplevel stream.}
+\caption{The frequency-hopping mechanism of our software radio provides an example of StreaMIT's messaging system.  In {\tt TrunkedRadio}, a Portal is created to hold the message target, {\tt rf2if}.  Then, {\tt CheckFreqHop} uses the Portal to send a frequency-change message.}
 \label{fig:portal-code}
 \end{figure}
 
