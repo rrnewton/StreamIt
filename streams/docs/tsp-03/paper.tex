@@ -1,0 +1,69 @@
+\documentclass[10pt,twocolumn,twoside]{IEEEtran}
+% For initial submission:
+%\documentclass[11pt,draftcls,onecolumn]{IEEEtran}
+
+\usepackage{cite}
+\usepackage{fancyvrb}
+\usepackage{graphicx}
+\usepackage{url}
+\usepackage{subfigure}
+
+\urldef\streamiturl\url{http://compiler.lcs.mit.edu/streamit}
+
+\begin{document}
+
+\pagestyle{headings}
+\markboth{IEEE Transactions on Signal Processing,~Vol.~1,
+  No.~1,~January~1970}{Thies \MakeLowercase{\textit{et al.}}:
+  StreamIt: A Language for Streaming Applications}
+
+\title{StreamIt: A Language for Streaming Applications%
+\thanks{For more information about StreamIt, see \streamiturl.}}
+
+\author{William~Thies, Michal~Karczmarek, and~Saman~Amarasinghe}
+%       \and Michael Gordon 
+%       \and David Maze
+%       \and \\ Jeremy Wong 
+%       \and Henry Hoffmann 
+%       \and Matthew Brown 
+
+\pubid{0000--0000/00\$00.00~\copyright~2003 IEEE}
+
+\maketitle
+
+\begin{abstract}
+\input{abstract.tex}
+\end{abstract}
+
+\begin{keywords}
+Streaming programs.
+\end{keywords}
+
+\input{intro.tex}
+\input{domain.tex}
+\input{overview.tex}
+%\input{timing.tex}
+\input{appendix.tex}
+\input{example.tex}
+\input{results.tex}
+\input{related.tex}
+\input{conclusion.tex}
+\bibliographystyle{IEEEtran}
+\bibliography{references}
+%\input{appendix2.tex}
+
+\begin{biography}{William Thies}
+Bill rocks.
+\end{biography}
+
+\begin{biography}{Michal Karczmarek}
+Mike K.~would rock too, but he's abandoning the ComMIT group.
+\end{biography}
+
+\begin{biography}%
+%[{\includegraphics[width=1in,height=1.25in,clip,keepaspectratio]{saman.eps}}]%
+{Saman Amarasinghe}
+Saman is The Man.
+\end{biography}
+
+\end{document}
