@@ -78,7 +78,7 @@ causes the I/O rates of the filters to be much larger.
 	    <tr>
 	      <td valign="top" align="left"><b>StreamIt</b></td>
 	      <td><p align="justify">
-	        <a href="../files/./benchmarks/beamformer/streamit/TemplateBeamFormer.str">TemplateBeamFormer.str</a>
+	        <a href="../apps/benchmarks/beamformer/streamit/TemplateBeamFormer.str">TemplateBeamFormer.str</a>
 	      </p></td>
 	    </tr>
 	  </tbody>
@@ -111,19 +111,19 @@ causes the I/O rates of the filters to be much larger.
 	    <tr>
 	      <td valign="top" align="left"><b>C</b></td>
 	      <td><p align="justify">
-	        <a href="../files/./benchmarks/beamformer/c/bitonic.c">bitonic.c</a>
+	        <a href="../apps/benchmarks/bitonic-sort/c/bitonic.c">bitonic.c</a>
 	      </p></td>
 	    </tr>
 	    <tr>
 	      <td valign="top" align="left"><b>StreamIt</b></td>
 	      <td><p align="justify">
-	        <a href="../files/./benchmarks/beamformer/streamit/BitonicSort.str">BitonicSort.str</a><br><i>Original implementation</i>
+	        <a href="../apps/benchmarks/bitonic-sort/streamit/BitonicSort.str">BitonicSort.str</a><br><i>Original implementation</i>
 	      </p></td>
 	    </tr>
 	    <tr>
 	      <td valign="top" align="left"><b>StreamIt</b></td>
 	      <td><p align="justify">
-	        <a href="../files/./benchmarks/beamformer/streamit/BitonicSortRecursive.str">BitonicSortRecursive.str</a><br><i>Recursive implementation</i>
+	        <a href="../apps/benchmarks/bitonic-sort/streamit/BitonicSortRecursive.str">BitonicSortRecursive.str</a><br><i>Recursive implementation</i>
 	      </p></td>
 	    </tr>
 	  </tbody>
@@ -152,7 +152,7 @@ causes the I/O rates of the filters to be much larger.
 	    <tr>
 	      <td valign="top" align="left"><b>C</b></td>
 	      <td><p align="justify">
-	        <a href="../files/./benchmarks/fft/c/fft2/driver.c">driver.c</a>, <a href="../files/./benchmarks/fftfft.c">fft.c</a><br><i>
+	        <a href="../apps/benchmarks/fft/c/fft2/driver.c">driver.c</a>, <a href="../apps/benchmarks/fft/c/fft2/fft.c">fft.c</a><br><i>
         Reference implementation for FFT2.
       </i>
 	      </p></td>
@@ -160,7 +160,7 @@ causes the I/O rates of the filters to be much larger.
 	    <tr>
 	      <td valign="top" align="left"><b>C</b></td>
 	      <td><p align="justify">
-	        <a href="../files/./benchmarks/fft/c/fft3/driver.c">driver.c</a>, <a href="../files/./benchmarks/fftfft.c">fft.c</a><br><i>
+	        <a href="../apps/benchmarks/fft/c/fft3/driver.c">driver.c</a>, <a href="../apps/benchmarks/fft/c/fft3/fft.c">fft.c</a><br><i>
         Reference implementation for FFT3.
       </i>
 	      </p></td>
@@ -168,7 +168,7 @@ causes the I/O rates of the filters to be much larger.
 	    <tr>
 	      <td valign="top" align="left"><b>StreamIt</b></td>
 	      <td><p align="justify">
-	        <a href="../files/./benchmarks/fft/streamit/FFT2.str">FFT2.str</a><br><i>
+	        <a href="../apps/benchmarks/fft/streamit/FFT2.str">FFT2.str</a><br><i>
       Blocked, coarse-grained version for use as a benchmark.  Conceptually it is a single pipeline, but the main path is duplicated into a splitjoin to expose parallelism.  Inputs in natural order, outputs in natural order.
       </i>
 	      </p></td>
@@ -176,7 +176,7 @@ causes the I/O rates of the filters to be much larger.
 	    <tr>
 	      <td valign="top" align="left"><b>StreamIt</b></td>
 	      <td><p align="justify">
-	        <a href="../files/./benchmarks/fft/streamit/FFT3.str">FFT3.str</a><br><i>
+	        <a href="../apps/benchmarks/fft/streamit/FFT3.str">FFT3.str</a><br><i>
       More fine-grained than FFT2.  Inputs in natural order, outputs in bit-reversed order (does NOT include bit-reversal stage).
       </i>
 	      </p></td>
@@ -184,7 +184,7 @@ causes the I/O rates of the filters to be much larger.
 	    <tr>
 	      <td valign="top" align="left"><b>StreamIt</b></td>
 	      <td><p align="justify">
-	        <a href="../files/./benchmarks/fft/streamit/FFT4.str">FFT4.str</a><br><i>
+	        <a href="../apps/benchmarks/fft/streamit/FFT4.str">FFT4.str</a><br><i>
       More fine-grained than FFT3.  Derived from original example in CC'02 paper, and intended only to demonstrate language features (has dummy weights; does not compute real FFT).  Inputs in bit-reversed order, outputs in natural order (does NOT include bit-reversal stage).
       </i>
 	      </p></td>
@@ -192,7 +192,7 @@ causes the I/O rates of the filters to be much larger.
 	    <tr>
 	      <td valign="top" align="left"><b>StreamIt</b></td>
 	      <td><p align="justify">
-	        <a href="../files/./benchmarks/fft/streamit/FFT5.str">FFT5.str</a><br><i>
+	        <a href="../apps/benchmarks/fft/streamit/FFT5.str">FFT5.str</a><br><i>
       Fine-grained version, more elegant than FFT4.  Inputs in natural order, outputs in natural order.
       </i>
 	      </p></td>
@@ -223,13 +223,13 @@ performed, followed by an upsample, delay, and filter.
 	    <tr>
 	      <td valign="top" align="left"><b>C</b></td>
 	      <td><p align="justify">
-	        <a href="../files/./benchmarks/fft/c/FilterBank.cpp">FilterBank.cpp</a>
+	        <a href="../apps/benchmarks/filterbank/c/FilterBank.cpp">FilterBank.cpp</a>
 	      </p></td>
 	    </tr>
 	    <tr>
 	      <td valign="top" align="left"><b>StreamIt</b></td>
 	      <td><p align="justify">
-	        <a href="../files/./benchmarks/fft/streamit/FilterBankNew.str">FilterBankNew.str</a>
+	        <a href="../apps/benchmarks/filterbank/streamit/FilterBankNew.str">FilterBankNew.str</a>
 	      </p></td>
 	    </tr>
 	  </tbody>
@@ -257,13 +257,13 @@ more parallelism to the compiler.
 	    <tr>
 	      <td valign="top" align="left"><b>C</b></td>
 	      <td><p align="justify">
-	        <a href="../files/./benchmarks/fft/c/firref.c">firref.c</a>
+	        <a href="../apps/benchmarks/fir/c/firref.c">firref.c</a>
 	      </p></td>
 	    </tr>
 	    <tr>
 	      <td valign="top" align="left"><b>StreamIt</b></td>
 	      <td><p align="justify">
-	        <a href="../files/./benchmarks/fft/streamit/FIR.str">FIR.str</a>, <a href="../files/./benchmarks/fftFIRfine.out">FIRfine.out</a>
+	        <a href="../apps/benchmarks/fir/streamit/FIR.str">FIR.str</a>
 	      </p></td>
 	    </tr>
 	  </tbody>
@@ -291,13 +291,13 @@ filter is in turn the difference of a pair of low-pass filters.
 	    <tr>
 	      <td valign="top" align="left"><b>C</b></td>
 	      <td><p align="justify">
-	        <a href="../files/./benchmarks/fft/c/fmref.c">fmref.c</a>
+	        <a href="../apps/benchmarks/fm/c/fmref.c">fmref.c</a>
 	      </p></td>
 	    </tr>
 	    <tr>
 	      <td valign="top" align="left"><b>StreamIt</b></td>
 	      <td><p align="justify">
-	        <a href="../files/./benchmarks/fft/streamit/FMRadio.str">FMRadio.str</a>
+	        <a href="../apps/benchmarks/fm/streamit/FMRadio.str">FMRadio.str</a>
 	      </p></td>
 	    </tr>
 	  </tbody>
@@ -325,13 +325,13 @@ again to get the final result matrix.
 	    <tr>
 	      <td valign="top" align="left"><b>C</b></td>
 	      <td><p align="justify">
-	        <a href="../files/./benchmarks/matmul-block/c/matmul-block.c">matmul-block.c</a>
+	        <a href="../apps/benchmarks/matmul-block/c/matmul-block.c">matmul-block.c</a>
 	      </p></td>
 	    </tr>
 	    <tr>
 	      <td valign="top" align="left"><b>StreamIt</b></td>
 	      <td><p align="justify">
-	        <a href="../files/./benchmarks/matmul-block/streamit/MatrixMultBlock.str">MatrixMultBlock.str</a>
+	        <a href="../apps/benchmarks/matmul-block/streamit/MatrixMultBlock.str">MatrixMultBlock.str</a>
 	      </p></td>
 	    </tr>
 	  </tbody>
@@ -361,7 +361,7 @@ StreamIt.
 	    <tr>
 	      <td valign="top" align="left"><b>StreamIt</b></td>
 	      <td><p align="justify">
-	        <a href="../files/./benchmarks/matmul-block/MP3.str">MP3.str</a>
+	        <a href="../apps/benchmarks/mp3decoder/MP3.str">MP3.str</a>
 	      </p></td>
 	    </tr>
 	  </tbody>
@@ -389,7 +389,7 @@ autocorrelation series for a specified number of lags.
 	    <tr>
 	      <td valign="top" align="left"><b>StreamIt</b></td>
 	      <td><p align="justify">
-	        <a href="../files/./examples/autocor/AutoCor.str">AutoCor.str</a>
+	        <a href="../apps/examples/autocor/AutoCor.str">AutoCor.str</a>
 	      </p></td>
 	    </tr>
 	  </tbody>
@@ -414,49 +414,49 @@ These are the examples in the StreamIt Cookbook.
 	    <tr>
 	      <td valign="top" align="left"><b>StreamIt</b></td>
 	      <td><p align="justify">
-	        <a href="../files/./examples/cookbook/Minimal.str">Minimal.str</a><br><i>Minimal program, section 2.1</i>
+	        <a href="../apps/examples/cookbook/Minimal.str">Minimal.str</a><br><i>Minimal program, section 2.1</i>
 	      </p></td>
 	    </tr>
 	    <tr>
 	      <td valign="top" align="left"><b>StreamIt</b></td>
 	      <td><p align="justify">
-	        <a href="../files/./examples/cookbook/MovingAverage.str">MovingAverage.str</a><br><i>Moving average filter, section 2.2</i>
+	        <a href="../apps/examples/cookbook/MovingAverage.str">MovingAverage.str</a><br><i>Moving average filter, section 2.2</i>
 	      </p></td>
 	    </tr>
 	    <tr>
 	      <td valign="top" align="left"><b>StreamIt</b></td>
 	      <td><p align="justify">
-	        <a href="../files/./examples/cookbook/LPFProgram.str">LPFProgram.str</a><br><i>Low-pass filter, section 2.3</i>
+	        <a href="../apps/examples/cookbook/LPFProgram.str">LPFProgram.str</a><br><i>Low-pass filter, section 2.3</i>
 	      </p></td>
 	    </tr>
 	    <tr>
 	      <td valign="top" align="left"><b>StreamIt</b></td>
 	      <td><p align="justify">
-	        <a href="../files/./examples/cookbook/BPFProgram.str">BPFProgram.str</a><br><i>Band-pass filter, section 2.4</i>
+	        <a href="../apps/examples/cookbook/BPFProgram.str">BPFProgram.str</a><br><i>Band-pass filter, section 2.4</i>
 	      </p></td>
 	    </tr>
 	    <tr>
 	      <td valign="top" align="left"><b>StreamIt</b></td>
 	      <td><p align="justify">
-	        <a href="../files/./examples/cookbook/EqualizerProgram.str">EqualizerProgram.str</a><br><i>Equalizer, section 2.5</i>
+	        <a href="../apps/examples/cookbook/EqualizerProgram.str">EqualizerProgram.str</a><br><i>Equalizer, section 2.5</i>
 	      </p></td>
 	    </tr>
 	    <tr>
 	      <td valign="top" align="left"><b>StreamIt</b></td>
 	      <td><p align="justify">
-	        <a href="../files/./examples/cookbook/EchoProgram.str">EchoProgram.str</a><br><i>Echo effect, section 2.6</i>
+	        <a href="../apps/examples/cookbook/EchoProgram.str">EchoProgram.str</a><br><i>Echo effect, section 2.6</i>
 	      </p></td>
 	    </tr>
 	    <tr>
 	      <td valign="top" align="left"><b>StreamIt</b></td>
 	      <td><p align="justify">
-	        <a href="../files/./examples/cookbook/FibProgram.str">FibProgram.str</a><br><i>Fibonacci number generator, section 2.7</i>
+	        <a href="../apps/examples/cookbook/FibProgram.str">FibProgram.str</a><br><i>Fibonacci number generator, section 2.7</i>
 	      </p></td>
 	    </tr>
 	    <tr>
 	      <td valign="top" align="left"><b>StreamIt</b></td>
 	      <td><p align="justify">
-	        <a href="../files/./examples/cookbook/FMRadio.str">FMRadio.str</a><br><i>FMRadio with equalizer, section 3</i>
+	        <a href="../apps/examples/cookbook/FMRadio.str">FMRadio.str</a><br><i>FMRadio with equalizer, section 3</i>
 	      </p></td>
 	    </tr>
 	  </tbody>
@@ -482,19 +482,19 @@ of elements.
 	    <tr>
 	      <td valign="top" align="left"><b>StreamIt</b></td>
 	      <td><p align="justify">
-	        <a href="../files/./examples/delay/Delay.str">Delay.str</a><br><i>Implementation as a feedback loop (discouraged)</i>
+	        <a href="../apps/examples/delay/Delay.str">Delay.str</a><br><i>Implementation as a feedback loop (discouraged)</i>
 	      </p></td>
 	    </tr>
 	    <tr>
 	      <td valign="top" align="left"><b>StreamIt</b></td>
 	      <td><p align="justify">
-	        <a href="../files/./examples/delay/DelayOne.str">DelayOne.str</a><br><i>Single-element delay within a filter</i>
+	        <a href="../apps/examples/delay/DelayOne.str">DelayOne.str</a><br><i>Single-element delay within a filter</i>
 	      </p></td>
 	    </tr>
 	    <tr>
 	      <td valign="top" align="left"><b>StreamIt</b></td>
 	      <td><p align="justify">
-	        <a href="../files/./examples/delay/DelayMany.str">DelayMany.str</a><br><i>Multiple-element delay using a circular buffer in a
+	        <a href="../apps/examples/delay/DelayMany.str">DelayMany.str</a><br><i>Multiple-element delay using a circular buffer in a
       filter</i>
 	      </p></td>
 	    </tr>
@@ -522,19 +522,19 @@ calculated.
 	    <tr>
 	      <td valign="top" align="left"><b>StreamIt</b></td>
 	      <td><p align="justify">
-	        <a href="../files/./examples/fib/Fib.str">Fib.str</a><br><i>Basic implementation</i>
+	        <a href="../apps/examples/fib/Fib.str">Fib.str</a><br><i>Basic implementation</i>
 	      </p></td>
 	    </tr>
 	    <tr>
 	      <td valign="top" align="left"><b>StreamIt</b></td>
 	      <td><p align="justify">
-	        <a href="../files/./examples/fib/FibFeed.str">FibFeed.str</a><br><i>As before, but with a top-level feedback loop</i>
+	        <a href="../apps/examples/fib/FibFeed.str">FibFeed.str</a><br><i>As before, but with a top-level feedback loop</i>
 	      </p></td>
 	    </tr>
 	    <tr>
 	      <td valign="top" align="left"><b>StreamIt</b></td>
 	      <td><p align="justify">
-	        <a href="../files/./examples/fib/Fib2.str">Fib2.str</a><br><i>With a round-robin splitter and no peeking</i>
+	        <a href="../apps/examples/fib/Fib2.str">Fib2.str</a><br><i>With a round-robin splitter and no peeking</i>
 	      </p></td>
 	    </tr>
 	  </tbody>
@@ -561,7 +561,7 @@ float.test in binary form.
 	    <tr>
 	      <td valign="top" align="left"><b>StreamIt</b></td>
 	      <td><p align="justify">
-	        <a href="../files/./examples/fib/FileTest.str">FileTest.str</a>
+	        <a href="../apps/examples/file/FileTest.str">FileTest.str</a>
 	      </p></td>
 	    </tr>
 	  </tbody>
@@ -588,19 +588,19 @@ an increasing sequence of numbers, the second prints this sequence.
 	    <tr>
 	      <td valign="top" align="left"><b>C</b></td>
 	      <td><p align="justify">
-	        <a href="../files/./examples/hello/HelloWorld6.c">HelloWorld6.c</a><br><i>Demonstration of compiler output format</i>
+	        <a href="../apps/examples/hello/HelloWorld6.c">HelloWorld6.c</a><br><i>Demonstration of compiler output format</i>
 	      </p></td>
 	    </tr>
 	    <tr>
 	      <td valign="top" align="left"><b>Java</b></td>
 	      <td><p align="justify">
-	        <a href="../files/./examples/hello/HelloWorld6.java">HelloWorld6.java</a><br><i>"Old syntax" Java implementation</i>
+	        <a href="../apps/examples/hello/HelloWorld6.java">HelloWorld6.java</a><br><i>"Old syntax" Java implementation</i>
 	      </p></td>
 	    </tr>
 	    <tr>
 	      <td valign="top" align="left"><b>StreamIt</b></td>
 	      <td><p align="justify">
-	        <a href="../files/./examples/hello/HelloWorld6.str">HelloWorld6.str</a><br><i>"New syntax" StreamIt implementation</i>
+	        <a href="../apps/examples/hello/HelloWorld6.str">HelloWorld6.str</a><br><i>"New syntax" StreamIt implementation</i>
 	      </p></td>
 	    </tr>
 	  </tbody>
@@ -629,7 +629,7 @@ by one element.
 	    <tr>
 	      <td valign="top" align="left"><b>StreamIt</b></td>
 	      <td><p align="justify">
-	        <a href="../files/./examples/lattice/Lattice.str">Lattice.str</a>, <a href="../files/./examples/lattice../delay/DelayOne.str">../delay/DelayOne.str</a>
+	        <a href="../apps/examples/lattice/Lattice.str">Lattice.str</a>
 	      </p></td>
 	    </tr>
 	  </tbody>
@@ -657,13 +657,13 @@ result matrix.
 	    <tr>
 	      <td valign="top" align="left"><b>C</b></td>
 	      <td><p align="justify">
-	        <a href="../files/./examples/matrixmult/matrix.c">matrix.c</a>
+	        <a href="../apps/examples/matrixmult/matrix.c">matrix.c</a>
 	      </p></td>
 	    </tr>
 	    <tr>
 	      <td valign="top" align="left"><b>StreamIt</b></td>
 	      <td><p align="justify">
-	        <a href="../files/./examples/matrixmult/MatrixMult.str">MatrixMult.str</a>
+	        <a href="../apps/examples/matrixmult/MatrixMult.str">MatrixMult.str</a>
 	      </p></td>
 	    </tr>
 	  </tbody>
@@ -696,7 +696,7 @@ result matrix.
 	    <tr>
 	      <td valign="top" align="left"><b>StreamIt</b></td>
 	      <td><p align="justify">
-	        <a href="../files/./examples/matrixmult/MergeSort.str">MergeSort.str</a>
+	        <a href="../apps/examples/mergesort/MergeSort.str">MergeSort.str</a>
 	      </p></td>
 	    </tr>
 	  </tbody>
@@ -725,7 +725,7 @@ doing an elementwise add on the output.
 	    <tr>
 	      <td valign="top" align="left"><b>StreamIt</b></td>
 	      <td><p align="justify">
-	        <a href="../files/./examples/vectadd/VectAdd.str">VectAdd.str</a><br><i>Generate two input vectors and add them</i>
+	        <a href="../apps/examples/vectadd/VectAdd.str">VectAdd.str</a><br><i>Generate two input vectors and add them</i>
 	      </p></td>
 	    </tr>
 	  </tbody>
@@ -751,7 +751,7 @@ doing an elementwise add on the output.
 	    <tr>
 	      <td valign="top" align="left"><b>StreamIt</b></td>
 	      <td><p align="justify">
-	        <a href="../files/./sorts/BatcherSort/BatcherSort.str">BatcherSort.str</a>
+	        <a href="../apps/sorts/BatcherSort/BatcherSort.str">BatcherSort.str</a>
 	      </p></td>
 	    </tr>
 	  </tbody>
@@ -784,7 +784,7 @@ doing an elementwise add on the output.
 	    <tr>
 	      <td valign="top" align="left"><b>StreamIt</b></td>
 	      <td><p align="justify">
-	        <a href="../files/./sorts/BatcherSort/BubbleSort.str">BubbleSort.str</a>
+	        <a href="../apps/sorts/BubbleSort/BubbleSort.str">BubbleSort.str</a>
 	      </p></td>
 	    </tr>
 	  </tbody>
@@ -811,7 +811,7 @@ doing an elementwise add on the output.
 	    <tr>
 	      <td valign="top" align="left"><b>StreamIt</b></td>
 	      <td><p align="justify">
-	        <a href="../files/./sorts/ComparisonCounting/ComparisonCounting.str">ComparisonCounting.str</a>
+	        <a href="../apps/sorts/ComparisonCounting/ComparisonCounting.str">ComparisonCounting.str</a>
 	      </p></td>
 	    </tr>
 	  </tbody>
@@ -839,7 +839,7 @@ doing an elementwise add on the output.
 	    <tr>
 	      <td valign="top" align="left"><b>StreamIt</b></td>
 	      <td><p align="justify">
-	        <a href="../files/./sorts/InsertionSort/InsertionSort.str">InsertionSort.str</a>
+	        <a href="../apps/sorts/InsertionSort/InsertionSort.str">InsertionSort.str</a>
 	      </p></td>
 	    </tr>
 	  </tbody>
@@ -872,7 +872,7 @@ doing an elementwise add on the output.
 	    <tr>
 	      <td valign="top" align="left"><b>StreamIt</b></td>
 	      <td><p align="justify">
-	        <a href="../files/./sorts/MergeSort/MergeSort.str">MergeSort.str</a>
+	        <a href="../apps/sorts/MergeSort/MergeSort.str">MergeSort.str</a>
 	      </p></td>
 	    </tr>
 	  </tbody>
@@ -904,7 +904,7 @@ doing an elementwise add on the output.
 	    <tr>
 	      <td valign="top" align="left"><b>StreamIt</b></td>
 	      <td><p align="justify">
-	        <a href="../files/./sorts/RadixSort/RadixSort.str">RadixSort.str</a>
+	        <a href="../apps/sorts/RadixSort/RadixSort.str">RadixSort.str</a>
 	      </p></td>
 	    </tr>
 	  </tbody>
