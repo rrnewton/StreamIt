@@ -8,18 +8,10 @@
 \setcounter{section}{0}
 
 \begin{center}
-{\bf APPENDIX:  Details on Java Syntax \\ ***DRAFT***}
+{\bf APPENDIX:  Details on Java Syntax \vspace{6pt} \\ ***DRAFT***}
 \end{center}
 
 \section{Java Classes}
-
-\begin{figure}
-\psfig{figure=hierarchy.eps,width=3.0in}
-\caption{\protect\small The StreaMIT class hierarchy.  Other StreaMIT
-classes unrelated to this hierarchy are {\tt SplitJoinType}, {\tt
-Channel}, {\tt Portal}, and {\tt TimeInterval}.
-\protect\label{fig:hierarchy}}
-\end{figure}
 
 A diagram of the Java class hierarchy for StreaMIT is shown in
 Figure~\ref{fig:hierarchy}.  A summary of the methods in each class is
@@ -62,6 +54,14 @@ exactly the items that it inputs.
 constrains the schedule such that, at any given time, $a$ can only
 progress up to the wavefront of information that $b$ will see after
 $n$ invocations of its own work function.
+
+\begin{figure}
+\psfig{figure=hierarchy.eps,width=3.0in}
+\caption{\protect\small The StreaMIT class hierarchy.  Other StreaMIT
+classes unrelated to this hierarchy are {\tt SplitJoinType}, {\tt
+Channel}, {\tt Portal}, and {\tt TimeInterval}.
+\protect\label{fig:hierarchy}}
+\end{figure}
 
 \subsection{Stream extends StreaMITObject}
 
