@@ -29,12 +29,12 @@ For linear traces, we generate parameterized, template assembly code
 for both computation and communication as described in Section
 \ref{sec:linear}.  As for non-linear traces we generate C code that is
 compiled using Raw's GCC 3.3 port.  Each compute processor begins by
-calling the {\tt init} function of all the filters mapped to it.  Next,
-it executes the {\tt work} of each filter in the sequence determined
-by the traversal of the schedule of each execution phase.
+calling the {\tt init} function of all the filters mapped to it.
+Next, it executes the {\tt work} of each filter in the sequence
+determined by the traversal of the schedule of each execution phase.
 The translation of the {\tt init} function, {\tt work} functions, and
 any helper function is, for the large part, straightforward.  Most
-StreamIt expression have direct analogs in C except for the channel
+StreamIt expressions have direct analogs in C except for the channel
 expressions {\tt push()}, {\tt peek(index)} and {\tt pop()}.
 
 One major benefit of StreamIt over other streaming languages is that
