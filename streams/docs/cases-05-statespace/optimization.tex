@@ -2,12 +2,12 @@
 \label{sec:optimization}
 
 There are two types of optimizations we consider.  The first is to
-remove extraneous state variables from the linear state-space
+remove extraneous state variables from the linear state space
 representation. This reduces the memory allocation for a program and
 reduces the number of loads and stores executed, which are typically
 slow and power-hungry operations. It also eliminates computations that
 involve the removed states.  The second optimization is to reduce the
-parametrization of a state-space representation, by changing the
+parametrization of a state space representation, by changing the
 representation to one with more zero and one entries in its
 matrices. This directly eliminates computations, since all
 multiplications by zero or one are not processed by the replacement
@@ -15,8 +15,8 @@ algorithm.
 
 \mysubsection{State-Space Transformations}
 
-    For any state-space equation pair, there are an infinite
-number of transformations to an equivalent state-space system.
+    For any state space equation pair, there are an infinite
+number of transformations to an equivalent state space system.
 These transformations involve a change of basis of the state
 vector $\vec{\mathbf{x}}$ to $\mathbf{T} \vec{\mathbf{x}}$, where
 $\mathbf{T}$ is an invertible matrix. Consider the state-update
@@ -28,7 +28,7 @@ $\mathbf{T}$ yields:
 \mathbf{TB} \vec{\mathbf{u}}
 \doneeqnstar
 
-    Since $\mathbf{T}^{-1} \mathbf{T} = \mathbf{I}$, we can write:
+\vspace{-9pt} Since $\mathbf{T}^{-1} \mathbf{T} = \mathbf{I}$, we can write:
 \starteqnstar
 \mathbf{T} \vec{\dot{\mathbf{x}}} & = & \mathbf{TA}
 (\mathbf{T}^{-1} \mathbf{T}) \vec{\mathbf{x}} + \mathbf{TB}
@@ -40,7 +40,7 @@ $\mathbf{T}$ yields:
 \vec{\mathbf{u}}
 \doneeqnstar
 
-    Where we have introduced the output equation as well. Let
+\vspace{-9pt} Where we have introduced the output equation as well. Let
 $\vec{\mathbf{z}} = \mathbf{T} \vec{\mathbf{x}}$.
 $\vec{\mathbf{z}}$ is a new state vector related to the old state
 vector $\vec{\mathbf{x}}$ by the change of basis $\mathbf{T}$.
@@ -51,12 +51,12 @@ Substituting into the equations above we get:
 + \mathbf{D}\vec{\mathbf{u}}
 \doneeqnstar
 
-    These is precisely the original state-space equation pair,
+\vspace{-9pt} This is precisely the original state space equation pair,
 with $\mathbf{A}$, $\mathbf{B}$, and $\mathbf{C}$ transformed to
 $\mathbf{T} \mathbf{A} \mathbf{T}^{-1}$, $\mathbf{T} \mathbf{B}$,
 and $\mathbf{C} \mathbf{T}^{-1}$, respectively.
 
-    For a StreamIt state-space representation $\mathrm{R}$, we must
+    For a StreamIt state space representation $\mathrm{R}$, we must
 determine how the other values change. The initialization state
 update equation is essentially the same as the regular state
 update equation, so $\mathbf{A_{pre}}$ and $\mathbf{B_{pre}}$ are
@@ -71,7 +71,7 @@ unchanged.
 \label{sec:state-removal}
 
     There are two types of states that can be removed from a
-state-space system without changing its behavior: unreachable and
+state space system without changing its behavior: unreachable and
 unobservable states. Informally, unreachable states are unaffected by
 inputs and unobservable states have no effect on outputs. More
 formally, the set of states in a system can be divided into reachable
@@ -83,7 +83,7 @@ reachable states.
 \vspace{\itemshrink} \item The unreachable states are not updated by any inputs.
 \vspace{\itemshrink} \end{enumerate}
 
-    In terms of the state-space equation pair, this means $\mathbf{A}[i,j] =
+    In terms of the state space equation pair, this means $\mathbf{A}[i,j] =
 0, \mathbf{B}[i,k] = 0$ where $i$ is the row of an unreachable
 state, $j$ is the column of a reachable state, and $k$ is any of
 the inputs.
@@ -103,7 +103,7 @@ unobservable states.
 \vspace{\itemshrink} \item The outputs do not depend on the unobservable states.
 \vspace{\itemshrink} \end{enumerate}
 
-    In terms of the state-space equation pair, this means $\mathbf{C}[i,j] =
+    In terms of the state space equation pair, this means $\mathbf{C}[i,j] =
 0, \mathbf{D}[k,j] = 0$ where $j$ is the column of an observable
 state, $i$ is the row of an unobservable state, and $k$ is any of
 the outputs.
@@ -226,7 +226,7 @@ $\mathbf{T} = \left [ \begin{array} {cc} \mathbf{Q}^{-1} &
     So far we have considered optimizations that affect $\mathbf{A}$,
 $\mathbf{B}$, and $\mathbf{C}$. Since the optimizations are
 entirely the result of state transformations, they do not affect
-$\mathbf{D}$, which is independent of the choice of state-space
+$\mathbf{D}$, which is independent of the choice of state space
 basis. By storing every input as a state, however, all the entries
 of $\mathbf{D}$ are moved into $\mathbf{A}$ and can then be
 changed by state optimizations.
@@ -259,7 +259,7 @@ computations involving $\mathbf{D}$.
 \label{sec:parameter-reduction}
 
     After removing as many states as possible, including input
-states, we want to change the state-space system to one with the
+states, we want to change the state space system to one with the
 fewest number of non-zero, non-one entries (termed parameters). If
 $\mathbf{A}$, $\mathbf{B}$, and $\mathbf{C}$ are completely
 filled, there are $s*(s+o+u)$ parameters. Ackermann and Bucy
@@ -309,26 +309,30 @@ that must go with all row operations.
 
 \begin{singlespace}
 \vspace{-12pt}
-\begin{scriptsize}
+\small
 \begin{verbatim}
 Reduce Parameters {
   currRow = 0; colA = 0; colC = 0;
 
   while(currRow < totalRows) {
 
-   -find a non-zero entry in column colC at or below row currRow of C{transpose}, and swap it with the
-    entry in row currRow;
+   -find a non-zero entry in column colC at or below row currRow 
+    of C{transpose}, and swap it with the entry in row currRow;
+
    -set C{transpose}[currRow,colC] = 1 by scaling the row appropriately;
-    make all entries above and below it zero by adding appropriate multiple of row currRow to other rows;
+    make all entries above and below it zero by adding appropriate 
+    multiple of row currRow to other rows;
 
     currRow = currRow + 1;
     colC = colC + 1;
 
     do {
-     -find a non-zero entry in column colA at or below row currRow of A{transpose}, and swap it with the
-      entry in row currRow;
+     -find a non-zero entry in column colA at or below row currRow 
+      of A{transpose}, and swap it with the entry in row currRow;
+
      -set A{transpose}[currRow,colA] = 1 by scaling the row appropriately;
-      make all entries below it zero by adding appropriate multiple of row currRow to other rows;
+      make all entries below it zero by adding appropriate multiple 
+      of row currRow to other rows;
 
       currRow = currRow + 1;
       colA = colA + 1;
@@ -338,8 +342,7 @@ Reduce Parameters {
   }
 }
 \end{verbatim}
-\end{scriptsize}
-\vspace{-12pt}
+\vspace{-15pt}
 \end{singlespace}
 
     It is possible that one type of form has fewer parameters than the
@@ -352,7 +355,7 @@ parameters.
 
 \mysubsubsection{Staged Execution}
 
-    Using input state variables corresponds to executing a state-space
+    Using input state variables corresponds to executing a state space
 block in two stages:
 \begin{enumerate}
 \vspace{\itemshrink} \item Put inputs into input state variables.
@@ -365,7 +368,7 @@ actual inputs.
 states - $\vec{\mathbf{x_{inputs1}}}$,
 $\vec{\mathbf{x_{inputs2}}}$, etc. The first set gets saved in the
 second set, the second set gets saved in the third set, etc.
-Suppose there are $k$ input sets. We can write our state-space
+Suppose there are $k$ input sets. We can write our state space
 equation pair as follows:
 \starteqnstar
 \left [ \begin{array} {c} \vec{\dot{\mathbf{x}}} \\ \vec{\dot{\mathbf{x_{inputsk}}}} \\

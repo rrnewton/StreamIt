@@ -2,21 +2,23 @@
 \label{sec:statespace}
 
   We analyze StreamIt programs at the filter level. We create a data
-structure representation that fully describes a state-space filter. We
+structure representation that fully describes a state space filter. We
 parse the code of each StreamIt filter to determine whether or not it
-is state-space; if so we initialize a data structure, fill it with the
+is state space; if so we initialize a data structure, fill it with the
 appropriate values through a process called \emph{extraction}, and
 associate the structure with the filter. We provide a set of rules to
-combine state-space representations of filters in higher StreamIt
+combine state space representations of filters in higher StreamIt
 blocks---pipelines, splitjoins, and feedback loops. Such a process
-results in a single state-space representation for the entire block.
-We also describe how to \emph{expand} a representation so that it can
-be combined with blocks of mis-matching dimensions.
+results in a single 
+\clearpage
+\noindent state space representation for the entire block.  We also describe how
+to \emph{expand} a representation so that it can be combined with
+blocks of mis-matching dimensions.
 
 \mysubsection{Representation}
 
     Our first task is to create a data structure that fully captures
-the state-space representation of a StreamIt filter.  We save a
+the state space representation of a StreamIt filter.  We save a
 filter's number of states, push rate, and pop rate in variables
 which we term $s$, $u$, and $o$, respectively. Our data structure
 also contains the matrices $\mathbf{A}$, $\mathbf{B}$,
@@ -86,7 +88,7 @@ tape.
 consists of the push and pop rates, the number of state variables,
 the number of stored inputs, the four state matrices, an initial
 state vector, and possibly an initial pop rate and two
-initialization state matrices. We define a state-space
+initialization state matrices. We define a state space
 representation $\mathrm{R}$ as the tuple $\langle$$u$, $o$, $s$,
 $stored$, $\mathbf{A}$, $\mathbf{B}$, $\mathbf{C}$, $\mathbf{D}$,
 $\overrightarrow{\mathbf{initVec}}$, $\mathbf{A_{pre}}$,
@@ -110,13 +112,13 @@ discuss how to create a representation from a StreamIt filter.
 
 \mysubsection{Extraction}
 
-    We use a simple dataflow analysis to extract the state-space representation of
+    We use a simple dataflow analysis to extract the state space representation of
 a filter. We symbolically execute a single iteration of a filter's
 work function, maintaining a vector pair representation for each
 local variable and filter field variable that is encountered
 (together, these are termed program variables). If the outputs and
 field variables all have vector pair representations, then the
-filter is state-space linear, and the vectors are used as rows of
+filter is state space linear, and the vectors are used as rows of
 $\mathbf{A}$, $\mathbf{B}$, $\mathbf{C}$, and $\mathbf{D}$. 
 %See \cite{Lamb}
 %for a treatment of the linear case.
@@ -189,7 +191,7 @@ input tape into the input states:
 \mathbf{I} \vec{\mathbf{u_{pre}}}
 \doneeqnstar
 
-    Stored inputs are always updated as shown in the same manner.
+\vspace{-9pt} Stored inputs are always updated as shown in the same manner.
 Therefore, we will use $\mathbf{A_s}$ and $\mathbf{B_s}$ to
 describe this update, where the values of these two matrices are
 shown in (3.1).
@@ -202,13 +204,10 @@ elements from the tape without consuming them.
 
 \begin{singlespace}
 \vspace{-12pt}
-\begin{scriptsize}
+\small
 \begin{verbatim}
 float->float filter IIR() {
     float curr;  // example of a field variable
-    init {
-      curr = 0;
-    }
     work push 1 pop 1 peek 3 {
       float temp; // example of a local variable
       temp = (peek(0) + peek(1) + peek(2))/6;
@@ -218,7 +217,6 @@ float->float filter IIR() {
     }
 }
 \end{verbatim}
-\end{scriptsize}
 \vspace{-36pt}
 \end{singlespace}
     The input vector is $\left [ \begin{array} {c} peek(2) \end{array}
@@ -290,7 +288,7 @@ stored inputs $peek(0)$, $peek(1)$ are updated as mentioned in
 \mysubsection{Combination}
 
     If all blocks within a pipeline, splitjoin, or feedback loop have
-state-space representations, we can combine them into a single
+state space representations, we can combine them into a single
 representation using the rules developed in this section. We combine
 blocks for two reasons.  First, combination can eliminate redundant
 computations across blocks.  Second, combination exposes optimization
@@ -422,7 +420,7 @@ block, etc.
 
 The combination rules for splitjoins and feedback loops are somewhat
 involved, and we omit them due to space considerations.  An important
-benefit of a linear state-space representation over a linear
+benefit of a linear state space representation over a linear
 representation is that feedback loops can be collapsed; the items on
 the feedback path become states in the combined block.  A thorough
 treatment of these cases appears in~\cite{Agrawal04}.
@@ -439,7 +437,7 @@ treatment of these cases appears in~\cite{Agrawal04}.
 %% \subsubsubsection{Conversion from roundrobin to duplicate splitjoin}
 
 %%     Suppose the roundrobin splitjoin has $k$ branches and let $w_i$ and
-%% $\mathrm{M_i}$ denote the splitter weight and state-space
+%% $\mathrm{M_i}$ denote the splitter weight and state space
 %% representation, respectively, on the $i^{th}$ branch. In each
 %% branch $i$ we add a filter with representation $\mathrm{L_i}$ that
 %% outputs to $\mathrm{M_i}$ in a pipeline format. Since the
@@ -506,7 +504,7 @@ treatment of these cases appears in~\cite{Agrawal04}.
 %% \vec{\mathbf{x_{is}}} \\ \vec{\mathbf{x_{ir}}} \end{array} \right
 %% ]$, where $\vec{\mathbf{x_{is}}}$ and $\vec{\mathbf{x_{ir}}}$ are
 %% the stored input states and remaining states of $\mathrm{R_i}$,
-%% respectively. For each representation $i$ denote the state-space
+%% respectively. For each representation $i$ denote the state space
 %% equation pair as:
 %% \starteqnstar
 %% \left [ \begin{array} {c} \vec{\dot{\mathbf{x_{is}}}} \\
@@ -763,16 +761,16 @@ ten items). Therefore, we need to have a method to expand a
 representation so that it models a block running multiple times,
 rather than once.
 
-    Consider the state-space equation pair, where $\vec{\mathbf{u_1}}$ and
+    Consider the state space equation pair, where $\vec{\mathbf{u_1}}$ and
 $\vec{\mathbf{y_1}}$ are the first set of inputs and outputs, and
-$\vec{\mathbf{x}}$ is the original state vector:
+$\vec{\mathbf{x}}$ is the original state vector: \vspace{-28pt}
 \starteqnstar
 \vec{\dot{\mathbf{x}}} & = & \mathbf{A}\vec{\mathbf{x}} + \mathbf{B}\vec{\mathbf{u_1}} \\
 \vec{\mathbf{y_1}} & = & \mathbf{C}\vec{\mathbf{x}} +
 \mathbf{D}\vec{\mathbf{u_1}}
 \doneeqnstar
 
-    If we run the block again, the equation pair in terms of the
+\vspace{-6pt} If we run the block again, the equation pair in terms of the
 original state vector $\vec{\mathbf{x}}$ and the next set of
 inputs and outputs ($\vec{\mathbf{u_2}}$ and $\vec{\mathbf{y_2}}$)
 is:
@@ -784,7 +782,7 @@ is:
 \mathbf{B}\vec{\mathbf{u_1}}) + \mathbf{D}\vec{\mathbf{u_2}}
 \doneeqnstar
 
-\noindent Simplifying yields:
+~ \vspace{-36pt} \\ \noindent Simplifying yields: \vspace{-12pt} 
 
 \starteqnstar
 \vec{\dot{\mathbf{x}}} & = & \mathbf{A}^2\vec{\mathbf{x}} +

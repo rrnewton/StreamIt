@@ -40,13 +40,13 @@ implemented as shown at the top of Figure~\ref{fig:opt-seq}.
 %% and could not be accessed within the work function. Therefore, the
 %% init function is used to initialize field variables.
 
-\mysubsection{State Space Example}
+\vspace{-6pt} \mysubsection{State Space Example}
 \input{example-figures}
 
 As described previously, a linear state space model describes a stream
 in which both the outputs and the state values are updated as a linear
 combination of the inputs and the previous states.  We use the
-following notation to describe a linear state space system:
+following notation to describe such systems:  \vspace{-36pt}
 
 \starteqnstar 
 \vec{\mathbf{y}}
@@ -55,7 +55,7 @@ following notation to describe a linear state space system:
 \mathbf{B}\vec{\mathbf{u}} \
 \doneeqnstar
 
-\noindent In these equations, the state vector is denoted by
+\vspace{-15pt} \noindent In these equations, the state vector is denoted by
 $\vec{\mathbf{x}}$, the inputs by $\vec{\mathbf{u}}$, and the outputs
 by $\vec{\mathbf{y}}$. $\vec{\dot{\mathbf{x}}}$ represents the new
 state vector, i.e. the state vector after it is updated. The first
@@ -86,7 +86,7 @@ The parameter reduction optimization refactors the coefficients that
 operate on the state variables in order to reduce the number of
 operations needed.  Following the transformation, $x$ assumes a value
 that is 4 times larger than the original (at any given point of
-execution).  However, this change does not effect the output of the
+execution).  However, this change does not affect the output of the
 filter, as the coefficients in $\mathbf{A}$ are compensated
 accordingly.  The transformation enables a coefficient in $\mathbf{D}$
 to change from 0.25 to 1, thereby eliminating a multiplication
@@ -375,7 +375,7 @@ operations.
 
 %%     The execution of a block (StreamIt or otherwise) can by
 %% characterized by a single equation if the block is linear, and a
-%% pair of equations if the block is state-space linear. We describe
+%% pair of equations if the block is state space linear. We describe
 %% these terms in detail below.
 
 %% \mysubsubsection{Linear Representations}

@@ -8,14 +8,14 @@
 
 %\mysubsection{Problem Overview}
 
-    Digital devices are increasingly common in everyday life. Examples
+Digital devices are increasingly common in everyday life. Examples
 include cell phones, modems, CD players, and high definition
 televisions. These products utilize Digital Signal Processing (DSP)
 for a variety of applications, including signal compression and
 decompression, noise reduction, and error correction.  Because such
 programs often run in embedded environments with limited power and
 strict real-time requirements, this is a domain where optimization is
-still very important.  
+still very important.
 
 Unfortunately, DSP optimizations typically defy high level language
 compiler analysis.  Consequently, DSP applications must be hand-coded
@@ -30,9 +30,9 @@ compiler.
 
 In this paper, we introduce a new framework for analyzing and
 optimizing a large class of DSP applications.  The framework, which we
-call {\it linear state space analysis}, applies a large body of work
-on linear state space systems to the domain of programming languages
-and compilers.  A state space system is one in which a computational
+call linear state space analysis, applies a large body of work on
+linear state space systems to the domain of programming languages and
+compilers.  A state space system is one in which a computational
 element produces and consumes some values on each execution.  In
 addition, some internal data may be preserved between executions; we
 refer to these values as {\it states}.
@@ -49,28 +49,29 @@ relationship holds but there is no state retained between executions.
 There is a strong theoretical foundation for reasoning about linear
 state space systems; it has been shown, for example, how to minimize
 the number of states~\cite{Moore} as well as the number of parameters
-in the system~\cite{Mayne,Schutter,Ackermann/Bucy}.
+in the system~\cite{Ackermann/Bucy,Mayne,Schutter}.
 
 Our technique leverages domain-specific knowledge of linear state
 space systems to perform novel optimization of stream programs.  Our
-framework applies to languages based on the {\it synchronous dataflow}
-model of computation.  In this model, a program is a set of autonomous
+framework applies to languages based on the synchronous dataflow model
+of computation.  In this model, a program is a set of autonomous
 filters that communicate over FIFO channels.  On each execution, a
 filter consumes some items from its input channels and produces some
 items on its output channels; it may also retain states between
 executions.  A filter can be modeled as a linear state space system if
-it satisfies the criteria above.  In this paper, we use StreamIt: a
-high-level language and compiler infrastructure for DSP applications.
+it satisfies the criteria above.  In this paper, we use StreamIt as
+the input language; StreamIt is a high-level language and compiler
+infrastructure for DSP applications.
 
 This paper makes the following contributions:
 
 \begin{itemize}
 
 \vspace{\itemshrink} \item An extraction algorithm that examines each
-filter and, where possible, builds a state-space representation to
+filter and, where possible, builds a state space representation to
 describe its behavior.
 
-\vspace{\itemshrink} \item Rules for combining adjacent state-space
+\vspace{\itemshrink} \item Rules for combining adjacent state space
 blocks into a single representation, thereby eliminating redundant
 computations and enabling further optimizations.  Each possible
 configuration of blocks (sequential, parallel, and cyclic) is handled.
@@ -93,7 +94,7 @@ In the rest of this section, we give an overview of StreamIt and
 illustrating examples of state space analysis\footnote{As the rest of
 this paper is devoted to linear state space analysis, we often say
 only ``state space analysis'' for brevity.}.
-Section~\ref{sec:statespace} gives the details of our state-space
+Section~\ref{sec:statespace} gives the details of our state space
 representation, including extraction and combination rules, while
 Section~\ref{sec:optimization} describes the optimizations.  In
 Section~\ref{sec:results} we discuss our implementation and results.
@@ -138,27 +139,27 @@ Section~\ref{sec:conclusion} concludes.
 %% outputs a linear combination of its inputs plus a constant term. A
 %% linear block can be represented by a matrix relating inputs to
 %% outputs and a vector of constants. The next simplest
-%% characterization of blocks is \textit{linear state-space}. Such a
+%% characterization of blocks is \textit{linear state space}. Such a
 %% block uses a set of state variables. The output of this block is a
 %% linear combination of its inputs and state variables. In addition,
 %% the state variables are updated by a linear combination of
-%% themselves and inputs.  A linear state-space block can be
+%% themselves and inputs.  A linear state space block can be
 %% represented by four independent matrices.
 
-%%     A linear state-space characterization is more general than a
+%%     A linear state space characterization is more general than a
 %% linear characterization - all linear blocks are also linear
-%% state-space blocks, but the converse is not true. The intuitive
+%% state space blocks, but the converse is not true. The intuitive
 %% reason for this fact is that a linear block is memoryless, meaning
 %% the outputs only depend on current inputs. However, a linear
-%% state-space block has memory in the form of state variables, so
+%% state space block has memory in the form of state variables, so
 %% the outputs depend on current inputs and past inputs.
 
 %%     We will perform analysis and optimization of DSP applications at
-%% the linear state-space level. We choose this representation
+%% the linear state space level. We choose this representation
 %% because it models a wide class of applications or parts of
 %% applications, and it is simple to work with.
 
-%%     Our work with state-space representations will be done in the
+%%     Our work with state space representations will be done in the
 %% context of StreamIt, a programming language designed for streaming
 %% applications \cite{streamitcc}.  StreamIt allows users to create
 %% their own blocks, but limits the way these blocks can be
@@ -166,17 +167,17 @@ Section~\ref{sec:conclusion} concludes.
 
 %% \begin{enumerate}
 %% \vspace{\itemshrink} \item Examine each block and determine whether or not it can be
-%% characterized as linear state-space. If it can, extract the
-%% appropriate state-space representation.
+%% characterized as linear state space. If it can, extract the
+%% appropriate state space representation.
 
-%% \vspace{\itemshrink} \item Combine connected blocks that each have a state-space
+%% \vspace{\itemshrink} \item Combine connected blocks that each have a state space
 %% representation, using an appropriate set of rules depending on the
 %% type of connection.
 
-%% \vspace{\itemshrink} \item Optimize representations through the use of state-space
+%% \vspace{\itemshrink} \item Optimize representations through the use of state space
 %% transformations.
 
-%% \vspace{\itemshrink} \item Convert the state-space representation(s) back to StreamIt
+%% \vspace{\itemshrink} \item Convert the state space representation(s) back to StreamIt
 %% code.
 %% \vspace{\itemshrink} \end{enumerate}
 

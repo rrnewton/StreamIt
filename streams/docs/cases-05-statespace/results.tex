@@ -9,22 +9,24 @@ number of floating point operations (additions and multiplications)
 executed in a given benchmark. The DynamoRIO~\cite{dynamo} system is
 used to count operations.
 
-We compare linear state-space optimizations with linear
-optimizations~\cite{Lamb}.  For the state-space numbers, all linear
-state-space blocks are combined and then optimizations are applied.
+We compare linear state space optimizations with linear
+optimizations~\cite{Lamb}.  For the state space numbers, all linear
+state space blocks are combined and then optimizations are applied.
 For applications of this size, it is primarily the combination that
 yields a performance boost; we have not characterized the individual
 contributions of state removal and minimal parameterization.  For the
 linear numbers, all linear blocks are combined.  We do not enable the
 ``frequency translation'' optimization~\cite{Lamb} because it has no
-counterpart in the state-space domain.  A hybrid optimizer could apply
-frequency translation where appropriate, and linear state-space
+counterpart in the state space domain.  A hybrid optimizer could apply
+frequency translation where appropriate, and linear state space
 optimizations elsewhere.
 
 \begin{table}[tbp]
+\vspace{-12pt}
+\small
 \begin{center}
 \begin{tabular} {c|c|c}
-{\bf Application} & \parbox{0.65in}{{\bf ~~~Linear} \\ {\bf Statespace}} & {\bf Linear} \\ \hline
+{\bf Application} & \parbox{0.7in}{{\bf ~~~Linear} \\ {\bf State Space}} & {\bf Linear} \\ \hline
 FM Radio & 0.1740 & 0.1692 \\
 FIR Program &  0.9961 & 0.9980 \\
 Channel Vocoder & 0.2601 & 0.2620 \\
@@ -37,15 +39,15 @@ IIR + 1/16 Decimator & 0.3393 & 1.000 \\
 IIR + FIR & 0.9413 & 1.000 \\
 FIR + IIR + IIR & 0.9214 & 1.000
 \end{tabular}
-\caption{Floating point operations with state-space and linear
+\caption{Floating point operations with state space and linear
 optimizations, normalized to no optimizations.\protect\label{tab:results}}
 \end{center}
-\vspace{-12pt}
+\vspace{-18pt}
 \end{table}
 
 Results appear in Table~\ref{tab:results}.  For the first 5
 applications, which mainly have linear components without state,
-linear optimizations and state-space optimizations are equally
+linear optimizations and state space optimizations are equally
 effective. There is a huge performance downgrade for an FFT (Fast
 Fourier Transform) for both types of transformations. This is not
 surprising, since an FFT performs its computations sparsely across
@@ -58,15 +60,15 @@ The remaining applications have filters with state.  Thus, they are
 not handled by linear analysis, and there is a normalized performance
 of 1.0 in the linear column.  For a simple standalone Linear
 Difference Equation or IIR (Infinite Impulse Response) filter,
-state-space transformations show a very slight degradation in
+state space transformations show a very slight degradation in
 performance. The reason for this is that there are a few extra
 operations performed by the prework function. In terms of steady-state
-behavior, state-space transformation is equivalent to no
+behavior, state space transformation is equivalent to no
 transformation. There is no gain in performance, because the filters
 are written optimally.
 
 When we combine stateful filters with other filters, we notice a
-performance improvement using state-space optimizations. For example,
+performance improvement using state space optimizations. For example,
 combining an IIR filter with a decimator that leaves 1 out of every 16
 values has a 66\% improvement. Combining an IIR filter with an FIR
 filter has a 6\% improvement. In the case of an IIR filter with a
@@ -75,5 +77,5 @@ filter that are thrown away by the decimator.  Combining their
 respective matrices removes these computations. In the case of an IIR
 filter with an FIR filter, the computations in both filters can be
 merged to a single set of computations. This indicates that
-state-space optimizations are more useful when applied to combined
+state space optimizations are more useful when applied to combined
 filters than when applied to individual filters.
