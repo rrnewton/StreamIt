@@ -3,11 +3,11 @@
 
 Our compiler currently has two linear analysis optimizations. The first,
 {\it linear replacement}, replaces the largest linear hierarchal {\tt streams} 
-possible with {\tt filters} that directly compute the calculation specified by 
-the {\tt stream}s associated linear node. The second optimization, called 
+possible with {\tt filter}s that directly compute the calculation specified by 
+the {\tt stream}s associated linear node. The second optimization, 
 {\it frequency replacement}, replaces all {\tt streams} which implement 
 a convolution using the frequency transformation described in 
-\ref{sec:freq}. Below we describe experiments and results that demonstrate
+Section \ref{sec:freq}. Below we describe experiments and results that demonstrate
 performance improvements due to these two optimizations.
 
 
@@ -40,14 +40,16 @@ Our measurement platform is a Dual Intel 2.2 GHz P4 Xenon processor system
 with 2GB of memory running Linux. We compiled our benchmarks using StreamIt's uniprocessor backend
 and generated executables from the resulting C files using {\tt gcc} with {\tt -O2} optimization.
 
-To measure the number of runtime multiplications we use a simple program written with the 
-the DynamoRIO\cite{dynamo99} infrastructure. Floating point multiplication instructions 
-in the IA-32 instruction set are defined to be any of ({\tt fmul fmulp fimulp fdiv fdivp fidivp fdivr fdivrp fidivr}).
-We measure execution time normalized to the number of program outputs generated.
-
-There are no standard benchmarks written yet for StreamIt, so we use a
-set of representative programs which perform computations that are
-found in actual streaming applications: 1) {\bf FIR}, a single 256
+To measure the number of runtime multiplications we use a simple instruction counting 
+program written using the DynamoRIO\cite{dynamo99} infrastructure. 
+%Floating point multiplication instructions 
+%in the IA-32 instruction set are defined to be any of ({\tt fmul fmulp fimulp fdiv fdivp fidivp fdivr fdivrp fidivr}).
+%We measure execution time normalized to the number of program outputs generated. 
+There are no standard benchmarks written yet for StreamIt, so we use
+a set of representative programs
+\footnote{Streamgraphs appear in appendix B}.
+which perform computations that 
+are found in actual streaming applications: 1) {\bf FIR}, a single 256
 point rectangularly windowed low pass FIR filter
 ($\omega_c=\frac{\pi}{3}$); 2) {\bf TargetDetect}, four matched
 filters performing threshold target detection in parallel; 3) {\bf
@@ -99,24 +101,26 @@ replacement optimization because the entire application is comprised of a single
 The reduction multiplication reduction in TargetDetect is also solely due to 
 the frequency transformation because threshold detection is non-linear which
 makes the parallel computation blocks uncollapsible. Finally, RateConvert contains
-a large low pass filter which can benefit from frequency replacement. A complete
-implementation of the linear combination rules will allow linear replacement 
-to improve performance as well.
+a large low pass filter which also benefits from frequency replacement. 
 
-The reduction in multiplies of the FMRadio benchmark is all due to
-automatic replacement of the parallel equalizer computations.
-The multiplication reduction in the Radar benchmark comes from algebraic  
-simplification due to combining several serial computations into one using
+%A complete
+%implementation of the linear combination rules will allow linear replacement 
+%to improve performance as well.
+
+All of the reduction in multiplies in the FMRadio benchmark is due to
+the automatic combination of parallel equalizer computations.
+The reduction in the Radar benchmark is due to algebraic  
+simplification by combining several serial computations using
 the pipeline combination rules. Table~\ref{fig:benchmark-statistics} shows
-the number of nodes in the stream graph both before and after linear replacement. 
+the number of nodes in each benchmark both before and after linear replacement. 
 
-FilterBank is the only benchmark whose multiplication reduction factor due to both optimizations
-is greater than the reduction for either alone. Linear replacement reduces
-multiplication because it can combine the action of the parallel analysis 
-and synthesis channels into an overall FIR filter. Frequency replacement reduces
-multiplication a small amount for each of the smaller FIR filters. However, when
-a frequency implementation of the overall linear form is generated,
-even more multiplications are reduced.
+FilterBank is the only benchmark where multiplications are reduced  
+more by both optimizations than either alone. Linear replacement reduces
+the required multiplications because it can combine the action of parallel analysis 
+and synthesis channels into an overall FIR filter. Frequency replacement alone helps 
+multiplication reduction only somewhat because FilterBank contains fairly small FIR filters.
+However, frequency replacement speeds up the calculation of the overall combined filter, 
+thus decreasing the multiplies further.
 
 \begin{figure}
 \center

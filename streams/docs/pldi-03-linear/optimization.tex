@@ -66,7 +66,7 @@ The {\tt stream}'s {\tt work} function is changed to perform the following:
 \begin{enumerate}
 \item $X[k]$ is is calculated from the input tape using an FFT algorithm. 
 \vspace{-6pt}
-\item $X[k]$ is multiplied $H[k]$, to produce $Y[k]$. 
+\item $X[k]$ is multiplied element wise with $H[k]$ to produce $Y[k]$. 
 \vspace{-6pt}
 \item $y[n]$ is obtained by transforming $Y[k]$ back to the time domain using an inverse FFT.
 \vspace{-6pt}
@@ -84,12 +84,12 @@ Therefore, the transformed filter needs to produce more $1$ output each
 execution of {\tt work}. The number of outputs, $N$, to produce on each 
 execution of {\tt work} is determined automatically by the compiler and set to be 
 approximately $2e$, a number determined by empirical observations. $N$ is then rounded 
-up such that the FFT size, $N+2(e-1)$, is a power of 
-two which is required by the FFT algorithm we employ.
+up such that $N+2(e-1)$ is a power of two which results in a much more efficient 
+FFT implementation.
 
 The frequency transformation generates a new {\tt stream} that
 peeks $e'=N+e-1$ items each execution where the original {\tt stream} used only $e$.
-The compiler automaticalls computes the complex values of
+The compiler automatically computes the complex values of
 $H[k]=FFT(N+2(e-1),h[n])$, the $N+2(e-1)$ point DFT of $h[n]$ at compile
 time and saves them as constants in the filter.
 A new compiler-generated {\tt work} function is generated that calculates the complex 
@@ -107,8 +107,8 @@ uses the middle $N$ values of $y[n]$ and discards the
 $e-1$ elements on both ends. The input tape is advanced by $N$ and the next 
 $N+e-1$ values are used to produce the next $N$ outputs.
 
-The {\it overlap and add} method ~\cite{oppenheim-discrete} is well known and and widely used.
-The overlap-add method exploits the fact that the overlaping values of $y[n]$ contain partial
+The {\it overlap and add} method ~\cite{oppenheim-discrete} is well known.
+This algorithm exploits the fact that the overlapping values of $y[n]$ contain partial
 output computations due to both the previous and the next $N+e-1$ inputs.
 The first $e-1$ of $y[n]$ are part of the computation from the previous invocation of the 
 {\tt work} function and the last $e-1$ are part of the next invocation. 
