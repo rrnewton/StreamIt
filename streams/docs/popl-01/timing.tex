@@ -87,14 +87,19 @@ $I_A$.  After the $n$'th execution, it has popped $n$ items, peeked up
 to $n + (peek_A - pop_A)$, and popped $2 * n$ items.  Thus, it can
 execute $n = floor((x - (peek_A - pop_A)) / pop_A))$ times, leaving
 the following expression for $\ma{I_A}{O_A}(x)$
-\begin{eqnarray*}
-\ma{I_A}{O_A}(x)& \\ = push_A&*floor((x-(peek_A-pop_A))/pop_A) if x \ge (peek_A-pop_A) \\
-         = 0 <  (peek_A-pop_A)
-\end{eqnarray*}
-Similarly, the reader can verify that:
-\begin{eqnarray*}
-\mi{I_A}{O_A}(x)&= ceil(x/push_A)*pop_A+(peek_A-pop_A)
-\end{eqnarray*}
+
+\[
+\begin{array}{l}
+\ma{I_A}{O_A}(x)  \\ 
+\makebox[.1in]{ } = \left\{
+\begin{array}{ccl}
+push_A*\left\lfloor\frac{x-(peek_A-pop_A)}{pop_A}\right\rfloor & if & x \ge (peek_A-pop_A) \\
+ & \\
+0 & if & x < (peek_A-pop_A) \\
+\end{array} \right.
+\end{array}
+\]
+
 
 \subsubsection{Pipelines}
 
@@ -136,22 +141,12 @@ thereby ensuring a unique definition for all pairs $(x, z)$ where
 there is a downstream path from $x$ to $z$.
 
 \subsubsection{SplitJoins}
-\begin{figure}[t]
-\scriptsize
-\begin{verbatim}
-Here I want a splitjoin diagram, labelled as:
 
-    B1 ... Bn 
-  /           \
-S               J
-  \           /
-    A1 ... An
-
-\end{verbatim}
-\vspace{-12pt}
-\caption{\protect\small SplitJoin labeling.
+\begin{figure}
+\centering
+\psfig{figure=splitjoin.eps,width=3.2in}
+\caption{\protect\small SplitJoin Construct with labeling.
 \protect\label{splitjoin}}
-\vspace{-12pt}
 \end{figure}
 
 We now derive $min$ and $max$ in the case of a SplitJoin, as pictured
@@ -169,8 +164,8 @@ items from the input tape are alternately routed to the output tapes,
 with the first item going onto tape $O1_S$.  By this definition, we
 can see that the splitter's $max$ is defined as follows:
 \begin{eqnarray*}
-\ma{I_S}{O1_S}(x) = ceil(x/2) \\
-\ma{I_S}{O2_S}(x) = floor(x/2)
+\ma{I_S}{O1_S}(x) = \left\lceil\frac{x}{2}\right\rceil \\
+\ma{I_S}{O2_S}(x) = \left\lfloor\frac{x}{2}\right\rfloor
 \end{eqnarray*}
 To derive the $min$ function across a splitter, observe that the input
 tape need only progress so far as to produce the items on the emptier
@@ -187,8 +182,8 @@ some sense dual to those of the round robin splitter.  Again assuming
 that items are alternately drawn from the input tapes, starting with
 $I1_J$, we have that:
 \begin{eqnarray*}
-\mi{I1_J}{O_J}(x) = ceil(x/2) \\
-\mi{I2_J}{O_J}(x) = floor(x/2) 
+\mi{I1_J}{O_J}(x) = \left\lceil\frac{x}{2}\right\rceil \\
+\mi{I2_J}{O_J}(x) = \left\lfloor\frac{x}{2}\right\rfloor
 \end{eqnarray*}
 Again, the $max$ function takes two arguments, corresponding to the
 number of items on $I1_J$ and $I2_J$, respectively:
@@ -218,21 +213,11 @@ as follows:
 
 \subsubsection{FeedbackLoops}
 
-\begin{figure}[t]
-\scriptsize
-\begin{verbatim}
-Here I want a feedback diagram, labelled as:
-
-         LOOP  
-      /        \
-
-A - FJ - BODY - FS - ->
-
-\end{verbatim}
-\vspace{-12pt}
-\caption{\protect\small  FeedbackLoop labeling.
+\begin{figure}
+\centering
+\psfig{figure=feedback.eps,width=3.2in}
+\caption{\protect\small  FeedbackLoop construct labeling.
 \protect\label{looplabel}}
-\vspace{-12pt}
 \end{figure}
 
 We have to be careful when defining the transfer functions for
@@ -255,12 +240,12 @@ the feedback loop $I2_J$.
 
 The $min$ function for the main stream is as before:
 \begin{eqnarray*}
-\mi{I1_J}{O_J}(x) = ceil(x/2)
+\mi{I1_J}{O_J}(x) = \left\lceil\frac{x}{2}\right\rceil 
 \end{eqnarray*}
 However, the equation must include the initial $n$ values for the
 $min$ function of the loop:
 \begin{eqnarray*}
-\mi{I2_J}{O_J}(x) = floor(x/2)-n
+\mi{I2_J}{O_J}(x) = \left\lfloor\frac{x}{2}\right\rfloor - n
 \end{eqnarray*}
 The $max$ function must be similarly shifted for the input from the loop:
 \begin{eqnarray*}
