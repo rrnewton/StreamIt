@@ -114,9 +114,12 @@ produced during the first phase, and 0 items are produced during the second phas
 Figure~\ref{fig:sdep-rates}.  The stream graphs illustrate a steady
 state cycle of a ``pull schedule''; execution proceeds from left to
 right, and channels are annotated with the number of items present.
-Because a pull schedule is as fine-grained as possible,
-$\figsdepf{X}{Y}(n)$ can be calculated as the number of times that $X$
-executes before the $n$th execution of $Y$.
+The second line lists the actors that fire in the pull schedule for
+$E$.  The third line counts the number of times that $A$ executes in
+the pull schedule, and the fourth line illustrates the computation of
+$\figsdepf{A}{E}(n)$: the number of times that $A$ executes before the
+$n$th execution of $E$.  The last two lines illustrate the computation
+of $\figsdepf{B}{E}$.
 \protect\label{fig:sdep1}}
 \end{center}
 \vspace{-12pt}
