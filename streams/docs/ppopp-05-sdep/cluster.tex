@@ -17,9 +17,10 @@ If a message is sent following data is written to a socket:
 
 {\scriptsize
 \begin{verbatim}
-int size; // size of message in bytes including size field
-int index; // index of handler
-int iteration_to_execute_at; // -1 for best effort messages, target iteration number otherwise
+int size; // size of message in bytes, including size field
+int index; // index of message handler
+int iteration_to_execute_at; // target iteration number or
+                             // -1 for best effort messages 
 int and float parameters;
 \end{verbatim}}
 
@@ -38,15 +39,16 @@ to 1000.
 (16, 0, 8, 1000)
 \end{verbatim}}
 
-A message for handler Nr. 0 that has to be executed before work
-function is invoked 8th time. Message has one integer parameter equal
+A message for handler Nr. 0 that has to be executed before its work
+function is invoked 8th time. The Message has one integer parameter equal
 to 1000.
 
 If a credit is being sent following data is written to a socket:
 
 {\scriptsize
 \begin{verbatim}
-int -1; int credit; 
+int -1; 
+int credit; 
 \end{verbatim}}
 
 Example:
@@ -70,9 +72,8 @@ If a message is being sent downstream and maximum latency is
 non-negative then no credits need to be sent. If a message is being
 sent downstream at negative maximum latency or is being sent upstream
 then one needs to coordinate the execution of filters by sending
-credits. The nodes that are receiving credits are called restricted
-execution nodes and only execute up to the maximum credit they have
-received so far.
+credits. Nodes that are receiving credits can only execute up 
+to the maximum credit they have received so far.
 
 In case of a message being sent downstream with negative latency,
 during compile time we use the sdep information to calculate following
