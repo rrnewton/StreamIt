@@ -153,6 +153,7 @@ $s$):
 \mt{dec}(s) = (o-1) * (100 + 4 * u) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 \]
 
+\clearpage
 For the direct cost, we consider the cost to be infinite for
 splitjoins with roundrobin splitters.  This is because the splitjoin
 combination does not eliminate any arithmetic operations, and for the
@@ -162,10 +163,8 @@ other streams, we count the number of multiplies and adds required to
 perform the matrix multiplication, giving more weight to the
 multiplies since they are more expensive.  We do not count the zero
 entries of the arrays, since our matrix multiply routines take
-advantage of the sparsity of the matrix.  
-\clearpage
-We add $100+2u$ to all costs in order to represent the overhead of the
-node's execution.
+advantage of the sparsity of the matrix.  We add $100+2u$ to all costs
+in order to represent the overhead of the node's execution.
 
 For the frequency cost, our cost curve is guided by profiler feedback.
 The speedup gained by translating to the frequency domain depends on

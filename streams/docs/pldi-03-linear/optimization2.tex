@@ -133,7 +133,7 @@ frequency domain:
     ~~~~{\tt for}~i=0~{\tt to}~u-1 \\
     ~~~~~~{\tt push(pop())} \\
     ~~~~{\tt for}~i=0~{\tt to}~u-1 \\
-    ~~~~~~{\tt for}~j=0{\tt to}~o-2 \\
+    ~~~~~~{\tt for}~j=0~{\tt to}~o-2 \\
     ~~~~~~~~{\tt pop()} \\
     ~~{\tt \}} \\
     {\tt \}}
@@ -196,36 +196,36 @@ frequency domain:
 \vspace{-24pt}
     \\
     ~~~~{\tt init}~{\tt \{} \\
-    ~~~~~~{\tt for}~j=0~to~u-1\\
+    ~~~~~~{\tt for}~j=0~{\tt to}~u-1\\
     ~~~~~~~~\vec{H}[*,j] \leftarrow \mathbf{FFT}(N,A[*,u-1-j]) \\
     ~~~~{\tt \}} \\
     \\
     ~~~~{\tt prework}~{\tt peek}~r~{\tt pop}~r~{\tt push}~u*m~{\tt \{}\\
     ~~~~~~\vec{x} \leftarrow {\tt pop}(0 \dots m+e-2) \\
     ~~~~~~\vec{X} \leftarrow \mathbf{FFT} (N, \vec{x}) \\
-    ~~~~~~{\tt for}~j=0~to~u-1\\
+    ~~~~~~{\tt for}~j=0~{\tt to}~u-1\\
     ~~~~~~~~\vec{Y}[*,j] \leftarrow \vec{X} .* \vec{H}[*,j] \\
     ~~~~~~~~\vec{y}[*,j] \leftarrow \mathbf{IFFT}(N, \vec{Y}[*,j]) \\
     ~~~~~~~~\vec{partials}[*,j] \leftarrow \vec{y}\hspace{1pt}[m+e-1 \dots m+2e-3,j] \\
     ~~~~~~{\tt \}} \\
-    ~~~~~~{\tt for}~i=0~to~m-1\\
-    ~~~~~~~~{\tt for}~j=0~to~u-1\\
+    ~~~~~~{\tt for}~i=0~{\tt to}~m-1\\
+    ~~~~~~~~{\tt for}~j=0~{\tt to}~u-1\\
     ~~~~~~~~~~{\tt push}(\vec{y}\hspace{1pt}[i+e-1,j] + \vec{b}[j]) \\
     ~~~~{\tt \}} \\
     \\
     ~~~~{\tt work}~{\tt peek}~r~{\tt pop}~r~{\tt push}~u*r~{\tt \{} \\
     ~~~~~~\vec{x} \leftarrow {\tt pop}(0 \dots m+e-2) \\
     ~~~~~~\vec{X} \leftarrow \mathbf{FFT} (N, \vec{x}) \\
-    ~~~~~~{\tt for}~j=0~to~u-1\\
+    ~~~~~~{\tt for}~j=0~{\tt to}~u-1\\
     ~~~~~~~~\vec{Y}[*,j] \leftarrow \vec{X} .* \vec{H}[*,j] \\
     ~~~~~~~~\vec{y}[*,j] \leftarrow \mathbf{IFFT}(N, \vec{Y}[*,j]) \\
     ~~~~~~{\tt \}} \\
-    ~~~~~~{\tt for}~i=0~to~e-1\\
-    ~~~~~~~~{\tt for}~j=0~to~u-1\\
+    ~~~~~~{\tt for}~i=0~{\tt to}~e-1\\
+    ~~~~~~~~{\tt for}~j=0~{\tt to}~u-1\\
     ~~~~~~~~~~{\tt push}(\vec{y}\hspace{1pt}[i,j] + \vec{partials}[i,j])\\
     ~~~~~~~~~~\vec{partials}[i,j] \leftarrow \vec{y}\hspace{1pt}[m+e-1+i,j]\\
-    ~~~~~~{\tt for~i~=~0~to~}m-1\\
-    ~~~~~~~~{\tt for~j~=~0~to~}u-1\\
+    ~~~~~~{\tt for}~i=0~{\tt to}~m-1\\
+    ~~~~~~~~{\tt for}~j=0~{\tt to}~u-1\\
     ~~~~~~~~~~{\tt push}(\vec{y}\hspace{1pt}[i+e-1,j] + {\vec b}[j])\\
     ~~~~{\tt \}} \\
     ~~{\tt \}} \\
