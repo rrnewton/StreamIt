@@ -1,0 +1,53 @@
+Installing the StreamIt Snapshot
+--------------------------------
+
+This is for the March 14, 2003 snapshot release (streamit-0.0.20030314).
+
+$Id: INSTALL,v 1.1 2003-03-10 20:06:00 dmaze Exp $
+
+
+Unpack the StreamIt source tar file somewhere; this can be in your
+home directory, or in a shared directory.  Perform the steps listed in
+"per-user setup" below, then log out and log in again (or reload your
+shell's dotfiles).  Then:
+
+  cd $STREAMIT_HOME/compiler
+  make
+  cd $STREAMIT_HOME/library/c
+  make
+
+You should now be able to run the compiler.  For a minimal test:
+
+  cd
+  cp $STREAMIT_HOME/apps/examples/hello/HelloWorld6.str .
+  knit HelloWorld6.str
+  ./a.out -i10
+
+This should print the numbers 0 through 9, in order.
+
+
+PER-USER SETUP: depends on the shell you use; you need to set the
+STREAMIT_HOME environment variable and search paths for Java and
+LaTeX.  If you use bash, add to your .bashrc file
+
+  export STREAMIT_HOME=$HOME/streamit-0.0.20030314 # or elsewhere
+  . $STREAMIT_HOME/include/dot-bashrc
+
+If you use tcsh, add to your .cshrc file
+
+  setenv STREAMIT_HOME ${HOME}/streamit-0.0.20030314
+  source ${STREAMIT_HOME}/include/dot-cshrc
+
+Note that this is a snapshot release; in particular, the settings in
+the dot-bashrc and dot-cshrc files contain some paths specific to the
+MIT LCS CAG local infrastructure.  You may want to edit these files to
+set some of the paths to directories more appropriate to your site.
+
+If you want to override the settings the provided scripts set (for
+example, the RAW StarSearch directory), set the relevant variables
+after reading the dot-bashrc or dot-cshrc file.
+
+
+Local variables:
+mode: text
+End:
