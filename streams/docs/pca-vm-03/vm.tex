@@ -434,8 +434,10 @@ argument to the stream initialization functions above.
 popping does not return elements in the same order that the elements
 were pushed.  This might enable improved routing or instruction
 scheduling, {\it e.g., } for applications dealing on unordered network
-packets.  If this flag is set, then peek can only be used with an
-index of 0 (to examine the next item).\\}
+packets.  Because the elements are unordered, {\tt svm\_streamPeek}
+and {\tt svm\_streamPeekEOS} cannot be used if this flag is set.  Note
+that this implies that there is no EOS support for unordered
+streams. \vspace{-2pt}\\}
 
 \decl{  svm\_Stream\_Unaliased\_RAM = 0x2,}
 
@@ -443,21 +445,21 @@ index of 0 (to examine the next item).\\}
 be aliased with this stream.  Thus, the Low Level Compiler can use an
 optimized, architecture-specific memory layout for this stream, rather
 than guaranteeing that it is implemented as an in-order circular
-buffer (as described above).\\}
+buffer (as described above). \vspace{-2pt}\\}
 
 \decl{  svm\_Stream\_Never\_Wraps = 0x4,}
 
 \spec{This flag is true if the number of elements pushed onto a given
 stream will never exceed the stream's capacity.  This allows the Low
 Level Compiler to treat the stream as a single-assignment block rather
-than a circular buffer.\\}
+than a circular buffer.\vspace{-2pt}\\}
 
 \decl{  svm\_Stream\_One\_EOS = 0x8}
 
 \spec{This flag is true if at most one element in the stream will ever
 have an EOS tag at any given time.  For memory streams, this allows
 the Low Level Compiler to implement EOS with a single pointer instead
-of tracking a set of EOS tokens.\\}
+of tracking a set of EOS tokens.\vspace{-2pt}\\}
 
 \decl{\} svm\_Stream\_Flags;}
 \makeline
@@ -537,8 +539,8 @@ until {\tt n+1} elements are available.}
   {\tt element} - location in which to store the peeked value.}
 
 \req{
-  if {\tt n} $>$ 0, then {\tt svm\_Stream\_Unordered} flag has NOT been set.\\
   {\tt n} $<$ {\tt capacity} of {\tt s}.\\
+  {\tt s} does not have the {\tt svm\_Stream\_Unordered} flag set.\\
   {\tt s} has been initialized.}
 
 \callkc
@@ -592,8 +594,8 @@ are available.}
   {\tt n} - index at which to peek (zero-based and starting from front of stream).}
 \ret{True if there is an EOS tag at index {\tt n}.}
 \req{
-  if {\tt n} $>$ 0, then {\tt svm\_Stream\_Unordered} flag has NOT been set.\\
   {\tt n} $<$ {\tt capacity} of {\tt s}.\\
+  {\tt s} does not have the {\tt svm\_Stream\_Unordered} flag set.\\
   {\tt s} has been initialized.}
 \callkc
 %%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1299,8 +1301,7 @@ move itself.}
 \req{
   {\tt move} is {\tt Unstarted}, {\tt Finished}, or uninitialized.\\
   {\tt srcStr} and {\tt destStr} have been initialized.\\
-  {\tt srcStr} and {\tt destStr} have the same {\tt elementSize}.\\
-  {\tt length} $>$ 0 or {\tt length} = {\tt svm\_Stream\_Length\_All}.}
+  {\tt srcStr} and {\tt destStr} have the same {\tt elementSize}.}
       
 \callc
 \makeline
@@ -1340,7 +1341,6 @@ processes a single stride.}
   {\tt scatter} is {\tt Unstarted}, {\tt Finished}, or uninitialized.\\
   {\tt srcStr} and {\tt destBlock} have been initialized.\\
   {\tt srcStr} and {\tt destBlock} have the same {\tt elementSize}.\\
-  {\tt length} $>$ 0 or {\tt length} = {\tt svm\_Stream\_Length\_All}.\\
   All accesses to {\tt destBlock} are within its capacity.}
 
 \callc
@@ -1380,7 +1380,6 @@ stride.  Each iteration of this kernel processes a single stride.}
   {\tt gather} is {\tt Unstarted}, {\tt Finished}, or uninitialized.\\
   {\tt srcBlock} and {\tt destStr} have been initialized.\\
   {\tt srcBlock} and {\tt destStr} have the same {\tt elementSize}.\\
-  {\tt length} $>$ 0 or {\tt length} = {\tt svm\_Stream\_Length\_All}.\\
   All accesses to {\tt srcBlock} are within its capacity.}
 
 \callc
@@ -1423,7 +1422,6 @@ processes a single index.}
   {\tt scatter} is {\tt Unstarted}, {\tt Finished}, or uninitialized.\\
   {\tt srcStr}, {\tt indexStr}, and {\tt destBlock} have been initialized.\\
   {\tt srcStr} and {\tt destBlock} have the same {\tt elementSize}.\\
-  {\tt length} $>$ 0 or {\tt length} = {\tt svm\_Stream\_Length\_All}. \\
   {\tt indexStr} uses an unsigned representation for the indices.\\
   All accesses to {\tt destBlock} are within its capacity.}
 
@@ -1466,7 +1464,6 @@ iteration of this kernel processes a single index.}
   {\tt gather} is {\tt Unstarted}, {\tt Finished}, or uninitialized.\\
   {\tt srcBlock}, {\tt indexStr} and {\tt destStr} have been initialized.\\
   {\tt srcBlock} and {\tt destStr} have the same {\tt elementSize}.\\
-  {\tt length} $>$ 0 or {\tt length} = {\tt svm\_Stream\_Length\_All}. \\
   {\tt indexStr} uses an unsigned representation for the indices.\\
   All accesses to {\tt srcBlock} are within its capacity.}
 
@@ -2182,7 +2179,7 @@ function, the {\tt iteration} variable marks the current iteration.
     void* element = malloc(scatter->srcStr->elementSize);
     void* index = malloc(scatter->indexStr->elementSize);
     for (iteration=0; iteration<scatter->length && !done_stream_all; iteration++) {
-      done_stream_all = scatter->length == svm_Stream_Length_all && 
+      done_stream_all = scatter->length == svm_Stream_Length_All && 
                         svm_streamPeekEOS(scatter->indexStr, 0);
       svm_streamPop(scatter->indexStr, index);
       size_t full_index = unpack_index((int8_t*)index, scatter->indexStr->elementSize);
@@ -2245,7 +2242,7 @@ function, the {\tt iteration} variable marks the current iteration.
     void* element = malloc(gather->srcBlock->elementSize);
     void* index = malloc(gather->indexStr->elementSize);
     for (iteration=0; iteration<gather->length && !done_stream_all; iteration++) {
-      done_stream_all = gather->length == svm_Stream_Length_all && 
+      done_stream_all = gather->length == svm_Stream_Length_All && 
                         svm_streamPeekEOS(gather->indexStr, 0);
       svm_streamPop(gather->indexStr, index);
       size_t full_index = unpack_index((int8_t*)index, gather->indexStr->elementSize);
