@@ -27,13 +27,13 @@ multiple of the underlying periodic schedule \cite{bhat1994x3}.
 While computing periodic schedules for StreamIt, we chose to preserve the
 hierarchical structure presented in the program.
 
-A filter has a periodic schedule of a single execution.  This is because
-there are no scheduler-visible buffers inside of a filter.  All other
-components of the program express their periodic schedules in terms of
-number of executions of their subcomponents necessary to construct a valid
-schedule.  This technique relies on Theorem \ref{theo:period-sched} to
-assure that the periodic schedule built is indeed the minimal periodic
-schedule.
+A filter has a periodic schedule of a single execution.  This is
+because there are no scheduler-visible buffers inside of a filter.
+All other components of the program express their periodic schedules
+in terms of number of executions of their subcomponents necessary to
+construct a valid schedule.  This technique relies on Theorem {\bf
+???} to assure that the periodic schedule built is indeed the minimal
+periodic schedule.
 
 \subsection{Initialization Schedule}
 
@@ -51,15 +51,16 @@ initialization has been completed.
 
 \subsection{Single Appearance Schedule}
 
-A single appearance schedule (SAS) is a schedule in which every filter and
-every structure appears exactly once.  Groups of filters and structures can be
-combined together to form bigger structures.  In our approach, we chose to
-perserve the structuring of the original program when selecting structures
-to be grouped together.  Thus a schedule for a given structure is a list
-of tuples of components included in this structure and corresponding number
-of times each of these components needs to be executed in a given periodic
-schedule. (Better results for buffer size have been presented in 
-\ref{somepaper}, they are however within the same order of magnitude.)
+A single appearance schedule (SAS) is a schedule in which every filter
+and every structure appears exactly once.  Groups of filters and
+structures can be combined together to form bigger structures.  In our
+approach, we chose to perserve the structuring of the original program
+when selecting structures to be grouped together.  Thus a schedule for
+a given structure is a list of tuples of components included in this
+structure and corresponding number of times each of these components
+needs to be executed in a given periodic schedule. (Better results for
+buffer size have been presented in \cite{somepaper}, they are however
+within the same order of magnitude.)
 
 As an example, the pipeline in Figure \ref{fig:sched} has a schedule
 $(4A)(6B)(9C)(3D)$.  This schedule is represented in the left column of

@@ -1,26 +1,26 @@
 \begin{figure}
 \centering
-%\psfig{figure=tapes.eps,width=3.2in}
+\psfig{figure=tapes.eps,width=3.2in}
 \caption{A filter's input and output tapes during an execution step.
 With each step, the filter pushes two items, pops two items, and peeks
 at three additional items.  The initial state of the input tape is
 shown at left.  The center shows the filter with both input and output
 tapes during the invocation of {\tt work}.  The final state of the
 output tape is shown at right.}
-\label{fig:tape}
+\label{fig:tapes}
 \end{figure}
 
 \begin{figure}
 \centering
-%\psfig{figure=pipeline.eps,width=2.0in}
+\psfig{figure=pipeline.eps,width=2.0in}
 
 (a) A Pipeline. \\
 \vspace{8pt}
-%\psfig{figure=splitjoin.eps,width=3.2in}
+\psfig{figure=splitjoin.eps,width=3.2in}
 
 (b) A SplitJoin. \\
 \vspace{8pt}
-%\psfig{figure=feedback.eps,width=3.2in}
+\psfig{figure=feedback.eps,width=3.2in}
 
 (c) A FeedbackLoop. \\
 \vspace{8pt}
@@ -45,10 +45,10 @@ computation, in which the notions of timing, scheduling, and
 dependence analysis are in terms that are relative to a given filter
 in the graph, instead of being global characteristics of a program.
 
-In Section \ref{minfunc}, we develop a transfer function that provides
-the basis for distributed time in a stream graph... [build operational
-semantics to give a precise meaning to messaging, and denotational
-semantics to validate program transformations].
+In Section \ref{sec:minfunc}, we develop a transfer function that
+provides the basis for distributed time in a stream graph... [build
+operational semantics to give a precise meaning to messaging, and
+denotational semantics to validate program transformations].
 
 \subsection{Notation}
 
@@ -61,7 +61,7 @@ We use the following notation:
   \ref{fig:tapes}).  We use $I_S$ and $O_S$ to denote the input and
   output tapes of stream $S$, respectively, with numbering used to
   distinguish between multiple input or output tapes (see Figure
-  \ref{tapelabels}).  Finally, $n(T)$ represents the number of items
+  \ref{fig:tapelabels}).  Finally, $n(T)$ represents the number of items
   on tape $T$ at a given point of execution.  [should we define $p(T)$
   here or wait until we use it?  long time def-use!]
 
@@ -94,7 +94,6 @@ of time.  The function is defined in terms of data dependence:
 $\mi{a}{b}(x)$ is the minimum number of items that must appear on tape
 $a$ given that there are $x$ items on tape $b$.
 \end{definition}
-
 We now turn to deriving $\mi{a}{b}$ for all pairs of tapes $a$ and $b$
 in a filter graph where $a$ is upstream of $b$.
 
@@ -107,9 +106,10 @@ $\left\lceil\frac{x}{push_A}\right\rceil$ to produce the $x$'th item.
 On each invocation, it consumes $pop_A$ items, and peeks at an
 additional $peek_A-pop_A$ items.  Thus, the total number of items that
 must be present on the input is:
-\begin{align*}
+\begin{align}
+\label{eq:minfilter}
 \mi{I_A}{O_A}(x) = \left\lceil\frac{x}{push_A}\right\rceil*pop_A+(peek_A-pop_A)
-\end{align*}
+\end{align}
 
 \subsubsection{Pipelines}
 \label{sec:timepipe}
@@ -157,7 +157,7 @@ We now derive $min$ expressions for the components of a SplitJoin, and
 for the SplitJoin construct as a whole.  We denote the $n$ output
 tapes of the splitter $S$ by $O1_S \dots On_S$, and the $n$ input
 tapes of the joiner $J$ by $I1_J \dots In_J$ (see Figure
-\ref{tapelabels}).
+\ref{fig:tapelabels}).
 
 {\bf Duplicate splitter.}  We consider the $i$'th output tape of an
 $n$-way duplicating splitter.  Since the splitter duplicates each
@@ -301,7 +301,7 @@ own feedback joiner.  This can be formulated in terms of the $min$
 function by considering $min_{t}{t}$, the data that a tape $t$ in a
 feedback loop requires of itself.  However, since we didn't define
 $min$ across circular paths in the stream graph, we will denote this
-function by $minloop$ and define it at loop input to the feedback
+function by $minloop$ and define it at the loop input to the feedback
 joiner:
 \begin{align*}
 minloop(x) \equiv \mi{I2_{FJ}}{O_{FJ}} \circ \mi{O_{FJ}}{I2_{FJ}}
@@ -359,7 +359,7 @@ operate on the same information wavefront.
 The $min$ function can be used to give a precise definition to an
 information wavefront.  One interpretation of $y = \mi{a}{b}(x)$ is
 that the item at position $y$ of tape $a$ is the the latest item on
-tape $a$ to {\it affect} the item at position $x$ of tape $b$.  This
+tape $a$ to {\it effect} the item at position $x$ of tape $b$.  This
 is because item $x$ on tabe $b$ can be produced if and only if tape
 $a$ contains at least $y$ items.  Note that this effect might be via a
 control dependence rather than a data dependence--for instance, if
@@ -368,7 +368,7 @@ from another stream can be routed to tape $b$.  This is why we choose
 ``information flow'' instead of ``data flow'' to describe the timing
 concept.  Also, when speaking of the information wavefront, we only
 consider information that is passed through the data streams; if a
-data item affects another via a low-latency downstream message, then
+data item effects another via a low-latency downstream message, then
 this effect could jump ahead of the wavefront.
 
 \subsubsection{Message Timing}
@@ -530,7 +530,9 @@ to abstract away the StreamIt-specific aspects of the program.  We
 provide an informal description of how to translate back and forth
 between StreamIt programs and the abstract syntax, and then consider
 more formal valuation functions for determining the meaning of the
-abstract syntax within the third algebra.
+abstract syntax within the semantic algebra.  Throughout the analysis,
+we assume that filters are stateless and that the stream program is
+semantically correct.
 
 \subsubsection{Intermediate Algebra}
 
@@ -545,14 +547,13 @@ program that is amenable to straightforward transformation techniques.
 \begin{figure}
 \begin{align*}
 &Item = Real \\
-&Index = N \\
-&Tape = Index \ra Item \\
+i~\in~&Index, IndexOffset = N \\
+t~\in~&Tape = Index \ra Item \\
 &Pop, Peek, Push = N \\ 
-&IndexTransform = Index \ra Index \\ 
-&WorkStatement = IndexTransform \ra (Tape \ra Item) \\ 
+f~\in~&WorkStatement = IndexOffset \ra (Tape \ra Item) \\ 
 &WorkFunction = WorkStatement^{+} \\
-&SplitType = {Duplicate, RoundRobin} \\ 
-&JoinType = {RoundRobin}
+S~\in~&SplitType = {Duplicate, RoundRobin} \\ 
+J~\in~&JoinType = {RoundRobin}
 \end{align*}
 \vspace{-18pt}
 \caption{Semantic domains that are shared between the intermediate and
@@ -560,147 +561,153 @@ program that is amenable to straightforward transformation techniques.
 \protect\label{fig:shareddom}}
 \vspace{-6pt}
 \begin{align*}
-&Stream = Filter + Pipeline + SplitJoin + FeedbackLoop \\
-&InitFeedback = Int^{+} \\
-&BodyStream, LoopStream = Stream \\
-&Filter = Peek \times Pop \times Push \times WorkFunction \\
+s~\in~&Stream = Filter + Pipeline + SplitJoin + FeedbackLoop \\
+&Filter = Push \times Pop \times Peek \times WorkFunction \\
 &Pipeline = Stream^{+} \\
 &SplitJoin = SplitType \times JoinType \times Stream^{+} \\
+&InitFeedback = Int^{+} \\
+&BodyStream, LoopStream = Stream \\
 &FeedbackLoop = SplitType \times JoinType \times \\
 & \hspace{0.5in} BodyStream \times LoopStream \times InitFeedback
 \end{align*}
 \vspace{-18pt}
-\caption{Semantic domains of the intermediate algebra.
+\caption{Semantic domains specific to the intermediate algebra.
 \protect\label{fig:interdom}}
+\vspace{-6pt}
+\begin{align*}
+&StreamTransform = Tape \ra Tape
+\end{align*}
+\caption{Semantic domains specific to the transform algebra.
+\protect\label{fig:transformdom}}
 \end{figure}
 
 The domains of the intermediate algebra are shown in
-Figures~\ref{fig:interdom}~and~\ref{fig:shareddom}.  
+Figures~\ref{fig:interdom}~and~\ref{fig:shareddom}.  The algebra
+represents tapes as an infinite mapping from an index to an item.
+Generally, stream constructs are represented as a list of their
+component streams, and filters' work functions are encoded as a list
+of push statements that--given the offset of their local indexing to
+the global tape position--returns a mapping from a tape to an output
+item.
 
-{\bf Converting to the intermediate algebra}.
+{\bf Converting to the intermediate algebra}.  It is straightforward
+to generate an expression in the intermediate algebra that reflects
+the meaning of a given StreamIt program.  Due to space limitations, we
+consider here only the translation of the work functions.
 
-{\bf Converting from the intermediate algebra}.
+The translation of a filter's work function contains two steps.
+First, the function should be arranged in a {\it canonical form}, in
+which each pushed item is given as a direct function of peeked items,
+and all of the pop statements are at the end of the function.  For
+example: \\
+\vspace{0.2in}
+\begin{scriptsize}
+\begin{tabular}{l}
+{\tt void work()}\{ \\
+\hspace{12pt} {\tt output.push(} $f_0$ {\tt (input.peek(0), ... , input.peek(PEEK-1) )} \\
+\hspace{12pt} $\dots$ \\
+\hspace{12pt} {\tt output.push(} $f_{PUSH-1}$ {\tt (input.peek(0), ... , input.peek(PEEK-1) )} \\
+\hspace{12pt} {\tt for (int i=0; i$<$POP; i++) \{ input.pop(); \}} \\
+\}
+\vspace{-12pt}
+\end{tabular}
+\end{scriptsize}
+Here we model the computation of the work function as pure
+mathematical functions that can be injected into the semantic domain.
+The algebraic work function, then, is the alternate application of
+each push statement's function $f$, with the index expressions offset
+by a parameter that signifies the filter's position on the input tape.
+This index will reference the $latest$ item peeked by a given filter
+execution, so we subtract the local indices from the index:
+\begin{align*}
+{\cal W}&[{\tt void work() \{...\}}]: {\tt StreamIt Work} \ra
+WorkFunction = \\
+(&i \ra (t \ra f_0(t(i - (PEEK-1)), \dots , t(index -
+0))), \\
+\dots \\
+&i \ra (t \ra f_{PUSH-1}(tape(i - (PEEK-1)), \dots , tape(i -
+0))))
+\end{align*}
+%$f_s(i \% push_s)_(input, i2 -> i2 + pop_s * floor(i / push_s))$)
+
+{\bf Converting from the intermediate algebra}.  To convert back to
+StreamIt, we can perform the inverse of the translation shown above,
+with a push statement for each function and a local index expression
+$x$ in place of the argument $i-x$.  Common sub-expression elimination
+can be used to eliminate duplicate peek statements or shared portions
+of the $f_i$'s.
 
 \subsubsection{Transform Algebra}
 
-Assumptions
------------
-- filters are stateless
-- the program is well-defined
+The transform algebra is designed to express the meaning of a stream
+graph as a transformation from an input tape to an output tape.  Its
+semantic domains are given in Figures \ref{fig:interdom} and
+\ref{fig:transformdom}.  We now give the valuation function ${\cal S}:
+Stream \ra StreamTransform$ for converting from the intermediate
+algebra to the transform algebra.  For a filter, we have:
+\begin{align*}
+{\cal S} [(Filter~push~pop~peek~(f_0~\dots~f_{push-1}))] = \\
+t \ra (i \ra (f_(i~\%~push)(t))(\mi{I_F}{O_F}(i)))
+\end{align*}
+That is, the value that a filter pushes onto the $i$'th position of
+its output tape is calculated with its function at index $i~\%~push$.
+The index offset to the latest value the filter peeks is
+$\mi{I_F}{O_F}(i)$, where $I_F$ and $O_F$ denote the input and output
+tapes of the filter (as shown in Equation \ref{eq:minfilter}, this is
+a pure function of $push$, $pop$, and $peek$).
 
-abstract syntactic domain
--------------------------
+For a pipeline, the transform function is simply the composition of
+the transforms of component streams:
+\begin{align*}
+{\cal S} [(Pipeline~s_1~s_2~\dots~s_n)] = \\
+{\cal S}[s_n] \circ \dots \circ {\cal S}[s_1]
+\end{align*}
+The valuation function for a SplitJoin follows the same idea, but the
+notation is slightly heavier.  Given that we have a round robin joiner
+with weights $w_1 \dots w_n$ and $W = \sum{w}$, we first represent the
+parallel stream $p(i)$ which computes the $i$'th output of the
+joiner:
+\begin{align*}
+p(i) = MIN(j~s.t.~\sum_{k=0}^{j-1}{w_i} \le i\%W) 
+\end{align*}
+Now, the $i$'th tape position assumes the value that is produced along
+stream $p(i)$ in the SplitJoin, and the index offset is obtained by
+tracing back from the output of the joiner to the input of the
+splitter:
+\begin{align*}
+{\cal S} [(SplitJoin~S~s_1~s_2~\dots~s_n~J)] = \\
+t \ra (i \ra ({\cal S}[s_{p(i)}](t))(
+(\mi{I_S}{Op(i)_S} \circ \mi{Op(i)_S}{Ip(i)_J} \circ \mi{Ip(i)_J}{O_J})(i)))
+\end{align*}
+This completes the formulation of the transform algebra.  Using this
+algebra, we can express the meaning of any StreamIt program as a
+mathematical transformation between infinite tapes.  We will utilize
+this formulation to prove that certain transformations of the stream
+graph preserve the meaning of the program.
 
-streams - 
-  (Filter peek pop push canonical-form-code)
-  (Pipeline $stream_1$ $stream_2$ ... $stream_n$)
-  (SplitJoin (SplitType splitter) $stream_1$ $stream_2$ (JoinType joiner))
-  (FeedbackLoop (JoinType joiner) $body_stream$ $loop_stream$
-        (SplitType splitter))
-($init_1 \dots init_n$)
+%% $\cal{S}$ 
+%%   [(FeedbackLoop (. S) $s_body$ $s_loop$ (. J) ($init_1 \dots init_n$))] =
 
-semantic domains
-----------------
+%% --
 
-Item = Real
+%% Let's look at merging:
 
-Index = N
-
-Tape = Index -> Item
-
-Pop, Peek, Push = N
-
-Index Transform = Index -> Index
-
-;; gives output values as function of input tape
-Work Function = Index Transform -> (Tape -> Item)
-
---
-
-Stream Transform = Tape -> Tape
-
-valuation functions
--------------------
-
-$\cal{S}: Stream \ra Stream Transform$
-
-$\cal{S}: Stream \ra Stream Transform$
-
-$\cal{S}$ [(Filter push pop peek canonical-form-code)]
- = (push, pop, peek, translate-code(canonical-form-code))
-
-filter valuation function:
-
-i. how to map a given textual representation into a canonical
-representation.
-
-ii. how to represent the canonical representation in the functional
-format (translate-code)
-
-iii. further, to help automate program transformations, we can talk
-about translationg from the functional format to the canonical
-representation.  talk about CSE from reconstruction
-
---
-
-$\cal{S}$ [(Abstract Filter push pop peek $f_0 \dots f_{push-1}$] = input -> 
-         (i -> $f_s(i \% push_s)_(input, i2 -> i2 + pop_s * floor(i / push_s))$)
-
---
-
-$\cal{S}$ [(Pipeline $s_1$ $s_2$ ... $s_n$] = 
-           $\cal{S}(s_n) \circ \dots \circ \cal{S}(s_1)$
-
---
-
-$\cal{S}$ [(SplitJoin (. S) $s_1$ $s_2$ ... $s_n$ (. J))] =
-$input -> (x -> let i = MIN(j s.t. sum_{k=0}^{j-1}{w_i} \le i%W) in 
-                           \cal{S}(input)(
-(\mi{I_S}{Oi_S} \circ \mi{Oi_S}{Ii_J} \circ \mi{Ii_J}{O_J})(x)))$
-
--> the i selects which parallel stream to draw from
-
-where $w_1 \dots w_n$ are the weights of the round robin joiner, and $W =
-sum_{i=0}^{n}{w_i}$
-
---
-
-As a special case, consider duplicate - round-robin:
-
-$\cal{S}$ [(SplitJoin (Duplicate S) $s_1$ $s_2$ (RoundRobin J))] = 
-           $input -> (x -> \cal{S}(input)(x/2)      if i is even
-                           \cal{S}(input)((x-1)/2)  if i is odd)$
-
---
-
-$\cal{S}$ 
-  [(FeedbackLoop (. S) $s_body$ $s_loop$ (. J) ($init_1 \dots init_n$))] =
-
-??
-
---
-
-Let's look at merging:
-
-	$push_sc = 2*LCM(push_s1, push_s2)$
-	$pop_sc = LCM(pop_s1, pop_s2)$
-	$peek_sc = ???$
-	$f_sc$ = $f_{sc_{j_(input, shift) for j = 1..push_sc-1}}:$
+%% 	$push_sc = 2*LCM(push_s1, push_s2)$
+%% 	$pop_sc = LCM(pop_s1, pop_s2)$
+%% 	$peek_sc = ???$
+%% 	$f_sc$ = $f_{sc_{j_(input, shift) for j = 1..push_sc-1}}:$
 	
-  if j is even:
+%%   if j is even:
 
-	$f_sc_j(input, shift) = f_s1_(j/2 % push_s1))_
-				(input,
-				 i -> shift(i)+pop_s1*floor((j/2)/push_s1))$
+%% 	$f_sc_j(input, shift) = f_s1_(j/2 % push_s1))_
+%% 				(input,
+%% 				 i -> shift(i)+pop_s1*floor((j/2)/push_s1))$
 
-  if j is odd:
+%%   if j is odd:
 
-	$f_sc_j(input, shift) = f_s2_((j-1)/2 % push_s2)_
-				(input,
-				 i -> shift(i)+pop_s2*floor(((j-1)/2)/push_s2))$
-
---
-
+%% 	$f_sc_j(input, shift) = f_s2_((j-1)/2 % push_s2)_
+%% 				(input,
+%% 				 i -> shift(i)+pop_s2*floor(((j-1)/2)/push_s2))$
 %% push = push_s
 %% pop = pop_s
 %% peek = peek_s
@@ -726,13 +733,4 @@ Let's look at merging:
 %% \dots
 %% output.push(f_s_push(input.peek(0) \dots input.peek(peek_s - 1)))
 
---
-
-in the next sections, we'll appeal to this denotational semantics in
-argueing for the correctness of program transformations.
-
 \section{Optimization}
-
-then discuss a few optimizations with the denotational semantics to
-prove that they are correct
-
