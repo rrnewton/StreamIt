@@ -12,7 +12,7 @@
 
 \noindent
 This is for the May 28, 2003 snapshot release (streamit-0.0.20030528).\\
-\verb|$Id: options.tex.in,v 1.3 2003-09-22 16:37:14 dmaze Exp $|
+\verb|$Id: options.tex.in,v 1.4 2003-09-22 19:31:21 dmaze Exp $|
 
 \section*{Basic Usage}
 
@@ -149,6 +149,10 @@ float->float filter ScaleBySquare(float v) {
       Use the RAW backend, but fuse to a single tile and output code
       that can be run on a uniprocessor as a standalone C program
       (without depending on the StreamIt C library).
+
+\item[-{}-wbs]
+  When laying out communication instructions, use the work-based
+  simulator.
 \end{description}
 
 \subsection*{Options specific to uniprocessor backend}
@@ -177,6 +181,29 @@ float->float filter ScaleBySquare(float v) {
       with a profiling version of the StreamIt library; \texttt{make
       profile} from \filename{\$STREAMIT\_HOME/library/c}.  Profiling
       results can be analyzed using \textsf{gprof}.
+\end{description}
+
+\subsection*{Options specific to the Java library}
+
+\begin{description}
+\item[-{}-iterations \metavar{n}, -i\metavar{n}]
+  Run the program for \metavar{n} steady-state iterations.  Defaults
+  to infinity.
+
+\item[-{}-norun]
+  Perform the library setup and schedule the stream graph, but don't
+  actually run the program.
+
+\item[-{}-nosched]
+  Don't run the scheduler; instead, run in a pull mode, where the
+  buffer lengths are examined at run time and a preceding filter is
+  run if needed to provide enough data to run the current filter.
+
+\item[-{}-printdot]
+  Print a ``.'' to standard output after each steady-state execution.
+
+\item[-{}-printsched]
+  Dump the program schedule.
 \end{description}
 
 \end{document}
