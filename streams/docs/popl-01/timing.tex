@@ -61,8 +61,9 @@ of items that must appear on tape $a$ is $\mi{a}{b}(x)$.
 \end{itemize}
 
 Note that these functions are only defined over pairs of tapes $(a,
-b)$ where $a$ is ``upstream'' of $b$ in the stream graph, as will
-become clear below.  We now turn to deriving expressions for
+b)$ where $a$ is ``upstream'' of $b$--that is, where there is a
+directed path in the stream graph from the filter following $a$ to the
+filter preceding $b$.  We now turn to deriving expressions for
 $\ma{a}{b}$ and $\mi{a}{b}$ as a step towards formalizing the
 semantics of messaging, latency, and re-initialization.
 
@@ -250,9 +251,16 @@ The $max$ function must be similarly shifted for the input from the loop:
 \ma{(I1_J, I2_J)}{O_J}(x_1, x_2) = max(2*x_1-1, 2*(x_2+n))
 \end{eqnarray*}
 
-\subsection{Formulating Constraints}
-
 \subsection{Semantics}
+
+Equipped with definitions of $min$ and $max$ for tapes that are
+connected by some series of downstream or
+
+\subsubsection{Messages}
+
+\subsubsection{Latency}
+
+\subsection{Scheduling Constraints}
 
 \begin{verbatim}
 
