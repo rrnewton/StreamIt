@@ -58,14 +58,16 @@ Restrictions are placed on the assignment of filters to tiles. From
 above we can see that filter endpoints of traces are mapped to the
 border tiles of the Raw chip. We must also take special care when
 dealing with application input and output streaming to and from I/O
-ports on the Raw chip.  As mentioned in Section \ref{sec:raw} an I/O
-port is multiplexed between its streaming memory module, an input
-stream originating off-chip, and an output stream whose final
-destination is off-chip.  Only one trace with an off-chip, application
-input stream can be mapped to a tile.  The same is true for a trace
-that writes to an off-chip, application output stream.  But a single
-tile can accommodate both an off-chip, application input stream and
-output stream.
+ports on the Raw chip.  For a given application, an I/O port on Raw is
+utilized for at most one file input stream and one file output stream.
+%% As mentioned in Section \ref{sec:raw} an I/O port is multiplexed
+%% between its streaming memory module, an input stream originating
+%% off-chip, and an output stream whose final destination is off-chip.
+%% Only one trace with an off-chip, application input stream can be
+%% mapped to a tile.  The same is true for a trace that writes to an
+%% off-chip, application output stream.  But a single tile can
+%% accommodate both an off-chip, application input stream and output
+%% stream.
 
 \subsubsection{Support for Software Pipelining of Traces}
 \label{sec:softpipe}
