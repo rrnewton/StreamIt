@@ -1,3 +1,7 @@
+- fission in the greedy partitioner is pretty stupid because it can't
+fiss 2-stage filters that peek -- thus each filter only gets fissed
+once.
+
 - the whole thing with sometims returning the new result and sometimes
 mutating the parent instead is misleading, esp. for toplevel parents
 where something should be returned but often it is assumed that it is
