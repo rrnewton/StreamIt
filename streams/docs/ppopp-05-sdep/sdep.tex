@@ -98,11 +98,14 @@ construct $\phi$ by simulating the stream graph's execution of a
 \mbox{} ~~~~{\bf pullSchedule}($X$, $n$) \{\\
 \mbox{} ~~~~~~~$\phi = \{ \}$ \\
 \mbox{} ~~~~~~~{\bf for} $i$ = 1 to $n$ \{ \\
+\mbox{} ~~~~~~~~~~// {\it execute predecessors of $X$ until $X$ can execute} \\
 \mbox{} ~~~~~~~~~~{\bf for all} input channels $c_i$ of $X$ \\
-\mbox{} ~~~~~~~~~~~~~{\bf while} $X$ needs more items on $c_i$ for next phase \\
-\mbox{} ~~~~~~~~~~~~~~~~$\phi = \phi $ o {\bf pullSchedule}({\bf source}($c_i$)) \\
-\mbox{} ~~~~~~~~~~{\bf simulateCurrentPhase}($X$) \\
+\mbox{} ~~~~~~~~~~~~~{\bf while} $X$ needs more items on $c_i$ in order to fire \\
+\mbox{} ~~~~~~~~~~~~~~~~$\phi = \phi ~\circ$ {\bf pullSchedule}({\bf source}($c_i$), 1) \\
+\mbox{} ~~~~~~~~~~// {\it add $X$ to schedule ($\circ$ denotes concatenation)} \\
 \mbox{} ~~~~~~~~~~$\phi = \phi~\circ~X$ \\
+\mbox{} ~~~~~~~~~~// {\it update number of items on I/O channels of $X$} \\
+\mbox{} ~~~~~~~~~~{\bf simulateExecution}($X$) \\
 \mbox{} ~~~~~~~{\bf end for} \\
 \mbox{} ~~~~~~~return $\phi$ \\
 \mbox{} ~~~~\}
@@ -145,14 +148,14 @@ in the stream graph.  However, for longer execution traces, there is a
 pattern in the marginal growth of $\sdep$ ({\it i.e.,} in $\sdep(n) -
 \sdep(n-1)$); this quantity follows a cyclic pattern and has the same
 periodicity as the steady state of the stream graph.  A steady state
-${\cal S}$ is an execution that does not change the buffering in the
-channels; the number of items on each channel after the execution is
-the same as it was before the execution.  The execution simulated in
-Figure~\ref{fig:sdep1} is a steady state, meaning that additional
-entries of the pull schedule will repeat the pattern given in the
-figure.  Thus, $\sdep$ will also grow in the same pattern, and we can
-calculate $\sdep$ for $n > 4$ as follows\footnote{Note that for any
-two actors $X$ and $Y$, $\sdepf{X}{Y}(0) = 0$}:
+${\cal S} \in \Phi$ is an execution that does not change the buffering
+in the channels; the number of items on each channel after the
+execution is the same as it was before the execution.  The execution
+simulated in Figure~\ref{fig:sdep1} is a steady state, meaning that
+additional entries of the pull schedule will repeat the pattern given
+in the figure.  Thus, $\sdep$ will also grow in the same pattern, and
+we can calculate $\sdep$ for $n > 4$ as follows\footnote{Note that for
+any two actors $X$ and $Y$, $\sdepf{X}{Y}(0) = 0$}:
 \begin{equation*}
 \begin{array}{l}
 \mbox{} \hspace{-5pt} \sdepf{A}{E}(n) = \\ 
