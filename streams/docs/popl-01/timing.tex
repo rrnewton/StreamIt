@@ -175,7 +175,7 @@ are needed at its input.  Thus, our $min$ function has two arguments:
 the first corresponding to $O1_S$ and the second corresponding to
 $O2_S$.  The equation is as follows:
 \begin{eqnarray*}
-\mi{I_S}{(O1_S, O2_S)}(x_1, x_2) = min(2*x_1-1, 2*x_2)
+\mi{I_S}{(O1_S, O2_S)}(x_1, x_2) = MIN(2*x_1-1, 2*x_2)
 \end{eqnarray*}
 {\bf Round robin joiner.}  The rules for a round robin joiner are in
 some sense dual to those of the round robin splitter.  Again assuming
@@ -188,7 +188,7 @@ $I1_J$, we have that:
 Again, the $max$ function takes two arguments, corresponding to the
 number of items on $I1_J$ and $I2_J$, respectively:
 \begin{eqnarray*}
-\ma{(I1_J, I2_J)}{O_J}(x_1, x_2) = min(2*x_1-1, 2*x_2)
+\ma{(I1_J, I2_J)}{O_J}(x_1, x_2) = MIN(2*x_1-1, 2*x_2)
 \end{eqnarray*}
 {\bf Duplicate splitter}.  Clearly, the $max$ function of a duplicate
 splitter is simply the identity function, since it maps each element
@@ -200,13 +200,13 @@ on the input tape to the same location on the output tapes:
 The $min$ function is similar, except that--like the round robin
 split--the input need only progress as far as the lesser output:
 \begin{eqnarray*}
-\mi{I_S}{(O1_S, O2_S)}(x_1, x_2) = min(x_1, x_2)
+\mi{I_S}{(O1_S, O2_S)}(x_1, x_2) = MIN(x_1, x_2)
 \end{eqnarray*}
 {\bf Combine joiner.} The combine joiner is simply the dual of the
 duplicate splitter, with transfer functions that the reader can verify
 as follows:
 \begin{eqnarray*}
-\ma{(I1_J, I2_J)}{O_J}(x_1, x_2) = min(x_1, x_2) \\
+\ma{(I1_J, I2_J)}{O_J}(x_1, x_2) = MIN(x_1, x_2) \\
 \mi{I1_J}{O_J}(x) = x \\
 \mi{I2_J}{O_J}(x) = x
 \end{eqnarray*}
@@ -249,7 +249,7 @@ $min$ function of the loop:
 \end{eqnarray*}
 The $max$ function must be similarly shifted for the input from the loop:
 \begin{eqnarray*}
-\ma{(I1_J, I2_J)}{O_J}(x_1, x_2) = min(2*x_1-1, 2*(x_2+n))
+\ma{(I1_J, I2_J)}{O_J}(x_1, x_2) = MIN(2*x_1-1, 2*(x_2+n))
 \end{eqnarray*}
 
 \subsubsection{Summary}
