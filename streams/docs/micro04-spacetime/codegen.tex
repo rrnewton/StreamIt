@@ -2,7 +2,9 @@
 \label{sec:codegen}
 In this section we consider low-level code generation for the Raw
 microprocessor. Each Raw tile is an amalgam of the filters that
-execute on it. As we step through the schedule for each stage of
+execute on it. To 
+
+As we step through the schedule for each stage of
 execution, we append the communication and computation code to the
 compute and switch processors considering the multiplicity of the
 filter in each stage.
@@ -31,7 +33,7 @@ calling the {\tt init} function of all the filters mapped to it.  Next,
 it executes the {\tt work} of each filter in the sequence determined
 by the traversal of the schedule of each execution phase.
 The translation of the {\tt init} function, {\tt work} functions, and
-any helper function is for the large part straightforward.  Most
+any helper function is, for the large part, straightforward.  Most
 StreamIt expression have direct analogs in C except for the channel
 expressions {\tt push()}, {\tt peek(index)} and {\tt pop()}.
 
@@ -46,12 +48,13 @@ buffer management:
 \item If a filter does not peek and there does not exist
 control-flow dependent channel expressions, then a buffer is not needed
 and {\tt pop()} statements are translated directly into static network
-receives.  Their exists other initialization considerations which are
+receives.  There exists other initialization considerations which are
 beyond the scope of this paper.
 \item If there exists peek statements, but $peek = pop$ then we can
 use a simple linear buffer that is reset after each work function execution.
-\item Otherwise, when $peek > pop$, we use a circular buffer to account for the data
-remaining on the channel after the work function invocation.
+\item Otherwise, when $peek > pop$, we use a circular buffer to
+account for the data remaining on the channel after the work function
+invocation.
 \end{enumerate}
 Each {\tt push()} statement is translated directly into a static
 network send.  
