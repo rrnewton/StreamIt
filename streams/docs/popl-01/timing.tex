@@ -162,10 +162,17 @@ $f_{ABJ}(y_1) = max( out_J | in_A = y_1 \wedge in_B = y_2)$.
 
 \end{itemize}
 
+To simplify the equations, the splitters and joiners have been
+decomposed into three ports, which will be regarded as separate
+filters in the semantics.  However, each split and join node can still
+be regarded as a single filter from the user's standpoint.
+
 {\bf Round robin.}  We first give derivations for round-robin
 splitters and joiners.  At a round-robin splitter, items are
-alternately dispatched to two different filters.  We define
-$f_{SSS}(x)$ 
+alternately dispatched from the input port $S_0$ to the output ports
+$S_
+
+to two different filters.  We define $f_{SSS}(x)$
 
 \begin{verbatim}
 
