@@ -81,7 +81,7 @@ $u'$-element row vector:
 %
 \mathbf{A'} & = & \sum_{m=0}^{\lceil u' / u \rceil} \mt{shift}(u'- u -m*u, e'-e-m*o) \\ ~ \vspace{-4pt} \\
 %
-\vec{\mathbf{b}}'[j] & = & {\vec b}\hspace{1pt}[u-1-(u'-j-1)~\mt{mod}~u]
+\vec{\mathbf{b}}'[j] & = & {\vec b}\hspace{1pt}[u-1-(u'-1-j)~\mt{mod}~u]
 %%
 %% \raisebox{-14pt}{\parbox{3in}{is created by starting with a zero
 %% matrix with $e'$ rows and $u'$ columns.  $A$ is then copied $k$ times
@@ -214,7 +214,7 @@ $u_1$ and $o_2$, any common multiple is legal.  As $\mt{chanPop}$
 grows, the regenerated portion $\mt{chanPeek}-\mt{chanPop}$ becomes
 smaller on a percentage basis.
 
-However, it is the case that some collapsed linear nodes are always
+It is the case that some collapsed linear nodes are always
 less efficient than the original pipeline sequence.  The worst case is
 when $A_1^e$ is a column vector and $A_2^e$ is a row vector, which
 requires $O(N)$ operations originally but $O(N^2)$ operations if
@@ -258,7 +258,7 @@ joiner with an array of weights $w$.  First, $w_0$ items from the
 leftmost child are placed onto the overall output
 tape, then $w_1$ elements from the second leftmost child are used,
 and so on.  The process repeats itself after
-$\sum_{i=0}^{N-1} w_i$ elements has been pushed.
+$\sum_{i=0}^{n-1} w_i$ elements has been pushed.
 
 In this section, we demonstrate how to collapse a splitjoin into
 a single linear node when all of its children are linear nodes.  Since
@@ -303,7 +303,7 @@ is described in mathematical terms below.
 
 \vspace{-6pt}
 \begin{transformation} (Duplicate splitjoin combination)
-Given a splitjoin $s$ containing a duplicate splitter, children that
+\\Given a splitjoin $s$ containing a duplicate splitter, children that
 are linear nodes $\lambda_0 \dots \lambda_{n-1}$, and a roundrobin
 joiner with weights $w_0 \dots w_{n-1}$, the combination 
 $\mbox{\bf splitjoin}(s)$ $=$ $ \{ \mathbf{A}',$ $\vec{\mathbf{b}}',$ $\mathbf{e}',$

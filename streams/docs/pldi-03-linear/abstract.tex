@@ -11,7 +11,7 @@ examples include FIR filters, expanders, compressors, FFTs and DCTs.
 We demonstrate that several algorithmic transformations, traditionally
 hand-tuned by DSP experts, can be completely automated by the
 compiler.  First, we present a linear extraction analysis that
-automatically detects linear filters based on the C-like code in their
+automatically detects linear filters from the C-like code in their
 work function.  Then, we give a procedure for combining adjacent
 linear filters into a single filter, as well as for translating a
 linear filter to operate in the frequency domain.  We also present an
@@ -21,4 +21,4 @@ benefit.
 
 We have completed a fully-automatic implementation of the above
 techniques as part of the StreamIt compiler, and we demonstrate
-performance improvements that average 450\% over our benchmark suite.
+a 450\% performance improvement over our benchmark suite.
