@@ -197,7 +197,7 @@ stage, then the FFT will muddle the spectrum of the old and new
 frequency bands.
 
 A StreamIt version of the radio frontend with language support for
-messaging appears in Figure~\ref{fig:freq1}.  The Freq\_Hopping\_Radio
+messaging appears in Figure~\ref{fig:freq1}.  The Freq\_Hop-ping\_Radio
 pipeline creates a portal and adds the RFtoIF actor as a receiver.
 The portal is passed to the Check\_Freq\_Hop stage, where four
 parallel detectors send messages into the portal if they detect a hop
@@ -214,7 +214,7 @@ stage will not operate on data that was demodulated at two separate
 frequencies.
 
 Another version of the frequency hopping radio appears in
-Figures~\ref{fig:fhr-streamit} and~\ref{fig:freq2}.  This version is
+Figures~\ref{fig:fhr-manual} and~\ref{fig:freq2}.  This version is
 functionality equivalent to the first, except that the control
 messages are implemented manually by embedding them in the data stream
 and introducing a feedback loop.  Because the number of items
@@ -456,20 +456,19 @@ marked with an asterisk. \protect\label{fig:freq2}}
 
 \subsection{Experimental Evaluation of Messaging}
 
-In order  to evaluate  our messaging methodology,  we compile  the two
-implementations      of      the      frequency      hopping      radio
-(Figures~\ref{}~and~\ref{}) into  a set of  threads. The message-based
-implementation  is compiled  into  28 threads,  whereas the  alternate
-version---relying on a feedback-loop for notification---results in 32
-threads.  Each  thread implements a  specific component of  the stream
-graph  (e.g., filter)  and is  allocated to  a specific  machine  in a
-networked computing  cluster.  The cluster consists  of sixteen 750Mhz
-Pentium~III workstations, each with  a 256~Kb cache.  The machines are
-interconnected  using a  fully switched  high speed  network,  and the
-threads     are    allowed     to     communicate    via     dedicated
-channels. Specifically, every channel  in the stream graph is assigned
-a  unique TCP/IP  connections for  the exchange  of data  and messages
-between actors.
+In order to evaluate our messaging methodology, we compile the two
+implementations of the frequency hopping radio into a set of
+threads. The message-based implementation is compiled into 28 threads,
+whereas the alternate version---relying on a feedback-loop for
+notification---results in 32 threads.  Each thread implements a
+specific component of the stream graph (e.g., filter) and is allocated
+to a specific machine in a networked computing cluster.  The cluster
+consists of sixteen 750Mhz Pentium~III workstations, each with a
+256~Kb cache.  The machines are interconnected using a fully switched
+high speed network, and the threads are allowed to communicate via
+dedicated channels. Specifically, every channel in the stream graph is
+assigned a unique TCP/IP connections for the exchange of data and
+messages between actors.
 
 In order to perform the thread-to-machine allocation, our {\it
 clustering} backend, part of the StreamIt
@@ -486,17 +485,18 @@ the two implementations of the frequency hopping radio.
 \protect\label{fig:fhr-throughput}}
 \end{figure}
 
-In Figure~\ref{fig:fhr-throughput},  we report the  throughput for the
+In Figure~\ref{fig:fhr-throughput}, we report the throughput for the
 two applications along the $y$-axis.  Each data point corresponds to a
-specific allocation  of the  threads to the  number of  clusters shown
-along the $x$-axis.   Note that due to the  limited parallelism in the
-two implementations of the  frequency hopper, increasing the number of
-clusters beyond five workstations leads to negligible gains with respect
-to throughput.   Nonetheless, the use of messaging  achieves a maximal
-throughput   that   is    49.8\%   better   than   its   feedback-loop
+specific allocation of the threads to the number of clusters shown
+along the $x$-axis.  Note that due to the limited parallelism in the
+two implementations of the frequency hopper, increasing the number of
+clusters beyond five workstations leads to negligible gains with
+respect to throughput.  Nonetheless, the use of messaging achieves a
+maximal throughput that is 49.8\% better than its feedback-loop
 counterpart. Furthermore, a detailed analysis of the results indicates
-a 35\%  reduction in  the total communication  when messaging  is used
-instead of a continuous feedback-loop.
+a 35\% reduction in the total number of data items sent across the
+communication channels when messaging is used (in contrast to a
+continuous feedback-loop).
 
 \section{Other SDEP Applications}
 
