@@ -49,24 +49,25 @@ notation):
 \begin{itemize}
 
 \item A $\mt{map}$ between each program variable $y$ and a linear form
-$\tup{{\vec v}}{c}$.  In an actual execution, the value of $y$ would
-be given by $y = {\vec v} \cdot {\vec x} + c$, where ${\vec x}$
+$\tup{\vec{v}}{c}$ where $\vec{v}[0 \cdots Peek]$ is a column vector 
+and $c$ is a scalar constant. In an actual execution, the value of $y$ would
+be given by $y = {\vec v} \cdot {\vec x} + c$, where ${\vec x}$ 
 represents the input items.
 
-\item $A$ and $\vec b$, which will come to represent the linear node.
+\item Matrix $A$ and vector $\vec b$, which will represent the linear node.
 These values are constructed during the operation of the algorithm.
 
 \item $\mt{pushcount}$, which indicates how many items have been
-pushed so far.  This is used to determine which columns of $A$ and
-$\vec b$ are set by a given {\tt push} statement.
+pushed so far.  This is used to determine which column of $A$ and
+$\vec b$ correspond to a given {\tt push} statement.
 
 \item $\mt{popcount}$, which indicates how many items have been popped
-so far.  This is used to determine the index that a given {\tt pop} or
-{\tt peek} statement refers to.
+so far.  This is used to determine the row in $\vec{v}$ that a 
+given {\tt peek} or {\tt pop} statement refers to.
 
 \end{itemize}
 
-We briefly discuss the operation of {\bf Extract} at each program
+We now briefly discuss the operation of {\bf Extract} at each program
 node.  The algorithm is formulated in terms of a simplified set of
 instructions, which appear in Figure~\ref{fig:types}.  First are the
 nodes that generate fresh linear forms.  A constant assignment $y = c$
@@ -80,12 +81,11 @@ offset by the index $i$.
 Next are the instructions which combine linear forms.  In the case of
 addition or subtraction, we simply add the components of the linear
 forms.  In the case of multiplication, the result is still a linear
-form if either of the terms is a known constant (that is, if either
-term has a zero vector of input coefficients.)  For division, the
-result is linear only if the divisor is a non-zero
+form if either of the terms is a known constant (eg $\vec{v}=\vec{0}$).
+For division, the result is linear only if the divisor is a non-zero
 constant\footnote{Note that if the dividend is zero and the divisor
 has a non-zero coefficients vector, we cannot conclude that the result
-is zero, since certain values of the inputs might cause a
+is zero, since certain runtime inputs might cause a
 singularity.} and for non-linear operations ({\it e.g.,} bit-level and
 boolean), both operands must be known constants.  If any of these
 conditions are not met, then the LHS is assigned a value of $\top$,
@@ -166,7 +166,7 @@ proc {\bf Extract}($code$, $map$, $A$, $\vec b$, int $\mt{popcount}$, int $\mt{p
 \STATE $\tup{\vec v}{c} \leftarrow \mt{map}.\mt{get}(y)$
 \STATE {\bf if} $\mt{pushcount} = \top$ {\bf then} $\mt{fail}$
 \STATE $A[*, \mbox{Push} - 1 - \mt{pushcount}] \leftarrow \vec v$
-\STATE $b[\mbox{Push} - 1 - \mt{pushcount}] \leftarrow c$
+\STATE $\vec{b}[\mbox{Push} - 1 - \mt{pushcount}] \leftarrow c$
 \STATE $\mt{pushcount}$\verb|++|
 \UND
 \STATE \vspace{-6pt}
@@ -181,11 +181,11 @@ proc {\bf Extract}($code$, $map$, $A$, $\vec b$, int $\mt{popcount}$, int $\mt{p
 \IND
 \STATE $\tup{\vec v_2}{c_2} \leftarrow \mt{map}.\mt{get}(y_2)$
 \STATE $\tup{\vec v_3}{c_3} \leftarrow \mt{map}.\mt{get}(y_3)$
-\STATE {\bf if} $~\vec v_2 = \vec 0_{Peek}$ {\bf then}
+\STATE {\bf if} $~\vec v_2 = \vec 0$ {\bf then}
 \IND
 \STATE $\mt{map}.\mt{put}(y_1, (c_2*\vec v_3, c_2*c_3))$
 \UND
-\STATE {\bf else if} $~\vec v_3=\vec 0_{Peek}$ {\bf then}
+\STATE {\bf else if} $~\vec v_3=\vec 0$ {\bf then}
 \IND
 \STATE $\mt{map}.\mt{put}(y_1, (c_3*\vec v_2, c_3*c_2))$
 \UND
@@ -199,7 +199,7 @@ proc {\bf Extract}($code$, $map$, $A$, $\vec b$, int $\mt{popcount}$, int $\mt{p
 \IND
 \STATE $\tup{\vec v_2}{c_2} \leftarrow \mt{map}.\mt{get}(y_2)$
 \STATE $\tup{\vec v_3}{c_3} \leftarrow \mt{map}.\mt{get}(y_3)$
-\STATE {\bf if} $~\vec v_3 = \vec 0_{Peek} \wedge c_3 \ne 0$ {\bf then}
+\STATE {\bf if} $~\vec v_3 = \vec 0 \wedge c_3 \ne 0$ {\bf then}
 \IND
 \STATE $\mt{map}.\mt{put}(y_1, (\frac{1}{c_3}*\vec v_2, c_2/c_3))$
 \UND
@@ -213,7 +213,7 @@ proc {\bf Extract}($code$, $map$, $A$, $\vec b$, int $\mt{popcount}$, int $\mt{p
 \IND
 \STATE $\tup{\vec v_2}{c_2} \leftarrow \mt{map}.\mt{get}(y_2)$
 \STATE $\tup{\vec v_3}{c_3} \leftarrow \mt{map}.\mt{get}(y_3)$
-\STATE $\mt{map}.\mt{put}(y_1, (\vec 0_{Peek} \sqcup \vec v_2 \sqcup \vec v_3, c_2 ~\mt{op}~ c_3))$
+\STATE $\mt{map}.\mt{put}(y_1, (\vec 0 \sqcup \vec v_2 \sqcup \vec v_3, c_2 ~\mt{op}~ c_3))$
 \UND
 \STATE \vspace{-6pt}
 \STATE \mbox{\bf case}~({\tt loop} N $code'$)

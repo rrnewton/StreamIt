@@ -20,12 +20,13 @@ functions.
 
 However, we note that a large subset of DSP operations produce outputs
 that are some affine function of their input, and we call
-filters that implement such operations ``linear.''  Examples of such
+filters that implement such operations {\it linear}. Examples of such
 filters are finite impulse response (FIR) filters, compressors,
 expanders and signal processing transforms such as the discrete
 Fourier transform (DFT) and discrete cosine transformation (DCT).  Our
 formal definition of a linear node is as follows (refer to
-Figure~\ref{fig:overview-matrix} for an illustration). \vspace{-4pt}
+Figure~\ref{fig:overview-matrix} for an illustration). 
+\vspace{-4pt}
 \begin{definition}(Linear node)
 A linear node $\lambda$ $=$ $\{A,$ $\vec{b},$ $e,$ $o,$ $u\}$
 represents an abstract stream block which performs an affine
@@ -36,7 +37,7 @@ push rates, respectively. \\ ~ \vspace{-8pt} \\
 
 A ``firing'' of a linear node $\lambda$ corresponds to the following
 series of abstract execution steps.  First, an $e$-element row vector
-$\vec{x}$ is constructed with $\vec{x}[e-i-1] = \mbox{\tt peek}(i)$.  The node
+$\vec{x}$ is constructed with $\vec{x}[e-1-i] = \mbox{\tt peek}(i)$.  The node
 computes $\vec{y} = \vec{x} A + {\vec b}$, and then pushes the $u$ elements 
 of $\vec{y}$ onto the output tape, starting with $y[u-1]$ and proceeding through $y[0]$.
 Finally, $o$ items are popped from the input tape.
@@ -57,10 +58,10 @@ The intuition of the computation represented by a linear node is
 simply that specific columns generate specific outputs and specific
 rows correspond to using specific inputs.  The values found in row
 $e-1-i$ of $A$ ({\it i.e.} the $i$th row from the bottom) and 
-column $u-j-1$ of $A$ ({\it i.e.} the $j$th column from the right) 
+column $u-1-j$ of $A$ ({\it i.e.} the $j$th column from the right) 
 represents a term in the formula to compute the $j$th output item using 
-the value of {\tt peek($i$)}. The value in column $u-j-1$ of 
-$\vec{b}$ is the constant offset added to output $j$.
+the value of {\tt peek($i$)}. The value in column $u-1-j$ of 
+$\vec{b}$ is a constant offset added to output $j$.
 Figure~\ref{fig:linear-node-example} shows a concrete example
 of a {\tt work} function and its corresponding linear node.
 
