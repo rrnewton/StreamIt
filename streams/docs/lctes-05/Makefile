@@ -1,5 +1,10 @@
 all: main.pdf
 
+#lctes.pdf: *.tex
+#	pdflatex main.tex
+#	mv main.pdf lctes.pdf
+#	cp lctes.pdf ${HOME}/public_html/lctes.pdf
+
 main.ps: main.dvi 
 	dvips -P cmz -t letter -o main.ps main.dvi
 	cp main.ps ${HOME}/public_html/lctes.ps

@@ -1,3 +1,134 @@
 \section{Cache Optimizations}
 \label{sec:cache-opt}
 
+In this section we describe a set of cache-aware transformations that
+are geared toward improving the instruction and temporal locality of a
+stream graph. We first describe our methodology for scaling actor
+firings, and subsequently we describe an optimization that is geared
+toward reducing the static and dynamic data requirements of
+producer-consumer pairs of filters.
+
+% - multiplicity algorithm
+% - forward reference to results
+
+% - partitioning algorithm
+% - forward reference to results
+
+\subsubsection{Multipilicity Scaling}
+
+The goal of this optimization is to increase the execution frequency
+of the actors in a steady state schedule, such that the temporal
+locality in the memory hiearchy is improved. Our approach is to find a
+single multiplicity factor \texttt{M} for scaling all actors, such that
+at least 90\% of the actors have a data workingset that fits in the cache.
+In other words, using our model, we calculate $M$ such that 
+$S(f) + D(f) \leq C_D$ and $DCM(f) = 0$ for 90\% of the actors in the
+stream graph.
+
+The algorithm 
+computes the largest scaling factor for every actor such that its data
+workingset does not exceed the size of the primary data cache
+(16~Kbyte on P3 for example). This yields a set of multiplicities
+${\texttt{M}_0, \ldots, \texttt{M}_n}$ for the actors in the stream
+graph. For example, the algorithm might calculate
+$\texttt{M}_\texttt{A} = 10$,
+$\texttt{M}_\texttt{B} = 20$, 
+$\texttt{M}_\texttt{C} = 30$, 
+$\texttt{M}_\texttt{D} = 40$ for four filters \texttt{A}, \texttt{B},
+\texttt{C}, and \texttt{D} in a stream graph.
+The algorithm then examines the
+distribution and selects the $\texttt{M}_i$
+for which 90\% of the actors satisfy our data workingset criterion.
+In the example, the 90-10 heurisitic
+selects $\texttt{M} = 10$; by contrast,
+a 75-25 heurisitc selects $\texttt{M} = 20$, where 75\% of the
+data workingsets are smaller than the cache, and the remaining 25\%
+overflowing the it.
+
+The 90-10 heuristic was determined empirically. We found that
+increasing the threshold to beyond 90\% leads to marginal
+performance gains. The graphs in Figure~\ref{fig:9010} show the
+performance (y-axis) of our benchmarks for different values of the multiplicity
+factor (x-axis). In each plot, the diamond represents the \texttt{M} chosen via
+the 90-10 rule, and the square represents the largest calculated
+\texttt{M} (e.g., in the example above, the largest \texttt{M} is 40).
+
+\begin{figure*}
+  \psfig{figure=beam-mult.eps,  width=3.4in}
+  \psfig{figure=bisort-mult.eps,width=3.4in}
+  \psfig{figure=fbank-mult.eps, width=3.4in}
+  \psfig{figure=fftc-mult.eps,  width=3.4in}
+  \psfig{figure=fftf-mult.eps,  width=3.4in}
+  \psfig{figure=fm-mult.eps,    width=3.4in}
+  \caption{Performance impact of multiplicity scaling on a Pentium~3.}
+  \label{fig:90-10}
+\end{figure*}
+
+\subsection{Actor Granularity}
+
+XXX {\bf todo}
+We have implemented an estimator that estimates code size and
+data and buffer requirement of a partition with high accuracy, 
+given information about actors in a partition.
+
+As an alternative we could actually generate an itermediate 
+representation of each partition considered and estimate its
+code, data and buffer 
+
+Our solution fully unrolls all loops that contain accesses to
+intermediate value buffers and then partitions the actors such 
+that code for each partition fits into high-speed on chip 
+instruction cache and all fields and intermediate 
+buffers of the partition fit into a certain fraction 
+of high-speed on chip data cache.
+
+In order to reduce instruction and data cache misses we increase
+the multiplicity of steady state schedule see [ASPLOS'02-Gordon] such 
+that 90\% of partitions can have their input, output, fields
+and buffers fit into high-speed on chip data cache.
+
+\subsubsection{Greedy Partitioning Algorithm}
+
+We calculate partitions using a greedy heirarchical 
+algorithm, that first caclulates partitions for children
+of a container before considering a container.
+We have to handle Pipelines and SplitJoins.
+
+We make sure that each partition can have it's code fit into
+L1 instruction cache and data fit into a given fraction (1/2)
+of L1 data cache.
+
+We calculate this in a hierarchical way. See Figure~\ref{fig:greedy}
+for pseudocode.
+
+\begin{figure*}[t]
+\begin{verbatim}
+Pipeline:
+
+Calculate number of partitions required for each child.
+If for any child this is >1 then remember those partitions.
+
+For each sequence (i..j) of children where for each child 
+number of partitions is 1.
+
+Interval(i,j) = "
+    Find maximum bandwidth connection between children. (k, k+1)
+    Consider partition (k..k+1) 
+    If partition (k..k+1) does not satisfy the requirement then
+        Call Interval(i,k) and Interval(k+1,j) to find two sets of partitions.
+
+    Else Start with (k, k+1) fused try fusing up or down
+        until can not fuse up and down let this be (l, m)
+        Remember (l..m) as a partition.
+        Use Interval(i,l) and Interval(m,j) to find partitions."
+
+SplitJoin:
+
+Consider splitter/joiner and all branches in a single partition.
+If this satisfies requirements then return a single partion
+else remember partitions corresponding to each branch as final
+partitions.
+\end{verbatim}
+\caption{Pseudocode of a greedy algorithm to find partitions}
+\label{fig:greedy}
+\end{figure*}
