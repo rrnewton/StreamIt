@@ -1,27 +1,27 @@
 problems:
 
-- scalingFactor's won't be integral; have float precision problems
+- scalingFactor's might not be integral? would lead to float precision problems.
 
 -----
 
 questions for andrew:
 
-* Is the LEETFrequencyReplacer definately the one to use for now?  I'm
+x Is the LEETFrequencyReplacer definately the one to use for now?  I'm
   factoring out its canReplace method so that I can set to -infinity
   if it's impossible to replace.  Should we look at using other
   frequency replacers too?  (Do they sometimes apply in more general
   cases, or get better results?)
 
-* the linear replacer visitor is doing much more work than it has
+x the linear replacer visitor is doing much more work than it has
   to... since it replaces in ALL children even if parent has been
   replaced.  I patched this up by returning a boolean from
   makeReplacement as to whether or not anything was done.
 
-* is it the case that no transformation of any hierarchical block ever
+x is it the case that no transformation of any hierarchical block ever
   changes the pop / push ratio of that block?  hmm, I think so... will
   assume this in this implementation.
 
-* if I call getFrequencyCost and getDirectCost(), they're going to be
+x if I call getFrequencyCost and getDirectCost(), they're going to be
   for the same I/O rates, right?  For instance, you wouldn't do
   something like unroll by a factor of two for frequency, such that
   the frequency cost represented a 10->10 item filter whereas the
