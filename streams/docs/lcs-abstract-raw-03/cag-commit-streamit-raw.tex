@@ -124,11 +124,11 @@ receives rather than arranging for a precise rendezvous between sender
 and receiver.
 
 \formatsection{Code Generation}
-The code generation phase of the Raw backend generates code for both
-the tile processor and the switch processor.  For the switch
-processor, we generate assembly code directly from the output of the
-communication scheduler.  For the tile
-processor, we generate C code that is compiled using Raw's GCC port.
+The code generation phase of the Raw backend targets both the tile
+processor and the switch processor.  For the switch processor, we
+generate assembly code directly from the output of the communication
+scheduler.  For the tile processor, we generate C code that is
+compiled with Raw's GCC port.
 
 \begin{table*}[t]
 \begin{center}
@@ -188,10 +188,19 @@ performance.  Our current implementation has taken a large step
 towards this goal.
 
 \formatsection{Future Work}
-* Raw specific optimizations
-* Low-level IR
-* More backends
-* Partitioning
+There are many thrusts of future work in the StreamIt project.  One
+focus is to collaborate with researchers from other groups to develop
+backends for additional communication-exposed architectures, including
+Scale, VIRAM, Imagine, Smart Memories, and TRIPS.  In this effort, we
+plan to demonstrate that StreamIt can serve as an effective common
+machine language for this class of machines.
+
+We also plan to use StreamIt as a programming model for pervasive
+computing systems.  In this context, the compiler will need to adapt
+to dynamic resource constraints and mobile network connections.  If an
+unreliable node fails, a lightweight runtime system can leverage
+static compiler analysis to recover crucial data from a backup node,
+automatically relocate the computation, and continue processing.
 
 \formatsection{Research Support}
 This research is supported in part by the MIT Oxygen Project, DARPA

@@ -1,3 +1,4 @@
+all: main.ps
 main.dvi:	main.tex *.tex *.bib
 		rm -f main.toc
 		latex main
