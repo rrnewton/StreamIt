@@ -44,15 +44,16 @@ configurable communication between nodes.  In iWarp, one can set up a
 few FIFO channels for communicating between non-neighboring
 nodes. However, reconfiguring the communication channels is more
 coarse-grained and has a higher cost than on Raw, where each cycle can
-be used to route items to a different location~\cite{Scalar Operand
-Network paper}.  ASSIGN \cite{assign} is a tool for building
-large-scale applications on multiprocessors, especially iWarp.  ASSIGN
-starts with a coarse-grained flow graph that is written as fragments
-of C code.  Like StreamIt, it performs partitioning, placement, and
-routing of the nodes in the graph.  However, ASSIGN is implemented as
-a runtime system instead of a full language and compiler such as
-StreamIt.  Consequently, it has fewer opportunities for global
-transformations such as fission and reordering.
+be used to route items to a different
+location~\cite{ScalarOperandNetworkPaper}.  ASSIGN \cite{assign} is a
+tool for building large-scale applications on multiprocessors,
+especially iWarp.  ASSIGN starts with a coarse-grained flow graph that
+is written as fragments of C code.  Like StreamIt, it performs
+partitioning, placement, and routing of the nodes in the graph.
+However, ASSIGN is implemented as a runtime system instead of a full
+language and compiler such as StreamIt.  Consequently, it has fewer
+opportunities for global transformations such as fission and
+reordering.
 
 Proebsting and Watterson \cite{pro96} present a filter fusion
 algorithm that interleaves the control flow graphs of adjacent nodes.
