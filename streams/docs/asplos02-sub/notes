@@ -14,11 +14,11 @@ Nokia(4/5/10/7)*?           ?             ?          ?       Jasper     Being op
 Nokia(4/20/15/7)*?          ?             ?          ?       Jasper     Being optimized.
 GSM             0           23.35         80.9       7/29    David      Code sucks, will refine later
 FIR-fine        812         86.1          1094.9     7/29    David      Done
+BitonicSort     0           63.94         2664.4     7/29    David      Done
 
 
 FFT(old)        304         63            ?          7/24    Bill       Mostly done (for N=64; could do others too)
 MatrixMultiply  15.4        42.5          161.6      7/26    Andrew     Not looked at.
-BitonicSort     0           63.94         2664.4     7/29    David      Done
 Lincoln Labs    ?           ?             ?          ?       ?          Stuck in frontend?
 MP3             ?           ?             ?          ?       ?          Not looked at.
 CRC             ?           ?             ?          ?       ?          Not looked at.
@@ -43,6 +43,7 @@ Nokia(4/20/15/7)*   ?                      .061/99.9%	     ?	              7/29 
 GSM                 ?		           ?		     ?	              ?       ?         C Code supplied.
 Fir-fine            ?		           ?		     ?	              7/29    Andrew    C Code supplied.
 Filterbank          ?		           .0069/99.9%       ?	              7/29    Andrew    C Code supplied.
+BitonicSort         ?   	           ?     	     ?                ?       ?         Chris writing C code.
 
 
 CRC                 ?		           ?		     ?	              ?       ?	        Optimized C supplied.
@@ -54,7 +55,6 @@ Lattice             ?		           ?		     ?	              ?       ?	        ?
 perftest4           ?		           ?		     ?	              ?       ?	        Spectrumware C Code?
 FilterBank          ?		           ?		     ?	              ?       ?	        ?
 MergeSort           ?		           ?		     ?	              ?       ?	        ?
-BitonicSort         ?   	           ?     	     ?                ?       ?         ?
 FIR                 ?   	           ?   	             ?                ?       ?         C code written.
 
 *  K/N/Q/W -- constant parameters to the Nokia 3gpp algorithm
