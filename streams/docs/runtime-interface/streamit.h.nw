@@ -456,8 +456,8 @@ This implementation also requires the GNU C compiler, which treats
 \subsection{Filter Context}
 
 <<Stream Context>>=
-<<Context Internal Data>>
 <<One-To-Many Structures>>
+<<Context Internal Data>>
 <<struct [[stream_context]]>>
 @
 
@@ -473,14 +473,22 @@ typedef struct stream_context_list {
   struct stream_context_list *next;
 } stream_context_list;
 
+<<Pipeline Internal Data>>
+<<Split/Join Internal Data>>
+
+typedef union stream_type_data {
+  pipeline_type_data pipeline_data;
+  splitjoin_type_data splitjoin_data;
+} stream_type_data;
+@
+
+For pipelines, the only data stored is a list of child nodes.
+
+<<Pipeline Internal Data>>=
 typedef struct pipeline_type_data {
   stream_context_list *first_child;
   stream_context_list *last_child;
 } pipeline_type_data;
-
-typedef union stream_type_data {
-  pipeline_type_data pipeline_data;
-} stream_type_data;
 @
 
 Split/join structures and feedback loops contain splitter and joiner
@@ -503,6 +511,21 @@ typedef struct one_to_many {
 } one_to_many;
 @
 
+The private data for split/joins and feedback loops are identical;
+both need to contain a [[one_to_many]] structure for the splitter and
+joiner, plus a list of child nodes.  Since most of the code for
+split/joins and feedback loops is shared as well, the code is
+substantially simpler if the two stream structures just share a data
+structure.
+
+<<Split/Join Internal Data>>=
+typedef struct splitjoin_type_data {
+  stream_context_list *children;
+  one_to_many splitter;
+  one_to_many joiner;
+} splitjoin_type_data;
+@
+
 The actual context structure contains a [[stream_type_data]] union,
 along with quite a bit of other information.  This includes the object
 the stream is associated with, the type of the stream, the data
@@ -520,7 +543,6 @@ typedef struct stream_context {
   tape *input_tape;
   tape *output_tape;
   stream_type_data type_data;
-  one_to_many splitter, joiner;
 } stream_context;
 @
 
