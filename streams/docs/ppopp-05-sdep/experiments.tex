@@ -48,21 +48,20 @@ require large computational resources. Second, clusters provide a
 simple abstraction for distributed and parallel computing---multiple program
 counters, and distributed memories---which 
 is at the heart of emerging multi-core and tile-based architectures
-for embedded, desktop, and server computing.
-In our experiments, we are primarily interested in quantifying two
+for embedded, desktop, and server computing.  In our experiments, we are primarily interested in quantifying two
 performance metrics: throughput and communication overhead.
 For the purpose of this paper, throughput is defined
 as the number of outputs produced per unit of time, and communication
 overhead reflects the quantity of data transmitted between
 workstations.
 
-The teleport messaging-based implementation of the frequency hopping
+The teleport based implementation of the frequency hopping
 radio was compiled into 28 threads
-whereas the alternate version---relying on a feedback-loop---was
-compiled into 32 threads.  Each thread implements a
+whereas the alternate version using a feedback-loop results in 
+32 threads.  Each thread implements a
 specific subset of the stream graph  and is assigned to one of
 sixteen 750Mhz Pentium~III workstations, each with a
-256~Kb cache.  The machines are interconnected using a fully switched
+256Kb cache.  The machines are interconnected using a fully switched
 high speed network.
 
 Our compiler maps threads to workstations using an algorithm that aims
