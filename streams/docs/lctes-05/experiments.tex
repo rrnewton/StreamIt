@@ -1,20 +1,58 @@
 \section{Experimental Evaluation}
 \label{sec:evaluation}
 
-- summary graph four bars:
-  - baseline: no fusion, best unrolling
-  - only fusion + partitioning
-  - only multiplicity
-  - fusion + multiplicity (best cacheopt line)
+In this section we evaluate the merits of the proposed cache-aware
+optimizations and buffer management strategies. We use two
+different architectures: a 600~MHz Pentium~3 and a 1.3~GHz
+Itanium~2. Both have 16~Kb primary instruction and data caches.
 
-- cacheopt details
-  - try different unrolling factors as baseline
-  - should demonstrate that cacheopt + full unrolling does as well as
-    any baseline unrolling factor
-  - argue that this demonstrates robustness re: choosing an unrolling factor
+Our benchmark suite (see Table~\ref{tab:benchmarks} consists of eleven
+different StreamIt applications. They are compiled with the StreamIt
+compiler which applies the optimizations described in this paper, and
+outputs an functionally equivalent C program that is compiled with the
+\texttt{gcc} (version 3.4, optimization level 3). Each benchmark is
+then run five times, and the median user time is recorded.
 
-- fusion details (time permitting)
-  - separate effects of:
-     - stack reuse
-     - scalar replacement
-     - peek scaling
+Figures~\ref{fig:results-p3} and~\ref{fig:results-ipf} illustrate the
+performance due the various compilation strategies. There are six bars
+per benchmark. The first bar represents the baseline compiler which
+schedule a stream graph to take advantage of producer-consumer
+locality but does account for the instruction or data memory
+footprints. The second bar, labeled {\tt scaling} represents the
+performance gains compared to the baseline when multiplicity scaling
+is applied to the stream graph. For example, {\tt scaling} cuts the
+execution time of \texttt{filterbank} by 19\%. The third bar, labeled
+{\tt CAF} adds cache-aware fusion to the baseline compiler. The fourth
+bar, labeled \texttt{CAF+scaling}, simultanously applies scaling and
+fusion. The last two bars summarize the impact of the buffer
+management strategies. The fifth bar, labeled \texttt{CAF+buffer}
+applies the copy-shift buffer management strategy. The last bar,
+labeled \texttt{CAF+buffer+scaling}, applies all three optimizations.
+
+In general, scaling improves performance, with speedups ranging for
+XXX-XXX\% compared to the baseline. In the case of \texttt{matmult}
+and \texttt{ofmd}, there is a slight degradation (nearly 5\%) due to
+XXX.
+
+Cache-aware fusion alone degrades performance for a few more benchmarks.
+This is generally due to the overhead in the buffer management. When
+we combine \texttt{CAF} with copy-shift buffer management, the
+performance consistantly improves. Note that our benchmark suite
+includes two implementations of \texttt{FFT}. The first is a
+fine-grained implementation (\texttt{fft-fine}) and the other is a
+coarse-grained implementation (\texttt{fft-coarse}). The former
+benefits more from our cache-aware fusion because there is greater
+versatility in fusing filters to achieve balanced actors. On the other hand
+a coarse grained implementation restricts the amount of fusion that
+can be performed and increases the burden for more effecient buffer
+management. In the case of \texttt{fft-coarse}, the copy-shift
+optimization regains nearly 30\% of the performance when applied in
+conjuction with fusion.
+
+The best results overall are mesured when all three optimizations are
+applied (the last bar). In this case, the granualarity-adjusted actors
+are scaled to maximize cache locality. In addition, the copy-shift
+buffer management is applied to reduce the overhead of moving data
+between actors. As a result, the performance gains can be quite
+dramatic, ranging upto 98\% savings in execution time.
+
