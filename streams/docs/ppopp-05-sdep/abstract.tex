@@ -15,11 +15,11 @@ the pitfalls of parallel programming: precise timing of events across
 parallel components.  The construct, termed {\it teleport messaging},
 uses the dependence information to provide a common notion of time in
 a parallel system.  For example, an actor $A$ can specify that an
-event should be received in an actor $B$ as soon as $B$ sees the
-``effects'' of the current output of $A$.  Based on a case study of a
-software radio, we argue that the language feature significantly
-improves programmer productivity. We have also implemented
-fully-automatic support for this feature in the StreamIt compiler,
-with a backend for a cluster of workstations.  We demonstrate that for
-our case study, incorporating precise event handling into the language
-improves performance by an average of 49\%.
+event should be processed by a non-neighboring actor $B$ as soon as
+$B$ sees the ``effects'' of the current execution of $A$.  Based on a
+case study of a software radio, we argue that teleport messaging
+significantly improves programmer productivity. We have also
+implemented fully-automatic support for messaging in the StreamIt
+compiler, with a backend for a cluster of workstations.  As messaging
+exposes optimization opportunities to the compiler, it also results in
+a 49\% performance improvement for our case study.
