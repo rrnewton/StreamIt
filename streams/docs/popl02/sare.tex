@@ -31,19 +31,12 @@ If each dependence function $h$ is a translation ($h(i) = i - k$ for
 constant $k$) then the SARE is {\it uniform}, and referred to as a
 SURE or SRE~\cite{karp67}.
 
-%Given an equation ${\cal E}$, we will use $\mt{lhs}({\cal E})$ to
-%refer to the variable defined on the left hand side of ${\cal E}$, and
-%$\mt{rhs}({\cal E})$ to refer to the set of variables referenced on
-%the right hand side of ${\cal E}$.  Thus, in the case of
-%(\ref{eq:sare}), $\mt{lhs}({\cal E}) = X$ and $Y \in \mt{rhs}({\cal
-%E})$.
-
 \section{\dep}
 
 \begin{align*}
 \DEP{X}{Y}(i) = max_{\preceq}~\{~ j ~|~ \exists ~&~ T_0 \dots T_n, ~ k_0 \dots k_n, ~ {\cal E}_1 \dots {\cal E}_n ~ s.t. ~ & ~ \\ 
 ~ & T_0 = Y ~\wedge~ T_n = X ~\wedge~ k_0 = j ~\wedge~ k_n = i ~\wedge~ & ~ \\
-~ & \forall p \in 1 \dots n, ~ T_p(k_p) \equiv f_{{\cal E}_p}(\dots, T_{m-1}(h_{{{\cal E}_p}, T_{m-1}}(k_p)), \dots) ~ \} & ~ \\
+~ & \forall p \in 1 \dots n, ~ T_p(k_p) \equiv f_{{\cal E}_p}(\dots, T_{p-1}(h_{{{\cal E}_p}, T_{p-1}}(k_p)), \dots) ~ \} & ~ \\
 \end{align*}
 
 \section{Phased Computation Graphs}
@@ -60,16 +53,16 @@ directed graph with the following components:
 \item Nodes $n_1 \dots n_{m_n}$.
 
 \item Channels $c_1 \dots c_{m_c}$, where each channel is directed
-from a given node $n_i$ to a given node $n_j$.
+from a given node $n_a$ to a given node $n_b$.
 
 \item A non-negative integer $A(c)$ indicating the number of items
   that are initially present on channel $c$.
 
 \item The number of phases $\mt{num}(n, t)$ that node $n$ exhibits
 during epoch $t$.  Here $t$ indicates the type of epoch, which is
-either \textit{initial} or \textit{steady-state}.  For all $n$,
-$\mt{num}(n, \mt{initial}) \ge 0$ and $\mt{num}(n, \mt{steady-state})
-\ge 1$.
+either initial ($\mt{init}$) or steady-state ($\mt{steady}$).  For all
+$n$, $\mt{num}(n, \mt{init}) \ge 0$ and $\mt{num}(n, \mt{steady}) \ge
+1$.
 
 \item Non-negative integers $U(c, t, p)$, $O(c, t, p)$, and $E(c, t,
 p)$, which give the number of items pushed, popped, and peeked,
@@ -93,12 +86,12 @@ in epoch $t$.  It is legal for $n$ to fire if $p \in [0, \mt{num}(n,
 t)-1]$ and, for each channel $c_{in}$ directed into $n$, there are at
 least $E(c_{in}, t, p)$ items on $c_{in}$.  The effect of this firing
 is to consume $O(c_{in}, t, p)$ items from each channel $c_{in}$
-directed into $n$, to produce $U(c_{out}, t, p)$ new items on each
-channel $c_{out}$ directed out of $n$, and to advance the phase $p$ of
+directed into $n$; to produce $U(c_{out}, t, p)$ new items on each
+channel $c_{out}$ directed out of $n$; and to advance the phase $p$ of
 $n$ to $\mt{next}(t, p)$.  In the initial epoch, each phase executes
-only once and $\mt{next}(\mt{initial}, p) = p + 1$; in the
+only once and $\mt{next}(\mt{init}, p) = p + 1$; in the
 steady-state epoch, the phases execute cyclically and
-$\mt{next}(\mt{steady-state}, p) = (p + 1)~\mt{mod}~\mt{num}(n, t)$.
+$\mt{next}(\mt{steady}, p) = (p + 1)~\mt{mod}~\mt{num}(n, t)$.
 
 From the starting state of the graph, execution proceeds through the
 initial epoch via a sequence of node firings.  The order of node
@@ -122,22 +115,24 @@ notation:
 same domain of values ${\cal V}$.
 
 \item An array type\footnote{To simplify the presentation, we allow
-ourselves a slight abuse of notation by using arrays in some cases
-instead of enumerating each element.  Our definitions could be
-expanded into strict element-wise SARE's without any fundamental
-change to the technique.} of length $n$ and element type $\tau$ is
-denoted by $\tau[n]$.  Given a two-dimensional array $A$ of type
-$\tau[n][m]$, $A[i][*]$ denotes the $m$-element array comprising the
-$i$'th row of $A$.
+ourselves a slight abuse of notation by sometimes using arrays instead
+of enumerating individual elements.  Our definitions could be expanded
+into strict element-wise SARE's without any fundamental change to the
+technique.} of length $n$ and element type $\tau$ is denoted by
+$\tau[n]$.  Given a two-dimensional array $A$ of type $\tau[n][m]$,
+$A[i][*]$ denotes the $m$-element array comprising the $i$'th row of
+$A$.
 
-\item $\mt{num-in}(n)$ (resp. $\mt{num-out}(n)$) denotes the number of
+\item $\mt{num\_in}(n)$ (resp. $\mt{num\_out}(n)$) denotes the number of
 channels that are directed into (resp. out of) node $n$.
 
-\item $\mt{chan-in}(n)$ (resp. $\mt{chan-out}(n)$) denotes the list of
+\item $\mt{chan\_in}(n)$ (resp. $\mt{chan\_out}(n)$) denotes the list of
 channels that are directed into (resp. out of) node $n$.
 
-\item $\mt{pos-in}(n, c)$ (resp. $\mt{pos-out}(n, c)$) denotes the
-position of channel $c$ in the input (resp. output) of node $n$.
+\item $\mt{pos\_in}(n, c)$ (resp. $\mt{pos\_out}(n, c)$) denotes the
+position of channel $c$ in $\mt{chan\_in}(n)$
+(resp. $\mt{chan\_out}(n)$.  That is, $\mt{chan\_out}(n)[\mt{pos\_out(n,
+c)}] = c$.
 
 \end{itemize}
 
@@ -157,14 +152,14 @@ channel $c$, $I(c)$ has type ${\cal V}[A(c)]$.
 %An initialization function $I(c)$ that returns an array of
 %length $A(c)$, the elements of which are enqueued onto channel $c$ at
 %the start of execution.  The procedure $I(c)$ takes no arguments; its
-%signature is $\mt{void} \rightarrow {\cal V}[A(c)]$.
+%signature is $\mt{void} {\small \rightarrow} {\cal V}[A(c)]$.
 
 \item A work function $W(n, t, p)$ that represents the computation of
 node $n$ in phase $p$ and epoch $t$.  The signature of $W(n, t, p)$ is
-$\{{\cal V}[E(chan-in(n)[1], t, p)], \dots, {\cal
-V}[E(chan-in(n)[\mt{num-in}(n)], t, p)]\} \rightarrow {\cal
-V}[U(chan-out(n)[1], t, p)], \dots, {\cal
-V}[U(chan-out(n)[\mt{nun-out}(n)], t, p)]\}$.  That is, the function
+$[{\cal V}[E(\mt{chan\_in}(n)[1], t, p)], \dots, {\cal
+V}[E(\mt{chan\_in}(n)[\mt{num\_in}(n)], t, p)]] {\small \rightarrow} [ {\cal
+V}[U(\mt{chan\_out}(n)[1], t, p)], \dots, {\cal
+V}[U(\mt{chan\_out}(n)[\mt{num\_out}(n)], t, p)]]$.  That is, the function
 inputs a list of arrays, each of which corresponds to an incoming
 channel $c$ and contains the $E(c,t,p)$ values that $n$ reads from $c$
 in a given firing.  The procedure returns a list of arrays, each of
@@ -200,6 +195,10 @@ phase for a balanced steady-state execution cycle of the entire graph.
 The translation will use the following helper functions:
 \begin{itemize}
 
+\item The number of integral points in a one-dimensional domain ${\cal
+D}$ is denoted by $|{\cal D}|$.  The sign and absolute value of an
+integer $i$ are given by $sign(i)$ and $abs(i)$, respectively.
+
 \item $\mt{PartialWrite}(c,t,p) = \sum_{r=0}^{p-1} U(c, t, r)$
 
 \item $\mt{TotalWrite}(n,c,t) = \sum_{r=0}^{\mt{num}(n, t)-1} U(c, t, r)$
@@ -208,212 +207,217 @@ The translation will use the following helper functions:
 
 \item $\mt{TotalRead}(n,c,t) =  \sum_{r=0}^{\mt{num}(n, t)-1} O(c, t, r)$
 
-\item If channel $c = (n_a, n_b)$, then 
+\item Given channel $c = (n_a, n_b)$:
 \begin{align*}
-\mt{Period}(c) = S(n)_a * \mt{TotalWrite}(n_a, c, \mt{steady-state}) \\
-\equiv \\
-S(n)_b * \mt{TotalRead}(n_b, c, \mt{steady-state})
+\mt{Period}(c) \equiv S(n_a) * \mt{TotalWrite}(n_a, c, \mt{steady})
+\equiv 
+S(n_b) * \mt{TotalRead}(n_b, c, \mt{steady})
 \end{align*}
 
 \end{itemize}
+
+\subsubsection{Variables}
 
 For each channel $c = (n_a, n_b)$, do the following:
 \begin{itemize}
 
 \item Introduce variables $\mt{IBUF}_c$ and $\mt{SBUF}_c$ with the following domains:
 \begin{align*}
-{\cal D}_{\mt{IBUF}_c} = \{~i~|~0 \le i \le A(c) +
-\sum_{p=0}^{\mt{num}(n_a, \mt{initial})-1} U(c, \mt{initial}, p) - 1\} \\ ~ \\
+{\cal D}_{{IBUF}_c} = \{~i~|~0 \le i \le A(c) +
+\sum_{p=0}^{\mt{num}(n_a, \mt{init})-1} U(c, \mt{init}, p) - 1 \} \\ ~ \\
 %
-{\cal D}_{\mt{SBUF}_c} = \{ ~(i,j)~|~0 \le i \le N \\
-~\wedge~ 0 \le j \le \mt{Period}(c) \}
+{\cal D}_{{SBUF}_c} = \{ ~(i,j)~|~0 \le i \le N - 1 ~\wedge~ 0 \le j \le \mt{Period}(c) - 1\}
 \end{align*}
 
-\item For each $p \in [0, num(n_a, \mt{initial})-1]$, introduce
+\item For each $p \in [0, num(n_a, \mt{init})-1]$, introduce
 variable $\mt{IWRITE}_{c, p}$ with this domain:
 \begin{align*}
-{\cal D}_{\mt{IWRITE}_{c, p}} = \{~i~|~0 \le i \le U(c, \mt{initial}, p) - 1\} \\
+{\cal D}_{{IWRITE}_{c, p}} = \{~i~|~0 \le i \le U(c, \mt{init}, p) - 1\} \\
 \end{align*}
 
-\item For each $p \in [0, num(n_b, \mt{initial})-1]$, introduce
+\item For each $p \in [0, num(n_b, \mt{init})-1]$, introduce
 variable $\mt{IREAD}_{c, p}$ with this domain:
 \begin{align*}
-{\cal D}_{\mt{IREAD}_{c, p}} = \{~i~|~0 \le i \le E(c, \mt{initial}, p) - 1\} \\
+{\cal D}_{{IREAD}_{c, p}} = \{~i~|~0 \le i \le E(c, \mt{init}, p) - 1\} \\
 \end{align*}
 
-\item For each $p \in [0, num(n_a, \mt{steady-state})-1]$, introduce
+\item For each $p \in [0, num(n_a, \mt{steady})-1]$, introduce
 variable $\mt{SWRITE}_{c, p}$ with this domain:
 \begin{align*}
-{\cal D}_{\mt{SWRITE}_{c, p}} = \{~(i,j,k)~|~0 \le i \le N-1 ~\wedge~ 0 \le j \le S(n_a) - 1 ~\wedge~ 0 \le k \le U(c, \mt{steady-state}, p) - 1\} \\
+{\cal D}_{{SWRITE}_{c, p}} = \{~(i,j,k)~|~0 \le i \le N-1 ~\wedge~ 0 \le j \le S(n_a) - 1 ~\wedge~ 0 \le k \le U(c, \mt{steady}, p) - 1\} \\
 \end{align*}
 
-\item For each $p \in [0, num(n_b, \mt{steady-state})-1]$, introduce
+\item For each $p \in [0, num(n_b, \mt{steady})-1]$, introduce
 variable $\mt{SREAD}_{c, p}$ with this domain:
 \begin{align*}
-{\cal D}_{\mt{SREAD}_{c, p}} = \{~(i,j,k)~|~0 \le i \le N-1 ~\wedge~ 0 \le j \le S(n_b) - 1 ~\wedge~ 0 \le k \le E(c, \mt{steady-state}, p) - 1\} \\
+{\cal D}_{{SREAD}_{c, p}} = \{~(i,j,k)~|~0 \le i \le N-1 ~\wedge~ 0 \le j \le S(n_b) - 1 ~\wedge~ 0 \le k \le E(c, \mt{steady}, p) - 1\} \\
 \end{align*}
+
+\end{itemize}
+
+\subsubsection{Equations}
+
+For each channel $c = (n_a, n_b)$, do the following:
+
+\begin{itemize}
 
 \item Introduce this equation (I to IBUF):
 \begin{align*}
 \forall i \in [0,A(c)-1],~\mt{IBUF}_{c}(i) = I(c)[i] \\
 \end{align*}
 
-\item For each $p \in [0, num(n_a, \mt{initial})-1]$, introduce this
+\item For each $p \in [0, num(n_a, \mt{init})-1]$, introduce this
 equation (IWRITE to IBUF):
 \begin{align*}
-\forall i \in [A(c) + \mt{PartialWrite}(c,\mt{initial},p), 
-               A(c) + \mt{PartialWrite}(c,\mt{initial},p)+U(c, \mt{initial}, p)-1],
-\mt{IBUF}_{c}(i) = \mt{IWRITE}_{c, p}(i - A(c) - \mt{PartialWrite}(c,\mt{initial},p)) \\
+\forall i \in [A(c) + \mt{PartialWrite}(c,\mt{init},p), 
+               A(c) + \mt{PartialWrite}(c,\mt{init},p+1)-1], \\
+\mt{IBUF}_{c}(i) = \mt{IWRITE}_{c, p}(i - A(c) - \mt{PartialWrite}(c,\mt{init},p)) \\
 \end{align*}
 
 \end{itemize}
+
 For each node $n$, do the following:
 \begin{itemize}
-
-\item For each $c \in \mt{chan-out}(n)$, and for each $p \in [0,
-num(n, \mt{initial})-1]$, introduce this equation (IREAD to IWRITE):
-
+%
+\item For each $c \in \mt{chan\_out}(n)$, and for each $p \in [0,
+num(n, \mt{init})-1]$, introduce this equation (IREAD to IWRITE):
+%
 \begin{align*}
-\forall i \in {\cal D}_{\mt{IWRITE}_{c, p}},~\mt{IWRITE}_{c,p}(i) = W(n, \mt{initial}, p)(\mt{Input-Arrays})[\mt{pos-out}(n, c)][i] \\
-\mt{where Input-Arrays} = \{\mt{IREAD}_{\mt{chan-in}(n)[1], p}(*), \dots, \mt{IREAD}_{\mt{chan-in}(n)[\mt{num-in}(n)], p}(*) \}
+\forall i \in {\cal D}_{{IWRITE}_{c, p}},~\mt{IWRITE}_{c,p}(i) = W(n, \mt{init}, p)(\mt{Input\_Arrays})[\mt{pos\_out}(n, c)][i] \\
+\mt{where Input\_Arrays} = [\mt{IREAD}_{{chan\_in}(n)[1], p}(*), \dots, \mt{IREAD}_{{chan\_in}(n)[\mt{num\_in}(n)], p}(*) ]
 \end{align*}
-
-\item For each $c \in \mt{chan-out}(n)$, and for each $p \in [0,
-num(n, \mt{steady-state})-1]$, introduce this equation (SREAD to SWRITE):
-
+%
+\item For each $c \in \mt{chan\_out}(n)$, and for each $p \in [0,
+num(n, \mt{steady})-1]$, introduce this equation (SREAD to SWRITE):
+%
 \begin{align*}
-\forall (i, j, k) \in {\cal D}_{\mt{SWRITE}_{c, p}},~\mt{SWRITE}_{c,p}(i,j,k) = W(n, \mt{steady-state}, p)(\mt{Input-Arrays})[\mt{pos-out}(n, c)][j] \\
-\mt{where Input-Arrays} = \{\mt{SREAD}_{\mt{chan-in}(n)[1], p}(i, j, *), \dots, \mt{SREAD}_{\mt{chan-in}(n)[\mt{num-in}(n)], p}(i, j, *) \}
+\forall (i, j, k) \in {\cal D}_{{SWRITE}_{c, p}},~\mt{SWRITE}_{c,p}(i,j,k) = W(n, \mt{steady}, p)(\mt{Input\_Arrays})[\mt{pos\_out}(n, c)][j] \\
+\mt{where Input\_Arrays} = [\mt{SREAD}_{{chan\_in}(n)[1], p}(i, j, *), \dots, \mt{SREAD}_{{chan\_in}(n)[\mt{num\_in}(n)], p}(i, j, *) ]
 \end{align*}
-
-\item For each $c \in \mt{chan-out}(n)$, for each $p \in [0,
-\mt{num}(n, \mt{steady-state})-1]$, and for each $q \in
-[0,\frac{\mt{Period}(c)}{\mt{WriteCycle}(n,c)}-1]$, introduce this
-equation (SWRITE to SBUF):
+%
+\item For each $c \in \mt{chan\_out}(n)$, for each $p \in [0,
+\mt{num}(n, \mt{steady})-1]$, and for each $q \in
+[0,\frac{\mt{Period(c)}}{\mt{TotalWrite(n,c,\mt{steady})}}-\mt{1}]$,
+introduce this equation (SWRITE to SBUF):
 \begin{align*}
-\forall (i,j) \in {\cal D}_{\mt{SW} \rightarrow \mt{SB}}(c,p,q), 
+\forall (i,j) \in {\cal D}_{SW {\small \rightarrow} SB}(c,p,q), \\
 \mt{SBUF}_{c}(i,j) = 
-  \mt{SWRITE}_{c, p}(i * \frac{\mt{Period}(c)}{\mt{WriteCycle}(n,c)} + 
+  \mt{SWRITE}_{c, p}(i * \frac{\mt{Period}(c)}{\mt{TotalWrite}(n,c,\mt{steady})} + 
                        \lfloor \frac{q}{S(n)} \rfloor, 
-                     q~mod~S(n), j) \\
-\mt{where } {\cal D}_{\mt{SW} \rightarrow \mt{SB}}(c,p,q) = 
-  {\cal D}_{\mt{SBUF}_{c}} \cap \\
-  \{ (i,j) | q*\mt{WriteCycle}(n,c) + \mt{WritePhase}(c,p) \\ 
-             \le j \le \\ 
-             q*\mt{WriteCycle}(n,c) + \mt{WritePhase}(c,p) + 
-               U(c, \mt{steady-state}, p) - 1 \} \\
+                     q~mod~S(n),
+                     j - \mt{Offset}_{SW {\small \rightarrow} SB}(q,n,c,p)) \\
+\mt{where } {\cal D}_{SW {\small \rightarrow} SB}(c,p,q) = 
+  {\cal D}_{{SBUF}_{c}} \cap \\
+  \{ (i,j) | \mt{Offset}_{SW {\small \rightarrow} SB}(q,n,c,p) \le j
+             \le \mt{Offset}_{SW {\small \rightarrow} SB}(q,n,c,p+1) - 1 \} \\ 
+\mt{and } \mt{Offset}_{SW {\small \rightarrow} SB}(q,n,c,r) = q*\mt{TotalWrite}(n,c,\mt{steady}) + \mt{PartialWrite}(c,\mt{steady},r))
 \end{align*}
-
-\item For each $c \in \mt{chan-in}(n)$, and for each phase $p \in
-[0, \mt{num}(n, \mt{initial})-1]$, introduce this equation (IBUF to IREAD):
+%
+\item For each $c \in \mt{chan\_in}(n)$, and for each phase $p \in
+[0, \mt{num}(n, \mt{init})-1]$, introduce this equation (IBUF to IREAD):
 \begin{align*}
-\forall i \in {\cal D}_{IB \rightarrow IR}(c,p), 
-\mt{IREAD}_{c, p}(i) = \mt{IBUF}_{c}(\mt{PartialRead}(c, \mt{initial}, p) + i) \\
-\mt{and }{\cal D}_{IB \rightarrow IR}(c,p) = 
-  \{ i | i \in {\cal D}_{\mt{IREAD}_{c,p}} ~\wedge~ 
-         i + \mt{PartialRead}(c, \mt{initial}, p) \in {\cal D}_{\mt{IBUF}_{c}} \}
+\forall i \in {\cal D}_{IB {\small \rightarrow} IR}(c,p), 
+\mt{IREAD}_{c, p}(i) = \mt{IBUF}_{c}(\mt{PartialRead}(c, \mt{init}, p) + i) \\
+\mt{and }{\cal D}_{IB {\small \rightarrow} IR}(c,p) = 
+  \{ i | i \in {\cal D}_{{IREAD}_{c,p}} ~\wedge~ 
+         i + \mt{PartialRead}(c, \mt{init}, p) \in {\cal D}_{{IBUF}_{c}} \}
 \end{align*}
-
-\item For each $c \in \mt{chan-in}(n)$, for each phase $p \in [0,
-\mt{num}(n, \mt{initial})-1]$, and for \\ each $q \in [0, \lfloor
-\frac{\mt{max}_{\mt{p}'} \left( \mt{PartialRead}(\mt{c}, \mt{initial},
-\mt{p}') + \mt{E}(\mt{c}, \mt{initial}, \mt{p}') \right)
-}{\mt{Steady}(\mt{c})} \rfloor ]$, introduce this equation (SBUF to
+%
+\item For each $c \in \mt{chan\_in}(n)$, for each phase $p \in [0,
+\mt{num}(n, \mt{init})-1]$, and for \\ each $q \in [0, \lfloor
+\frac{\mt{argmax}_{\mt{p}'} \left( \mt{PartialRead}(\mt{c}, \mt{init},
+\mt{p}') + \mt{E}(\mt{c}, \mt{init}, \mt{p}') \right)
+}{\mt{TotalRead(n,c,steady)}} \rfloor ]$, introduce this equation (SBUF to
 IREAD):
 \begin{align*}
-\forall i \in {\cal D}_{SB \rightarrow IR}(c,p), 
+\forall i \in {\cal D}_{SB {\small \rightarrow} IR}(c,p), 
 \mt{IREAD}_{c,p}(i) = 
     \mt{SBUF}_{c}(q,
-      \mt{PartialRead}(c, \mt{initial}, p) + i - 
-            |{\cal D}_{\mt{IBUF}_{c}}| - q * \mt{Steady}(c)) \\
-\mt{where }{\cal D}_{SB \rightarrow IR}(c,p) = 
-  \{ i | i \in {\cal D}_{\mt{IREAD}_{c,p}} ~\wedge~ 
-         \mt{PartialRead}(c, \mt{initial}, p) + i \notin {\cal D}_{\mt{IBUF}_{c}} \}
-%  \{ i | \mt{PartialRead}(c, \mt{initial}, \mt{num}(n, \mt{initial})) +
-%         \mt{PartialRead}(c, \mt{steady-state}, p) \le i \le
-%         \mt{PartialRead}(c, \mt{initial}, \mt{num}(n, \mt{initial})) +
-%         \mt{PartialRead}(c, \mt{steady-state}, p) + E(c, \mt{steady-state}, p) \\
-%         ~\wedge~ i \in {\cal D}_{\mt{IREAD}_{c}} \}
+      \mt{PartialRead}(c, \mt{init}, p) + i - 
+            |{\cal D}_{{IBUF}_{c}}| - q * \mt{TotalRead}(n,c,\mt{steady})) \\
+\mt{where }{\cal D}_{SB {\small \rightarrow} IR}(c,p) = 
+  \{ i | i \in {\cal D}_{{IREAD}_{c,p}} ~\wedge~ 
+         \mt{PartialRead}(c, \mt{init}, p) + i \notin {\cal D}_{{IBUF}_{c}} \}
 \end{align*}
-
-\item For each $c \in \mt{chan-in}(n)$, and for each phase $p \in [0,
-\mt{num}(n, \mt{steady-state})-1]$, introduce this equation (IBUF to
+%
+\item For each $c \in \mt{chan\_in}(n)$, and for each phase $p \in [0,
+\mt{num}(n, \mt{steady})-1]$, introduce this equation (IBUF to
 SREAD):
 \begin{align*}
-\forall (i,j,k) \in {\cal D}_{IB \rightarrow SR}(n,c,p), 
+\forall (i,j,k) \in {\cal D}_{IB {\small \rightarrow} SR}(n,c,p), 
 \mt{SREAD}_{c, p}(i,j,k) = 
     \mt{IBUF}_{c}(\mt{ReadIndex}(n,c,p,i,j,k)) \\
-\mt{where ReadIndex}(n,c,p) = \mt{TotalRead}(n,c,\mt{initial})
-                + (i*S(n)+j)*\mt{TotalRead}(n,c,\mt{steady-state}) \\
-                + \mt{PartialRead}(c, \mt{steady-state}, p) 
+\mt{where ReadIndex}(n,c,p,i,j,k) = \mt{TotalRead}(n,c,\mt{init})
+                + (i*S(n)+j)*\mt{TotalRead}(n,c,\mt{steady}) \\
+                + \mt{PartialRead}(c, \mt{steady}, p) 
                 + k) \\
-\mt{and }{\cal D}_{IB \rightarrow SR}(n,c,p) = 
-  \{ (i,j,k) | \mt{ReadIndex}(n,c,p,i,j,k) \in {\cal D}_{\mt{IBUF}_{c}} \}
+\mt{and }{\cal D}_{IB {\small \rightarrow} SR}(n,c,p) = 
+  \{ (i,j,k) | \mt{ReadIndex}(n,c,p,i,j,k) \in {\cal D}_{{IBUF}_{c}} \}
 \end{align*}
-
+%
 % here is the simple, base case of the SBUF -> SREAD function
-%\item For each $c \in \mt{chan-in}(n)$, and for each phase $p \in [0,
-%\mt{num}(n, \mt{steady-state})-1]$, introduce this equation (SBUF to
+%\item For each $c \in \mt{chan\_in}(n)$, and for each phase $p \in [0,
+%\mt{num}(n, \mt{steady})-1]$, introduce this equation (SBUF to
 %SREAD):
 %\begin{align*}
-%\forall (i,j,k) \in {\cal D}_{\mt{SREAD}_{c, p}},
+%\forall (i,j,k) \in {\cal D}_{{SREAD}_{c, p}},
 %\mt{SREAD}_{c, p}(i,j,k) = 
 %    \mt{SBUF}_{c}(i,
-%                  j*\mt{TotalRead}(n,c,\mt{steady-state}) + 
-%                    \mt{PartialRead}(c,\mt{steady-state},p) + k)
+%                  j*\mt{TotalRead}(n,c,\mt{steady}) + 
+%                    \mt{PartialRead}(c,\mt{steady},p) + k)
 %\end{align*}
-
-\item For each $c \in \mt{chan-in}(n)$, for each phase $p \in [0,
-\mt{num}(n, \mt{steady-state})-1]$, and for each $q \in [0, \lfloor
-\frac{E(c, \mt{steady-state}, p)}{\mt{Period}(c)} \rfloor]$, introduce
+%
+\item For each $c \in \mt{chan\_in}(n)$, for each phase $p \in [0,
+\mt{num}(n, \mt{steady})-1]$, and for each $q \in [0, \lfloor
+\frac{\mt{E(c, steady, p)}}{\mt{Period(c)}} \rfloor]$, introduce
 these equations (SBUF to SREAD):
 % two possible problems: sread has already been written to, or sbuf has already been read from
 \begin{align*}
-\forall (i,j,k) \in {\cal D}_{SB \rightarrow SR}(c,p,q), \\
+\forall (i,j,k) \in {{\cal D}\mt{1}}_{SB {\small \rightarrow} SR}(c,p,q), \\
 \mt{SREAD}_{c, p}(i,j,k) = 
     \mt{SBUF}_{c}(i+q+
-                  \mt{sign(Offset)}*\lfloor \frac{|\mt{Offset}(n,c,p)|}{\mt{Period}(c)} \rfloor, \\
-                  j*\mt{TotalRead}(n,c,\mt{steady-state}) + 
-                    \mt{PartialRead}(c,\mt{steady-state},p) + k \\
-                   - q * \mt{Period}(c) + (\mt{Offset}(n,c,p)~\mt{mod}~\mt{Period}(c))) \\
-\mt{where }{\cal D}_{SB \rightarrow SR}(c,p,q) = 
-  ({\cal D}_{\mt{SREAD}_{c, p}} - \mt{PUSHED}) \\
-                         \cap \{ k | q * \mt{Period}(c) 
+                  \mt{Int\_Offset}(n,c,p), \\
+                  j*\mt{TotalRead}(n,c,\mt{steady}) + 
+                    \mt{PartialRead}(c,\mt{steady},p) + k \\
+                   - q * \mt{Period}(c) + \mt{Mod\_Offset}(n,c,p)) \\
+\mt{where }{{\cal D}\mt{1}}_{SB {\small \rightarrow} SR}(c,p,q) = 
+  ({\cal D}_{{SREAD}_{c, p}} - \mt{PUSHED}) \\
+                         \cap \{ k | q * \mt{Period}(c) - min(0, \mt{Mod\_Offset}(n,c,p))
                                 \le k 
                                 \le min((q+1)*\mt{Period}(c),  \\
-                                        E(c, \mt{steady-state}, p)) - 1 
-                                        - |\mt{Offset}(n,c,p)|~\mt{mod}~\mt{Period}(c) \} \\ ~ \\
+                                        E(c, \mt{steady}, p)) - 1 
+                                        - max(0, \mt{Mod\_Offset}(n,c,p)) \} \\ ~ \\
 %
 %
-\forall (i,j,k) \in {\cal D}_{SB \rightarrow SR}(c,p,q), \\
+\forall (i,j,k) \in {{\cal D}\mt{2}}_{SB {\small \rightarrow} SR}(c,p,q), \\
 \mt{SREAD}_{c, p}(i,j,k) = 
     \mt{SBUF}_{c}(i+q+
-                  \mt{sign(Offset)}*(1 + \lfloor \frac{|\mt{Offset}(n,c,p)|}{\mt{Period}(c)} \rfloor), \\
-                  j*\mt{TotalRead}(n,c,\mt{steady-state}) + 
-                    \mt{PartialRead}(c,\mt{steady-state},p) + k  \\
+                  \mt{sign(Offset)} + \mt{Int\_Offset}(n,c,p), \\
+                  j*\mt{TotalRead}(n,c,\mt{steady}) + 
+                    \mt{PartialRead}(c,\mt{steady},p) + k  \\
                    - q * \mt{Period}(c) 
-                   - (\mt{Period}(c) - (|\mt{Offset}(n,c,p)|~\mt{mod}~\mt{Period}(c))) \\
-\mt{where }{\cal D}_{SB \rightarrow SR}(c,p,q) = 
-  ({\cal D}_{\mt{SREAD}_{c, p}} - \mt{PUSHED}) \\
-                         \cap \{ k | min((q+1)*\mt{Period}(c), \\
-                                        E(c, \mt{steady-state}, p)) - 1 
-                                        - |\mt{Offset}(n,c,p)|~\mt{mod}~\mt{Period}(c)
-                                \le k 
-                                \le min((q+1)*\mt{Period}(c), 
-                                        E(c, \mt{steady-state}, p)) - 1 \} \\ ~ \\
+                   - \mt{sign(Offset)} * \mt{Period}(c) + \mt{Mod\_Offset}(n,c,p)) \\
+\mt{where }{{\cal D}\mt{2}}_{SB {\small \rightarrow} SR}(c,p,q) = 
+  ({\cal D}_{{SREAD}_{c, p}} - \mt{PUSHED}) \\
+                         \cap ( \{ k | q * \mt{Period}(c)
+                                      \le k 
+                                      \le min((q+1)*\mt{Period}(c),  \\
+                                              E(c, \mt{steady}, p)) - 1 \} - {{\cal D}\mt{1}}_{SB {\small \rightarrow} SR}(c,p,q) ) \\ ~ \\
 %
 %
-\mt{where }\mt{PUSHED}(n,c,p) = {\cal D}_{IB \rightarrow SR}(n,c,p) \\
+\mt{where }\mt{PUSHED}(n,c,p) = {\cal D}_{IB {\small \rightarrow} SR}(n,c,p) \\
 \mt{and }\mt{Num\_Pushed}(n,c,p) = 
 % this is a dot product of (i,j,k) with something
-  max_{\preceq}\mt{PUSHED} \cdot \{S(n) * \mt{TotalRead}(n,c,\mt{steady-state}), \\
-                                        \mt{TotalRead}(n,c,\mt{steady-state}), \\
-                                        1 \} + \mt{PartialRead}(c, \mt{steady-state}, p) \\
-\mt{and }\mt{PEEKED}(c,p) = {SB \rightarrow IR}(c,p) \\
-\mt{and }\mt{Num\_Popped}(c,p) = |PEEKED| - (E(c,\mt{steady-state},p) - O(c,\mt{steady-state},p)) \\
+  max_{\preceq}\mt{PUSHED} \cdot \{S(n) * \mt{TotalRead}(n,c,\mt{steady}), \\
+                                        \mt{TotalRead}(n,c,\mt{steady}), \\
+                                        1 \} + \mt{PartialRead}(c, \mt{steady}, p) \\
+\mt{and }\mt{PEEKED}(c,p) = {SB {\small \rightarrow} IR}(c,p) \\
+\mt{and }\mt{Num\_Popped}(c,p) = |\mt{PEEKED}| - (E(c,\mt{steady},p) - O(c,\mt{steady},p)) \\
 \mt{and }\mt{Offset}(n,c,p) = \mt{Num\_Popped}(c,p)-\mt{Num\_Pushed}(n,c,p) \\
+\mt{and }\mt{Int\_Offset}(n,c,p) = \mt{sign(Offset)}*\lfloor \frac{abs(\mt{Offset}(n,c,p))}{\mt{Period}(c)} \rfloor) \\
+\mt{and }\mt{Mod\_Offset}(n,c,p) = \mt{sign(Offset)}*(abs(\mt{Offset}(n,c,p))~\mt{mod}~\mt{Period}(c)) \\
 %
 \end{align*}
-
+%
 \end{itemize}
 
