@@ -3,7 +3,7 @@ Options to the StreamIt 'knit' Compiler Script
 
 This is for the March 14, 2003 snapshot release (streamit-0.0.20030314).
 
-$Id: OPTIONS,v 1.1 2003-03-11 22:10:16 dmaze Exp $
+$Id: OPTIONS,v 1.2 2003-03-14 19:46:05 dmaze Exp $
 
 
 Basic usage:
@@ -81,11 +81,6 @@ Options specific to RAW backend:
       Use a partitioner based on dynamic programming, rather than the
       default greedy partitioner.  On some benchmarks this gets better
       results; performance is generally comparable.
-
-  --numbers <n>, -N<n>
-      Instrument code to gather performance statistics on simulated
-      code over <n> stady-state cycles.  The results are placed in
-      results.out in the current directory.
 
   --partition, -a
       Partition the stream graph, performing either filter fission or
