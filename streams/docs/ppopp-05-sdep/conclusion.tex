@@ -21,12 +21,12 @@ communication.
 
 Our work can also be viewed as the integration of dynamic behavior
 into a static dataflow language.  Our insight is that there is a class
-of control messages which only adjust a parameter in the target actor;
+of control messages that only adjust a parameter in the target actor;
 they do not otherwise affect the input or output channels upon
 delivery.  This model enables a hybrid scheduling scheme in which the
 steady-state dataflow is exactly orchestrated at compile time, but
 there are windows in which a message could adjust an internal field of
-a filter between its execution steps.  We consider this to be a modest
+a filter between its execution steps.  We consider this a modest
 but promising step towards a unified development environment that
 captures all aspects of stream application development without
 sacrificing either performance or programmability.
