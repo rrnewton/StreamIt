@@ -35,7 +35,7 @@ The phases of the StreamIt compiler are described in
 Table~\ref{tab:phases}.  The front end is built on top of KOPI, an
 open-source compiler infrastructure for Java~\cite{kopi}.  We
 translate the KOPI syntax tree into the StreamIt IR (SIR) that
-encapsulates the hierararchical stream graph.  Since the structure of
+encapsulates the hierarchical stream graph.  Since the structure of
 the graph might be parameterized, we propagate constants and expand
 each stream construct to a static structure of known extent.  At this
 point, we can calculate an execution schedule for the nodes of the

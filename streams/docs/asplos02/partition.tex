@@ -47,7 +47,7 @@ Figure~\ref{fig:fm-blood}).  \protect\label{fig:fm-opt}}}
 \vspace{-6pt}
 \caption{\protect\small Fusion of a Pipeline into a two-stage filter.
 In this example, the UpSampler pushes $K$ items on every step, while the
-MovingAverage filter peeks at $N$ items but only pops 1.  To accomodate
+MovingAverage filter peeks at $N$ items but only pops 1.  To accommodate
 this peeking behavior, the fused filter maintains a {\tt peek\_buffer}
 for the items that reside on the channel between the two filters.  In
 the initial work function, which is called only on the first
@@ -90,7 +90,7 @@ The fusion transformation for SplitJoins containing RoundRobin
 Splitters is similar to those containing Duplicate Splitters.  One
 filter simulates the execution of a steady-state cycle in the
 SplitJoin by inlining the code from each filter.  This filter is
-surrounded by ReoderRoundRobin filters that recreate the reordering of
+surrounded by ReorderRoundRobin filters that recreate the reordering of
 the RoundRobin nodes.  In the above example, the difference the
 Splitter's weights, the Filter's I/O rates, and the Joiner's weights
 adds complexity to the reordering.  Though this transformation is

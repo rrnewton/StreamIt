@@ -137,13 +137,13 @@ internal buffers accordingly.  At the same time, the Joiner outputs
 items according to the ordering given by the weights of the
 RoundRobin.  That is, the sending code is interleaved with the
 receiving code in the Joiner; no additional items are input if a
-buffered item can be written to the output stream.  To faciliate code
+buffered item can be written to the output stream.  To facilitate code
 generation (Section \ref{sec:codegen}), the maximum buffer size of
 each internal buffer is recorded.
 
-Our current implemenation of the communication scheduler is overly
-cautious in its deadlock avoidance.  All Feedbackloops are serialized
+Our current implementation of the communication scheduler is overly
+cautious in its deadlock avoidance.  All FeedbackLoops are serialized
 by the communication scheduler to prevent deadlock.  More precisely,
-the loop and body streams of the FeedBackLoop cannot execute in
+the loop and body streams of the FeedbackLoop cannot execute in
 parallel.  Crossed routes in the layout of the graph are serialized as
 well, forcing each path to wait its turn at the contention point.

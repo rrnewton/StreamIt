@@ -14,8 +14,8 @@ scheduler implemented in microcode~\cite{may87communicating}.
 DSPL is a language with simple filters interconnected in a flat acyclic
 graph using unbuffered channels~\cite{Thiel93}.  Unlike the Occam
 compiler for the Transputer, the DSPL compiler automatically maps the
-graph into the available resouces of the Transputer. The DSPL language
-does not expose a cyclic schedule, thus the compisiler models the
+graph into the available resources of the Transputer. The DSPL language
+does not expose a cyclic schedule, thus the compiler models the
 possible executions of each filter to determine the possible cost of
 execution and the volume of communication. It uses a search technique
 to map multiple filters onto a single processor for load balancing and
