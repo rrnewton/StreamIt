@@ -515,31 +515,217 @@ $A$'s input and $push_A$ items have been pushed to $A$'s output.
 
 \subsection{Denotational Semantics}
 
-assume for now that the filters are stateless.
+The operational semantics above defines the space of legal execution
+orderings for the filters in a stream graph, but says nothing about
+the values that are being pushed onto the tapes.  For this we develop
+a denotational semantics, with which we can prove that certain
+transformations preserve the meaning of the entire program.
 
-the above discussion addresses the order in which filters can be
-executed, but does not address the values on the tapes, or the meaning
-of a program as a whole.  for this we turn to a denotational
-semantics, which will allow us to prove the equivalence of two
-different stream programs.
+Our denotational semantics contains three algebras: one for literal
+StreamIt syntax, one for an intermediate abstract syntax, and one for
+the semantic analysis.  The purpose of the intermediate algebra is to
+provide a simplified syntax for developing stream transformations, and
+to abstract away the StreamIt-specific aspects of the program.  We
+provide an informal description of how to translate back and forth
+between StreamIt programs and the abstract syntax, and then consider
+more formal valuation functions for determining the meaning of the
+abstract syntax within the semantic algebra.
 
-in the denotaional semantics, we'll represent a filter as follows:
+\subsubsection{Intermediate Algebra}
 
-1. push, pop, (max items peeked)
-2. the functions specifying the output values as a function of the
-input values.
+The intermediate algebra provides a common mathematical representation
+for manipulating stream programs.  Though we have referred to this
+algebra as providing an abstract syntax for stream programs, the
+representation is strictly a mathematical framework within semantic
+domains rather than a program that is fit for execution.  Nonetheless,
+the LISP-like syntax allows us to think of the representation as a
+program that is amenable to straightforward transformation techniques.
 
-3. this set of functions...
+\begin{figure}
+\begin{align*}
+&Item = Real \\
+&Index = N \\
+&Tape = Index \ra Item \\
+&Pop, Peek, Push = N \\ 
+&IndexTransform = Index \ra Index \\ 
+&WorkStatement = IndexTransform \ra (Tape \ra Item) \\ 
+&WorkFunction = WorkStatement^{+} \\
+&SplitType = {Duplicate, RoundRobin} \\ 
+&JoinType = {RoundRobin}
+\end{align*}
+\vspace{-18pt}
+\caption{Semantic domains that are shared between the intermediate and
+  transform algebras.
+\protect\label{fig:shareddom}}
+\vspace{-6pt}
+\begin{align*}
+&Stream = Filter + Pipeline + SplitJoin + FeedbackLoop \\
+&InitFeedback = Int^{+} \\
+&BodyStream, LoopStream = Stream \\
+&Filter = Peek \times Pop \times Push \times WorkFunction \\
+&Pipeline = Stream^{+} \\
+&SplitJoin = SplitType \times JoinType \times Stream^{+} \\
+&FeedbackLoop = SplitType \times JoinType \times \\
+& \hspace{0.5in} BodyStream \times LoopStream \times InitFeedback
+\end{align*}
+\vspace{-18pt}
+\caption{Semantic domains of the intermediate algebra.
+\protect\label{fig:interdom}}
+\end{figure}
 
-ii. how to map a given textual representation into a canonical
+The domains of the intermediate algebra are shown in
+Figures~\ref{fig:interdom}~and~\ref{fig:shareddom}.
+
+{\bf Converting to the intermediate algebra}.
+
+{\bf Converting from the intermediate algebra}.
+
+\subsubsection{Transform Algebra}
+
+Assumptions
+-----------
+- filters are stateless
+- the program is well-defined
+
+abstract syntactic domain
+-------------------------
+
+streams - 
+  (Filter peek pop push canonical-form-code)
+  (Pipeline $stream_1$ $stream_2$ ... $stream_n$)
+  (SplitJoin (SplitType splitter) $stream_1$ $stream_2$ (JoinType joiner))
+  (FeedbackLoop (JoinType joiner) $body_stream$ $loop_stream$
+        (SplitType splitter))
+($init_1 \dots init_n$)
+
+semantic domains
+----------------
+
+Item = Real
+
+Index = N
+
+Tape = Index -> Item
+
+Pop, Peek, Push = N
+
+Index Transform = Index -> Index
+
+;; gives output values as function of input tape
+Work Function = Index Transform -> (Tape -> Item)
+
+--
+
+Stream Transform = Tape -> Tape
+
+valuation functions
+-------------------
+
+$\cal{S}: Stream \ra Stream Transform$
+
+$\cal{S}: Stream \ra Stream Transform$
+
+$\cal{S}$ [(Filter push pop peek canonical-form-code)]
+ = (push, pop, peek, translate-code(canonical-form-code))
+
+filter valuation function:
+
+i. how to map a given textual representation into a canonical
 representation.
 
-iii. how to represent the canonical representation in the functinal
-format
+ii. how to represent the canonical representation in the functional
+format (translate-code)
 
-iv. further, to help automate program transformations, we can talk
+iii. further, to help automate program transformations, we can talk
 about translationg from the functional format to the canonical
 representation.  talk about CSE from reconstruction
+
+--
+
+$\cal{S}$ [(Abstract Filter push pop peek $f_0 \dots f_{push-1}$] = input -> 
+         (i -> $f_s(i \% push_s)_(input, i2 -> i2 + pop_s * floor(i / push_s))$)
+
+--
+
+$\cal{S}$ [(Pipeline $s_1$ $s_2$ ... $s_n$] = 
+           $\cal{S}(s_n) \circ \dots \circ \cal{S}(s_1)$
+
+--
+
+$\cal{S}$ [(SplitJoin (. S) $s_1$ $s_2$ ... $s_n$ (. J))] =
+$input -> (x -> let i = MIN(j s.t. sum_{k=0}^{j-1}{w_i} \le i%W) in 
+                           \cal{S}(input)(
+(\mi{I_S}{Oi_S} \circ \mi{Oi_S}{Ii_J} \circ \mi{Ii_J}{O_J})(x)))$
+
+-> the i selects which parallel stream to draw from
+
+where $w_1 \dots w_n$ are the weights of the round robin joiner, and $W =
+sum_{i=0}^{n}{w_i}$
+
+--
+
+As a special case, consider duplicate - round-robin:
+
+$\cal{S}$ [(SplitJoin (Duplicate S) $s_1$ $s_2$ (RoundRobin J))] = 
+           $input -> (x -> \cal{S}(input)(x/2)      if i is even
+                           \cal{S}(input)((x-1)/2)  if i is odd)$
+
+--
+
+$\cal{S}$ 
+  [(FeedbackLoop (. S) $s_body$ $s_loop$ (. J) ($init_1 \dots init_n$))] =
+
+??
+
+--
+
+Let's look at merging:
+
+	$push_sc = 2*LCM(push_s1, push_s2)$
+	$pop_sc = LCM(pop_s1, pop_s2)$
+	$peek_sc = ???$
+	$f_sc$ = $f_{sc_{j_(input, shift) for j = 1..push_sc-1}}:$
+	
+  if j is even:
+
+	$f_sc_j(input, shift) = f_s1_(j/2 % push_s1))_
+				(input,
+				 i -> shift(i)+pop_s1*floor((j/2)/push_s1))$
+
+  if j is odd:
+
+	$f_sc_j(input, shift) = f_s2_((j-1)/2 % push_s2)_
+				(input,
+				 i -> shift(i)+pop_s2*floor(((j-1)/2)/push_s2))$
+
+--
+
+%% push = push_s
+%% pop = pop_s
+%% peek = peek_s
+
+%% canonical form:
+
+%% output.push(f_s_1(input.peek(0) \dots input.peek(peek_s - 1)))
+%% \dots
+%% output.push(f_s_push(input.peek(0) \dots input.peek(peek_s - 1)))
+
+%% input.pop()
+%% input.pop()  } x pop_s
+%% input.pop()
+
+%% --
+
+%% combined input:
+
+%% output.push(f_s1_1(input.peek(pop_s1*floor((j/2)/push_s1)),
+%%                    \dots
+%%                    input.peek(pop_s1*floor((j/2)/push_s1))))
+%% output.push(f_s2_1(input.peek(0) \dots input.peek(peek_s - 1)))
+%% \dots
+%% output.push(f_s_push(input.peek(0) \dots input.peek(peek_s - 1)))
+
+--
 
 in the next sections, we'll appeal to this denotational semantics in
 argueing for the correctness of program transformations.

@@ -8,8 +8,27 @@ things to do with paper:
 - add note that the message delivery constraints sometimes specify a
 minimum buffer size, sometimes specify a maximum buffer size?
 
+- define a max function in the case of the downstream message sending,
+just for the sake of making the explanation clearer (and defining the
+max function, so that other people can use it in other papers, and
+think about the concept even.)
+
+- abstract away the function composing streams around a path of a
+splitjoin?  then could use it again when talking about the
+denotational semantics.
+
 things to figure out / solve:
 -----------------------------
+
+*** Someone please check the equations.
+
+*** Can we figure out the denotational semantics for a feedback loop?
+
+*** Can we show that fusion preserves the min function across its
+inputs?
+
+- Can we say anything about how message latencies should be modified
+following a fusion transformation?
 
 - I think the min function is violated when the tapes are empty.
 Should probably look at this and see if there's a way to fix it.
