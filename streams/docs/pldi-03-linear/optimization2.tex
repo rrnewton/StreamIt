@@ -101,6 +101,7 @@ Given a linear node $\lambda = \{A, {\vec b}, e, o, u\}$, the
 following stream is a {\naive} implementation of $\lambda$ in the
 frequency domain: \\
 \begin{equation} \nonumber
+{\small
   \begin{array}{ll}
     {\tt float \rightarrow float}~{\tt pipeline~naiveFreq~}(A, {\vec b}, e, o, u){\tt ~\{} & \hspace{40pt}\\
     ~~{\tt add~float \rightarrow float~filter~\{}\\
@@ -137,7 +138,7 @@ frequency domain: \\
     ~~~~~~~~{\tt pop()} \\
     ~~{\tt \}} \\
     {\tt \}}
-  \end{array}
+  \end{array}}
 \end{equation}
 \label{trans:freq1}
 \end{transformation}
@@ -175,6 +176,7 @@ Given a linear node $\lambda = \{A, {\vec b}, e, o, u\}$, the
 following stream is an optimized implementation of $\lambda$ in the
 frequency domain: \\
 \begin{equation} \nonumber
+{\small
   \begin{array}{ll}
 
     {\tt float \rightarrow float}~{\tt pipeline~optimizedFreq~}(A, {\vec b}, e, o, u){\tt ~\{} & \hspace{40pt}\\
@@ -220,7 +222,7 @@ frequency domain: \\
     ~~{\tt \}} \\
     ~~{\tt add~Decimator}(o, u)~~\mt{// see Transformation 5}\\
     {\tt \}} \\
-  \end{array}
+  \end{array}}
 \end{equation}
 \label{trans:freq1}
 \end{transformation}
