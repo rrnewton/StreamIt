@@ -48,12 +48,12 @@ significance of this fact is that a convolution operation can be
 implemented very efficiently by using the Fast Fourier Transform (FFT)
 to translate into the frequency domain.  To compute the convolution,
 the $N$-point FFTs of $\vec{in}$ and $A[*,0]$ are calculated to obtain
-$\vec{{\cal I}}$ and $\vec{\cal A}$, each of which is a complex-valued
-vector of length $N$.  Element-wise multiplication of $\vec{\cal I}$
-and $\vec{\cal A}$ yields a vector $\vec{Y}$, to which the inverse
-transform (IFFT) is applied to obtain $\vec{y}$.  Convolution in the
-frequency domain requires $O(N \lg(N))$ operations, as each FFT and
-IFFT has a cost of $O(N \lg (N))$ and the vector multiplication is
+$\vec{X}$ and $\vec{H}$, respectively, each of which is a
+complex-valued vector of length $N$.  Element-wise multiplication of
+$\vec{X}$ and $\vec{H}$ yields a vector $\vec{Y}$, to which the
+inverse transform (IFFT) is applied to obtain $\vec{y}$.  Convolution
+in the frequency domain requires $O(N \lg(N))$ operations, as each FFT
+and IFFT has a cost of $O(N \lg (N))$ and the vector multiplication is
 $O(N)$.  By contrast, the complexity is $O(N^2)$ in the time domain,
 as each of the $N$ output values requires $O(N)$ operations.  For more
 details, refer to~\cite{oppenheim-discrete}.
@@ -115,11 +115,11 @@ frequency domain:
     ~~~~{\tt work}~{\tt peek}~m+e-1~{\tt pop}~m~{\tt push}~u*m~{\tt \{} \\
     ~~~~~~\vec{x} \leftarrow {\tt peek}(0 \dots m+e-2 ) \\
     ~~~~~~\vec{X} \leftarrow \mathbf{FFT} (N, \vec{x}) \\
-    ~~~~~~{\tt for}~j=0~{\tt to}~u-1\\
+    ~~~~~~{\tt for}~j=0~{\tt to}~u-1~{\tt \{}\\
     ~~~~~~~~\vec{Y}[*,j] \leftarrow \vec{X} .* \vec{H}[*,j] \\
     ~~~~~~~~\vec{y}\hspace{1pt}[*,j] \leftarrow \mathbf{IFFT}(N, \vec{Y}[*,j]) \\
     ~~~~~~{\tt \}} \\
-    ~~~~~~{\tt for}~i=0~{\tt to}~m-1\\
+    ~~~~~~{\tt for}~i=0~{\tt to}~m-1~{\tt \{}\\
     ~~~~~~~~{\tt pop()} \\
     ~~~~~~~~{\tt for}~j=0~{\tt to}~u-1\\
     ~~~~~~~~~~{\tt push}(\vec{y}\hspace{1pt}[i+e-1,j] + {\vec b}[j])\\
@@ -193,7 +193,7 @@ frequency domain:
     ~~~~{\tt prework}~{\tt peek}~r~{\tt pop}~r~{\tt push}~u*m~{\tt \{}\\
     ~~~~~~\vec{x} \leftarrow {\tt pop}(0 \dots m+e-2) \\
     ~~~~~~\vec{X} \leftarrow \mathbf{FFT} (N, \vec{x}) \\
-    ~~~~~~{\tt for}~j=0~{\tt to}~u-1\\
+    ~~~~~~{\tt for}~j=0~{\tt to}~u-1~{\tt \{}\\
     ~~~~~~~~\vec{Y}[*,j] \leftarrow \vec{X} .* \vec{H}[*,j] \\
     ~~~~~~~~\vec{y}[*,j] \leftarrow \mathbf{IFFT}(N, \vec{Y}[*,j]) \\
     ~~~~~~~~\vec{partials}[*,j] \leftarrow \vec{y}\hspace{1pt}[m+e-1 \dots m+2e-3,j] \\
@@ -206,12 +206,12 @@ frequency domain:
     ~~~~{\tt work}~{\tt peek}~r~{\tt pop}~r~{\tt push}~u*r~{\tt \{} \\
     ~~~~~~\vec{x} \leftarrow {\tt pop}(0 \dots m+e-2) \\
     ~~~~~~\vec{X} \leftarrow \mathbf{FFT} (N, \vec{x}) \\
-    ~~~~~~{\tt for}~j=0~{\tt to}~u-1\\
+    ~~~~~~{\tt for}~j=0~{\tt to}~u-1~{\tt \{}\\
     ~~~~~~~~\vec{Y}[*,j] \leftarrow \vec{X} .* \vec{H}[*,j] \\
     ~~~~~~~~\vec{y}[*,j] \leftarrow \mathbf{IFFT}(N, \vec{Y}[*,j]) \\
     ~~~~~~{\tt \}} \\
     ~~~~~~{\tt for}~i=0~{\tt to}~e-1\\
-    ~~~~~~~~{\tt for}~j=0~{\tt to}~u-1\\
+    ~~~~~~~~{\tt for}~j=0~{\tt to}~u-1~{\tt \{}\\
     ~~~~~~~~~~{\tt push}(\vec{y}\hspace{1pt}[i,j] + \vec{partials}[i,j])\\
     ~~~~~~~~~~\vec{partials}[i,j] \leftarrow \vec{y}\hspace{1pt}[m+e-1+i,j]\\
     ~~~~~~~~{\tt \}} \\
@@ -232,7 +232,7 @@ The transformation to the frequency domain is straightforward in
 theory and very common in practice. However, the detailed record
 keeping, transform size selection, and state management make an actual
 implementation quite involved.  Further, as the complexity of DSP
-programs continue to grow, manually determining the disparate regions
+programs continues to grow, manually determining the disparate regions
 across which to apply this optimization is an ever more daunting task.
 For example, several filters individually may not perform sufficiently
 large convolutions to merit a frequency transformation, but after a

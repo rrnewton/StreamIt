@@ -803,9 +803,8 @@
 \@float{copyrightbox}[b]
 \begin{center}
 \setlength{\unitlength}{1pc}
-% CHANGED BY BILL to give more space for text
 \begin{picture}(20,4) %Space for copyright notice
-\put(0,-0.95){\crnotice{\@toappear}}
+\put(0,-2.95){\crnotice{\@toappear}}
 \end{picture}
 \end{center}
 \end@float}
@@ -1235,7 +1234,7 @@
 \ifnum\addauflag=0\addauthorsection\global\addauflag=1\fi
     \section{%
        {REFERENCES}
-         \vskip -9pt  % GM July 2000 (for tighter spacing)
+         \vskip -2pt  % GM July 2000 (for tighter spacing)
         \@mkboth{{\refname}}{{\refname}}%
     }%
     \list{[\arabic{enumi}]}{%
@@ -1243,7 +1242,7 @@
         \leftmargin\labelwidth
         \advance\leftmargin\labelsep
         \advance\leftmargin\bibindent
-        \parsep=0pt\itemsep=1pt % GM July 2000
+        \parsep=0pt\itemsep=3pt % GM July 2000
         \itemindent -\bibindent
         \listparindent \itemindent
         \usecounter{enumi}
