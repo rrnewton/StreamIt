@@ -164,6 +164,8 @@ supporting enumerations and functions are declared as follows:
   void streamInitRAM(Stream* s, VM_NODE_MEM ramLocation, int address, 
                      int capacity, int elementSize, int flags); 
  
+
+
   // as above with <initLength> elements already in place.  If 
   // <initEOS> is true, then the last item is tagged with an EOS flag.
   void streamInitWithDataRAM(Stream* s, VM_NODE_MEM ramLocation, int address, 
@@ -172,11 +174,9 @@ supporting enumerations and functions are declared as follows:
 
   // make a stream mapped to hardware FIFO <fifoLocation> that contains
   // elements of size <elementSize>
-  void streamInitFIFO(Stream* s, VM_NODE_MEM fifoLocation, int elementSize,
-                      int flags);
+  void streamInitFIFO(Stream* s, VM_NODE_MEM fifoLocation, int elementSize, int flags);
 
-  // flags used by high level-compiler to pass 
-  // performance hints to the low-level compiler
+  // flags used by high level-compiler to pass performance hints to the low-level compiler
   typedef enum /* STREAM_FLAGS */ {
     // True if FIFO semantics may be relaxed such that popping does not return   
     // elements in the same order that the elements were pushed. Peek cannot be
@@ -223,7 +223,6 @@ supporting enumerations and functions are declared as follows:
   // returns whether or not there is an EOS tag on element n from the
   // front of the stream; stalls if less than n+1 elements available.
   boolean streamPeekEOS(Stream* s, int n)
-
 \end{verbatim}}
 
 \ssss{Stream types} The IStream, OStream, and IOStream aliases for the
@@ -855,7 +854,7 @@ An example follows:
   blockInit(&scratch, LOCALMEM1, 0x180, 32, 1);
 
   // move from memory
-  moveInit(&move01, DMA1, &s0, &s1, STREAM_LENGTH_ALL);
+  moveInit(&move01, DMA1, &s0, &s1, STREAM_LENGTH_ALL, TRUE);
   kernelRun(&move01.kernel);
   
   // run rle
@@ -889,7 +888,7 @@ An example follows:
   streamInitRAM(&s4, GLOBALMEM1, 0x2000, 1024, 4, STREAM_NEVER_WRAPS),
   
   // move to memory
-  moveInit(&move24, DMA1, &s2, &s4, STREAM_LENGTH_ALL);
+  moveInit(&move24, DMA1, &s2, &s4, STREAM_LENGTH_ALL, TRUE);
   kernelRun(&move24.kernel);
   kernelWait(&move24.kernel);
 
