@@ -1,3 +1,128 @@
 \section{Optimizations}
-\subsection{Common Sub Expression Elimination for free}
+The end goal of the gathering our linearity information is so that we can use
+that information to do clever optimizations. 
+
+
+\subsection{Algebraic Simplification for Free}
+One very nice result of combining
+linear representations in pipelines in the stream graph is that  
+the compiler is doing algebriac simplification {\textbf across} {\tt Filters}. 
+By simply replacing a pipeline structure with a filter that directly computes
+the linear combination that the pipeline represents, we can realize a significant
+performance improvement. While a very clever programmer could determine the coefficients 
+of two FIR filters back to back in a pipeline, very often it is easier to understand the
+program's structure and function be keeping them separate. 
+
+One example of a processing block which is represented in a different way than
+it is implemented is a FIR filter followed by a compressor 
+(see \cite{oppenheim-discrete}) which only passes on every $M$th sample. 
+If you sit down and try to figure it out, there is no need to calcluate all of the outputs
+only to through out $M-1$ of them. Instead you should only calculate every $M$th sample.
+Therefore, we end up with an FIR filter that pops $M$ instead of poping one. While
+this is a transformation that is certainly worth doing (it reduces the computational
+requirements by a factor of $\frac{M-1}{M}$ the programmer should not be forced to do
+it manually if the compiler can do it instead. The combination rules above will
+actually perform the transformation automatically, letting the programmer
+express the system in the most natural way (seperate filter and compressor).
+
+Another example is a multi band equalizer (such as is found in the FMRadio benchmark). 
+The overall purpose of such an equalizer is to amplify $N$ frequency bands by 
+different gain factors $G_i$ (like the graphic equalizer found on stereos). 
+The obvious design calls for sending the input signal though $N$ filters
+which is a bandpass filter with the appropriate cutoff frequencies and gain $G_i$.
+The obvious design calls for $N$ filters, but if the gains do 
+not vary with time, a single filter with the appropriate gain in each frequency band
+could be used. However, designing such a filter with $N$ bands each with a given
+different gain is very difficult. it would be nice if the designer could specfy the 
+filter implementation and have the compiler combine them. This is in fact exactly what
+can be accomplished with the splitjoin combination described above. The compiler 
+actually does the combination of the parallel filters to determine the overall 
+filter coefficients. Thus the programmer is freed from many details of the
+implementation without having to sacrifice their application's performance. 
+
+
 \subsection{Frequency Implementation}
+There is a wealth of knowledge about DSP implementation optimizations, 
+and a clear description (with our linear representation) of the programs execution
+allows us to leverave known transformations automatically. 
+
+\begin{figure}
+\center
+\epsfxsize=2.0in
+\epsfbox{images/frequency-conversion-convolution.eps}
+\caption{A filter directly implementing the convolution sum.}
+\label{fig:frequency-conversion-convolution}
+\end{figure}
+
+\begin{figure}
+\center
+\epsfxsize=2.0in
+\epsfbox{images/frequency-conversion-frequency.eps}
+\caption{A filter computing the convolution in the frequency domain.}
+\label{fig:frequency-conversion-frequency}
+\end{figure}
+
+For instance, if a {\tt Filter} is implementing an FIR digital filter as a direct 
+convolution sum (eg it is calculating exactly $\sum_{i=0}^{N}a_ix[i]$ for each output)
+the performance could often be improved by moving the calculation to the frequency
+domain. 
+
+The mathematics of transforming a convlution in time to a multiplication in frequency 
+is both well understood and widely used. The main thrust is that it requires less
+computation to change the representations to the frequency domain,
+do a multiplication, and then convert back to the time domain than it does to do the
+convolution directly in the time domain. This sequence is faster because there is
+an $O(N lg N)$ time algorithm for changing the basis. Therfore, the overall sequence
+requires two $O(N lg N)$ operations and one $O(N)$ operation where the direct 
+convolution is a $O(N^2)$ algorithm.
+
+(unclear how much more to put in here -- do we use an example, or do we perhaps
+just point them to another source for information, such as the venerable
+\cite{oppehneim-discrete}?)
+
+In our compiler with our linear analysis information, we can recognize filters that are
+computing convolution sums and we can take advantage of the above transformation of the
+algorithm. Specifically, a convolution $y[n]$ of two sequences  $x[n]$ and $h[n]$ is defined to be
+$y[n] = \sum_{k=-\infty}^{\infty}x[n]h[n-k]$. Identifying
+$h[n] n\in[0..x]$ where $x=peek_F$ with the values held in the matrix representing the filter, 
+we know that $h[n]$ has only a finite number of values. 
+
+The compiler computes the (complex) values of $H(e^{j\omega})$, the discrete time 
+Fourier transform (DTFT) of $h[n]$ at compile time. The filter is transformed 
+so that at runtime instead of performing a convolution sum, it calcluates  
+$X(e^{j\omega})$, the DTFT of $x[n]$. Then it calculates 
+$Y(e^{j\omega})=X(e^{j\omega})H(e^{j\omega})$, the DTFT of the output sequence.
+Then the filter transforms $Y(e^{j\omega})$ into $y[n]$, the output data in the
+time domain, and pushes the appropriate values onto the output tape. Note that we
+use the well-known ``fast Fourier transform'' FFT algorithm to actually calculate
+the DTFTs and the IFFT to calculate the inverse DTFT.
+
+As always, the devil is in the details. There are two critical details that 
+we have not mentioned above: the size of the DTFT, and how we determine which
+values of $y[n]$ we are to push on to the output tape. 
+
+Retreating to the definition of the convolution sum, provides us the answer.
+As we are dealing with a real system and not simply the mathematics, we can only 
+deal with finite amounts of data. First of all, we need to choose how many data items
+we want to produce on each firing of the work function. If we choose too few items,
+the overhead of the FFT, multipliy and IFFT will outweigh the potential savings
+from reducing the assumptic bounds of the algorithm. If we choose too many items, we
+risk blowing the data cache and we make load balancing harder. 
+
+So we are left choosing a value of $N$, which is the number of outputs we will produce
+each cycle. Looking at the definition of the convolution sum as it applies to 
+two finite length sequences, XXXXXXXXXXXXXXXXXX
+are going to look at every cycle. Out current implementation of the FFT is constrained
+to compute FFTs of sizes that are powers of two, which means that we need $N+2(M-1)$ 
+to be a power of two. This means that we choose a our target output rate 
+(eg we specify $M-N+1$) and choose the $N$ that is closest to our target and still
+allows us to take an even power of two.
+
+
+\begin{figure}
+\center
+\epsfxsize=3.0in
+\epsfbox{images/frequency-example.eps}
+\caption{Example of edge case in frequency results.}
+\label{fig:frequency-example}
+\end{figure}

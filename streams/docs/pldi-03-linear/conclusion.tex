@@ -3,6 +3,16 @@
 
 \subsection{Future Work}
 We could extend linear analysis to incorporate the set of filters
-that has a state between executions. Our formulation would then be
-the output and the new state are a linear combination of the input 
-and the current state.
+that has a state between executions. Our formulation would then be very
+much like a standard state space model. The current state would be a set of
+variables. Each iteration of the filter would update the new state to be
+a linear combination of the input and the current state. The output of the 
+filter would also be some linear combination of the input and the current state.
+This representation would be able to capture the fundamental operation of
+a large set of programs -- specifically digital control systems (where state
+space models are used frequently to model real systems ) and IIR filters (which
+is represented as a feed back loop). An transformation that we could do with 
+a feed back loop that we determine is IIR would be to calculate enough of its
+frequency response so that its behavior could be captured in a FFT, multiplie,
+IFFT sequence. Another possible use would be to remove a feedback loop that was
+performing IIR filtering and convert it into a single linear state filter.  

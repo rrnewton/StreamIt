@@ -1,12 +1,19 @@
 \section{Introduction}
 As more and more parts of modern life use digital computation, from cell phones to GPS systems
-and satellite radio systems, the importance of digitally processing signals is growing.
+and satellite radios, the importance of processing digital signals is growing.
 Each successive generation of applications requires ever more sophisticated algorithms mapped 
-on to ever more specialized processors. Since embedded computers have severe performance
-requirements placed on them, typically the mapping of algorithm to architecture is done by hand.
-When writing optimized assempbly for the latest DSP processors, one has to map the same algorithm
-and time again. This remapping is costly arduous process that slows the pace of advance
-because it forces engineers to spend time working out details rather than focusing on new technology.
+on to ever more specialized digital signal processors (DSP). Since embedded computers have severe performance
+requirements placed on them, the mapping of algorithm to architecture is typically done by hand.
+
+Upwards of fifty percent of the code that runs a DSP in a modern cell phone is written in assembly. Some
+ten percent of that code is actually hand tuned to eek out the maximum possible performance with
+the lowest possible power. 
+
+The problem with these hand optimized assembly code is that one has to implement the same algorithm time
+and time again whenever a new chip comes out. This remapping by hand is costly arduous process that 
+slows the pace of advance because it forces engineers to spend time working out details rather 
+than focusing on new technology. This is exactly the problem that compilers were invented to solve
+fourty years ago. 
 
 \subsection{StreamIt}
 

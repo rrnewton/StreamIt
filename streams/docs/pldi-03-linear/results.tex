@@ -1,3 +1,101 @@
+\section{Results}
+We chose to measure the strength of our optimizations in terms of 
+floating point instruction reduction. The StreamIt compiler currently
+has two code generation backends. The uniprocessor backend generates C code
+that can be compiled and linked against a supporting library to produce an
+executable. There is also a backend that generates code designed to be 
+run on the RAW microprocessor\cite{waingold97baring, raw-micro}, which features
+a communication exposed grid of processors with various communication facilities. 
+Mapping a StreamIt program on to the raw architecture is complicated
+by issues of communication, load balancing and partitioning\cite{streamit-asplos}
+and the effects of the linear analysis optimizations presented above can not
+be easily differentiated in differences in placement, routing and fusion. Therefore
+we chose to use the uniprocessor backend for our measurements.
+
+\subsection{Measurement Methodology}
+As always, it is not totally clear what the appropriate metric for measuring performance
+is for our uniprocessor programs. Measuring running time is complicated by the multitasking
+environment offered by modern operating systems. Given that the uniprocessor backend for
+the StreamIt compiler is meant as a prototyping system, the supporting library is anything
+but optimized, so measutring timing information is probably not very useful anyways.
+
+The optimizations that we have presented are all aimed at reducing the amount of 
+computation that is performed. Most of the applications that are and will
+be written in streamit process floating point instructions(FLOPs), so reducing their
+number is advantageous. Therefore, we choose as our measurement metric the number of 
+floating point instructions executed.
+
+Our measurement platform was a Dual Intel 2.2 GHz P4 Xenon processor system 
+running Linux.
+
+Obviously counting statically the number of FLOPs is not helpful, so we need to
+measure the number of floating point instructions that are executed at runtime.
+To do this dynamic measurement, we utilized the DynamoRIO\cite{rio-webpage}
+runtime introspection and optimization infrastructure. Using DynamoRio we
+inserted counters into the program stream that counted the number of floading point
+operations as each basic block was executed. We define
+
+\begin{itemize}
+\item[flops] Any instruction that begins with {\tt f} in the x86 instruction set.
+\item[fadds] Any of ({\tt fadd faddp fiaddp fsub fsubp fisubp fsubr fsubrp fisubr}).
+\item[fadds] Any of ({\tt fmul fmulp fimulp fdiv fdivp fidivp fdivr fdivrp fidivr}).
+\end{itemize}
+
+The benchmark programs that we used are:
+
+\begin{enumerate}
+\item FilterBank: Implements a multi-rate signal processing block common in communications and image processing.
+\item FIR: A single 100 point rectangularly windowed low pass filter with $\omega_c=\frac{\pi}{3}$
+\item FMRadio Implements the demodulation and processing necessary for an FM radio in software.
+\item RateConverter Changes the effective sampling rate of the input sequence by a factor of $\frac{3}{2}$.
+\item TargetDetect Four matched filters performing target detection in parallel.
+\item Radar Beamformer, radar array and radar frontend.
+\end{enumerate}
 
 
-\section{results}
+\subsection{Linear Replacement}
+\begin{figure}
+\center
+\epsfxsize=3.0in
+\epsfbox{images/combination-graph.eps}
+\caption{Performance gains realized by replacing structures with direct linear forms.}
+\label{fig:combination-graph}
+\end{figure}
+
+
+\subsection{Frequency Replacement}
+\begin{figure}
+\center
+\epsfxsize=3.0in
+\epsfbox{images/freq-scaling.eps}
+\caption{Results of scaling the target FIR size versus number of multiplies for the FIR kernel.}
+\label{fig:freq-scaling}
+\end{figure}
+
+As mentioned above, even though we are converting an $O(N^2)$ implementation into an
+$O(N lg N)$ algorithm, the hidden constant hidden $O(N lg N)$ is non trivial. In
+Figure~\ref{fig:freq-scaling} we show the results of choosing different target sizes
+for the frequency implementation. The X axis shows the various sizes chosen, and 
+the Y axis shows the number of multiplies required per output compared to the normal
+implementation. A number less than one means that fewer multiplies were required after
+our transformation, and a number more than one means that more multiplies were required.
+
+(discuss specific results)
+
+\begin{figure}
+\center
+\epsfxsize=3.0in
+\epsfbox{images/linear-freq-both.eps}
+\caption{Results of running the benchmarks with linear replacement, frequency replacement, and both.}
+\label{fig:linear-freq-both}
+\end{figure}
+
+We can also hope to get performance gains by combining our two optimizations. 
+If the compiler can figure out that several filters are all doing linear operations
+and combine them together we already probably win. If, however, we can then tranform
+the overall representation into the frequency domain, we can win big. 
+Figure~\ref{fig:linear-freq-both} shows the normalized number of multiplications
+required per output when linear replacement is applied, when the frequency transformation 
+is applied, and when both are applied, frequency tranformation following linear replacement.
+
+(discuss specific results)
