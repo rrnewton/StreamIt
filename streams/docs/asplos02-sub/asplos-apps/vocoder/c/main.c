@@ -4,13 +4,13 @@
 #include "raw.h"
 #endif
 
-#define BUFSIZE   16
+#define BUFSIZE   256
 /*  #define BUFSIZE   512 */
 
 #ifdef RAW
 int full_count = 0;
-const int BLOCK_SIZE =  64;
-const int RUN_SIZE   = 128;
+const int BLOCK_SIZE =  256;
+const int RUN_SIZE   = 768;
 /*  const int BLOCK_SIZE =  524288; */
 /*  const int RUN_SIZE   = 1048576; */
 /*  const int RUN_SIZE   = 2097152; */
@@ -243,7 +243,7 @@ int  main(argc, argv)
 #ifndef RAW
   sscanf((char *)(argv[3]), "%d", &fftlen);
 #else
-  fftlen = 16;
+  fftlen = 128;
 #endif //RAW
 
   /*argument 4: downsample flag */
@@ -261,7 +261,7 @@ int  main(argc, argv)
   if (argc >= 6) 
     sscanf((char *)(argv[5]), "%c%c", &Command, &Command);
 #else
-  Command = 's';
+  Command = 'f';
 #endif //RAW
 
 #ifndef RAW
@@ -270,7 +270,7 @@ int  main(argc, argv)
       sscanf((char*)(argv[6]), "%f", &TimeRatio);
     else TimeRatio = 0;
 #else
-  TimeRatio = 2.0;
+  TimeRatio = 0;
   raw_test_pass_reg(2);
 /*    print_int(2); */
 #endif //RAW
