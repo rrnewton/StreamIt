@@ -1,55 +1,82 @@
 \section{Introduction}
 
-Applications that are structured around streams of data are becoming
-increasingly pervasive.  Stream programs include embedded systems for
-sensor nets and cell phones, desktop applications such as streaming
-media and networking, as well as high-performance servers such as HDTV
-editing consoles and hyper-spectral imaging.  Performance is still a
-critical factor in all of these domains, and programmers often
-sacrifice readability, robustness, and maintainability of their code
-in order to achieve it.  It is an important problem to improve the
-programmability of stream programs without sacrificing performance.
 
-One difficult aspect of stream programming is reconciling regular,
-steady-state dataflow with irregular control messages.  For modeling
-data paths of signal processing applications, Synchronous Dataflow
-(SDF) is a popular model of computation~\cite{LM87-i}.  An SDF graph
-consists of actors connected by communication channels; on each
-execution, an actor must consume and produce a constant number of
-items from its input and output channels.  SDF is appealing because it
-can be statically scheduled and optimized.  However, the challenge
-comes when there is a dynamic, unpredictable event in the stream; for
-instance, an actor detects a low signal-to-noise ratio and sends a
-signal to the frontend to increase the amplification.  How should the
-control message be delivered?  The problem is further complicated when
-there is a constraint on the timing of the message.  With the abundant
-parallelism in stream programs, how can concurrent actors have a
-common frame of reference with respect to time?
+Applications that are structured around streams of data pervade common
+computing  practices,  and  there  is evidence  that  streaming  media
+applications already consume a substantial fraction of the computation
+cycles    on    consumer   machines~\cite{rixner98bandwidthefficient}.
+Examples  of streaming  workloads  can be  found  in embedded  systems
+(e.g., sensor nets and mobile  phones), as well as in desktop machines
+(e.g., networking, and  multimedia) and high-performance servers (e.g.,
+HDTV editing consoles and hyper-spectral imaging). 
 
-In this paper, we make two contributions towards improving the
-programming model for stream programming.  First, we define a novel
-language construct that uses data dependences in the stream graph to
-provide simple and precise event handling in stream programs.  Second,
-we define a stream dependence function, $\sdep$, which describes the
-ordering constraints of actor firings in an SDF graph.  This
-dependence information is similar to a program slice, which has a rich
-body of work surrounding it~\cite{hrb88pdg,pugh97slice,tip95slice}.
-Like program slicing, $\sdep$ can also facilitate debugging and
-program analysis.  However, unlike program slicing, one can leverage
-the static properties of SDF to provide an exact, complete, and
-compact representation of $\sdep$ at compile time.  
+The performance  of streaming  applications is evermore  critical, and
+programmers   often  sacrifice   the   readability,  robustness,   and
+maintainability  of their  code in  order to  deliver high-performance
+implementations.    One   especially   difficult  aspect   of   stream
+programming---that  commands considerable  and  tedious attention---is
+the  reconciliation  of regular  streaming  data  flow with  irregular
+control messages. Consider for example a frequency hopping (FHR) radio
+which mirrors how  CDMA-based cell phone technology works.   In FHR, a
+transmitter  and  a receiver  change  between  a  set of  known  radio
+frequencies, and they must do so in synchrony with respect to a stream
+boundary. That is,  if a received changes its  radio frequency between
+streams,  then it  can  properly  process its  incoming  data.  It  is
+therefore imperative  for streaming programs  to properly synchronize
+their  control messages; in  FHR, the  receiver must  change to  a new
+frequency when it  has finished processing the current  stream, if and
+only if  the transmitter has also changed  its transmission frequency.
+What makes this aspect of stream programming especially challenging is
+that it is difficult to reason about ``time'' in parallel (concurrent)
+and distributed systems.
 
-Using $\sdep$, we formalize the semantics of our language construct
-for precise event handling.  Via a case study of a frequency hopping
-radio, we argue that the construct is a significant improvement over
-the existing implementation practice.  We also present a fully
-automatic implementation of precise event handling as part of the
-StreamIt compiler infrastructure~\cite{streamit-asplos, streamitcc},
-with a backend that targets a cluster of workstations.  We demonstrate
-an average speedup of 48\% over StreamIt programs that do not utilize
-the messaging feature.  As a result, we believe that the $\sdep$
-formalism and language support for messaging enabled the simultaneous
-improvement of both programmability and performance.
+
+In  this  paper,  we  make  two contributions  toward  improving  the
+programming model  for stream programming.  First, we  define a stream
+dependence function, $\sdep$,
+% which describes the
+% ordering constraints of actor firings in an SDF graph.  This
+% dependence information is similar to a program slice, which has a rich
+% body of work surrounding it~\cite{hrb88pdg,pugh97slice,tip95slice}.
+% Like program slicing, $\sdep$ can also facilitate debugging and
+% program analysis.  However, unlike program slicing, one can leverage
+% the static properties of SDF 
+to  provide   an  exact,  complete,  and   compact  representation  of
+dependencies between stream processing components.
+% $\sdep$ at compile time.  
+Second,  we define  {\it  teleport messaging}  as a  novel language
+construct  to provide  simple  and precise  event  handling of control
+messages in stream
+programs.
+% Our work  is presented  in the context  of Synchronous  Dataflow (SDF)
+% which  is a popular  model of  computation~\cite{LM87-i} that  is well
+% suited for  streaming codes. In  SDF, computation is represented  as a
+% graph consisting of {\it  actors} connected by communication channels;
+% the actors consume  and produce a constant number  of items from their
+% input and output  channels every time they execute.   SDF is appealing
+% because it is ameable to static scheduling and optimization.
+% However, the challenge
+% comes when there is a dynamic, unpredictable event in the stream; for
+% instance, an actor detects a low signal-to-noise ratio and sends a
+% signal to the frontend to increase the amplification.  How should the
+% control message be delivered?  The problem is further complicated when
+% there is a constraint on the timing of the message.  With the abundant
+% parallelism in stream programs, how can concurrent actors have a
+% common frame of reference with respect to time?
+The semantics of teleport  messaging are formalized using $\sdep$, and
+we  will  argue  that  is  a  significant  improvement  over  existing
+programming practices. Specifically, we  will describe a case study of
+a frequency  hopping radio using  a fully automatic  implementation of
+precise   event   handling   as   part  of   the   StreamIt   compiler
+infrastructure~\cite{streamit-asplos,  streamitcc}. Our implementation
+of FHR  in StreamIt using teleport  messaging is 48\%  faster than its
+counterpart which does not use messaging. This is preliminary evidence
+that
+% with a backend that targets a cluster of workstations.  We demonstrate
+% an average speedup of 48\% over StreamIt programs that do not utilize
+% the messaging feature.  As a result, we believe that 
+the $\sdep$  formalism and language support for  messaging enables the
+simultaneous improvement of both programmability and performance.
 
 The rest of this paper is organized as follows.  Sections 2 and 3
 define the stream dependence function and show how to calculate it
