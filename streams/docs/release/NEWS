@@ -1,0 +1,26 @@
+Changes in the StreamIt Infrastructure
+======================================
+
+$Id: NEWS,v 1.1 2003-05-28 15:33:35 dmaze Exp $
+
+streamit-snapshot-20030528
+--------------------------
+
+* 28 May 2003 snapshot release.
+* Language specification and front-end broadened to include more
+  conventional Java-like features, including a boolean primitive type
+  and typecasts.  Anonymous stream declarations should be able to
+  successfully reference variables defined in enclosing code.
+* Cause statements like push(pop() + pop()) to be strictly sequenced
+  in the front-end by inserting temporary variables.
+* The front-end should correctly deal with multiple source files; pass
+  them all on the 'knit' command line.
+* Various fixes to reduce the memory footprint of the compiler.
+* Correctness and performance fixes in fusion, constant propagation,
+  and loop unrolling.
+
+streamit-snapshot-20030322
+--------------------------
+
+* 22 Mar 2003 snapshot release.
+* First StreamIt snapshot release.
