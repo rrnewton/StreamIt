@@ -1,0 +1,26 @@
+\section{Results}
+\label{sec:results}
+
+\begin{table*}[t]
+\begin{center}
+\scriptsize
+\begin{tabular}{|l|l||r||r|r|r||} \hline
+& & {\bf lines of} & {\bf Filters} &  {\bf Pipelines} & {\bf SplitJoins}\\
+{\bf Benchmark} & {\bf Description} & {\bf code} & {\bf (linear)} &
+ {\bf (linear)} & {\bf (linear)} \\
+\hline \hline
+%D2A & one-bit D to A oversampler and noise shaper &  200 \\ \hline 
+FilterBank & 3 band Filterbank & 147 & 27 (24) & 17 (9) & 4 (4)\\ \hline
+FIR & ? tap FIR & 90 & 3 (1) & 1 (0) & 0 (0)\\ \hline 
+Oversampler & one-bit D to A oversampler & 105 & 10 (8) & 1 (1) & 0 (0)\\ \hline 
+Radar & Radar array front-end\cite{pca} & 500 & 76 (60) & 17 (0) & 2 (0)\\ \hline 
+Radio & FM Radio with an equalizer & 245 & 26 (22) & 11 (9) & 2 (2)\\ \hline 
+RateConvert & Multirate filtering to change sampling rate & 117 & 5 (3) & 2 (1) & 0 (0)\\ \hline 
+Sort & 32 element bitonic sort & 260 & & & \\ \hline
+TargetDetect & Target detection & 185 & 10(4) & 6 (0) & 1 (0)\\ \hline 
+Vocoder & Channel vocoder with filterbank & 253 & 17 (13) & 10 (8) & 0 (0)\\ \hline 
+3GPP & 3GPP Radio Access Protocol & 606 & & & \\ \hline
+\hline
+\end{tabular}
+\end{center}
+\end{table*}
