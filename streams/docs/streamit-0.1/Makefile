@@ -1,3 +1,3 @@
 all:
-	latex report.tex; xdvi report.dvi
+	latex report.tex;
 
