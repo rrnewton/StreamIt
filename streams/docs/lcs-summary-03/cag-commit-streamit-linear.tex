@@ -30,124 +30,140 @@ More than fifty percent of the code that runs the Digital Signal Processors
 (DSPs) in a modern cell phone is written in assembly language and the 
 rest is written in annotated C\cite{gass-talk}. Clearly even the best 
 compilers that DSP companies can produce are utterly failing to produce
-optimizion necessary for programs that will run on the next generation
+the optimizion necessary for programs that will run the next generation
 of signal processors.
 
 The sheer volume of analysis required to make optimal use of the special 
 purpose instructions in DSPs leaves compilers for standard languages such 
-as C unable to perform many of the standard optimizations known to electrical 
-engineers. Using StreamIt~\cite{streamit-asplos,streamitcc}, a domain-specific 
-stream processing language, we have been exploring novel high-level automatic 
-DSP optimizations that are intractable in a general-purpose
-language.
+as C unable to perform most of the simplest optimizations taught to electrical 
+engineering students. Using StreamIt~\cite{streamitcc}, 
+a domain-specific stream processing language, we have been exploring
+high-level automatic DSP optimizations that are generally intractable 
+for a general-purpose language.
 
 \formatsection{Approach}
 Our analysis and optimizations focus on filters which compute {\it linear} 
-functions of their inputs. A filter computes a linear function if its
-the computation it does to convert input to output can be described by a 
-matrix operation. Many fundamental DSP operations such as filtering, the
-Discrete Fourier Transform (DFT), upsampling and downsampling, can be described 
-as linear functions. We have developed and implemented a simple dataflow 
-algorithm that can determine which filters in a StreamIt program compute 
-linear functions and the specific matrices which describe that computation.
-Figure~\ref{fig:overview} (top) shows a filter, and Figure~\ref{fig:overview}
-(bottom) shows how a matrix and a vector can be used to describe the same
-computation.
+functions of their inputs. A filter computes a linear function if
+the computation it does can be described by a vector-matrix operation. 
+Many fundamental DSP operations such as filtering, the Discrete Fourier 
+Transform (DFT), up sampling and downsampling, can be described 
+with vector-matrix operations. The foundation of this project is built on
+a simple dataflow algorithm that can determine which filters in a 
+StreamIt program perform linear computations and the specific matrices
+which describe that computation.
 
 \begin{figure}
-\center
-\begin{tabular}{cc}
-  \includegraphics[height=1in]{cag-commit-streamit-linear-filter.eps} &
-  \includegraphics[height=1in]{cag-commit-streamit-linear-matrix.eps} \\
-\end{tabular}
-\caption{
-  Top: StreamIt filter with I/O rates. 
-  Bottom: Linear filter as a vector-matrix operation.
-}
-\label{fig:overview}
+  \center
+  \begin{tabular}{cc}
+    \begin{minipage}{2.3in}
+      \includegraphics[height=1.5in]{cag-commit-streamit-linear-expand.eps} \\
+      \noindent
+      {\bf (a) Expanding rates to $(e', o', u')$.}
+    \end{minipage} &
+    \begin{minipage}{3.5in}
+      \includegraphics[height=1.5in]{cag-commit-streamit-linear-sjcombo.eps} \\
+      \noindent
+      {\bf (b) Combining a SplitJoin of linear sub streams.}
+    \end{minipage} \\
+  \end{tabular}
+  \caption{Graphical depictions of linear combination algorithms.}
+  \label{fig:cag-commit-streamit-linear-combo}
+  \vspace{-12pt}
 \end{figure}
 
 A primary benefit of linear filter analysis is that neighboring
 filters can be collapsed into a single matrix representation if both
-of the filters are linear.  This transformation automatically
-eliminates redundant computations in linear sections of the stream
-graph, thereby allowing the programmer to write simple, modular
-filters and leaving the combination to the compiler.  We have 
-developed algorithms for a {\it linear expansion} operation that serves as a
-building block for the combination techniques, collapsing {\tt pipeline}s 
-and {\tt splitjoin}s into linear nodes.
+of the filters are linear. Transformations such as this automatically
+eliminate redundant computations in linear sections of the stream
+graph. This automation allows programmers to write simple, modular 
+filters and leave complex combination and optimizations to the compiler.
+We have developed algorithms for a {\it linear expansion} operation 
+(Figure~\ref{fig:cag-commit-streamit-linear-combo} (a)), and for collapsing 
+{\tt pipeline}s and {\tt splitjoin}s into overall linear nodes
+(Figure~\ref{fig:cag-commit-streamit-linear-combo} (b)).
 
-To take advantage of our linear analysis framework, our compiler currently 
-has two linear analysis optimizations. The first, {\it linear replacement}, 
-replaces the largest possible linear sections of the program with filters 
-that directly compute the calculation specified by the corresponding 
-matrix representation. The second optimization, {\it frequency replacement}, 
-replaces all streams which implement a sufficiently long convolution sum
-using a standard frequency domain conversion.
-
+To take advantage of the linear analysis framework, our compiler
+has two linear analysis optimizations. The first, {\it linear replacement},
+replaces the largest possible linear sections of the program with filters
+that directly compute the corresponding vector-matrix product. 
+The second optimization, {\it frequency replacement}, replaces streams 
+which implement digital filtering using a standard conversion to the 
+frequency domain.
 
 \formatsection{Progress}
 We have developed a fully automatic implementation of the linear analysis 
 and optimizations as passes in the StreamIt compiler. Our preliminary results
 are very promising. In our suite of benchmark applications, our optimizations
 increased execution speed by an average factor of five, $6.5$ in the best 
-case. Figure~\ref{fig:cag-commit-streamit-linear-speedup} (left) shows
-the execution time increase for our benchmarks. The source of these impressive
-speedups is shown in Figure~\ref{fig:cag-commit-streamit-linear-speedup}
-(right). Both optimizations significantly reduce the number of floating point multiplications
-in the benchmarks. 
-
-XXXXXXXXXX
+case. Figure~\ref{fig:cag-commit-streamit-linear-speedup} (a) shows
+the execution time increase for our benchmarks. 
+Both optimizations significantly reduce the amount of computation required
+for each benchmarks, which is reflected by a reduction in the number of floating 
+point multiplications (Figure~\ref{fig:cag-commit-streamit-linear-speedup} (right)).
 
 \begin{figure}
   \center
   \begin{tabular}{cc}
-    \includegraphics[height=2in]{cag-commit-streamit-linear-speedup.eps} &
-    \includegraphics[height=2in]{cag-commit-streamit-linear-mults.eps} \\
+    \begin{minipage}{3.0in}
+      \includegraphics[height=2in]{cag-commit-streamit-linear-speedup.eps} \\
+      \noindent {\bf (a) Execution speedup for each of the benchmarks with both linear 
+	replacement and frequency replacement optimizations.}
+    \end{minipage} &
+    \begin{minipage}{3.0in}
+      \includegraphics[height=2in]{cag-commit-streamit-linear-mults.eps} \\
+      \noindent {\bf (b) Percent of multiplication operations remaining after performing 
+	linear replacement, frequency replacement, and both.}
+    \end{minipage}
   \end{tabular}
-  \caption{
-    Left: Execution speedup for each of the benchmarks with both linear 
-    replacement and frequency replacement optimizations.
-    Right: Percent of multiplication operations remaining after performing 
-    linear replacement, frequency replacement, and both.
-  }
+  \caption{Benchmark performance for linear optimizations.}
   \label{fig:cag-commit-streamit-linear-speedup}
+\vspace{-12pt}
 \end{figure}
 
-
-
+To determine if our automatic optimization could fully realize the maximum 
+theoretical savings possible using the frequency
+replacement optimization, we measured multiplication reduction as a function
+of both filter size and FFT size. The results predicted by theory are shown in
+Figure~\ref{fig:cag-commit-streamit-linear-freq} (a) and the results that
+we measured are shown in Figure~\ref{fig:cag-commit-streamit-linear-freq} (b).
 
 \formatsection{Future}
 For future research, we are developing new optimizations which make use
-of our Linear Analysis framework. For instance, we are investigating saving
-redundant partial results between filter executions in order to improve 
-program performace. This optimization is very much like standard common
-sub-expression eliminiation except that our optimization will remove common
-subexpressions that occur in subsequenct calls to the same function.
+of our linear analysis framework. For instance, we are investigating saving
+redundant partial results between filter executions. 
 
-Our current Linear Analysis framework requires that the only state
-filters are allowed to use is the input tape. However, recognizing state
-variables that are linear combinations of the input and previous state 
-variables would allow us to analyze many other classes of programs. This
-type of linear state is common in adaptive filters and in control 
-applications.
+We are considering expanding our framework to capture
+more information about linear computations. Recognizing state variables 
+that are linear combinations of the input and previous state would 
+allow us to analyze wider range of programs such as adaptive filters 
+and in control applications.
+Another way to extend the framework is to add support for symbolic array entries.
+Symbolic entries would allow us to use out current optimizations with
+programs that are updated rarely within the program's execution.
 
-Another area of potential research is in working with symbolic arrays. 
-Currently, our analysis can only extract arrays with constant valued
-entries. However, some applications actually perform linear operations
-at runtime, but the values of the corresponding matrix are not compile
-time constants. We can extend our framework to allow this sort of filter.
-This type of analysis would allow, for instance, an FIR filter whose 
-coefficients changed at runtime but at infrequent intervals. With an
-updated framework we could still do the frequency transformation, and
-we would know the approprate ways to updated the frequency coefficients
-at runtime.
-
-Additionally, we are planning on using the linearity information our
+Finally, we are planning on using the linearity information our
 analysis extracts to make more informed decisions in other parts of the compiler.
 For instance,  the StreamIt compiler is going to be extended to target 
 a DSP architecture and we can make use of the linear information to 
 take advantage of the specialized instructions that DSPs offer.
+
+\begin{figure}
+  \center
+  \begin{tabular}{cc}
+    \begin{minipage}{3.0in}
+      {\center \includegraphics[height=2in]{cag-commit-streamit-linear-freq-theory.eps}} \\
+      \noindent {\bf (a) Theoretical multiplication reduction.}
+    \end{minipage} &
+    \begin{minipage}{3.0in}
+      {\center \includegraphics[height=2in]{cag-commit-streamit-linear-freq-measure.eps}} \\
+      \noindent {\bf (b) Measured multiplication reduction.}
+    \end{minipage}
+  \end{tabular}
+  \caption{Theoretical vs. Empirical multiplication reduction.}
+  \label{fig:cag-commit-streamit-linear-freq}
+  \vspace{-12pt}
+\end{figure}
+
 
 
 \formatsection{Research Support}
