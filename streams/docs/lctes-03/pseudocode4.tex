@@ -19,8 +19,8 @@ Phase[] phasedSchedule (Stream s, int maxPhases, int mode) {
   phases = {}
   do {
     phases = phases o pushSchedule(s)
-  } until {each node of s has fired all its init phases    (if mode==INIT)
-           each node of s has completed its steady state   (if mode==STEADY) }
+  } loop until {each node of s has fired all its init phases    (if mode==INIT)
+                each node of s has completed its steady state   (if mode==STEADY) }
   // combine into <maxPhases> groups, with contents sorted by child stream
   size = ceil(phases.length / maxPhases)
   forall i in [0, min(phases.length, maxPhases) - 1] {
