@@ -224,8 +224,31 @@ A - FJ - BODY - FS - ->
 We have to be careful when defining the transfer functions for
 feedback loops (see Figure {\ref:looplabel}).  The feedback splitter
 $FS$ serves as a normal splitter, and has the same $min$ and $max$
-functions as defined above.  However, the feedback joiner $FJ$, even
-though it functions like a normal joiner, 
+functions as defined above.  However, the feedback joiner $FJ$ is
+slightly different than a standard joiner, since on starting up it
+fabricates values from the loop body before they appear on the input
+tape.  The transfer function must take special count of these initial
+values, since they are not included in the count of the number of
+items on the input tape from the loop body.
+
+Recall that if the feedback loop specifies a wavefront latency of $n$,
+then $n$ initial values are provided to the feedback joiner before
+values from the feedback loop are read.  Assume that the round robin
+feedback joiner first draws from the data stream $I1_J$, and then from
+the feedback loop $I2_J$.  The $min$ function for the main stream is
+as before:
+\begin{eqnarray*}
+\mi{I1_J}{O_J}(x) = ceil(x/2) \\
+\end{eqnarray*}
+However, the equation must include the initial $n$ values for the
+$min$ function of the loop:
+\begin{eqnarray*}
+\mi{I2_J}{O_J}(x) = floor((x+n)/2) 
+\end{eqnarray*}
+The $max$ function must be similarly shifted for the input from the loop:
+\begin{eqnarray*}
+\ma{(I1_J, I2_J)}{O_J}(x_1, x_2) = max(2*x_1-1, 2*(x_2+n))
+\end{eqnarray*}
 
 \subsection{Formulating Constraints}
 
