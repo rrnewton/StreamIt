@@ -41,7 +41,7 @@ computation to be performed at an appropriate level and the compiler takes care 
 \center
 \epsfxsize=2.0in
 \epsfbox{images/motivating-example.eps}
-
+\scriptsize
 \begin{verbatim}
 float data[N]; /* input data buffer */
 float buffer[N]; /* inter-filter buffer */
@@ -76,6 +76,7 @@ standard compiler analysis and optimization techniques because of its use of cir
 buffers and the muddled relationship between {\tt data}, {\tt buffer} and the output.
 
 \begin{figure}
+\scriptsize
 \begin{verbatim}
 float->float pipeline TwoPipe {
   add FIRFilter(weights1);
@@ -104,6 +105,7 @@ block diagram.
 
 
 \begin{figure}
+\scriptsize
 \begin{verbatim}
 float->float filter LinearTwoPipe() {
   work push 1 pop 1 peek N {
@@ -126,6 +128,7 @@ in Figure~\ref{fig:example-combine}. The new combined filter's {\tt combined\_we
 array contains elements such that the overall output is the same.
 
 \begin{figure}
+\scriptsize
 \begin{verbatim}
 float->float filter FreqTwoPipe() {
   complex[N] H;

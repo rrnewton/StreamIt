@@ -58,7 +58,7 @@ real world applications. We settled on the following set of six.
 
 \begin{figure}
 \center
-\epsfxsize=3.0in
+\epsfxsize=3.2in
 \epsfbox{images/frequency-win-theory.eps}
 \caption{Plot showing the theoretical multiplication reduction factor as a function of the size of the FIR ($M$) and the number of outputs produced ($N$). The dark regions denote an increase in the required number of multiplications.}
 \label{fig:frequency-win-theory}
@@ -83,20 +83,21 @@ multiplication savings factor per output.
 
 \begin{figure}
 \center
-\epsfxsize=3.0in
+\epsfxsize=3.2in
 \epsfbox{images/frequency-win-empirical.eps}
 \caption{Plot showing the empirically measured multiplication reduction factor as a function of the size of the FIR ($M$) and the number of outputs produced ($N$). The dark regions denote an increase in the required number of multiplications.}
 \label{fig:frequency-win-empirical}
 \vspace{-12pt}
 \end{figure}
 
-
 Our experimental results have the same shape, however we don't get the same
 speedup because of constant factors hidden by the assymptotic notation. For instance,
 elementwise multiplication of the complex values in $H[k]$ and $X[k]$ require
 four floating point operations for a straightforward implementation.
 
-\subsection{Algebraic Simplification from Combination}
+
+
+\subsection{Simplificaton from Combination}
 Linear analysis is valuable because it provides a precise relationship between input and output   
 that are impossible for normal compilers to discern from imperative programs. By 
 combining the actions of StreamIt structures we can do optimizations that are 
@@ -143,21 +144,38 @@ will only necessitate a recompile rather than a manual redesign.
 
 \begin{figure}
 \center
-\epsfxsize=3.0in
+\epsfxsize=3.2in
+\epsfbox{images/overlap-add-savings.eps}
+\caption{Multiplication savings from using the overlap and add method compared to overlap and discard method.}
+\label{fig:overlap-add-savings}
+\vspace{-12pt}
+\end{figure}
+
+Figure~\ref{fig:overlap-add-savings} shows the required computation differences for
+the overlap-add method and the overlap-discard method. 
+In all cases, the overlap-add method performs better than the overlap-discard method.
+The performance difference declines as the number of outputs($N$) increases because
+the ratio of the amount of data discarded by the overlap-discard method to the 
+amount of data produced grows smaller. 
+
+
+
+
+\begin{figure}
+\center
+\epsfxsize=3.2in
 \epsfbox{images/linear-freq-both.eps}
 \caption{Multiplication reduction factors for each of the benchmarks with linear replacement, frequency replacement, and both.}
 \label{fig:linear-freq-both}
+\vspace{-12pt}
 \end{figure}
 
 To determine the effects of our linear replacement and frequency replacement 
 optimizations, we compiled each benchmark with the linear 
-replacement, stupid frequency replacement, smart frequency replacement,
-and with linear replacement followed by smart frequency replacement. 
+replacement, frequency replacement (overlap-add),
+and with linear replacement followed by frequency replacement. 
 Figure~\ref{fig:linear-freq-both} shows the multiplication reduction factor 
 achieved for each set of optimizations.
-
-In all cases, the smart frequency replacement performs much
-better than the naive one.
 
 For the FIR filter, all of the multiplication reduction comes from the frequency
 replacement optimization because the entire application is comprised of a single
