@@ -1,10 +1,10 @@
 \section{Trace Extraction}
 \label{sec:extraction}	
 Trace extraction refers to the process of assigning each filter of the
-stream graph to a trace.  As stated above, a trace is a contiguous
-section of the stream graph that is scheduled for execution as a
-group. The trace will occupy a portion of the chip as it executes and
-then be swapped out when it completes execution.  Each filter in the
+stream graph to a trace.  As stated previously, a trace is a
+contiguous section of the stream graph that is scheduled for execution
+as a group. Each trace occupies a portion of the chip as it executes
+and is swapped out when it completes execution.  Each filter in the
 stream graph is a member of exactly one trace.
 
 Our initial algorithm for trace extraction is rather straightforward
@@ -43,24 +43,24 @@ workload that is within 80-125\% of the workload of the first filter
 of the trace.
 
 After the trace extraction stage, we can build a {\it trace graph}
-where nodes of the graph represent traces and an edge between $n$ and
-$m$ denotes that a channel exists between the last filter of trace $n$
-and the first filter of trace $m$. This graph describes the flow of data
-between traces and is used by subsequent passes.
+where nodes of the graph represent traces and an edge between $t_1$
+and $t_2$ denotes that a channel exists between the last filter of
+trace $t_1$ and the first filter of trace $t_2$. This graph describes
+the flow of data between traces and is used by subsequent passes.
 
 \section{Trace Scheduling}
 \label{sec:scheduling}
-In the trace scheduling pass of our compiler, we calculate a relative
+In the trace scheduling pass of the compiler, we calculate a relative
 execution ordering of the traces and assign each filter of each trace
 to a tile on the Raw chip.  The current implementation of the trace
 scheduling pass implements a modified list scheduler. The scheduler
 attempts to optimize for occupancy and chip utilization.  At each
-iteration, the scheduler will traverse the list until it finds a trace
-to schedule, if it cannot, the current time will be incremented.  The
+iteration, the scheduler traverses the list until it finds a trace to
+schedule; if it cannot, the current time is incremented.  The
 scheduler maintains a block reservation table with entries for each
 tile of the Raw chip.  The reservation table stores the next cycle in
 which the tile is available for the assignment of a filter.  At the
-end of the trace scheduling phase we will have an execution ordering of
+end of the trace scheduling phase we have an execution ordering of
 traces and for each tile, an ordered list of the filters that execute
 on it, each filter from a different trace. Note that the linear
 ordering of traces calculated does not preclude the parallel execution
@@ -70,36 +70,36 @@ to their neighbors through distinct memory modules.
 The scheduler begins by ordering the traces based on a given priority
 function, ignoring the data-flow dependencies inherent in the stream
 graph.  It then attempts to schedule the traces in order of decreasing
-priority.  When attempting to schedule a trace, the scheduler will
-check if the trace can be legally scheduled at this time (see Section
+priority.  When attempting to schedule a trace, the scheduler checks
+if the trace can be legally scheduled at this time (see Section
 \ref{sec:softpipe}) and attempt to find a set of tiles for which to
 assign the filters of this trace. If the trace is currently
 schedulable, update the reservation table entry for each tile assigned
 by adding the work estimation for the filter assigned to the tile to
-the current schedule time. Then remove the trace from the list.
-If the current trace cannot be scheduled, attempt to schedule the next
-trace in the list and so on.  If no trace can be scheduled, increment the
-current time to the earliest time that a busy tile will become
+the current schedule time. Then remove the trace from the list.  If
+the current trace cannot be scheduled, attempt to schedule the next
+trace in the list and so on.  If no trace can be scheduled, increment
+the current time to the earliest time that a busy tile will become
 available.
 
-When trying to schedule a trace, the scheduler will exhaustively
-search the chip for a possible layout, using the first legal layout
+When trying to schedule a trace, the scheduler exhaustively searches
+the chip for a possible layout, using the first legal layout
 encountered. Of course, at the current scheduling time-step, the
 scheduler may not be able to find tile assignments for the filters of
-the trace due to the lack of free (non-busy) tiles.  It will then move
-on to the next trace in the list. In the current version of the
-backend, each trace is composed of a pipeline of filters and each
-filter must be directly connected to its downstream consumer filter.
-Again, the endpoints of traces must be assigned to the border tiles of
-the chip.  There are numerous tile assignment heuristics that are
-included in the current version of the compiler, but their discussion
-will provide little benefit to the reader.
+the trace due to the lack of free (non-busy) tiles.  It then moves on
+to the next trace in the list. In the current version of the backend,
+each trace is composed of a pipeline of filters and each filter must
+be directly connected to its downstream consumer filter.  Again, the
+endpoints of traces must be assigned to the border tiles of the chip.
+There are numerous tile assignment heuristics that are included in the
+current version of the compiler, but their discussion would provide
+little benefit to the reader.
 
 For the performance results in Section \ref{sec:results}, we use the
 {\it bottleneck workload} of each trace as the priority function of
 the scheduler. The bottleneck workload for a trace is defined to be
 the maximum work estimation of the filters that compose the trace.
-This priority function was not chosen arbitrarily, we initially tried
+This priority function was not chosen arbitrarily; we initially tried
 multiple orderings including a height-based priority function and a
 communication-based priority function.
 % and priority functions that
