@@ -3,7 +3,7 @@ Options to the StreamIt 'knit' Compiler Script
 
 This is for the March 14, 2003 snapshot release (streamit-0.0.20030314).
 
-$Id: OPTIONS,v 1.3 2003-03-14 22:19:44 thies Exp $
+$Id: OPTIONS,v 1.4 2003-03-19 19:26:55 dmaze Exp $
 
 
 Basic usage:
@@ -74,6 +74,11 @@ Options available for all backends:
       Specify loop unrolling limit.
 
 Options specific to RAW backend:
+
+  --numbers <n>, -N<n>
+      Instrument code to gather performance statistics on simulated
+      code over <n> stady-state cycles.  The results are placed in
+      results.out in the current directory.
 
   --partition, -a
       Partition the stream graph, performing either filter fission or
