@@ -22,25 +22,18 @@ medium priority
 high priority
 -------------
 
-- fix abstract
-- typeset the pseudocode, and split into different figures
 - related work
   - go through ptolemy directory on cag and see which papers are relevant
   - also check p. 14 of bhatty's file
   - add the APGAN/mincut paper to related work
+- reference the splitjoin example figure
+  - work in the new example
+- intuitive explanation of algorithm is confusing
 - check latex compilation errors
 - layout
 - spelling
 
-- fix the bibliography - especially some things that are completely
-missing journal names.  (comparison of synchronou s and cyclostatic
-dataflow; buffer merging; static scheduling of synchronous dataflow
-graphs; cyclo-dynamic dtaflow; minimizing buffer requirements under
-rate-optimal schedule; analyzing the realtime requireements; synthesis
-of embedded software
-
-- intuitive explanation of algorithm is confusing
-- the sqrt instead of \infty thing for calling pipeline sinks (need to understand this)
-
-----
+karczma:
+- typeset the pseudocode, and split into different figures
+- fix the bibliography
 

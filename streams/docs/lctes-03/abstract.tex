@@ -1,19 +1,39 @@
+As embedded DSP applications become more complex, it is increasingly
+important to provide high-level stream abstractions that can be
+compiled without sacrificing efficiency.  In this paper, we describe
+scheduler support for StreamIt: a high-level language for signal
+processing applications.  A StreamIt program consists of a set of
+autonomous filters that communicate with each other via FIFO queues.
+As in Synchronous Dataflow (SDF), the input and output rates of each
+filter are known at compile time.  However, unlike SDF, the stream
+graph is represented using hierarchical structures, each of which has
+a single input and a single output.
 
+We describe a scheduling algorithm that leverages the structure of
+StreamIt to provide a flexible tradeoff between code size and buffer
+size.  The algorithm describes the execution of each hierarchical unit
+as a set of phases.  A complete cycle through the phases represents a
+single steady-state execution.  By varying the granularity of a phase,
+our algorithm provides a continuum between single appearance schedules
+and minimum latency schedules.  We demonstrate that a minimal latency
+schedule is effective in decreasing buffer requirements for some
+applications, while the phased representation mitigates the associated
+increase in code size.
 
-Applications structured around some notion of a ``stream'' are
-becoming increasingly important and widespread. \cite{Rix98} provides
-evidence that streaming media applications are already consuming most
-of the cycles on consumer machines, and their use is continuing to
-grow. The streaming computation model is pervasive and ranges from
-small, embedded systems (ex. cell phones) to large, computationally
-powerful machines (ex. cell base stations). In this paper, we describe
-a novel technique for scheduling execution of synchronous data flow
-streaming applications exhibiting hierarchical properties. A vital
-aspect in compiling such programs is finding an efficient
-schedule. The technique presented here focuses on producing schedules
-that are optimized for the amount of space required for buffering and
-storing the schedule. A wide variety of real-life applications and a
-few synthetic applications are surveyed. Applications benefit from an
-average 14.5\% decrease in buffer requirements, with a peak of 93\%
-savings in buffer size. No application requires more space than the
-most popular technique used today (Single Appearance Scheduling).
+%% Applications structured around some notion of a ``stream'' are
+%% becoming increasingly important and widespread. \cite{Rix98} provides
+%% evidence that streaming media applications are already consuming most
+%% of the cycles on consumer machines, and their use is continuing to
+%% grow. The streaming computation model is pervasive and ranges from
+%% small, embedded systems (ex. cell phones) to large, computationally
+%% powerful machines (ex. cell base stations). In this paper, we describe
+%% a novel technique for scheduling execution of synchronous data flow
+%% streaming applications exhibiting hierarchical properties. A vital
+%% aspect in compiling such programs is finding an efficient
+%% schedule. The technique presented here focuses on producing schedules
+%% that are optimized for the amount of space required for buffering and
+%% storing the schedule. A wide variety of real-life applications and a
+%% few synthetic applications are surveyed. Applications benefit from an
+%% average 14.5\% decrease in buffer requirements, with a peak of 93\%
+%% savings in buffer size. No application requires more space than the
+%% most popular technique used today (Single Appearance Scheduling).
