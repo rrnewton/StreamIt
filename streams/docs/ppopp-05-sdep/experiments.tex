@@ -69,11 +69,11 @@ can only execute as many iterations as allowed by a
 schedules the exchange  of credits between actors when it derives an
 execution of the stream graph. Our communication layer guarantees that
 messages are received before credits and hence processed during the
-appropriate execution.
+appropriate execution step.
 For messages sent downstream with zero or positive latencies, we
 do not use the credit system, and assume that the messages arrive as fast or
 faster than the data items exchanged between the two actors. This
-assumption is reasonable since a downstream filter can not get too far
+assumption is reasonable since a downstream filter can not get 
 ahead of an upstream actor.
 
                                                                                                      
