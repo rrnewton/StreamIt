@@ -223,9 +223,9 @@ algorithm that only performs beneficial transformations (see
 Section~\ref{sec:partitioning}).
 
 \begin{figure}[t]
-\center
-\epsfxsize=3.2in
-\epsfbox{images/example-pipeline-combination.eps}
+\begin{center}
+\psfig{figure=images/example-pipeline-combination.eps,width=3.2in}
+\end{center}
 \vspace{-6pt}
 \caption{Pipeline combination example.}
 \label{fig:example-pipeline-combination}
@@ -268,15 +268,6 @@ by wrapping them in a hierarchical splitjoin and then collapsing the
 wrapper completely.  Our technique also assumes that each 
 splitjoin admits a valid steady-state schedule; this property is
 verified by the StreamIt semantic checker.
-
-\begin{figure}[t]
-\center
-\epsfxsize=3.2in
-\epsfbox{images/splitjoin-combination.eps}
-\caption{Matrix resulting from combining a splitjoin of rate matched sub streams.
-\protect\label{fig:splitjoin-duplicate-matrix}}
-\vspace{-12pt}
-\end{figure}
 
 Our analysis distinguishes between two cases. For duplicate splitters,
 we directly construct a linear node from the child streams.  For
@@ -355,6 +346,15 @@ a factor of $\mt{rep}_k$, with the peek value set to the maximum peek
 across all of the expanded children.  Following the expansion, each
 $\lambda_i^e$ has the same number of rows, as the peek uniformization
 caused shorter matrices to be padded with rows of zero's at the top.
+
+\begin{figure}[t]
+\center
+\epsfxsize=3.2in
+\epsfbox{images/splitjoin-combination.eps}
+\caption{Matrix resulting from combining a splitjoin of rate matched sub streams.
+\protect\label{fig:splitjoin-duplicate-matrix}}
+\vspace{-12pt}
+\end{figure}
 
 The final phase of the transformation is to re-arrange the columns of
 the child matrices into the columns of $A'$ and $\vec{b}'$ such that

@@ -1,12 +1,12 @@
 \begin{algorithm}[t]
 \caption{Linear extraction analysis.\protect\label{alg:dataflow}}
-proc {\bf Toplevel}(filter $F$) returns linear node for $F$
+proc {\bf Toplevel}(filter $F$) returns linear node for $F$ \vspace{-4pt}
 \begin{enumerate}
-\item Set globals Peek, Pop, Push to I/O rates of filter $F$.
-\item Let $A_{0} \leftarrow \mbox{new float[Peek, Push] with each entry =~} \bot$
-\item Let ${\vec b_{0}} \leftarrow \mbox{new float[Push] with each entry =~} \bot$
-\item $(\mt{map}, A, {\vec b}, \mt{popcount}, \mt{pushcount}) \leftarrow$ \\
-\verb+      +{\bf Extract}$(F_{work}, (\lambda x . \bot), A_{0}, {\vec b_{0}}, 0, 0)$
+\item Set globals Peek, Pop, Push to I/O rates of filter $F$. \vspace{-4pt}
+\item Let $A_{0} \leftarrow \mbox{new float[Peek, Push] with each entry =~} \bot$ \vspace{-14pt}
+\item Let ${\vec b_{0}} \leftarrow \mbox{new float[Push] with each entry =~} \bot$ \vspace{-6pt}
+\item $(\mt{map}, A, {\vec b}, \mt{popcount}, \mt{pushcount}) \leftarrow$ \\ 
+\verb+      +{\bf Extract}$(F_{work}, (\lambda x . \bot), A_{0}, {\vec b_{0}}, 0, 0)$ \vspace{-6pt}
 \item {\bf if} $A$ and ${\vec b}$ contain no $\top$ or $\bot$ entries {\bf then} \\
 \verb+ + return linear node $\lambda = \{A, {\vec b}, \mbox{Peek}, \mbox{Pop}, \mbox{Push}\}$ \\
  {\bf else} \\

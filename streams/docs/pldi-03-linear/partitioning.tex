@@ -81,10 +81,10 @@ time, using dynamic programming.
 
 \begin{figure}[t]
 \psfig{figure=images/part-algorithm2.eps,width=3.5in}
-  \vspace{-14pt}
+  \vspace{-16pt}
   \caption{Type declarations for code in Figure~\ref{fig:part-alg}.
   \protect\label{fig:part-decl}}
-  \vspace{-18pt}
+  \vspace{-19pt}
 \end{figure}
 
 \begin{figure}[t]
@@ -152,7 +152,6 @@ $s$):
 % trial and error with the ~, can't get it to move over :(
 \mt{dec}(s) = (o-1) * (100 + 4 * u) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 \]
-\clearpage
 
 For the direct cost, we consider the cost to be infinite for
 splitjoins with roundrobin splitters.  This is because the splitjoin
@@ -163,8 +162,10 @@ other streams, we count the number of multiplies and adds required to
 perform the matrix multiplication, giving more weight to the
 multiplies since they are more expensive.  We do not count the zero
 entries of the arrays, since our matrix multiply routines take
-advantage of the sparsity of the matrix.  We add $100+2u$ to all costs
-in order to represent the overhead of the node's execution.
+advantage of the sparsity of the matrix.  
+\clearpage
+We add $100+2u$ to all costs in order to represent the overhead of the
+node's execution.
 
 For the frequency cost, our cost curve is guided by profiler feedback.
 The speedup gained by translating to the frequency domain depends on
