@@ -41,23 +41,26 @@ and Saman Amarasinghe\\
 \newcommand{\mi}[2]{min_{#1 \leftarrow #2}}
 \newcommand{\floor}[2]{\left\lfloor\frac{#1}{#2}\right\rfloor}
 \newcommand{\ceil}[2]{\left\lceil\frac{#1}{#2}\right\rceil}
+\newcommand{\ra}[0]{\rightarrow}
+
 \newtheorem{definition}{Definition}
 \newtheorem{theorem}{Theorem}
-
-\newcommand{\ra}[0]{\rightarrow}
 
 \maketitle
 
 \begin{abstract}
-%\input{abstract.tex}
+\input{abstract}
 \end{abstract}
 
-%\input{intro.tex}
-%\input{language.tex}
-\input{model.tex}
-\input{scheduler.tex}
-%\input{related.tex}
-%\input{conclusion.tex}
-%\bibliographystyle{abbrv}
-%\bibliography{references}
+\input{intro}
+\input{language}
+\input{model}
+\input{optimization}
+\input{scheduler}
+\input{implementation}
+\input{results}
+\input{related}
+\input{conclusion}
+\bibliographystyle{abbrv}
+\bibliography{references}
 \end{document}
