@@ -1,25 +1,3 @@
-\begin{figure}[t]
-\begin{center}
-\begin{minipage}{0.46in}
-\centering
-\psfig{figure=pipeline.eps,width=0.46in} \\
-\end{minipage} 
-~
-\begin{minipage}{1.3in}
-\centering
-\psfig{figure=splitjoin.eps,width=1.3in} \\
-\end{minipage}
-~
-\begin{minipage}{1.02in}
-\centering
-\psfig{figure=feedback.eps,width=1.02in} \\
-\end{minipage} 
-\\ ~ \\ {\bf \protect\small (a) A pipeline. ~~(b) A splitjoin. ~~(c) A feedbackloop.}
-\caption{\protect\small Stream structures supported by StreamIt.
-\protect\label{fig:structures}}
-\end{center}
-\end{figure}
-
 \section{The StreamIt Language}
 \label{sec:streamit}
 
@@ -78,6 +56,28 @@ stream graph: the feedbackloop.  Due to space constraints, we omit a
 detailed discussion of the feedbackloop. From now on, we use the word
 {\it stream} to refer to any instance of a filter, pipeline,
 splitjoin, or feedbackloop.
+
+\begin{figure}[t]
+\begin{center}
+\begin{minipage}{0.46in}
+\centering
+\psfig{figure=pipeline.eps,width=0.46in} \\
+\end{minipage} 
+~
+\begin{minipage}{1.3in}
+\centering
+\psfig{figure=splitjoin.eps,width=1.3in} \\
+\end{minipage}
+~
+\begin{minipage}{1.02in}
+\centering
+\psfig{figure=feedback.eps,width=1.02in} \\
+\end{minipage} 
+\\ ~ \\ {\bf \protect\small (a) A pipeline. ~~(b) A splitjoin. ~~(c) A feedbackloop.}
+\caption{\protect\small Stream structures supported by StreamIt.
+\protect\label{fig:structures}}
+\end{center}
+\end{figure}
 
 \subsection{Linear Filters}
 One far-reaching goal of the StreamIt project is to incorporate the
