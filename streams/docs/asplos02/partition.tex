@@ -123,18 +123,16 @@ value on the partitioning phase of a stream compiler.
 \begin{figure}[t]
 \vspace{-6pt}
 \begin{minipage}{3.1in}
-\psfig{figure=orig-blood.eps,width=1.7in}
+\psfig{figure=beam-blood-orig.eps,width=3in}
 \vspace{-12pt}
-\caption{\protect\small Blocking diagram for the naive partitioning of
- FM Radio.
+\caption{\protect\small Blocking diagram for BeamFormer before load balancing.
 \protect\label{fig:fmblood1}}
 \end{minipage}
 \hspace{0.3in}
 \vspace{-12pt}
 \begin{minipage}{3.1in}
-\psfig{figure=adjust-2-blood.eps,width=3in}
-\caption{\protect\small Blocking diagram for the optimized
-partitioning of FM Radio.
+\psfig{figure=beam-blood-opt.eps,width=3in}
+\caption{\protect\small Blocking diagram for the load-balanced partitioning of BeamFormer.
 \protect\label{fig:fmblood2}}
 \end{minipage}
 \vspace{-6pt}
@@ -149,20 +147,22 @@ intensive filters can be split, and less demanding filters can be
 fused.  Currently, the decision of which transformations to apply is
 done by hand, but the transformations themselves are fully automated.
 
-We return to our software radio example to illustrate the partitioning
-process.  Figure~\ref{fig:fmblood1} illustrates a blocking diagram for
-the original partitioning of the radio (which appears in
-Figure~\ref{fig:radio-ascoded}).  The dark bands indicate where a processor is
-waiting to send or receive an item, while the light areas indicate
-periods of useful work.  With the filters partitioned in the original
-configuration, most of the processors spend their time waiting for the
-input from the first LowPassFilter.
-
-Figure~\ref{fig:?2} illustrates a sequence of transformations that
-improve the load balancing for the radio, resulting in the blocking
-diagram shown in Figure~\ref{fig:fmblood2}.  \todo{Describe the
-transformations} In the following sections, we describe these
-transformations in more detail.
+We use the BeamFormer application \cite{pca} to illustrate the
+partitioning process (see Section~\ref{sec:results} for more
+information about the BeamFormer).  Figure~\ref{fig:fmblood1}
+illustrates a blocking diagram for the original partitioning of the
+application.  The dark bands indicate where a processor is waiting to
+send or receive an item, while the light areas indicate periods of
+useful work.  With the filters partitioned in the original
+configuration, most of the processors spend their time waiting on two
+filters in the stream (they each block a path of a SplitJoin).  The
+StreamIt compiler performs four vertical fusion transformations and
+two four-way horizontal fission transformations to split up the
+computationally-intensive nodes while combining the less demanding
+nodes.  The resulting blocking diagram appears in
+Figure~\ref{fig:fmblood2}, illustrating approximately four times as
+much processor utilization as the original.  In the following
+sections, we describe these transformations in more detail.
 
 % note that sometimes you have to fuse and then later fizz, if you
 % want partial multiplication of a given work function
