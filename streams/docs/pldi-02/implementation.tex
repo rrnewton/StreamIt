@@ -30,6 +30,29 @@ A performance test from the SpectrumWare system \cite{spectrumware}.
 
 [add performance table, number of lines of benchmarks?, discussion]
 
+\begin{table}[t]
+\begin{center}
+\scriptsize
+\begin{tabular}{|l|r|r|r|} \hline
+Benchmark       & Lines   & Filters & Graph Size\\
+\hline \hline
+GSM Decoder      & 3050       & 11  & 21 \\
+\hline
+PCA Demo & 484 & 5 & 7\\
+\hline
+FM Radio & 411 & 5 & 27\\
+\hline
+perftest4 & 347 & 5 & 20\\
+\hline
+\end{tabular}
+\vspace{-6pt}
+\caption{\protect\small Benchmark characteristics}
+\label{tab:benchmarks}
+\end{center}
+\end{table}
+
+
+
 %% \subsection{GSM Decoder}
 
 %%   The decoder portion of the Streamit GSM Vocoder takes GSM encoded
@@ -49,3 +72,24 @@ A performance test from the SpectrumWare system \cite{spectrumware}.
 
 %% This application is representative of the core functionality needed by
 %% modern radar, sonar, and communications signal processors.
+
+\begin{table}[t]
+\begin{center}
+\scriptsize
+\begin{tabular}{|l|r|r|r|} \hline
+Benchmark       & Baseline & Fusion & SpectrumWare \\
+\hline \hline
+GSM Decoder      & & & \\
+\hline
+PCA Demo &  &  & 1.7\\
+\hline
+FM Radio &  &  & 9.9\\
+\hline
+perftest4 &  &  & 320\\
+\hline
+\end{tabular}
+\vspace{-6pt}
+\caption{\protect\small Performance Results (in $\mu$sec/output)}
+\label{tab:benchmarks}
+\end{center}
+\end{table}
