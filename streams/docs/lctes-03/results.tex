@@ -1,15 +1,12 @@
 \section{Results}
 \label{chpt:results}
 
-This section presents results of creating schedules using
-techniques described in Sections \ref{chpt:hierarchical} and
-\ref{chpt:phased}.
+This section presents results of creating schedules using the
+technique described in Section \ref{chpt:phased}.  Section
+\ref{sec:results:apps} presents the applications used for evaluation.
+Section \ref{sec:results:results} presents the results and analysis.
 
-Section \ref{sec:results:apps} presents the applications used for
-testing.  Section \ref{sec:results:results} presents the results and
-analysis.
-
-\subsection{Applications}
+\subsection{Benchmarks}
 \label{sec:results:apps}
 
 Our benchmark suite contains 17 applications. Out of those
@@ -18,43 +15,42 @@ real-life applications, while two were chosen to highlight the
 effectiveness of phased scheduling.
 
 SJPeek1024 and SJPeek31 are synthetic benchmarks, designed to
-highlight strengths of phased schedules. SJPeek1024 requires an
-initialization schedule which benefits from finer granularity of
-minimum latency schedule. SJPeek31 contains a push/pop mismatch
-which causes a combinatorial blow-up using SAS.
+highlight the strengths of phased schedules. SJPeek1024 requires an
+initialization schedule which benefits from the finer granularity of
+minimum latency scheduling. SJPeek31 contains a push/pop mismatch
+which causes a combinatorial blow-up using single appearance
+scheduling.
 
-Nine test applications (BitonicSort, FFT, FilterBank, FIR, Radio,
-GSM, 3GPP, Radar and Vocoder) are applications used in
-\cite{Gordo02}. BitonicSort performs a 32 element bitonic sort.
-FFT performs a 64-element FFT, FilterBank is an 8 channel filter
-bank.  FIR is a 64-tap FIR application. Radio is an FM radio
-decoder with an equalizer.  3GPP is a 3GPP Radio Access Protocol
-application. Radar is a radar array front-end application. Vocoder
-is a 28 channel Vocoder.
+Nine test applications (BitonicSort, FFT, FilterBank, FIR, Radio, GSM,
+3GPP, Radar and Vocoder) are applications used in
+\cite{Gordo02}. BitonicSort performs a 32 element bitonic sort; FFT
+performs a 64-element FFT; FilterBank is an 8 channel filter bank; FIR
+is a 64-tap fine-grained FIR filter; Radio is an FM radio decoder with
+an equalizer; 3GPP is a 3GPP Radio Access Protocol application; Radar
+is a radar array front-end application with beamforming; Vocoder is a
+28 channel Vocoder.
 
 Two test applications (QMF and CD-DAT) are applications used in
 another publication on scheduling streaming applications
-(\cite{murthy99buffer}). QMF is a filter bank application. CD-DAT
-is a sample rate conversion application. The code inside of the
-{\filters} has not been implemented. QMF application is a
-qmf12\_3d.  It was slightly modified to account for {\StreamIt}
-{\splitters} and {\joiners} not allowing any computation. The
-high-pass and low-pass filtering in the {\splitters} has been
-moved to just after data has been separated into two channels. The
-re-combining of data in the {\joiners} has been moved to a
-{\filter} just after the {\joiners}. The low and high pass filters
-have also been given a peek amount of 16 so they can perform their
-function in the way intended in {\StreamIt}.
- CD-DAT is exactly the same application as
-that described in \cite{murthy99buffer}.
+(\cite{murthy99buffer}). QMF is a filter bank application. CD-DAT is a
+sample rate conversion application. The code inside of the {\filters}
+has not been implemented. QMF is a filter bank application which uses
+a 1/2-1/2 split for the spectrum up to a depth of 3 (qmf12\_3d
+in~\cite{murthy99buffer}).  It was slightly modified to use
+{\StreamIt}'s pre-defined {\splitter} and {\joiner} constructs.  The
+high-pass and low-pass filtering in multiple-output blocks has been
+converted to a splitter followed by filters on each of the output
+channels. The low and highb pass filters have also been given a peek
+amount of 16 so they can perform their function in the way intended in
+{\StreamIt}.  CD-DAT is exactly the same application as that described
+in \cite{murthy99buffer}.
 
-The remaining 4 applications were chosen from our sample
-applications used for testing the StreamIt compiler. HDTV performs
-a HDTV signal decoding/encoding. CFAR implements PCA Constant
-False Alarm Rate detection. Block Matrix Mult performs a blocked
-matrix multiplication application - it multiplies a 12x12 matrix
-by a 9x12 matrix in blocks of 3x3 submatrices. Trellis performs
-trellis encoding/decoding.
+The remaining 4 applications were chosen from our sample applications
+used for testing the StreamIt compiler. HDTV performs a HDTV signal
+decoding/encoding. CFAR implements PCA Constant False Alarm Rate
+detection. Block Matrix Mult performs a blocked matrix multiplication
+- it multiplies a 12x12 matrix by a 9x12 matrix in blocks of 3x3
+submatrices. Trellis performs trellis encoding/decoding.
 
 \begin{comment}
 
@@ -121,17 +117,17 @@ phase of the {\pipeline}.
 
 \begin{figure}[t]
 \psfig{figure=buffer-graph.eps,width=3.35in}
-\caption{Buffer sizes.}
+\caption{Buffer sizes.\protect\label{fig:buffergraph}}
 \end{figure}
 
 \begin{figure}[t]
 \psfig{figure=code-graph.eps,width=3.35in}
-\caption{Code sizes.}
+\caption{Code sizes.\protect\label{fig:codegraph}}
 \end{figure}
 
 \begin{figure}[t]
 \psfig{figure=total-size-graph.eps,width=3.35in}
-\caption{Sum of code size and buffer size.}
+\caption{Sum of code size and buffer size.\protect\label{fig:sumgraph}}
 \end{figure}
 
 \begin{table*} \centering \small
@@ -182,31 +178,48 @@ amount of space.}
 \end{figure}
 \end{comment}
 
-Table \ref{tbl:results} presents buffer and schedule sizes
-necessary to execute various applications using the algorithms
-developed in this thesis.
-
-The GSM application cannot be scheduled using pseudo
-single-appearance algorithm, because it has a loop which is too
-tight for execution under the SAS.
+Table \ref{tbl:results} presents the buffer and schedule sizes
+required by our hierarchical single appearance and minimum latency
+scheduling algorithms for our benchmark suite.  Note that the GSM
+application cannot be scheduled using a single appearance schedule,
+because it has a tightly constrained feedback loop (see
+Figure~\ref{fig:gsm}).
 
 Several applications show a very large improvement in buffer size
-necessary for execution.  Namely, CD-DAT decreases from 1021 to
-72, a 93\% improvement. \cite{murthy99buffer} reports a buffer
-size of 226 after applying buffer merging techniques. Our
-improvement is due to reducing the combinatorial growth of the
-buffers using phased scheduling.
+necessary for execution (see Figure~\ref{fig:buffergraph}).  These
+improvements are usually coupled with an increase in code size
+(Figure~\ref{fig:codegraph}).  However, as shown in
+Figure~\ref{fig:sumgraph}, minimum latency scheduling never increases
+the sum of code size and data size for any application.
 
-Our synthetic benchmarks decrease from 7168 to 4864 and from 19964
-to 12063, a 32\% and 40\% improvements. The first improvement is
-due to creating fine grained phases which allow the initialization
-schedule to transfer smaller amount of data and allow the children
-of a {\splitjoin} to drain their data before the {\splitter}
-provides them with more. This improvement is only created in
-presence of peeking. The second improvement is due to reducing
-combinatorial growth and due to finer grained schedules to deal
-with peeking.
+The CD-DAT benchmark exhibits a buffer size decreases from 1021 to 72,
+a 93\% improvement. \cite{murthy99buffer} reports a buffer size of 226
+after applying buffer merging techniques. Our improvement is due to
+reducing the combinatorial growth of the buffers using phased
+scheduling.  
 
-Other applications show no or little improvement in buffer
-requirements. As expected, no application requires more buffer
-space.
+For our synthetic benchmarks SJPeek31 and SJPeek1024, buffer sizes
+decrease by 95\% and 32\%, respectively. In the case of SJPeek1024,
+the improvement is due to creating fine grained phases which allow the
+initialization schedule to transfer smaller amount of data and allow
+the children of a {\splitjoin} to drain their data before the
+{\splitter} provides them with more. This improvement is only evident
+in the presence of peeking. In the case of SJPeek31, the improvement
+reflects reduced combinatorial growth in addition to the fine-grained
+benefit with peeking.
+
+It is important to note that the schedules we consider in our
+evaluation have the elements of a hierarchical phase sorted as
+described in Section~\ref{chpt:phased}: all of the phases of a given
+child stream are executed before advancing to the next child.  For
+both single-appearance and minimum latency scheduling, this represents
+only one possible execution order for child phases; in particular, a
+more fine-grained interleaving of children could reduce buffer
+requirements.  While we do not explore the range of possible
+interleavings within a hierarchical node, note that the hierarchy of
+the stream graph provides a set granularity at which the leaf nodes of
+the graph can be interleaved---for example, in a hierarchical
+single-appearance schedule, two consecutive executions of a pipeline
+construct would execute all of its nodes once before executing all of
+the nodes again.  We are currently exploring other interleaving
+strategies for the nodes within a given phase.

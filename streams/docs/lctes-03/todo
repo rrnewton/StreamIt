@@ -1,27 +1,31 @@
-high priority
--------------
-
-medium priority
----------------
+low priority
+------------
 
 - make all the figures scale by the same amount when they're inserted
   into document (can do this by examining EPS bounding box size).  For
   example, feedbackloop is in bigger print than splitjoin in Figure 2.
 
-low priority
-------------
+medium priority
+---------------
 
-things missing / to fix
------------------------
-
-initialization
-  - note that there is more than one initialization schedule, as you
-    could advance partway into the steady state.  this would effect
-    the ordering of nodes in the steady state, but not the steady
-    state multiplicity.
+- note that there is more than one initialization schedule, as you
+  could advance partway into the steady state.  this would effect
+  the ordering of nodes in the steady state, but not the steady
+  state multiplicity.
 
   - note that there is unique initialization schedule?
 
-scheduling algorithm
+- y axis title, instead of "as % of", say "normalized to"
 
-- maybe give other examples of traces of execution?
+- give other examples of traces of execution?
+
+high priority
+-------------
+
+- fix abstract, intro
+- cite michal's thesis
+- typeset the pseudocode, and split into different figures
+- add citations where needed
+- check latex compilation errors
+- layout
+- spelling
