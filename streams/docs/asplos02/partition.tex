@@ -93,15 +93,16 @@ data set; the running time is the {\it sum} of the running times of
 the phases, such that a high-performance, parallel phase can partially
 compensate for an inefficient phase.  In mathematical terms, Amdahl's
 Law captures the maximum realizable speedup for scientific
-applications, but for streaming programs, the maximum improvement in
-throughput is given by the following expression:
+applications.  However, for streaming programs, the maximum
+improvement in throughput is given by the following expression:
 \begin{align*}
-\mbox{\it Maximum speedup}(w, c) = \frac{\sum_{i=1}^m{c_i \cdot w_i}}{MAX_i(c_i \cdot w_i)}
+\mbox{\it Maximum speedup}(w, c) = \frac{\sum_{i=1}^N{w_i \cdot c_i}}{MAX_i(w_i \cdot c_i)}
 \end{align*}
-where $w_1 \dots w_m$ denote the amount of work in each of the $m$
+where $w_1 \dots w_m$ denote the amount of work in each of the $N$
 partitions of a program, and $c_i$ denotes the multiplicity of work
 segment $i$ in the steady-state schedule.  Thus, if we double the load
-of the heaviest node, then the performance will suffer by a factor of
+of the heaviest node ({\it i.e.}, the node with the maximum $w_i \cdot
+c_i$), then the performance could suffer by as much as a factor of
 two.  The impact of load balancing on performance places particular
 value on the partitioning phase of a stream compiler.
 % This can be posed in

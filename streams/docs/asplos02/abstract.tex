@@ -9,21 +9,20 @@ efficiently across a range of wire-exposed architectures.
 
 In this paper, we describe our compiler for StreamIt: a high-level,
 architecture-independent language for streaming applications.  Our
-compiler targets the Raw processor, and we present results using the
-cycle-accurate Raw simulator.  Though StreamIt exposes the parallelism
-and communication patterns of stream programs, much analysis is needed
-to adapt a stream program to a parallel stream processor.  We describe
-fission and fusion transformations that can be used to adjust the
-granularity of a stream graph, a layout algorithm for mapping a stream
-graph to a given network topology, and a scheduling algorithm for
-generating a fine-grained static communication pattern for each
-computational element.  We consider this work to be a first step
-towards a portable programming model for communication-exposed
-architectures.
+compiler targets the Raw processor.  Though StreamIt exposes the
+parallelism and communication patterns of stream programs, much
+analysis is needed to adapt a stream program to a parallel stream
+processor.  We describe fission and fusion transformations that can be
+used to adjust the granularity of a stream graph, a layout algorithm
+for mapping a stream graph to a given network topology, and a
+scheduling algorithm for generating a fine-grained static
+communication pattern for each computational element.
 
 We have a fully functioning compiler that parallelizes StreamIt
-applications for Raw, with a host of optimizations implemented. We
-will show that our optimizations are able to increase the performance
-by up to 350\%.
+applications for Raw, with several load-balancing optimizations
+implemented.  Using the cycle-accurate Raw simulator, we demonstrate
+that these optimizations can improve performance by up to 350\%.  We
+consider this work to be a first step towards a portable programming
+model for communication-exposed architectures.
 % and the compiled code was able to sustain 755 MFLOPS on
 %a 250 MHz Raw processor.

@@ -5,13 +5,13 @@
 \begin{center}
 \scriptsize
 \begin{tabular}{|l|l|} \hline
-Stage & Function \\
+{\bf Phase} & {\bf Function} \\
 \hline \hline
-KOPI Front-end & Parses syntax into a Java-like abstract syntax tree \\
+KOPI Front-end & Parses syntax into a Java-like abstract syntax tree. \\
 \hline
-SIR Conversion & Converts the AST to the StreamIt IR (SIR) \\
+SIR Conversion & Converts the AST to the StreamIt IR (SIR). \\
 \hline
-Graph Expansion & Expands all parameterized structures in the stream graph \\
+Graph Expansion & Expands all parameterized structures in the stream graph. \\
 \hline
 Scheduling & Calculates initialization and steady-state execution orderings for filter firings. \\
 \hline
@@ -19,20 +19,20 @@ Partitioning & Performs fission and fusion transformations for load balancing. \
 \hline
 Layout & Determines minimum-cost placement of filters on grid of Raw tiles. \\
 \hline
-Communication Scheduling & Orchestrates fine-grained communication between tiles via simulation of stream graph. \\
+Communication Scheduling & Orchestrates fine-grained communication between tiles via simulation of the stream graph. \\
 \hline
 Code generation & Generates code for the tile and switch processors. \\
 \hline
 \end{tabular}
 \vspace{-6pt}
-\caption{\protect\small Stages of the StreamIt compiler.
-\label{tab:stages}}
+\caption{\protect\small Phases of the StreamIt compiler.
+\label{tab:phases}}
 \vspace{-12pt}
 \end{center}
 \end{table}
 
 The phases of the StreamIt compiler are described in
-Table~\ref{tab:stages}.  The front end is built on top of KOPI, an
+Table~\ref{tab:phases}.  The front end is built on top of KOPI, an
 open-source compiler infrastructure for Java~\cite{kopi}.  We
 translate the KOPI syntax tree into the StreamIt IR (SIR) that
 encapsulates the hierararchical stream graph.  Since the structure of
@@ -43,7 +43,7 @@ stream graph.
 
 The automatic scheduling of the stream graph is one of the primary
 benefits that StreamIt offers, and the subtleties of scheduling and
-buffer management are evident throughout all of the following stages
+buffer management are evident throughout all of the following phases
 of the compiler.  The scheduling is complicated by StreamIt's support
 for the {\tt peek} operation, which implies that some programs require
 a separate schedule for initialization and for the steady state.  The
@@ -57,19 +57,19 @@ to the startup configuration if a filter leaves $peek-pop$ items on
 its channel after every firing.
 
 In the StreamIt compiler, the initialization schedule is constructed
-via symbolic execution of the stream graph, until each filter has
-$peek-pop$ items on its input channel.  For the steady state schedule,
-there are many tradeoffs between code size, buffer size, and latency,
-and we are developing techniques to optimize different metrics
-\cite{streamittech2}.  In this paper, we use a simple hierarchical
-scheduler that constructs a Single Appearance Schedule \cite{leesdf}
-(SAS) for each filter.  An SAS is one where each node appears exactly
-once in the loop nest denoting the schedule.  We construct one such
-loop nest for each hierarchical stream construct, such that each
-component is executed a set number of times for every execution of its
-parent.  In later sections, we refer to the ``multiplicity'' of a
-filter as the number of times that it executes in one steady stat
-execution of the entire stream graph.
+via symbolic execution of the stream graph, until each filter has at
+least $peek-pop$ items on its input channel.  For the steady state
+schedule, there are many tradeoffs between code size, buffer size, and
+latency, and we are developing techniques to optimize different
+metrics \cite{streamittech2}.  In this paper, we use a simple
+hierarchical scheduler that constructs a Single Appearance Schedule
+(SAS) \cite{leesdf} for each filter.  An SAS is one where each node
+appears exactly once in the loop nest denoting the schedule.  We
+construct one such loop nest for each hierarchical stream construct,
+such that each component is executed a set number of times for every
+execution of its parent.  In later sections, we refer to the
+``multiplicity'' of a filter as the number of times that it executes
+in one steady state execution of the entire stream graph.
 
 Following the scheduler, the compiler has stages that are specific for
 communication-exposed architectures: partitioning, layout, and

@@ -6,10 +6,9 @@ as the fundamental barrier to performance.  Recently, a number of
 architectures have been emerging that address the problem of wire
 delay by replicating the basic processing unit and exposing the
 communication between units to a software layer ({\it e.g.}, Raw
-\cite{rawshort}, SmartMemories \cite{smartmemories}, TRIPS
-\cite{trips}).  These machines are especially well-suited for
-streaming applications that have regular communication patterns and
-widespread parallelism.
+\cite{raw}, SmartMemories \cite{smartmemories}, TRIPS \cite{trips}).
+These machines are especially well-suited for streaming applications
+that have regular communication patterns and widespread parallelism.
 
 However, today's communication-exposed architectures are lacking a
 portable programming model.  If these machines are to be widely used,
@@ -35,26 +34,28 @@ stream language that aims to be portable across communication-exposed
 machines \cite{streamitcc}.  StreamIt contains basic constructs that
 expose the parallelism and communication of streaming applications
 without depending on the granularity of the underlying architecture.
-Our current backend is for Raw \cite{rawshort}, a tiled architecture
-with fine-grained, programmable communication between processors.
-However, the compiler consists of three general techniques that can be
-applied to compile StreamIt to machines other than Raw: 1)
-partitioning, which adjusts the granularity of a stream graph to match
-that of a given target, 2) layout, which maps a partitioned stream
-graph to a given network topology, and 3) scheduling, which generates
-a fine-grained static communication pattern for each computational
-element.  We consider this work to be a first step towards a portable
-programming model for communication-exposed architectures.
+Our current backend is for Raw \cite{raw}, a tiled architecture with
+fine-grained, programmable communication between processors.  However,
+the compiler consists of three general techniques that can be applied
+to compile StreamIt to machines other than Raw: 1) partitioning, which
+adjusts the granularity of a stream graph to match that of a given
+target, 2) layout, which maps a partitioned stream graph to a given
+network topology, and 3) scheduling, which generates a fine-grained
+static communication pattern for each computational element.  We
+consider this work to be a first step towards a portable programming
+model for communication-exposed architectures.
 
-This paper makes the following technical contributions:
+This paper makes the following contributions:
 \begin{itemize}
-\item Filter fusion optimizations, horizontal fusion and vertical fusion, with and without peeking.
+\item Filter fusion optimizations that combine both sequential and
+parallel stream segments, even if there are buffers between nodes.
 \item A filter fission optimization.
 \item A graph reodering optimization.
 \item An algorithm for laying out a filter graph onto a tiled architecture.
 \item A communication scheduling algorithm that manages limited 
 communication and buffer resources.
-\item An implementation of an end-to-end compiler for parallelizing stream applications.
+\item An end-to-end implementation of a parallelizing compiler for
+streaming applications.
 \end{itemize}
 
 The rest of this paper is organized as follows.  Section
@@ -63,7 +64,8 @@ Section~\ref{sec:raw} contains an overview of Raw, and
 Section~\ref{sec:phases} outlines our compiler for StreamIt on Raw.
 Sections \ref{sec:partition}, \ref{sec:layout}, and \ref{sec:communic}
 describe our algorithms for partitioning, layout, and communication
-scheduling, respectively.  Section~\ref{sec:results} presents our
-results from the cycle-accurate Raw simulator.
-Section~\ref{sec:related} considers related work, and
-Section~\ref{sec:conclusion} contains our conclusions.
+scheduling, respectively.  Section~\ref{sec:codegen} describes code
+generation for Raw, and Section~\ref{sec:results} presents our results
+from the cycle-accurate Raw simulator.  Section~\ref{sec:related}
+considers related work, and Section~\ref{sec:conclusion} contains our
+conclusions.

@@ -97,21 +97,21 @@ output rates.
 %Designing a cleaner syntax and considering dynamically
 %varying rates will be the subject of future work.
 
-The basic unit of computation in StreamIt is the {\tt Filter}.  An
-example of a Filter is the {\tt LowPassFilter}, a component of our
-software radio (see Figure \ref{fig:radiocode}).  Each {\tt Filter}
-contains an {\tt init} function that is called at initialization time;
-in this case, the {\tt LowPassFilter} calculates {\tt weights}, the
-coefficients it should use for filtering.  The {\tt work} function
-describes the most fine grained execution step of the filter in the
-steady state.  Within the {\tt work} function, the filter can
-communicate with its neighbors using the {\tt input} and {\tt output}
-channels, which are FIFO queues with types as declared in the {\tt
-init} function.  These high-volume channels support the intuitive
-operations of {\tt push(value)}, {\tt pop()}, and {\tt peek(index)},
-where {\tt peek} returns the value at position {\tt index} without
-dequeuing the item.  The user never calls the {\tt init} and {\tt
-work} functions--they are called automatically.
+The basic unit of computation in StreamIt is the Filter.  An example
+of a Filter is the {\tt LowPassFilter}, a component of our software
+radio (see Figure \ref{fig:radiocode}).  Each Filter contains an {\tt
+init} function that is called at initialization time; in this case,
+the {\tt LowPassFilter} calculates {\tt weights}, the coefficients it
+should use for filtering.  The {\tt work} function describes the most
+fine grained execution step of the filter in the steady state.  Within
+the {\tt work} function, the filter can communicate with its neighbors
+using the {\tt input} and {\tt output} channels, which are FIFO queues
+with types as declared in the {\tt init} function.  These high-volume
+channels support the intuitive operations of {\tt push(value)}, {\tt
+pop()}, and {\tt peek(index)}, where {\tt peek} returns the value at
+position {\tt index} without dequeuing the item.  The user never calls
+the {\tt init} and {\tt work} functions--they are called
+automatically.
 
 %% StreamIt's representation of a filter is an improvement over
 %% general-purpose languages.  In a procedural language, the analog of a
@@ -135,20 +135,20 @@ work} functions--they are called automatically.
 %% optimization from the programmer.
 
 The basic construct for composing filters into a communicating network
-is a {\tt Pipeline}, such as the FM Radio in Figure
-\ref{fig:radiocode}.  Like a {\tt Filter}, a {\tt Pipeline} has an
-{\tt init} function that is called upon its instantiation.  However,
-there is no {\tt work} function, and all input and output channels are
-implicit; instead, the stream behaves as the sequential composition of
-filters that are specified with successive calls to {\tt add} from
-within {\tt init}.  That is, the output of {\tt DataSource} is
-implicitly connected to the input of {\tt LowPassFilter}, who's output
-is connected to {\tt FMDemodulator}, and so on.
+is a Pipeline, such as the FM Radio in Figure \ref{fig:radiocode}.
+Like a Filter, a Pipeline has an {\tt init} function that is called
+upon its instantiation.  However, there is no {\tt work} function, and
+all input and output channels are implicit; instead, the stream
+behaves as the sequential composition of filters that are specified
+with successive calls to {\tt add} from within {\tt init}.  That is,
+the output of {\tt DataSource} is implicitly connected to the input of
+{\tt LowPassFilter}, who's output is connected to {\tt FMDemodulator},
+and so on.
 
-There are two other stream constructors besides {\tt Pipeline}: {\tt
-SplitJoin} and {\tt FeedbackLoop} (see Figure \ref{fig:structures}).
-From now on, we use the word {\it stream} to refer to any instance of
-a Filter, Pipeline, SplitJoin, or FeedbackLoop.
+There are two other stream constructors besides Pipeline: SplitJoin
+and FeedbackLoop (see Figure \ref{fig:structures}).  From now on, we
+use the word {\it stream} to refer to any instance of a Filter,
+Pipeline, SplitJoin, or FeedbackLoop.
 
 A SplitJoin is used to specify independent parallel streams that
 diverge from a common {\it splitter} and merge into a common {\it
@@ -166,8 +166,8 @@ calls to {\tt add}, with the $i$'th call setting the $i$'th stream in
 the SplitJoin.
 
 The last control construct provides a way to create cycles in the
-stream graph: the {\tt FeedbackLoop}.  Due to space constraints, we
-omit a detailed discussion of the {\tt FeedbackLoop}.
+stream graph: the FeedbackLoop.  Due to space constraints, we omit a
+detailed discussion of the FeedbackLoop.
 
 \subsection{Rationale}
 
