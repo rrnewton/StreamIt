@@ -1,82 +1,127 @@
 \section{Container Combination(propagation)}
 Merely determining that a single filter computes a linear combination of its input is not
-all that interesting or useful. There is significant savings to be reaped if we can
-find $A$ and $b$ for combinations of filters. Obviously, all of the child filters need
-to be linear filters for this combinations to work. We restrict our attention to combining
-{\tt Pipelines} and {\tt SplitJoins} because those constructs combine to form a new linear filter. 
-{\tt FeedbackLoops} retain state between executions, so the overall construct 
-does not compute a linear operation as we have defined it. 
+all that interesting or useful. However, we can take advantage of StreamIt's heirarchal 
+structures to find the linear representation for {\tt Stream} structures ({\tt Pipelines},
+{\tt SplitJoins} and {\tt FeedbackLoops}. First we require that all of the structure's 
+children {\tt Streams} need to have linear representations for us determine an overall
+linear representation. In the following discussion we restrict our attention to combining
+{\tt Pipelines} and {\tt SplitJoins}. There is nothing inherent in the discussion that 
+forecloses combining {\tt FeedbackLoops} into an overall linear representatin, but it
+requires us to develop the notion of linear state (see Future Work).
 
-To combine filters, we must deal with rate matching. For instance, if there are two
-filters in a pipeline and the first one produces (pushes) 2 elements but the second one
-needs 4 elements to produce any output, we need the equivaluet of two firings of the
-first filter's {\tt work} function to produce output for the combined filter. 
+\subsection{Rate Matching}
+
+As in any streaming systems, the issue of rate is important. Data is being produced
+and consumed by the various {\tt Filters} and when they are combined with structures
+the overall {\tt Streams} have specific rates as well. The problem of scheduling the
+the number and order of executions of {\tt work} functions is fully described in
+\cite{karczma-thesis}. In order to combine filters, the rules we develop must take
+rate matching into account. 
+
+For example, if there are two
+{\tt Filters} $F_1$ and $F_2$ in a {\tt Pipeline} and $F_1$ produces ({\tt push}es) 2 elements 
+during its {\tt work} function but $F_2$ needs to examine ({\tt peek()}s) 4 elements 
+to produce any output, it will be necessary to execute $F_1$'s {\tt work} function 
+twice to produce enough output for $F_2$. If we want to combine the action of the 
+{\tt Pipeline} into a single linear representation, we need to take into account
+the different rates of the sub components.
 
 \begin{figure}
 \center
 \epsfxsize=3.0in
 \epsfbox{images/expanding-a-filter.eps}
-\caption{Expanding filter $F$ by a factor $f_{A}$}
+\caption{Expanding {\tt Stream} $S$ by a factor $f_A$}
 \label{fig:expanding-a-filter}
 \end{figure}
 
-
-Therefore, there is a need for a fundamental operation on our representation for 
-linear filters to represent producing data from multiple invocations of the work
-function. When a linear filter's form is ``expanded'' by a factor $F_{A}$ 
-we produce the matrix that describes the output from executing the filter's work
-function $f_{A}$ times. Figure~\ref{fig:expanding-a-filter} shows how the {\tt peek},
-{\tt pop} and  {\tt push} rates are affected by expanding by factor $f_{A}$.
+Therefore, a fundamental operation necessary to combine any of StreamIt's structures, 
+we need an expansion operation on our linear forms which represents the data produced
+by multiple invocations of a {\tt Stream}. 
+We denote expanding a filter $F$ by a factor $f_a$ as $expand(F, f_a)$.
+When a {\tt Stream}'s linear form is expanded by $f_A$ 
+the resulting linear form describes the formula for describing the filter's work
+function exactly $f_a$ times. Figure~\ref{fig:expanding-a-filter} shows a 
+high level picture of expanding filter $F$ to $F'$. Specifically, 
+the new peek rate $peek_{F'}$ is  $peek_F + (f_A-1)pop_F$, the new pop rate
+$pop_{F'}$ is  $f_{a}pop_F$ and the new push rate $push_{F'}$ is  $f_{a}push_F$.
 
 \begin{figure}
 \center
 \epsfxsize=3.0in
 \epsfbox{images/expanding-a-matrix.eps}
-\caption{Expanding a linear form $(A,b)$ by a factor $f_{A}$}
+\caption{Expanding a linear form $(A,a)$ by a factor $f_{A}$}
 \label{fig:expanding-a-matrix}
 \end{figure}
 
-Figure~\ref{fig:expanding-a-matrix} shows the matrix corresponding to expanding 
-a filter represented by $(A,b)$ by a factor $f_{A}$. The expansion is done by 
-making a new matrix with $f_{A}*push_{F}$ columns and $peek_{F}+(f_{A}-1)*pop_{F}$
-rows. The original matrix $A$ is then copied $f_{A}$ times and placed along the
-diagonal. Each copy is offset by $push_{F}$ columns and $pop_{F}$ rows.
+Expansion is an operation that can be performed on any filter. Since we are interested
+in linear filters, we need to formulate expansion on linear forms as well.
+Figure~\ref{fig:expanding-a-matrix} shows the result of expanding the linear 
+form $lf = (A,a)$ by a factor $f_A$ such that $lf' = expand(lf, f_A) = (A',a')$. 
+The expansion of $A$ to $A'$ is done by first creating a zero matrix 
+with $peek_{F}+(f_{A}-1)*pop_{F}$ rows and $f_{A}push_F$ columns which corresponds 
+to the expanded filter. The original matrix $A$ is then copied $f_{A}$ times and placed along the
+diagonal. Starting from the top left, each copy of $A$ is offset from the previous copy 
+by $push_{F}$ columns and $pop_{F}$ rows. To expand the constant vector $a$ to $a'$ we simply
+create a row vector with $f_{A}push_F$ rows and place $f_A$ adjacent copies in there.
 
 \subsection{Pipelines}
 
 \begin{figure}
 \center
 \epsfxsize=3.0in
-\epsfbox{images/pipeline-combination.eps}
-\caption{Combining a pipeline of two filters.}
+\epsfbox{images/pipeline-combination-before.eps}
+\epsfxsize=3.0in
+\epsfbox{images/pipeline-combination-after.eps}
+\caption{A {\tt Pipeline} of two linear {\tt Streams} with linear forms $(A,a)$ and $(B,b)$ (above) and the same {\tt Pipeline} after we have expanded the child filters (below).}
 \label{fig:combining-pipeline}
 \end{figure}
 
-{\tt Pipelines} are serial combinations of filters, one followed directly after 
-another. To combine two filters in a pipeline, $F_{1}$ followed by $F_{2}$, we can
-simply write down the equations. $F_{1}$ inputs $x$ to prodcue $y_1$ and $F_{2}$
-inputs $y_1$ to produce $y_2$. Using our linear filter equations from above,
-we can see that $y_1 = xA_1 + b_1$ and $y_2 = y_1A_2 + b_2$. Combining the
-two previous equations, it is clear that $y_2 = xA_1A_2 + (A_2b_1 + b_2)$ 
-which corresponds to the linear form $(A_1A_2, A_1b_2+b_2)$. 
+{\tt Pipelines} are serial combinations of {\tt Streams}, one followed directly after 
+another. Below we describe the rules necessary to combine two serial filters. 
+Combining a {\tt Pipeline} with an arbitrary number of {\tt Streams} can be accomplished 
+by continually combining adjacent pairs until there are none left. 
+We wish to derive the rules for combining two adjacent {\tt Streams}, 
+$S_{1}$ followed by $S_{2}$ with linear forms $(A,a)$ and $(B,b$) respectively.
+The combination rules follow directly from the equations relating the inputs and the outputs of the 
+two {\tt Streams}. Defining our notation: $S_{1}$ takes $x[n]$ as input and produces 
+$y_1[n]$ as output. $S_{2}$ inputs $y_1[n]$ and produces $y_2[n]$. 
+Using our linear input to output equations from above,
+$y_1 = xA + a$ and $y_2 = yB + b$. Combining the
+two previous equations, it is clear that $y_2 = xAB + (Aa + b)$ 
+which corresponds to a new linear form $(AB, Aa+b)$. 
 
-The above math equations look very simple, but it is not necessairly the case
-that you can actually perform the calculation $A_1A_2$ because the dimensions of 
-$A_1$ and $A_2$ might not be compatible. For most pairs of linear filters, there
-is a choice of scaling factors $f_1$ and $F_2$ that makes the number of columns 
-of $A_1$ equal the number of rows of $A_2$.
+The equations for the overall linear form is very elegant, but it is important to 
+remember that the expressions are matrix operations, and that the dimensions of 
+$A$ and $B$ might not be compatible (we don't worry about $a$ ane $b$ because if the 
+we can multiply $AB$ then we can also multiply $ab$. The problem of incompatible
+matrix sizes is the same problem of scheduling the first {\tt Stream} to produce
+enough data for the second {\tt Stream} to read from. To make the dimensions match up, 
+we have at our disposal the $expand$ operation described above. We will try and 
+choose expansion factors $f_A$ and $f_B$ such that the expanded linear forms are
+compatible. For most pairs of linear filters, there are multiple $(f_A,f_B)$ combinations
+that make the multiplication compatible. In general, we try and choose the pair that
+will result in the smallest overall matrix.
 
-In general, to make the rates of two filters match, one needs to satisfy
-$push_{F_{1}'} = push_{F_{2}'}$ which means that 
-$f_1push_{F_1}=peek_{F_2}+(f_2-1)pop_{F_2}$, where $push_{F_1}$,
-$peek_{F_2}$ and $pop_{F_2}$ are all arbitrary integers and 
-$f_1$ and $f_2$ are integers that must be determined by the compiler.
+
+In general, to make the rates of two {\tt Streams} match, one needs to satisfy
+$push_{S_1'} = push_{S_2'}$ which means that 
+$f_Apush_{S_1}=peek_{S_2}+(f_B-1)pop_{S_2}$, where $push_{S_1}$,
+$peek_{S_2}$ and $pop_{S_2}$ are all arbitrary integers and 
+$f_A$ and $f_B$ are integers calculated by the compiler.
 This constraint is not always satisfiable. For instance if
 $push_{F_1}=2$, $peek_{F_2}=3$ and $pop_{F_2}=2$, you can not
-choose $f_a$ and $f_2$ to satisfy the above equation.
+choose $f_a$ and $f_2$ to satisfy the above equation. In this 
+case we can use something called a {\tt TwoStageFilter} to block
+the operation into a {\tt work} function that initializes the 
+computation and another {\tt work} function that computes values
+in the steady state.
 
-Figure~\ref{fig:combining-pipeline} shows graphically the process of combining
-a pipeline of two filters into a single linear filter.
+It is also interesting to note that in some cases the combined linear form
+actually represents a less inefficient way of computing the results of the
+filters. (Possibly an example????XXXXXXXXXXXXXXX)
+
+Figure~\ref{fig:combining-pipeline} shows graphically the process of expanding the
+two {\tt Streams} in a {\tt Pipeline} so that they can be combined into a single linear filter.
 
 \subsection{SplitJoins}
 {\tt SplitJoins} are the StreamIt construct that allow a programmer to describe explicitly 
