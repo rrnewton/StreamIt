@@ -164,7 +164,7 @@ Mathematically, the dynamic data measure is defined as:
   \nonumber
 	   &&\sum_{f_k} min(R(f_k), O(f_k) \times A(f_k)) - \\
   \nonumber
-         &&\sum_{f_s} O(f_s) \times A(f_s)
+         &&\sum_{f_s} min(R(f_s), O(f_s) \times A(f_s))
 \end{eqnarray}
 with $W(f)$ equal to the output buffer size reserved for writing data, $R(f)$
 equal to the input buffer size reserved for reading data, $U(f)$ equal to the
@@ -174,7 +174,7 @@ filter $f$ in $phase(f_i)$. Also note that the $Y(f_i)$ is defined
 over all distinct occurrences of $f_k$ in the phase, and $f_s$
 represents the filter that consumes the data produced by $f_k$ (i.e.,
 it is $f_k$'s successor in the stream graph, and $f_k$-$f_s$
-constitute a producer-consumer pair).
+constitute a producer-consumer pair; $f_s$ is unique unless $f_k$ is a splitter).
 
 The first term in the equation above quantifies the address space
 accessed for writing data. It is  equal to the lesser of the buffer size
