@@ -5,7 +5,7 @@
 SplitJoin.  As the Joiner is reading items from the stream on the
 left, items accumulate in the channels on the right.  On Raw, senders
 will block once a channel has four items in it.  Thus, once 10 items
-have passed through the joiner, the system is deadlocked, as the
+have passed through the Joiner, the system is deadlocked, as the
 Joiner is trying to read from the left, but the stream on the right is
 blocked.  The Identity filter is blocking on the send of item \#10,
 and the Splitter is blocking on the send of item \#20.  If the weights
@@ -15,7 +15,7 @@ on the Joiner were (10, 10), the system would be deadlock-free.
 \vspace{48pt}
 
 \psfig{figure=joiner-buffer-live.eps,width=3.97in}
-\caption{\protect\small Fixing the deadlock with a buffering joiner.
+\caption{\protect\small Fixing the deadlock with a buffering Joiner.
 The BufferingRoundRobin is an internal StreamIt construct (it is not
 part of the language) which reads items from its input channels in the
 order in which they arrive, rather than in the order specified by its
@@ -144,6 +144,6 @@ each internal buffer is recorded.
 Our current implementation of the communication scheduler is overly
 cautious in its deadlock avoidance.  All FeedbackLoops are serialized
 by the communication scheduler to prevent deadlock.  More precisely,
-the loop and body streams of the FeedbackLoop cannot execute in
+the loop and body streams of each FeedbackLoop cannot execute in
 parallel.  Crossed routes in the layout of the graph are serialized as
 well, forcing each path to wait its turn at the contention point.

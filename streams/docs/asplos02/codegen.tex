@@ -26,7 +26,7 @@ In the translation, each Filter collects the data necessary to fire in
 an internal buffer.  Before each Filter is allowed to fire, it must
 receive \emph{pop} items from its switch processor (\emph{peek} items
 for the initial firing).  The buffer is managed circularly and the
-size of the buffer is equal to the number of items peeked by this
+size of the buffer is equal to the number of items peeked by the
 Filter.  {\tt peek(index)} and {\tt pop()} are translated into
 accesses of the buffer, with {\tt pop()} adjusting the end of the
 buffer, and {\tt peek(index)} accessing the $index^{th}$ element from

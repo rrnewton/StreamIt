@@ -51,10 +51,13 @@ steady state schedule must be periodic--that is, its execution must
 preserve the number of live items on each channel in the graph (since
 otherwise a buffer would grow without bound.)  A separate
 initialization schedule is needed if there is a filter with $peek >
-pop$, since a periodic schedule would return the graph to its initial
-configuration after every cycle, but it would be impossible to return
-to the startup configuration if a filter leaves $peek-pop$ items on
-its channel after every firing.
+pop$, by the following reasoning.  If the initialization schedule were
+also periodic, then after each firing it would return the graph to its
+initial configuration, in which there were zero live items on each
+channel.  But a filter with $peek > pop$ leaves $peek-pop$ (a positive
+number) of items on its input channel after {\it every} firing, and
+thus could not be part of this periodic schedule.  Therefore, the
+initialization schedule is separate, and non-periodic.
 
 In the StreamIt compiler, the initialization schedule is constructed
 via symbolic execution of the stream graph, until each filter has at

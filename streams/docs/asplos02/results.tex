@@ -2,10 +2,10 @@
 \label{sec:results}
 
 We have implemented a fully-functional prototype of the StreamIt
-compiler for the Raw architecture; the compiler phases are described
-in Section~\ref{sec:phases}.  We have implemented all of the phases of
-the compiler as well as the optimizations, but the decision of which
-optimizations to apply is currently guided by the programmer.
+compiler for the Raw architecture.  Our implementation includes all of
+the phases described in Section~\ref{sec:phases} as well as the
+optimizations, but the decision of which optimizations to apply is
+currently guided by the programmer.
 
 \begin{table}[t]
 \begin{center}
@@ -62,7 +62,6 @@ CRC & A 32-bit Cyclic Redundancy Check (CRC) Encoder/Decoder. \\
 
 %%\end{itemize}
 
-
 \begin{table}[t]
 \begin{center}
 \scriptsize
@@ -107,35 +106,35 @@ CRC & 336 & 47 & 35.1 & N/A & 5 & 52.4 & N/A\\
 \vspace{-6pt}
 \caption{\protect\small Performance Results.}
 \label{tab:performance}
-\vspace{-21pt}
 \end{center}
 \end{table}
 
 We evaluate the StreamIt compiler for the set of applications shown in
 Table~\ref{tab:benchmarks}; results appear in
-Figure~\ref{tab:performance}.  We show the performance of the original
+Table~\ref{tab:performance}, with MFLOPS calculated using Raw's target
+clock speed of 250 MHz.  We show the performance of the original
 application, which maps each Filter in the original program to a
 single Raw tile.  In some cases, we need to use an 8x8 Raw processor
 in order to have enough tiles for the Filters; otherwise, we target a
 4x4 configuration of Raw.  To obtain the ``optimized'' numbers, we
 perform a series of fusion, fission and reordering transformations to
 create a load-balanced set of filters that can be mapped onto a 4x4
-Raw processor. Figures~\ref{fig:opt-diagram} and
+Raw processor.  Figures~\ref{fig:opt-diagram} and
 \ref{fig:utilization-diagram} depict the impact of our load balancing
-transformations on performance and tile utilization, respectively.
+transformations on throughput and tile utilization, respectively.
 
 \begin{figure}
 \begin{minipage}{3.2in}
 \centering
-\psfig{figure=speedup-diagram.eps,width=3.3in}
-\caption{The speedup due to load balancing normalized to original performance.
+\psfig{figure=speedup-diagram.eps,width=3.2in}
+\caption{Speedup due to load balancing, normalized to original performance.
 \protect\label{fig:opt-diagram}}
 \end{minipage}
 \hspace{0.1in}
 \begin{minipage}{3.2in}
 \centering
 \psfig{figure=utilization-diagram.eps,width=3.2in}
-\caption{Utilization of a tile ofter load balancing normalized to the original utilization.\protect\label{fig:utilization-diagram}}
+\caption{Utilization of a tile after load balancing, normalized to original utilization.\protect\label{fig:utilization-diagram}}
 \end{minipage}
 \end{figure}
 
@@ -156,13 +155,22 @@ leading to a slowdown.  Better tile code generation and traditional
 optimizations may help improve the performance.
 
 \begin{figure}
-\centering
+  \begin{center} \psfig{figure=beam-blood-key.eps,width=3.25in} \\
+    \subfigure[\vspace{-6pt}
+    Original.\label{fig:beam-blood1}]{\psfig{figure=beam-blood-orig.eps,width=3in}}
+    \hspace{0.3in} \subfigure[\vspace{-6pt}
+    Load-balanced.\label{fig:beam-blood2}]{\psfig{figure=beam-blood-opt.eps,width=3in}
+    \vspace{-6pt}} \vspace{-6pt} \caption{Execution traces for the (a)
+    original (on 64 tiles) and (b) load-balanced (on 16 tiles)
+    partitionings of the BeamFormer.  Graphs are shaded as in
+    Figure~\ref{fig:fm-blood}. \protect\label{fig:beam-blood}}
+\end{center}
+\vspace{24pt}
 \small
 \begin{verbatim}
                          class BeamFormer extends Pipeline {
                          
                             void init(numChannels, numBeams) {
-                         
                                add(new SplitJoin() { 
                                   void init() {
                                      setSplitter(Null());
@@ -200,18 +208,4 @@ optimizations may help improve the performance.
 \caption{\protect\small Stream graph of the load-balanced 12x4 BeamFormer.  Vertical fusion is applied to collapse each pipeline into a single filter, and horizontal fusion is used to transform the 4-way SplitJoin into a 2-way SplitJoin.
 Figure~\ref{fig:beam-blood} shows the benefit of these
 transformations. \protect\label{fig:beam-opt}}
-\end{figure}
-
-\begin{figure}
-  \begin{center} \psfig{figure=beam-blood-key.eps,width=3.25in} \\
-    \subfigure[\vspace{-6pt}
-    Original.\label{fig:beam-blood1}]{\psfig{figure=beam-blood-orig.eps,width=3in}}
-    \hspace{0.3in} \subfigure[\vspace{-6pt}
-    Load-balanced.\label{fig:beam-blood2}]{\psfig{figure=beam-blood-opt.eps,width=3in}
-    \vspace{-6pt}} \vspace{-6pt} \caption{Execution traces for the (a)
-    original and (b) load-balanced partitionings of the BeamFormer.
-    Graphs are colored as in
-    Figure~\ref{fig:fm-blood}. \protect\label{fig:beam-blood}}
-    \vspace{-6pt}
-\end{center}
 \end{figure}

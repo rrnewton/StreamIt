@@ -21,27 +21,28 @@ obtain good performance.  However, for wire-exposed targets that
 contain multiple instruction streams and distributed memory banks, C
 is obsolete.  Though C can still be used to write efficient programs
 on these machines, doing so either requires architecture-specific
-directives or a very smart compiler that can extract the parallelism
-and communication from the C semantics.  Both of these options
-disqualify C as a portable machine language, since it fails to hide
-the architectural details from the programmer and it imposes
+directives or an impossibly smart compiler that can extract the
+parallelism and communication from the C semantics.  Both of these
+options disqualify C as a portable machine language, since it fails to
+hide the architectural details from the programmer and it imposes
 abstractions which are a mismatch for the domain.
 
-In this paper, we describe a compiler for StreamIt, a high level
-stream language that aims to be portable across communication-exposed
-machines \cite{streamitcc}.  StreamIt contains basic constructs that
-expose the parallelism and communication of streaming applications
-without depending on the granularity of the underlying architecture.
-Our current backend is for Raw \cite{raw}, a tiled architecture with
-fine-grained, programmable communication between processors.  However,
-the compiler consists of three general techniques that can be applied
-to compile StreamIt to machines other than Raw: 1) partitioning, which
-adjusts the granularity of a stream graph to match that of a given
-target, 2) layout, which maps a partitioned stream graph to a given
-network topology, and 3) scheduling, which generates a fine-grained
-static communication pattern for each computational element.  We
-consider this work to be a first step towards a portable programming
-model for communication-exposed architectures.
+In this paper, we describe a compiler for StreamIt~\cite{streamitcc},
+a high level stream language that aims to be portable across
+communication-exposed machines.  StreamIt contains basic constructs
+that expose the parallelism and communication of streaming
+applications without depending on the granularity of the underlying
+architecture.  Our current backend is for Raw~\cite{raw}, a tiled
+architecture with fine-grained, programmable communication between
+processors.  However, the compiler consists of three general
+techniques that can be applied to compile StreamIt to machines other
+than Raw: 1) partitioning, which adjusts the granularity of a stream
+graph to match that of a given target, 2) layout, which maps a
+partitioned stream graph to a given network topology, and 3)
+scheduling, which generates a fine-grained static communication
+pattern for each computational element.  We consider this work to be a
+first step towards a portable programming model for
+communication-exposed architectures.
 
 This paper makes the following contributions:
 \begin{itemize}
