@@ -3,6 +3,21 @@ to add to paper:
 
 for Andrew to do:
 ------
+- in splitjoin and pipeline combo figures, we should label the (a)
+  original, (b) expanded, and (c) collapsed versions
+
+- i think some typesetting could also be improved... e.g. labels of
+  splitter, joiner in the first stream graph (fig 6) could be centered
+  vertically better
+
+- also, if we have time, a nice touch with figures is to make the font
+  size consistent between them.  otherwise it looks kind of
+  sloppy... the way I've done this before is to save in the same point
+  size from illustrator, then to open the .eps file and see the size of
+  the bounding box in pixels.  Pick a constant ratio between the size of
+  the figure in inches on the page, and its size in pixels, and then
+  adjust all the sizes in latex appropriately.
+
 - This is a low-priority pain, but bibliography could use some
   uniformizing.  For example, we reference PLDI in three completely
   different ways.
