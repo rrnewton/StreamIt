@@ -464,14 +464,14 @@ of tracking a set of EOS tokens.\vspace{-2pt}\\}
 \decl{\} svm\_Stream\_Flags;}
 \makeline
 %%%%%%%%%%%%%%%%%%%%%%%%%
-\clearpage
+\clearpage ~ \\ \vspace{-24pt}
 \makeline
 \name{streamPush}
 \decl{void svm\_streamPush(svm\_Stream* s, void* element)}
 \spec{Enqueues a value onto the end of a stream.  If the stream cannot hold any more elements, then {\tt svm\_streamPush} stalls until there is space available.}
 \param{{\tt s} - stream to push onto.\\
   {\tt element} - value to push.}
-\req{{\tt s} has been initialized.}
+\req{{\tt s} has been initialized and has a non-zero capacity.}
 \callkc
 %%%%%%%%%%%%%%%%%%%%%%%%%
 \makeline
@@ -501,7 +501,7 @@ broadcast messages.}
   {\tt s1, s2, ..., sn} - streams to push onto.\\
   {\tt element} - value to push.}
 
-\req{{\tt s1, s2, ..., sn} have been initialized.}
+\req{{\tt s1, s2, ..., sn} have been initialized and have non-zero capacities.}
 
 \callkc
 %%%%%%%%%%%%%%%%%%%%%%%%%
@@ -517,7 +517,7 @@ the EOS information is no longer accessible.}
 \param{{\tt s} - stream to pop from.\\
   {\tt element} - location in which to store the popped value.}
 
-\req{{\tt s} has been initialized.}
+\req{{\tt s} has been initialized and has a non-zero capacity.}
 
 \callkc
 %%%%%%%%%%%%%%%%%%%%%%%%%
@@ -541,7 +541,7 @@ until {\tt n+1} elements are available.}
 \req{
   {\tt n} $<$ {\tt capacity} of {\tt s}.\\
   {\tt s} does not have the {\tt svm\_Stream\_Unordered} flag set.\\
-  {\tt s} has been initialized.}
+  {\tt s} has been initialized and has a non-zero capacity.}
 
 \callkc
 %%%%%%%%%%%%%%%%%%%%%%%%%
@@ -558,7 +558,7 @@ there is space to push the element.}
 \param{{\tt s} - stream to push onto.\\
   {\tt element} - value to push.}
 
-\req{{\tt s} has been initialized.}
+\req{{\tt s} has been initialized and has a non-zero capacity.}
 
 \callkc
 %%%%%%%%%%%%%%%%%%%%%%%%%
@@ -575,7 +575,7 @@ pushed onto all streams.  See {\tt svm\_streamPushMulticast} for an example.}
   {\tt s1, s2, ..., sn} - streams to push onto.\\
   {\tt element} - value to push.}
 
-\req{{\tt s1, s2, ..., sn} have been initialized.}
+\req{{\tt s1, s2, ..., sn} have been initialized and have non-zero capacities.}
 
 \callkc
 %%%%%%%%%%%%%%%%%%%%%%%%%
@@ -596,7 +596,7 @@ are available.}
 \req{
   {\tt n} $<$ {\tt capacity} of {\tt s}.\\
   {\tt s} does not have the {\tt svm\_Stream\_Unordered} flag set.\\
-  {\tt s} has been initialized.}
+  {\tt s} has been initialized and has a non-zero capacity.}
 \callkc
 %%%%%%%%%%%%%%%%%%%%%%%%%
 \makeline
@@ -666,7 +666,7 @@ address} and {\tt capacity} might be dynamically calculated at runtime.}
   {\tt element} - value to write.}
 
 \req{
-  {\tt b} has been initialized.\\
+  {\tt b} has been initialized and has a non-zero capacity.\\
   {\tt index} $<$ {\tt capacity} of {\tt b}.}
 
 \callkc
@@ -684,7 +684,7 @@ address} and {\tt capacity} might be dynamically calculated at runtime.}
   {\tt element} - location to load value into.}
 
 \req{
-  {\tt b} has been initialized.\\
+  {\tt b} has been initialized and has a non-zero capacity.\\
   {\tt index} $<$ {\tt capacity} of {\tt b}}
 
 \callkc
@@ -1300,7 +1300,7 @@ move itself.}
 
 \req{
   {\tt move} is {\tt Unstarted}, {\tt Finished}, or uninitialized.\\
-  {\tt srcStr} and {\tt destStr} have been initialized.\\
+  {\tt srcStr} and {\tt destStr} have been initialized and have non-zero capacities.\\
   {\tt srcStr} and {\tt destStr} have the same {\tt elementSize}.}
       
 \callc
@@ -1339,7 +1339,7 @@ processes a single stride.}
 
 \req{
   {\tt scatter} is {\tt Unstarted}, {\tt Finished}, or uninitialized.\\
-  {\tt srcStr} and {\tt destBlock} have been initialized.\\
+  {\tt srcStr} and {\tt destBlock} have been initialized and have non-zero capacities.\\
   {\tt srcStr} and {\tt destBlock} have the same {\tt elementSize}.\\
   All accesses to {\tt destBlock} are within its capacity.}
 
@@ -1378,7 +1378,7 @@ stride.  Each iteration of this kernel processes a single stride.}
 
 \req{
   {\tt gather} is {\tt Unstarted}, {\tt Finished}, or uninitialized.\\
-  {\tt srcBlock} and {\tt destStr} have been initialized.\\
+  {\tt srcBlock} and {\tt destStr} have been initialized and have non-zero capacities.\\
   {\tt srcBlock} and {\tt destStr} have the same {\tt elementSize}.\\
   All accesses to {\tt srcBlock} are within its capacity.}
 
@@ -1420,7 +1420,7 @@ processes a single index.}
 
 \req{
   {\tt scatter} is {\tt Unstarted}, {\tt Finished}, or uninitialized.\\
-  {\tt srcStr}, {\tt indexStr}, and {\tt destBlock} have been initialized.\\
+  {\tt srcStr}, {\tt indexStr}, and {\tt destBlock} have been initialized and have non-zero capacities.\\
   {\tt srcStr} and {\tt destBlock} have the same {\tt elementSize}.\\
   {\tt indexStr} uses an unsigned representation for the indices.\\
   All accesses to {\tt destBlock} are within its capacity.}
@@ -1462,7 +1462,7 @@ iteration of this kernel processes a single index.}
 
 \req{
   {\tt gather} is {\tt Unstarted}, {\tt Finished}, or uninitialized.\\
-  {\tt srcBlock}, {\tt indexStr} and {\tt destStr} have been initialized.\\
+  {\tt srcBlock}, {\tt indexStr} and {\tt destStr} have been initialized and have non-zero capacities.\\
   {\tt srcBlock} and {\tt destStr} have the same {\tt elementSize}.\\
   {\tt indexStr} uses an unsigned representation for the indices.\\
   All accesses to {\tt srcBlock} are within its capacity.}
