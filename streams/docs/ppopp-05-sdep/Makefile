@@ -7,7 +7,7 @@ main.ps: main.dvi
 main.pdf: main.ps
 	ps2pdf main.ps
 
-main.dvi: main.tex references.bib *.tex *.eps
+main.dvi: main.tex references.bib *.tex *.eps *.cls
 	latex main
 	bibtex main
 	latex main

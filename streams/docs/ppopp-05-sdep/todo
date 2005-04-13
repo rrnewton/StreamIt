@@ -1,3 +1,129 @@
+ppopp final
+-----------
+
+- layout
+
+- try printing pdf, make sure speedup graph is ok
+
+- spelling
+
+- comment / highlight FIR code?
+
+x initialize W throughout (esp. on the left)
+
+x make lines in figure wider so you can see ... 
+
+n "filters" vs "actors"?
+
+n "execution" vs. "firing"?
+
+x coeff vs. weight
+
+x check SDEP -> \sdep
+
+x remove italics from e.g and i.e.
+
+x frequency hopping vs. frequency-hopping
+
+x define upsream, downstream?
+
+x sanitize bibliography
+
+x unresolved references
+
+x cite Brook, Cg
+
+x adjust streamit diffs to other languages at end of related work
+
+x issue with functionality of _pullSchedule_ The "for all input
+channels" allows for more than one possible execution.  (Or do you
+mean to make it evaluate left-to-right edges in order?)  As-is, the
+authors need to state that all pull-schedules produce the same count,
+which I believe they do.  E.g., after step 4 or 5 in the example,
+actor B could fire -- this would produce a different execution
+(PullSchedule is not a function), but the number of A's in those
+executions will all be equal.  I believe this all fixable, but it
+relies critically on what constructs are in the dataflow graph, since
+something with nondetermism could make the greedy algorithm find a
+non-minimal
+
+x could still be more explicit in in explaining [n:m] latency
+  "message sends are annotated with a range [n:m] that means...]
+
+x though this model does not allow messaging between parallel
+  components, it could be possible to time such
+  things using a common ancestor (or sequence of ancestors)
+
+x limitations / future work
+
+  n there is a problem if messages sent during initialization schedule
+
+  n add con of messaging: modify the I/O rate of a black-box actor in
+    between the message source and destination, and it automatically
+    changes the granularity of message behavior.  could imagine
+    system where it is instead declared at high level what a parent assumes
+    about child?  would need to think about this.
+
+  x hierarchical messaging system so that containers do not have to
+    know about children.
+
+  x we only deal with non-overlapping constraints
+    x say this in intro?
+
+x I don't like "applications of sdep" section
+  x move to another section, summarize in conclusion, or delete
+
+x fix conclusion to emphasize messaging, not sdep
+
+x constraints section
+  x give example of infeasible constraints
+
+  x more comprehensible notion of constraints (end of 5.1)
+  x overlapping constraints
+  x intervals of the stream graph
+
+x example of calculating delivery time
+
+x talk about compositionality of sdep?
+  SDEP_C<-A (n) = SDEP_C<-B ( SDEP_B<-A (n))
+
+x In section 5.1, the term "work function" comes up, which has not
+been discussed previously.  What are the restrictions on these work
+functions?
+
+x rewrite parts of intro
+
+x acknowledge grant numbers	
+
+ x In definition 2, I had trouble with the phrase "the message
+handler can be invoked in R immediately before its work function has
+fired M(...) times".  Should that be "can only be invoked"?  I think
+some kind of if-and-only-iff is needed here, since you want to invoke
+them inside (never outside) the specific time period, but they also
+have to be invoked sometime in that perior, don't they?  As a
+notational point, the use of the notation "M(...)" as if it is some
+function, which is clearly is not (it's only constrained to have some
+range of values) is also bothersome.  I think it would be cleaner to
+define the minimum and maximum values separately, which should both be
+well-defined, and then put constraints on where the message handler is
+invoked.
+
+n more details on portal implementation
+    4.3 The third paragraph. "The actual message delivery can be
+    implemented in the most efficient way for the given architecture"
+    I think that many readers, including me, are equally interested in
+    the implementation of the portal. Thus, it is very instructive if
+    you describe (perhaps in a separate section rather than here)
+    things like how the portal is implemented in the system you used
+    in 4.4 and what code is generated to satisfy the latency range
+    specified.
+
+n mention complexity of scheduling algorithm?
+n mention inverse SDEP in the latency section?
+n clean up second bullet of what happens with messaging (4.5)?
+
+*********************************************************************************
+
 general
 -------
 x describe how messaging is actually implemented (credits, SDEP, etc)

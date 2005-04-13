@@ -9,13 +9,13 @@
 @Article{BELP96,
   author = 	 {Greet Bilsen and Marc Engels and Rudy Lauwereins and Jean Peperstraete},
   title = 	 {Cyclo-Static Dataflow},
-  journal = 	 {IEEE Transactions on Signal Processing},
+  journal = 	 {IEEE Trans. on Signal Proc.},
   year = 	 {1996},
   OPTkey = 	 {},
   OPTvolume = 	 {},
   OPTnumber = 	 {},
-  pages = 	 {397-408},
-  month = 	 {February},
+  OPTpages = 	 {397-408},
+  OPTmonth = 	 {February},
   OPTnote = 	 {},
   OPTannote = 	 {}
 }
@@ -44,7 +44,7 @@
 
 @Article{AK82,
   author = 	 {J.R. Allen and K. Kennedy},
-  title = 	 {PFC:  A program to convert Fortran to parallel form},
+  title = 	 "{PFC:  A program to convert Fortran to parallel form}",
   journal = 	 {Proc. of the IBM Conf. on Parallel Computing and Scientific Computations},
   year = 	 {1982},
   OPTkey = 	 {},
@@ -59,7 +59,7 @@
 @PhdThesis{frank-thesis,
   author = 	 {Matthew Frank},
   title = 	 {SUDS: Automatic Parallelization for Raw Processors},
-  school = 	 {Massachusetts Institute of Technology},
+  school = 	 {MIT},
   year = 	 {2003},
   OPTkey = 	 {},
   OPTtype = 	 {},
@@ -127,7 +127,7 @@
 @article{ singer02automatic,
     author = "Byran Singer and Manuela M. Veloso",
     title = "Automating the Modeling and Optimization of the Performance of Signal Transforms",
-    journal = "IEEE Transactions on Signal Processing",
+    journal = "IEEE Trans. on Signal Proc.",
     volume = "50",
     number = "8",
     pages = "2003--2014",
@@ -189,6 +189,46 @@
     OPTaddress = "Atlanta, GA",
     year = "1999",
     url = "citeseer.nj.nec.com/frigo99fast.html" }
+
+
+@article{dief97,
+  author = 	 {Keith Diefendorff and Pradeep K. Dubey},
+  title = 	 {How Multimedia Workloads Will Change Processor Design},
+  journal = 	 {IEEE Computer},
+  year = 	 {1997},
+  OPTkey = 	 {},
+  volume = 	 {30},
+  number = 	 {9},
+  OPTpages = 	 {},
+  OPTmonth = 	 {},
+  OPTnote = 	 {},
+  OPTannote = 	 {}
+}
+
+@Article{conte97,
+  author = 	 {Thomas M. Conte and Pradeep K. Dubey and Matthew D. Jennings and Ruby B. Lee and Alex Peleg and Salliah Rathnam and Mike Schlansker and Peter Song and Andrew Wolfe},
+  title = 	 {Challenges to Combining General-Purpose and Multimedia Processors},
+  journal = 	 {IEEE Computer},
+  year = 	 {1997},
+  OPTkey = 	 {},
+  volume = 	 {30},
+  number = 	 {12},
+  OPTpages = 	 {},
+  OPTmonth = 	 {},
+  OPTnote = 	 {},
+  OPTannote = 	 {}
+}
+
+@Misc{kirkpatrick97,
+  OPTkey = 	 {},
+  author = 	 {Scott Kirkpatrick},
+  title = 	 {Multimedia's Impact on Computer Architecture},
+  howpublished = {Presentation, Harvard University Colloquium Series},
+  month = 	 {May},
+  year = 	 {1997},
+  OPTnote = 	 {},
+  OPTannote = 	 {}
+}
 
 @misc{fftw, 
   author = "M. Frigo and S. Johnson",
@@ -277,11 +317,51 @@ year="2003"}
   organization = {ASPLOS},
 }
 
+@InProceedings{brook04,
+  author = 	 {Ian Buck and Tim Foley and Daniel Horn and Jeremy Sugerman and Kayvon Fatahalian and Mike Houston and Pat Hanrahan},
+  title = 	 "{Brook for GPUs: Stream Computing on Graphics Hardware}",
+  OPTcrossref =  {},
+  OPTkey = 	 {},
+  booktitle =    {SIGGRAPH},
+  OPTpages = 	 {},
+  year = 	 {2004},
+  OPTeditor = 	 {},
+  OPTvolume = 	 {},
+  OPTnumber = 	 {},
+  OPTseries = 	 {},
+  OPTaddress = 	 {},
+  OPTmonth = 	 {},
+  OPTorganization = {},
+  OPTpublisher = {},
+  OPTnote = 	 {},
+  OPTannote = 	 {}
+}
+
+@InProceedings{cg03,
+  author = 	 {William R. Mark and R. Steven Glanville and Kurt Akeley and Mark J. Kilgard},
+  title = 	 "{Cg: A System for Programming Graphics Hardware in a C-like Language}",
+  OPTcrossref =  {},
+  OPTkey = 	 {},
+  booktitle = {SIGGRAPH},
+  OPTpages = 	 {},
+  year = 	 {2003},
+  OPTeditor = 	 {},
+  OPTvolume = 	 {},
+  OPTnumber = 	 {},
+  OPTseries = 	 {},
+  OPTaddress = 	 {},
+  OPTmonth = 	 {},
+  OPTorganization = {},
+  OPTpublisher = {},
+  OPTnote = 	 {},
+  OPTannote = 	 {}
+}
+
 @MastersThesis{karczma-thesis,
   author = 	 {Michael A. Karczmarek},
-  title = 	 {Constrained and phased scheduling of synchronous data flow graphs for the StreamIt language},
-  school = 	 {MIT LCS},
-  month =        {October},
+  title = 	 "{Constrained and phased scheduling of synchronous data flow graphs for StreamIt language}",
+  school = 	 {MIT},
+  OPTmonth =        {October},
   year = 	 {2002},
 }
 
@@ -446,7 +526,7 @@ year="2003"}
 
 @TechReport{spidle02,
   author = 	 {Charles Consel and Hedi Hamdi and Laurent Reveillere and Lenin Singaravelu and Haiyan Yu and Calton Pu},
-  title = 	 {Spidle: A DSL Approach to Specifying Streaming Applications},
+  title = 	 "{Spidle: A DSL Approach to Specifying Streaming Applications}",
   institution =  {LABRI Research Report 1282-02},
   year = 	 {2002},
   OPTkey = 	 {},
@@ -493,7 +573,7 @@ volume={6}}
 
 @TechReport{ptolemy03overview,
   author = 	 {Edward A. Lee},
-  title = 	 {Overview of the Ptolemy Project},
+  title = 	 "{Overview of the Ptolemy Project}",
   institution =  {Tech Memo UCB/ERL M03/25, UC Berkeley},
   year = 	 {2003},
   OPTkey = 	 {},
@@ -507,10 +587,10 @@ volume={6}}
 
 @InProceedings{sisal,
   author = 	 {J. Gaudiot and W. Bohm and T. DeBoni and J. Feo and P. Mille},
-  title = 	 {The Sisal Model of Functional Programming and its Implementation},
+  title = 	 "{The Sisal Model of Functional Programming and its Implementation}",
   OPTcrossref =  {},
   OPTkey = 	 {},
-  booktitle = {Proceedings of the 2nd Aizu International Symposium on Parallel Algorithms/Architecture Synthesis},
+  booktitle = {Proc. of the 2nd Aizu Int. Symp. on Parallel Algorithms/Architecture Synthesis},
   OPTOPTpages = 	 {},
   year = 	 {1997},
   OPTeditor = 	 {},
@@ -527,7 +607,7 @@ volume={6}}
 
 @InProceedings{ph,
 author="Shail Aidtya and Arvind and Lennart Augustsson and Jan-Willem Maessen and Rishiyur S. Nikhil",
-title="Semantics of pH: A parallel dialect of Haskell",
+title="{Semantics of pH: A parallel dialect of Haskell}",
 booktitle="Haskell Workshop",
 year="1995"}
 
@@ -622,7 +702,7 @@ year="1995"}
 @Article{LM87-i,
   author = 	 {E. A. Lee and D. G. Messerschmitt},
   title = 	 {Static Scheduling of Synchronous Data Flow Programs for Digital Signal Processing},
-  journal = 	 {IEEE Transactions on Computers},
+  journal = 	 {IEEE Trans. on Computers},
   year = 	 {1987},
   OPTkey = 	 {},
   OPTvolume = 	 {},
