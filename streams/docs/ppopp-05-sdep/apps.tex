@@ -1,9 +1,10 @@
-\section{Other SDEP Applications}
+\section{Applications of SDEP}
 \label{sec:others-apps}
 
-We believe that there are many interesting applications for $\sdep$ in
-programming language design and implementation.  We summarize four
-potential applications below.
+This paper applies $\sdep$ to define the semantics of a new language
+construct. We believe that there could be additional applications for
+$\sdep$ in programming language design and implementation.  Four
+potential applications are summarized below.
 
 \subsection{Specifying Latency Constraints}
 
@@ -12,10 +13,10 @@ employed as a declarative way to specify latency constraints between
 actors.  For instance, our infrastructure can interpret a directive
 such as $\mt{maxLatency}(A, B, k)$ to indicate a maximum latency of
 $k$ between actors $A$ and $B$.  To implement this directive, the
-schedule is constrained as if there were an upstream message with
-latency range $[0,k]$.  This kind of data-centric latency constraint
-could be important for reactive applications that need to produce an
-output before consuming too many items from the input.
+schedule is constrained as if there were an upstream message from B to
+A with latency range $[0,k]$.  This kind of data-centric latency
+constraint could be important for reactive applications that need to
+produce an output before consuming too many items from the input.
 
 \subsection{Debugging}
 
@@ -50,6 +51,5 @@ optimizations.  Representations such as dependence levels~\cite{AK82},
 direction vectors~\cite{wolfe82}, and dependence
 polyhedra~\cite{Irig88} were important abstractions because they
 provided an efficient way to test the validity of program
-transformations.  We believe that a similar abstraction of dependences
-is needed for the emerging realm of streaming applications, and
-$\sdep$ represents our first step towards this goal.
+transformations.  In some ways, $\sdep$ can serve a similar role
+within the class of streaming applications.

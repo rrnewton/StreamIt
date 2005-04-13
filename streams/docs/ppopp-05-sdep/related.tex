@@ -22,7 +22,7 @@ Pugh and Rosser present an iteration-based slicing
 algorithm~\cite{pugh97slice} to identify the dynamic instances of
 statements (in terms of their loop iteration) that effect a given
 value.  This bears some similarity to stream dependence analysis, as
-$\sdep{A}{B}(n)$ represents the last iteration of actor $A$ that
+$\sdepf{A}{B}(n)$ represents the last iteration of actor $A$ that
 affected the $n$th iteration of actor $B$.
 However,~\cite{pugh97slice} focuses on the problem of computing the
 transitive closure of dependences in loops, in which some iterations
@@ -51,11 +51,11 @@ its approach.  We believe that control messages represent a distinct
 and well-behaved class of dynamic communication in which a parameter
 is ``pushed'' into the receiver actor in an asynchronous way.  Because
 the message handlers do not access the input and output tapes of the
-receiving filter, their irregular invocations do not affect the
+receiving actor, their irregular invocations do not affect the
 multiplicity of the steady-state schedule.  Instead, the schedule is
-constrained only by the latency of control messages; if a message
-doesn't show up in the allotted window, then the receiving actor can
-go ahead with its high-bandwidth schedule.  This is the distinction in
+constrained only by the latency of control messages; if a message does
+not show up in the allotted window, then the receiving actor can go
+ahead with its high-bandwidth schedule.  This is the distinction in
 the computational model.  In addition, the static/dynamic integration
 offered by our system is integrated with language features that
 support the model.
@@ -64,11 +64,14 @@ There are many domain-specific stream languages in addition to
 StreamIt.  Streams have a long history in the programming languages
 community, with influences from dataflow, CSP, synchronous and
 functional languages; see Stephens~\cite{survey97} for a review.
-Languages of recent interest include Occam~\cite{occammanual},
-Sisal~\cite{sisal}, Parallel Haskell~\cite{ph}, StreamC /
-KernelC~\cite{imagine03ieee}, and Spidle~\cite{spidle02}.  The
-principle differences between StreamIt and these languages is $(i)$
-the single-input, single-output hierarchical structure that StreamIt
-imposes on the stream graph, $(ii)$ StreamIt's support for a ``peek''
-construct that inspects data without consuming it from a channel, and
-$(iii)$ teleport messaging as described in this paper.
+Languages of recent interest include Brook~\cite{brook04},
+Cg~\cite{cg03}, StreamC/KernelC~\cite{imagine03ieee},
+Spidle~\cite{spidle02}, Occam~\cite{occammanual}, Sisal~\cite{sisal},
+and Parallel Haskell~\cite{ph}.  The principle differences between
+StreamIt and these languages is $(i)$ the SDF model of computation in
+StreamIt, which narrows the application class but allows powerful
+optimizations, $(ii)$ StreamIt's support for a ``peek'' construct that
+inspects data without consuming it from a channel, $(iii)$ the
+single-input, single-output hierarchical structure that StreamIt
+imposes on the stream graph, and $(iv)$ teleport messaging as
+described in this paper.

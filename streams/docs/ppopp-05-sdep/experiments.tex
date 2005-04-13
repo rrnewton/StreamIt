@@ -6,21 +6,22 @@ infrastructure~\cite{streamit-asplos}, with a backend that targets a
 cluster of workstations.  A StreamIt program is compiled to a set of
 parallel threads; if two threads are allocated to different machines,
 they communicate via dedicated TCP/IP connections.  Teleport messaging
-is supported via auxilliary communication channels that transmit two
+is supported via auxiliary communication channels that transmit two
 kinds of signals from a message sender to the receiver: 1) the contents of
 a control message, or 2) a {\it credit} that indicates the receiver
 can execute some number of iterations before checking for a message
 again.
 
 Each actor alternates between normal execution and checking for the
-exchange of credits.  This serves to throttle the message receiver as
-described in Section~\ref{sec:teleport}, as an actor will block
-waiting for credits until the sender has reached a given point in its
-execution.  The compiler calculates the $\sdep$ relation and
-automatically schedules the exchange of credits to make sure that the
-timing constraints are respected.  When a message is sent, it is
-tagged with the iteration number during which the receiver should
-process it; this is also calculated using $\sdep$ in the compiler.
+exchange of credits.  This serves to throttle the message receiver in
+accordance with the constraints (Section~\ref{sec:teleport}), as an
+actor will block waiting for credits until the sender has reached a
+given point in its execution.  The compiler calculates the $\sdep$
+relation and automatically schedules the exchange of credits to make
+sure that the timing constraints are respected.  When a message is
+sent, it is tagged with the iteration number during which the receiver
+should process it; this is also calculated using $\sdep$ in the
+compiler.
 
 %% In our implementation, each actor maintains an iteration number which
 %% serves to synchronize message delivery. A message from a sender $A$ to
@@ -37,6 +38,14 @@ process it; this is also calculated using $\sdep$ in the compiler.
 %% or faster than the data items exchanged between the two actors. This
 %% assumption is safe since, due to the data dependences, a downstream
 %% filter cannot get ahead of an upstream actor.
+
+\begin{figure}[t]
+\vspace{-16pt}
+\psfig{figure=throughput-graph.eps,width=3.3in}
+\caption{\small Throughput as a function of the number of workstations
+in the cluster. 
+\protect\label{fig:fhr-throughput}}
+\end{figure}
 
 We use a cluster of workstations as our evaluation testbed. Our
 StreamIt compiler automatically partitions an input program into a set
@@ -55,26 +64,17 @@ as the number of outputs produced per unit of time, and communication
 overhead reflects the quantity of data transmitted between
 workstations.
 
-The teleport based implementation of the frequency hopping
-radio was compiled into 28 threads
-whereas the alternate version using a feedback-loop results in 
-32 threads.  Each thread implements a
-specific subset of the stream graph  and is assigned to one of
-sixteen 750Mhz Pentium~III workstations, each with a
-256Kb cache.  The machines are interconnected using a fully switched
-high speed network.
+The teleport implementation of the frequency hopping radio was
+compiled into 28 threads whereas the alternate version using a
+feedback-loop results in 32 threads.  Each thread implements a
+specific subset of the stream graph and is assigned to one of sixteen
+750Mhz Pentium~III workstations, each with a 256Kb cache.  The
+machines are interconnected using a fully switched high speed network.
 
-Our compiler maps threads to workstations using an algorithm that aims
-to reduce the overall application bottleneck while
-maximizing the throughput of the output filter (i.e., most downstream
-actor) in the stream graph.
-
-\begin{figure}[t]
-\psfig{figure=throughput-graph.eps,width=3.3in}
-\caption{\small Throughput as a function of the number of workstations
-in the cluster. 
-\protect\label{fig:fhr-throughput}}
-\end{figure}
+Our compiler maps threads to workstations using a dynamic programming
+algorithm algorithm.  The algorithm aims to reduce the overall
+application bottleneck, thereby maximizing the steady-state throughput
+of the output actor (i.e., most downstream actor in the stream graph).
 
 In Figure~\ref{fig:fhr-throughput}, we report the measured throughput
 ($y$-axis) for various cluster sizes ranging from one to sixteen
@@ -95,6 +95,6 @@ process one frame at a time.  This explains why the speedup improves
 as the number of processors increases: the extra parallelism is being
 utilized.  A second factor that could contribute to the improved
 performance is the reduced communication overhead.  A detailed
-analysis of the results shows that teleport messaging reduces the
+analysis of the results indicates that teleport messaging reduces the
 number of items communicated by 35\%, as a small number of credits are
 sent compared to the manual implementation.

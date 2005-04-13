@@ -558,11 +558,8 @@
  \setcounter{footnote}{0}
  \let\maketitle\relax
  \let\@maketitle\relax
-%%%RMR{
-%% \gdef\@thanks{}\gdef\@author{}\gdef\@title{}\gdef\@subtitle{}\let\thanks\relax
-%% \@copyrightspace}
- \gdef\@thanks{}\gdef\@author{}\gdef\@title{}\gdef\@subtitle{}\let\thanks\relax}
-%%%RMR}
+ \gdef\@thanks{}\gdef\@author{}\gdef\@title{}\gdef\@subtitle{}\let\thanks\relax
+ \@copyrightspace}
 
 %% CHANGES ON NEXT LINES
 \newif\if@ll % to record which version of LaTeX is in use
@@ -574,7 +571,7 @@
 
 \if@ll
   \NeedsTeXFormat{LaTeX2e}
-  \ProvidesClass{sig-alternate-submission} [2002/02/10 - V1.6 - based on acmproc.cls V1.3 <Nov. 30 '99>]
+  \ProvidesClass{sig-alternate} [2002/02/10 - V1.6 - based on acmproc.cls V1.3 <Nov. 30 '99>]
   \RequirePackage{latexsym}% QUERY: are these two really needed?
   \let\dooptions\ProcessOptions
 \else
@@ -1237,6 +1234,7 @@
 \ifnum\addauflag=0\addauthorsection\global\addauflag=1\fi
     \section{%
        {REFERENCES}
+         \vskip -9pt  % GM July 2000 (for tighter spacing)
         \@mkboth{{\refname}}{{\refname}}%
     }%
     \list{[\arabic{enumi}]}{%
@@ -1250,9 +1248,7 @@
         \usecounter{enumi}
     }%
     \let\newblock\@empty
-%%%RMR{
-%%    \raggedright % GM July 2000
-%%%RMR}
+    \raggedright % GM July 2000
     \sloppy
     \sfcode`\.=1000\relax
 }
@@ -1344,9 +1340,7 @@
 \baselineskip=11pt
 \let\thepage\relax % For NO page numbers - GM Nov. 30th. 1999 and July 2000
 \def\setpagenumber#1{\global\setcounter{page}{#1}}
-%%%RMR{
-\pagenumbering{arabic}  % Arabic page numbers GM July 2000
-%%%RMR}
+%\pagenumbering{arabic}  % Arabic page numbers GM July 2000
 \twocolumn             % Double column.
 \flushbottom           % Even bottom -- alas, does not balance columns at end of document
 \pagestyle{plain}
@@ -1357,7 +1351,7 @@
 \newtoks\acmcopyr
 \newtoks\boilerplate
 \global\acmcopyr={X-XXXXX-XX-X/XX/XX}  % Default - 5/11/2001 *** Gerry
-\global\copyrtyr={2002}                % Default - 7/30/2002 *** Gerry
+\global\copyrtyr={200X}                % Default - 3/3/2003 *** Gerry
 \def\CopyrightYear#1{\global\copyrtyr{#1}}
 \def\crdata#1{\global\acmcopyr{#1}}
 \def\permission#1{\global\boilerplate{#1}}
@@ -1369,5 +1363,5 @@
 \toappear{\the\boilerplate\par
 {\confname{\the\conf}} \the\confinfo\par \the\copyrightetc.}
 %
-%% End of sig-alternate-submission.cls -- V1.6 - 10/02/2002 --
+%% End of sig-alternate.cls -- V1.6 - 10/02/2002 --
 %% Gerry Murray -- Wednesday October 2nd. 2002

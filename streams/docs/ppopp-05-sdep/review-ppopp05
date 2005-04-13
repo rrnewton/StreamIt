@@ -1,0 +1,265 @@
+Return-Path: <yelick@eecs.berkeley.edu>
+Received: from po10.mit.edu (po10.mit.edu [18.7.21.66])
+	by po10.mit.edu (Cyrus v2.1.5) with LMTP; Tue, 01 Feb 2005 21:50:49 -0500
+X-Sieve: CMU Sieve 2.2
+Received: from fort-point-station.mit.edu by po10.mit.edu (8.12.4/4.7) id j122ohNh016038; Tue, 1 Feb 2005 21:50:48 -0500 (EST)
+Received: from main.softconf.com (softconf.com [69.10.135.168])
+	by fort-point-station.mit.edu (8.12.4/8.9.2) with ESMTP id j122obrP006892
+	for <thies@mit.edu>; Tue, 1 Feb 2005 21:50:37 -0500 (EST)
+Received: from main.softconf.com (localhost.localdomain [127.0.0.1])
+	by main.softconf.com (8.12.11/8.12.11) with ESMTP id j123jBaj023015;
+	Tue, 1 Feb 2005 19:45:11 -0800
+Received: (from rrgerber@localhost)
+	by main.softconf.com (8.12.11/8.12.11/Submit) id j123jBct023014;
+	Tue, 1 Feb 2005 19:45:11 -0800
+Date: Tue, 1 Feb 2005 19:45:11 -0800
+Message-Id: <200502020345.j123jBct023014@main.softconf.com>
+X-Authentication-Warning: main.softconf.com: rrgerber set sender to yelick@eecs.berkeley.edu using -f
+From: yelick@eecs.berkeley.edu
+To: thies@MIT.EDU
+CC: yelick@eecs.berkeley.edu
+Subject: Your PPoPP 2005 Paper (Number 80)
+X-Spam-Score: -4.74
+X-Spam-Flag: NO
+X-Scanned-By: MIMEDefang 2.42
+
+Dear Mr. William Thies:
+
+On behalf of the PPoPP 2005 Program Committee, I am delighted to inform
+you that the following paper has been accepted to appear at the
+conference:
+
+     Stream Dependence Analysis and its Application to
+           Precise Event Handling
+
+The Program Committee worked very hard to thoroughly review
+all the submitted papers.  Please read the reviews carefully and 
+following their suggestions when you revise your paper.
+
+Final papers will be due sometime after April 1.  Additional information 
+about formatting instructions and the exact deadline will be sent shortly.
+
+Congratulations on your fine work.  If you have any additional 
+questions, please feel free to get in touch.
+
+
+Best Regards,
+Kathy Yelick and Andrew Grimshaw 
+PPoPP 2005 
+
+============================================================================ 
+PPoPP 2005 Reviews for Paper #80
+============================================================================ 
+
+Title: Stream Dependence Analysis and its Application to Precise Event Handling
+
+Authors: William Thies, Michal Karczmarek, Janis Sermulins, Rodric Rabbah, and Saman Amarasinghe
+============================================================================
+                            REVIEWER #1
+============================================================================ 
+
+                           Reviewer's Scores
+                  -----------------------------------
+
+            Overall quality of the paper: 7
+                     Reviewer confidence: 2
+
+
+---------------------------------------------------------------------------
+                          Detailed Comments
+---------------------------------------------------------------------------
+
+The paper works with a synchronous dataflow model of computation that
+is applicable to streaming applications.  A set of actors (the nodes
+of a graph that models the program) accept and produce tokens on the
+directed arcs of the graph.  Each actor cycles through a set of
+states, specific to it.  In each state, when there are at least some
+state-specific number of tokens on each of its input arcs, it may
+fire, producing a predetermined number of tokens on each output arc,
+and going to the next state in its cycle.  The system starts in some
+well-defined state (actors in start states, some number of tokens on
+each arc.)  A computation is a sequence of actor firings, each one
+allowable at the current state of the system.  There are in infinite
+number of legal, finite computation sequences.
+
+The goal of the paper is to allow additional control channels to be
+established between actors, so that they can send messages (other than
+the tokens, which represent the data streams) that, for example,
+control computation parameters: e.g. -- "add 3 to your gain parameter,
+please."  The problem is how to synchronize their arrival and effect
+with the data streams.  The problem being that the system is
+nondeterministic.  At the nth firing of actor A, we may know only
+partial information about how many firings have occurred at all the
+other actors.  One key idea here is that it is possible, using a form
+of greedy schedule, to know the minimum number of firings of any A
+given that B has just fired for the nth time, SDEP(A, B, n), and that
+this can be calculated statically in time independent of n.  Thus, the
+language is extended to allow a control message (from, e.g., A to B)
+of the form "B: Do <something> but not before you know that I (A) must
+have fired at least three times since I sent you this message".  For a
+downstream message (when there is a directed path from A to B) the
+control signal can ride along with the data first data tokens produced
+by A for which the message should take effect at B.  But it does not
+have to.  The basic idea of the paper is that the recipient of such a
+message can use knowledge of the SDEP function to determine when to
+take the action specified by such a control message, and that this is
+true for messages that travel upsteam as well as downstream.  The
+authors say that SDEP, its definition and the efficient way to
+determine it, as well as its use for such synchronized control
+signals, are the contributions made here.  (Note that if SDEP(A, B, n)
+= 0 for all n, i.e. B needs not tokens from A, then there is no path
+in the graph from A to B, and no message can be sent from one to
+another.  This is a limitation of the model, isn't it?)
+
+The key idea is presented in Section 5.1.  I found it hard to follow,
+because of a certain vagueness in places; and also because the idea
+here is quite subtle and nice.  Please give some help, a small
+example, after Definition 2.  The end of Section 5.1 defeated me.  The
+paragraph that begins with "Calculating a legal sequence of actor
+firings..." uses concepts not previously introduced: overlapping
+constraints and intervals of the stream graph.  The whole question of
+constraints needs to be presented in a more careful, comprehensible
+way.
+
+This approach "eludes" the need --> This approach avoids the need...
+(wrong word).
+
+This paper does appear to be a substantive contribution to the
+languages for streaming computation with a synchronous dataflow model.
+It is written quite well.  But I wish it was easier to understand; I
+don't think the ideas so hard to convey, and with some work the
+presentation can be made even better.
+
+============================================================================
+                            REVIEWER #2
+============================================================================ 
+
+                           Reviewer's Scores
+                  -----------------------------------
+
+            Overall quality of the paper: 6
+                     Reviewer confidence: 3
+
+
+---------------------------------------------------------------------------
+                          Detailed Comments
+---------------------------------------------------------------------------
+
+This paper addresses and interesting and "hot" topic of stream
+processing.  The programming model is a very restrictive synchronous
+dataflow model, which has been used by the authors and others in past
+work.  In this model, there are no conditionals or recursion, and the
+execution model says that data is continuously fed into the graph in a
+stream.  The applications areas are signal and media processing.
+
+The specific problem addressed in the paper is how to send precise
+events from one actor (a finite state machine) to another.  These are
+quite different than the kinds of asynchronous message used in other
+forms of parallel programming, as they come with a minimum and maximum
+allowed delay.  The language mechanism is introduced along with a
+static analysis that allows the dataflow graph to be analyzed to
+ensure that the message arrive in the specified time frame.
+
+The authors demonstrate these ideas in a software radio problem and
+show that they result in a 49% speedup.
+
+Overall, this paper combines some formalism with implementation work
+and is nicely balanced.  It addresses an interesting, albeit quite
+narrow, area of parallel programming.  My only serious complaint is
+that the definitions are not carefully presented -- this was easily
+fixable in the earlier parts of the paper where the concepts were
+straightforward, but not when I got to the critical section defining
+M.  I suspect these problems come, at least in part, to having shrunk
+this paper from a much longer document and omitted some of the
+definitions.
+
+First, the SDF is not precisely defined.  Although there is an example
+and some discussion from which one can deduce the general definition,
+I would like to see a clear statement of what kinds of nodes eistand
+there is prior work here.  The text says, "this type of splitter is a
+round-robing splitter."  Are there others?  Are there nondeterministic
+splitter?  Another sentence says about splitters: "and on every
+execution step, they can distribute their output to any one of their
+children."  From the example with output edges labels 1,0 and 0,1 it
+seems that there is some consistency requirement on those edge labels
+and exactly one of the edges can be enabled for an output on each
+step.  Is this true?  Are there other features of the language that
+are not described at all in this section? This is critical to the
+question of how many possible schedules pullSchedule produces later in
+the paper.  (As an aside, I don't understand the use of "actors" in
+this field, rather than "automata" or "finite state machines" which
+these seem to be.)
+
+The statement of Theorem 1 needs to be cleaned up, since pullSchedule
+is not well-defined.  The "for all input channels" allows for more
+than one possible execution.  (Or do you mean to make it evaluate
+left-to-right edges in order?)  As-is, the authors need to state that
+all pull-schedules produce the same count, which I believe they do.
+E.g., after step 4 or 5 in the example, actor B could fire -- this
+would produce a different execution (PullSchedule is not a function),
+but the number of A's in those executions will all be equal.  I
+believe this all fixable, but it relies critically on what constructs
+are in the dataflow graph, since something with nondetermism could
+make the greedy algorithm find a non-minimal
+
+In section 5.1, the term "work function" comes up, which has not been
+discussed previously.  What are the restrictions on these work
+functions?
+
+In definition 2, I had trouble with the phrase "the message handler
+can be invoked in R immediately before its work function has fired
+M(...) times".  Should that be "can only be invoked"?  I think some
+kind of if-and-only-iff is needed here, since you want to invoke them
+inside (never outside) the specific time period, but they also have to
+be invoked sometime in that perior, don't they?  As a notational
+point, the use of the notation "M(...)" as if it is some function,
+which is clearly is not (it's only constrained to have some range of
+values) is also bothersome.  I think it would be cleaner to define the
+minimum and maximum values separately, which should both be
+well-defined, and then put constraints on where the message handler is
+invoked.
+
+The discussion of overlapping constraints is critical.  Once these
+teleport messages have been added to the language, all the results
+from earlier in the paper about SDEP being easy to compute on the
+simpler language are not necessarily true.  Saying that the compiler
+may choose to prohibit these is not sufficient.  Instead, it should be
+clear (at the beginning of this section) that this paper only
+addresses the problem of non-overlapping constraints, which is a
+property that is statically checkable.
+
+============================================================================
+                            REVIEWER #3
+============================================================================ 
+
+                           Reviewer's Scores
+                  -----------------------------------
+
+            Overall quality of the paper: 9
+                     Reviewer confidence: 2
+
+
+---------------------------------------------------------------------------
+                          Detailed Comments
+---------------------------------------------------------------------------
+
+This paper introduces a stream dependence function, SDEP, that
+describes the dependence between two components in a synchronous
+dataflow system.  They use this function to define teleport messaging,
+a mechanism for communicating control signals in a streaming
+programming model to ensure that messages are received at the
+appropriate time.  The teleport messaging approach is compared against
+an approach in which control signals are modeled as normal data
+streams, resulting in a substantial improvement due to the looser
+coupling and reduced communication.  It is also argued to be a cleaner
+model for the stream programmer to use.
+
+This paper was written very clearly, explained the problem domain and
+approach taken by the authors very well (even for people not familiar
+with this area), and diagrams and examples were used very effectively.
+Stream programming is an interesting area of parallel computation, and
+the problem of dealing with control messages is a worthwhile one for
+study.  This paper seems polished, ready for, and worthy of
+publication.  I am hard-pressed to find anything to suggest or comment
+on for improvement, and recommend it be accepted.
+

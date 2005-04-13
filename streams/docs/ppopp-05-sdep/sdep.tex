@@ -3,45 +3,45 @@
 \newcommand{\UND}{\end{ALC@g}}
 \newcommand{\tup}[2]{\langle{#1}, {#2}\rangle}
 
-\section{Model of Computation}
-\label{sec:modelofcomp}
+%% \section{Model of Computation}
+%% \label{sec:modelofcomp}
 
-%In this section, we describe our model of computation and define the
-%stream dependence function, $\sdep$.
+%% %In this section, we describe our model of computation and define the
+%% %stream dependence function, $\sdep$.
 
-Our model of computation is Cyclo-Static Dataflow~\cite{BELP96},
-a generalization of Synchronous Dataflow (SDF). It  is a popular  model of
-computation~\cite{LM87-i} that  is well suited for  streaming
-codes. In this model, computation is represented  as a graph consisting of
-{\it  actors} connected by FIFO communication channels.
-Each actor follows a set of execution steps, or phases, that consume
-a constant number of items from the input channels and produce a
-constant number of items onto the output channels.  
-The number and ordering of phases is known at
-compile time, and their execution is cyclic (that is, after executing
-the last phase, the first phase is executed again).
-SDF is appealing because every actor has a fixed input and output rate
-(I/O rate) thus making the stream graphs  amenable to static
-scheduling and optimization.
+%% Our model of computation is Cyclo-Static Dataflow~\cite{BELP96},
+%% a generalization of Synchronous Dataflow (SDF). It  is a popular  model of
+%% computation~\cite{LM87-i} that  is well suited for  streaming
+%% codes. In this model, computation is represented  as a graph consisting of
+%% {\it  actors} connected by FIFO communication channels.
+%% Each actor follows a set of execution steps, or phases, that consume
+%% a constant number of items from the input channels and produce a
+%% constant number of items onto the output channels.  
+%% The number and ordering of phases is known at
+%% compile time, and their execution is cyclic (that is, after executing
+%% the last phase, the first phase is executed again).
+%% SDF is appealing because every actor has a fixed input and output rate
+%% (I/O rate) thus making the stream graphs  amenable to static
+%% scheduling and optimization.
 
-Figure~\ref{fig:sdep-rates} illustrates an example stream graph. The
-nodes represent the actors, and the numbers within the nodes represent
-the I/O rate of each actor. For example, actor $C$  consumes 3 input
-items and produces 2 output times with every execution step. Actors
-with a single input and multiple output channels are known as {\it splitters}, and on
-every execution step, they can distribute their output to any one of
-their children. For example, actor $A$ writes the output of its first
-execution to its left child ($C$), and the output of its second
-execution to its right child ($D$). This type of a splitter is a
-round-robin splitter with one I/O rate per output edge. 
-%A duplicate splitter is also possible but is not illustrated. 
-A counterpart to splitters
-are the joiners which have multiple input channels but only one output
-channel. The joiner assembles the data from their predecessors
-in a round-robin manner. In Figure~\ref{fig:sdep-rates}, actor $E$ is
-a joiner which reads one item from $C$ in its first phase, then
-another from $D$ in its second phase (before cycling back and 
-repeating the pattern).
+%% Figure~\ref{fig:sdep-rates} illustrates an example stream graph. The
+%% nodes represent the actors, and the numbers within the nodes represent
+%% the I/O rate of each actor. For example, actor $C$  consumes 3 input
+%% items and produces 2 output times with every execution step. Actors
+%% with a single input and multiple output channels are known as {\it splitters}, and on
+%% every execution step, they can distribute their output to any one of
+%% their children. For example, actor $A$ writes the output of its first
+%% execution to its left child ($C$), and the output of its second
+%% execution to its right child ($D$). This type of a splitter is a
+%% round-robin splitter with one I/O rate per output edge. 
+%% %A duplicate splitter is also possible but is not illustrated. 
+%% A counterpart to splitters
+%% are the joiners which have multiple input channels but only one output
+%% channel. The joiner assembles the data from their predecessors
+%% in a round-robin manner. In Figure~\ref{fig:sdep-rates}, actor $E$ is
+%% a joiner which reads one item from $C$ in its first phase, then
+%% another from $D$ in its second phase (before cycling back and 
+%% repeating the pattern).
 
 %The actors consume
 %and produce a constant number  of items from their input and output
@@ -56,23 +56,18 @@ repeating the pattern).
 %consumed from the channel, and the peek amount is known at compile
 %time (note that peeking is not part of CSDF).
 
-\begin{figure}[t]
-\begin{center}
-\psfig{figure=sdep-example-rates3.eps,height=1.5in}
-\caption{{\small Example stream graph. Nodes are annotated with their
-I/O rates. Nodes A and E have two phases; for example, the annotation
-``1, 0'' on the left output channel of A indicates that 1 item is
-produced during the first phase, and 0 items are produced during the second phase.
-\protect\label{fig:sdep-rates}}}
-\end{center}
-\vspace{-12pt}
-\end{figure}
-
 \section{Stream Dependence Function}
 \label{sec:sdep}
 
-In this section we formally define the stream dependence function,
-$\sdep$.
+This section defines a stream dependence function, $\sdep$, that can
+be used to describe the timing of teleport messages.  The dependence
+is meaningful for exactly those pairs of actors that are connected by
+a directed path (aligned with the direction of data flow) in the
+stream graph.  The {\it upstream} actor is at the start of the path,
+while the {\it downstream} actor is at the end.  Dependences between
+parallel actors (e.g., parallel branches of a splitjoin) currently
+fall outside the scope of this model but could be addressed in future
+work~(Section~\ref{sec:conclusion}).
 
 An execution $\phi$ of a dataflow graph is an ordered sequence of
 actor firings.  Each firing represents the execution of a single phase
@@ -90,11 +85,11 @@ The stream dependence function, $\sdep$, describes the dependences
 between actor firings in the graph.  Informally, $\sdepf{A}{B}(n)$
 represents the minimum number of times that actor $A$ must execute to
 make it possible for actor $B$ to execute $n$ times.  This dependence
-is meaningful only if there is a directed path in the stream graph
-from $A$ to $B$; otherwise, $\sdep$ will have a value of zero.
-Because the I/O rates of each actor in the stream graph are known at
-compile time, $\sdep$ is also a static relation.  The following is a
-formal definition of $\sdep$ using the notations introduced earlier:
+is meaningful only if $A$ is upstream of $B$; otherwise, $\sdep$
+assumes a value of zero.  Because the I/O rates of each actor in the
+stream graph are known at compile time, $\sdep$ is also a static
+relation.  The following is a formal definition of $\sdep$ using the
+notations introduced earlier:
 \begin{definition}(SDEP)
 \begin{center}
 $\sdepf{A}{B}(n)~~ = ~~\mbox{MIN}~~|\phi \wedge A|$ \\
@@ -107,24 +102,6 @@ times, $\sdepf{A}{B}(n)$ is the minimum number of times that $A$
 fires.  An example of $\sdep$ for the stream graph in
 Figure~\ref{fig:sdep-rates} appears in Figure~\ref{fig:sdep1}.
 
-\begin{figure*}[t]
-\begin{center}
-\psfig{figure=sdep-example3.eps,width=7in}
-\caption{\small Example \figsdep\ calculation for stream graph in
-Figure~\ref{fig:sdep-rates}.  The stream graphs illustrate a steady
-state cycle of a ``pull schedule''; execution proceeds from left to
-right, and channels are annotated with the number of items present.
-The second line lists the actors that fire in the pull schedule for
-$E$.  The third line counts the number of times that $A$ executes in
-the pull schedule, and the fourth line illustrates the computation of
-$\figsdepf{A}{E}(n)$: the number of times that $A$ executes before the
-$n$th execution of $E$.  The last two lines illustrate the computation
-of $\figsdepf{B}{E}$.
-\protect\label{fig:sdep1}}
-\end{center}
-\vspace{-12pt}
-\end{figure*}
-
 \section{Calculating SDEP}
 \label{sec:calc-sdep}
 
@@ -134,6 +111,47 @@ construct an execution $\phi$ that provides the minimum value of
 $|\phi \wedge A|$ that is selected in Definition~\ref{eq:sdepdef}.  We
 construct $\phi$ by simulating the stream graph's execution of a
 ``pull schedule'' with respect to actor $B$ (see Algorithm 1).
+
+Intuitively, a pull schedule for $X$ is one that executes other nodes
+as few times as possible for each firing of $X$.  This is achieved by
+calculating the demand for data items on the input channels of $X$,
+and then propagating the demand back through the stream graph via pull
+scheduling of the actors connected to $X$.  Pull scheduling results in
+a fine-grained interleaving of actor firings.  Some stream graphs
+admit multiple pull schedules, as actors with multiple input channels
+can traverse them in any order; however, the set of actor executions
+remains constant even as the order changes.  The following theorem
+allows us to use a pull schedule to calculate the $\sdep$ function.
+\begin{theorem} 
+\label{thm1}
+\[
+\sdepf{A}{B}(n) = |{\bf pullSchedule}(B, n) \wedge A|
+\]
+\end{theorem}
+\begin{proof}
+By construction, ${\bf pullSchedule}(B, n)$ executes each node in the
+graph as few times as possible for $B$ to fire $n$ times.  Thus, there
+is no execution containing $n$ executions of $B$ where $A$ executes
+fewer times.  The theorem follows from the definition of $\sdep$.
+\end{proof}
+
+\begin{figure*}[t]
+\begin{center}
+\psfig{figure=sdep-example3.eps,width=6in}
+\caption{\small Example \figsdep\ calculation for stream graph in
+Figure~\ref{fig:sdep-rates}.  The stream graphs illustrate a steady
+state cycle of a ``pull schedule''; execution proceeds from left to
+right, and channels are annotated with the number of items present.
+The second line lists the actors that fire in a pull schedule for
+$E$.  The third line counts the number of times that $A$ executes in
+the pull schedule, and the fourth line illustrates the computation of
+$\figsdepf{A}{E}(n)$: the number of times that $A$ executes before the
+$n$th execution of $E$.  The last two lines illustrate the computation
+of $\figsdepf{B}{E}$.
+\protect\label{fig:sdep1}}
+\end{center}
+\vspace{-12pt}
+\end{figure*}
 
 \begin{figure}[t]
 \begin{center}
@@ -159,24 +177,18 @@ construct $\phi$ by simulating the stream graph's execution of a
 \vspace{-12pt}
 \end{figure}
 
-Intuitively, a pull schedule for $X$ is one that executes other nodes
-as few times as possible for each firing of $X$.  This is achieved by
-calculating the demand for data items on the input channels of $X$,
-and then propagating the demand back through the stream graph via pull
-scheduling of the actors connected to $X$.  Pull scheduling results in
-a fine-grained interleaving of actor firings.  The following theorem
-allows us to use a pull schedule to calculate the $\sdep$ function.
-\begin{theorem} 
-\[
-\sdepf{A}{B}(n) = |{\bf pullSchedule}(B, n) \wedge A|
-\]
-\end{theorem}
-\begin{proof}
-By construction, ${\bf pullSchedule}(B, n)$ executes each node in the
-graph as few times as possible for $B$ to fire $n$ times.  Thus, there
-is no execution containing $n$ executions of $B$ where $A$ executes
-fewer times.  The theorem follows from the definition of $\sdep$.
-\end{proof}
+\begin{figure}[t]
+\begin{center}
+\psfig{figure=sdep-example-rates3.eps,height=1.5in}
+\caption{{\small Example stream graph.  Nodes are annotated with their
+I/O rates.  For example, node C consumes 3 items and produces 2 items
+on each execution.  Node A is a round-robin splitter that produces one
+item on its left channel during the first phase, and one item on its
+right channel during the second phase (similarly for Node E).
+\protect\label{fig:sdep-rates}}}
+\end{center}
+\vspace{-26pt}
+\end{figure}
 
 Some example $\sdep$ calculations appear in Figure~\ref{fig:sdep1}.
 The results are summarized in the following table.
@@ -193,7 +205,7 @@ $n$ & $\sdepf{A}{E}(n)$ & $\sdepf{B}{E}(n)$ \\
 \end{center}
 Note that $\sdep$ is highly non-linear due to mis-matching I/O rates
 in the stream graph.  However, for longer execution traces, there is a
-pattern in the marginal growth of $\sdep$ ({\it i.e.,} in $\sdep(n) -
+pattern in the marginal growth of $\sdep$ (i.e., in $\sdep(n) -
 \sdep(n-1)$); this quantity follows a cyclic pattern and has the same
 periodicity as the steady state of the stream graph.  A steady state
 ${\cal S} \in \Phi$ is an execution that does not change the buffering
@@ -203,7 +215,7 @@ simulated in Figure~\ref{fig:sdep1} is a steady state, meaning that
 additional entries of the pull schedule will repeat the pattern given
 in the figure.  Thus, $\sdep$ will also grow in the same pattern, and
 we can calculate $\sdep$ for $n > 4$ as follows\footnote{Note that for
-any two actors $X$ and $Y$, $\sdepf{X}{Y}(0) = 0$}:
+any two actors $X$ and $Y$, $\sdepf{Y}{X}(0) = 0$}:
 \begin{equation*}
 \begin{array}{l}
 \mbox{} \hspace{-5pt} \sdepf{A}{E}(n) = \\ 
@@ -215,29 +227,61 @@ any two actors $X$ and $Y$, $\sdepf{X}{Y}(0) = 0$}:
 where ${\cal S}$ is a steady state execution.  In this example,
 $|{\cal S} \wedge A| = 6$, $|{\cal S} \wedge B| = 3$, and $|{\cal S}
 \wedge E| = 4$.  There are well-known techniques for computing steady
-state schedules~\cite{LM87-i}.  Thus, to calculate $\sdepf{X}{Y}(n)$,
+state schedules~\cite{LM87-i}.  Thus, to calculate $\sdepf{Y}{X}(n)$,
 it is not necessary to simulate a pull schedule for $n$ iterations of
-$Y$ as described in Algorithm 1.  Instead, one can simulate $|{\cal S}
-\wedge Y|$ iterations as a pre-processing step and answer all future
+$X$ as described in Algorithm 1.  Instead, one can simulate $|{\cal S}
+\wedge X|$ iterations as a pre-processing step and answer all future
 $\sdep$ queries in constant time.  In addition, the pull schedule for
-$Y$ can be reused to calculate $\sdep$ from $Y$ to any other actor
-({\it e.g.,} $\sdepf{W}{Y}$ in addition to $\sdepf{X}{Y}$).
+$X$ can be reused to calculate $\sdep$ from $X$ to any other actor
+(e.g., $\sdepf{W}{X}$ in addition to $\sdepf{Y}{X}$).
 
-However, note that the pull schedule for $Y$ can {\it not} be used to
-calculate $\sdep$ from any actor other than $Y$ ({\it e.g.,}
-$\sdepf{W}{X}$).  The guarantee provided by ${\bf pullSchedule}(X, n)$
+However, note that the pull schedule for $X$ can {\it not} be used to
+calculate $\sdep$ from any actor other than $X$ (e.g.,
+$\sdepf{W}{Y}$).  The guarantee provided by ${\bf pullSchedule}(X, n)$
 is only with respect to the base actor $X$. For other pairs of actors
 in the graph, one actor might execute more than necessary for $n$
-executions of the other.  For example, consider what happens if we
-calculate $\sdepf{A}{B}$ using the schedule in Figure~\ref{fig:sdep1}
+executions of the other.  For example, consider what happens if one
+calculates $\sdepf{A}{B}$ using the schedule in Figure~\ref{fig:sdep1}
 (which is a pull schedule for $E$).  In the schedule, $A$ executes 5
-times before the first firing of $B$, so we would conclude that
+times before the first firing of $B$, so one would conclude that
 $\sdepf{A}{B}(1) = 5$.  However, this is incorrect; since $B$ could
 have fired after only 2 executions of $A$, the correct value is
-$\sdepf{A}{B} = 2$.  Thus, to calculate $\sdepf{X}{Y}$, it is
-essential to calculate ${\bf pullSchedule}(Y, |{\cal S} \wedge Y|)$,
-that is, a steady state cycle of the pull schedule with respect to
-$Y$.
+$\sdepf{A}{B}(1) = 2$.  Thus, to calculate $\sdepf{Y}{X}$, it is
+essential to calculate ${\bf pullSchedule}(X, |{\cal S} \wedge X|)$,
+that is, a steady state cycle of a pull schedule with respect to $X$.
+
+A related fact is that $\sdep$ is not necessarily compositional.  For
+example, in Figure~\ref{fig:sdep1}:
+\[
+\sdepf{A}{E}(1) \ne \sdepf{A}{B} ( \sdepf{B}{E}(1) )
+\]
+%% \[
+%% \sdepf{A}{E}(1) = 1 \\
+%% \sdepf{A}{B} ( \sdepf{B}{E}(1) ) = \sdepf{A}{B} (0) = 0 
+%% \]
+This fact is due to the parallelism in the stream graph.  For $E$ to
+fire once, it consumes an item from $C$, which must be produced by
+$A$.  Thus $\sdepf{A}{E}(1) = 1$.  But $\sdepf{B}{E}(1) = 0$ because
+$E$ does not consume anything from $B$ on its first firing; finally,
+$\sdepf{A}{B}(0) = 0$ by definition.  However, $\sdep$ does exhibit
+compositionality within sequential regions (pipelines), and this
+property can be exploited to tabulate $\sdep$ hierarchically instead
+of via a complete pull schedule.
+
+%% It is also possible to calculate $\sdep$ using a compositional
+%% approach.  Suppose there is a path in the stream graph from $A$ to $B$
+%% to $C$.  Then $\sdep$ has the following property, which follows from
+%% Theorem~\ref{thm1}:
+%% \[
+%% \sdepf{A}{C}(n) = \sdepf{A}{B} ( \sdepf{B}{C}(n) )
+%% \]
+%% That is, to calculate the minimum number of executions of $A$ that
+%% enables $n$ executions of $C$, one first calculates the minimum number
+%% of executions of an intermediate actor $B$ for $n$ executions of $C$,
+%% and then finds the minimum number of executions of $A$ for the given
+%% execution count of $B$.  One can utilize this property to tabulate
+%% $\sdep$ values hierarchically, starting with adjacent actors and then
+%% composing successively longer paths through the stream graph.
 
 %% {\scriptsize
 %% \begin{verbatim}

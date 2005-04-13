@@ -1,25 +1,22 @@
-Many parallel programs can be naturally represented as a graph of
-independent components (or {\it actors}) that communicate over
-channels.  In this paper, we present a stream dependence
-function, $\sdep$, which describes the ordering constraints between
-executions of parallel actors.  This dependence information offers
-many of the benefits of slicing in procedural languages, including
-debugging and program analysis.  However, unlike slicing, we focus on
-the domain of Synchronous Dataflow (SDF) programs, in which each
-component has a fixed input and output rate.  We leverage the static
-properties of SDF to compute $\sdep$ exactly at compile time and to
-store the dependence information compactly.
+In this paper, we develop a new language construct to address one of
+the pitfalls of parallel programming: precise handling of events
+across parallel components.  The construct, termed {\it teleport
+messaging}, uses dependences between components to provide a common
+notion of time in a parallel system.  Our work is done in the context
+of the Synchronous Dataflow (SDF) model, in which computation is
+expressed as a graph of independent components (or {\it actors}) that
+communicate in regular patterns over data channels.  We leverage the
+static properties of SDF to compute a stream dependence function,
+$\sdep$, that compactly describes the exact ordering constraints
+between actor executions.
 
-Using $\sdep$, we develop a new language construct to address one of
-the pitfalls of parallel programming: precise timing of events across
-parallel components.  The construct, termed {\it teleport messaging},
-uses the dependence information to provide a common notion of time in
-a parallel system.  For example, an actor $A$ can specify that an
-event should be processed by a non-neighboring actor $B$ as soon as
+Teleport messaging utilizes $\sdep$ to provide powerful and precise
+semantics for event handling.  For example, an actor $A$ can specify
+that an event should be processed by a downstream actor $B$ as soon as
 $B$ sees the ``effects'' of the current execution of $A$.  Based on a
 case study of a software radio, we argue that teleport messaging
-significantly improves programmer productivity. We have also
-implemented fully-automatic support for messaging in the StreamIt
-compiler, with a backend for a cluster of workstations.  As messaging
-exposes optimization opportunities to the compiler, it also results in
-a 49\% performance improvement for our case study.
+improves readability and robustness of code.  We have also implemented
+messaging within the StreamIt compiler, with a backend for a cluster
+of workstations.  As teleport messaging exposes optimization
+opportunities to the compiler, it also results in a 49\% performance
+improvement for our case study.
