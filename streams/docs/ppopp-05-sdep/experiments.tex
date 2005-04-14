@@ -39,16 +39,6 @@ compiler.
 %% assumption is safe since, due to the data dependences, a downstream
 %% filter cannot get ahead of an upstream actor.
 
-\begin{figure}[t]
-\vspace{-16pt}
-\psfig{figure=throughput-graph.eps,width=3.3in}
-\vspace{-20pt}
-\caption{\small Throughput as a function of the number of workstations
-in the cluster. 
-\protect\label{fig:fhr-throughput}}
-\vspace{-6pt}
-\end{figure}
-
 We use a cluster of workstations as our evaluation testbed.  The
 StreamIt compiler automatically partitions an input program into a set
 of threads that are mapped to the workstations and then run
@@ -90,6 +80,16 @@ communication overhead.  A detailed analysis of the results indicates
 that teleport messaging reduces the number of items communicated by
 35\%, as a small number of credits are sent compared to the manual
 implementation.
+
+\begin{figure}[t]
+\vspace{-16pt}
+\psfig{figure=throughput-graph.eps,width=3.3in}
+\vspace{-20pt}
+\caption{\small Throughput as a function of the number of workstations
+in the cluster. 
+\protect\label{fig:fhr-throughput}}
+\vspace{-6pt}
+\end{figure}
 
 %% There are two factors contributing to this speedup.  First, teleport
 %% messaging exposes more parallelism in the application, as the compiler
