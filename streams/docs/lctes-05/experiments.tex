@@ -8,15 +8,15 @@
 {\tiny
 \begin{tabular}{|c|c|c|} \hline
 {\bf benchmark}&{\bf description}&{\bf \# of actors}\\ \hline \hline
-\texttt{beamformer} &beamformer with 12 sources and 4 detectors& 54 \\ \hline
-\texttt{fft-fine	} &fine grained FFT implementation	&	121 \\ \hline
+\texttt{bitonic	} &bitonic sort of 64 integers	&	972 \\ \hline
+\texttt{fir	      } &finite impulse response program	&	132 \\ \hline
+\texttt{fft-fine	} &fine grained FFT implementation	&	267 \\ \hline
 \texttt{fft-coarse} &coarse grained FFT implementation	&	26 \\ \hline
+\texttt{3gpp	} &3GPP Radio Access Protocol application	&	105 \\ \hline
+\texttt{beamformer} &beamformer with 64 sources and 1 detector& 197 \\ \hline
+\texttt{matmult	} &matrix multiplication	&	48 \\ \hline
 \texttt{fmradio	} &FM Radio with 10 way equalizer	&	49 \\ \hline
 \texttt{filterbank} &simple filterbank program	&	53 \\ \hline
-\texttt{bitonic	} &bitonic sort of 64 integers	&	972 \\ \hline
-\texttt{matmult	} &matrix multiplication	&	48 \\ \hline
-\texttt{fir	      } &finite impulse response program	&	132 \\ \hline
-\texttt{3gpp	} &3GPP Radio Access Protocol application	&	105 \\ \hline
 \texttt{filterbank2}&alternate implementation of a filterbank &	37 \\ \hline
 \texttt{ofdm	 }& Orthogonal Frequency Division Multiplexor~\cite{spectrumware}	&	16 \\ \hline
 \end{tabular}
@@ -44,36 +44,79 @@ then run five times, and the median user time is recorded.
 % large code size.
 
 
-\begin{figure}[t]
-  \vspace{-24pt}
-  \hspace{-0.3in}\psfig{figure=p3-caf-new.eps, width=3.9in}
-  \vspace{-48pt}
-  \caption{Performance results for a Pentium~3.  The bars for each
-  benchmark appear in the same order as the legend.}
-  \label{fig:results-p3}
-  \vspace{-3pt}
-\end{figure}
+\begin{figure*}
+\begin{minipage}{3.4in}
+\vspace{-36pt}
+\hspace{-0.4in}\psfig{figure=arm2.eps,width=4.2in}
+\vspace{-66pt}
+\caption{Performance results for a StrongARM.\protect\label{fig:arm-perf2}}
+\end{minipage}
+\hspace{0.1in}
+\begin{minipage}{3.4in}
+\vspace{-36pt}
+\hspace{-0.4in}\psfig{figure=arm1.eps,width=4.2in}
+\vspace{-66pt}
+\caption{Full fusion versus \texttt{CAF+scaling+buffer} on a StrongARM.\protect\label{fig:arm-perf}}
+\end{minipage}
+\end{figure*}
 
-\begin{figure}[t]
-  \vspace{-36pt}
-  \hspace{-0.3in}\psfig{figure=i2-caf-new.eps, width=3.9in}
-  \vspace{-48pt}
-  \caption{Performance results for an Itanium~2.  The bars for each
-  benchmark appear in the same order as the legend.}
-  \label{fig:results-ipf}
-  \vspace{-12pt}
-\end{figure}
+\begin{figure*}
+\begin{minipage}{3.4in}
+\vspace{-36pt}
+\hspace{-0.4in}\psfig{figure=p3-2.eps,width=4.2in}
+\vspace{-66pt}
+\caption{Performance results for a Pentium~3.\protect\label{fig:p3-perf2}}
+\end{minipage}
+\hspace{0.1in}
+\begin{minipage}{3.4in}
+\vspace{-36pt}
+\hspace{-0.4in}\psfig{figure=p3-1.eps,width=4.2in}
+\vspace{-66pt}
+\caption{Full fusion versus \texttt{CAF+scaling+buffer} on a Pentium~3\protect\label{fig:p3-perf}}
+\end{minipage}
+\end{figure*}
+
+\begin{figure*}
+\begin{minipage}{3.4in}
+\vspace{-36pt}
+\hspace{-0.4in}\psfig{figure=i2-2.eps,width=4.2in}
+\vspace{-66pt}
+\caption{Performance results for an Itanium~2.\protect\label{fig:i2-perf2}}
+\end{minipage}
+\hspace{0.1in}
+\begin{minipage}{3.4in}
+\vspace{-36pt}
+\hspace{-0.4in}\psfig{figure=i2-1.eps,width=4.2in}
+\vspace{-66pt}
+\caption{Full fusion versus \texttt{CAF+scaling+buffer} on an Itanium~2\protect\label{fig:i2-perf}}
+\end{minipage}
+\end{figure*}
 
 
-\begin{figure}[t]
-  \vspace{-74pt}
-  \hspace{-0.3in}\psfig{figure=peek.eps, width=3.9in}
-  \vspace{-96pt}
-  \caption{Performance results for different 
-	   buffer management strategies.}
-  \label{fig:results-peek}
-  \vspace{-12pt}
-\end{figure}
+
+
+%\begin{figure}[t]
+%  \vspace{-36pt}
+%  \hspace{-0.4in}\psfig{figure=arm1.eps, width=4.2in}
+%  \vspace{-66pt}
+%  \caption{Performance results for a StrongARM.
+%%  The bars for each benchmark appear in the same order as the legend.
+%  }
+%  \label{fig:results-ipf}
+%  \vspace{-8pt}
+%\end{figure}
+
+%\begin{figure}[t]
+%  \vspace{-36pt}
+%  \hspace{-0.4in}\psfig{figure=p3-1.eps, width=4.2in}
+%  \vspace{-66pt}
+%  \caption{Performance results for a Pentium~3.  
+%%  The bars for each benchmark appear in the same order as the legend.
+%  }
+%  \label{fig:results-p3}
+%  \vspace{-12pt}
+%\end{figure}
+
 
 
 Figures~\ref{fig:results-p3} and~\ref{fig:results-ipf} illustrate the
