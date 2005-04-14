@@ -1242,7 +1242,7 @@
         \leftmargin\labelwidth
         \advance\leftmargin\labelsep
         \advance\leftmargin\bibindent
-        \parsep=3pt\itemsep=2pt % GM July 2000
+        \parsep=2.5pt\itemsep=2pt % GM July 2000
         \itemindent -\bibindent
         \listparindent \itemindent
         \usecounter{enumi}
