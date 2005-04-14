@@ -42,39 +42,41 @@ compiler.
 \begin{figure}[t]
 \vspace{-16pt}
 \psfig{figure=throughput-graph.eps,width=3.3in}
+\vspace{-20pt}
 \caption{\small Throughput as a function of the number of workstations
 in the cluster. 
 \protect\label{fig:fhr-throughput}}
+\vspace{-6pt}
 \end{figure}
 
-We use a cluster of workstations as our evaluation testbed. Our
+We use a cluster of workstations as our evaluation testbed.  The
 StreamIt compiler automatically partitions an input program into a set
-of threads that are mapped to the workstations and then run concurrently.
-We chose a cluster-based evaluation for two reasons. 
+of threads that are mapped to the workstations and then run
+concurrently.  We chose a cluster-based evaluation for two reasons.
 First, a number of streaming applications run on the server side
 (e.g., cell phone base stations, radar processing, HDTV editing) and
 require large computational resources. Second, clusters provide a
-simple abstraction for distributed and parallel computing---multiple program
-counters, and distributed memories---which 
-is at the heart of emerging multi-core and tile-based architectures
-for embedded, desktop, and server computing.  In our experiments, we are primarily interested in quantifying two
-performance metrics: throughput and communication overhead.
-For the purpose of this paper, throughput is defined
-as the number of outputs produced per unit of time, and communication
+simple abstraction for distributed and parallel computing---multiple
+program counters, and distributed memories---which is at the heart of
+emerging multi-core architectures for embedded, desktop, and server
+computing.  In our experiments, we are primarily interested in
+quantifying two performance metrics: throughput and communication
+overhead.  For the purpose of this paper, throughput is defined as the
+number of outputs produced per unit of time, and communication
 overhead reflects the quantity of data transmitted between
 workstations.
 
 The teleport implementation of the frequency hopping radio was
 compiled into 28 threads whereas the alternate version using a
-feedback-loop results in 32 threads.  Each thread implements a
+feedback loop results in 32 threads.  Each thread implements a
 specific subset of the stream graph and is assigned to one of sixteen
 750Mhz Pentium~III workstations, each with a 256Kb cache.  The
 machines are interconnected using a fully switched high speed network.
 
 Our compiler maps threads to workstations using a dynamic programming
-algorithm algorithm.  The algorithm aims to reduce the overall
-application bottleneck, thereby maximizing the steady-state throughput
-of the output actor (i.e., most downstream actor in the stream graph).
+algorithm.  The algorithm aims to reduce the overall application
+bottleneck, thereby maximizing the steady-state throughput of the
+output actor (i.e., most downstream actor in the stream graph).
 
 In Figure~\ref{fig:fhr-throughput}, we report the measured throughput
 ($y$-axis) for various cluster sizes ranging from one to sixteen
@@ -83,18 +85,19 @@ in the two implementations of the frequency hopper, cluster
 configurations with more than five workstations lead to negligible
 gains in terms of throughput. From the data, we can observe that
 teleport messaging achieves a maximal throughput that is 49\% better
-than its counterpart. %feedback-loop counterpart.  
+than its counterpart.  We attribute this speedup primarily to reduced
+communication overhead.  A detailed analysis of the results indicates
+that teleport messaging reduces the number of items communicated by
+35\%, as a small number of credits are sent compared to the manual
+implementation.
 
-There are two factors contributing to this speedup.  First, teleport
-messaging exposes more parallelism in the application, as the compiler
-understands that the RFtoIF stage can execute ahead of each
-Check\_Freq\_Hop stage, so long as the message latency is respected.
-In contrast, the manual implementation sends an item along the
-feedback path on every iteration, thereby restricting RFtoIF to only
-process one frame at a time.  This explains why the speedup improves
-as the number of processors increases: the extra parallelism is being
-utilized.  A second factor that could contribute to the improved
-performance is the reduced communication overhead.  A detailed
-analysis of the results indicates that teleport messaging reduces the
-number of items communicated by 35\%, as a small number of credits are
-sent compared to the manual implementation.
+%% There are two factors contributing to this speedup.  First, teleport
+%% messaging exposes more parallelism in the application, as the compiler
+%% understands that the RFtoIF stage can execute ahead of each
+%% Check\_Freq\_Hop stage, so long as the message latency is respected.
+%% In contrast, the manual implementation sends an item along the
+%% feedback path on every iteration, thereby restricting RFtoIF to only
+%% process one frame at a time.  This explains why the speedup improves
+%% as the number of processors increases: the extra parallelism is being
+%% utilized.  A second factor that could contribute to the improved
+%% performance is the reduced communication overhead.  

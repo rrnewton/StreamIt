@@ -1,13 +1,21 @@
 ppopp final
 -----------
 
-- layout
-
-- try printing pdf, make sure speedup graph is ok
-
-- spelling
+- possibly improve appearance, font size, compactness of freq-hopping radio graphs
 
 - comment / highlight FIR code?
+
+- try printing pdf, make sure fonts, graphics are ok
+
+n why 28 thread vs. 32 threads in results?  i also don't see that many
+threads in the app.
+
+n performance comparison doesn't make sense
+
+x maybe add paragraph: sometimes a positive upstream latency is also
+illegal
+
+x spelling
 
 x initialize W throughout (esp. on the left)
 

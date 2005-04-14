@@ -54,9 +54,9 @@
 messages in FIR.  Circles represent data items, which are numbered in
 order of production from the source; this represents one of many
 possible executions. {\bf (a)} Source initiates change of weights,
-{\bf (b)} weights are embedded in stream (item \#5), {\bf (c)-(e)},
-actors check each item, adjusting weights when they are
-found.\protect\label{fig:fir-manual-diagram}}
+{\bf (b)} weights are attached to data item \#5 and embedded in
+stream, {\bf (c)-(e)}, actors check each input item, adjusting their
+own weight when they find a tagged item.\protect\label{fig:fir-manual-diagram}}
 \end{minipage}
 \hspace{0.2in}
 \begin{minipage}[t]{2.9in}
@@ -68,10 +68,11 @@ found.\protect\label{fig:fir-manual-diagram}}
 \caption{Execution snapshots illustrating teleport messaging in FIR.
 Circles represent data items, which are numbered in order of
 production from the source; this represents one of many possible
-executions. {\bf (a)} Source sends a message with new weights, {\bf
-(b)} message boundary is maintained by compiler, {\bf (c)-(e)},
-message is automatically delivered to actors immediately before the
-arrival of affected items. \protect\label{fig:fir-message-diagram}}
+executions. {\bf (a)} Source calls a message handler, passing new
+weights as argument, {\bf (b)} message boundary is maintained by
+compiler, {\bf (c)-(e)}, message handler is automatically invoked in
+actors immediately before the arrival of affected
+items. \protect\label{fig:fir-message-diagram}}
 \end{minipage}
 
 \end{figure*}
