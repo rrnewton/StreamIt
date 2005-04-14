@@ -273,9 +273,10 @@ execute to enable $n$ executions of $E$, first calculate the minimum
 number of times each of $A$'s successors in the stream graph must
 execute for $n$ executions of $E$.  Then $A$ must execute enough to
 enable all of these children to complete the given number of
-executions, which translates to the $\max$ operation shown above.
-This compositional property can be exploited to tabulate $\sdep$ in an
-efficient hierarchical manner, rather than simulating a pull schedule.
+executions, which translates to the $\max$ operation shown above.  Our
+implementation exploits this compositional property to tabulate
+$\sdep$ in an efficient hierarchical manner, rather than simulating a
+pull schedule.
 
 %% It is also possible to calculate $\sdep$ using a compositional
 %% approach.  Suppose there is a path in the stream graph from $A$ to $B$

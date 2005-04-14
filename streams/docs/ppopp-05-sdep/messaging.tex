@@ -273,8 +273,8 @@ actor in the stream graph.
 In the presence of overlapping constraints, we leave to future work
 the problem of finding a legal execution schedule (if one exists).
 Because overlapping constraints can be detected at compile time, a
-compiler may choose to prohibit overlapping constraints altogether.  A
-discussion of the issues involved appears in a
+given compiler may choose to prohibit overlapping constraints
+altogether.  A discussion of the issues involved appears in a
 thesis~\cite{karczma-thesis} by one of the authors.
 
 For the case of non-overlapping constraints, a simple modification to
@@ -307,17 +307,16 @@ To illustrate the pros and cons of teleport messaging, we implemented
 a spread-spectrum frequency hopping radio frontend~\cite{harada02} as
 shown in Figure~\ref{fig:fhr-streamit}.  A frequency hopping radio is
 one in which the receiver switches between a set of known frequencies
-whenever it detects certain tones from the transmitter.  The
-frequency hopping is a good match for control messages because the
-hopping interval is dynamic (based on the data in the stream); it
-spans a large section of the stream graph (there is an FFT between the
-demodulator and the hop detector); and it requires precise delivery of
-messages.  The delivery must be precise both to meet real-time
+whenever it detects certain tones from the transmitter.  The frequency
+hopping is a good match for control messages because the hopping
+interval is dynamic (based on data in the stream); it spans a large
+section of the stream graph (there is a Fast Fourier Transform (FFT)
+between the demodulator and the hop detector); and it requires precise
+message delivery.  The delivery must be precise both to meet real-time
 requirements (as the transmitter will leave the current frequency
-soon), and to ensure that the message falls at a logical packet
-boundary; if the frequency change is out of sync with the Fast Fourier
-Transform (FFT) stage, then the FFT will muddle the spectrum of the
-old and new frequency bands.
+soon), and to ensure that the message falls at a logical frame
+boundary; if the frequency change is out of sync with the FFT, then
+the FFT will muddle the spectrum of the old and new frequency bands.
 
 \begin{figure}[t]
 \vspace{-12pt}
