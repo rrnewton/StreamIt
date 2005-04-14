@@ -64,7 +64,7 @@ minimum latency 2 and maximum latency 3.
 For another example, see line 25 of Figure~\ref{fig:fir-message-code}.
 \end{itemize}
 \paragraph*{Informal Semantics} The most interesting aspect of teleport
-messaging are the semantics for the message latency.  Because there
+messaging is the semantics for the message latency.  Because there
 are many legal orderings of actor executions, there does not exist a
 notion of ``global time'' in a stream graph.  The only common frame of
 reference between concurrently executing actors is the series of data
@@ -107,8 +107,7 @@ before its $m$th execution, where $m$ is constrained as follows.
 There are two cases\footnote{\small In a feedback path, both cases might apply.  In this event, we assume the message is being sent upstream.}:
 \begin{enumerate}
 
-\item $R$ is downstream of $S$.  Then $m$ obeys the following
-constraints:
+\item $R$ is downstream of $S$.  Then the constraints on $m$ are:
 \[
 \begin{array}{l}
 n+k_1 \le \sdepf{S}{R}(m) \le n+k_2
@@ -117,8 +116,7 @@ n+k_1 \le \sdepf{S}{R}(m) \le n+k_2
 \end{array}
 \]
 
-\item $R$ is upstream of $S$.  Then $m$ obeys the following
-constraints:
+\item $R$ is upstream of $S$.  Then the constraints on $m$ are:
 \[
 \begin{array}{l}
 %m \ge \sdepf{R}{S}(n + k_1)\\

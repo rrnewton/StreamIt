@@ -257,24 +257,25 @@ $\sdepf{A}{B}(1) = 2$.  Thus, to calculate $\sdepf{Y}{X}$, it is
 essential to calculate ${\bf pullSchedule}(X, |{\cal S} \wedge X|)$,
 that is, a steady state cycle of a pull schedule with respect to $X$.
 
-A related fact is that, while $\sdep$ displays compositionality within
-sequential pipelines, it is not compositional in general.  For
-example, in Figure~\ref{fig:sdep1}:
-\[
-\sdepf{A}{E}(1) \ne \sdepf{A}{B} ( \sdepf{B}{E}(1) )
-\]
-%% \[
-%% \sdepf{A}{E}(1) = 1 \\
-%% \sdepf{A}{B} ( \sdepf{B}{E}(1) ) = \sdepf{A}{B} (0) = 0 
-%% \]
-This fact is due to the parallelism in the stream graph.  For $E$ to
-fire once, it consumes an item from $C$, which must be produced by
-$A$.  Thus $\sdepf{A}{E}(1) = 1$.  But $\sdepf{B}{E}(1) = 0$ because
-$E$ does not consume anything from $B$ on its first firing; finally,
-$\sdepf{A}{B}(0) = 0$ by definition.  However, $\sdep$ is
-compositional in the absence of parallelism (i.e., within pipelines),
-and this property can be exploited to tabulate $\sdep$ hierarchically
-instead of via a complete pull schedule.
+It is also possible to calculate $\sdep$ using a compositional
+approach.  For example, $\sdepf{A}{E}$ from Figure~\ref{fig:sdep1} can
+be expressed as follows:
+\begin{equation*}
+\begin{array}{rl}
+\sdepf{A}{E}(n) = \max \left\{\begin{array}{l}
+\sdepf{A}{B} ( \sdepf{B}{E}(n) ) \\
+\sdepf{A}{C} ( \sdepf{C}{E}(n) )
+\end{array}\right.
+\end{array}
+\end{equation*}
+That is, to determine the minimum number of times that $A$ must
+execute to enable $n$ executions of $E$, first calculate the minimum
+number of times each of $A$'s successors in the stream graph must
+execute for $n$ executions of $E$.  Then $A$ must execute enough to
+enable all of these children to complete the given number of
+executions, which translates to the $\max$ operation shown above.
+This compositional property can be exploited to tabulate $\sdep$ in an
+efficient hierarchical manner, rather than simulating a pull schedule.
 
 %% It is also possible to calculate $\sdep$ using a compositional
 %% approach.  Suppose there is a path in the stream graph from $A$ to $B$
