@@ -11,12 +11,12 @@ $\sdep$, that compactly describes the exact ordering constraints
 between actor executions.
 
 Teleport messaging utilizes $\sdep$ to provide powerful and precise
-semantics for event handling.  For example, an actor $A$ can specify
-that an event should be processed by a downstream actor $B$ as soon as
-$B$ sees the ``effects'' of the current execution of $A$.  Based on a
-case study of a software radio, we argue that teleport messaging
-improves readability and robustness of code.  We have also implemented
-messaging within the StreamIt compiler, with a backend for a cluster
-of workstations.  As teleport messaging exposes optimization
+event handling.  For example, an actor $A$ can specify that an event
+should be processed by a downstream actor $B$ as soon as $B$ sees the
+``effects'' of the current execution of $A$.  Based on a case study of
+a software radio, we argue that teleport messaging improves
+readability and robustness over existing practices.  We have also
+implemented messaging within the StreamIt compiler, with a backend for
+a cluster of workstations.  As teleport messaging exposes optimization
 opportunities to the compiler, it also results in a 49\% performance
 improvement for our case study.

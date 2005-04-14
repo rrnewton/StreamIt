@@ -17,16 +17,16 @@ optimization.  One notoriously difficult aspect of stream programming,
 from both a performance and programmability standpoint, is in
 reconciling regular streaming data flow with irregular control
 messages.  While the high-bandwidth flow of data is very predictable,
-realistic applications also include infrequent, low-bandwidth control
-messages for adjusting parameters in various parts of the system.
-Such control messages often have strict timing constraints, which
-complicates their implementation on a parallel system.
+realistic applications also include unpredictable, low-bandwidth
+control messages for adjusting parameters in various parts of the
+system.  Such control messages often have strict timing constraints,
+which complicates their implementation on a parallel system.
 
 Consider for example a frequency hopping radio (FHR), which mirrors
 how CDMA-based cell phone technology works.  In FHR, a transmitter and
-a receiver change between a set of known radio frequencies, and they
+a receiver switch between a set of known radio frequencies, and they
 must do so in synchrony with respect to a stream boundary. That is, a
-receiver must change its radio frequency at an exact point in the
+receiver must switch its radio frequency at an exact point in the
 stream (as indicated by the transmitter) in order to follow the
 incoming signal.  Such a receiver is challenging to implement in a
 distributed environment because different processors might be
@@ -60,16 +60,17 @@ steady-state data processing, and it requires a direct high-bandwidth
 connection between sender and receiver.
 
 A second implementation strategy is to perform control messaging
-``out-of-band'', via a new low-bandwidth connection or a synchronous
-method call.  While this avoids the complexity of embedding messages
-in another data stream, it falls short in terms of timing guarantees.
-In a distributed environment, each processor has its own clock and is
-making independent progress on its part of the application.  The only
-common notion of time between processors is the data stream itself.
-Though extra synchronization can be imposed to keep processors in
-check, such synchronization is costly and can needlessly suppress
-parallelism.  Also, the presence of dynamic messaging can invalidate
-other optimizations which rely on static communication patterns.
+``out-of-band'', via a new low-bandwidth connection or a remote
+procedure call.  While this avoids the complexity of embedding
+messages in another data stream, it falls short in terms of timing
+guarantees.  In a distributed environment, each processor has its own
+clock and is making independent progress on its part of the
+application.  The only common notion of time between processors is the
+data stream itself.  Though extra synchronization can be imposed to
+keep processors in check, such synchronization is costly and can
+needlessly suppress parallelism.  Also, the presence of dynamic
+messaging can invalidate other optimizations which rely on static
+communication patterns.
 
 This paper presents a new language construct and supporting compiler
 analysis that allows the programmer to declaratively specify control
@@ -79,36 +80,38 @@ embedding messages in the data stream.  The idea is to treat control
 messages as an asynchronous method call with no return value.  When
 the sender calls the method, it has the semantics of embedding a
 placeholder in the sender's output stream.  The method is invoked in
-the receiver when the receiver processes the placeholder.  This
-concept is generalized to allow messages both upstream and downstream,
-and with variable latency.  By exposing the true communication pattern
-to the compiler, the message can be delivered using whatever mechanism
-is appropriate for a given architecture.  The declarative mechanism
-also enables the compiler to parallelize and reorder application
-components so long as it respects the latency constraints of messages.
+the receiver when the receiver would have processed the placeholder.
+We generalize this concept to allow messages both upstream and
+downstream, and with variable latency.  By exposing the true
+communication pattern to the compiler, the message can be delivered
+using whatever mechanism is appropriate for a given architecture.  The
+declarative mechanism also enables the compiler to parallelize and
+reorder application components so long as it delivers messages on
+time.
 
 Our formulation of teleport messaging relies on a restricted model of
 computation known as Synchronous Dataflow, or SDF~\cite{LM87-i}.  As
-described in Section~\ref{sec:sdf}, SDF expresses computations as a
-graph of communicating components.  A critical property of SDF is that
-the input and output rate of each component is known at compile time.
-Using this property, we can compute the dependences between components
-and automatically calculate when a message should be delivered.  We
-develop a stream dependence function, $\sdep$, that provides an exact,
-complete, and compact representation of this dependence information;
-we use $\sdep$ to specify the semantics of teleport messaging.
+described in Section~\ref{sec:sdf}, SDF expresses computation as a
+graph of communicating components, or {\it actors}.  A critical
+property of SDF is that the input and output rate of each actor is
+known at compile time.  Using this property, we can compute the
+dependences between actors and automatically calculate when a message
+should be delivered.  We develop a stream dependence function,
+$\sdep$, that provides an exact, complete, and compact representation
+of this dependence information; we use $\sdep$ to specify the
+semantics of teleport messaging.
 
-We describe an implementation of teleport messaging as part of the
-StreamIt compiler infrastructure~\cite{streamitcc}.  The
-implementation computes $\sdep$ information and automatically targets
-a cluster of workstations.  Based on a case study of a
-frequency hopping radio, we demonstrate a 49\% performance improvement
-due to the scheduling benefits of teleport messaging.  As described in
-Section~\ref{sec:constraints}, our implementation limits certain
-sender-receiver pairs to be in distinct portions of the stream graph;
-if overlapping messages are sent with conflicting latencies, it may be
-impossible to schedule the delivery.  This constrained scheduling
-problem remains an interesting problem for future work.
+Teleport messaging is implemented as part of the StreamIt compiler
+infrastructure~\cite{streamitcc}.  The implementation computes $\sdep$
+information and automatically targets a cluster of workstations.
+Based on a case study of a frequency hopping radio, we demonstrate a
+49\% performance improvement due to the scheduling benefits of
+teleport messaging.  As described in Section~\ref{sec:constraints},
+our implementation limits certain sender-receiver pairs to be in
+distinct portions of the stream graph; if overlapping messages are
+sent with conflicting latencies, it may be impossible to schedule the
+delivery.  This constrained scheduling problem remains an interesting
+problem for future work.
 
 The rest of this paper is organized as follows.  In the rest of this
 section, we describe our model of computation and give a concrete
@@ -119,7 +122,7 @@ semantics for teleport messaging, and Section~\ref{sec:casestudy}
 describes our case study and implementation results.  
 %Other
 %applications for $\sdep$ appear in Section~\ref{sec:others-apps},
-Related work appears in Section~\ref{sec:related-work}, while
+Related work appear in Section~\ref{sec:related-work}, while
 conclusions and future work appear in Section~\ref{sec:conclusion}.
 
 %% In  this  paper, we focus on the 
@@ -181,93 +184,94 @@ conclusions and future work appear in Section~\ref{sec:conclusion}.
 \label{sec:sdf}
 
 Our model of computation is Cyclo-Static Dataflow~\cite{BELP96}, a
-generalization of Synchronous Dataflow (SDF). It is a popular model of
-computation~\cite{LM87-i} that is well suited for streaming codes. In
-this model, computation is represented as a graph consisting of {\it
-actors} connected by FIFO communication channels.  Each actor follows
-a set of execution steps, or phases, that consume a constant number of
-items from the input channels and produce a constant number of items
-onto the output channels.  The number and ordering of phases is known
-at compile time, and their execution is cyclic (that is, after
-executing the last phase, the first phase is executed again).  SDF is
-appealing because every actor has a fixed input and output rate (I/O
-rate) thus making the stream graphs amenable to static scheduling and
-optimization.
+generalization of Synchronous Dataflow~\cite{LM87-ii}.  This is a
+popular model of computation that is well suited for signal processing
+applications. Computation is represented as a graph of {\it actors}
+connected by FIFO communication channels.  Each actor follows a set of
+execution steps, or phases, that consume a constant number of items
+from the input channels and produce a constant number of items onto
+the output channels.  The number and ordering of phases is known at
+compile time, and their execution is cyclic (that is, after executing
+the last phase, the first phase is executed again).  SDF is appealing
+because every actor has a fixed input and output rate, making the
+stream graphs amenable to static scheduling and
+optimization~\cite{LM87-i}.
 
 In this paper, we use the StreamIt programming
 language~\cite{streamitcc} to describe the connectivity of the
-dataflow graph as well as the internal functions of each actor.
-(Though our results apply to general Cyclo-Static Dataflow, we use
-StreamIt for concreteness.)  In StreamIt, each actor (called a {\it
-filter} in the language) has one input channel and one output channel.
-An execution step consists of a call to the ``work function'', which
-contains general-purpose code.  During each invocation, an actor
-consumes ({\it pops}) a fixed number of items from the input channel
-and produces ({\it pushes}) a fixed number of items on the output
-channel.  It can also {\it peek} at input items without consuming them
-from the channel.
+dataflow graph as well as the internal functions of each actor.  Our
+technique is general and should apply equally well to other languages
+and systems based on Synchronous or Cyclo-Static Dataflow.  In
+StreamIt, each actor (called a {\it filter} in the language) has one
+input channel and one output channel.  An execution step consists of a
+call to the ``work function'', which contains general-purpose code.
+During each invocation, an actor consumes ({\it pops}) a fixed number
+of items from the input channel and produces ({\it pushes}) a fixed
+number of items on the output channel.  It can also {\it peek} at
+input items without consuming them from the channel.
 
 Actors are assembled into single-input, single-output stream graphs
 (or {\it streams}) using three hierarchical primitives.  A {\it
 pipeline} arranges a set of streams in sequence, with the output of
 one stream connected to the input of the next.  A {\it splitjoin}
 arranges streams in parallel; incoming data can either be duplicated
-to all streams, or distributed in a weighted round-robin fashion.  The
-outputs of parallel streams are also serialized using a round-robin
-joiner.  Round-robin splitters (resp. joiners) execute in multiple
-phases: the $i$th phase pushes (resp. pops) a fixed number of items to
-the $i$th stream in the splitjoin.  Finally, a {\it feedbackloop} can
-be used to introduce cycles in the graph.
+to all streams, or distributed using a round-robin splitter.
+Likewise, outputs of the parallel streams are serialized using a
+round-robin joiner.  Round-robin splitters (resp. joiners) execute in
+multiple phases: the $i$th phase pushes (resp. pops) a known number of
+items $k_i$ to the $i$th stream in the splitjoin.  Finally, a {\it
+feedbackloop} can be used to introduce cycles in the graph.
 
 \subsection{Illustrating Example}
 
-Figure~\ref{fig:fir-orig-code} illustrates a StreamIt version of a FIR
-(Finite Impulse Response) filter.  A pervasive component of digital
-signal processing, FIR filters represent sliding window computations
-in which a set of coefficients is convolved with
+Figure~\ref{fig:fir-orig-code} illustrates a StreamIt version of an
+FIR (Finite Impulse Response) filter.  A common component of digital
+signal processing applications, FIR filters represent sliding window
+computations in which a set of coefficients is convolved with the
+input data.  This FIR implementation is
 %
 \input{fir-example}
 \noindent 
 %
-the input data.  This FIR implementation is very fine-grained; as
-depicted in Figure~\ref{fig:fir-orig-diagram}, the stream graph
-consists of a single pipeline with a {\tt Source}, a {\tt Printer},
-and 128 {\tt Multiply} stages (one for each coefficient).  Each {\tt
+very fine-grained; as depicted in Figure~\ref{fig:fir-orig-diagram},
+the stream graph consists of a single pipeline with a {\tt Source}, a
+{\tt Printer}, and 64 {\tt Multiply} stages---each of which contains a
+single coefficient (or {\it weight}) of the FIR filter.  Each {\tt
 Multiply} actor inputs a {\tt Packet} consisting of an input item and
-a running sum; the actor increments the sum by the product of a
-coefficient and the {\it previous} input to the actor.  Delaying the
+a partial sum; the actor increments the sum by the product of a
+weight and the {\it previous} input to the actor.  Delaying the
 inputs by one step ensures that each actor adds a different input to
 the sum.  While we typically advocate a more coarse-grained
 implementation of FIR filters, this formulation is simple to
-parallelize (each actor is mapped to a separate processor) and serves
-as a simple target for our analysis.
+parallelize (each actor is mapped to a separate processor) and
+provides a simple illustratoin of our analysis.
 
 The problem addressed by this paper is as follows.  Suppose that the
 actors in the FIR program are running in parallel and the {\tt Source}
-detects that the coefficients should be adjusted (e.g., to suite the
+detects that the weights should be adjusted (e.g., to suite the
 current operating conditions).  Further, to guarantee stability, every
 output from the system must be obtained using either the old
-coefficients or the new ones, but not a mixture of the two.  This
-constraint precludes updating all of the coefficients at the same
+weights or the new ones, but not a mixture of the two.  This
+constraint precludes updating all of the weights at the same
 instant, as the partial sums within the pipeline would retain evidence
-of the old coefficients.  Rather, the coefficients must be changed one
+of the old weights.  Rather, the weights must be changed one
 actor at a time, mirroring the flow of data through the pipeline.
 What is a simple and efficient way to implement this behavior?
 
 One way to implement this functionality is by manually tagging each
 data item with a flag, indicating whether or not it marks the
-transition to a new set of coefficients (or {\it weights}).  If it
-does, then the new set of weights is included with the item itself.
-While this strategy (shown in Figures~\ref{fig:fir-manual-code}
-and~\ref{fig:fir-manual-diagram}) is functional, it complicates the
-{\tt Packet} structure with two additional fields--a {\tt newWeights}
-flag and a {\tt weights} array--the latter of which is meaningful only
-when {\tt newWeights} is true.  This strategy muddles steady-state
-dataflow with event handling by checking the flag on every iteration
-of {\tt Multiply} (line 41 of Figure~\ref{fig:fir-manual-code}).  It
-is also very inefficient in StreamIt because arrays are passed by
-value; a new optimization would be needed to compress each {\tt
-Packet} structure when the {\tt weights} field is unused.
+transition to a new set of weights.  If it does, then the new set of
+weights is included with the item itself.  While this strategy (shown
+in Figures~\ref{fig:fir-manual-code} and~\ref{fig:fir-manual-diagram})
+is functional, it complicates the {\tt Packet} structure with two
+additional fields---a {\tt newWeights} flag and a {\tt weights}
+array---the latter of which is meaningful only when {\tt newWeights}
+is true.  This scheme muddles steady-state dataflow with event
+handling by checking the flag on every invocation of {\tt Multiply}
+(line 41 of Figure~\ref{fig:fir-manual-code}).  It is also very
+inefficient in StreamIt because arrays are passed by value; a new
+optimization would be needed to compress each {\tt Packet} structure
+when the {\tt weights} field is unused.
 
 This paper proposes an alternate solution: teleport messaging.  The
 idea behind teleport messaging is for the {\tt Source} to change the

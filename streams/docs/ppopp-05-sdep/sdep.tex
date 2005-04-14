@@ -59,15 +59,17 @@
 \section{Stream Dependence Function}
 \label{sec:sdep}
 
-This section defines a stream dependence function, $\sdep$, that can
-be used to describe the timing of teleport messages.  The dependence
-is meaningful for exactly those pairs of actors that are connected by
-a directed path (aligned with the direction of data flow) in the
-stream graph.  The {\it upstream} actor is at the start of the path,
-while the {\it downstream} actor is at the end.  Dependences between
-parallel actors (e.g., parallel branches of a splitjoin) currently
-fall outside the scope of this model but could be addressed in future
-work~(Section~\ref{sec:conclusion}).
+This section defines a stream dependence function, $\sdep$, that
+describes how one actor depends on the execution of another actor in
+the stream graph.  This information is used to assign a precise
+semantics to message delivery.  $\sdep$ is meaningful only for pairs
+of actors that are connected by a directed path (aligned with the
+direction of data flow) in the stream graph.  We say that the {\it
+upstream} actor is at the start of the path, while the {\it
+downstream} actor is at the end.  Dependences between parallel actors
+(e.g., parallel branches of a splitjoin) currently fall outside the
+scope of this model but could be addressed in future work~(see
+Section~\ref{sec:conclusion}).
 
 An execution $\phi$ of a dataflow graph is an ordered sequence of
 actor firings.  Each firing represents the execution of a single phase
@@ -81,26 +83,29 @@ next phase atomically.  Let $\Phi$ denote the set of legal executions.
 Note that while $\Phi$ is an infinite set, each $\phi \in \Phi$ is a
 finite sequence.
 
-The stream dependence function, $\sdep$, describes the dependences
-between actor firings in the graph.  Informally, $\sdepf{A}{B}(n)$
-represents the minimum number of times that actor $A$ must execute to
-make it possible for actor $B$ to execute $n$ times.  This dependence
-is meaningful only if $A$ is upstream of $B$; otherwise, $\sdep$
-assumes a value of zero.  Because the I/O rates of each actor in the
-stream graph are known at compile time, $\sdep$ is also a static
-relation.  The following is a formal definition of $\sdep$ using the
-notations introduced earlier:
+%The stream dependence function, $\sdep$, describes the dependences
+%between actor firings in the graph.  
+Informally, $\sdepf{A}{B}(n)$ represents the minimum number of times
+that actor $A$ must execute to make it possible for actor $B$ to
+execute $n$ times.  This dependence is meaningful only if $A$ is
+upstream of $B$; otherwise, $\sdep$ assumes a value of zero.  Because
+the I/O rates of each actor in the stream graph are known at compile
+time, $\sdep$ is also a static relation.  
+
+A formal definition of $\sdep$ using the notations introduced above is
+as follows:
 \begin{definition}(SDEP)
 \begin{center}
-$\sdepf{A}{B}(n)~~ = ~~\mbox{MIN}~~|\phi \wedge A|$ \\
-~~~~~~~~~~~~~\raisebox{5pt}[0pt]{$~_{\phi \in \Phi, |\phi \wedge B| = n}$}
+$\sdepf{A}{B}(n)~~ = ~~\min~|\phi \wedge A|$ \\
+~~~~~~~~~~~~~{\tiny ~}\raisebox{5pt}[0pt]{$~_{\phi \in \Phi,}$} \\
+~~~~~~~~~~~~~~~~~{\tiny ~}\hspace{-1.3pt}\raisebox{8pt}[0pt]{$~_{|\phi \wedge B| = n}$}
 \label{eq:sdepdef}
 \end{center}
 \end{definition}
 This equation reads: over all legal executions in which $B$ fires $n$
 times, $\sdepf{A}{B}(n)$ is the minimum number of times that $A$
-fires.  An example of $\sdep$ for the stream graph in
-Figure~\ref{fig:sdep-rates} appears in Figure~\ref{fig:sdep1}.
+fires.  Figure~\ref{fig:sdep1} illustrates an example of $\sdep$ for
+the stream graph in Figure~\ref{fig:sdep-rates}.
 
 \section{Calculating SDEP}
 \label{sec:calc-sdep}
@@ -118,10 +123,11 @@ calculating the demand for data items on the input channels of $X$,
 and then propagating the demand back through the stream graph via pull
 scheduling of the actors connected to $X$.  Pull scheduling results in
 a fine-grained interleaving of actor firings.  Some stream graphs
-admit multiple pull schedules, as actors with multiple input channels
-can traverse them in any order; however, the set of actor executions
-remains constant even as the order changes.  The following theorem
-allows us to use a pull schedule to calculate the $\sdep$ function.
+admit multiple pull schedules, as actors might be connected to
+multiple inputs that can be scheduled in any order; however, the set
+of actor executions remains constant even as the order changes.  The
+following theorem allows us to use a pull schedule to calculate the
+$\sdep$ function.
 \begin{theorem} 
 \label{thm1}
 \[
@@ -180,6 +186,7 @@ of $\figsdepf{B}{E}$.
 \begin{figure}[t]
 \begin{center}
 \psfig{figure=sdep-example-rates3.eps,height=1.5in}
+\vspace{-1pt}
 \caption{{\small Example stream graph.  Nodes are annotated with their
 I/O rates.  For example, node C consumes 3 items and produces 2 items
 on each execution.  Node A is a round-robin splitter that produces one
@@ -250,7 +257,8 @@ $\sdepf{A}{B}(1) = 2$.  Thus, to calculate $\sdepf{Y}{X}$, it is
 essential to calculate ${\bf pullSchedule}(X, |{\cal S} \wedge X|)$,
 that is, a steady state cycle of a pull schedule with respect to $X$.
 
-A related fact is that $\sdep$ is not necessarily compositional.  For
+A related fact is that, while $\sdep$ displays compositionality within
+sequential pipelines, it is not compositional in general.  For
 example, in Figure~\ref{fig:sdep1}:
 \[
 \sdepf{A}{E}(1) \ne \sdepf{A}{B} ( \sdepf{B}{E}(1) )
@@ -263,10 +271,10 @@ This fact is due to the parallelism in the stream graph.  For $E$ to
 fire once, it consumes an item from $C$, which must be produced by
 $A$.  Thus $\sdepf{A}{E}(1) = 1$.  But $\sdepf{B}{E}(1) = 0$ because
 $E$ does not consume anything from $B$ on its first firing; finally,
-$\sdepf{A}{B}(0) = 0$ by definition.  However, $\sdep$ does exhibit
-compositionality within sequential regions (pipelines), and this
-property can be exploited to tabulate $\sdep$ hierarchically instead
-of via a complete pull schedule.
+$\sdepf{A}{B}(0) = 0$ by definition.  However, $\sdep$ is
+compositional in the absence of parallelism (i.e., within pipelines),
+and this property can be exploited to tabulate $\sdep$ hierarchically
+instead of via a complete pull schedule.
 
 %% It is also possible to calculate $\sdep$ using a compositional
 %% approach.  Suppose there is a path in the stream graph from $A$ to $B$

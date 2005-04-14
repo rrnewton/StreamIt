@@ -5,11 +5,11 @@ This paper makes two contributions.  First, it introduces teleport
 messaging: a powerful language construct enabling precise message
 delivery between nodes of a distributed stream program.  In comparison
 with other methods to implement messaging functionality in a
-Synchronous Dataflow (SDF) model, teleport messaging is arguably more
+Synchronous Dataflow model, teleport messaging is arguably more
 readable, more robust, and easier to maintain.  In addition, our
-implementation of teleport messaging in the StreamIt compiler resulted
+implementation of teleport messaging in the StreamIt compiler results
 in a 49\% performance improvement for a frequency hopping radio
-running on a cluster of workstations.  Like several declarative
+running on a cluster of workstations.  Like several other declarative
 language constructs, teleport messaging improves performance by
 exposing the true dependences to the compiler and allowing it to
 optimize the communication.
@@ -27,7 +27,7 @@ of a downstream actor.  In a software-based speculation
 system~\cite{frank-thesis}, $\sdep$ could be applied to trace the
 effects of a failed prediction and to roll back the appropriate actor
 executions.  $\sdep$ also offers a new method for measuring latency in
-a stream graph.  Similar to representations such as dependence
+a stream graph.  Analogous to representations such as dependence
 levels~~\cite{AK82}, direction vectors~\cite{wolfe82}, and dependence
 polyhedra~\cite{Irig88} for scientific programs, $\sdep$ provides
 dependence information that could be used to test or verify program
