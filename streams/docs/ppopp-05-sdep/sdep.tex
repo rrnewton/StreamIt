@@ -119,7 +119,7 @@ construct $\phi$ by simulating the stream graph's execution of a
 \begin{figure*}[t]
 \begin{center}
 \vspace{-12pt}
-\psfig{figure=sdep-example3.eps,width=6in}
+\psfig{figure=sdep-example3.eps,width=5.8in}
 \vspace{-4pt}
 \caption{\small Example \figsdep\ calculation for stream graph in
 Figure~\ref{fig:sdep-rates}.  The stream graphs illustrate a steady
@@ -212,8 +212,8 @@ $n$ & $\sdepf{A}{E}(n)$ & $\sdepf{B}{E}(n)$ \\
 4 & 6 & 3 \\ \hline
 \end{tabular}
 \end{center}
-Note that $\sdep$ is highly non-linear due to mis-matching I/O rates
-in the stream graph.  However, for longer execution traces, there is a
+Note that $\sdep$ is non-linear due to mis-matching I/O rates in the
+stream graph.  However, for longer execution traces, there is a
 pattern in the marginal growth of $\sdep$ (i.e., in $\sdep(n) -
 \sdep(n-1)$); this quantity follows a cyclic pattern and has the same
 periodicity as the steady state of the stream graph.  A steady state
@@ -224,58 +224,128 @@ a steady state is well-understood~\cite{LM87-i}.  The execution
 simulated in Figure~\ref{fig:sdep1} is a steady state, meaning that
 additional entries of the pull schedule will repeat the pattern given
 in the figure.  Thus, $\sdep$ will also grow in the same pattern, and
-we can calculate $\sdep$ for $n > 4$ as follows\footnote{Note that for
-any two actors $X$ and $Y$, $\sdepf{Y}{X}(0) = 0$.}:
+we can calculate $\sdepf{A}{E}(n)$ for $n > 4$ as
+follows\footnote{Note that for any two actors $X$ and $Y$,
+$\sdepf{Y}{X}(0) = 0$.}:
 \begin{equation}
 \label{eq:sdep-steady}
 \nonumber
 \hspace{-4.5pt}\begin{array}{rcl}
-\sdepf{A}{E}(n) \hspace{-5.5pt}&=&\hspace{-5.5pt} p * |{\cal S} \wedge A| + \sdepf{A}{E}(n - p * |{\cal S} \wedge E|)~~(1)\\[1Ex]
-p \hspace{-5.5pt}&=&\hspace{-5.5pt} \lfloor \frac{n-1}{|{\cal S} \wedge E|} \rfloor~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\hspace{1.3pt}~~~~~~~~~(2) % I can't get the Eq. number to appear here any other way :(
+p(n) \hspace{-5.5pt}&=&\hspace{-5.5pt} \lfloor \frac{n}{|{\cal S} \wedge E|} \rfloor~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\hspace{1.3pt}~~~~~~~~~(1) \\[1Ex] % I can't get the Eq. number to appear here any other way :(
+\sdepf{A}{E}(n) \hspace{-5.5pt}&=&\hspace{-5.5pt} p(n) * |{\cal S} \wedge A| + ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\hspace{3.3pt}~~(2)\\[1Ex]
+~&~&\mbox{~}\hspace{8.5pt} \sdepf{A}{E}(n - p(n) * |{\cal S} \wedge E|)
 \end{array}
 \end{equation}
-where ${\cal S}$ is a steady state execution and $p$ represents the
-number of completed steady states.  The first term of the $\sdep$
-equation gives the number of times $A$ has executed in previous steady
+where ${\cal S}$ is a steady state and $p(n)$ represents the number of
+completed steady states by execution $n$.  The first term of
+Equation~(2) gives the execution count of $A$ in previous steady
 states ($A$ executes $|{\cal S} \wedge A| = 6$ times per steady
 state), while the second term accounts for the current steady state.
-Note that $p$ is set to $\lfloor \frac{n-1}{|{\cal S} \wedge
-E|}\rfloor$ rather than $\lfloor
-\frac{n}{|{\cal S} \wedge E|}\rfloor$ because, for some pairs of actors,
-the downstream actor might finish its steady state before the upstream
-actor.  For example, $\sdepf{A}{C}(|{\cal S} \wedge C|) =
-\sdepf{A}{C}(1) = 5$ even though $|{\cal S} \wedge A| = 6$.  For this
-reason, the most recent steady state is always handled by the second
-term (i.e., with a non-zero argument to $\sdep$) rather than assuming
-the upstream actor has also completed the most recent steady state.
 
-Equation~2 needs one modification to be fully general.  For an
-arbitrary $\sdepf{Y}{X}$, one must choose $p$ as follows:
+While Equation~(2) is valid for $\sdepf{A}{C}$, the general form
+requires a larger base case, and is as follows:
+% To encapsulate the dependences across a steady
+%state boundary, we need to tabulate two steady state iterations of
+%$\sdep$ instead of just one:
 \begin{equation*}
-\begin{array}{c}
-~~\hspace{0.7in}~~p = \lfloor \frac{n-q}{|{\cal S} \wedge X|}\rfloor~~\hspace{0.7in}~~(3)
+\begin{array}{l}
+q(n) = \lfloor \frac{n}{|{\cal S} \wedge X} \rfloor - 1\\[2Ex]
+\sdepf{Y}{X}(n) = ~\hspace{2in}\hspace{12pt}(3)\\[2Ex]
+\mbox{~}\hspace{6pt}
+\left\{\begin{array}{lr}
+\hspace{-3.5pt}|{\bf pullSchedule}(X, n) \wedge Y| & \hspace{-3pt} \mbox{if~} n \le 2*|{\cal S} \wedge X| \\[2Ex]
+\hspace{-3.5pt}q(n) * |{\cal S} \wedge Y| + & \hspace{-3pt} \mbox{otherwise} \\[1Ex] %(\mbox{if~} n > 2*|{\cal S} \wedge X|)\\[1Ex]
+\mbox{~}\hspace{12.5pt} \sdepf{Y}{X}(n - q(n) * |{\cal S} \wedge X|)
+\end{array}
+\right.
 \end{array}
 \end{equation*}
-where $q \in [1,|{\cal S} \wedge X|]$ is chosen such that
-$\sdepf{Y}{X}(q) > \sdepf{Y}{X}(q-1)$.  Using this value of $p$,
-Equation~1 is still valid, though the base case for $\sdep$ now ranges
-from $n=1$ to $n=q+|{\cal S} \wedge X|-1$.  This general form is
-needed for cases where both: 1) $X$ does not depend on the last
-steady-state execution of $Y$, and 2) the first steady-state execution
-of $X$ does not depend on $Y$.  In such cases, the steady state
-boundary is blurred and the original choice of $p$ gives erroneous
-results.  Using the general form of $p$ serves to shift the effective
-steady state boundary so that, on the first execution of $X$ within
-each steady state, it is guaranteed that $Y$ has finished all of its
-executions from the previous steady state.
+That is, we use a pull schedule to calculate $\sdep$ through the first
+two steady states of $X$.  Then we extrapolate $\sdep$ as before,
+except we use $q(n)$ instead of $p(n)$; $q(n)$ subtracts one so that an
+extra steady-state iteration is evaluated as part of the second term
+(in the argument to $\sdep$) rather than in the first term (as the
+coefficient of $|{\cal S} \wedge Y|$).  
+
+This formulation correctly handles a number of dependences on the
+steady state boundaries that are otherwise tricky and problematic.
+For example, Equation~(2) yields the wrong answer for $\sdepf{A}{C}$
+in Figure~\ref{fig:sdep1}; this case is unusual because $C$ finishes
+its steady state before $A$, even though $C$ is downstream of $A$.
+That is, $\sdepf{A}{C}(|{\cal S} \wedge C|) = \sdepf{A}{C}(1) = 5$,
+but $|{\cal S} \wedge A| = 6$.  Due to the unit offset in $q(n)$,
+Equation~(3) evaluates this dependence as being in the middle (not the
+boundary) of the double steady-state cycle, thereby avoiding issues of
+this sort.
+
+%Another tricky case is when
+%$\sdepf{Y}{X}(|{\cal S} \wedge X|) < |{\cal S} \wedge Y|$ and
+%$\sdepf{Y}{X}(1) = 0$, in which case $Y$ has executions on both sides
+%of the steady state boundary that $X$ does not depend on.  This
+%behavior is correctly modeled by Equation~(3).
+
+%% This general form is needed when, within a single steady state, both
+%% of the following are true: a) the first execution of $X$ does not
+%% depend on $Y$, and b) $X$ does not depend on the last execution of
+%% $Y$.  An example condition (a) is actor $B$ and $E$ in
+%% Figure~\ref{fig:sdep1}, because $\sdepf{B}{E}(1) = 0$.  An example of
+%% condition (b) is actor $A$ and $C$: $C$ finishes its steady state
+%% before $A$, even though $C$ is downstream of $A$.  That is,
+%% $\sdepf{A}{C}(|{\cal \wedge C|) = \sdepf{A}{C}(1) = 5$, but $|{\cal S}
+%% \wedge A| = 6$.  If we add a dummy phase (producing no items) to the
+%% beginning of $A$'s steady state, then the actors $A$ and $C$ also do
+%% meet both conditions.  In such cases, the steady state boundary is
+%% blurred, as one cannot tell if $X$ is in the 
+
+%% \begin{equation*}
+%% \begin{array}{c}
+%% ~~\hspace{0.7in}~~p = \lfloor \frac{n-q}{|{\cal S} \wedge X|}\rfloor~~\hspace{0.7in}~~(3)
+%% \end{array}
+%% \end{equation*}
+%% where $q \in [1,|{\cal S} \wedge X|]$ is chosen such that
+%% $\sdepf{Y}{X}(q) > \sdepf{Y}{X}(q-1)$.  
+
+%%  and the original choice of $p$ gives erroneous results.  As
+%% Equation~(1) assumes that $p$ steady states have completed, $p$ needs
+%% to be chosen on a boundary
+
+
+%% This choice of $p$ has the following property: for any value of $n$,
+%% $Y$ has completed at least $p(n)$ steady state cycles.
+
+%% , then $Y$ has completed at least $p$ steady
+%% state cycles.
+
+
+%% but it was not satisfied by the original choice of $p$
+%% (Equation~(2)).  For example, consider
+
+%% That is, $q$ is chosen to
+%% represent a transition whereby $Y$ must have fired 
+
+%% Using this value of $p$, Equation~(1) is still used to extrapolate
+%% values of $\sdep$, though the base case for $\sdep$ now ranges from
+%% $n=1$ to $n=q+|{\cal S}
+%% \wedge X|-1$.  
+
+
+%% Using the general form of $p$ serves to shift the effective steady
+%% state boundary so that, on the first execution of $X$ within each
+%% steady state, it is guaranteed that $Y$ has finished all of its
+%% executions from the previous steady state.
+
+
+%% 1) , and 2) on the
+%% first execution of $X$ within each steady state, it is guaranteed that
+%% $Y$ has finished all of its executions from the previous steady state.
 
 Thus, to calculate $\sdepf{Y}{X}(n)$, it is not necessary to simulate
 a pull schedule for $n$ iterations of $X$ as described in Algorithm 1.
-Instead, one can simulate $|{\cal S} \wedge X|+q$ iterations as a
+Instead, one can simulate $2 * |{\cal S} \wedge X|$ iterations as a
 pre-processing step and answer all future $\sdep$ queries in constant
-time, using Equations~(2) and (3).  In addition, the pull schedule for
-$X$ can be reused to calculate $\sdep$ from $X$ to any other actor
-(e.g., $\sdepf{W}{X}$ in addition to $\sdepf{Y}{X}$).
+time, using Equation~(3).  In addition, the pull schedule for $X$ can
+be reused to calculate $\sdep$ from $X$ to any other actor (e.g.,
+$\sdepf{W}{X}$ in addition to $\sdepf{Y}{X}$).
 
 However, note that the pull schedule for $X$ can {\it not} be used to
 calculate $\sdep$ from any actor other than $X$ (e.g.,
