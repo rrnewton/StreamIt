@@ -1,11 +1,23 @@
 ppopp final
 -----------
 
-- possibly improve appearance, font size, compactness of freq-hopping radio graphs
+- spelling, layout, proofreading
 
-- comment / highlight FIR code?
+x i didn't see the exact explanation of why we send fewer tokens than
+  a feedback loop would.
 
-- try printing pdf, make sure fonts, graphics are ok
+x in radio figure, say that FFT has internal stages and that complex
+#'s interleaved on tape
+
+n comment / highlight FIR code?
+
+x possibly improve appearance, font size, compactness of freq-hopping radio graphs
+
+x layout for fir streams
+
+x fix where feedback version is jumping to in pseudocode
+
+x try printing pdf, make sure fonts, graphics are ok
 
 n why 28 thread vs. 32 threads in results?  i also don't see that many
 threads in the app.
@@ -24,7 +36,6 @@ x make lines in figure wider so you can see ...
 n "filters" vs "actors"?
 
 n "execution" vs. "firing"?
-
 x coeff vs. weight
 
 x check SDEP -> \sdep

@@ -61,11 +61,9 @@
 
 This section defines a stream dependence function, $\sdep$, that
 describes how one actor depends on the execution of another actor in
-the stream graph.  This information is used to assign a precise
-semantics to message delivery.  $\sdep$ is meaningful only for pairs
-of actors that are connected by a directed path (aligned with the
-direction of data flow) in the stream graph.  We say that the {\it
-upstream} actor is at the start of the path, while the {\it
+the stream graph.  $\sdep$ is meaningful only for pairs of actors that
+are connected by a directed path in the stream graph.  We say that the
+{\it upstream} actor is at the start of the path, while the {\it
 downstream} actor is at the end.  Dependences between parallel actors
 (e.g., parallel branches of a splitjoin) currently fall outside the
 scope of this model but could be addressed in future work~(see
@@ -89,8 +87,8 @@ Informally, $\sdepf{A}{B}(n)$ represents the minimum number of times
 that actor $A$ must execute to make it possible for actor $B$ to
 execute $n$ times.  This dependence is meaningful only if $A$ is
 upstream of $B$; otherwise, $\sdep$ assumes a value of zero.  Because
-the I/O rates of each actor in the stream graph are known at compile
-time, $\sdep$ is also a static relation.  
+the I/O rates of each actor are known at compile time, $\sdep$ is also
+a static relation.
 
 A formal definition of $\sdep$ using the notations introduced above is
 as follows:
@@ -101,6 +99,7 @@ $\sdepf{A}{B}(n)~~ = ~~\min~|\phi \wedge A|$ \\
 ~~~~~~~~~~~~~~~~~{\tiny ~}\hspace{-1.3pt}\raisebox{8pt}[0pt]{$~_{|\phi \wedge B| = n}$}
 \label{eq:sdepdef}
 \end{center}
+\vspace{-12pt}
 \end{definition}
 This equation reads: over all legal executions in which $B$ fires $n$
 times, $\sdepf{A}{B}(n)$ is the minimum number of times that $A$
@@ -117,33 +116,11 @@ $|\phi \wedge A|$ that is selected in Definition~\ref{eq:sdepdef}.  We
 construct $\phi$ by simulating the stream graph's execution of a
 ``pull schedule'' with respect to actor $B$ (see Algorithm 1).
 
-Intuitively, a pull schedule for $X$ is one that executes other nodes
-as few times as possible for each firing of $X$.  This is achieved by
-calculating the demand for data items on the input channels of $X$,
-and then propagating the demand back through the stream graph via pull
-scheduling of the actors connected to $X$.  Pull scheduling results in
-a fine-grained interleaving of actor firings.  Some stream graphs
-admit multiple pull schedules, as actors might be connected to
-multiple inputs that can be scheduled in any order; however, the set
-of actor executions remains constant even as the order changes.  The
-following theorem allows us to use a pull schedule to calculate the
-$\sdep$ function.
-\begin{theorem} 
-\label{thm1}
-\[
-\sdepf{A}{B}(n) = |{\bf pullSchedule}(B, n) \wedge A|
-\]
-\end{theorem}
-\begin{proof}
-By construction, ${\bf pullSchedule}(B, n)$ executes each node in the
-graph as few times as possible for $B$ to fire $n$ times.  Thus, there
-is no execution containing $n$ executions of $B$ where $A$ executes
-fewer times.  The theorem follows from the definition of $\sdep$.
-\end{proof}
-
 \begin{figure*}[t]
 \begin{center}
+\vspace{-12pt}
 \psfig{figure=sdep-example3.eps,width=6in}
+\vspace{-4pt}
 \caption{\small Example \figsdep\ calculation for stream graph in
 Figure~\ref{fig:sdep-rates}.  The stream graphs illustrate a steady
 state cycle of a ``pull schedule''; execution proceeds from left to
@@ -170,8 +147,9 @@ of $\figsdepf{B}{E}$.
 \mbox{} ~~~~~~~~~~// {\it execute predecessors of $X$ until $X$ can execute} \\
 \mbox{} ~~~~~~~~~~{\bf for all} input channels $c_i$ of $X$ \\
 \mbox{} ~~~~~~~~~~~~~{\bf while} $X$ needs more items on $c_i$ in order to fire \\
+\mbox{} ~~~~~~~~~~~~~~~~// {\it extend schedule ($\circ$ denotes concatenation)} \\
 \mbox{} ~~~~~~~~~~~~~~~~$\phi = \phi ~\circ$ {\bf pullSchedule}({\bf source}($c_i$), 1) \\
-\mbox{} ~~~~~~~~~~// {\it add $X$ to schedule ($\circ$ denotes concatenation)} \\
+\mbox{} ~~~~~~~~~~// {\it add $X$ to schedule} \\
 \mbox{} ~~~~~~~~~~$\phi = \phi~\circ~X$ \\
 \mbox{} ~~~~~~~~~~// {\it update number of items on I/O channels of $X$} \\
 \mbox{} ~~~~~~~~~~{\bf simulateExecution}($X$) \\
@@ -186,7 +164,7 @@ of $\figsdepf{B}{E}$.
 \begin{figure}[t]
 \begin{center}
 \psfig{figure=sdep-example-rates3.eps,height=1.5in}
-\vspace{-1pt}
+\vspace{9pt}
 \caption{{\small Example stream graph.  Nodes are annotated with their
 I/O rates.  For example, node C consumes 3 items and produces 2 items
 on each execution.  Node A is a round-robin splitter that produces one
@@ -196,6 +174,30 @@ right channel during the second phase (similarly for Node E).
 \end{center}
 \vspace{-26pt}
 \end{figure}
+
+Intuitively, a pull schedule for $X$ is one that executes other nodes
+as few times as possible for each firing of $X$.  This is achieved by
+calculating the demand for data items on the input channels of $X$,
+and then propagating the demand back through the stream graph via pull
+scheduling of the actors connected to $X$.  Pull scheduling results in
+a fine-grained interleaving of actor firings.  Some stream graphs
+admit multiple pull schedules, as actors might be connected to
+multiple inputs that can be scheduled in any order; however, the set
+of actor executions remains constant even as the order changes.  The
+following theorem allows us to use a pull schedule to calculate the
+$\sdep$ function.
+\begin{theorem} 
+\label{thm1}
+\[
+\sdepf{A}{B}(n) = |{\bf pullSchedule}(B, n) \wedge A|
+\]
+\end{theorem}
+\begin{proof}
+By construction, ${\bf pullSchedule}(B, n)$ executes each node in the
+graph as few times as possible for $B$ to fire $n$ times.  Thus, there
+is no execution containing $n$ executions of $B$ where $A$ executes
+fewer times.  The theorem follows from the definition of $\sdep$.
+\end{proof}
 
 Some example $\sdep$ calculations appear in Figure~\ref{fig:sdep1}.
 The results are summarized in the following table.
@@ -216,29 +218,62 @@ pattern in the marginal growth of $\sdep$ (i.e., in $\sdep(n) -
 \sdep(n-1)$); this quantity follows a cyclic pattern and has the same
 periodicity as the steady state of the stream graph.  A steady state
 ${\cal S} \in \Phi$ is an execution that does not change the buffering
-in the channels; the number of items on each channel after the
-execution is the same as it was before the execution.  The execution
+in the channels---that is, the number of items on each channel after
+the execution is the same as it was before the execution.  Calculating
+a steady state is well-understood~\cite{LM87-i}.  The execution
 simulated in Figure~\ref{fig:sdep1} is a steady state, meaning that
 additional entries of the pull schedule will repeat the pattern given
 in the figure.  Thus, $\sdep$ will also grow in the same pattern, and
 we can calculate $\sdep$ for $n > 4$ as follows\footnote{Note that for
-any two actors $X$ and $Y$, $\sdepf{Y}{X}(0) = 0$}:
+any two actors $X$ and $Y$, $\sdepf{Y}{X}(0) = 0$.}:
+\begin{equation}
+\label{eq:sdep-steady}
+\nonumber
+\hspace{-4.5pt}\begin{array}{rcl}
+\sdepf{A}{E}(n) \hspace{-5.5pt}&=&\hspace{-5.5pt} p * |{\cal S} \wedge A| + \sdepf{A}{E}(n - p * |{\cal S} \wedge E|)~~(1)\\[1Ex]
+p \hspace{-5.5pt}&=&\hspace{-5.5pt} \lfloor \frac{n-1}{|{\cal S} \wedge E|} \rfloor~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\hspace{1.3pt}~~~~~~~~~(2) % I can't get the Eq. number to appear here any other way :(
+\end{array}
+\end{equation}
+where ${\cal S}$ is a steady state execution and $p$ represents the
+number of completed steady states.  The first term of the $\sdep$
+equation gives the number of times $A$ has executed in previous steady
+states ($A$ executes $|{\cal S} \wedge A| = 6$ times per steady
+state), while the second term accounts for the current steady state.
+Note that $p$ is set to $\lfloor \frac{n-1}{|{\cal S} \wedge
+E|}\rfloor$ rather than $\lfloor
+\frac{n}{|{\cal S} \wedge E|}\rfloor$ because, for some pairs of actors,
+the downstream actor might finish its steady state before the upstream
+actor.  For example, $\sdepf{A}{C}(|{\cal S} \wedge C|) =
+\sdepf{A}{C}(1) = 5$ even though $|{\cal S} \wedge A| = 6$.  For this
+reason, the most recent steady state is always handled by the second
+term (i.e., with a non-zero argument to $\sdep$) rather than assuming
+the upstream actor has also completed the most recent steady state.
+
+Equation~2 needs one modification to be fully general.  For an
+arbitrary $\sdepf{Y}{X}$, one must choose $p$ as follows:
 \begin{equation*}
-\begin{array}{l}
-\mbox{} \hspace{-5pt} \sdepf{A}{E}(n) = \\ 
-~~~|{\cal S} \wedge A| * \floor{n-1}{|{\cal S} \wedge E|} + \sdepf{A}{E}(1 + (n-1)~\mbox{mod}~|{\cal S} \wedge E|) \vspace{3pt} \\
-\mbox{} \hspace{-5pt} \sdepf{B}{E}(n) = \\
-~~~|{\cal S} \wedge B| * \floor{n-1}{|{\cal S} \wedge E|} + \sdepf{B}{E}(1 + (n-1)~\mbox{mod}~|{\cal S} \wedge E|)
+\begin{array}{c}
+~~\hspace{0.7in}~~p = \lfloor \frac{n-q}{|{\cal S} \wedge X|}\rfloor~~\hspace{0.7in}~~(3)
 \end{array}
 \end{equation*}
-where ${\cal S}$ is a steady state execution.  In this example,
-$|{\cal S} \wedge A| = 6$, $|{\cal S} \wedge B| = 3$, and $|{\cal S}
-\wedge E| = 4$.  There are well-known techniques for computing steady
-state schedules~\cite{LM87-i}.  Thus, to calculate $\sdepf{Y}{X}(n)$,
-it is not necessary to simulate a pull schedule for $n$ iterations of
-$X$ as described in Algorithm 1.  Instead, one can simulate $|{\cal S}
-\wedge X|$ iterations as a pre-processing step and answer all future
-$\sdep$ queries in constant time.  In addition, the pull schedule for
+where $q \in [1,|{\cal S} \wedge X|]$ is chosen such that
+$\sdepf{Y}{X}(q) > \sdepf{Y}{X}(q-1)$.  Using this value of $p$,
+Equation~1 is still valid, though the base case for $\sdep$ now ranges
+from $n=1$ to $n=q+|{\cal S} \wedge X|-1$.  This general form is
+needed for cases where both: 1) $X$ does not depend on the last
+steady-state execution of $Y$, and 2) the first steady-state execution
+of $X$ does not depend on $Y$.  In such cases, the steady state
+boundary is blurred and the original choice of $p$ gives erroneous
+results.  Using the general form of $p$ serves to shift the effective
+steady state boundary so that, on the first execution of $X$ within
+each steady state, it is guaranteed that $Y$ has finished all of its
+executions from the previous steady state.
+
+Thus, to calculate $\sdepf{Y}{X}(n)$, it is not necessary to simulate
+a pull schedule for $n$ iterations of $X$ as described in Algorithm 1.
+Instead, one can simulate $|{\cal S} \wedge X|+q$ iterations as a
+pre-processing step and answer all future $\sdep$ queries in constant
+time, using Equations~(2) and (3).  In addition, the pull schedule for
 $X$ can be reused to calculate $\sdep$ from $X$ to any other actor
 (e.g., $\sdepf{W}{X}$ in addition to $\sdepf{Y}{X}$).
 
@@ -275,8 +310,8 @@ execute for $n$ executions of $E$.  Then $A$ must execute enough to
 enable all of these children to complete the given number of
 executions, which translates to the $\max$ operation shown above.  Our
 implementation exploits this compositional property to tabulate
-$\sdep$ in an efficient hierarchical manner, rather than simulating a
-pull schedule.
+$\sdep$ in a hierarchical manner, rather than simulating a pull
+schedule.
 
 %% It is also possible to calculate $\sdep$ using a compositional
 %% approach.  Suppose there is a path in the stream graph from $A$ to $B$

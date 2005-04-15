@@ -1234,7 +1234,7 @@
 \ifnum\addauflag=0\addauthorsection\global\addauflag=1\fi
     \section{%
        {REFERENCES}
-         \vskip -3pt  % GM July 2000 (for tighter spacing)
+         \vskip -4pt  % GM July 2000 (for tighter spacing)
         \@mkboth{{\refname}}{{\refname}}%
     }%
     \list{[\arabic{enumi}]}{%
@@ -1242,7 +1242,7 @@
         \leftmargin\labelwidth
         \advance\leftmargin\labelsep
         \advance\leftmargin\bibindent
-        \parsep=2.5pt\itemsep=2pt % GM July 2000
+        \parsep=0.7pt\itemsep=0.7pt % GM July 2000
         \itemindent -\bibindent
         \listparindent \itemindent
         \usecounter{enumi}

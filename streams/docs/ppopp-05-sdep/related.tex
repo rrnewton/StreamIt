@@ -20,16 +20,15 @@ that of SDF while keeping some flexibility of DDF.
 Teleport messaging shares the motivation of BDF, but is different in
 its approach.  We believe that control messages represent a distinct
 and well-behaved class of dynamic communication in which a parameter
-is ``pushed'' into the receiver actor in an asynchronous way.  Because
-the message handlers do not access the input and output tapes of the
-receiving actor, their irregular invocations do not affect the
-multiplicity of the steady-state schedule.  Instead, the schedule is
-constrained only by the latency of control messages; if a message does
-not show up in the allotted window, then the receiving actor can go
-ahead with its high-bandwidth schedule.  This is the distinction in
-the computational model.  In addition, the static/dynamic integration
-offered by our system is integrated with language features that
-support the model.
+is ``pushed'' into the receiving actor in an asynchronous way.
+Because the message handlers do not access the I/O channels of the
+receiving actor, their irregular invocations do not interfere with a
+given static schedule.  Instead, the schedule is constrained only by
+the latency of control messages; if a message does not show up in the
+allotted window, then the receiving actor can go ahead with its
+high-bandwidth schedule.  This is the distinction in the computational
+model.  In addition, the static/dynamic integration offered by our
+system is integrated with language features that support the model.
 
 Program slicing identifies the set of statements in a program that a
 given statement might depend on.  There is a rich history of work in
@@ -69,10 +68,10 @@ Languages of recent interest include Brook~\cite{brook04},
 Cg~\cite{cg03}, StreamC/KernelC~\cite{imagine03ieee},
 Spidle~\cite{spidle02}, Occam~\cite{occammanual}, Sisal~\cite{sisal},
 and Parallel Haskell~\cite{ph}.  The principle differences between
-StreamIt and these languages is $(i)$ StreamIt adopts the SDF model of
+StreamIt and these languages are $(i)$ StreamIt adopts the SDF model of
 computation, which narrows the application class but enables powerful
 optimizations, $(ii)$ StreamIt's support for a ``peek'' construct that
-inspects data without consuming it from a channel, $(iii)$ the
+inspects an item without consuming it from the channel, $(iii)$ the
 single-input, single-output hierarchical structure that StreamIt
 imposes on the stream graph, and $(iv)$ teleport messaging as
 described in this paper.

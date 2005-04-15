@@ -23,19 +23,19 @@
 
 \begin{minipage}[t]{0.74in}
 \begin{center}
-\psfig{figure=fir1.eps,width=0.673in}
+\psfig{figure=fir1.eps,width=0.629in}
 \end{center}
 \end{minipage}
 \hspace{0.15in}
-\begin{minipage}[t]{2.95in}
+\begin{minipage}[t]{3.04in}
 \begin{center}
-\psfig{figure=fir2.eps,width=2.95in}
+\psfig{figure=fir2.eps,width=3.04in}
 \end{center}
 \end{minipage}
-\hspace{0.2in}
+\hspace{0.11in}
 \begin{minipage}[t]{2.95in}
 \begin{center}
-\psfig{figure=fir3.eps,width=2.95in}
+\psfig{figure=fir3.eps,width=2.915in}
 \end{center}
 \end{minipage}
 
@@ -46,32 +46,32 @@
 \hspace{0.2in}
 \begin{minipage}[t]{2.9in}
 \mbox{~}\hspace{0.045in}{\bf (a)}
-~\hspace{0.365in}{\bf (b)}
+~\hspace{0.368in}{\bf (b)}
 ~\hspace{0.345in}{\bf (c)}
 ~\hspace{0.345in}{\bf (d)}
 ~\hspace{0.345in}{\bf (e)}
 \caption{Execution snapshots illustrating manual embedding of control
-messages in FIR.  Circles represent data items, which are numbered in
-order of production from the source; this represents one of many
-possible executions. {\bf (a)} Source initiates change of weights,
-{\bf (b)} weights are attached to data item \#5 and embedded in
-stream, {\bf (c)-(e)}, actors check each input item, adjusting their
-own weight when they find a tagged item.\protect\label{fig:fir-manual-diagram}}
+messages in FIR.  Channels are annotated with data items present on
+one possible execution; items are numbered in order of production.
+{\bf (a)} Source initiates change of weights, {\bf (b)} weights are
+attached to data item \#5 and embedded in stream, {\bf (c)-(e)},
+actors check each input item, adjusting their own weight when they
+find a tagged item.\protect\label{fig:fir-manual-diagram}}
 \end{minipage}
-\hspace{0.2in}
-\begin{minipage}[t]{2.9in}
-\mbox{~}\hspace{0.09in}{\bf (a)}
-~\hspace{0.334in}{\bf (b)}
-~\hspace{0.334in}{\bf (c)}
-~\hspace{0.334in}{\bf (d)}
-~\hspace{0.334in}{\bf (e)}
+\hspace{0.25in}
+\begin{minipage}[t]{2.85in}
+\mbox{~}\hspace{0.11in}{\bf (a)}
+~\hspace{0.325in}{\bf (b)}
+~\hspace{0.325in}{\bf (c)}
+~\hspace{0.325in}{\bf (d)}
+~\hspace{0.325in}{\bf (e)}
 \caption{Execution snapshots illustrating teleport messaging in FIR.
-Circles represent data items, which are numbered in order of
-production from the source; this represents one of many possible
-executions. {\bf (a)} Source calls a message handler, passing new
-weights as argument, {\bf (b)} message boundary is maintained by
-compiler, {\bf (c)-(e)}, message handler is automatically invoked in
-actors immediately before the arrival of affected
+Channels are annotated with data items present on one possible
+execution; items are numbered in order of production.  {\bf (a)}
+Source calls a message handler, passing new weights as argument, {\bf
+(b)} message boundary is maintained by compiler, {\bf (c)-(e)},
+message handler is automatically invoked in actors immediately before
+the arrival of affected
 items. \protect\label{fig:fir-message-diagram}}
 \end{minipage}
 
