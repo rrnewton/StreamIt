@@ -5,23 +5,21 @@ We have implemented teleport messaging in the StreamIt compiler
 infrastructure~\cite{streamit-asplos}, with a backend that targets a
 cluster of workstations.  A StreamIt program is compiled to a set of
 parallel threads; if two threads are allocated to different machines,
-they communicate via dedicated TCP/IP connections.  Teleport messaging
-is supported via auxiliary communication channels that transmit two
-kinds of signals from a message sender to the receiver: 1) the contents of
-a control message, or 2) a {\it credit} that indicates the receiver
-can execute some number of iterations before checking for a message
-again.
+they communicate via dedicated TCP/IP connections.  Messages are
+supported via auxiliary communication channels that transmit two kinds
+of signals from senders to receivers: 1) the contents of a control
+message, or 2) a {\it credit} that indicates the receiver can execute
+some number of iterations before checking for a message again.
 
 Each actor alternates between normal execution and checking for the
 exchange of credits.  This serves to throttle the message receiver in
 accordance with the constraints (Section~\ref{sec:teleport}), as an
 actor will block waiting for credits until the sender has reached a
 given point in its execution.  The compiler calculates the $\sdep$
-relation and automatically schedules the exchange of credits to make
-sure that the timing constraints are respected.  When a message is
-sent, it is tagged with the iteration number during which the receiver
-should process it; this is also calculated using $\sdep$ in the
-compiler.
+relation and schedules the exchange of credits to make sure that the
+timing constraints are respected.  When a message is sent, it is
+tagged with the iteration number during which the receiver should
+process it; this is also calculated using $\sdep$ in the compiler.
 
 %% In our implementation, each actor maintains an iteration number which
 %% serves to synchronize message delivery. A message from a sender $A$ to
@@ -39,50 +37,63 @@ compiler.
 %% assumption is safe since, due to the data dependences, a downstream
 %% filter cannot get ahead of an upstream actor.
 
-We use a cluster of workstations as our evaluation testbed.  The
-StreamIt compiler automatically partitions an input program into a set
-of threads that are mapped to the workstations and then run
-concurrently.  We chose a cluster-based evaluation for two reasons.
-First, a number of streaming applications run on the server side
-(e.g., cell phone base stations, radar processing, HDTV editing) and
-require large computational resources. Second, clusters provide a
-simple abstraction for distributed and parallel computing---multiple
-program counters, and distributed memories---which is at the heart of
-emerging multi-core architectures for embedded, desktop, and server
-computing.  In our experiments, we are primarily interested in
-quantifying two performance metrics: throughput and communication
-overhead.  For the purpose of this paper, throughput is defined as the
-number of outputs produced per unit of time, and communication
-overhead reflects the quantity of data transmitted between
-workstations.
+%Our compiler maps threads to workstations using a dynamic programming
+%algorithm.  The algorithm aims to reduce the overall application
+%bottleneck, thereby maximizing the steady-state throughput of the
+%output actor (i.e., most downstream actor in the stream graph).
+%In our experiments, we are interested in quantifying two performance
+%metrics: throughput and communication overhead.  For the purpose of
+%this paper, throughput is defined as the number of outputs produced
+%per unit of time, and communication overhead reflects the quantity of
+%data transmitted between workstations.
+%The StreamIt compiler automatically partitions an input program into a
+%set of threads that are mapped to the workstations and then run
+%concurrently.
+
+We chose a cluster-based evaluation for two reasons.  First, many
+streaming applications run on the server side (e.g., cell phone base
+stations, radar processing, HDTV editing) and require large
+computational resources. Second, clusters provide a simple abstraction
+for distributed and parallel computing---multiple program counters,
+and distributed memories---which is at the heart of emerging
+multi-core architectures for embedded, desktop, and server computing.
 
 The teleport implementation of the frequency hopping radio was
-compiled into 28 threads whereas the alternate version using a
-feedback loop results in 32 threads.  Each thread implements a
-specific subset of the stream graph and is assigned to one of sixteen
-750Mhz Pentium~III workstations, each with a 256Kb cache.  The
-machines are interconnected using a fully switched high speed network.
+compiled into 29 threads whereas the alternate version using a
+feedback loop results in 33 threads.  Each thread corresponds to a
+single actor (there are more threads than appear in
+Figures~\ref{fig:fhr-streamit} and~\ref{fig:fhr-manual} because the
+FFT stage is a pipeline composed of several actors).  The thread
+mapping is done using a dynamic programming algorithm that aims to
+reduce the overall bottleneck, thereby maximizing throughput (outputs
+per unit time).  Threads are assigned to one of sixteen 750Mhz
+Pentium~III workstations, each with a 256Kb cache.  The machines are
+interconnected using a fully switched 100Mb network.
 
-Our compiler maps threads to workstations using a dynamic programming
-algorithm.  The algorithm aims to reduce the overall application
-bottleneck, thereby maximizing the steady-state throughput of the
-output actor (i.e., most downstream actor in the stream graph).
+%
+\input{code-example2}
+\clearpage
+\noindent
+%
 
-In Figure~\ref{fig:fhr-throughput}, we report the measured throughput
-($y$-axis) for various cluster sizes ranging from one to sixteen
-interconnected workstations. Note that due to the limited parallelism
-in the two implementations of the frequency hopper, cluster
-configurations with more than five workstations lead to negligible
-gains in terms of throughput. From the data, we can observe that
+Figure~\ref{fig:fhr-throughput} shows the measured throughput
+($y$-axis) for various cluster sizes.  Note that due to the limited
+parallelism in the two implementations of the frequency hopper,
+cluster configurations with more than five workstations lead to
+negligible performance gains. From the data, we can observe that
 teleport messaging achieves a maximal throughput that is 49\% better
 than its counterpart.  We attribute this speedup primarily to reduced
 communication overhead.  A detailed analysis of the results indicates
 that teleport messaging reduces the number of items communicated by
-35\%, as a small number of credits are sent compared to the manual
-implementation.
+35\%.  While the feedback loop version sends a message placeholder on
+every iteration, teleport messaging uses credits to allow the receiver
+to execute several iterations at a time without checking for messages.
+The amount of communications savings is dictated by the message
+latency, as larger latencies allow for a less frequent exchange of
+credits.
 
 \begin{figure}[t]
-\vspace{-16pt}
+\vspace{-10pt}
 \psfig{figure=throughput-graph.eps,width=3.3in}
 \vspace{-20pt}
 \caption{\small Throughput as a function of the number of workstations
@@ -94,7 +105,7 @@ in the cluster.
 %% There are two factors contributing to this speedup.  First, teleport
 %% messaging exposes more parallelism in the application, as the compiler
 %% understands that the RFtoIF stage can execute ahead of each
-%% Check\_Freq\_Hop stage, so long as the message latency is respected.
+%% CheckFreqHop stage, so long as the message latency is respected.
 %% In contrast, the manual implementation sends an item along the
 %% feedback path on every iteration, thereby restricting RFtoIF to only
 %% process one frame at a time.  This explains why the speedup improves

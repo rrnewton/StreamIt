@@ -22,24 +22,22 @@ Second, this paper formulates $\sdep$, a natural and useful dependence
 representation for the streaming domain.  While this paper applies
 $\sdep$ to a new language construct, we envision other applications as
 well.  For example, $\sdep$ could be used in a debugger to identify
-which iterations of an upstream actor are affecting a given iteration
-of a downstream actor.  In a software-based speculation
-system~\cite{frank-thesis}, $\sdep$ could be applied to trace the
-effects of a failed prediction and to roll back the appropriate actor
-executions.  $\sdep$ also offers a new method for measuring latency in
-a stream graph.  Analogous to representations such as dependence
-levels~~\cite{AK82}, direction vectors~\cite{wolfe82}, and dependence
-polyhedra~\cite{Irig88} for scientific programs, $\sdep$ provides
-dependence information that could be used to test or verify program
-transformations.
+which iterations of one actor are affecting a given iteration of
+another.  In a software-based speculation system~\cite{frank-thesis},
+$\sdep$ could be applied to trace the effects of a failed prediction
+and to roll back the appropriate actor executions.  Analogous to
+representations such as dependence levels~~\cite{AK82}, direction
+vectors~\cite{wolfe82}, and dependence polyhedra~\cite{Irig88} for
+scientific programs, $\sdep$ provides dependence information that
+could be used to test or verify program transformations.  Also,
+$\sdep$ offers a new method for measuring latency in a stream graph.
 
 There are some limitations in the current study that are fertile
 grounds for future research.  First, our formulation of $\sdep$
-requires a directed path in the stream graph (aligned with the
-direction of data flow) between the actors in question.  We are
-generalizing $\sdep$ to actors that run in parallel by leveraging
-their data dependences with common predecessors (upstream) or
-successors (downstream).  Second, as detailed in
+requires a directed path in the stream graph between the actors in
+question.  We are generalizing $\sdep$ to actors that run in parallel
+by leveraging their data dependences with common predecessors
+(upstream) or successors (downstream).  Second, as detailed in
 Section~\ref{sec:constraints}, we do not solve the general scheduling
 problem that incorporates overlapping constraints from teleport
 messaging; even determining whether or not a set of constraints is
@@ -49,20 +47,20 @@ Third, in the current model only actors can send and receive messages.
 We are extending this into a hierarchical model where stream
 containers (such as pipelines) can also receive events and dispatch
 them precisely to other streams.  Finally, our approach relies on the
-static communication rates present in SDF.  It would be interesting to
+static communication rates present in SDF.  It is interesting to
 consider teleport messaging in a more dynamic context; for example,
-downstream non-negative latency messages could be immediately
-supported by embedding messages in data items, while other messages
-might require speculative delivery or modified timing contracts.
+downstream non-negative latency messages could be supported by
+embedding messages in data items, while other messages might require
+speculative delivery or modified timing contracts.
 
-Our work can be viewed as the integration of dynamic behavior into a
-static dataflow language.  Our insight is that there is a class of
-control messages that only adjust a parameter in the target actor;
-they do not otherwise affect the input or output channels upon
-delivery.  This model enables a hybrid scheduling scheme in which the
-steady-state dataflow is exactly orchestrated at compile time, but
-there are windows in which a message could adjust an internal field of
-an actor between its execution steps.  We consider this to be a
-promising avenue for creating a unified development environment that
-captures all aspects of stream application development without
-sacrificing either performance or programmability.
+Our work can be viewed as integrating dynamic behavior into a static
+dataflow language.  Our insight is that there is a class of control
+messages that only adjust parameters in the target actor; they do not
+otherwise affect the input or output channels upon delivery.  This
+model enables a hybrid scheduling scheme in which the steady-state
+dataflow is exactly orchestrated at compile time, but there are
+windows in which a message could adjust an internal field of an actor
+between its execution steps.  We consider this to be a promising
+avenue for creating a unified development environment that captures
+all aspects of stream application development without sacrificing
+either performance or programmability.

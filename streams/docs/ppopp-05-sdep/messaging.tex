@@ -9,16 +9,15 @@
 Teleport messaging is a language construct that makes use of $\sdep$
 to achieve precise timing of control messages.  It is included as part
 of the StreamIt language~\cite{streamitcc}.  Teleport messaging
-represents an out-of-band communication between two actors, distinct
-from the high-bandwidth communication channels in the stream graph.
-Messages are currently supported between any pair of actors with a
-meaningful $\sdep$ relation; i.e., wherever there is a directed path
-in the stream graph (aligned with the direction of data flow) from one
-actor to the other.  We say that a {\it downstream} message travels in
-the same direction as the steady-state data flow, whereas an {\it
-upstream} message travels against it.
+represents out-of-band communication between two actors, distinct from
+the high-bandwidth dataflow in the stream graph.  Messages are
+currently supported between any pair of actors with a meaningful
+$\sdep$ relation, i.e., wherever there is a directed path in the
+stream graph from one actor to the other.  We say that a {\it
+downstream} message travels in the same direction as the steady-state
+data flow, whereas an {\it upstream} message travels against it.
 
-\paragraph*{Syntax.}  In order for actor $A$ to send a teleport message to
+\paragraph*{Syntax}  In order for actor $A$ to send a message to
 actor $B$, the following steps need to be taken:
 \begin{itemize}
 
@@ -44,7 +43,7 @@ portal and passes the portal to $A$ during initialization.
 For example, see lines 8, 10 and 12 of Figure~\ref{fig:fir-message-code}.
 
 \item To send a message, $A$ invokes the handler method on the portal
-from within its steady state work function. The handler invocation
+from within its steady-state work function. The handler invocation
 includes a range of latencies {\tt [min:max]} specifying when the
 message should be delivered; if no latency is specified, then a
 default latency of {\tt [0:0]} is used.  The following illustrates an
@@ -79,7 +78,7 @@ that is tagged, all of its subsequent outputs are tagged.  Then, the
 message handler of $B$ is invoked immediately before the first
 invocation of $B$ that inputs a tagged item.  In this sense, the
 message has the semantics of traveling ``with the data'' through the
-stream graph, even though it does not have to be implemented this way.
+stream graph, even though it is not necessarily implemented this way.
 
 The intuition for upstream messages is similar.  Consider that $B$ is
 sending a message with latency $k$ to upstream actor $A$ in the stream
@@ -157,9 +156,8 @@ Multiply} in the pipeline, respectively.  The message arrives
 immediately before the fifth data item (which corresponds to the fifth
 execution).
 
-\subsection{Constraints on the Schedule}
+\paragraph*{Constraints on the Schedule}  
 \label{sec:constraints}
-
 It is important to recognize that messaging can place constraints on
 the execution schedule.  The different categories of constraints are
 illustrated in Figure~\ref{tab:messcons}.  A negative-latency
@@ -193,25 +191,6 @@ buffered between the actors must not grow too large.
 %% \end{tabular}}
 \label{tab:messcons}
 \end{center}
-\end{figure}
-
-\begin{figure}[t]
-\vspace{-8pt}
-\begin{center}
-\psfig{figure=infeasible-messaging2.eps,height=0.6in}
-\hspace{0.7in}
-\psfig{figure=infeasible-messaging.eps,height=1.3in} \vspace{6pt}
-
-{\tiny ~}{\tiny ~}~{\bf (a)}\hspace{1in}{\bf (b)}~~~{\tiny ~}{\tiny ~}
-\vspace{-3pt}
-\caption{{\small Examples of unsatisfiable message constraints.  Each
-node is annoated with its input and output rate.  Messages are
-represented by dotted arrows, drawn from sender to receiver with a
-given latency.  (a) Constraint is unsatisfiable because latency is
-smaller than the communication ratio between $X$ and $Y$, (b)
-Constraints are satisfiable in isolation, but unsatisfiable in
-combination.  \protect\label{fig:infeasible}}}
-\end{center}
 \vspace{-18pt}
 \end{figure}
 
@@ -222,6 +201,7 @@ downstream message with positive or zero latency imposes no constraint
 on the schedule, as the sender has not yet produced the data that is
 synchronized with the message.
 
+\paragraph*{Unsatisfiable Constraints}  
 Messaging constraints can be unsatisfiable---that is, assuming a
 message is sent on every iteration of the sender's work function,
 there does not exist a schedule that delivers all of the messages
@@ -229,53 +209,73 @@ within the desired latency range.  Such constraints should result in a
 compile-time error.  Figure~\ref{fig:infeasible} illustrates two
 examples of unsatisfiable constraints.  In
 Figure~\ref{fig:infeasible}(a), the latency of the upstream message
-from $Y$ to $X$ is is too tight given the actors' I/O rates.  Consider
-that $Y$ sends a message on its first invocation ($n=1$).  The message
-should be delivered to $X$ on iteration $m$, where $m$ is constrained
-as follows:
+from $X$ to $Y$ is is too tight given the actors' I/O rates.  Consider
+that $X$ sends a message on its first execution ($n=1$).  The message
+should be delivered to $Y$ on iteration $m$, where $m$ is constrained
+as follows ($k_1 = k_2 = 1$):
 \begin{equation*}
 \begin{array}{c}
-\sdepf{X}{Y}(n+k_1) \le m \le \sdepf{X}{Y}(n+k_2) \\[1Ex]
-\sdepf{X}{Y}(2) \le m \le \sdepf{X}{Y}(2)
+\sdepf{Y}{X}(n+k_1) \le m \le \sdepf{Y}{X}(n+k_2) \\[1Ex]
+\sdepf{Y}{X}(2) \le m \le \sdepf{Y}{X}(2) \\[1Ex]
+m = \sdepf{Y}{X}(2)
 \end{array}
+\vspace{-4pt}
 \end{equation*}
-The reader can verify that $\sdepf{X}{Y}(n) = \lceil n/3 \rceil$,
-which implies that $m=1$.  However, because $Y$ is executing its first
-iteration, $X$ must have already fired, so it is too late to deliver
+The reader can verify that $\sdepf{Y}{X}(n) = \lceil n/3 \rceil$,
+which implies that $m=1$.  However, because $X$ is executing its first
+iteration, $Y$ must have already fired, so it is too late to deliver
 the message.  The smallest legal message latency in this graph is 3,
 which will lead to a legal delivery time of $m=2$.  In general, for an
-upstream message from $Y$ to $X$ to be satisfiable, its maximum
+upstream message from $X$ to $Y$ to be satisfiable, its maximum
 latency $k_2$ must meet the following condition:
 \begin{equation*}
 \begin{array}{c}
-\forall n \in [1, |{\cal S} \wedge Y|]:~~\sdepf{X}{Y}(n) < \sdepf{X}{Y}(n+k_2)
+\forall n \in [1, |{\cal S} \wedge X|]:~~\sdepf{Y}{X}(n) < \sdepf{Y}{X}(n+k_2)
 \end{array}
 \end{equation*}
-That is, for every execution of $Y$ in the steady-state (see
-Section~\ref{sec:calc-sdep}), the message must be delivered to $X$ in
-a later execution than has already passed.  This condition is
-straightforward to check at compile time once the $\sdep$ information
-has been computed.  A similar condition applies to downstream
-messages.
+That is, for all executions $n$ of actor $X$ in the steady state (see
+Section~\ref{sec:calc-sdep}), the current iteration of $Y$
+($\sdepf{Y}{X}(n)$) must precede the delivery time
+($\sdepf{Y}{X}(n+k_2)$).  This condition is straightforward to check
+at compile time once the $\sdep$ information has been computed.  A
+similar condition applies to downstream messages.
 
-It is also possible to construct cases where each constraint implied
-by messaging is satisfiable, but the set of constraints together is
+\begin{figure}[t]
+\begin{center}
+\psfig{figure=infeasible-messaging2.eps,height=0.66in}
+\hspace{0.7in}
+\psfig{figure=infeasible-messaging.eps,height=1.43in} \vspace{6pt}
+
+{\tiny ~}{\tiny ~}~{\bf (a)}\hspace{1in}{\bf (b)}~~~{\tiny ~}{\tiny ~}
+\vspace{-3pt}
+\caption{{\small Examples of unsatisfiable message constraints.  Each
+node is annotated with its input and output rate.  Messages are shown
+by dotted arrows, drawn from sender to receiver with a given latency.
+(a) Constraint is unsatisfiable because latency is smaller than the
+communication ratio between $Y$ and $X$, (b) Constraints are
+satisfiable in isolation, but unsatisfiable in combination.
+\protect\label{fig:infeasible}}}
+\end{center}
+\vspace{-18pt}
+\end{figure}
+
+One can also construct cases where each constraint implied by
+messaging is satisfiable, but the set of constraints together is
 unsatisfiable.  Figure~\ref{fig:infeasible}(b) shows one such case.
 The unsatisfiability is caused by conflicting demands on the buffering
-between actors B and C.  The message from B to C constrains this
-buffer to contain at least 10 items, while the message from D to A
-constrains it to be empty.  We say that these two constraints {\it
-overlap} because the paths from sender to receiver intersect a common
-actor in the stream graph.
+between B and C.  The message from B to C constrains this buffer to
+contain at least 10 items, while the message from D to A constrains it
+to be empty.  We say that these two constraints {\it overlap} because
+the paths from sender to receiver intersect a common actor in the
+stream graph.
 
-\input{code-example1}
-
+\paragraph*{Finding a Schedule}
 In the presence of overlapping constraints, we leave to future work
 the problem of finding a legal execution schedule (if one exists).
-Because overlapping constraints can be detected at compile time, a
-given compiler may choose to prohibit overlapping constraints
-altogether.  A discussion of the issues involved appears in a
-thesis~\cite{karczma-thesis} by one of the authors.
+Because overlapping constraints can be detected statically, a given
+compiler may choose to prohibit overlapping constraints altogether.
+%A discussion of the issues involved appears in a
+%thesis~\cite{karczma-thesis} by one of the authors.
 
 For the case of non-overlapping constraints, a simple modification to
 pull scheduling will always result in a legal schedule (if one
@@ -311,42 +311,31 @@ whenever it detects certain tones from the transmitter.  The frequency
 hopping is a good match for control messages because the hopping
 interval is dynamic (based on data in the stream); it spans a large
 section of the stream graph (there is a Fast Fourier Transform (FFT)
-between the demodulator and the hop detector); and it requires precise
-message delivery.  The delivery must be precise both to meet real-time
-requirements (as the transmitter will leave the current frequency
-soon), and to ensure that the message falls at a logical frame
-boundary; if the frequency change is out of sync with the FFT, then
-the FFT will muddle the spectrum of the old and new frequency bands.
-
-\begin{figure}[t]
-\vspace{-12pt}
-\psfig{figure=fhr-feedback.eps,width=3.35in}
-\vspace{-20pt}
-\caption{\small Stream graph of frequency hopping radio with control
-messages implemented manually.  A feedback loop connects the detectors
-with the RFtoIF stage, and an item is sent on every invocation to
-indicate whether or not a message is present.  The latency and
-periodicity of message delivery are governed by the data rates and the
-number of items on the feedback
-path. \protect\label{fig:fhr-manual}}
-\vspace{-12pt}
-\end{figure}
+with 15 child actors, not shown, between the demodulator and the hop
+detector); and it requires precise message delivery.  The delivery
+must be precise both to meet real-time requirements (as the
+transmitter will leave the current frequency soon), and to ensure that
+the message falls at a logical frame boundary; if the frequency change
+is out of sync with the FFT, then the FFT will muddle the spectrum of
+the old and new frequency bands.
 
 A StreamIt version of the radio frontend with teleport messaging
-appears in Figure~\ref{fig:freq1}.  The Freq\_Hopping\_Radio pipeline
+appears in Figure~\ref{fig:freq1}.  The FreqHoppingRadio pipeline
 creates a portal and adds the RFtoIF actor as a receiver (lines 45 and
-48 respectively).  The portal is passed to the Check\_Freq\_Hop stage,
+48 respectively).  The portal is passed to the CheckFreqHop stage,
 where four parallel detectors send messages into the portal if they
-detect a hop to the frequency they are monitoring (lines 32-35).  The
+detect a hop in the frequency they are monitoring (lines 32-35).  The
 messages are sent with a latency of 6 to ensure a timely transition.
-To make sense of the latency, note that $\sdepf{RFtoIF}{D}(n) = 64*n$
+To make sense of the latency, note that $\sdepf{RFtoIF}{D}(n) = 512*n$
 for each of the detector actors $D$.  This comes about because the FFT
-stage consumes and produces 64 items; each detector fires once per set
-of outputs from the FFT, but RFtoIF fires 64 times to fill the FFT
+stage consumes and produces 512 items\footnote{Though the FFT is
+256-way, the real and imaginary parts are interleaved on the tape,
+leading to an I/O rate of 512.}; each detector fires once per set of
+outputs from the FFT, but RFtoIF fires 512 times to fill the FFT
 input.  Because of this $\sdep$ relationship, messages sent from the
 detectors to RFtoIF are guaranteed to arrive only at iterations that
-are a multiple of 64.  This satisfies the design criterion that a
-given FFT stage will not operate on data that was demodulated at two
+are a multiple of 512.  This satisfies the design criterion that a
+given FFT stage will not operate on data that were demodulated at two
 separate frequencies.
 
 Another version of the frequency hopping radio appears in
@@ -360,16 +349,12 @@ algorithm.  The RFtoIF filter checks the values from the loop on every
 iteration; if the value is non-zero, it is treated as a message (the
 new frequency), while a value of zero is ignored (no message).  The
 I/O rate of the RFtoIF filter has been scaled up to ensure that the
-messaging information is received at intervals of 64 iterations (as in
-the version with portals).  To achieve the desired messaging latency,
-a number of items are enqueued on the feedback path prior to
-execution.
+messaging information is received at intervals of 512 iterations (as
+in the version with portals).  To achieve the desired messaging
+latency of 6 frames, $6*256 = 1536$ items are enqueued on the feedback
+path prior to execution.
 
-%
-\input{code-example2}
-\clearpage
-\noindent
-%
+\input{code-example1}
 
 %% As described previously, yet another way to approximate the behavior
 %% of messaging is with a direct function call from the detector to the
@@ -387,7 +372,7 @@ Teleport messaging offers several benefits compared to a manual
 implementation of equivalent functionality.  While embedding messages
 in the data stream is equally precise, it involves several tedious
 and error-prone changes, not only to the stream graph but also to the
-steady state execution code within the actors.  In particular, the
+steady-state execution code within the actors.  In particular, the
 manual derivation of the loop delay, adjustment of the actor I/O
 rates, and implicit interleaving of data items with control messages
 has a negative impact on the readability and maintainability of the
@@ -396,14 +381,29 @@ with the simplicity of a method call.
 
 Teleport messaging also has advantages from a compiler standpoint.  By
 separating the data-intensive code from the control-oriented code, the
-common case of the steady state actor execution is not sacrificed for
+common case of steady-state execution is not sacrificed for
 the uncommon case of message processing.  There are no ``dummy items''
 serving as placeholders in the static-rate channels.  In addition, by
 exposing the message latency as part of the language, the compiler can
 infer the true dependences between actor firings and reorder the
 execution so long as the message constraints are respected.  The
 actual message delivery can be implemented in the most efficient way
-for the given architecture.
+for a given architecture.
+
+\begin{figure}[t]
+\centering
+\vspace{-12pt}
+\psfig{figure=fhr-feedback.eps,width=3.13in}
+\vspace{-10pt}
+\caption{\small Stream graph of frequency hopping radio with control
+messages implemented manually.  A feedback loop connects the detectors
+with the RFtoIF stage, and an item is sent on every invocation to
+indicate whether or not a message is present.  The latency and
+periodicity of message delivery are governed by the data rates and the
+number of items on the feedback
+path. \protect\label{fig:fhr-manual}}
+\vspace{-12pt}
+\end{figure}
 
 A final benefit of teleport messaging is the clean interface provided
 by the portals.  Since a portal can have multiple receivers, it is
@@ -422,10 +422,10 @@ exposing the underlying actor implementation.
 One aspect of teleport messaging might be considered unusual: the
 granularity of message delivery can be affected by changes in
 granularity elsewhere in the stream graph.  This is evident in the
-frequency hopping radio, as the I/O rate of 64 on the FFT implies that
-the RFToIF stage will receive messages from Check\_Freq\_Hop at most
-once every 64 iterations.  (If the FFT were coarsened to 128-way, the
-granularity of messages in RFToIF would increase accordingly.)  In
+frequency hopping radio, as the I/O rate of 512 on the FFT implies
+that the RFToIF stage will receive messages from CheckFreqHop at most
+once every 512 iterations.  (If the FFT were coarsened to 1024-way,
+the granularity of messages in RFToIF would increase accordingly.)  In
 this case the behavior is desirable, as messages should not interrupt
 frame boundaries.  It seems that in many cases, the I/O rates are
 meaningful aspects of the program and their influence on message

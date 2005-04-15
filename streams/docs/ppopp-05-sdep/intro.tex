@@ -4,7 +4,7 @@ Algorithms that operate on streams of data are becoming increasingly
 pervasive across a broad range of applications, and there is evidence
 that streaming media applications already consume a substantial
 fraction of the computation cycles on consumer
-machines~\cite{kirkpatrick97,Rix98,dief97,conte97}.  Examples of
+machines~\cite{conte97,dief97,kirkpatrick97,Rix98}.  Examples of
 streaming workloads can be found in embedded systems (e.g., sensor
 nets and mobile phones), as well as in desktop machines (e.g.,
 networking and multimedia) and high-performance servers (e.g., HDTV
@@ -14,57 +14,62 @@ As high performance remains a critical factor for many streaming
 applications, programmers are often forced to sacrifice readability,
 robustness, and maintainability of their code for the sake of
 optimization.  One notoriously difficult aspect of stream programming,
-from both a performance and programmability standpoint, is in
-reconciling regular streaming data flow with irregular control
-messages.  While the high-bandwidth flow of data is very predictable,
-realistic applications also include unpredictable, low-bandwidth
-control messages for adjusting parameters in various parts of the
-system.  Such control messages often have strict timing constraints,
-which complicates their implementation on a parallel system.
+from both a performance and programmability standpoint, is reconciling
+regular streaming dataflow with irregular control messages.  While the
+high-bandwidth flow of data is very predictable, realistic
+applications also include unpredictable, low-bandwidth control
+messages for adjusting system parameters (e.g., filtering
+coefficients, frame size, compression ratio, network protocol, etc.).
+Control messages often have strict timing constraints that are
+difficult to reason about on parallel systems.
 
-Consider for example a frequency hopping radio (FHR), which mirrors
+For example, consider a frequency hopping radio (FHR), which mirrors
 how CDMA-based cell phone technology works.  In FHR, a transmitter and
 a receiver switch between a set of known radio frequencies, and they
-must do so in synchrony with respect to a stream boundary. That is, a
-receiver must switch its radio frequency at an exact point in the
-stream (as indicated by the transmitter) in order to follow the
-incoming signal.  Such a receiver is challenging to implement in a
-distributed environment because different processors might be
-responsible for the radio frontend and the frequency hop detection.
-When a frequency hop is detected, the detector must send a message to
-the frontend that is timed precisely with respect to the data stream,
-even though the two components are running on different processors
-with independent clocks.
+do so in synchrony with respect to a stream boundary. That is, a
+receiver must switch its frequency at an exact point in the stream (as
+indicated by the transmitter) in order to follow the incoming signal.
+Such a receiver is challenging to implement in a distributed
+environment because different processors might be responsible for the
+radio frontend and the frequency hop detection.  When a hop is
+detected, the detector must send a message to the frontend that is
+timed precisely with respect to the data stream, even though the two
+components are running on different processors with independent
+clocks.
 
 Other instances of control messaging have a similar flavor.  A
 component in a communications frontend might detect an invalid
 checksum for a packet, and send a precisely-timed message downstream
 to invalidate the effects of what has been processed.  Or, a
 downstream component might detect a high signal-to-noise ratio and
-send a message to the frontend to increase the amplification.
-Additional examples include: periodic channel characterization;
-adaptive beamforming; initiating a handoff (e.g., to a new
-network protocol); marking the end of a large data segment; and
-responding to user inputs, environmental conditions, or runtime
-exceptions.
+send a message to the frontend to increase the amplification.  In an
+adaptive beamformer, a set of filtering coefficients is periodically
+updated to focus the amplification in the direction of a moving
+target.  Additional examples include: periodic channel
+characterization; initiating a handoff (e.g., to a new network
+protocol); marking the end of a large data segment; and responding to
+user inputs, environmental stimuli, or runtime exceptions.
 
 There are two common implementation strategies for control messages
-using today's language and compiler tools.  First, the message can be
+using today's languages and compilers.  First, the message can be
 embedded in the high-bandwidth data stream, perhaps as an extra field
 in a data structure.  Application components check for the presence of
 messages on every iteration, processing any that are found.  This
 scheme offers precise timing across distributed components, as the
 control message has a well-defined position with respect to the data
-stream.  However, it adds complexity and runtime overhead to the
-steady-state data processing, and it requires a direct high-bandwidth
-connection between sender and receiver.
+stream.  However, the timing is inflexible: it is impossible for the
+sender to synchronize the message delivery with a data item that has
+already been sent, or to send messages upstream, against the flow of
+data.  In addition, this approach adds complexity and runtime overhead
+to the steady-state data processing, and it requires a direct
+high-bandwidth connection between sender and receiver.
 
 A second implementation strategy is to perform control messaging
 ``out-of-band'', via a new low-bandwidth connection or a remote
 procedure call.  While this avoids the complexity of embedding
-messages in another data stream, it falls short in terms of timing
-guarantees.  In a distributed environment, each processor has its own
-clock and is making independent progress on its part of the
+messages in a high-bandwidth data stream, it falls short in terms of
+timing guarantees.  In a distributed environment, each processor has
+its own clock and is making independent progress on its part of the
 application.  The only common notion of time between processors is the
 data stream itself.  Though extra synchronization can be imposed to
 keep processors in check, such synchronization is costly and can
@@ -105,15 +110,15 @@ Teleport messaging is implemented as part of the StreamIt compiler
 infrastructure~\cite{streamitcc}.  The implementation computes $\sdep$
 information and automatically targets a cluster of workstations.
 Based on a case study of a frequency hopping radio, we demonstrate a
-49\% performance improvement due to the scheduling benefits of
-teleport messaging.  As described in Section~\ref{sec:constraints},
-our implementation limits certain sender-receiver pairs to be in
-distinct portions of the stream graph; if overlapping messages are
-sent with conflicting latencies, it may be impossible to schedule the
-delivery.  This constrained scheduling problem remains an interesting
-problem for future work.
+49\% performance improvement due to communication benefits of teleport
+messaging.  As described in Section~\ref{sec:constraints}, our
+implementation limits certain sender-receiver pairs to be in distinct
+portions of the stream graph; if overlapping messages are sent with
+conflicting latencies, it may be impossible to schedule the delivery.
+This constrained scheduling problem is an interesting topic for future
+work.
 
-The rest of this paper is organized as follows.  In the rest of this
+This paper is organized as follows.  In the rest of this
 section, we describe our model of computation and give a concrete
 example of teleport messaging.  Section~\ref{sec:sdep} defines the
 stream dependence function, and Section~\ref{sec:calc-sdep} shows how
@@ -122,7 +127,7 @@ semantics for teleport messaging, and Section~\ref{sec:casestudy}
 describes our case study and implementation results.  
 %Other
 %applications for $\sdep$ appear in Section~\ref{sec:others-apps},
-Related work appear in Section~\ref{sec:related-work}, while
+Related work appears in Section~\ref{sec:related-work}, while
 conclusions and future work appear in Section~\ref{sec:conclusion}.
 
 %% In  this  paper, we focus on the 
@@ -183,18 +188,34 @@ conclusions and future work appear in Section~\ref{sec:conclusion}.
 \subsection{Model of Computation}
 \label{sec:sdf}
 
-Our model of computation is Cyclo-Static Dataflow~\cite{BELP96}, a
-generalization of Synchronous Dataflow~\cite{LM87-ii}.  This is a
-popular model of computation that is well suited for signal processing
-applications. Computation is represented as a graph of {\it actors}
-connected by FIFO communication channels.  Each actor follows a set of
-execution steps, or phases, that consume a constant number of items
-from the input channels and produce a constant number of items onto
-the output channels.  The number and ordering of phases is known at
-compile time, and their execution is cyclic (that is, after executing
-the last phase, the first phase is executed again).  SDF is appealing
-because every actor has a fixed input and output rate, making the
-stream graphs amenable to static scheduling and
+%% Our model of computation is Synchronous Dataflow~\cite{LM87-ii}, which
+%% is well suited for signal processing applications.  Computation is
+%% represented as a graph of {\it actors} connected by FIFO communication
+%% channels.  We also support a generalization of SDF known as
+%% Cyclo-Static Dataflow (CSDF), in which each actor follows a set of
+%% execution steps, or phases~\cite{BELP96}.  Like actors in SDF, each
+%% phase in CSDF consumes a constant number of items from each input
+%% channel and produces a constant number of items onto each output
+%% channel.  The number and ordering of phases is known at compile time,
+%% and their execution is cyclic (that is, after executing the last
+%% phase, the first phase is executed again).  Synchronous Dataflow is
+%% appealing because every actor has fixed input and output rates, making
+%% the stream graphs amenable to static scheduling and
+%% optimization~\cite{LM87-i}.
+
+Our model of computation is Cyclo-Static Dataflow (CSDF), a
+generalization~\cite{BELP96} of Synchronous Dataflow, or
+SDF~\cite{LM87-i}.  SDF and its variants are well suited for signal
+processing applications. Computation is represented as a graph of {\it
+actors} connected by FIFO communication channels.  In CSDF, each actor
+follows a set of execution steps, or phases.  Each phase consumes a
+fixed number of items from each input channel and produces a fixed
+number of items onto each output channel.  The number and ordering of
+phases is known at compile time, and their execution is cyclic (that
+is, after executing the last phase, the first phase is executed
+again).  If each actor has only one phase, then CSDF is equivalent to
+SDF.  These models are appealing because the constant input and output
+rates make the stream graph amenable to static scheduling and
 optimization~\cite{LM87-i}.
 
 In this paper, we use the StreamIt programming
@@ -219,44 +240,44 @@ to all streams, or distributed using a round-robin splitter.
 Likewise, outputs of the parallel streams are serialized using a
 round-robin joiner.  Round-robin splitters (resp. joiners) execute in
 multiple phases: the $i$th phase pushes (resp. pops) a known number of
-items $k_i$ to the $i$th stream in the splitjoin.  Finally, a {\it
-feedbackloop} can be used to introduce cycles in the graph.
+items $k_i$ to (resp. from) the $i$th stream in the splitjoin.
+Finally, a {\it feedbackloop} can be used to introduce cycles in the
+graph.
 
 \subsection{Illustrating Example}
 
 Figure~\ref{fig:fir-orig-code} illustrates a StreamIt version of an
 FIR (Finite Impulse Response) filter.  A common component of digital
-signal processing applications, FIR filters represent sliding window
-computations in which a set of coefficients is convolved with the
-input data.  This FIR implementation is
 %
 \input{fir-example}
 \noindent 
 %
-very fine-grained; as depicted in Figure~\ref{fig:fir-orig-diagram},
-the stream graph consists of a single pipeline with a {\tt Source}, a
-{\tt Printer}, and 64 {\tt Multiply} stages---each of which contains a
-single coefficient (or {\it weight}) of the FIR filter.  Each {\tt
-Multiply} actor inputs a {\tt Packet} consisting of an input item and
-a partial sum; the actor increments the sum by the product of a
-weight and the {\it previous} input to the actor.  Delaying the
-inputs by one step ensures that each actor adds a different input to
-the sum.  While we typically advocate a more coarse-grained
-implementation of FIR filters, this formulation is simple to
-parallelize (each actor is mapped to a separate processor) and
-provides a simple illustratoin of our analysis.
+signal processing applications, FIR filters represent sliding window
+computations in which a set of coefficients is convolved with the
+input data.  This FIR implementation is very fine-grained; as depicted
+in Figure~\ref{fig:fir-orig-diagram}, the stream graph consists of a
+single pipeline with a {\tt Source}, a {\tt Printer}, and 64 {\tt
+Multiply} stages---each of which contains a single coefficient (or
+{\it weight}) of the FIR filter.  Each {\tt Multiply} actor inputs a
+{\tt Packet} consisting of an input item and a partial sum; the actor
+increments the sum by the product of a weight and the {\it previous}
+input to the actor.  Delaying the inputs by one step ensures that each
+actor adds a different input to the sum.  While we typically advocate
+a more coarse-grained implementation of FIR filters, this formulation
+is simple to parallelize (each actor is mapped to a separate
+processor) and provides a simple illustration of our analysis.
 
 The problem addressed by this paper is as follows.  Suppose that the
-actors in the FIR program are running in parallel and the {\tt Source}
-detects that the weights should be adjusted (e.g., to suite the
-current operating conditions).  Further, to guarantee stability, every
-output from the system must be obtained using either the old
-weights or the new ones, but not a mixture of the two.  This
-constraint precludes updating all of the weights at the same
-instant, as the partial sums within the pipeline would retain evidence
-of the old weights.  Rather, the weights must be changed one
-actor at a time, mirroring the flow of data through the pipeline.
-What is a simple and efficient way to implement this behavior?
+actors in FIR are running in parallel and the {\tt Source} detects
+that the weights should be adjusted (e.g., to suite the current
+operating conditions).  Further, to guarantee stability, every output
+from the system must be obtained using either the old weights or the
+new ones, but not a mixture of the two.  This constraint precludes
+updating all of the weights at the same instant, as the partial sums
+within the pipeline would retain evidence of the old weights.  Rather,
+the weights must be changed one actor at a time, mirroring the flow of
+data through the pipeline.  What is a simple and efficient way to
+implement this behavior?
 
 One way to implement this functionality is by manually tagging each
 data item with a flag, indicating whether or not it marks the
@@ -269,9 +290,11 @@ array---the latter of which is meaningful only when {\tt newWeights}
 is true.  This scheme muddles steady-state dataflow with event
 handling by checking the flag on every invocation of {\tt Multiply}
 (line 41 of Figure~\ref{fig:fir-manual-code}).  It is also very
-inefficient in StreamIt because arrays are passed by value; a new
-optimization would be needed to compress each {\tt Packet} structure
-when the {\tt weights} field is unused.
+inefficient in StreamIt because arrays are passed by value; though it
+might be possible to compress each {\tt Packet} when the {\tt weights}
+field is unused, this would require an aggressive compiler analysis
+and would also jeopardize other optimizations by introducing an
+unanalyzable communication rate in the stream graph.
 
 This paper proposes an alternate solution: teleport messaging.  The
 idea behind teleport messaging is for the {\tt Source} to change the
@@ -285,9 +308,10 @@ Multiply} actor declares a message handler that adjusts its own weight
 Figure~\ref{fig:fir-message-diagram}, teleport messaging gives the
 same result as the manual version, but without corrupting the data
 structures or control flow used in the steady-state.  It also exposes
-the true information flow to the compiler, allowing the compiler to
-deliver the message in the most efficient way for a given
-architecture.
+the true information flow, allowing the compiler to deliver the
+message in the most efficient way for a given architecture.  Finally,
+teleport messaging offers powerful control over timing and latency
+beyond what is utilized in this example.
 
 %% The rest of this paper is devoted to making the above notions more
 %% general and more precise.  In particular, it is natural to use
