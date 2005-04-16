@@ -243,17 +243,16 @@ of Equation~1 gives the total number of times that $A$ has fired in
 previous steady states, while the second term counts firings of $A$ in
 the current steady state.
 
-While Equation~1 is valid for $\sdepf{A}{E}$, it does not work for
-certain corner cases.  For example, for $\sdepf{A}{C}(3)$ it detects
-exactly 3 steady state executions $(p(3)=3)$ and concludes that each
-requires $6$ executions of $A$ ($|{\cal S} \wedge A| = 6$).  However,
-as is visible from Figure~\ref{fig:sdep1}, the last firing of $C$
-requires only $5$ executions of $A$.  $C$ is unusual in that it
+While Equation~1 works for actors $A$ and $E$, it fails for certain
+corner cases in stream graphs.  For example, for $\sdepf{A}{C}(3)$ it
+detects exactly 3 steady state executions $(p(3)=3)$ and concludes
+that each requires $6$ executions of $A$ ($|{\cal S} \wedge A| = 6$).
+However, as shown in Figure~\ref{fig:sdep1}, the last firing of
+$C$ requires only $5$ executions of $A$.  $C$ is unusual in that it
 finishes its steady state before the upstream actor $A$.
 
 To handle the general case, we simulate {\it two} executions of the
-steady state $|{\cal S} \wedge X|$ when building the base $\sdep$
-table:
+steady state (rather than one) for the base case of $\sdep$:
 %This results in a 2X
 %larger $\sdep$ table that can index any execution within a steady
 %state without being on the boundary of the table.  The formulation is:
@@ -274,18 +273,26 @@ table:
 \end{array}
 \vspace{-2pt}
 \end{equation*}
-By growing the base $\sdep$ table by one steady state, this
-formulation can set $q(n)$ to be one unit smaller than $p(n)$.  The
-result is that the last complete steady state cycle is counted as part
-of the ``current iteration'' rather than a ``completed'' iteration.
-For example, Equation~3 evaluates $\sdepf{A}{C}(3)$ using $q(3)=2$,
-yielding $\sdepf{A}{C}(3) = 2*6 + \sdepf{A}{C}(3-2*1) = 17$ as
-desired.  Moreover, in complex cases\footnote{{\small For example, if
-within each steady state, the first firing of $X$ does not depend on
-the first firing of $Y$, and the last firing of $X$ does not depend on
-the last firing of $Y$.}}, including the last complete steady state as
-part of the $\sdep$ lookup provides important context for the current
-execution.
+This formulation increases the size of the base $\sdep$ table by one
+steady state, and also sets 
+%perform table lookups of $\sdep$ anywhere in the
+%range of $1$ to 
+$q(n)$ to be one unit smaller than $p(n)$.  The result is that the
+last complete steady state is counted as part of the ``current''
+iteration rather than a ``completed'' iteration.  For example,
+Equation~3 evaluates $\sdepf{A}{C}(3)$ using $q(3)=2$, yielding
+$\sdepf{A}{C}(3) = 2*6 + \sdepf{A}{C}(3-2*1) = 17$ as desired.
+Moreover, in complex cases\footnote{{\small For example, if within
+each steady state, the first firing of $X$ does not depend on the
+first firing of $Y$, and the last firing of $X$ does not depend on the
+last firing of $Y$.}}, the last steady state adds important context to
+the SDEP lookup for a given execution.
+
+%including the last complete steady state as
+%part of the $\sdep$ lookup provides important context for the current
+%execution.
+
+
 
 %% That is, we use a pull schedule to calculate $\sdep$ through the first
 %% two steady states of $X$.  Then we extrapolate $\sdep$ as before,
