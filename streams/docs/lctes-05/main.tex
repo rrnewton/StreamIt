@@ -1,22 +1,36 @@
-\documentclass{sig-alternate}
-\usepackage{epsfig}
-
-\title{Cache Aware Optimization of Stream Programs}
-\numberofauthors{1}
-\author{
-	Janis Sermulins, William Thies, Rodric Rabbah, and Saman Amarasinghe\\
-	\small MIT Computer Science and Artificial Intelligence Laboratory\\
-	\small \{janiss, thies, rabbah, saman\}@csail.mit.edu
-}
-\begin{document}
+\documentclass[preprint]{sigplanconf}
+%\documentclass{sig-alternate}
+\usepackage{epsfig, times, graphicx, amssymb, amsmath, amsfonts}
 
 \newcommand{\mt}[1]{\mbox{\it #1}}
+
+\begin{document}
+
+\conferenceinfo{LCTES'05,} {June 15--17, 2005, Chicago, Illinois, USA.}
+\CopyrightYear{2005}
+\copyrightdata{1-59593-018-3/05/0006} 
+
+\title{Cache Aware Optimization of Stream Programs}
+\authorinfo{Janis Sermulins \and William Thies \and Rodric Rabbah \and Saman Amarasinghe}
+	     {Computer Science and Artificial Intelligence Laboratory, Massachusetts Institute of Technology}
+	     {\{janiss, thies, rabbah, saman\}@csail.mit.edu}
 
 \maketitle
 
 \begin{abstract}
 \input{abstract}
 \end{abstract}
+
+\category{D.2.2}{Software Engineering}{Software Architectures, Design Tools and Techniques}
+\category{D.3.2}{Programming Languages}{Language Classifications}
+\category{D.3.4}{Programming Languages}{Processors}
+
+\terms 
+Languages, Design, Performance
+
+\keywords
+Stream Programing, StreamIt, Synchronous Dataflow, Cache, Cache
+Optimizations, Fusion, Embedded
 
 \input{intro}
 \input{language}
@@ -25,13 +39,16 @@
 \input{fusion-opt}
 \input{experiments}
 \input{related}
-%\input{conclusion}
+\input{conclusion}
 
-{\scriptsize
-  \bibliographystyle{abbrv}
-  \bibliography{references}
-}
+\section*{Acknowledgements}
+The StreamIt project is
+supported by DARPA grants PCA-F29601-03-2-0065 and
+HPCA/PERCS-W0133890; NSF awards CNS-0305453 and EIA-0071841; and the
+MIT Oxygen Alliance.
 
+\bibliographystyle{abbrv}
+\bibliography{references}
 
 \clearpage
 

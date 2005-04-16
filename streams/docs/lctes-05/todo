@@ -1,10 +1,22 @@
+
+- fix spacing for all figures and tables; style file draws a line (?) above the caption: remove all box frames if possible
+- inline appendix into the text and remove appendix
+- add a conclusion
+- check acknowledgment
+- add a roadmap? (currently forward section pointers inlined in the intro)
+- fix FIR (the word) in Figure 2
+- fix font in Figures 9-11
+
+
 - results:  did we  only apply  scalar replacement  in  CAF+buffer and
 CAF+buffer+optimizations? we should be more specific.
 
 > other things to consider adding:
 
 - results with modulation
-- evidence that our cache model makes sense
+- what is the right peek scaling number
+- change 90/10 rule to equalize *amount* of work in steady state
+- provide evidence that our cache model makes sense
 - at least a cursory investigation with/comparison to phased scheduling
 - better explanation of results, especially scalar replacement and 
 register allocation impact (need to verify our hypothesis)
