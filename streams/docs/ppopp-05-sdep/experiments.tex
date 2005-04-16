@@ -16,8 +16,8 @@ exchange of credits.  This serves to throttle the message receiver in
 accordance with the constraints (Section~\ref{sec:teleport}), as an
 actor will block waiting for credits until the sender has reached a
 given point in its execution.  The compiler calculates the $\sdep$
-relation and schedules the exchange of credits to make sure that the
-timing constraints are respected.  When a message is sent, it is
+information and schedules the exchange of credits to make sure that
+the timing constraints are respected.  When a message is sent, it is
 tagged with the iteration number during which the receiver should
 process it; this is also calculated using $\sdep$ in the compiler.
 

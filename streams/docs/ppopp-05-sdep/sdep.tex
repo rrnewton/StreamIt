@@ -87,8 +87,8 @@ Informally, $\sdepf{A}{B}(n)$ represents the minimum number of times
 that actor $A$ must execute to make it possible for actor $B$ to
 execute $n$ times.  This dependence is meaningful only if $A$ is
 upstream of $B$; otherwise, $\sdep$ assumes a value of zero.  Because
-the I/O rates of each actor are known at compile time, $\sdep$ is also
-a static relation.
+the I/O rates of each actor are known at compile time, $\sdep$ is a
+static mapping.
 
 A formal definition of $\sdep$ using the notations introduced above is
 as follows:
@@ -119,7 +119,7 @@ construct $\phi$ by simulating the stream graph's execution of a
 \begin{figure*}[t]
 \begin{center}
 \vspace{-12pt}
-\psfig{figure=sdep-example3.eps,width=5.8in}
+\psfig{figure=sdep-example3.eps,width=5.5in}
 \vspace{-4pt}
 \caption{\small Example \figsdep\ calculation for stream graph in
 Figure~\ref{fig:sdep-rates}.  The stream graphs illustrate a steady
@@ -153,7 +153,7 @@ of $\figsdepf{B}{E}$.
 \mbox{} ~~~~~~~~~~$\phi = \phi~\circ~X$ \\
 \mbox{} ~~~~~~~~~~// {\it update number of items on I/O channels of $X$} \\
 \mbox{} ~~~~~~~~~~{\bf simulateExecution}($X$) \\
-\mbox{} ~~~~~~~{\bf end for} \\
+\mbox{} ~~~~~~~\} \\
 \mbox{} ~~~~~~~return $\phi$ \\
 \mbox{} ~~~~\}
 }}
@@ -202,6 +202,7 @@ fewer times.  The theorem follows from the definition of $\sdep$.
 Some example $\sdep$ calculations appear in Figure~\ref{fig:sdep1}.
 The results are summarized in the following table.
 \begin{center}
+{\small
 \begin{tabular}{|c|c|c|}
 \hline
 $n$ & $\sdepf{A}{E}(n)$ & $\sdepf{B}{E}(n)$ \\
@@ -210,7 +211,7 @@ $n$ & $\sdepf{A}{E}(n)$ & $\sdepf{B}{E}(n)$ \\
 2 & 5 & 2 \\ \hline
 3 & 5 & 2 \\ \hline
 4 & 6 & 3 \\ \hline
-\end{tabular}
+\end{tabular}}
 \end{center}
 Note that $\sdep$ is non-linear due to mis-matching I/O rates in the
 stream graph.  However, for longer execution traces, there is a
@@ -225,64 +226,93 @@ simulated in Figure~\ref{fig:sdep1} is a steady state, meaning that
 additional entries of the pull schedule will repeat the pattern given
 in the figure.  Thus, $\sdep$ will also grow in the same pattern, and
 we can calculate $\sdepf{A}{E}(n)$ for $n > 4$ as
-follows\footnote{Note that for any two actors $X$ and $Y$,
+follows\footnote{\small Note that for any two actors $X$ and $Y$,
 $\sdepf{Y}{X}(0) = 0$.}:
 \begin{equation}
 \label{eq:sdep-steady}
 \nonumber
 \hspace{-4.5pt}\begin{array}{rcl}
-p(n) \hspace{-5.5pt}&=&\hspace{-5.5pt} \lfloor \frac{n}{|{\cal S} \wedge E|} \rfloor~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\hspace{1.3pt}~~~~~~~~~(1) \\[1Ex] % I can't get the Eq. number to appear here any other way :(
-\sdepf{A}{E}(n) \hspace{-5.5pt}&=&\hspace{-5.5pt} p(n) * |{\cal S} \wedge A| + ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\hspace{3.3pt}~~(2)\\[1Ex]
-~&~&\mbox{~}\hspace{8.5pt} \sdepf{A}{E}(n - p(n) * |{\cal S} \wedge E|)
+\sdepf{A}{E}(n) \hspace{-5.5pt}&=&\hspace{-5.5pt} p(n) * |{\cal S} \wedge A| + ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\hspace{3.3pt}~~(1)\\[0.2Ex]
+~&~&\mbox{~}\hspace{8.5pt} \sdepf{A}{E}(n - p(n) * |{\cal S} \wedge E|) \\[1Ex]
+p(n) \hspace{-5.5pt}&=&\hspace{-5.5pt} \lfloor \frac{n}{|{\cal S} \wedge E|} \rfloor~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\hspace{1.3pt}~~~~~~~~~(2) % I can't get the Eq. number to appear here any other way :(
 \end{array}
 \end{equation}
 where ${\cal S}$ is a steady state and $p(n)$ represents the number of
-completed steady states by execution $n$.  The first term of
-Equation~(2) gives the execution count of $A$ in previous steady
-states ($A$ executes $|{\cal S} \wedge A| = 6$ times per steady
-state), while the second term accounts for the current steady state.
+steady states that $E$ has completed by iteration $n$.  The first term
+of Equation~1 gives the total number of times that $A$ has fired in
+previous steady states, while the second term counts firings of $A$ in
+the current steady state.
 
-While Equation~(2) is valid for $\sdepf{A}{E}$, the general form
-requires a larger base case, and is as follows:
+While Equation~1 is valid for $\sdepf{A}{E}$, it does not work for
+certain corner cases.  For example, for $\sdepf{A}{C}(3)$ it detects
+exactly 3 steady state executions $(p(3)=3)$ and concludes that each
+requires $6$ executions of $A$ ($|{\cal S} \wedge A| = 6$).  However,
+as is visible from Figure~\ref{fig:sdep1}, the last firing of $C$
+requires only $5$ executions of $A$.  $C$ is unusual in that it
+finishes its steady state before $A$, which lies upstream.
+
+To handle the general case, we simulate {\it two} executions of the
+steady state, thereby capturing all of the dependences in the
+transition from one steady state to another:
+%This results in a 2X
+%larger $\sdep$ table that can index any execution within a steady
+%state without being on the boundary of the table.  The formulation is:
 % To encapsulate the dependences across a steady
 %state boundary, we need to tabulate two steady state iterations of
 %$\sdep$ instead of just one:
 \begin{equation*}
-\begin{array}{l}
-q(n) = \lfloor \frac{n}{|{\cal S} \wedge X} \rfloor - 1\\[2Ex]
-\sdepf{Y}{X}(n) = ~\hspace{2in}\hspace{12pt}(3)\\[2Ex]
+\hspace{20pt}\begin{array}{l}
+\hspace{-10pt}\sdepf{Y}{X}(n) = ~\hspace{2in}\hspace{2pt}(3)\\[1Ex]
 \mbox{~}\hspace{6pt}
 \left\{\begin{array}{lr}
-\hspace{-3.5pt}|{\bf pullSchedule}(X, n) \wedge Y| & \hspace{-3pt} \mbox{if~} n \le 2*|{\cal S} \wedge X| \\[2Ex]
-\hspace{-3.5pt}q(n) * |{\cal S} \wedge Y| + & \hspace{-3pt} \mbox{otherwise} \\[1Ex] %(\mbox{if~} n > 2*|{\cal S} \wedge X|)\\[1Ex]
+\hspace{-3.5pt}|{\bf pullSchedule}(X, n) \wedge Y| & \hspace{-23pt} \mbox{if~} n \le 2*|{\cal S} \wedge X| \\[2.5Ex]
+\hspace{-3.5pt}q(n) * |{\cal S} \wedge Y| + & \hspace{-23pt} \mbox{otherwise} \\[0.2Ex] %(\mbox{if~} n > 2*|{\cal S} \wedge X|)\\[1Ex]
 \mbox{~}\hspace{12.5pt} \sdepf{Y}{X}(n - q(n) * |{\cal S} \wedge X|)
 \end{array}
-\right.
+\right.~\\~\\
+\hspace{-10pt}q(n) = \lfloor \frac{n}{|{\cal S} \wedge X|} \rfloor - 1  ~\hspace{1.83in}\hspace{2pt}(4)
 \end{array}
+\vspace{-2pt}
 \end{equation*}
-That is, we use a pull schedule to calculate $\sdep$ through the first
-two steady states of $X$.  Then we extrapolate $\sdep$ as before,
-except we use $q(n)$ instead of $p(n)$; $q(n)$ subtracts one so that an
-extra steady-state iteration is evaluated as part of the second term
-(in the argument to $\sdep$) rather than in the first term (as the
-coefficient of $|{\cal S} \wedge Y|$).  
+In addition to growing the base $\sdep$ table by $2\times$, this
+formulation sets $q(n)$ to be one unit smaller than $p(n)$.  This
+causes one steady state iteration to be counted as part of the
+``current iteration'' rather than the ``completed'' iteration.  For
+example, Equation~3 evaluates $\sdepf{A}{C}(3)$ using $q(3)=2$,
+yielding $\sdepf{A}{C}(3) = 2*6 + \sdepf{A}{C}(3-2*1) = 17$ as
+desired.  Moreover, this formulation handles more complex
+cases\footnote{{\small For example, if within each steady state, the
+first firing of $X$ does not depend on the first firing of $Y$, and
+the last firing of $X$ does not depend on the last firing of $Y$.}}
+that are beyond the scope of this discussion.
 
-This formulation correctly handles a number of dependences on the
-steady state boundaries that are otherwise tricky and problematic.
-For example, Equation~(2) yields the wrong answer for $\sdepf{A}{C}$
-in Figure~\ref{fig:sdep1}; this case is unusual because $C$ finishes
-its steady state before $A$, even though $C$ is downstream of $A$.
-That is, $\sdepf{A}{C}(|{\cal S} \wedge C|) = \sdepf{A}{C}(1) = 5$,
-but $|{\cal S} \wedge A| = 6$.  Due to the unit offset in $q(n)$,
-Equation~(3) evaluates this dependence as being in the middle (not the
-boundary) of the double steady-state cycle, thereby avoiding issues of
-this sort.
+%% That is, we use a pull schedule to calculate $\sdep$ through the first
+%% two steady states of $X$.  Then we extrapolate $\sdep$ as before,
+%% except we use $q(n)$ instead of $p(n)$; $q(n)$ subtracts one so that
+%% an extra steady-state iteration is evaluated as part of the second
+%% term (in the argument to $\sdep$) rather than in the first term (as
+%% the coefficient of $|{\cal S} \wedge Y|$).
+
+%This formulation correctly
+%handles a number of dependences on the steady state boundaries that
+%are otherwise tricky and problematic.  
+
+
+
+%as being in the middle (not the boundary) of the double steady-state
+%cycle, thereby avoiding the boundary issues.
+
+%% For example, Equation~2 yields the wrong answer for $\sdepf{A}{C}$ in
+%% Figure~\ref{fig:sdep1}; this case is unusual because $C$ finishes its
+%% steady state before $A$, even though $C$ is downstream of $A$.  That
+%% is, $\sdepf{A}{C}(|{\cal S}
+%% \wedge C|) = \sdepf{A}{C}(1) = 5$, but $|{\cal S} \wedge A| = 6$.  
 
 %Another tricky case is when
 %$\sdepf{Y}{X}(|{\cal S} \wedge X|) < |{\cal S} \wedge Y|$ and
 %$\sdepf{Y}{X}(1) = 0$, in which case $Y$ has executions on both sides
 %of the steady state boundary that $X$ does not depend on.  This
-%behavior is correctly modeled by Equation~(3).
+%behavior is correctly modeled by Equation~3.
 
 %% This general form is needed when, within a single steady state, both
 %% of the following are true: a) the first execution of $X$ does not
@@ -343,8 +373,8 @@ Thus, to calculate $\sdepf{Y}{X}(n)$, it is not necessary to simulate
 a pull schedule for $n$ iterations of $X$ as described in Algorithm 1.
 Instead, one can simulate $2 * |{\cal S} \wedge X|$ iterations as a
 pre-processing step and answer all future $\sdep$ queries in constant
-time, using Equation~(3).  In addition, the pull schedule for $X$ can
-be reused to calculate $\sdep$ from $X$ to any other actor (e.g.,
+time, using Equation~3.  In addition, the pull schedule for $X$ can be
+reused to calculate $\sdep$ from $X$ to any other actor (e.g.,
 $\sdepf{W}{X}$ in addition to $\sdepf{Y}{X}$).
 
 However, note that the pull schedule for $X$ can {\it not} be used to
@@ -364,7 +394,7 @@ that is, a steady state cycle of a pull schedule with respect to $X$.
 
 It is also possible to calculate $\sdep$ using a compositional
 approach.  For example, $\sdepf{A}{E}$ from Figure~\ref{fig:sdep1} can
-be expressed as follows:
+be expressed as follows: ~\vspace{-3pt}~
 \begin{equation*}
 \begin{array}{rl}
 \sdepf{A}{E}(n) = \max \left\{\begin{array}{l}
