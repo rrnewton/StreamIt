@@ -58,10 +58,10 @@ compiler ensures sure the actor's code size is not
 greater than the instruction cache. Furthermore, we {\it scale}
 the execution of the actor so that it runs several times before we move
 on to some other actor in the stream 
-graph. This serves to $(i)$ amortize the cost of fetching the actor's
-instructions into the cache from memory (an expensive operation), $(ii)$
-improve the instruction temporal locality, and $(iii)$ improve overall
-performance. However, as our cache model will show
+graph. This serves to amortize the cost of fetching the actor's
+instructions into the cache from memory (an expensive operation), and to
+%% , $(ii)$ improve the instruction temporal locality
+improve overall performance. However, as our cache model will show
 (Section~\ref{sec:cache-model}), we 
 cannot arbitrarily scale the execution frequency of an actor. This
 is because actors produce data that must be buffered, and therefore,
