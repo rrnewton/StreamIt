@@ -249,11 +249,11 @@ exactly 3 steady state executions $(p(3)=3)$ and concludes that each
 requires $6$ executions of $A$ ($|{\cal S} \wedge A| = 6$).  However,
 as is visible from Figure~\ref{fig:sdep1}, the last firing of $C$
 requires only $5$ executions of $A$.  $C$ is unusual in that it
-finishes its steady state before $A$, which lies upstream.
+finishes its steady state before the upstream actor $A$.
 
 To handle the general case, we simulate {\it two} executions of the
-steady state, thereby capturing all of the dependences in the
-transition from one steady state to another:
+steady state $|{\cal S} \wedge X|$ when building the base $\sdep$
+table:
 %This results in a 2X
 %larger $\sdep$ table that can index any execution within a steady
 %state without being on the boundary of the table.  The formulation is:
@@ -274,17 +274,18 @@ transition from one steady state to another:
 \end{array}
 \vspace{-2pt}
 \end{equation*}
-In addition to growing the base $\sdep$ table by $2\times$, this
-formulation sets $q(n)$ to be one unit smaller than $p(n)$.  This
-causes one steady state iteration to be counted as part of the
-``current iteration'' rather than the ``completed'' iteration.  For
-example, Equation~3 evaluates $\sdepf{A}{C}(3)$ using $q(3)=2$,
+By growing the base $\sdep$ table by one steady state, this
+formulation can set $q(n)$ to be one unit smaller than $p(n)$.  The
+result is that the last complete steady state cycle is counted as part
+of the ``current iteration'' rather than a ``completed'' iteration.
+For example, Equation~3 evaluates $\sdepf{A}{C}(3)$ using $q(3)=2$,
 yielding $\sdepf{A}{C}(3) = 2*6 + \sdepf{A}{C}(3-2*1) = 17$ as
-desired.  Moreover, this formulation handles more complex
-cases\footnote{{\small For example, if within each steady state, the
-first firing of $X$ does not depend on the first firing of $Y$, and
-the last firing of $X$ does not depend on the last firing of $Y$.}}
-that are beyond the scope of this discussion.
+desired.  Moreover, in complex cases\footnote{{\small For example, if
+within each steady state, the first firing of $X$ does not depend on
+the first firing of $Y$, and the last firing of $X$ does not depend on
+the last firing of $Y$.}}, including the last complete steady state as
+part of the $\sdep$ lookup provides important context for the current
+execution.
 
 %% That is, we use a pull schedule to calculate $\sdep$ through the first
 %% two steady states of $X$.  Then we extrapolate $\sdep$ as before,
