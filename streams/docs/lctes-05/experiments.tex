@@ -199,9 +199,10 @@ applied in \texttt{CAF+scaling+buffer}. Note that on StrongARM
 \texttt{CAF+scaling+buffer} consistenly outperforms full fusion
 strategy (see Figure~\ref{fig:arm-perf}), except for a 43\% slowdown 
 for \texttt{3gpp}, this is because our compiler predicts that the
-fused version of \texttt{3gpp} will not fit into instruction cache 
+fused version of \texttt{3gpp} will not fit into the instruction cache 
 due to a conservative code size estimation, however, the optimized code 
-of the fused \texttt{3gpp} fits into 16kb instruction cache.
+of the fused \texttt{3gpp} turns out to be smaller than predicted and 
+fits into the 16Kb instruction cache.
 
 
 On average \texttt{CAF+scaling+buffer} imporves performance over full 
