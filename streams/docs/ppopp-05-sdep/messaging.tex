@@ -12,7 +12,7 @@ of the StreamIt language~\cite{streamitcc}.  Teleport messaging
 represents out-of-band communication between two actors, distinct from
 the high-bandwidth dataflow in the stream graph.  Messages are
 currently supported between any pair of actors with a meaningful
-$\sdep$ relation, i.e., wherever there is a directed path in the
+$\sdep$ relationship, i.e., wherever there is a directed path in the
 stream graph from one actor to the other.  We say that a {\it
 downstream} message travels in the same direction as the steady-state
 data flow, whereas an {\it upstream} message travels against it.
@@ -328,7 +328,7 @@ detect a hop in the frequency they are monitoring (lines 32-35).  The
 messages are sent with a latency of 6 to ensure a timely transition.
 To make sense of the latency, note that $\sdepf{RFtoIF}{D}(n) = 512*n$
 for each of the detector actors $D$.  This comes about because the FFT
-stage consumes and produces 512 items\footnote{Though the FFT is
+stage consumes and produces 512 items\footnote{\small Though the FFT is
 256-way, the real and imaginary parts are interleaved on the tape,
 leading to an I/O rate of 512.}; each detector fires once per set of
 outputs from the FFT, but RFtoIF fires 512 times to fill the FFT
