@@ -27,9 +27,9 @@ optimizations} that are geared toward the concomitant increase of instruction
 and data {\it temporal locality}. These
 optimization lead to significantly better utilization of the memory
 system, and as such, they deliver
-a speedup of 131\% for our streaming benchmark suite on a Pentium~3 
-architecture, and a speedup of 114\% for the same benchmark suite on
-an Itanium~2 processor.
+a speedup of 258\% for our streaming benchmark suite on a StrongARM 
+processor, a speedup of 154\% on a Pentium~3 processor, and a 
+speedup of 152\% on an Itanium~2 processor over unoptimized StreamIt.
 
 %they deliver performance gains ranging from 11\%
 %to 99\% for our streaming benchmark suite.
@@ -113,15 +113,18 @@ larger and richer repertoire of registers. The two architectures serve
 to validate our cache-aware optimizations, in that we expect an
 architecture with more registers to benefit more from optimization such
 as scalar replacement. Fusion with scalar replacement leads to a 
-82\% speedup for our benchmark suite on the Pentium~3, and 84\% speedup 
-on the Itanium~2. Scaling gives a 43\% speedup over baseline for our 
-benchmark suite on the Pentium~3 and 37\% speedup on the Itanium~2.
+84\% speedup for our benchmark suite on the StrongARM, a
+101\% speedup on the Pentium~3, and a 103\% speedup on the Itanium~2. 
+
+Scaling gives a 148\% speedup over unoptimized StreamIt for our 
+benchmark suite on the StrongARM, a 58\% speedup on the Pentium~3 and a 
+57\% speedup on the Itanium~2.
 
 While both scaling and fusion lead to modest performance gains, we
 combine the two to deliver the best possible performance. When we
-do so, we can achieve a speedup of 131\% for our benchmark suite on a 
-Pentium~3, and a speedup of 114\% on an Itanium~2 processor.
-Section~\ref{sec:evaluation} describes our evaluation
+do so, we can achieve a speedup of 250\% for our benchmark suite on a
+StrongARM, a speedup of 146\% on a Pentium~3, and a speedup of 144\% on 
+an Itanium~2 processor. Section~\ref{sec:evaluation} describes our evaluation
 methodology and presents our experimental analysis.
 
 %further improve the performance of our benchmarks by
@@ -150,7 +153,7 @@ in a detailed micro-benchmark analysis.
 StreamIt compiler.
 
 \item An experimental evaluation across 11 streaming benchmarks,
-demonstrating speedup of up to 5800\% on Pentium~3 and up to 6400\% 
+demonstrating speedup of up to 8830\% on StrongARM, up to 5720\% on Pentium~3 and up to 4780\% 
 on Itanium~2.
 \end{itemize}
 
