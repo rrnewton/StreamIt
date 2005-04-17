@@ -223,3 +223,41 @@ limiting the possibility of memory access reduction.
 
 
 
+\subsection{Buffer Management}
+
+\texttt{CAF+scaling} is our baseline for buffer management strategies. 
+According to this strategy the live items are copied to the beginning of 
+the buffer after every execution of a filter that has 
+$peek>pop$.
+
+\texttt{CAF+scaling+peekscale} strategy replaces filters that have
+$peek>pop$ with an equivalent filter that executes the original filter 
+multiple times to make sure that $pop$ is at least $4*(peek-pop)$.
+This reduces the overhead of copying live items, since we only copy live 
+items once after each execution of the scaled actor.
+
+\texttt{CAF+scaling+mod} strategy uses modular buffers for channels where 
+downstream filter has $peek>pop$.
+
+\texttt{CAF+scaling+cutpeek} modifies the CAF algorithm so that two 
+adjacent filters are never fused if the downstream filter has 
+$peek>pop$. After we apply multiplicity scaling to the 
+granularity adjusted actors we apply buffer expansion. The 
+live items are copied to the start of the buffer once after executing 
+the granularity adjusted actor for the number of times that is equal 
+to the global multiplicity scaling. This reduces the overhead of 
+copying live items.
+
+\texttt{CAF+scaling+cutpeek+mod} also modifies the CAF algorithm so 
+that two adjacent filters are never fused if the downstream filter has 
+$peek>pop$ and modular buffers are used for channels 
+where downstream filter has $peek>pop$.
+
+We found that on average \texttt{CAF+scaling+cutpeek} works best across 
+the 3 platforms and this is the buffer optimizatio included in our 
+performance numbers. However, \texttt{CAF+scaling+peekscale} is the 
+best strategy for fmradio benchmark and our baseline \texttt{CAF+scaling} 
+is best for the filterbank benchmark.
+
+
+
