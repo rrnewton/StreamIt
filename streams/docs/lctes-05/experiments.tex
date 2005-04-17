@@ -225,10 +225,10 @@ limiting the possibility of memory access reduction.
 
 \subsection{Buffer Management}
 
-\texttt{CAF+scaling} is our baseline for buffer management strategies. 
-According to this strategy the live items are copied to the beginning of 
-the buffer after every execution of a filter that has 
-$peek>pop$.
+\texttt{CAF+scaling} is our baseline for evaluating optimized buffer 
+management strategies. In \texttt{CAF+scaling} the live items are 
+copied to the beginning of the buffer after every execution of a filter 
+that has $peek>pop$.
 
 \texttt{CAF+scaling+peekscale} strategy replaces filters that have
 $peek>pop$ with an equivalent filter that executes the original filter 
