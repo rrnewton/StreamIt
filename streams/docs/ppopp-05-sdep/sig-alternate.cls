@@ -1232,9 +1232,10 @@
 \bibindent=0em
 \def\thebibliography#1{%
 \ifnum\addauflag=0\addauthorsection\global\addauflag=1\fi
+\vspace{-2pt}
     \section{%
        {REFERENCES}
-         \vskip -4pt  % GM July 2000 (for tighter spacing)
+         \vskip -3pt  % GM July 2000 (for tighter spacing)
         \@mkboth{{\refname}}{{\refname}}%
     }%
     \list{[\arabic{enumi}]}{%
@@ -1242,7 +1243,7 @@
         \leftmargin\labelwidth
         \advance\leftmargin\labelsep
         \advance\leftmargin\bibindent
-        \parsep=0.7pt\itemsep=0.7pt % GM July 2000
+        \parsep=0.9pt\itemsep=0.9pt % GM July 2000
         \itemindent -\bibindent
         \listparindent \itemindent
         \usecounter{enumi}
