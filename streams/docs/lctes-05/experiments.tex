@@ -107,8 +107,8 @@ The speedups offered by cache optimizations over a full fusion
 strategy are more modest for the desktop processors: 34\% average
 speedup on Pentium~3 (Figure~\ref{fig:p3-perf}) and 6\% speedup on
 Itanium~2 (Figure~\ref{fig:i2-perf}).  Out of the 11 benchmarks, cache
-optimizations perform better than full fusion for {\bf [???]}
-benchmarks on the Pentium~3 and {\bf [???]} benchmarks on the
+optimizations perform as well or better than full fusion for 7
+benchmarks on the Pentium~3 and 5 benchmarks on the
 Itanium~2.  Performance on any architecture is a tradoeff between two
 factors: 1) the benefit of data and instruction locality, and 2) the
 benefit of fusion, which reduces memory accesses due to improved
@@ -166,8 +166,9 @@ actors overwriting the state of an executing actor in the data cache.
 Since StrongARM has no L2 cache then such eviction can be quite
 expensive.
 
-Independently, cache-aware fusion also improves performance by {\bf
-???}.  Cache-aware fusion degrades performance only for
+Independently, cache-aware fusion also improves performance by 
+84\% on StrongARM, 101\% on Pentium~3 and a 103\% on the Itanium~2. 
+Cache-aware fusion degrades performance only for
 \texttt{filter}-\texttt{bank2} (by 6\% on StrongARM). When we combine
 cache-aware fusion with execution scaling, the performance
 consistently improves.  The speedup of \texttt{CAF+scaling} over
@@ -209,10 +210,10 @@ we apply buffer expansion.  The live items are copied to the start of
 the buffer once after executing the granularity-adjusted actor for the
 number of times that is equal to the global multiplicity scaling. This
 reduces the overhead of copying live items.  Optimized buffer
-management offers the largest gains for {\tt filterbank2}: {\bf ???}
-on StrongARM, {\bf ???} on Pentium~3, and {\bf ???} on Itanium~2.
+management offers the largest gains for {\tt filterbank2}: 45\%
+on StrongARM, 38\% on Pentium~3, and 36\% on Itanium~2.
 This is due to a large peek rate (100 items) in addition a large
-global multiplicity of {\bf ???} that amortizes the cost of copying
+global multiplicity of 300 that amortizes the cost of copying
 items.
 
 While we found that {\tt cutpeek} is, on average, the best buffer
