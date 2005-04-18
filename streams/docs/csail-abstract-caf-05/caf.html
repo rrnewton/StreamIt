@@ -1,7 +1,5 @@
-
-
 <div align="center">
-<h3>Cache Aware Optimization of Stream Programs</h3>
+<h3>Cache Optimizations for Stream Programs</h3>
    
 <h4>Janis Sermulins, William Thies, Rodric Rabbah &amp; Saman Amarasinghe</h4>
 </div>
@@ -10,21 +8,22 @@
 <h5>Introduction</h5>
 
 <p>
-StreamIt programming language enables rapid development of digital signal 
-processing (DSP) and other streaming programs in a high level programming 
-language[1,2]. StreamIt optimizing compiler enables high level linear and 
-space-time transformations that have been shown to reduce the number of 
-floating point operations[3]. Our research shows that a stream compiler can 
+The StreamIt programming language enables rapid development of digital signal 
+processing (DSP) and other streaming programs in a high-level programming 
+language[1,2]. The StreamIt optimizing compiler enables powerful transformations
+for linear filters[3] as well as parallel execution on communication-exposed
+architectures[4].  Our research[5] shows that a stream compiler can 
 use the information found in the stream program to automatically generate 
-cache optimized executable. This optimization can be used to generate code 
-that runs faster and consumes less energy on an embedded processors such as StrongARM.
+cache-optimized executables for execution on a uniprocessor.  These optimizations 
+can be used to generate code that runs faster and consumes less energy 
+on an embedded processors such as StrongARM.
 </p>
 
 <p>
 An embedded system usually has slow memory and a fast cache. In contrast 
-to desktop systems embedded system usually has only a single level of cache 
-and every cache-miss results in a slow memory access. To achieve good 
-performance an embedded program must have a very low cache-miss ratio.
+to desktop systems, embedded systems usually have only a single level of cache 
+and every cache miss results in a slow memory access.  To achieve good 
+performance, an embedded program must have a very low cache-miss ratio.
 </p>
 
 <h5>StreamIt</h5>
@@ -34,7 +33,7 @@ A stream program consists of a graph of actors that are connected via
 communication channels. Each channel connects two actors, where one is a 
 producer and the other is a consumer. Each actor examines and consumes a 
 fixed number of items from its input connection and produces a fixed number
- of items onto its output connection during every execution of the actor.
+of items onto its output connection during every execution of the actor.
 </p>
 
 <h5>Cache Aware Optimizations</h5>
@@ -48,16 +47,21 @@ scaling and optimized buffer management.
 </p>
 
 <p>
-The cache-aware fusion combines several adjacent actors and replaces
- them with a single new actor. This allows the compiler to perform optimizations 
-across actor boundaries. For example intermediate values that a source passes 
+Cache-aware fusion combines several adjacent actors and replaces
+them with a single new actor. This allows the compiler to perform optimizations 
+across actor boundaries. For example, intermediate values that a source passes 
 to a destination over a communication channel can be register allocated if the 
 two actors have been combined using fusion. Register allocation leads to reduction 
-of memory accesses that the program issues reducing the memory bottleneck.
+of memory accesses that the program issues, reducing the memory bottleneck.  
+However, our algorithm performs fusion judiciously, as excessive fusion can
+result in combined actors that exceed the size of the instruction cache.
 </p>
 
 <p>
-The execution scaling executes each actor multiple times. Execution scaling 
+Execution scaling executes each actor multiple times before moving on to the
+next one.  This scheduling freedom is an aspect of stream programs, where
+the graph of actors is executing in an infinite loop; actors can fire out of
+order so long as they fire in the same ratio during the steady state.  Execution scaling 
 reduces the number of cache misses for accessing the instructions of the scaled 
 actor (if all code of the actor fits into the instruction cache) and it also 
 reduces the number of cache misses for accessing the state of the scaled actor 
@@ -66,9 +70,9 @@ reduces the number of cache misses for accessing the state of the scaled actor
 
 <p>
 Some actors examine many items on the input channel but only consume (remove) 
-few items. In such case the stream compiler has to decide how the live items 
+a few items. In such cases, the stream compiler has to decide how the live items 
 should be buffered. We examine several alternative methods for buffer management 
-such as modulation and shifting the live items within a large buffer.
+such as modulo indexing and shifting the live items within a large buffer.
 </p>
 
 <h5>Conclusion</h5>
@@ -80,17 +84,18 @@ account the caching behavior of the generated code. CAF and optimized buffer
 management reduces the number of memory accesses issued by the program. Execution 
 scaling reduces the number of cache misses. A combination of all of the mentioned 
 optimizations reduces the memory bottleneck and results in a substantial speedup 
-for stream programs on embedded processors.
+for stream programs on embedded processors.  The performance improvements
+offered by our technique are summarized in the graphs below.
 </p>
 
 <p>
-<img src="arm1.gif" alt="Performance of various compilation strategies on a StrongARM"><br>
-<strong>Figure 1.</strong> Performance of various compilation strategies on a StrongARM.
+<img src="arm2.gif" alt="Overall performance numbers on StrongARM"><br>
+<strong>Figure 1.</strong> Performance of cache-oblivious "full fusion" versus our cache optimizations (<em>CAF+scaling+buffer</em>), normalized to unoptimized code on a StrongARM.
 </p>
 
 <p>
-<img src="arm2.gif" alt="Full fusion versus CAF+scaling+buffer on a StrongARM"><br>
-<strong>Figure 2.</strong> Full fusion versus <em>CAF+scaling+buffer</em> on a StrongARM.
+<img src="arm1.gif" alt="Impact of each cache optimization on StrongARM."><br>
+<strong>Figure 2.</strong> Impact of each of our cache optimizations---cache aware fusion, execution scaling, and buffer management---relative to unoptimized code on a StrongARM.
 </p>
 
 <h5>References:</h5>
@@ -109,6 +114,18 @@ pp. 35--44, San Francisco, February 13, 2005.</p>
 Linear Analysis and Optimization of Stream Programs. 
 In <em>Proceedings of the SIGPLAN '03 Conference on Programming Language Design and Implementation</em>, 
 San Diego, CA, June, 2003.</p>
+
+<p>[4] Michael I. Gordon, William Thies, Michal Karczmarek, Jasper
+Lin, Ali S. Meli, Andrew A. Lamb, Chris Leger, Jeremy Wong, Henry
+Hoffmann, David Maze, and Saman Amarasinghe.  In <em>Proceedings of
+the Tenth International Conference on Architectural Support for
+Programming Languages and Operating Systems</em>, San Jose, CA,
+October 2002.</p>
+
+<p>[5]Janis Sermulins, William Thies, Rodric Rabbah, and Saman
+Amarasinghe.  Cache Aware Optimization of Stream Programs.  In
+<em>Proceedings of the 2005 Conference on Languages, Compilers, and
+Tools for Embedded Systems</em>, Chicago, Illinois, June 2005.
 
 <!--
 [1] Author A. Lastname and Author B. Lastname. 
