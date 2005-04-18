@@ -16,8 +16,8 @@ makes  it  simple  to  represent computation over a
 sliding-window.   The {\tt push}, {\tt pop}, and {\tt peek} rates are
 declared as part  of  the work  function,  thereby enabling  the
 compiler    to construct a static schedule of filter executions. The
-following is an example implementation of an FIR   (Finite Impulse
-Response)  filter: 
+following is an example implementation of a finite impulse
+response (FIR)  filter: 
 %\begin{scriptsize}
 {\small
 \begin{verbatim}
@@ -42,17 +42,16 @@ known at compile time when the filter is composed to form a stream
 graph. A filter is akin to a class in object oriented programming
 with the work function serving as the main method. The parameters
 to a filter (e.g., \texttt{N} and \texttt{weights}) are equivalent to
-parameters passed to a class constructor. In StreamIt, the
-application developer focuses on the hierarchical assembly of the
-stream graph and its communication topology, rather than on the 
-explicit management of the data buffers between filters.
+parameters passed to a class constructor. 
 
 \begin{figure}[t]
 \begin{center}
-\vspace{-24pt}
- \framebox{\includegraphics[scale=1, angle=0]{./constructs-eg.eps}}
- \vspace{-6pt}
- \caption{StreamIt containers.}
+%\vspace{-24pt}
+% \framebox{
+ \includegraphics[scale=1, angle=0]{./constructs-eg.eps}
+%}
+% \vspace{-6pt}
+ \caption{Hieararchical streams in StreamIt.}
  \label{fig:containers}
 \end{center}
 \end{figure}
@@ -60,14 +59,20 @@ explicit management of the data buffers between filters.
 \begin{figure}[t]
 \begin{center}
 \vspace{-12pt}
- \framebox{\includegraphics[scale=1, angle=0]{./pipeline-eg.eps}}
- \vspace{-6pt}
+% \framebox{
+ \includegraphics[scale=1, angle=0]{./pipeline-eg.eps}
+%}
+% \vspace{-6pt}
  \caption{Example pipeline with FIR filter.}
  \label{fig:pipeline}
-\vspace{-18pt}
+%\vspace{-18pt}
 \end{center}
 \end{figure}
 
+In StreamIt, the
+application developer focuses on the hierarchical assembly of the
+stream graph and its communication topology, rather than on the 
+explicit management of the data buffers between filters.
 StreamIt provides three hierarchical structures for composing filters
 into larger stream graphs (see Figure~\ref{fig:containers}). The 
 {\it pipeline} construct composes streams in sequence, with the output
@@ -83,13 +88,13 @@ every execution step, it can distribute its output to any one of
 its children in either a {\it duplicate} or a {\it roundrobin}
 manner. For the former, incoming data are replicated to every
 sibling connected to the splitter. For the latter, data are scattered
-in a round-robin manner, with each item sent to exactly one child
+in a round robin manner, with each item sent to exactly one child
 stream, in order.  The splitter type and the weights for distributing data to
 child streams are declared as part of the syntax (e.g., \texttt{split
-duplicate} or \texttt{split roundrobin($w_1$, $w_1$, ... $w_n$)}). The
-splitter counterpart, the joiner, is a specialized filter with  
+duplicate} or \texttt{split roundrobin($w_1,\ldots,w_n$)}). The
+splitter counterpart is the joiner. It is a specialized filter with  
 multiple input channels but only one output channel. The joiner
-gathers data from its predecessors in a round-robin manner (declared
+gathers data from its predecessors in a round robin manner (declared
 as part of the syntax) to produce a single output stream.
 
 StreamIt also provides a {\it feedback loop} construct for introducing
@@ -140,59 +145,63 @@ consumed.
 The StreamIt compiler derives the initialization and steady state
 schedules~\cite{karczma-lctes03} and outputs a C program that includes
 the initialization and work functions, as well as a driver to execute
-each of the two schedules. For example, referring to
-Figure~\ref{fig:pipe-with-rates}, the compiler generates the following
-sample code for running the steady state schedule:
-%\begin{scriptsize}
-\begin{verbatim}
-run_steady_state() {
-  for (i = 0; i < 4; i++) A_work();
-  for (i = 0; i < 6; i++) B_work();
-  for (i = 0; i < 9; i++) C_work();
-  for (i = 0; i < 3; i++) D_work();
-}
-\end{verbatim}
-%\end{scriptsize}
-To execute the program, the steady state is wrapped with
-another loop that invokes the steady state a designated number of
-times. Preceding the state steady, a similar initialization schedule
-is run to prime the data buffers.
+each of the two schedules. 
+
+%% For example, referring to
+%% Figure~\ref{fig:pipe-with-rates}, the compiler generates the following
+%% sample code for running the steady state schedule:
+%% %\begin{scriptsize}
+%% \begin{verbatim}
+%% run_steady_state() {
+%%   for (i = 0; i < 4; i++) A_work();
+%%   for (i = 0; i < 6; i++) B_work();
+%%   for (i = 0; i < 9; i++) C_work();
+%%   for (i = 0; i < 3; i++) D_work();
+%% }
+%% \end{verbatim}
+%% %\end{scriptsize}
+%% To execute the program, the steady state is wrapped with
+%% another loop that invokes the steady state a designated number of
+%% times. Preceding the state steady, a similar initialization schedule
+%% is run to prime the data buffers.
 %, and following the steady state, an
 %epilogue is run to drain the buffers as necessary.
 
-\begin{figure}[t]
-\begin{center}
-\vspace{-12pt}
- \psfig{figure=ssi.eps,width=3in}
- \vspace{-6pt}
- \caption{Instruction size (in bytes along the y-axis) per filter
- (x-axis) occurring in a steady state execution of FFT.}
- \label{fig:ssi-single}
-\vspace{-18pt}
-\end{center}
-\end{figure}
+%% \begin{figure}[t]
+%% \begin{center}
+%% \vspace{-12pt}
+%%  \psfig{figure=ssi.eps,width=3in}
+%%  \vspace{-6pt}
+%%  \caption{Instruction size (in bytes along the y-axis) per filter
+%%  (x-axis) occurring in a steady state execution of FFT.}
+%%  \label{fig:ssi-single}
+%% \vspace{-18pt}
+%% \end{center}
+%% \end{figure}
 
 From a caching point of view, it is intuitively clear that once a
-filter's instruction working set is fetched into the cache, we must
+filter's instruction working set is fetched into the cache, we should
 execute that filter as many times as possible to improve instruction
 locality and amortize the cost of the accesses to lower levels of the
 memory hierarchy. This of course assumes that the total code size for
 all filters in the steady state exceeds the capacity of the
-instruction cache (which is commonly the case). In
-Figure~\ref{fig:ssi-single} we show a representative breakdown of the
-code size per filter in a steady state execution of a StreamIt
-implementation of a Fast Fourier Transform (FFT). In all, the total code size for a steady state
-ranges from 16~Kb to over 60~Kb for our benchmarks. These results
-provide evidence that while individual filters may have a
+instruction cache (which is commonly the case).
+%% In
+%% Figure~\ref{fig:ssi-single} we show a representative breakdown of the
+%% code size per filter in a steady state execution of a StreamIt
+%% implementation of a Fast Fourier Transform (FFT).
+For our benchmarks, the total code size for a steady state
+ranges from 16~Kb to over 60~Kb. Thus, while individual filters may have a
 small instruction footprint, the total footprint of the filters in a
 steady state exceeds a typical instruction cache size.
 From these observations, it is evident that we must {\it scale} the
 execution of filters in the steady state in order to improve temporal
-locality. In other words, rather than running a filter $\texttt{S}$ times per
-steady state, we increase the loop bound so that it runs $\texttt{M}
-\times \texttt{S}$ times (e.g., the loop bound for \verb+A_work+ is
-changed to $\texttt{M} \times 4$ in the example shown earlier). 
-We term \texttt{M} the {\it multiplicity factor}.
+locality. In other words, rather than running a filter $\S$ times per
+steady state, we increase the loop bound so that it runs $M \times S$ 
+times.
+%% (e.g., the loop bound for \verb+A_work+ is
+%% changed to $\texttt{M} \times 4$ in the example shown earlier). 
+We term $M$ the {\it multiplicity factor}.
 
 The obvious question is: to what extent can we scale the execution of
 filters in the steady state? The answer is non-trivial because
