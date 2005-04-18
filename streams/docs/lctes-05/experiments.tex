@@ -25,205 +25,186 @@
 \caption{Evaluation benchmark suite.}
 \end{table}
 
-
-
-\begin{figure*}
-\begin{minipage}{3.4in}
-\psfig{figure=arm2.eps,width=3.4in}
-\caption{Performance of various compilation strategies on a StrongARM.\protect\label{fig:arm-perf2}}
-\end{minipage}
-\hspace{0.1in}
-\begin{minipage}{3.4in}
+\begin{figure}
+\begin{minipage}{3.35in}
 \psfig{figure=arm1.eps,width=3.4in}
 \caption{Full fusion versus \texttt{CAF+scaling+buffer} on a StrongARM.\protect\label{fig:arm-perf}}
-\end{minipage}
-\end{figure*}
 
-\begin{figure*}
-\begin{minipage}{3.4in}
-\psfig{figure=p3-2.eps,width=3.4in}
-\caption{Performance of various compilation strategies on a Pentium~3.\protect\label{fig:p3-perf2}}
-\end{minipage}
-\hspace{0.1in}
-\begin{minipage}{3.4in}
 \psfig{figure=p3-1.eps,width=3.4in}
 \caption{Full fusion versus \texttt{CAF+scaling+buffer} on a Pentium~3\protect\label{fig:p3-perf}}
-\end{minipage}
-\end{figure*}
 
-\begin{figure*}
-\begin{minipage}{3.4in}
-\psfig{figure=i2-2.eps,width=3.4in}
-\caption{Performance of various compilation strategies on an Itanium~2.\protect\label{fig:i2-perf2}}
-\end{minipage}
-\hspace{0.1in}
-\begin{minipage}{3.4in}
 \psfig{figure=i2-1.eps,width=3.4in}
 \caption{Full fusion versus \texttt{CAF+scaling+buffer} on an Itanium~2\protect\label{fig:i2-perf}}
 \end{minipage}
-\end{figure*}
+\end{figure}
 
+\begin{figure}
+\begin{minipage}{3.35in}
+\psfig{figure=arm2.eps,width=3.4in}
+\caption{Performance of various compilation strategies on a StrongARM.\protect\label{fig:arm-perf2}}
 
+\psfig{figure=p3-2.eps,width=3.4in}
+\caption{Performance of various compilation strategies on a Pentium~3.\protect\label{fig:p3-perf2}}
+
+\psfig{figure=i2-2.eps,width=3.4in}
+\caption{Performance of various compilation strategies on an Itanium~2.\protect\label{fig:i2-perf2}}
+\end{minipage}
+\end{figure}
 
 In this section we evaluate the merits of the proposed cache-aware
-optimizations and buffer management strategies. We use three
-different architectures: a 137MHz Strong-ARM-1110, a 600~MHz Pentium~3 and 
-a 1.3~GHz Itanium~2. All three processors have 16~Kb primary instruction and data caches.
+optimizations and buffer management strategies.  We use three
+different architectures: a 137MHz StrongARM-1110, a 600~MHz Pentium~3
+and a 1.3~GHz Itanium~2. The StrongARM results reflect performance for
+an embedded target; it has a 16Kb L1 instruction cache, an 8Kb L1 data
+cache, and no L2 cache.  The Pentium~3 and Itanium~2 reflect desktop
+performance; they have a 16Kb L1 instruction cache, 16Kb L1 data
+cache, and 256Kb shared L2 cache.
 
+Our benchmark suite (see Table~\ref{tab:benchmarks}) consists of
+eleven StreamIt applications. They are compiled with the StreamIt
+compiler which applies the optimizations described in this paper, as
+well as aggressive loop unrolling (by a factor of 128 for all
+benchmarks) to facilitate scalar replacement
+(Section~\ref{sec:buffer}).  The StreamIt compiler outputs a
+functionally equivalent C program that is compiled with \texttt{gcc}
+(v3.4, -O3) for the StrongARM and for the Pentium~3 and with
+\texttt{ecc} (v7.0, -O3) for the Itanium~2.  Each benchmark is then
+run five times, and the median user time is recorded.
 
-Our benchmark suite (see Table~\ref{tab:benchmarks}) consists of eleven
-different StreamIt applications. They are compiled with the StreamIt
-compiler which applies the optimizations described in this paper, and
-outputs a functionally equivalent C program that is compiled with
-\texttt{gcc} (v3.4, -O3) for the StrongARM and for the Pentium~3 and with
-\texttt{ecc} (v7.0, -O3) for the Itanium~2. Each benchmark is
-then run five times, and the median user time is recorded.
+\paragraph*{Overall Speedup} 
+The overall speedups offered by our techniques are illustrated in
+Figure~\ref{fig:arm-perf} (StrongARM), Figure~\ref{fig:p3-perf}
+(Pentium~3), and \ref{fig:p3-perf} (Itanium~2).  These graphs have two
+bars: one for ``full fusion'', in which all filters are fused into a
+single function (with scalar replacement), and one labelled
+``CAF+scaling+buffer'', representing all of our optimizations (cache
+aware fusion, execution scaling, and buffer optimizations) applied
+together.  We include the comparison to full fusion because it
+represents the most simple approach for eliminating function call
+overhead and optimizing across filter boundaries; however, it is
+oblivious to instruction and data locality, and lacks aggressive
+buffer optimizations.  Performance is normalized to unoptimized
+StreamIt, in which no filters are fused (but there is still unrolling
+by 128).  Average execution times are shown on the right of each
+graph.
 
+On StrongARM (Figure~\ref{fig:arm-perf}), our cache optimizations
+offer a {\bf [[???]]} average speedup over the baseline and a 169\%
+average speedup over full fusion.  Cache optimizations always perform
+better than the baseline, and they perform better than full fusion in
+all cases except for \texttt{3gpp}, where they yield a 45\% slowdown.
+This slowdown is due to conservative code size estimation: the
+compiler predicts that the fused version of \texttt{3gpp} will not fit
+into the instruction cache, thereby preventing fusion.  However, due
+to optimizations by {\tt gcc}, the final code size is smaller than
+expected and does fit within the cache.  While such inaccuracies could
+be improved by adding feedback between the output of {\tt gcc} and our
+code estimation, each fusion possibility would need to be evaluated
+separately as the fusion boundary affects the impact of low-level
+optimizations (and thus the final code size).
 
-Figures~\ref{fig:arm-perf2}, ~\ref{fig:p3-perf2} and~\ref{fig:i2-perf2} 
-illustrate the performance due to the various compilation strategies. 
-Figures~\ref{fig:arm-perf}, ~\ref{fig:p3-perf} and~\ref{fig:i2-perf} 
-compare full fusion strategy versus a combination of optimizations 
-proposed in our paper. The average execution time due to various compilation 
-strategies is displayed at the right side of all six figures and all 
-execution times are normalized to the execution time of unoptimized 
-StreamIt.
+The speedups offered by cache optimizations over a full fusion
+strategy are more modest for the desktop processors: 34\% average
+speedup on Pentium~3 (Figure~\ref{fig:p3-perf}) and 6\% speedup on
+Itanium~2 (Figure~\ref{fig:i2-perf}).  Out of the 11 benchmarks, cache
+optimizations perform better than full fusion for {\bf [???]}
+benchmarks on the Pentium~3 and {\bf [???]} benchmarks on the
+Itanium~2.  Performance on any architecture is a tradoeff between two
+factors: 1) the benefit of data and instruction locality, and 2) the
+benefit of fusion, which reduces memory accesses due to improved
+register allocation across filter boundaries.  Compared to the
+StrongARM, the Pentium~3 and Itanium~2 offer an L2 cache (as well as a
+larger L1 data cache), thereby lessening the impact of
+locality-enhancing cache optimizations.  However, the fusion benefit
+remains a significant factor; for example, using Intel VTune on the
+Pentium~3, we measured that full fusion offers a 50\% reduction in
+memory accesses over the cache-optimized version.  This effect may be
+pronounced in Itanium~2 due to the larger number of registers on that
+architecture (128 general, 128 floating point).  While fusion benefits
+are also present on StrongARM, cache optimizations are more important
+on that processor due to the large penalty for cache misses.
 
+The cache-aware fusion algorithm can be adjusted to account for the
+caching hierarchy on desktop machines.  Specifically, if cache-aware
+fusion is modified to allow fused filters to consume up to one half of
+the L2 cache (rather than L1 cache), then the performance of cache
+optimizations is closer or equal to full fusion, for cases it was
+previously trailing on Pentium~3 or Itanium~2 (data not shown).  The
+only benchmark that is negatively impacted by this change is {\tt
+ofdm}, where two large filters are fused despite a very low
+communication to computation ratio, thereby lessening the impact of
+eliminated memory accesses while nonetheless worsening the instruction
+locality.
 
-The Figures~\ref{fig:arm-perf2}, ~\ref{fig:p3-perf2} and~\ref{fig:i2-perf2} 
-have four bars per benchmark. The first bar labeled {\tt scaling}
-represents the performance gains compared to the baseline when multiplicity
-scaling is applied to the stream graph. The second graph labeled 
-{\tt CAF} shows the performance gains compared to the baseline when 
-cache-aware fusion is applied to the stream graph. The third graph
-labeled {\tt CAF+scaling} shows the performance gains from applying
-multiplicity scaling to actors that have been produced using cache-aware
-fusion. The last bar labeled \texttt{CAF+scaling+buffer} shows the
-execution time when buffer management optimization is combined with
-cache-aware fusion and multiplicity scaling.
+\paragraph*{Impact of Each Optimization}
+To better understand the overall speedups, we assess the individual
+performance impact of execution scaling, cache aware fusion, and
+buffer management optimizations.  These results are illustrated in
+Figures~\ref{fig:arm-perf2}, \ref{fig:p3-perf2} and~\ref{fig:i2-perf2}
+for the StrongARM, Pentium~3, and Itanium~2, respectively.  There are
+four bars per benchmark; as in the previous analysis, all performance
+is normalized to unoptimized StreamIt (with 128-way unrolling).  The
+first bar, labeled {\tt scaling}, applies only execution scaling.  The
+second bar, labeled {\tt CAF}, applies only cache-aware fusion.  The
+third bar, labeled {\tt CAF+scaling}, first applies cache-aware fusion
+and then applies execution-scaling to the granularity-adjusted
+filters.  The fourth bar, labeled {\tt CAF+scaling+buffer},
+additionally applies buffer management optimizations (detailed in the
+next section); this bar is equivalent to the ``best'' cache-optimized
+performance illustrated in Figures~\ref{fig:arm-perf},
+\ref{fig:p3-perf}, and \ref{fig:i2-perf}.
 
-
-Only \texttt{fmradio}, \texttt{filterbank}, \texttt{filterbank2}
-and \texttt{ofdm} benchmarks have filters that peek, therefore those are the 
-only benchmarks that benefit from optimized buffer management when we 
-apply all of the optimizations together. 
-
-
-Scaling improves performance, with a speedup of 148\% for
-StrongARM a speedup of 58\% for Pentium~3 and a speedup of 57\% for Itanium~2 over the baseline for our benchmark suite. 
-The 90-10 heuristic works quite well and there is only one instance
-where scaling results in a performance degradation. The granularity adjusted
-\texttt{3gpp} on StrongARM has a 17\% slowdown due to scaling. The is possibly 
-due to a buffer for items in flight between the granularity adjusted
+Execution scaling improves performance over unoptimized StreamIt, with
+average speedups of 148\% for StrongARM, 58\% for Pentium~3, and 57\%
+for Itanium~2.  {\bf [[refs to scaling charts?]]}.  The 90-10
+heuristic works quite well and there is only one instance where
+scaling results in a performance degradation. The granularity-adjusted
+\texttt{3gpp} on StrongARM has a 17\% slowdown due to scaling (compare
+{\tt CAF} to {\tt CAF+scaling} in Figure~\ref{fig:arm-perf}).  This is
+possibly due to items in flight between the granularity-adjusted
 actors overwriting the state of an executing actor in the data cache.
-Since StrongARM has no L2 cache then such eviction can be quite expensive.
+Since StrongARM has no L2 cache then such eviction can be quite
+expensive.
 
-As we coarsen the actors with cache-aware fusion, scaling results 
-in less speedup. The speedup of \texttt{CAF+scaling} over \texttt{CAF} is
-90\% for StrongARM, 22\% for Pentium~3 and only 20\% for Itanium~2. 
-This is because some actors are implicity scaled by fusion to match 
-input/output rates of succesive actors within a fused block. 
+Independently, cache-aware fusion also improves performance by {\bf
+???}.  Cache-aware fusion degrades performance only for
+\texttt{filter}-\texttt{bank2} (by 6\% on StrongARM). When we combine
+cache-aware fusion with execution scaling, the performance
+consistently improves.  The speedup of \texttt{CAF+scaling} over
+baseline is 250\% on StrongARM, 146\% on Pentium~3 and 144\% on
+Itanium~2.
 
-
-%% The Itanium~2 has less speedup possibly
-%% because of data and instruction prefetch instructions generated by the 
-%% \texttt{ecc} compiler.
-
-%% By comparsion, the scaling results on the 
-%% Itanium are more uniform, and in fact, scaling does not degrade the
-%% performance of any of the benchmarks in suite. 
-
-%% The discrepancy between
-%% the Pentium and Itanium results is likely due to the in-order
-%% nature of the latter. Unlike the Pentium which can tolerate a cache
-%% miss by issuing instructions out-of-order, the Itanium pipeline stalls
-%% when an outstanding memory request is not serviced in time for
-%% its consuming instruction to execute. The Itanium VLIW architecture
-%% therefore places a greater emphasis on the memory hierarchy, and our
-%% locality enhancing optimizations help to bridge the gap between
-%% processor and memory speeds.
-
-%% whereas it improved the performance of the applications on the Itanium.
-
-%% a few benchmarks on both platforms.
-%% A performance degradation as a result of fusion is generally caused by
-%% an increase in the buffer management overhead. 
-
-
-Cache-aware fusion degrades performance only for \texttt{filter}-
-\texttt{bank2} on StrongARM by 6\%. When we combine cache-aware fusion 
-with multiplicity scaling, the performance consistently improves. 
-The speedup of \texttt{CAF+scaling} over baseline is 250\% on StrongARM,
-146\% on Pentium~3 and 144\% on Itanium~2.
-
-
-%% Note that our benchmark suite
-%% includes two implementations of \texttt{FFT}. The first is a
-%% fine-grained implementation (\texttt{fft-fine}) and the other is a
-%% coarse-grained implementation (\texttt{fft-coarse}). The former
-%% benefits more from our cache-aware fusion because there is greater
-%% versatility in fusing filters to achieve balanced actors. On the other hand
-%% a coarse grained implementation restricts the amount of fusion that
-%% can be performed and increases the burden for more efficient buffer
-%% management. 
-
+However, after coarsening the actors with cache-aware fusion, scaling
+results in less additional speedup than it did relative to the
+baseline.  The speedup of \texttt{CAF+scaling} over \texttt{CAF} is
+90\% for StrongARM, 22\% for Pentium~3 and only 20\% for Itanium~2.
+This is because some actors are implicity scaled by fusion to match
+input/output rates of succesive actors within a fused block.
 
 Note that the \texttt{ofmd} benchmark does not benefit from fusion or
-scaling. This is because  \texttt{ofmd} has few actors that consume 
-and produce a total of 16-66Kb data, therefore actors can not be scaled.
-Also there is limited oportunity to fuse actors of \texttt{ofmd} 
-benchmark, since there are actors that have an instruction size of 9Kb 
-and fusing them with other actors would generate actors that exceed the
-insturcion cache.
+scaling. This is because \texttt{ofmd} has few filters, some of which
+consume and produce a total of 16-66Kb data; consequently, execution
+scaling does not apply.  Also there is limited oportunity to fuse
+filters within \texttt{ofmd}, as there are filters that have an
+instruction size of 9Kb and fusing them with other filters would
+exceed the instruction cache.
 
+The last bar, {\tt CAF+scaling+buffer}, illustrates the benefit of
+buffer management optimizations for filters that peek.  As detailed in
+section~\ref{sec:fusion-opt}, such filters demand specialized buffer
+management, as they reuse items on the input tape across successive
+iterations.  In our benchmark suite, peeking occurs only in the last
+four applications (i.e., \texttt{fmradio}, \texttt{filterbank},
+\texttt{filterbank2} and \texttt{ofdm}).  Thus, the {\tt CAF+scaling}
+bar is equivalent to {\tt CAF+scaling+buffer} for all benchmarks from
+{\tt bitonic} through {\tt matmult}.  Optimized buffer management
+offers the largest gains for {\tt filterbank2}: {\bf ???} on
+StrongARM, {\bf ???} on Pentium~3, and {\bf ???} on Itanium~2.  This
+is due to...
 
-%% In the case of \texttt{fft-coarse}, the scalar-replacement
-%% strategy regains nearly 30-70\% of the performance when applied in
-%% conjunction with fusion.
+\paragraph*{Buffer Management}
 
-
-The best results overall are measured when all optimizations are
-applied in \texttt{CAF+scaling+buffer}. Note that on StrongARM
-\texttt{CAF+scaling+buffer} consistenly outperforms full fusion
-strategy (see Figure~\ref{fig:arm-perf}), except for a 43\% slowdown 
-for \texttt{3gpp}, this is because our compiler predicts that the
-fused version of \texttt{3gpp} will not fit into the instruction cache 
-due to a conservative code size estimation, however, the optimized code 
-of the fused \texttt{3gpp} turns out to be smaller than predicted and 
-fits into the 16Kb instruction cache.
-
-
-On average \texttt{CAF+scaling+buffer} imporves performance over full 
-fusion with a 169\% speedup on StrongARM, a 34\% speedup on Pentium~3 
-and only a 6\% speedup on Itanium~2. The reason full fusion is better
-for several benchmarks on Pentium~3 and Itanium~2 is that 
-full fusion allows large reduction of memory accesses by allowing better 
-register allocation accross actor boundaries. In cases where full fusion 
-outperforms \texttt{CAF+scaling+buffer}, full-fusion results in up to 50\% 
-reduction in memory accesses.
-
-
-If the cache-aware fusion is modified to allow the code size of a 
-granularity adjusted actor to be up to one half of the L2 cache on 
-Pentium~3 and Itanium~2, then \texttt{CAF+scaling+buffer} results
-move closer to or become equal to results of the full fusion in cases where
-previously \texttt{CAF+scaling+buffer} was worse than full-fusion.
-This modification only reduces performance of \texttt{CAF+scaling+buffer}
-for \texttt{ofdm}, where two actors that have a very low communication 
-to computation ratio and large instruction size are fused, thus 
-limiting the possibility of memory access reduction. 
-
-
-%% In this case, the granularity-adjusted actors
-%% are scaled to maximize cache locality. In addition, the scalar replacement
-%% and copy-shift in conjunction with scaling helps to reduce the overhead of 
-%% moving data between actors. As a result, the performance gains can be quite
-%% dramatic, ranging up to a 5800\% speedup for \texttt{bitonic} on Pentium~3
-%% and up to a 6400\% speedup for \texttt{bitonic} on Itanium~2.
-
-
-
-\subsection{Buffer Management}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \texttt{CAF+scaling} is our baseline for evaluating optimized buffer 
 management strategies. In \texttt{CAF+scaling} the live items are 
@@ -259,5 +240,49 @@ performance numbers. However, \texttt{CAF+scaling+peekscale} is the
 best strategy for fmradio benchmark and our baseline \texttt{CAF+scaling} 
 is best for the filterbank benchmark.
 
+%% The Itanium~2 has less speedup possibly
+%% because of data and instruction prefetch instructions generated by the 
+%% \texttt{ecc} compiler.
+
+%% By comparsion, the scaling results on the 
+%% Itanium are more uniform, and in fact, scaling does not degrade the
+%% performance of any of the benchmarks in suite. 
+
+%% The discrepancy between
+%% the Pentium and Itanium results is likely due to the in-order
+%% nature of the latter. Unlike the Pentium which can tolerate a cache
+%% miss by issuing instructions out-of-order, the Itanium pipeline stalls
+%% when an outstanding memory request is not serviced in time for
+%% its consuming instruction to execute. The Itanium VLIW architecture
+%% therefore places a greater emphasis on the memory hierarchy, and our
+%% locality enhancing optimizations help to bridge the gap between
+%% processor and memory speeds.
+
+%% whereas it improved the performance of the applications on the Itanium.
+
+%% a few benchmarks on both platforms.
+%% A performance degradation as a result of fusion is generally caused by
+%% an increase in the buffer management overhead. 
 
 
+%% Note that our benchmark suite
+%% includes two implementations of \texttt{FFT}. The first is a
+%% fine-grained implementation (\texttt{fft-fine}) and the other is a
+%% coarse-grained implementation (\texttt{fft-coarse}). The former
+%% benefits more from our cache-aware fusion because there is greater
+%% versatility in fusing filters to achieve balanced actors. On the other hand
+%% a coarse grained implementation restricts the amount of fusion that
+%% can be performed and increases the burden for more efficient buffer
+%% management. 
+
+
+%% In the case of \texttt{fft-coarse}, the scalar-replacement
+%% strategy regains nearly 30-70\% of the performance when applied in
+%% conjunction with fusion.
+
+%% In this case, the granularity-adjusted actors
+%% are scaled to maximize cache locality. In addition, the scalar replacement
+%% and copy-shift in conjunction with scaling helps to reduce the overhead of 
+%% moving data between actors. As a result, the performance gains can be quite
+%% dramatic, ranging up to a 5800\% speedup for \texttt{bitonic} on Pentium~3
+%% and up to a 6400\% speedup for \texttt{bitonic} on Itanium~2.
