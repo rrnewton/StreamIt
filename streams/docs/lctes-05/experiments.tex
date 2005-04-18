@@ -89,7 +89,7 @@ by 128).  Average execution times are shown on the right of each
 graph.
 
 On StrongARM (Figure~\ref{fig:arm-perf}), our cache optimizations
-offer a {\bf [[???]]} average speedup over the baseline and a 169\%
+offer a 249\% average speedup over the baseline and a 162\%
 average speedup over full fusion.  Cache optimizations always perform
 better than the baseline, and they perform better than full fusion in
 all cases except for \texttt{3gpp}, where they yield a 45\% slowdown.
@@ -155,7 +155,7 @@ performance illustrated in Figures~\ref{fig:arm-perf},
 \ref{fig:p3-perf}, and \ref{fig:i2-perf}.
 
 Execution scaling improves performance over unoptimized StreamIt, with
-average speedups of 148\% for StrongARM, 58\% for Pentium~3, and 57\%
+average speedups of 145\% for StrongARM, 58\% for Pentium~3, and 57\%
 for Itanium~2.  {\bf [[refs to scaling charts?]]}.  The 90-10
 heuristic works quite well and there is only one instance where
 scaling results in a performance degradation. The granularity-adjusted
@@ -171,13 +171,13 @@ Independently, cache-aware fusion also improves performance by {\bf
 \texttt{filter}-\texttt{bank2} (by 6\% on StrongARM). When we combine
 cache-aware fusion with execution scaling, the performance
 consistently improves.  The speedup of \texttt{CAF+scaling} over
-baseline is 250\% on StrongARM, 146\% on Pentium~3 and 144\% on
+baseline is 241\% on StrongARM, 146\% on Pentium~3 and 144\% on
 Itanium~2.
 
 However, after coarsening the actors with cache-aware fusion, scaling
 results in less additional speedup than it did relative to the
 baseline.  The speedup of \texttt{CAF+scaling} over \texttt{CAF} is
-90\% for StrongARM, 22\% for Pentium~3 and only 20\% for Itanium~2.
+86\% for StrongARM, 22\% for Pentium~3 and only 20\% for Itanium~2.
 This is because some actors are implicity scaled by fusion to match
 input/output rates of succesive actors within a fused block.
 
