@@ -149,10 +149,10 @@ second bar, labeled {\tt CAF}, applies only cache-aware fusion.  The
 third bar, labeled {\tt CAF+scaling}, first applies cache-aware fusion
 and then applies execution-scaling to the granularity-adjusted
 filters.  The fourth bar, labeled {\tt CAF+scaling+buffer},
-additionally applies buffer management optimizations (detailed in the
-next section); this bar is equivalent to the ``best'' cache-optimized
-performance illustrated in Figures~\ref{fig:arm-perf},
-\ref{fig:p3-perf}, and \ref{fig:i2-perf}.
+additionally applies buffer management optimizations (detailed later);
+this bar is equivalent to the ``best'' cache-optimized performance
+illustrated in Figures~\ref{fig:arm-perf}, \ref{fig:p3-perf}, and
+\ref{fig:i2-perf}.
 
 Execution scaling improves performance over unoptimized StreamIt, with
 average speedups of 145\% for StrongARM, 58\% for Pentium~3, and 57\%
@@ -197,48 +197,75 @@ iterations.  In our benchmark suite, peeking occurs only in the last
 four applications (i.e., \texttt{fmradio}, \texttt{filterbank},
 \texttt{filterbank2} and \texttt{ofdm}).  Thus, the {\tt CAF+scaling}
 bar is equivalent to {\tt CAF+scaling+buffer} for all benchmarks from
-{\tt bitonic} through {\tt matmult}.  Optimized buffer management
-offers the largest gains for {\tt filterbank2}: {\bf ???} on
-StrongARM, {\bf ???} on Pentium~3, and {\bf ???} on Itanium~2.  This
-is due to...
+{\tt bitonic} through {\tt matmult}.
 
-\paragraph*{Buffer Management}
+The buffer optimization applied in Figures~\ref{fig:arm-perf},
+\ref{fig:p3-perf}, and \ref{fig:i2-perf} is termed {\tt cutpeek}.  In
+this optimization, the cache-aware fusion algorithm is modified so
+that two adjacent filters are never fused if the downstream filter
+performs any peeking (i.e., it has $\mbox{\it peek} > \mbox{\it pop}$.
+After we apply execution scaling to the granularity-adjusted actors,
+we apply buffer expansion.  The live items are copied to the start of
+the buffer once after executing the granularity-adjusted actor for the
+number of times that is equal to the global multiplicity scaling. This
+reduces the overhead of copying live items.  Optimized buffer
+management offers the largest gains for {\tt filterbank2}: {\bf ???}
+on StrongARM, {\bf ???} on Pentium~3, and {\bf ???} on Itanium~2.
+This is due to a large peek rate (100 items) in addition a large
+global multiplicity of {\bf ???} that amortizes the cost of copying
+items.
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+While we found that {\tt cutpeek} is, on average, the best buffer
+management strategy across the three platforms, we also evaluated
+several others.  For {\tt fmradio}, up to a 5\% improvement is offered
+by a strategy called {\tt peekscale}: filters with $\mbox{\it
+peek}>\mbox{\it pop}$ are replaced with an equivalent filter that
+executes the original multiple times to ensure that {\it pop} is at
+least $4*\mbox{\it peek}$.  Like {\tt cutpeek}, this serves to
+amortize the overhead of copy-shift buffer management, but it can also
+hamper the execution scaling optimization.  Because certain other
+filters in the graph must fire more frequently to compensate for the
+scaled peeking filter, there is less room for global execution
+scaling.  On the StrongARM, {\tt peekscale} also benefits {\tt ofdm}
+by up to {\bf ???}.  Finally, on the {\tt filterbank} benchmark,
+highest performance results from unoptimized copy-shift buffer
+management.  We also evaluated buffer management using modulation for
+indexing, but this did not yield the best performance for any
+benchmark or platform.
 
-\texttt{CAF+scaling} is our baseline for evaluating optimized buffer 
-management strategies. In \texttt{CAF+scaling} the live items are 
-copied to the beginning of the buffer after every execution of a filter 
-that has $peek>pop$.
+%% \texttt{CAF+scaling} is our baseline for evaluating optimized buffer 
+%% management strategies. In \texttt{CAF+scaling} the live items are 
+%% copied to the beginning of the buffer after every execution of a filter 
+%% that has $peek>pop$.
 
-\texttt{CAF+scaling+peekscale} strategy replaces filters that have
-$peek>pop$ with an equivalent filter that executes the original filter 
-multiple times to make sure that $pop$ is at least $4*(peek-pop)$.
-This reduces the overhead of copying live items, since we only copy live 
-items once after each execution of the scaled actor.
+%% \texttt{CAF+scaling+peekscale} strategy replaces filters that have
+%% $peek>pop$ with an equivalent filter that executes the original filter 
+%% multiple times to make sure that $pop$ is at least $4*(peek-pop)$.
+%% This reduces the overhead of copying live items, since we only copy live 
+%% items once after each execution of the scaled actor.
 
-\texttt{CAF+scaling+mod} strategy uses modular buffers for channels where 
-downstream filter has $peek>pop$.
+%% \texttt{CAF+scaling+mod} strategy uses modular buffers for channels where 
+%% downstream filter has $peek>pop$.
 
-\texttt{CAF+scaling+cutpeek} modifies the CAF algorithm so that two 
-adjacent filters are never fused if the downstream filter has 
-$peek>pop$. After we apply multiplicity scaling to the 
-granularity adjusted actors we apply buffer expansion. The 
-live items are copied to the start of the buffer once after executing 
-the granularity adjusted actor for the number of times that is equal 
-to the global multiplicity scaling. This reduces the overhead of 
-copying live items.
+%% \texttt{CAF+scaling+cutpeek} modifies the CAF algorithm so that two 
+%% adjacent filters are never fused if the downstream filter has 
+%% $peek>pop$. After we apply multiplicity scaling to the 
+%% granularity adjusted actors we apply buffer expansion. The 
+%% live items are copied to the start of the buffer once after executing 
+%% the granularity adjusted actor for the number of times that is equal 
+%% to the global multiplicity scaling. This reduces the overhead of 
+%% copying live items.
 
-\texttt{CAF+scaling+cutpeek+mod} also modifies the CAF algorithm so 
-that two adjacent filters are never fused if the downstream filter has 
-$peek>pop$ and modular buffers are used for channels 
-where downstream filter has $peek>pop$.
+%% \texttt{CAF+scaling+cutpeek+mod} also modifies the CAF algorithm so 
+%% that two adjacent filters are never fused if the downstream filter has 
+%% $peek>pop$ and modular buffers are used for channels 
+%% where downstream filter has $peek>pop$.
 
-We found that on average \texttt{CAF+scaling+cutpeek} works best across 
-the 3 platforms and this is the buffer optimizatio included in our 
-performance numbers. However, \texttt{CAF+scaling+peekscale} is the 
-best strategy for fmradio benchmark and our baseline \texttt{CAF+scaling} 
-is best for the filterbank benchmark.
+%% We found that on average \texttt{CAF+scaling+cutpeek} works best across 
+%% the 3 platforms and this is the buffer optimizatio included in our 
+%% performance numbers. However, \texttt{CAF+scaling+peekscale} is the 
+%% best strategy for fmradio benchmark and our baseline \texttt{CAF+scaling} 
+%% is best for the filterbank benchmark.
 
 %% The Itanium~2 has less speedup possibly
 %% because of data and instruction prefetch instructions generated by the 
