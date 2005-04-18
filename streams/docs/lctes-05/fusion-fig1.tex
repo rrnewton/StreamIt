@@ -17,8 +17,8 @@ void->void pipeline BufferTest {
                                 
 void->float filter Source {     
   work push 1 {                 
-    push(random());             
-  }                             
+    push( ... );             
+  } 
 }                               
                                 
 float->void filter FIR {        
@@ -49,15 +49,13 @@ void->void filter BufferTest {
                                      
   prework {                          
     for (int i=0; i<PEEK-1; i++) {   
-      BUFFER[push_index++] =         
-         random();                   
+      BUFFER[push_index++] = ... ;
     }                                
   }                                  
                                      
   work {                             
     // run Source                    
-    BUFFER[push_index] =             
-       random();                     
+    BUFFER[push_index] = ... ;
     push_index =                     
       (push_index+1)&3;              
                                      
