@@ -5,20 +5,20 @@
 \center
 \label{tab:benchmarks}
 \vspace{-12pt}
-{\tiny
-\begin{tabular}{|c|c|c|} \hline
-{\bf benchmark}&{\bf description}&{\bf \# of actors}\\ \hline \hline
-\texttt{bitonic	} &bitonic sort of 64 integers	&	972 \\ \hline
-\texttt{fir	      } &finite impulse response program	&	132 \\ \hline
-\texttt{fft-fine	} &fine grained FFT implementation	&	267 \\ \hline
-\texttt{fft-coarse} &coarse grained FFT implementation	&	26 \\ \hline
-\texttt{3gpp	} &3GPP Radio Access Protocol application	&	105 \\ \hline
-\texttt{beamformer} &beamformer with 64 sources and 1 detector& 197 \\ \hline
-\texttt{matmult	} &matrix multiplication	&	48 \\ \hline
-\texttt{fmradio	} &FM Radio with 10 way equalizer	&	49 \\ \hline
-\texttt{filterbank} &simple filterbank program	&	53 \\ \hline
-\texttt{filterbank2}&alternate implementation of a filterbank &	37 \\ \hline
-\texttt{ofdm	 }& Orthogonal Frequency Division Multiplexor~\cite{spectrumware}	&	16 \\ \hline
+{\scriptsize
+\begin{tabular}{|l|l|c|} \hline
+\hspace{-2pt}{\bf Benchmark}&\hspace{-2pt}{\bf Description}& \hspace{-6pt} {\bf \# of Actors} \hspace{-6pt} \\ \hline \hline
+\hspace{-2pt}\texttt{bitonic	} &\hspace{-2pt}bitonic sort of 64 integers	&	972 \\ \hline
+\hspace{-2pt}\texttt{fir	      } &\hspace{-2pt} finite impulse response (128 taps)&	132 \\ \hline
+\hspace{-2pt}\texttt{fft-fine	} &\hspace{-2pt}fine grained 64-way FFT	&	267 \\ \hline
+\hspace{-2pt}\texttt{fft-coarse}\hspace{-2pt} &\hspace{-2pt}coarse grained 64-way FFT	&	26 \\ \hline
+\hspace{-2pt}\texttt{3gpp	} &\hspace{-2pt}3GPP Radio Access Protocol	&	105 \\ \hline
+\hspace{-2pt}\texttt{beamformer} & \hspace{-2pt}beamformer with 64 channels and 1 beam & 197 \\ \hline
+\hspace{-2pt}\texttt{matmult	} & \hspace{-2pt}matrix multiplication	&	48 \\ \hline
+\hspace{-2pt}\texttt{fmradio	} & \hspace{-2pt}FM Radio with 10-way equalizer	&	49 \\ \hline
+\hspace{-2pt}\texttt{filterbank}\hspace{-2pt} & \hspace{-2pt}filterbank program (8 bands, 32 taps / filter)	&	53 \\ \hline
+\hspace{-2pt}\texttt{filterbank2}\hspace{-3pt}& \hspace{-2pt}independent filterbank (3 bands, 100 taps / filter) &	37 \\ \hline
+\hspace{-2pt}\texttt{ofdm	 }& \hspace{-2pt}Orthogonal Frequency Division Multiplexor~\cite{spectrumware}	&	16 \\ \hline
 \end{tabular}
 }
 \caption{Evaluation benchmark suite.}
@@ -55,9 +55,10 @@ optimizations and buffer management strategies.  We use three
 different architectures: a 137MHz StrongARM-1110, a 600~MHz Pentium~3
 and a 1.3~GHz Itanium~2. The StrongARM results reflect performance for
 an embedded target; it has a 16Kb L1 instruction cache, an 8Kb L1 data
-cache, and no L2 cache.  The Pentium~3 and Itanium~2 reflect desktop
-performance; they have a 16Kb L1 instruction cache, 16Kb L1 data
-cache, and 256Kb shared L2 cache.
+cache, and no L2 cache.  The StrongARM also has a separate 512-byte
+minicache (not targeted by our optimizations).  The Pentium~3 and
+Itanium~2 reflect desktop performance; they have a 16Kb L1 instruction
+cache, 16Kb L1 data cache, and 256Kb shared L2 cache.
 
 Our benchmark suite (see Table~\ref{tab:benchmarks}) consists of
 eleven StreamIt applications. They are compiled with the StreamIt
@@ -95,8 +96,8 @@ The overall speedups offered by our techniques are illustrated in
 Figure~\ref{fig:arm-perf} (StrongARM), Figure~\ref{fig:p3-perf}
 (Pentium~3), and \ref{fig:p3-perf} (Itanium~2).  These graphs have two
 bars: one for ``full fusion'', in which all filters are fused into a
-single function (with scalar replacement), and one labelled
-``CAF+scaling+buffer'', representing all of our optimizations (cache
+single function (with scalar replacement), and one labelled {\tt
+CAF+scaling+buffer}, representing all of our optimizations (cache
 aware fusion, execution scaling, and buffer optimizations) applied
 together.  We include the comparison to full fusion because it
 represents the most simple approach for eliminating function call
@@ -216,7 +217,7 @@ exceed the instruction cache.
 
 The last bar, {\tt CAF+scaling+buffer}, illustrates the benefit of
 buffer management optimizations for filters that peek.  As detailed in
-section~\ref{sec:fusion-opt}, such filters demand specialized buffer
+Section~\ref{sec:fusion-opt}, such filters demand specialized buffer
 management, as they reuse items on the input tape across successive
 iterations.  In our benchmark suite, peeking occurs only in the last
 four applications (i.e., \texttt{fmradio}, \texttt{filterbank},
@@ -228,34 +229,36 @@ The buffer optimization applied in Figures~\ref{fig:arm-perf},
 \ref{fig:p3-perf}, and \ref{fig:i2-perf} is termed {\tt cutpeek}.  In
 this optimization, the cache-aware fusion algorithm is modified so
 that two adjacent filters are never fused if the downstream filter
-performs any peeking (i.e., it has $\mbox{\it peek} > \mbox{\it pop}$.
-After we apply execution scaling to the granularity-adjusted actors,
-we apply buffer expansion.  The live items are copied to the start of
-the buffer once after executing the granularity-adjusted actor for the
-number of times that is equal to the global multiplicity scaling. This
-reduces the overhead of copying live items.  Optimized buffer
-management offers the largest gains for {\tt filterbank2}: 45\%
-on StrongARM, 38\% on Pentium~3, and 36\% on Itanium~2.
-This is due to a large peek rate (100 items) in addition a large
-global multiplicity of 300 that amortizes the cost of copying
-items.
+performs any peeking (i.e., it has $\mbox{\it peek} > \mbox{\it
+pop}$).  After we apply execution scaling to the granularity-adjusted
+actors, we apply buffer expansion.  The live items are copied to the
+start of the buffer once per scaled execution, thereby reducing the
+overhead of copying live items.  Optimized buffer management offers
+the largest gains for {\tt filterbank2}: 45\% on StrongARM, 38\% on
+Pentium~3, and 36\% on Itanium~2.  This is due to a large peek rate
+(100 items) in addition a large global multiplicity of 300 that
+amortizes the cost of copying items.
 
 While we found that {\tt cutpeek} is, on average, the best buffer
 management strategy across the three platforms, we also evaluated
 several others.  For {\tt fmradio}, up to a 5\% improvement is offered
-by a strategy called {\tt peekscale}: filters with $\mbox{\it
-peek}>\mbox{\it pop}$ are replaced with an equivalent filter that
-executes the original multiple times to ensure that {\it pop} is at
-least $4*\mbox{\it peek}$.  Like {\tt cutpeek}, this serves to
-amortize the overhead of copy-shift buffer management, but it can also
-hamper the execution scaling optimization.  Because certain other
-filters in the graph must fire more frequently to compensate for the
-scaled peeking filter, there is less room for global execution
-scaling.  On the StrongARM, {\tt peekscale} also benefits {\tt ofdm}
-by up to 7\%.  Finally, on the {\tt filterbank} benchmark, highest
-performance results from unoptimized copy-shift buffer management.  We
-also evaluated buffer management using modulation for indexing, but
-this did not yield the best performance for any benchmark or platform.
+by a strategy called {\tt peekscale}, in which (prior to other
+optimizations) filters with $\mbox{\it peek}>\mbox{\it pop}$ are
+scaled to perform several executions at once.  As scaling is
+performed, the {\it pop} and {\it peek} rates increase but $\mbox{{\it
+peek}} - \mbox{\it pop}$ remains constant; scaling continues until the
+{\it pop} rate is at least $4*(\mbox{{\it peek}} - \mbox{{\it pop}})$.
+Like {\tt cutpeek}, this serves to amortize the overhead of copy-shift
+buffer management, but it can also hamper the execution scaling
+optimization.  Because certain other filters in the graph must fire
+more frequently to compensate for the scaled peeking filter, there is
+less room for global execution scaling.  The only other case where
+{\tt peekscale} is the best strategy is for {\tt ofdm} on StrongARM,
+where there is a 7\% improvement over {\tt cutpeek}.  Finally, on the
+{\tt filterbank} benchmark, highest performance results from
+unoptimized copy-shift buffer management.  We also evaluated buffer
+management using modulation for indexing, but this did not yield the
+best performance for any benchmark or platform.
 
 %% \texttt{CAF+scaling} is our baseline for evaluating optimized buffer 
 %% management strategies. In \texttt{CAF+scaling} the live items are 
