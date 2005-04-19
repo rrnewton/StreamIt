@@ -1,15 +1,6 @@
 \section{Cache Model for Streaming}
 \label{sec:cache-model}
 
-In this section we describe a simple and intuitive cache model to
-estimate the instruction and data cache miss rates for a steady state
-sequence of actor firings. 
-The model is based on the notion of an actor reuse distance, which is 
-based on the LRU stack distance~\cite{mattson70}. We develop the model
-first for the instruction cache, and then subsequently generalize it to
-account for the data cache.
-
-
 From a caching point of view, it is intuitively clear that once a
 filter's instruction working set is fetched into the cache, we should
 execute that filter as many times as possible to improve instruction
@@ -41,6 +32,13 @@ overburden the data cache as the buffers between actors may grow to
 prohibitively large sizes that degrade the data cache
 behavior. Specifically, if a buffer overflows the cache, then
 producer-consumer locality is lost.
+
+In this section we describe a simple and intuitive cache model to
+estimate the instruction and data cache miss rates for a steady state
+sequence of actor firings. The model serves as a foundation for
+reasoning about the cache-aware optimizations introduced in this
+paper. We develop the model first for the instruction cache, and then
+generalize it to account for the data cache.
 
 \input{cache-model-instruction}
 \input{cache-model-data}
