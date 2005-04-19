@@ -3,18 +3,18 @@
 
 In this section we describe two cache-aware optimizations that
 are geared toward improving the cache behavior of streaming programs. First, we
-describe {\it multiplicity scaling} which 
+describe {\it execution scaling} which 
 scales a steady state to improve instruction locality, subject to the
 data working set constraints of the actors in the stream graph.
 Second, we describe {\it cache-aware fusion} which performs a series
 of granularity adjustments to the actors in the steady state. The
 fusion serves to $(i)$ reduce
 the overhead of switching between actors, $(ii)$ create coarser
-grained actors for multiplicity scaling, and $(iii)$ enable novel
+grained actors for execution scaling, and $(iii)$ enable novel
 buffer management techniques between fused actors, as detailed
 Section~\ref{sec:buffer}.
 
-\subsection{Multiplicity Scaling}
+\subsection{Execution Scaling}
 \input{scaling-opt}
 
 \subsection{Actor Coarsening}
