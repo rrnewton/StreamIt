@@ -8,12 +8,12 @@ data working set requirements as we scale a steady state.
 \begin{figure}[t]
 \begin{center}
 \framebox{\parbox{3.25in}{
-\mbox{} ~~~~// {\it Returns a multiplicity factor for steady state $S$} \\
+\mbox{} ~~~~// {\it Returns a scaling factor for steady state $S$} \\
 \mbox{} ~~~~// - $C_D$ is the data cache size\\
 \mbox{} ~~~~// - $\alpha$ is the fraction of $C_D$ dedicated for I/O\\%$(0 < \alpha)$\\
 \mbox{} ~~~~// - $p$ is the desired percentile of all actors to be\\
-\mbox{} ~~~~// satisfied by the chosen multiplicity $(0 < p \le 1$)\\
-\mbox{} ~~~~{\bf calculateMultiplicity}($S$, $C_D$, $\alpha$, $p$) \{\\
+\mbox{} ~~~~// satisfied by the chosen scaling factor $(0 < p \le 1$)\\
+\mbox{} ~~~~{\bf calculateScalingFactor}($S$, $C_D$, $\alpha$, $p$) \{\\
 \mbox{} ~~~~~~~{\bf create} $\mt{array}$ of size $|S|$ and {\bf initialize} all entries to 0\\
 \mbox{} ~~~~~~~{\bf for} $i$ = 1 to $|S|$ \{ \\
 \mbox{} ~~~~~~~~~~$X = S[i]$\\
@@ -23,23 +23,22 @@ data working set requirements as we scale a steady state.
 %\mbox{} ~~~~~~~~~~$d = \mt{IO}(X)$\\
 \mbox{} ~~~~~~~~~~// account for the I/O requirements and\\
 \mbox{} ~~~~~~~~~~// calculate largest possible scaling for $X$\\
-\mbox{} ~~~~~~~~~~$M_X = \lfloor C / \mt{IO}(X) \rfloor$\\
-\mbox{} ~~~~~~~~~~// array indexed from 0 \\
-\mbox{} ~~~~~~~~~~$\mt{array}[i - 1] = M_X$\\
+\mbox{} ~~~~~~~~~~$M_X = {\bf round}(C / \mt{IO}(X))$\\
+\mbox{} ~~~~~~~~~~$\mt{array}[i] = M_X$\\
 \mbox{} ~~~~~~~\} \\
 \mbox{} ~~~~~~~{\bf sort} $\mt{array}$ into ascending numerical order\\
-\mbox{} ~~~~~~~$i = \mt{{\bf round}}((1-p) \times (|S| - 1))$ \\
+\mbox{} ~~~~~~~$i = \lfloor (1-p) \times |S| \rfloor$ \\
 \mbox{} ~~~~~~~return $\mt{array}[i]$\\
 \mbox{} ~~~~\}
 }}
 \end{center}
 \nocaptionrule
-\caption{Algorithm for calculating the multiplicity factor.}
+\caption{Algorithm for calculating the scaling factor.}
 \label{fig:scaling-algo}
 \end{figure}
 
 Our approach is to scale the entire steady state by a single
-multiplicity factor, with the constraint that only a small percentage
+scaling factor, with the constraint that only a small percentage
 of the actors overflow the data cache. Our two-staged algorithm is
 outlined in Figure~\ref{fig:scaling-algo}.
 
@@ -68,7 +67,7 @@ largest factor we can choose is 20.
 In our implementation, we use the 90-10 heuristic. In other words, we
 set $p=90\%$. We empirically determined this value via a series of
 experiments using our benchmark suite. Specifically, we varied the
-multiplicity factor across a wide range of values,
+scaling factor across a wide range of values,
 and measured the resulting performance. We found that
 increasing the threshold beyond 90\% leads to marginal
 performance gains. Due to the limited space we cannot include all of

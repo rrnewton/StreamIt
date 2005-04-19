@@ -1,0 +1,83 @@
+
+\subsection{Data Cache}
+
+As noted earlier, we can not arbitrarily scale the execution frequency
+of a filter without also considering how scaling might impact
+the data buffer sizes between filters. In this regard, a filter's
+output buffer size is also constrained by the amount of state that a
+filter retains with every execution of its work function.
+
+Clearly if a filter has any static data (e.g., state information or
+coefficient arrays), then it is prudent to maximize their temporal
+access locality. We can define a data-cache miss rate ($\mt{DMR}$) based on
+a derivation similar to that for the instruction-cache miss rate:
+replace $C_I$ with $C_D$ in Equation~\ref{eq:ims}, and $I(f_i)$ with
+$S(f_i)$ when calculating the {\it data reuse distance} ($\mt{DRD}$). 
+Here, $C_D$ represents a constant proportional to the data cache size,
+and $S(f)$ represents the total size of the static data in the
+specified filter.
+
+The presence of static data in a filter implies that we have to limit
+the scaling of a filter $f$ such that it does not require more than $C_D -
+S(f)$ bytes of buffer space for reading and writing data; otherwise
+the data working sets of the filter will overflow the cache and we lose
+producer-consumer locality. The buffer requirements are represented by
+$Y(f_i)$, and the data-cache model accounts for the dynamic data
+requirements by adjusting the data reuse distance as follows:
+$\mt{DRD}(f_i) = \sum (S(f_i) + Y(f_i))$ over all distinct filters occurring
+in $phase(f_i)$.
+
+Intuitively, the dynamic data accounts for the size of the buffer
+required for writing new values, as well as the size of the buffer
+necessary for reading values. It also adjusts for any
+producer-consumer locality since the output buffer of one filter is
+also the input buffer of its neighbor in the stream graph. What this
+measure tells us is that we can scale the execution of a filter as
+long as its buffer requirements (for reading and writing) do not
+exceed the cache, and furthermore, as long as the input-output rates
+between producer consumer pairs are not grossly mismatched. Managing the buffer 
+requirements is important and motivates a series of cache
+optimizations discussed in the next section. In the case of rate
+mismatch, the metric tells us that the effective cache size is
+reduced, or in other words, the data that is left over after a
+producer-consumer firing must be preserved until a future occurrence of
+the same pair of filters. This translates to lower data locality and
+degrades cache performance.
+
+Mathematically, the dynamic data measure is defined as:
+\begin{eqnarray}
+  \nonumber
+  Y(f_i) &=&\sum_{f_k} min(W(f_k), U(f_k) \times A(f_k)) + \\
+  \nonumber
+	   &&\sum_{f_k} min(R(f_k), O(f_k) \times A(f_k)) - \\
+  \nonumber
+         &&\sum_{f_s} min(R(f_s), O(f_s) \times A(f_s))
+\end{eqnarray}
+with $W(f)$ equal to the output buffer size reserved for writing data, $R(f)$
+equal to the input buffer size reserved for reading data, $U(f)$ equal to the
+{\tt push} rate (in bytes) of the filter, $O(f)$ equal to the {\tt pop} rate (in
+bytes) of the filter, and $A(f)$ equal to the number of occurrences of
+filter $f$ in $phase(f_i)$. Also note that the $Y(f_i)$ is defined
+over all distinct occurrences of $f_k$ in the phase, and $f_s$
+represents the filter that consumes the data produced by $f_k$ (i.e.,
+it is $f_k$'s successor in the stream graph, and $f_k$--$f_s$
+constitute a producer-consumer pair; $f_s$ is unique unless $f_k$ is a splitter).
+
+The first summand in the equation above quantifies the address space
+accessed for writing data. It is  equal to the lesser of the buffer size
+reserved for output, and the total number of items produced by
+the filter (i.e., the push rate multiplied by the number of times the
+work function fired in the phase); this avoids over estimating the
+address space when an exceedingly large buffer is reserved but only a
+portion of it is used for writing in a phase.
+
+The second term in the equation quantifies the referenced address space 
+for reading the input data. This term is also the lesser of two
+values: the input buffer size, and the total number of bytes referenced for
+reading data.
+
+The third term avoids double counting since the output buffer of one
+filter is also the input buffer of its successor in the stream
+graph. The term quantifies the amount of data that is consumed by the
+producer's successor (which therefore releases a portion of the
+address space for use by other filters in the phase).

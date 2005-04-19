@@ -21,28 +21,31 @@ charged a miss penalty if and only if the number of referenced
 instructions since the last execution (of the same actor)
 is greater than the instruction cache capacity.
 
-Formally, let $P=\mt{phase}(S,i)$, for $1\le i\le|S|$ represent a
-subsequence of $S$,  formed such that 
-% $|P|\ge 2$,
+Formally, let $P=\mt{phase}(S,i)$ for $1\le i\le|S|$ represent a
+subsequence of $k$ elements of $S$:
 \[ 
-P[1]=S[i], P[2]=S[i+1], \ldots, P[k]=S[i+k-1]=S[i],
+P[1]=S[i], P[2]=S[i+1], \ldots, P[k]=S[i+k-1],
 \]
-and $1 < k \le |S|+1$ is the minimum index for which
-the above property holds.  
-In other words, a phase is subsequence of $S$ that starts and ends
-with the same actor, and there are no interveaning occurences of the
-same actor within the phase. Note that because the steady state
-execution is cyclic, the 
-construction of the subsequence is allowed to wrap around the steady
-state\footnote{In other words, the subsequence is formed from a new
-sequence $S'=S|S$ where $|$ represents concatenation.}. For example,
-the steady state $S_1=(\texttt{AABB})$ has
-$\mt{phase}(S_1,1)=(\texttt{AA})$ and
-$\mt{phase}(S_1,2)=(\texttt{ABBA})$.
+where $k\in[1,|S|]$ is the smallest integer such that $S[i+k]=S[i]$.
+In other words, a phase is a subsequence of $S$ that starts with the
+specified actor ($S[i]$) and ends before the next occurence of the same actor
+(i.e., there are no interveaning occurences of $S[i]$ in the phase).
+Note that because the steady state
+execution is cyclic, the construction of the subsequence is allowed to
+wrap around the steady state\footnote{In other words, the subsequence
+is formed from a new sequence $S'=S|S$ where $|$ represents
+concatenation.}. For example, the steady state $S_1=(\texttt{AABB})$
+has 
+$\mt{phase}(S_1,1)=(\texttt{A})$,
+$\mt{phase}(S_1,2)=(\texttt{ABB})$,
+$\mt{phase}(S_1,3)=(\texttt{B})$, and
+$\mt{phase}(S_1,4)=(\texttt{AAB})$,
+
 
 Let $I(w)$ equal the code size of work function $w$, and
 \[
-\mt{IRD}(S,i)=\sum_j I(S[j])
+%\mt{IRD}(S,i)=\sum_{j \in \mt{phase}(S,i)} I(S[j])
+\mt{IRD}(S,i)=\sum_{j} I(S[j])
 \]
 over all distinct actors occurring in
 $\mt{phase}(S,i)$. We can then determine if a specific work function will
@@ -79,12 +82,12 @@ $I(\texttt{A})=I(\texttt{B})=\lceil{C_I/2}\rceil+1$, then the
 combined instruction working 
 sets exceed the instruction cache. Therefore, 
 we expect to suffer a miss at the start of every
-steady state because $\mt{IRD}(S_1, 2)>C_I$ (i.e., the reuse distance
-from the last execution of \texttt{A} at $i=2$ to the next execution
-of \texttt{A}---at $i=1$ of the next steady state---is greater than the cache
-size). Similarly, there is a 
+steady state because the phase that precedes the execution of
+\texttt{A} (at $S_1[1]$) is $\mt{phase}(S_1,2)$ with 
+an instruction reuse distance greater than the cache size 
+($\mt{IRD}(S_1,2) > C_I$). Similarly, there is a 
 miss predicted for the first occurrence of actor \texttt{B} since
-$\mt{phase}(S_1,4)=(\texttt{BAAB})$ and 
+$\mt{phase}(S_1,4)=(\texttt{BAA})$ and 
 $\mt{IRD}(S_1, 4)>C_I$. Thus, $\mt{IMR}(S_1)=2/4$ whereas for the
 following variant $S_2=(\texttt{ABAB})$, $\mt{IMR}(S_2)=1$.
 In the case of $S_2$, we know that since the combined
@@ -108,22 +111,22 @@ distribution.
 
 \paragraph*{Temporal Locality} In our model, the concept of improving
 temporal locality translates to deriving a steady state where, in the
-best case, each actor has only one phase that is longer than two
-elements. For example, a permutation of the actors in $S_2$ (where all
+best case, each actor has only one phase that is longer than unit-length.
+For example, a permutation of the actors in $S_2$ (where all
 phases are of length three) that improves temporal locality
 will result in $S_1$, which we have shown has a relatively lower miss rate.
 
 
 \paragraph*{Execution Scaling}
 Another approach to improving temporal locality is to scale the
-execution of the actors in the steady state. Scaling increasing the
+execution of the actors in the steady state. Scaling increases the
 number of consecutive firings of the same actor. In our model, a
-scaled steady state has a greater number of length-two phases (i.e., a
-phase of 2 elements and the shortest possible reuse distance).
+scaled steady state has a greater number of unit-length phases (i.e., a
+phase of length one and the shortest possible reuse distance).
 
 We represent a scaled execution of the steady state as
-$S^M=(w_1^M\dots w_n^M)$: the steady state $S$ is scaled by a
-multiplicity factor $M$, which translates to $M-1$ additional firings of
+$S^M=(w_1^M\dots w_n^M)$: the steady state $S$ is scaled by $M$, which
+translates to $M-1$ additional firings of 
 each actor. For example, scaling $S_1=(\texttt{AABB})$ by a factor of
 two results in
 %$S_1^2=(\texttt{\underline{A}A\underline{A}A\underline{B}B\underline{B}B})$
@@ -133,7 +136,7 @@ and scaling $S_2=(ABAB)$ by the same amount results in
 $S_2^2=(\texttt{AABBAABB})$;
 %; the underlined actors constitute the unscaled steady state.
 
-From Equation~\ref{eq:imiss}, we observe that length-two  phases do
+From Equation~\ref{eq:imiss}, we observe that unit-length phases do
 not impact the instruction miss rate  as long as the size of the actor's 
 instruction working set  is smaller than the cache
 size; we assume this is always the case. Therefore, scaling has the
@@ -150,19 +153,19 @@ we can rewrite Equation~\ref{eq:imr} as:
 \end{eqnarray}
 
 In other words, the miss rate is inversely proportional to the
-multiplicity factor.
+scaling factor.
 \begin{figure}[t]
 \begin{center}
-  \psfig{figure=fftf-mult2.eps, width=\columnwidth}
+  \psfig{figure=fftc-mult2.eps, width=\columnwidth}
 % \nocaptionrule
-  \caption{Impact of multiplicity scaling on performance.}
+  \caption{Impact of execution scaling on performance.}
  \label{fig:scaling-data}
 \end{center}
 \end{figure}
 
 In Figure~\ref{fig:scaling-data} we show a
 representative curve relating the scaling factor to overall
-performance. The data corresponds to a fine-grained implementation of 
+performance. The data corresponds to a coarse-grained implementation of 
 a Fast Fourier Transform (FFT) running on a Pentium~3 architecture. The
 x-axis represents the scaling factors (with increasing values from
 left to right). The y-axis represents the execution time and is an
