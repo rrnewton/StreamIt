@@ -23,7 +23,7 @@ data working set requirements as we scale a steady state.
 %\mbox{} ~~~~~~~~~~$d = \mt{IO}(X)$\\
 \mbox{} ~~~~~~~~~~// account for the I/O requirements and\\
 \mbox{} ~~~~~~~~~~// calculate largest possible scaling for $w$\\
-\mbox{} ~~~~~~~~~~$M[i] = {\bf round}(c~/~\mt{IO}(X))$\\
+\mbox{} ~~~~~~~~~~$M[i] = {\bf round}(c~/~\mt{IO}(w, 1))$\\
 \mbox{} ~~~~~~~\} \\
 \mbox{} ~~~~~~~{\bf sort} $M$ into ascending numerical order\\
 \mbox{} ~~~~~~~$i = \lfloor~(1-p) \times |S|~\rfloor$ \\
