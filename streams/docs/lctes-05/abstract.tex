@@ -10,16 +10,16 @@ StreamIt, a language and compiler specifically engineered for stream
 computing. In StreamIt, a program is described as a structured dataflow
 graph, where the nodes represent actors that carry out 
 computation. The edges in a stream graph represent
-communication. Our work is unique in that the compiler
-accounts for the size of instruction and data working sets as it
-performs a series of cache-aware optimizations, all while deriving an
-ordering of executions for the nodes in the stream graph. The
+communication. Our cache optimizations are unique in that they 
+account for both the instruction and data working sets, finding a
+schedule of actor executions that compromises instruction locality
+with data locality.  The
 optimizations are founded upon two simple and intuitive models that
 quantify $(i)$ the temporal locality for a sequence of  actor
 executions, and $(ii)$ the overhead for managing the communication
 between actors. The cache-aware transformations lead to significantly
 better utilization of the memory system, and as such, they deliver
-a speedup of 249\% for our streaming benchmark suite on a StrongARM 
-processor, a speedup of 154\% on a Pentium~3 processor, and a 
-speedup of 152\% on an Itanium~2 processor over unoptimized StreamIt.
-
+a 249\% speedup (over unoptimized StreamIt) for our streaming benchmark 
+suite on a StrongARM processor.  We also evaluate the optimizations on 
+desktop processors, yielding a 154\% average speedup on the Pentium~3 
+and a 152\% average speedup on Itanium~2.
