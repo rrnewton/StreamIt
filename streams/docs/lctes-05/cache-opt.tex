@@ -1,12 +1,12 @@
 \section{Cache Optimizations}
 \label{sec:cache-opt}
 
-In this section we describe two cache-aware optimizations that
+In this section we describe two cache aware optimizations that
 are geared toward improving the cache behavior of streaming programs. First, we
 describe {\it execution scaling} which 
 scales a steady state to improve instruction locality, subject to the
 data working set constraints of the actors in the stream graph.
-Second, we describe {\it cache-aware fusion} which performs a series
+Second, we describe {\it cache aware fusion} which performs a series
 of granularity adjustments to the actors in the steady state. The
 fusion serves to $(i)$ reduce
 the overhead of switching between actors, $(ii)$ create coarser
@@ -17,5 +17,5 @@ Section~\ref{sec:buffer}.
 \subsection{Execution Scaling}
 \input{scaling-opt}
 
-\subsection{Actor Coarsening}
+\subsection{Cache Aware Fusion}
 \input{caf-opt}
