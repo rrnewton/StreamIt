@@ -94,31 +94,33 @@ single function (with scalar replacement), and one labelled {\tt
 CAF+scaling+buffer}, representing all of our optimizations (cache
 aware fusion, execution scaling, and buffer optimizations) applied
 together.  We include the comparison to full fusion because it
-represents the most simple approach for eliminating function call
-overhead and optimizing across filter boundaries; however, it is
-oblivious to instruction and data locality, and lacks aggressive
-buffer optimizations.  Performance is normalized to unoptimized
-StreamIt, in which no filters are fused (but there is still unrolling
-by 128).  On the right of each graph, both arithmetic and geometric
-means are shown for the benchmarks.  We usually speak in terms of the
-arithmetic means as they are more intuitive (and also yield more
-conservative speedups), though we refer to the geometric mean for an
-unambiguous reference on close results.
+represents a simple approach for eliminating function call overhead
+and optimizing across filter boundaries; while this fusion strategy
+utilizes our scalar replacement optimization, it remains oblivious to
+instruction and data locality.  Performance is normalized to
+unoptimized StreamIt, in which no filters are fused (but there is
+still unrolling by 128).  On the right of each graph, both arithmetic
+and geometric means are shown for the benchmarks.  We usually speak in
+terms of the arithmetic means as they are more intuitive (and also
+yield more conservative speedups), though we refer to the geometric
+mean for an unambiguous reference on close results.
 
 On StrongARM (Figure~\ref{fig:arm-perf}), our cache optimizations
-offer a 249\% average speedup over the baseline and a 162\%
-average speedup over full fusion.  Cache optimizations always perform
-better than the baseline, and they perform better than full fusion in
-all cases except for \texttt{3gpp}, where they yield a 45\% slowdown.
-This slowdown is due to conservative code size estimation: the
-compiler predicts that the fused version of \texttt{3gpp} will not fit
-into the instruction cache, thereby preventing fusion.  However, due
-to optimizations by {\tt gcc}, the final code size is smaller than
-expected and does fit within the cache.  While such inaccuracies could
-be improved by adding feedback between the output of {\tt gcc} and our
-code estimation, each fusion possibility would need to be evaluated
-separately as the fusion boundary affects the impact of low-level
-optimizations (and thus the final code size).
+offer a 249\% average speedup over the baseline and a 162\% average
+speedup over full fusion.  Scalar replacement is responsible for much
+of the gains that both strategies offer over the baseline.  Cache
+optimizations always perform better than the baseline, and they
+perform better than full fusion in all cases except for \texttt{3gpp},
+where they yield a 45\% slowdown.  This slowdown is due to
+conservative code size estimation: the compiler predicts that the
+fused version of \texttt{3gpp} will not fit into the instruction
+cache, thereby preventing fusion.  However, due to optimizations by
+{\tt gcc}, the final code size is smaller than expected and does fit
+within the cache.  While such inaccuracies could be improved by adding
+feedback between the output of {\tt gcc} and our code estimation, each
+fusion possibility would need to be evaluated separately as the fusion
+boundary affects the impact of low-level optimizations (and thus the
+final code size).
 
 The speedups offered by cache optimizations over a full fusion
 strategy are more modest for the desktop processors: 34\% average
