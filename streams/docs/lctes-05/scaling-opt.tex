@@ -9,26 +9,25 @@ data working set requirements as we scale a steady state.
 \begin{center}
 \framebox{\parbox{3.25in}{
 \mbox{} ~~~~// {\it Returns a scaling factor for steady state $S$} \\
-\mbox{} ~~~~// - $C_D$ is the data cache size\\
-\mbox{} ~~~~// - $\alpha$ is the fraction of $C_D$ dedicated for I/O\\%$(0 < \alpha)$\\
+\mbox{} ~~~~// - $c$ is the data cache size\\
+\mbox{} ~~~~// - $\alpha$ is the fraction of $c$ dedicated for I/O\\%$(0 < \alpha)$\\
 \mbox{} ~~~~// - $p$ is the desired percentile of all actors to be\\
 \mbox{} ~~~~// satisfied by the chosen scaling factor $(0 < p \le 1$)\\
-\mbox{} ~~~~{\bf calculateScalingFactor}($S$, $C_D$, $\alpha$, $p$) \{\\
-\mbox{} ~~~~~~~{\bf create} $\mt{array}$ of size $|S|$ and {\bf initialize} all entries to 0\\
+\mbox{} ~~~~{\bf calculateScalingFactor}($S$, $c$, $\alpha$, $p$) \{\\
+\mbox{} ~~~~~~~{\bf create} array $M$ of size $|S|$ and {\bf initialize} all entries to 0\\
 \mbox{} ~~~~~~~{\bf for} $i$ = 1 to $|S|$ \{ \\
-\mbox{} ~~~~~~~~~~$X = S[i]$\\
+\mbox{} ~~~~~~~~~~$w = S[i]$\\
 \mbox{} ~~~~~~~~~~// calculate effective cache size\\
-\mbox{} ~~~~~~~~~~$C = \alpha \times (C_D - \mt{State}(X))$\\
+\mbox{} ~~~~~~~~~~$c = \alpha \times (c - \mt{State}(w))$\\
 %\mbox{} ~~~~~~~~~~// estimate I/O requirements\\
 %\mbox{} ~~~~~~~~~~$d = \mt{IO}(X)$\\
 \mbox{} ~~~~~~~~~~// account for the I/O requirements and\\
-\mbox{} ~~~~~~~~~~// calculate largest possible scaling for $X$\\
-\mbox{} ~~~~~~~~~~$M_X = {\bf round}(C / \mt{IO}(X))$\\
-\mbox{} ~~~~~~~~~~$\mt{array}[i] = M_X$\\
+\mbox{} ~~~~~~~~~~// calculate largest possible scaling for $w$\\
+\mbox{} ~~~~~~~~~~$M[i] = {\bf round}(c~/~\mt{IO}(X))$\\
 \mbox{} ~~~~~~~\} \\
-\mbox{} ~~~~~~~{\bf sort} $\mt{array}$ into ascending numerical order\\
-\mbox{} ~~~~~~~$i = \lfloor (1-p) \times |S| \rfloor$ \\
-\mbox{} ~~~~~~~return $\mt{array}[i]$\\
+\mbox{} ~~~~~~~{\bf sort} $M$ into ascending numerical order\\
+\mbox{} ~~~~~~~$i = \lfloor~(1-p) \times |S|~\rfloor$ \\
+\mbox{} ~~~~~~~return $M[i]$\\
 \mbox{} ~~~~\}
 }}
 \end{center}
