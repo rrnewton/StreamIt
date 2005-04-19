@@ -8,7 +8,6 @@ working set requirements as we scale a steady state.
 \begin{figure}[t]
 \begin{center}
 \framebox{\parbox{3.25in}{
-\mbox{} \textsc{Algorithm 1.} {\it (Calculate Multiplicity Factor)} \vspace{6pt}\\
 \mbox{} ~~~~// {\it Returns a multiplicity factor for steady state $S$} \\
 \mbox{} ~~~~// - $C_D$ is the data cache size\\
 \mbox{} ~~~~// - $\alpha$ is the fraction of $C_D$ dedicated for I/O $(0 < \alpha)$\\
@@ -33,22 +32,27 @@ working set requirements as we scale a steady state.
 \mbox{} ~~~~\}
 }}
 \end{center}
-\vspace{-12pt}
+\nocaptionrule
+\caption{Algorithm for calculating the multiplicity factor.}
+\label{fig:scaling-algo}
 \end{figure}
 
 Our approach is to scale the entire steady state by a single
 multiplicity factor, with the constraint that only a small percentage
-of the actors overflow the data cache. Our algorithm is described in
-Algorithm~1. First, it calculates the largest possible multiplicity
-for every actor in the steady state. Second, it choses the largest
+of the actors overflow the data cache. Our algorithm is outlined in
+Figure~\ref{fig:scaling-algo}. First, it calculates the largest
+possible multiplicity 
+for every actor in the steady state. Second, it chooses the largest
 factor that allows a fraction ($p$) of the steady state actors to be
 scaled safely (i.e., the cache is adequate for their I/O
 requirements).  For example, the algorithm might calculate
 $M_\texttt{A} = 10$,
 $M_\texttt{B} = 20$, 
 $M_\texttt{C} = 30$, and 
-$M_\texttt{D} = 40$, for four actors in some steady state.
-In this case, the largest $M$ that allows 90\% of the actors to be
+$M_\texttt{D} = 40$, for four actors in some steady state. This,
+scaling actor \texttt{A} beyond 10 consecutive iterations will cause
+its dynamic I/O requirements to exceed the data cache. Therefore, the
+largest $M$ that allows 90\% of the actors to be
 scaled without violating the cache constraints is 10.
 Similarly, to allow for the safe scaling of 75\% of the actors, the
 largest factor we can choose is 20.
@@ -60,7 +64,7 @@ multiplicity factor across a wide range of values,
 and measured the resulting performance. We found that
 increasing the threshold beyond 90\% leads to marginal
 performance gains. Due to the limited space we cannot include all of
-the data that was collected. However, the interested reader can find
+the collected data. However, the interested reader can find
 the data in a thesis by one of the authors~\cite{janis-thesis}.
 
 Note that our algorithm for adjusting the multiplicity of a steady
