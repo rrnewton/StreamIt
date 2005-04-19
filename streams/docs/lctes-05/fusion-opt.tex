@@ -3,23 +3,23 @@
 
 A salient characteristic of stream programs is the use of FIFO
 channels to communicate between parallel components.  Such channels
-make explicit the communication between filters, allowing execution to
+make explicit the communication between actors, allowing execution to
 proceed in parallel or out-of-order so long as items are produced
 before they are consumed.  FIFO channels also provide a natural
 abstraction for the programmer, as complex modules can be assembled
 from a set of small, reusable components.  For these reasons, it is
 important to optimize the performance of communication channels.  An
 efficient implementation enables a high-level abstraction for
-composing filters without sacrificing performance.
+composing actors without sacrificing performance.
 
 Buffer management in StreamIt is more involved than some other stream
 languages, due to the {\tt peek} operation.  The {\tt peek} operation
-allows a filter to access an item on its input channel without
+allows a actor to access an item on its input channel without
 removing the item from the channel (removal is done via the {\tt pop}
 operation).  The {\tt peek} functionality is very important for
-components such as FIR (Finite Impulse Response) filters that access
+components such as FIR (Finite Impulse Response) actors that access
 data over a sliding window.  Because a given data item is accessed by
-multiple iterations of the filter, there must be a persistent buffer
+multiple iterations of the actor, there must be a persistent buffer
 that stores items across executions.  In the context of a
 uniprocessor, efficient buffer management translates to efficient
 maintenance and addressing of this buffer in memory.  On a parallel
@@ -42,8 +42,8 @@ Our study is done in the context of a synthetic benchmark, shown in
 Figure~\ref{fig:code-orig}.  
 %As depicted in Figure~\ref{fig:code-graph}, 
 The benchmark is a pipeline consisting of a simple source and an FIR
-filter.  On each iteration, the source pushes a single item.  The FIR
-filter calculates a weighted sum over {\tt PEEK} items of the input,
+actor.  On each iteration, the source pushes a single item.  The FIR
+actor calculates a weighted sum over {\tt PEEK} items of the input,
 then pops a single item from the channel.  In our experiments, we vary
 the {\tt PEEK} value from 1 to 128 items.
 
@@ -54,14 +54,14 @@ the {\tt PEEK} value from 1 to 128 items.
 Figure~\ref{fig:code-modulation} illustrates a fused version of the
 benchmark using modulation for buffer management.  For simplicity, we
 illustrate each buffer management strategy as a source-to-source
-transformation in StreamIt.  Each fused filter contains a {\tt
-prework} function in which the source filter executes several times to
+transformation in StreamIt.  Each fused actor contains a {\tt
+prework} function in which the source actor executes several times to
 prime the communication channel with initial items, as well as a {\tt
 work} function that represents the steady-state execution.
 
 The modulation scheme uses a traditional circular-buffer approach.
 Three variables are introduced: a {\tt BUFFER} to hold all items
-transfered between the filters, a {\tt push\_index} to indicate the
+transfered between the actors, a {\tt push\_index} to indicate the
 buffer location that will be written next, and a {\tt pop\_index} to
 indicate the buffer location that will be read next (i.e., the
 location corresponding to {\tt peek(0)}).  The communication
@@ -78,10 +78,10 @@ peek(i)    ==>  BUFFER[(pop_index + i) % BUF_SIZE]
 \noindent The StreamIt compiler converts the modulo operations to
 bitwise-and operations by scaling the buffer to a power of two.  Note
 that if there are no {\tt peek} operations, then the buffer will be
-empty following each execution of the downstream filter.  In this
+empty following each execution of the downstream actor.  In this
 case, the indices can be reset to zero at the start of each execution
 and the modulo operations can be eliminated.  However, in our example
-the FIR filter does perform peeking, so the modulo operations are
+the FIR actor does perform peeking, so the modulo operations are
 needed.
 
 {\bf Experimental setup.}  Figures~\ref{fig:buf-arm},~\ref{fig:buf-p3}
@@ -92,7 +92,7 @@ execution time per $10^7$ outputs for the synthetic benchmark
 (Figure~\ref{fig:code-orig}) across a range of {\tt PEEK} values.  To
 ensure a fair comparison with the scalar replacement optimization
 (Section~\ref{sec:scalar-replacement}), all loops in the original
-filter are fully unrolled.
+actor are fully unrolled.
 
 {\bf Evaluation.}  The time required for the modulation strategy
 increases linearly with the peek rate.  This is expected, as there is
@@ -120,7 +120,7 @@ a local {\tt TEMP\_BUFFER}.  All subsequent operations reference the
 {\tt TEMP\_BUFFER}, and the live items are copied back to the {\tt
 BUFFER} upon completion.  While these two variables could also be
 combined into a single buffer, keeping them separate results in a
-smaller live data set when the filter is not executing.
+smaller live data set when the actor is not executing.
 
 The communication primitives are translated as follows:
 {\scriptsize
@@ -152,8 +152,8 @@ approach.
 The first optimization enabled by the copy-shift scheme is dubbed {\it
 scalar replacement}.  In contrast to the modulation scheme, the
 copy-shift approach can result in array operations that access the
-same location on every execution of the filter.  The idea behind
-scalar replacement is to fully unroll the loops in the filter, thereby
+same location on every execution of the actor.  The idea behind
+scalar replacement is to fully unroll the loops in the actor, thereby
 resolving each array index to an integer literal.  Then, since each
 location is fully resolved at compile time, an $n$-length array can be
 replaced by a set of $n$ scalar variables: one for each item in the
@@ -172,7 +172,7 @@ are independent in memory, thereby facilitating this optimization.
 
 Note that scalar replacement can only be applied when array indices
 can be resolved to compile-time constants.  In the presence of unpredictable
-control flow within a filter, or if the loops are too large to fully unroll,
+control flow within a actor, or if the loops are too large to fully unroll,
 then scalar replacement does not apply.
 
 {\bf Evaluation.}  Compared to an unoptimized copy-shift strategy,
@@ -183,8 +183,8 @@ modest gains on our synthetic benchmark.  At the maximum peek rate of
 respectively; these speedups are rougly uniform across all peek rates.
 On the Itanium~2, speedups range from 5\% to 58\% depending on the
 peek rate.  We conjecture that scalar replacement is more critical for
-small filters that perform only a few operations.  Due to the high
-communication-to-computation ratio in such filters, there could be
+small actors that perform only a few operations.  Due to the high
+communication-to-computation ratio in such actors, there could be
 large gains from register-allocating and copy-propagating the
 temporary variables.
 
@@ -192,21 +192,21 @@ temporary variables.
 
 A final optimization of the copy-shift strategy uses execution scaling
 to dramatically decrease the overhead associated with copying the
-buffer contents on each iteration.  In any filter, the number of items
+buffer contents on each iteration.  In any actor, the number of items
 inspected on one execution that need to be saved for the next
 execution is $(\mbox{\it peek} - \mbox{\it pop})$.  This represents
 the number of items copied by the copy-shift scheme.  However, this
 cost can be amortized by scaling the number of executions of the
-downstream filter in the fused code.  By enclosing the body of the
-filter in a loop, the $\mbox{\it peek}$ and $\mbox{\it pop}$ rates can
+downstream actor in the fused code.  By enclosing the body of the
+actor in a loop, the $\mbox{\it peek}$ and $\mbox{\it pop}$ rates can
 be made arbitrarily large, while $(\mbox{\it peek} - \mbox{\it pop})$
 remains constant.
 
 Thus, execution scaling reduces the fraction of time spent copying to
 an arbitrarily small level.  In our study, we scale the executions of
-a filter until $(\mbox{\it peek} - \mbox{\it pop}) \leq \frac{1}{4}
+a actor until $(\mbox{\it peek} - \mbox{\it pop}) \leq \frac{1}{4}
 \mbox{\it pop}$.  In the synthetic benchmark, this implies that each
-filter body executes 16 times before the buffer contents are shifted.
+actor body executes 16 times before the buffer contents are shifted.
 The code resulting from this transformation is shown in
 Figure~\ref{fig:code-scaling}.
 
@@ -239,7 +239,7 @@ speedup over the original copy-shift approach.
 \subsection{Summary}
 
 We conclude that copy-shift with execution scaling is the best buffer
-management strategy for filters that utilize peeking.  This is
+management strategy for actors that utilize peeking.  This is
 somewhat surprising because the unoptimized copy-shift strategy has
 large overheads that result in a slowdown relative to a circular
 buffer with modulation.  However, by leveraging the flexibility of the
@@ -251,7 +251,7 @@ Itanium~2.
 
 %% \subsection{Reusing Intermediate Storage Variables}
 
-%% Once loops have been unrolled, filters have been fused into a
+%% Once loops have been unrolled, actors have been fused into a
 %% partition and arrays have been replaced with scalar variables we can
 %% find approximations of live ranges for the new variables and use this
 %% information to reduce stack space required by the partition's work
