@@ -24,46 +24,6 @@
 \caption{Evaluation benchmark suite.}
 \end{table}
 
-\begin{figure}
-\nocaptionrule
-\begin{minipage}{3.35in}
-\psfig{figure=arm1.eps,width=3.4in}
-\vspace{-14pt}
-\caption{Summary of results on a StrongARM.\protect\label{fig:arm-perf}}
-~ \\
-
-\psfig{figure=p3-1.eps,width=3.4in}
-\vspace{-14pt}
-\caption{Summary of results on a Pentium~3\protect\label{fig:p3-perf}}
-~ \\
-
-\psfig{figure=i2-1.eps,width=3.4in}
-\vspace{-14pt}
-\caption{Summary of results on an Itanium~2\protect\label{fig:i2-perf}}
-~ \\
-\end{minipage}
-\end{figure}
-
-\begin{figure}
-\nocaptionrule
-\begin{minipage}{3.35in}
-\psfig{figure=arm2.eps,width=3.4in}
-\vspace{-14pt}
-\caption{Impact of each optimization on a StrongARM.\protect\label{fig:arm-perf2}}
-~ \\
-
-\psfig{figure=p3-2.eps,width=3.4in}
-\vspace{-14pt}
-\caption{Impact of each optimization on a Pentium~3.\protect\label{fig:p3-perf2}}
-~ \\
-
-\psfig{figure=i2-2.eps,width=3.4in}
-\vspace{-14pt}
-\caption{Impact of each optimization on an Itanium~2.\protect\label{fig:i2-perf2}}
-~ \\
-\end{minipage}
-\end{figure}
-
 In this section we evaluate the merits of the proposed cache-aware
 optimizations and buffer management strategies.  We use three
 different architectures: a 137MHz StrongARM-1110, a 600~MHz Pentium~3
@@ -104,6 +64,26 @@ filter outputs will repeatedly evict the state variables of the
 filter, thereby making it worthwhile to further fill the data cache.
 This observation leads yields up to 25\% improvement on some
 benchmarks.
+
+\begin{figure}
+\nocaptionrule
+\begin{minipage}{3.35in}
+\psfig{figure=arm1.eps,width=3.4in}
+\vspace{-14pt}
+\caption{Summary of results on a StrongARM.\protect\label{fig:arm-perf}}
+~ \\
+
+\psfig{figure=p3-1.eps,width=3.4in}
+\vspace{-14pt}
+\caption{Summary of results on a Pentium~3\protect\label{fig:p3-perf}}
+~ \\
+
+\psfig{figure=i2-1.eps,width=3.4in}
+\vspace{-14pt}
+\caption{Summary of results on an Itanium~2\protect\label{fig:i2-perf}}
+~ \\
+\end{minipage}
+\end{figure}
 
 \paragraph*{Overall Speedup} 
 The overall speedups offered by our techniques are illustrated in
@@ -173,6 +153,26 @@ ofdm}, where two large filters are fused despite a very low
 communication to computation ratio, thereby lessening the impact of
 eliminated memory accesses while nonetheless worsening the instruction
 locality.
+
+\begin{figure}
+\nocaptionrule
+\begin{minipage}{3.35in}
+\psfig{figure=arm2.eps,width=3.4in}
+\vspace{-14pt}
+\caption{Impact of each optimization on a StrongARM.\protect\label{fig:arm-perf2}}
+~ \\
+
+\psfig{figure=p3-2.eps,width=3.4in}
+\vspace{-14pt}
+\caption{Impact of each optimization on a Pentium~3.\protect\label{fig:p3-perf2}}
+~ \\
+
+\psfig{figure=i2-2.eps,width=3.4in}
+\vspace{-14pt}
+\caption{Impact of each optimization on an Itanium~2.\protect\label{fig:i2-perf2}}
+~ \\
+\end{minipage}
+\end{figure}
 
 \paragraph*{Impact of Each Optimization}
 To better understand the overall speedups, we assess the individual
@@ -244,8 +244,7 @@ The buffer optimization applied in Figures~\ref{fig:arm-perf},
 this optimization, the cache-aware fusion algorithm is modified so
 that two adjacent filters are never fused if the downstream filter
 performs any peeking (i.e., it has $\mbox{\it peek} > \mbox{\it
-pop}$).  After we apply execution scaling to the granularity-adjusted
-actors, we apply buffer expansion.  The live items are copied to the
+pop}$).  Following execution scaling, the live items are copied to the
 start of the buffer once per scaled execution, thereby reducing the
 overhead of copying live items.  Optimized buffer management offers
 the largest gains for {\tt filterbank2}: 45\% on StrongARM, 38\% on
