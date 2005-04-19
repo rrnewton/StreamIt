@@ -11,8 +11,8 @@ working set requirements as we scale a steady state.
 \mbox{} ~~~~// {\it Returns a multiplicity factor for steady state $S$} \\
 \mbox{} ~~~~// - $C_D$ is the data cache size\\
 \mbox{} ~~~~// - $\alpha$ is the fraction of $C_D$ dedicated for I/O $(0 < \alpha)$\\
-\mbox{} ~~~~// - $p$ is the desired percentile of all actors that are\\
-\mbox{} ~~~~// satisfied by chosen multiplicity $(0 < p \le 1$)\\
+\mbox{} ~~~~// - $p$ is the desired percentile of all actors to be\\
+\mbox{} ~~~~// satisfied by the chosen multiplicity $(0 < p \le 1$)\\
 \mbox{} ~~~~{\bf calculateMultiplicity}($S$, $C_D$, $\alpha$, $p$) \{\\
 \mbox{} ~~~~~~~{\bf create} $\mt{array}$ of size $|S|$ and {\bf initialize} all entries to 0\\
 \mbox{} ~~~~~~~{\bf for} $i$ = 1 to $|S|$ \{ \\
@@ -21,6 +21,7 @@ working set requirements as we scale a steady state.
 \mbox{} ~~~~~~~~~~$C = \alpha \times (C_D - \mt{State}(X))$\\
 %\mbox{} ~~~~~~~~~~// estimate I/O requirements\\
 %\mbox{} ~~~~~~~~~~$d = \mt{IO}(X)$\\
+\mbox{} ~~~~~~~~~~// account for the I/O requirements and
 \mbox{} ~~~~~~~~~~// calculate largest possible scaling for $X$\\
 \mbox{} ~~~~~~~~~~$M_X = \lfloor C / \mt{IO}(X) \rfloor$\\
 \mbox{} ~~~~~~~~~~// array indexed from 0 \\
@@ -84,4 +85,4 @@ and measured the resulting performance. We found that
 increasing the threshold beyond 90\% leads to marginal
 performance gains. Due to the limited space we cannot include all of
 the collected data. However, the interested reader can find
-the data in a thesis by one of the authors~\cite{janis-thesis}.
+the results in a thesis by one of the authors~\cite{janis-thesis}.
