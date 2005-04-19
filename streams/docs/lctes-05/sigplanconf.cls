@@ -421,6 +421,9 @@
 
 \renewcommand{\tiny}{\@setfontsize{\tiny}{5pt}{6pt}}
 
+\newcommand{\FusionFigA}{\@setfontsize{\FusionFigA}{5.9pt}{6.9pt}}
+\newcommand{\FusionFig}{\@setfontsize{\FusionFig}{6.2pt}{7.2pt}}
+
 \renewcommand{\scriptsize}{\@setfontsize{\scriptsize}{7pt}{8pt}}
 
 \renewcommand{\small}{%

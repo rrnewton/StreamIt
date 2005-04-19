@@ -1,4 +1,5 @@
 \begin{figure}[t]
+\nocaptionrule
 %% \begin{minipage}{1.7in}
 %% \centering
 %% \psfig{figure=fusion-pipeline.eps,width=0.7in}
@@ -6,9 +7,9 @@
 %% \caption{Stream graph for a synthetic buffer test.\protect\label{fig:code-graph}}
 %% \end{minipage}
 %% \hspace{0.3in}
-\begin{minipage}{1.6in}
+\begin{minipage}{1.5in}
 \centering
-{\scriptsize
+{\FusionFigA
 \begin{verbatim}
 void->void pipeline BufferTest {
   add Source();                 
@@ -39,7 +40,7 @@ float->void filter FIR {
 \end{minipage}
 ~~\vrule~
 \begin{minipage}{1.5in}
-{\scriptsize
+{\FusionFigA
 \begin{verbatim}
 void->void filter BufferTest {       
   int PEEK = 4;                      
