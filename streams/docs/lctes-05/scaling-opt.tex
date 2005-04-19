@@ -1,16 +1,16 @@
-We have already alluded to multiplicity scaling in previous
+We have already alluded to execution scaling in previous
 sections. As the instruction cache model shows, increasing the number
-of consecutive firings of the same actor leads to lower miss
-rates. However, scaling increases the data buffers that are maintained
-between actors. Thus it is prudent that we account for the data
-working set requirements as we scale a steady state.
+of consecutive firings of the same actor leads to lower instruction
+cache miss rates. However, scaling increases the data buffers that are
+maintained between actors. Thus it is prudent that we account for the
+data working set requirements as we scale a steady state.
 
 \begin{figure}[t]
 \begin{center}
 \framebox{\parbox{3.25in}{
 \mbox{} ~~~~// {\it Returns a multiplicity factor for steady state $S$} \\
 \mbox{} ~~~~// - $C_D$ is the data cache size\\
-\mbox{} ~~~~// - $\alpha$ is the fraction of $C_D$ dedicated for I/O $(0 < \alpha)$\\
+\mbox{} ~~~~// - $\alpha$ is the fraction of $C_D$ dedicated for I/O\\%$(0 < \alpha)$\\
 \mbox{} ~~~~// - $p$ is the desired percentile of all actors to be\\
 \mbox{} ~~~~// satisfied by the chosen multiplicity $(0 < p \le 1$)\\
 \mbox{} ~~~~{\bf calculateMultiplicity}($S$, $C_D$, $\alpha$, $p$) \{\\
@@ -43,10 +43,41 @@ multiplicity factor, with the constraint that only a small percentage
 of the actors overflow the data cache. Our two-staged algorithm is
 outlined in Figure~\ref{fig:scaling-algo}.
 
-{\it First}, The algorithm calculates the largest
-possible multiplicity  
-for every actor in the steady state. To do this, it
-adjusts the effective cache size that is reserved for an actor's
+First, the algorithm calculates the largest possible scaling factor
+for every actor in the steady state. To do this, it calculates the
+amount of data produced by each actor firing and divides the available
+data cache size by this data production rate. In addition, the
+algorithm can toggle the effective cache size to account for various
+eviction policies.
+
+Second, it chooses the largest
+factor that allows a fraction ($p$) of the steady state actors to be
+scaled safely (i.e., the cache is adequate for their I/O
+requirements).  For example, the algorithm might calculate
+$M_\texttt{A} = 10$,
+$M_\texttt{B} = 20$, 
+$M_\texttt{C} = 30$, and 
+$M_\texttt{D} = 40$, for four actors in some steady state. Thus,
+scaling actor \texttt{A} beyond 10 consecutive iterations will cause
+its dynamic I/O requirements to exceed the data cache. Therefore, the
+largest $M$ that allows $p=90\%$ of the actors to be
+scaled without violating the cache constraints is 10.
+Similarly, to allow for the safe scaling of $p=75\%$ of the actors, the
+largest factor we can choose is 20.
+
+In our implementation, we use the 90-10 heuristic. In other words, we
+set $p=90\%$. We empirically determined this value via a series of
+experiments using our benchmark suite. Specifically, we varied the
+multiplicity factor across a wide range of values,
+and measured the resulting performance. We found that
+increasing the threshold beyond 90\% leads to marginal
+performance gains. Due to the limited space we cannot include all of
+the collected data. However, the interested reader can find
+the results in a thesis by one of the authors~\cite{janis-thesis}.
+
+
+Note that our algorithm adjusts the effective cache size that is
+reserved for an actor's 
 dynamic working set (i.e., data accessed via {\tt pop} and {\tt
 push}). This adjustment allows us to control the fraction of the cache
 that is used for reading and writing data---and affords some
@@ -61,28 +92,3 @@ organization, but also dependent on the instruction  working
 set size, and the  I/O properties of the actors in the steady
 state; this is an interesting issue that warrants further
 investigation.
-
-{\it Second}, it chooses the largest
-factor that allows a fraction ($p$) of the steady state actors to be
-scaled safely (i.e., the cache is adequate for their I/O
-requirements).  For example, the algorithm might calculate
-$M_\texttt{A} = 10$,
-$M_\texttt{B} = 20$, 
-$M_\texttt{C} = 30$, and 
-$M_\texttt{D} = 40$, for four actors in some steady state. Thus,
-scaling actor \texttt{A} beyond 10 consecutive iterations will cause
-its dynamic I/O requirements to exceed the data cache. Therefore, the
-largest $M$ that allows 90\% of the actors to be
-scaled without violating the cache constraints is 10.
-Similarly, to allow for the safe scaling of 75\% of the actors, the
-largest factor we can choose is 20.
-
-In our implementation, we use the 90-10 heuristic. In other words, we
-set $p=90\%$. We empirically determined this value via a series of
-experiments using our benchmark suite. Specifically, we varied the
-multiplicity factor across a wide range of values,
-and measured the resulting performance. We found that
-increasing the threshold beyond 90\% leads to marginal
-performance gains. Due to the limited space we cannot include all of
-the collected data. However, the interested reader can find
-the results in a thesis by one of the authors~\cite{janis-thesis}.
