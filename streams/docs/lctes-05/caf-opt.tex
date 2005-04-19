@@ -19,7 +19,7 @@ firing of \texttt{A} and two firings of \texttt{B}. If other terms, the work
 function for actor \texttt{F} inlines the work functions of
 actors \texttt{A} and \texttt{B}.
 
-When two actors are fused, their executions are scaled such that output
+When two actors are fused, their executions are scaled such that the output
 rate of one actor matches the input rate of the next. In the example,
 \texttt{A} and \texttt{B} represent a producer-consumer pair of
 filters within a pipeline, with filter \texttt{A}  
@@ -27,15 +27,15 @@ pushing two items per firing, and \texttt{B} poping one item per
 firing. The fusion implicitly scales the execution of \texttt{B} so
 that it runs twice for every firing of \texttt{A}.
 
-Fusion is important because it leads to coarser grained actors with
-I/O rates that are more closely matched to their
-neighbors. Furthermore, the fused actors themselves become the target
-the execution scaling which results in better producer-consumer locality.
+%Fusion is important because it leads to coarser grained actors with
+%I/O rates that are more closely matched to their
+%neighbors. Furthermore, the fused actors themselves become the target
+%the execution scaling which results in better producer-consumer locality.
 
 Fusion also reduces the overhead of switching between
 work functions. In our infrastructure, the steady state is a loop that
 invokes the work functions via method calls. Thus, every pair of fused
-actors eliminates one half of the method calls. The impact on
+actors eliminates a method call (per invocation of the actors). The impact on
 performance can be significant, but not only because method calls are
 removed: the fusion of two actors also enables the compiler to
 optimize across function boundaries. In particular, for actors that
@@ -57,24 +57,28 @@ cache aware specifically because it is cognisant of the instruction
 and data factors.
 
 The CAF algorithm uses a greedy fusion heuristic to select the set of
-actors to fuse. It will continuously fuse actors until the addition of
+actors to fuse. It continuously fuses actors until the addition of
 a new actor causes the fused actor to exceed {\it either} the instruction cache
 capacity, or a fraction of the data cache capacity. For the latter, we
 allow the state of the new fused actor to occupy up to 50\% of the
 data cache capacity.
 
-The algorithm  leverages the hierarchical nature of the StreamIt
-language. It sorts the filter in ascending order based on their I/O
-rates, and then processes the filters in that order. It will first
-attempt to fuse the filter (with the lowest I/O rate) to its upstream 
-and downstream neighbors: a filter with a low pop count is fused
-upstream, and a filter with low push count is fused downstream. The
-algorithm then expands the fused filter 
-in both directions until it can no longer satisfy either of the
-instruction or data memory constraints. It then selects the filter
-with the next lowest I/O rate (as long as it is not already fused) and
-repeats the process. Once it can no longer fuse filters, it tries to fuse
-splitjoins, and subsequently, it terminates.
+The algorithm leverages the hierarchical nature of the stream graph,
+starting at the leaf nodes and working upwards.  For pipeline streams,
+the algorithm identifies the connection in the pipeline with the
+highest steady-state I/O rate, i.e., the pair of filters that
+communicate the most number of items per steady state.  These filters
+are fused if the instruction and data cache constraints are respected.
+To prevent fragmentation of the pipeline, each fused filter is further
+fused with its upstream and downstream neighbors so long as the
+constraints are met.  The algorithm then repeats this process with the
+next highest-bandwidth connection in the pipeline, continuing until no
+more filters can be fused.  For splitjoin streams, the CAF algorithm
+fuses all parallel branches together if the combination satisfies the
+instruction and data constraints.  Partial fusion of a splitjoin is
+not helpful, as the child streams do not communicate directly with
+each other; however, complete combination can enable further fusion in
+parent pipelines.
 
 %% This differs from that in
 %% \cite{streamit-asplos} in that the algorithm
