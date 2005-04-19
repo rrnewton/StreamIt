@@ -1,4 +1,5 @@
 \begin{figure*}
+\nocaptionrule
 \begin{minipage}{2.2in}
 \psfig{figure=arm-buf.eps,width=2.2in}
 \caption{Performance of buffer management strategies on a StrongARM.\protect\label{fig:buf-arm}}
@@ -15,9 +16,9 @@
 \end{minipage}
 \vspace{18pt}
 \hrule
-\begin{minipage}[t]{2.1in}
+\begin{minipage}[t]{2.25in}
 %% copy-shift
-{\scriptsize
+{\FusionFig
 \begin{verbatim}
 
 
@@ -65,7 +66,7 @@ void->void filter BufferTest {
 ~~\vrule~~
 \begin{minipage}[t]{2in}
 %% copy-shift + scalar-replacement
-{\scriptsize
+{\FusionFig
 \begin{verbatim}
 
 
@@ -111,9 +112,9 @@ void->void filter BufferTest {
 \caption{Copy-shift with scalar-replacement.\protect\label{fig:code-scalar-replace}}
 \end{minipage}
 ~~\vrule~~
-\begin{minipage}[t]{2.1in}
+\begin{minipage}[t]{2.25in}
 %% copy-shift + scaling
-{\scriptsize
+{\FusionFig
 \begin{verbatim}
 
 

@@ -29,8 +29,8 @@ In this section, we explore two basic strategies for buffer management
 in stream programs.  The first strategy, termed {\it modulation},
 implements a traditional circular buffer that is indexed by wraparound
 head and tail pointers.  The second strategy, termed {\it copy-shift},
-is a new approach that elides modulo operations by shifting the buffer
-contents after each operation.  We demonstrate that, while a naive
+is a new approach that avoids modulo operations by shifting the buffer
+contents after each execution.  We demonstrate that, while a naive
 implementation of copy-shift can be up to 2X slower than modulation,
 optimizations that utilize execution scaling can boost the performance
 of copy-shift to be significantly faster than modulation (geometric
@@ -67,7 +67,7 @@ buffer location that will be written next, and a {\tt pop\_index} to
 indicate the buffer location that will be read next (i.e., the
 location corresponding to {\tt peek(0)}).  The communication
 primitives are translated as follows: 
-{\small
+{\scriptsize
 \begin{verbatim}
 push(val); ==>  BUFFER[push_index] = val;
                 push_index = (push_index + 1) % BUF_SIZE;
@@ -120,7 +120,7 @@ combined into a single buffer, keeping them separate results in a
 smaller live data set when the filter is not executing.
 
 The communication primitives are translated as follows:
-{\small
+{\scriptsize
 \begin{verbatim}
 push(val); ==>  TEMP_BUFFER[push_index] = val;
                 push_index = push_index + 1;
