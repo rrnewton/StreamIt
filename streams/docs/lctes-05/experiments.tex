@@ -249,7 +249,7 @@ start of the buffer once per scaled execution, thereby reducing the
 overhead of copying live items.  Optimized buffer management offers
 the largest gains for {\tt filterbank2}: 45\% on StrongARM, 38\% on
 Pentium~3, and 36\% on Itanium~2.  This is due to a large peek rate
-(100 items) in addition a large global multiplicity of 300 that
+(100 items) in addition a large scaling factor of 300 that
 amortizes the cost of copying items.
 
 While we found that {\tt cutpeek} is, on average, the best buffer

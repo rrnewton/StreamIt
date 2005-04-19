@@ -18,11 +18,11 @@ steady state exceeds a typical instruction cache size.
 From these observations, it is evident that we must {\it scale} the
 execution of filters in the steady state in order to improve temporal
 locality. In other words, rather than running a filter $n$ times per
-steady state, we increase its {\it multiplicity} to $M \times n$ 
-times.
+steady state, we scale it to run $M \times n$ times.
+
 %% (e.g., the loop bound for \verb+A_work+ is
 %% changed to $\texttt{M} \times 4$ in the example shown earlier). 
-We term $M$ the {\it multiplicity factor}.
+We term $M$ the {\it scaling factor}.
 
 The obvious question is: to what extent can we scale the execution of
 filters in the steady state? The answer is non-trivial because
