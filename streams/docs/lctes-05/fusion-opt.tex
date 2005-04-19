@@ -29,13 +29,12 @@ In this section, we explore two basic strategies for buffer management
 in stream programs.  The first strategy, termed {\it modulation},
 implements a traditional circular buffer that is indexed by wraparound
 head and tail pointers.  The second strategy, termed {\it copy-shift},
-is a new approach that avoids modulo operations by shifting the buffer
-contents after each execution.  We demonstrate that, while a naive
-implementation of copy-shift can be up to 2X slower than modulation,
-optimizations that utilize execution scaling can boost the performance
-of copy-shift to be significantly faster than modulation (geometric
-means of 110\% speedup on the Pentium~3 and 57\% speedup on the
-Itanium~2).
+avoids modulo operations by shifting the buffer contents after each
+execution.  We demonstrate that, while a naive implementation of
+copy-shift can be 2X to 3X slower than modulation, optimizations that
+utilize execution scaling can boost the performance of copy-shift to
+be significantly faster than modulation (51\% speedup on StrongARM,
+48\% speedup on Pentium~3, and 5\% speedup on Itanium~2).
 
 \input{fusion-fig1}
 
@@ -46,7 +45,7 @@ The benchmark is a pipeline consisting of a simple source and an FIR
 filter.  On each iteration, the source pushes a single item.  The FIR
 filter calculates a weighted sum over {\tt PEEK} items of the input,
 then pops a single item from the channel.  In our experiments, we vary
-the {\tt PEEK} value from 1 to 121 items.
+the {\tt PEEK} value from 1 to 128 items.
 
 \input{fusion-fig2}
 
@@ -85,30 +84,34 @@ and the modulo operations can be eliminated.  However, in our example
 the FIR filter does perform peeking, so the modulo operations are
 needed.
 
-{\bf Experimental setup.}  Figures~\ref{fig:buf-p3}
+{\bf Experimental setup.}  Figures~\ref{fig:buf-arm},~\ref{fig:buf-p3}
 and~\ref{fig:buf-itanium} illustrate the performance of various buffer
-management strategies on a Pentium~3 and an Itanium~2, respectively.
-The figures illustrate the execution time per output for the synthetic
-benchmark (Figure~\ref{fig:code-orig}) across a range of {\tt PEEK}
-values.  Performance is normalized to the modulation strategy with
-{\tt PEEK=1}.  To ensure a fair comparison with the scalar replacement
-optimization (Section~\ref{sec:scalar-replacement}), all loops in the
-original filter are fully unrolled.
+management strategies on a 137Mhz StrongARM-1110, a 600Mhz Pentium~3
+and a 1.3Ghz Itanium~2, respectively.  The figures illustrate the
+execution time per $10^7$ outputs for the synthetic benchmark
+(Figure~\ref{fig:code-orig}) across a range of {\tt PEEK} values.  To
+ensure a fair comparison with the scalar replacement optimization
+(Section~\ref{sec:scalar-replacement}), all loops in the original
+filter are fully unrolled.
 
 {\bf Evaluation.}  The time required for the modulation strategy
 increases linearly with the peek rate.  This is expected, as there is
-a constant overhead per peek operation.
+a constant overhead per peek operation.  Relative to the other
+strategies, modulation performs noticeably better on the Itanium~2.
+We attribute this to the six integer units on the Itanium~2; since
+there is not much additional work in this benchmark, it can likely
+process the modulo operations in parallel with other operations using
+software pipelining.
 
 \subsection{Copy-Shift}
 
 The copy-shift strategy, illustrated in Figure~\ref{fig:copy-shift},
-is a novel approach that shifts the live items to the front of the
-buffer at the beginning of each execution.  Because each execution
-starts writing and reading to the buffer at the same location, there
-is no need for the indices to wraparound and the modulo operations can
-be eliminated.  This savings is compounded by additional optimizations
-enabled by the copy-shift approach, as described in the subsequent
-sections.
+shifts the live items to the front of the buffer at the beginning of
+each execution.  Because each execution starts writing and reading to
+the buffer at the same location, there is no need for the indices to
+wraparound and the modulo operations can be eliminated.  This savings
+is compounded by additional optimizations enabled by the copy-shift
+approach, as described in the subsequent sections.
 
 However, the cost of this strategy comes in the copying operations: at
 the start of each execution, $(\mbox{\it peek} - \mbox{\it pop})$
@@ -133,14 +136,15 @@ peek(i)    ==>  TEMP_BUFFER[pop_index + i]
 references the {\tt TEMP\_BUFFER} and does not perform modulo
 operations.
 
-{\bf Evaluation.}  As shown in Figures~\ref{fig:buf-p3}
-and~\ref{fig:buf-itanium}, the unoptimized copy-shift strategy is the
-slowest strategy that we evaluate.  Though the cost per peek operation
-is smaller than the modulation scheme, the copying overhead per
-iteration also grows with the peek rate and cancels out any savings;
-overall, copy-shift performs up to 2X slower than modulation.  The
-following sections describe optimizations that can justify taking the
-copy-shift approach.
+{\bf Evaluation.}  As shown in
+Figures~\ref{fig:buf-arm},~\ref{fig:buf-p3} and~\ref{fig:buf-itanium},
+the unoptimized copy-shift strategy is the slowest strategy that we
+evaluate.  Though the cost per peek operation is smaller than the
+modulation scheme, the copying overhead per iteration also grows with
+the peek rate and cancels out any savings; overall, copy-shift
+performs from 2X to 3X slower than modulation.  The following sections
+describe optimizations that can justify taking the copy-shift
+approach.
 
 \subsection{Copy-Shift with Scalar Replacement}
 \label{sec:scalar-replacement}
@@ -156,7 +160,7 @@ replaced by a set of $n$ scalar variables: one for each item in the
 buffer.  This transformation is illustrated in
 Figure~\ref{fig:code-scalar-replace}.
 
-Scalar replacement offers several performance benefits.\\ Scalar
+Scalar replacement offers several performance benefits. Scalar
 variables can be register allocated, and as local variables they are
 subject to a range of dataflow optimizations (constant propagation,
 copy propagation, dead code elimination, etc.).  Replacing array
@@ -172,11 +176,13 @@ control flow within a filter, or if the loops are too large to fully unroll,
 then scalar replacement does not apply.
 
 {\bf Evaluation.}  Compared to an unoptimized copy-shift strategy,
-Figures~\ref{fig:buf-p3} and~\ref{fig:buf-itanium} illustrate that
-scalar replacement offers modest gains on our synthetic benchmark.  On
-the Pentium~3, improvements range from 16\% to 36\%, while on the
-Itanium~2, improvements range from 3\% to 62\% (depending on the peek
-rate).  We conjecture that scalar replacement is more critical for
+Figures~\ref{fig:buf-arm},~Figures~\ref{fig:buf-p3}
+and~\ref{fig:buf-itanium} illustrate that scalar replacement offers
+modest gains on our synthetic benchmark.  At the maximum peek rate of
+128, the StrongARM and Pentium~3 offer speedups of 16\% and 26\%,
+respectively; these speedups are rougly uniform across all peek rates.
+On the Itanium~2, speedups range from 5\% to 58\% depending on the
+peek rate.  We conjecture that scalar replacement is more critical for
 small filters that perform only a few operations.  Due to the high
 communication-to-computation ratio in such filters, there could be
 large gains from register-allocating and copy-propagating the
@@ -209,19 +215,26 @@ cannot be used in combination with scalar replacement.  If the loops
 were unrolled to resolve the array indices, there could be a negative
 impact on the instruction cache.
 
-{\bf Evaluation.}  As shown in Figure~\ref{fig:buf-p3}, the copy-shift
-approach with execution scaling performs significantly better than
-modulation on the Pentium~3.  Speedups range from 61\% to 189\%, with a
-geometric mean of 110\%.  This makes sense, as each peek operation is
-cheaper due to the eliminated modulo operations (implemented as
-bitwise-and in the modulation scheme), while the overhead from copying
-is reduced to a fraction of the original copy-shift approach.  
+{\bf Evaluation.}  As shown in Figures~\ref{fig:buf-arm}
+and~\ref{fig:buf-p3}, the copy-shift approach with execution scaling
+performs significantly better than modulation on the StrongARM and
+Pentium~3.  At the maximum peek rate of 128, the StrongARM exhibits a
+51\% speedup while the Pentium~3 shows a 48\%.  These speedups make
+sense, as each peek operation is cheaper due to the eliminated modulo
+operations (implemented as bitwise-and in the modulation scheme),
+while the overhead from copying is reduced to a fraction of the
+original copy-shift approach.
 
-The gains are also sizable on the Itanium~2, as shown in
-Figure~\ref{fig:buf-itanium}.  Speedups range from 11\% to 618\%
-(where {\tt PEEK=1}), with a geometric mean of 57\%.  Keep in mind
-that these are speedups of copy-shift with scaling over modulation;
-the speedups over unoptimized copy-shift are even greater.
+The gains are less substantial on Itanium~2, where the speedup at
+$\mbox{\it peek} = 128$ is only 5\% (Figure~\ref{fig:buf-i2}).  We
+attribute this to the relatively high performance of the modulation
+approach on Itanium~2; due to the six parallel integer units, the
+bitwise-and operation can perhaps be run in parallel and does not
+increase the critical path of the program.  This balance might be
+different in programs with higher integer workloads within the actors.
+Still, copy-shift with execution scaling does no worse than modulation
+(on any architecture), and execution scaling always offers a large
+speedup over the original copy-shift approach.
 
 \subsection{Summary}
 
@@ -231,9 +244,10 @@ somewhat surprising because the unoptimized copy-shift strategy has
 large overheads that result in a slowdown relative to a circular
 buffer with modulation.  However, by leveraging the flexibility of the
 parallel stream graph to perform execution scaling, the overheads are
-amortized and there are significant speedups (geometric means of 110\%
-on the Pentium~3 and 57\% on the Itanium~2) over a plain circular buffer
-strategy.
+amortized.  Compared to a plain circular buffer strategy, there are
+significant improvements on StrongARM (51\% speedup) and Pentium~3
+(48\% speedup) with respectable performance (5\% speedup) on
+Itanium~2.
 
 %% \subsection{Reusing Intermediate Storage Variables}
 
