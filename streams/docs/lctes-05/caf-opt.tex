@@ -1,1 +1,120 @@
+In StreamIt, the granularity of actors is determined by the
+application developer, according to 
+the most natural representation of an algorithm. When compiling to a
+cache-based architecture, the presence of a  large number of actors
+exacerbates the transition-overhead between work functions.
+It is the role of the compiler  to adjust the granularity of
+the stream graph to mitigate the execution overhead.
+
+In this section we describe an actor coarsening technique we refer to
+as {\it cache aware fusion} (CAF). When two actors are fused, they
+form a new actor whose work function is equivalent to its constituents.
+For example, let an actor \texttt{A} fire $n$
+times, and an actor \texttt{B} fire $2n$ times per steady:
+$S^n=(\texttt{A}^n\texttt{B}^n\texttt{B}^n)$. A new actor \texttt{F}
+that is formed by fusing \texttt{A} and \texttt{B} results in
+\texttt{F} firing $n$ times per steady state $(S^n=(\texttt{F}^n))$, but
+each execution of \texttt{F} is equivalent to  one 
+firing of \texttt{A} and two firings of \texttt{B}. If other terms, the work
+function for actor \texttt{F} inlines the work functions of
+actors \texttt{A} and \texttt{B}.
+
+When two actors are fused, their executions are scaled such that output
+rate of one actor matches the input rate of the next. In the example,
+\texttt{A} and \texttt{B} represent a producer-consumer pair of
+filters within a pipeline, with filter \texttt{A}  
+pushing two items per firing, and \texttt{B} poping one item per
+firing. The fusion implicitly scales the execution of \texttt{B} so
+that it runs twice for every firing of \texttt{A}.
+
+Fusion is important because it leads to coarser grained actors with
+I/O rates that are more closely matched to their
+neighbors. Furthermore, the fused actors themselves become the target
+the execution scaling which results in better producer-consumer locality.
+
+Fusion also reduces the overhead of switching between
+work functions. In our infrastructure, the steady state is a loop that
+invokes the work functions via method calls. Thus, every pair of fused
+actors eliminates one half of the method calls. The impact on
+performance can be significant, but not only because method calls are
+removed: the fusion of two actors also enables the compiler to
+optimize across function boundaries. In particular, for actors that
+exchange only a few data items, the compiler can allocate the data
+streams to registers. 
+%For example, in the example above, the values
+%produced by \texttt{A} may be passed to \texttt{B} via registers, rather
+%than through memory. 
+The data channel between fused actors is
+subject to special buffer management techniques as described in the
+next section.
+
+There are, however, downsides to fusion. First, as more and more actors are
+fused, the instruction footprint can dramatically increase, possibly
+leading to poor use of the instruction cache. Second, fusion also
+increases the data footprint when the fused actors maintain state
+(e.g., coefficient arrays and lookup tables). Our fusion algorithm is
+cache aware specifically because it is cognisant of the instruction
+and data factors.
+
+The CAF algorithm uses a greedy fusion heuristic to select the set of
+actors to fuse. It will continuously fuse actors until the addition of
+a new actor causes the fused actor to exceed {\it either} the instruction cache
+capacity, or a fraction of the data cache capacity. For the latter, we
+allow the state of the new fused actor to occupy up to 50\% of the
+data cache capacity.
+
+The algorithm  leverages the hierarchical nature of the StreamIt
+language. It sorts the filter in ascending order based on their I/O
+rates, and then processes the filters in that order. It will first
+attempt to fuse the filter (with the lowest I/O rate) to its upstream 
+and downstream neighbors: a filter with a low pop count is fused
+upstream, and a filter with low push count is fused downstream. The
+algorithm then expands the fused filter 
+in both directions until it can no longer satisfy either of the
+instruction or data memory constraints. It then selects the filter
+with the next lowest I/O rate (as long as it is not already fused) and
+repeats the process. Once it can no longer fuse filters, it tries to fuse
+splitjoins, and subsequently, it terminates.
+
+%% This differs from that in
+%% \cite{streamit-asplos} in that the algorithm
+%% only considers vertical fusion (i.e., within a pipeline): horizontal
+%% fusion is not beneficial from caching perspective. \framebox{Expand on this} \framebox{Emphasize order:  fuse then scale.}
+%Second, since the 
+%graph partitioning is limited to
+%horizontal cuts, our actor coarsening optimizations employs a greedy
+%algorithm instead of a dynamic programing methodology; this reduces
+%compilation time. 
+
+%% \begin{figure*}[t]
+%% \begin{verbatim}
+%% Pipeline:
+
+%% Calculate number of partitions required for each child.
+%% If for any child this is >1 then remember those partitions.
+
+%% For each sequence (i..j) of children where for each child 
+%% number of partitions is 1.
+
+%% Interval(i,j) = "
+%%     Find maximum bandwidth connection between children. (k, k+1)
+%%     Consider partition (k..k+1) 
+%%     If partition (k..k+1) does not satisfy the requirement then
+%%         Call Interval(i,k) and Interval(k+1,j) to find two sets of partitions.
+
+%%     Else Start with (k, k+1) fused try fusing up or down
+%%         until can not fuse up and down let this be (l, m)
+%%         Remember (l..m) as a partition.
+%%         Use Interval(i,l) and Interval(m,j) to find partitions."
+
+%% SplitJoin:
+
+%% Consider splitter/joiner and all branches in a single partition.
+%% If this satisfies requirements then return a single partion
+%% else remember partitions corresponding to each branch as final
+%% partitions.
+%% \end{verbatim}
+%% \caption{Pseudocode of a greedy algorithm to find partitions}
+%% \label{fig:greedy}
+%% \end{figure*}
 
