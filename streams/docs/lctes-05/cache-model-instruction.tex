@@ -58,8 +58,9 @@ the following step function:
 In the equation, $C_I$ represents a constant proportional to the
 instruction cache size. 
 
-Using the instruction miss ($\mt{IMISS}$) metric in
-Equation~\ref{eq:imiss}, we can estimate the instruction-cache miss
+Using 
+%the instruction miss ($\mt{IMISS}$) metric in
+Equation~\ref{eq:imiss}, we can estimate the instruction miss
 rate ($\mt{IMR}$) of a steady state as: 
 \begin{equation}
 \label{eq:imr}
@@ -85,7 +86,6 @@ miss predicted for the first occurrence of actor \texttt{B} since
 $\mt{phase}(S_1,4)=(\texttt{BAAB})$ and 
 $\mt{IRD}(S_1, 4)>C_I$. Thus, $\mt{IMR}(S_1)=2/4$ whereas for the
 following variant $S_2=(\texttt{ABAB})$, $\mt{IMR}(S_2)=1$.
-
 In the case of $S_2$, we know that since the combined
 instruction working sets of the actors exceed the cache size, when
 actor \texttt{B} is fired following \texttt{A}, it evicts part of
@@ -119,7 +119,7 @@ rates. Similarly,
 we may also scale the execution of the actors in the steady state to
 improve locality and cache performance. A scaled steady state has a
 greater number of length-two phases (i.e., a phase of 2 elements and
-he shortest possible reuse distance). 
+the shortest possible reuse distance). 
 
 We represent a scaled execution of the steady state as
 $S^M=(w_1^M\dots w_n^M)$: the steady state $S$ is scaled by a
