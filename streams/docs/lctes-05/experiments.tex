@@ -55,13 +55,13 @@ compuation pattern for the sake of benchmarking by simply replacing
 every floating point type with an integer type.
 
 We also made an additional modification in compiling to the StrongARM:
-our execution scaling heuristic scales filters until their output
+our execution scaling heuristic scales actors until their output
 fills 100\% of the data cache, rather than 2/3 of the data cache as
 described in Section~\ref{sec:cache-opt}.  This modification accounts
 for the 32-way set-associative L1 data cache in the StrongARM.  Due to
 the high degree of associativity, there is a smaller chance that the
-filter outputs will repeatedly evict the state variables of the
-filter, thereby making it worthwhile to further fill the data cache.
+actor outputs will repeatedly evict the state variables of the
+actor, thereby making it worthwhile to further fill the data cache.
 This observation leads yields up to 25\% improvement on some
 benchmarks.
 
@@ -89,16 +89,16 @@ benchmarks.
 The overall speedups offered by our techniques are illustrated in
 Figure~\ref{fig:arm-perf} (StrongARM), Figure~\ref{fig:p3-perf}
 (Pentium~3), and \ref{fig:p3-perf} (Itanium~2).  These graphs have two
-bars: one for ``full fusion'', in which all filters are fused into a
+bars: one for ``full fusion'', in which all actors are fused into a
 single function (with scalar replacement), and one labelled {\tt
 CAF+scaling+buffer}, representing all of our optimizations (cache
 aware fusion, execution scaling, and buffer optimizations) applied
 together.  We include the comparison to full fusion because it
 represents a simple approach for eliminating function call overhead
-and optimizing across filter boundaries; while this fusion strategy
+and optimizing across actor boundaries; while this fusion strategy
 utilizes our scalar replacement optimization, it remains oblivious to
 instruction and data locality.  Performance is normalized to
-unoptimized StreamIt, in which no filters are fused (but there is
+unoptimized StreamIt, in which no actors are fused (but there is
 still unrolling by 128).  On the right of each graph, both arithmetic
 and geometric means are shown for the benchmarks.  We usually speak in
 terms of the arithmetic means as they are more intuitive (and also
@@ -132,7 +132,7 @@ benchmarks on the Pentium~3 and 5 benchmarks on the Itanium~2.
 Performance on any architecture is a tradoeff between two factors: 1)
 the benefit of data and instruction locality, and 2) the benefit of
 fusion, which reduces memory accesses due to improved register
-allocation across filter boundaries.  Compared to the StrongARM, the
+allocation across actor boundaries.  Compared to the StrongARM, the
 Pentium~3 and Itanium~2 offer an L2 cache (as well as a larger L1 data
 cache), thereby lessening the impact of locality-enhancing cache
 optimizations.  However, the fusion benefit remains a significant
@@ -146,12 +146,12 @@ due to the large penalty for cache misses.
 
 The cache-aware fusion algorithm can be adjusted to account for the
 caching hierarchy on desktop machines.  Specifically, if cache-aware
-fusion is modified to allow fused filters to consume up to one half of
+fusion is modified to allow fused actors to consume up to one half of
 the L2 cache (rather than L1 cache), then the performance of cache
 optimizations is closer or equal to full fusion, for cases it was
 previously trailing on Pentium~3 or Itanium~2 (data not shown).  The
 only benchmark that is negatively impacted by this change is {\tt
-ofdm}, where two large filters are fused despite a very low
+ofdm}, where two large actors are fused despite a very low
 communication to computation ratio, thereby lessening the impact of
 eliminated memory accesses while nonetheless worsening the instruction
 locality.
@@ -186,10 +186,10 @@ four bars per benchmark; as in the previous analysis, all performance
 is normalized to unoptimized StreamIt (with 128-way unrolling).  The
 first bar, labeled {\tt scaling}, applies only execution scaling.  The
 second bar, labeled {\tt CAF}, applies only cache-aware fusion,
-including scalar replacement across the fused filters.  The third bar,
+including scalar replacement across the fused actors.  The third bar,
 labeled {\tt CAF+scaling}, first applies cache-aware fusion with
 scalar replacement and then applies execution-scaling to the
-granularity-adjusted filters.  The fourth bar, labeled {\tt
+granularity-adjusted actors.  The fourth bar, labeled {\tt
 CAF+scaling+buffer}, additionally applies buffer management
 optimizations (detailed later); this bar is equivalent to the ``best''
 cache-optimized performance illustrated in Figures~\ref{fig:arm-perf},
@@ -197,15 +197,15 @@ cache-optimized performance illustrated in Figures~\ref{fig:arm-perf},
 
 Execution scaling improves performance over unoptimized StreamIt, with
 average speedups of 145\% for StrongARM, 58\% for Pentium~3, and 57\%
-for Itanium~2.  {\bf [[refs to scaling charts?]]}.  The 90-10
-heuristic works quite well and there is only one instance where
-scaling results in a performance degradation. The granularity-adjusted
-\texttt{3gpp} on StrongARM has a 17\% slowdown due to scaling (compare
-{\tt CAF} to {\tt CAF+scaling} in Figure~\ref{fig:arm-perf}).  This is
-possibly due to items in flight between the granularity-adjusted
-actors overwriting the state of an executing actor in the data cache.
-Since StrongARM has no L2 cache then such eviction can be quite
-expensive.
+for Itanium~2.  The 90-10 heuristic works quite well
+(see~\cite{janis-thesis} for full details) and there is only one
+instance where scaling results in a performance degradation. The
+granularity-adjusted \texttt{3gpp} on StrongARM has a 17\% slowdown
+due to scaling (compare {\tt CAF} to {\tt CAF+scaling} in
+Figure~\ref{fig:arm-perf}).  This is possibly due to items in flight
+between the granularity-adjusted actors overwriting the state of an
+executing actor in the data cache.  Since StrongARM has no L2 cache
+then such eviction can be quite expensive.
 
 Independently, cache-aware fusion also improves performance by 84\% on
 StrongARM, 101\% on Pentium~3 and a 103\% on the Itanium~2.
@@ -224,11 +224,11 @@ This is because some actors are implicity scaled by fusion to match
 input/output rates of succesive actors within a fused block.
 
 Note that the \texttt{ofmd} benchmark does not benefit from fusion or
-scaling. This is because \texttt{ofmd} has few filters, some of which
+scaling. This is because \texttt{ofmd} has few actors, some of which
 consume and produce a total of 16-66Kb data; consequently, execution
 scaling does not apply.  Also there is limited oportunity to fuse
-filters within \texttt{ofmd}, as there are filters that have an
-instruction size of 9Kb and fusing them with other filters would
+actors within \texttt{ofmd}, as there are actors that have an
+instruction size of 9Kb and fusing them with other actors would
 exceed the instruction cache.
 
 The last bar, {\tt CAF+scaling+buffer}, illustrates the benefit of
@@ -265,7 +265,7 @@ peek}} - \mbox{\it pop}$ remains constant; scaling continues until the
 {\it pop} rate is at least $4*(\mbox{{\it peek}} - \mbox{{\it pop}})$.
 Like {\tt cutpeek}, this serves to amortize the overhead of copy-shift
 buffer management, but it can also hamper the execution scaling
-optimization.  Because certain other filters in the graph must fire
+optimization.  Because certain other actors in the graph must fire
 more frequently to compensate for the scaled peeking filter, there is
 less room for global execution scaling.  The only other case where
 {\tt peekscale} is the best strategy is for {\tt ofdm} on StrongARM,
@@ -274,84 +274,3 @@ where there is a 7\% improvement over {\tt cutpeek}.  Finally, on the
 unoptimized copy-shift buffer management.  We also evaluated buffer
 management using modulation for indexing, but this did not yield the
 best performance for any benchmark or platform.
-
-%% \texttt{CAF+scaling} is our baseline for evaluating optimized buffer 
-%% management strategies. In \texttt{CAF+scaling} the live items are 
-%% copied to the beginning of the buffer after every execution of a filter 
-%% that has $peek>pop$.
-
-%% \texttt{CAF+scaling+peekscale} strategy replaces filters that have
-%% $peek>pop$ with an equivalent filter that executes the original filter 
-%% multiple times to make sure that $pop$ is at least $4*(peek-pop)$.
-%% This reduces the overhead of copying live items, since we only copy live 
-%% items once after each execution of the scaled actor.
-
-%% \texttt{CAF+scaling+mod} strategy uses modular buffers for channels where 
-%% downstream filter has $peek>pop$.
-
-%% \texttt{CAF+scaling+cutpeek} modifies the CAF algorithm so that two 
-%% adjacent filters are never fused if the downstream filter has 
-%% $peek>pop$. After we apply multiplicity scaling to the 
-%% granularity adjusted actors we apply buffer expansion. The 
-%% live items are copied to the start of the buffer once after executing 
-%% the granularity adjusted actor for the number of times that is equal 
-%% to the global multiplicity scaling. This reduces the overhead of 
-%% copying live items.
-
-%% \texttt{CAF+scaling+cutpeek+mod} also modifies the CAF algorithm so 
-%% that two adjacent filters are never fused if the downstream filter has 
-%% $peek>pop$ and modular buffers are used for channels 
-%% where downstream filter has $peek>pop$.
-
-%% We found that on average \texttt{CAF+scaling+cutpeek} works best across 
-%% the 3 platforms and this is the buffer optimizatio included in our 
-%% performance numbers. However, \texttt{CAF+scaling+peekscale} is the 
-%% best strategy for fmradio benchmark and our baseline \texttt{CAF+scaling} 
-%% is best for the filterbank benchmark.
-
-%% The Itanium~2 has less speedup possibly
-%% because of data and instruction prefetch instructions generated by the 
-%% \texttt{ecc} compiler.
-
-%% By comparsion, the scaling results on the 
-%% Itanium are more uniform, and in fact, scaling does not degrade the
-%% performance of any of the benchmarks in suite. 
-
-%% The discrepancy between
-%% the Pentium and Itanium results is likely due to the in-order
-%% nature of the latter. Unlike the Pentium which can tolerate a cache
-%% miss by issuing instructions out-of-order, the Itanium pipeline stalls
-%% when an outstanding memory request is not serviced in time for
-%% its consuming instruction to execute. The Itanium VLIW architecture
-%% therefore places a greater emphasis on the memory hierarchy, and our
-%% locality enhancing optimizations help to bridge the gap between
-%% processor and memory speeds.
-
-%% whereas it improved the performance of the applications on the Itanium.
-
-%% a few benchmarks on both platforms.
-%% A performance degradation as a result of fusion is generally caused by
-%% an increase in the buffer management overhead. 
-
-
-%% Note that our benchmark suite
-%% includes two implementations of \texttt{FFT}. The first is a
-%% fine-grained implementation (\texttt{fft-fine}) and the other is a
-%% coarse-grained implementation (\texttt{fft-coarse}). The former
-%% benefits more from our cache-aware fusion because there is greater
-%% versatility in fusing filters to achieve balanced actors. On the other hand
-%% a coarse grained implementation restricts the amount of fusion that
-%% can be performed and increases the burden for more efficient buffer
-%% management. 
-
-
-%% In the case of \texttt{fft-coarse}, the scalar-replacement
-%% strategy regains nearly 30-70\% of the performance when applied in
-%% conjunction with fusion.
-
-%% In this case, the granularity-adjusted actors
-%% are scaled to maximize cache locality. In addition, the scalar replacement
-%% and copy-shift in conjunction with scaling helps to reduce the overhead of 
-%% moving data between actors. As a result, the performance gains can be quite
-%% dramatic, ranging up to a 5800\% speedup for \texttt{bitonic} on Pentium~3
-%% and up to a 6400\% speedup for \texttt{bitonic} on Itanium~2.

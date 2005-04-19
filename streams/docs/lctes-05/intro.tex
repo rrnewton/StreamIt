@@ -72,7 +72,7 @@ mapping streaming computation to cache-based architectures (Section~\ref{sec:cac
 In terms of improving the data cache behavior, the compiler schedules
 actor firing such that the producer-consumer locality is
 preserved. Furthermore,  the compiler may {\it fuse}
-together two or more actors to form a coarser grained kernel.
+together two or more actors to form a coarser grained actor.
 The fusion allows for better register allocation as we can sometimes
 perform {\it scalar replacement}: arrays used to buffer data between 
 the actors are broken down into a set of local scalar variables.
@@ -99,13 +99,10 @@ alternatives (for buffer management) and evaluates their performance
 
 %% the comment about p3 and itanium not being embedded architectures
 %% is out of the blue! need a better transition.
-Cache-aware fusion alone delivers significant performance gains,
-although our evaluation shows that fusion with execution scaling leads
-to the best performance on a general purpose, cache-based
-architecture. For our experiments, we use three different processors:
-a StrongARM 1110, a Pentium~3, and an Itanium~2.  The StrongARM
-represents an embedded processor in which cache optimizations are very
-important due to the absence of an L2 cache.  The other processors are
+For our experiments, we use three different processors: a StrongARM
+1110, a Pentium~3, and an Itanium~2.  The StrongARM represents an
+embedded processor in which cache optimizations are very important due
+to the absence of a secondary cache.  The other processors are
 general-purpose desktop machines, the Pentium~3 representing
 performance on a superscalar out-of-order processor and the Itanium~2
 representing a VLIW processor.  Execution scaling gives a 145\%
