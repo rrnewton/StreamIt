@@ -39,17 +39,36 @@ working set requirements as we scale a steady state.
 
 Our approach is to scale the entire steady state by a single
 multiplicity factor, with the constraint that only a small percentage
-of the actors overflow the data cache. Our algorithm is outlined in
-Figure~\ref{fig:scaling-algo}. First, it calculates the largest
-possible multiplicity 
-for every actor in the steady state. Second, it chooses the largest
+of the actors overflow the data cache. Our two-staged algorithm is
+outlined in Figure~\ref{fig:scaling-algo}.
+
+{\it First}, The algorithm calculates the largest
+possible multiplicity  
+for every actor in the steady state. To do this, it
+adjusts the effective cache size that is reserved for an actor's
+dynamic working set (i.e., data accessed via {\tt pop} and {\tt
+push}). This adjustment allows us to control the fraction of the cache
+that is used for reading and writing data---and affords some
+flexibility in targeting various cache organizations.  For example,
+architectures with highly associative and multilevel caches may benefit
+from scaling up the effective cache size (i.e., $\alpha > 1$), whereas
+a direct mapped cache that is more prone to conflicts may benefit from
+scaling down the cache (i.e., $alpha < 1$). In our implementation, we
+found $\alpha=2/3$ to work well. However, we note that tuning the
+effective cache size is not only dependent on the underlying cache
+organization, but also dependent on the instruction  working
+set size, and the  I/O properties of the actors in the steady
+state; this is an interesting issue that warrants further
+investigation.
+
+{\it Second}, it chooses the largest
 factor that allows a fraction ($p$) of the steady state actors to be
 scaled safely (i.e., the cache is adequate for their I/O
 requirements).  For example, the algorithm might calculate
 $M_\texttt{A} = 10$,
 $M_\texttt{B} = 20$, 
 $M_\texttt{C} = 30$, and 
-$M_\texttt{D} = 40$, for four actors in some steady state. This,
+$M_\texttt{D} = 40$, for four actors in some steady state. Thus,
 scaling actor \texttt{A} beyond 10 consecutive iterations will cause
 its dynamic I/O requirements to exceed the data cache. Therefore, the
 largest $M$ that allows 90\% of the actors to be
@@ -66,19 +85,3 @@ increasing the threshold beyond 90\% leads to marginal
 performance gains. Due to the limited space we cannot include all of
 the collected data. However, the interested reader can find
 the data in a thesis by one of the authors~\cite{janis-thesis}.
-
-Note that our algorithm for adjusting the multiplicity of a steady
-state adjusts the effective cache size that is reserved for an actor's
-dynamic working set (i.e., data accessed via {\tt pop} and {\tt
-push}). This adjustment allows us to control the fraction of the cache
-that is used for reading and writing data---and affords some
-flexibility in targeting various cache organizations.  For example,
-architectures with highly associative and multilevel caches may benefit
-from scaling up the effective cache size (i.e., $\alpha > 1$), whereas
-a direct mapped cache that is more prone to conflicts may benefit from
-scaling down the cache (i.e., $alpha < 1$). In our implementation, we
-found $\alpha=2/3$ to work well. However, we note that tuning the
-effective cache size is not only dependent on the underlying cache
-organization, but also dependent on the instruction  working
-set size, and the  I/O properties of the actors in the steady
-state; this is an interesting issue that warrants further investigation.
