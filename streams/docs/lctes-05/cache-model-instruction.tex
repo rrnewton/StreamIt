@@ -1,0 +1,165 @@
+\subsection{Instruction Cache}
+
+A steady state execution is a sequence of actor firings
+$S=(w_1\ldots w_n)$, and a
+{\it program execution} corresponds to one or more repetitions of the
+steady state. We use the notation $S[i]=w$ to refer to the
+work function $w$ that is fired at logical time $i$, and $|S|$ to
+denote the length of the sequence. 
+
+Our cache model is simple in that it considers each actor in the
+steady state sequence, and determines whether one or more misses are
+bound to occur. The miss determination is based on the 
+the {\it instruction reuse distance} ($\mt{IRD}$), which is equal to
+the number of unique instructions that are referenced between two
+executions of the actor under consideration (as they appear in the
+schedule). The steady state is a 
+compact representation of the whole program execution, and thus, we
+simply account for the misses within a steady state, and generalize
+the result to the whole program. Within a steady state, an actor is
+charged a miss penalty only if the number of referenced instructions
+since the last execution (of the same actor)
+is greater than the instruction cache capacity.
+
+Formally, let $P=\mt{phase}(S,i)$, for $1\le i\le|S|$ represent a
+subsequence of $S$,  
+formed such that 
+\[ 
+P[1]=S[i], P[2]=S[i+1], \ldots, P[k]=S[i+k-1]=S[i],
+\]
+and $k$ is the minimum index for which the above property holds. 
+In other words, a phase is subsequence of $S$ that starts and ends
+with the same actor, and there are no interveaning occurences of the
+same actor within the phase. Note that because the steady state
+execution is cyclic, the 
+construction of the subsequence is allowed to wrap around the steady
+state\footnote{In other words, the subsequence is formed from a new
+sequence $S'=S|S$ where $|$ represents concatenation.}. For example,
+the steady state $S_1=(\texttt{AABB})$ has
+$\mt{phase}(S_1,1)=(\texttt{AA})$ and
+$\mt{phase}(S_1,2)=(\texttt{ABBA})$.
+
+Let $I(w)$ equal the code size of work function $w$, and
+\[
+\mt{IRD}(S,i)=\sum_j I(S[j])
+\]
+over all distinct actors occurring in
+$\mt{phase}(S,i)$. We can then determine if a specific work function will
+result in an instruction cache miss (on its next firing) by evaluating
+the following step function:
+\begin{equation}
+\label{eq:imiss}
+  \mt{IMISS}(S,i) =
+    \begin{cases}
+      0& \text{if $\mt{IRD}(S,i) \leq C_I$; hit: no cache refill,}\\
+      1& \text{otherwise; miss: (some) cache refill.}
+    \end{cases}
+\end{equation}
+In the equation, $C_I$ represents a constant proportional to the
+instruction cache size. 
+
+Using the instruction miss ($\mt{IMISS}$) metric in
+Equation~\ref{eq:imiss}, we can estimate the instruction-cache miss
+rate ($\mt{IMR}$) of a steady state as: 
+\begin{equation}
+\label{eq:imr}
+  \mt{IMR}(S) = \frac{1}{|S|}\sum_{j=1}^{|S|} \mt{IMISS}(S,j).
+\end{equation}
+
+The cache model allows us to rank the quality of an
+execution ordering: schedules that boost temporal locality
+result in miss rates closer to zero, and schedules that do not
+exploit temporal locality result in miss rates closer to one.
+
+For example, assuming equal sized actors for the steady
+state $S_1$ (shown earlier) such that
+$I(\texttt{A})=I(\texttt{B})=\lceil{C_I/2}\rceil+1$, then the
+combined instruction working 
+sets exceed the instruction cache. Therefore, 
+we expect to suffer a miss at the start of every
+steady state because $\mt{IRD}(S_1, 2)>C_I$ (i.e., the reuse distance
+from the last execution of \texttt{A} at $i=2$ to the next execution
+of \texttt{A}---at $i=1$ of the next steady state---is greater than the cache
+size). Similarly, there is a 
+miss predicted for the first occurrence of actor \texttt{B} since
+$\mt{phase}(S_1,4)=(\texttt{BAAB})$ and 
+$\mt{IRD}(S_1, 4)>C_I$. Thus, $\mt{IMR}(S_1)=2/4$ whereas for the
+following variant $S_2=(\texttt{ABAB})$, $\mt{IMR}(S_2)=1$.
+
+In the case of $S_2$, we know that since the combined
+instruction working sets of the actors exceed the cache size, when
+actor \texttt{B} is fired following \texttt{A}, it evicts part of
+actor \texttt{A}'s instruction working set. Hence when we transition
+back to fire actor \texttt{A}, we have to refetch certain
+instructions, but in the process, we replace parts of actor
+\texttt{B}'s working set. In terms of our model, $\mt{IRD}(S_2,j)>C_I$
+for every actor in the sequence, i.e. $1\le j\le|S_2|$.
+
+Note that the
+amount of refill is proportional to the number of cache lines that are
+replaced when swapping actors, and as such, we may wish to adjust
+our cache miss step function ($\mt{IMISS}$). One simple variation is to allow for
+some partial replacement without unduly penalizing the overall value
+of the metric. Namely, we can allow the constant $C_I$ to be some
+fraction greater than the actual cache size. Alternatively, we can use
+a more complicated miss function with a more uniform probability
+distribution.
+
+\paragraph*{Temporal Locality} In our model, the concept of improving
+temporal locality translates to deriving a steady state where, in the
+best case, each actor has only one phase that is longer than two
+elements. For example, a permutation of the actors in $S_2$ (where all
+phases are of length three) that improves temporal locality
+will result in $S_1$, which we have shown has a relatively lower miss rate.
+
+
+\paragraph*{Scaling} A permutation of actor firings within a steady
+can improve temporal locality and concomitantly lead to lower miss
+rates. Similarly, 
+we may also scale the execution of the actors in the steady state to
+improve locality and cache performance. A scaled steady state has a
+greater number of length-two phases (i.e., a phase of 2 elements and
+he shortest possible reuse distance). 
+
+We represent a scaled execution of the steady state as
+$S^M=(w_1^M\dots w_n^M)$: the steady state $S$ is scaled by a
+multiplicity factor $M$, which translates to $M-1$ additional firings of
+each actor. For example, scaling $S_1$ by a factor of two results in
+$S_1^2=(\texttt{\underline{A}A\underline{A}A\underline{B}B\underline{B}B})$
+and scaling $S_2$ by the same amount results in 
+$S_2^2=(\texttt{\underline{A}A\underline{B}B\underline{A}A\underline{B}B})$;
+the underlined actors constitute the unscaled steady state.
+
+From Equation~\ref{eq:imiss}, we observe that length-two  phases do
+not impact the instruction miss rate  as long as the size of the actor's 
+instruction working set  is smaller than the cache
+size; we assume this is always the case. Therefore, scaling has the
+effect of preserving the pattern of 
+miss occurrences while also lengthening the steady state. Mathematically,
+we can rewrite Equation~\ref{eq:imr} as:
+\begin{equation}
+\label{eq:imrM}
+  \mt{IMR}(S, M) = \frac{1}{|S|\times M}\sum_{j=1}^{|S|} \mt{IMISS}(S,j).
+\end{equation}
+In other words, the miss rate is inversely proportional to the
+multiplicity factor.
+\begin{figure}[t]
+\begin{center}
+  \psfig{figure=fftf-mult2.eps, width=\columnwidth}
+% \nocaptionrule
+  \caption{Impact of multiplicity scaling on performance.}
+ \label{fig:scaling-data}
+\end{center}
+\end{figure}
+
+In Figure~\ref{fig:scaling-data} we show a
+representative curve relating the scaling factor to overall
+performance. The data corresponds to a fine-grained implementation of 
+a Fast Fourier Transform (FFT) running on a Pentium~3 architecture. The
+x-axis represents the scaling factors (with increasing values from
+left to right). The y-axis represents the execution time and is an
+indirect indicator of the miss rate (the two measures are positively
+correlated). The execution time improves in accord with our model: 
+the running time is shortened as the scaling factor grows larger. There
+is however an eventual degradation, and as the sequel will show, it is 
+attributed to the data cache performance.

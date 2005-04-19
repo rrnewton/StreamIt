@@ -1,0 +1,80 @@
+We have already alluded to multiplicity scaling in previous
+sections. As the instruction cache model shows, increasing the number
+of consecutive firings of the same actor leads to lower miss
+rates. However, scaling increases the data buffers that are maintained
+between actors. Thus it is prudent that we account for the data
+working set requirements as we scale a steady state.
+
+\begin{figure}[t]
+\begin{center}
+\framebox{\parbox{3.25in}{
+\mbox{} \textsc{Algorithm 1.} {\it (Calculate Multiplicity Factor)} \vspace{6pt}\\
+\mbox{} ~~~~// {\it Returns a multiplicity factor for steady state $S$} \\
+\mbox{} ~~~~// - $C_D$ is the data cache size\\
+\mbox{} ~~~~// - $\alpha$ is the fraction of $C_D$ dedicated for I/O $(0 < \alpha)$\\
+\mbox{} ~~~~// - $p$ is the desired percentile of all actors that are\\
+\mbox{} ~~~~// satisfied by chosen multiplicity $(0 < p \le 1$)\\
+\mbox{} ~~~~{\bf calculateMultiplicity}($S$, $C_D$, $\alpha$, $p$) \{\\
+\mbox{} ~~~~~~~{\bf create} $\mt{array}$ of size $|S|$ and {\bf initialize} all entries to 0\\
+\mbox{} ~~~~~~~{\bf for} $i$ = 1 to $|S|$ \{ \\
+\mbox{} ~~~~~~~~~~$X = S[i]$\\
+\mbox{} ~~~~~~~~~~// calculate effective cache size\\
+\mbox{} ~~~~~~~~~~$C = \alpha \times (C_D - \mt{State}(X))$\\
+%\mbox{} ~~~~~~~~~~// estimate I/O requirements\\
+%\mbox{} ~~~~~~~~~~$d = \mt{IO}(X)$\\
+\mbox{} ~~~~~~~~~~// calculate largest possible scaling for $X$\\
+\mbox{} ~~~~~~~~~~$M_X = \lfloor C / \mt{IO}(X) \rfloor$\\
+\mbox{} ~~~~~~~~~~// array indexed from 0 \\
+\mbox{} ~~~~~~~~~~$\mt{array}[i - 1] = M_X$\\
+\mbox{} ~~~~~~~\} \\
+\mbox{} ~~~~~~~{\bf sort} $\mt{array}$ into ascending numerical order\\
+\mbox{} ~~~~~~~$i = \mt{{\bf round}}((1-p) \times (|S| - 1))$ \\
+\mbox{} ~~~~~~~return $\mt{array}[i]$\\
+\mbox{} ~~~~\}
+}}
+\end{center}
+\vspace{-12pt}
+\end{figure}
+
+Our approach is to scale the entire steady state by a single
+multiplicity factor, with the constraint that only a small percentage
+of the actors overflow the data cache. Our algorithm is described in
+Algorithm~1. First, it calculates the largest possible multiplicity
+for every actor in the steady state. Second, it choses the largest
+factor that allows a fraction ($p$) of the steady state actors to be
+scaled safely (i.e., the cache is adequate for their I/O
+requirements).  For example, the algorithm might calculate
+$M_\texttt{A} = 10$,
+$M_\texttt{B} = 20$, 
+$M_\texttt{C} = 30$, and 
+$M_\texttt{D} = 40$, for four actors in some steady state.
+In this case, the largest $M$ that allows 90\% of the actors to be
+scaled without violating the cache constraints is 10.
+Similarly, to allow for the safe scaling of 75\% of the actors, the
+largest factor we can choose is 20.
+
+In our implementation, we use the 90-10 heuristic. In other words, we
+set $p=90\%$. We empirically determined this value via a series of
+experiments using our benchmark suite. Specifically, we varied the
+multiplicity factor across a wide range of values,
+and measured the resulting performance. We found that
+increasing the threshold beyond 90\% leads to marginal
+performance gains. Due to the limited space we cannot include all of
+the data that was collected. However, the interested reader can find
+the data in a thesis by one of the authors~\cite{janis-thesis}.
+
+Note that our algorithm for adjusting the multiplicity of a steady
+state adjusts the effective cache size that is reserved for an actor's
+dynamic working set (i.e., data accessed via {\tt pop} and {\tt
+push}). This adjustment allows us to control the fraction of the cache
+that is used for reading and writing data---and affords some
+flexibility in targeting various cache organizations.  For example,
+architectures with highly associative and multilevel caches may benefit
+from scaling up the effective cache size (i.e., $\alpha > 1$), whereas
+a direct mapped cache that is more prone to conflicts may benefit from
+scaling down the cache (i.e., $alpha < 1$). In our implementation, we
+found $\alpha=2/3$ to work well. However, we note that tuning the
+effective cache size is not only dependent on the underlying cache
+organization, but also dependent on the instruction  working
+set size, and the  I/O properties of the actors in the steady
+state; this is an interesting issue that warrants further investigation.
