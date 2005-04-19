@@ -1,7 +1,7 @@
 \section{Introduction}
 
 
-Stream computing represents an increasingly important class of
+Stream computing represents an increasingly widespread class of
 applications. In streaming codes, there is an abundance of parallelism that
 is easier to extract compared to traditional desktop workloads (e.g.,
 pointer-based computing). As a result, the extraction of parallelism
@@ -26,10 +26,11 @@ workloads. This model serves as a foundation for several {\it cache-aware
 optimizations} that are geared toward the concomitant increase of instruction
 and data {\it temporal locality}. These
 optimization lead to significantly better utilization of the memory
-system, and as such, they deliver
-a speedup of 249\% for our streaming benchmark suite on a StrongARM 
-processor, a speedup of 154\% on a Pentium~3 processor, and a 
-speedup of 152\% on an Itanium~2 processor over unoptimized StreamIt.
+system, and as such, they improve the performance of unoptimized code
+by 249\% for our streaming benchmark suite on an embedded StrongARM 
+processor.   They also offer performance gains on desktop machines:  
+a speedup of 154\% on a Pentium~3 and a speedup of 152\% on an Itanium~2,
+compared to unoptimized code.
 
 %they deliver performance gains ranging from 11\%
 %to 99\% for our streaming benchmark suite.
@@ -52,9 +53,7 @@ computation kernels, and the communication between actors represents
 data buffers that must be streamed to and from the processor. Thus
 the size of an actor and the
 order of actor executions are critical properties that
-impact the performance of the instruction cache. For example, our
-compiler ensures that the actor's code size is not
-greater than the instruction cache. Furthermore, we {\it scale}
+impact the performance of the instruction cache.  In this paper, we {\it scale}
 the execution of the actor so that it runs several times before we move
 on to some other actor in the stream 
 graph. This serves to amortize the cost of fetching the actor's
@@ -65,8 +64,8 @@ improve overall performance. However, as our cache model will show
 cannot arbitrarily scale the execution frequency of an actor. This
 is because actors produce data that must be buffered, and therefore,
 we must also consider the amount of data an actor produces and
-consumes if we are to adequately manage the data cache. This paper is unique
-in that it is the first to present a unified optimization methodology
+consumes if we are to adequately manage the data cache. 
+This paper is one of the first to present a unified optimization methodology
 that simultaneously considers instruction and data locality for
 mapping streaming computation to cache-based architectures (Section~\ref{sec:cache-opt}).
 
@@ -74,9 +73,13 @@ In terms of improving the data cache behavior, the compiler schedules
 actor firing such that the producer-consumer locality is
 preserved. Furthermore,  the compiler may {\it fuse}
 together two or more actors to form a coarser grained kernel.
-The fusion allows for better register allocation as we can
-destroy the arrays used to buffer data between the actors and replace
-the corresponding array references with scalars.  It also allows for
+The fusion allows for better register allocation as we can sometimes
+perform {\it scalar replacement}: arrays used to buffer data between 
+the actors are broken down into a set of local scalar variables.
+Our compiler fuses
+actors only when the resulting actor fits within the instruction cache, 
+as otherwise fusion would negatively impact instruction locality.
+Fusion also allows for
 various competing implementations for managing the buffers between the
 fused actors.  This paper investigates several implementation
 alternatives (for buffer management) and evaluates their performance
@@ -96,34 +99,27 @@ alternatives (for buffer management) and evaluates their performance
 
 %% the comment about p3 and itanium not being embedded architectures
 %% is out of the blue! need a better transition.
-Cache-aware fusion alone delivers significant performance gains, although our
-evaluation shows that fusion with scaling leads to the best
-performance on a general purpose, cache-based architecture. For our
-experiments, we use two different processors: a superscalar out-of-order
-processor, and an in-order VLIW processor. The former is a Pentium~3
-whereas the latter is an Itanium~2. While these architectures are not
-particularly suited for an embedded system, they do exhibit some
-properties that are worthy of investigation. Furthermore, that we can
-demonstrate measurable performance gains on real systems is far more
-convincing than using a simulation-based environment. We chose the
-Pentium~3 processor because it has very few registers in its
-instruction set architecture. The Itanium by contrast has a much 
-larger and richer repertoire of registers. The two architectures serve
-to validate our cache-aware optimizations, in that we expect an
-architecture with more registers to benefit more from optimization such
-as scalar replacement. Fusion with scalar replacement leads to a 
-84\% speedup for our benchmark suite on the StrongARM, a
-101\% speedup on the Pentium~3, and a 103\% speedup on the Itanium~2. 
+Cache-aware fusion alone delivers significant performance gains,
+although our evaluation shows that fusion with execution scaling leads
+to the best performance on a general purpose, cache-based
+architecture. For our experiments, we use three different processors:
+a StrongARM 1110, a Pentium~3, and an Itanium~2.  The StrongARM
+represents an embedded processor in which cache optimizations are very
+important due to the absence of an L2 cache.  The other processors are
+general-purpose desktop machines, the Pentium~3 representing
+performance on a superscalar out-of-order processor and the Itanium~2
+representing a VLIW processor.  Execution scaling gives a 145\%
+speedup over unoptimized StreamIt for our benchmark suite on the
+StrongARM, a 58\% speedup on the Pentium~3 and a 57\% speedup on the
+Itanium~2.  Fusion with scalar replacement leads to a 84\% speedup on
+the StrongARM, a 101\% speedup on the Pentium~3, and a 103\% speedup
+on the Itanium~2.
 
-Scaling gives a 145\% speedup over unoptimized StreamIt for our 
-benchmark suite on the StrongARM, a 58\% speedup on the Pentium~3 and a 
-57\% speedup on the Itanium~2.
-
-While both scaling and fusion lead to modest performance gains, we
-combine the two to deliver a substantial performance improvement. When we
-do so, we can achieve a speedup of 241\% for our benchmark suite on a
-StrongARM, a speedup of 146\% on a Pentium~3, and a speedup of 144\% on 
-an Itanium~2 processor. An optimized buffer management strategy in
+While both execution scaling and fusion lead to frequent performance gains, we
+combine the two to deliver a more consistent performance improvement. When we
+do so, we can achieve an average speedup of 241\% on a
+StrongARM, 146\% on a Pentium~3, and 144\% on 
+an Itanium~2. An optimized buffer management strategy in
 combination with scaling and fusion gives the best possible performance.
 Section~\ref{sec:evaluation} describes our evaluation
 methodology and presents our experimental analysis.
@@ -150,12 +146,12 @@ while not exceeding the instruction cache.
 execution scaling'', which out-performs a traditional rotating buffer
 in a detailed micro-benchmark analysis.
 
-\item A fully automatic implementation of the above techniques in the
-StreamIt compiler.
+\item An experimental evaluation of these techniques using the
+StreamIt compiler and a streaming benchmark suite of eleven programs.
+Compared to unoptimized StreamIt, the cache optimizations deliver an
+average speedup of 249\% on a StrongARM, 154\% on a Pentium~3 and
+152\% on an Itanium~2.
 
-\item An experimental evaluation across 11 streaming benchmarks,
-demonstrating speedup of up to 8830\% on StrongARM, up to 5720\% on Pentium~3 and up to 4780\% 
-on Itanium~2.
 \end{itemize}
 
 %% The remainder of the paper is organized as
