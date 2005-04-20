@@ -125,8 +125,8 @@ needed.
 
 {\bf Experimental setup.}  Figures~\ref{fig:buf-arm},~\ref{fig:buf-p3}
 and~\ref{fig:buf-i2} illustrate the performance of various buffer
-management strategies on a 137Mhz StrongARM-1110, a 600Mhz Pentium~3
-and a 1.3Ghz Itanium~2, respectively.  The figures illustrate the
+management strategies on a 137~Mhz StrongARM-1110, a 600~Mhz Pentium~3
+and a 1.3~Ghz Itanium~2, respectively.  The figures illustrate the
 execution time per $10^7$ outputs for the synthetic benchmark
 (Figure~\ref{fig:code-orig}) across a range of {\tt PEEK} values.  To
 ensure a fair comparison with the scalar replacement optimization
@@ -233,7 +233,7 @@ temporary variables.
 A final optimization of the copy-shift strategy uses execution scaling
 to dramatically decrease the overhead associated with copying the
 buffer contents on each iteration.  In any actor, the number of items
-inspected on one execution that are saved for the next
+inspected on one execution and saved for the next
 execution is $(\mbox{\it peek} - \mbox{\it pop})$.  This represents
 the number of items copied by the copy-shift scheme.  However, this
 cost can be amortized by scaling the number of executions of the
@@ -244,10 +244,10 @@ remains constant.
 
 Thus, execution scaling reduces the fraction of time spent copying to
 an arbitrarily small level.  In our study, we scale the executions of
-an actor until $(\mbox{\it peek} - \mbox{\it pop}) \leq \frac{1}{4}
-\mbox{\it pop}$.  In the synthetic benchmark, this implies that each
-actor body executes 16 times before the buffer contents are shifted.
-The code resulting from this transformation is shown in
+an actor until $(\mbox{\it peek} - \mbox{\it pop}) \leq
+\frac{1}{4}~\mbox{\it pop}$.  In the synthetic benchmark, this implies
+that each actor body executes 16 times before the buffer contents are
+shifted.  The code resulting from this transformation is shown in
 Figure~\ref{fig:code-scaling}.
 
 Note that due to the large loops introduced by execution scaling, it
@@ -269,24 +269,23 @@ The gains are less substantial on Itanium~2, where the speedup at
 $\mbox{\it peek} = 128$ is only 5\% (Figure~\ref{fig:buf-i2}).  We
 attribute this to the relatively high performance of the modulation
 approach on Itanium~2; due to the six parallel integer units, the
-bitwise-and operation can perhaps be run in parallel and does not
-increase the critical path of the program.  This balance might be
-different in programs with higher integer workloads within the actors.
-Still, copy-shift with execution scaling does no worse than modulation
-(on any architecture), and execution scaling always offers a large
-speedup over the original copy-shift approach.
+bitwise-and operation may not increase the critical path.  This
+balance might be different in programs with higher integer workloads
+within the actors.  Still, copy-shift with execution scaling does no
+worse than modulation (on any architecture), and execution scaling
+always offers a large speedup over the original copy-shift approach.
 
 \subsection{Summary}
 
 We conclude that copy-shift with execution scaling is the best buffer
-management strategy for actors that utilize peeking.  This is
-somewhat surprising because the unoptimized copy-shift strategy has
-large overheads that result in a slowdown relative to a circular
-buffer with modulation.  However, by leveraging the flexibility of the
-parallel stream graph to perform execution scaling, the overheads are
+management strategy for actors that utilize peeking.  This is somewhat
+surprising because the unoptimized copy-shift strategy has large
+overheads that result in a slowdown relative to a circular buffer with
+modulation.  However, by leveraging the flexibility of the parallel
+stream graph to perform execution scaling, the overheads are
 amortized.  Compared to a plain circular buffer strategy, there are
 significant improvements on StrongARM (51\% speedup) and Pentium~3
-(48\% speedup) with respectable performance (5\% speedup) on
+(48\% speedup), and respectable performance (5\% speedup) on
 Itanium~2.
 
 %% \subsection{Reusing Intermediate Storage Variables}
