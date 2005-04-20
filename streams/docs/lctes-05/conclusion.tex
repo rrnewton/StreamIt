@@ -4,54 +4,49 @@
 In this paper, we present a simple yet highly effective methodology
 for running streaming programms on common cache-based architectures.
 The work shows that we can exploit the adundant parallelism in
-streaming codes to improve the behavior of the cache-hierarchy and
+streaming codes to improve the behavior of the cache hierarchy and
 deliver significant performance improvements on existing machines. We
 evaluate our methodology on three architectures: the embedded
 StrongARM processor, the superscalar Pentium~3, and the VLIW Itanium~2.
 
 Our optimizations are simple but yield surprisingly big savings in
-performance. First, we introduced {\it execution scaling}: it 
-increases the execution frequency of every actors in the stream
+performance. First, we introduce {\it execution scaling}: it 
+increases the execution frequency of every actor in the stream
 graph. Intuitively, scaling improves instruction  locality because
 it increases the amount of reuse from the instruction
 cache. Concomitantly, it leads to performance gains of 145\% on the
 StrongARM, 58\% on the Pentium~3, and 57\% on the Itanium~2.
-It it worthy to note that execution scaling is a departure from
+It is worthy to note that execution scaling is a departure from
 past optimization strategies for streaming programs, which try to
 minimize buffer requirements. Our scaling transformation actually {\it
 increases} the size of the data buffers between actors.
 
 We also showed that scaling presents a tradeoff between 
-instruction locality and  data cache locality. Using a simple cache
+instruction locality and data locality. Using a simple cache
 model, we show how scaling impacts the instruction and data
-caches. The models serves to motivate a heuristic for calculating the
+caches. The model serves to motivate a heuristic for calculating the
 scaling factor. The heurisitic, which accounts for the size of the
 instruction and data caches, works quite well in practice.
 
-The cache models also motivate another optimization introduced in this
-paper: {\it cache aware fusion}. The fusion optimization helps to
-reduce the data requirements of a program, and can reduce the total
-number of memory requests by as much as 50\%. The fusion of actors in
-the stream graph is carried out judiciously, and our algorithms are
-sensitive to the instruction and data working sets of the coarsened
-execution units, and their impact on the cache hierarchy. Cache aware
-fusion leads to performance gains of 84\% on the StrongARM, 101\% on the
-Pentium~3, and 103\% on the Itanium~2.
+This paper also introduces {\it cache aware fusion}. The fusion
+optimization helps to reduce the data requirements of a program, and
+can reduce the total number of memory requests by as much as 50\%. The
+fusion of actors in the stream graph is carried out judiciously, and
+our algorithms are sensitive to the instruction and data working sets
+of the coarsened execution units, and their impact on the cache
+hierarchy. Cache aware fusion leads to performance gains of 84\% on
+the StrongARM, 101\% on the Pentium~3, and 103\% on the Itanium~2.
 
 Cache aware fusion also enables a set of novel buffer management
 strategies for handling the streams of data between actors. Due to the
-static nature of the stream program, we can apply {\it scalar
+static nature of the stream program, we can often apply {\it scalar
   replacement} to remove array references, and thus communication
 between fused actors is done through registers, rather than through
-memory. Furthermore, to deal with a streaming programs that operate
-over sliding data windows, we introduce {\it copy-shift}, as a novel
-buffer management policy which  out-performs a traditional rotating
-buffer.
+memory.  To allow scalar replacement to apply to sliding window 
+computations, we introduce a {\it copy-shift} buffer management policy
+that out-performs a traditional rotating buffer.
 
 In summary, applying execution scaling, cache aware fusion, and our
-new buffer management strategies, we can improve performance by 249\% on
-the StrongARM, 154\% on the Pentium~3, and 152\% on the Itanium~2.
-
-
-
-
+new buffer management strategies, we can improve performance of
+StreamIt programs by 249\% on the StrongARM, 154\% on the Pentium~3,
+and 152\% on the Itanium~2.
