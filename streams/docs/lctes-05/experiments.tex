@@ -233,7 +233,7 @@ exceed the instruction cache.
 
 The last bar, {\tt CAF+scaling+buffer}, illustrates the benefit of
 buffer management optimizations for filters that peek.  As detailed in
-Section~\ref{sec:fusion-opt}, such filters demand specialized buffer
+Section~\ref{sec:buffer}, such filters demand specialized buffer
 management, as they reuse items on the input tape across successive
 iterations.  In our benchmark suite, peeking occurs only in the last
 four applications (i.e., \texttt{fmradio}, \texttt{filterbank},
