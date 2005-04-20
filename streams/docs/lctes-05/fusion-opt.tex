@@ -117,7 +117,7 @@ approach, as described in the subsequent sections.
 However, the cost of this strategy comes in the copying operations: at
 the start of each execution, $(\mbox{\it peek} - \mbox{\it pop})$
 items are copied from the persistent {\tt BUFFER} to the beginning of
-a local {\tt TEMP\_BUFFER}.  All subsequent operations reference the
+a local {\tt TEMP\_BUFFER}.  Subsequent operations reference
 {\tt TEMP\_BUFFER}, and the live items are copied back to the {\tt
 BUFFER} upon completion.  While these two variables could also be
 combined into a single buffer, keeping them separate results in a
