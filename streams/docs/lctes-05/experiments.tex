@@ -3,7 +3,7 @@
 
 In this section we evaluate the merits of the proposed cache-aware
 optimizations and buffer management strategies.  We use three
-different architectures: a 137MHz StrongARM-1110, a 600~MHz Pentium~3
+different architectures: a 137~MHz StrongARM-1110, a 600~MHz Pentium~3
 and a 1.3~GHz Itanium~2. The StrongARM results reflect performance for
 an embedded target; it has a 16~Kb L1 instruction cache, an 8~Kb L1 data
 cache, and no L2 cache.  The StrongARM also has a separate 512-byte
@@ -32,6 +32,7 @@ computation pattern for the sake of benchmarking by simply replacing
 every floating point type with an integer type.
 
 \begin{table}[t]
+\vspace{6pt}
 \nocaptionrule
 \center
 \label{tab:benchmarks}
@@ -52,6 +53,7 @@ every floating point type with an integer type.
 \end{tabular}
 }
 \caption{Evaluation benchmark suite.}
+\vspace{6pt}
 \end{table}
 
 We also made an additional modification in compiling to the StrongARM:
@@ -62,23 +64,22 @@ for the 32-way set-associative L1 data cache in the StrongARM.  Due to
 the high degree of associativity, there is a smaller chance that the
 actor outputs will repeatedly evict the state variables of the
 actor, thereby making it worthwhile to further fill the data cache.
-This observation leads yields up to 25\% improvement on some
+This observation yields up to 25\% improvement on some
 benchmarks.
 
 \begin{figure}[t]
-\vspace{-6pt}
 \nocaptionrule
 \begin{minipage}{3.35in}
 \centering
 \psfig{figure=arm1.eps,width=3.4in}
 \vspace{-14pt}
 \caption{Summary of results on a StrongARM.\protect\label{fig:arm-perf}}
-~ \\
+~ \\ \vspace{3pt}
 
 \psfig{figure=p3-1.eps,width=3.4in}
 \vspace{-14pt}
 \caption{Summary of results on a Pentium~3\protect\label{fig:p3-perf}}
-~ \\
+~ \\ \vspace{3pt}
 
 \psfig{figure=i2-1.eps,width=3.4in}
 \vspace{-14pt}
@@ -158,19 +159,18 @@ eliminated memory accesses while nonetheless worsening the instruction
 locality.
 
 \begin{figure}[t]
-\vspace{-6pt}
 \nocaptionrule
 \begin{minipage}{3.35in}
 \centering
 \psfig{figure=arm2.eps,width=3.4in}
 \vspace{-14pt}
 \caption{Impact of each optimization on a StrongARM.\protect\label{fig:arm-perf2}}
-~ \\
+~ \\ \vspace{3pt}
 
 \psfig{figure=p3-2.eps,width=3.4in}
 \vspace{-14pt}
 \caption{Impact of each optimization on a Pentium~3.\protect\label{fig:p3-perf2}}
-~ \\
+~ \\ \vspace{3pt}
 
 \psfig{figure=i2-2.eps,width=3.4in}
 \vspace{-14pt}
