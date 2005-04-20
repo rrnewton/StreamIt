@@ -52,7 +52,7 @@ composing actors without sacrificing performance.
 
 Buffer management in StreamIt is more involved than some other stream
 languages, due to the {\tt peek} operation.  The {\tt peek} operation
-allows a actor to access an item on its input channel without
+allows an actor to access an item on its input channel without
 removing the item from the channel (removal is done via the {\tt pop}
 operation).  The {\tt peek} functionality is very important for
 components such as FIR (Finite Impulse Response) actors that access
@@ -244,7 +244,7 @@ remains constant.
 
 Thus, execution scaling reduces the fraction of time spent copying to
 an arbitrarily small level.  In our study, we scale the executions of
-a actor until $(\mbox{\it peek} - \mbox{\it pop}) \leq \frac{1}{4}
+an actor until $(\mbox{\it peek} - \mbox{\it pop}) \leq \frac{1}{4}
 \mbox{\it pop}$.  In the synthetic benchmark, this implies that each
 actor body executes 16 times before the buffer contents are shifted.
 The code resulting from this transformation is shown in

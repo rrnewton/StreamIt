@@ -39,7 +39,7 @@ has
 $\mt{phase}(S_1,1)=(\texttt{A})$,
 $\mt{phase}(S_1,2)=(\texttt{ABB})$,
 $\mt{phase}(S_1,3)=(\texttt{B})$, and
-$\mt{phase}(S_1,4)=(\texttt{AAB})$,
+$\mt{phase}(S_1,4)=(\texttt{BAA})$,
 
 
 Let $I(a)$ denote the code size of the work function for actor $a$.
@@ -60,8 +60,7 @@ the following step function:
       1& \text{otherwise; miss: (some) cache refill.}
     \end{cases}
 \end{equation}
-In the equation, $C_I$ represents a constant proportional to the
-instruction cache size. 
+In the equation, $C_I$ represents the instruction cache size. 
 
 Using 
 %the instruction miss ($\mt{IMISS}$) metric in
@@ -77,12 +76,10 @@ execution ordering: schedules that boost temporal locality
 result in miss rates closer to zero, and schedules that do not
 exploit temporal locality result in miss rates closer to one.
 
-For example, assuming equal sized actors for the steady
-state $S_1=(\texttt{AABB})$ such that
-$I(\texttt{A})=I(\texttt{B})=\lceil{C_I/2}\rceil+1$, then the
-combined instruction working 
-sets exceed the instruction cache. Therefore, 
-we expect to suffer a miss at the start of every
+For example, in the steady 
+state $S_1=(\texttt{AABB})$, assume that the combined instruction working
+sets exceed the instruction cache, i.e., $I(\texttt{A}) + I(\texttt{B}) > C_I$.
+Then, we expect to suffer a miss at the start of every
 steady state because the phase that precedes the execution of
 \texttt{A} (at $S_1[1]$) is $\mt{phase}(S_1,2)$ with 
 an instruction reuse distance greater than the cache size 
@@ -112,9 +109,9 @@ distribution.
 
 \paragraph*{Temporal Locality} In our model, the concept of improving
 temporal instruction locality translates to deriving a steady state where, in the
-best case, each actor has only one phase that is longer than unit-length.
+best case, every actor has only one phase that is longer than unit-length.
 For example, a permutation of the actors in $S_2$ (where all
-phases are of length three) that improves temporal locality
+phases are of length two) that improves temporal locality
 will result in $S_1$, which we have shown has a relatively lower miss rate.
 
 
@@ -128,11 +125,11 @@ phase of length one and the shortest possible reuse distance).
 We represent a scaled execution of the steady state as
 $S^m=(a_1^m,\dots, a_n^m)$: the steady state $S$ is scaled by $m$, which
 translates to $m-1$ additional firings of 
-each actor. For example, scaling $S_1=(\texttt{AABB})$ by a factor of
+every actor. For example, scaling $S_1=(\texttt{AABB})$ by a factor of
 two results in
 %$S_1^2=(\texttt{\underline{A}A\underline{A}A\underline{B}B\underline{B}B})$
 $S_1^2=(\texttt{AAAABBBB})$
-and scaling $S_2=(ABAB)$ by the same amount results in 
+and scaling $S_2=(\texttt{ABAB})$ by the same amount results in 
 %$S_2^2=(\texttt{\underline{A}A\underline{B}B\underline{A}A\underline{B}B})$.
 $S_2^2=(\texttt{AABBAABB})$;
 %; the underlined actors constitute the unscaled steady state.
@@ -153,7 +150,7 @@ we can substitute into Equation~\ref{eq:imr}:
                  &=& \frac{1}{m \times |S|}\sum_{i=1}^{|S|} \mt{IMISS}(S,i).
 \end{eqnarray}
 The last step is possible because $\mt{IMISS}$ is zero for $m-1$ out
-of $m$ executions of each scaled actor.  The result is that the miss
+of $m$ executions of every scaled actor.  The result is that the miss
 rate is inversely proportional to the scaling factor.
 \begin{figure}[t]
 \begin{center}

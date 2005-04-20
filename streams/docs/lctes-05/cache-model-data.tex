@@ -20,25 +20,25 @@ that this is true, we can define a data miss rate ($\mt{DMR}$) based on
 a derivation similar to that for the instruction miss rate, replacing
 $C_I$ with $C_D$ in Equation~\ref{eq:imiss}, and $I(a)$ with
 $\mt{State}(a)$ when calculating the reuse distance. Here, $C_D$
-represents a constant proportional to the data cache size, and
+represents the data cache size, and
 $\mt{State}(a)$ represents the total size of the static data in the
 specified actor. 
 
 Execution scaling however also increases the I/O requirements of a
 scaled actor. Let $\mt{pop}$ and $\mt{push}$ denote the declared pop and push rates
 of an actor, respectively.  The scaling of an
-actor by a factor $m$ therefore increases the pop rate to $m\times o$
-and the push rate to $m\times u$. Combined, we represent the dynamic
+actor by a factor $m$ therefore increases the pop rate to $m\times \mt{pop}$
+and the push rate to $m\times \mt{push}$. Combined, we represent the dynamic
 data working set of an actor $a$ as $\mt{IO}(a, m) =
-m\times(o+u)$. Therefore, we measure the data reuse distance ($\mt{DRD}$)
-of an execution $S$ with scaling factor $m$ follows:
+m\times(\mt{pop}+\mt{push})$. Therefore, we measure the data reuse distance ($\mt{DRD}$)
+of an execution $S$ with scaling factor $m$ as follows:
 \[
   \mt{DRD}(S^m,i)=\sum_{a} \mt{State}(a) + \mt{IO}(a,m)
 \]
-over all distinct actors $a$ occurring in $\mt{phase}(S^m,i)$.  While
-this simple measure double-counts data that is both produced and
+where the sum is over all distinct actors $a$ occurring in $\mt{phase}(S^m,i)$.  While
+this simple measure double-counts data that are both produced and
 consumed within a phase, such duplication could be roughly accounted
-for by setting $IO'(a,m) = IO(a,m) / 2$.
+for by setting $\mt{IO}'(a,m) = \mt{IO}(a,m) / 2$.
 
 We can determine if a
 specific work function will result in a data cache miss (on its next
