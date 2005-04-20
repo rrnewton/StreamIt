@@ -1,13 +1,13 @@
 Effective use of the memory hierarchy is critical for achieving high
-performance on embedded systems.  In this paper, we focus on the
-domain of streaming programs, which are increasingly prevalent in an
-embedded context.  We utilize the widespread parallelism and regular
-communication patterns in stream programs to formulate a set of cache
-aware optimizations that automatically improve instruction and data
-locality.  Our work is done in the Synchronous Dataflow model, in
-which a program is described as a graph of independent actors that
-communicate over channels.  The communication rates between actors is
-known at compile time.
+performance on embedded systems.  We focus on the class of streaming
+programs, which is increasingly prevalent in the embedded domain.  We
+exploit the widespread parallelism and regular communication patterns
+in stream programs to formulate a set of cache aware optimizations
+that automatically improve instruction and data locality.  Our work is
+in the context of the Synchronous Dataflow model, in which a program
+is described as a graph of independent actors that communicate over
+channels.  The communication rates between actors is known at compile
+time, allowing the compiler to statically model the caching behavior.
 
 We present three cache aware optimizations: 1) execution scaling,
 which judiciously repeats actor executions to improve instruction
@@ -16,8 +16,8 @@ respecting instruction cache constraints, and 3) scalar replacement,
 which converts certain data buffers into a sequence of scalar
 variables that can be register allocated.  The optimizations are
 founded upon a simple and intuitive model that quantifies the temporal
-locality for a sequence of actor executions.  An implementation in the
-StreamIt compiler yields a 249\% average speedup (over unoptimized
-code) for our streaming benchmark suite on a StrongARM 1110 processor.
-The optimizations also yield a 154\% speedup on a Pentium~3 and a
-152\% speedup on an Itanium~2.
+locality for a sequence of actor executions.  Our implementation of
+cache aware optimizations in the StreamIt compiler yields a 249\%
+average speedup (over unoptimized code) for our streaming benchmark
+suite on a StrongARM 1110 processor.  The optimizations also yield a
+154\% speedup on a Pentium~3 and a 152\% speedup on an Itanium~2.
