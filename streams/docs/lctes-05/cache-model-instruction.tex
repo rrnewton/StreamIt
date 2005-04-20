@@ -45,9 +45,9 @@ $\mt{phase}(S_1,4)=(\texttt{AAB})$,
 Let $I(w)$ equal the code size of work function $w$, and
 \[
 %\mt{IRD}(S,i)=\sum_{j \in \mt{phase}(S,i)} I(S[j])
-\mt{IRD}(S,i)=\sum_{j} I(S[j])
+\mt{IRD}(S,i)=\sum_{w} I(w)
 \]
-over all distinct actors occurring in
+over all distinct actors $w$ occurring in
 $\mt{phase}(S,i)$. We can then determine if a specific work function will
 result in an instruction cache miss (on its next firing) by evaluating
 the following step function:
@@ -125,8 +125,8 @@ scaled steady state has a greater number of unit-length phases (i.e., a
 phase of length one and the shortest possible reuse distance).
 
 We represent a scaled execution of the steady state as
-$S^M=(w_1^M\dots w_n^M)$: the steady state $S$ is scaled by $M$, which
-translates to $M-1$ additional firings of 
+$S^m=(w_1^m\dots w_n^m)$: the steady state $S$ is scaled by $m$, which
+translates to $m-1$ additional firings of 
 each actor. For example, scaling $S_1=(\texttt{AABB})$ by a factor of
 two results in
 %$S_1^2=(\texttt{\underline{A}A\underline{A}A\underline{B}B\underline{B}B})$
@@ -142,18 +142,16 @@ instruction working set  is smaller than the cache
 size; we assume this is always the case. Therefore, scaling has the
 effect of preserving the pattern of 
 miss occurrences while also lengthening the steady state. Mathematically,
-we can rewrite Equation~\ref{eq:imr} as:
+we substitute into Equation~\ref{eq:imr}:
 \begin{eqnarray}
   \nonumber
-  \mt{IMR}(S, M) &=& \mt{IMR}(S^M) \\
-  \nonumber
-                 &=& \frac{1}{|S^M|}\sum_{i=1}^{|S^M|} \mt{IMISS}(S,i) \\
+  \mt{IMR}(S^m)  &=& \frac{1}{|S^m|}\sum_{i=1}^{|S^m|} \mt{IMISS}(S^m,i) \\
   \label{eq:imrM}
-                 &=& \frac{1}{M \times |S|}\sum_{i=1}^{|S|} \mt{IMISS}(S,i).
+                 &=& \frac{1}{m \times |S|}\sum_{i=1}^{|S|} \mt{IMISS}(S,i).
 \end{eqnarray}
-
-In other words, the miss rate is inversely proportional to the
-scaling factor.
+The second step is possible because $\mt{IMISS}$ is zero for $m-1$ out
+of $m$ executions of each scaled actor.  The result is that the miss
+rate is inversely proportional to the scaling factor.
 \begin{figure}[t]
 \begin{center}
   \psfig{figure=fftc-mult2.eps, width=\columnwidth}

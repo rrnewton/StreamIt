@@ -18,11 +18,11 @@ steady state exceeds a typical instruction cache size.
 From these observations, it is evident that we must {\it scale} the
 execution of filters in the steady state in order to improve temporal
 locality. In other words, rather than running a filter $n$ times per
-steady state, we scale it to run $M \times n$ times.
+steady state, we scale it to run $m \times n$ times.
 
 %% (e.g., the loop bound for \verb+A_work+ is
-%% changed to $\texttt{M} \times 4$ in the example shown earlier). 
-We term $M$ the {\it scaling factor}.
+%% changed to $\texttt{m} \times 4$ in the example shown earlier). 
+We term $m$ the {\it scaling factor}.
 
 The obvious question is: to what extent can we scale the execution of
 filters in the steady state? The answer is non-trivial because
@@ -69,7 +69,7 @@ generalize it to account for the data cache.
 %% leads to lower miss rates. An actor is fired a greater number of times in 
 %% the steady state before transitioning to the next actor in the
 %% schedule. Specifically, scaling a steady state $S$ by a multiplicity
-%% factor $M$ 
+%% factor $m$ 
 %% Hence for example, a program that would generate a trace
 %% $T_2$
 %% might be as follows:
@@ -84,14 +84,14 @@ generalize it to account for the data cache.
 %% {\small
 %% \begin{verbatim}
 %% run_steady_state() {
-%%   for (i = 0; i < M * 1; i++) A_work();
-%%   for (i = 0; i < M * 1; i++) B_work();
+%%   for (i = 0; i < m * 1; i++) A_work();
+%%   for (i = 0; i < m * 1; i++) B_work();
 %% }
 %% \end{verbatim}}
-%% \noindent where \texttt{M} (the multiplicity factor) is an integer greater than
+%% \noindent where \texttt{m} (the multiplicity factor) is an integer greater than
 %% one.
 %% From our model, it is easy to see that scaling reduces the number
-%% of misses for a given filter $f$ from $K$ to $\frac{K}{\texttt{M}}- 1$, where $K =
+%% of misses for a given filter $f$ from $K$ to $\frac{K}{\texttt{m}}- 1$, where $K =
 %% \sum \mt{IMS}(f)$ for all occurrences of $f$ in  the execution trace.
 
 %% \subsection{Remarks}
