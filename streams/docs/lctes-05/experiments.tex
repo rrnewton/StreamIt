@@ -1,9 +1,9 @@
 \section{Experimental Evaluation}
 \label{sec:evaluation}
 
-In this section we evaluate the merits of the proposed cache-aware
+In this section we evaluate the merits of the proposed cache aware
 optimizations and buffer management strategies.  We use three
-different architectures: a 137~MHz StrongARM-1110, a 600~MHz Pentium~3
+different architectures: a 137~MHz StrongARM~1110, a 600~MHz Pentium~3
 and a 1.3~GHz Itanium~2. The StrongARM results reflect performance for
 an embedded target; it has a 16~Kb L1 instruction cache, an 8~Kb L1 data
 cache, and no L2 cache.  The StrongARM also has a separate 512-byte
@@ -12,7 +12,7 @@ Itanium~2 reflect desktop performance; they have a 16~Kb L1 instruction
 cache, 16~Kb L1 data cache, and 256~Kb shared L2 cache.
 
 Our benchmark suite (see Table~\ref{tab:benchmarks}) consists of
-eleven StreamIt applications. They are compiled with the StreamIt
+11 StreamIt applications. They are compiled with the StreamIt
 compiler which applies the optimizations described in this paper, as
 well as aggressive loop unrolling (by a factor of 128 for all
 benchmarks) to facilitate scalar replacement
@@ -140,18 +140,18 @@ cache), thereby lessening the impact of locality-enhancing cache
 optimizations.  However, the fusion benefit remains a significant
 factor; for example, using Intel VTune on the Pentium~3, we measured
 that full fusion offers a 50\% reduction in memory accesses over the
-cache-optimized version.  This effect may be pronounced in Itanium~2
+cache-optimized version.  This effect may be pronounced on the Itanium~2
 due to the larger number of registers on that architecture (128
 general, 128 floating point).  While fusion benefits are also present
-on StrongARM, cache optimizations are more important on that processor
+on the StrongARM, cache optimizations are more important on that processor
 due to the large penalty for cache misses.
 
-The cache-aware fusion algorithm can be adjusted to account for the
-caching hierarchy on desktop machines.  Specifically, if cache-aware
+The cache aware fusion algorithm can be adjusted to account for the
+caching hierarchy on desktop machines.  Specifically, if cache aware
 fusion is modified to allow fused actors to consume up to one half of
-the L2 cache (rather than L1 cache), then the performance of cache
+the L2 cache (rather than L1 cache), then the performance of the cache
 optimizations is closer or equal to full fusion, for cases it was
-previously trailing on Pentium~3 or Itanium~2 (data not shown).  The
+previously trailing on the Pentium~3 or the Itanium~2 (data not shown).  The
 only benchmark that is negatively impacted by this change is {\tt
 ofdm}, where two large actors are fused despite a very low
 communication to computation ratio, thereby lessening the impact of
@@ -187,9 +187,9 @@ for the StrongARM, Pentium~3, and Itanium~2, respectively.  There are
 four bars per benchmark; as in the previous analysis, all performance
 is normalized to unoptimized StreamIt (with 128-way unrolling).  The
 first bar, labeled {\tt scaling}, applies only execution scaling.  The
-second bar, labeled {\tt CAF}, applies only cache-aware fusion,
+second bar, labeled {\tt CAF}, applies only cache aware fusion,
 including scalar replacement across the fused actors.  The third bar,
-labeled {\tt CAF+scaling}, first applies cache-aware fusion with
+labeled {\tt CAF+scaling}, first applies cache aware fusion with
 scalar replacement and then applies execution-scaling to the
 granularity-adjusted actors.  The fourth bar, labeled {\tt
 CAF+scaling+buffer}, additionally applies buffer management
@@ -209,16 +209,16 @@ between the granularity-adjusted actors overwriting the state of an
 executing actor in the data cache.  Since StrongARM has no L2 cache
 then such eviction can be quite expensive.
 
-Independently, cache-aware fusion also improves performance by 84\% on
+Independently, cache aware fusion also improves performance by 84\% on
 StrongARM, 101\% on Pentium~3 and a 103\% on the Itanium~2.
-Cache-aware fusion degrades performance only for
+cache aware fusion degrades performance only for
 \texttt{filter}-\texttt{bank2} (by 6\% on StrongARM). When we combine
-cache-aware fusion with execution scaling, the performance
+cache aware fusion with execution scaling, the performance
 consistently improves.  The speedup of \texttt{CAF+scaling} over
 baseline is 241\% on StrongARM, 146\% on Pentium~3 and 144\% on
 Itanium~2.
 
-However, after coarsening the actors with cache-aware fusion, scaling
+However, after coarsening the actors with cache aware fusion, scaling
 results in less additional speedup than it did relative to the
 baseline.  The speedup of \texttt{CAF+scaling} over \texttt{CAF} is
 86\% for StrongARM, 22\% for Pentium~3 and only 20\% for Itanium~2.
@@ -245,7 +245,7 @@ bar is equivalent to {\tt CAF+scaling+buffer} for all benchmarks from
 
 The buffer optimization applied in Figures~\ref{fig:arm-perf},
 \ref{fig:p3-perf}, and \ref{fig:i2-perf} is termed {\tt cutpeek}.  In
-this optimization, the cache-aware fusion algorithm is modified so
+this optimization, the cache aware fusion algorithm is modified so
 that two adjacent filters are never fused if the downstream filter
 performs any peeking (i.e., it has $\mbox{\it peek} > \mbox{\it
 pop}$).  Following execution scaling, the live items are copied to the
@@ -266,14 +266,14 @@ scaled to perform several executions at once.  As scaling is
 performed, the {\it pop} and {\it peek} rates increase but $\mbox{{\it
 peek}} - \mbox{\it pop}$ remains constant; scaling continues until the
 {\it pop} rate is at least $4*(\mbox{{\it peek}} - \mbox{{\it pop}})$.
-Like {\tt cutpeek}, this serves to amortize the overhead of copy-shift
-buffer management, but it can also hamper the execution scaling
-optimization.  Because certain other actors in the graph must fire
-more frequently to compensate for the scaled peeking filter, there is
-less room for global execution scaling.  The only other case where
-{\tt peekscale} is the best strategy is for {\tt ofdm} on StrongARM,
-where there is a 7\% improvement over {\tt cutpeek}.  Finally, on the
-{\tt filterbank} benchmark, highest performance results from
-unoptimized copy-shift buffer management.  We also evaluated buffer
-management using modulation for indexing, but this did not yield the
-best performance for any benchmark or platform.
+Like {\tt cutpeek}, this serves to amortize the overhead of
+copy-shift, but it can also hamper the execution scaling optimization.
+Because certain other actors in the graph must fire more frequently to
+compensate for the scaled peeking filter, there is less room for
+global execution scaling.  The only other case where {\tt peekscale}
+is the best strategy is for {\tt ofdm} on StrongARM, where there is a
+7\% improvement over {\tt cutpeek}.  Finally, on the {\tt filterbank}
+benchmark, highest performance results from unoptimized copy-shift
+buffer management.  We also evaluated buffer management using
+modulation for indexing, but this did not yield the best performance
+for any benchmark or platform.

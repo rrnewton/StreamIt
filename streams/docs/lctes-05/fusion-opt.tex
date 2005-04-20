@@ -14,7 +14,7 @@
 \begin{verbatim}
           void->void pipeline BufferTest {
             add Source();                 
-            add FIR();                    
+            add FIR2();                    
           }                               
                                           
           void->float filter Source {     
@@ -23,7 +23,7 @@
             } 
           }                               
                                           
-          float->void filter FIR {        
+          float->void filter FIR2 {        
             int PEEK = 4;                 
             work pop 1 peek PEEK {        
               float result = 0;           
@@ -120,12 +120,12 @@ that if there are no {\tt peek} operations, then the buffer will be
 empty following each execution of the downstream actor.  In this
 case, the indices can be reset to zero at the start of each execution
 and the modulo operations can be eliminated.  However, in our example
-the FIR actor does perform peeking, so the modulo operations are
+the FIR actor performs peeking, so the modulo operations are
 needed.
 
 {\bf Experimental setup.}  Figures~\ref{fig:buf-arm},~\ref{fig:buf-p3}
 and~\ref{fig:buf-i2} illustrate the performance of various buffer
-management strategies on a 137~Mhz StrongARM-1110, a 600~Mhz Pentium~3
+management strategies on a 137~Mhz StrongARM~1110, a 600~Mhz Pentium~3
 and a 1.3~Ghz Itanium~2, respectively.  The figures illustrate the
 execution time per $10^7$ outputs for the synthetic benchmark
 (Figure~\ref{fig:code-orig}) across a range of {\tt PEEK} values.  To

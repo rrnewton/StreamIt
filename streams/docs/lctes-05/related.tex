@@ -5,9 +5,9 @@ There is a large body of literature on scheduling synchronous dataflow
 (SDF) graphs to optimize various
 metrics~\cite{bhattacharyya99synthesis,leesdf}.  The work most closely
 related to ours is a recent study by Kohli~\cite{kohli04} on
-cache-aware scheduling of SDF graphs, implemented as part of the
+cache aware scheduling of SDF graphs, implemented as part of the
 Ptolemy framework for simulating heterogeneous embedded
-systems~\cite{ptolemy03overview}.  Kohli develops a Cache-Aware
+systems~\cite{ptolemy03overview}.  Kohli develops a Cache Aware
 Scheduling (CAS) heuristic for an embedded target with a
 software-managed scratchpad instruction cache.  His algorithm greedily
 decides how many times to execute a given actor based on estimates of
@@ -32,7 +32,7 @@ requirements for single-appearance schedules (see
 shown that obtaining the minimal memory requirements for general
 graphs is NP-complete~\cite{Bhatta97}, there are two complimentary
 heuristics, APGAN (Pairwise Grouping of Adjacent Nodes) and RPMC
-(Recursive Partitioning by Minimum Cuts), that have shown to be
+(Recursive Partitioning by Minimum Cuts), that have been shown to be
 effective when applied together~\cite{Bhatta97}.  Buffer
 merging\cite{murt1999x3,murt2000x2} represents another technique for
 decreasing buffer sizes, which could be integrated with our approach
@@ -73,7 +73,7 @@ Benveniste et al.~\cite{benveniste93dataflow} also provides an
 overview of dataflow synchronous languages.  Sisal (Stream and
 Iteration in a Single Assignment Language) is a high-performance,
 implicitly parallel functional language~\cite{sisal}.  We are not
-aware of any cache-aware optimizations in these stream languages.
+aware of any cache aware optimizations in these stream languages.
 
 %(cache models?)
 %[rodric:] there isn't a good survey/single source (that i know of) that covers
