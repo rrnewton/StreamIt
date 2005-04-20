@@ -32,7 +32,7 @@ equivalent to parameters passed to a class constructor.
 \begin{scriptsize}
 % {\small
 \begin{verbatim}
-float->float filter FIR (int N, float[] weights) {
+float->float filter FIR_Filter (int N, float[] weights) {
   work push 1 pop 1 peek N {
     float sum = 0;
     for (int i = 0; i < N; i++) {
