@@ -12,27 +12,27 @@ data working set requirements as we scale a steady state.
 \mbox{} ~~~~// - $c$ is the data cache size\\
 \mbox{} ~~~~// - $\alpha$ is the fraction of $c$ dedicated for I/O\\%$(0 < \alpha)$\\
 \mbox{} ~~~~// - $p$ is the desired percentile of all actors to be\\
-\mbox{} ~~~~// satisfied by the chosen scaling factor $(0 < p \le 1$)\\
+\mbox{} ~~~~// ~~satisfied by the chosen scaling factor $(0 < p \le 1$)\\
 \mbox{} ~~~~{\bf calculateScalingFactor}($S$, $c$, $\alpha$, $p$) \{\\
 \mbox{} ~~~~~~~{\bf create} array $M$ of size $|S|$ and {\bf initialize} all entries to 0\\
 \mbox{} ~~~~~~~{\bf for} $i$ = 1 to $|S|$ \{ \\
-\mbox{} ~~~~~~~~~~$w = S[i]$\\
+\mbox{} ~~~~~~~~~~$a = S[i]$\\
 \mbox{} ~~~~~~~~~~// calculate effective cache size\\
-\mbox{} ~~~~~~~~~~$c = \alpha \times (c - \mt{State}(w))$\\
+\mbox{} ~~~~~~~~~~$c' = \alpha \times (c - \mt{State}(a))$\\
 %\mbox{} ~~~~~~~~~~// estimate I/O requirements\\
 %\mbox{} ~~~~~~~~~~$d = \mt{IO}(X)$\\
 \mbox{} ~~~~~~~~~~// account for the I/O requirements and\\
-\mbox{} ~~~~~~~~~~// calculate largest possible scaling for $w$\\
-\mbox{} ~~~~~~~~~~$M[i] = {\bf round}(c~/~\mt{IO}(w, 1))$\\
+\mbox{} ~~~~~~~~~~// calculate largest possible scaling for $a$\\
+\mbox{} ~~~~~~~~~~$M[i] = {\bf round}(c'~/~\mt{IO}(a, 1))$\\
 \mbox{} ~~~~~~~\} \\
 \mbox{} ~~~~~~~{\bf sort} $M$ into ascending numerical order\\
 \mbox{} ~~~~~~~$i = \lfloor~(1-p) \times |S|~\rfloor$ \\
-\mbox{} ~~~~~~~return $M[i]$\\
+\mbox{} ~~~~~~~{\bf return} $M[i]$\\
 \mbox{} ~~~~\}
 }}
 \end{center}
 \nocaptionrule
-\caption{Algorithm for calculating the scaling factor.}
+\caption{Our heuristic for calculating the scaling factor.}
 \label{fig:scaling-algo}
 \end{figure}
 
@@ -42,20 +42,20 @@ of the actors overflow the data cache. Our two-staged algorithm is
 outlined in Figure~\ref{fig:scaling-algo}.
 
 First, the algorithm calculates the largest possible scaling factor
-for every actor in the steady state. To do this, it calculates the
+for every actor that appears in the steady state. To do this, it calculates the
 amount of data produced by each actor firing and divides the available
 data cache size by this data production rate. In addition, the
 algorithm can toggle the effective cache size to account for various
 eviction policies.
 
 Second, it chooses the largest
-factor that allows a fraction ($p$) of the steady state actors to be
+factor that allows a fraction $p$ of the steady state actors to be
 scaled safely (i.e., the cache is adequate for their I/O
 requirements).  For example, the algorithm might calculate
 $m_\texttt{A} = 10$,
 $m_\texttt{B} = 20$, 
 $m_\texttt{C} = 30$, and 
-$m_\texttt{D} = 40$, for four actors in some steady state. Thus,
+$m_\texttt{D} = 40$, for four actors in some steady state. That is,
 scaling actor \texttt{A} beyond 10 consecutive iterations will cause
 its dynamic I/O requirements to exceed the data cache. Therefore, the
 largest $m$ that allows $p=90\%$ of the actors to be
@@ -63,13 +63,12 @@ scaled without violating the cache constraints is 10.
 Similarly, to allow for the safe scaling of $p=75\%$ of the actors, the
 largest factor we can choose is 20.
 
-In our implementation, we use the 90-10 heuristic. In other words, we
+In our implementation, we use a 90-10 heuristic. In other words, we
 set $p=90\%$. We empirically determined this value via a series of
 experiments using our benchmark suite. Specifically, we varied the
 scaling factor across a wide range of values,
-and measured the resulting performance. We found that
-increasing the threshold beyond 90\% leads to marginal
-performance gains. Due to the limited space we cannot include all of
+and measured the resulting performance. 
+Due to the limited space we cannot include all of
 the collected data. However, the interested reader can find
 the results in a thesis by one of the authors~\cite{janis-thesis}.
 

@@ -16,15 +16,23 @@ a given index  on its input tape without  consuming  the  item;  this
 makes  it  simple  to  represent computation over a
 sliding window.   The {\tt push}, {\tt pop}, and {\tt peek} rates are
 declared as part  of  the work  function,  thereby enabling  the
-compiler    to construct a static schedule of filter executions. The
-following is an example implementation of a Finite Impulse
-Response (FIR)  filter: 
+compiler  to construct a static schedule of filter executions. An examplen
+implementation of a Finite Impulse Response (FIR) filter appears in Figure~\ref{fig:fir}.
 
+The work function is invoked (fired) whenever there is sufficient data
+on the input tape. For the FIR example in Figure~\ref{fig:fir}, the filter requires at least
+\texttt{N} elements before it can execute. The value of \texttt{N} is
+known at compile time when the filter is constructed to form a stream
+graph. A filter is akin to a class in object oriented programming
+with the work function serving as the main method. The parameters
+to a filter (e.g., \texttt{N} and \texttt{weights}) are equivalent to
+parameters passed to a class constructor. 
+
+\begin{figure}[t]
 \begin{scriptsize}
 % {\small
 \begin{verbatim}
-float->float filter FIR (int N, float[] weights) 
-{
+float->float filter FIR (int N, float[] weights) {
   work push 1 pop 1 peek N {
     float sum = 0;
     for (int i = 0; i < N; i++) {
@@ -37,15 +45,9 @@ float->float filter FIR (int N, float[] weights)
 \end{verbatim}
 % }
 \end{scriptsize}
-
-The work function is invoked (fired) whenever there is sufficient data
-on the input tape. For the FIR example above, the filter requires at least
-\texttt{N} elements before it can execute. The value of \texttt{N} is
-known at compile time when the filter is constructed to form a stream
-graph. A filter is akin to a class in object oriented programming
-with the work function serving as the main method. The parameters
-to a filter (e.g., \texttt{N} and \texttt{weights}) are equivalent to
-parameters passed to a class constructor. 
+\vspace{-3pt}
+\caption{StreamIt code for an FIR filter\label{fig:fir}}
+\end{figure}
 
 \begin{figure}[t]
 \begin{center}
@@ -162,7 +164,7 @@ each of the two schedules. Our compilation process allows the StreamIt
 compiler to focus on high level optimizations, and relies on existing
 compilers to perform machine-specific optimizations such as register
 allocation, instruction scheduling, and 
-code generation---this two step approach affords us a
+code generation---this two-step approach affords us a
 great deal of portability (e.g., code generated from the StreamIt
 compiler is compiled and run on three different machines as reported
 in Section~\ref{sec:evaluation}).
