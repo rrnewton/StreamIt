@@ -14,7 +14,7 @@
 \begin{verbatim}
           void->void pipeline BufferTest {
             add Source();                 
-            add FIR2();                    
+            add FIR();                    
           }                               
                                           
           void->float filter Source {     
@@ -23,7 +23,7 @@
             } 
           }                               
                                           
-          float->void filter FIR2 {        
+          float->void filter FIR {        
             int PEEK = 4;                 
             work pop 1 peek PEEK {        
               float result = 0;           
