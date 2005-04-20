@@ -5,37 +5,6 @@ cache miss rates. However, scaling increases the data buffers that are
 maintained between actors. Thus it is prudent that we account for the
 data working set requirements as we scale a steady state.
 
-\begin{figure}[t]
-\begin{center}
-\framebox{\parbox{3.25in}{
-\mbox{} ~~~~// {\it Returns a scaling factor for steady state $S$} \\
-\mbox{} ~~~~// - $c$ is the data cache size\\
-\mbox{} ~~~~// - $\alpha$ is the fraction of $c$ dedicated for I/O\\%$(0 < \alpha)$\\
-\mbox{} ~~~~// - $p$ is the desired percentile of all actors to be\\
-\mbox{} ~~~~// ~~satisfied by the chosen scaling factor $(0 < p \le 1$)\\
-\mbox{} ~~~~{\bf calculateScalingFactor}($S$, $c$, $\alpha$, $p$) \{\\
-\mbox{} ~~~~~~~{\bf create} array $M$ of size $|S|$ and {\bf initialize} all entries to 0\\
-\mbox{} ~~~~~~~{\bf for} $i$ = 1 to $|S|$ \{ \\
-\mbox{} ~~~~~~~~~~$a = S[i]$\\
-\mbox{} ~~~~~~~~~~// calculate effective cache size\\
-\mbox{} ~~~~~~~~~~$c' = \alpha \times (c - \mt{State}(a))$\\
-%\mbox{} ~~~~~~~~~~// estimate I/O requirements\\
-%\mbox{} ~~~~~~~~~~$d = \mt{IO}(X)$\\
-\mbox{} ~~~~~~~~~~// account for the I/O requirements and calculate\\
-\mbox{} ~~~~~~~~~~// scaling for $a$ that comes closest to cache size\\
-\mbox{} ~~~~~~~~~~$M[i] = {\bf round}(c'~/~\mt{IO}(a, 1))$\\
-\mbox{} ~~~~~~~\} \\
-\mbox{} ~~~~~~~{\bf sort} $M$ into ascending numerical order\\
-\mbox{} ~~~~~~~$i = \lfloor~(1-p) \times |S|~\rfloor$ \\
-\mbox{} ~~~~~~~{\bf return} $M[i]$\\
-\mbox{} ~~~~\}
-}}
-\end{center}
-\nocaptionrule
-\caption{Our heuristic for calculating the scaling factor.}
-\label{fig:scaling-algo}
-\end{figure}
-
 Our approach is to scale the entire steady state by a single
 scaling factor, with the constraint that only a small percentage
 of the actors overflow the data cache. Our two-staged algorithm is
@@ -85,3 +54,35 @@ found $\alpha=2/3$ to work well. However, we note that the optimal
 choice for the effective cache size is a complex function of the 
 underlying cache organization and possibly the application as well; 
 this is an interesting issue that warrants further investigation.
+
+\begin{figure}[t]
+\begin{center}
+\framebox{\parbox{3.25in}{
+\mbox{} ~~~~// {\it Returns a scaling factor for steady state $S$} \\
+\mbox{} ~~~~// - $c$ is the data cache size\\
+\mbox{} ~~~~// - $\alpha$ is the fraction of $c$ dedicated for I/O\\%$(0 < \alpha)$\\
+\mbox{} ~~~~// - $p$ is the desired percentile of all actors to be\\
+\mbox{} ~~~~// ~~satisfied by the chosen scaling factor $(0 < p \le 1$)\\
+\mbox{} ~~~~{\bf calculateScalingFactor}($S$, $c$, $\alpha$, $p$) \{\\
+\mbox{} ~~~~~~~{\bf create} array $M$ of size $|S|$ and {\bf initialize} all entries to 0\\
+\mbox{} ~~~~~~~{\bf for} $i$ = 1 to $|S|$ \{ \\
+\mbox{} ~~~~~~~~~~$a = S[i]$\\
+\mbox{} ~~~~~~~~~~// calculate effective cache size\\
+\mbox{} ~~~~~~~~~~$c' = \alpha \times (c - \mt{State}(a))$\\
+%\mbox{} ~~~~~~~~~~// estimate I/O requirements\\
+%\mbox{} ~~~~~~~~~~$d = \mt{IO}(X)$\\
+\mbox{} ~~~~~~~~~~// account for the I/O requirements and calculate\\
+\mbox{} ~~~~~~~~~~// scaling for $a$ that comes closest to cache size\\
+\mbox{} ~~~~~~~~~~$M[i] = {\bf round}(c'~/~\mt{IO}(a, 1))$\\
+\mbox{} ~~~~~~~\} \\
+\mbox{} ~~~~~~~{\bf sort} $M$ into ascending numerical order\\
+\mbox{} ~~~~~~~$i = \lfloor~(1-p) \times |S|~\rfloor$ \\
+\mbox{} ~~~~~~~{\bf return} $M[i]$\\
+\mbox{} ~~~~\}
+}}
+\end{center}
+\nocaptionrule
+\caption{Our heuristic for calculating the scaling factor.}
+\label{fig:scaling-algo}
+\end{figure}
+
