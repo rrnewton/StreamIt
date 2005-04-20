@@ -473,6 +473,7 @@
             \leftmargin\labelwidth
             \advance\leftmargin\labelsep
             \@openbib@code
+            \parsep=1.9pt\itemsep=1.5pt % BFT
             \usecounter{enumiv}%
             \let\p@enumiv\@empty
             \renewcommand\theenumiv{\@arabic\c@enumiv}}%

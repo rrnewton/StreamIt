@@ -1,6 +1,44 @@
 \section{Buffer Management}
 \label{sec:buffer}
 
+\begin{figure}[t]
+%% \begin{minipage}{1.7in}
+%% \centering
+%% \psfig{figure=fusion-pipeline.eps,width=0.7in}
+
+%% \caption{Stream graph for a synthetic buffer test.\protect\label{fig:code-graph}}
+%% \end{minipage}
+%% \hspace{0.3in}
+\centering
+{\small
+\begin{verbatim}
+          void->void pipeline BufferTest {
+            add Source();                 
+            add FIR();                    
+          }                               
+                                          
+          void->float filter Source {     
+            work push 1 {                 
+              push( ... );             
+            } 
+          }                               
+                                          
+          float->void filter FIR {        
+            int PEEK = 4;                 
+            work pop 1 peek PEEK {        
+              float result = 0;           
+              for (int i=1; i<PEEK; i++) {
+                result += i*peek(i);      
+              }                           
+              pop();                      
+              print(result);              
+            }                             
+          }                               
+\end{verbatim}}
+\vspace{-6pt}
+\caption{Original StreamIt code for the buffer test.\protect\label{fig:code-orig}}
+\end{figure}
+
 A salient characteristic of stream programs is the use of FIFO
 channels to communicate between parallel components.  Such channels
 make explicit the communication between actors, allowing execution to
