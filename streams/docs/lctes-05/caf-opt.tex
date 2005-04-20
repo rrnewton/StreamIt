@@ -11,8 +11,9 @@ as {\it cache aware fusion} (CAF). When two actors are fused, they
 form a new actor whose work function is equivalent to its constituents.
 For example, let an actor \texttt{A} fire $n$
 times, and an actor \texttt{B} fire $2n$ times per steady state:
-$S^n=(\texttt{A}^n\texttt{B}^n\texttt{B}^n)$. A fused actor \texttt{F}
-is formed that is equivalent to one firing of \texttt{A} and two 
+$S^n=(\texttt{A}^n\texttt{B}^n\texttt{B}^n)$. Fusing \texttt{A} and
+\texttt{B} results in an actor \texttt{F} that is equivalent to one 
+firing of \texttt{A} and two 
 firings of \texttt{B}; \texttt{F} fires $n$ times per steady state
 $(S^n=(\texttt{F}^n))$.  In other terms, the work
 function for actor \texttt{F} inlines the work functions of

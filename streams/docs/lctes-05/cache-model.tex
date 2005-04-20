@@ -2,22 +2,22 @@
 \label{sec:cache-model}
 
 From a caching point of view, it is intuitively clear that once a
-filter's instruction working set is fetched into the cache, we can
-maximize instruction locality by running the filter as many times as
+actor's instruction working set is fetched into the cache, we can
+maximize instruction locality by running the actor as many times as
 possible.  This of course assumes that the total code size for
-all filters in the steady state exceeds the capacity of the
-instruction cache (which is commonly the case).
+all actors in the steady state exceeds the capacity of the
+instruction cache.
 %% In
 %% Figure~\ref{fig:ssi-single} we show a representative breakdown of the
-%% code size per filter in a steady state execution of a StreamIt
+%% code size per actor in a steady state execution of a StreamIt
 %% implementation of a Fast Fourier Transform (FFT).
 For our benchmarks, the total code size for a steady state
-ranges from 2~Kb to over 135~Kb. Thus, while individual filters may have a
-small instruction footprint, the total footprint of the filters in a
+ranges from 2~Kb to over 135~Kb (and commonly exceeds 16~Kb). Thus, while individual actors may have a
+small instruction footprint, the total footprint of the actors in a
 steady state exceeds a typical instruction cache size.
 From these observations, it is evident that we must {\it scale} the
-execution of filters in the steady state in order to improve temporal
-locality. In other words, rather than running a filter $n$ times per
+execution of actors in the steady state in order to improve temporal
+locality. In other words, rather than running a actor $n$ times per
 steady state, we scale it to run $m \times n$ times.
 %
 %% (e.g., the loop bound for \verb+A_work+ is
@@ -25,7 +25,7 @@ steady state, we scale it to run $m \times n$ times.
 We term $m$ the {\it scaling factor}.
 
 The obvious question is: to what extent can we scale the execution of
-filters in the steady state? The answer is non-trivial because
+actors in the steady state? The answer is non-trivial because
 scaling, while beneficial to the instruction cache behavior, may
 overburden the data cache as the buffers between actors may grow to
 prohibitively large sizes that degrade the data cache
@@ -42,7 +42,7 @@ generalize it to account for the data cache.
 \input{cache-model-instruction}
 \input{cache-model-data}
 
-%% Also complicating matters is the amount of state a filter must retain
+%% Also complicating matters is the amount of state a actor must retain
 %% from one execution of its work function to the next. In the FIR
 %% example shown earlier, the state is proportional to the size of
 %% the coefficient array (i.e., \texttt{weights}). Thus any scaling of
@@ -53,7 +53,7 @@ generalize it to account for the data cache.
 %% effects of an execution trace. This does not affect our model, and can
 %% be easily remedied if necessary. To see why this is so, consider the
 %% following two execution traces which represent the executions of work
-%% functions for two filters \texttt{A} and \texttt{B}:
+%% functions for two actors \texttt{A} and \texttt{B}:
 %% $T_1 = \texttt{A}_1\texttt{A}_2\texttt{B}_3\texttt{B}_4$
 %% and 
 %% $T_2 = \texttt{A}_1\texttt{B}_2\texttt{A}_3\texttt{B}_4$.
@@ -91,7 +91,7 @@ generalize it to account for the data cache.
 %% \noindent where \texttt{m} (the multiplicity factor) is an integer greater than
 %% one.
 %% From our model, it is easy to see that scaling reduces the number
-%% of misses for a given filter $f$ from $K$ to $\frac{K}{\texttt{m}}- 1$, where $K =
+%% of misses for a given actor $f$ from $K$ to $\frac{K}{\texttt{m}}- 1$, where $K =
 %% \sum \mt{IMS}(f)$ for all occurrences of $f$ in  the execution trace.
 
 %% \subsection{Remarks}
@@ -103,16 +103,16 @@ generalize it to account for the data cache.
 %% Also note that while we use  an execution trace to describe our model,
 %% it  is possible  to  calculate  the instruction  and  data cache  miss
 %% metrics at  compile time.  To do so,  we can leverage  the hierarchical
-%% StreamIt   representation  that  dictates   the  ordering   of  filter
+%% StreamIt   representation  that  dictates   the  ordering   of  actor
 %% executions.
 
 
 %% Intuitively, the dynamic data accounts for the size of the buffer
 %% required for writing new values, as well as the size of the buffer
 %% necessary for reading values. It also adjusts for any
-%% producer-consumer locality since the output buffer of one filter is
+%% producer-consumer locality since the output buffer of one actor is
 %% also the input buffer of its neighbor in the stream graph. What this
-%% measure tells us is that we can scale the execution of a filter as
+%% measure tells us is that we can scale the execution of a actor as
 %% long as its buffer requirements (for reading and writing) do not
 %% exceed the cache, and furthermore, as long as the input-output rates
 %% between producer consumer pairs are not grossly mismatched. Managing the buffer 
@@ -121,7 +121,7 @@ generalize it to account for the data cache.
 %% mismatch, the metric tells us that the effective cache size is
 %% reduced, or in other words, the data that is left over after a
 %% producer-consumer firing must be preserved until a future occurrence of
-%% the same pair of filters. This translates to lower data locality and
+%% the same pair of actors. This translates to lower data locality and
 %% degrades cache performance.
 
 %% Mathematically, the dynamic data measure is defined as:
@@ -135,18 +135,18 @@ generalize it to account for the data cache.
 %% \end{eqnarray}
 %% with $W(f)$ equal to the output buffer size reserved for writing data, $R(f)$
 %% equal to the input buffer size reserved for reading data, $U(f)$ equal to the
-%% {\tt push} rate (in bytes) of the filter, $O(f)$ equal to the {\tt pop} rate (in
-%% bytes) of the filter, and $A(f)$ equal to the number of occurrences of
-%% filter $f$ in $phase(f_i)$. Also note that the $Y(f_i)$ is defined
+%% {\tt push} rate (in bytes) of the actor, $O(f)$ equal to the {\tt pop} rate (in
+%% bytes) of the actor, and $A(f)$ equal to the number of occurrences of
+%% actor $f$ in $phase(f_i)$. Also note that the $Y(f_i)$ is defined
 %% over all distinct occurrences of $f_k$ in the phase, and $f_s$
-%% represents the filter that consumes the data produced by $f_k$ (i.e.,
+%% represents the actor that consumes the data produced by $f_k$ (i.e.,
 %% it is $f_k$'s successor in the stream graph, and $f_k$--$f_s$
 %% constitute a producer-consumer pair; $f_s$ is unique unless $f_k$ is a splitter).
 
 %% The first summand in the equation above quantifies the address space
 %% accessed for writing data. It is  equal to the lesser of the buffer size
 %% reserved for output, and the total number of items produced by
-%% the filter (i.e., the push rate multiplied by the number of times the
+%% the actor (i.e., the push rate multiplied by the number of times the
 %% work function fired in the phase); this avoids over estimating the
 %% address space when an exceedingly large buffer is reserved but only a
 %% portion of it is used for writing in a phase.
@@ -157,7 +157,7 @@ generalize it to account for the data cache.
 %% reading data.
 
 %% The third term avoids double counting since the output buffer of one
-%% filter is also the input buffer of its successor in the stream
+%% actor is also the input buffer of its successor in the stream
 %% graph. The term quantifies the amount of data that is consumed by the
 %% producer's successor (which therefore releases a portion of the
-%% address space for use by other filters in the phase).
+%% address space for use by other actors in the phase).
