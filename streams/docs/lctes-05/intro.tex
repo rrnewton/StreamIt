@@ -1,6 +1,5 @@
 \section{Introduction}
 
-
 Stream computing represents an increasingly widespread class of
 applications. In streaming codes, there is an abundance of parallelism that
 is easier to extract compared to traditional desktop workloads (e.g.,
@@ -22,7 +21,7 @@ levels, including the register file. In this paper, we present a
 methodology for compiling streaming codes to general purpose,
 cache-based architectures. We first introduce a simple model for
 reasoning effectively about the caching behavior of streaming
-workloads. This model serves as a foundation for several {\it cache-aware
+workloads. This model serves as a foundation for several {\it cache aware
 optimizations} that are geared toward the concomitant increase of instruction
 and data {\it temporal locality}. These
 optimization lead to significantly better utilization of the memory
@@ -35,7 +34,7 @@ compared to unoptimized code.
 %they deliver performance gains ranging from 11\%
 %to 99\% for our streaming benchmark suite.
 
-The context for our work is StreamIt, an architecture-independent
+The context for our work is StreamIt, an architecture independent
 language that is engineered for streaming
 applications~\cite{streamitcc}. It adopts the 
 Cyclo-Static Dataflow~\cite{BELP96} model of computation which is a
@@ -51,35 +50,34 @@ optimization. An overview of StreamIt appears in Section~\ref{sec:streamit}.
 From a general purpose architecture's point of view, actors represent
 computation kernels, and the communication between actors represents
 data buffers that must be streamed to and from the processor. Thus
-the size of an actor and the
-order of actor executions are critical properties that
-impact the performance of the instruction cache.  In this paper, we {\it scale}
-the execution of the actor so that it runs several times before we move
-on to some other actor in the stream 
-graph. This serves to amortize the cost of fetching the actor's
-instructions into the cache from memory (an expensive operation), and to
-%% , $(ii)$ improve the instruction temporal locality
-improve overall performance. However, as our cache model will show
-(Section~\ref{sec:cache-model}), we 
-cannot arbitrarily scale the execution frequency of an actor. This
-is because actors produce data that must be buffered, and therefore,
-we must also consider the amount of data an actor produces and
-consumes if we are to adequately manage the data cache. 
-This paper is one of the first to present a unified optimization methodology
-that simultaneously considers instruction and data locality for
-mapping streaming computation to cache-based architectures (Section~\ref{sec:cache-opt}).
+the size of an actor and the order of actor executions are critical
+properties that impact the performance of the instruction cache.  
+
+In this paper, we introduce {\it execution scaling} as a simple and
+effective optimization to improve instruction locality. Scaling 
+increases the number of consecutive executions of an actor to
+amortize the cost of fetching its instructions into the cache (usually
+an expensive operation). The locality improvements translate to better
+performance. However, as our cache model will show
+(Section~\ref{sec:cache-model}), we  cannot arbitrarily scale the
+execution frequency of an actor. This is because actors produce data
+that is buffered, and therefore, we must also consider the amount of
+data an actor produces and consumes if we are to adequately manage the
+data cache.  This paper is one of the first to present a unified
+optimization methodology that simultaneously considers instruction and
+data locality for mapping streaming computation to cache-based
+architectures (Section~\ref{sec:cache-opt}). 
 
 In terms of improving the data cache behavior, the compiler schedules
 actor firing such that the producer-consumer locality is
-preserved. Furthermore,  the compiler may {\it fuse}
-together two or more actors to form a coarser grained actor.
-The fusion allows for better register allocation as we can sometimes
-perform {\it scalar replacement}: arrays used to buffer data between 
-the actors are broken down into a set of local scalar variables.
-Our compiler fuses
-actors only when the resulting actor fits within the instruction cache, 
-as otherwise fusion would negatively impact instruction locality.
-Fusion also allows for
+preserved. Furthermore,  the compiler applies  {\it cache aware fusion}
+to fuse together two or more actors (forming a coarser grained
+execution unit. The fusion allows for better register allocation as we
+can sometimes perform {\it scalar replacement}: arrays used to buffer
+data between the actors are broken down into a set of local scalar
+variables. Our compiler fuses actors only when the resulting actor
+fits within the instruction cache, as otherwise fusion would
+negatively impact instruction locality. Fusion also allows for
 various competing implementations for managing the buffers between the
 fused actors.  This paper investigates several implementation
 alternatives (for buffer management) and evaluates their performance
@@ -108,54 +106,45 @@ performance on a superscalar out-of-order processor and the Itanium~2
 representing a VLIW processor.  Execution scaling gives a 145\%
 speedup over unoptimized StreamIt for our benchmark suite on the
 StrongARM, a 58\% speedup on the Pentium~3 and a 57\% speedup on the
-Itanium~2.  Fusion with scalar replacement leads to a 84\% speedup on
-the StrongARM, a 101\% speedup on the Pentium~3, and a 103\% speedup
-on the Itanium~2.
+Itanium~2. Cache aware fusion with scalar replacement leads to a 84\%
+speedup on the StrongARM, a 101\% speedup on the Pentium~3, and a
+103\% speedup on the Itanium~2.
 
-While both execution scaling and fusion lead to frequent performance gains, we
-combine the two to deliver a more consistent performance improvement. When we
-do so, we can achieve an average speedup of 241\% on a
-StrongARM, 146\% on a Pentium~3, and 144\% on 
+While both execution scaling and fusion lead to frequent performance
+gains, we combine the two to deliver a more consistent performance
+improvement. When we do so, we can achieve an average speedup of 241\%
+on a StrongARM, 146\% on a Pentium~3, and 144\% on 
 an Itanium~2. An optimized buffer management strategy in
 combination with scaling and fusion gives the best possible performance.
 Section~\ref{sec:evaluation} describes our evaluation
 methodology and presents our experimental analysis.
 
-%further improve the performance of our benchmarks by
-%53\% on average for the Pentium~3, and 55\% for the Itanium~2.
-
 In summary, this paper makes the following contributions:
 \begin{itemize}
-
 \item A cache model for stream computing that provides a quantitative
 estimate of the caching performance for any sequence of actor
 executions.
-
-\item A cache-aware scheduling heuristic that judiciously increases
-the multiplicity of actors, improving instruction and data locality
-while not exceeding the data cache.
-
-\item A cache-aware partitioning policy that judiciously fuses
-adjacent actors into a single component, enabling local optimizations
-while not exceeding the instruction cache.
-
+\item A cache aware scheduling heuristic that judiciously scales the
+execution frequency of actors to improve instruction and data locality,
+while not overflowing the data cache.
+\item A cache aware partitioning policy that judiciously fuses
+adjacent actors into a single component, enabling local optimizations,
+while not overflowing the instruction cache.
 \item An optimized buffer management policy, termed ``copy-shift with
-execution scaling'', which out-performs a traditional rotating buffer
+execution scaling'', which out-performs a traditional rotating buffers
 in a detailed micro-benchmark analysis.
-
 \item An experimental evaluation of these techniques using the
 StreamIt compiler and a streaming benchmark suite of eleven programs.
 Compared to unoptimized StreamIt, the cache optimizations deliver an
 average speedup of 249\% on a StrongARM, 154\% on a Pentium~3 and
 152\% on an Itanium~2.
-
 \end{itemize}
 
 %% The remainder of the paper is organized as
 %% follows. Section~\ref{sec:streamit} describes StreamIt and introduces
 %% our motivating example.  Section~\ref{sec:cache-model} introduces our
 %% cache model for reasoning about the performance of a streaming
-%% computation. Section~\ref{sec:cache-opt} describes our cache-aware
+%% computation. Section~\ref{sec:cache-opt} describes our cache aware
 %% optimizations, and Section~\ref{sec:buffer} describes the optimization
 %% enabled by fusion. Section~\ref{sec:evaluation} describes our
 %% evaluation methodology and present our experimental
@@ -166,7 +155,7 @@ average speedup of 249\% on a StrongARM, 154\% on a Pentium~3 and
 % describes StreamIt and introduces our motivating example.
 % Section~\ref{sec:cache-model} introduces our cache model for 
 % reasoning about the performance of a streaming
-% computation. Section~\ref{sec:cache-opt} describes our cache-aware
+% computation. Section~\ref{sec:cache-opt} describes our cache aware
 % optimizations, and Section~\ref{sec:buffer} describes the 
 % optimization enabled by fusion. Section~\ref{sec:evaluation} describes
 % our evaluation methodology and present our experimental
