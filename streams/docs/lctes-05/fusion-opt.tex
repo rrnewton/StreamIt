@@ -85,7 +85,7 @@ the FIR actor does perform peeking, so the modulo operations are
 needed.
 
 {\bf Experimental setup.}  Figures~\ref{fig:buf-arm},~\ref{fig:buf-p3}
-and~\ref{fig:buf-itanium} illustrate the performance of various buffer
+and~\ref{fig:buf-i2} illustrate the performance of various buffer
 management strategies on a 137Mhz StrongARM-1110, a 600Mhz Pentium~3
 and a 1.3Ghz Itanium~2, respectively.  The figures illustrate the
 execution time per $10^7$ outputs for the synthetic benchmark
@@ -137,7 +137,7 @@ references the {\tt TEMP\_BUFFER} and does not perform modulo
 operations.
 
 {\bf Evaluation.}  As shown in
-Figures~\ref{fig:buf-arm},~\ref{fig:buf-p3} and~\ref{fig:buf-itanium},
+Figures~\ref{fig:buf-arm},~\ref{fig:buf-p3} and~\ref{fig:buf-i2},
 the unoptimized copy-shift strategy is the slowest strategy that we
 evaluate.  Though the cost per peek operation is smaller than the
 modulation scheme, the copying overhead per iteration also grows with
@@ -177,7 +177,7 @@ then scalar replacement does not apply.
 
 {\bf Evaluation.}  Compared to an unoptimized copy-shift strategy,
 Figures~\ref{fig:buf-arm},~Figures~\ref{fig:buf-p3}
-and~\ref{fig:buf-itanium} illustrate that scalar replacement offers
+and~\ref{fig:buf-i2} illustrate that scalar replacement offers
 modest gains on our synthetic benchmark.  At the maximum peek rate of
 128, the StrongARM and Pentium~3 offer speedups of 16\% and 26\%,
 respectively; these speedups are rougly uniform across all peek rates.
