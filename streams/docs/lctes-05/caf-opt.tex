@@ -2,7 +2,7 @@ In StreamIt, the granularity of actors is determined by the
 application developer, according to 
 the most natural representation of an algorithm. When compiling to a
 cache-based architecture, the presence of a  large number of actors
-exacerbates the transition-overhead between work functions.
+exacerbates the transition overhead between work functions.
 It is the role of the compiler  to adjust the granularity of
 the stream graph to mitigate the execution overhead.
 
@@ -10,14 +10,13 @@ In this section we describe an actor coarsening technique we refer to
 as {\it cache aware fusion} (CAF). When two actors are fused, they
 form a new actor whose work function is equivalent to its constituents.
 For example, let an actor \texttt{A} fire $n$
-times, and an actor \texttt{B} fire $2n$ times per steady:
-$S^n=(\texttt{A}^n\texttt{B}^n\texttt{B}^n)$. A new actor \texttt{F}
-that is formed by fusing \texttt{A} and \texttt{B} results in
-\texttt{F} firing $n$ times per steady state $(S^n=(\texttt{F}^n))$, but
-each execution of \texttt{F} is equivalent to  one 
-firing of \texttt{A} and two firings of \texttt{B}. If other terms, the work
+times, and an actor \texttt{B} fire $2n$ times per steady state:
+$S^n=(\texttt{A}^n\texttt{B}^n\texttt{B}^n)$. A fused actor \texttt{F}
+is formed that is equivalent to one firing of \texttt{A} and two 
+firings of \texttt{B}; \texttt{F} fires $n$ times per steady state
+$(S^n=(\texttt{F}^n))$.  In other terms, the work
 function for actor \texttt{F} inlines the work functions of
-actors \texttt{A} and \texttt{B}.
+\texttt{A} and \texttt{B}.
 
 When two actors are fused, their executions are scaled such that the output
 rate of one actor matches the input rate of the next. In the example,
@@ -48,16 +47,15 @@ The data channel between fused actors is
 subject to special buffer management techniques as described in the
 next section.
 
-There are, however, downsides to fusion. First, as more and more actors are
-fused, the instruction footprint can dramatically increase, possibly
-leading to poor use of the instruction cache. Second, fusion
+There are, however, downsides to fusion. First, as more and more
+actors are fused, the instruction footprint can dramatically increase,
+possibly leading to poor use of the instruction cache. Second, fusion
 increases the data footprint when the fused actors maintain state
 (e.g., coefficient arrays and lookup tables). Our fusion algorithm is
-cache aware specifically because it is cognisant of the instruction
-and data factors.
+cache aware in that it is cognisant of the instruction and data sizes.
 
-The CAF algorithm uses a greedy fusion heuristic to select the set of
-actors to fuse. It continuously fuses actors until the addition of
+The CAF algorithm uses a greedy fusion heuristic to determine which filters
+should be fused. It continuously fuses actors until the addition of
 a new actor causes the fused actor to exceed {\it either} the instruction cache
 capacity, or a fraction of the data cache capacity. For the latter, we
 allow the state of the new fused actor to occupy up to 50\% of the
@@ -67,8 +65,8 @@ The algorithm leverages the hierarchical nature of the stream graph,
 starting at the leaf nodes and working upwards.  For pipeline streams,
 the algorithm identifies the connection in the pipeline with the
 highest steady-state I/O rate, i.e., the pair of filters that
-communicate the most number of items per steady state.  These filters
-are fused if the instruction and data cache constraints are respected.
+communicate the largest number of items per steady state.  These two filters
+are fused, if doing so respects the instruction and data cache constraints.
 To prevent fragmentation of the pipeline, each fused filter is further
 fused with its upstream and downstream neighbors so long as the
 constraints are met.  The algorithm then repeats this process with the
@@ -77,7 +75,7 @@ more filters can be fused.  For splitjoin streams, the CAF algorithm
 fuses all parallel branches together if the combination satisfies the
 instruction and data constraints.  Partial fusion of a splitjoin is
 not helpful, as the child streams do not communicate directly with
-each other; however, complete combination can enable further fusion in
+each other; however, complete fusion can enable further fusion in
 parent pipelines.
 
 %% This differs from that in
