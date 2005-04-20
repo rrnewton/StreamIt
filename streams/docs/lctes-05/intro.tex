@@ -72,7 +72,7 @@ In terms of improving the data cache behavior, the compiler schedules
 actor firing such that the producer-consumer locality is
 preserved. Furthermore,  the compiler applies  {\it cache aware fusion}
 to fuse together two or more actors (forming a coarser grained
-execution unit. The fusion allows for better register allocation as we
+execution unit). The fusion allows for better register allocation as we
 can sometimes perform {\it scalar replacement}: arrays used to buffer
 data between the actors are broken down into a set of local scalar
 variables. Our compiler fuses actors only when the resulting actor
