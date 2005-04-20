@@ -55,12 +55,15 @@ increases the data footprint when the fused actors maintain state
 (e.g., coefficient arrays and lookup tables). Our fusion algorithm is
 cache aware in that it is cognizant of the instruction and data sizes.
 
-The CAF algorithm uses a greedy fusion heuristic to determine which filters
-should be fused. It continuously fuses actors until the addition of
-a new actor causes the fused actor to exceed {\it either} the instruction cache
-capacity, or a fraction of the data cache capacity. For the latter, we
-allow the state of the new fused actor to occupy up to 50\% of the
-data cache capacity.
+The CAF algorithm uses a greedy fusion heuristic to determine which
+filters should be fused. It continuously fuses actors until the
+addition of a new actor causes the fused actor to exceed {\it either}
+the instruction cache capacity, or a fraction of the data cache
+capacity.  For the former, we estimate the instruction code size using
+a simple count of the number of operations in the intermediate
+representation of the work function.  For the latter, we allow the
+state of the new fused actor to occupy up to 50\% of the data cache
+capacity.
 
 The algorithm leverages the hierarchical nature of the stream graph,
 starting at the leaf nodes and working upward.  For pipeline streams,
