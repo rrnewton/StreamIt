@@ -14,10 +14,9 @@ communication. Our cache optimizations are amongst the first to
 jointly consider both instruction and data working sets, finding 
 a schedule that enhances instruction locality without unduly
 affecting data locality.  The
-optimizations are founded upon two simple and intuitive models that
-quantify $(i)$ the temporal locality for a sequence of  actor
-executions, and $(ii)$ the overhead for managing the communication
-between actors. The cache-aware transformations lead to significantly
+optimizations are founded upon a simple and intuitive model that
+quantifies the temporal locality for a sequence of  actor
+executions.  The cache-aware transformations lead to significantly
 better utilization of the memory system, and as such, they deliver
 a 249\% speedup (over unoptimized StreamIt) for our streaming benchmark 
 suite on a StrongARM processor.  We also evaluate the optimizations on 
