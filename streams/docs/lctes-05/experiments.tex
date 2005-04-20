@@ -28,7 +28,7 @@ of our floating point applications (i.e., every application except for
 practice, a detailed precision analysis is needed in converting such
 applications to fixed-point.  However, as the control flow within
 these applications is very static, we are able to preserve the
-compuation pattern for the sake of benchmarking by simply replacing
+computation pattern for the sake of benchmarking by simply replacing
 every floating point type with an integer type.
 
 \begin{table}[t]
@@ -91,7 +91,7 @@ The overall speedups offered by our techniques are illustrated in
 Figure~\ref{fig:arm-perf} (StrongARM), Figure~\ref{fig:p3-perf}
 (Pentium~3), and \ref{fig:p3-perf} (Itanium~2).  These graphs have two
 bars: one for ``full fusion'', in which all actors are fused into a
-single function (with scalar replacement), and one labelled {\tt
+single function (with scalar replacement), and one labeled {\tt
 CAF+scaling+buffer}, representing all of our optimizations (cache
 aware fusion, execution scaling, and buffer optimizations) applied
 together.  We include the comparison to full fusion because it
@@ -222,13 +222,13 @@ However, after coarsening the actors with cache-aware fusion, scaling
 results in less additional speedup than it did relative to the
 baseline.  The speedup of \texttt{CAF+scaling} over \texttt{CAF} is
 86\% for StrongARM, 22\% for Pentium~3 and only 20\% for Itanium~2.
-This is because some actors are implicity scaled by fusion to match
-input/output rates of succesive actors within a fused block.
+This is because some actors are implicitly scaled by fusion to match
+input/output rates of successive actors within a fused block.
 
 Note that the \texttt{ofmd} benchmark does not benefit from fusion or
 scaling. This is because \texttt{ofmd} has few actors, some of which
 consume and produce a total of 16-66Kb data; consequently, execution
-scaling does not apply.  Also there is limited oportunity to fuse
+scaling does not apply.  Also there is limited opportunity to fuse
 actors within \texttt{ofmd}, as there are actors that have an
 instruction size of 9Kb and fusing them with other actors would
 exceed the instruction cache.
