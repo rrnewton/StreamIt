@@ -123,21 +123,21 @@ In summary, this paper makes the following contributions:
 \begin{itemize}
 \item A cache model for stream computing that provides a quantitative
 estimate of the caching performance for any sequence of actor
-executions.
+executions (Section 3).
 \item A cache aware scheduling heuristic that judiciously scales the
 execution frequency of actors to improve instruction and data locality,
-while not overflowing the data cache.
+while not overflowing the data cache (Section 4).
 \item A cache aware partitioning policy that judiciously fuses
 adjacent actors into a single component, enabling local optimizations,
-while not overflowing the instruction cache.
+while not overflowing the instruction cache (Section 4).
 \item An optimized buffer management policy, termed ``copy-shift with
 execution scaling'', which out-performs a traditional rotating buffers
-in a detailed micro-benchmark analysis.
-\item An experimental evaluation of these techniques using the
+in a micro-benchmark analysis (Section 5).
+\item An evaluation of these techniques using the
 StreamIt compiler and a streaming benchmark suite of eleven programs.
 Compared to unoptimized StreamIt, the cache optimizations deliver an
 average speedup of 249\% on a StrongARM, 154\% on a Pentium~3 and
-152\% on an Itanium~2.
+152\% on an Itanium~2 (Section 6).
 \end{itemize}
 
 %% The remainder of the paper is organized as
