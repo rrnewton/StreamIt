@@ -7,21 +7,20 @@ Current practices for hiding memory latency are invariably expensive
 and complex.  For example, superscalar processors resort to
 out-of-order execution to hide the latency of cache misses.  However,
 this results in large power expenditures (unfit for embedded systems)
-and also increases the cost of the system.  While compilers have
-attempted to optimize traditional C programs, the obscured parallelism
-and communication patterns prevent effective parallelization and
-memory hierarchy optimization without a heroic analysis.
+and also increases the cost of the system.  Compilers have also
+attempted aggressive optimizations for the memory hierarchy, but this
+has proven to be impossibly complex due to the obscured parallelism
+and communication patterns in traditional languages such as C.
 
 For performance-critical programs, the complexity inevitably
-propagates the whole way to the application developer.  Procedures are
+propagates all the way to the application developer.  Programs are
 written to explicitly manage parallelism and to reorder the
 computation so that the instruction and data working sets fit within
 the cache.  For example, the inputs and outputs of a procedure might
 be arrays that are specifically designed to fit within the data cache
 on a given architecture; loop bodies are written at a level of
-granularity that matches the instruction cache.  While such manual
-approaches can be effective, they are specialized to the details of a
-given architecture and thus sacrifice portability.  They are also
+granularity that matches the instruction cache.  While manual tuning
+can be effective, the end solutions are not portable.  They are also
 exceedingly difficult to understand, modify, and debug.
 
 The recent emergence of streaming applications represents an
@@ -31,34 +30,35 @@ applications, including embedded communications processing, multimedia
 encoding and playback, compression, and encryption.  They also range
 to server applications, such as HDTV editing and hyper-spectal
 imaging.  Stream programs are rich with parallelism and regular
-communication patterns that can be exploited by the compiler.  It is
-natural to express stream programs as a high-level graph of
-independent components, or {\it actors}.  Each actor communicates
-using explicit FIFO channels and can execute whenever a sufficient
-number of items are available on its input channels.
+communication patterns that can be exploited by the compiler to
+automatically tune memory performance.  It is natural to express a
+stream program as a high-level graph of independent components, or
+{\it actors}.  Actor communicate using explicit FIFO channels and can
+execute whenever a sufficient number of items are available on their
+input channels.  In a stream graph, actors can be freely combined and
+reordered to improve caching behavior so long as there are sufficient
+inputs to complete each execution.  These transformations serve to
+automate tedious approaches that must be performed manually using
+today's languages; they are too complex to perform automatically in
+hardware or in the most aggressive of C compilers.
 
-In a stream graph, actors can be freely combined and reordered to
-improve caching behavior so long as there are sufficient inputs to
-complete each execution.  By calculating the input and output rates of
-each actor, the compiler can determine how long to execute each one so
-as to assure that the outputs fit within the data cache.  In addition,
-by running an actor multiple times in succession, instruction locality
-is enhanced.  These transformations serve to automate tedious
-approaches that must be performed manually using today's languages;
-they are too complex to perform automatically in hardware or in the
-most aggressive of C compilers.
+%By calculating the input and
+%output rates of each actor, the compiler can determine how long to
+%execute each one so as to assure that the outputs fit within the data
+%cache.  In addition, by running an actor multiple times in succession,
+%instruction locality is enhanced.  
 
-This paper presents three simple optimizations for stream programs
-that significantly improve the utilization of the memory hierarchy:
-execution scaling, cache aware fusion, and scalar replacement.  These
-optimizations represent a {\it unified approach} that simultaneously
-considers the instruction and data working sets.  We also develop a
-simple quantitative model of caching behavior for streaming workloads,
-providing a foundation to reason about the transformations.  Our work
-is done in the context of the Synchronous Dataflow~~\cite{LM87-i}
-model of computation, in which each actor in the stream graph has a
-known input and ouput rate.  This is a popular model for a broad range
-of signal processing and embedded applications.
+This paper presents three simple cache aware optimizations for stream
+programs: {\it (i)} execution scaling, {\it (ii)} cache aware fusion,
+and {\it (iii)} scalar replacement.  These optimizations represent a
+{\it unified approach} that simultaneously considers the instruction
+and data working sets.  We also develop a simple quantitative model of
+caching behavior for streaming workloads, providing a foundation to
+reason about the transformations.  Our work is done in the context of
+the Synchronous Dataflow~\cite{LM87-i} model of computation, in which
+each actor in the stream graph has a known input and ouput rate.  This
+is a popular model for a broad range of signal processing and embedded
+applications.
 
 Execution scaling is a transformation that improves instruction
 locality by executing each actor in the stream graph multiple times
@@ -70,50 +70,47 @@ outputs will eventually overflow the data cache.  We present a simple
 and effective algorithm for calculating a scaling factor that respects
 both instruction and data constraints.
 
-While execution scaling ensures that communication between actors does
-not overflow the data cache, cache aware fusion is a technique for
-promoting such communication to the register file.  A fusion
-transformation combines several actors into one, thereby eliminating a
-function call boundary and allowing the compiler to optimize across
-actors.  As there is a fine-grained interleaving of actors, the live
-data sets are small and can sometimes be register-allocated.  However,
-as fusion grows the size of the actors, it has the potential to exceed
-the instruction cache.  Our cache aware fusion algorithm only fuses
-actors as long as they do not jeopardize instruction locality.
+Prior to execution scaling, pairs of actors that both fit in the
+instruction cache are optimized using cache aware fusion.  Fusion
+combines several actors into one, thereby eliminating function calls
+and allowing the compiler to optimize across actor boundaries.
+However, as fusion combines actors into a single function, it has the
+potential to exceed the instruction cache.  Our cache aware fusion
+algorithm only fuses actors as long as they do not jeopardize
+instruction locality.
 
-As actors are fused into a single component, it opens the door to a
-number of optimized buffer management strategies that manage the
-communication within the fused actor.  The most aggressive of these,
-termed scalar replacement, serves to replace an array with a series of
-local scalar variables.  Unlike array references, scalar variables can
-be register allocated, leading to large performance gains.  We also
-develop a new buffer management strategy (called "copy-shift") that
-extends scalar replacement to sliding-window computations, a domain
-where complex indexing expressions typically hinder compiler analysis.
+As actors are fused together, new buffer management strategies become
+possible.  The most aggressive of these, termed scalar replacement,
+serves to replace an array with a series of local scalar variables.
+Unlike array references, scalar variables can be register allocated,
+leading to large performance gains.  We also develop a new buffer
+management strategy (called ``copy-shift'') that extends scalar
+replacement to sliding-window computations, a domain where complex
+indexing expressions typically hinder compiler analysis.
 
-We have implemented the above techniques as part of StreamIt, a
+Our cache aware optimizations are implemented as part of StreamIt, a
 language and compiler infrastructure for stream
 programming~\cite{streamitcc}.  We evaluate the optimizations on three
-architectures: a StrongARM 1110, a Pentium 3, and an Itanium 2.  As an
-embedded processor that lacks a secondary cache, the StrongARM
-represents our primary target; however, the desktop machines reflect
-expected performance for a superscalar (Pentium~3) and a VLIW
-processor (Itanium~2).  We find that execution scaling, cache aware
-fusion, and scalar replacement each offer significant performance
-gains, and the most consistent speedups result when all are applied
-together.  Compared to unoptimized StreamIt code, our cache
-optimizations yield a 249\% speedup on the StrongARM, a 154\% speedup
-on the Pentium~3, and a 152\% speedup on Itanium~2.  These numbers
-represent averages over our streaming benchmark suite.
+architectures.  The StrongARM 1110 represents our primary target; it
+is an embedded processor without a secondary cache.  Our other targets
+are the Pentium~3 (a superscalar) and the Itanium~2 (a VLIW
+processor).  We find that execution scaling, cache aware fusion, and
+scalar replacement each offer significant performance gains, and the
+most consistent speedups result when all are applied together.
+Compared to unoptimized StreamIt code, our cache optimizations yield a
+249\% speedup on the StrongARM, a 154\% speedup on the Pentium~3, and
+a 152\% speedup on Itanium~2.  These numbers represent averages over
+our streaming benchmark suite.
 
-This paper is organized as follows.  In Section~3, we lay the
-foundation for our approach by developing a quantitative model of
-caching behavior for any sequence of actor executions.  Section~4
-describes execution scaling and cache-aware scheduling.  Section~5
-evaluates buffer management strategies for within a fused actor,
-including scalar replacement.  Section~6 contains our experimental
-evaluation of these techniques in the StreamIt compiler.  Finally,
-Section~7 describes related work and Section~8 concludes.
+This paper is organized as follows.  Section~2 gives background
+information on the StreamIt language.  Section~3 lays the foundation
+for our approach by developing a quantitative model of caching
+behavior for any sequence of actor executions.  Section~4 describes
+execution scaling and cache-aware scheduling.  Section~5 evaluates
+buffer management strategies within fused actors, including scalar
+replacement.  Section~6 contains our experimental evaluation of these
+techniques in the StreamIt compiler.  Finally, Section~7 describes
+related work and Section~8 concludes.
 
 %% In summary, this paper presents a unified optimization strategy for
 %% improving instruction and data locality.  Its contributions are:

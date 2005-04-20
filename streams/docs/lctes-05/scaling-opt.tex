@@ -21,8 +21,8 @@ data working set requirements as we scale a steady state.
 \mbox{} ~~~~~~~~~~$c' = \alpha \times (c - \mt{State}(a))$\\
 %\mbox{} ~~~~~~~~~~// estimate I/O requirements\\
 %\mbox{} ~~~~~~~~~~$d = \mt{IO}(X)$\\
-\mbox{} ~~~~~~~~~~// account for the I/O requirements and\\
-\mbox{} ~~~~~~~~~~// calculate largest possible scaling for $a$\\
+\mbox{} ~~~~~~~~~~// account for the I/O requirements and calculate\\
+\mbox{} ~~~~~~~~~~// scaling for $a$ that comes closest to cache size\\
 \mbox{} ~~~~~~~~~~$M[i] = {\bf round}(c'~/~\mt{IO}(a, 1))$\\
 \mbox{} ~~~~~~~\} \\
 \mbox{} ~~~~~~~{\bf sort} $M$ into ascending numerical order\\

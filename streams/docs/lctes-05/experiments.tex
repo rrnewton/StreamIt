@@ -1,29 +1,6 @@
 \section{Experimental Evaluation}
 \label{sec:evaluation}
 
-\begin{table}[t]
-\nocaptionrule
-\center
-\label{tab:benchmarks}
-{\scriptsize
-\begin{tabular}{|l|l|c|} \hline
-\hspace{-2pt}{\bf Benchmark}&\hspace{-2pt}{\bf Description}& \hspace{-6pt} {\bf \# of Actors} \hspace{-6pt} \\ \hline \hline
-\hspace{-2pt}\texttt{bitonic	} &\hspace{-2pt}bitonic sort of 64 integers	&	972 \\ \hline
-\hspace{-2pt}\texttt{fir	      } &\hspace{-2pt} finite impulse response (128 taps)&	132 \\ \hline
-\hspace{-2pt}\texttt{fft-fine	} &\hspace{-2pt}fine grained 64-way FFT	&	267 \\ \hline
-\hspace{-2pt}\texttt{fft-coarse}\hspace{-2pt} &\hspace{-2pt}coarse grained 64-way FFT	&	26 \\ \hline
-\hspace{-2pt}\texttt{3gpp	} &\hspace{-2pt}3GPP Radio Access Protocol	&	105 \\ \hline
-\hspace{-2pt}\texttt{beamformer} & \hspace{-2pt}beamformer with 64 channels and 1 beam & 197 \\ \hline
-\hspace{-2pt}\texttt{matmult	} & \hspace{-2pt}matrix multiplication	&	48 \\ \hline
-\hspace{-2pt}\texttt{fmradio	} & \hspace{-2pt}FM Radio with 10-way equalizer	&	49 \\ \hline
-\hspace{-2pt}\texttt{filterbank}\hspace{-2pt} & \hspace{-2pt}filterbank program (8 bands, 32 taps / filter)	&	53 \\ \hline
-\hspace{-2pt}\texttt{filterbank2}\hspace{-3pt}& \hspace{-2pt}independent filterbank (3 bands, 100 taps / filter) &	37 \\ \hline
-\hspace{-2pt}\texttt{ofdm	 }& \hspace{-2pt}Orthogonal Frequency Division Multiplexor~\cite{spectrumware}	&	16 \\ \hline
-\end{tabular}
-}
-\caption{Evaluation benchmark suite.}
-\end{table}
-
 In this section we evaluate the merits of the proposed cache-aware
 optimizations and buffer management strategies.  We use three
 different architectures: a 137MHz StrongARM-1110, a 600~MHz Pentium~3
@@ -53,6 +30,29 @@ applications to fixed-point.  However, as the control flow within
 these applications is very static, we are able to preserve the
 compuation pattern for the sake of benchmarking by simply replacing
 every floating point type with an integer type.
+
+\begin{table}[t]
+\nocaptionrule
+\center
+\label{tab:benchmarks}
+{\scriptsize
+\begin{tabular}{|l|l|c|} \hline
+\hspace{-2pt}{\bf Benchmark}&\hspace{-2pt}{\bf Description}& \hspace{-6pt} {\bf \# of Actors} \hspace{-6pt} \\ \hline \hline
+\hspace{-2pt}\texttt{bitonic	} &\hspace{-2pt}bitonic sort of 64 integers	&	972 \\ \hline
+\hspace{-2pt}\texttt{fir	      } &\hspace{-2pt} finite impulse response (128 taps)&	132 \\ \hline
+\hspace{-2pt}\texttt{fft-fine	} &\hspace{-2pt}fine grained 64-way FFT	&	267 \\ \hline
+\hspace{-2pt}\texttt{fft-coarse}\hspace{-2pt} &\hspace{-2pt}coarse grained 64-way FFT	&	26 \\ \hline
+\hspace{-2pt}\texttt{3gpp	} &\hspace{-2pt}3GPP Radio Access Protocol	&	105 \\ \hline
+\hspace{-2pt}\texttt{beamformer} & \hspace{-2pt}beamformer with 64 channels and 1 beam & 197 \\ \hline
+\hspace{-2pt}\texttt{matmult	} & \hspace{-2pt}matrix multiplication	&	48 \\ \hline
+\hspace{-2pt}\texttt{fmradio	} & \hspace{-2pt}FM Radio with 10-way equalizer	&	49 \\ \hline
+\hspace{-2pt}\texttt{filterbank}\hspace{-2pt} & \hspace{-2pt}filterbank program (8 bands, 32 taps / filter)	&	53 \\ \hline
+\hspace{-2pt}\texttt{filterbank2}\hspace{-3pt}& \hspace{-2pt}independent filterbank (3 bands, 100 taps / filter) &	37 \\ \hline
+\hspace{-2pt}\texttt{ofdm	 }& \hspace{-2pt}Orthogonal Frequency Division Multiplexor~\cite{spectrumware}	&	16 \\ \hline
+\end{tabular}
+}
+\caption{Evaluation benchmark suite.}
+\end{table}
 
 We also made an additional modification in compiling to the StrongARM:
 our execution scaling heuristic scales actors until their output
