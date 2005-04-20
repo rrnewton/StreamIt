@@ -17,10 +17,11 @@ makes  it  simple  to  represent computation over a
 sliding-window.   The {\tt push}, {\tt pop}, and {\tt peek} rates are
 declared as part  of  the work  function,  thereby enabling  the
 compiler    to construct a static schedule of filter executions. The
-following is an example implementation of a finite impulse
-response (FIR)  filter: 
-%\begin{scriptsize}
-{\small
+following is an example implementation of a Finite Impulse
+Response (FIR)  filter: 
+
+\begin{scriptsize}
+% {\small
 \begin{verbatim}
 float->float filter FIR (int N, float[] weights) 
 {
@@ -33,8 +34,9 @@ float->float filter FIR (int N, float[] weights)
     push(sum);
   }
 }
-\end{verbatim}}
-%\end{scriptsize}
+\end{verbatim}
+% }
+\end{scriptsize}
 
 The work function is invoked (fired) whenever there is sufficient data
 on the input tape. For the FIR example above, the filter requires at least

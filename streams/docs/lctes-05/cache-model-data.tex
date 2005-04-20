@@ -33,7 +33,7 @@ data working set of an actor $w$ as $\mt{IO}(w, m) =
 m\times(o+u)$. Therefore, we measure the data reuse distance ($\mt{DRD}$)
 of an execution $S$ with scaling factor $m$ follows:
 \[
-  \mt{DRD}(S^m,i)=\sum_{j} \mt{State}(w) + \mt{IO}(w,m)
+  \mt{DRD}(S^m,i)=\sum_{w} \mt{State}(w) + \mt{IO}(w,m)
 \]
 over all distinct actors $w$ occurring in $\mt{phase}(S^m,i)$.  While
 this simple measure double-counts data that is both produced and
@@ -52,7 +52,7 @@ firing) by evaluating the following step function:
 Finally, to model the data miss rate ($\mt{DMR}$):
 \begin{eqnarray}
   \label{eq:dmrM}
-  \mt{DMR}(S^m) &=& \frac{1}{m \times |S^m|}\sum_{i=1}^{|S^m|} \mt{DMISS}(S,m,i).
+  \mt{DMR}(S^m) &=& \frac{1}{m \times |S^m|}\sum_{i=1}^{|S^m|} \mt{DMISS}(S^m,i).
 \end{eqnarray}
 
 It is evident from Equation~\ref{eq:dmrM} that scaling can lead to
