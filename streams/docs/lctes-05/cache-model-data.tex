@@ -60,10 +60,11 @@ Finally, to model the data miss rate ($\mt{DMR}$):
 It is evident from Equation~\ref{eq:dmrM} that scaling can lead to
 lower data miss rates, as the coefficient $1/|S^m| = 1/(m \times |S|)$
 is inversely proportional to $m$.  However, as the scaling factor $m$
-grows larger, more of the $\mt{DMISS}$ rates transition from $0$ to
+grows larger, more of the $\mt{DMISS}$ values transition from $0$ to
 $1$ (they increase monotonically with the I/O rate, which is
-proportional to $m$).  Thus, scaling must be performed in moderation
-to avoid negatively impacting the data locality.
+proportional to $m$).  For sufficiently large $m$, $\mt{DMR}(S^m) =
+1$.  Thus, scaling must be performed in moderation to avoid negatively
+impacting the data locality.
 
 Note that in order to generalize the data miss rate equation so that it properly
 accounts for the dynamic working set, we must consider the amount of
