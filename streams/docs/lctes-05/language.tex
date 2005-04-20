@@ -41,7 +41,7 @@ float->float filter FIR (int N, float[] weights)
 The work function is invoked (fired) whenever there is sufficient data
 on the input tape. For the FIR example above, the filter requires at least
 \texttt{N} elements before it can execute. The value of \texttt{N} is
-known at compile time when the filter is composed to form a stream
+known at compile time when the filter is constructed to form a stream
 graph. A filter is akin to a class in object oriented programming
 with the work function serving as the main method. The parameters
 to a filter (e.g., \texttt{N} and \texttt{weights}) are equivalent to
