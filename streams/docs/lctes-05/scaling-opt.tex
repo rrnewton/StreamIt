@@ -71,8 +71,8 @@ this is an interesting issue that warrants further investigation.
 \mbox{} ~~~~~~~~~~$c' = \alpha \times (c - \mt{State}(a))$\\
 %\mbox{} ~~~~~~~~~~// estimate I/O requirements\\
 %\mbox{} ~~~~~~~~~~$d = \mt{IO}(X)$\\
-\mbox{} ~~~~~~~~~~// account for the I/O requirements and calculate\\
-\mbox{} ~~~~~~~~~~// scaling for $a$ that comes closest to cache size\\
+\mbox{} ~~~~~~~~~~// calculate scaling factor for $a$ such \\
+\mbox{} ~~~~~~~~~~// that I/O requirements are close to $c'$\\
 \mbox{} ~~~~~~~~~~$M[i] = {\bf round}(c'~/~\mt{IO}(a, 1))$\\
 \mbox{} ~~~~~~~\} \\
 \mbox{} ~~~~~~~{\bf sort} $M$ into ascending numerical order\\
