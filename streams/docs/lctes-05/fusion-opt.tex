@@ -31,7 +31,7 @@ implements a traditional circular buffer that is indexed by wraparound
 head and tail pointers.  The second strategy, termed {\it copy-shift},
 avoids modulo operations by shifting the buffer contents after each
 execution.  We demonstrate that, while a naive implementation of
-copy-shift can be 2X to 3X slower than modulation, optimizations that
+copy-shift can be $2\times$ to $3\times$ slower than modulation, optimizations that
 utilize execution scaling can boost the performance of copy-shift to
 be significantly faster than modulation (51\% speedup on StrongARM,
 48\% speedup on Pentium~3, and 5\% speedup on Itanium~2).
@@ -66,6 +66,7 @@ buffer location that will be written next, and a {\tt pop\_index} to
 indicate the buffer location that will be read next (i.e., the
 location corresponding to {\tt peek(0)}).  The communication
 primitives are translated as follows: 
+
 {\scriptsize
 \begin{verbatim}
 push(val); ==>  BUFFER[push_index] = val;
@@ -107,7 +108,7 @@ software pipelining.
 
 The copy-shift strategy, illustrated in Figure~\ref{fig:copy-shift},
 shifts the live items to the front of the buffer at the beginning of
-each execution.  Because each execution starts writing and reading to
+each execution.  Because each execution starts writing to and reading from
 the buffer at the same location, there is no need for the indices to
 wraparound and the modulo operations can be eliminated.  This savings
 is compounded by additional optimizations enabled by the copy-shift
@@ -123,6 +124,7 @@ combined into a single buffer, keeping them separate results in a
 smaller live data set when the actor is not executing.
 
 The communication primitives are translated as follows:
+
 {\scriptsize
 \begin{verbatim}
 push(val); ==>  TEMP_BUFFER[push_index] = val;
@@ -142,7 +144,7 @@ the unoptimized copy-shift strategy is the slowest strategy that we
 evaluate.  Though the cost per peek operation is smaller than the
 modulation scheme, the copying overhead per iteration also grows with
 the peek rate and cancels out any savings; overall, copy-shift
-performs from 2X to 3X slower than modulation.  The following sections
+performs from $2\times$ to $3\times$ slower than modulation.  The following sections
 describe optimizations that can justify taking the copy-shift
 approach.
 
@@ -172,7 +174,7 @@ are independent in memory, thereby facilitating this optimization.
 
 Note that scalar replacement can only be applied when array indices
 can be resolved to compile-time constants.  In the presence of unpredictable
-control flow within a actor, or if the loops are too large to fully unroll,
+control flow within an actor, or if the loops are too large to fully unroll,
 then scalar replacement does not apply.
 
 {\bf Evaluation.}  Compared to an unoptimized copy-shift strategy,
@@ -193,7 +195,7 @@ temporary variables.
 A final optimization of the copy-shift strategy uses execution scaling
 to dramatically decrease the overhead associated with copying the
 buffer contents on each iteration.  In any actor, the number of items
-inspected on one execution that need to be saved for the next
+inspected on one execution that are saved for the next
 execution is $(\mbox{\it peek} - \mbox{\it pop})$.  This represents
 the number of items copied by the copy-shift scheme.  However, this
 cost can be amortized by scaling the number of executions of the

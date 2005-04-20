@@ -33,7 +33,7 @@ optimization helps to reduce the data requirements of a program, and
 can reduce the total number of memory requests by as much as 50\%. The
 fusion of actors in the stream graph is carried out judiciously, and
 our algorithms are sensitive to the instruction and data working sets
-of the coarsened execution units, and their impact on the cache
+of the coarsened execution units, as well as their impact on the cache
 hierarchy. Cache aware fusion leads to performance gains of 84\% on
 the StrongARM, 101\% on the Pentium~3, and 103\% on the Itanium~2.
 
@@ -46,7 +46,7 @@ memory.  To allow scalar replacement to apply to sliding window
 computations, we introduce a {\it copy-shift} buffer management policy
 that out-performs a traditional rotating buffer.
 
-In summary, applying execution scaling, cache aware fusion, and our
-new buffer management strategies, we can improve performance of
+In summary, the application of execution scaling, cache aware fusion, and our
+new buffer management strategies, can improve performance of
 StreamIt programs by 249\% on the StrongARM, 154\% on the Pentium~3,
 and 152\% on the Itanium~2.
