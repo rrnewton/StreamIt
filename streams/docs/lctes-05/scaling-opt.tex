@@ -52,13 +52,13 @@ Second, it chooses the largest
 factor that allows a fraction ($p$) of the steady state actors to be
 scaled safely (i.e., the cache is adequate for their I/O
 requirements).  For example, the algorithm might calculate
-$M_\texttt{A} = 10$,
-$M_\texttt{B} = 20$, 
-$M_\texttt{C} = 30$, and 
-$M_\texttt{D} = 40$, for four actors in some steady state. Thus,
+$m_\texttt{A} = 10$,
+$m_\texttt{B} = 20$, 
+$m_\texttt{C} = 30$, and 
+$m_\texttt{D} = 40$, for four actors in some steady state. Thus,
 scaling actor \texttt{A} beyond 10 consecutive iterations will cause
 its dynamic I/O requirements to exceed the data cache. Therefore, the
-largest $M$ that allows $p=90\%$ of the actors to be
+largest $m$ that allows $p=90\%$ of the actors to be
 scaled without violating the cache constraints is 10.
 Similarly, to allow for the safe scaling of $p=75\%$ of the actors, the
 largest factor we can choose is 20.
