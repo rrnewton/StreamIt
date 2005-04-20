@@ -4,14 +4,13 @@ Efficiency and high performance are of central importance within the
 embedded domain.  As processor speeds continue to increase, the memory
 bottleneck remains a primary impediment to attaining performance.
 Current practices for hiding memory latency are invariably expensive
-and complex.  At the hardware level, superscalar processors have come
-to support out-of-order execution to hide the latency of cache misses.
-However, this results in large power expenditures (unfit for embedded
-systems) and also increases the cost of the system.  While compilers
-have attempted to optimize traditional C programs, the obscured
-parallelism and communication patterns prevent effective
-parallelization and memory hierarchy optimization without a heroic
-analysis.
+and complex.  For example, superscalar processors resort to
+out-of-order execution to hide the latency of cache misses.  However,
+this results in large power expenditures (unfit for embedded systems)
+and also increases the cost of the system.  While compilers have
+attempted to optimize traditional C programs, the obscured parallelism
+and communication patterns prevent effective parallelization and
+memory hierarchy optimization without a heroic analysis.
 
 For performance-critical programs, the complexity inevitably
 propagates the whole way to the application developer.  Procedures are
@@ -53,11 +52,13 @@ This paper presents three simple optimizations for stream programs
 that significantly improve the utilization of the memory hierarchy:
 execution scaling, cache aware fusion, and scalar replacement.  These
 optimizations represent a {\it unified approach} that simultaneously
-considers the instruction and data working sets.  Our work is done in
-the context of the Synchronous Dataflow~~\cite{LM87-i} model of
-computation, in which each actor in the stream graph has a known input
-and ouput rate.  This is a popular model for a broad range of signal
-processing and embedded applications.
+considers the instruction and data working sets.  We also develop a
+simple quantitative model of caching behavior for streaming workloads,
+providing a foundation to reason about the transformations.  Our work
+is done in the context of the Synchronous Dataflow~~\cite{LM87-i}
+model of computation, in which each actor in the stream graph has a
+known input and ouput rate.  This is a popular model for a broad range
+of signal processing and embedded applications.
 
 Execution scaling is a transformation that improves instruction
 locality by executing each actor in the stream graph multiple times
