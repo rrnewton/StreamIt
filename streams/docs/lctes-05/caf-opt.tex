@@ -22,7 +22,7 @@ When two actors are fused, their executions are scaled such that the output
 rate of one actor matches the input rate of the next. In the example,
 \texttt{A} and \texttt{B} represent a producer-consumer pair of
 filters within a pipeline, with filter \texttt{A}  
-pushing two items per firing, and \texttt{B} poping one item per
+pushing two items per firing, and \texttt{B} popping one item per
 firing. The fusion implicitly scales the execution of \texttt{B} so
 that it runs twice for every firing of \texttt{A}.
 
@@ -52,7 +52,7 @@ actors are fused, the instruction footprint can dramatically increase,
 possibly leading to poor use of the instruction cache. Second, fusion
 increases the data footprint when the fused actors maintain state
 (e.g., coefficient arrays and lookup tables). Our fusion algorithm is
-cache aware in that it is cognisant of the instruction and data sizes.
+cache aware in that it is cognizant of the instruction and data sizes.
 
 The CAF algorithm uses a greedy fusion heuristic to determine which filters
 should be fused. It continuously fuses actors until the addition of
@@ -62,7 +62,7 @@ allow the state of the new fused actor to occupy up to 50\% of the
 data cache capacity.
 
 The algorithm leverages the hierarchical nature of the stream graph,
-starting at the leaf nodes and working upwards.  For pipeline streams,
+starting at the leaf nodes and working upward.  For pipeline streams,
 the algorithm identifies the connection in the pipeline with the
 highest steady-state I/O rate, i.e., the pair of filters that
 communicate the largest number of items per steady state.  These two filters
