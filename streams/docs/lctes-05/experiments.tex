@@ -251,12 +251,13 @@ this optimization, the cache-aware fusion algorithm is modified so
 that two adjacent filters are never fused if the downstream filter
 performs any peeking (i.e., it has $\mbox{\it peek} > \mbox{\it
 pop}$).  Following execution scaling, the live items are copied to the
-start of the buffer once per scaled execution, thereby reducing the
-overhead of copying live items.  Optimized buffer management offers
-the largest gains for {\tt filterbank2}: 45\% on StrongARM, 38\% on
-Pentium~3, and 36\% on Itanium~2.  This is due to a large peek rate
-(100 items) in addition a large scaling factor of 300 that
-amortizes the cost of copying items.
+start of the buffer once per scaled execution (using the copy-shift
+strategy, Section~\ref{sec:fusion-opt}), thereby reducing the overhead
+of copying live items.  Optimized buffer management offers the largest
+gains for {\tt filterbank2}: 45\% on StrongARM, 38\% on Pentium~3, and
+36\% on Itanium~2.  This is due to a large peek rate (100 items) in
+addition a large scaling factor of 300 that amortizes the cost of
+copying items.
 
 While we found that {\tt cutpeek} is, on average, the best buffer
 management strategy across the three platforms, we also evaluated
