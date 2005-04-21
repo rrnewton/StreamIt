@@ -20,10 +20,10 @@ on an embedded processors such as StrongARM.
 </p>
 
 <p>
-An embedded system usually has slow memory and a fast cache. In contrast 
-to desktop systems, embedded systems usually have only a single level of cache 
-and every cache miss results in a slow memory access.  To achieve good 
-performance, an embedded program must have a very low cache-miss ratio.
+In contrast to desktop systems, embedded systems usually have only a
+single level of cache and every cache miss results in a slow memory
+access.  To achieve good performance, an embedded program must have a
+very low cache-miss rate.
 </p>
 
 <h5>StreamIt</h5>
@@ -61,7 +61,7 @@ result in combined actors that exceed the size of the instruction cache.
 Execution scaling executes each actor multiple times before moving on to the
 next one.  This scheduling freedom is an aspect of stream programs, where
 the graph of actors is executing in an infinite loop; actors can fire out of
-order so long as they fire in the same ratio during the steady state.  Execution scaling 
+order so long as they fire in the same ratio at steady state.  Execution scaling 
 reduces the number of cache misses for accessing the instructions of the scaled 
 actor (if all code of the actor fits into the instruction cache) and it also 
 reduces the number of cache misses for accessing the state of the scaled actor 
