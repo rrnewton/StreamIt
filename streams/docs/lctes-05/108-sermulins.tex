@@ -65,7 +65,7 @@ and complex.  For example, superscalar processors resort to
 out-of-order execution to hide the latency of cache misses.  This
 results in large power expenditures (unfit for embedded systems) and
 also increases the cost of the system.  Compilers have also employed
-computation and data reordering to improve memory performance, but this requires
+computation and data reordering to improve locality, but this requires
 a heroic analysis due to the obscured parallelism and communication
 patterns in traditional languages such as C.
 
@@ -2020,10 +2020,10 @@ and 152\% on the Itanium~2.
 
 
 \section{Acknowledgments}
-We thank Michael Gordon and Jasper Lin for their helpful comments as 
-well as their contributions to the StreamIt infrastructure.
-The StreamIt project is
-supported by DARPA grants PCA-F29601-03-2-0065 and
+We thank Michael Gordon and Jasper Lin for their helpful comments as
+well as their contributions to the StreamIt infrastructure.  We also
+thank Ken Steele for providing an IPAQ for our experiments.  The
+StreamIt project is supported by DARPA grants PCA-F29601-03-2-0065 and
 HPCA/PERCS-W0133890; NSF awards CNS-0305453 and EIA-0071841; and the
 MIT Oxygen Alliance.
 
