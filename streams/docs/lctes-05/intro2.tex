@@ -33,10 +33,10 @@ processing, multimedia encoding and playback, compression, and
 encryption.  They also range to server applications, such as HDTV
 editing and hyper-spectral imaging.  It is natural to express a stream
 program as a high-level graph of independent components, or {\it
-actors}.  Actor communicate using explicit FIFO channels and can
+actors}.  Actors communicate using explicit FIFO channels and can
 execute whenever a sufficient number of items are available on their
 input channels.  In a stream graph, actors can be freely combined and
-reordered to improve caching behavior so long as there are sufficient
+reordered to improve caching behavior as long as there are sufficient
 inputs to complete each execution.  Such transformations can serve to
 automate tedious approaches that are performed manually using today's
 languages; they are too complex to perform automatically in hardware
@@ -107,7 +107,7 @@ execution scaling and cache aware scheduling.  Section~5 evaluates
 buffer management strategies, including scalar replacement.  Section~6
 contains our experimental evaluation of these techniques in the
 StreamIt compiler.  Finally, Section~7 describes related work and
-Section~8 concludes.
+Section~8 concludes the paper.
 
 %% In summary, this paper presents a unified optimization strategy for
 %% improving instruction and data locality.  Its contributions are:
