@@ -23,11 +23,18 @@ $\mathbf{T}$ is an invertible matrix. Consider the state-update
 equation $\vec{\dot{\mathbf{x}}} = \mathbf{A} \vec{\mathbf{x}} +
 \mathbf{B} \vec{\mathbf{u}}$. Multiplying the entire equation by
 $\mathbf{T}$ yields:
+\begin{minipage}{2in}
+\vspace{-6pt}
 \starteqnstar
 \mathbf{T} \vec{\dot{\mathbf{x}}} = \mathbf{TA} \vec{\mathbf{x}} +
 \mathbf{TB} \vec{\mathbf{u}}
 \doneeqnstar
+\end{minipage}
+
 Since $\mathbf{T}^{-1} \mathbf{T} = \mathbf{I}$, we can write:
+\hspace{15pt}
+\begin{minipage}{3.5in}
+\vspace{12pt}
 \starteqnstar
 \mathbf{T} \vec{\dot{\mathbf{x}}} & = & \mathbf{TA}
 (\mathbf{T}^{-1} \mathbf{T}) \vec{\mathbf{x}} + \mathbf{TB}
@@ -38,17 +45,28 @@ Since $\mathbf{T}^{-1} \mathbf{T} = \mathbf{I}$, we can write:
 \mathbf{T}^{-1} (\mathbf{T} \vec{\mathbf{x}}) + \mathbf{D}
 \vec{\mathbf{u}}
 \doneeqnstar
+\end{minipage}
 
+\bigskip
 Where we have introduced the output equation as well. Let
 $\vec{\mathbf{z}} = \mathbf{T} \vec{\mathbf{x}}$.
 $\vec{\mathbf{z}}$ is a new state vector related to the old state
 vector $\vec{\mathbf{x}}$ by the change of basis $\mathbf{T}$.
 Substituting into the equations above we get:
+
+\hspace{0.5in}\begin{minipage}{2.5in}
+\vspace{-4pt}
 \starteqnstar
-\vec{\dot{\mathbf{z}}} & = & \mathbf{TA} \mathbf{T}^{-1} \vec{\mathbf{z}} + \mathbf{TB} \vec{\mathbf{u}} \\
+\vec{\dot{\mathbf{z}}} & = & \mathbf{TA} \mathbf{T}^{-1} \vec{\mathbf{z}} + \mathbf{TB} \vec{\mathbf{u}}
+\doneeqnstar
+\end{minipage}
+\begin{minipage}{3in}
+\starteqnstar
 \vec{\mathbf{y}} & = & \mathbf{C} \mathbf{T}^{-1}\vec{\mathbf{z}}
 + \mathbf{D}\vec{\mathbf{u}}
 \doneeqnstar
+\vspace{4pt}
+\end{minipage}
 
 This is precisely the original state space equation pair,
 with $\mathbf{A}$, $\mathbf{B}$, and $\mathbf{C}$ transformed to
@@ -112,8 +130,8 @@ representation (regardless of their initial values).
 A simple algorithm to isolate the unreachable and unobservable states
 in a system by use of transformations is explained in
 \cite{Mayne}. The algorithm works as follows: perform row
-operations on the augmented matrix $\left [ \begin{array} {cc}
-\mathbf{A} & \mathbf{B} \end{array} \right ]$ to put it into a
+operations on the augmented matrix \setstretch{1}$\left [ \begin{array} {cc}
+\mathbf{A} & \mathbf{B} \end{array} \right ]$\setstretch{1.8} to put it into a
 type of row-echelon form\footnote{A matrix is in standard row-echelon
 form if the first non-zero entry in each row is a 1 (called the
 leading 1) and the leading 1 in a higher row is to the left of the
@@ -128,9 +146,9 @@ operation on a matrix is equivalent to right multiplying it by some
 invertible matrix).  Once the augmented matrix is in the desired form,
 row $i$ of the combined matrix represents an unreachable state if
 there are no non-zero entries past the $i^{th}$ column. For
-unobservable states, the combined matrix $\left [ \begin{array} {cc}
+unobservable states, the combined matrix \setstretch{1}$\left [ \begin{array} {cc}
 \mathbf{A}^T & \mathbf{C}^T
-\end{array} \right ]$ is operated on instead.
+\end{array} \right ]$\setstretch{1.8} is operated on instead.
 
 Using this algorithm, we can find the entire set of unobservable
 states and remove them all. The only exceptions are those unobservable
@@ -214,8 +232,8 @@ transformation to the unreachable state sub-matrix, where the
 transformation matrix $\mathbf{T}$ is $\mathbf{Q}^{-1}$. Since we
 want to keep the other states unchanged, the full transformation
 matrix applied to $\mathbf{A}$, $\mathbf{B}$, $\mathbf{C}$ is
-$\mathbf{T} = \left [ \begin{array} {cc} \mathbf{Q}^{-1} &
-\mathbf{0} \\ \mathbf{0} & \mathbf{I} \end{array} \right ]$.
+\setstretch{1}$\mathbf{T} = \left [ \begin{array} {cc} \mathbf{Q}^{-1} &
+\mathbf{0} \\ \mathbf{0} & \mathbf{I} \end{array} \right ]$\setstretch{1.8}.
 
 \mysubsubsection{Putting Inputs into States}
 
@@ -229,6 +247,9 @@ optimizations.
 
 We have already discussed how to store inputs as states. When every
 input is stored as a state, we find the new state-equation pair is:
+
+\begin{minipage}{3.7in}
+\vspace{-10pt}
 \starteqnstar
 \left [ \begin{array} {c} \vec{\dot{\mathbf{x}}} \\
 \vec{\dot{\mathbf{x_{in}}}} \end{array} \right ] & = & \left [
@@ -236,12 +257,18 @@ input is stored as a state, we find the new state-equation pair is:
 \mathbf{0} \end{array} \right ] \left [ \begin{array} {c}
 \vec{\mathbf{x}} \\ \vec{\mathbf{x_{in}}} \end{array} \right ]
 + \left [ \begin{array} {c} \mathbf{0} \\ \mathbf{I} \end{array}
-\right ] \vec{\mathbf{u}} \\
+\right ] \vec{\mathbf{u}}
+\doneeqnstar
+\end{minipage}
+\begin{minipage}{2in}
+\starteqnstar
 \vec{\mathbf{y}} & = & \left [ \begin{array} {cc} \mathbf{C} &
 \mathbf{D} \end{array} \right ] \left [ \begin{array} {c}
 \vec{\mathbf{x}} \\ \vec{\mathbf{x_{in}}} \end{array} \right ]
 + \mathbf{0} \vec{\mathbf{u}}
 \doneeqnstar
+\vspace{10pt}
+\end{minipage}
 
 These states should be added before state-removal is
 performed. It may seem counter-intuitive that we first add states,
@@ -263,9 +290,11 @@ $\mathbf{C}$ ($\mathbf{B}$ can be filled with parameters) to have
 at most $s*(o+u)$ parameters, assuming there are no unobservable
 or unreachable states. They derive this form using system impulse
 responses. We will achieve this same form using row operations on
-the augmented matrix $\left [
+the augmented matrix \setstretch{1}$\left [
 \begin{array} {cc} \mathbf{A}^T & \mathbf{C}^T \end{array} \right
-]$. The form we want is:
+]$\setstretch{1.8}. The form we want is:
+
+\hspace{0.5in}\begin{minipage}{2.5in}
 \starteqnstar
 \mathbf{A}^T &=& \left [ \begin{array} {ccccc} \mathbf{L_1} &
 \mathbf{A_{12}} & \mathbf{A_{13}} & ... & \mathbf{A_{1u}} \\
@@ -273,20 +302,27 @@ the augmented matrix $\left [
 \mathbf{A_{2u}} \\ \mathbf{0} & \mathbf{0} & \mathbf{L_3} & ... &
 \mathbf{A_{3u}} \\ ... & ... & ... & ... & ... \\ \mathbf{0} &
 \mathbf{0} & \mathbf{0} & ... & \mathbf{L_u} \end{array} \right ] \\ ~ \\
+\doneeqnstar
+\end{minipage}
+\begin{minipage}{3in}
+\vspace{-9pt}
+\starteqnstar
 \mathbf{C}^T &=& \left [ \begin{array} {ccccc} 1 & 0 & 0 & ... &
 0 \\ 0 & 0 & 0 & ... & 0 \\ ... & ... & ... & ... & ... \\ 0 & 1 &
 0 & ... & 0 \\ 0 & 0 & 0 & 0 & 0 \\ ... & ... & ... & ... & ... \\
 0 & 0 & 0 & ... & 1 \end{array} \right ]
 \doneeqnstar
+\vspace{15pt}
+\end{minipage}
 
 The matrices $\mathbf{L_i}$ are rectangular, and the matrices
 $\mathbf{A_{ij}}$ are square, but do not necessarily have the same
-dimensions as each other. These matrices have the form:
+dimensions as each other. These matrices have the form: \vspace{-3pt}
 \starteqnstar
 \mathbf{L_i} = \left [ \begin{array} {ccccc} \hspace{-1pt}0 & 0 & ...
 & 0 & * \hspace{-1pt}\\\hspace{-1pt} 1 & 0 & ... & 0 & * \hspace{-1pt}\\\hspace{-1pt} 0 & 1 & ... & 0 & * \hspace{-1pt}\\\hspace{-1pt}
 ... & ... & ... & ... & ... \hspace{-1pt}\\\hspace{-1pt} 0 & 0 & ... & 1 & *\hspace{-1pt} \end{array}
-\right ] ~~
+\right ] ~~~~~
 \mathbf{A_{ij}} = \left [ \begin{array} {cccc} \hspace{-1pt}0 & 0 & ... & *
 \hspace{-1pt}\\\hspace{-1pt} ... & ... & ... & ... \hspace{-1pt}\\\hspace{-1pt} 0 & 0 & ... & *\hspace{-1pt} \end{array} \right ]
 \doneeqnstar
@@ -305,22 +341,24 @@ inverse column operations that must go with all row operations.
 \newcommand{\UND}{\end{ALC@g}}
 
 \begin{figure}[t]
-\hspace{-0.05in}\parbox{3.2in}{
-{\bf Reduce\_Parameters}(\mbox{$A, C$}) \{
+\begin{singlespace}
+{\small
+\hspace{16pt}\parbox{4.2in}{
+{\bf Reduce\_Parameters}(\mbox{$A, C$})
 \begin{algorithmic}
 \STATE - $\mt{currRow} = 0$; \\ \vspace{6pt}
 \STATE - $\mt{colA} = 0$; \\ \vspace{6pt}
 \STATE - $\mt{colC} = 0$; \\ \vspace{6pt}
 \STATE {\bf while} $(\mt{currRow} < \mt{totalRows})$ \{
 \IND
-\STATE - \parbox[t]{2.85in}{Find a non-zero entry in column $\mt{colC}$ at or below row $\mt{currRow}$ of $C^T$, and swap it with the entry in row $\mt{currRow}$} \\ \vspace{6pt}
-\STATE - \parbox[t]{2.85in}{Set $C^T[\mt{currRow}, colC] = 1$ by scaling the row appropriately; make all entries above and below it zero by adding appropriate multiple of row $\mt{currRow}$ to other rows} \\ \vspace{6pt}
+\STATE - \parbox[t]{5.85in}{Find a non-zero entry in column $\mt{colC}$ at or below row $\mt{currRow}$ of $C^T$, and swap it with the entry in row $\mt{currRow}$} \\ \vspace{6pt}
+\STATE - \parbox[t]{5.85in}{Set $C^T[\mt{currRow}, colC] = 1$ by scaling the row appropriately; make all entries above and below it zero by adding appropriate multiple of row $\mt{currRow}$ to other rows} \\ \vspace{6pt}
 \STATE - $\mt{currRow} = \mt{currRow} + 1$ \\ \vspace{6pt}
 \STATE - $\mt{colC} = \mt{colC} + 1$ \\ \vspace{6pt}
 \STATE {\bf do} \{  \\ \vspace{6pt}
 \IND
-\STATE - \parbox[t]{2.75in}{Find a non-zero entry in column $\mt{colA}$ at or below row $\mt{currRow}$ of $A^T$, and swap it with the entry in row $\mt{currRow}$} \\ \vspace{6pt}
-\STATE - \parbox[t]{2.75in}{Set $A^T[\mt{currRow}, colA] = 1$ by scaling the row appropriately; make all entries below it zero by adding appropriate multiple of row $\mt{currRow}$ to other rows} \\ \vspace{6pt}
+\STATE - \parbox[t]{5.75in}{Find a non-zero entry in column $\mt{colA}$ at or below row $\mt{currRow}$ of $A^T$, and swap it with the entry in row $\mt{currRow}$} \\ \vspace{6pt}
+\STATE - \parbox[t]{5.75in}{Set $A^T[\mt{currRow}, colA] = 1$ by scaling the row appropriately; make all entries below it zero by adding appropriate multiple of row $\mt{currRow}$ to other rows} \\ \vspace{6pt}
 \STATE - $\mt{currRow} = \mt{currRow} + 1$ \\ \vspace{6pt}
 \STATE - $\mt{colA} = \mt{colA} + 1$ \\ \vspace{6pt}
 \UND
@@ -329,7 +367,6 @@ inverse column operations that must go with all row operations.
 \UND
 \STATE \} \\ \vspace{6pt}
 \end{algorithmic}
-\}
 } % end parbox
 %% \begin{verbatim}
 %% Reduce Parameters {
@@ -363,16 +400,20 @@ inverse column operations that must go with all row operations.
 %%   }
 %% }
 %% \end{verbatim}
-\vspace{-6pt}
+\vspace{-18pt}}
 \caption{Algorithm for parameter reduction. \protect\label{fig:param}}
+\vspace{6pt}
+\hrule
+\vspace{6pt}
+\end{singlespace}
 \end{figure}
 
     It is possible that one type of form has fewer parameters than the
-other. Therefore, we perform the above algorithm on $\left [
+other. Therefore, we perform the above algorithm on \setstretch{1}$\left [
 \begin{array} {cc} \mathbf{A}^T & \mathbf{C}^T
-\end{array} \right ]$ as noted to produce the observable form, and on $\left [
+\end{array} \right ]$\setstretch{1.8} as noted to produce the observable form, and on \setstretch{1}$\left [
 \begin{array} {cc} \mathbf{A} & \mathbf{B} \end{array} \right
-]$ to produce the reachable form, and check which one has fewer
+]$\setstretch{1.8} to produce the reachable form, and check which one has fewer
 parameters.
 
 \mysubsubsection{Staged Execution}
@@ -391,6 +432,8 @@ $\vec{\mathbf{x_{in1}}}$, $\vec{\mathbf{x_{in2}}}$, etc. The
 first set gets saved in the second set, the second set gets saved in
 the third set, etc.  Suppose there are $k$ input sets. We can write
 our state space equation pair as follows:
+
+\hspace{-30pt}\begin{minipage}{4in}
 \starteqnstar
 \left [\hspace{-1.4pt} \begin{array} {c} \vec{\dot{\mathbf{x}}} \\ \vec{\dot{\mathbf{x_{ink}}}} \\
 ... \\ \vec{\dot{\mathbf{x_{in2}}}} \\
@@ -405,13 +448,21 @@ our state space equation pair as follows:
 \\ \vec{\mathbf{x_{in2}}} \\ \vec{\mathbf{x_{in1}}} \end{array} \hspace{-1.4pt} \right]
 + \left [\hspace{-1.4pt} \begin{array} {c} \mathbf{0} \\ \mathbf{0} \\ ... \\
 \mathbf{0} \\ \mathbf{I} \end{array} \hspace{-1.4pt} \right]
-\vec{\mathbf{u}} \\
+\vec{\mathbf{u}}
+\doneeqnstar
+\vspace{20pt}
+\end{minipage}
+~~~
+\begin{minipage}{2in}
+\vspace{-15pt}
+\starteqnstar
 \vec{\mathbf{y}} &\hspace{-6pt}=\hspace{-6pt}& \left [\hspace{-1.4pt} \begin{array} {ccccc} \mathbf{C} &
 \mathbf{D} & ... & \mathbf{0} & \mathbf{0} \end{array} \hspace{-1.4pt} \right]
 \left [\hspace{-1.4pt} \begin{array} {c} \vec{\mathbf{x}}
 \\ \vec{\mathbf{x_{ink}}} \\ ... \\ \vec{\mathbf{x_{in2}}}
 \\ \vec{\mathbf{x_{in1}}} \end{array} \hspace{-1.4pt} \right] + \mathbf{0} \vec{\mathbf{u}}
 \doneeqnstar
+\end{minipage}
 
 By itself, executing the work of a filter in stages does not result in
 any gain in performance. However, minimally parameterizing the

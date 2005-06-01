@@ -24,24 +24,28 @@ optimizations elsewhere.
 \begin{table}[tbp]
 \small
 \begin{center}
-\begin{tabular} {c|c|c}
-{\bf Application} & \hspace{-8pt}~~~~~~\parbox{0.7in}{{\bf ~~~Linear} \\ {\bf State Space} \vspace{2pt}}\hspace{-8pt} & {\bf Linear} \\ \hline
-FM Radio & 0.1740 & 0.1692 \\
-FIR Program &  0.9961 & 0.9980 \\
-Channel Vocoder & 0.2601 & 0.2620 \\
-FilterBank2 & 1.000 & 1.001 \\
-FFT (16 pt) & 2.938 & 3.000 \\
-Linear Difference Equation & 1.005 & 1.000 \\
-IIR & 1.005 & 1.000 \\
-IIR + 1/2 Decimator & 0.6441 & 1.000 \\
-IIR + 1/16 Decimator & 0.3393 & 1.000 \\
-IIR + FIR & 0.9413 & 1.000 \\
-FIR + IIR + IIR & 0.9214 & 1.000
+\begin{tabular} {|c|c|c|} \hline
+{\bf Application} & {\bf ~~~Linear State Space} & {\bf Linear} \\ \hline \hline
+FM Radio & 0.1740 & 0.1692 \\ \hline
+FIR Program &  0.9961 & 0.9980 \\ \hline
+Channel Vocoder & 0.2601 & 0.2620 \\ \hline
+FilterBank2 & 1.000 & 1.001 \\ \hline
+FFT (16 pt) & 2.938 & 3.000 \\ \hline
+Linear Difference Equation & 1.005 & 1.000 \\ \hline
+IIR & 1.005 & 1.000 \\ \hline
+IIR + 1/2 Decimator & 0.6441 & 1.000 \\ \hline
+IIR + 1/16 Decimator & 0.3393 & 1.000 \\ \hline
+IIR + FIR & 0.9413 & 1.000 \\ \hline
+FIR + IIR + IIR & 0.9214 & 1.000 \\ \hline
 \end{tabular}
+\begin{minipage}{4in}
 \caption{Floating point operations with state space and linear
 optimizations, normalized to no optimizations.\protect\label{tab:results}}
+\end{minipage}
+\vspace{6pt}
+\hrule
 \end{center}
-\vspace{-18pt}
+\vspace{-24pt}
 \end{table}
 
 Results appear in Table~\ref{tab:results}.  For the first 5

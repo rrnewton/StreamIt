@@ -1,11 +1,11 @@
 % double-spaced format
-%\documentclass[11pt,twoside]{article}
-%\usepackage{doublespace}
+\documentclass[12pt,twoside]{article}
+\usepackage{setspace}
 
 % ACM format
-\documentclass{sig-alternate}
-\newcommand{\setstretch}[1]{}
-\newenvironment{singlespace}{}
+%\documentclass{sig-alternate}
+%\newcommand{\setstretch}[1]{}
+%\newenvironment{singlespace}{}
 
 \usepackage{smaller}
 \usepackage{algorithm}
@@ -17,18 +17,20 @@
 
 %\title{Optimizing Stream Programs \\ Using a Linear State Space Representation}
 %\title{A Linear State Space Representation \\ for Optimizing Stream Programs}
-\title{Optimizing Stream Programs \\ Using Linear State Space Analysis}
- \author{~ \vspace{-18pt} \\ Sitij Agrawal, William Thies, and Saman Amarasinghe \\[0.2Ex]
-   MIT Computer Science and Artificial Intelligence Laboratory \\[0.8Ex]
-   \normalsize\tt{\{sitij, thies, saman\}@csail.mit.edu}}
+\title{\vspace*{-0.5in}\smaller {\bf Optimizing Stream Programs Using Linear State Space Analysis}}
+ \author{~ \vspace{-24pt} \\ Sitij Agrawal, William Thies, and Saman Amarasinghe \\[0.2Ex]
+   MIT Computer Science and Artificial Intelligence Laboratory}
+%   \normalsize\tt{\{sitij, thies, saman\}@csail.mit.edu}}
 
 % don't include the date
 \date{}
 
-\setallmargins{1in}
+\setallmargins{0.85in}
+% because page number takes a lot of space
+\setbottommargin{0.47in}
 
 % this is the line spacing
-\setstretch{1.9}
+\setstretch{1.8}
 
 % \sloppy lets Latex be a little less anal about interword spacing.  It is
 % one way to eliminate those annoying Overfull hbox warnings.
@@ -47,31 +49,31 @@
   
   % shrink the itemized lists
   \newlength{\itemshrink}
-  %\setlength{\itemshrink}{-12pt}
-  \setlength{\itemshrink}{0pt}
+  \setlength{\itemshrink}{-12pt}
+  %\setlength{\itemshrink}{0pt}
 
   % shrink spacing of section titles
-  %\newcommand{\mysection}[1]{\vspace{-22pt} \section{#1} \vspace{-12pt}}
-  %\newcommand{\mysubsection}[1]{\vspace{-15pt} \subsection{#1} \vspace{-12pt}}
-  %\newcommand{\mysubsubsection}[1]{\vspace{-9pt} \subsubsection{#1} \vspace{-12pt}}
-  \newcommand{\mysection}[1]{\section{#1}}
-  \newcommand{\mysubsection}[1]{\subsection{#1}}
-  \newcommand{\mysubsubsection}[1]{\subsubsection{#1}}
+  \newcommand{\mysection}[1]{\vspace{-23pt} \section{#1} \vspace{-12pt}}
+  \newcommand{\mysubsection}[1]{\vspace{-17pt} \subsection{#1} \vspace{-12pt}}
+  \newcommand{\mysubsubsection}[1]{\vspace{-17pt} \subsubsection{#1} \vspace{-12pt}}
+%  \newcommand{\mysection}[1]{\section{#1}}
+%  \newcommand{\mysubsection}[1]{\subsection{#1}}
+%  \newcommand{\mysubsubsection}[1]{\subsubsection{#1}}
 
   % proper spacing of equations
-  \newcommand{\starteqnstar}[0]{\begin{eqnarray*}}
-  \newcommand{\doneeqnstar}[0]{\end{eqnarray*}}
-  \newcommand{\starteqn}[0]{\begin{eqnarray}}
-  \newcommand{\doneeqn}[0]{\end{eqnarray}}
+%  \newcommand{\starteqnstar}[0]{\begin{eqnarray*}}
+%  \newcommand{\doneeqnstar}[0]{\end{eqnarray*}}
+%  \newcommand{\starteqn}[0]{\begin{eqnarray}}
+%  \newcommand{\doneeqn}[0]{\end{eqnarray}}
 
-%%   \newlength{\topeqn}
-%%   \setlength{\topeqn}{0pt}
-%%   \newlength{\boteqn}
-%%   \setlength{\boteqn}{0pt}
-%%   \newcommand{\starteqnstar}[0]{\begin{singlespace}\vspace{\topeqn}\begin{eqnarray*}}
-%%   \newcommand{\doneeqnstar}[0]{\end{eqnarray*}\vspace{\boteqn}\end{singlespace}}
-%%   \newcommand{\starteqn}[0]{\begin{singlespace}\begin{eqnarray}\vspace{\topeqn}}
-%%   \newcommand{\doneeqn}[0]{\end{eqnarray}\vspace{\boteqn}\end{singlespace}}
+   \newlength{\topeqn}
+   \setlength{\topeqn}{-24pt}
+   \newlength{\boteqn}
+   \setlength{\boteqn}{-24pt}
+   \newcommand{\starteqnstar}[0]{\begin{singlespace}\vspace{\topeqn}\begin{eqnarray*}}
+   \newcommand{\doneeqnstar}[0]{\end{eqnarray*}\vspace{\boteqn}\end{singlespace}}
+   \newcommand{\starteqn}[0]{\begin{singlespace}\begin{eqnarray}\vspace{\topeqn}}
+   \newcommand{\doneeqn}[0]{\end{eqnarray}\vspace{\boteqn}\end{singlespace}}
 
   %\toappear{\centerline{\Large\bf MIT LCS Technical Memo,}
   %          \centerline{\Large\bf MIT-LCS-TM-6XX,}
@@ -79,6 +81,7 @@
   
   \begin{singlespace}
     \maketitle
+    \vspace{-20pt}
     \begin{abstract}
       \input{abstract}
     \end{abstract}
@@ -96,10 +99,13 @@
   %\input{apps}
 
   \begin{smaller}
-    \begin{singlespace}
-      \bibliographystyle{abbrv}
-      \bibliography{main}
-    \end{singlespace}
+    \begin{smaller}
+      \begin{singlespace}
+	\vspace{-12pt}
+	\bibliographystyle{abbrv}
+	\bibliography{main}
+      \end{singlespace}
+    \end{smaller}
   \end{smaller}
   
 \end{document}
