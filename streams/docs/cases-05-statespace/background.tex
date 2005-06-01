@@ -30,17 +30,31 @@
 \label{sec:background}
 
 StreamIt~\cite{streamitcc} is an architecture-independent language for
-signal processing applications.  The basic programmable unit in
-StreamIt is a filter; for example, see the {\tt MovingAverage} filter
-in Figure~\ref{fig:filter-example}.  A filter contains a work function
-which executes atomically, popping a fixed number of items from the
-filter's input tape and pushing a fixed number of items to the
-filter's output tape.  A filter can also ``peek'' at a given index on
-its input tape without consuming the item; this makes it simple to
-write sliding-window applications such as the {\tt MovingAverage}.
-The push, pop, and peek rates are declared on the same line as the
-work function, thereby enabling the compiler to construct a static
-schedule of filter firings~\cite{lee87static}.
+signal processing applications.  StreamIt aims to expose the abundant
+parallelism and regular communication patterns in stream programs for
+the benefit of the compiler.  The optimizations described in this
+paper would be infeasible in a general-purpose language such as C.  As
+detailed elsewhere~\cite{streamitcc}, C obscures the high-level
+structure of a streaming application due to possible aliasing between
+autonomous filters, complex modulo expressions on circular buffers,
+and muddling of atomic execution steps with global control flow.
+%There is not enough information in C code to automatically perform the
+%high-level transformations that experts use to achieve competitive
+%performance.  
+In addition, StreamIt offers improved programmer productivity over C
+due to its parameterizable and composable stream constructs.
+
+The basic programmable unit in StreamIt is a filter; for example, see
+the {\tt MovingAverage} filter in Figure~\ref{fig:filter-example}.  A
+filter contains a work function which executes atomically, popping a
+fixed number of items from the filter's input tape and pushing a fixed
+number of items to the filter's output tape.  A filter can also
+``peek'' at a given index on its input tape without consuming the
+item; this makes it simple to write sliding-window applications such
+as the {\tt MovingAverage}.  The push, pop, and peek rates are
+declared on the same line as the work function, thereby enabling the
+compiler to construct a static schedule of filter
+firings~\cite{lee87static}.
 
 Each filter has a distinct address space.  A filter can store two
 types of variables: a {\it field} and a {\it local}.  Fields are

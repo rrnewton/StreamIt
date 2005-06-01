@@ -15,29 +15,17 @@ for a variety of applications, including signal compression and
 decompression, noise reduction, and error correction.  Because such
 programs often run in embedded environments with limited power and
 strict real-time requirements, this is a domain where optimization is
-still very important.  The streaming domain is also rich with
-optimization opportunities, as DSP algorithms often exhibit widespread
-parallelism and regular communication patterns that could be exploited
-by a compiler.
+still very important.  
 
-However, many of the optimization opportunities for DSP programs are
-obscured by general-purpose languages such as C.  As detailed
-elsewhere~\cite{streamitcc}, C obscures the high-level structure of a
-streaming application due to possible aliasing between autonomous
-filters, complex modulo expressions on circular buffers, and muddling
-of atomic execution steps with global control flow.  There is not
-enough information in C code to automatically perform the high-level
-transformations that experts use to achieve competitive performance.
-
-Consequently, DSP programs typically are implemented in two phases.
-First, the functionality of the algorithm is specified at a high level
-of abstraction by applications designers.  Next, a set of DSP experts
-examine the global flow of data and perform specialized
-transformations to efficiently map the algorithm to C and assembly
-code.  This process is tedious and costly, as every change in the
-high-level design necessitates new optimizations and re-implementation
-of the code; in addition, the optimizations are typically
-architecture-dependent, thereby sacrificing portability and
+Due to the emphasis on performance, DSP programs are typically
+implemented in two phases.  First, the functionality of the algorithm
+is specified at a high level of abstraction by applications designers.
+Then, a set of DSP experts examine the global flow of data and perform
+specialized transformations to efficiently map the algorithm to C and
+assembly code.  This process is tedious and costly, as every change in
+the high-level design necessitates new optimizations and
+re-implementation of the code; in addition, the optimizations are
+typically architecture-dependent, thereby sacrificing portability and
 robustness.  In an ideal world, the compiler would provide a unified
 framework for optimizing high-level DSP algorithms, thereby providing
 an automatic path from the functional specification to an efficient
@@ -99,12 +87,14 @@ and eliminates redundant states within a block.
 adjusts the coefficients of the state update and output calculation in
 order to decrease the number of operations used.
 
-\vspace{\itemshrink} \item An implementation of the above techniques
-in the StreamIt compiler, with an evaluation over a small set of
-benchmarks.  We demonstrate that state space analysis is more general
-and can offer speedups over linear optimizations alone.
-
 \vspace{\itemshrink} \end{itemize}
+
+While the principle contribution of this paper is in the elegance and
+generality of its theoretical formulation, we also demonstrate that
+state space analysis is tractable by implementing it in the StreamIt
+compiler.  We evaluate state space analysis over a modest set of
+micro-benchmarks and illustrate that it is more general than linear
+optimizations alone.
 
 In the rest of this section, we give an overview of StreamIt and
 illustrating examples of state space analysis\footnote{As the rest of
@@ -112,8 +102,8 @@ this paper is devoted to linear state space analysis, we often say
 only ``state space analysis'' for brevity.}.
 Section~\ref{sec:statespace} gives the details of our state space
 representation, including extraction and combination rules, while
-Section~\ref{sec:optimization} describes the optimizations.  In
-Section~\ref{sec:results} we discuss our implementation and results.
+Section~\ref{sec:optimization} describes the optimizations.
+Section~\ref{sec:results} discusses our implementation,
 Section~\ref{sec:related} details related work, and
 Section~\ref{sec:conclusion} concludes.
 
