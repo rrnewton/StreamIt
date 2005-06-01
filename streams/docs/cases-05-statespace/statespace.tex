@@ -1,4 +1,3 @@
-\clearpage
 \mysection{State-Space Analysis}
 \label{sec:statespace}
 
@@ -9,10 +8,13 @@ is state space; if so we initialize a data structure, fill it with the
 appropriate values through a process called \emph{extraction}, and
 associate the structure with the filter. We provide a set of rules to
 combine state space representations of filters in higher StreamIt
-blocks---pipelines, splitjoins, and feedback loops. Such a process
-results in a single state space representation for the entire block.
-We also describe how to \emph{expand} a representation so that it can
-be combined with blocks of mis-matching dimensions.
+blocks---pipelines, splitjoins, and feedback loops. Such a 
+\clearpage
+\input{example-figures}
+\noindent process results in a single state space representation for 
+the entire block. We also describe how to \emph{expand} a
+representation so that it can be combined with blocks of mis-matching
+dimensions.
 
 \mysubsection{Representation}
 
@@ -143,10 +145,7 @@ for the state vector, because their values are not saved across
 filter executions. 
 %Therefore, their values should be resolved to
 %constants at compile time. 
-A field variable has the initial vector
-pair ($\vec{\mathbf{0}}$,$\left [
-\begin{array} {ccccc} 0 & ... & 1 & ... & 0 \end{array} \right
-]$), where the 1 corresponds to the field variable itself.
+A field variable has the initial vector pair ($\vec{\mathbf{0}}$,$[ 0 ~...~ 1 ~...~ 0 ]$), where the 1 corresponds to the field variable itself.
 
 If the vector pair can be found, then the program variable $y$ can be
 written as a linear combination of the inputs and state variables,
@@ -198,77 +197,76 @@ shown in (3.1).
 Consider another IIR filter.  Unlike the example in
 Section~\ref{sec:background}, this filter uses peeking to read
 elements from the tape without consuming them.
-
 \begin{singlespace}
-\small
+\vspace{-16pt}
+\scriptsize
 \begin{verbatim}
-float->float filter IIR() {
-    float curr;  // example of a field variable
-    work push 1 pop 1 peek 3 {
-      float temp; // example of a local variable
-      temp = (peek(0) + peek(1) + peek(2))/6;
-      curr = temp + curr/2;
-      push(curr);
-      pop();
-    }
-}
+                          float->float filter IIR() {
+                              float curr;  // example of a field variable
+                              work push 1 pop 1 peek 3 {
+                                float temp; // example of a local variable
+                                temp = (peek(0) + peek(1) + peek(2))/6;
+                                curr = temp + curr/2;
+                                push(curr);
+                                pop();
+                              }
+                          }                         
 \end{verbatim}
 \end{singlespace}
 \vspace{-16pt}
 
-\noindent The input vector is $\left [\begin{array} {c} peek(2) \end{array}
-\right]$ and the state vector is $\left [\begin{array} {c} peek(0) \\ peek(1) \\ curr \\ 1 \end{array} \right]$. The first program
-variable encountered is $temp$. It is given the vector pair
-($\left [ \begin{array} {c} 1/6 \end{array} \right ]$, $\left [
-\begin{array} {cccc} 1/6 & 1/6 & 0 & 0 \end{array} \right ]$). The
+\noindent The input vector is \setstretch{1}$\left [\begin{array} {c} peek(2) \end{array}
+\right]$\setstretch{1.8} and the state vector is \setstretch{1}$\left [\begin{array} {c} peek(0) \\ peek(1) \\ curr \\ 1 \end{array} \right]$\setstretch{1.8}. The first program
+variable encountered is $temp$. It is given the vector pair (\setstretch{1}$\left [
+\begin{array} {c} 1/6 \end{array} \right ]$\setstretch{1.8}, \setstretch{1}$\left [
+\begin{array} {cccc} 1/6 & 1/6 & 0 & 0 \end{array} \right ]$\setstretch{1.8}). The
 variable $curr$, as a state variable, has an initial vector pair:
-($\left [ \begin{array} {c} 0 \end{array} \right ]$, $\left
+(\setstretch{1}$\left [ \begin{array} {c} 0 \end{array} \right ]$\setstretch{1.8}, \setstretch{1}$\left
 [\begin{array} {cccc} 0 & 0 & 1 & 0
-\end{array} \right ]$). When $curr$ is found in an assignment
+\end{array} \right ]$\setstretch{1.8}). When $curr$ is found in an assignment
 statement, it is given a new vector pair, constructed as $1$ times
 the vector pair for $temp$ plus $1/2$ times the old vector pair
-for $curr$: ($\left [ \begin{array} {c} 1/6 \end{array} \right ]$,
-$\left [ \begin{array} {cccc} 1/6 & 1/6 & 1/2 & 0 \end{array}
-\right ]$). The output is $curr$, so it is given the same vector
+for $curr$: (\setstretch{1}$\left [ \begin{array} {c} 1/6 \end{array} \right ]$\setstretch{1.8},
+\setstretch{1}$\left [ \begin{array} {cccc} 1/6 & 1/6 & 1/2 & 0 \end{array}
+\right ]$\setstretch{1.8}). The output is $curr$, so it is given the same vector
 pair. The final pair for $curr$ represents its state update. The
 stored inputs $peek(0)$, $peek(1)$ are updated as mentioned in
 (3.1), and the constant $1$ is not updated. Therefore, we have:
-
-\begin{minipage}{1.6in}
+\begin{center} \vspace{-6pt}
+\begin{minipage}{2.0in}
 \starteqnstar
 \mathbf{A} = \left [ \begin{array} {cccc} 0 & 1 & 0 & 0 \\ 0 &
 0 & 0 & 0 \\ 1/6 & 1/6 & 1/2 & 0 \\ 0 & 0 & 0 & 0 \end{array}
 \right ]
 \doneeqnstar
 \end{minipage}
-\begin{minipage}{1.4in}
+\begin{minipage}{1.1in}
 \starteqnstar
 \mathbf{B} = \left [ \begin{array} {c} 0 \\ 1 \\ 1/6 \\ 0
 \end{array} \right ]
 \doneeqnstar
 \end{minipage}
-
-\begin{minipage}{1.6in}
+\begin{minipage}{2.0in}
 \starteqnstar
 \mathbf{C} = \left [ \begin{array} {cccc} 1/6 & 1/6 & 1/2 & 0
 \end{array} \right ]
 \doneeqnstar
 \end{minipage}
-\begin{minipage}{1.4in}
+\begin{minipage}{1in}
 \starteqnstar
 \mathbf{D} = \left [ \begin{array} {c} 1/6 \end{array} \right ]
 \doneeqnstar
 \end{minipage}
+\end{center}
 
-\hspace{1in}
-\begin{minipage}{1in}
+\begin{center}
+\begin{minipage}{1.8in}
 \starteqnstar
 \overrightarrow{\mathbf{initVec}} = \left [ \begin{array} {c}
 0 \\ 0 \\ 0 \\ 1 \end{array} \right ]
 \doneeqnstar
 \end{minipage}
-
-\begin{minipage}{1.6in}
+\begin{minipage}{2.0in}
 \starteqnstar
 \mathbf{A_{pre}} = \left [ \begin{array} {cccc} 0 & 0 & 0 & 0 \\
 0 & 0 & 0 & 0 \\ 0 & 0 & 1 & 0 \\ 0 & 0 & 0 & 1 \end{array}
@@ -280,7 +278,9 @@ stored inputs $peek(0)$, $peek(1)$ are updated as mentioned in
 \mathbf{B_{pre}} = \left [ \begin{array} {cc} 1 & 0 \\ 0 & 1
 \\ 0 & 0 \\ 0 & 0 \end{array} \right ]
 \doneeqnstar
-\end{minipage} ~\\
+\end{minipage}
+\vspace{6pt}
+\end{center}
 
 The pop and push rates are both one, and we have four states so $o
 = 1, u = 1, s = 4$. We have two stored input states, so $o_{pre} =
@@ -314,39 +314,59 @@ write:
 \begin{minipage}{3in}
 \starteqnstar
 \vec{\dot{\mathbf{x_1}}} & = & \mathbf{A_1}\vec{\mathbf{x_1}} + \mathbf{B_1}\vec{\mathbf{u_1}} \\
-\vec{\dot{\mathbf{x_2}}} & = & \mathbf{A_2}\vec{\mathbf{x_2}} + \mathbf{B_2}\vec{\mathbf{y_1}} \\ ~ \\
+\vec{\dot{\mathbf{x_2}}} & = & \mathbf{A_2}\vec{\mathbf{x_2}} + \mathbf{B_2}\vec{\mathbf{y_1}}
+\doneeqnstar
+\end{minipage}
+\begin{minipage}{3in}
+\starteqnstar
 \vec{\mathbf{y_1}} & = & \mathbf{C_1}\vec{\mathbf{x_1}} + \mathbf{D_1}\vec{\mathbf{u_1}} \\
 \vec{\mathbf{y_2}} & = & \mathbf{C_2}\vec{\mathbf{x_2}} +
 \mathbf{D_2}\vec{\mathbf{y_1}}
 \doneeqnstar
 \end{minipage} ~\\
 
-Substituting for $\vec{\mathbf{y_1}}$ we get:
+\begin{minipage}{2in}
+Substituting for $\vec{\mathbf{y_1}}$ we get: ~ \\ \vspace{-12pt}
+\end{minipage}
+\begin{minipage}{3in}
 \starteqnstar
 \vec{\dot{\mathbf{x_2}}} & = & \mathbf{A_2}\vec{\mathbf{x_2}} + \mathbf{B_2}(\mathbf{C_1}\vec{\mathbf{x_1}} + \mathbf{D_1}\vec{\mathbf{u_1}}) \\
 \vec{\mathbf{y_2}} & = & \mathbf{C_2}\vec{\mathbf{x_2}} +
 \mathbf{D_2}(\mathbf{C_1}\vec{\mathbf{x_1}} +
 \mathbf{D_1}\vec{\mathbf{u_1}})
 \doneeqnstar
+\end{minipage}
 
-Which simplifies to:
+\medskip
+\begin{minipage}{2in}
+Which simplifies to: ~ \\ \vspace{-12pt}
+\end{minipage}
+\begin{minipage}{3in}
 \starteqnstar
 \vec{\dot{\mathbf{x_2}}} & = & \mathbf{A_2}\vec{\mathbf{x_2}} + \mathbf{B_2}\mathbf{C_1}\vec{\mathbf{x_1}} + \mathbf{B_2}\mathbf{D_1}\vec{\mathbf{u_1}} \\
 \vec{\mathbf{y_2}} & = & \mathbf{C_2}\vec{\mathbf{x_2}} +
 \mathbf{D_2}\mathbf{C_1}\vec{\mathbf{x_1}} +
 \mathbf{D_2}\mathbf{D_1}\vec{\mathbf{u_1}}
 \doneeqnstar
+\vspace{3pt}
+\end{minipage}
 
-Let $\vec{\mathbf{x}} = \left [ \begin{array} {c} \vec{\mathbf{x_1}} \\
+Let \setstretch{1}$\vec{\mathbf{x}} = \left [ \begin{array} {c} \vec{\mathbf{x_1}} \\
 \vec{\mathbf{x_2}} \end{array} \right ]$, $\vec{\mathbf{u}} =
-\vec{\mathbf{u_1}}$ (the input to the entire pipeline), and
+\vec{\mathbf{u_1}}$\setstretch{1.8} (the input to the entire pipeline), and
 $\vec{\mathbf{y}} = \vec{\mathbf{y_2}}$ (the output of the entire
 pipeline). The equations relating $\vec{\mathbf{x}}$,
 $\vec{\mathbf{u}}$, and $\vec{\mathbf{y}}$ are:
+
+\begin{minipage}{2in}
+~ \\ \vspace{-30pt}
 \starteqnstar
 \vec{\dot{\mathbf{x}}} & = & \mathbf{A}\vec{\mathbf{x}} + \mathbf{B}\vec{\mathbf{u}} \\
 \vec{\mathbf{y}} & = & \mathbf{C}\vec{\mathbf{x}} + \mathbf{D}\vec{\mathbf{u}}
-\doneeqnstar ~ \\ \vspace{-36pt} ~ \\
+\doneeqnstar
+~ \\ \vspace{-28pt}
+\end{minipage}
+\begin{minipage}{3in}
 \starteqnstar
 \mathbf{A} = \left [ \begin{array} {cc} \mathbf{A_1} &
 \mathbf{0} \\ \mathbf{B_2}\mathbf{C_1} & \mathbf{A_2} \end{array} \right ] &~&
@@ -354,15 +374,16 @@ $\vec{\mathbf{u}}$, and $\vec{\mathbf{y}}$ are:
 \mathbf{C} = \left [ \begin{array} {cc} \mathbf{D_2}\mathbf{C_1} & \mathbf{C_2} \end{array} \right ] &~&
 \mathbf{D} = \mathbf{D_2}\mathbf{D_1}
 \doneeqnstar
+\end{minipage}
 
 The input to the pipeline is identical to the input to $\mathrm{R_1}$,
 and the output of the pipeline is identical to the output of
 $\mathrm{R_2}$. Furthermore, the states of the pipeline are the states
 of the first block appended to the states of the second
 block. Therefore, $u = u_2$, $o = o_1$, $s = s_1 + s_2$,
-$\overrightarrow{\mathbf{initVec}} = \left [ \begin{array} {c}
+\setstretch{1}$\overrightarrow{\mathbf{initVec}} = \left [ \begin{array} {c}
 \overrightarrow{initVec_1} \\ \overrightarrow{initVec_2}
-\end{array} \right ]$.
+\end{array} \right ]$\setstretch{1.8}.
 
 If both blocks do not have initialization matrices, then the entire
 pipeline does not need initialization matrices, so $\mathbf{A_{pre}} =
@@ -371,15 +392,22 @@ the first block has initialization matrices, then we want to
 initialize the states in the pipeline corresponding to the first block
 while keeping the states corresponding to the second block
 unchanged. Therefore:
+
+\begin{minipage}{3.3in}
+~ \\ \vspace{-30pt}
 \starteqnstar
 \mathbf{A_{pre}} = \left [ \begin{array} {cc}
 \mathbf{A_{pre1}} & \mathbf{0} \\ \mathbf{0} & \mathbf{I} \end{array} \right ] ~~~~~
 \mathbf{B_{pre}} = \left [ \begin{array} {c} \mathbf{B_{pre1}} \\ \mathbf{0} \end{array} \right ]
-\doneeqnstar ~ \\ \vspace{-36pt} ~ \\
+\doneeqnstar
+~ \\ \vspace{-28pt}
+\end{minipage}
+\begin{minipage}[b]{2in}
 \starteqnstar
 o_{pre} = o_{pre1} ~~~~~
 stored = stored_1
 \doneeqnstar
+\end{minipage}
 
 If the second block has initialization matrices, we must run the first
 block enough times to provide the necessary inputs to initialize the
@@ -761,16 +789,22 @@ running multiple times, rather than once.
 Consider the state space equation pair, where $\vec{\mathbf{u_1}}$ and
 $\vec{\mathbf{y_1}}$ are the first set of inputs and outputs, and
 $\vec{\mathbf{x}}$ is the original state vector:
+\hspace{0.8in}\begin{minipage}[t]{2in}
+\vspace{-15pt}
 \starteqnstar
 \vec{\dot{\mathbf{x}}} & = & \mathbf{A}\vec{\mathbf{x}} + \mathbf{B}\vec{\mathbf{u_1}} \\
 \vec{\mathbf{y_1}} & = & \mathbf{C}\vec{\mathbf{x}} +
 \mathbf{D}\vec{\mathbf{u_1}}
 \doneeqnstar
+\vspace{8pt}
+\end{minipage}
 
 If we run the block again, the equation pair in terms of the
 original state vector $\vec{\mathbf{x}}$ and the next set of
 inputs and outputs ($\vec{\mathbf{u_2}}$ and $\vec{\mathbf{y_2}}$)
 is:
+\hspace{0.59in}\begin{minipage}[t]{2in}
+\vspace{-15pt}
 \starteqnstar
 \vec{\dot{\mathbf{x}}} & = & \mathbf{A}(\mathbf{A}\vec{\mathbf{x}}
 +
@@ -778,24 +812,36 @@ is:
 \vec{\mathbf{y_2}} & = & \mathbf{C}(\mathbf{A}\vec{\mathbf{x}} +
 \mathbf{B}\vec{\mathbf{u_1}}) + \mathbf{D}\vec{\mathbf{u_2}}
 \doneeqnstar
+\vspace{16pt}
+\end{minipage}
+
 \noindent Simplifying yields:
+\hspace{1.73in}\begin{minipage}[t]{2in}
+\vspace{-15pt}
 \starteqnstar
 \vec{\dot{\mathbf{x}}} & = & \mathbf{A}^2\vec{\mathbf{x}} +
 \mathbf{AB}\vec{\mathbf{u_1}} + \mathbf{B}\vec{\mathbf{u_2}} \\
 \vec{\mathbf{y_2}} & = & \mathbf{CA}\vec{\mathbf{x}} +
 \mathbf{CB}\vec{\mathbf{u_1}} + \mathbf{D}\vec{\mathbf{u_2}}
 \doneeqnstar
+\vspace{8pt}
+\end{minipage}
 
-Let $\vec{\mathbf{u}}$ be the combined input vector ($\vec{\mathbf{u}}
+Let $\vec{\mathbf{u}}$ be the combined input vector (\setstretch{1}$\vec{\mathbf{u}}
 = \left [ \begin{array} {c} \vec{\mathbf{u_1}}
-\\ \vec{\mathbf{u_2}} \end{array} \right ]$) and $\vec{\mathbf{y}}$ be the combined output vector
-($\vec{\mathbf{y}} = \left [ \begin{array} {c} \vec{\mathbf{y_1}}
-\\ \vec{\mathbf{y_2}} \end{array} \right ]$). The representation in terms of these two
+\\ \vec{\mathbf{u_2}} \end{array} \right ]$\setstretch{1.8}) and $\vec{\mathbf{y}}$ be the combined output vector
+(\setstretch{1}$\vec{\mathbf{y}} = \left [ \begin{array} {c} \vec{\mathbf{y_1}}
+\\ \vec{\mathbf{y_2}} \end{array} \right ]$\setstretch{1.8}). The representation in terms of these two
 vectors is:
+
+\hspace{0.3in}\begin{minipage}{2in}
+\vspace{-6pt}
 \starteqnstar
 \vec{\dot{\mathbf{x}}} & = & \mathbf{A_2}\vec{\mathbf{x}} + \mathbf{B_2}\vec{\mathbf{u}} \\
 \vec{\mathbf{y}} & = & \mathbf{C_2}\vec{\mathbf{x}} + \mathbf{D_2}\vec{\mathbf{u}}
-\doneeqnstar ~ \\ \vspace{-36pt} ~ \\
+\doneeqnstar
+\end{minipage}
+\begin{minipage}{3in}
 \starteqnstar
 \mathbf{A_2} = \mathbf{A}^2 ~~~~~
 \mathbf{B_2} = \left [ \begin{array} {cc} \mathbf{AB} & \mathbf{B} \end{array} \right ]  \\ ~ \\
@@ -804,21 +850,39 @@ vectors is:
 \mathbf{D_2} = \left [ \begin{array} {cc} \mathbf{D} & \mathbf{0} \\
 \mathbf{CB} & \mathbf{D} \end{array} \right ]
 \doneeqnstar
+\vspace{18pt}
+\end{minipage}
+
 This new representation corresponds to a block that upon every
 execution runs the old block twice. By induction, a general formula
-for running a block n times is:
+for running a block $n$ times is:
+
+\begin{minipage}{1.5in}
 \starteqnstar
 \mathbf{A_n} = \mathbf{A}^n ~~~~~
+\doneeqnstar
+\end{minipage}
+\begin{minipage}{4in}
+\starteqnstar
 \mathbf{B_n} = \left [ \begin{array} {ccccc} \mathbf{A}^{n-1}
 \mathbf{B} & \mathbf{A}^{n-2} \mathbf{B} & ...  & \mathbf{AB} &
 \mathbf{B} \end{array} \right ]
 \doneeqnstar
+\vspace{9pt}
+\end{minipage}
+
+\hspace{12pt}\begin{minipage}{1.5in}
 \starteqnstar
 \mathbf{C_n} = \left [ \begin{array} {c} \mathbf{C} \\
 \mathbf{CA} \\
 ... \\
 \mathbf{CA^{n-2}} \\
 \mathbf{CA^{n-1}} \end{array} \right ]~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \\
+\doneeqnstar
+\end{minipage}
+\hspace{18pt}
+\begin{minipage}{4in}
+\starteqnstar
 \mathbf{D_n} = \left [ \begin{array} {ccccccc}
 \mathbf{D} & \mathbf{0} & \mathbf{0} & ... & \mathbf{0} & \mathbf{0} \\
 \mathbf{CB} & \mathbf{D} & \mathbf{0} & ... & \mathbf{0} & \mathbf{0} \\
@@ -843,6 +907,8 @@ for running a block n times is:
 %% \mathbf{CA}^{n-4} \mathbf{B} & ... & \mathbf{CAB} & \mathbf{CB} &
 %% \mathbf{D} \end{array} \right ]
 \doneeqnstar
+\vspace{12pt}
+\end{minipage}
 
 Since initializations are not affected,
 $\overrightarrow{\mathbf{initVec}}$, $\mathbf{preA}$, $\mathbf{preB}$,
