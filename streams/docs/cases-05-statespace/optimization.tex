@@ -9,25 +9,25 @@ slow and power-hungry operations. It also eliminates computations that
 involve the removed states.  The second optimization is to reduce the
 parametrization of a state space representation, by changing the
 representation to one with more zero and one entries in its
-matrices. This directly eliminates computations, since all
-multiplications by zero or one are not processed by the replacement
-algorithm.
+matrices. This directly eliminates computations, as the compiler
+statically evaluates $0 \cdot x = 0$ and $1 \cdot x = x$ rather than
+performing a multiplication at runtime.
 
 \mysubsection{State-Space Transformations}
 
 For any state space equation pair, there are an infinite number of
 transformations to an equivalent state space system.  These
 transformations involve a change of basis of the state vector
-$\vec{\mathbf{x}}$ to $\mathbf{T} \vec{\mathbf{x}}$, where
+$\vc{\mathbf{x}}$ to $\mathbf{T} \vc{\mathbf{x}}$, where
 $\mathbf{T}$ is an invertible matrix. Consider the state-update
-equation $\vec{\dot{\mathbf{x}}} = \mathbf{A} \vec{\mathbf{x}} +
-\mathbf{B} \vec{\mathbf{u}}$. Multiplying the entire equation by
+equation $\vc{\dot{\mathbf{x}}} = \mathbf{A} \vc{\mathbf{x}} +
+\mathbf{B} \vc{\mathbf{u}}$. Multiplying the entire equation by
 $\mathbf{T}$ yields:
 \begin{minipage}{2in}
 \vspace{-6pt}
 \starteqnstar
-\mathbf{T} \vec{\dot{\mathbf{x}}} = \mathbf{TA} \vec{\mathbf{x}} +
-\mathbf{TB} \vec{\mathbf{u}}
+\mathbf{T} \vc{\dot{\mathbf{x}}} = \mathbf{TA} \vc{\mathbf{x}} +
+\mathbf{TB} \vc{\mathbf{u}}
 \doneeqnstar
 \end{minipage}
 
@@ -36,34 +36,34 @@ Since $\mathbf{T}^{-1} \mathbf{T} = \mathbf{I}$, we can write:
 \begin{minipage}{3.5in}
 \vspace{12pt}
 \starteqnstar
-\mathbf{T} \vec{\dot{\mathbf{x}}} & = & \mathbf{TA}
-(\mathbf{T}^{-1} \mathbf{T}) \vec{\mathbf{x}} + \mathbf{TB}
-\vec{\mathbf{u}} = \mathbf{TA}
-\mathbf{T}^{-1} (\mathbf{T} \vec{\mathbf{x}}) + \mathbf{TB} \vec{\mathbf{u}} \\
-\vec{\mathbf{y}} & = & \mathbf{C} (\mathbf{T}^{-1} \mathbf{T})
-\vec{\mathbf{x}} + \mathbf{D} \vec{\mathbf{u}} = \mathbf{C}
-\mathbf{T}^{-1} (\mathbf{T} \vec{\mathbf{x}}) + \mathbf{D}
-\vec{\mathbf{u}}
+\mathbf{T} \vc{\dot{\mathbf{x}}} & = & \mathbf{TA}
+(\mathbf{T}^{-1} \mathbf{T}) \vc{\mathbf{x}} + \mathbf{TB}
+\vc{\mathbf{u}} = \mathbf{TA}
+\mathbf{T}^{-1} (\mathbf{T} \vc{\mathbf{x}}) + \mathbf{TB} \vc{\mathbf{u}} \\
+\vc{\mathbf{y}} & = & \mathbf{C} (\mathbf{T}^{-1} \mathbf{T})
+\vc{\mathbf{x}} + \mathbf{D} \vc{\mathbf{u}} = \mathbf{C}
+\mathbf{T}^{-1} (\mathbf{T} \vc{\mathbf{x}}) + \mathbf{D}
+\vc{\mathbf{u}}
 \doneeqnstar
 \end{minipage}
 
 \bigskip
 Where we have introduced the output equation as well. Let
-$\vec{\mathbf{z}} = \mathbf{T} \vec{\mathbf{x}}$.
-$\vec{\mathbf{z}}$ is a new state vector related to the old state
-vector $\vec{\mathbf{x}}$ by the change of basis $\mathbf{T}$.
+$\vc{\mathbf{z}} = \mathbf{T} \vc{\mathbf{x}}$.
+$\vc{\mathbf{z}}$ is a new state vector related to the old state
+vector $\vc{\mathbf{x}}$ by the change of basis $\mathbf{T}$.
 Substituting into the equations above we get:
 
 \hspace{0.5in}\begin{minipage}{2.5in}
 \vspace{-4pt}
 \starteqnstar
-\vec{\dot{\mathbf{z}}} & = & \mathbf{TA} \mathbf{T}^{-1} \vec{\mathbf{z}} + \mathbf{TB} \vec{\mathbf{u}}
+\vc{\dot{\mathbf{z}}} & = & \mathbf{TA} \mathbf{T}^{-1} \vc{\mathbf{z}} + \mathbf{TB} \vc{\mathbf{u}}
 \doneeqnstar
 \end{minipage}
 \begin{minipage}{3in}
 \starteqnstar
-\vec{\mathbf{y}} & = & \mathbf{C} \mathbf{T}^{-1}\vec{\mathbf{z}}
-+ \mathbf{D}\vec{\mathbf{u}}
+\vc{\mathbf{y}} & = & \mathbf{C} \mathbf{T}^{-1}\vc{\mathbf{z}}
++ \mathbf{D}\vc{\mathbf{u}}
 \doneeqnstar
 \vspace{4pt}
 \end{minipage}
@@ -73,13 +73,13 @@ with $\mathbf{A}$, $\mathbf{B}$, and $\mathbf{C}$ transformed to
 $\mathbf{T} \mathbf{A} \mathbf{T}^{-1}$, $\mathbf{T} \mathbf{B}$,
 and $\mathbf{C} \mathbf{T}^{-1}$, respectively.
 
-For a StreamIt state space representation $\mathrm{R}$, we must
+For a StreamIt state space representation ${\cal R}$, we must
 determine how the other values change. The initialization state update
 equation is essentially the same as the regular state update equation,
 so $\mathbf{A_{pre}}$ and $\mathbf{B_{pre}}$ are transformed to
 $\mathbf{T} \mathbf{A_{pre}} \mathbf{T}^{-1}$ and $\mathbf{T}
 \mathbf{B}$ respectively. Since the old state vector
-$\vec{\mathbf{x}}$ is multiplied by $\mathbf{T}$, the old initial
+$\vc{\mathbf{x}}$ is multiplied by $\mathbf{T}$, the old initial
 state vector is multiplied by $\mathbf{T}$. The number of states,
 inputs, and outputs is the same, so $s$, $o$, and $u$ are unchanged.
 
@@ -131,7 +131,7 @@ A simple algorithm to isolate the unreachable and unobservable states
 in a system by use of transformations is explained in
 \cite{Mayne}. The algorithm works as follows: perform row
 operations on the augmented matrix \setstretch{1}$\left [ \begin{array} {cc}
-\mathbf{A} & \mathbf{B} \end{array} \right ]$\setstretch{1.8} to put it into a
+\mathbf{A} & \mathbf{B} \end{array} \right ]$\setstretch{1.78} to put it into a
 type of row-echelon form\footnote{A matrix is in standard row-echelon
 form if the first non-zero entry in each row is a 1 (called the
 leading 1) and the leading 1 in a higher row is to the left of the
@@ -141,14 +141,14 @@ and the ending 1 in a higher row is to the left of the ending 1 in a
 lower row.}, and perform the corresponding inverse column operations
 on $\mathbf{A}$ and $\mathbf{C}$ to keep the system equivalent to the
 original. (Performing a row operation on a matrix is equivalent to
-left multiplying it by some invertible matrix, and performing a column
-operation on a matrix is equivalent to right multiplying it by some
+left-multiplying it by some invertible matrix, and performing a column
+operation on a matrix is equivalent to right-multiplying it by some
 invertible matrix).  Once the augmented matrix is in the desired form,
 row $i$ of the combined matrix represents an unreachable state if
 there are no non-zero entries past the $i^{th}$ column. For
 unobservable states, the combined matrix \setstretch{1}$\left [ \begin{array} {cc}
 \mathbf{A}^T & \mathbf{C}^T
-\end{array} \right ]$\setstretch{1.8} is operated on instead.
+\end{array} \right ]$\setstretch{1.78} is operated on instead.
 
 Using this algorithm, we can find the entire set of unobservable
 states and remove them all. The only exceptions are those unobservable
@@ -175,20 +175,20 @@ states. If an unreachable state $x_1$ is updated by unreachable states
 $x_2$ and $x_3$, we must check if those states can be removed before
 determining if state $x_1$ can be removed.  If one of those states,
 say $x_2$, depends on $x_1$, we must determine if $x_1$ can be removed
-before determining whether $x_2$ can be removed - resulting in an
+before determining whether $x_2$ can be removed---resulting in an
 impossible `loop-like' determination. Clearly, a more robust approach
 is necessary.
 
-Suppose we have found the set of unreachable states and they form the
-first $k$ states of the state vector (we can do both of these steps by
-isolating the unreachable states, then moving them to the top of the
-state vector if necessary). Consider the sub-matrix
-$\mathbf{A}[1:k;1:k]$ consisting of the first k rows and first k
-columns of $\mathbf{A}$. This sub-matrix represents how the
-unreachable states are updated based on each other.  Suppose this
-sub-matrix is in upper-triangular form, which means that all entries
-below the main diagonal are zero. We can remove states in the
-following manner:
+The robust approach is as follows.  Suppose we have found the set of
+unreachable states and they form the first $k$ states of the state
+vector (we can do both of these steps by isolating the unreachable
+states, then moving them to the top of the state vector if
+necessary). Consider the sub-matrix $\mathbf{A}[1:k;1:k]$ consisting
+of the first k rows and first k columns of $\mathbf{A}$. This
+sub-matrix represents how the unreachable states are updated based on
+each other.  Suppose this sub-matrix is in upper-triangular form,
+which means that all entries below the main diagonal are zero. We can
+remove states in the following manner:
 \begin{enumerate}
 \vspace{\itemshrink} \item Check the states in reverse order, from state $k$ to state
 $1$.
@@ -220,9 +220,9 @@ P)
 \vspace{\itemshrink} \end{enumerate}
 
 The QR factorization of a matrix $\mathbf{P}$ factors $\mathbf{P}$
-into the product of an orthogonal matrix $\mathbf{Q}$\footnote{An
-orthogonal matrix has the property that its transpose is equal to its
-inverse} and an upper-triangular matrix $\mathbf{R}$. Since
+into the product of an orthogonal\footnote{An orthogonal matrix has
+the property that its transpose is equal to its inverse} matrix
+$\mathbf{Q}$ and an upper-triangular matrix $\mathbf{R}$. Since
 $\mathbf{R} = \mathbf{Q}^{-1}
 \mathbf{P}$, the QR algorithm is repeatedly transforming
 $\mathbf{P}$ to $\mathbf{Q}^{-1} \mathbf{P} \mathbf{Q}$.
@@ -231,9 +231,9 @@ Since $\mathbf{Q}$ is invertible, we can apply this
 transformation to the unreachable state sub-matrix, where the
 transformation matrix $\mathbf{T}$ is $\mathbf{Q}^{-1}$. Since we
 want to keep the other states unchanged, the full transformation
-matrix applied to $\mathbf{A}$, $\mathbf{B}$, $\mathbf{C}$ is
+matrix applied to $\mathbf{A}$, $\mathbf{B}$, and $\mathbf{C}$ is
 \setstretch{1}$\mathbf{T} = \left [ \begin{array} {cc} \mathbf{Q}^{-1} &
-\mathbf{0} \\ \mathbf{0} & \mathbf{I} \end{array} \right ]$\setstretch{1.8}.
+\mathbf{0} \\ \mathbf{0} & \mathbf{I} \end{array} \right ]$\setstretch{1.78}.
 
 \mysubsubsection{Putting Inputs into States}
 
@@ -251,21 +251,21 @@ input is stored as a state, we find the new state-equation pair is:
 \begin{minipage}{3.7in}
 \vspace{-10pt}
 \starteqnstar
-\left [ \begin{array} {c} \vec{\dot{\mathbf{x}}} \\
-\vec{\dot{\mathbf{x_{in}}}} \end{array} \right ] & = & \left [
+\left [ \begin{array} {c} \vc{\dot{\mathbf{x}}} \\
+{\vc{\dot{\mathbf{x}}}}_{\mathbf{in}} \end{array} \right ] & = & \left [
 \begin{array} {cc} \mathbf{A} & \mathbf{B} \\ \mathbf{0} &
 \mathbf{0} \end{array} \right ] \left [ \begin{array} {c}
-\vec{\mathbf{x}} \\ \vec{\mathbf{x_{in}}} \end{array} \right ]
+\vc{\mathbf{x}} \\ {\vc{\mathbf{x}}}_{\mathbf{in}} \end{array} \right ]
 + \left [ \begin{array} {c} \mathbf{0} \\ \mathbf{I} \end{array}
-\right ] \vec{\mathbf{u}}
+\right ] \vc{\mathbf{u}}
 \doneeqnstar
 \end{minipage}
 \begin{minipage}{2in}
 \starteqnstar
-\vec{\mathbf{y}} & = & \left [ \begin{array} {cc} \mathbf{C} &
+\vc{\mathbf{y}} & = & \left [ \begin{array} {cc} \mathbf{C} &
 \mathbf{D} \end{array} \right ] \left [ \begin{array} {c}
-\vec{\mathbf{x}} \\ \vec{\mathbf{x_{in}}} \end{array} \right ]
-+ \mathbf{0} \vec{\mathbf{u}}
+\vc{\mathbf{x}} \\ {\vc{\mathbf{x}}}_{\mathbf{in}} \end{array} \right ]
++ \mathbf{0} \vc{\mathbf{u}}
 \doneeqnstar
 \vspace{10pt}
 \end{minipage}
@@ -292,7 +292,7 @@ or unreachable states. They derive this form using system impulse
 responses. We will achieve this same form using row operations on
 the augmented matrix \setstretch{1}$\left [
 \begin{array} {cc} \mathbf{A}^T & \mathbf{C}^T \end{array} \right
-]$\setstretch{1.8}. The form we want is:
+]$\setstretch{1.78}. The form we want is:
 
 \hspace{0.5in}\begin{minipage}{2.5in}
 \starteqnstar
@@ -342,7 +342,7 @@ inverse column operations that must go with all row operations.
 
 \begin{figure}[t]
 \begin{singlespace}
-{\small
+{
 \hspace{16pt}\parbox{4.2in}{
 {\bf Reduce\_Parameters}(\mbox{$A, C$})
 \begin{algorithmic}
@@ -411,9 +411,9 @@ inverse column operations that must go with all row operations.
     It is possible that one type of form has fewer parameters than the
 other. Therefore, we perform the above algorithm on \setstretch{1}$\left [
 \begin{array} {cc} \mathbf{A}^T & \mathbf{C}^T
-\end{array} \right ]$\setstretch{1.8} as noted to produce the observable form, and on \setstretch{1}$\left [
+\end{array} \right ]$\setstretch{1.78} as noted to produce the observable form, and on \setstretch{1}$\left [
 \begin{array} {cc} \mathbf{A} & \mathbf{B} \end{array} \right
-]$\setstretch{1.8} to produce the reachable form, and check which one has fewer
+]$\setstretch{1.78} to produce the reachable form, and check which one has fewer
 parameters.
 
 \mysubsubsection{Staged Execution}
@@ -427,40 +427,40 @@ block in two stages:
 actual inputs.
 \vspace{\itemshrink} \end{enumerate}
 
-We can add additional stages by having multiple sets of input states -
-$\vec{\mathbf{x_{in1}}}$, $\vec{\mathbf{x_{in2}}}$, etc. The
-first set gets saved in the second set, the second set gets saved in
-the third set, etc.  Suppose there are $k$ input sets. We can write
-our state space equation pair as follows:
+We can add additional stages by having multiple sets of input states---${\vc{\mathbf{x}}}_{\mathbf{in1}}$, ${\vc{\mathbf{x}}}_{\mathbf{in2}}$, etc. The first set
+\clearpage \noindent gets saved in the second set, the second set gets
+saved in the third set, etc.  Suppose there are $k$ input sets. We can
+write our state space equation pair as follows:
 
 \hspace{-30pt}\begin{minipage}{4in}
+\vspace{10pt}
 \starteqnstar
-\left [\hspace{-1.4pt} \begin{array} {c} \vec{\dot{\mathbf{x}}} \\ \vec{\dot{\mathbf{x_{ink}}}} \\
-... \\ \vec{\dot{\mathbf{x_{in2}}}} \\
-\vec{\dot{\mathbf{x_{in1}}}}
+\left [\hspace{-1.4pt} \begin{array} {c} \vc{\dot{\mathbf{x}}} \\ {\vc{\dot{\mathbf{x}}}}_{{\mathbf{{ink}}}} \\
+... \\ {\vc{\dot{\mathbf{x}}}}_{{\mathbf{{in2}}}} \\
+{\vc{\dot{\mathbf{x}}}}_{{\mathbf{{in1}}}}
 \end{array} \hspace{-1.4pt} \right] &\hspace{-6pt}=\hspace{-6pt}& \left [\hspace{-1.4pt} \begin{array} {ccccc}
 \mathbf{A} & \mathbf{B} & \mathbf{0} & ... &
 \mathbf{0} \\ \mathbf{0} & \mathbf{0} & \mathbf{I} & ... & \mathbf{0} \\
 ... & ... & ... & ... & ... \\ \mathbf{0} & \mathbf{0} &
 \mathbf{0} & ... & \mathbf{I} \\ \mathbf{0} & \mathbf{0} &
 \mathbf{0} & ... & \mathbf{0} \end{array} \hspace{-1.4pt} \right] \left [\hspace{-1.4pt}
-\begin{array} {c} \vec{\mathbf{x}} \\ \vec{\mathbf{x_{ink}}} \\ ...
-\\ \vec{\mathbf{x_{in2}}} \\ \vec{\mathbf{x_{in1}}} \end{array} \hspace{-1.4pt} \right]
+\begin{array} {c} \vc{\mathbf{x}} \\ {\vc{\mathbf{x}}}_{\mathbf{{ink}}} \\ ...
+\\ {\vc{\mathbf{x}}}_{\mathbf{{in2}}} \\ {\vc{\mathbf{x}}}_{\mathbf{{in1}}} \end{array} \hspace{-1.4pt} \right]
 + \left [\hspace{-1.4pt} \begin{array} {c} \mathbf{0} \\ \mathbf{0} \\ ... \\
 \mathbf{0} \\ \mathbf{I} \end{array} \hspace{-1.4pt} \right]
-\vec{\mathbf{u}}
+\vc{\mathbf{u}}
 \doneeqnstar
-\vspace{20pt}
+\vspace{24pt}
 \end{minipage}
 ~~~
 \begin{minipage}{2in}
 \vspace{-15pt}
 \starteqnstar
-\vec{\mathbf{y}} &\hspace{-6pt}=\hspace{-6pt}& \left [\hspace{-1.4pt} \begin{array} {ccccc} \mathbf{C} &
+\vc{\mathbf{y}} &\hspace{-6pt}=\hspace{-6pt}& \left [\hspace{-1.4pt} \begin{array} {ccccc} \mathbf{C} &
 \mathbf{D} & ... & \mathbf{0} & \mathbf{0} \end{array} \hspace{-1.4pt} \right]
-\left [\hspace{-1.4pt} \begin{array} {c} \vec{\mathbf{x}}
-\\ \vec{\mathbf{x_{ink}}} \\ ... \\ \vec{\mathbf{x_{in2}}}
-\\ \vec{\mathbf{x_{in1}}} \end{array} \hspace{-1.4pt} \right] + \mathbf{0} \vec{\mathbf{u}}
+\left [\hspace{-1.4pt} \begin{array} {c} \vc{\mathbf{x}}
+\\ {\vc{\mathbf{x}}}_{\mathbf{{ink}}} \\ ... \\ {\vc{\mathbf{x}}}_{\mathbf{{in2}}}
+\\ {\vc{\mathbf{x}}}_{\mathbf{{in1}}} \end{array} \hspace{-1.4pt} \right] + \mathbf{0} \vc{\mathbf{u}}
 \doneeqnstar
 \end{minipage}
 
