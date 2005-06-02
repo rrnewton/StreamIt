@@ -138,23 +138,23 @@ following notation to describe such systems:
 
 \hspace{0.5in}\begin{minipage}{2.5in}
 \starteqnstar 
-\vec{\mathbf{y}}
-& = & \mathbf{C}\vec{\mathbf{x}} + \mathbf{D}\vec{\mathbf{u}}
+\vc{\dot{\mathbf{x}}} & = & \mathbf{A}\vc{\mathbf{x}} +
+\mathbf{B}\vc{\mathbf{u}} \
 \doneeqnstar
 \end{minipage}
 \begin{minipage}{2.5in}
 \starteqnstar 
-\vec{\dot{\mathbf{x}}} & = & \mathbf{A}\vec{\mathbf{x}} +
-\mathbf{B}\vec{\mathbf{u}} \
+\vc{\mathbf{y}}
+& = & \mathbf{C}\vc{\mathbf{x}} + \mathbf{D}\vc{\mathbf{u}}
 \doneeqnstar
 \end{minipage}
 
 \noindent In these equations, the state vector is denoted by
-$\vec{\mathbf{x}}$, the inputs by $\vec{\mathbf{u}}$, and the outputs
-by $\vec{\mathbf{y}}$. $\vec{\dot{\mathbf{x}}}$ represents the new
-state vector, i.e. the state vector after it is updated. The first
-equation is for the outputs, while the second equation is for the
-state updates.  $\mathbf{A}$, $\mathbf{B}$, $\mathbf{C}$, and
+$\vc{\mathbf{x}}$, the inputs by $\vc{\mathbf{u}}$, and the outputs
+by $\vc{\mathbf{y}}$. $\vc{\dot{\mathbf{x}}}$ represents the new
+state vector, i.e., the state vector after it is updated. The first
+equation is for the state updates, while the second equation is for the
+outputs.  $\mathbf{A}$, $\mathbf{B}$, $\mathbf{C}$, and
 $\mathbf{D}$ are matrices whose dimensions depend on the number of
 states, inputs, and outputs.
 
@@ -182,11 +182,11 @@ operations needed.  Following the transformation, $x$ assumes a value
 that is twice as large as the original (at any given point of
 execution).  However, this change does not affect the output of the
 filter, as the coefficients in $\mathbf{A}$ are compensated
-accordingly.  The transformation enables two coefficients in $\mathbf{D}$
-to change to a value of 1, thereby eliminating two multiplication
-operations.  As described in Section~\ref{sec:parameter-reduction},
-this transformation is also formulated as a general series of matrix
-operations.
+accordingly.  The transformation enables two coefficients in
+$\mathbf{B}$ and $\mathbf{C}$ to change to a value of 1, thereby
+eliminating two multiplication operations.  As described in
+Section~\ref{sec:parameter-reduction}, this transformation is also
+formulated as a general series of matrix operations.
 
 %%     StreamIt is a programming language specifically tailored to DSP
 %% streaming applications. The user creates a graph composed of four
@@ -477,17 +477,17 @@ operations.
 %%     A block is termed linear if its outputs are a linear
 %% combination of its inputs plus a set of constants. In mathematical
 %% terms, this relationship can be modelled by the equation
-%% $\vec{\mathbf{y}} = \mathbf{D}\vec{\mathbf{u}} +
-%% \vec{\mathbf{b}}$, where $\vec{\mathbf{u}}$ is a column vector
+%% $\vc{\mathbf{y}} = \mathbf{D}\vc{\mathbf{u}} +
+%% \vc{\mathbf{b}}$, where $\vc{\mathbf{u}}$ is a column vector
 %% representing the inputs, $\mathbf{D}$ is a matrix representing the
-%% weights applied to each input, $\vec{\mathbf{b}}$ is a column
+%% weights applied to each input, $\vc{\mathbf{b}}$ is a column
 %% vector representing constants added to the inputs, and
-%% $\vec{\mathbf{y}}$ is a column vector representing the outputs.
+%% $\vc{\mathbf{y}}$ is a column vector representing the outputs.
 
 %%     Suppose we have the following linear model:
 %% \starteqnstar
-%% \vec{\mathbf{y}} = \left [ \begin{array} {cc} 1 & 2 \\ 3 & 4 \\
-%% 5 & 6 \end{array} \right ] \vec{\mathbf{u}} + \left [
+%% \vc{\mathbf{y}} = \left [ \begin{array} {cc} 1 & 2 \\ 3 & 4 \\
+%% 5 & 6 \end{array} \right ] \vc{\mathbf{u}} + \left [
 %% \begin{array} {c} 7
 %% \\ 8 \\ 9 \end{array}\right ]
 %% \doneeqnstar

@@ -1,3 +1,4 @@
+\vspace{-24pt}
 \mysection{Implementation}
 \label{sec:results}
 
@@ -77,17 +78,17 @@ are written optimally.
 When we combine stateful filters with other filters, we notice a
 performance improvement using state space optimizations. For example,
 combining an IIR filter with a decimator that leaves 1 out of every 16
-values has a 66\% improvement. Combining an IIR filter with an FIR
-filter has a 6\% improvement. In the case of an IIR filter with a
-decimator, there are extraneous computations performed by the IIR
+values offers a 3X improvement. Combining an IIR filter with an FIR
+filter results in a 6\% improvement. In the case of an IIR filter with
+a decimator, there are extraneous computations performed by the IIR
 filter that are thrown away by the decimator.  Combining their
 respective matrices removes these computations. In the case of an IIR
 filter with an FIR filter, the computations in both filters can be
-merged to a single set of computations. This indicates that
-state space optimizations are more useful when applied to combined
-filters than when applied to individual filters.
+merged to a single set of computations. This indicates that state
+space optimizations are more useful when applied to combined filters
+than when applied to individual filters.
 
 In summary, the results show that linear state space analysis is more
-general than linear analysis.  While the evaluation spans only a
-modest set of micro-benchmarks, it also demonstrates that a relatively
-elaborate mathematical framework is managable within the compiler.
+general than linear analysis.  While the evaluation only considers a
+small set of micro-benchmarks, it also demonstrates that a relatively
+elaborate mathematical framework is manageable within the compiler.

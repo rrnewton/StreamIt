@@ -8,13 +8,19 @@ of low-level DSP code.  In order to replace the signal processing
 expert in the design flow, compilers need to incorporate
 domain-specific knowledge and have a clean, unified framework for
 representing and optimizing the application.  This paper presents one
-such framework, which is based on linear state space systems.  Using a
-state space representation, we develop two novel optimizations for
-stream programs: state removal and parameter reduction.  To
-effectively apply these optimizations, we develop a general framework
-for extracting, expanding, and combining state space representations.
-An implementation of the framework within the StreamIt compiler
-demonstrates increased generality over plain linear optimizations.
+such framework, which is based on linear state space systems.  Our
+framework provides for general extraction, expansion, and combination
+of state space representations.
+
+Using state space analysis, we develop two novel optimizations for
+stream programs: state removal and parameter reduction.  These
+transformations radically alter the internal data space of the program
+while maintaining the proper input/output relationship.  Such
+transformations are generally infeasible in languages such as C due to
+aliasing and global variables.  We implement the optimizations as part
+of StreamIt, a high-level stream language based on the synchronous
+dataflow model.  Our implementation demonstrates increased generality
+over plain linear optimizations.
 
 %A large class of applications can be described using a
 %linear state space model; in particular, the model subsumes a linear

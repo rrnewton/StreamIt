@@ -1,31 +1,30 @@
-x explain in second paragraph why DSP programs defy high-level
-  language analysis
+non-formatting changes during CASES submission:
+- an n became $n$
+- managable -> manageable
+- title of Section 3, "state-space analysis" -> "state space analysis"
+- reverse order of first x, y equation (x comes first)
+- reverse order of x, y equations in example figure
+- say in statespace example, changes value to 1 in "B and C" not "D"
+- replace - by -- :  "themselves---the specifics are covered"
+- "used for to fill" --> "used to fill"
+- Since the output of $\mathrm{R_1}$ (i.e., $\vc{\mathbf{y_1}}$) is
+equivalent to the input of $\mathrm{R_2}$ (i.e., $\vc{\mathbf{u_2}}$),
+we can write:
+- This directly eliminates computations, as the compiler statically
+evaluates $0 \cdot x = 0$ and $1 \cdot x = x$ rather than performing a
+multiplication at runtime.
+- "-" to "---" in optimization
+- all vector symbols shifted to right.  vector symbol doesn't cover u_pre
+  - should be {\vec u}_pre instead of {\vec u_pre}
+- FIXED: stored inputs are always updated as shown in the same manner ???
+  --> and what is "(3.1)"?
+- FIXED: "updated as mentioned in (3.1)" ???
 
-    Reviews 376 and 338 seek a better explanation for why DSP
-    applications typically defy high-level analysis.  As detailed in a
-    CC'02 paper (reference #18), languages such as C are nearly
-    impossible to analyze due to: 1) complex modulo expressions for
-    circular buffers, 2) possible aliasing between internal states of 
-    different filters, 3) scheduling is done by hand, obscuring 
-    parallelism, 4) atomic execution steps are muddled with global 
-    control flow, and 5) FIFO's between channels are muddled with 
-    global data.  Also, general programs differ from the Synchronous 
-    Dataflow model because they lack the explicit I/O rates exploited 
-    by our analysis.  For these reasons, we believe it is completely 
-    infeasible to perform linear state-space optimizations on a
-    traditional IR.  We will expand on this point in the final
-    version.
+-----------------------------------
 
-x explain streamit example code better
-  x point out peek/pop annotations
+n improve typesetting of u1_new, o2_new in statespace.tex?
 
-x better typesetting for parameter reduction algorithm 
-
-n strengthen conclusion
-
-- final formatting
-
-- see if inputs really have to be converted to states for
+n see if inputs really have to be converted to states for
   optimization
 
-x cite full sitij thesis 
+n strengthen conclusion

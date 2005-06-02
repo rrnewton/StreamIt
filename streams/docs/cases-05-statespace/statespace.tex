@@ -1,4 +1,4 @@
-\mysection{State-Space Analysis}
+\mysection{State Space Analysis}
 \label{sec:statespace}
 
 We analyze StreamIt programs at the filter level. We create a data
@@ -25,14 +25,14 @@ we term $s$, $u$, and $o$, respectively. Our data structure also
 contains the matrices $\mathbf{A}$, $\mathbf{B}$, $\mathbf{C}$, and
 $\mathbf{D}$ with dimensions $s \times s$, $s
 \times o$, $u \times s$, and $u \times o$, respectively. The
-inputs to a filter are denoted as $\vec{\mathbf{u}}$ (length $o$), the
-outputs as $\vec{\mathbf{y}}$ (length $u$), and the states as
-$\vec{\mathbf{x}}$ (length $s$). Upon every execution of the filter,
-we can calculate the outputs by the formula $\vec{\mathbf{y}} =
-\mathbf{C}\vec{\mathbf{x}} +
-\mathbf{D}\vec{\mathbf{u}}$, and update the state matrix by the
-formula $\vec{\dot{\mathbf{x}}} = \mathbf{A}\vec{\mathbf{x}} +
-\mathbf{B}\vec{\mathbf{u}}$. For convenience, we will calculate
+inputs to a filter are denoted as $\vc{\mathbf{u}}$ (length $o$), the
+outputs as $\vc{\mathbf{y}}$ (length $u$), and the states as
+$\vc{\mathbf{x}}$ (length $s$). Upon every execution of the filter,
+we can calculate the outputs by the formula $\vc{\mathbf{y}} =
+\mathbf{C}\vc{\mathbf{x}} +
+\mathbf{D}\vc{\mathbf{u}}$, and update the state matrix by the
+formula $\vc{\dot{\mathbf{x}}} = \mathbf{A}\vc{\mathbf{x}} +
+\mathbf{B}\vc{\mathbf{u}}$. For convenience, we will calculate
 the filter outputs before updating the state matrix. Since the
 states may have initial values other than zero, we store these
 values as the vector $\overrightarrow{\mathbf{initVec}}$ (length
@@ -56,12 +56,12 @@ access these additional items.
 
 We solve the problem of having a peek rate greater than a pop
 rate by storing $e-o$ items from the input tape in the state
-vector $\vec{\mathbf{x}}$. Therefore, when a filter executes, it
+vector $\vc{\mathbf{x}}$. Therefore, when a filter executes, it
 can access all $e$ items it needs, $o$ items from its input vector
 and $e-o$ items from its state vector. These $e-o$ states must be
-updated by the inputs and themselves - the specifics are covered
+updated by the inputs and themselves---the specifics are covered
 in the next section. We store the number of states used for inputs
-as the variable $stored$. This will be useful when combining
+as the variable $\mt{stored}$. This will be useful when combining
 representations.
 
 When the filter is executed for the first time, it will have access to
@@ -71,12 +71,12 @@ state vector before computing the output/state update equation pair
 for every filter execution. We introduce two new matrices,
 $\mathbf{A_{pre}}$ and $\mathbf{B_{pre}}$ to perform this
 initialization. Before the filter runs it will perform the state
-update $\vec{\dot{\mathbf{x}}} =
-\mathbf{A_{pre}}\vec{\mathbf{x}} +
-\mathbf{B_{pre}}\vec{\mathbf{u_{pre}}}$. The initialization input
-vector, $\vec{\mathbf{u_{pre}}}$, has length $o_{pre} = e-o$. For
-now, $o_{pre}$ and $stored$ have the same value, but combining
-filters might result in $o_{pre}$ being greater than $stored$.
+update $\vc{\dot{\mathbf{x}}} =
+\mathbf{A_{pre}}\vc{\mathbf{x}} +
+\mathbf{B_{pre}}{\vc{\mathbf{u}}}_{\mathbf{pre}}$. The initialization input
+vector, ${\vc{\mathbf{u}}}_{\mathbf{pre}}$, has length $o_{pre} = e-o$. For
+now, $o_{pre}$ and $\mt{stored}$ have the same value, but combining
+filters might result in $o_{pre}$ being greater than $\mt{stored}$.
 $\mathbf{A_{pre}}$ is $s \times s$ and $\mathbf{B_{pre}}$ is $s
 \times o_{pre}$. Note that initial assignments of the state
 variables by $\overrightarrow{\mathbf{initVec}}$ are done
@@ -89,16 +89,16 @@ Putting these pieces together, we find a full representation consists
 of the push and pop rates, the number of state variables, the number
 of stored inputs, the four state matrices, an initial state vector,
 and possibly an initial pop rate and two initialization state
-matrices. We define a state space representation $\mathrm{R}$ as the
-tuple $\langle$$u$, $o$, $s$, $stored$, $\mathbf{A}$, $\mathbf{B}$,
+matrices. We define a state space representation $\cal{R}$ as the
+tuple $\langle$$u$, $o$, $s$, $\mt{stored}$, $\mathbf{A}$, $\mathbf{B}$,
 $\mathbf{C}$, $\mathbf{D}$, $\overrightarrow{\mathbf{initVec}}$,
 $\mathbf{A_{pre}}$, $\mathbf{B_{pre}}$, $o_{pre}$$\rangle$. When we
-introduce a representation $\mathrm{R_i}$, each of its values in the
+introduce a representation ${\cal R}_i$, each of its values in the
 ordered set will be denoted with the index $i$ (for example $u_i$,
 $\mathbf{A_i}$). For representations of filters that do not need the
 initialization matrices, we will write $\mathbf{A_{pre}} = null$,
 $\mathbf{B_{pre}} = null$, $o_{pre} = 0$. In this case, the filter
-will not have any stored inputs, so $stored = 0$ as well.
+will not have any stored inputs, so $\mt{stored} = 0$ as well.
 
 Representations are initially created from StreamIt filters and
 ultimately converted to StreamIt filters. Between these steps,
@@ -118,79 +118,79 @@ of a filter's work function, maintaining a vector pair representation
 for each local variable and filter field variable that is encountered
 (together, these are termed program variables). If the outputs and
 field variables all have vector pair representations, then the filter
-is state space linear, and the vectors are used as rows of
+is linear state space, and the vectors are used as rows of
 $\mathbf{A}$, $\mathbf{B}$, $\mathbf{C}$, and $\mathbf{D}$.
 %See \cite{Lamb}
 %for a treatment of the linear case.
 
 We attempt to find a vector pair
-($\vec{\mathbf{v}}$,$\vec{\mathbf{w}}$) for each program variable $y$
-where $y = \vec{\mathbf{v}} \cdot \vec{\mathbf{u}} +
-\vec{\mathbf{w}} \cdot \vec{\mathbf{x}}$. $\vec{\mathbf{u}}$ is
-the filter input vector and $\vec{\mathbf{x}}$ is the filter state
+($\vc{\mathbf{v}}$,$\vc{\mathbf{w}}$) for each program variable $y$
+where $y = \vc{\mathbf{v}} \cdot \vc{\mathbf{u}} +
+\vc{\mathbf{w}} \cdot \vc{\mathbf{x}}$. $\vc{\mathbf{u}}$ is
+the filter input vector and $\vc{\mathbf{x}}$ is the filter state
 vector. When $y$ is on the left hand side of an assignment
 statement, terms from the right hand side are compared with
-entries from $\vec{\mathbf{u}}$ (inputs) and $\vec{\mathbf{x}}$
-(states). The coefficients from terms that match are used for to
-fill the corresponding entries in $\vec{\mathbf{v}}$ and
-$\vec{\mathbf{w}}$, as long as they are constants. If any
+entries from $\vc{\mathbf{u}}$ (inputs) and $\vc{\mathbf{x}}$
+(states). The coefficients from terms that match are used to
+fill the corresponding entries in $\vc{\mathbf{v}}$ and
+$\vc{\mathbf{w}}$, as long as they are constants. If any
 coefficient is not a constant, then $y$ is non-linear.
 
-The input vector, $\vec{\mathbf{u}}$, is defined as $[peek(e-o)
-~peek(e-o+1) ~... ~peek(o-1)]$. The state vector,
-$\vec{\mathbf{x}}$, holds $e-o$ variables from the input tape
-($peek(0) ~... ~peek(e-o-1)$), every field variable, and a
+The input vector, $\vc{\mathbf{u}}$, is defined as $[\mt{peek}(e-o)
+~\mt{peek}(e-o+1) ~... ~\mt{peek}(o-1)]$. The state vector,
+$\vc{\mathbf{x}}$, holds $e-o$ variables from the input tape
+($\mt{peek}(0) ~... ~\mt{peek}(e-o-1)$), every field variable, and a
 variable for the constant 1. We do not consider local variables
 for the state vector, because their values are not saved across
 filter executions. 
 %Therefore, their values should be resolved to
 %constants at compile time. 
-A field variable has the initial vector pair ($\vec{\mathbf{0}}$,$[ 0 ~...~ 1 ~...~ 0 ]$), where the 1 corresponds to the field variable itself.
+A field variable has the initial vector pair ($\vc{\mathbf{0}}$,$[ 0 ~...~ 1 ~...~ 0 ]$), where the 1 corresponds to the field variable itself.
 
 If the vector pair can be found, then the program variable $y$ can be
 written as a linear combination of the inputs and state variables,
 with the vector pair entries representing the weights.  Then the final
 assignment to state variable $x_i$ by some program variable $y_i$
 indicates that the $i^{th}$ rows of $\mathbf{A}$ and $\mathbf{B}$
-should be $\vec{\mathbf{w_i}}$ and $\vec{\mathbf{v_i}}$,
+should be ${\vc{\mathbf{w}}}_{\mathbf{i}}$ and ${\vc{\mathbf{v}}}_{\mathbf{i}}$,
 respectively. Similarly, the $j^{th}$ push statement using program
 variable $y_j$ indicates that the $j^{th}$ rows of $\mathbf{C}$ and
-$\mathbf{D}$ should be $\vec{\mathbf{w_j}}$ and $\vec{\mathbf{v_j}}$,
+$\mathbf{D}$ should be ${\vc{\mathbf{w}}}_{\mathbf{j}}$ and ${\vc{\mathbf{v}}}_{\mathbf{j}}$,
 respectively. For the constant state variable $1$, the corresponding
 rows of $\mathbf{A}$ and $\mathbf{B}$ are all zeros.
 
 We use the same procedure in the init function to find the initial
 values for each field variable. However, we do not need a vector
-$\vec{\mathbf{v}}$ for the inputs, since there are no inputs to
+$\vc{\mathbf{v}}$ for the inputs, since there are no inputs to
 the init function. The initial value for each stored inputs is
 zero, and the initial value for the variable $1$ is one.
 
 Finally, consider the stored input states (call them
-$\vec{\mathbf{x_s}}$). They are updated by the inputs; however if
-$stored > o$, then some of the input states must be updated by other
-input states. In particular, the first $stored-o$ input states are
-updated by the last $stored-o$ inputs, and the remaining $o$ input
+${\vc{\mathbf{x}}}_{\mathbf{s}}$). They are updated by the inputs; however if
+$\mt{stored} > o$, then some of the input states must be updated by other
+input states. In particular, the first $\mt{stored}-o$ input states are
+updated by the last $\mt{stored}-o$ inputs, and the remaining $o$ input
 states are updated by the $o$ inputs. The update is described by the
 equation:
-\starteqnstar
-\vec{\dot{\mathbf{x_s}}} = \left [
+\vspace{-26pt}
+\starteqn
+{\vc{\dot{\mathbf{x}}}}_{\mathbf{s}} = \left [
 \begin{array} {cc} \mathbf{0} & \mathbf{I} \\ \mathbf{0} &
-\mathbf{0} \end{array} \right ] \vec{\mathbf{x_s}} + \left [
+\mathbf{0} \end{array} \right ] {\vc{\mathbf{x}}}_{\mathbf{s}} + \left [
 \begin{array} {c} \mathbf{0} \\ \mathbf{I} \end{array} \right ]
-\vec{\mathbf{u}}
-\doneeqnstar
+\vc{\mathbf{u}}
+\doneeqn
 
 We also create initialization matrices to put values from the input
 tape into the input states:
 \starteqnstar
-\vec{\dot{\mathbf{x_s}}} = \mathbf{0} \vec{\mathbf{x_s}} +
-\mathbf{I} \vec{\mathbf{u_{pre}}}
+{\vc{\dot{\mathbf{x}}}}_{\mathbf{s}} = \mathbf{0} {\vc{\mathbf{x}}}_{\mathbf{s}} +
+\mathbf{I} {\vc{\mathbf{u}}}_{\mathbf{pre}}
 \doneeqnstar
-
-Stored inputs are always updated as shown in the same manner.
-Therefore, we will use $\mathbf{A_s}$ and $\mathbf{B_s}$ to
-describe this update, where the values of these two matrices are
-shown in (3.1).
+Stored inputs are updated as shown on every execution step.
+Therefore, we use $\mathbf{A_s}$ and $\mathbf{B_s}$ to describe
+this update, where the values of these two matrices are given in
+Equation~(1).
 
 \mysubsubsection{Extraction Example}
 
@@ -198,6 +198,7 @@ Consider another IIR filter.  Unlike the example in
 Section~\ref{sec:background}, this filter uses peeking to read
 elements from the tape without consuming them.
 \begin{singlespace}
+\enlargethispage{\baselineskip}
 \vspace{-16pt}
 \scriptsize
 \begin{verbatim}
@@ -215,23 +216,23 @@ elements from the tape without consuming them.
 \end{singlespace}
 \vspace{-16pt}
 
-\noindent The input vector is \setstretch{1}$\left [\begin{array} {c} peek(2) \end{array}
-\right]$\setstretch{1.8} and the state vector is \setstretch{1}$\left [\begin{array} {c} peek(0) \\ peek(1) \\ curr \\ 1 \end{array} \right]$\setstretch{1.8}. The first program
+\noindent The input vector is \setstretch{1}$\left [\begin{array} {c} \mt{peek}(2) \end{array}
+\right]$\setstretch{1.78} and the state vector is \setstretch{1}$\left [\begin{array} {c} \mt{peek}(0) \\ \mt{peek}(1) \\ curr \\ 1 \end{array} \right]$\setstretch{1.78}. The first program
 variable encountered is $temp$. It is given the vector pair (\setstretch{1}$\left [
-\begin{array} {c} 1/6 \end{array} \right ]$\setstretch{1.8}, \setstretch{1}$\left [
-\begin{array} {cccc} 1/6 & 1/6 & 0 & 0 \end{array} \right ]$\setstretch{1.8}). The
+\begin{array} {c} 1/6 \end{array} \right ]$\setstretch{1.78}, \setstretch{1}$\left [
+\begin{array} {cccc} 1/6 & 1/6 & 0 & 0 \end{array} \right ]$\setstretch{1.78}). The
 variable $curr$, as a state variable, has an initial vector pair:
-(\setstretch{1}$\left [ \begin{array} {c} 0 \end{array} \right ]$\setstretch{1.8}, \setstretch{1}$\left
+(\setstretch{1}$\left [ \begin{array} {c} 0 \end{array} \right ]$\setstretch{1.78}, \setstretch{1}$\left
 [\begin{array} {cccc} 0 & 0 & 1 & 0
-\end{array} \right ]$\setstretch{1.8}). When $curr$ is found in an assignment
+\end{array} \right ]$\setstretch{1.78}). When $curr$ is found in an assignment
 statement, it is given a new vector pair, constructed as $1$ times
 the vector pair for $temp$ plus $1/2$ times the old vector pair
-for $curr$: (\setstretch{1}$\left [ \begin{array} {c} 1/6 \end{array} \right ]$\setstretch{1.8},
+for $curr$: (\setstretch{1}$\left [ \begin{array} {c} 1/6 \end{array} \right ]$\setstretch{1.78},
 \setstretch{1}$\left [ \begin{array} {cccc} 1/6 & 1/6 & 1/2 & 0 \end{array}
-\right ]$\setstretch{1.8}). The output is $curr$, so it is given the same vector
+\right ]$\setstretch{1.78}). The output is $curr$, so it is given the same vector
 pair. The final pair for $curr$ represents its state update. The
-stored inputs $peek(0)$, $peek(1)$ are updated as mentioned in
-(3.1), and the constant $1$ is not updated. Therefore, we have:
+stored inputs $\mt{peek}(0)$, $\mt{peek}(1)$ are updated as in
+Equation~(1), and the constant $1$ is not updated. Therefore, we have:
 \begin{center} \vspace{-6pt}
 \begin{minipage}{2.0in}
 \starteqnstar
@@ -282,9 +283,9 @@ stored inputs $peek(0)$, $peek(1)$ are updated as mentioned in
 \vspace{6pt}
 \end{center}
 
-The pop and push rates are both one, and we have four states so $o
-= 1, u = 1, s = 4$. We have two stored input states, so $o_{pre} =
-2, stored = 2$.
+The pop and push rates are both one, and we have four states, so $o
+= 1$, $u = 1$, and $s = 4$. We have two stored input states, so $o_{pre} =
+2$ and $\mt{stored} = 2$.
 
 \mysubsection{Combination}
 
@@ -301,39 +302,39 @@ blocks by combining the blocks first.
 \label{sec:pipeline}
 
 Consider two blocks connected in a pipeline with representations
-$\mathrm{R_1}$ and $\mathrm{R_2}$. Let $\mathrm{R}$ denote the
+${\cal R}_1$ and ${\cal R}_2$. Let ${\cal R}$ denote the
 combined representation of the two blocks, which we are trying to
-derive. Suppose the output rate of $\mathrm{R_1}$ equals the input
-rate of $\mathrm{R_2}$ ($u_1 = o_2$). If this is not the case, we must
+derive. Suppose the output rate of ${\cal R}_1$ equals the input
+rate of ${\cal R}_2$ ($u_1 = o_2$). If this is not the case, we must
 expand one or both blocks to have their input/output rates match
 ($u_{1\_new} = o_{2\_new} = lcm(u_1,o_2)$). Block expansion is covered
-in Section~\ref{sec:expansion}. Since the output of $\mathrm{R_1}$
-($y_1$) is equivalent to the input of $\mathrm{R_2}$ ($u_2$), we can
-write:
+in Section~\ref{sec:expansion}. Since the output of ${\cal R}_1$ is
+equivalent to the input of ${\cal R}_2$, we can substitute
+${\vc{\mathbf{y}}}_{\mathbf{1}}$ for ${\vc{\mathbf{u}}}_{\mathbf{2}}$:
 
 \begin{minipage}{3in}
 \starteqnstar
-\vec{\dot{\mathbf{x_1}}} & = & \mathbf{A_1}\vec{\mathbf{x_1}} + \mathbf{B_1}\vec{\mathbf{u_1}} \\
-\vec{\dot{\mathbf{x_2}}} & = & \mathbf{A_2}\vec{\mathbf{x_2}} + \mathbf{B_2}\vec{\mathbf{y_1}}
+{\vc{\dot{\mathbf{x}}}}_{\mathbf{1}} & = & \mathbf{A_1}{\vc{\mathbf{x}}}_{\mathbf{1}} + \mathbf{B_1}{\vc{\mathbf{u}}}_{\mathbf{1}} \\
+{\vc{\dot{\mathbf{x}}}}_{\mathbf{2}} & = & \mathbf{A_2}{\vc{\mathbf{x}}}_{\mathbf{2}} + \mathbf{B_2}{\vc{\mathbf{y}}}_{\mathbf{1}}
 \doneeqnstar
 \end{minipage}
 \begin{minipage}{3in}
 \starteqnstar
-\vec{\mathbf{y_1}} & = & \mathbf{C_1}\vec{\mathbf{x_1}} + \mathbf{D_1}\vec{\mathbf{u_1}} \\
-\vec{\mathbf{y_2}} & = & \mathbf{C_2}\vec{\mathbf{x_2}} +
-\mathbf{D_2}\vec{\mathbf{y_1}}
+{\vc{\mathbf{y}}}_{\mathbf{1}} & = & \mathbf{C_1}{\vc{\mathbf{x}}}_{\mathbf{1}} + \mathbf{D_1}{\vc{\mathbf{u}}}_{\mathbf{1}} \\
+{\vc{\mathbf{y}}}_{\mathbf{2}} & = & \mathbf{C_2}{\vc{\mathbf{x}}}_{\mathbf{2}} +
+\mathbf{D_2}{\vc{\mathbf{y}}}_{\mathbf{1}}
 \doneeqnstar
 \end{minipage} ~\\
 
 \begin{minipage}{2in}
-Substituting for $\vec{\mathbf{y_1}}$ we get: ~ \\ \vspace{-12pt}
+Substituting for ${\vc{\mathbf{y}}}_{\mathbf{1}}$ we get: ~ \\ \vspace{-12pt}
 \end{minipage}
 \begin{minipage}{3in}
 \starteqnstar
-\vec{\dot{\mathbf{x_2}}} & = & \mathbf{A_2}\vec{\mathbf{x_2}} + \mathbf{B_2}(\mathbf{C_1}\vec{\mathbf{x_1}} + \mathbf{D_1}\vec{\mathbf{u_1}}) \\
-\vec{\mathbf{y_2}} & = & \mathbf{C_2}\vec{\mathbf{x_2}} +
-\mathbf{D_2}(\mathbf{C_1}\vec{\mathbf{x_1}} +
-\mathbf{D_1}\vec{\mathbf{u_1}})
+{\vc{\dot{\mathbf{x}}}}_{\mathbf{2}} & = & \mathbf{A_2}{\vc{\mathbf{x}}}_{\mathbf{2}} + \mathbf{B_2}(\mathbf{C_1}{\vc{\mathbf{x}}}_{\mathbf{1}} + \mathbf{D_1}{\vc{\mathbf{u}}}_{\mathbf{1}}) \\
+{\vc{\mathbf{y}}}_{\mathbf{2}} & = & \mathbf{C_2}{\vc{\mathbf{x}}}_{\mathbf{2}} +
+\mathbf{D_2}(\mathbf{C_1}{\vc{\mathbf{x}}}_{\mathbf{1}} +
+\mathbf{D_1}{\vc{\mathbf{u}}}_{\mathbf{1}})
 \doneeqnstar
 \end{minipage}
 
@@ -343,26 +344,26 @@ Which simplifies to: ~ \\ \vspace{-12pt}
 \end{minipage}
 \begin{minipage}{3in}
 \starteqnstar
-\vec{\dot{\mathbf{x_2}}} & = & \mathbf{A_2}\vec{\mathbf{x_2}} + \mathbf{B_2}\mathbf{C_1}\vec{\mathbf{x_1}} + \mathbf{B_2}\mathbf{D_1}\vec{\mathbf{u_1}} \\
-\vec{\mathbf{y_2}} & = & \mathbf{C_2}\vec{\mathbf{x_2}} +
-\mathbf{D_2}\mathbf{C_1}\vec{\mathbf{x_1}} +
-\mathbf{D_2}\mathbf{D_1}\vec{\mathbf{u_1}}
+{\vc{\dot{\mathbf{x}}}}_{\mathbf{2}} & = & \mathbf{A_2}{\vc{\mathbf{x}}}_{\mathbf{2}} + \mathbf{B_2}\mathbf{C_1}{\vc{\mathbf{x}}}_{\mathbf{1}} + \mathbf{B_2}\mathbf{D_1}{\vc{\mathbf{u}}}_{\mathbf{1}} \\
+{\vc{\mathbf{y}}}_{\mathbf{2}} & = & \mathbf{C_2}{\vc{\mathbf{x}}}_{\mathbf{2}} +
+\mathbf{D_2}\mathbf{C_1}{\vc{\mathbf{x}}}_{\mathbf{1}} +
+\mathbf{D_2}\mathbf{D_1}{\vc{\mathbf{u}}}_{\mathbf{1}}
 \doneeqnstar
 \vspace{3pt}
 \end{minipage}
 
-Let \setstretch{1}$\vec{\mathbf{x}} = \left [ \begin{array} {c} \vec{\mathbf{x_1}} \\
-\vec{\mathbf{x_2}} \end{array} \right ]$, $\vec{\mathbf{u}} =
-\vec{\mathbf{u_1}}$\setstretch{1.8} (the input to the entire pipeline), and
-$\vec{\mathbf{y}} = \vec{\mathbf{y_2}}$ (the output of the entire
-pipeline). The equations relating $\vec{\mathbf{x}}$,
-$\vec{\mathbf{u}}$, and $\vec{\mathbf{y}}$ are:
+Let \setstretch{1}$\vc{\mathbf{x}} = \left [ \begin{array} {c} {\vc{\mathbf{x}}}_{\mathbf{1}} \\
+{\vc{\mathbf{x}}}_{\mathbf{2}} \end{array} \right ]$, $\vc{\mathbf{u}} =
+{\vc{\mathbf{u}}}_{\mathbf{1}}$\setstretch{1.78} (the input to the entire pipeline), and
+$\vc{\mathbf{y}} = {\vc{\mathbf{y}}}_{\mathbf{2}}$ (the output of the entire
+pipeline). The equations relating $\vc{\mathbf{x}}$,
+$\vc{\mathbf{u}}$, and $\vc{\mathbf{y}}$ are:
 
 \begin{minipage}{2in}
 ~ \\ \vspace{-30pt}
 \starteqnstar
-\vec{\dot{\mathbf{x}}} & = & \mathbf{A}\vec{\mathbf{x}} + \mathbf{B}\vec{\mathbf{u}} \\
-\vec{\mathbf{y}} & = & \mathbf{C}\vec{\mathbf{x}} + \mathbf{D}\vec{\mathbf{u}}
+\vc{\dot{\mathbf{x}}} & = & \mathbf{A}\vc{\mathbf{x}} + \mathbf{B}\vc{\mathbf{u}} \\
+\vc{\mathbf{y}} & = & \mathbf{C}\vc{\mathbf{x}} + \mathbf{D}\vc{\mathbf{u}}
 \doneeqnstar
 ~ \\ \vspace{-28pt}
 \end{minipage}
@@ -376,18 +377,18 @@ $\vec{\mathbf{u}}$, and $\vec{\mathbf{y}}$ are:
 \doneeqnstar
 \end{minipage}
 
-The input to the pipeline is identical to the input to $\mathrm{R_1}$,
+The input to the pipeline is identical to the input to ${\cal R}_1$,
 and the output of the pipeline is identical to the output of
-$\mathrm{R_2}$. Furthermore, the states of the pipeline are the states
+${\cal R}_2$. Furthermore, the states of the pipeline are the states
 of the first block appended to the states of the second
-block. Therefore, $u = u_2$, $o = o_1$, $s = s_1 + s_2$,
+block. Therefore, $u = u_2$, $o = o_1$, $s = s_1 + s_2$, and
 \setstretch{1}$\overrightarrow{\mathbf{initVec}} = \left [ \begin{array} {c}
 \overrightarrow{initVec_1} \\ \overrightarrow{initVec_2}
-\end{array} \right ]$\setstretch{1.8}.
+\end{array} \right ]$\setstretch{1.78}.
 
 If both blocks do not have initialization matrices, then the entire
 pipeline does not need initialization matrices, so $\mathbf{A_{pre}} =
-null$, $\mathbf{B_{pre}} = null$, $o_{pre} = 0$, $stored = 0$. If only
+null$, $\mathbf{B_{pre}} = null$, $o_{pre} = 0$, and $\mt{stored} = 0$. If only
 the first block has initialization matrices, then we want to
 initialize the states in the pipeline corresponding to the first block
 while keeping the states corresponding to the second block
@@ -484,9 +485,9 @@ treatment of these cases appears in~\cite{Agrawal04}.
 %% $s = 1$, $\mathbf{A} = \mathbf{0}$, $\mathbf{B} = \mathbf{0}$,
 %% $\mathbf{C} = \mathbf{0}$, $\mathbf{D} = \left [ \begin{array}
 %% {ccc} \mathbf{0} & \mathbf{I} & \mathbf{0} \end{array} \right ]$,
-%% $\overrightarrow{\mathbf{initVec}} = \vec{\mathbf{0}}$,
+%% $\overrightarrow{\mathbf{initVec}} = \vc{\mathbf{0}}$,
 %% $\mathbf{A_{pre}}, \mathbf{B_{pre}} = null$, $o_{pre} = 0$,
-%% $stored = 0$. We use one state in the representation, even though
+%% $\mt{stored} = 0$. We use one state in the representation, even though
 %% none are needed, to make combinations of representations simpler.
 %% Once $\mathrm{L_i}$ is created, it can be combined with
 %% $\mathrm{M_i}$ to form a single representation (call it
@@ -526,33 +527,33 @@ treatment of these cases appears in~\cite{Agrawal04}.
 %% they can be combined to a single representation. The stored input
 %% states in each representation evolve in the same manner, so only
 %% one set of them is needed for the entire splitjoin representation.
-%% Let $\vec{\mathbf{x_i}} = \left [ \begin{array} {c}
-%% \vec{\mathbf{x_{is}}} \\ \vec{\mathbf{x_{ir}}} \end{array} \right
-%% ]$, where $\vec{\mathbf{x_{is}}}$ and $\vec{\mathbf{x_{ir}}}$ are
+%% Let ${\vc{\mathbf{x}}}_{\mathbf{i}} = \left [ \begin{array} {c}
+%% {\vc{\mathbf{x}}}_{\mathbf{{is}}} \\ {\vc{\mathbf{x}}}_{\mathbf{{ir}}} \end{array} \right
+%% ]$, where ${\vc{\mathbf{x}}}_{\mathbf{{is}}}$ and ${\vc{\mathbf{x}}}_{\mathbf{{ir}}}$ are
 %% the stored input states and remaining states of $\mathrm{R_i}$,
 %% respectively. For each representation $i$ denote the state space
 %% equation pair as:
 %% \starteqnstar
-%% \left [ \begin{array} {c} \vec{\dot{\mathbf{x_{is}}}} \\
-%% \vec{\dot{\mathbf{x_{ir}}}} \end{array} \right ] & = & \left [
+%% \left [ \begin{array} {c} {\vc{\dot{\mathbf{x}}}}_{\mathbf{{is}}}} \\
+%% {\vc{\dot{\mathbf{x}}}}_{\mathbf{{ir}}}} \end{array} \right ] & = & \left [
 %% \begin{array} {cc} \mathbf{A_{is}} & \mathbf{0} \\
 %% \mathbf{A_{irs}} & \mathbf{A_{irr}} \end{array} \right ] \left [
-%% \begin{array} {c} \vec{\mathbf{x_{is}}} \\ \vec{\mathbf{x_{ir}}}
+%% \begin{array} {c} {\vc{\mathbf{x}}}_{\mathbf{{is}}} \\ {\vc{\mathbf{x}}}_{\mathbf{{ir}}}
 %% \end{array} \right ] +  \left [ \begin{array} {c} \mathbf{B_{is}}
-%% \\ \mathbf{B_{ir}} \end{array} \right ] \vec{\mathbf{u}} \\
-%% \vec{\mathbf{y}} & = & \left [ \begin{array} {cc} \mathbf{C_{is}}
+%% \\ \mathbf{B_{ir}} \end{array} \right ] \vc{\mathbf{u}} \\
+%% \vc{\mathbf{y}} & = & \left [ \begin{array} {cc} \mathbf{C_{is}}
 %% & \mathbf{C_{ir}} \end{array} \right ] \left [ \begin{array} {c}
-%% \vec{\mathbf{x_{is}}} \\ \vec{\mathbf{x_{ir}}} \end{array} \right
-%% ] + \mathbf{D} \vec{\mathbf{u}}
+%% {\vc{\mathbf{x}}}_{\mathbf{{is}}} \\ {\vc{\mathbf{x}}}_{\mathbf{{ir}}} \end{array} \right
+%% ] + \mathbf{D} \vc{\mathbf{u}}
 %% \doneeqnstar
 
 %%     Since the stored input states in each representation are
-%% equivalent, we set them to be $\vec{\mathbf{x_s}}$, and set their
+%% equivalent, we set them to be ${\vc{\mathbf{x}}}_{\mathbf{s}}$, and set their
 %% corresponding matrix blocks to be $\mathbf{A_s}$ and
-%% $\mathbf{B_s}$. Let $\vec{\mathbf{x}} = \left [ \begin{array} {c}
-%% \vec{\mathbf{x_{s}}} \\ \vec{\mathbf{x_{1r}}} \\
-%% \vec{\mathbf{x_{2r}}} \\ ... \\ \vec{\mathbf{x_{kr}}} \end{array}
-%% \right ]$. The states $\vec{\mathbf{x_{ir}}}$ evolve separately,
+%% $\mathbf{B_s}$. Let $\vc{\mathbf{x}} = \left [ \begin{array} {c}
+%% {\vc{\mathbf{x}}}_{\mathbf{{s}}} \\ {\vc{\mathbf{x}}}_{\mathbf{{1r}}} \\
+%% {\vc{\mathbf{x}}}_{\mathbf{{2r}}} \\ ... \\ {\vc{\mathbf{x}}}_{\mathbf{{kr}}} \end{array}
+%% \right ]$. The states ${\vc{\mathbf{x}}}_{\mathbf{{ir}}}$ evolve separately,
 %% so:
 %% \starteqnstar
 %% \mathbf{A} & = & \left [ \begin{array} {ccccc} \mathbf{A_s} &
@@ -614,7 +615,7 @@ treatment of these cases appears in~\cite{Agrawal04}.
 %% $\mathbf{D}$, $\mathbf{A_{pre}}$, and $\mathbf{B_{pre}}$. As
 %% mentioned previously, all the pop rates are equal so $o = o_1$.
 %% Additionally, all the initial pop rates and stored inputs are
-%% equal, so $o_{pre} = o_{pre1}$ and $stored = o_{pre1}$. The
+%% equal, so $o_{pre} = o_{pre1}$ and $\mt{stored} = o_{pre1}$. The
 %% splitjoin runs $E$ times, hence $u = E * \sum_{j=1}^{k} w_j$. The
 %% states of the entire representation are the non-stored input
 %% states of each branch representation concatenated along with one
@@ -623,7 +624,7 @@ treatment of these cases appears in~\cite{Agrawal04}.
 %% $\overrightarrow{\mathbf{initVec_{ir}}}$ be the initial values of
 %% these states. Then $s = stored + \sum_{j=1}^{k} s_{jr}$ and
 %% $\overrightarrow{\mathbf{initVec}} =
-%% \left [ \begin{array} {c} \vec{\mathbf{0}} \\ \overrightarrow{\mathbf{initVec_{1r}}} \\
+%% \left [ \begin{array} {c} \vc{\mathbf{0}} \\ \overrightarrow{\mathbf{initVec_{1r}}} \\
 %% \overrightarrow{\mathbf{initVec_{2r}}} \\ ... \\
 %% \overrightarrow{\mathbf{initVec_{kr}}} \end{array} \right ]$.
 
@@ -682,20 +683,20 @@ treatment of these cases appears in~\cite{Agrawal04}.
 %% state for each enqueued item. The equations for $\mathrm{R_3}$
 %% are:
 %% \starteqnstar
-%% \vec{\dot{\mathbf{x_3}}} & = & \left [ \begin{array} {cc}
+%% {\vc{\dot{\mathbf{x}}}}_{\mathbf{3}}} & = & \left [ \begin{array} {cc}
 %% \mathbf{0} & \mathbf{I} \\ \mathbf{0} & \mathbf{0} \end{array} \right ]
-%% \vec{\mathbf{x_3}} + \left [ \begin{array} {c} \mathbf{0} \\ \mathbf{I}
-%% \end{array} \right ] \vec{\mathbf{u_3}} \\
-%% \vec{\mathbf{y_3}} & = & \left [ \begin{array} {c} \mathbf{I} \\
-%% \mathbf{0} \end{array} \right ] \vec{\mathbf{x_1}}
+%% {\vc{\mathbf{x}}}_{\mathbf{3}} + \left [ \begin{array} {c} \mathbf{0} \\ \mathbf{I}
+%% \end{array} \right ] {\vc{\mathbf{u}}}_{\mathbf{3}} \\
+%% {\vc{\mathbf{y}}}_{\mathbf{3}} & = & \left [ \begin{array} {c} \mathbf{I} \\
+%% \mathbf{0} \end{array} \right ] {\vc{\mathbf{x}}}_{\mathbf{1}}
 %% \doneeqnstar
 
 %%     $\mathrm{R_3}$ does not have initialization matrices, and
 %% $\overrightarrow{\mathbf{initVec_3}}$ is assigned the enqueued
 %% values.
 
-%%     Note that the output $\vec{\mathbf{y_3}}$ does not depend on
-%% the input $\vec{\mathbf{u_3}}$. This is the key to starting the
+%%     Note that the output ${\vc{\mathbf{y}}}_{\mathbf{3}}$ does not depend on
+%% the input ${\vc{\mathbf{u}}}_{\mathbf{3}}$. This is the key to starting the
 %% feedback loop: $\mathrm{R_3}$ outputs first, the body block uses
 %% these outputs along with inputs to the entire feedback loop to
 %% execute and produce outputs, the loop body uses these outputs to
@@ -709,60 +710,60 @@ treatment of these cases appears in~\cite{Agrawal04}.
 %%   \label{fig:feedback2}
 %% \end{figure}
 
-%%     From figure \ref{fig:feedback2} it is apparent that $\vec{\mathbf{u_3}} =
-%% \vec{\mathbf{y_1}}$, $\vec{\mathbf{y}} = \vec{\mathbf{y_2}} =
-%% \vec{\mathbf{u_1}}$, and $\vec{\mathbf{u_2}}$ is composed of
-%% $\vec{\mathbf{u}}$ and $\vec{\mathbf{u_3}}$. We can write the
+%%     From figure \ref{fig:feedback2} it is apparent that ${\vc{\mathbf{u}}}_{\mathbf{3}} =
+%% {\vc{\mathbf{y}}}_{\mathbf{1}}$, $\vc{\mathbf{y}} = {\vc{\mathbf{y}}}_{\mathbf{2}} =
+%% {\vc{\mathbf{u}}}_{\mathbf{1}}$, and ${\vc{\mathbf{u}}}_{\mathbf{2}}$ is composed of
+%% $\vc{\mathbf{u}}$ and ${\vc{\mathbf{u}}}_{\mathbf{3}}$. We can write the
 %% equations for the body block as:
 %% \starteqnstar
-%% \vec{\dot{\mathbf{x_2}}} & = & \mathbf{A_2} \vec{\mathbf{x_2}} +
-%% \mathbf{B_2} \vec{\mathbf{u_2}} = \mathbf{A_2}\vec{\mathbf{x_2}} +
-%% \mathbf{B_{2\_1}} \vec{\mathbf{u}} + \mathbf{B_{2\_2}}
-%% \vec{\mathbf{y_3}} = \mathbf{A_2}\vec{\mathbf{x_2}} +
-%% \mathbf{B_{2\_1}} \vec{\mathbf{u}} + \mathbf{B_{2\_2}}
-%% \mathbf{C_3} \vec{\mathbf{x_3}} \\
-%% \vec{\mathbf{y_2}} & = & \mathbf{C_2} \vec{\mathbf{x_2}} +
-%% \mathbf{D_2} \vec{\mathbf{u_2}} = \mathbf{C_2}\vec{\mathbf{x_2}} +
-%% \mathbf{D_{2\_1}} \vec{\mathbf{u}} + \mathbf{D_{2\_2}}
-%% \vec{\mathbf{y_3}} = \mathbf{C_2}\vec{\mathbf{x_2}} +
-%% \mathbf{D_{2\_1}} \vec{\mathbf{u}} + \mathbf{D_{2\_2}}
-%% \mathbf{C_3} \vec{\mathbf{x_3}}
+%% {\vc{\dot{\mathbf{x}}}}_{\mathbf{2}}} & = & \mathbf{A_2} {\vc{\mathbf{x}}}_{\mathbf{2}} +
+%% \mathbf{B_2} {\vc{\mathbf{u}}}_{\mathbf{2}} = \mathbf{A_2}{\vc{\mathbf{x}}}_{\mathbf{2}} +
+%% \mathbf{B_{2\_1}} \vc{\mathbf{u}} + \mathbf{B_{2\_2}}
+%% {\vc{\mathbf{y}}}_{\mathbf{3}} = \mathbf{A_2}{\vc{\mathbf{x}}}_{\mathbf{2}} +
+%% \mathbf{B_{2\_1}} \vc{\mathbf{u}} + \mathbf{B_{2\_2}}
+%% \mathbf{C_3} {\vc{\mathbf{x}}}_{\mathbf{3}} \\
+%% {\vc{\mathbf{y}}}_{\mathbf{2}} & = & \mathbf{C_2} {\vc{\mathbf{x}}}_{\mathbf{2}} +
+%% \mathbf{D_2} {\vc{\mathbf{u}}}_{\mathbf{2}} = \mathbf{C_2}{\vc{\mathbf{x}}}_{\mathbf{2}} +
+%% \mathbf{D_{2\_1}} \vc{\mathbf{u}} + \mathbf{D_{2\_2}}
+%% {\vc{\mathbf{y}}}_{\mathbf{3}} = \mathbf{C_2}{\vc{\mathbf{x}}}_{\mathbf{2}} +
+%% \mathbf{D_{2\_1}} \vc{\mathbf{u}} + \mathbf{D_{2\_2}}
+%% \mathbf{C_3} {\vc{\mathbf{x}}}_{\mathbf{3}}
 %% \doneeqnstar
 
-%%     Since $\vec{\mathbf{y}} = \vec{\mathbf{y_2}}$, we have written
+%%     Since $\vc{\mathbf{y}} = {\vc{\mathbf{y}}}_{\mathbf{2}}$, we have written
 %% the output of the feedback loop and the update for
-%% $\vec{\mathbf{x_2}}$ in terms of the input to the feedback loop
-%% and the state vectors. For the updates to $\vec{\mathbf{x_1}}$ and
-%% $\vec{\mathbf{x_3}}$ we can write:
+%% ${\vc{\mathbf{x}}}_{\mathbf{2}}$ in terms of the input to the feedback loop
+%% and the state vectors. For the updates to ${\vc{\mathbf{x}}}_{\mathbf{1}}$ and
+%% ${\vc{\mathbf{x}}}_{\mathbf{3}}$ we can write:
 %% \starteqnstar
-%% \vec{\dot{\mathbf{x_1}}} & = & \mathbf{A_1} \vec{\mathbf{x_1}} +
-%% \mathbf{B_1} \vec{\mathbf{u_1}} = \mathbf{A_1}\vec{\mathbf{x_1}} +
-%% \mathbf{B_1} \vec{\mathbf{y}} =  \mathbf{A_1}\vec{\mathbf{x_1}} +
-%% \mathbf{B_1}(\mathbf{C_2}\vec{\mathbf{x_2}} + \mathbf{D_{2\_1}}
-%% \vec{\mathbf{u}} + \mathbf{D_{2\_2}} \mathbf{C_3}
-%% \vec{\mathbf{x_3}}) \\
-%% & = & \mathbf{A_1}\vec{\mathbf{x_1}} +
-%% \mathbf{B_1}\mathbf{C_2}\vec{\mathbf{x_2}} + \mathbf{B_1}
-%% \mathbf{D_{2\_1}} \vec{\mathbf{u}} + \mathbf{B_1}
-%% \mathbf{D_{2\_2}} \mathbf{C_3} \vec{\mathbf{x_3}} \\ \\
-%% \vec{\dot{\mathbf{x_3}}} & = & \mathbf{A_3} \vec{\mathbf{x_3}} +
-%% \mathbf{B_3} \vec{\mathbf{u_3}} = \mathbf{A_3}\vec{\mathbf{x_3}} +
-%% \mathbf{B_3} \vec{\mathbf{y_1}} =  \mathbf{A_3}\vec{\mathbf{x_3}}
-%% + \mathbf{B_3}(\mathbf{C_1}\vec{\mathbf{x_1}} + \mathbf{D_1}
-%% \vec{\mathbf{u_1}}) \\
-%% & = & \mathbf{A_3}\vec{\mathbf{x_3}} +
-%% \mathbf{B_3}(\mathbf{C_1}\vec{\mathbf{x_1}} +
-%% \mathbf{D_1}\vec{\mathbf{y}}) = \mathbf{A_3}\vec{\mathbf{x_3}} +
-%% \mathbf{B_3}(\mathbf{C_1}\vec{\mathbf{x_1}} +
-%% \mathbf{D_1}(\mathbf{C_2}\vec{\mathbf{x_2}} + \mathbf{D_{2\_1}}
-%% \vec{\mathbf{u}} + \mathbf{D_{2\_2}} \mathbf{C_3}
-%% \vec{\mathbf{x_3}})) \\
-%% & = & \mathbf{A_3}\vec{\mathbf{x_3}} +
-%% \mathbf{B_3}\mathbf{C_1}\vec{\mathbf{x_1}} +
-%% \mathbf{B_3}\mathbf{D_1}\mathbf{C_2}\vec{\mathbf{x_2}} +
-%% \mathbf{B_3}\mathbf{D_1}\mathbf{D_{2\_1}} \vec{\mathbf{u}} +
+%% {\vc{\dot{\mathbf{x}}}}_{\mathbf{1}}} & = & \mathbf{A_1} {\vc{\mathbf{x}}}_{\mathbf{1}} +
+%% \mathbf{B_1} {\vc{\mathbf{u}}}_{\mathbf{1}} = \mathbf{A_1}{\vc{\mathbf{x}}}_{\mathbf{1}} +
+%% \mathbf{B_1} \vc{\mathbf{y}} =  \mathbf{A_1}{\vc{\mathbf{x}}}_{\mathbf{1}} +
+%% \mathbf{B_1}(\mathbf{C_2}{\vc{\mathbf{x}}}_{\mathbf{2}} + \mathbf{D_{2\_1}}
+%% \vc{\mathbf{u}} + \mathbf{D_{2\_2}} \mathbf{C_3}
+%% {\vc{\mathbf{x}}}_{\mathbf{3}}) \\
+%% & = & \mathbf{A_1}{\vc{\mathbf{x}}}_{\mathbf{1}} +
+%% \mathbf{B_1}\mathbf{C_2}{\vc{\mathbf{x}}}_{\mathbf{2}} + \mathbf{B_1}
+%% \mathbf{D_{2\_1}} \vc{\mathbf{u}} + \mathbf{B_1}
+%% \mathbf{D_{2\_2}} \mathbf{C_3} {\vc{\mathbf{x}}}_{\mathbf{3}} \\ \\
+%% {\vc{\dot{\mathbf{x}}}}_{\mathbf{3}}} & = & \mathbf{A_3} {\vc{\mathbf{x}}}_{\mathbf{3}} +
+%% \mathbf{B_3} {\vc{\mathbf{u}}}_{\mathbf{3}} = \mathbf{A_3}{\vc{\mathbf{x}}}_{\mathbf{3}} +
+%% \mathbf{B_3} {\vc{\mathbf{y}}}_{\mathbf{1}} =  \mathbf{A_3}{\vc{\mathbf{x}}}_{\mathbf{3}}
+%% + \mathbf{B_3}(\mathbf{C_1}{\vc{\mathbf{x}}}_{\mathbf{1}} + \mathbf{D_1}
+%% {\vc{\mathbf{u}}}_{\mathbf{1}}) \\
+%% & = & \mathbf{A_3}{\vc{\mathbf{x}}}_{\mathbf{3}} +
+%% \mathbf{B_3}(\mathbf{C_1}{\vc{\mathbf{x}}}_{\mathbf{1}} +
+%% \mathbf{D_1}\vc{\mathbf{y}}) = \mathbf{A_3}{\vc{\mathbf{x}}}_{\mathbf{3}} +
+%% \mathbf{B_3}(\mathbf{C_1}{\vc{\mathbf{x}}}_{\mathbf{1}} +
+%% \mathbf{D_1}(\mathbf{C_2}{\vc{\mathbf{x}}}_{\mathbf{2}} + \mathbf{D_{2\_1}}
+%% \vc{\mathbf{u}} + \mathbf{D_{2\_2}} \mathbf{C_3}
+%% {\vc{\mathbf{x}}}_{\mathbf{3}})) \\
+%% & = & \mathbf{A_3}{\vc{\mathbf{x}}}_{\mathbf{3}} +
+%% \mathbf{B_3}\mathbf{C_1}{\vc{\mathbf{x}}}_{\mathbf{1}} +
+%% \mathbf{B_3}\mathbf{D_1}\mathbf{C_2}{\vc{\mathbf{x}}}_{\mathbf{2}} +
+%% \mathbf{B_3}\mathbf{D_1}\mathbf{D_{2\_1}} \vc{\mathbf{u}} +
 %% \mathbf{B_3}\mathbf{D_1}\mathbf{D_{2\_2}} \mathbf{C_3}
-%% \vec{\mathbf{x_3}}
+%% {\vc{\mathbf{x}}}_{\mathbf{3}}
 %% \doneeqnstar
 
 %%     For the input and output rates we have $o = E * w_2$
@@ -786,62 +787,62 @@ must run two times (in order to input ten items). Therefore, we need
 to have a method to expand a representation so that it models a block
 running multiple times, rather than once.
 
-Consider the state space equation pair, where $\vec{\mathbf{u_1}}$ and
-$\vec{\mathbf{y_1}}$ are the first set of inputs and outputs, and
-$\vec{\mathbf{x}}$ is the original state vector:
-\hspace{0.8in}\begin{minipage}[t]{2in}
+Consider the state space equation pair, where ${\vc{\mathbf{u}}}_{\mathbf{1}}$ and
+${\vc{\mathbf{y}}}_{\mathbf{1}}$ are the first set of inputs and outputs, and
+$\vc{\mathbf{x}}$ is the original state vector:
+\hspace{1in}\hspace{-3pt}\begin{minipage}[t]{2in}
 \vspace{-15pt}
 \starteqnstar
-\vec{\dot{\mathbf{x}}} & = & \mathbf{A}\vec{\mathbf{x}} + \mathbf{B}\vec{\mathbf{u_1}} \\
-\vec{\mathbf{y_1}} & = & \mathbf{C}\vec{\mathbf{x}} +
-\mathbf{D}\vec{\mathbf{u_1}}
+\vc{\dot{\mathbf{x}}} & = & \mathbf{A}\vc{\mathbf{x}} + \mathbf{B}{\vc{\mathbf{u}}}_{\mathbf{1}} \\
+{\vc{\mathbf{y}}}_{\mathbf{1}} & = & \mathbf{C}\vc{\mathbf{x}} +
+\mathbf{D}{\vc{\mathbf{u}}}_{\mathbf{1}}
 \doneeqnstar
 \vspace{8pt}
 \end{minipage}
 
-If we run the block again, the equation pair in terms of the
-original state vector $\vec{\mathbf{x}}$ and the next set of
-inputs and outputs ($\vec{\mathbf{u_2}}$ and $\vec{\mathbf{y_2}}$)
-is:
-\hspace{0.59in}\begin{minipage}[t]{2in}
+If we run the block again, we can write the equations in terms of the
+original state vector $\vc{\mathbf{x}}$ and the next set of
+inputs and outputs (${\vc{\mathbf{u}}}_{\mathbf{2}}$ and ${\vc{\mathbf{y}}}_{\mathbf{2}}$):
+\hspace{0.23in}\begin{minipage}[t]{2in}
 \vspace{-15pt}
 \starteqnstar
-\vec{\dot{\mathbf{x}}} & = & \mathbf{A}(\mathbf{A}\vec{\mathbf{x}}
+\vc{\dot{\mathbf{x}}} & = & \mathbf{A}(\mathbf{A}\vc{\mathbf{x}}
 +
-\mathbf{B}\vec{\mathbf{u_1}}) + \mathbf{B}\vec{\mathbf{u_2}} \\
-\vec{\mathbf{y_2}} & = & \mathbf{C}(\mathbf{A}\vec{\mathbf{x}} +
-\mathbf{B}\vec{\mathbf{u_1}}) + \mathbf{D}\vec{\mathbf{u_2}}
+\mathbf{B}{\vc{\mathbf{u}}}_{\mathbf{1}}) + \mathbf{B}{\vc{\mathbf{u}}}_{\mathbf{2}} \\
+{\vc{\mathbf{y}}}_{\mathbf{2}} & = & \mathbf{C}(\mathbf{A}\vc{\mathbf{x}} +
+\mathbf{B}{\vc{\mathbf{u}}}_{\mathbf{1}}) + \mathbf{D}{\vc{\mathbf{u}}}_{\mathbf{2}}
 \doneeqnstar
 \vspace{16pt}
 \end{minipage}
 
 \noindent Simplifying yields:
-\hspace{1.73in}\begin{minipage}[t]{2in}
+\hspace{1.75in}\hspace{1.2pt}\begin{minipage}[t]{2in}
 \vspace{-15pt}
 \starteqnstar
-\vec{\dot{\mathbf{x}}} & = & \mathbf{A}^2\vec{\mathbf{x}} +
-\mathbf{AB}\vec{\mathbf{u_1}} + \mathbf{B}\vec{\mathbf{u_2}} \\
-\vec{\mathbf{y_2}} & = & \mathbf{CA}\vec{\mathbf{x}} +
-\mathbf{CB}\vec{\mathbf{u_1}} + \mathbf{D}\vec{\mathbf{u_2}}
+\vc{\dot{\mathbf{x}}} & = & \mathbf{A}^2\vc{\mathbf{x}} +
+\mathbf{AB}{\vc{\mathbf{u}}}_{\mathbf{1}} + \mathbf{B}{\vc{\mathbf{u}}}_{\mathbf{2}} \\
+{\vc{\mathbf{y}}}_{\mathbf{2}} & = & \mathbf{CA}\vc{\mathbf{x}} +
+\mathbf{CB}{\vc{\mathbf{u}}}_{\mathbf{1}} + \mathbf{D}{\vc{\mathbf{u}}}_{\mathbf{2}}
 \doneeqnstar
 \vspace{8pt}
 \end{minipage}
 
-Let $\vec{\mathbf{u}}$ be the combined input vector (\setstretch{1}$\vec{\mathbf{u}}
-= \left [ \begin{array} {c} \vec{\mathbf{u_1}}
-\\ \vec{\mathbf{u_2}} \end{array} \right ]$\setstretch{1.8}) and $\vec{\mathbf{y}}$ be the combined output vector
-(\setstretch{1}$\vec{\mathbf{y}} = \left [ \begin{array} {c} \vec{\mathbf{y_1}}
-\\ \vec{\mathbf{y_2}} \end{array} \right ]$\setstretch{1.8}). The representation in terms of these two
+Let $\vc{\mathbf{u}}$ be the combined input vector (\setstretch{1}$\vc{\mathbf{u}}
+= \left [ \begin{array} {c} {\vc{\mathbf{u}}}_{\mathbf{1}}
+\\ {\vc{\mathbf{u}}}_{\mathbf{2}} \end{array} \right ]$\setstretch{1.78}) and $\vc{\mathbf{y}}$ be the combined output vector
+(\setstretch{1}$\vc{\mathbf{y}} = \left [ \begin{array} {c} {\vc{\mathbf{y}}}_{\mathbf{1}}
+\\ {\vc{\mathbf{y}}}_{\mathbf{2}} \end{array} \right ]$\setstretch{1.78}). The representation in terms of these two
 vectors is:
 
-\hspace{0.3in}\begin{minipage}{2in}
-\vspace{-6pt}
+\hspace{0.7in}\begin{minipage}[t]{2in}
+\vspace{-18pt}
 \starteqnstar
-\vec{\dot{\mathbf{x}}} & = & \mathbf{A_2}\vec{\mathbf{x}} + \mathbf{B_2}\vec{\mathbf{u}} \\
-\vec{\mathbf{y}} & = & \mathbf{C_2}\vec{\mathbf{x}} + \mathbf{D_2}\vec{\mathbf{u}}
+\vc{\dot{\mathbf{x}}} & = & \mathbf{A_2}\vc{\mathbf{x}} + \mathbf{B_2}\vc{\mathbf{u}} \\
+\vc{\mathbf{y}} & = & \mathbf{C_2}\vc{\mathbf{x}} + \mathbf{D_2}\vc{\mathbf{u}}
 \doneeqnstar
 \end{minipage}
-\begin{minipage}{3in}
+\begin{minipage}[t]{3in}
+\vspace{-18pt}
 \starteqnstar
 \mathbf{A_2} = \mathbf{A}^2 ~~~~~
 \mathbf{B_2} = \left [ \begin{array} {cc} \mathbf{AB} & \mathbf{B} \end{array} \right ]  \\ ~ \\
@@ -857,7 +858,7 @@ This new representation corresponds to a block that upon every
 execution runs the old block twice. By induction, a general formula
 for running a block $n$ times is:
 
-\begin{minipage}{1.5in}
+\hspace{0.2in}\begin{minipage}{1.5in}
 \starteqnstar
 \mathbf{A_n} = \mathbf{A}^n ~~~~~
 \doneeqnstar
@@ -871,6 +872,7 @@ for running a block $n$ times is:
 \vspace{9pt}
 \end{minipage}
 
+\enlargethispage{-1\baselineskip}
 \hspace{12pt}\begin{minipage}{1.5in}
 \starteqnstar
 \mathbf{C_n} = \left [ \begin{array} {c} \mathbf{C} \\
@@ -912,10 +914,10 @@ for running a block $n$ times is:
 
 Since initializations are not affected,
 $\overrightarrow{\mathbf{initVec}}$, $\mathbf{preA}$, $\mathbf{preB}$,
-$stored$, and $o_{pre}$ remain unchanged from the initial
+$\mt{stored}$, and $o_{pre}$ remain unchanged from the initial
 representation. Since the number of states is not changed, $s$ remains
 the same. The new representation runs the old representation $n$
-times, so $u_{new} = n * u_{old}$, $o_{new} = n * o_{old}$.
+times, so $u_{new} = n * u_{old}$ and $o_{new} = n * o_{old}$.
 
 As mentioned in Section~\ref{sec:pipeline}, we may need to run a block
 $n$ times, in addition to its initialization matrices, for the purpose
@@ -973,53 +975,53 @@ $\mathbf{B_{pre}}$.  Full details appear in~\cite{Agrawal04}.
 
 %%     The old representation was:
 %% \starteqnstar
-%% \left [ \begin{array} {c} \vec{\dot{\mathbf{x_1}}} \\
-%% \vec{\dot{\mathbf{x_2}}}
+%% \left [ \begin{array} {c} {\vc{\dot{\mathbf{x}}}}_{\mathbf{1}}} \\
+%% {\vc{\dot{\mathbf{x}}}}_{\mathbf{2}}}
 %% \end{array} \right ] & = & \left [ \begin{array} {cc} \mathbf{A_{11}} & \mathbf{A_{12}} \\
 %% \mathbf{A_{21}} & \mathbf{A_{22}} \end{array} \right ] \left [
-%% \begin{array} {c} \vec{\mathbf{x_1}} \\ \vec{\mathbf{x_2}} \end{array} \right ]
+%% \begin{array} {c} {\vc{\mathbf{x}}}_{\mathbf{1}} \\ {\vc{\mathbf{x}}}_{\mathbf{2}} \end{array} \right ]
 %%  + \left [ \begin{array} {cc} \mathbf{B_{11}} & \mathbf{B_{12}} \\
 %% \mathbf{B_{21}} & \mathbf{B_{22}} \end{array} \right ] \left[
-%% \begin{array} {c} \vec{\mathbf{u_1}} \\ \vec{\mathbf{u_2}} \end{array} \right ] \\
-%% \vec{\mathbf{y}} & = & \left [ \begin{array} {cc} \mathbf{C_1} &
+%% \begin{array} {c} {\vc{\mathbf{u}}}_{\mathbf{1}} \\ {\vc{\mathbf{u}}}_{\mathbf{2}} \end{array} \right ] \\
+%% \vc{\mathbf{y}} & = & \left [ \begin{array} {cc} \mathbf{C_1} &
 %% \mathbf{C_2} \end{array} \right ] \left [
-%% \begin{array} {c} \vec{\mathbf{x_1}} \\ \vec{\mathbf{x_2}} \end{array} \right ] +
+%% \begin{array} {c} {\vc{\mathbf{x}}}_{\mathbf{1}} \\ {\vc{\mathbf{x}}}_{\mathbf{2}} \end{array} \right ] +
 %% \left [ \begin{array} {cc} \mathbf{D_1} & \mathbf{D_2}
-%% \end{array} \right ] \left [ \begin{array} {c} \vec{\mathbf{u_1}} \\
-%% \vec{\mathbf{u_2}} \end{array} \right ]
+%% \end{array} \right ] \left [ \begin{array} {c} {\vc{\mathbf{u}}}_{\mathbf{1}} \\
+%% {\vc{\mathbf{u}}}_{\mathbf{2}} \end{array} \right ]
 %% \doneeqnstar
 
-%%     We have divided the state vector $\vec{\mathbf{x}}$ into the non-stored input variables ($\vec{\mathbf{x_1}}$)
-%% and the stored input variables ($\vec{\mathbf{x_2}}$), and divided
-%% the input vector $\vec{\mathbf{u}}$ into the first
-%% $newStored-oldStored$ inputs ($\vec{\mathbf{u_1}}$) and the
-%% remaining inputs ($\vec{\mathbf{u_2}}$). We will assume
+%%     We have divided the state vector $\vc{\mathbf{x}}$ into the non-stored input variables (${\vc{\mathbf{x}}}_{\mathbf{1}}$)
+%% and the stored input variables (${\vc{\mathbf{x}}}_{\mathbf{2}}$), and divided
+%% the input vector $\vc{\mathbf{u}}$ into the first
+%% $newStored-oldStored$ inputs (${\vc{\mathbf{u}}}_{\mathbf{1}}$) and the
+%% remaining inputs (${\vc{\mathbf{u}}}_{\mathbf{2}}$). We will assume
 %% $newStored-oldStored <= o$ (If not we can run this algorithm
 %% multiple times). The matrices $\mathbf{A}$, $\mathbf{B}$,
 %% $\mathbf{C}$, and $\mathbf{D}$ are put into block-matrix form
 %% according to the state and input vector divisions.
 
-%%     In our new representation, we use $\vec{\mathbf{x_3}}$ to denote the
+%%     In our new representation, we use ${\vc{\mathbf{x}}}_{\mathbf{3}}$ to denote the
 %% added $newStored - oldStored$ states. As mentioned early,
 %% references to the first $oldStored$ stored input states
-%% ($\vec{\mathbf{x_2}}$) remain the same. Additionally, references
-%% to the non-input states ($\vec{\mathbf{x_1}}$) also remain the
+%% (${\vc{\mathbf{x}}}_{\mathbf{2}}$) remain the same. Additionally, references
+%% to the non-input states (${\vc{\mathbf{x}}}_{\mathbf{1}}$) also remain the
 %% same. Our new representation so far is:
 %% \starteqnstar
-%% \left [ \begin{array} {c} \vec{\dot{\mathbf{x_1}}} \\ \vec{\dot{\mathbf{x_2}}} \\
-%% \vec{\dot{\mathbf{x_3}}}
+%% \left [ \begin{array} {c} {\vc{\dot{\mathbf{x}}}}_{\mathbf{1}}} \\ {\vc{\dot{\mathbf{x}}}}_{\mathbf{2}}} \\
+%% {\vc{\dot{\mathbf{x}}}}_{\mathbf{3}}}
 %% \end{array} \right ] & = & \left [ \begin{array} {ccc} \mathbf{A_{11}} & \mathbf{A_{12}} & ? \\
 %% \mathbf{A_{21}} & \mathbf{A_{22}} & ? \\ ? & ? & ?
 %% \end{array} \right ] \left [
-%% \begin{array} {c} \vec{\mathbf{x_1}} \\ \vec{\mathbf{x_2}} \\ \vec{\mathbf{x_3}} \end{array} \right ]
+%% \begin{array} {c} {\vc{\mathbf{x}}}_{\mathbf{1}} \\ {\vc{\mathbf{x}}}_{\mathbf{2}} \\ {\vc{\mathbf{x}}}_{\mathbf{3}} \end{array} \right ]
 %%  + \left [ \begin{array} {cc} ? & ? \\ ? & ? \\ ? & ? \end{array} \right ] \left[
-%% \begin{array} {c} \vec{\mathbf{u_1}} \\ \vec{\mathbf{u_2}} \end{array} \right ] \\
-%% \vec{\mathbf{y}} & = & \left [ \begin{array} {ccc} \mathbf{C_1} &
+%% \begin{array} {c} {\vc{\mathbf{u}}}_{\mathbf{1}} \\ {\vc{\mathbf{u}}}_{\mathbf{2}} \end{array} \right ] \\
+%% \vc{\mathbf{y}} & = & \left [ \begin{array} {ccc} \mathbf{C_1} &
 %% \mathbf{C_2} & ? \end{array} \right ] \left [
-%% \begin{array} {c} \vec{\mathbf{x_1}} \\ \vec{\mathbf{x_2}} \\ \vec{\mathbf{x_3}} \end{array} \right ] +
+%% \begin{array} {c} {\vc{\mathbf{x}}}_{\mathbf{1}} \\ {\vc{\mathbf{x}}}_{\mathbf{2}} \\ {\vc{\mathbf{x}}}_{\mathbf{3}} \end{array} \right ] +
 %% \left [ \begin{array} {cc} ? & ?
-%% \end{array} \right ] \left [ \begin{array} {c} \vec{\mathbf{u_1}} \\
-%% \vec{\mathbf{u_2}} \end{array} \right ]
+%% \end{array} \right ] \left [ \begin{array} {c} {\vc{\mathbf{u}}}_{\mathbf{1}} \\
+%% {\vc{\mathbf{u}}}_{\mathbf{2}} \end{array} \right ]
 %% \doneeqnstar
 
 %%     The ? indicates yet to be determined entries. In the old
@@ -1030,103 +1032,103 @@ $\mathbf{B_{pre}}$.  Full details appear in~\cite{Agrawal04}.
 %% $u_1$ should be multiplied by $x_2$ instead. Now the new
 %% representation is:
 %% \starteqnstar
-%% \left [ \begin{array} {c} \vec{\dot{\mathbf{x_1}}} \\ \vec{\dot{\mathbf{x_2}}} \\
-%% \vec{\dot{\mathbf{x_3}}}
+%% \left [ \begin{array} {c} {\vc{\dot{\mathbf{x}}}}_{\mathbf{1}}} \\ {\vc{\dot{\mathbf{x}}}}_{\mathbf{2}}} \\
+%% {\vc{\dot{\mathbf{x}}}}_{\mathbf{3}}}
 %% \end{array} \right ] & = & \left [ \begin{array} {ccc} \mathbf{A_{11}} &
 %% \mathbf{A_{12}} & \mathbf{B_{11}} \\ \mathbf{A_{21}} &
 %% \mathbf{A_{22}} & \mathbf{B_{21}} \\ ? & ? & ?  \end{array} \right
 %% ] \left [
-%% \begin{array} {c} \vec{\mathbf{x_1}} \\ \vec{\mathbf{x_2}} \\ \vec{\mathbf{x_3}} \end{array} \right ]
+%% \begin{array} {c} {\vc{\mathbf{x}}}_{\mathbf{1}} \\ {\vc{\mathbf{x}}}_{\mathbf{2}} \\ {\vc{\mathbf{x}}}_{\mathbf{3}} \end{array} \right ]
 %%  + \left [ \begin{array} {cc} ? & ? \\ ? & ? \\ ? & ? \end{array} \right ] \left[
-%% \begin{array} {c} \vec{\mathbf{u_1}} \\ \vec{\mathbf{u_2}} \end{array} \right ] \\
-%% \vec{\mathbf{y}} & = & \left [ \begin{array} {ccc} \mathbf{C_1} &
+%% \begin{array} {c} {\vc{\mathbf{u}}}_{\mathbf{1}} \\ {\vc{\mathbf{u}}}_{\mathbf{2}} \end{array} \right ] \\
+%% \vc{\mathbf{y}} & = & \left [ \begin{array} {ccc} \mathbf{C_1} &
 %% \mathbf{C_2} & \mathbf{D_1}  \end{array} \right ] \left [
-%% \begin{array} {c} \vec{\mathbf{x_1}} \\ \vec{\mathbf{x_2}} \\ \vec{\mathbf{x_3}} \end{array} \right ] +
+%% \begin{array} {c} {\vc{\mathbf{x}}}_{\mathbf{1}} \\ {\vc{\mathbf{x}}}_{\mathbf{2}} \\ {\vc{\mathbf{x}}}_{\mathbf{3}} \end{array} \right ] +
 %% \left [ \begin{array} {cc} ? & ?
-%% \end{array} \right ] \left [ \begin{array} {c} \vec{\mathbf{u_1}} \\
-%% \vec{\mathbf{u_2}} \end{array} \right ]
+%% \end{array} \right ] \left [ \begin{array} {c} {\vc{\mathbf{u}}}_{\mathbf{1}} \\
+%% {\vc{\mathbf{u}}}_{\mathbf{2}} \end{array} \right ]
 %% \doneeqnstar
 
 %%     In the old representation, the remaining $o-(newStored-oldStored)$ input elements
 %% ($u_2$) were $peek(newStored)$ ... $peek(o+oldStored-1)$. In the
 %% new representation, these are the first $o-(newStored-oldStored)$
 %% input elements. We divide the input vector into the first
-%% $o-(newStored-oldStored)$ elements ($\vec{u_{1'}}$) and the
-%% remaining $newStored-oldStored$ elements ($\vec{u_{2'}}$). Any
+%% $o-(newStored-oldStored)$ elements ($\vc{u_{1'}}$) and the
+%% remaining $newStored-oldStored$ elements ($\vc{u_{2'}}$). Any
 %% matrix block that was previously multiplied by
-%% $\vec{\mathbf{u_2}}$ should be multiplied by $\vec{u_{1'}}$
-%% instead. Additionally, there is no dependence on $\vec{u_{2'}}$ by
-%% $\vec{\mathbf{x_1}}$, $\vec{\mathbf{x_2}}$, or $\vec{\mathbf{y}}$.
+%% ${\vc{\mathbf{u}}}_{\mathbf{2}}$ should be multiplied by $\vc{u_{1'}}$
+%% instead. Additionally, there is no dependence on $\vc{u_{2'}}$ by
+%% ${\vc{\mathbf{x}}}_{\mathbf{1}}$, ${\vc{\mathbf{x}}}_{\mathbf{2}}$, or $\vc{\mathbf{y}}$.
 %% The new representation is:
 %% \starteqnstar
-%% \left [ \begin{array} {c} \vec{\dot{\mathbf{x_1}}} \\ \vec{\dot{\mathbf{x_2}}} \\
-%% \vec{\dot{\mathbf{x_3}}} \end{array} \right ] & = & \left [
+%% \left [ \begin{array} {c} {\vc{\dot{\mathbf{x}}}}_{\mathbf{1}}} \\ {\vc{\dot{\mathbf{x}}}}_{\mathbf{2}}} \\
+%% \vc{\dot{\mathbf{x_3}}} \end{array} \right ] & = & \left [
 %% \begin{array} {ccc} \mathbf{A_{11}} & \mathbf{A_{12}} &
 %% \mathbf{B_{11}} \\ \mathbf{A_{21}} & \mathbf{A_{22}} &
 %% \mathbf{B_{21}} \\ ? & ? & ? \end{array} \right ] \left [
-%% \begin{array} {c} \vec{\mathbf{x_1}} \\ \vec{\mathbf{x_2}} \\ \vec{\mathbf{x_3}} \end{array} \right ]
+%% \begin{array} {c} {\vc{\mathbf{x}}}_{\mathbf{1}} \\ {\vc{\mathbf{x}}}_{\mathbf{2}} \\ {\vc{\mathbf{x}}}_{\mathbf{3}} \end{array} \right ]
 %% + \left [ \begin{array} {cc} \mathbf{B_{12}} & \mathbf{0} \\
 %% \mathbf{B_{22}} & \mathbf{0} \\ ? & ? \end{array} \right ] \left[
-%% \begin{array} {c} \vec{u_{1'}} \\ \vec{u_{2'}} \end{array} \right ] \\
-%% \vec{\mathbf{y}} & = & \left [ \begin{array} {ccc} \mathbf{C_1} &
+%% \begin{array} {c} \vc{u_{1'}} \\ \vc{u_{2'}} \end{array} \right ] \\
+%% \vc{\mathbf{y}} & = & \left [ \begin{array} {ccc} \mathbf{C_1} &
 %% \mathbf{C_2} & \mathbf{D_1} \end{array} \right ] \left [
-%% \begin{array} {c} \vec{\mathbf{x_1}} \\ \vec{\mathbf{x_2}} \\ \vec{\mathbf{x_3}} \end{array} \right ] +
+%% \begin{array} {c} {\vc{\mathbf{x}}}_{\mathbf{1}} \\ {\vc{\mathbf{x}}}_{\mathbf{2}} \\ {\vc{\mathbf{x}}}_{\mathbf{3}} \end{array} \right ] +
 %% \left [ \begin{array} {cc} \mathbf{D_2} & \mathbf{0}
-%% \end{array} \right ] \left [ \begin{array} {c} \vec{u_{1'}} \\
-%% \vec{u_{2'}} \end{array} \right ]
+%% \end{array} \right ] \left [ \begin{array} {c} \vc{u_{1'}} \\
+%% \vc{u_{2'}} \end{array} \right ]
 %% \doneeqnstar
 
-%%     The entries for the state update $\vec{\dot{\mathbf{x_3}}}$ remain to be
+%%     The entries for the state update $\vc{\dot{\mathbf{x_3}}}$ remain to be
 %% determined. Any stored input variable representing $peek(i)$ must
-%% get updated by $peek(i+o)$. $\vec{\dot{\mathbf{x_3}}}$ is
+%% get updated by $peek(i+o)$. $\vc{\dot{\mathbf{x_3}}}$ is
 %% $peek(oldStored)$ ... $peek(newStored-1)$, so it must be updated
 %% by $peek(o+oldStored)$ ... $peek(o+newStored-1)$. This is
-%% precisely $\vec{u_{2'}}$, so the final new representation is:
+%% precisely $\vc{u_{2'}}$, so the final new representation is:
 %% \starteqnstar
-%% \left [ \begin{array} {c} \vec{\dot{\mathbf{x_1}}} \\ \vec{\dot{\mathbf{x_2}}} \\
-%% \vec{\dot{\mathbf{x_3}}}
+%% \left [ \begin{array} {c} \vc{\dot{\mathbf{x_1}}} \\ \vc{\dot{\mathbf{x_2}}} \\
+%% \vc{\dot{\mathbf{x_3}}}
 %% \end{array} \right ] & = & \left [ \begin{array} {ccc} \mathbf{A_{11}} &
 %% \mathbf{A_{12}} & \mathbf{B_{11}} \\ \mathbf{A_{21}} &
 %% \mathbf{A_{22}} & \mathbf{B_{21}} \\ \mathbf{0} & \mathbf{0} & \mathbf{0} \\
-%% \end{array} \right ] \left [ \begin{array} {c} \vec{\mathbf{x_1}} \\ \vec{\mathbf{x_2}} \\
-%% \vec{\mathbf{x_3}} \end{array} \right ] + \left [ \begin{array}
+%% \end{array} \right ] \left [ \begin{array} {c} {\vc{\mathbf{x}}}_{\mathbf{1}} \\ {\vc{\mathbf{x}}}_{\mathbf{2}} \\
+%% {\vc{\mathbf{x}}}_{\mathbf{3}} \end{array} \right ] + \left [ \begin{array}
 %% {cc} \mathbf{B_{12}} & \mathbf{0} \\ \mathbf{B_{22}} & \mathbf{0} \\ \mathbf{0} & \mathbf{I} \\
-%% \end{array} \right ] \left[ \begin{array} {c} \vec{u_{1'}} \\ \vec{u_{2'}} \end{array} \right ] \\
-%% \vec{\mathbf{y}} & = & \left [ \begin{array} {ccc} \mathbf{C_1} &
+%% \end{array} \right ] \left[ \begin{array} {c} \vc{u_{1'}} \\ \vc{u_{2'}} \end{array} \right ] \\
+%% \vc{\mathbf{y}} & = & \left [ \begin{array} {ccc} \mathbf{C_1} &
 %% \mathbf{C_2} & \mathbf{D_1} \end{array} \right ] \left [
-%% \begin{array} {c} \vec{\mathbf{x_1}} \\ \vec{\mathbf{x_2}} \\ \vec{\mathbf{x_3}} \end{array} \right ] +
+%% \begin{array} {c} {\vc{\mathbf{x}}}_{\mathbf{1}} \\ {\vc{\mathbf{x}}}_{\mathbf{2}} \\ {\vc{\mathbf{x}}}_{\mathbf{3}} \end{array} \right ] +
 %% \left [ \begin{array} {cc} \mathbf{D_2} & \mathbf{0}
-%% \end{array} \right ] \left [ \begin{array} {c} \vec{u_{1'}} \\
-%% \vec{u_{2'}} \end{array} \right ]
+%% \end{array} \right ] \left [ \begin{array} {c} \vc{u_{1'}} \\
+%% \vc{u_{2'}} \end{array} \right ]
 %% \doneeqnstar
 
 %%     Similarly, let the original initialization equation be:
 %% \starteqnstar
-%% \left [ \begin{array} {c} \vec{\dot{\mathbf{x_1}}} \\
-%% \vec{\dot{\mathbf{x_2}}} \end{array} \right ] = \left [
+%% \left [ \begin{array} {c} \vc{\dot{\mathbf{x_1}}} \\
+%% \vc{\dot{\mathbf{x_2}}} \end{array} \right ] = \left [
 %% \begin{array} {cc} \mathbf{A_{pre11}} & \mathbf{A_{pre12}} \\
 %% \mathbf{0} & \mathbf{0} \end{array} \right ] \left [
-%% \begin{array} {c} \vec{\mathbf{x_1}} \\ \vec{\mathbf{x_2}}
+%% \begin{array} {c} {\vc{\mathbf{x}}}_{\mathbf{1}} \\ {\vc{\mathbf{x}}}_{\mathbf{2}}
 %% \end{array} \right ] + \left [ \begin{array} {cc} \mathbf{B_{pre11}} & \mathbf{B_{pre12}} \\
 %% \mathbf{I} & \mathbf{0} \end{array} \right ] \left [ \begin{array}
-%% {c} \vec{\mathbf{u_{pre1}}} \\ \vec{\mathbf{u_{pre2}}}
+%% {c} {\vc{\mathbf{u}}}_{\mathbf{{pre1}}} \\ {\vc{\mathbf{u}}}_{\mathbf{{pre2}}}
 %% \end{array} \right ]
 %% \doneeqnstar
 
-%%     Where $\vec{\mathbf{u_{pre1}}}$ has length $oldStored$, and
-%% $\vec{\mathbf{u_{pre2}}}$ has length $o_{pre} - oldStored$. Now we
-%% simply consider $\vec{\mathbf{u_{pre1}}}$ to have length
-%% $newStored$ and $\vec{\mathbf{u_{pre2}}}$ to have length $o_{pre}
+%%     Where ${\vc{\mathbf{u}}}_{\mathbf{{pre1}}}$ has length $oldStored$, and
+%% ${\vc{\mathbf{u}}}_{\mathbf{{pre2}}}$ has length $o_{pre} - oldStored$. Now we
+%% simply consider ${\vc{\mathbf{u}}}_{\mathbf{{pre1}}}$ to have length
+%% $newStored$ and ${\vc{\mathbf{u}}}_{\mathbf{{pre2}}}$ to have length $o_{pre}
 %% - newStored$. If $o_{pre} < newStored$, we set $o_{pre} =
 %% newStored$. Then the initialization equation is the same as
 %% before, except the original stored input states
-%% ($\vec{\mathbf{x_2}})$ are replaced by the new stored input states
-%% ($\left [ \begin{array} {c} \vec{\mathbf{x_2}} \\
-%% \vec{\mathbf{x_3}} \end{array} \right ]$).
+%% (${\vc{\mathbf{x}}}_{\mathbf{2}})$ are replaced by the new stored input states
+%% ($\left [ \begin{array} {c} {\vc{\mathbf{x}}}_{\mathbf{2}} \\
+%% {\vc{\mathbf{x}}}_{\mathbf{3}} \end{array} \right ]$).
 
 %%     We have derived $\mathbf{A}$, $\mathbf{B}$, $\mathbf{C}$, $\mathbf{D}$,
 %% $\mathbf{A_{pre}}$, and $\mathbf{B_{pre}}$ for the new
-%% representation. Clearly, $stored = newStored$ and $o_{pre} =
+%% representation. Clearly, $\mt{stored} = newStored$ and $o_{pre} =
 %% o_{preold} + newStored-oldStored$. The input/output rate remains
 %% the same, so $o = o_{old}$ and $u = u_{old}$. We have added
 %% $newStored-oldStored$ total states, so $s = s_{old} + (newStored -
