@@ -1,0 +1,376 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!-- saved from url=(0077)http://systems.cs.colorado.edu/CASES2005/CRP/Author/ViewReview.php?paperId=21 -->
+<HTML><HEAD><TITLE>See all the finished reviews for Paper #21</TITLE>
+<META http-equiv=Content-Type content="text/html; charset=windows-1252">
+<META content="MSHTML 6.00.2900.2668" name=GENERATOR></HEAD>
+<BODY>
+<TABLE cellSpacing=2 cellPadding=1 width="95%" align=center bgColor=#000000 
+border=0>
+  <TBODY>
+  <TR>
+    <TD>
+      <TABLE align=center bgColor=#eeeeff border=0>
+        <TBODY>
+        <TR>
+          <TD align=middle width="100%" colSpan=3><FONT size=+3>CASES2005 
+            Paper Submission Site </FONT></TD></TR>
+        <TR>
+          <TD align=left width="15%">
+            <FORM action=http://www.casesconference.org/cases2005/ method=post><INPUT type=submit value="Go To CASES2005 Site" name=textButton></FORM></TD>
+          <TD vAlign=center align=middle width="70%"><FONT size=+2>See all the 
+            finished reviews for Paper #21 </FONT></TD>
+          <TD align=right width="15%">
+            <FORM action=http://systems.cs.colorado.edu/CASES2005/CRP/index.php 
+            method=post><INPUT type=submit value="Go To CASES2005 Submissions" name=textButton></FORM></TD></TR>
+        <TR>
+          <TD align=middle colSpan=3><FONT color=red size=+1>It is currently 
+            Friday 15th of July 2005 01:51:32 AM 
+    MDT</FONT></TD></TR></TBODY></TABLE></TD></TR></TBODY></TABLE><BR>
+<P>You can see the paper reviews until Wednesday 07th of September 2005 11:59:00 
+PM . </P>
+<CENTER>
+<P>There are 6 finalized reviews and 0 started, but unfinalized, reviews for 
+your paper.<BR>A total of 8 reviews were requested by the program 
+committee.<BR>You will receive an email notifcation when any of the unfinished 
+reviews are finalized. </P></CENTER>
+<CENTER>
+<TABLE align=center bgColor=#9999cc border=1>
+  <TBODY>
+  <TR>
+    <TH align=middle colSpan=2><FONT size=+1><B>Paper # 21 <A 
+      href="http://systems.cs.colorado.edu/CASES2005/CRP/Download/GetPaper.php?paperId=21" 
+      target=_blank>(Download paper of type application/pdf, 214700 bytes) 
+      </A></B></FONT></TH></TR>
+  <TR>
+    <TD>Title: </TD>
+    <TD>Optimizing Stream Programs Using Linear State Space Analysis </TD></TR>
+  <TR>
+    <TD>Author Information: </TD>
+    <TD>Sitij Agrawal, Massachusetts Institute of Technology<BR>William Thies, 
+      Massachusetts Institute of Technology<BR>Saman Amarasinghe, Massachusetts 
+      Institute of Technology<BR></TD></TR>
+  <TR>
+    <TD>Abstract: </TD>
+    <TD>Digital Signal Processing (DSP) is becoming increasingly 
+      widespread<BR>in portable devices. Due to harsh constraints on power, 
+      latency, and<BR>throughput in embedded environments, developers often 
+      appeal to signal<BR>processing experts to hand-optimize algorithmic 
+      aspects of the<BR>application. However, such DSP optimizations are 
+      tedious,<BR>error-prone, and expensive, as they require 
+      sophisticated<BR>domain-specific knowledge.<BR><BR>We present a general 
+      model for automatically representing and<BR>optimizing a large class of 
+      signal processing applications. The model<BR>is based on linear state 
+      space systems. A program is viewed as a set<BR>of filters, each of which 
+      has an input stream, an output stream, and a<BR>set of internal states. At 
+      each time step, the filter produces some<BR>outputs that are a linear 
+      combination of the inputs and the state<BR>values; the state values are 
+      also updated in a linear<BR>fashion. Examples of linear state space 
+      filters include IIR filters<BR>and linear difference 
+      equations.<BR><BR>Using the state space representation, we describe a 
+      novel set of<BR>program transformations, including combination of adjacent 
+      filters,<BR>elimination of redundant states and reduction of the number of 
+      system<BR>parameters. We have implemented the optimizations in the 
+      StreamIt<BR>compiler and demonstrate improved generality over previous 
+      techniques.<BR></TD></TR></TBODY></TABLE></CENTER>
+<TABLE width="100%">
+  <TBODY>
+  <TR bgColor=#eeeeee>
+    <TH><BIG><BIG>Review #110 For Paper #21 </BIG></BIG></TH></TR>
+  <TR bgColor=#eeeeee>
+    <TH>(review last modified Monday 04th of July 2005 07:49:26 AM) </TH></TR>
+  <TR bgColor=#eeeeee>
+    <TD>
+      <TABLE align=center border=1 columns="2">
+        <TBODY>
+        <TR>
+          <TH width="25%">Attribute </TH>
+          <TH width="75%" colSpan=12>Value </TH></TR>
+        <TR>
+          <TD>What is the strength of the paper? (1-3 strong points)</TD>
+          <TD>The paper is a formal presentation of how DSP filters can be 
+            represented as linear state systems and how certain optimizations 
+            can be performed after this transformation.<BR><BR></TD></TR>
+        <TR>
+          <TD>What is the weakness of the paper? (1-3 weak points)</TD>
+          <TD>Experimental results are very preliminary and does not address 
+            challenges faced when combining multiple filters such as FFT.</TD></TR>
+        <TR>
+          <TD>Provide a short summary of the paper</TD>
+          <TD>This paper provides how StreamIt programs can be represented as 
+            linear state space systems. Next, optimizations that reduce the 
+            number of states and parameters are presented. The results indicate 
+            that when compared unoptimized StreamIt programs, the number of 
+            floating point operations can be reduced by approximately 80% in 
+            some cases. </TD></TR>
+        <TR>
+          <TD>Provide additional detailed comments to the author</TD>
+          <TD>I like how the paper first presents somewhat informally what 
+            optimization/transformation they are going to do, and then formally 
+            show how to do it. Without that, I would not have been able follow 
+            through as clearly.<BR><BR>The weakest part of the paper is 
+            experimental results. There is a lot of information at the beginning 
+            about StreamIt which can be excluded from the paper with proper 
+            citation. The effects of transformations and optimizations are not 
+            fully studied. As you mention some filters like FFT cause major 
+            problems when combining filters. Solutions to such problems should 
+            be provided, otherwise any StreamIt program that uses this very 
+            common type of filters can not be effectively 
+            handled.<BR><BR>Another question I have is the parallels between 
+            state reduction and common subexpression elimination. In a 
+            traditional language, an optimizing compiler can detect and 
+            eliminate multiple copies of the same operation. It can do further 
+            optimizations such as value specialization and constant propagation 
+            to reduce the number of parameters as well. When compared to such an 
+            optimizing compiler, it is not clear how they would compare head to 
+            head. Even though a quantitative analysis is not expected, 
+            qualitatively, these are issues that need to be 
+        addressed.</TD></TR></TBODY></TABLE></TD></TR></TBODY></TABLE>
+<TABLE width="100%">
+  <TBODY>
+  <TR bgColor=#cccccc>
+    <TH><BIG><BIG>Review #118 For Paper #21 </BIG></BIG></TH></TR>
+  <TR bgColor=#cccccc>
+    <TH>(review last modified Thursday 30th of June 2005 02:03:02 PM) </TH></TR>
+  <TR bgColor=#cccccc>
+    <TD>
+      <TABLE align=center border=1 columns="2">
+        <TBODY>
+        <TR>
+          <TH width="25%">Attribute </TH>
+          <TH width="75%" colSpan=12>Value </TH></TR>
+        <TR>
+          <TD>What is the strength of the paper? (1-3 strong points)</TD>
+          <TD>The paper presents an elegant representation of DSP kernels. The 
+            paper is rigorous in treatment of the transformations.</TD></TR>
+        <TR>
+          <TD>What is the weakness of the paper? (1-3 weak points)</TD>
+          <TD>It is not clear how many common DSP algorithms can be 
+            represented directly in the linear state space representation. The 
+            paper is light on details of implementation.</TD></TR>
+        <TR>
+          <TD>Provide a short summary of the paper</TD>
+          <TD>The paper presents algorithms to convert DSP kernels written in 
+            StreamIt to linear state space representation and also algorithms 
+            for transforming and optimising the representation. Optimisations 
+            include combining adjacent filters, state space reduction etc. The 
+            optimisations have been implemented and results are presented for a 
+            set of micro benchmarks.</TD></TR>
+        <TR>
+          <TD>Provide additional detailed comments to the author</TD>
+          <TD>1) Developers write their programs and StreamIt and the authors 
+            propose analysis techniques to derive a linear state space 
+            representation. However, the developers already had the linear 
+            equation in mind when the coded the program. Therefore the 
+            importance of the derivation step is not clear. Why can't the 
+            language have extensions to describe the algorithms directly in 
+            linear state space representation? Obviously linear representation 
+            cannot be derived from an inherently non-linear problem. So the 
+            roundabout route of going from problem to StreamIt to the linear 
+            state space representation seems wasteful.<BR><BR>2) The linear 
+            state space conversion step considers one filter at a time. Does 
+            this mean parts of the stream graph can in the linear representation 
+            and others non-linear? Can the optimisations be selectively applied 
+            only the linear parts or does it need the entire stream 
+            graph?<BR><BR>3) What are complexities of the proposed 
+            transformation steps? How well do they scale if the body of the 
+            filters are huge?<BR><BR>4) Although the results seem indicative of 
+            the benefits of this approach, it is not clear how much cost savings 
+            is really achieved. It will be nice if the authors compared an 
+            implementation of thier optimised filters with a different existing 
+            ASIC implementation.<BR><BR></TD></TR></TBODY></TABLE></TD></TR></TBODY></TABLE>
+<TABLE width="100%">
+  <TBODY>
+  <TR bgColor=#eeeeee>
+    <TH><BIG><BIG>Review #242 For Paper #21 </BIG></BIG></TH></TR>
+  <TR bgColor=#eeeeee>
+    <TH>(review last modified Friday 01st of July 2005 03:53:30 PM) </TH></TR>
+  <TR bgColor=#eeeeee>
+    <TD>
+      <TABLE align=center border=1 columns="2">
+        <TBODY>
+        <TR>
+          <TH width="25%">Attribute </TH>
+          <TH width="75%" colSpan=12>Value </TH></TR>
+        <TR>
+          <TD>What is the strength of the paper? (1-3 strong points)</TD>
+          <TD>Elegance of the formulation, soundness of the method.</TD></TR>
+        <TR>
+          <TD>What is the weakness of the paper? (1-3 weak points)</TD>
+          <TD>As the paper itself indicates, this is a very small/incremental 
+            step towards realizing the vision of building a unified framework 
+            for optimizing DSP algorithms.<BR></TD></TR>
+        <TR>
+          <TD>Provide a short summary of the paper</TD>
+          <TD>The paper present a model (based on linear state space systems) 
+            for representing a class of signal processing applications, and then 
+            describes a set of program transformations using the state space 
+            representation, including combination of adjacent filters, 
+            elimination of redundant states and reduction of the number of 
+            system parameters. <BR></TD></TR>
+        <TR>
+          <TD>Provide additional detailed comments to the author</TD>
+          <TD>Increase the number and size of the benchmarks used in your 
+            experiments.<BR></TD></TR></TBODY></TABLE></TD></TR></TBODY></TABLE>
+<TABLE width="100%">
+  <TBODY>
+  <TR bgColor=#cccccc>
+    <TH><BIG><BIG>Review #356 For Paper #21 </BIG></BIG></TH></TR>
+  <TR bgColor=#cccccc>
+    <TH>(review last modified Thursday 07th of July 2005 04:48:49 PM) </TH></TR>
+  <TR bgColor=#cccccc>
+    <TD>
+      <TABLE align=center border=1 columns="2">
+        <TBODY>
+        <TR>
+          <TH width="25%">Attribute </TH>
+          <TH width="75%" colSpan=12>Value </TH></TR>
+        <TR>
+          <TD>What is the strength of the paper? (1-3 strong points)</TD>
+          <TD>1. Elegant, analytical approach to state-space-based performance 
+            improvement<BR>2. Solid, mathematically sound techniques</TD></TR>
+        <TR>
+          <TD>What is the weakness of the paper? (1-3 weak points)</TD>
+          <TD>1. Experimental results are somewhat weak. The only comparison 
+            is to an MS thesis in 2003. No comparison is made to standard 
+            compiler techniques such as loop fusing, constant folding, 
+            etc...<BR>2. No discussion on how does the work extend to 
+            multi-dimensional arrays used for example in diversity 
+        processing.</TD></TR>
+        <TR>
+          <TD>Provide a short summary of the paper</TD>
+          <TD>Paper proposes a state-space analysis approach for reducing the 
+            code complexity in filter-based applications. Results indicate that 
+            the method seems effective for combination of filters, rather than 
+            single isolated filtering instances.</TD></TR>
+        <TR>
+          <TD>Provide additional detailed comments to the author</TD>
+          <TD></TD></TR></TBODY></TABLE></TD></TR></TBODY></TABLE>
+<TABLE width="100%">
+  <TBODY>
+  <TR bgColor=#eeeeee>
+    <TH><BIG><BIG>Review #377 For Paper #21 </BIG></BIG></TH></TR>
+  <TR bgColor=#eeeeee>
+    <TH>(review last modified Tuesday 05th of July 2005 03:11:48 AM) </TH></TR>
+  <TR bgColor=#eeeeee>
+    <TD>
+      <TABLE align=center border=1 columns="2">
+        <TBODY>
+        <TR>
+          <TH width="25%">Attribute </TH>
+          <TH width="75%" colSpan=12>Value </TH></TR>
+        <TR>
+          <TD>What is the strength of the paper? (1-3 strong points)</TD>
+          <TD>Full benchmark evaluations, including reporting negative 
+            results.<BR><BR>An interesting idea that appears to be fully 
+            developed.<BR><BR></TD></TR>
+        <TR>
+          <TD>What is the weakness of the paper? (1-3 weak points)</TD>
+          <TD>The omitted discussion from Section 2.3.2 feels like it is 
+            important to the overall system. Instead of showing complete 
+            equation transformations (individual terms, combined, simplified, 
+            etc.), a better balance would be to show key equation steps and use 
+            the additional space to add missing discussions.<BR><BR></TD></TR>
+        <TR>
+          <TD>Provide a short summary of the paper</TD>
+          <TD>By re-evaluating DSP kernel applications such as FFT and IIR in 
+            terms of linear state space, new opportunities for optimizations 
+            develop. These optimizations reduce global and local storage 
+            requirements, eliminate some redundant instructions, and generally 
+            result in better performance. The system proposed, unlike most DSP 
+            solutions, is not hardware dependent. </TD></TR>
+        <TR>
+          <TD>Provide additional detailed comments to the author</TD>
+          <TD>In general writing style, the paper is easy to read. There are a 
+            few instances of word choice, such as "muddling", that may be 
+            somewhat dubious for a technical publication.<BR><BR>With the 
+            captions, if you set the key identifier in bold (ie, "Figure 4:" in 
+            bold), it makes it easier to visually isolate the caption from the 
+            rest of the text in the figure. Similarly, in some places the linear 
+            equations run together, such as at the beginning of section 2.3.1. 
+            By using uniform notation, or by separating body text on different 
+            lines from equations, this can easily be fixed.<BR><BR>In several 
+            places, where FIFO queues exist between filter kernels, you refer to 
+            "push" and "pop" as operations on these FIFO queues. These are 
+            incorrect terms -- you really mean "enqueue" and "dequeue", as push 
+            and pop imply a LIFO scheme which is certainly not what the paper 
+            describes.<BR><BR>My lack of deep experience and knowledge of this 
+            area leaves me hesitant to give a stronger recommendation on the 
+            paper, and I am definitely unqualified to evaluate the related work 
+            discussions. Unfortunately, this also means I am unable to determine 
+            the novelty of the work.<BR><BR>I found the arguments coherent and 
+            the discussion well formed. The evaluation of the idea seems well 
+            developed.<BR></TD></TR></TBODY></TABLE></TD></TR></TBODY></TABLE>
+<TABLE width="100%">
+  <TBODY>
+  <TR bgColor=#cccccc>
+    <TH><BIG><BIG>Review #415 For Paper #21 </BIG></BIG></TH></TR>
+  <TR bgColor=#cccccc>
+    <TH>(review last modified Tuesday 05th of July 2005 11:17:10 PM) </TH></TR>
+  <TR bgColor=#cccccc>
+    <TD>
+      <TABLE align=center border=1 columns="2">
+        <TBODY>
+        <TR>
+          <TH width="25%">Attribute </TH>
+          <TH width="75%" colSpan=12>Value </TH></TR>
+        <TR>
+          <TD>What is the strength of the paper? (1-3 strong points)</TD>
+          <TD>I personally think the technique of parameter reduction is 
+            genuinely smart. In some sense, it is similar to strength reduction, 
+            but taking a step further. <BR></TD></TR>
+        <TR>
+          <TD>What is the weakness of the paper? (1-3 weak points)</TD>
+          <TD>One major caveat of their results is that <BR>the measurement is 
+            not based on simulation, but based on counting the number of FP 
+            operations (but how about loads and stores reduced through state 
+            removal?). This results show the best case speedup because streaming 
+            processor should have multiple processing unit, even though a few 
+            operations are reduced, it could mean just that you leave more 
+            functional units idle but you do not directly obtain 1-to-1 
+            performance gain. Even by using this metric, conspicuous speedups 
+            are only seen in 4 out of their 11 benchmark programs; 4 on-par; 2 
+            had visible but not significant slowdown, and one was slowed down by 
+            3x. The worse case FFT (3x -) is not a surprise though, since the 
+            optimization actually turns an FFT to DFT. <BR><BR>One caveat (in my 
+            opinion) is that since the evaluation is based on counting the 
+            number of operations rather than actually executing the code, it is 
+            hard to tell if their formal method is flawless. (I suspect any 
+            reviewer can guarantee that.) But I have no doubt that the 
+            optimization the authors propose is completely valid.<BR><BR>The 
+            scheme only works for streaming apps written in streaming language 
+            such as their StreamIt. The authors specifically pointed out that it 
+            is not applicable to C based programs. <BR></TD></TR>
+        <TR>
+          <TD>Provide a short summary of the paper</TD>
+          <TD>This paper proposes a compiler optimization based on global 
+            (inter-procedural) optimization to remove transient (or they call 
+            state) and operation redundancy for performance improvement in 
+            DSP/media streaming application. The transient storage sometimes is 
+            an artifact of programmers and can be merged/combined to reduce the 
+            number of operations and argument passing. The operation can be 
+            further reduced by refactoring the coefficients in convolution. 
+          <BR></TD></TR>
+        <TR>
+          <TD>Provide additional detailed comments to the author</TD>
+          <TD>I am a bit uneasy with the terminology you used: push and pop. I 
+            guess that was already defined as part of the StreamIt language. 
+            When I see push and pop, my perception is that there is a stack-like 
+            queue, you push to and pop from the "same stack." However, for 
+            example in your Figure 1 example, the source of "pop" and the 
+            destination of "push" are two different entities. It is more like a 
+            FIFO, you get one from a source, process it, then put the result 
+            back to a destination. My mind boggles every time I read push and 
+            pop in the paper, 'cause I can't help to not think about pushing and 
+            popping a stack.<BR></TD></TR></TBODY></TABLE></TD></TR></TBODY></TABLE>
+<HR>
+
+<TABLE width="50%" align=center>
+  <TBODY>
+  <TR>
+    <TD align=left>
+      <FORM action=http://systems.cs.colorado.edu/CASES2005/CRP/index.php 
+      method=post><INPUT type=submit value="Goto Main Index" name=textButton></FORM></TD>
+    <TD align=right>
+      <FORM><INPUT onclick=javascript:window.close() type=submit value="Close Window"></FORM></TD></TR></TBODY></TABLE>
+<H5><A href="http://crp.sourceforge.net/">Conference Review Package -- Copyright 
+© 2001&nbsp; </A><BR>All rights reserved.<BR></H5></BODY></HTML>
