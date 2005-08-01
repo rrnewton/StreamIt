@@ -6,7 +6,7 @@ We have implemented the extraction, combination, and optimization
 compiler, which uses the Kopi Java Compiler
 infrastructure~\cite{kopi}.  A small set of micro-benchmarks is used
 to demonstrate the functionality of the technique; complete code for
-the benchmarks appears in~\cite[pp.67-93]{Agrawal04}.  We measure
+the benchmarks appears in~\cite[pp. 67-93]{Agrawal04}.  We measure
 performance by counting the number of floating point operations
 (additions and multiplications) executed in a given benchmark.  The
 DynamoRIO~\cite{dynamo,dynamorio} system is employed to count
@@ -59,14 +59,14 @@ combination of stateful filters.
 
 For example, combining an IIR filter with a decimator that leaves 1
 out of every 16 values yields a 194\% improvement. Combining an IIR
-filter with an FIR filter has a 6\% improvement. In the case of an IIR
-filter with a decimator, there are extraneous computations performed
-by the IIR filter that are thrown away by the decimator.  Combining
-their respective matrices removes these computations. In the case of
-an IIR filter with an FIR filter, the computations in both filters can
-be merged to a single set of computations. This indicates that state
-space optimizations are more useful when applied to combined filters
-than when applied to individual filters.
+filter with an FIR filter offers a 6\% improvement. In the case of an
+IIR filter with a decimator, there are extraneous computations
+performed by the IIR filter that are thrown away by the decimator.
+Combining their respective matrices removes these computations. In the
+case of an IIR filter with an FIR filter, the computations in both
+filters can be merged to a single set of computations. This indicates
+that state space optimizations are more useful when applied to
+combined filters than when applied to individual filters.
 
 For the last five applications, which mainly have linear components
 without state, linear optimizations and state space optimizations are
@@ -92,7 +92,7 @@ This degradation would not occur in practice.
 In summary, the results show that linear state space analysis is more
 general than linear analysis.  While the experiments consider only a
 small set of micro-benchmarks, they also demonstrate that a relatively
-elaborate mathematical framework is managable within the compiler.  It
+elaborate mathematical framework is manageable within the compiler.  It
 remains an important topic of future work to evaluate linear state
 space analysis using realistic applications, and to measure actual
 execution times on an embedded architecture.

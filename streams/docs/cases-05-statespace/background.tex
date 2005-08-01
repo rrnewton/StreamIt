@@ -1,4 +1,5 @@
 \begin{figure}[t]
+\vspace{6pt}
 {\small
 \begin{verbatim}
    float->float filter MovingAverage(int N) {
@@ -104,30 +105,31 @@ following notation to describe such systems:
 \noindent In these equations, the state vector is denoted by
 $\vec{\mathbf{x}}$, the inputs by $\vec{\mathbf{u}}$, and the outputs
 by $\vec{\mathbf{y}}$. $\vec{\dot{\mathbf{x}}}$ represents the new
-state vector, i.e., the state vector after it is updated.  The 
 \clearpage \noindent 
+state vector, i.e., the state vector after it is updated.  The 
 first equation is for the state updates, while the second equation is
 for the outputs.  $\mathbf{A}$, $\mathbf{B}$, $\mathbf{C}$, and
-$\mathbf{D}$ are matrices whose dimensions depend on the number of
-states, inputs, and outputs.
+$\mathbf{D}$ are matrices whose dimensions depend on the 
+number of states, inputs, and outputs.
 
-Figure~\ref{fig:opt-seq} illustrates an optimization sequence for an
+\looseness+1 Figure~\ref{fig:opt-seq} illustrates an optimization sequence for an
 IIR filter.  Three versions of the filter are shown: original,
 following state removal, and following parameter reduction.  In each
 case, the state space representation for the filter is shown on the
 right, along with the number of multiplications and additions needed
 per execution of the work function.
 
-The state removal optimization identifies that the states $x_1$ and
-$x_2$ are always used as part of the expression $x_1 + x_2$.  Thus,
-one of the states can be eliminated in favor of a single variable,
-$x$, that tracks the value of the sum.  While relatively simple in
-this example, such a transformation can be quite subtle when applied
-to a large representation (e.g., the result of combining many filters
-together.)  State removal can reduce storage requirements as well as
-eliminate arithmetic operations (in this example, 1 multiplication and
-4 additions).  As described in Section~\ref{sec:state-removal}, state
-removal is formulated as a general sequence of matrix operations.
+\looseness+1 The state removal optimization identifies that the states
+$x_1$ and $x_2$ are always used as part of the expression $x_1 + x_2$.
+Thus, one of the states can be eliminated in favor of a single
+variable, $x$, that tracks the value of the sum.  While relatively
+simple in this example, such a transformation can be quite subtle when
+applied to a large representation (e.g., the result of combining many
+filters together.)  State removal can reduce storage requirements as
+well as eliminate arithmetic operations (in this example, 1
+multiplication and 4 additions).  As described in
+Section~\ref{sec:state-removal}, state removal is formulated as a
+general sequence of matrix operations.
 
 The parameter reduction optimization refactors the coefficients that
 operate on the state variables in order to reduce the number of
