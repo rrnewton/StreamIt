@@ -56,7 +56,7 @@ the number of states~\cite{Moore} as well as the number of parameters
 in the system~\cite{Ackermann/Bucy,Mayne,Schutter}.
 
 Our technique leverages domain-specific knowledge of linear state
-space systems to perform novel optimization of stream programs.  Our
+space systems to perform novel optimizations on stream programs.  Our
 framework applies to languages based on the synchronous dataflow model
 of computation.  In this model, a program is a set of autonomous
 filters that communicate over FIFO channels.  On each execution, a
@@ -72,10 +72,10 @@ This paper makes the following contributions:
 \begin{itemize}
 
 \vspace{\itemshrink} \item An extraction algorithm that examines each
-filter and, where possible, builds a state space representation to
-describe its behavior.
+filter and, where possible, builds a linear state space representation
+to describe its behavior.
 
-\vspace{\itemshrink} \item Rules for combining adjacent state space
+\vspace{\itemshrink} \item Rules for combining adjacent linear state space
 blocks into a single representation, thereby eliminating redundant
 computations and enabling further optimizations.  Each possible
 configuration of blocks (sequential, parallel, and cyclic) is handled.
@@ -92,14 +92,14 @@ order to decrease the number of operations used.
 While the principle contribution of this paper is in the elegance and
 generality of its theoretical formulation, we also demonstrate that
 state space analysis is tractable by implementing it in the StreamIt
-compiler.  We evaluate state space analysis over a modest set of
+compiler.  We evaluate state space analysis over a small set of
 micro-benchmarks and illustrate that it is more general than linear
 optimizations alone.
 
 In the rest of this section, we give an overview of StreamIt and
-illustrating examples of state space analysis\footnote{As the rest of
-this paper is devoted to linear state space analysis, we often say
-only ``state space analysis'' for brevity.}.
+illustrating examples of state space analysis\footnote{\smaller As the
+rest of this paper is devoted to linear state space analysis, we often
+say only ``state space analysis'' for brevity.}.
 Section~\ref{sec:statespace} gives the details of our state space
 representation, including extraction and combination rules, while
 Section~\ref{sec:optimization} describes the optimizations.

@@ -1,94 +1,98 @@
-\vspace{-24pt}
 \mysection{Implementation}
 \label{sec:results}
 
 We have implemented the extraction, combination, and optimization
 (except multiple execution stages) procedures within the StreamIt
 compiler, which uses the Kopi Java Compiler
-infrastructure~\cite{kopi}. We measure performance by counting the
-number of floating point operations (additions and multiplications)
-executed in a given benchmark. The DynamoRIO~\cite{dynamo} system is
-used to count operations.
+infrastructure~\cite{kopi}.  A small set of micro-benchmarks is used
+to demonstrate the functionality of the technique; complete code for
+the benchmarks appears in~\cite[pp.67-93]{Agrawal04}.  We measure
+performance by counting the number of floating point operations
+(additions and multiplications) executed in a given benchmark.  The
+DynamoRIO~\cite{dynamo,dynamorio} system is employed to count
+operations.
 
-We compare linear state space optimizations with linear
+We compare linear state space optimizations to linear
 optimizations~\cite{Lamb}.  For the state space numbers, all linear
 state space blocks are combined and then optimizations are applied.
-For applications of this size, it is primarily the combination that
+For applications this small, it is primarily the combination that
 yields a performance boost; we have not characterized the individual
 contributions of state removal and parameter reduction.  For the
 linear numbers, all linear blocks are combined.  We do not enable the
 ``frequency translation'' optimization~\cite{Lamb} because it has no
 counterpart in the state space domain.  A hybrid optimizer could apply
-frequency translation where appropriate, and linear state space
+frequency translation where appropriate and linear state space
 optimizations elsewhere.
 
 \begin{table}[tbp]
 \small
 \begin{center}
-\begin{tabular} {|c|c|c|} \hline
-{\bf Application} & {\bf ~~~Linear State Space} & {\bf Linear} \\ \hline \hline
-FM Radio & 0.1740 & 0.1692 \\ \hline
-FIR Program &  0.9961 & 0.9980 \\ \hline
-Channel Vocoder & 0.2601 & 0.2620 \\ \hline
-FilterBank2 & 1.000 & 1.001 \\ \hline
-FFT (16 pt) & 2.938 & 3.000 \\ \hline
-Linear Difference Equation & 1.005 & 1.000 \\ \hline
-IIR & 1.005 & 1.000 \\ \hline
-IIR + 1/2 Decimator & 0.6441 & 1.000 \\ \hline
-IIR + 1/16 Decimator & 0.3393 & 1.000 \\ \hline
-IIR + FIR & 0.9413 & 1.000 \\ \hline
-FIR + IIR + IIR & 0.9214 & 1.000 \\ \hline
+\begin{tabular} {|c|c|c|} \hline 
+{\bf Application} & \parbox{0.7in}{\centering \raisebox{7.5pt}{~} {\bf Linear} \\ {\bf State\raisebox{-2.2pt}{~}Space}} & {\bf Linear} \\ \hline \hline
+\raisebox{7.5pt}{~} Linear Difference Equation \raisebox{-2.2pt}{~} & 1.00 & 1.00 \\ \hline
+\raisebox{7.5pt}{~} IIR \raisebox{-2.2pt}{~} & 1.00 & 1.00 \\ \hline
+\raisebox{7.5pt}{~} IIR + 1/2 Decimator \raisebox{-2.2pt}{~} & 0.64 & 1.00 \\ \hline
+\raisebox{7.5pt}{~} IIR + 1/16 Decimator \raisebox{-2.2pt}{~} & 0.34 & 1.00 \\ \hline
+\raisebox{7.5pt}{~} IIR + FIR \raisebox{-2.2pt}{~} & 0.94 & 1.00 \\ \hline
+\raisebox{7.5pt}{~} FIR + IIR + IIR \raisebox{-2.2pt}{~} & 0.92 & 1.00 \\ \hline
+\raisebox{7.5pt}{~} FM Radio \raisebox{-2.2pt}{~} & 0.17 & 0.17 \\ \hline
+\raisebox{7.5pt}{~} FIR Program \raisebox{-2.2pt}{~} &  1.00 & 1.00 \\ \hline
+\raisebox{7.5pt}{~} Channel Vocoder \raisebox{-2.2pt}{~} & 0.26 & 0.26 \\ \hline
+\raisebox{7.5pt}{~} FilterBank2 \raisebox{-2.2pt}{~} & 1.00 & 1.00 \\ \hline
+\raisebox{7.5pt}{~} FFT (16 pt) \raisebox{-2.2pt}{~} & 2.94 & 3.00 \\ \hline
 \end{tabular}
-\begin{minipage}{4in}
 \caption{Floating point operations with state space and linear
 optimizations, normalized to no optimizations.\protect\label{tab:results}}
-\end{minipage}
-\vspace{6pt}
-\hrule
 \end{center}
-\vspace{-24pt}
+\vspace{-18pt}
 \end{table}
 
-Results appear in Table~\ref{tab:results}.  For the first 5
-applications, which mainly have linear components without state,
-linear optimizations and state space optimizations are equally
-effective. There is a large performance degradation for an FFT (Fast
-Fourier Transform) for both types of transformations. This is not
-surprising, since an FFT performs its computations sparsely across
-multiple filters. Combining these filters creates one filter densely
-packed with computations. This is exactly a conversion from an FFT to
-a DFT (Discrete Fourier Transform).  We would need staged execution
-with minimal parameterization to convert the DFT back to an FFT.  Note
-that the compiler could detect that the operations count has increased
-and refrain from combining the filters when performance
-degrades~\cite{Lamb}; in this paper we are evaluating only the
-performance impact of blindly combining all filters.
+Results appear in Table~\ref{tab:results}.  The first six applications
+have filters with state.  Thus, they are not handled by linear
+analysis, and there is a normalized performance of 1.00 in the linear
+column.  The first two programs (Linear Difference Equation, IIR) do
+not benefit from linear state space analysis, as there are no
+opportunities for combination, state removal, or parameter reduction.
+For the next four programs (IIR in combination with various filters),
+state space transformations offer performance improvements due to the
+combination of stateful filters.
 
-The remaining applications have filters with state.  Thus, they are
-not handled by linear analysis, and there is a normalized performance
-of 1.0 in the linear column.  For a simple standalone Linear
-Difference Equation or IIR (Infinite Impulse Response) filter,
-state space transformations show a very slight degradation in
-performance. The reason for this is that there are a few extra
-operations performed by the prework function. In terms of steady-state
-behavior, state space transformation is equivalent to no
-transformation. There is no gain in performance, because the filters
-are written optimally.
-
-When we combine stateful filters with other filters, we notice a
-performance improvement using state space optimizations. For example,
-combining an IIR filter with a decimator that leaves 1 out of every 16
-values offers a 3X improvement. Combining an IIR filter with an FIR
-filter results in a 6\% improvement. In the case of an IIR filter with
-a decimator, there are extraneous computations performed by the IIR
-filter that are thrown away by the decimator.  Combining their
-respective matrices removes these computations. In the case of an IIR
-filter with an FIR filter, the computations in both filters can be
-merged to a single set of computations. This indicates that state
+For example, combining an IIR filter with a decimator that leaves 1
+out of every 16 values yields a 194\% improvement. Combining an IIR
+filter with an FIR filter has a 6\% improvement. In the case of an IIR
+filter with a decimator, there are extraneous computations performed
+by the IIR filter that are thrown away by the decimator.  Combining
+their respective matrices removes these computations. In the case of
+an IIR filter with an FIR filter, the computations in both filters can
+be merged to a single set of computations. This indicates that state
 space optimizations are more useful when applied to combined filters
 than when applied to individual filters.
 
+For the last five applications, which mainly have linear components
+without state, linear optimizations and state space optimizations are
+equally effective.  Compared to the baseline, there is an improvement
+of 5.9X for FM Radio and 3.8X for Channel Vocoder.
+
+There is a large performance degradation for the Fast Fourier
+Transform (FFT) using either linear or state space transformations.
+This is not surprising, since an FFT performs its computations
+sparsely across multiple filters.  Combining these filters creates one
+filter densely packed with computations.  This is exactly a conversion
+from an FFT to a DFT (Discrete Fourier Transform).  We would need
+staged execution with minimal parameterization to convert the DFT back
+to an FFT.  However, note that it is straightforward for the compiler
+to detect that the operations count has increased and refrain from
+combining the filters when performance degrades.  A simple algorithm
+for such judicious application of the transformations has been
+implemented for the linear case~\cite{Lamb} and applies directly to
+this work.  The results in Table~\ref{tab:results} illustrate only the
+performance impact of blindly combining as many filters as possible.
+This degradation would not occur in practice.
+
 In summary, the results show that linear state space analysis is more
-general than linear analysis.  While the evaluation only considers a
-small set of micro-benchmarks, it also demonstrates that a relatively
-elaborate mathematical framework is manageable within the compiler.
+general than linear analysis.  While the experiments consider only a
+small set of micro-benchmarks, they also demonstrate that a relatively
+elaborate mathematical framework is managable within the compiler.  It
+remains an important topic of future work to evaluate linear state
+space analysis using realistic applications, and to measure actual
+execution times on an embedded architecture.

@@ -1,24 +1,92 @@
+todo:
+
+- remove A_pre
+- remove "we", "our", "want", "need"
+
+- formatting
+- spellcheck
+- make sure figure fonts print
+
+----------------------------------------------------------------------------
+
+n add worked examples?
+
+x make bibliography consistent (abbreviations vs. full)
+
+x The omitted discussion from Section 2.3.2 feels like it is important
+  to the overall system. Instead of showing complete equation
+  transformations (individual terms, combined, simplified, etc.), a
+  better balance would be to show key equation steps and use the
+  additional space to add missing discussions.
+
+  --> at least, give more specific reference to thesis (page numbers)
+
+x make clear that FFT should not be combined
+
+x reduce significant digits of results; change discussion so
+  statespace and linear look the same
+
+x correct citation for dynamorio
+
+x With the captions, if you set the key identifier in bold (ie,
+  "Figure 4:" in bold), it makes it easier to visually isolate the
+  caption from the rest of the text in the figure. Similarly, in some
+  places the linear equations run together, such as at the beginning
+  of section 2.3.1. By using uniform notation, or by separating body
+  text on different lines from equations, this can easily be fixed.
+
+x improve wording of "muddling" 
+
+x mention that more experimental evaluation is needed in practice?
+
+x mention synchronous dataflow in background
+
+x point out that push/pop are FIFO, not LIFO.
+
+x compare to common sub-expression elimination
+
+x compare to feedback paper
+  - say that we cover all filters listed in feedback linear paper?
+  - compare to lobo
+  - compare to kolson
+  - compare to landwehr
+  - compare to jansenn
+
+x Add to expansion section: of course could specify linear state space
+  form directly, but a) we think that programming language is good way
+  to do it, b) want unified development environment; do not want
+  language changing with each optimization
+
+x The linear state space conversion step considers one filter at a
+  time. Does this mean parts of the stream graph can in the linear
+  representation and others non-linear? Can the optimisations be
+  selectively applied only the linear parts or does it need the entire
+  stream graph?
+
+n What are complexities of the proposed transformation steps? How
+  well do they scale if the body of the filters are huge?
+
+----------------------------------------------------------------------------
+
 non-formatting changes during CASES submission:
-- an n became $n$
-- managable -> manageable
-- title of Section 3, "state-space analysis" -> "state space analysis"
-- reverse order of first x, y equation (x comes first)
-- reverse order of x, y equations in example figure
-- say in statespace example, changes value to 1 in "B and C" not "D"
-- replace - by -- :  "themselves---the specifics are covered"
-- "used for to fill" --> "used to fill"
-- Since the output of $\mathrm{R_1}$ (i.e., $\vc{\mathbf{y_1}}$) is
+x an n became $n$
+x managable -> manageable
+x title of Section 3, "state-space analysis" -> "state space analysis"
+x reverse order of first x, y equation (x comes first)
+x reverse order of x, y equations in example figure
+x say in statespace example, changes value to 1 in "B and C" not "D"
+x replace - by -- :  "themselves---the specifics are covered"
+x "used for to fill" --> "used to fill"
+x Since the output of $\mathrm{R_1}$ (i.e., $\vc{\mathbf{y_1}}$) is
 equivalent to the input of $\mathrm{R_2}$ (i.e., $\vc{\mathbf{u_2}}$),
 we can write:
-- This directly eliminates computations, as the compiler statically
+x This directly eliminates computations, as the compiler statically
 evaluates $0 \cdot x = 0$ and $1 \cdot x = x$ rather than performing a
 multiplication at runtime.
-- "-" to "---" in optimization
-- all vector symbols shifted to right.  vector symbol doesn't cover u_pre
-  - should be {\vec u}_pre instead of {\vec u_pre}
-- FIXED: stored inputs are always updated as shown in the same manner ???
+x "-" to "---" in optimization
+x FIXED: stored inputs are always updated as shown in the same manner ???
   --> and what is "(3.1)"?
-- FIXED: "updated as mentioned in (3.1)" ???
+x FIXED: "updated as mentioned in (3.1)" ???
 
 -----------------------------------
 
@@ -26,5 +94,3 @@ n improve typesetting of u1_new, o2_new in statespace.tex?
 
 n see if inputs really have to be converted to states for
   optimization
-
-n strengthen conclusion
