@@ -2,12 +2,12 @@
 \label{sec:related}
 
 This paper builds directly on the work done to analyze and optimize
-linear components in StreamIt programs \cite{Lamb}. We extend the
+linear components in StreamIt graphs \cite{Lamb}. We extend the
 theoretical framework for linear analysis to state space analysis in
 order to apply our optimizations to a wider class of applications.
 Specifically, state space analysis applies to filters with persistent
 state, and feedback loops can be combined into a single state space
-representation; neither of these cases are handled by linear analysis.
+representation; neither of these cases is handled by linear analysis.
 The extension from linear analysis to state space analysis required a
 fundamental change to the underlying representation, as well as a
 complete reformulation of the rules for combination and expansion.
@@ -15,20 +15,209 @@ Moreover, this paper introduces novel optimizations of state removal
 and parameter reduction, both of which operate on the state space
 representation.
 
-Several other groups are researching methods for automated DSP
-optimizations. SPIRAL \cite{Spiral} is a system developed to generate
-libraries of DSP transforms. These libraries are designed for specific
-architectures, and can be re-optimized when hardware is upgraded or
-replaced. Other such libraries that have been designed include a
-package for linear algebra manipulations by the ATLAS project
-\cite{Atlas} and portable high-perfor\-mance FFTs (Fast Fourier
-Transforms) \cite{fftw}.
+Potkonjak and Rabaey describe optimized hardware synthesis for linear
+and ``feedback linear'' computations~\cite{Potkonjak00}.  Linear state
+space systems correspond to ``constant feedback linear computations''
+in the authors' terminology.  For linear and linear feedback systems,
+their technique offers 1) a maximally fast implementation under
+latency constraints, 2) an arbitrarily fast implementation, and 3) an
+implementation reducing the number of arithmetic operations.  In
+reducing arithmetic operations, they perform common subexpression
+elimination (CSE) in a manner that resembles our state removal
+optimization.
 
-Aside from StreamIt, other programming languages have been designed
-for streaming data. Synchronous languages which target embedded
-applications include LUSTRE \cite{Lustre}, Esterel \cite{Esterel}, and
-Signal \cite{Signal}. Other stream-based languages are Occam
-\cite{Occam}, SISAL \cite{sisal}, and StreamC \cite{streamc}.  Some of
-these languages are designed to exploit vector and parallel
-processing. However, none of these languages have compilers that run
-state space or linear analysis.
+However, the benefits of state removal cannot be achieved by CSE alone
+(or by the Potkonjak and Rabaey algorithm).  For example, in
+Figure~\ref{fig:opt-seq}, state removal replaces references to
+$\mt{x1} + \mt{x2}$ by a single variable $x$.  While CSE can also
+perform this substitution, it cannot independently maintain the value
+of $x$ across iterations of the filter.  That is, state removal
+replaces the assignments to $\mt{x1}$, $\mt{x2}$,
+$\mt{x1}\_{\mt{temp}}$, and $\mt{x2}\_{\mt{temp}}$ with a single
+assignment to $x$.  This transformation decreases the number of
+arithmetic operations due to algebraic simplification in the update of
+$x$.  Further, state removal completely removes the variables
+$\mt{x1}$, $\mt{x2}$, $\mt{x1}\_{\mt{temp}}$, and
+$\mt{x2}\_{\mt{temp}}$ from the program.  We are unaware of any
+sequence of traditional compiler optimizations that achieves the same
+effect as state removal (and likewise for parameter reduction).
+
+Several other groups have developed automated frameworks for
+optimizing linear signal processing kernels.  The SPIRAL
+project~\cite{Spiral-SI} uses a formal mathematical language to
+describe linear DSP operations.  Using search and machine learning
+techniques, SPIRAL evaluates alternate versions of a formula on a
+given platform and optimized code is generated.  The FFTW
+system~\cite{FFTW-SI} generates platform-optimized FFT libraries using
+a dynamic programming algorithm and profile feedback to match the
+recursive FFT formulation to a given memory hierarchy.
+ATLAS~\cite{ATLAS,ATLAS-Sparsity-SI} produces platform-specific linear
+algebra routines by searching over blocking strategies and other
+parameters; Sparsity~\cite{ATLAS-Sparsity-SI,Sparsity} applies a
+similar approach to sparse matrices.
+
+While these approaches offer a rich set of optimizations, they are
+limited to linear systems.  The transformations described in this
+paper apply not only to linear systems, but also to linear systems
+with state.  In particular, the state removal and parameter reduction
+optimizations apply specifically to linear state space systems.  In
+addition, our focus is on the application of linear state space
+optimizations in the context of a general-purpose stream language,
+optimizing across application components rather than within a single
+library function.
+
+A variety of tools have been developed for specifying and deriving DSP
+algorithms~\cite{oppenheim-symbolic}.  The SMART project aims to
+develop an algebraic theory of signal processing, providing a unified
+framework for deriving, explaining, and classifying fast transform
+algorithms~\cite{SMART03}.  ADE (A Design Environment) provides a
+predefined set of composable signal transforms, as well as a
+rule-based system that searches for improved algorithms using
+extensible rewriting rules~\cite{covell-ade}.  Janssen et al.
+automatically derive low-cost hardware implementations of signal flow
+graphs using algebraic transformations and hill-climbing
+search~\cite{Janssen94}.  Our work shares the vision of automatically
+deriving optimized algorithms from a high-level description, though we
+start from a general-purpose, imperative stream language rather than a
+mathematical formalism.
+
+%% - SMART project
+%%   --> need to request info for citation on algebra paper
+%%   - can currently cite SIAM'03 paper
+%%   - request after finishing other related work
+%%   - http://www.ece.cmu.edu/%7esmart/research.html
+
+The streaming abstraction has been an integral part of many
+programming languages, including dataflow, CSP, synchronous and
+functional languages; see Stephens~\cite{survey97} for a review.
+Synchronous languages which target embedded applications include
+Lustre~\cite{Lustre}, Esterel~\cite{Esterel}, Signal~\cite{Signal},
+Lucid~\cite{Lucid77}, and Lucid Synchrone~\cite{Lucid-Synchrone}.
+Other languages of recent interest are Brook~\cite{brook04},
+Spidle~\cite{spidle03}, Cg~\cite{cg03}, Occam\cite{Occam}, Sisal
+\cite{sisal}, StreamC/KernelC \cite{imagine03ieee}, and Parallel
+Haskell~\cite{ph}.  The principle differences between StreamIt and
+these languages are $(i)$ StreamIt adopts the Synchronous
+Dataflow~\cite{lee87static} model of computation, which narrows the
+application class but enables aggressive optimizations such as linear
+state space analysis, $(ii)$ StreamIt's support for a ``peek''
+construct that inspects an item without consuming it from the channel,
+$(iii)$ the single-input, single-output hierarchical structure that
+StreamIt imposes on the stream graph, and $(iv)$ a ``teleport
+messaging'' feature for out-of-band communication~\cite{thies05ppopp}.
+
+%% - SPIRAL -- cite special issue
+%%   * only linear
+%%   - formal framework to generate many alternate versions, then
+%%     translate them into code
+%%   - uses search and learning techniques to traverse the alternatives
+%%     and choose one
+%%   - ``searches at compile time over space of mathematically equivalent
+%%     formulas expressed in a 'tensor-product' language'' whereas FFTW
+%%     searches at runtime over formalism for FFTW
+%%       - also searches strides and memory-alignments
+%% - FFTW -- cite special issue
+%%   * only ffts
+%%   - machine-independent codelets
+%%   - uses dynamic programming (vs. more general learning for SPIRAL)
+%%   - small DFT sizes, uses auto-generated code likely to compile well
+%%   - for large DFT sizes, searches over various recursive strategies
+%% - ATLAS -- parallel computing + special issue
+%%   * also only linear
+%%   - ``generate platform-optimized BLAS routines (basic linear algebra
+%%     subroutines')'' by searching over different blocking strategies,
+%%     operation schedules, and degrees of unrolling''
+%% - BEBOP -- Yelick special issue paper + SPARSITY paper
+%%   - Sparsity: Optimization framework for sparse matrix kernels 
+
+
+%% TRYING TO COMPARE TO LOOP TRANSFORMATIONS
+
+%% What series of loop transformations could do this?
+
+%% float x1, x2;
+
+%% do i = 1 to N {
+%%   u1 = A[3i]
+%%   u2 = A[3i+1]
+%%   u3 = A[3i+2]
+
+%%   B[2i]   = 2*x1 + 2*x2 + 3*u1
+%%   B[2i+1] = 4*u3 - 5*x1 - 5*x2
+
+%%   x1_temp = (x1 + x2 + u1) * 0.5
+%%   x2_temp = (x1 + x2 + u2) * 0.25
+
+%%   x1 = x1_temp
+%%   x2 = x2_temp
+%% }
+
+%% --->
+
+%% do i = 1 to N {
+%%   u1 = A[3i]
+%%   u2 = A[3i+1]
+%%   u3 = A[3i+2]
+
+%%   x = x1 + x2
+
+%%   B[2i]   = 2*x + 3*u1
+%%   B[2i+1] = 4*u3 - 5*x
+
+%%   x1_temp = (x + u1) * 0.5
+%%   x2_temp = (x + u2) * 0.25
+
+%%   x1 = x1_temp
+%%   x2 = x2_temp
+%% }
+
+%% --->
+
+%% do i = 1 to N {
+%%   u1 = A[3i]
+%%   u2 = A[3i+1]
+%%   u3 = A[3i+2]
+
+%%   x = x1_temp + x2_temp
+
+%%   B[2i]   = 2*x + 3*u1
+%%   B[2i+1] = 4*u3 - 5*x
+
+%%   x1_temp = (x + u1) * 0.5
+%%   x2_temp = (x + u2) * 0.25
+
+%%   x1 = x1_temp
+%%   x2 = x2_temp
+%% }
+
+%% --->
+
+%% do i = 1 to N {
+%%   u1 = A[3i]
+%%   u2 = A[3i+1]
+%%   u3 = A[3i+2]
+
+%%   x = x1_temp + x2_temp
+
+%%   B[2i]   = 2*x + 3*u1
+%%   B[2i+1] = 4*u3 - 5*x
+
+%%   x1_temp = (x + u1) * 0.5
+%%   x2_temp = (x + u2) * 0.25
+
+%% }
+
+%% --->
+
+%% float x
+
+%% do i = 1 to N {
+%%   u1 = A[3i]
+%%   u2 = A[3i+1]
+%%   u3 = A[3i+2]
+
+%%   B[2i]   = 2*x + 3*u1
+%%   B[2i+1] = 4*u3 - 5*x
+
+%%   x = 0.75*x + 0.5*u1 + 0.25*u2
+%% }

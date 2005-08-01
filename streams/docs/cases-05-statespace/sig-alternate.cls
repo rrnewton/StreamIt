@@ -558,10 +558,8 @@
  \setcounter{footnote}{0}
  \let\maketitle\relax
  \let\@maketitle\relax
- \gdef\@thanks{}\gdef\@author{}\gdef\@title{}\gdef\@subtitle{}
-%% THIS LINE TOGGLES COPYRIGHT SPACE
-% \let\thanks\relax\@copyrightspace
-}
+ \gdef\@thanks{}\gdef\@author{}\gdef\@title{}\gdef\@subtitle{}\let\thanks\relax
+ \@copyrightspace}
 
 %% CHANGES ON NEXT LINES
 \newif\if@ll % to record which version of LaTeX is in use
@@ -648,7 +646,7 @@
   \newcommand\scriptsize{\@setfontsize\scriptsize\@viipt{8\p@}}
   \newcommand\tiny{\@setfontsize\tiny\@vpt{6\p@}}
   \newcommand\large{\@setfontsize\large\@xiipt{14\p@}}
-  \newcommand\Large{\@setfontsize\Large\@xivpt{11\p@}}
+  \newcommand\Large{\@setfontsize\Large\@xivpt{18\p@}}
   \newcommand\LARGE{\@setfontsize\LARGE\@xviipt{20\p@}}
   \newcommand\huge{\@setfontsize\huge\@xxpt{25\p@}}
   \newcommand\Huge{\@setfontsize\Huge\@xxvpt{30\p@}}
@@ -683,7 +681,7 @@
     \vskip 1.5em               % Vertical space after author.
    \end{center}}
  \dimen0=\ht\@acmtitlebox
- \advance\dimen0 by -9.75pc\relax % Increased space for title box -- KBT
+ \advance\dimen0 by -12.75pc\relax % Increased space for title box -- KBT
  \unvbox\@acmtitlebox
  \ifdim\dimen0<0.0pt\relax\vskip-\dimen0\fi}
 
@@ -756,14 +754,12 @@
 \def\endabstract{\if@twocolumn\else\endquotation\fi}
 
 \def\keywords{\if@twocolumn
-\vspace{-8pt}
 \section*{Keywords}
 \else \small
 \quotation
 \fi}
 
 \def\terms{\if@twocolumn
-\vspace{-8pt}
 \section*{General Terms}
 \else \small
 \quotation
@@ -775,7 +771,6 @@
 
 \def\category#1#2#3{%
 \ifnum\catcount=1
-\vspace{-8pt}
 \section*{Categories and Subject Descriptors}
 \advance\catcount by 1\else{\unskip; }\fi
     \@ifnextchar [{\@category{#1}{#2}{#3}}{\@category{#1}{#2}{#3}[]}%
@@ -784,7 +779,7 @@
 \def\@category#1#2#3[#4]{%
     \begingroup
         \let\and\relax
-            #1 [{\bf #2}]%
+            #1 [\textbf{#2}]%
             \if!#4!%
                 \if!#3!\else : #3\fi
             \else
@@ -808,8 +803,8 @@
 \@float{copyrightbox}[b]
 \begin{center}
 \setlength{\unitlength}{1pc}
-\begin{picture}(20,4) %Space for copyright notice
-\put(0,-2.95){\crnotice{\@toappear}}
+\begin{picture}(20,6) %Space for copyright notice
+\put(0,-0.95){\crnotice{\@toappear}}
 \end{picture}
 \end{center}
 \end@float}
@@ -1239,7 +1234,7 @@
 \ifnum\addauflag=0\addauthorsection\global\addauflag=1\fi
     \section{%
        {REFERENCES}
-         \vskip -2pt  % GM July 2000 (for tighter spacing)
+        \vskip -6pt  % GM July 2000 (for tighter spacing)
         \@mkboth{{\refname}}{{\refname}}%
     }%
     \list{[\arabic{enumi}]}{%
@@ -1247,7 +1242,7 @@
         \leftmargin\labelwidth
         \advance\leftmargin\labelsep
         \advance\leftmargin\bibindent
-        \parsep=0pt\itemsep=8pt % GM July 2000
+        \parsep=0pt\itemsep=1pt % GM July 2000
         \itemindent -\bibindent
         \listparindent \itemindent
         \usecounter{enumi}
