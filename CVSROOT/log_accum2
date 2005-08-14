@@ -1,7 +1,7 @@
 #! /usr/uns/bin/perl
 # -*-Perl-*-
 #
-#ident	"@(#)ccvs/contrib:$Name: not supported by cvs2svn $:$Id: log_accum2,v 1.3 2005-08-14 20:21:34 thies Exp $"
+#ident	"@(#)ccvs/contrib:$Name: not supported by cvs2svn $:$Id: log_accum2,v 1.4 2005-08-14 20:24:11 thies Exp $"
 #
 # Perl filter to handle the log messages from the checkin of files in
 # a directory.  This script will group the lists of files by log
@@ -25,11 +25,11 @@
 
 # point to new PERL directory on RHEL-3. On old CAG they were in
 # /usr/local, now moved to /usr/uns
-use lib '/usr/uns/encap/perl-5.8.0/lib/5.8.0/i686-linux';
-use lib '/usr/uns/encap/perl-5.8.0/lib/5.8.0';
-use lib '/usr/uns/lib/site_perl/5.8.0/i686-linux';
-use lib '/usr/uns/lib/site_perl/5.8.0';
-use lib '/usr/uns/lib/site_perl';
+unshift (@INC, '/usr/uns/encap/perl-5.8.0/lib/5.8.0/i686-linux');
+unshift (@INC, '/usr/uns/encap/perl-5.8.0/lib/5.8.0');
+unshift (@INC, '/usr/uns/lib/site_perl/5.8.0/i686-linux');
+unshift (@INC, '/usr/uns/lib/site_perl/5.8.0');
+unshift (@INC, '/usr/uns/lib/site_perl');
 
 #
 #	Configurable options
