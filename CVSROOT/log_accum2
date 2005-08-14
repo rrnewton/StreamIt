@@ -1,7 +1,11 @@
 #! /usr/uns/bin/perl
 # -*-Perl-*-
 #
-#ident	"@(#)ccvs/contrib:$Name: not supported by cvs2svn $:$Id: log_accum2,v 1.4 2005-08-14 20:24:11 thies Exp $"
+#ident	"@(#)ccvs/contrib:$Name: not supported by cvs2svn $:$Id: log_accum2,v 1.5 2005-08-14 20:30:46 thies Exp $"
+#
+# NOTE: This file was copied from log_accum, but added to CVS properly
+# so that other people can edit it.  As of 8/14/05, log_accum is dead
+# and can be deleted by someone who has root permission.
 #
 # Perl filter to handle the log messages from the checkin of files in
 # a directory.  This script will group the lists of files by log
