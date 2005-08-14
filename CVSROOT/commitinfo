@@ -1,5 +1,5 @@
 #
-#ident	"@(#)cvs/examples:$Name: not supported by cvs2svn $:$Id: commitinfo,v 1.11 2005-08-14 19:03:55 thies Exp $"
+#ident	"@(#)cvs/examples:$Name: not supported by cvs2svn $:$Id: commitinfo,v 1.12 2005-08-14 20:30:46 thies Exp $"
 #
 # The "commitinfo" file is used to control pre-commit checks.
 # The filter on the right is invoked with the repository and a list 
@@ -18,7 +18,7 @@
 # in addition to the first matching regex or "DEFAULT".
 #
 # NOTE:  contrib/commit_prep usage:
-# -r	- record directories affected by commit for use with contrib/log_accum
+# -r	- record directories affected by commit for use with contrib/log_accum2
 # -c	- check for things like "$Id" near head of file, no "$Log", etc.
 #
 #^apc			$CVSROOT/CVSROOT/commit_prep -r -c
