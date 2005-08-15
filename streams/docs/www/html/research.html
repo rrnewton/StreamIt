@@ -68,26 +68,45 @@
 	  <ul>
 	    <li><p align="justify"> Language constructs that improve
     programmer productivity for streaming, including hierarchical
-    structured streams, graph parameterization, and circular buffer
-    management; these constructs also enable novel compiler analyses [<a
-    href="http://cag.lcs.mit.edu/streamit/papers/streamit-cc.pdf">CC'02</a>].
+    structured streams, graph parameterization, circular buffer
+    management, and teleport messaging; these constructs also enable
+    novel compiler analyses [<a
+    href="http://cag.lcs.mit.edu/streamit/papers/streamit-cc.pdf">CC'02</a>,
+    <a
+    href="http://cag.lcs.mit.edu/commit/papers/05/thies-ppopp05.pdf">PPoPP'05</a>].
+    The language has been integrated into the Eclipse development
+    environment, making it easier for users to debug stream programs [<a
+    href="http://cag.lcs.mit.edu/commit/papers/05/kkuo-sdt.pdf">P-PHEC'04</a>].
+
 	    </p>
 	    <li><p align="justify">
+
     An optimizing compiler infrastructure for the <a href="http://cag.lcs.mit.edu/raw">MIT Raw machine</a>,
     with fully automatic load balancing, graph layout, communication
-    scheduling, and routing [<a href="http://cag.lcs.mit.edu/streamit/papers/streamit-asplos.pdf">ASPLOS'02</a>, <a href="http://cag.lcs.mit.edu/streamit/results/index.html">details</a>].
+    scheduling, and routing [<a href="http://cag.lcs.mit.edu/streamit/papers/streamit-asplos.pdf">ASPLOS'02</a>, <a href="http://cag.lcs.mit.edu/streamit/results/index.html">details</a>].  In collaboration with the MIT graphics group, we have also developed a flexible graphics pipeline on Raw [<a href="http://cag.lcs.mit.edu/commit/papers//05/streamit-graphics-gh.pdf">Graphics Hardware'05</a>].
+
 	    </p>
-          <li><p align="justify">
-    A robust compilation infrastructure that compiles to an ANSI C
-    runtime library for execution on a general-purpose uniprocessor.
+    <li><p align="justify"> A set of cache optimizations for embedded
+	  and general-purpose processors, adjusting the granularity
+	  and interleaving of filter executions to match the size of
+	  the data and instruction caches [<a
+	  href="http://cag.lcs.mit.edu/commit/papers/05/sermulins-lctes05.pdf">LCTES'05</a>].
     </p>
-    <li><p align="justify">
-    A set of domain-specific optimizations for linear filters, in which
-    each output is a weighted sum of the inputs (e.g., FIR, FFT, DCT).
-    The analysis automatically detects linear filters and performs
-    large-scale algebraic simplification of adjacent components, as well
-    as automated translation into the frequency domain [<a href="http://cag.lcs.mit.edu/commit/papers/03/pldi-linear.pdf">PLDI'03</a>, 
-    <a href="http://cag.lcs.mit.edu/linear">details</a>].
+
+    <li><p align="justify"> A set of domain-specific optimizations for
+    linear filters, in which each output is a weighted sum of the
+    inputs.  For stateless filters (e.g., FIR, FFT, DCT), linear
+    analysis performs large-scale algebraic simplification of adjacent
+    components, as well as automated translation into the frequency
+    domain [<a
+    href="http://cag.lcs.mit.edu/commit/papers/03/pldi-linear.pdf">PLDI'03</a>,
+    <a href="http://cag.lcs.mit.edu/linear">details</a>].  For
+    stateful filters (e.g., IIR, feedback loops), linear state space
+    analysis offers more general algebraic simplification, as well as
+    minimization of the number of states and reduction in the number
+    of system parameters [<a
+    href="http://cag.lcs.mit.edu/commit/papers//05/agrawal-cases05.pdf">CASES'05</a>].
+
 	    </p>
 	    <li><p align="justify"> 
     A minimal latency scheduler that leverages phased scheduling to
@@ -101,13 +120,18 @@
     optimizations).  The partitioner efficiently searches a large space
     of hierarchical stream configurations to optimize a given metric.
 -->
-</p><li align="justify">
-   A high-level stream IR (in Java) with a host of graph
-transformations, including graph canonicalization, synchronization
-removal, refactoring of parallel components, fusion of adjacent
-filters (running in parallel or in sequence), and fission of
-individual filters (into data-parallel or task-parallel components.)
-	    </p>
+</p>
+          <li><p align="justify"> A robust compilation infrastructure
+    that compiles to an ANSI C runtime library for execution on a
+    general-purpose uniprocessor.  The infrastructure includes a
+    high-level stream IR (in Java) with a host of graph
+    transformations, including graph canonicalization, synchronization
+    removal, refactoring of parallel components, fusion of adjacent
+    filters (running in parallel or in sequence), and fission of
+    individual filters (into data-parallel or task-parallel
+    components.)
+    
+    </p>
 	    <li><p align="justify"> A set of 
 	      <a href="../html/benchmarks.html">benchmarks</a> for the
 	      evaluation of streaming optimizations and architectures.
