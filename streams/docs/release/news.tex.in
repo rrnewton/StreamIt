@@ -6,14 +6,15 @@
 \maketitle
 
 \noindent
-This is for the October 17, 2003 release of the StreamIt compiler and
+% note: RELEASE_DATE resolved in Makefile
+This is for the RELEASE_DATE release of the StreamIt compiler and
 runtime system, version 2.0.\\
-\verb|$Id: news.tex.in,v 1.2 2003-10-17 15:58:25 dmaze Exp $|
+\verb|$Id: news.tex.in,v 1.3 2005-08-15 00:49:23 thies Exp $|
 
 \section*{streamit-2.0}
 
 \begin{itemize}
-\item Initial public release (October 17, 2003).
+\item Initial public release (RELEASE_DATE).
 \end{itemize}
 
 \end{document}
