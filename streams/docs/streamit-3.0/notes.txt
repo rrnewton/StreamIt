@@ -1,3 +1,209 @@
+9/27:
+
+- modifying 9/22 notes for C interface
+
+- regarding prefire:
+  - add colon to specify ranges in addition to the values, e.g.
+
+   work peek i:[*,5] push i:[*,10] (int i) {
+   }
+
+  - "compiler can assume that given value falls in given range"
+  --> it is NOT checked and error-reported like an assert
+  - apply to rate declarations, message latencies
+
+AGENDA:
+x requests from Kevin
+  - static segments
+x go over last time
+x MPEG (B frames)
+x how to do prefire
+
+9/22:
+
+- add new data type: size_T
+- external interface:  C to StreamIt
+ - MemoryReader<type>, MemoryWriter<type>
+   --> size_T argument
+ - toplevel_init(... all of toplevel arguments ) {
+   - it could choose to take argument N; will send itself message from
+     init function to ensure that it is paused after N executions of
+      clock
+   - the <etc> symbolizes well-typed and fixed number of arguments
+     that are parameters of toplevel stream.  The compiler generates
+     the function signature accordingly.
+ - export message handlers too
+  - the control program can send messages in by calling these functions
+ - where toplevel is name of toplevel stream
+--> so this means that you can pause, resume, free of toplevel stream
+
+- external interface:  StreamIt to C
+  - just declare native functions:
+    "native int[N] myFFT(int A[N], int N);
+   - you can then call these from the work function, etc.
+
+- decided on a new type of splitter "switch", which enforces that only
+  one stream is active at once.  If you resume a given stream, it will
+  pause all other streams before activating the new stream.
+
+********************************************************************************
+
+9/17:
+
+x default message latency:  0 or best effort?
+  - 0 latency
+  - @ * means best effort
+
+x currently we only use the "send" keyword for going from child to
+  parent.  Should we use it when going from parent to child, too?
+  - YES -- makes it clear that it's a message
+ 
+x can you push to a killed stream?
+  - YES -- same behavior as paused
+
+x what is keyword:  kill or free?
+  - pause/resume
+  - init / free
+
+x does re-initializing a stream automatically start it running again,
+  or do you have to explicitly enable()?
+
+  - init:  don't need call to resume
+    - STREAM TYPE
+    - running: pause -> free -> do init and start running
+    - paused:  free -> do init and start running
+    - free: do init and start running
+  - pause:
+    - paused: no-op
+    - running: calls pause and pauses
+    - free: no-op 
+  - resume:
+    - paused: calls resume starts running
+    - running: no-op
+    - free: no-op
+  - free:
+    - paused:  call free, then just frees
+    - running: pause -> free -> do freeze
+    - freed:  no-op
+
+x more details on static restrictions
+  RESOLUTION:
+   - cannot pass handles as arguments to init
+   - only time you can pass a handle as an argument to a message handler  
+     1. sending message to one of your children (not to parent)
+     2. handle public is public field of that child
+     3. handler is passed as literal argument to function
+   - still note you can reference static data anywhere, based on type 
+     - for instance data
+
+   - maintains invariant:  parent is only person that can interface to children
+     - the handles don't "escape"
+     - the only place where someone else references handles is the parent's parent
+       - but this is only as part of method call to parent -- can encode as integer in argument
+
+  OLD
+  - public fields -- might need to revisit
+    - we said that public fields have to be "final" and can then be
+      referenced by parents, e.g., for using as parameters
+      - question is:  can others reference the field too?  What if the
+        parent passes around a handle to the child.  Can some other
+        stream reference the child's public field?
+    - do public fields really buy us anything, given our relatively lax
+      message constraints?
+  - is there a way to specify any static guarantee on message latencies?
+
+x add this: message handlers are atomic, well-ordered with sequential consistency
+  - if messages from different sources, random of delivery
+
+x messaging to paused components
+  x are messages to paused/killed components ignored or runtime error?  (which one?)
+    - ignored
+  - is another rate besides 1-to-1 needed for the placeholder receiver at a paused stream?
+    - i don't think so
+  - what about to paused source/sink?
+    - use best effort
+
+--
+
+details:
+
+x clock syntax
+  - "clock 5*childHandle"
+    - can also add this to send/receive syntax
+
+- messaging syntax
+  x compact syntax for declaring what you send
+   - at the top of stream, inside the brace
+   - say " sends (ifacename | handlerSignature)* ;"
+   - can have multiple "sends" statements
+   - we are not declaring what we receive
+     - instead, have "public handler foo()" which implies you receive that
+  x compact syntax for forwarding messages across containers
+    - want to forward both up/down, and possibly with varying clocks
+  x syntax for declaring clocks
+    - declaring with handlers, with send statements, for containers overall
+  x formalize typing rules: you must send what your children send and you don't receive from children
+    - but we don't currently force you to declare what you receive from children, so how do you report error?
+    x you report error just by saying that you don't implement a handler for a given child
+  x syntax for latencies (and what part of latencies are known statically)
+    - keep latency of @ [min,max], etc.
+    - but to communicate static information, allow new keyword "hint
+     <boolean>" which the compiler can assume is true
+
+- formal writeup of inorder joiner semantics 
+  - consider null splitter, or some weights 0 on roundrobin
+
+--
+
+- considering receive messages before vs. receive messages after
+  - can you get away with suspend instead of rollback right now?
+    - we don't know
+    - maybe
+
+  - observe: before more powerful because you can always delay by one
+    - but "after" does let you do child->splitter
+
+  * going to postpone judgement on this
+    - going with "before" for now would be a safe thing for app programmers
+    - could have a default value
+
+AGENDA
+- immediately before / immediately after
+- process brain dump
+
+********************************************************************************
+
+9/14:
+
+- bill:  consider jasper's n-1 vs. n question on steady state
+
+- to discuss:  SDEP not surjective, what do you do? 
+  - SOLUTION:
+   - current downstream constraints are:
+     SDEP_A<-B (M(A,B,k1,k2,n)) >= n + k_1
+     SDEP_A<-B (M(A,B,k1,k2,n)) <= n + k_2
+   - want to change them: 
+     SDEP_A<-B (M(A,B,k1,k2,n)) >= n + k_1
+     SDEP_A<-B (M(A,B,k1,k2,n)-1) < n + k_2
+
+- talking about delivery "immediately before" vs. "immediately after"
+  - reasons for before:
+    - it is probably what the programmer wants
+    - want to process message BEFORE you see dirty data
+    - and with unknown frame downstream, this cannot be compensated by an offset of 1 at the sender
+  - reasons for after: 
+    - easier to implement.  
+      - with before, you need rollback (one filter's worth for
+        downstream, arbitrary stream segment for upstream).
+         - at least, with before + dynamic rates (maybe it's better w/ static rates?)
+    - allows sending from disabled child to splitter, even though no more items will be sent
+
+AGENDA
+- bugs in PLDI
+- minor issues from brain dump
+
+********************************************************************************
+
 Table of Contents:
 
 * overview
@@ -500,7 +706,7 @@ a paused stream.
 - reconfigurable splitters/joiners?
   - currently no way for a splitjoin to reconfigure roundrobin to
     duplicate without totally replacing the whole splitjoin
-- external interface to C
+x external interface to C
 - allow dynamic memory allocation within filters
   - possibly support as dynamic arrays
 - union / tagged union type
@@ -836,3 +1042,4 @@ float -> float out, float loopPath FooSplitter
         firstInFrame = true;
     }
 }
+
