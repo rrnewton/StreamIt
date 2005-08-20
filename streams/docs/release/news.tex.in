@@ -9,24 +9,23 @@
 % note: RELEASE_DATE resolved in Makefile
 This is for the RELEASE_DATE release of the StreamIt compiler and
 runtime system, version 2.0.\\
-\verb|$Id: news.tex.in,v 1.4 2005-08-20 00:54:31 thies Exp $|
+\verb|$Id: news.tex.in,v 1.5 2005-08-20 02:11:56 thies Exp $|
 
 \section*{streamit-2.0}
 
 \begin{itemize}
 
 \item Snapshot release of internal infrastructure (August 2005).  This
-snapshot has new features, bug fixes, and also new bugs compared to
+snapshot has new features, bug fixes, and possibly new bugs compared to
 the initial public release.  Major features are as follows, please
 contact us if you have any questions:
 
 \begin{itemize}
-\item Faster and more memory-efficient Java library (up to 10X).
-\item Faster uniprocessor implementation (up to 2X).
-\item Snapshot of current cache optimizations.
-\item Snapshot of current cluster backend.
-\item JPEG decoder/encoder application (supported in library only).
-\item Limited support for dynamic rates and messaging in Java library.
+\item Faster and more memory-efficient Java library (up to 10X).		      
+\item Faster buffer management in uniprocessor library (up to 2X).	      
+\item JPEG decoder/encoder application (supported in Java library only).	      
+\item Limited support for dynamic rates and teleport messaging in Java library.
+\item Undocumented snapshot of cache optimizations and cluster backend.
 \end{itemize}
 
 \item Initial public release (October 2003).
