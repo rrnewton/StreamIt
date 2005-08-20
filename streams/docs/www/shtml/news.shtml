@@ -1,0 +1,166 @@
+<!--#include virtual="../include/init.inc"-->
+   <title>StreamIt - News</title>
+<!--#include virtual="../include/header-level1.inc"-->
+
+  <tr>
+    <td width="130" valign="top" align="left"></td>
+    <td width="20" valign="top" align="left"></td>
+    <td width="700" valign="top" align="left">
+      <hr><br>
+      <h3>NEWS</h3>
+      <br>
+
+	 <table width="100%" cellspacing=0 cellpadding=0 border=0>
+
+	   <tr>
+	     <td width="15%" align=left valign=top><b>Aug., 2005</b></td>
+	     <td width="1%"></td>
+	     <td align=left valign=top>
+	     <p align=justify>A new <a
+	     href="http://cag.lcs.mit.edu/streamit/shtml/register.shtml">snapshot
+	     release</a> of the StreamIt infrastructure has been posted.
+	     </p>
+
+	       <p align=justify>
+	       Our paper on <a
+	       href="http://cag.lcs.mit.edu/commit/papers//05/agrawal-cases05.pdf">linear
+	       state space analysis</a> will appear at CASES in
+	       September, 2005.  This paper extends our <a
+	       href="http://cag.lcs.mit.edu/linear">previous work</a>
+	       on optimizing linear filters to encompass linear
+	       filters with state, including new optimizations for
+	       reducing the number of states and non-zero system
+	       parameters.
+	       </p>
+	     </td>
+	   </tr>
+	   
+	   <tr><td>&nbsp;</td></tr>
+
+	   <tr>
+	     <td width="15%" align=left valign=top><b>July, 2005</b></td>
+	     <td width="1%"></td>
+	     <td align=left valign=top>
+	       <p align=justify>
+	       A paper on <a
+	       href="http://cag.lcs.mit.edu/commit/papers//05/streamit-graphics-gh.pdf">
+	       flexible graphics pipelines</a>, in collaboration with
+	       Jiawen Chen, <a
+	       href="http://people.csail.mit.edu/matthias/">Matthias
+	       Zwicker</a>, <a
+	       href="http://people.csail.mit.edu/kapu/">Kari
+	       Pulli</a>, and <a
+	       href="http://people.csail.mit.edu/fredo/">Fr&eacute;do
+	       Durand</a>, appears in Graphics Hardware 2005.  As part
+	       of this project, we extended StreamIt's Raw backend to
+	       support dynamic communication rates between filters.
+
+	       </a> 
+	       </p>
+	     </td>
+	   </tr>
+	   
+	   <tr><td>&nbsp;</td></tr>
+
+	   <tr>
+	     <td width="15%" align=left valign=top><b>June, 2005</b></td>
+	     <td width="1%"></td>
+	     <td align=left valign=top>
+	       <p align=justify>
+	       Our paper on <a
+	       href="http://cag.lcs.mit.edu/commit/papers/05/sermulins-lctes05.pdf">cache
+	       optimizations</a> for embedded and general-purpose
+	       processors appears in LCTES 2005.  Also, our paper on
+	       <a
+	       href="http://cag.lcs.mit.edu/commit/papers/05/thies-ppopp05.pdf">teleport
+	       messaging</a>, a new language construct for out-of-band
+	       communication, appears in PPoPP 2005.
+	       </p>
+	     </td>
+	   </tr>
+	   
+	   <tr><td>&nbsp;</td></tr>
+
+	   <tr>
+	     <td width="15%" align=left valign=top><b>June, 2005</b></td>
+	     <td width="1%"></td>
+	     <td align=left valign=top>
+	       <p align=justify>
+	       A paper on <a
+	       href="http://web.mit.edu/rabbah/www/docs/solar-pldi-2005.pdf">programming
+	       by sketching</a> for bit-streaming programs, a
+	       collaborative effort with <a
+	       href="http://www.cs.berkeley.edu/~asolar/">Armando
+	       Solar-Lezama</a> and <a
+	       href="http://www.cs.berkeley.edu/%7Ebodik">Ras
+	       Bodik</a> of UC Berkeley and Kemal Ebcioglu of IBM
+	       Research, wins the Best Paper Award at PLDI 2005.
+	       </p>
+	     </td>
+	   </tr>
+	   
+	   <tr><td>&nbsp;</td></tr>
+
+	   <tr>
+	     <td width="15%" align=left valign=top><b>Feb., 2005</b></td>
+	     <td width="1%"></td>
+	     <td align=left valign=top>
+	       <p align=justify>
+
+	       Our paper on the <a
+	       href="http://cag.lcs.mit.edu/commit/papers/05/kkuo-sdt.pdf">
+	       StreamIt Development Tool</a> for high-productivity
+	       stream programming, including a user study that
+	       demonstrates improved debugging of stream programs,
+	       appears in P-PHEC 2005.
+
+	       </p>  
+	     </td>
+	   </tr>
+	   
+	   <tr><td>&nbsp;</td></tr>
+
+	   <tr>
+	     <td width="15%" align=left valign=top><b>Dec., 2004</b></td>
+	     <td width="1%"></td>
+	     <td align=left valign=top>
+	       <p align=justify>
+
+	       <a href="http://www.cs.berkeley.edu/~nmani/">Mani
+	       Narayanan</a> and <a
+	       href="http://www.cs.berkeley.edu/~yelick/">Kathy
+	       Yelick</a> of UC Berkeley publish a <a
+	       href="http://www.cs.berkeley.edu/~nmani/ms/msp6.ps">paper</a>
+	       in the 4th Workshop on Media and Streaming Processors,
+	       describing automatic generation of permutation
+	       instructions for VIRAM using StreamIt as a high-level
+	       input language.
+
+	       </p>  
+	     </td>
+	   </tr>
+	   
+	   <tr><td>&nbsp;</td></tr>
+
+	   <tr>
+	     <td width="15%" align=left valign=top><b>Oct., 2003</b></td>
+	     <td width="1%"></td>
+	     <td align=left valign=top>
+	       <p align=justify>
+	         Version 2.0 of the StreamIt compiler is now available
+	         for <a href="../shtml/download.html">download</a>.
+	         You may download either the source distribution and
+	         natively build the compiler, or a prebuilt
+	         distribution of the full compiler. The distribution
+	         also includes a set of
+	         <a href="../shtml/benchmarks.html">streaming benchmarks</a>.
+	       </p>  
+	     </td>
+	   </tr>
+	 </table>
+
+    </td>
+    <td width="150" valign="top" align="left"></td>
+  </tr>
+
+<!--#include virtual="../include/footer.inc"-->

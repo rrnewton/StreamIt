@@ -1,0 +1,87 @@
+<!--#include virtual="../include/init.inc"-->
+   <title>StreamIt - Links to Related and Collaborative Projects</title>
+<!--#include virtual="../include/header-level1.inc"-->
+
+  <tr>
+    <td width="130" valign="top" align="left"><b>
+      <hr>
+      <a href="../shtml/links.shtml#languages"><font color="#000099">systems and compilers</font></a><hr>
+      <a href="../shtml/links.shtml#papers"><font color="#000099">papers and theses</font></a><hr>
+    </b></td>
+    <td width="20" valign="top" align="left"></td>
+    <td width="700" valign="top" align="left">
+    <hr><br>
+      <h3>RELATED AND COLLABORATIVE PROJECTS</h3>
+      <br>
+      <p align="justify">
+        The following is  a collection of links to related and
+        collaborative projects, research  papers,  benchmark suites, and
+        software. If you have a link you would like us to add, we
+        would love to hear from you---please send mail to
+        <tt>streamit<a></a>@<i></i>cag<b></b>.<u></u>csail<a></a>.<b></b>mit<i></i>.<u></u>edu</tt>.
+      </p>
+
+      <h2><hr><a name="languages">Stream Systems and Compilers</a><hr></h2>
+      <ul>
+        <li><a href="http://graphics.stanford.edu/projects/brookgpu/">Brook</a><br>
+        <li><a href="http://developer.nvidia.com/page/cg_main.html">Cg</a><br>
+        <li><a href="http://cva.stanford.edu/imagine/project/imagine_stream_programming.html">StreamC/KernelC</a><br>
+        <li><a href="http://phoenix.labri.fr/software/spidle/">Spidle</a><br>
+        <li><a href="http://www-spi.lip6.fr/lucid-synchrone/">Lucid Syncrhone</a><br>
+        <li><a href="http://www.fftw.org/">FFTW</a>
+        <li><a href="http://www.spiral.net/">SPIRAL</a><br>
+
+        <li><p align="justify">
+          <a href="http://ptolemy.eecs.berkeley.edu/">The Ptolemy
+          Project</a> studies modeling, simulation, and design of
+          concurrent, real-time, embedded systems.<br>
+
+        <li><p align="justify">
+          <a href="http://www.cs.berkeley.edu/~asolar/projects/StreamBit">StreamBit</a>
+          is  a compiler that aims to increase productivity
+          in the development of applications that  process streams at
+          the  bit level.
+
+        <li><p align="justify">
+          <a href="http://www.reservoir.com/r-stream.php">Reservoir
+          R-Stream Compiler</a> maps applications to next generation
+          high-performance computing architectures containing multiple
+          processor cores and distributed memories.
+      </ul>
+
+      <h2><hr><a name="papers">Papers and Theses</a><hr></h2>
+      <ul>
+	  <li><p align="justify">
+          <a href="http://www.cs.berkeley.edu/~nmani/ms/msp6.ps">Generating
+          Permutation Instructions from a High-Level Description</a>.
+          <a href="http://www.cs.berkeley.edu/~nmani/">Mani Narayanan</a> 
+          and <a href="http://www.cs.berkeley.edu/~yelick/">Kathy Yelick</a>.
+          In the 4th Workshop on Media and Streaming Processors, December 2004.
+          The paper describes the automatic generation of permutation
+	    instructions for VIRAM using StreamIt as a high-level
+	    input language.
+
+	  <li><p align="justify">
+	    <a href="http://www2.hh.se/stud/pt04eggstream/thesis.pdf">Programming 
+          and Implementation of Streaming Applications</a>. Ola
+	    Johnsson, Magnus Stenemo, and Zain ul-Abdin. Technical
+	    Report IDE0405, Halmstad University, January 2005. The
+	    techical report implements a medium pulse repitition
+	    frequency doppler radar (MPD) application in StreamIt and
+	    evaluates its performance on 
+          <a href="http://cag.csail.mit.edu/raw">Raw</a> and 
+          <a href="http://www.pactcorp.com/">PACT XPP</a>.
+
+	  <li><p align="justify">
+	    <a href="http://duca.acm.jhu.edu/papers/SeniorThesis.pdf">Applications
+	    and Execution of Stream Graphs</a>. Nathaniel Duca. Senior
+	    Undergraduate Thesis, Johns Hopkins University, May
+	    2004. The thesis describes a stream graph execution model
+	    using dynamic linking.
+      </ul>
+
+    </td>
+    <td width="150" valign="top" align="left"></td>
+  </tr>
+
+<!--#include virtual="../include/footer.inc"-->
