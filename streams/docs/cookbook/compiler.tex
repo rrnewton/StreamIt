@@ -262,9 +262,9 @@ Exiting
 %
 As is evident in the compiler output above, the standalone option
 utilizes the Raw backend and stores the self-contained output file in
-{\tt tile0.c} (as well as the binary {\tt fm}).  Also, due to an
-implementation detail, it is not possible to control the number of
-runtime iterations for standalone programs (they will run forever.)
+{\tt tile0.c} (as well as the binary {\tt fm}).  The number of
+standalone iterations can be controlled with the {\tt -i} flag as
+before, e.g., {\tt fm -i 5}.
 
 \subsection{Using the Java Library}
 
@@ -302,7 +302,7 @@ this case.)
 
 There are a few additional options available in the library.  For
 instance, you can direct the library not to execute the program, but
-to instead just print the schedule of filter firings:
+to instead just print the schedule of filter firings: \enlargethispage{1\baselineskip}
 {\small
 \begin{verbatim}
 % strc -library -norun -printsched FMRadio.str
