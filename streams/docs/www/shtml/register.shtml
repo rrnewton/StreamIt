@@ -1,0 +1,62 @@
+<!--#include virtual="../include/init.inc"-->
+   <title>StreamIt - Registration</title>
+<!--#include virtual="../include/header-level1.inc"-->
+
+  <tr>
+    <td width="130" valign="top" align="left"></td>
+    <td width="20" valign="top" align="left"></td>
+    <td width="700" valign="top" align="left">
+    <hr><br>
+      <h3>REGISTRATION</h3>
+      <br>
+      <p align="justify">
+
+        You  must  register  to  download StreamIt.   Registration  is
+        largely for statistical  purposes; we will occasionally notify
+        registrants  of updates  to the  StreamIt  software, including
+        future public releases.
+
+	  <form method=post name="regForm" action="http://cag.lcs.mit.edu/cgi-bin/streamit-reg">
+
+	    <table cellpadding="0" cellspacing="10" border="0" widt="30%">
+            <tr>
+              <td><input name="name"></input></td>
+		  <td>Full Name</td>
+            </tr>
+            <tr>
+              <td><input name="company"></input></td>
+		  <td>Affiliation (e.g., company or university name)</td>
+            </tr>
+            <tr>
+              <td><input name="email"></input></td>
+		  <td>Email</td>
+            </tr>
+          </table>
+
+  	    <p align="justify">
+	      <i>The StreamIt compiler is built on top of version 1.5B
+	      of the <a href="http://www.dms.at/kopi/">Kopi Java
+	      compiler</a> from DMS Decision Management Systems GmbH.
+	      The independent components of the system, including the
+	      scheduler, Java runtime library, C library, and the
+	      frontend, are released subject to the terms of the
+	      <a
+	      href="http://www.opensource.org/licenses/mit-license.php">MIT
+	      license agreement</a>.  Other components of the system are
+	      released     under     the     terms     of     the     <a
+	      href="http://www.gnu.org/licenses/gpl.txt">GNU      General
+	      Public License</a>. The  binary release also include class
+	      files   from   the  <a   href="http://www.antlr.org">ANTLR
+	      LL(k)</a> parser generator.</i>
+	    </p>
+
+	    <input type="submit" value="Submit" onClick="return(validate(regForm))";>
+	    <input type="reset" value="Clear Form">
+        </form>
+
+      </p>
+    </td>
+    <td width="150" valign="top" align="left"></td>
+  </tr>
+
+<!--#include virtual="../include/footer.inc"-->

@@ -1,0 +1,157 @@
+<!--#include virtual="../include/init.inc"-->
+   <title>StreamIt - People</title>
+<!--#include virtual="../include/header-level1.inc"-->
+
+  <tr>
+    <td width="130" valign="top" align="left"><b>
+      <hr>
+      <a href="../shtml/people.shtml#alumni"><font color="#000099">alumni</font></a><hr>
+      <a href="../shtml/people.shtml#external"><font color="#000099">external contributors</font></a><hr>
+    </b></td>
+    <td width="20" valign="top" align="left"></td>
+    <td width="700" valign="top" align="left">
+    <hr><br>
+      <h3>PEOPLE</h3>
+      <br>
+      <p align="justify">
+
+	  <b>StreamIt</b> is the result of several years of research and
+        development  and it  incorporates the  extended  and extensive
+        efforts of:
+
+	  <ul>
+	    <li><p align="justify">
+	      <b><a href="http://cag.lcs.mit.edu/~saman">Saman
+	      Amarasinghe</a></b> the fearless leader.
+	    </p>	
+	    <li><p align="justify">
+	      <b><a href="http://mattdrake.mit.edu">Matt Drake</a></b> is implementing an MPEG2 decoder in
+	      StreamIt.
+	    </p>
+	    <li><p align="justify">
+	      <b><a href="http://cag.lcs.mit.edu/~mgordon">Michael  Gordon</a></b> 
+	      leads the StreamIt <a href="http://cag.lcs.mit.edu/raw">Raw</a> 
+		backend  effort.   He  wrote  the   layout,  communication
+	      scheduling, and code generation phases.  He also worked on
+	      coding benchmarks, creating  tools for syntax translation,
+	      code evaluation and debugging on Raw.
+	    </p>
+	    <li><p align="justify">
+	      <b><a href="http://www.cag.lcs.mit.edu/~hank/">Hank
+	      Hoffman</a></b> from the <a
+	      href="http://cag.lcs.mit.edu/raw">Raw</a> group helps
+	      with development, optimization and evaluation of
+	      applications (including FIR, MPEG2, and others).
+	    </p>
+	    <li><p align="justify">
+	      <b>Michal Karczmarek</b> built the StreamIt library and
+	      the scheduler.  He also implemented the Makefile build
+	      system.
+	    </p>
+	    <li><p align="justify">
+            <b>Jasper Lin</b> worked on <i>Filter</i> optimizations as
+            well as the current partitioners and the Raw backend.  He
+            also helped to design the new dynamic language features.
+	    </p>
+	    <li><p align="justify">
+	      <b><a href="http://web.mit.edu/rabbah/www/">Rodric
+	      Rabbah</a></b> contributes to the language design and
+	      compiler optimizations for DSPs, conventional processors,
+	      and computer grids.
+	    </p>
+	    <li><p align="justify">
+	    <b>Adam Reed</b> is working on integrating StreamIt with
+	    the X10 language from IBM.
+	    </p>
+	    <li><p align="justify">
+	      <b>Janis Sermulins</b> designed and implemented cache
+                optimizations for uniprocessor targets.  He also
+                implemented a backend that maps StreamIt to a cluster
+                of workstations, including support for teleport
+                messaging.
+	    </p>
+	    <li><p align="justify">
+	      <b><a   href="http://cag.lcs.mit.edu/~thies/">Bill  Thies</a></b>
+		 led the  design of the  StreamIt language and  compiler. He
+		 built the  high-level IR infrastructure  and partitioning
+		 algorithms for load balancing and linear optimizations.
+	    </p>
+ 	  </ul>
+
+
+        <h2><hr><a name="alumni">Alumni</a><hr></h2>
+	  <ul>
+	    <li><p align="justify">
+	      <b>Kunal Agrawal</b> implemented bit-level analysis and optimizations.
+	    </p>
+	    <li><p align="justify">
+	      <b>Sitij  Agrawal</b> developed applications  in StreamIt,
+	      including   a  radar  tracker.    He  also   designed  and
+	      implemented a  suite of domain-specific  optimizations for
+	      linear  state-space   filters,  including  combination  of
+	      adjacent linear state-space filters.
+	    </p>
+	    <li><p align="justify">
+	      <b>Kimberly Kuo</b>  implemented a graphical  debugger for
+		 StreamIt.     It    is    integrated    with    the    <a
+		 href="http://www.eclipse.org">Eclipse</a>      development
+		 environment.
+	    </p>
+	    <li><p align="justify">
+	      <b>Matt Brown</b> implemented applications in
+	      StreamIt, including an FM software radio.
+	    </p>
+	    <li><p align="justify">
+	      <b>Andrew Lamb</b> designed and implemented a suite of
+		domain-specific optimizations for linear filters,
+		including combination of adjacent linear filters and
+		automated translation to the frequency domain.  He
+		also implemented our regression test framework, as
+		well as several StreamIt applications.
+	    </p>
+	    <li><p align="justify">
+	      <b>Chris Leger</b> implemented applications in StreamIt,
+	      including a vocoder with speech transformation.
+	    </p>
+	    <li><p align="justify">
+            <b>David Maze</b> implemented  the new-syntax frontend and
+            uniprocessor backend.  He managed the  StreamIt source and
+            provided technical support to the  rest of the team.
+	    </p>
+	    <li><p align="justify">
+	      <b>Ali S. Meli</b> implemented applications in StreamIt,
+	      including part of the 3GPP physical layer.
+	    </p>
+	    <li><p align="justify">
+	      <b>Satish   Ramaswamy</b>  implemented   applications  for
+	      StreamIt,    and    is   currently    investigating
+	      domain-specific optimizations.
+	    </p>
+	    <li><p align="justify">
+	      <b>Juan   Reyes</b>  contributed the  graph  editor and
+	      tools for visualizing and editing StreamIt graphs.
+	    </p>
+	    <li><p align="justify">
+	      <b>Jeremy    Wong</b>    implemented    applications    in
+		StreamIt, including a GSM decoder.  He is currently
+		working   on  characterizing  the   streaming  application
+		domain.
+	    </p>
+	  </ul>
+
+
+        <h2><hr><a name="external">External Contributors</a><hr></h2>
+	  <ul>
+	    <li><p align="justify">
+	      <b><a href="http://www.cs.berkeley.edu/~nmani/">Mani Narayanan</a></b>
+		from UC  Berkeley, independently designed  and implemented
+		an optimizing  backend for  the VIRAM processor.   He also
+		contributed   versions   of   the  FFT   and   BitonicSort
+		benchmarks.
+	    </p>
+      </p>
+    </td>
+    <td width="150" valign="top" align="left"></td>
+  </tr>
+
+<!--#include virtual="../include/footer.inc"-->
