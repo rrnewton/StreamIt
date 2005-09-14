@@ -21,5 +21,13 @@ them.
       <desc>MIT, test involving a splitjoin</desc>
       <file>ArrayTest3.str</file>
     </impl>
+    <impl lang="StreamIt" id="arraytest4">
+      <desc>MIT, simple test of 3-d array allocation</desc>
+      <file>ArrayTest4.str</file>
+    </impl>
+    <impl lang="StreamIt" id="arraytest5">
+      <desc>MIT, multiple array allocations</desc>
+      <file>ArrayTest5.str</file>
+    </impl>
   </implementations>
 </benchmark>
