@@ -23,11 +23,13 @@ them.
     </impl>
     <impl lang="StreamIt" id="arraytest4">
       <desc>MIT, simple test of 3-d array allocation</desc>
-      <file>ArrayTest4.str</file>
+      <file class="source">ArrayTest4.str</file>
+      <file class="output">ArrayTest4.out</file>
     </impl>
     <impl lang="StreamIt" id="arraytest5">
       <desc>MIT, multiple array allocations</desc>
-      <file>ArrayTest5.str</file>
+      <file class="source">ArrayTest5.str</file>
+      <file class="output">ArrayTest5.out</file>
     </impl>
   </implementations>
 </benchmark>
