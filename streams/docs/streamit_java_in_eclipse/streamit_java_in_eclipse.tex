@@ -1,0 +1,548 @@
+%% latex StreamitEclipse && dvips StreamitEclipse -o && ps2pdf StreamitEclipse.ps StreamitEclipse.pdf
+%%
+%% images captured with 
+%% xwd -nobdrs | xwdtopnm | pnmtopng > foo.png
+%% all those intermediate stages because xv (which I often use)
+%% gets colormaps wrong on raw, pnm.
+%%
+%% then changed to encapsulated pestscript2 with the gimp.
+
+\documentclass[11pt]{article} 
+\usepackage{latex8}
+\usepackage{times}
+\usepackage{epsfig}
+\usepackage{fullpage}
+\usepackage{url}
+\usepackage{times}
+\pagestyle{empty}
+%\setlength{\textheight}{10in}
+\setlength{\parindent}{0ex}
+\setlength{\parskip}{1em}
+\raggedbottom			%needed with fixed length \parskip
+
+\begin{document}
+\title{Using Eclipse for StreamIt Development in CAG\\DRAFT}
+\author{Allyn Dimock, Michael Karczmarek, Rodric Rabbah, Bill Thies}
+\maketitle
+
+\section{StreamIt Under Eclipse}
+The goal of this exercise is to 
+\begin{enumerate}
+\item allow .java files in the StreamIt compiler to be edited under
+  Eclipse,
+\item allow the StreamIt compiler to be debugged under Eclipse,
+\item have StreamIt live where it usually 
+does so that no changes have to be made to startup files to point to
+\$STREAMIT\_HOME,
+\item Allow Eclipse to use CVS on StreamIt files.
+\end{enumerate}
+Caveat: This sets up the entire {\tt streams} directory as a Java project.
+We will want to eventually refine this procedure so that we can set up
+{\tt streams/src/streamit/eclipse} as a Plugins project, {\tt streams/apps} as a
+StreamIt project, and {\tt streams/library/C} and {\tt /cluster} as C projects.
+
+Eclipse currently runs on RHEL3 machines, not on RH7.2 machines.
+
+I alias {\tt eclipse} to {\tt /home/bits7/NOBACKUP/eclipse.3.1/eclipse}\\
+Note that you can not just link to the eclipse executable from
+somewhere in your path since Eclipse needs to know its real path to
+work correctly.
+
+\section{Checking Out to let Eclipse use CVS}
+\label{secCheckout}
+
+First: we need to check out a copy of the {\tt streams} directory in a
+form that Eclipse can use.
+Eclipse has a CVS client but no CVS server, so we can not do a local
+CVS checkout and expect Eclipse to handle CVS.
+
+We need to set up environment variable {\tt CVS\_RSH} to be {\tt ssh}.
+
+We need to checkout as\\
+\verb+cvs -d ':ext:USERNAME@SYSTEMNAME:/projects/raw/cvsroot' co streams+\\
+Fill in your user name for {\tt USERNAME}.  
+Fill in a system name for {\tt SYSTEMNAME} -- don't use {\tt  localhost}
+as a system name if you are going to be developing on multiple systems
+sharing a common {\tt streams} directory: If you do this you will get lots
+of warnings from {\tt ssh} as you move between systems.
+
+If you can set up your {\tt .ssh/config} to use RSAAuthentication of
+something other than interactive authentication with your password,
+you will be happier:  Otherwise Eclipse, when using CVS, will require
+you to enter your password from the window from which Eclipse was
+started.\footnote{Assuming that you don't have Eclipse store your
+  password, which may be insecure; and assuming that you don't find
+  some way to get Eclipse to pop up a password prompt.  There should
+  be a way of getting Eclipse to pop up a password prompt, but I don't
+know it.}
+
+\section{Setting up a streams project in Eclipse}
+
+If you have never used StreamIt before you should include support for
+it in your shell initialization file (.cshrc, .bachrc, whatever...).
+Set up the following lines for csh variants:
+\begin{verbatim}
+setenv STREAMIT_HOME ${HOME}/streams
+source $STREAMIT_HOME/include/dot-cshrc
+\end{verbatim}
+or the following linse for sh variants
+\begin{verbatim}
+export STREAMIT_HOME=$HOME/streams
+. $STREAMIT_HOME/include/dot-bashrc
+\end{verbatim}
+Also, type these lines at the command level before proceeding.
+
+Now:
+\begin{verbatim}
+cd ~/streams
+make
+\end{verbatim}
+This builds at least one file that will be essential later: KjcOptions.java,
+as well as the libraries used for the uniprocessor and cluster
+backends.
+
+Run Eclipse.
+
+If this is your first time running eclipse, you should see a window
+that looks like:
+
+\hspace*\fill\fbox{%
+\epsfig{figure=Workspace0.eps,height=3in}
+} \hspace*\fill
+
+Just click the curved-arrow icon in the upper right to get going.
+
+There have been situations there instead of the previous window
+popping up, we have seen:
+
+\hspace*\fill\fbox{%
+\epsfig{figure=WorkspaceInUse1.eps,width=4in}
+} \hspace*\fill
+
+\vspace{+33pt}
+In this case you need to type in the complete path to your
+workspace:\footnote{%
+\url{https://bugs.eclipse.org/bugs/show_bug.cgi?id=44735\#c51}
+indicates that this can happen if your home directory is served over nfs and
+the serving system is running {\tt lockd} but not {\tt statd}. 
+They suggest a fix that might make sense to a Linux guru.
+For mere mortals, willing to take the risk that the workspace was
+legitimately locked, you can start Eclipse with 
+{\tt -vmargs -Dosgi.locking=none}.
+}
+
+\hspace*\fill\fbox{%
+\epsfig{figure=WorkspaceInUse2.eps,height=2.5in}
+} \hspace*\fill
+
+
+
+From {\tt File $\rightarrow$ New $\rightarrow$ Project}
+(or the context menu from right-clicking in the {\tt Navigator} pane)
+create a new Java project.\footnote{I know how to add CVS to a Java project
+but not Java features to a CVS project.}
+
+Eclipse should pop up a panel like that in %Figure~\ref{javapOne}.
+the illustration below.
+If, for some reason, ``Java Project'' is not highlighted, click on it.
+Then click on ``Next''.
+
+%\begin{figure}[htb]
+\hspace*\fill\fbox{%
+\epsfig{figure=new_project1.eps,height=4in}
+} \hspace*\fill
+%\caption{{\protect\small Creating a Java Project: Panel 1.}}
+%\label{javapOne}
+%\end{figure}
+
+When you click Next, you will get a window like %Figure~\ref{javapTwo}.
+the one below.
+Fill in the project name, select ``Create project from existing
+source'', give the full path to your {\tt streams} directory, and
+click on ``Next''.
+
+%\begin{figure}[htb]
+\hspace*\fill\fbox{%
+\epsfig{figure=new_project2.eps,height=4in}
+} \hspace*\fill
+%\caption{Creating a Java Project: panel 2}
+%\label{javapTwo}
+%\end{figure}
+
+
+Clicking ``Next'' should allow you to configure how the project is
+built under Java: it should pop up a panel similar to the one in
+%Figure~\ref{javapSix}.
+the illustration below:
+
+%\begin{figure}[htb]
+\hspace*\fill\fbox{%
+\epsfig{figure=new_project6.eps,height=4in}
+} \hspace*\fill
+%\caption{Creating a Java Project: Excluding from Build Path}
+%\label{javapSix}
+%\end{figure}
+
+If you clicked on ``Finish'' rather than ``Next'' by accident, you can 
+change Java build properties on a Java project after the
+project is set up: select the root of the project, right click, select
+``Properties''  from the context menu, and select ``Java Build Path''
+from the menu at the left of the panel.  
+%Figure~\ref{javapThree} was generated this way.
+The illustration below was generated this way.
+
+%\begin{figure}[htb]
+\hspace*\fill\fbox{%
+\epsfig{figure=new_project3.eps,height=4in}
+} \hspace*\fill
+%\caption{Creating a Java Project: Panel 3}
+%\label{javapThree}
+%\end{figure}
+
+Select the ``Source'' tab and remove the following from the Java build
+Path by clicking on ``Remove from Java build path''
+\begin{itemize}
+\item All {\tt streams/docs} and any subdirectories that appear in the listing:
+ We don't want to try to build any example Java code.
+\item {\tt streams/src/streamit/eclipse} contains some .java files for the
+eclipse StreamIt plugin.
+We don't want to try to build these. 
+\item {\tt streams/regtest/streamit} (The JUnit-based regression test
+  package) has been superseded by the {\tt streams/regtest/qmtest}
+  regression test package.  Remove it from the build path.
+\item {\tt streams/src/com},\\
+ {\tt streams/src/org},\\ 
+ {\tt streams/src/streamit/stair},\\
+ {\tt streams/at/dms/kjc/raw2}\\
+ and any subdirectories that appear in the listing:
+ These are not necessary for building the StreamIt compiler and may contain
+ errors that would persistently appear in Eclipse's ``Problems'' panel
+ if not removed. 
+\item The following application directories contain Java code that
+  produces error messages. Remove the following for now, or just remove all of
+  the {\tt apps} subdirectory:\\
+  {\tt streams/apps/applications/nolia/streamit},\\
+  {\tt streams/apps/applications/nolia-fine},\\
+  {\tt  streams/apps/applications/nolia-new},\\ 
+  {\tt raytracer/library},\\
+  {\tt reed-solomon},\\
+  {\tt streams/apps/benchmarks/nokia/streamit},\\
+  {\tt streams/apps/benchmarks/viram/fft},\\
+  {\tt streams/apps/examples/hello},\\
+  {\tt streams/apps/examples/median},\\
+  {\tt streams/apps/examples/sample-trellis},\\
+  {\tt streams/apps/examples/toy-trellis},\\
+  {\tt streams/apps/examples/old/*},\\
+  {\tt streams/apps/tests/field-init},\\
+  {\tt streams/apps/tests/fir-test},\\
+  {\tt streams/apps/tests/flybit},\\
+  {\tt streams/apps/tests/fuse-test},\\
+  {\tt streams/apps/tests/hello-message},\\
+  {\tt streams/apps/tests/hello-simple},\\
+  {\tt streams/apps/tests/hello-splits},\\
+  {\tt streams/apps/tests/lineartest/regtests},\\
+  {\tt streams/apps/tests/weighted-rr}.
+\end{itemize}
+Directories removed from the build path may be reinstated later...
+
+You can copy and paste from the source of this document to reduce
+your typing.
+%
+Another method of excluding directories (after clicking ``Finish'' in
+setting up the project) is to highlight the {\tt streams} project in
+the Package Explorer,\footnote{%
+If there is no ``Package Explorer'' panel, then 
+``Window $\rightarrow$  Show View $\rightarrow$ Package Explorer''
+}
+then 
+``Project $\rightarrow$ Properties $\rightarrow$ Java Build Path''
+Click the ``Source'' tab if not already selected.
+Expand the directory if necessary to find a line starting with ``Excluded:''
+Click on the ``Excluded:'' line to highlight it.
+
+I have not re-installed to check if there is a similar way of
+excluding from the ``Java project'' wizard.
+
+%\begin{figure}[htb]
+\hspace*\fill\fbox{%
+\epsfig{figure=exclude-1.eps,height=4in}
+} \hspace*\fill
+%\caption{Creating a Java Project: Excluding from Build Path later}
+%\label{javaxOne}
+%\end{figure}
+
+Click on ``Edit...'' to bring up a window of inclusion and exclusion
+patterns, put in the necessary exclusion patterns, and then click
+``OK''.
+
+%\begin{figure}[htb]
+\hspace*\fill\fbox{%
+\epsfig{figure=exclude-2.eps,height=4in}
+} \hspace*\fill
+%\caption{Creating a Java Project: Excluding from Build Path later}
+%\label{javaxTwo}
+%\end{figure}
+
+
+
+We need to set up the class path for the project.\footnote{%
+Unfortunately,
+there seems to be only one class path per project, and our directory
+structure is not such that we can easily break {\tt streams} down into
+sub-projects.}
+
+Click the ``Libraries'' tab.\\
+You will need to ``Add External JARs...'' for our antlr implementation
+({\tt /usr/uns/java/antlr.jar}).\footnote{
+  There is an antlr plug-in for eclipse available from
+  \url{http://antlreclipse.sourceforge.net}
+  The antlr plug-in allows sensible editing and building of ``.g''
+  files.
+  Installation directions are on the web page.
+  I have included the plugin in the eclipse plugins directory, but
+  have not had to edit any {\tt .g} files yet, nor have I used its {\tt .jar} file
+  in place of StreamIt's {\tt antlr.jar} 
+}
+
+You will need to ``Add JARs...'' for {\tt streams/3rdparty/cplex/cplex.jar},\\
+and {\tt streams/3rdparty/jgraph/jgraph.jar}\footnote{%
+If you wish to play with the obsolete streams/regtest/streamit code,
+you will also need to ``Add JARs...'' for 
+{\tt streams/regtest/streamittest/junit.jar}.
+Eclipse has a Junit
+interface. I do not know whether including
+{\tt streams/regtest/streamittest/junit.jar} will interfere with that
+interface or not.
+}
+%, and (if you do not exclude
+%streams/regtest/streamit from your build path)
+%streams/regtest/streamittest/junit.jar\footnote{Eclipse has a Junit
+%  interface. I do not know whether including
+%  streams/regtest/streamittest/junit.jar will interfere with that
+%  interface or not.}
+%
+%See Figure~\ref{javapFive}.
+
+%\begin{figure}[htb]
+\hspace*\fill\fbox{%
+\epsfig{figure=new_project5.eps,height=4in}
+} \hspace*\fill
+%\caption{Creating a Java Project: JAR browser}
+%\label{javapFive}
+%\end{figure}
+
+
+Even though the standard CLASSPATH includes streams/3rdparty and
+streams/src, you {\em do not need to} ``Add Class Folder'' for these to get
+the StreamIt compiler to build, which is lucky since Eclipse will not
+allow you to use ``Add Class Folder'' for a subdirectory of the
+current project.\footnote{%
+The lack of these directories in the project class path may be the
+cause of some of the errors that forced us to exclude some
+applications from the build path.
+If this is the case, the only solution I can see would be to check out the
+applications into their own project.}
+
+\bigskip
+
+To build the StreamIt compiler as currently implemented, we need to
+change some settings in Eclipse's Java compiler.
+Follow ``Window $\rightarrow$ Preferences'' to set compiler
+preferences.  Uncheck the ``Use default compliance settings'' box and
+set settings as 
+below.  
+%in Figure~\ref{compilerPrefs}
+Click ``Apply'' to make the changes.
+
+%\begin{figure}[htb]
+\hspace*\fill\fbox{%
+\epsfig{figure=compiler-preferences.eps,height=4in}
+} \hspace*\fill
+%\caption{Setting Compiler Preferences}
+%\label{compilerPrefs}
+%\end{figure}
+
+
+Change some settings for how the Eclipse Java editor handles text,
+just to be safe:
+``Window $\rightarrow$ Preferences... $\rightarrow$ General
+$\rightarrow$ Editors''
+
+\hspace*\fill\fbox{%
+\epsfig{figure=text-prefs.eps,height=4in}
+} \hspace*\fill
+
+
+Create a ``Problems'' panel by 
+``Window $\rightarrow$ Show View $\rightarrow$ Problems'' if there is
+not one already on the screen.
+
+Now click on the Filters icon
+(\epsfig{figure=filters1.eps,height=2ex}) on the ``Problems'' panel
+and set to only display errors. 
+%See Figure~\ref{problemFilters}.  
+Compiling the StreamIt
+compiler generates several thousand warnings which will otherwise be
+displayed in the Problems panel.
+
+%\begin{figure}[htb]
+\hspace*\fill\fbox{%
+\epsfig{figure=problem_filters.eps,height=4in}
+} \hspace*\fill
+%\caption{Setting Filters for Problems}
+%\label{problemFilters}
+%\end{figure}
+
+
+Try: Click on the {\tt streams} project to highlight it in the
+``Navigator'' panel.
+
+Select menu item ``Project $\rightarrow$ Build Automatically'' to
+remove the check mark next to ``Build Automatically'' if one is there.
+(If one was not there and you just created one then repeat to remove
+the check mark.)
+
+Now, menu item ``Project $\rightarrow$ Build Project'' should not be
+grayed-out, so select it to build the project.
+After some time,
+you should see 0 errors, but lots or warnings in the information line
+at the top of the ``Problems'' panel.
+
+Click ``Project $\rightarrow$ Build Automatically'' again, so that the
+menu item is checked. This will cause partial rebuilds to happen
+automatically when a file is saved.
+
+\section{Accessing CVS through Eclipse}
+
+To set up so that Eclipse can use CVS, you need to have checked out
+from CVS as prescribed in Section~\ref{secCheckout}.
+
+\begin{itemize}
+\item Click on the ``streams'' project to select it.
+\item Right-click to get the context menu for the project.
+\item Select ``Team $\rightarrow$ Share Project''
+\item In the pop-up window ``Connect Project to Repository'' click on
+  ``Finish''.
+\end{itemize}
+
+\section{Running the StreamIt Compiler in Eclipse}
+
+The {\tt strc} compiler script will not run with the current setup:
+someone will have to update the StreamIt plugins to work with Eclipse 3.1
+But, we can run the components of the 
+
+To compile a file with the StreamIt compiler, you need to set up a
+``run configuration'', which be done by following ``Run $\rightarrow$ Run...''
+or ``Run $\rightarrow$ Debug...''.
+%Figure~\ref{runOne} 
+The illustration below
+shows setting up a new configuration for running
+Java applications.
+You may want one configuration per set of commonly-used StreamIt
+compiler switches.
+
+%\begin{figure}[htb]
+\hspace*\fill\fbox{%
+\epsfig{figure=run-debug1.eps,height=4in}
+} \hspace*\fill
+%\caption{Setting up a run configuration: Panel 1}
+%\label{runOne}
+%\end{figure}
+
+
+Set up the arguments for your run / debug configuration.
+The illustration below shows setting up the arguments for a run:\\
+the ``VM arguments'' are those usually created by strc.\\
+The ``Program arguments'' are ``--streamit'' which is always the first
+argument, then the arguments for running on a cluster, with a pop-up
+menu asking for the ``Number of Processors'' and defaulting to 1, and
+with a file selection dialog for ``Pre-compiled file, .java assumed''
+with input pre-set to the {\tt apps} subdirectory of the project
+directory which hopefully will decrease the number of characters you
+have to type to get to the file that you want to compile.
+%
+%Figure~\ref{runTwo} shows setting up the arguments for a run.
+%instead of using \verb+${file_prompt+, which gives you a text entry and a 
+%file browser, you could use other built-in
+%variables such as \verb+${string_prompt}+, which gives you test entry only.
+Click the ``Variables'' button to see a list of other potentially
+useful variables to use in prompts.
+
+%\begin{figure}[htb]
+\hspace*\fill\fbox{%
+\epsfig{figure=run-debug2.eps,height=4in}
+} \hspace*\fill
+%\caption{Setting up a run configuration: Panel 2}
+%\label{runTwo}
+%\end{figure}
+
+The contents of the ``JRE'', ``Classpath'', ``Source'',
+``Environment'', and ``Common'' tabs all seem to be OK. without
+modification.\\ 
+Once you are through setting up configurations, click ``Apply''.\\
+(The fancy defaults turn out not to be too useful: Eclipse tries to be
+helpful by reusing the last value of a \$\{whatever\} variable.)
+
+Once the program has been run, you can re-run it by selecting 
+``Run $\rightarrow$ Run last launched'' (Ctrl+F11). 
+
+You will need a pre-compiler to convert .str files to .java files as
+shown in the next two illustrations.
+
+\hspace*\fill\fbox{%
+\epsfig{figure=run-debug3.eps,height=4in}
+} \hspace*\fill
+
+\hspace*\fill\fbox{%
+\epsfig{figure=run-debug4.eps,height=4in}
+} \hspace*\fill
+
+\section{Eclipse Gotchas}
+
+Eclipse believes that it has control over its project directories
+unless told otherwise: If I want to run the StreamIt preprocessor in a
+subdirectory of {\tt apps} and make the resulting .java file visible
+in Eclipse then I will need use ``Refresh'' from the context menu for
+the directory.
+
+Key bindings are different for different windows!
+Shift+Ctrl+L will generally show you the key bindings for a window
+
+Modify keys with ``Window $\rightarrow$ Preferences $\rightarrow$
+General $\rightarrow$ Keys''  
+For instance: ``Modify'' tab, pull down ``Scheme'', select ``Emacs'' 
+This gives some standard Emacs key bindings, but far from the full set.
+
+Is ``src'' a special directory name in Eclipse?
+I was not able to make an Eclipse project out of just streams/src: some 
+eclipse files ended up in streams instead,  but I didn't try all that hard...
+We might want to try to set up src as one project, the applications as
+another project and the eclipse plugin for .str files as a third
+project.
+Given the structure of the streams directories, this might be
+difficult.
+Especially to separate out the eclipse plugin, which is in
+streams/src/streamit/eclipse.
+
+For some reason, Eclipse, as set up above was {\em sometimes} not catching assertion
+errors despite the ``-ea'' switch to java from the debug
+configuration.  I was able to fix this in the JRE tab of the debug
+configuration window by using /home/linux/jdk-1.5.0\_01/jre rather than
+/home/linux/j2sdk-1.4.2\_03: Once I added and used /home/linux/jdk-1.5.0\_01/jre, then 
+/home/linux/j2sdk-1.4.2\_03 started catching the assertion errors.  I am baffled by this behavior.
+
+Trying to update streams from CVS in Eclipse:
+Eclipse follows symbolic links so {\tt streams/misc/raw/Makefile.include} and
+{\tt streams/misc/raw/stardata/starbuild} will cause problems since they point to common files under 
+CVS control -- but not in the user's directory tree, and not with CVS/Root in a format that 
+Eclipse understands.
+
+
+
+
+\end{document}
+
+%% % Sets box from page width. Not what I want...
+%% \begin{boxfigure}{label}{caption}
+%% payload
+%% \end{boxfigure}
