@@ -1,6 +1,6 @@
 \Section{MPEG-2 Video Coding and Decoding}
 
-MPEG-2~\cite{MPEG2} is a popular coding and decoding standard standard
+MPEG-2~\cite{MPEG2} is a popular coding and decoding standard
 for digital video data. The scheme is a subset of both the
 DVD-Video~\cite{DVDVideo} standard for storing movies, and the Digital
 Video Broadcasting specifications for transmitting HDTV and
@@ -26,8 +26,8 @@ compressed\cite{Huffman52}. The amount of lossy and lossless
 compression depends on the video data. Common compression ratios range
 from 10:1 to 100:1. For example, HDTV with a resolution of 1280x720
 pixels and a streaming rate of 59.94 frames per second, has an
-uncompressed data rate of 1.33 Gigabits per second. It is usually
-compressed at a rate of 66:1, reducing the required streaming rate to
+uncompressed data rate of 1.33 Gigabits per second. It is compressed at 
+an average rate of 66:1, reducing the required streaming rate to
 20 Megabits per second~\cite{imagevidstandards, Page 3}.
 
 \SubSection{MPEG Coding}
@@ -48,31 +48,34 @@ compressed at a rate of 66:1, reducing the required streaming rate to
 
 An overview of the encoding process is illustrated in
 Figure~\ref{fig:mpeg-encoder}. The encoder operates on a sequence of
-pictures. Each pictures is made up of pixels arranged in a 8x8 array
-known as a block. A 2x2 array of blocks forms a macroblock. The
-compression in MPEG is achieved largely via motion estimation, which
-detects and eliminates similarties between macroblocks across
-pictures.  Specifically, the motion estimator calculates a motion
+pictures. Each picture is made up of pixels arranged in a 16x16 array
+known as a macroblock. Macroblocks are formed from 8x8 arrays, 
+known as blocks, which contain pixel data for a single color channel. 
+Each color channel in a macroblock may be represented by a 2x2 matrix
+of blocks, or downsampled to a 1x2 or 1x1 block representation.
+The compression in MPEG is achieved largely via motion estimation, which
+detects and eliminates similarities between macroblocks across
+pictures. Specifically, the motion estimator calculates a motion
 vector to represent the horizontal and vertical displacement of a
 given macroblock (i.e., the one being encoded) to a matching
-macroblock-sized area in a reference picture, know as an intra-coded
-(I) picture. The matching block is removed (subtracted) from the
+macroblock-sized area in a reference picture. 
+The matching macroblock is removed (subtracted) from the
 current picture on a pixel by pixel basis. The result is a residual
 predictive-code (P) picture. It represents the difference between the
-current picture and the reference picture. In addition to forward
+current picture and the reference picture. Reference pictures encoded without
+the use of motion prediction are intra-coded (I) pictures. In addition to forward
 motion prediction, it is possible to encode new pictures using motion
 estimation from both previous and subsequent pictures. Such pictures
 are bidirectionally predictive-coded (B) pictures, and they exploit a
 greater amount of temporal locality.
 
-Each of the I, P, and B pictures then undergoes a 2-dimmensional
+Each of the I, P, and B pictures then undergoes a 2-dimensional
 discrete cosine transform (DCT) which separates the picture into parts
-with varying visual importance. The input to the DCT is an 8x8 matrix
-representing a pixel block. Each element in the matrix represents the
-intensity of the corresponding pixel in the picture. The output of the
+with varying visual importance. The input to the DCT is one block. 
+The output of the
 DCT is an 8x8 matrix of frequency coefficients. The upper left corner
 of the matrix represents low frequencies, whereas the lower right
-corner represents higher frequencies. The latter ar often small and
+corner represents higher frequencies. The latter are often small and
 can be neglected without sacrificing human visual perception.
 
 \begin{figure}[t]
@@ -98,21 +101,21 @@ represent the coefficient, and its value. The run-length encoder
 scans the DCT matrix in a zig-zag order (Figure~\ref{fig:zigzag}) to
 consolidate the zeros in the matrix.
 
-Finally, the output of the run-length encoder is Huffman coded to 
-further reduce the average number of bits per coefficient. This is
-combined with motion vector data and other information (e.g., 
-type of picture) and streamed to the output device.
+Finally, the output of the run-length encoder, motion vector data,
+and other information (e.g., type of picture), are Huffman coded to 
+further reduce the average number of bits per data item. The compressed
+stream is sent to the output device.
 
 \SubSection{MPEG Decoding}
 
-An MPEG-2 input stream is organized as a  Group of Pictures (GOP)
+An MPEG-2 input stream is organized as a Group of Pictures (GOP)
 which contains all the information needed to reconstruct a video. The
 GOP contains the three kinds of pictures produced by the encoder,
 namely I, P, and B pictures. I pictures are intended to assist scene
 cuts, random access, fast forward, or fast reverse
 playback~\cite{MPEG2, Page 14 6.1.1.7}. A typical I:P:B picture ratio
 in a GOP is 1:3:8, and a typical picture pattern is a
-repatition of the following sequence: I B B P B B P B B P B B. The
+repetition of the following sequence: I B B P B B P B B P B B. The
 input pictures are not ordered temporally within the stream. Rather,
 they are ordered such that if a decoder encounters a P picture, its
 motion prediction is with respect to the previously decoded I or P
@@ -120,14 +123,14 @@ picture, and if the decoder encounters a B picture, its motion
 prediction is with respect the previously two decoded I or P pictures.
 
 As with the encoding process, pictures are divided up into 16x16 pixel
-macroblocks, themselves composed of 8x8 pixel blocks. Macroblocks
+macroblocks, themselves composed of 8x8 blocks. Macroblocks
 specify colors using a {\it luminance} channel to represent saturation
 (color intensity), and two {\it chrominance} channels to represent
 hue. MPEG-2 streams specify a chroma format which allows the
-chrominance data to be sampled at a lower rate. A common chroma format
-is 4:2:0 which represents a macroblock using four blocks for the
+chrominance data to be sampled at a lower rate. The most common chroma 
+format is 4:2:0 which represents a macroblock using four blocks for the
 luminance channel and one block for each of the two chrominance
-channels.
+channels. 
 
 \begin{figure}[t]
 \begin{center}
@@ -153,7 +156,10 @@ the spatial domain.
 Finally, the motion vectors parsed from the data stream are passed to
 a motion compensator, which reconstructs the orginal pictures. In the
 case of I pictures, the compensator need not make any changes since
-these pictures were not subject to motion estimation. In the case of P
+these pictures were not subject to motion estimation~\footnote{I 
+pictures are allowed to contain concealment motion vectors which aid in
+macroblock reconstruction should a bitstream error destroy the 
+frequency coefficient data. We ignore this special case.}. In the case of P
 and B pictures however, motion vectors are used to find the
 corresponding region in the current reference pictures. The
 compensator then adds the relevant reference macroblocks to the
