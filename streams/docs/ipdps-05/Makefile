@@ -1,11 +1,14 @@
 all: main.pdf
 	cp main.pdf ~/public_html/ipdps.pdf
 
-main.pdf: main.tex main.bib
+main2.pdf: main.tex main.bib
 	pdflatex main.tex
 	bibtex main
 	pdflatex main.tex
 	pdflatex main.tex
+
+main.pdf: main.pdf.ps
+	ps2pdf main.pdf.ps main.pdf
 
 main.ps: clean main.dvi
 	dvips main.dvi -o main.ps
@@ -18,7 +21,7 @@ main.pdf.ps: clean main.dvi
 
 main.dvi: $(FILES)
 	latex main
-	bibtex main
+#	bibtex main
 	latex main
 	latex main
 

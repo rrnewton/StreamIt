@@ -1,1 +1,69 @@
 \Section{Introduction}
+
+Image compression, whether for still pictures or motion pictures
+(e.g., video), plays an important role in internet and multimedia
+applications, digital appliances such as HDTV, and handheld devices
+such as digital cameras and mobile phones. Compression allows one to
+represent images and video with a much smaller amount of data and
+negligible quality loss. The reduction in data decreases storage
+requirements (important for embedded devices) and provides higher
+effective transmission rates (important for internet enabled devices).
+
+Unfortunately, implementing a compression scheme can be especially
+difficult. For performance reasons, implementations are typically not
+portable as they are tuned to specific architectures. And while image
+and video compression is needed on embedded systems, desktop PCs, and
+high end servers, writing a separate implementation for every
+architecture is not cost effective. Furthermore, compression standards
+are also continuously evolving, and thus compression programs must be
+easy to modify and update.
+
+A typical compression algorithm involves three types of operations:
+data representation, lossy compression, and lossless
+compression. These operations are semi-autonomous, data-parallel, and
+easily fit into a sequence of distinct processing steps. As such,
+image and video compression is a good match for the streaming model of
+computation, which affords certain advantages in terms of
+programmability, robustness, and achieving high performance. Our goal
+is to implement well-known still image and motion picture compression
+standards---such as JPEG and MPEG-2---in StreamIt~\cite{streamit}, a high-level
+architecture-independent language for the streaming domain. This will
+result in clean, malleable, and portable codes. In addition, using the
+stream-aware StreamIt compiler, we will produce highly optimized codes
+that are competitive with hand-tuned implementations. Our architecture
+targets include conventional processors, as well as new and emerging
+wire exposed~\cite{raw} and multi-core architectures.
+
+This work is in the context of the StreamIt programming language[1],
+an architecture-independent stream language that aims to improve
+programmer productivity within the streaming domain. StreamIt provides
+an intuitive programming model, allowing the programmer to build an
+application by connecting components together into a stream graph,
+where the nodes represent actors that carry out the computation, and
+edges represent FIFO communication channels between actors. As a
+result, the parallelism and communication topology of the application
+are exposed, empowering the compiler to perform many stream-aware
+optimizations~\cite{andrew,sitij,gordo,janis} that elude other languages.
+
+While StreamIt formerly required every execution of an actor to
+consume and produce a constant number of items from its input and
+output channels, recent extensions of the language allow for
+variability of the I/O rates. For example, the rate at which items are
+produced or consumed may now be a function of the input data. This
+extension allows StreamIt to extend to a whole new class of
+data-dependent applications, including graphics, encryption, and data
+compression.
+
+We have chosen to build both a JPEG and an MPEG-2 encoder/decoder in
+StreamIt. In these applications, there are several processing steps
+that can run in parallel. For example, the processing of YUV color
+channels, which represent the luminance and chrominance, are
+independent. In StreamIt, this type of parallelism is trivial (and
+natural) to express. In addition, when compressing several still
+images at a time, or during motion picture compression (which is
+substantially more involved), the task level parallelism between the
+various parts of the coders naturally follows from the organization of
+the application. Thus there exists a lot of flexibility in compiling
+the coders to yield high-performance implementations.
+
+
