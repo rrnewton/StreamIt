@@ -217,4 +217,103 @@ StreamIt also provides a {\it feedback loop} construct for introducing
 cycles in the graph. This stream construct is not used in the decoder,
 but may be used in the MPEG encoder.
 
-\paragraph{XXX: need to introduce messaging and talk about it.}
+\SubSection{Teleport Messaging}
+%%% XXX largely copied from ppopp paper
+A notoriously difficult aspect of stream programming, from both a
+performance and programmability standpoint, is reconciling regular
+streaming dataflow with irregular control messages.  While the
+high-bandwidth flow of data is very predictable, realistic
+applications such as MPEG also include unpredictable, low-bandwidth
+control messages for adjusting system parameters (e.g., desired
+precision in quantization, type of picture, resolution, etc.).
+
+For example, the inverse quantization step in the decoder uses a
+lookup table that provide the inverse quantization scaling factors.
+However, the particular scaling factor is determined by the stream
+parser. Since the parsing and inverse quantization tasks are logically
+decoupled, any pertinent information that the parser discovers must be
+teleported to the appropriate streams.  In StreamIt, such
+communication is conveniently accomplished using teleport
+messaging~\cite{thies-ppopp05}.
+
+\begin{figure*}[t]
+  \begin{scriptsize}
+    \begin{verbatim}
+	01 void->void MPEGDecoder {
+	02   ...
+	03   portal<InverseDCQuantizer> p;
+	04   ...
+	05   add Parser(p);
+	06   ...
+	07   add InverDCQuantizer() to p;
+	08   ...
+	09 }
+	 
+	 
+	10 int->int filter Parser(portal<InverseDCQuantizer> p) {
+	11   work push * {
+	12     int precision;
+	13     ...
+	14     if (...) {
+	15       precision = pop();
+	16       p.setPrecision(precision) [0:0];
+	17     }
+	18     ...
+	19   }
+	20 }
+
+	21 int->int filter InverseDCQuantizer() {
+	22   int[4] scalingFactor = {8, 4, 2, 1};
+	23   int    precision = 0;
+
+	24   work pop 1 push 1 {
+	25     push(scalingFactor[precision] * pop());
+	26   }
+
+	27   handler setPrecision(int new_precision) {
+	28     precision = new_precision;
+	29   }
+	30  }
+    \end{verbatim}
+  \end{scriptsize}
+  % \vspace{-3pt}
+  \caption{MPEG messaging example.}
+  \label{fig:messaging}
+\end{figure*}
+
+The idea behind teleport messaging is for the {\tt Parser} to change
+the quantization precision via an asynchronous method call, where
+method invocations in the target are timed relative to the flow of
+data in the stream (i.e., macroblocks). As shown in
+Figure~\ref{fig:messaging}, the {\tt InverseDCQuantizaer} declares a
+message handler that adjusts its precision (lines 27-29). The {\tt
+Parser} calls this handler through a {\it portal} (line 16), which
+provides a clean interface for messaging.  The handler invocation
+includes a range of latencies {\tt [min:max]} specifying when the
+message should be delivered with respect to the data produced by
+sender.
+
+The interesting aspects of teleport messaging are the semantics for
+the message latency.  Intuitively, the message semantics can be
+thought of in terms of attaching tags to data items.  If the {\tt
+Parser} sends a message to a downstream filter with a latency $k$,
+then conceptually, the filter tags the items that it outputs in $k$
+iterations of its work function. If $k=0$, the data produced in the
+current execution of the work function is tagged. The tags propagate
+through the stream graph; whenever a filter inputs an item that is
+tagged, all of its subsequent outputs are also tagged with the same
+message. The message flows through the graph until the tagged data
+reaches its intended receiver, at which time, the message handler is
+invoked immediately before the execution of the work function in the
+receiver.  In this sense, the message has the semantics of traveling
+``with the data'' through the stream graph, even though it is not
+necessarily implemented this way.  The intuition for upstream messages
+is similar.
+
+Teleport messaging exposes the true information flow, and avoids the
+muddling of data streams with control-relevant information. Teleport
+messaging thus separates the concerns of the programmer from that a
+system implementation, thereby allowing the compiler to deliver the
+message in the most efficient way for a given architecture. Teleport
+messaging also offers other powerful control over timing and latency
+beyond what is used in this example.
