@@ -30,7 +30,21 @@ uncompressed data rate of 1.33 Gigabits per second. It is usually
 compressed at a rate of 66:1, reducing the required streaming rate to
 20 Megabits per second~\cite{imagevidstandards, Page 3}.
 
-\SubSection{MPEG Encoding}
+\SubSection{MPEG Coding}
+
+\begin{figure}[t]
+\begin{center}
+\vspace{-12pt}
+% \framebox{
+% \includegraphics[scale=1, angle=0]{./mpeg-encoder.eps}
+%}
+% \vspace{-6pt}
+% \nocaptionrule
+ \caption{MPEG encoder.}
+ \label{fig:mpeg-encoder}
+%\vspace{-18pt}
+\end{center}
+\end{figure}
 
 An overview of the encoding process is illustrated in
 Figure~\ref{fig:mpeg-encoder}. The encoder operates on a sequence of
@@ -60,6 +74,20 @@ DCT is an 8x8 matrix of frequency coefficients. The upper left corner
 of the matrix represents low frequencies, whereas the lower right
 corner represents higher frequencies. The latter ar often small and
 can be neglected without sacrificing human visual perception.
+
+\begin{figure}[t]
+\begin{center}
+\vspace{-12pt}
+% \framebox{
+% \includegraphics[scale=1, angle=0]{./zigzag.eps}
+%}
+% \vspace{-6pt}
+% \nocaptionrule
+ \caption{Zig-Zag scan patterns.}
+ \label{fig:zigzag}
+%\vspace{-18pt}
+\end{center}
+\end{figure}
 
 The DCT coeffecients are quantized to reduce the number of bits needed
 to represent them. Following quantization, many coefficients are
@@ -100,6 +128,20 @@ chrominance data to be sampled at a lower rate. A common chroma format
 is 4:2:0 which represents a macroblock using four blocks for the
 luminance channel and one block for each of the two chrominance
 channels.
+
+\begin{figure}[t]
+\begin{center}
+\vspace{-12pt}
+% \framebox{
+% \includegraphics[scale=1, angle=0]{./mpeg-decoder.eps}
+%}
+% \vspace{-6pt}
+% \nocaptionrule
+ \caption{MPEG decoder.}
+ \label{fig:mpeg-decoder}
+%\vspace{-18pt}
+\end{center}
+\end{figure}
 
 The decoding process is illustrated in
 Figure~\ref{fig:mpeg-decoder}. It is conceptually the reverse of the
