@@ -30,107 +30,90 @@ uncompressed data rate of 1.33 Gigabits per second. It is usually
 compressed at a rate of 66:1, reducing the required streaming rate to
 20 Megabits per second~\cite{imagevidstandards, Page 3}.
 
-\SubSection{Encoding}
-Encoded pictures are made up of pixels. Each 8x8 array of pixels is
-known as a block. A 2x2 array of blocks is termed a
-macroblock. Compression is achieved using
-motion estimation, 2-dimensional discrete cosine transform (DCT) performed
-on 8x8 blocks of pixels, quantization of DCT coefficients, and Huffman
-and run/level coding. Pictures called I pictures are encoded without
-prediction. Pictures termed P pictures may be encoded with prediction
-from previous pictures. B pictures may be encoded using prediction
-from both previous and subsequent pictures. A simplified MPEG-2
-encoder is shown in Figure~\ref{fig:encoder-simple}.
+\SubSection{MPEG Encoding}
 
-The motion estimator calculates a
-motion vector which represents the horizontal and vertical
-displacement from the macroblock being encoded to the matching
-macroblock-sized area in the reference picture.
+An overview of the encoding process is illustrated in
+Figure~\ref{fig:mpeg-encoder}. The encoder operates on a sequence of
+pictures. Each pictures is made up of pixels arranged in a 8x8 array
+known as a block. A 2x2 array of blocks forms a macroblock. The
+compression in MPEG is achieved largely via motion estimation, which
+detects and eliminates similarties between macroblocks across
+pictures.  Specifically, the motion estimator calculates a motion
+vector to represent the horizontal and vertical displacement of a
+given macroblock (i.e., the one being encoded) to a matching
+macroblock-sized area in a reference picture, know as an intra-coded
+(I) picture. The matching block is removed (subtracted) from the
+current picture on a pixel by pixel basis. The result is a residual
+predictive-code (P) picture. It represents the difference between the
+current picture and the reference picture. In addition to forward
+motion prediction, it is possible to encode new pictures using motion
+estimation from both previous and subsequent pictures. Such pictures
+are bidirectionally predictive-coded (B) pictures, and they exploit a
+greater amount of temporal locality.
 
-The motion estimator then substract the matching block from the
-current picture, on a pixel by pixel basis, from
-the new macroblock entering the encoder. This forms a
-residual signal that represents the difference between the
-predicted macroblock and the actual macroblock being encoded. This
-residual is often very small.
+Each of the I, P, and B pictures then undergoes a 2-dimmensional
+discrete cosine transform (DCT) which separates the picture into parts
+with varying visual importance. The input to the DCT is an 8x8 matrix
+representing a pixel block. Each element in the matrix represents the
+intensity of the corresponding pixel in the picture. The output of the
+DCT is an 8x8 matrix of frequency coefficients. The upper left corner
+of the matrix represents low frequencies, whereas the lower right
+corner represents higher frequencies. The latter ar often small and
+can be neglected without sacrificing human visual perception.
 
-The residual is transformed from the spatial domain by a 2-dimensional
-DCT.  The two dimensional DCT consists of separable vertical and
-horizontal one-dimensional DCTs. The DCT coefficients of the residual
-are then quantized in a process that reduces the number of bits needed
-to represent each coefficient. Usually many coefficients are
-effectively quantized to 0.
+The DCT coeffecients are quantized to reduce the number of bits needed
+to represent them. Following quantization, many coefficients are
+effectively reduced to zero. The DCT matrix is then run-length
+encoded by emitting each non-zero coefficient, followed by the number
+of zeros that precede it, along with the number of bits needed to
+represent the coefficient, and its value. The run-length encoder
+scans the DCT matrix in a zig-zag order (Figure~\ref{fig:zigzag}) to
+consolidate the zeros in the matrix.
 
-The quantized DCT coefficients are Huffman run/level coded which
-further reduces the average number of bits per coefficient. This is
-combined with motion vector data and other side information (including
-an indication of I, P or B picture) and sent to the decoder.
+Finally, the output of the run-length encoder is Huffman coded to 
+further reduce the average number of bits per coefficient. This is
+combined with motion vector data and other information (e.g., 
+type of picture) and streamed to the output device.
 
-{\bf need to introduce zig-zag ordering since i use it in the language
-  section}
+\SubSection{MPEG Decoding}
 
-\SubSection{Decoding}
-
-The decoding process is conceptually the reverse of the encoding
-process. The input stream is is Huffman/run-level decoded. Motion vectors
-are parsed from the data stream and fed to the motion
-compensator. Quantized DCT coefficients are fed to the inverse
-quantizer and then to an IDCT circuit that transforms them back to the
-spatial domain. For P and B pictures, motion vector data is translated
-to a memory address  by the motion compensator to read a particular
-macroblock (predicted macroblock) out of a previously stored reference
-picture. The adder adds this prediction  to the residual to form
-reconstructed picture data. For I pictures, there are no motion
-vectors and no reference picture, so the prediction is forced to
-zero. For I and P pictures, the adder output it is fed back to be
-stored as a reference picture for future predictions.
-
-The highest level of organization within an MPEG-2 stream is a Group
-of Pictures (GOP) which contains all the information needed to
-reconstruct a video over some time span. A GOP contains three kinds of
-pictures: Pictures which are coded independently of other pictures and
-can be reconstructed without additional information are
-{\it Intra-coded (I) pictures}. {\it Predictive-coded (P) pictures} must
-be reconstructed using motion estimates from the immediately
-preceeding I or P picture. {\it Bidirectionally predictive-coded (B)
-  pictures} must be constructed using motion estimates from both the
-previous and subsequent I and P pictures. I pictures are intended to
-assist scene cuts, random access, fast forward, or fast reverse
-playback\cite{MPEG2, Page 14 6.1.1.7}, B pictures provide the best
-compression, and P pictures are a compromise between the two. A
-typical I:P:B frame ratio in a GOP is 1:3:8.~\footnote{A typical
-  picture sequence pattern is the indefinite repetition within a GOP
-  of the subpattern "I B B P B B P B B P B B".} Pictures are not
-ordered temporally within an MPEG-2 stream, but instead ordered such
-that if a decoder encounters a P picture, the P picture's motion
-prediction is with respect to the previously decoded I or P picture,
-and if the decoder encounters a B picture, the B picture's motion
+An MPEG-2 input stream is organized as a  Group of Pictures (GOP)
+which contains all the information needed to reconstruct a video. The
+GOP contains the three kinds of pictures produced by the encoder,
+namely I, P, and B pictures. I pictures are intended to assist scene
+cuts, random access, fast forward, or fast reverse
+playback~\cite{MPEG2, Page 14 6.1.1.7}. A typical I:P:B picture ratio
+in a GOP is 1:3:8, and a typical picture pattern is a
+repatition of the following sequence: I B B P B B P B B P B B. The
+input pictures are not ordered temporally within the stream. Rather,
+they are ordered such that if a decoder encounters a P picture, its
+motion prediction is with respect to the previously decoded I or P
+picture, and if the decoder encounters a B picture, its motion
 prediction is with respect the previously two decoded I or P pictures.
 
-Pictures break up into 16x16 pixel {\it macroblocks}, themselves
-composed of 8x8 pixel {\it blocks}. Macroblocks specify colors using a
-{\it luminance} channel to represent saturation (color intensity), and
-two {\it chrominance} channels to represent hue. MPEG-2 streams specify
-a "chroma format" which allows the chrominance data to be sampled at a
-lower rate - many applications use the "4:2:0 chroma format" which
-represents a macroblock using four blocks for the luminance channel
-and one block for each of the two chrominance channels. For P and B
-pictures, blocks may be encoded independently, as a set of vectors
-representing a motion estimate, or the combination of a set of motion
-estimate vectors and a block representing the error between the motion
-prediction and the desired reconstruction. Additionally, blocks in B
-pictures may be motion predicted from either the previous reference
-frame, the subsequent reference frame, or a linear combination of both
-predictions.
+As with the encoding process, pictures are divided up into 16x16 pixel
+macroblocks, themselves composed of 8x8 pixel blocks. Macroblocks
+specify colors using a {\it luminance} channel to represent saturation
+(color intensity), and two {\it chrominance} channels to represent
+hue. MPEG-2 streams specify a chroma format which allows the
+chrominance data to be sampled at a lower rate. A common chroma format
+is 4:2:0 which represents a macroblock using four blocks for the
+luminance channel and one block for each of the two chrominance
+channels.
 
-For blocks that are independently coded or incorporate an error block,
-each block is stored in the frequency domain using a Discrete Cosine
-Transform (DCT). Before the frequency coefficients are stored, they
-are quantized by dividing the block's coefficients by a quantization
-matrix and throwing away the non-integer remainder. The values in the
-matrix are based on the human ability to perceive different horizontal
-and vertical frequencies.
+The decoding process is illustrated in
+Figure~\ref{fig:mpeg-decoder}. It is conceptually the reverse of the
+encoding process. The input stream is Huffman and run-length decoded,
+resulting in quantized DCT matrices. The DCT coefficients are scaled
+in magnitude and an inverse DCT (IDCT) maps the frequency matrices to
+the spatial domain.
 
-All of the data in the various MPEG stream structures is entropy
-encoded using Huffman tables to minimize stream size.
-
+Finally, the motion vectors parsed from the data stream are passed to
+a motion compensator, which reconstructs the orginal pictures. In the
+case of I pictures, the compensator need not make any changes since
+these pictures were not subject to motion estimation. In the case of P
+and B pictures however, motion vectors are used to find the
+corresponding region in the current reference pictures. The
+compensator then adds the relevant reference macroblocks to the
+current picture to reconstruct it. These pictures are then emitted to
+an output device.
