@@ -5,12 +5,12 @@ We implemented an MPEG-2 decoder in StreamIt. It is a fully portable
 implementation in that the application is not architecture
 dependent. The implementation was carried out by one student
 programmer with no prior understanding of MPEG. The development
-spanned eight weeks from specification~\cite{MPEG2} to the first
-fully functional MPEG decoder. The StreamIt code is nearly 4,921 lines
-of code with 48 static streams. The MPEG stream parser is the largest
-single filter, consisting of 1,924 lines of code.  The compiler
-compiles the 48 static streams in the decoder into 2,150 filters for a
-picture resolution of 352x240. In contrast, the reference C
+spanned eight weeks from specification~\cite{MPEG2} to the first fully
+functional MPEG decoder. The StreamIt code is nearly 4,921 lines of
+code with 48 static streams. The MPEG stream parser is the largest
+single filter, consisting of 1,924 lines of code.  The 48 static
+streams are compiled to 2,150 filters for a picture resolution of
+352x240. In contrast, the reference C
 implementation~\cite{reference-mpeg-c} is nearly 9,832 lines of code,
 although it provides several features such as interlacing and
 multi-layer streams that are not yet implemented in the StreamIt
@@ -23,18 +23,17 @@ streams are encoded using a 4:2:0 sampling rate, which achieve a 50\%
 reduction in the number of bits required to represent a video, with
 little noticeable loss of color. However, better quality is possible
 with higher sampling rates since more color information is retained
-from the original picture. In this paper, we'll describe how our
+from the original picture. In this paper, we describe how our
 decoder implementation, originally designed to deal with 4:2:0
 sampling rate is modified for a 4:2:2 sampling rate.
 
 In the second example, we describe a straight forward language-level
 transformation that exposes the data-parellism across macroblocks in a
-picture. This is done in the context of the motion compensator. We
-initially decribe the simplest implementation of the motion
-compensator, which is a coarse grained filter operating at the
-granularity of pictures. Then, we illustrate a more parallel
-implementation that operates at finer granularity (i.e., macroblocks),
-and show that the migration path is trivial.
+picture. This is done in the context of the decoder pipeline which
+consits of the inverse quantization, inverse DCT, and motion
+compensator. We decribe parallelism can be exposed at various levels
+in the decoding process, from macroblock to block granularities. We
+show that the migration path is trivial.
 
 \input{chroma}
 
@@ -52,8 +51,7 @@ previously decoded, stored reference picture. This reference
 macroblock is added to the current macroblock to recover the original
 picture data. If the current macroblock is part of an I or P picture,
 then the decoder stores it for future reference.
-Figure~\ref{fig:dec_block} shows the block diagram of the decode
-sequence.
+Figure~\ref{fig:dec_block} illustrates the decode sequence.
 
 \begin{figure}[htbp]
 \centerline{\epsfig{file=dec_block.eps,width=5in}}
@@ -94,6 +92,27 @@ parallelism. A StreamIt pipeline that operates at macroblock
 granularity is shown in Figure~\ref{fig:decoder-macroblock}. It is
 worthy to note that there is a high correlation between the stream
 graph, and the StreamIt syntax describing the pipeline.
+
+The implementation can be made more fine grained by exposing the
+intra-macroblock parallelism. For example, the IQ-IDCT pipeline can
+operate at a block level, rather than at a macroblock
+granularity. This is easily achieved by encapsulating the IQ-DCT pipeline
+within a splitjoin to scatter the blocks, operate, and gather the
+results to recover the parent macroblock.
+
+There are many implementation strategies for the decoder, each with
+varying degrees of exposed parallelism. Of the greatest advantage of
+the StreamIt implemenation is its malleability. The stream graph is
+easily reconfigured to operate at picture-level granularity (exposing
+parallelism between chroma channels), macroblock level (exposing even
+more data-level parallelism), or even at block level (exposing the
+greatest amount of data-level parallelism). The modularity of the
+language also affords the ability to cleanly define stream interfaces,
+and reuse existing components. As an example, the zig-zag descrambler,
+inverse quantizer, and inverse DCT components were all reused for our
+JPEG codec implementation. The modularity also reduces the complexity
+of the debugging process, as stream components can be functionally
+verified independently, leading to greater programmer productivity.
 
 %% TODO: add figure showing decoder pipeline at macroblock granularity
 %% and streamit text ala Bill's beamformer/fmradio examples
