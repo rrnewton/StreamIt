@@ -1,7 +1,7 @@
 Image and video codecs are prevalent in multimedia applications,
 ranging from embedded systems, to desktop computers, to high-end
-servers such as HDTV editing consoles. It is not uncommon however
-that developers create (from scratch) and customize their codec
+servers such as HDTV editing consoles. It is not uncommon however that
+developers create (from scratch) and customize their codec
 implementations for each of the architecture targets they intend their
 coders and decoders to run on. This practice is time consuming and
 error prone, leading to code that is not malleable or portable.  In
@@ -9,15 +9,14 @@ this paper we describe an implementation of the MPEG-2 codec using the
 StreamIt programming language. StreamIt is an architecture-independent
 stream language that aims to improve programmer productivity, while
 concomitantly exposing the inherent parallelism and communication
-topology of the application.  We describe why MPEG is a good match for
+topology of the application. We describe why MPEG is a good match for
 the streaming programming model, and illustrate the malleability of
-the implementation in terms of quickly varying the degree of
-parallelism that a developer can readily expose. StreamIt allows for
-modular application development, which also reduces the complexity of
-the debugging process since stream components can be verified
-independently. This in turn leads to greater programmer productivity.
-We implement a fully functional MPEG-2 decoder in StreamIt. The
-decoder was developed in eight weeks by a single student programmer
-who did not have any prior experience with MPEG or video codecs in
-general. Many of the MPEG-2 components were subsequently reused to
-assemble a JPEG codec.
+the implementation in terms of easily modifying the decoder to support
+alternate chrominance formats. StreamIt allows for modular application
+development, which also reduces the complexity of the debugging
+process since stream components can be verified independently. This in
+turn leads to greater programmer productivity.  We implement a fully
+functional MPEG-2 decoder in StreamIt. The decoder was developed in
+eight weeks by a single student programmer who did not have any prior
+experience with MPEG or video codecs in general. Many of the MPEG-2
+components were subsequently reused to assemble a JPEG codec.
