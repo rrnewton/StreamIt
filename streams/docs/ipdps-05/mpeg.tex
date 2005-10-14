@@ -24,7 +24,7 @@ for its later reconstruction. Similarities between adjacent video
 pictures are encoded using motion prediction, and all data is Huffman
 compressed\cite{Huffman52}. The amount of lossy and lossless
 compression depends on the video data. Common compression ratios range
-from 10:1 to 100:1. For example, HDTV with a resolution of 1280x720
+from 10:1 to 100:1. For example, HDTV, with a resolution of 1280x720
 pixels and a streaming rate of 59.94 frames per second, has an
 uncompressed data rate of 1.33 Gigabits per second. It is compressed at 
 an average rate of 66:1, reducing the required streaming rate to
@@ -32,39 +32,42 @@ an average rate of 66:1, reducing the required streaming rate to
 
 \SubSection{MPEG Coding}
 
-\begin{figure}[t]
-\begin{center}
-\vspace{-12pt}
-% \framebox{
-% \includegraphics[scale=1, angle=0]{./mpeg-encoder.eps}
-%}
-% \vspace{-6pt}
-% \nocaptionrule
- \caption{MPEG encoder.}
- \label{fig:mpeg-encoder}
-%\vspace{-18pt}
-\end{center}
-\end{figure}
+%% \begin{figure}[t]
+%% \begin{center}
+%% \vspace{-12pt}
+%% % \framebox{
+%% % \includegraphics[scale=1, angle=0]{./mpeg-encoder.eps}
+%% %}
+%% % \vspace{-6pt}
+%% % \nocaptionrule
+%%  \caption{MPEG encoder.}
+%%  \label{fig:mpeg-encoder}
+%% %\vspace{-18pt}
+%% \end{center}
+%% \end{figure}
 
-An overview of the encoding process is illustrated in
-Figure~\ref{fig:mpeg-encoder}. The encoder operates on a sequence of
-pictures. Each picture is made up of pixels arranged in a 16x16 array
-known as a macroblock.  Macroblocks consist of a 2x2 array of blocks
-(each of which contains an 8x8 array of pixels).  There is a separate
-series of macroblocks for each color channel, and the macroblocks for
-a given channel are sometimes downsampled to a 2x1 or 1x1 block
-matrix.  The compression in MPEG is achieved largely via motion
-estimation, which detects and eliminates similarities between
-macroblocks across pictures. Specifically, the motion estimator
-calculates a motion vector to represent the horizontal and vertical
-displacement of a given macroblock (i.e., the one being encoded) to a
-matching macroblock-sized area in a reference picture.  The matching
-macroblock is removed (subtracted) from the current picture on a pixel
-by pixel basis. The result is a residual predictive-code (P)
-picture. It represents the difference between the current picture and
-the reference picture. Reference pictures encoded without the use of
-motion prediction are intra-coded (I) pictures. In addition to forward
-motion prediction, it is possible to encode new pictures using motion
+%% An overview of the encoding process is illustrated in
+%% Figure~\ref{fig:mpeg-encoder}. 
+The encoder operates on a sequence of pictures. Each picture is made
+up of pixels arranged in a 16x16 array known as a macroblock.
+Macroblocks consist of a 2x2 array of blocks (each of which contains
+an 8x8 array of pixels).  There is a separate series of macroblocks
+for each color channel, and the macroblocks for a given channel are
+sometimes downsampled to a 2x1 or 1x1 block matrix.  The compression
+in MPEG is achieved largely via motion estimation, which detects and
+eliminates similarities between macroblocks across
+pictures. Specifically, the motion estimator calculates a motion
+vector to represent the horizontal and vertical displacement of a
+given macroblock (i.e., the one being encoded) to a matching
+macroblock-sized area in a reference picture.  The matching macroblock
+is removed (subtracted) from the current picture on a pixel by pixel
+basis, and an motion vector is associated with the macroblock
+describing its displacement relative to the reference picture. The
+result is a residual predictive-code (P) picture. It represents the
+difference between the current picture and the reference
+picture. Reference pictures encoded without the use of motion
+prediction are intra-coded (I) pictures. In addition to forward motion
+prediction, it is possible to encode new pictures using motion
 estimation from both previous and subsequent pictures. Such pictures
 are bidirectionally predictive-coded (B) pictures, and they exploit a
 greater amount of temporal locality.
@@ -151,17 +154,17 @@ channels.
 \end{center}
 \end{figure}
 
-The decoding process is illustrated in
-Figure~\ref{fig:mpeg-decoder}. It is conceptually the reverse of the
-encoding process. The input stream is Huffman and run-length decoded,
-resulting in quantized DCT matrices. The DCT coefficients are scaled
-in magnitude and an inverse DCT (IDCT) maps the frequency matrices to
-the spatial domain.
+%% is illustrated in Figure~\ref{fig:mpeg-decoder}. It 
+The decoding process is conceptually the reverse of the encoding
+process. The input stream is Huffman and run-length decoded, resulting
+in quantized DCT matrices. The DCT coefficients are scaled in
+magnitude and an inverse DCT (IDCT) maps the frequency matrices to the
+spatial domain.
 
 Finally, the motion vectors parsed from the data stream are passed to
 a motion compensator, which reconstructs the orginal pictures. In the
 case of I pictures, the compensator need not make any changes since
-these pictures were not subject to motion estimation~\footnote{I 
+these pictures were not subject to motion estimation\footnote{I 
 pictures are allowed to contain concealment motion vectors which aid in
 macroblock reconstruction should a bitstream error destroy the 
 frequency coefficient data. We ignore this special case.}. In the case of P
