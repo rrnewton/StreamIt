@@ -179,33 +179,32 @@ channels but only one output channel. The joiner gathers data from its
 predecessors in a roundrobin manner (declared as part of the syntax)
 to produce a single output stream.
 \begin{figure*}[t]
-\center{
   \begin{scriptsize}
     \begin{verbatim}
-	// N = macroblock size + motion vector data size;
-	// W = picture width (in pixels);
-	// H = picture width (in pixels);
+                           // N = macroblock size + motion vector data size;
+                           // W = picture width (in pixels);
+                           // H = picture width (in pixels);
 
-	int->int splitjoin YCrCbDecoding(int N, int W, int H)
-	{
-	  // 4:2:0 chroma format
-	  split roundrobin(4*N, 1*N, 1*N);
+                           int->int splitjoin YCrCbDecoding(int N, int W, int H)
+                           {
+                             // 4:2:0 chroma format
+                             split roundrobin(4*N, 1*N, 1*N);
 
-	  // last two parameters indicate
-	  // necessary upsampling in x-y directions
-	  add LuminanceChannel  (W, H, 0, 0);
-	  add ChrominanceChannel(W, H, 2, 2);
-	  add ChrominanceChannel(W, H, 2, 2);
+                             // last two parameters indicate
+                             // necessary upsampling in x-y directions
+                             add LuminanceChannel  (W, H, 0, 0);
+                             add ChrominanceChannel(W, H, 2, 2);
+                             add ChrominanceChannel(W, H, 2, 2);
 
-	  join roundrobin(1, 1, 1);
-	}
+                             join roundrobin(1, 1, 1);
+                           }              
     \end{verbatim}
     % TODO: validate 4*N, N, N parameters to above streams
   \end{scriptsize}
   %\vspace{150pt}
+  \vspace{-12pt}
   \caption{Example MPEG decoder splitjoin.}
   \label{fig:decoder-sj}
-   }
 \end{figure*}
 
 \begin{figure*}[t]
