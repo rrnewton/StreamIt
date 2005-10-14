@@ -189,9 +189,10 @@ single output stream.
 	  // 4:2:0 chroma format
 	  split roundrobin(4*N, 1*N, 1*N);
 
-	  add LuminanceChannel  (W, H, 4*N);
-	  add ChrominanceChannel(W, H, N);
-	  add ChrominanceChannel(W, H, N);
+	  // last two parameters indicate necessary upsampling in x-y directions
+	  add LuminanceChannel  (W, H, 0, 0);
+	  add ChrominanceChannel(W, H, 2, 2);
+	  add ChrominanceChannel(W, H, 2, 2);
 
 	  join roundrobin(1, 1, 1);  
 	}
