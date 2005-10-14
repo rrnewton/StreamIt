@@ -28,10 +28,10 @@ decoder implementation, originally designed to deal with 4:2:0
 sampling rate is modified for a 4:2:2 sampling rate.
 
 In the second example, we describe a straight forward language-level
-transformation that exposes the data-parellism across macroblocks in a
+transformation that exposes the data-parallelism across macroblocks in a
 picture. This is done in the context of the decoder pipeline which
-consits of the inverse quantization, inverse DCT, and motion
-compensator. We decribe parallelism can be exposed at various levels
+consists of the inverse quantization, inverse DCT, and motion
+compensator. We describe parallelism can be exposed at various levels
 in the decoding process, from macroblock to block granularities. We
 show that the migration path is trivial.
 
@@ -87,7 +87,7 @@ is required to send the reference data to the requesting stream. This
 situation is not uncommon, and is more prevalent for higher resolution
 pictures. A simple scheme for handling this situation is for every
 stream to broadcast its decoded macroblocks to all other streams. This
-solution has the benefit of being conceptualy easy to understand and
+solution has the benefit of being conceptually easy to understand and
 implement. StreamIt allows programmers to naturally expose such
 parallelism. A StreamIt pipeline that operates at macroblock
 granularity is shown in Figure~\ref{decoder_macroblock_parallelism}. It is
@@ -103,7 +103,7 @@ results to recover the parent macroblock.
 
 There are many implementation strategies for the decoder, each with
 varying degrees of exposed parallelism. Of the greatest advantage of
-the StreamIt implemenation is its malleability. The stream graph is
+the StreamIt implementation is its malleability. The stream graph is
 easily reconfigured to operate at picture-level granularity (exposing
 parallelism between chroma channels), macroblock level (exposing even
 more data-level parallelism), or even at block level (exposing the
