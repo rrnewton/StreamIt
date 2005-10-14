@@ -1,13 +1,13 @@
 \Section{Introduction}
 
 Image compression, whether for still pictures or motion pictures
-(e.g., video), plays an important role in internet and multimedia
+(e.g., video), plays an important role in Internet and multimedia
 applications, digital appliances such as HDTV, and handheld devices
 such as digital cameras and mobile phones. Compression allows one to
 represent images and video with a much smaller amount of data and
 negligible quality loss. The reduction in data decreases storage
 requirements (important for embedded devices) and provides higher
-effective transmission rates (important for internet enabled devices).
+effective transmission rates (important for Internet enabled devices).
 
 Unfortunately, implementing a compression scheme can be especially
 difficult. For performance reasons, implementations are typically not
@@ -20,19 +20,22 @@ easy to modify and update.
 
 A typical compression algorithm involves three types of operations:
 data representation, lossy compression, and lossless
-compression. These operations are semi-autonomous, data-parallel, and
-easily fit into a sequence of distinct processing steps. As such,
-image and video compression is a good match for the streaming model of
-computation, which affords certain advantages in terms of
-programmability, robustness, and achieving high performance. Our goal
-is to implement well-known still image and motion picture compression
-standards---such as JPEG and MPEG-2---in StreamIt~\cite{streamit}, a high-level
-architecture-independent language for the streaming domain. This will
-result in clean, malleable, and portable codes. In addition, using the
-stream-aware StreamIt compiler, we will produce highly optimized codes
-that are competitive with hand-tuned implementations. Our architecture
-targets include conventional processors, as well as new and emerging
-wire exposed~\cite{raw} and multi-core architectures.
+compression. These operations are semi-autonomous, exhibit data and
+pipeline parallelism, and easily fit into a sequence of distinct
+processing kernels. As such, image and video compression is a good
+match for the streaming model of computation, which affords certain
+advantages in terms of programmability, robustness, and achieving high
+performance. Our goal is to implement well-known still image and
+motion picture compression standards---such as JPEG and MPEG-2---in
+StreamIt~\cite{streamit}, a high-level architecture-independent
+language for the streaming domain. This will result in clean,
+malleable, and portable codes.
+% TODO: emphasize benefits over C
+In addition, using the stream-aware StreamIt compiler, we will produce
+highly optimized codes that are competitive with hand-tuned
+implementations. Our architecture targets include conventional
+processors, as well as new and emerging wire exposed~\cite{raw} and
+multi-core architectures.
 
 This work is in the context of the StreamIt programming language[1],
 an architecture-independent stream language that aims to improve
@@ -62,8 +65,6 @@ independent. In StreamIt, this type of parallelism is trivial (and
 natural) to express. In addition, when compressing several still
 images at a time, or during motion picture compression (which is
 substantially more involved), the task level parallelism between the
-various parts of the coders naturally follows from the organization of
-the application. Thus there exists a lot of flexibility in compiling
-the coders to yield high-performance implementations.
-
-
+various stages follows from the organization of the application. Thus
+there exists a lot of flexibility in compiling the application to
+yield high-performance implementations.
