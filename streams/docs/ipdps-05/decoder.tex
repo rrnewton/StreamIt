@@ -76,7 +76,7 @@ strategy, the streams can execute independently with one exception.
 %\epsfig{file=decoder_macroblock_parallelism.eps, width=3in}
 \epsfig{file=decoder-parallel.eps, width=\textwidth}
 % TODO: Change Matt's 2 am caption.
-\caption{An MPEG-2 Decoder exploiting macroblock parallelism}
+\caption{An MPEG-2 Decoder exploiting macroblock parallelism.}
 \label{decoder_macroblock_parallelism}
 \end{figure*}
 
@@ -90,7 +90,7 @@ stream to broadcast its decoded macroblocks to all other streams. This
 solution has the benefit of being conceptualy easy to understand and
 implement. StreamIt allows programmers to naturally expose such
 parallelism. A StreamIt pipeline that operates at macroblock
-granularity is shown in Figure~\ref{fig:decoder-macroblock}. It is
+granularity is shown in Figure~\ref{decoder_macroblock_parallelism}. It is
 worthy to note that there is a high correlation between the stream
 graph, and the StreamIt syntax describing the pipeline.
 
