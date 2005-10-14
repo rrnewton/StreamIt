@@ -65,12 +65,21 @@ A simple strategy for parallelizing the MPEG-2 decoding can exploit
 the data parallelism among macroblocks. Using this scheme, the Huffman
 and run-length decoding is inherently serial, as macroblock boundaries
 can only be discovered by performing the decode operation.  Once this
-decode is complete, a parallel implemenation can distribute
-macroblocks tp independent streams (using a splitjoin). Each stream
+decode is complete, a parallel implementation can distribute
+macroblocks to independent streams (using a splitjoin). Each stream
 performs the inverse quantization, inverse discrete cosine transform,
 and motion compensation. Furthermore, each stream locally stores
 reference macroblocks for future motion compensation. Using this
 strategy, the streams can execute independently with one exception.
+
+% TODO: This is the figure showing the macroblock parallelism
+% I'm not sure where it goes. - Matt
+\begin{figure}
+\epsfig{file=decoder_macroblock_parallelism.eps, width=3in}
+% TODO: Change Matt's 2 am caption.
+\caption{An MPEG-2 Decoder exploiting macroblock parallelism}
+\label{decoder_macroblock_parallelism}
+\end{figure}
 
 This exception occurs when a stream is performing motion compensation
 and the corresponding motion vector indicates a reference macroblock
