@@ -31,7 +31,9 @@ streaming programs.
 	\end{scriptsize}
     }
     % \vspace{-3pt}
+    \vspace{-28pt}
     \caption{Example filter implementing zig-zag descrambling.}
+    \vspace{-6pt}
     \label{fig:zigzag-filter}
   \end{minipage}
   ~~\vrule~~
@@ -49,14 +51,13 @@ streaming programs.
 	       20, 22, 33, 38, 46, 51, 55, 60,
 	       21, 34, 37, 47, 50, 56, 59, 61,
 	       35, 36, 48, 49, 57, 58, 62, 63};
-
-
-
 	  \end{verbatim}
 	\end{scriptsize}
     }
     % \vspace{-3pt}
+    \vspace{-12pt}
     \caption{Example zig-zag descrambling order for filter.}
+    \vspace{-6pt}
     \label{fig:zigzag-order}
   \end{minipage}
 \end{figure*}
@@ -111,18 +112,19 @@ with a series of pops.
   \begin{minipage}[t]{2.8in}
     {
   \vspace{-100pt}
+  \vspace{20pt}
   \begin{scriptsize}
     \begin{verbatim}
-	int->int pipeline Decode()
-	{
-	  int Order[64] = {...};
-	  add ZigZagDescramble(64, Order);
-	  add IQ();
-	  add IDCT(8, 8);
-	}
+     int->int pipeline Decode()
+     {
+       int Order[64] = {...};
+       add ZigZagDescramble(64, Order);
+       add IQ();
+       add IDCT(8, 8);
+     }
     \end{verbatim}
   \end{scriptsize}
-  \vspace{12pt}
+  \vspace{-8pt}
   \caption{Example MPEG decoder pipeline.}
   \label{fig:decoder-pipeline}
     }
