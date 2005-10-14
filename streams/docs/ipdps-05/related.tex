@@ -1,1 +1,140 @@
 \Section{Related Work}
+
+% TODO:
+% - fill in first few references
+% - improve citations of multicore architectures
+% - sanitize references (fields ok, consistent abbrev, capitalization)
+
+Video codecs such as MPEG-2 have been a longtime focus of the embedded
+and high-performance computing communities.  We consider related work
+in modeling environments, stream languages and parallel computing.
+
+There have been many efforts to develop expressive and efficient
+models of computation for use in rapid prototyping environments such
+as Ptolemy~\cite{ptolemy03overview}, GRAPE-II~\cite{grape-ii}, and
+COSSAP~\cite{cossap}.  The Synchronous Dataflow model (SDF) represents
+computation as an independent set of actors that communicate at fixed
+rates~\cite{lee87static}.  StreamIt leverages the SDF model of
+computation, though also supports dynamic communication rates and
+out-of-band control messages.  There are other extensions to SDF that
+provide similar dynamic constructs.  Synchronous Piggybacked Dataflow
+(SPDF) supports control messages in the form of a global state table
+with well-timed reads and writes~\cite{park99spdf2,park02spdf3}.  SPDF
+is evaluated using MP3 decoding, and would also be effective for
+MPEG-2 decoding.  However, control messages in StreamIt are more
+expressive than SPDF, as they allow messages to travel upstream
+(opposite the direction of dataflow), with adjustable latency, and
+with more fine-grained delivery (i.e., allowing multiple execution
+phases per actor and multiple messages per phase).  Moreover, our
+focus is on providing a high-level programming abstraction rather than
+an underlying model of computation.
+
+Ko and Bhattacharyya also extend SDF with the dynamism needed for
+MPEG-2 encoding; they use ``blocked dataflow'' to reconfigure
+sub-graphs based on parameters embedded in the data
+stream~\cite{bhatta05block} and a ``dynamic graph topology'' to extend
+compile-time scheduling optimizations to each runtime
+possibility~\cite{ko05dgt}. Neuendorffer and Lee also extend SDF to
+support hierarchical parameter reconfiguration, subject to semantic
+constraints~\cite{neuendorffer04hierarchical}.  Unlike our description
+of control messages, these models allow reconfiguration of filter I/O
+rates and thus require alternate or parameterized schedules.  MPEG-2
+encoding has also been expressed in formalisms such as Petri
+nets~\cite{valero02petri} and process algebras~\cite{pelayo01rosa}.
+
+There are a number of stream-oriented languages besides StreamIt,
+drawing from functional, dataflow, CSP and synchronous programming
+styles~\cite{survey97}.  Synchronous languages which target embedded
+applications include Esterel~\cite{Esterel}, Lustre~\cite{Lustre},
+Signal~\cite{Signal}, Lucid~\cite{Lucid77}, and Lucid
+Synchrone~\cite{Lucid-Synchrone}.  Additional languages of recent
+interest are Cg~\cite{cg03}, Brook~\cite{brook04},
+Spidle~\cite{spidle03}, StreamC/KernelC \cite{imagine03ieee},
+Occam\cite{Occam}, Parallel Haskell~\cite{ph} and Sisal \cite{sisal}.
+The primary differences between StreamIt and these languages are $(i)$
+StreamIt supports (but is no longer limited to) the Synchronous
+Dataflow~\cite{lee87static} model of computation, $(ii)$ StreamIt
+offers a ``peek'' construct that inspects an item without consuming it
+from the channel, $(iii)$ the single-input, single-output hierarchical
+structure that StreamIt imposes on the stream graph, and $(iv)$ the
+teleport messaging feature for out-of-band communication.
+
+Many researchers have developed both hardware and software schemes for
+parallel video compression; see Ahmad et al.~\cite{ahmad01compression}
+and Shen et al.~\cite{shen94overview} for reviews.  We focus on
+programming models used to implement MPEG on general-purpose hardware.
+Assay et al. present a syntax of parallel tasks, forall loops, and
+dependence annotations for exposing fine-grained parallelism in an
+MPEG-4 encoder~\cite{assayad05mpeg4b}.  A series of loop
+transformations (currently done by hand) lowers the representation to
+an MPI program for an SMP target.  The system allows parallel
+components to communicate some values through shared memory, with
+execution constraints specified by the programmer.  In comparison,
+StreamIt adopts a pure dataflow model with a focus on making the
+programming model as simple as possible.  Another programming model is
+the Y-Chart Applications Programmers Interface
+(YAPI)~\cite{kock00yapi}, which is a C++ runtime library extending
+Kahn process networks with flexible channel selection.  Researchers
+have used YAPI to leverage programmer-extracted parallelism in
+JPEG~\cite{kock02jpeg} and MPEG-2~\cite{dwivedi01exploring}.  Other
+high-performance programming models for MPEG-2 include manual
+conversion of C/C++ to SystemC~\cite{pazos04soc}, manual conversion to
+POSIX threads~\cite{li05alpbench}, and custom mappings to
+multiprocessors~\cite{iwata98coarse, ahmad01multiproc}.  Our focus
+again lies on the programmability: StreamIt provides an
+architecture-independent representation that is natural for the
+programmer while exposing pipeline and data parallelism to the
+compiler.
+
+% Not bothering to cite, though relevant:
+%
+% - \cite{li05thesis}
+%
+% - \cite{assayad05mpeg4a}
+%   4b is better
+%
+% - \cite{schneider99spec} 
+%   more of an architectural synthsis paper
+% 
+% - Extracting fine- and coarse-grained from C
+%   MPEG just a benchmark \cite{karkowski98parallelism}
+%
+% - older publications from Ahmad:
+%   http://ranger.uta.edu/~iahmad/pub4.html
+%
+% - Investigation of Thread-Level Parallelism in
+%   the Architectural Complexity Reduction of
+%   MPEG2, XviD and H.264 Video Encoders
+%   http://www.lboro.ac.uk/departments/el/research/conferences/esc2005/Tom_Jacobs.pdf
+%
+% - more on SPDF:
+%  - implemented in RTL:
+%    http://iris.snu.ac.kr/publications/data/64/ISSS2000park_c.pdf
+%  - for 3-D graphics pipeline:
+%    http://iris.snu.ac.kr/publications/data/68/aspdac_01.pdf
+% 
+% @Article{,
+%   author =   {},
+%   title =   "{}",
+%   journal = "{}",
+%   volume =   {},
+%   number =   {},
+%   year =     {},
+%   mynotes = {
+% -------------------------------------------------------------------------------------------
+% TODO
+% -------------------------------------------------------------------------------------------
+% }
+% }
+%
+% @InProceedings{,
+%  author =     {},
+%   title =     "{}",
+%   booktitle = "{}",
+%   year =       {},
+%   mynotes = {
+% -------------------------------------------------------------------------------------------
+% TODO
+% -------------------------------------------------------------------------------------------
+% }
+% }                                                                                           
