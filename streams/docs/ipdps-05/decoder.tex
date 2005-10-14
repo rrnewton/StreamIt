@@ -72,12 +72,13 @@ strategy, the streams can execute independently with one exception.
 
 % TODO: This is the figure showing the macroblock parallelism
 % I'm not sure where it goes. - Matt
-\begin{figure}
-\epsfig{file=decoder_macroblock_parallelism.eps, width=3in}
+\begin{figure*}[t]
+%\epsfig{file=decoder_macroblock_parallelism.eps, width=3in}
+\epsfig{file=decoder-parallel.eps, width=\textwidth}
 % TODO: Change Matt's 2 am caption.
 \caption{An MPEG-2 Decoder exploiting macroblock parallelism}
 \label{decoder_macroblock_parallelism}
-\end{figure}
+\end{figure*}
 
 This exception occurs when a stream is performing motion compensation
 and the corresponding motion vector indicates a reference macroblock
