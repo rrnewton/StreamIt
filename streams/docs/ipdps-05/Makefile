@@ -21,7 +21,7 @@ main.pdf.ps: clean main.dvi
 
 main.dvi: $(FILES)
 	latex main
-#	bibtex main
+	bibtex main
 	latex main
 	latex main
 
