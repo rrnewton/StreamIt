@@ -28,7 +28,7 @@ from 10:1 to 100:1. For example, HDTV with a resolution of 1280x720
 pixels and a streaming rate of 59.94 frames per second, has an
 uncompressed data rate of 1.33 Gigabits per second. It is compressed at 
 an average rate of 66:1, reducing the required streaming rate to
-20 Megabits per second~\cite{imagevidstandards, Page 3}.
+20 Megabits per second~\cite[p. 3]{imagevidstandards}.
 
 \SubSection{MPEG Coding}
 
@@ -113,10 +113,10 @@ An MPEG-2 input stream is organized as a Group of Pictures (GOP) which
 contains all the information needed to reconstruct a video. The GOP
 contains the three kinds of pictures produced by the encoder, namely
 I, P, and B pictures. I pictures are intended to assist scene cuts,
-random access, fast forward, or fast reverse playback~\cite{MPEG2,
-Page 14 6.1.1.7}. A typical I:P:B picture ratio in a GOP is 1:3:8, and
-a typical picture pattern is a repetition of the following logical
-sequence:
+random access, fast forward, or fast reverse
+playback~\cite[p. 14]{MPEG2}. A typical I:P:B picture ratio in a GOP
+is 1:3:8, and a typical picture pattern is a repetition of the
+following logical sequence:
 I$_1$~B$_2$~B$_3$~P$_4$~B$_5$~B$_6$~P$_7$~B$_8$~B$_9$~P$_{10}$~B$_{11}$~B$_{12}$
 where the subscripts denote positions in the original video.  However,
 to simplify the decoder, the encoder reorders the pictures to produce
