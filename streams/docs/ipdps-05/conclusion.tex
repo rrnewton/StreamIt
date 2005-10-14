@@ -1,1 +1,28 @@
-\Section{Conclusions}
+\Section{Concluding Remarks}
+
+In this paper we described our MPEG-2 codec implementation as it was
+developed using the StreamIt programming language. Our MPEG-2 decoder
+was developed in eight week by a single student programmer with no
+prior MPEG knowledge. We showed how the implementation is malleable by
+describing how the decoder is modified to support two different chroma
+sampling rates. In addition, we showed that the StreamIt language is a
+good match for representing the MPEG stream flow in that there is
+great correlation between a block level diagram describing the flow of
+data between computation elements and the application
+syntax. Furthermore, we illustrated that teleport messaging, which
+allows for out-of-band communication of stream parameters, allows the
+decoder to decouple the regular flow of data from the irregular
+communication of decoding parameters (e.g., quantization
+coefficients). This in turns leads to a cleaner implementation that is
+easier to maintain and evolve with changing software specification.
+In addition, we have prototypes an MPEG-2 encoder, and our current
+focus is geared toward augmenting the implementation using various
+motion estimation techniques.
+
+As computer architectures change from the traditional monolithic
+processors, to scalable wire-exposed and multi-core processors, there
+will be a greater need for portable codec implementations that boost
+programmer productivity---while also exposing parallelism and
+communication to enable efficient and high performance executions.
+StreamIt makes a great stride toward this end by providing a language
+that features hierarchical, modular, malleable, and portable streams.
