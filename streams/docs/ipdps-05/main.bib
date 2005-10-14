@@ -21,6 +21,33 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+@Article{grape-ii,
+author = {Rudy Lauwereins and Marc Engels and Marleen Ad\'e and J.A. Peperstraete},
+title = "{Grape-II: A System-Level Prototyping Environment for DSP Applications}",
+journal = "{IEEE Computer}",
+volume = 28,
+number = 2,
+year = 1995
+}
+
+@article{lee87static,
+  author = "E. Lee and D. Messershmitt",
+  title = "{Static Scheduling of Synchronous Data Flow Programs for Digital Signal Processing}",
+    journal = "IEEE Trans. on Computers",
+    volume = "C-36",
+    number = "1",
+    month = "January",
+    pages = "24-35",
+    year = "1987"
+}
+
+@InProceedings{cossap,
+  author = 	 {J. Kunkel},
+  title = 	 "{COSSAP: A stream driven simulator}",
+  booktitle =    "{Proceedings of the International Workshop on Microelectronics in Communications}",
+  year = 	 {1991}
+}
+
 % Not sure if this is exactly the correct citation for an ISO/IEC document - Matt
 @misc{MPEG2,
   key = "ISO",
@@ -229,17 +256,6 @@ title="{Semantics of pH: A parallel dialect of Haskell}",
 booktitle="Haskell Workshop",
 year="1995"}
 
-@article{lee87static,
-  author = "E. Lee and D. Messershmitt",
-  title = "{Static Scheduling of Synchronous Data Flow Programs for Digital Signal Processing}",
-    journal = "IEEE Trans. on Computers",
-    volume = "C-36",
-    number = "1",
-    month = "January",
-    pages = "24-35",
-    year = "1987",
-  }
-
 @InProceedings{kock02jpeg,
   author = 	 {E.A. de Kock},
   title = 	 "{Multiprocessor Mapping of Process Networks: A JPEG Decoding Case Study}",
@@ -302,7 +318,12 @@ year="1995"}
   year = {2002},
   mynotes = {
 -------------------------------------------------------------------------------------------
-TODO
+- only consider periodic checking for messages, with only one
+  phase. SDEP allows checking with periods that are more fine-grained.
+- they require a coarse granularity of sending times at the message
+  sender so that two messages do not overlap while in transit (as that
+  would lead to "state inconsistency")
+  --> the user declares this period of sending
 -------------------------------------------------------------------------------------------
 }
 }
@@ -367,7 +388,7 @@ TODO
 -------------------------------------------------------------------------------------------
 - considers both encoding and decoding
 - processes macroblocks or slices in parallel
-- evaluates on chip multiprocessor
+- evaluates on chip multiprocessor (simos)
 - not sure how portable?
 -------------------------------------------------------------------------------------------
 }
@@ -380,7 +401,14 @@ TODO
   year = 	 {2005},
   mynotes = {
 -------------------------------------------------------------------------------------------
-TODO
+- parallel model, architecture independent
+- transform (currently by hand, later with compiler) into something for given architecture
+- output MPI code as execution model
+- targetting an SMP machine
+- make point about extracting all parallelism from app, even that not present in block diag
+- parallel IR is for-all loops and sequential C blocks, annotated with dependences
+- basically a loop-based model with dependence annotations and some explicit task parallelism?
+- doing MPEG-4 encoding
 -------------------------------------------------------------------------------------------
 }
 }
@@ -392,7 +420,16 @@ TODO
   year =       {2005},
   mynotes = {
 -------------------------------------------------------------------------------------------
-TODO
+- more readable than first one
+- concrete language model: 
+  - specify lots of task parallelism between C components with
+    explicit dependences "drawn in with arrows".  but there are also
+    "implicit dependences" as in dataflow.
+  - forall loops with dependences allowed between iterations (both
+    implict and explicit)
+  - supports annotations for execution model (message passing, shared
+    mem, etc) or implementation model (OpenMP, threads, MPI)
+- doing MPEG-4 encoding
 -------------------------------------------------------------------------------------------
 }
 }
@@ -416,7 +453,11 @@ TODO
   year =       {2004},
   mynotes = {
 -------------------------------------------------------------------------------------------
-TODO
+- start with sequential C/C++
+- then convert to SystemC by breaking into actors
+- compile to muliprocessor system-on-chip
+- case study of MPEG-2 decoder
+- compile to array of 16 PE's with on-chip network
 -------------------------------------------------------------------------------------------
 }
 }
@@ -457,6 +498,7 @@ TODO
   year = 	 {2004},
   mynotes = {
 -------------------------------------------------------------------------------------------
+
 -------------------------------------------------------------------------------------------
 }
 }
@@ -548,7 +590,27 @@ TODO
   year =     {2001},
   mynotes = {
 -------------------------------------------------------------------------------------------
-TODO
+- Intel Paragon
+- appears to be manual mapping
 -------------------------------------------------------------------------------------------
 }
+}
+
+@InProceedings{kock00yapi,									      
+  author =     {E.A. de Kock and G. Essink and W.J.M. Smits and P. van der Wolf and J.Y. Brunel and W.M. Kruijtzer and P. Lieverse and K.A. Vissers},
+  title =     "{YAPI: Application Modeling for Signal Processing Systems}",
+  booktitle = "{37th Conference on Design Automation}",
+  year =       {2000},									      
+  mynotes = {										      
+------------------------------------------------------------------------------------------- 
+- extends Kahn process networks with channel selection to support non-deterministic events
+- C++ runtime library
+------------------------------------------------------------------------------------------- 
+}											      
+}                                                                                           
+
+@Misc{systemc,
+  key = 	 {SystemC},
+  title = 	 {SystemC},
+  howpublished = {http://www.systemc.org/},
 }
