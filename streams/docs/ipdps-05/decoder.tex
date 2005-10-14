@@ -17,23 +17,23 @@ multi-layer streams that are not yet implemented in the StreamIt
 decoder.
 
 A noteworthy aspect of the StreamIt implementation is its
-malleability. We illustrate this using two specific examples. 
-In the first example, we focus on the video sampling rates. MPEG-2
-streams are encoded using a 4:2:0 sampling rate, which achieve a 50\%
+malleability. We illustrate this using two specific examples.  In the
+first example, we focus on the video sampling rates. MPEG-2 streams
+are encoded using a 4:2:0 sampling rate, which achieves a 50\%
 reduction in the number of bits required to represent a video, with
-little noticeable loss of color. However, better quality is possible
-with higher sampling rates since more color information is retained
-from the original picture. In this paper, we describe how our
-decoder implementation, originally designed to deal with 4:2:0
+little noticeable loss of color information. However, better quality
+is possible with higher sampling rates since more color information is
+retained from the original picture. In this paper, we describe how our
+decoder implementation, originally designed to deal with a 4:2:0
 sampling rate is modified for a 4:2:2 sampling rate.
 
 In the second example, we describe a straight forward language-level
-transformation that exposes the data-parallelism across macroblocks in a
-picture. This is done in the context of the decoder pipeline which
+transformation that exposes the data-parallelism across macroblocks in
+a picture. This is done in the context of the decoder pipeline which
 consists of the inverse quantization, inverse DCT, and motion
-compensator. We describe parallelism can be exposed at various levels
-in the decoding process, from macroblock to block granularities. We
-show that the migration path is trivial.
+compensator. We show that parallelism can be exposed at various levels
+in the decoding process, from macroblock to block granularities, and
+that the migration path is trivial.
 
 \input{chroma}
 
@@ -78,7 +78,7 @@ strategy, the streams can execute independently with one exception.
 %\epsfig{file=decoder-parallel.eps, width=\textwidth}
 \epsfig{file=decoderpipeline.eps, width=\textwidth}
 % TODO: Change Matt's 2 am caption.
-\caption{An MPEG-2 Decoder exploiting macroblock parallelism.}
+\caption{MPEG-2 decoder exploiting macroblock-level parallelism.}
 \label{decoder_macroblock_parallelism}
 \vspace{-6pt}
 \end{figure*}

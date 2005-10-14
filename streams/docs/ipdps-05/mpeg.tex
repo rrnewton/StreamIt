@@ -57,11 +57,11 @@ sometimes downsampled to a 2x1 or 1x1 block matrix.  The compression
 in MPEG is achieved largely via motion estimation, which detects and
 eliminates similarities between macroblocks across
 pictures. Specifically, the motion estimator calculates a motion
-vector to represent the horizontal and vertical displacement of a
-given macroblock (i.e., the one being encoded) to a matching
+vector that represents the horizontal and vertical displacement of a
+given macroblock (i.e., the one being encoded) from a matching
 macroblock-sized area in a reference picture.  The matching macroblock
 is removed (subtracted) from the current picture on a pixel by pixel
-basis, and an motion vector is associated with the macroblock
+basis, and a motion vector is associated with the macroblock
 describing its displacement relative to the reference picture. The
 result is a residual predictive-code (P) picture. It represents the
 difference between the current picture and the reference

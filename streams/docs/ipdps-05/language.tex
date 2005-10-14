@@ -56,7 +56,7 @@ streaming programs.
     }
     % \vspace{-3pt}
     \vspace{-12pt}
-    \caption{Example zig-zag descrambling order for filter.}
+    \caption{MPEG-2 zig-zag descrambling order.}
     \vspace{-6pt}
     \label{fig:zigzag-order}
   \end{minipage}
@@ -316,7 +316,7 @@ message handler that adjusts its precision (lines 27-29). The {\tt
 Parser} calls this handler through a {\it portal} (line 16), which
 provides a clean interface for messaging.  The handler invocation
 includes a range of latencies {\tt [min:max]} specifying when the
-message should be delivered with respect to the data produced by
+message should be delivered with respect to the data produced by the
 sender.
 
 The interesting aspects of teleport messaging are the semantics for
@@ -329,7 +329,7 @@ current execution of the work function is tagged. The tags propagate
 through the stream graph; whenever a filter inputs an item that is
 tagged, all of its subsequent outputs are also tagged with the same
 message. The message flows through the graph until the tagged data
-reaches its intended receiver, at which time, the message handler is
+reaches its intended receiver, at which time the message handler is
 invoked immediately before the execution of the work function in the
 receiver.  In this sense, the message has the semantics of traveling
 ``with the data'' through the stream graph, even though it is not
@@ -338,7 +338,7 @@ is similar.
 
 Teleport messaging exposes the true information flow, and avoids the
 muddling of data streams with control-relevant information. Teleport
-messaging thus separates the concerns of the programmer from that a
+messaging thus separates the concerns of the programmer from that of a
 system implementation, thereby allowing the compiler to deliver the
 message in the most efficient way for a given architecture. Teleport
 messaging also offers other powerful control over timing and latency
