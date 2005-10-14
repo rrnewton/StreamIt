@@ -1,38 +1,76 @@
-# Not sure if this is exactly the correct citation for an ISO/IEC document - Matt
+% pointer to C reference implementation
+@misc{reference-mpeg-c,
+}
+
+% the relevant spec is "DVD Specifications for Read-Only Discs" 
+% Part 3 put out by the DVDForum organization.
+@misc{DVDVideo,
+}
+
+% No reference found yet, but the Tivo customer support page says 
+% they use MPEG-2
+@misc{tivo,
+}
+
+% Like Tivo, no reference found yet, but I'm pretty sure this 
+% is correct from web surfing
+@misc{directv,
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Not sure if this is exactly the correct citation for an ISO/IEC document - Matt
+@Book{MPEG2,
+  author = "{International Organization for Standardization}",
+  title = "{ISO/IEC 11172: Information technology
+          --- Coding of moving pictures and associated audio
+          for digital storage media at up to about 1.5 Mbit/s}",
+  OPTpublisher =   pub-ISO,
+  OPTaddress = pub-ISO:adr,
+  year = 1999
+}
+
+@misc{DVB,
+  title="{Implementation Guidelines for the use of MPEG-2 Systems, Video and Audio in Satellite, Cable and Terrestrial Broadcasting Applications}",
+  howpublished="{ETSI ETR 154, Revision 2}"
+  year=2000
+}
 
 @BOOK{imagevidstandards,
   author = {Bhaskaran Vasudev and Konstantinides Konstantinos},
   title = {Image and Video Compression Standards},
   publisher = {Kluwer Academic Publishers},
-  address = {NOT SURE},
-  year = {1997},
-  ISBN = {0792399528}
+  year = {1997}
 }
  
-@Book{MPEG2,
-  author = "{International Organization for Standardization}",
-  title = "{ISO\slash IEC 11172:1994: Information technology
-          --- Coding of moving pictures and associated audio
-          for digital storage media at up to about 1.5 Mbit/s}",
-  publisher =   pub-ISO,
-  address = pub-ISO:adr,
-  year = "1999"
+@InProceedings{lamb03pldi,
+  author = "Andrew A. Lamb and William Thies and Saman Amarasinghe",
+  title = "{Linear Analysis and Optimization of Stream Programs}",
+  booktitle = "{PLDI}",
+  year = 2003
 }
 
-@Book{DVDVideo,
-  the relevant spec is "DVD Specifications for Read-Only Discs" Part 3 put out by the DVDForum organization.
+@InProceedings{agrawal05cases,
+  author = "Sitij Agrawal and William Thies and Saman Amarasinghe",
+  title = "Optimizing Stream Programs Using Linear State Space Analysis",
+  booktitle = "{CASES}",
+  year = 2005
 }
 
-@Book{DVB,
-  ETSI ETR 154 revision 2, "Implementation Guidelines for the use of MPEG-2 Systems, Video and Audio in Satellite, Cable and Terrestrial Broadcasting Applications"
+@InProceedings{sermulins05lctes,
+  author = "Janis Sermulins and William Thies and Rodric Rabbah and Saman Amarasinghe",
+  title = "{Cache Aware Optimization of Stream Programs}",
+  booktitle = "{LCTES}",
+  year = 2005
 }
 
-@BOOK{tivo,
-  No reference found yet, but the Tivo customer support page says they use MPEG-2
-}
-
-@BOOK{directv,
-  Like Tivo, no reference found yet, but I'm pretty sure this is correct from web surfing
+@InProceedings{gordon02asplos,
+  author = "Michael Gordon and William Thies and Michal Karczmarek and Jasper Lin and Ali S. Meli and Christopher Leger and Andrew A. Lamb and Jeremy Wong and Henry Hoffman and David Z. Maze and Saman Amarasinghe",
+  title = "{A Stream Compiler for Communication-Exposed Architectures}",
+  booktitle = "{ASPLOS}",
+  year = 2002
 }
 
 @STRING{ireproc = "Proceedings of the IRE"}
@@ -46,4 +84,464 @@
         VOLUME             = {40},
         YEAR               = {1952},
         CRINDEX            = {DS 003.54 KEY: Key Papers in The Development of Information Theory (ed. David Slepian)}
+}
+
+@article{raw02ieee,
+    author = {Michael Bedford Taylor and Jason Kim and Jason Miller
+              and David Wentzlaff and Fae Ghodrat and Ben Greenwald
+              and Henry Hoffmann and Paul Johnson and Jae-Wook Lee
+              and Walter Lee and Albert Ma and Arvind Saraf and Mark Seneski
+              and Nathan Shnidman and Volker Strumpen and Matt Frank
+              and Saman Amarasinghe and Anant Agarwal},
+    title = "{The Raw Microprocessor: A Computational Fabric for Software
+            Circuits and General Purpose Programs}",
+    journal = {IEEE Micro},
+    year = {2002}
+}
+
+
+
+@InProceedings{thies05ppopp,
+  author = 	 {William Thies and Michal Karczmarek and Janis Sermulins and Rodric Rabbah and Saman Amarasinghe},
+  title = 	 {Teleport Messaging for Distributed Stream Programs},
+  booktitle = {PPoPP},
+  year = 	 {2005}
+}
+
+@inproceedings{raw04isca,
+ author = {Michael Bedford Taylor and Walter Lee and Jason Miller and David Wentzlaff and Ian Bratt and Ben Greenwald and Henry Hoffmann and Paul Johnson and Jason Kim and James Psota and Arvind Saraf and Nathan Shnidman and Volker Strumpen and Matt Frank and Saman Amarasinghe and Anant Agarwal},
+ title = "{Evaluation of the Raw Microprocessor: An Exposed-Wire-Delay Architecture for ILP and Streams}",
+ booktitle = {ISCA},
+ year = {2004}
+}
+
+@inproceedings{streamitcc,
+ author = "William Thies and Michal Karczmarek and Saman Amarasinghe",
+ title = "{StreamIt:  A Language for Streaming Applications}",
+ booktitle = "{Proceedings of the International Conference on Compiler Construction}",
+ year = "{2002}"
+}
+
+@article{survey97,
+    author = "Robert Stephens",
+    title = "{A Survey of Stream Processing}",
+    journal = "Acta Informatica",
+    volume = "34",
+    number = "7",
+    pages = "491--541",
+    year = "1997"
+}
+
+@ARTICLE{Lustre,
+   author = {N. Halbwachs and P. Caspi and P. Raymond and D. Pilaud},
+   title = {The Synchronous Data Flow Language {LUSTRE}},
+   journal = {Proceedings of the IEEE},
+   year = 1991,
+   volume = 79,
+   number = 1
+}
+
+@ARTICLE{Esterel,
+   author = {Gerard Berry and Georges Gonthier},
+   title = "{The Esterel Synchronous Programming Language: Design, Semantics, Implementation}",
+   journal = {Science of Computer Programming},
+   year = 1992,
+   volume = 19,
+   number = 2
+}
+
+@ARTICLE{Signal,
+   author = {Thierry Gautier and Paul Le Guernic and Loic Besnard},
+   title = {Signal: A Declarative Language for Synchronous Programming of Real-Time Systems},
+   journal = {Springer Verlag LNCS},
+   year = 1987,
+   volume = 274
+}
+
+@Article{lucid77,
+  author = 	 {E.A. Ashcroft and W.W. Wadge},
+  title = 	 {Lucid, a non procedural language with iteration},
+  journal = 	 {Communications of the ACM},
+  year = 	 {1977},
+  volume = 	 {20},
+  number = 	 {7},
+  pages = 	 {519--526}
+}
+
+@misc{Lucid-Synchrone,
+  author = 	 {P. Caspi and M. Pouzet},
+  title = 	 "{The Lucid Synchrone distribution}",
+  note = 	 {{\tt http://www-spi.lip6.fr/lucid-synchrone/}}
+}
+
+@InProceedings{brook04,
+  author = 	 {Ian Buck and Tim Foley and Daniel Horn and Jeremy Sugerman and Kayvon Fatahalian and Mike Houston and Pat Hanrahan},
+  title = 	 "{Brook for GPUs: Stream Computing on Graphics Hardware}",
+  booktitle =    {SIGGRAPH},
+  year = 	 {2004}
+}
+
+@INPROCEEDINGS{spidle03,
+AUTHOR = {Consel, C. and Hamdi, H. and Réveillère, L. and Singaravelu, L. and Yu, H. and Pu, C.},
+TITLE = "{Spidle: A DSL Approach to Specifying Streaming Application}",
+BOOKTITLE = "{2nd International Conference on Generative Programming and Component Engineering}",
+YEAR = {2003}
+}
+
+@InProceedings{cg03,
+  author = 	 {William R. Mark and R. Steven Glanville and Kurt Akeley and Mark J. Kilgard},
+  title = 	 "{Cg: A System for Programming Graphics Hardware in a C-like Language}",
+  booktitle = {SIGGRAPH},
+  year = 	 {2003}
+}
+
+@BOOK{Occam,
+   author = "Inmos Corporation",
+   title = "Occam 2 Reference Manual",
+   publisher = "Prentice Hall",
+   year = "1988"
+}
+
+@inproceedings{sisal,
+ author = "J. Gaudiot and W. Bohm and T. DeBoni and J. Feo and P. Mille",
+ title = "{The Sisal Model of Functional Programming and its Implementation}",
+ booktitle = "{Proc. of the 2nd Aizu Int. Symposium on Parallel Algorithms/Architecture Synthesis}",
+ year = "{1997}"
+}
+
+@article{imagine03ieee,
+author="Ujval J. Kapasi and Scott Rixner and William J. Dally and Brucek Khailany and Jung Ho Ahn and Peter Mattson and John D. Owens",
+title="Programmable Stream Processors",
+journal="IEEE Computer",
+year="2003"
+}
+
+@InProceedings{ph,
+author="Shail Aidtya and Arvind and Lennart Augustsson and J. Maessen and Rishiyur S. Nikhil",
+title="{Semantics of pH: A parallel dialect of Haskell}",
+booktitle="Haskell Workshop",
+year="1995"}
+
+@article{lee87static,
+  author = "E. Lee and D. Messershmitt",
+  title = "{Static Scheduling of Synchronous Data Flow Programs for Digital Signal Processing}",
+    journal = "IEEE Trans. on Computers",
+    volume = "C-36",
+    number = "1",
+    month = "January",
+    pages = "24-35",
+    year = "1987",
+  }
+
+@InProceedings{kock02jpeg,
+  author = 	 {E.A. de Kock},
+  title = 	 "{Multiprocessor Mapping of Process Networks: A JPEG Decoding Case Study}",
+  booktitle = "{Proceedings of the 15th International Symposium on System Synthesis}",
+  pages = 	 {68--73},
+  year = 	 {2002},
+  mynotes = {
+-------------------------------------------------------------------------------------------
+- shares emphasis on portability
+- uses YAPI, Y-Chart Applications Programmers Interface
+- Data Packaging, Task Fusion
+-------------------------------------------------------------------------------------------
+}
+}
+
+
+@InProceedings{park99spdf1,
+  author = {Chanik Park and Jaewoong Chung and Soonhoi Ha},
+  title = "{Extended Synchronous Dataflow for Efficient DSP System Prototyping}",
+  booktitle = "{10th IEEE International Workshop on Rapid System Prototyping}",
+  year = {1999},
+  mynotes = {
+-------------------------------------------------------------------------------------------
+- exactly the same motivation for messaging
+- describes general solution with Global State Table (GST), tagged by iteration number
+- but compiler arranges schedule to deliver directly, so only overhead is checking for
+  right iteration to deliver messages (like us)
+- less formal description of schedule constraints
+- calls extended graph "Synchronous Piggybacked Dataflow Graph (PDSF)"
+- does handle:
+  - MPEG-1 (layer 3) audio decoder
+     - sends parameters such as sampling freq, global/local gain, scale factor, etc.
+- does not handle:
+  - upstream messages
+  - adjustable latencies
+  - cyclo-static delivery (introduces more complexity -- can't just 
+    check periodic "offset" in receiver, need to check SDEP)
+-------------------------------------------------------------------------------------------
+}
+}
+
+@InProceedings{park99spdf2,
+  author = {Chanik Park and Jaewoong Chung and Soonhoi Ha},
+  title = "{Efficient Dataflow Representation of MPEG-1 Audio (Layer III) Decoder Algorithm with Controlled Global States}",
+  booktitle = "{IEEE Workshop on Signal Processing Systems: Design and Implementation}",
+  year = {1999},
+  mynotes = {
+-------------------------------------------------------------------------------------------
+- slightly expanded version of 1
+-------------------------------------------------------------------------------------------
+}
+}
+
+@Article{park02spdf3,
+  author = {Chanik Park and Jaewoong Jung and Soonhoi Ha},
+  title = "{Extended Synchronous Dataflow for Efficient DSP System Prototyping}",
+  journal = "{Design Automation for Embedded Systems}",
+  volume = {6},
+  number = {3},
+  year = {2002},
+  mynotes = {
+-------------------------------------------------------------------------------------------
+TODO
+-------------------------------------------------------------------------------------------
+}
+}
+
+@InProceedings{ko05dgt,
+  author = 	 {Dong-Ik Ko and Shuvra S. Bhattacharyya},
+  title = 	 "{Dynamic Configuration of Dataflow Graph Topology for DSP System Design}",
+  booktitle = "{Proceedings of the International Conference on Acoustics, Speech, and Signal Processing}",
+  pages = 	 {69--72},
+  year = 	 {2005},
+  mynotes = {
+-------------------------------------------------------------------------------------------
+- DGT: Dynamic Graph Topology
+- builds on semantics of PSDF -- parameterized SDF [not SPDF, Synchronous Piggybacked Dataflow]
+- all possible graph configurations computed at compile time, stored until runtime
+- focusses on "type 1" configuration: "either/or" -- only one 
+  graph topology selected @ runtime.
+   - vs. "type 2" configuration - two or more configurations at same time (?)
+- PSDF: init graph, subinit graph, body graph
+- claims benefits from specializing sub-graphs to parameters (e.g., scheduling optimizations)
+   - done at compile time, switched at runtime
+- evaluated in context of MPEG2 encoder, demonstrate smaller buffer size
+-------------------------------------------------------------------------------------------
+}
+}
+
+@InProceedings{li05alpbench,
+  author = 	 {Man-Lap Li and Ruchira Sasanka and Sarita V. Adve and Yen-Kuang Chen and Eric Debes},
+  title = 	 "{The ALPBench Benchmark Suite for Complex Multimedia Applications}",
+  booktitle = "{Proceedings of the IEEE International Symposium on Workload Characterization}",
+  year = 	 {2005},
+  mynotes = {
+-------------------------------------------------------------------------------------------
+- inserted POSIX threads into 5 multimedia applications, including MPEG-2 decoder/encoder
+- within a frame, each thread represents a contiguous set of macroblock rows.
+  - the thread takes those macroblocks through all the stages
+  - thread joined at frame boundaries
+- compares to Hydra guys and seems to do more
+-------------------------------------------------------------------------------------------
+}
+}
+
+@MastersThesis{li05thesis,
+  author = 	 {Man-Lap Li},
+  title = 	 "{Data-level and Thread-level Parallelism in Emerging Multimedia Applications}",
+  school = 	 {University of Illinois at Urbana-Champaign},
+  year = 	 {2001},
+  mynotes = {
+-------------------------------------------------------------------------------------------
+TODO
+-------------------------------------------------------------------------------------------
+}
+}
+
+@TechReport{iwata98coarse,
+  author = 	 {Eiji Iwata and Kunle Olukotun},
+  title = 	 "{Exploiting coarse-grain parallelism in the MPEG-2 algorithm}",
+  institution =  {Stanford University},
+  year = 	 {1998},
+  number = 	 "{Technical Report CSL-TR-98-771}",
+  mynotes = {
+-------------------------------------------------------------------------------------------
+- considers both encoding and decoding
+- processes macroblocks or slices in parallel
+- evaluates on chip multiprocessor
+- not sure how portable?
+-------------------------------------------------------------------------------------------
+}
+}
+
+@InProceedings{assayad05mpeg4a,
+  author = 	 {I. Assayad and S. Yovine},
+  title = 	 "{Parallel model analysis and implementation for MPEG-4 encoder}",
+  booktitle = "{Proceedings of Embedded Processors for Multimedia and Communications II}",
+  year = 	 {2005},
+  mynotes = {
+-------------------------------------------------------------------------------------------
+TODO
+-------------------------------------------------------------------------------------------
+}
+}
+
+@InProceedings{assayad05mpeg4b,
+  author =     {Ismail Assayad and Philippe Gerner and Sergio Yovine and Valerie Bertin},
+  title =     "{Modelling, Analysis and Parallel Implementation of an On-line Video Encoder}",
+  booktitle =  "{1st International Conference on Distributed Frameworks for Multimedia Applications}",
+  year =       {2005},
+  mynotes = {
+-------------------------------------------------------------------------------------------
+TODO
+-------------------------------------------------------------------------------------------
+}
+}
+
+@InProceedings{dwivedi01exploring,
+  author =     {Basant K. Dwivedi and Jan Hoogerbrugge and Paul Stravers and M. Balakrishnan},
+  title =     "{Exploring design space of parallel realizations: MPEG-2 decoder case study}",
+  booktitle =  "{Proceedings of the 9th International Symposium on Hardware/Software Codesign}",
+  year =       {2001},
+  mynotes = {
+-------------------------------------------------------------------------------------------
+TODO
+-------------------------------------------------------------------------------------------
+}
+}
+
+@InProceedings{pazos04soc,
+  author =     {Nuria Pazos and Paolo Ienne and Yusuf Leblebici and Alexander Maxiaguine},
+  title =     "{Parallel Modelling Paradigm in Multimedia Applications: Mapping and Scheduling onto a Multi-Processor System-on-Chip Platform}",
+  booktitle =  "{Proceedings of the International Global Signal Processing Conference}",
+  year =       {2004},
+  mynotes = {
+-------------------------------------------------------------------------------------------
+TODO
+-------------------------------------------------------------------------------------------
+}
+}
+
+@Article{bhatta05block,
+  author = 	 {Dong-Ik Ko and Shuvra S. Bhattacharyya},
+  title = 	 "{Modeling of Block-Based DSP Systems}",
+  journal = 	 "{Journal of VLSI Signal Processing Systems for Signal, Image, and Video Technology}",
+  year = 	 {2005},
+  volume = 	 {40},
+  number = 	 {3},
+  pages = 	 {289--299},
+  mynotes = {
+-------------------------------------------------------------------------------------------
+- problems with doing MPEG in SDF:
+  - control problem (sometimes actors should not push or pop anything)
+  - consistent schedule problem (messaging)
+  - iteration counts (dynamic rates)
+  - saving buffers, reducing unnecessary delivery (messaging)
+- deliver parameters to sub-graphs before starting to run
+- implemented prototype in Ptolemy 2
+- claims that PSDF cannot avoid buffer overhead of delivering control information
+- implements MPEG2 *encoder* 3 ways for experiments:
+  1. FSM/SDF combo
+     FSM corresponds to dispatching to I-frame, P-frame, B-frame
+  2. SDF - all frames go through everything with dummy values
+  3. BLDF - reconfigures frame-processing per each frame
+- claims that BLDF expression reduces number of connections and number
+  of buffers in graph
+-------------------------------------------------------------------------------------------
+}
+}
+
+@InProceedings{neuendorffer04hierarchical,
+  author = 	 {Stephen Neuendorffer and Edward Lee},
+  title = 	 "{Hierarchical Reconfiguration of Dataflow Models}",
+  booktitle = "{Conference on Formal Methods and Models for Codesign}",
+  year = 	 {2004},
+  mynotes = {
+-------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------
+}
+}
+
+@Article{valero02petri,
+  author =     {Valent\'in Valero and Fernando L. Pelayo and Fernando Cuartero and Diego Cazorla},
+  title =     "{Specification and Analysis of the MPEG-2 Video Encoder with Timed-Arc Petri Nets}",
+  journal = "{Electronic Notes in Theoretical Computer Science}",
+  volume = {66},
+  number = {2},
+  year =       {2002},
+  mynotes = {
+-------------------------------------------------------------------------------------------
+TODO
+-------------------------------------------------------------------------------------------
+}
+}
+
+@InProceedings{pelayo01rosa,
+  author =     {Fernando L. Pelayo and Fernando Cuartero and Valent\'in Valero and Diego Cazorla and Teresa Olivares},
+  title =     "{Specification and Performance of the MPEG-2 Video Encoder by Using the Stochastic Process Algebra: ROSA}",
+  booktitle = "{Proceedings of the 17th UK Performance Evaluation Workshop}",
+  year =       {2001},
+  mynotes = {
+-------------------------------------------------------------------------------------------
+TODO
+-------------------------------------------------------------------------------------------
+}
+}
+
+
+@InProceedings{schneider99spec,
+  author =     {Claus Schneider},
+  title =     "{Executable Specification for Multimedia Supporting Refinement and Architecture Exploration}",
+  booktitle = "{25th Euromicro Conference}",
+  year =       {1999},
+  mynotes = {
+-------------------------------------------------------------------------------------------
+TODO
+-------------------------------------------------------------------------------------------
+}
+}
+
+@InProceedings{shen94overview,
+   author = {K. Shen and G.W. Cook and L.H. Jamieson and E.J. Delp},
+    title = "{Overview of parallel processing approaches to image and video compression}",
+booktitle = "{Proceedings of the SPIE Conference on Image and Video Compression}",
+     year = {1994},
+  mynotes = {
+-------------------------------------------------------------------------------------------
+TODO
+-------------------------------------------------------------------------------------------
+}
+}
+
+@InProceedings{karkowski98parallelism,
+  author =     {Ireneusz Karkowski and Henk Corporaal},
+  title =     "{Exploiting Fine- and Coarse-grain Parallelism in Embedded Programs}",
+  booktitle = "{7th International Conference on Parallel Architectures and Compilation Techniques}",
+  year =       {1998},
+  mynotes = {
+-------------------------------------------------------------------------------------------
+TODO
+-------------------------------------------------------------------------------------------
+}
+}
+
+@Article{ahmad01compression,
+  author =   {Ishfaq Ahmad and Yong He and Ming L. Liou},
+  title =   "{Video compression with parallel processing}",
+  journal = "{Parallel Computing}",
+  volume =   {28},
+  pages  =   {1039--1078},
+  number =   {},
+  year =     {2002},
+  mynotes = {
+-------------------------------------------------------------------------------------------
+TODO
+-------------------------------------------------------------------------------------------
+}
+}
+
+@Article{ahmad01multiproc,
+  author =   {Ishfaq Ahmad and Shahriar M. Akramullah and Ming L. Liou and Mohammad Kafeel},
+  title =   "{A Scalable Off-line MPEG-2 Video Encoding Scheme using a Multiprocessor System}",
+  journal = "{Parallel Computing}",
+  pages = {823--846},
+  volume =   {27},
+  year =     {2001},
+  mynotes = {
+-------------------------------------------------------------------------------------------
+TODO
+-------------------------------------------------------------------------------------------
+}
 }
