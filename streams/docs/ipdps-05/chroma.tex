@@ -1,113 +1,55 @@
-\SubSection{   }
+\SubSection{Video Sampling Rate}
 
-% Note: Some of this is repeat information from the mpeg.tex file. The
-% first sentence is verbatim from mpeg.tex. Do we want to include
-% less detail in the MPEG section or less detail here? We probably
-% don't want to be totally redundant.
-
-Macroblocks specify colors using a {\it luminance} channel to
-represent saturation (color intensity), and two {\it chrominance}
-channels to represent hue. The human eye is more sensitive to changes
-in saturation than changes in hue, so the chrominance channels
-are frequently compressed by downsampling the chrominance data within
-a macroblock. The type of chrominance downsampling an MPEG-2 file
+Macroblocks specify colors using a luminance channel to represent
+saturation (color intensity), and two chrominance channels to
+represent hue. The human eye is more sensitive to changes in
+saturation than changes in hue, so the chrominance channels are
+frequently compressed by downsampling the chrominance data within a
+macroblock. The type of chrominance downsampling an MPEG-2 encoder
 uses is its {\it chrominance format}. The most common chrominance
 format is 4:2:0, which uses a single block for each of the chrominance
-channels, downsampling each of the two channels from 16x16 to 8x8. 
-The other chrominance format with downsampling is 4:2:2, which uses two
-blocks for each chrominance channel, downsampling each of the channels
-from 16x16 to 8x16, The possible chrominance formats are shown in
-Figure~\ref{chroma_format}.
+channels, downsampling each of the two channels from 16x16 to 8x8.
+The other chrominance format with downsampling is 4:2:2, which uses
+two blocks for each chrominance channel, downsampling each of the
+channels from 16x16 to 8x16. The possible chrominance formats are
+shown in Figure~\ref{fig:chroma-format}.
 
-ADD SOME TEXT HERE
+To support the 4:2:2 chrominance format in our StreamIt decoder, we
+modified 31 lines and added 20 new lines. Of the 31 modified lines, 23
+were trivial modifications to pass a variable representing the
+chrominance format as a stream parameter. The greatest substantial
+change was to the decoding splitjoin previously illustrated in
+Figure~\ref{fig:decoding-sj}. The stream is reconfigured such that it
+can properly deal with the interleaving of chrominance data when the
+sampling rate is increased. The more general splitjoin is shown in
+Figure~\ref{fig:chroma-stream}.
 
-Adding support for the 4:2:2 chrominance format required modifying 31 lines
-and adding 27 additional lines. Of the 31 modified lines, 23 were trivial
-modifications to pass a variable representing the chrominance format
-as a stream parameter or replace hardcoded block count values with variables.
-Of the 27 added lines, 7 were fixing a flawed assumption in the MPEG stream
-parsing which 4:2:0 had not uncovered and had nothing to do with the 4:2:2
-data. A typical set of changes is shown in Figures~\ref{chroma_original} and~\ref{chroma_modified}, which
-illustrates the code wrapping the parallel processing of the different
-color channels. The changes needed to support the additional 4:2:2 format
-are base
-
-% In what follows some of the variables are renamed from what they
-% are in the actual MPEGdecoder.str.pre file since the names aren't
-% as meaningful in the context of the paper.
-% The changes are listed here:
-% UpdatePortal_picture_type -> pic_messages
-% the_chroma_format -> chroma_format
-% LuminanceChannelProcessing -> LuminanceUpsampleAndMotionPredict
-% ChrominanceChannelProcessing -> ChrominanceUpsampleAndMotionPredict
+%% TODO: add figure showing pattern for 4:2:0 and 4:2:2 and expand on
+%% description above
 \begin{figure*}[t]
-  \begin{minipage}[t]{4.0in}
-    {
   \begin{scriptsize}
     \begin{verbatim}
-add int->int splitjoin {
+    int ->int splitjoin(String chromaFormat) {
+      if (chromaFormat == ``4:2:0'') {
+        split roundrobin(4*N, 2*N);
+      } else { // chromaFormat == ``4:2:2''
+        split roundrobin(4*N, 4*N);
+      }
 
+      add LuminanceChannel(W, H, 4*N, chromaFormat);
 
-  split roundrobin(4*75, 1*75, 1*75);
-  
+      add int->int splitjoin {
+        split roundrobin(N, N);
+        add ChrominanceChannel(W, H, N, chromaFormat);
+        add ChrominanceChannel(W, H, N, chromaFormat);
+        join roundrobin(1, 1);
+      }
 
-  add LuminanceUpsampleAndMotionPredict
-    (width, height, pic_messages);
-  
-
-  add ChrominanceUpsampleAndMotionPredict
-    (width, height, pic_messages);
-  add ChrominanceUpsampleAndMotionPredict
-    (width, height, pic_messages);
-  
-
-  join roundrobin(1,1,1);  
-}
- 	  \end{verbatim}
-	\end{scriptsize}
-    }
-    % \vspace{-3pt}
-    \caption{High level distribution of data (4:2:0 chrominance format).}
-    \label{chroma_original}
-    % \label{fig:zigzag-filter}
-  \end{minipage}
-  ~~\vrule~~
-  \begin{minipage}[t]{3.0in}
-    {  
-	\begin{scriptsize}
-	  \begin{verbatim}
-add int->int splitjoin {
-  if (the_chroma_format == 1) {
-    split roundrobin(4*75, 2*75);
-  } else {
-    split roundrobin(4*75, 4*75);
+      join roundrobin(1, 2);
   }
-  add LuminanceUpsampleAndMotionPredict
-    (width, height, pic_messages, chroma_format);
-  add int->int splitjoin {
-    split roundrobin(75);
-    add ChrominanceUpsampleAndMotionPredict
-      (width, height, pic_messages, chroma_format);  
-    add ChrominanceUpsampleAndMotionPredict
-      (width, height, pic_messages, chroma_format);  
-    join roundrobin(1, 1);
-  }
-  join roundrobin(1, 2);
-}
-	  \end{verbatim}
-	\end{scriptsize}
-    }
-    % \vspace{-3pt}
-    \caption{High level distribution of data (4:2:0 or 4:2:2 chrominance format).}
-    \label{chroma_modified}
-  \end{minipage}
+  \end{verbatim}
+  \end{scriptsize}
+  % \vspace{-3pt}
+  \caption{Decoding stream to handle 4:2:0 and 4:2:2 chroma formats.}
+  \label{fig:chroma-stream}
 \end{figure*}
-
-
-
-
-
-
-
-
-
