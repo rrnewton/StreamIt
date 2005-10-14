@@ -16,9 +16,8 @@ streaming programs.
     {
 	\begin{scriptsize}
 	  \begin{verbatim}
-	    int->int filter ZigZagScan(int N, int[N] Order)
-	    {
-	        work pop N push N {
+	    int->int filter ZigZagScan(int N, int[N] Order) {
+	      work pop N push N {
 	        for (int i = 0; i < N; i++) {
 	          int pixel = peek(Order[i]);
 	          push(pixel);
@@ -38,9 +37,10 @@ streaming programs.
   ~~\vrule~~
   \begin{minipage}[t]{3.0in}
     {  
+      % TODO: change to EPS figure with arrows for zig-zag order
 	\begin{scriptsize}
 	  \begin{verbatim}
-	    int[64] Ordering = 
+	    int[64] Order = 
 	      {00, 01, 05, 06, 14, 15, 27, 28,
 	       02, 04, 07, 13, 16, 26, 29, 42,
 	       03, 08, 12, 17, 25, 30, 41, 43,
@@ -62,17 +62,19 @@ streaming programs.
 \end{figure*}
 
 \SubSection{Filters as Programmable Units}
-In StreamIt, the basic programmable unit is a {\it filter}. Each
-filter contains a work function that executes atomically, popping
-(i.e., reading) a fixed number of items from the filter input tape
-and pushing (i.e., writing) a fixed number of items to the filter
-output tape. A filter may also {\tt peek} at a given index on its
-input tape without consuming the item; this makes it simple to
-represent computation over a sliding window or performing permutations
-on the input stream. The {\tt push}, {\tt pop}, and {\tt peek} rates
-are declared as part of the work function, thereby enabling the
-compiler to apply various optimizations and construct efficient
-execution schedules. 
+In StreamIt, the basic programmable unit is a {\it filter}.  Each
+filter has an independent address space; all communication with other
+filters is via the input and output channels (and occaisionally via
+control messages, see Section~\ref{sec:messaging}).  Filters contain a
+work function that represents a steady-state execution step.  The work
+function pops (i.e., reads) items from the filter input tape and
+pushes (i.e., writes) items to the filter output tape. A filter may
+also {\tt peek} at a given index on its input tape without consuming
+the item; this makes it simple to represent computation over a sliding
+window or to perform permutations on the input stream. The {\tt push},
+{\tt pop}, and {\tt peek} rates are declared as part of the work
+function, thereby enabling the compiler to apply various optimizations
+and construct efficient execution schedules.
 
 A filter is akin to a class in object oriented programming with the
 work function serving as the main method. A filter is parameterizable,
@@ -187,13 +189,14 @@ single output stream.
 	  // 4:2:0 chroma format
 	  split roundrobin(4*N, 1*N, 1*N);
 
-	  add LuminanceChannel  (W, H);
-	  add ChrominanceChannel(W, H);
-	  add ChrominanceChannel(W, H);
+	  add LuminanceChannel  (W, H, 4*N);
+	  add ChrominanceChannel(W, H, N);
+	  add ChrominanceChannel(W, H, N);
 
 	  join roundrobin(1, 1, 1);  
 	}
     \end{verbatim}
+    % TODO: validate 4*N, N, N parameters to above streams
   \end{scriptsize}
   % \vspace{-3pt}
   \caption{Example MPEG decoder splitjoin.}
@@ -218,6 +221,7 @@ cycles in the graph. This stream construct is not used in the decoder,
 but may be used in the MPEG encoder.
 
 \SubSection{Teleport Messaging}
+\label{sec:messaging}
 %%% XXX largely copied from ppopp paper
 A notoriously difficult aspect of stream programming, from both a
 performance and programmability standpoint, is reconciling regular
@@ -278,6 +282,7 @@ messaging~\cite{thies-ppopp05}.
   \end{scriptsize}
   % \vspace{-3pt}
   \caption{MPEG messaging example.}
+  % TODO: add picture
   \label{fig:messaging}
 \end{figure*}
 
@@ -316,4 +321,4 @@ messaging thus separates the concerns of the programmer from that a
 system implementation, thereby allowing the compiler to deliver the
 message in the most efficient way for a given architecture. Teleport
 messaging also offers other powerful control over timing and latency
-beyond what is used in this example.
+beyond what is used in this example~\cite{thies-ppopp05}.
