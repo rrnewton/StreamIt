@@ -26,7 +26,7 @@ compressed\cite{Huffman52}. The amount of lossy and lossless
 compression depends on the video data. Common compression ratios range
 from 10:1 to 100:1. For example, HDTV, with a resolution of 1280x720
 pixels and a streaming rate of 59.94 frames per second, has an
-uncompressed data rate of 1.33 Gigabits per second. It is compressed at 
+uncompressed data rate of 1.33 Gigabits per second. It is compressed at
 an average rate of 66:1, reducing the required streaming rate to
 20 Megabits per second~\cite{imagevidstandards}. %% page 3: [p.3]
 
@@ -47,7 +47,7 @@ an average rate of 66:1, reducing the required streaming rate to
 %% \end{figure}
 
 %% An overview of the encoding process is illustrated in
-%% Figure~\ref{fig:mpeg-encoder}. 
+%% Figure~\ref{fig:mpeg-encoder}.
 The encoder operates on a sequence of pictures. Each picture is made
 up of pixels arranged in a 16x16 array known as a macroblock.
 Macroblocks consist of a 2x2 array of blocks (each of which contains
@@ -74,26 +74,26 @@ greater amount of temporal locality.
 
 Each of the I, P, and B pictures then undergoes a 2-dimensional
 discrete cosine transform (DCT) which separates the picture into parts
-with varying visual importance. The input to the DCT is one block. 
+with varying visual importance. The input to the DCT is one block.
 The output of the
 DCT is an 8x8 matrix of frequency coefficients. The upper left corner
 of the matrix represents low frequencies, whereas the lower right
 corner represents higher frequencies. The latter are often small and
 can be neglected without sacrificing human visual perception.
 
-\begin{figure}[t]
-\begin{center}
-\vspace{-12pt}
-% \framebox{
-% \includegraphics[scale=1, angle=0]{./zigzag.eps}
+%\begin{figure}[t]
+%\begin{center}
+%\vspace{-12pt}
+%\framebox{
+% \includegraphics[scale=.5, angle=0]{./zigzag.eps}
 %}
 % \vspace{-6pt}
-% \nocaptionrule
- \caption{Zig-Zag scan patterns.}
- \label{fig:zigzag}
+ %\nocaptionrule
+% \caption{Zig-Zag scan patterns. (a) shows the default scan pattern, while (b) shows the alternate scan pattern.}
+% \label{fig:zigzag}
 %\vspace{-18pt}
-\end{center}
-\end{figure}
+%\end{center}
+%\end{figure}
 
 The DCT coeffecients are quantized to reduce the number of bits needed
 to represent them. Following quantization, many coefficients are
@@ -103,10 +103,10 @@ by emitting each non-zero coefficient,
 followed by the number of zeros that precede it, along with the number
 of bits needed to represent the coefficient, and its value. The
 run-length encoder scans the DCT matrix in a zig-zag order
-(Figure~\ref{fig:zigzag}) to consolidate the zeros in the matrix.
+(Figure~\ref{fig:zigzag-order}) to consolidate the zeros in the matrix.
 
 Finally, the output of the run-length encoder, motion vector data,
-and other information (e.g., type of picture), are Huffman coded to 
+and other information (e.g., type of picture), are Huffman coded to
 further reduce the average number of bits per data item. The compressed
 stream is sent to the output device.
 
@@ -135,10 +135,10 @@ macroblocks, themselves composed of 8x8 blocks. Macroblocks
 specify colors using a {\it luminance} channel to represent saturation
 (color intensity), and two {\it chrominance} channels to represent
 hue. MPEG-2 streams specify a chroma format which allows the
-chrominance data to be sampled at a lower rate. The most common chroma 
+chrominance data to be sampled at a lower rate. The most common chroma
 format is 4:2:0 which represents a macroblock using four blocks for the
 luminance channel and one block for each of the two chrominance
-channels. 
+channels.
 
 %% \begin{figure}[t]
 %% \begin{center}
@@ -154,7 +154,7 @@ channels.
 %% \end{center}
 %% \end{figure}
 
-%% is illustrated in Figure~\ref{fig:mpeg-decoder}. It 
+%% is illustrated in Figure~\ref{fig:mpeg-decoder}. It
 The decoding process is conceptually the reverse of the encoding
 process. The input stream is Huffman and run-length decoded, resulting
 in quantized DCT matrices. The DCT coefficients are scaled in
@@ -164,9 +164,9 @@ spatial domain.
 Finally, the motion vectors parsed from the data stream are passed to
 a motion compensator, which reconstructs the orginal pictures. In the
 case of I pictures, the compensator need not make any changes since
-these pictures were not subject to motion estimation\footnote{I 
+these pictures were not subject to motion estimation\footnote{I
 pictures are allowed to contain concealment motion vectors which aid in
-macroblock reconstruction should a bitstream error destroy the 
+macroblock reconstruction should a bitstream error destroy the
 frequency coefficient data. We ignore this special case.}. In the case of P
 and B pictures however, motion vectors are used to find the
 corresponding region in the current reference pictures. The
