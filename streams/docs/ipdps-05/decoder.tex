@@ -1,9 +1,22 @@
 \Section{MPEG Decoder in StreamIt}
 
-\paragraph*{Inverse Quantization and DCT}
+\input{chroma}
 
 \paragraph*{Motion Compensation}
 
 \SubSection{Naive Implementation}
 \SubSection{Algorithm Level Optimization for Parallel Execution}
 \SubSection{Reducing Communication by Leveraging Constraints in MPEG Specification}
+\SubSection{Implementation Characteristics}
+
+- 4921 Lines of Code
+- 48 static streams compile to 2150 (for 352*240 resolution)
+- Reference C implementation has 9832 lines of code (supports interlacing and multi-layers).
+- 8 weeks of development.
+- 1 programmer with no prior MPEG-2 (or MPEG : - ) experience.
+
+
+
+
+
+
