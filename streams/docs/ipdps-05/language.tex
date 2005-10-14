@@ -250,7 +250,7 @@ messaging~\cite{thies05ppopp}.
 	04   ...
 	05   add Parser(p);
 	06   ...
-	07   add InverDCQuantizer() to p;
+	07   add InverseDCQuantizer() to p;
 	08   ...
 	09 }
 	 
@@ -283,9 +283,11 @@ messaging~\cite{thies05ppopp}.
   \end{scriptsize}
   % \vspace{-3pt}
   \caption{MPEG messaging example.}
-  % TODO: add picture
   \label{fig:messaging}
 \end{figure*}
+
+% TODO: Where does this figure go?
+\epsfig{file=messaging_example_fig.eps, width=5in} 
 
 The idea behind teleport messaging is for the {\tt Parser} to change
 the quantization precision via an asynchronous method call, where
