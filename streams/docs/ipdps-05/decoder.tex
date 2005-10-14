@@ -41,18 +41,19 @@ and show that the migration path is trivial.
 \SubSection{Motion Compensation}
 
 An MPEG decoder accepts a bitstream as input and performs Huffman and
-run-length decoding (VLD).  This process results in a set of
+variable run-length decoding (VLD).  This process results in a set of
 quantized, frequency-domain macroblocks and corresponding motion
 vectors.  The decoder inverse quantizes (IQ) the macroblocks and then
 performs an inverse DCT (IDCT) to convert the macroblocks to the
-spatial domain.  For predictively coded macroblocks, the decoder
-performs motion compensation (MC) using the motion vector to find a
-corresponding macroblock in a previously decoded, stored reference
-frame.  This reference macroblock is added to the current macroblock
-to recover the original picture data.  If the current macroblock is
-part of an I- or P-frame, then the decoder stores it for future
-reference.  Figure~\ref{fig:dec_block} shows the block diagram of the
-decode sequence.
+spatial domain.  For predictively coded macroblocks (e.g., P and B
+pictures), the decoder performs motion compensation (MC) using the
+input motion vectors to find a corresponding macroblock in a
+previously decoded, stored reference picture. This reference
+macroblock is added to the current macroblock to recover the original
+picture data. If the current macroblock is part of an I or P picture,
+then the decoder stores it for future reference.
+Figure~\ref{fig:dec_block} shows the block diagram of the decode
+sequence.
 
 \begin{figure}[htbp]
 \centerline{\epsfig{file=dec_block.eps,width=5in}}
@@ -60,63 +61,32 @@ decode sequence.
 \label{fig:dec_block}
 \end{figure}
 
-Our strategy for parallelizing MPEG-2 decoding is based on exploiting
-data parallelism among macroblocks.  Using this scheme, the Huffman
+A simple strategy for parallelizing the MPEG-2 decoding can exploit
+the data parallelism among macroblocks. Using this scheme, the Huffman
 and run-length decoding is inherently serial, as macroblock boundaries
 can only be discovered by performing the decode operation.  Once this
-decode is complete, a parallel implemenation can spread macroblocks
-across independent processing elements (PEs) which can run
-concurrently.  Each PE performs the inverse quantization, inverse
-discrete cosine transform, and motion compensation.  Furthermore, each
-PE locally stores reference macroblocks for future motion
-compensation.  Using this strategy, PEs can execute independently with
-one exception.
+decode is complete, a parallel implemenation can distribute
+macroblocks tp independent streams (using a splitjoin). Each stream
+performs the inverse quantization, inverse discrete cosine transform,
+and motion compensation. Furthermore, each stream locally stores
+reference macroblocks for future motion compensation. Using this
+strategy, the streams can execute independently with one exception.
 
-This exception occurs when a PE is performing motion compensation and
-the corresponding motion vector indicates a reference macroblock
-stored on a separate PE.  In this case, inter-PE communication occurs
-to send the required reference data to the requesting PE.  This
-situation is not uncommon, and it becomes more common as the number of
-PEs increases for a fixed picture size.
+This exception occurs when a stream is performing motion compensation
+and the corresponding motion vector indicates a reference macroblock
+stored in some other stream. In this case, inter-stream communication
+is required to send the reference data to the requesting stream. This
+situation is not uncommon, and is more prevalent for higher resolution
+pictures. A simple scheme for handling this situation is for every
+stream to broadcast its decoded macroblocks to all other streams. This
+solution has the benefit of being conceptualy easy to understand and
+implement. StreamIt allows programmers to naturally expose such
+parallelism. A StreamIt pipeline that operates at macroblock
+granularity is shown in Figure~\ref{fig:decoder-macroblock}. It is
+worthy to note that there is a high correlation between the stream
+graph, and the StreamIt syntax describing the pipeline.
 
-One simple scheme for handling this situation is to have every PE
-broadcast its decoded macroblocks to all other PEs.  This solution has
-the benefit of being conceptualy easy to understand and implement.
-However, broadcast communication can be very inefficient and it
-generally does not scale well for large numbers of PEs.
+%% TODO: add figure showing decoder pipeline at macroblock granularity
+%% and streamit text ala Bill's beamformer/fmradio examples
 
-A more sophisticated implementation takes advantage of algorithmic
-knowledge to limit the amount of inter-PE communication.
-Specifically, such an implementation exploits the fact
-that MPEG-2 motion vectors have a bounded length.  Therefore, the
-number of potential reference macroblocks for a predictively coded
-macroblock is just a small subset of the total number of macroblocks.
-This sophisticated implementation does not broadcast reference data to
-all PEs, but sends data only to the PEs which might need it for
-reference.  Furthermore, by ensuring that adjacent ranges of
-macroblocks are allocated to adjacent PEs, this implementation ensures
-that communication is kept local, as illustrated in
-Figure~\ref{fig:mb_alloc}.  Such local communication patterns allow
-such an implementation to scale much more efficiently as more PEs are
-made available.
 
-\begin{figure}[htbp]
-\centerline{\epsfig{file=mb_alloc.eps,width=5in}}
-\caption{Potential allocation of a reference frame among sixteen
-processing elements.  Regions in gray represent reference macroblocks
-that are communicated among neighboring processors.}
-\label{fig:mb_alloc}
-\end{figure}
-
-The disadvantage of this latter implementation is that it can be quite
-complicated to keep track of which PEs contain which macroblocks.
-Furthermore, the local communication scheme can be more difficult to
-schedule than a broadcast for some parallel processors.  However,
-StreamIt provides mechanisms which allow programmers to expose these
-local communication patterns to the compiler.  The compiler handles
-the burden of allocating macroblocks to PEs and scheduling local
-communication. The remainder of this section illustrates these
-concepts in the context of MPEG-2 decoding.
-
-\paragraph{Coarse-grained Implemenation}
-\paragraph{Fine-grained Implemenation}

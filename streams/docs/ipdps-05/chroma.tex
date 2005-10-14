@@ -29,19 +29,24 @@ Figure~\ref{fig:chroma-stream}.
 \begin{figure*}[t]
   \begin{scriptsize}
     \begin{verbatim}
-    int ->int splitjoin(String chromaFormat) {
-      if (chromaFormat == ``4:2:0'') {
+    int->int splitjoin(int chromaFormat) {
+      int xUpSample, yUpSample;
+
+      if (chromaFormat == 420) { // 4:2:0 chroma format
         split roundrobin(4*N, 2*N);
-      } else { // chromaFormat == ``4:2:2''
+	  xUpSample = yUpSample = 2;
+      } else {                   // 4:2:2 chroma format
         split roundrobin(4*N, 4*N);
+	  xUpSample = 2;
+	  yUpSample = 0;
       }
 
-      add LuminanceChannel(W, H, 4*N, chromaFormat);
+      add LuminanceChannel(W, H, 0, 0, chromaFormat);
 
       add int->int splitjoin {
         split roundrobin(N, N);
-        add ChrominanceChannel(W, H, N, chromaFormat);
-        add ChrominanceChannel(W, H, N, chromaFormat);
+        add ChrominanceChannel(W, H, xUpsample, yUpSample, chromaFormat);
+        add ChrominanceChannel(W, H, xUpsample, yupsample, chromaFormat);
         join roundrobin(1, 1);
       }
 
