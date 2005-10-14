@@ -1,7 +1,7 @@
 \Section{StreamIt Programming Language}
 \label{sec:streamit}
 
-StreamIt~\cite{streamit-cc} is an architecture independent language
+StreamIt~\cite{streamitcc} is an architecture independent language
 that is designed for stream programming. In StreamIt, programs are
 represented as graphs where nodes represent computation and edges
 represent FIFO-ordered communication of data over tapes. The language
@@ -239,7 +239,7 @@ parser. Since the parsing and inverse quantization tasks are logically
 decoupled, any pertinent information that the parser discovers must be
 teleported to the appropriate streams.  In StreamIt, such
 communication is conveniently accomplished using teleport
-messaging~\cite{thies-ppopp05}.
+messaging~\cite{thies05ppopp}.
 
 \begin{figure*}[t]
   \begin{scriptsize}
@@ -322,4 +322,4 @@ messaging thus separates the concerns of the programmer from that a
 system implementation, thereby allowing the compiler to deliver the
 message in the most efficient way for a given architecture. Teleport
 messaging also offers other powerful control over timing and latency
-beyond what is used in this example~\cite{thies-ppopp05}.
+beyond what is used in this example~\cite{thies05ppopp}.
