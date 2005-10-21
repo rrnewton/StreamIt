@@ -42,7 +42,7 @@ that the migration path is trivial.
 An MPEG decoder accepts a bitstream as input and performs Huffman and
 variable run-length decoding (VLD).  This process results in a set of
 quantized, frequency-domain macroblocks and corresponding motion
-vectors.  The decoder inverse quantizes (IQ) the macroblocks and then
+vectors.  The decoder inversely quantizes (IQ) the macroblocks and then
 performs an inverse DCT (IDCT) to convert the macroblocks to the
 spatial domain.  For predictively coded macroblocks (e.g., P and B
 pictures), the decoder performs motion compensation (MC) using the
