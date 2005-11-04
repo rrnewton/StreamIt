@@ -53,6 +53,6 @@ void->int filter Source {
 }
 
 int->void filter Printer {
-    work pop 1 { print(pop()); }
+    work pop 1 { println(pop()); }
 }
 

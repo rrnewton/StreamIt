@@ -1,5 +1,5 @@
 /**
- * this should print 1.0, 2.0, 3.0 ...
+ * this should println 1.0, 2.0, 3.0 ...
  */
 void->void pipeline ArrayTest {
     add void->float[1][1] filter {
@@ -17,7 +17,7 @@ void->void pipeline ArrayTest {
     add float[1][1]->void filter {
 	work pop 1 {
             float[1][1] myArray = pop();
-	    print(myArray[0][0]);
+	    println(myArray[0][0]);
 	}
     }
 }
