@@ -1,0 +1,391 @@
+===== TPC Review =====
+
+
+
+*** Significance (Assess the significance of the topic addressed in the
+paper.): 1:None 2:Below average 3:Average 4:Above average 5:Excellent
+
+Evaluation=Average (3)
+
+*** Contribution (What is the value of the contribution of the paper?):
+1:None 2:Below average 3:Average 4:Above average 5:Excellent
+
+Evaluation=Above average (4)
+
+*** Originality/Novelty (To what extent does this paper "break new
+ground," either conceptually or technically?): 1:None 2:Below average
+3:Average 4:Above average 5:Excellent
+
+Evaluation=Excellent (5)
+
+*** Quality of Presentation (Assess both the ease of reading the paper
+and the extent to which it gets its contributions across.): 1:Below
+average 2:Average 3:Above average 4:Excellent
+
+Evaluation=Excellent (4)
+
+*** Overall Recommendation (What should be the disposition of this
+paper?): 1:Definite Reject 2:Weak Reject 3:Accept only if room 4:Accept
+5:Strong accept
+
+Evaluation=Strong accept (5)
+
+*** Significance (Assess the significance of the topic addressed in the
+paper.): The paper talks about parallel implementation of MPEG-2 video
+codec. This is a highly important research area where multimedia
+applications can benefit from high-performance computing. Hwoever
+
+*** Contribution (What is the value of the contribution of the paper?):
+The paper proposes a implementation of MPEG-2 codec using StreamIt
+langauge. A Parallel pipeline implementation is proposed which works
+efficiently.
+
+*** Originality/Novelty (How novel are the concepts presented in the
+paper and the techniques used to study them?): Pieplined based MPEG
+codec using data parallelism is exploited, which seems original.
+
+*** Quality of Presentation (How effectively does the paper describe its
+contributions? How easy is it to read?): The paper is well written.
+
+*** Overall Recommendation (Your final rating should be consistent with
+your ratings on previous questions.): I recommend strong acceptance
+
+*** Strengths (What are the key strengths of the paper? Please give
+detailed comments.): Technical novelty and important of research topic.
+
+*** Weaknesses (What are the major weaknesses of the paper? Please give
+detailed comments.): Results could be a bit more elaborate.
+
+*** Detailed comments (Please justify your recommendation and suggest
+improvements in technical content or presentation for the author(s).
+Please be as detailed and constructive as you can be.): Data-parallel
+implementation of MPEG-2 video codec is proposed, which seems original.
+The paper is well written, and the problem is clearly presented. I would
+recommend that the authors add some more results to confirm with the
+claims. It is unclear what is the strength of the teleport maessage
+passing.
+
+*** Comments to author(s) (Please provide comments to the authors that
+explain your ratings and provide helpful criticism.): Data-patrallel
+implementation of MPEG-2 video codec is proposed, which seems original.
+The paper is well written, and the problem is well presented. I would
+recommend that the authors add some more results to confirm with the
+claims. It is unclear what is the strength of the teleport maessage
+passing. What kind of motion estimation algorithm was used? And why?
+
+
+===== TPC Review =====
+
+
+
+*** Significance (Assess the significance of the topic addressed in the
+paper.): 1:None 2:Below average 3:Average 4:Above average 5:Excellent
+
+Evaluation=Below average (2)
+
+*** Contribution (What is the value of the contribution of the paper?):
+1:None 2:Below average 3:Average 4:Above average 5:Excellent
+
+Evaluation=Below average (2)
+
+*** Originality/Novelty (To what extent does this paper "break new
+ground," either conceptually or technically?): 1:None 2:Below average
+3:Average 4:Above average 5:Excellent
+
+Evaluation=Below average (2)
+
+*** Quality of Presentation (Assess both the ease of reading the paper
+and the extent to which it gets its contributions across.): 1:Below
+average 2:Average 3:Above average 4:Excellent
+
+Evaluation=Above average (3)
+
+*** Overall Recommendation (What should be the disposition of this
+paper?): 1:Definite Reject 2:Weak Reject 3:Accept only if room 4:Accept
+5:Strong accept
+
+Evaluation=Weak Reject (2)
+
+*** Significance (Assess the significance of the topic addressed in the
+paper.): I could not find significance of this paper in terms of
+integrating existing MPEG-2 codec to the existing Stream programming
+language. If the approach of this paper was reverse way, from the stream
+programming language and utilizing MPEG-2 as well, it would have been
+much more interesting.
+
+*** Contribution (What is the value of the contribution of the paper?):
+This work seems to be a project report. It maybe important contribution
+within the project, but it is tough to find research issue in this work.
+
+*** Originality/Novelty (How novel are the concepts presented in the
+paper and the techniques used to study them?): The work is clearly
+presented in this paper.
+
+*** Quality of Presentation (How effectively does the paper describe its
+contributions? How easy is it to read?): The presentation of this paper
+is very clear and well organized.
+
+*** Overall Recommendation (Your final rating should be consistent with
+your ratings on previous questions.): I would not recommend this paper
+to be accepted. Although the work is clearly presented and this paper is
+easy to read, I could not find significant research contribution in this
+paper.
+
+*** Strengths (What are the key strengths of the paper? Please give
+detailed comments.): This paper is easy to read, and technical stuffs
+are explained clearly.
+
+*** Weaknesses (What are the major weaknesses of the paper? Please give
+detailed comments.): Again, I could not see research contribution in
+this paper. Also this paper contains implementation issues mostly.
+However, I could not find any of resultant data which can verify their
+concept or approach.
+
+
+===== Review =====
+
+
+
+*** Significance (Assess the significance of the topic addressed in the
+paper.): 1:None 2:Below average 3:Average 4:Above average 5:Excellent
+
+Evaluation=Average (3)
+
+*** Contribution (What is the value of the contribution of the paper?):
+1:None 2:Below average 3:Average 4:Above average 5:Excellent
+
+Evaluation=Below average (2)
+
+*** Originality/Novelty (To what extent does this paper "break new
+ground," either conceptually or technically?): 1:None 2:Below average
+3:Average 4:Above average 5:Excellent
+
+Evaluation=Average (3)
+
+*** Quality of Presentation (Assess both the ease of reading the paper
+and the extent to which it gets its contributions across.): 1:Below
+average 2:Average 3:Above average 4:Excellent
+
+Evaluation=Average (2)
+
+*** Overall Recommendation (What should be the disposition of this
+paper?): 1:Definite Reject 2:Weak Reject 3:Accept only if room 4:Accept
+5:Strong accept
+
+Evaluation=Accept only if room (3)
+
+*** Significance (Assess the significance of the topic addressed in the
+paper.): This paper is an application study of writing an MPEG decoder
+in StreamIt, a streaming-based programming language.  While StreamIt is
+a very interesting and compelling language and application studies
+constitute useful and (for me at least) interesting ways to study new
+programming languages, I wouldn't describe the work, at least as it is
+presented here, as being deeply significant -- merely average and
+interesting.
+
+*** Contribution (What is the value of the contribution of the paper?):
+The contributions of the paper are (in order of importance, to me):
+
+- showing how the authors' implementation of the MPEG decoder can be
+modified with a reasonable amount of work
+
+- an interesting demonstration of the value of teleport messaging, a
+concept which has been published by the authors previously, but is
+illustrated in this study.
+
+- a description of the implementation of the MPEG decoder, which felt
+like it could have more meat to it, esp. given the amount of space
+devoted to describing MPEG in general.
+
+- an illustration that StreamIt is a reasonable match for MPEG decoding
+(one would hope so given that MPEG is a favored application for the
+streaming community)
+
+*** Originality/Novelty (How novel are the concepts presented in the
+paper and the techniques used to study them?): StreamIt is a fairly
+novel language, and while a good deal has been published on it, I think
+these sorts of application studies can be very valuable to help people
+connect language descriptions presented in other papers to real
+applications.
+
+MPEG is a worthy application for study in such stream-based languages,
+though perhaps not overly novel.
+
+The techniques used to study the MPEG implementation were somewhat
+disappointing -- linecounts were presented and contrasted with a C
+implementation, but the two codes had different capabilities and thus
+constituted an apples-to-oranges comparison.  Similarly, the authors
+gave the number of weeks it took a student to write the implementation,
+but again, given the amount of variation in abilities between people,
+this was an interesting factoid, but not a great metric.
+
+*** Quality of Presentation (How effectively does the paper describe its
+contributions? How easy is it to read?): I found this paper to be quite
+clearly written, and to provide good descriptions of the MPEG process
+and of StreamIt.  I particularly liked that aspects of the MPEG decoder
+were woven into the introduction of StreamIt rather than just using a
+canned introduction to the language -- this was useful and a wise use of
+space.
+
+I thought that the paper's description of its contributions was not
+quite as clear as it could have been, since the main contributions were
+the explanation of the implementation and its amenability to
+modification.  In these areas, the reader was left to fend for
+him/her-self a bit more, where being led by the hand (through a new
+application and/or language) would have been very useful.
+
+*** Overall Recommendation (Your final rating should be consistent with
+your ratings on previous questions.): Overall, I think this paper is
+worthy of acceptance, though not the strongest of accepts.  The paper
+sets itself up well with its descriptions of MPEG and StreamIt, but then
+fails to say very much that is of lasting value about the experience.
+
+*** Strengths (What are the key strengths of the paper? Please give
+detailed comments.): The key strengths of this paper are its clear
+presentation, its introductions to MPEG and StreamIt, and its exhaustive
+bibliography.  The pictures are also useful.
+
+I should also say that I like the overall approach of taking a single
+application, and an interesting one at that, and exploring it in detail
+in a novel language.  This can be far more instructive than studying a
+suite of 6-30 benchmarks and summarizing them without going into any
+detail.
+
+*** Weaknesses (What are the major weaknesses of the paper? Please give
+detailed comments.): For me the major weakness of this paper was that it
+didn't leave me with much to chew on.
+
+If its only contribution is to illustrate how this (worthy) application
+can be written in this interesting language, then it should do so in
+more detail.  Other possible contributions could be to describe what
+worked particularly well in mapping the application to the language and
+where the language fell short (all languages do in one way or another,
+unless they were designed with the given application in mind).  It would
+also be interesting to see the comparison to other modern streaming
+languages (Brook, StreamC, etc.) performed in more detail and hoisted
+into the results of the paper rather than the related work. 
+Alternatively, some indicators for the performance obtained for the code
+compared to other implementations, or a description of how the algorithm
+would map to the novel architectures that StreamIt targets.  Any of
+these would have made the paper stick to the ribs a bit more.  As
+written, it is doesn't impart much in the way of principles learned from
+the experience nor hard facts.
+
+*** Detailed comments (Please justify your recommendation and suggest
+improvements in technical content or presentation for the author(s).
+Please be as detailed and constructive as you can be.): I'll try to
+avoid repeating overall comments or themes from the previous sections:
+
+* I would've preferred to have the title read "An MPEG-2 *Decoder* in a
+..." because I missed the first indicators that the encoder was not yet
+complete, so was disappointed when I did learn it further down the road.
+That's not to say a decoder isn't a worthy study, just that the title
+was misleading.
+
+* I found the footnote on page 4 somewhat tantalizing and frustrating. 
+It would be helpful to explain to the non-MPEG expert whether ignoring
+this special case is reasonable, a simplifying assumption, laziness,
+etc.  And why?  While I appreciate the candor in mentioning this rather
+than ignoring it, some more context for evaluating it would be
+appreciated.
+
+* Section 3.3: teleporting messages are described, semantically, as
+being equivalent to tagging data as part of the datastreams. The
+sentence "the intuition for upstream messages is similar" is therefore
+somewhat frustrating, since data wouldn't seem to be flowing upstream. 
+I realize that the implementation model doesn't need to match the
+semantic model, but given that the bulk of this section described the
+semantic model, it was hard for me as a reader to guess at how these
+would be similar to the downstream case (and I've even read a paper on
+teleporting messages).
+
+* Some more frustrations with the handling of teleporting messages in
+this paper...  I'm worried that these will be confusing to most readers
+(they were to me).
+
+- they are described at one point as being "out-of-band" yet also
+described in the semantic model as being like tags on data.  This seems
+intuitively contradictory to me, since out-of-band communication would
+imply a model that was completely disjoint from the data to me.
+
+- I also thought that the use of teleport messages to broadcast a
+reference picture to a number of parallel workers seemed strange since
+the reference picture seemed to me to be a large chunk of data that
+would need to be refreshed at regular intervals, and would therefore be
+a reasonable candidate for a data stream.  In contrast, I tend to think
+of teleport messages as being more for less-predictable, shorter,
+less-dataflow messages.  Clarifying the rationale for using a teleport
+message for this case would be useful to the reader -- Can I not set up
+the two streams with two different rates that I'd envision for the
+reference image and personal blocks of data?
+
+* Section 4: Given my frustration with the apples-to-oranges comparison
+of the StreamIt vs. C implementations, I'd change the wording from "In
+contrast, " (which implies to me that the two things are comparable and
+that yours is a clear win) to something more innocuous like "By way of
+comparison, ".  I'd also like to see more explanation for why you didn't
+implement the additional features -- were they too complex?  did they
+prove challenging for StreamIt?  Or was it merely a matter of time? 
+Could those lines be eliminated cleanly from the C code to make the
+comparison more fair?  (though, given that I assume that they are
+valuable features, this seems unfortunate).
+
+* Section 4.1: Here's an example where I'd like to see more detail. I
+think that the study of modifying code and what needs to change is
+valuable.  The line counts are, again, not the best metric for making
+this point to me.  Better would be to walk me through the differences
+between figure 5 and figure 7 in a bit more detail, explaining what's
+changed and why.  This would be a great way to teach me more about your
+implementation and language, as well as to make me a believer that
+"yeah, this isn't so bad of a change."
+
+* Section 4.2: Again, I could use more hand-holding.  Code is hard to
+read in general, let alone with an unfamiliar language and application. 
+Pointing a reader to figure 9 and saying "here's our code -- see how it
+resembles the picture" is not nearly as valuable as walking them through
+some of the salient lines in more detail.  I found myself spending a bit
+of time trying to determine how the degree of parallelism in the main
+split was specified in the code, and am not convinced I ever did figure
+it out.  Again, a good opportunity to teach the reader and make them
+believers rather than taking your word for it.
+
+* The simple scheme of broadcasting decoded macroblocks to all other
+streams strikes me as being expensive (either in communication or in
+memory), yet only its advantages (simplicity) are touted.  I'd either
+like to see its disadvantages described squarely so that I know what's
+being swept under the rug, or to have you argue why the gut reactions of
+a programmer who might avoid broadcast-based replication on a cluster
+for these reasons do not apply here.
+
+* The related work section came across as somewhat more of a laundry
+list than an interesting section.  This may simply be the challenge of
+there being so many streaming languages out there, but I thought it was
+worth mentioning at least.
+
+* I was confused by the description of StreamIt as a "pure dataflow
+model" in the related work section, given that teleport messages seem to
+break out of pure dataflow in a way.  Or perhaps I don't have the same
+view of pure dataflow as you do...  in either case, it struck me.
+
+*** Comments to author(s) (Please provide comments to the authors that
+explain your ratings and provide helpful criticism.): I hope my comments
+do not come across as being overly negative. I was excited to read this
+paper when I learned that it had been assigned to me, and enjoyed
+reading it very much.  As described above, the main lack to me was that
+I felt that any principles learned during the exercise were not
+communicated to me, which would have been useful given the lack of
+experimental results or even qualitative evaluation against other
+languages or explaining how the code would map to the novel
+architectures that StreamIt targets.  Thus, the main thing I took from
+the paper was "these guys wrote MPEG in StreamIt" which doesn't make as
+good of a story, especially since several of the code fragments were not
+described in enough detail that I could understand them.
+
+If this paper is accepted, I hope that at the very least you will spend
+some more time leading the user through the code you provide and your
+modification examples, and also provide some overall lessons learned
+about what matched particularly well between MPEG and StreamIt, and
+where you felt like the language was hemming you in a bit.  I'd of
+course also be happy to see any of the other evaluation ideas that I've
+thrown out incorporated, but these ones seem quite do-able at least.
+
