@@ -1,0 +1,35 @@
+/**
+ * This tests propagation of fields into array dimensions.
+ */
+
+void->void pipeline ArrayTest7 {
+    add Source();
+    add Test(10);
+    add Test(100);
+    add Printer();
+}
+
+int->int filter Test (int N) {
+    int[N] arr;
+
+    init {
+	arr[N-1] = 1;
+    }
+
+    work pop N push N {
+	int i;
+	for (i = 0; i < N; i++) {
+	    push(arr[N-1] * pop());
+	}
+    }
+}
+
+
+void->int filter Source {
+    int i;
+    work push 1 { push(i++); }
+}
+
+int->void filter Printer {
+    work pop 1 { println(pop()); }
+}

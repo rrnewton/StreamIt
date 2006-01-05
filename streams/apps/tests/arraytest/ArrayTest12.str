@@ -1,0 +1,40 @@
+/**
+ * This tests at the intersection of arrays and global prop into
+ * splitjoin weights.
+ **/
+
+static {
+    int[2] A;
+
+    init {
+	A[0] = 2;
+	A[1] = 2;
+    }
+}
+
+void->void pipeline ArrayTest12 {
+    add Source();
+    add splitjoin {
+	split roundrobin(A[1]);
+	add Test(1);
+	add Test(1);
+	join roundrobin;
+    }
+    add Printer();
+}
+
+int->int filter Test(int j) {
+    work pop 1 push 1 {
+	push (j * pop());
+    }
+}
+
+void->int filter Source {
+    int i = 0;
+    work push 1 { push(i++); }
+}
+
+int->void filter Printer {
+    work pop 1 { println(pop()); }
+}
+

@@ -1,0 +1,41 @@
+/**
+ * This tests array constant propagation in a style similar to
+ * FMRadio.  The tricky part is just propagating array values into
+ * streams (anonymous or otherwise) without them assuming a value of
+ * zero.
+ **/
+
+void->void pipeline ArrayTest14 {
+    int bands = 10;
+    int[bands] gain;
+    
+    for (int i=0; i<bands; i++) {
+	gain[i] = i;
+    }
+    
+    add Source();
+    add Test(bands, gain);
+    /* -- anonymous also fails
+    add int->int filter {
+	work push 1 pop 1 {
+	    push(gain[5] * pop());
+	}
+    }
+    */
+    add Printer();
+}
+
+int->int filter Test(int bands, int[bands] gain) {
+    work push 1 pop 1 {
+	push(gain[5] * pop());
+    }
+}
+
+void->int filter Source {
+    int i = 0;
+    work push 1 { push(i++); }
+}
+
+int->void filter Printer {
+    work pop 1 { println(pop()); }
+}
