@@ -1,6 +1,6 @@
 <benchmark>
   <name>arraytest</name>
-  <desc>Tests of passing arrays over tapes</desc>
+  <desc>Tests of array declarations; passing arrays over tapes; passing arrays between functions, etc.</desc>
   <description>
 This set of tests looks at the problem of using arrays as the values
 passed between filters.  These tests all have a single source and a
@@ -34,6 +34,56 @@ them.
       <desc>MIT, multiple array allocations</desc>
       <file class="source">ArrayTest5.str</file>
       <file class="output">ArrayTest5.out</file>
+    </impl>
+    <impl lang="StreamIt" id="arraytest6">
+      <desc>MIT, propagating fields into array dimensions</desc>
+      <file class="source">ArrayTest6.str</file>
+      <file class="output">ArrayTest6.out</file>
+    </impl>
+    <impl lang="StreamIt" id="arraytest7">
+      <desc>MIT, propagating fields into array dimensions</desc>
+      <file class="source">ArrayTest7.str</file>
+      <file class="output">ArrayTest7.out</file>
+    </impl>
+    <impl lang="StreamIt" id="arraytest8">
+      <desc>MIT, passing parameterized arrays to helper functions</desc>
+      <file class="source">ArrayTest8.str</file>
+      <file class="output">ArrayTest8.out</file>
+    </impl>
+    <impl lang="StreamIt" id="arraytest9">
+      <desc>MIT, resolving constant expressions within dimensions of fields</desc>
+      <file class="source">ArrayTest9.str</file>
+      <file class="output">ArrayTest9.out</file>
+    </impl>
+    <impl lang="StreamIt" id="arraytest10">
+      <desc>MIT, resolving constant expressions within dimensions of parameters</desc>
+      <file class="source">ArrayTest10.str</file>
+      <file class="output">ArrayTest10.out</file>
+    </impl>
+    <impl lang="StreamIt" id="arraytest11">
+      <desc>MIT, intersection of arrays and global prop</desc>
+      <file class="source">ArrayTest11.str</file>
+      <file class="output">ArrayTest11.out</file>
+    </impl>
+    <impl lang="StreamIt" id="arraytest12">
+      <desc>MIT, intersection of arrays and global prop into splitjoin weights</desc>
+      <file class="source">ArrayTest12.str</file>
+      <file class="output">ArrayTest12.out</file>
+    </impl>
+    <impl lang="StreamIt" id="arraytest13">
+      <desc>MIT, propagating one constant field into array dimension of another field</desc>
+      <file class="source">ArrayTest13.str</file>
+      <file class="output">ArrayTest13.out</file>
+    </impl>
+    <impl lang="StreamIt" id="arraytest14">
+      <desc>MIT, propagating array values into streams</desc>
+      <file class="source">ArrayTest14.str</file>
+      <file class="output">ArrayTest14.out</file>
+    </impl>
+    <impl lang="StreamIt" id="arraytest15">
+      <desc>MIT, assignment of arrays to each other</desc>
+      <file class="source">ArrayTest15.str</file>
+      <file class="output">ArrayTest15.out</file>
     </impl>
   </implementations>
 </benchmark>
