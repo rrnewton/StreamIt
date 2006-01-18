@@ -1,20 +1,16 @@
-all: main.pdf
-	cp main.pdf ~/public_html/ipdps.pdf
+all: main.pdf abstract-standalone.pdf
+#	cp main.pdf ~/public_html/ipdps.pdf
+#	cp abstract-standalone.pdf ~/public_html/ipdps-ab.pdf
 
-main2.pdf: main.tex main.bib
-	pdflatex main.tex
-	bibtex main
-	pdflatex main.tex
-	pdflatex main.tex
+abstract-standalone.pdf:
+	pdflatex abstract-standalone.tex
+	pdflatex abstract-standalone.tex
 
 main.pdf: main.pdf.ps
 	ps2pdf main.pdf.ps main.pdf
 
 main.ps: clean main.dvi
 	dvips main.dvi -o main.ps
-
-#main.pdf: main.pdf.ps
-	ps2pdf main.pdf.ps main.pdf
 
 main.pdf.ps: clean main.dvi
 	dvips main.dvi -P cmz -o main.pdf.ps
@@ -26,4 +22,4 @@ main.dvi: $(FILES)
 	latex main
 
 clean:
-	$(RM) *.aux *.bbl *.blg *.dvi *.log main.pdf main.pdf.ps
+	$(RM) *.aux *.bbl *.blg *.dvi *.log main.pdf main.pdf.ps abstract-standalone.pdf
