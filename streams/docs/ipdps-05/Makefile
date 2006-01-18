@@ -26,4 +26,4 @@ main.dvi: $(FILES)
 	latex main
 
 clean:
-	$(RM) *.aux *.bbl *.blg *.dvi *.log main.pdf
+	$(RM) *.aux *.bbl *.blg *.dvi *.log main.pdf main.pdf.ps

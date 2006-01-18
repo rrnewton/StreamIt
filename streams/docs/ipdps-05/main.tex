@@ -1,48 +1,52 @@
-\documentclass[times,12pt,onecolumn]{article} 
-\usepackage{latex8}
-\usepackage{times}
-\usepackage{epsfig}
+\documentclass[10pt,twocolumn]{article}
+\usepackage{ipdps}
+\usepackage{vmargin}
+\setpapersize{USletter}
+\setmargnohf{0.8125in}{1in}{6.875in}{8.875in}
 \pagestyle{empty}
+\newenvironment{twoaffiliations}{\begin{tabular}{cc}}{\end{tabular}}
+%\newenvironment{oddaffiliation}{\begin{center}}{\\~\\\end{center}}
+%\documentclass[times,11pt,onecolumn]{article} 
+%\usepackage{latex8}
+%\usepackage{times}
+\usepackage{epsfig}
+%\pagestyle{empty}
+%\newcommand{\mt}[1]{\mbox{#1}}
 
-\newcommand{\mt}[1]{\mbox{#1}}
+\title{MPEG-2 Decoder in a Stream Programming Language}
 
-% TODO:  Put MPEG in title?
-\title{MPEG-2 in a Stream Programming Language\footnote{
-    MIT technical report MIT-CSAIL-TR-2005-068. This work is supported
-    in part by DARPA grants PCA-F29601-03-2-0065 and
-    HPCA/PERCS-W0133890, and NSF awards CNS-0305453 and EIA-0071841.}}
 \author{
   Matthew Drake, Hank Hoffmann, Rodric Rabbah, and Saman Amarasinghe\\
-  MIT Computer Science and Artificial Intelligence Laboratory
-}
-
-\date{}
-
-\sloppy
+  Massachusetts Institute of Technology\\
+  Computer Science and Artificial Intelligence Laboratory\\
+  \{madrake, hank, rabbah, saman\}@mit.edu
+ }
 
 \begin{document}
-\maketitle
-\thispagestyle{empty}
-
-\begin{abstract}
-\input{abstract}
-\end{abstract}
-
-\input{intro}
-\input{mpeg}
-\input{language}
-\input{decoder}
-%\input{compiler}
-\input{encoder}
-\input{related}
-%\input{future}
-\input{conclusion}
-
-%\section*{Acknowledgements}
-%The StreamIt project is supported by DARPA grants PCA-F29601-03-2-0065
-%and HPCA/PERCS-W0133890,and NSF awards CNS-0305453 and EIA-0071841.
-
-\bibliographystyle{latex8}
-\bibliography{main}
-
+  
+  \maketitle
+  \thispagestyle{empty}
+  
+  \begin{abstract}
+    \input{abstract}
+  \end{abstract}
+  
+  \input{intro}
+  \input{mpeg}
+  \input{language}
+  \input{decoder}
+  %\input{compiler}
+  \input{encoder}
+  \input{related}
+  %\input{future}
+  \input{conclusion}
+  
+  \section*{Acknowledgements}
+  MIT technical report MIT-CSAIL-TR-2005-068. This work is supported
+  in part by DARPA grants PCA-F29601-03-2-0065 and
+  HPCA/PERCS-W0133890, and NSF awards CNS-0305453 and EIA-0071841.
+  
+  \bibliographystyle{ipdps}
+  \bibliography{main}
+  
 \end{document}
