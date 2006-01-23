@@ -1,4 +1,4 @@
-%% latex StreamitEclipse && dvips StreamitEclipse -o && ps2pdf StreamitEclipse.ps StreamitEclipse.pdf
+%% latex streamit_java_in_eclipse && dvips streamit_java_in_eclipse -o && ps2pdf streamit_java_in_eclipse.ps streamit_java_in_eclipse.pdf
 %%
 %% images captured with 
 %% xwd -nobdrs | xwdtopnm | pnmtopng > foo.png
@@ -365,16 +365,41 @@ Click ``Apply'' to make the changes.
 
 
 Change some settings for how the Eclipse Java editor handles text,
-just to be safe:
-``Window $\rightarrow$ Preferences... $\rightarrow$ General
+just to be safe (To use US-ASCII encoding and Unix line terminators):
+``Window $\rightarrow$ Preferences... $\triangleright$ General
 $\rightarrow$ Editors''
 
 \hspace*\fill\fbox{%
 \epsfig{figure=text-prefs.eps,height=4in}
 } \hspace*\fill
 
+Fix indentation so that eclipse users and emacs users do not constantly have 
+to reformat each other's code:
+``Window $\rightarrow$ Preferences... $\triangleright$ Java $\triangleright$
+Code Style $\rightarrow$ Formatter''
 
-Create a ``Problems'' panel by 
+Create a new template based on the default template, and set ``Tab
+policy'' to be ``Spaces only'' from the drop-down menu.  ``Indentation
+size'' should be ``4'' for StreamIt code.  Set the ``Tab size'' to be
+8.  With these settings eclipse will correctly read files created by
+emacs, which use tab stops every 8 characters (the default behavior of
+emacs).  Eclipse will perform all its indentation using spaces, which
+should be readable by any editor.
+
+\hspace*\fill\fbox{%
+\epsfig{figure=formatter_preferences1.eps,height=4in}
+} \hspace*\fill
+
+\hspace*\fill\fbox{%
+\epsfig{figure=formatter_preferences2.eps,height=4in}
+} \hspace*\fill
+
+Select your new profile, Press ``Apply'' and then ``OK''.
+\bigskip
+
+Back to getting the streams directory set up as an eclipse project...
+
+Creat a ``Problems'' panel by 
 ``Window $\rightarrow$ Show View $\rightarrow$ Problems'' if there is
 not one already on the screen.
 
@@ -430,7 +455,8 @@ from CVS as prescribed in Section~\ref{secCheckout}.
 
 The {\tt strc} compiler script will not run with the current setup:
 someone will have to update the StreamIt plugins to work with Eclipse 3.1
-But, we can run the components of the 
+But, we can run the java compiler on programs that {\tt strc} has
+converted from {\tt str} format to {\tt java}.
 
 To compile a file with the StreamIt compiler, you need to set up a
 ``run configuration'', which be done by following ``Run $\rightarrow$ Run...''
@@ -467,7 +493,13 @@ have to type to get to the file that you want to compile.
 %file browser, you could use other built-in
 %variables such as \verb+${string_prompt}+, which gives you test entry only.
 Click the ``Variables'' button to see a list of other potentially
-useful variables to use in prompts.
+useful variables to use in prompts.\footnote{%
+After using this for a while, I decided that we should not set up the
+options to append ``.java'':  The file selection box gives you the
+full filename when used in point-and-click mode.  I seem to use it
+more often in point-and-click mode than I do with just typing in
+paths to files. I just haen't gotten around to updating the figure yet. 
+}
 
 %\begin{figure}[htb]
 \hspace*\fill\fbox{%
