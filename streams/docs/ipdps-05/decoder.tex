@@ -16,6 +16,79 @@ although it provides several features such as interlacing and
 multi-layer streams that are not yet implemented in the StreamIt
 decoder.
 
+% What follows is the added section with a detailed description
+% of our implementation. - Matt, 1/25/06
+
+\begin{figure}[htbp]
+% Width and spacing is probably all wrong now
+% Also, we probably want to get rid of dec_block later on in favor
+% of this. This is also just a draft of the detailed block diagram right
+% now with changes and improvements to be made.
+\centerline{\epsfig{file=dec_block_detailed.eps,width=5in}}
+\caption{Block diagram of MPEG-2 decode.}
+\label{fig:dec_block_detailed}
+\end{figure}
+
+The MPEG decoder implementation, shown in Figure 
+\ref{fig:dec_block_detailed} is a pipeline, with most of the work
+contained within three subsections. It accepts a compressed bitstream as input, and 
+produces the decoded video as output. 
+
+The first subsection is a filter responsible for
+parsing the MPEG-2 bitstream and performing Huffman and variable
+run-length decoding (VLD). This process results in a set of
+quantized, frequency-domain macroblocks and corresponding motion
+vectors. 
+
+The second subsection is a splitjoin which processes the macroblocks
+and motion vectors in parallel. The macroblocks are reordered, 
+inversely quantized, and inversely DCT transformed to the spatial 
+domain. The motion vectors, coded with respect to their associated
+macroblock position and the value of previously decoded vectors,
+are converted to absolute addresses.
+
+The third section is responsible for motion compensation in the case of
+predictively coded macroblocks (e.g., P and B pictures). Because the
+color channels can be decoded independently from each other, a
+splitjoin processes the motion compensation for each channel in
+parallel. The motion compensation filter uses the motion vectors to find
+a corresponding macroblock in a previously decoded, stored 
+reference picture. This reference macroblock is added to the current
+macroblock to recover the original picture data. If the current macroblock
+is part of an I or P picture, then the decoder stores it for future
+reference. In addition to the motion compensation, the chrominance
+channels require upsampling.
+
+In addition to these three decoder subsections, two additional filters handle
+reordering the decoded pictures temporally and transforming them into the
+RGB color space.
+
+The decoder uses messaging to send metadata associated with macroblocks
+from the parser to downstream filters. For instance, the parser generates
+a message whenever the picture or macroblock type changes. The motion
+compensation filter uses this information to determine how to process
+the blocks and determine whether it needs to store them for future
+reference. The picture reordering step uses the picture type to 
+determine the correct temporal order, and the math behind the inverse
+quantization depends on the encoding type of the macroblock. Because
+the macroblock type and picture type information changes infrequently
+and irregularly compared to the regular flow of data, messaging is an
+intuitive mechanism for propogating these updates.
+
+While each of the described components decomposes into its own 
+subgraph, this high level description is enough to show the advantages
+of a stream based implementation. For instance, the pipeline 
+parallelism is exposed for both the steps involved in block decoding 
+and the chrominance color channel processing. The splitjoin in the lower
+part of the graph explicitly exposes the data parallelism present because
+the color channels can be decoded independently. 
+
+% done with addition
+
+% I think the information in the very first paragraph on the decoder 
+% about line counts and C comparison should get moved here and
+% incorporated into the following paragraph - Matt 1/25/06
+
 A noteworthy aspect of the StreamIt implementation is its
 malleability. We illustrate this using two specific examples.  In the
 first example, we focus on the video sampling rates. MPEG-2 streams
@@ -39,25 +112,27 @@ that the migration path is trivial.
 
 \SubSection{Motion Compensation}
 
-An MPEG decoder accepts a bitstream as input and performs Huffman and
-variable run-length decoding (VLD).  This process results in a set of
-quantized, frequency-domain macroblocks and corresponding motion
-vectors.  The decoder inversely quantizes (IQ) the macroblocks and then
-performs an inverse DCT (IDCT) to convert the macroblocks to the
-spatial domain.  For predictively coded macroblocks (e.g., P and B
-pictures), the decoder performs motion compensation (MC) using the
-input motion vectors to find a corresponding macroblock in a
-previously decoded, stored reference picture. This reference
-macroblock is added to the current macroblock to recover the original
-picture data. If the current macroblock is part of an I or P picture,
-then the decoder stores it for future reference.
-Figure~\ref{fig:dec_block} illustrates the decode sequence.
+% Commented out this section since this information is incorporated into
+% the decoder implementation section. - Matt 1/25/06
+% An MPEG decoder accepts a bitstream as input and performs Huffman and
+% variable run-length decoding (VLD).  This process results in a set of
+% quantized, frequency-domain macroblocks and corresponding motion
+% vectors.  The decoder inversely quantizes (IQ) the macroblocks and then
+% performs an inverse DCT (IDCT) to convert the macroblocks to the
+% spatial domain.  For predictively coded macroblocks (e.g., P and B
+% pictures), the decoder performs motion compensation (MC) using the
+% input motion vectors to find a corresponding macroblock in a
+% previously decoded, stored reference picture. This reference
+% macroblock is added to the current macroblock to recover the original
+% picture data. If the current macroblock is part of an I or P picture,
+% then the decoder stores it for future reference.
+% Figure~\ref{fig:dec_block} illustrates the decode sequence.
 
-\begin{figure}[htbp]
-\centerline{\epsfig{file=dec_block.eps,width=5in}}
-\caption{Block diagram of MPEG-2 decode.}
-\label{fig:dec_block}
-\end{figure}
+%\begin{figure}[htbp]
+%\centerline{\epsfig{file=dec_block.eps,width=5in}}
+%\caption{Block diagram of MPEG-2 decode.}
+%\label{fig:dec_block}
+%\end{figure}
 
 A simple strategy for parallelizing the MPEG-2 decoding can exploit
 the data parallelism among macroblocks. Using this scheme, the Huffman
