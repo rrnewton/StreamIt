@@ -11,56 +11,36 @@ architecture independent. In addition, the language exposes the
 inherent parallelism and communication patterns that are prevalent in
 streaming programs.
 
-\begin{figure*}[t]
-  \begin{minipage}[t]{4.0in}
-    {
-	\begin{scriptsize}
-	  \begin{verbatim}
-	    int->int filter ZigZag(int N, int[N] Order) {
-	      work pop N push N {
-	        for (int i = 0; i < N; i++) {
-	          int pixel = peek(Order[i]);
-	          push(pixel);
-	        }
-	        for (int i = 0; i < N; i++) {
-	          pop();
-	        }
+\begin{figure}[t]
+  \begin{scriptsize}
+	\begin{verbatim}
+	  int->int filter ZigZag(int N, int[N] Order) {
+	    work pop N push N {
+	      for (int i = 0; i < N; i++) {
+	        int pixel = peek(Order[i]);
+	        push(pixel);
+	      }
+	      for (int i = 0; i < N; i++) {
+	        pop();
 	      }
 	    }
-	  \end{verbatim}
-	\end{scriptsize}
-    }
-    % \vspace{-3pt}
-    \vspace{-28pt}
-    \caption{Zig-zag descrambling filter.}
-    \vspace{-6pt}
-    \label{fig:zigzag-filter}
-  \end{minipage}
-  ~~\vrule~~
-  \begin{minipage}[t]{3.0in}
-    {
-      % TODO: change to EPS figure with arrows for zig-zag order
-	\begin{scriptsize}
-	  \begin{verbatim}
-	    int[64] Order =
-	      {00, 01, 05, 06, 14, 15, 27, 28,
-	       02, 04, 07, 13, 16, 26, 29, 42,
-	       03, 08, 12, 17, 25, 30, 41, 43,
-	       09, 11, 18, 24, 31, 40, 44, 53,
-	       10, 19, 23, 32, 39, 45, 52, 54,
-	       20, 22, 33, 38, 46, 51, 55, 60,
-	       21, 34, 37, 47, 50, 56, 59, 61,
-	       35, 36, 48, 49, 57, 58, 62, 63};
-	  \end{verbatim}
-	\end{scriptsize}
-    }
-    % \vspace{-3pt}
-    \vspace{-12pt}
-    \caption{Zig-zag descrambling order.}
-    \vspace{-6pt}
-    \label{fig:zigzag-order}
-  \end{minipage}
-\end{figure*}
+	  }
+
+	  int[64] Order =
+	    {00, 01, 05, 06, 14, 15, 27, 28,
+	     02, 04, 07, 13, 16, 26, 29, 42,
+	     03, 08, 12, 17, 25, 30, 41, 43,
+	     09, 11, 18, 24, 31, 40, 44, 53,
+	     10, 19, 23, 32, 39, 45, 52, 54,
+	     20, 22, 33, 38, 46, 51, 55, 60,
+	     21, 34, 37, 47, 50, 56, 59, 61,
+	     35, 36, 48, 49, 57, 58, 62, 63};
+	\end{verbatim}
+  \end{scriptsize}
+  \caption{Zig-zag descrambling filter.}
+%  \vspace{-12pt}
+  \label{fig:zigzag-filter}
+\end{figure}
 
 \SubSection{Filters as Programmable Units}
 In StreamIt, the basic programmable unit is a {\it filter}.  Each
@@ -88,9 +68,10 @@ encoding of quantized DCT coefficients. Typically, the zig-zag scan
 operates on an 8x8 matrix. Each instantiation of a filter specifies the
 matrix dimensions, as well as the desired ordering. In MPEG, there are
 two possible scan orders. The {\tt Order} parameter defines the
-specific scan pattern that is desired. For example, the filter shown
-in Figure~\ref{fig:zigzag-filter} implements the default MPEG-2 scan
-pattern shown in Figure~\ref{fig:zigzag-order}.
+specific scan pattern that is desired, as shown in 
+Figure~\ref{fig:zigzag-filter}.
+%% in Figure~\ref{fig:zigzag-filter} implements the default MPEG-2 scan
+%% pattern shown in Figure~\ref{fig:zigzag-order}.
 
 In this example, the input matrix is represented as a unidimensional
 stream of elements. The filter peeks or inspects the elements and
@@ -100,38 +81,31 @@ tape with a series of pops.  It has been shown that vector permutation
 instructions can be automatically generated from this
 representation~\cite{yelick04msp}.
 
-\begin{figure*}[t]
-\center{
-  \begin{minipage}[t]{3.2in}
-    {
+\begin{figure}[t]
+  \center{
  	\includegraphics[scale=1, angle=0]{./constructs-eg.eps}
  	\caption{Hierarchical streams in StreamIt.}
+%    \vspace{-12pt}
  	\label{fig:containers}
-    }
-  \end{minipage}
-  ~~\vrule~~
-  \begin{minipage}[t]{2.8in}
-    {
-  \vspace{-100pt}
-  \vspace{20pt}
+  }
+\end{figure}
+
+\begin{figure}[t]
   \begin{scriptsize}
     \begin{verbatim}
-     int->int pipeline InverseTransform() {
-       int[64] Order = {...};
-       add ZigZag(64, Order);
-       add IQuantization(64);
-       add IDCT(64);
-       add Saturation(64);
-     }
+      int->int pipeline InverseTransform() {
+        int[64] Order = {...};
+        add ZigZag(64, Order);
+        add IQuantization(64);
+        add IDCT(64);
+        add Saturation(64);
+      }
     \end{verbatim}
   \end{scriptsize}
-  \vspace{-8pt}
   \caption{Example pipeline.}
+%  \vspace{-12pt}
   \label{fig:decoder-pipeline}
-    }
-\end{minipage}
-}
-\end{figure*}
+\end{figure}
 
 \SubSection{Hierarchical Streams}
 In StreamIt, the application developer focuses on the hierarchical
@@ -181,122 +155,86 @@ filter with multiple input channels but only one output channel. The
 joiner gathers data from its predecessors in a roundrobin manner
 (declared as part of the syntax) to produce a single output stream.
 
-%% \begin{figure}[t]
-%%   \begin{scriptsize}
-%%     \begin{verbatim}
-%%       // N = macroblock size + motion vector data size;
-%%       // W = picture width (in pixels);
-%%       // H = picture width (in pixels);
-      
-%%       int->int splitjoin YCrCbDecoding(int N, int W, int H)
-%%       {
-%%         // 4:2:0 chroma format
-%%         split roundrobin(4*N, 1*N, 1*N);
-        
-%%         // last two parameters indicate
-%%         // necessary upsampling in x-y directions
-%%         add LuminanceChannel  (W, H, 0, 0);
-%%         add ChrominanceChannel(W, H, 2, 2);
-%%         add ChrominanceChannel(W, H, 2, 2);
-        
-%%         join roundrobin(1, 1, 1);
-%%       }              
-%%     \end{verbatim}
-%%     % TODO: validate 4*N, N, N parameters to above streams
-%%   \end{scriptsize}
-%%   %\vspace{150pt}
-%%   \vspace{-12pt}
-%%   \caption{Example MPEG decoder splitjoin.}
-%%   \label{fig:decoder-sj}
-%% \end{figure}
-
 \begin{figure}[t]
-  %\center{
-  %\begin{minipage}[t]{3.8in}
-  %{
-  %\vspace{-180pt}
   \begin{scriptsize}
     \begin{verbatim}
-	01 void->void MPEGDecoder {
-	02   ...
-	03   portal<InverseDCQuantizer> p;
-	04   ...
-	05   add Parser(p);
-	06   ...
-	07   add InverseDCQuantizer() to p;
-	08   ...
-	09 }
+      float->float pipeline IDCT_2D(int N) {
+        // perform N 1D-IDCTs in parallel in the X direction
+        add splitjoin {
+          split roundrobin(N);
+          for (int i = 0; i < N; i++) {
+            add IDCT(N);
+          }
+          join roundrobin(N);
+        }
+        // perform N 1D-IDCTs in parallel in the Y direction
+        add splitjoin {
+          split roundrobin(1);
+          for (int i = 0; i < N; i++) {
+            add IDCT_1D(N);
+          }
+          join roundrobin(1);
+        }
+      }
 
-	10 int->int filter Parser(portal<InverseDCQuantizer> p) {
-	11   work push * {
-	12     int precision;
-	13     ...
-	14     if (...) {
-	15       precision = pop();
-	16       p.setPrecision(precision) [0:0];
-	17     }
-	18     ...
-	19   }
-	20 }
-
-	21 int->int filter InverseDCQuantizer() {
-	22   int[4] scalingFactor = {8, 4, 2, 1};
-	23   int    precision = 0;
-
-	24   work pop 1 push 1 {
-	25     push(scalingFactor[precision] * pop());
-	26   }
-
-	27   handler setPrecision(int new_precision) {
-	28     precision = new_precision;
-	29   }
-	30  }
+      float->float filter IDCT_1D(int N) {
+        float[N][N] coeff = { ... };
+        
+        work pop N push N {
+          for (int x = 0; x < N; x++) {
+            float product = 0;
+            for (int u = 0; u < N; u++)
+                product += coeff[x][u] * peek(u);
+            push(product);
+          }
+          for (int x = 0; x < N; x++) pop();
+        }
+      }
     \end{verbatim}
   \end{scriptsize}
-  %\vspace{-3pt}
-  %}
-  %\end{minipage}
-  %~~\vrule~~
-  %\begin{minipage}[t]{2.8in}
-  %{
-  %  \vspace{50pt}
-  %  \center{
-  %	    \includegraphics[scale=.9, angle=0]{./messaging_example_fig.eps}
-  %  }
-  %}
-  %\end{minipage}
-  %}
-  \caption{MPEG messaging example.}
-  \label{fig:messaging}
+  \caption{Example MPEG decoder splitjoin.}
+%  \vspace{-12pt}
+  \label{fig:decoder-sj}
 \end{figure}
 
 \begin{figure}[t]
   \begin{scriptsize}
     \begin{verbatim}
-float->float pipeline IDCT_2D(int size) {
-    // perform 8 1D-IDCTs in parallel in the Y direction
-    add splitjoin {
-        split roundrobin(1);
-        for (int i = 0; i < size; i++) {
-            add IDCT_1D(size);
-        }
-        join roundrobin(1);
-    }
-    // perform 8 1D-IDCTs in parallel in the X direction
-    add splitjoin {
-        split roundrobin(size);
-        for (int i = 0; i < size; i++) {
-            add IDCT(size);
-        }
-        join roundrobin(size);
-    }
-}
-  \end{verbatim}
+      // global variable
+      float coeff[64] = { ... };
+      
+      void idct(float* block) {
+        int i, j, u;
+        float product;
+        float tmp[64];
+        
+        // 1D DCT in X direction
+        for (i = 0; i < 8; i++)
+          for (j = 0; j < 8; j++) {
+            product = 0;
+
+            for (u = 0; u < 8; u++)
+              product += c[u][j] * block[8*i + u];
+
+            tmp[8*i + j] = product;
+          }
+
+        // 1D DCT in Y direction
+        for (j = 0; j < 8; j++)
+          for (i = 0; i < 8; i++) {
+            product = 0;
+
+            for (u = 0; u < 8; u++)
+              product += c[u][i] * tmp[8*u + j];
+
+            block[8*i + j] = product;
+          }
+      }
+    \end{verbatim}
   \end{scriptsize}
-  %\vspace{150pt}
   \vspace{-12pt}
-  \caption{Example MPEG decoder splitjoin.}
-  \label{fig:decoder-sj}
+  \caption{Example C code for 2D inverse DCT calculation using 2 1D transforms.}
+  \label{fig:idct_creference}
 \end{figure}
 
 The splitjoin and pipeline constructs provide a convenient and natural
@@ -318,28 +256,6 @@ the compiler to understand and optimize the buffer
 management~\cite{sermulins05lctes}.  The StreamIt implementation is
 also parameterized such that it is trivial to adjust the size of the
 inverse DCT.
-
-\begin{figure*}[t]
-  \begin{scriptsize}
-    \begin{verbatim}
-// TODO: NEED to clean this up
-  for (i=0; i<8; i++)
-    for (j=0; j<8; j++)
-    {
-      partial_product = 0.0;
-
-      for (k=0; k<8; k++)
-        partial_product += coeff[k][j]*block[8*i+k];
-
-      tmp[8*i+j] = partial_product;
-    }
-    \end{verbatim}
-  \end{scriptsize}
-  %\vspace{150pt}
-  \vspace{-12pt}
-  \caption{Example C Code for 1D Inverse DCT Calculation.}
-  \label{fig:idct_creference}
-\end{figure*}
 
 %% For example, when the decoder performs the
 %% luminance and chrominance channel processing, the computation can
@@ -420,3 +336,64 @@ thereby allowing the compiler to deliver the message in the most
 efficient way for a given architecture. Teleport messaging also offers
 other powerful control over timing and latency beyond what is used in
 this example~\cite{thies05ppopp}.
+
+
+\begin{figure}[t]
+  %\center{
+  %\begin{minipage}[t]{3.8in}
+  %{
+  %\vspace{-180pt}
+  \begin{scriptsize}
+    \begin{verbatim}
+	01 void->void MPEGDecoder {
+	02   ...
+	03   portal<InverseDCQuantizer> p;
+	04   ...
+	05   add Parser(p);
+	06   ...
+	07   add InverseDCQuantizer() to p;
+	08   ...
+	09 }
+
+	10 int->int filter Parser(portal<InverseDCQuantizer> p) {
+	11   work push * {
+	12     int precision;
+	13     ...
+	14     if (...) {
+	15       precision = pop();
+	16       p.setPrecision(precision) [0:0];
+	17     }
+	18     ...
+	19   }
+	20 }
+
+	21 int->int filter InverseDCQuantizer() {
+	22   int[4] scalingFactor = {8, 4, 2, 1};
+	23   int    precision = 0;
+
+	24   work pop 1 push 1 {
+	25     push(scalingFactor[precision] * pop());
+	26   }
+
+	27   handler setPrecision(int new_precision) {
+	28     precision = new_precision;
+	29   }
+	30  }
+    \end{verbatim}
+  \end{scriptsize}
+  %\vspace{-3pt}
+  %}
+  %\end{minipage}
+  %~~\vrule~~
+  %\begin{minipage}[t]{2.8in}
+  %{
+  %  \vspace{50pt}
+  %  \center{
+  %	    \includegraphics[scale=.9, angle=0]{./messaging_example_fig.eps}
+  %  }
+  %}
+  %\end{minipage}
+  %}
+  \caption{MPEG messaging example.}
+  \label{fig:messaging}
+\end{figure}
