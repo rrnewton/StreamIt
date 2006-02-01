@@ -1,0 +1,94 @@
+\Section{MPEG-2 Encoding Format}
+
+MPEG-2~\cite{MPEG2} is a popular coding and decoding standard
+for digital video data. The scheme is a subset of both the
+DVD-Video~\cite{Taylor:1999:SDV} standard for storing movies, and the Digital
+Video Broadcasting specifications for transmitting HDTV and
+SDTV~\cite{DVB}. The scheme is used by a wide variety of multimedia
+applications and appliances such as the Tivo Digital Video
+Recorder~\cite{tivo}, and the DirecTV satellite broadcast
+service~\cite{directv}.
+
+MPEG-2 encoding uses both {\it lossy} compression and {\it lossless}
+compression. Lossy compression permanently eliminates information from
+a video based on a human perception model. Humans are much better at
+discerning changes in color intensity (luminance information) than
+changes in color (chrominance information). Humans are also much more
+sensitive to low frequency image components, such as a blue sky, than
+to high frequency image components, such as a plaid shirt. Details
+which humans are likely to miss can be thrown away without affecting
+the perceived video quality. Lossless compression eliminates 
+redundant information while allowing for its later reconstruction. 
+Similarities between adjacent video pictures are encoded using motion 
+prediction, and all data is Huffman compressed\cite{Huffman52}. 
+
+An MPEG-2 data stream is organized at the highest level into a Group of 
+Pictures (GOP) which contains all the information needed to reconstruct a
+video. The GOP contains the three kinds of pictures produced by the
+encoder, namely intra-coded (I), predictive-coded (P), and bidirectionally
+predictive-coded (B) pictures. I pictures are encoded without the use of 
+motion prediction and are intended to assist scene cuts, random access, 
+fast forward, or fast reverse playback~\cite[p. 14]{MPEG2}. P pictures 
+achieve compression by using forward motion estimation to detect and eliminate
+similarities between I or other P pictures. B pictures exploit a greater
+amount of temporal locality by making use of both forward and backward 
+motion estimation, although they may not themselves be used for motion 
+prediction by any other pictures.
+
+A typical I:P:B picture ratio in a GOP
+is 1:3:8, and a typical picture pattern is a repetition of the
+following logical sequence:
+I$_1$~B$_2$~B$_3$~P$_4$~B$_5$~B$_6$~P$_7$~B$_8$~B$_9$~P$_{10}$~B$_{11}$~B$_{12}$
+where the subscripts denote positions in the original video.  However,
+to simplify the decoder, the encoder reorders the pictures to produce
+the following pattern:
+I$_1$~P$_4$~B$_2$~B$_3$~P$_7$~B$_5$~B$_6$~P$_{10}$~B$_8$~B$_9$~B$_{11}$~B$_{12}$.
+Under this configuration, if the decoder encounters a P picture, its
+motion prediction is with respect to the previously decoded I or P
+picture; if the decoder encounters a B picture, its motion prediction
+is with respect to the previously two decoded I or P pictures.
+
+Each I, P, or B picture is made up of 16x16 pixel groupings known as macroblocks. A
+macroblock consists of a 2x2 array of blocks, each of which contains
+an 8x8 array of subpixels (individual color components of a pixel). Macroblocks in
+P and B pictures contain residuals with respect to a reference picture
+and a motion estimate. These residual macroblocks have an associated 
+set of motion vectors which specify a horizontal and vertical displacement 
+between the encoded macroblock and a matching macroblock-sized area in a 
+reference picture. The matching area is added to the current macroblock residual
+on a pixel by pixel basis to reconstruct the original macroblock.
+
+Macroblocks specify colors using a {\it
+luminance} channel to represent saturation (color intensity), and two
+{\it chrominance} channels to represent hue.  The human eye is more
+sensitive to changes in saturation than changes in hue, so the
+chrominance channels are frequently downsampled. The type of
+downsampling an MPEG-2 encoder uses is known as the {\it chrominance
+format}. The most common chrominance format is 4:2:0, which uses one
+8x8 block for each of the chrominance channels, downsampling a
+macroblock from 16x16 to 8x8 subpixels. An alternate chrominance format
+is 4:2:2. It uses two blocks for each chrominance channel,
+downsampling each of the channels from 16x16 to 8x16 subpixels. The two
+chrominance formats are shown in Figure~\ref{fig:chroma}.
+
+Each of the blocks within a macroblock undergo a 2-dimensional
+discrete cosine transform (DCT) which separates the picture into parts
+with varying visual importance. The input to the DCT is one block.
+The output of the DCT is an 8x8 matrix of frequency coefficients. 
+The upper left corner of the matrix represents low frequencies, whereas 
+the lower right corner represents higher frequencies. The latter are 
+often small and can be neglected without sacrificing human visual perception.
+The DCT block coefficients are quantized to reduce the number of bits needed
+to represent them. 
+
+An MPEG-2 bitstream is entropy coded to minimize its length. 
+Following quantization, many coefficients are effectively reduced to zero. 
+The DCT matrix is stored in a run-length encoded format by emitting each 
+non-zero coefficient, the number of bits needed to represent that coefficient, 
+and the number of zero coefficients since the last non-zero coefficient. The
+run-length encoder scans the DCT matrix in a zig-zag order
+(Figure~\ref{fig:zigzag-order}) to consolidate the zeros in the matrix.
+
+The output of the run-length encoder, motion vectors, picture type,
+and other picture and macroblock metadata are Huffman coded to
+further reduce the average number of bits per data item.
