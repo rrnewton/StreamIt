@@ -49,9 +49,10 @@ an average rate of 66:1, reducing the required streaming rate to
 %% An overview of the encoding process is illustrated in
 %% Figure~\ref{fig:mpeg-encoder}.
 The encoder operates on a sequence of pictures. Each picture is made
-up of pixels arranged in a 16x16 array known as a macroblock.  A
-macroblocks consists of a 2x2 array of blocks, each of which contains
-an 8x8 array of pixels. Macroblocks specify colors using a {\it
+up of a 16x16 grouping of pixels known as a macroblock.  A
+macroblock consists of a 2x2 array of blocks, each of which contains
+an 8x8 array of subpixels (individual color components of a pixel). 
+Macroblocks specify colors using a {\it
 luminance} channel to represent saturation (color intensity), and two
 {\it chrominance} channels to represent hue.  The human eye is more
 sensitive to changes in saturation than changes in hue, so the
@@ -59,9 +60,9 @@ chrominance channels are frequently downsampled. The type of
 downsampling an MPEG-2 encoder uses is known as the {\it chrominance
 format}. The most common chrominance format is 4:2:0, which uses one
 8x8 block for each of the chrominance channels, downsampling a
-macroblock from 16x16 to 8x8 pixels. An alternate chrominance format
+macroblock from 16x16 to 8x8 subpixels. An alternate chrominance format
 is 4:2:2. It uses two blocks for each chrominance channel,
-downsampling each of the channels from 16x16 to 8x16 pixels. The two
+downsampling each of the channels from 16x16 to 8x16 subpixels. The two
 chrominance formats are shown in Figure~\ref{fig:chroma}.
 
 The compression in MPEG is achieved largely via motion estimation,
