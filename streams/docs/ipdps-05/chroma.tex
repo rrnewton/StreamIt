@@ -1,59 +1,88 @@
 \SubSection{Video Sampling Rate}
 
-Macroblocks specify colors using a luminance channel to represent
-saturation (color intensity), and two chrominance channels to
-represent hue. The human eye is more sensitive to changes in
-saturation than changes in hue, so the chrominance channels are
-frequently compressed by downsampling the chrominance data within a
-macroblock. The type of chrominance downsampling an MPEG-2 encoder
-uses is its {\it chrominance format}. The most common chrominance
-format is 4:2:0, which uses a single block for each of the chrominance
-channels, downsampling each of the two channels from 16x16 to 8x8.  An
-alternate chrominance format is 4:2:2. It uses two blocks for each
-chrominance channel, downsampling each of the channels from 16x16 to
-8x16. The two chrominance formats are shown in Figure~\ref{fig:chroma}.
+A contrast of chrominance format support between the StreamIt and  C reference
+implementations illustrates the benefits stream based languages can 
+provide to programmability. While the conceptual difference between chrominance formats
+is merely a change in downsampling ratio, this leads to a change in the data rates
+and the ratios of data between the color channels. This requires that the C
+implementation parameterize its buffer sizes, array lengths, array indices, and
+pointer offsets on the chrominance format; the reference implementation uses a 
+``chroma flag'' to dictate control flow to alternate index/offset calculations 
+in 43 locations in the code. As an example, a fragment of the ``form\_prediction'' routine 
+(in recon.c~\cite{reference-mpeg-c}) used for motion compensation is shown in 
+Figure~\ref{fig:chroma}. This function calls a 
+subroutine to perform the actual motion compensation on each of the three color channels,
+passing in array offsets to a global array holding the data. Lines 4-6 adjusts values used for address
+calculations to handle the 4:2:2 and 4:2:0 chrominance formats, and lines 7-9 provide
+additional adjustments for the 4:2:0 format. While these offset adjustments
+are neccesary for high performance, they are difficult for programmers 
+and make the code hard to understand.  
+% I don't really like that last sentence but I can't think of a better way to say it. - Matt
 
-To support the 4:2:2 chrominance format in our StreamIt decoder, we
+To add support for the 4:2:2 chrominance format in our StreamIt decoder, we
 modified 31 lines and added 20 new lines. Of the 31 modified lines, 23
 were trivial modifications to pass a variable representing the
 chrominance format as a stream parameter. The greatest substantial
-change was to the decoding splitjoin previously illustrated in
-Figure~\ref{fig:decoder-sj}. In the case of a 4:2:2 sampling rate,
+change was to the color channel splitter, previously illustrated on line 20 of 
+Figure~\ref{fig:dec_block_detailed}. In the case of a 4:2:2 sampling rate,
 the chrominance data, as it appears on the input tape, alternates
 between each of the two chrominance channels. Thus, a two-tiered
 splitjoin is used to properly recover the appropriate chrominance
-channels. The new splitjoin is shown in Figure~\ref{fig:chroma}.
+channels. The new splitjoin is shown in Figure~\ref{fig:chroma}. 
+Even after these modifications, the chrominance formmat only explicitly dictates
+control flow in 9 locations. Of course, the stream graph execution changes 
+dramatically between chrominance formats, but these changes will be to 
+scheduling and buffer management, which are implicit changes hidden from 
+the programmer. 
+
 \begin{figure*}[t]
  \begin{minipage}[t]{4.3in}
    {
     \begin{scriptsize}
-    \begin{verbatim} 
-    // N = macroblock size + motion vector data size;
-    // W = picture width (resolution in pixels);
-    // H = picture width (resolution in pixels);
-
-    int->int splitjoin(int chroma) {
-      int xsample, ysample; // upsampling requirement
-
-      if (chroma == 420) {  // 4:2:0 chroma format
-        split roundrobin(4*N, 2*N);
-        xsample = ysample = 2;
-      } else {              // 4:2:2 chroma format
-        split roundrobin(4*N, 4*N);
-        xsample = 2;
-        ysample = 0;
-      }
-
-      add LuminanceChannel(W, H, 0, 0, chroma);
-
-      add int->int splitjoin {
+    \begin{verbatim}
+   // Matt's note - this is the C reference code I added.
+   // I added the line numbers so I can reference them in the text.
+1    /* Y */
+2    form_component_prediction(src[0]+(sfield?lx2>>1:0),dst[0]+(dfield?lx2>>1:0),
+3                              lx,lx2,w,h,x,y,dx,dy,average_flag);
+4    if (chroma_format!=CHROMA444)  {
+5        lx>>=1; lx2>>=1; w>>=1; x>>=1; dx/=2;
+6    }
+7    if (chroma_format==CHROMA420)  {
+8        h>>=1; y>>=1; dy/=2;
+9    }
+10   /* Cb */
+11   form_component_prediction(src[1]+(sfield?lx2>>1:0),dst[1]+(dfield?lx2>>1:0),
+12                             lx,lx2,w,h,x,y,dx,dy,average_flag);
+13   /* Cr */
+14   form_component_prediction(src[2]+(sfield?lx2>>1:0),dst[2]+(dfield?lx2>>1:0),
+15                             lx,lx2,w,h,x,y,dx,dy,average_flag);    
+    \end{verbatim}
+    \end{scriptsize}
+   }
+   % \vspace{-3pt}
+   % \caption{Decoding stream to handle 4:2:0 and 4:2:2 chroma formats.}
+   % \label{fig:chroma-stream}
+  \end{minipage}
+    ~~\hrule~~
+ \begin{minipage}[t]{4.3in}
+   {
+    \begin{scriptsize}
+    \begin{verbatim}
+    // C = blocks per chrominance channel per macroblock 
+    // C = 1 for 4:2:0, C = 2 for 4:2:2
+    add splitjoin {
+      split roundrobin(4*(B+V), 2*C*(B+V));
+      add MotionCompensation() to PT1;
+      add splitjoin {
         split roundrobin(N, N);
-        add ChrominanceChannel(W, H, xsample, ysample, chroma);
-        add ChrominanceChannel(W, H, xsample, ysample, chroma);
+        for (int i = 0; i < 2; i++) {
+          add MotionCompensation() to PT1;
+          add ChannelUpsample(C);
+        }
         join roundrobin(1, 1);
       }
-
-      join roundrobin(1, 2);
+      join roundrobin(1, 1, 1);
     }
     \end{verbatim}
     \end{scriptsize}
@@ -77,6 +106,3 @@ channels. The new splitjoin is shown in Figure~\ref{fig:chroma}.
     differ.}
   \label{fig:chroma}
 \end{figure*}
-
-
-
