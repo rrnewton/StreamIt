@@ -1,14 +1,14 @@
 \Section{Code Malleability: A Case Study}
 \label{section:chroma}
 
-A contrast of chrominance format support between the StreamIt and  C
+A contrast of chroma format support between the StreamIt and  C
 reference implementations illustrates the benefits stream based
 languages can  provide to programmability. While the conceptual
-difference between chrominance formats is merely a change in
+difference between chroma formats is merely a change in
 downsampling ratio, this leads to a change in the data rates and the
 ratios of data between the color channels. This requires that the C
 implementation parameterize its buffer sizes, array lengths, array
-indices, and pointer offsets on the chrominance format; the reference
+indices, and pointer offsets on the chroma format; the reference
 implementation uses a  ``chroma flag'' to dictate control flow to
 alternate index/offset calculations  in 43 locations in the code. As
 an example, a fragment of the ``form\_prediction'' routine  (in
@@ -17,24 +17,24 @@ in  Figure~\ref{fig:chroma}. This function calls a  subroutine to
 perform the actual motion compensation on each of the three color
 channels, passing in array offsets to a global array holding the
 data. Lines 4-6 adjusts values used for address calculations to handle
-the 4:2:2 and 4:2:0 chrominance formats, and lines 7-9 provide
+the 4:2:2 and 4:2:0 chroma formats, and lines 7-9 provide
 additional adjustments for the 4:2:0 format. While these offset
 adjustments are neccesary for high performance, they are difficult for
 programmers  and make the code hard to understand.
 
-To add support for the 4:2:2 chrominance format in our StreamIt decoder, we
+To add support for the 4:2:2 chroma format in our StreamIt decoder, we
 modified 31 lines and added 20 new lines. Of the 31 modified lines, 23
 were trivial modifications to pass a variable representing the
-chrominance format as a stream parameter. The greatest substantial
+chroma format as a stream parameter. The greatest substantial
 change was to the color channel splitter, previously illustrated on line 20 of 
 Figure~\ref{fig:dec_block_detailed}. In the case of a 4:2:2 sampling rate,
 the chrominance data, as it appears on the input tape, alternates
 between each of the two chrominance channels. Thus, a two-tiered
 splitjoin is used to properly recover the appropriate chrominance
 channels. The new splitjoin is shown in Figure~\ref{fig:chroma}. 
-Even after these modifications, the chrominance formmat only explicitly dictates
+Even after these modifications, the chroma formmat only explicitly dictates
 control flow in 9 locations. Of course, the stream graph execution changes 
-dramatically between chrominance formats, but these changes will be to 
+dramatically between chroma formats, but these changes will be to 
 scheduling and buffer management, which are implicit changes hidden from 
 the programmer. 
 
@@ -99,7 +99,7 @@ the programmer.
   {
    \begin{center}
     \epsfig{file=chroma_format.eps, width=2.5in}
-    % \caption{4:2:0 and 4:2:2 chrominance formats showing macroblock ordering}
+    % \caption{4:2:0 and 4:2:2 chroma formats showing macroblock ordering}
     % \label{fig:chroma-format}
    \end{center}
   }

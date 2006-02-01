@@ -13,7 +13,7 @@ MPEG-2 encoding uses both {\it lossy} compression and {\it lossless}
 compression. Lossy compression permanently eliminates information from
 a video based on a human perception model. Humans are much better at
 discerning changes in color intensity (luminance information) than
-changes in color (chrominance information). Humans are also much more
+changes in hue (chrominance information). Humans are also much more
 sensitive to low frequency image components, such as a blue sky, than
 to high frequency image components, such as a plaid shirt. Details
 which humans are likely to miss can be thrown away without affecting
@@ -49,20 +49,19 @@ an average rate of 66:1, reducing the required streaming rate to
 %% An overview of the encoding process is illustrated in
 %% Figure~\ref{fig:mpeg-encoder}.
 The encoder operates on a sequence of pictures. Each picture is made
-up of a 16x16 grouping of pixels known as a macroblock.  A macroblock
+up of a 16x16 group of pixels known as a macroblock.  A macroblock
 consists of a 2x2 array of blocks, each of which contains an 8x8 array
 of subpixels (i.e., individual color components of a pixel).
-Macroblocks specify colors using a luminance channel to represent
-saturation (color intensity), and two chrominance channels to
-represent hue. Becuae the human eye is more sensitive to changes in
-saturation than changes in hue, the chrominance channels are
-frequently downsampled. The type of downsampling an MPEG-2 encoder
-uses is known as the chrominance (chroma) format. The most common
+Macroblocks specify colors in terms of their luminance and 
+chrominance components. Because of human insensitivity to hue
+the chrominance channels are frequently downsampled. 
+The type of downsampling an MPEG-2 encoder
+uses is known as its chroma format. The most common
 chroma format is 4:2:0, which uses one 8x8 block for each of the
 chrominance channels, downsampling a macroblock from 16x16 to 8x8
 subpixels. An alternate format is 4:2:2. It uses two blocks for each
 chrominance channel, downsampling each of the channels from 16x16 to
-8x16 subpixels. The two chrominance formats are shown in
+8x16 subpixels. The two chroma formats are shown in
 Figure~\ref{fig:chroma}.
 
 The compression in MPEG is achieved largely via motion estimation,
