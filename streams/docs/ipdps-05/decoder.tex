@@ -1,5 +1,5 @@
 \begin{figure*}[t]
-  \centerline{\epsfig{file=decoder_with_code.eps,width=5in}}
+  \centerline{\epsfig{file=decoder_with_code.eps,width=\textwidth}}
   \caption{MPEG-2 decoder block diagram and corresponding StreamIt code.}
   \label{fig:dec-with-code}
 \end{figure*}
@@ -128,19 +128,24 @@ communication is relegated to teleport messaging (lines 13, 25, 28, and
 33, and illustrated with dotted lines in
 Figure~\ref{fig:dec-with-code}). For instance, the parser (VLD)
 generates a message whenever the picture or macroblock type
-changes. The motion compensation filter receives this information via
-its dedicated portal (line 28), determines how to process the current
-picture, and decides whether it needs to store it for future
-reference. The picture reordering filter receives a similar message
+changes. The motion compensation filters receive this information via
+their dedicated portal (line 28), determine how to process the current
+picture, and decide whether they needs to store the picture for future
+reference. Note however that while there are multiple motion compensators
+subscribed to the same portal, they each receive the same message with
+respect to their local execution.
+The picture reordering filter receives a similar message
 (via portal on line 33), and uses the information to determine the
 correct temporal order of pictures. The inverse transformation
 pipeline listens to its portal (line 13) to determine the algebraic
 manipulation required to perform the inverse quantization of the input
-macroblock. Teleport messaging proves as a natural mechanism because
-the macroblock type and picture type information changes infrequently
-and irregularly, compared to the regular flow of data in the
-application. Moreover, by exposing the flow of messages to the
-compiler, the application can be reordered or parallelized without a
+macroblock. Teleport messaging 
+%% proves as a natural mechanism because
+%% the macroblock type and picture type information changes infrequently
+%% and irregularly, compared to the regular flow of data in the
+%% application. Moreover, by 
+exposes the flow of messages to the compiler, and allows for large
+scale reordering or parallelization of the application without a
 heroic dependence analysis.
 
 In StreamIt, all of the processing is encapsulated hierarchically into
@@ -161,8 +166,6 @@ video. However, better quality is possible with higher sampling rates
 since more color information is retained from the original picture. In
 the next section, we show that the migration path to support multiple
 chroma formats is trivial.
-
-\input{chroma}
 
 %% \SubSection{Motion Compensation}
 

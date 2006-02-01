@@ -114,19 +114,17 @@ StreamIt provides three hierarchical structures for composing filters
 into larger stream graphs (see Figure~\ref{fig:containers}).
 
 \paragraph{Pipeline.}
-The pipeline stream construct composes streams in sequence, with
-the output of one connected to the input of the next.  An example of a
-pipeline appears in Figure~\ref{fig:decoder-pipeline}. A pipeline is a
-single input to single output stream. The decoding pipeline in the
-figure consists of four streams. The first is a filter which zig-zag
-unorders the input stream, and prepares the data for the inverse
-quantization and DCT. The output of the filter is consumed by a stream
-named {\tt IQ} which is a pipeline itself (not shown). This example
-illustrates the hierarchical nature of stream composition in
-StreamIt. The {\tt IQuantization} pipeline performs the inverse quantization, and
-produces an output stream that is in turn consumed by another stream
-which performs the inverse DCT. As in the case of a filter, pipelines
-are also parameterizable.
+A StreamIt pipeline is a parameterized stream that composes streams in
+sequence, with the output of one connected to the input of the next.
+An example of a pipeline appears in
+Figure~\ref{fig:decoder-pipeline}. A pipeline is a single input to
+single output stream. The decoding pipeline in the figure consists of
+four streams. The first is a filter which zig-zag unorders the input
+stream, and prepares the data for the inverse quantization and
+DCT. The output of the filter is consumed by a stream named {\tt
+IQuantization} that performs the inverse quantization, and produces an
+output stream that is in turn consumed by another stream that performs
+the inverse DCT.
 
 The {\tt add} keyword in StreamIt constructs the specified stream
 using the input arguments. The {\tt add} statement may only appear in
@@ -137,7 +135,7 @@ and development of large applications, thereby  promoting
 collaboration, increasing code reuse, and simplifying debugging.
 
 \paragraph{Split-Join.}
-The splitjoin stream construct distributes data to a set of parallel
+The splitjoin construct distributes data to a set of parallel
 streams, which are then joined together in a roundrobin fashion. In a
 splitjoin, the {\it splitter} performs the data scattering, and the
 {\it joiner} performs the gathering. A splitter is a specialized
@@ -162,7 +160,7 @@ joiner gathers data from its predecessors in a roundrobin manner
         add splitjoin {
           split roundrobin(N);
           for (int i = 0; i < N; i++)
-            add IDCT(N);
+            add IDCT_1D(N);
           join roundrobin(N);
         }
         // perform N 1D-IDCTs in parallel in the Y direction
@@ -230,7 +228,7 @@ joiner gathers data from its predecessors in a roundrobin manner
     \end{verbatim}
   \end{scriptsize}
   \vspace{-12pt}
-  \caption{Example C code for 2D inverse DCT calculation using 2 1D transforms.}
+  \caption{Example C code for 2D inverse DCT calculation using two 1D transforms.}
   \label{fig:idct_creference}
 \end{figure}
 
