@@ -31,16 +31,16 @@ channels. Therefore, the VLD outputs a total of six 8x8 blocks,
 or 384 subpixels per macroblock.
 
 The VLD output is segregated into two homogeneous streams by a
-round robin splitter (line 7). The first stream undergoes inverse
-transformations (lines 8-13), while the second is decoded to produce
-absolute motion vectors (line 14). As is evident from the computation
+round robin splitter (line 10). The first stream undergoes inverse
+transformations (lines 11-16), while the second is decoded to produce
+absolute motion vectors (line 17). As is evident from the computation
 graph, the two streams are decoded in parallel, and then merged (line
-15) prior to the motion compensation stage of the pipeline.
+21) prior to the motion compensation stage of the pipeline.
 
 The inverse transformations map each 8x8 block from the frequency
 domain back to the spatially encoded domain. Each block is reordered
-(line 9), and then inversely quantized (line 10). This is followed by
-an inverse DCT and a bounded saturation filter (lines 11-12). The set
+(line 12), and then inversely quantized (line 13). This is followed by
+an inverse DCT and a bounded saturation filter (lines 14-15). The set
 of transformations is grouped into a pipeline whose input
 and output types are automatically inferred by the compiler. Each of
 the filters in this pipeline operate on 8x8 blocks. The code that is
@@ -64,7 +64,7 @@ can be easily identified as those that are stateless (i.e., do not
 carry mutable state from one iteration to the next).
 
 The third stage of the decoding pipeline performs the motion
-compensation (lines 17-27) to recover predictively coded
+compensation (lines 23-34) to recover predictively coded
 macroblocks. The motion compensation filter uses the motion vectors to
 find a corresponding macroblock in a previously decoded reference
 picture. The reference macroblock is added to the current macroblock
@@ -75,16 +75,16 @@ future reference picture.
 In the compensation stage, there are three parallel streams. 
 The first handles the luminance color channel (Y), and the
 other two handle the chrominance channels (Cb and Cr). The round robin
-splitter (line 18) distributes the macroblocks according to the chroma
+splitter (line 24) distributes the macroblocks according to the chroma
 format. Since the luminance channel is not down sampled during the
 encoding process, the splitter dispatches four 8x8 blocks at a time to
 the Y motion compensator. The chrominance channels are typically down
 sampled by a factor of 4, and hence one 8x8 block is streamed to each
-of the Cb and Cr pipelines, which up sample (line 23) the results of
+of the Cb and Cr pipelines, which up sample (line 29) the results of
 the motion compensator to generate the full 16x16 macroblock.  The
-joiner (line 26) assembles the pictures from each of the color
+joiner (line 31) assembles the pictures from each of the color
 channels, one pixel at a time. The output is then readied for display
-(lines 28 and 29) by organizing the pictures in accord with their
+(lines 33 and 34) by organizing the pictures in accord with their
 temporal order, and performing color space conversion to the RGB (red,
 green, blue) color model. Note that these two filters each consume
 $3\times\texttt{W}\times\texttt{H}$ subpixels per picture. This is three
@@ -122,17 +122,17 @@ motion compensation, making it difficult to clearly follow the code,
 and hindering a better comparison. The C code also relies on global
 variables to communicate values, such as quantization coefficients,
 from the parser to the relevant code regions. In StreamIt, such
-communication is relegated to teleport messaging (lines 5, 10, 22, and
-28, and illustrated with dotted lines in
+communication is relegated to teleport messaging (lines 13, 25, 28, and
+33, and illustrated with dotted lines in
 Figure~\ref{fig:dec-with-code}). For instance, the parser (VLD)
 generates a message whenever the picture or macroblock type
 changes. The motion compensation filter receives this information via
-its dedicated portal (line 22), determines how to process the current
+its dedicated portal (line 28), determines how to process the current
 picture, and decides whether it needs to store it for future
 reference. The picture reordering filter receives a similar message
-(via portal on line 28), and uses the information to determine the
+(via portal on line 33), and uses the information to determine the
 correct temporal order of pictures. The inverse transformation
-pipeline listens to its portal (line 10) to determine the algebraic
+pipeline listens to its portal (line 13) to determine the algebraic
 manipulation required to perform the inverse quantization of the input
 macroblock. Teleport messaging proves as a natural mechanism because
 the macroblock type and picture type information changes infrequently
