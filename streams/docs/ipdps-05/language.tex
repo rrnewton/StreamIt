@@ -162,17 +162,15 @@ joiner gathers data from its predecessors in a roundrobin manner
         // perform N 1D-IDCTs in parallel in the X direction
         add splitjoin {
           split roundrobin(N);
-          for (int i = 0; i < N; i++) {
+          for (int i = 0; i < N; i++)
             add IDCT(N);
-          }
           join roundrobin(N);
         }
         // perform N 1D-IDCTs in parallel in the Y direction
         add splitjoin {
           split roundrobin(1);
-          for (int i = 0; i < N; i++) {
+          for (int i = 0; i < N; i++)
             add IDCT_1D(N);
-          }
           join roundrobin(1);
         }
       }
@@ -203,7 +201,7 @@ joiner gathers data from its predecessors in a roundrobin manner
       // global variable
       float coeff[64] = { ... };
       
-      void idct(float* block) {
+      void IDCT_2D(float* block) {
         int i, j, u;
         float product;
         float tmp[64];
