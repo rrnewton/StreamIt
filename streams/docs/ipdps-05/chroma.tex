@@ -26,7 +26,7 @@ modified 31 lines and added 20 new lines. Of the 31 modified lines, 23
 were trivial modifications to pass a variable representing the chroma
 format as a stream parameter. The greatest substantial change was to
 the color channel splitter, previously illustrated on line 20 of
-Figure~\ref{fig:dec_block_detailed}. In the case of a 4:2:2 sampling
+Figure~\ref{fig:dec0with-code}. In the case of a 4:2:2 sampling
 rate, the chrominance data, as it appears on the input tape,
 alternates between each of the two chrominance channels. Thus, a
 nested splitjoin is used to properly recover the appropriate
@@ -34,7 +34,7 @@ chrominance channels. The new splitjoin is shown in
 Figure~\ref{fig:chroma}.  Even after these modifications, the chroma
 format only explicitly dictates control flow in 9 locations. Of
 course, the scheduling and buffer management changes dramatically
-between chrominance formats, but this is automatic and hidden from the
+between chroma formats, but this is automatic and hidden from the
 programmer.
 
 \begin{figure*}[t]

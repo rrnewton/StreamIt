@@ -25,8 +25,8 @@ outputs $\texttt{N}\times\texttt{B}$ data elements for each
 macroblock, followed by \texttt{V} data elements that encode its
 motion vector. The actual value of \texttt{N} depends on the chroma
 format. In a 4:2:0 chroma format regime, $\texttt{N}=6$ since each
-macroblock consists of four 8x8 subpixel blocks in the luminance channel,
-and two 8x8 subpixel blocks in each of the two chrominance
+macroblock consists of four 8x8 subpixel blocks for the luminance channel,
+and two 8x8 subpixel blocks for the two chrominance
 channels. Therefore, the VLD outputs a total of six 8x8 blocks,
 or 384 subpixels per macroblock.
 
@@ -59,7 +59,7 @@ add splitjoin {
 \end{verbatim}
 \end{center}
 A stream-aware compiler can also automatically adjust the execution
-granularity as necessary~\cite{gordo-asplos}.  Data-parallel streams
+granularity as necessary~\cite{gordon02asplos}, since data-parallel streams
 can be easily identified as those that are stateless (i.e., do not
 carry mutable state from one iteration to the next).
 
@@ -89,8 +89,8 @@ temporal order, and performing color space conversion to the RGB (red,
 green, blue) color model. Note that these two filters each consume
 $3\times\texttt{W}\times\texttt{H}$ subpixels per picture. This is three
 times the pixel resolution of the decoded image since there is one
-pixel generated from each of the three channel decoders. The output of
-the decoder is $\texttt{W}\times\texttt{H}$ pixels in the end.
+pixel generated from each of the three channel decoders. The final output of
+the decoder is $\texttt{W}\times\texttt{H}$ pixels.
 
 The MPEG-2 decoder in StreamIt is a fully portable implementation in
 that the application is not architecture dependent. The implementation
@@ -106,8 +106,10 @@ static streams. The bit stream parser is the largest single filter,
 consisting of 775 lines of code. The 48 static streams are compiled to
 2,150 filters for a picture resolution of 352x240. By way of
 comparison, the reference C implementation~\cite{reference-mpeg-c} is
-6,835 lines of code. A line count comparison is not an accurate
-measure of programmability, and our StreamIt decoder 
+6,835 lines of code~\footnote{Line counts were generated using 
+the SLOCcount tool which strips whitespace and comments.}.
+A line count comparison is not an accurate
+measure of programmability, since our StreamIt decoder 
 implements only a subset of several stream types supported by MPEG.
 Our decoder does provide full support for the range of different 
 compression techniques used within MPEG, but supports only a subset 
@@ -152,12 +154,12 @@ components may be used as is to implement a JPEG decoder.
 Another noteworthy aspect of the StreamIt implementation is its
 malleability. We illustrate this by outlining how the decoder
 implementation, originally designed to deal with a 4:2:0 chroma
-sampling rate is modified for a 4:2:2 sampling rate. MPEG-2 streams
+sampling rate, is modified for a 4:2:2 sampling rate. MPEG-2 streams
 are typically encoded using the former, which achieves a 50\%
-reduction in the number of bits required to represent a
+reduction in the number of blocks required to represent a
 video. However, better quality is possible with higher sampling rates
 since more color information is retained from the original picture. In
-this sequel, we show that the migration path to support multiple
+the next section, we show that the migration path to support multiple
 chroma formats is trivial.
 
 \input{chroma}

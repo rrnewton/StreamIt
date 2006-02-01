@@ -49,15 +49,14 @@ an average rate of 66:1, reducing the required streaming rate to
 %% An overview of the encoding process is illustrated in
 %% Figure~\ref{fig:mpeg-encoder}.
 The encoder operates on a sequence of pictures. Each picture is made
-up of a 16x16 group of pixels known as a macroblock.  A macroblock
-consists of a 2x2 array of blocks, each of which contains an 8x8 array
-of subpixels (i.e., individual color components of a pixel).
-Macroblocks specify colors in terms of their luminance and 
-chrominance components. Because of human insensitivity to hue
-the chrominance channels are frequently downsampled. 
-The type of downsampling an MPEG-2 encoder
+from 16x16 groups of pixels known as a macroblocks.  A macroblock
+is composed from a series of blocks, which are 8x8 arrays of subpixels
+(individual color components of a pixel). The luminance information for
+a macroblock, never downsampled, is a 2x2 array of blocks. 
+Because of human insensitivity to hue the chrominance channels 
+are frequently downsampled. The type of downsampling an MPEG-2 encoder
 uses is known as its chroma format. The most common
-chroma format is 4:2:0, which uses one 8x8 block for each of the
+chroma format is 4:2:0, which uses one block for each of the
 chrominance channels, downsampling a macroblock from 16x16 to 8x8
 subpixels. An alternate format is 4:2:2. It uses two blocks for each
 chrominance channel, downsampling each of the channels from 16x16 to
@@ -89,7 +88,9 @@ The output of the
 DCT is an 8x8 matrix of frequency coefficients. The upper left corner
 of the matrix represents low frequencies, whereas the lower right
 corner represents higher frequencies. The latter are often small and
-can be neglected without sacrificing human visual perception.
+can be neglected without sacrificing human visual perception. The DCT 
+block coefficients are quantized to reduce the number of bits needed
+to represent them. 
 
 %\begin{figure}[t]
 %\begin{center}
@@ -105,18 +106,15 @@ can be neglected without sacrificing human visual perception.
 %\end{center}
 %\end{figure}
 
-The DCT coefficients are quantized to reduce the number of bits needed
-to represent them. Following quantization, many coefficients are
-effectively reduced to zero. The DCT matrix is then run-length encoded
-by emitting each non-zero coefficient,
-% TODO: clarify ``followed by the number of zeros that precede it''?
-followed by the number of zeros that precede it, along with the number
-of bits needed to represent the coefficient, and its value. The
+Following quantization, many coefficients are effectively reduced to
+zero. The DCT matrix is stored in a run-length encoded format by emitting each 
+non-zero coefficient, the number of bits needed to represent that coefficient, 
+and the number of zero coefficients since the last non-zero coefficient. The
 run-length encoder scans the DCT matrix in a zig-zag order
-(Figure~\ref{fig:zigzag-order}) to consolidate the zeros in the matrix.
+to consolidate the zeros in the matrix.
 
-Finally, the output of the run-length encoder, motion vector data,
-and other information (e.g., type of picture), are Huffman coded to
+The output of the run-length encoder, motion vectors, picture type,
+and other picture and macroblock metadata are Huffman coded to
 further reduce the average number of bits per data item. The compressed
 stream is sent to the output device.
 
