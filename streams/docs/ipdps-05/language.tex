@@ -46,19 +46,18 @@ streaming programs.
 In StreamIt, the basic programmable unit is a {\it filter}.  Each
 filter has an independent address space. Thus, all communication with
 other filters is via the input and output channels, and occasionally
-via control messages (see Section~\ref{sec:messaging}).  Filters
-contain a work function that represents a steady-state execution step.
+via control messages (see Section~\ref{sec:messaging}).  The main method
+in a filter is the work function which represents a steady-state execution step.
 The work function pops (i.e., reads) items from the filter input tape
 and pushes (i.e., writes) items to the filter output tape. A filter
 may also peek at a given index on its input tape without consuming the
 item; this makes it simple to represent computation over a sliding
 window or to perform permutations on the input stream. The {\tt push},
-{\tt pop}, and {\tt peek} rates are declared as part of the work
+{\tt pop}, and {\tt peek} rates can be declared as part of the work
 function, thereby enabling the compiler to apply various optimizations
 and construct efficient execution schedules.
 
-A filter is akin to a class in object oriented programming with the
-{\tt work} function serving as the main method. A filter is parameterizable,
+A filter is parameterizable,
 and this allows for greater malleability and code reuse. An example
 filter is shown in Figure~\ref{fig:zigzag-filter}. This filter
 consumes a stream whose elements are of type {\tt int} and produces a
@@ -74,7 +73,7 @@ Figure~\ref{fig:zigzag-filter}.
 %% pattern shown in Figure~\ref{fig:zigzag-order}.
 
 In this example, the input matrix is represented as a unidimensional
-stream of elements. The filter peeks or inspects the elements and
+stream of elements. The filter peeks the elements and
 copies them to the output stream in the specified order. Once all the
 DCT coefficients are copied, the input stream is deallocated from the
 tape with a series of pops.  It has been shown that vector permutation
@@ -146,10 +145,10 @@ filter with a single input and multiple output channels. On every
 execution step, it can distribute its output to any one of its
 children in either a {\it duplicate} or a {\it roundrobin} manner.  A
 duplicate splitter (indicated by \texttt{split duplicate}) replicates
-incoming data to every sibling connected to the splitter.  A
+incoming data to each stream connected to the splitter.  A
 roundrobin splitter (indicated by {\tt split
 roundrobin($w_1,\ldots,w_n$)}) distributes the first $w_1$ items to
-the first sibling, the next $w_2$ items to the second sibling, and so
+the first child, the next $w_2$ items to the second child, and so
 on.  The splitter counterpart is the joiner. It is a specialized
 filter with multiple input channels but only one output channel. The
 joiner gathers data from its predecessors in a roundrobin manner
@@ -304,7 +303,7 @@ sender.
 Intuitively, the message semantics can be thought of in terms of
 attaching tags to data items.  If the {\tt Parser} sends a message to
 a filter downstream (i.e., in the same direction as dataflow) with a
-latency $k$, then conceptually, the filter tags the items that it
+latency $k$, then, conceptually, the filter tags the items that it
 outputs in $k$ iterations of its work function. If $k=0$, the data
 produced in the current execution of the work function are tagged. The
 tags propagate through the stream graph; whenever a filter inputs an
