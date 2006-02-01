@@ -242,18 +242,17 @@ implementation of the 2D inverse DCT using 1D inverse DCTs. This
 implementation is both data parallel (within the rows and columns) and
 pipeline parallel (between the rows and columns). While a C
 implementation of the inverse DCT can be implemented just as quickly,
-it does not explicitly expose the parallelism. Morever, the one
-dimensional DCT must explicitly manage its array indices, as
-illustrated in Figure~\ref{fig:idct_creference}. Note that the code
-structure is similar to the StreamIt version, with one exception. The
-C code includes array indexing expressions (e.g.,
-\texttt{block[8*i+k]} and \texttt{tmp[8*i+j]}) which are notably
-absent in the StreamIt code. The splitter and joiner in StreamIt free
-the programmer from tedious indexing operations, which also enables
-the compiler to understand and optimize the buffer
-management~\cite{sermulins05lctes}.  The StreamIt implementation is
-also parameterized such that it is trivial to adjust the size of the
-inverse DCT.
+it does not explicitly expose the parallelism. Moreover, the C version
+must explicitly manage its array indices, as illustrated in
+Figure~\ref{fig:idct_creference}. Note that the code structure is
+similar to the StreamIt version, with one exception. The C code
+includes array indexing expressions (e.g., \texttt{block[8*i+k]} and
+\texttt{tmp[8*i+j]}) which are notably absent in the StreamIt
+code. The splitter and joiner in StreamIt free the programmer from
+tedious indexing operations, which also enables the compiler to
+understand and optimize the buffer management~\cite{sermulins05lctes}.
+The StreamIt implementation is also parameterized such that it is
+trivial to adjust the size of the inverse DCT.
 
 %% For example, when the decoder performs the
 %% luminance and chrominance channel processing, the computation can
@@ -307,11 +306,11 @@ attaching tags to data items.  If the {\tt Parser} sends a message to
 a filter downstream (i.e., in the same direction as dataflow) with a
 latency $k$, then conceptually, the filter tags the items that it
 outputs in $k$ iterations of its work function. If $k=0$, the data
-produced in the current execution of the work function is tagged. The
+produced in the current execution of the work function are tagged. The
 tags propagate through the stream graph; whenever a filter inputs an
 item that is tagged, all of its subsequent outputs are also
 tagged. The message flows through the graph until the tagged data
-reaches its intended receiver, at which time the message handler is
+reach the intended receiver, at which time the message handler is
 invoked immediately before the execution of the work function in the
 receiver.  In this sense, the message has the semantics of traveling
 ``with the data'' through the stream graph, even though it is not
