@@ -1,5 +1,5 @@
 all: main.pdf abstract-standalone.pdf
-#	cp main.pdf ~/public_html/ipdps.pdf
+	cp main.pdf ~/public_html/ipdps.pdf
 #	cp abstract-standalone.pdf ~/public_html/ipdps-ab.pdf
 
 abstract-standalone.pdf:

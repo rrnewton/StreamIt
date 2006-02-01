@@ -1,23 +1,25 @@
-\SubSection{Video Sampling Rate}
+\Section{Code Malleability: A Case Study}
 
-A contrast of chrominance format support between the StreamIt and  C reference
-implementations illustrates the benefits stream based languages can 
-provide to programmability. While the conceptual difference between chrominance formats
-is merely a change in downsampling ratio, this leads to a change in the data rates
-and the ratios of data between the color channels. This requires that the C
-implementation parameterize its buffer sizes, array lengths, array indices, and
-pointer offsets on the chrominance format; the reference implementation uses a 
-``chroma flag'' to dictate control flow to alternate index/offset calculations 
-in 43 locations in the code. As an example, a fragment of the ``form\_prediction'' routine 
-(in recon.c~\cite{reference-mpeg-c}) used for motion compensation is shown in 
-Figure~\ref{fig:chroma}. This function calls a 
-subroutine to perform the actual motion compensation on each of the three color channels,
-passing in array offsets to a global array holding the data. Lines 4-6 adjusts values used for address
-calculations to handle the 4:2:2 and 4:2:0 chrominance formats, and lines 7-9 provide
-additional adjustments for the 4:2:0 format. While these offset adjustments
-are neccesary for high performance, they are difficult for programmers 
-and make the code hard to understand.  
-% I don't really like that last sentence but I can't think of a better way to say it. - Matt
+A contrast of chrominance format support between the StreamIt and  C
+reference implementations illustrates the benefits stream based
+languages can  provide to programmability. While the conceptual
+difference between chrominance formats is merely a change in
+downsampling ratio, this leads to a change in the data rates and the
+ratios of data between the color channels. This requires that the C
+implementation parameterize its buffer sizes, array lengths, array
+indices, and pointer offsets on the chrominance format; the reference
+implementation uses a  ``chroma flag'' to dictate control flow to
+alternate index/offset calculations  in 43 locations in the code. As
+an example, a fragment of the ``form\_prediction'' routine  (in
+recon.c~\cite{reference-mpeg-c}) used for motion compensation is shown
+in  Figure~\ref{fig:chroma}. This function calls a  subroutine to
+perform the actual motion compensation on each of the three color
+channels, passing in array offsets to a global array holding the
+data. Lines 4-6 adjusts values used for address calculations to handle
+the 4:2:2 and 4:2:0 chrominance formats, and lines 7-9 provide
+additional adjustments for the 4:2:0 format. While these offset
+adjustments are neccesary for high performance, they are difficult for
+programmers  and make the code hard to understand.
 
 To add support for the 4:2:2 chrominance format in our StreamIt decoder, we
 modified 31 lines and added 20 new lines. Of the 31 modified lines, 23

@@ -16,7 +16,7 @@ streaming programs.
     {
 	\begin{scriptsize}
 	  \begin{verbatim}
-	    int->int filter ZigZagDescramble(int N, int[N] Order) {
+	    int->int filter ZigZag(int N, int[N] Order) {
 	      work pop N push N {
 	        for (int i = 0; i < N; i++) {
 	          int pixel = peek(Order[i]);
@@ -32,7 +32,7 @@ streaming programs.
     }
     % \vspace{-3pt}
     \vspace{-28pt}
-    \caption{Example filter implementing zig-zag descrambling.}
+    \caption{Zig-zag descrambling filter.}
     \vspace{-6pt}
     \label{fig:zigzag-filter}
   \end{minipage}
@@ -56,7 +56,7 @@ streaming programs.
     }
     % \vspace{-3pt}
     \vspace{-12pt}
-    \caption{MPEG-2 zig-zag descrambling order.}
+    \caption{Zig-zag descrambling order.}
     \vspace{-6pt}
     \label{fig:zigzag-order}
   \end{minipage}
@@ -114,17 +114,18 @@ with a series of pops.
   \vspace{20pt}
   \begin{scriptsize}
     \begin{verbatim}
-     int->int pipeline Decode()
+     int->int pipeline InverseTransform()
      {
-       int Order[64] = {...};
-       add ZigZagDescramble(64, Order);
-       add IQ();
-       add IDCT(8, 8);
+       int[64] Order = {...};
+       add ZigZag(64, Order);
+       add IQuantization(64);
+       add IDCT(64);
+       add Saturation(64);
      }
     \end{verbatim}
   \end{scriptsize}
   \vspace{-8pt}
-  \caption{Example MPEG decoder pipeline.}
+  \caption{Example pipeline.}
   \label{fig:decoder-pipeline}
     }
 \end{minipage}
@@ -179,40 +180,41 @@ is the joiner. It is a specialized filter with  multiple input
 channels but only one output channel. The joiner gathers data from its
 predecessors in a roundrobin manner (declared as part of the syntax)
 to produce a single output stream.
-\begin{figure*}[t]
-  \begin{scriptsize}
-    \begin{verbatim}
-                           // N = macroblock size + motion vector data size;
-                           // W = picture width (in pixels);
-                           // H = picture width (in pixels);
 
-                           int->int splitjoin YCrCbDecoding(int N, int W, int H)
-                           {
-                             // 4:2:0 chroma format
-                             split roundrobin(4*N, 1*N, 1*N);
+%% \begin{figure}[t]
+%%   \begin{scriptsize}
+%%     \begin{verbatim}
+%%       // N = macroblock size + motion vector data size;
+%%       // W = picture width (in pixels);
+%%       // H = picture width (in pixels);
+      
+%%       int->int splitjoin YCrCbDecoding(int N, int W, int H)
+%%       {
+%%         // 4:2:0 chroma format
+%%         split roundrobin(4*N, 1*N, 1*N);
+        
+%%         // last two parameters indicate
+%%         // necessary upsampling in x-y directions
+%%         add LuminanceChannel  (W, H, 0, 0);
+%%         add ChrominanceChannel(W, H, 2, 2);
+%%         add ChrominanceChannel(W, H, 2, 2);
+        
+%%         join roundrobin(1, 1, 1);
+%%       }              
+%%     \end{verbatim}
+%%     % TODO: validate 4*N, N, N parameters to above streams
+%%   \end{scriptsize}
+%%   %\vspace{150pt}
+%%   \vspace{-12pt}
+%%   \caption{Example MPEG decoder splitjoin.}
+%%   \label{fig:decoder-sj}
+%% \end{figure}
 
-                             // last two parameters indicate
-                             // necessary upsampling in x-y directions
-                             add LuminanceChannel  (W, H, 0, 0);
-                             add ChrominanceChannel(W, H, 2, 2);
-                             add ChrominanceChannel(W, H, 2, 2);
-
-                             join roundrobin(1, 1, 1);
-                           }              
-    \end{verbatim}
-    % TODO: validate 4*N, N, N parameters to above streams
-  \end{scriptsize}
-  %\vspace{150pt}
-  \vspace{-12pt}
-  \caption{Example MPEG decoder splitjoin.}
-  \label{fig:decoder-sj}
-\end{figure*}
-
-\begin{figure*}[t]
-%\center{
-  \begin{minipage}[t]{3.8in}
-    {
-%\vspace{-180pt}
+\begin{figure}[t]
+  %\center{
+  %\begin{minipage}[t]{3.8in}
+  %{
+  %\vspace{-180pt}
   \begin{scriptsize}
     \begin{verbatim}
 	01 void->void MPEGDecoder {
@@ -224,7 +226,6 @@ to produce a single output stream.
 	07   add InverseDCQuantizer() to p;
 	08   ...
 	09 }
-
 
 	10 int->int filter Parser(portal<InverseDCQuantizer> p) {
 	11   work push * {
@@ -252,35 +253,98 @@ to produce a single output stream.
 	30  }
     \end{verbatim}
   \end{scriptsize}
-   \vspace{-3pt}
-}
-\end{minipage}
-  ~~\vrule~~
-  \begin{minipage}[t]{2.8in}
-    {
-        \vspace{50pt}
-        \center{
- 	\includegraphics[scale=.9, angle=0]{./messaging_example_fig.eps}
-        }
-
-    }
-\end{minipage}
-%}
+  %\vspace{-3pt}
+  %}
+  %\end{minipage}
+  %~~\vrule~~
+  %\begin{minipage}[t]{2.8in}
+  %{
+  %  \vspace{50pt}
+  %  \center{
+  %	    \includegraphics[scale=.9, angle=0]{./messaging_example_fig.eps}
+  %  }
+  %}
+  %\end{minipage}
+  %}
   \caption{MPEG messaging example.}
   \label{fig:messaging}
-   \end{figure*}
+\end{figure}
 
-The splitjoin stream is a convenient and natural way to represent
-parallel computation. For example, when the decoder performs the
-luminance and chrominance channel processing, the computation can
-occur in parallel. In StreamIt, this is expressed as shown in
-Figure~\ref{fig:decoder-sj}. The input stream contains the
-macroblock data along with the parsed motion vectors. The data is
-partitioned and passed to one of three decoding channels, with $4N$
-items assigned to the first stream, $N$ items to the second, and $N$
-items to the third. The three streams reconstruct the original
-pictures with respect to the different color channels, and their
-output is combined by the joiner to produce the final decoded picture.
+\begin{figure}[t]
+  \begin{scriptsize}
+    \begin{verbatim}
+float->float pipeline IDCT_2D(int size) {
+    // perform 8 1D-IDCTs in parallel in the Y direction
+    split roundrobin(1);
+    for (int i = 0; i < size; i++) {
+        add IDCT_1D(size);
+    }
+    join roundrobin(1);
+    // perform 8 1D-IDCTs in parallel in the X direction
+    split roundrobin(size);
+    for (int i = 0; i < size; i++) {
+        add IDCT(size);
+    }
+    join roundrobin(size);
+}
+    \end{verbatim}
+  \end{scriptsize}
+  %\vspace{150pt}
+  \vspace{-12pt}
+  \caption{Example MPEG decoder splitjoin.}
+  \label{fig:decoder-sj}
+\end{figure}
+
+The splitjoin and pipeline constructs provide a convenient and natural
+way to represent parallel computation. An example is shown in
+Figure~\ref{fig:decoder-sj}, which illustates a parallel
+implementation of the 2D inverse DCT using 1D inverse DCTs. This
+implementation is both data parallel (within the rows and columns) and
+pipeline parallel (between the rows and columns). While a C
+implementation of the inverse DCT can be implemented just as quickly,
+it does not explicitly expose the parallelism. Morever, the one
+dimensional DCT must explicitly manage its array indices, as
+illustrates in Figure~\ref{fig:idct_creference}. Note that the code
+structure is similar to the StreamIt version, with one exception. The
+C code includes array indexing expressions (e.g.,
+\texttt{block[8*i+k]} and \texttt{tmp[8*i+j]} which are notably absent
+in the StreamIt code. The splitter and joiner in StreamIt free the
+programmer from the tedious indexing operations that are otherwise
+required. The StreamIt implementation is also parameterized such that
+it is trivial to adjust the size of the inverse DCT.
+
+\begin{figure*}[t]
+  \begin{scriptsize}
+    \begin{verbatim}
+// TODO: NEED to clean this up
+  for (i=0; i<8; i++)
+    for (j=0; j<8; j++)
+    {
+      partial_product = 0.0;
+
+      for (k=0; k<8; k++)
+        partial_product += coeff[k][j]*block[8*i+k];
+
+      tmp[8*i+j] = partial_product;
+    }
+    \end{verbatim}
+  \end{scriptsize}
+  %\vspace{150pt}
+  \vspace{-12pt}
+  \caption{Example C Code for 1D Inverse DCT Calculation.}
+  \label{fig:idct_creference}
+\end{figure*}
+
+%% For example, when the decoder performs the
+%% luminance and chrominance channel processing, the computation can
+%% occur in parallel. In StreamIt, this is expressed as shown in
+%% Figure~\ref{fig:decoder-sj}. The input stream contains the
+%% macroblock data along with the parsed motion vectors. The data is
+%% partitioned and passed to one of three decoding channels, with $4N$
+%% items assigned to the first stream, $N$ items to the second, and $N$
+%% items to the third. The three streams reconstruct the original
+%% pictures with respect to the different color channels, and their
+%% output is combined by the joiner to produce the final decoded picture.
 
 \paragraph{Feedback Loop.}
 StreamIt also provides a feedback loop construct for introducing
@@ -289,7 +353,6 @@ but may be used in the MPEG encoder.
 
 \SubSection{Teleport Messaging}
 \label{sec:messaging}
-%%% XXX largely copied from ppopp paper
 A notoriously difficult aspect of stream programming, from both a
 performance and programmability standpoint, is reconciling regular
 streaming dataflow with irregular control messages.  While the
@@ -319,27 +382,34 @@ includes a range of latencies {\tt [min:max]} specifying when the
 message should be delivered with respect to the data produced by the
 sender.
 
-The interesting aspects of teleport messaging are the semantics for
-the message latency.  Intuitively, the message semantics can be
-thought of in terms of attaching tags to data items.  If the {\tt
-Parser} sends a message to a downstream filter with a latency $k$,
-then conceptually, the filter tags the items that it outputs in $k$
-iterations of its work function. If $k=0$, the data produced in the
-current execution of the work function is tagged. The tags propagate
-through the stream graph; whenever a filter inputs an item that is
-tagged, all of its subsequent outputs are also tagged with the same
-message. The message flows through the graph until the tagged data
-reaches its intended receiver, at which time the message handler is
-invoked immediately before the execution of the work function in the
-receiver.  In this sense, the message has the semantics of traveling
-``with the data'' through the stream graph, even though it is not
-necessarily implemented this way.  The intuition for upstream messages
-is similar.
+Intuitively, the message semantics can be thought of in terms of
+attaching tags to data items.  If the {\tt Parser} sends a message to
+a downstream filter with a latency $k$, then conceptually, the filter
+tags the items that it outputs in $k$ iterations of its work
+function. If $k=0$, the data produced in the current execution of the
+work function is tagged. The tags propagate through the stream graph;
+whenever a filter inputs an item that is tagged, all of its subsequent
+outputs are also tagged with the same message. The message flows
+through the graph until the tagged data reaches its intended receiver,
+at which time the message handler is invoked immediately before the
+execution of the work function in the receiver.  In this sense, the
+message has the semantics of traveling ``with the data'' through the
+stream graph, even though it is not necessarily implemented this way.
 
-Teleport messaging exposes the true information flow, and avoids the
-muddling of data streams with control-relevant information. Teleport
-messaging thus separates the concerns of the programmer from that of a
-system implementation, thereby allowing the compiler to deliver the
-message in the most efficient way for a given architecture. Teleport
-messaging also offers other powerful control over timing and latency
-beyond what is used in this example~\cite{thies05ppopp}.
+The intuition for upstream messages is somewhate similar. Namely,
+immagine a feedback loop connecting the downstream sender with the
+upstream message receiver. The downstream filter uses the loop to send
+tokens on every iteration, and the upstream filter checks the values
+from the loop before each of its executions. If the value is non-zero,
+it is treated as a message, otherwise the token is ignored. In this
+scenario, the upstream message is processed immediately before it
+generates data that the sender will consume in $k$ of its own
+iterations.
+
+Teleport messaging avoids the muddling of data streams with
+control-relevant information. Teleport messaging thus separates the
+concerns of the programmer from that of a system implementation,
+thereby allowing the compiler to deliver the message in the most
+efficient way for a given architecture. Teleport messaging also offers
+other powerful control over timing and latency beyond what is used in
+this example~\cite{thies05ppopp}.

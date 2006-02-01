@@ -1,116 +1,157 @@
+\begin{figure*}[t]
+  \centerline{\epsfig{file=decoder_with_code.eps,width=5in}}
+  \caption{MPEG-2 decoder block diagram and corresponding StreamIt code.}
+  \label{fig:dec-with-code}
+\end{figure*}
+
 \Section{MPEG Decoder in StreamIt}
 
-% TODO: recalculate lines of code using statement count (num of ;)
-We implemented an MPEG-2 decoder in StreamIt. It is a fully portable
-implementation in that the application is not architecture
-dependent. The implementation was carried out by one student
-programmer with no prior understanding of MPEG. The development
-spanned eight weeks from specification~\cite{MPEG2} to the first fully
-functional MPEG decoder. The StreamIt code is nearly 4,921 lines of
-code with 48 static streams. The MPEG stream parser is the largest
-single filter, consisting of 1,924 lines of code.  The 48 static
-streams are compiled to 2,150 filters for a picture resolution of
-352x240. In contrast, the reference C
-implementation~\cite{reference-mpeg-c} is nearly 9,832 lines of code,
-although it provides several features such as interlacing and
-multi-layer streams that are not yet implemented in the StreamIt
-decoder.
+The MPEG decoder pipeline is shown in
+Figure~\ref{fig:dec-with-code}. The stream graph is shown on the left,
+alongside the StreamIt code on the right. It is worthy to note that
+there is a high correlation between the stream block level diagram and
+the StreamIt syntax describing the pipeline.
 
-% What follows is the added section with a detailed description
-% of our implementation. - Matt, 1/25/06
+The decoder accepts a compressed bit stream as input, and produces the
+decoded video stream as output. The computation is encapsulated in
+three main components: the parser (line 5), the block and motion vector
+decoder (lines 6-16), and the motion compensator (lines 17-27).
 
-\begin{figure}[htbp]
-% Width and spacing is probably all wrong now
-% Also, we probably want to get rid of dec_block later on in favor
-% of this. This is also just a draft of the detailed block diagram right
-% now with changes and improvements to be made.
-\centerline{\epsfig{file=dec_block_detailed.eps,width=5in}}
-\caption{Block diagram of MPEG-2 decode.}
-\label{fig:dec_block_detailed}
-\end{figure}
+The parser is responsible for parsing the MPEG-2 bit stream and
+performing Huffman and variable run-length decoding (VLD). The output
+of the VLD is an interleaved stream of quantized macroblocks encoded
+in the frequency-domain, and offset-encoded motion vectors. The VLD
+outputs $\texttt{N}\times\texttt{B}$ data elements for each
+macroblock, followed by \texttt{V} data elements that encode its
+motion vector. The actual value of \texttt{N} depends on the chroma
+format. In a 4:2:0 chroma format regime, $\texttt{N}=6$ since each
+macroblock consists of four 8x8 pixel blocks in the luminance channel,
+and two 8x8 pixel blocks in each of the two chrominance
+channels. Therefore, the VLD outputs a total of six 8x8 pixel blocks,
+or 384 pixels per macroblock.
 
-The MPEG decoder implementation, shown in Figure 
-\ref{fig:dec_block_detailed} is a pipeline, with most of the work
-contained within three subsections. It accepts a compressed bitstream as input, and 
-produces the decoded video as output. 
+The VLD output is segregated into two homogeneous streams by a
+round robin splitter (line 7). The first stream undergoes inverse
+transformations (lines 8-13), while the second is decoded to produce
+absolute motion vectors (line 14). As is evident from the computation
+graph, the two streams are decoded in parallel, and then merged (line
+15) prior to the motion compensation stage of the pipeline.
 
-The first subsection is a filter responsible for
-parsing the MPEG-2 bitstream and performing Huffman and variable
-run-length decoding (VLD). This process results in a set of
-quantized, frequency-domain macroblocks and corresponding motion
-vectors. 
+The inverse transformations map each 8x8 block from the frequency
+domain back to the spatially encoded domain. Each block is reordered
+(line 9), and then inversely quantized (line 10). This is followed by
+an inverse DCT and a bounded saturation filter (lines 11-12). The set
+of transformations is grouped into an anonymous pipeline whose input
+and output types are automatically inferred by the compiler. Each of
+the filters in this pipeline operate on 8x8 blocks. The code that is
+shown does not take advantage of data level parallelism between
+blocks. It is rather straight forward however to expose this
+parallelism if it is desirable. For example, in this case a splitjoin
+can replicate the inverse transformation pipeline six times:
+\begin{center}
+\begin{verbatim}
+add splitjoin {
+   split roundrobin(B);
+   for (int i = 0; i < 6; i++) 
+      // add pipeline
+   join roundrobin(B);
+}
+\end{verbatim}
+\end{center}
+A stream-aware compiler can also automatically adjust the execution
+granularity as necessary~\cite{gordo-asplos}.
 
-The second subsection is a splitjoin which processes the macroblocks
-and motion vectors in parallel. The macroblocks are reordered, 
-inversely quantized, and inversely DCT transformed to the spatial 
-domain. The motion vectors, coded with respect to their associated
-macroblock position and the value of previously decoded vectors,
-are converted to absolute addresses.
+The third stage of the decoding pipeline performs the motion
+compensation (lines 17-27) to recover predictively coded
+macroblocks. The motion compensation filter uses the motion vectors to
+find a corresponding macroblock in a previously decoded reference
+picture. The reference macroblock is added to the current macroblock
+to recover the original picture data. If the current macroblock is
+part of an I or P picture, then the decoder stores it for use as a
+future reference picture.
 
-The third section is responsible for motion compensation in the case of
-predictively coded macroblocks (e.g., P and B pictures). Because the
-color channels can be decoded independently from each other, a
-splitjoin processes the motion compensation for each channel in
-parallel. The motion compensation filter uses the motion vectors to find
-a corresponding macroblock in a previously decoded, stored 
-reference picture. This reference macroblock is added to the current
-macroblock to recover the original picture data. If the current macroblock
-is part of an I or P picture, then the decoder stores it for future
-reference. In addition to the motion compensation, the chrominance
-channels require upsampling.
+In the compensation stage, there are three parallel stream
+processors. The first handles the luminance color channel (Y), and the
+other two handle the chrominance channels (Cb and Cr). The round robin
+splitter (line 18) distributes the macroblocks according to the chroma
+format. Since the luminance channel is not down sampled during the
+encoding process, the splitter dispatches four 8x8 blocks at a time to
+the Y motion compensator. The chrominance channels are typically down
+sampled by a factor of 4, and hence one 8x8 block is streamed to each
+of the Cb and Cr pipelines, which up sample (line 23) the results of
+the motion compensator to generate the full 16x16 macroblock.  The
+joiner (line 26) assembles the pictures from each of the color
+channels, one pixel at a time. The output is then readied for display
+(lines 28 and 29) by organizing the pictures in accord with their
+temporal order, and performing color space conversion to the RGB (red,
+green, blue) color model. Note that these two filters each consume
+$3\times\texttt{W}\times\texttt{H}$ pixels per picture. This is three
+times the pixel resolution of the decoded image since there is one
+pixel generated from each of the three channel decoders. The output of
+the decoder is $\texttt{W}\times\texttt{H}$ pixels in the end.
 
-In addition to these three decoder subsections, two additional filters handle
-reordering the decoded pictures temporally and transforming them into the
-RGB color space.
+The MPEG-2 decoder in StreamIt is a fully portable implementation in
+that the application is not architecture dependent. The implementation
+naturally exposes the pipeline parallelism that exists throughout the
+decoder, as well as the data level parallelism inherent to the inverse
+transformations and motion compensation.
 
-The decoder uses messaging to send metadata associated with macroblocks
-from the parser to downstream filters. For instance, the parser generates
-a message whenever the picture or macroblock type changes. The motion
-compensation filter uses this information to determine how to process
-the blocks and determine whether it needs to store them for future
-reference. The picture reordering step uses the picture type to 
-determine the correct temporal order, and the math behind the inverse
-quantization depends on the encoding type of the macroblock. Because
+The implementation was carried out by one student programmer with no
+prior understanding of MPEG. The development spanned eight weeks from
+specification~\cite{MPEG2} to the first fully functional MPEG
+decoder. The StreamIt code is nearly 3,165 lines of code with 48
+static streams. The bit stream parser is the largest single filter,
+consisting of 775 lines of code. The 48 static streams are compiled to
+2,150 filters for a picture resolution of 352x240. By way of
+comparison, the reference C implementation~\cite{reference-mpeg-c} is
+6,835 lines of code, although it provides several features such as
+interlacing and multi-layer streams that are not yet implemented in
+the StreamIt decoder.
+
+The reference C implementation intermingles parsing, decoding, and
+motion compensation, making it difficult to clearly follow the code,
+and hinders a better comparison. The C code also relies on global
+variables to communicate values, such as quantization coefficients,
+from the parser to the relevant code regions. In StreamIt, such
+communication is relegated to teleport messaging (lines 5, 10, 22, and
+28, and illustrated with dotted lines in
+Figure~\ref{fig:dec-with-code}). For instance, the parser (VLD)
+generates a message whenever the picture or macroblock type
+changes. The motion compensation filter receives this information via
+its dedicated portal (line 22), and determines how to process the
+current picture, and whether it needs to store it for future
+reference. The picture reordering filters receives a similar message
+(via portal on line 28), and uses the information to determine the
+correct temporal order of picture. The inverse transformation pipeline
+listens to its portal (line 10) to determine the algebraic
+manipulation required to perform the inverse quantization of the input
+macroblock. Teleport messaging proves as a natural mechanism because
 the macroblock type and picture type information changes infrequently
-and irregularly compared to the regular flow of data, messaging is an
-intuitive mechanism for propogating these updates.
+and irregularly, compared to the regular flow of data in the
+application.
 
-While each of the described components decomposes into its own 
-subgraph, this high level description is enough to show the advantages
-of a stream based implementation. For instance, the pipeline 
-parallelism is exposed for both the steps involved in block decoding 
-and the chrominance color channel processing. The splitjoin in the lower
-part of the graph explicitly exposes the data parallelism present because
-the color channels can be decoded independently. 
+In StreamIt, all of the processing is encapsulated hierarchically into
+single input-single output streams with well defined modular
+interfaces. This property facilitates development and boosts
+programmer productivity, as components can be debugged and verified as
+standalone components. The modularity also promotes reuse. For
+example, the zig-zag descrambler, inverse quantizer, and inverse DCT
+components may be used as is to implement a JPEG decoder.
 
-% done with addition
-
-% I think the information in the very first paragraph on the decoder 
-% about line counts and C comparison should get moved here and
-% incorporated into the following paragraph - Matt 1/25/06
-
-A noteworthy aspect of the StreamIt implementation is its
-malleability. We illustrate this using two specific examples.  In the
-first example, we focus on the video sampling rates. MPEG-2 streams
-are encoded using a 4:2:0 sampling rate, which achieves a 50\%
-reduction in the number of bits required to represent a video, with
-little noticeable loss of color information. However, better quality
-is possible with higher sampling rates since more color information is
-retained from the original picture. In this paper, we describe how our
-decoder implementation, originally designed to deal with a 4:2:0
-sampling rate is modified for a 4:2:2 sampling rate.
-
-In the second example, we describe a straight forward language-level
-transformation that exposes the data-parallelism across macroblocks in
-a picture. This is done in the context of the decoder pipeline which
-consists of the inverse quantization, inverse DCT, and motion
-compensator. We show that parallelism can be exposed at various levels
-in the decoding process, from macroblock to block granularities, and
-that the migration path is trivial.
+Another noteworthy aspect of the StreamIt implementation is its
+malleability. We illustrate this by outlining how the decoder
+implementation, originally designed to deal with a 4:2:0 chroma
+sampling rate is modified for a 4:2:2 sampling rate. MPEG-2 streams
+are typically encoded using the former, which achieves a 50\%
+reduction in the number of bits required to represent a
+video. However, better quality is possible with higher sampling rates
+since more color information is retained from the original picture. In
+this sequel, we show that the migration path to support multiple
+chroma formats is trivial.
 
 \input{chroma}
 
-\SubSection{Motion Compensation}
+%% \SubSection{Motion Compensation}
 
 % Commented out this section since this information is incorporated into
 % the decoder implementation section. - Matt 1/25/06
@@ -134,66 +175,56 @@ that the migration path is trivial.
 %\label{fig:dec_block}
 %\end{figure}
 
-A simple strategy for parallelizing the MPEG-2 decoding can exploit
-the data parallelism among macroblocks. Using this scheme, the Huffman
-and run-length decoding is inherently serial, as macroblock boundaries
-can only be discovered by performing the decode operation.  Once this
-decode is complete, a parallel implementation can distribute
-macroblocks to independent streams (using a splitjoin). Each stream
-performs the inverse quantization, inverse discrete cosine transform,
-and motion compensation. Furthermore, each stream locally stores
-reference macroblocks for future motion compensation. Using this
-strategy, the streams can execute independently with one exception.
+%% A simple strategy for parallelizing the MPEG-2 decoding can exploit
+%% the data parallelism among macroblocks. Using this scheme, the Huffman
+%% and run-length decoding is inherently serial, as macroblock boundaries
+%% can only be discovered by performing the decode operation.  Once this
+%% decode is complete, a parallel implementation can distribute
+%% macroblocks to independent streams (using a splitjoin). Each stream
+%% performs the inverse quantization, inverse discrete cosine transform,
+%% and motion compensation. Furthermore, each stream locally stores
+%% reference macroblocks for future motion compensation. Using this
+%% strategy, the streams can execute independently with one exception.
 
-% TODO: This is the figure showing the macroblock parallelism
-% I'm not sure where it goes. - Matt
-\begin{figure*}[t]
-\vspace{-12pt}
-%\epsfig{file=decoder_macroblock_parallelism.eps, width=3in}
-%\epsfig{file=decoder-parallel.eps, width=\textwidth}
-\epsfig{file=decoderpipeline.eps, width=\textwidth}
-% TODO: Change Matt's 2 am caption.
-\caption{MPEG-2 decoder exploiting macroblock-level parallelism.}
-\label{decoder_macroblock_parallelism}
-\vspace{-6pt}
-\end{figure*}
+%% % TODO: This is the figure showing the macroblock parallelism
+%% % I'm not sure where it goes. - Matt
+%% \begin{figure*}[t]
+%% \vspace{-12pt}
+%% %\epsfig{file=decoder_macroblock_parallelism.eps, width=3in}
+%% %\epsfig{file=decoder-parallel.eps, width=\textwidth}
+%% \epsfig{file=decoderpipeline.eps, width=\textwidth}
+%% % TODO: Change Matt's 2 am caption.
+%% \caption{MPEG-2 decoder exploiting macroblock-level parallelism.}
+%% \label{decoder_macroblock_parallelism}
+%% \vspace{-6pt}
+%% \end{figure*}
 
-This exception occurs when a stream is performing motion compensation
-and the corresponding motion vector indicates a reference macroblock
-stored in some other stream. In this case, inter-stream communication
-is required to send the reference data to the requesting stream. This
-situation is not uncommon, and is more prevalent for higher resolution
-pictures. A simple scheme for handling this situation is for every
-stream to broadcast its decoded macroblocks to all other streams. This
-solution has the benefit of being conceptually easy to understand and
-implement. StreamIt allows programmers to naturally expose such
-parallelism. A StreamIt pipeline that operates at macroblock
-granularity is shown in Figure~\ref{decoder_macroblock_parallelism}. It is
-worthy to note that there is a high correlation between the stream
-graph, and the StreamIt syntax describing the pipeline.
+%% This exception occurs when a stream is performing motion compensation
+%% and the corresponding motion vector indicates a reference macroblock
+%% stored in some other stream. In this case, inter-stream communication
+%% is required to send the reference data to the requesting stream. This
+%% situation is not uncommon, and is more prevalent for higher resolution
+%% pictures. A simple scheme for handling this situation is for every
+%% stream to broadcast its decoded macroblocks to all other streams. This
+%% solution has the benefit of being conceptually easy to understand and
+%% implement. StreamIt allows programmers to naturally expose such
+%% parallelism.
+%% A StreamIt pipeline that operates at macroblock
+%% granularity is shown in Figure~\ref{decoder_macroblock_parallelism}. It is
+%% worthy to note that there is a high correlation between the stream
+%% graph, and the StreamIt syntax describing the pipeline.
 
-The implementation can be made more fine grained by exposing the
-intra-macroblock parallelism. For example, the IQ-IDCT pipeline can
-operate at a block level, rather than at a macroblock
-granularity. This is easily achieved by encapsulating the IQ-DCT pipeline
-within a splitjoin to scatter the blocks, operate, and gather the
-results to recover the parent macroblock.
+%% The implementation can be made more fine grained by exposing the
+%% intra-macroblock parallelism. For example, the IQuantization-IDCT
+%% pipeline can operate at a block level, rather than at a macroblock
+%% granularity. This is easily achieved by encapsulating the  pipeline
+%% within a splitjoin to scatter the blocks, operate, and gather the
+%% results to recover the parent macroblock.
 
-There are many implementation strategies for the decoder, each with
-varying degrees of exposed parallelism. Of the greatest advantage of
-the StreamIt implementation is its malleability. The stream graph is
-easily reconfigured to operate at picture-level granularity (exposing
-parallelism between chroma channels), macroblock level (exposing even
-more data-level parallelism), or even at block level (exposing the
-greatest amount of data-level parallelism). The modularity of the
-language also affords the ability to cleanly define stream interfaces,
-and reuse existing components. As an example, the zig-zag descrambler,
-inverse quantizer, and inverse DCT components were all reused for our
-JPEG codec implementation. The modularity also reduces the complexity
-of the debugging process, as stream components can be functionally
-verified independently, leading to greater programmer productivity.
-
-%% TODO: add figure showing decoder pipeline at macroblock granularity
-%% and streamit text ala Bill's beamformer/fmradio examples
-
-
+%% There are many implementation strategies for the decoder, each with
+%% varying degrees of exposed parallelism. Of the greatest advantage of
+%% the StreamIt implementation is its malleability. The stream graph is
+%% easily reconfigured to operate at picture-level granularity (exposing
+%% parallelism between chroma channels), macroblock level (exposing even
+%% more data-level parallelism), or even at block level (exposing the
+%% greatest amount of data-level parallelism).
