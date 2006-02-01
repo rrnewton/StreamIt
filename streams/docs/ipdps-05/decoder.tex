@@ -31,7 +31,7 @@ channels. Therefore, the VLD outputs a total of six 8x8 blocks,
 or 384 subpixels per macroblock.
 
 The VLD output is segregated into two homogeneous streams by a
-round robin splitter (line 10). The first stream undergoes inverse
+roundrobin splitter (line 10). The first stream undergoes inverse
 transformations (lines 11-16), while the second is decoded to produce
 absolute motion vectors (line 17). As is evident from the computation
 graph, the two streams are decoded in parallel, and then merged (line
@@ -72,25 +72,25 @@ to recover the original picture data. If the current macroblock is
 part of an I or P picture, then the decoder stores it for use as a
 future reference picture.
 
-In the compensation stage, there are three parallel streams. 
-The first handles the luminance color channel (Y), and the
-other two handle the chrominance channels (Cb and Cr). The round robin
-splitter (line 24) distributes the macroblocks according to the chroma
-format. Since the luminance channel is not down sampled during the
+In the compensation stage, there are three parallel streams.  The
+first handles the luminance color channel (Y), and the other two
+handle the chrominance channels (Cb and Cr). The roundrobin splitter
+(line 24) distributes the macroblocks according to the chroma
+format. Since the luminance channel is not downsampled during the
 encoding process, the splitter dispatches four 8x8 blocks at a time to
-the Y motion compensator. The chrominance channels are typically down
-sampled by a factor of 4, and hence one 8x8 block is streamed to each
-of the Cb and Cr pipelines, which up sample (line 29) the results of
-the motion compensator to generate the full 16x16 macroblock.  The
+the Y motion compensator. The chrominance channels are typically
+downsampled by a factor of 4, and hence one 8x8 block is streamed to
+each of the Cb and Cr pipelines, which upsample (line 29) the results
+of the motion compensator to generate the full 16x16 macroblock.  The
 joiner (line 31) assembles the pictures from each of the color
 channels, one pixel at a time. The output is then readied for display
 (lines 33 and 34) by organizing the pictures in accord with their
 temporal order, and performing color space conversion to the RGB (red,
 green, blue) color model. Note that these two filters each consume
-$3\times\texttt{W}\times\texttt{H}$ subpixels per picture. This is three
-times the pixel resolution of the decoded image since there is one
-pixel generated from each of the three channel decoders. The final output of
-the decoder is $\texttt{W}\times\texttt{H}$ pixels.
+$3\times\texttt{W}\times\texttt{H}$ subpixels per picture. This is
+three times the pixel resolution of the decoded image since there is
+one pixel generated from each of the three channel decoders. The final
+output of the decoder is $\texttt{W}\times\texttt{H}$ pixels.
 
 The MPEG-2 decoder in StreamIt is a fully portable implementation in
 that the application is not architecture dependent. The implementation
