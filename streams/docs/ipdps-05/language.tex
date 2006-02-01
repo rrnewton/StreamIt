@@ -330,10 +330,14 @@ Teleport messaging avoids the muddling of data streams with
 control-relevant information. Teleport messaging thus separates the
 concerns of the programmer from that of a system implementation,
 thereby allowing the compiler to deliver the message in the most
-efficient way for a given architecture. Teleport messaging also offers
-other powerful control over timing and latency beyond what is used in
-this example~\cite{thies05ppopp}.
-
+efficient way for a given architecture. In addition, by exposing the
+exact data dependences to the compiler, filter executions can be
+reordered so long as they respect the message timing.  Such reordering
+is generally impossible if control information is passed via global
+variables.  Teleport messaging also offers other powerful control over
+timing and latency beyond what is used in this example (in particular,
+the ability to send messages opposite the direction of
+dataflow~\cite{thies05ppopp}).
 
 \begin{figure}[t]
   %\center{
