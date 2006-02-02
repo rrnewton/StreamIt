@@ -9,13 +9,13 @@ requirements (important for embedded devices) and provides higher
 effective transmission rates (important for Internet enabled devices).
 
 Current programming practices often require developers to implement
-compression algorithms in low level languages, and arduously
+compression algorithms in low level languages and arduously
 tune their code for performance. This methodology is not cost
-effective, as architecture-specific code is not portable, leading to
-multiple implementations of the same codec. The process is made more
-challenging by the continuous evolutions of the standards, as new
-innovations are realized in a rapidly growing digital multimedia
-market.
+effective because architecture-specific code is not portable and 
+multiple implementations of the same codec are necessary. 
+The process is made more challenging by the continuous evolution
+of standards driven by new innovations in a rapidly growing 
+digital multimedia market.
 
 A typical compression algorithm involves three types of operations:
 data representation, lossy compression, and lossless
@@ -33,7 +33,7 @@ architecture-independent language for streaming computations. Our goal
 is to deliver a unified development environment that captures all
 aspects of stream application development without sacrificing either
 performance or programmability. This paper details the salient
-processing steps of the MPEG-2 decoder in StreamIt, and compares some
+processing steps of the MPEG-2 decoder in StreamIt and compares some
 of the important implementation details to a reference C
 implementation of the decoder.
 
@@ -46,5 +46,4 @@ multi-dimensional data.  StreamIt also exposes the inherent
 parallelism and communication topology of the application, thereby
 empowering the compiler to perform many stream-aware
 optimizations~\cite{agrawal05cases,gordon02asplos,lamb03pldi,sermulins05lctes}
-that elude other languages. The end result is a clean, malleable,
-and efficient portable code.
+that elude other languages. The end result is a clean, malleable, portable, and efficient code.
