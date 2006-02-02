@@ -87,7 +87,7 @@ the Y motion compensator. The chrominance channels are typically
 downsampled by a factor of 4, and hence one 8x8 block is streamed to
 each of the Cb and Cr pipelines, which upsample (line 29) the results
 of the motion compensator to generate the full 16x16 macroblock.  The
-upsampling is a simple linear interpolation of the surrounding pixels.
+upsampling is a linear interpolation of the surrounding pixels.
 The joiner (line 31) assembles the pictures from each of the color
 channels, one pixel at a time.  The output is then readied for display
 (lines 33 and 34) by organizing the pictures in accord with their
