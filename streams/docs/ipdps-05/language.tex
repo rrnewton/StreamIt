@@ -46,8 +46,8 @@ streaming programs.
 In StreamIt, the basic programmable unit is a {\it filter}.  Each
 filter has an independent address space. Thus, all communication with
 other filters is via the input and output channels, and occasionally
-via control messages (see Section~\ref{sec:messaging}).  The main method
-in a filter is the work function which represents a steady-state execution step.
+via control messages (see Section~\ref{sec:messaging}).  The main filter 
+method is the work function which represents a steady-state execution step.
 The work function pops (i.e., reads) items from the filter input tape
 and pushes (i.e., writes) items to the filter output tape. A filter
 may also peek at a given index on its input tape without consuming the
@@ -109,7 +109,7 @@ representation~\cite{yelick04msp}.
 \SubSection{Hierarchical Streams}
 In StreamIt, the application developer focuses on the hierarchical
 assembly of the stream graph and its communication topology, rather
-than on the  explicit management of the data buffers between filters.
+than the explicit management of the data buffers between filters.
 StreamIt provides three hierarchical structures for composing filters
 into larger stream graphs (see Figure~\ref{fig:containers}).
 
@@ -120,7 +120,7 @@ An example of a pipeline appears in
 Figure~\ref{fig:decoder-pipeline}. A pipeline is a single input to
 single output stream. The decoding pipeline in the figure consists of
 four streams. The first is a filter which zig-zag unorders the input
-stream, and prepares the data for the inverse quantization and
+stream, preparing the data for the inverse quantization and
 DCT. The output of the filter is consumed by a stream named {\tt
 IQuantization} that performs the inverse quantization, and produces an
 output stream that is in turn consumed by another stream that performs
@@ -237,15 +237,15 @@ way to represent parallel computation. An example is shown in
 Figure~\ref{fig:decoder-sj}, which illustates a parallel
 implementation of the 2D inverse DCT using 1D inverse DCTs. This
 implementation is both data parallel (within the rows and columns) and
-pipeline parallel (between the rows and columns). While a C
-implementation of the inverse DCT can be implemented just as quickly,
-it does not explicitly expose the parallelism. Moreover, the C version
-must explicitly manage its array indices, as illustrated in
-Figure~\ref{fig:idct_creference}. Note that the code structure is
-similar to the StreamIt version, with one exception. The C code
-includes array indexing expressions (e.g., \texttt{block[8*i+k]} and
-\texttt{tmp[8*i+j]}) which are notably absent in the StreamIt
-code. The splitter and joiner in StreamIt free the programmer from
+pipeline parallel (between the rows and columns). 
+A straightforward C implementation of a computationally equivalent
+inverse DCT is shown in Figure~\ref{fig:idct_creference}. Note that
+the code structure is similar to the StreamIt version, although it does 
+not explicitly expose the parallelism.
+The C code also requires explicit array index management, such as the 
+expressions \texttt{block[8*i + u]} and \texttt{tmp[8*i + j]} which are
+notably absent in the StreamIt code. 
+The splitter and joiner in StreamIt free the programmer from
 tedious indexing operations, which also enables the compiler to
 understand and optimize the buffer management~\cite{sermulins05lctes}.
 The StreamIt implementation is also parameterized such that it is
@@ -298,16 +298,16 @@ includes a range of latencies {\tt [min:max]} specifying when the
 message should be delivered with respect to the data produced by the
 sender.
 
-Intuitively, the message semantics can be thought of in terms of
-attaching tags to data items.  If the {\tt Parser} sends a message to
+Intuitively, the message semantics can be understood as tags
+attached to data items.  If the {\tt Parser} sends a message to
 a filter downstream (i.e., in the same direction as dataflow) with a
 latency $k$, then, conceptually, the filter tags the items that it
 outputs in $k$ iterations of its work function. If $k=0$, the data
-produced in the current execution of the work function are tagged. The
+produced in the current execution of the work function is tagged. The
 tags propagate through the stream graph; whenever a filter inputs an
 item that is tagged, all of its subsequent outputs are also
-tagged. The message flows through the graph until the tagged data
-reach the intended receiver, at which time the message handler is
+tagged. The message flows through the graph until the first tagged data
+item reaches the intended receiver, at which time the message handler is
 invoked immediately before the execution of the work function in the
 receiver.  In this sense, the message has the semantics of traveling
 ``with the data'' through the stream graph, even though it is not
@@ -325,7 +325,7 @@ necessarily implemented this way.
 
 Teleport messaging avoids the muddling of data streams with
 control-relevant information. Teleport messaging thus separates the
-concerns of the programmer from that of a system implementation,
+concerns of the programmer from the system implementation,
 thereby allowing the compiler to deliver the message in the most
 efficient way for a given architecture. In addition, by exposing the
 exact data dependences to the compiler, filter executions can be

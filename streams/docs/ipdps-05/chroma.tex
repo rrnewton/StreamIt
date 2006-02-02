@@ -16,7 +16,7 @@ Figure~\ref{fig:chroma-format-code} shows a code fragment from the
 \texttt{recon.c}~\cite{reference-mpeg-c}. The function calls a
 subroutine to perform the motion compensation on each of the three
 color channels, passing in array offsets to a global array holding the
-data. Lines 4-6 adjusts values used for address calculations to handle
+data. Lines 4-6 adjust values used for address calculations to handle
 the 4:2:2 and 4:2:0 chroma formats, and lines 7-9 provide additional
 adjustments for the 4:2:0 format. While these offset adjustments are
 necessary in C, they are difficult for programmers and make the code
@@ -26,8 +26,8 @@ To add support for the 4:2:2 chroma format in our StreamIt decoder, we
 modified 31 lines and added 20 new lines. Of the 31 modified lines, 23
 were trivial modifications to pass a variable representing the chroma
 format as a stream parameter. The greatest substantial change was to
-the color channel splitter, previously illustrated on line 20 of
-Figure~\ref{fig:dec0with-code}. In the case of a 4:2:2 sampling rate,
+the color channel splitter, previously illustrated on line 24 of
+Figure~\ref{fig:dec-with-code}. In the case of a 4:2:2 sampling rate,
 the chrominance data, as they appear on the input tape, alternate
 between each of the two chrominance channels (see
 Figure~\ref{fig:chroma-block-order}). Thus, a nested splitjoin is used

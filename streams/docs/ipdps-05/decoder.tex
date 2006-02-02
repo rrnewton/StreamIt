@@ -15,7 +15,7 @@ the StreamIt syntax describing the pipeline.
 The decoder accepts a compressed bit stream as input, and produces the
 decoded video stream as output. The computation is encapsulated in
 three main components: the parser (line 8), the block and motion vector
-decoder (lines 9-22), and the motion compensator (lines 23-34).
+decoder (lines 9-22), and the motion compensator (lines 23-32).
 
 The parser is responsible for parsing the MPEG-2 bit stream and
 performing Huffman and variable run-length decoding (VLD). The output
@@ -33,7 +33,7 @@ or 384 subpixels per macroblock.
 The VLD output is segregated into two homogeneous streams by a
 roundrobin splitter (line 10). The first stream undergoes inverse
 transformations (lines 11-16), while the second is decoded to produce
-absolute motion vectors (line 17). As is evident from the computation
+absolute motion vectors (lines 17-20). As is evident from the computation
 graph, the two streams are decoded in parallel, and then merged (line
 21) prior to the motion compensation stage of the pipeline.
 
@@ -64,7 +64,7 @@ can be easily identified as those that are stateless (i.e., do not
 carry mutable state from one iteration to the next).
 
 The third stage of the decoding pipeline performs the motion
-compensation (lines 23-34) to recover predictively coded
+compensation (lines 23-32) to recover predictively coded
 macroblocks. The motion compensation filter uses the motion vectors to
 find a corresponding macroblock in a previously decoded reference
 picture. The reference macroblock is added to the current macroblock
@@ -82,7 +82,8 @@ the Y motion compensator. The chrominance channels are typically
 downsampled by a factor of 4, and hence one 8x8 block is streamed to
 each of the Cb and Cr pipelines, which upsample (line 29) the results
 of the motion compensator to generate the full 16x16 macroblock.  The
-joiner (line 31) assembles the pictures from each of the color
+upsampling is a simple linear interpolation of the surrounding pixels. 
+The joiner (line 31) assembles the pictures from each of the color
 channels, one pixel at a time. The output is then readied for display
 (lines 33 and 34) by organizing the pictures in accord with their
 temporal order, and performing color space conversion to the RGB (red,
@@ -103,8 +104,11 @@ prior understanding of MPEG. The development spanned eight weeks from
 specification~\cite{MPEG2} to the first fully functional MPEG
 decoder. The StreamIt code is nearly 3,165 lines of code with 48
 static streams. The bit stream parser is the largest single filter,
-consisting of 775 lines of code. The 48 static streams are compiled to
-2,150 filters for a picture resolution of 352x240. By way of
+consisting of 775 lines of code. The 48 static streams compile to
+2,150 instantiated filters at a picture resolution of 352x240~\footnote{A 
+{\it static stream} is a unique code block, which may have multiple 
+instantiations when compiled. For instance the \texttt{MotionCompensation()} 
+filter is one static stream, but is instantiated three times.}. By way of
 comparison, the reference C implementation~\cite{reference-mpeg-c} is
 6,835 lines of code~\footnote{Line counts were generated using 
 the SLOCcount tool which strips whitespace and comments.}.
@@ -153,7 +157,7 @@ single-input, single-output streams with well-defined modular
 interfaces. This property facilitates development and boosts
 programmer productivity, as components can be debugged and verified as
 standalone components. The modularity also promotes reuse. For
-example, the zig-zag descrambler, inverse quantizer, and inverse DCT
+example, the zig-zag descrambler and inverse DCT
 components may be used as is to implement a JPEG decoder.
 
 Another noteworthy aspect of the StreamIt implementation is its
