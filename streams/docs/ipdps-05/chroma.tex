@@ -32,7 +32,7 @@
  \begin{minipage}[t]{4.3in}{
   \begin{scriptsize}
    \begin{verbatim}
-   // C = blocks per chromia channel per macroblock 
+   // C = blocks per chroma channel per macroblock 
    // C = 1 for 4:2:0, C = 2 for 4:2:2
    add splitjoin {
       split roundrobin(4*(B+V), 2*C*(B+V));
@@ -54,7 +54,7 @@
  % \label{fig:chroma-stream}
  \vspace{-12pt}
  \end{minipage}
- \caption{C (left) and StreamIt (right) code exerpts for handling
+ \caption{C (left) and StreamIt (right) code excerpts for handling
           4:2:0 and 4:2:2 chroma formats.} % during motion compensation.}
  \label{fig:chroma-format-code}
  \vspace{-8pt}
