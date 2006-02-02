@@ -1,6 +1,63 @@
 \Section{Code Malleability: A Case Study}
 \label{section:chroma}
 
+\begin{figure*}[t]
+ \begin{minipage}[t]{4.1in}{
+  \begin{scriptsize}
+   \begin{verbatim}
+01 /* Y */
+02 form_component_prediction(src[0]+(sfield?lx2>>1:0),dst[0]+(dfield?lx2>>1:0),
+03                           lx,lx2,w,h,x,y,dx,dy,average_flag);
+04 if (chroma_format!=CHROMA444)  {
+05    lx>>=1; lx2>>=1; w>>=1; x>>=1; dx/=2;
+06 }
+07 if (chroma_format==CHROMA420)  {
+08    h>>=1; y>>=1; dy/=2;
+09 }
+10 /* Cb */
+11 form_component_prediction(src[1]+(sfield?lx2>>1:0),dst[1]+(dfield?lx2>>1:0),
+12                           lx,lx2,w,h,x,y,dx,dy,average_flag);
+13 /* Cr */
+14 form_component_prediction(src[2]+(sfield?lx2>>1:0),dst[2]+(dfield?lx2>>1:0),
+15                           lx,lx2,w,h,x,y,dx,dy,average_flag);    
+   \end{verbatim}
+  \end{scriptsize}
+ }
+ % \caption{C code exerpt for handling 4:2:0 and 4:2:2 chroma formats.}
+ \label{fig:chroma-stream}
+\vspace{-12pt}
+ \end{minipage}
+ ~\vrule
+ \begin{minipage}[t]{4.3in}{
+  \begin{scriptsize}
+   \begin{verbatim}
+   // C = blocks per chromia channel per macroblock 
+   // C = 1 for 4:2:0, C = 2 for 4:2:2
+   add splitjoin {
+      split roundrobin(4*(B+V), 2*C*(B+V));
+      add MotionCompensation() to PT1;
+      add splitjoin {
+         split roundrobin(B+V, B+V);
+         for (int i = 0; i < 2; i++) {
+            add MotionCompensation() to PT1;
+            add ChannelUpsample(C);
+         }
+         join roundrobin(1, 1);
+      }
+      join roundrobin(1, 1, 1);
+   }
+   \end{verbatim}
+  \end{scriptsize}
+ }
+ % \caption{StreamIt code exerpt for handling 4:2:0 and 4:2:2 chroma formats.}
+ % \label{fig:chroma-stream}
+ \vspace{-12pt}
+ \end{minipage}
+ \caption{C (left) and StreamIt (right) code exerpts for handling
+          4:2:0 and 4:2:2 chroma formats.} % during motion compensation.}
+ \label{fig:chroma-format-code}
+\end{figure*}
+
 A noteworthy aspect of the StreamIt implementation is its
 malleability. We illustrate this by outlining how the decoder
 implementation is modified to support both 4:2:0 and 4:2:2 chroma
@@ -32,83 +89,29 @@ adjustments for the 4:2:0 format. While these offset adjustments are
 necessary in C, they are difficult for programmers and make the code
 hard to understand.
 
-To add support for the 4:2:2 chroma format in our StreamIt decoder, we
-modified 31 lines and added 20 new lines. Of the 31 modified lines, 23
-were trivial modifications to pass a variable representing the chroma
-format as a stream parameter. The greatest substantial change was to
-the color channel splitter, previously illustrated on line 24 of
-Figure~\ref{fig:dec-with-code}. In the case of a 4:2:2 sampling rate,
-the chrominance data, as they appear on the input tape, alternate
-between each of the two chrominance channels (see
-Figure~\ref{fig:chroma-block-layout}). Thus, a nested splitjoin is used
-to properly recover the chrominance channels. The new splitjoin is
-shown on the right half of Figure~\ref{fig:chroma-format-code}.  In
-the StreamIt code, the chroma format explicitly dictates control flow
-in only 9 locations. Of course, the scheduling and buffer management
-changes dramatically between chroma formats, but this is transparent
-to the programmer.
+In StreamIt, we modified 31 lines and added 20 new lines to support
+the 4:2:2 format. Of the 31 modified lines, 23 were trivial changes to
+introduce the chroma format as a stream parameter. The greatest
+substantial change was to the color channel splitter, previously
+illustrated on line 24 of Figure~\ref{fig:dec-with-code}. In the case
+of a 4:2:2 sampling rate, the chrominance data, as they appear on the
+input tape, alternate between each of the two chrominance
+channels. That is, the pattern of blocks is $\texttt{Y}_1 \texttt{Y}_2
+\texttt{Y}_3 \texttt{Y}_4 \texttt{Cb}_5 \texttt{Cr}_6 \texttt{Cb}_7
+\texttt{Cr}_8$ (the pattern for the 4:2:0 case omits the last two
+blocks). Thus, a nested splitjoin is used to properly recover the
+chrominance channels. The new splitjoin is shown in the right half of
+Figure~\ref{fig:chroma-format-code}.  In the StreamIt code, the chroma
+format explicitly dictates control flow in only 9 locations. Of
+course, the scheduling and buffer management changes dramatically
+between chroma formats, but this is transparent to the programmer.
 
-\begin{figure*}[t]
- \begin{minipage}[t]{4.3in}{
-  \begin{scriptsize}
-   \begin{verbatim}
-   01 /* Y */
-   02 form_component_prediction(src[0]+(sfield?lx2>>1:0),dst[0]+(dfield?lx2>>1:0),
-   03                           lx,lx2,w,h,x,y,dx,dy,average_flag);
-   04 if (chroma_format!=CHROMA444)  {
-   05    lx>>=1; lx2>>=1; w>>=1; x>>=1; dx/=2;
-   06 }
-   07 if (chroma_format==CHROMA420)  {
-   08    h>>=1; y>>=1; dy/=2;
-   09 }
-   10 /* Cb */
-   11 form_component_prediction(src[1]+(sfield?lx2>>1:0),dst[1]+(dfield?lx2>>1:0),
-   12                           lx,lx2,w,h,x,y,dx,dy,average_flag);
-   13 /* Cr */
-   14 form_component_prediction(src[2]+(sfield?lx2>>1:0),dst[2]+(dfield?lx2>>1:0),
-   15                           lx,lx2,w,h,x,y,dx,dy,average_flag);    
-   \end{verbatim}
-  \end{scriptsize}
- }
- % \caption{C code exerpt for handling 4:2:0 and 4:2:2 chroma formats.}
- \label{fig:chroma-stream}
-\vspace{-12pt}
- \end{minipage}
- ~~\vrule~~
- \begin{minipage}[t]{4.3in}{
-  \begin{scriptsize}
-   \begin{verbatim}
-   // C = blocks per chrominance channel per macroblock 
-   // C = 1 for 4:2:0, C = 2 for 4:2:2
-   add splitjoin {
-      split roundrobin(4*(B+V), 2*C*(B+V));
-      add MotionCompensation() to PT1;
-      add splitjoin {
-         split roundrobin(B+V, B+V);
-         for (int i = 0; i < 2; i++) {
-            add MotionCompensation() to PT1;
-            add ChannelUpsample(C);
-         }
-         join roundrobin(1, 1);
-      }
-      join roundrobin(1, 1, 1);
-   }
-   \end{verbatim}
-  \end{scriptsize}
- }
- % \caption{StreamIt code exerpt for handling 4:2:0 and 4:2:2 chroma formats.}
- % \label{fig:chroma-stream}
-\vspace{-12pt}
- \end{minipage}
- \caption{C (left) and StreamIt (right) code exerpts for handling
-          4:2:0 and 4:2:2 chroma formats.} % during motion compensation.}
- \label{fig:chroma-format-code}
-\end{figure*}
-
-\begin{figure}[t]
-\begin{center}
-  \epsfig{file=chroma_format.eps, width=1.5in}
-   \caption{4:2:0 and 4:2:2 chroma formats showing macroblock ordering}
-   \label{fig:chroma-block-layout}
-\end{center}
-\end{figure}
+%% \begin{figure}[t]
+%% \begin{center}
+%%   \epsfig{file=chroma_format.eps, width=2.5in}
+%%    \vspace{-12pt}
+%%    \caption{4:2:0 and 4:2:2 chroma formats showing macroblock ordering}
+%%    \vspace{-24pt}
+%%    \label{fig:chroma-block-layout}
+%% \end{center}
+%% \end{figure}
