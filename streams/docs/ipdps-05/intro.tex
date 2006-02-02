@@ -1,52 +1,52 @@
 \Section{Introduction}
 
-Image compression, whether for still pictures or motion pictures
-(e.g., video), plays an important role in Internet and multimedia
-applications, digital appliances such as HDTV, and handheld devices
-such as digital cameras and mobile phones. Compression allows one to
-represent images and video with a much smaller amount of data and
-negligible quality loss. The reduction in data decreases storage
+Image compression of still and motion pictures plays an important role
+in Internet and multimedia applications, digital appliances such as
+HDTV, and handheld devices. The compression process allows images and
+video to be encoded with a much smaller amount of data, and often with
+a negligible loss in quality. The reduction in data decreases storage
 requirements (important for embedded devices) and provides higher
 effective transmission rates (important for Internet enabled devices).
 
-Unfortunately, implementing a compression scheme can be especially
-difficult. For performance reasons, implementations are typically not
-portable as they are tuned to specific architectures. And while image
-and video compression is needed on embedded systems, desktop PCs, and
-high end servers, writing a separate implementation for every
-architecture is not cost effective. Furthermore, compression standards
-are also continuously evolving, and thus compression programs must be
-easy to modify and update.
+Current programming practices often require developers to implement
+their compression algorithms in low level languages, and arduously
+tune their code for performance. This methodology is not cost
+effective, as architecture-specific code is not portable, leading to
+multiple implementations of the same codec. The process is made more
+challenging by the continuous evolutions of the standards, as new
+innovations are realized in a rapidly growing digital multimedia
+market.
 
 A typical compression algorithm involves three types of operations:
 data representation, lossy compression, and lossless
 compression. These operations are semi-autonomous, exhibit data and
 pipeline parallelism, and easily fit into a sequence of distinct
-processing kernels. As such, image and video compression is a good
-match for the streaming model of computation, which affords certain
-advantages in terms of programmability, robustness, and achieving high
-performance. Our goal is to implement well-known still image and
-motion picture compression standards---such as JPEG and MPEG-2---in
-StreamIt~\cite{streamitcc}, a high-level architecture-independent
-language for the streaming domain. This will result in clean,
-malleable, and portable codes.
-% TODO: emphasize benefits over C
-In addition, using the stream-aware StreamIt compiler, we can produce
-highly optimized codes that are competitive with hand-tuned
-implementations. Our architecture targets include conventional
-processors, as well as new and emerging wire
-exposed and multi-core architectures~\cite{cell05hpca,mai00smartmemories,raw02ieee,raw04isca,burger04trips}.
+processing stages. As such, image and video compression is a good
+match for the streaming model of computation where data is transformed
+by a series of filters, usually organized in well structure
+topologies.  Stream programming models afford certain advantages in
+terms of programmability, robustness, and achieving high performance.
 
-This work is in the context of the StreamIt programming
-language~\cite{streamitcc}, an architecture-independent stream
-language that aims to improve programmer productivity within the
-streaming domain. StreamIt provides an intuitive programming model,
-allowing the programmer to build an application by connecting
-components together into a stream graph, where the nodes represent
-actors that carry out the computation, and edges represent FIFO
-communication channels between actors. As a result, the parallelism
-and communication topology of the application are exposed, empowering
-the compiler to perform many stream-aware
+This paper describes an implementation of the widely used MPEG-2
+compression standard in StreamIt~\cite{streamitcc}, a high-level
+architecture-independent language for streaming computation. Our goal
+is to deliver a unified development environment that captures all
+aspects of stream application development without sacrificing either
+performance or programmability. This paper details the salients
+processing steps of the MPEG-2 decoder in StreamIt, and compares some
+of the important implementation details to a reference C
+implementation of the decoder.
+
+The StreamIt programming model allows the programmer to build an
+application by connecting components together into a stream graph,
+where the nodes represent filters that transform the data communicated
+along the edges. In StreamIt, the programmer is relieved of the burden
+of explicit buffer management, complex index expression for
+multi-dimensional data, and naturally exposed the inherent
+parallelism and communication topology of the application. The latter
+empower the compiler to perform many stream-aware
 optimizations~\cite{agrawal05cases,gordon02asplos,lamb03pldi,sermulins05lctes}
-that elude other languages.
+that elude other languages. The end result is a clean, malleable,
+and efficient portable code.
+
 
