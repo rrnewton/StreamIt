@@ -37,8 +37,8 @@ streaming programs.
 	     35, 36, 48, 49, 57, 58, 62, 63};
 	\end{verbatim}
   \end{scriptsize}
-  \caption{Zig-zag descrambling filter.}
   \vspace{-12pt}
+  \caption{Zig-zag descrambling filter.}
   \label{fig:zigzag-filter}
 \end{figure}
 
@@ -83,28 +83,28 @@ representation~\cite{yelick04msp}.
 \begin{figure}[t]
   \center{
  	\includegraphics[scale=1, angle=0]{./constructs-eg.eps}
+    \vspace{-12pt}
  	\caption{Hierarchical streams in StreamIt.}
-%    \vspace{-12pt}
  	\label{fig:containers}
   }
 \end{figure}
 
-\begin{figure}[t]
-  \begin{scriptsize}
-    \begin{verbatim}
-      int->int pipeline InverseTransform() {
-        int[64] Order = {...};
-        add ZigZag(64, Order);
-        add IQuantization(64);
-        add IDCT(64);
-        add Saturation(64);
-      }
-    \end{verbatim}
-  \end{scriptsize}
-  \caption{Example pipeline.}
-%  \vspace{-12pt}
-  \label{fig:decoder-pipeline}
-\end{figure}
+%% \begin{figure}[t]
+%%   \begin{scriptsize}
+%%     \begin{verbatim}
+%%       int->int pipeline InverseTransform() {
+%%         int[64] Order = {...};
+%%         add ZigZag(64, Order);
+%%         add IQuantization(64);
+%%         add IDCT(64);
+%%         add Saturation(64);
+%%       }
+%%     \end{verbatim}
+%%   \end{scriptsize}
+%%   \vspace{-12pt}
+%%   \caption{Example pipeline.}
+%%   \label{fig:decoder-pipeline}
+%% \end{figure}
 
 \SubSection{Hierarchical Streams}
 In StreamIt, the application developer focuses on the hierarchical
@@ -114,17 +114,17 @@ StreamIt provides three hierarchical structures for composing filters
 into larger stream graphs (see Figure~\ref{fig:containers}).
 
 \paragraph{Pipeline.}
-A StreamIt pipeline is a parameterized stream that composes streams in
-sequence, with the output of one connected to the input of the next.
-An example of a pipeline appears in
-Figure~\ref{fig:decoder-pipeline}. A pipeline is a single input to
-single output stream. The decoding pipeline in the figure consists of
-four streams. The first is a filter which zig-zag unorders the input
-stream, preparing the data for the inverse quantization and
-DCT. The output of the filter is consumed by a stream named {\tt
-IQuantization} that performs the inverse quantization, and produces an
-output stream that is in turn consumed by another stream that performs
-the inverse DCT.
+A StreamIt pipeline is a single input to single output parameterized
+stream. It composes streams in sequence, with the output of one
+connected to the input of the next.  An example of a pipeline appears
+in Figure~\ref{fig:decoder-sj}.
+%% The decoding pipeline in the figure consists of
+%% four streams. The first is a filter which zig-zag unorders the input
+%% stream, preparing the data for the inverse quantization and
+%% DCT. The output of the filter is consumed by a stream named {\tt
+%% IQuantization} that performs the inverse quantization, and produces an
+%% output stream that is in turn consumed by another stream that performs
+%% the inverse DCT.
 
 The {\tt add} keyword in StreamIt constructs the specified stream
 using the input arguments. The {\tt add} statement may only appear in
@@ -189,8 +189,8 @@ produce a single output stream.
       }
     \end{verbatim}
   \end{scriptsize}
+  \vspace{-12pt}
   \caption{Example MPEG decoder splitjoin.}
-%  \vspace{-12pt}
   \label{fig:decoder-sj}
 \end{figure}
 
@@ -231,6 +231,7 @@ produce a single output stream.
   \end{scriptsize}
   \vspace{-12pt}
   \caption{Example C code for 2D inverse DCT calculation using two 1D transforms.}
+  \vspace{-16pt}
   \label{fig:idct_creference}
 \end{figure}
 
@@ -394,6 +395,7 @@ dataflow~\cite{thies05ppopp}).
   %}
   %\end{minipage}
   %}
+  \vspace{-12pt}
   \caption{MPEG messaging example.}
   \label{fig:messaging}
 \end{figure}
