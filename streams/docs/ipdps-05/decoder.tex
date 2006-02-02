@@ -51,7 +51,7 @@ can replicate the inverse transformation pipeline $N$ times:
       add splitjoin {
         split roundrobin(B);
         for (int i = 0; i < N; i++) 
-        // add pipeline
+          // add pipeline
         join roundrobin(B);
       }
     \end{verbatim}

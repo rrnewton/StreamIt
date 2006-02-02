@@ -1,7 +1,8 @@
 \Section{Overview of MPEG-2}
+\vspace{-6pt}
 
 MPEG-2~\cite{MPEG2} is a popular encoding and decoding standard for
-digital video data. %% The scheme is a subset of both the
+digital video. %% The scheme is a subset of both the
 %% DVD-Video~\cite{Taylor:1999:SDV} standard for storing movies, and the
 %% Digital Video Broadcasting specifications for transmitting HDTV and
 %% SDTV~\cite{DVB}. The scheme is used by a wide variety of multimedia
@@ -51,14 +52,14 @@ The encoder operates on a sequence of pictures. Each picture is made
 from 16x16 groups of pixels known as macroblocks.  A macroblock is
 composed from a series of blocks, which are 8x8 arrays of subpixels
 (individual color components of a pixel). The luminance information
-for a macroblock is a 2x2 array of blocks. In contrast, the
-chrominance channels are frequently downsampled because of human
-insensitivity to hue. The type of downsampling in an MPEG-2 stream is
-known as its chroma format. The most common chroma format is 4:2:0. It
-uses one block for each of the chrominance channels, downsampling a
-macroblock from 16x16 to 8x8 subpixels. An alternate format is
-4:2:2. It uses two blocks for each chrominance channel, downsampling
-each macroblock from 16x16 to 8x16 subpixels.
+for a macroblock is a 2x2 array of blocks, whereas the
+chrominance channels are downsampled because of human insensitivity to
+hue. The type of downsampling in an MPEG-2 stream is known as its
+chroma format. The most common chroma format is 4:2:0. It uses one
+block for each chrominance channel, downsampling a macroblock from
+16x16 to 8x8 subpixels. An alternate format is 4:2:2. It uses two
+blocks for each chrominance channel, downsampling each macroblock from
+16x16 to 8x16 subpixels.
 %% The two chroma formats are shown in
 %% Figure~\ref{fig:chroma}.
 

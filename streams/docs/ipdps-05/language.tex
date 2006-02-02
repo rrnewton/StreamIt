@@ -14,27 +14,27 @@ streaming programs.
 \begin{figure}[t]
   \begin{scriptsize}
 	\begin{verbatim}
-	  int->int filter ZigZag(int N, int[N] Order) {
-	    work pop N push N {
-	      for (int i = 0; i < N; i++) {
-	        int pixel = peek(Order[i]);
-	        push(pixel);
-	      }
-	      for (int i = 0; i < N; i++) {
-	        pop();
-	      }
-	    }
-	  }
+	        int->int filter ZigZag(int N, int[N] Order) {
+	           work pop N push N {
+	             for (int i = 0; i < N; i++) {
+	               int pixel = peek(Order[i]);
+	               push(pixel);
+	             }
+	             for (int i = 0; i < N; i++) {
+	               pop();
+	             }
+	           }
+	        }
 
-	  int[64] Order =
-	    {00, 01, 05, 06, 14, 15, 27, 28,
-	     02, 04, 07, 13, 16, 26, 29, 42,
-	     03, 08, 12, 17, 25, 30, 41, 43,
-	     09, 11, 18, 24, 31, 40, 44, 53,
-	     10, 19, 23, 32, 39, 45, 52, 54,
-	     20, 22, 33, 38, 46, 51, 55, 60,
-	     21, 34, 37, 47, 50, 56, 59, 61,
-	     35, 36, 48, 49, 57, 58, 62, 63};
+	        int[64] Order =
+	                {00, 01, 05, 06, 14, 15, 27, 28,
+	                 02, 04, 07, 13, 16, 26, 29, 42,
+	                 03, 08, 12, 17, 25, 30, 41, 43,
+	                 09, 11, 18, 24, 31, 40, 44, 53,
+	                 10, 19, 23, 32, 39, 45, 52, 54,
+	                 20, 22, 33, 38, 46, 51, 55, 60,
+	                 21, 34, 37, 47, 50, 56, 59, 61,
+	                 35, 36, 48, 49, 57, 58, 62, 63};
 	\end{verbatim}
   \end{scriptsize}
   \vspace{-12pt}
@@ -246,7 +246,7 @@ inverse DCT is shown in Figure~\ref{fig:idct_creference}. Note that
 the code structure is similar to the StreamIt version, although it does 
 not explicitly expose the parallelism.
 The C code also requires explicit array index management, such as the 
-expressions \texttt{block[8*i + u]} and \texttt{tmp[8*i + j]} which are
+expressions $\texttt{block[8*i+u]}$ and $\texttt{tmp[8*i+j]}$ which are
 notably absent in the StreamIt code. 
 The splitter and joiner in StreamIt free the programmer from
 tedious indexing operations, which also enables the compiler to
