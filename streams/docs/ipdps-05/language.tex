@@ -38,7 +38,7 @@ streaming programs.
 	\end{verbatim}
   \end{scriptsize}
   \caption{Zig-zag descrambling filter.}
-%  \vspace{-12pt}
+  \vspace{-12pt}
   \label{fig:zigzag-filter}
 \end{figure}
 
@@ -53,7 +53,7 @@ and pushes (i.e., writes) items to the filter output tape. A filter
 may also peek at a given index on its input tape without consuming the
 item; this makes it simple to represent computation over a sliding
 window or to perform permutations on the input stream. The {\tt push},
-{\tt pop}, and {\tt peek} rates can be declared as part of the work
+{\tt pop}, and {\tt peek} rates are declared as part of the work
 function, thereby enabling the compiler to apply various optimizations
 and construct efficient execution schedules.
 
@@ -147,10 +147,12 @@ incoming data to each stream connected to the splitter.  A
 roundrobin splitter (indicated by {\tt split
 roundrobin($w_1,\ldots,w_n$)}) distributes the first $w_1$ items to
 the first child, the next $w_2$ items to the second child, and so
-on.  The splitter counterpart is the joiner. It is a specialized
-filter with multiple input channels but only one output channel. The
-joiner gathers data from its predecessors in a roundrobin manner
-(declared as part of the syntax) to produce a single output stream.
+on.  The splitter counterpart is the joiner. 
+%% It is a specialized
+%% filter with multiple input channels but only one output
+%% channel. The joiner
+It gathers data from its predecessors in a roundrobin manner to
+produce a single output stream.
 
 \begin{figure}[t]
   \begin{scriptsize}
