@@ -40,8 +40,8 @@
       add splitjoin {
          split roundrobin(B+V, B+V);
          for (int i = 0; i < 2; i++) {
-            add MotionCompensation() to PT1;
-            add ChannelUpsample(C);
+            add MotionCompensation(B+V) to PT1;
+            add ChannelUpsample(C*B);
          }
          join roundrobin(1, 1);
       }
@@ -65,10 +65,10 @@ malleability. We illustrate this by outlining how the decoder
 implementation is modified to support both 4:2:0 and 4:2:2 chroma
 formats. MPEG-2 streams are typically encoded using the former, which
 achieves a 50\% reduction in the number of blocks required to
-represent a video. However, better quality is possible with higher
-sampling rates since more color information is retained from the
-original picture. In this section, we show that the migration path is
-trivial.
+represent a video. A higher sampling rate retains more color
+information from the original picture, and results in better overall
+quality.
+%% In this section, we show that the migration path is trivial.
 
 %% To illustrate the concrete benefits of programming in a stream
 %% language, we compare the support for varying chroma formats in the
@@ -77,9 +77,9 @@ The conceptual difference between chroma formats is merely a change in
 downsampling ratio. The change affects the data I/O rates, and the
 ratios of data between color channels. In the C reference code, the
 change requires adjustments to buffer sizes, array lengths, array
-indices, and various pointer offsets. The reference implementation
-uses a \texttt{chroma flag} to dictate control flow and alternate
-index/offset calculations {\newpage\noindent}in 43 locations in the code. As an example,
+indices, loop bounds, and various pointer offsets. The reference implementation
+uses a \texttt{chroma}{\newpage\noindent}\texttt{flag} to dictate control flow and alternate
+index/offset calculations in 43 locations in the code. As an example,
 Figure~\ref{fig:chroma-format-code} shows a code fragment from the
 \texttt{form\_prediction} routine in
 \texttt{recon.c}~\cite{reference-mpeg-c}. The function calls a

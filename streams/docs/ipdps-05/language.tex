@@ -114,7 +114,7 @@ StreamIt provides three hierarchical structures for composing filters
 into larger stream graphs (see Figure~\ref{fig:containers}).
 
 \paragraph{Pipeline.}
-A StreamIt pipeline is a single input to single output parameterized
+A pipeline is a single input to single output parameterized
 stream. It composes streams in sequence, with the output of one
 connected to the input of the next.  An example of a pipeline appears
 in Figure~\ref{fig:decoder-sj}.
@@ -181,7 +181,7 @@ produce a single output stream.
           for (int x = 0; x < N; x++) {
             float product = 0;
             for (int u = 0; u < N; u++)
-                product += coeff[x][u] * peek(u);
+              product += coeff[x][u] * peek(u);
             push(product);
           }
           for (int x = 0; x < N; x++) pop();
@@ -211,7 +211,7 @@ produce a single output stream.
             product = 0;
 
             for (u = 0; u < 8; u++)
-              product += c[u][j] * block[8*i + u];
+              product += coeff[u][j] * block[8*i + u];
 
             tmp[8*i + j] = product;
           }
@@ -222,7 +222,7 @@ produce a single output stream.
             product = 0;
 
             for (u = 0; u < 8; u++)
-              product += c[u][i] * tmp[8*u + j];
+              product += coeff[u][i] * tmp[8*u + j];
 
             block[8*i + j] = product;
           }
@@ -268,7 +268,7 @@ trivial to adjust the size of the inverse DCT.
 \paragraph{Feedback Loop.}
 StreamIt also provides a feedback loop construct for introducing
 cycles in the graph. This stream construct is not used in the decoder,
-but may be used in the MPEG encoder.
+but is useful in other applications.
 
 \SubSection{Teleport Messaging}
 \label{sec:messaging}
