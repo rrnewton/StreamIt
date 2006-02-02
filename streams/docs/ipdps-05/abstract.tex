@@ -1,16 +1,16 @@
 Image and video codecs are prevalent in multimedia devices, ranging
 from embedded systems, to desktop computers, and high-end servers such
 as HDTV editing consoles. It is not uncommon however that developers
-create (from scratch) and customize their codec implementations for
-each of the architecture targets they intend their coders and decoders
-to run on. This practice is time consuming and error prone, leading to
-code that is not malleable or portable. This paper describes an
+create and customize seperate coder and decoder implementations for
+each of the architectures they target. This practice is time 
+consuming and error prone, leading to
+code that is neither malleable nor portable. This paper describes an
 implementation of the MPEG-2 decoder using the StreamIt programming
 language. StreamIt is an architecture-independent stream language that
 aims to improve programmer productivity, while concomitantly exposing
 the inherent parallelism and communication topology of the
 application. The paper shows that MPEG is a good match for the
-streaming programming model, and illustrate the malleability of the
+streaming programming model and illustrates the malleability of the
 implementation using a simple modification to the decoder to support
 alternate color compression formats. StreamIt allows for modular
 application development, which increases code reuse, and reduces the
