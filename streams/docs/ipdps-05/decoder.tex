@@ -35,7 +35,7 @@ graph, the two streams are decoded in parallel, and then merged (line
 21) prior to the motion compensation stage of the pipeline.
 
 The inverse transformations map each 8x8 block from the frequency
-domain back to the spatially encoded domain. Each block is reordered
+domain back to the spatial domain. Each block is reordered
 (line 12), and then inversely quantized (line 13). This is followed by
 an inverse DCT and a bounded saturation filter (lines 14-15). The set
 of transformations is grouped into a pipeline whose input
@@ -95,7 +95,7 @@ output of the decoder is $\texttt{W}\times\texttt{H}$ pixels.  In
 contrast to the filters for motion compensation and inverse transformation,
 whose I/O rates are statically resolved at compile time, the picture 
 reordering and color space conversion have I/O rates that are
-parameterized on initialization time constants; namely the pixel
+parameterized on initialization time constants, namely the pixel
 resolution of the pictures.
 
 %% The MPEG-2 decoder in StreamIt is a fully portable implementation in
@@ -156,7 +156,7 @@ macroblock. Teleport messaging
 exposes the flow of messages to the compiler, and allows for large
 scale reordering or parallelization of the application without a
 heroic dependence analysis. It also provides a mechanism to easily
-dynamic behavior into an otherwise static processing pipeline.
+introduce dynamic behavior into an otherwise static processing pipeline.
 
 %% \begin{figure*}[b]
 %%   \centerline{\epsfig{file=decoder_with_code.eps,width=\textwidth}}
