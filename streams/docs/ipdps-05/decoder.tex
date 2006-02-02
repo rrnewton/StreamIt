@@ -29,7 +29,7 @@ macroblock consists of four 8x8 subpixel blocks for the luminance
 channel, and two 8x8 subpixel blocks for the two chrominance
 channels. Therefore, the VLD outputs a total of six 8x8 blocks, or 384
 subpixels per macroblock. However, the total number of macroblocks
-that are output by the parser is dependent on the numbers frames in
+that are output by the parser is dependent on the number of frames in
 the input encoded video. As a result, the VLD has a variable I/O
 rate. The VLD filter is the only variable rate filter in the decoder
 pipeline.
@@ -96,12 +96,11 @@ $3\times\texttt{W}\times\texttt{H}$ subpixels per picture. This is
 three times the pixel resolution of the decoded image since there is
 one pixel generated from each of the three channel decoders. The final
 output of the decoder is $\texttt{W}\times\texttt{H}$ pixels.  In
-contrast to the motion compensation and inverse transformations
-stages, which consist of filters whose I/O rates are statically
-resolved at compile time, the picture reordering and color space
-conversion are parameterized on, and have I/O rates that depend on
-initialization time constants; namely the pixel resolution of the
-pictures.
+contrast to the filters for motion compensation and inverse transformation,
+whose I/O rates are statically resolved at compile time, the picture 
+reordering and color space conversion have I/O rates that are
+parameterized on initialization time constants; namely the pixel
+resolution of the pictures.
 
 The MPEG-2 decoder in StreamIt is a fully portable implementation in
 that the application is not architecture dependent. The implementation
