@@ -9,7 +9,7 @@ requirements (important for embedded devices) and provides higher
 effective transmission rates (important for Internet enabled devices).
 
 Current programming practices often require developers to implement
-their compression algorithms in low level languages, and arduously
+compression algorithms in low level languages, and arduously
 tune their code for performance. This methodology is not cost
 effective, as architecture-specific code is not portable, leading to
 multiple implementations of the same codec. The process is made more
@@ -23,16 +23,16 @@ compression. These operations are semi-autonomous, exhibit data and
 pipeline parallelism, and easily fit into a sequence of distinct
 processing stages. As such, image and video compression is a good
 match for the streaming model of computation where data is transformed
-by a series of filters, usually organized in well structure
+by a series of filters, usually organized in well structured
 topologies.  Stream programming models afford certain advantages in
 terms of programmability, robustness, and achieving high performance.
 
 This paper describes an implementation of the widely used MPEG-2
 compression standard in StreamIt~\cite{streamitcc}, a high-level
-architecture-independent language for streaming computation. Our goal
+architecture-independent language for streaming computations. Our goal
 is to deliver a unified development environment that captures all
 aspects of stream application development without sacrificing either
-performance or programmability. This paper details the salients
+performance or programmability. This paper details the salient
 processing steps of the MPEG-2 decoder in StreamIt, and compares some
 of the important implementation details to a reference C
 implementation of the decoder.
@@ -41,12 +41,10 @@ The StreamIt programming model allows the programmer to build an
 application by connecting components together into a stream graph,
 where the nodes represent filters that transform the data communicated
 along the edges. In StreamIt, the programmer is relieved of the burden
-of explicit buffer management, complex index expression for
-multi-dimensional data, and naturally exposed the inherent
-parallelism and communication topology of the application. The latter
-empower the compiler to perform many stream-aware
+of explicit buffer management and complex index expressions for
+multi-dimensional data.  StreamIt also exposes the inherent
+parallelism and communication topology of the application, thereby
+empowering the compiler to perform many stream-aware
 optimizations~\cite{agrawal05cases,gordon02asplos,lamb03pldi,sermulins05lctes}
 that elude other languages. The end result is a clean, malleable,
 and efficient portable code.
-
-
