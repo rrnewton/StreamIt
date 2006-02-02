@@ -7,16 +7,15 @@
 \Section{MPEG Decoder in StreamIt}
 
 The MPEG decoder pipeline is shown in
-Figure~\ref{fig:dec-with-code}. The stream graph is shown on the left,
-alongside the StreamIt code on the right. It is worthy to note that
-there is a high correlation between the stream block level diagram and
-the StreamIt syntax describing the pipeline.
+Figure~\ref{fig:dec-with-code}. The stream graph is shown on the
+left. The StreamIt code is shown on the right, and it is correlated
+with the stream block level diagram.
 
-The decoder accepts a compressed bit stream as input, and produces the
-decoded video stream as output. The computation is encapsulated in
-three main components: the parser (line 8), the block and motion vector
-decoder (lines 9-22), and the motion compensator (lines 23-32).
-
+%% The decoder accepts a compressed bit stream as input, and produces the
+%% decoded video stream as output.
+The computation is encapsulated in three main components:
+the parser (line 8), the block and motion vector decoder (lines 9-22),
+and the motion compensator (lines 23-32).
 The parser is responsible for parsing the MPEG-2 bit stream and
 performing Huffman and variable run-length decoding (VLD). The output
 of the VLD is an interleaved stream of quantized macroblocks encoded
@@ -53,14 +52,16 @@ blocks. It is rather straightforward however to expose this
 parallelism if it is desirable. For example, in this case a splitjoin
 can replicate the inverse transformation pipeline $N$ times:
 \begin{center}
-\begin{verbatim}
-add splitjoin {
-   split roundrobin(B);
-   for (int i = 0; i < N; i++) 
-      // add pipeline
-   join roundrobin(B);
-}
-\end{verbatim}
+  \begin{scriptsize}
+    \begin{verbatim}
+      add splitjoin {
+        split roundrobin(B);
+        for (int i = 0; i < N; i++) 
+        // add pipeline
+        join roundrobin(B);
+      }
+    \end{verbatim}
+  \end{scriptsize}
 \end{center}
 A stream-aware compiler can also automatically adjust the execution
 granularity as necessary~\cite{gordon02asplos}, since data-parallel streams
@@ -102,15 +103,16 @@ reordering and color space conversion have I/O rates that are
 parameterized on initialization time constants; namely the pixel
 resolution of the pictures.
 
-The MPEG-2 decoder in StreamIt is a fully portable implementation in
-that the application is not architecture dependent. The implementation
-naturally exposes the pipeline parallelism that exists throughout the
-decoder, as well as the data level parallelism inherent to the inverse
-transformations and motion compensation.  The implementation was
-carried out by one student programmer with no prior understanding of
-MPEG. The development spanned eight weeks from
-specification~\cite{MPEG2} to the first fully functional MPEG
-decoder. The StreamIt code is nearly 3,165 lines of code with 48
+%% The MPEG-2 decoder in StreamIt is a fully portable implementation in
+%% that the application is not architecture dependent. The implementation
+%% naturally exposes the pipeline parallelism that exists throughout the
+%% decoder, as well as the data level parallelism inherent to the inverse
+%% transformations and motion compensation.  
+
+The decoder implementation was carried out by one student programmer
+with no prior understanding of MPEG. The development spanned eight
+weeks from specification~\cite{MPEG2} to the first fully functional
+MPEG decoder. The StreamIt code is nearly 3,165 lines of code with 48
 static streams. The bit stream parser is the largest single filter,
 consisting of 775 lines of code. The 48 static streams compile to
 2,150 instantiated filters\footnote{A  {\it static stream} is a unique
@@ -128,8 +130,9 @@ compression techniques used within MPEG, but supports only a subset of
 the possible display modes (i.e. interlaced versus progressive
 output).  However, these alternate display formats represent minor
 conceptual changes and should therefore affect small portions of the
-StreamIt code.  This is demonstrated in Section~\ref{section:chroma}
-with an example of support for multiple chrominance formats.
+StreamIt code. This is demonstrated in Section~\ref{section:chroma}
+with an example that illustrates how to support multiple chrominance
+formats.
 
 The reference C implementation intermingles parsing, decoding, and
 motion compensation, making it difficult to clearly follow the code,
@@ -168,17 +171,6 @@ programmer productivity, as components can be debugged and verified as
 standalone components. The modularity also promotes reuse. For
 example, the zig-zag descrambler and inverse DCT
 components may be used as is to implement a JPEG decoder.
-
-Another noteworthy aspect of the StreamIt implementation is its
-malleability. We illustrate this by outlining how the decoder
-implementation, originally designed to deal with a 4:2:0 chroma
-sampling rate, is modified for a 4:2:2 sampling rate. MPEG-2 streams
-are typically encoded using the former, which achieves a 50\%
-reduction in the number of blocks required to represent a
-video. However, better quality is possible with higher sampling rates
-since more color information is retained from the original picture. In
-the next section, we show that the migration path to support multiple
-chroma formats is trivial.
 
 %% \SubSection{Motion Compensation}
 

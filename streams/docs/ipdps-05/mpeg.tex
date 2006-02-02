@@ -1,15 +1,14 @@
 \Section{Overview of MPEG-2}
 
-MPEG-2~\cite{MPEG2} is a popular coding and decoding standard for
-digital video data. The scheme is a subset of both the
-DVD-Video~\cite{Taylor:1999:SDV} standard for storing movies, and the
-Digital Video Broadcasting specifications for transmitting HDTV and
-SDTV~\cite{DVB}. The scheme is used by a wide variety of multimedia
-applications and appliances such as the Tivo Digital Video Recorder,
-and the DirecTV satellite broadcast
-service.%~\cite{tivo}%~\cite{directv}.
-
-MPEG-2 encoding uses both {\it lossy} compression and {\it lossless}
+MPEG-2~\cite{MPEG2} is a popular encoding and decoding standard for
+digital video data. %% The scheme is a subset of both the
+%% DVD-Video~\cite{Taylor:1999:SDV} standard for storing movies, and the
+%% Digital Video Broadcasting specifications for transmitting HDTV and
+%% SDTV~\cite{DVB}. The scheme is used by a wide variety of multimedia
+%% applications and appliances such as the Tivo Digital Video Recorder,
+%% and the DirecTV satellite broadcast
+%% service.%~\cite{tivo}%~\cite{directv}.
+The encoding process relies on {\it lossy} and {\it lossless}
 compression. Lossy compression permanently eliminates information from
 a video based on a human perception model. Humans are much better at
 discerning changes in color intensity (luminance information) than
@@ -19,16 +18,16 @@ to high frequency image components, such as a plaid shirt. Details
 which humans are likely to miss can be thrown away without affecting
 the perceived video quality.
 
-Lossless compression eliminates redundant information while allowing
-for its later reconstruction. Similarities between adjacent video
-pictures are encoded using motion prediction, and all data is Huffman
-compressed\cite{Huffman52}. The amount of lossy and lossless
-compression depends on the video data. Common compression ratios range
-from 10:1 to 100:1. For example, HDTV, with a resolution of 1280x720
-pixels and a streaming rate of 59.94 frames per second, has an
-uncompressed data rate of 1.33 Gigabits per second. It is compressed at
-an average rate of 66:1, reducing the required streaming rate to
-20 Megabits per second~\cite{imagevidstandards}. %% page 3: [p.3]
+%% Lossless compression eliminates redundant information while allowing
+%% for its later reconstruction. Similarities between adjacent video
+%% pictures are encoded using motion prediction, and all data is Huffman
+%% compressed\cite{Huffman52}. The amount of lossy and lossless
+%% compression depends on the video data. Common compression ratios range
+%% from 10:1 to 100:1. For example, HDTV, with a resolution of 1280x720
+%% pixels and a streaming rate of 59.94 frames per second, has an
+%% uncompressed data rate of 1.33 Gigabits per second. It is compressed at
+%% an average rate of 66:1, reducing the required streaming rate to
+%% 20 Megabits per second~\cite{imagevidstandards}. %% page 3: [p.3]
 
 %\SubSection{MPEG Encoding}
 
@@ -54,12 +53,12 @@ composed from a series of blocks, which are 8x8 arrays of subpixels
 (individual color components of a pixel). The luminance information
 for a macroblock is a 2x2 array of blocks. In contrast, the
 chrominance channels are frequently downsampled because of human
-insensitivity to hue. The type of downsampling an MPEG-2 encoder uses
-is known as its chroma format. The most common chroma format is
-4:2:0. It uses one block for each of the chrominance channels,
-downsampling a macroblock from 16x16 to 8x8 subpixels. An alternate
-format is 4:2:2. It uses two blocks for each chrominance channel,
-downsampling each macroblock from 16x16 to 8x16 subpixels.
+insensitivity to hue. The type of downsampling in an MPEG-2 stream is
+known as its chroma format. The most common chroma format is 4:2:0. It
+uses one block for each of the chrominance channels, downsampling a
+macroblock from 16x16 to 8x8 subpixels. An alternate format is
+4:2:2. It uses two blocks for each chrominance channel, downsampling
+each macroblock from 16x16 to 8x16 subpixels.
 %% The two chroma formats are shown in
 %% Figure~\ref{fig:chroma}.
 
