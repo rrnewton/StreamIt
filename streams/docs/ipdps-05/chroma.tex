@@ -77,7 +77,7 @@ The conceptual difference between chroma formats is merely a change in
 downsampling ratio. The change affects the data I/O rates, and the
 ratios of data between color channels. In the C reference code, the
 change requires adjustments to buffer sizes, array lengths, array
-indices, loop bounds, and various pointer offsets. The reference implementation
+indices, loop bounds, and various pointer offsets.~~~~The reference implementation
 uses a \texttt{chroma}{\newpage\noindent}\texttt{flag} to dictate control flow and alternate
 index/offset calculations in 43 locations in the code. As an example,
 Figure~\ref{fig:chroma-format-code} shows a code fragment from the
