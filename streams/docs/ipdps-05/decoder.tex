@@ -63,6 +63,7 @@ can replicate the inverse transformation pipeline $N$ times:
     \end{verbatim}
   \end{scriptsize}
 \end{center}
+\vspace{-12pt}
 A stream-aware compiler can also automatically adjust the execution
 granularity as necessary~\cite{gordon02asplos}, since data-parallel streams
 can be easily identified as those that are stateless (i.e., do not
@@ -116,23 +117,22 @@ MPEG decoder. The StreamIt code is nearly 3,165 lines of code with 48
 static streams. The bit stream parser is the largest single filter,
 consisting of 775 lines of code. The 48 static streams compile to
 2,150 instantiated filters\footnote{A  {\it static stream} is a unique
-code block, which may have multiple  instantiations when compiled. For
-instance the \texttt{MotionCompensation()}  filter is one static
-stream, but is instantiated three times.} at a picture resolution of
-352x240. By way of comparison, the reference C
-implementation~\cite{reference-mpeg-c} is 6,835 lines of
-code\footnote{Line counts were generated using  the \texttt{SLOCcount}
-tool. It strips whitespace and comments.}.  A line count comparison is
-not an accurate measure of programmability, since our StreamIt decoder
-implements only a subset of several stream types supported by MPEG.
-Our decoder does provide full support for the range of different
-compression techniques used within MPEG, but supports only a subset of
-the possible display modes (i.e. interlaced versus progressive
-output).  However, these alternate display formats represent minor
-conceptual changes and should therefore affect small portions of the
-StreamIt code. This is demonstrated in Section~\ref{section:chroma}
-with an example that illustrates how to support multiple chrominance
-formats.
+code block, which may have multiple instantiations. For instance,
+\texttt{MotionCompensation()} is a single filter with three
+instantiations.} at a picture resolution of 352x240. By way of
+comparison, the reference C implementation~\cite{reference-mpeg-c} is
+6,835 lines of code\footnote{Line counts were generated using  the
+\texttt{SLOCcount} tool. It strips whitespace and comments.}.  A line
+count comparison is not an accurate measure of programmability, since
+our StreamIt decoder implements only a subset of several stream types
+supported by MPEG.  Our decoder does provide full support for the
+range of different compression techniques used within MPEG, but
+supports only a subset of the possible display modes (i.e. interlaced
+versus progressive output).  However, these alternate display formats
+represent minor conceptual changes and should therefore affect small
+portions of the StreamIt code. This is demonstrated in
+Section~\ref{section:chroma} with an example that illustrates how to
+support multiple chrominance formats.
 
 The reference C implementation intermingles parsing, decoding, and
 motion compensation, making it difficult to clearly follow the code,
