@@ -1,13 +1,13 @@
-\Section{MPEG-2 Video Coding and Decoding}
+\Section{Overview of MPEG-2}
 
-MPEG-2~\cite{MPEG2} is a popular coding and decoding standard
-for digital video data. The scheme is a subset of both the
-DVD-Video~\cite{Taylor:1999:SDV} standard for storing movies, and the Digital
-Video Broadcasting specifications for transmitting HDTV and
+MPEG-2~\cite{MPEG2} is a popular coding and decoding standard for
+digital video data. The scheme is a subset of both the
+DVD-Video~\cite{Taylor:1999:SDV} standard for storing movies, and the
+Digital Video Broadcasting specifications for transmitting HDTV and
 SDTV~\cite{DVB}. The scheme is used by a wide variety of multimedia
-applications and appliances such as the Tivo Digital Video
-Recorder~\cite{tivo}, and the DirecTV satellite broadcast
-service~\cite{directv}.
+applications and appliances such as the Tivo Digital Video Recorder,
+and the DirecTV satellite broadcast
+service.%~\cite{tivo}%~\cite{directv}.
 
 MPEG-2 encoding uses both {\it lossy} compression and {\it lossless}
 compression. Lossy compression permanently eliminates information from
@@ -30,7 +30,7 @@ uncompressed data rate of 1.33 Gigabits per second. It is compressed at
 an average rate of 66:1, reducing the required streaming rate to
 20 Megabits per second~\cite{imagevidstandards}. %% page 3: [p.3]
 
-\SubSection{MPEG Encoding}
+%\SubSection{MPEG Encoding}
 
 %% \begin{figure}[t]
 %% \begin{center}
@@ -49,18 +49,17 @@ an average rate of 66:1, reducing the required streaming rate to
 %% An overview of the encoding process is illustrated in
 %% Figure~\ref{fig:mpeg-encoder}.
 The encoder operates on a sequence of pictures. Each picture is made
-from 16x16 groups of pixels known as macroblocks.  A macroblock
-is composed from a series of blocks, which are 8x8 arrays of subpixels
-(individual color components of a pixel). The luminance information for
-a macroblock, never downsampled, is a 2x2 array of blocks. 
-Because of human insensitivity to hue the chrominance channels 
-are frequently downsampled. The type of downsampling an MPEG-2 encoder
-uses is known as its {\it chroma format}. The most common
-chroma format is 4:2:0, which uses one block for each of the
-chrominance channels, downsampling a macroblock from 16x16 to 8x8
-subpixels. An alternate format is 4:2:2. It uses two blocks for each
-of the chrominance channels, downsampling from 16x16 to
-8x16 subpixels.
+from 16x16 groups of pixels known as macroblocks.  A macroblock is
+composed from a series of blocks, which are 8x8 arrays of subpixels
+(individual color components of a pixel). The luminance information
+for a macroblock is a 2x2 array of blocks. In contrast, the
+chrominance channels are frequently downsampled because of human
+insensitivity to hue. The type of downsampling an MPEG-2 encoder uses
+is known as its chroma format. The most common chroma format is
+4:2:0. It uses one block for each of the chrominance channels,
+downsampling a macroblock from 16x16 to 8x8 subpixels. An alternate
+format is 4:2:2. It uses two blocks for each chrominance channel,
+downsampling each macroblock from 16x16 to 8x16 subpixels.
 %% The two chroma formats are shown in
 %% Figure~\ref{fig:chroma}.
 
@@ -119,14 +118,14 @@ and other picture and macroblock metadata are Huffman coded to
 further reduce the average number of bits per data item. The compressed
 stream is sent to the output device.
 
-\SubSection{MPEG Decoding}
+%\SubSection{MPEG Decoding}
 
-An MPEG-2 decoder input stream is organized as a Group of Pictures
+The decoder input stream is organized as a Group of Pictures
 (GOP) which contains all the information needed to reconstruct a
 video. The GOP contains the three kinds of pictures produced by the
-encoder, namely I, P, and B pictures. I pictures are intended to
-assist scene cuts, random access, fast forward, or fast reverse
-playback~\cite[p. 14]{MPEG2}. A typical I:P:B picture ratio in a GOP
+encoder, namely I, P, and B pictures. I pictures 
+assist in scene cuts, random access, fast forwarding, or fast reverse
+playback~\cite{MPEG2}. A typical I:P:B picture ratio in a GOP
 is 1:3:8, and a typical picture pattern is a repetition of the
 following logical sequence:
 I$_1$~B$_2$~B$_3$~P$_4$~B$_5$~B$_6$~P$_7$~B$_8$~B$_9$~P$_{10}$~B$_{11}$~B$_{12}$~I$_{13}$
