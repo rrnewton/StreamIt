@@ -1,5 +1,5 @@
 \Section{Overview of MPEG-2}
-\vspace{-6pt}
+%\vspace{-6pt}
 
 MPEG-2~\cite{MPEG2} is a popular encoding and decoding standard for
 digital video. %% The scheme is a subset of both the
@@ -67,12 +67,12 @@ The compression in MPEG is achieved largely via motion estimation,
 which detects and eliminates similarities between macroblocks across
 pictures. For each macroblock, the motion estimator calculates a motion
 vector that represents the horizontal and vertical displacement of that 
-given macroblock from a similar matching
+macroblock from a similar matching
 macroblock-sized area in a reference picture.  The matching macroblock
 is removed (subtracted) from the current picture on a pixel by pixel
 basis, and a motion vector is associated with the macroblock
 describing its displacement relative to the reference picture. The
-result is a residual predictive-code (P) picture. It represents the
+result is a residual predictive-coded (P) picture. It represents the
 difference between the current picture and the reference
 picture. Reference pictures encoded without the use of motion
 prediction are intra-coded (I) pictures. In addition to forward motion
@@ -81,14 +81,14 @@ estimation from both previous and subsequent pictures. Such pictures
 are bidirectionally predictive-coded (B) pictures, and they exploit a
 greater amount of temporal locality.
 
-Each of the I, P, and B pictures then undergo a 2-dimensional
+Each of the I, P, and B pictures then undergoes a 2-dimensional
 discrete cosine transform (DCT) which separates the picture into parts
 with varying visual importance. The input to the DCT is one block.
 The output of the
 DCT is an 8x8 matrix of frequency coefficients. The upper left corner
 of the matrix represents low frequencies, whereas the lower right
 corner represents higher frequencies. The latter are often small and
-can be neglected without sacrificing human visual perception. The DCT 
+can be neglected without sacrificing visual perception. The DCT 
 block coefficients are quantized to reduce the number of bits needed
 to represent them. 
 
@@ -138,8 +138,8 @@ motion prediction is with respect to the previously decoded I or P
 picture; if the decoder encounters a B picture, its motion prediction
 is with respect to the previously two decoded I or P pictures.
 
-As with the encoding process, pictures are divided up into 16x16 pixel
-macroblocks composed of 8x8 blocks for the color channels. 
+%% As with the encoding process, pictures are divided up into 16x16 pixel
+%% macroblocks composed of 8x8 blocks for the color channels. 
 %% \begin{figure}[t]
 %% \begin{center}
 %% \vspace{-12pt}

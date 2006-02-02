@@ -7,25 +7,23 @@ with the stream block level diagram.
 
 %% The decoder accepts a compressed bit stream as input, and produces the
 %% decoded video stream as output.
-The computation is encapsulated in three main components:
-the parser (line 8), the block and motion vector decoder (lines 9-22),
-and the motion compensator (lines 23-32).
-The parser is responsible for parsing the MPEG-2 bit stream and
-performing Huffman and variable run-length decoding (VLD). The output
-of the VLD is an interleaved stream of quantized macroblocks encoded
-in the frequency-domain, and offset-encoded motion vectors. The VLD
-outputs $\texttt{N}\times\texttt{B}$ data elements for each
-macroblock, followed by \texttt{V} data elements that encode its
-motion vector. The actual value of \texttt{N} depends on the chroma
-format. In a 4:2:0 chroma format regime, $\texttt{N}=6$ since each
+The computation is encapsulated in three main components: the parser
+(line 8), the block and motion vector decoder (lines 9-22), and the
+motion compensator (lines 23-32).  The parser is responsible for
+parsing the MPEG-2 bit stream and performing Huffman and variable
+run-length decoding (VLD). The output of the VLD is an interleaved
+stream of quantized macroblocks encoded in the frequency-domain, and
+offset-encoded motion vectors. The VLD outputs
+$\texttt{N}\times\texttt{B}$ data elements for each macroblock,
+followed by \texttt{V} data elements that encode its motion
+vector. The actual value of \texttt{N} depends on the chroma
+format. In a 4:2:0 chroma format, $\texttt{N}=6$ since each
 macroblock consists of four 8x8 subpixel blocks for the luminance
 channel, and two 8x8 subpixel blocks for the two chrominance
 channels. Therefore, the VLD outputs a total of six 8x8 blocks, or 384
-subpixels per macroblock. However, the total number of macroblocks
-that are output by the parser is dependent on the number of frames in
-the input encoded video. As a result, the VLD has a variable I/O
-rate. The VLD filter is the only variable rate filter in the decoder
-pipeline.
+subpixels per macroblock.  The I/O rate of the parser varies with the
+compression ratio of the input stream. The VLD filter is the only
+variable rate filter in the decoder pipeline.
 
 The VLD output is segregated into two homogeneous streams by a
 roundrobin splitter (line 10). The first stream undergoes inverse
@@ -40,7 +38,7 @@ domain back to the spatial domain. Each block is reordered
 an inverse DCT and a bounded saturation filter (lines 14-15). The set
 of transformations is grouped into a pipeline whose input
 and output types are automatically inferred by the compiler. Each of
-the filters in this pipeline operate on 8x8 blocks. The code that is
+the filters in this pipeline operates on 8x8 blocks. The code that is
 shown does not take advantage of data level parallelism between
 blocks. It is rather straightforward however to expose this
 parallelism if it is desirable. For example, in this case a splitjoin
@@ -81,7 +79,7 @@ encoding process, the splitter dispatches four 8x8 blocks at a time to
 the Y motion compensator. The chrominance channels are typically
 downsampled by a factor of 4, and hence one 8x8 block is streamed to
 each of the Cb and Cr pipelines, which upsample (line 29) the results
-of the motion compensator to generate the full 16x16 macroblock.  The
+of the motion compensator to generate 16x16 macroblocks.  The
 upsampling is a linear interpolation of the surrounding pixels.
 The joiner (line 31) assembles the pictures from each of the color
 channels, one pixel at a time.  The output is then readied for display
@@ -89,13 +87,13 @@ channels, one pixel at a time.  The output is then readied for display
 temporal order, and performing color space conversion to the RGB (red,
 green, blue) color model. Note that these two filters each consume
 $3\times\texttt{W}\times\texttt{H}$ subpixels per picture. This is
-three times the pixel resolution of the decoded image since there is
+three times the resolution of the decoded image since there is
 one pixel generated from each of the three channel decoders. The final
 output of the decoder is $\texttt{W}\times\texttt{H}$ pixels.  In
 contrast to the filters for motion compensation and inverse transformation,
 whose I/O rates are statically resolved at compile time, the picture 
 reordering and color space conversion have I/O rates that are
-parameterized on initialization time constants, namely the pixel
+parameterized on initialization time constants, namely the 
 resolution of the pictures.
 
 %% The MPEG-2 decoder in StreamIt is a fully portable implementation in
@@ -108,7 +106,7 @@ The decoder implementation was carried out by one student programmer
 with no prior understanding of MPEG. The development spanned eight
 weeks from specification~\cite{MPEG2} to the first fully functional
 MPEG decoder. The StreamIt code is nearly 3,165 lines of code with 48
-static streams. The bit stream parser is the largest single filter,
+static streams. The stream parser is the largest single filter,
 consisting of 775 lines of code. The 48 static streams compile to
 2,150 instantiated filters\footnote{A  {\it static stream} is a unique
 code block, which may have multiple instantiations. For instance,
@@ -121,7 +119,7 @@ count comparison is not an accurate measure of programmability, since
 our StreamIt decoder implements only a subset of several stream types
 supported by MPEG.  Our decoder does provide full support for the
 range of different compression techniques used within MPEG, but
-supports only a subset of the possible display modes (i.e. interlaced
+supports only a subset of the possible display modes (i.e., interlaced
 versus progressive output).  However, these alternate display formats
 represent minor conceptual changes and should therefore affect small
 portions of the StreamIt code. This is demonstrated in
@@ -139,9 +137,9 @@ Figure~\ref{fig:dec-with-code}). For instance, the parser (VLD)
 generates a message whenever the picture or macroblock type
 changes. The motion compensation filters receive this information via
 their dedicated portal (line 28), determine how to process the current
-picture, and decide whether they needs to store the picture for future
+picture, and decide whether they need to store the picture for future
 reference. Note however that while there are multiple motion compensators
-subscribed to the same portal, they each receive the same message with
+subscribed to the same portal, they each receive messages with
 respect to their local execution.
 The picture reordering filter receives a similar message
 (via portal on line 33), and uses the information to determine the
