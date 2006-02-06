@@ -1,0 +1,32 @@
+<!--#include virtual="./mpeg_header.inc"-->
+
+<h3>FEATURES</h3>
+
+<p>Our implementations are meant for research, not production use, and as such are somewhat limited. A brief list of the important features and limitations follows. In deciding which features to include and which to leave out we followed the general rule that features aiding in video compression (such as skipping low-noise macroblocks in motion predicted images) were always included and tested. Features which simply provided a greater breadth of video formats, (i.e. support for both interlaced and progressive video) were limited to a small working subset.</p>
+
+<p>Features of the Encoder and Decoder:</p>
+<ul>
+ <li>Motion Compensation: support for I,P, and B images</li>
+ <li>Motion Compensation: support for forward, backward, and bidrectionally predicted macroblocks</li>
+ <li>Motion Compensation: picture reordering</li>
+ <li>Variable Length Coding: Huffman encoding
+ <li>Variable Length Coding: custom quantization coefficient tables</li>
+ <li>Image Compression: intra and non-intra macroblock quantization</li>
+ <li>Image Compression: 4:2:0 and 4:2:2 chrominance compression in the decoder, 4:2:0 compression in the encoder</li>
+ <li>Image Compression: Zig Zag Reordering, Discrete Cosine Transform (DCT), and inverse DCT</li>
+</ul>
+
+<p>Limitations:</p>
+<ul>
+ <li>chrominance format, video width, video height, and number of frames are stream parameters, and thus changes require the stream graph to be recompiled</li>
+ <li>no support for redundant motion vectors or bitstream error recovery</li>
+ <li>requires the video have a certain set of <a href="config_param.txt">configuration parameters</a></li>
+ <li>video must be progressive scan</li>
+ <li>encoder does not generate vbv_buffer information</li>
+ <li>decoder does not enforce profile/level information.
+ <li>encoder does not use bitrate feedback to adjust quantization level</li>
+</ul>
+
+<p>Our decoder does not enforce profile/level restrictions. (For instance, if the bitstream low_delay value indicates that the bitstream cannot contain B pictures, the decoder will not enforce this.) As such, it is possible that certain invalid MPEG-2 bitstreams would decode without generating an error message.</p>
+
+<!--#include virtual="./mpeg_footer.inc"-->
