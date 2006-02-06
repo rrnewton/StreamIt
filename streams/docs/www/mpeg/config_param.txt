@@ -1,0 +1,28 @@
+/* The format of this file is meant to resemble the PAR file format read
+   in by the C reference implementation's encoder. This file lists the
+   configuration options an MPEG-2 stream must obey for it to be correctly
+   decoded by our reference decoder. Additionally, the encoder also
+   produces a bitstream limited to these configuration parameters. */
+
+1     /* aspect_ratio_information = square pel */
+4     /* frame_rate_code = 29.97 fps */
+0 0 0 /* alternate scan not used for any of (I P B) */
+0     /* not an ISO/EC 11172-2 (MPEG-1) stream */
+1     /* progressive_sequence = only progressive frames */
+1     /* chroma_format = 4:2:0 */
+      /* can also set chroma_format to 2 for 4:2:2 */
+352   /* width, must be set in the source code */
+240   /* height, must be set in the source code, must be less than 2800 */
+0     /* low_delay allows B pictures */
+
+/* The following parameters are not individually settable in the C reference
+   implementation, although specifying Profile ID = 4 (Main) and 
+   Level ID = 8 (Main) will guarantee that these are true. */
+
+      /* composite_display_flag cannot be present in the bitstream */
+      /* extension_and_user_data(2) cannot be present in the bitstream */
+      /* intra_slice_flag cannot be present in the bitstream */
+      /* dmv = 0 */
+      /* motion_vector_count == 1 and mv_format == 0 and dmv == 0 not allowed */
+      
+      

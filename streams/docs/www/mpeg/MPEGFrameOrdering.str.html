@@ -1,0 +1,82 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!--NewPage-->
+<HTML>
+<HEAD>
+<TITLE>
+MPEGFrameOrdering.str.pre (Version 1.0)
+</TITLE>
+<LINK REL="stylesheet" TYPE="text/css" HREF="http://java.sun.com/j2se/1.4.2/docs/api/stylesheet.css" TITLE="Style">
+</HEAD>
+<BODY>
+  <H2>
+    File MPEGFrameOrdering.str.pre<BR>
+    <FONT SIZE="-1">Version 1.0</FONT>
+  </H2>
+  <HR>
+  <P>This file contains functions that specify the reordering of frames between an encoded stream and a decoded stream. There are essentially two correct orderings for frames. There is the temporal ordering, where each frame occurs in order, and the reference ordering, where B frames are temporally ordered and I/P frames are temporally ordered, but B frames are ordered between I/P frames such that they immediately follow the two reference frames which their motion vectors are with respect to.</P>
+  <HR>
+  <P>
+  <A NAME="field_summary"><!-- --></A>
+  <TABLE BORDER="1" WIDTH="100%" CELLPADDING="3" CELLSPACING="0" SUMMARY="">
+    <TR BGCOLOR="#CCCCFF" CLASS="TableHeadingColor">
+      <TD COLSPAN=2><FONT SIZE="+2"><B>Component Summary</B></FONT></TD>
+    </TR>
+    <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+        <CODE>int->int</CODE></FONT>
+      </TD>
+      <TD><CODE><B><A HREF="#PictureReorderToReference">PictureReorderToReference</A></B></CODE>
+
+        <BR>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Reorders pictures from a temporal ordering to a reference ordering.
+      </TD>
+    </TR>
+    <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+        <CODE>int->int</CODE></FONT>
+      </TD>
+      <TD><CODE><B><A HREF="#PictureReorderToTemporal">PictureReorderToTemporal</A></B></CODE>
+
+        <BR>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Reorders pictures from a temporal ordering to a reference ordering.
+      </TD>
+    </TR>
+  </TABLE>
+  <P>
+  <A NAME="field_detail"><!-- --></A>
+  <TABLE BORDER="1" WIDTH="100%" CELLPADDING="3" CELLSPACING="0" SUMMARY="">
+    <TR BGCOLOR="#CCCCFF" CLASS="TableHeadingColor">
+      <TD COLSPAN=1><FONT SIZE="+2"><B>Component Detail</B></FONT></TD>
+    </TR>
+  </TABLE>
+  <A NAME="PictureReorderToReference"><!-- --></A>
+  <H3>PictureReorderToReference</H3>
+  <PRE>int->int&nbsp;<B>PictureReorderToReference</B>(int downsampled_data_per_image)</PRE>
+  <DL>
+    <DD>Reorders pictures from a temporal ordering to a reference ordering.
+    <P>
+    <DL><DD>
+    <DT><B>Input:</B><DD><CODE>&lt;int&gt;</CODE> - A temporally ordered picture stream
+    <DT><B>Output:</B><DD><CODE>&lt;int&gt;</CODE> - A reference ordered picture stream    <DT><B>Parameters:</B>                      <DD><CODE>downsampled_data_per_image</CODE> - The amount of data per image
+
+    </DD></DL>
+  </DD>
+  </DL>
+  <HR>
+  <A NAME="PictureReorderToTemporal"><!-- --></A>
+  <H3>PictureReorderToTemporal</H3>
+  <PRE>int->int&nbsp;<B>PictureReorderToTemporal</B>(int width, int height)</PRE>
+  <DL>
+    <DD>Reorders pictures from a temporal ordering to a reference ordering.
+    <P>
+    <DL><DD>
+    <DT><B>Input:</B><DD><CODE>&lt;int&gt;</CODE> - A reference ordered picture stream
+    <DT><B>Output:</B><DD><CODE>&lt;int&gt;</CODE> - A temporally ordered picture stream    <DT><B>Parameters:</B>                      <DD><CODE>width</CODE> - The width of the image
+                      <DD><CODE>height</CODE> - The height of the image
+
+    </DD></DL>
+  </DD>
+  </DL>
+  <HR>
+  Please contact the author (<a href="mailto:madrake@gmail.com">Matthew Drake</a>) for more information.
+</BODY>

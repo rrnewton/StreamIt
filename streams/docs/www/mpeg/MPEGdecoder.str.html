@@ -1,0 +1,58 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!--NewPage-->
+<HTML>
+<HEAD>
+<TITLE>
+MPEGdecoder.str.pre (Version 1.0)
+</TITLE>
+<LINK REL="stylesheet" TYPE="text/css" HREF="http://java.sun.com/j2se/1.4.2/docs/api/stylesheet.css" TITLE="Style">
+</HEAD>
+<BODY>
+  <H2>
+    File MPEGdecoder.str.pre<BR>
+    <FONT SIZE="-1">Version 1.0</FONT>
+  </H2>
+  <HR>
+  <P>This file contains functions that allow one to decode MPEG-2 compliant video. The code is based on the MPEG-2 specification (ISO/IEC 13818-2). The MPEG-2 decoding is a work in progress, although it works within a limited test range. Throughout the source code, citations are made in cases where an understanding of the code would be helped by looking at an outside source. The format I have chosen is (cite NUM#, LOOKUP_INFO). NUM=1 refers to ISO/IEC: 13818-2, and NUM=2 refers to the reference MPEG implementation written in C, available at [www.mpeg.org].</P>
+  <HR>
+  <P>
+  <A NAME="field_summary"><!-- --></A>
+  <TABLE BORDER="1" WIDTH="100%" CELLPADDING="3" CELLSPACING="0" SUMMARY="">
+    <TR BGCOLOR="#CCCCFF" CLASS="TableHeadingColor">
+      <TD COLSPAN=2><FONT SIZE="+2"><B>Component Summary</B></FONT></TD>
+    </TR>
+    <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+        <CODE>bit->int</CODE></FONT>
+      </TD>
+      <TD><CODE><B><A HREF="#MPEGStream_to_rawImageStream">MPEGStream_to_rawImageStream</A></B></CODE>
+
+        <BR>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Interprets and decodes a compressed MPEG-2 compliant bit stream, in accordance with the IEEE MPEG-2 specification.
+      </TD>
+    </TR>
+  </TABLE>
+  <P>
+  <A NAME="field_detail"><!-- --></A>
+  <TABLE BORDER="1" WIDTH="100%" CELLPADDING="3" CELLSPACING="0" SUMMARY="">
+    <TR BGCOLOR="#CCCCFF" CLASS="TableHeadingColor">
+      <TD COLSPAN=1><FONT SIZE="+2"><B>Component Detail</B></FONT></TD>
+    </TR>
+  </TABLE>
+  <A NAME="MPEGStream_to_rawImageStream"><!-- --></A>
+  <H3>MPEGStream_to_rawImageStream</H3>
+  <PRE>bit->int&nbsp;<B>MPEGStream_to_rawImageStream</B></PRE>
+  <DL>
+    <DD>Interprets and decodes a compressed MPEG-2 compliant bit stream, in accordance with the IEEE MPEG-2 specification.
+    <P>
+    <DL><DD>
+    <DT><B>Input:</B><DD><CODE>&lt;bit&gt;</CODE> - An MPEG-2 compliant bit stream of variable length.
+    <DT><B>Output:</B><DD><CODE>&lt;int&gt;</CODE> - Outputs a series of images representing the frames of the video. Each image consists of 3 integers for each pixel, with the number of pixels per image equalling the width height of the video. Frames are output in time order, top to bottom, left to right, and RGB color order.    <DT><B>Parameters:</B>                      <DD><CODE>width</CODE> - The resolution width of the video. This variable is only needed until the StreamIt language supports dynamically reconfiguring splijtoins.
+                      <DD><CODE>height</CODE> - The resolution height of the video. This variable is only needed until the StreamIt language supports dynamically reconfiguring splitjoins.
+
+    </DD></DL>
+  </DD>
+  </DL>
+  <HR>
+  Please contact the author (<a href="mailto:madrake@gmail.com">Matthew Drake</a>) for more information.
+</BODY>

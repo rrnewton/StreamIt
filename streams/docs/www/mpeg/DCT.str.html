@@ -1,0 +1,317 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!--NewPage-->
+<HTML>
+<HEAD>
+<TITLE>
+DCT.str (Version 1.0)
+</TITLE>
+<LINK REL="stylesheet" TYPE="text/css" HREF="http://java.sun.com/j2se/1.4.2/docs/api/stylesheet.css" TITLE="Style">
+</HEAD>
+<BODY>
+  <H2>
+    File DCT.str<BR>
+    <FONT SIZE="-1">Version 1.0</FONT>
+  </H2>
+  <HR>
+  <P>This file contains functions that implement Discrete Cosine Transforms and their inverses. When reference is made to the IEEE DCT specification, it is refering to the IEEE DCT specification used by both MPEG and JPEG. A definition of what makes an 8x8 DCT conform to the IEEE specification, as well as a pseudocode implementation, can be found in Appendix A of the MPEG-2 specification (ISO/IEC 13818-2) on P. 125. @author <a href="mailto:madrake@gmail.com">Matthew Drake</a></P>
+  <HR>
+  <P>
+  <A NAME="field_summary"><!-- --></A>
+  <TABLE BORDER="1" WIDTH="100%" CELLPADDING="3" CELLSPACING="0" SUMMARY="">
+    <TR BGCOLOR="#CCCCFF" CLASS="TableHeadingColor">
+      <TD COLSPAN=2><FONT SIZE="+2"><B>Component Summary</B></FONT></TD>
+    </TR>
+    <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+        <CODE>int->int</CODE></FONT>
+      </TD>
+      <TD><CODE><B><A HREF="#iDCT8x8_ieee">iDCT8x8_ieee</A></B></CODE>
+
+        <BR>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Transforms an 8x8 signal from the frequency domain to the signal domain using an inverse Discrete Cosine Transform in accordance with the IEEE specification for a 2-dimensional 8x8 iDCT.
+      </TD>
+    </TR>
+    <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+        <CODE>int->int</CODE></FONT>
+      </TD>
+      <TD><CODE><B><A HREF="#DCT8x8_ieee">DCT8x8_ieee</A></B></CODE>
+
+        <BR>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Transforms an 8x8 signal from the signal domain to the frequency domain using a Discrete Cosine Transform in accordance with the IEEE specification for a 2-dimensional 8x8 DCT.
+      </TD>
+    </TR>
+    <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+        <CODE>int->int</CODE></FONT>
+      </TD>
+      <TD><CODE><B><A HREF="#iDCT_2D_reference_fine">iDCT_2D_reference_fine</A></B></CODE>
+
+        <BR>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Transforms a 2D signal from the frequency domain to the signal domain using an inverse Discrete Cosine Transform.
+      </TD>
+    </TR>
+    <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+        <CODE>int->int</CODE></FONT>
+      </TD>
+      <TD><CODE><B><A HREF="#iDCT8x8_2D_fast_coarse">iDCT8x8_2D_fast_coarse</A></B></CODE>
+
+        <BR>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Transforms a 2D signal from the frequency domain to the signal domain using a FAST inverse Discrete Cosine Transform.
+      </TD>
+    </TR>
+    <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+        <CODE>int->int</CODE></FONT>
+      </TD>
+      <TD><CODE><B><A HREF="#iDCT8x8_2D_fast_fine">iDCT8x8_2D_fast_fine</A></B></CODE>
+
+        <BR>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Transforms a 2D signal from the frequency domain to the signal domain using a FAST inverse Discrete Cosine Transform.
+      </TD>
+    </TR>
+    <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+        <CODE>int->int</CODE></FONT>
+      </TD>
+      <TD><CODE><B><A HREF="#DCT_2D_reference_fine">DCT_2D_reference_fine</A></B></CODE>
+
+        <BR>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Transforms a 2D signal from the signal domain to the frequency domain using a Discrete Cosine Transform.
+      </TD>
+    </TR>
+    <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+        <CODE>int->int</CODE></FONT>
+      </TD>
+      <TD><CODE><B><A HREF="#DCT_2D_reference_coarse">DCT_2D_reference_coarse</A></B></CODE>
+
+        <BR>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Transforms a 2D signal from the signal domain to the frequency domain using a Discrete Cosine Transform.
+      </TD>
+    </TR>
+    <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+        <CODE>float->float</CODE></FONT>
+      </TD>
+      <TD><CODE><B><A HREF="#iDCT_1D_reference_fine">iDCT_1D_reference_fine</A></B></CODE>
+
+        <BR>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Transforms a 1D signal from the frequency domain to the signal domain using an inverse Discrete Cosine Transform.
+      </TD>
+    </TR>
+    <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+        <CODE>int->int</CODE></FONT>
+      </TD>
+      <TD><CODE><B><A HREF="#iDCT8x8_1D_row_fast">iDCT8x8_1D_row_fast</A></B></CODE>
+
+        <BR>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Transforms a 1D horizontal signal from the frequency domain to the signal domain using a FAST inverse Discrete Cosine Transform.
+      </TD>
+    </TR>
+    <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+        <CODE>int->int</CODE></FONT>
+      </TD>
+      <TD><CODE><B><A HREF="#iDCT8x8_1D_col_fast">iDCT8x8_1D_col_fast</A></B></CODE>
+
+        <BR>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Transforms a 1D vertical signal from the frequency domain to the signal domain using a FAST inverse Discrete Cosine Transform.
+      </TD>
+    </TR>
+    <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+        <CODE>int->int</CODE></FONT>
+      </TD>
+      <TD><CODE><B><A HREF="#iDCT8x8_1D_col_fast_fine">iDCT8x8_1D_col_fast_fine</A></B></CODE>
+
+        <BR>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Transforms a 1D vertical signal from the frequency domain to the signal domain using a FAST inverse Discrete Cosine Transform.
+      </TD>
+    </TR>
+    <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+        <CODE>float->float</CODE></FONT>
+      </TD>
+      <TD><CODE><B><A HREF="#DCT_1D_reference_fine">DCT_1D_reference_fine</A></B></CODE>
+
+        <BR>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Transforms a 1D signal from the signal domain to the frequency domain using a Discrete Cosine Transform.
+      </TD>
+    </TR>
+  </TABLE>
+  <P>
+  <A NAME="field_detail"><!-- --></A>
+  <TABLE BORDER="1" WIDTH="100%" CELLPADDING="3" CELLSPACING="0" SUMMARY="">
+    <TR BGCOLOR="#CCCCFF" CLASS="TableHeadingColor">
+      <TD COLSPAN=1><FONT SIZE="+2"><B>Component Detail</B></FONT></TD>
+    </TR>
+  </TABLE>
+  <A NAME="iDCT8x8_ieee"><!-- --></A>
+  <H3>iDCT8x8_ieee</H3>
+  <PRE>int->int&nbsp;<B>iDCT8x8_ieee</B>(int mode)</PRE>
+  <DL>
+    <DD>Transforms an 8x8 signal from the frequency domain to the signal domain using an inverse Discrete Cosine Transform in accordance with the IEEE specification for a 2-dimensional 8x8 iDCT.
+    <P>
+    <DL><DD>
+    <DT><B>Input:</B><DD><CODE>&lt;int&gt;</CODE> - 64 values representing an 8x8 array of values in the frequency domain, ordered by row and then column. Vertical frequency increases along each row and horizontal frequency along each column.
+    <DT><B>Output:</B><DD><CODE>&lt;int&gt;</CODE> - 64 values representing an 8x8 array of values in the signal domain, ordered by row and then column.    <DT><B>Parameters:</B>                      <DD><CODE>mode</CODE> - indicates algorithm to use; mode == 0: reference, coarse implementation mode == 1: reference, fine (parallel) implementation mode == 2: fast, coarse implementation mode == 3: fast, fine (parallel) implementation
+
+    </DD></DL>
+  </DD>
+  </DL>
+  <HR>
+  <A NAME="DCT8x8_ieee"><!-- --></A>
+  <H3>DCT8x8_ieee</H3>
+  <PRE>int->int&nbsp;<B>DCT8x8_ieee</B>(int mode)</PRE>
+  <DL>
+    <DD>Transforms an 8x8 signal from the signal domain to the frequency domain using a Discrete Cosine Transform in accordance with the IEEE specification for a 2-dimensional 8x8 DCT.
+    <P>
+    <DL><DD>
+    <DT><B>Input:</B><DD><CODE>&lt;int&gt;</CODE> - 64 values representing an 8x8 array of values in the signal domain, ordered by row and then column.
+    <DT><B>Output:</B><DD><CODE>&lt;int&gt;</CODE> - 64 values representing an 8x8 array of values in the frequency domain, ordered by row and then column. Vertical frequency increases along each row and horizontal frequency along each column.    <DT><B>Parameters:</B>                      <DD><CODE>mode</CODE> - indicates algorithm to use; mode == 0: reference, coarse implementation, mode == 1: reference, fine (parallel) implementation
+
+    </DD></DL>
+  </DD>
+  </DL>
+  <HR>
+  <A NAME="iDCT_2D_reference_fine"><!-- --></A>
+  <H3>iDCT_2D_reference_fine</H3>
+  <PRE>int->int&nbsp;<B>iDCT_2D_reference_fine</B>(int size)</PRE>
+  <DL>
+    <DD>Transforms a 2D signal from the frequency domain to the signal domain using an inverse Discrete Cosine Transform.
+    <P>
+    <DL><DD>
+    <DT><B>Input:</B><DD><CODE>&lt;int&gt;</CODE> - size x size values, representing an array of values in the frequency domain, ordered by row and then column. Vertical frequency increases along each row and horizontal frequency along each column.
+    <DT><B>Output:</B><DD><CODE>&lt;int&gt;</CODE> - size x size values representing an array of values in the signal domain, ordered by row and then column.    <DT><B>Parameters:</B>                      <DD><CODE>size</CODE> - The number of elements in each dimension of the signal.
+
+    </DD></DL>
+  </DD>
+  </DL>
+  <HR>
+  <A NAME="iDCT8x8_2D_fast_coarse"><!-- --></A>
+  <H3>iDCT8x8_2D_fast_coarse</H3>
+  <PRE>int->int&nbsp;<B>iDCT8x8_2D_fast_coarse</B>()</PRE>
+  <DL>
+    <DD>Transforms a 2D signal from the frequency domain to the signal domain using a FAST inverse Discrete Cosine Transform.
+    <P>
+    <DL><DD>
+    <DT><B>Input:</B><DD><CODE>&lt;int&gt;</CODE> - size x size values, representing an array of values in the frequency domain, ordered by row and then column. Vertical frequency increases along each row and horizontal frequency along each column.
+    <DT><B>Output:</B><DD><CODE>&lt;int&gt;</CODE> - size x size values representing an array of values in the signal domain, ordered by row and then column.
+    </DD></DL>
+  </DD>
+  </DL>
+  <HR>
+  <A NAME="iDCT8x8_2D_fast_fine"><!-- --></A>
+  <H3>iDCT8x8_2D_fast_fine</H3>
+  <PRE>int->int&nbsp;<B>iDCT8x8_2D_fast_fine</B>()</PRE>
+  <DL>
+    <DD>Transforms a 2D signal from the frequency domain to the signal domain using a FAST inverse Discrete Cosine Transform.
+    <P>
+    <DL><DD>
+    <DT><B>Input:</B><DD><CODE>&lt;int&gt;</CODE> - size x size values, representing an array of values in the frequency domain, ordered by row and then column. Vertical frequency increases along each row and horizontal frequency along each column.
+    <DT><B>Output:</B><DD><CODE>&lt;int&gt;</CODE> - size x size values representing an array of values in the signal domain, ordered by row and then column.
+    </DD></DL>
+  </DD>
+  </DL>
+  <HR>
+  <A NAME="DCT_2D_reference_fine"><!-- --></A>
+  <H3>DCT_2D_reference_fine</H3>
+  <PRE>int->int&nbsp;<B>DCT_2D_reference_fine</B>(int size)</PRE>
+  <DL>
+    <DD>Transforms a 2D signal from the signal domain to the frequency domain using a Discrete Cosine Transform.
+    <P>
+    <DL><DD>
+    <DT><B>Input:</B><DD><CODE>&lt;int&gt;</CODE> - size x size values, representing an array of values in the signal domain, ordered by row and then column.
+    <DT><B>Output:</B><DD><CODE>&lt;int&gt;</CODE> - size x size values representing an array of values in the frequency domain, ordered by row and then column. Vertical frequency increases along each row and horizontal frequency along each column.    <DT><B>Parameters:</B>                      <DD><CODE>size</CODE> - The number of elements in each dimension of the signal.
+
+    </DD></DL>
+  </DD>
+  </DL>
+  <HR>
+  <A NAME="DCT_2D_reference_coarse"><!-- --></A>
+  <H3>DCT_2D_reference_coarse</H3>
+  <PRE>int->int&nbsp;<B>DCT_2D_reference_coarse</B>(int size)</PRE>
+  <DL>
+    <DD>Transforms a 2D signal from the signal domain to the frequency domain using a Discrete Cosine Transform.
+    <P>
+    <DL><DD>
+    <DT><B>Input:</B><DD><CODE>&lt;int&gt;</CODE> - size values, representing an array of values in the signal domain, ordered by row and then column.
+    <DT><B>Output:</B><DD><CODE>&lt;int&gt;</CODE> - size values representing an array of values in the frequency domain, ordered by row and then column. Vertical frequency increases along each row and horizontal frequency along each column.    <DT><B>Parameters:</B>                      <DD><CODE>size</CODE> - The number of elements in each dimension of the signal.
+
+    </DD></DL>
+  </DD>
+  </DL>
+  <HR>
+  <A NAME="iDCT_1D_reference_fine"><!-- --></A>
+  <H3>iDCT_1D_reference_fine</H3>
+  <PRE>float->float&nbsp;<B>iDCT_1D_reference_fine</B>(int size)</PRE>
+  <DL>
+    <DD>Transforms a 1D signal from the frequency domain to the signal domain using an inverse Discrete Cosine Transform.
+    <P>
+    <DL><DD>
+    <DT><B>Input:</B><DD><CODE>&lt;float&gt;</CODE> - size values, representing an array of values in the frequency domain, ordered by row and then column. Vertical frequency increases along each row and horizontal frequency along each column.
+    <DT><B>Output:</B><DD><CODE>&lt;float&gt;</CODE> - size values representing an array of values in the signal domain, ordered by row and then column.    <DT><B>Parameters:</B>                      <DD><CODE>size</CODE> - The number of elements in each dimension of the signal.
+
+    </DD></DL>
+  </DD>
+  </DL>
+  <HR>
+  <A NAME="iDCT8x8_1D_row_fast"><!-- --></A>
+  <H3>iDCT8x8_1D_row_fast</H3>
+  <PRE>int->int&nbsp;<B>iDCT8x8_1D_row_fast</B>()</PRE>
+  <DL>
+    <DD>Transforms a 1D horizontal signal from the frequency domain to the signal domain using a FAST inverse Discrete Cosine Transform.
+    <P>
+    <DL><DD>
+    <DT><B>Input:</B><DD><CODE>&lt;int&gt;</CODE> - size values, representing an array of values in the frequency domain, ordered by row and then column. Vertical frequency increases along each row and horizontal frequency along each column.
+    <DT><B>Output:</B><DD><CODE>&lt;int&gt;</CODE> - size values representing an array of values in the signal domain, ordered by row and then column.
+    </DD></DL>
+  </DD>
+  </DL>
+  <HR>
+  <A NAME="iDCT8x8_1D_col_fast"><!-- --></A>
+  <H3>iDCT8x8_1D_col_fast</H3>
+  <PRE>int->int&nbsp;<B>iDCT8x8_1D_col_fast</B>()</PRE>
+  <DL>
+    <DD>Transforms a 1D vertical signal from the frequency domain to the signal domain using a FAST inverse Discrete Cosine Transform.
+    <P>
+    <DL><DD>
+    <DT><B>Input:</B><DD><CODE>&lt;int&gt;</CODE> - sizesize values, representing an array of values in the frequency domain, ordered by row and then column. Vertical frequency increases along each row and horizontal frequency along each column.
+    <DT><B>Output:</B><DD><CODE>&lt;int&gt;</CODE> - size values representing an array of values in the signal domain, ordered by row and then column.
+    </DD></DL>
+  </DD>
+  </DL>
+  <HR>
+  <A NAME="iDCT8x8_1D_col_fast_fine"><!-- --></A>
+  <H3>iDCT8x8_1D_col_fast_fine</H3>
+  <PRE>int->int&nbsp;<B>iDCT8x8_1D_col_fast_fine</B>()</PRE>
+  <DL>
+    <DD>Transforms a 1D vertical signal from the frequency domain to the signal domain using a FAST inverse Discrete Cosine Transform.
+    <P>
+    <DL><DD>
+    <DT><B>Input:</B><DD><CODE>&lt;int&gt;</CODE> - size values, representing an array of values in the frequency domain, ordered by row and then column. Vertical frequency increases along each row and horizontal frequency along each column.
+    <DT><B>Output:</B><DD><CODE>&lt;int&gt;</CODE> - size values representing an array of values in the signal domain, ordered by row and then column.    <DT><B>Parameters:</B>                      <DD><CODE>size</CODE> - The number of elements in each dimension of the signal.
+
+    </DD></DL>
+  </DD>
+  </DL>
+  <HR>
+  <A NAME="DCT_1D_reference_fine"><!-- --></A>
+  <H3>DCT_1D_reference_fine</H3>
+  <PRE>float->float&nbsp;<B>DCT_1D_reference_fine</B>(int size)</PRE>
+  <DL>
+    <DD>Transforms a 1D signal from the signal domain to the frequency domain using a Discrete Cosine Transform.
+    <P>
+    <DL><DD>
+    <DT><B>Input:</B><DD><CODE>&lt;float&gt;</CODE> - size values, representing an array of values in the signal domain, ordered by row and then column.
+    <DT><B>Output:</B><DD><CODE>&lt;float&gt;</CODE> - size values representing an array of values in the frequency domain, ordered by row and then column. Vertical frequency increases along each row and horizontal frequency along each column.    <DT><B>Parameters:</B>                      <DD><CODE>size</CODE> - The number of elements in each dimension of the signal.
+
+    </DD></DL>
+  </DD>
+  </DL>
+  <HR>
+  Please contact the author (<a href="mailto:madrake@gmail.com">Matthew Drake</a>) for more information.
+</BODY>

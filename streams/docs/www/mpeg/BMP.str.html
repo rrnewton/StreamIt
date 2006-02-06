@@ -1,0 +1,83 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!--NewPage-->
+<HTML>
+<HEAD>
+<TITLE>
+BMP.str.pre (Version 1.0)
+</TITLE>
+<LINK REL="stylesheet" TYPE="text/css" HREF="http://java.sun.com/j2se/1.4.2/docs/api/stylesheet.css" TITLE="Style">
+</HEAD>
+<BODY>
+  <H2>
+    File BMP.str.pre<BR>
+    <FONT SIZE="-1">Version 1.0</FONT>
+  </H2>
+  <HR>
+  <P>This file contains functions that allow one to encode BMP images. This code is based on several Google searches for "BMP file format" and is based on no specification; nevertheless, it seems to work fairly well.</P>
+  <HR>
+  <P>
+  <A NAME="field_summary"><!-- --></A>
+  <TABLE BORDER="1" WIDTH="100%" CELLPADDING="3" CELLSPACING="0" SUMMARY="">
+    <TR BGCOLOR="#CCCCFF" CLASS="TableHeadingColor">
+      <TD COLSPAN=2><FONT SIZE="+2"><B>Component Summary</B></FONT></TD>
+    </TR>
+    <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+        <CODE>int->bit</CODE></FONT>
+      </TD>
+      <TD><CODE><B><A HREF="#rawImageStream_to_BMPStream">rawImageStream_to_BMPStream</A></B></CODE>
+
+        <BR>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Encodes an image to a bitmap (BMP) file.
+      </TD>
+    </TR>
+    <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+        <CODE>bit->int</CODE></FONT>
+      </TD>
+      <TD><CODE><B><A HREF="#BMPStream_to_rawImageStream">BMPStream_to_rawImageStream</A></B></CODE>
+
+        <BR>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Decodes a bitmap file to a raw imageasdf
+      </TD>
+    </TR>
+  </TABLE>
+  <P>
+  <A NAME="field_detail"><!-- --></A>
+  <TABLE BORDER="1" WIDTH="100%" CELLPADDING="3" CELLSPACING="0" SUMMARY="">
+    <TR BGCOLOR="#CCCCFF" CLASS="TableHeadingColor">
+      <TD COLSPAN=1><FONT SIZE="+2"><B>Component Detail</B></FONT></TD>
+    </TR>
+  </TABLE>
+  <A NAME="rawImageStream_to_BMPStream"><!-- --></A>
+  <H3>rawImageStream_to_BMPStream</H3>
+  <PRE>int->bit&nbsp;<B>rawImageStream_to_BMPStream</B>(int width, int height)</PRE>
+  <DL>
+    <DD>Encodes an image to a bitmap (BMP) file.
+    <P>
+    <DL><DD>
+    <DT><B>Input:</B><DD><CODE>&lt;int&gt;</CODE> - An image consisting of a number of pixels equal to its width height 3. The data is ordered top to bottom, left to right, and RGB color order.
+    <DT><B>Output:</B><DD><CODE>&lt;bit&gt;</CODE> - Outputs a bitstream suitable for generating a .BMP file    <DT><B>Parameters:</B>                      <DD><CODE>width</CODE> - The resolution width of the image. This variable is only needed until the StreamIt language supports dynamically reconfiguring splijtoins.
+                      <DD><CODE>height</CODE> - The resolution height of the image. This variable is only needed until the StreamIt language supports dynamically reconfiguring splitjoins.
+
+    </DD></DL>
+  </DD>
+  </DL>
+  <HR>
+  <A NAME="BMPStream_to_rawImageStream"><!-- --></A>
+  <H3>BMPStream_to_rawImageStream</H3>
+  <PRE>bit->int&nbsp;<B>BMPStream_to_rawImageStream</B>(int width, int height)</PRE>
+  <DL>
+    <DD>Decodes a bitmap file to a raw image
+    <P>
+    <DL><DD>
+    <DT><B>Input:</B><DD><CODE>&lt;bit&gt;</CODE> - Decodes a bitmap file to a raw image
+    <DT><B>Output:</B><DD><CODE>&lt;int&gt;</CODE> - Inputs a BMP bitstream, presumably from a .BMP file    <DT><B>Parameters:</B>                      <DD><CODE>width</CODE> - The resolution width of the image. This variable is only needed until the StreamIt language supports dynamically reconfiguring splijtoins.
+                      <DD><CODE>height</CODE> - The resolution height of the image. This variable is only needed until the StreamIt language supports dynamically reconfiguring splitjoins.
+
+    </DD></DL>
+  </DD>
+  </DL>
+  <HR>
+  Please contact the author (<a href="mailto:madrake@gmail.com">Matthew Drake</a>) for more information.
+</BODY>

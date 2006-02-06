@@ -1,0 +1,79 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!--NewPage-->
+<HTML>
+<HEAD>
+<TITLE>
+ColorSpace.str (Version 1.0)
+</TITLE>
+<LINK REL="stylesheet" TYPE="text/css" HREF="http://java.sun.com/j2se/1.4.2/docs/api/stylesheet.css" TITLE="Style">
+</HEAD>
+<BODY>
+  <H2>
+    File ColorSpace.str<BR>
+    <FONT SIZE="-1">Version 1.0</FONT>
+  </H2>
+  <HR>
+  <P>This file contains components for converting between various different color spaces.</P>
+  <HR>
+  <P>
+  <A NAME="field_summary"><!-- --></A>
+  <TABLE BORDER="1" WIDTH="100%" CELLPADDING="3" CELLSPACING="0" SUMMARY="">
+    <TR BGCOLOR="#CCCCFF" CLASS="TableHeadingColor">
+      <TD COLSPAN=2><FONT SIZE="+2"><B>Component Summary</B></FONT></TD>
+    </TR>
+    <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+        <CODE>int->int</CODE></FONT>
+      </TD>
+      <TD><CODE><B><A HREF="#RGBtoYCbCr">RGBtoYCbCr</A></B></CODE>
+
+        <BR>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Converts a pixel in RGB format to a pixel in YCbCr format according to Recommendation ITU-R BT.
+      </TD>
+    </TR>
+    <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+        <CODE>int->int</CODE></FONT>
+      </TD>
+      <TD><CODE><B><A HREF="#YCbCrtoRGB">YCbCrtoRGB</A></B></CODE>
+
+        <BR>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Converts a pixel in YCbCr format to a pixel in RGB format according to Recommendation ITU-R BT.
+      </TD>
+    </TR>
+  </TABLE>
+  <P>
+  <A NAME="field_detail"><!-- --></A>
+  <TABLE BORDER="1" WIDTH="100%" CELLPADDING="3" CELLSPACING="0" SUMMARY="">
+    <TR BGCOLOR="#CCCCFF" CLASS="TableHeadingColor">
+      <TD COLSPAN=1><FONT SIZE="+2"><B>Component Detail</B></FONT></TD>
+    </TR>
+  </TABLE>
+  <A NAME="RGBtoYCbCr"><!-- --></A>
+  <H3>RGBtoYCbCr</H3>
+  <PRE>int->int&nbsp;<B>RGBtoYCbCr</B></PRE>
+  <DL>
+    <DD>Converts a pixel in RGB format to a pixel in YCbCr format according to Recommendation ITU-R BT.709 for color space transformations. This is the default transformation that should be used for MPEG-2 videos. This transformation is given in Table 6-9 on P.47 of the MPEG-2 13818-2 IEEE specification (entry #1).
+    <P>
+    <DL><DD>
+    <DT><B>Input:</B><DD><CODE>&lt;int&gt;</CODE> - Three integers in RGB color space and order.
+    <DT><B>Output:</B><DD><CODE>&lt;int&gt;</CODE> - Three integers in YCbCr color space and order.
+    </DD></DL>
+  </DD>
+  </DL>
+  <HR>
+  <A NAME="YCbCrtoRGB"><!-- --></A>
+  <H3>YCbCrtoRGB</H3>
+  <PRE>int->int&nbsp;<B>YCbCrtoRGB</B></PRE>
+  <DL>
+    <DD>Converts a pixel in YCbCr format to a pixel in RGB format according to Recommendation ITU-R BT.709 for color space transformations. This is the default transformation that should be used for MPEG-2 videos. This transformation is given in Table 6-9 on P.47 of the MPEG-2 13818-2 IEEE specification (entry #1). The recommendation specifies the transform from RGB to YCbCR. This function's transformation coefficients were calculated using MATLAB and an inverse matrix transform based on the RGB to YCbCr conversion.
+    <P>
+    <DL><DD>
+    <DT><B>Input:</B><DD><CODE>&lt;int&gt;</CODE> - Three integers in YCbCr color space and order.
+    <DT><B>Output:</B><DD><CODE>&lt;int&gt;</CODE> - Three integers in RGB color space and order.
+    </DD></DL>
+  </DD>
+  </DL>
+  <HR>
+  Please contact the author (<a href="mailto:madrake@gmail.com">Matthew Drake</a>) for more information.
+</BODY>

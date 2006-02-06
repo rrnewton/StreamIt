@@ -1,0 +1,205 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!--NewPage-->
+<HTML>
+<HEAD>
+<TITLE>
+ColorSampling.str.pre (Version 1.0)
+</TITLE>
+<LINK REL="stylesheet" TYPE="text/css" HREF="http://java.sun.com/j2se/1.4.2/docs/api/stylesheet.css" TITLE="Style">
+</HEAD>
+<BODY>
+  <H2>
+    File ColorSampling.str.pre<BR>
+    <FONT SIZE="-1">Version 1.0</FONT>
+  </H2>
+  <HR>
+  <P>This file contains functions that allow one to downsample from 4:4:4 to 4:2:0 or upsample from 4:2:0 or 4:2:2 to 4:4:4.</P>
+  <HR>
+  <P>
+  <A NAME="field_summary"><!-- --></A>
+  <TABLE BORDER="1" WIDTH="100%" CELLPADDING="3" CELLSPACING="0" SUMMARY="">
+    <TR BGCOLOR="#CCCCFF" CLASS="TableHeadingColor">
+      <TD COLSPAN=2><FONT SIZE="+2"><B>Component Summary</B></FONT></TD>
+    </TR>
+    <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+        <CODE>int->int</CODE></FONT>
+      </TD>
+      <TD><CODE><B><A HREF="#ChannelUpsample_Vert_and_Horz">ChannelUpsample_Vert_and_Horz</A></B></CODE>
+
+        <BR>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Upsamples from 4:2:0 to 4:4:4asdf
+      </TD>
+    </TR>
+    <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+        <CODE>int->int</CODE></FONT>
+      </TD>
+      <TD><CODE><B><A HREF="#ChannelUpsample_Vertical">ChannelUpsample_Vertical</A></B></CODE>
+
+        <BR>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Upsample from 4:2:2 to 4:4:4 (in the vertical direction)asdf
+      </TD>
+    </TR>
+    <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+        <CODE>int->int</CODE></FONT>
+      </TD>
+      <TD><CODE><B><A HREF="#ChannelUpsample_Horizontal">ChannelUpsample_Horizontal</A></B></CODE>
+
+        <BR>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Upsample from 4:2:2 to 4:4:4 (in the horizontal direction)asdf
+      </TD>
+    </TR>
+    <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+        <CODE>int->int</CODE></FONT>
+      </TD>
+      <TD><CODE><B><A HREF="#ChannelUpsample_1D">ChannelUpsample_1D</A></B></CODE>
+
+        <BR>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Performs a one dimensional upsampling, doubling the pixel count Each pixel is computed from a weighted average of its two neighbors with the closer neighbor getting weight1 and the further neighbor getting weight2.
+      </TD>
+    </TR>
+    <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+        <CODE>int->int</CODE></FONT>
+      </TD>
+      <TD><CODE><B><A HREF="#DropSecond">DropSecond</A></B></CODE>
+
+        <BR>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;This drops every second value from a data stream, essentially performing a very simple downsampling (used for the horizontal downsampling in color channel downsampling.
+      </TD>
+    </TR>
+    <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+        <CODE>int->int</CODE></FONT>
+      </TD>
+      <TD><CODE><B><A HREF="#ChannelDownsample_1D">ChannelDownsample_1D</A></B></CODE>
+
+        <BR>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;This cuts a data stream in half by combining two pixels into one.
+      </TD>
+    </TR>
+    <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+        <CODE>int->int</CODE></FONT>
+      </TD>
+      <TD><CODE><B><A HREF="#ChannelDownsample">ChannelDownsample</A></B></CODE>
+
+        <BR>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Downsample from 4:4:4 to 4:2:0asdf
+      </TD>
+    </TR>
+  </TABLE>
+  <P>
+  <A NAME="field_detail"><!-- --></A>
+  <TABLE BORDER="1" WIDTH="100%" CELLPADDING="3" CELLSPACING="0" SUMMARY="">
+    <TR BGCOLOR="#CCCCFF" CLASS="TableHeadingColor">
+      <TD COLSPAN=1><FONT SIZE="+2"><B>Component Detail</B></FONT></TD>
+    </TR>
+  </TABLE>
+  <A NAME="ChannelUpsample_Vert_and_Horz"><!-- --></A>
+  <H3>ChannelUpsample_Vert_and_Horz</H3>
+  <PRE>int->int&nbsp;<B>ChannelUpsample_Vert_and_Horz</B>(int sourcewidth, int sourceheight)</PRE>
+  <DL>
+    <DD>Upsamples from 4:2:0 to 4:4:4
+    <P>
+    <DL><DD>
+    <DT><B>Input:</B><DD><CODE>&lt;int&gt;</CODE> - A 4:2:0 downsampled image
+    <DT><B>Output:</B><DD><CODE>&lt;int&gt;</CODE> - A 4:4:4 upsampled image    <DT><B>Parameters:</B>                      <DD><CODE>sourcewidth</CODE> - The width of the downsampled image
+                      <DD><CODE>sourceheight</CODE> - The height of the downsampled image
+
+    </DD></DL>
+  </DD>
+  </DL>
+  <HR>
+  <A NAME="ChannelUpsample_Vertical"><!-- --></A>
+  <H3>ChannelUpsample_Vertical</H3>
+  <PRE>int->int&nbsp;<B>ChannelUpsample_Vertical</B>(int sourcewidth, int sourceheight)</PRE>
+  <DL>
+    <DD>Upsample from 4:2:2 to 4:4:4 (in the vertical direction)
+    <P>
+    <DL><DD>
+    <DT><B>Input:</B><DD><CODE>&lt;int&gt;</CODE> - A 4:2:2 downsampled in the vertical direction
+    <DT><B>Output:</B><DD><CODE>&lt;int&gt;</CODE> - A 4:4:4 upsampled image    <DT><B>Parameters:</B>                      <DD><CODE>sourcewidth</CODE> - The width of the downsampled image
+                      <DD><CODE>sourceheight</CODE> - The height of the downsampled image
+
+    </DD></DL>
+  </DD>
+  </DL>
+  <HR>
+  <A NAME="ChannelUpsample_Horizontal"><!-- --></A>
+  <H3>ChannelUpsample_Horizontal</H3>
+  <PRE>int->int&nbsp;<B>ChannelUpsample_Horizontal</B>(int sourcewidth, int sourceheight)</PRE>
+  <DL>
+    <DD>Upsample from 4:2:2 to 4:4:4 (in the horizontal direction)
+    <P>
+    <DL><DD>
+    <DT><B>Input:</B><DD><CODE>&lt;int&gt;</CODE> - A 4:2:2 downsampled in the horizontal direction
+    <DT><B>Output:</B><DD><CODE>&lt;int&gt;</CODE> - A 4:4:4 upsampled image    <DT><B>Parameters:</B>                      <DD><CODE>sourcewidth</CODE> - The width of the downsampled image
+                      <DD><CODE>sourceheight</CODE> - The height of the downsampled image
+
+    </DD></DL>
+  </DD>
+  </DL>
+  <HR>
+  <A NAME="ChannelUpsample_1D"><!-- --></A>
+  <H3>ChannelUpsample_1D</H3>
+  <PRE>int->int&nbsp;<B>ChannelUpsample_1D</B></PRE>
+  <DL>
+    <DD>Performs a one dimensional upsampling, doubling the pixel count Each pixel is computed from a weighted average of its two neighbors with the closer neighbor getting weight1 and the further neighbor getting weight2.
+    <P>
+    <DL><DD>
+    <DT><B>Input:</B><DD><CODE>&lt;int&gt;</CODE> - The downsampled data stream
+    <DT><B>Output:</B><DD><CODE>&lt;int&gt;</CODE> - The reconstructed upsampled data stream    <DT><B>Parameters:</B>                      <DD><CODE>sourcelen</CODE> - The length of the downsampled data stream
+                      <DD><CODE>weight1</CODE> - The weight of the closer neighbor
+                      <DD><CODE>weight2</CODE> - The weight of the further neighbor
+
+    </DD></DL>
+  </DD>
+  </DL>
+  <HR>
+  <A NAME="DropSecond"><!-- --></A>
+  <H3>DropSecond</H3>
+  <PRE>int->int&nbsp;<B>DropSecond</B></PRE>
+  <DL>
+    <DD>This drops every second value from a data stream, essentially performing a very simple downsampling (used for the horizontal downsampling in color channel downsampling.
+    <P>
+    <DL><DD>
+    <DT><B>Input:</B><DD><CODE>&lt;int&gt;</CODE> - A data stream
+    <DT><B>Output:</B><DD><CODE>&lt;int&gt;</CODE> - A downsampled data stream
+    </DD></DL>
+  </DD>
+  </DL>
+  <HR>
+  <A NAME="ChannelDownsample_1D"><!-- --></A>
+  <H3>ChannelDownsample_1D</H3>
+  <PRE>int->int&nbsp;<B>ChannelDownsample_1D</B>(float weight1, float weight2)</PRE>
+  <DL>
+    <DD>This cuts a data stream in half by combining two pixels into one. Each new pixel's value is based on a weighting.
+    <P>
+    <DL><DD>
+    <DT><B>Input:</B><DD><CODE>&lt;int&gt;</CODE> - A data stream
+    <DT><B>Output:</B><DD><CODE>&lt;int&gt;</CODE> - A data stream    <DT><B>Parameters:</B>                      <DD><CODE>weight1</CODE> - The weighting used for the antecedent pixel
+                      <DD><CODE>weight2</CODE> - The weighting used for the subsequent pixel
+
+    </DD></DL>
+  </DD>
+  </DL>
+  <HR>
+  <A NAME="ChannelDownsample"><!-- --></A>
+  <H3>ChannelDownsample</H3>
+  <PRE>int->int&nbsp;<B>ChannelDownsample</B>()</PRE>
+  <DL>
+    <DD>Downsample from 4:4:4 to 4:2:0
+    <P>
+    <DL><DD>
+    <DT><B>Input:</B><DD><CODE>&lt;int&gt;</CODE> - A 4:4:4 upsampled image
+    <DT><B>Output:</B><DD><CODE>&lt;int&gt;</CODE> - A 4:2:0 downsampled image
+    </DD></DL>
+  </DD>
+  </DL>
+  <HR>
+  Please contact the author (<a href="mailto:madrake@gmail.com">Matthew Drake</a>) for more information.
+</BODY>
