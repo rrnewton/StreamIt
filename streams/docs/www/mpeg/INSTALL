@@ -1,0 +1,33 @@
+AUTHOR
+Matthew Drake (madrake@gmail.com)
+
+COPYRIGHT
+
+Copyright 2005 by the Massachusetts Institute of Technology.
+Permission to use, copy, modify, and distributex this
+software and its documentation for any purpose and without
+fee is hereby granted, provided that the above copyright
+notice appear in all copies and that both that copyright
+notice and this permission notice appear in supporting
+documentation, and that the name of M.I.T. not be used in
+advertising or publicity pertaining to distribution of the
+software without specific, written prior permission.
+M.I.T. makes no representations about the suitability of
+this software for any purpose.  It is provided "as is"
+without express or implied warranty.
+
+DESCRIPTION
+
+This file contains the installation instructions for the MPEG2 StreamIt codec.
+  
+INSTALL
+
+1. Make sure your StreamIt compile environment is setup correctly.
+If the StreamIt environment is not yet setup, go to the StreamIt website
+[http://cag.csail.mit.edu/streamit/html/download.html] and follow the 
+download and setup instructions.
+
+2. Unzip and untar the mpeg_streamit_codec.tar.gz file.
+ 
+3. Follow the instructions in MPEG2 for running the encoder or decoder in
+its various modes, or DCT_IEEE for testing the DCT by itself.

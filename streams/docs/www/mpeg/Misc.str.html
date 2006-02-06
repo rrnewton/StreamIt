@@ -1,0 +1,109 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!--NewPage-->
+<HTML>
+<HEAD>
+<TITLE>
+Misc.str (Version 1.0)
+</TITLE>
+<LINK REL="stylesheet" TYPE="text/css" HREF="http://java.sun.com/j2se/1.4.2/docs/api/stylesheet.css" TITLE="Style">
+</HEAD>
+<BODY>
+  <H2>
+    File Misc.str<BR>
+    <FONT SIZE="-1">Version 1.0</FONT>
+  </H2>
+  <HR>
+  <P>This file contains various functions that are used by a variety of other stream components.</P>
+  <HR>
+  <P>
+  <A NAME="field_summary"><!-- --></A>
+  <TABLE BORDER="1" WIDTH="100%" CELLPADDING="3" CELLSPACING="0" SUMMARY="">
+    <TR BGCOLOR="#CCCCFF" CLASS="TableHeadingColor">
+      <TD COLSPAN=2><FONT SIZE="+2"><B>Component Summary</B></FONT></TD>
+    </TR>
+    <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+        <CODE>int->int</CODE></FONT>
+      </TD>
+      <TD><CODE><B><A HREF="#Saturation">Saturation</A></B></CODE>
+
+        <BR>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Saturates a stream of integers, forcing them to lie within a specified range.
+      </TD>
+    </TR>
+    <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+        <CODE>int->int</CODE></FONT>
+      </TD>
+      <TD><CODE><B><A HREF="#BoundedSaturation">BoundedSaturation</A></B></CODE>
+
+        <BR>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Saturates a stream of integers known to lie within some larger range, forcing them to lie within a specified range.
+      </TD>
+    </TR>
+    <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+        <CODE>int->int</CODE></FONT>
+      </TD>
+      <TD><CODE><B><A HREF="#DivideBy">DivideBy</A></B></CODE>
+
+        <BR>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Divide every value in the stream by a given number, truncating to the nearest integer.
+      </TD>
+    </TR>
+  </TABLE>
+  <P>
+  <A NAME="field_detail"><!-- --></A>
+  <TABLE BORDER="1" WIDTH="100%" CELLPADDING="3" CELLSPACING="0" SUMMARY="">
+    <TR BGCOLOR="#CCCCFF" CLASS="TableHeadingColor">
+      <TD COLSPAN=1><FONT SIZE="+2"><B>Component Detail</B></FONT></TD>
+    </TR>
+  </TABLE>
+  <A NAME="Saturation"><!-- --></A>
+  <H3>Saturation</H3>
+  <PRE>int->int&nbsp;<B>Saturation</B>(int min, int max)</PRE>
+  <DL>
+    <DD>Saturates a stream of integers, forcing them to lie within a specified range. Values greater than the maximum are saturated to have the max value, and values less than the minimum are saturated to have the minimum value.
+    <P>
+    <DL><DD>
+    <DT><B>Input:</B><DD><CODE>&lt;int&gt;</CODE> - A stream of integers.
+    <DT><B>Output:</B><DD><CODE>&lt;int&gt;</CODE> - A stream of integers lying between min and max, inclusive.    <DT><B>Parameters:</B>                      <DD><CODE>min</CODE> - The minimum value any integer in the stream is allowed to assume.
+                      <DD><CODE>max</CODE> - The maximum value any integer in the stream is allowed to assume.
+
+    </DD></DL>
+  </DD>
+  </DL>
+  <HR>
+  <A NAME="BoundedSaturation"><!-- --></A>
+  <H3>BoundedSaturation</H3>
+  <PRE>int->int&nbsp;<B>BoundedSaturation</B>(int min, int max, int worst_input_min, int worst_input_max)</PRE>
+  <DL>
+    <DD>Saturates a stream of integers known to lie within some larger range, forcing them to lie within a specified range. Values greater than the maximum are saturated to have the max value, and values less than the minimum are saturated to have the minimum value. If a value lies outside of the great range behavior is undefined. The BoundedSaturation, without the initialization cost, is roughly twice as fast as the regular Saturation.
+    <P>
+    <DL><DD>
+    <DT><B>Input:</B><DD><CODE>&lt;int&gt;</CODE> - A stream of integers.
+    <DT><B>Output:</B><DD><CODE>&lt;int&gt;</CODE> - A stream of integers lying between min and max, inclusive.    <DT><B>Parameters:</B>                      <DD><CODE>min</CODE> - The minimum value any integer in the stream is allowed to assume.
+                      <DD><CODE>max</CODE> - The maximum value any integer in the stream is allowed to assume.
+                      <DD><CODE>worst_input_min</CODE> - The absolute minimum value any input could ever take on.
+                      <DD><CODE>worst_input_max</CODE> - The absolute maximum value any input could ever take on.
+
+    </DD></DL>
+  </DD>
+  </DL>
+  <HR>
+  <A NAME="DivideBy"><!-- --></A>
+  <H3>DivideBy</H3>
+  <PRE>int->int&nbsp;<B>DivideBy</B>(int div)</PRE>
+  <DL>
+    <DD>Divide every value in the stream by a given number, truncating to the nearest integer.
+    <P>
+    <DL><DD>
+    <DT><B>Input:</B><DD><CODE>&lt;int&gt;</CODE> - An integer
+    <DT><B>Output:</B><DD><CODE>&lt;int&gt;</CODE> - An integer related to the input by output = floor(input / div)    <DT><B>Parameters:</B>                      <DD><CODE>div</CODE> - The denominator in the division.
+
+    </DD></DL>
+  </DD>
+  </DL>
+  <HR>
+  Please contact the author (<a href="mailto:madrake@gmail.com">Matthew Drake</a>) for more information.
+</BODY>

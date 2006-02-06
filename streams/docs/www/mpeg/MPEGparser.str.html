@@ -1,0 +1,62 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!--NewPage-->
+<HTML>
+<HEAD>
+<TITLE>
+MPEGparser.str.pre (Version 1.0)
+</TITLE>
+<LINK REL="stylesheet" TYPE="text/css" HREF="http://java.sun.com/j2se/1.4.2/docs/api/stylesheet.css" TITLE="Style">
+</HEAD>
+<BODY>
+  <H2>
+    File MPEGparser.str.pre<BR>
+    <FONT SIZE="-1">Version 1.0</FONT>
+  </H2>
+  <HR>
+  <P>This file contains functions that allow one to parse MPEG-2 compliant video. The code is based on the MPEG-2 specification (ISO/IEC 13818-2). The MPEG-2 decoding is a work in progress, although it works within a limited test range. Throughout the source code, citations are made in cases where an understanding of the code would be helped by looking at an outside source. The format I have chosen is (cite NUM#, LOOKUP_INFO). NUM=1 refers to ISO/IEC: 13818-2, and NUM=2 refers to the reference MPEG implementation written in C, available at [www.mpeg.org].</P>
+  <HR>
+  <P>
+  <A NAME="field_summary"><!-- --></A>
+  <TABLE BORDER="1" WIDTH="100%" CELLPADDING="3" CELLSPACING="0" SUMMARY="">
+    <TR BGCOLOR="#CCCCFF" CLASS="TableHeadingColor">
+      <TD COLSPAN=2><FONT SIZE="+2"><B>Component Summary</B></FONT></TD>
+    </TR>
+    <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+        <CODE>bit->int</CODE></FONT>
+      </TD>
+      <TD><CODE><B><A HREF="#MPEGStreamParser">MPEGStreamParser</A></B></CODE>
+
+        <BR>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Performs variable length decoding on an MPEG-2 compliant bit stream in accordance with the IEEE MPEG-2 specification.
+      </TD>
+    </TR>
+  </TABLE>
+  <P>
+  <A NAME="field_detail"><!-- --></A>
+  <TABLE BORDER="1" WIDTH="100%" CELLPADDING="3" CELLSPACING="0" SUMMARY="">
+    <TR BGCOLOR="#CCCCFF" CLASS="TableHeadingColor">
+      <TD COLSPAN=1><FONT SIZE="+2"><B>Component Detail</B></FONT></TD>
+    </TR>
+  </TABLE>
+  <A NAME="MPEGStreamParser"><!-- --></A>
+  <H3>MPEGStreamParser</H3>
+  <PRE>bit->int&nbsp;<B>MPEGStreamParser</B></PRE>
+  <DL>
+    <DD>Performs variable length decoding on an MPEG-2 compliant bit stream in accordance with the IEEE MPEG-2 specification.
+    <P>
+    <DL><DD>
+    <DT><B>Input:</B><DD><CODE>&lt;bit&gt;</CODE> - An MPEG-2 variable length encoded bitstream
+    <DT><B>Output:</B><DD><CODE>&lt;int&gt;</CODE> - A series of variable length decoded macroblocks with associated motion vectors and messages interleaved on parser phase boundaries with updates to the state of the decoded data.    <DT><B>Parameters:</B>                      <DD><CODE>UpdatePortal_quantiser_data_ac</CODE> - The portal that recieves AC quantiser coefficient table data
+                      <DD><CODE>UpdatePortal_quantiser_data_dc</CODE> - The portal that recieves DC quantiser coefficient table data
+                      <DD><CODE>UpdatePortal_macroblock_intra</CODE> - The portal that receives intra macroblock information
+                      <DD><CODE>UpdatePortal_picture_type</CODE> - The portal that receives picture type information
+                      <DD><CODE>UpdatePortal_mvd</CODE> - The portal that needs to be notified about motion vector resets
+                      <DD><CODE>UpdatePortal_picture_type2</CODE> - The portal that receives picture type information
+
+    </DD></DL>
+  </DD>
+  </DL>
+  <HR>
+  Please contact the author (<a href="mailto:madrake@gmail.com">Matthew Drake</a>) for more information.
+</BODY>
