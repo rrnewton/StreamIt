@@ -1,0 +1,72 @@
+<!--#include virtual="./mpeg_header.inc"-->
+
+<h3>DECODER</h3>
+
+<p>For details on the MPEG2 format itself we suggest reading either the <a href="./related.shtml#13818">MPEG-2 video specification</a> or the <a href="http://en.wikipedia.org/wiki/MPEG-2">Wikipedia article</a> on the subject.</p>
+
+<p>Both the decoder and the encoder are represented by a stream graph showing the filters, splitters, and joiners, which operate on the data. Both are described with respect to their block diagrams which show the flow of data through the computation.</p>
+
+<div style="float: left; margin: 5px;">
+<a href="./images/decoder.jpg">High Resolution Decoder Stream Graph</a> (3.3 MB)<br>
+<a href="./images/decoder.jpg"><img src="./images/decoder_thumbnail.jpg" alt="MPEG2 Decoder Stream Graph"></a>
+</div>
+
+<p>The MPEG decoder implementation, is a pipeline, with most of the work
+contained within three subsections. It accepts a compressed bitstream as input, and 
+produces the decoded video as output.</p>
+
+<p>The first subsection is a filter responsible for
+parsing the MPEG-2 bitstream and performing Huffman and variable
+run-length decoding (VLD). This process results in a set of
+quantized, frequency-domain macroblocks and corresponding motion
+vectors.</p>
+
+<p>The second subsection is a splitjoin which processes the macroblocks
+and motion vectors in parallel. The macroblocks are reordered, 
+inversely quantized, and inversely DCT transformed to the spatial 
+domain. The motion vectors, coded with respect to their associated
+macroblock position and the value of previously decoded vectors,
+are converted to absolute addresses.</p>
+
+<p>The third section is responsible for motion compensation in the case of
+predictively coded macroblocks (e.g., P and B pictures). Because the
+color channels can be decoded independently from each other, a
+splitjoin processes the motion compensation for each channel in
+parallel. The motion compensation filter uses the motion vectors to find
+a corresponding macroblock in a previously decoded, stored 
+reference picture. This reference macroblock is added to the current
+macroblock to recover the original picture data. If the current macroblock
+is part of an I or P picture, then the decoder stores it for future
+reference. In addition to the motion compensation, the chrominance
+channels require upsampling.</p>
+
+<p>In addition to these three decoder subsections, two additional filters handle
+reordering the decoded pictures temporally and transforming them into the
+RGB color space.</p>
+
+<p>The decoder uses messaging to send metadata associated with macroblocks
+from the parser to downstream filters. For instance, the parser generates
+a message whenever the picture or macroblock type changes. The motion
+compensation filter uses this information to determine how to process
+the blocks and determine whether it needs to store them for future
+reference. The picture reordering step uses the picture type to 
+determine the correct temporal order, and the math behind the inverse
+quantization depends on the encoding type of the macroblock. Because
+the macroblock type and picture type information changes infrequently
+and irregularly compared to the regular flow of data, messaging is an
+intuitive mechanism for propogating these updates.</p>
+
+<p>While each of the described components decomposes into its own 
+subgraph, this high level description is enough to show the advantages
+of a stream based implementation. For instance, the pipeline 
+parallelism is exposed for both the steps involved in block decoding 
+and the chrominance color channel processing. The splitjoin in the lower
+part of the graph explicitly exposes the data parallelism present because
+the color channels can be decoded independently.</p>
+  </td>
+ </tr>
+</table>
+
+<!--#include virtual="./mpeg_footer.inc"-->
+
+
