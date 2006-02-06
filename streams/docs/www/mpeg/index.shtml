@@ -1,0 +1,193 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+
+<!--#include virtual="../include/init.inc"-->
+   <style type="text/css">A:hover {color: #000000}</style>
+   <meta NAME="author" CONTENT="Matthew H. Drake">
+   <title>StreamIt</title>
+<!--#include virtual="../include/header-level1.inc"-->
+
+</table>
+
+<h1 align="center">MPEG-2 in StreamIt</h1>
+
+<h2>Description of Work</h2>
+
+<p>To show the feasibility of stream based dataflow languages for multimedia applications, we've implemented an MPEG-2 video decoder and encoder in <a href="../">StreamIt</a>, the research language in development by the MIT Computer Architecture Group. Our implementation exposes both pipeline and dataflow parallelism, and represents a straight-forward transformation of the block level specification.</p>
+
+<h2>Downloads</h2>
+
+<ul>
+ <li><a href="./mpeg_streamit_codec.tar.gz">mpeg_streamit_codec.tar.gz</a> - the source code for the StreamIt Encoder and Decoder</li>
+ <li><a href="./INSTALL">INSTALL</a> - the installation instructions for the StreamIt MPEG2 codec (included in tarball)</li>
+ <li><a href="./README">README</a> - description of the MPEG2 Streamit codec and source organization (included in tarball)</li>
+</ul>
+
+<h2>Feature Set</h2>
+
+<p>Our implementations are meant for research, not production use, and as such are somewhat limited. A brief list of the important features and limitations follows. In deciding which features to include and which to leave out we followed the general rule that features aiding in video compression (such as skipping low-noise macroblocks in motion predicted images) were always included and tested. Features which simply provided a greater breadth of video formats, (i.e. support for both interlaced and progressive video) were limited to a small working subset.</p>
+
+<p>Features of the Encoder and Decoder:</p>
+<ul>
+ <li>Motion Compensation: support for I,P, and B images</li>
+ <li>Motion Compensation: support for forward, backward, and bidrectionally predicted macroblocks</li>
+ <li>Motion Compensation: picture reordering</li>
+ <li>Variable Length Coding: Huffman encoding
+ <li>Variable Length Coding: custom quantization coefficient tables</li>
+ <li>Image Compression: intra and non-intra macroblock quantization</li>
+ <li>Image Compression: 4:2:0 and 4:2:2 chrominance compression in the decoder, 4:2:0 compression in the encoder</li>
+ <li>Image Compression: Zig Zag Reordering, Discrete Cosine Transform (DCT), and inverse DCT</li>
+</ul>
+
+<p>Limitations:</p>
+<ul>
+ <li>chrominance format, video width, video height, and number of frames are stream parameters, and thus changes require the stream graph to be recompiled</li>
+ <li>no support for redundant motion vectors or bitstream error recovery</li>
+ <li>requires the video have a certain set of <a href="config_param.txt">configuration parameters</a></li>
+ <li>video must be progressive scan</li>
+ <li>encoder does not generate vbv_buffer information</li>
+ <li>decoder does not enforce profile/level information.
+ <li>encoder does not use bitrate feedback to adjust quantization level</li>
+</ul>
+
+Our decoder does not enforce profile/level restrictions. (For instance, if the bitstream low_delay value indicates that the bitstream cannot contain B pictures, the decoder will not enforce this.) As such, it is possible that certain invalid MPEG-2 bitstreams would decode without generating an error message.
+
+<h2>Implementation Details</h2>
+
+<p>(Note: for details on MPEG2 itself we suggest reading the <a href="#13818">MPEG-2 video specification</a>.)</p>
+
+Both the decoder and the encoder are represented by a stream graph showing the filters, splitters, and joiners, which operate on the data. Both are described with respect to their block diagrams which show the flow of data through the computation.
+
+<h3>Decoder</h3>
+
+<table>
+ <tr>
+  <td valign="top"><a href="./images/decoder.jpg">High Resolution Decoder Stream Graph</a> (3.3 MB)<br>
+      <a href="./images/decoder.jpg"><img src="./images/decoder_thumbnail.jpg" alt="MPEG2 Decoder Stream Graph"></a></td>
+  <td valign="top">
+<p>The MPEG decoder implementation, is a pipeline, with most of the work
+contained within three subsections. It accepts a compressed bitstream as input, and 
+produces the decoded video as output.</p>
+
+<p>The first subsection is a filter responsible for
+parsing the MPEG-2 bitstream and performing Huffman and variable
+run-length decoding (VLD). This process results in a set of
+quantized, frequency-domain macroblocks and corresponding motion
+vectors.</p>
+
+<p>The second subsection is a splitjoin which processes the macroblocks
+and motion vectors in parallel. The macroblocks are reordered, 
+inversely quantized, and inversely DCT transformed to the spatial 
+domain. The motion vectors, coded with respect to their associated
+macroblock position and the value of previously decoded vectors,
+are converted to absolute addresses.</p>
+
+<p>The third section is responsible for motion compensation in the case of
+predictively coded macroblocks (e.g., P and B pictures). Because the
+color channels can be decoded independently from each other, a
+splitjoin processes the motion compensation for each channel in
+parallel. The motion compensation filter uses the motion vectors to find
+a corresponding macroblock in a previously decoded, stored 
+reference picture. This reference macroblock is added to the current
+macroblock to recover the original picture data. If the current macroblock
+is part of an I or P picture, then the decoder stores it for future
+reference. In addition to the motion compensation, the chrominance
+channels require upsampling.</p>
+
+<p>In addition to these three decoder subsections, two additional filters handle
+reordering the decoded pictures temporally and transforming them into the
+RGB color space.</p>
+
+<p>The decoder uses messaging to send metadata associated with macroblocks
+from the parser to downstream filters. For instance, the parser generates
+a message whenever the picture or macroblock type changes. The motion
+compensation filter uses this information to determine how to process
+the blocks and determine whether it needs to store them for future
+reference. The picture reordering step uses the picture type to 
+determine the correct temporal order, and the math behind the inverse
+quantization depends on the encoding type of the macroblock. Because
+the macroblock type and picture type information changes infrequently
+and irregularly compared to the regular flow of data, messaging is an
+intuitive mechanism for propogating these updates.</p>
+
+<p>While each of the described components decomposes into its own 
+subgraph, this high level description is enough to show the advantages
+of a stream based implementation. For instance, the pipeline 
+parallelism is exposed for both the steps involved in block decoding 
+and the chrominance color channel processing. The splitjoin in the lower
+part of the graph explicitly exposes the data parallelism present because
+the color channels can be decoded independently.</p>
+  </td>
+ </tr>
+</table>
+
+<h3>Encoder</h3>
+
+<table>
+ <tr>
+  <td valign="top"><a href="./images/encoder.jpg">High Resolution Encoder Stream Graph</a> (3.5 MB)<br>
+                   <a href="./images/encoder.jpg"><img src="./images/encoder_thumbnail.jpg" alt="MPEG2 Encoder Stream Graph"></a></td>
+  <td valign="top">
+<p>The MPEG encoder, as one would expect, is something like the reverse of the decoder pipeline
+However, because of the lossy compression, the encoder also must incorporate most of the decoder
+so that it knows exactly what the decoder sees at its output. This is neccesary so that the
+reference frames used for motion compensation are identical; otherwise lossy errors would accumulate
+between frames.</p>
+
+<p>The input to the encoder is a sequence of raw video frames. Initially the data is duplicated and split - one channel 
+is passed to a filter which determines a picture type for the image, and the other channel downsamples the color channels
+based on the chrominance format. The resulting data is combined and a Picture Reorder filter rearranges the pictures so that
+each motion predicted image's reference frames have already been processed. </p>
+
+<p>The bulk of the picture data is then triplicated, with one copy of the data being sent to one of three motion estimation filters.
+The first filter performs no motion estimation. The second and third filters each perform motion estimation
+with respect to a reference image. Each of the two motion estimators use a different reference image, one refering
+the preceeding key image, and the other referencing the second preceeding image. Thus, one provides forward estimation for
+P images and backward estimation for B images, and the other provides forward estimation for B images. The output of each of these
+filters is the vectors for the best motion estimate and the difference between the predicted value and the actual value of the macroblock.</p>
+
+<p>Each of these three data streams is joined and a filter immediately after the joiner takes care of deciding which of the
+estimations to choose, based on which provides the best compression. Additionally, this filter takes care of determining the bidirectionally
+predicted block values in the case where both the forward and backward predictions are used.</p>
+
+<p>Following this step, the motion vectors are encoded and the macroblock values coded in a process that reverses the decoder - the values
+are transformed via a DCT, quantized, and zig zag ordered. The output of this step is then duplicated, with one copy going to the 
+bitstream variable length coder, and the other being inversely zig zag ordered, dequantized, and inversely transformed. This inverted
+copy is then sent upstream via a message to update the reference frames used by the motion estimation filters.</p>
+  </td>
+ </tr>
+</table>
+
+<h3>StreamItDocs</h3>
+
+<p>StreamItDocs (also found in the tarball) can be viewed showing the public functions in each StreamIt source file.</p>
+
+<ul>
+ <li><a href="./BMP.str.html">BMP.str</a></li>
+ <li><a href="./BMPtoMPEG.str.html">BMPtoMPEG.str</a></li>
+ <li><a href="./ColorSampling.str.html">ColorSampling.str</a></li>
+ <li><a href="./ColorSpace.str.html">ColorSpace.str</a></li>
+ <li><a href="./DCT.str.html">DCT.str</a></li>
+ <li><a href="./DCTverify.str.html">DCTverify.str</a></li>
+ <li><a href="./iDCTcompare.str.html">iDCTcompare.str</a></li>
+ <li><a href="./Misc.str.html">Misc.str</a></li>
+ <li><a href="./MPEGdecoder.str.html">MPEGdecoder.str</a></li>
+ <li><a href="./MPEGencoder.str.html">MPEGencoder.str</a></li>
+ <li><a href="./MPEGFrameOrdering.str.html">MPEGFrameOrdering.str</a></li>
+ <li><a href="./MPEGgenerator.str.html">MPEGgenerator.str</a></li>
+ <li><a href="./MPEGglobal.str.html">MPEGglobal.str</a></li>
+ <li><a href="./MPEGparser.str.html">MPEGparser.str</a></li>
+ <li><a href="./MPEGplayer.str.html">MPEGplayer.str</a></li>
+ <li><a href="./MPEGtoBMP.str.html">MPEGtoBMP.str</a></li>
+</ul>
+
+<h2>Related Materials</h2>
+
+<ul>
+ <li><a name="13818"><i>ISO/IEC 13818-2</i> - the technical specification for MPEG-2 video coding</a></li>
+ <li><a href="http://cag.lcs.mit.edu/commit/papers/06/drake-ipdps06.pdf">MPEG-2 decoding in StreamIt</a> - Our paper on MPEG-2 decoding, published in <i>IPDPS 2006</i></li>
+ <li><a href="http://cag.csail.mit.edu/streamit/">StreamIt</a> - the StreamIt website</li>
+ <li><a href="ftp://ftp.mpegtv.com/pub/mpeg/mssg/mpeg2vidcodec\_v12.tar.gz">C implementation</a> - the C MPEG-2 decoder/encoder reference implementation</li>
+</ul>
+
+</body>
+</html>
