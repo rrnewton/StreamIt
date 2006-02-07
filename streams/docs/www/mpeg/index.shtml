@@ -1,6 +1,33 @@
 <!--#include virtual="./mpeg_header.inc"-->
 
-<p>Image and video codecs are prevalent in a wide range of computer systems and multimedia devices. It is not uncommon however that developers create and customize separate coder and decoder implementations for each of the architectures they target. This practice is time consuming and error prone, leading to code that is neither malleable nor portable. This website details our implementation of an MPEG-2 codec using <a href="../">StreamIt</a>, an architecture-independent stream language in development by the MIT Computer Architecture Group. MPEG coding is a good match for streaming programming model, which allows one to create a straight-forward implementation from the block level MPEG specification which exposes both the pipeline and dataflow parallelism inherent to the problem. Both the MPEG-2 encoder and decoder are available for download here, and we provide supplemental material to our recently published paper <a href="http://cag.lcs.mit.edu/commit/papers/06/drake-ipdps06.pdf">MPEG-2 decoding in StreamIt</a> (IPDPS 2006).
+<p>Image and video codecs are prevalent in a wide range of computer
+systems and multimedia devices. It is not uncommon however that
+developers create and customize separate coder and decoder
+implementations for each of the architectures they target. This
+practice is time consuming and error prone, leading to code that is
+neither malleable nor portable.<br>
+<br>
+This website details our implementation of an MPEG-2 codec using 
+<a href="../">StreamIt</a>. MPEG coding is a good match for the streaming
+programming model, as is evident from the high correlation between our
+code and the MPEG block level specification. The StreamIt
+implementation has the added advantage of naturally exposing 
+both the pipeline and dataflow parallelism inherent to the
+problem.<br>
+<br>
+The MPEG-2 <a
+href="http://cag.lcs.mit.edu/streamit/mpeg/encoder.shtml">encoder</a>
+and <a
+href="http://cag.lcs.mit.edu/streamit/mpeg/decoder.shtml">decoder</a>
+source codes are available for
+<a
+href="http://cag.lcs.mit.edu/streamit/mpeg/downloads.shtml">download</a>.
+We also provide <a
+href="http://cag.lcs.mit.edu/streamit/mpeg/related.shtml">links to
+related material</a> to supplement our <a
+href="http://cag.lcs.mit.edu/commit/papers/06/drake-ipdps06.pdf">paper</a>
+to appear at IPDPS in April, 2006.
+
 
 <!--#include virtual="./mpeg_footer.inc"-->
 

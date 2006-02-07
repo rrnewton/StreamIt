@@ -1,12 +1,15 @@
 <!--#include virtual="./mpeg_header.inc"-->
 
-<h3>DOWNLOADS</h3>
+<h3>DOWNLOAD</h3>
 
-<p>A public release of the MPEG-2 is now available. At the moment it will not compile with the current <a href="http://cag.lcs.mit.edu/streamit/shtml/download.shtml">public release</a> of the StreamIt compiler, but a new release will be coming soon. 
+<p>A public release of the MPEG-2 codec in StreamIt is available for
+download. Currently, the code will not compile with the publicly
+available StreamIt compiler. A new compiler toolchain release is coming soon. 
 <ul>
- <li><p>Download the <a href="./mpeg_streamit_codec.tar.gz">source code</a> for the StreamIt MPEG-2 encoder and decoder</p></li>
- <li><p>Read the <a href="./INSTALL">installation instructions</a> for the StreamIt MPEG2 codec (included in tarball)</p></li>
- <li><p>Read the <a href="./README">description</a> of the MPEG2 Streamit codec and source organization (included in tarball)</p></li>
+ <li><a href="./mpeg_streamit_codec.tar.gz">Source code tarball</a>
+ for the StreamIt MPEG-2 Encoder and Decoder.</li><br>
+ <li><a href="./INSTALL">Installation instructions</a> for the codec (included in tarball).</li><br>
+ <li><a href="./README">Description</a> of the codec and source organization (included in tarball).</li>
 </ul>
 
 <!--#include virtual="./mpeg_footer.inc"-->
