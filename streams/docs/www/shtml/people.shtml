@@ -10,9 +10,8 @@
     </b></td>
     <td width="20" valign="top" align="left"></td>
     <td width="700" valign="top" align="left">
-    <hr><br>
+    <hr>
       <h3>PEOPLE</h3>
-      <br>
       <p align="justify">
 
 	  <b>StreamIt</b> is the result of several years of research and
@@ -21,27 +20,31 @@
 
 	  <ul>
 	    <li><p align="justify">
-	      <b><a href="http://cag.lcs.mit.edu/~saman">Saman
+	      <b><a href="http://cag.csail.mit.edu/~saman">Saman
 	      Amarasinghe</a></b> the fearless leader.
 	    </p>	
 	    <li><p align="justify">
-	      <b><a href="http://mattdrake.mit.edu">Matt Drake</a></b> is implementing an MPEG2 decoder in
-	      StreamIt.
+	      <b>Allyn Dimock</b> contributes to many aspects of the
+	      StreamIt compiler and development toolchain.
 	    </p>
 	    <li><p align="justify">
-	      <b><a href="http://cag.lcs.mit.edu/~mgordon">Michael  Gordon</a></b> 
-	      leads the StreamIt <a href="http://cag.lcs.mit.edu/raw">Raw</a> 
+	      <b><a href="http://mattdrake.mit.edu">Matt Drake</a></b> is
+	      implementing an <a href="http://cag.csail.mit.edu/streamit/mpeg">MPEG-2 codec in StreamIt</a>.
+	    </p>
+	    <li><p align="justify">
+	      <b><a href="http://cag.csail.mit.edu/~mgordon">Michael  Gordon</a></b> 
+	      leads the StreamIt <a href="http://cag.csail.mit.edu/raw">Raw</a> 
 		backend  effort.   He  wrote  the   layout,  communication
 	      scheduling, and code generation phases.  He also worked on
 	      coding benchmarks, creating  tools for syntax translation,
 	      code evaluation and debugging on Raw.
 	    </p>
 	    <li><p align="justify">
-	      <b><a href="http://www.cag.lcs.mit.edu/~hank/">Hank
+	      <b><a href="http://www.cag.csail.mit.edu/~hank/">Hank
 	      Hoffman</a></b> from the <a
-	      href="http://cag.lcs.mit.edu/raw">Raw</a> group helps
+	      href="http://cag.csail.mit.edu/raw">Raw</a> group helps
 	      with development, optimization and evaluation of
-	      applications (including FIR, MPEG2, and others).
+	      applications (including FIR, MPEG-2, and others).
 	    </p>
 	    <li><p align="justify">
 	      <b>Michal Karczmarek</b> built the StreamIt library and
@@ -49,19 +52,10 @@
 	      system.
 	    </p>
 	    <li><p align="justify">
-            <b>Jasper Lin</b> worked on <i>Filter</i> optimizations as
-            well as the current partitioners and the Raw backend.  He
-            also helped to design the new dynamic language features.
-	    </p>
-	    <li><p align="justify">
 	      <b><a href="http://web.mit.edu/rabbah/www/">Rodric
 	      Rabbah</a></b> contributes to the language design and
 	      compiler optimizations for DSPs, conventional processors,
 	      and computer grids.
-	    </p>
-	    <li><p align="justify">
-	    <b>Adam Reed</b> is working on integrating StreamIt with
-	    the X10 language from IBM.
 	    </p>
 	    <li><p align="justify">
 	      <b>Janis Sermulins</b> designed and implemented cache
@@ -71,10 +65,14 @@
                 messaging.
 	    </p>
 	    <li><p align="justify">
-	      <b><a   href="http://cag.lcs.mit.edu/~thies/">Bill  Thies</a></b>
+	      <b><a   href="http://cag.csail.mit.edu/~thies/">Bill  Thies</a></b>
 		 led the  design of the  StreamIt language and  compiler. He
 		 built the  high-level IR infrastructure  and partitioning
 		 algorithms for load balancing and linear optimizations.
+	    </p>
+	    <li><p align="justify">
+	    <b>David Zhang</b> is working on integrating StreamIt with
+	    the X10 language from IBM.
 	    </p>
  	  </ul>
 
@@ -100,6 +98,11 @@
 	    <li><p align="justify">
 	      <b>Matt Brown</b> implemented applications in
 	      StreamIt, including an FM software radio.
+	    </p>
+	    <li><p align="justify">
+            <b>Jasper Lin</b> worked on <i>Filter</i> optimizations as
+            well as the current partitioners and the Raw backend.  He
+            also helped to design the new dynamic language features.
 	    </p>
 	    <li><p align="justify">
 	      <b>Andrew Lamb</b> designed and implemented a suite of
