@@ -2,38 +2,38 @@
 
 <h3>ENCODER</h3>
 
-<p>For details on the MPEG2 format itself we suggest reading either the <a href="./related.shtml#13818">MPEG-2 video specification</a> or the <a href="http://en.wikipedia.org/wiki/MPEG-2">Wikipedia article</a> on the subject.</p>
+<p align=justify>For details on the MPEG2 format itself we suggest reading either the <a href="./related.shtml#13818">MPEG-2 video specification</a> or the <a href="http://en.wikipedia.org/wiki/MPEG-2">Wikipedia article</a> on the subject.</p>
 
-<p>Both the decoder and the encoder are represented by a stream graph showing the filters, splitters, and joiners, which operate on the data. Both are described with respect to their block diagrams which show the flow of data through the computation.</p>
+<p align=justify>Both the decoder and the encoder are represented by a stream graph showing the filters, splitters, and joiners, which operate on the data. Both are described with respect to their block diagrams which show the flow of data through the computation.</p>
 
 <div style="float: left; margin: 5px;">
-<a href="./images/encoder.jpg">High Resolution Encoder Stream Graph</a> (3.5 MB)<br>
+<a href="./images/encoder.jpg">High Resolution Encoder Stream Graph</a><!--(3.5 MB)--><br>
 <a href="./images/encoder.jpg"><img src="./images/encoder_thumbnail.jpg" alt="MPEG2 Encoder Stream Graph"></a>
 </div>
 
-<p>The MPEG encoder, as one would expect, is something like the reverse of the decoder pipeline
+<p align=justify>The MPEG encoder, as one would expect, is something like the reverse of the decoder pipeline
 However, because of the lossy compression, the encoder also must incorporate most of the decoder
 so that it knows exactly what the decoder sees at its output. This is neccesary so that the
 reference frames used for motion compensation are identical; otherwise lossy errors would accumulate
 between frames.</p>
 
-<p>The input to the encoder is a sequence of raw video frames. Initially the data is duplicated and split - one channel 
+<p align=justify>The input to the encoder is a sequence of raw video frames. Initially the data is duplicated and split - one channel 
 is passed to a filter which determines a picture type for the image, and the other channel downsamples the color channels
 based on the chrominance format. The resulting data is combined and a Picture Reorder filter rearranges the pictures so that
 each motion predicted image's reference frames have already been processed. </p>
 
-<p>The bulk of the picture data is then triplicated, with one copy of the data being sent to one of three motion estimation filters.
+<p align=justify>The bulk of the picture data is then triplicated, with one copy of the data being sent to one of three motion estimation filters.
 The first filter performs no motion estimation. The second and third filters each perform motion estimation
 with respect to a reference image. Each of the two motion estimators use a different reference image, one refering
 the preceeding key image, and the other referencing the second preceeding image. Thus, one provides forward estimation for
 P images and backward estimation for B images, and the other provides forward estimation for B images. The output of each of these
 filters is the vectors for the best motion estimate and the difference between the predicted value and the actual value of the macroblock.</p>
 
-<p>Each of these three data streams is joined and a filter immediately after the joiner takes care of deciding which of the
+<p align=justify>Each of these three data streams is joined and a filter immediately after the joiner takes care of deciding which of the
 estimations to choose, based on which provides the best compression. Additionally, this filter takes care of determining the bidirectionally
 predicted block values in the case where both the forward and backward predictions are used.</p>
 
-<p>Following this step, the motion vectors are encoded and the macroblock values coded in a process that reverses the decoder - the values
+<p align=justify>Following this step, the motion vectors are encoded and the macroblock values coded in a process that reverses the decoder - the values
 are transformed via a DCT, quantized, and zig zag ordered. The output of this step is then duplicated, with one copy going to the 
 bitstream variable length coder, and the other being inversely zig zag ordered, dequantized, and inversely transformed. This inverted
 copy is then sent upstream via a message to update the reference frames used by the motion estimation filters.</p>

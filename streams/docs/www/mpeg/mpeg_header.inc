@@ -8,12 +8,12 @@
     <td width="130" valign="top" align="left"><b>
       <hr>
       <nobr>
-        <h4 align="center">MPEG-2 in StreamIt</h4><hr>
-        <a href="./">Home</a><hr>
-        <a href="./downloads.shtml">Downloads</a><hr>
+        <h4 valign="center" align="left">MPEG-2</h4><hr>
+        <a href="./">Overview</a><hr>
         <a href="./features.shtml">Features</a><hr>
-        <a href="./decoder.shtml">Decoder</a><hr>
         <a href="./encoder.shtml">Encoder</a><hr>
+        <a href="./decoder.shtml">Decoder</a><hr>
+        <a href="./downloads.shtml">Download</a><hr>
         <a href="./api.shtml">StreamItDocs</a><hr>
         <a href="./related.shtml">Links</a><hr>
       </nobr>
