@@ -1,0 +1,7 @@
+AddType text/html .shtml
+AddHandler server-parsed .shtml
+
+#Options Indexes FollowSymLinks Includes
+#Options +Includes
+DirectoryIndex index.shtml
+# index.shtml 
