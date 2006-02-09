@@ -2,13 +2,13 @@
 
 <h3>DECODER</h3>
 
-<p align=justify>For details on the MPEG2 format itself we suggest reading either the <a href="./related.shtml#13818">MPEG-2 video specification</a> or the <a href="http://en.wikipedia.org/wiki/MPEG-2">Wikipedia article</a> on the subject.</p>
+<p align=justify>For details on the MPEG-2 format itself we suggest reading either the <a href="./related.shtml#13818">MPEG-2 video specification</a> or the <a href="http://en.wikipedia.org/wiki/MPEG-2">Wikipedia article</a> on the subject.</p>
 
 <p align=justify>Both the decoder and the encoder are represented by a stream graph showing the filters, splitters, and joiners, which operate on the data. Both are described with respect to their block diagrams which show the flow of data through the computation.</p>
 
 <div style="float: left; margin: 5px;">
 <a href="./images/decoder.jpg">High Resolution Decoder Stream Graph</a><!-- (3.3 MB)--><br>
-<a href="./images/decoder.jpg"><img src="./images/decoder_thumbnail.jpg" alt="MPEG2 Decoder Stream Graph"></a>
+<a href="./images/decoder.jpg"><img src="./images/decoder_thumbnail.jpg" alt="MPEG-2 Decoder Stream Graph"></a>
 </div>
 
 <p align=left>The MPEG decoder implementation, is a pipeline, with most of the work
