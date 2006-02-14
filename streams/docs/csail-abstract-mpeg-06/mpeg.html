@@ -1,0 +1,103 @@
+<html><head>
+<!-- Section: Architecture, Systems and Networks -->
+
+</head>
+
+<body><div align="center">
+<h3>Still Image and Motion Picture Compression Using Stream Programming</h3>
+   <h4>Matthew Drake, Rodric Rabbah & Saman Amarasinghe</h4>
+</div>
+
+<h5>Overview</h5>
+
+<p>Image and video codecs are prevalent in a wide range of computer systems and multimedia devices. It is not uncommon, however, that developers create and customize separate coder and decoder implementations for each of the architectures they target. This practice is time consuming and error prone, leading to code that is neither malleable nor portable. Because multimedia codecs exhibit both strong data locality and high degrees of data and pipeline parallelism, they should be good candidates for stream-based languages. Our research focusses on the features needed within a stream-based language and its compiler to provide both ease-of-implementation and high performance. 
+
+We are implementing an encoder and decoder for the MPEG-2[1] specification in the <a href="http://cag.csail.mit.edu/streamit/index.shtml">StreamIt</a> programming language[2]. StreamIt is an architecture-independent stream language that aims to improve programmer productivity within the streaming domain. StreamIt provides an intuitive programming model, allowing the programmer to build an application by connecting components together into a stream graph, where the nodes represent actors that carry out the computation, and edges represent FIFO communication channels between actors. As a result, the parallelism and communication topology of the application are exposed, empowering the compiler to perform many stream-aware optimizations[3,4] that ellude other languages. Detailed information about this project is available at the <a href="http://cag.csail.mit.edu/streamit/mpeg/">project's website</a> and in our <a href="http://cag.lcs.mit.edu/commit/papers/06/drake-ipdps06.pdf">paper</a>[5] to appear in IPDPS in April 2006.</p>
+
+<h5>MPEG Decoder</h5>
+
+<table>
+  <tr>
+    <td><a href="http://cag.csail.mit.edu/streamit/mpeg/images/decoder.jpg"><img src="./decoder_thumbnail.gif" alt="StreamIt Decoder Pipeline" align="center"></a>
+        <p align="center"><b>Figure 1: StreamIt Decoder Pipeline</b></p></td>
+    <td>
+<p>The decoder implementation was carried out by one student programmer with no prior understanding of MPEG. The development spanned eight weeks from specification to the first fully functional MPEG decoder. The StreamIt code is nearly 3,165 lines of code, and is an intuitive translation of the block level MPEG-2 specification. The MPEG decoder implementation, is a pipeline, with most of the work contained within three subsections. It accepts a compressed bitstream as input, and produces the decoded video as output. The first subsection is a filter responsible for parsing the MPEG-2 bitstream and performing the variable-length decoding. This process results in quantized, frequency-domain data, and motion estimation vectors. The second subsection is a splitjoin which handles spatial decoding and uncompression af the image data and motion vectors. The third section is responsible for temporal uncompression, using motion estimation and frame error data to recover a series of related pictures. In addition to these three decoder subsections, two additional filters handle reordering the decoded pictures temporally and transforming them into the RGB color space.</p>
+
+<p>The decoder uses messaging to send metadata associated with macroblocks from the parser to downstream filters. For instance, the parser generates a message whenever the picture or macroblock type changes. The motion compensation filter uses this information to determine how to process the blocks and determine whether it needs to store them for future reference. The picture reordering step uses the picture type to determine the correct temporal order, and the math behind the inverse quantization depends on the encoding type of the macroblock. Because the macroblock type and picture type information changes infrequently and irregularly compared to the regular flow of data, messaging is an intuitive mechanism for propogating these updates.</p>
+
+<p>While each of the described components decomposes into its own subgraph, this high level description is enough to show the advantages of a stream based implementation. For instance, the pipeline parallelism is exposed for both the steps involved in block decoding and the chrominance color channel processing. The splitjoin in the lower part of the graph explicitly exposes the data parallelism present because the color channels can be decoded independently.</p>
+
+<p>
+Current efforts on the decoder are focused on improving performance. somethingaboutcompiledstuffhere TODO. We're working on alternate formulations of the stream graph and additional language features which expose additional parallelism to the compiler.
+</p>
+    </td>
+  </tr>
+</table>
+    
+<h5>MPEG Encoder</h5>
+
+<table>
+  <tr>
+    <td><a href="http://cag.csail.mit.edu/streamit/mpeg/images/encoder.jpg"><img src="./encoder_thumbnail.gif" alt="StreamIt Decoder Pipeline" align="center"></a>
+        <p align="center"><b>Figure 2: StreamIt Encoder Pipeline</b></p></td>
+    <td>
+<p>
+The recently completed encoder, as one would expect, is something like the reverse of the decoder pipeline. The input to the encoder is a sequence of raw video frames. A picture type, for the purposes of motion estimation, is assigned to each picture, and the chrominance color information is downsampled.
+<p>
+
+<p>
+The bulk of the picture data is then triplicated, with one copy of the data being sent to one of three motion estimation filters. The first filter performs no motion estimation. The second and third filters each perform motion estimation with respect to a reference image. Each of the two motion estimators use a different reference image, one refering the preceeding key image, and the other referencing the second preceeding image. Thus, one provides forward estimation and one backward estimation. The output of each of these filters is the vectors for the best motion estimate and the difference between the predicted value and the actual value of the macroblock.
+</p>
+
+<p>
+Each of these three data streams is joined and a decision made regarding which of the estimations to choose, based on which provides the best compression. Additionally, this filter takes care of determining the bidirectionally predicted block values in the case where both the forward and backward predictions are used.
+</p>
+
+<p>
+Following this step, the spatial encoding takes place, which consists of a discrete cosine transformation, a quantization step, and a reordering. The output of this step is then duplicated, with one copy going to the bitstream variable length coder, and the other receiving an inverse spatial compression. This inverted copy is then sent upstream via a message to update the reference frames used by the motion estimation filters.
+</p>
+
+<p>The encoder, recently completed, presents an even greater challenge for compilation. The encoder, which produces a valid MPEG-2 stream, is a much larger stream graph. This is due in part to the fact that it contains most of the decoder as a subcomponent, since it needs to understand what the decoded picture will look like for the purposes of motion estimation.
+</p>
+
+<p>
+It also makes use of upstream messaging to send reference pictures from the decoded output back to the motion compensation stage near the beginning of the pipeline. Additionally, it requirse the use of programmable splitters and joiners, a feature currently being looked at. While it works correctly without this feature, a large amount of unnecessary computation must be performed. 
+</p>
+    </td>
+  </tr>
+</table>
+
+<h5>Research Support:</h5>
+
+This project is funded by TODO FILLIN.
+
+<h5>References:</h5>
+
+<p>[1]ISO/IEC 13818:1994: Information technology --- Coding of moving pictures
+and associated audio for digital storage media at up to about 1.5 Mbit/s</p>
+
+<p>[2] William Thies, Michal Karczmarek, and Saman Amarasinghe.
+StreamIt: A Language for Streaming Applications.  In <em>Proceedings
+of the 2002 International Conference on Compiler Construction</em>.
+Grenoble, France, April, 2002.</p>
+
+<p>[3] Andrew A. Lamb, William Thies, and Saman Amarasinghe.  Linear
+Analysis and Optimization of Stream Programs.  In <em>Proceedings of
+the SIGPLAN '03 Conference on Programming Language Design and
+Implementation</em>,  San Diego, California, June, 2003.</p>
+
+<p>[4]Janis Sermulins, William Thies, Rodric Rabbah, and Saman
+Amarasinghe.  Cache Aware Optimization of Stream Programs.  In
+<em>Proceedings of the 2005 Conference on Languages, Compilers, and
+Tools for Embedded Systems</em>, Chicago, Illinois, June 2005.</p>
+
+<p>[5]Matthew Drake, Henry Hoffman, Rodric Rabbah, and Saman Amarasinghe.
+MPEG-2 Decoding in a Stream Programming Language. In 20th IEEE 
+International Parallel & Distributed Processing Symposium, Rhodes Island,
+Greece, April, 2006.</p>
+ 
+</body></html>
+
+
+
+
