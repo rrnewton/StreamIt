@@ -48,18 +48,18 @@ detailed discussion of the feedbackloop. From now on, we use the word
 {\it stream} to refer to any instance of a filter, pipeline,
 splitjoin, or feedbackloop.
 
-\subsection{Linear Filters}
-One far-reaching goal of the StreamIt project is to incorporate the
-knowledge of expert DSP programmers into the compiler.  Toward that
-end, the StreamIt compiler can recognize sections of the stream graph
-that adhere to a certain model, apply targeted transformations and
-optimizations, and generate specialized code for these sections.
-Currently the StreamIt compiler can recognize {\it linear} sections of
-a stream graph. We call a filter linear if its outputs can be
-expressed as an affine combination of its inputs.  Many ubiquitous DSP
-kernels are linear, including FIR filters, expanders, compressors,
-DFTs and DCTs.  In \cite{streamit-linear} a completely automated
-framework for extracting, combining, and transforming linear filters
-in the StreamIt compiler is presented.  In the current paper, linear
-components of the stream graph are targeted for specialized code
-generation (see Section \ref{sec:linear}).
+%\subsection{Linear Filters}
+%One far-reaching goal of the StreamIt project is to incorporate the
+%knowledge of expert DSP programmers into the compiler.  Toward that
+%end, the StreamIt compiler can recognize sections of the stream graph
+%that adhere to a certain model, apply targeted transformations and
+%optimizations, and generate specialized code for these sections.
+%Currently the StreamIt compiler can recognize {\it linear} sections of
+%a stream graph. We call a filter linear if its outputs can be
+%expressed as an affine combination of its inputs.  Many ubiquitous DSP
+%kernels are linear, including FIR filters, expanders, compressors,
+%DFTs and DCTs.  In \cite{streamit-linear} a completely automated
+%framework for extracting, combining, and transforming linear filters
+%in the StreamIt compiler is presented.  In the current paper, linear
+%components of the stream graph are targeted for specialized code
+%generation (see Section \ref{sec:linear}).
