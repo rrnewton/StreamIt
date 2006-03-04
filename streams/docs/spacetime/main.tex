@@ -1,0 +1,69 @@
+%\documentclass[11pt, letterpaper, onecolumn]{article}
+\documentclass{sig-alternate}
+
+\usepackage{amsmath}
+\usepackage{times}
+\usepackage{fullpage}
+\usepackage{epsfig}
+\usepackage{subfigure}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+
+
+\title{Scheduling Stream Programs \\ Using Hybrid Space-Time Multiplexing}
+
+%\author{Michael Gordon, Jasper Lin, William Thies, and Saman Amarasinghe\\ \\
+%  MIT Computer Science and Artificial Intelligence Laboratory\\
+%  Cambridge, MA  02139\\ \\
+%  \sffamily{\{mgordon, jasperln, thies, saman\}@cag.csail.mit.edu}}
+
+% don't include the date
+%\date{}
+
+% this is the line spacing
+%\setstretch{1.25}
+
+% \sloppy lets Latex be a little less anal about interword spacing.  It is
+% one way to eliminate those annoying Overfull hbox warnings.
+% Another way is to surround each offending paragraph with
+% \begin{sloppypar} ... \end{sloppypar}
+
+%\sloppy
+
+% See page 90 of the Latex book for info about vertical spacing probs.
+
+\begin{document}
+
+  \newcommand{\mt}[1]{\mbox{\it #1}}
+  \newcommand{\todo}[1]{\framebox{#1}}
+
+  %\toappear{\centerline{\Large\bf MIT LCS Technical Memo,}
+  %          \centerline{\Large\bf MIT-LCS-TM-6XX,}
+  %          \centerline{\Large\bf November, 2001.}}
+
+\date{}  
+\maketitle
+\begin{abstract}
+\input{abstract}
+\end{abstract}
+
+\input{intro}  
+\input{streamit}	
+\input{raw}
+\input{example}
+\input{layout}
+\input{Synchremoval}
+\input{implementation}
+\input{trace}
+%\input{linear}
+\input{init}
+\input{codegen}
+\input{results}
+\input{related}
+\input{conclusion}
+
+{\bibliographystyle{abbrv}
+\bibliography{references}
+}
+    
+\end{document}
