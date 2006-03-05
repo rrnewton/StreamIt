@@ -49,6 +49,12 @@ trace $t_1$ and the first filter of trace $t_2$. This graph describes
 the flow of data between traces and is used by subsequent passes.
 
 \section{Trace Scheduling}
+Some software pipelining terminology, should use the terminology
+throughout. 
+Span:  The number of iterations executed in the software pipelined
+loop.
+
+
 \label{sec:scheduling}
 In the trace scheduling pass of the compiler, we calculate a relative
 execution ordering of the traces and assign each filter of each trace
