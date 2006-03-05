@@ -96,18 +96,18 @@ extends these loop-level techniques---in particular, software
 pipelining---to a coarse level of granularity that encompasses
 multiple program modules at a time.
 
-Inter-slice communication leverages abundant off-chip DRAM resources.
+Inter-slice communication leverages capacious off-chip DRAM resources.
 This enables us to aggressively buffer data between slices, amortizing
 the cost of slice pipeline startup and providing scheduling
 flexibility. The space-time execution model uses rotating buffers to
-buffer data between slices to remove dependences between slices and to
-allow slices of different iterations of the stream graph to execute
-concurrently.  These rotating buffers are akin to a rotating register
-file found in some superscalar and VLIW architectures and are
-distributed amongst the off-chip dram banks. Furthermore, the
-inter-slice off-chip memory accesses are highly regular (unit-stride
-bulk transfers) that can utilize batch processing modes of modern
-DRAMs. \todo{Anything else here}?
+buffer data between slices allowing the compiler remove dependences
+between slices and allowing slices of different iterations of the
+stream graph to execute concurrently.  These rotating buffers are akin
+to a rotating register file found in some superscalar and VLIW
+architectures and are distributed amongst the off-chip dram
+banks. Furthermore, the inter-slice off-chip memory accesses are
+highly regular (unit-stride bulk transfers) that can utilize batch
+processing modes of modern DRAMs. \todo{Anything else here}?
 
 Using the on-chip interconnect of a communication-exposed architecture
 to communicate data between processing units is more efficient than
