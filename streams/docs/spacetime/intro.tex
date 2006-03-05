@@ -36,7 +36,7 @@ containing multiple instruction streams and distributed memory banks.
 \begin{figure*}[th]
   \centering
   \vspace{-18pt}
-  \psfig{figure=space-vs-time.eps,width=5.5in}
+  \psfig{figure=space-vs-time.eps,width=4.5in}
   \vspace{-12pt}
   \caption{Techniques for scheduling stream programs. \protect\label{fig:spacevstime}}
   \vspace{-6pt}
@@ -75,9 +75,6 @@ multiplexing affords the flexible load balancing of time multiplexing,
 while preserving the locality and latency benefits of space
 multiplexing.
 
-Scales well with communicate exposed architectures (space multiplexing
-within a trace leverages the on-chip interconnect).
-
 In this paper, we describe and evaluate our SpaceTime Compiler, a
 fully-automatic implementation of space-time multiplexing.  Our source
 language is StreamIt~\cite{streamitcc}, a high-level stream
@@ -88,12 +85,16 @@ fine-grained, programmable communication between processors.
 
 Our implementation of space-time multiplexing treats each group of
 space-multiplexed filters, which we refer to as a {\it slice}, as an
-atomic unit for scheduling.  Due to the implicit outer loop of an
-infinite stream graph (or subgraph), slices can be scheduled using
-techniques traditionally limited to individual instructions in a given
-loop nest.  Our approach extends these loop-level techniques---in
-particular, software pipelining---to a coarse level of granularity
-that encompasses multiple program modules at a time.  
+atomic unit for scheduling. Our compiler first extracts slices from
+the stream graph by aggregating contiguous filters into a slice. We
+attempt to extract slices from the stream graph that are internally
+load-balanced. Next, we schedule the slices in both space and time.
+Due to the implicit outer loop of an infinite stream graph (or
+subgraph), slices can be scheduled using techniques traditionally
+limited to individual instructions in a given loop nest.  Our approach
+extends these loop-level techniques---in particular, software
+pipelining---to a coarse level of granularity that encompasses
+multiple program modules at a time.
 
 Inter-slice communication leverages abundant off-chip DRAM resources.
 This enables us to aggressively buffer data between slices, amortizing
@@ -108,11 +109,17 @@ inter-slice off-chip memory accesses are highly regular (unit-stride
 bulk transfers) that can utilize batch processing modes of modern
 DRAMs. \todo{Anything else here}?
 
-We use the on-chip interconnect of the target architecture for
-intra-slice communication, for space multiplexing each slice.  
-
-
-
+Using the on-chip interconnect of a communication-exposed architecture
+to communicate data between processing units is more efficient than
+communicating through off-chip DRAM. Furthermore, as these
+architectures mature (and the memory wall remains), the difference
+will become more drastic.  Thus, we use the on-chip interconnect of
+the target architecture for intra-slice communication, for
+space-multiplexing each slice.  Also, the on-chip interconnect is
+harnessed to implement the distribution and merging of data streams
+inherent in streaming languages. Abundant utilization of the on-chip
+interconnect is essential to scalability of a parallel execution
+model for communication-exposed architectures.
 
 %Also, since each trace is independent, a specific code generation
 %strategy can be applied depending on the properties of the trace.  In
