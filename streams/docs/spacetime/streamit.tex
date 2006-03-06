@@ -44,9 +44,10 @@ analogous to a roundrobin splitter.
 
 The last control construct provides a way to create cycles in the
 stream graph: the feedbackloop.  Due to space constraints, we omit a
-detailed discussion of the feedbackloop. From now on, we use the word
-{\it stream} to refer to any instance of a filter, pipeline,
-splitjoin, or feedbackloop.
+detailed discussion of the feedbackloop. In practice, feedbackloops
+are rare and currently the Space-Time Compiler does not support
+them. From now on, we use the word {\it stream} to refer to any
+instance of a filter, pipeline, splitjoin, or feedbackloop.
 
 %\subsection{Linear Filters}
 %One far-reaching goal of the StreamIt project is to incorporate the
