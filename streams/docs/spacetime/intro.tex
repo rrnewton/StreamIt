@@ -89,7 +89,7 @@ atomic unit for scheduling. Our compiler first extracts slices from
 the stream graph by aggregating contiguous filters into a slice. We
 attempt to extract slices from the stream graph that are internally
 load-balanced. Next, we schedule the slices in both space and time.
-Due to the implicit outer loop of an infinite stream graph (or
+Due to the implicit outer loop of a stream graph (or
 subgraph), slices can be scheduled using techniques traditionally
 limited to individual instructions in a given loop nest.  Our approach
 extends these loop-level techniques---in particular, software
@@ -113,39 +113,45 @@ Using the on-chip interconnect of a communication-exposed architecture
 to communicate data between processing units is more efficient than
 communicating through off-chip DRAM. Furthermore, as these
 architectures mature (and the memory wall remains), the difference
-will become more drastic.  Thus, we use the on-chip interconnect of
+will become more pronounced.  Thus, we use the on-chip interconnect of
 the target architecture for intra-slice communication, for
 space-multiplexing each slice.  Also, the on-chip interconnect is
 harnessed to implement the distribution and merging of data streams
 inherent in streaming languages. Abundant utilization of the on-chip
-interconnect is essential to scalability of a parallel execution
+interconnect is essential to the scalability of a parallel execution
 model for communication-exposed architectures.
 
-%Also, since each trace is independent, a specific code generation
-%strategy can be applied depending on the properties of the trace.  In
-%this paper, we recognize traces that compute a {\it linear} function
-%of their input.  Using the coefficients and I/O rates of the linear
-%trace (extracted automatically from the code), we generate template
-%assembly code based on a hand-optimized systolic algorithm.  By
-%decoupling memory accesses from computation and carefully utilizing
-%the register-mapped communication network on Raw, this code achieves
-%near-optimal performance for linear functions.
-
-Somewhat restricted model of spacetime execution, but still good
-result.  Right?
+In its tradition setting, software pipelining \cite{lam-softpipe,
+rau-softpipe} is a scheduling technique which hides latency and
+maximizes resource utilization by building a loop with instructions
+from multiple iterations of the original loop.  In our context, the
+software pipeliner is scheduling whole slices for execution on
+multiple raw tiles. Our slice scheduling phase employs novel
+techniques to arrive at the software pipelined schedule, these
+techniques are enabled by the regular and structured slice graphs that
+we are scheduling. Unlike traditional software pipelining algorithms,
+we use simulated annealing to solve a 3-dimensional bin-packing
+problem with irregular shaped objects.  These objects represent the
+slices of the graph and the bins represent the ccmputational nodes of the
+target architecture.  The solution to the 3D bin-packing gives us both
+the slice scheduling order and the resource mapping for the filters of
+each slice.
 
 In summary, this paper makes the following contributions:
 
 \begin{itemize}
-\item A procedure for eliminating synchronization from a hierarchical
-stream graph, yielding a flat graph that directly exposes
-communication patterns.
-\item An algorithm for extracting load-balanced traces from a flat
+%\item A procedure for eliminating synchronization from a hierarchical
+%stream graph, yielding a flat graph that directly exposes
+%communication patterns.
+\item A description of the space-time multiplexing parallel execution
+model.
+\item A high-level intermediate representation for representing
+space-time multiplexing in the context of a stream compiler.  
+\item An algorithm for extracting load-balanced slices from a flat
 stream graph.
-\item An optimized code generation strategy for traces that compute a
-linear function.
-\item A modified software pipelining algorithm for scheduling traces,
-respecting layout and occupancy constraints on a tiled architecture.
+\item A translation of the 3D bin-packing problem to our
+software-pipelined slice scheduling problem where simulated annealing
+is used to arrive at a solution.
 \item An evaluation of space-time multiplexing in the StreamIt-to-Raw
 compiler, demonstrating an average improvement of \todo{??} over a
 space multiplexing approach.
@@ -191,3 +197,12 @@ Section \ref{sec:related} reviews related work and Section
 %% monograph include:
 
 
+%Also, since each trace is independent, a specific code generation
+%strategy can be applied depending on the properties of the trace.  In
+%this paper, we recognize traces that compute a {\it linear} function
+%of their input.  Using the coefficients and I/O rates of the linear
+%trace (extracted automatically from the code), we generate template
+%assembly code based on a hand-optimized systolic algorithm.  By
+%decoupling memory accesses from computation and carefully utilizing
+%the register-mapped communication network on Raw, this code achieves
+%near-optimal performance for linear functions.

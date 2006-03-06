@@ -19,7 +19,7 @@ adding filters to the trace, we must introduce a trace boundary if the
 size of the trace is equal to the number of tiles in the Raw
 configuration.
 
-%%what about linear filters, are they restricted to being pipelines???
+%%what abox_ut linear filters, are they restricted to being pipelines???
 
 Additionally, we try to coax the generation of load-balanced traces.
 For each filter, we calculate a static work estimation of the filter
@@ -51,9 +51,34 @@ the flow of data between traces and is used by subsequent passes.
 \section{Trace Scheduling}
 Some software pipelining terminology, should use the terminology
 throughout. 
+
+hide latency between coarser instructions! not individual
+instructions...
+
+
+
 Span:  The number of iterations executed in the software pipelined
 loop.
+intro to software pipelining with one paragraph high-level overview...
+graph is structured and regular with no loop carried dependencies...
+easier to generate a valid schedule...
 
+we generate our own registers, no register pressure...
+
+still want to hide dram latency always want to software pipeline...
+
+modulo schedule not modulo scheduler!
+don't worry about rotating register pressure...
+don't need an algorithm that backtracks? can always make forward
+progress...
+
+why not software pipeline within a slice?  
+	we get the pipeline parallelism anyway
+	why?
+	get the overlap by increasing the scheduling multiplicity 
+	of the slice pipeline 
+	each has its own tile (its own issue slot).
+	
 
 \label{sec:scheduling}
 In the trace scheduling pass of the compiler, we calculate a relative
