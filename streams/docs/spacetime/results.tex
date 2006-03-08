@@ -9,6 +9,13 @@ in Figure \ref{fig:benchmarks}.  The performance results for running
 each application on the Raw architecture is shown in Table
 \ref{tab:results}.
 
+The results of this paper were generated using btl, a cycle-accurate
+simulator that models arrays of Raw tiles identical to those in the
+.15 micron 16-tile Raw prototype ASIC chip.  With a target clock rate
+of 450 MHz, the tile employs as compute processor an 8-stage, single
+issue, in-order MIPS-style pipeline that has a 32 KB data cache, 32 KB
+of instruction memory, and 64 KB of static router memory.
+
 
 TODO
 get tables with static numbers
@@ -18,6 +25,7 @@ get tables with static numbers
 	max slice size
 
 get performance numbers for space
+	space is unoptimized, un-unrolled, note this.
 
 get performance numbers for spacetime 
 	size filter slices
