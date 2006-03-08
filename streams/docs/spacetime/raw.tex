@@ -55,12 +55,9 @@ a number of simple streaming memory requests.  The chipset receives
 request messages over the general dynamic network for bulk transfers
 to and from the DRAMs.  The transfers themselves can use either the
 static network or the general dynamic network (the desired network is
-encoded in the request).  Simple interleaving and striding is
-supported by the chipset, but is unused by the Spacetime Compiler,
-since all DRAM accesses are to or from a contiguous chuck of memory
-with unit stride. The chipsets also have a simple demultiplexing
-mechanism that allows multiple devices (such as external input and
-output streams) to share a single port.
+encoded in the request).  The chipsets also have a simple
+demultiplexing mechanism that allows multiple devices (such as
+external input and output streams) to share a single port.
 
 The results of this paper were generated using btl, a cycle-accurate
 simulator that models arrays of Raw tiles identical to those in the

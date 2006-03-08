@@ -55,7 +55,7 @@ flattened stream graph; note that some splitters have been
 coalesced. For the remainder of this paper the terms splitter and
 joiner refer to our more powerful splitting and joining nodes and the
 term stream graph refers to the flattened graph composed of these
-nodes and filters.  At this point we are ready to extract the traces
+nodes and filters.  At this point we are ready to extract the slices
 from the graph and schedule them for execution.
 
 %\begin{figure}
@@ -89,9 +89,9 @@ In Figure \ref{fig:fm-ex}c, we give a possible slice graph for the
 12-way FMRadio application.  The blue boxes represent individual
 slices.
 
-These restrictions are not fundamental to the hybrid space-time
-multiplexing execution model; they simplify the compiler.  In future
-work, we plan to relax some of the restrictions.
+These restrictions are not fundamental to space-time multiplexing
+execution model; they simplify the compiler.  In future work, we plan
+to relax some of the restrictions.
 
 In Section \ref{sec:extract} we describe our algorithm for extracting
 slices from a stream graph.
@@ -104,8 +104,6 @@ slices from a stream graph.
 \protect\label{fig:slice}}
 \end{figure}
 
-\section{The Raw Architecture}
-\label{sec:raw}
 After we compose a graph of slices from the stream graph, we are ready
 to schedule the slices in both space and time onto the parallel
 target.  In this section we will describe our current slice execution
@@ -155,13 +153,13 @@ filter that composes the slice fires the number of times stipulated by
 its SAS multiplicity.  A slice cannot be interrupted once it begins
 its execution (irrespective of hardware interrupts); it is atomic.
 
-To achieve its goal, the compiler fully software pipelines the {\it
-entire} stream graph at the slice level. By this we mean that during
-execution of the steady-state, two slices that have a dependence chain
-between them in the slice graph are executing at different iterations
-of the original steady-state loop.  We do this to remove all of the
-dependences between slices of the new steady-state.  The can now
-execute out-of-order within the steady-state, and they do not directly
+To achieve its goal, the compiler software pipelines the {\it entire}
+stream graph at the slice level. By this we mean that during execution
+of the steady-state, two slices that have a dependence chain between
+them in the slice graph are executing at different iterations of the
+original steady-state loop.  We introduce enough buffering between the
+slices to support this pipelined model. The slices can now execute
+out-of-order within the steady-state, and they do not directly
 communicate.  Note that {\it filters} within a slice are all of the
 same iteration executing in a normal pipeline fashion.
 
@@ -196,16 +194,17 @@ parallel resources.  We generate a prologue schedule that will
 guarantee that each slice is ready to execute.  In software pipelining
 terminology, the iteration interval is 1.  This is essential because,
 unlike machine instructions, there exists complicated
-data-organization between slices.  Therefore, we need to remove all
-dependences between slices of the steady-state.  We rely on a {\it
-data-reorganization phase}that executes before each steady-state to
-perform the data-reorganization described by each joiner and splitter
-of the slice graph.  {\it Before} we execute a steady-state schedule,
-all joining for the entire slice graph is executed using the buffers
-in off-chip DRAMs as the sources and destinations, and using the
-interconnect of the target to perform the data-reorganization
-stipulated by each joiner.  {\it After} each steady-state completes we
-perform the analog for splitters.
+data-organization between slices. Therefore, we delay communication
+and data-reorganization between slices until it can be more
+efficiently executed.  We rely on a {\it data-reorganization
+phase}that executes before each steady-state to perform the
+data-reorganization described by each joiner and splitter of the slice
+graph.  {\it Before} we execute a steady-state schedule, all joining
+for the entire slice graph is executed using the buffers in off-chip
+DRAMs as the sources and destinations, and using the interconnect of
+the target to perform the data-reorganization stipulated by each
+joiner.  {\it After} each steady-state completes we perform the analog
+for splitters.
 
 When the steady-state is repeated, the splitting and joining phases
 happen in sequence.  First, we perform all the splitting of the graph
@@ -228,16 +227,17 @@ the steady-state.
 
 \subsection{Scheduling the Software Pipeline}
 We have chosen to reduce our steady-state slice scheduling problem to
-a 3D bin packing problem \cite{binpacking} with irregularly shaped
-objects.  In the translation, each slice is represented by a
-3-dimensional object.  The x,y area occupied by an object correspond
-to the number of computational nodes occupied by the associated
-slice. The z dimension is time.  The bins are the computational nodes
-themselves.  We want to minimize the height (in the z dimension) of
-the packing.  By doing this, we will minimize the critical path
-schedule length.  We use simulated annealing to arrive at an optimized
-solution to the packing.  The translation and the solution is
-discussed in detail in section \ref{sec:scheduling}. Figure
+a 3D bin packing problem \cite{binpacking} with transformable,
+irregularly shaped objects.  In the translation, each slice is
+represented by a 3-dimensional object.  The x,y area occupied by an
+object correspond to the number of computational nodes occupied by the
+associated slice. The z dimension is time.  The bins are the
+computational nodes themselves.  We want to minimize the height (in
+the z dimension) of the packing.  By doing this, we will minimize the
+critical path schedule length.  We use simulated annealing to arrive
+at an optimized solution to the packing.  The translation and the
+solution is discussed in detail in section
+\ref{sec:scheduling}. Figure
 \ref{fig:fm-ex}d presents a fictitious 3d conceptualization for
 our scheduling solution.  The figure does not correspond to the
 steady-state of FMRadio, but it does help one to conceptualize the

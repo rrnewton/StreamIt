@@ -1,93 +1,18 @@
 \section{Space-Time Scheduling}
 \label{sec:scheduling}
-\subsection{Steady-State Schedule}
+The goal of the scheduling phase of the SpaceTime Compiler is to
+create an efficient steady-state schedule of slice execution.  The
+scheduler operates in both the space dimension, assigning filters to
+the multiple computational nodes of the target, and the time
+dimension, ordering filter executions on the nodes.  This phase calculates
+three separate schedules.
 
-\begin{figure}
-\centering
-\psfig{figure=scheduling_2d.eps,width=3in}
-\caption{The bin-packing, slice scheduling problem in two dimensions.
-\protect\label{fig:2d}}
-\end{figure}
-
-what we get at this stage
-
-3d bin packing translation
-
-What the pieces look like 
-
-saman's figures...
-
-We arrive at a solution to the 3d bin packing by using simulated
-annealing \cite{simanneal}, a type of iterative improvement.  A
-detailed explanation of simulated annealing is beyond the scope of
-this paper.  Simulated annealing is a form of stochastic
-hill-climbing. Unlike most other methods for cost function
-minimization, simulated annealing is suitable for problems where there
-are many local minima.  Simulated annealing achieves its success by
-allowing the system to go uphill with some probability as it searches
-for the global minima.  As the simulation proceeds, the probability of
-climbing uphill decreases.
-
-talk about inter-trace-buffer assignment!
-
-Calculate a total ordering of slices...
-
-initial schedule is random
-
-don't need to map the splitters and joiners, done by the static network.
-
-mapping of tiles to drams.
-
-How the solution creates the schedule...
-
-\subsection{Cost Function}
-The cost function for the simulated annealing solution to our 3D bin
-packing problem attempts to incorporate three different aspects of the
-scheduling problem.  First that the critical path of the schedule is
-determined by the node(s) with the maximum work.  We do not generate a
-true modulo schedule because all nodes must wait for the bottleneck
-node to complete to perform the data-reorganization.  Next, we assume
-that the work estimation performed by our compiler is inaccurate, so
-we bias the estimate to reflect this observation.  Finally, we take
-into account the communication cost of the data-reorganization phase.
-
-As mentioned above, we would like to account for the intra-slice
-pipeline startup and wind-down shape of the slices.  We would like the
-slices of the final schedule to be placed like a Tetris-master would
-align the falling pieces he or she encounters.  Toward this goal, our
-node work estimation component of the cost function models these
-properties.  Given an assignment of filters of the slices to nodes,
-we arrive at the cost estimation for each tile using Algorithm
-\ref{alg:tilework}. 
-
-\begin{algorithm}
-\caption{nodeWorkEst} \label{alg:tilework} {\tt
-nodeWorkEst(}$T${\tt ,}$M${\tt )}. Given a the slice ordering $T$, and
-$M$, a map of filters to computation nodes, return $C$, a map of nodes
-to integers that represents the work of the node given the assignment $M$.
-\begin{algorithmic}
-\FORALL {$t \in T$}
-\STATE Determined the  of 
-\IF {$u$ scheduled before $t$ in $S$}
-\STATE $u.prologue = t.prologue$
-\ELSE
-\STATE $u.prologue = t.prologue + 1$ 
-\ENDIF 
-\STATE {\tt incrementUpStream(}$u${\tt ,}$S${\tt )}
-\ENDFOR
-\end{algorithmic}
-\end{algorithm}
-
-
-link contention in the cost function
-what it does!
-
-\subsection{Prologue Schedule}
-The prologue schedule guarantees that when the steady-state commences,
-all the slices are ready to fire irrespective of their data-flow
-dependencies.  To create this schedule we iteratively execute slices,
-at each iteration we fire all the slices that can fire.  Stop the
-schedule when all slices are ready to fire.
+Recall that the data-reorganization described by splitters and joiners
+of the graph is implemented by the on-chip network, thus we do not map
+these nodes to computational nodes.  Each filter lives on exactly one
+computational node.  The two initialization schedules described below
+use the assignment of filters to computational nodes calculated by the
+steady-state scheduler.
 
 \subsection{Peek Initialization Schedule}
 Before both the prologue schedule is executed and the steady-state
@@ -99,5 +24,127 @@ and the buffers are not rotated.  Therefore, the prologue schedule
 starts with the rotating buffers untouched.  See
 \cite{streamitcc} for a more complete discussion of the peek
 initialization schedule.
+
+\subsection{Prologue Schedule}
+The prologue schedule guarantees that when the steady-state commences,
+all the slices are ready to fire irrespective of their data-flow
+dependencies.  To create this schedule we iteratively execute slices,
+at each iteration we fire all the slices that can fire.  Stop the
+schedule when all slices are ready to fire.
+
+\subsection{Steady-State Schedule}
+
+\begin{figure}
+\centering
+\psfig{figure=scheduling_2d.eps,width=3in}
+\caption{The bin-packing, slice scheduling problem in two dimensions.
+\protect\label{fig:2d}}
+\end{figure}
+Now we are ready to calculate the software-pipelined schedule for the
+steady-state of the slice graph.  At this point the prologue schedule
+will guarantee that there are no dependencies between slices during
+the execution of a steady-state; we are fully software-pipelined. The
+steady-state scheduler is free to execute slices in any order.
+
+Initially, we tried a list scheduling algorithm that greedily
+scheduled slices in order of descending work load. Unfortunately, it
+could not take advantage of the flexibility of the scheduling problem.
+The resulting schedules performed over 2x worse than hand-optimized
+schedules for a small subset of our benchmarks. We would like to use
+an optimization method that would not be stuck traversing down a
+single solution path.
+
+Our current implementation maps our scheduling problem to a
+3-dimensional bin packing problem with transformable, irregularly
+shaped objects.  Each object represents a slice and each bin
+represents a computational node of the target.  The objects are shaped
+like 3D stairs, accounting for intra-slice pipeline effects. The
+object can change shape by hinging at a stair.  This corresponds to
+different node assignments of the slice.  In Figure
+\ref{fig:2d} we present a 2D illustration of the mapping.  Limiting
+the problem to two dimensions considers only architectural
+configurations with single dimension of computational nodes.
+
+We arrive at a solution to the 3d bin packing by using simulated
+annealing \cite{simanneal}, a type of iterative improvement.  A
+detailed explanation of simulated annealing is beyond the scope of
+this paper.  Simulated annealing is a form of stochastic
+hill-climbing. Unlike most other methods for cost function
+minimization, simulated annealing is suitable for problems where there
+are many local minima.  Simulated annealing achieves its success by
+allowing the system to go uphill with some probability as it searches
+for the global minima.  As the simulation proceeds, the probability of
+climbing uphill decreases.  Simulated annealing is an accepted method
+for solving a simple 3d bin packing problem \cite{binpacking}. 
+
+To arrive at a complete SpaceTime schedule, we first create a total
+ordering of slices, where a slice that does more work per steady-state
+is greater than a slice that does less work.  After we arrive at an
+assignment of filters to a computational nodes, we order the filter
+executions within a computational node by the total ordering,
+executing the filters in descending order.
+
+The running time of the simulated annealing solution is usually under
+2 minutes for our benchmarks.  For the same subset of benchmarks used
+to test the list scheduler, the annealed steady-state schedule matched
+a hand-optimized schedule in terms of throughput of the steady-state
+on Raw.  In the next two sections we will provide more details about
+the annealing process.
+
+\subsubsection{Perturbation Function and Initial Configuration}
+The simulated annealing algorithm iteratively perturbs the
+configuration during its search.  We perturb the configuration by
+randomly choosing a slice, and randomly assigning the filters of the
+slice to a computational nodes.  To continue with the analogy, each
+perturbation can be thought of as picking a random object, possibly
+remolding it into a new shape, and inserting back into the bins. Each
+intermediate configuration is legal; it respects the constraints on
+slices outlined in the previous sections.  After the slice is
+re-assigned, we assign the buffers between slices to off-chip dram
+banks, using greedy heuristics to position them to minimize
+communication latency.
+
+The calculation of an initial schedule is random.  We randomly assign
+the filters of each slice to computational nodes and run the
+buffer-to-DRAM allocation pass.  
+
+\subsubsection{Cost Function}
+The cost function for the simulated annealing solution to our 3D bin
+packing problem attempts to incorporate two aspects of the
+scheduling problem.  First the critical path of the schedule is
+determined by the node(s) with the maximum work.  We do not generate a
+true modulo schedule because all nodes must wait for the bottleneck
+node to complete to perform the data-reorganization phase Next, we
+assume that the work estimation performed by our compiler is
+inaccurate, so we bias the estimate to reflect this observation.
+
+For the current configuration $C$, we determine the work assigned to
+each computational node of the target, incorporating our work
+estimation for each filter and the multiplicities of each filter.  As
+mentioned above, the work estimation for each target node accounts for
+the intra-slice pipeline startup and wind-down shape of individual
+slices, the interaction between slices, and the occupancy of the
+on-chip interconnect.  In our discussion, for a computational node
+$N$, let $W_C(N)$ be the work estimation for $N$ for the current
+configuration.  A rigorous description of this calculation beyond the
+scope of this paper.
+
+After each computational node's work estimation is calculated, we find
+the single node that does performs the most work in the
+steady-state. This node is the critical path of the steady-state, call
+this node the {\it bottleneck node}, $B$. Next, for each node $N$
+where $\frac{W_C(N)}{W_C(B)} < 0.95$, we set $W_C(N) = 1.10 * W_C(N)$.
+We recalculate $B$ using the biased $W_C()$. Our cost function for
+configuration (scheduling) $C$, $F(C) = W_C(B)$.
+
+We experimented with including a communication and data-reorganization
+estimate to the cost function.  This cost function included an
+estimate of the idle time of the chip during the data-reorganization
+phase.  This proved to be ineffectual. Even worse, it tended to
+obscure the bottleneck work calculation described above, always
+leading to poor steady-state performance as compared to the cost
+function described above.
+
+
 
 

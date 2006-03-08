@@ -3,7 +3,7 @@
 Due to the inexorable advance of VLSI technology, transistors are
 essentially free.  However, centralized microprocessor designs do not
 scale effectively.  Microprocessor design is now dominated by wire
-delay concerns.  One popular solution harnesses the plethora of
+delay and power concerns.  One popular solution harnesses the plethora of
 chip-level resources by replicating processing units.  This limits
 wire delay because wires need not be longer than a replicated unit.
 The multiple units communicate through shared memory or through an
@@ -22,16 +22,17 @@ candidate targets.
 
 A number of efforts have focused on stream programming as a paradigm
 for producing high-level, efficient, and retargetable application code
-for wire-exposed architectures \cite{streamit-asplos,imagine-ieee,merrimac-sc03,trips-isca03}.
-In a stream program, computation is expressed as a set of filters that
-operate over sequences of data.  Because each filter has an
+for wire-exposed architectures
+\cite{streamit-asplos,imagine-ieee,merrimac-sc03,trips-isca03}.  In a
+stream program, computation is expressed as a composition of filters
+that operate over sequences of data.  Because each filter has an
 independent address space and program counter, there is abundant task
 and data parallelism that can be recognized by the compiler.  Also,
 the data streams expose the communication between filters; the
 compiler can predict the flow of data and orchestrate data movement.
 These properties distinguish stream programs from imperative languages
 such as C and FORTRAN.  While imperative languages were a good match
-for von-Neumann machines, they are obsolete for architectures
+for von-Neumann machines, they are ill-suited for architectures
 containing multiple instruction streams and distributed memory banks.
 
 \begin{figure*}[th]
@@ -59,17 +60,18 @@ Figure~\ref{fig:spacevstime}a).  Space multiplexing affords $(i)$ no
 filter swapping, $(ii)$ reduced memory traffic, $(iii)$ localized
 communication, and $(iv)$ tighter latencies.  Because it distributes
 computation across decentralized processing units, space multiplexing
-supports architectures that scale spatially without any global wires.
-Unfortunately, this approach is highly dependent on effective load
-balancing techniques: the goal is to merge and split filters (into new
-filters) until all computation resources are assigned filters with a
-uniform work distribution.  Such load balancing can be very difficult
-for applications with an irregular distribution of work and the cost
-of data-reorganization associated with filter merging is prohibitive
-as it creates large memory structures. Also, mapping the complex
-communication patterns described by a stream graph to the simple
-interconnect of a parallel processor may introduce additional
-synchronization points not present in the original graph.
+is well-suited to architectures that scale spatially without any
+global wires.  Unfortunately, this approach is highly dependent on
+effective load balancing techniques: the goal is to merge and split
+filters (into new filters) until all computation resources are
+assigned filters with a uniform work distribution.  Such load
+balancing can be very difficult for applications with an irregular
+distribution of work and the cost of data-reorganization associated
+with filter merging is prohibitive as it creates large memory
+structures. Also, mapping the complex communication patterns described
+by a stream graph to the simple interconnect of a parallel processor
+may introduce additional synchronization points not present in the
+original graph.
 
 This paper proposes a hybrid approach, {\it space-time multiplexing},
 that exploits the advantages of both space multiplexing and time
@@ -132,15 +134,16 @@ rau-softpipe} is a scheduling technique that hides latency and
 maximizes resource utilization by building a loop with instructions
 from multiple iterations of the original loop.  In our context, the
 software pipeliner is scheduling whole slices for execution on
-multiple computational nodes. Our slice scheduling phase employs novel
-techniques to arrive at the software pipelined schedule; these
-techniques are enabled by the regular and structured slice graphs that
-we are scheduling. Unlike traditional software pipelining algorithms,
-we use simulated annealing to solve a 3-dimensional bin-packing
-problem with irregular shaped objects.  These objects represent the
-slices of the graph and the bins represent the computational nodes of the
-target architecture.  The solution to the 3D bin-packing gives us both
-the slice scheduling order and the resource mapping for the filters of
+multiple computational nodes. The scheduling problem has many degrees
+of freedom and our slice scheduling phase employs novel techniques to
+arrive at the software pipelined schedule.  These techniques are
+enabled by the regular and structured slice graphs that we are
+scheduling. Unlike traditional software pipelining algorithms, we use
+simulated annealing to solve a 3-dimensional bin-packing problem with
+irregular shaped objects.  These objects represent the slices of the
+graph and the bins represent the computational nodes of the target
+architecture.  The solution to the 3D bin-packing gives us both the
+slice scheduling order and the resource mapping for the filters of
 each slice.
 
 In summary, this paper makes the following contributions:
@@ -155,28 +158,29 @@ model.
 space-time multiplexing in the context of a stream compiler.  
 \item An algorithm for extracting load-balanced slices from a flat
 stream graph.
+\item A novel formulation of software pipelining for scheduling
+coarse-grained slices onto multiple computational nodes.
 \item A translation of the 3D bin-packing problem to our
 software-pipelined slice scheduling problem where simulated annealing
 is used to arrive at a solution.
-\item An evaluation of space-time multiplexing in the StreamIt-to-Raw
-compiler, demonstrating an average improvement of \todo{??} over a
-space multiplexing approach.
+\item An evaluation of the SpaceTime Compiler
+, demonstrating an average improvement of \todo{??} over a space
+multiplexing approach.
 \end{itemize}
 
-In the next sections we will present an overview of the input to the
-SpaceTime compiler, its slice execution model, and its relevant
-passes.  We will use our FM Radio application to further illustrate
-these concepts.  
+%In the next sections we will present an overview of the input to the
+%SpaceTime compiler, its slice execution model, and its relevant
+%passes.  
 
-The remainder of this paper is organized as follows.  Section
-\ref{sec:streamit} gives an introduction to the StreamIt programming
-language and Section \ref{sec:raw} provides an overview of
-Raw. Section~\ref{sec:example} gives an illustrative example for our
-technique.  Sections 5 through 10 describe our compilation framework,
-including synchronization removal, trace extraction and scheduling,
-and code generation.  Section \ref{sec:results} presents our results,
-Section \ref{sec:related} reviews related work and Section
-\ref{sec:conclusion} concludes.
+%The remainder of this paper is organized as follows.  Section
+%\ref{sec:streamit} gives an introduction to the StreamIt programming
+%language and Section \ref{sec:raw} provides an overview of
+%Raw. Section~\ref{sec:example} gives an illustrative example for our
+%technique.  Sections 5 through 10 describe our compilation framework,
+%including synchronization removal, trace extraction and scheduling,
+%and code generation.  Section \ref{sec:results} presents our results,
+%Section \ref{sec:related} reviews related work and Section
+%\ref{sec:conclusion} concludes.
 
 %% In this paper we present a compiler for the StreamIt programming
 %% language \cite{streamitcc}.  StreamIt is a high-level stream
