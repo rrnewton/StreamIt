@@ -23,9 +23,9 @@ implementation of FM radio with a 12-way equalizer.  StreamIt's stream
 graph is given in Figure \ref{fig:fm-ex}a.  In the figure, we
 represent splitters, joiners, and filters with circles.  Containers
 (splitjoins and pipelines) are represented with as rectangles around
-the leaf nodes they contain.  In the figure, the filters colored red
-have the highest work estimation per steady-state execution (in this
-case, the red nodes account for over 90\% of the computation in the
+the nodes they contain.  In the figure, the filters colored red have
+the highest work estimation per steady-state execution (in this case,
+the red nodes account for over 90\% of the computation in the
 steady-state).
 
 The initial pass of our compiler takes this structured stream graph
@@ -39,7 +39,7 @@ data-reorganization patterns.  For example, our splitter node can
 describe a round-robin distribution with duplication.  A more exact
 discussion of our splitters and joiners is omitted, but it suffices to
 say that we designed each node to closely match the data-organizations
-that are possible with a scalar operand network \ref{scalaroperands}.
+that are possible with a scalar operand network \cite{scalaroperands}.
 We next run a synchronization removal pass that converts StreamIt
 splitters and joiners into our own notion of data-distribution nodes.
 In the process we remove unnecessary synchronization points present in
@@ -50,15 +50,13 @@ produced by multiple filters.
 
 After synchronization removal, we are left with a flat stream graph
 composed of filters, and data-reorganization nodes (our more powerful
-splitters and joiners), see Figure \ref{fig:fm_ex}b FMRadio's
+splitters and joiners), see Figure \ref{fig:fm-ex}b FMRadio's
 flattened stream graph; note that some splitters have been
 coalesced. For the remainder of this paper the terms splitter and
 joiner refer to our more powerful splitting and joining nodes and the
 term stream graph refers to the flattened graph composed of these
 nodes and filters.  At this point we are ready to extract the traces
 from the graph and schedule them for execution.
-
-\todo{add the fm radio stream graph and its synch removed analog.}
 
 %\begin{figure}
 %\centering
@@ -79,16 +77,17 @@ graph with restrictions on its composition.
 A slice always begins with a joiner node to join the (possibly)
 multiple inputs of the slice.  The slice continues with a pipeline of
 filters from the stream graph.  The slice ends with a splitter node to
-distribute the slice's output to its (possibly) multiple readers.
-More specifically, only the end-points of slices can communicate with
-more than one filter (these filters are contained in other slices);
-inner filters are restricted to single input and single output.  Each
-filter of the original stream graph is contained in exactly one slice.
-Slices are not hierarchical.  The number of filters in a slice must be
-less than or equal to the number of computational nodes of the
-architecture to which we are targeting.  In Figure \ref{fig:fm_ex}c,
-we give a possible slice graph for the 12-way FMRadio application.
-The blue boxes represent individual slices.
+distribute the slice's output to its (possibly) multiple readers (see
+Figure \ref{fig:slice}).  More specifically, only the end-points of
+slices can communicate with more than one filter (these filters are
+contained in other slices); inner filters are restricted to single
+input and single output.  Each filter of the original stream graph is
+contained in exactly one slice.  Slices are not hierarchical.  The
+number of filters in a slice must be less than or equal to the number
+of computational nodes of the architecture to which we are targeting.
+In Figure \ref{fig:fm-ex}c, we give a possible slice graph for the
+12-way FMRadio application.  The blue boxes represent individual
+slices.
 
 These restrictions are not fundamental to the hybrid space-time
 multiplexing execution model; they simplify the compiler.  In future
@@ -108,7 +107,7 @@ slices from a stream graph.
 \section{The Raw Architecture}
 \label{sec:raw}
 After we compose a graph of slices from the stream graph, we are ready
-to schedule the slices in both space and time on to the parallel
+to schedule the slices in both space and time onto the parallel
 target.  In this section we will describe our current slice execution
 model considering our backend for the Raw microprocessor.
 
@@ -151,7 +150,7 @@ number of items a filter needs to fire (its pop rate).
 The goal of the SpaceTime compiler is to efficiently schedule the
 steady-state of the stream graph.  We rely on the StreamIt frontend to
 produce a SAS.  In the steady-state execution of our slice graph, each
-slice executes exactly once and for each execution of a slice, each
+slice executes exactly once. For each execution of a slice, each
 filter that composes the slice fires the number of times stipulated by
 its SAS multiplicity.  A slice cannot be interrupted once it begins
 its execution (irrespective of hardware interrupts); it is atomic.
@@ -159,23 +158,25 @@ its execution (irrespective of hardware interrupts); it is atomic.
 To achieve its goal, the compiler fully software pipelines the {\it
 entire} stream graph at the slice level. By this we mean that during
 execution of the steady-state, two slices that have a dependence chain
-between them in the slice graph are from on different iterations of
-the steady-state.  We do this to remove the dependence between.  The
-can now execute out-of-order within the steady-state, and they do not
-directly communicate.  Note that {\it filters} within a slice are all of the
+between them in the slice graph are executing at different iterations
+of the original steady-state loop.  We do this to remove all of the
+dependences between slices of the new steady-state.  The can now
+execute out-of-order within the steady-state, and they do not directly
+communicate.  Note that {\it filters} within a slice are all of the
 same iteration executing in a normal pipeline fashion.
 
 To achieve this software pipelined schedule, we must buffer adequately
 between slices.  Inter-slice communication utilizes off-chip memory
-modules of the target.  In our backend for Raw, for example, we target
-the 16 DDR DRAM modules attached to the i/o ports of the chip.  It is
-the task of the tile to send memory requests to these modules and
-communicate data to and from the memory modules via the static network
-or, for non-border tiles, the user-level dynamic network.  Each
-conceptual buffer between two slices is represented as a rotating set
-of buffers (much like a rotating register file), with a separate
-rotation for the producer and the consumer, the producer
-always being ahead of the consumer in the rotation.
+modules of the target (see Figure \ref{fig:slice}).  In our backend
+for Raw, for example, we target the 16 DDR DRAM modules attached to
+the i/o ports of the chip.  It is the task of the tile to send memory
+requests to these modules and communicate data to and from the memory
+modules via the static network or, for non-border tiles, the
+user-level dynamic network.  Each conceptual buffer between two slices
+is represented as a rotating set of buffers (much like a rotating
+register file), with a separate rotation for the producer and the
+consumer, the producer always being ahead of the consumer in the
+rotation (see Figure \ref{fig:slice}).
 
 Synergistically, software pipelining of slices on a parallel
 architecture avoids many of the complications of and exposes many new
@@ -196,15 +197,15 @@ guarantee that each slice is ready to execute.  In software pipelining
 terminology, the iteration interval is 1.  This is essential because,
 unlike machine instructions, there exists complicated
 data-organization between slices.  Therefore, we need to remove all
-dependences between slices of the steady-state.  We rely on a joining
-phase that executes before each steady-state to perform the
-data-reorganization described by each joiner of each slice.  {\it
-Before} we execute a steady-state schedule, all joining for the entire
-slice graph is executed using the buffers in off-chip DRAMs as the
-sources and destinations, and using the interconnect of the target to
-perform the data-reorganization stipulated by each joiner.  {\it
-After} each steady-state completes we perform the analog for
-splitters.
+dependences between slices of the steady-state.  We rely on a {\it
+data-reorganization phase}that executes before each steady-state to
+perform the data-reorganization described by each joiner and splitter
+of the slice graph.  {\it Before} we execute a steady-state schedule,
+all joining for the entire slice graph is executed using the buffers
+in off-chip DRAMs as the sources and destinations, and using the
+interconnect of the target to perform the data-reorganization
+stipulated by each joiner.  {\it After} each steady-state completes we
+perform the analog for splitters.
 
 When the steady-state is repeated, the splitting and joining phases
 happen in sequence.  First, we perform all the splitting of the graph
@@ -213,8 +214,8 @@ all the joining for the steady-state execution that is about to
 commence. Next, computation of the slices begins.  Observations early
 in the development of the SpaceTime compiler show that this separation
 of computation from data-reorganization has a huge benefit over a
-combined schedule that includes both.  The intuition is that we need
-many tiles to perform most reorganizations, and during the
+combined schedule that intermixes the two..  The intuition is that we
+need many tiles to perform most reorganizations, and during the
 steady-state other tiles are off doing the computation of other
 slices; it is very difficult to coordinate this interaction
 effectively.
@@ -227,7 +228,7 @@ the steady-state.
 
 \subsection{Scheduling the Software Pipeline}
 We have chosen to reduce our steady-state slice scheduling problem to
-a 3D bin packing problem \ref{binpacking} with irregularly shaped
+a 3D bin packing problem \cite{binpacking} with irregularly shaped
 objects.  In the translation, each slice is represented by a
 3-dimensional object.  The x,y area occupied by an object correspond
 to the number of computational nodes occupied by the associated
@@ -237,8 +238,10 @@ the packing.  By doing this, we will minimize the critical path
 schedule length.  We use simulated annealing to arrive at an optimized
 solution to the packing.  The translation and the solution is
 discussed in detail in section \ref{sec:scheduling}. Figure
-\ref{fig:fm_ex}d presents a fictitious 3d conceptualization for
-FMRadio. In the figure, each irregularly shaped object represents a
+\ref{fig:fm-ex}d presents a fictitious 3d conceptualization for
+our scheduling solution.  The figure does not correspond to the
+steady-state of FMRadio, but it does help one to conceptualize the
+problem. In the figure, each irregularly shaped object represents a
 slice and we attempt to pack them into the cube while minimizing the
 maximum height of packing.
 
