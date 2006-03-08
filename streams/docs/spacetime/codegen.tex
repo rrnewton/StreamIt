@@ -6,103 +6,97 @@ execute on it. To generate the execution code for the entire
 application, we traverse the schedule for each phase of computation:
 first the peek initialization stage, then prologue stage, and finally
 the steady-state.  As we traverse each schedule, we generate the
-computation and communication code as we visit each trace.  For the
-initialization and prologue stages, we do a traversal of the trace
+computation and communication code as we visit each slice.  For the
+initialization and prologue stages, we do a traversal of the slice
 graph that respects the data-dependencies stipulated by the stream
 graph. For the steady-state we traverse the schedule as calculated by
-the trace scheduling algorithm of Section \ref{sec:scheduling}.
+the slice scheduling algorithm of Section \ref{sec:scheduling}.
 
-When we visit a trace, we first generate the DRAM requests and
-communication code to gather its input.  Next, we generate computation
-and communication code for each filter of the trace.  Finally, we
-generate DRAM requests and communication code to scatter its outputs.
-For each stage, when we visit a trace, the code generated is appended
-to the existing code for the stage, producing the proper ordering of
-operations as given by the schedule.  The code produced for the
-steady-state is wrapped in an infinite loop. The following sections
-investigates the steps in more detail.
+When we visit a slice, we first generate the DRAM requests and
+communication code load its inputs from and store its outputs to its
+mapped off-chip DRAM.  Next, we generate computation and communication
+code for each filter of the slice.  
 
-\subsection{Trace Data Reordering}
-Before the first filter of a trace can execute, its single input
-stream must be assembled in the order stipulated by the round-robin
-weights on its incoming channels. To achieve this, the various input
-streams of the traces are collected into the memory module attached to
-the tile to which the first filter of the trace is mapped. Streaming
-DRAM requests are generated to read each input channel and to write
-the final, reassembled input.  Code is generated for the static
-routers, as they enforce the ordering of the final input stream.
-
-After the last filter of a trace executes, its single output stream is
-split into memory ports assigned to the output channels of the trace.
-The choice of memory port for each inter-trace channel is beyond the
-scope of this paper. Streaming DRAM requests are generated to read the
-output of the last filter and streaming DRAM requests are generated to
-write the reordered (and possible duplicated) output to the memory
-ports assigned to the inter-trace channels.
+\subsection{Slice Data Reordering}
+Before a steady-state execution can commence, each slice's single
+input stream must be assembled in the order stipulated by the
+round-robin weights on its incoming channels. To achieve this, the
+various input streams of the slices are collected into the memory
+module attached to the tile to which the first filter of the slice is
+mapped. Streaming DRAM requests are generated to read each input
+channel and to write the final, reassembled input.  Code is generated
+for the static routers, as they perform the ordering of the final
+input stream as stipulated by each joiner.  Splitting is done in much
+the same way.  Remember from Section \ref{sec:softpipe} that the
+source and destination buffers of this stage are the rotating buffers
+that facilitate the software pipeline.  The compute processor of Raw
+are idle during data-reorganization stage.
 
 \subsection{Filter Code Generation}
-When we visit a trace in the schedule for each execution phase, we
-iterate over the filters that compose the trace, generating 
-communication and computation code necessary to execute the trace.
-The scheduling phase (Section \ref{sec:scheduling}) produces a mapping
-of filters to tiles.
+We generate computation and communication code for the individual
+filters of the slice in much the same way as \cite{streamit-asplos}.  
+%When we visit a slice in the schedule for each execution phase, we
+%iterate over the filters that compose the slice, generating 
+%communication and computation code necessary to execute the slice.
+%The scheduling phase (Section \ref{sec:scheduling}) produces a mapping
+%of filters to tiles.
 
-\subsubsection{Compute Processor}
-%For linear traces, we generate parameterized, template assembly code
-%for both computation and communication as described in Section
-%\ref{sec:linear}.  
-As we iterate over the filters of the trace, we append the code
-necessary to execute the current filter to the existing code for the
-tile to which the filter is mapped.  We also make sure to execute the
-{\tt init} function of each filter before we start the peek
-initialization stage. Consequently, each compute processor begins by
-calling the {\tt init} function of all the filters mapped to it.
-Next, the compute processor executes the {\tt work} function of each
-filter assigned to it in sequence.  The sequence is determined by the
-traversal of the schedule of each execution phase; first the
-peek initialization stage, then the prologue stage, and finally the
-steady-state.  Each work function execution is placed in a loop that
-executes the number of times the filter fires in the current stage.
+%\subsubsection{Compute Processor}
+%%For linear slices, we generate parameterized, template assembly code
+%%for both computation and communication as described in Section
+%%\ref{sec:linear}.  
+%As we iterate over the filters of the slice, we append the code
+%necessary to execute the current filter to the existing code for the
+%tile to which the filter is mapped.  We also make sure to execute the
+%{\tt init} function of each filter before we start the peek
+%initialization stage. Consequently, each compute processor begins by
+%calling the {\tt init} function of all the filters mapped to it.
+%Next, the compute processor executes the {\tt work} function of each
+%filter assigned to it in sequence.  The sequence is determined by the
+%traversal of the schedule of each execution phase; first the
+%peek initialization stage, then the prologue stage, and finally the
+%steady-state.  Each work function execution is placed in a loop that
+%executes the number of times the filter fires in the current stage.
 
-For Raw's compute processor, we generate a mixture of C code
-and assembly instructions that is compiled using Raw's GCC 3.3
-port. The translation of the {\tt init} function, {\tt work}
-functions, and any helper function is, for the large part,
-straightforward.  Most StreamIt expression have direct analogs in C
-except for the channel expressions {\tt push()}, {\tt peek(index)} and
-{\tt pop()}.
+%For Raw's compute processor, we generate a mixture of C code
+%and assembly instructions that is compiled using Raw's GCC 3.3
+%port. The translation of the {\tt init} function, {\tt work}
+%functions, and any helper function is, for the large part,
+%straightforward.  Most StreamIt expression have direct analogs in C
+%except for the channel expressions {\tt push()}, {\tt peek(index)} and
+%{\tt pop()}.
 
-One major benefit of StreamIt over other streaming languages is that
-the StreamIt compiler is responsible for buffer management.  The
-programmer is free to call {\tt pop()} or {\tt peek(index)} without
-having to worry about the structure of the buffer or updating the
-buffer's index variable after each execution of the work function.
-Currently, we classify filters as one of three types with respect to
-buffer management:
-\begin{enumerate}
-\item If a filter $(i)$ does not contain any {\tt peek} statements, $(ii)$
-does not contain any control-flow dependent channel expressions, and
-$(iii)$ has peek rate equals to pop rate, then a buffer is not needed
-and {\tt pop()} statements are translated directly into static network
-receives.  There exist other initialization considerations which are
-beyond the scope of this paper.
-\item If a filter contains peek statements, but $peek = pop$ then we can
-use a simple linear buffer that is reset after each work function execution.
-\item Otherwise, when $peek > pop$, we use a circular buffer to
-account for the data remaining on the channel after the work function
-invocation.
-\end{enumerate}
-Each {\tt push()} statement is translated directly into a static
-network send.  
+%One major benefit of StreamIt over other streaming languages is that
+%the StreamIt compiler is responsible for buffer management.  The
+%programmer is free to call {\tt pop()} or {\tt peek(index)} without
+%having to worry about the structure of the buffer or updating the
+%buffer's index variable after each execution of the work function.
+%Currently, we classify filters as one of three types with respect to
+%buffer management:
+%\begin{enumerate}
+%\item If a filter $(i)$ does not contain any {\tt peek} statements, $(ii)$
+%does not contain any control-flow dependent channel expressions, and
+%$(iii)$ has peek rate equals to pop rate, then a buffer is not needed
+%and {\tt pop()} statements are translated directly into static network
+%receives.  There exist other initialization considerations which are
+%beyond the scope of this paper.
+%\item If a filter contains peek statements, but $peek = pop$ then we can
+%use a simple linear buffer that is reset after each work function execution.
+%\item Otherwise, when $peek > pop$, we use a circular buffer to
+%account for the data remaining on the channel after the work function
+%invocation.
+%\end{enumerate}
+%Each {\tt push()} statement is translated directly into a static
+%network send.  
 
-\subsubsection{Switch Processor}
-As mentioned in Section \ref{sec:implementation}, individual traces
-are limited to pipelines, thus we do not have to worry about
-complicated patterns for intra-trace communication.  For each tile we
-place the switch instructions to receive $pop$ items from the
-direction of its upstream neighbor and send $push$ items to the
-direction of its downstream neighbor.  The end-points of a trace send
-or receive their data to or from off-chip, routing their items to and
-from the side of the chip. These instructions are placed in a loop
-that executes as many times as the filter fires in the current stage.
+%\subsubsection{Switch Processor}
+%As mentioned in Section \ref{sec:implementation}, individual slices
+%are limited to pipelines, thus we do not have to worry about
+%complicated patterns for intra-slice communication.  For each tile we
+%place the switch instructions to receive $pop$ items from the
+%direction of its upstream neighbor and send $push$ items to the
+%direction of its downstream neighbor.  The end-points of a slice send
+%or receive their data to or from off-chip, routing their items to and
+%from the side of the chip. These instructions are placed in a loop
+%that executes as many times as the filter fires in the current stage.
 

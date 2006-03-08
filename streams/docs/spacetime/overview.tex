@@ -91,6 +91,7 @@ when it is finished, the next filter will execute.  In this way, a
 complete space-time execution will unfold on the target.
 
 \subsection{Software Pipelining}
+\label{sec:softpipe}
 In StreamIt's model of streaming computation, the stream graph is
 infinite.  There exists an implicit infinite outer loop over the
 stream graph.\footnote{Note that our technique is not just limited to
@@ -178,6 +179,12 @@ many tiles to perform most reorganizations, and during the
 steady-state other tiles are off doing the computation of other
 slices; it is very difficult to coordinate this interaction
 effectively.  
+
+The buffers that are the sources and destinations of the
+data-reorganization stage are the rotated.  Each conceptual arc in the
+slice graph is concretely represented by allocating enough buffers as
+the iteration difference between the source and destination slices in
+the steady-state.
 
 \subsection{Scheduling the Software Pipeline}
 We have chosen to reduce our steady-state slice scheduling problem to
