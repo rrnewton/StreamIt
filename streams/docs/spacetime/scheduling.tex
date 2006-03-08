@@ -28,6 +28,15 @@ allowing the system to go uphill with some probability as it searches
 for the global minima.  As the simulation proceeds, the probability of
 climbing uphill decreases.
 
+talk about inter-trace-buffer assignment!
+
+Calculate a total ordering of slices...
+
+initial schedule is random
+
+don't need to map the splitters and joiners, done by the static network.
+
+mapping of tiles to drams..
 
 \subsection{Cost Function}
 The cost function for the simulated annealing solution to our 3D bin
@@ -40,12 +49,41 @@ that the work estimation performed by our compiler is inaccurate, so
 we bias the estimate to reflect this observation.  Finally, we take
 into account the communication cost of the data-reorganization phase.
 
+As mentioned above, we would like to account for the intra-slice
+pipeline startup and wind-down shape of the slices.  We would like the
+slices of the final schedule to be placed like a Tetris-master would
+align the falling pieces he or she encounters.  Toward this goal, our
+node work estimation component of the cost function models these
+properties.  Given an assignment of filters of the slices to nodes,
+we arrive at the cost estimation for each tile using Algorithm
+\ref{alg:tilework}. 
 
+\begin{algorithm}
+\caption{nodeWorkEst} \label{alg:tilework} {\tt
+nodeWorkEst(}$T${\tt ,}$M${\tt )}. Given a the slice ordering $T$, and
+$M$, a map of filters to computation nodes, return $C$, a map of nodes
+to integers that represents the work of the node given the assignment $M$.
+\begin{algorithmic}
+\FORALL {$t \in T$}
+\STATE Determined the  of 
+\IF {$u$ scheduled before $t$ in $S$}
+\STATE $u.prologue = t.prologue$
+\ELSE
+\STATE $u.prologue = t.prologue + 1$ 
+\ENDIF 
+\STATE {\tt incrementUpStream(}$u${\tt ,}$S${\tt )}
+\ENDFOR
+\end{algorithmic}
+\end{algorithm}
 
 what it does!
 
 \subsection{Prologue Schedule}
-how contructed, what it guarantees.
+The prologue schedule guarantees that when the steady-state commences,
+all the slices are ready to fire irrespective of their data-flow
+dependencies.  To create this schedule we iteratively execute slices,
+at each iteration we fire all the slices that can fire.  Stop the
+schedule when all slices are ready to fire.
 
 \subsection{Peek Initialization Schedule}
 Before both the prologue schedule is executed and the steady-state

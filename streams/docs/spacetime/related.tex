@@ -28,10 +28,10 @@ employed to adjust the granularity of the graph by fusing adjacent
 filters into one.  While filter fusion can be regarded as a restricted
 form of time multiplexing (as the fused filter simulates the execution
 of the originals, in turn), the approach given in the current paper is
-much more general, as a given tile participates in multiple traces
+much more general, as a given tile participates in multiple slices
 that can be drawn from non-adjacent sections of the stream graph.  The
 current paper also advances over previous work in its software
-pipelining of traces and template code generation for linear filters.
+pipelining of slices and template code generation for linear filters.
 
 %Our fine-grained execution model for linear portions of the stream
 %graph is closely related to the large body of work on systolic
@@ -60,7 +60,7 @@ A number of emerging architectures are incorporating a notion of
 polymorphic execution modes that include support for
 streams~\cite{trips-isca03,smartmemories,m3t}.  Such hardware support
 is complementary to space-time multiplexing, as the mode of a given
-resource could be toggled on the granularity of a trace to best
+resource could be toggled on the granularity of a slice to best
 accommodate the computation pattern therein.
 
 % \cite{cheops-thesis}

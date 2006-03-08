@@ -1,11 +1,13 @@
-\section{Stream Graph}
+\section{Stream Graph} 
+
 Currently we use the StreamIt Programming Language as the input
 language to the SpaceTime Compiler. After the StreamIt frontend
 executes, it passes our compiler a complete stream graph representing
 the computation and communication of the application.  In StreamIt,
-the stream graph is structured, hierarchical composition of pipelines,
-splitjoins, and feedbackloops with filters, splitters, and joiners as
-the leaf nodes of the graph (see Section \ref{sec:streamit}).
+the stream graph is a structured, hierarchical composition of
+pipelines, splitjoins, and feedbackloops with filters, splitters, and
+joiners as the leaf nodes of the graph (see Section
+\ref{sec:streamit}).
 
 The initial pass of our compiler takes this structured stream graph
 and de-structures it.  We remove all hierarchy and structure of the
@@ -16,23 +18,22 @@ have separate nodes for splitting an output stream and joining an
 input stream, but these nodes can handle more complicated
 data-reorganization patterns.  For example, our splitter node can
 describe a round-robin distribution with duplication.  A more exact
-discussion of our splitters and joiners is omitted due to space
-constraints, but it suffices to say that we designed each nodes to
-closely match the data-organizations that are possible with a scalar
-operand network \ref{scalaroperands}.  We next run a synchronization
-removal pass that converts StreamIt splitters and joiners into our own
-notion of data-distribution nodes.  In the process we remove
-unnecessary synchronization points present in the stream graph.  We
-introduce a (more powerful) splitter node after each filter whose
-output is read by multiple filters and we introduce a (more powerful)
-joiner node before each filter that reads data produced by multiple
-filters.
+discussion of our splitters and joiners is omitted, but it suffices to
+say that we designed each node to closely match the data-organizations
+that are possible with a scalar operand network \ref{scalaroperands}.
+We next run a synchronization removal pass that converts StreamIt
+splitters and joiners into our own notion of data-distribution nodes.
+In the process we remove unnecessary synchronization points present in
+the stream graph.  We introduce a (more powerful) splitter node after
+each filter whose output is read by multiple filters and we introduce
+a (more powerful) joiner node before each filter that reads data
+produced by multiple filters.
 \todo{Are we going to include a section on synch removal?}
 
 After synchronization removal, we are left with a flat stream graph
 composed of filters, and data-reorganization nodes (our more powerful
 splitters and joiners).  For the remainder of this paper the terms
-splitter and joiner refer to our more power splitting and joining
+splitter and joiner refer to our more powerful splitting and joining
 nodes and the term stream graph refers to the flattened graph composed
 of these nodes and filters.  At this point we are ready to extract the
 traces from the graph and schedule them for execution. 
@@ -44,8 +45,8 @@ Before we move on to describing the algorithms that compose the
 compiler, we will describe our implementation of a
 slice. Conceptually, the slice is the atomic unit of scheduling in our
 compiler.  Our scheduling algorithm operates at the slice level.
-Slice themselves are composed of contiguous regions of the stream
-graph with restrictions on their composition. 
+Each slice is composed of a contiguous region of the stream
+graph with restrictions on its composition. 
 
 A slice always begins with a joiner node to join the (possibly)
 multiple inputs of the slice.  The slice continues with a pipeline of
@@ -103,8 +104,8 @@ techniques traditionally reserved for scheduling loops of machine
 instructions.  In the streaming domain, a schedule that executes all
 filters and can be repeated indefinitely is termed a {\it steady-state
 schedule}.  In this work, we use a {\it single appearance}
-steady-state schedule (SAS), where each filter occurs only one in the
-schedule with an associated multiplicity.  As long as one buffers
+steady-state schedule (SAS), where each filter occurs exactly once in
+the schedule with an associated multiplicity.  As long as one buffers
 adequately, a SAS can be executed in any order that respects the
 number of items a filter needs to fire (its pop rate).
 
@@ -112,51 +113,50 @@ The goal of the SpaceTime compiler is to efficiently schedule the
 steady-state of the stream graph.  We rely on the StreamIt frontend to
 produce a SAS.  In the steady-state execution of our slice graph, each
 slice executes exactly once and for each execution of a slice, each
-filter that composes the slice fires the number of times stipulated
-by its SAS multiplicity.  A slice cannot be interrupted once it has
-begin its execution (irrespective of hardware interrupts); it is
-atomic.
+filter that composes the slice fires the number of times stipulated by
+its SAS multiplicity.  A slice cannot be interrupted once it begins
+its execution (irrespective of hardware interrupts); it is atomic.
 
 To achieve its goal, the compiler fully software pipelines the {\it
-entire} stream graph at the slice level By this we mean that the
-during execution of the steady-state two slices that have a dependence
-chain between them are execution from different iterations of the
-steady-state.  We do this to remove the dependence between.  The can
-now execute out-of-order within the steady-state, and they do not
-directly communicate.  Note that filters within a slice are all of the
-same iteration executing in a normal pipeline fashion.  
+entire} stream graph at the slice level. By this we mean that during
+execution of the steady-state, two slices that have a dependence chain
+between them in the slice graph are from on different iterations of
+the steady-state.  We do this to remove the dependence between.  The
+can now execute out-of-order within the steady-state, and they do not
+directly communicate.  Note that {\it filters} within a slice are all of the
+same iteration executing in a normal pipeline fashion.
 
-To achieve this software pipelined schedule we must buffer adequately
+To achieve this software pipelined schedule, we must buffer adequately
 between slices.  Inter-slice communication utilizes off-chip memory
-modules of the target.  In our backend for Raw for example, we target
+modules of the target.  In our backend for Raw, for example, we target
 the 16 DDR DRAM modules attached to the i/o ports of the chip.  It is
 the task of the tile to send memory requests to these modules and
 communicate data to and from the memory modules via the static network
 or, for non-border tiles, the user-level dynamic network.  Each
 conceptual buffer between two slices is represented as a rotating set
 of buffers (much like a rotating register file), with a separate
-rotation for the producer and the consumer.  The producer
-always being ahead of the consumer.
+rotation for the producer and the consumer, the producer
+always being ahead of the consumer in the rotation.
 
-Synergistically, software pipelining of slices on a parallel architecture
-avoids many of the complications of and exposes many new optimization
-opportunities versus traditional software pipelining.  In tradition
-software pipelining, the limited size of the register file is always
-an adversary (register pressure), but we instead use voluminous
-off-chip DRAM, producing regular bulk transfers.  Another recurring
-issue traditionally is the length of the prologue to the software
-pipelined loop, but for our domain we don't have less interest in this
-concern.  Lastly, and most importantly, we can use this synergy to
-fully pipeline the graph, removing all dependencies and thus removing
-all the constraints for our scheduling algorithm (discussed below and
-in Section \ref{sec:scheduling}).
+Synergistically, software pipelining of slices on a parallel
+architecture avoids many of the complications of and exposes many new
+optimization opportunities versus traditional software pipelining.  In
+traditional software pipelining, the limited size of the register file
+is always an adversary (register pressure), but we instead use
+voluminous off-chip DRAM, producing regular bulk transfers.  Another
+recurring issue traditionally is the length of the prologue to the
+software pipelined loop, but for our domain we have less interest in
+this concern.  Lastly, and most importantly, we can use this synergy
+to fully pipeline the graph, removing all dependencies and thus
+removing all the constraints for our scheduling algorithm (discussed
+below and in Section \ref{sec:scheduling}).
 
 In our approach, we first assume that we have a machine with infinite
 parallel resources.  We generate a prologue schedule that will
 guarantee that each slice is ready to execute.  In software pipelining
 terminology, the iteration interval is 1.  This is essential because,
 unlike machine instructions, there exists complicated
-data-organization between slices.  So we need to remove all
+data-organization between slices.  Therefore, we need to remove all
 dependences between slices of the steady-state.  We rely on a joining
 phase that executes before each steady-state to perform the
 data-reorganization described by each joiner of each slice.  {\it
@@ -165,15 +165,15 @@ slice graph is executed using the buffers in off-chip DRAMs as the
 sources and destinations, and using the interconnect of the target to
 perform the data-reorganization stipulated by each joiner.  {\it
 After} each steady-state completes we perform the analog for
-splitters.  
+splitters.
 
 When the steady-state is repeated, the splitting and joining phases
-happen in sequence.  First we perform all the splitting of the graph
-from the steady-state execution that just finished; then we perform
-the all joining for the steady-state execution that is about to
-commence.  Then the steady state commences.  Observations early in the
-development of the SpaceTime compiler show that this separation of
-computation from data-reorganization has a huge benefit over a
+happen in sequence.  First, we perform all the splitting of the graph
+from the steady-state execution that just finished; then, we perform
+all the joining for the steady-state execution that is about to
+commence. Next, computation of the slices begins.  Observations early
+in the development of the SpaceTime compiler show that this separation
+of computation from data-reorganization has a huge benefit over a
 combined schedule that includes both.  The intuition is that we need
 many tiles to perform most reorganizations, and during the
 steady-state other tiles are off doing the computation of other
@@ -189,15 +189,15 @@ the steady-state.
 \subsection{Scheduling the Software Pipeline}
 We have chosen to reduce our steady-state slice scheduling problem to
 a 3D bin packing problem \ref{binpacking} with irregularly shaped
-objects.  The translation is straightforward, each slice is
-represented by a 3-dimensional object.  The x,y area occupied by
-the slice correspond to the number of computational nodes occupied by
-the slice.  The bins are the computational nodes themselves.  The z
-dimension is time.  We want to minimize the height (in the z
-dimension) of the packing.  By doing this, we will minimize the
-critical path schedule length.  We use simulated annealing to arrive
-at an optimized solution to the packing.  The translation and the
-solution is discussed in detail in section \ref{sec:scheduling}.
+objects.  In the translation, each slice is represented by a
+3-dimensional object.  The x,y area occupied by the slice correspond
+to the number of computational nodes occupied by the slice. The z
+dimension is time.  The bins are the computational nodes themselves.
+We want to minimize the height (in the z dimension) of the packing.
+By doing this, we will minimize the critical path schedule length.  We
+use simulated annealing to arrive at an optimized solution to the
+packing.  The translation and the solution is discussed in detail in
+section \ref{sec:scheduling}.
 
 \section{Compiler Flow}
 Neglecting the irrelevant initial passes, the flow of the space-time
