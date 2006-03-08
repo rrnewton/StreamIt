@@ -6,11 +6,7 @@ execute on it. To generate the execution code for the entire
 application, we traverse the schedule for each phase of computation:
 first the peek initialization stage, then prologue stage, and finally
 the steady-state.  As we traverse each schedule, we generate the
-computation and communication code as we visit each slice.  For the
-initialization and prologue stages, we do a traversal of the slice
-graph that respects the data-dependencies stipulated by the stream
-graph. For the steady-state, we traverse the schedule as calculated by
-the slice scheduling algorithm of Section \ref{sec:scheduling}.
+computation and communication code as we visit each slice.  
 
 When we visit a slice, we first generate the DRAM requests and
 communication code to load its inputs from its mapped DRAM. Then, we
@@ -24,11 +20,11 @@ input stream must be assembled in the order stipulated by the
 round-robin weights on its incoming channels. To achieve this, the
 various input streams of the slices are collected into the memory
 module attached to the tile to which the first filter of the slice is
-mapped. Streaming DRAM requests are generated to read each input
+mapped. DRAM requests are generated to read each input
 channel and to write the final, reassembled input.  Code is generated
 for the static routers, as they perform the ordering of the final
 input stream as stipulated by each joiner.  Splitting is done in much
-the same way.  The compute processor of Raw are idle during
+the same way.  The compute processors of Raw are idle during
 data-reorganization stage.
 
 Remember from Section \ref{sec:softpipe} that the source and

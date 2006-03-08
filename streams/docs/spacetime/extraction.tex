@@ -13,19 +13,20 @@ should suffice.  We traverse the stream graph in depth-first order.
 Each time we visit a node, we must decide if the node should be added
 to the slice we are currently constructing.  Due to the restrictions
 of the current implementation, as we traverse the stream graph, we end
-the current slice and begin a new slice {\it before} a joiner node and
-{\it after} a splitter node, thus restricting the slices to pipelines
-of filters.  Also, as we are adding filters to the slice, we must
-introduce a slice boundary if the size of the slice is equal to the
-number of tiles in the Raw configuration. 
+the current a slice {\it before} a joiner node and we end the current
+slice {\it after} a splitter node, thus restricting the slices to
+pipelines of filters.  Also, as we are adding filters to the slice, we
+must introduce a slice boundary if the size of the slice is equal to
+the number of tiles in the Raw configuration.
 
 Additionally, we try to coax the generation of load-balanced slices.
 For each filter, we calculate a static work estimation of the filter
-based on an analysis of the {\tt work} function.  Because of the
-static I/O (push, pop, and peek) rates in this version of StreamIt,
-most loop bounds within {\tt work} can be resolved, allowing a close
-approximation of the actual cycle count.  This estimate is multiplied
-by the number of times the filter executes in the steady-state.
+based on an analysis of the {\tt work} function
+\cite{streamit-asplos}.  Because of the static I/O (push, pop, and
+peek) rates in this version of StreamIt, most loop bounds within {\tt
+work} can be resolved, allowing a close approximation of the actual
+cycle count.  This estimate is multiplied by the number of times the
+filter executes in the steady-state.
 
 As we are adding filters to the slice, we compare the work estimation
 of the current filter we are examining to the work estimation for the
