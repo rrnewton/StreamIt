@@ -30,8 +30,8 @@ by the number of times the filter executes in the steady-state.
 As we are adding filters to the slice, we compare the work estimation
 of the current filter we are examining to the work estimation for the
 filter of the slice that performs the most work (the current {\it
-bottleneck} of the slice).  If the ratio of the work in the current
-filter to the work in of the bottleneck is within a predefined
+bottleneck} of the slice).  If the ratio of the work of the current
+filter to the work of the bottleneck is within a predefined
 threshold, termed the {\it work threshold}, then we proceed to add the
 filter to the slice.  Otherwise, begin a new slice with the current
 filter as the first filter in this new slice. In the case where a

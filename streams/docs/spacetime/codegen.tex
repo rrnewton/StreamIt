@@ -9,13 +9,14 @@ the steady-state.  As we traverse each schedule, we generate the
 computation and communication code as we visit each slice.  For the
 initialization and prologue stages, we do a traversal of the slice
 graph that respects the data-dependencies stipulated by the stream
-graph. For the steady-state we traverse the schedule as calculated by
+graph. For the steady-state, we traverse the schedule as calculated by
 the slice scheduling algorithm of Section \ref{sec:scheduling}.
 
 When we visit a slice, we first generate the DRAM requests and
-communication code load its inputs from and store its outputs to its
-mapped off-chip DRAM.  Next, we generate computation and communication
-code for each filter of the slice.  
+communication code to load its inputs from its mapped DRAM. Then, we
+generate the DRAM requests and communication code to store its outputs
+to its mapped DRAM.  Finally, we generate computation and
+communication code for each filter of the slice.
 
 \subsection{Slice Data Reordering}
 Before a steady-state execution can commence, each slice's single

@@ -106,11 +106,11 @@ Inter-slice communication leverages capacious off-chip DRAM resources.
 This enables us to aggressively buffer data between slices, amortizing
 the cost of slice pipeline startup and providing scheduling
 flexibility. The space-time execution model uses rotating buffers to
-buffer data between slices allowing the compiler remove dependences
+buffer data between slices allowing the compiler to remove dependences
 between slices and allowing slices of different iterations of the
 stream graph to execute concurrently.  These rotating buffers are akin
 to a rotating register file found in some superscalar and VLIW
-architectures and are distributed amongst the off-chip dram
+architectures and are distributed amongst the off-chip DRAM
 banks. Furthermore, the inter-slice off-chip memory accesses are
 highly regular (unit-stride bulk transfers) that can utilize batch
 processing modes of modern DRAMs. \todo{Anything else here}?
@@ -127,18 +127,18 @@ inherent in streaming languages. Abundant utilization of the on-chip
 interconnect is essential to the scalability of a parallel execution
 model for communication-exposed architectures.
 
-In its tradition setting, software pipelining \cite{lam-softpipe,
-rau-softpipe} is a scheduling technique which hides latency and
+In its traditional setting, software pipelining \cite{lam-softpipe,
+rau-softpipe} is a scheduling technique that hides latency and
 maximizes resource utilization by building a loop with instructions
 from multiple iterations of the original loop.  In our context, the
 software pipeliner is scheduling whole slices for execution on
 multiple computational nodes. Our slice scheduling phase employs novel
-techniques to arrive at the software pipelined schedule, these
+techniques to arrive at the software pipelined schedule; these
 techniques are enabled by the regular and structured slice graphs that
 we are scheduling. Unlike traditional software pipelining algorithms,
 we use simulated annealing to solve a 3-dimensional bin-packing
 problem with irregular shaped objects.  These objects represent the
-slices of the graph and the bins represent the ccmputational nodes of the
+slices of the graph and the bins represent the computational nodes of the
 target architecture.  The solution to the 3D bin-packing gives us both
 the slice scheduling order and the resource mapping for the filters of
 each slice.
@@ -163,13 +163,10 @@ compiler, demonstrating an average improvement of \todo{??} over a
 space multiplexing approach.
 \end{itemize}
 
-
-In this section we will present a overview of the input to the
+In the next sections we will present an overview of the input to the
 SpaceTime compiler, its slice execution model, and its relevant
 passes.  We will use our FM Radio application to further illustrate
 these concepts.  
-
-
 
 The remainder of this paper is organized as follows.  Section
 \ref{sec:streamit} gives an introduction to the StreamIt programming

@@ -44,8 +44,8 @@ they can deliver a value from the ALU of one tile to the ALU of a
 neighboring tile in 3 cycles, or more generally, 2+N cycles for an
 inter-tile distance of N hops.
 
-Because we generate regular bulk DRAM transfers, we did not want
-accesses to off-chip memory to become the bottleneck of the hardware
+Because we generate bulk DRAM transfers, we did not want these
+optimizable accesses to become the bottleneck of the hardware
 configuration.  So, we use a simulation of a CL2 PC 3500 DDR DRAM,
 which provides enough bandwidth to saturate both directions of a Raw
 port \cite{raw_isca}.  In our configuration, we use 16 such DRAMs,
@@ -69,5 +69,5 @@ of 450 MHz, the tile employs as compute processor an 8-stage, single
 issue, in-order MIPS-style pipeline that has a 32 KB data cache, 32 KB
 of instruction memory, and 64 KB of static router memory.
 
-(FileReaders and writers should be talked about as connected to the
-bypass port of the dram chipset).
+\todo{FileReaders and writers should be talked about as connected to the
+bypass port of the dram chipset}.
