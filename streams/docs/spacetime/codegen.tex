@@ -27,10 +27,17 @@ mapped. Streaming DRAM requests are generated to read each input
 channel and to write the final, reassembled input.  Code is generated
 for the static routers, as they perform the ordering of the final
 input stream as stipulated by each joiner.  Splitting is done in much
-the same way.  Remember from Section \ref{sec:softpipe} that the
-source and destination buffers of this stage are the rotating buffers
-that facilitate the software pipeline.  The compute processor of Raw
-are idle during data-reorganization stage.
+the same way.  The compute processor of Raw are idle during
+data-reorganization stage.
+
+Remember from Section \ref{sec:softpipe} that the source and
+destination buffers of this stage are the rotating buffers that
+facilitate the software pipeline.  The number of individual memory
+blocks that compose the rotating buffer is determined by the
+multiplicity difference between the source slice and destination slice
+in the prologue schedule.  Each time an off-chip memory request is
+issued, the buffer will rotate, with two rotation structures for each
+buffer that rotate separately, one for reading and one for writing.
 
 \subsection{Filter Code Generation}
 We generate computation and communication code for the individual

@@ -2,12 +2,12 @@
 \label{sec:scheduling}
 \subsection{Steady-State Schedule}
 
-\begin{figure}
-\centering
-\psfig{figure=space-time-ex-1.ps, width=3in}
-\caption{Something should go here.
-\protect\label{fig:1d}}
-\end{figure}
+%\begin{figure}
+%\centering
+%\psfig{figure=schedule_ex_1.eps,width=3in}
+%\caption{Something should go here.
+%\protect\label{fig:1d}}
+%\end{figure}
 
 what we get at this stage
 
@@ -29,15 +29,33 @@ for the global minima.  As the simulation proceeds, the probability of
 climbing uphill decreases.
 
 
+\subsection{Cost Function}
+The cost function for the simulated annealing solution to our 3D bin
+packing problem attempts to incorporate three different aspects of the
+scheduling problem.  First that the critical path of the schedule is
+determined by the node(s) with the maximum work.  We do not generate a
+true modulo schedule because all nodes must wait for the bottleneck
+node to complete to perform the data-reorganization.  Next, we assume
+that the work estimation performed by our compiler is inaccurate, so
+we bias the estimate to reflect this observation.  Finally, we take
+into account the communication cost of the data-reorganization phase.
+
+
+
 what it does!
 
 \subsection{Prologue Schedule}
 how contructed, what it guarantees.
 
 \subsection{Peek Initialization Schedule}
-what is it for?
-
-how constructed
-
+Before both the prologue schedule is executed and the steady-state
+schedule is commenced, we perform a {\it peek initialization
+schedule}.  This schedule is required to make sure that we can create
+a cyclic steady-state schedule that respects StreamIt's peeking
+operation.  In this schedule, slices are executed in data-flow order
+and the buffers are not rotated.  Therefore, the prologue schedule
+starts with the rotating buffers untouched.  See
+\cite{streamitcc} for a more complete discussion of the peek
+initialization schedule.
 
 
