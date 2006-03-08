@@ -28,7 +28,6 @@ the stream graph.  We introduce a (more powerful) splitter node after
 each filter whose output is read by multiple filters and we introduce
 a (more powerful) joiner node before each filter that reads data
 produced by multiple filters.
-\todo{Are we going to include a section on synch removal?}
 
 After synchronization removal, we are left with a flat stream graph
 composed of filters, and data-reorganization nodes (our more powerful
@@ -39,6 +38,14 @@ of these nodes and filters.  At this point we are ready to extract the
 traces from the graph and schedule them for execution. 
 
 \todo{add the fm radio stream graph and its synch removed analog.}
+
+%\begin{figure}
+%\centering
+%\psfig{figure=fm_example.eps,width=3in}
+%\caption{FMRadion with a 12-way equalizer.
+%\protect\label{fig:fm-example}}
+%\end{figure}
+
 
 \section{The Slice}
 Before we move on to describing the algorithms that compose the
