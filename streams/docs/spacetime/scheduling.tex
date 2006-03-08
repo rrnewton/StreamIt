@@ -1,12 +1,27 @@
 \section{Space-Time Scheduling}
 \label{sec:scheduling}
 \subsection{Steady-State Schedule}
-3d bin packing translation
-simulated annealing solution
-what it does!
+what we get at this stage
 
-how we map slices to dram based on an owner tile then we 
-are free to select any dram for the inter trace buffers.
+3d bin packing translation
+
+What the pieces look like 
+
+saman's figures...
+
+We arrive at a solution to the 3d bin packing by using simulated
+annealing \cite{simanneal}, a type of iterative improvement.  A
+detailed explanation of simulated annealing is beyond the scope of
+this paper.  Simulated annealing is a form of stochastic
+hill-climbing. Unlike most other methods for cost function
+minimization, simulated annealing is suitable for problems where there
+are many local minima.  Simulated annealing achieves its success by
+allowing the system to go uphill with some probability as it searches
+for the global minima.  As the simulation proceeds, the probability of
+climbing uphill decreases.
+
+
+what it does!
 
 \subsection{Prologue Schedule}
 how contructed, what it guarantees.
