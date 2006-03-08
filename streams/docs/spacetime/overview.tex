@@ -98,6 +98,15 @@ In Section \ref{sec:extract} we describe our algorithm for extracting
 slices from a stream graph.
 
 \section{Execution Model}
+\begin{figure}[t]
+\centering
+\psfig{figure=slices.eps,width=3.0in}
+\caption{The characteristics of a slice.
+\protect\label{fig:slice}}
+\end{figure}
+
+\section{The Raw Architecture}
+\label{sec:raw}
 After we compose a graph of slices from the stream graph, we are ready
 to schedule the slices in both space and time on to the parallel
 target.  In this section we will describe our current slice execution
