@@ -2,7 +2,7 @@
 \label{sec:related}
 
 The Imagine stream processor~\cite{rixner98bandwidthefficient}
-supports a time multiplexed execution model.  The architecture
+supports a time-multiplexed execution model.  The architecture
 contains 48 parallel ALU's organized into 6 VLIW clusters.  The
 programming model requires the programmer to write computation filters
 in Kernel-C and stitch them together using Stream-C.  Because the
@@ -13,12 +13,7 @@ arithmetic utilization when there is abundant data parallelism, it
 suffers when a filter has retained state or data-dependences between
 iterations.  Moreover, architectures based solely on
 time-multiplexing do not scale spatially, as there are global wires
-orchestrating the parallel execution units.  There is also a large
-amount of memory traffic due to the prolonged execution of each
-time-multiplexed stage; Imagine addresses this challenge by
-introducing a compiler-controlled buffer called the ``stream register
-file'' to prefetch data streams from memory and arrange them for
-processing.
+orchestrating the parallel execution units. 
 
 Previous work in compiling StreamIt to Raw has taken a purely space
 multiplexed approach~\cite{streamit-asplos}.  In this model, a single
@@ -29,9 +24,7 @@ filters into one.  While filter fusion can be regarded as a restricted
 form of time multiplexing (as the fused filter simulates the execution
 of the originals, in turn), the approach given in the current paper is
 much more general, as a given tile participates in multiple slices
-that can be drawn from non-adjacent sections of the stream graph.  The
-current paper also advances over previous work in its software
-pipelining of slices and template code generation for linear filters.
+that can be drawn from non-adjacent sections of the stream graph.
 
 %Our fine-grained execution model for linear portions of the stream
 %graph is closely related to the large body of work on systolic
@@ -47,21 +40,41 @@ pipelining of slices and template code generation for linear filters.
 %decoupling memory accesses from computation for several scientific
 %applications on tiled processors.
 
-The Transputer architecture~\cite{transputer88} is an array of
-processors, where neighboring processors are connected with unbuffered
-point-to-point channels.  The programming language used for the
-Transputer is Occam \cite{occammanual}: a streaming language similar
-to CSP \cite{Hoare78}.  However, Occam concurrent processes are not
-statically load-balanced, scheduled and bound to a processor. Occam
-processes are run off a very efficient runtime scheduler implemented
-in microcode~\cite{may87communicating}.  
+Previous work in scheduling computation graphs to parallel targets
+have focused on dynamic techniques \cite{SDFSched, SDFSched2,
+may87communicating, DAGSched}. In general, multiple graph nodes are
+{\it clustered} onto a single computational node and scheduled
+dynamically.  We differ from clustering because we first combine
+multiple graph nodes into a space-partitioned slice, then we cluster
+the elements of different slices on a processing node. There is no
+communication between slice elements of a single computational node.
+We create a static schedule at each node that is tightly orchestrated
+based on a our load estimations. Our work, unlike most previous work
+in this field, models link contention and topography.  Furthermore,
+StreamIt graphs are implicitly formed of loops so we can apply loop
+scheduling techniques such as software pipelining to build our
+schedules.
 
-A number of emerging architectures are incorporating a notion of
-polymorphic execution modes that include support for
-streams~\cite{trips-isca03,smartmemories,m3t}.  Such hardware support
-is complementary to space-time multiplexing, as the mode of a given
-resource could be toggled on the granularity of a slice to best
-accommodate the computation pattern therein.
+The problem of instruction scheduling for MIMD and VLIW architectures
+is similar to the problem tackled by the space-time compiler.  ILP
+compilers for clustered VLIW architectures~\cite{Bulldog, Multiflow}
+are decomposed into stages that are analogous to the stages of the
+SpaceTime compiler.  These compilers must partition or cluster
+instructions, assign instructions to processors, and then schedule the
+instructions.  Previous work on ILP scheduling for the Raw
+architectures ~\cite{lee98spacetime} also bears similarity. Again, the
+problem is decomposed into stages that have analogues to the stages of
+our SpaceTime Compiler.  However, these compilers schedule
+graphs of fine-grained instructions. The partitioning and scheduling
+heuristics are mindful of a different set of constraints including
+different types of dynamism and less regular communication patterns as
+compared to StreamIt graphs.
+
+As far as we know, the SpaceTime Compiler is the first scheduler to
+apply loop-level scheduling techniques to the problem
+of scheduling coarse-grained task graphs.  Also, our compiler is the first
+to map a software-pipelined scheduling problem to a 3-dimensional
+bin-packing problem and employ simulated annealing to arrive at a solution.
 
 % \cite{cheops-thesis}
 %   http://web.media.mit.edu/~kung/publication/thesis.pdf
