@@ -1,5 +1,13 @@
 \section{Stream Graph} 
 
+\begin{figure*}
+\centering
+\psfig{figure=fm_example.eps,width=6.5in}
+\caption{FMRadio with a 12-way equalizer after the passes of the
+SpaceTime Compiler.
+\protect\label{fig:fm-ex}}
+\end{figure*}
+
 Currently we use the StreamIt Programming Language as the input
 language to the SpaceTime Compiler. After the StreamIt frontend
 executes, it passes our compiler a complete stream graph representing
@@ -7,7 +15,18 @@ the computation and communication of the application.  In StreamIt,
 the stream graph is a structured, hierarchical composition of
 pipelines, splitjoins, and feedbackloops with filters, splitters, and
 joiners as the leaf nodes of the graph (see Section
-\ref{sec:streamit}).
+\ref{sec:streamit}).  
+
+Throughout the following sections, we will use our FMRadio benchmark
+to elucidate our discussion.  The FMRadio application is a software
+implementation of FM radio with a 12-way equalizer.  StreamIt's stream
+graph is given in Figure \ref{fig:fm-ex}a.  In the figure, we
+represent splitters, joiners, and filters with circles.  Containers
+(splitjoins and pipelines) are represented with as rectangles around
+the leaf nodes they contain.  In the figure, the filters colored red
+have the highest work estimation per steady-state execution (in this
+case, the red nodes account for over 90\% of the computation in the
+steady-state).
 
 The initial pass of our compiler takes this structured stream graph
 and de-structures it.  We remove all hierarchy and structure of the
@@ -31,11 +50,13 @@ produced by multiple filters.
 
 After synchronization removal, we are left with a flat stream graph
 composed of filters, and data-reorganization nodes (our more powerful
-splitters and joiners).  For the remainder of this paper the terms
-splitter and joiner refer to our more powerful splitting and joining
-nodes and the term stream graph refers to the flattened graph composed
-of these nodes and filters.  At this point we are ready to extract the
-traces from the graph and schedule them for execution. 
+splitters and joiners), see Figure \ref{fig:fm_ex}b FMRadio's
+flattened stream graph; note that some splitters have been
+coalesced. For the remainder of this paper the terms splitter and
+joiner refer to our more powerful splitting and joining nodes and the
+term stream graph refers to the flattened graph composed of these
+nodes and filters.  At this point we are ready to extract the traces
+from the graph and schedule them for execution.
 
 \todo{add the fm radio stream graph and its synch removed analog.}
 
@@ -65,7 +86,9 @@ inner filters are restricted to single input and single output.  Each
 filter of the original stream graph is contained in exactly one slice.
 Slices are not hierarchical.  The number of filters in a slice must be
 less than or equal to the number of computational nodes of the
-architecture to which we are targeting.
+architecture to which we are targeting.  In Figure \ref{fig:fm_ex}c,
+we give a possible slice graph for the 12-way FMRadio application.
+The blue boxes represent individual slices.
 
 These restrictions are not fundamental to the hybrid space-time
 multiplexing execution model; they simplify the compiler.  In future
@@ -197,14 +220,18 @@ the steady-state.
 We have chosen to reduce our steady-state slice scheduling problem to
 a 3D bin packing problem \ref{binpacking} with irregularly shaped
 objects.  In the translation, each slice is represented by a
-3-dimensional object.  The x,y area occupied by the slice correspond
-to the number of computational nodes occupied by the slice. The z
-dimension is time.  The bins are the computational nodes themselves.
-We want to minimize the height (in the z dimension) of the packing.
-By doing this, we will minimize the critical path schedule length.  We
-use simulated annealing to arrive at an optimized solution to the
-packing.  The translation and the solution is discussed in detail in
-section \ref{sec:scheduling}.
+3-dimensional object.  The x,y area occupied by an object correspond
+to the number of computational nodes occupied by the associated
+slice. The z dimension is time.  The bins are the computational nodes
+themselves.  We want to minimize the height (in the z dimension) of
+the packing.  By doing this, we will minimize the critical path
+schedule length.  We use simulated annealing to arrive at an optimized
+solution to the packing.  The translation and the solution is
+discussed in detail in section \ref{sec:scheduling}. Figure
+\ref{fig:fm_ex}d presents a fictitious 3d conceptualization for
+FMRadio. In the figure, each irregularly shaped object represents a
+slice and we attempt to pack them into the cube while minimizing the
+maximum height of packing.
 
 \section{Compiler Flow}
 Neglecting the irrelevant initial passes, the flow of the space-time
