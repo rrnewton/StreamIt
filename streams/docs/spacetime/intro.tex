@@ -1,7 +1,8 @@
 \section{Introduction}
 
 Due to the inexorable advance of VLSI technology, transistors are
-essentially free.  Microprocessor design is now dominated by wire
+essentially free.  However, centralized microprocessor designs do not
+scale effectively.  Microprocessor design is now dominated by wire
 delay concerns.  One popular solution harnesses the plethora of
 chip-level resources by replicating processing units.  This limits
 wire delay because wires need not be longer than a replicated unit.
@@ -63,7 +64,12 @@ Unfortunately, this approach is highly dependent on effective load
 balancing techniques: the goal is to merge and split filters (into new
 filters) until all computation resources are assigned filters with a
 uniform work distribution.  Such load balancing can be very difficult
-for applications with an irregular distribution of work.
+for applications with an irregular distribution of work and the cost
+of data-reorganization associated with filter merging is prohibitive
+as it creates large memory structures. Also, mapping the complex
+communication patterns described by a stream graph to the simple
+interconnect of a parallel processor may introduce additional
+synchronization points not present in the original graph.
 
 This paper proposes a hybrid approach, {\it space-time multiplexing},
 that exploits the advantages of both space multiplexing and time
@@ -126,7 +132,7 @@ rau-softpipe} is a scheduling technique which hides latency and
 maximizes resource utilization by building a loop with instructions
 from multiple iterations of the original loop.  In our context, the
 software pipeliner is scheduling whole slices for execution on
-multiple raw tiles. Our slice scheduling phase employs novel
+multiple computational nodes. Our slice scheduling phase employs novel
 techniques to arrive at the software pipelined schedule, these
 techniques are enabled by the regular and structured slice graphs that
 we are scheduling. Unlike traditional software pipelining algorithms,
@@ -156,6 +162,14 @@ is used to arrive at a solution.
 compiler, demonstrating an average improvement of \todo{??} over a
 space multiplexing approach.
 \end{itemize}
+
+
+In this section we will present a overview of the input to the
+SpaceTime compiler, its slice execution model, and its relevant
+passes.  We will use our FM Radio application to further illustrate
+these concepts.  
+
+
 
 The remainder of this paper is organized as follows.  Section
 \ref{sec:streamit} gives an introduction to the StreamIt programming

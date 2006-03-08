@@ -33,19 +33,19 @@ that can be drawn from non-adjacent sections of the stream graph.  The
 current paper also advances over previous work in its software
 pipelining of traces and template code generation for linear filters.
 
-Our fine-grained execution model for linear portions of the stream
-graph is closely related to the large body of work on systolic
-architectures~\cite{systolic78,systolic82}.  A systolic architecture
-is arranged as an array of cells with local neighbor-to-neighbor
-communication.  Each cell has limited storage, and computation is
-arranged as data streaming through the array.  A large number of
-algorithms have been recast in a systolic
-context~\cite{leighton-book}, including others that focus on linear
-operations~\cite{wu87systolic}.  The algorithm underlying our template
-code generation is based on Hoffmann's stream
-algorithms~\cite{hoffmann-streams}, which provide a framework for
-decoupling memory accesses from computation for several scientific
-applications on tiled processors.
+%Our fine-grained execution model for linear portions of the stream
+%graph is closely related to the large body of work on systolic
+%architectures~\cite{systolic78,systolic82}.  A systolic architecture
+%is arranged as an array of cells with local neighbor-to-neighbor
+%communication.  Each cell has limited storage, and computation is
+%arranged as data streaming through the array.  A large number of
+%algorithms have been recast in a systolic
+%context~\cite{leighton-book}, including others that focus on linear
+%operations~\cite{wu87systolic}.  The algorithm underlying our template
+%code generation is based on Hoffmann's stream
+%algorithms~\cite{hoffmann-streams}, which provide a framework for
+%decoupling memory accesses from computation for several scientific
+%applications on tiled processors.
 
 The Transputer architecture~\cite{transputer88} is an array of
 processors, where neighboring processors are connected with unbuffered

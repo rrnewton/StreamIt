@@ -16,22 +16,22 @@ hybrid algorithm that offers the flexible load balancing of time
 multiplexing while preserving the fine-grained benefits of space
 multiplexing.
 
-A second contribution of our work is using program traces as a target
-of domain-specific optimizations.  For traces that compute a linear
-function, we extract the coefficients and generate template assembly
-code that has been hand-tuned for Raw.  This technique yields
-near-optimal floating point utilization and provides a \todo{??}
-speedup over our benchmark suite.  Our vision is that similar
-architecture-specific templates could be generated for a variety of
-filters---not only for those that compute a given function (e.g., FFT)
-but also for filters with a specific property.  For example,
-data-parallel filters can be parallelized by a backend or can admit
-instruction reordering between different instances.  Such properties
-can facilitate a retargetable backend infrastructure, as each backend
-provides its own optimizations for a given class of filters.  Of
-course, domain-specific optimizations such as these rely on space-time
-multiplexing for their generality, as traces that are not subject to
-specific optimizations can can execute in their own time partitions.
+%A second contribution of our work is using program traces as a target
+%of domain-specific optimizations.  For traces that compute a linear
+%function, we extract the coefficients and generate template assembly
+%code that has been hand-tuned for Raw.  This technique yields
+%near-optimal floating point utilization and provides a \todo{??}
+%speedup over our benchmark suite.  Our vision is that similar
+%architecture-specific templates could be generated for a variety of
+%filters---not only for those that compute a given function (e.g., FFT)
+%but also for filters with a specific property.  For example,
+%data-parallel filters can be parallelized by a backend or can admit
+%instruction reordering between different instances.  Such properties
+%can facilitate a retargetable backend infrastructure, as each backend
+%provides its own optimizations for a given class of filters.  Of
+%course, domain-specific optimizations such as these rely on space-time
+%multiplexing for their generality, as traces that are not subject to
+%specific optimizations can can execute in their own time partitions.
 
 Our implementation of space-time multiplexing in the StreamIt-to-Raw
 compiler demonstrates an average improvement of \todo{??} over a
