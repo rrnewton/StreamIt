@@ -55,20 +55,29 @@ StreamIt graphs are implicitly formed of loops so we can apply loop
 scheduling techniques such as software pipelining to build our
 schedules.
 
-The problem of instruction scheduling for MIMD and VLIW architectures
-is similar to the problem tackled by the space-time compiler.  ILP
-compilers for clustered VLIW architectures~\cite{Bulldog, Multiflow}
-are decomposed into stages that are analogous to the stages of the
-SpaceTime compiler.  These compilers must partition or cluster
-instructions, assign instructions to processors, and then schedule the
-instructions.  Previous work on ILP scheduling for the Raw
-architectures ~\cite{lee98spacetime} also bears similarity. Again, the
-problem is decomposed into stages that have analogues to the stages of
-our SpaceTime Compiler.  However, these compilers schedule
-graphs of fine-grained instructions. The partitioning and scheduling
-heuristics are mindful of a different set of constraints including
-different types of dynamism and less regular communication patterns as
-compared to StreamIt graphs.
+%The problem of instruction scheduling for MIMD and VLIW architectures
+%is similar to the problem tackled by the space-time compiler.  ILP
+%compilers for clustered VLIW architectures~\cite{Bulldog, Multiflow}
+%are decomposed into stages that are analogous to the stages of the
+%SpaceTime compiler.  These compilers must partition or cluster
+%instructions, assign instructions to processors, and then schedule the
+%instructions.  
+
+Previous work on software pipeline has focused on scheduling machine
+instructions in a loop \cite{lam-softpipe, rau-softpipe} to a
+uniprocessor target.  The algorithms devised must account for tight
+resource constraints and complex instruction dependences.  Our
+software-pipelining problem is much less constrained, a traditional
+modulo scheduling algorithm can not effectively take advantage of this
+flexibility.  So we employ a stochastic hill-climbing algorithm to
+more completely search the solution space.  Previous work on ILP
+scheduling for the Raw architectures ~\cite{lee98spacetime} also bears
+similarity. Again, the problem is decomposed into stages that have
+analogues to the stages of our SpaceTime Compiler.  However, these
+compilers schedule graphs of fine-grained instructions. The
+partitioning and scheduling heuristics are mindful of a different set
+of constraints including different types of dynamism and less regular
+communication patterns as compared to StreamIt graphs.
 
 As far as we know, the SpaceTime Compiler is the first scheduler to
 apply loop-level scheduling techniques to the problem
