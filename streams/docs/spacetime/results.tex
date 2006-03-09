@@ -37,10 +37,10 @@ comparison to space-multiplexing.
 We have completed a fully-automated SpaceTime compiler implementing
 the execution model and algorithms as detailed in the previous
 sections. Our current backend is for the Raw microprocessor. The
-results of this paper were generated using btl, a cycle-accurate
+results in this paper were generated using btl, a cycle-accurate
 simulator that models arrays of Raw tiles identical to those in the
-.15 micron 16-tile Raw prototype ASIC chip.  With a target clock rate
-of 450 MHz, the tile employs as compute processor an 8-stage, single
+.15 micron 16-tile Raw prototype ASIC chip, with a target clock rate
+of 450 MHz. The tile employs as compute processor an 8-stage, single
 issue, in-order MIPS-style pipeline that has a 32 KB data cache, 32 KB
 of instruction memory, and 64 KB of static router memory.
 
@@ -51,26 +51,26 @@ points.  We gather throughput numbers for the benchmarks (in cycles
 per output), utilization percentage (the percentage of time that an
 {\it occupied tile} is not blocked on a send or receive), and we
 compare the SpaceTime performance to the performance of a
-space-multiplexing StreamIt compiler targeting Raw.  
+space-multiplexing StreamIt compiler targeting Raw.
 
-We compile without code optimization for each compiler, so that we can
-compiler the load balancing is prominent.  Furthermore, for the
+We compile without code optimization for each compiler, so that the
+effect of the load balancing is more prominent.  Furthermore, for the
 SpaceTime compiler, we hand tune the work threshold described in
-\ref{sec:extraction}.  We compile the code produced by each compiler
+\ref{sec:extract}.  We compile the code produced by each compiler
 with GCC 3.3 with optimization level O3.
 
-An example execution trace for the FMRadio with 7 equalizer ways and
+An example execution trace for the FMRadio with 7-way equalizer and
 64 taps.  In Figure \ref{fig:util} we show the processor utilization
 graph for each benchmark. For these benchmarks roughly half the tiles
 are utilized during steady-state; this number is uniformly consistent
 across the benchmark suite.  Considering processor and communication
-stalls over 16 tiles, these numbers are favorable.
+stalls over 16 tiles, these numbers are encouraging.
 
 In comparing to the space-multiplexing, over the benchmark suite we
-have improved the load-balancing thus significantly reducing
+have improved the load-balancing, thus significantly reducing
 communication stalls.  Note that our slice extractor creates many
-small slices which helps the load balancing but increasing
+small slices which helps the load balancing but increases
 communication to off-chip DRAM.  Over the benchmark suite the average
-speedup over space-multiplexing is 1.38 with a maximum speed up of
+speedup over space-multiplexing is 1.38, with a maximum speed up of
 2.67. The throughput comparison to space-multiplexing is given in
 Figure \ref{fig:speedup}.
