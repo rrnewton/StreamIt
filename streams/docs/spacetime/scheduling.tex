@@ -37,7 +37,18 @@ ready to fire.
 
 \begin{figure}
 \centering
+\psfig{figure=slice-shapes.eps,width=2.5in}
+\vspace{-6pt}
+\caption{Unique shapes considered by the scheduler for a four-element
+slice.  The scheduler also considers all rotations and reflections of
+these shapes.
+\protect\label{fig:shapes}}
+\end{figure}
+
+\begin{figure}
+\centering
 \psfig{figure=scheduling_2d.eps,width=3in}
+\vspace{-6pt}
 \caption{The bin-packing, slice scheduling problem in two dimensions.
 \protect\label{fig:2d}}
 \end{figure}
@@ -59,13 +70,13 @@ Our current implementation maps our scheduling problem to a
 3-dimensional bin packing problem with transformable, irregularly
 shaped objects.  Each object represents a slice and each bin
 represents a computational node of the target.  The objects are shaped
-like 3D stairs, accounting for intra-slice pipeline effects. The
-object can change shape.  This corresponds to the different node
-assignments of the slice and their routing.  In Figure
-\ref{fig:2d} we present a 2D illustration of the mapping.  Limiting
-the problem to two dimensions considers only architectural
-configurations with single dimension of computational nodes and slices
-do not change shape.
+like 3D stairs, accounting for intra-slice pipeline effects. As
+illustrated in Figure~\ref{fig:shapes}, the object can change shape.
+This corresponds to the different node assignments of the slice and
+their routing.  In Figure \ref{fig:2d} we present a 2D illustration of
+the mapping.  Limiting the problem to two dimensions considers only
+architectural configurations with single dimension of computational
+nodes and slices do not change shape.
 
 We arrive at a solution to the 3d bin packing by using simulated
 annealing \cite{simanneal}, a type of iterative improvement.  A
