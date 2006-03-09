@@ -2,7 +2,7 @@
 \label{sec:conclusion}
 
 This paper proposes space-time multiplexing, a flexible scheme for
-compiling streaming applications to wire-exposed architectures.  Up
+compiling streaming applications to parallel architectures.  Up
 until now, the two prevailing compilation strategies have been at odds
 with one another: time-multiplexing provides flexible load balancing
 at the expense of memory traffic and limited scalability, while space
@@ -34,7 +34,7 @@ multiplexing.
 %specific optimizations can can execute in their own time partitions.
 
 Our implementation of space-time multiplexing in the StreamIt-to-Raw
-compiler demonstrates an average improvement of \todo{??} over a
+compiler demonstrates an average improvement of 1.38 over a
 purely space-multiplexing scheme.  We believe that hybrid space-time
 multiplexing represents a viable technique for harvesting the
 computation resources of next-generation machines.
