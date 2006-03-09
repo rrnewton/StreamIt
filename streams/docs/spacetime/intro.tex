@@ -40,7 +40,9 @@ containing multiple instruction streams and distributed memory banks.
   \vspace{-18pt}
   \psfig{figure=space-vs-time.eps,width=4.5in}
   \vspace{-12pt}
-  \caption{Techniques for scheduling stream programs. \protect\label{fig:spacevstime}}
+  \caption{Techniques for scheduling stream programs, squares denote
+computational nodes, rectangles denote off-chip memories.
+ \protect\label{fig:spacevstime}}
   \vspace{-6pt}
 \end{figure*}
 
@@ -111,7 +113,7 @@ flexibility. The space-time execution model uses rotating buffers to
 buffer data between slices allowing the compiler to remove dependences
 between slices and allowing slices of different iterations of the
 stream graph to execute concurrently.  These rotating buffers are akin
-to a rotating register file found in some superscalar and VLIW
+to a rotating register file found in some VLIW
 architectures and are distributed amongst the off-chip DRAM
 banks. Furthermore, the inter-slice off-chip memory accesses are
 highly regular (unit-stride bulk transfers) that can utilize batch
@@ -138,13 +140,15 @@ multiple computational nodes. The scheduling problem has many degrees
 of freedom and our slice scheduling phase employs novel techniques to
 arrive at the software pipelined schedule.  These techniques are
 enabled by the regular and structured slice graphs that we are
-scheduling. Unlike traditional software pipelining algorithms, we use
-simulated annealing to solve a 3-dimensional bin-packing problem with
-irregular shaped objects.  These objects represent the slices of the
-graph and the bins represent the computational nodes of the target
-architecture.  The solution to the 3D bin-packing gives us both the
-slice scheduling order and the resource mapping for the filters of
-each slice.
+scheduling. 
+
+%Unlike traditional software pipelining algorithms, we use
+%simulated annealing to solve a 3-dimensional bin-packing problem with
+%irregular shaped objects.  These objects represent the slices of the
+%graph and the bins represent the computational nodes of the target
+%architecture.  The solution to the 3D bin-packing gives us both the
+%slice scheduling order and the resource mapping for the filters of
+%each slice.
 
 In summary, this paper makes the following contributions:
 
@@ -152,20 +156,27 @@ In summary, this paper makes the following contributions:
 %\item A procedure for eliminating synchronization from a hierarchical
 %stream graph, yielding a flat graph that directly exposes
 %communication patterns.
+\vspace{-6pt}
 \item A description of the space-time multiplexing parallel execution
 model.
+\vspace{-6pt}
 \item A high-level intermediate representation for representing
 space-time multiplexing in the context of a stream compiler.  
+\vspace{-6pt}
 \item An algorithm for extracting load-balanced slices from a flat
 stream graph.
+\vspace{-6pt}
 \item A novel formulation of software pipelining for scheduling
 coarse-grained slices onto multiple computational nodes.
-\item A translation of the 3D bin-packing problem to our
-software-pipelined slice scheduling problem where simulated annealing
-is used to arrive at a solution.
-\item An evaluation of the SpaceTime Compiler
-, demonstrating an average improvement of \todo{??} over a space
+\vspace{-6pt}
+\item A translation of our software-pipelined slice scheduling problem
+to the 3D bin-packing problem where simulated annealing is used to
+arrive at a solution.
+\vspace{-6pt}
+\item An evaluation of the SpaceTime Compiler, 
+demonstrating an average improvement of \todo{??} over a space
 multiplexing approach.
+\vspace{-6pt}
 \end{itemize}
 
 %In the next sections we will present an overview of the input to the

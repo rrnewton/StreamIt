@@ -28,9 +28,10 @@ initialization schedule.
 \subsection{Prologue Schedule}
 The prologue schedule guarantees that when the steady-state commences,
 all the slices are ready to fire irrespective of their data-flow
-dependencies.  To create this schedule we iteratively execute slices,
-at each iteration we fire all the slices that can fire.  Stop the
-schedule when all slices are ready to fire.
+dependencies.  This schedule is composed of multiple iterations.  At
+each iteration we fire all the slices whose input requirements are met
+from the previous iteration.  We stop the schedule when all slices are
+ready to fire.
 
 \subsection{Steady-State Schedule}
 
@@ -42,9 +43,9 @@ schedule when all slices are ready to fire.
 \end{figure}
 Now we are ready to calculate the software-pipelined schedule for the
 steady-state of the slice graph.  At this point the prologue schedule
-will guarantee that there are no dependencies between slices during
-the execution of a steady-state; we are fully software-pipelined. The
-steady-state scheduler is free to execute slices in any order.
+will guarantee that there exists sufficient buffering between slices
+so that we can fully software-pipelined. The steady-state scheduler is
+free to execute slices in any order.
 
 Initially, we tried a list scheduling algorithm that greedily
 scheduled slices in order of descending work load. Unfortunately, it
@@ -59,28 +60,23 @@ Our current implementation maps our scheduling problem to a
 shaped objects.  Each object represents a slice and each bin
 represents a computational node of the target.  The objects are shaped
 like 3D stairs, accounting for intra-slice pipeline effects. The
-object can change shape by hinging at a stair.  This corresponds to
-different node assignments of the slice.  In Figure
+object can change shape.  This corresponds to the different node
+assignments of the slice and their routing.  In Figure
 \ref{fig:2d} we present a 2D illustration of the mapping.  Limiting
 the problem to two dimensions considers only architectural
-configurations with single dimension of computational nodes.
+configurations with single dimension of computational nodes and slices
+do not change shape.
 
 We arrive at a solution to the 3d bin packing by using simulated
 annealing \cite{simanneal}, a type of iterative improvement.  A
 detailed explanation of simulated annealing is beyond the scope of
-this paper.  Simulated annealing is a form of stochastic
-hill-climbing. Unlike most other methods for cost function
-minimization, simulated annealing is suitable for problems where there
-are many local minima.  Simulated annealing achieves its success by
-allowing the system to go uphill with some probability as it searches
-for the global minima.  As the simulation proceeds, the probability of
-climbing uphill decreases.  Simulated annealing is an accepted method
+this paper.   Simulated annealing is an accepted method
 for solving a simple 3d bin packing problem \cite{binpacking}. 
 
 To arrive at a complete SpaceTime schedule, we first create a total
 ordering of slices, where a slice that does more work per steady-state
 is greater than a slice that does less work.  After we arrive at an
-assignment of filters to a computational nodes, we order the filter
+assignment of filters to computational nodes, we order the filter
 executions within a computational node by the total ordering,
 executing the filters in descending order.
 
@@ -95,7 +91,7 @@ the annealing process.
 The simulated annealing algorithm iteratively perturbs the
 configuration during its search.  We perturb the configuration by
 randomly choosing a slice, and randomly assigning the filters of the
-slice to a computational nodes.  To continue with the analogy, each
+slice to computational nodes.  To continue with the analogy, each
 perturbation can be thought of as picking a random object, possibly
 remolding it into a new shape, and inserting back into the bins. Each
 intermediate configuration is legal; it respects the constraints on
@@ -110,32 +106,38 @@ buffer-to-DRAM allocation pass.
 
 \subsubsection{Cost Function}
 The cost function for the simulated annealing solution to our 3D bin
-packing problem attempts to incorporate two aspects of the
-scheduling problem.  First the critical path of the schedule is
-determined by the node(s) with the maximum work.  We do not generate a
-true modulo schedule because all nodes must wait for the bottleneck
-node to complete to perform the data-reorganization phase Next, we
-assume that the work estimation performed by our compiler is
-inaccurate, so we bias the estimate to reflect this observation.
+packing problem attempts to incorporate two aspects of the scheduling
+problem.  First, we do not generate a true modulo schedule because all
+nodes must wait for the bottleneck node to complete to perform the
+data-reorganization phase. Next, we assume that the work estimation
+performed by our compiler is inaccurate, so we bias the estimate to
+reflect this observation.  For the current configuration, the cost
+function calculates the critical path length of the schedule
+accounting for the work of each filter and any idle time.
 
-For the current configuration $C$, we determine the work assigned to
-each computational node of the target, incorporating our work
-estimation for each filter and the multiplicities of each filter.  As
-mentioned above, the work estimation for each target node accounts for
-the intra-slice pipeline startup and wind-down shape of individual
-slices, the interaction between slices, and the occupancy of the
-on-chip interconnect.  In our discussion, for a computational node
-$N$, let $W_C(N)$ be the work estimation for $N$ for the current
-configuration.  A rigorous description of this calculation beyond the
-scope of this paper.
+%For the current configuration the cost function is the critical path
+%length of the schedule.  This calculation .  Calculating this
+%interaction requires
 
-After each computational node's work estimation is calculated, we find
-the single node that does performs the most work in the
-steady-state. This node is the critical path of the steady-state, call
-this node the {\it bottleneck node}, $B$. Next, for each node $N$
-where $\frac{W_C(N)}{W_C(B)} < 0.95$, we set $W_C(N) = 1.10 * W_C(N)$.
-We recalculate $B$ using the biased $W_C()$. Our cost function for
-configuration (scheduling) $C$, $F(C) = W_C(B)$.
+%we determine the work assigned to
+%each computational node of the target, incorporating our work
+%estimation for each filter and the multiplicities of each filter.  As
+%mentioned above, the work estimation for each target node accounts for
+%the intra-slice pipeline startup and wind-down shape of individual
+%slices, the interaction between slices, and the occupancy of the
+%on-chip interconnect.  In our discussion, for a computational node
+%$N$, let $W_C(N)$ be the work estimation for $N$ for the current
+%configuration. 
+
+%Due to the inaccuraccies 
+
+%After each computational node's work estimation is calculated, we find
+%the single node that does performs the most work in the
+%steady-state. This node is the critical path of the steady-state, call
+%this node the {\it bottleneck node}, $B$. Next, for each node $N$
+%where $\frac{W_C(N)}{W_C(B)} < 0.95$, we set $W_C(N) = 1.10 * W_C(N)$.
+%We recalculate $B$ using the biased $W_C()$. Our cost function for
+%configuration (scheduling) $C$, $F(C) = W_C(B)$.
 
 We experimented with including a communication and data-reorganization
 estimate to the cost function.  This cost function included an
@@ -148,3 +150,10 @@ function described above.
 
 
 
+%Simulated annealing is a form of stochastic
+%hill-climbing. Unlike most other methods for cost function
+%minimization, simulated annealing is suitable for problems where there
+%are many local minima.  Simulated annealing achieves its success by
+%allowing the system to go uphill with some probability as it searches
+%for the global minima.  As the simulation proceeds, the probability of
+%climbing uphill decreases. 

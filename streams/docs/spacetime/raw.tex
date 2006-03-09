@@ -31,18 +31,18 @@ compute processor interfaces to the network through a bypassed,
 register-mapped interface \cite{raw10} that allows instructions to use
 the networks and the register files interchangeably.
 
-Each tile's static router has a virtualized instruction memory to
-control the crossbars of the two static networks. Collectively, the
-static routers can reconfigure the communication pattern across these
-networks every cycle.  The input and output possibilities for each
-crossbar are: North, East, South, West, Processor, to the other
-crossbar, and into the static router. The FIFOs are typically four or
-eight elements large.  To route a word from one tile to another, the
-compiler inserts a route instruction on every intermediate static
-router.  Because the routers are pipelined and compile-time scheduled,
-they can deliver a value from the ALU of one tile to the ALU of a
-neighboring tile in 3 cycles, or more generally, 2+N cycles for an
-inter-tile distance of N hops.
+Each tile's static router has a instruction memory to control the
+crossbars of the two static networks. Collectively, the static routers
+can reconfigure the communication pattern across these networks every
+cycle.  The input and output possibilities for each crossbar are:
+North, East, South, West, Processor, to the other crossbar, and into
+the static router. The FIFOs are typically four or eight elements
+large.  To route a word from one tile to another, the compiler inserts
+a route instruction on every intermediate static router.  Because the
+routers are pipelined and compile-time scheduled, they can deliver a
+value from the ALU of one tile to the ALU of a neighboring tile in 3
+cycles, or more generally, 2+N cycles for an inter-tile distance of N
+hops.
 
 Because we generate bulk DRAM transfers, we did not want these
 optimizable accesses to become the bottleneck of the hardware
@@ -52,10 +52,12 @@ port \cite{raw_isca}.  In our configuration, we use 16 such DRAMs,
 attached to each of the 16 logical ports of the chip.  Also, we
 implemented a streaming memory controller in the chipset that supports
 a number of simple streaming memory requests.  The chipset receives
-request messages over the general dynamic network for bulk transfers
-to and from the DRAMs.  The transfers themselves can use either the
-static network or the general dynamic network (the desired network is
-encoded in the request).  The chipsets also have a simple
-demultiplexing mechanism that allows multiple devices (such as
-external input and output streams) to share a single port.
+request messages over the dynamic network for bulk transfers to and
+from the DRAMs.  The transfers themselves can use either the static
+network or the general dynamic network (the desired network is encoded
+in the request).  
+
+%The chipsets also have a simple demultiplexing
+%mechanism that allows multiple devices (such as external input and
+%output streams) to share a single port.
 

@@ -8,13 +8,12 @@ SpaceTime Compiler.
 \protect\label{fig:fm-ex}}
 \end{figure*}
 
-Currently we use the StreamIt Programming Language as the input
-language to the SpaceTime Compiler. After the StreamIt frontend
-executes, it passes our compiler a complete stream graph representing
-the computation and communication of the application.  In StreamIt,
-the stream graph is a structured, hierarchical composition of
-pipelines, splitjoins, and feedbackloops with filters, splitters, and
-joiners as the leaf nodes of the graph (see Section
+After the StreamIt frontend executes, it passes our compiler a
+complete stream graph representing the computation and communication
+of the application.  In StreamIt, the stream graph is a structured,
+hierarchical composition of pipelines, splitjoins, and feedbackloops
+with filters, splitters, and joiners as the leaf nodes of the graph
+(see Section
 \ref{sec:streamit}).  
 
 Throughout the following sections, we will use our FMRadio benchmark
@@ -22,11 +21,10 @@ to elucidate our discussion.  The FMRadio application is a software
 implementation of FM radio with a 12-way equalizer.  StreamIt's stream
 graph is given in Figure \ref{fig:fm-ex}a.  In the figure, we
 represent splitters, joiners, and filters with circles.  Containers
-(splitjoins and pipelines) are represented with as rectangles around
-the nodes they contain.  In the figure, the filters colored red have
-the highest work estimation per steady-state execution (in this case,
-the red nodes account for over 90\% of the computation in the
-steady-state).
+(splitjoins and pipelines) are represented as rectangles around the
+nodes they contain.  In the figure, the filters colored red have the
+highest workload per steady-state execution (in this case, the red
+nodes account for over 90\% of the computation in the steady-state).
 
 The initial pass of our compiler takes this structured stream graph
 and de-structures it.  We remove all hierarchy and structure of the
