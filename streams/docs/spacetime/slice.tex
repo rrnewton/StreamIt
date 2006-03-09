@@ -1,6 +1,30 @@
 \section{The Slice}
+Before we move on to describing the algorithms that compose the
+compiler, we will describe our implementation of a
+slice. Conceptually, the slice is the atomic unit of scheduling in our
+compiler.  Our scheduling algorithm operates at the slice level.
+Each slice is composed of a contiguous region of the stream
+graph with restrictions on its composition. 
 
-What is a slice?
-Why a slice? (slight rehash of intro).
-Restrictions.
-Representation in the compiler.
+A slice always begins with a joiner node to join the (possibly)
+multiple inputs of the slice.  The slice continues with a pipeline of
+filters from the stream graph.  The slice ends with a splitter node to
+distribute the slice's output to its (possibly) multiple readers (see
+Figure \ref{fig:slice}).  More specifically, only the end-points of
+slices can communicate with more than one filter (these filters are
+contained in other slices); inner filters are restricted to single
+input and single output.  Each filter of the original stream graph is
+contained in exactly one slice.  Slices are not hierarchical.  The
+number of filters in a slice must be less than or equal to the number
+of computational nodes of the architecture to which we are targeting.
+In Figure \ref{fig:fm-ex}c, we give a possible slice graph for the
+12-way FMRadio application.  The blue boxes represent individual
+slices.
+
+These restrictions are not fundamental to space-time multiplexing
+execution model; they simplify the compiler.  In future work, we plan
+to relax some of the restrictions.
+
+In Section \ref{sec:extract} we describe our algorithm for extracting
+slices from a stream graph.
+
