@@ -1,0 +1,60 @@
+\section{Stream Graph} 
+
+\begin{figure*}
+\centering
+\psfig{figure=fm_example.eps,width=6.5in}
+\caption{FMRadio with a 12-way equalizer after the passes of the
+SpaceTime Compiler.
+\protect\label{fig:fm-ex}}
+\end{figure*}
+
+Currently we use the StreamIt Programming Language as the input
+language to the SpaceTime Compiler. After the StreamIt frontend
+executes, it passes our compiler a complete stream graph representing
+the computation and communication of the application.  In StreamIt,
+the stream graph is a structured, hierarchical composition of
+pipelines, splitjoins, and feedbackloops with filters, splitters, and
+joiners as the leaf nodes of the graph (see Section
+\ref{sec:streamit}).  
+
+Throughout the following sections, we will use our FMRadio benchmark
+to elucidate our discussion.  The FMRadio application is a software
+implementation of FM radio with a 12-way equalizer.  StreamIt's stream
+graph is given in Figure \ref{fig:fm-ex}a.  In the figure, we
+represent splitters, joiners, and filters with circles.  Containers
+(splitjoins and pipelines) are represented with as rectangles around
+the nodes they contain.  In the figure, the filters colored red have
+the highest work estimation per steady-state execution (in this case,
+the red nodes account for over 90\% of the computation in the
+steady-state).
+
+The initial pass of our compiler takes this structured stream graph
+and de-structures it.  We remove all hierarchy and structure of the
+containers and are left with only filters, splitters and joiners.
+Furthermore, we introduce our own notion of a splitter and a joiner,
+each slightly more powerful than their analog in StreamIt.  We still
+have separate nodes for splitting an output stream and joining an
+input stream, but these nodes can handle more complicated
+data-reorganization patterns.  For example, our splitter node can
+describe a round-robin distribution with duplication.  A more exact
+discussion of our splitters and joiners is omitted, but it suffices to
+say that we designed each node to closely match the data-organizations
+that are possible with a scalar operand network \cite{scalaroperands}.
+We next run a synchronization removal pass that converts StreamIt
+splitters and joiners into our own notion of data-distribution nodes.
+In the process we remove unnecessary synchronization points present in
+the stream graph.  We introduce a (more powerful) splitter node after
+each filter whose output is read by multiple filters and we introduce
+a (more powerful) joiner node before each filter that reads data
+produced by multiple filters.
+
+After synchronization removal, we are left with a flat stream graph
+composed of filters, and data-reorganization nodes (our more powerful
+splitters and joiners), see Figure \ref{fig:fm-ex}b FMRadio's
+flattened stream graph; note that some splitters have been
+coalesced. For the remainder of this paper the terms splitter and
+joiner refer to our more powerful splitting and joining nodes and the
+term stream graph refers to the flattened graph composed of these
+nodes and filters.  At this point we are ready to extract the slices
+from the graph and schedule them for execution.
+
