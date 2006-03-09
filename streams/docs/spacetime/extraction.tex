@@ -3,7 +3,7 @@
 \begin{figure*}
 \centering
 \psfig{figure=fm_example.eps,width=6.5in}
-\caption{FMRadio with a 12-way equalizer after the passes of the
+\caption{FMRadio with a 7-way equalizer after the passes of the
 SpaceTime Compiler.
 \protect\label{fig:fm-ex}}
 \end{figure*}
@@ -18,7 +18,7 @@ with filters, splitters, and joiners as the leaf nodes of the graph
 
 We will use our FMRadio benchmark to elucidate our discussion.  The
 FMRadio application is a software implementation of FM radio with a
-12-way equalizer.  StreamIt's stream graph is given in Figure
+7-way equalizer.  StreamIt's stream graph is given in Figure
 \ref{fig:fm-ex}a.  In the figure, we represent splitters, joiners, and
 filters with circles.  Containers (splitjoins and pipelines) are
 represented as rectangles around the nodes they contain.  In the
@@ -82,6 +82,6 @@ the introduced splitters and joiners assume the connections of their
 insertion point.
 
 In Figure \ref{fig:fm-ex}c, we give a possible slice graph for the
-12-way FMRadio application.  The blue boxes represent individual
+7-way FMRadio application.  The blue boxes represent individual
 slices.
 
