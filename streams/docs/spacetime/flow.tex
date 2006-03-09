@@ -1,2 +1,11 @@
-\section{Compiler Flow}
-The compiler flow.
+\section{Compiler Flow} 
+
+In the SpaceTime Compiler, we first convert the StreamIt graph into to
+a flat, non-hierarchical graph with unnecessary communication channels
+removed.  Our compiler then extracts the slices from the stream
+graph, considering the concurrency, communication, and work load of
+the filters (Section \ref{sec:extract}).  Next, we schedule the
+slices, producing both a multi-stage initialization schedule and a
+software-pipelined steady-state schedule (Section
+\ref{sec:scheduling}).  Lastly, we generate both communication and
+computation code.  

@@ -1,23 +1,60 @@
 \section{Slice Extraction}
-\label{sec:extract}
-Slice extraction refers to the process of assigning each joiner,
-filter, and splitter of the stream graph to a slice.  As stated
-previously, a slice is a contiguous section of the stream graph that
-is scheduled for execution as a group. Each slice occupies a portion
-of the chip as it executes and is ``swapped out'' when it completes
-execution, not to execute again until the next steady-state.  Each
-filter in the stream graph is a member of exactly one slice.
 
-An informal English description of our slice extraction algorithm
-should suffice.  We traverse the stream graph in depth-first order.
-Each time we visit a node, we must decide if the node should be added
-to the slice we are currently constructing.  Due to the restrictions
-of the current implementation, as we traverse the stream graph, we end
-the current a slice {\it before} a joiner node and we end the current
-slice {\it after} a splitter node, thus restricting the slices to
-pipelines of filters.  Also, as we are adding filters to the slice, we
-must introduce a slice boundary if the size of the slice is equal to
-the number of tiles in the Raw configuration.
+\begin{figure*}
+\centering
+\psfig{figure=fm_example.eps,width=6.5in}
+\caption{FMRadio with a 12-way equalizer after the passes of the
+SpaceTime Compiler.
+\protect\label{fig:fm-ex}}
+\end{figure*}
+
+\label{sec:extract}
+After the StreamIt frontend executes, it passes our compiler a
+complete stream graph representing the computation and communication
+of the application.  In StreamIt, the stream graph is a structured,
+hierarchical composition of pipelines, splitjoins, and feedbackloops
+with filters, splitters, and joiners as the leaf nodes of the graph
+(see Section \ref{sec:streamit}).
+
+We will use our FMRadio benchmark to elucidate our discussion.  The
+FMRadio application is a software implementation of FM radio with a
+12-way equalizer.  StreamIt's stream graph is given in Figure
+\ref{fig:fm-ex}a.  In the figure, we represent splitters, joiners, and
+filters with circles.  Containers (splitjoins and pipelines) are
+represented as rectangles around the nodes they contain.  In the
+figure, the filters colored red have the highest workload per
+steady-state execution (in this case, the red nodes account for over
+90\% of the computation in the steady-state).
+
+The initial pass of our compiler takes this structured stream graph
+and de-structures and canonicalizes it.  We remove all hierarchy and
+structure of the containers and are left with only filters, splitters
+and joiners. We are left with a flat stream graph composed of filters,
+and data-reorganization nodes (splitters and joiners), see Figure
+\ref{fig:fm-ex}b FMRadio's flattened stream graph; note that some
+splitters have been coalesced.
+
+Conceptually, the slice is the atomic unit of scheduling in our
+compiler.  Our scheduling algorithm operates at the slice level.  Each
+slice is composed of a contiguous region of the stream graph with
+restrictions on its composition.  Slice extraction refers to the
+process of assigning each joiner, filter, and splitter of the stream
+graph to a slice.  As stated previously, a slice is a contiguous
+section of the stream graph that is scheduled for execution as a
+group. Each slice occupies a portion of the chip as it executes and is
+``swapped out'' when it completes execution, not to execute again
+until the next steady-state.  Each filter in the stream graph is a
+member of exactly one slice.
+
+We traverse the stream graph in depth-first order.  Each time we visit
+a node, we must decide if the node should be added to the slice we are
+currently constructing.  Due to the restrictions of the current
+implementation, as we traverse the stream graph, we end the current
+slice {\it before} a joiner node and we end the current slice {\it
+after} a splitter node, thus restricting the slices to pipelines of
+filters.  Also, as we are adding filters to the slice, we must
+introduce a slice boundary if the size of the slice is equal to the
+number of tiles in the Raw configuration.
 
 Additionally, we try to coax the generation of load-balanced slices.
 For each filter, we calculate a static work estimation of the filter
@@ -32,17 +69,19 @@ As we are adding filters to the slice, we compare the work estimation
 of the current filter we are examining to the work estimation for the
 filter of the slice that performs the most work (the current {\it
 bottleneck} of the slice).  If the ratio of the work of the current
-filter to the work of the bottleneck is within a predefined
-threshold, termed the {\it work threshold}, then we proceed to add the
-filter to the slice.  Otherwise, begin a new slice with the current
-filter as the first filter in this new slice. In the case where a
-slice will end in a filter, we will insert a dummy splitter at the end
-of the just-completed slice.  Conversely, if needed, we will insert a
-dummy joiner at the beginning of a newly created slice if the slice
-begins with a filter.
+filter to the work of the bottleneck is within a predefined threshold,
+termed the {\it work threshold}, then we proceed to add the filter to
+the slice.  Otherwise, begin a new slice with the current filter as
+the first filter in this new slice. In the case where a slice will end
+in a filter, we will insert a dummy splitter at the end of the
+just-completed slice.  Conversely, if needed, we will insert a dummy
+joiner at the beginning of a newly created slice if the slice begins
+with a filter. Any data-flow arcs that existed from splitters and to
+joiners will persist as arcs to nodes of other slices.  The arcs of
+the introduced splitters and joiners assume the connections of their
+insertion point.
 
-Any data-flow arcs that existed from splitters and to joiners will
-persist as arcs to nodes of other slices.  The arcs of the introduced
-splitters and joiners assume the connections of their insertion point.
+In Figure \ref{fig:fm-ex}c, we give a possible slice graph for the
+12-way FMRadio application.  The blue boxes represent individual
+slices.
 
-\todo{What value of work threshold do we use or do we experiment?}
