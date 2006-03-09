@@ -2,9 +2,14 @@
 \section{Execution Model}
 \begin{figure}[t]
 \centering
-\psfig{figure=slices.eps,width=3.0in}
-\caption{The characteristics of a slice.
-\protect\label{fig:slice}}
+\psfig{figure=slice-schedule.eps,width=3.0in}
+\caption{Example scheduling of a slice graph.  The steady state
+consists of two time steps.  The first step executes the filters
+(nodes 2, 5, 6) and performs intra-slice communication.  The second
+step executes splitters (3, 7) and joiners (1, 4), shuffling data
+between DRAMs to perform inter-slice communication.  Due to software
+pipelining, the two slices are executing different iterations at any
+given time step.  \protect\label{fig:slice}}
 \end{figure}
 
 After we compose a graph of slices from the stream graph, we are ready
