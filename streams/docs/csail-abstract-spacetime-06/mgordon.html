@@ -4,8 +4,8 @@
 
 
 <div align="center">
-<h3>Hybrid Space-Time Partitioning of Stream Programs</h3>
-   <h4>Michael Gordon, Jasper Lin, William Thies, &amp; Saman Amarasinghe</h4>
+<h3>Space-Time Multiplexing of Stream Programs</h3>
+   <h4>Michael Gordon &amp; Saman Amarasinghe</h4>
 </div>
 
 <h5>What</h5>
@@ -70,29 +70,30 @@ efficiently to the 2-D mesh in Raw.</p>
 advantages of space multiplexing and time multiplexing.  This hybrid
 approach will time multiplex different groups of filters and space
 multiplex the filters within a group. We call each group a space-time
-slice or just a slice.  Hybrid space-time multiplexing allows space
-multiplexing for fine-grained, systolic sections of the stream graph
-and time multiplexing for improved load balancing.  Furthermore, we
-use software pipelining techniques to allow arbitrary ordering of
+slice or just a slice.  It is the responsibility of the compiler to
+schedule the slices, calculating both an ordering of slices and a
+placement for the filters of the slices. We leverage techniques
+traditionally applied to schedule machine instructions in loop nests.
+Currently, we employ software pipelining techniques to slacken
+dependencies between slices and allow for more flexibility scheduling
 slices during steady-state execution.</p>
 
-<p>An integral part of our technique is to recognize parts of the stream
-graph that can be space-multiplexed in a fine-grained, systolic
-fashion.  Using our linear analysis framework [2], we can
-discover the linear sections of a streaming application.  We define a
-linear section of a stream graph as a group of filters that
-compute a linear combination of their inputs.  Many ubiquitous DSP
-kernels are linear including FIR, low and high-pass filters, and DFT.
-These linear computations can be represented as a matrix
-multiplication and efficiently mapped to Raw.  Linear slices of the
-stream graph are space-multiplexed across tiles of the chip using
-parameterized computation and communication code.  The matrix
-representations of the linear filters are broken into pieces that the
-compiler targets for aggressive code generation.  This results in
-optimal usage of the tiles for each piece.</p>
+<p>We also recognize parts of the stream graph that can be
+space-multiplexed in a fine-grained, systolic fashion.  Using our
+linear analysis framework [2], we can discover the linear sections of
+a streaming application.  We define a linear section of a stream graph
+as a group of filters that compute a linear combination of their
+inputs.  Many ubiquitous DSP kernels are linear including FIR, low and
+high-pass filters, and DFT.  These linear computations can be
+represented as a matrix multiplication and efficiently mapped to Raw.
+Linear slices of the stream graph are space-multiplexed across tiles
+of the chip using parameterized computation and communication code.
+The matrix representations of the linear filters are broken into
+pieces that the compiler targets for aggressive code generation.  This
+results in optimal usage of the tiles for each piece.</p>
 
 <div align="center">
-<img src="mgordon_figure1.gif" alt="Figure 1: Stream Graph for a Channel Vocoder" width="527" height="450">
+<img src="mgordon_figure1.jpg" alt="Figure 1: Slice Graph for FMRadio" width="432" height="272">
 </div>
 
 <p>We will now present a small example to solidify the reader's
@@ -102,7 +103,7 @@ linear filters of the application.  The white ovals are non-linear but
 stateless filters and thus can be data-parallelized.</p>
 
 <div align="center">
-<img src="mgordon_figure2.gif" alt="Figure 2: Mapping the Vocoder to a 4x4 Raw Machine" width="434" height="328">
+<img src="mgordon_figure2.jpg" alt="Figure 2: Mapping the FMRadio to a 4x4 Raw Microprocessor" width="519" height="521">
 </div>
 
 <p>An example mapping of this application to a 16 tile Raw
@@ -116,36 +117,56 @@ stateless pitch detector slice is data-parallelized across the entire
 Raw chip. Each slice reads its input from and writes its output to
 off-chip DRAM.<p>
 
-<h5>Progress</h5>
-<p>Currently, we have completed a first version of our hybrid space-time
-multiplexing Raw backend for StreamIt and are in the process of
-evaluating its performance and scalability.  We have a robust
-implementation of inter-slice communication using Raw's off-chip
-streaming memory interface.  For intra-slice communication, we exploit
-Raw's static network and translate StreamIt's filter code into C
-code to be executed on the compute processors.  We have completed
-parameterized code generation for linear filters that generates
-assembly directly.</p>
+<h5>Progress</h5> 
+
+<p>Currently, we have completed a second version of
+our space-time multiplexing Raw backend for StreamIt and are in the
+process of evaluating its performance and scalability.  We have a
+robust implementation of inter-slice communication using Raw's
+off-chip streaming memory interface.  For intra-slice communication,
+we exploit Raw's static network and translate StreamIt's filter code
+into C code to be executed on the compute processors.  For many common
+cases, we have completed parameterized code generation for linear
+filters that generates assembly directly.</p>
+
+<div align="center">
+<img src="mgordon_figure3.jpg" alt="Figure 3: Example 3D bin-packing of slice objects" width="436" height="312">
+</div>
  
 <p>As for the high-level algorithms, we have implemented a greedy
-algorithm to partition and schedule the stream graph into ordered slices.
-This algorithm has the freedom of producing an arbitrary ordering of slices
-to best distribute the work evenly, while the software
-pipelining algorithm is responsible for mapping the schedule and
-producing a valid execution---by determining what initialization steps
-are necessary for steady-state execution.</p>
+algorithm to partition the stream graph into slices.  We translate the
+slice scheduling problem into a form that approximates a well-studied
+optimization problem.  We translate our problem into a 3-dimensional
+bin-packing problem with irregularly shaped, transformable objects.
+In our translation, each slice is represented by a shape, and each Raw
+tile is a represented as a bin.  See the figure above for a sample
+3-dimensional bin-packing of slice objects.  The shape of each object
+is dependent upon the properties of the filters of the slice it
+represents and its assignment to bins (tiles).  The height of a slice
+object is calculated from a static estimation of the slice's work load
+as it varies with each filter of the slice. In the figure above, note
+the step shape of each slice due to the pipelining of the filters that
+compose the slice.</p>
 
-<h5>Future</h5>
-<p>In the near future we would like to explore more advanced partitioning
-and layout algorithms.  Additionally, we will further expand space
-multiplexing as we investigate additional parallelism schemes such as
-filter fission (breaking a filter into multiple, smaller filters),
-state-space filter representations, and optimized linear code
-generation for sparse matrices.  We are also working on a new
-intermediate representation for our compiler that will allow us to
-directly generate assembly code for Raw's compute
-processors. This will overcome some of the inefficiencies in generating
-stream code via a procedural framework.</p>
+<p>We use simulated annealing to arrive at an optimized solution to the
+bin-packing and thus a schedule.  Although in previous work simulated
+annealing has been applied to only regular 3-dimensional bin-packing
+(i.e., non-transformable, rectilinear objects), our initial results
+are very encouraging.</p>
+
+
+<h5>Future</h5> 
+
+<p>In the near future we would like to further investigate our
+partitioning and scheduling algorithms.  Additionally, we will further
+expand space multiplexing as we investigate additional parallelism
+schemes such as filter fission (breaking a filter into multiple,
+smaller filters), state-space filter representations, and optimized
+linear code generation for sparse matrices.  We are also working on a
+new intermediate representation for our compiler that will allow us to
+directly generate assembly code for Raw's compute processors. This
+will overcome some of the inefficiencies in generating stream code via
+a procedural framework.</p>
 
 <h5>Research Support</h5>
 <p>This work is supported in part by a grant from DARPA (PCA
