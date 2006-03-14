@@ -14,7 +14,7 @@ practice is time consuming and error prone, leading to code that is
 neither malleable nor portable.</p>
 
 <p>Multimedia algorithms generally exhibit both strong data locality
-and high degrees of data and pipeline parallelism. As such, thjey are
+and high degrees of data and pipeline parallelism. As such, they are
 well-suited for stream-based languages. Our research has focused on
 enabling the rapid implementation of high performance multimedia codes in
 <a href="http://cag.csail.mit.edu/streamit">StreamIt</a>,
@@ -32,7 +32,7 @@ actors that carry out the computation, and edges represent FIFO
 communication channels between actors. As a result, the parallelism
 and communication topology of the application are exposed, empowering
 the compiler to perform many stream-aware optimizations[3,4] that
-ellude other languages. Detailed information about this project is
+elude other languages. Detailed information about this project is
 available at the 
 <a href="http://cag.csail.mit.edu/streamit/mpeg/">project website</a>
 and in our IPDPS 2006
@@ -64,7 +64,7 @@ filter responsible for parsing the MPEG-2 bitstream and performing the
 variable-length decoding. This process results in quantized,
 frequency-domain data, and motion estimation vectors. The second
 subsection is a splitjoin that handles spatial decoding and
-uncompression af the image data and motion vectors. The third section
+uncompression of the image data and motion vectors. The third section
 is responsible for temporal decompression, using motion estimation and
 frame error data to recover a series of related pictures. In addition
 to these three decoder subsections, two additional filters handle
@@ -89,56 +89,26 @@ communication to the compiler which then chooses an optimal
 implementation strategy, depending on the target architecture
 platform.</p>
 
-<p>Current efforts on the decoder are focused on improving
-performance. somethingaboutcompiledstuffhere TODO. We're working on
-alternate formulations of the stream graph and additional language
-features which expose additional parallelism to the compiler.</p>
+<p>Current efforts on the decoder focus on improving
+performance. An alternative formulation of the MPEG decoder stream graph
+exposes greater parallelism to the compiler by parallelizing both the 
+spatial and temporal decompression over all macroblocks. However,
+this implementation relies extensively on efficient upstream messaging,
+providing additional compilation challenges.</p>
     
 <h5>MPEG Encoder</h5>
-<p>The recently completed encoder, as one would expect, is something
-like the reverse of the decoder pipeline. The input to the encoder is
-a sequence of raw video frames. A picture type, for the purposes of
-motion estimation, is assigned to each picture, and the chrominance
-color information is downsampled.</p>
-
-<p>The bulk of the picture data is then triplicated, with one copy of
-the data being sent to one of three motion estimation filters. The
-first filter performs no motion estimation. The second and third
-filters each perform motion estimation with respect to a reference
-image. Each of the two motion estimators use a different reference
-image, one refering the preceeding key image, and the other
-referencing the second preceeding image. Thus, one provides forward
-estimation and one backward estimation. The output of each of these
-filters is the vectors for the best motion estimate and the difference
-between the predicted value and the actual value of the macroblock.</p>
-
-<p>Each of these three data streams is joined and a decision made
-regarding which of the estimations to choose, based on which provides
-the best compression. Additionally, this filter takes care of
-determining the bidirectionally predicted block values in the case
-where both the forward and backward predictions are used.</p>
-
-<p>Following this step, the spatial encoding takes place, which
-consists of a discrete cosine transformation, a quantization step, and
-a reordering. The output of this step is then duplicated, with one
-copy going to the bitstream variable length coder, and the other
-receiving an inverse spatial compression. This inverted copy is then
-sent upstream via a message to update the reference frames used by the
-motion estimation filters.</p>
-
 <p>The encoder, recently completed, presents an even greater challenge
 for compilation. The encoder, which produces a valid MPEG-2 stream, is
 a much larger stream graph. This is due in part to the fact that it
 contains most of the decoder as a subcomponent, since it needs to
 understand what the decoded picture will look like for the purposes of
-motion estimation.</p>
-
-<p>It also makes use of upstream messaging to send reference pictures
-from the decoded output back to the motion compensation stage near the
-beginning of the pipeline. Additionally, it requirse the use of
-programmable splitters and joiners, a feature currently being looked
-at. While it works correctly without this feature, a large amount of
-unnecessary computation must be performed.</p>
+motion estimation. It also makes use of upstream messaging to send reference
+pictures from the decoded output back to the motion compensation stage near the
+beginning of the pipeline. Language extensions allowing the use of
+programmable splitters and joiners will give the programmer better control
+of his stream program execution and expose scheduling information to the
+compiler which will allow it to avoid large quantities of
+unnecessary computation.</p>
 
 <h5>Research Support:</h5>
 <p>The StreamIt  project is supported by DARPA grants
