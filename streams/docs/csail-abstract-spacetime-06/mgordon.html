@@ -97,25 +97,51 @@ results in optimal usage of the tiles for each piece.</p>
 </div>
 
 <p>We will now present a small example to solidify the reader's
-understanding of our work.  In the above figure we show the
-stream graph for a simple channel vocoder.  The dark ovals denote the
-linear filters of the application.  The white ovals are non-linear but
-stateless filters and thus can be data-parallelized.</p>
+understanding of our work.  In the above figure we show the slice
+graph for our FMRadio benchmark, an implementation of a software
+FMRadio with a 7-way equalizer.  The exact implementation is
+irrelevant to our discussion.  In the Figure, the colored ovals denote
+filters and the blue boxes around filters denote the slices of the
+graph. In this particular application the 12 red filters and the green
+filter each perform an equal workload and together account for over
+95% of the workload of the steady-state as calculated by our static
+workload estimation algorithm.</p>
 
 <div align="center">
-<img src="mgordon_figure2.jpg" alt="Figure 2: Mapping the FMRadio to a 4x4 Raw Microprocessor" width="519" height="521">
+<img src="mgordon_figure2.jpg" alt="Figure 2: Mapping the FMRadio to a 4x4 Raw Microprocessor" width="523" height="521">
 </div>
 
-<p>An example mapping of this application to a 16 tile Raw
-configuration (figure above) first executes the top low-pass filter
-slice, occupying the entire Raw chip and executing enough times to
-supply the subsequent slices. Next, each band-pass slice will occupy a
-quarter of the chip, executing the 4 bands in parallel.  Remember that
-each of the above slices are linear and our parameterized linear code
-generation provides near-optimal utilization. Finally, the non-linear,
-stateless pitch detector slice is data-parallelized across the entire
-Raw chip. Each slice reads its input from and writes its output to
-off-chip DRAM.<p>
+<p>An example steady-state execution of the FMRadio application on a
+16 tile Raw configuration is shown above.  In the figure we see the 16
+raw tiles represented as a 4x4 array of squares.  The off-chip DRAM
+modules are shown as rectangles attached to the border tiles.</p>  
+
+<p>In the mapping, the 12 slices composed of a red filter and the one
+slice composed of the green filter each occupy their own tile.  The
+blue filter and the gray filter share a tile.  The 6 slices composed
+of a brown filter and a yellow filter occupy 2 tiles.  In the figure,
+the black arrows denote communication to and from off-chip memory over
+Raw's static network, the gray arrows denote communication to and from
+off-chip memory using Raw's dynamic network, and the blue arrows
+denote intra-slice communication between filters of a single slice
+utilizing Raw's static network.</p>
+
+<p>Since the steady-state is software pipelined and adequately
+buffered, we do not directly communicate data between slices during
+its execution. Before each steady-state we perform a
+data-reorganization stage that shuttles data between DRAMs to prepare
+for the next steady-state iteration.  In this example, the
+data-reorganization stage performs the data splitting occurring after
+the gray filter, the joining before each brown filter, and the joining
+before the blue filter.</p>
+
+<p> In this mapping, each bottleneck filter (red or green) occupies
+its own tile and is busy computing nearly the entire steady-state for
+very high computational utilization.  These bottleneck tiles are not
+burdened with other work not on the critical path. This mapping is
+completely automated and achieves a 2-fold increase in terms of
+throughput versus a space-multiplexed mapping of the FMRadio
+application.  </p>
 
 <h5>Progress</h5> 
 
@@ -142,11 +168,11 @@ In our translation, each slice is represented by a shape, and each Raw
 tile is a represented as a bin.  See the figure above for a sample
 3-dimensional bin-packing of slice objects.  The shape of each object
 is dependent upon the properties of the filters of the slice it
-represents and its assignment to bins (tiles).  The height of a slice
-object is calculated from a static estimation of the slice's work load
-as it varies with each filter of the slice. In the figure above, note
-the step shape of each slice due to the pipelining of the filters that
-compose the slice.</p>
+represents and the filter's assignment to bins (tiles).  The height of
+a slice object is calculated from a static estimation of the slice's
+work load as it varies with each filter of the slice. In the figure
+above, note the step shape of each slice due to the pipelining of the
+filters that compose the slice.</p>
 
 <p>We use simulated annealing to arrive at an optimized solution to the
 bin-packing and thus a schedule.  Although in previous work simulated
