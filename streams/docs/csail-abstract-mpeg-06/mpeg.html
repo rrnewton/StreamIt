@@ -25,21 +25,23 @@ practices. Second, our research is also concerned with compiler
 optimizations that lead to high performance code on a variety of
 commodity processors.</p>
 
-<p>We have implemented an MPEG-2[1] encoder and decoder in StreamIt.
-In StreamIt, the programmer builds an application by connecting
+<p>In StreamIt, the programmer builds an application by connecting
 components together into a stream graph, where the nodes represent
 actors that carry out the computation, and edges represent FIFO
 communication channels between actors. As a result, the parallelism
 and communication topology of the application are exposed, empowering
 the compiler to perform many stream-aware optimizations[3,4] that
-elude other languages. Detailed information about this project is
-available at the 
-<a href="http://cag.csail.mit.edu/streamit/mpeg/">project website</a>
-and in our IPDPS 2006
+elude other languages. We have implemented an MPEG-2[1] encoder and
+decoder in StreamIt. Detailed information about this project is
+available at the  
+<a href="http://cag.csail.mit.edu/streamit/mpeg/">project website</a> and
+in our IPDPS 2006 
 <a href="http://cag.lcs.mit.edu/commit/papers/06/drake-ipdps06.pdf">paper</a>[6].</p>
 
+<center>
 <table>
   <tr>
+<!--
     <td><a href="http://cag.csail.mit.edu/streamit/mpeg/images/decoder.jpg">
         <img src="./decoder_thumbnail.gif" alt="StreamIt Decoder Pipeline" align="center"></a>
         <p align="center"><b>Figure 1: StreamIt Decoder Pipeline</b></p>
@@ -48,67 +50,80 @@ and in our IPDPS 2006
         <img src="./encoder_thumbnail.gif" alt="StreamIt Decoder Pipeline" align="center"></a>
         <p align="center"><b>Figure 2: StreamIt Encoder Pipeline</b></p>
     </td>
+-->
+    <td><img src="./decoder_with_code_small.jpg" width=900 alt="StreamIt Decoder Pipeline" div align="center">
+        <p align="center"><b>Figure 1: MPEG-2 Decoder Pipeline in StreamIt</b></p>
+    </td>
   </tr>
 </table>
+</center>
 
-<h5>MPEG Decoder</h5>
-<p>The decoder implementation was carried out by one student
-programmer with no prior understanding of MPEG. The development
-spanned eight weeks from specification to the first fully functional
-MPEG decoder. The StreamIt code is nearly 3,165 lines of code, and is
-a natural translation of the block level MPEG-2 specification. The
-MPEG decoder implementation is a pipeline, with most of the work
-contained within three subsections. It accepts a compressed bitstream
-as input, and produces the decoded video as output. The front-end is a
-filter responsible for parsing the MPEG-2 bitstream and performing the
-variable-length decoding. This process results in quantized,
-frequency-domain data, and motion estimation vectors. The second
-subsection is a splitjoin that handles spatial decoding and
-uncompression of the image data and motion vectors. The third section
-is responsible for temporal decompression, using motion estimation and
-frame error data to recover a series of related pictures. In addition
-to these three decoder subsections, two additional filters handle
-reordering the decoded pictures temporally and transforming them into
-the RGB color space.</p>
+<h5>MPEG Decoder in StreamIt</h5>
+<p>We highlight the advantages of our stream programming methodology
+by describing the StreamIt implementation of the MPEG-2 decoder. In
+Figure 1, the StreamIt code is shown on the right. It is correlated
+with the stream graph on the left. It is worthy to note that there is
+a high correlation between the stream block level diagram and the
+StreamIt syntax describing the pipeline.</p>
 
-<p>A notable aspect of our implementation is that it decouples the
-high bandwidth flow of the bitstream data throughout the pipeline,
+<p>The computation is encapsulated in three main components: the
+parser (line 8), the block and motion vector decoder (lines 9-22), and
+the motion compensator (lines 23-32). The pipeline accepts a
+compressed bitstream as input, and produces the decoded video as
+output. The front-end is a filter responsible for parsing the MPEG-2
+bitstream and performing the variable-length decoding. This process
+results in quantized, frequency-domain data, and motion estimation
+vectors. The second stage is a splitjoin that handles spatial decoding
+and decompression of the image data and motion vectors. The splitjoin
+is a StreamIt construct that helps to expose the inherent parallelism
+in an application. The third stage is responsible for temporal
+decompression, using motion estimation and frame error data to recover
+a series of related pictures. Finally, two filters handle reordering
+the decoded pictures temporally and transforming them into the RGB
+color space.</p>
+
+<p>In StreamIt, all of the processing is encapsulated hierarchically
+into single-input, single-output streams with well-defined modular
+interfaces. This facilitates development and boosts programmer
+productivity, as components can be debugged and verified as standalone
+components. The modularity also promotes reuse. For example, the
+zig-zag descrambler and inverse DCT can be used as-is in a JPEG
+decoder. In contrast, the reference C implementation of the decoder[1]
+intermingles parsing, decoding, and motion compensation, making it
+difficult to clearly follow the code, or reuse code for other
+applications.</p>
+
+<p>Another notable aspect of our implementation is that it decouples
+the high bandwidth flow of the bitstream data throughout the pipeline,
 from the low bandwidth communication of control information that is
 necessary to properly decode the bitstream. The decoder uses teleport
 messaging[5] to send metadata associated with macroblocks from the
 parser to downstream filters. For instance, the parser generates a
 message whenever the picture or macroblock type changes. The motion
-compensation filter uses this information to determine how to process
-the blocks and determine whether it needs to store them for future
+compensation filters use this information to determine how to process
+the blocks and determine whether they need to store them for future
 reference. The picture reordering step uses the picture type to
-determine the correct temporal order, and the math behind the inverse
-quantization depends on the encoding type of the macroblock. Teleport
-messaging is a clean and efficient mechanism for propogating the
-relevant metadata through out the stream graph. It also exposes the
+determine the correct temporal order for output. Teleport messaging is
+a clean and efficient mechanism for propagating the relevant metadata
+through out the stream graph (lines 13, 25, 28, and 33, and
+illustrated with dotted lines in Figure 1). It also exposes the
 communication to the compiler which then chooses an optimal
 implementation strategy, depending on the target architecture
 platform.</p>
 
-<p>Current efforts on the decoder focus on improving
-performance. An alternative formulation of the MPEG decoder stream graph
-exposes greater parallelism to the compiler by parallelizing both the 
-spatial and temporal decompression over all macroblocks. However,
-this implementation relies extensively on efficient upstream messaging,
-providing additional compilation challenges.</p>
-    
-<h5>MPEG Encoder</h5>
-<p>The encoder, recently completed, presents an even greater challenge
-for compilation. The encoder, which produces a valid MPEG-2 stream, is
-a much larger stream graph. This is due in part to the fact that it
-contains most of the decoder as a subcomponent, since it needs to
-understand what the decoded picture will look like for the purposes of
-motion estimation. It also makes use of upstream messaging to send reference
-pictures from the decoded output back to the motion compensation stage near the
-beginning of the pipeline. Language extensions allowing the use of
-programmable splitters and joiners will give the programmer better control
-of his stream program execution and expose scheduling information to the
-compiler which will allow it to avoid large quantities of
-unnecessary computation.</p>
+<h5>Ongoing Work</h5>
+<p>In addition to the MPEG-2 decoder highlighted above, we have a
+fully functional encoder implementation in StreamIt. Our current
+emphasis is on generating high performance code for a range of
+architecture targets. We believe that as computer architectures change
+from the traditional monolithic processors, to scalable wire-exposed
+and multi-core processors, there will be a greater need for portable
+codec implementations that expose parallelism and communication to
+enable efficient and high performance executions---while also boosting
+programmer productivity.  StreamIt represents a step toward this end
+by providing a language that features hierarchical, modular,
+malleable, and portable streams, and a stream-aware compiler to
+deliver high performance solutions for new and emerging processors.</p>
 
 <h5>Research Support:</h5>
 <p>The StreamIt  project is supported by DARPA grants
