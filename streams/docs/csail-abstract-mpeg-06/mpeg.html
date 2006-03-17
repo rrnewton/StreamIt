@@ -18,7 +18,7 @@ and high degrees of data and pipeline parallelism. As such, they are
 well-suited for stream-based languages. Our research has focused on
 enabling the rapid implementation of high performance multimedia codes in
 <a href="http://cag.csail.mit.edu/streamit">StreamIt</a>,
-a high level programming language for stream programming[2].
+a high level programming language for stream programming [2].
 There are two aspects to our work. First, we are investigating
 stream-based abstractions that facilitate productive programming
 practices. Second, our research is also concerned with compiler
@@ -26,17 +26,18 @@ optimizations that lead to high performance code on a variety of
 commodity processors.</p>
 
 <p>In StreamIt, the programmer builds an application by connecting
-components together into a stream graph, where the nodes represent
-actors that carry out the computation, and edges represent FIFO
-communication channels between actors. As a result, the parallelism
+components together into a stream graph, where nodes represent
+filters that carry out the computation, and edges represent FIFO
+communication channels between filters. As a result, the parallelism
 and communication topology of the application are exposed, empowering
-the compiler to perform many stream-aware optimizations[3,4] that
-elude other languages. We have implemented an MPEG-2[1] encoder and
+the compiler to perform many stream-aware optimizations [3,4] that
+elude other languages. We have implemented an MPEG-2 [1] encoder and
 decoder in StreamIt. Detailed information about this project is
 available at the  
 <a href="http://cag.csail.mit.edu/streamit/mpeg/">project website</a> and
 in our IPDPS 2006 
-<a href="http://cag.lcs.mit.edu/commit/papers/06/drake-ipdps06.pdf">paper</a>[6].</p>
+<a href="http://cag.lcs.mit.edu/commit/papers/06/drake-ipdps06.pdf">paper</a>
+[6].</p>
 
 <center>
 <table>
@@ -88,7 +89,7 @@ interfaces. This facilitates development and boosts programmer
 productivity, as components can be debugged and verified as standalone
 components. The modularity also promotes reuse. For example, the
 zig-zag descrambler and inverse DCT can be used as-is in a JPEG
-decoder. In contrast, the reference C implementation of the decoder[1]
+decoder. In contrast, the reference C implementation of the decoder [7]
 intermingles parsing, decoding, and motion compensation, making it
 difficult to clearly follow the code, or reuse code for other
 applications.</p>
@@ -97,7 +98,7 @@ applications.</p>
 the high bandwidth flow of the bitstream data throughout the pipeline,
 from the low bandwidth communication of control information that is
 necessary to properly decode the bitstream. The decoder uses teleport
-messaging[5] to send metadata associated with macroblocks from the
+messaging [5] to send metadata associated with macroblocks from the
 parser to downstream filters. For instance, the parser generates a
 message whenever the picture or macroblock type changes. The motion
 compensation filters use this information to determine how to process
@@ -119,7 +120,7 @@ architecture targets. We believe that as computer architectures change
 from the traditional monolithic processors, to scalable wire-exposed
 and multi-core processors, there will be a greater need for portable
 codec implementations that expose parallelism and communication to
-enable efficient and high performance executions---while also boosting
+enable efficient and high performance executions, while also boosting
 programmer productivity.  StreamIt represents a step toward this end
 by providing a language that features hierarchical, modular,
 malleable, and portable streams, and a stream-aware compiler to
@@ -161,6 +162,5 @@ Amarasinghe.  MPEG-2 Decoding in a Stream Programming Language. In
 Distributed Processing Symposium</em>, Rhodes Island, Greece, April,
 2006.</p>
 
-
-
-
+<p>[7] VMPEG (Reference C Code). <a href="ftp://ftp.mpegtv.com/pub/mpeg/mssg/mpeg2vidcodec_v12.tar.gz">
+ftp://ftp.mpegtv.com/pub/mpeg/mssg/mpeg2vidcodec_v12.tar.gz</a>.
