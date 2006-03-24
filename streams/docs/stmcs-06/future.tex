@@ -1,0 +1,32 @@
+\Section{Concluding Remarks}
+\vspace{-11pt}
+
+As computer architectures change from the traditional monolithic
+processors, to scalable wire-exposed and multicore processors, there
+is a greater need for portable applications that expose parallelism
+and communication to enable efficient and high performance
+executions---while also boosting programmer productivity. StreamIt is
+a programming language and a compilation infrastructure specifically
+engineered to naturally expose and leverage stream abstractions that
+are embodied in modern streaming applications. We have used StreamIt
+to implement DSP codes (e.g., software radio, beamforming), image and
+video codecs (e.g., MPEG-2 encoding and decoding), encryption
+algorithms (e.g., DES and Serpent), and many other applications. The
+language, compiler, and applications are available for download from
+the project web page at http://cag.csail.mit.edu/streamit.
+
+The goal of the StreamIt project is to boost productivity for
+streaming application developers such that they focus on algorithmic
+innovation rather than on performance tuning. The ability to leverage
+domain specific language constructs affords optimization opportunities
+that can deliver high performance from high levels of abstraction. 
+
+We believe emerging languages such as X10 can provide a framework to
+implement domain specific abstractions in a general purpose
+programming model. We have designed and implemented a prototype bridge
+to run StreamIt code as part of the X10 virtual machine. As a result,
+application developers can use the streaming abstractions for the
+computation that fit that model of computation, while different
+abstractions can be used to describe other aspects of the computation.
+A part of our ongoing work is concerned with evaluating the productivity
+and performance merit of native interfaces to and from StreamIt codes.

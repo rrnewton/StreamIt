@@ -1,0 +1,26 @@
+%% Multicore architectures offer a significant amount of coarse-grained
+%% parallelism on chip. They also increase the burden on programmers who
+%% now have to explicitly extract coarse-grained parallelism from their
+%% codes in order to leverage the compute potential available in emerging
+%% processors. Multimedia applications are especially challenging because
+%% they require stream abstractions that are not easily representd using
+%% current programming paradigms, and general purpose compilers eschew
+%% stream-aware optimizations. As a result, applications are hand-coded
+%% for performance, and this practice precludes portability, and
+%% obfuscates readability. 
+The goal of the StreamIt project is to become the language of choice
+for streaming applications, which include multimedia codes, as well as
+cryptography, networking and security, and some forms of scientific
+computation. StreamIt provides a high level stream language and a
+stream-aware compiler that leverages domain specific language
+constructs to deliver high performance from high levels of
+abstraction. We believe that StreamIt will lead to a dramatic
+improvement in programmer productivity, program robustness,
+portability, and performance scalability on commodity multicore
+architectures. A key component of the research is to also provide
+seamless integration with other programming practices,  because large
+applications have various properties that may require different
+language abstractions. This paper outlines a methodology that allows
+StreamIt programs to run as part of the X10 virtual machine. X10 is
+one of three general purpose languages under development from vendors
+designing large scale parallel platforms.

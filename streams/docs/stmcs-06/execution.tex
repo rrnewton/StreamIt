@@ -1,0 +1,51 @@
+\Section{StreamIt Execution Model}
+\vspace{-11pt}
+
+In StreamIt, a filter work function may execute whenever the amount of
+data on the input tape is equal to or greater than the declared input
+rate (i.e., max of peek and pop rates). The compiler can take
+advantage of the declared I/O rates to statically
+schedule filter executions. There are often many legal execution
+orders for a given stream graph. The compiler can manage the schedule
+such that it accounts for the buffer requirements between filters and
+the instruction footprint of the stream graph, and can optimize the
+output latency or computational throughput~\cite{karczma03lctes,
+sermulins05lctes}.
+
+The StreamIt compiler can generate single threaded or multi-threaded
+code for commodity processors, including computing clusters. We have
+also developed a {\sc Java} emulation library to promote research and
+experimentation in language design and compiler innovation.  StreamIt
+programs can run as standalone applications, but may also integrate
+with native codes. For example it is possible to use highly optimized
+libraries for specific computations (e.g., FFTW~\cite{frigo98fftw} for
+convolutions in signal processing). StreamIt provides an interface to
+native codes which may be viewed as black box components by the
+StreamIt compiler. Similarly, a native to StreamIt interface allows
+applications to view StreamIt code as a black box
+component. Application developers can thus leverage the benefits of
+StreamIt for computation that is well suited for the streaming
+paradigm.
+
+Recently, we began to explore how constructs in X10~\cite{x10} may be
+used to express streaming abstractions. X10 is a new high performance
+programming language for parallel architectures. It features many
+novelties, of which three are especially relevant to StreamIt. The
+first is the concept of a {\it place}. Informally, a place is
+partition in a global address space, and can encapsulate filter
+code. The second is the ability to specify the {\it distribution} of
+arrays, which is useful to expose the communication between streams,
+as in the splitjoin containers. The last is the ability to initiate
+asynchronous method calls via the {\it async} construct, which
+provides a facility to implement teleport messaging.
+
+We have designed and implemented a runtime interface to run StreamIt
+programs as part of an experimental X10 virtual machine. When a
+program is launched, a StreamIt library constructs the stream graph
+and performs all filter initialization. The library then iterates
+through the stream graph to create equivalent X10 stream objects that
+wrap around filters and tapes. Currently the virtual machine ignores
+the StreamIt compiler scheduling decisions. Instead, it uses a push
+model of execution where a filter is run as soon as a sufficient
+number of input data items appear on its input stream.
+
