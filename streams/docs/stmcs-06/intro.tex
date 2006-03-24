@@ -1,0 +1,90 @@
+\vspace{-6pt}
+\Section{Introduction}
+\vspace{-11pt}
+
+Multicore architectures offer a significant amount of coarse-grained
+parallelism on chip. They also increase the burden on programmers who
+now have to explicitly extract coarse-grained parallelism from their
+codes in order to leverage the compute potential available in emerging
+processors. Multimedia applications are especially challenging because
+they require stream abstractions that are not easily represented using
+current programming paradigms, and general purpose compilers eschew
+stream-aware optimizations. As a result, applications are hand-coded
+for performance, and this practice precludes portability, and
+obfuscates readability. 
+
+%% Application developers face new challenges as they port and redesign
+%% their codes to run on multicore architectures. Multicore processors
+%% from IBM, Intel, AMD, Sun, and other vendors, have  marked a
+%% significant departure from the von Neumann architecture paradigm that
+%% catalyzed the growth of the computing industry for the last few
+%% decades.  The change in processor design is largely due to scalability
+%% challenges imposed by wire delay and power consumption. The emerging
+%% architectures place less emphasis on raw clock speed as means for
+%% better performance, focusing instead on massive capabilities for
+%% concurrent execution. The IBM Cell processor for example is touted as
+%% a supercomputer on a chip. It will appear in a new line of IBM blade
+%% servers that power various tiers of the computing industry. 
+
+%% The computation abilities of multicore architectures require explicit
+%% code parallelization to tap their full potential. This will inevitably
+%% translate to arduous manual tuning and recoding of applications, since
+%% automatic parallelization technology by a compiler has long failed to
+%% deliver acceptable results for applications expressed in general
+%% purpose languages. Partly, the reasons for the shortcomings are due to the
+%% heroic analysis efforts required to determine legal code orchestration
+%% for parallel execution.
+
+%% Leading vendors have recognized the need for new programming
+%% abstractions that will lessen the burden on programmers and
+%% compilers. New languages such as X10~\cite{x10} from IBM place a great
+%% emphasis on exposing data distributions across virtual computation
+%% locales, and provide new abstractions geared toward making programmers
+%% more productive while concomitantly making parallel computing
+%% constructs first class citizens in the languages they design.
+%% However, time and again parallel languages have failed to gain
+%% momentum because they have demanded more from the programmers. A new
+%% programming paradigm cannot increase the burden on the programmer, who
+%% is already teetering on the abyss of complexity.
+
+The StreamIt project at MIT provides a language~\cite{streamitcc} with
+simple abstractions for parallel programming, and a stream-aware
+compiler~\cite{agrawal05cases,gordon02asplos,lamb03pldi,sermulins05lctes}
+that delivers scalable high performance on a variety of commodity
+processors~\cite{gordon02asplos, raw04isca}. StreamIt is focused on
+stream programming ubiquitous to multimedia and digital signal
+processing, as well as applications drawn from cryptography, security,
+networking, and some forms of scientific computing. In StreamIt,
+computation is carried out by autonomous filters, and data are
+communicated over well structured topologies that interconnect the
+filters. The StreamIt programming model allows the programmer to build
+an application by connecting components together into a stream
+graph. The programmer is relieved of the burden of explicit buffer
+management and complex index expressions for multi-dimensional data,
+and naturally exposes the parallelism and communication patterns
+inherent to their codes.  The end result is clean, malleable, and
+portable code~\cite{drake06ipdps}.
+
+The StreamIt project is also concerned with providing seamless
+integration between streaming codes and other programming
+practices. This is necessary because large scale applications have
+various properties, each requiring a different language approach. The
+alternative is to use a single general purpose language for an
+application, although this practice hides program details that are
+necessary for good compilation strategies. StreamIt provides an
+interface to native code, such that the streaming computation is
+expressed in StreamIt, and the remaining code is implemented in
+languages such as C, C++, or Java. The interface allows native code to
+invoke the StreamIt pipeline, and vice versa.  In addition, we are
+exploring the use of emerging languages such as X10~\cite{x10} as
+frameworks for providing first class support for domain specific
+language primitives. We have designed and built a prototype
+environment that allows StreamIt programs to run as part of the X10
+virtual machine. The bridge implements the StreamIt language
+abstractions using new constructs founded upon the X10 language
+primitives. We are currently evaluating the productivity merits of
+this approach, along with the performance potential it affords.
+
+The StreamIt development environment, optimizing compiler, and set of
+streaming benchmarks are available for download from the project
+web page at http://cag.csail.mit.edu/streamit.

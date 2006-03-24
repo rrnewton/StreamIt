@@ -1,0 +1,47 @@
+\documentclass[times,11pt,twocolumn]{article}
+\usepackage{ipdps}
+\usepackage{vmargin}
+\setpapersize{USletter}
+\setmargnohf{0.8125in}{1in}{6.875in}{8.875in}
+\pagestyle{empty}
+\newenvironment{twoaffiliations}{\begin{tabular}{cc}}{\end{tabular}}
+\newenvironment{oddaffiliation}{\begin{center}}{\\~\\\end{center}}
+\usepackage{epsfig}
+
+\title{Ubiquitous Stream Programming to Facilitate the Migration to\\ Mutlicore Architectures}
+\author{
+  Matthew Drake, David Zhang, Michael Gordon, Janis Sermulins, William Thies\\
+  Allyn Dimock, Rodric Rabbah, and Saman Amarasinghe\\
+  \begin{twoaffiliations}
+    Massachusetts Institute of Technology\\
+    Computer Science and Artificial Intelligence Laboratory
+  \end{twoaffiliations}
+}
+
+\begin{document}
+  
+  \maketitle
+  \thispagestyle{empty}
+  
+  \begin{abstract}
+    \vspace{-5.5pt}
+    \input{abstract}
+  \end{abstract}
+  
+  \input{intro}
+  \input{language}
+  \input{execution}
+  \input{future}
+  
+  \vspace{-2pt}
+  \section*{Acknowledgements}
+  \vspace{-7pt}
+  The StreamIt
+  project is supported by DARPA grants PCA-F29601-03-2-0065 and
+  HPCA/PERCS-W0133890, and NSF awards CNS-0305453 and EIA-0071841.
+  Special thanks to Vijay Saraswat for his help in navigating X10 and
+  answering various questions about the infrastructure.
+\bibliographystyle{ipdps}
+\bibliography{main}
+
+\end{document}
