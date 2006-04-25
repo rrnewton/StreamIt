@@ -1,0 +1,596 @@
+\newcommand{\sdep}[0]{\textsc{sdep}}
+\newcommand{\sdepf}[2]{\sdep_{#1 \small{\leftarrow} #2}}
+
+\section{Messaging}
+\label{sec:messaging}
+
+It is sometimes necessary to send occasional messages outside of the
+normal stream data flow.  A radio application might contain an in-band
+signal requesting a change in the listening frequency, for example;
+this signal would happen infrequently, but it would be detected by a
+filter late in the application and require a change in a filter early
+in the application.  StreamIt provides an out-of-band messaging system
+to accomodate this sort of application.
+
+Section~\ref{sec:message-syntax} describes the syntax of messaging,
+while Section~\ref{sec:message-timing} describes the timing of message
+delivery.
+
+\subsection{Messaging Syntax}
+\label{sec:message-syntax}
+
+The syntax of messages is very similar to method calls.  However,
+message delivery is asynchronous, and there is no return value.  To
+distinguish them from normal methods, message handlers are declared
+using the \lstinline|handler| keyword, and calls to them are preceded
+by the \lstinline|send| keyword.  Messages can be sent from the work
+function, helper functions, and other message handlers.
+
+All messages are sent hierarchically, either from a child stream to
+its parent or from a parent stream to one of its children.  While
+there is no support for direct messaging between sibling streams
+(e.g., two filters in a pipeline), such streams can communicate via
+cascaded messaging through a shared parent.
+
+\paragraph{Messaging from child to parent.} Just as methods declare 
+checked exception in Java, each stream declares the messages that it
+might send to its parent in the stream graph.  For each message, the
+parent stream must either provide a message handler, or declare the
+message in its own interface to indicate that it can propagate further
+up the hierarchy.
+
+For example, the following filter sends a message to its parent every
+time it sees a value outside a given range.  It uses an interface to
+express the set of message signatures that can be raised to the
+parent.
+
+\begin{lstlisting}{}
+interface RangeMessages {
+  underflow(float val);  // indicate that val is below range
+  overflow(float val);   // indicate that val is above range
+}
+
+float->float filter CheckRange(float MIN, float MAX)
+  sends RangeMessages { ... }
+
+  work pop 1 push [0,1] {
+    float val = pop();
+    if (val < MIN) {
+      send underflow(val);
+    } else if (val > MAX)
+      send overflow(val);
+    } else {
+      push(val);
+    }
+  }
+}
+\end{lstlisting}
+
+When only a few messages are sent, the interface can be tedious to
+write.  In this case, the interface can be eliminated and the message
+signatures can be inlined into the stream declaration.  As in C
+function prototypes, the parameter names are optional:
+
+\begin{lstlisting}{}
+float->float filter CheckRange(float MIN, float MAX) 
+  sends underflow(float), overflow(float val) { ... }
+\end{lstlisting}{}
+
+For the parent stream to receive the message, it must declare an
+appropriate message handler.  A message handler is a method declared
+with the \lstinline|handler| keyword that has no return value.  For
+child-to-parent communication, handlers can further specify which
+children they are listening to.  A handler is invoked if it matches
+both the source and signature of a message.
+
+For example, the following stream simply counts the errors that are
+raised by the \lstinline|CheckRange| filter:
+
+\begin{lstlisting}{}
+float->float pipeline AudioTransform() {
+  CheckRange checker; // handle on range checker
+  int count = 0;      // error count
+
+  init {
+    add MyTransform();
+    checker = add CheckRange(0.0, 0.5);
+  }
+
+  // handle underflow message from checker
+  handler checker.underflow(float val) {
+    count++;
+  }
+
+  // handle overflow message from checker
+  handler checker.overflow(float val) {
+    count++;
+  }
+}
+\end{lstlisting}{}
+
+As illustrated above, parent streams use {\bf stream handles} to keep
+track of child streams.  A stream handle (such as \lstinline|checker|)
+represents an instance of a stream object and is used to indicate the
+source and target of messages.  To enable compiler analysis of
+handles, there are strict restrictions regarding their use:
+\begin{itemize}
+\item Handles must be declared as fields (not locals or parameters).
+\item Handles can only be assigned in the init function.
+\item Handles cannot appear on the right hand side of any assignment.
+\end{itemize}
+
+For child-to-parent communication, a handle is used in the declaration
+of message handlers to indicate the source of messages.  Thus, the
+\lstinline|checker.underflow| handler only processes messages that
+originated from the \lstinline|checker| stream.  This mechanism allows
+parents to distinguish messages from different children, even if they
+have the same type.  To easily distinguish messages from a large
+number of children, there is built-in support for arrays of stream
+handles:
+
+\begin{lstlisting}{}
+float->float splitjoin ParallelChecker(int N) {
+  CheckRange checker[N]; // handles on range checker
+  int[N] count;          // error counts
+
+  init {
+    split roundrobin;
+    for (int i=0; i<N; i++)
+      checker[i] = add CheckRange(i/10.0, (i+1)/10.0);
+    join roundrobin;
+  }
+
+  // handle underflow message from i'th checker
+  handler checker[i].underflow(float val) {
+    count[i]++;
+  }
+
+  // handle overflow message from i'th checker
+  handler checker[i].overflow(float val) {
+    count[i]++;
+  }
+}
+\end{lstlisting}{}
+
+In this example, the \lstinline|checker[i].underflow| handler listens
+to all members of the \lstinline|checker| array.  If
+\lstinline|checker[5]| sends a message at runtime, then the handler is
+invoked with $i=5$.  This allows for a parameterized implementation of
+handlers.
+
+One can think of messages from children as being runtime events.  A
+given parent might not be interested in all the events from a child.
+However, some events might cause the parent to adjust its internal
+state, initiate messages to other children, or construct a broader
+message to a higher-level parent.
+
+\paragraph{Messaging from parent to child.}  Messaging from parent 
+streams to child streams is very similar to the opposite direction.
+The only syntactic difference is the position of the stream handles.
+As the \lstinline|send| statement appears in the parent, it includes a
+stream handle to indicate which child should receive the message.
+Likewise, as the message handler appears in the child, it does not
+need a stream handle (there is only one parent that can invoke the
+handler).  All message handlers declared without a stream handle are
+accessible to the parent.
+
+For example, the following stream performs exponentiation as a
+composition of several multiplies.  It provides a message handler to
+adjust the base of the exponent:
+
+\begin{lstlisting}{}
+int->int pipeline Exponent(int base, int exp) {
+  Multiply[exp] mult;
+
+  init {
+    for (int i=0; i<exp; i++)
+      mult[i] = add Multiply(base);
+  }
+
+  handler setBase(int base) {
+    for (int i=0; i<exp; i++)
+      mult[i].setFactor(base);
+  }
+}
+
+int->int filter Multiply(int initFactor) {
+  int factor = initFactor;
+
+  work push 1 pop 1 {
+    push(factor * pop());
+  }
+
+  handler setFactor(int _factor) {
+    factor = _factor;
+  }
+}
+\end{lstlisting}{}
+
+There is also syntactic sugar for performing a broadcast message: a
+message addressed as \lstinline|child[*].handleMessage()| sends the
+message to all elements of the \lstinline|child| array.  Thus, the
+\lstinline|Exponent.setBase| handler can be re-written as follows:
+
+\begin{lstlisting}{}
+  handler setBase(int base) {
+    mult[*].setFactor(base);
+  }
+\end{lstlisting}{}
+
+\subsection{Message Timing}
+\label{sec:message-timing}
+
+According to the StreamIt execution model, filters in the stream graph
+may execute in any order (or in parallel) so long as the dependences
+along the FIFO data channels are satisfied.  If messages were to be
+delivered ``instantly'' by the runtime system, the timing would be
+non-deterministic because different runtime systems may execute
+different schedules, buffering varying amounts of data between message
+senders and receivers.  
+
+To ensure deterministic behavior, messages in StreamIt are timed
+relative to a {\it canonical schedule}.  While the runtime schedule
+might differ from the canonical schedule, the canonical schedule
+provides a standard framework for describing message timing.
+
+We present the details of message delivery in three steps.  First, we
+present the canonical schedule.  Next, we describe how messages can be
+timed relative to two filters, given the canonical schedule.  Finally,
+we describe how two hierarchical streams can express their
+communication in terms of two underlying filters.
+
+\paragraph{Canonical schedule.}
+
+To send messages between two filters in a deterministic way, there
+needs to be a canonical ordering in which those two filters are
+executed.  In order to simplify the canonical ordering, we only permit
+messaging between {\it dependent} filters in the stream graph.
+
+Two filters $A$ and $B$ are dependent if and only if they are
+connected by a directed path in the stream graph.  That is, the output
+of filter $A$ passes through some set of filters and eventually leads
+to the input of filter $B$.  In this case, we say that filter $A$ is
+{\it upstream} and filter $B$ is {\it downstream}.  Messages can not
+be timed relative to filters that execute completely independently
+(for example, in alternate branches of a top-level splitjoin).
+
+Given a pair of dependent filters, the canonical ordering in StreamIt
+follows a simple rule: for each execution of the upstream filter, the
+downstream filter executes as much as possible.  That is, the schedule
+has minimal latency, with each filter's outputs being propagated
+downstream before reconsidering the filter for execution.  This
+ordering can be constructed using a greedy scheduling algorithm such
+as pull scheduling~\cite{thies05ppopp}.
+
+It is important to emphasize that while the canonical schedule is the
+basis for message timing, it is not necessarily the schedule employed
+by the runtime system.  In fact, the runtime system must depart from
+the canonical schedule in order to deliver long-latency messages
+correctly.  Furthermore, runtime systems will often adjust the
+schedule for the sake of optimization.
+
+\paragraph{Timing between filters.}  
+
+Each filter maintains a message queue to hold incoming messages.  This
+queue is checked twice during the atomic execution of a filter: once
+before the work function executes, and once after it executes.  Any
+messages in the queue at the start of the check are dispatched to the
+appropriate message handlers.  However, if the processing of these
+messages causes additional messages to be added to the queue, the new
+messages are not handled until the next check.
+
+Messages have adjustable latency and are timed as follows.  Assuming
+execution under the canonical schedule, messages sent with default
+(zero) latency are immediately added to the message queue of the
+target filter.  Non-zero latencies are measured in terms of filter
+executions.  If a filter sends a message with latency $k$ during
+execution $n$, the outcome is equivalent to sending a message with
+latency 0 on execution $n+k$.
+
+Message latencies can be interpreted as follows.  If the message is
+sent in the direction of dataflow (from an upstream node to a
+downstream node), a positive latency indicates that the message is
+synchronized with some data that the message sender will produce in
+the future.  Likewise, a negative latency synchronizes the message
+with some data that the message sender produced in the past.
+
+If a message is sent opposite the direction of dataflow (from a
+downstream node to an upstream node), a positive latency synchronizes
+the message with some data the message sender will consume in the
+future.  In this case, negative latencies are illegal (they correspond
+to data consumed by the message sender in the past).
+
+Messages can also be sent with a range of latencies, indicating that
+any latency in the range is acceptable.  The runtime system is free to
+choose a different latency for each dynamic instance of the
+\lstinline|send| statement.  However, each message must be delivered 
+as if it were sent with some particular latency.  For example, if
+latencies of 0 and 1 lead to message deliveries at iterations 10 and
+12, respectively, then a latency range of [0:1] can lead to delivery
+at iteration 10 or 12, but not at iteration 11.
+
+\medskip
+\framebox{Add example}
+
+\paragraph{Timing between streams.}
+
+We now consider how to time the delivery of messages between
+hierarchical streams (such as pipelines) in addition to filters.
+Unlike filters, hierarchical streams do not have a natural notion of
+an atomic execution step (especially in the presence of dynamic rates)
+and, as a consequence, do not have a well-defined position in the
+canonical schedule.
+
+In order to integrate hierarchical streams into the canonical
+schedule, we introduce the notion of a {\it clock}.  The purpose of a
+clock is to count executions of the hierarchical stream in terms of
+the executions of one of its children.  A clock consists of a
+reference to a child stream as well as a multiplicity $m$.  Every time
+that the given child executes $m$ times, the clock advances one tick.
+As all hierarchical streams have clocks, each clock tick can
+eventually be reduced to a number of executions of some particular
+filter.  Thus, messages sent between hierarchical streams are timed
+with respect to the filters underlying the clocks for those streams.
+
+To be more precise, suppose that the message receiver has a clock that
+corresponds to $p$ executions of an underlying filter ($p$ might be
+greater than $m$ due to nested clocks).  Message timing is exactly as
+described in the previous section, except that the message receiver
+only checks the message queue immediately before the work function
+executes iterations $0$, $p$, $2p$, etc. and immediately after the
+work function executes iterations $p-1$, $2p-1$, $3p-1$, etc.  In
+other words, from the standpoint of checking messages, every $p$ calls
+to the work function are effectively collapsed into one.
+
+A stream defines two types of clocks: a stream clock (for the entire
+stream) and handler clocks (one for each message handler).  The stream
+clock enables the stream to serve as a clock itself (from its parent's
+standpoint).  That is, if a stream $S$ is used as a clock by its
+parent, the stream clock for $S$ translates each execution of $S$ into
+executions of an underlying filter.  In contrast, the clock for a
+given message handler serves to define the endpoint for messages
+received by the handler, as well as the starting point for messages
+that are sent from within the handler.
+
+Default values are provided for both stream clocks and handler clocks.
+The default stream clock depends on the type of stream.  For a
+pipeline, the default clock is the first child stream; for a
+splitjoin, the default clock is the splitter; and for a feedback loop,
+the default clock is the joiner.  The default multiplicity is 1 in
+each case.
+
+The default handler clock depends on the type of handler.  For
+handlers receiving messages from a child, the default handler clock is
+the child itself.  For handlers receiving messages from a parent, the
+default handler clock is the stream clock.  The default multiplicity
+is 1.
+
+The following stream provides an example of clocks.  It uses messaging
+to output a sequence of numbers.
+
+\begin{lstlisting}{}
+void->void pipeline Counter {
+  Source source;
+  Sink sink;
+
+  init {
+    source = add Source;
+    sink = add Sink;
+  }
+
+  handler source.count(int val) {
+    send sink.setOutput(val);
+  }
+}
+
+void->int filter Source sends count(int) {
+  int i = 1;
+  work {
+    push(0);
+    send count(i++);
+  }
+}
+
+int->void filter Sink {
+  int output = 0;
+
+  work {
+    pop();
+    print(output);
+  }
+
+  handler setOutput(int val) {
+    output = val;
+  }
+}
+\end{lstlisting}{}
+
+When run for 6 iterations, the code above outputs ``123456''.  The
+canonical schedule is to execute the Source and Sink in alternation.
+On the first execution of the Source, a count() message is raised with
+the default latency of zero.  Because the default clock for the
+count() handler is the Source, the message is immediately added to the
+Source's message queue.  At the end of the Source's work function, the
+message is processed by invoking the count() handler.  The handler
+sends a setOutput() message to the Sink with zero latency, thereby
+adding it to the Sink's message queue.  The Sink handles the message
+immediately before its next execution, thereby updating its
+\lstinline|output| variable before it is printed to the screen.
+
+To override the default clocks, the programmer can specify custom
+clocks.  Stream clocks are specified via a statement in the init
+function, using the syntax \lstinline|clock mult*childHandle;| where
+the multiplicity \lstinline|mult| is optional.  Handler clocks are
+specified by appending an expression of the same form to a handler's
+declaration.
+
+For example, let us reconsider the Counter example with various
+customized clocks.  By modifying the declaration of the count()
+handler, the message can be timed relative to every other execution of
+the Source:
+
+\begin{lstlisting}{}
+  handler source.count(int val) clock 2*source {
+    send sink.setOutput(val);
+  }
+\end{lstlisting}{}
+
+When run for 6 iterations, the output is now ``224466''.  Execution
+proceeds as in the original example, except that the count() handler
+is only triggered after executions 2, 4, and 6 of the Source.
+
+As another example, consider setting the clock of the handler to the
+Sink rather than the Source:
+
+\begin{lstlisting}{}
+  handler source.count(int val) clock sink {
+    send sink.setOutput(val);
+  }
+\end{lstlisting}{}
+
+In this case, the output of the program is ``012345''.  The count()
+handler is invoked immediately before the Sink's execution, and the
+message sent from within the handler is not processed until after the
+Sink's execution.
+
+\medskip
+\framebox{Examples with nested clocks.}
+
+\medskip
+\framebox{Examples with latency.}
+
+%% For example, the following stream uses a frame parser as the clock
+%% (which is useful because it fires once per frame, rather than once per
+%% bit):
+
+%% \begin{lstlisting}{}
+%% float->float pipeline Decoder { 
+%%   Parser parser;
+
+%%   init {
+%%     add FileReader<bit>("input.dat");
+%%     parser = add Parser();
+%%     add Decompress();
+%%     add Render();
+
+%%     clock parser;
+%%   }
+
+%%   handler skipFrame() { ... }
+%% }
+%% \end{lstlisting}{}
+
+%% -----------------------------------------------------------------
+
+%% This looks like a function call in Java: the portal name is followed
+%% by a period, the message name, and a parenthesized parameter list.
+%% This may, optionally, be followed by a message latency, which
+%% specifies the minimum and maximum delay to receive the message.  The
+%% latency specification is an open bracket, an optional minimum latency,
+%% a colon, an optional maximum latency, and a close bracket.  If the
+%% latency specification is omitted, it defaults to \lstinline|[:]|,
+%% allowing any latency.
+
+%% \begin{lstlisting}{}
+%% float->float filter VolumeDetect {
+%%   work pop 1 push 1 {
+%%     float val = pop();
+%%     if (/* detected */)
+%%       send setAmplification(0.5);
+%%     push(val);
+%%   }
+%% }
+
+%% float->float filter VolumeControl {
+%%   float amplification;
+%%   init { amplification = 1.0; }
+%%   work pop 1 push 1 { push(pop() * amplification); }
+%%   handler setAmplification(float val)
+%%     { amplification = val; }
+%% }
+
+%% float->float pipeline Volume {
+%%   VolumeDetect detect;
+%%   VolControl control;
+
+%%   init {
+%%     detect = add VolumeDetect();
+%%     control = add VolumeControl();
+%%   }
+
+%%   handler detect.setAmplification(float val) {
+%%     control.setAmplification(val);
+%%   }
+%% }
+%% \end{lstlisting}
+
+%% -------------------------------------------------------------------
+
+%% At each time step, a pull schedule inspects the set of filters that
+%% have sufficient inputs to fire and executes the one that is closest to
+%% the output of the stream.  This results in a fine-grained interleaving
+%% of filter firings, with the output of a given filter being propagated
+%% as far as possible before executing the filter again.  Due to the
+%% parallelism in splitjoins and feedback loops, there are many valid
+%% pull schedules~\cite{thies05ppopp}.  However, as described below,
+%% there is a unique pull schedule connecting each message sender and
+%% receiver.
+
+%% It is important to note that while the pull schedule is the basis for
+%% message timing, it is not necessarily the schedule employed by the
+%% runtime system.  In fact, the runtime system must depart from the pull
+%% schedule in order to deliver long-latency messages correctly.  Apart
+%% from correctness, runtime systems will often adjust the schedule for
+%% the sake of optimization.
+
+%% Messages between upstream filter $A$ and downstream filter $B$ are
+%% timed relative to a specific pull schedule: the pull schedule rooted
+%% at $B$.  As detailed elsewhere~\cite{thies05ppopp}, this schedule is
+%% constructed by calculating the demand for data items on the input
+%% channels of $B$, and then propagating the demand back through the
+%% stream graph.  In subtle cases, this schedule may be slightly
+%% different than the pull schedule rooted at the output
+%% node~\cite{thies05ppopp}.
+
+%% ---------
+
+%% A pull schedule for filter $X$ is one that executes other nodes as few
+%% times as possible for each firing of $X$.  This is achieved by
+%% calculating the demand for data items on the input channels of $X$,
+%% and then propagating the demand back through the stream graph via pull
+%% scheduling of the actors connected to $X$.  Pull scheduling results in
+%% a fine-grained interleaving of actor firings.  Some stream graphs
+%% admit multiple pull schedules, as actors might be connected to
+%% multiple inputs that can be scheduled in any order; however, the set
+%% of actor executions remains constant even as the order changes.
+
+%% ---------
+
+%% Formally, messages are defined in terms of a {\it stream dependence
+%% function}, or $\sdep$.  $\sdepf{A}{B}(n)$ represents the minimum
+%% number of times that filter $A$ must execute to make it possible for
+%% filter $B$ to execute $n$ times.  This dependence is meaningful only
+%% if $B$ is downstream of $A$ (as described above); otherwise, $\sdep$
+%% assumes a value of zero.  When the I/O rates of each actor are known
+%% at compile time, $\sdep$ can be computed statically~\cite{thies05ppopp}.
+
+%% ---------
+
+%% Consider that filter $A$ sends a message to downstream filter $B$ with
+%% latency $k$ and that the message is sent during execution $n$ or
+%% between executions $n-1$ and $n$ of $A$.  Then the message handler is
+%% invoked between executions $m-1$ and $m$ of $B$, for the smallest $m$
+%% satisfying $\sdepf{A}{B}(m) = n+k$.  If no such $m$ satisfies this
+%% equation, then the message cannot be delivered with latency $k$.  As
+%% $\sdep$ is known at compile time, the compiler can check whether a
+%% message can be delivered with a given latency across all values of
+%% $n$.
+
+%% ---------
+
+%% In the other direction, filter $B$ sends a message to upstream filter
+%% $A$ with latency range $[k_1:k_2]$ and the message is sent during
+%% execution $n$ or between executions $n$ and $n+1$ of $B$.  Then the
+%% message handler is invoked between executions $m$ and $m+1$ of $A$,
+%% for any $m$ such that $\sdepf{A}{B}(n + k_1) \le m \le \sdepf{A}{B}(n
+%% + k_2)$.
