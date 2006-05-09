@@ -1,0 +1,13 @@
+
+The utilization metric includes pipeline stalls due to cache accesses
+and hazards for each tile.  Each RAW tile is a single-issue, inorder
+processor.  Stalls are frequent.
+
+Utilization should not be compared between space multiplexing and
+SpaceTime multiplexing because space multiplexing adds compute
+instructions necessary to implement filter fusion (the data buffering
+and redistribution of fused filters mapped to a single node). In
+SpaceTime this is achieved using the communication networks.  A
+throughput comparison makes more sense.
+
+
