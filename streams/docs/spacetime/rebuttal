@@ -1,13 +1,41 @@
 
-The utilization metric includes pipeline stalls due to cache accesses
-and hazards for each tile.  Each RAW tile is a single-issue, inorder
-processor.  Stalls are frequent.
+
+Our research is important for any multicore architecture but
+especially for architectures with a fast on-chip communication network
+(CELL, etc.).  For these architectures, our approach leverages the
+on-chip network necessray for scaling while benefiting from flexible
+load-balancing and scheduling.  This is unlike previous approaches
+that cannot make both claims (for example Cilk's shared memory model).
+
+Reviewer 4 calls the work incremental.  Our research is very different
+from previous compilations systems accepting StreamIt and/or targeting
+multicores.  We used the space-multiplexing and time-multiplexing
+analogy to help the reader understand our research.  
+
+While we are inspired by instruction-level software pipelining, we
+feel that we are different enough that 
+
+Dynamic filter input and output rates can be naturally and efficiently
+supported by SpaceTime multiplexing.  Limit dynamic i/o rates to
+the slice boundaries, allowing for load balancing within a slice and
+off-chip buffering between dynamic rate slices.  Mention it is an area
+of future work?
+
+In response to Reviewer 2, the utilization metric includes stalls due
+to cache accesses and pipeline hazards for each tile.  Each RAW tile
+is a single-issue, inorder processor.  Stalls are frequent.
 
 Utilization should not be compared between space multiplexing and
 SpaceTime multiplexing because space multiplexing adds compute
 instructions necessary to implement filter fusion (the data buffering
-and redistribution of fused filters mapped to a single node). In
+and redistribution of filters mapped to a single node). In
 SpaceTime this is achieved using the communication networks.  A
 throughput comparison makes more sense.
 
+We agree with Reviewer 2, the organization and quality of the writing
+needs to be improved, but Reviewer 2 is critical only of the
+presentation.  
 
+Feedbackloop support  
+
+Outliers? 
