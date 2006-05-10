@@ -39,7 +39,7 @@ because it software-pipelines filters across a parallel target,
 communicating through off-chip memory. However, the space-multiplexing
 component of our SpaceTime model is essential because it reduces
 off-chip memory traffic by utilizing on-chip communication resources.
-This will aspect will become more pronounced as multicores scale up.
+This aspect will become more pronounced as multicores scale up.
 
 Reviewer 4 calls the work incremental.  Our research is very different
 from previous compilations systems accepting StreamIt and/or targeting
