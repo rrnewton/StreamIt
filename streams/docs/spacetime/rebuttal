@@ -11,17 +11,18 @@ parallel target.  The SpaceTime model forms space-multiplexed slices,
 which can occupy multiple compute nodes, and time-multiplexes them.
 SpaceTime scheduling can balance latency and load-balancing concerns.
 Due to the time-multiplexed outer loop, we can employ scheduling
-techniques (software pipelining) previously reserved for scheduling
-instructions in a loop.
+techniques (in this case software pipelining) previously reserved for
+scheduling instructions in a loop.
 
 Our research is applicable to any multicore architecture but
 especially for architectures with a fast on-chip communication network
-(CELL, Merrimac, TRIPS, etc.).  For these architectures, our approach
-leverages the on-chip network necessary for scaling while benefiting
-from flexible load-balancing and scheduling.  This is unlike previous
-approaches that cannot make both claims (for example Cilk's shared
-memory model). We use RAW to prove the validity of our research, as a
-demonstration.
+(CELL, Merrimac, TRIPS, etc.).  For these architectures, forming
+slices leverages the on-chip network necessary for scaling while
+benefiting from flexible load-balancing and scheduling.  This is
+unlike previous approaches that cannot make both claims (for example
+Cilk's shared memory model). We use RAW to prove the validity of our
+research, as a demonstration.  In the final paper, we will more
+clearly present our general contributions and findings.
 
 Reviewer 1 is concerned about the benchmarking baseline and asks how
 it compares to a uniprocessor.  In previous work [Taylor et al., ISCA
@@ -36,26 +37,20 @@ Reviewer 3 asks why we did not compare to time-multiplexing only. If
 we limit slices to one filter, we come close to approximating a
 time-multiplexing baseline. However, even with one filter per slice,
 there are many novelties in our system including software-pipelining
-of slices across a parallel target. We will rigorously evaluate the
-effect of the slice size (by varying the work threshold parameter).
-However, the space-multiplexing component of our SpaceTime model is
-essential because it reduces off-chip memory traffic by utilizing
-on-chip communication resources.  This aspect will become more
-pronounced as multicores scale up.
-
-Reviewer 1 questions the sensitivity of the work threshold parameter
-because we currently select this parameter by hand.  Our SpaceTime
-compiler is a complex and novel system and we are still investigating
-parameter selection for some of the algorithms.  For work threshold,
-on 3 of our applications, this parameter alone accounts for over a 20%
-throughput difference, but for the remainder of the applications, the
-parameter makes little difference.  
+of slices across a parallel target. In the final paper, we will
+rigorously investigate the effect of slice size by varying the
+work threshold parameter (addressing Reviewer 1's comments regarding
+this parameter).  We will show that the space-multiplexing component
+of our SpaceTime model is essential because it reduces off-chip memory
+traffic by utilizing on-chip communication resources.  This aspect
+will become more pronounced as multicores scale up and the memory
+bottleneck remains.
 
 We agree with Reviewer 2, the organization and quality of the writing
 needs to be improved, but Reviewer 2 is critical only of the
 presentation.  
 
-Dynamic filter input and output rates can be naturally and efficiently
+Dynamic input and output rates can be naturally and efficiently
 supported by SpaceTime multiplexing.  This is one major benefits of
 our SpaceTime model over space multiplexing.  It is straightforward to
 limit dynamic i/o rates to the slice boundaries, allowing for load
@@ -63,37 +58,34 @@ balancing within a slice and off-chip buffering between dynamic rate
 slices.
 
 Reviewer 4 questions the generality of the system because we chose not
-to implement support for feedbackloops at this time.  We chose not
-support feedbackloops because they occur very infrequently in
-practice.  There does not exist a fundamental limitation in our system
-that prevents us from supporting them.  Feedbackloops are akin to
-loop-carried dependencies which traditional software pipeliners
-respect.  The presence of a feedbackloop would place a limit on the
-realizable throughput of the stream graph.
+to support for feedbackloops at this time.  We chose not support
+feedbackloops because they occur very infrequently in practice.  There
+does not exist a fundamental limitation in our system that prevents us
+from supporting them.  Feedbackloops are akin to loop-carried
+dependencies which traditional software pipeliners respect.  The
+presence of a feedbackloop would place a limit on the realizable
+throughput of the stream graph.
 
-In response to multiple reviewers, the final version of the paper will
-include a more detailed explanation of the results and the 3 outlier
-cases in which space-multiplexing has higher performance than
-SpaceTime. Note that these cases can be alleviated with fine-tuning of
-our parameters.
+The final version of the paper will include a more detailed
+explanation of the results and the 3 outlier cases in which
+space-multiplexing has higher performance than SpaceTime. Note that
+with fine-tuning of our parameters these 3 benchmarks cease to be
+outliers.
 
 In response to Reviewer 2, the utilization metric includes stalls due
 to cache accesses and pipeline hazards for each tile.  Each RAW tile
 is a single-issue, inorder processor.  Pipeline stalls are frequent
 and thus depress the utilization metric.  
 
-Utilization should not be compared between space multiplexing and
-SpaceTime multiplexing because space multiplexing adds compute
-instructions necessary to implement filter fusion (the data buffering
-and redistribution of filters mapped to a single node). In
+Utilization should not be compared because space multiplexing adds
+compute instructions necessary to implement filter fusion (the data
+buffering and redistribution of filters mapped to a single node). In
 SpaceTime this is achieved using the communication networks.  A
 throughput comparison makes more sense.
 
 We did not enable code optimizations (unrolling, constant propagation,
-and scalar replacement) for the Space-multiplexing compiler because
-we did not have these same optimizations implemented in the SpaceTime
-compiler.  Thus, the comparison would be unfair.  It is unclear which
-approach will benefit more from these optimizations.  To
-clarify, the Space and SpaceTime compilers produce a mix of C and
-assembly code.  This code is compiled with GCC using -O3.
+and scalar replacement) for space-multiplexing because we did not have
+these optimizations implemented in the SpaceTime compiler.  Thus,
+the comparison would be unfair.  It is unclear which approach will
+benefit more from these optimizations. 
 
