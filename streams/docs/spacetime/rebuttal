@@ -1,17 +1,21 @@
-The SpaceTime model differs from traditional 
+The SpaceTime model differs substantially from traditional parallel
+execution models.  Traditionally, time-multiplexed portions of a
+parallel program are mapped to a single compute node and these
+portions are space-multiplexed across a parallel target.  The
+SpaceTime model forms space-multiplexed slices, which can occupy
+multiple compute nodes, and time-multiplexes them.  SpaceTime
+scheduling can balance latency and load-balancing concerns.  Due to
+the time-multiplexed outer loop, we can employ scheduling techniques
+previously reserved for scheduling instructions in a loop.
 
-Our research is important for any multicore architecture
-but especially for architectures with a fast on-chip communication
-network (CELL, Merrimack, etc.).  For these architectures, our
-approach leverages the on-chip network necessray for scaling while
-benefiting from flexible load-balancing and scheduling.  This is
-unlike previous approaches that cannot make both claims (for example
-Cilk's shared memory model). We use RAW to prove the validity of our
-research, as a demonstration.
-
-What is spacetime?  Software pipelining.  Not Imagine...
-Fully automated, fully utilizing machine resources...
-address the evolutionary deadend.
+Our research is applicable to any multicore architecture but
+especially for architectures with a fast on-chip communication network
+(CELL, Merrimack, TRIPS, etc.).  For these architectures, our approach
+leverages the on-chip network necessray for scaling while benefiting
+from flexible load-balancing and scheduling.  This is unlike previous
+approaches that cannot make both claims (for example Cilk's shared
+memory model). We use RAW to prove the validity of our research, as a
+demonstration.
 
 Reviewer 1 questions the importance of the research, calls the work
 insular, and asks how it compares to a uniprocessor.  We do not feel
@@ -36,8 +40,6 @@ communicating through off-chip memory. However, the space-multiplexing
 component of our SpaceTime model is essential because it reduces
 off-chip memory traffic by utilizing on-chip communication resources.
 This will aspect will become more pronounced as multicores scale up.
-
-
 
 Reviewer 4 calls the work incremental.  Our research is very different
 from previous compilations systems accepting StreamIt and/or targeting
@@ -64,12 +66,13 @@ respect.  The presence of a feedbackloop would place a limit on the
 realizable throughput of the stream graph.
 
 The final version of the paper will include a more detailed
-explanation of the 3 outlier cases in which space-multiplexing has
-higher performance than SpaceTime.  For example, FFT6 is a small
-application with a pathological asymmetry where the SpaceTime
-scheduler produces a schedule that increases the critical path of the
-bottleneck slice.  This problem can be alleviated by falling back to a
-time-multiplexed compilation by setting the work threshold parameter.
+explanation of the results and the 3 outlier cases in which
+space-multiplexing has higher performance than SpaceTime.  For
+example, FFT6 is a small application with a pathological asymmetry
+where the SpaceTime scheduler produces a schedule that increases the
+critical path of the bottleneck slice.  This problem can be alleviated
+by falling back to a time-multiplexed compilation by setting the work
+threshold parameter.
 
 In response to Reviewer 2, the utilization metric includes stalls due
 to cache accesses and pipeline hazards for each tile.  Each RAW tile
