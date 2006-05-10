@@ -14,15 +14,14 @@ Due to the time-multiplexed outer loop, we can employ scheduling
 techniques (in this case software pipelining) previously reserved for
 scheduling instructions in a loop.
 
-Our research is applicable to any multicore architecture but
-especially for architectures with a fast on-chip communication network
-(CELL, Merrimac, TRIPS, etc.).  For these architectures, forming
-slices leverages the on-chip network necessary for scaling while
-benefiting from flexible load-balancing and scheduling.  This is
-unlike previous approaches that cannot make both claims (for example
-Cilk's shared memory model). We use RAW to prove the validity of our
-research, as a demonstration.  In the final paper, we will more
-clearly present our general contributions and findings.
+Our research is applicable to any multicore architecture with
+distributed memory but especially for architectures with a fast
+on-chip communication network (CELL, Merrimac, Monarch, TRIPS, etc.).
+For these architectures, forming slices leverages the on-chip network
+necessary for scaling while benefiting from flexible load-balancing
+and scheduling.  Previous approaches, such as shared memory models
+(e.g. Cilk), cannot make both claims. We use RAW to prove the validity
+of our research, as a demonstration.
 
 Reviewer 1 is concerned about the benchmarking baseline and asks how
 it compares to a uniprocessor.  In previous work [Taylor et al., ISCA
@@ -41,7 +40,7 @@ of slices across a parallel target. In the final paper, we will
 rigorously investigate the effect of slice size by varying the
 work threshold parameter (addressing Reviewer 1's comments regarding
 this parameter).  We will show that the space-multiplexing component
-of our SpaceTime model is essential because it reduces off-chip memory
+of our SpaceTime model is useful because it reduces off-chip memory
 traffic by utilizing on-chip communication resources.  This aspect
 will become more pronounced as multicores scale up and the memory
 bottleneck remains.
@@ -53,12 +52,12 @@ presentation.
 Dynamic input and output rates can be naturally and efficiently
 supported by SpaceTime multiplexing.  This is one major benefits of
 our SpaceTime model over space multiplexing.  It is straightforward to
-limit dynamic i/o rates to the slice boundaries, allowing for load
+limit dynamic I/O rates to the slice boundaries, allowing for load
 balancing within a slice and off-chip buffering between dynamic rate
 slices.
 
 Reviewer 4 questions the generality of the system because we chose not
-to support for feedbackloops at this time.  We chose not support
+to support for feedbackloops at this time.  We chose not to support
 feedbackloops because they occur very infrequently in practice.  There
 does not exist a fundamental limitation in our system that prevents us
 from supporting them.  Feedbackloops are akin to loop-carried
