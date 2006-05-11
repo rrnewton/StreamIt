@@ -1,21 +1,21 @@
 We would like to thank the reviewers for their careful reviews and
-thoughtful suggestions to improve our paper.  The final paper will
-improve the organization and the quality of the presentation as
+thoughtful suggestions to improve our paper.  For the final paper, we
+will improve the organization and the quality of the presentation as
 suggested by the reviewers.
 
-CPU vendors have already begun to embrace multicore architectures.
-Our research is applicable to any multicore architecture with
-distributed memory but especially for architectures with a fast
-on-chip communication network. Examples include CELL, RAW, Monarch,
-and TRIPS. RAW provides a vehicle for experimentation and validation
-of our ideas.
+CPU vendors have already begun to embrace multicore architectures and
+our research is relevant to any multicore architecture. This work is
+especially applicable to scalable architectures with fast on-chip
+communication networks. Examples include CELL, RAW, Monarch, and
+TRIPS. RAW provides us with a vehicle for experimentation and
+validation of our ideas.
 
 We are quite different from traditional automatic parallelization
-frameworks for distributed machines.  Traditional approaches separate
-execution into the space-multiplexing of time-multiplexed components.
-Our approach more freely combines time-multiplexing and
+frameworks for distributed machines.  Traditional approaches strictly
+separate execution into the space-multiplexing of time-multiplexed
+components.  Our approach more freely combines time-multiplexing and
 space-multiplexing.  We are not just another point on a
-continuum. This has many advantages over the traditional approach:
+continuum. We have many advantages over the traditional approach:
 
 * We form spatial pipelines (slices), leveraging fast on-chip
 bandwidth and minimizing global communication.
@@ -47,23 +47,23 @@ increased throughput while exploiting spatial characteristics of the
 hardware.
 
 Reviewer 1 is concerned about the benchmarking baseline and asks how
-it compares to a uniprocessor.  Previous work [Taylor et al., ISCA
-04] has been shown that a space multiplexing compiler for StreamIt
-targeting RAW is an order of magnitude faster than a comparable
-superscalar. In this work we show that we are on average 38% better
-than a space-multiplexing approach.
+it compares to a uniprocessor.  Previous work [Taylor et al., ISCA 04]
+has shown that a space multiplexing compiler for StreamIt targeting
+RAW is an order of magnitude faster than a comparable superscalar. In
+this work we show that we are on average 38% better than a
+space-multiplexing approach.
 
 In the final paper, we will rigorously investigate the effects of slice
 size and compare to a time-multiplexed strategy by limiting slices to
 one filter.  This will address the related benchmarking concerns of
 Reviewers 1 and 3.
 
-To answer Reviewer 3, although time-multiplexing alone will benefit
-from our novel scheduling techniques, it will increase off-chip memory
-bandwidth requirements as it will not exploit the on-chip
-communication networks.
+To answer Reviewer 3, if we only employ time-multiplexing, we will
+benefit from our novel scheduling techniques.  However, as compared to
+our full system, off-chip memory bandwidth requirements will increase
+because the on-chip communication networks will be unexploited.
 
-Reviewer's 2 and 4 ask why we chose not to support for
+Reviewers 2 and 4 ask why we chose not to support
 feedbackloops. Feedbackloops occur very infrequently in practice.
 There does not exist a fundamental limitation in our system that
 prevents us from supporting them.  Feedbackloops are akin to
