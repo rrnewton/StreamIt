@@ -1,18 +1,13 @@
-First, we would like to thank the reviewers for their careful reviews
-and thoughtful suggestions to improve our paper.  The final paper will
+We would like to thank the reviewers for their careful reviews and
+thoughtful suggestions to improve our paper.  The final paper will
 improve the organization and the quality of the presentation as
 suggested by the reviewers.
 
-Processors are fast moving away from centralized designs.  Multicores
-with fast point-to-point communication networks are the future.
-Examples include RAW, CELL, Merrimac, Monarch, and TRIPS. The major CPU
-vendors have already begun to switch.  Language and compiler
-technology lags far behind the hardware.
-
+CPU vendors have already begun to embrace multicore architectures.
 Our research is applicable to any multicore architecture with
 distributed memory but especially for architectures with a fast
-on-chip communication network. RAW is an example of such an
-architecture. It provides a vehicle for experimentation and validation
+on-chip communication network. Examples include CELL, RAW, Monarch,
+and TRIPS. RAW provides a vehicle for experimentation and validation
 of our ideas.
 
 We are quite different from traditional automatic parallelization
@@ -44,11 +39,12 @@ because it reduces off-chip memory traffic by utilizing on-chip
 communication resources. This benefit will become more pronounced as
 multicores scale up and the memory bottleneck remains.
 
-Reviewer 4, while we are inspired by instruction-level software
-pipelining, the novelty of our paper is in recognizing that the
-technique can be applied at a much coarser level.  We provide a novel
-framework for such an application that leads to increased throughput
-while exploiting spatial characteristics of the hardware.
+In response to Reviewer 4, while we are inspired by
+instruction-level software pipelining, the novelty of our paper is in
+recognizing that the technique can be applied at a much coarser level.
+We provide a novel framework for such an application that leads to
+increased throughput while exploiting spatial characteristics of the
+hardware.
 
 Reviewer 1 is concerned about the benchmarking baseline and asks how
 it compares to a uniprocessor.  Previous work [Taylor et al., ISCA
@@ -59,7 +55,7 @@ than a space-multiplexing approach.
 
 In the final paper, we will rigorously investigate the effects of slice
 size and compare to a time-multiplexed strategy by limiting slices to
-on filter.  This will address the related benchmarking concerns of
+one filter.  This will address the related benchmarking concerns of
 Reviewers 1 and 3.
 
 To answer Reviewer 3, although time-multiplexing alone will benefit
