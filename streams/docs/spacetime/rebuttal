@@ -44,6 +44,12 @@ because it reduces off-chip memory traffic by utilizing on-chip
 communication resources. This benefit will become more pronounced as
 multicores scale up and the memory bottleneck remains.
 
+Reviewer 4, while we are inspired by instruction-level software
+pipelining, the novelty of our paper is in recognizing that the
+technique can be applied at a much coarser level.  We provide a novel
+framework for such an application that leads to increased throughput
+while exploiting spatial characteristics of the hardware.
+
 Reviewer 1 is concerned about the benchmarking baseline and asks how
 it compares to a uniprocessor.  Previous work [Taylor et al., ISCA
 04] has been shown that a space multiplexing compiler for StreamIt
