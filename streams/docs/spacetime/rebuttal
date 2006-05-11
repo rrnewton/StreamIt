@@ -1,18 +1,30 @@
-Firstly, we would like to thank the reviewers for their careful
+First, we would like to thank the reviewers for their careful
 reviews and thoughtful suggestions to improve our paper.
 
 We used the space-multiplexing and time-multiplexing analogy to help
 the reader understand our research.  However, our work is not simply a
-new point on a continuum. The SpaceTime model differs substantially
-from traditional parallel execution models.  Traditionally,
-time-multiplexed portions of a parallel program are mapped to a single
-compute node and these portions are space-multiplexed across a
-parallel target.  The SpaceTime model forms space-multiplexed slices,
-which can occupy multiple compute nodes, and time-multiplexes them.
-SpaceTime scheduling can balance latency and load-balancing concerns.
-Due to the time-multiplexed outer loop, we can employ scheduling
-techniques (in this case software pipelining) previously reserved for
-scheduling instructions in a loop.
+new point on a continuum; it differs substantially from traditional
+automatic parallelization frameworks for distributed memory machines.
+ 
+Traditionally, a subset of the graph is mapped to each compute node
+and the subset is scheduled statically (time-multiplexing).  The
+subsets execute in parallel and each subset occupies its compute node
+indefinitely (space-multiplexing).  Complicated dependencies can exist
+between non-contiguous subsets.  It is very difficult to reconcile
+load-balancing with locality and synchronization concerns.
+
+The SpaceTime model maps a contiguous subgraph to multiple compute
+nodes (space-multiplexing) and switches between these subgraphs at
+runtime based on a static schedule (time-multiplexing).  Multiple
+subgraphs can execute at the same time on different portions of the
+chip.
+
+SpaceTime scheduling can balance locality and load-balancing concerns
+through the selection of the subgraphs (slices).  Within load-balanced
+slices we exploit fast on-chip interconnects. Across contiguous slices
+the dependencies remain simple. We employ scheduling techniques (in
+this case software pipelining) previously reserved for scheduling
+instructions in a loop.
 
 Our research is applicable to any multicore architecture with
 distributed memory but especially for architectures with a fast
@@ -20,30 +32,30 @@ on-chip communication network (CELL, Merrimac, Monarch, TRIPS, etc.).
 For these architectures, forming slices leverages the on-chip network
 necessary for scaling while benefiting from flexible load-balancing
 and scheduling.  Previous approaches, such as shared memory models
-(e.g. Cilk), cannot make both claims. We use RAW to prove the validity
-of our research, as a demonstration.
+(e.g. Cilk) and clustering, cannot make both claims. We use RAW to
+prove the validity of our research, as a demonstration.
 
 Reviewer 1 is concerned about the benchmarking baseline and asks how
-it compares to a uniprocessor.  In previous work [Taylor et al., ISCA
-04], it has been shown that a space multiplexing compiler for StreamIt
-targeting RAW is 4.9x - 15.4x faster in terms of cycle count and 3.5x
-- 10.9x faster in terms of time than a Pentium III across a benchmark
-suite similar to the suite employed in this research. In this work we
-show that we are on average 38% better than a space-multiplexing
-approach.
+it compares to a uniprocessor.  Previous work [Taylor et al., ISCA
+04] has been shown that a space multiplexing compiler for StreamIt
+targeting RAW is an order of magnitude faster than a comparable
+superscalar. In this work we show that we are on average 38% better
+than a space-multiplexing approach.
 
-Reviewer 3 asks why we did not compare to time-multiplexing only. If
-we limit slices to one filter, we come close to approximating a
-time-multiplexing baseline. However, even with one filter per slice,
-there are many novelties in our system including software-pipelining
-of slices across a parallel target. In the final paper, we will
-rigorously investigate the effect of slice size by varying the
-work threshold parameter (addressing Reviewer 1's comments regarding
-this parameter).  We will show that the space-multiplexing component
-of our SpaceTime model is useful because it reduces off-chip memory
-traffic by utilizing on-chip communication resources.  This aspect
-will become more pronounced as multicores scale up and the memory
-bottleneck remains.
+Some Related Concerns:
+* Reviewer 1 wants more rigorous exploration of slice size (work threshold)
+* Reviewer 3: Why did we not compare to time-multiplexing only
+* Reviewer 3: Why not just toss the space-multiplexing aspect
+
+In the final paper, we will rigorously investigate the effects of slice
+size. We can approximate time-multiplexing by limiting slices to
+one filter.  Note that even in this configuration there are many
+novelties including software-pipelining of filters across a parallel
+target. However, we will show that the space-multiplexing component of our
+SpaceTime model is useful because it reduces off-chip memory traffic
+by utilizing on-chip communication resources. This benefit will become
+more pronounced as multicores scale up and the memory bottleneck
+remains.
 
 We agree with Reviewer 2, the organization and quality of the writing
 needs to be improved, but Reviewer 2 is critical only of the
@@ -56,14 +68,12 @@ limit dynamic I/O rates to the slice boundaries, allowing for load
 balancing within a slice and off-chip buffering between dynamic rate
 slices.
 
-Reviewer 4 questions the generality of the system because we chose not
-to support for feedbackloops at this time.  We chose not to support
-feedbackloops because they occur very infrequently in practice.  There
-does not exist a fundamental limitation in our system that prevents us
-from supporting them.  Feedbackloops are akin to loop-carried
-dependencies which traditional software pipeliners respect.  The
-presence of a feedbackloop would place a limit on the realizable
-throughput of the stream graph.
+Reviewer 4 ask why we chose not to support for
+feedbackloops. Feedbackloops occur very infrequently in practice.
+There does not exist a fundamental limitation in our system that
+prevents us from supporting them.  Feedbackloops are akin to
+loop-carried dependencies which traditional software pipeliners
+respect.
 
 The final version of the paper will include a more detailed
 explanation of the results and the 3 outlier cases in which
