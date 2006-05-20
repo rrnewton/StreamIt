@@ -1,7 +1,797 @@
+\section{Messaging Design Criteria}
+
+The following are the main criteria that influenced the design of the
+messaging system.  Each of the main design alternatives (portals and
+hierarchical messaging) are compared along these criteria.  Portals
+are currently winning the battle.  (Note that this section is unlikely
+to appear in the language spec, though it might have a place in a
+publication.)
+
+\begin{enumerate}
+
+\item {\bf Malleability.}  If a sender/receiver pair want to modify
+the signature(s) of the messages they exchange, only the sender and
+receiver should need to be modified.
+
+Portals naturally support this notion, as containers simply pass
+portals between senders and receivers.
+
+Hierarchical messaging is not malleable, as a message handler
+needs to be explicitly defined in a parent to pass the message from
+the grandparent to the child.  While we could brainstorm intuitive
+syntactic sugar for this case, my attempts to do so were not very
+fruitful.
+
+Verdict: {\bf This is the main point in favor of portals.}
+
+\item {\bf Granularity control.}  A stream container should be able to
+control the granularity of message delivery within that container.
+For example, a container should be able to define frame boundaries in
+terms of the number of executions of its children, and all messages
+from outside the container are delivered at frame boundaries.
+However, components of the container should also be able to exchange
+messages within a frame.
+
+Portals support this notion by incorporating the granularity into a
+canonical schedule for the stream graph.  Containers can choose to
+receive messages either at steady-state boundaries, or at the
+fine-grained boundaries of child execution.  Children can communicate
+directly (fine granularity) even if the container is receiving
+messages at steady-state boundaries (coarse granularity).
+
+Hierarchical messaging supports this notion with a sophisticated
+semantics for ``clocks''.  Messages from outside a container are timed
+relative to the clock defining the frame boundary; messages from
+inside are timed relative to the sender of the message.
+
+Verdict: In my opinion, {\bf in favor of portals.}
+
+\item {\bf Parameterized receiving of messages.}  If a child stream
+sends a message to a parent, the parent should be able to easily
+discern which child sent it, and in a parameterized way.  For example,
+if there are $n$ children, then the parent should be able to resolve
+the index $i$ of the child that sent the message.  This is important
+so that the parent can do various bookkeeping; for example, tracking
+which streams are enabled or disabled.
+
+Portals meet this criterion using arrays of portals.  All
+handlers are declared with the portal that they apply to.  If there is
+any free variable in the declaration (e.g., {\tt
+portal[i].msgHandler()} then the variable {\tt i} is dynamically bound
+to the index of the portal that send this message.
+
+Hierarchical messaging provides similar support, but with arrays
+of ``handles'' to child streams rather than arrays of portals.
+
+Verdict: Largely equivalent.
+
+\item {\bf Hierarchical latency control}.  Containers should easily be
+able to adjust the latency of messages sent between its components,
+and between external components and internal components.
+
+Portals can adjust internal latencies by either intercepting the
+message or by passing down a latency parameter to affect direct
+sibling communication.  External messages can be received at either
+coarse (steady-state) or fine (individual filter) granularity -- less
+flexible than hierarchical messaging, but hopefully the common case.
+
+Hierarchical messaging always intercepts external and internal
+messages at the container level.  Thus, latencies can be flexibly
+adjusted using clocks.
+
+Verdict: In favor of portals, if they are expressive enough.
+
+\item {\bf Compile-time safety.}  The compiler should be able to check
+whether all messages sent have an appropriate handler.
+
+Portals require a whole-program analysis to meet this criterion.
+
+Hierarchical messaging requires only a local analysis to meet
+this criterion, as all constraints are enforced between parent/child
+pairs (much like checked exceptions).
+
+Verdict: Probably in favor of hierarchical messaging.
+
+\item {\bf Simplicity.}  Sometimes the expressiveness should be
+limited in order to improve the simplicity and comprehension of the
+common case.
+
+With portals, handlers in containers can choose only two clocks
+(coarse and fine) instead of arbitrary clocks.  This is simpler but
+less expressive.
+
+With hierarchical messaging, all sender/receiver pairs must have
+an immediate parent/child relationship in the stream graph.  This
+makes it simple to reason about who is receiving a message, but also
+limits expressiveness because one cannot immediately connect various
+sets of senders/receivers via a single portal.
+
+Verdict: TBD, though I'm leaning towards poratls.
+
+\item {\bf Dynamic rates.} Messaging should have a natural meaning for
+sending across dynamic-rate components.
+
+Portals attempt to capture this notion via the hierarchical canonical
+schedule.  Effectiveness still needs to be evaluated.
+
+Hierarchical messaging attempts to capture this notion via
+clocks.  It seemed to withstand questioning by Rodric/Bill/Jasper.
+
+Verdict: TBD.
+
+\end{enumerate}
+
+\newpage
 \newcommand{\sdep}[0]{\textsc{sdep}}
 \newcommand{\sdepf}[2]{\sdep_{#1 \small{\leftarrow} #2}}
 
-\section{Messaging}
+\section{Messaging (Portals Version)}
+\label{sec:messaging}
+
+It is sometimes necessary to send irregular messages outside of the
+normal stream of data flow.  A radio application might contain an
+in-band signal requesting a change in the listening frequency, for
+example; this signal would happen infrequently, but it would be
+detected by a filter late in the application and require a change in a
+filter early in the application.  StreamIt provides an out-of-band
+messaging system to accomodate this sort of application.
+
+Section~\ref{sec:message-syntax} describes the syntax of messaging,
+while Section~\ref{sec:message-timing} describes the timing of message
+delivery.
+
+\subsection{Messaging Syntax}
+\label{sec:message-syntax}
+
+The syntax of messages is very similar to method calls in an
+object-oriented language.  However, there are two major differences
+between messages and method calls.  First, message delivery is
+asynchronous and there is no return value.  For this reason, we refer
+to the target of messages as {\it handlers} rather than methods.
+
+Second, rather than invoking a handler directly, messages are sent via
+proxy objects called {\it portals}.  Portals provide two key benefits
+over calling a handler directly: 1) multiple streams can subscribe to
+receive messages from a portal, providing a simple way to send
+broadcast messages, and 2) a stream can implement the same handler in
+different ways for different portals, allowing receiver streams to
+customize message handling based on the source of the message.
+
+A portal {\tt p} to a streams of type {\tt T} is declared as {\tt
+portal<T> p}.  The type {\tt T} can be either a concrete stream type
+(e.g., a filter or pipeline) or an interface, as described below.  Any
+filter can send a message to {\tt p} using the syntax {\tt
+p.msgName()}, where {\tt msgName()} is a handler defined in type {\tt
+T}.  To receive messages from {\tt p}, a stream of type {\tt T}
+declares methods of the form {\tt handler p.msgName()}.
+
+For example, the following stream uses messaging to count the number
+of times that values fall outside a given range.
+
+\begin{lstlisting}{}
+float->float pipeline AudioTransform() {
+  int count = 0;             // error count
+  portal<AudioTransform> p;  // portal for messaging
+
+  init {
+    add MyTransform();
+    add CheckRange(0.0, 0.5, p);
+  }
+
+  // handle underflow message from checker
+  handler p.underflow(float val) {
+    count++;
+  }
+
+  // handle overflow message from checker
+  handler p.overflow(float val) {
+    count++;
+  }
+}
+
+float->float filter CheckRange(float MIN, float MAX,
+                               portal<AudioTransform> p) {
+  work pop 1 push [0,1] {
+    float val = pop();
+    if (val < MIN) {
+      p.underflow(val);
+    } else if (val > MAX)
+      p.overflow(val);
+    } else {
+      push(val);
+    }
+  }
+}
+\end{lstlisting}
+
+In this example, the portal {\tt p} is shared between the
+\lstinline|AudioTransform| stream and the \lstinline|CheckRange|
+stream.  Thus, when a message is sent to {\tt p.underflow} from within
+\lstinline|CheckRange|, the {\tt p.underflow} handler is invoked in
+\lstinline|AudioTransform| because this handler matches both the
+source ({\tt p}) and the signature ({\tt underflow(int)}) of the
+message.  Note that the sharing of the portal instance {\tt p} is
+setup by the {\tt init} functions of the streams.  In order to ensure
+that the compiler can determine which portals are shared between
+streams, there are some restrictions on the uses of portals:
+
+\begin{itemize}
+\item Portals are never assigned to.
+\item Portals are never passed as arguments to message handlers.
+\end{itemize}
+
+\noindent Given these restrictions, the compiler can calculate all
+sender and receiver pairs at initialization time.
+
+For broadcast messaging, it is often useful to be able to send the
+same message to streams of varying types.  To enable such
+functionality, one can define an {\it interface} that lists a set of
+message signatures.  A stream {\it implements} an interface if it
+defines a handler\footnote{or work function, though this document does
+not address this yet.} for each function in the interface.  The
+handlers can be attached to any portal, though any portals that are
+handled must be handled completely (a stream cannot listen to only
+half the messages sent through a portal).
+
+The following code re-writes the example above to use interfaces:
+
+\begin{lstlisting}{}
+interface RangeMessages {
+  underflow(float val);  // indicate that val is below range
+  overflow(float val);   // indicate that val is above range
+}
+
+float->float pipeline AudioTransform implements RangeMessages() {
+  int count = 0;             // error count
+  portal<RangeMessages> p;   // portal for messaging
+
+  init {
+    add MyTransform();
+    add CheckRange(0.0, 0.5, p);
+  }
+
+  // handle underflow message from checker
+  handler p.underflow(float val) {
+    count++;
+  }
+
+  // handle overflow message from checker
+  handler p.overflow(float val) {
+    count++;
+  }
+}
+
+float->float filter CheckRange(float MIN, float MAX,
+                               portal<RangeMessages> p) {
+  work pop 1 push [0,1] {
+    float val = pop();
+    if (val < MIN) {
+      p.underflow(val);
+    } else if (val > MAX)
+      p.overflow(val);
+    } else {
+      push(val);
+    }
+  }
+}
+\end{lstlisting}{}
+
+It remains to be demonstrated how message receivers can easily
+distinguish the sources of messages, even if the senders have the same
+type.  This functionality is provided by using built-in support for
+arrays of portals:
+
+%% A handler is declared for {\tt p[i]}, where {\tt i} is a free
+%% variable; within the handler, {\tt i} is bound to the index of the
+%% portal that delivered the message:
+
+\begin{lstlisting}{}
+float->float splitjoin ParallelChecker(int N) {
+  int[N] count;            // error counts
+  portal<CheckRange>[N] p; // portals to range checker
+
+  init {
+    split roundrobin;
+    for (int i=0; i<N; i++)
+      add CheckRange(i/10.0, (i+1)/10.0, p[i]);
+    join roundrobin;
+  }
+
+  // handle underflow message from i'th checker
+  handler p[i].underflow(float val) {
+    count[i]++;
+  }
+
+  // handle overflow message from i'th checker
+  handler p[i].overflow(float val) {
+    count[i]++;
+  }
+}
+\end{lstlisting}{}
+
+In this example, the \lstinline|p[i].underflow| handler listens to all
+members of the \lstinline|p| array.  If \lstinline|p[5]| sends a
+message at runtime, then the handler is invoked with $i=5$.  This
+allows for a parameterized implementation of handlers.
+
+Until now, the examples have illustrated messaging from child streams
+to parent streams.  It is equally natural to send messages from a
+parent stream to a child stream, or directly between sibling streams.
+For example, the following stream performs exponentiation as a
+composition of several multiplies.  It provides a message handler to
+adjust the base of the exponent:
+
+\begin{lstlisting}{}
+int->int pipeline Exponent(int base, int exp, portal<Exponent> this) {
+  portal<Multiply> mult;
+
+  init {
+    for (int i=0; i<exp; i++)
+      add Multiply(base, mult);
+  }
+
+  handler this.setBase(int base) {
+    mult.setFactor(base);
+  }
+}
+
+int->int filter Multiply(int initFactor, portal<Multiply> this) {
+  int factor = initFactor;
+
+  work push 1 pop 1 {
+    push(factor * pop());
+  }
+
+  handler this.setFactor(int _factor) {
+    factor = _factor;
+  }
+}
+\end{lstlisting}{}
+
+\subsection{Message Timing}
+\label{sec:message-timing}
+
+According to the StreamIt execution model, filters in the stream graph
+may execute in any order (or in parallel) so long as the dependences
+along the FIFO data channels are satisfied.  If messages were to be
+delivered ``instantly'' by the runtime system, the timing would be
+non-deterministic because different runtime systems may execute
+different schedules, buffering varying amounts of data between message
+senders and receivers.  
+
+To ensure deterministic behavior, messages in StreamIt are timed
+relative to a {\it canonical schedule}.  While the runtime schedule
+might differ from the canonical schedule, the canonical schedule
+provides a standard framework for describing message timing.
+
+We present the details of message delivery in three steps.  First, we
+describe the notion of an atomic execution step for filters and
+streams.  Then, we define the canonical schedule.  Finally, we
+describe how messages can be timed between two streams using the
+canonical schedule.
+
+\paragraph{Atomic execution step.}
+
+Central to StreamIt's messaging system is the notion of an atomic
+execution step.  For a filter, an atomic execution step simply
+corresponds to an execution of its {\tt prework} or {\tt work}
+functions.  For stream containers, we utilize two distinct definitions
+of the execution step: a fine-grained execution step (assigned by
+default) and a coarse-grained execution step (optionally enabled by
+the user).  The granularity of the execution step impacts the timing
+of messages into and out of the container, but not between sibling
+streams within the container.
+
+The fine-grained (default) execution step of a stream container
+corresponds to a single execution step of any of its children.  For
+example, if a pipeline contains a number of filters, then the pipeline
+advances one execution step whenever one of the filters executes a
+{\tt prework} or {\tt work} function.
+
+The coarse-grained (user-enabled) execution step of a stream container
+corresponds to a steady-state execution of its children.  For
+containers in which all children have static I/O rates, the steady
+state multiplicities can be calculated using balance
+equations~\cite{LM87-i}.  The steady state has the property that it
+can be repeated infinitely without causing deadlock or overflow on the
+data channels.  If any of the children have a dynamic I/O rate, then
+steady-state multiplicities cannot be calculated statically.  Instead,
+we define the coarse-grained execution step to be the minimal number
+of atomic executions of each child that leads to some data being
+produced on the output of the container~\footnote{If the container has
+no output, then we count executions of the sink nodes.  The case of
+multiple sinks remains to be specified.}.
+
+To indicate that a container has a coarse-grained execution step, the
+{\tt atomic} keyword should be used in declaring the stream:
+
+\begin{lstlisting}{}
+int->int atomic pipeline Foo { ... }
+\end{lstlisting}{}
+
+Using the above definitions, it is natural to speak of an
+``execution'' of either a filter or a stream container.
+
+\paragraph{Canonical schedule.}
+
+To send messages between streams in a deterministic way, there needs
+to be a canonical ordering in which the streams are executed.
+Intuitively, this ordering follows a minimal latency schedule: each
+filter's outputs are propagated downstream before reconsidering the
+filter for execution.  However, streams that are designated for
+coarse-grained execution require intermediate results to be buffered
+at their inputs and outputs.  Nonetheless, when a coarse-grained
+stream is executing, its internal schedule has minimal latency.
+
+To be more precise, each stream container defines a precedence order
+in which child streams are considered for execution.  For pipelines,
+the order is from the bottom-most stream to the top-most stream.  For
+splitjoins, the order starts with the joiner, continues with the
+parallel streams from right to left ($n$ downto $1$), and finishes
+with the splitter.  For feedback loops, the order is: loop stream,
+splitter, body stream, joiner.
+
+To proceed with executing a container, the streams are queried in
+order of precedence (each time starting from the beginning) and the
+first stream that can execute one step is fired.  A filter can execute
+one step if there are enough items on its input tape to satisfy the
+next execution ({\tt prework} or {\tt work}).  A fine-grained stream
+container can execute one step if any of its child streams can execute
+one step.  A coarse-grained stream container can execute one step if
+all of its children can execute enough steps to fulfill a complete
+steady state.  (Note that in the presence of dynamic rates, testing
+whether or not a stream can execute may require speculation and
+rollback.  This document should elaborate on an implementation
+strategy.)
+
+Due to the hierarchy of the stream graph, execution steps are
+overlapping.  When a stream container executes a step, it first starts
+its own step, then starts and finishes the step of a child (for
+fine-grained streams) or children (for coarse-grained streams), before
+finally finishing its own step.  In this way, the scheduling strategy
+defines a unique and total ordering of the beginning and end of each
+stream's execution steps.
+
+It is important to emphasize that while the canonical schedule is the
+basis for message timing, it is not necessarily the schedule employed
+by the runtime system.  In fact, the runtime system must depart from
+the canonical schedule in order to deliver long-latency messages
+correctly.  Furthermore, runtime systems will often adjust the
+schedule for the sake of optimization.
+
+\paragraph{Message timing.}  
+
+Each stream maintains a message queue to hold incoming messages.  This
+queue is checked at the beginning and end of an execution step.  Any
+messages in the queue at the start of the check are dispatched to the
+appropriate message handlers.  However, if the processing of these
+messages causes additional messages to be added to the queue, the new
+messages are not handled until the next check.
+
+Messages have adjustable latency and are timed as follows.  Assuming
+execution under the canonical schedule, messages sent with default
+(zero) latency are immediately added to the message queue of the
+target stream.  Non-zero latencies are measured in terms of stream
+executions.  If a stream sends a message with latency $k$ at a given
+point of its $n$th execution, the outcome is equivalent to sending a
+message with latency 0 at the same point of its $n+k$th execution.
+(All streams can send messages at the beginning and end of their
+executions; filters can further send messages during their execution.)
+
+Message latencies can be interpreted as follows.  If the message is
+sent in the direction of dataflow (from an upstream node to a
+downstream node), a positive latency indicates that the message is
+synchronized with some data that the message sender will produce in
+the future.  Likewise, a negative latency synchronizes the message
+with some data that the message sender produced in the past.
+
+If a message is sent opposite the direction of dataflow (from a
+downstream node to an upstream node), a positive latency synchronizes
+the message with some data the message sender will consume in the
+future.  In this case, negative latencies are illegal (they correspond
+to data consumed by the message sender in the past).
+
+Messages can also be sent with a range of latencies, indicating that
+any latency in the range is acceptable.  The runtime system is free to
+choose a different latency for each dynamic instance of the
+\lstinline|send| statement.  However, each message must be delivered 
+as if it were sent with some particular latency.  For example, if
+latencies of 0 and 1 lead to message deliveries at iterations 10 and
+12, respectively, then a latency range of [0:1] can lead to delivery
+at iteration 10 or 12, but not at iteration 11.
+
+\paragraph{Examples.}
+
+The following code uses messaging to count in sequence:
+
+\begin{lstlisting}{}
+void->void pipeline Counter {
+  portal<Sink> p;
+
+  init {
+    add Source(p);
+    add Sink(p);
+  }
+}
+
+void->int filter Source(portal<Sink> p) {
+  int i = 1;
+  work {
+    push(0);
+    p.count(i++);
+  }
+}
+
+int->void filter Sink(portal<Sink> p) {
+  int output = 0;
+
+  work {
+    pop();
+    print(output);
+  }
+
+  handler p.setOutput(int val) {
+    output = val;
+  }
+}
+\end{lstlisting}{}
+
+When run for 6 iterations, the code above outputs ``123456''.  The
+canonical schedule is to execute the Source and Sink in alternation.
+On the first execution of the Source, a count() message is sent to
+portal {\tt p} with the default latency of zero.  Because the Sink is
+listening on portal {\tt p}, the message is immediately added to the
+Sink's incoming message queue.  Thus, when the Sink executes, it
+checks the queue and handles the message before executing {\tt work},
+thereby updating its \lstinline|output| variable before it is printed
+to the screen.
+
+Suppose that the message was sent with a latency of 1 instead of 0:
+
+\begin{lstlisting}{}
+void->int filter Source(portal<Sink> p) {
+  int i = 1;
+  work {
+    push(0);
+    p.count(i++) @ 1;
+  }
+}
+\end{lstlisting}{}
+
+In this case, the program outputs ``012345'' because the message was
+effectively sent one iteration later.
+
+An equivalent latency can be achieved by introducing a message handler
+in the toplevel container:
+
+\begin{lstlisting}{}
+interface SetOutput {
+  setOutput(int val);
+}
+
+void->void pipeline Counter implements SetOutput {
+  portal<SetOutput> self;
+  portal<SetOutput> child;
+
+  init {
+    add Source(self);
+    add Sink(child);
+  }
+
+  handler self.setOutput(int val) {
+    child.setOutput(val) @ 1;
+  }
+}
+
+void->int filter Source(portal<SetOutput> p) {
+  int i = 1;
+  work {
+    push(0);
+    p.count(i++);
+  }
+}
+
+int->void filter Sink(portal<SetOutput> p) {
+  int output = 0;
+
+  work {
+    pop();
+    print(output);
+  }
+
+  handler p.setOutput(int val) {
+    output = val;
+  }
+}
+\end{lstlisting}{}
+
+In this case, the Source sends a zero-latency message to the Counter
+stream.  Because the Counter is executing in fine-grained (default)
+mode, the Counter finishes its first execution step immediately after
+the Source and receives the message before the Sink executes.  The
+Counter's handler sends a message to the Sink with latency 1.  This is
+equivalent to sending the message at the end of the next execution of
+the Counter, which will be immediately following the next execution of
+the Sink.  Thus, the Sink will receive the message before its second
+execution, thereby producing the output ``012345''.
+
+It is also possible to achieve a latency of 1 by making the Counter
+atomic (so that it executes in coarse-grained mode).  Like the
+previous version, the message is intercepted by the Counter, but this
+time it is resent to the Sink with latency 0.  However, because each
+execution of the Counter spans both the execution of the Source and
+Sink, the Counter does not receive the message until after the Sink
+has executed once, thereby increasing the effective latency to 1:
+
+\begin{lstlisting}{}
+interface SetOutput {
+  setOutput(int val);
+}
+
+void->void atomic pipeline Counter implements SetOutput {
+  portal<SetOutput> self;
+  portal<SetOutput> child;
+
+  init {
+    add Source(self);
+    add Sink(child);
+  }
+
+  handler self.setOutput(int val) {
+    child.setOutput(val);
+  }
+}
+
+(rest as before)
+\end{lstlisting}{}
+
+Thus, the output in this case is ``012345''.
+
+\medskip\framebox{Add more examples.}
+
+%% As a more involved scenario, consider a data-dependent feedback loop
+%% with messaging:
+%% \begin{verbatim}
+%%      ._______ 
+%%     \|/      \
+%%    ->A->B->C->D->
+%% \end{verbatim}
+%% A is processing data in frames.  It either draws a fresh frame of 64
+%% items from the input, or it draws leftover items (that need to be
+%% processed more) from the loop path.  B is static rate work; C is
+%% dynamic rate compression.  D is looking at frames (though they have a
+%% different length than at the output of A) and deciding if the frame
+%% should be output, or if it should be processed around the loop path
+%% again.
+
+%% The challenges are:
+%% \begin{itemize}
+%% \item For A to indicate frame boundaries to D. 
+%% \item For D to indicate the amount of data on the feedback loop to A.
+%% \end{itemize}
+
+%% Both of these are done using messages.  D includes a cascaded message
+%% (where a message is sent from a message handler).  Here it is:
+
+%% \begin{lstlisting}{}
+%% float->float feedbackloop DynamicCompression {
+%%     portal<MyJoiner> top;
+%%     portal<MySplitter> bot;
+
+%%     init {
+%%         joiner MyJoiner(top, bot);
+%%         body pipeline {
+%%             add DoWork;           // static rate
+%%             add RemoveNegatives;  // dynamic rate
+%%         }
+%%         splitter MySplitter(top, bot);
+%%     }
+%% }
+
+%% float in, float loopPath -> float joiner 
+%%   MyJoiner(portal<MyJoiner> top, portal<MySplitter> bot) {
+
+%%     int nextDynamicCount = 0;
+
+%%     work pop *,* push * {
+%%         if (nextDynamicCount>0) {
+%%             processLoop(nextDynamicCount);
+%%         } else {
+%%             processInputFrame();
+%%         }
+%%     }
+
+%%     // process <num> items from the loop path
+%%     void processLoop pop 0,num push num (int num) {
+%%         for (int i=0; i<num; i++) {
+%%             push(loopPath.pop());
+%%         }
+%%         nextDynamicCount = 0;
+%%     }
+
+%%     // passes a frame of data (64 items big) through the input
+%%     void processInputFrame pop 64,0 push 64 {
+%%         for (int i=0; i<64; i++) {
+%%             push(in.pop());
+%%         }
+%%         bot.frameBoundary();
+%%     }
+
+%%     handler top.dynamicDataCount(int count) {
+%%         nextDynamicCount = count;
+%%     }
+%% }
+
+%% // does some static-rate work on each item
+%% float->float filter DoWork {
+%%     work push 1 pop 1 {
+%%         push(f(pop()));
+%%     }
+%% }
+
+%% // removes the negative entries from a stream
+%% float->float filter RemoveNegatives {
+%%     work push [0,1] pop 1 {
+%%         float val = pop();
+%%         if (val>0) {
+%%             push(val);
+%%         }
+%%     }
+%% }
+
+%% // Looks at the first element of a frame.  If the element is "ok",
+%% // then the whole frame passes through to the output of the splitter.
+%% // Otherwise, the frame is routed back to the top of the feedback loop.
+%% float -> float out, float loopPath 
+%%   MySplitter(portal<MyJoiner> top, portal<MySplitter> bot) {
+
+%%     // if true, then we are routing data out of loop
+%%     // if false, then we are routing data back around loop
+%%     boolean routingOutOfLoop;
+    
+%%     // whether or not the next item to be popped will be the first in
+%%     // its frame
+%%     boolean firstOfFrame = true;
+
+%%     // how many items we have passed around the loop in this frame
+%%     int count = 0;
+
+%%     work pop 1 push [0,1],[0,1] {
+%%         float val = pop();
+%%         // test value if it is first in its frame
+%%         if (firstOfFrame) {
+%%             if (ok(val)) {
+%%                 routingOutOfLoop = true;
+%%             } else {
+%%                 routingOutOfLoop = false;
+%%             }
+%%             firstInFrame = false;
+%%         }
+%%         // push value to appropriate tape
+%%         if (routingOutOfLoop) {
+%%             out.push(val);
+%%         } else {
+%%             loopPath.push(val);
+%%             count++;
+%%         }
+%%     }
+
+%%     // returns whether or not <val> is an ok value for the first in a
+%%     // frame
+%%     boolean ok(float val) { ... }
+
+%%     handler bot.frameBoundary() {
+%%         // tell the loop header how much data has been pushed around
+%%         top.dynamicDataCount(count);
+%%         // reset the count and the tracking of frames
+%%         count = 0;  
+%%         firstInFrame = true;
+%%     }
+%% }
+%% \end{lstlisting}{}
+
+\newpage
+\section{Messaging (Hierarchical Version)}
 \label{sec:messaging}
 
 It is sometimes necessary to send occasional messages outside of the
