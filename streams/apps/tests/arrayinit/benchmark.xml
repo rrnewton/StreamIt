@@ -1,0 +1,25 @@
+<benchmark>
+  <name>arrayinit</name>
+  <desc>Tests of static array initializers.</desc>
+  <description>
+This set of tests looks at the problem of initializing arrays in the
+code, using a static array initializer.
+  </description>
+  <implementations>
+    <impl lang="StreamIt" id="arrayinit1">
+      <desc>MIT, initialize an array as a field of a filter.</desc>
+      <file class="source">ArrayInit1.str</file>
+      <file class="output">ArrayInit1.out</file>
+    </impl>
+    <impl lang="StreamIt" id="arrayinit2">
+      <desc>MIT, initialize an array as a field of a pipeline.</desc>
+      <file class="source">ArrayInit2.str</file>
+      <file class="output">ArrayInit2.out</file>
+    </impl>
+    <impl lang="StreamIt" id="arrayinit3">
+      <desc>MIT, initialize an array as a local variable of a filter.</desc>
+      <file class="source">ArrayInit3.str</file>
+      <file class="output">ArrayInit3.out</file>
+    </impl>
+  </implementations>
+</benchmark>
