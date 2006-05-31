@@ -322,7 +322,7 @@ composition of several multiplies.  It provides a message handler to
 adjust the base of the exponent:
 
 \begin{lstlisting}{}
-int->int pipeline Exponent(int base, int exp, portal<Exponent> this) {
+int->int pipeline Exponent(int base, int exp, portal<Exponent> self) {
   portal<Multiply> mult;
 
   init {
@@ -330,19 +330,19 @@ int->int pipeline Exponent(int base, int exp, portal<Exponent> this) {
       add Multiply(base, mult);
   }
 
-  handler this.setBase(int base) {
+  handler self.setBase(int base) {
     mult.setFactor(base);
   }
 }
 
-int->int filter Multiply(int initFactor, portal<Multiply> this) {
+int->int filter Multiply(int initFactor, portal<Multiply> self) {
   int factor = initFactor;
 
   work push 1 pop 1 {
     push(factor * pop());
   }
 
-  handler this.setFactor(int _factor) {
+  handler self.setFactor(int _factor) {
     factor = _factor;
   }
 }
@@ -518,7 +518,7 @@ void->int filter Source(portal<Sink> p) {
   int i = 1;
   work {
     push(0);
-    p.count(i++);
+    p.setOutput(i++);
   }
 }
 
@@ -538,7 +538,7 @@ int->void filter Sink(portal<Sink> p) {
 
 When run for 6 iterations, the code above outputs ``123456''.  The
 canonical schedule is to execute the Source and Sink in alternation.
-On the first execution of the Source, a count() message is sent to
+On the first execution of the Source, a setOutput() message is sent to
 portal {\tt p} with the default latency of zero.  Because the Sink is
 listening on portal {\tt p}, the message is immediately added to the
 Sink's incoming message queue.  Thus, when the Sink executes, it
@@ -553,7 +553,7 @@ void->int filter Source(portal<Sink> p) {
   int i = 1;
   work {
     push(0);
-    p.count(i++) @ 1;
+    p.setOutput(i++) @ 1;
   }
 }
 \end{lstlisting}{}
@@ -587,7 +587,7 @@ void->int filter Source(portal<SetOutput> p) {
   int i = 1;
   work {
     push(0);
-    p.count(i++);
+    p.setOutput(i++);
   }
 }
 
