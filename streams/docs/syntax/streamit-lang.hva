@@ -4,3 +4,4 @@
 \let\bottomrule\hline
 \def\picture{\begin{toimage}\begin{picture}}
 \def\endpicture{\end{picture}\end{toimage}\imageflush}
+\renewcommand{\heveaimageext}{.png}
