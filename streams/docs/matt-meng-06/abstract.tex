@@ -1,0 +1,39 @@
+Video playback devices rely on compression 
+algorithms to minimize storage, transmission bandwidth, and overall cost. 
+Compression techniques have high realtime and sustained
+throughput requirements, and the end of CPU clock scaling 
+means that parallel implementations
+for novel system architectures are needed. Parallel implementations
+increase the complexity of application design.
+Current languages force the programmer to trade off productivity for
+performance;
+the performance demands dictate that the parallel programmer
+choose a low-level language in which he can explicitly 
+control the degree of parallelism and tune his code for performance. 
+This methodology is not cost effective because this architecture-specific code is 
+neither malleable nor portable. 
+Reimplementations must be written from scratch for each of the 
+existing 
+parallel and reconfigurable architectures.
+
+This thesis shows that multimedia compression algorithms, composed of many 
+independent processing stages, are a good match for the streaming model of computation.
+Stream programming models afford certain advantages in terms of programmability, robustness, 
+and achieving high performance. 
+
+This thesis intends to influence language design towards the inclusion of
+features that lend to the efficient implementation and parallel 
+execution of streaming applications like image and video compression algorithms. 
+Towards this I contribute $i)$ a clean, malleable, and portable implementation of an 
+MPEG-2 encoder and decoder expressed in a streaming fashion, $ii)$ an 
+analysis of how a streaming language improves programmer productivity, $iii)$ an 
+analysis of how a streaming language enables scalable parallel execution, $iv)$
+an enumeration of the language features that are needed to cleanly express
+compression algorithms, $v)$ an enumeration of the language features that 
+support large scale application development and promote software engineering
+principles such as portability and reusability.
+This thesis presents a case study of MPEG-2 encoding and decoding
+to explicate points about language expressiveness. 
+The work is in the context of the StreamIt programming language.
+
+

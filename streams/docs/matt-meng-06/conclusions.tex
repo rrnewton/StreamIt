@@ -1,0 +1,44 @@
+\chapter{Conclusions}
+\label{chapter:conclusions}
+
+Compression schemes play a key role in the proliferation of 
+multimedia applications and the digital media explosion. 
+At the same time, applications must be written 
+for a plethora of unique parallel architectures. 
+This thesis has shown that stream programming is an 
+ideal model of computation for realizing image and 
+video compression schemes. 
+For this domain, stream programming boosts programmer 
+productivity and enables scalable parallel execution 
+of an application on a variety of architecture targets. 
+Streaming language features allow a programmer to 
+efficiently express a computation and expose 
+parallelism, enabling a compiler to provide scalable performance.
+
+This thesis shows these points through the following contributions: 
+$(i)$ clean, malleable, and portable MPEG-2 encoder and 
+decoder implementations expressed in a streaming fashion, 
+$(ii)$ an analysis showing that a streaming language 
+improves programmer productivity, 
+$(iii)$ an analysis showing that a streaming language 
+enables parallel execution, 
+$(iv)$ an enumeration of the language features that are 
+needed to cleanly express compression algorithms, 
+$(v)$ an enumeration of the language features that 
+support large scale application development and promote 
+software engineering principles such as portability and reusability. 
+
+This work was performed in the context of the StreamIt 
+programming language, for its ability to express streaming 
+computations, and the MPEG-2 video compression scheme. 
+However the work is relevant to the domain of multimedia
+codecs, including JPEG and MPEG-4.
+Currently the H.264 
+compression scheme is poised to supersede MPEG-2 video 
+compression; assuming the language suggestions in this 
+paper make their way into streaming languages, the most 
+interesting research direction would be scalable, portable, 
+and malleable implementations of H.264 codecs, expressed in a 
+streaming fashion.
+
+\input{future}
