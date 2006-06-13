@@ -1,0 +1,98 @@
+\section{Future Research}
+\label{section:future}
+
+Realtime processing is an important part of embedded systems and video
+codecs. StreamIt specifies timing constraints through message delivery
+semantics but these are logical scheduling constraints divorced from
+any absolute notion of time. No constraints can be specified 
+regarding the maximum latency from stream graph input to 
+output. One direction for future work would be to
+examine these realtime performance issues.
+
+MPEG-2 is interesting from a language 
+and compiler research perspective, but hardware advances have made MPEG-2 
+coding relatively easy. 
+However, the new H.264 standard presents serious challenges to 
+modern architectures and is designed to push performance well into the 
+future. 
+H.264 is the video coding scheme specified in Part 10 of the MPEG-4 
+video specification~\cite{MPEG4}. H.264 reflects many advances in video and image compression 
+research. The major specification changes and their consequences for 
+a stream-based implementation are detailed.
+
+\paragraph{Video Organization}
+\begin{itemize}
+\item Macroblocks can occur in any order within a picture. 
+This will require additional messages associated with each 
+macroblock indicating its position within an image.
+\item Macroblocks may be composed of blocks of many different 
+sizes (8x8, 16x8, 16x16, 8x16), and block sizes may change 
+from macroblock to macroblock. This will make programmable 
+splitjoins and dynamic filter reconfiguration especially 
+important as language features.
+\item Blocks are always composed of 4x4 subblocks, which 
+have their own motion vectors.
+\item I and P pictures are no longer automatically considered 
+reference pictures; instead, pictures are explicitly declared 
+as reference pictures and may be used as reference pictures 
+for an indeterminate length of time. The picture reordering 
+filter will be substantially more complicated. 
+\end{itemize}
+
+\paragraph{Spatial Coding}
+\begin{itemize}
+\item The DCT is replaced by a wavelet transform. The 
+wavelet transform incorporates the quantization scale 
+factors. The transform is simple to implement and 
+simplifies the spatial decoding process from a 
+programmer's standpoint, although little can be reused 
+from MPEG-2.
+\item A block-aliasing mechanism removes edge-artifacts between 
+macroblock boundaries. The spatial coding pipeline can be
+naturally extended to include an additional filter or 
+subgraph that handles this transformation.
+\end{itemize}
+
+\paragraph{Motion Prediction}
+\begin{itemize}
+\item Motion vectors may now refer to data contained in other 
+macroblocks in the same frame. Instead of referring to the 
+previous 2 decoded reference frames, P and B pictures may 
+now refer to any of the past 32 decoded reference frames. 
+The optimization to share read-only message sent data
+between filters will be necessary.
+\item Because blocks have variable size and are composed 
+of subblocks with their own motion vectors, 
+the motion prediction filters are substantially complicated
+in both encoders and decoders. An encoder will only 
+benefit from the huge variety of prediction options
+if it can expose a high degree of coarse grained
+parallelism in the motion estimation subgraph.
+\item Motion vectors include a scaling factor (for zooms) 
+and an amplitude factor (for image fades). 
+Motion vectors are also accurate 
+to a quarter pixel resolution instead of half pixel 
+resolution. This particular aspect of motion prediction
+can be accommodated by small changes to the existing
+prediction formation process. 
+\end{itemize}
+
+\paragraph{Variable Length Coding}
+\begin{itemize}
+\item The bit-stream syntax uses many new variable bit 
+rate encoding algorithms which have higher compression 
+rates than Huffman coding. The bitstream also makes a 
+distinction about the importance of data and provides 
+options for variable rate error correction. Bitstream 
+parsing is therefore dramatically more complicated and 
+good inter-language interfaces for this non-streaming 
+computation are critical.
+\end{itemize}
+
+StreamIt should be well suited for MPEG-4 decoding and 
+encoding. Encoding, in particular, should benefit
+from the extreme kinds of parallelization that StreamIt
+can expose. MPEG-4 provides a huge variety of motion
+prediction options for encoding any particular video 
+and exploring the space of potential compression options
+will require a scalable parallel encoder implementation. 

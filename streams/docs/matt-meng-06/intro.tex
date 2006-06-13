@@ -1,0 +1,110 @@
+\chapter{Introduction}
+
+Image and video compression algorithms are at the heart of a digital 
+media explosion, playing an important role in Internet and multimedia 
+applications, digital appliances, and handheld devices. Multimedia 
+appliances are ubiquitous in everyday life, encompassed by standards 
+such as DVD~\cite{Taylor:1999:SDV}, HDTV~\cite{DVB}, and satellite 
+broadcasting~\cite{directv}. With even budget cell phones capable of 
+playing and recording videos, these appliances continue to increase in 
+pervasiveness. Virtually all video playback devices rely on compression 
+techniques to minimize storage, transmission bandwidth, and overall cost. 
+Compression techniques often contain complex mathematics and demand 
+realtime performance or high sustained throughput. The end of traditional 
+CPU clock scaling means that Von Neumann architectures can no longer meet 
+these performance requirements and parallel implementations for novel 
+system architectures are needed. Parallel implementations increase the 
+complexity of applications.
+
+The parallel programmer picking a language
+for a compression algorithm implementation
+faces a dilemma, forced to trade 
+off productivity for performance. Functional 
+languages provide a high degree of malleability but poor performance. 
+Imperative languages with compiler directed 
+parallelism introduce implementation details and the code 
+loses malleability. High performance imperative languages
+tie implementations to specific architectures or families of 
+architectures. Assembly code provides the greatest performance 
+but is neither malleable nor portable and minimizes programmer productivity. 
+
+Current programming practices and performance demands dictate that the 
+parallel programmer choose a low-level language in which he can explicitly 
+control the degree of parallelism and arduously tune his code for performance. 
+This methodology is not cost effective because architecture-specific code is 
+not portable. Reimplementations must be written from scratch for each of the 
+parallel and reconfigurable architectures that exist, such as clusters, 
+multicores, tiled architectures, ASICs and FPGAs. The process is made more 
+challenging by the continuous evolution of compression standards, which are 
+driven by new innovations in a rapidly growing digital multimedia market. 
+
+This thesis shows that stream programming is an ideal model of 
+computation for expressing image and video compression algorithms. The three 
+types of operations in a typical compression algorithm --- data representation, 
+lossy compression, and lossless compression --- are semi-autonomous, exhibit 
+data and pipeline parallelism, and easily fit into a sequence of distinct 
+processing stages. Operations with these properties fit
+the streaming model of computation, 
+which treats a computation as a series of data transformations performed by 
+actors arranged in well organized topologies. Stream programming models afford 
+certain advantages in terms of programmability, robustness, and achieving high 
+performance. The goal of my thesis is to influence the design of languages 
+towards the inclusion of features that lend to the efficient implementation and parallel 
+execution of streaming applications, such as image and video compression codecs. 
+Towards this goal I make the following contributions:
+
+\begin{enumerate}
+ \item A clean, malleable, and portable implementation of an MPEG-2 encoder and decoder expressed in a streaming fashion.
+ \item An analysis of how a streaming language improves programmer productivity.
+ \item An analysis of how a streaming language enables scalable parallel execution.
+ \item An enumeration of the language features that are needed to cleanly express compression algorithms.
+ \item An enumeration of the language features that support large scale application development 
+and promote software engineering principles such as portability and reusability.
+\end{enumerate}
+
+This work is in the context of the StreamIt programming language. StreamIt reflects
+a compiler-aware language design. The language constructs allow for the natural expression 
+of computation and the flow of data through a streaming application. This boosts 
+productivity and allows rapid development because functionality maps directly to code. 
+At the same time, the language exposes both coarse-grained and fine-grained parallelism and 
+makes scheduling and communication requirements explicit. The exposed parallelism and
+communication requirements  allow the compiler to perform 
+domain-specific optimizations and enable parallel execution on a variety of architectures, 
+including scalable multicores. 
+
+This thesis presents a case study of MPEG-2 encoding and decoding to explicate 
+points about language expressiveness. 
+MPEG-2 codecs are interesting because they are widely used
+streaming applications with high realtime frame throughput requirements.
+The author has also implemented JPEG~\cite{JPEG} codecs, and
+found them to express the same types of computations and demand the same language features 
+as MPEG-2 codecs. 
+In the interests of narrowly tailoring the subject and not forcing the 
+reader to learn two compression schemes, the paper limits its discussion to MPEG-2 coding. 
+I mention JPEG only to intimate that the points I make are broader than the MPEG-2 context 
+and apply to the domain of multimedia compression schemes\footnote{The MPEG-4 standard is now
+replacing the MPEG-2 standard; however, the MPEG-4 standard is extremely complicated and 
+a streaming implementation without new language features discussed in this thesis would be
+infeasible. In the discussion of future work I mention where the new 
+language features are needed.}.
+
+This thesis is organized as follows. Chapter~\ref{chapter:mpeg2} provides a
+detailed description of MPEG-2 video compression. This background 
+is necessary to understand the rest of the thesis. 
+Chapter~\ref{chapter:related} describes related stream programming 
+research. 
+Chapter~\ref{chapter:streamit} includes an in-depth 
+introduction to the StreamIt language. 
+Chapter~\ref{chapter:decoder} details the implementation
+of an MPEG-2 decoder and encoder in a stream based language. 
+Chapter~\ref{chapter:compare} illustrates how a stream 
+programming language improves programmer productivity for video 
+compression codecs. Chapter~\ref{chapter:exposing_parallelism} describes 
+how a streaming codec implementation can expose parallelism to the 
+compiler and gives performance results showing a parallel scalable 
+implementation on a 
+multicore wire-exposed architecture. 
+Chapter~\ref{section:impl_issues} emphasizes parts of MPEG-2 
+which demand new language features for their clean expression. 
+Chapter~\ref{chapter:conclusions}
+concludes and discusses future work extensions.

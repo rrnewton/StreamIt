@@ -1,0 +1,113 @@
+
+\title{Stream Programming for Image and Video Compression}
+
+\author{Matthew Henry Drake}
+\department{Department of Electrical Engineering and Computer~Science}
+% If the thesis is for two degrees simultaneously, list them both
+% separated by \and like this:
+% \degree{Doctor of Philosophy \and Master of Science}
+\degree{Bachelor of Science in Computer Science and Engineering
+        \and Master of Engineering in Electrical Engineering and Computer Science}
+\degreemonth{May}
+\degreeyear{2006}
+\thesisdate{May 26, 2006}
+
+%% By default, the thesis will be copyrighted to MIT.  If you need to copyright
+%% the thesis to yourself, just specify the `vi' documentclass option.  If for
+%% some reason you want to exactly specify the copyright notice text, you can
+%% use the \copyrightnoticetext command.  
+%\copyrightnoticetext{\copyright IBM, 1990.  Do not open till Xmas.}
+
+% If there is more than one supervisor, use the \supervisor command
+% once for each.
+\supervisor{Saman Amarasinghe}{Associate Professor}
+
+% This is the department committee chairman, not the thesis committee
+% chairman.  You should replace this with your Department's Committee
+% Chairman.
+\chairman{Arthur C. Smith}{Chairman, Department Committee on Graduate Theses}
+
+% Make the titlepage based on the above information.  If you need
+% something special and can't use the standard form, you can specify
+% the exact text of the titlepage yourself.  Put it in a titlepage
+% environment and leave blank lines where you want vertical space.
+% The spaces will be adjusted to fill the entire page.  The dotted
+% lines for the signatures are made with the \signature command.
+\maketitle
+
+% The abstractpage environment sets up everything on the page except
+% the text itself.  The title and other header material are put at the
+% top of the page, and the supervisors are listed at the bottom.  A
+% new page is begun both before and after.  Of course, an abstract may
+% be more than one page itself.  If you need more control over the
+% format of the page, you can use the abstract environment, which puts
+% the word "Abstract" at the beginning and single spaces its text.
+
+%% You can either \input (*not* \include) your abstract file, or you can put
+%% the text of the abstract directly between the \begin{abstractpage} and
+%% \end{abstractpage} commands.
+
+% First copy: start a new page, and save the page number.
+\cleardoublepage
+% Uncomment the next line if you do NOT want a page number on your
+% abstract and acknowledgments pages.
+% \pagestyle{empty}
+\setcounter{savepage}{\thepage}
+\begin{abstractpage}
+\input{abstract}
+\end{abstractpage}
+
+% Additional copy: start a new page, and reset the page number.  This way,
+% the second copy of the abstract is not counted as separate pages.
+% Uncomment the next 6 lines if you need two copies of the abstract
+% page.
+% \setcounter{page}{\thesavepage}
+% \begin{abstractpage}
+% \input{abstract}
+% \end{abstractpage}
+
+\cleardoublepage
+
+\section*{Acknowledgments}
+
+\begin{quote}
+\noindent\textit{Though we are not now that strength which in old days\\
+Moved earth and heaven; that which we are, we are;\\
+One equal temper of heroic hearts,\\
+Made weak by time and fate, but strong in will\\
+To strive, to seek, to find, and not to yield.
+}
+
+Tennyson, \textit{Ulysses} (1842)
+\end{quote}
+
+My thanks go first to Rodric Rabbah and William Thies for 
+their direction, advice, and innumerable hours of help; I could
+not have asked for better role models and guides to the world
+of computer science research. 
+I thank my advisor Saman Amarasinghe for supporting and guiding
+this thesis and demanding the highest of standards.
+
+I am grateful to everyone in the StreamIt group, including William Thies, 
+Rodric Rabbah, Michael Gordon, Allyn Dimock, and Janis Sermulins,
+for their extensive work on the StreamIt language and compiler. Without
+their help this thesis would not have been possible.
+
+I want to thank my parents for twenty two years spent instilling in me the 
+importance of education and hard work - particularly, my father's
+early encouragement of my programming interests and my mother's 
+demand for impeccable writing. 
+I owe a huge debt of gratitude to my grandfather, Benjamin Turner, 
+and Meng Mao, for their encouragement and interest in my work.
+
+This thesis extends from a paper\cite{drake:ipdps:2006} by
+the author, Rodric Rabbah, and Saman Amarasinghe that appeared in
+the proceedings of the 
+IEEE 2006 International Parallel and Distributed Processing
+Symposium. 
+The StreamIt project is supported by DARPA grants 
+PCA-F29601-03-2-0065 and HPCA/PERCS-W0133890, and
+NSF awards CNS-0305453 and EIA-0071841.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% -*-latex-*-
