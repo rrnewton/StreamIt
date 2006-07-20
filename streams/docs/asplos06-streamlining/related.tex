@@ -1,0 +1,94 @@
+\section{Related Work}
+\label{sec:related}
+
+The Imagine stream processor~\cite{rixner98bandwidthefficient}
+supports a time-multiplexed execution model.  The architecture
+contains 48 parallel ALU's organized into 6 VLIW clusters.  The
+programming model requires the programmer to write computation filters
+in Kernel-C and stitch them together using Stream-C.  Because the
+execution unit is data-parallel, the compiler uses time multiplexing
+to execute a single filter at a time across all of the parallel
+clusters.  While this provides perfect load balancing and high
+arithmetic utilization when there is abundant data parallelism, it
+suffers when a filter has retained state or data-dependences between
+iterations.  Moreover, architectures based solely on
+time-multiplexing do not scale spatially, as there are global wires
+orchestrating the parallel execution units. 
+
+Previous work in compiling StreamIt to Raw has taken a purely space
+multiplexed approach~\cite{streamit-asplos}.  In this model, a single
+filter was mapped to each execution tile.  To support applications
+with more filters than execution tiles, a partitioning algorithm was
+employed to adjust the granularity of the graph by fusing adjacent
+filters into one.  While filter fusion can be regarded as a restricted
+form of time multiplexing (as the fused filter simulates the execution
+of the originals, in turn), the approach given in the current paper is
+much more general, as a given tile participates in multiple slices
+that can be drawn from non-adjacent sections of the stream graph.
+
+%Our fine-grained execution model for linear portions of the stream
+%graph is closely related to the large body of work on systolic
+%architectures~\cite{systolic78,systolic82}.  A systolic architecture
+%is arranged as an array of cells with local neighbor-to-neighbor
+%communication.  Each cell has limited storage, and computation is
+%arranged as data streaming through the array.  A large number of
+%algorithms have been recast in a systolic
+%context~\cite{leighton-book}, including others that focus on linear
+%operations~\cite{wu87systolic}.  The algorithm underlying our template
+%code generation is based on Hoffmann's stream
+%algorithms~\cite{hoffmann-streams}, which provide a framework for
+%decoupling memory accesses from computation for several scientific
+%applications on tiled processors.
+
+Previous work in scheduling computation graphs to parallel targets
+have focused on dynamic techniques \cite{SDFSched, SDFSched2,
+may87communicating, DAGSched}. In general, multiple graph nodes are
+{\it clustered} onto a single computational node and scheduled
+dynamically.  We differ from clustering because we first combine
+multiple graph nodes into a space-partitioned slice, then we cluster
+the elements of different slices on a processing node. There is no
+communication between slice elements of a single computational node.
+We create a static schedule at each node that is tightly orchestrated
+based on a our load estimations. Our work, unlike most previous work
+in this field, models link contention and topography.  Furthermore,
+StreamIt graphs are implicitly formed of loops so we can apply loop
+scheduling techniques such as software pipelining to build our
+schedules.
+
+%The problem of instruction scheduling for MIMD and VLIW architectures
+%is similar to the problem tackled by the space-time compiler.  ILP
+%compilers for clustered VLIW architectures~\cite{Bulldog, Multiflow}
+%are decomposed into stages that are analogous to the stages of the
+%SpaceTime compiler.  These compilers must partition or cluster
+%instructions, assign instructions to processors, and then schedule the
+%instructions.  
+
+Previous work on software pipeline has focused on scheduling machine
+instructions in a loop \cite{lam-softpipe, rau-softpipe} to a
+uniprocessor target.  The algorithms devised must account for tight
+resource constraints and complex instruction dependences.  Our
+software-pipelining problem is much less constrained, a traditional
+modulo scheduling algorithm can not effectively take advantage of this
+flexibility.  So we employ a stochastic hill-climbing algorithm to
+more completely search the solution space.  Previous work on ILP
+scheduling for the Raw architectures ~\cite{lee98spacetime} also bears
+similarity. Again, the problem is decomposed into stages that have
+analogues to the stages of our SpaceTime Compiler.  However, these
+compilers schedule graphs of fine-grained instructions. The
+partitioning and scheduling heuristics are mindful of a different set
+of constraints including different types of dynamism and less regular
+communication patterns as compared to StreamIt graphs.
+
+As far as we know, the SpaceTime Compiler is the first scheduler to
+apply loop-level scheduling techniques to the problem
+of scheduling coarse-grained task graphs.  Also, our compiler is the first
+to map a software-pipelined scheduling problem to a 3-dimensional
+bin-packing problem and employ simulated annealing to arrive at a solution.
+
+% \cite{cheops-thesis}
+%   http://web.media.mit.edu/~kung/publication/thesis.pdf
+%
+% other possible things to cite:
+%  http://portal.acm.org/citation.cfm?id=801721&dl=ACM&coll=portal
+%  http://www.csrl.unt.edu/~kavi/Research/ica3pp156.pdf
+%  http://cdmetcalf.home.comcast.net/papers/cop/node1.html#SECTION00010000000000000000
