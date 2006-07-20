@@ -479,18 +479,55 @@ amount of data needed for a filter to complete an atomic execution.
 
 \begin{itemize}
 
-\item If the push or pop rate is ommitted, it is assumed to be zero.
+\item If the push or pop rate is omitted, it is assumed to be zero.
 The corresponding input or output tape type must be \lstinline|void|.
 
-\item If the peek rate is ommitted, it is assumed to be equal to the
+\item If the peek rate is omitted, it is assumed to be equal to the
 pop rate.
 
-\item If there are no \lstinline|pop| calls at all in the function
-body (all access to the input tape is by peeking), the number of items
-declared as the pop rate will be automatically popped at the end of
-the work function.
+\item If the peek rate is specified, it should not be smaller than the
+pop rate.
+
+%% \item If there are no \lstinline|pop| calls at all in the function
+%% body (all access to the input tape is by peeking), the number of items
+%% declared as the pop rate will be automatically popped at the end of
+%% the work function.
 
 \end{itemize}
+
+\paragraph{Prework Functions.}  A filter may specify an additional work 
+function that is run in place of the normal work function the first
+time the filter executes.  This function uses the \lstinline|prework|
+keyword, and is otherwise identical to the normal work function.
+
+Prework functions can be very useful for setting up initial conditions
+based on the first set of inputs, or for pushing extra items on the
+first invocation.  For example, consider the following implementation
+of a Delay:
+
+\begin{lstlisting}{}
+float->float filter Delay(int N) {
+  prework push N {
+    for (int i=0; i<N; i++) {
+      push(0);
+    }
+  }
+
+  work push 1 pop 1{
+    push(pop());
+  }
+}
+\end{lstlisting}
+
+\paragraph{Limitations on work and preWork functions}
+The push, peek, and pop expressions
+in the declaration of a \lstinline|work| or \lstinline|prework| function
+must be correct for the compilers to produce correct output.  These
+declarations can not, in general be statically checked.  They are
+dynamically checked in the \lstinline|library| back end, but are not
+checked at all in the compiled back ends.  An incorrect single numeric value
+for one of these expressions may cause obscure bugs in the compiled
+code, as may an incorrect maximum value for a range.
 
 \paragraph{Helper functions.}  A helper function performs some
 auxiliary bit of computation, and may be called from the init function
