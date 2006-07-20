@@ -26,7 +26,7 @@
 \title{StreamIt Language Specification\\
 Version 3.0\ifprerel\thanks{
 This document is the latest working version of the language specification.\hfil\break\ttfamily
-\hbox{$Id: streamit-lang.tex,v 1.27 2006-04-25 17:55:56 thies Exp $}
+\hbox{$Id: streamit-lang.tex,v 1.28 2006-07-20 17:45:00 dimock Exp $}
 }\fi}
 \author{\texttt{streamit@cag.csail.mit.edu}}
 \catcode`\$=3
@@ -509,6 +509,16 @@ float->float filter Delay(int N) {
   }
 }
 \end{lstlisting}
+
+\paragraph{Limitations on work and preWork functions}
+The push, peek, and pop expressions
+in the declaration of a \lstinline|work| or \lstinline|prework| function
+must be correct for the compilers to produce correct output.  These
+declarations can not, in general be statically checked.  They are
+dynamically checked in the \lstinline|library| back end, but are not
+checked at all in the compiled back ends.  An incorrect single numeric value
+for one of these expressions may cause obscure bugs in the compiled
+code, as may an incorrect maximum value for a range.
 
 \paragraph{Helper functions.}  A helper function performs some
 auxiliary bit of computation, and may be called from the init function
