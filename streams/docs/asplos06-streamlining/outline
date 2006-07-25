@@ -1,0 +1,153 @@
+Title + abs = .5
+
+Intro (~1) 
+  Multicores are here.  
+  Multicores (and cluster of wor) imply coarse granularity 
+     as opposed to vector
+  At the instruction level a broard array of techniques have been developed
+     to leverage data-parallelism
+  need to take techs that were traditionally applied at the ins level
+    and apply them to the coarse level.
+  as we try to extract, expose coarse grained parallel or map prgs to 
+    coasrse grained architectres
+  we need to id and expose coarse grained parallels
+  traditionally very hard in languages like C that have single program counter   
+    monolithic memory with aliasing 
+
+  Streaming computation offers attractive solution by ...
+    outer loop
+    unified model for exposing data, task, and pipeline parallelism
+    in some ways this is more powerful than trad sp, because streamit programs
+     are essentially nested loops and we software pipeline these...
+    maybe simpler because we do not have resource hazards
+
+  in this paper we show how to exploit the streaming model to employ techniques
+    once used only in at the instruction level.
+
+  details about technique
+    what we do
+
+Programming Model (0.5)
+  further hammer home benefits aof streamit
+  critical to adopt a model with following props:
+    a depends between actors are explicit prod/cons relationships
+        independent memory spaces with fifo queues
+    implicit outer loop
+    some parts of graph are static rate
+    rely on work estimation
+  then discuss streamit as our harness, could imagine something else, but
+    as far we know streamit is the only shits
+  comparison to other stream languages (here or related work)
+
+
+Execution Model (2.5):
+  different ways to execute and our baselines
+    clustering and thread baseline?
+  contrast streamit with c for each model
+  different types of parallelism
+  
+  outer loop is new!
+
+  trend in parallel processor design is to decouple comp from comm
+     raw, imagine (stanford)
+  compiler should keep comp units busy
+  synchronization is usually the hazard
+  
+  Coarse-Grained software pipelining
+     benefits
+        no dependences 
+           schedule however you want
+        side benefit, always reading and writing directly from memories
+          don't need to manage synchronization (including scatter/gather) between actors/processors
+          might be benefit from doing all communication at once  (forward pointer)
+     executing each filter a steady-state number of time
+  what to say about buffering?
+    one can buffer results on chip (at each node or L1, L2) or off chip
+    depends on architecture
+  static model, why not dynamic?
+    each could be dynamic (space?)
+    state locality is benefit of static (including code)
+       state include immutable state
+    one could prime the pump dynamically
+    latency of the scheduler, latency of the 
+    have to double buffer everything for switching between stages.
+  discussion  
+     comparison to traditional software pipelining
+     resource hazards not needed 
+     compare techniques, modulo scheduling vs what we do
+     software pipelining terminology?
+     taking min periodicity as starting point, so you would never arrive at a better
+        mapping by changing the ii 
+     nested loops
+     in our implementation we require all instances of ins/actor to execute on same compute node
+     
+
+
+Partitioning (formulation as a packing problem) (.5)
+  Partitioning (or possibly clustering)
+  bin-packing, no!  this is something else!  Partitioning Problem?
+  rigorous 
+  bound on greedy (most empty?)
+
+Layout (.5)
+  simulated annealing
+  layout for distributed memory
+     have to create a channel betwixt producers and consumers 
+          want to minimize the channel congestion for this communication across the graph
+          co-locating simple prod/cons will remove the need for communication
+
+Graph transformations (.75) 
+  Introduce fission fusion, and a more aggressive algorithm would...
+  BufferSize for streamlined.
+  Increase amount of buffering by at least 2x.
+  maybe graph for actual values?
+  the amount of buffering for thread case is number of items produced by all filters for SS
+  buffering for thread-dup = possible bloat of steady-state 
+  All paths from beginning to end are of the same length then 2x.
+*Communication 
+    Buffering = communication for non-streamlined cases
+    For streamlined buffering = communication if shortest path == longest path
+    otherwise not all data buffered is transfered in each SS 
+
+  benefits of fusion are intranode optimization and less offchip communication
+     hazard, reduce parallelism too much
+  benefits of
+  Granularity Adjustment
+     pseudocode
+
+Implementation (1.0)
+  Language paragraph
+    StreamIt
+    talk about transformations that are already implemented
+    mention mpeg (app complexity)
+  Architecture
+    Raw section 
+    How raw directed our implementation choices
+         why we don't interleave comp and comm
+             statically scheduled communication, don't want it interfering with
+             communication (comp/comm for our benchmarks?)
+             
+         why we go off chip
+             lots of offchip bandwidth, pins
+             memory ops are relatively expensive (single issue inorder)
+             have register-mapped network (alus read from network)
+                with stream-access optimized controllers cheaper to go off chip
+     How are scatter/gathers implemented traditionally, are we better?  More powerful?           
+    
+
+Results (2.5)
+
+Related Work (.75)
+  Software Pipelining
+
+Conclusion (.5)
+ discussion
+    graph transformation benefits of streamit
+
+acks (.25) 
+
+refs (.75)
+
+
+    
+

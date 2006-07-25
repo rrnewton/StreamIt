@@ -1,0 +1,49 @@
+Results:
+
+Characteristics of the benchmarks
+* filters
+* splits
+* joins
+* comp/comm
+* % stateless
+* longest path from source to sink
+* shortest path from source to sink
+* description
+* differentiation from previous publications
+* filters that peek?
+
+relative weight of phases of mpeg
+what are the mpegs doing?
+is DCT a subet of one of the mpegs?
+why multiple runs of some benchmarks?
+  remove the duplicates that are not fundamentally different
+
+  
+Comparison between thread, thread + dup, space, streamlined (maybe with dup)
+* throughput
+* latency (thread and space would be lowest) (just talk about)
+* Graph normalized to thread baseline (with average bar)
+
+Show for 1-3 of benchmarks robustness to change in parameters vs other backends.
+
+Hard buffersize numbers:
+This will fit in a compute node or L2, but why do we go off chip
+
+
+Take home points:
+
+Explanations:
+Describing outliers and general trends
+
+
+GranAdj
+ show throughput and buffer size decrease (not exactly equal to commuication, but not for...)
+ try to show that it might reduce it to L2?
+
+Bandwidth?
+
+Space-time pipelining?	 
+
+Duplication for streamlining?  Low priority
+
+Raw 1x1  to establish the thread baseline.
