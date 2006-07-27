@@ -1,0 +1,32 @@
+\section{Streamlining}
+Overview.
+
+No antidependencies, no output dependencies, no control dependencies!
+only producer/consumer data dependencies.
+Loop-carried dependences from each node to itself
+
+Recall that the data-reorganization described by splitters and joiners
+of the graph is implemented by the on-chip network, thus we do not map
+these nodes to computational nodes.  Each filter lives on exactly one
+computational node.  The two initialization schedules described below
+use the assignment of filters to computational nodes calculated by the
+steady-state scheduler.
+
+\subsection{Peek Initialization Schedule}
+Before both the prologue schedule is executed and the steady-state
+schedule is commenced, we perform a {\it peek initialization
+schedule}.  This schedule is required to make sure that we can create
+a cyclic steady-state schedule that respects StreamIt's peeking
+operation.  In this schedule, filters are executed in data-flow order
+and the buffers are not rotated.  Therefore, the prologue schedule
+starts with the rotating buffers untouched.  See
+\cite{streamitcc} for a more complete discussion of the peek
+initialization schedule.
+
+\subsection{Prologue Schedule}
+The prologue schedule guarantees that when the steady-state commences,
+all the filters are ready to fire irrespective of their data-flow
+dependencies.  This schedule is composed of multiple iterations.  At
+each iteration we fire all the filters whose input requirements are met
+from the previous iteration.  We stop the schedule when all filters are
+ready to fire.

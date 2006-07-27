@@ -1,0 +1,23 @@
+\section{Mapping Algorithm}
+
+\subsection{Selective Fission}
+\begin{algorithm}
+\caption{Selective Fission}\label{alg:select_fis}
+\begin{algorithmic}
+\State $T \gets 0.9$
+\Procedure{SelectFiss}{$G$}\Comment{Selective fission on graph $G$}
+\Repeat
+\State $G_p \gets G$
+\Until {$W_{old} / W_{new} < T$}
+\State \textbf{return} $G_p$
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
+
+
+\subsection{Selective Fusion}
+
+\subsection{Work Distribution}
+Homogeneous, persistent, irregular, resources.
+
+\subsection{Synchronization Annealing}
