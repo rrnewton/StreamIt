@@ -1,9 +1,21 @@
 \section{Streamlining}
 Overview.
+Does not incur overhead of duplicate (data-distribution) vs. the
+thread dup case and still has good load balancing (ideal work numbers).
+
 
 No antidependencies, no output dependencies, no control dependencies!
 only producer/consumer data dependencies.
 Loop-carried dependences from each node to itself
+So difference (dif) between producer and consumer in SS is always one
+iteration difference is at most the max height of the graph 
+(single source, sink)
+Kernel is the steady-state
+Initiation Interval is the critical path (most work tile)
+Iteration count is always 1
+
+No feedbackloops
+
 
 Recall that the data-reorganization described by splitters and joiners
 of the graph is implemented by the on-chip network, thus we do not map
