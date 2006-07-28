@@ -14,7 +14,7 @@
 	\State $(A, proc$-$weight) \gets $ \Call{WorkDist}{$G, w, P$}
 	\State $new$-$max \gets $ \Call{MaxProc}{$proc$-$weight$}
 	\State $change \gets prev$-$max / new$-$max $
-	\State $new$-$max \gets prev$-$max$
+	\State $prev$-$max \gets new$-$max$
 \Until{$change < threshold$}
 \State \textbf{return} $G_{prev}$
 \end{algorithmic}
