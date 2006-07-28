@@ -32,14 +32,15 @@
 	\EndFor
 \EndFor
 \ForAll {$v \in V$}
-	\If {\Call{Filter}{$v$} and $\mid$\Call{Out}{$v$}$\mid = 1$}
+\Statex // For a filter, 
+	\If {\Call{Filter}{$v$} $\wedge \mid$\Call{Out}{$v$}$\mid = 1$ $\wedge $ \Call{Filter}{\textsc{Out}$(v)[0]$}}
 		\State $u \gets $ \Call{Out}{$v$}$[0]$
 		\State $pair$-$weight[v,u] \gets w(v) + w(u)$
 	\ElsIf {\Call{Splitter}{$v$}}
 		\Statex // decide if this is a simple splitter
 		\State $simple \gets true$			
 		\ForAll {$d \in $\Call{Out}{$v$}}
-			\If {$\neg$\Call{Filter}{$d$} or $\neg$\Call{Joiner}{\textsc{Out}($d$)$[0]$}}
+			\If {$\neg$\Call{Filter}{$d$} $ \vee  \neg$\Call{Joiner}{\textsc{Out}($d$)$[0]$}}
 				\State $simple \gets false$
 				\State \textbf{break}
 			\EndIf
@@ -53,13 +54,21 @@
 		\EndIf
 	\EndIf
 \EndFor
+\Statex // Find the min adjacent pair and fuse them
 \State $(p, q) \gets $ \Call{MinPair}{$pair$-$weight$}
 \State $G \gets $ \Call{Fuse}{$G, p, q$}
+\Statex // Delete any splitters that have single output
+\State \Call{RemoveDeadSplitters}{G}
+\Statex // Delete any joiners that have single input
+\State \Call{RemoveDeadJoiners}{G}
 \State \textbf{return} $G$
 \end{algorithmic}
 \end{algorithm}
 
-
+Why do we only fuse components of a splitjoin when each stream of the
+splitjoin is of height 1 (a filter)?  I know the answer, but the
+reader might wonder why.
+ 
 
 \subsection{Work Distribution}
 Homogeneous, persistent, irregular, resources.
