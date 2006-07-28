@@ -24,6 +24,8 @@ Comparison between thread, thread + dup, space, streamlined (maybe with dup)
 * latency (thread and space would be lowest) (just talk about)
 * Graph normalized to thread baseline (with average bar)
 
+Maybe show ideal work vs. bottleneck tile for streamlined 
+
 Show for 1-3 of benchmarks robustness to change in parameters vs other backends.
 
 Hard buffersize numbers:

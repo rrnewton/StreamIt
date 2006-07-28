@@ -1,23 +1,98 @@
 \section{Mapping Algorithm}
 
-\subsection{Selective Fission}
+\subsection{Selective Fusion}
 \begin{algorithm}
-\caption{Selective Fission}\label{alg:select_fis}
-\begin{algorithmic}
-\State $T \gets 0.9$
-\Procedure{SelectFiss}{$G$}\Comment{Selective fission on graph $G$}
+\caption{Selective Fusion} \label {alg:select_fus}
+\textsc{SelectFusion}($G = (V, E), w, P$)
+\begin{algorithmic}[1]
+\State $(A, proc$-$weight) \gets $ \Call{WorkDist}{$G, w, P$} 
+\State $prev$-$max \gets $ \Call{MaxProc}{$proc$-$weight$}
 \Repeat
-\State $G_p \gets G$
-\Until {$W_{old} / W_{new} < T$}
-\State \textbf{return} $G_p$
-\EndProcedure
+	\State $G_{prev} \gets G$
+	\State $G \gets $ \Call{AdjGreedyFusion}{$G, w$}
+	\State $w \gets $ \Call{UpdateWeights}{G}
+	\State $(A, proc$-$weight) \gets $ \Call{WorkDist}{$G, w, P$}
+	\State $new$-$max \gets $ \Call{MaxProc}{$proc$-$weight$}
+	\State $change \gets prev$-$max / new$-$max $
+	\State $new$-$max \gets prev$-$max$
+\Until{$change < threshold$}
+\State \textbf{return} $G_{prev}$
 \end{algorithmic}
 \end{algorithm}
 
 
-\subsection{Selective Fusion}
+
+\begin{algorithm}
+\caption{Adjacent Greedy Fusion} \label {alg:adj_fus}
+\textsc{AdjGreedyFusion}($G = (V, E), w$)
+\begin{algorithmic}[1]
+\ForAll {$v \in V$}  
+	\ForAll {$u \in V$}
+		\State $pair$-$weight[u,v] \gets \infty$
+	\EndFor
+\EndFor
+\ForAll {$v \in V$}
+	\If {\Call{Filter}{$v$} and $\mid$\Call{Out}{$v$}$\mid = 1$}
+		\State $u \gets $ \Call{Out}{$v$}$[0]$
+		\State $pair$-$weight[v,u] \gets w(v) + w(u)$
+	\ElsIf {\Call{Splitter}{$v$}}
+		\Statex // decide if this is a simple splitter
+		\State $simple \gets true$			
+		\ForAll {$d \in $\Call{Out}{$v$}}
+			\If {$\neg$\Call{Filter}{$d$} or $\neg$\Call{Joiner}{\textsc{Out}($d$)$[0]$}}
+				\State $simple \gets false$
+				\State \textbf{break}
+			\EndIf
+		\EndFor
+		\If {$simple$}
+			\For {$i \gets 0, \mid$\Call{Out}{$v$}$\mid - 1$}
+				\State $x \gets $\Call{Out}{$v$}$[i]$
+				\State $y \gets $\Call{Out}{$v$}$[i + 1]$
+				\State $pair$-$weight[x,y] \gets w(x) + w(y)$
+			\EndFor 
+		\EndIf
+	\EndIf
+\EndFor
+\State $(p, q) \gets $ \Call{MinPair}{$pair$-$weight$}
+\State $G \gets $ \Call{Fuse}{$G, p, q$}
+\State \textbf{return} $G$
+\end{algorithmic}
+\end{algorithm}
+
+
 
 \subsection{Work Distribution}
 Homogeneous, persistent, irregular, resources.
+
+\begin{algorithm}
+\caption{Work Distribution}\label{alg:work_dist}
+%{\small Given: 
+%\begin{itemize}
+%\item a stream graph $G = (V, E)$
+%\item the node weights $w$
+%\item processors $P$
+%\end{itemize}
+%Return:
+%\begin{itemize} 
+%\item $A$, an assignment of nodes to processors.
+%\item $T_p, p \in P,$ the sum of weights of the nodes assigned to proc
+%$p.$
+%\end{itemize}}
+\textsc{WorkDist}($G(V,E), w, P$)
+\begin{algorithmic}[1]
+\ForAll {$p \in P$}
+	\State $proc$-$weight[p] \gets 0$  %\Comment{init the proc weights}
+\EndFor
+\State Sort $v \in V$ in descending order by $w(v)$
+\ForAll {$v \in V$}
+        \State $m \gets $ \Call{MinProc}{$proc$-$weight$}
+	\State $assign[v] \gets m$ %\Comment{Remember the assignment} 
+	\State $proc$-$weight[m] \gets proc$-$weight[m] + w(v)$ %\Comment{Update the work on the proc}
+\EndFor
+\State \textbf{return} $assign$, $proc$-$weight$ 
+\end{algorithmic}
+\end{algorithm}
+
+
 
 \subsection{Synchronization Annealing}
