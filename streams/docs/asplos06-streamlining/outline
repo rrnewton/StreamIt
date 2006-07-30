@@ -1,10 +1,13 @@
 Title + abs = .5
 
+Exploiting Data and Pipeline Parallelism in Stream Programs
+Coarse-Grained Parallelization and Software Pipelining of Stream Programs
+
 Intro (~1) 
   Multicores are here.  
-  Multicores (and cluster of wor) imply coarse granularity 
+  Multicores (and cluster of work stations) imply coarse granularity 
      as opposed to vector
-  At the instruction level a broard array of techniques have been developed
+  At the instruction level a broad array of techniques have been developed
      to leverage data-parallelism
   need to take techs that were traditionally applied at the ins level
     and apply them to the coarse level.
@@ -21,26 +24,60 @@ Intro (~1)
      are essentially nested loops and we software pipeline these...
     maybe simpler because we do not have resource hazards
 
+  Trad data and pipeline parallelism
+    data parallelism at a fine gran, we are targetting coarse-g arch, we don't want to 
+      overwhelm the communication substrate
+    data II cannot leverage all the parallelism, state
+
+   previously we attempted to exploit the pipeline by leveraging the pipeline parallel
+     by direcly connecting prod/con with minimal buffering
+     technique was hampered by pipeline load-balancing  and synchronization
+   introduce software pipelining as necessary for pipeline parallelism and more flexible
+     for load balancing
+
   in this paper we show how to exploit the streaming model to employ techniques
     once used only in at the instruction level.
 
   details about technique
     what we do
 
+  contributions:
+   techniques for exploiting coarse grained parallelism
+      a technique 
+   software pipelining on a coarse-g data flow graph
+     
+   comparing these techniques to 
+
 Programming Model (0.5)
-  further hammer home benefits aof streamit
+ 
+  further hammer home benefits aof streaming
   critical to adopt a model with following props:
     a depends between actors are explicit prod/cons relationships
         independent memory spaces with fifo queues
     implicit outer loop
     some parts of graph are static rate
     rely on work estimation
+
+
   then discuss streamit as our harness, could imagine something else, but
     as far we know streamit is the only shits
   comparison to other stream languages (here or related work)
-
+  StreamIt tutorial with fig sans feedbackloop
 
 Execution Model (2.5):
+
+  space pros: low latency, good locality, small live data set, takes ad. of on-chip comm
+    cons:  hard to load balance, synchronization (arch dep), good work estimation 
+
+  task pros: simplicity
+    cons: wrong granularity
+  
+  task + data pros:  produces load balanced chunks, robust to work est.
+    cons:  communication (intro scatter/gather), does not deal with state, locality, higher latency
+  
+  task + sfpipe:  handles stateful filters, most flexible layout / load balancing, 
+    cons: more buffering,
+
   different ways to execute and our baselines
     clustering and thread baseline?
   contrast streamit with c for each model
@@ -82,12 +119,22 @@ Execution Model (2.5):
      in our implementation we require all instances of ins/actor to execute on same compute node
      
 
+Exploiting Data Parallelism
+  stateless fusion
+  cousins
+  fusing resulting pipelining for thread case, not for swpipe foward pointer
+  forward pointer to results 
+  leaves out stateful cases!
+
+Exploiting Pipeline Parallelism
 
 Partitioning (formulation as a packing problem) (.5)
   Partitioning (or possibly clustering)
   bin-packing, no!  this is something else!  Partitioning Problem?
   rigorous 
   bound on greedy (most empty?)
+  benefits of fusion are intranode optimization and less offchip communication
+     hazard, reduce parallelism too much
 
 Layout (.5)
   simulated annealing
@@ -96,30 +143,13 @@ Layout (.5)
           want to minimize the channel congestion for this communication across the graph
           co-locating simple prod/cons will remove the need for communication
 
-Graph transformations (.75) 
-  Introduce fission fusion, and a more aggressive algorithm would...
-  BufferSize for streamlined.
-  Increase amount of buffering by at least 2x.
-  maybe graph for actual values?
-  the amount of buffering for thread case is number of items produced by all filters for SS
-  buffering for thread-dup = possible bloat of steady-state 
-  All paths from beginning to end are of the same length then 2x.
-*Communication 
-    Buffering = communication for non-streamlined cases
-    For streamlined buffering = communication if shortest path == longest path
-    otherwise not all data buffered is transfered in each SS 
 
-  benefits of fusion are intranode optimization and less offchip communication
-     hazard, reduce parallelism too much
+
   benefits of
   Granularity Adjustment
      pseudocode
 
 Implementation (1.0)
-  Language paragraph
-    StreamIt
-    talk about transformations that are already implemented
-    mention mpeg (app complexity)
   Architecture
     Raw section 
     How raw directed our implementation choices
@@ -134,8 +164,22 @@ Implementation (1.0)
                 with stream-access optimized controllers cheaper to go off chip
      How are scatter/gathers implemented traditionally, are we better?  More powerful?           
     
-
 Results (2.5)
+  benchmarks, 
+
+Maybe?
+  Introduce fission fusion, and a more aggressive algorithm would...
+  BufferSize for streamlined.
+  Increase amount of buffering by at least 2x.
+  maybe graph for actual values?
+  the amount of buffering for thread case is number of items produced by all filters for SS
+  buffering for thread-dup = possible bloat of steady-state 
+  All paths from beginning to end are of the same length then 2x.
+*Communication 
+    Buffering = communication for non-streamlined cases
+    For streamlined buffering = communication if shortest path == longest path
+    otherwise not all data buffered is transfered in each SS 
+
 
 Related Work (.75)
   Software Pipelining

@@ -1,5 +1,11 @@
 Results:
 
+To mention in text:
+benefit of fusing before fissing in duplicate case
+
+benefit of gran adj (throughput and buffer size)
+benefit of comm annealing
+
 Characteristics of the benchmarks
 * filters
 * splits
@@ -18,34 +24,25 @@ is DCT a subet of one of the mpegs?
 why multiple runs of some benchmarks?
   remove the duplicates that are not fundamentally different
 
-  
-Comparison between thread, thread + dup, space, streamlined (maybe with dup)
-* throughput
-* latency (thread and space would be lowest) (just talk about)
-* Graph normalized to thread baseline (with average bar)
 
-Maybe show ideal work vs. bottleneck tile for streamlined 
+Graphs (with unroll 4)
+thread over 1x1
+Big Comparison (over thread)
+  vector 
+  streamlining 
+  streamlining and Vector
+Combined over Space graph
+     
 
-Show for 1-3 of benchmarks robustness to change in parameters vs other backends.
 
 Hard buffersize numbers:
-This will fit in a compute node or L2, but why do we go off chip
-
-
-Take home points:
+  This will fit in a compute node or L2, but why do we go off chip
+Show for 1-3 of benchmarks robustness to change in parameters vs other backends.
 
 Explanations:
 Describing outliers and general trends
 
 
-GranAdj
- show throughput and buffer size decrease (not exactly equal to commuication, but not for...)
- try to show that it might reduce it to L2?
+Take home points:
+  
 
-Bandwidth?
-
-Space-time pipelining?	 
-
-Duplication for streamlining?  Low priority
-
-Raw 1x1  to establish the thread baseline.
