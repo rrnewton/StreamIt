@@ -1,22 +1,129 @@
 \section{Introduction}
 
+%% Possibly add figure with stream graph that labels task, data, and pipeline parallelism
 
-Other Multicores (Trademarks?):
-Cell, 
-RMI XLR Family of Processors
-  (http://razamicroelectronics.com/products/xlr.htm)
-Cavium OCTEON Processors?  cavium.com
-Rapport KC256 www.rapportincorporated.com
-PicoChip's PicoArray
+Due to the inexorable advance of VLSI technology, transistors are in
+almost unlimited supply.  However, centralized microprocessors are
+ceasing to scale effectively due to wire delay, power, and complexity
+concerns.  The emerging approach being adopted by the industry is to
+replicate basic processing units in the form of multicore
+architectures.  Tor example, the IBM/Toshiba/Sony Cell processor has 9
+cores\cite{}, Sun Niagra has 8 cores\cite{}, and most vendors are
+shipping dual-core chips.  This trend has pushed the performance
+burden to the compiler, as future application-level speedups depend on
+effective parallelization across the cores.  Unfortunately,
+traditional programming models such as C, C++ and FORTRAN are
+ill-suited to multicore architectures because they assume a single
+instruction stream and a monolithic memory.  Extracting coarse-grained
+parallelism suitable for multicore execution amounts to a heroic
+compiler analysis that remains largely intractable.
 
-Software Pipelining definition:
-``overlapping successive iterations of a loop''
-``code from various iterations are overlapped in time''
+The stream programming paradigm offers a promising approach for
+exposing parallelism suitable for multicore architectures.  Stream
+languages such as StreamIt\cite{}, Brook\cite{}, Baker\cite{}, and
+Spidle\cite{} are motivated not only by trends in computer
+architecture, but also by trends in the application space, as image,
+voice, and multimedia programs are becoming only more prevalent.  In a
+stream language, a program is represented as a set of actors that
+operate over sequences of data.  Because each actor has an independent
+program counter and address space, there is abundant task and data
+parallelism that can be recognized by the compiler.  In addition, the
+data streams reveal the communication between filters, thereby
+exposing pipeline parallelism and also allowing the compiler to
+predict and orchestrate the flow of data.
 
+Despite the abundance of parallelism in stream programs, it is
+nonetheless a challenging problem to obtain an efficient mapping to a
+multicore architecture.  Often the gains from parallel execution can
+be overshadowed by the costs of communication and synchronization.  In
+addition, not all parallelism has equal benefits, as there is
+sometimes a critical path that can only be reduced by running certain
+actors in parallel.  Due to these concerns, it is critical to leverage
+the right combination of task, data, and pipeline parallelism while
+avoiding the hazards associated with each.
 
-Mapping Algorithm:
- Selective Fission
- Selective Fusion		 
- Work Distribution
- Synchronization Annealing (maybe Synch?)
+Task parallelism refers to pairs of actors that are on different
+parallel branches in the original stream graph, as written by the
+programmer (see figure?).  That is, the output of each filter never
+reaches the input of the other.  In stream programs, task parallelism
+reflects logical parallelism in the underlying algorithm.  It is easy
+to exploit by mapping each task to an independent processor and
+joining at synchronization points.  The hazards associated with task
+parallelism are the communication and synchronization associated with
+the splits and joins.  Also, as the granularity of task parallelism
+depends on the application (and the programmer), it is not sufficient
+as the only source of parallelism.
 
+Data parallelism refers to actors that have no dependences between one
+execution and the next (see figure?).  Such ``stateless''
+filters\footnote{A stateless filter may still have read-only state.}
+offer unlimited data parallelism, as different instances of the filter
+can be spread across any number of computation units.  However, while
+data parallelism is well-suited to vector machines, on coarse-grained
+multicore architectures it can introduce excessive communication
+overhead.  Previous data-parallel streaming architectures have focused
+on designing a special memory hierarchy to support this
+communication\cite{imagine}.  The other hazards of data parallelism
+include increased buffering and latency, as well as the inability to
+parallelize filters with state.
+
+Pipeline parallelism applies to pairs of producers and consumers that
+are directly connected in the stream graph.  In our previous work, we
+exploited pipeline parallelism by mapping clusters of producers and
+consumers to different cores and using an on-chip network for direct
+communication between actors\cite{gordon02asplos}.  Compared to data
+parallelism, this approach offers reduced latency, reduced buffering,
+and good locality.  It does not introduce any extraneous
+communication, and it provides the new ability to execute stateful
+filters in parallel.  However, this form of pipelining introduces
+extra synchronization, as producers and consumers must stay tightly
+coupled in their execution.  In addition, effective load balancing is
+critical, as the throughput of the stream graph is equal to the
+minimum throughput across all of the processors.
+
+In this paper, we present two novel techniques for overcoming the
+traditional limitations in exploiting data and pipeline parallelism on
+multicore architectures.  The first technique leverages data
+parallelism, but avoids the communication overhead by first increasing
+the granularity of the stream graph.  Using a program analysis, we
+fuse filters in the graph as much as possible so long as the result is
+stateless.  Each combined filter has a significantly higher
+computation to communication ratio, and thus incurs significantly
+reduced communication overhead in being duplicated across cores.
+While this technique exploits data parallelism, it also relies on the
+producer-consumer relationships evident in stream programs for
+increasing the granularity of the graph.
+
+The second technique leverages pipeline parallelism.  However, to
+avoid the pitfall of synchronization, it employs software pipelining
+techniques to execute actors from different iterations in parallel.
+While traditional software pipelining has only been applied at the
+instruction level, we leverage powerful properties of the stream
+programming model to apply the same technique at a coarse level of
+granularity.  This effectively removes all dependences between actors
+scheduled in a steady-state iteration of the stream graph, greatly
+increasing the scheduling freedom.  Like hardware-based pipelining,
+software pipelining allows stateful filters to execute in parallel and
+avoids the communication overhead of data parallelism.  However, it
+avoids the synchronization overhead because processors are reading and
+writing into a buffer rather than directly communicating with another
+processor.
+
+Our techniques for exploiting coarse-grained data and pipeline
+parallelism are complementary, as data-parallel actors can also be
+scheduled using software pipelining.  As described in our results
+section, either technique in isolation offers significant speedups
+(number?) over a sequential or task-parallel baseline.  Combining the
+techniques yields the most general results, as data parallelism offers
+good load balancing for stateless actors while software pipelining
+enables stateful filters to execute in parallel.  (more numbers.)
+
+The rest of this paper is organized as follows.  (blah blah blah.)
+
+%% Other Multicores (Trademarks?):
+%% Cell, 
+%% RMI XLR Family of Processors
+%%   (http://razamicroelectronics.com/products/xlr.htm)
+%% Cavium OCTEON Processors?  cavium.com
+%% Rapport KC256 www.rapportincorporated.com
+%% PicoChip's PicoArray
