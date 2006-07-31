@@ -5,18 +5,18 @@
 Due to the inexorable advance of VLSI technology, transistors are in
 almost unlimited supply.  However, centralized microprocessors are
 ceasing to scale effectively due to wire delay, power, and complexity
-concerns.  The emerging approach being adopted by the industry is to
-replicate basic processing units in the form of multicore
-architectures.  Tor example, the IBM/Toshiba/Sony Cell processor has 9
-cores\cite{}, Sun Niagra has 8 cores\cite{}, and most vendors are
-shipping dual-core chips.  This trend has pushed the performance
-burden to the compiler, as future application-level speedups depend on
-effective parallelization across the cores.  Unfortunately,
-traditional programming models such as C, C++ and FORTRAN are
-ill-suited to multicore architectures because they assume a single
-instruction stream and a monolithic memory.  Extracting coarse-grained
-parallelism suitable for multicore execution amounts to a heroic
-compiler analysis that remains largely intractable.
+concerns.  The emerging approach being adopted by industry is to
+replicate processing cores, thus yielding multicore architectures.
+Tor example, the IBM/Toshiba/Sony Cell processor has 9 cores\cite{},
+Sun Niagra has 8 cores\cite{}, and most vendors are shipping dual-core
+chips.  This trend has pushed the performance burden to the compiler,
+as future application-level performance gains depend on effective
+parallelization across the cores.  Unfortunately, traditional
+programming models such as C, C++ and FORTRAN are ill-suited to
+multicore architectures because they assume a single instruction
+stream and a monolithic memory.  Extracting coarse-grained parallelism
+suitable for multicore execution amounts to a heroic compiler analysis
+that remains largely intractable.
 
 The stream programming paradigm offers a promising approach for
 exposing parallelism suitable for multicore architectures.  Stream
@@ -24,13 +24,13 @@ languages such as StreamIt\cite{}, Brook\cite{}, Baker\cite{}, and
 Spidle\cite{} are motivated not only by trends in computer
 architecture, but also by trends in the application space, as image,
 voice, and multimedia programs are becoming only more prevalent.  In a
-stream language, a program is represented as a set of actors that
-operate over sequences of data.  Because each actor has an independent
-program counter and address space, there is abundant task and data
-parallelism that can be recognized by the compiler.  In addition, the
-data streams reveal the communication between filters, thereby
-exposing pipeline parallelism and also allowing the compiler to
-predict and orchestrate the flow of data.
+stream language, a program is represented as a set of autonomous
+actors that communicate through FIFO data channels.  During program
+execution, actors fire repeatedly in a periodic schedule.  As each
+actor has a separate program counter and an independent address space,
+all dependences between actors are made explicit by the communication
+channels.  Compilers can leverage this dependence information to
+orchestrate parallel execution.
 
 Despite the abundance of parallelism in stream programs, it is
 nonetheless a challenging problem to obtain an efficient mapping to a
@@ -67,7 +67,7 @@ communication\cite{imagine}.  The other hazards of data parallelism
 include increased buffering and latency, as well as the inability to
 parallelize filters with state.
 
-Pipeline parallelism applies to pairs of producers and consumers that
+Pipeline parallelism applies to chains of producers and consumers that
 are directly connected in the stream graph.  In our previous work, we
 exploited pipeline parallelism by mapping clusters of producers and
 consumers to different cores and using an on-chip network for direct
@@ -86,8 +86,8 @@ traditional limitations in exploiting data and pipeline parallelism on
 multicore architectures.  The first technique leverages data
 parallelism, but avoids the communication overhead by first increasing
 the granularity of the stream graph.  Using a program analysis, we
-fuse filters in the graph as much as possible so long as the result is
-stateless.  Each combined filter has a significantly higher
+combine filters in the graph as much as possible so long as the result
+is stateless.  Each combined filter has a significantly higher
 computation to communication ratio, and thus incurs significantly
 reduced communication overhead in being duplicated across cores.
 While this technique exploits data parallelism, it also relies on the
@@ -97,17 +97,17 @@ increasing the granularity of the graph.
 The second technique leverages pipeline parallelism.  However, to
 avoid the pitfall of synchronization, it employs software pipelining
 techniques to execute actors from different iterations in parallel.
-While traditional software pipelining has only been applied at the
+While software pipelining has traditionally been applied at the
 instruction level, we leverage powerful properties of the stream
 programming model to apply the same technique at a coarse level of
 granularity.  This effectively removes all dependences between actors
 scheduled in a steady-state iteration of the stream graph, greatly
 increasing the scheduling freedom.  Like hardware-based pipelining,
-software pipelining allows stateful filters to execute in parallel and
-avoids the communication overhead of data parallelism.  However, it
-avoids the synchronization overhead because processors are reading and
-writing into a buffer rather than directly communicating with another
-processor.
+software pipelining allows stateful filters to execute in parallel.
+% and avoids the communication overhead of data parallelism.  
+However, it avoids the synchronization overhead because processors are
+reading and writing into a buffer rather than directly communicating
+with another processor.
 
 Our techniques for exploiting coarse-grained data and pipeline
 parallelism are complementary, as data-parallel actors can also be
