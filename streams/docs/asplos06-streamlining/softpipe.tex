@@ -1,0 +1,218 @@
+\section{Coarse-Grained Software Pipelining} 
+
+Talk about the benefits of pipeline parallelism
+  expanding upon the introduction
+  talk about state and how it arises and give examples in our apps
+     beamformer and vocoder, referring to results section
+  maybe talk about how it would not help in the case where the entire
+     app is stateless
+  talk about traditional software pipelining defining the term
+  use the analogy to machine instructions
+     work estimation of filters is less accurate, problem not as 
+             constrained...
+     but we are also optimizing for communication, maybe clustered
+             vliw sp
+  put everything in the context of instruction scheduling?
+  why we don't need a modulo scheduling algorithm
+  why we assume iteration interval of one
+  dependencies of the graph
+  how we model computation and communication costs
+  how we reduce communication cost (synchronization annealing)
+  explain the model of execution and what happens at the steady state
+  explain the buffering between filters
+	approximately a 2x increase but it does down with gran adj
+  
+talk about the data-reorganization stage
+
+NP-completeness, running time of algorithms, approximation of greedy
+packing (not too important, but get name correct).
+
+
+There exists an implicit infinite outer loop over the stream graph. We
+recognize this outer loop and apply scheduling techniques
+traditionally reserved for scheduling loops of machine
+instructions. We can think of each filter as a single machine
+instruction and each computational node of the parallel target as a
+functional unit of a uniprocessor. There exists data-flow dependencies
+between filters and filters have an occupancy.  The stream graph, much
+like a data-flow graph composed of machine instructions, encodes the
+data-flow dependencies between filters. Thus, our compiler maps
+filters to computational nodes much like a traditional scheduler maps
+instructions to functional units.
+
+After the software pipeline the stream graph, each computational node
+will have a time-ordered list of filters to fire. Each filter executes
+for the number of times given by the SAS schedule.  The first filter
+mapped to the node will fire when its input has arrived, and when it
+is finished, the next filter will execute.  In this way, a complete
+software pipelined execution will unfold on the target.
+
+The compiler software pipelines the {\it entire} stream graph at the
+filter level. By this we mean that during execution of the
+steady-state, two filters that have a dependence chain between them in
+the filter graph are executing at different iterations of the original
+steady-state loop.  We introduce enough buffering between the filters
+to support this pipelined model. The filters can now execute
+out-of-order within the steady-state, and they do not directly
+communicate.  
+
+To achieve this software pipelined schedule, we must buffer adequately
+between filters.  Each conceptual buffer between two filters is
+represented as a rotating set of buffers (much like a rotating
+register file \textbf{ref?}), with a separate rotation for the
+producer and the consumer, the producer always being ahead of the
+consumer in the rotation.
+
+Synergistically, software pipelining of filters on a parallel
+architecture avoids many of the complications of and exposes many new
+optimization opportunities versus traditional software pipelining.  In
+traditional software pipelining, the limited size of the register file
+is always an adversary (register pressure).  Another recurring issue
+traditionally is the length of the prologue to the software pipelined
+loop, but for our domain we have less interest in this concern because
+the steady-state executes infinitely.  Lastly, and most importantly,
+we can use this synergy to fully pipeline the graph, removing all
+dependencies and thus removing all the constraints for our scheduling
+algorithm.
+
+In our approach, we first assume that we have a machine with infinite
+parallel resources.  We generate a prologue schedule that will
+guarantee that each filter is ready to execute.  In software pipelining
+terminology, the iteration interval is 1.  This is essential because,
+unlike machine instructions, there exists complicated
+data-organization between filters. Therefore, we delay communication
+and data-reorganization between filters until it can be more
+efficiently executed.  We rely on a {\it data-reorganization
+phase} that executes before each steady-state to perform the
+data-reorganization described by each joiner and splitter of the filter
+graph.  {\it Before} we execute a steady-state schedule, all joining
+for the entire filter graph is executed using the buffers in off-chip
+DRAMs as the sources and destinations, and using the interconnect of
+the target to perform the data-reorganization stipulated by each
+joiner.  {\it After} each steady-state completes we perform the analog
+for splitters.
+
+When the steady-state is repeated, the splitting and joining phases
+happen in sequence.  First, we perform all the splitting of the graph
+from the steady-state execution that just finished; then, we perform
+all the joining for the steady-state execution that is about to
+commence. Next, computation of the filters begins.  Observations early
+in the development of the SpaceTime compiler show that this separation
+of computation from data-reorganization has a huge benefit over a
+combined schedule that intermixes the two.  The intuition is that we
+need to route over many of the computational nodes to perform most
+reorganizations, and during the steady-state other are performing the
+computation and communication of other filters; it is very difficult to
+coordinate this interaction efficiently.
+
+The buffers that are the sources and destinations of the
+data-reorganization stage are the rotated.  Each conceptual arc in the
+stream graph is concretely represented by allocating enough buffers as
+the iteration difference between the source and destination filters in
+the steady-state.
+
+\subsection{Selective Fusion}
+\begin{algorithm}
+\caption{Selective Fusion} \label {alg:select_fus}
+\textsc{SelectFusion}($G = (V, E), w, P$)
+\begin{algorithmic}[1]
+\State $(A, proc$-$weight) \gets $ \Call{WorkDist}{$G, w, P$} 
+\State $prev$-$max \gets $ \Call{MaxProc}{$proc$-$weight$}
+\Repeat
+	\State $G_{prev} \gets G$
+	\State $G \gets $ \Call{AdjGreedyFusion}{$G, w$}
+	\State $w \gets $ \Call{UpdateWeights}{G}
+	\State $(A, proc$-$weight) \gets $ \Call{WorkDist}{$G, w, P$}
+	\State $new$-$max \gets $ \Call{MaxProc}{$proc$-$weight$}
+	\State $change \gets prev$-$max / new$-$max $
+	\State $prev$-$max \gets new$-$max$
+\Until{$change < threshold$}
+\State \textbf{return} $G_{prev}$
+\end{algorithmic}
+\end{algorithm}
+
+
+
+\begin{algorithm}
+\caption{Adjacent Greedy Fusion} \label {alg:adj_fus}
+\textsc{AdjGreedyFusion}($G = (V, E), w$)
+\begin{algorithmic}[1]
+\ForAll {$v \in V$}  
+	\ForAll {$u \in V$}
+		\State $pair$-$weight[u,v] \gets \infty$
+	\EndFor
+\EndFor
+\ForAll {$v \in V$}
+\Statex // For a filter, 
+	\If {\Call{Filter}{$v$} $\wedge \mid$\Call{Out}{$v$}$\mid = 1$ $\wedge $ \Call{Filter}{\textsc{Out}$(v)[0]$}}
+		\State $u \gets $ \Call{Out}{$v$}$[0]$
+		\State $pair$-$weight[v,u] \gets w(v) + w(u)$
+	\ElsIf {\Call{Splitter}{$v$}}
+		\Statex // decide if this is a simple splitter
+		\State $simple \gets true$			
+		\ForAll {$d \in $\Call{Out}{$v$}}
+			\If {$\neg$\Call{Filter}{$d$} $ \vee  \neg$\Call{Joiner}{\textsc{Out}($d$)$[0]$}}
+				\State $simple \gets false$
+				\State \textbf{break}
+			\EndIf
+		\EndFor
+		\If {$simple$}
+			\For {$i \gets 0, \mid$\Call{Out}{$v$}$\mid - 1$}
+				\State $x \gets $\Call{Out}{$v$}$[i]$
+				\State $y \gets $\Call{Out}{$v$}$[i + 1]$
+				\State $pair$-$weight[x,y] \gets w(x) + w(y)$
+			\EndFor 
+		\EndIf
+	\EndIf
+\EndFor
+\Statex // Find the min adjacent pair and fuse them
+\State $(p, q) \gets $ \Call{MinPair}{$pair$-$weight$}
+\State $G \gets $ \Call{Fuse}{$G, p, q$}
+\Statex // Delete any splitters that have single output
+\State \Call{RemoveDeadSplitters}{G}
+\Statex // Delete any joiners that have single input
+\State \Call{RemoveDeadJoiners}{G}
+\State \textbf{return} $G$
+\end{algorithmic}
+\end{algorithm}
+
+Why do we only fuse components of a splitjoin when each stream of the
+splitjoin is of height 1 (a filter)?  I know the answer, but the
+reader might wonder why.
+ 
+
+\subsection{Work Distribution}
+Homogeneous, persistent, irregular, resources.
+
+\begin{algorithm}
+\caption{Work Distribution}\label{alg:work_dist}
+%{\small Given: 
+%\begin{itemize}
+%\item a stream graph $G = (V, E)$
+%\item the node weights $w$
+%\item processors $P$
+%\end{itemize}
+%Return:
+%\begin{itemize} 
+%\item $A$, an assignment of nodes to processors.
+%\item $T_p, p \in P,$ the sum of weights of the nodes assigned to proc
+%$p.$
+%\end{itemize}}
+\textsc{WorkDist}($G(V,E), w, P$)
+\begin{algorithmic}[1]
+\ForAll {$p \in P$}
+	\State $proc$-$weight[p] \gets 0$  %\Comment{init the proc weights}
+\EndFor
+\State Sort $v \in V$ in descending order by $w(v)$
+\ForAll {$v \in V$}
+        \State $m \gets $ \Call{MinProc}{$proc$-$weight$}
+	\State $assign[v] \gets m$ %\Comment{Remember the assignment} 
+	\State $proc$-$weight[m] \gets proc$-$weight[m] + w(v)$ %\Comment{Update the work on the proc}
+\EndFor
+\State \textbf{return} $assign$, $proc$-$weight$ 
+\end{algorithmic}
+\end{algorithm}
+
+
+
+\subsection{Synchronization Annealing}
