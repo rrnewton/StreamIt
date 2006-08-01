@@ -27,6 +27,23 @@ talk about the data-reorganization stage
 NP-completeness, running time of algorithms, approximation of greedy
 packing (not too important, but get name correct).
 
+Overview.
+Does not incur overhead of duplicate (data-distribution) vs. the
+thread dup case and still has good load balancing (ideal work numbers).
+
+
+No antidependencies, no output dependencies, no control dependencies!
+only producer/consumer data dependencies.
+Loop-carried dependences from each node to itself
+So difference (dif) between producer and consumer in SS is always one
+iteration difference is at most the max height of the graph 
+(single source, sink)
+Kernel is the steady-state
+Initiation Interval is the critical path (most work tile)
+Iteration count is always 1
+
+No feedbackloops
+
 
 There exists an implicit infinite outer loop over the stream graph. We
 recognize this outer loop and apply scheduling techniques
@@ -110,6 +127,33 @@ data-reorganization stage are the rotated.  Each conceptual arc in the
 stream graph is concretely represented by allocating enough buffers as
 the iteration difference between the source and destination filters in
 the steady-state.
+
+
+Recall that the data-reorganization described by splitters and joiners
+of the graph is implemented by the on-chip network, thus we do not map
+these nodes to computational nodes.  Each filter lives on exactly one
+computational node.  The two initialization schedules described below
+use the assignment of filters to computational nodes calculated by the
+steady-state scheduler.
+
+\subsection{Peek Initialization Schedule}
+Before both the prologue schedule is executed and the steady-state
+schedule is commenced, we perform a {\it peek initialization
+schedule}.  This schedule is required to make sure that we can create
+a cyclic steady-state schedule that respects StreamIt's peeking
+operation.  In this schedule, filters are executed in data-flow order
+and the buffers are not rotated.  Therefore, the prologue schedule
+starts with the rotating buffers untouched.  See
+\cite{streamitcc} for a more complete discussion of the peek
+initialization schedule.
+
+\subsection{Prologue Schedule}
+The prologue schedule guarantees that when the steady-state commences,
+all the filters are ready to fire irrespective of their data-flow
+dependencies.  This schedule is composed of multiple iterations.  At
+each iteration we fire all the filters whose input requirements are met
+from the previous iteration.  We stop the schedule when all filters are
+ready to fire.
 
 \subsection{Selective Fusion}
 \begin{algorithm}
