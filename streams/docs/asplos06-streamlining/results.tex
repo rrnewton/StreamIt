@@ -8,12 +8,12 @@ of the following contributions and conclusions:
 \begin{itemize}
 \item Our technique for exploiting coarse-grained data parallelism
 produces abundant parallelism and achieve a geometric mean performance
-gain of 9.9x over a strictly task parallel baseline.
+gain of 9.9x over a sequential, single-core baseline.
 \item Coarse-grained software pipelining is a
 an effective technique for extracting parallelism beyond task and data
 parallelism, with an additional geometric mean speedup of 1.45x. On
 its own, our software pipelining technique affords a 7.7x performance
-gain over a task parallel baseline.
+gain over a sequential single-core baseline.
 \item The combination of the techniques presented in this paper
 improves upon previous work that exploited a combination of task and
 pipeline parallelism.
@@ -126,7 +126,7 @@ data-parallelizes the bottleneck of the application (a single filter
 that performs more than 6x the work of each of the other filters).
 For DCT, coarse-grained data parallelism achieves a 14.6x speedup over
 single-core, while fine-grained achieves only 4.0x because it fisses
-at too fine a granularity, improperly considering synchronization.
+at too fine a granularity, ignoring synchronization.
 Coarsening and then parallelizing reduces the synchronization costs of
 data parallelizing.  For Radar and Vocoder, data parallelism is
 paralyzed by the preponderance of stateful computation.
@@ -146,7 +146,7 @@ More importantly, combining software pipelining with our data
 parallelism techniques, provides a cumulative performance gain,
 most especially for applications with stateful computation.
 
-Figure \ref{softpipe_graph} considers coarse-grained software
+Figure \ref{fig:softpipe_graph} considers coarse-grained software
 pipelining and task parallelism normalized to single-core performance.
 On average, software pipelining has a speedup of 7.7x over single-core
 (compare to 9.9 for data parallelism) and a speedup of 3.4x over task
@@ -265,7 +265,7 @@ space partitioner is forced to partition these 4 containers (8 filters
 each) into 2 filters that are not load balanced.  Synchronization
 issues not alleviated when forced to fuse to pipeline.
 
-This comparison shows that combining our techniques are important for
+This comparison shows that combining our techniques is important for
 generalization to stateful benchmarks.  For Radar, data parallelism
 loses to this baseline by 19\%, while the combined technique enjoys a
 38\% speedup. For Vocoder, data parallelism is 18\% slower, while the
@@ -277,12 +277,12 @@ load-balanced, including FFT, TDE, and Serpent.  For example, the
 stream graph for Serpent is a pipeline of identical splitjoins that is
 fused down to a balanced pipeline.  The baseline incurs less
 synchronization and consequently its compute utilization is higher
-(64\%).  The combined approach fuses Serpent to a single filter and
-then fisses it 16 ways (no software pipelining occurs), not always the
-right thing to do... However, although Raw's on-chip network is
-well-suited to pipeline communication, most other contemporary
-multicore architectures do not provide a low-latency, fine-grained
-on-chip interconnect.
+(64\% versus 57\%).  The combined approach fuses Serpent to a single
+filter and then fisses it 16 ways, not
+always the right thing to do... However, although Raw's on-chip
+network is well-suited to pipeline communication, most other
+contemporary multicore architectures do not provide a low-latency,
+fine-grained on-chip interconnect.
 
 
 
