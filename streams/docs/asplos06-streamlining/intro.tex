@@ -136,7 +136,10 @@ The rest of this paper is organized as follows.  (blah blah blah.)
 \centering
 \psfig{figure=vocoder.eps,width=3in}
 \caption{Stream graph for a simplified subset of our Vocoder
-benchmark.\label{fig:vocoder}}
+benchmark.  Following a bank of sliding DFTs, the signal is converted
+to polar coordinates.  Node {\tt B2} sends the magnitude component to
+the left and the phase component to the right.  In this simplified
+example, no magnitude adjustment is needed.\label{fig:vocoder}}
 \end{figure}
 
 \begin{figure*}[t]
