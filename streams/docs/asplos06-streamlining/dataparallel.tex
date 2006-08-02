@@ -1,0 +1,50 @@
+\begin{figure}[t]
+\psfig{figure=filterbank-orig.eps,width=3in}
+\end{figure}
+
+\begin{figure}[t]
+\psfig{figure=filterbank-dup.eps,width=3in}
+\end{figure}
+
+\section{Coarse-Grained Data Parallelism}
+
+While there is often widespread data-parallelism in a stream graph, 
+
+- two components -- granularity and task parallelism
+
+a. granularity
+
+primary benefit is for pipelines in the stream graph
+
+i. scheduling on same node, replaces ld/store from global memory with
+ld/store from local memory.
+
+  - effectively increases computation/communication ratio of something
+    scheduled for a given node
+
+ii. compiler-directed fusion can allow inter-node optimizations
+  - removing copy operations
+  - reference to linear
+
+b. task parallelism
+
+ - if there is already some natural parallelism in the stream graph,
+   do not need to further duplicate
+
+ - so for given filter, compiler estimates work that is running in
+   parallel with it, and only expands the parallelism of that node by
+   the appropriate amount
+
+-----------
+
+  cousins
+  stateless fusion
+  fusing resulting pipelining for thread case, not for swpipe foward pointer
+  forward pointer to results 
+  leaves out stateful cases!
+
+optimizations due to fusion:
+ - avoids copy operations 
+ - replaces inter-processor communication with memory operations
+ - inter-node optimizations
+ - can register-allocate?
