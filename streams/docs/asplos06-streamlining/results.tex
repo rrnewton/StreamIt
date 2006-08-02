@@ -242,34 +242,14 @@ and the on-chip static network for communication and
 synchronization. Our new techniques achieve a mean speedup of 1.84x
 over this baseline.  
 
-As mentioned in Section \ref{sec:space-imp}, this baseline employs the
-fission and local fusion transformations to arrive at a load-balanced
-graph for space-multiplexed execution.  It is limited to fusing local
-sections of the stream graph in the hope of creating a load-balanced
-pipeline parallel graph, relying heavily on the accuracy of the static
-work estimation strategy.  Also, it attempts to orchestrate
-communication...
- 
-DCT: must be partitioned to 16 tiles, the bottleneck is fissed 2 ways,
-but the remaining stages must be fused to 4-way and they become the
-bottleneck, plus synchronization!
-
-For MPEGDecoder, the space partitioner must fuse down to 16 tiles removing task
-parallelism of the program, and the work is not evenly distributed
-across the application, resulting partitioning is not load-balanced,
-dominated by a single filter that does more than 2x the amount of work
-than the next largest filter.
-
-DES:somewhat complicated graph repeated 4 time between some filters,
-space partitioner is forced to partition these 4 containers (8 filters
-each) into 2 filters that are not load balanced.  Synchronization
-issues not alleviated when forced to fuse to pipeline.
-
-This comparison shows that combining our techniques is important for
-generalization to stateful benchmarks.  For Radar, data parallelism
-loses to this baseline by 19\%, while the combined technique enjoys a
-38\% speedup. For Vocoder, data parallelism is 18\% slower, while the
-combined technique is 30\% faster.
+For most of our benchmarks, the combined techniques presented in this
+paper offer improved data parallelism, improved scheduling
+flexibility, and reduced synchronization compared to our previous
+work. This comparison demonstrates that combining our techniques is
+important for generalization to stateful benchmarks.  For Radar, data
+parallelism loses to this baseline by 19\%, while the combined
+technique enjoys a 38\% speedup. For Vocoder, data parallelism is 18\%
+slower, while the combined technique is 30\% faster.
 
 The task plus pipeline parallel baseline performs exceptionally well
 for applications that contain long pipelines that can be
@@ -278,13 +258,34 @@ stream graph for Serpent is a pipeline of identical splitjoins that is
 fused down to a balanced pipeline.  The baseline incurs less
 synchronization and consequently its compute utilization is higher
 (64\% versus 57\%).  The combined approach fuses Serpent to a single
-filter and then fisses it 16 ways, not
-always the right thing to do... However, although Raw's on-chip
-network is well-suited to pipeline communication, most other
-contemporary multicore architectures do not provide a low-latency,
-fine-grained on-chip interconnect.
+filter and then fisses it 16 ways, converting the pipeline parallelism
+into data parallelism.  Fission communication using a splitjoin is
+more expensive than the pipeline communication of the baseline.
+However, although Raw's on-chip network is well-suited to pipeline
+communication, most other contemporary multicore architectures do not
+provide a low-latency, fine-grained on-chip interconnect enabling
+optimized pipeline parallelism between cores.
 
 
+%For
+%example, the single data parallel bottleneck in DCT is fissed only
+%two ways in the baseline before the remainder of the pipeline becomes
+%the bottleneck.  The partitioner DES
+
+%DCT: must be partitioned to 16 tiles, the bottleneck is fissed 2 ways,
+%but the remaining stages must be fused to 4-way and they become the
+%bottleneck, plus synchronization!
+
+%For MPEGDecoder, the space partitioner must fuse down to 16 tiles removing task
+%parallelism of the program, and the work is not evenly distributed
+%across the application, resulting partitioning is not load-balanced,
+%dominated by a single filter that does more than 2x the amount of work
+%than the next largest filter.
+
+%DES:somewhat complicated graph repeated 4 time between some filters,
+%space partitioner is forced to partition these 4 containers (8 filters
+%each) into 2 filters that are not load balanced.  Synchronization
+%issues not alleviated when forced to fuse to pipeline.
 
 %Also the way we simulate input differs between the two backends.  Task
 %+ Pipeline attaches the input and output devices to the chip in the
