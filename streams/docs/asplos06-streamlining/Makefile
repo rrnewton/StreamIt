@@ -1,5 +1,5 @@
 asplos172-gordon.ps: clean asplos172-gordon.dvi
-	dvips asplos172-gordon.dvi -o asplos172-gordon.ps
+	dvips -t letter -P cmz asplos172-gordon.dvi -o asplos172-gordon.ps
 
 asplos172-gordon.pdf: clean asplos172-gordon.dvi asplos172-gordon.ps
 	ps2pdf asplos172-gordon.ps asplos172-gordon.pdf

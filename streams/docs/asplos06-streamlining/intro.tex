@@ -26,12 +26,13 @@ Spidle\cite{} are motivated not only by trends in computer
 architecture, but also by trends in the application space, as image,
 voice, and multimedia programs are becoming only more prevalent.  In a
 stream language, a program is represented as a set of autonomous
-actors that communicate through FIFO data channels.  During program
-execution, actors fire repeatedly in a periodic schedule.  As each
-actor has a separate program counter and an independent address space,
-all dependences between actors are made explicit by the communication
-channels.  Compilers can leverage this dependence information to
-orchestrate parallel execution.
+actors that communicate through FIFO data channels (see
+Figure~\ref{fig:vocoder}).  During program execution, actors fire
+repeatedly in a periodic schedule.  As each actor has a separate
+program counter and an independent address space, all dependences
+between actors are made explicit by the communication channels.
+Compilers can leverage this dependence information to orchestrate
+parallel execution.
 
 Despite the abundance of parallelism in stream programs, it is
 nonetheless a challenging problem to obtain an efficient mapping to a
@@ -45,42 +46,42 @@ avoiding the hazards associated with each.
 
 Task parallelism refers to pairs of actors that are on different
 parallel branches of the original stream graph, as written by the
-programmer (see figure?).  That is, the output of each actor never
-reaches the input of the other.  In stream programs, task parallelism
-reflects logical parallelism in the underlying algorithm.  It is easy
-to exploit by mapping each task to an independent processor and
-splitting or joining the data stream at the endpoints.  The hazards
-associated with task parallelism are the communication and
+programmer.  That is, the output of each actor never reaches the input
+of the other.  In stream programs, task parallelism reflects logical
+parallelism in the underlying algorithm.  It is easy to exploit by
+mapping each task to an independent processor and splitting or joining
+the data stream at the endpoints (see Figure~\ref{fig:exemodel}b).
+The hazards associated with task parallelism are the communication and
 synchronization associated with the splits and joins.  Also, as the
 granularity of task parallelism depends on the application (and the
 programmer), it is not sufficient as the only source of parallelism.
 
 Data parallelism refers to actors that have no dependences between one
-execution and the next (see figure?).  Such ``stateless''
-actors\footnote{A stateless actor may still have read-only state.}
-offer unlimited data parallelism, as different instances of the actor
-can be spread across any number of computation units.  However, while
-data parallelism is well-suited to vector machines, on coarse-grained
-multicore architectures it can introduce excessive communication
-overhead.  Previous data-parallel streaming architectures have focused
-on designing a special memory hierarchy to support this
-communication\cite{imagine}.  The other hazards of data parallelism
-include increased buffering and latency, as well as the inability to
-parallelize actors with state.
+execution and the next.  Such ``stateless'' actors\footnote{A
+stateless actor may still have read-only state.}  offer unlimited data
+parallelism, as different instances of the actor can be spread across
+any number of computation units (see Figure~\ref{fig:exemodel}c).
+However, while data parallelism is well-suited to vector machines, on
+coarse-grained multicore architectures it can introduce excessive
+communication overhead.  Previous data-parallel streaming
+architectures have focused on designing a special memory hierarchy to
+support this communication\cite{imagine}.  The other hazards of data
+parallelism include increased buffering and latency, as well as the
+inability to parallelize actors with state.
 
 Pipeline parallelism applies to chains of producers and consumers that
-are directly connected in the stream graph.  In our previous work, we
-exploited pipeline parallelism by mapping clusters of producers and
-consumers to different cores and using an on-chip network for direct
-communication between actors\cite{gordon02asplos}.  Compared to data
-parallelism, this approach offers reduced latency, reduced buffering,
-and good locality.  It does not introduce any extraneous
-communication, and it provides the new ability to execute stateful
-actors in parallel.  However, this form of pipelining introduces
-extra synchronization, as producers and consumers must stay tightly
-coupled in their execution.  In addition, effective load balancing is
-critical, as the throughput of the stream graph is equal to the
-minimum throughput across all of the processors.
+are directly connected in the stream graph.  In our previous
+work\cite{gordon02asplos}, we exploited pipeline parallelism by
+mapping clusters of producers and consumers to different cores and
+using an on-chip network for direct communication between actors (see
+Figure~\ref{fig:exemodel}d).  Compared to data parallelism, this
+approach offers reduced latency, reduced buffering, and good locality.
+It does not introduce any extraneous communication, and it provides
+the new ability to execute stateful actors in parallel.  However, this
+form of pipelining introduces extra synchronization, as producers and
+consumers must stay tightly coupled in their execution.  In addition,
+effective load balancing is critical, as the throughput of the stream
+graph is equal to the minimum throughput across all of the processors.
 
 In this paper, we present two novel techniques for overcoming the
 traditional limitations in exploiting task, data, and pipeline
@@ -130,3 +131,15 @@ The rest of this paper is organized as follows.  (blah blah blah.)
 %% Cavium OCTEON Processors?  cavium.com
 %% Rapport KC256 www.rapportincorporated.com
 %% PicoChip's PicoArray
+
+\begin{figure}[t]
+\centering
+\psfig{figure=vocoder.eps,width=3in}
+\caption{Stream graph for a simplified subset of our Vocoder
+benchmark.\label{fig:vocoder}}
+\end{figure}
+
+\begin{figure*}[t]
+\psfig{figure=time-proc-4-1.eps,width=7in}
+\caption{Parallel execution models for stream programs.  Each block corresponds to a filter in the Vocoder example (Figure~\ref{fig:vocoder}).  The height of the block reflects the amount of work contained in the filter.\label{fig:exemodel}}
+\end{figure*}
