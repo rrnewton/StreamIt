@@ -180,11 +180,16 @@ achieve a 45\% mean speedup over data parallelism alone. The
 cumulative effect is most prominent when the application in question
 contains significant amounts of stateful computation.  For example,
 the combined technique achieves a 69\% speedup over each individual
-technique for Vocoder. For most of our other applications, software
-pipeline further coarsens the stream graph without affecting the
-critical path work (as estimated statically) and performs inter-core
-communication in parallel.  Each reduces the synchronization
-encountered on the critical path.
+technique for Vocoder. For the 6 stateless benchmarks without peeking,
+the software pipeliner does not have an effect because the application
+composed of solely of a 16-way splitjoin of filters executing
+in a data parallel fashion.
+
+For most of the remaining benchmarks (ChannelVocoder, FilterBank, and
+FM), software pipelining further coarsens the stream graph without
+affecting the critical path work (as estimated statically) and
+performs inter-core communication in parallel.  Each reduces the
+synchronization encountered on the critical path.
 
 The combined technique depresses the performance of MPEG by 6\%
 because the Selective Fusion component of the software pipeliner fuses
@@ -229,32 +234,27 @@ greater.
 \protect\label{fig:thruput}}
 \end{figure*}
 In Figure \ref{fig:vs-space} we show our combined technique normalized
-to our previous work \cite{streamit-asplos}.  
+to our previous work for compiling streaming applications to multicore
+architectures.  This baseline configuration is a maturation of the
+ideas presented in \cite{streamit-asplos} and implements a task plus
+pipeline parallel execution model relying solely on on-chip buffering
+and the on-chip static network for communication and
+synchronization. Our new techniques achieve a mean speedup of 1.84x
+over this baseline.  
 
-Space good versus us for applications composed of long pipelines with little
-splitting, including FFT5, tde
-
-Serpent is fused down to a load-balanced pipeline, splitjoins
-composed in a pipeline, space version has util of 64\% we are fusing
-then taking advantage of pipeline parallelism, not always the right
-thing to do.
-
-Talk more about using on-chip network
-
-Also the way we simulate input differs between the two backends.  Task
-+ Pipeline attaches the input and output devices to the chip in the
-place of dram, and the input is continuously streamed onto the chip.
-The new backend fetches input and writes output from/to the DRAMs,
-generating a DRAM command.
-
-Raw's on-chip network is well-suited to pipeline communication, but it
-does not approximate any other multicore.
-
+As mentioned in Section \ref{sec:space-imp}, this baseline employs the
+fission and local fusion transformations to arrive at a load-balanced
+graph for space-multiplexed execution.  It is limited to fusing local
+sections of the stream graph in the hope of creating a load-balanced
+pipeline parallel graph, relying heavily on the accuracy of the static
+work estimation strategy.  Also, it attempts to orchestrate
+communication...
+ 
 DCT: must be partitioned to 16 tiles, the bottleneck is fissed 2 ways,
 but the remaining stages must be fused to 4-way and they become the
 bottleneck, plus synchronization!
 
-MPEG: space partitioner must fuse down to 16 tiles removing task
+For MPEGDecoder, the space partitioner must fuse down to 16 tiles removing task
 parallelism of the program, and the work is not evenly distributed
 across the application, resulting partitioning is not load-balanced,
 dominated by a single filter that does more than 2x the amount of work
@@ -265,10 +265,30 @@ space partitioner is forced to partition these 4 containers (8 filters
 each) into 2 filters that are not load balanced.  Synchronization
 issues not alleviated when forced to fuse to pipeline.
 
-Stateful benchmarks, compare without softpipe to space, and
-then softpipe kicks in, hopefully, like 
-vocoder:
-beamformer:Task + Data loses to space by 19\%, T+D+SP beats space by
-38\%
-vocoder:T+D loses to space by 18\%, T+D+SP beats space by 30\%.
+This comparison shows that combining our techniques are important for
+generalization to stateful benchmarks.  For Radar, data parallelism
+loses to this baseline by 19\%, while the combined technique enjoys a
+38\% speedup. For Vocoder, data parallelism is 18\% slower, while the
+combined technique is 30\% faster.
+
+The task plus pipeline parallel baseline performs exceptionally well
+for applications that contain long pipelines that can be
+load-balanced, including FFT, TDE, and Serpent.  For example, the
+stream graph for Serpent is a pipeline of identical splitjoins that is
+fused down to a balanced pipeline.  The baseline incurs less
+synchronization and consequently its compute utilization is higher
+(64\%).  The combined approach fuses Serpent to a single filter and
+then fisses it 16 ways (no software pipelining occurs), not always the
+right thing to do... However, although Raw's on-chip network is
+well-suited to pipeline communication, most other contemporary
+multicore architectures do not provide a low-latency, fine-grained
+on-chip interconnect.
+
+
+
+%Also the way we simulate input differs between the two backends.  Task
+%+ Pipeline attaches the input and output devices to the chip in the
+%place of dram, and the input is continuously streamed onto the chip.
+%The new backend fetches input and writes output from/to the DRAMs,
+%generating a DRAM command.
 
