@@ -1,4 +1,81 @@
-\section{Coarse-Grained Software Pipelining} 
+\begin{figure}[t]
+\psfig{figure=pipeline-scaling.eps,width=3in}
+\end{figure}
+
+\section{Coarse-Grained Software Pipelining}
+
+Pipeline parallelism is an important mechanism for parallelizing
+filters that have dependences from one iteration to another.  Such
+``stateful'' filters are not data parallel and do not benefit from the
+techniques described in the previous section.  While many streaming
+applications have abundant data parallelism, even a small number of
+stateful filters can greatly limit the performance of a purely
+data-parallel approach on a large multicore architecture.
+
+The potential benefits of pipeline parallelism are straightforward to
+quantify.  Consider that the sequential execution of an application
+requires unit time, and let $s$ denote the fraction of work
+(sequential execution time) that is spent within stateful filters.
+Also let $m$ denote the maximum work performed by any individual
+stateful filter.  Given $N$ processing cores, let us consider the load
+balancing achieved by a data-parallel and pipeline-parallel execution
+model.  In this exercise, we do not model the costs of communication,
+synchronization, locality, etc.
+
+\begin{itemize}
+\item Using data parallelism, $1-s$ parts of the work are
+data-parallel and can be spread across all $N$ cores, yielding a
+parallel execution time of $(1-s)/N$.  The stateful work must be run
+as a separate stage on a single core, adding $s$ units to the overall
+execution.  The total execution time is $s+(1-s)/N$.
+
+\item Using pipeline parallelism, any set of filters can execute in
+parallel during the steady state.  The stateful filters can be
+assigned to the processors, minimizing the maximum amount of work
+allocated to any processor.  Even a greedy assignment (filling up one
+processor at a time) guarantees that no processor exceeds the ideal
+work balance of $s/N$ by more than $m$, the bottleneck stateful
+filter.  Thus, the stateful work can always complete in $s/N+m$ time.
+Remaining data parallelism can be freely distributed across
+processors.  If it fills each processor to $s/N+m$ or beyond, then
+there is perfect utilization and execution completes in $1/N$ time;
+otherwise, the state is the bottleneck.  Thus the general execution
+time is $\max(s/N+m, 1/N)$.
+
+%% \begin{itemize}
+
+%% \item In the worst case, there is only one stateful filter.  It
+%% executes on 1 core, while the other $N-1$ cores are filled with data
+%% parallelism.  If $s > 1/N$, then the data-parallel work finishes
+%% first, and the overall execution time is $s$.  Otherwise, at time $s$
+%% the data-parallelism can be extended to the core executing stateful
+%% work, thereby achieving perfect load balance throughout the
+%% application.  The overall runtime is thus $\max(s, 1/N)$.
+
+%% \item In the best case, the stateful filters can be distributed across
+%% cores such that any resulting load imbalance can be compensated by the
+%% data-parallelism.  Thus, all cores are fully utilized and the runtime
+%% is $1/N$.
+
+%% \end{\itemize}
+
+\end{itemize}
+
+Using these modeled runtimes, Figure~\ref{fig:model-speedup}
+illustrates the potential speedup (due to load balancing) of
+pipeline-parallel execution over data-parallel execution for various
+values of $m/s$ on a 16-core architecture.  In the best case, $m/s$
+approaches $0$ and the speedup is $(s+(1-s)/N)/\max(s/N, 1/N) =
+1+s*N$.  For example, if there are $16$ cores and even as little as
+$1/16$th of the work is stateful, then pipeline parallelism offers
+potential gains of 2X.  For these parameters, the worst-case gain
+($m=s$) is also 2X.  The best and worst cases diverge for larger
+values of $s$.
+
+To realize the full potential of pipeline parallelism, it is critical
+to offer an implementation that reaps the full benefits of load
+balancing without introducing undue synchronization between producers
+and consumers.
 
 Talk about the benefits of pipeline parallelism
   expanding upon the introduction
