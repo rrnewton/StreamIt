@@ -1,3 +1,42 @@
-\section{Programming Model}
+\section{The StreamIt Language}
 
-- work estimation
+StreamIt is an architecture-independent programming language for
+high-performance streaming
+applications~\cite{streamitcc,streamit-lang-spec}.  As described
+previously, it represents programs as a set of independent actors
+(referred to as {\it filters} in StreamIt) that use explicit data
+channels for all communication.  Each filter contains a {\tt work}
+function that executes a single step of the filter.  From within {\tt
+work}, filters can {\it push} items onto the output channel, {\it pop}
+items from the input channel, or {\it peek} at an input item without
+removing it from the channel.  
+%Peeking enables a natural expression of
+%sliding-window computations (e.g., FIR filters).  
+While peeking requires special care in parts of our analysis, it is
+critical for exposing data parallelism in sliding-window filters
+(e.g., FIR filters), as they would otherwise need internal state.
+
+StreamIt provides three hierarchical primitives for composing filters
+into larger stream graphs.  A {\it pipeline} connects streams
+sequentially; for example, there is a four-element pipeline begining
+with {\tt UnwrapPhase} in the Vocoder example
+(Figure~\ref{fig:vocoder}).  A {\it splitjoin} specifies independent,
+task-parallel streams that diverge from a common {\it splitter} and
+merge into a common {\it joiner}.  For example, the {\tt AdapativeDFT}
+filters in Figure~\ref{fig:vocoder} form a two-element splitjoin (each
+filter is configured with different parameters).  The final
+hierarchical primitive in StreamIt is the {\it feedbackloop}, which
+provides a way to create cycles in the graph.  In practice,
+feedbackloops are rare and we do not consider them in this paper.
+
+In this paper, we require that the push, pop, and peek rates of each
+filter are known at compile time.  This enables the compiler to
+calculate a steady-state for the stream graph: a repetition of each
+filter that does not change the number of items buffered on any data
+channel~\cite{lee-messserchmidt93staticscheduling,karczma03lctes}.  In
+combination with a simple program analysis that estimates the number
+of operations performed on each invocation of a given work function,
+the steady-state multiplicities offer an estimate of the work
+performed by a given filter as a fraction of the overall program
+execution.  This estimate is important for our software pipelining
+technique.
