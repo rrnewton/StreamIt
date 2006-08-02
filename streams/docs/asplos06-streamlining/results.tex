@@ -19,8 +19,10 @@ improves upon previous work that exploited a combination of task and
 pipeline parallelism.
 \end{itemize}
 
-First, we present a description of the benchmark suite employed
-in the evaluation.
+In the evaluation, speedup is calculated as the throughput ratio of an
+average steady-state.  The initialization and prologue schedules are
+not included.  First, we present a description of the benchmark suite
+employed in the evaluation.
 
 \begin{figure*}[t]
 \centering
@@ -116,18 +118,18 @@ coarse-grained data parallelism over single-core StreamIt. The mean
 speedup across our suite is 9.9x over single-core and 4.36x over our
 task parallel baseline (not shown in the figure).  BitonicSort, whose
 original granularity was too fine, now achieves a 8.4x speedup over a
-single-core. 6 of our 12 applications are stateless and non-peeking,
-and thus fuse to one filter that is fissed 16 ways.  For these
-benchmarks the mean speedup is 11.1x over the single-core.  For DCT,
-the algorithm data-parallelizes the bottleneck of the application (a
-single filter that performs more than 6x the work of each of the other
-filters).  For DCT, coarse-grained data parallelism achieves a 14.6x
-speedup over single-core, while fine-grained achieves only 4.0x
-because it fisses at too fine a granularity, improperly considering
-synchronization.  Coarsening and then parallelizing reduces the
-synchronization costs of data parallelizing.  For Radar and Vocoder,
-data parallelism is paralyzed by the preponderance of stateful
-computation.
+single-core. 6 of our 12 applications are stateless and non-peeking
+(BitonicSort, DCT, DES, FFT, Serpent, and TDE) and thus fuse to one
+filter that is fissed 16 ways.  For these benchmarks the mean speedup
+is 11.1x over the single-core.  For DCT, the algorithm
+data-parallelizes the bottleneck of the application (a single filter
+that performs more than 6x the work of each of the other filters).
+For DCT, coarse-grained data parallelism achieves a 14.6x speedup over
+single-core, while fine-grained achieves only 4.0x because it fisses
+at too fine a granularity, improperly considering synchronization.
+Coarsening and then parallelizing reduces the synchronization costs of
+data parallelizing.  For Radar and Vocoder, data parallelism is
+paralyzed by the preponderance of stateful computation.
 
 \subsection{Exploiting Coarse-Grained Software Pipeline Parallelism}
 
@@ -181,15 +183,13 @@ cumulative effect is most prominent when the application in question
 contains significant amounts of stateful computation.  For example,
 the combined technique achieves a 69\% speedup over each individual
 technique for Vocoder. For the 6 stateless benchmarks without peeking,
-the software pipeliner does not have an effect because the application
-composed of solely of a 16-way splitjoin of filters executing
-in a data parallel fashion.
-
-For most of the remaining benchmarks (ChannelVocoder, FilterBank, and
-FM), software pipelining further coarsens the stream graph without
-affecting the critical path work (as estimated statically) and
-performs inter-core communication in parallel.  Each reduces the
-synchronization encountered on the critical path.
+software pipelining enjoys a benefit versus task parallelism because
+there exists small amounts of hardware parallelism across 
+steady-states.  For ChannelVocoder, FilterBank, and FM, software
+pipelining further coarsens the stream graph without affecting the
+critical path work (as estimated statically) and performs inter-core
+communication in parallel.  Each reduces the synchronization
+encountered on the critical path.
 
 The combined technique depresses the performance of MPEG by 6\%
 because the Selective Fusion component of the software pipeliner fuses
@@ -207,15 +207,15 @@ because we fiss too aggressively and create synchronization across the
 critical path.
 
 In Figure \ref{fig:thruput}, we report the compute utilization and the
-MFLOPS performance for each benchmark employing the combination of our
-techniques. Note that for our target architecture, the maximum number
-of MFLOPS achievable is 7200.  The compute utilization is calculated
-as the number of instructions issued on each computer processor
-divided by the total number possible for a steady-state.  The
-utilization accurately models pipeline hazards and stalls of Raw's
-single issue, in-order processing cores.  We achieve generally
-excellent compute utilization; in 7 cases the utilization is 60\% or
-greater.
+MFLOPS performance (N/A for integer benchmarks) for each benchmark
+employing the combination of our techniques. Note that for our target
+architecture, the maximum number of MFLOPS achievable is 7200.  The
+compute utilization is calculated as the number of instructions issued
+on each computer processor divided by the total number possible for a
+steady-state.  The utilization accurately models pipeline hazards and
+stalls of Raw's single issue, in-order processing cores.  We achieve
+generally excellent compute utilization; in 7 cases the utilization is
+60\% or greater.
 
 
 \subsection{Comparison To Previous Work}
