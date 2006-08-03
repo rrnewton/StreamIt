@@ -79,7 +79,7 @@ is blocking and has little buffering, the simulated annealing cost
 function attempts to model the synchronization costs of each layout
 configuration encountered during the search. 
 
-\subsection{New Backend}
+\subsection{Compiler and Execution Model}
 For this paper we have implemented a new backend targeting Raw that
 does not solely rely on a space-multiplexed approach.  The new backend
 adopts a more flexible approach for its execution model. Multiple
@@ -185,8 +185,7 @@ computation code of a filter.  For the results detailed in the next
 section we ran a host of optimizations including function inlining,
 constant propagation, constant folding, array scalarization, and loop
 unrolling (with a factor of 4).  These optimizations are especially
-important for a fused filter, as we can unroll it, and .  Possibly
-scalarizing the buffers within the fused filter used for communication
-between the constituent filters.  Finally, the two backends produce a
-mix of C and assembly code that is compiled with GCC 3.4 at
-optimization level 3.
+important for a fused filter, as we can possibly unroll enough to
+scalarize the splitter and joiner buffers, eliminating the shuffling
+operations.  Finally, the two backends produce a mix of C and assembly
+code that is compiled with GCC 3.4 at optimization level 3.
