@@ -26,34 +26,34 @@ data-parallel approach on a large multicore architecture.
 
 The potential benefits of pipeline parallelism are straightforward to
 quantify.  Consider that the sequential execution of an application
-requires unit time, and let $s$ denote the fraction of work
+requires unit time, and let $\sigma$ denote the fraction of work
 (sequential execution time) that is spent within stateful filters.
-Also let $m$ denote the maximum work performed by any individual
+Also let $\mu$ denote the maximum work performed by any individual
 stateful filter.  Given $N$ processing cores, let us consider the load
-balancing achieved by a data-parallel and pipeline-parallel execution
-model.  In this exercise, we do not model the costs of communication,
-synchronization, locality, etc.  We also do not model the effects of
-task parallelism.
+balancing achieved by two execution models: 1) data parallelism, and
+2) data parallelism plus pipeline parallelism.  In this exercise, we
+do not model the costs of communication, synchronization, locality,
+etc.  We also do not model the impact of task parallelism.
 
-\begin{itemize}
-\item Using data parallelism, $1-s$ parts of the work are
+\begin{enumerate}
+\item Using data parallelism, $1-\sigma$ parts of the work are
 data-parallel and can be spread across all $N$ cores, yielding a
-parallel execution time of $(1-s)/N$.  The stateful work must be run
-as a separate stage on a single core, adding $s$ units to the overall
-execution.  The total execution time is $s+(1-s)/N$.
+parallel execution time of $(1-\sigma)/N$.  The stateful work must be
+run as a separate stage on a single core, adding $\sigma$ units to the
+overall execution.  The total execution time is $\sigma+(1-\sigma)/N$.
 
-\item Using pipeline parallelism, any set of filters can execute in
-parallel during the steady state.  The stateful filters can be
-assigned to the processors, minimizing the maximum amount of work
+\item Using data and pipeline parallelism, any set of filters can
+execute in parallel during the steady state.  The stateful filters can
+be assigned to the processors, minimizing the maximum amount of work
 allocated to any processor.  Even a greedy assignment (filling up one
 processor at a time) guarantees that no processor exceeds the ideal
-work balance of $s/N$ by more than $m$, the bottleneck stateful
-filter.  Thus, the stateful work can always complete in $s/N+m$ time.
-Remaining data parallelism can be freely distributed across
-processors.  If it fills each processor to $s/N+m$ or beyond, then
-there is perfect utilization and execution completes in $1/N$ time;
-otherwise, the state is the bottleneck.  Thus the general execution
-time is $\max(s/N+m, 1/N)$.
+work balance of $\sigma/N$ by more than $\mu$, the bottleneck stateful
+filter.  Thus, the stateful work can always complete in $\sigma/N+\mu$
+time.  Remaining data parallelism can be freely distributed across
+processors.  If it fills each processor to $\sigma/N+\mu$ or beyond,
+then there is perfect utilization and execution completes in $1/N$
+time; otherwise, the state is the bottleneck.  Thus the general
+execution time is $\max(\sigma/N+\mu, 1/N)$.
 
 %% \begin{itemize}
 
@@ -72,18 +72,18 @@ time is $\max(s/N+m, 1/N)$.
 
 %% \end{\itemize}
 
-\end{itemize}
+\end{enumerate}
 
 Using these modeled runtimes, Figure~\ref{fig:model-speedup}
-illustrates the potential speedup (due to load balancing) of
-pipeline-parallel execution over data-parallel execution for various
-values of $m/s$ on a 16-core architecture.  In the best case, $m/s$
-approaches $0$ and the speedup is $(s+(1-s)/N)/\max(s/N, 1/N) =
-1+s*N$.  For example, if there are $16$ cores and even as little as
-$1/16$th of the work is stateful, then pipeline parallelism offers
-potential gains of 2X.  For these parameters, the worst-case gain
-($m=s$) is also 2X.  The best and worst cases diverge for larger
-values of $s$.
+illustrates the potential speedup (due to load balancing) of adding
+pipeline parallelism to a data-parallel execution model for various
+values of $\mu/\sigma$ on a 16-core architecture.  In the best case,
+$\mu/\sigma$ approaches $0$ and the speedup is
+$(\sigma+(1-\sigma)/N)/\max(\sigma/N, 1/N) = 1+\sigma*N$.  For
+example, if there are $16$ cores and even as little as $1/16$th of the
+work is stateful, then pipeline parallelism offers potential gains of
+2x.  For these parameters, the worst-case gain ($\mu=\sigma$) is also
+2x.  The best and worst cases diverge for larger values of $\sigma$.
 
 \subsection{Exploiting Pipeline Parallelism}
 
