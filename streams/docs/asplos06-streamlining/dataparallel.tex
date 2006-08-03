@@ -67,9 +67,9 @@ peek rate exceeds their pop rate.
 
 \begin{algorithm}[t]
 \caption{Granularity coarsening algorithm to expose coarse-grained
-data parallelism.} \label{fig:coarsening-code}
+data parallelism. \label{fig:coarsening-code}}
 \textsc{CoarsenGranularity}()
-\begin{algorithmic}[1]
+\begin{algorithmic}
 \Repeat
 	\ForAll{$(f_1, f_2)$ pairs of adjacent stateless filters}
 		\If {$f_1$ and $f_2$ in a splitjoin}
@@ -160,34 +160,61 @@ also have a significant impact on performance.
 
 \subsection{Complementing Task Parallelism}
 
-\begin{figure}[t]
-\framebox{TODO: typeset this code.}
-\small
-\begin{verbatim}
-// F is the filter to fiss; N is the total number of cores
-JudiciousFission(filter F, int N) {
-  // estimate work done by F as fraction of 
-  // everyone running task-parallel to F
-  fraction = 1.0
-  Stream parent = getParent(F)
-  Stream child = f
-  while (parent != null) {
-    if (parent is splitjoin)
-      totalWork = sum_{c \in children(parent)} avgWorkPerFilter(c)
-      myWork = avgWorkPerFilter(child)
-      fraction = fraction * myWork / totalWork
-    endif
-    child = parent
-    parent = getParent(parent)
-  endwhile
-  // fiss F according to its weight in task-parallel unit
-  fiss F into ceil(fraction*N) filters
-}
-\end{verbatim}
+\begin{algorithm}[t]
 \caption{Heuristic algorithm for fissing a filter as little as
 possible while filling all cores with task or data-parallel
-work.\label{fig:judicious-fission}}
-\end{figure}
+work. \label{fig:judicious-fission}}
+{$\triangleright$ F is the filter to fiss; N is the total number of cores\\
+\textsc{JudiciousFission}(filter $F$, int $N$)}
+\begin{algorithmic}
+\Statex $\triangleright$ Estimate work done by F as fraction of
+\Statex $\triangleright$ everyone running task-parallel to F
+\State $fraction = 1.0$
+\State Stream $parent \gets $ \Call{getParent}{$F$}
+\State Stream $child \gets F$
+\While {$parent \not= $ null}
+	\If {$parent$ is splitjoin}
+		\State $total$-$work \gets$ \\
+\ \ \ \ \ \ \ \ \ \ \ \ \ \  \ \ \ \ \  $\sum_{c \in children(parent)}$ \Call{avgWorkPerFilter}{$c$}
+		\State $my$-$work \gets $ \Call{avgWorkPerFilter}{$child$}
+		\State $fraction = fraction * my$-$work / total$-$work$
+	\EndIf
+	\State $child \gets parent$
+	\State $parent \gets $ \Call{getParent}{$parent$}
+\EndWhile
+\Statex $\triangleright$ Fiss F according to its weight in task-parallel unit
+\State Fiss $F$ into \Call{ceil}{$fraction * N$} filters
+\end{algorithmic}
+\end{algorithm}
+
+%\begin{figure}[t]
+%\framebox{TODO: typeset this code.}
+%\small
+%\begin{verbatim}
+%// F is the filter to fiss; N is the total number of cores
+%JudiciousFission(filter F, int N) {
+%  // estimate work done by F as fraction of 
+%  // everyone running task-parallel to F
+%  fraction = 1.0
+%  Stream parent = getParent(F)
+%  Stream child = f
+%  while (parent != null) {
+%    if (parent is splitjoin)
+%      totalWork = sum_{c \in children(parent)} avgWorkPerFilter(c)
+%      myWork = avgWorkPerFilter(child)
+%      fraction = fraction * myWork / totalWork
+%    endif
+%    child = parent
+%    parent = getParent(parent)
+%  endwhile
+%  // fiss F according to its weight in task-parallel unit
+%  fiss F into ceil(fraction*N) filters
+%}
+%\end{verbatim}
+%\caption{Heuristic algorithm for fissing a filter as little as
+%possible while filling all cores with task or data-parallel
+%work.\label{fig:judicious-fission}}
+%\end{figure}
 
 Even if every filter in an application is data-parallel, it may not be
 desirable to fiss each filter across all of the cores.  Doing so would
@@ -206,7 +233,7 @@ product).
 In order to balance task and data parallelism, we employ a ``judicious
 fission'' heuristic that estimates the amount of work that is
 task-parallel to a given filter and fisses the filter accordingly.
-Depicted in Figure~\ref{fig:judicious-fission}, this algorithm works
+Depicted in Algorithm~\ref{fig:judicious-fission}, this algorithm works
 by ascending through the hierarchy of the stream graph.  Whenever it
 reaches a splitjoin, it calculates the ratio of work done by the
 stream containing the filter of interest to the work done by the
