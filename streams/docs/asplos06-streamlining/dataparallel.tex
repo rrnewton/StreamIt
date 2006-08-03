@@ -64,30 +64,52 @@ Figure~\ref{fig:filterbank-orig}, the LowPassFilters and
 HighPassFilters cannot be fused with upstream neighbors because their
 peek rate exceeds their pop rate.
 
-\begin{figure}[t]
-\framebox{TODO: typeset this code.}
-\small
-\begin{verbatim}
-CoarsenGranularity() {
-  do { 
-    for each pair of adjacent, stateless filters (f1, f2) do
-      if (f1 and f2 in splitjoin) then
-        speculatively fuse f1 and f2
-      else if (f1 and f2 in pipeline and
-               no initial buffering between f1 and f2) then
-        finalize any speculative fusion within f1 and f2
-        fuse f1 and f2
-      endif
-    endfor
-  } while something is fused
-  undo remaining speculative fuses
-}
-\end{verbatim}
-\caption{Granularity coarsening algorithm to expose coarse-grained
-data parallelism.\label{fig:coarsening-code}}
-\end{figure}
 
-Figure~\ref{fig:coarsening-code} gives pseudocode for our granularity
+\begin{algorithm}[t]
+\caption{Granularity coarsening algorithm to expose coarse-grained
+data parallelism.} \label{fig:coarsening-code}
+\textsc{CoarsenGranularity}()
+\begin{algorithmic}[1]
+\Repeat
+	\ForAll{$(f_1, f_2)$ pairs of adjacent stateless filters}
+		\If {$f_1$ and $f_2$ in a splitjoin}
+			\State Speculatively fuse $f_1$ and $f_2$
+		\ElsIf{$f_1$ and $f_2$ in a pipeline and \\
+\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ no initial buffering between $f_1$ and $f_2$}
+			\State Finalize any speculative fusion within
+$f_1$ an $f_2$
+			\State Fuse $f_1$ and $f_2$
+		\EndIf
+	\EndFor
+\Until{nothing is fused}
+\State Undo remaining speculative fuses	
+\end{algorithmic}
+\end{algorithm}
+
+%\begin{figure}[t]
+%\framebox{TODO: typeset this code.}
+%\small
+%\begin{verbatim}
+%CoarsenGranularity() {
+%  do { 
+%    for each pair of adjacent, stateless filters (f1, f2) do
+%      if (f1 and f2 in splitjoin) then
+%        speculatively fuse f1 and f2
+%      else if (f1 and f2 in pipeline and
+%               no initial buffering between f1 and f2) then
+%        finalize any speculative fusion within f1 and f2
+%        fuse f1 and f2
+%      endif
+%    endfor
+%  } while something is fused
+%  undo remaining speculative fuses
+%}
+%\end{verbatim}
+%\caption{Granularity coarsening algorithm to expose coarse-grained
+%data parallelism.\label{fig:coarsening-code}}
+%\end{figure}
+
+Algorithm~\ref{fig:coarsening-code} gives pseudocode for our granularity
 coarsening algorithm.  The code repeatedly considers pairs of
 stateless filters that are adjacent in the stream graph.  If the
 filters are contained in a splitjoin, they are ``speculatively'' fused
