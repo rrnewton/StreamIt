@@ -58,28 +58,34 @@ network, with resource contention modeled accordingly.
 We will now turn to discussing our compiler backends for each of the
 execution models.
 
-\subsection{Task + Pipeline Parallel Execution}
-\label{sec:space-imp}
-To compile for the task plus (hardware) pipeline parallel execution
-model, we leverage our previous work~\cite{streamit-asplos}.  In this
-model we require that the number of filters in the stream graph be
-less than or equal to the number of processing cores of the target
-architecture.  To achieve this, we repeatedly apply fusion and fission
-transformations as directed by a dynamic programming algorithm, termed
-the {\it partitioner}.  The algorithm fisses individual filters or
-fuses contiguous sections of the stream graph in the hope of creating
-a load balanced stream graph ready for execution.
+%\subsection{Task + Pipeline Parallel Execution}
+%\label{sec:space-imp}
+%Talk about this as our previous work, not leveraging!!, reference the
+%results sections that this appears in.  
 
-The resulting nodes of the stream graph are executed in a pipelined
-manner.  We calculate the mapping of nodes to Raw cores using
-simulated annealing, with at most one node mapped to each core.
-Communication bypasses the memory system as the nodes communicate over
-the Raw's static network.  Because the static network is blocking and
-has little buffering, the simulated annealing cost function attempts
-to model the synchronization costs of each layout configuration
-encountered during the search.
+
+%To compile for the task plus (hardware) pipeline parallel execution
+%model, we leverage our previous work~\cite{streamit-asplos}.  In this
+%model we require that the number of filters in the stream graph be
+%less than or equal to the number of processing cores of the target
+%architecture.  To achieve this, we repeatedly apply fusion and fission
+%transformations as directed by a dynamic programming algorithm, termed
+%the {\it partitioner}.  The algorithm fisses individual filters or
+%fuses contiguous sections of the stream graph in the hope of creating
+%a load balanced stream graph ready for execution.
+
+%The resulting nodes of the stream graph are executed in a pipelined
+%manner.  We calculate the mapping of nodes to Raw cores using
+%simulated annealing, with at most one node mapped to each core.
+%Communication bypasses the memory system as the nodes communicate over
+%the Raw's static network.  Because the static network is blocking and
+%has little buffering, the simulated annealing cost function attempts
+%to model the synchronization costs of each layout configuration
+%encountered during the search.
 
 \subsection{Compiler and Execution Model}
+this is a new backend, don't compare / contrast to old backend
+
 For this paper we have implemented a new backend targeting Raw that
 does not solely rely on a hardware-pipelined approach.  The new
 backend adopts a more flexible approach for its execution model.
