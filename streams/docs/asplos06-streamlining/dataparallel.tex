@@ -164,26 +164,27 @@ also have a significant impact on performance.
 \caption{Heuristic algorithm for fissing a filter as little as
 possible while filling all cores with task or data-parallel
 work. \label{fig:judicious-fission}}
-{$\triangleright$ F is the filter to fiss; N is the total number of cores\\
+{$\triangleright$ $F$ is the filter to fiss; $N$ is the total number of cores\\
 \textsc{JudiciousFission}(filter $F$, int $N$)}
 \begin{algorithmic}
-\Statex $\triangleright$ Estimate work done by F as fraction of
-\Statex $\triangleright$ everyone running task-parallel to F
-\State $fraction = 1.0$
-\State Stream $parent \gets $ \Call{getParent}{$F$}
-\State Stream $child \gets F$
-\While {$parent \not= $ null}
-	\If {$parent$ is splitjoin}
-		\State $total$-$work \gets$ \\
-\ \ \ \ \ \ \ \ \ \ \ \ \ \  \ \ \ \ \  $\sum_{c \in children(parent)}$ \Call{avgWorkPerFilter}{$c$}
-		\State $my$-$work \gets $ \Call{avgWorkPerFilter}{$child$}
-		\State $fraction = fraction * my$-$work / total$-$work$
+\Statex $\triangleright$ Estimate work done by $F$ as fraction of
+\Statex $\triangleright$ everyone running task-parallel to $F$
+\State $\mt{fraction} = 1.0$
+\State Stream $\mt{parent} \gets$ \Call{getParent}{$F$}
+\State Stream $\mt{child}  \gets F$
+\While {\mt{parent} $ \not= $ null}
+	\If {\mt{parent} is splitjoin}
+		\State \mt{total-work} $\gets$ \\
+\ \ \ \ \ \ \ \ \ \ \ \ \ \  \ \ \ \ \  $\sum_{c \in \textsc{children}(\mt{parent})}$ \Call{avgWorkPerFilter}{$c$}
+		\State \mt{my-work} $ \gets $ \Call{avgWorkPerFilter}{\mt{child}}
+		\State $\mt{fraction} \gets \mt{fraction} * \mt{my-work} /
+\mt{total-work}$
 	\EndIf
-	\State $child \gets parent$
-	\State $parent \gets $ \Call{getParent}{$parent$}
+	\State $\mt{child} \gets \mt{parent}$
+	\State $\mt{parent} \gets $ \Call{getParent}{\mt{parent}}
 \EndWhile
-\Statex $\triangleright$ Fiss F according to its weight in task-parallel unit
-\State Fiss $F$ into \Call{ceil}{$fraction * N$} filters
+\Statex $\triangleright$ Fiss $F$ according to its weight in task-parallel unit
+\State Fiss $F$ into \Call{ceil}{$\mt{fraction} * N$} filters
 \end{algorithmic}
 \end{algorithm}
 
