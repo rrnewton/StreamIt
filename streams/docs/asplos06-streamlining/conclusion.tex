@@ -19,23 +19,24 @@ instruction level---to coarse-grained filters in the program.
 
 A detailed evaluation of these techniques on the Raw microprocessor
 offers very favorable results.  Coarse-grained data parallelism offers
-a {\bf !!} speedup over a task-parallel baseline and a {\bf !!}
-speedup over a sequential code.  Without granularity coarsening, these
-speedups reduce to {\bf !!} and {\bf !!}, respectively.
-Coarse-grained software pipelining improves the generality of the
-compiler, as it is able to parallelize stateful filters with
-dependences from one iteration to the next.  Our two techniques are
-complementary and offer a combined speedup of {\bf !!} over the
-baseline (and {\bf !!} over our previous work).
+a 4.4x speedup over a task-parallel baseline and a 9.9x speedup over a
+sequential code.  Without granularity coarsening, these reduce to 0.7x
+and 1.4x, respectively.  Coarse-grained software pipelining improves
+the generality of the compiler, as it is able to parallelize stateful
+filters with dependences from one iteration to the next.  Our two
+techniques are complementary and offer a combined speedup of 11.2x
+over the baseline (and 1.84x over our previous work).
 
-%% Though data parallelism is responsible for much of our speedups on a
-%% 16-core chip, pipeline parallelism may become more important as
-%% multicore architectures scale.  Data parallelism requires global
-%% communication, and keeps resources sitting idle when it encounters
-%% stateful filters (or feedback loops).  According to our analysis in
-%% Section~\ref{sec:model}, leveraging pipeline parallelism on a 64-core
-%% chip when only 10\% of the filters have state could offer up to a 6.4X
-%% speedup (improvement in load balancing).
+Though data parallelism is responsible for much of our speedups on a
+16-core chip, pipeline parallelism may become more important as
+multicore architectures scale.  Data parallelism requires global
+communication, and keeps resources sitting idle when it encounters
+stateful filters (or feedback loops).  According to our analysis in
+Section~\ref{sec:model}, leveraging pipeline parallelism on a 64-core
+chip when only 10\% of the filters have state could offer up to a 6.4x
+speedup (improvement in load balancing).  Exposing pipeline
+parallelism for the stateful benchmarks in our suite provided a 1.45x
+speedup over data parallelism.  
 
 As our techniques rely on specific features of the StreamIt
 programming model, the results suggest that these features are a good
