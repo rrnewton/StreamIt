@@ -204,13 +204,6 @@ affecting the critical path work (as estimated statically) and
 performs inter-core communication in parallel.  Each reduces the
 synchronization encountered on the critical path.
 
-\begin{figure}[t]
-\centering
-\psfig{figure=softpipe_graph.eps, width=3.2in}
-\caption{Task and Task + Software Pipeline normalized to single core.
-\protect\label{fig:softpipe_graph}}
-\vspace{-6pt}
-\end{figure}
 The combined technique depresses the performance of MPEG by 6\%
 because the Selective Fusion component of the software pipeliner fuses
 one step too far.  In most circumstances, fusion will help to reduce
@@ -253,7 +246,7 @@ generally excellent compute utilization; in 7 cases the utilization is
 \begin{figure*}[t]
 \centering
 \psfig{figure=thruput.eps, width=6.1in}
-\caption{Comparison of Task + Data + Software Pipeline performance results.
+\caption{Throughput Speedup Comparison and  Task + Data + Software Pipeline performance results.
 \protect\label{fig:thruput}}
 \vspace{-6pt}
 \end{figure*}
