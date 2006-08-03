@@ -6,6 +6,8 @@ to multicore architectures.  This section will include an elaboration
 of the following contributions and conclusions:
 
 \begin{itemize}
+\item overall consistent parallelization of our benchmark suite.
+
 \item Our technique for exploiting coarse-grained data parallelism
 produces abundant parallelism at the correct granularity and achieve a
 geometric mean performance gain of 9.9x over a sequential, single-core
@@ -80,7 +82,7 @@ iteration of work.
 \begin{figure*}[t]
 \centering
 \psfig{figure=maingraph.eps, width=6.5in}
-\caption{Task, Task + Data, and Task + Data + Software Pipeline
+\caption{Task, Task + Data, Task + Software Pipeline, and Task + Data + Software Pipeline
 normalized to single core.
 \protect\label{fig:main_comp}}
 \vspace{-6pt}
