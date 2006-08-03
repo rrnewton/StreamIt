@@ -24,9 +24,12 @@ In the evaluation, speedup of configuration A over B is calculated as
 the throughput for an average steady-state of A divided by B; the
 initialization and prologue schedules, if present, are not
 included. Figure \ref{fig:thruput} presents a table of throughput
-speedups normalized to single-core for most configurations. First, we
-present a description of the benchmark suite employed in the
-evaluation.
+speedups normalized to single-core for most configurations.
+\cite{raw_isca} reported that sequential StreamIt executing on a
+single Raw core outperformed hand-written C implementations executing
+on a single core over a benchmark similar to ours. Furthermore, we
+have increased the performance of sequential compilation since
+\cite{raw_isca}.
 
 \begin{figure*}[t]
 \centering
@@ -123,9 +126,11 @@ exposing data parallelism: replicate each filter by the number of
 cores, mapping each to its own core.  We call this fine-grained data
 parallelism. In Figure \ref{fig:fine_data}, we show this technique
 normalized to single-core performance. Fine-grained data parallelism
-achieves a mean speedup of 1.40x over sequential StreamIt. For four of
-our benchmarks, fine-grained duplication on 16 cores has lower
-throughput than single-core.
+achieves a mean speedup of 1.40x over sequential StreamIt. Note that
+FilterBank is not included in Figure \ref{fig:fine_data} because the
+size of the fine-grained data parallel stream graph stressed our
+system. For four of our benchmarks, fine-grained duplication on 16
+cores has lower throughput than single-core.
 
 The second bar of Figure \ref{fig:main_comp} gives the speedup of
 coarse-grained data parallelism over single-core StreamIt. The mean
