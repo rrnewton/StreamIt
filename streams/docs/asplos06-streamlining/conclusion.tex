@@ -1,1 +1,70 @@
-\section{Conclusion}
+\section{Conclusions}
+
+As multicore architectures become ubiquitous, it will be critical to
+develop a high-level programming model that can automatically exploit
+the coarse-grained parallelism of the underlying machine without
+requiring heroic efforts on the part of the programmer.  Stream
+programming represents a promising approach to this problem, as
+high-level descriptions of streaming applications naturally expose
+task, data, and pipeline parallelism.  
+
+In this paper, we develop improved techniques for automatically
+bridging the gap between the original granularity of the program and
+the underlying granularity of the architecture.  To bolster the
+benefits of data parallelism on a multicore architecture, we build
+coarse-grained data-parallel units that are duplicated as few times as
+needed.  And to leverage the benefits of pipeline parallelism, we
+employ software pipelining techniques---traditionally applied at the
+instruction level---to coarse-grained filters in the program.
+
+A detailed evaluation of these techniques on the Raw microprocessor
+offers very favorable results.  Coarse-grained data parallelism offers
+a {\bf !!} speedup over a task-parallel baseline and a {\bf !!}
+speedup over a sequential code.  Without granularity coarsening, these
+speedups reduce to {\bf !!} and {\bf !!}, respectively.
+Coarse-grained software pipelining improves the generality of the
+compiler, as it is able to parallelize stateful filters with
+dependences from one iteration to the next.  Our two techniques are
+complementary and offer a combined speedup of {\bf !!} over the
+baseline (and {\bf !!} over our previous work).
+
+%% Though data parallelism is responsible for much of our speedups on a
+%% 16-core chip, pipeline parallelism may become more important as
+%% multicore architectures scale.  Data parallelism requires global
+%% communication, and keeps resources sitting idle when it encounters
+%% stateful filters (or feedback loops).  According to our analysis in
+%% Section~\ref{sec:model}, leveraging pipeline parallelism on a 64-core
+%% chip when only 10\% of the filters have state could offer up to a 6.4X
+%% speedup (improvement in load balancing).
+
+As our techniques rely on specific features of the StreamIt
+programming model, the results suggest that these features are a good
+match for multicore architectures.  Of particular importance are the
+following two language features:
+\begin{enumerate}
+
+\item Exposing producer-consumer relationships between filters.  This
+enables us to coarsen the computation to communication ratio via
+filter fusion, and also enables pipeline parallelism.
+
+\item Exposing the outer loop around the entire stream graph.  This is
+central to the formulation of software pipelining; it also enables
+data parallelism, as the products of filter fission may span multiple
+steady-state iterations.
+
+\end{enumerate}
+
+While our implementation targets Raw, the techniques developed should
+be applicable to other multicore architectures.  As Raw has a
+relatively high communication bandwidth, coarsening the granularity of
+data parallelism may benefit commodity multicores even more.  In
+porting this transformation to a new architecture, one may need to
+adjust the threshold computation-to-communication ratio that justifies
+filter fission.  As for coarse-grained software pipelining, the
+scheduling freedom afforded should benefit many multicore systems.
+One should consider the most efficient location for intermediate
+buffers (local memory, shared memory, FIFOs, etc.) as well as the best
+mechanism for shuffling data (DMA, on-chip network, etc.).  The basic
+algorithms for coarsening granularity, judicious fission,
+partitioning, and selective fusion are largely
+architecture-independent.
