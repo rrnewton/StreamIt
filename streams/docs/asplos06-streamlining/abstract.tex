@@ -1,26 +1,26 @@
-With the continued miniaturization of the transistor, microprocessor
-performance is increasingly dominated by wire delays.  Many
-architectures address this problem by replicating processing units.
-Furthermore, some architectures expose the communication between units
-to a software layer.  For compilers to effectively target multicore
-architectures, explicitly parallel programming models are required.
-Currently, there are two basic approaches for compiling a parallel
-program to a multicore target.  A {\it time multiplexing} approach
-utilizes the entire chip for each computation unit, and switches
-between units over time.  A {\it space multiplexing} approach distributes
-computation units across the entire chip, running them continuously
-and in parallel.
+As multicore architectures enter the mainstream, there is a pressing
+demand for high-level programming models that can effectively utilize
+the underlying parallelism.  Stream programming offers an attractive
+way to expose coarse-grained parallelism, as streaming applications
+(image, video, DSP, etc.) are naturally represented by independent
+filters that communicate over explicit data channels.  In order to
+obtain the best mapping, a compiler must fully utilize the task, data,
+and pipeline parallelism that is present in the application.
 
-In this paper, we describe a hybrid space-time multiplexing scheme
-that provides the flexible load-balancing of time multiplexing while
-preserving the locality and latency benefits of space multiplexing.
-Our work is done in the context of StreamIt, a high-level stream
-programming language, with a backend that targets the Raw
-architecture.  Our compiler extracts fine-grained {\it slices} from a
-concurrent stream graph; it then uses space multiplexing for code
-within a slice, but time multiplexing to switch between slices. We
-leverage software pipelining, a technique traditionally applied to
-scheduling a loop of machine instructions, and apply it to the
-scheduling of coarse-grained slices.  We give performance results that
-demonstrate the efficacy of space-time multiplexing in compiling
-StreamIt to Raw.
+In this paper, we describe two new techniques for mapping stream
+programs to multicores.  The first technique exploits {\it
+coarse-grained data parallelism} by duplicating data-parallel sections
+across cores.  However, to lessen the synchronization overhead, we
+operate on large sections of the stream graph rather than individual
+actors.  The second technique, {\it coarse-grained software
+pipelining}, applies traditional instruction-scheduling techniques to
+coarse-grained actors in the stream graph.  This affords complete
+scheduling freedom and extracts valuable pipeline parallelism from the
+application.
+
+We have implemented these techniques in the StreamIt compiler,
+targetting the 16-core Raw architecture.  Coarse-grained data
+parallelism offers a ?? speedup over a single-core baseline, while
+coarse-grained software pipelining offers a ?? speedup.  Combining
+both techniques yields the best results, offering ?? over a single
+core and ?? over our previous work.
