@@ -32,7 +32,7 @@ Though data parallelism is responsible for much of our speedups on a
 multicore architectures scale.  Data parallelism requires global
 communication, and keeps resources sitting idle when it encounters
 stateful filters (or feedback loops).  According to our analysis in
-Section~\ref{sec:model}, leveraging pipeline parallelism on a 64-core
+Section~\ref{sec:pipeline-model}, leveraging pipeline parallelism on a 64-core
 chip when only 10\% of the filters have state could offer up to a 6.4x
 speedup (improvement in load balancing).  Exposing pipeline
 parallelism in combination with data parallelism for the stateful
