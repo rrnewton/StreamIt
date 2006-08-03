@@ -100,6 +100,12 @@ parallelism is expressed at too fine a granularity for the
 communication system.  Given that we are targetting a 16-core
 processor, a mean speedup of 2.27x is inadequate.
 
+\begin{figure}[t]
+\centering
+\psfig{figure=fine_data.eps, width=3.2in}
+\caption{Fine-Grained Data Parallelism normalized to Single Core
+\protect\label{fig:fine_data}}
+\end{figure}
 The StreamIt programming model facilitates relatively simple analysis
 to determine opportunities for data parallelism.  But the granularity
 of the transformations must account for the additional synchronization
@@ -109,9 +115,11 @@ stateless filter across the cores of the architecture we run the risk
 of overwhelming the communication substrate of the target
 architecture.  To study this, we implemented a simple algorithm for
 data parallelism, replicate each filter by the number of cores,
-mapping each to its own core.  In
-\ref{fig:fine-dup}, we show this technique normalized to single-core
-performance.  \textbf{todo!}
+mapping each to its own core.  In Figure \ref{fig:fine_data}, we show
+this technique normalized to single-core performance. Fine-grained
+duplication achieves a mean speedup of 1.40x over sequential
+StreamIt. For four of our benchmarks, fine-grained duplication on 16
+cores has lower throughput than single core.
 
 The second bar of Figure \ref{fig:main_comp} gives the speedup of
 coarse-grained data parallelism over single-core StreamIt. The mean

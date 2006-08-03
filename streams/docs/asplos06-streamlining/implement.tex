@@ -10,46 +10,27 @@ execution models.
 \subsection{The Raw Architecture}
 \label{sec:raw}
 
-\begin{figure}
-\centering
-\psfig{figure=raw-diagram.eps,width=3in}
-\caption{Block diagram of the Raw architecture.
-\protect\label{fig:raw-diagram}}
-\end{figure}
+%\begin{figure}
+%\centering
+%\psfig{figure=raw-diagram.eps,width=3in}
+%\caption{Block diagram of the Raw architecture.
+%\protect\label{fig:raw-diagram}}
+%\end{figure}
 The Raw Microprocessor \cite{raw10,raw} addresses the wire delay
 problem \cite{raw13} by providing direct instruction set architecture
 (ISA) analogs to three underlying physical resources of the processor:
-gates, wires and pins. Because ISA primitives exist for these
-resources, a compiler such as StreamIt has direct control over both
-the computation and the communication of values between the functional
-units of the microprocessor, as well as across the pins of the
-processor.
-
-The architecture exposes the gate resources as a scalable 2-D array of
-identical, programmable cores, that are connected to their immediate
-neighbors by four on-chip networks.  Values routed through the
-networks off of the side of the array appear on the pins, and values
-placed on the pins by external devices (wide-word A/Ds, DRAMS, etc.)
-appear on the networks.  Each of the cores contains a compute
-processor, some memory and two types of routers--one static, one
-dynamic--that control the flow of data over the networks as well as
-into the compute processor (see Figure \ref{fig:raw-diagram}).  The
-compute processor interfaces to the network through a bypassed,
+gates, wires and pins. The architecture exposes the gate resources as
+a scalable 2-D array of identical, programmable cores, that are
+connected to their immediate neighbors by four on-chip networks.
+Values routed through the networks off of the side of the array appear
+on the pins, and values placed on the pins by external devices
+(wide-word A/Ds, DRAMS, etc.) appear on the networks.  Each of the
+cores contains a compute processor, some memory and two types of
+routers--one static, one dynamic--that control the flow of data over
+the networks as well as into the compute processor.  The compute
+processor interfaces to the network through a bypassed,
 register-mapped interface \cite{raw10} that allows instructions to use
 the networks and the register files interchangeably.
-
-Each core's static router has a instruction memory to control the
-crossbars of the two static networks. Collectively, the static routers
-can reconfigure the communication pattern across these networks every
-cycle.  The input and output possibilities for each crossbar are:
-North, East, South, West, Processor, to the other crossbar, and into
-the static router. The FIFOs are typically four or eight elements
-large.  To route a word from one core to another, the compiler inserts
-a route instruction on every intermediate static router.  Because the
-routers are pipelined and compile-time scheduled, they can deliver a
-value from the ALU of one core to the ALU of a neighboring core in 3
-cycles, or more generally, 2+N cycles for an inter-core distance of N
-hops.
 
 Because we generate bulk DRAM transfers, we do not want these
 optimizable accesses to become the bottleneck of the hardware
@@ -96,61 +77,58 @@ core.  Communication bypasses the memory system as the nodes
 communicate over the Raw's static network.  Because the static network
 is blocking and has little buffering, the simulated annealing cost
 function attempts to model the synchronization costs of each layout
-configuration encountered during the search.  After we anneal to a
-final layout, we generate switch assembly instructions to realize the
-steady-state communication of the mapped stream graph.  Finally, we
-generate code to execute each filter on the compute processor to which
-it was assigned.
+configuration encountered during the search. 
 
 \subsection{New Backend}
 For this paper we have implemented a new backend targeting Raw that
 does not solely rely on a space-multiplexed approach.  The new backend
 adopts a more flexible approach for its execution model. Multiple
-filters can be assigned to each processing core.  Across the
-replicated cores, the filters execute in dataflow order, with each
-filter reading its input and writing its output to shared memory. Each
-core executes a schedule of filters assigned to it and each filter
-executes on a single processing core for the entire execution.
+filters from non-local sections of the stream graph can be assigned to
+each processing core.  Across the cores, filters execute in dataflow
+order, with each filter reading its input from and writing its output
+to shared memory. Each core executes a schedule of filters assigned to
+it and each filter executes on a single processing core for the entire
+execution.
 
 Interestingly, for the techniques presented in this paper we do not
 leverage Raw's on-chip static network for communication between
-filters (although the compiler supports it) nor do we buffer
+processors (although the compiler supports it) nor do we buffer
 communication on the data caches of the cores themselves. Each core
-executes independently until a split or join point is reached. 
+executes independently until a split or join point is reached.
 
-We do not buffer communication filter input and output on the chip
-itself because given the Raw configuration we are simulating and for
-the regular bulk memory traffic we generate, it is more expensive to
-access a core's local data cache than to fetch the item from one of
-the streaming memory controllers. A load hit in the data cache incurs
-a 3-cycle latency.  So although the networks are register-mapped, two
+We do not buffer filter input nor output on the chip itself because
+given the Raw configuration we are simulating and for the regular bulk
+memory traffic we generate, it is more expensive to stream data from a
+core's local data cache than to stream the data from the streaming
+memory controllers. A load hit in the data cache incurs a 3-cycle
+latency.  So although the networks are register-mapped, two
 instructions must be performed to hide the latency of the load,
-implying a maximum bandwidth of 1/2 word per cycle.  While each
-streaming memory controller has a bandwidth of 1 word per cycle for
-unit-stride memory accesses.
+implying a maximum bandwidth of 1/2 word per cycle, while each
+streaming memory controller has a load bandwidth of 1 word per cycle
+for unit-stride memory accesses.
 
 Furthermore, we have found that employing Raw's on-chip network for
-communication between filters of a pipeline is not necessary
+communication between filters of a pipeline is not necessarily
 advantageous because of the added synchronization incurred by tightly
 coupling the filters.  We experimented with numerous techniques for
-forming spatial pipelines of filters that communicate amongst
-themselves using only on-chip resources.  Our best techniques afforded
-no performance gains.  We have concluded that it is extremely
-difficult for a compiler operating at a coarse granularity to manage
-the fine-grained synchronization required to map stream communication
-to Raw's on-chip static network.  Additionally, the techniques
-presented in this paper are general since nearly all commercial
-multicores do not provide fine-grained, low-latency inter-core
-communication.
+forming {\it spatial} pipelines of filters mapped to different cores
+that communicate among themselves using only on-chip resources.  Our
+best techniques afforded no performance gains.  We have concluded that
+it is extremely difficult for a compiler operating at a coarse
+granularity to manage the fine-grained synchronization required to map
+stream communication to Raw's on-chip static network.  Additionally,
+the techniques presented in this paper are general since nearly all
+commercial multicores do not provide fine-grained, low-latency
+inter-core communication.
 
 Our new backend requires that the target architecture provides an
 efficient mechanism for implementing split and join (scatter and
-gather) operations.  For Raw, we leverage the static network and the
-switch processors of the static network to efficiently implement the
-splitting and joining of data streams as described by the stream
-graph.  In our previous backend, we devoted a core to buffering and
-forwarding joined data streams (split data streams were implemented
-completely in the switch).
+gather) operations.  For Raw, we leverage the static network and its
+switch processors to efficiently implement the splitting and joining
+of data streams as described by the stream graph.  In our previous
+backend, we devoted a core to buffering and forwarding joined data
+streams (split data streams were implemented completely in the
+switch).
 
 Our new backend programs the switch processors to form a network to
 perform the splitting (including duplication) and the joining of data
@@ -200,9 +178,6 @@ search.  Finally, we run a greedy assignment algorithm to assign the
 buffers representing the channels of the stream graph to DRAM ports,
 attempting to minimize synchronization costs.
 
-\subsubsection{Code Generation}
-
-
 \subsubsection{Optimizations}
 
 The two backends share a suite of optimizations that target the
@@ -210,8 +185,7 @@ computation code of a filter.  For the results detailed in the next
 section we ran a host of optimizations including function inlining,
 constant propagation, constant folding, array scalarization, and loop
 unrolling (with a factor of 4).  These optimizations are especially
-important for a fused filter, as we can unroll it, unrolling the
-schedule of the constituent filters within the fused filter.  Possibly
+important for a fused filter, as we can unroll it, and .  Possibly
 scalarizing the buffers within the fused filter used for communication
 between the constituent filters.  Finally, the two backends produce a
 mix of C and assembly code that is compiled with GCC 3.4 at
