@@ -1,8 +1,11 @@
 \begin{figure}[t]
 \psfig{figure=pipeline-scaling.eps,width=3in}
+\caption{ PUT SOMETHING HERE!
+\protect\label{fig:model-speedup}}
 \end{figure}
 
 \section{Coarse-Grained Software Pipelining}
+\label{sec:softpipe}
 
 \subsection{Benefits of Pipeline Parallelism}
 \label{sec:pipeline-model}
@@ -177,7 +180,7 @@ balancing across cores while minimizing the synchronization needed
 during the communication stage.  We address these criteria in two
 passes, first optimizing load balancing and then optimizing the
 layout.  As the load-balancing problem is NP-complete (by reduction
-from SUBSET-SUM~\cite{sipser-textbook}), we use a greedy partitioning
+from SUBSET-SUM~\cite{sipser97}), we use a greedy partitioning
 heuristic that assigns each filter to one of $N$ processors.  The
 algorithm considers filters in order of decreasing work, assigning
 each one to the processor that has the least amount of work so far.

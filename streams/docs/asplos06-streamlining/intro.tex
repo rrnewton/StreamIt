@@ -4,9 +4,9 @@
 
 As centralized microprocessors are ceasing to scale effectively,
 multicore architectures are becoming the industy standard.  For
-example, the IBM/Toshiba/Sony Cell processor has 9 cores\cite{}, Sun
-Niagra has 8 cores\cite{}, RMI XLR732 has 8 cores\cite{},
-IBM/Microsoft Xenon has 3 cores\cite{}, and most vendors are shipping
+example, the IBM/Toshiba/Sony Cell processor has 9 cores\cite{Cell-hpca}, Sun
+Niagara has 8 cores\cite{Niagara}, RMI XLR732 has 8 cores\cite{RMI-web},
+IBM/Microsoft Xenon has 3 cores, and most vendors are shipping
 dual-core chips.  Cisco has described a next-generation network
 processor containing 192 Tensilica Xtensa cores~\cite{etherton05ancs}.
 %The Intel IXP 2800 network processor has 1 core and 16 micro-engines.
@@ -21,18 +21,18 @@ that remains largely intractable.
 
 The stream programming paradigm offers a promising approach for
 exposing parallelism suitable for multicore architectures.  Stream
-languages such as StreamIt\cite{}, Brook\cite{}, Baker\cite{}, and
-Spidle\cite{} are motivated not only by trends in computer
-architecture, but also by trends in the application space, as image,
-voice, and multimedia programs are becoming only more prevalent.  In a
-stream language, a program is represented as a set of autonomous
-actors that communicate through FIFO data channels (see
-Figure~\ref{fig:vocoder}).  During program execution, actors fire
-repeatedly in a periodic schedule.  As each actor has a separate
-program counter and an independent address space, all dependences
-between actors are made explicit by the communication channels.
-Compilers can leverage this dependence information to orchestrate
-parallel execution.
+languages such as StreamIt\cite{streamitcc}, Brook\cite{brook04},
+Baker\cite{Baker}, and Spidle\cite{spidle02} are motivated not only by
+trends in computer architecture, but also by trends in the application
+space, as data, image, voice, and multimedia programs are becoming
+only more prevalent.  In the StreamIt Language, a program is represented
+as a set of autonomous actors that communicate through FIFO data
+channels (see Figure~\ref{fig:vocoder}).  During program execution,
+actors fire repeatedly in a periodic schedule.  As each actor has a
+separate program counter and an independent address space, all
+dependences between actors are made explicit by the communication
+channels.  Compilers can leverage this dependence information to
+orchestrate parallel execution.
 
 Despite the abundance of parallelism in stream programs, it is
 nonetheless a challenging problem to obtain an efficient mapping to a
@@ -65,13 +65,13 @@ However, while data parallelism is well-suited to vector machines, on
 coarse-grained multicore architectures it can introduce excessive
 communication overhead.  Previous data-parallel streaming
 architectures have focused on designing a special memory hierarchy to
-support this communication\cite{imagine}.  The other hazards of data
+support this communication\cite{imagine-ieee}.  The other hazards of data
 parallelism include increased buffering and latency, as well as the
 inability to parallelize actors with state.
 
 Pipeline parallelism applies to chains of producers and consumers that
 are directly connected in the stream graph.  In our previous
-work\cite{gordon02asplos}, we exploited pipeline parallelism by
+work\cite{streamit-asplos}, we exploited pipeline parallelism by
 mapping clusters of producers and consumers to different cores and
 using an on-chip network for direct communication between actors (see
 Figure~\ref{fig:exemodel}d).  Compared to data parallelism, this

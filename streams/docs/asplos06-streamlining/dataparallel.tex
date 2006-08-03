@@ -10,7 +10,7 @@
 
 There is typically widespread data parallelism in a stream graph, as
 stateless filters can be applied in parallel to different parts of the
-data stream.  For example, Figure~\ref{fig:filterbank-orig} depicts
+data stream.  For example, Figure~\ref{fig:filterbank}a depicts
 our Filterbank benchmark, in which all of the filters are stateless.
 %Examples of stateless
 %filters include FIR filters, FFTs, DCTs, color conversions,
@@ -22,7 +22,7 @@ leverage the implicit data parallelism of stateless filters, we
 convert the filters into an explicit splitjoin of many filters, such
 that each filter can be mapped to a separate processor.  This process,
 which is called {\it filter fission}, is described in more detail
-elsewhere~\cite{gordon02asplos}.
+elsewhere~\cite{streamit-asplos}.
 
 On a distributed memory machine, it can be expensive to distribute
 data to and from the parallel products of filter fission.  As a
@@ -36,7 +36,7 @@ granularity, and complementing task parallelism.
 \subsection{Coarsening the Granularity}
 
 Stateless filters are often connected together in a pipeline (see
-Figure~\ref{fig:filterbank-orig}).  In such cases, performing fission
+Figure~\ref{fig:filterbank}a).  In such cases, performing fission
 independently on each filter leads to undue synchronization, as the
 data streams need to be scattered and gathered between each
 computation stage.  For this reason, we prefer to fuse pipelines as
@@ -57,10 +57,10 @@ data channel.  Due to StreamIt's support for peeking (sliding window
 computations) as well as an optional {\tt prework} function
 (performing distinct computation on the first firing of a filter), an
 {\it initialization schedule} may be needed to prime the buffers prior
-to steady-state execution~\cite{karczma02thesis}.  If this schedule
+to steady-state execution~\cite{karczma-thesis}.  If this schedule
 deposits items between two filters, then those items introduce state
 into the fused filter and prohibit data parallelism.  For example, in
-Figure~\ref{fig:filterbank-orig}, the LowPassFilters and
+Figure~\ref{fig:filterbank}a, the LowPassFilters and
 HighPassFilters cannot be fused with upstream neighbors because their
 peek rate exceeds their pop rate.
 
@@ -126,13 +126,13 @@ cancelled.  Note that all fused filters produced by the algorithm are
 stateless and, due to an increased computation to communication ratio,
 are likely to benefit from filter fission.  The output of the
 algorithm on the FilterBank benchmark is illustrated in
-Figure~\ref{fig:filterbank-coarse}.
+Figure~\ref{fig:filterbank}b.
 
 Apart from reducing synchronization and increasing the computation to
 communication ratio, fusion allows the compiler to perform
 optimizations across filter boundaries.  These optimizations, which
-include scalar replacement~\cite{sermulins05lctes} and algebraic
-simplification of linear filers~\cite{lamb03pldi,agrawal05cases}, can
+include scalar replacement~\cite{sermulins:lctes:2005} and algebraic
+simplification of linear filers~\cite{lamb:pldi:2003,agrawal:cases:2005}, can
 also have a significant impact on performance.
 % mention memory operations vs. network operations?
 
@@ -247,9 +247,9 @@ minimum number of times needed to ensure that none of the fission
 products contains more than $1/N$ of the total task-parallel work
 (where $N$ is the total number of cores).
 
-Figure~\ref{fig:filterbank-dup} illustrates the outcome of performing
+Figure~\ref{fig:filterbank}c illustrates the outcome of performing
 judicious fission on the coarsened-granularity stream graph from
-Figure~\ref{fig:filterbank-coarse}.  Because there is 8-way task
+Figure~\ref{fig:filterbank}b.  Because there is 8-way task
 parallelism between all of the pipelines, the filters in each pipeline
 are fissed a maximum of 2 ways so as not to overwhelm the
 communication resources.  As described in the results section, the
