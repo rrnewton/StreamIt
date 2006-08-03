@@ -1,26 +1,29 @@
 As multicore architectures enter the mainstream, there is a pressing
-demand for high-level programming models that can effectively utilize
-the underlying parallelism.  Stream programming offers an attractive
-way to expose coarse-grained parallelism, as streaming applications
-(image, video, DSP, etc.) are naturally represented by independent
-filters that communicate over explicit data channels.  In order to
-obtain the best mapping, a compiler must fully utilize the task, data,
-and pipeline parallelism that is present in the application.
+demand for high-level programming models that can effectively map to
+them.  Stream programming offers an attractive way to expose
+coarse-grained parallelism, as streaming applications (image, video,
+DSP, etc.) are naturally represented by independent filters that
+communicate over explicit data channels.
+%In order to obtain the best
+%mapping, a compiler must fully utilize the task, data, and pipeline
+%parallelism that is present in the application.
 
 In this paper, we describe two new techniques for mapping stream
 programs to multicores.  The first technique exploits {\it
 coarse-grained data parallelism} by duplicating data-parallel sections
-across cores.  However, to lessen the synchronization overhead, we
-operate on large sections of the stream graph rather than individual
-actors.  The second technique, {\it coarse-grained software
-pipelining}, applies traditional instruction-scheduling techniques to
-coarse-grained actors in the stream graph.  This affords complete
-scheduling freedom and extracts valuable pipeline parallelism from the
-application.
+across cores.  While traditional data parallelism incurs excessive
+communication and synchronization costs on multicores, our technique
+utilizes a program analysis to coarsen the granularity of
+data-parallel actors and duplicate them the minimum number of times
+needed.  The second technique, {\it coarse-grained software
+pipelining}, leverages powerful properties of the stream programming
+model to apply traditional instruction-scheduling techniques at the
+level of coarse-grained actors.  This increases scheduling freedom and
+extracts valuable pipeline parallelism from the application.
 
 We have implemented these techniques in the StreamIt compiler,
 targeting the 16-core Raw architecture.  Coarse-grained data
-parallelism offers a 9.9x speedup over a single-core baseline, while
-coarse-grained software pipelining offers a 7.7x speedup.  Combining
-both techniques yields the best results, achieving a 11.2x speedup over
-a single core and 1.84x over our previous work.
+parallelism offers a 9.9x mean speedup over a single-core baseline,
+while coarse-grained software pipelining offers a 7.7x speedup.
+Combining both techniques yields the best results, achieving a 11.2x
+speedup over a single core and 1.84x over our previous work.
