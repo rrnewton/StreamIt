@@ -9,6 +9,10 @@ asplos172-gordon.dvi: $(FILES)
 	bibtex asplos172-gordon
 	latex asplos172-gordon
 	latex asplos172-gordon
+# space bib entries closer together
+#	perl -pi -e 's/\\bibitem/\\vspace{-24pt}\\bibitem/g' asplos172-gordon.bbl
+# but do not cramp the References section title
+#	perl -pi -e 's/\\begin\{thebibliography\}\{10\}/\\begin\{thebibliography\}\{10\}\\vspace\{7pt\}/g' asplos172-gordon.bbl
 
 clean:
 	$(RM) *.aux *.bbl *.blg *.dvi *.log

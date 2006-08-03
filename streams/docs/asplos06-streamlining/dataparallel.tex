@@ -1,11 +1,3 @@
-\begin{figure*}[t]
-\begin{center}
-\psfig{figure=filterbank.eps,width=7in}
-\end{center}
-\caption{FilterBank benchmark. Only one pipeline of the outer split-join is shown, rest are identical pipelines. \label{fig:filterbank}}
-\end{figure*}
-
-
 \section{Coarse-Grained Data Parallelism}
 
 There is typically widespread data parallelism in a stream graph, as
@@ -23,6 +15,18 @@ convert the filters into an explicit splitjoin of many filters, such
 that each filter can be mapped to a separate processor.  This process,
 which is called {\it filter fission}, is described in more detail
 elsewhere~\cite{streamit-asplos}.
+
+\begin{figure*}[t]
+\begin{center}
+\psfig{figure=filterbank.eps,width=7in}
+\vspace{-16pt}
+\end{center}
+\caption{Exploiting coarse-grained data parallelism in the FilterBank
+benchmark.  Only one pipeline of the toplevel splitjoin is shown; the
+other parallel streams are identical and are transformed in the same
+way. \label{fig:filterbank}}
+\vspace{-6pt}
+\end{figure*}
 
 On a multicore architecture, it can be expensive to distribute data to
 and from the parallel products of filter fission.  As a starting
@@ -42,10 +46,15 @@ data streams need to be scattered and gathered between each
 computation stage.  For this reason, we prefer to fuse pipelines as
 much as possible before performing fission.  The only constraint is
 that the result of the fusion must also be stateless, as otherwise the
-data parallelism is lost.  It can also be beneficial to fuse
-splitjoins of stateless components, so long as the fused splitjoin is
-later combined as part of a pipeline.  Fusing splitjoins in isolation
-does not change the external computation to communication ratio.
+data parallelism is lost.  In order to facilitate pipeline fusion, it
+can also be beneficial to fuse splitjoins that appear in the middle of
+stateless pipelines.  Though fusing the splitjoin temporarily removes
+task parallelism, this parallelism will be restored in the form of
+data parallelism once the resulting filter is fissed.
+%% It can also be beneficial to fuse splitjoins of stateless components,
+%% so long as the fused splitjoin is later combined as part of a
+%% pipeline.  Fusing splitjoins in isolation does not change the external
+%% computation to communication ratio.
 
 If two filters are fused, their result will be stateless under the
 following conditions.  Filters that execute in parallel (i.e.,
@@ -63,27 +72,6 @@ into the fused filter and prohibit data parallelism.  For example, in
 Figure~\ref{fig:filterbank}a, the LowPassFilters and
 HighPassFilters cannot be fused with upstream neighbors because their
 peek rate exceeds their pop rate.
-
-\begin{algorithm}[t]
-\caption{Granularity coarsening algorithm to expose coarse-grained
-data parallelism. \label{fig:coarsening-code}}
-\textsc{CoarsenGranularity}()
-\begin{algorithmic}
-\Repeat
-	\ForAll{$(f_1, f_2)$ pairs of adjacent stateless filters}
-		\If {$f_1$ and $f_2$ in a splitjoin}
-			\State Speculatively fuse $f_1$ and $f_2$
-		\ElsIf{$f_1$ and $f_2$ in a pipeline and \\
-\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ no initial buffering between $f_1$ and $f_2$}
-			\State Finalize any speculative fusion within
-$f_1$ and $f_2$
-			\State Fuse $f_1$ and $f_2$
-		\EndIf
-	\EndFor
-\Until{nothing is fused}
-\State Undo remaining speculative fuses	
-\end{algorithmic}
-\end{algorithm}
 
 %\begin{figure}[t]
 %\framebox{TODO: typeset this code.}
@@ -108,23 +96,21 @@ $f_1$ and $f_2$
 %data parallelism.\label{fig:coarsening-code}}
 %\end{figure}
 
-Algorithm~\ref{fig:coarsening-code} gives pseudocode for our granularity
-coarsening algorithm.  The code repeatedly considers pairs of
-stateless filters that are adjacent in the stream graph.  If the
+Algorithm~\ref{fig:coarsening-code} gives pseudocode for our
+granularity coarsening algorithm.  The code repeatedly considers pairs
+of stateless filters that are adjacent in the stream graph.  If the
 filters are contained in a splitjoin, they are ``speculatively'' fused
 by the algorithm\footnote{Our compiler performs speculative fusion
-symbolically rather than actually fusing the filters.}.  
-%The fusion is
-%speculative because it will only be beneficial if combined with
-%further fusion within a higher-level pipeline.  
-If the filters are in a pipeline and do not require a buffer at
-initialization time, then they are permanently fused, and any
-speculative fuses performed in building the filters are finalized.  At
-the end of the algorithm, all remaining speculative fuses are
-cancelled.  Note that all fused filters produced by the algorithm are
-stateless and, due to an increased computation to communication ratio,
-are likely to benefit from filter fission.  The output of the
-algorithm on the FilterBank benchmark is illustrated in
+symbolically rather than actually fusing the filters.}.  The fusion is
+speculative because it will only eliminate communication if it enables
+later fusion within a pipeline construct.  If the filters are in a
+pipeline and do not require a buffer at initialization time, then they
+are permanently fused, and any speculative fuses performed in building
+the filters are finalized.  At the end of the algorithm, all remaining
+speculative fuses are cancelled.  Note that all fused filters produced
+by the algorithm are stateless and, due to an increased computation to
+communication ratio, are likely to benefit from filter fission.  The
+output of the algorithm on the FilterBank benchmark is illustrated in
 Figure~\ref{fig:filterbank}b.
 
 Apart from reducing synchronization and increasing the computation to
@@ -134,13 +120,13 @@ include scalar replacement~\cite{sermulins:lctes:2005} and algebraic
 simplification of linear filers~\cite{lamb:pldi:2003,agrawal:cases:2005}, can
 also have a significant impact on performance.
 % mention memory operations vs. network operations?
-
+%
 %% Predicting whether a fusion product will be stateless is not a simple
 %% matter of testing the original filters for statelessness.  While
 %% pre-existing state in any of the original filters does imply that the
 %% fused filter is stateful, there are three additional sources of state
 %% in the fusion process.
-
+%%
 %% First, filters performing a sliding window computation (i.e., the peek
 %% rate is greater than the pop rate) require an internal buffer when
 %% they are fused with an upstream neighbor in a pipeline.  For example,
@@ -149,15 +135,36 @@ also have a significant impact on performance.
 %% introducing internal state.  In addition, our fusion algorithm
 %% introduces state when fusing such filters with neighbors in a
 %% roundrobin splitjoin (to optimize access to the input buffers).
-
+%%
 %% Second, filters may indicate a {\tt prework} function to indicate
 %% distinct functionality on the first execution (for example, reading a
 %% file header).  If a filter's {\tt prework} and {\tt work} function
 %% declare different input (resp. output) rates, then the filter
 %% generally requires an internal buffer when fused with an upstream
 %% (resp. downstream) neighbor.
-
+%%
 \subsection{Complementing Task Parallelism}
+
+\begin{algorithm}[t]
+\caption{Granularity coarsening algorithm to expose coarse-grained
+data parallelism. \label{fig:coarsening-code}}
+\textsc{CoarsenGranularity}()
+\begin{algorithmic}
+\Repeat
+	\ForAll{$(f_1, f_2)$ pairs of adjacent stateless filters}
+		\If {$f_1$ and $f_2$ in a splitjoin}
+			\State Speculatively fuse $f_1$ and $f_2$
+		\ElsIf{$f_1$ and $f_2$ in a pipeline and \\
+\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ no initial buffering between $f_1$ and $f_2$}
+			\State Finalize any speculative fusion within
+$f_1$ and $f_2$
+			\State Fuse $f_1$ and $f_2$
+		\EndIf
+	\EndFor
+\Until{nothing is fused}
+\State Undo remaining speculative fuses	
+\end{algorithmic}
+\end{algorithm}
 
 \begin{algorithm}[t]
 \caption{Heuristic algorithm for fissing a filter as little as
@@ -233,18 +240,19 @@ product).
 In order to balance task and data parallelism, we employ a ``judicious
 fission'' heuristic that estimates the amount of work that is
 task-parallel to a given filter and fisses the filter accordingly.
-Depicted in Algorithm~\ref{fig:judicious-fission}, this algorithm works
-by ascending through the hierarchy of the stream graph.  Whenever it
-reaches a splitjoin, it calculates the ratio of work done by the
-stream containing the filter of interest to the work done by the
-entire splitjoin.  Rather than summing the work within a stream, it
-considers the average work per filter in each stream so as to mitigate
-the effects of imbalanced pipelines.\framebox{Not clear when/why/if
-this works.}  After estimating a filter's work as a fraction of
-task-parallel filters, the algorithm attempts to fiss the filter the
-minimum number of times needed to ensure that none of the fission
-products contains more than $1/N$ of the total task-parallel work
-(where $N$ is the total number of cores).
+Depicted in Algorithm~\ref{fig:judicious-fission}, this algorithm
+works by ascending through the hierarchy of the stream graph.
+Whenever it reaches a splitjoin, it calculates the ratio of work done
+by the stream containing the filter of interest to the work done by
+the entire splitjoin.  Rather than summing the work within a stream,
+it considers the average work per filter in each stream so as to
+mitigate the effects of imbalanced pipelines.
+%\framebox{Not clear when/why/if this works.}  
+After estimating a filter's work as a fraction of task-parallel
+filters, the algorithm attempts to fiss the filter the minimum number
+of times needed to ensure that none of the fission products contains
+more than $1/N$ of the total task-parallel work (where $N$ is the
+total number of cores).
 
 Figure~\ref{fig:filterbank}c illustrates the outcome of performing
 judicious fission on the coarsened-granularity stream graph from

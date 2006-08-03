@@ -520,6 +520,7 @@
 
 \def \@copyrightspace {%
   \@float{copyrightbox}[b]%
+  \vspace{-0.3in}
   \vbox to 1in{%
     \vfill
     \if \@preprint

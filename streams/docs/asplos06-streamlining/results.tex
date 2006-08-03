@@ -32,13 +32,6 @@ over a benchmark similar to ours \cite{raw_isca}. Furthermore, we have
 increased the performance of sequential compilation since this
 previous evaluation.
 
-\begin{figure*}[t]
-\centering
-\psfig{figure=benchchar.eps, width=6.5in}
-\caption{Benchmark description and characteristics.
-\protect\label{fig:benchchar}}
-\end{figure*}
-
 \subsection{Benchmark Suite}
 We evaluate our techniques using the benchmark suite given in Figure
 \ref{fig:benchchar}.   The benchmark suite consists of 12 StreamIt
@@ -75,11 +68,14 @@ The benchmarks are sorted in ascending order of the final column,
 performed per steady-state by all filters that have state divided by
 the total work performed by all filters per steady-state.  Referring
 to Figure \ref{fig:benchchar}, we see that three of our benchmarks
-include stateful computation.  The stateful computation performed in
-MPEGDecoder is insignificant and expressed as...
-\textbf{Bill, can you talk about the statefull computation in
-MPEG, radar, and vocoder}.
-
+include stateful computation.  Radar repeatedly operates on long
+columns of an array requiring special behavior at the boundaries;
+thus, the state tracks position in the column and does some internal
+buffering.  Vocoder performs an adaptive DFT that uses a stateful
+decay to ensure stability; it also needs to retain the previous output
+across one iteration within a phase transformation.  MPEGDecoder has
+neglible state in retaining predicted motion vectors across one
+iteration of work.
 
 \begin{figure*}[t]
 \centering
@@ -87,6 +83,7 @@ MPEG, radar, and vocoder}.
 \caption{Task, Task + Data, and Task + Data + Software Pipeline
 normalized to single core.
 \protect\label{fig:main_comp}}
+\vspace{-6pt}
 \end{figure*}
 
 \subsection{Exploiting Coarse-Grained Data Parallelism}
@@ -115,6 +112,7 @@ processor, a mean speedup of 2.27x is inadequate.
 \psfig{figure=fine_data.eps, width=3.2in}
 \caption{Fine-Grained Data Parallelism normalized to single core.
 \protect\label{fig:fine_data}}
+\vspace{-6pt}
 \end{figure}
 The StreamIt programming model facilitates relatively simple analysis
 to determine opportunities for data parallelism.  But the granularity
@@ -126,12 +124,12 @@ of overwhelming the communication substrate of the target
 architecture.  To study this, we implemented a simple algorithm for
 exposing data parallelism: replicate each filter by the number of
 cores, mapping each to its own core.  We call this fine-grained data
-parallelism. In Figure \ref{fig:fine_data}, we show this technique
-normalized to single-core performance. Fine-grained data parallelism
-achieves a mean speedup of 1.40x over sequential StreamIt. Note that
-FilterBank is not included in Figure \ref{fig:fine_data} because the
-size of the fine-grained data parallel stream graph stressed our
-infrastructure. For four of our benchmarks, fine-grained duplication
+parallelism.  In Figure \ref{fig:fine_data}, we show this technique
+normalized to single-core performance.  Fine-grained data parallelism
+achieves a mean speedup of only 1.40x over sequential StreamIt.  Note
+that FilterBank is not included in Figure \ref{fig:fine_data} because
+the size of the fine-grained data parallel stream graph stressed our
+infrastructure.  For four of our benchmarks, fine-grained duplication
 on 16 cores has lower throughput than single-core.
 
 The second bar of Figure \ref{fig:main_comp} gives the speedup of
@@ -154,12 +152,6 @@ preponderance of stateful computation.
 
 \subsection{Exploiting Coarse-Grained Software Pipeline Parallelism}
 
-\begin{figure}[t]
-\centering
-\psfig{figure=softpipe_graph.eps, width=3.2in}
-\caption{Task and Task + Software Pipeline normalized to single core.
-\protect\label{fig:softpipe_graph}}
-\end{figure}
 Our technique for coarse-grained software pipelining is effective for
 exploiting coarse-grained pipelined parallelism (though it
 under-performs when compared to coarse-grained data parallelism).
@@ -212,6 +204,13 @@ affecting the critical path work (as estimated statically) and
 performs inter-core communication in parallel.  Each reduces the
 synchronization encountered on the critical path.
 
+\begin{figure}[t]
+\centering
+\psfig{figure=softpipe_graph.eps, width=3.2in}
+\caption{Task and Task + Software Pipeline normalized to single core.
+\protect\label{fig:softpipe_graph}}
+\vspace{-6pt}
+\end{figure}
 The combined technique depresses the performance of MPEG by 6\%
 because the Selective Fusion component of the software pipeliner fuses
 one step too far.  In most circumstances, fusion will help to reduce
@@ -248,13 +247,15 @@ generally excellent compute utilization; in 7 cases the utilization is
 \psfig{figure=vs_space_graph.eps, width=3.2in}
 \caption{Task + Data + Software Pipeline normalized to Task + Pipeline.
 \protect\label{fig:vs-space}}
+\vspace{-6pt}
 \end{figure}
 
 \begin{figure*}[t]
 \centering
-\psfig{figure=thruput.eps, width=6.5in}
-\caption{Comparison and Task + Data + Software Pipeline Performance Results.
+\psfig{figure=thruput.eps, width=6.1in}
+\caption{Comparison of Task + Data + Software Pipeline performance results.
 \protect\label{fig:thruput}}
+\vspace{-6pt}
 \end{figure*}
 In Figure \ref{fig:vs-space} we show our combined technique normalized
 to our previous work for compiling streaming applications to multicore
@@ -263,10 +264,9 @@ ideas presented in \cite{streamit-asplos} and implements a task plus
 pipeline parallel execution model relying solely on on-chip buffering
 and the on-chip static network for communication and
 synchronization. Our new techniques achieve a mean speedup of 1.84x
-over this baseline. \footnote{Please note that the version of
-\cite{streamit-asplos} published in the conference proceedings 
-contained incorrect MFLOPS measurements.}
-
+over this baseline\footnote{Please note that the version of
+\cite{streamit-asplos} published in the conference proceedings
+contained incorrect MFLOPS measurements.}.
 
 For most of our benchmarks, the combined techniques presented in this
 paper offer improved data parallelism, improved scheduling

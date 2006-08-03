@@ -3,8 +3,8 @@
 To facilitate evaluation of our techniques, we have implemented a
 fully-automatic compiler that supports each of the execution models
 discussed in this paper.  The compiler targets the Raw
-Microprocessor.  In this section we will first give a description of
-the Raw Architecture followed by implementation details of the 
+microprocessor.  In this section we will first give a description of
+the Raw architecture followed by implementation details of the 
 execution models.
 
 \subsection{The Raw Architecture}
@@ -16,8 +16,8 @@ execution models.
 %\caption{Block diagram of the Raw architecture.
 %\protect\label{fig:raw-diagram}}
 %\end{figure}
-The Raw Microprocessor \cite{raw10,raw} addresses the wire delay
-problem \cite{raw13} by providing direct instruction set architecture
+The Raw microprocessor~\cite{raw10,raw} addresses the wire delay
+problem~\cite{raw13} by providing direct instruction set architecture
 (ISA) analogs to three underlying physical resources of the processor:
 gates, wires and pins. The architecture exposes the gate resources as
 a scalable 2-D array of identical, programmable cores, that are
@@ -29,14 +29,14 @@ cores contains a compute processor, some memory and two types of
 routers--one static, one dynamic--that control the flow of data over
 the networks as well as into the compute processor.  The compute
 processor interfaces to the network through a bypassed,
-register-mapped interface \cite{raw10} that allows instructions to use
+register-mapped interface~\cite{raw10} that allows instructions to use
 the networks and the register files interchangeably.
 
 Because we generate bulk DRAM transfers, we do not want these
 optimizable accesses to become the bottleneck of the hardware
 configuration.  So, we employ a simulation a CL2 PC 3500 DDR DRAM,
 which provides enough bandwidth to saturate both directions of a Raw
-port \cite{raw_isca}.  Additionally, each chipset contains a streaming
+port~\cite{raw_isca}.  Additionally, each chipset contains a streaming
 memory controller that supports a number of simple streaming memory
 requests. In our configuration, we attach 16 such DRAMs to each of the
 16 logical ports of the chip.  The chipset receives request messages
@@ -60,35 +60,35 @@ execution models.
 
 \subsection{Task + Pipeline Parallel Execution}
 \label{sec:space-imp}
-To compile for the task plus pipeline parallel execution model, we
-leverage our previous work\cite{streamit-asplos}. In this model we
-require that the number of filters in the stream graph be less than or
-equal to the number of processing cores of the target architecture.
-To achieve this, we repeatedly apply fusion and fission
+To compile for the task plus (hardware) pipeline parallel execution
+model, we leverage our previous work~\cite{streamit-asplos}.  In this
+model we require that the number of filters in the stream graph be
+less than or equal to the number of processing cores of the target
+architecture.  To achieve this, we repeatedly apply fusion and fission
 transformations as directed by a dynamic programming algorithm, termed
 the {\it partitioner}.  The algorithm fisses individual filters or
-fuses local sections of the stream graph in the hope of creating a
-load balanced stream graph ready for execution.
+fuses contiguous sections of the stream graph in the hope of creating
+a load balanced stream graph ready for execution.
 
-The resulting nodes of the stream graph are executed in a
-space-multiplexed manner.  We calculate the mapping of nodes to Raw
-cores using simulated annealing, with at most one node mapped to each
-core.  Communication bypasses the memory system as the nodes
-communicate over the Raw's static network.  Because the static network
-is blocking and has little buffering, the simulated annealing cost
-function attempts to model the synchronization costs of each layout
-configuration encountered during the search. 
+The resulting nodes of the stream graph are executed in a pipelined
+manner.  We calculate the mapping of nodes to Raw cores using
+simulated annealing, with at most one node mapped to each core.
+Communication bypasses the memory system as the nodes communicate over
+the Raw's static network.  Because the static network is blocking and
+has little buffering, the simulated annealing cost function attempts
+to model the synchronization costs of each layout configuration
+encountered during the search.
 
 \subsection{Compiler and Execution Model}
 For this paper we have implemented a new backend targeting Raw that
-does not solely rely on a space-multiplexed approach.  The new backend
-adopts a more flexible approach for its execution model. Multiple
-filters from non-local sections of the stream graph can be assigned to
-each processing core.  Across the cores, filters execute in dataflow
-order, with each filter reading its input from and writing its output
-to shared memory. Each core executes a schedule of filters assigned to
-it and each filter executes on a single processing core for the entire
-execution.
+does not solely rely on a hardware-pipelined approach.  The new
+backend adopts a more flexible approach for its execution model.
+Multiple filters from non-local sections of the stream graph can be
+assigned to each processing core.  Across the cores, filters execute
+in dataflow order, with each filter reading its input from and writing
+its output to shared memory. Each core executes a schedule of filters
+assigned to it and each filter executes on a single processing core
+for the entire execution.
 
 Interestingly, for the techniques presented in this paper we do not
 leverage Raw's on-chip static network for communication between
@@ -146,6 +146,13 @@ stream graph removes the dependences between filters allowing us to
 perform all the splits and joins of the stream graph in parallel
 across the chip.
 
+\begin{figure*}[t]
+\centering
+\psfig{figure=benchchar.eps, width=6.15in}
+\caption{Benchmark descriptions and characteristics.
+\protect\label{fig:benchchar}}
+\vspace{-6pt}
+\end{figure*}
 
 \subsubsection{Scheduling without Software Pipelining}
 Our scheduling techniques for software pipelining of the stream graph
@@ -158,11 +165,11 @@ encompassing outer loop in the stream graph.
 
 This scheduling problem is equivalent to static scheduling of a
 coarse-grained dataflow DAG to a multiprocessor which has been a
-well-studied problem over the last 40 years (see \cite{DAGSched} for a
+well-studied problem over the last 40 years (see~\cite{DAGSched} for a
 good review).  After a review of the research, we decided to once
 again leverage simulated annealing because recent research
 demonstrates that randomized solutions to this static scheduling
-problem are superior to other heuristics \cite{kwok99fastest}. 
+problem are superior to other heuristics~\cite{kwok99fastest}. 
 
 Briefly, we generate an initial layout by assigning the filters of the
 stream graph to processors in dataflow order, assigning a random
