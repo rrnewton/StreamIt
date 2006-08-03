@@ -35,8 +35,9 @@ stateful filters (or feedback loops).  According to our analysis in
 Section~\ref{sec:model}, leveraging pipeline parallelism on a 64-core
 chip when only 10\% of the filters have state could offer up to a 6.4x
 speedup (improvement in load balancing).  Exposing pipeline
-parallelism for the stateful benchmarks in our suite provided a 1.45x
-speedup over data parallelism.  
+parallelism in combination with data parallelism for the stateful
+benchmarks in our suite provided a 1.45x speedup over data
+parallelism alone.
 
 As our techniques rely on specific features of the StreamIt
 programming model, the results suggest that these features are a good
