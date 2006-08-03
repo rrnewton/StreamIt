@@ -7,8 +7,9 @@ of the following contributions and conclusions:
 
 \begin{itemize}
 \item Our technique for exploiting coarse-grained data parallelism
-produces abundant parallelism and achieve a geometric mean performance
-gain of 9.9x over a sequential, single-core baseline.
+produces abundant parallelism at the correct granularity and achieve a
+geometric mean performance gain of 9.9x over a sequential, single-core
+baseline.
 \item Coarse-grained software pipelining is a
 an effective technique for extracting parallelism beyond task and data
 parallelism, with an additional mean speedup of 1.45x for
@@ -24,17 +25,17 @@ In the evaluation, speedup of configuration A over B is calculated as
 the throughput for an average steady-state of A divided by B; the
 initialization and prologue schedules, if present, are not
 included. Figure \ref{fig:thruput} presents a table of throughput
-speedups normalized to single-core for most configurations.
-\cite{raw_isca} reported that sequential StreamIt executing on a
-single Raw core outperformed hand-written C implementations executing
-on a single core over a benchmark similar to ours. Furthermore, we
-have increased the performance of sequential compilation since
-\cite{raw_isca}.
+speedups normalized to single-core for most configurations.  Previous
+work has shown that sequential StreamIt executing on a single Raw core
+outperformed hand-written C implementations executing on a single core
+over a benchmark similar to ours \cite{raw_isca}. Furthermore, we have
+increased the performance of sequential compilation since this
+previous evaluation.
 
 \begin{figure*}[t]
 \centering
 \psfig{figure=benchchar.eps, width=6.5in}
-\caption{Benchmark characteristics
+\caption{Benchmark description and characteristics.
 \protect\label{fig:benchchar}}
 \end{figure*}
 
@@ -84,6 +85,7 @@ MPEG, radar, and vocoder}.
 \centering
 \psfig{figure=maingraph.eps, width=6.5in}
 \caption{Task, Task + Data, and Task + Data + Software Pipeline
+normalized to single core.
 \protect\label{fig:main_comp}}
 \end{figure*}
 
@@ -111,7 +113,7 @@ processor, a mean speedup of 2.27x is inadequate.
 \begin{figure}[t]
 \centering
 \psfig{figure=fine_data.eps, width=3.2in}
-\caption{Fine-Grained Data Parallelism normalized to Single Core
+\caption{Fine-Grained Data Parallelism normalized to single core.
 \protect\label{fig:fine_data}}
 \end{figure}
 The StreamIt programming model facilitates relatively simple analysis
@@ -155,7 +157,7 @@ preponderance of stateful computation.
 \begin{figure}[t]
 \centering
 \psfig{figure=softpipe_graph.eps, width=3.2in}
-\caption{Task and Task + Software Pipeline
+\caption{Task and Task + Software Pipeline normalized to single core.
 \protect\label{fig:softpipe_graph}}
 \end{figure}
 Our technique for coarse-grained software pipelining is effective for
@@ -244,14 +246,14 @@ generally excellent compute utilization; in 7 cases the utilization is
 \begin{figure}[t]
 \centering
 \psfig{figure=vs_space_graph.eps, width=3.2in}
-\caption{Task + Pipeline and Task + Data + Software Pipeline
+\caption{Task + Data + Software Pipeline normalized to Task + Pipeline.
 \protect\label{fig:vs-space}}
 \end{figure}
 
 \begin{figure*}[t]
 \centering
 \psfig{figure=thruput.eps, width=6.5in}
-\caption{Comparison and Task + Data + Software Pipeline Performance Results
+\caption{Comparison and Task + Data + Software Pipeline Performance Results.
 \protect\label{fig:thruput}}
 \end{figure*}
 In Figure \ref{fig:vs-space} we show our combined technique normalized
