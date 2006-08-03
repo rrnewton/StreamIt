@@ -4,9 +4,9 @@
 
 As centralized microprocessors are ceasing to scale effectively,
 multicore architectures are becoming the industy standard.  For
-example, the IBM/Toshiba/Sony Cell processor has 9 cores\cite{Cell-hpca}, Sun
-Niagara has 8 cores\cite{Niagara}, RMI XLR732 has 8 cores\cite{RMI-web},
-IBM/Microsoft Xenon has 3 cores, and most vendors are shipping
+example, the IBM/Toshiba/Sony Cell processor has 9 cores~\cite{Cell-hpca}, Sun
+Niagara has 8 cores~\cite{Niagara}, RMI XLR732 has 8 cores~\cite{RMI-web},
+IBM/Micro\-soft Xenon has 3 cores, and most vendors are shipping
 dual-core chips.  Cisco has described a next-generation network
 processor containing 192 Tensilica Xtensa cores~\cite{etherton05ancs}.
 %The Intel IXP 2800 network processor has 1 core and 16 micro-engines.
@@ -21,8 +21,8 @@ that remains largely intractable.
 
 The stream programming paradigm offers a promising approach for
 exposing parallelism suitable for multicore architectures.  Stream
-languages such as StreamIt\cite{streamitcc}, Brook\cite{brook04},
-Baker\cite{Baker}, and Spidle\cite{spidle02} are motivated not only by
+languages such as StreamIt~\cite{streamitcc}, Brook~\cite{brook04},
+Baker~\cite{Baker}, and Spidle~\cite{spidle02} are motivated not only by
 trends in computer architecture, but also by trends in the application
 space, as network, image, voice, and multimedia programs are becoming
 only more prevalent.  In the StreamIt Language, a program is represented
@@ -65,13 +65,13 @@ However, while data parallelism is well-suited to vector machines, on
 coarse-grained multicore architectures it can introduce excessive
 communication overhead.  Previous data-parallel streaming
 architectures have focused on designing a special memory hierarchy to
-support this communication\cite{imagine-ieee}.  The other hazards of data
+support this communication~\cite{imagine-ieee}.  The other hazards of data
 parallelism include increased buffering and latency, as well as the
 inability to parallelize actors with state.
 
 Pipeline parallelism applies to chains of producers and consumers that
 are directly connected in the stream graph.  In our previous
-work\cite{streamit-asplos}, we exploited pipeline parallelism by
+work~\cite{streamit-asplos}, we exploited pipeline parallelism by
 mapping clusters of producers and consumers to different cores and
 using an on-chip network for direct communication between actors (see
 Figure~\ref{fig:exemodel}d).  Compared to data parallelism, this
@@ -117,17 +117,17 @@ with another processor.
 
 Our techniques for exploiting coarse-grained data and pipeline
 parallelism are complementary, as data-parallel actors can also be
-scheduled using software pipelining.  As described in our results
-section, either technique in isolation offers significant speedups,
-Executing on 16 cores, coarse-grained pipeline parallelism achieves a
-mean speedup of 7.7x over single core performance and 3.4x over a task
-parallel baseline on 16 cores.  Coarse-grained data parallelism
-achieves 9.9x and 4.4x, respectively. Combining the techniques yields
-the most general results, as data parallelism offers good load
-balancing for stateless actors while software pipelining enables
-stateful actors to execute in parallel.  The mean speedup of the
-combined technique executed on 16 cores is 11.2x over single core and
-5.0x speedup over task parallelism on 16 cores.
+scheduled using software pipelining.  To evaluate the techniques, we
+implemented them in the StreamIt compiler, targeting the 16-core Raw
+architecture.  Executing on 16 cores, coarse-grained data parallelism
+achieves a mean speedup of 9.9x over a single core and 4.4x over a
+task parallel baseline on 16 cores.  Coarse-grained pipeline
+parallelism achieves 7.7x and 3.4x, respectively.  Combining the
+techniques yields the most general results, as data parallelism offers
+good load balancing for stateless actors while software pipelining
+enables stateful actors to execute in parallel.  The mean speedup of
+the combined technique is 11.2x over a single core and 5.0x over a
+task-parallel baseline.
 
 %% Other Multicores (Trademarks?):
 %% RMI XLR Family of Processors
@@ -139,11 +139,13 @@ combined technique executed on 16 cores is 11.2x over single core and
 \begin{figure}[t]
 \centering
 \psfig{figure=vocoder.eps,width=3in}
+\vspace{-12pt}
 \caption{Stream graph for a simplified subset of our Vocoder
 benchmark.  Following a bank of sliding DFTs, the signal is converted
 to polar coordinates.  Node {\tt B2} sends the magnitude component to
 the left and the phase component to the right.  In this simplified
 example, no magnitude adjustment is needed.\label{fig:vocoder}}
+\vspace{-12pt}
 \end{figure}
 
 \begin{figure*}[t]

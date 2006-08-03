@@ -1,6 +1,11 @@
 \begin{figure}[t]
+\centering
 \psfig{figure=pipeline-scaling.eps,width=3in}
-\caption{ PUT SOMETHING HERE!
+\caption{Potential speedups of pure pipeline paralellism over pure data
+parallelism for varying amounts of stateful work in the application.
+Each line represents a different amount of work in the bottleneck
+filter.  The graph assumes 16 cores and does not consider task
+parallelism or communication costs.
 \protect\label{fig:model-speedup}}
 \end{figure}
 
@@ -26,7 +31,8 @@ Also let $m$ denote the maximum work performed by any individual
 stateful filter.  Given $N$ processing cores, let us consider the load
 balancing achieved by a data-parallel and pipeline-parallel execution
 model.  In this exercise, we do not model the costs of communication,
-synchronization, locality, etc.
+synchronization, locality, etc.  We also do not model the effects of
+task parallelism.
 
 \begin{itemize}
 \item Using data parallelism, $1-s$ parts of the work are

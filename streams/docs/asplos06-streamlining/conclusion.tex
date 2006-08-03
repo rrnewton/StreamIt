@@ -44,7 +44,6 @@ programming model, the results suggest that these features are a good
 match for multicore architectures.  Of particular importance are the
 following two language features:
 \begin{enumerate}
-
 \item Exposing producer-consumer relationships between filters.  This
 enables us to coarsen the computation to communication ratio via
 filter fusion, and also enables pipeline parallelism.
@@ -53,7 +52,6 @@ filter fusion, and also enables pipeline parallelism.
 central to the formulation of software pipelining; it also enables
 data parallelism, as the products of filter fission may span multiple
 steady-state iterations.
-
 \end{enumerate}
 
 While our implementation targets Raw, the techniques developed should
