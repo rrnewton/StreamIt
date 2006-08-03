@@ -186,6 +186,7 @@ section we ran a host of optimizations including function inlining,
 constant propagation, constant folding, array scalarization, and loop
 unrolling (with a factor of 4).  These optimizations are especially
 important for a fused filter, as we can possibly unroll enough to
-scalarize the splitter and joiner buffers, eliminating the shuffling
-operations.  Finally, the two backends produce a mix of C and assembly
-code that is compiled with GCC 3.4 at optimization level 3.
+scalarize constituent splitter and joiner buffers, eliminating the
+shuffling operations.  Finally, the two backends produce a mix of C
+and assembly code that is compiled with GCC 3.4 at optimization level
+3.
