@@ -84,18 +84,31 @@ In addition, effective load balancing is critical, as the throughput
 of the stream graph is equal to the minimum throughput across all of
 the processors.
 
-In this paper, we present two novel techniques for overcoming the
-traditional limitations in exploiting task, data, and pipeline
-parallelism on multicore architectures.  The first technique leverages
-data parallelism, but avoids the communication overhead by first
-increasing the granularity of the stream graph.  Using a program
-analysis, we fuse actors in the graph as much as possible so long as
-the result is stateless.  Each fused actor has a significantly higher
-computation to communication ratio, and thus incurs significantly
-reduced communication overhead in being duplicated across cores.  To
-further reduce the communication costs, the technique also leverages
-task parallelism: two task-parallel actors need only be split across
-half of the cores in order to obtain high utilization.
+In this paper, we describe a robust compiler system that leverages the
+right combination of task, data, and pipeline parallelism to achieve
+good multicore performance across a wide range of input programs.
+Because no single type of parallelism is a perfect fit for all
+situations, a unified analysis is needed to obtain consistent results.
+Using the StreamIt language as our input and targeting the 16-core Raw
+architecture, our compiler demonstrates a mean speedup of 11.2x over a
+single-core baseline; 7 out of 12 benchmarks speedup by over 12x.
+This also represents a 1.84x improvement over our previous
+work~\cite{streamit-asplos}.
+
+As part of this effort, we have developed two new compiler techniques
+that are generally applicable to any coarse-grained multicore
+architecture.  The first technique leverages data parallelism, but
+avoids the communication overhead by first increasing the granularity
+of the stream graph.  Using a program analysis, we fuse actors in the
+graph as much as possible so long as the result is stateless.  Each
+fused actor has a significantly higher computation to communication
+ratio, and thus incurs significantly reduced communication overhead in
+being duplicated across cores.  To further reduce the communication
+costs, the technique also leverages task parallelism: two
+task-parallel actors need only be split across half of the cores in
+order to obtain high utilization.  On Raw, coarse-grained data
+parallelism achieves a mean speedup of 9.9x over a single core and
+4.4x over a task-parallel baseline.
 %While this technique exploits data parallelism, it also relies on the
 %producer-consumer relationships evident in stream programs for
 %increasing the granularity of the graph.
@@ -113,21 +126,18 @@ pipelining allows stateful actors to execute in parallel.
 % and avoids the communication overhead of data parallelism.  
 However, it avoids the synchronization overhead because processors are
 reading and writing into a buffer rather than directly communicating
-with another processor.
-
-Our techniques for exploiting coarse-grained data and pipeline
-parallelism are complementary, as data-parallel actors can also be
-scheduled using software pipelining.  To evaluate the techniques, we
-implemented them in the StreamIt compiler, targeting the 16-core Raw
-architecture.  Executing on 16 cores, coarse-grained data parallelism
-achieves a mean speedup of 9.9x over a single core and 4.4x over a
-task parallel baseline on 16 cores.  Coarse-grained pipeline
-parallelism achieves 7.7x and 3.4x, respectively.  Combining the
-techniques yields the most general results, as data parallelism offers
-good load balancing for stateless actors while software pipelining
-enables stateful actors to execute in parallel.  The mean speedup of
-the combined technique is 11.2x over a single core and 5.0x over a
+with another processor.  On Raw, coarse-grained software pipelining
+achieves a 7.7x speedup over a single core and a 3.4x speedup over a
 task-parallel baseline.
+
+Combining the techniques yields the most general results, as data
+parallelism offers good load balancing for stateless actors while
+software pipelining enables stateful actors to execute in parallel.
+Any task parallelism in the application is also naturally utilized,
+though excess parallelism may be collapsed during granularity
+adjustment.  This integrated treatment of coarse-grained parallelism
+leads to an overall speedup of 11.2x over a single core and 5.0x over
+a task-parallel baseline.
 
 %% Other Multicores (Trademarks?):
 %% RMI XLR Family of Processors
