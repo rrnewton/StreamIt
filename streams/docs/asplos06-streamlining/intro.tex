@@ -77,11 +77,12 @@ using an on-chip network for direct communication between actors (see
 Figure~\ref{fig:exemodel}d).  Compared to data parallelism, this
 approach offers reduced latency, reduced buffering, and good locality.
 It does not introduce any extraneous communication, and it provides
-the new ability to execute stateful actors in parallel.  However, this
-form of pipelining introduces extra synchronization, as producers and
-consumers must stay tightly coupled in their execution.  In addition,
-effective load balancing is critical, as the throughput of the stream
-graph is equal to the minimum throughput across all of the processors.
+the ability to execute any pair of stateful actors in parallel.
+However, this form of pipelining introduces extra synchronization, as
+producers and consumers must stay tightly coupled in their execution.
+In addition, effective load balancing is critical, as the throughput
+of the stream graph is equal to the minimum throughput across all of
+the processors.
 
 In this paper, we present two novel techniques for overcoming the
 traditional limitations in exploiting task, data, and pipeline
@@ -127,8 +128,6 @@ balancing for stateless actors while software pipelining enables
 stateful actors to execute in parallel.  The mean speedup of the
 combined technique executed on 16 cores is 11.2x over single core and
 5.0x speedup over task parallelism on 16 cores.
-
-The rest of this paper is organized as follows.  (blah blah blah.)
 
 %% Other Multicores (Trademarks?):
 %% RMI XLR Family of Processors

@@ -204,14 +204,15 @@ architecture avoids many of the complications and exposes many new
 optimization opportunities versus traditional software pipelining.  In
 traditional software pipelining, the limited size of the register file
 is always an adversary (register pressure), but there is more memory
-available for buffering stream data.  In addition, the unrolling
-associated with instruction-level software pipelining causes a
-corresponding expansion of code size; however, since we are mapping
-each filter to only a single processor, there is no code bloat.
+available for buffering stream data.
+%In addition, the unrolling
+%associated with instruction-level software pipelining causes a
+%corresponding expansion of code size; however, since we are mapping
+%each filter to only a single processor, there is no code bloat.
 Another recurring issue traditionally is the length of the prologue to
 the software pipelined loop, but this is less problematic in the
 streaming domain because the steady-state executes infinitely.
-Lastly, and most importantly, we can use this synergy to fully
+Lastly, and most importantly, we can exploit these properties to fully
 pipeline the graph, removing all dependences and thus removing all the
 constraints for our scheduling algorithm.
 
