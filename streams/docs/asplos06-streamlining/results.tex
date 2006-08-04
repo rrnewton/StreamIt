@@ -55,11 +55,7 @@ total number of filters in the stream (including file input filters
 and file output filters that are not mapped to cores).  The number of
 filters that perform peeking is important because peeking filters
 cannot be fused with upstream neighbors without introducing shared
-state. ``Task Parallel Critical Path'' calculates, using static work
-estimates, the work that is on the critical path for a task parallel
-model, assuming infinite processors, as a percentage of the total
-work.  Smaller percentages indicate the presence of task parallelism.
-``Comp / Comm'' gives the static estimate of the computation to
+state. ``Comp / Comm'' gives the static estimate of the computation to
 communication ratio of each benchmark for one steady-state
 execution. This is calculated by totaling the computation estimates
 across all filters and dividing by the number of dynamic {\tt push} or
@@ -67,7 +63,11 @@ across all filters and dividing by the number of dynamic {\tt push} or
 and popped are 32 bits). Notice that although the computation to
 communication ratio is much larger than 1 across our benchmarks, we
 will demonstrate that inter-core synchronization is an important
-factor to consider.
+factor to consider. ``Task Parallel Critical Path'' calculates, using
+static work estimates, the work that is on the critical path for a
+task parallel model, assuming infinite processors, as a percentage of
+the total work.  Smaller percentages indicate the presence of task
+parallelism.
 
 ``$\sigma$'' is defined in Section \ref{sec:pipeline-model} as the
 fraction of total work that is stateful.  ``$\mu$'' is the maximum
