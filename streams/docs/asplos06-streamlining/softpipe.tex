@@ -2,11 +2,11 @@
 \begin{center}
 \psfig{figure=pipeline-scaling.eps,width=3.2in}
 \end{center}
-\caption{Potential speedups of pure pipeline paralellism over pure data
-parallelism for varying amounts of stateful work in the application.
-Each line represents a different amount of work in the bottleneck
-filter.  The graph assumes 16 cores and does not consider task
-parallelism or communication costs.
+\caption{Potential speedups of pure pipeline paralellism over pure
+data parallelism for varying amounts of stateful work in the
+application.  Each line represents a different amount of work in the
+heaviest stateful filter.  The graph assumes 16 cores and does not
+consider task parallelism or communication costs.
 \protect\label{fig:model-speedup}}
 \end{figure}
 
@@ -29,9 +29,10 @@ quantify.  Consider that the sequential execution of an application
 requires unit time, and let $\sigma$ denote the fraction of work
 (sequential execution time) that is spent within stateful filters.
 Also let $\mu$ denote the maximum work performed by any individual
-stateful filter.  Given $N$ processing cores, let us consider the load
-balancing achieved by two execution models: 1) data parallelism, and
+stateful filter.  Given $N$ processing cores, we model the execution
+time achieved by two scheduling techniques: 1) data parallelism, and
 2) data parallelism plus pipeline parallelism.  In this exercise, we
+assume that execution time is purely a function of load balancing; we
 do not model the costs of communication, synchronization, locality,
 etc.  We also do not model the impact of task parallelism.
 
@@ -43,11 +44,13 @@ run as a separate stage on a single core, adding $\sigma$ units to the
 overall execution.  The total execution time is $\sigma+(1-\sigma)/N$.
 
 \item Using data and pipeline parallelism, any set of filters can
-execute in parallel during the steady state.  The stateful filters can
-be assigned to the processors, minimizing the maximum amount of work
-allocated to any processor.  Even a greedy assignment (filling up one
-processor at a time) guarantees that no processor exceeds the ideal
-work balance of $\sigma/N$ by more than $\mu$, the bottleneck stateful
+execute in parallel during the steady state.  (That is, each stateful
+filter can now execute in parallel with others; the stateful filter
+itself is not parallelized.)  The stateful filters can be assigned to
+the processors, minimizing the maximum amount of work allocated to any
+processor.  Even a greedy assignment (filling up one processor at a
+time) guarantees that no processor exceeds the lower-bound work
+balance of $\sigma/N$ by more than $\mu$, the heaviest stateful
 filter.  Thus, the stateful work can always complete in $\sigma/N+\mu$
 time.  Remaining data parallelism can be freely distributed across
 processors.  If it fills each processor to $\sigma/N+\mu$ or beyond,
@@ -75,15 +78,15 @@ execution time is $\max(\sigma/N+\mu, 1/N)$.
 \end{enumerate}
 
 Using these modeled runtimes, Figure~\ref{fig:model-speedup}
-illustrates the potential speedup (due to load balancing) of adding
-pipeline parallelism to a data-parallel execution model for various
-values of $\mu/\sigma$ on a 16-core architecture.  In the best case,
-$\mu/\sigma$ approaches $0$ and the speedup is
-$(\sigma+(1-\sigma)/N)/\max(\sigma/N, 1/N) = 1+\sigma*N$.  For
-example, if there are $16$ cores and even as little as $1/16$th of the
-work is stateful, then pipeline parallelism offers potential gains of
-2x.  For these parameters, the worst-case gain ($\mu=\sigma$) is also
-2x.  The best and worst cases diverge for larger values of $\sigma$.
+illustrates the potential speedup of adding pipeline parallelism to a
+data-parallel execution model for various values of $\mu/\sigma$ on a
+16-core architecture.  In the best case, $\mu/\sigma$ approaches $0$
+and the speedup is $(\sigma+(1-\sigma)/N)/\max(\sigma/N, 1/N) =
+1+\sigma*N$.  For example, if there are $16$ cores and even as little
+as $1/16$th of the work is stateful, then pipeline parallelism offers
+potential gains of 2x.  For these parameters, the worst-case gain
+($\mu=\sigma$) is also 2x.  The best and worst cases diverge for
+larger values of $\sigma$.
 
 \subsection{Exploiting Pipeline Parallelism}
 
@@ -123,10 +126,9 @@ processor monitors several filters and fires any who has data
 available.  This allows filters to advance to different iterations of
 the original stream graph even if they are assigned to the same
 processing node.  However, because filters are executing out-of-order,
-a new flow-control mechanism (e.g., using credits) is needed;
-otherwise it may not be possible to buffer some newly-arrived input
-items that are destined for a specific filter.  There is also some
-overhead due to the dynamic dispatching step.
+the communication pattern is no longer static and a more complex
+flow-control mechanism (e.g., using credits) may be needed.  There is
+also some overhead due to the dynamic dispatching step.
 
 \end{itemize}
 
@@ -193,7 +195,7 @@ algorithm considers filters in order of decreasing work, assigning
 each one to the processor that has the least amount of work so far.
 As described in Section~\ref{sec:pipeline-model}, this heuristic
 ensures that the bottleneck processor does not exceed the optimum by
-more than the amount of work in the overall bottleneck filter.
+more than the amount of work in the heaviest filter.
 
 To minimize synchronization, we wrap the partitioning algorithm with a
 selective fusion pass.  This pass repeatedly fuses the two adjacent
