@@ -82,7 +82,7 @@ network, with resource contention modeled accordingly.
 
 \subsection{StreamIt Compiler Infrastructure}
 The techniques presented in this paper are evaluated in the context of
-the StreamIt Compiler Infrastructure.  The system includes both
+the StreamIt compiler infrastructure.  The system includes both
 high-level stream optimizations and multiple architecture-specific
 backends
 \cite{streamittech2,lamb:pldi:2003,agrawal:cases:2005,sermulins:lctes:2005,
@@ -100,8 +100,7 @@ of the limited FIFO buffering of the network.  Although this is not a
 fundamental limit of the architecture, it forces fine-grained
 orchestration of communication and computation.
 
-Also, we elected to buffer all streaming data off-chip.  In the
-compiler, multiple filters from non-local sections of the stream graph
+Also,  multiple filters from non-local sections of the stream graph
 can be assigned to each processing core.  Across the cores, filters
 execute in dataflow order, with each filter reading its input from and
 writing its output to shared memory. Each core executes a schedule of
@@ -120,9 +119,9 @@ a split or join point is reached.
 %multicores do not provide fine-grained, low-latency inter-core
 %communication.
 
-Streaming input and output to a filter are not buffered on the chip
-itself because given the Raw configuration we are simulating and for
-the regular bulk memory traffic we generate, it is more expensive to
+In the compiler, we elected to buffer all streaming data off-chip
+because given the Raw configuration we are simulating and for the
+regular bulk memory traffic we generate, it is more expensive to
 stream data from a core's local data cache than to stream the data
 from the streaming memory controllers. A load hit in the data cache
 incurs a 3-cycle latency.  So although the networks are
