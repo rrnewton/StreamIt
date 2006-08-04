@@ -53,37 +53,46 @@ unit maintains local communication.  We implement this functionality
 by first fusing the pipeline into a single filter, and then fissing
 the filter into a data-parallel splitjoin.  We apply fusion first
 because we assume that each data-parallel product will execute on a
-single machine; fusion enables powerful inter-node optimizations such
-as scalar replacement~\cite{sermulins:lctes:2005} and algebraic
+single core; fusion enables powerful inter-node optimizations such as
+scalar replacement~\cite{sermulins:lctes:2005} and algebraic
 simplification~\cite{agrawal:cases:2005,lamb:pldi:2003}.
 
 Some pipelines in the application cannot be fully fused without
 introducing internal state, thereby eliminating the data parallelism.
 %Fusion may introduce state even for previously stateless filters due
 %to items buffered on the intervening data channel.  
-Due to StreamIt's support for peeking (sliding window computations) as
-well as an optional {\tt prework} function (performing distinct
-computation on the first firing of a filter), an {\it initialization
-schedule} may be needed to prime the buffers prior to steady-state
-execution~\cite{karczma-thesis}.  If this schedule deposits items
-between two filters, then those items introduce state into the fused
-filter and prohibit data parallelism (even if the original filters
-were stateless).  For example, in Figure~\ref{fig:filterbank}a, the
-{\tt LowPassFilter}s and {\tt HighPassFilter}s cannot be fused with
-upstream neighbors because their peek rate exceeds their pop rate.
+For example, in Figure~\ref{fig:filterbank}a, the {\tt LowPassFilter}s
+and {\tt HighPassFilter}s perform peeking (a sliding window
+computation) and always require a number of data items to be present
+on the input channel.  If either filter is fused with filters above
+it, the data items will become state of the fused filter, thereby
+prohibiting data parallelism.  In the general case, the number of
+persistent items buffered between filters depends on the
+initialization schedule~\cite{karczma-thesis}.
+
+%% Due to StreamIt's support for peeking (sliding window computations) as
+%% well as an optional {\tt prework} function (performing distinct
+%% computation on the first firing of a filter), an {\it initialization
+%% schedule} may be needed to prime the buffers prior to steady-state
+%% execution~\cite{karczma-thesis}.  If this schedule deposits items
+%% between two filters, then those items introduce state into the fused
+%% filter and prohibit data parallelism (even if the original filters
+%% were stateless).  For example, in Figure~\ref{fig:filterbank}a, the
+%% {\tt LowPassFilter}s and {\tt HighPassFilter}s cannot be fused with
+%% upstream neighbors because their peek rate exceeds their pop rate.
 
 Thus, our algorithm for coarsening the granularity of data-parallel
 regions operates by fusing pipeline segments as much as possible so
 long as the result of each fusion is stateless.  For every pipeline in
 the application, the algorithm identifies the largest sub-segments
-that contain neither stateful filters nor buffered items and fuses
-them into single filters.  As the algorithm operates on pipelines at
-all levels of the stream hierarchy, it is possible that a low-level
-splitjoin will be collapsed during the fusion of a high-level
-pipeline.  While such fusion temporarily removes task parallelism,
-this parallelism will be restored in the form of data parallelism once
-the resulting filter is fissed.  The output of the algorithm on the
-FilterBank benchmark is illustrated in Figure~\ref{fig:filterbank}b.
+that contain neither stateful filters nor buffered items and fuses the
+sub-segments into single filters.  It is important to note that
+pipelines may contain splitjoins in addition to filters, and thus
+stateless splitjoins may be fused during this process.  While such
+fusion temporarily removes task parallelism, this parallelism will be
+restored in the form of data parallelism once the resulting filter is
+fissed.  The output of the algorithm on the FilterBank benchmark is
+illustrated in Figure~\ref{fig:filterbank}b.
 
 %% Filters that execute in parallel (i.e., adjacent children of a
 %% splitjoin) will be stateless in fused form if and only if they were
@@ -189,34 +198,6 @@ FilterBank benchmark is illustrated in Figure~\ref{fig:filterbank}b.
 %% \end{algorithmic}
 %% \end{algorithm}
 
-\begin{algorithm}[t]
-\caption{Heuristic algorithm for fissing a filter as little as
-possible while filling all cores with task or data-parallel
-work. \label{fig:judicious-fission}}
-{$\triangleright$ $F$ is the filter to fiss; $N$ is the total number of cores\\
-\textsc{JudiciousFission}(filter $F$, int $N$)}
-\begin{algorithmic}
-\Statex $\triangleright$ Estimate work done by $F$ as fraction of
-\Statex $\triangleright$ everyone running task-parallel to $F$
-\State $\mt{fraction} = 1.0$
-\State Stream $\mt{parent} \gets$ \Call{getParent}{$F$}
-\State Stream $\mt{child}  \gets F$
-\While {\mt{parent} $ \not= $ null}
-	\If {\mt{parent} is splitjoin}
-		\State \mt{total-work} $\gets$ \\
-\ \ \ \ \ \ \ \ \ \ \ \ \ \  \ \ \ \ \  $\sum_{c \in \textsc{children}(\mt{parent})}$ \Call{avgWorkPerFilter}{$c$}
-		\State \mt{my-work} $ \gets $ \Call{avgWorkPerFilter}{\mt{child}}
-		\State $\mt{fraction} \gets \mt{fraction} * \mt{my-work} /
-\mt{total-work}$
-	\EndIf
-	\State $\mt{child} \gets \mt{parent}$
-	\State $\mt{parent} \gets $ \Call{getParent}{\mt{parent}}
-\EndWhile
-\Statex $\triangleright$ Fiss $F$ according to its weight in task-parallel unit
-\State Fiss $F$ into \Call{ceil}{$\mt{fraction} * N$} filters
-\end{algorithmic}
-\end{algorithm}
-
 %\begin{figure}[t]
 %\framebox{TODO: typeset this code.}
 %\small
@@ -260,6 +241,35 @@ any computational overhead imposed by filter fission (e.g., fission of
 peeking filters introduces a decimation stage on each fission
 product).
 
+
+\begin{algorithm}[t]
+\caption{Heuristic algorithm for fissing a filter as little as
+possible while filling all cores with task or data-parallel
+work. \label{fig:judicious-fission}}
+{$\triangleright$ $F$ is the filter to fiss; $N$ is the total number of cores\\
+\textsc{JudiciousFission}(filter $F$, int $N$)}
+\begin{algorithmic}
+\Statex $\triangleright$ Estimate work done by $F$ as fraction of
+\Statex $\triangleright$ everyone running task-parallel to $F$
+\State $\mt{fraction} = 1.0$
+\State Stream $\mt{parent} \gets$ \Call{getParent}{$F$}
+\State Stream $\mt{child}  \gets F$
+\While {\mt{parent} $ \not= $ null}
+	\If {\mt{parent} is splitjoin}
+		\State \mt{total-work} $\gets$ \\
+\ \ \ \ \ \ \ \ \ \ \ \ \ \  \ \ \ \ \  $\sum_{c \in \textsc{children}(\mt{parent})}$ \Call{avgWorkPerFilter}{$c$}
+		\State \mt{my-work} $ \gets $ \Call{avgWorkPerFilter}{\mt{child}}
+		\State $\mt{fraction} \gets \mt{fraction} * \mt{my-work} /
+\mt{total-work}$
+	\EndIf
+	\State $\mt{child} \gets \mt{parent}$
+	\State $\mt{parent} \gets $ \Call{getParent}{\mt{parent}}
+\EndWhile
+\Statex $\triangleright$ Fiss $F$ according to its weight in task-parallel unit
+\State Fiss $F$ into \Call{ceil}{$\mt{fraction} * N$} filters
+\end{algorithmic}
+\end{algorithm}
+
 In order to balance task and data parallelism, we employ a ``judicious
 fission'' heuristic that estimates the amount of work that is
 task-parallel to a given filter and fisses the filter accordingly.
@@ -272,13 +282,13 @@ summing the work within a stream, it considers the average work per
 filter in each stream so as to mitigate the effects of imbalanced
 pipelines.
 %\framebox{Not clear when/why/if this works.}  
-After estimating a filter's work 
-%
-\\\vspace{-24pt} ~ \\ as a fraction of those running in parallel, the
-algorithm attempts to fiss the filter the minimum number of times
-needed to ensure that none of the fission products contains more than
-$1/N$ of the total task-parallel work (where $N$ is the total number
-of cores).
+After estimating a filter's work as a fraction of those running in
+parallel, the algorithm attempts to fiss the filter the minimum number
+of times needed to ensure that none of the fission products contains
+more than $1/N$ of the total task-parallel work (where $N$ is the
+total number of cores).  Note that if several filters are being
+fissed, the work estimation is calculated ahead of time and is not
+updated during the course of fission.
 
 Figure~\ref{fig:filterbank}c illustrates the outcome of performing
 judicious fission on the coarsened-granularity stream graph from

@@ -180,7 +180,7 @@ implications for managing buffers and scheduling communication.  We
 also describe our algorithm for mapping filters to cores, and compare
 the process to conventional software pipelining.
 
-We select the loop prologue so as to buffer at least one steady state
+We construct the loop prologue so as to buffer at least one steady state
 of data items between each pair of dependent filters.  This allows
 each filter to execute completely independently during each subsequent
 iteration of the stream graph, as they are reading and writing to
@@ -226,14 +226,14 @@ bottleneck partition increases by more than a given threshold (10\%),
 then the fusion is reversed and the process terminates.  This process
 increases the computation to communication ratio of the stream graph,
 while also leveraging the inter-node fusion optimizations mentioned
-previously.  It improves performance by up to 2X on the Radar
+previously.  It improves performance by up to 2x on the Radar
 benchmark, with a geometric mean of 15\% across all benchmarks.
 
 Overall, coarse-grained software pipelining on a multicore
 architecture avoids many of the complications and exposes many new
 optimization opportunities versus traditional software pipelining.  In
 traditional software pipelining, the limited size of the register file
-is always an adversary (register pressure), but there is more memory
+is always an adversary (register pressure), but there is ample memory
 available for buffering stream data.
 %In addition, the unrolling
 %associated with instruction-level software pipelining causes a
@@ -241,8 +241,8 @@ available for buffering stream data.
 %each filter to only a single processor, there is no code bloat.
 Another recurring issue traditionally is the length of the prologue to
 the software pipelined loop, but this is less problematic in the
-streaming domain because the steady-state executes infinitely.
-Lastly, and most importantly, we can exploit these properties to fully
+streaming domain because the steady-state executes longer.  Lastly,
+and most importantly, we can exploit these properties to fully
 pipeline the graph, removing all dependences and thus removing all the
 constraints for our scheduling algorithm.
 

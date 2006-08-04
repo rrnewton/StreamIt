@@ -1,4 +1,4 @@
-\section{Implementation} 
+\section{Implementation and Methodology}
 
 \subsection{The Raw Architecture}
 \label{sec:raw}
@@ -19,7 +19,7 @@ networks.  Values routed through the networks off of the side of the
 array appear on the pins, and values placed on the pins by external
 devices (wide-word A/Ds, DRAMS, etc.) appear on the networks.  Each of
 the cores contains a compute processor, some memory and two types of
-routers--one static, one dynamic--that control the flow of data over
+routers---one static, one dynamic---that control the flow of data over
 the networks as well as into the compute processor.  The compute
 processor interfaces to the network through a bypassed,
 register-mapped interface~\cite{raw10} that allows instructions to use
@@ -27,26 +27,25 @@ the networks and the register files interchangeably.
 
 Because we generate bulk DRAM transfers, we do not want these
 optimizable accesses to become the bottleneck of the hardware
-configuration.  So, we employ a simulation a CL2 PC 3500 DDR DRAM,
+configuration.  So, we employ a simulation of a CL2 PC 3500 DDR DRAM,
 which provides enough bandwidth to saturate both directions of a Raw
 port~\cite{raw_isca}.  Additionally, each chipset contains a streaming
 memory controller that supports a number of simple streaming memory
-requests. In our configuration, we attach 16 such DRAMs to each of the
-16 logical ports of the chip.  The chipset receives request messages
-over the dynamic network for bulk transfers to and from the DRAMs.
-The transfers themselves can use either the static network or the
-general dynamic network (the desired network is encoded in the
-request).
+requests. In our configuration, 16 such DRAMs are attached to the 16
+logical ports of the chip.  The chipset receives request messages over
+the dynamic network for bulk transfers to and from the DRAMs.  The
+transfers themselves can use either the static network or the general
+dynamic network (the desired network is encoded in the request).
 
 The results in this paper were generated using btl, a cycle-accurate
 simulator that models arrays of Raw cores identical to those in the
 .15 micron 16-core Raw prototype ASIC chip, with a target clock rate
 of 450 MHz. The core employs as compute processor an 8-stage, single
 issue, in-order MIPS-style pipeline that has a 32 KB data cache, 32 KB
-of instruction memory, and 64 KB of static router memory.  We
-augmented the simulator to include a 2-way set associative hardware
-instruction caching mechanism that is serviced over the dynamic
-network, with resource contention modeled accordingly. 
+of instruction memory, and 64 KB of static router memory.  The
+simulator includes a 2-way set associative hardware instruction
+caching mechanism (not present in the hardware) that is serviced over
+the dynamic network, with resource contention modeled accordingly.
 
 %\subsection{Task + Pipeline Parallel Execution}
 %\label{sec:space-imp}
@@ -82,18 +81,17 @@ and fission~\cite{streamit-asplos}.  Also included are domain specific
 optimizations for linear filters (e.g., FIR, FFT, and
 DCT)~\cite{lamb:pldi:2003}, state-space
 analysis~\cite{agrawal:cases:2005}, and cache
-optimizations~\cite{sermulins:lctes:2005}.  The infrastructure bundles
-multiple architecture-specific backends.  We leverage StreamIt's
+optimizations~\cite{sermulins:lctes:2005}.  We leverage StreamIt's
 spatially-aware Raw backend for this work.
 
 Previously, we described hardware and software pipelining as two
 distinct techniques for exploiting pipeline parallelism.  The StreamIt
-compiler has full support for each.  However it also implements a
-hybrid approach where hardware pipelined units are scheduled in a
-software pipelined loop.  While we were excited by the possibilities
-of the hybrid approach, it does not provide a benefit on Raw due the
-tight coupling between processors and the limited FIFO buffering of
-the network. Although these are not fundamental limits of the
+compiler has full support for each.  It also implements a hybrid
+approach where hardware pipelined units are scheduled in a software
+pipelined loop.  While we were excited by the possibilities of the
+hybrid approach, it does not provide a benefit on Raw due the tight
+coupling between processors and the limited FIFO buffering of the
+network. Although these are not fundamental limits of the
 architecture, they enforce fine-grained orchestration of communication
 and computation that is a mismatch for our coarse-grained execution
 model.
@@ -151,25 +149,25 @@ computation.
 \psfig{figure=benchchar.eps, width=6.15in}
 \caption{Benchmark descriptions and characteristics.
 \protect\label{fig:benchchar}}
-\vspace{-6pt}
 \end{figure*}
 
 \subsubsection{Baseline Scheduler}
-Our scheduling techniques for software pipelining of the stream graph
-were presented in Section \ref{sec:softpipe}.  To facilitate
-evaluation of coarse-grained software pipelining, we implemented a
-separate scheduling path for a non-software pipelined schedule that
-executes the steady-state respecting the dataflow dependencies of the
-stream graph.  This scheduling path ignores the presence of the
-encompassing outer loop in the stream graph and is employed for the
-task and task + data parallel configurations of the evaluation section.
+%Our scheduling techniques for software pipelining of the stream graph
+%were presented in Section \ref{sec:softpipe}.  
+To facilitate evaluation of coarse-grained software pipelining, we
+implemented a separate scheduling path for a non-software-pipelined
+schedule that executes the steady-state respecting the dataflow
+dependencies of the stream graph.  This scheduling path ignores the
+presence of the encompassing outer loop in the stream graph and is
+employed for the task and task + data parallel configurations of the
+evaluation section.
 
 This scheduling problem is equivalent to static scheduling of a
 coarse-grained dataflow DAG to a multiprocessor which has been a
 well-studied problem over the last 40 years (see~\cite{DAGSched} for a
-good review).  We once again leverage simulated annealing as
-randomized solutions to this static scheduling problem are superior to
-other heuristics~\cite{kwok99fastest}.
+good review).  We leverage simulated annealing as randomized solutions
+to this static scheduling problem are superior to other
+heuristics~\cite{kwok99fastest}.
 
 Briefly, we generate an initial layout by assigning the filters of the
 stream graph to processors in dataflow order, assigning a random
@@ -181,9 +179,7 @@ annealer uses our static work estimation to calculate the maximum
 critical path length (measured in cycles) from a source to a sink in
 the graph.  After the annealer is finished, we use the configuration
 that achieved the minimum critical path length over the course of the
-search.  Finally, we run a greedy assignment algorithm to assign the
-buffers representing the channels of the stream graph to DRAM ports,
-attempting to minimize synchronization costs.
+search.
 
 \subsubsection{Instruction-Level Optimizations}
 For the results detailed in the next section we ran a host of
@@ -192,5 +188,8 @@ constant folding, array scalarization, and loop unrolling (with a
 factor of 4).  These optimizations are especially important for a
 fused filter, as we can possibly unroll enough to scalarize
 constituent splitter and joiner buffers, eliminating the shuffling
-operations.  Finally, the two backends produce a mix of C and assembly
+operations.  We do not enable StreamIt's aggressive cache
+optimizations~\cite{sermulins:lctes:2005} or linear
+optimizations~\cite{lamb:pldi:2003}, as they conflate too many factors
+into the experiments.  Finally, we produce a mix of C and assembly
 code that is compiled with GCC 3.4 at optimization level 3.
