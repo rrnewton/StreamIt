@@ -22,7 +22,7 @@ that remains largely intractable.
 The stream programming paradigm offers a promising approach for
 exposing parallelism suitable for multicore architectures.  Stream
 languages such as StreamIt~\cite{streamitcc}, Brook~\cite{brook04},
-Baker~\cite{Baker}, and Spidle~\cite{spidle02} are motivated not only by
+Baker~\cite{Baker}, and Spidle~\cite{spidle03} are motivated not only by
 trends in computer architecture, but also by trends in the application
 space, as network, image, voice, and multimedia programs are becoming
 only more prevalent.  In the StreamIt Language, a program is represented
@@ -65,9 +65,9 @@ However, while data parallelism is well-suited to vector machines, on
 coarse-grained multicore architectures it can introduce excessive
 communication overhead.  Previous data-parallel streaming
 architectures have focused on designing a special memory hierarchy to
-support this communication~\cite{imagine-ieee}.  The other hazards of data
-parallelism include increased buffering and latency, as well as the
-inability to parallelize actors with state.
+support this communication~\cite{imagine03ieee}.  The other hazards of
+data parallelism include increased buffering and latency, as well as
+the inability to parallelize actors with state.
 
 Pipeline parallelism applies to chains of producers and consumers that
 are directly connected in the stream graph.  In our previous

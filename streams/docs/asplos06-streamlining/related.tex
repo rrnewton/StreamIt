@@ -1,56 +1,88 @@
 \section{Related Work}
 \label{sec:related}
 
-Previous work in scheduling computation graphs to parallel targets has
-focused on partitioning and scheduling techniques that exploit task
-and pipeline parallelism~\cite{SDFSched, SDFSched2,
-may87communicating, DAGSched, pipeline-sdf}.  Application of
-loop-conscience transformations to coarse-grained dataflow graphs has
-been investigated.  Unrolling (or ``unfolding'' in this domain) is
-employed for SDF graphs to reduce the initiation interval but they do
-not consider real architectures~\cite{unfolding,unfolding2}. Software
-pipelining techniques have been employed for scheduling synchronous
-dataflow graphs onto various embedded and DSP
-targets~\cite{bakshi99,chatha-02}, but requires a programmer knowledge
-of both the application and the architecture. To our knowledge, none
-of these systems exploit the combination of task, data, and pipeline
-parallelism.  Furthermore, these systems do not provide a robust
-end-to-end path for application parallelization from a high-level,
-portable programming language.
+% BILL
 
-Previous work on instruction-level software pipelining has focused
-mostly on scheduling machine instructions in a loop via modulo
-scheduling~\cite{rau81, lam-softpipe}.  The algorithms devised must
-account for tight resource constraints and complex instruction
-dependences. Our software-pipelining problem is much less constrained,
-enabling us to employ a simple greedy heuristic.  Furthermore, a
-traditional modulo scheduling algorithm is not needed because we have
-an implicit loop barrier at the end of each steady-state.  ILP
-compilers for clustered VLIW architectures~\cite{Bulldog, Multiflow,
-lee98spacetime, qian02} must partition instructions and assign them to
-clusters as part of the instruction scheduling. Clustering is
-analogous to our application of filter fusion in our software
-pipelining algorithm. 
+%Signal~\cite{Signal}, 
+%Lucid~\cite{Lucid77}, and
+%Occam~\cite{Occam}, and Sisal \cite{sisal}.
+%Parallel Haskell~\cite{ph}
+In addition to StreamIt, there are a number of stream-oriented
+languages drawing from domains such as functional, dataflow, CSP and
+synchronous programming~\cite{survey97}.  The Brook language is
+architecture-independent and focusses on data
+parallelism~\cite{brook04}.  Stream kernels are required to be
+stateless, though there is special support for reducing streams to a
+single value.  Stream\-C/Ker\-nel\-C is lower level than Brook;
+kernels written in KernelC are stiched together in StreamC and mapped
+to the data-parallel Imagine processor~\cite{imagine03ieee}.  SPUR
+adopts a similar decomposition between ``microcode'' stream kernels
+and skeleton programs to expose data parallelism~\cite{spur05samos}.
+Cg exploits pipeline parallelism and data parallelism, though the
+programmer must write algorithms to exactly match the two pipeline
+stages of a graphics processor~\cite{cg03}.  Compared to these
+languages, StreamIt places more emphasis on exposing task and pipeline
+parallelism (all the languages expose data parallelim).
+%and on sliding window operations (filters that peek).  
+By adopting the synchronous dataflow model of execution~\cite{lee87},
+StreamIt focusses on well-structured programs that can be aggressively
+optimized.  The implicit infinite loop around programs is also a key
+StreamIt characteristic that enables the transformations in this
+paper.  Spidle is also a recent stream language that was influenced by
+StreamIt~\cite{spidle03}.
+%and Lucid Synchrone~\cite{Lucid-Synchrone}.
+%Synchronous languages which
+%target embedded applications include Esterel~\cite{Esterel},
+%Lustre~\cite{Lustre}, and Additional
 
-% MIKE
+Liao et al. map Brook to multicore processors by leveraging the affine
+partitioning model~\cite{liao06brook}.  While affine partitioning is a
+powerful model for parameterized loop-based programs, in StreamIt we
+simplify the problem by fully resolving the program structure at
+compile time.  This allows us to schedule a single steady state using
+flexible, non-affine techniques (e.g., simulated annealing) and to
+repeat the found schedule for an indefinite period at runtime.
+Gummaraju and Rosenblum map stream programs to a general-purpose
+hyperthreaded processor~\cite{gummaraju05micro}.  Such techniques
+could be integrated with our spatial partitioning to optimize per-core
+performance.  Gu et al. expose data and pipeline parallelism in a
+Java-like language and use a compiler analysis to efficiently extract
+coarse-grained filter boundaries~\cite{du03sc}.  Ottoni et al. also
+extract decoupled threads from sequential code, using hardware-based
+software pipelining to distribute the resulting threads across
+cores~\cite{ottoni05decoupled}.  By embedding pipeline-parallel
+filters in the programming model, we focus on the mapping step.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% BILL
+Previous work in scheduling computation graphs to parallel targets has
+focused on partitioning and scheduling techniques that exploit task
+and pipeline parallelism~\cite{SDFSched, SDFSched2,may87communicating,
+DAGSched, pipeline-sdf}.  Application of loop-conscious
+transformations to coarse-grained dataflow graphs has been
+investigated.  Unrolling (or ``unfolding'' in this domain) is employed
+for synchronous dataflow (SDF) graphs to reduce the initiation
+interval but they do not evaluate mappings to actual
+architectures~\cite{unfolding,unfolding2}. Software pipelining
+techniques have been applied to SDF graphs onto various embedded and
+DSP targets~\cite{bakshi99,chatha-02}, but has required programmer
+knowledge of both the application and the architecture. To our
+knowledge, none of these systems automatically exploit the combination
+of task, data, and pipeline parallelism.  Furthermore, these systems
+do not provide a robust end-to-end path for application
+parallelization from a high-level, portable programming language.
 
-The Imagine stream processor~\cite{rixner98bandwidthefficient}
-supports a time-multiplexed execution model.  The architecture
-contains 48 parallel ALU's organized into 6 VLIW clusters.  The
-programming model requires the programmer to write computation filters
-in Kernel-C and stitch them together using Stream-C.  Because the
-execution unit is data-parallel, the compiler uses time multiplexing
-to execute a single filter at a time across all of the parallel
-clusters.  While this provides perfect load balancing and high
-arithmetic utilization when there is abundant data parallelism, it
-suffers when a filter has retained state or data-dependences between
-iterations.  Moreover, architectures based solely on time-multiplexing
-do not scale spatially, as there are global wires orchestrating the
-parallel execution units.
+Previous work on instruction-level software pipelining has focused
+mostly on scheduling machine instructions in a loop via modulo
+scheduling~\cite{rau81,lam-softpipe}.  The algorithms devised must
+account for tight resource constraints and complex instruction
+dependences. Our software-pipelining problem is much less constrained,
+enabling us to employ a simple greedy heuristic.  
 
-- partitioning stuff
-- SDF
+%% Furthermore, a traditional modulo scheduling algorithm is not needed
+%% because we have an implicit loop barrier at the end of each
+%% steady-state.  ILP compilers for clustered VLIW
+%% architectures~\cite{Bulldog,Multiflow,lee98spacetime,qian02} must
+%% partition instructions and assign them to clusters as part of the
+%% instruction scheduling. Clustering is analogous to our application of
+%% filter fusion in our software pipelining algorithm.
