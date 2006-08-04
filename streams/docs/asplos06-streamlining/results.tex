@@ -10,9 +10,9 @@ the following contributions and conclusions:
 benchmark suite to a 16-core architecture, with a mean speedup of 
 11.2x over sequential, single-core performance.
 \item Our technique for exploiting coarse-grained data parallelism
-produces abundant parallelism at the correct granularity and achieve a
-mean performance gain of 9.9x over a sequential, single-core
-baseline.
+achieves a mean performance gain of 9.9x over a sequential,
+single-core baseline.  Compared to a fine-grained data parallel
+approach it offers a speedup of 6.8x.
 \item Coarse-grained software pipelining is a
 an effective technique for extracting parallelism beyond task and data
 parallelism, with an additional mean speedup of 1.45x for
@@ -20,9 +20,9 @@ our benchmarks with stateful computation and 1.13x across all of our
 benchmarks. On its own, our software pipelining technique affords a
 7.7x performance gain over a sequential single-core baseline.
 \item Our compiler, employing the combination of the techniques
-presented in this paper, improves upon previous work that exploited a
-combination of task and pipeline parallelism, with a mean speedup of
-1.84x.
+presented in this paper, improves upon our previous work that
+exploited a combination of task and hardware pipeline parallelism,
+with a mean speedup of 1.84x.
 \end{itemize}
 
 In the evaluation, speedup of configuration A over B is calculated as
@@ -55,42 +55,43 @@ total number of filters in the stream (including file input filters
 and file output filters that are not mapped to cores).  The number of
 filters that perform peeking is important because peeking filters
 cannot be fused with upstream neighbors without introducing shared
-state.  Thus, once a peeking filter is fused, it cannot be fissed.
-``Total Parallel Critical Path'' calculates, using static work
+state. ``Task Parallel Critical Path'' calculates, using static work
 estimates, the work that is on the critical path for a task parallel
-model assuming infinite processors as a percentage of the total work.
-Smaller percentages indicate the presence of task parallelism.  ``Comp
-/ Comm'' gives the static estimate of the computation to communication
-ratio of each benchmark for one steady-state execution. This is
-calculated by totaling the computation estimates across all filters
-and dividing by the number of words (32-bits) communicated per
-steady-state. Notice that although the computation to communication
-ratio is much larger than 1 across our benchmarks, we demonstrate that
-inter-core synchronization is an important factor to consider.
+model, assuming infinite processors, as a percentage of the total
+work.  Smaller percentages indicate the presence of task parallelism.
+``Comp / Comm'' gives the static estimate of the computation to
+communication ratio of each benchmark for one steady-state
+execution. This is calculated by totaling the computation estimates
+across all filters and dividing by the number of dynamic {\tt push} or
+{\tt pop} statements executed in the steady-state (all items pushed
+and popped are 32 bits). Notice that although the computation to
+communication ratio is much larger than 1 across our benchmarks, we
+will demonstrate that inter-core synchronization is an important
+factor to consider.
 
 ``$\sigma$'' is defined in Section \ref{sec:pipeline-model} as the
 fraction of total work that is stateful.  ``$\mu$'' is the maximum
-fraction of stateful work performed by an individual filter. Referring
-to Figure \ref{fig:benchchar}, we see that three of our benchmarks
-include stateful computation.  Radar repeatedly operates on long
-columns of an array requiring special behavior at the boundaries;
-thus, the state tracks position in the column and does some internal
-buffering.  Vocoder performs an adaptive DFT that uses a stateful
-decay to ensure stability; it also needs to retain the previous output
-across one iteration within a phase transformation.  MPEGDecoder has
-neglible state in retaining predicted motion vectors across one
-iteration of work.
+fraction of total work performed by any individual stateful
+filter. Referring to Figure \ref{fig:benchchar}, we see that three of
+our benchmarks include stateful computation.  Radar repeatedly
+operates on long columns of an array requiring special behavior at the
+boundaries; thus, the state tracks the position in the column and does
+some internal buffering.  Vocoder performs an adaptive DFT that uses a
+stateful decay to ensure stability; it also needs to retain the
+previous output across one iteration within a phase transformation.
+MPEGDecoder has neglible state in retaining predicted motion vectors
+across one iteration of work.
 
 \begin{figure*}[t]
 \centering
 \psfig{figure=maingraph.eps, width=6.5in}
-\caption{Task, Task + Data, Task + Software Pipeline, and Task + Data + Software Pipeline
+\caption{Task, Task + Data, Task + Software Pipelining, and Task + Data + Software Pipelining
 normalized to single core.
 \protect\label{fig:main_comp}}
 \vspace{-6pt}
 \end{figure*}
 
-\subsection{Exploiting Coarse-Grained Data Parallelism}
+\subsection{Task Parallelism}
 To motivate the necessity of our parallelism extraction techniques let
 us first consider the task parallel execution model.  This model
 closely approximates a thread model of execution where the only form
@@ -108,9 +109,10 @@ parallelism is exploited, notable exceptions are Radar,
 ChannelVocoder, and FilterBank.  Each contains wide splitjoins of
 load-balanced children.  In the case of BitonicSort, the task
 parallelism is expressed at too fine a granularity for the
-communication system.  Given that we are targetting a 16-core
+communication system.  Given that we are targeting a 16-core
 processor, a mean speedup of 2.27x is inadequate.
 
+\subsection{Coarse-Grained Data Parallelism}
 \begin{figure}[t]
 \centering
 \psfig{figure=fine_data.eps, width=3.2in}
@@ -156,25 +158,25 @@ then parallelizing reduces the synchronization costs of data
 parallelizing.  For Radar and Vocoder, data parallelism is paralyzed
 by the preponderance of stateful computation.
 
-\subsection{Exploiting Coarse-Grained Software Pipeline Parallelism}
+\subsection{Coarse-Grained Software Pipelining}
 
 Our technique for coarse-grained software pipelining is effective for
 exploiting coarse-grained pipelined parallelism (though it
 under-performs when compared to coarse-grained data parallelism).
 More importantly, combining software pipelining with our data
-parallelism techniques, provides a cumulative performance gain, most
+parallelism techniques provides a cumulative performance gain,
 especially for applications with stateful computation.
 
-The third bar of Figure \ref{fig:main_comp} gives the throughput
-speedup for software pipelining over single-core.  On average,
-software pipelining has a speedup of 7.7x over single core (compare to
-9.9 for data parallelism) and a speedup of 3.4x over task
-parallelism. Software pipelining performs well when it can effectively
-load-balance the packing of the dependence-free steady-state.  In the
-case of Radar, TDE, FilterBank, and FFT, software pipelining achieves
-comparable or better performance compared to data parallelism (see
-Figure \ref{fig:thruput}).  For these applications, the workload is
-not dominated by a single filter and the resultant schedules are
+The third bar of Figure \ref{fig:main_comp} gives the speedup for
+software pipelining over single core.  On average, software pipelining
+has a speedup of 7.7x over single core (compare to 9.9 for data
+parallelism) and a speedup of 3.4x over task parallelism. Software
+pipelining performs well when it can effectively load-balance the
+packing of the dependence-free steady-state.  In the case of Radar,
+TDE, FilterBank, and FFT, software pipelining achieves comparable or
+better performance compared to data parallelism (see Figure
+\ref{fig:thruput}).  For these applications, the workload is not
+dominated by a single filter and the resultant schedules are
 statically load-balanced across cores.  For the Radar application,
 software pipelining achieves a 2.3x speedup over data parallelism and
 task parallelism because there is little coarse-grained data
@@ -185,33 +187,31 @@ However, when compared to data parallelism, software pipelining is
 hampered by its inability to reduce the critical path when the
 critical path contains stateless work (e.g., DCT, MPEGDecoder).  Also,
 our data parallelism techniques tend to coarsen the stream graph more
-than Selective Fusion, removing more synchronization.  For example, in
-DES, the Selective Fusion Algorithm makes a greedy decision that it
-cannot remove communication affecting the critical path workload.
-Software pipelining performs poorly for this application when compared
-to data parallelism, 6.9x versus 13.9x over single core, although it
-calculates a load-balanced mapping.  Another consideration when
-comparing software pipelining to data parallelism is that the software
-pipelining techniques rely more heavily on the accuracy of the static
-work estimation strategy, although it is difficult to quantify this
-effect.
+than the selective fusion stage of software pipelining, removing more
+synchronization.  For example, in DES, selective fusion makes a greedy
+decision that it cannot remove communication affecting the critical
+path workload.  Software pipelining performs poorly for this
+application when compared to data parallelism, 6.9x versus 13.9x over
+single core, although it calculates a load-balanced mapping.  Another
+consideration when comparing software pipelining to data parallelism
+is that the software pipelining techniques rely more heavily on the
+accuracy of the static work estimation strategy, although it is
+difficult to quantify this effect.
 
+\subsection{Combining the Techniques}
 When we software pipeline the data-parallelized stream graph, we
 achieve a 13\% mean speedup over data parallelism alone. The
 cumulative effect is most prominent when the application in question
 contains stateful computation (45\% over data parallelism).  For
 example, the combined technique achieves a 69\% speedup over each
-individual technique for Vocoder. For the 6 stateless benchmarks
-without peeking, software pipelining enjoys a benefit versus data
-parallelism because there exists small amounts of hardware pipeline
-parallelism across steady-states.  For ChannelVocoder, FilterBank, and
+individual technique for Vocoder. For ChannelVocoder, FilterBank, and
 FM, software pipelining further coarsens the stream graph without
 affecting the critical path work (as estimated statically) and
 performs inter-core communication in parallel.  Each reduces the
 synchronization encountered on the critical path.
 
 The combined technique depresses the performance of MPEG by 6\%
-because the Selective Fusion component of the software pipeliner fuses
+because the selective fusion component of the software pipeliner fuses
 one step too far.  In most circumstances, fusion will help to reduce
 inter-core synchronization by using the local memory of the core for
 buffering. Consequently, the algorithm does not model the
@@ -239,12 +239,12 @@ generally excellent compute utilization; in 7 cases the utilization is
 60\% or greater.
 
 
-\subsection{Comparison To Previous Work}
+\subsection{Comparison to our Previous Work: Hardware Pipelining}
 
 \begin{figure}[t]
 \centering
 \psfig{figure=vs_space_graph.eps, width=3.2in}
-\caption{Task + Data + Software Pipeline normalized to Task + Pipeline.
+\caption{Task + Data + Software Pipelining normalized to Hardware Pipelining.
 \protect\label{fig:vs-space}}
 \vspace{-6pt}
 \end{figure}
@@ -252,7 +252,7 @@ generally excellent compute utilization; in 7 cases the utilization is
 \begin{figure*}[t]
 \centering
 \psfig{figure=thruput.eps, width=6.1in}
-\caption{Throughput Speedup Comparison and  Task + Data + Software Pipeline performance results.
+\caption{Throughput Speedup Comparison and  Task + Data + Software Pipelining performance results.
 \protect\label{fig:thruput}}
 \vspace{-6pt}
 \end{figure*}
@@ -260,43 +260,42 @@ In Figure \ref{fig:vs-space} we show our combined technique normalized
 to our previous work for compiling streaming applications to multicore
 architectures.  This baseline configuration is a maturation of the
 ideas presented in \cite{streamit-asplos}\footnote{Please note that
-the version of \cite{streamit-asplos} published in the conference
-proceedings contained incorrect MFLOPS measurements.} and implements a
-task plus (hardware) pipeline parallel execution model relying solely
-on on-chip buffering and the on-chip static network for communication
-and synchronization. In the task and pipeline parallel model we
-require that the number of filters in the stream graph be less than or
-equal to the number of processing cores of the target architecture.
-To achieve this, we repeatedly apply fusion and fission
-transformations as directed by a dynamic programming algorithm.
+due to a bug in our tools, the MFLOPS numbers reported in the
+proceedings version of \cite{streamit-asplos} were inaccurate.} and
+implements a task plus hardware pipeline parallel execution model
+relying solely on on-chip buffering and the on-chip static network for
+communication and synchronization. In the this model, referred to as
+hardware pipelining, we require that the number of filters in
+the stream graph be less than or equal to the number of processing
+cores of the target architecture.  To achieve this, we repeatedly
+apply fusion and fission transformations as directed by a dynamic
+programming algorithm.
 
-Our new techniques achieve a mean speedup of 1.84x over the task and
-pipeline parallel model and establish the StreamIt compiler as a
-stable and uniform platform for exploiting coarse-grained parallelism
-on multicore architectures. For most of our benchmarks, the combined
-techniques presented in this paper offer improved data parallelism,
-improved scheduling flexibility, and reduced synchronization compared
-to our previous work. This comparison demonstrates that combining our
+Our new techniques achieve a mean speedup of 1.84x over hardware
+pipelining and establish the StreamIt compiler as a stable and uniform
+platform for exploiting coarse-grained parallelism on multicore
+architectures. For most of our benchmarks, the combined techniques
+presented in this paper offer improved data parallelism, improved
+scheduling flexibility, and reduced synchronization compared to our
+previous work. This comparison demonstrates that combining our
 techniques is important for generalization to stateful benchmarks.
-For Radar, data parallelism loses to this baseline by 19\%, while the
-combined technique enjoys a 38\% speedup. For Vocoder, data
+For Radar, data parallelism loses to hardware pipelining by 19\%,
+while the combined technique enjoys a 38\% speedup. For Vocoder, data
 parallelism is 18\% slower, while the combined technique is 30\%
 faster.
 
-Task plus pipeline parallelism performs exceptionally well for
-applications that contain long pipelines that can be load-balanced,
-including FFT, TDE, and Serpent.  For example, the stream graph for
-Serpent is a pipeline of identical splitjoins that is fused down to a
-balanced pipeline.  Task plus pipeline parallel incurs less
-synchronization and consequently its compute utilization is higher
-(64\% versus 57\%).  The combined approach fuses Serpent to a single
-filter and then fisses it 16 ways, converting the pipeline parallelism
-into data parallelism.  Fission communication using a splitjoin is
-more expensive than the pipeline communication of task plus pipeline
-parallelism.  However, although Raw's on-chip network is well-suited to
-pipeline communication, most other contemporary multicore
-architectures do not provide a low-latency, fine-grained on-chip
-interconnect enabling optimized pipeline parallelism between cores.
+Hardware pipelining performs well in 3 out of 12 benchmarks (FFT, TDE,
+and Serpent). This is because these applications contain long
+pipelines that can be load-balanced.  For example, the stream graph
+for Serpent is a pipeline of identical splitjoins that is fused down
+to a balanced pipeline. Hardware pipelining incurs less
+synchronization than usual in this case because the I/O rates of the
+filters are matched; consequently, its compute utilization is higher
+than our combined technique (64\% versus 57\%).  The combined approach
+fuses Serpent to a single filter and then fisses it 16 ways,
+converting the pipeline parallelism into data parallelism.  In this
+case, data-parallel communication is more expensive than the hardware
+pipelined communication.
 
 
 %For
