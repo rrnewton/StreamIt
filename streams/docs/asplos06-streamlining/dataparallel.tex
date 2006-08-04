@@ -272,17 +272,19 @@ summing the work within a stream, it considers the average work per
 filter in each stream so as to mitigate the effects of imbalanced
 pipelines.
 %\framebox{Not clear when/why/if this works.}  
-After estimating a filter's work as a fraction of those running in
-parallel, the algorithm attempts to fiss the filter the minimum number
-of times needed to ensure that none of the fission products contains
-more than $1/N$ of the total task-parallel work (where $N$ is the
-total number of cores).
+After estimating a filter's work 
+%
+\\\vspace{-24pt} ~ \\ as a fraction of those running in parallel, the
+algorithm attempts to fiss the filter the minimum number of times
+needed to ensure that none of the fission products contains more than
+$1/N$ of the total task-parallel work (where $N$ is the total number
+of cores).
 
 Figure~\ref{fig:filterbank}c illustrates the outcome of performing
 judicious fission on the coarsened-granularity stream graph from
-Figure~\ref{fig:filterbank}b.  Because there is 8-way task
-parallelism between all of the pipelines, the filters in each pipeline
-are fissed a maximum of 2 ways so as not to overwhelm the
-communication resources.  As described in the results section, the
-combination of granularity coarsening and judicious fission offers
-a 6.8x mean speedup over a naive fission policy.
+Figure~\ref{fig:filterbank}b.  Because there is 8-way task parallelism
+between all of the pipelines, the filters in each pipeline are fissed
+a maximum of 2 ways so as not to overwhelm the communication
+resources.  As described in the Section~\ref{sec:results}, the
+combination of granularity coarsening and judicious fission offers a
+6.8x mean speedup over a naive fission policy.
