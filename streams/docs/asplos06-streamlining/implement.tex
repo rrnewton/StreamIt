@@ -1,12 +1,5 @@
 \section{Implementation} 
 
-To facilitate evaluation of our techniques, we have implemented a
-fully-automatic compiler that supports each of the execution models
-discussed in this paper.  The compiler targets the Raw
-microprocessor.  In this section we will first give a description of
-the Raw architecture followed by implementation details of the 
-execution models.
-
 \subsection{The Raw Architecture}
 \label{sec:raw}
 
@@ -16,16 +9,16 @@ execution models.
 %\caption{Block diagram of the Raw architecture.
 %\protect\label{fig:raw-diagram}}
 %\end{figure}
-The Raw microprocessor~\cite{raw10,raw} addresses the wire delay
-problem~\cite{raw13} by providing direct instruction set architecture
-(ISA) analogs to three underlying physical resources of the processor:
-gates, wires and pins. The architecture exposes the gate resources as
-a scalable 2-D array of identical, programmable cores, that are
-connected to their immediate neighbors by four on-chip networks.
-Values routed through the networks off of the side of the array appear
-on the pins, and values placed on the pins by external devices
-(wide-word A/Ds, DRAMS, etc.) appear on the networks.  Each of the
-cores contains a compute processor, some memory and two types of
+We target the Raw microprocessor~\cite{raw10,raw}, which addresses the
+wire delay problem by providing direct instruction set
+architecture (ISA) analogs to three underlying physical resources of
+the processor: gates, wires and pins. The architecture exposes the
+gate resources as a scalable 2-D array of identical, programmable
+cores, that are connected to their immediate neighbors by four on-chip
+networks.  Values routed through the networks off of the side of the
+array appear on the pins, and values placed on the pins by external
+devices (wide-word A/Ds, DRAMS, etc.) appear on the networks.  Each of
+the cores contains a compute processor, some memory and two types of
 routers--one static, one dynamic--that control the flow of data over
 the networks as well as into the compute processor.  The compute
 processor interfaces to the network through a bypassed,
@@ -100,7 +93,7 @@ hybrid approach where hardware pipelined units are scheduled in a
 software pipelined loop.  While we were excited by the possibilities
 of the hybrid approach, it does not provide a benefit on Raw due the
 tight coupling between processors and the limited FIFO buffering of
-the network. Although these are not a fundamental limits of the
+the network. Although these are not fundamental limits of the
 architecture, they enforce fine-grained orchestration of communication
 and computation that is a mismatch for our coarse-grained execution
 model.
@@ -124,19 +117,19 @@ model.
 %multicores do not provide fine-grained, low-latency inter-core
 %communication.
 
-In the compiler, we elected to buffer all streaming data off-chip
-because given the Raw configuration we are simulating and for the
-regular bulk memory traffic we generate, it is more expensive to
-stream data from a core's local data cache than to stream the data
+In the compiler, we elected to buffer all streaming data off-chip.
+Given the Raw configuration we are simulating and for the regular bulk
+memory traffic we generate, it is more expensive to stream data onto
+the network from a core's local data cache than to stream the data
 from the streaming memory controllers. A load hit in the data cache
 incurs a 3-cycle latency.  So although the networks are
 register-mapped, two instructions must be performed to hide the
 latency of the load, implying a maximum bandwidth of 1/2 word per
 cycle, while each streaming memory controller has a load bandwidth of
 1 word per cycle for unit-stride memory accesses.  When targeting an
-architecture with more modest memory bandwidth, the stream buffers
-could reside completely in on-chip memory.  For example, the total
-buffer allocation for each of our benchmarks in Section
+architecture with more modest off-chip memory bandwidth, the stream
+buffers could reside completely in on-chip memory.  For example, the
+total buffer allocation for each of our benchmarks in Section
 \ref{sec:results} would fit in Cell's 512KB L2 cache.
 
 Streaming computation requires that the target architecture provides
@@ -192,8 +185,7 @@ search.  Finally, we run a greedy assignment algorithm to assign the
 buffers representing the channels of the stream graph to DRAM ports,
 attempting to minimize synchronization costs.
 
-\subsubsection{Optimizations}
-
+\subsubsection{Instruction-Level Optimizations}
 For the results detailed in the next section we ran a host of
 optimizations including function inlining, constant propagation,
 constant folding, array scalarization, and loop unrolling (with a
