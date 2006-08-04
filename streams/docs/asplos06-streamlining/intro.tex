@@ -133,11 +133,10 @@ task-parallel baseline.
 Combining the techniques yields the most general results, as data
 parallelism offers good load balancing for stateless actors while
 software pipelining enables stateful actors to execute in parallel.
-Any task parallelism in the application is also naturally utilized,
-though excess parallelism may be collapsed during granularity
-adjustment.  This integrated treatment of coarse-grained parallelism
-leads to an overall speedup of 11.2x over a single core and 5.0x over
-a task-parallel baseline.
+Any task parallelism in the application is also naturally utilized, or
+judicously collapsed during granularity adjustment.  This integrated
+treatment of coarse-grained parallelism leads to an overall speedup of
+11.2x over a single core and 5.0x over a task-parallel baseline.
 
 %% Other Multicores (Trademarks?):
 %% RMI XLR Family of Processors
