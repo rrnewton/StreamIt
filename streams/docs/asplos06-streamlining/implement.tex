@@ -134,9 +134,10 @@ register-mapped, two instructions must be performed to hide the
 latency of the load, implying a maximum bandwidth of 1/2 word per
 cycle, while each streaming memory controller has a load bandwidth of
 1 word per cycle for unit-stride memory accesses.  When targeting an
-architecture with more modest memory bandwidth, given our buffering
-requirements, the stream buffers could reside completely in on-chip
-memory.
+architecture with more modest memory bandwidth, the stream buffers
+could reside completely in on-chip memory.  For example, the total
+buffer allocation for each of our benchmarks in Section
+\ref{sec:results} would fit in Cell's 512KB L2 cache.
 
 Streaming computation requires that the target architecture provides
 an efficient mechanism for implementing split and join (scatter and
