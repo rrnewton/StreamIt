@@ -264,12 +264,11 @@ due to a bug in our tools, the MFLOPS numbers reported in the
 proceedings version of \cite{streamit-asplos} were inaccurate.} and
 implements a task plus hardware pipeline parallel execution model
 relying solely on on-chip buffering and the on-chip static network for
-communication and synchronization. In the this model, referred to as
-hardware pipelining, we require that the number of filters in
-the stream graph be less than or equal to the number of processing
-cores of the target architecture.  To achieve this, we repeatedly
-apply fusion and fission transformations as directed by a dynamic
-programming algorithm.
+communication and synchronization. In this hardware pipelining model,
+we require that the number of filters in the stream graph be less than
+or equal to the number of processing cores of the target architecture.
+To achieve this, we repeatedly apply fusion and fission
+transformations as directed by a dynamic programming algorithm.
 
 Our new techniques achieve a mean speedup of 1.84x over hardware
 pipelining and establish the StreamIt compiler as a stable and uniform
