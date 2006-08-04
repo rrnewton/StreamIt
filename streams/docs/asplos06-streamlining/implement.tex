@@ -160,7 +160,8 @@ evaluation of coarse-grained software pipelining, we implemented a
 separate scheduling path for a non-software pipelined schedule that
 executes the steady-state respecting the dataflow dependencies of the
 stream graph.  This scheduling path ignores the presence of the
-encompassing outer loop in the stream graph.    
+encompassing outer loop in the stream graph and is employed for the
+task and task + data parallel configurations of the evaluation section.
 
 This scheduling problem is equivalent to static scheduling of a
 coarse-grained dataflow DAG to a multiprocessor which has been a
