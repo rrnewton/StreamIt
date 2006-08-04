@@ -1,16 +1,17 @@
 \section{Experimental Evaluation}
 
-In this section we present an evaluation of the contributions of this
-paper and compare to previous techniques for compiling stream programs
-to multicore architectures.  This section will include an elaboration
-of the following contributions and conclusions:
+In this section we present an evaluation of our full compiler system
+and compare to previous techniques for compiling stream programs to
+multicore architectures.  This section will include an elaboration of
+the following contributions and conclusions:
 
 \begin{itemize}
-\item overall consistent parallelization of our benchmark suite.
-
+\item Our compiler achieves consistent and excellent parallelization of our
+benchmark suite to a 16-core architecture, with a mean speedup of 
+11.2x over sequential, single-core performance.
 \item Our technique for exploiting coarse-grained data parallelism
 produces abundant parallelism at the correct granularity and achieve a
-geometric mean performance gain of 9.9x over a sequential, single-core
+mean performance gain of 9.9x over a sequential, single-core
 baseline.
 \item Coarse-grained software pipelining is a
 an effective technique for extracting parallelism beyond task and data
@@ -18,9 +19,10 @@ parallelism, with an additional mean speedup of 1.45x for
 our benchmarks with stateful computation and 1.13x across all of our
 benchmarks. On its own, our software pipelining technique affords a
 7.7x performance gain over a sequential single-core baseline.
-\item The combination of the techniques presented in this paper
-improves upon previous work that exploited a combination of task and
-pipeline parallelism, with a mean speedup of 1.84x.
+\item Our compiler, employing the combination of the techniques
+presented in this paper, improves upon previous work that exploited a
+combination of task and pipeline parallelism, with a mean speedup of
+1.84x.
 \end{itemize}
 
 In the evaluation, speedup of configuration A over B is calculated as
@@ -59,7 +61,7 @@ give the shortest path and the longest path from a source to a
 sink. ``Comp / Comm'' gives the static estimate of the computation to
 communication ratio of each benchmark for one steady-state
 execution. This is calculated by totaling the computation estimates
-across all filters and dividing by the number of items communicated
+across all filters and dividing by the number of words communicated
 per steady-state. Notice that although the computation to
 communication ratio is much larger than 1 across our benchmarks, we
 demonstrate that inter-core synchronization is an important factor to
@@ -99,7 +101,7 @@ first bar of Figure \ref{fig:main_comp} gives the throughput speedup
 for the each of our benchmarks running in the task parallel model
 executing on 16-core Raw normalized to sequential StreamIt executing
 on a single core of Raw.  For the remainder of the presentation,
-unless otherwise noted, we target all 16 cores of Raw.  The geometric
+unless otherwise noted, we target all 16 cores of Raw.  The 
 mean performance speedup for task parallel is 2.27x over sequential
 performance. We can see that for most of our benchmarks, little
 parallelism is exploited, notable exceptions are Radar,
