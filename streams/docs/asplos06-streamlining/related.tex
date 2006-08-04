@@ -7,17 +7,16 @@ and pipeline parallelism~\cite{SDFSched, SDFSched2,
 may87communicating, DAGSched, pipeline-sdf}.  Application of
 loop-conscience transformations to coarse-grained dataflow graphs has
 been investigated.  Unrolling (or ``unfolding'' in this domain) is
-employed for SDF graphs to reduce the initiation interval but they
-they do not consider real
-architectures~\cite{unfolding,unfolding2}. Software pipelining
-techniques have been employed for scheduling synchronous dataflow
-graphs onto various embedded and DSP
+employed for SDF graphs to reduce the initiation interval but they do
+not consider real architectures~\cite{unfolding,unfolding2}. Software
+pipelining techniques have been employed for scheduling synchronous
+dataflow graphs onto various embedded and DSP
 targets~\cite{bakshi99,chatha-02}, but requires a programmer knowledge
-of both the application and the architecture. None of these systems
-exploit the combination of task, data, and pipeline parallelism.
-Furthermore, these systems do not provide a robust end-to-end path for
-application parallelization from a high-level, portable programming
-language.
+of both the application and the architecture. To our knowledge, none
+of these systems exploit the combination of task, data, and pipeline
+parallelism.  Furthermore, these systems do not provide a robust
+end-to-end path for application parallelization from a high-level,
+portable programming language.
 
 Previous work on instruction-level software pipelining has focused
 mostly on scheduling machine instructions in a loop via modulo
