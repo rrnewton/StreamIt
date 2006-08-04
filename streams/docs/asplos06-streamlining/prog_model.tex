@@ -18,7 +18,7 @@ critical for exposing data parallelism in sliding-window filters
 
 StreamIt provides three hierarchical primitives for composing filters
 into larger stream graphs.  A {\it pipeline} connects streams
-sequentially; for example, there is a four-element pipeline begining
+sequentially; for example, there is a four-element pipeline beginning
 with {\tt UnwrapPhase} in the Vocoder example
 (Figure~\ref{fig:vocoder}).  A {\it splitjoin} specifies independent,
 task-parallel streams that diverge from a common {\it splitter} and

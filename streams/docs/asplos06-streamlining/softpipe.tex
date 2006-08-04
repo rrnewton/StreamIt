@@ -2,7 +2,7 @@
 \begin{center}
 \psfig{figure=pipeline-scaling.eps,width=3.2in}
 \end{center}
-\caption{Potential speedups of pure pipeline paralellism over pure
+\caption{Potential speedups of pure pipeline parallelism over pure
 data parallelism for varying amounts of stateful work in the
 application.  Each line represents a different amount of work in the
 heaviest stateful filter.  The graph assumes 16 cores and does not
@@ -90,6 +90,22 @@ larger values of $\sigma$.
 
 \subsection{Exploiting Pipeline Parallelism}
 
+\begin{figure*}[t]
+\begin{center}
+\psfig{figure=time-proc-4-2.eps,width=6.2in}
+\end{center}
+
+\caption{Comparison of hardware pipelining and software pipelining for
+the Vocoder example (see Figure~\ref{fig:vocoder}).  For clarity, the
+same assignment of filters to processors is used in both cases, though
+software pipelining admits a more flexible set of assignments than
+hardware pipelining.  In software pipelining, filters read and write
+directly into buffers and communication is done at steady-state
+boundaries.  The prologue schedule for software pipelining is not
+shown.
+\protect\label{fig:pipelining}}
+\end{figure*}
+
 At any given time, pipeline-parallel actors are executing different
 iterations from the original stream program.  However, the distance
 between active iterations must be bounded, as otherwise the amount of
@@ -99,12 +115,13 @@ schedule of each actor, and for bounding the buffer sizes.  This can
 be done in either hardware or software.
 
 In coarse-grained {\it hardware pipelining}, groups of filters are
-assigned to independent processors that proceed at their own rate.  As
-the processors have decoupled program counters, filters early in the
-pipeline can advance to a later iteration of the program.  Buffer size
-is limited either by blocking FIFO communication, or by other
-synchronization primitives (e.g., a shared-memory data structure).
-However, hardware pipelining entails a performance tradeoff:
+assigned to independent processors that proceed at their own rate (see
+Figure~\ref{fig:pipelining}a).  As the processors have decoupled
+program counters, filters early in the pipeline can advance to a later
+iteration of the program.  Buffer size is limited either by blocking
+FIFO communication, or by other synchronization primitives (e.g., a
+shared-memory data structure).  However, hardware pipelining entails a
+performance tradeoff:
 
 \begin{itemize}
 
@@ -133,19 +150,20 @@ also some overhead due to the dynamic dispatching step.
 \end{itemize}
 
 Coarse-grained {\it software pipelining} offers an alternative that
-does not have the drawbacks of either of the above approaches.
-Software pipelining provides decoupling by executing two distinct
-schedules: a loop prologue and a steady-state loop.  The prologue
-serves to advance each filter to a different iteration of the stream
-graph, even if those filters are mapped to the same core.  Because
-there are no dependences between filters within an iteration of the
-steady-state loop, any set of filters (contiguous or non-contiguous)
-can be assigned to a core.  This offers a new degree of freedom to the
-partitioner, thereby enhancing the load balancing.  Also, software
-pipelining avoids the overhead of the demand-driven model by executing
-filters in a fixed and repeatable pattern on each core.  Buffering can
-be bounded by the on-chip communication networks, without needing to
-resort to software-based flow control.
+does not have the drawbacks of either of the above approaches (see
+Figure~\ref{fig:pipelining}b).  Software pipelining provides
+decoupling by executing two distinct schedules: a loop prologue and a
+steady-state loop.  The prologue serves to advance each filter to a
+different iteration of the stream graph, even if those filters are
+mapped to the same core.  Because there are no dependences between
+filters within an iteration of the steady-state loop, any set of
+filters (contiguous or non-contiguous) can be assigned to a core.
+This offers a new degree of freedom to the partitioner, thereby
+enhancing the load balancing.  Also, software pipelining avoids the
+overhead of the demand-driven model by executing filters in a fixed
+and repeatable pattern on each core.  Buffering can be bounded by the
+on-chip communication networks, without needing to resort to
+software-based flow control.
 
 \subsection{Software Pipelining Implementation}
 
