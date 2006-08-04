@@ -55,22 +55,22 @@ total number of filters in the stream (including file input filters
 and file output filters that are not mapped to cores).  The number of
 filters that perform peeking is important because peeking filters
 cannot be fused with upstream neighbors without introducing shared
-state.  Thus, once a peeking filter is fused, it cannot be fissed. In
-the table, the column labeled ``Shortest Path'' and ``Longest Path''
-give the shortest path and the longest path from a source to a
-sink. ``Comp / Comm'' gives the static estimate of the computation to
-communication ratio of each benchmark for one steady-state
-execution. This is calculated by totaling the computation estimates
-across all filters and dividing by the number of words communicated
-per steady-state. Notice that although the computation to
-communication ratio is much larger than 1 across our benchmarks, we
-demonstrate that inter-core synchronization is an important factor to
-consider.
+state.  Thus, once a peeking filter is fused, it cannot be fissed.
+``Total Parallel Critical Path'' calculates, using static work
+estimates, the work that is on the critical path for a task parallel
+model assuming infinite processors as a percentage of the total work.
+Smaller percentages indicate the presence of task parallelism.  ``Comp
+/ Comm'' gives the static estimate of the computation to communication
+ratio of each benchmark for one steady-state execution. This is
+calculated by totaling the computation estimates across all filters
+and dividing by the number of words (32-bits) communicated per
+steady-state. Notice that although the computation to communication
+ratio is much larger than 1 across our benchmarks, we demonstrate that
+inter-core synchronization is an important factor to consider.
 
-The benchmarks are sorted in ascending order of the final column,
-``Stateful work''. This is percentage of the statically estimated work
-performed per steady-state by all filters that have state divided by
-the total work performed by all filters per steady-state.  Referring
+``$\sigma$'' is defined in Section \ref{sec:pipeline-model} as the
+fraction of total work that is stateful.  ``$\mu$'' is the maximum
+fraction of stateful work performed by an individual filter. Referring
 to Figure \ref{fig:benchchar}, we see that three of our benchmarks
 include stateful computation.  Radar repeatedly operates on long
 columns of an array requiring special behavior at the boundaries;
@@ -100,7 +100,7 @@ technique is the parallelism across the children of a splitjoin. The
 first bar of Figure \ref{fig:main_comp} gives the throughput speedup
 for the each of our benchmarks running in the task parallel model
 executing on 16-core Raw normalized to sequential StreamIt executing
-on a single core of Raw.  For the remainder of the presentation,
+on a single core of Raw.  For the remainder of the paper,
 unless otherwise noted, we target all 16 cores of Raw.  The 
 mean performance speedup for task parallel is 2.27x over sequential
 performance. We can see that for most of our benchmarks, little
@@ -122,7 +122,7 @@ The StreamIt programming model facilitates relatively simple analysis
 to determine opportunities for data parallelism.  But the granularity
 of the transformations must account for the additional synchronization
 incurred by data-parallelizing a filter.  If we attempt to exploit
-data-parallelism a fine granularity, by simply replicating each
+data parallelism at a fine granularity, by simply replicating each
 stateless filter across the cores of the architecture we run the risk
 of overwhelming the communication substrate of the target
 architecture.  To study this, we implemented a simple algorithm for
@@ -136,23 +136,25 @@ the size of the fine-grained data parallel stream graph stressed our
 infrastructure.  For four of our benchmarks, fine-grained duplication
 on 16 cores has lower throughput than single-core.
 
-The second bar of Figure \ref{fig:main_comp} gives the speedup of
-coarse-grained data parallelism over single-core StreamIt. The mean
-speedup across our suite is 9.9x over single core and 4.36x over our
-task parallel baseline.  BitonicSort, whose original granularity was
-too fine, now achieves a 8.4x speedup over a single core. 6 of our 12
-applications are stateless and non-peeking (BitonicSort, DCT, DES,
-FFT, Serpent, and TDE) and thus fuse to one filter that is fissed 16
-ways.  For these benchmarks the mean speedup is 11.1x over the
-single core.  For DCT, the algorithm data-parallelizes the bottleneck
-of the application (a single filter that performs more than 6x the
-work of each of the other filters).  For DCT, coarse-grained data
-parallelism achieves a 14.6x speedup over single-core, while
-fine-grained achieves only 4.0x because it fisses at too fine a
-granularity, ignoring synchronization.  Coarsening and then
-parallelizing reduces the synchronization costs of data parallelizing.
-For Radar and Vocoder, data parallelism is paralyzed by the
-preponderance of stateful computation.
+This motivates the need for a more intelligent approach for exploiting
+data parallelism in streaming applications when targeting multicore
+architectures.  The second bar of Figure \ref{fig:main_comp} gives the
+speedup of coarse-grained data parallelism over single-core
+StreamIt. The mean speedup across our suite is 9.9x over single core
+and 4.36x over our task parallel baseline.  BitonicSort, whose
+original granularity was too fine, now achieves a 8.4x speedup over a
+single core. 6 of our 12 applications are stateless and non-peeking
+(BitonicSort, DCT, DES, FFT, Serpent, and TDE) and thus fuse to one
+filter that is fissed 16 ways.  For these benchmarks the mean speedup
+is 11.1x over the single core.  For DCT,the algorithm
+data-parallelizes the bottleneck of the application (a single filter
+that performs more than 6x the work of each of the other filters).
+Coarse-grained data parallelism achieves a 14.6x speedup over
+single-core, while fine-grained achieves only 4.0x because it fisses
+at too fine a granularity, ignoring synchronization.  Coarsening and
+then parallelizing reduces the synchronization costs of data
+parallelizing.  For Radar and Vocoder, data parallelism is paralyzed
+by the preponderance of stateful computation.
 
 \subsection{Exploiting Coarse-Grained Software Pipeline Parallelism}
 
@@ -163,10 +165,10 @@ More importantly, combining software pipelining with our data
 parallelism techniques, provides a cumulative performance gain, most
 especially for applications with stateful computation.
 
-Figure \ref{fig:softpipe_graph} considers coarse-grained software
-pipelining and task parallelism normalized to single-core performance.
-On average, software pipelining has a speedup of 7.7x over single core
-(compare to 9.9 for data parallelism) and a speedup of 3.4x over task
+The third bar of Figure \ref{fig:main_comp} gives the throughput
+speedup for software pipelining over single-core.  On average,
+software pipelining has a speedup of 7.7x over single core (compare to
+9.9 for data parallelism) and a speedup of 3.4x over task
 parallelism. Software pipelining performs well when it can effectively
 load-balance the packing of the dependence-free steady-state.  In the
 case of Radar, TDE, FilterBank, and FFT, software pipelining achieves
@@ -257,22 +259,29 @@ generally excellent compute utilization; in 7 cases the utilization is
 In Figure \ref{fig:vs-space} we show our combined technique normalized
 to our previous work for compiling streaming applications to multicore
 architectures.  This baseline configuration is a maturation of the
-ideas presented in \cite{streamit-asplos} and implements a task plus
-pipeline parallel execution model relying solely on on-chip buffering
-and the on-chip static network for communication and
-synchronization. Our new techniques achieve a mean speedup of 1.84x
-over this baseline\footnote{Please note that the version of
-\cite{streamit-asplos} published in the conference proceedings
-contained incorrect MFLOPS measurements.}.
+ideas presented in \cite{streamit-asplos}\footnote{Please note that
+the version of \cite{streamit-asplos} published in the conference
+proceedings contained incorrect MFLOPS measurements.} and implements a
+task plus (hardware) pipeline parallel execution model relying solely
+on on-chip buffering and the on-chip static network for communication
+and synchronization. In the task and pipeline parallel model we
+require that the number of filters in the stream graph be less than or
+equal to the number of processing cores of the target architecture.
+To achieve this, we repeatedly apply fusion and fission
+transformations as directed by a dynamic programming algorithm.
 
-For most of our benchmarks, the combined techniques presented in this
-paper offer improved data parallelism, improved scheduling
-flexibility, and reduced synchronization compared to our previous
-work. This comparison demonstrates that combining our techniques is
-important for generalization to stateful benchmarks.  For Radar, data
-parallelism loses to this baseline by 19\%, while the combined
-technique enjoys a 38\% speedup. For Vocoder, data parallelism is 18\%
-slower, while the combined technique is 30\% faster.
+Our new techniques achieve a mean speedup of 1.84x over the task and
+pipeline parallel model and establish the StreamIt compiler as a
+stable and uniform platform for exploiting coarse-grained parallelism
+on multicore architectures. For most of our benchmarks, the combined
+techniques presented in this paper offer improved data parallelism,
+improved scheduling flexibility, and reduced synchronization compared
+to our previous work. This comparison demonstrates that combining our
+techniques is important for generalization to stateful benchmarks.
+For Radar, data parallelism loses to this baseline by 19\%, while the
+combined technique enjoys a 38\% speedup. For Vocoder, data
+parallelism is 18\% slower, while the combined technique is 30\%
+faster.
 
 Task plus pipeline parallelism performs exceptionally well for
 applications that contain long pipelines that can be load-balanced,
