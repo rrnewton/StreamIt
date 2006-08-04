@@ -53,9 +53,9 @@ unit maintains local communication.  We implement this functionality
 by first fusing the pipeline into a single filter, and then fissing
 the filter into a data-parallel splitjoin.  We apply fusion first
 because we assume that each data-parallel product will execute on a
-single machine; in this case, fusion enables powerful inter-node
-optimizations such as scalar replacement~\cite{sermulins:lctes:2005}
-and algebraic simplification~\cite{agrawal:cases:2005,lamb:pldi:2003}.
+single machine; fusion enables powerful inter-node optimizations such
+as scalar replacement~\cite{sermulins:lctes:2005} and algebraic
+simplification~\cite{agrawal:cases:2005,lamb:pldi:2003}.
 
 Some pipelines in the application cannot be fully fused without
 introducing internal state, thereby eliminating the data parallelism.

@@ -79,7 +79,7 @@ boundaries; thus, the state tracks the position in the column and does
 some internal buffering.  Vocoder performs an adaptive DFT that uses a
 stateful decay to ensure stability; it also needs to retain the
 previous output across one iteration within a phase transformation.
-MPEGDecoder has neglible state in retaining predicted motion vectors
+MPEGDecoder has negligible state in retaining predicted motion vectors
 across one iteration of work.
 
 \begin{figure*}[t]
@@ -113,13 +113,7 @@ communication system.  Given that we are targeting a 16-core
 processor, a mean speedup of 2.27x is inadequate.
 
 \subsection{Coarse-Grained Data Parallelism}
-\begin{figure}[t]
-\centering
-\psfig{figure=fine_data.eps, width=3.2in}
-\caption{Fine-Grained Data Parallelism normalized to single core.
-\protect\label{fig:fine_data}}
-\vspace{-6pt}
-\end{figure}
+
 The StreamIt programming model facilitates relatively simple analysis
 to determine opportunities for data parallelism.  But the granularity
 of the transformations must account for the additional synchronization
@@ -157,6 +151,14 @@ at too fine a granularity, ignoring synchronization.  Coarsening and
 then parallelizing reduces the synchronization costs of data
 parallelizing.  For Radar and Vocoder, data parallelism is paralyzed
 by the preponderance of stateful computation.
+
+\begin{figure}[t]
+\centering
+\psfig{figure=fine_data.eps, width=3.2in}
+\caption{Fine-Grained Data Parallelism normalized to single core.
+\protect\label{fig:fine_data}}
+\vspace{-6pt}
+\end{figure}
 
 \subsection{Coarse-Grained Software Pipelining}
 
