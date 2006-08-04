@@ -21,14 +21,15 @@ A detailed evaluation in the context of the StreamIt language and the
 16-core Raw microprocessor offers very favorable results that are also
 quite consistent across diverse applications.  Coarse-grained data
 parallelism offers a 4.4x speedup over a task-parallel baseline and a
-9.9x speedup over a sequential code.  Without granularity coarsening,
-these reduce to 0.7x and 1.4x, respectively.  Coarse-grained software
-pipelining improves the generality of the compiler, as it is able to
-parallelize stateful filters with dependences from one iteration to
-the next.  Our two techniques are complementary and offer a combined
-speedup of 11.2x over the baseline (and 1.84x over our previous work).
+9.9x speedup over a sequential code.  Without our granularity
+coarsening pass, these reduce to 0.7x and 1.4x, respectively.
+Coarse-grained software pipelining improves the generality of the
+compiler, as it is able to parallelize stateful filters with
+dependences from one iteration to the next.  Our two techniques are
+complementary and offer a combined speedup of 11.2x over the baseline
+(and 1.84x over our previous work).
 
-Though data parallelism is responsible for much of our speedups on a
+Though data parallelism is responsible for greater speedups on a
 16-core chip, pipeline parallelism may become more important as
 multicore architectures scale.  Data parallelism requires global
 communication, and keeps resources sitting idle when it encounters

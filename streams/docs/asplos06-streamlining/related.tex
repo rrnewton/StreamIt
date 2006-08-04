@@ -10,11 +10,11 @@
 In addition to StreamIt, there are a number of stream-oriented
 languages drawing from domains such as functional, dataflow, CSP and
 synchronous programming~\cite{survey97}.  The Brook language is
-architecture-independent and focusses on data
+architecture-independent and focuses on data
 parallelism~\cite{brook04}.  Stream kernels are required to be
 stateless, though there is special support for reducing streams to a
 single value.  Stream\-C/Ker\-nel\-C is lower level than Brook;
-kernels written in KernelC are stiched together in StreamC and mapped
+kernels written in KernelC are stitched together in StreamC and mapped
 to the data-parallel Imagine processor~\cite{imagine03ieee}.  SPUR
 adopts a similar decomposition between ``microcode'' stream kernels
 and skeleton programs to expose data parallelism~\cite{spur05samos}.
@@ -22,14 +22,14 @@ Cg exploits pipeline parallelism and data parallelism, though the
 programmer must write algorithms to exactly match the two pipeline
 stages of a graphics processor~\cite{cg03}.  Compared to these
 languages, StreamIt places more emphasis on exposing task and pipeline
-parallelism (all the languages expose data parallelim).
+parallelism (all the languages expose data parallelism).
 %and on sliding window operations (filters that peek).  
 By adopting the synchronous dataflow model of execution~\cite{lee87},
-StreamIt focusses on well-structured programs that can be aggressively
+StreamIt focuses on well-structured programs that can be aggressively
 optimized.  The implicit infinite loop around programs is also a key
 StreamIt characteristic that enables the transformations in this
-paper.  Spidle is also a recent stream language that was influenced by
-StreamIt~\cite{spidle03}.
+paper.  Spidle~\cite{spidle03} is also a recent stream language that
+was influenced by StreamIt.
 %and Lucid Synchrone~\cite{Lucid-Synchrone}.
 %Synchronous languages which
 %target embedded applications include Esterel~\cite{Esterel},
@@ -37,7 +37,7 @@ StreamIt~\cite{spidle03}.
 
 Liao et al. map Brook to multicore processors by leveraging the affine
 partitioning model~\cite{liao06brook}.  While affine partitioning is a
-powerful model for parameterized loop-based programs, in StreamIt we
+powerful technique for parameterized loop-based programs, in StreamIt we
 simplify the problem by fully resolving the program structure at
 compile time.  This allows us to schedule a single steady state using
 flexible, non-affine techniques (e.g., simulated annealing) and to

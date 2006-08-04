@@ -5,11 +5,11 @@
 As centralized microprocessors are ceasing to scale effectively,
 multicore architectures are becoming the industry standard.  For
 example, the IBM/Toshiba/Sony Cell processor has 9
-cores~\cite{Cell-hpca}, Sun Niagara has 8 cores~\cite{Niagara}, RMI
-XLR732 has 8 cores~\cite{RMI-web}, IBM/Micro\-soft Xenon has 3
-cores~\cite{xbox360}, and most vendors are shipping dual-core chips.
-Cisco has described a next-generation network processor containing 192
-Tensilica Xtensa cores~\cite{etherton05ancs}.
+cores~\cite{Cell-hpca}, the Sun Niagara has 8 cores~\cite{Niagara},
+the RMI XLR732 has 8 cores~\cite{RMI-web}, the IBM/Micro\-soft Xenon
+has 3 cores~\cite{xbox360}, and most vendors are shipping dual-core
+chips.  Cisco has described a next-generation network processor
+containing 192 Tensilica Xtensa cores~\cite{etherton05ancs}.
 %The Intel IXP 2800 network processor has 1 core and 16 micro-engines.
 This trend has pushed the performance burden to the compiler, as
 future application-level performance gains depend on effective
@@ -23,17 +23,18 @@ that remains largely intractable.
 The stream programming paradigm offers a promising approach for
 exposing parallelism suitable for multicore architectures.  Stream
 languages such as StreamIt~\cite{streamitcc}, Brook~\cite{brook04},
-Baker~\cite{Baker}, and Spidle~\cite{spidle03} are motivated not only by
-trends in computer architecture, but also by trends in the application
-space, as network, image, voice, and multimedia programs are becoming
-only more prevalent.  In the StreamIt Language, a program is represented
-as a set of autonomous actors that communicate through FIFO data
-channels (see Figure~\ref{fig:vocoder}).  During program execution,
-actors fire repeatedly in a periodic schedule.  As each actor has a
-separate program counter and an independent address space, all
-dependences between actors are made explicit by the communication
-channels.  Compilers can leverage this dependence information to
-orchestrate parallel execution.
+SPUR~\cite{spur05samos}, Cg~\cite{cg03}, Baker~\cite{Baker}, and
+Spidle~\cite{spidle03} are motivated not only by trends in computer
+architecture, but also by trends in the application space, as network,
+image, voice, and multimedia programs are becoming only more
+prevalent.  In the StreamIt language, a program is represented as a
+set of autonomous actors that communicate through FIFO data channels
+(see Figure~\ref{fig:vocoder}).  During program execution, actors fire
+repeatedly in a periodic schedule.  As each actor has a separate
+program counter and an independent address space, all dependences
+between actors are made explicit by the communication channels.
+Compilers can leverage this dependence information to orchestrate
+parallel execution.
 
 Despite the abundance of parallelism in stream programs, it is
 nonetheless a challenging problem to obtain an efficient mapping to a
@@ -57,8 +58,8 @@ synchronization associated with the splits and joins.  Also, as the
 granularity of task parallelism depends on the application (and the
 programmer), it is not sufficient as the only source of parallelism.
 
-Data parallelism refers to actors that have no dependences between one
-execution and the next.  Such ``stateless'' actors\footnote{A
+Data parallelism refers to any actor that has no dependences between
+one execution and the next.  Such ``stateless'' actors\footnote{A
 stateless actor may still have read-only state.}  offer unlimited data
 parallelism, as different instances of the actor can be spread across
 any number of computation units (see Figure~\ref{fig:exemodel}c).
@@ -66,9 +67,9 @@ However, while data parallelism is well-suited to vector machines, on
 coarse-grained multicore architectures it can introduce excessive
 communication overhead.  Previous data-parallel streaming
 architectures have focused on designing a special memory hierarchy to
-support this communication~\cite{imagine03ieee}.  The other hazards of
-data parallelism include increased buffering and latency, as well as
-the inability to parallelize actors with state.
+support this communication~\cite{imagine03ieee}.  However, data
+parallelism has the hazard of increasing buffering and latency, and
+the limitation of being unable to parallelize actors with state.
 
 Pipeline parallelism applies to chains of producers and consumers that
 are directly connected in the stream graph.  In our previous
@@ -89,7 +90,7 @@ In this paper, we describe a robust compiler system that leverages the
 right combination of task, data, and pipeline parallelism to achieve
 good multicore performance across a wide range of input programs.
 Because no single type of parallelism is a perfect fit for all
-situations, a unified analysis is needed to obtain consistent results.
+situations, a unified approach is needed to obtain consistent results.
 Using the StreamIt language as our input and targeting the 16-core Raw
 architecture, our compiler demonstrates a mean speedup of 11.2x over a
 single-core baseline; 7 out of 12 benchmarks speedup by over 12x.
@@ -105,11 +106,11 @@ graph as much as possible so long as the result is stateless.  Each
 fused actor has a significantly higher computation to communication
 ratio, and thus incurs significantly reduced communication overhead in
 being duplicated across cores.  To further reduce the communication
-costs, the technique also leverages task parallelism: two
-task-parallel actors need only be split across half of the cores in
-order to obtain high utilization.  On Raw, coarse-grained data
-parallelism achieves a mean speedup of 9.9x over a single core and
-4.4x over a task-parallel baseline.
+costs, the technique also leverages task parallelism; for example, two
+balanced task-parallel actors need only be split across half of the
+cores in order to obtain high utilization.  On Raw, coarse-grained
+data parallelism achieves a mean speedup of 9.9x over a single core
+and 4.4x over a task-parallel baseline.
 %While this technique exploits data parallelism, it also relies on the
 %producer-consumer relationships evident in stream programs for
 %increasing the granularity of the graph.
@@ -151,8 +152,8 @@ treatment of coarse-grained parallelism leads to an overall speedup of
 \psfig{figure=vocoder.eps,width=3in}
 \vspace{-24pt}
 \caption{Stream graph for a simplified subset of our Vocoder
-benchmark.  Following a bank of sliding DFTs, the signal is converted
-to polar coordinates.  Node {\tt B2} sends the magnitude component to
+benchmark.  Following a set of sliding DFTs, the signal is converted
+to polar coordinates.  Node {\tt S2} sends the magnitude component to
 the left and the phase component to the right.  In this simplified
 example, no magnitude adjustment is needed.\label{fig:vocoder}}
 \vspace{-12pt}

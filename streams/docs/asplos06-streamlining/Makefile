@@ -11,7 +11,7 @@ asplos172-gordon.dvi: $(FILES)
 # space bib entries closer together
 	perl -pi -e 's/\\bibitem/\\vspace{-1pt}\\bibitem/g' asplos172-gordon.bbl
 # but do not cramp the References section title
-	perl -pi -e 's/\\begin\{thebibliography\}\{10\}/\\begin\{thebibliography\}\{10\}\\vspace\{-2pt\}/g' asplos172-gordon.bbl
+#	perl -pi -e 's/\\begin\{thebibliography\}\{10\}/\\begin\{thebibliography\}\{10\}\\vspace\{-2pt\}/g' asplos172-gordon.bbl
 	latex asplos172-gordon
 
 clean:
