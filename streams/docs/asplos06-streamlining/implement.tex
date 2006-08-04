@@ -82,31 +82,36 @@ network, with resource contention modeled accordingly.
 
 \subsection{StreamIt Compiler Infrastructure}
 The techniques presented in this paper are evaluated in the context of
-the StreamIt compiler infrastructure.  The system includes both
-high-level stream optimizations and multiple architecture-specific
-backends
-\cite{streamittech2,lamb:pldi:2003,agrawal:cases:2005,sermulins:lctes:2005,
-karczmarek:lctes:2003,chen:graphics-hardware:2005,streamit-asplos}. We
-leverage StreamIt's spatially-aware Raw backend for this work.
+the StreamIt compiler infrastructure.  The system includes a
+high-level stream IR with a host of graph transformations including
+graph canonicalization, synchronization removal, refactoring, fusion,
+and fission~\cite{streamit-asplos}.  Also included are domain specific
+optimizations for linear filters (e.g., FIR, FFT, and
+DCT)~\cite{lamb:pldi:2003}, state-space
+analysis~\cite{agrawal:cases:2005}, and cache
+optimizations~\cite{sermulins:lctes:2005}.  The infrastructure bundles
+multiple architecture-specific backends.  We leverage StreamIt's
+spatially-aware Raw backend for this work.
 
-The compiler provides a hybrid model that is able to utilize both
-on-chip and off-chip resources for the buffering and communication of
-streaming data.  For this paper, we choose to adopt a coarse-grained
-approach, leaving the fine-grained communication resources unutilized
-for pipeline communication within a steady-state, relying solely on
-software pipelining. We found that employing Raw's on-chip static
-network to enable hardware pipelining is extremely difficult because
-of the limited FIFO buffering of the network.  Although this is not a
-fundamental limit of the architecture, it forces fine-grained
-orchestration of communication and computation.
+Previously, we described hardware and software pipelining as two
+distinct techniques for exploiting pipeline parallelism.  The StreamIt
+compiler has full support for each.  However it also implements a
+hybrid approach where hardware pipelined units are scheduled in a
+software pipelined loop.  While we were excited by the possibilities
+of the hybrid approach, it does not provide a benefit on Raw due the
+tight coupling between processors and the limited FIFO buffering of
+the network. Although these are not a fundamental limits of the
+architecture, they enforce fine-grained orchestration of communication
+and computation that is a mismatch for our coarse-grained execution
+model.
 
-Also,  multiple filters from non-local sections of the stream graph
-can be assigned to each processing core.  Across the cores, filters
-execute in dataflow order, with each filter reading its input from and
-writing its output to shared memory. Each core executes a schedule of
-filters assigned to it and each filter executes on a single processing
-core for the entire execution. Each core executes independently until
-a split or join point is reached.
+%Also, multiple filters from non-local sections of the stream graph
+%can be assigned to each processing core.  Across the cores, filters
+%execute in dataflow order, with each filter reading its input from and
+%writing its output to shared memory. Each core executes a schedule of
+%filters assigned to it and each filter executes on a single processing
+%core for the entire execution. Each core executes independently until
+%a split or join point is reached.
 
 %We experimented with numerous techniques for forming {\it spatial}
 %pipelines of filters mapped to different cores that communicate among
@@ -140,9 +145,9 @@ reorganization from off-chip memory and write it back to off-chip
 memory.  The disadvantages to this scheme are that all the data
 required for joining must be available before the join can commence
 and the compute processors of the cores involved are idle during the
-reorganization.
-
-
+reorganization.  Architectures that include decoupled DMA engines
+(e.g., Cell) can overlap splitting/joining communication with useful
+computation.
 
 \begin{figure*}[t]
 \centering
@@ -152,7 +157,7 @@ reorganization.
 \vspace{-6pt}
 \end{figure*}
 
-\subsubsection{Scheduling without Software Pipelining}
+\subsubsection{Baseline Scheduler}
 Our scheduling techniques for software pipelining of the stream graph
 were presented in Section \ref{sec:softpipe}.  To facilitate
 evaluation of coarse-grained software pipelining, we implemented a
