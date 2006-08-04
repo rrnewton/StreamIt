@@ -7,12 +7,12 @@ communicate over explicit data channels.
 
 In this paper, we demonstrate an end-to-end stream compiler that
 attains robust multicore performance in the face of varying
-application characteristics.  As different benchmarks have varying
-amounts of task, data, and pipeline parallelism, we exploit all types
-of parallelism in a unified manner in order to achieve this
-generality.  Our compiler, which maps from the StreamIt language to
-the 16-core Raw architecture, attains a 11.2x mean speedup over a
-single-core baseline, and a 1.84x speedup over our previous work.
+application characteristics.  As benchmarks exhibit different amounts
+of task, data, and pipeline parallelism, we exploit all types of
+parallelism in a unified manner in order to achieve this generality.
+Our compiler, which maps from the StreamIt language to the 16-core Raw
+architecture, attains a 11.2x mean speedup over a single-core
+baseline, and a 1.84x speedup over our previous work.
 
 %% Our compiler relies on two new techniques.  {\it Coarse-grained data
 %% parallelism} increases the granularity of data-parallel streams to
