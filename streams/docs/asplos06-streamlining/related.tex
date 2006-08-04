@@ -1,56 +1,42 @@
 \section{Related Work}
 \label{sec:related}
 
-- software pipelining on SDF and instruction-level
+Previous work in scheduling computation graphs to parallel targets has
+focused on partitioning and scheduling techniques that exploit task
+and pipeline parallelism~\cite{SDFSched, SDFSched2,
+may87communicating, DAGSched, pipeline-sdf}.  Application of
+loop-conscience transformations to coarse-grained dataflow graphs has
+been investigated.  Unrolling (or ``unfolding'' in this domain) is
+employed for SDF graphs to reduce the initiation interval but they
+they do not consider real
+architectures~\cite{unfolding,unfolding2}. Software pipelining
+techniques have been employed for scheduling synchronous dataflow
+graphs onto various embedded and DSP
+targets~\cite{bakshi99,chatha-02}, but requires a programmer knowledge
+of both the application and the architecture. None of these systems
+exploit the combination of task, data, and pipeline parallelism.
+Furthermore, these systems do not provide a robust end-to-end path for
+application parallelization from a high-level, portable programming
+language.
 
-% reading group paper: streaming on multithreaded cores
-Software pipelining for clustered VLIWs~\cite{qian02}.
-
-Previous work in scheduling computation graphs to parallel targets
-have focused on dynamic techniques~\cite{SDFSched, SDFSched2,
-may87communicating, DAGSched}. In general, multiple graph nodes are
-{\it clustered} onto a single computational node and scheduled
-dynamically.
-
-Our work, unlike most previous work in this field, models link
-contention and topography.  Furthermore, StreamIt graphs are
-implicitly formed of loops so we can apply loop scheduling techniques
-such as software pipelining to build our schedules.
-
-%The problem of instruction scheduling for MIMD and VLIW architectures
-%is similar to the problem tackled by the space-time compiler.  ILP
-%compilers for clustered VLIW architectures~\cite{Bulldog, Multiflow}
-%are decomposed into stages that are analogous to the stages of the
-%SpaceTime compiler.  These compilers must partition or cluster
-%instructions, assign instructions to processors, and then schedule the
-%instructions.  
-
-Previous work on software pipelining has focused on scheduling machine
-instructions in a loop~\cite{lam-softpipe, rau-softpipe} to a
-uniprocessor target.  The algorithms devised must account for tight
-resource constraints and complex instruction dependences.  Our
-software-pipelining problem is much less constrained; a traditional
-modulo scheduling algorithm can not effectively take advantage of this
-flexibility.  Previous work on ILP scheduling for the Raw
-architectures~\cite{lee98spacetime} also bears similarity.  However,
-these compilers schedule graphs of fine-grained instructions. The
-partitioning and scheduling heuristics are mindful of a different set
-of constraints including different types of dynamism and less regular
-communication patterns as compared to StreamIt graphs.
-
-%As far as we know, we are the first to evaluate loop-level scheduling
-%techniques as a method for scheduling coarse-grained task graphs.
-
-% \cite{cheops-thesis}
-%   http://web.media.mit.edu/~kung/publication/thesis.pdf
-%
-% other possible things to cite:
-%  http://portal.acm.org/citation.cfm?id=801721&dl=ACM&coll=portal
-%  http://www.csrl.unt.edu/~kavi/Research/ica3pp156.pdf
-%  http://cdmetcalf.home.comcast.net/papers/cop/node1.html#SECTION00010000000000000000
+Previous work on instruction-level software pipelining has focused
+mostly on scheduling machine instructions in a loop via modulo
+scheduling~\cite{rau81, lam-softpipe}.  The algorithms devised must
+account for tight resource constraints and complex instruction
+dependences. Our software-pipelining problem is much less constrained,
+enabling us to employ a simple greedy heuristic.  Furthermore, a
+traditional modulo scheduling algorithm is not needed because we have
+an implicit loop barrier at the end of each steady-state.  ILP
+compilers for clustered VLIW architectures~\cite{Bulldog, Multiflow,
+lee98spacetime, qian02} must partition instructions and assign them to
+clusters as part of the instruction scheduling. Clustering is
+analogous to our application of filter fusion in our software
+pipelining algorithm. 
 
 % MIKE
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 % BILL
 
 The Imagine stream processor~\cite{rixner98bandwidthefficient}
@@ -63,9 +49,9 @@ to execute a single filter at a time across all of the parallel
 clusters.  While this provides perfect load balancing and high
 arithmetic utilization when there is abundant data parallelism, it
 suffers when a filter has retained state or data-dependences between
-iterations.  Moreover, architectures based solely on
-time-multiplexing do not scale spatially, as there are global wires
-orchestrating the parallel execution units. 
+iterations.  Moreover, architectures based solely on time-multiplexing
+do not scale spatially, as there are global wires orchestrating the
+parallel execution units.
 
 - partitioning stuff
 - SDF
