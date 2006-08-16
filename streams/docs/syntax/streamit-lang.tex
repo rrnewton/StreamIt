@@ -26,7 +26,7 @@
 \title{StreamIt Language Specification\\
 Version 3.0\ifprerel\thanks{
 This document is the latest working version of the language specification.\hfil\break\ttfamily
-\hbox{$Id: streamit-lang.tex,v 1.28 2006-07-20 17:45:00 dimock Exp $}
+\hbox{$Id: streamit-lang.tex,v 1.29 2006-08-16 20:35:06 thies Exp $}
 }\fi}
 \author{\texttt{streamit@cag.csail.mit.edu}}
 \catcode`\$=3
@@ -479,10 +479,10 @@ The corresponding input or output tape type must be \lstinline|void|.
 \item If the peek rate is ommitted, it is assumed to be equal to the
 pop rate.
 
-\item If there are no \lstinline|pop| calls at all in the function
-body (all access to the input tape is by peeking), the number of items
-declared as the pop rate will be automatically popped at the end of
-the work function.
+%% \item If there are no \lstinline|pop| calls at all in the function
+%% body (all access to the input tape is by peeking), the number of items
+%% declared as the pop rate will be automatically popped at the end of
+%% the work function.
 
 \end{itemize}
 
@@ -1345,7 +1345,7 @@ template<T> T->void filter FileWriter
 
 
 \newpage
-\include{messaging}
+\include{messaging (Hierarchical Version)}
 \newpage
 
 \section{Dynamic Morphing}
