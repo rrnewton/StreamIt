@@ -12,14 +12,31 @@
 	 <table width="100%" cellspacing=0 cellpadding=0 border=0>
 
 	   <tr>
-	     <td width="15%" align=left valign=top><b>Feb. 2006</b></td>
+	     <td width="15%" align=left valign=top><b>Aug. 2006</b></td>
+	     <td width="1%"></td>
+	     <td align=left valign=top>
+	       <p align=justify>
+                 Our paper on <a
+	         href="http://cag.lcs.mit.edu/commit/papers/06/gordon-asplos06.pdf">exploiting
+	         coarse-grained parallelism</a> in stream programs
+	         will appear at ASPLOS in October 2006.  This paper
+	         maps StreamIt to Raw, a 16-core architecture,
+	         demonstrating an 11.2X mean speedup over a
+	         single-core baseline.
+           </p>
+	     </td>
+	   </tr>
+
+	   <tr><td>&nbsp;</td></tr>
+
+	   <tr>
+	     <td width="15%" align=left valign=top><b>Apr. 2006</b></td>
 	     <td width="1%"></td>
 	     <td align=left valign=top>
 	       <p align=justify>
              Our paper on <a
 	         href="http://cag.lcs.mit.edu/commit/papers/06/drake-ipdps06.pdf">MPEG-2
-	         decoding in StreamIt</a> will appear at IPDPS in April
-	         2006. The paper shows that MPEG decoding is a good match for
+	         decoding in StreamIt</a> appears at IPDPS. The paper shows that MPEG decoding is a good match for
              StreamIt, leading to clean, reusable, and portable code. The
              source code and related resources are <a
              href="../mpeg">available

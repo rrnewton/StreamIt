@@ -47,7 +47,7 @@
 
     An optimizing compiler infrastructure for the <a href="http://cag.lcs.mit.edu/raw">MIT Raw machine</a>,
     with fully automatic load balancing, graph layout, communication
-    scheduling, and routing [<a href="http://cag.lcs.mit.edu/streamit/papers/streamit-asplos.pdf">ASPLOS'02</a>, <a href="http://cag.lcs.mit.edu/streamit/results/index.html">details</a>].  In collaboration with the MIT graphics group, we have also developed a flexible graphics pipeline on Raw [<a href="http://cag.lcs.mit.edu/commit/papers//05/streamit-graphics-gh.pdf">Graphics Hardware'05</a>].
+    scheduling, and routing [<a href="http://cag.lcs.mit.edu/streamit/papers/streamit-asplos.pdf">ASPLOS'02</a>, <a href="http://cag.lcs.mit.edu/commit/papers/06/gordon-asplos06.pdf">ASPLOS'06</a>].  In collaboration with the MIT graphics group, we have also developed a flexible graphics pipeline on Raw [<a href="http://cag.lcs.mit.edu/commit/papers/05/streamit-graphics-gh.pdf">Graphics Hardware'05</a>].
 
 	    </p>
     <li><p align="justify"> A set of cache optimizations for embedded
@@ -98,7 +98,8 @@
     </p>
 	    <li><p align="justify"> A set of 
 	      <a href="../shtml/benchmarks.shtml">benchmarks</a> for the
-	      evaluation of streaming optimizations and architectures.
+	      evaluation of streaming optimizations and architectures, including
+              a detailed study on MPEG-2 in StreamIt [<a href="http://cag.lcs.mit.edu/commit/papers/06/drake-ipdps06.pdf">IPDPS'06</a>, <a href="../mpeg/">details</a>].
 	    </p>
 	  </ul>
 
