@@ -1,0 +1,73 @@
+/*
+ * Splitjoin test like ArrayTest3, but slightly different code between branches of splitjoin
+ */
+void->void pipeline ArrayTest16_2d
+{
+  add source();
+  add splitjoin {
+    split roundrobin;
+    add f1;
+    add f2;
+    join roundrobin;
+  };
+  add sum();
+  add printer();
+}
+
+float[2][2]->float[2][2] filter f1() {
+      work pop 1 push 1 {
+	  push(pop());
+      }
+}
+
+float[2][2]->float[2][2] filter f2 () {
+      work pop 1 push 1 peek 1 {
+	  float[2][2] temp;
+	  temp = pop();
+	  temp[0][0] = - temp[0][0];
+	  push(temp);
+      }
+}
+
+void->float[2][2] filter source() {
+    float val;
+    init { val = 1.0; }
+    work push 1 {
+      int i, j;
+      float[2][2] myArray;
+      for (i = 0; i < 2; i++)
+        for (j = 0; j < 2; j++) {
+          myArray[i][j] = val;
+          val = val + 1;
+        }
+      push(myArray);
+    }
+}
+
+
+float[2][2]->float[2][2] filter sum() {
+    work pop 2 push 1 {
+      float[2][2] temp, a, b;
+      int i, j;
+      a = peek(0);
+      b = peek(1);
+      for (i = 0; i < 2; i++)
+        for (j = 0; j < 2; j++)
+          temp[i][j] = a[i][j] + b[i][j];
+      pop();
+      pop();
+      push(temp);
+    }
+}
+
+float[2][2]->void filter printer() {
+    work pop 1 {
+      int i, j;
+      float[2][2] popArray;
+      popArray = pop();
+      for (i = 0; i < 2; i++)
+        for (j = 0; j < 2; j++)
+          println(popArray[i][j]);
+    }
+}
+
