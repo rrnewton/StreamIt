@@ -40,13 +40,6 @@
 	      code evaluation and debugging on Raw.
 	    </p>
 	    <li><p align="justify">
-	      <b><a href="http://www.cag.csail.mit.edu/~hank/">Hank
-	      Hoffman</a></b> from the <a
-	      href="http://cag.csail.mit.edu/raw">Raw</a> group helps
-	      with development, optimization and evaluation of
-	      applications (including FIR, MPEG-2, and others).
-	    </p>
-	    <li><p align="justify">
 	      <b>Michal Karczmarek</b> built the StreamIt library and
 	      the scheduler.  He also implemented the Makefile build
 	      system.
@@ -69,10 +62,6 @@
 		 led the  design of the  StreamIt language and  compiler. He
 		 built the  high-level IR infrastructure  and partitioning
 		 algorithms for load balancing and linear optimizations.
-	    </p>
-	    <li><p align="justify">
-	    <b>David Zhang</b> is working on integrating StreamIt with
-	    the X10 language from IBM.
 	    </p>
  	  </ul>
 
@@ -98,6 +87,13 @@
 	    <li><p align="justify">
 	      <b>Matt Brown</b> implemented applications in
 	      StreamIt, including an FM software radio.
+	    </p>
+	    <li><p align="justify">
+	      <b><a href="http://www.cag.csail.mit.edu/~hank/">Hank
+	      Hoffman</a></b> from the <a
+	      href="http://cag.csail.mit.edu/raw">Raw</a> group helped
+	      with development, optimization and evaluation of
+	      applications (including FIR, MPEG-2, and others).
 	    </p>
 	    <li><p align="justify">
             <b>Jasper Lin</b> worked on <i>Filter</i> optimizations as
@@ -139,6 +135,9 @@
 		StreamIt, including a GSM decoder.  He is currently
 		working   on  characterizing  the   streaming  application
 		domain.
+	    </p>
+	    <li><p align="justify">
+	    <b>David Zhang</b> integrated StreamIt with the X10 language from IBM.
 	    </p>
 	  </ul>
 
