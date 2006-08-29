@@ -5,11 +5,15 @@
 \documentclass[11pt]{article}
 
 \usepackage{booktabs}
-%\usepackage[margin=0.5in]{geometry}
-\usepackage{fullpage}
+%\usepackage[margin=1in]{geometry}
+%\usepackage{fullpage}
+\usepackage{simplemargins}
 \usepackage{palatino}
 \usepackage{tabularx}
 \usepackage{streamit}
+
+% to improve layout
+\setallmargins{0.95in}
 
 \newif\ifprerel
 \prereltrue
@@ -30,7 +34,7 @@
 \title{StreamIt Language Specification\\
 Version 2.1}
 \author{\texttt{streamit@cag.csail.mit.edu}}
-\date{July, 2005}
+\date{August, 2006}
 \catcode`\$=3
 
 \begin{document}
@@ -87,12 +91,12 @@ The following primitive types exist in StreamIt:
 
 \item[\lstinline|int|]  A signed integer type, of unspecified length.
   This length will typically be the native word length on the target
-  machine; for RAW and x86 compilation, this is usually 32 bits.
+  machine; for Raw and x86 compilation, this is usually 32 bits.
 
 \item[\lstinline|float|]  A floating-point type, of the best precision
   that will give good performance.  On x86 this is a double-precision
   float, since computation with single-precision floats is implicitly
-  converted to double-precision; on RAW, this is single-precision,
+  converted to double-precision; on Raw, this is single-precision,
   since that is all that is supported in hardware.
 
 \item[\lstinline|complex|]  A floating-point complex type, of the same
@@ -140,6 +144,7 @@ a boolean value.
 \bottomrule
 \end{tabular}
 \end{center}
+\vspace{-12pt}
 \caption{Operators on primitive types}
 \label{tab:primitive-operators}
 \end{table}
@@ -194,20 +199,61 @@ of a fixed length.  Array types are written with the base type name,
 followed by a single dimension in square brackets.  Multi-dimensional
 arrays or matrices are supported as arrays of arrays.
 
+\subsubsection{Portals}
+
+A portal is a special type of variable used for teleport messaging
+(see Section~\ref{sec:messaging}).  Portals allow control messages to
+be sent to a set of filters with a given type.  They are declared
+using a template on that type: \lstinline|portal<FilterType>|.
+
 \subsubsection{Variable Declarations}
 
 Variable declarations appear in structure declarations, as well as in
-code blocks and stream declarations.  A variable declaration may
-declare one or multiple variables, possibly with initializers;
-multiple variables are separated with commas.  Of note, the syntax for
-array declarations is different from C and Java.  A correct
-declaration is \lstinline|int[4] rgbi;|, with the entire type stated
-before the variable name.  A static array initializer may be provided
-as in C and Java, for example:
+code blocks, static blocks and stream declarations.  A variable
+declaration may declare one or multiple variables, possibly with
+initializers; multiple variables are separated with commas.  Of note,
+the syntax for array declarations is different from C and Java.  A
+correct declaration is \lstinline|int[4] rgbi;|, with the entire type
+stated before the variable name.  A static array initializer may be
+provided as in C and Java, for example:
 
 \begin{lstlisting}{}
 int[3][2] arr = {{1, 2}, {3, 4}, {5, 6}};
 \end{lstlisting}{}
+
+\subsubsection{Static Blocks}
+
+Read-only constants can be made visible to all streams in the program
+by declaring them within a \lstinline|static| block.  A static block
+contains one or more variable declarations, as well as an optional
+\lstinline|init| function to initialize data:
+
+\begin{lstlisting}{}
+static {
+  float PI = 3.14159;
+  float[100] sqrtTable;
+
+  init {
+    for (int i=0; i<100; i++) {
+      sqrtTable[i] = sqrt(i);
+    }
+  }
+}
+\end{lstlisting}
+
+Variables declared within a static block have global scope across the
+current compilation unit.  They are initialized at load time and
+remain constant throughout the lifetime of the program.  Thus,
+variables declared within a static block are read-only outside of the
+block.
+
+%% commented out because this implementation detail is not observable, 
+%% apart from code bloat and calls to rand() (do we allow them?)
+%
+%% \begin{note}
+%% Our current implementation resolves the values of static variables at
+%% compile time.
+%% \end{note}
 
 \subsection{Stream Types}
 
@@ -216,7 +262,7 @@ stream object has an input type and an output data type; the object is
 connected to ``tapes'' of a hypothetically infinite number of
 homogeneous data objects.  \emph{Filters} are atomic, and have
 initialization code and steady-state work code; \emph{pipelines},
-\emph{split-joins}, and \emph{feedback loops} are all composite
+\emph{splitjoins}, and \emph{feedback loops} are all composite
 structures that include some number of stream objects as children.
 
 All stream objects have initialization code that runs when the object
@@ -372,9 +418,7 @@ void->int filter Counter {
 \end{lstlisting}{}
 
 \paragraph{Work functions.}  Work functions are declared using the
-keyword \lstinline|work|.  This keyword may be followed by rate
-declarations; if these are absent, the filter is a \emph{phased
-filter} (see Section~\ref{sec:phased-filter}).  
+keyword \lstinline|work|, which must be followed by rate declarations.
 
 Rate declarations consist of \lstinline|push rate-expr|,
 \lstinline|peek rate-expr|, and \lstinline|pop rate-expr|,
@@ -403,12 +447,6 @@ work pop 1 push [2, 3, 4] { ... }
 The declaration above signifies a {\it dynamic rate} in that the exact
 number of items produced on any given execution is unknown at compile
 time.  
-
-\begin{note}
-There is limited support for dynamic rates in the compiler.
-Currently, only the Java library and the Raw backend support dynamic
-rates.
-\end{note}
 
 \noindent Rate declarations support two forms of dynamism:
 \begin{itemize}
@@ -467,11 +505,11 @@ int->int filter FilterLessThan(int N) {
 }
 \end{lstlisting}
 
-While the \lstinline|*| token allows one to declare filters with
-unbounded I/O rates, a concrete upper bound should be provided
-whenever possible.  Unbounded I/O rates can drastically degrade
-performance, as it becomes difficult (or impossible) to predict the
-amount of data needed for a filter to complete an atomic execution.
+%% While the \lstinline|*| token allows one to declare filters with
+%% unbounded I/O rates, a concrete upper bound should be provided
+%% whenever possible.  Unbounded I/O rates can drastically degrade
+%% performance, as it becomes difficult (or impossible) to predict the
+%% amount of data needed for a filter to complete an atomic execution.
 
 \end{itemize}
 
@@ -509,7 +547,7 @@ of a Delay:
 float->float filter Delay(int N) {
   prework push N {
     for (int i=0; i<N; i++) {
-      push(0);
+      push(0.0);
     }
   }
 
@@ -519,7 +557,7 @@ float->float filter Delay(int N) {
 }
 \end{lstlisting}
 
-\paragraph{Limitations on work and preWork functions}
+\paragraph{Limitations on work and prework functions}
 The push, peek, and pop expressions
 in the declaration of a \lstinline|work| or \lstinline|prework| function
 must be correct for the compilers to produce correct output.  These
@@ -537,12 +575,40 @@ declaration contains the return type, the name of the function, the
 parameter list, and the function body, just like a normal C or Java
 function.
 
+Helper functions may also access the I/O tapes using \lstinline|peek|,
+\lstinline|pop|, and \lstinline|push|, in which case they must declare
+their I/O rates just like the work function.  The declared rates
+represent all I/O operations performed by the filter between the start
+and end of the function (including operations in other functions that
+are called by the given function).  For example:
+
+\begin{lstlisting}{}
+// produces a square wave with period 2*N
+void->float filter SquareWave(int N) {
+  work push 2*N {
+    pushZeros();
+    pushOnes();
+  }
+
+  void pushZeros() push N {
+    for (int i=0; i<N; i++)
+      push(0.0);
+  }
+
+  void pushOnes() push N {
+    for (int i=0; i<N; i++)
+      push(1.0);
+  }
+}
+\end{lstlisting}
+
 \paragraph{Message-handler functions.}  A message handler function
 changes the state of the filter in response to some external event,
 delivered via a message.  It is declared with the keyword
 \lstinline|handler|, the name of the message, the parameter list, and
 the function body.  A message handler cannot return a value, so no
-return type is declared.
+return type is declared.  See Section~\ref{sec:messaging} for more
+details on messaging.
 
 %% \paragraph{Naming I/O tapes.}  For {\new} documentation 
 %% purposes, a filter's input and output tapes can be given a name as
@@ -555,37 +621,6 @@ return type is declared.
 %%   }
 %% }
 %% \end{lstlisting}
-
-\subsubsection{Phased Filters}  
-\label{sec:phased-filter}
-
-If the work function does not have rate declarations, it may not
-perform \lstinline|push| and \lstinline|pop| operations directly.
-However, in a phased filter, it may call \emph{phase functions}, which
-are declared like work functions but begin with the keyword
-\lstinline|phase| and a name, and always have rate declarations.  The
-runtime system ensures that, when a phase function is called, its
-\lstinline|peek| and \lstinline|pop| rates are satisfiable, even if
-other filters need to run for later phases to execute.  Beyond this
-special use, phase functions may not be directly called.  For example:
-
-\begin{lstlisting}{}
-int->int filter BlockReader {
-  // Each block has a 4-int header, 24 ints of data,
-  // and a 4-int footer.
-  work {
-    readHeader();
-    for (int i = 0; i < 24; i++)
-      echoData();
-    readFooter();
-  }
-  phase readHeader pop 4
-     { pop(); pop(); pop(); pop(); }
-  phase echoData pop 1 push 1 { push(pop()); }
-  phase readFooter pop 4
-     { pop(); pop(); pop(); pop(); }
-}
-\end{lstlisting}
 
 \subsubsection{Pipelines}
 
@@ -635,14 +670,14 @@ the output type of the last filter.
 \end{figure}
 
 
-\subsubsection{Split-Joins}
+\subsubsection{Splitjoins}
 
-A split-join allows computation to be run in parallel, possibly using
+A splitjoin allows computation to be run in parallel, possibly using
 different parts of the input stream.  It is so named because incoming
 data passes through a \emph{splitter}, is redistributed to the child
 streams for processing, and then is fed through a \emph{joiner} to be
 recombined into a single output stream; see section
-\ref{sec:expr-splitters-joiners}.
+\ref{sec:splitters-joiners}.
 
 \begin{lstlisting}{}
 int->int splitjoin AddAndSub {
@@ -653,7 +688,7 @@ int->int splitjoin AddAndSub {
 }
 \end{lstlisting}
 
-This split-join has two children.  Incoming data is duplicated onto
+This splitjoin has two children.  Incoming data is duplicated onto
 both streams.  The first branch consumes two elements and adds them;
 the second consumes two elements and subtracts them.  The resulting
 values are then pushed onto the output stream in a round-robin
@@ -682,7 +717,7 @@ fashion, with values from alternating streams.
       \put(6,1){\vector(0,-1){1}}
       \put(13,0){\makebox(16,1)[l]{\lstinline|\}|}}
     \end{picture}
-    \caption{Split-Joins}
+    \caption{Splitjoins}
     \label{fig:splitjoin}
   \end{center}
 \end{figure}
@@ -707,17 +742,6 @@ float->float feedbackloop AddFeedback(float scaling) {
 The \lstinline|body| and \lstinline|loop| declarations may be omitted;
 if so, an implicit \lstinline|Identity| filter of the appropriate type
 is inserted.
-
-\paragraph{Semantics of splitters and joiners.}  Splitters and joiners
-both treat the stream input as the first child, and the loop edge as
-the second child.  Splitters and joiners that do not allow exactly two
-children are disallowed.
-
-\paragraph{\lstinline|enqueue| statement.}  The \lstinline|enqueue|
-statement takes a value and places it in FIFO order on the output tape
-from the loop stream.  You will generally need to enqueue enough items
-that the input joiner will be able to fire once; enqueuing more items
-causes a delay in the feedback loop.
 
 \begin{figure}[htbp]
   \begin{center}
@@ -749,11 +773,23 @@ causes a delay in the feedback loop.
   \end{center}
 \end{figure}
 
+\paragraph{Semantics of splitters and joiners.}  Splitters and joiners
+both treat the stream input as the first child, and the loop edge as
+the second child.  Splitters and joiners that do not allow exactly two
+children are disallowed.
+
+\paragraph{\lstinline|enqueue| statement.}  The \lstinline|enqueue|
+statement takes a value and places it in FIFO order on the output tape
+from the loop stream.  You will generally need to enqueue enough items
+that the input joiner will be able to fire once; enqueuing more items
+causes a delay in the feedback loop.
+
 \subsubsection{Splitters and Joiners}
+\label{sec:splitters-joiners}
 
 Splitters have a single input tape and multiple output tapes; joiners
 have multiple input tapes and a single output tape.  They appear in
-feedback loops and split-joins.
+feedback loops and splitjoins.
 
 %% Splitters {\new} and joiners are programmable, just like filters.  The
 %% only difference is that they declare multiple input or output tapes,
@@ -870,9 +906,7 @@ feedback loops and split-joins.
 
 \paragraph{\lstinline|duplicate| Splitters.} \lstinline|duplicate| 
 splitters take each incoming item and push the same item to each of
-the outgoing tapes, duplicating data.  As illustrated previously, the
-\lstinline|duplicate| splitter can be implemented within the StreamIt
-language if the data type and number of output streams are fixed.
+the outgoing tapes, duplicating data.
 
 \paragraph{\lstinline|roundrobin| Splitters and Joiners.}  \lstinline|roundrobin| 
 splitters take each item and send it to exactly one of the child
@@ -884,8 +918,8 @@ requires there to be exactly three children, and sends two to
 the first child, four to the second, and two to the third.  A
 round-robin weight may be 0; in this case, the child input must be of
 type \lstinline|void|.  A \lstinline|roundrobin(0)| splitter on a
-split-join means that no children take any input, and the input type
-of the entire split-join is \lstinline|void|.
+splitjoin means that no children take any input, and the input type
+of the entire splitjoin is \lstinline|void|.
 
 \lstinline|roundrobin| joiners are identical to \lstinline|roundrobin|
 splitters, except that they read from the input tapes in the specified
@@ -906,7 +940,7 @@ pattern and write data to the output tape.
 %% \paragraph{\lstinline|inorder| Joiners.}  \lstinline|inorder| {\new} 
 %% joiners merge items in the same order that they were produced by the
 %% corresponding splitter.  If there is a change of data rate on a given
-%% path of a split-join, then items are merged according to the stream
+%% path of a splitjoin, then items are merged according to the stream
 %% dependence relation as used by the messaging system.
 
 \subsubsection{Anonymous Streams}
@@ -920,6 +954,8 @@ streams and the name is omitted.  The semicolon that normally ends the
 \lstinline|add|, \lstinline|body|, or \lstinline|loop| statement is
 optional in this case.
 
+%layout
+\enlargethispage{\baselineskip}
 \begin{lstlisting}{}
 complex->float feedbackloop FeedbackMagnitude(float scaling) {
   join roundrobin;
@@ -979,7 +1015,7 @@ constraints are transparent to the programmer, however.
 %%   preceding and succeeding phases.  The current phase may execute
 %%   under the same conditions listed above for a filter; execution of
 %%   the phased filter then may pause until the next phase may fire.
-\item A joiner in a feedback loop or split-join may fire when the
+\item A joiner in a feedback loop or splitjoin may fire when the
   specified number of items are available on each of its inputs.  It
   pushes the sum of the input weights onto its output.
 \item A round-robin splitter may fire when the sum of the number of
@@ -989,6 +1025,14 @@ constraints are transparent to the programmer, however.
   available on its input.  It pops one item from its input and pushes
   one item to each output.
 \end{itemize}
+
+The programmer should think of each work function as firing
+atomically.  However, the compiler may choose to run filters in
+parallel, or to interleave certain work functions (this is sometimes
+necessary in the case of unbounded I/O rates).  Such transformations
+will not be observable unless the programmer uses \lstinline|print|
+statements (the only function with side effects) within multiple
+filters.
 
 \section{Statements}
 
@@ -1002,8 +1046,8 @@ legal in initialization code; other statements are legal anywhere.
 \subsubsection{\lstinline|add| Statement}
 
 The \lstinline|add| statement adds a child stream to the current stream
-object.  It is valid in split-joins and pipelines only.  In a
-split-join, it adds a new stream to the end of the current list of
+object.  It is valid in splitjoins and pipelines only.  In a
+splitjoin, it adds a new stream to the end of the current list of
 children.  In a pipeline, it adds a new stream to the end of the chain
 of children.
 
@@ -1033,7 +1077,7 @@ expression.
 \subsubsection{\lstinline|join| Statement}
 
 The \lstinline|join| statement declares the joiner type of a feedback
-loop or split-join.  It only appears in initialization code, and is
+loop or splitjoin.  It only appears in initialization code, and is
 invalid in initialization code for any other construct.  
 
 \subsubsection{\lstinline|loop| Statement}
@@ -1051,12 +1095,13 @@ This statement takes a \emph{stream constructor}; see section
 \subsubsection{\lstinline|split| Statement}
 
 The \lstinline|split| statement declares the splitter type of a feedback
-loop or split-join.  It only appears in initialization code, and is
+loop or splitjoin.  It only appears in initialization code, and is
 invalid in initialization code for any other construct.  
 
-\subsection{Work-only Statements}
+\subsection{Work and Helper Statements}
 
-These statements may only appear within the \lstinline|work| function.
+These statements may appear only within \lstinline|work| or helper
+functions.
 %steady-state work code, and in
 %particular, within a filter's \lstinline|prework|, \lstinline|work|
 %and \lstinline|phase| function(s).
@@ -1067,19 +1112,15 @@ The \lstinline|push| statement takes a value expression and pushes its
 value onto the output tape of the current filter.  The type of the
 expression must match the output type of the filter.
 
-%% \subsubsection{Message-sending Statements}
+\subsubsection{Message-sending Statements}
 
-%% A message may be sent to a portal that is a stream parameter in the
-%% current filter.  The syntax of this is like a Java function call: the
-%% portal variable name is followed by a period, the name of the message
-%% function, and a parameter list.  This may optionally be followed by a
-%% latency specification, consisting of an open bracket, an optional
-%% minimum latency expression, a colon, an optional maximum latency
-%% expression, and a close bracket; if omitted, the message has
-%% best-effort delivery, equivalent to omitting both minimum and maximum
-%% latency.  For a syntax example and details on the meaning of the
-%% latency, see Section \ref{sec:messaging}.
+As detailed in Section~\ref{sec:messaging}, filters can exchange
+control messages by invoking methods on portal variables.  The syntax
+of this is like a Java function call: the portal variable name is
+followed by a period, the name of the message handler, and a parameter
+list.  There is also an optional latency range enclosed in brackets.
 
+\newpage
 \subsection{General-use Statements}
 
 These statements may appear anywhere code is legal.
@@ -1130,7 +1171,6 @@ as possible.  \lstinline|complex| variables are initialized to
 0 as described here.  Similarly, each field of a structure variable is
 initialized to 0 in the same way.
 
-
 \section{Expressions}
 
 \subsection{Value Expressions}
@@ -1156,12 +1196,13 @@ integer-valued value expression.
 \label{sec:expr-peek-pop}
 
 The \lstinline|peek| and \lstinline|pop| expressions look at items on
-the incoming tape in a filter's work function; they are illegal in any
-other context.  \lstinline|peek(n)| examines the n-th item on the tape
-without removing it; \lstinline|peek(0)| returns the next incoming
-item, \lstinline|peek(1)| the one afterwards, and so on.
-\lstinline|pop()| returns the same item \lstinline|peek(0)| returns,
-but also removes it from the tape.
+the incoming tape in a filter's work or helper functions; they are
+illegal in init or message-handler functions.  \lstinline|peek(n)|
+examines the n-th item on the tape without removing it;
+\lstinline|peek(0)| returns the next incoming item,
+\lstinline|peek(1)| the one afterwards, and so on.  \lstinline|pop()|
+returns the same item \lstinline|peek(0)| returns, but also removes it
+from the tape.
 
 \begin{note}
 There is not a guaranteed evaluation order for StreamIt expressions,
@@ -1172,12 +1213,11 @@ if there is one, there should be no \lstinline|peek()|s.
 \end{note}
 
 Note that \lstinline|pop()| removes an item from the tape, so
-\lstinline|peek()|s afterwards use different indices.  A work function
-must pop a fixed number of items, and declare the number of items in
-its rate declaration.  It may not peek at more items than it declares
-in its rate declaration, though it may peek at fewer.  The peek
-declaration declares the furthest position on the tape examined from
-the point of view of the beginning of the function.
+\lstinline|peek()|s afterwards use different indices.  A function may
+not peek at more items than it declares in its rate declaration,
+though it may peek at fewer.  The peek declaration declares the
+furthest position on the tape examined from the point of view of the
+beginning of the function.
 
 \begin{lstlisting}{}
 int->int filter PeekRates {
@@ -1211,7 +1251,7 @@ in which the value passed is a reference (i.e., a pointer) to each
 object and array parameter.
 
 Function calls may be made to declared helper functions, or to
-built-in math functions.  The math functions are listed in table
+built-in math functions.  The math functions are listed in Table
 \ref{tab:math-functions}.
 
 \begin{note}
@@ -1304,7 +1344,8 @@ semicolon, since it ends with a close-brace.
 
 A stream constructor may be followed by the keyword \lstinline|to| and
 the name of a portal variable.  This causes the newly created stream
-to be registered with the named portal.
+to be registered with the named portal.  See
+Section~\ref{sec:messaging} for details.
 
 \section{Built-in Types}
 
@@ -1349,38 +1390,7 @@ template<T> T->void filter FileWriter
     \label{fig:built-in-streams}
 \end{figure}
 
-\section{Future Additions}
-
-This section describes features that are likely to be present in a
-future release of the language.  In particular, parts of the compiler
-already have full support for prework functions, phased filters, and
-messaging.
-
-\paragraph{Prework Functions.}  A filter may specify an additional work 
-function that is run in place of the normal work function the first
-time the filter executes.  This function uses the \lstinline|prework|
-keyword, and is otherwise identical to the normal work function.
-
-Prework functions can be very useful for setting up initial conditions
-based on the first set of inputs, or for pushing extra items on the
-first invocation.  For example, consider the following implementation
-of a Delay:
-
-\begin{lstlisting}{}
-float->float filter Delay(int N) {
-  prework push N {
-    for (int i=0; i<N; i++) {
-      push(0);
-    }
-  }
-
-  work push 1 pop 1{
-    push(pop());
-  }
-}
-\end{lstlisting}
-
-\subsection{Messaging}
+\section{Teleport Messaging}
 \label{sec:messaging}
 
 It is sometimes necessary to send occasional messages outside of the
@@ -1389,7 +1399,7 @@ signal requesting a change in the listening frequency, for example;
 this signal would happen infrequently, but it would be detected by a
 filter late in the application and require a change in a filter early
 in the application.  StreamIt provides an out-of-band messaging system
-to accomodate this sort of application.
+called ``teleport messaging'' to accomodate this sort of application.
 
 Only filters can receive messages.  The possible messages are defined
 by message handler functions; these functions have the keyword
@@ -1397,125 +1407,202 @@ by message handler functions; these functions have the keyword
 to a \emph{portal}, which can have multiple targets registered with
 it.
 
-\paragraph{Portals.}  A portal is a special type of variable.  It is
-associated with a single message receiver type; the full type name is
+\subsection{Portals}  
+
+A portal is a special type of variable.  It is associated with a
+single message receiver type; the full type name is
 \lstinline|portal<ReceiverType>|.  Unlike other variables in StreamIt,
 portals are passed by reference in stream parameters.  Declaring a
 portal as a local variable, and then passing that as a parameter to a
 child stream which adds a filter to the portal, results in the filter
-also being added to the portal in the original container.
-When a filter is created, it may be added to a portal by adding the
-keyword \lstinline|to| and the portal variable to the end of the
-declaration.
+also being added to the portal in the original container.  When a
+filter is created, it may be added to a portal by adding the keyword
+\lstinline|to| and the portal variable to the end of the declaration
+(see Section~\ref{sec:messaging-example} for an example).
 
-\paragraph{Sending messages.}  A filter work function with a portal
-variable may send a message through the portal.  This looks like a
-function call in Java: the portal name is followed by a period, the
-message name, and a parenthesized parameter list.  This may,
-optionally, be followed by a message latency, which specifies the
+\subsection{Sending and receiving messages}  
+
+Work or helper functions may send messages through portals.  This
+looks like a function call in Java: the portal name is followed by a
+period, the message name, and a parenthesized parameter list.  This
+may, optionally, be followed by a message latency, which specifies the
 minimum and maximum delay to receive the message.  The latency
-specification is an open bracket, an optional minimum latency, a
-colon, an optional maximum latency, and a close bracket.  If the
-latency specification is omitted, it defaults to \lstinline|[:]|,
-allowing any latency.
+specification is an open bracket, a minimum latency, a colon, a
+maximum latency, and a close bracket.  If the latency specification is
+omitted, the default message latency is zero (for both the minimum and
+maximum).
 
-When specified, message latency is stated in terms of number of items
-pushed or popped by the sending filter.  If a message is sent with
-latency \lstinline|[10:12]|, it will be received by upstream targets
-immediately before a work function execution that would generate an
-item that would affect the tenth through twelfth next data item that
-would be received by the sender; downstream filters would receive the
-message after a work function execution that processes data derived
-from the tenth through twelfth pushed items.
+For each filter that receives messages, the runtime system maintains a
+queue to hold incoming messages.  This queue is checked prior to each
+execution of the work function; any messages in the queue are
+dispatched to the appropriate message handlers.
 
-A typical message-handling application might use a message to change
-an amplification factor.  The following code demonstrates such an
-application.  The \lstinline|Volume| pipeline creates the portal,
-passes it as a parameter to the detector, and adds the actual
-amplifier to it.
+\subsection{Message timing}
 
-\begin{lstlisting}{}
-float->float filter VolumeControl {
-  float amplification;
-  init { amplification = 1.0; }
-  work pop 1 push 1 { push(pop() * amplification); }
-  handler setAmplification(float val)
-    { amplification = val; }
-}
+Messages sent with a fixed latency (i.e., the minimum and maximum
+latencies are equal) on a given execution of the sending filter will
+always arrive at a given execution of the receiving filter.  This
+deterministic property holds even if the compiler is parallelizing or
+reordering the filters at runtime.  Messages sent with a range of
+latencies (i.e., the minimum and maximum latencies are different) are
+sent as if some latency is chosen from within the range on every
+message invocation.
 
-float->float filter VolDetect
-    (portal<VolumeControl> vol) {
-  work pop 1 push 1 {
-    float val = pop();
-    if (/* detected */)
-      vol.setAmplification(0.5) [10:12];
-    push(val);
-  }
-}
+For each pair of message senders and receivers, there must be a
+directed path in the stream graph from one filter to the other
+(messages cannot be sent between filters on parallel paths in a
+splitjoin).  We refer to the filter at the start of this path as the
+{\it upstream} filter, and the filter at the end of this path as the
+{\it downstream} filter.
 
-float->float pipeline Volume {
-  portal<VolumeControl> vol;
-  add VolDetect(vol);
-  add VolumeControl() to vol;
-}
-\end{lstlisting}
+Messages are timed relative to a {\it pull schedule}.  A pull schedule
+corresponds to a sequence of atomic filter firings.  For each pair of
+message senders and receivers, a pull schedule executes the upstream
+filter as few times as possible for each execution of the downstream
+filter.  This corresponds to a fine-grained execution with the minimal
+amount of buffering between filters.  While the runtime system may
+deviate from the pull schedule, it must time the delivery of messages
+as if the pull schedule is in effect.
 
-\subsection{The \lstinline|keep| Construct}
+Assuming execution under a pull schedule, messages sent with default
+(zero) latency are immediately added to the message queue of the
+target stream.  Non-zero latencies are measured in terms of filter
+executions.  If a filter sends a message with latency $k$ during its
+$n$th execution, the outcome is equivalent to sending a message with
+latency 0 during its $n+k$th execution.
 
-The \lstinline|keep| function will look at, but not remove, items on
-the output tape of a filter.  \lstinline|keep(0)| returns the item
-that was most recently pushed, even if that was on a previous filter
-iteration.  Just as \lstinline|pop| affects indices for future
-\lstinline|peek| calls, \lstinline|push| adds another item to the
-output tape and hence changes the indices for future \lstinline|keep|
-calls.
+Message latencies can be interpreted as follows.  If the message is
+sent in the direction of dataflow (from an upstream node to a
+downstream node), a positive latency indicates that the message is
+synchronized with some data that the message sender will produce in
+the future.  Likewise, a negative latency synchronizes the message
+with some data that the message sender produced in the past.
 
-\lstinline|keep| can be used to implement IIR filters.  For example,
-given this LTI filter:
+If a message is sent opposite the direction of dataflow (from a
+downstream node to an upstream node), a positive latency synchronizes
+the message with some data the message sender will consume in the
+future.  In this case, negative latencies are illegal (they correspond
+to data consumed by the message sender in the past).
 
-\begin{eqnarray*}
-H(z) & = & \frac{1+z^{-1}}{1-z^{-1}} \\
-(1-z^{-1}) Y(z) & = & (1+z^{-1}) X(z) \\
-y[n] - y[n-1] & = & x[n] + x[n-1] \\
-y[n] & = & x[n] + x[n-1] + y[n-1] \\
-\end{eqnarray*}
+\subsection{Messaging Example}
+\label{sec:messaging-example}
 
-We can write equivalent StreamIt code:
+The following code uses teleport messaging to count in sequence:
 
 \begin{lstlisting}{}
-float->float filter IIRExample {
-  prework push 1 {
+void->void pipeline Counter {
+  portal<Sink> p;
+  add Source(p);
+  add Sink to p;
+}
+
+void->int filter Source(portal<Sink> p) {
+  int i = 1;
+  work {
     push(0);
-  }
-  work push 1 pop 1 peek 2 keep 1 {
-    // y[n] = x[n] + x[n-1] + y[n-1]
-    push(peek(0) + peek(1) + keep(0));
-    pop();
+    p.count(i++);
   }
 }
-\end{lstlisting}
 
-Of note, since the work function can not fire unless there is at least
-one item on its output tape, there must be a prework function that
-pushes that item; otherwise, the program is unschedulable.
+int->void filter Sink {
+  int output = 0;
 
-\subsection{Helper Packages}
+  work {
+    pop();
+    print(output);
+  }
 
-In many cases the programmer would benefit from writing a set of
-stateless helper functions that can be used in multiple filters.  For
-example, the GSM encoder we have now uses the C preprocessor to
-include a set of functions to perform 16-bit arithmetic.  Syntax for
-this functionality does not yet exist, though we may create a
-\lstinline|static| keyword:
+  handler count(int val) {
+    output = val;
+  }
+}
+\end{lstlisting}{}
+
+When run for 6 iterations, the code above outputs ``123456''.  The
+pull schedule executes the Source and Sink in alternation.  On the
+first execution of the Source, a \lstinline|count()| message is sent
+to portal {\tt p} with the default latency of zero.  The message is
+immediately added to the Sink's incoming message queue.  Thus, when
+the Sink executes, it checks the queue and handles the message before
+executing {\tt work}, thereby updating its \lstinline|output| variable
+before it is printed to the screen.
+
+Suppose that the message was sent with a latency of 1 instead of 0:
 
 \begin{lstlisting}{}
-static MyHelpers {
-  int square(int x) { return x * x; }
+void->int filter Source(portal<Sink> p) {
+  int i = 1;
+  work {
+    push(0);
+    p.count(i++) [1:1];
+  }
 }
-int->int filter SquareIt {
-  work pop 1 push 1 { push(MyHelpers.square(pop())); }
-}
-\end{lstlisting}
+\end{lstlisting}{}
+
+In this case, the program outputs ``012345'' because the message was
+effectively sent one iteration later.
+
+%% \section{Future Additions}
+
+%% This section describes features that may be present in a future
+%% release of the language.
+
+%% \subsection{The \lstinline|keep| Construct}
+
+%% The \lstinline|keep| function will look at, but not remove, items on
+%% the output tape of a filter.  \lstinline|keep(0)| returns the item
+%% that was most recently pushed, even if that was on a previous filter
+%% iteration.  Just as \lstinline|pop| affects indices for future
+%% \lstinline|peek| calls, \lstinline|push| adds another item to the
+%% output tape and hence changes the indices for future \lstinline|keep|
+%% calls.
+
+%% \lstinline|keep| can be used to implement IIR filters.  For example,
+%% given this LTI filter:
+
+%% \begin{eqnarray*}
+%% H(z) & = & \frac{1+z^{-1}}{1-z^{-1}} \\
+%% (1-z^{-1}) Y(z) & = & (1+z^{-1}) X(z) \\
+%% y[n] - y[n-1] & = & x[n] + x[n-1] \\
+%% y[n] & = & x[n] + x[n-1] + y[n-1] \\
+%% \end{eqnarray*}
+
+%% We can write equivalent StreamIt code:
+
+%% \begin{lstlisting}{}
+%% float->float filter IIRExample {
+%%   prework push 1 {
+%%     push(0);
+%%   }
+%%   work push 1 pop 1 peek 2 keep 1 {
+%%     // y[n] = x[n] + x[n-1] + y[n-1]
+%%     push(peek(0) + peek(1) + keep(0));
+%%     pop();
+%%   }
+%% }
+%% \end{lstlisting}
+
+%% Of note, since the work function can not fire unless there is at least
+%% one item on its output tape, there must be a prework function that
+%% pushes that item; otherwise, the program is unschedulable.
+
+%% \subsection{Helper Packages}
+
+%% In many cases the programmer would benefit from writing a set of
+%% stateless helper functions that can be used in multiple filters.  For
+%% example, the GSM encoder we have now uses the C preprocessor to
+%% include a set of functions to perform 16-bit arithmetic.  Syntax for
+%% this functionality does not yet exist, though we may create a
+%% \lstinline|static| keyword:
+
+%% \begin{lstlisting}{}
+%% static MyHelpers {
+%%   int square(int x) { return x * x; }
+%% }
+%% int->int filter SquareIt {
+%%   work pop 1 push 1 { push(MyHelpers.square(pop())); }
+%% }
+%% \end{lstlisting}
 
 %\input{streamit-lang-future}
 
@@ -1540,7 +1627,8 @@ int->int filter SquareIt {
 
 \subsection{StreamIt 2.1}
 
-Adding limited support for dynamic rates.
+Adding support for dynamic rates, teleport messaging, static sections,
+and prework functions.
 
 \subsection{StreamIt 2.0}
 
