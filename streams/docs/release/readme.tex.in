@@ -5,7 +5,7 @@
 \newcommand\filename[1]{\textsf{#1}}
 \newcommand\envar[1]{\textsf{#1}}
 
-\title{StreamIt 2.0 Release}
+\title{StreamIt 2.1 Release}
 
 \begin{document}
 \maketitle
@@ -13,8 +13,8 @@
 \noindent
 % note: RELEASE_DATE resolved in Makefile
 This is for the RELEASE_DATE release of the StreamIt compiler and
-runtime system, version 2.0.\\
-\verb|$Id: readme.tex.in,v 1.15 2005-08-15 00:49:23 thies Exp $|
+runtime system, version 2.1.\\
+\verb|$Id: readme.tex.in,v 1.16 2006-08-29 23:40:42 thies Exp $|
 
 \section{What is this?}
 
@@ -25,35 +25,33 @@ compiler.  While the compiler is still under active development, we
 believe this release should be useful for developing StreamIt
 applications.  See "caveats", below, and report bugs and feature
 requests to \texttt{streamit@cag.lcs.mit.edu}.  This compiler should
-produce functional code for both uniprocessor targets and the MIT RAW
+produce functional code for both uniprocessor targets and the MIT Raw
 processor.  There is also a runtime library for testing programs
 through a Java compiler.
 
 There are two versions of this release.  These are:
 
 \begin{description}
-\item[streamit-src-2.0.tar.gz] "Source release."  This contains the
+\item[streamit-src-2.1.tar.gz] "Source release."  This contains the
   full sources of the StreamIt compiler and runtime libraries, but no
   binaries.  Build instructions are included in the INSTALL file.
   
-\item[streamit-2.0.tar.gz] "Binary release."  This contains no
+\item[streamit-2.1.tar.gz] "Binary release."  This contains no
   sources, but does contain a Java jar file with the full compiler.
 \end{description}
 
 The StreamIt compiler is built on top of version 1.5B of the Kopi Java
-compiler from  DMS Decision  Management Systems GmbH.  The independent
-components  of  the  system,  including the  scheduler,  Java  runtime
-library,  C library,  and the  frontend, are  released subject  to the
+compiler from DMS Decision Management Systems GmbH.  The independent
+components of the system, including the scheduler, Java runtime
+library, C library, and the frontend, are released subject to the
 terms of the MIT license agreement. Other components of the system are
-released under  the terms of the  GNU General Public  License; see the
-\filename{COPYING} file for details.   The binary release also include
+released under the terms of the GNU General Public License; see the
+\filename{COPYING} file for details.  The binary release also include
 class files from the ANTLR LL(k) parser generator.
 
-Several documents  on StreamIt  are in the  \filename{docs} directory.
-You   can    find   more   information    on   our   Web    page,   at
+Several documents on StreamIt are in the \filename{docs} directory.
+You can find more information on our Web page, at
 \url{http://cag.lcs.mit.edu/streamit/}.
-
-
 
 \section{Dependencies}
 
@@ -64,28 +62,19 @@ and running the StreamIt compiler.  If you are using the binary
 release, the required ANTLR classes are already included in the
 StreamIt jar file.
 
-The C library depends on the FFTW library; see
-\url{http://www.fftw.org/}.  The StreamIt runtime system currently
-only supports fftw-2.1.x, not the newer fftw-3.0 branch.  FFTW should
-be installed somewhere in your default compiler search path if you are
-using the uniprocessor compiler backend.  You need to build
-single-precision versions of the library, such that you have an
-\filename{srfftw.h} and a \filename{libsrfftw.a}.  If you are building
-FFTW from source, use the \texttt{--enable-float} and
-\texttt{--enable-type-prefix} options when compiling.
+The linear optimizations (not turned on by default) depend on the FFTW
+library; see \url{http://www.fftw.org/}.  The StreamIt runtime system
+currently only supports fftw-2.1.x, not the newer fftw-3.0 branch.
+FFTW should be installed somewhere in your default compiler search
+path.  You need to build single-precision versions of the library,
+such that you have an \filename{srfftw.h} and a
+\filename{libsrfftw.a}.  If you are building FFTW from source, pass
+the following options to configure: \texttt{--enable-shared
+--enable-type-prefix --enable-threads --enable-float}.
 
-Compilation for Raw depends on the most recent released Raw build
-environment (as of this release, \verb|raw_dist_2003_10_08|).  Please
-contact Paul Johnson, \verb|prj@cag.lcs.mit.edu|, for information on
-this release if you are developing for RAW.  The \envar{TOPDIR}
-environment variable needs to point to your StarSearch directory; this
-may be the reduced \filename{workdir} tree from the Raw distribution,
-or the full \filename{starsearch} tree.
-
-The source release only builds with IBM's Jikes Java compiler; see
-\url{http://www.jikes.org/}.  Otherwise, a Java virtual machine is
-required to run the compiler; see \url{http://java.sun.com/} for
-possibilities.
+The source release depends on Sun's Java compiler (javac).  Otherwise,
+a Java virtual machine is required to run the compiler; see
+\url{http://java.sun.com/} for possibilities.
 
 The makefile infrastructure generally uses the GNU tools otherwise.
 In particular, GNU Make is required to build; this is the default
@@ -104,27 +93,6 @@ research compiler; as such, it has several known shortcomings:
    compiling 'foo.str' will clobber a file named 'foo.java' in the
    same directory.
 
-\item The frontend has only rudimentary correctness checks.  If you get
-   strange exceptions from the frontend, check your program's syntax,
-   and that all variables are declared before being used.  A semantic
-   checker is currently in progress.
-
-\item The compiler may have memory issues running on particularly
-  large benchmarks.  The dynamic programming partitioner
-  (\verb|--partition-dp|) generally uses less memory than the default
-  greedy partitioner.
-  
-\item The \verb|--removeglobals| and \verb|--destroyfieldarray|
-  options (and consequently \verb|-O2|) can produce incorrect results
-  on the \filename{filterbank} benchmark.
-
-%% \item Phased filter support differs between the compiler and library.  A
-%%    work function that consists only of calls to phase functions should
-%%    work in both; a more complicated work function, possibly including
-%%    variable declarations and static control flow, would work in the
-%%    compiler but not the library.  The intermediate Java code differs
-%%    between the two compilation paths.
-%%
 \item The compiler does not support passing structures or complex
   numbers as stream parameters.  This will result in an error such as
 
@@ -138,16 +106,10 @@ name=pipe_3
    input or output types of filters.
 
 \item Arrays may not be used as the input or output types of streams.
-  This is largely a limitation in the uniprocessor runtime library;
+  This is largely a limitation in the uniprocessor backend;
   you can get equivalent code by using streams of the base type of the
   array, and constructing the array inside the work function if
   necessary.
-
-\item The Java library infrastructure may not allow particular
-   combinations of stream parameters.  This should not be a problem
-   with the compiler; if you run into it, see
-   docs/implementation-notes/library-init-functions.txt for how to fix
-   it.
 
 \item Most of our development is done under Linux; some aspects of the
    compiler may be specific to gcc and/or Linux.
