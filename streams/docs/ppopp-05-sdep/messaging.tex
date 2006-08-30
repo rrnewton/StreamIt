@@ -22,7 +22,7 @@ actor $B$, the following steps need to be taken:
 \begin{itemize}
 
 \item $B$ declares a message handler that is invoked when a
-message arrives.  For example: {\small
+message arrives.  For example: {
 \vspace{-5pt}
 \begin{verbatim}
 handler increaseGain(float amount) {
@@ -47,8 +47,8 @@ from within its steady-state work function. The handler invocation
 includes a range of latencies {\tt [min:max]} specifying when the
 message should be delivered; if no latency is specified, then a
 default latency of {\tt [0:0]} is used.  The following illustrates an
-example.{\small
-\vspace{-5pt}
+example.{
+\vspace{-12pt}
 \begin{verbatim}
 work pop 1 {
   float val = pop();
@@ -83,12 +83,12 @@ stream graph, even though it is not necessarily implemented this way.
 The intuition for upstream messages is similar.  Consider that $B$ is
 sending a message with latency $k$ to upstream actor $A$ in the stream
 graph.  This means that $A$ will receive the message immediately
-before its last invocation that produces an item affecting the output
+after its last invocation that produces an item affecting the output
 of $B$'s $k$th firing, counting the current firing as 0.  As before,
 we can also think of this in terms of $A$ tagging items and $B$
 observing the tags.  In this case, the latency constraint says that
 $B$ must input a tagged item before it finishes $k$ additional
-executions.  The message is delivered immediately before the latest
+executions.  The message is delivered immediately after the latest
 firing in $A$ during which tagging could start without violating this
 constraint.
 
@@ -100,13 +100,15 @@ leverages $\sdep$ to give a precise meaning to message timing.
 \begin{definition}(Message delivery)
 Consider that $S$ sends a message to receiver $R$ with latency range
 $[k_1:k_2]$ and that the message is sent during the $n$th execution of
-$S$.  Then the message handler must be invoked in $R$ immediately
-before its $m$th execution, where $m$ is constrained as follows.
+$S$.  There are two cases\footnote{\small In a feedback path, both
+cases might apply.  In this event, we assume the message is being sent
+upstream.}:
 
-There are two cases\footnote{\small In a feedback path, both cases might apply.  In this event, we assume the message is being sent upstream.}:
 \begin{enumerate}
 
-\item $R$ is downstream of $S$.  Then the constraints on $m$ are:
+\item If $R$ is downstream of $S$, then the message handler must be
+invoked in $R$ immediately before its $m$th execution, where $m$
+is constrained as follows:
 \[
 \begin{array}{l}
 n+k_1 \le \sdepf{S}{R}(m) \le n+k_2
@@ -115,7 +117,9 @@ n+k_1 \le \sdepf{S}{R}(m) \le n+k_2
 \end{array}
 \]
 
-\item $R$ is upstream of $S$.  Then the constraints on $m$ are:
+\item If $R$ is upstream of $S$, then the message handler must be
+invoked in $R$ immediately after its $m$th execution, where $m$ is
+constrained as follows:
 \[
 \begin{array}{l}
 %m \ge \sdepf{R}{S}(n + k_1)\\
@@ -172,16 +176,17 @@ schedule for the program.  Intuitively, it also constrains the
 buffering of data: the data buffers must not grow too small, as
 otherwise the receiver would be too far ahead.
 
-Similarly, a positive-latency upstream message places a constraint on
-the maximum allowable latency between the sender and receiver.  This
-time the upstream actor must be throttled so that it does not get too
-far ahead before the message arrives.  Intuitively, the amount of data
-buffered between the actors must not grow too large.
+Similarly, a non-negative-latency upstream message places a constraint
+on the maximum allowable latency between the sender and receiver.
+This time the upstream actor must be throttled so that it does not get
+too far ahead before the message arrives.  Intuitively, the amount of
+data buffered between the actors must not grow too large.
 
 \begin{figure}[t]
 \begin{center}
-\psfig{file=constraints.eps,width=3.3in}
-\vspace{-16pt}
+\vspace{4pt}
+\psfig{file=constraints.eps,width=3in}
+\vspace{-4pt}
 \caption{\small Scheduling constraints imposed by messages.}
 %% {\small
 %% \begin{tabular}{|r|c|c|} \hline
@@ -194,80 +199,45 @@ buffered between the actors must not grow too large.
 \vspace{-18pt}
 \end{figure}
 
-An upstream message with negative or zero latency is impossible to
-deliver, because the data dependences imply that the target iteration
-has already passed when the message was sent.  Conversely, a
-downstream message with positive or zero latency imposes no constraint
-on the schedule, as the sender has not yet produced the data that is
-synchronized with the message.
+For upstream messages with negative latency, there always exist
+iterations of the sender during which any messages sent are
+impossible to deliver.  Consider an iteration of the sender that is
+the first to depend on data propagating from the $n$th execution of
+the receiver.  A negative-latency message would be delivered
+immediately after a {\it previous} iteration of the receiver, but
+since iteration $n$ has already fired, the message is impossible to
+deliver.  Conversely, a downstream message with positive or zero
+latency imposes no constraint on the schedule, as the sender has not
+yet produced the data that is synchronized with the message.
 
 \paragraph*{Unsatisfiable Constraints}  
 Messaging constraints can be unsatisfiable---that is, assuming a
 message is sent on every iteration of the sender's work function,
 there does not exist a schedule that delivers all of the messages
 within the desired latency range.  Such constraints should result in a
-compile-time error.  Figure~\ref{fig:infeasible} illustrates two
-examples of unsatisfiable constraints.  In
-Figure~\ref{fig:infeasible}(a), the latency of the upstream message
-from $X$ to $Y$ is is too tight given the actors' I/O rates.  Consider
-that $X$ sends a message on its first execution ($n=1$).  The message
-should be delivered to $Y$ on iteration $m$, where $m$ is constrained
-as follows ($k_1 = k_2 = 1$):
-\begin{equation*}
-\begin{array}{c}
-\sdepf{Y}{X}(n+k_1) \le m \le \sdepf{Y}{X}(n+k_2) \\[1Ex]
-\sdepf{Y}{X}(2) \le m \le \sdepf{Y}{X}(2) \\[1Ex]
-m = \sdepf{Y}{X}(2)
-\end{array}
-\vspace{-4pt}
-\end{equation*}
-The reader can verify that $\sdepf{Y}{X}(n) = \lceil n/3 \rceil$,
-which implies that $m=1$.  However, because $X$ is executing its first
-iteration, $Y$ must have already fired, so it is too late to deliver
-the message.  The smallest legal message latency in this graph is 3,
-which will lead to a legal delivery time of $m=2$.  In general, for an
-upstream message from $X$ to $Y$ to be satisfiable, its maximum
-latency $k_2$ must meet the following condition:
-\begin{equation*}
-\begin{array}{c}
-\forall n \in [1, |{\cal S} \wedge X|]:~~\sdepf{Y}{X}(n) < \sdepf{Y}{X}(n+k_2)
-\end{array}
-\end{equation*}
-That is, for all executions $n$ of actor $X$ in the steady state (see
-Section~\ref{sec:calc-sdep}), the current iteration of $Y$
-($\sdepf{Y}{X}(n)$) must precede the delivery time
-($\sdepf{Y}{X}(n+k_2)$).  This condition is straightforward to check
-at compile time once the $\sdep$ information has been computed.  A
-similar condition applies to downstream messages.
+compile-time error.  
 
-\begin{figure}[t]
-\begin{center}
-\psfig{figure=infeasible-messaging2.eps,height=0.66in}
-\hspace{0.7in}
-\psfig{figure=infeasible-messaging.eps,height=1.43in} \vspace{6pt}
-
-{\tiny ~}{\tiny ~}~{\bf (a)}\hspace{1in}{\bf (b)}~~~{\tiny ~}{\tiny ~}
-\vspace{-3pt}
-\caption{{\small Examples of unsatisfiable message constraints.  Each
-node is annotated with its input and output rate.  Messages are shown
-by dotted arrows, drawn from sender to receiver with a given latency.
-(a) Constraint is unsatisfiable because latency is smaller than the
-communication ratio between $Y$ and $X$, (b) Constraints are
-satisfiable in isolation, but unsatisfiable in combination.
-\protect\label{fig:infeasible}}}
-\end{center}
-\vspace{-18pt}
-\end{figure}
-
-One can also construct cases where each constraint implied by
-messaging is satisfiable, but the set of constraints together is
-unsatisfiable.  Figure~\ref{fig:infeasible}(b) shows one such case.
-The unsatisfiability is caused by conflicting demands on the buffering
+Figure~\ref{fig:infeasible} illustrates an example of unsatisfiable
+constraints.  Though each messaging constraint is feasible in
+isolation, the set of constraints together is unsatisfiable.  The
+unsatisfiability is caused by conflicting demands on the buffering
 between B and C.  The message from B to C constrains this buffer to
 contain at least 10 items, while the message from D to A constrains it
 to be empty.  We say that these two constraints {\it overlap} because
 the paths from sender to receiver intersect a common actor in the
 stream graph.
+\begin{figure}[t]
+\begin{center}
+\psfig{figure=infeasible-messaging.eps,height=1.43in}
+\vspace{-8pt}
+\caption{{\small Example of unsatisfiable message constraints.  Each
+node is annotated with its input and output rate.  Messages are shown
+by dotted arrows, drawn from sender to receiver with a given latency.
+The constraints are satisfiable in isolation, but unsatisfiable in
+combination.  \protect\label{fig:infeasible}}}
+\end{center}
+\vspace{-13pt}
+\end{figure}
 
 \paragraph*{Finding a Schedule}
 In the presence of overlapping constraints, we leave to future work
@@ -276,6 +246,8 @@ Because overlapping constraints can be detected statically, a given
 compiler may choose to prohibit overlapping constraints altogether.
 %A discussion of the issues involved appears in a
 %thesis~\cite{karczma-thesis} by one of the authors.
+
+\input{code-example1}
 
 For the case of non-overlapping constraints, a simple modification to
 pull scheduling will always result in a legal schedule (if one
@@ -338,11 +310,28 @@ are a multiple of 512.  This satisfies the design criterion that a
 given FFT stage will not operate on data that were demodulated at two
 separate frequencies.
 
+\begin{figure}[t]
+\centering
+\psfig{figure=fhr-feedback.eps,width=3.13in}
+\caption{\small Stream graph of frequency hopping radio with control
+messages implemented manually.  A feedback loop connects the detectors
+with the RFtoIF stage, and an item is sent on every invocation to
+indicate whether or not a message is present.  The latency and
+periodicity of message delivery are governed by the data rates and the
+number of items on the feedback
+path. \protect\label{fig:fhr-manual}}
+\end{figure}
+
 Another version of the frequency hopping radio appears in
 Figures~\ref{fig:fhr-manual} and~\ref{fig:freq2}.  This version is
 functionally equivalent to the first, except that the control messages
 are implemented manually by embedding them in the data stream and
-introducing a feedback loop.  Because the number of items transfered
+in-
+%
+\input{code-example2}
+\clearpage
+\noindent
+troducing a feedback loop.  Because the number of items transfered
 around the loop must be constant from one iteration to the next, a
 data item is sent whether or not there is a message as part of the
 algorithm.  The RFtoIF filter checks the values from the loop on every
@@ -353,8 +342,6 @@ messaging information is received at intervals of 512 iterations (as
 in the version with portals).  To achieve the desired messaging
 latency of 6 frames, $6*256 = 1536$ items are enqueued on the feedback
 path prior to execution.
-
-\input{code-example1}
 
 %% As described previously, yet another way to approximate the behavior
 %% of messaging is with a direct function call from the detector to the
@@ -389,21 +376,6 @@ infer the true dependences between actor firings and reorder the
 execution so long as the message constraints are respected.  The
 actual message delivery can be implemented in the most efficient way
 for a given architecture.
-
-\begin{figure}[t]
-\centering
-\vspace{-12pt}
-\psfig{figure=fhr-feedback.eps,width=3.13in}
-\vspace{-10pt}
-\caption{\small Stream graph of frequency hopping radio with control
-messages implemented manually.  A feedback loop connects the detectors
-with the RFtoIF stage, and an item is sent on every invocation to
-indicate whether or not a message is present.  The latency and
-periodicity of message delivery are governed by the data rates and the
-number of items on the feedback
-path. \protect\label{fig:fhr-manual}}
-\vspace{-12pt}
-\end{figure}
 
 A final benefit of teleport messaging is the clean interface provided
 by the portals.  Since a portal can have multiple receivers, it is
