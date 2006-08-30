@@ -1,4 +1,9 @@
+~\\~\\
 \section{Introduction}
+
+\long\def\symbolfootnote[#1]#2{\begingroup%
+\def\thefootnote{\fnsymbol{footnote}}\footnotetext[#1]{#2}\endgroup}
+\symbolfootnote[2]{\small This is a revised version of the paper, released in September 2006.  Compared to the conference version, it simplifies the timing of upstream messages.  Changes are limited to Section 4.}
 
 Algorithms that operate on streams of data are becoming increasingly
 pervasive across a broad range of applications, and there is evidence
