@@ -14,7 +14,7 @@
 % note: RELEASE_DATE resolved in Makefile
 This is for the RELEASE_DATE release of the StreamIt compiler and
 runtime system, version 2.1.\\
-\verb|$Id: readme.tex.in,v 1.16 2006-08-29 23:40:42 thies Exp $|
+\verb|$Id: readme.tex.in,v 1.17 2006-08-30 00:19:16 thies Exp $|
 
 \section{What is this?}
 
@@ -69,8 +69,7 @@ FFTW should be installed somewhere in your default compiler search
 path.  You need to build single-precision versions of the library,
 such that you have an \filename{srfftw.h} and a
 \filename{libsrfftw.a}.  If you are building FFTW from source, pass
-the following options to configure: \texttt{--enable-shared
---enable-type-prefix --enable-threads --enable-float}.
+the following options to configure: \texttt{--enable-shared --enable-type-prefix --enable-threads} \newline \texttt{--enable-float}.
 
 The source release depends on Sun's Java compiler (javac).  Otherwise,
 a Java virtual machine is required to run the compiler; see
@@ -88,10 +87,22 @@ This is a \emph{snapshot} release of the StreamIt compiler.  This is a
 research compiler; as such, it has several known shortcomings:
 
 \begin{itemize}
+
 \item The compiler works by converting StreamIt syntax to a Java
    intermediate form, and then using a Java compiler.  Of note,
    compiling 'foo.str' will clobber a file named 'foo.java' in the
    same directory.
+
+\item The dimensions of a filter field cannot be declared in terms of
+another filter field.  That is, code of the following form will fail:
+\begin{verbatim}
+float->float filter Foo {
+  int N = 10;
+  float[N] coeff;
+  ...
+}
+\end{verbatim}
+In such cases, just declare the array to be \verb+float[10]+.
 
 \item The compiler does not support passing structures or complex
   numbers as stream parameters.  This will result in an error such as
@@ -105,14 +116,14 @@ name=pipe_3
    Structures and complex should work as local variables and as the
    input or output types of filters.
 
-\item Arrays may not be used as the input or output types of streams.
-  This is largely a limitation in the uniprocessor backend;
-  you can get equivalent code by using streams of the base type of the
-  array, and constructing the array inside the work function if
-  necessary.
+\item Arrays cannot be returned from helper functions.
 
-\item Most of our development is done under Linux; some aspects of the
-   compiler may be specific to gcc and/or Linux.
+\item In most backends, arrays cannot be used as the input or output
+types of streams.  This is largely a limitation in the uniprocessor
+backend; you can get equivalent code by using streams of the base type
+of the array, and constructing the array inside the work function if
+necessary.
+
 \end{itemize}
 
 \section{For more info}
