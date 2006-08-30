@@ -13,54 +13,61 @@ following directory:
 }
 \noindent The example is in {\tt FMRadio.str}. The following
 sections describe the compilation of {\tt FMRadio} using the
-uniprocessor backend, the Java library, and the Raw backend.  A
-summary of the compiler's command-line options can be found in
-Appendix~\ref{ap:options}, or by typing {\tt strc -help} at the
-command line.
+uniprocessor backend, the cluster/multicore backend, and the Java
+library.  A summary of the compiler's command-line options can be
+found in Appendix~\ref{ap:options}, or by typing {\tt strc -help} at
+the command line.
 
 \subsection{Compiling for a Uniprocessor}
 
 There are two ways to compile a StreamIt program for execution on a
-general-purpose processor.  Both methods compile StreamIt to a C
-program that can be further compiled with a C compiler.  The first
-method (the default) preserves the hierarchical structure of the
-original program and relies on a C runtime library to do buffer
-management.  The second method (``standalone'') produces a
-self-contained file where the entire stream graph has been collapsed
-into a single function, with buffer management embedded into the code.
-The default output is more readable and provides some flexibility (by
-exposing the runtime library interface).  The standalone output might
-be useful for groups interested in compiling C programs to new
-architectures; however, the size of the main work function might grow
-very large.  We recommend using the default backend with the C runtime
-library.
+general-purpose processor.  The first method (the default) compiles to
+a set of C++ files, which are linked against a StreamIt runtime
+library.  It uses the same infrastructure as our cluster backend and
+supports the full suite of StreamIt features and optimizations.  The
+second method (invoked with the {\tt -simpleC} option) emits a
+standalone C file in which the entire program is inlined into a single
+function.  The simpleC backend is not fully featured\footnote{As of
+this release, simpleC lacks support for dynamic rates, teleport
+messaging, prework functions, general helper functions,
+domain-specific optimizations, cache optimizations, and other
+features.} but the output is readable and the C interface may be
+useful for some compiler projects.  As we recommend using the default
+backend, we focus on it for the remainder of this section.
 
-\medskip {\bf Compiling for C library.}  To compile {\tt FMRadio} using the
-uniprocessor backend and C runtime library, issue the following
-command (the compiler output is shown): {\small
+To compile {\tt FMRadio} using the uniprocessor backend, issue the
+following command (the compiler output is shown): 
+{\small
 \begin{verbatim}
 % strc FMRadio.str -o fm
+Starting Kopi2SIR... done.
+Entry to Cluster Backend (uniprocessor)
 Running Constant Prop and Unroll... done.
-Raising variable declarations... done.
-Propagating constant fields... done.
-Flattening blocks... done.
-Raising variables... done.
-Raising variable declarations... done.
-Moving initial assignments... done.
-Structuring... done.
-Scheduling... got schedule, interpreting... done.
-Annotating IR for uniprocessor... done.
-Generating code...
+Running Constant Field Propagation... done.
+Estimating Code size of Filters... done.
+Estimating Code size of Filters... done.
+Running Partitioning... target number of threads: 1
+Done Partitioning...
+Generating cluster code...
+Done generating cluster code.
+gcc34 -O3 -I/u/thies/research/streams/streams/library/cluster 
+      -c -o combined_threads.o combined_threads.cpp
+gcc34 -O3 -o fm combined_threads.o 
+      -L/u/thies/research/streams/streams/library/cluster 
+      -lpthread -lcluster -lstdc++
 \end{verbatim}
-} 
-This will create a C file named FMRadio.c and a binary named {\tt
-fm}.  The binary can be executed for 5 steady-state iterations as follows:
+}
+This will create a number of threadXX.cpp files, one for each filter,
+splitter, and joiner in the original program.  The files are
+concatenated into a single file (combined\_threads.cpp) and compiled to
+create a binary named {\tt fm}.  The binary can be executed for 5
+steady-state iterations as follows: 
 {\small
 \begin{verbatim}
 % ./fm -i 5
-278074.000000
+278073.968750
 278074.750000
-278075.437500
+278075.406250
 278075.968750
 278076.437500
 \end{verbatim}
@@ -68,19 +75,20 @@ fm}.  The binary can be executed for 5 steady-state iterations as follows:
 During the compilation process, several {\tt dot} graphs are
 generated.  The {\tt dot} format can be displayed and converted to
 other formats using the Graphviz software, which is available
-online\footnote{\tt http://www.research.att.com/sw/tools/graphviz/}.
+online\footnote{\tt http://www.graphviz.org/}.
 For example, we can examine a stream graph for the FM application as
 follows: {\small
 \begin{verbatim}
-% dotty first-sir-tree.dot
+% dotty stream-graph-simple.dot
 \end{verbatim}
-} The result appears in Figure~\ref{fig:fm-sir-tree}.  A complete list
-of the {\tt dot} graphs that are produced on the normal uniprocessor path
-are shown in Figure~\ref{fig:dot-uni}.
+} 
+The result appears in Figure~\ref{fig:fm-sir-tree}.  A complete list
+of the {\tt dot} graphs that are produced on the normal uniprocessor
+path are shown in Figure~\ref{fig:dot-uni}.
 
 \begin{figure}[t]
 \hspace{-0.75in}\psfig{figure=fm-sir-tree.eps,width=6.6in}
-\caption{{\tt first-sir-tree.dot} for the FMRadio example.\protect\label{fig:fm-sir-tree}}
+\caption{{\tt stream-graph-simple.dot} for the FMRadio example.\protect\label{fig:fm-sir-tree}}
 \end{figure}
 
 \begin{figure}[t]
@@ -89,13 +97,18 @@ are shown in Figure~\ref{fig:dot-uni}.
 \hline
 {\bf Filename} & {\bf Description} \\
 \hline
-{\tt first-sir-tree.dot} & \entry{Original stream graph, as written by programmer.} \\ \hline
-{\tt before-partition.dot} & \entry{Canonical version of stream graph, before any stream transformations are applied.  Nodes are annotated with their I/O rates.}\\ \hline
-{\tt after-partition.dot} & \entry{Canonical version of stream graph, after any stream transformations are applied.  Nodes are annotated with their I/O rates.}\\ \hline
-{\tt schedule.dot} & \entry{Final stream graph, annotated with I/O rates and the number of times each node executes in the initial and steady-state schedule.} \\ \hline
+{\tt stream-graph-simple.dot} & \entry{Original stream graph, as written by programmer.} \\ \hline
+{\tt stream-graph.dot} & \entry{Original stream graph, including I/O rates.} \\ \hline
+{\tt after-collapse-sjs.dot} & \entry{Partial canonicalization of stream graph, after collapsing data parallelism in the application.  (The parallelism can be restored if needed.)} \\ \hline
+{\tt canonical-graph.dot} & \entry{Canonical version of stream graph, after further eliminating unneeded synchronization.} \\ \hline
+%{\tt before-partition.dot} & \entry{Canonical version of stream graph, before any stream transformations are applied.  Nodes are annotated with their I/O rates.}\\ \hline
+%{\tt after-partition.dot} & \entry{Canonical version of stream graph, after any stream transformations are applied.  Nodes are annotated with their I/O rates.}\\ \hline
+%{\tt schedule.dot} & \entry{Final stream graph, annotated with I/O rates and the number of times each node executes in the initial and steady-state schedule.} \\ \hline
 \end{tabular}
 }
-\caption{{\tt dot} graphs produced on the uniprocessor path.\protect\label{fig:dot-uni}}
+\vspace{-5pt}
+\caption{Notable {\tt dot} graphs produced on the uniprocessor path.\protect\label{fig:dot-uni}}
+\vspace{-5pt}
 \end{figure}
 
 \medskip {\bf Domain-specific optimizations.}  It turns out that our
@@ -119,7 +132,8 @@ performance, the compiler also does a global cost/benefit analysis to
 determine the best set of transformations for a given stream graph.
 
 \begin{figure}[t]
-\hspace{3pt} \psfig{figure=fm-linear-simple.eps,width=4.6in}
+\centering
+\psfig{figure=fm-linear-simple.eps,width=\textwidth}
 \caption{{\tt linear-simple.dot}, which illustrates the linear sections of FMRadio.  Linear filters are shaded blue, while linear containers are shaded pink.\protect\label{fig:fm-linear-simple}}
 \end{figure}
 
@@ -141,23 +155,27 @@ where it is not beneficial.}:
 {\small
 \begin{verbatim}
 % strc -linearpartition FMRadio.str -o fm
+Starting Kopi2SIR... done.
+Entry to Cluster Backend (uniprocessor)
 Running Constant Prop and Unroll... done.
-Raising variable declarations... done.
-Propagating constant fields... done.
-Flattening blocks... done.
-Raising variables... done.
-Raising variable declarations... done.
-Moving initial assignments... done.
-Running linear analysis...
-WARNING: Assuming method call expression non linear(atan). Also 
-  removing all field mappings.
-WARNING: Insufficient pushes detected in filter
+Running Constant Field Propagation... done.
+Estimating Code size of Filters... done.
+Running linear analysis... 
+WARNING: Assuming method call expression non linear(atan). 
+         Also removing all field mappings.
 done with linear analysis.
-Linear partitioner took 1 secs to calculate partitions.
-Structuring... done.
-Scheduling... got schedule, interpreting... done.
-Annotating IR for uniprocessor... done.
-Generating code...
+Running linear partitioner...
+Linear partitioner took 0 secs to calculate partitions.
+Estimating Code size of Filters... done.
+Running Partitioning... target number of threads: 1
+Done Partitioning...
+Generating cluster code...
+Done generating cluster code.
+gcc34 -O3 -I/u/thies/research/streams/streams/library/cluster 
+      -c -o combined_threads.o combined_threads.cpp
+gcc34 -O3 -o fm combined_threads.o 
+      -L/u/thies/research/streams/streams/library/cluster 
+      -lpthread -lcluster -lstdc++ -lsrfftw -lsfftw
 \end{verbatim}
 } 
 %
@@ -186,7 +204,7 @@ then was translated to the frequency domain (by virtue of the ``Freq''
 prefix in the filter's name.)  However, the LowPassFilter at the top
 was left unmodified; this is because it has a large pop rate that
 degrades the performance of the frequency transformation.  In this
-case, the linear optimizations lead to a 6.5X improvement in
+case, the linear optimizations lead to a 6.7X improvement in
 throughput.
 
 The linear optimizations produce additional {\tt dot} graphs; see
@@ -200,9 +218,9 @@ linear analysis and optimization, please refer to {\tt http://cag.lcs.mit.edu/li
 \hline
 {\bf Filename} & {\bf Description} \\
 \hline
-{\tt ldp-partition-input.dot} & \entry{The stream graph as it was input to the linear partitioning algorithm.}\\ \hline
-{\tt linear.dot} & \entry{The stream graph with linear filters highlighted and each node annotated with its I/O rates.}\\ \hline
-{\tt linear-simple.dot} & \entry{Same as {\tt linear.dot} but without the I/O rates.}\\ \hline
+{\tt linear-simple.dot} & \entry{Stream graph with linear filters highlighted.}\\ \hline
+{\tt linear.dot} & \entry{Same as linear-simple, but including I/O rates of each node.}\\ \hline
+{\tt linear-partitions.dot} & \entry{Illustration of which nodes are combined by linear optimizations.} \\ \hline
 {\tt after-linear.dot} & \entry{The stream graph after linear transformations are complete.} \\ \hline
 \end{tabular}
 }
@@ -211,60 +229,172 @@ linear analysis and optimization, please refer to {\tt http://cag.lcs.mit.edu/li
 \vspace{-5pt}
 \end{figure}
 
-\bigskip {\bf Compiling as standalone.}  To compile FMRadio to a
-standalone file that can execute without the C runtime library, use
-the {\tt -standalone} option:
+\subsection{Compiling for a Cluster or Multicore}
+
+The {\tt -cluster N} option selects a backend that compiles to N
+parallel threads that communicate using sockets.  When targeting a
+cluster of workstations, the sockets communicate over the network
+using TCP/IP.  When targeting a multicore architecture, the sockets
+provide an interface to shared memory.  A hybrid setup is also
+possible, in which there are multiple machines and multiple threads
+per machine; some threads communicate via memory, while others
+communicate over the network.
+
+\subsubsection{Multicores}
+
+By default, the StreamIt compiler will map all of the threads to the
+current host (i.e., the one that issued the compile command).  This is
+suitable for multicores, as running the resulting executable will
+spawn the threads on a single machine.
+
+For example, consider compiling the FMRadio to eight parallel threads:
 {\small
 \begin{verbatim}
-% strc -standalone FMRadio.str -o fm
-/*
-Out of Kopi2SIR.
-Out of semantic checker.
-*/
-Entry to RAW Backend
-Moving initializers into init functions... done.
-Running Constant Prop and Unroll...
-Done Constant Prop and Unroll...
-Running Constant Field Propagation...
-Done Constant Field Propagation...
-Running Partitioning...
-  Found 26 tiles.
+% strc -cluster 8 FMRadio.str -o fm
+Starting Kopi2SIR... done.
+Entry to Cluster Backend
+Running Constant Prop and Unroll... done.
+Running Constant Field Propagation... done.
+Estimating Code size of Filters... done.
+Estimating Code size of Filters... done.
+Running Partitioning... target number of threads: 8
+Running Partitioning... target number of threads: 8
+  Found 0 tiles.
   Building stream config...
+Trying 8 tiles.
   Calculating partition info...
   Tracing back...
   Work Estimates:
-    Fused_Flo_Low_FMD_Low_Pre_E...      10240   (100%)
+    Fused_SplitJoin0_EqSplit_81...      1545    (21%)
+    Fused_SplitJoin0_EqSplit_81...      1545    (21%)
+    Fused_SplitJoin0_EqSplit_81...      1545    (21%)
+    Fused_SplitJoin0_EqSplit_81...      1545    (21%)
+    LowPassFilter__13                   730     (10%)
+    FMDemodulator__17                   221     (3%)
+    Fused_Spl_Ano_Flo                   89      (1%)
+    FloatOneSource__3                   35      (0%)
+  Building stream config...
+Trying 8 tiles.
+  Calculating partition info...
+  Tracing back...
 Done Partitioning...
-Flattener Begin...
-Filters in Graph: 1
-Flattener End.
-Simulated Annealing Assignment
-Tiles layout.assigned: 1
-Initial Cost: 0.0
-Assign End.
-Switch Code Begin...
-FineGrainSimulator Running...
-End of init simulation
-End of steady-state simulation
-sw0.s written
-Switch Code End.
-Generating Raw Code: 
-  Fused_Flo_Low_FMD_Low_Pre_EqS_Pos_Fil_Flo_172 (no buffer)
-Tile Code begin...
-Optimizing Fused_Flo_Low_FMD_Low_Pre_EqS_Pos_Fil_Flo_172...
-Code for Fused_Flo_Low_FMD_Low_Pre_EqS_Pos_Fil_Flo_172 
-  written to tile0.c
-Tile Code End.
-Creating Makefile.
-Exiting
+Generating cluster code...
+NOTE: Missing or empty $STREAMIT_HOME/cluster-machines.txt file,
+  so all threads assigned to cagfarm-49 in cluster-config.txt.
+Done generating cluster code.
+gcc34 -O3 -I/u/thies/research/streams/streams/library/cluster 
+      -c -o combined_threads.o combined_threads.cpp
+gcc34 -O3 -o fm combined_threads.o 
+      -L/u/thies/research/streams/streams/library/cluster 
+      -lpthread -lcluster -lstdc++
+\end{verbatim}}
+
+The compiler used a partitioning algorithm to fuse filters in the
+graph down to eight load-balanced units.  The stream graph following this
+partitioning can be found in {\tt after-partition.dot}:
+{\small
+\begin{verbatim}
+% dotty after-partition.dot
+\end{verbatim}}
+The result appears in Figure~\ref{fig:after-partition}.  The array of
+eight low-pass filters was collapsed to a width of four, and the
+bottom half of the application (Subtracter, Amplify, Printer filters)
+was fused into a single filter.  The other auto-generated files
+provide more information about the distribution of work amongst these
+filters; see Figure~\ref{fig:dot-cluster} for details.
+
+\begin{figure}[t!]
+{\small
+\noindent \begin{tabular}{|l|l|}
+\hline
+{\bf Filename} & {\bf Description} \\
+\hline
+{\tt before-partition.dot} & \entry{Stream graph before partitioning into requested number of threads.} \\ \hline
+{\tt after-partition.dot} & \entry{Stream graph after partitioning into requested number of threads.} \\ \hline
+{\tt work-before-partition.dot} & \entrybig{The stream graph before partitioning, annotated with estimates of the steady-state work within each node.  Nodes with the same amount of work are given the same color (although the colors themselves are meaningless.)}\\ \hline
+{\tt work-before-partition.txt} & \entry{Text listing of the work estimates for filters in the graph, before load balancing.}\\ \hline
+{\tt work-after-partition.dot} & \entry{The stream graph after partitioning, annotated with work estimates as above.}\\ \hline
+{\tt work-after-partition.txt} & \entry{Text listing of the work estimates for filters in the graph, after load balancing.}\\ \hline
+{\tt work-estimate.txt} & \entry{Same as above, but indexed by the thread numbers in cluster-config.txt.}\\ \hline
+{\tt cluster-config.txt} & \entry{Mapping from threads to machines.}\\ \hline
+\end{tabular}
+}
+\vspace{-5pt}
+\caption{Files produced by the cluster/multicore backend, above and beyond those produced by the uniprocessor backend.\protect\label{fig:dot-cluster}}
+\vspace{-5pt}
+\end{figure}
+
+Running the {\tt fm} binary will spawn all eight threads on the
+current host.
+
+\begin{figure}[t]
+\centering
+\psfig{figure=fm-after-partition.eps,width=\textwidth}
+\caption{The FMRadio example partitioned to eight threads ({\tt after-partition.dot}).\protect\label{fig:after-partition}}
+\end{figure}
+
+\subsubsection{Cluster of Workstations}
+
+In order to compile for a cluster of workstations, one should create a
+list of available machines and store it in the following location:
+\begin{verbatim}
+$STREAMIT_HOME/cluster-machines.txt
 \end{verbatim}
-} 
-%
-As is evident in the compiler output above, the standalone option
-utilizes the Raw backend and stores the self-contained output file in
-{\tt tile0.c} (as well as the binary {\tt fm}).  The number of
-standalone iterations can be controlled with the {\tt -i} flag as
-before, e.g., {\tt fm -i 5}.
+This file should contain one machine name (or IP address) per line.
+When the compiler generates N threads, it will assign one thread per
+machine (for the first N machines in the file).  If there are fewer
+than N machines available, it will distribute the threads across the
+machines.
+
+For example, consider that our {\tt cluster-machines.txt} file
+contains the following:
+{\small
+\begin{verbatim}
+machine-1
+machine-2
+machine-3
+machine-4
+\end{verbatim}}
+
+Let's say that each machine is a dual-processor, so we again compile
+FMRadio for eight threads as shown previously.  The resulting mapping
+from threads to machines can be found in {\tt cluster-config.txt}:
+{\small
+\begin{verbatim}
+% strc -cluster 8 FMRadio.str -o fm
+...
+% cat cluster-config.txt
+0 machine-1
+1 machine-1
+2 machine-1
+3 machine-2
+4 machine-2
+5 machine-2
+6 machine-3
+7 machine-3
+8 machine-4
+9 machine-4
+\end{verbatim}}
+
+This file indicates that threads 0, 1, and 2 are mapped to machine-1;
+threads 3, 4, and 5 are mapped to machine-2, and so on.  The
+cluster-config file contains 10 threads (rather than eight) because a
+thread is also generated for each splitter and joiner in the stream
+graph.  However, as these threads rarely do as much work as the
+filters, it is not detrimental for a processor to acquire them.
+
+To execute the program on the cluster, one should run the {\tt fm}
+executable from each machine that is assigned one or more threads.
+Each instance of the program will wait until all of its network
+connections are established before starting to process data.  To
+measure performance, a built-in timer keeps track of the elapsed time
+after the connections are made.
+
+As the cluster-config file is read at application load time, one can
+freely modify it to experiment with various layouts or to move the
+program from one cluster to another.  Mapping all the threads to a
+single machine will have the same effect as compiling to a multicore
+(as described previously).
 
 \subsection{Using the Java Library}
 
@@ -307,43 +437,44 @@ to instead just print the schedule of filter firings: \enlargethispage{1\baselin
 \begin{verbatim}
 % strc -library -norun -printsched FMRadio.str
 init = [
-$0 = FloatOneSource@3541984.work
-$1 = LowPassFilter@4565111.work
-$2 = FMDemodulator@1233730.work
-$3 = EqSplit@4689495.duplicate
-$4 = BPFCore@6288523.duplicate
-$5 = BPFCore@4074853.duplicate
-$6 = BPFCore@5058143.duplicate
-$7 = BPFCore@2951274.duplicate
-$8 = { {379 $0} {64 $1} {63 $2} {63 $3} 
-       {63 $4} {63 $5} {63 $6} {63 $7} }
+$0 = FloatOneSource@1.work
+$1 = LowPassFilter@4.work
+$2 = FMDemodulator@5.work
+$3 = EqSplit@8.streamit.misc.Pair@1386000
+$4 = BPFCore@16.streamit.misc.Pair@a470b8
+$5 = BPFCore@24.streamit.misc.Pair@cdedfd
+$6 = BPFCore@32.streamit.misc.Pair@116471f
+$7 = BPFCore@40.streamit.misc.Pair@12558d6
+$8 = { {379 $0} {64 $1} {63 $2} {63 $3} {63 $4} {63 $5} 
+       {63 $6} {63 $7} }
 ]
 steady = [
-$9 = LowPassFilter@3738425.work
-$10 = LowPassFilter@1042371.work
-$11 = BPFCore@6288523.roundrobin
-$12 = Subtracter@3144816.work
-$13 = EqSplit$2@6700605.work
-$14 = LowPassFilter@5188736.work
-$15 = LowPassFilter@7510100.work
-$16 = BPFCore@4074853.roundrobin
-$17 = Subtracter@1467553.work
-$18 = EqSplit$2@2671847.work
-$19 = LowPassFilter@503498.work
-$20 = LowPassFilter@6589979.work
-$21 = BPFCore@5058143.roundrobin
-$22 = Subtracter@2069821.work
-$23 = EqSplit$2@8316668.work
-$24 = LowPassFilter@1649037.work
-$25 = LowPassFilter@7808535.work
-$26 = BPFCore@2951274.roundrobin
-$27 = Subtracter@230849.work
-$28 = EqSplit$2@4354460.work
-$29 = EqSplit@4689495.roundrobin
-$30 = Equalizer$1@3615258.work
-$31 = FloatPrinter@2964388.work
-$32 = { {5 $0} $1 $2 $3 $4 $9 $10 $11 $12 $13 $5 $14 $15 $16 $17 $18
-        $6 $19 $20 $21 $22 $23 $7 $24 $25 $26 $27 $28 $29 $30 $31 }
+$9 = LowPassFilter@18.work
+$10 = LowPassFilter@19.work
+$11 = BPFCore@16.streamit.misc.Pair@18e2b22
+$12 = Subtracter@17.work
+$13 = Amplify@15.work
+$14 = LowPassFilter@26.work
+$15 = LowPassFilter@27.work
+$16 = BPFCore@24.streamit.misc.Pair@bf2d5e
+$17 = Subtracter@25.work
+$18 = Amplify@23.work
+$19 = LowPassFilter@34.work
+$20 = LowPassFilter@35.work
+$21 = BPFCore@32.streamit.misc.Pair@1ee3914
+$22 = Subtracter@33.work
+$23 = Amplify@31.work
+$24 = LowPassFilter@42.work
+$25 = LowPassFilter@43.work
+$26 = BPFCore@40.streamit.misc.Pair@12a54f9
+$27 = Subtracter@41.work
+$28 = Amplify@39.work
+$29 = EqSplit@8.streamit.misc.Pair@1662dc8
+$30 = AnonFilter_a0@9.work
+$31 = FloatPrinter@3.work
+$32 = { {5 $0} $1 $2 $3 $4 $9 $10 $11 $12 $13 $5 $14 
+        $15 $16 $17 $18 $6 $19 $20 $21 $22 $23 $7 
+        $24 $25 $26 $27 $28 $29 $30 $31 }
 ]
 !ml sched size = 39
 !ml buff size = 1299
@@ -362,406 +493,6 @@ loop nest in the schedule is denoted by {\tt (N F)}, where the filter
 required are printed at the end of the listing.
 
 Additional options for the library can be found in
-Appendix~\ref{ap:options}.
-
-\subsection{Compiling for Raw}
-
-To compile for an {\tt NxN} Raw machine, use the {\tt -raw N}
-option\footnote{You can also compile for an NxM machine by using {\tt
--raw N -rawcol M}.}.  In most cases, you will want to use {\tt -raw
-4}, since the actual chip has 4 tiles on each side.  When compiling to
-Raw, we also recommend using the {\tt -O1} flag to enable common
-optimizations; the default is {\tt -O0} (no optimizations), and the
-most aggressive is {\tt -O2} (which includes slow and potentially
-unstable transformations).  More information about specific
-optimizations can be found in Appendix~\ref{ap:options}.
-
-Compiling FMRadio looks like this: {\small
-\begin{verbatim}
-% strc -raw 4 -O1 FMRadio.str
-/*
-Out of Kopi2SIR.
-Out of semantic checker.
-*/
-Entry to RAW Backend
-Moving initializers into init functions... done.
-Running Constant Prop and Unroll...
-Done Constant Prop and Unroll...
-Running Constant Field Propagation...
-Done Constant Field Propagation...
-Running Partitioning...
-  Found 26 tiles.
-  Building stream config...
-  Calculating partition info...
-  Tracing back...
-  Work Estimates:
-    LowPassFilter__24                   1444    (10%)
-    LowPassFilter__59                   1420    (10%)
-    LowPassFilter__80                   1420    (10%)
-    LowPassFilter__59                   1420    (10%)
-    LowPassFilter__80                   1420    (10%)
-    LowPassFilter__59                   1420    (10%)
-    LowPassFilter__80                   1420    (10%)
-    LowPassFilter__59                   1420    (10%)
-    LowPassFilter__80                   1420    (10%)
-    Fused_Pre_EqS_Pos_Fil_Flo           386     (2%)
-    FMDemodulator__38                   224     (1%)
-    FMDemodulator__38                   224     (1%)
-    FloatOneSource__3                   110     (0%)
-Done Partitioning...
-Flattener Begin...
-Filters in Graph: 13
-Flattener End.
-Simulated Annealing Assignment
-Tiles layout.assigned: 15
-Initial Cost: 60060.0
-Final Cost: 29055.0 Min Cost : 21119.0 in  451 iterations.
-Assign End.
-Cannot perform Rate Matching.
-Switch Code Begin...
-WorkBasedSimulator Running...
-End of init simulation
-End of steady-state simulation
-sw0.s written
-\end{verbatim}
-$\dots$
-\begin{verbatim}
-sw14.s written
-Switch Code End.
-Generating Raw Code: FloatOneSource__3_96 (Direct Communication)
-\end{verbatim}
-$\dots$
-\begin{verbatim}
-Generating Raw Code: FMDemodulator__38_178 (simple)
-Tile Code begin...
-Optimizing FloatOneSource__3_96...
-Code for FloatOneSource__3_96 written to tile0.c
-\end{verbatim}
-$\dots$
-\begin{verbatim}
-Optimizing FMDemodulator__38_178...
-Code for FMDemodulator__38_178 written to tile2.c
-Code  written to tile10.c
-Tile Code End.
-Creating Makefile.
-Exiting
-\end{verbatim}
-} 
-%
-
-\begin{figure}[t]
-\hspace{0.25in}\psfig{figure=fm-after-partition.eps,width=4.6in}
-\caption{\protect\small Load-balanced stream graph ({\tt after-partition.dot}) that is output by partitioner for executing FMRadio on a 4x4 Raw machine.\protect\label{fig:fm-after-partition}}
-\end{figure}
-
-\begin{figure}[t]
-{\small
-\noindent \begin{tabular}{|l|l|}
-\hline
-{\bf Filename} & {\bf Description} \\
-\hline
-{\tt dp-partition-input.dot} & \entry{The stream graph in the format used by the partitioning algorithm.}\\ \hline
-{\tt work-before-partition.dot} & \entrybig{The stream graph before partitioning, annotated with estimates of the steady-state work within each node.  Nodes with the same amount of work are given the same color (although the colors themselves are meaningless.)}\\ \hline
-{\tt work-before-partition.txt} & \entry{Text listing of the work estimates for filters in the graph, before load balancing.}\\ \hline
-{\tt work-after-partition.dot} & \entry{The stream graph after partitioning, annotated with work estimates as above.}\\ \hline
-{\tt work-after-partition.txt} & \entry{Text listing of the work estimates for filters in the graph, after load balancing.}\\ \hline
-{\tt flatgraph.dot} & \entry{The stream graph with structure eliminated, before it is mapped onto Raw.} \\ \hline
-{\tt layout.dot} & \entrymed{The final layout of filters onto Raw tiles, with arrows between communicating filters.  Note that the arrows do NOT indicate the routes that items take.}\\ \hline
-{\tt initial-layout.dot} & \entry{The initial layout, before the simulated annealing algorithm.} \\ \hline
-\end{tabular}
-}
-\caption{Files produced by the Raw backend, above and beyond those produced by the uniprocessor backend.\protect\label{fig:dot-raw}}
-\end{figure}
-
-A number of {\tt dot} files are produced during the compilation to
-Raw; they are listed in Figure~\ref{fig:dot-raw}.  For example, since
-there are more filters than Raw tiles, the compiler has to partition
-the graph into a set of load-balanced execution units.  The output of
-the partitioning stage can be viewed as follows (see
-Figure~\ref{fig:fm-after-partition}): 
-%
-{\small
-\begin{verbatim}
-% dotty after-partition.dot
-\end{verbatim}
-} 
-%
-In this case, the partitioner detected that the LowPassFilter's in the
-equalizer were on the critical path, so it allocated a tile for each
-one.  The bottom part of the equalizer was fused with the end of the
-pipeline.  Also, the FMDemodulator was fissed into two data-parallel
-sections.  The steady-state work estimates for before and after
-partitioning can be found in {\tt work-} {\tt before-partition.dot}
-and {\tt work-after-partition.dot}.  There are also corresponding text
-files.
-
-After partitioning, the compiler maps the partitioned stream graph to
-the Raw tiles.  The layout can be viewed in {\tt layout.dot}: 
-%
-\clearpage
-%
-{\small
-\begin{verbatim}
-% dotty layout.dot
-\end{verbatim}
-} 
-\begin{figure}[t]
-\psfig{figure=fm-layout.eps,width=4.6in}
-\caption{\protect\small Final layout ({\tt layout.dot}) for the FMRadio on a 4x4 Raw machine.\protect\label{fig:fm-layout}}
-\end{figure}
-%
-This layout is shown in Figure~\ref{fig:fm-layout}.  Note that the
-arrows represent communication channels between filters, but are
-unrelated to the routes assigned for these channels.
-
-The final outputs of the Raw backend are: 1) the tile code, which runs
-on the compute processors ({\tt tile*.c}), 2) the switch code, which
-routes items between processors ({\tt sw*.s}), and 3) {\tt
-Makefile.streamit}, which interfaces with the Raw simulation
-infrastructure and orchestrates the execution.
-
-\bigskip {\bf Using the Raw simulator.}  To execute the output of the
-Raw backend, you will need the Raw simulator and ``starsearch''
-infrastructure; for more information, see the Raw website at {\tt
-http://cag.lcs.mit.edu/raw}.  The StreamIt compiler makes use of the
-cycle-accurate BTL (``Beetle'') simulator for Raw.
-
-To run the simulator, do as follows:
-\begin{verbatim}
-make -f Makefile.streamit run
-\end{verbatim}
-
-This command will cause the simulator to boot up, execute the startup
-code and then run for a bunch of cycles. If you want to quit before
-the simulation is done, use CTL-C.
-
-Once the simulator is executing the program, the output should should
-look as follows:
-{\small
-\begin{verbatim}
-[31: 00001384b]: 278073.937500
-[31: 000013d53]: 278074.750000
-[31: 000013fc4]: 278075.375000
-[31: 000014278]: 278075.937500
-[31: 0000144e4]: 278076.406250
-[31: 000014798]: 278076.812500
-[31: 000014a04]: 278077.156250
-[31: 000014cb8]: 278077.468750
-[31: 000014f24]: 278077.750000
-[31: 0000151d8]: 278078.000000
-...
-\end{verbatim}
-}
-The first number (31) represents the fact that the tile at row 3,
-column 1 issued the print command. The next number ({\it e.g.},
-00001384b) is the cycle count (in hexadecimal) at which the third
-number was produced. The third number is the output value that is
-produced from FMRadio.
-
-\medskip {\it Running in debug mode.} To run the simulator in interactive debug
-mode, you should run:
-\begin{verbatim}
-make -f Makefile.streamit debug
-\end{verbatim}
-This will change the terminal window to a text layout of the Raw
-tiles being executed, showing the active instruction stream of each.
-An extra ``shunt'' window will appear to control the actions of the
-debugger; it will look something like this:
-{\scriptsize
-\begin{verbatim}
-// welcome to beetle
-// try: 
-  help(); help(``help'');
-
-Configuration: 
-
-[THREAD_C THREAD_E DEVICE NAME    RESET ROUTINE          CALC ROUTINE           
-PARAM   ]
-
-[081c0f10 00000000 Serial Rom     dev_serial_rom_reset   dev_serial_rom_calc    
-0844c9d0]
-[0815fcf0 00000000 Print Service  dev_print_service_rese dev_print_service_calc 
-0844c410]
-\end{verbatim}
-$\dots$
-\begin{verbatim}
-[08205508 00000000 streaming_dram dev_streaming_dram_res dev_streaming_dram_cal 
-08444220]
-
-// Use VMShowPositionOfThread(THREAD #); to inspect execution of device 
-
-/*[0] 0*/ 
-\end{verbatim}
-}
-
-To start the simulator, type {\tt go();}.  This will boot up the Raw
-processor, bring the program into memory, and perform some other
-initialization tasks.  After initialization, there will be a message
-and a prompt such as:
-{\small
-\begin{verbatim}
-running...
-\end{verbatim}
-$\dots$
-\begin{verbatim}
-### PASSED: -0000000001 ffffffff      nan [x,y] = [1, 3]
-// [ serial rom : finished 
-     tile.B79414E0.0004-0004.rbf-15 --> static port 15 ]
-// *** interrupted [135033/inf]
-stopped.
-/*[34576982] 2*/ 
-\end{verbatim}
-}
-
-You are now ready to start doing useful things with the debugger.  The
-following are the most useful commands:
-
-\begin{itemize}
-
-\item {\bf go();} starts the simulator executing, without any limit as
-to how many cycles it will run.
-
-If you want to stop the simulator, you can hit CTL-C in the main
-window (not the shunt window), which will give you the command prompt
-back in the shunt window.
-
-\item {\bf step(N);} steps the simulator forward \texttt{N} cycles. At
-the end of {\tt N} cycles, the simulator will stop executing and
-return you to a command prompt.
-
-By stepping the simulator \texttt{N} cycles, each processor (of the
-16) is stepped forward \texttt{N} cycles.
-
-\item {\bf sv(N);} produces a graphical execution trace over {\tt N}
-cycles.  This trace shows the activity of each processor over time; we
-call it a ``bloodgraph'' because red indicates that a processor is
-blocked and performing no useful work.  For FMRadio, the result of
-running {\tt sv(5000);} appears in Figure~\ref{fig:fm-bloodgraph}.
-
-\clearpage
-
-\begin{figure}[t]
-\begin{center}
-\hspace{0pt}\psfig{figure=fm-bloodgraph.eps,width=4.5in}
-\caption{\protect\small Execution trace for FMRadio on a 4x4 Raw
-machine.  The vertical axis represents processors, while the
-horizontal axis represents time.  Note that the entirely white
-processor is not being used by the configuration (you can verify this
-by inspecting {\tt layout.dot}, which shows the tile to be
-empty).\protect\label{fig:fm-bloodgraph}}
-\end{center}
-\end{figure}
-
-The complete guide to the colors in the bloodgraph is as follows: \vspace{6pt}
-
-\begin{tabular}{|l|l|}
-\hline
-{\bf Color} & {\bf Meaning} \\
-\hline
-{\tt white} & useful work\\ \hline
-{\tt purple} & floating point operation\\ \hline
-{\tt green} & pipeline stall, {\it e.g.,} for a hazard\\ \hline
-{\tt red} & blocked while receiving an item from the switch\\ \hline
-{\tt blue} & blocked while sending an item to the switch\\ \hline
-\end{tabular}
-
-\item {\bf quit();} will exit the interactive debugger.  Incidentally,
-typing CTL-D will close the shunt window.
-
-\end{itemize}
-
-%% {\it The cycle limit.}  By default, there is a limit on the number of
-%% cycles that the simulator will execute before halting (so as not to
-%% freeze scripts, etc., with an infinite loop.)  If you run the
-%% simulator and it finishes before your program produces any outputs,
-%% you can edit {\tt Makefile.streamit} and delete the lines which define
-%% {\tt LIMIT} and {\tt SIM-CYCLES}.  Then the simulator will run
-%% indefinitely.
-
-\bigskip {\bf Gathering numbers.}  The compiler provides automatic
-support for gathering throughput, MFLOPS, and utilization numbers, as
-well as automated generation of bloodgraphs.  To collect these
-performance statistics, use the {\tt -numbers} option, which takes an
-argument indicating the number of steady-state cycles to execute:
-{\small
-\begin{verbatim}
-% strc -raw 4 -O1 -numbers 15 FMRadio.str
-\end{verbatim}
-} 
-%
-Compilation will proceed as before, except that the code will be
-instrumented to gather numbers using hooks in the Raw simulator.  The
-program should then be executed in batch mode, and number gathering
-messages (one per steady-state) will replace the standard output: 
-%
-{\small
-\begin{verbatim}
-% make -f Makefile.streamit run
-\end{verbatim}
-$\dots$
-\begin{verbatim}
-running...
-
-### PASSED:  1073741901 4000004d      2.00001836 [x,y] = [0, 0]
-
-### PASSED: -0000000001 ffffffff             nan [x,y] = [0, 0]
-Interrupted tile 0, pc = 0x3b8
-stopped.
-running...
-Cycles: 1312,  MFLOPS: 463
-Cycles: 1312,  MFLOPS: 463
-Cycles: 1312,  MFLOPS: 463
-Cycles: 1312,  MFLOPS: 464
-Cycles: 1312,  MFLOPS: 460
-Cycles: 1312,  MFLOPS: 463
-Cycles: 1312,  MFLOPS: 463
-Cycles: 1312,  MFLOPS: 463
-Cycles: 1312,  MFLOPS: 463
-Cycles: 1312,  MFLOPS: 464
-Cycles: 1312,  MFLOPS: 461
-Cycles: 1312,  MFLOPS: 463
-Cycles: 1312,  MFLOPS: 463
-Cycles: 1312,  MFLOPS: 463
-Cycles: 1312,  MFLOPS: 463
-Generating results.out
-echo `date` cagfarm-42 'end   running BTL' `pwd` >> /u/thies/researc
-h/streams/streams/misc/raw/stardata/logs/cagfarm-42.log; echo `date`
-cagfarm-42 'end   running BTL' `pwd` >> /u/thies/research/streams/st
-reams/misc/raw/stardata/logs/all.log; rm /u/thies/research/streams/s
-treams/misc/raw/stardata/logs/cagfarm-42:BTL::home:bits6:thies:strea
-ms:streams:apps:examples:cookbook;rm tile1.s tile8.s tile3.s tile11.
-s tile5.s tile13.s tile0.s tile7.s tile15.s tile2.s tile9.s tile10.s
-tile4.s tile12.s tile6.s tile14.s 70.540u 18.180s 1:30.55 97.9%   0+
-0k 0+0io 58180pf+0w
-\end{verbatim}
-} 
-%
-The simulator will terminate naturally, leaving a detailed accounts
-summary in the file {\tt results.out}.  Here is an excerpt from the
-results file: {\small
-\begin{verbatim}
-Summmary:
-Steady State Executions: 15
-Total Cycles: 19680
-Total Steady State Outputs: 30
-Avg Cycles per Steady-State: 1312
-Thruput per 10^5: 152
-Total Non-Blocked Cycles: 195438
-
-Instruction Mix:
-FPU: 36484
-MEM: 37071
-BRANCH: 21584
-ADMIN: 0
-ALU: 100299
-
-workCount* = 195438 / 314880
-Avg MFLOPS: 463
-\end{verbatim}
-}
-\noindent Also, a blood graph will be saved in {\tt bloodgraph.ppm}.
-
-\smallskip \noindent More options for the Raw backend are described in
 Appendix~\ref{ap:options}.
 
 \clearpage
