@@ -14,7 +14,7 @@
 % note: RELEASE_DATE resolved in Makefile
 This is for the RELEASE_DATE release of the StreamIt compiler and
 runtime system, version 2.1.\\
-\verb|$Id: readme.tex.in,v 1.17 2006-08-30 00:19:16 thies Exp $|
+\verb|$Id: readme.tex.in,v 1.18 2006-08-31 19:27:09 dimock Exp $|
 
 \section{What is this?}
 
@@ -43,7 +43,7 @@ There are two versions of this release.  These are:
 The StreamIt compiler is built on top of version 1.5B of the Kopi Java
 compiler from DMS Decision Management Systems GmbH.  The independent
 components of the system, including the scheduler, Java runtime
-library, C library, and the frontend, are released subject to the
+library, C library, and the front end, are released subject to the
 terms of the MIT license agreement. Other components of the system are
 released under the terms of the GNU General Public License; see the
 \filename{COPYING} file for details.  The binary release also include
@@ -55,7 +55,7 @@ You can find more information on our Web page, at
 
 \section{Dependencies}
 
-The frontend depends on the ANTLR LL($k$) parser generator; see
+The front end depends on the ANTLR LL($k$) parser generator; see
 \url{http://www.antlr.org/}.  If you are using the source release, the
 ANTLR classes must be in your Java \envar{CLASSPATH} when compiling
 and running the StreamIt compiler.  If you are using the binary
@@ -67,19 +67,31 @@ library; see \url{http://www.fftw.org/}.  The StreamIt runtime system
 currently only supports fftw-2.1.x, not the newer fftw-3.0 branch.
 FFTW should be installed somewhere in your default compiler search
 path.  You need to build single-precision versions of the library,
-such that you have an \filename{srfftw.h} and a
-\filename{libsrfftw.a}.  If you are building FFTW from source, pass
+such that you have include files \filename{sfftw.h},
+\filename{srfftw.h} and library files \filename{libsfftw.a} and
+\filename{libsrfftw.a}. 
+The linear  optimizations are turned on only if  \texttt{configure}
+can find all four files. 
+ If you are building FFTW from source, pass 
 the following options to configure: \texttt{--enable-shared --enable-type-prefix --enable-threads} \newline \texttt{--enable-float}.
 
+
 The source release depends on Sun's Java compiler (javac).  Otherwise,
-a Java virtual machine is required to run the compiler; see
-\url{http://java.sun.com/} for possibilities.
+a Java virtual machine, for Java version 1.5 or later, is required to
+run the compiler; see \url{http://java.sun.com/} for possibilities.
 
 The makefile infrastructure generally uses the GNU tools otherwise.
 In particular, GNU Make is required to build; this is the default
 \filename{make} on Linux machines, and may be available as
 \filename{gmake} on other Unix-like machines.  GNU Make can be
 downloaded from \url{http://www.gnu.org/}.
+
+While this is not a a dependency, the \tt{graphviz} package from 
+\url{http://www.graphviz.org} contains a viewer, \texttt{dotty}, that
+will display the dot files created by the StreamIt compiler.
+\texttt{ZGRViewer}, from
+\url{http://zvtm.sourceforge.net/zgrviewer.html} should also work for
+displaying dot files.
 
 \section{Caveats}
 
@@ -118,30 +130,36 @@ name=pipe_3
 
 \item Arrays cannot be returned from helper functions.
 
-\item In most backends, arrays cannot be used as the input or output
+\item In most back ends, arrays cannot be used as the input or output
 types of streams.  This is largely a limitation in the uniprocessor
-backend; you can get equivalent code by using streams of the base type
+back end; you can get equivalent code by using streams of the base type
 of the array, and constructing the array inside the work function if
 necessary.
+
+\item The \texttt{static block}s are limited (except in the Java
+library back end) in that they act as specified only if every declared
+variable in the static block is assigned to exactly
+once. Furthermore, there can currently be at most one static block in
+a program.
 
 \end{itemize}
 
 \section{For more info}
 
-The StreamIt home page is at \url{http://cag.lcs.mit.edu/streamit/}.
+The StreamIt home page is at \url{http://cag.csail.mit.edu/streamit/}.
 There are a number of places you can send electronic mail to:
 
 \begin{description}
-\item[streamit@cag.lcs.mit.edu]
+\item[streamit@csail.lcs.mit.edu]
     General information on StreamIt, to report bugs in the compiler or
     request new language features, or to be added to streamit-users
     or streamit-dev
 
-\item[streamit-users@cag.lcs.mit.edu]
+\item[streamit-users@cag.csail.mit.edu]
     Discussion list for application developers and others using the
     StreamIt compiler
 
-\item[streamit-dev@cag.lcs.mit.edu]
+\item[streamit-dev@cag.csail.mit.edu]
     Discussion list for people working on the internals of the
     StreamIt compiler
 \end{description}

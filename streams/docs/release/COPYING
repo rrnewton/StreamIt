@@ -1,7 +1,7 @@
 Copyright and License for the StreamIt Release
 ----------------------------------------------
 
-StreamIt is copyright 2003 by the Massachusetts Institute of
+StreamIt is copyright 2006 by the Massachusetts Institute of
 Technology.  This entire release is under the terms of the GNU General
 Public License, version 2 or (at your option) any later version; see
 the COPYING.GPL file for details.
@@ -10,7 +10,7 @@ Additionally, certain parts of this release are necessary to use the
 output of the compiler at runtime, or may be useful as sample code.
 These parts of the release are subject to the following license:
 
-  Copyright 2003 by the Massachusetts Institute of Technology.
+  Copyright 2006 by the Massachusetts Institute of Technology.
 
   Permission to use, copy, modify, and distribute this
   software and its documentation for any purpose and without
@@ -29,6 +29,7 @@ Files which may be used under this license include:
 -- All of the sample code in the 'apps' directory;
 -- The .bc files in the 'include' directory;
 -- The StreamIt uniprocessor C library in the 'library/c' directory;
+-- The StreamIt cluster C++ library in the 'library/cluster' directory;
 -- Sample code in the documentation provided in the 'docs' directory,
    and child directories; and
 -- All of the code in the 'src/streamit' directory of the source
