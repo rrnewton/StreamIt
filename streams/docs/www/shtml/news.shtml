@@ -10,6 +10,23 @@
       <h3>NEWS</h3>
 
 	 <table width="100%" cellspacing=0 cellpadding=0 border=0>
+	   <tr>
+	     <td width="15%" align=left valign=top><b>Sep. 2006</b></td>
+	     <td width="1%"></td>
+	     <td align=left valign=top>
+	       <p align=justify>
+	         Version 2.1 of the StreamIt compiler is now available
+	         for <a href="../shtml/download.shtml">download</a>.
+	         You may download either the source distribution and
+	         natively build the compiler, or a prebuilt
+	         distribution of the full compiler. The distribution
+	         also includes a set of
+	         <a href="../shtml/benchmarks.shtml">streaming benchmarks</a>.
+	       </p>  
+	     </td>
+	   </tr>
+
+	   <tr><td>&nbsp;</td></tr>
 
 	   <tr>
 	     <td width="15%" align=left valign=top><b>Aug. 2006</b></td>
@@ -17,7 +34,7 @@
 	     <td align=left valign=top>
 	       <p align=justify>
                  Our paper on <a
-	         href="http://cag.lcs.mit.edu/commit/papers/06/gordon-asplos06.pdf">exploiting
+	         href="http://cag.csail.mit.edu/commit/papers/06/gordon-asplos06.pdf">exploiting
 	         coarse-grained parallelism</a> in stream programs
 	         will appear at ASPLOS in October 2006.  This paper
 	         maps StreamIt to Raw, a 16-core architecture,
@@ -35,7 +52,7 @@
 	     <td align=left valign=top>
 	       <p align=justify>
              Our paper on <a
-	         href="http://cag.lcs.mit.edu/commit/papers/06/drake-ipdps06.pdf">MPEG-2
+	         href="http://cag.csail.mit.edu/commit/papers/06/drake-ipdps06.pdf">MPEG-2
 	         decoding in StreamIt</a> appears at IPDPS. The paper shows that MPEG decoding is a good match for
              StreamIt, leading to clean, reusable, and portable code. The
              source code and related resources are <a
@@ -53,10 +70,10 @@
 	     <td align=left valign=top>
 	       <p align=justify>
 	         Our paper on <a
-	         href="http://cag.lcs.mit.edu/commit/papers//05/agrawal-cases05.pdf">linear
+	         href="http://cag.csail.mit.edu/commit/papers//05/agrawal-cases05.pdf">linear
 	         state space analysis</a> appears in CASES
 	         2005.  This paper extends our <a
-	         href="http://cag.lcs.mit.edu/linear">previous work</a>
+	         href="http://cag.csail.mit.edu/linear">previous work</a>
 	         on optimizing linear filters to encompass linear
 	         filters with state, including new optimizations for
 	         reducing the number of states and non-zero system
@@ -73,7 +90,7 @@
 	     <td align=left valign=top>
 	       <p align=justify>
 	         A paper on <a
-	         href="http://cag.lcs.mit.edu/commit/papers//05/streamit-graphics-gh.pdf">
+	         href="http://cag.csail.mit.edu/commit/papers//05/streamit-graphics-gh.pdf">
 	         flexible graphics pipelines</a>, in collaboration with
 	         Jiawen Chen, <a
 	         href="http://people.csail.mit.edu/matthias/">Matthias
@@ -96,11 +113,11 @@
 	     <td align=left valign=top>
 	       <p align=justify>
 	         Our paper on <a
-	         href="http://cag.lcs.mit.edu/commit/papers/05/sermulins-lctes05.pdf">cache
+	         href="http://cag.csail.mit.edu/commit/papers/05/sermulins-lctes05.pdf">cache
 	         optimizations</a> for embedded and general-purpose
 	         processors appears in LCTES 2005.  Also, our paper on
 	         <a
-	         href="http://cag.lcs.mit.edu/commit/papers/05/thies-ppopp05.pdf">teleport
+	         href="http://cag.csail.mit.edu/commit/papers/05/thies-ppopp05.pdf">teleport
 	         messaging</a>, a new language construct for out-of-band
 	         communication, appears in PPoPP 2005.
 	       </p>
@@ -135,7 +152,7 @@
 	     <td align=left valign=top>
 	       <p align=justify>
 	         Our paper on the <a
-	         href="http://cag.lcs.mit.edu/commit/papers/05/kkuo-sdt.pdf">
+	         href="http://cag.csail.mit.edu/commit/papers/05/kkuo-sdt.pdf">
 	         StreamIt Development Tool</a> for high-productivity
 	         stream programming, including a user study that
 	         demonstrates improved debugging of stream programs,

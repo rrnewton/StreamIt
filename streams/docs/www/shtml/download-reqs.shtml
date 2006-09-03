@@ -16,40 +16,44 @@
 	  on Linux  machines, and may be available  as <tt>gmake</tt> on
 	  other Unix-like machines.
 
-	  The    source    release    only    builds   with    the    <a
-	  href="http://www-124.ibm.com/developerworks/oss/jikes">IBM
-	  Jikes       Java      Compiler</a>.      Also,       a      <a
-	  href="http://www.java.sun.com">Java   Virtual  Machine</a>  is
-	  required to run the compiler.<br>
-	  <br>
+	  The source release depends on Sun's Java compiler (javac).  
+	  Both the 
+	  source and binary releases require 
+	  a <a href="http://java.sun.com/">Java virtual machine<a> for Java 
+	  version 1.5 or later.
+	  <br />
+	  <br />
 
 	  The     StreamIt     frontend     depends    on     the     <a
-	  href="http://www.antlr.org">ANTLR  LL(k)</a> parser generator.
+	  href="http://www.antlr.org">ANTLR  LL(<i>k</i>)</a> parser generator.
 	  If you are using the source release, the ANTLR classes must be
 	  in your Java CLASSPATH when compiling and running the StreamIt
 	  compiler. If  you are using  the binary release,  the required
 	  ANTLR  classes  are  already  included  in  the  StreamIt  jar
-	  file.<br>
+	  file.<br />
 
-	  <br>
-	  The C library depends on the <a href="http://www.fftw.org">FFTW library</a>. The
+	  <br />
+	  The linear optimizations (not turned on by default) depend on the
+	  <a href="http://www.fftw.org">FFTW library</a>. The
 	  StreamIt runtime system currently only supports <i>fftw-2.1.x</i>, not the newer
 	  <i>fftw-3.0</i> branch. FFTW  should be installed somewhere in
-	  your  default  compiler  search  path  if you  are  using  the
-	  uniprocessor   compiler   backend.     You   need   to   build
+	  your  default  compiler  search  path.  You   need   to   build
 	  single-precision versions  of the library, such  that you have
-	  <i>srfftw.h</i>  and <i>libsrfftw.a</i>.  If you  are building
-	  FFTW   from   source,   use  the   <i>--enable-float</i>   and
-	  <i>--enable-type-prefix</i> options when configuring.<br>
-	  <br>
+	  include files <i>srfftw.h</i>,  <i>sfftw.h</i> and library files
+	  <i>libsrfftw.a</i> and <i>libsfftw.a</i>.  If you  are building
+	  FFTW   from   source,   use  the following options when configuring:
+	  <i>--enable-shared --enable-type-prefix --enable-threads --enable-float</i>.
+	  <br />
 
-	  Compilation  for  <a href="http://cag.lcs.mit.edu/raw">Raw</a>
-	  depends on the most  recent released Raw build environment (as
-	  of    this    release,    <i>raw_dist_2003_10_08</i>).     The
+	  <br />
+	  Compilation  for  <a href="http://cag.csail.mit.edu/raw">Raw</a>
+	  depends on the most  recent released Raw build environment.
+	  <!-- (as of this release, <i>raw_dist_2003_10_08</i>).     -->
+	   The
 	  <i>TOPDIR</i>  environment  variable needs  to  point to  your
 	  <i>StarSearch</i> directory;  this may be  the reduced workdir
-	  tree from the Raw distribution, or the full starsearch tree.<br>
-        <br>
+	  tree from the Raw distribution, or the full starsearch tree.<br />
+        <br />
 
 <!-- NOTE: If only distributing prebuilt documentation then the following are is not necessary -->
 <!--
