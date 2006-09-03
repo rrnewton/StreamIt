@@ -1,203 +1,187 @@
 <!--#include virtual="../include/init.inc"-->
-   <title>StreamIt - Quick Start Guide to the StreamIt Compiler</title>
+  <title>StreamIt - Quick Start Guide to the StreamIt Compiler</title>
 <!--#include virtual="../include/header-level1.inc"-->
 
 <!-- NOTE: DO NOTE EDIT THE OPTIONS LIST BY HAND!  Generate it from
 options.tex in ../release (by typing "make").  The HTML here has just
 minor visual cleanups of the Latex-to-HTML conversion, plus a link to
 the cookbook.  -->
-
-  <tr>
-    <td width="130" valign="top" align="left"></td>
-    <td width="20" valign="top" align="left"></td>
-    <td width="700" valign="top" align="left">
-    <hr>
-      <h3>QUICK START GUIDE</h3>
-      <p align="justify">
-
-	The StreamIt compiler is invoked via the <b>strc</b> script:
-	<pre>       <b>strc <font color=purple>foo.str</font></b></pre>
-	reads   <font    color=purple>foo.str</font>,   produces   <font
-	color=purple>foo.java</font>  as an intermediate  file, compiles
-	this down to  <font color=purple>foo.c</font>, and then compiles
-	and    links     this    to    produce     a    binary,    <font
-	color=purple>a.out</font>.<br>
-
-      <p align="justify">
-      
-      The <a href="http://cag.lcs.mit.edu/streamit/papers/streamit-cookbook.pdf">StreamIt
-      Cookbook</a> provides a step-by-step tutorial for getting
-      started with the language and compiler.  For reference, the
-      command-line options to the compiler are also described below.<br>
-
-	<h2><hr>strc Command Line Options<hr></h2>
-	<dl compact=compact>
-	  <dt><b>--help</b><dd>
-	      Displays a summary of common options.<br>
-	  <br>
-
-	  <dt><b>--more-help</b><dd>
-	      Displays a summary of advanced options (which are not described below).<br>
-	  <br>
-
-	  <dt><b>--output &lt;<em>filename</em>&gt;</b>, -o &lt;<em>filename</em>&gt;<dd>
-	      Places the resulting binary in &lt;<em>filename</em>&gt;.<br>
-	  <br>
-
-	  <dt><b>--raw &lt;<em>n</em>&gt;, -r&lt;<em>n</em>&gt;</b><dd>
-	      Compile for an &lt;<em>n</em>&gt;-by-&lt;<em>n</em>&gt; Raw processor.<br>
-	  <br>
-
-	  <dt><b>--standalone, -S</b><dd>
-	      Generate C file without library dependencies.<br>
-	  <br>
-
-	  <dt><b>--library</b><dd>
-	  Produce a Java file compatible with the StreamIt Java library,
-	  and compile and run it.<br>
-	  <br>
-
-	  <dt><b>--memory &lt;<em>size</em>&gt;, -Mmx &lt;<em>size</em>&gt;</b><dd>
-	      Set maximum Java runtime heap size. The default heap size is 1700Mb.<br>
-	  <br>
-
-	  <dt><b>--verbose</b><dd>
-	      Show intermediate commands as they are executed.<br>
-	  <br>
-
-      </dl>
-
-	<h2><hr>strc Options Available for All Backends<hr></h2>
-	<dl compact=compact>
-
-	  <dt><b>-O0</b><dd>
-	      Do not optimize (default).<br>
-	  <br>
-
-	  <dt><b>-O1</b><dd>
-	      Perform basic optimizations that should improve performance in most
-		cases. Adds <tt>--unroll 16 --destroyfieldarray --partition --ratematch --wbs</tt>.<br>
-	  <br>
-
-	  <dt><b>-O2</b><dd>
-	       Perform extended optimizations that should improve performance in
-		 most cases, but may also cause the compiler to become unstable.
-		 Adds <tt>--unroll 256 --destroyfieldarray --partition --ratematch --removeglobals --wbs</tt>.<br>
-	  <br> 
-
-	  <dt><b>--linearreplacement, -l</b><dd> Domain-specific
-	      optimization: combine adjacent "linear" filters in the
-	      program into a single matrix multiplication operation
-	      wherever possible.  Corresponds to the "linear" option
-	      in the PLDI'03 paper.<br>
-	  <br>
-	  <dt><b>--unroll &lt;<em>n</em>&gt;, -u&lt;<em>n</em>&gt;</b><dd>
-            Specify loop unrolling limit. The default value is 0.<br>
-	  <br>
-	</dl>
-
-	<h2><hr>strc Options Specific to Raw Backend<hr></h2>
-	<dl compact=compact>
-	  <dt><b>--partition, -p</b><dd> Partition the stream graph,
-	     using a dynamic programming algorithm to divide the graph
-	     into load balanced units for execution on separate tiles.
-	     This is turned on by default if the number of filters in
-	     the expanded stream graph is greater than the number of
-	     tiles.<br>
-	  <br>
-
-	  <dt><b> --magic_net, -M</b><dd>
-	     Compile to a "magic" network in which the buffer sizes between
-	     Raw tiles are conceptually unbounded (the sender never blocks),
-	     and the communication time has a constant overhead and per-hop
-	     latency. These parameters can be varied by editing the
-	     auto-generated <font color=purple>Makefile.streamit</font> file, which contains
-	     a string <tt>-magic_crossbar C1H1</tt>. The number after the
-	     "C" refers to the constant overhead; after the "H" refers to
-	     the per-hop latency.<br>
-	  <br>
-
-	  <dt><b>--numbers &lt;<em>n</em>&gt;, -N&lt;<em>n</em>&gt;</b><dd>
-	     Instrument code to gather performance statistics on simulated
-	     code over &lt;<em>n</em>&gt; steady-state cycles. The results are
-	     placed in <font color=purple>results.out</font> in the current directory.<br>
-	  <br>
-
-	  <dt><b>--rawcol &lt;<em>m</em>&gt;, -c&lt;<em>m</em>&gt;</b><dd>
-	      Specify number of columns in Raw processor; --raw specifies number of rows.<br>
-	  <br>
-
-	  <dt><b>--simulatework, -s</b><dd> Use the Raw simulator to
-	      calculate the amount of time required to execute a work
-	      function, rather than using an estimator.  This makes
-	      the compiler substantially slower; it may result in
-	      better partitioning.<br>
-	  <br>
-
-	  <dt><b>--wbs</b><dd> When laying out communication
-	     instructions, use the work-based simulator to estimate
-	     exactly when items will be produced and consumed.  This
-	     improves the scheduling of routing instructions.
-	  <br>
-	</dl>
-
-
-	<h2><hr>strc Options Specific to Uniprocessor Backend<hr></h2>
-	<dl compact=compact>
-	  <dt><b>--frequencyreplacement, -F</b><dd> Domain-specific
-	     optimization: combine adjacent "linear" filters in the
-	     program and convert them to the frequency domain wherever
-	     possible.  Corresponds to the "freq" option in the
-	     PLDI'03 paper.<br>
-	  <br>
-
-	  <dt><b>--linearpartition, -L</b><dd> Domain-specific
-	     optimization: perform linear replacement and frequency
-	     replacement selectively, based on an estimate of where it
-	     is most beneficial. Corresponds to the "autosel" option
-	     in the PLDI'03 paper.<br>
-	  <br>
-
-	  <dt><b>--profile</b><dd>
-	     Compile C code with profiling information. This requires that
-	     your system have profiling versions of the standard C and math
-	     libraries (<font color=purple>libc_p.a</font> and <font color=purple>libm_p.a</font>), along
-	     with a profiling version of the StreamIt library; invoke <tt>make
-	     profile</tt> in <font color=purple>$STREAMIT_HOME/library/c</font>. Profiling
-	     results can be analyzed using <font color=purple>gprof</font>.
-	  <br>
-	</dl>
-
-
-	<h2><hr>strc Options Specific to Java Library<hr></h2>
-	<dl compact=compact>
-	  <dt><b>--iterations &lt;<em>n</em>&gt;, -i&lt;<em>n</em>&gt;</b><dd>
-	     Run the program for &lt;<em>n</em>&gt; steady-state iterations. Defaults
-	     to infinity.<br>
-	  <br>
-
-	  <dt><b>--marksteady</b><dd>
-	     Print "*" to standard output after each steady-state execution.<br>
-	  <br>
-
-	  <dt><b>--norun</b><dd>
-	     Perform the library setup and schedule the stream graph, but don't
-	     actually run the program.<br>
-	  <br>
-
-	  <dt><b>--nosched</b><dd>
-	     Don't run the scheduler; instead, run in a pull mode, where the
-	     buffer lengths are examined at run time and a preceding filter is
-	     run if needed to provide enough data to run the current filter.<br>
-	  <br>
-
-	  <dt><b>--printsched</b><dd>
-	     Print out the minimal-latency schedule for the program.
-	</dl>
-
-      </p>
-    </td>
-    <td width="150" valign="top" align="left"></td>
-  </tr>
+<hr>
+<h3>QUICK START GUIDE</h3>
+<p align="justify"> The StreamIt compiler is invoked via the <b>strc</b>
+script: </p>
+<pre>       <b>strc <font color="purple">foo.str</font></b></pre>
+reads <font color="purple">foo.str</font>, produces <font
+ color="purple">foo.java</font> as an intermediate file, compiles this
+down to <font color="purple">foo.c</font>, and then compiles and links
+this to produce a binary, <font color="purple">a.out</font>.<br>
+<p align="justify"> The <a
+ href="http://cag.lcs.mit.edu/streamit/papers/streamit-cookbook.pdf">StreamIt
+Cookbook</a> provides a step-by-step tutorial for getting started with
+the language and compiler. For reference, the command-line options to
+the compiler are also described below.<br>
+</p>
+<h2>
+<hr>strc Command Line Options
+<hr></h2>
+<br>
+<dl compact="compact">
+  <dt><b>--help</b></dt>
+  <dd>Displays a summary of common options.<br>
+    <br>
+  </dd>
+  <dt><b>--more-help</b></dt>
+  <dd> Displays a summary of advanced options (which are not described
+below).<br>
+    <br>
+  </dd>
+  <dt><b>--cluster &lt;<em>n</em>&gt;</b></dt>
+  <dd>Compile for a cluter or multicore with &lt;<em>n</em>&gt; nodes.<br>
+    <br>
+  </dd>
+  <dt><b>--library</b></dt>
+  <dd>Produce a Java file compatible with the StreamIt Java library,
+and compile and run it.<br>
+    <br>
+  </dd>
+  <dt><b>--simpleC</b></dt>
+  <dd>Generate a simple C file that inlines the entire application into
+a
+single function. This is sometimes more readable than the default
+uniprocessor output, but the backend is not fully-featured.<br>
+    <br>
+  </dd>
+  <dt><b>--raw &lt;<em>n</em>&gt;, -r &lt;<em>n</em>&gt;</b></dt>
+  <dd>Compile for an &lt;<em>n</em>&gt;-by-&lt;<em>n</em>&gt; Raw
+processor.<br>
+    <br>
+  </dd>
+  <dt><b>--rstream, -R</b></dt>
+  <dd>Generate a C-like file to be compiled by the RStream compiler
+from
+Reservoir Labs.<br>
+    <br>
+  </dd>
+  <dt><b>--output &lt;<em>filename</em>&gt;, -o &lt;<em>filename</em>&gt;</b></dt>
+  <dd>Places the resulting binary in &lt;<em>filename</em>&gt;.<br>
+    <br>
+  </dd>
+  <dt><b>--verbose</b></dt>
+  <dd>Show intermediate commands as they are executed.
+  </dd>
+</dl>
+<!--TOC subsection Options available for all backends-->
+<h3>Options available for all backends</h3>
+<!--SEC END -->
+<dl compact="compact">
+  <dt><b>-O0</b></dt>
+  <dd>Do not optimize (default).<br>
+    <br>
+  </dd>
+  <dt><b>-O1</b></dt>
+  <dd>Perform basic optimizations that should improve performance in
+most
+cases. Adds <tt>--unroll 16 --destroyfieldarray --partition --wbs</tt>.<br>
+    <br>
+  </dd>
+  <dt><b>-O2</b></dt>
+  <dd>Perform extended optimizations that should improve performance in
+most cases, but may also cause the compiler to become unstable.
+Adds <tt>--unroll 256 --destroyfieldarray --partition --wbs --macros</tt>.<br>
+    <br>
+  </dd>
+  <dt><b>--asciifileio</b></dt>
+  <dd>Specifies that FileReader's and FileWriter's should use ASCII
+format
+rather than binary.<br>
+    <br>
+  </dd>
+  <dt><b>--iterations &lt;<em>n</em>&gt;, -i&lt;<em>n</em>&gt;</b></dt>
+  <dd>Run the program for &lt;<em>n</em>&gt; steady-state iterations.
+Defaults to
+infinity. For the uniprocessor, cluster, and simpleC backends, the
+number of iterations can also be passed at the command line of the
+final executable (<tt>a.out -i 100</tt>).<br>
+    <br>
+  </dd>
+  <dt><b>--linearreplacement</b></dt>
+  <dd>Domain-specific optimization: combine adjacent ``linear'' filters
+in
+the program into a single matrix multiplication operation wherever
+possible. Corresponds to the ``linear'' option in the PLDI'03 paper.<br>
+    <br>
+  </dd>
+  <dt><b>--statespace</b></dt>
+  <dd>In combination with <tt>--linearreplacement</tt>, performs
+combination
+and optimization of linear statespace filters as described in the
+CASES'05 paper.<br>
+    <br>
+  </dd>
+  <dt><b>--unroll &lt;<em>n</em>&gt;, -u&lt;<em>n</em>&gt;</b></dt>
+  <dd>Specify loop unrolling limit. The default value is 0.
+  </dd>
+</dl>
+<!--TOC subsection Options specific to Uniprocessor and Cluster backends-->
+<h3>Options specific to Uniprocessor and Cluster backends</h3>
+<!--SEC END -->
+<dl compact="compact">
+  <dt><b>--cacheopt</b></dt>
+  <dd>Performs cache optimizations as described in the LCTES'05 paper.<br>
+    <br>
+  </dd>
+  <dt><b>--l1d &lt;<em>n</em>&gt;</b></dt>
+  <dd>Sets the L1 data cache size (in KB) for cache optimizations. The
+default is 8 KB.<br>
+    <br>
+  </dd>
+  <dt><b>--l1i &lt;<em>n</em>&gt;</b></dt>
+  <dd>Sets the L1 instruction cache size (in KB) for cache
+optimizations.
+The default is 8 KB.<br>
+    <br>
+  </dd>
+  <dt><b>--l2 &lt;<em>n</em>&gt;</b></dt>
+  <dd>Sets the L2 cache size (in KB) for cache optimizations (we assume
+a
+unified L2 cache). The default is 256 KB.<br>
+    <br>
+  </dd>
+  <dt><b>--linearpartition, -L</b></dt>
+  <dd>Domain-specific optimization: perform linear replacement and
+frequency
+replacement selectively, based on an estimate of where it is most
+beneficial. Corresponds to the ``autosel'' option in the PLDI'03
+paper. (Relies on FFTW installation.)</dd>
+</dl>
+<!--TOC subsection Options specific to Raw backend-->
+<h3>Options specific to Raw backend</h3>
+<!--SEC END -->
+<dl compact="compact">
+  <dt><b>--numbers &lt;<em>n</em>&gt;, -N&lt;<em>n</em>&gt;</b></dt>
+  <dd>Instrument code to gather performance statistics on simulated
+code
+over &lt;<em>n</em>&gt; steady-state cycles. The results are placed in
+    <font color="purple">results.out</font> in the current directory.<br>
+    <br>
+  </dd>
+  <dt><b>--ssoutputs &lt;<em>n</em>&gt;</b></dt>
+  <dd>For applications containing a dynamic I/O rate, this option
+indicates
+how many outputs should count as a steady-state when gathering numbers
+(with <tt>--numbers</tt>).<br>
+    <br>
+  </dd>
+  <dt><b>--rawcol &lt;<em>m</em>&gt;, -c&lt;<em>m</em>&gt;</b></dt>
+  <dd>Specify number of columns in Raw processor; --raw specifies
+number of rows.<br>
+    <br>
+  </dd>
+  <dt><b>--wbs</b></dt>
+  <dd> When laying out communication instructions, use the work-based
+simulator to estimate exactly when items will be produced
+and consumed. This improves the scheduling of routing instructions.</dd>
+</dl>
+<p></p>
 
 <!--#include virtual="../include/footer.inc"-->
