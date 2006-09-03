@@ -2,6 +2,7 @@
    <title>StreamIt - Installation Instructions for the StreamIt Compiler</title>
 <!--#include virtual="../include/header-level1.inc"-->
 
+<!-- THIS FILE SHOULD BE KEPT IN SYNCH WITH ../../release/install.tex.in -->
   <tr>
     <td width="130" valign="top" align="left"></td>
     <td width="20" valign="top" align="left"></td>
@@ -15,14 +16,14 @@
 	  </p>
 	  <p>
 	  Before  using   StreamIt,  you   need  to  setup   your  shell
-	  enviroment,   configure,   and    build   the   compiler   and
+	  environment,   configure,   and    build   the   compiler   and
 	  libraries. Instructions are  provided below, but first review
 	  the  list   of  <a  href="../shtml/download-reqs.shtml">software
 	  requirements</a> before proceeding.
 	</p>
 
 
-	<h2><hr><a name="setup-source">1a) Setting the Shell Enviroment (Source Release)</a><hr></h2>
+	<h2><hr><a name="setup-source">1a) Setting the Shell Environment (Source Release)</a><hr></h2>
       <p align="justify">
 	  In   order   to  compile   StreamIt,   ensure   that  compiler for Java version 1.5
 	    is  installed and  can compile  Java
@@ -32,11 +33,11 @@
 	<ul>
 	  <li>If you are using bash, add the following to your <b>.bashrc</b><br>
 	  <pre>
-###Location of StreamIt
-STREAMIT_HOME=$HOME/streamit-2.1        
+### Location of unpacked StreamIt tree
+STREAMIT_HOME=$HOME/streamit-src-2.1
 
-###Location of Antlr jar
-ANTLRJAR=/usr/share/java/antlr.jar 
+### Location of ANTLR jar file (test: 'java antlr.tool')
+ANTLRJAR=/usr/share/java/antlr.jar
 
 ###Update CLASSPATH
 CLASSPATH=${CLASSPATH}:${ANTLRJAR}     
@@ -48,15 +49,15 @@ CLASSPATH=${CLASSPATH}:${STREAMIT_HOME}/3rdparty/JFlex/jflex.jar
 ###Update the shell path
 PATH=${PATH}:${STREAMIT_HOME}
 
-export STREAMIT_HOME CLASSPATH
+export STREAMIT_HOME CLASSPATH PATH
 	  </pre>
 
 	  <li>If you are using csh, add the following to your <b>.cshrc</b><br>
 	  <pre>
-###Location of StreamIt
-setenv STREAMIT_HOME $HOME/streamit-2.1
+###Location of unpacked StreamIt tree
+setenv STREAMIT_HOME ${HOME}/streamit-src-2.1
 
-###Location of Antlr jar
+###Location of ANTLR jar  file(test: 'java antlr.tool')
 setenv ANTLRJAR      /usr/share/java/antlr.jar
 
 ###Update CLASSPATH
@@ -72,7 +73,7 @@ setenv PATH          ${PATH}:${STREAMIT_HOME}
 	</ul>
 
 
-	<h2><hr><a name="setup-binary">1b) Setting the Shell Enviroment (Binary Release)</a><hr></h2>
+	<h2><hr><a name="setup-binary">1b) Setting the Shell Environment (Binary Release)</a><hr></h2>
       <p align="justify">
 	  If you downloaded the binary release, setup your environment
         as follows:
@@ -108,7 +109,7 @@ setenv PATH          ${PATH}:${STREAMIT_HOME}
 
 	<h2><hr><a name="resource">2) Re-source Shell Startup Files</a><hr></h2>
       <p align="justify">
-        Re-source  your  shell startup  file  or  relogin to  register
+        Re-source  your  shell startup  file  or  re-login to  register
         changes to your shell environment.
       </p>
 
@@ -148,7 +149,7 @@ make
 	<ul>
 	  <pre>
 cd /tmp
-cp $STREAMIT_HOME/apps/examples/hello/HelloWorld6.str .
+cp $STREAMIT_HOME/apps/examples/misc/hello/HelloWorld6.str .
 $STREAMIT_HOME/strc HelloWorld6.str
 ./a.out -i10
 	  </pre>
