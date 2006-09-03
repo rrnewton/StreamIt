@@ -1,5 +1,7 @@
 \documentclass{article}
-
+%%%
+%%% THIS FILE SHOULD BE KEPT IN SYNCH WITH ../www/shtml/install.shtml
+%%%
 \title{Installing the StreamIt Compiler}
 
 \begin{document}
@@ -9,7 +11,7 @@
 % note: RELEASE_DATE resolved in Makefile
 This is for the RELEASE_DATE release of the StreamIt compiler and
 runtime system, version 2.1.\\
-\verb|$Id: install.tex.in,v 1.11 2006-08-31 19:27:09 dimock Exp $|
+\verb|$Id: install.tex.in,v 1.12 2006-09-03 19:45:25 dimock Exp $|
 
 \section{Compilation}
 
@@ -32,15 +34,20 @@ also need to add the top-level StreamIt directory to your
 
 \begin{verbatim}
 ### Location of unpacked StreamIt tree
-STREAMIT_HOME=$HOME/streams
+STREAMIT_HOME=$HOME/streamit-src-2.1
 
 ### Location of ANTLR jar file (test: 'java antlr.tool')
 ANTLRJAR=/usr/share/java/antlr.jar
 
-CLASSPATH=$CLASSPATH:$ANTLRJAR
-CLASSPATH=$CLASSPATH:$STREAMIT_HOME/src
-CLASSPATH=$CLASSPATH:$STREAMIT_HOME/3rdparty
-PATH=$PATH:$STREAMIT_HOME
+###Update CLASSPATH
+CLASSPATH=${CLASSPATH}:${ANTLRJAR}     
+CLASSPATH=${CLASSPATH}:${STREAMIT_HOME}/src
+CLASSPATH=${CLASSPATH}:${STREAMIT_HOME}/3rdparty
+CLASSPATH=${CLASSPATH}:${STREAMIT_HOME}/3rdparty/jgraph/jgraph.jar
+CLASSPATH=${CLASSPATH}:${STREAMIT_HOME}/3rdparty/JFlex/jflex.jar
+
+###Update the shell path
+PATH=${PATH}:${STREAMIT_HOME}
 
 export STREAMIT_HOME CLASSPATH PATH
 \end{verbatim}
@@ -50,15 +57,20 @@ export STREAMIT_HOME CLASSPATH PATH
 
 \begin{verbatim}
 ### Location of unpacked StreamIt tree
-setenv STREAMIT_HOME ${HOME}/streams
+setenv STREAMIT_HOME  ${HOME}/streamit-src-2.1
 
 ### Location of ANTLR jar file (test: 'java antlr.tool')
-setenv ANTLRJAR /usr/share/java/antlr.jar
+setenv ANTLRJAR       /usr/share/java/antlr.jar
 
-setenv CLASSPATH ${CLASSPATH}:${ANTLRJAR}
-setenv CLASSPATH ${CLASSPATH}:${STREAMIT_HOME}/src
-setenv CLASSPATH ${CLASSPATH}:${STREAMIT_HOME}/3rdparty
-setenv PATH ${PATH}:${STREAMIT_HOME}
+###Update CLASSPATH
+setenv CLASSPATH      ${CLASSPATH}:${ANTLRJAR}
+setenv CLASSPATH      ${CLASSPATH}:${STREAMIT_HOME}/src
+setenv CLASSPATH      ${CLASSPATH}:${STREAMIT_HOME}/3rdparty
+setenv CLASSPATH      ${CLASSPATH}:${STREAMIT_HOME}/3rdparty/jgraph/jgraph.jar
+setenv CLASSPATH      ${CLASSPATH}:${STREAMIT_HOME}/3rdparty/JFlex/jflex.jar
+
+###Update the shell path
+setenvPATH            ${PATH}:${STREAMIT_HOME}
 \end{verbatim}
 %$
 
@@ -92,24 +104,36 @@ top-level StreamIt directory to your \verb|PATH|.  If you use
 bash, add to your \textsf{.bashrc} file
 
 \begin{verbatim}
-STREAMIT_HOME=$HOME/streams
-PATH=$PATH:$STREAMIT_HOME
-CLASSPATH=$CLASSPATH:$STREAMIT_HOME/streamit.jar
+###Location of StreamIt
+STREAMIT_HOME=$HOME/streamit-2.1        
+
+###Update CLASSPATH
+CLASSPATH=${CLASSPATH}:${STREAMIT_HOME}/streamit.jar
+
+###Update the shell path
+PATH=${PATH}:${STREAMIT_HOME}
+
+export STREAMIT_HOME CLASSPATH
 \end{verbatim}
 %$
 
 \noindent or if you use tcsh, add to your \textsf{.cshrc} file
 
 \begin{verbatim}
-setenv STREAMIT_HOME ${HOME}/streams
-setenv PATH ${PATH}:${STREAMIT_HOME}
-setenv CLASSPATH ${CLASSPATH}:${STREAMIT_HOME}/streamit.jar
+###Location of StreamIt
+setenv STREAMIT_HOME $HOME/streamit-2.1
+
+###Update CLASSPATH
+setenv CLASSPATH     ${CLASSPATH}:${STREAMIT_HOME}/streamit.jar
+
+###Update the shell path
+setenv PATH          ${PATH}:${STREAMIT_HOME}
 \end{verbatim}
 %$
 
-Compilation for the various backends requires extra setup.  If you are
+Compilation for the various back ends requires extra setup.  If you are
 compiling for Raw, you need to set up the Raw tools separately.  The
-uniprocessor backend requires a runtime library, which can be compiled
+uniprocessor back end requires a runtime library, which can be compiled
 by running \texttt{./configure} and then \texttt{make} from the
 top-level directory of the StreamIt release.
 
@@ -131,7 +155,7 @@ strc HelloWorld6.str
 
 This should print the numbers 0 through 9, in order.
 
-You can also test the Java library backend using \verb|strc|:
+You can also test the Java library back end using \verb|strc|:
 
 \begin{verbatim}
 strc --library HelloWorld6.str -i 10
