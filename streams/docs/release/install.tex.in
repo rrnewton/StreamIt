@@ -11,7 +11,7 @@
 % note: RELEASE_DATE resolved in Makefile
 This is for the RELEASE_DATE release of the StreamIt compiler and
 runtime system, version 2.1.\\
-\verb|$Id: install.tex.in,v 1.13 2006-09-05 17:27:50 dimock Exp $|
+\verb|$Id: install.tex.in,v 1.14 2006-09-05 19:11:28 dimock Exp $|
 
 \section{Compilation}
 
@@ -67,7 +67,6 @@ setenv CLASSPATH     .:${CLASSPATH}
 setenv CLASSPATH      ${CLASSPATH}:${ANTLRJAR}
 setenv CLASSPATH      ${CLASSPATH}:${STREAMIT_HOME}/src
 setenv CLASSPATH      ${CLASSPATH}:${STREAMIT_HOME}/3rdparty
-setenv CLASSPATH      ${CLASSPATH}:${STREAMIT_HOME}/3rdparty/jgraph/jgraph.jar
 setenv CLASSPATH      ${CLASSPATH}:${STREAMIT_HOME}/3rdparty/JFlex/jflex.jar
 
 ###Update the shell path
@@ -148,7 +147,7 @@ following:
 
 \begin{verbatim}
 cd /tmp
-cp $STREAMIT_HOME/apps/examples/hello/HelloWorld6.str .
+cp $STREAMIT_HOME/apps/examples/misc/hello/HelloWorld6.str .
 strc HelloWorld6.str
 ./a.out -i 10
 \end{verbatim}
