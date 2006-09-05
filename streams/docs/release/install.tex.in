@@ -11,7 +11,7 @@
 % note: RELEASE_DATE resolved in Makefile
 This is for the RELEASE_DATE release of the StreamIt compiler and
 runtime system, version 2.1.\\
-\verb|$Id: install.tex.in,v 1.12 2006-09-03 19:45:25 dimock Exp $|
+\verb|$Id: install.tex.in,v 1.13 2006-09-05 17:27:50 dimock Exp $|
 
 \section{Compilation}
 
@@ -40,10 +40,10 @@ STREAMIT_HOME=$HOME/streamit-src-2.1
 ANTLRJAR=/usr/share/java/antlr.jar
 
 ###Update CLASSPATH
+CLASSPATH=.:${CLASSPATH}
 CLASSPATH=${CLASSPATH}:${ANTLRJAR}     
 CLASSPATH=${CLASSPATH}:${STREAMIT_HOME}/src
 CLASSPATH=${CLASSPATH}:${STREAMIT_HOME}/3rdparty
-CLASSPATH=${CLASSPATH}:${STREAMIT_HOME}/3rdparty/jgraph/jgraph.jar
 CLASSPATH=${CLASSPATH}:${STREAMIT_HOME}/3rdparty/JFlex/jflex.jar
 
 ###Update the shell path
@@ -63,6 +63,7 @@ setenv STREAMIT_HOME  ${HOME}/streamit-src-2.1
 setenv ANTLRJAR       /usr/share/java/antlr.jar
 
 ###Update CLASSPATH
+setenv CLASSPATH     .:${CLASSPATH}
 setenv CLASSPATH      ${CLASSPATH}:${ANTLRJAR}
 setenv CLASSPATH      ${CLASSPATH}:${STREAMIT_HOME}/src
 setenv CLASSPATH      ${CLASSPATH}:${STREAMIT_HOME}/3rdparty
@@ -108,7 +109,7 @@ bash, add to your \textsf{.bashrc} file
 STREAMIT_HOME=$HOME/streamit-2.1        
 
 ###Update CLASSPATH
-CLASSPATH=${CLASSPATH}:${STREAMIT_HOME}/streamit.jar
+CLASSPATH=.:${CLASSPATH}:${STREAMIT_HOME}/streamit.jar
 
 ###Update the shell path
 PATH=${PATH}:${STREAMIT_HOME}
@@ -117,14 +118,14 @@ export STREAMIT_HOME CLASSPATH
 \end{verbatim}
 %$
 
-\noindent or if you use tcsh, add to your \textsf{.cshrc} file
+\noindent or if you use csh, add to your \textsf{.cshrc} file
 
 \begin{verbatim}
 ###Location of StreamIt
 setenv STREAMIT_HOME $HOME/streamit-2.1
 
 ###Update CLASSPATH
-setenv CLASSPATH     ${CLASSPATH}:${STREAMIT_HOME}/streamit.jar
+setenv CLASSPATH     .:${CLASSPATH}:${STREAMIT_HOME}/streamit.jar
 
 ###Update the shell path
 setenv PATH          ${PATH}:${STREAMIT_HOME}

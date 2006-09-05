@@ -9,31 +9,37 @@
       <hr>
       <p align="justify">
 
-      <li><b>Stable Snapshot Release</b>, August 19, 2005.<br>
-      &nbsp; &nbsp; Download: [<a href="streamit-2.0.20050819.tar.gz">binary</a> .tar.gz]&nbsp; [<a href="streamit-src-2.0.20050819.tar.gz">source</a> .tar.gz]
+	<p><li><b>Stable Public Release</b>, September 05, 2006.&nbsp; &nbsp; <b>StreamIt 2.1.</b><br>
+Download: [<a href="streamit-2.1.tar.gz">binary</a> .tar.gz]&nbsp; [<a href="streamit-src-2.1.tar.gz">source</a> .tar.gz]
+
       <ul>
-	<i>Recommended download</i>.  This snapshot has new features,
+      <!-- Keep in synch with ../../release/news.tex.in -->
+	<i>Recommended download</i>.  This release has new features,
         bug fixes, and possibly new bugs compared to the initial
         public release.  Major features are as follows, please <a
         href="mailto:streamit@cag.lcs.mit.edu">contact us</a> if you
         have any questions:
 
 	<ul>
+	<li> Multi-threaded backend for multicores and clusters of workstations.
+	<li> Support for dynamic rates and teleport messaging.
+	<li> Faster uniprocessor implementation (up to 2X).
 	<li> Faster and more memory-efficient Java library (up to 10X).
-	<li> Faster buffer management in uniprocessor library (up to 2X).
-	<li> JPEG decoder/encoder application (supported in Java library only).
-	<li> Limited support for dynamic rates and teleport messaging in Java library.
-	<li> Undocumented snapshot of cache optimizations and cluster backend.
+	<li>  MPEG-2 and JPEG applications (limited compiler support; full support in Java library).
+	<li> Snapshot of cache optimizations and linear statespace analysis.
 
 	</ul>
 	</ul>
 
-        <p><li><b>Stable Public Release</b>, October 20, 2003.<br>
-	&nbsp; &nbsp; Download: [<a href="streamit-2.0.tar.gz">binary</a> .tar.gz]&nbsp; [<a href="streamit-src-2.0.tar.gz">source</a> .tar.gz]
-	<ul>
-	Our first public release.
-	</ul>
-
+	<p>Install any <a href="../shtml/download-reqs.shtml">prerequisite</a> 
+	tools or packages: C++ and C compilers, GNU utilities, Java 1.5, 
+	ANTLR (for source release only), 
+	FFTW fft libraries (optional: Needed only for <i>--linearreplacement</i> 
+	and <i>--frequencyreplacement</i> switches),
+	and RAW infrastructure (optional: Needed only for <i>--raw</i> switch to 
+	generate code for the RAW tiled architecture).
+	</p>
+ 
         <p>Unpack the tar file, and read the <tt><a
         href="../shtml/install.shtml">INSTALL</a></tt> file for
         installation instructions.  Note that while these releases
@@ -42,43 +48,24 @@
         error checking in the frontend.  Read the
         <tt>README</tt> file in the  release for more details on known
         shortcomings.
-      </p>
+	</p>
 
-      <h2><hr>Dependencies<hr></h2>
-  
-      <ul>
-        <li><p align="justify">
-          <b><a href="http://cag.lcs.mit.edu/raw/">RAW</a>
-          infrastructure tools.</b> Set these  up before trying to use
-          StreamIt  if  you are  compiling  for  RAW.   Make sure  the
-          <tt>TOPDIR</tt>   environment   variable   points  to   your
-          StarSearch directory.
+	<h2><hr>Older Releases<hr></h2>
+
+	<p>The source releases below require the 
+	<a href="http://www-124.ibm.com/developerworks/oss/jikes">JIKES</a>
+	 Java Compiler.
         </p>
-        <li><p align="justify">
-  	    <b><a href="http://www-124.ibm.com/developerworks/oss/jikes">JIKES</a>
-	    Java      Compiler</b> (source release only). Also, a  
-          <a href="http://www.java.sun.com">Java   Virtual  Machine</a>  is
-	    required to run the compiler.
-	  <br>
-        </p>
-        <li><p align="justify">
-          <b><a  href="http://www.antlr.org/">ANTLR</a> LL(k) parser
-          generator</b> (source  release only).   This is needed  by the
-          StreamIt frontend;  if you are  using the source  release, the
-          ANTLR jar  file must  be in  your Java class  path to  read in
-          StreamIt files.
-	  </p>
-        <li><p align="justify">
-          <b><a href="http://www.fftw.org/">FFTW</a>       FFT
-          library.</b>  Download and  install FFTW  before  building the
-          uniprocessor  C library,  if  you are  using the  uniprocessor
-          target.  Use version 2.1.x of  FFTW, not 3.0, and compile with
-          <tt>--enable-float --enable-type-prefix</tt>.
-	  </p>
-      </ul>
 
-      <h2><hr>Older Releases<hr></h2>
+	<p><li><b>Stable Snapshot Release</b>, August 19, 2005.<br>
+      &nbsp; &nbsp; Download: [<a href="streamit-2.0.20050819.tar.gz">binary</a> .tar.gz]&nbsp; [<a href="streamit-src-2.0.20050819.tar.gz">source</a> .tar.gz]
 
+
+        <p><li><b>First Public Release</b>, October 20, 2003.<br>
+	&nbsp; &nbsp; Download: [<a href="streamit-2.0.tar.gz">binary</a> .tar.gz]&nbsp; [<a href="streamit-src-2.0.tar.gz">source</a> .tar.gz]
+	<ul>
+	Our first public release.
+	</ul>
       <p>
         <b>May 28, 2003 snapshot</b>
         [<a href="streamit-0.0.20030528.tar.gz">binary</a>

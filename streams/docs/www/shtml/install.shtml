@@ -40,10 +40,10 @@ STREAMIT_HOME=$HOME/streamit-src-2.1
 ANTLRJAR=/usr/share/java/antlr.jar
 
 ###Update CLASSPATH
+CLASSPATH=.:${CLASSPATH}
 CLASSPATH=${CLASSPATH}:${ANTLRJAR}     
 CLASSPATH=${CLASSPATH}:${STREAMIT_HOME}/src
 CLASSPATH=${CLASSPATH}:${STREAMIT_HOME}/3rdparty
-CLASSPATH=${CLASSPATH}:${STREAMIT_HOME}/3rdparty/jgraph/jgraph.jar
 CLASSPATH=${CLASSPATH}:${STREAMIT_HOME}/3rdparty/JFlex/jflex.jar
 
 ###Update the shell path
@@ -61,10 +61,10 @@ setenv STREAMIT_HOME ${HOME}/streamit-src-2.1
 setenv ANTLRJAR      /usr/share/java/antlr.jar
 
 ###Update CLASSPATH
+setenv CLASSPATH     .:${CLASSPATH}
 setenv CLASSPATH     ${CLASSPATH}:${ANTLRJAR}
 setenv CLASSPATH     ${CLASSPATH}:${STREAMIT_HOME}/src
 setenv CLASSPATH     ${CLASSPATH}:${STREAMIT_HOME}/3rdparty
-setenv CLASSPATH     ${CLASSPATH}:${STREAMIT_HOME}/3rdparty/jgraph/jgraph.jar
 setenv CLASSPATH     ${CLASSPATH}:${STREAMIT_HOME}/3rdparty/JFlex/jflex.jar
 
 ###Update the shell path
@@ -85,7 +85,7 @@ setenv PATH          ${PATH}:${STREAMIT_HOME}
 STREAMIT_HOME=$HOME/streamit-2.1        
 
 ###Update CLASSPATH
-CLASSPATH=${CLASSPATH}:${STREAMIT_HOME}/streamit.jar
+CLASSPATH=.:${CLASSPATH}:${STREAMIT_HOME}/streamit.jar
 
 ###Update the shell path
 PATH=${PATH}:${STREAMIT_HOME}
@@ -93,13 +93,13 @@ PATH=${PATH}:${STREAMIT_HOME}
 export STREAMIT_HOME CLASSPATH
 	  </pre>
 
-	  <li>If you are using tcsh, add the following to your <b>.tcshrc</b><br>
+	  <li>If you are using csh, add the following to your <b>.cshrc</b><br>
 	  <pre>
 ###Location of StreamIt
 setenv STREAMIT_HOME $HOME/streamit-2.1
 
 ###Update CLASSPATH
-setenv CLASSPATH     ${CLASSPATH}:${STREAMIT_HOME}/streamit.jar
+setenv CLASSPATH     .:${CLASSPATH}:${STREAMIT_HOME}/streamit.jar
 
 ###Update the shell path
 setenv PATH          ${PATH}:${STREAMIT_HOME}
