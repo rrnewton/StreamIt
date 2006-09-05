@@ -45,6 +45,7 @@ CLASSPATH=${CLASSPATH}:${ANTLRJAR}
 CLASSPATH=${CLASSPATH}:${STREAMIT_HOME}/src
 CLASSPATH=${CLASSPATH}:${STREAMIT_HOME}/3rdparty
 CLASSPATH=${CLASSPATH}:${STREAMIT_HOME}/3rdparty/JFlex/jflex.jar
+CLASSPATH=${CLASSPATH}:${STREAMIT_HOME}/3rdparty/jcc/jcc.jar
 
 ###Update the shell path
 PATH=${PATH}:${STREAMIT_HOME}
@@ -66,6 +67,7 @@ setenv CLASSPATH     ${CLASSPATH}:${ANTLRJAR}
 setenv CLASSPATH     ${CLASSPATH}:${STREAMIT_HOME}/src
 setenv CLASSPATH     ${CLASSPATH}:${STREAMIT_HOME}/3rdparty
 setenv CLASSPATH     ${CLASSPATH}:${STREAMIT_HOME}/3rdparty/JFlex/jflex.jar
+setenv CLASSPATH     ${CLASSPATH}:${STREAMIT_HOME}/3rdparty/jcc/jcc.jar
 
 ###Update the shell path
 setenv PATH          ${PATH}:${STREAMIT_HOME}
