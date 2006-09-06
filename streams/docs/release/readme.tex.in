@@ -14,7 +14,7 @@
 % note: RELEASE_DATE resolved in Makefile
 This is for the RELEASE_DATE release of the StreamIt compiler and
 runtime system, version 2.1.\\
-\verb|$Id: readme.tex.in,v 1.18 2006-08-31 19:27:09 dimock Exp $|
+\verb|$Id: readme.tex.in,v 1.19 2006-09-06 07:35:38 thies Exp $|
 
 \section{What is this?}
 
@@ -24,10 +24,11 @@ processing applications.  This is a public release of the StreamIt
 compiler.  While the compiler is still under active development, we
 believe this release should be useful for developing StreamIt
 applications.  See "caveats", below, and report bugs and feature
-requests to \texttt{streamit@cag.lcs.mit.edu}.  This compiler should
-produce functional code for both uniprocessor targets and the MIT Raw
-processor.  There is also a runtime library for testing programs
-through a Java compiler.
+requests to \texttt{streamit@cag.csail.mit.edu}.  This compiler should
+produce functional code for uniprocessor targets, multicore
+architectures, clusters of workstations, and the MIT Raw processor.
+There is also a runtime library for testing programs through a Java
+compiler.
 
 There are two versions of this release.  These are:
 
@@ -43,15 +44,16 @@ There are two versions of this release.  These are:
 The StreamIt compiler is built on top of version 1.5B of the Kopi Java
 compiler from DMS Decision Management Systems GmbH.  The independent
 components of the system, including the scheduler, Java runtime
-library, C library, and the front end, are released subject to the
-terms of the MIT license agreement. Other components of the system are
-released under the terms of the GNU General Public License; see the
-\filename{COPYING} file for details.  The binary release also include
-class files from the ANTLR LL(k) parser generator.
+library, C/C++ libraries, the front end, and the StreamIt .str files,
+are released subject to the terms of the MIT license agreement. Other
+components of the system are released under the terms of the GNU
+General Public License; see the \filename{COPYING} file for details.
+The binary release also include class files from the ANTLR LL(k)
+parser generator.
 
 Several documents on StreamIt are in the \filename{docs} directory.
 You can find more information on our Web page, at
-\url{http://cag.lcs.mit.edu/streamit/}.
+\url{http://cag.csail.mit.edu/streamit/}.
 
 \section{Dependencies}
 
@@ -150,7 +152,7 @@ The StreamIt home page is at \url{http://cag.csail.mit.edu/streamit/}.
 There are a number of places you can send electronic mail to:
 
 \begin{description}
-\item[streamit@csail.lcs.mit.edu]
+\item[streamit@csail.csail.mit.edu]
     General information on StreamIt, to report bugs in the compiler or
     request new language features, or to be added to streamit-users
     or streamit-dev
