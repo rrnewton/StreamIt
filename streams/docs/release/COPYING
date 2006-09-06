@@ -2,13 +2,16 @@ Copyright and License for the StreamIt Release
 ----------------------------------------------
 
 StreamIt is copyright 2006 by the Massachusetts Institute of
-Technology.  This entire release is under the terms of the GNU General
-Public License, version 2 or (at your option) any later version; see
-the COPYING.GPL file for details.
+Technology.  Different parts of the source code are covered by
+different licenses.
 
-Additionally, certain parts of this release are necessary to use the
-output of the compiler at runtime, or may be useful as sample code.
-These parts of the release are subject to the following license:
+The "src/at" directory (and all subdirectories) are released under the
+terms of the GNU General Public License, version 2 or (at your option)
+any later version; see the COPYING.GPL file for details.  This
+includes most of the compiler, with the exception of the front end and
+the scheduler (which are under "src/streamit").
+
+The rest of the code is released subject to the following license:
 
   Copyright 2006 by the Massachusetts Institute of Technology.
 
@@ -26,12 +29,14 @@ These parts of the release are subject to the following license:
 
 Files which may be used under this license include:
 
--- All of the sample code in the 'apps' directory;
--- The .bc files in the 'include' directory;
--- The StreamIt uniprocessor C library in the 'library/c' directory;
--- The StreamIt cluster C++ library in the 'library/cluster' directory;
--- Sample code in the documentation provided in the 'docs' directory,
-   and child directories; and
 -- All of the code in the 'src/streamit' directory of the source
    release, and child directories, including the StreamIt-to-Java
-   converter, the StreamIt Java runtime library, and the scheduler.
+   converter, the StreamIt Java runtime library, and the scheduler;
+-- The StreamIt cluster C++ library in the 'library/cluster' directory;
+-- All of the StreamIt .str files in the 'apps' directory;
+-- StreamIt code in the documentation provided in the 'docs' directory,
+   and child directories; and
+-- The .bc files in the 'include' directory.
+
+Finally, please note that the .jar files we are redistributing under
+the 3rdparty directory are covered by their own respective licenses.

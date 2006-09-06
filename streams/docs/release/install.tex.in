@@ -11,7 +11,7 @@
 % note: RELEASE_DATE resolved in Makefile
 This is for the RELEASE_DATE release of the StreamIt compiler and
 runtime system, version 2.1.\\
-\verb|$Id: install.tex.in,v 1.16 2006-09-05 20:52:38 thies Exp $|
+\verb|$Id: install.tex.in,v 1.17 2006-09-06 07:35:38 thies Exp $|
 
 \section{Compilation}
 
@@ -39,14 +39,14 @@ STREAMIT_HOME=$HOME/streamit-src-2.1
 ### Location of ANTLR jar file (test: 'java antlr.tool')
 ANTLRJAR=/usr/share/java/antlr.jar
 
-###Update CLASSPATH
+### Update CLASSPATH
 CLASSPATH=.:${CLASSPATH}
 CLASSPATH=${CLASSPATH}:${ANTLRJAR}     
 CLASSPATH=${CLASSPATH}:${STREAMIT_HOME}/src
 CLASSPATH=${CLASSPATH}:${STREAMIT_HOME}/3rdparty
 CLASSPATH=${CLASSPATH}:${STREAMIT_HOME}/3rdparty/JFlex/jflex.jar
 
-###Update the shell path
+### Update the shell path
 PATH=${PATH}:${STREAMIT_HOME}
 
 export STREAMIT_HOME CLASSPATH PATH
@@ -62,14 +62,14 @@ setenv STREAMIT_HOME  ${HOME}/streamit-src-2.1
 ### Location of ANTLR jar file (test: 'java antlr.tool')
 setenv ANTLRJAR       /usr/share/java/antlr.jar
 
-###Update CLASSPATH
+### Update CLASSPATH
 setenv CLASSPATH     .:${CLASSPATH}
 setenv CLASSPATH      ${CLASSPATH}:${ANTLRJAR}
 setenv CLASSPATH      ${CLASSPATH}:${STREAMIT_HOME}/src
 setenv CLASSPATH      ${CLASSPATH}:${STREAMIT_HOME}/3rdparty
 setenv CLASSPATH      ${CLASSPATH}:${STREAMIT_HOME}/3rdparty/JFlex/jflex.jar
 
-###Update the shell path
+### Update the shell path
 setenvPATH            ${PATH}:${STREAMIT_HOME}
 \end{verbatim}
 %$
@@ -81,7 +81,7 @@ infrastructure.  In this case, you can ``source''
 \verb|$STREAMIT_HOME/include/dot-bashrc| or
 \verb|${STREAMIT_HOME}/include/dot-cshrc|, as appropriate, after
 editing the files.  If you want to override the settings the provided
-scripts set (for example, the Raw StarSearch directory), set the
+scripts set (for example, the Raw starsearch directory), set the
 relevant variables after reading the \textsf{dot-bashrc} or
 \textsf{dot-cshrc} file.
 
@@ -104,13 +104,13 @@ top-level StreamIt directory to your \verb|PATH|.  If you use
 bash, add to your \textsf{.bashrc} file
 
 \begin{verbatim}
-###Location of StreamIt
+### Location of StreamIt
 STREAMIT_HOME=$HOME/streamit-2.1        
 
-###Update CLASSPATH
+### Update CLASSPATH
 CLASSPATH=.:${CLASSPATH}:${STREAMIT_HOME}/streamit.jar
 
-###Update the shell path
+### Update the shell path
 PATH=${PATH}:${STREAMIT_HOME}
 
 export STREAMIT_HOME CLASSPATH
@@ -120,13 +120,13 @@ export STREAMIT_HOME CLASSPATH
 \noindent or if you use csh, add to your \textsf{.cshrc} file
 
 \begin{verbatim}
-###Location of StreamIt
+### Location of StreamIt
 setenv STREAMIT_HOME $HOME/streamit-2.1
 
-###Update CLASSPATH
+### Update CLASSPATH
 setenv CLASSPATH     .:${CLASSPATH}:${STREAMIT_HOME}/streamit.jar
 
-###Update the shell path
+### Update the shell path
 setenv PATH          ${PATH}:${STREAMIT_HOME}
 \end{verbatim}
 %$
