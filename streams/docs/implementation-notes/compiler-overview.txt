@@ -52,18 +52,31 @@ Here's the general flow of the compiler as it stands now:
 
 -----
 
-Then the flow splits up into two parts, one for Raw and one for the
-uniprocessor backend.
+Then the flow splits up into three parts: one for the default
+(uniprocessor/multicore/cluster) backend, one for the simpleC backend,
+and one for the Raw backend.  Please consult the StreamIt cookbook for
+a discussion of these backends.
+
+Uniprocessor/Multicore/Cluster Backend
+--------------------------------------
+
+TODO
+
+SimpleC Backend
+---------------
+
+TODO
 
 Raw Backend
 -----------
 
-The Raw side of the project (in kjc/raw) does partitioning, layout,
-and communication scheduling for a Raw backend.  This generally works
-by conversion to a flat, unstructured graph, and then simulation of
-the execution according to a legal schedule.  The toplevel controller
-for the raw backend is kjc/raw/RawBackend.java.  You can trace the
-modules that it calls in the backend from there.
+The Raw side of the project (in kjc/spacedynamic) does partitioning,
+layout, and communication scheduling for a Raw backend.  This
+generally works by conversion to a flat, unstructured graph, and then
+simulation of the execution according to a legal schedule.  The
+toplevel controller for the raw backend is
+kjc/spacedynamic/SpaceDynamicBackend.java.  You can trace the modules
+that it calls in the backend from there.
 
 There are two partitioning algorithms implemented to do automatic
 load-balancing on Raw:
@@ -77,70 +90,11 @@ load-balancing on Raw:
  - greedy algorithm
     - in kjc/sir/lowering/partition/GreedyPartitioner.java
     - locally fuses the filters with the least amount of work
-    - generally performs significantly (~2X) worse than dynamic programming
 
 The Raw backend will output a series of tile and switch files that you
-can compile for the raw simulator by typing "make".  You can do "make
+can compile for the Raw simulator by typing "make".  You can do "make
 -f Makefile.streamit debug" to run the simulator, and "make -f
-Makefile.streamit run" to just run it.  See the StreamIt Cookbook for
-more detailed instructions.
-
-Uniprocessor Backend
---------------------
-
-The uniprocessor backend differs from the Raw backend in that the
-entire filter graph is scheduled to run in serial, and the resulting
-code is linked with a runtime library to do the scheduling at runtime.
-In the long run, we could adjust the model to be more like raw's by
-fusing the entire stream graph into one node and then just executing
-that node; however, the runtime system of the C library also provides
-more flexibility for things like message delivery, where you might
-want to have some runtime control of the scheduling.
-
-In order to compile to C for the uniprocessor, the stream graph is
-lowered into a "low ir" or LIR, with supporting files in kjc/lir.  The
-original purpose of the "lowering" package (kjc/sir/lowering) was to
-lower the SIR to the LIR, although it now includes some files that are
-somewhat broader in scope.  The toplevel controller for the
-uniprocessor path is in kjc/sir/lowering/Flattener.java.  As is
-visible from the code, there are a number of passes in the lowering,
-and they are in this order:
-
-kjc/sir/lowering/Structurer: this deals with the fact that there are
-			     no objects in C.  Thus, all fields of a
-			     given stream class need to be packaged
-			     into a structure, and passed around to
-			     each method that operates on the
-			     structure.  So the Structurer modifies
-			     all methods to take an additional
-			     argument, and to pass the state of the
-			     stream through this argument.
-
-kjc/sir/lowering/SIRScheduler: this class interfaces with the
-			       scheduler (see below) to build a set of
-			       hierarchical work functions for all the
-			       stream containers (pipelines,
-			       splitjoins, and feedbackloops) in the
-			       graph.  Then, the resulting runtime
-			       system can execute the entire stream by
-			       calling the toplevel work function,
-			       with all the components scheduled
-			       accordingly.
-
-kjc/sir/lowering/LowerInitFunctions: this adds LIR hooks to the init
-				functions to pass information to the C
-				library about the properties of each
-				stream (e.g., it's I/O types, rates, etc.)
-
-kjc/sir/lowering/LowerWorkFunctions: just marks the entries and exits
-				of work functions with LIR nodes.
-
-So, the LIR basically consists of a set of hooks for our C runtime
-system.  It is not a "low-level IR" in the traditional
-sense--i.e. there is no 3-address form, or low-level optimizations.
-If you wanted to implement a different backend for StreamIt, the LIR
-might be useful if you had library support in the backend, but not
-otherwise.
+Makefile.streamit run" to just run it.
 
 The Directory Structure
 -----------------------
