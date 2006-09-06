@@ -11,7 +11,7 @@
 % note: RELEASE_DATE resolved in Makefile
 This is for the RELEASE_DATE release of the StreamIt compiler and
 runtime system, version 2.1.\\
-\verb|$Id: install.tex.in,v 1.17 2006-09-06 07:35:38 thies Exp $|
+\verb|$Id: install.tex.in,v 1.18 2006-09-06 21:07:13 thies Exp $|
 
 \section{Compilation}
 
@@ -70,7 +70,7 @@ setenv CLASSPATH      ${CLASSPATH}:${STREAMIT_HOME}/3rdparty
 setenv CLASSPATH      ${CLASSPATH}:${STREAMIT_HOME}/3rdparty/JFlex/jflex.jar
 
 ### Update the shell path
-setenvPATH            ${PATH}:${STREAMIT_HOME}
+setenv PATH           ${PATH}:${STREAMIT_HOME}
 \end{verbatim}
 %$
 
