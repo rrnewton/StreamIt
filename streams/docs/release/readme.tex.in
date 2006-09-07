@@ -14,7 +14,7 @@
 % note: RELEASE_DATE resolved in Makefile
 This is for the RELEASE_DATE release of the StreamIt compiler and
 runtime system, version 2.1.\\
-\verb|$Id: readme.tex.in,v 1.19 2006-09-06 07:35:38 thies Exp $|
+\verb|$Id: readme.tex.in,v 1.20 2006-09-07 01:25:25 thies Exp $|
 
 \section{What is this?}
 
@@ -88,7 +88,7 @@ In particular, GNU Make is required to build; this is the default
 \filename{gmake} on other Unix-like machines.  GNU Make can be
 downloaded from \url{http://www.gnu.org/}.
 
-While this is not a a dependency, the \tt{graphviz} package from 
+While this is not a a dependency, the \texttt{graphviz} package from
 \url{http://www.graphviz.org} contains a viewer, \texttt{dotty}, that
 will display the dot files created by the StreamIt compiler.
 \texttt{ZGRViewer}, from
