@@ -16,7 +16,7 @@ parser correctly.
 
 \section{Statement Placement}
 
-\subsection{Init, Work, and Phase Functions}
+\subsection{Init, Work, and Helper Functions}
 
 \begin{enumerate}
 \item \lstinline|add| statements can only appear in init functions in
@@ -25,17 +25,16 @@ parser correctly.
   appear in init functions in split-joins and feedback loops;
 \item \lstinline|loop|, \lstinline|body|, and \lstinline|enqueue|
   statements can only appear in init functions in feedback loops;
-\item \lstinline|push| statements can only appear in work and phase
+\item \lstinline|push| statements can only appear in work and helper
   functions in filters.
 \item \lstinline|pop| and \lstinline|peek| expressions can only appear
-  in work and phase functions in filters.
+  in work and helper functions in filters.
 \item If a work function does not declare I/O rates, it may not use
   \lstinline|push|, \lstinline|pop|, or \lstinline|peek|.  If it
   declares a push rate, though, it must call
   \lstinline|push|.\footnote{Declaring a nonzero peek rate affects the
     scheduling but not correctness, so you're not obligated to peek;
-    if you don't pop, you automatically pop your pop rate at the end
-    of the work function.}
+    however, you are obligated to pop the right number of items.}
 \item Every filter must have a work function.
 \item Every stream object that is not a filter must have an init
   function, but may have no other functions.\footnote{This is
@@ -54,11 +53,6 @@ statements are sensitive to the order in which they are executed.
   \lstinline|loop| statements must be executed exactly once if they
   are allowed at all.  Every path of control through the
   initialization code must result in exactly one execution.
-\item A data-flow analysis must be able to determine the number and
-  sequence of phases, along with any intermediate code, for a phased
-  filter.
-\item Nothing other than a work function which does not declare I/O
-  rates may call a phase function.
 \end{enumerate}
 
 \section{Typing}
@@ -200,9 +194,8 @@ there is no implicit type promotion across tapes.
 \item Stream parameters within a single stream must have distinct
   names from each other and from all stream and structure names.
 \item Functions declared within a filter must have unique names; these
-  include phase functions, message handlers, and helper functions.
-  The name of a function must be distinct from stream and structure
-  names.
+  include message handlers and helper functions.  The name of a
+  function must be distinct from stream and structure names.
 \item A variable may not be declared with the same name as a stream
   parameter.  (Other variable hiding is legal.)  The name of a
   variable must be distinct from stream, structure, and function
@@ -219,9 +212,9 @@ there is no implicit type promotion across tapes.
   of  the the stream.
 \item A variable must be declared before it is used.
 \item A stream parameter may not be assigned to or otherwise modified.
-\item A function call must have a name matching a phase or helper
-  function in the current filter, and a parameter list matching the
-  parameter list of the target function.
+\item A function call must have a name matching a helper function in
+  the current filter, and a parameter list matching the parameter list
+  of the target function.
 \item A message-sending statement must name a portal variable on the
   left-hand side of the ``.'', and a message name on the right-hand
   side.  The message name must match a message in the target type of
@@ -246,8 +239,6 @@ questionable code:
 \item The compiler may need to guess at the I/O types of anonymous
   streams.  If the type isn't clear from context a warning should be
   issued.
-\item A warning should be issued if a phase function is declared which
-  is not used.
 \item A warning may be issued if the compiler cannot verify that
   splitters and joiners for split-joins can accomodate the exact
   number of children present.  Note that this may only be possible
