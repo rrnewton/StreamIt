@@ -11,7 +11,7 @@
 % note: RELEASE_DATE resolved in Makefile
 This is for the RELEASE_DATE release of the StreamIt compiler and
 runtime system, version 2.1.\\
-\verb|$Id: install.tex.in,v 1.18 2006-09-06 21:07:13 thies Exp $|
+\verb|$Id: install.tex.in,v 1.19 2006-09-08 19:58:15 thies Exp $|
 
 \section{Compilation}
 
@@ -147,8 +147,8 @@ following:
 
 \begin{verbatim}
 cd /tmp
-cp $STREAMIT_HOME/apps/examples/misc/hello/HelloWorld6.str .
-strc HelloWorld6.str
+cp $STREAMIT_HOME/apps/examples/misc/hello/HelloWorld.str .
+strc HelloWorld.str
 ./a.out -i 10
 \end{verbatim}
 %$
@@ -158,7 +158,7 @@ This should print the numbers 0 through 9, in order.
 You can also test the Java library back end using \verb|strc|:
 
 \begin{verbatim}
-strc --library HelloWorld6.str -i 10
+strc --library HelloWorld.str -i 10
 \end{verbatim}
 
 This will convert the StreamIt program to Java, compile it against the
