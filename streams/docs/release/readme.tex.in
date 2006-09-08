@@ -14,7 +14,7 @@
 % note: RELEASE_DATE resolved in Makefile
 This is for the RELEASE_DATE release of the StreamIt compiler and
 runtime system, version 2.1.\\
-\verb|$Id: readme.tex.in,v 1.22 2006-09-08 19:46:44 thies Exp $|
+\verb|$Id: readme.tex.in,v 1.23 2006-09-08 21:30:36 thies Exp $|
 
 \section{What is this?}
 
@@ -58,7 +58,7 @@ You can find more information on our Web page, at
 \section{Dependencies}
 
 The StreamIt makefile infrastructure uses the GNU tools, which are
-available from \url{http://www.gnu.org.  In particular, GNU Make is
+available from \url{http://www.gnu.org}.  In particular, GNU Make is
 required to build; this is the default <tt>make</tt> on Linux
 machines, and may be available as <tt>gmake</tt> on other Unix-like
 machines.  The source release depends on Sun's Java compiler (javac).
