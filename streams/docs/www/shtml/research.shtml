@@ -23,8 +23,8 @@
         systems.  It is designed to facilitate the programming of large
         streaming applications, as well as their efficient mapping to
         a wide variety of target architectures, including
-        commercial-off-the-shelf uniprocessors, multi-clustered
-        architectures, and the emerging class of grid-processors
+	commercial-off-the-shelf uniprocessors,
+	  multicore architectures, and clusters of workstations.
 	  [<a href="http://cag.lcs.mit.edu/cgi-bin/commit-papers.pl?keyword=4">StreamIt Publications</a>].<br>
         <br> 
 	  The StreamIt programming and compilation paradigm makes
@@ -86,7 +86,7 @@
 -->
 </p>
           <li><p align="justify"> A robust compilation infrastructure
-    that compiles to an ANSI C runtime library for execution on a
+    that compiles to a C++ runtime library for execution on a
     general-purpose uniprocessor.  The infrastructure includes a
     high-level stream IR (in Java) with a host of graph
     transformations, including graph canonicalization, synchronization

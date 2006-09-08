@@ -39,14 +39,14 @@ STREAMIT_HOME=$HOME/streamit-src-2.1
 ### Location of ANTLR jar file (test: 'java antlr.tool')
 ANTLRJAR=/usr/share/java/antlr.jar
 
-###Update CLASSPATH
+### Update CLASSPATH
 CLASSPATH=.:${CLASSPATH}
 CLASSPATH=${CLASSPATH}:${ANTLRJAR}     
 CLASSPATH=${CLASSPATH}:${STREAMIT_HOME}/src
 CLASSPATH=${CLASSPATH}:${STREAMIT_HOME}/3rdparty
 CLASSPATH=${CLASSPATH}:${STREAMIT_HOME}/3rdparty/JFlex/jflex.jar
 
-###Update the shell path
+### Update the shell path
 PATH=${PATH}:${STREAMIT_HOME}
 
 export STREAMIT_HOME CLASSPATH PATH
@@ -54,20 +54,20 @@ export STREAMIT_HOME CLASSPATH PATH
 
 	  <li>If you are using csh, add the following to your <b>.cshrc</b><br>
 	  <pre>
-###Location of unpacked StreamIt tree
+### Location of unpacked StreamIt tree
 setenv STREAMIT_HOME ${HOME}/streamit-src-2.1
 
-###Location of ANTLR jar  file(test: 'java antlr.tool')
+### Location of ANTLR jar  file(test: 'java antlr.tool')
 setenv ANTLRJAR      /usr/share/java/antlr.jar
 
-###Update CLASSPATH
+### Update CLASSPATH
 setenv CLASSPATH     .:${CLASSPATH}
 setenv CLASSPATH     ${CLASSPATH}:${ANTLRJAR}
 setenv CLASSPATH     ${CLASSPATH}:${STREAMIT_HOME}/src
 setenv CLASSPATH     ${CLASSPATH}:${STREAMIT_HOME}/3rdparty
 setenv CLASSPATH     ${CLASSPATH}:${STREAMIT_HOME}/3rdparty/JFlex/jflex.jar
 
-###Update the shell path
+### Update the shell path
 setenv PATH          ${PATH}:${STREAMIT_HOME}
 	  </pre>
 	</ul>
@@ -81,13 +81,13 @@ setenv PATH          ${PATH}:${STREAMIT_HOME}
 	<ul>
 	  <li>If you are using bash, add the following to your <b>.bashrc</b><br>
 	  <pre>
-###Location of StreamIt
+### Location of StreamIt
 STREAMIT_HOME=$HOME/streamit-2.1        
 
-###Update CLASSPATH
+### Update CLASSPATH
 CLASSPATH=.:${CLASSPATH}:${STREAMIT_HOME}/streamit.jar
 
-###Update the shell path
+### Update the shell path
 PATH=${PATH}:${STREAMIT_HOME}
 
 export STREAMIT_HOME CLASSPATH
@@ -95,13 +95,13 @@ export STREAMIT_HOME CLASSPATH
 
 	  <li>If you are using csh, add the following to your <b>.cshrc</b><br>
 	  <pre>
-###Location of StreamIt
+### Location of StreamIt
 setenv STREAMIT_HOME $HOME/streamit-2.1
 
-###Update CLASSPATH
+### Update CLASSPATH
 setenv CLASSPATH     .:${CLASSPATH}:${STREAMIT_HOME}/streamit.jar
 
-###Update the shell path
+### Update the shell path
 setenv PATH          ${PATH}:${STREAMIT_HOME}
 	  </pre>
 	</ul>
@@ -149,8 +149,8 @@ make
 	<ul>
 	  <pre>
 cd /tmp
-cp $STREAMIT_HOME/apps/examples/misc/hello/HelloWorld6.str .
-$STREAMIT_HOME/strc HelloWorld6.str
+cp $STREAMIT_HOME/apps/examples/misc/hello/HelloWorld.str .
+$STREAMIT_HOME/strc HelloWorld.str
 ./a.out -i10
 	  </pre>
       </ul>
