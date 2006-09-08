@@ -2,6 +2,11 @@
   <title>StreamIt - Quick Start Guide to the StreamIt Compiler</title>
 <!--#include virtual="../include/header-level1.inc"-->
 
+  <tr>
+    <td width="130" valign="top" align="left"></td>
+    <td width="20" valign="top" align="left"></td>
+    <td width="700" valign="top" align="left">
+
 <!-- NOTE: DO NOTE EDIT THE OPTIONS LIST BY HAND!  Generate it from
 options.tex in ../release (by typing "make").  The HTML here has just
 minor visual cleanups of the Latex-to-HTML conversion, plus a link to
@@ -13,7 +18,7 @@ script: </p>
 <pre>       <b>strc <font color="purple">foo.str</font></b></pre>
 reads <font color="purple">foo.str</font>, produces <font
  color="purple">foo.java</font> as an intermediate file, compiles this
-down to <font color="purple">foo.c</font>, and then compiles and links
+down to a number of C++ files, and then compiles and links
 this to produce a binary, <font color="purple">a.out</font>.<br>
 <p align="justify"> The <a
  href="http://cag.lcs.mit.edu/streamit/papers/streamit-cookbook.pdf">StreamIt
@@ -24,7 +29,6 @@ the compiler are also described below.<br>
 <h2>
 <hr>strc Command Line Options
 <hr></h2>
-<br>
 <dl compact="compact">
   <dt><b>--help</b></dt>
   <dd>Displays a summary of common options.<br>
@@ -183,5 +187,11 @@ simulator to estimate exactly when items will be produced
 and consumed. This improves the scheduling of routing instructions.</dd>
 </dl>
 <p></p>
+
+<!-- END CUT AND PASTE -->
+
+    </td>
+    <td width="150" valign="top" align="left"></td>
+  </tr>
 
 <!--#include virtual="../include/footer.inc"-->
