@@ -34,7 +34,7 @@
           Public License Version 2.0</a>.  </p>
         <ul>
           <li>
-            Download the <a href="../restricted/SDT_1.0.0.zip">StreamIt Development Tool, version 1.0.0</a>.
+            Download the <a href="../restricted/SDT_1.0.1.zip">StreamIt Development Tool, version 1.0.1</a>.
           </li>
         </ul>
 
@@ -44,11 +44,8 @@
               The SDT was thoroughly tested with 
               <a href="http://download2.eclipse.org/downloads/drops/R-2.1.1-200306271545/index.php">
                 Eclipse version 2.1.1</a> and
-              <a href="http://java.sun.com/j2se/1.4.2/download.html">Sun Java  2SE version 1.4.2</a> when originally released.
-	      It has not been updated for the StreamIt 2.1 release.
-<!--              If you  are using the IBM Java  Runtime Environment, you
-              may encounter some problems related to the processing of
-              XML files. -->
+              <a href="http://java.sun.com/javase/downloads/index.jsp">Sun Java
+	        2SE version 1.5.0</a>. It will not work with Eclipse version 3.x.
           </p></li>
           <li><p align="justify">
               The SDT also requires
@@ -60,7 +57,7 @@
         <h4><hr>Installation<hr></h4>
         <ul>
           <li><p  align="justify">   Before  installing  the  StreamIt
-	        Development Tool, make sure the Eclipse workbench is not
+	        Development Tool, make sure Eclipse is not
 	        running, then  extract the contents  of the distribution
 	        zip-file   to  the  root   directory  of   your  Eclipse
 	        installation.  For  example, if  your Eclipse SDK  is in
@@ -68,8 +65,7 @@
 	        distribution to <b>d:\</b>.
 	    </p></li>
 
-          <li>
-              You need to restart Eclipse. We recommend you verify
+          <li>We recommend you verify
               that the installation was successful as follows.
               <ul>
                 <li>From the main Eclipse window, click on "Window".
