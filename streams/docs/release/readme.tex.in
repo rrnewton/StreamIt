@@ -14,7 +14,7 @@
 % note: RELEASE_DATE resolved in Makefile
 This is for the RELEASE_DATE release of the StreamIt compiler and
 runtime system, version 2.1.\\
-\verb|$Id: readme.tex.in,v 1.24 2006-09-11 14:14:32 thies Exp $|
+\verb|$Id: readme.tex.in,v 1.25 2006-09-11 14:55:52 thies Exp $|
 
 \section{What is this?}
 
@@ -89,9 +89,6 @@ the following options to configure: \texttt{--enable-shared --enable-type-prefix
 While this is not a a dependency, the \texttt{graphviz} package from
 \url{http://www.graphviz.org} contains a viewer, \texttt{dotty}, that
 will display the dot files created by the StreamIt compiler.
-\texttt{ZGRViewer}, from
-\url{http://zvtm.sourceforge.net/zgrviewer.html} should also work for
-displaying dot files.
 
 \section{Caveats}
 
