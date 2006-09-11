@@ -52,10 +52,6 @@ Perform extended optimizations that should improve performance in
 most cases, but may also cause the compiler to become unstable.
 Adds \texttt{--unroll 256 --destroyfieldarray --partition --wbs --macros}.
 
-\item[-{}-asciifileio]
-Specifies that FileReader's and FileWriter's should use ASCII format
-rather than binary.
-
 \item [-{}-iterations \metavar{n}, -i\metavar{n}]
 Run the program for \metavar{n} steady-state iterations. Defaults to
 infinity.  For the uniprocessor, cluster, and simpleC backends, the
@@ -104,6 +100,10 @@ paper.  (Relies on FFTW installation.)
 
 \subsection*{Options specific to Raw backend}
 \begin{description}
+\item[-{}-asciifileio]
+Specifies that FileReader's and FileWriter's should use ASCII format
+rather than binary.  Also works under the \texttt{--simpleC} backend.
+
 \item [-{}-numbers \metavar{n}, -N\metavar{n}]
 Instrument code to gather performance statistics on simulated code
 over \metavar{n} steady-state cycles. The results are placed in

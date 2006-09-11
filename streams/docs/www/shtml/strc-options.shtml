@@ -94,12 +94,6 @@ most cases, but may also cause the compiler to become unstable.
 Adds <tt>--unroll 256 --destroyfieldarray --partition --wbs --macros</tt>.<br>
     <br>
   </dd>
-  <dt><b>--asciifileio</b></dt>
-  <dd>Specifies that FileReader's and FileWriter's should use ASCII
-format
-rather than binary.<br>
-    <br>
-  </dd>
   <dt><b>--iterations &lt;<em>n</em>&gt;, -i&lt;<em>n</em>&gt;</b></dt>
   <dd>Run the program for &lt;<em>n</em>&gt; steady-state iterations.
 Defaults to
@@ -162,6 +156,12 @@ paper. (Relies on FFTW installation.)</dd>
 <h3>Options specific to Raw backend</h3>
 <!--SEC END -->
 <dl compact="compact">
+  <dt><b>--asciifileio</b></dt>
+  <dd>Specifies that FileReader's and FileWriter's should use ASCII
+format
+rather than binary.  Also works under the <tt>--simpleC</tt> backend.<br>
+    <br>
+  </dd>
   <dt><b>--numbers &lt;<em>n</em>&gt;, -N&lt;<em>n</em>&gt;</b></dt>
   <dd>Instrument code to gather performance statistics on simulated
 code
