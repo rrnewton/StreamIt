@@ -8,23 +8,47 @@
     <td width="700" valign="top" align="left">
       <hr>
       <p align="justify">
+      
+	<h2>StreamIt 2.1 (Recommended Download)</h2>
+<table width=100% border=1>
+<tr>
+<td><b>File</b></td>
+<td><b>Size</b></td>
+<td><b>Description</b></td>
+</tr
 
-	<p><b>StreamIt 2.1 (Stable Public Release).</b>  September, 2006.<br>
-Download: [<a href="streamit-2.1.tar.gz">binary</a> .tar.gz]&nbsp; [<a href="streamit-src-2.1.tar.gz">source</a> .tar.gz]
+<tr>
+<td><a href="streamit-2.1.tar.gz">streamit-2.1.tar.gz</a></td>
+<td>25 MB</td>
+<td>Binary distribution</td>
+</tr>
+
+<tr>
+<td><a href="streamit-src-2.1.tar.gz">streamit-src-2.1.tar.gz</a></td>
+<td>29 MB</td>
+<td>Source distribution</td>
+</tr>
+
+<tr>
+<td><a href="streamit-vmware-appliance.zip">streamit-vmware-appliance.zip</a></td>
+<td>1.8 GB</td>
+<td>StreamIt pre-installed on Fedora Core 5, requires free <a href="http://www.vmware.com/products/player/">VMWare player</a></td>
+</tr>
+</table>
 
        <!-- Keep in synch with ../../release/news.tex.in -->
-	<p><i>Recommended download</i>.  This release has new features,
-        bug fixes, and possibly new bugs compared to the initial
-        public release.  Major features are as follows, please <a
-        href="mailto:streamit@cag.lcs.mit.edu">contact us</a> if you
-        have any questions:
+	<p>This release (September, 2006) offers new features and
+	improved robustness over the initial public release.  Major
+	features are as follows, please <a
+	href="mailto:streamit@cag.lcs.mit.edu">contact us</a> if you
+	have any questions:
 
 	<ul>
 	<p><li> Multi-threaded backend for multicores and clusters of workstations.
 	<li> Support for dynamic rates and teleport messaging.
 	<li> Faster uniprocessor implementation (up to 2X).
 	<li> Faster and more memory-efficient Java library (up to 10X).
-	<li>  MPEG-2 and JPEG applications (limited compiler support; full support in Java library).
+	<li> New benchmarks, including MPEG-2 (limited compiler support; full support in Java library).
 	<li> Snapshot of cache optimizations and linear statespace analysis.
 
 	</ul>
@@ -57,7 +81,7 @@ Download: [<a href="streamit-2.1.tar.gz">binary</a> .tar.gz]&nbsp; [<a href="str
 	 Java Compiler.
         </p>
 
-        <p><li><b>StreamIt 2.0 (Stable Public Release)</b>. October 20, 2003.<br>
+        <p><li><b>StreamIt 2.0</b>. October 20, 2003.<br>
 	&nbsp; &nbsp; Download: [<a href="streamit-2.0.tar.gz">binary</a> .tar.gz]&nbsp; [<a href="streamit-src-2.0.tar.gz">source</a> .tar.gz]
 <!--
       <p><li>
