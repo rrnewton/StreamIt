@@ -9,7 +9,7 @@
 % note: RELEASE_DATE resolved in Makefile
 This is for the RELEASE_DATE release of the StreamIt compiler and
 runtime system, version 2.1.\\
-\verb|$Id: news.tex.in,v 1.9 2006-09-06 07:35:38 thies Exp $|
+\verb|$Id: news.tex.in,v 1.10 2006-09-11 20:06:53 thies Exp $|
 
 \section*{streamit-2.1}
 
@@ -20,10 +20,9 @@ runtime system, version 2.1.\\
 \item Snapshot release of internal infrastructure (September 2006).
 This snapshot has new features, bug fixes, and possibly new bugs
 compared to the initial public release.  Major features are as
-follows, please contact us if you have any questions:
-
-\begin{itemize}
-\item Multi-threaded backend for multicores and clusters of workstations.
+follows, please contact us if you have any 
+% written like this to avoid weird spacing in converting to plain text with hevea
+questions:\begin{itemize}\item Multi-threaded backend for multicores and clusters of workstations.
 \item Support for dynamic rates and teleport messaging.
 \item Faster uniprocessor implementation (up to 2X).
 \item Faster and more memory-efficient Java library (up to 10X).		      
