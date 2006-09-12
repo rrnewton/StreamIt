@@ -1,6 +1,10 @@
 <!-- NOTE: DO NOTE EDIT THE LIST OF BENCHMARKS LIST BY HAND!  Grab
 the apps/benchmarks.html file from the release bundle and cut and paste
 it in where indicated.
+
+HOWEVER, be careful when publishing -- I had to adjust the relative
+directory references for the links to actually point to the benchmark
+files under /home/public/streamit.
 -->
 
 <!--#include virtual="../include/init.inc"-->
@@ -36,12 +40,12 @@ it in where indicated.
 </tr>
     
 <tr>
-<td align="left" valign="top"><b>C</b></td><td align="left" valign="top"><a href="././benchmarks/audiobeam/c/optimized.c">optimized.c</a> (Hand-coded and optimized C version.)<br>
+<td align="left" valign="top"><b>C</b></td><td align="left" valign="top"><a href="../apps/benchmarks/audiobeam/c/optimized.c">optimized.c</a> (Hand-coded and optimized C version.)<br>
 </td>
 </tr>
     
 <tr>
-<td align="left" valign="top"><b>StreamIt</b></td><td align="left" valign="top"><a href="././benchmarks/audiobeam/streamit/Audiobeam.str">Audiobeam.str</a> <a href="././benchmarks/audiobeam/streamit/../data/str-data/near-field/data2.bin">data2.bin</a> (StreamIt benchmark as described above.)<br>
+<td align="left" valign="top"><b>StreamIt</b></td><td align="left" valign="top"><a href="../apps/benchmarks/audiobeam/streamit/Audiobeam.str">Audiobeam.str</a> <a href="../apps/benchmarks/audiobeam/streamit/../data/str-data/near-field/data2.bin">data2.bin</a> (StreamIt benchmark as described above.)<br>
 </td>
 </tr>
   
@@ -85,12 +89,12 @@ causes the I/O rates of the filters to be much larger.
     
     
 <tr>
-<td align="left" valign="top"><b>StreamIt</b></td><td align="left" valign="top"><a href="././benchmarks/beamformer/streamit/BeamFormer.str">BeamFormer.str</a> (StreamIt benchmark as described above, with parallel outputs.)<br>
+<td align="left" valign="top"><b>StreamIt</b></td><td align="left" valign="top"><a href="../apps/benchmarks/beamformer/streamit/BeamFormer.str">BeamFormer.str</a> (StreamIt benchmark as described above, with parallel outputs.)<br>
 </td>
 </tr>
     
 <tr>
-<td align="left" valign="top"><b>StreamIt</b></td><td align="left" valign="top"><a href="././benchmarks/beamformer/streamit/SerializedBeamFormer.str">SerializedBeamFormer.str</a> (StreamIt benchmark as described above, with deterministic output ordering.)<br>
+<td align="left" valign="top"><b>StreamIt</b></td><td align="left" valign="top"><a href="../apps/benchmarks/beamformer/streamit/SerializedBeamFormer.str">SerializedBeamFormer.str</a> (StreamIt benchmark as described above, with deterministic output ordering.)<br>
 </td>
 </tr>
   
@@ -125,18 +129,18 @@ causes the I/O rates of the filters to be much larger.
 </tr>
     
 <tr>
-<td align="left" valign="top"><b>C</b></td><td align="left" valign="top"><a href="././benchmarks/bitonic-sort/c/bitonic.c">bitonic.c</a> ((Hand-coded C version.))<br>
+<td align="left" valign="top"><b>C</b></td><td align="left" valign="top"><a href="../apps/benchmarks/bitonic-sort/c/bitonic.c">bitonic.c</a> ((Hand-coded C version.))<br>
 </td>
 </tr>
 
     
 <tr>
-<td align="left" valign="top"><b>StreamIt</b></td><td align="left" valign="top"><a href="././benchmarks/bitonic-sort/streamit/BitonicSort.str">BitonicSort.str</a> (StreamIt benchmark as described above.)<br>
+<td align="left" valign="top"><b>StreamIt</b></td><td align="left" valign="top"><a href="../apps/benchmarks/bitonic-sort/streamit/BitonicSort.str">BitonicSort.str</a> (StreamIt benchmark as described above.)<br>
 </td>
 </tr>
     
 <tr>
-<td align="left" valign="top"><b>StreamIt</b></td><td align="left" valign="top"><a href="././benchmarks/bitonic-sort/streamit/BitonicSortRecursive.str">BitonicSortRecursive.str</a> (Recursive implementation.)<br>
+<td align="left" valign="top"><b>StreamIt</b></td><td align="left" valign="top"><a href="../apps/benchmarks/bitonic-sort/streamit/BitonicSortRecursive.str">BitonicSortRecursive.str</a> (Recursive implementation.)<br>
 </td>
 </tr>
   
@@ -173,7 +177,7 @@ can be found in Appendix A of the MPEG-2 specification (ISO/IEC
 </tr>
     
 <tr>
-<td align="left" valign="top"><b>StreamIt</b></td><td align="left" valign="top"><a href="././benchmarks/dct_ieee/streamit/DCT.str">DCT.str</a> (Contains a library of DCT and iDCT implementations.  There are
+<td align="left" valign="top"><b>StreamIt</b></td><td align="left" valign="top"><a href="../apps/benchmarks/dct_ieee/streamit/DCT.str">DCT.str</a> (Contains a library of DCT and iDCT implementations.  There are
       two versions of iDCT: a reference version (based on the C
       reference code for MPEG) and a fast version (an integer iDCT
       that uses bit-twiddling, but does not have the floating point
@@ -212,7 +216,7 @@ can be found in Appendix A of the MPEG-2 specification (ISO/IEC
 </tr>
     
 <tr>
-<td align="left" valign="top"><b>StreamIt</b></td><td align="left" valign="top"><a href="././benchmarks/des/streamit/DES.str">DES.str</a> <a href="././benchmarks/des/streamit/Sboxes.str">Sboxes.str</a> <a href="././benchmarks/des/streamit/Utils.str">Utils.str</a> <a href="././benchmarks/des/streamit/Keys.str">Keys.str</a> <a href="././benchmarks/des/streamit/Source.str">Source.str</a> <a href="././benchmarks/des/streamit/Statics.str">Statics.str</a> <a href="././benchmarks/des/streamit/../output/output.txt">output.txt</a> (StreamIt benchmark as described above.)<br>
+<td align="left" valign="top"><b>StreamIt</b></td><td align="left" valign="top"><a href="../apps/benchmarks/des/streamit/DES.str">DES.str</a> <a href="../apps/benchmarks/des/streamit/Sboxes.str">Sboxes.str</a> <a href="../apps/benchmarks/des/streamit/Utils.str">Utils.str</a> <a href="../apps/benchmarks/des/streamit/Keys.str">Keys.str</a> <a href="../apps/benchmarks/des/streamit/Source.str">Source.str</a> <a href="../apps/benchmarks/des/streamit/Statics.str">Statics.str</a> <a href="../apps/benchmarks/des/streamit/../output/output.txt">output.txt</a> (StreamIt benchmark as described above.)<br>
 </td>
 </tr>
   
@@ -246,32 +250,32 @@ can be found in Appendix A of the MPEG-2 specification (ISO/IEC
 </tr>
     
 <tr>
-<td align="left" valign="top"><b>C</b></td><td align="left" valign="top"><a href="././benchmarks/fft/c/fft2/driver.c">driver.c</a> <a href="././benchmarks/fft/c/fft2/fft.c">fft.c</a> (Reference implementation for FFT2.)<br>
+<td align="left" valign="top"><b>C</b></td><td align="left" valign="top"><a href="../apps/benchmarks/fft/c/fft2/driver.c">driver.c</a> <a href="../apps/benchmarks/fft/c/fft2/fft.c">fft.c</a> (Reference implementation for FFT2.)<br>
 </td>
 </tr>
     
 <tr>
-<td align="left" valign="top"><b>C</b></td><td align="left" valign="top"><a href="././benchmarks/fft/c/fft3/driver.c">driver.c</a> <a href="././benchmarks/fft/c/fft3/fft.c">fft.c</a> (Reference implementation for FFT3.)<br>
+<td align="left" valign="top"><b>C</b></td><td align="left" valign="top"><a href="../apps/benchmarks/fft/c/fft3/driver.c">driver.c</a> <a href="../apps/benchmarks/fft/c/fft3/fft.c">fft.c</a> (Reference implementation for FFT3.)<br>
 </td>
 </tr>
     
 <tr>
-<td align="left" valign="top"><b>StreamIt</b></td><td align="left" valign="top"><a href="././benchmarks/fft/streamit/FFT2.str">FFT2.str</a> (Blocked, coarse-grained version for use as a benchmark.  Conceptually it is a single pipeline, but the main path is duplicated into a splitjoin to expose parallelism.  Inputs in natural order, outputs in natural order.  This is the version that we typically use for benchmarking.)<br>
+<td align="left" valign="top"><b>StreamIt</b></td><td align="left" valign="top"><a href="../apps/benchmarks/fft/streamit/FFT2.str">FFT2.str</a> (Blocked, coarse-grained version for use as a benchmark.  Conceptually it is a single pipeline, but the main path is duplicated into a splitjoin to expose parallelism.  Inputs in natural order, outputs in natural order.  This is the version that we typically use for benchmarking.)<br>
 </td>
 </tr>
     
 <tr>
-<td align="left" valign="top"><b>StreamIt</b></td><td align="left" valign="top"><a href="././benchmarks/fft/streamit/FFT3.str">FFT3.str</a> (More fine-grained than FFT2.  Inputs in natural order, outputs in bit-reversed order (does NOT include bit-reversal stage).)<br>
+<td align="left" valign="top"><b>StreamIt</b></td><td align="left" valign="top"><a href="../apps/benchmarks/fft/streamit/FFT3.str">FFT3.str</a> (More fine-grained than FFT2.  Inputs in natural order, outputs in bit-reversed order (does NOT include bit-reversal stage).)<br>
 </td>
 </tr>
     
 <tr>
-<td align="left" valign="top"><b>StreamIt</b></td><td align="left" valign="top"><a href="././benchmarks/fft/streamit/FFT4.str">FFT4.str</a> (More fine-grained than FFT3.  Derived from original example in CC'02 paper, and intended only to demonstrate language features (has dummy weights; does not compute real FFT).  Inputs in bit-reversed order, outputs in natural order (does NOT include bit-reversal stage).)<br>
+<td align="left" valign="top"><b>StreamIt</b></td><td align="left" valign="top"><a href="../apps/benchmarks/fft/streamit/FFT4.str">FFT4.str</a> (More fine-grained than FFT3.  Derived from original example in CC'02 paper, and intended only to demonstrate language features (has dummy weights; does not compute real FFT).  Inputs in bit-reversed order, outputs in natural order (does NOT include bit-reversal stage).)<br>
 </td>
 </tr>
     
 <tr>
-<td align="left" valign="top"><b>StreamIt</b></td><td align="left" valign="top"><a href="././benchmarks/fft/streamit/FFT5.str">FFT5.str</a> (Fine-grained version, more elegant than FFT4.  Inputs in natural order, outputs in natural order.)<br>
+<td align="left" valign="top"><b>StreamIt</b></td><td align="left" valign="top"><a href="../apps/benchmarks/fft/streamit/FFT5.str">FFT5.str</a> (Fine-grained version, more elegant than FFT4.  Inputs in natural order, outputs in natural order.)<br>
 </td>
 </tr>
     
@@ -306,11 +310,11 @@ performed, followed by an upsample, delay, and filter.
 </tr>
     
 <tr>
-<td align="left" valign="top"><b>C</b></td><td align="left" valign="top"><a href="././benchmarks/filterbank/c/filterbank.c">filterbank.c</a> </td>
+<td align="left" valign="top"><b>C</b></td><td align="left" valign="top"><a href="../apps/benchmarks/filterbank/c/filterbank.c">filterbank.c</a> </td>
 </tr>
     
 <tr>
-<td align="left" valign="top"><b>StreamIt</b></td><td align="left" valign="top"><a href="././benchmarks/filterbank/streamit/FilterBankNew.str">FilterBankNew.str</a> </td>
+<td align="left" valign="top"><b>StreamIt</b></td><td align="left" valign="top"><a href="../apps/benchmarks/filterbank/streamit/FilterBankNew.str">FilterBankNew.str</a> </td>
 </tr>
   
 </tbody>
@@ -342,11 +346,11 @@ filter is in turn the difference of a pair of low-pass filters.
 </tr>
     
 <tr>
-<td align="left" valign="top"><b>C</b></td><td align="left" valign="top"><a href="././benchmarks/fm/c/fmref.c">fmref.c</a> </td>
+<td align="left" valign="top"><b>C</b></td><td align="left" valign="top"><a href="../apps/benchmarks/fm/c/fmref.c">fmref.c</a> </td>
 </tr>
     
 <tr>
-<td align="left" valign="top"><b>StreamIt</b></td><td align="left" valign="top"><a href="././benchmarks/fm/streamit/FMRadio.str">FMRadio.str</a> </td>
+<td align="left" valign="top"><b>StreamIt</b></td><td align="left" valign="top"><a href="../apps/benchmarks/fm/streamit/FMRadio.str">FMRadio.str</a> </td>
 </tr>
   
 </tbody>
@@ -378,11 +382,11 @@ again to get the final result matrix.
 </tr>
     
 <tr>
-<td align="left" valign="top"><b>C</b></td><td align="left" valign="top"><a href="././benchmarks/matmul-block/c/matmul-block.c">matmul-block.c</a> </td>
+<td align="left" valign="top"><b>C</b></td><td align="left" valign="top"><a href="../apps/benchmarks/matmul-block/c/matmul-block.c">matmul-block.c</a> </td>
 </tr>
     
 <tr>
-<td align="left" valign="top"><b>StreamIt</b></td><td align="left" valign="top"><a href="././benchmarks/matmul-block/streamit/MatrixMultBlock.str">MatrixMultBlock.str</a> </td>
+<td align="left" valign="top"><b>StreamIt</b></td><td align="left" valign="top"><a href="../apps/benchmarks/matmul-block/streamit/MatrixMultBlock.str">MatrixMultBlock.str</a> </td>
 </tr>
   
 </tbody>
@@ -417,7 +421,7 @@ StreamIt compiler does support dynamic rates).
 
     
 <tr>
-<td align="left" valign="top"><b>StreamIt</b></td><td align="left" valign="top"><a href="././benchmarks/mp3decoder/MP3.str">MP3.str</a> <a href="././benchmarks/mp3decoder/Blur.float.raw.portion">Blur.float.raw.portion</a> </td>
+<td align="left" valign="top"><b>StreamIt</b></td><td align="left" valign="top"><a href="../apps/benchmarks/mp3decoder/MP3.str">MP3.str</a> <a href="../apps/benchmarks/mp3decoder/Blur.float.raw.portion">Blur.float.raw.portion</a> </td>
 </tr>
   
 </tbody>
@@ -451,7 +455,7 @@ interpolation (see noted text, Section 4.5).
     
     
 <tr>
-<td align="left" valign="top"><b>StreamIt</b></td><td align="left" valign="top"><a href="././benchmarks/sar/streamit/SAR.str">SAR.str</a> <a href="././benchmarks/sar/streamit/genRawSAR.str">genRawSAR.str</a> <a href="././benchmarks/sar/streamit/FFT.str">FFT.str</a> <a href="././benchmarks/sar/streamit/Statics.str">Statics.str</a> <a href="././benchmarks/sar/streamit/Utils.str">Utils.str</a> <a href="././benchmarks/sar/streamit/../output/image">image</a> </td>
+<td align="left" valign="top"><b>StreamIt</b></td><td align="left" valign="top"><a href="../apps/benchmarks/sar/streamit/SAR.str">SAR.str</a> <a href="../apps/benchmarks/sar/streamit/genRawSAR.str">genRawSAR.str</a> <a href="../apps/benchmarks/sar/streamit/FFT.str">FFT.str</a> <a href="../apps/benchmarks/sar/streamit/Statics.str">Statics.str</a> <a href="../apps/benchmarks/sar/streamit/Utils.str">Utils.str</a> <a href="../apps/benchmarks/sar/streamit/../output/image.txt">image.txt</a> </td>
 </tr>
   
 </tbody>
@@ -481,7 +485,7 @@ interpolation (see noted text, Section 4.5).
     
     
 <tr>
-<td align="left" valign="top"><b>StreamIt</b></td><td align="left" valign="top"><a href="././benchmarks/serpent/streamit/Serpent.str">Serpent.str</a> <a href="././benchmarks/serpent/streamit/Source.str">Source.str</a> <a href="././benchmarks/serpent/streamit/Keys.str">Keys.str</a> <a href="././benchmarks/serpent/streamit/L.str">L.str</a> <a href="././benchmarks/serpent/streamit/Utils.str">Utils.str</a> <a href="././benchmarks/serpent/streamit/Statics.str">Statics.str</a> <a href="././benchmarks/serpent/streamit/../output/output.txt">output.txt</a> </td>
+<td align="left" valign="top"><b>StreamIt</b></td><td align="left" valign="top"><a href="../apps/benchmarks/serpent/streamit/Serpent.str">Serpent.str</a> <a href="../apps/benchmarks/serpent/streamit/Source.str">Source.str</a> <a href="../apps/benchmarks/serpent/streamit/Keys.str">Keys.str</a> <a href="../apps/benchmarks/serpent/streamit/L.str">L.str</a> <a href="../apps/benchmarks/serpent/streamit/Utils.str">Utils.str</a> <a href="../apps/benchmarks/serpent/streamit/Statics.str">Statics.str</a> <a href="../apps/benchmarks/serpent/streamit/../output/output.txt">output.txt</a> </td>
 </tr>
   
 </tbody>
@@ -512,7 +516,7 @@ Target Indiciator) application using the "Small" input dataset.
     
     
 <tr>
-<td align="left" valign="top"><b>StreamIt</b></td><td align="left" valign="top"><a href="././benchmarks/tde/streamit/tde_pp.str">tde_pp.str</a> (Pipeline-parallel version of the application that is a more natural
+<td align="left" valign="top"><b>StreamIt</b></td><td align="left" valign="top"><a href="../apps/benchmarks/tde/streamit/tde_pp.str">tde_pp.str</a> (Pipeline-parallel version of the application that is a more natural
 fit to StreamIt.  There is some data-parallelism available by setting
 parameters in tde_pp.str, which allows us to increase the number of
 filters for use in performance studies.  This version canonicalizes
@@ -552,7 +556,7 @@ the order of the output data.)<br>
 </tr>  
     
 <tr>
-<td align="left" valign="top"><b>StreamIt</b></td><td align="left" valign="top"><a href="././examples/sorts/BatcherSort/BatcherSort.str">BatcherSort.str</a> </td>
+<td align="left" valign="top"><b>StreamIt</b></td><td align="left" valign="top"><a href="../apps/examples/sorts/BatcherSort/BatcherSort.str">BatcherSort.str</a> </td>
 </tr>
   
 </tbody>
@@ -586,7 +590,7 @@ the order of the output data.)<br>
 </tr>  
     
 <tr>
-<td align="left" valign="top"><b>StreamIt</b></td><td align="left" valign="top"><a href="././examples/sorts/BubbleSort/BubbleSort.str">BubbleSort.str</a> </td>
+<td align="left" valign="top"><b>StreamIt</b></td><td align="left" valign="top"><a href="../apps/examples/sorts/BubbleSort/BubbleSort.str">BubbleSort.str</a> </td>
 </tr>   
   
 </tbody>
@@ -617,7 +621,7 @@ the order of the output data.)<br>
 </tr>  
     
 <tr>
-<td align="left" valign="top"><b>StreamIt</b></td><td align="left" valign="top"><a href="././examples/sorts/ComparisonCounting/ComparisonCounting.str">ComparisonCounting.str</a> </td>
+<td align="left" valign="top"><b>StreamIt</b></td><td align="left" valign="top"><a href="../apps/examples/sorts/ComparisonCounting/ComparisonCounting.str">ComparisonCounting.str</a> </td>
 </tr>   
   
 </tbody>
@@ -649,7 +653,7 @@ the order of the output data.)<br>
 </tr>  
     
 <tr>
-<td align="left" valign="top"><b>StreamIt</b></td><td align="left" valign="top"><a href="././examples/sorts/InsertionSort/InsertionSort.str">InsertionSort.str</a> </td>
+<td align="left" valign="top"><b>StreamIt</b></td><td align="left" valign="top"><a href="../apps/examples/sorts/InsertionSort/InsertionSort.str">InsertionSort.str</a> </td>
 </tr>   
   
 </tbody>
@@ -683,7 +687,7 @@ the order of the output data.)<br>
 </tr>  
     
 <tr>
-<td align="left" valign="top"><b>StreamIt</b></td><td align="left" valign="top"><a href="././examples/sorts/MergeSort/MergeSort.str">MergeSort.str</a> </td>
+<td align="left" valign="top"><b>StreamIt</b></td><td align="left" valign="top"><a href="../apps/examples/sorts/MergeSort/MergeSort.str">MergeSort.str</a> </td>
 </tr>   
   
 </tbody>
@@ -716,7 +720,7 @@ the order of the output data.)<br>
 </tr>  
     
 <tr>
-<td align="left" valign="top"><b>StreamIt</b></td><td align="left" valign="top"><a href="././examples/sorts/RadixSort/RadixSort.str">RadixSort.str</a> </td>
+<td align="left" valign="top"><b>StreamIt</b></td><td align="left" valign="top"><a href="../apps/examples/sorts/RadixSort/RadixSort.str">RadixSort.str</a> </td>
 </tr>   
   
 </tbody>
@@ -751,7 +755,7 @@ autocorrelation series for a specified number of lags.
 </tr>
     
 <tr>
-<td align="left" valign="top"><b>StreamIt</b></td><td align="left" valign="top"><a href="././examples/misc/autocor/AutoCor.str">AutoCor.str</a> </td>
+<td align="left" valign="top"><b>StreamIt</b></td><td align="left" valign="top"><a href="../apps/examples/misc/autocor/AutoCor.str">AutoCor.str</a> </td>
 </tr>
   
 </tbody>
@@ -781,7 +785,7 @@ to push N initial items before passing input to output.
 </tr>
     
 <tr>
-<td align="left" valign="top"><b>StreamIt</b></td><td align="left" valign="top"><a href="././examples/misc/delay/DelayTest.str">DelayTest.str</a> </td>
+<td align="left" valign="top"><b>StreamIt</b></td><td align="left" valign="top"><a href="../apps/examples/misc/delay/DelayTest.str">DelayTest.str</a> </td>
 </tr>
   
 </tbody>
@@ -812,17 +816,17 @@ calculated.
 </tr>
     
 <tr>
-<td align="left" valign="top"><b>StreamIt</b></td><td align="left" valign="top"><a href="././examples/misc/fib/Fib.str">Fib.str</a> (Basic implementation.)<br>
+<td align="left" valign="top"><b>StreamIt</b></td><td align="left" valign="top"><a href="../apps/examples/misc/fib/Fib.str">Fib.str</a> (Basic implementation.)<br>
 </td>
 </tr>
     
 <tr>
-<td align="left" valign="top"><b>StreamIt</b></td><td align="left" valign="top"><a href="././examples/misc/fib/FibFeed.str">FibFeed.str</a> (As before, but with a top-level feedback loop.)<br>
+<td align="left" valign="top"><b>StreamIt</b></td><td align="left" valign="top"><a href="../apps/examples/misc/fib/FibFeed.str">FibFeed.str</a> (As before, but with a top-level feedback loop.)<br>
 </td>
 </tr>
     
 <tr>
-<td align="left" valign="top"><b>StreamIt</b></td><td align="left" valign="top"><a href="././examples/misc/fib/Fib2.str">Fib2.str</a> (With a round-robin splitter and no peeking.)<br>
+<td align="left" valign="top"><b>StreamIt</b></td><td align="left" valign="top"><a href="../apps/examples/misc/fib/Fib2.str">Fib2.str</a> (With a round-robin splitter and no peeking.)<br>
 </td>
 </tr>
   
@@ -854,7 +858,7 @@ float.test in binary form.
 </tr>
     
 <tr>
-<td align="left" valign="top"><b>StreamIt</b></td><td align="left" valign="top"><a href="././examples/misc/file/FileTest.str">FileTest.str</a> </td>
+<td align="left" valign="top"><b>StreamIt</b></td><td align="left" valign="top"><a href="../apps/examples/misc/file/FileTest.str">FileTest.str</a> </td>
 </tr>
   
 </tbody>
@@ -885,7 +889,7 @@ an increasing sequence of numbers, the second prints this sequence.
 </tr>
     
 <tr>
-<td align="left" valign="top"><b>StreamIt</b></td><td align="left" valign="top"><a href="././examples/misc/hello/HelloWorld.str">HelloWorld.str</a> </td>
+<td align="left" valign="top"><b>StreamIt</b></td><td align="left" valign="top"><a href="../apps/examples/misc/hello/HelloWorld.str">HelloWorld.str</a> </td>
 </tr>
   
 </tbody>
@@ -918,7 +922,7 @@ by one element.
 </tr>
     
 <tr>
-<td align="left" valign="top"><b>StreamIt</b></td><td align="left" valign="top"><a href="././examples/misc/lattice/Lattice.str">Lattice.str</a> </td>
+<td align="left" valign="top"><b>StreamIt</b></td><td align="left" valign="top"><a href="../apps/examples/misc/lattice/Lattice.str">Lattice.str</a> </td>
 </tr>
   
 </tbody>
@@ -950,11 +954,11 @@ result matrix.
 </tr>
     
 <tr>
-<td align="left" valign="top"><b>C</b></td><td align="left" valign="top"><a href="././examples/misc/matrixmult/matrix.c">matrix.c</a> </td>
+<td align="left" valign="top"><b>C</b></td><td align="left" valign="top"><a href="../apps/examples/misc/matrixmult/matrix.c">matrix.c</a> </td>
 </tr>
     
 <tr>
-<td align="left" valign="top"><b>StreamIt</b></td><td align="left" valign="top"><a href="././examples/misc/matrixmult/MatrixMult.str">MatrixMult.str</a> </td>
+<td align="left" valign="top"><b>StreamIt</b></td><td align="left" valign="top"><a href="../apps/examples/misc/matrixmult/MatrixMult.str">MatrixMult.str</a> </td>
 </tr>
   
 </tbody>
@@ -987,7 +991,7 @@ doing an elementwise add on the output.
 </tr>
     
 <tr>
-<td align="left" valign="top"><b>StreamIt</b></td><td align="left" valign="top"><a href="././examples/misc/vectadd/VectAdd.str">VectAdd.str</a> (Generate two input vectors and add them)<br>
+<td align="left" valign="top"><b>StreamIt</b></td><td align="left" valign="top"><a href="../apps/examples/misc/vectadd/VectAdd.str">VectAdd.str</a> (Generate two input vectors and add them)<br>
 </td>
 </tr>
   
@@ -1018,42 +1022,42 @@ These are the examples in the StreamIt Cookbook.
 </tr>
     
 <tr>
-<td align="left" valign="top"><b>StreamIt</b></td><td align="left" valign="top"><a href="././examples/cookbook/Minimal.str">Minimal.str</a> (Minimal program, section 2.1)<br>
+<td align="left" valign="top"><b>StreamIt</b></td><td align="left" valign="top"><a href="../apps/examples/cookbook/Minimal.str">Minimal.str</a> (Minimal program, section 2.1)<br>
 </td>
 </tr>
     
 <tr>
-<td align="left" valign="top"><b>StreamIt</b></td><td align="left" valign="top"><a href="././examples/cookbook/MovingAverage.str">MovingAverage.str</a> (Moving average filter, section 2.2)<br>
+<td align="left" valign="top"><b>StreamIt</b></td><td align="left" valign="top"><a href="../apps/examples/cookbook/MovingAverage.str">MovingAverage.str</a> (Moving average filter, section 2.2)<br>
 </td>
 </tr>
     
 <tr>
-<td align="left" valign="top"><b>StreamIt</b></td><td align="left" valign="top"><a href="././examples/cookbook/LPFProgram.str">LPFProgram.str</a> (Low-pass filter, section 2.3)<br>
+<td align="left" valign="top"><b>StreamIt</b></td><td align="left" valign="top"><a href="../apps/examples/cookbook/LPFProgram.str">LPFProgram.str</a> (Low-pass filter, section 2.3)<br>
 </td>
 </tr>
     
 <tr>
-<td align="left" valign="top"><b>StreamIt</b></td><td align="left" valign="top"><a href="././examples/cookbook/BPFProgram.str">BPFProgram.str</a> (Band-pass filter, section 2.4)<br>
+<td align="left" valign="top"><b>StreamIt</b></td><td align="left" valign="top"><a href="../apps/examples/cookbook/BPFProgram.str">BPFProgram.str</a> (Band-pass filter, section 2.4)<br>
 </td>
 </tr>
     
 <tr>
-<td align="left" valign="top"><b>StreamIt</b></td><td align="left" valign="top"><a href="././examples/cookbook/EqualizerProgram.str">EqualizerProgram.str</a> (Equalizer, section 2.5)<br>
+<td align="left" valign="top"><b>StreamIt</b></td><td align="left" valign="top"><a href="../apps/examples/cookbook/EqualizerProgram.str">EqualizerProgram.str</a> (Equalizer, section 2.5)<br>
 </td>
 </tr>
     
 <tr>
-<td align="left" valign="top"><b>StreamIt</b></td><td align="left" valign="top"><a href="././examples/cookbook/EchoProgram.str">EchoProgram.str</a> (Echo effect, section 2.6)<br>
+<td align="left" valign="top"><b>StreamIt</b></td><td align="left" valign="top"><a href="../apps/examples/cookbook/EchoProgram.str">EchoProgram.str</a> (Echo effect, section 2.6)<br>
 </td>
 </tr>
     
 <tr>
-<td align="left" valign="top"><b>StreamIt</b></td><td align="left" valign="top"><a href="././examples/cookbook/FibProgram.str">FibProgram.str</a> (Fibonacci number generator, section 2.7)<br>
+<td align="left" valign="top"><b>StreamIt</b></td><td align="left" valign="top"><a href="../apps/examples/cookbook/FibProgram.str">FibProgram.str</a> (Fibonacci number generator, section 2.7)<br>
 </td>
 </tr>
     
 <tr>
-<td align="left" valign="top"><b>StreamIt</b></td><td align="left" valign="top"><a href="././examples/cookbook/FMRadio.str">FMRadio.str</a> (FMRadio with equalizer, section 3)<br>
+<td align="left" valign="top"><b>StreamIt</b></td><td align="left" valign="top"><a href="../apps/examples/cookbook/FMRadio.str">FMRadio.str</a> (FMRadio with equalizer, section 3)<br>
 </td>
 </tr>
   
@@ -1091,12 +1095,12 @@ handled in the Makefile.
 
     
 <tr>
-<td align="left" valign="top"><b>StreamIt</b></td><td align="left" valign="top"><a href="././library_only/jpeg/streamit/Transcoder.str">Transcoder.str</a> <a href="././library_only/jpeg/streamit/../../dct_ieee/streamit/DCT.str">DCT.str</a> <a href="././library_only/jpeg/streamit/input.jpg.int">input.jpg.int</a> (StreamIt version of JPEG encoder/decoder.)<br>
+<td align="left" valign="top"><b>StreamIt</b></td><td align="left" valign="top"><a href="../apps/library_only/jpeg/streamit/Transcoder.str">Transcoder.str</a> <a href="../apps/library_only/jpeg/streamit/input.jpg.int">input.jpg.int</a> (StreamIt version of JPEG encoder/decoder.)<br>
 </td>
 </tr>
     
 <tr>
-<td align="left" valign="top"><b>StreamIt</b></td><td align="left" valign="top"><a href="././library_only/jpeg/streamit/JPEGtoBMP.str">JPEGtoBMP.str</a> <a href="././library_only/jpeg/streamit/input.jpg.int">input.jpg.int</a> (StreamIt version of JPEG decoder to .bmp.)<br>
+<td align="left" valign="top"><b>StreamIt</b></td><td align="left" valign="top"><a href="../apps/library_only/jpeg/streamit/JPEGtoBMP.str">JPEGtoBMP.str</a> <a href="../apps/library_only/jpeg/streamit/input.jpg.int">input.jpg.int</a> (StreamIt version of JPEG decoder to .bmp.)<br>
 </td>
 </tr>
   
@@ -1132,7 +1136,7 @@ MPEGdecoder_nomessage is a decoder that does not use message passing (and only d
     
     
 <tr>
-<td align="left" valign="top"><b>StreamIt</b></td><td align="left" valign="top"><a href="././library_only/mpeg2/streamit/MPEGtoBMP.str">MPEGtoBMP.str</a> <a href="././library_only/mpeg2/streamit/MPEGdecoder.str">MPEGdecoder.str</a> <a href="././library_only/mpeg2/streamit/Parser_alt_preserved_state.str">Parser_alt_preserved_state.str</a> <a href="././library_only/mpeg2/streamit/ChannelUpsampling.str">ChannelUpsampling.str</a> <a href="././library_only/mpeg2/streamit/MotionVectorDecode.str">MotionVectorDecode.str</a> <a href="././library_only/mpeg2/streamit/PictureReorder.str">PictureReorder.str</a> <a href="././library_only/mpeg2/streamit/BlockDecode.str">BlockDecode.str</a> <a href="././library_only/mpeg2/streamit/ColorChannelProcessing_opt_splitjoin.str">ColorChannelProcessing_opt_splitjoin.str</a> <a href="././library_only/mpeg2/streamit/DescrambleAndMotionCompensate.str">DescrambleAndMotionCompensate.str</a> <a href="././library_only/mpeg2/streamit/MotionPrediction.str">MotionPrediction.str</a> <a href="././library_only/mpeg2/streamit/BlockDescrambler.str">BlockDescrambler.str</a> <a href="././library_only/mpeg2/streamit/MacroBlockDescrambler.str">MacroBlockDescrambler.str</a> <a href="././library_only/mpeg2/streamit/MPEGglobal.str">MPEGglobal.str</a> <a href="././library_only/mpeg2/streamit/ColorSpace.str">ColorSpace.str</a> <a href="././library_only/mpeg2/streamit/Misc.str">Misc.str</a> <a href="././library_only/mpeg2/streamit/BinaryFile.str">BinaryFile.str</a> <a href="././library_only/mpeg2/streamit/ZigZag.str">ZigZag.str</a> <a href="././library_only/mpeg2/streamit/InverseQuantization.str">InverseQuantization.str</a> <a href="././library_only/mpeg2/streamit/BMP.str">BMP.str</a> <a href="././library_only/mpeg2/streamit/../../../benchmarks/dct_ieee/streamit/DCT.str">DCT.str</a> <a href="././library_only/mpeg2/streamit/../input/cact_015.m2v">cact_015.m2v</a> (The decoder with messaging.)<br>
+<td align="left" valign="top"><b>StreamIt</b></td><td align="left" valign="top"><a href="../apps/library_only/mpeg2/streamit/MPEGtoBMP.str">MPEGtoBMP.str</a> <a href="../apps/library_only/mpeg2/streamit/MPEGdecoder.str">MPEGdecoder.str</a> <a href="../apps/library_only/mpeg2/streamit/Parser_alt_preserved_state.str">Parser_alt_preserved_state.str</a> <a href="../apps/library_only/mpeg2/streamit/ChannelUpsampling.str">ChannelUpsampling.str</a> <a href="../apps/library_only/mpeg2/streamit/MotionVectorDecode.str">MotionVectorDecode.str</a> <a href="../apps/library_only/mpeg2/streamit/PictureReorder.str">PictureReorder.str</a> <a href="../apps/library_only/mpeg2/streamit/BlockDecode.str">BlockDecode.str</a> <a href="../apps/library_only/mpeg2/streamit/ColorChannelProcessing_opt_splitjoin.str">ColorChannelProcessing_opt_splitjoin.str</a> <a href="../apps/library_only/mpeg2/streamit/DescrambleAndMotionCompensate.str">DescrambleAndMotionCompensate.str</a> <a href="../apps/library_only/mpeg2/streamit/MotionPrediction.str">MotionPrediction.str</a> <a href="../apps/library_only/mpeg2/streamit/BlockDescrambler.str">BlockDescrambler.str</a> <a href="../apps/library_only/mpeg2/streamit/MacroBlockDescrambler.str">MacroBlockDescrambler.str</a> <a href="../apps/library_only/mpeg2/streamit/MPEGglobal.str">MPEGglobal.str</a> <a href="../apps/library_only/mpeg2/streamit/ColorSpace.str">ColorSpace.str</a> <a href="../apps/library_only/mpeg2/streamit/Misc.str">Misc.str</a> <a href="../apps/library_only/mpeg2/streamit/BinaryFile.str">BinaryFile.str</a> <a href="../apps/library_only/mpeg2/streamit/ZigZag.str">ZigZag.str</a> <a href="../apps/library_only/mpeg2/streamit/InverseQuantization.str">InverseQuantization.str</a> <a href="../apps/library_only/mpeg2/streamit/BMP.str">BMP.str</a> <a href="../apps/benchmarks/dct_ieee/streamit/DCT.str">DCT.str</a> <a href="../apps/library_only/mpeg2/streamit/../input/cact_015.m2v">cact_015.m2v</a> (The decoder with messaging.)<br>
 </td>
 </tr>
   
