@@ -1,0 +1,44 @@
+Outline 9-12-06:
+
+Take away points:
+- Flexibility of StreamIt
+  - radical reorganization
+- 
+
+Slides:
+Intro
+(1) Multicores motivation (maybe update the multicore timeline, tensilica 192 core pic?) 
+       - not just a multiprogramming environment
+        talk about communication bandwidth (granularity)
+
+(1) These are transformations that one could do on a program expressed parallely
+    Vocoder example or synthetic example:
+    block diagram labeling parallelism (task, data, pipeline)
+    start with task using fork and join (natural parallelism)
+    if you want more parallelism 
+    introduce data parallelism
+    fine-grained up to coarse-grained using our compiler
+      to improve communication issue (talk about match to hardware)
+    introduce stateful filters and pipeline parallelism
+    with each mapping give qualitative pros/cons
+
+    show loop-based code vs stream graph model on transformations
+    show that user would not be able to do that let alone a compiler
+
+Representation for Transformations
+  Picture of example stream graph (need to gather)
+  C vs streamit slide
+  show that for software pipelining 
+
+Algorithms (shown by example)
+  coarse grained data-parallelism using example stream graph with peeking and state
+ 
+  coarse grained software pipelining
+
+Raw
+
+Results (Evaluation)
+
+Related Work
+
+Future Work
