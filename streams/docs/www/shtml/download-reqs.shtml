@@ -14,9 +14,9 @@
 href="http://www.gnu.org">GNU tools</a>.  In particular, GNU Make is
 required to build; this is the default <tt>make</tt> on Linux
 machines, and may be available as <tt>gmake</tt> on other Unix-like
-machines.  The source release depends on Sun's Java compiler (javac).  Both the
-source and binary releases require a <a
-href="http://java.sun.com/">Java virtual machine<a> for Java version
+machines.  The source release depends on Sun's Java compiler (javac), available as part of Sun's <a href="http://java.sun.com/javase/downloads/index.jsp">JDK 5.0</a>.  
+Both the source and binary releases require a 
+<a href="http://java.sun.com/javase/downloads/index.jsp">Java virtual machine<a> for Java version
 1.5 or later.
 
 <p>The front end depends on the <A HREF="http://www.antlr.org/">ANTLR LL(<I>k</I>)</a> parser generator. If you are using the source release, the
