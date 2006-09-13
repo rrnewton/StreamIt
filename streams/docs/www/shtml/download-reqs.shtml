@@ -23,7 +23,9 @@ Both the source and binary releases require a
 ANTLR classes must be in your Java <FONT COLOR=purple>CLASSPATH</FONT> when compiling
 and running the StreamIt compiler. If you are using the binary
 release, the required ANTLR classes are already included in the
-StreamIt jar file.
+StreamIt jar file.  You do not need to install ANTLR to use
+the StreamIt source release, just get antlr.jar from the ANTLR distribution's .tar.gz
+file and save the antlr.jar file in a directory that is accessible to users of StreamIt. 
 
 <p>The linear optimizations (not turned on by default) depend on the <A HREF="http://www.fftw.org/">FFTW
 library</A>. The StreamIt runtime system
