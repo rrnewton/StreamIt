@@ -1,5 +1,7 @@
 rsync -Cavz ./images /home/public/streamit
 rsync -Cavz ./include /home/public/streamit
+rsync -Cavz ./shtml/files.shtml /home/streamit/www/restricted
 rsync -Cavz ./shtml /home/public/streamit
+rm /home/public/streamit/shtml/files.shtml
 rsync -Cavz ./mpeg /home/public/streamit
 rsync -Cavz ./index.shtml /home/public/streamit
