@@ -25,7 +25,7 @@
         a wide variety of target architectures, including
 	commercial-off-the-shelf uniprocessors,
 	  multicore architectures, and clusters of workstations.
-	  [<a href="http://cag.lcs.mit.edu/cgi-bin/commit-papers.pl?keyword=4">StreamIt Publications</a>].<br>
+	  [<a href="http://cag.csail.mit.edu/cgi-bin/commit-papers.pl?keyword=4">StreamIt Publications</a>].<br>
         <br> 
 	  The StreamIt programming and compilation paradigm makes
         the following contributions:
@@ -35,26 +35,26 @@
     structured streams, graph parameterization, circular buffer
     management, and teleport messaging; these constructs also enable
     novel compiler analyses [<a
-    href="http://cag.lcs.mit.edu/streamit/papers/streamit-cc.pdf">CC'02</a>,
+    href="http://cag.csail.mit.edu/streamit/papers/streamit-cc.pdf">CC'02</a>,
     <a
-    href="http://cag.lcs.mit.edu/commit/papers/05/thies-ppopp05.pdf">PPoPP'05</a>].
+    href="http://cag.csail.mit.edu/commit/papers/05/thies-ppopp05.pdf">PPoPP'05</a>].
     The language has been integrated into the Eclipse development
     environment, making it easier for users to debug stream programs [<a
-    href="http://cag.lcs.mit.edu/commit/papers/05/kkuo-sdt.pdf">P-PHEC'04</a>].
+    href="http://cag.csail.mit.edu/commit/papers/05/kkuo-sdt.pdf">P-PHEC'04</a>].
 
 	    </p>
 	    <li><p align="justify">
 
-    An optimizing compiler infrastructure for the <a href="http://cag.lcs.mit.edu/raw">MIT Raw machine</a>,
+    An optimizing compiler infrastructure for the <a href="http://cag.csail.mit.edu/raw">MIT Raw machine</a>,
     with fully automatic load balancing, graph layout, communication
-    scheduling, and routing [<a href="http://cag.lcs.mit.edu/streamit/papers/streamit-asplos.pdf">ASPLOS'02</a>, <a href="http://cag.lcs.mit.edu/commit/papers/06/gordon-asplos06.pdf">ASPLOS'06</a>].  In collaboration with the MIT graphics group, we have also developed a flexible graphics pipeline on Raw [<a href="http://cag.lcs.mit.edu/commit/papers/05/streamit-graphics-gh.pdf">Graphics Hardware'05</a>].
+    scheduling, and routing [<a href="http://cag.csail.mit.edu/streamit/papers/streamit-asplos.pdf">ASPLOS'02</a>, <a href="http://cag.csail.mit.edu/commit/papers/06/gordon-asplos06.pdf">ASPLOS'06</a>].  In collaboration with the MIT graphics group, we have also developed a flexible graphics pipeline on Raw [<a href="http://cag.csail.mit.edu/commit/papers/05/streamit-graphics-gh.pdf">Graphics Hardware'05</a>].
 
 	    </p>
     <li><p align="justify"> A set of cache optimizations for embedded
 	  and general-purpose processors, adjusting the granularity
 	  and interleaving of filter executions to match the size of
 	  the data and instruction caches [<a
-	  href="http://cag.lcs.mit.edu/commit/papers/05/sermulins-lctes05.pdf">LCTES'05</a>].
+	  href="http://cag.csail.mit.edu/commit/papers/05/sermulins-lctes05.pdf">LCTES'05</a>].
     </p>
 
     <li><p align="justify"> A set of domain-specific optimizations for
@@ -63,20 +63,20 @@
     analysis performs large-scale algebraic simplification of adjacent
     components, as well as automated translation into the frequency
     domain [<a
-    href="http://cag.lcs.mit.edu/commit/papers/03/pldi-linear.pdf">PLDI'03</a>,
-    <a href="http://cag.lcs.mit.edu/linear">details</a>].  For
+    href="http://cag.csail.mit.edu/commit/papers/03/pldi-linear.pdf">PLDI'03</a>,
+    <a href="http://cag.csail.mit.edu/linear">details</a>].  For
     stateful filters (e.g., IIR, feedback loops), linear state space
     analysis offers more general algebraic simplification, as well as
     minimization of the number of states and reduction in the number
     of system parameters [<a
-    href="http://cag.lcs.mit.edu/commit/papers//05/agrawal-cases05.pdf">CASES'05</a>].
+    href="http://cag.csail.mit.edu/commit/papers//05/agrawal-cases05.pdf">CASES'05</a>].
 
 	    </p>
 	    <li><p align="justify"> 
     A minimal latency scheduler that leverages phased scheduling to
     produce a deadlock-free schedule for hierarchical stream graphs.
     Phased scheduling also offers a flexible tradeoff between code size
-    and buffer size [<a href="http://cag.lcs.mit.edu/commit/papers/03/lctes-phased.pdf">LCTES'03</a>].
+    and buffer size [<a href="http://cag.csail.mit.edu/commit/papers/03/lctes-phased.pdf">LCTES'03</a>].
 <!--
 </p><li><p align="justify">
     A dynamic programming partitioner that is used for load balancing
@@ -99,14 +99,14 @@
 	    <li><p align="justify"> A set of 
 	      <a href="../shtml/benchmarks.shtml">benchmarks</a> for the
 	      evaluation of streaming optimizations and architectures, including
-              a detailed study on MPEG-2 in StreamIt [<a href="http://cag.lcs.mit.edu/commit/papers/06/drake-ipdps06.pdf">IPDPS'06</a>, <a href="../mpeg/">details</a>].
+              a detailed study on MPEG-2 in StreamIt [<a href="http://cag.csail.mit.edu/commit/papers/06/drake-ipdps06.pdf">IPDPS'06</a>, <a href="../mpeg/">details</a>].
 	    </p>
 	  </ul>
 
 	  <b>StreamIt</b>  is  the  <a  href="../shtml/people.shtml">result  of
         several  years  of  research  and  development</a>  under  the
         fearless        leadership        of       Professor        <a
-        href="http://cag.lcs.mit.edu/~saman">Saman  Amarasinghe</a> at
+        href="http://cag.csail.mit.edu/~saman">Saman  Amarasinghe</a> at
         the   <a   href="http://csail.mit.edu">Computer  Science   and
         Artificial      Intelligence     Laboratory</a>      at     <a
         href="http://www.mit.edu">MIT</a>.
