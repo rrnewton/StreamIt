@@ -1,0 +1,626 @@
+StreamIt-Cell SPU Library API (working draft - do not distribute)
+David Zhang and Rodric Rabbah
+
+
+Organization:
+
+1. Overview
+   1.1. SPU management command summary
+2. Objects
+   2.1. Filters
+   2.2. Channels
+   2.3. Buffers
+3. SPU management commands
+   3.1. Filter management commands
+   3.2. Filter execution commands
+   3.3. Data transfer commands
+4. Implementation
+   4.1. Data transfer
+5. Examples
+6. Discussion
+
+
+1. OVERVIEW
+-----------
+
+The goal of the SPU library is to provide an interface that "automates" much of
+the work involved in running filters on SPUs and transferring data between
+them.
+
+The interface is intended to be general enough that any type of scheduler can
+be implemented: from a fully static schedule with the scheduler controlling all
+data transfer, to a fully dynamic schedule with the SPUs automatically
+time-multiplexing multiple filters and transferring data between themselves.
+
+In addition to filters running on SPUs, some filters may be more suited for
+execution on the PPU (e.g., any filter that does I/O or splitters/joiners with
+very many outputs/inputs). The same interface can be implemented for managing
+both SPU and PPU filters, with minor differences. This document mainly focuses
+on issues regarding SPU filters.
+
+Each SPU runs an event loop that handles commands from the PPU and other SPUs.
+When not handling commands or transferring data, it runs iterations of the work
+functions of any filters that have been scheduled to run on it.
+
+A limitation is that it is probably infeasible to support SPU context
+switching. As a result, a single SPU can run at most 1 dynamic-rate filter at a
+time (the filter may become blocked on input or output at any time), although
+it can run many static-rate filters at the same time. This is probably not a
+problem in the majority of cases.
+
+
+1.1. SPU management command summary
+-----------------------------------
+
+filter_load
+  Loads/reloads a filter onto an SPU
+filter_unload
+  Unloads a filter from an SPU
+filter_cache
+  Hint to cache filter code on an SPU
+filter_run
+  Starts running a filter's work function for n iterations
+filter_stop
+  Stops running a filter's work function
+filter_set_priority
+  Sets the execution priority of filter
+filter_query_info
+  Set of functions to query filter performance counters
+buffer_set_link
+  Informs a buffer about its partner on another SPU
+buffer_fill
+  Transfers data into an input buffer
+buffer_dump
+  Transfers data from an output buffer to memory
+buffer_stop_transfers
+  Stops a buffer from starting any more DMA operations
+buffer_resume_transfers
+  Allows a buffer to resume DMA operations
+buffer_query_info
+  Set of functions to query buffer status information
+
+
+2. OBJECTS
+----------
+
+The library manages 3 types of objects: FILTERS, CHANNELS, and BUFFERS. All of
+these are exposed to the scheduler in varying ways.
+
+Filters are self-explanatory. Channels conceptually connect an upstream filter
+to the downstream filter. Filter and channel objects are created when the
+stream graph is initialized, and exist for the lifetime of the program.
+
+Buffers store data items that have been produced by an upstream filter but not
+yet consumed by the downstream filter. Each buffer object exists only in
+association with a filter or channel. There are 3 types of buffers: INPUT and
+OUTPUT buffers, belonging to filters loaded on SPUs, and MEMORY buffers,
+belonging to channels.
+
+
+2.1. Filters
+------------
+
+n->m filters are supported: the filter reads from n input "tapes" and writes to
+m output tapes. Each input and output "tape" is associated with a channel
+object.
+
+At any time, a filter is in one of 3 possible states:
+
+- Loaded and running on exactly 1 processor (SPU or PPU).
+- Loaded on exactly 1 processor and not running.
+- Not loaded on any processor.
+
+Filters that are loaded on an SPU have an input buffer for each input tape and
+an output buffer for each output tape. These buffers are located in the SPU's
+local store and serve to "buffer" input/output data items. A filter's input/
+output buffers "belong" to the filter, and do not exist when the filter is not
+loaded on an SPU.
+
+Allowing filters to be loaded separately from running them allows a scheduler
+to efficiently time-multiplex filters, as long as their code and buffers do not
+occupy too much local store.
+
+Parameters:
+- Standard filter properties (data item size, rates, etc.)
+
+Contains:
+- Code (constant, shared among multiple filters), parameters (constant), state
+  (mutable)
+- Input and output buffers (only when loaded on an SPU)
+
+
+2.2. Channels
+-------------
+
+A channel's endpoints correspond to the upstream filter and its output buffer
+and the downstream filter and its input buffer. Conceptually, each item
+produced by a channel's upstream filter is "contained" in the channel until it
+is consumed by the downstream filter.
+
+Each channel has a memory buffer located in memory that stores excess data
+items. At any time, the sequence of data items contained in a channel form 3
+contiguous (possibly empty) subsequences that are located in the channel's
+output, memory, and input buffers, respectively. Data items can end up in the
+memory buffer when output buffers becomes full, when filters with non-empty
+input/output buffers are unloaded, or at the request of the scheduler (this is
+described in more detail in the next section).
+
+Channels have a block size property. This is the granuarity of certain DMA
+transfers between the channel's output/memory/input buffers (more on this in
+the next section).
+
+Parameters:
+- Block size (must be multiple of cache line size)
+
+Contains:
+- Memory buffer
+
+
+2.3. Buffers
+------------
+
+Each memory buffer belongs to a channel. Each input and output buffer belongs
+to a filter that is loaded on an SPU, and is also associated with a channel;
+the "corresponding buffer" refers to the buffer (of the opposite type) at the
+other endpoint of the channel, if it exists (i.e., if the filter at that
+endpoint is loaded on an SPU), or the channel's memory buffer if it does not.
+
+Input and output buffers serve to "buffer" data items to be consumed/produced
+by their parent filters in the SPU's local store. Memory buffers are located in
+memory and store excess data items.
+
+Buffers have a fixed size. Input and output buffers are allocated when their
+parent filters are loaded. Memory buffers always exist and are allocated at
+stream graph initialization.
+
+A filter running on an SPU can peek/pop data items from its input buffer(s) and
+push(n) data items to its output buffer(s). A peek/pop on an input buffer that
+does not contain the requested data item causes the filter to block until the
+buffer does contain the requested data item (how this happens is described
+later). Similarly, a push(n) on an output buffer that does not have space for
+(n + 1) items also causes the filter to block. If the filter is dynamic-rate,
+this may occur in the middle of its work function; for a static-rate filter,
+the library will run an iteration of the work function only if there is enough
+data/space for it to complete without blocking. While a dynamic-rate filter is
+blocked, the SPU still services its event loop and can run the work functions
+of other (static-rate) filters.
+
+Input and output buffers can be controlled by the library or by the scheduler.
+Library-controlled input buffers attempt to keep themselves as full as possible
+at all times by automatically transferring data from its corresponding buffer,
+if any is available. Library-controlled output buffers automatically transfer
+("dump") data to its channel's memory buffer when it becomes full. Scheduler-
+controlled buffers do not automatically transfer data; all data transfer must
+be explicitly initiated by commands from the scheduler. In general, as long as
+data has not been dumped to memory, data transfers (whether library- or
+scheduler-controlled) will be local store to local store and (hopefully) fast.
+
+Note that in any channel, if the (downstream) input buffer is scheduler-
+controlled, it makes no sense for the (upstream) output buffer to be library-
+controlled, as the scheduler will not know when/if the output buffer dumps data
+to memory. However, the input buffer can be library-controlled when the output
+buffer is scheduler-controlled; in this case, data is always transferred
+directly from SPU to SPU and never dumped to memory (if the output buffer
+becomes full, the upstream filter blocks until the downstream filter has
+consumed enough data for the input buffer to initiate and complete another
+transfer).
+
+Every buffer has a separate data area that stores bookkeeping information. In
+any channel, the (downstream) input buffer must be able to write to the data
+area of the (upstream) output buffer in order to notify it after data transfers
+complete. If the input buffer is library-controlled, the output buffer must
+also be able to write to the data area of the input buffer to notify it when
+data items are produced.
+
+Note that although input/output buffers can automatically initiate data
+transfers, they never force upstream/downstream filters to run for additional
+iterations. A library-controlled input buffer, when empty, passively waits for
+the upstream output buffer to contain data; it does not force the upstream
+filter to run. The scheduler is the only entity that can cause filters to run.
+
+Filters that are loaded on the PPU do not have input/output buffers; because
+they can directly access memory, they use the memory buffers of their
+input/output channels instead.
+
+When an upstream-downstream filter pair is loaded on the same SPU, the
+downstream filter directly accesses the upstream filter's output buffer.
+However, it still keeps its input buffer around (with whatever parameters the
+scheduler specified) in case the upstream filter is later unloaded. In this
+case, regardless of the control specified for the buffers, the upstream
+filter's output buffer will never dump data to memory.
+
+Before unloading a filter from an SPU, data transfers involving its input and
+output buffers must have stopped. When a filter is unloaded, unused data items
+in its input buffers are immediately dumped to memory. However, its output
+buffers are cached on the SPU.
+
+When a filter F is loaded on an SPU and its input channel corresponds to a
+cached output buffer, it first uses data items from the cached buffer. No new
+data is transferred to the cached buffer, and the cached buffer is deallocated
+when all data items it contains are used (or when F is unloaded, if it happens
+first). This avoids a pair of unnecessary data transfers to and from memory
+when an upstream filter is run on an SPU, unloaded, and then the downstream
+filter is run on the same SPU, while being transparent to the scheduler.
+
+Data items in cached output buffers that belong to filter F are dumped to
+memory upon any of the following:
+
+- If the downstream filter (the filter at the other endpoint of the buffer's
+  channel) is a filter that runs on the PPU or loaded on another SPU,
+  immediately when F is unloaded.
+- If the channel's memory buffer is not empty, immediately when F is unloaded.
+- Before the downstream filter is loaded on another SPU.
+- Before F is loaded on any SPU.
+- At the request of the scheduler.
+- If the SPU needs the local store space.
+
+The scheduler needs to be prepared for an input buffer to be able to
+temporarily contain more data items than its specified size.
+
+The library transparently handles DMA alignment issues.
+
+Parameters:
+- Size (must be multiple of channel block size)
+- For input/output buffers:
+  - Control (library/scheduler)
+
+Contains:
+- Data area
+
+
+3. SPU MANAGEMENT COMMANDS
+--------------------------
+
+SPU management commands are issued by the scheduler on the PPU to control SPUs.
+Commands are handled asynchronously by both the PPU and SPU. Commands are
+issued by sending a mailbox message with the address and size of the memory
+location containing command parameters (this memory location will eventually be
+overwritten with the return value). The SPU receives the message in its event
+loop, DMAs the parameters to its local store, and processes the command
+concurrently with running filters. When it finishes processing, it DMAs a
+return value to the original memory location and notifies the PPU via mailbox.
+After issuing a command, the PPU can do something else, periodically polling
+the mailbox to detect completions.
+
+At any time, the PPU may have multiple outstanding commands to an SPU, but the
+library ensures that it does not overflow an SPU mailbox. Certain commands are
+small but possibly frequent; as a result, commands are allowed to be batched:
+the parameters for multiple commands can be grouped into a single "message".
+The SPU processes the commands in order and informs the PPU of completion when
+it finishes processing all commands in the batch.
+
+The interface to the scheduler is a set of functions; library code on the PPU
+handles communication with SPUs. These functions appear to complete
+asynchronously, returning a sequence number; the scheduler calls another
+function to check for completion of a command.
+
+Library code on the PPU performs additional processing (i.e., updating the
+memory versions of objects to reflect changes in state as commands are issued
+to SPUs and values are returned).
+
+
+3.1. Filter management commands
+-------------------------------
+
+These commands control filter loading and unloading. They have drastically
+simplified forms for PPU filters.
+
+[filter_load]
+
+Loads a filter onto an SPU in preparation for running it. The filter's code,
+parameters, and state are copied to the SPU's local store. This command also
+sets up the filter's input/output buffers. However, some buffers may need to be
+told about their corresponding buffers (via buffer_set_link commands) before
+the filter can be run. Returns when all processing is complete.
+
+This command can also be used to adjust buffer sizes for ("reload") a filter
+that is already loaded. For each buffer that is changed, its corresponding
+buffer may need to be re-told about it before that filter can be run.
+
+(See discussion section for more.)
+
+Parameters:
+- Flag specifying whether the filter is being reloaded
+- For filters being loaded for the first time, information about the filter
+  (address/size of code/parameters/state, data item size, rates, etc.)
+- Settings for each input/output buffer
+
+[filter_unload]
+
+Unloads a filter from an SPU. The filter must be stopped. The filter's state
+is copied back to memory, data items in the filter's input buffers are copied
+to their corresponding memory buffers, and the filter's output buffers are
+cached. Returns when all processing is complete.
+
+Parameters:
+(none)
+
+[filter_cache]
+
+Asks any SPU to attempt to cache the code and parameters for a filter in case
+it is later loaded. The filter may currently be loaded on another SPU. This is
+a hint only. Returns immediately.
+
+Parameters:
+- Information about the filter (address/size of code/parameters)
+- Priority flag
+
+
+3.2. Filter execution commands
+------------------------------
+
+[filter_run]
+
+Causes an SPU to start running a loaded filter's work function until it has run
+for the specified number of iterations. If the filter is already running, this
+changes the total number of iterations it is allowed to run. Returns
+immediately.
+
+Parameters:
+- Number of iterations
+
+[filter_stop]
+
+Stops a filter's work function from running additional iterations after
+completing the current one (this only applies to blocked dynamic-rate filters).
+Returns either immediately or after finishing the current iteration (this only
+has an effect for blocked dynamic-rate filters).
+
+Parameters:
+- Flag specifying whether to wait for the current iteration to finish
+
+[filter_set_priority]
+
+Sets the priority of a loaded filter. This is used to prioritize filters when
+the SPU is running multiple filters at once. Returns immediately.
+
+Parameters:
+- Priority flag
+
+[filter_query_info]
+
+This is a set of functions that return immediately with various status flags/
+performance counters about a filter (whether the filter is blocked on input/
+output, number of iterations executed, cumulative work function runtime, etc.).
+
+The SPUs periodically write this information to fields in filter objects in
+memory; this command is only useful if the scheduler needs more up-to-date
+information.
+
+Parameters:
+(none)
+
+
+3.3. Buffer commands
+--------------------
+
+These commands conceptually operate on buffer objects. They do not apply for
+PPU filters.
+
+[buffer_set_link]
+
+When called on an input buffer, informs it about the data area and any
+additional properties of its upstream output buffer. When called on an output
+buffer, the downstream input buffer must be library-controlled; informs it
+about the data area and any additional properties of its downstream input
+buffer. Returns immediately; the library may initiate DMA in the background to
+"synchronize" the buffers.
+
+Parameters:
+- Address of data area and additional properties about the corresponding
+  buffer, or a suitable flag to indicate it does not exist
+
+[buffer_fill]
+
+Causes a scheduler-controlled input buffer to transfer data from either its
+upstream output buffer or its channel's memory buffer. The data source must
+contain at least the amount of data specified, although the input buffer does
+not need to have space available for all the data. Returns immediately with the
+amount of data that will be transferred. The transfer is considered to be
+pending.
+
+Cannot be called on library-controlled buffers.
+
+Parameters:
+- Flag for source (output or memory buffer)
+- Bytes to transfer
+
+[buffer_dump]
+
+Causes a scheduler-controlled output buffer to transfer data to its channel's
+memory buffer. The memory buffer must have space for at least the amount of
+data specified, although the output buffer does not need to have all the data
+available. Returns immediately with the amount of data that will be
+transferred. The transfer is considered to be pending.
+
+Cannot be called on library-controlled buffers.
+
+Parameters:
+- Bytes to transfer
+
+[buffer_stop_transfers]
+
+Waits for all pending data transfers initiated by an input or output buffer to
+complete before returning. If the buffer is library-controlled, also stops all
+future data transfers.
+
+Parameters:
+(none)
+
+[buffer_resume_transfers]
+
+Allows a library-controlled input or output buffer to resume data transfers.
+Returns immediately.
+
+Has no effect on scheduler-controlled buffers.
+
+Parameters:
+(none)
+
+[buffer_query_info]
+
+This is a set of functions that return immediately with various status
+information about a buffer (number of data items it contains, temporary size,
+percentage of time it is empty/full, etc.).
+
+Parameters:
+(none)
+
+
+4. IMPLEMENTATION
+-----------------
+
+It is probably safe for the SPU to only process commands in between running
+iterations of work functions (or when a dynamic-rate filter is blocked).
+
+Filter, channel, and buffer objects are all stored somewhere in memory (arrays
+of filters and channels, per-filter arrays of input and output buffers); they
+contain status fields that SPUs periodically update with the same information
+that can be obtained with a query_info command. This provides another way for
+the scheduler to obtain information about loaded/running filters; it would be
+faster but less up-to-date.
+
+
+4.1. Data transfer
+------------------
+
+This section describes how data is transferred between an upstream-downstream
+filter pair running on different SPUs.
+
+DMA operations to transfer data are always issued by the downstream filter's
+input buffer. If the input buffer is scheduler-controlled, this is ultimately
+in response to a buffer_fill command from the scheduler. If the input buffer is
+library-controlled, this is done automatically whenever the input buffer has an
+empty block and the (upstream) output buffer has a block available. If the
+input buffer and channel block size are specified appropriately by the
+scheduler, this effectively double-buffers input automatically.
+
+A static buffer acts as a circular queue of data items and maintains head and
+tail pointers. Only the case when the upstream output buffer is static is
+described.
+
+If the input buffer is library-controlled, the output buffer periodically
+writes the position of its tail pointer to the input buffer's data area (via a
+DMA operation). If the input buffer is scheduler-controlled, the output buffer
+does nothing.
+
+The input buffer maintains the true value of the output buffer's head pointer
+and writes it to the output buffer's data area whenever it completes a data
+transfer. When the input buffer needs to transfer data, if it is library-
+controlled, it checks its data area for the value of the output buffer's tail
+pointer. If block(s) are available, it starts a DMA operation to transfer them.
+If the input buffer is scheduler-controlled, it simply transfers the requested
+amount (adjusting for alignment) without checking its data area.
+
+For a library-controlled input buffer, assuming tail pointer updates are only
+done when a new block of data is produced, this has a cost of at most 1 small
+DMA write per block produced or transferred. For a scheduler-controlled input
+buffer, this has a cost of 1 small DMA write per buffer_fill command (plus the
+overhead of the command).
+
+
+5. EXAMPLES
+-----------
+
+The following examples show how to perform some common operations involving
+loading and unloading filters. Filters and buffers are treated as objects,
+(the actual commands are sent to SPUs). Commands in braces ({, }) are batched:
+all commands to the same SPU are specified in the given order with one call,
+calls are made to all SPUs before waiting for all of them to return.
+
+Loading an upstream-downstream filter pair on 2 different SPUs, with library-
+controlled buffers, and then running them:
+
+{
+    filter0.load(spu0, <params>)
+    filter1.load(spu1, <params>)
+}
+{
+    filter0.outputBuffers[0].set_link(filter1.inputBuffers[0])
+    filter0.run(n0)
+    filter1.inputBuffers[0].set_link(filter0.outputBuffers[0])
+    filter1.run(n1)
+}
+
+Loading an upstream-downstream filter pair on 2 different SPUs, with scheduler-
+controlled buffers, and then running them: (it is assumed that the channel's
+memory buffer holds some data items previously produced)
+
+{
+    filter0.load(spu0, <params>)
+    filter1.load(spu1, <params>)
+}
+{
+    filter0.run(n0)
+    filter1.inputBuffers[0].set_link(filter0.outputBuffers[0])
+    filter1.inputBuffers[0].fill(<from memory buffer>, <bytes to transfer>)
+    filter1.run(n1)
+}
+
+Unloading the downstream filter in an upstream-downstream filter pair when it
+is library-controlled:
+
+{
+    filter0.outputBuffers[0].stop_transfers()
+        This is necessary to stop the upstream output buffer from writing to
+        the downstream input buffer's data area.
+}
+{
+    filter1.unload()
+}
+
+Unloading the downstream filter when it is scheduler-controlled:
+
+{
+    filter1.unload()
+}
+
+Unloading the upstream filter:
+
+{
+    filter1.inputBuffers[0].stop_transfers()
+        This is always necessary because buffer_fill commands complete
+        asynchronously.
+}
+{
+    filter0.unload()
+}
+
+
+6. DISCUSSION
+-------------
+
+One possibility would be to implement the PPU part of the library in C++, with
+classes for filters, channels, and buffers (filter objects would contain arrays
+of buffer objects). The filter class would have a load method that takes in
+only a processor ID (SPU or PPU) and performs the filter_load command. Buffer
+settings are specified beforehand by calling appropriate methods on the
+filter's buffer objects.
+
+The main drawbacks to this are:
+
+- This would require the scheduler to be implemented in C++ (not such a
+  problem).
+- Objects would need to keep "shadow" state (distinguishing between the current
+  state of SPUs and the state the scheduler has specified for the next time
+  filters are loaded). This is also not such a problem, as any implementation
+  would need to keep shadow state somewhere.
+
+The main advantages are:
+
+- A cleaner interface.
+- Objects automatically track all relevant state; the scheduler can access it
+  directly.
+
+An alternative is a "monolithic" implementation, where functions such as
+filter_load take in an array of buffer settings.
+
+A far-flung idea: allow input/output buffers that are dynamically resized
+(allocated/deallocated in blocks as data items are transferred/produced/
+consumed, up to a specified maximum size). Dynamic buffers would only be useful
+for a fully dynamic scheduler that runs multiple filters on each SPU and leaves
+the SPUs to do their own time-multiplexing. In this case, the total maximum
+size of all buffers can exceed the size of the local store, and local store can
+be allocated/deallocated for different filters as needed. However, this is
+probably of questionable utility, and more or less requires a completely
+separate implementation.
