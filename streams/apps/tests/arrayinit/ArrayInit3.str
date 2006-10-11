@@ -10,10 +10,13 @@ void->void pipeline ArrayInit3 {
 
 int->int filter Tester() {
     work pop 3 push 3 {
-        int[3] arr = {1, 2, 3};
-        push(arr[0] * pop());
-        push(arr[1] * pop());
-        push(arr[2] * pop());
+	// This array is based on knowing that Constant Propagatoin
+	// can not handle 3-d arrays, so the initialization code will
+	// not be propagated away.
+        int[3][1][1] arr = {{{1}}, {{2}}, {{3}}};
+        push(arr[0][0][0] * pop());
+        push(arr[1][0][0] * pop());
+        push(arr[2][0][0] * pop());
     }
 }
 
