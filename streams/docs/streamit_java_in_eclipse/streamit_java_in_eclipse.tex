@@ -48,6 +48,11 @@ Note that you can not just link to the eclipse executable from
 somewhere in your path since Eclipse needs to know its real path to
 work correctly.
 
+If Eclipse 3.1 gives you the following error:\\
+An error has occurred. See the log file
+/home/bits7/NOBACKUP/eclipse.3.1/configuration/1161898731326.log\\
+Try running Eclipse 3.2 instead by aliasing {\tt eclipse} to {\tt /home/bits7/NOBACKUP/eclipse.3.2/eclipse}.\\
+
 \section{Checking Out to let Eclipse use CVS}
 \label{secCheckout}
 
@@ -61,7 +66,7 @@ We need to set up environment variable {\tt CVS\_RSH} to be {\tt ssh}.
 We need to checkout as\\
 \verb+cvs -d ':ext:USERNAME@SYSTEMNAME:/projects/raw/cvsroot' co streams+\\
 Fill in your user name for {\tt USERNAME}.  
-Fill in a system name for {\tt SYSTEMNAME} -- don't use {\tt  localhost}
+Fill in a system name for {\tt SYSTEMNAME}, (e.g. {\tt cagfarm-50}) -- don't use {\tt  localhost}
 as a system name if you are going to be developing on multiple systems
 sharing a common {\tt streams} directory: If you do this you will get lots
 of warnings from {\tt ssh} as you move between systems.
@@ -305,8 +310,8 @@ You will need to ``Add External JARs...'' for our antlr implementation
 }
 
 You will need to ``Add JARs...'' for {\tt streams/3rdparty/cplex/cplex.jar},\\
-{\tt streams/3rdparty/JFlex/jflex.jar}
-and {\tt streams/3rdparty/jgraph/jgraph.jar}\footnote{%
+{\tt streams/3rdparty/JFlex/jflex.jar}, {\tt streams/3rdparty/jgraph/jgraph.jar},\\
+and {\tt streams/3rdparty/jcc/jcc.jar}\footnote{%
 If you wish to play with the obsolete streams/regtest/streamit code,
 you will also need to ``Add JARs...'' for 
 {\tt streams/regtest/streamittest/junit.jar}.
