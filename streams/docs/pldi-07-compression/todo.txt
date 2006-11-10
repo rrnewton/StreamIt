@@ -1,0 +1,17 @@
+Before submission:
+- abstract: 
+  - Apple Animation not "based on" LZ77
+  - speedup only proportional to compression ratio for pixel transforms
+- results:
+  - add pictures of video frames?
+- format section:
+  - apple animation
+     - mention 32bpp
+     - mention pain of translating first frame separately
+     - mention pain of some frames getting bigger
+
+After submission:
+- look at more mencoder transformations
+    - autolevels, IIR filters, FIR filters, etc.
+- get breakdown of time spent processing vs. time spent re-compressing
+  - delete *.so* in ffmpeg directory and rebuild blender to link

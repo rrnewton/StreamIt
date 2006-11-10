@@ -1,0 +1,680 @@
+programmable and optimized rollback of stream programs
+
+- send a message backwards in time, rollback the app
+- message handling at container boundaries
+
+- apps:
+  - run two versions in parallel, run again if they mismatch
+
+- optimizations:
+  - if commutative, can "patch" the rollback rather than replaying?
+  - if stateless, can process out-of-order
+  - memoization
+
+I. Commutativity
+  - does it rely on whole app being commutative?
+  --> _states_ should be commutative, but outputs identity?
+
+  - or if outputs are commutative, then you can skip ahead by
+    modifying something in the past, but discarding the intervening
+    outputs
+
+commutative/associative reductions: sum, product, min/max, OR, AND, and XOR bit operations
+not: subtraction, division
+
+Q: if you rollback, do you re-emit outputs?
+  - if not, then commutative outputs becomes more interesting (beccause you only need the last output)
+  - stateless rollback becomes a no-op
+
+directions:
+- fault-tolerance
+- looking at commutativity of whole pieces of filters rather than individual reductions
+- detecting symmetry automatically (e.g., detect reflection in input space, then reflect output space)
+- wavelet transform the input, then proceed with computation along the most interesting direction
+  --> or random sample the input, fill in output where it is varying most
+  --> for stateless OR commutative filters
+- linear operations applied directly to delta-coded inputs 
+   (do not have to reconstruct input; can transform delta and then sum onto existing output)
+- computing directly on run-length encoded inputs
+   - relation to memoization?  similar but more efficient
+
+related
+http://www.win.ua.ac.be/~vincenz/thesis.pdf
+
+---------------------
+
+Computing on RLE data:
+
+- can replace every pop and peek with a consant, then wrap in a loop
+  to N and do induction variable recognition (adds -> multiplies, etc.)
+
+- things that use run-length encoding:
+http://www2.biology.ualberta.ca/jbrzusto/ftp/fragstat/cookie.html#GettingSoftware
+http://delivery.acm.org/10.1145/200000/192628/p77-smith.pdf?key1=192628&key2=3817591511&coll=ACM&dl=ACM&CFID=15151515&CFTOKEN=6184618
+ --> shrink-by-2 on JPEG images 5X faster if done directly on compressed data
+http://ieeexplore.ieee.org/iel3/3874/11296/00515542.pdf?arnumber=515542
+
+http://vislab.cs.vt.edu/Publications/2000/PDFfiles/Que00.pdf
+  "Examples of current RLE use are in image digitizers[6], common
+   image formats[6], satellite image representation[7], and in region
+   representation for computer vision[8, 9, 10, 11, 12] and
+   graphics[13]."
+
+applications
+* searching in genetic sequences?
+  http://www.genome.jp/manuscripts/GIW99/Oral/GIW99F06.pdf
+  BioCompress
+  A new challenge for compression algorithms: genetic sequences
+  appears that sequitur was designed for DNA originally
+  - good overview: http://www.inf.fu-berlin.de/inst/ag-bio/FILES/ROOT/Teaching/Lectures/SS06//SeqanII/DNA%20Compression%20Algorithms.pdf
+- calculate area of an image
+  --> O(n^2) to O(n) reduction in computation
+  - same with resizing, scaling, any image manipulation, etc.
+- something with Apple Animation format (uses RLE for video)
+  - but this is a proprietary format
+  http://wiki.multimedia.cx/index.php?title=Apple_QuickTime_RLE
+- FLAC uses run-length encoding as final piece
+  http://en.wikipedia.org/wiki/Free_Lossless_Audio_Codec
+
+---------------------
+
+outline
+
+- motivation
+  - data sizes are big
+  - memoization makes it faster
+  - has been invented by hand, but nothing general-purpose
+  * also can be used to edit-in-place on digital cameras and cell phones
+
+- representing compression by a grammar 
+   - RLE
+   - LZ77
+   - LZ78/LZW
+   - JPEG: say there is run-length encoding at first, then DCT components
+
+- computing on a grammar
+  - plain
+    example: saturation
+  - multi-in, multi-out
+    example: phonetic translation
+  - dealing with state
+    example: histogram
+
+- computing in frequency domain
+  - use linear analysis
+  - infinite precision to avoid floating point problems
+
+- results
+  - JPEG saturation number
+  - algorithmic speedups for grammar computing
+    - count area:  n^2 --> O(n)
+    - do any kind of local image transform (brightness, contrast, resize, etc.)
+    - matrix multiply
+
+- conclusions
+  - first general-purpose language to allow direct operations on compressed data
+  - rich opportunities for future work:
+   - dealing well with 2-D data.  You'd like to memoize on square chunks, not on lines
+   - more complex compression types (DCT, linear prediction, etc.)
+   - lossy compression
+   - databases
+
+OLD
+- semantics for representing data in compressed form
+  - RLE
+    - apply whenever peek rate less than repeat window
+    - calculate number of repeats; update state accordingly
+    * challenge: outputs may follow grammar?  (if don't output same value)
+  - LZ77
+    - window offset needs to divide pop rate, then it will be memoized
+    - repeat given number of times
+    - work out details
+  - LZ78/LZW
+    - apply memoization within dictionary entries less than peek rate
+ 
+---------------------
+
+Q: why not do the whole program instead of filter-by-filter?
+
+A: whole program might need a huge input rate, might not take
+   advantage of partial redundancy.  eg: bitonic sort
+
+---------------------
+
+S := n*R m*T
+
+- should compute a steady state and extract, or compute less than a
+  steady state and store it
+
+- when computing down, "propagate" the "n" into the production for R
+  so that larger unit is computed --> to carry through S := n*R
+  productions
+
+Let u, o, e denote push, pop, peek rates of current filter
+Let |S| denote the number of terminals in production S
+
+process(production S := n*R m*T, int iterations, int offset) {
+  if 
+}
+
+inner memo table:
+production, offset, iterations, state --> 
+  name of output production, multiplicity of output production, leftover items, new state
+
+overlap memo table -- not needed
+production, leftover, state --> name of output production, offset, new state
+
+---------------------
+
+* word length
+  --> appears that GIF word length is the bits needed to represent a single pixel
+  - or a single character (byte) in text files
+  - looks like compress always deals with bytes, as the parameter for the dictionary limit starts at 9 bits
+- why streamit
+  - power of the language
+
+---------------------
+
+3. Re: POPL, I've been working on a new topic that I think is cooler
+than rollback: computing directly on compressed data.  For example,
+if the input to a filter is run-length encoded (AAA becomes 3A),
+then you can calculate the output of a single firing (A --> B) and
+then run-length encode the total output (3B) by relying on static
+I/O rates.  You never have to uncompress the data.
+
+I've generalized this notion to compute on any data that is
+compressed into a context-free grammar with repetitions (i.e.,
+productions of the form S := n*R m*T).  This representation is a
+generalization of run-length encoding, LZ77 (PNG) and LZ78/LZW
+(GIF, compress), as well as grammar-based compressions like
+SEQUITUR.  The output of each filter is also a compressed grammar.
+The process resembles memoization, but essentially uses the
+original input encoding to indicate overlapping units (thereby
+avoiding the expensive search for overlapping inputs).
+
+Updates to filter state are elegant: if you calculate that a filter
+will execute n times in a run-length encoded unit, then any state
+updates are compounded n times (ala induction variables).  For
+example, n increments translates to addition of n.  This allows you
+to memoize filters based only on inputs (not on states) since you
+can update any states in constant time (assuming the filter's
+control flow does not depend on the state variables).
+
+Example applications: 1) can do local image transforms (resizing,
+color conversion, histograms, counting area of segments, etc.) in
+time proportional to size of compressed picture (GIF, PNG, BMP+RLE)
+rather than to the number of pixels; 2) bitonic sort on n elements
+with redundant sequences (e.g., only k distinct values) can become
+algorithmically cheaper; 3) can provide elegant framework for many
+hand-crafted multimedia algorithms that deal directly on compressed
+data.  A few such algorithms have been published, but no one has
+offered a simple, general framework to do it automatically.
+
+Describing the algorithm in StreamIt would be "portable" across
+many common compression formats and could offer significant space
+and time speedups.  Rich potential for future work in applying to
+other compression techniques (lossy, spectral, linear predictive)
+and databases.  Most of all, I could see people actually being
+excited about using this stuff.
+
+I have some more notes on the technique (e.g., how to deal with
+sliding windows between different components of the grammar), but
+I'll save them for tomorrow morning.
+
+-----------
+
+related:
+- Flavor for extracting from bitstream, http://www.ee.columbia.edu/mmsp/papers/acm-mm97.pdf
+- "A Text Compression Scheme that Allows Fast Searching Directly on the Compressed File"
+  http://delivery.acm.org/10.1145/250000/248639/p124-manber.pdf?key1=248639&key2=0065122511&coll=GUIDE&dl=GUIDE&CFID=704770&CFTOKEN=75036064
+
+-----------
+
+could also do parameterized memoization: note that certain outputs do
+not depend on inputs, so outputs can perhaps be translated over (e.g.,
+only touching R part of RGB.)  OR could just represent this w/ splitjoin.
+
+--> evidence of using a splitjoin as separating out which components
+    are important for memoization
+
+-----------
+
+how to split/join a grammar?
+
+directions:
+- audio
+- matrix multiply
+- detect parts of the program that corrupt the compression and then
+  re-encode them
+- steal from RIVL: demand-driven interpretation (if someone
+  overwriting, do not calculate orig)
+- possible lossless transformations -- e.g., lossless rotate, crop, etc?
+  -- see jpegtran http://sylvana.net/jpegcrop/jpegtran/
+
+-----------
+
+result of experiments:
+- 9.2 X flops reduction due to plain linear collapse
+- 98 X flops reduction due to approximate (rounding 1E-6 to 0) linear collapse
+  - removes *ALL* of the 167 million mul operations in the app
+
+- seems that either RGBtoYCbCr *OR* DCT/iDCT being present in the
+  stream graph is enough to shrink the results (even with no extra
+  compression), presumably due to rounding
+
+-----------
+
+*************************
+
+Re: EXR, split of top and low bytes makes it difficult
+
+Re: PNG, it could easily work for:
+ - no filtering and 8-bit or smaller words
+ - or grayscale or pallette-based
+
+- filtering would make it too hard
+- and filtering is often used (?)
+
+brainstorming: what about something that takes full *space* of
+decompressed image, but time of compressed image?
+
+*************************
+
+getting a feel for potential speedup -- compare translating to Raw
+video versus copying the original stream over.
+
+time mencoder Animation.mov -o Animation2.avi -of avi -ovc copy
+0.000u 0.010s 0:00.15 6.6%      0+0k 0+0io 367pf+0w
+
+time mencoder Animation.mov -o Animation2.avi -of avi -ovc raw
+0.000u 0.560s 0:02.62 21.3%     0+0k 0+0io 450pf+0w
+
+This does a crop:
+
+time mencoder Animation.mov -o Animation2.avi -of avi -ovc lavc -vf crop=400:400:10:10
+1.520u 0.010s 0:01.71 89.4%     0+0k 0+0io 562pf+0w
+
+need my RLE encoder to really judge things
+
+--------
+
+source of screencasts:
+
+~200 MB php -- but in MPEG-4
+http://cakephp.org/screencasts
+
+might have some potential, hard to save movie
+http://www.atomiclearning.com/home
+
+drexel seems to have created a big archive of lecture screencasts, though in flash format:
+www.techsmith.com/camtasia/casestudy/drexeluniversity.asp
+
+mathcasts -- cool but in flash
+http://www.mathcasts.org/index.php?title=Main_Page
+
+this discussion makes clear that QT animations are preferred format for actually shipping to clients
+http://forums.cgsociety.org/archive/index.php/t-84580.html
+
+edemaine recommends submitting quicktime animation for computational geometry demos
+http://theory.lcs.mit.edu/~edemaine/SoCG2003_multimedia/tips.html
+but final versions in different format
+
+digital juice samples in sorensen, but perhaps originals not?
+http://www.digitaljuice.com/media/jumpbacks_HD/mov/017_JB_HD.mov
+http://www.digitaljuice.com/media/ETK7/mov/147_Background2.mov
+http://www.digitaljuice.com/media/motion_design_elements/mov/0006_Revealer.mov
+
+--> distributed in lossless PNG (for editor's toolkit; others different)
+
+*********************************************************************
+
+QUOTES FOR MOTIVATING APPLE ANIMATION FORMAT:
+
+--
+
+***
+
+"Lossless codecs, such as Animation (at the Best quality setting), are
+used to preserve maximum quality during editing or for still images
+where data rate is not an issue."
+
+"About Digital Video Editing", Adobe Online Education Materials,
+Chapter 2, p. 106.
+
+http://www.adobe.com/education/pdf/cib/pre65_cib/pre65_cib02.pdf
+
+--
+
+"On the Macintosh, the popular lossless codecs are Apple's QuickTime
+Animation or Video codecs, and on Windows, the uncompressed AVI
+format. Use these codecs when you're editing or compositing your
+footage before encoding to FLV, so that you can encode a high-quality,
+flattened final version into FLV and avoid multiple encoding passes
+that can quickly degrade quality."
+
+http://communitymx.com/content/article.cfm?cid=EBD77&print=true
+
+FLV Data Rate and Bandwidth... Demysitifed.
+
+--
+
+"That being said, I usually stick with the Animation codec for
+computer-generated graphics, especially for ones with transparent
+regions."
+
+Interactive QuickTime: Authoring Wired Media, Matthew R. Peterson, p. 521
+
+http://books.google.com/books?vid=ISBN1558607463&id=YeQVZ9WbmHgC&pg=PA521&lpg=PA521&dq=%22animation+codec&sig=-dKwWenwgzOYuPQvRLlorUw9JrU
+o
+--
+
+***
+
+"Again, we'll choose the Animation CODEC when saving to ensure highest
+quality" -- page 36
+7
+"Ideally, you'll want to use the Animation CODEC to produce a lossless
+copy of your project.  If you're hurting for disk space, you can go
+ahead and use the DV CODEC, but if you've already exposed your footage
+to one or two levels of compression, this might not be a very good
+idea." -- page 469
+
+Digital Filmmaking Handbook, Ben Long, Sonja Schenk, p. 367
+http://books.google.com/books?vid=ISBN1584500980&id=caAzrUlIXjAC&pg=PA367&lpg=PA367&dq=%22animation+codec&sig=tIBgd6-FCNfsn5sQiJoxM8ZEuVU
+
+--
+
+***
+
+"Many users will prefer the animation codec as it provides a good
+balance of quality to size." -- page 282
+
+"When in doubt, use the Lossless setting.  This will use the Animation
+codec, an incredibly high-quality codec that is universal.  File sizes
+will be larger (and you will have to convert them upon import or in
+the timeline) but the file is 'universal'." -- page 284
+
+After Effects on the Spot: Time-Saving Tips and Shortcuts from the Pros
+By Richard Harrington, Rachel Max, Marcus Geduld
+
+--
+
+***
+
+"Animation.  This codec is significant because, at its Best quality
+setting, it maintains _all_ of the original DV picture quality, while
+still managing to convert files so that they're smaller than files
+with no compression at all.  [snip]
+
+As a result, the Animation codec is a popular format for storing or
+transferring Quicktime footage from one piece of video-editing
+software to another.  Because the files are so huge, however, it's not
+so great as a finished movie file format."
+-- page 280
+
+IMovie 3 & IDVD: The Missing Manual
+By David Pogue
+
+--
+
+"Many of the nicest Motion Menus around begin life as 2-D motion
+compositions in Adobe After Effects.  These motion sequences are more
+typically output using the animation codec, usually at 100 percent
+quality.  This particular codec outputs a very high quality MPEG
+image.  This codec also handles text elements much better than the DV
+codec."
+-- page 395
+
+Dvd Studio Pro 2: A Complete Guide to DVD Authoring
+By Bruce C Nazarian
+
+--
+*********************************************************************
+
+numbers for manual invert image, with uncompressed needing a frame copy:
+ - 175x user time speedup
+ - 66x total speedup
+
+*********************************************************************
+
+great review of capabilities of existing systems:
+
+http://www.linuxjournal.com/article/8589
+
+*********************************************************************
+
+to execute rendering as it was setup:
+
+../blender-2.42a/blender -b ultra-sub.blend -a
+
+amazing!
+
+----
+
+istockvideo:
+# Clips must be encoded with MJPG-A/B, PhotoJPEG, DV, or HDV, at BEST setting.
+
+----
+
+sun 10/29
+
+auth generator in blender (no transformations):
+on compressed data:   64.83s, 66.00s, 66.79s
+on uncompressed data: 90.33s, 88.73s, 87.27s
+--> speedup of medians = 1.34x
+
+reason it's slow:
+ - looks like the image bounding boxes are being allocated, copied around anyway (?)
+
+auth generator in mencoder (no transformations, user time):
+on compressed data: 0.29s, 0.30s, 0.23s
+on uncompressed data: 20.52s, 19.58s, 20.33s
+--> speedup of medians = 70x
+
+--
+
+ultra demo in blender (no transformations):
+on compressed data: 0.19s
+on uncompressed data: 0.41s
+--> speedup of medians = 2.16x
+
+----
+
+status: 
+implementing do_alphaunder_compressed_effect_byte2 in seqeffects.c
+realizing you need to have a rolling buffer that is updated with latest frame as part of compositing
+ --> remaining advantage over fully uncompressed data: don't need to recompress everything
+
+how do you implement the crossover for a single line?
+
+each line can be skip, rle, or new:
+
+-------
+
+some major munging routines in anim.c --> ffmpegfetchibuf
+ - rotation
+ - BGRA -> RGBA
+ - probably scanning over bounding box of image
+   - yes, these lines are the boundaries:
+     unsigned char * p =(unsigned char*) ibuf->rect;
+     unsigned char * e = p + anim->x * anim->y * 4;
+ *--> removed from loop for compressed data, runtime decreases from ~68s to 60s
+ **-> should try further eliminating call to imb_flipy --> must be done both on entry and exit
+  - so there must be other culprits!
+  --> to patch, need to move imb_flipy call below while loops, and set e = p+4 
+
+-------
+
+current task: get right answer on 
+
+../blender-2.42a/blender -b ../samples/ultra-alpha25-compressed.blend -a >& /dev/null
+
+229049 instead of 398950
+
+***************
+
+Auth_generator is a GPL authentification generator for rails.
+http://penso.info/auth_generator
+
+The demo movie is a real online demonstration of how to use it.
+
+***************
+
+todo: setup benchmarks, gather numbers
+- gather a screencast from my machine
+  - re-gather inverse numbers
+   - other pointwise ops:
+    - brightness
+    - contrast
+    - alpha gain
+  - perhaps add a small motion design element in corner perhaps
+
+- make some digital juice videos and composite them
+  - need to think about what to composite onto what
+
+
+                      inverse      brightness      contrast     alpha-gain
+screencast1 (auth)
+screencast2 (mine1)
+background1
+background2
+MDE1
+MDE2
+LowerThird1
+LowerThird2
+
+                     MDE1     MDE2     LowerThird1   LowerThird2
+screencast1 (auth)
+screencast2 (mine1)
+
+                    OverlayMatte1  OverlayMatte2  LowerThirdMatte1  LowerThirdMatte2
+background1
+background2
+
+------------
+
+Screencasts
+screencast1
+screencast2
+
+logo1 - #87, MDE1 - 691x518  logo is 144x114 in bottom right
+logo2 - #89, MDE2 - 691x518  logo is 180x142 in bottom right
+
+Computer Animation
+blenderback-1
+blenderback-2
+
+blenderfore-1
+blenderfore-2
+
+Digital Video Editing
+background1 95,#2
+background2 90,#1
+
+matte1 - frame - 90, #2
+matte2 - lowerthird - 102, #9
+
+------------
+
+for importance/popularity of blender, see the wikipedia page
+ - spiderman2
+ - 250,000 users
+
+blend files from elephant's dream:
+http://xseed.bowiestate.edu/ED/production/
+
+using ani_scissor_attack, mach2, 
+
+------------
+
+status:
+x done constructing/testing inverse cases
+x done constructing/testing uncompressed composites
+- fix the 1-screencast composites
+- then gather numbers
+
+-----
+
+Computing Directly on Compressed Data
+Transforming Programs into the Compressed Domain
+Mapping Streaming Computations into the Compressed Domain
+Mapping Stream Programs into the Compressed Domain
+
+(1) Advisor/ PhD student relationship forever.
+(2) Same institution now, or in past 5 years.
+(3) Collaborator on a publication or grant in the past 5 years.
+(4) Relative or close personal friend.
+
+*** Viktor Kuncak
+*** Martin Rinard   
+
+Additional:
+
+Monica Lam
+Michael Ernst
+Frederic Vivien
+Rodric Rabbah
+Shih-Wei Liao
+Rajeev Barua
+Matthew Frank
+Evelyn Duesterwald
+
+Computing Directly on Compressed Data
+
+Due to the high data rates involved in audio, video, and signal
+processing applications, it is imperative to compress the data to
+decrease the amount of storage used.  However, compression incurs
+extra computational overhead, as any program operating on the data
+must be wrapped by a decompression and re-compression stage.
+
+In this paper, we present a program transformation that eliminates
+much of the overhead involved in processing compressible data.  Given
+a program that operates on uncompressed data, we output an equivalent
+program that operates directly on the compressed format.  We currently
+support lossless compression formats based on LZ77, a popular
+compression algorithm utilized by gzip, PNG, and Apple Animation.  Our
+transformations rely on the streaming model of computation, which
+exposes the flow of data in the applications.
+
+To evaluate the impact of our transformations, we implemented plugins
+for two digital video editing tools: Blender and MPlayer.  For common
+operations such as color adjustment and video compositing, computing
+directly on compressed data offers a speedup roughly proportional to
+the overall compression ratio.  For our benchmark suite of 12 videos
+in Apple Animation format, speedups ranged from 1.5x to 235x.
+
+-----
+
+trying to gather gprof output to assess recompression vs. processing
+ - was unable to get blender to profile shared library in ffmpeg
+ - tried LD_PROFILE, sprof, etc.
+
+-----
+
+with much hacking, increased doalpha_under to be 95% of blender
+runtime.  but taking this away only changes overall runtime by ~20%.
+so there must be something in a blender library that is taking
+forever, and I can't track through gprof.  need to do the static
+build.
+
+--> ah, from blender irc chat -- just remove the .so files from ffmpeg
+directory and then they get linked in statically.  now can view ffmpeg
+profiling under blender!
+
+- if you believe the gprof cumulative time, then it's 3.88s vs. 1.7s
+  for the time in the alpha routine
+
+--------
+
+result of profiling digvid-background2 on inverse:
+
+ - compressed version: 73.4% in memcpy, 25.53% in transcode/inverse
+ - uncompressed version: 63.03% encode_line, 13.84% memcpy, 
+                         13.11 decode_frame, 10.01 encode_frame
+    --> the transform itself didn't get any samples
+    --> presumably uncompressed decode is slower than compressed
+        transcode (which resembles decode) because uncompressed decode
+        is also doing a copy
+
+--------
+
