@@ -42,14 +42,14 @@ screencasts, computer animation, and digital television production.
 While videos in each area are often rendered to a lossy format for
 final distribution, lossless codecs are preferred during the editing
 process to avoid accumulating compression artifacts.  All of our
-source videos are in the Apple Animation format, which is a leading
-choice amongst digital video editing
-professionals~\cite[p.~106]{adobe-anim} \cite[p.~284]{harrington-anim}
-\cite[p.~367]{long-anim} \cite[p.~280]{pogue-anim}.  The Apple
-Animation format is also popular for capturing video from the screen
-or camera, as the encoder is relatively fast.
+source videos are in the Apple Animation format, which is widely used
+by video editing professionals~\cite[p.~106]{adobe-anim}
+\cite[p.~284]{harrington-anim} \cite[p.~367]{long-anim}
+\cite[p.~280]{pogue-anim}.  The Apple Animation format is also popular
+for capturing video from the screen or camera, as the encoder is
+relatively fast.
 
-The videos are assembled from a variety of realistic and
+Our suite of videos is assembled from a variety of realistic and
 industry-standard sources.  The first screencast is an online demo of
 an authentication generator for rails~\cite{auth-demo}; the second is
 a PowerPoint presentation (including animations), captured using
@@ -81,13 +81,13 @@ also in excess of 200x because motion is limited to a small animated
 character.  The animated logos are the next most compressed
 ($\sim$50-70x), influenced largely by the constant blank region
 outside the logo.  The computer animation content ($\sim$10-30x
-compression) is detailed but benefits from both inter-frame and
-intra-frame redundancy, as some rendered regions have constant color.
-Next are the digital video mattes ($\sim$5-10x compression), which
-have fine-grained motion in some sections.  Finally, the digital video
-backgrounds offer almost no compression gains under Apple Animation
-(1.0-1.1x), as they have pervasive motion and detail across the entire
-frame.
+compression) has a high level of detail but benefits from both
+inter-frame and intra-frame redundancy, as some rendered regions have
+constant color.  Next are the digital video mattes ($\sim$5-10x
+compression), which have fine-grained motion in some sections.
+Finally, the digital video backgrounds offer almost no compression
+gains (1.0-1.0x) under Apple Animation, as they have pervasive motion
+and detail across the entire frame.
 
 The Apple Animation format supports various bit depths.  All of our
 source videos use 32 bits per pixel, allocating a single byte for each
@@ -104,6 +104,9 @@ of 20 (saturating at 255).
 center (128) by a factor of 1.2 (saturating at 0 and 255).
 \item Color inversion, which subtracts each RGB value from 255.
 \end{itemize}
+Color inversion is useful for screencasts that have an unusual color
+scheme (e.g., white on black) or for reversing the effect of video
+mattes.
 
 \subsubsection{Setup}
 
@@ -135,10 +138,10 @@ program five times and report the median user time.
 Detailed results for the pixel transformations appear in
 Table~\ref{tab:pixel-speedup}.  Figure~\ref{fig:pixel-speedup}
 illustrates the speedups, which range from 3.1x to 235x.  As
-illustrated in Figure~\ref{fig:graph-speedup-scatter}, the speedups
+illustrated in Figure~\ref{fig:speedup-scatter}, the speedups
 are closely correlated with the compression factor in the original
 video.  For the highly-compressed screencasts and {\tt anim-scene1},
-speedups range from 52x-235x.  For the medium-compression computer
+speedups range from 52x to 235x.  For the medium-compression computer
 animations (including the animated logos), speedups range from 11x to
 40x.  And for the low-compression digital television content, speedups
 range from 3x to 10x.
@@ -148,13 +151,14 @@ avoiding the decompression stage, computing on compressed data reduces
 the volume of data that needs to be stored, manipulated, and
 transformed.  This savings is directly related to the compression
 factor and is responsible for the upwards slope of the graph in
-Figure~\ref{fig:graph-speedup-scatter}.  Second, computing on
+Figure~\ref{fig:speedup-scatter}.  Second, computing on
 compressed data eliminates the algorithmic complexity of
 re-compression.  For the Apple Animation format, the cost of
 compressing a given frame does not increase with the compression
 factor (if anything, it decreases as fewer pixels need a fine-grained
-encoding).  Thus, the impact of re-compression can be visualized as
-the intercept of the graph in Figure~\ref{fig:graph-speedup-scatter}.
+encoding).  Thus, the baseline suffers roughly constant overhead for
+re-compressing data, which explains the positive intercept in the
+graph of Figure~\ref{fig:speedup-scatter}.
 
 The impact of re-compression is especially evident in the digital
 television examples.  Despite a compression factor of 1.0 on {\tt
@@ -174,19 +178,18 @@ first frame may increase the size of the file, as it removes
 inter-frame redundancy.}, performing pixel transformations directly on
 compressed data will never increase the size of the file.  This is
 illustrated in the middle columns of Table~\ref{fig:pixel-speedup}, in
-which the output sizes are mostly equal to the input sizes (to 2
+which the output sizes are mostly equal to the input sizes (up to 2
 decimal places).  The only exception is constrast adjustment on {\tt
 anim-scene1}, in which the output is 3\% smaller than the input due to
 variations in the first frame; for the same reason, some cases
 experience a 0.1\% increase in size (not visisble in the table).
 
-Though computing on compressed data has no significant effect on the
+Though computing on compressed data has virtually no effect on the
 file size, there are some cases in which the pixel transformation
-increases the redundancy in the video.  In such cases, an additional
-re-compression stage (not present in our technique) could compress the
-output even further than the original input.  This potential benefit
-is illustrated in the last three columns of
-Table~\ref{tab:pixel-speedup}, which tracks the output size of the
+increases the redundancy in the video and an additional re-compression
+step could compress the output even further than the original input.
+This potential benefit is illustrated in the last three columns of
+Table~\ref{tab:pixel-speedup}, which track the output size of the
 baseline configuration (including a re-compression stage) versus the
 original input.  For the inverse transformation, no additional
 compression is possible because inverse is a 1-to-1 transform: if two
@@ -196,8 +199,9 @@ contrast transformations may map distinct input values to the same
 ouput value, due to the saturating arithmetic.  In such cases, the
 re-recompression stage can shrink the file to as low as 0.75x
 (brightness) and 0.35x (contrast) its original size.  These are
-extreme cases in which many pixels were close to the saturating point;
-the median compression (across brightness and contrast) is only 10\%.
+extreme cases in which many pixels are close to the saturating point;
+the median re-compression (across brightness and contrast) is only
+10\%.
 
 To achieve the minimal file size whenever possible, future work will
 explore integrating a lightweight recompression stage into the
@@ -206,34 +210,114 @@ already in place, it should be possible to improve the compression
 ratio without running the full encoder (e.g., run-length encoded
 regions can be extended without being rediscovered).  Even running the
 full encoding algorithm (in place on the compressed data) may leave us
-with a significant speedup, as much of the speedup comes from
-decreased data volume rather than the decreased re-compression cost.
+with significant speedups, as much of the improvement comes from
+decreased data volume rather than decreased re-compression cost.
 
 \subsection{Video Compositing}
 
+In video compositing, two videos are combined using a specific
+function to derive each output pixel from a pair of input pixels.  In
+the case of subtitling, animated logos, and computer graphics, an
+alpha-under transformation is common; it overlays one video on top of
+another using the transparency information in the alpha channel.  In
+applying an animated matte, the videos are combined with a multiply
+operation, thereby masking the output according to the brightness of
+the matte.  For our experiments, we generated composites using each
+foreground/background pair within a given application area, yielding a
+total of 12 composites.
 
+\subsubsection{Setup}
+
+We implemented optimized compositing operations as plugins for
+Blender, a popular tool for modeling, rendering, and post-processing
+3-D animations.  Blender has logged 1.8 million downloads in the last
+year~\cite{blender-stats} and was used in the production of Spiderman
+2~\cite{blender-wikipedia}.  Like MEncoder, Blender relies on the
+FFMPEG library for video coding, so we utilize the same Apple
+Animation decoder/encoder as in the pixel transformations.
+
+As Blender already includes support for video compositing, we use its
+implementation as our baseline.  The compositing operations have
+already been hand-tuned for performance; the implementation of
+alpha-under includes multiple shorcuts, unrolled loops, and the
+following comment: ``this complex optimalisation is because the
+'skybuf' can be crossed in''.  We further improved the baseline
+performance by patching other parts of the Blender source base, which
+were designed around 3-D rendering and are more general than needed
+for video editing.  We removed two redundant vertical flips for each
+frame, two redundant BGRA-RGBA conversions, and redundant memory
+allocation/deallocation for each frame.
+% did not mention removal of O(frames^2) linked list search, although 
+% this fell out of removing the redundant memory deallocation
+
+Our optimized configuration uses the compressed processing technique
+to track the current position in both compressed frames.  When both
+frames have inter-frame or intra-frame repeats, the repeats are copied
+directly to the output.  {\bf [[say more depending on method
+section]]} Outside of the plugin, we also patched three frame-copy
+operations in
+% actually four frame-copy operations, though one of them is a no-op
+the Blender source code to copy only the compressed frame data rather
+than the full dimensions of the frame.
+
+\subsubsection{Results}
+
+Full results for the compositing operations appear in
+Table~\ref{tab:composite-speedup}.  Figure~\ref{fig:composite-speedup}
+illustrates the speedups, which range from 1.01x to 34.6x.  As in the
+case of the pixel transformations, the speedups are closely correlated
+with the compression factor of the resulting videos, a relationship
+depicted in Figure~\ref{fig:speedup-scatter}.  The highly-compressed
+screencasts enjoy the largest speedups (16x-35x), the computer
+animations have intermediate speedups (6x-12x), while the digital
+television content has negligible speedups (1.01x-1.24x).  Overall,
+the speedups on video compositing (median = 7.4x) are lower than the
+pixel transformations (median = 19x); this is because the compression
+achieved on composite videos is roughly proportional to the minimum
+compression across the two input files.
+
+As for the pixel transformations, the composite videos produced by the
+compressed processing technique would sometimes benefit from an
+additional re-compression stage.  The last three columns in
+Table~\ref{tab:composite-speedup} quantify this benefit by comparing
+the compression factors achieved by compressed processing and normal
+processing (including a re-compression step).  For screencasts and
+computer animations, compressed processing preserves a sizable
+compression factor (7.7x-44x), though the full re-compression can
+further reduce file sizes by 1.3x to 1.6x.  For digital television,
+the matting operations introduce a large amount of redundancy (black
+regions), thereby enabling the re-compression stage to shrink the file
+by 1.8x to 5.4x over the compresed processing technique.
+
+Even if the composite transformation does not introduce any new
+redundancy in the video, the compressed processing technique may
+increase file sizes by ignoring a specific kind of redundancy in the
+inputs.  Suppose that in the first frame, both inputs are 100\% black,
+while in the second frame, one input is 100\% black and the other is
+100\% white.  If the inputs are averaged, the second frame of output
+will be 100\% gray and can be run-length encoded within the frame.
+However, because the inputs have different kinds of redundancy on the
+second frame (one is inter-frame, the other is intra-frame), the
+technique is unable to detect the intra-frame redundancy in the output
+and will instead produce N distinct pixels (all of them gray).  We
+believe that this effect is small in practice, though we have yet to
+quantify its impact in relation to the new redundancy introduced by a
+transformation.  Future work will explore alternate data structures
+for the compressed processing technique that may be able to preserve
+this redundancy with low overhead.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{table*}[t]
 \psfig{figure=table-benchmarks.eps,width=7.1in}
-\caption{Video characteristics.
+\caption{Characteristics of the video workloads.
 \protect\label{tab:videos}}
 \end{table*}
 
 \begin{table*}[t]
 \psfig{figure=table-pixel-speedup.eps,width=7.1in}
-\caption{Speedup on pixel transformations.
+\caption{Results for pixel transformations.
 \protect\label{tab:pixel-speedup}}
-\end{table*}
-
-\begin{table*}[t]
-\begin{minipage}{0.8in}
-\mbox{~}
-\end{minipage}
-\psfig{figure=table-composite-speedup.eps,width=5.9in}
-\caption{Speedup on composite transformations.
-\protect\label{tab:composite-speedup}}
 \end{table*}
 
 \begin{figure}[t]
@@ -245,8 +329,17 @@ decreased data volume rather than the decreased re-compression cost.
 \begin{figure}[t]
 \psfig{figure=graph-speedup-scatter.eps,width=3.35in}
 \caption{Speedup vs. compression factor for all transformations.
-\protect\label{fig:graph-speedup-scatter}}
+\protect\label{fig:speedup-scatter}}
 \end{figure}
+
+\begin{table*}[t]
+\begin{minipage}{0.8in}
+\mbox{~}
+\end{minipage}
+\psfig{figure=table-composite-speedup.eps,width=5.9in}
+\caption{Results for composite transformations.
+\protect\label{tab:composite-speedup}}
+\end{table*}
 
 \begin{figure}[t]
 \psfig{figure=graph-speedup-composite.eps,width=3.35in}
@@ -255,51 +348,3 @@ decreased data volume rather than the decreased re-compression cost.
 \end{figure}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-{\scriptsize
-\begin{verbatim}
-
-\subsection{Video Compositing}
-
-- goal: combine two source videos into a composite output
-  - subtitling/logos
-  - computer graphics
-  - digital video editing / matte's
-
-- do every background / foreground pair within a given application
-  area, for total of 12 composites
-
-\subsubsection{Setup}
- - implement as part of Blender (describe)
-   - additional modifications needed to avoid O(n) flipping,
-     O(frames^2) linked-list search, O(frames) custom-memory-mallocs,
-     replace memcpy with compressed_memcpy, RGBA-BGRA on compressed
-     data
- - relies on same FFMPEG codec as MEncoder
-
- - baseline: highly hand optimized
-   - give quote from code
- - optimized: analog of a joiner
-   - transcode two in parallel, keeping track of latest frames
-   - if both input videos have a repeat, output a repeat; otherwise
-     output new data
-
-\subsubsection{Results}
-
- - point to speedups
-   - again breakdown by area
-   - point to same linear relationship seen previously
-
- - explain bloat factor, summarize by category
-
-   - compressed data unable to get compression factor in dig
-     tv. category because original videos not compressed much.  but
-     output has so much black in it that they are compressed.
-
- - future improvement: recognize that alpha-under is not changing one
-   of the source videos (perhaps with a linear analysis), then just
-   copy that frame
-
-\end{verbatim}
-}
-
