@@ -1,0 +1,22 @@
+Due to the high data rates involved in audio, video, and signal
+processing applications, it is imperative to compress the data to
+decrease the amount of storage used.  However, compression incurs
+extra computational overhead, as any program operating on the data
+must be wrapped by a decompression and re-compression stage.
+
+In this paper, we present a program transformation that eliminates
+much of the overhead involved in processing compressible data.  Given
+a program that operates on uncompressed data, we output an equivalent
+program that operates directly on the compressed format.  We currently
+support lossless compression formats based on LZ77, a popular
+compression algorithm utilized by gzip, PNG, and Apple Animation.  Our
+transformations rely on the streaming model of computation, which
+exposes the flow of data in the applications.
+
+To evaluate the impact of our transformations, we implemented plugins
+for two digital video editing tools: MEncoder and Blender.  For common
+operations such as color adjustment and video compositing, computing
+directly on compressed data offers a speedup roughly proportional to
+the overall compression ratio.  For our benchmark suite of 12 videos
+in Apple Animation format, speedups range from 1.0x to 235x, with a
+median of 16x.
