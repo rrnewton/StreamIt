@@ -1,18 +1,26 @@
 Before submission:
+------------------
+
+- EXAMPLES of transformations
+
 - abstract: 
   - Apple Animation not "based on" LZ77
   - speedup only proportional to compression ratio for pixel transforms
+
 - results:
+  - backwards pointer to apple animation
   - possibly describe 1x,1x case on scatter plot
   - add pictures of video frames?
-- format section:
-  - apple animation
-     - mention 32bpp
-     - mention pain of translating first frame separately
-     - mention pain of some frames getting bigger
 
 After submission:
+-----------------
+
+- if you combined intra-align and inter-align, could you get better
+  compression?  Maybe intra-align expands LCM's too far
+
 - look at more mencoder transformations
     - autolevels, IIR filters, FIR filters, etc.
+
 - get breakdown of time spent processing vs. time spent re-compressing
+  - can't really explain why encode_frame is so high (e.g., noop/inverse/screencast1)
   - delete *.so* in ffmpeg directory and rebuild blender to link
