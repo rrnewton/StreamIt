@@ -151,14 +151,14 @@ avoiding the decompression stage, computing on compressed data reduces
 the volume of data that needs to be stored, manipulated, and
 transformed.  This savings is directly related to the compression
 factor and is responsible for the upwards slope of the graph in
-Figure~\ref{fig:speedup-scatter}.  Second, computing on
-compressed data eliminates the algorithmic complexity of
-re-compression.  For the Apple Animation format, the cost of
-compressing a given frame does not increase with the compression
-factor (if anything, it decreases as fewer pixels need a fine-grained
-encoding).  Thus, the baseline suffers roughly constant overhead for
-re-compressing data, which explains the positive intercept in the
-graph of Figure~\ref{fig:speedup-scatter}.
+Figure~\ref{fig:speedup-scatter}.  Second, computing on compressed
+data eliminates the algorithmic complexity of re-compression.  For the
+Apple Animation format, the cost of compressing a given frame does not
+increase with the compression factor (if anything, it decreases as
+fewer pixels need a fine-grained encoding).  Thus, the baseline
+devotes roughly constant runtime to re-compressing each video, which
+explains the positive intercept in the graph of
+Figure~\ref{fig:speedup-scatter}.
 
 The impact of re-compression is especially evident in the digital
 television examples.  Despite a compression factor of 1.0 on {\tt
@@ -168,7 +168,14 @@ runtime is spent in the encoder; as this stage is absent from the
 optimized version, it accounts for $1/(1-0.73) = 3.7$x of the speedup.
 The remaining speedup in this case is due to the extra frame buffer
 (and associated memory operations) needed by the baseline
-configuration.
+configuration.  
+%
+%(Don't really understand these profiling numbers yet)
+%
+%Note that videos with larger compression ratios spend
+%a smaller fraction of time in the encoder; for example, color
+%inversion on {\tt screencast1-demo} spends only 5\% of its time in the
+%encoder (and 65\% of the time doing the transformation itself).
 
 Another important aspect of the results is the size of the output
 files produced.  Apart from the first frame of a video\footnote{In the
