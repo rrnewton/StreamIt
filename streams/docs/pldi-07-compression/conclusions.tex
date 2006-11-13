@@ -1,3 +1,78 @@
+\section{Future Work}
+
+There remain rich areas for future work in computing on compressed
+data.  First, as the current transformation has the potential to
+increase the size of the file, we plan to explore lightweight
+techniques for re-compressing a data stream that is already partially
+compressed.  This should be straightforward in the case of Apple
+Animation; for example, a run-length encoded unit can be extended
+without needing to be rediscovered.
+
+Second, the compressed processing technique can be applied far beyond
+the current focus.  In its current form, the technique could be
+evaluated on video operations such as thresholding, color depth
+reduction, sepia toning, saturation adjustment, and color replacement.
+With minor extensions (see Section~\ref{sec:extensions}), the
+technique can support video operations such as cropping, padding,
+histograms, image flipping, sharpening, and blurring.  The technique
+may also have applications in an embedded setting, where it could
+offer power savings---for example, in processing the RAW data format
+within digital cameras.
+
+Finally, research is underway to apply a similar technique to lossy,
+DCT-based compression formats.  The streaming model cf computation
+also offers key advantages in this domain, as neighboring actors that
+compute linear functions can be algebraically simplified at compile
+time~\cite{aalamb}.  For example, a JPEG transcoder typically performs
+an iDCT (during decompression), followed by the user's transformation,
+followed by a DCT (during compression).  If the user's transformation
+is also linear (e.g., brightness adjustment) then all three stages can
+be automatically collapsed, thereby eliminating the decompression and
+re-compression steps.  Preliminary experiments in this direction
+indicate speedups upwards 10x.  By extending the framework to multiple
+compression formats, users will be able to write their transformations
+once, in a high-level language, and rely on the compiler to map the
+computations to each of the compresed domains.
+
 \section{Conclusions}
 \label{sec:conclusions}
 
+%% Many of the applications that will drive the next generation of
+%% computing systems---digital video editing, computer vision, computer
+%% graphics and animation---operate on image and video formats that are
+%% universally stored in compressed data formats.  
+
+In order to accelerate operations on compressible data, this paper
+presents a general technique for translating programs into the
+compressed domain.  Given a natural program that operates on
+uncompressed data, our transformation outputs a program that directly
+operates on the compressed data format.  We support lossless
+compression formats based on LZ77.  In the general case, the
+transformed program may need to partially decompress the data to
+perform the computation, though this decompression is minimized
+throughout the process and significant compression ratios are
+preserved without resorting to an explicit re-compression step.
+
+Though our transformations would likely prove intractable in a
+language such as C, they are quite straightforward in the synchronous
+dataflow model.  Synchronous dataflow is supported by high-level
+languages such as StreamIt and is a natural fit for media processing
+applications.  Because each actor in a synchronous dataflow graph has
+a regular pattern of communication, it can easily be wrapped in our
+compressed execution driver.  A similar transformation may be possible
+in a functional language, if the compiler can detect that a function
+is repeatedly applied across a window of data.
+
+Our techniques demonstrate excellent speedups in our experimental
+evaluation.  Across a suite of 12 videos in Apple Animation format,
+computing directly on compressed data offers a speedup roughly
+proportional to the compression ratio.  For pixel transformations
+(brightness, contrast, inverse) speedups range from 3.1x to 235x, with
+a median of 19x; for video compositing operations (overlays and
+mattes) speedups range from 1.0x to 35x, with a median of 7.4x.  While
+previous researchers have used special-purpose compressed processing
+techniques to obtain speedups on lossy, DCT-based codecs, we are
+unaware of a comparable demonstration for lossless video compression.
+As digital films and animated features have embraced lossless formats
+for the editing process, the speedups obtained may have significant
+practical value.
