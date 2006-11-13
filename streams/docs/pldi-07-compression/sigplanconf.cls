@@ -635,7 +635,10 @@
     \noindent \@setfigurenumber{#1.}\nut #2\par
   \else
     \centerline{\box\@tempboxa}%
-  \fi}
+  \fi
+% BY BILL
+\vspace{-6pt}
+}
 
 \newcommand{\nocaptionrule}{%
   \@setflag \@caprule = \@false}

@@ -21,12 +21,12 @@ The main results of our evaluation are:
 proportional to the compression factor in the resulting video.
 
 \item For pixel transformations, speedups range from 3.1x to 235x,
-with a median of 19x.
+with a median of 19x.  Output sizes are within 0.1\% of input sizes
+and about 10\% larger (median) than a full re-compression.
 
 \item For video compositing, speedups range from 1.0x to 35x, with a
-median of 7.4x.
-
-\item {\bf [[summarize bloat using language of method section]]}
+median of 7.4x.  Output files retain a sizable compression ratio (1.0x
+to 44x) and are about 56\% larger (median) than a full re-compression.
 
 \end{itemize}
 The following sections provide more details on our video workloads,
@@ -42,12 +42,12 @@ screencasts, computer animation, and digital television production.
 While videos in each area are often rendered to a lossy format for
 final distribution, lossless codecs are preferred during the editing
 process to avoid accumulating compression artifacts.  All of our
-source videos are in the Apple Animation format, which is widely used
-by video editing professionals~\cite[p.~106]{adobe-anim}
-\cite[p.~284]{harrington-anim} \cite[p.~367]{long-anim}
-\cite[p.~280]{pogue-anim}.  The Apple Animation format is also popular
-for capturing video from the screen or camera, as the encoder is
-relatively fast.
+source videos are in the Apple Animation format (described in
+Section~\ref{sec:formats-good}), which is widely used by video editing
+professionals~\cite[p.~106]{adobe-anim} \cite[p.~284]{harrington-anim}
+\cite[p.~367]{long-anim} \cite[p.~280]{pogue-anim}.  The Apple
+Animation format is also popular for capturing video from the screen
+or camera, as the encoder is relatively fast.
 
 Our suite of videos is assembled from a variety of realistic and
 industry-standard sources.  The first screencast is an online demo of
@@ -71,6 +71,12 @@ high-resolution, rotating backdrops as might appear in the
 introduction to a program.  The mattes are black-and-white animations
 that can be used to synthesize a smaller overlay (such as a frame or a
 ``lower third'', often used for text) from a full animated background.
+
+\begin{table*}[t]
+\psfig{figure=table-pixel-speedup.eps,width=7.1in}
+\caption{Results for pixel transformations.
+\protect\label{tab:pixel-speedup}}
+\end{table*}
 
 The videos exhibit a wide range of compression factors.  The
 screencasts have very high compression ($\sim$100x-400x) because only
@@ -210,6 +216,12 @@ extreme cases in which many pixels are close to the saturating point;
 the median re-compression (across brightness and contrast) is only
 10\%.
 
+\begin{figure}[t]
+\psfig{figure=graph-speedup-pixel.eps,width=3.35in}
+\caption{Speedup on pixel transformations.
+\protect\label{fig:pixel-speedup}}
+\end{figure}
+
 To achieve the minimal file size whenever possible, future work will
 explore integrating a lightweight recompression stage into the
 compressed processing technique.  Because most of the compression is
@@ -243,6 +255,12 @@ year~\cite{blender-stats} and was used in the production of Spiderman
 FFMPEG library for video coding, so we utilize the same Apple
 Animation decoder/encoder as in the pixel transformations.
 
+\begin{figure}[t]
+\psfig{figure=graph-speedup-scatter.eps,width=3.35in}
+\caption{Speedup vs. compression factor for all transformations.
+\protect\label{fig:speedup-scatter}}
+\end{figure}
+
 As Blender already includes support for video compositing, we use its
 implementation as our baseline.  The compositing operations have
 already been hand-tuned for performance; the implementation of
@@ -260,12 +278,21 @@ allocation/deallocation for each frame.
 Our optimized configuration uses the compressed processing technique
 to track the current position in both compressed frames.  When both
 frames have inter-frame or intra-frame repeats, the repeats are copied
-directly to the output.  {\bf [[say more depending on method
-section]]} Outside of the plugin, we also patched three frame-copy
-operations in
+directly to the output.  Outside of the plugin, we also patched three
+frame-copy operations in
 % actually four frame-copy operations, though one of them is a no-op
 the Blender source code to copy only the compressed frame data rather
 than the full dimensions of the frame.
+
+
+\begin{table*}[t]
+\begin{minipage}{0.6in}
+\mbox{~}
+\end{minipage}
+\psfig{figure=table-composite-speedup.eps,width=5.8in}
+\caption{Results for composite transformations.
+\protect\label{tab:composite-speedup}}
+\end{table*}
 
 \subsubsection{Results}
 
@@ -313,45 +340,8 @@ transformation.  Future work will explore alternate data structures
 for the compressed processing technique that may be able to preserve
 this redundancy with low overhead.
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\begin{table*}[t]
-\psfig{figure=table-benchmarks.eps,width=7.1in}
-\caption{Characteristics of the video workloads.
-\protect\label{tab:videos}}
-\end{table*}
-
-\begin{table*}[t]
-\psfig{figure=table-pixel-speedup.eps,width=7.1in}
-\caption{Results for pixel transformations.
-\protect\label{tab:pixel-speedup}}
-\end{table*}
-
-\begin{figure}[t]
-\psfig{figure=graph-speedup-pixel.eps,width=3.35in}
-\caption{Speedup on pixel transformations.
-\protect\label{fig:pixel-speedup}}
-\end{figure}
-
-\begin{figure}[t]
-\psfig{figure=graph-speedup-scatter.eps,width=3.35in}
-\caption{Speedup vs. compression factor for all transformations.
-\protect\label{fig:speedup-scatter}}
-\end{figure}
-
-\begin{table*}[t]
-\begin{minipage}{0.8in}
-\mbox{~}
-\end{minipage}
-\psfig{figure=table-composite-speedup.eps,width=5.9in}
-\caption{Results for composite transformations.
-\protect\label{tab:composite-speedup}}
-\end{table*}
-
 \begin{figure}[t]
 \psfig{figure=graph-speedup-composite.eps,width=3.35in}
 \caption{Speedup on composite transformations.
 \protect\label{fig:composite-speedup}}
 \end{figure}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

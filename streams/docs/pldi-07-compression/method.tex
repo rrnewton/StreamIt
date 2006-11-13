@@ -4,19 +4,19 @@
 struct rgb {
   byte r, g, b;
 }
-
-rgb->rgb filter InvertColor() {
-  work push 1 pop 1 {
-    rgb pixel = pop();
-    pixel.r = 255 - pixel.r;
-    pixel.g = 255 - pixel.g;
-    pixel.b = 255 - pixel.b;
-    push(pixel);
-  }
-}
-
-void->void pipeline Toplevel() {
-  add ReadRGB();
+                                           --------------
+rgb->rgb filter InvertColor() {            |  ReadRGB   |
+  work push 1 pop 1 {                      --------------
+    rgb pixel = pop();                           |
+    pixel.r = 255 - pixel.r;                    \./
+    pixel.g = 255 - pixel.g;               --------------
+    pixel.b = 255 - pixel.b;               | InvertColor|
+    push(pixel);                           --------------
+  }                                              |
+}                                               \./
+                                           --------------
+void->void pipeline Toplevel() {           |  WriteRGB  |
+  add ReadRGB();                           --------------
   add InvertColor();
   add WriteRGB();
 }
@@ -62,12 +62,10 @@ tape.  The work function can contain general-purpose code.
 LZ77 is a lossless, dictionary-based compression algorithm.  Named
 after its creators Lempel and Ziv, which published the algorithm in
 1977~\cite{lz77}, LZ77 forms the basis for many popular compression
-codecs such as DEFLATE\cite{deflate} (used in GZIP\cite{gzip} and
-ZLIB\cite{zlib}) and PNG~\cite{png}.  As described in
+formats, including ZIP, GZIP and PNG.  As described in
 Section~\ref{sec:formats}, LZ77 also serves as a generalization of
-run-length encoding techniques such as Apple Animation and Microsoft
-RLE, allowing our transformations to naturally extend to these
-formats.
+simpler encodings such as Apple Animation, Microsoft RLE, and Targa,
+allowing our transformations to naturally extend to these formats.
 
 \begin{figure}[t]
 \scriptsize
@@ -93,16 +91,16 @@ to the output.  The distances are bounded, which enables the decoder
 to operate with a fixed buffer size.  It is important to note that the
 count may exceed the distance, in which case some of the values
 produced by a repeat operation are also copied by that operation.  For
-example, a value 2 followed by a repeat $\langle1, 3\rangle$ results
-in an output of ``2 2 2''.  An additional example of LZ77 compression
+example, a value A followed by a repeat $\langle1, 3\rangle$ results
+in an output of ``A A A''.  An additional example of LZ77 compression
 is given in Figure~\ref{fig:lz77}.
 
 \begin{figure}[t]
-\scriptsize
-\begin{verbatim}
-TODO
-\end{verbatim}
-\caption{Example of LZ77 compression.
+\begin{minipage}{0.21in}
+\mbox{~}
+\end{minipage}
+\psfig{figure=lz77-figure.eps,width=2.6in}
+\caption{Example of LZ77 decompression.
 \protect\label{fig:lz77}}
 \end{figure}
 
@@ -121,7 +119,9 @@ will not be as compressed as possible, under certain conditions the
 output is guaranteed to be fully compressed (relative to the
 compression of the input).
 
-{\bf [[outline of section]]}
+We describe the transformation in three stages, first focussing on the
+execution of actors themselves before detailing two helper routines.
+We also discuss some optimizations and extensions to the technique.
 
 \subsection{Execution of Actors}
 
@@ -147,106 +147,6 @@ pop n1 |      | pop n2               |             |
 \end{verbatim}
 \caption{Overall execution of an actor A in the uncompressed and compressed domains.
 \protect\label{fig:actor-pic}}
-\end{figure}
-
-\begin{figure}[t]
-\scriptsize
-\begin{verbatim}
-S1 o V1; S2 o V2 -> T  |V1| = n1, |V2| = n2
---------------------------------------------- [exec-uncompressed]
-S1; S2 -> A(V1, V2) o T
-\end{verbatim}
-\caption{Semantics of \textsc{Exec(A)}: execution of actor A in the
-uncompressed domain.  $V_1$ and $V_2$ denote lists of values, $\circ$
-denotes list concatenation, $A$ represents the work function of the
-actor, and $n_1$, $n_2$ and $m$ are I/O rates.
-\protect\label{fig:exec-rule}}
-\end{figure}
-
-\begin{figure}[t]
-\scriptsize
-\begin{verbatim}
-S1 o V1; S2 o V2 -> T  |V1| = n1, |V2| = n2
-------------------------------------------------  [exec-uncompressed]
-S1; S2 -> A(V1, V2) o T
-
-S1 o (d*n1, c*n1); S2 o (d*n2, c*n2) -> T
------------------------------------------------   [exec-compressed]
-S1; S2 -> <d*m, c*m> o T
-\end{verbatim}
-
-\caption{Semantics of \textsc{Compressed-Exec(A)}: execution of actor
-$A$ in the compressed domain.  Notations are the same as in
-Figure~\ref{fig:exec-rule}.  \protect\label{fig:compressed-exec-rule}}
-\end{figure}
-
-\begin{figure}[t]
-\scriptsize
-\begin{verbatim}
-S o V -> T            |V|=n
---------------------------- [pass-uncompressed]
-S -> V o T
-
-S o <d, c> -> T      d%n=0, c>=n
---------------------------------- [pass-compressed]
-S o <d, c%n> -> <d, c-c%n> o T
-
-                     (c<n or 1<=|V|<n or d%n>0) AND
-S o <d, c> o V -> T  c<=LCM(d,n)
------------------------------------------- [expand]
-S o <d, c-1> o decode(<d,1>) o V -> T
-
-S o <d, 0> o V -> T
--------------------- [prune]
-S o V -> T
-
-                     let L=LCM(d,n)
-S o <d, c> o V -> T  d%n>0,c>L
--------------------------------------- [coarsen-repeat]
-S o <L, c-(L-d)> o <d, L-d> o V -> T
-
-\end{verbatim}
-\caption{Semantics of \textsc{Intra-Stream-Align}($n$): aligning data
-to a granularity of $n$.  The \mbox{\it decode} function uncompresses
-a repeat token into a list of values; other notations are given in
-Figure~\ref{fig:exec-rule}. \protect\label{fig:intra-stream-align}}
-\end{figure}
-
-\begin{figure}[t]
-\scriptsize
-\begin{verbatim}
-S1 o V1; S2 o V2 -> T1; T2   |V1| = n1, |V2| = n2
---------------------------------------------------- [pass-uncompressed]
-S1; S2 -> V1 o T1; V2 o T2 
-
-S1 o <d1*n1, c1*n1>; 
-S2 o <d2*n2, c2*n2> -> T1, T2   d1=d2,c1>=c2
----------------------------------------- [pass-compressed]
-S1 o <d1*n1, (c1-c2)*n1>; 
-S2 -> <d1*n1, c2*n1> o T1; <d2*n2, c2*n2> o T2
-
-S1 o <d1*n1, c1*n1>;                 (|V2|>0 or d1!=d2) AND
-S2 o <d2*n2, c2*n2> o V2 -> T1, T2   (c1<=LCM(d1,d2) or c2<=LCM(d1,d2))
--------------------------------------------------------------- [expand]
-S1 o <d1*n1, (c1-1)*n1> o decode(<d1*n1, n1>) o V1;
-S2 o <d2*n2, c2*n2> o V2 -> T1, T2
-
-S1 o <d, 0> o V; S2 -> T1, T2
-------------------------- [prune]
-S1 o V; S2 -> T1; T2
-
-                                     V1,V2 may be empty
-S1 o <d1*n1, c1*n1> o V1;            let L = LCM(d1,d2)
-S2 o <d2*n2, c2*n2> o V2 -> T1, T2   d1<d2,c1>L,c2>L
------------------------------------------------------- [coarsen-repeat]
-S1 o <L*n1, (c1-(L-d1))*n1> o <d1*n1, (L-d1)*n1> o V1
-S2 o <d2*n2, c2*n2> o V2 -> T1, T2;
-
-\end{verbatim}
-\caption{Semantics of \textsc{Inter-Stream-Align}($n_1$, $n_2$):
-aligning two streams with granularities $n_1$ and $n_2$.  Notations
-are the same as in Figure~\ref{fig:inter-stream-align}.
-\protect\label{fig:inter-stream-align}}
 \end{figure}
 
 We describe the transformation for an actor with two input streams and
@@ -279,6 +179,36 @@ actors input a list of $n_1$ values from the end of stream 1 and $n_2$
 values from the end of stream 2; these lists are denoted by $V_1$ and
 $V_2$.  The actor pushes its results, denoted by $A(V_1, V_2)$, onto
 the front of the output stream.
+
+\begin{figure}[t]
+\scriptsize
+\begin{verbatim}
+S1 o V1; S2 o V2 -> T  |V1| = n1, |V2| = n2
+--------------------------------------------- [exec-uncompressed]
+S1; S2 -> A(V1, V2) o T
+\end{verbatim}
+\caption{Semantics of \textsc{Exec(A)}: execution of actor A in the
+uncompressed domain.  $V_1$ and $V_2$ denote lists of values, $\circ$
+denotes list concatenation, $A$ represents the work function of the
+actor, and $n_1$, $n_2$ and $m$ are I/O rates.
+\protect\label{fig:exec-rule}}
+\end{figure}
+
+\begin{figure}[t]
+\scriptsize
+\begin{verbatim}
+S1 o V1; S2 o V2 -> T  |V1| = n1, |V2| = n2
+------------------------------------------------  [exec-uncompressed]
+S1; S2 -> A(V1, V2) o T
+
+S1 o (d*n1, c*n1); S2 o (d*n2, c*n2) -> T
+-----------------------------------------------   [exec-compressed]
+S1; S2 -> <d*m, c*m> o T
+\end{verbatim}
+\caption{Semantics of \textsc{Compressed-Exec(A)}: execution of actor
+$A$ in the compressed domain.  Notations are the same as in
+Figure~\ref{fig:exec-rule}.  \protect\label{fig:compressed-exec-rule}}
+\end{figure}
 
 Actor execution in the compressed domain requires a sequence of
 transformations (see Figure~\ref{fig:actor-pic}b).  First, each stream
@@ -363,7 +293,73 @@ distance, as otherwise the repeat references old data that may have no
 periodicity.  Also, the stream needs to be padded with LCM-$d$ values
 before the coarsened repeat can begin; this padding takes the form of
 a shorter repeat using the original distance.  
-{\bf [[add explanatory figure?]]}
+
+\begin{figure}[t]
+\scriptsize
+\begin{verbatim}
+S o V -> T            |V|=n
+--------------------------- [pass-uncompressed]
+S -> V o T
+
+S o <d, c> -> T      d%n=0, c>=n
+--------------------------------- [pass-compressed]
+S o <d, c%n> -> <d, c-c%n> o T
+
+                     (c<n or 1<=|V|<n or d%n>0) AND
+S o <d, c> o V -> T  c<=LCM(d,n)
+------------------------------------------ [expand]
+S o <d, c-1> o decode(<d,1>) o V -> T
+
+S o <d, 0> o V -> T
+-------------------- [prune]
+S o V -> T
+
+                     let L=LCM(d,n)
+S o <d, c> o V -> T  d%n>0,c>L
+-------------------------------------- [coarsen-repeat]
+S o <L, c-(L-d)> o <d, L-d> o V -> T
+\end{verbatim}
+\caption{Semantics of \textsc{Intra-Stream-Align}($n$): aligning data
+to a granularity of $n$.  The \mbox{\it decode} function uncompresses
+a repeat token into a list of values; other notations are given in
+Figure~\ref{fig:exec-rule}. \protect\label{fig:intra-stream-align}}
+\end{figure}
+
+\begin{figure}[t]
+\scriptsize
+\begin{verbatim}
+S1 o V1; S2 o V2 -> T1; T2   |V1| = n1, |V2| = n2
+--------------------------------------------------- [pass-uncompressed]
+S1; S2 -> V1 o T1; V2 o T2 
+
+S1 o <d1*n1, c1*n1>; 
+S2 o <d2*n2, c2*n2> -> T1, T2   d1=d2,c1>=c2
+---------------------------------------- [pass-compressed]
+S1 o <d1*n1, (c1-c2)*n1>; 
+S2 -> <d1*n1, c2*n1> o T1; <d2*n2, c2*n2> o T2
+
+S1 o <d1*n1, c1*n1>;                 (|V2|>0 or d1!=d2) AND
+S2 o <d2*n2, c2*n2> o V2 -> T1, T2   (c1<=LCM(d1,d2) or c2<=LCM(d1,d2))
+-------------------------------------------------------------- [expand]
+S1 o <d1*n1, (c1-1)*n1> o decode(<d1*n1, n1>) o V1;
+S2 o <d2*n2, c2*n2> o V2 -> T1, T2
+
+S1 o <d, 0> o V; S2 -> T1, T2
+------------------------- [prune]
+S1 o V; S2 -> T1; T2
+
+                                     V1,V2 may be empty
+S1 o <d1*n1, c1*n1> o V1;            let L = LCM(d1,d2)
+S2 o <d2*n2, c2*n2> o V2 -> T1, T2   d1<d2,c1>L,c2>L
+------------------------------------------------------ [coarsen-repeat]
+S1 o <L*n1, (c1-(L-d1))*n1> o <d1*n1, (L-d1)*n1> o V1
+S2 o <d2*n2, c2*n2> o V2 -> T1, T2;
+\end{verbatim}
+\caption{Semantics of \textsc{Inter-Stream-Align}($n_1$, $n_2$):
+aligning two streams with granularities $n_1$ and $n_2$.  Notations
+are the same as in Figure~\ref{fig:inter-stream-align}.
+\protect\label{fig:inter-stream-align}}
+\end{figure}
 
 \subsection{Inter-Stream Alignment}
 
@@ -412,8 +408,7 @@ then the distances can be coarsened to the LCM of their original
 values.  For this to be profitable, the repeat counts must also exceed
 the LCM value, as otherwise there would be no repetition following the
 coarsening.  The rule coarsens one stream at a time; it needs to be
-applied twice if neither repeat distance is equal to the LCM. {\bf
-[[add example?]]}
+applied twice if neither repeat distance is equal to the LCM.
 
 \subsection{Optimizations}
 \label{sec:opt}
