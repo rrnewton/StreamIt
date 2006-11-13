@@ -1,1 +1,120 @@
 \section{Introduction}
+
+With the emergence of data-intensive applications such as digital
+film, medical imaging and geographic information systems, the
+performance of next-generation systems will often depend on their
+ability to process huge volumes of data.  For example, each frame of a
+digital film requires approximately 2 megabytes, implying that a
+fully-edited 90-minute video demands about 300 gigabytes of data for
+the imagery alone~\cite{ibm-video}.  Industrial Light and Magic
+reports that, in 2003, their processing pipeline output 13.7 million
+frames and their internal network processed 9 petabytes of
+data~\cite{ilm-interview}.  The U.S. Geological Survey had archived
+over 13 million frames of photographic data by the end of 2004, and
+estimates that 5 years is needed to digitize 8.6 million additional
+images~\cite{usgs}.  In all of these situations, the data is highly
+compressed to reduce storage costs.  At the same time, extensive
+post-processing of the images and videos is often required.  As such
+processing logically operates on the uncompressed format, the usual
+practice is to decompress and re-compress the data whenever it needs
+to be modified.
+
+In order to accelerate the process of editing compressed data,
+researchers have identified specific transformations that can be
+mapped into the compressed domain---that is, they can operate directly
+on the compressed data format rather than on the uncompressed
+format~\cite{surveys-folder}.  In addition to averting the cost of the
+decompression and re-compression, such techniques greatly reduce the
+total volume of data processed, thereby offering large savings in both
+execution time and memory footprint.
+
+However, existing techniques for operating directly on compressed data
+are limited to special-purpose transformations on specific data
+formats.  The process of mapping a new operation to the compressed
+domain is so ad-hoc and painstaking that each mapping warrants a new
+publication.  For DCT-based spatial compression formats (JPEG,
+Motion-JPEG), researchers have developed algorithms for
+resizing\cite{image/dugad01,imag/mukerjee}, edge
+detection\cite{11-shen,12-shen}, image
+segmentation\cite{image/feng03}, shearing and rotating inner
+blocks\cite{image/++shen98}, and arbitrary linear combinations of
+pixels~\cite{smith98}.  Techniques extending to DCT-based temporal
+compression (MPEG) include captioning\cite{video/nang00}, distortion
+detection\cite{video/dorai99}, transcoding~\cite{video/smith98}, and
+others~\cite{surveys/wee02}.  For run-length encoded images,
+algorithms have been devised for efficient transpose and
+rotation~\cite{shoji95,images/99-misra}.  A compressed audio format
+has been invented that allows direct modification of pitch and
+playback speed~\cite{audio/levine}.
+
+This paper presents the first technique for automatically mapping
+flexible, user-defined computations into the compressed domain.  While
+this problem has been regarded as too unwieldy for general-purpose
+source languages such as C, we make the problem tractable by using a
+streaming model of computation.  Stream programming captures the
+essential functionality needed by image, video, and signal processing
+applications while exposing the flow of data to the compiler.  Our
+transformation targets lossless compression formats based on LZ77,
+which includes popular standards such as Apple Animation, PNG, and
+gzip.  Lossless compression is widely used in computer animation and
+digital video editing in order to avoid accumulating compression
+artifacts.  By providing a programmable solution, our technique
+enables a large class of transformations to be customized by the user
+and directly applied to the compressed data.
+
+The key idea behind our technique can be understood in simple terms.
+Consider a data stream that is run-length encoded, that is, it
+indicates that a given value is repeated $n$ times.  Consider further
+that the user program processes only one value at a time---for
+example, it applies a uniform adjustment to each pixel.  Since the
+input stream contains only one distinct value, the program only needs
+to be invoked once; the multiplicity of $n$ can be directly copied
+from the input stream to the output stream without performing any
+additional computation.  Our technique generalizes this notion in two
+important ways.  First, it targets LZ77, a sliding-window compression
+algorithm that is much more powerful than run-length encoding.
+Second, it supports a broad class of user-defined modules, which may
+contain multiple input streams and process multiple values at a time.
+
+We have implemented our transformations as hand-coded plugins for
+MEncoder and Blender, two popular video editing tools.  We evaluated
+the compressed processing technique for a variety of pixel
+transformations (brightness, contrast, color inversion) as well as
+video compositing (overlays and mattes).  Using a suite of 12 videos
+(screencasts, computer animations, digital television content) in
+Apple animation format, computing directly on compressed data offers a
+speedup roughly proportional to the compression factor.  For pixel
+transformations, speedups range from 3.1x to 235x, with a median of
+19x; for video compositing, speedups range from 1.0x to 35x, with a
+median of 7.4x.
+
+In the general case, our compressed processing technique may need to
+partially decompress the input data, thereby producing an output file
+that is larger than the input file.  Even if the output size remains
+constant, the output may benefit from an additional re-compression
+step if new redundancy is introduced during the transformation (for
+example, increasing image brightness can whiteout parts of the image).
+This effect turns out to be minor in the case of our experiments.  For
+pixel transformations, output sizes are within 0.1\% of input sizes
+and usually within 10\% (median) of a full re-compression.  For video
+compositing, output files maintain sizable compression ratios (1.0x to
+44x) and benefit by 56\% (median) by an additional recompression.
+
+To summarize, this paper makes the following contributions:
+\begin{itemize}
+
+\item An automatic mapping from an arbitrary stream program, written
+in the synchronous dataflow model, to operate directly on lossless
+LZ77-compressed data (Sections 2-3).
+
+\item An analysis of popular lossless compression formats and the
+opportunities for direct processing on each (Section 4).
+
+\item An empirical demonstration that computing on compressed data can
+speedup realistic operations in popular video editing tools.  Across
+all benchmarks, the median speedup is 16x (Section 5).
+
+\end{itemize}
+
+The paper concludes with related work (Section 6) and conclusions
+(Section 7).
