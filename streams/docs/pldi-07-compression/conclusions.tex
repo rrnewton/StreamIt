@@ -1,39 +1,3 @@
-\section{Future Work}
-
-There remain rich areas for future work in computing on compressed
-data.  First, as the current transformation has the potential to
-increase the size of the file, we plan to explore lightweight
-techniques for re-compressing a data stream that is already partially
-compressed.  This should be straightforward in the case of Apple
-Animation; for example, a run-length encoded unit can be extended
-without needing to be rediscovered.
-
-Second, the compressed processing technique can be applied far beyond
-the current focus.  In its current form, the technique could be
-evaluated on video operations such as thresholding, color depth
-reduction, sepia toning, saturation adjustment, and color replacement.
-With minor extensions (see Section~\ref{sec:extensions}), the
-technique can support video operations such as cropping, padding,
-histograms, image flipping, sharpening, and blurring.  The technique
-may also have applications in an embedded setting, where it could
-offer power savings---for example, in processing the RAW data format
-within digital cameras.
-
-Finally, research is underway to apply a similar technique to lossy,
-DCT-based compression formats.  The streaming model cf computation
-also offers key advantages in this domain, as neighboring actors that
-compute linear functions can be algebraically simplified at compile
-time~\cite{aalamb}.  For example, a JPEG transcoder typically performs
-an iDCT (during decompression), followed by the user's transformation,
-followed by a DCT (during compression).  If the user's transformation
-is also linear (e.g., brightness adjustment) then all three stages can
-be automatically collapsed, thereby eliminating the decompression and
-re-compression steps.  Preliminary experiments in this direction
-indicate speedups upwards 10x.  By extending the framework to multiple
-compression formats, users will be able to write their transformations
-once, in a high-level language, and rely on the compiler to map the
-computations to each of the compresed domains.
-
 \section{Conclusions}
 \label{sec:conclusions}
 

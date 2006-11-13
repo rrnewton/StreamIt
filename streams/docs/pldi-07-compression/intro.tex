@@ -23,10 +23,11 @@ In order to accelerate the process of editing compressed data,
 researchers have identified specific transformations that can be
 mapped into the compressed domain---that is, they can operate directly
 on the compressed data format rather than on the uncompressed
-format~\cite{surveys-folder}.  In addition to averting the cost of the
-decompression and re-compression, such techniques greatly reduce the
-total volume of data processed, thereby offering large savings in both
-execution time and memory footprint.
+format~\cite{chang95survey,mandal95survey,smith95survey,wee02survey}.
+In addition to averting the cost of the decompression and
+re-compression, such techniques greatly reduce the total volume of
+data processed, thereby offering large savings in both execution time
+and memory footprint.
 
 However, existing techniques for operating directly on compressed data
 are limited to special-purpose transformations on specific data
@@ -34,18 +35,17 @@ formats.  The process of mapping a new operation to the compressed
 domain is so ad-hoc and painstaking that each mapping warrants a new
 publication.  For DCT-based spatial compression formats (JPEG,
 Motion-JPEG), researchers have developed algorithms for
-resizing\cite{image/dugad01,imag/mukerjee}, edge
-detection\cite{11-shen,12-shen}, image
-segmentation\cite{image/feng03}, shearing and rotating inner
-blocks\cite{image/++shen98}, and arbitrary linear combinations of
-pixels~\cite{smith98}.  Techniques extending to DCT-based temporal
-compression (MPEG) include captioning\cite{video/nang00}, distortion
-detection\cite{video/dorai99}, transcoding~\cite{video/smith98}, and
-others~\cite{surveys/wee02}.  For run-length encoded images,
-algorithms have been devised for efficient transpose and
-rotation~\cite{shoji95,images/99-misra}.  A compressed audio format
-has been invented that allows direct modification of pitch and
-playback speed~\cite{audio/levine}.
+resizing~\cite{dugad01,mukherjee02}, edge
+detection~\cite{shen96,shen96b}, image segmentation~\cite{feng03},
+shearing and rotating inner blocks~\cite{shen98}, and arbitrary linear
+combinations of pixels~\cite{smith96b}.  Techniques extending to
+DCT-based temporal compression (MPEG) include captioning~\cite{nang00},
+reversal~\cite{vasudev98}, distortion detection~\cite{dorai00},
+transcoding~\cite{smith98}, and others~\cite{wee02survey}.  For
+run-length encoded images, algorithms have been devised for efficient
+transpose and rotation~\cite{misra99,shoji95}.  A compressed audio
+format has been invented that allows direct modification of pitch and
+playback speed~\cite{levine98}.
 
 This paper presents the first technique for automatically mapping
 flexible, user-defined computations into the compressed domain.  While
@@ -54,13 +54,13 @@ source languages such as C, we make the problem tractable by using a
 streaming model of computation.  Stream programming captures the
 essential functionality needed by image, video, and signal processing
 applications while exposing the flow of data to the compiler.  Our
-transformation targets lossless compression formats based on LZ77,
-which includes popular standards such as Apple Animation, PNG, and
-gzip.  Lossless compression is widely used in computer animation and
-digital video editing in order to avoid accumulating compression
-artifacts.  By providing a programmable solution, our technique
-enables a large class of transformations to be customized by the user
-and directly applied to the compressed data.
+transformation targets LZ77, a lossless encoding utilized by ZIP, and
+immediately applies to simpler formats such as Apple Animation,
+Microsoft RLE, and Targa.  Lossless compression is widely used in
+computer animation and digital video editing in order to avoid
+accumulating compression artifacts.  By providing a programmable
+solution, our technique enables a large class of transformations to be
+customized by the user and directly applied to the compressed data.
 
 The key idea behind our technique can be understood in simple terms.
 Consider a data stream that is run-length encoded, that is, it
