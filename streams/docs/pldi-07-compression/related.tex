@@ -1,26 +1,54 @@
 \section{Related Work}
 \label{sec:related}
 
-Swartz and Smith, (RIVL) - Resolution Independent Video Language~\cite{languages/swartz95}
- - builds sequence of image transformations and does lazy evaluation to avoid computing pixels that are not seen
+Several other researchers have pursued the idea of operating directly
+on compressed data formats.  The novelty of our work is two-fold:
+first, in its ability to map an arbitrary stream program, rather than
+a single predefined operation, into the compressed domain; and second,
+in its focus on lossless compression formats.
 
-Levine describes new representations for audio signals that allow modifying playback speed or pitch without decompression\cite{audio/Levine}
+Most of the previous work on mapping algorithms into the compressed
+domain has focussed on formats such as JPEG that utilize a Discrete
+Cosine Transform (DCT) to achieve spatial
+compression~\cite{refs-from-intro}.  This task requires a different
+analysis, with particular attention given to details such as the
+blocked decomposition of the image, quantization of DCT coefficients,
+zig-zag ordering, and so-on.  Because there is also a run-length
+encoding stage in JPEG, our current technique might find some
+application there; however, it appears that techniques designed for
+JPEG have limited application to formats such as LZ77.  Also, we are
+unaware of any previous methodology for translating a generic program
+to operate on compressed data; previous efforts have mapped each
+algorithm in a manual and ad-hoc way.
 
-%% 11. B. Shen and I. K. Sethi, ‘‘Direct feature extraction from
+There has been some interest in performing compressed processing on
+lossless encodings of black-and-white images.  Shoji presents the pxy
+format for performing transpose and other affine
+operations~\cite{shoji95}; the memory behavior of the technique was
+later improved by Misra et al.~\cite{images/99-misra}.  As described
+in Section~\ref{sec:formats}, the pxy format lists the $(x,y)$
+coordinate pairs at which a black-and-white image changes color during
+a horizontal scan.  If the image is represented using LZ77
+compression, our transformation could also preserve some compression
+during a transpose if we include support for filters with state (see
+Section~\ref{sec:extensions}.
+
+From the perspective of programming languages, Swartz and Smith
+present RIVL, a Resolution Independent Video
+Language~\cite{languages/swartz95}.  The language is used to describe
+a sequence of image transformations; this allows the compiler to
+analyze the sequence and, via lazy evaluation, to eliminate any
+operations that do not effect the final output.  Such a technique is
+complementary to ours and could also be implemented using StreamIt as
+the source language.
+
+%% 11. B. Shen and I. K. Sethi, ``Direct feature extraction from
 %% compressed images,’’ in Storage & Retrieval for Image and Video
-%% Databases IV, Proc. SPIE 2670, pp. 404–414 ~1996!.
+%% Databases IV, Proc. SPIE 2670, pp. 404-414 ~1996.
 %%
-%% 12. B. Shen and I. K. Sethi, ‘‘Convolution-based Edge detection
+%% 12. B. Shen and I. K. Sethi, ``Convolution-based Edge detection
 %% for image/video in block DCT domain,’’ J. Visual Commun. Image
-%% Represent 7~4!, 411–423 ~1996!.
+%% Represent 7~4'', 411-423 ~1996!.
 %%
 %% Brian C. Smith and Lawrence A. Rowe. Compressed domain processing of
 %% JPEG encoded images. Real-Time Imaging, 2, 1996.
-
-Shoji presents a technique for performing transpose and other affine
-operations on run-length encoded images~\cite{shoji95}; Misra at
-al. later improved the memory efficiency of the
-technique~\cite{images/99-misra}.  Levine describes new
-representations for audio signals that allow modifying playback speed
-or pitch without decompressing the data\cite{audio/Levine}
-
