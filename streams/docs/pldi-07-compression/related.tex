@@ -31,13 +31,12 @@ The pxy format lists the $(x,y)$ coordinate pairs at which a
 black-and-white image changes color during a horizontal scan.  If the
 image is represented using LZ77 compression, our transformation could
 also preserve some compression during a transpose if we include
-support for filters with state (see Section~\ref{sec:extensions}.
+support for filters with state (see Section~\ref{sec:extensions}).
 
-From the perspective of programming languages, Swartz and Smith
-present RIVL, a Resolution Independent Video
-Language~\cite{swartz95}.  The language is used to describe
-a sequence of image transformations; this allows the compiler to
-analyze the sequence and, via lazy evaluation, to eliminate any
-operations that do not effect the final output.  Such a technique is
-complementary to ours and could also be implemented using StreamIt as
-the source language.
+In the realm of programming languages, Swartz and Smith present RIVL,
+a Resolution Independent Video Language~\cite{swartz95}.  The language
+is used to describe a sequence of image transformations; this allows
+the compiler to analyze the sequence and, via lazy evaluation, to
+eliminate any operations that do not effect the final output.  Such a
+technique is complementary to ours and could also be implemented using
+StreamIt as the source language.

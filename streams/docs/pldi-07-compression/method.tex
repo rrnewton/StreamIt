@@ -45,9 +45,9 @@ with known communication patterns.  As a programmer, one can use a
 high-level language such as StreamIt~\cite{streamitcc} to express a
 synchronous dataflow program.  An example StreamIt program appears in
 Figure~\ref{fig:streamit}.  It consists of a sequence of four actors
-(also called filters) that reads lines of RGB data from a file,
-shrinks the width by a factor of two, inverts the color of each pixel,
-then writes the data to a file.  In the {\tt InvertColor} actor, the
+(also called filters) that read lines of RGB data from a file,
+shrink the width by a factor of two, invert the color of each pixel,
+then write the data to a file.  In the {\tt InvertColor} actor, the
 {\tt work} function specifies the atomic execution step; it declares
 that on each execution, it pops (inputs) 1 item from the input tape
 and pushes (outputs) 1 item to the output tape.  The work function can
@@ -219,8 +219,8 @@ both the distance and the count are multiples of $n$.  As a second
 stage, the two input streams are aligned with each other.  The
 inter-stream alignment guarantees that 1) if one stream is emitting a
 repeat, then the other is emitting a repeat, and 2) if both streams
-are emitting a repeat, then the repeat distances (and independently,
-the counts) are in a ratio that matches the actor's input rates.
+are emitting a repeat, then they are repeating the same logical
+executions of the actor.
 
 After the alignment stages comes the execution of the compressed
 actor, which appears in Figure~\ref{fig:compressed-exec-rule}.  The
@@ -283,17 +283,17 @@ later.  If the count of a repeat reaches zero, it is eliminated by the
 The final rule, {\tt coarsen-repeat}, preserves a specific kind of
 compression in the input stream.  Consider that a filter pops two
 items at a time, but encounters a long repeat with distance three and
-count 100.  That is, input stream contains a regular pattern of values
-with periodicity three.  Though consecutive executions of the filter
-are aligned at different offsets in this pattern, every third filter
-execution (spanning six values) falls at the same alignment.  In
-general, a repeat with distance $d$ can be exploited by a filter with
-pop rate $n$ by expanding the distance to $\mbox{LCM}(d, n)$.  In
+count 100.  That is, the input stream contains a regular pattern of
+values with periodicity three.  Though consecutive executions of the
+filter are aligned at different offsets in this pattern, every third
+filter execution (spanning six values) falls at the same alignment.
+In general, a repeat with distance $d$ can be exploited by a filter
+with pop rate $n$ by expanding the distance to $\mbox{LCM}(d, n)$.  In
 order to perform this expansion, the count must be greater than the
 distance, as otherwise the repeat references old data that may have no
-periodicity.  Also, the stream needs to be padded with LCM-$d$ values
-before the coarsened repeat can begin; this padding takes the form of
-a shorter repeat using the original distance.  
+periodicity.  Also, the stream needs to be padded with $\mbox{LCM}-d$
+values before the coarsened repeat can begin; this padding takes the
+form of a shorter repeat using the original distance.
 
 \begin{figure}[t]
 $S \concat V \rightarrow T~~~|V|=n$\name{pass-uncompressed}\skiptopb
@@ -410,14 +410,14 @@ applied twice if neither repeat distance is equal to the LCM.
 \subsection{Optimizations}
 \label{sec:opt}
 
-Though the transformation to the compressed domain was formulated in
+As the transformation to the compressed domain is formulated in
 fully general terms, the process can be streamlined considerably for
 common classes of inputs:
 \begin{itemize}
-\item If an actor has only one input stream, then no inter-stream
-alignment is needed.
 \item If an actor has a pop rate of one ($n=1$) on a given stream,
 then no intra-stream alignment is needed.
+\item If an actor has only one input stream, then no inter-stream
+alignment is needed.
 \item If the repeat distance is equal to the LZ77 window size, then no
 decompression is needed because it would simply overwrite the same
 values in the buffer.  This property holds for inter-frame repeats in
@@ -451,17 +451,18 @@ initial value.
 \item {\it Dynamic input and output rates.}  The current formulation
 relies on an actor's fixed I/O rates to calculate repeat distances and
 counts for the output tape from the repeat tokens on the input tapes.
-However, a lookup table could be used to track the actual I/O rates on
-each execution.  In the event of a repeat, the recorded I/O rates from
-the previous execution could be used to calculate the repeat
+However, in the presence of unpredictable I/O rates (e.g., edge
+detection), a lookup table could be used to track the actual I/O rates
+on each execution.  In the event of a repeat, the recorded I/O rates
+from the previous execution could be used to calculate the repeat
 parameters on the output tape.
 
 \item {\it Sliding window computations.}  We currently assume that an
 actor consumes all of the items it inspects on a given execution step.
 However, some actors (e.g., a Gaussian blur filter) inspect a window
-of values in addition to the one that is popped from the input.  Such
-{\it peeking} filters can be supported by adjusting the translation of
-repeat tokens, shortening the output count to match the period that the
+of values in addition to the one that is consumed.  Such {\it peeking}
+filters can be supported by adjusting the translation of repeat
+tokens, shortening the output count to match the period that the
 entire window was within the repeated range.
 
 \end{itemize}

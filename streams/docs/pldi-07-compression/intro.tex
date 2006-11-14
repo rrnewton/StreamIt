@@ -71,19 +71,19 @@ applied to the compressed data.
 The key idea behind our technique can be understood in simple terms.
 Consider a data stream that is run-length encoded, that is, it
 indicates that a given value is repeated $n$ times.  Consider further
-that the user program processes only one value at a time---for
-example, it applies a uniform adjustment to each pixel.  Since the
-input stream contains only one distinct value, the program only needs
-to be invoked once; the multiplicity of $n$ can be directly copied
-from the input stream to the output stream without performing any
-additional computation.  Our technique generalizes this notion in two
-important ways.  First, it targets LZ77, a popular sliding-window
-compression algorithm that subsumes run-length encoding.  Second, it
-supports a broad class of user-defined filters, which may contain
-multiple input streams and process multiple values at a time.
+that the program processes only one value at a time---for example, it
+applies a uniform adjustment to each pixel.  Since the input stream
+contains only one distinct value, the program only needs to be invoked
+once; the multiplicity of $n$ can be directly copied from the input
+stream to the output stream without performing any additional
+computation.  Our technique generalizes this notion in two important
+ways.  First, it targets LZ77, a popular sliding-window compression
+algorithm that subsumes run-length encoding.  Second, it supports a
+broad class of user-defined filters, which may contain multiple input
+streams and process multiple values at a time.
 
 We manually applied our transformations to produce optimized plugins
-for two popular video editing tools, MEncoder and Blender.  We
+for two popular video editing tools: MEncoder and Blender.  We
 evaluated the compressed processing technique for a variety of pixel
 transformations (brightness, contrast, color inversion) as well as
 video compositing (overlays and mattes).  Using a suite of 12 videos
@@ -94,18 +94,17 @@ transformations, speedups range from 3.1x to 235x, with a median of
 19x; for video compositing, speedups range from 1.0x to 35x, with a
 median of 7.4x.
 
-In the general case, our compressed processing technique may need to
-partially decompress the input data, thereby producing an output file
-that is larger than the input file.  Even if the output size remains
-constant, the output may benefit from an additional re-compression
-step if new redundancy is introduced during the transformation (for
-example, increasing image brightness can whiteout parts of the image).
-This effect turns out to be minor in the case of our experiments.  For
-pixel transformations, output sizes are within 0.1\% of input sizes
-and often within 10\% (median case) of a full re-compression.  For
-video compositing, output files maintain a sizable compression ratio
-of 8.8x (median) while full re-compression results in a ratio of 13x
-(median).
+In the general case, compressed processing techniques may need to
+partially decompress the input data to support the behavior of certain
+programs.  Even if no decompression is performed, the output may
+benefit from an additional re-compression step if new redundancy is
+introduced during the processing (for example, increasing image
+brightness can whiteout parts of the image).  This effect turns out to
+be minor in the case of our experiments.  For pixel transformations,
+output sizes are within 0.1\% of input sizes and often within 10\%
+(median case) of a full re-compression.  For video compositing, output
+files maintain a sizable compression ratio of 8.8x (median) while full
+re-compression results in a ratio of 13x (median).
 
 To summarize, this paper makes the following contributions:
 \begin{itemize}

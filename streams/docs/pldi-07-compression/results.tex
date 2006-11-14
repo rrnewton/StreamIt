@@ -13,8 +13,8 @@ popular video editing tools, MEncoder and Blender.  The plugins are
 written for the Apple Animation format, and support any transformation
 that either adjusts a single pixel (MEncoder) or combines two pixels
 together (Blender).  Though we have yet to implement a fully automatic
-translation to generate the plugins from StreamIt source code, we do
-not forese foresee any major hurdles in doing so.
+translation from general StreamIt source code, we do not foresee any
+major hurdles in doing so.
 
 The main results of our evaluation are:
 \begin{itemize}
@@ -73,7 +73,8 @@ library~\cite{digital-juice}.  The backgrounds represent
 high-resolution, rotating backdrops as might appear in the
 introduction to a program.  The mattes are black-and-white animations
 that can be used to synthesize a smaller overlay (such as a frame or a
-``lower third'', often used for text) from a full animated background.
+``lower third'', often used for text) from a full animated background
+(see Figure~\ref{fig:videos}b for an example).
 
 \begin{table*}[t]
 \psfig{figure=table-pixel-speedup.eps,width=7.1in}
@@ -132,7 +133,7 @@ transformations, then re-compression.  Because the main video frame is
 updated incrementally by the decoder, the pixel transformations are
 unable to modify the frame in place (otherwise pixels present across
 frames would be transformed multiple times).  Thus, the baseline
-transformations write to a separate location in memory.  The optimized
+transformation writes to a separate location in memory.  The optimized
 configuration performs pixel transformations directly on the
 compressed data, avoiding data expansion implied by decompression and
 multiple frame buffers, before copying the data to the output file.
@@ -215,11 +216,11 @@ This potential benefit is illustrated in the last three columns of
 Table~\ref{tab:pixel-speedup}, which track the output size of the
 baseline configuration (including a re-compression stage) versus the
 original input.  For the inverse transformation, no additional
-compression is possible because inverse is a 1-to-1 transform: if two
-pixels have different values in the input file, then they have
-different values in the output file.  However, the brightness and
-contrast transformations may map distinct input values to the same
-output value, due to the saturating arithmetic.  In such cases, the
+compression is possible because inverse is a 1-to-1 transform: two
+pixels have equal values in the output file if and only if they have
+equal values in the input file.  However, the brightness and contrast
+transformations may map distinct input values to the same output
+value, due to the saturating arithmetic.  In such cases, the
 re-compression stage can shrink the file to as low as 0.75x
 (brightness) and 0.35x (contrast) its original size.  These are
 extreme cases in which many pixels are close to the saturating point;

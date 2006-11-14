@@ -3,16 +3,16 @@
 
 As LZ77 refers to a compression algorithm rather than a complete
 compression format, there are additional factors to consider in
-mapping computations to a real-world image or video codec.  Some
+mapping computations to real-world image and video codecs.  Some
 codecs are a subset of LZ77, utilizing only run-length encoding or a
 fixed window size; these are supported very efficiently by our
 technique.  Others are a superset of LZ77, incorporating additional
 techniques such as delta coding or Huffman coding; these may incur
 additional processing overhead.
 
-In the following sections, we describe the practical considerations in
-targeting various compression formats with our technique.  Formats
-are ordered by approximate goodness of the mapping admitted.
+In the following sections, we describe the practical considerations
+involved in targeting various compression formats with our technique.
+Formats are ordered by approximate goodness of the achievable mapping.
 
 \subsection{High-Efficiency Mappings}
 \label{sec:formats-good}
@@ -22,7 +22,7 @@ LZ77.
 
 \paragraph{Apple Animation.}  
 The Apple Animation codec (which forms the basis for our experimental
-evaluation) is supported as part of the Quicktime {\tt .mov} container
+evaluation) is supported as part of the Quicktime MOV container
 format.  It serves as an industry standard for exchanging computer
 animations and digital video content before they are rendered to lossy
 formats for final distribution~\cite[p.~106]{adobe-anim}\cite[p.~284]{harrington-anim} \cite[p.~367]{long-anim}\cite[p.~280]{pogue-anim}.
@@ -31,13 +31,14 @@ The Animation codec represents a restricted form of LZ77 in which
 repeat distances are limited to two values: a full frame or a single
 pixel.  A repeat across frames indicates that a stretch of pixels did
 not change from one frame to the next, while a repeat across pixels
-indicates that a stretch of pixels have the same color within a frame.
+indicates that a stretch of pixels has the same color within a frame.
 % mention bit depths?
 
 \paragraph{Flic Video.}
 Flic Video files (FLI/FLC) were originally produced by Autodesk
-Animator, and are still supported by many animation packages today.
-Its compression of frame data is almost identical to Apple Animation.
+Animator and are still supported by many animation packages today.
+Their compression of frame data is almost identical to Apple
+Animation.
 
 \paragraph{Microsoft RLE.}
 Microsoft RLE compression can appear in both BMP images and AVI
@@ -93,8 +94,9 @@ files.
 
 The formats in this category are supersets of LZ77.  While our
 technique could offer some gains in exploiting the LZ77 compression,
-it would also have to decompress the other layers of compression that
-have been introduced.
+it would have to undo any compression sitting on top of LZ77 and
+offers limited benefit for filters (as in PNG) applied underneath
+LZ77.
 
 \begin{table*}[t]
 \vspace{-1\baselineskip}
@@ -107,7 +109,7 @@ have been introduced.
 DEFLATE is a general-purpose algorithm that provides all of the
 compression for popular formats such as ZIP and GZIP.  The algorithm
 consists of a full LZ77 encoder followed by Huffman coding, which
-resizes the symbols in the stream to match to their usage frequencies.
+resizes the symbols in the stream to match their usage frequencies.
 In targeting ZIP or GZIP with our transformations, we would first
 have to undo the Huffman coding (unless the application simply
 reordered data, in which case the coding could remain intact).  Though
@@ -128,7 +130,8 @@ the image.  However, before running DEFLATE, the pixels are usually
 filtered with a delta encoding; each pixel is replaced with the
 difference between its value and a predicted value, where the
 prediction is a linear combination of neighboring pixels.  While
-programs that compute a linear function~\cite{aalamb} could perhaps be
-mapped to this compressed format, our current technique only applies
-if the delta encoding is turned off.  Even in this scenario, there is
-a large amount of overhead due to the Huffman coding in DEFLATE.
+program segments that compute a linear function~\cite{aalamb} could
+perhaps be mapped to this compressed format, our current technique
+only applies if the delta encoding is turned off.  Even in this
+scenario, there is a large amount of overhead due to the Huffman
+coding in DEFLATE.
