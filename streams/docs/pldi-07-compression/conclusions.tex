@@ -17,19 +17,24 @@ perform the computation, though this decompression is minimized
 throughout the process and significant compression ratios are
 preserved without resorting to an explicit re-compression step.
 
-Though our transformations would likely prove intractable in a
-language such as C, they are quite straightforward in the synchronous
-dataflow model.  Synchronous dataflow is supported by high-level
-languages such as StreamIt and is a natural fit for media processing
-applications.  Because each actor in a synchronous dataflow graph has
-a regular pattern of communication, it can easily be wrapped in our
-compressed execution driver.  A similar transformation may be possible
-in a functional language, if the compiler can detect that a function
-is repeatedly applied across a window of data.
+While we formulated our transformation in terms of the synchronous
+dataflow model, the techniques can be applied within other functional
+and general-purpose languages so long as the right information is
+available and certain constraints are satisfied.  The transformation
+relies on a regular pattern of data access; we use a streaming
+abstraction, but structured iteration over arrays could also suffice.
+We rely on static data rates in actors, which can also be expressed as
+functions with a fixed number of arguments and return values.  Actors
+(functions) must be pure, without side-effects or unresolvable
+dependences on potentially mutable data.  While these properties are
+intrinsic to a language such as StreamIt, they also come naturally in
+most functional languages and may be adaptable to general-purpose
+languages in the form of a runtime library with a restricted API.
 
-Our techniques demonstrate excellent speedups in our experimental
-evaluation.  Across a suite of 12 videos in Apple Animation format,
-computing directly on compressed data offers a speedup roughly
+Though we have not implemented a fully automatic version of our
+transformation, a manual application of our techniques demonstrates
+excellent speedups.  Across a suite of 12 videos in Apple Animation
+format, computing directly on compressed data offers a speedup roughly
 proportional to the compression ratio.  For pixel transformations
 (brightness, contrast, inverse) speedups range from 3.1x to 235x, with
 a median of 19x; for video compositing operations (overlays and

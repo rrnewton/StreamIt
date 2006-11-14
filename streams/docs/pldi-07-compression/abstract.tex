@@ -16,10 +16,9 @@ Microsoft RLE, and Targa.  Our transformations rely on the streaming
 model of computation, which exposes the flow of data in the
 applications.
 
-To evaluate the impact of our transformations, we implemented plugins
-for two digital video editing tools: MEncoder and Blender.  For common
-operations such as color adjustment and video compositing, computing
-directly on compressed data offers a speedup roughly proportional to
-the overall compression ratio.  For our benchmark suite of 12 videos
-in Apple Animation format, speedups range from 1.0x to 235x, with a
-median of 16x.
+We manually applied our transformations within two video editing
+tools: MEncoder and Blender.  For common operations such as color
+adjustment and video compositing, computing directly on compressed
+data offers a speedup roughly proportional to the overall compression
+ratio.  For our benchmark suite of 12 videos in Apple Animation
+format, speedups range from 1.0x to 235x, with a median of 16x.
