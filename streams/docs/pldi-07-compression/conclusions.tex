@@ -23,18 +23,17 @@ and general-purpose languages so long as the right information is
 available and certain constraints are satisfied.  The transformation
 relies on a regular pattern of data access; we use a streaming
 abstraction, but structured iteration over arrays could also suffice.
-We rely on static data rates in actors, which can also be expressed as
-functions with a fixed number of arguments and return values.  Actors
-(functions) must be pure, without side-effects or unresolvable
+We rely on static data rates in actors, which could also be expressed
+as functions with a fixed number of arguments and return values.
+Actors (functions) must be pure, without side effects or unresolvable
 dependences on potentially mutable data.  While these properties are
 intrinsic to a language such as StreamIt, they also come naturally in
 most functional languages and may be adaptable to general-purpose
 languages in the form of a runtime library with a restricted API.
 
-Though we have not implemented a fully automatic version of our
-transformation, a manual application of our techniques demonstrates
-excellent speedups.  Across a suite of 12 videos in Apple Animation
-format, computing directly on compressed data offers a speedup roughly
+In our empirical evaluation, our techniques demonstrate excellent
+speedups.  Across a suite of 12 videos in Apple Animation format,
+computing directly on compressed data offers a speedup roughly
 proportional to the compression ratio.  For pixel transformations
 (brightness, contrast, inverse) speedups range from 3.1x to 235x, with
 a median of 19x; for video compositing operations (overlays and
