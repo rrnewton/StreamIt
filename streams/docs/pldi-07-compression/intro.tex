@@ -42,7 +42,7 @@ domain is so ad-hoc and painstaking that each mapping warrants a new
 publication.  For DCT-based spatial compression formats (JPEG,
 Motion-JPEG), researchers have developed algorithms for
 resizing~\cite{dugad01,mukherjee02}, edge
-detection~\cite{shen96,shen96b}, image segmentation~\cite{feng03},
+detection~\cite{shen96b,shen96}, image segmentation~\cite{feng03},
 shearing and rotating inner blocks~\cite{shen98}, and arbitrary linear
 combinations of pixels~\cite{smith96b}.  Techniques extending to
 DCT-based temporal compression (MPEG) include captioning~\cite{nang00},
@@ -53,7 +53,8 @@ transpose and rotation~\cite{misra99,shoji95}.  A compressed audio
 format has been invented that allows direct modification of pitch and
 playback speed~\cite{levine98}.
 
-This paper presents the first technique for automatically mapping
+\enlargethispage{0.2\baselineskip}
+This paper presents the first technique for systematically mapping
 flexible, user-defined computations into the compressed domain.  While
 this mapping would require a heroic program analysis for arbitrary C
 programs, we make the problem tractable by using a streaming model of
@@ -82,17 +83,17 @@ algorithm that subsumes run-length encoding.  Second, it supports a
 broad class of user-defined filters, which may contain multiple input
 streams and process multiple values at a time.
 
-We manually applied our transformations to produce optimized plugins
-for two popular video editing tools: MEncoder and Blender.  We
-evaluated the compressed processing technique for a variety of pixel
-transformations (brightness, contrast, color inversion) as well as
-video compositing (overlays and mattes).  Using a suite of 12 videos
-(screencasts, computer animations, digital television content) in
-Apple animation format, computing directly on compressed data offers a
-speedup roughly proportional to the compression factor.  For pixel
-transformations, speedups range from 3.1x to 235x, with a median of
-19x; for video compositing, speedups range from 1.0x to 35x, with a
-median of 7.4x.
+To understand the performance potential of our technique, we manually
+applied our transformations and produced optimized plugins for two
+popular video editing tools: MEncoder and Blender.  We evaluated the
+compressed processing technique for a variety of pixel transformations
+(brightness, contrast, color inversion) as well as video compositing
+(overlays and mattes).  Using a suite of 12 videos (screencasts,
+computer animations, digital television content) in Apple animation
+format, computing directly on compressed data offers a speedup roughly
+proportional to the compression factor.  For pixel transformations,
+speedups range from 3.1x to 235x, with a median of 19x; for video
+compositing, speedups range from 1.0x to 35x, with a median of 7.4x.
 
 In the general case, compressed processing techniques may need to
 partially decompress the input data to support the behavior of certain
