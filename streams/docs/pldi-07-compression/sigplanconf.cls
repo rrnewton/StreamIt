@@ -930,7 +930,8 @@
   \noindent \LARGE \bfseries \@titletext \par
   \vskip 6pt
   \noindent \Large \@subtitletext \par
-  \vskip 12pt
+% BY BILL
+%  \vskip 12pt
   \ifcase \@authorcount
     \@latex@error{No authors were specified for this paper}{}\or
     \@titleauthors{i}{}{}\or
@@ -954,7 +955,8 @@
   \else
     \@latex@error{Cannot handle more than 12 authors}{}%
   \fi
-  \vspace{1.75pc}
+% BY BILL
+%  \vspace{1.75pc}
   \end{center}}
 
 \def \@settitlebanner {%

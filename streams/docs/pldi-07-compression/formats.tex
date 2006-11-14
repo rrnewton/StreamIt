@@ -11,7 +11,7 @@ techniques such as delta coding or Huffman coding; these may incur
 additional processing overhead.
 
 In the following sections, we describe the practical considerations in
-targetting various compression formats with our technique.  Formats
+targeting various compression formats with our technique.  Formats
 are ordered by approximate goodness of the mapping admitted.
 
 \subsection{High-Efficiency Mappings}
@@ -52,13 +52,13 @@ widely used to render frame sequences in the computer animation and
 video industries.  The format includes an optional RLE compression
 stage, making it a good target for our technique.
 
-\paragraph{PXY.}
-The pxy format is a research-based image format designed to support
-efficient transpose and rotation of black-and-white
-images~\cite{shoji95}.  It consists of the series of $(x,y)$
-coordinates at which the image changes color during a horizontal scan.
-As this information can be converted to a run-length encoding, it can
-also be targetted by our technique.
+%% \paragraph{PXY.}
+%% The pxy format is a research-based image format designed to support
+%% efficient transpose and rotation of black-and-white
+%% images~\cite{shoji95}.  It consists of the series of $(x,y)$
+%% coordinates at which the image changes color during a horizontal scan.
+%% As this information can be converted to a run-length encoding, it can
+%% also be targetted by our technique.
 
 \subsection{Medium-Efficiency Mappings}
 \label{sec:formats-med}
@@ -97,6 +97,7 @@ it would also have to decompress the other layers of compression that
 have been introduced.
 
 \begin{table*}[t]
+\vspace{-1\baselineskip}
 \psfig{figure=table-benchmarks.eps,width=7.1in}
 \caption{Characteristics of the video workloads.
 \protect\label{tab:videos}}
@@ -107,7 +108,7 @@ DEFLATE is a general-purpose algorithm that provides all of the
 compression for popular formats such as ZIP and GZIP.  The algorithm
 consists of a full LZ77 encoder followed by Huffman coding, which
 resizes the symbols in the stream to match to their usage frequencies.
-In targetting ZIP or GZIP with our transformations, we would first
+In targeting ZIP or GZIP with our transformations, we would first
 have to undo the Huffman coding (unless the application simply
 reordered data, in which case the coding could remain intact).  Though
 Huffman decoding is a lightweight lookup operation, it would also

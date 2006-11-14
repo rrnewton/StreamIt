@@ -8,7 +8,7 @@ a single predefined operation, into the compressed domain; and second,
 in its focus on lossless compression formats.
 
 Most of the previous work on mapping algorithms into the compressed
-domain has focussed on formats such as JPEG that utilize a Discrete
+domain has focused on formats such as JPEG that utilize a Discrete
 Cosine Transform (DCT) to achieve spatial
 compression~\cite{smith98,dorai00,dugad01,feng03,mukherjee02,nang00,shen96,shen96b,shen98,smith96b,vasudev98}.
 This task requires a different analysis, with particular attention
@@ -25,13 +25,13 @@ There has been some interest in performing compressed processing on
 lossless encodings of black-and-white images.  Shoji presents the pxy
 format for performing transpose and other affine
 operations~\cite{shoji95}; the memory behavior of the technique was
-later improved by Misra et al.~\cite{misra99}.  As described
-in Section~\ref{sec:formats}, the pxy format lists the $(x,y)$
-coordinate pairs at which a black-and-white image changes color during
-a horizontal scan.  If the image is represented using LZ77
-compression, our transformation could also preserve some compression
-during a transpose if we include support for filters with state (see
-Section~\ref{sec:extensions}.
+later improved by Misra et al.~\cite{misra99}.  
+%As described in Section~\ref{sec:formats}, 
+The pxy format lists the $(x,y)$ coordinate pairs at which a
+black-and-white image changes color during a horizontal scan.  If the
+image is represented using LZ77 compression, our transformation could
+also preserve some compression during a transpose if we include
+support for filters with state (see Section~\ref{sec:extensions}.
 
 From the perspective of programming languages, Swartz and Smith
 present RIVL, a Resolution Independent Video

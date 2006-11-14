@@ -711,3 +711,10 @@ COMPLETE:
 http://www.fileformat.info/format/fli/spec/index.htm
 PARTIAL:
 http://www.whisqu.se/per/docs/graphics55.htm
+
+-----
+
+to convert png to eps:
+
+"c:\Program Files\Krause\bin\bmeps.exe" blender-background1-frame5.png -c > blender-background1-frame5.eps
+--> need to do this instead of includegraphics because dvips somehow can't deal with that output in color -- goes to B&W postscript

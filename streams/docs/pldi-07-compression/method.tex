@@ -1,35 +1,30 @@
+% RULE APPEARANCE:
+\newcommand{\x}{\hspace{1.3pt}} % arithmetic multiplication symbol
+\newcommand{\concat}[0]{\bullet}               % list concatenation symbol
+\newcommand{\name}[1]{~~\hfill\framebox{#1}}   % for labeling rules
+
+% RULE SPACING:
+\newcommand{\skiptop}[0]{\vspace{-13pt}\\}   % for single line on top
+\newcommand{\skiptopa}[0]{\vspace{-1pt}\\}   % for first line of two-line top part
+\newcommand{\skiptopb}[0]{\vspace{-3pt}\\}   % for second line of two-line top part
+\newcommand{\skipbot}[0]{\vspace{-3pt}\\}    % for single line on botto
+
+% HELPER FOR REPEATS:
+\newcommand{\tup}[2]{\langle#1, #2\rangle}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \begin{figure}[t]
-\scriptsize
-\begin{verbatim}
-struct rgb {
-  byte r, g, b;
-}
-                                           --------------
-rgb->rgb filter InvertColor() {            |  ReadRGB   |
-  work push 1 pop 1 {                      --------------
-    rgb pixel = pop();                           |
-    pixel.r = 255 - pixel.r;                    \./
-    pixel.g = 255 - pixel.g;               --------------
-    pixel.b = 255 - pixel.b;               | InvertColor|
-    push(pixel);                           --------------
-  }                                              |
-}                                               \./
-                                           --------------
-void->void pipeline Toplevel() {           |  WriteRGB  |
-  add ReadRGB();                           --------------
-  add InvertColor();
-  add WriteRGB();
-}
-\end{verbatim}
-\caption{StreamIt program for color inversion.
+\psfig{figure=streamit-figure.eps,width=3.408in}
+\caption{Example StreamIt program.
 \protect\label{fig:streamit}}
 \end{figure}
 
 \section{Program Representation}
 
-Our transformation relies on the synchronous dataflow model of
-computation and the LZ77 representation of compressed data.  These are
-described in the next two sections.
+Our transformation relies on the synchronous dataflow representation
+for input programs and the LZ77 representation of compressed data.
+These are described in the next two sections.
 
 \subsection{Synchronous Dataflow}
 
@@ -49,18 +44,19 @@ processing kernels, as such programs often have a regular structure
 with known communication patterns.  As a programmer, one can use a
 high-level language such as StreamIt~\cite{streamitcc} to express a
 synchronous dataflow program.  An example StreamIt program appears in
-Figure~\ref{fig:streamit}.  It consists of a sequence of three actors
-(also called filters) that reads RGB data from a file, inverts the
-color of each pixel, then writes the data to a file.  In the {\tt
-InvertColor} actor, the {\tt work} function specifies the atomic
-execution step; it declares that on each execution, it pops (inputs) 1
-item from the input tape and pushes (outputs) 1 item to the output
-tape.  The work function can contain general-purpose code.
+Figure~\ref{fig:streamit}.  It consists of a sequence of four actors
+(also called filters) that reads lines of RGB data from a file,
+shrinks the width by a factor of two, inverts the color of each pixel,
+then writes the data to a file.  In the {\tt InvertColor} actor, the
+{\tt work} function specifies the atomic execution step; it declares
+that on each execution, it pops (inputs) 1 item from the input tape
+and pushes (outputs) 1 item to the output tape.  The work function can
+contain general-purpose code.
 
 \subsection{LZ77 Compression}
 
 LZ77 is a lossless, dictionary-based compression algorithm.  Named
-after its creators Lempel and Ziv, which published the algorithm in
+after its creators Lempel and Ziv, who published the algorithm in
 1977~\cite{lz77}, LZ77 forms the basis for many popular compression
 formats, including ZIP, GZIP and PNG.  As described in
 Section~\ref{sec:formats}, LZ77 also serves as a generalization of
@@ -68,19 +64,28 @@ simpler encodings such as Apple Animation, Microsoft RLE, and Targa,
 allowing our transformations to naturally extend to these formats.
 
 \begin{figure}[t]
-\scriptsize
-\begin{verbatim}
-stream := list-of value       stream := list-of (value | repeat)
-                              repeat := <distance, count>
-
-(a) Uncompressed domain       (b) Compressed domain (LZ77)
-\end{verbatim}
-\caption{Representation of data in the uncompresed and compressed
+\begin{minipage}{1.6in}
+\hspace{-5pt}\begin{tabular}{rcl}
+stream&\hspace{-9pt}:=&\hspace{-9pt}value$^*$
+\end{tabular}
+\end{minipage}
+\begin{minipage}{1.8in}
+\hspace{-5pt}\begin{tabular}{rcl}
+stream&\hspace{-9pt}:=&\hspace{-9pt}(value~$|$~repeat)$^*$ ~ \\
+repeat&\hspace{-9pt}:=&\hspace{-9pt}$\langle$distance, count$\rangle$
+\end{tabular}
+\end{minipage} 
+~ \\
+\begin{minipage}{1.6in}
+(a) Uncompressed domain
+\end{minipage}
+(b) Compressed domain (LZ77)
+\caption{Representation of data in the uncompressed and compressed
 domains.  \protect\label{fig:domains}}
 \end{figure}
 
 The basic idea behind LZ77 is to utilize a sliding window of recently
-decoded values as the dictionary for the compression algorithm.  In
+encoded values as the dictionary for the compression algorithm.  In
 the compressed data stream, there are two types of tokens: {\it
 values} and {\it repeats} (see Figure~\ref{fig:domains}).  A value
 indicates a token that should be copied directly to output of the
@@ -91,9 +96,9 @@ to the output.  The distances are bounded, which enables the decoder
 to operate with a fixed buffer size.  It is important to note that the
 count may exceed the distance, in which case some of the values
 produced by a repeat operation are also copied by that operation.  For
-example, a value A followed by a repeat $\langle1, 3\rangle$ results
-in an output of ``A A A''.  An additional example of LZ77 compression
-is given in Figure~\ref{fig:lz77}.
+example, a value A followed by a repeat $\tup{1}{3}$ results in an
+output of ``A A A''.  An additional example of LZ77 decoding is given
+in Figure~\ref{fig:lz77}.
 
 \begin{figure}[t]
 \begin{minipage}{0.21in}
@@ -119,56 +124,41 @@ will not be as compressed as possible, under certain conditions the
 output is guaranteed to be fully compressed (relative to the
 compression of the input).
 
-We describe the transformation in three stages, first focussing on the
-execution of actors themselves before detailing two helper routines.
-We also discuss some optimizations and extensions to the technique.
+We describe the transformation in three stages, first focusing on the
+basic execution of actors themselves before detailing two helper
+routines.  We also discuss some optimizations and extensions to the
+technique.
 
-\subsection{Execution of Actors}
+\subsection{Transformation Overview}
 
 \begin{figure}[t]
-\scriptsize
-\begin{verbatim}
-                                     |             |
-                             ----------------   ---------------
-stream S1   stream S2        | Intra-Stream |  | Intra-Stream |
-       |      |              |  Align (n1)  |  |  Align(n2)   |
-       |      |              ----------------  ----------------
-pop n1 |      | pop n2               |             |
-     ------------              -----------------------------
-     | Exec(A)  |              | Inter-Stream Align(n1, n2)|
-     ------------              -----------------------------
-          |push m                    |             |
-          |                       ----------------------
-          |                       | Compressed-Exec(A) |
-       stream T                   ----------------------
-                                            |
+~~\psfig{figure=actor-figure.eps,width=3.1in}
 
- (a) Uncompressed domain          (b) Compressed domain
-\end{verbatim}
+\mbox{~}(a) Uncompressed domain~~~~~~~~~~~~~~(b) Compressed domain
 \caption{Overall execution of an actor A in the uncompressed and compressed domains.
 \protect\label{fig:actor-pic}}
 \end{figure}
 
 We describe the transformation for an actor with two input streams and
-one output stream.  This simplifies the presentation while capturing
-all of the fundamental ideas; extension to other numbers of inputs and
-outputs is only a matter of notation.  Also for the sake of
-presentation, we use an operational semantics to express the execution
-under the uncompressed and compressed domains.  All of the transition
-rules have an efficient implementation in StreamIt, though some of
-them require dynamic data rates and thus fall outside the synchronous
-dataflow model.  The rules use the notations given in
-Figure~\ref{fig:actor-pic}a, and have the following form:
+one output stream (see Figure~\ref{fig:actor-pic}a).  This simplifies
+the presentation while capturing all of the fundamental ideas;
+extension to other numbers of inputs and outputs is only a matter of
+notation.  Also for the sake of presentation, we use an operational
+semantics to express the execution under the uncompressed and
+compressed domains.  Though some of the transition rules require
+dynamic data rates and thus fall outside the synchronous dataflow
+model, all of them have an efficient implementation in StreamIt.  The
+rules use the notations given in Figure~\ref{fig:notations}, and have
+the following form:
 
-{\scriptsize
-\begin{verbatim}
-S1; S2 -> T
---------------
-S1'; S2' -> T'
-\end{verbatim}}
-This rule reads: if streams with values $S_1$ and $S_2$ are feeding
-into a stream with value $T$, then after an execution step, the
-streams have values $S_1'$, $S_2'$, and $T'$, respectively.  As
+\hspace{-12pt}\begin{tabular}{l} ~ \vspace{-6pt} \\ 
+\hspace{-3pt}$S_1; S_2 \rightarrow T$ \hspace{-7pt}~\vspace{0.5pt} \\ \hline ~ \vspace{-7.5pt} \\
+\hspace{-3pt}$S_1'; S_2' \rightarrow T'$ \hspace{-7pt} \\ ~ \vspace{-6pt} \\
+\end{tabular}
+
+This rule reads: if the incoming streams have values $S_1$ and $S_2$
+and the outgoing stream has value $T$, then after an execution step,
+the streams have values $S_1'$, $S_2'$, and $T'$, respectively.  As
 detailed in Figure~\ref{fig:domains}, we represent streams as lists of
 tokens; inputs to the stream are added to the front of the list, while
 outputs from the stream are removed from the end of the list.
@@ -180,34 +170,44 @@ values from the end of stream 2; these lists are denoted by $V_1$ and
 $V_2$.  The actor pushes its results, denoted by $A(V_1, V_2)$, onto
 the front of the output stream.
 
+\newcommand{\tablesep}{\hspace{-3.5pt}}
 \begin{figure}[t]
-\scriptsize
-\begin{verbatim}
-S1 o V1; S2 o V2 -> T  |V1| = n1, |V2| = n2
---------------------------------------------- [exec-uncompressed]
-S1; S2 -> A(V1, V2) o T
-\end{verbatim}
+\hspace{-5pt}\begin{tabular}{llll}
+\multicolumn{2}{l}{Variables} & \multicolumn{2}{l}{{\tablesep}Constants} \\ \rule[10pt]{1.9in}{0.3pt}\hspace{0.1in}\rule[10pt]{1.3in}{0.3pt}\hspace{-1.3in}\hspace{-2pt}\hspace{-1.97in}\hspace{-2pt}
+$S$, $T$ & {\tablesep}Input, output streams & {\tablesep}$n_1$, $n_2$ & {\tablesep}Actor's pop rates \\
+$V$ & {\tablesep}List of values (may be empty) & {\tablesep}$m$ & {\tablesep}Actor's push rate \\
+$\tup{d}{c}$ & {\tablesep}Repeat distance \& count & {\tablesep}~ & ~ \vspace{6pt} \\
+\multicolumn{2}{l}{Functions (list $\times$ list $\rightarrow$ list)}& ~ & ~ \\ \rule[10pt]{3.3in}{0.3pt}\hspace{-3.3in}
+$\concat$ & {\tablesep}List concatenation & ~ & ~ \\
+$A$ & \multicolumn{3}{l}{{\tablesep}Actor work function, outputs $m$-element list}
+\end{tabular}
+\caption{Notations used in the semantic rules.\protect\label{fig:notations}}
+\end{figure}
+
+\begin{figure}[t]
+$S_1 \concat V_1; S_2 \concat V_2 \rightarrow T~~~~|V_1|=n_1~~|V_2|=n_2$\name{exec-uncompressed} \skiptop
+----------------------------------------------------- \skipbot
+$S_1; S_2 \rightarrow A(V_1, V_2) \concat T$
 \caption{Semantics of \textsc{Exec(A)}: execution of actor A in the
-uncompressed domain.  $V_1$ and $V_2$ denote lists of values, $\circ$
-denotes list concatenation, $A$ represents the work function of the
-actor, and $n_1$, $n_2$ and $m$ are I/O rates.
+uncompressed domain.  Notations are defined in Figure~\ref{fig:notations}.
 \protect\label{fig:exec-rule}}
 \end{figure}
 
 \begin{figure}[t]
-\scriptsize
-\begin{verbatim}
-S1 o V1; S2 o V2 -> T  |V1| = n1, |V2| = n2
-------------------------------------------------  [exec-uncompressed]
-S1; S2 -> A(V1, V2) o T
-
-S1 o (d*n1, c*n1); S2 o (d*n2, c*n2) -> T
------------------------------------------------   [exec-compressed]
-S1; S2 -> <d*m, c*m> o T
-\end{verbatim}
+%% $S_1 \concat V_1; S_2 \concat V_2 \rightarrow T~~~|V_1|=n_1~~|V_2|=n_2$\name{exec-uncompressed} \skiptop
+%% ----------------------------------------------------- \skipbot
+%% $S_1; S_2 \rightarrow A(V_1, V_2) \concat T$
+%% ~ \\ ~ \\
+\hfill\mbox{\it Same as above.}\name{exec-uncompressed}\vspace{6pt}\\
+$S_1 \concat \tup{n_1{\x}d}{n_1{\x}c};S_2 \concat \tup{n_2{\x}d}{n_2{\x}c} \rightarrow T$\name{exec-compressed} \skiptopb
+------------------------------------------------------ \skipbot
+$S_1; S_2 \rightarrow \tup{m{\x}d}{m{\x}c} \concat T$
 \caption{Semantics of \textsc{Compressed-Exec(A)}: execution of actor
-$A$ in the compressed domain.  Notations are the same as in
-Figure~\ref{fig:exec-rule}.  \protect\label{fig:compressed-exec-rule}}
+$A$ in the compressed domain.
+%This filter also includes an {\tt exec-uncompressed} rule, which is
+%identical to the one in Figure~\ref{fig:exec-rule}.
+Notations are defined in Figure~\ref{fig:notations}.
+\protect\label{fig:compressed-exec-rule}}
 \end{figure}
 
 Actor execution in the compressed domain requires a sequence of
@@ -224,14 +224,15 @@ the counts) are in a ratio that matches the actor's input rates.
 
 After the alignment stages comes the execution of the compressed
 actor, which appears in Figure~\ref{fig:compressed-exec-rule}.  The
-{\tt exec-uncompressed} rule deals with values on the input streams,
-and is identical to that in the uncompressed execution.  The {\tt
-exec-compressed} rule deals with repeats on the input streams and
-encapsulates the key idea of the paper.  Because both inputs are
-repeating at the correct granularity, the repeat can be copied
-directly to the output of the actor without performing any new
-computation.  The only change needed is to adjust the repeat distance
-and count to match the actor's output rate.
+{\tt exec-uncompressed} rule
+%(not shown in Figure~\ref{fig:compressed-exec-rule}) 
+deals with values on the input streams, and is identical to that in
+the uncompressed execution.  The {\tt exec-compressed} rule deals with
+repeats on the input streams and encapsulates the key idea of the
+paper.  Because both inputs are repeating at the correct granularity,
+the repeat can be copied directly to the output of the actor without
+performing any new computation.  The only change needed is to adjust
+the repeat distance and count to match the actor's output rate.
 
 The next two sections fill in the details of the intra-stream and
 inter-stream alignment transformations that are utilized above.
@@ -295,69 +296,65 @@ before the coarsened repeat can begin; this padding takes the form of
 a shorter repeat using the original distance.  
 
 \begin{figure}[t]
-\scriptsize
-\begin{verbatim}
-S o V -> T            |V|=n
---------------------------- [pass-uncompressed]
-S -> V o T
-
-S o <d, c> -> T      d%n=0, c>=n
---------------------------------- [pass-compressed]
-S o <d, c%n> -> <d, c-c%n> o T
-
-                     (c<n or 1<=|V|<n or d%n>0) AND
-S o <d, c> o V -> T  c<=LCM(d,n)
------------------------------------------- [expand]
-S o <d, c-1> o decode(<d,1>) o V -> T
-
-S o <d, 0> o V -> T
--------------------- [prune]
-S o V -> T
-
-                     let L=LCM(d,n)
-S o <d, c> o V -> T  d%n>0,c>L
--------------------------------------- [coarsen-repeat]
-S o <L, c-(L-d)> o <d, L-d> o V -> T
-\end{verbatim}
+$S \concat V \rightarrow T~~~|V|=n$\name{pass-uncompressed}\skiptopb
+---------------------------\skipbot
+$S \rightarrow V \concat T$
+~ \\ ~ \\
+$S \concat \tup{d}{c} \rightarrow T~~~d$\%$n=0~~~c \ge n$\name{pass-compressed}\skiptopb
+------------------------------------------\skipbot
+$S \concat \tup{d}{c$\%$n} \rightarrow \tup{d}{c-c$\%$n} \concat T$
+~ \\ ~ \\
+$S \concat \tup{d}{c} \concat V \rightarrow T~~~~~c\le\mbox{LCM}(d,n)$\name{expand}\\
+$(c<n~\vee~1 \le |V|<n~\vee~d$\%$n>0)$\skiptopb
+--------------------------------------------------\skipbot
+$S \concat \tup{d}{c-1} \concat \mbox{\it decode}(\tup{d}{1}) \concat V \rightarrow T$
+~ \\ ~ \\
+$S \concat \tup{d}{0} \concat V \rightarrow T$\name{prune}\skiptopb
+------------------------\skipbot
+$S \concat V \rightarrow T$
+~ \\ ~ \\
+let~$L=\mbox{LCM}(d,n)$\name{coarsen-repeat}\\
+$S \concat \tup{d}{c} \concat V \rightarrow T~~~~d$\%$n > 0~~~~c > L$\vspace{-3pt}\skiptopa
+------------------------------------------------------\skipbot
+$S \concat \tup{L}{c-(L-d)} \concat \tup{d}{L-d} \concat V \rightarrow T$
 \caption{Semantics of \textsc{Intra-Stream-Align}($n$): aligning data
 to a granularity of $n$.  The \mbox{\it decode} function uncompresses
 a repeat token into a list of values; other notations are given in
-Figure~\ref{fig:exec-rule}. \protect\label{fig:intra-stream-align}}
+Figure~\ref{fig:notations}. \protect\label{fig:intra-stream-align}}
 \end{figure}
 
+\renewcommand{\skiptopa}[0]{\vspace{-2pt}\\}
 \begin{figure}[t]
-\scriptsize
-\begin{verbatim}
-S1 o V1; S2 o V2 -> T1; T2   |V1| = n1, |V2| = n2
---------------------------------------------------- [pass-uncompressed]
-S1; S2 -> V1 o T1; V2 o T2 
-
-S1 o <d1*n1, c1*n1>; 
-S2 o <d2*n2, c2*n2> -> T1, T2   d1=d2,c1>=c2
----------------------------------------- [pass-compressed]
-S1 o <d1*n1, (c1-c2)*n1>; 
-S2 -> <d1*n1, c2*n1> o T1; <d2*n2, c2*n2> o T2
-
-S1 o <d1*n1, c1*n1>;                 (|V2|>0 or d1!=d2) AND
-S2 o <d2*n2, c2*n2> o V2 -> T1, T2   (c1<=LCM(d1,d2) or c2<=LCM(d1,d2))
--------------------------------------------------------------- [expand]
-S1 o <d1*n1, (c1-1)*n1> o decode(<d1*n1, n1>) o V1;
-S2 o <d2*n2, c2*n2> o V2 -> T1, T2
-
-S1 o <d, 0> o V; S2 -> T1, T2
-------------------------- [prune]
-S1 o V; S2 -> T1; T2
-
-                                     V1,V2 may be empty
-S1 o <d1*n1, c1*n1> o V1;            let L = LCM(d1,d2)
-S2 o <d2*n2, c2*n2> o V2 -> T1, T2   d1<d2,c1>L,c2>L
------------------------------------------------------- [coarsen-repeat]
-S1 o <L*n1, (c1-(L-d1))*n1> o <d1*n1, (L-d1)*n1> o V1
-S2 o <d2*n2, c2*n2> o V2 -> T1, T2;
-\end{verbatim}
+$S_1 \concat V_1;$\name{pass-uncompressed}\skiptopa
+$S_2 \concat V_2 \rightarrow T_1; T_2~~~|V_1| = n_1~~~|V_2| = n_2$\vspace{-1pt}\skiptopa
+---------------------------------------------------\skipbot
+$S_1; S_2 \rightarrow V_1 \concat T_1; V_2 \concat T_2$
+~ \\ ~ \\
+$S_1 \concat \tup{n_1{\x}d_1}{n_1{\x}c_1};~~~~~~~~~~~~~~~~~~~d_1 = d_2$\name{pass-compressed}\skiptopa
+$S_2 \concat \tup{n_2{\x}d_2}{n_2{\x}c_2} \rightarrow T_1; T_2~~~~c_1 \ge c_2$\vspace{-2pt}\skiptopa
+--------------------------------------------------------\skipbot
+$S_1 \concat \tup{n_1{\x}d_1}{n_1{\x}(c_1-c_2)};$\\
+$S_2 \rightarrow \tup{n_1{\x}d_1}{n_1{\x}c_2} \concat T_1; \tup{n_2{\x}d_2}{n_2{\x}c_2} \concat T_2$
+~ \\ ~ \\
+$S_1 \concat \tup{n_1{\x}d_1}{n_1{\x}c_1};~~~~~~~~~~$\name{expand}\skiptopa
+$S_2 \concat \tup{n_2{\x}d_2}{n_2{\x}c_2} \concat V_2 \rightarrow T_1; T_2$\vspace{2pt}\\
+$(|V_2| > 0 \vee d_1 \ne d_2)~~~(c_1 \le \mbox{LCM}(d_1,d_2) \vee c_2 \le \mbox{LCM}(d_1,d_2))$\vspace{-1pt}\skiptopa
+--------------------------------------------------------------------------------\skipbot
+$S_1 \concat \tup{n_1{\x}d_1}{n_1{\x}(c_1-1)} \concat \mbox{\it decode}(\tup{n_1{\x}d_1}{n_1}) \concat V_1;$\vspace{1pt}\\
+$S_2 \concat \tup{n_2{\x}d_2}{n_2{\x}c_2} \concat V_2 \rightarrow T_1; T_2$
+~ \\ ~ \\
+$S_1 \concat \tup{d}{0} \concat V; S_2 \rightarrow T_1; T_2$\name{prune}\skiptopa
+-----------------------------------\skipbot
+$S_1 \concat V; S_2 \rightarrow T_1; T_2$
+~ \\ ~ \\
+let~$L=\mbox{LCM}(d_1,d_2)$\name{coarsen-repeat}\vspace{-3pt}\\
+$S_1 \concat \tup{n_1{\x}d_1}{n_1{\x}c_1} \concat V_1;$\\
+$S_2 \concat \tup{n_2{\x}d_2}{n_2{\x}c_2} \concat V_2 \rightarrow T_1; T_2~~~d_1 < d_2~~~c_1 > L~~~c_2 > L$\vspace{-4pt}\\
+--------------------------------------------------------------------------------\skipbot
+$S_1 \concat \tup{n_1{\x}L}{n_1{\x}(c_1-(L-d_1))} \concat \tup{n_1{\x}d_1}{n_1{\x}(L-d_1)} \concat V_1$\\
+$S_2 \concat \tup{n_2{\x}d_2}{n_2{\x}c_2} \concat V_2 \rightarrow T_1; T_2$
 \caption{Semantics of \textsc{Inter-Stream-Align}($n_1$, $n_2$):
-aligning two streams with granularities $n_1$ and $n_2$.  Notations
-are the same as in Figure~\ref{fig:inter-stream-align}.
+aligning two streams with granularities $n_1$ and $n_2$.  See Figure~\ref{fig:notations} for notations.
 \protect\label{fig:inter-stream-align}}
 \end{figure}
 
@@ -444,10 +441,12 @@ actors.  Some straightforward extensions are as follows:
 one execution to the next, a repeat token can be copied across the
 actor if the current state values are the same as they were at the
 beginning of the repeated segment.  One could maintain a lookup table
-that tracks the state values for the sake of this comparison.
-Further, state updates that are associative (e.g., counting pixels for
-a histogram) could be detected and applied even if the current state
-is different than the original.
+that tracks the state values for the sake of this comparison.  Also,
+state updates that have a closed form can be applied in the compressed
+domain even if the current state has never been seen before; for
+example, if a histogram filter runs for $n$ iterations on a blue
+pixel, it will increment the blue count by $n$ regardless of the
+initial value.
 
 \item {\it Dynamic input and output rates.}  The current formulation
 relies on an actor's fixed I/O rates to calculate repeat distances and
@@ -459,8 +458,10 @@ parameters on the output tape.
 
 \item {\it Sliding window computations.}  We currently assume that an
 actor consumes all of the items it inspects on a given execution step.
-However, some actors (e.g., a gaussian blur filter) inspect a window
+However, some actors (e.g., a Gaussian blur filter) inspect a window
 of values in addition to the one that is popped from the input.  Such
-{\it peeking} filters can be supported by shortening the output
+{\it peeking} filters can be supported by adjusting the translation of
+repeat tokens, shortening the output count to match the period that the
+entire window was within the repeated range.
 
 \end{itemize}
