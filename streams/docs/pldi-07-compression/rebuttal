@@ -1,0 +1,34 @@
+* Reviewer 1 repeatedly states that our technique is limited to
+run-length encoding.  This is inaccurate; we support LZ77 compression,
+which in many ways is the gold standard of lossless compression
+techniques.  Unlike run-length encoding, LZ77 is asymptotically
+optimal [1] and is pervasively used in ZIP and other formats.  As no
+technique should be expected to handle all compression formats, we
+feel that our title "Computing Directly on Compressed Data" is fair.
+
+- We agree with Reviewer 1 that the first few paragraphs can imply
+undue generality with respect to lossy compression formats.  We did
+not intend this implication and we will fix it in the final version.
+Overall, we believe the technical claims in the paper are very
+precise; we even devoted an entire page (Section 4) to the practical
+limitations of the technique.
+
+- Reviewers 2 and 3 ask about the prevalence of stateful filters.  An
+ASPLOS'06 paper by Gordon et al. shows that state is quite rare in
+stream programs (9 of 12 benchmarks were completely stateless).
+
+- Reviewer 3 has a question about Figure 7.  Actor A does appear as
+part of the exec-uncompressed rule, though the rule is spelled out in
+Figure 6.  We will clarify this in the final version.
+
+- Reviewer 4 asks about the baseline algorithm.  We confirm that the
+baseline operates frame-by-frame rather than writing temporary files
+to disk.
+
+- Reviewer 5 asks whether the pixel transformations are free from
+alignment cost.  Yes, there is no alignment cost because the actor
+inputs only a single value from the LZ77 stream.  (However, as the
+values are in RGBA format, they are 4 bytes rather than 1 byte.)
+
+[1] Wyner and Ziv, "The Sliding-Window Lempel-Ziv Algorithm is
+Asymptotically Optimal", Proceedings of the IEEE, 1994.

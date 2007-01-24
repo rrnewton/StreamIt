@@ -1,0 +1,441 @@
+============================================================================
+PLDI 2007 Reviews for Submission #92
+============================================================================
+
+Title: Computing Directly on Compressed Data
+
+Authors: William Thies and Saman Amarasinghe
+============================================================================
+                           REVIEWER #1
+============================================================================
+
+
+---------------------------------------------------------------------------
+                          Reviewer's Scores
+---------------------------------------------------------------------------
+
+                             Confidence: 4
+                        Writing quality: 3
+                      Relevance to PLDI: 2
+      Quality of evaluation methodology: 3
+          Characterize the contribution: 3
+                 Overall Recommendation: 3
+                               Advocate: 2
+
+
+---------------------------------------------------------------------------
+                        Description of paper
+---------------------------------------------------------------------------
+
+The paper describes how certain kinds of operation on compressed data
+streams can be performed without uncompressing and recompressing the
+data.  The key observation is that LZ77-style compression works by
+compressing data by references back into the uncompressed stream.  If
+the computation is a pure function of the input stream(s) data then
+repetitions in the input stream(s) will necessarily lead to
+repetitions in the output stream(s).
+
+---------------------------------------------------------------------------
+                           Main Strengths
+---------------------------------------------------------------------------
+
+A really neat observation!  Clear performance benefits for some
+workloads.
+
+---------------------------------------------------------------------------
+                          Main Weaknesses
+---------------------------------------------------------------------------
+
+The technique is very specialized to particular kinds of function
+working on LZ77-style compressed data.  Borderline relevance to PLDI.
+
+
+---------------------------------------------------------------------------
+                         Detailed Comments
+---------------------------------------------------------------------------
+
+The core idea here is interesting, but I think overall the paper is
+borderline for PLDI since the contribution is really about working on
+compressed data rather than about the design and implementation of the
+language for writing transformations.
+
+I think the paper would benefit from presenting the core idea more
+clearly up front, and making it explicit what properties are required
+(i) of the compression scheme, (ii) of the transformations.  This is
+important because the core idea is applicable only under very specific
+circumstances (e.g. HalfWidth on Fig 1 is OK, but a corresponding
+HalfHeight would not be).
+
+Minor comments:
+
+ - p1, inconsistent capitalization of "Apple Animation"
+
+ - p3, it did take me some time to realise the key idea that the
+  "exec-compressed" rule describes
+
+ - p6, if possible it would be good to see more detailed numbers from
+  CPU performance counters to help understand when and why the
+  technique is effective.  How does the cache performance change?
+  Presumably the baseline decompress-transform-recompress is working
+  on a frame-by-frame basis rather than needing to write large
+  temporary files to disk?
+
+============================================================================
+                           REVIEWER #2
+============================================================================
+
+
+---------------------------------------------------------------------------
+                          Reviewer's Scores
+---------------------------------------------------------------------------
+
+                             Confidence: 4
+                        Writing quality: 4
+                      Relevance to PLDI: 3
+      Quality of evaluation methodology: 4
+          Characterize the contribution: 5
+                 Overall Recommendation: 6
+                               Advocate: 4
+
+
+---------------------------------------------------------------------------
+                        Description of paper
+---------------------------------------------------------------------------
+
+This paper describes a system that takes as input a streamIt program
+for processing uncompressed streaming data and converts it into a
+program for processing a version of the data compressed using a
+LZ77-style compression algorithm.  Programmers get to write their
+transforms on the semantically meaningful uncompressed data, but their
+programs run faster because the data does not have to be decompressed,
+transformed, and then recompressed.  The authors report impressive
+speedups, ranging from 1.0x to 235x on a relatively rich set of
+tasks. In general, the speed up is proportional to the compression
+rate of the stream, with more compressed formats showing the greatest
+speed increases.
+
+---------------------------------------------------------------------------
+                           Main Strengths
+---------------------------------------------------------------------------
+
+The speed ups reported in the paper are truly impressive. The array of
+previous work on enabling particular transforms on compressed data
+shows how important the problem is.  The paper is well written.
+
+---------------------------------------------------------------------------
+                          Main Weaknesses
+---------------------------------------------------------------------------
+
+The conversion from streamIt source to codes that work over compressed
+data is not yet fully implemented.  The measurements in the paper are
+on hand-coded versions.  The results would be even more impressive if
+the translator were fully implemented.
+
+
+---------------------------------------------------------------------------
+                         Detailed Comments
+---------------------------------------------------------------------------
+
+p. 3
+"As detailed in Figure 2, we represent streams as lists of tokens"
+Are you sure you mean to refer to figure 2 here?
+
+You say at the end of section 3.1 that the next two sections will
+expand upon intra- and inter-stream alignment.  It might be better to
+move this comment up so readers don't think they should be able to
+understand the ideas solely from the paragraphs in section 3.1
+
+The sentence "Thus, our formulation assumes that a fully decompressed
+version of the stream is available" comes out of the blue and is very
+surprising, seemingly undercutting the message you have been trying to
+convey.  You should add more material here explaining why this doesn't
+kill your whole approach.
+
+Section 3.5
+The paragraph on "Actors with state" is too terse.  What does it mean
+to copy a repeat token across an actor?  What does it mean for a state
+update to have a closed form?
+
+I would like to see measurements of how much decompression you have to
+do to get the necessarily alignments, partly to verify that the
+experiments you are reporting cover this case.
+
+Author response question
+Is it true that Pixel test programs don't incur alignment penalties
+because they consume one byte at a time?
+
+============================================================================
+                           REVIEWER #3
+============================================================================
+
+
+---------------------------------------------------------------------------
+                          Reviewer's Scores
+---------------------------------------------------------------------------
+
+                             Confidence: 4
+                        Writing quality: 4
+                      Relevance to PLDI: 2
+      Quality of evaluation methodology: 3
+          Characterize the contribution: 3
+                 Overall Recommendation: 6
+                               Advocate: 3
+
+
+---------------------------------------------------------------------------
+                        Description of paper
+---------------------------------------------------------------------------
+
+The authors describe a technique for computing filters over LZ77-like
+compressed data such that (i) the amount of work is proportional to
+the compressed representation and (ii) no intermediate
+compression/decompression steps are necessary.  The efficacy of the
+design is shown by applying it to two filters (color adjustment and
+image compositing).  Speedups (versus uncompress/processes/compress)
+as high as 235x are achieved.
+
+---------------------------------------------------------------------------
+                           Main Strengths
+---------------------------------------------------------------------------
+
+Three strengths: The formalization and presentation of the transition
+rules are interesting and clear.  The achieved results (median speedup
+of 16x) are impressive.  And the paper is well written.
+
+---------------------------------------------------------------------------
+                          Main Weaknesses
+---------------------------------------------------------------------------
+
+This technique is likely to be effective for only a limited form of
+filters (i.e., those where the transformation of one pixel does not
+depend on adjacent pixels).  In addition, even filters having this
+property sometimes result in a significant loss of compression (as high
+as a factor of 5 is presented).
+
+---------------------------------------------------------------------------
+                        Questions for Authors
+---------------------------------------------------------------------------
+
+No clarification questions.
+
+---------------------------------------------------------------------------
+                         Detailed Comments
+---------------------------------------------------------------------------
+
+This is well thought out and presented work.  The basic transition and
+alignment process is interesting and effective.  The core idea is very
+simple and clean and the paper would benefit from presenting it (the
+core idea) in the introduction (only the penultimate paragraph of 3.1
+makes it clear why one can simply "ignore" compressed sequences...
+because they've already been transformed and you know they will be
+transformed in the same way).
+
+At one point, the paper implies that a program transformation is being
+performed, but then it becomes clear that the authors are describing a
+data transformation.  In fact, this work has very little to do with
+program transformation.  Instead, it describes what can best be thought
+of as a run-time system.
+
+My main concern is that this technique will only do well in limited
+domains.  In particular, any actor with state will likely cause the
+technique to perform very poorly (i.e., expensive to perform filter
+and nearly uncompressed output).  Even actors without state sometimes
+produce output that is not well compressed.  One could easily image
+inputs that result in an uncompressed output.  A more complete
+solution would clearly sometimes also need to perform a compression
+step.  Even so, are there circumstances where the technique is still
+an improvement?
+
+The transition and alignment process is described in great generality,
+but it is only evaluated for the case where n_1=n_2=1.        I would guess
+that the technique becomes less effective as n grows.  An analytical and
+empirical analysis of the effect of n would strengthen this work and
+(hopefully) demonstrate that it is useful even when n is not 1.
+
+Summary: It is clear that there are circumstances under which this
+technique is very effective.  To understand the contribution, it is
+important to show that the technique is effective in non-trivial
+contexts (e.g., actors with state and n!=1).
+
+============================================================================
+                           REVIEWER #4
+============================================================================
+
+
+---------------------------------------------------------------------------
+                          Reviewer's Scores
+---------------------------------------------------------------------------
+
+                             Confidence: 4
+                        Writing quality: 4
+                      Relevance to PLDI: 2
+      Quality of evaluation methodology: 4
+          Characterize the contribution: 4
+                 Overall Recommendation: 7
+                               Advocate: 4
+
+
+---------------------------------------------------------------------------
+                        Description of paper
+---------------------------------------------------------------------------
+
+The title says it all: the paper shows a way to create wrappers for
+simple, stateless streaming codes such that they can compute directly
+on LZ77-compressed data, as opposed to decompressing, computing, and
+recompressing.  The utility of the technique is demonstrated by using
+this technique to improve the performance of plugins for some
+media-processing applications.
+
+---------------------------------------------------------------------------
+                           Main Strengths
+---------------------------------------------------------------------------
+
+The paper offers a compelling idea, with a supporting
+implementation that results in substantial performance gains.  It is
+well written.  The paper is out of the main mold of PLDI papers:
+accepting it would make PLDI 2007 a slightly more eclectic conference,
+which would be very nice.
+
+---------------------------------------------------------------------------
+                          Main Weaknesses
+---------------------------------------------------------------------------
+
+It is not totally clear that the paper belongs at PLDI: the strategy
+for operating on compressed data has not been automated or integrated
+with the StreamIt language or compiler.  One might argue that this
+paper does not actually involve compiler technology, since the
+transformation takes the form of a manually inserted wrapper.
+StreamIt ends up being merely a conceptual framework for the paper.
+Pehaps the time to publish this paper at a top conference is after the
+authors have an integrated compiler-based solution.
+
+The failure of the technique to handle stateful transformations seems
+like a serious one; what fraction of a user's time is really spent
+waiting for simple, stateless filters to complete?
+
+---------------------------------------------------------------------------
+                        Questions for Authors
+---------------------------------------------------------------------------
+
+Figure 7: I'm confused as to why the actor A does not appear here.
+Perhaps this should be fixed, or else clarified in the caption or
+text.
+
+---------------------------------------------------------------------------
+                         Detailed Comments
+---------------------------------------------------------------------------
+
+The paper is missing a running example: the authors should have pushed
+the "ana banana" example forward into Section 3, showing a text
+transformation operating on the compressed form of this data.  My
+suggestion would be to remove some detail from the performance
+evaluation, which is probably informative beyond the point of being
+interesting.
+
+Use of "averting" in the intro is awkward.
+
+The algorithm implemented by bzip2 offers compelling compression
+advantages over LZ77, I would have liked to see some speculation about
+how this more powerful compressor could be supported by this
+technique.
+
+============================================================================
+                           REVIEWER #5
+============================================================================
+
+
+---------------------------------------------------------------------------
+                          Reviewer's Scores
+---------------------------------------------------------------------------
+
+                             Confidence: 3
+                        Writing quality: 3
+                      Relevance to PLDI: 3
+      Quality of evaluation methodology: 3
+          Characterize the contribution: 3
+                 Overall Recommendation: 7
+                               Advocate: 3
+
+
+---------------------------------------------------------------------------
+                        Description of paper
+---------------------------------------------------------------------------
+
+This paper provides a way to transform a StreamIt program to operate
+directly on LV77 compressed data, rather than requiring
+decompression/recompression. This results in major performance
+improvements in transformation of lossless-encoded video.
+
+---------------------------------------------------------------------------
+                           Main Strengths
+---------------------------------------------------------------------------
+
+Very impressive performance results in real applications.
+Simple, precisely described idea.
+
+---------------------------------------------------------------------------
+                          Main Weaknesses
+---------------------------------------------------------------------------
+
+Overly broad claims.
+Technique is limited to data compressed in one particular way
+(run-length encoding).
+
+
+---------------------------------------------------------------------------
+                         Detailed Comments
+---------------------------------------------------------------------------
+
+I am very annoyed by this paper. On one hand, I think this is a very
+nice idea, which, in a limited set of experiments, demonstrates
+significant value in improving performance by very large amounts.
+
+On the other hand, the paper egregiously overstates the generality of
+the result. In addition, the approach has only been implemented by
+hand so it probably does not belong at a programming languages and
+compiler conference. If the paper is accepted, I would insist that the
+title, abstract, introduction,and conclusion be severely toned down to
+reflect what was actually accomplished. I would prefer, however, that
+the paper not appear until the technique was implemented.
+
+My reading of the paper is that you have designed and hand prototyped
+a way of compiling StreamIt programs to operate directly on data
+encoded with a form of run-length encoding. This is a creditable and
+valuable result, as your experiments show.
+
+You have ***not*** however shown how to "Computing Directly on
+Compressed Data" as your title claims. There are numerous other
+sentences in the introduction that suggest your technique is far more
+general than it actually is. For example, the first paragraph cites
+YouTube and TerraServer, both of which deliver store and deliver
+results encoded with lossy techniques, which your approach cannot
+handle. The introduction continues to describe previous efforts to
+compute directly on data compressed by these lossy algorithms and then
+contains the sentence "This paper presents the first technique for
+systematically mapping flexible, user-defined computations into the
+compression domain." Besides being overall broad by itself, this
+statement is deceptive and inaccurate given the text that precedes it.
+
+A more accurate claim is that this paper presents a technique for
+computing directly on data compressed with run-length encoding. And,
+as discussed below, "computing" should be qualified as well.
+
+In addition to this issue about the limited form of compression, the
+paper only present a technique applicable to programs written in a
+restricted programming model (synchronous dataflow) expressed in the
+StreamIt language. You may (or may not) believe that this model
+encompasses all algorithms applied to compressed data, but you need to
+provide some evidence (beyond two very simple filters for images) that
+this computation model is general before you make a claim that you can
+"compute directly" on compressed data.
+
+My final complaint is that the technique has not been implemented,
+even though it appears to (you) to be straight forward and simple to
+implement. I'm not sure what it says about your infrastructure, but it
+makes me question the generality and applicability of the performance
+results that constitute the bulk of the paper.
+
+I am sorry to be so strident about the shortcomings of this paper. I
+think this is a good first result that could lead to interesting and
+important work. However, this paper is far too flawed to be published
+in its current form.
