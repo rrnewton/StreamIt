@@ -9,7 +9,7 @@
       <hr>
       <p align="justify">
       
-	<h2>StreamIt 2.1 (Recommended Download)</h2>
+	<h2>StreamIt 2.1.1 (Recommended Download)</h2>
 <table width=100% border=1>
 <tr>
 <td><b>File</b></td>
@@ -18,39 +18,27 @@
 </tr
 
 <tr>
-<td><a href="streamit-2.1.tar.gz">streamit-2.1.tar.gz</a></td>
+<td><a href="streamit-2.1.1.tar.gz">streamit-2.1.1.tar.gz</a></td>
 <td>25 MB</td>
 <td>Binary distribution</td>
 </tr>
 
 <tr>
-<td><a href="streamit-src-2.1.tar.gz">streamit-src-2.1.tar.gz</a></td>
+<td><a href="streamit-src-2.1.1.tar.gz">streamit-src-2.1.1.tar.gz</a></td>
 <td>29 MB</td>
 <td>Source distribution</td>
-</tr>
-
-<tr>
-<td><a href="http://www.moka5.com/node/113">StreamIt LivePC</a></td>
-<td>1 GB</td>
-<td>StreamIt pre-installed in a Linux host, requires free <a href="http://www.moka5.com/products/getstarted.html">Moka5 player</a></td>
-</tr>
-
-<tr>
-<td><a href="streamit-vmware-appliance.zip">streamit-vmware-appliance.zip</a></td>
-<td>1.8 GB</td>
-<td>StreamIt pre-installed on Fedora Core 5, requires free <a href="http://www.vmware.com/products/player/">VMWare player</a></td>
 </tr>
 </table>
 
        <!-- Keep in synch with ../../release/news.tex.in -->
-	<p>This release (September, 2006) offers new features and
+	<p>This release (January, 2007) offers new features and
 	improved robustness over the initial public release.  Major
 	features are as follows, please <a
 	href="mailto:streamit@cag.csail.mit.edu">contact us</a> if you
 	have any questions:
 
 	<ul>
-	<p><li> Multi-threaded backend for multicores and clusters of workstations.
+	<p><li> Multi-threaded backend for multicores and clusters of workstations. <font color=darkred>(<i>Performance fix in 2.1.1</i>)</font>
 	<li> Support for dynamic rates and teleport messaging.
 	<li> Faster uniprocessor implementation (up to 2X).
 	<li> Faster and more memory-efficient Java library (up to 10X).
@@ -58,6 +46,10 @@
 	<li> Snapshot of cache optimizations and linear statespace analysis.
 
 	</ul>
+
+        If you do not depend on multicore performance, then you may
+        prefer to download a pre-installed version of StreamIt 2.1 for
+        VMWare or Moka5.  See links at the bottom of this page.
 
 	<h2><hr>Release Notes<hr></h2>
 
@@ -82,13 +74,40 @@
 
 	<h2><hr>Older Releases<hr></h2>
 
-	<p>The source release below requires the
-	<a href="http://jikes.sourceforge.net">Jikes</a>
-	 Java Compiler.
-        </p>
+        <p><li><b>StreamIt 2.1</b>. September, 2006.<br>
+<table width=100%>
+<tr><td>&nbsp;&nbsp;</td>
+<td>
+<table width=100% border=1>
+<tr>
+<td><a href="streamit-2.1.tar.gz">streamit-2.1.1.tar.gz</a></td>
+<td>25 MB</td>
+<td>Binary distribution</td>
+</tr>
 
-        <p><li><b>StreamIt 2.0</b>. October 20, 2003.<br>
-	&nbsp; &nbsp; Download: [<a href="streamit-2.0.tar.gz">binary</a> .tar.gz]&nbsp; [<a href="streamit-src-2.0.tar.gz">source</a> .tar.gz]
+<tr>
+<td><a href="streamit-src-2.1.tar.gz">streamit-src-2.1.1.tar.gz</a></td>
+<td>29 MB</td>
+<td>Source distribution</td>
+</tr>
+<tr>
+<td><a href="http://www.moka5.com/node/113">StreamIt LivePC</a></td>
+<td>1 GB</td>
+<td>Pre-installed in a Linux host, requires free <a href="http://www.moka5.com/products/getstarted.html">Moka5 player</a></td>
+</tr>
+
+<tr>
+<td><a href="streamit-vmware-appliance.zip">streamit-vmware-appliance.zip</a></td>
+<td>1.8 GB</td>
+<td>Pre-installed on Fedora Core 5, requires free <a href="http://www.vmware.com/products/player/">VMWare player</a></td>
+</tr>
+</td>
+</table>
+</table>
+
+        <p><li><b>StreamIt 2.0</b>. October 20, 2003.&nbsp;<br>
+	&nbsp; &nbsp; Download: [<a href="streamit-2.0.tar.gz">binary</a> .tar.gz]&nbsp; [<a href="streamit-src-2.0.tar.gz">source</a> .tar.gz]<br>
+        &nbsp; &nbsp; <i>Source release requires <a href="http://jikes.sourceforge.net">Jikes</a> Java Compiler.</i>
 <!--
       <p><li>
         <b>May 28, 2003 snapshot</b>
