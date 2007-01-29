@@ -83,11 +83,11 @@ illustrates the potential speedup of adding pipeline parallelism to a
 data-parallel execution model for various values of $\mu/\sigma$ on a
 16-core architecture.  In the best case, $\mu/\sigma$ approaches $0$
 and the speedup is $(\sigma+(1-\sigma)/N)/\max(\sigma/N, 1/N) =
-1+\sigma*N$.  For example, if there are $16$ cores and even as little
-as $1/16$th of the work is stateful, then pipeline parallelism offers
-potential gains of 2x.  For these parameters, the worst-case gain
-($\mu=\sigma$) is also 2x.  The best and worst cases diverge for
-larger values of $\sigma$.
+1+\sigma*(N-1)$.  For example, if there are $16$ cores and even as
+little as $1/15$th of the work is stateful, then pipeline parallelism
+offers potential gains of 2x.  For these parameters, the worst-case
+gain ($\mu=\sigma$) is 1.8x.  The best and worst cases diverge further
+for larger values of $\sigma$.
 
 \subsection{Exploiting Pipeline Parallelism}
 
