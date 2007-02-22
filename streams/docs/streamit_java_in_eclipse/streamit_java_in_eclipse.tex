@@ -5,7 +5,7 @@
 %% all those intermediate stages because xv (which I often use)
 %% gets colormaps wrong on raw, pnm.
 %%
-%% then changed to encapsulated pestscript2 with the gimp.
+%% then changed to encapsulated postscript2 with the gimp.
 
 \documentclass[11pt]{article} 
 \usepackage{latex8}
@@ -43,15 +43,46 @@ StreamIt project, and {\tt streams/library/C} and {\tt /cluster} as C projects.
 
 Eclipse currently runs on RHEL3 machines, not on RH7.2 machines.
 
-I alias {\tt eclipse} to {\tt /home/bits7/NOBACKUP/eclipse.3.1/eclipse}\\
+I alias {\tt eclipse} to 
+{\tt /home/bits7/NOBACKUP/eclipse.3.2/eclipse -data \$HOME/workspace}
 Note that you can not just link to the eclipse executable from
 somewhere in your path since Eclipse needs to know its real path to
 work correctly.
 
-If Eclipse 3.1 gives you the following error:\\
-An error has occurred. See the log file
-/home/bits7/NOBACKUP/eclipse.3.1/configuration/1161898731326.log\\
-Try running Eclipse 3.2 instead by aliasing {\tt eclipse} to {\tt /home/bits7/NOBACKUP/eclipse.3.2/eclipse}.\\
+The {\tt  -data \$HOME/workspace} tells eclipse to look for my preferences 
+files in my {\tt workspace} rather than trying the last workspace that
+anyone used.
+
+Without {\tt  -data \$HOME/workspace} you may see a window popping up:
+
+\hspace*\fill\fbox{%
+\epsfig{figure=WorkspaceInUse1.eps,width=4in}
+} \hspace*\fill
+
+\vspace{+33pt}
+In this case you can click and type in the complete path to your
+workspace:\footnote{%
+If you get the ``Workspace in use'' popup window at some point, and
+you have your {\tt -data} switch pointed to the correct workspace,
+it is likely that previously exited eclipse with
+SIGNAL 9 ({\tt kill -9}) so the workspace remained locked, you
+can start Eclipse with 
+{\tt -vmargs -Dosgi.locking=none -data \$HOME/workspace} to ignore the
+lock.
+
+\url{https://bugs.eclipse.org/bugs/show_bug.cgi?id=44735\#c51}
+indicates that this window can pop up if your home directory is served
+over nfs and the serving system is running {\tt lockd} but not {\tt statd}. 
+They suggest a fix that might make sense to a Linux guru.
+We run {\tt statd}. We have not run into that case.
+}
+
+%% \hspace*\fill\fbox{%
+%% \epsfig{figure=WorkspaceInUse2.eps,height=2.5in}
+%% } \hspace*\fill
+
+
+
 
 \section{Checking Out to let Eclipse use CVS}
 \label{secCheckout}
@@ -75,11 +106,11 @@ If you can set up your {\tt .ssh/config} to use RSAAuthentication of
 something other than interactive authentication with your password,
 you will be happier:  Otherwise Eclipse, when using CVS, will require
 you to enter your password from the window from which Eclipse was
-started.\footnote{Assuming that you don't have Eclipse store your
+started. (Assuming that you don't have Eclipse store your
   password, which may be insecure; and assuming that you don't find
   some way to get Eclipse to pop up a password prompt.  There should
   be a way of getting Eclipse to pop up a password prompt, but I don't
-know it.}
+know it.)
 
 \section{Setting up a streams project in Eclipse}
 
@@ -115,39 +146,17 @@ that looks like:
 \epsfig{figure=Workspace0.eps,height=3in}
 } \hspace*\fill
 
-Just click the curved-arrow icon in the upper right to get going.
-
-There have been situations there instead of the previous window
-popping up, we have seen:
-
-\hspace*\fill\fbox{%
-\epsfig{figure=WorkspaceInUse1.eps,width=4in}
-} \hspace*\fill
-
-\vspace{+33pt}
-In this case you need to type in the complete path to your
-workspace:\footnote{%
-\url{https://bugs.eclipse.org/bugs/show_bug.cgi?id=44735\#c51}
-indicates that this can happen if your home directory is served over nfs and
-the serving system is running {\tt lockd} but not {\tt statd}. 
-They suggest a fix that might make sense to a Linux guru.
-For mere mortals, willing to take the risk that the workspace was
-legitimately locked, you can start Eclipse with 
-{\tt -vmargs -Dosgi.locking=none}.
-}
-
-\hspace*\fill\fbox{%
-\epsfig{figure=WorkspaceInUse2.eps,height=2.5in}
-} \hspace*\fill
-
-
+Just click the curved-arrow icon at the right to get going.
 
 From {\tt File $\rightarrow$ New $\rightarrow$ Project}
-(or the context menu from right-clicking in the {\tt Navigator} pane)
-create a new Java project.\footnote{I know how to add CVS to a Java project
-but not Java features to a CVS project.}
-
-Eclipse should pop up a panel like that in %Figure~\ref{javapOne}.
+(or the context menu from right-clicking in the {\tt Package Explorer}
+panel\footnote{%
+Eclipse documentation calls subdivisions of the main window
+``views''.  We will use that term henceforth.})
+create a new Java project.
+%\footnote{I know how to add CVS to a Java project
+%but not Java features to a CVS project.}
+Eclipse should pop up a window like that in %Figure~\ref{javapOne}.
 the illustration below.
 If, for some reason, ``Java Project'' is not highlighted, click on it.
 Then click on ``Next''.
@@ -160,11 +169,19 @@ Then click on ``Next''.
 %\label{javapOne}
 %\end{figure}
 
+If you set the radio button for ``Create separate source and output
+folders'' eclipse will create a {\tt outut} directory under your {\tt
+ streams} directory with subdirectories mirroring your source tree 
+and will create all {\tt .class} files in the {\tt output}
+directory tree.  If you do set that radio button then the {\tt .class}
+files are created in the directory containing the {\tt .java} file. 
+
 When you click Next, you will get a window like %Figure~\ref{javapTwo}.
 the one below.
 Fill in the project name, select ``Create project from existing
 source'', give the full path to your {\tt streams} directory, and
-click on ``Next''.
+click on ``Next'' (if available: eclipse 3.1 allowed ``Next'',
+eclipse 3.2 only allowed ``Finish'').
 
 %\begin{figure}[htb]
 \hspace*\fill\fbox{%
@@ -176,7 +193,7 @@ click on ``Next''.
 
 
 Clicking ``Next'' should allow you to configure how the project is
-built under Java: it should pop up a panel similar to the one in
+built under Java: it should pop up a window similar to the one in
 %Figure~\ref{javapSix}.
 the illustration below:
 
@@ -188,11 +205,15 @@ the illustration below:
 %\label{javapSix}
 %\end{figure}
 
-If you clicked on ``Finish'' rather than ``Next'' by accident, you can 
+Do not worry about the number of errors listed on ``Problems'' view:
+The number of errors should drop to 0 once you exclude the souce
+folders and include the jar files as recommended below.
+
+If you clicked on ``Finish'' rather than ``Next'', you can 
 change Java build properties on a Java project after the
 project is set up: select the root of the project, right click, select
 ``Properties''  from the context menu, and select ``Java Build Path''
-from the menu at the left of the panel.  
+from the menu at the left of the window.  
 %Figure~\ref{javapThree} was generated this way.
 The illustration below was generated this way.
 
@@ -217,11 +238,10 @@ We don't want to try to build these.
   regression test package.  Remove it from the build path.
 \item {\tt streams/src/com},\\
  {\tt streams/src/org},\\ 
- {\tt streams/src/streamit/stair},\\
- {\tt streams/at/dms/kjc/raw2}\\
+ {\tt streams/src/streamit/stair}\\
  and any subdirectories that appear in the listing:
  These are not necessary for building the StreamIt compiler and may contain
- errors that would persistently appear in Eclipse's ``Problems'' panel
+ errors that would persistently appear in Eclipse's ``Problems'' view
  if not removed. 
 \item The following application directories contain Java code that
   produces error messages. Remove the following for now, or just remove all of
@@ -248,6 +268,8 @@ We don't want to try to build these.
   {\tt streams/apps/tests/lineartest/regtests},\\
   {\tt streams/apps/tests/weighted-rr}.
 \end{itemize}
+(List may be out of date as new StreamIt applications are written.)
+
 Directories removed from the build path may be reinstated later...
 
 You can copy and paste from the source of this document to reduce
@@ -256,7 +278,7 @@ your typing.
 Another method of excluding directories (after clicking ``Finish'' in
 setting up the project) is to highlight the {\tt streams} project in
 the Package Explorer,\footnote{%
-If there is no ``Package Explorer'' panel, then 
+If there is no ``Package Explorer'' view, then 
 ``Window $\rightarrow$  Show View $\rightarrow$ Package Explorer''
 }
 then 
@@ -337,6 +359,7 @@ interface or not.
 %\label{javapFive}
 %\end{figure}
 
+(Figure is out of date: should also add {\tt 3rdparty/jflex.jar})
 
 Even though the standard CLASSPATH includes streams/3rdparty and
 streams/src, you {\em do not need to} ``Add Class Folder'' for these to get
@@ -351,28 +374,28 @@ applications into their own project.}
 
 \bigskip
 
-To build the StreamIt compiler as currently implemented, we need to
-change some settings in Eclipse's Java compiler.
-Follow ``Window $\rightarrow$ Preferences'' to set compiler
-preferences.  Uncheck the ``Use default compliance settings'' box and
-set settings as 
-below.  
-%in Figure~\ref{compilerPrefs}
-Click ``Apply'' to make the changes.
+%% To build the StreamIt compiler as currently implemented, we need to
+%% change some settings in Eclipse's Java compiler.
+%% Follow ``Window $\rightarrow$ Preferences'' to set compiler
+%% preferences.  Uncheck the ``Use default compliance settings'' box and
+%% set settings as 
+%% below.  
+%% %in Figure~\ref{compilerPrefs}
+%% Click ``Apply'' to make the changes.
 
-%\begin{figure}[htb]
-\hspace*\fill\fbox{%
-\epsfig{figure=compiler-preferences.eps,height=4in}
-} \hspace*\fill
-%\caption{Setting Compiler Preferences}
-%\label{compilerPrefs}
-%\end{figure}
+%% %\begin{figure}[htb]
+%% \hspace*\fill\fbox{%
+%% \epsfig{figure=compiler-preferences.eps,height=4in}
+%% } \hspace*\fill
+%% %\caption{Setting Compiler Preferences}
+%% %\label{compilerPrefs}
+%% %\end{figure}
 
 
-Change some settings for how the Eclipse Java editor handles text,
+Change some settings for how the Eclipse editors handle text,
 just to be safe (To use US-ASCII encoding and Unix line terminators):
 ``Window $\rightarrow$ Preferences... $\triangleright$ General
-$\rightarrow$ Editors''
+$\rightarrow$ Info''
 
 \hspace*\fill\fbox{%
 \epsfig{figure=text-prefs.eps,height=4in}
@@ -404,17 +427,17 @@ Select your new profile, Press ``Apply'' and then ``OK''.
 
 Back to getting the streams directory set up as an eclipse project...
 
-Creat a ``Problems'' panel by 
+Creat a ``Problems'' view by 
 ``Window $\rightarrow$ Show View $\rightarrow$ Problems'' if there is
 not one already on the screen.
 
 Now click on the Filters icon
-(\epsfig{figure=filters1.eps,height=2ex}) on the ``Problems'' panel
+(\epsfig{figure=filters1.eps,height=2ex}) on the ``Problems'' view
 and set to only display errors. 
 %See Figure~\ref{problemFilters}.  
 Compiling the StreamIt
 compiler generates several thousand warnings which will otherwise be
-displayed in the Problems panel.
+displayed in the ``Problems'' view.
 
 %\begin{figure}[htb]
 \hspace*\fill\fbox{%
@@ -424,9 +447,16 @@ displayed in the Problems panel.
 %\label{problemFilters}
 %\end{figure}
 
+Setting  ``Where severity is'' and ``Error'', will filter out warning
+messages that would otherwise show up in the ``Problems'' view.\footnote{%
+for eclipse 3.2, the warnings should just vanish from the ``Problems''
+view except for a count of filtered warnings in the header line.
 
-Try: Click on the {\tt streams} project to highlight it in the
-``Navigator'' panel.
+For eclipse 3.1, you need to perform a rebuild to get rid of the
+warning messages.
+ 
+Click on the {\tt streams} project to highlight it in the
+``Package Explorer'' view.
 
 Select menu item ``Project $\rightarrow$ Build Automatically'' to
 remove the check mark next to ``Build Automatically'' if one is there.
@@ -437,26 +467,32 @@ Now, menu item ``Project $\rightarrow$ Build Project'' should not be
 grayed-out, so select it to build the project.
 After some time,
 you should see 0 errors, but lots or warnings in the information line
-at the top of the ``Problems'' panel.
+at the top of the ``Problems'' view.
 
 Click ``Project $\rightarrow$ Build Automatically'' again, so that the
 menu item is checked. This will cause partial rebuilds to happen
 automatically when a file is saved.
+}
 
-\section{Accessing CVS through Eclipse}
 
-To set up so that Eclipse can use CVS, you need to have checked out
-from CVS as prescribed in Section~\ref{secCheckout}.
-
-\begin{itemize}
-\item Click on the ``streams'' project to select it.
-\item Right-click to get the context menu for the project.
-\item Select ``Team $\rightarrow$ Share Project''
-\item In the pop-up window ``Connect Project to Repository'' click on
-  ``Finish''.
-\end{itemize}
+%% No longer needed in eclipse 3.2: detects CVS directories gets
+%% correct CVS parameters for project.
+%% \section{Accessing CVS through Eclipse}
+%%
+%% To set up so that Eclipse can use CVS, you need to have checked out
+%% from CVS as prescribed in Section~\ref{secCheckout}.
+%%
+%% \begin{itemize}
+%% \item Click on the ``streams'' project to select it.
+%% \item Right-click to get the context menu for the project.
+%% \item Select ``Team $\rightarrow$ Share Project''
+%% \item In the pop-up window ``Connect Project to Repository'' click on
+%%   ``Finish''.
+%% \end{itemize}
 
 \section{Running the StreamIt Compiler in Eclipse}
+
+Todo: bring up to date for eclipse 3.2, and for new selection of back ends.
 
 The {\tt strc} compiler script will not run with the current setup:
 someone will have to update the StreamIt plugins to work with Eclipse 3.1
@@ -570,8 +606,8 @@ configuration window by using /home/linux/jdk-1.5.0\_01/jre rather than
 /home/linux/j2sdk-1.4.2\_03 started catching the assertion errors.  I am baffled by this behavior.
 
 Trying to update streams from CVS in Eclipse:
-Eclipse follows symbolic links so {\tt streams/misc/raw/Makefile.include} and
-{\tt streams/misc/raw/stardata/starbuild} will cause problems since they point to common files under 
+Eclipse follows symbolic links so \url{streams/misc/raw/Makefile.include} and
+\url{streams/misc/raw/stardata/starbuild} will cause problems since they point to common files under 
 CVS control -- but not in the user's directory tree, and not with CVS/Root in a format that 
 Eclipse understands.
 
