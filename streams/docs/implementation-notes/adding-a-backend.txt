@@ -1,0 +1,54 @@
+Create a new subdirectory in src/at/dms/kjc for your back end.
+
+Create 
+
+Pick a backend name for strc and edit
+  sub get_options (switch for backend)
+  sub get_compiler_opts (convert switch for backend into --dirname
+    where dirname is your subdirectory name.)
+  sub non_streamit_backend_defined (this switch is a backend)
+  sub usage (user documentation for --help)
+  sub java_to_c (return output file if C compilation under strc)
+  
+Modify at/dms/kjc/Main.java ??
+
+Your backend calls creates an instance of
+  at.dms.kjc.lowering.CommonPasses
+  -- WorkEstimate is always calculated based on RAW code.
+     not currently specialized for different architectures,
+     should be at some time in future.
+
+You create a subclass of BackEndFactory that allows the
+types of all of your extensions to common back-end code
+to match up.  You extend the enumeration in BackEndENUM
+and have BackEndAbsFactory return your kind of BackendFactory.
+
+Your BackendFactory specifies ComputeNodes, a Layout, some 
+back-end specific code.
+  
+Your code generates a Layout
+ (mapping of filters / splitters / joiners to ComputeNode's)
+ 
+Your code calls BackEndScaffold.run with your BackEndFactory to
+convert SIR code to kopi code stored per ComputeNode, and
+a set of Channel's expressing inter-ComputeNode and 
+intra-ComputeNode connections.
+
+Your code calls (your extension of) BackEndEmitter once with
+a ComputeNode and your ChannelPool once per ComputeNode.
+
+You generate a Makefile and header files as needed (some of
+this goes into BackendEmitter)
+
+Your coding responsibilities:
+-- new back end top-level file and mods to strc as above.
+-- splitting_for_target
+-- Extensions to the Channel class for code to handle your
+ inter-ComputeNode communication (calls to your RTS).
+-- Extensions to ComputeCodeStore to handle variants of a main(),
+ init(), and the steady() loop, if needed here.  (Also for 
+ generating co-processor code.)
+-- Extensions to ComputeNodes to handle geometry / heretogeneity.
+-- Extensions to BackendEmitter / ToC to handle variant C dialects.
+  Extensions to BackendEmitter for purely textual wrapper functions
+  if you prefer them here over kopi code in a ComputeCodeStore.
