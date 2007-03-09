@@ -1,17 +1,102 @@
-Create a new subdirectory in src/at/dms/kjc for your back end.
+Getting from strc to your back end:
+-----------------------------------
+
+Pick the following names
+ -- a name for a subdirectory (also a java sub-package).
+    will refer to as subdirName in following.
+ -- a name for your top-level java file, that will have a
+    public static void run(...) method.
+    will refer to as javaName in following.
+ -- a name for a user-visible switch to strc to invoke your backend.
+    will refer to as strcName in following.
+ -- a name to be passed from strc to the back end dispatcher.
+    will refer to as kjcName.
+ The common naming scheme is something like
+     subdirName = spacetime
+     strcName = spacetime
+     kjcName = spacetime
+     javaName = SpaceTimeBackend
+
+Directory setup and getting java to run your back end from Streamit compiler: 
+-----------------------------------------------------------------------------
+
+Create a new subdirectory in src/at/dms/kjc/subdirName.
+Add to CVS.
+
+Add your kjcName name to src/at/sms/kjc/KjcOptions.opt
+  and "cd $STREAMIT_HOME/src; make at/dms/kjc/KjcOptions.class"
+
+In src/at/dms/kjc.StreaMITMain.java, in that ugly nested if statement,
+add 
+  ...
+  if (KjcOptions.kjcName) {
+    backendClass = "at.dms.kjc.subdirName.javaName";
+  }
+and "cd $STREAMIT_HOME/src; make at/dms/kjc/StreaMITMain.class"
 
 Create 
+  src/at/sms/kjc/subdirName/javaName.java with some content.
+package at.dms.kjc.subdirName;
+public class javaName {
+    public static void run(SIRStream str,
+                           JInterfaceDeclaration[] interfaces,
+                           SIRInterfaceTable[] interfaceTables,
+                           SIRStructure[]structs,
+                           SIRHelper[] helpers,
+                           SIRGlobal global) {
+       System.out.println("Hi, I'm the new back end.")'
+       System.exit(0);
+    }
+and "cd $STREAMIT_HOME/src; make"
 
-Pick a backend name for strc and edit
-  sub get_options (switch for backend)
-  sub get_compiler_opts (convert switch for backend into --dirname
-    where dirname is your subdirectory name.)
-  sub non_streamit_backend_defined (this switch is a backend)
-  sub usage (user documentation for --help)
-  sub java_to_c (return output file if C compilation under strc)
+At this point you should be able to, for instance:
+ pushd $STREAMIT_HOME/apps/examples/matrixmult
+ java streamit.frontend.ToJava --output MatrixMult.java MatrixMult.str
+ java at.dms.kjc.Main --streamit --kjcName MatrixMult.java
+and invoke your back end.
+
+(Please always exit with a 0 value, a non-zero value is used to
+indicate a compile failure to strc or to the regression test manager.)
+
+Incorporating into the strc script:
+----------------------------------
+
+Edit the $STREAMIT_HOME/strc perl script to mung the following
+subroutines appropriately:
+
+  sub get_options 
+    -- add your strcName to the parameters to GetOptions(...)
+
+  sub get_compiler_opts
+    -- convert to kjcName, probably by adding line:
+    $opts{strcName} && ($copts .= " --kjcName");
+
+  sub non_streamit_backend_defined
+     -- indicate that strcName is a switch that selects a backend
+     ... || $opts{strcName} ...
+ 
+  sub usage 
+     -- user documentation for --help
+     common back end names are near the top of the Options: portion of
+     the message.  Start line with "+" to only show with --more-help
+     or --much-more-help; start line with "*" to only show with
+     --much-more-help.
+ 
+  sub java_to_c 
+     -- if you wish to have strc perform work after a successful
+     compilation with your backend, make sure that java_to_c returns
+     a non-empty array reference.
+
+  sub c_to_out
+     -- if you wish to have strc perform work after a successful
+     compilation with your backend, it is most likely that you will
+     hack some code here to invoke gcc, or you might hack code in the
+     (poorly-named) cluster_to_out to invoke a Makefile.
+
+
+Using existing code to help create a useful backend:
+---------------------------------------------------
   
-Modify at/dms/kjc/Main.java ??
-
 Your backend calls creates an instance of
   at.dms.kjc.lowering.CommonPasses
   -- WorkEstimate is always calculated based on RAW code.
