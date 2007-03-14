@@ -1,0 +1,172 @@
+<html><head><!-- Which section should this abstract be included in?   	1.) Systems   	-->
+
+<!-- Capitalize appropriate first letters of your title  	use commas between authors and an & (&amp;) instead of the word "and"	 -->
+</head><body><div align="center">
+<h3>StreamIt: A Common Machine Language for Parallel Architectures</h3>
+   
+<h4>Michael I. Gordon, Bill Thies, Qiuyuan J. Li, Phil Sung, David Zhang, 
+&amp; Saman Amarasinghe</h4>
+</div>
+
+<h5>Introduction</h5>
+
+<p>To continue performance scalability and to manage design
+complexity, processor architectures are now relying on coarse-grained
+parallelism.  This form of parallelism is achieved by the replication
+of simple processing elements.  However, easing the programming burden
+for these explicitly parallel machines is still a largely unsolved
+problem. We are developing high-level programming idioms, compiler
+technologies, and runtime systems for parallel machines.  We seek to
+enable high programmer productivity coupled with high application
+performance, portability, and scalability.  The algorithms we develop
+will be applicable across the spectrum of parallel architectures, from
+general purpose multicores to emerging flexible graphics hardware.</p>
+
+<p>Unfortunately, parallel programming is notoriously
+difficult. Application developers have long hoped for new high-level
+programming models, with associated compiler and runtime technologies,
+in order to produce efficient, portable, and scalable code for
+coarse-grained parallel architectures. As we will see, the stream
+programming paradigm offers a promising high-level approach for
+application development targeting parallel machines.  Our research
+focuses on language, compiler, and runtime technology for the StreamIt
+programming language [3], a streaming language we are
+developing in the Compilers Group at MIT (COMMIT).</p>
+
+<h5>Background</h5>
+
+<p>The common properties across parallel machines are multiple flows
+of control and multiple local memories. StreamIt directly exposes
+these common properties. In the StreamIt language, a program is
+represented as a set of autonomous filters that communicate through
+FIFO data channels.  During program execution, filters fire repeatedly
+in a periodic schedule.  As each filter has a separate program counter
+and an independent address space, all dependences between filters are
+made explicit by the communication channels.  Compilers or runtime
+systems can leverage this dependence information to orchestrate
+parallel execution.<p>
+
+<p>StreamIt directly exposes three types of coarse-grained
+parallelism: task, data, and pipeline. Task parallelism refers to
+pairs of filters that are on different parallel branches of the
+original stream graph, as written by the programmer. That is, the
+output of each filter never reaches the input of the other. In stream
+programs, task parallelism reflects logical parallelism in the
+underlying algorithm. Data parallelism refers to any filter that has
+no dependences between one execution and the next. Such "stateless"
+filters offer unlimited data parallelism, as different instances of
+the filter can be spread across any number of computation units.
+StreamIt, unlike many other streaming languages, naturally supports
+pipeline parallelism [1].  Pipeline parallelism applies to chains of
+producers and consumers that are directly connected in the stream
+graph. Each type of parallelism has advantages and disadvantages. For
+example, exploiting data parallelism is straightforward and produces a
+load-balanced mapping. However, by itself, data parallelism requires
+global communication and synchronization. A stream-aware system can
+determine the correct granularity and combination of parallelism for
+high efficiency.<p>
+
+<h5>Current Techniques</h5> 
+
+<p>In our most recent work, we present automatic compiler techniques
+for bridging the gap between the granularity of a stream program and
+the underlying granularity of the target architecture [2].  We present
+a unified static approach that leverages the correct combination of
+task, data, and pipeline parallelism.  To reduce the communication
+overhead typical of data-parallelism, we first increase the
+granularity of the stream graph by fusing filters so long as the
+results is data-parallel.  To further reduce communication costs, we
+data-parallelize the application while maintaining task parallelism
+being careful to load-balance each data-parallel stage.  To
+parallelize filters with loop-carried dependencies, we employ
+software-pipelining techniques to execute filters from different
+iterations in parallel, increasing scheduling flexibility.</p>
+
+<p>Targeting the 16-core Raw Architecture [5], we achieve a
+mean speedup of 11.2x over a single core baseline; 7 out of 12
+benchmarks speedup by over 12x. While a traditional data-parallel
+approach that does not attempt to match the granularity achieves a
+speedup of only 1.4x over the sequential baseline.  Current research
+shows that our techniques scale to 64 core configurations.  Our
+research suggests that two specific features of StreamIt are a good
+match for parallel architectures: exposing producer-consumer
+relationships and exposing the outer loop around the entire stream
+graph.</p>
+
+<h5>Current and Future Work</h5>
+
+
+
+Outline:
+
+Introduction
+    Multicores are here
+    Examples, touch on gpus
+    need a new programming paradigm (use the asplos stuff)
+    want portability, high-performance, malleablility, etc.
+    
+    Streaming is a good match
+    describe streaming and streamit
+    what are the features of streamit that are novel and enable what we promise
+    
+
+    What we are doing:
+    building compiler technology enable portability etc. scalability!
+
+Background
+    describe data, pipeline and task and pros and cons of each
+    picture from asplos...
+    describe static implementations, dynamic runtimes, and hybrid models
+    our compiler enables all of this, 
+    currently working on runtime for cell?
+
+Prior Work
+    Space
+    SpaceTime
+    
+Future Work
+    Scalability
+    our studies show that it does not continue to scale, ...
+    what are we investigatinge
+
+    Cell more backends, cell, gpu, emerging dsp mulitcores...
+
+    step toward portability for parallel architectures
+
+TODO: Check reference numbers!
+
+    
+
+
+  	<!-- 	* Feel free to add as many section headers and paragraphs of text as you like  	* separate paragraphs with <p> tags	* include <a href="http://link.to.page">links</a> where ever possible	* use 12pt helvetica font gif images for inline mathematical equations	for the best alignment of equations, use the align="absmiddle" tag (example below)	<img src="math12pt.gif" alt="equation" width="40" height="16" align="absmiddle">	* for more math tips, including a very handy "cheat sheet" for 	html mathematical characters and a list of conversion tools,	go to http://abstracts.csail.mit.edu/math-converters.html	-->
+
+<h5>Section Header</h5>
+
+<p>Paragraph text goes here.</p>
+
+
+        <!-- 	* use 72dpi, web optimized jpgs for photos and gifs for figures	* the maximum size for your images should be no more than 	600x600 pixels (which will render quite large)	* use tables for side by side figures   	* include a brief description of the image in the alt tag   	* width and height should be scaled to 100%	* example below:	<img src="image.jpg" alt="brief image description goes here" width="125" height="168">  	 -->
+     
+        <!-- Use the following syntax for listing your references:	[1] Author A. Lastname and Author B. Lastname. Title of the paper. 	In <em>The Proceedings of the Conference</em>, pp. 1--3, City, State, 	Country, Month 2004.	 -->
+
+<h5>References:</h5>
+
+<p>[1] Michael Gordon, William Thies, Michal Karczmarek, Jasper Lin,
+Ali S. Meli, Andrew A. Lamb, Chris Leger, Jeremy Wong, Henry Hoffmann,
+David Maze, and Saman Amarasinghe. A Stream Compiler for
+Communication-Exposed Architectures. In <em>ASPLOS</em>, 2002.</p>
+
+<p>[2] Michael Gordon, William Thies, and Saman
+Amarasinghe. Exploiting Coarse-Grained Task, Data, and Pipeline
+Parallelism in Stream Programs. In <em>ASPLOS</em>, 2006.</p>
+
+<p>[3] William Thies, Michal Karczmarek, and Saman
+Amarasinghe. StreamIt: A Language for Streaming Applications. In
+<em>Proc. of the International Conference of Compiler
+Construction</em>, Grenoble, France, 2002.</p>
+
+<p>[4] Michael Taylor, Walter Lee, Jason Miller, David Wentzlaff,
+et. al. Evaluation of the Raw Microprocessor: An Exposed-Wire-Delay
+Architecture for ILP and Streams. In <em>ISCA</em>, 2004.</p>
+
+</body></html>
