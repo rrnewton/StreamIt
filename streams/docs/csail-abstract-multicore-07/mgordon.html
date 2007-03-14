@@ -19,7 +19,8 @@ technologies, and runtime systems for parallel machines.  We seek to
 enable high programmer productivity coupled with high application
 performance, portability, and scalability.  The algorithms we develop
 will be applicable across the spectrum of parallel architectures, from
-general purpose multicores to emerging flexible graphics hardware.</p>
+general purpose multicores to emerging flexible graphics hardware
+(GPUs).</p>
 
 <p>Unfortunately, parallel programming is notoriously
 difficult. Application developers have long hoped for new high-level
@@ -29,7 +30,7 @@ coarse-grained parallel architectures. The stream programming paradigm
 offers a promising high-level approach for application development
 targeting parallel machines.  Our research focuses on language,
 compiler, and runtime technologies for the StreamIt programming
-language [3], a streaming language we are developing in the Compilers
+language [5], a streaming language we are developing in the Compilers
 Group at MIT (COMMIT).</p>
 
 <h5>Background</h5>
@@ -113,9 +114,52 @@ the outer loop around the entire stream graph.</p>
 
 <h5>Current and Future Work</h5>
 
+<p>We wish to demonstrate that, for the class of streaming applications,
+StreamIt programs are portable, scalable and efficient across parallel
+architectures.  Toward this end, we are in the process of developing
+backends and runtime systems for emerging and research parallel
+architectures. Each separate architecture tests the portability of the
+language, generality of our current mapping algorithms, and reveals
+further opportunities for research.</p>
 
+<p>For example, we are currently working on a compiler backend with an
+associated runtime system for the Cell processor[3]. This development
+effort is interesting for multiple reasons. For high-performance Cell
+requires the exploitation of fine-grained data-parallelism in the form
+of SIMD instructions.  We have developed an infrastructure that will
+map a "copy" of a suitable stateless filter onto a SIMD
+lane. Furthermore, Cell is an example of a heterogeneous parallel
+architecture.  We must extend our mapping algorithms to make informed
+mapping decisions given the differing capabilities of the processing
+cores. Finally, we are developing a system for Cell where we can vary
+the mapping and scheduling of the stream program between static
+(compiler) and dynamic (runtime) control.  We wish to investigate
+points on the continuum between static and dynamic mappings, e.g.,
+whether it is useful to compute the mapping and schedule at
+compile time.</p>
 
- 
+<p>Data-parallelism often requires global communication and data
+reorganization.  Another question we seek to investigate is whether
+data parallelism scales indefinitely.  We wish to determine the points
+at which data-parallelism ceases to scale as we vary the architectural
+parameters (e.g., number and capability of processing elements,
+network parameters, memory bandwidth)?  When data-parallelism no
+longer scales, what architectural, language, and compiler techniques
+will be necessary to continue performance scaling?</p>
+
+<p>Finally, we plan on demonstrating that StreamIt can effectively target
+GPUs. GPUs have massive data parallelism and are specialized for
+rendering data-types and operations. Coarse-grained data parallelism
+can be discovered in StreamIt and should be relatively easy to
+exploit. A more difficult task is to generate efficient code for the
+processing elements themselves, code that exploits the dense
+instruction encoding of the processing elements. As GPUs become more
+programmable and more tightly coupled with the CPU. One can think of
+the coupling as a heterogeneous parallel processor where segments of
+an application are offloaded to the GPU for processing. With StreamIt,
+one can write an application in a single high-level programming
+language and let the compiler decide the partitioning between CPU and
+GPU.  We plan to extend our mapping algorithms for this problem.</p> 
 
 <h5>References:</h5>
 
@@ -128,13 +172,17 @@ Communication-Exposed Architectures. In <em>ASPLOS</em>, 2002.</p>
 Amarasinghe. Exploiting Coarse-Grained Task, Data, and Pipeline
 Parallelism in Stream Programs. In <em>ASPLOS</em>, 2006.</p>
 
-<p>[3] William Thies, Michal Karczmarek, and Saman
-Amarasinghe. StreamIt: A Language for Streaming Applications. In
-<em>Proc. of the International Conference of Compiler
-Construction</em>, Grenoble, France, 2002.</p>
+<p>[3] H. Peter Hofstee. Power Efficient Processor Architecture and
+The Cell Processor. In <em>HPCA</em>, 2005.
 
 <p>[4] Michael Taylor, Walter Lee, Jason Miller, David Wentzlaff,
 et. al. Evaluation of the Raw Microprocessor: An Exposed-Wire-Delay
 Architecture for ILP and Streams. In <em>ISCA</em>, 2004.</p>
+
+<p>[5] William Thies, Michal Karczmarek, and Saman
+Amarasinghe. StreamIt: A Language for Streaming Applications. In
+<em>Proc. of the International Conference of Compiler
+Construction</em>, Grenoble, France, 2002.</p>
+
 
 </body></html>
