@@ -69,7 +69,7 @@ parallelism: task, data, and pipeline. Conceptually, each type of
 parallelism can be is expressed on an independent axis of a stream
 graph (see Figure 1).  Task parallelism refers to pairs of filters
 that are on different parallel branches of the original stream graph,
-as written by the programmer (Filters C, D, and E in Filter 1). That
+as written by the programmer (Filters C, D, and E in Figure 1). That
 is, the output of each filter never reaches the input of the other. In
 stream programs, task parallelism reflects logical parallelism in the
 underlying algorithm. Data parallelism refers to any filter that has
@@ -114,13 +114,13 @@ the outer loop around the entire stream graph.</p>
 
 <h5>Current and Future Work</h5>
 
-<p>We wish to demonstrate that, for the class of streaming applications,
-StreamIt programs are portable, scalable and efficient across parallel
-architectures.  Toward this end, we are in the process of developing
-backends and runtime systems for emerging and research parallel
-architectures. Each separate architecture tests the portability of the
-language, generality of our current mapping algorithms, and reveals
-further opportunities for research.</p>
+<p>We wish to demonstrate that, for the class of streaming
+applications, StreamIt programs are portable, scalable and efficient
+across parallel architectures.  Toward this end, we are in the process
+of developing backends and runtime systems for emerging industry and
+research parallel architectures. Each separate architecture tests the
+portability of the language, generality of our current mapping
+algorithms, and reveals further opportunities for research.</p>
 
 <p>For example, we are currently working on a compiler backend with an
 associated runtime system for the Cell processor[3]. This development
