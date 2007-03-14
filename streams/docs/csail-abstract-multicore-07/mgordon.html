@@ -29,7 +29,7 @@ in order to produce efficient, portable, and scalable code for
 coarse-grained parallel architectures. As we will see, the stream
 programming paradigm offers a promising high-level approach for
 application development targeting parallel machines.  Our research
-focuses on language, compiler, and runtime technology for the StreamIt
+focuses on language, compiler, and runtime technologies for the StreamIt
 programming language [3], a streaming language we are
 developing in the Compilers Group at MIT (COMMIT).</p>
 
@@ -46,10 +46,25 @@ made explicit by the communication channels.  Compilers or runtime
 systems can leverage this dependence information to orchestrate
 parallel execution.<p>
 
+<p>
+<center>
+<img src="mgordon1.jpg" alt="3 types of parallelism: example.">
+</center>
+</p>
+<p>
+<center>
+<b>Figure 1</b>: Example stream graph demonstrating task, data, and
+pipeline parallelism.  Filters are denoted by green boxes and
+data-reorganization nodes are denoted by blue ovals. Filter B is
+stateless and can be data-parallelized by duplicating the filter
+(shown by the lighter boxes).
+</center>
+</p>
+
 <p>StreamIt directly exposes three types of coarse-grained
-parallelism: task, data, and pipeline. Task parallelism refers to
-pairs of filters that are on different parallel branches of the
-original stream graph, as written by the programmer. That is, the
+parallelism: task, data, and pipeline (see Figure 1). Task parallelism
+refers to pairs of filters that are on different parallel branches of
+the original stream graph, as written by the programmer. That is, the
 output of each filter never reaches the input of the other. In stream
 programs, task parallelism reflects logical parallelism in the
 underlying algorithm. Data parallelism refers to any filter that has
@@ -66,7 +81,7 @@ global communication and synchronization. A stream-aware system can
 determine the correct granularity and combination of parallelism for
 high efficiency.<p>
 
-<h5>Current Techniques</h5> 
+<h5>Compiler Techniques</h5> 
 
 <p>In our most recent work, we present automatic compiler techniques
 for bridging the gap between the granularity of a stream program and
@@ -82,16 +97,14 @@ parallelize filters with loop-carried dependencies, we employ
 software-pipelining techniques to execute filters from different
 iterations in parallel, increasing scheduling flexibility.</p>
 
-<p>Targeting the 16-core Raw Architecture [5], we achieve a
-mean speedup of 11.2x over a single core baseline; 7 out of 12
-benchmarks speedup by over 12x. While a traditional data-parallel
-approach that does not attempt to match the granularity achieves a
-speedup of only 1.4x over the sequential baseline.  Current research
-shows that our techniques scale to 64 core configurations.  Our
-research suggests that two specific features of StreamIt are a good
-match for parallel architectures: exposing producer-consumer
-relationships and exposing the outer loop around the entire stream
-graph.</p>
+<p>Targeting the 16-core Raw Architecture [4], we achieve a mean
+speedup of 11.2x over a single core baseline; 7 out of 12 benchmarks
+speedup by over 12x. While a traditional data-parallel approach that
+does not attempt to match the granularity achieves a speedup of only
+1.4x over the sequential baseline. Our research suggests that two
+specific features of StreamIt are a good match for parallel
+architectures: exposing producer-consumer relationships and exposing
+the outer loop around the entire stream graph.</p>
 
 <h5>Current and Future Work</h5>
 
@@ -127,7 +140,7 @@ Prior Work
 Future Work
     Scalability
     our studies show that it does not continue to scale, ...
-    what are we investigatinge
+    what are we investigating, runtime versus compiler, hybrid approaches..
 
     Cell more backends, cell, gpu, emerging dsp mulitcores...
 
@@ -139,11 +152,6 @@ TODO: Check reference numbers!
 
 
   	<!-- 	* Feel free to add as many section headers and paragraphs of text as you like  	* separate paragraphs with <p> tags	* include <a href="http://link.to.page">links</a> where ever possible	* use 12pt helvetica font gif images for inline mathematical equations	for the best alignment of equations, use the align="absmiddle" tag (example below)	<img src="math12pt.gif" alt="equation" width="40" height="16" align="absmiddle">	* for more math tips, including a very handy "cheat sheet" for 	html mathematical characters and a list of conversion tools,	go to http://abstracts.csail.mit.edu/math-converters.html	-->
-
-<h5>Section Header</h5>
-
-<p>Paragraph text goes here.</p>
-
 
         <!-- 	* use 72dpi, web optimized jpgs for photos and gifs for figures	* the maximum size for your images should be no more than 	600x600 pixels (which will render quite large)	* use tables for side by side figures   	* include a brief description of the image in the alt tag   	* width and height should be scaled to 100%	* example below:	<img src="image.jpg" alt="brief image description goes here" width="125" height="168">  	 -->
      
