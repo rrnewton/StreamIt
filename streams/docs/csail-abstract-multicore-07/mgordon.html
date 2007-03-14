@@ -26,12 +26,12 @@ general purpose multicores to emerging flexible graphics hardware.</p>
 difficult. Application developers have long hoped for new high-level
 programming models, with associated compiler and runtime technologies,
 in order to produce efficient, portable, and scalable code for
-coarse-grained parallel architectures. As we will see, the stream
-programming paradigm offers a promising high-level approach for
-application development targeting parallel machines.  Our research
-focuses on language, compiler, and runtime technologies for the StreamIt
-programming language [3], a streaming language we are
-developing in the Compilers Group at MIT (COMMIT).</p>
+coarse-grained parallel architectures. The stream programming paradigm
+offers a promising high-level approach for application development
+targeting parallel machines.  Our research focuses on language,
+compiler, and runtime technologies for the StreamIt programming
+language [3], a streaming language we are developing in the Compilers
+Group at MIT (COMMIT).</p>
 
 <h5>Background</h5>
 
@@ -53,33 +53,39 @@ parallel execution.<p>
 </p>
 <p>
 <center>
-<b>Figure 1</b>: Example stream graph demonstrating task, data, and
-pipeline parallelism.  Filters are denoted by green boxes and
-data-reorganization nodes are denoted by blue ovals. Filter B is
-stateless and can be data-parallelized by duplicating the filter
-(shown by the lighter boxes).
+<b>Figure 1</b>: Example stream graph with parallelism axes. Filters
+are denoted by green boxes and data-reorganization nodes are denoted
+by blue ovals. Pipeline parallelism is present between filters in the
+horizontal dimension, task parallelism in the vertical dimension, and
+data parallelism in the perceived depth dimension.  Data parallelism
+is exploited only in Filter B.  Filter B is stateless and can be
+data-parallelized by duplicating the filter (duplicates denoted by the
+lighter boxes). 
 </center>
 </p>
 
 <p>StreamIt directly exposes three types of coarse-grained
-parallelism: task, data, and pipeline (see Figure 1). Task parallelism
-refers to pairs of filters that are on different parallel branches of
-the original stream graph, as written by the programmer. That is, the
-output of each filter never reaches the input of the other. In stream
-programs, task parallelism reflects logical parallelism in the
+parallelism: task, data, and pipeline. Conceptually, each type of
+parallelism can be is expressed on an independent axis of a stream
+graph (see Figure 1).  Task parallelism refers to pairs of filters
+that are on different parallel branches of the original stream graph,
+as written by the programmer (Filters C, D, and E in Filter 1). That
+is, the output of each filter never reaches the input of the other. In
+stream programs, task parallelism reflects logical parallelism in the
 underlying algorithm. Data parallelism refers to any filter that has
 no dependences between one execution and the next. Such "stateless"
 filters offer unlimited data parallelism, as different instances of
-the filter can be spread across any number of computation units.
-StreamIt, unlike many other streaming languages, naturally supports
-pipeline parallelism [1].  Pipeline parallelism applies to chains of
-producers and consumers that are directly connected in the stream
-graph. Each type of parallelism has advantages and disadvantages. For
-example, exploiting data parallelism is straightforward and produces a
-load-balanced mapping. However, by itself, data parallelism requires
-global communication and synchronization. A stream-aware system can
-determine the correct granularity and combination of parallelism for
-high efficiency.<p>
+the filter can be spread across any number of computation units
+(Filter B in Figure 1).  StreamIt, unlike many other streaming
+languages, naturally supports pipeline parallelism [1].  Pipeline
+parallelism applies to chains of producers and consumers that are
+directly connected in the stream graph (e.g., Filters A and B in
+Figure 1). Each type of parallelism has advantages and
+disadvantages. For example, exploiting data parallelism is
+straightforward and produces a load-balanced mapping. However, by
+itself, data parallelism requires global communication and
+synchronization. A stream-aware system can determine the correct
+granularity and combination of parallelism for high efficiency.<p>
 
 <h5>Compiler Techniques</h5> 
 
@@ -110,7 +116,7 @@ the outer loop around the entire stream graph.</p>
 
 
 
-Outline:
+<h5>Outline:</h5>
 
 Introduction
     Multicores are here
