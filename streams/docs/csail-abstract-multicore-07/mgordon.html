@@ -66,7 +66,7 @@ lighter boxes).
 
 <p>StreamIt directly exposes three types of coarse-grained
 parallelism: task, data, and pipeline. Conceptually, each type of
-parallelism can be is expressed on an independent axis of a stream
+parallelism can be expressed on an independent axis of a stream
 graph (see Figure 1).  Task parallelism refers to pairs of filters
 that are on different parallel branches of the original stream graph,
 as written by the programmer (Filters C, D, and E in Figure 1). That
@@ -96,7 +96,7 @@ a unified static approach that leverages the correct combination of
 task, data, and pipeline parallelism.  To reduce the communication
 overhead typical of data-parallelism, we first increase the
 granularity of the stream graph by fusing filters so long as the
-results is data-parallel.  To further reduce communication costs, we
+result is data-parallel.  To further reduce communication costs, we
 data-parallelize the application while maintaining task parallelism
 being careful to load-balance each data-parallel stage.  To
 parallelize filters with loop-carried dependencies, we employ
@@ -105,12 +105,12 @@ iterations in parallel, increasing scheduling flexibility.</p>
 
 <p>Targeting the 16-core Raw Architecture [4], we achieve a mean
 speedup of 11.2x over a single core baseline; 7 out of 12 benchmarks
-speedup by over 12x. While a traditional data-parallel approach that
-does not attempt to match the granularity achieves a speedup of only
-1.4x over the sequential baseline. Our research suggests that two
-specific features of StreamIt are a good match for parallel
-architectures: exposing producer-consumer relationships and exposing
-the outer loop around the entire stream graph.</p>
+speedup by over 12x. In comparison, a traditional data-parallel
+approach that does not attempt to match the granularity achieves a
+speedup of only 1.4x over the sequential baseline. Our research
+suggests that two specific features of StreamIt are a good match for
+parallel architectures: exposing producer-consumer relationships and
+exposing the outer loop around the entire stream graph.</p>
 
 <h5>Current and Future Work</h5>
 
@@ -123,8 +123,8 @@ portability of the language, generality of our current mapping
 algorithms, and reveals further opportunities for research.</p>
 
 <p>For example, we are currently working on a compiler backend with an
-associated runtime system for the Cell processor[3]. This development
-effort is interesting for multiple reasons. For high-performance Cell
+associated runtime system for the Cell processor [3]. This development
+effort is interesting for multiple reasons. For high-performance, Cell
 requires the exploitation of fine-grained data-parallelism in the form
 of SIMD instructions.  We have developed an infrastructure that will
 map a "copy" of a suitable stateless filter onto a SIMD
@@ -154,7 +154,7 @@ can be discovered in StreamIt and should be relatively easy to
 exploit. A more difficult task is to generate efficient code for the
 processing elements themselves, code that exploits the dense
 instruction encoding of the processing elements. As GPUs become more
-programmable and more tightly coupled with the CPU. One can think of
+programmable and more tightly coupled with the CPU, one can think of
 the coupling as a heterogeneous parallel processor where segments of
 an application are offloaded to the GPU for processing. With StreamIt,
 one can write an application in a single high-level programming
