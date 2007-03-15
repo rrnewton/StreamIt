@@ -1,7 +1,7 @@
 <html><head><!-- Which section should this abstract be included in?   	1.) Systems   	-->
 
 </head><body><div align="center">
-<h3>StreamIt: A Common Machine Language for Parallel Architectures</h3>
+<h3>StreamIt: A Common Machine Language for Multicore Architectures</h3>
    
 <h4>Michael I. Gordon, William Thies, Qiuyuan J. Li, Phil Sung, David Zhang, 
 Weng Fai Wong, &amp; Saman Amarasinghe</h4>
@@ -10,35 +10,37 @@ Weng Fai Wong, &amp; Saman Amarasinghe</h4>
 <h5>Introduction</h5>
 
 <p>To continue performance scalability and to manage design
-complexity, processor architectures are now relying on coarse-grained
-parallelism.  This form of parallelism is achieved by the replication
-of simple processing elements.  However, easing the programming burden
-for these explicitly parallel machines is still a largely unsolved
-problem. We are developing high-level programming idioms, compiler
-technologies, and runtime systems for parallel machines.  We seek to
-enable high programmer productivity coupled with high application
-performance, portability, and scalability.  The algorithms we develop
-will be applicable across the spectrum of parallel architectures, from
-general purpose multicores to emerging flexible graphics hardware
-(GPUs).</p>
+complexity, commodity processor architectures are now relying on
+multicore designs.  These designs replicate processing elements to
+expose coarse-grained parallelism.  For general purpose processors and
+graphics processors (GPUs), multicore designs are now standard and are
+quickly scaling in the number of cores. However, easing the
+programming burden for these explicitly parallel machines is still a
+largely unsolved problem. We are developing high-level programming
+idioms, compiler technologies, and runtime systems for multicore
+architectures. We seek to enable high programmer productivity coupled
+with high application performance, portability, and scalability. The
+algorithms we develop will be applicable across the spectrum of
+multicore architectures, from general purpose processors to emerging
+flexible graphics hardware (GPUs).</p>
 
-<p>Unfortunately, parallel programming is notoriously
-difficult. Application developers have long hoped for new high-level
-programming models, with associated compiler and runtime technologies,
-in order to produce efficient, portable, and scalable code for
-coarse-grained parallel architectures. The stream programming paradigm
-offers a promising high-level approach for application development
-targeting parallel machines.  Our research focuses on language,
-compiler, and runtime technologies for the StreamIt programming
-language [5], a streaming language we are developing in the Compilers
-Group at MIT (COMMIT).</p>
+<p>Unfortunately, parallel programming is notoriously difficult.
+Application developers have long hoped for new high-level programming
+models, with associated compiler and runtime technologies, in order to
+produce efficient, portable, and scalable code for coarse-grained
+parallel architectures. The stream programming paradigm offers a
+promising high-level approach for application development targeting
+multicore architectures. Our research focuses on language, compiler,
+and runtime technologies for the StreamIt programming language [5], a
+streaming language we are developing in the Compilers Group at MIT
+(COMMIT).</p>
 
 <h5>Background</h5>
 
-<p>The common properties across parallel machines are multiple flows
-of control and multiple local memories. StreamIt directly exposes
-these common properties. In the StreamIt language, a program is
-represented as a set of autonomous filters that communicate through
+<p>The common properties across multicore architectures are multiple
+flows of control and multiple local memories. StreamIt directly
+exposes these common properties. In the StreamIt language, a program
+is represented as a set of autonomous filters that communicate through
 FIFO data channels.  During program execution, filters fire repeatedly
 in a periodic schedule.  As each filter has a separate program counter
 and an independent address space, all dependences between filters are
@@ -109,16 +111,16 @@ speedup by over 12x. In comparison, a traditional data-parallel
 approach that does not attempt to match the granularity achieves a
 speedup of only 1.4x over the sequential baseline. Our research
 suggests that two specific features of StreamIt are a good match for
-parallel architectures: exposing producer-consumer relationships and
+multicore architectures: exposing producer-consumer relationships and
 exposing the outer loop around the entire stream graph.</p>
 
 <h5>Current and Future Work</h5>
 
 <p>We wish to demonstrate that, for the class of streaming
 applications, StreamIt programs are portable, scalable and efficient
-across parallel architectures.  Toward this end, we are in the process
+across multicore architectures.  Toward this end, we are in the process
 of developing backends and runtime systems for emerging industry and
-research parallel architectures. Each separate architecture tests the
+research multicore architectures. Each separate architecture tests the
 portability of the language, generality of our current mapping
 algorithms, and reveals further opportunities for research.</p>
 
@@ -128,7 +130,7 @@ effort is interesting for multiple reasons. For high-performance, Cell
 requires the exploitation of fine-grained data-parallelism in the form
 of SIMD instructions.  We have developed an infrastructure that will
 map a "copy" of a suitable stateless filter onto a SIMD
-lane. Furthermore, Cell is an example of a heterogeneous parallel
+lane. Furthermore, Cell is an example of a heterogeneous multicore
 architecture.  We must extend our mapping algorithms to make informed
 mapping decisions given the differing capabilities of the processing
 cores. Finally, we are developing a system for Cell where we can vary
@@ -147,19 +149,23 @@ network parameters, memory bandwidth)?  When data-parallelism no
 longer scales, what architectural, language, and compiler techniques
 will be necessary to continue performance scaling?</p>
 
-<p>Finally, we plan on demonstrating that StreamIt can effectively target
-GPUs. GPUs have massive data parallelism and are specialized for
-rendering data-types and operations. Coarse-grained data parallelism
-can be discovered in StreamIt and should be relatively easy to
-exploit. A more difficult task is to generate efficient code for the
-processing elements themselves, code that exploits the dense
-instruction encoding of the processing elements. As GPUs become more
-programmable and more tightly coupled with the CPU, one can think of
-the coupling as a heterogeneous parallel processor where segments of
-an application are offloaded to the GPU for processing. With StreamIt,
-one can write an application in a single high-level programming
-language and let the compiler decide the partitioning between CPU and
-GPU.  We plan to extend our mapping algorithms for this problem.</p> 
+<p>Finally, we plan on demonstrating that StreamIt can effectively
+target GPUs. In parallel with the evolution of general purpose
+processors, graphics processors (GPUs) have evolved from the fixed
+pipeline allocations of the past to multicore designs. These designs
+replicate simple processing elements achieving massive coarse-grained
+data parallelism for specialized rendering data-types and operations.
+Coarse-grained data parallelism can be discovered in StreamIt and
+should be relatively easy to exploit.  A more difficult task is to
+generate efficient code for the processing elements themselves, code
+that exploits the dense instruction encoding of the processing
+elements. As GPUs become more programmable and more tightly coupled
+with the CPU, one can think of the coupling as a heterogeneous
+multicore processor where segments of an application are offloaded to
+the GPU for processing. With StreamIt, one can write an application in
+a single high-level programming language and let the compiler decide
+the partitioning between CPU and GPU.  We plan to extend our mapping
+algorithms for this problem.</p>
 
 <h5>References:</h5>
 
