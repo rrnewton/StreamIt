@@ -25,15 +25,14 @@ multicore architectures, from general purpose processors to emerging
 flexible graphics hardware (GPUs).</p>
 
 <p>Unfortunately, parallel programming is notoriously difficult.
-Application developers have long hoped for new high-level programming
-models, with associated compiler and runtime technologies, in order to
-produce efficient, portable, and scalable code for coarse-grained
-parallel architectures. The stream programming paradigm offers a
-promising high-level approach for application development targeting
-multicore architectures. Our research focuses on language, compiler,
-and runtime technologies for the StreamIt programming language [5], a
-streaming language we are developing in the Compilers Group at MIT
-(COMMIT).</p>
+Traditional programming models such as C, C++ and FORTRAN are
+ill-suited to multicore architectures because they assume a single
+instruction stream and a monolithic memory.  The stream programming
+paradigm offers a promising high-level approach for application
+development targeting multicore architectures. Our research focuses on
+language, compiler, and runtime technologies for the StreamIt
+programming language [5], a streaming language we are developing in
+the Compilers Group at MIT (COMMIT).</p>
 
 <h5>Background</h5>
 
@@ -61,8 +60,8 @@ by blue ovals. Pipeline parallelism is present between filters in the
 horizontal dimension, task parallelism in the vertical dimension, and
 data parallelism in the perceived depth dimension.  Data parallelism
 is exploited only in IFFT.  IFFT is stateless and can be
-data-parallelized by duplicating the filter (duplicates denoted by the
-lighter boxes). 
+data-parallelized by duplicating the filter (duplicates denoted by
+lighter boxes).
 </center>
 </p>
 
@@ -124,12 +123,12 @@ research multicore architectures. Each separate architecture tests the
 portability of the language, generality of our current mapping
 algorithms, and reveals further opportunities for research.</p>
 
-<p>For example, we are currently working on a compiler backend with an
-associated runtime system for the Cell processor [3]. This development
-effort is interesting for multiple reasons. For high-performance, Cell
-requires the exploitation of fine-grained data-parallelism in the form
-of SIMD instructions.  We have developed an infrastructure that will
-map a "copy" of a suitable stateless filter onto a SIMD
+<p>We are currently working on a compiler backend with an associated
+runtime system for the Cell processor [3]. This development effort is
+interesting for multiple reasons. For high-performance, Cell requires
+the exploitation of fine-grained data-parallelism in the form of SIMD
+instructions.  We have developed an infrastructure that will map a
+"copy" of a suitable stateless filter onto each SIMD
 lane. Furthermore, Cell is an example of a heterogeneous multicore
 architecture.  We must extend our mapping algorithms to make informed
 mapping decisions given the differing capabilities of the processing
@@ -137,8 +136,8 @@ cores. Finally, we are developing a system for Cell where we can vary
 the mapping and scheduling of the stream program between static
 (compiler) and dynamic (runtime) control.  We wish to investigate
 points on the continuum between static and dynamic mappings, e.g.,
-whether it is useful to compute the mapping and schedule at
-compile time.</p>
+whether it is useful to compute the mapping and schedule at compile
+time.</p>
 
 <p>Data-parallelism often requires global communication and data
 reorganization.  Another question we seek to investigate is whether
@@ -149,12 +148,12 @@ network parameters, memory bandwidth)?  When data-parallelism no
 longer scales, what architectural, language, and compiler techniques
 will be necessary to continue performance scaling?</p>
 
-<p>Finally, we plan on demonstrating that StreamIt can effectively
-target GPUs. In parallel with the evolution of general purpose
-processors, graphics processors (GPUs) have evolved from the fixed
-pipeline allocations of the past to multicore designs. These designs
-replicate simple processing elements achieving massive coarse-grained
-data parallelism for specialized rendering data-types and operations.
+<p>Finally, we will demonstrate that StreamIt can effectively target
+GPUs. In parallel with the evolution of general purpose processors,
+graphics processors (GPUs) have evolved from the fixed pipeline
+allocations of the past to multicore designs. These designs replicate
+simple processing elements achieving massive coarse-grained data
+parallelism for specialized rendering data-types and operations.
 Coarse-grained data parallelism can be discovered in StreamIt and
 should be relatively easy to exploit.  A more difficult task is to
 generate efficient code for the processing elements themselves, code
