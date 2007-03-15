@@ -58,7 +58,7 @@ are denoted by green boxes and data-reorganization nodes are denoted
 by blue ovals. Pipeline parallelism is present between filters in the
 horizontal dimension, task parallelism in the vertical dimension, and
 data parallelism in the perceived depth dimension.  Data parallelism
-is exploited only in Filter B.  Filter B is stateless and can be
+is exploited only in IFFT.  IFFT is stateless and can be
 data-parallelized by duplicating the filter (duplicates denoted by the
 lighter boxes). 
 </center>
@@ -67,20 +67,20 @@ lighter boxes).
 <p>StreamIt directly exposes three types of coarse-grained
 parallelism: task, data, and pipeline. Conceptually, each type of
 parallelism can be expressed on an independent axis of a stream
-graph (see Figure 1).  Task parallelism refers to pairs of filters
+graph (see Figure 1).  Task parallelism refers to groups of filters
 that are on different parallel branches of the original stream graph,
-as written by the programmer (Filters C, D, and E in Figure 1). That
-is, the output of each filter never reaches the input of the other. In
-stream programs, task parallelism reflects logical parallelism in the
-underlying algorithm. Data parallelism refers to any filter that has
-no dependences between one execution and the next. Such "stateless"
-filters offer unlimited data parallelism, as different instances of
-the filter can be spread across any number of computation units
-(Filter B in Figure 1).  StreamIt, unlike many other streaming
-languages, naturally supports pipeline parallelism [1].  Pipeline
-parallelism applies to chains of producers and consumers that are
-directly connected in the stream graph (e.g., Filters A and B in
-Figure 1). Each type of parallelism has advantages and
+as written by the programmer (e.g., three Thresh filters in Figure
+1). That is, the output of each filter never reaches the input of the
+other. In stream programs, task parallelism reflects logical
+parallelism in the underlying algorithm. Data parallelism refers to
+any filter that has no dependences between one execution and the
+next. Such "stateless" filters offer unlimited data parallelism, as
+different instances of the filter can be spread across any number of
+computation units (e.g., IFFT in Figure 1).  StreamIt, unlike many
+other streaming languages, naturally supports pipeline parallelism
+[1].  Pipeline parallelism applies to chains of producers and
+consumers that are directly connected in the stream graph (e.g., IIR
+and IFFT in Figure 1). Each type of parallelism has advantages and
 disadvantages. For example, exploiting data parallelism is
 straightforward and produces a load-balanced mapping. However, by
 itself, data parallelism requires global communication and
