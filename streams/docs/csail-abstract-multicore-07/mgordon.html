@@ -4,7 +4,7 @@
 <h3>StreamIt: A Common Machine Language for Multicore Architectures</h3>
    
 <h4>Michael I. Gordon, William Thies, Qiuyuan J. Li, Phil Sung, David Zhang, 
-Weng Fai Wong, &amp; Saman Amarasinghe</h4>
+Weng Fai Wong &amp; Saman Amarasinghe</h4>
 </div>
 
 <h5>Introduction</h5>
@@ -22,7 +22,7 @@ architectures. We seek to enable high programmer productivity coupled
 with high application performance, portability, and scalability. The
 algorithms we develop will be applicable across the spectrum of
 multicore architectures, from general purpose processors to emerging
-flexible graphics hardware (GPUs).</p>
+flexible graphics hardware.</p>
 
 <p>Unfortunately, parallel programming is notoriously difficult.
 Traditional programming models such as C, C++ and FORTRAN are
@@ -95,7 +95,7 @@ for bridging the gap between the granularity of a stream program and
 the underlying granularity of the target architecture [2].  We present
 a unified static approach that leverages the correct combination of
 task, data, and pipeline parallelism.  To reduce the communication
-overhead typical of data-parallelism, we first increase the
+overhead typical of data parallelism, we first increase the
 granularity of the stream graph by fusing filters so long as the
 result is data-parallel.  To further reduce communication costs, we
 data-parallelize the application while maintaining task parallelism
@@ -126,7 +126,7 @@ algorithms, and reveals further opportunities for research.</p>
 <p>We are currently working on a compiler backend with an associated
 runtime system for the Cell processor [3]. This development effort is
 interesting for multiple reasons. For high-performance, Cell requires
-the exploitation of fine-grained data-parallelism in the form of SIMD
+the exploitation of fine-grained data parallelism in the form of SIMD
 instructions.  We have developed an infrastructure that will map a
 "copy" of a suitable stateless filter onto each SIMD
 lane. Furthermore, Cell is an example of a heterogeneous multicore
@@ -139,12 +139,12 @@ points on the continuum between static and dynamic mappings, e.g.,
 whether it is useful to compute the mapping and schedule at compile
 time.</p>
 
-<p>Data-parallelism often requires global communication and data
+<p>Data parallelism often requires global communication and data
 reorganization.  Another question we seek to investigate is whether
 data parallelism scales indefinitely.  We wish to determine the points
-at which data-parallelism ceases to scale as we vary the architectural
+at which data parallelism ceases to scale as we vary the architectural
 parameters (e.g., number and capability of processing elements,
-network parameters, memory bandwidth)?  When data-parallelism no
+network parameters, memory bandwidth).  When data parallelism no
 longer scales, what architectural, language, and compiler techniques
 will be necessary to continue performance scaling?</p>
 
@@ -162,9 +162,9 @@ elements. As GPUs become more programmable and more tightly coupled
 with the CPU, one can think of the coupling as a heterogeneous
 multicore processor where segments of an application are offloaded to
 the GPU for processing. With StreamIt, one can write an application in
-a single high-level programming language and let the compiler decide
-the partitioning between CPU and GPU.  We plan to extend our mapping
-algorithms for this problem.</p>
+a single high-level programming language and let the compiler or
+runtime decide the partitioning between CPU and GPU.  We plan to
+extend our mapping algorithms for this problem.</p>
 
 <h5>References:</h5>
 
