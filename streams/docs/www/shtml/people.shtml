@@ -21,7 +21,10 @@
 	    <li><p align="justify">
 	      <b><a href="http://cag.csail.mit.edu/~saman">Saman
 	      Amarasinghe</a></b> the fearless leader.
-	    </p>	
+	    </p>
+            <li><p align="justify">
+            <b>Basier Aziz</b> is using StreamIt to implement a mosaic image analysis (utilizing the RANSAC algorithm).
+            </p>
 	    <li><p align="justify">
 	      <b><a href="http://cag.csail.mit.edu/~dimock">Allyn Dimock</a></b> contributes to many aspects of the
 	      StreamIt compiler and development toolchain.
@@ -36,15 +39,21 @@
 	    </p>
 	    <li><p align="justify">
 	      <b>Michal Karczmarek</b> built the StreamIt library and
-	      the scheduler.  He also implemented the Makefile build
+	      the scheduler, as well as the Makefile build
 	      system.
 	    </p>
+            <li><p align="justify">
+            <b>Qiuyuan Jimmy Li</b> is mapping StreamIt onto the Cell processor.
+            </p>
 	    <li><p align="justify">
 	      <b><a href="http://web.mit.edu/rabbah/www/">Rodric
 	      Rabbah</a></b> contributes to the language design and
 	      compiler optimizations for DSPs, conventional processors,
 	      and computer grids.
 	    </p>
+            <li><p align="justify">
+            <b>Phil Sung</b> is mapping StreamIt onto Graphics Processing Units (GPUs).
+            </p>
 	    <li><p align="justify">
 	      <b><a   href="http://cag.csail.mit.edu/~thies/">Bill  Thies</a></b>
 		 led the  design of the  StreamIt language and  compiler. He
@@ -52,7 +61,7 @@
 		 algorithms for load balancing and linear optimizations.
 	    </p>
 	    <li><p align="justify">
-	    <b>David Zhang</b> is integrating StreamIt with the X10 language from IBM.
+	    <b>David Zhang</b> is building a lightweight streaming runtime library for the Cell processor.
 	    </p>
  	  </ul>
 
@@ -72,6 +81,9 @@
 	    <li><p align="justify">
 	      <b>Matt Drake</b> implemented an 
               <a href="../mpeg">MPEG-2 codec in StreamIt</a>.
+	    </p>
+	    <li><p align="justify">
+	      <b>Shirley Fung</b> implemented part of an MPEG-4 decoder in StreamIt</a>.
 	    </p>
 	    <li><p align="justify">
 	      <b>Kimberly Kuo</b>  implemented a graphical  debugger for
