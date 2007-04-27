@@ -1,7 +1,5 @@
 </table>
 
-</body>
-
 <!-- Google analytics, ask Bill for access to records -->
 <script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
 </script>
@@ -9,5 +7,7 @@
 _uacct = "UA-366150-1";
 urchinTracker();
 </script>
+
+</body>
 
 </html>
