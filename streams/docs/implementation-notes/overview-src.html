@@ -1,0 +1,55 @@
+<!--
+  Copyright 2003 by the Massachusetts Institute of Technology.
+
+  Permission to use, copy, modify, and distribute this
+  software and its documentation for any purpose and without
+  fee is hereby granted, provided that the above copyright
+  notice appear in all copies and that both that copyright
+  notice and this permission notice appear in supporting
+  documentation, and that the name of M.I.T. not be used in
+  advertising or publicity pertaining to distribution of the
+  software without specific, written prior permission.
+  M.I.T. makes no representations about the suitability of
+  this software for any purpose.  It is provided "as is"
+  without express or implied warranty.
+-->
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" [<!ELEMENT code - - (#PCDATA)>]>
+<html>
+<head>
+<title>StreamIt Source Code Roadmap</title>
+</head>
+<body>
+<p>
+Package <b>at.dms</b> contains the DMS's Kopi compiler for Java with
+the additions that form the StreamIt compilers.
+Most of StreamIt the modifications for the compilers are in
+<b>at.dms.kjc</b>, but <b>at.dms.util</b> also contains some StreamIt
+code.
+Note that the parser has been changed from parsing Java to parsing a
+variant that requires sizes to be declared for all arrays.
+</p>
+<p>
+Package <b>streamit</b> contains 
+<ul>
+<li>the code for the StreamIt interpreter
+a.k.a. the library back end <b>streamit.library</b>.
+</li><li> <b>streamit.frontend</b> which contains lexical analysis
+and parsing of StreamIt code and conversion either into Java code for
+the library back end, or into a variant of Java code annotated with
+sizes for all array declarations suitable for the compier back ends.
+</li><li> <b>streamit.eclipse</b> contains eclipse addons for graphical program
+development and debugging.
+</li><li> <b>streamit.scheduler2</b> contains scheduling code that
+works both in the library and in the compiled back ends.
+The scheduling relies on  <b>streamit.library.iriter</b> for iterating 
+in the library and <b>at.dms.kjc.iterator</b> for iterating in the
+compiler back ends.
+</ul>
+</p>
+<p> 
+Package <b>com.jgraph</b> appears obsolete and should be replaced with 
+<b>org.jgraph</b>.  This third-party package is used only by the graph
+editor eclipse add-on.
+</p>
+</body>
+</html>
