@@ -13,18 +13,11 @@
   this software for any purpose.  It is provided "as is"
   without express or implied warranty.
 -->
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" [<!ELEMENT code - - (#PCDATA)>]>
-<html>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <title>StreamIt Developer FAQ</title>
 <!-- TODO: links to sub packages -->
-<!-- TODO: sources of fresh variables: put this where?  
-at.dms.kjc.sir.lowering.RenameAll.newName("xxx") generates "xxx__NNN"
-at.dms.kjc.sir.lowering.LoweringConstants.getUniqueVarName() generates
-"streamItVar_NNN"
-at.dms.kjc.sir.lowering.ThreeAddressCode.nextTemp() generates
-"__tmpNNN"
--->
 <!-- TODO: iterators: put where? -->
 </head>
 <body>
@@ -41,14 +34,16 @@ Here are some preferred routines:
 <li> at.dms.kjc.sir.lowering.ThreeAddressCode.nextTemp() generates
 "__tmpNNN"
 </ul>
+<br/>
 <li>Where do I find the intermediate representation?
 <p>
 The compiler works on an abstract syntax tree.
+</p><p>
 The underlying representation from the Kopi compiler, modified to our needs is found in at/dms/kjc.
-<br/>Extensions for SIR primitives and SIR graphs are found in at.dms.kjc.sir.
-<br/>The Slice Graph representation for unstructured graphs is found in at.dms.kjc.slicegraph.
-<br/>The Flatgraph representation found in at.dms.kjc.flatgraph is deprecated, but is still used transiently for some partitioners, for creating subgraphs with only static rates (if there are dynamic rate edges in the SIR graph), and is used extensively in the at.dms.kjc.spacedynamic back end, and is used in combination with other representations in the at.dms.kjc.cluster back end.
-<br/>The LIR extensions in at.dms.kjc.lir, and the code in library/c are for the initial implmentation fo the StreamIt compiler (sometimes called the old Uni back-end), and are no longer supported.
+</p><p>Extensions for SIR primitives and SIR graphs are found in at.dms.kjc.sir.
+</p><p>The Slice Graph representation for unstructured graphs is found in at.dms.kjc.slicegraph.
+</p><p>The Flatgraph representation found in at.dms.kjc.flatgraph is deprecated, but is still used transiently for some partitioners, for creating subgraphs with only static rates (if there are dynamic rate edges in the SIR graph), and is used extensively in the at.dms.kjc.spacedynamic back end, and is used in combination with other representations in the at.dms.kjc.cluster back end.
+</p><p>The LIR extensions in at.dms.kjc.lir, and the code in library/c are for the initial implmentation fo the StreamIt compiler (sometimes called the old Uni back-end), and are no longer supported.
 </p>
 <p>
 The library intermediate representation is Java code.
@@ -57,6 +52,9 @@ The library intermediate representation is Java code.
 <li>How do I iterate over the intermediate representation(s)?
 <p>FILL IN</p>
 </li>
+<li>How do I add a new back end?
+<p>See <a href="adding-a-backend.html">adding-a-backend</a>.</p>
+<li>
 </ul>
 </body>
 </html>
