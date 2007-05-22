@@ -1,0 +1,439 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html  xml:lang="en" lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<!--
+  Copyright 2003 by the Massachusetts Institute of Technology.
+
+  Permission to use, copy, modify, and distribute this
+  software and its documentation for any purpose and without
+  fee is hereby granted, provided that the above copyright
+  notice appear in all copies and that both that copyright
+  notice and this permission notice appear in supporting
+  documentation, and that the name of M.I.T. not be used in
+  advertising or publicity pertaining to distribution of the
+  software without specific, written prior permission.
+  M.I.T. makes no representations about the suitability of
+  this software for any purpose.  It is provided "as is"
+  without express or implied warranty.
+-->
+<head>
+<title>Adding a StreamIt back end</title>
+</head>
+<body>
+<h1>Adding a StreamIt back end</h1>
+<p>This FAQ entry contains several parts:</p>
+<ol>
+<li><a href="#pick_names">Names and directory structure</a>
+</li>
+<li><a href="#skeleton">Directory setup and getting java to run a skeleton back end from Streamit compiler</a>
+</li>
+<li><a href="#strc">Incorporating your back end into the <code>strc</code> script</a>
+</li>
+<li><a href="#common-code">Using existing code to help create a useful backend</a>
+<ol>
+<li><a href="#common-passes">Common passes</a>
+</li><li><a href="#lowering">Lowering to Kopi code</a>
+</li><li><a href="#emitting">Emitting C</a>
+</li>
+</ol>
+</li>
+</ol>
+<h3><a name="pick_names"/>Names and directory structure</h3>
+<p>Pick the following names:</p>
+<dl>
+<dt><em>subdirName</em></dt><dd>a name for a subdirectory (also a java sub-package) to hold your code.  This is standardly a subpackage of at.dms.kjc.  You will create a subdirectory <code>$STREAMIT_HOME/src/at/dms/kjc/<em>subdirName</em></code>.</dd>
+<dt><em>javaName</em></dt><dd>a name for your top-level java file, that will have a public <code>static void run(...)</code> method.</dd>
+<dt><em>strcName</em></dt><dd>a name for a user-visible switch to <code>strc</code> to invoke your backend.</dd>
+<dt><em>kjcName</em></dt><dd>a name to be passed from strc to the back end dispatcher and can be tested by referring to <code>KjcOptions.<em>kjcName</em></code>. This name may just have a boolean value "I am in this back end", or it may have a numeric or string value to communicate some information such as number of cores to compile for.
+</dd>
+</dl>
+<p>One example of the naming scheme is:</p>
+<ul>
+<li><em>subdirName</em> = spacetime</li>
+<li><em>strcName</em> = spacetime</li>
+<li><em>kjcName</em> = spacetime</li>
+<li><em>javaName</em> = SpaceTimeBackend</li>
+</ul>
+
+
+<h3><a name="skeleton"/>Directory setup and getting java to run a skeleton back end from Streamit compiler:</h3>
+<ul>
+<li>
+<p>Create a new subdirectory in <code>src/at/dms/kjc/<em>subdirName</em></code>.
+<br/>Add to CVS.
+</p>
+</li>
+<li>
+<p>
+Add your <em>kjcName</em> name to <code>src/at/sms/kjc/KjcOptions.opt</code> specifying a type and a default value. Then:
+<br/>
+<code>$ cd $STREAMIT_HOME/src</code>
+<br/>
+<code>$ make at/dms/kjc/KjcOptions.class</code>
+</p>
+</li>
+<li>
+<p>
+In <code>src/at/dms/kjc.StreaMITMain.java</code>, in that ugly nested <code>if</code> statement,
+add:</p><pre>
+  ...
+  if (KjcOptions.kjcName) {
+    backendClass = "at.dms.kjc.subdirName.<em>javaName</em>";
+  }
+</pre><p>
+and 
+<br/>
+<code>$ cd $STREAMIT_HOME/src; make at/dms/kjc/StreaMITMain.class</code>
+</p>
+</li>
+<li>  <p>
+Create 
+<code>src/at/sms/kjc/subdirName/<em>javaName</em>.java</code> with some content:</p><pre>
+package at.dms.kjc.<em>subdirName</em>;
+public class <em>javaName</em> {
+    public static void run(SIRStream str,
+                           JInterfaceDeclaration[] interfaces,
+                           SIRInterfaceTable[] interfaceTables,
+                           SIRStructure[]structs,
+                           SIRHelper[] helpers,
+                           SIRGlobal global) {
+       System.out.println("Hi, I'm the new back end.")'
+       System.exit(0);
+    }
+</pre>
+<p>
+Please always exit with a 0 value, a non-zero value is used to
+indicate a compile failure to <code>strc</code> or to the regression test manager.
+</p>
+<p>now:<br/>
+<code>$ cd $STREAMIT_HOME/src; make</code>
+</p>
+</li>
+</ul>
+<p>
+At this point you should be able to, for instance:</p>
+<pre>
+$ pushd $STREAMIT_HOME/apps/examples/matrixmult
+$ java streamit.frontend.ToJava --output MatrixMult.java MatrixMult.str
+$ java at.dms.kjc.Main --streamit --<em>kjcName</em> MatrixMult.java
+</pre>
+<p>and invoke your back end.
+</p>
+
+
+<h3><a name="strc"/>Incorporating your back end into the <code>strc</code> script</h3>
+<p>Edit the <code>$STREAMIT_HOME/strc</code> perl script to mung the following
+subroutines appropriately:</p>
+<ul>
+<li>sub get_options
+<ul>
+<li> add your <em>strcName</em> to the parameters to GetOptions(...)
+</li>
+</ul></li>
+<li>sub get_compiler_opts
+<ul>
+<li>convert <em>{strcName</em> to <em>kjcName</em>, probably by adding line:<pre>
+    $opts{<em>strcName</em>} &amp;&amp; ($copts .= " --<em>kjcName</em>");</pre>
+</li>
+</ul></li>
+<li>sub non_streamit_backend_defined
+<ul>
+<li> indicate that <em>strcName</em> is a switch that selects a backend<pre>
+     ... || $opts{<em>strcName</em>} ...</pre>
+</li>
+</ul></li>
+<li>sub usage 
+<ul>
+<li>add  user documentation for <code>--help</code>
+     common back end names are near the top of the Options: portion of
+     the message.  Start line with "+" to only show with <code>--more-help</code>
+     or <code>--much-more-help</code>; start line with "*" to only show with
+     <code>--much-more-help</code>.
+</li>
+</ul></li>
+<li>sub java_to_c 
+<ul>
+<li> if you wish to have strc perform work after a successful
+     compilation with your backend, make sure that <code>java_to_c</code> 
+     returns a non-empty array reference.
+</li>
+</ul></li>
+<li>sub c_to_out
+<ul>
+<li>if you wish to have strc perform work after a successful
+     compilation with your backend, it is most likely that you will
+     hack some code here to invoke gcc, or you might hack code in the
+     (poorly-named) <code>cluster_to_out</code> to invoke a Makefile.
+</li>
+</ul></li>
+</ul>
+
+<h3><a name="common-code"/>Using existing code to help create a useful backend</h3>
+<p>
+The pattern for a back end is</p>
+<ol>
+<li>Perform some common optimizations and convert to unstructured (slice graph) format.
+</li>
+<li>Create representations of the target processors, lay out filters on appropriate processors, and process the filters and communication paths creating code that will implement the schedules, and perform the communication.
+We will refer to this process as "lowering to Kopi code".
+</li>
+<li>
+Emit code for a lower-level compiler or assembler.
+We will refer to this process as "emitting C" since we give very little support to generating anything except C code.
+</li>
+</ol>
+<p>At each step there is code available to take care of many of the details.
+</p>
+
+
+<h4><a name="common-passes"/>Common passes</h4>
+<p>
+The standard optimization passes are packaged together in
+<code>at.dms.kjc.lowering.CommonPasses</code>.  It needs the values passed to your back end from <code>StreaMITMain</code> plus a number of cores (processors) used for duplicating stateless filters and a few other tasks.
+</p>
+<p>
+If you have a new optimization, the place to put it is usually in <code>CommonPasses</code> so that it is available for all back ends.
+</p> 
+<p>
+You actually need to call three routines in <code>CommonPasses</code>.  The calls will be adjacent statements in most back ends.
+Here is an example of your code through the calls to <code>CommonPasses</code>.
+</p><pre>
+package at.dms.kjc.<em>subdirName</em>;
+import at.dms.kjc.backendSupport.*;
+
+/** javadoc here */
+
+public class <em>javaName</em> {
+
+/** javadoc here */
+
+    public static void run(SIRStream str,
+                           JInterfaceDeclaration[] interfaces,
+                           SIRInterfaceTable[] interfaceTables,
+                           SIRStructure[]structs,
+                           SIRHelper[] helpers,
+                           SIRGlobal global) {
+
+        int myNumberOfProcessors = KjcOptions.???; // get nuber of processors/cores
+
+        // The usual optimizations and transformation to slice graph
+        CommonPasses commonPasses = new CommonPasses();
+        // perform standard optimizations.
+        commonPasses.run(str, interfaces, interfaceTables, structs, helpers, global, numCores);
+        // perform some standard cleanup on the slice graph.
+        commonPasses.simplifySlices();
+        // Set schedules for initialization, prime-pump (if KjcOptions.spacetime), and steady state.
+        SpaceTimeScheduleAndPartitioner schedule = commonPasses.scheduleSlices();
+        // partitioner contains information about the Slice graph used by dumpGraph
+        Partitioner partitioner = commonPasses.getPartitioner();
+
+        // back end specific assignment of code to processors starts here.
+    }
+</pre>
+<p>At this point you no longer need the <code>commonPasses</code> object.
+You will need the <code>schedule</code> object to create the code that schedules the executions of the filters.
+You will need the <code>partition</code> object to create a graph of your processed code (useful for debugging).
+</p>
+
+<h4><a name="lowering"/>Lowering to Kopi code</h4>
+
+<p>You need to specify a class for each kind of processing element
+that you need to refer to.  If the processing element performs
+computation then you should extend <code>ComputeNode</code>, otherwise
+you should extend <code>ProcElement</code></p> 
+
+<p>In extending the <code>ComputeNode</code> class, you will need to
+specify the class for storing code for the <code>ComputeNode</code>.
+This task of extending <code>ComputeCodeStore</code> is probably
+minimal, and mostly amounts to deciding what you want to call the main
+function in the code on each processing element.   It is a historical
+accident that you have to subclass <code>ComputeCodeStore</code>, and
+someone should fix this at some time...</p> 
+
+<p>You need to specify a class for the collection of all
+<code>ComputeNode</code>s.  The class is currently used in the support
+code just to provide functions mapping <code>int</code> to
+<code>ComputeNode</code>.  
+This class can be useful for your extensions in keeping information
+about the geometry of your system.</p> 
+
+<h5>Layout</h5>
+<p>You will need to create a class implementing <code>Layout</code>.
+Running your layout will assign <code>SliceNode</code>s to
+<code>ComputeNode</code>s.
+Example layouts for interchangable processors are
+<code>NoSWPipeLayout</code> using simulated annealing, or 
+<code>BasicGreedyLayout</code>.
+<code>CellNoSWPipeLayout</code> shows a simple extension of
+<code>NoSWPipeLayout</code> to a system with heterogeneous processors.
+</p>
+
+<h5>Channels</h5>
+<p>
+The idea behind lowering to Kopi code is to remove all StreamIt
+specific code leaving just code that could be easily translated to
+Java (or in our case C).  All instances of peek(), pop(), and push()
+are translated to function calls to communication code.  This
+communication code is encapsulated in subclasses of
+<code>Channel</code>.
+Code for filters, splitters, and joiners is put into the
+<code>ComputeCodeStore</code>s.
+The code in the <code>ComputeCodeStore</code>s includes JMethodCall's
+to JMethodDeclaration's generated by the channel code.
+At code emission time, code that is relevant to a channel for a
+particulat compute node is emitted along with the code that calls it
+for that compute node.
+</p>
+<p>
+One task in writing a back end is to write code for any communication
+channel not already supplied.
+Another task is to select a subclass of <code>Channel</code> to
+implement each <code>Edge</code> in the slice graph.
+<code>GetOrMakeChannel</code> will implement channels as arrays for
+edges between <code>SliceNode</code>s that are mapped to the same
+<code>ComputeNode</code>.
+You can get some leverage by subclassing <code>GetOrMakeChannel</code>
+and overriding <code>GetOrMakeChannel.makeInterSliceChannel</code>.
+</p>
+
+
+<h5>BackEndFactory</h5>
+<p>
+You will need to write an extension to <code>BackEndFactory</code> to
+coordinate your extensions to various classes.
+For a subclass of <code>BackEndFactory</code> to co-ordinate
+extensions to the back end base classes it  needs to be parameterized
+on the types of your extenssions.
+</p>
+<p>
+<code>BackEndFactory</code> should work by delegating to other classes
+as appropriate.
+</p>
+<p>Here are the services that <code>BackEndFactory</code>
+provides:</p>
+<ul>
+<li>
+<code>getBackEndMain()</code> returns an instance of
+<code>BackEndScaffold</code> with a
+<code>run(schedule,backendfactory)</code> method that is the main
+driver for generating code for <code>SliceNode</code>s.  The
+<code>BackEndScaffold</code> us usually sufficient.
+</li>
+<li><code>processInputSliceNode</code>, <code>processFilterSlices</code>,
+<code>processFilterSliceNode</code>, and <code>processOutputSliceNode</code>
+Are methods to generate code into a code store for different
+subclasses of <code>SliceNode</code>.  
+<code>processFilterSlices</code> is only needed if a slice contains a
+sequence of filters.  If your backend uses <code>SimpleSlice</code>s,
+as is probably the case then calling this method should just result in
+an error.
+In the case where a <code>SliceNode</code> needs to generate code only
+for the <code>ComputeNode</code> that the layout assigns the slice to,
+then the standard
+<code>ProcessFilterSliceNode.processFilterSliceNode</code>
+should suffice.  If not, these methods have extension points that
+allow extra processing.
+The standard <code>processFilterSliceNode</code> and
+<code>processOutputSliceNode</code> geneate little state machines for
+splitting and joining.
+<br/>
+These methods are subdivided into two portions: the main portion
+processes code reachable or inferrable from a <code>SliceNode</code>.
+A second portion deals with wrapping code in calls to the appropriate
+channel initialization code, and in looping code the correct number of
+times for a multiplicity.  This code is packaged in subclasses of
+<code>CodeStoreHelper</code> and the <code>getCodeStoreHelper()</code>
+method acts as a factory for instances of these subclasses.  In most
+cases this code should not need to be changed from the standard.
+</li>
+<li>
+<code>getComputeNodes()</code> allows you to access your
+<code>ComputeNodes</code> without having to pass an instance of the
+class around separately.
+Similarly <code>getComputeNode(selector)</code> allows you to access
+an individual compute node. 
+</li>
+<li>
+<code>getComputeCodeStore()</code> is a baby step toward de-coupling 
+the code stores and compute nodes.  We do not like the 1-1
+relationship because there may be co-processors associated with a
+compute node that have their own code stores.  The switch code
+processor of a RAW tile is an example.  This is not yet supported and
+exists only as a reminder to de-couple compute nodes from code stores
+some day.
+</li>
+<li>
+<code>setLayout</code>, <code>getLayout</code> make accessing the
+layout more convenient.
+</li>
+<li>
+<code>getChannel(Edge e)</code> returns a channel implementing an
+edge, probably by calling a subclass of  <code>GetOrMakeChannel</code>.
+</li>
+<li>
+<code>getChannels</code> returns all the channels, and is used in the
+code emission phase.
+</li>
+<li> 
+<code>ProcessFilterSliceNode.processFilterSliceNode</code> and its
+relatives need make some queries that they make through the back end
+factory:
+<ul>
+<li><code>sliceHasUpstreamChannel(Slice s)</code> Is there data
+flowing into a slice?</li>
+<li><code>sliceHasDownstreamChannel(Slice s)</code> Is there data
+flowing out of a slice?</li>
+<li><code>sliceNeedsJoinerCode</code> Is there code necessary to
+implement a joiner?</li>
+<li><code>sliceNeedsJoinerWorkFunction</code> Does the joiner need its
+own work function, or is it implementable as synchronous calls from
+the filter code?</li>
+<li><code>sliceNeedsSplitterCode</code> Is there code necessary to
+implement a splitter?</li>
+<li><code>sliceNeedsSplitterWorkFunction</code> Does the splitter need its
+own work function, or is it implementable as synchronous calls from
+the filter code?</li>
+<li>
+<code>sliceNeedsPeekBuffer(Slice s)</code> Is there bufferring needed between
+the input slice node and the filter?
+</li>
+<li>
+<code>sliceNeedsPokeBuffer(Slice s)</code> Is there bufferring needed
+between the filter and the output slice node?
+</li>
+</ul>
+</li>
+</ul>
+<p>Given a schedule, a layout, and the routines for a back end
+factory, calling <code>getBackEndMain().run()</code> should generate
+all necessary code into the code stores for the compute nodes
+accessible through <code>getComputeNodes()</code> and in
+instances of channels accessible through <code>getChannels</code> </p>
+
+<h4><a name="emitting"/>Emitting C</h4>
+<p>To emit code you need to create an instance of a
+<code>CodegenPrintWriter</code> per output file and  call
+<code>EmitCode.emitCodeForComputeNode</code> for each compute node.
+Things are not quite so simple, because there may be code for
+<code>main()</code> functions and other startup code that is specific
+to a particular back end,
+so <code>EmitCode</code> needs to be subclassed in every back end.</p>
+<p>
+<code>EmitTypedefs</code> creates and emits typedefs for all structs in
+the original program and for some additional structures that are
+created during compilation.
+Again, it takes a <code>CodegenPrintWriter</code>.
+</p>
+
+<p>If you use a particular dialect of C you may want to override some
+of the visitors that are generating code in <code>EmitCode</code>.
+If you are generating specialized code to emit, you might take
+advantage of <code>kjc.CEmittedTextType</code> for types, and
+<code>kjc.JEmittedTextExpression</code> for expressions.
+These can be included in Kopi code to pass text straight through to
+the code emitter.  They also act as way of getting around laboriously
+creating Kopi code until such a time as we create a program text to
+Kopi source code translator.
+</p>
+</body>
+</html>
