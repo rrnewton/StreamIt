@@ -43,18 +43,161 @@ The underlying representation from the Kopi compiler, modified to our needs is f
 </p><p>Extensions for SIR primitives and SIR graphs are found in at.dms.kjc.sir.
 </p><p>The Slice Graph representation for unstructured graphs is found in at.dms.kjc.slicegraph.
 </p><p>The Flatgraph representation found in at.dms.kjc.flatgraph is deprecated, but is still used transiently for some partitioners, for creating subgraphs with only static rates (if there are dynamic rate edges in the SIR graph), and is used extensively in the at.dms.kjc.spacedynamic back end, and is used in combination with other representations in the at.dms.kjc.cluster back end.
-</p><p>The LIR extensions in at.dms.kjc.lir, and the code in library/c are for the initial implmentation fo the StreamIt compiler (sometimes called the old Uni back-end), and are no longer supported.
+</p><p>The LIR extensions in at.dms.kjc.lir, and the code in library/c are for the initial implementation fo the StreamIt compiler (sometimes called the old Uni back-end), and are no longer supported.
 </p>
 <p>
 The library intermediate representation is Java code.
 </p>
 </li>
 <li>How do I iterate over the intermediate representation(s)?
-<p>FILL IN</p>
+<p>TODO: fill in here -- Mikhal's iterators: how they work with library and compiler, Kopi iterators and SIR extensions, the expression iterator?  caveats about iterating into parameters (which most iterators don't do)</p>
+<pre>
+* Propagating visitor into inner class
+
+class ... implements SLIRReplacing Visitor {
+ ...
+   private void removeMultiProps(SIRStream str) {
+       final SLIRReplacingVisitor visitor = this;
+       IterFactory.createFactory().createIter(str).accept(
+           new EmptyStreamVisitor() {
+               public void visitFilter(SIRFilter self,
+                                       SIRFilterIter iter) {
+                   for (int i = 0; i < self.getMethods().length; i++) {
+                       self.getMethods()[i].accept(visitor);
+                   }
+               }});
+   }
+ ...
+</pre>
 </li>
 <li>How do I add a new back end?
 <p>See <a href="adding-a-backend.html">adding-a-backend</a>.</p>
+</li>
 <li>
+How do I find out what the benchmarks and applications do?
+<p>Run $STREAMIT_HOME/misc/build-bench-doc<br/>
+It will produce a file $STREAMIT_HOME/apps/benchmarks.html containing
+documentation from all benchmark.xml files in subdirectories of
+$STREAMIT_HOME/apps.
+</p>
+<p>
+This only works if someone has written a description!
+We need to enforce that any application developer create a
+benchmark.xml file containing a description of the code: what it does,
+where the algorithms are documented, whether we have permission to
+include it in a release.
+</p>
+<p>
+Some notes that are not included in benchmark.xml files, or where
+benchmark.xml is missing:
+</p>
+<pre>
+apps directory:
+--------------
+crc       CRC32 calculation in c and StreamIt 1.0 (java)
+          StreamIt 1.0 no longer supported.
+          author D.Maze
+ 
+DCT       presumable discrete cosine transform and inverse,
+          relation to benchmarks/dct unknown.
+ 
+FAT       some sort of radar processing?
+          "Feature Aided Tracking"??
+          http://stinet.dtic.mil/cgi-bin/GetTRDoc?AD=ADA427295&Location=U2&doc=GetTRDoc.pdf
+          in StreamIt 1.0,  no longer supported.
+ 
+FAT-new   Streamit 2 adaption of FAT.
+          author unknown
+          author unknown, check CVS logs...
+
+hdtv      fragments of hdtv encode / decoder.  Which implemented?
+          ReedSolomon, Trellis, Ungerboeck
+          in StreamIt 1.0,  no longer supported.
+          author unknown, check CVS logs...
+  
+nokia     ??
+          possibly part of "Group Radio Access Network" protocols
+          /projects/streamit/3rdparty/specs/nokia-3gpp/
+          in StreamIt 1.0,  no longer supported.
+          author unknown, check CVS logs...
+                                                                                
+nokia-fine  ?? a few diffs from nokia/streamit code but no more comments.
+          in StreamIt 1.0,  no longer supported.
+          author unknown, check CVS logs...
+ 
+nokia-new ?? a few diffs from nokia/streamit code but no more comments.
+          in StreamIt 1.0,  no longer supported.
+          author unknown, check CVS logs...
+ 
+raytracer simple raytracer with hard-coded scene.
+           RayTracer_works.java may work but StreamIt 1.0
+           have not tried RayTracer.str
+ 
+raytracer-new re-implementation of raytracer.
+          library version has some Java extension code, "cluster" version
+          has some c++ extension code.
+          Janis Sermulins based on example from Intel.
+ 
+reed-solomon implementation of Reed-Solomon encoder, decoder in StreamIt 1.0
+          Comments in README say worth converting to StreamIt 2, but no such
+          port has been carried out yet.
+          author unknown, check CVS logs...
+ 
+ 
+video     forward motion prediction algorithm
+          for what format?
+          author unknown, check CVS logs...
+ 
+benchmarks directory:
+--------------------
+ 
+asplos06, asplos06-space, asplos06-superset are all selections from the
+          benchmarks.  May include some performance gathering scripts.
+          exception is that they include channelvocoder, which is different
+          from vocoder.  May change parameters or contain only
+          portions of benchmark codes.
+ 
+pldi-03   another selection, also contains
+          OneBitDToA.str  based on processing for 1-bit d-a in a CD player.
+          Oversampler.str portion of OneBitDToA.
+          SamplingRateConverter.str multiplt a sample rate with interpolation.
+ 
+raw_isca_04 remains of a deleted collection.
+ 
+traces   yet another collection.  targetdetector presumably extracted from GMTI
+         application
+
+cfar       no description in benchmark.xml presumably second stage of GMTI:
+ 
+Constant False Alarm Rate:  calculating a finite series for a sliding window,
+divide a value calculated for the center of the window by the appropriate
+seties value, and compare ration with some threshold value.
+From "Polymorphous Computing Architecture Kernel-Level Benchmarks I"
+/projects/streamit/3rdparty/specs/pca-kernel-benchmarks/PCA-Kernel-1.pdf
+
+firbank  no benchmark.xml.
+%   Returns the result of applying a bank of FIR filters to the matrix x.
+%   The frequency-domain coefficients for each FIR filter are contained
+%   in a vector of length n; there are assumed to be m such filters.
+%   Each row of the output matrix y(i,:) is the result of filtering
+%   x(i,:) with the coefficients in the matrix f(i,:).
+(a bunch of frequency-domain FIR filters in parallel...)
+
+h264 no benchmark.xml. "MPEG4" decoder.
+
+mosaic  no benchmark.xml.
+  correlate images, extract features, use RANSAC algorithm to suppress
+  incorrect matches.
+  Basier Asiz
+ 
+ 
+nokia   no description in benchmark.xml file.
+        Andrew, Jasper
+ 
+perftest4 no description in benchmark.xml file.
+        portion of a software radio??
+</pre>
+</li>
 </ul>
 </body>
 </html>
