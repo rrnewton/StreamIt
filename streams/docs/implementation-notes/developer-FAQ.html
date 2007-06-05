@@ -50,13 +50,33 @@ The library intermediate representation is Java code.
 </p>
 </li>
 <li>How do I iterate over the intermediate representation(s)?
-<p>TODO: fill in here -- Mikhal's iterators: how they work with library and compiler, Kopi iterators and SIR extensions, the expression iterator?  caveats about iterating into parameters (which most iterators don't do)</p>
-<pre>
-* Propagating visitor into inner class
 
-class ... implements SLIRReplacing Visitor {
+<p>There are iterators for the SIR graph that work both for the library 
+({@link streamit.library.iriter}) 
+and for the compilers ({@link at.dms.kjc.iterator}).
+A standard way of walking the SIR graph is to use 
+<code>IterFactory.createFactory().createIter(str)</code>.
+The returned object will have methods to determine some properties of
+<code>str</code> in a way that is independent of whether this code is
+being run in the library or in the compilers.
+One important thing that the returned object will do is to implement
+an <code>accept</code> method that will accept a class implementing the
+<code>at.dms.kjc.StreamVisitor</code> interface and will iterate
+throught the SIR graph (even though the 
+<code>at.dms.kjc.StreamVisitor</code> itself performs no 
+iteration).  The usual impleemntation of
+<code>at.dms.kjc.StreamVisitor</code> is 
+<code>at.dms.kjc.EmptyStreamVisitor</code>.
+</p>
+
+<p>
+Most iteration over the contents of SIRFilters is done using
+implementations of the "visitor pattern".
+
+<pre>
+class Foo implements SLIRReplacingVisitor {
  ...
-   private void removeMultiProps(SIRStream str) {
+   private void foo(SIRStream str) {
        final SLIRReplacingVisitor visitor = this;
        IterFactory.createFactory().createIter(str).accept(
            new EmptyStreamVisitor() {
@@ -69,6 +89,134 @@ class ... implements SLIRReplacing Visitor {
    }
  ...
 </pre>
+<p>In general, you only have to override a few methods of a visitor,
+if few enough, can just put inline</p>
+<pre>
+class Foo {
+ ...
+   private void foo(SIRStream str) {
+       IterFactory.createFactory().createIter(str).accept(
+           new EmptyStreamVisitor() {
+               public void visitFilter(SIRFilter self,
+                                       SIRFilterIter iter) {
+                   for (int i = 0; i < self.getMethods().length; i++) {
+                       self.getMethods()[i].accept(new SLIRVisitor(){
+                       public Object visitFieldExpression(JFieldAccessExpression self,
+                            JExpression left, String fieldIdent) {
+                            ...
+                      } });
+                   }
+               } });
+   }
+ ...
+</pre>
+<p>If you extend a standard visitor to override several methods, then
+you should probably implement the specialized visitor as an inner
+class in your class.</p>
+<p>Some standard visitors:
+
+<table border="1">
+<tr>
+<th>Visitor</th>
+<th>Kjc Visitor</th>
+<th>Accepted By</th>
+<th>use</th>
+</tr>
+<tr>
+<td>StreamVisitor</td>
+<td></td>
+<td>Iterator</td>
+<td>interface</td>
+</tr>
+<tr>
+<td>EmptyStreamVisitor</td>
+<td></td>
+<td>(Iterator)</td>
+<td>implements StreamVisitor, Iterator uses this to walk SIRStream's</td>
+</tr>
+<tr>
+<td>AttributeStreamVisitor</td>
+<td></td>
+<td>SIROperator</td>
+<td>interface</td>
+</tr>
+<tr>
+<td>EmptyAttributeStreamVisitor</td>
+<td></td>
+<td>(SIROperator)</td>
+<td>recurrs, implements AttributeStreamVisitor</td>
+</tr>
+<tr>
+<td>ReplacingStreamVisitor</td>
+<td></td>
+<td>(SIROperator)</td>
+<td>recurrs, replaces substreams, implements AttributeStreamVisitor</td>
+</tr>
+<tr>
+<td>SLIRAttributeVisitor</td>
+<td>AttributeVisitor</td>
+<td>JPhylum</td>
+<td>interface for visitors returning values</td>
+</tr>
+<tr>
+<td>SLIREmptyAttributeVisitor</td>
+<td>EmptyAttributeVisitor</td>
+<td>(JPhylum)</td>
+<td>recurrs, returns passed object</td>
+</tr>
+<tr>
+<td>SLIRReplacingVisitor</td>
+<td>ReplacingVisitor</td>
+<td>(JPhylum)</td>
+<td>extends (SLIR)EmptyAttributeVisitor, replacing changed substructures</td>
+</tr>
+<tr>
+<td>StatementQueueVisitor</td>
+<td></td>
+<td></td>
+<td>Visited expressions in certain places can add statements before
+the the next executable statment, for instance visiting the
+contitional of an <b>if</b> may cause statements to be added to the
+consequent and alternate branches of the if.</td>
+</tr>
+<tr>
+<td>SLIRVisitor</td>
+<td>KjcVisitor</td>
+<td>JPhylum</td>
+<td>Interface for visitors used purely for side effect, not returning
+any value,</td>
+</tr>
+<tr>
+<td>SLIREmptyVisitor</td>
+<td>KjcEmptyVisitor</td>
+<td>(JPhylum)</td>
+<td>recurrs, implements {SLIT/Kjc}Visitor</td>
+</tr>
+<tr>
+<td>ExpressionVisitor</td>
+<td></td>
+<td>JExpression</td>
+<td>interface</td>
+</tr>
+<tr>
+<td>ExpressionVisitorBase</td>
+<td></td>
+<td>(JExpression)</td>
+<td>implements ExpressionVisitor, throws UnsupportedOperationException</td>
+</tr>
+</table>
+
+<p>There is a bit of a mismatch between the SIRStream / SIROperator visitors
+and the JPhylum visitors.  There are JExpressions that are part of
+SIROperators that do not normally get visited in the examples above.  
+<b>StaticsProp.iterOverFieldsAndMethods</b> attempts to remedy this
+for situations where it is necessary to visit parameters of
+SIRStreams: splitter and joiner weight JExpressions, feedback loop
+delay expression, filter method push, pop, peek rate expressions.
+Visiting these expressions is generally of interest in the
+at.dms.kjc.sir.lowering passes, but parameters are expected to become
+constant after these passes.</p>
+
 </li>
 <li>How do I add a new back end?
 <p>See <a href="adding-a-backend.html">adding-a-backend</a>.</p>
@@ -197,6 +345,37 @@ nokia   no description in benchmark.xml file.
 perftest4 no description in benchmark.xml file.
         portion of a software radio??
 </pre>
+</li>
+<li>
+<p>Compiler internal debugging techniques:</p>
+<p>A lot of classes have a "debug" or "debugging" flag that can be turned on.<br/>
+strc --backendvalues "at.dms.kjc.cluster.ClusterBackend.debug true at.dms.kjc.sir.lowering.ConstantProp.debug true"<br/>
+The above only an example those particular flage may not exist.
+</p>
+<p>Ye goode olde print statement.</p>
+<p>at.dms.kjc.sir.SIRToStreamIt  dumps internal representation in source format.</p>
+<p>at.dms.util.SIRPrinter dumps internal format with a bit more detail.</p>
+
+<p>Some code for printing an element of a stack trace:</p>
+<pre>
+   // getting caller or caller's caller...
+   private final Throwable tracer = new Throwable();
+
+    private String findCaller() {
+        if (debugDepth < 0) {
+            throw new IllegalArgumentException();
+        }
+        tracer.fillInStackTrace();
+        return tracer.getStackTrace()[debugDepth + 1].toString();
+    }
+</pre>
+<p>If you can get a StreamIt application to fail in library then can use a java debugger.</p>
+</li>
+<li><p>Cloning:<br/>
+Why and wherefor of cloning...<br/>
+at.dms.kjc,CloneGenerator<br/>
+remember to add class name to at.dms.kjc,CloneGenerator.classes.
+</p>
 </li>
 </ul>
 </body>
