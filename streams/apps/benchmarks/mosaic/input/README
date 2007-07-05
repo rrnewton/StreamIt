@@ -1,0 +1,10 @@
+Note that 3.ppm is the same as 1.ppm.  For unusual reasons, the
+StreamIt version first tracks from 1.ppm to 2.ppm, then 2.ppm back to
+1.ppm, so having 3.ppm in this directory allows the Matlab version to
+do the equivalent computation.
+
+An expanded dataset is available on CAG under:
+
+/projects/streamit/compiler-static/mosaic
+
+Note that in that directory, 3.ppm is different than 1.ppm.
