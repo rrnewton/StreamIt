@@ -7,7 +7,7 @@
 %% universally stored in compressed data formats.  
 
 In order to accelerate operations on compressible data, this paper
-presents a general technique for translating programs into the
+presents a general technique for translating stream programs into the
 compressed domain.  Given a natural program that operates on
 uncompressed data, our transformation outputs a program that directly
 operates on the compressed data format.  We support lossless
@@ -17,7 +17,7 @@ perform the computation, though this decompression is minimized
 throughout the process and significant compression ratios are
 preserved without resorting to an explicit re-compression step.
 
-While we formulated our transformation in terms of the synchronous
+While we formulated our transformation in terms of the cyclo-static
 dataflow model, the techniques can be applied within other functional
 and general-purpose languages so long as the right information is
 available and certain constraints are satisfied.  The transformation
@@ -31,16 +31,16 @@ intrinsic to a language such as StreamIt, they also come naturally in
 most functional languages and may be adaptable to general-purpose
 languages in the form of a runtime library with a restricted API.
 
-In our empirical evaluation, our techniques demonstrate excellent
-speedups.  Across a suite of 12 videos in Apple Animation format,
-computing directly on compressed data offers a speedup roughly
-proportional to the compression ratio.  For pixel transformations
-(brightness, contrast, inverse) speedups range from 3.1x to 235x, with
-a median of 19x; for video compositing operations (overlays and
-mattes) speedups range from 1.0x to 35x, with a median of 7.4x.  While
-previous researchers have used special-purpose compressed processing
-techniques to obtain speedups on lossy, DCT-based codecs, we are
-unaware of a comparable demonstration for lossless video compression.
-As digital films and animated features have embraced lossless formats
-for the editing process, the speedups obtained may have significant
-practical value.
+We implemented the transformation for the case of simple filters in
+the StreamIt compiler and demonstrated excellent speedups.  Across a
+suite of 12 videos in Apple Animation format, computing directly on
+compressed data offers a speedup roughly proportional to the
+compression ratio.  For pixel transformations (brightness, contrast,
+inverse) speedups range from 3.1x to 235x, with a median of 19x; for
+video compositing operations (overlays and mattes) speedups range from
+1.0x to 35x, with a median of 7.4x.  While previous researchers have
+used special-purpose compressed processing techniques to obtain
+speedups on lossy, DCT-based codecs, we are unaware of a comparable
+demonstration for lossless video compression.  As digital films and
+animated features have embraced lossless formats for the editing
+process, the speedups obtained may have significant practical value.

@@ -930,8 +930,8 @@
   \noindent \LARGE \bfseries \@titletext \par
   \vskip 6pt
   \noindent \Large \@subtitletext \par
-% BY BILL
-%  \vskip 12pt
+% BY BILL (commenting out next line) -- but undone for popl submission
+  \vskip 12pt
   \ifcase \@authorcount
     \@latex@error{No authors were specified for this paper}{}\or
     \@titleauthors{i}{}{}\or
@@ -955,8 +955,9 @@
   \else
     \@latex@error{Cannot handle more than 12 authors}{}%
   \fi
-% BY BILL
-%  \vspace{1.75pc}
+% BY BILL (switch comment of next lines) -- but undone for popl submission
+  \vspace{1.75pc}
+%  \vspace{-1.75pc}
   \end{center}}
 
 \def \@settitlebanner {%
