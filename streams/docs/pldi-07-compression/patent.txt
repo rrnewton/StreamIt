@@ -1,0 +1,198 @@
+I. Run-length encoding
+======================
+
+6078691 - Method, apparatus, and article of manufacture for performing
+image processing operations on run-length encoded bitmaps
+
+6980220 - Run-based compositing
+  - compositing of run-length data
+
+5295235 - Polygon engine for updating computer graphic display employing compressed bit map data
+  - also seem to merge RLE line-by-line
+
+6049390 - Compressed merging of raster images for high speed digital printing
+  - pp. 37-38 show merging of RLE line-by-line data
+
+6058219 - Method of skeletonizing a binary image using compressed run length data
+  - only produces a skeleton
+
+4792981 - Manipulation of run-length encoded images
+  - deals with image *outlines* only
+
+5581635 - Method and system for fast rotation of run-length encoded images
+
+II. LZ77 / LZ78 String Matching
+===============================
+
+Navarro - Regular expressions on LZ78
+
+Farach98 - Fixed pattern matching in LZ77
+
+III. Temporal video compression
+===============================
+
+5912709 - Method and apparatus for editing or mixing compressed pictures 
+
+6181743 - Method and device for modifying data in an encoded data stream
+ - does linear transformations on linear-predicted codes
+ - talks about embedding logos in MPEG streams
+
+6697061 - Image compression featuring selective re-use of prior compression data
+  - detect parts of video where your transformation applies, don't change the rest
+
+6970510 - Method for downstream editing of compressed video
+  - looks like when editing, only change from previous I-frame
+
+IV. DCT-based
+=============
+
+A. Image
+--------
+
+5872874 - Method and apparatus for scaling down images that are provided in a compressed data format
+
+7050656 - Image scaling in the compressed domain
+  - scales images by any k/8
+
+6298166 - Image transformations in the compressed domain
+  - dihedral group on a square - e.g., transpose
+
+6819803 - Faster lossless rotation of JPEG images
+
+6490323 - Fast compressed domain processing using orthogonality 
+
+6633673 - Fast fade operation on MPEG video or other compressed data
+
+6100930 - Process and apparatus for performing wipes on compressed MPEG video bitstreams
+
+5708732 - Fast DCT domain downsampling and inverse motion compensation
+
+6104441 - System for editing compressed image sequences
+
+5408274 - Method and apparatus for compositing compressed video data
+
+5832135 - Fast method and apparatus for filtering compressed images in the DCT domain
+
+6298145 - Extracting image frames suitable for printing and visual presentation from the compressed image data
+
+5774593 - Automatic scene decomposition and optimization of MPEG compressed video
+
+B. Audio
+--------
+
+7050980 - System and method for compressed domain beat detection in audio bitstreams
+ - uses MDCT codefficients
+
+C. Other
+--------
+
+6307968 - Direct manipulation of compressed geometry
+  - takes FFT of geometry data and does linear operations in freq. domain
+
+************************************************************************************
+************************************************************************************
+
+1. Is this a process (see 1.1.) or a thing (see 1.2)?
+
+This is a process.
+
+1.1 If it's a process, list the steps.  1.1.1 What are the essential
+  steps?
+
+Given a set of LZ77-compressed data streams and a function that
+operates on the streams, there are three steps:
+
+(i) Intra-stream alignment: align the data in the streams to match the
+granularity of the function.
+
+(ii) Inter-stream alignment: align the data in each stream to match
+the granularity of the other streams.
+
+(iii) Compressed transformation: generate compressed output streams
+directly from the input streams, preserving the repetitive structure
+while changing the base data values.
+
+1.2 If it's a thing, draw it and label the parts.  1.2.1 What must be
+  included?
+
+1.3 How will it be used to make money?
+
+Computing directly on compressed data offers radical speedups (as high
+as 235x, with a median of 16x) for digital video editing, thereby
+adding considerable value to any video editing platform.  Also, the
+speedups can reduce hardware costs for server-side video
+transformations, enabling a new class of online video services.
+
+2. What problem are you solving? (Why is this useful?)
+
+The problem is that data-intensive computer applications (such as
+audio, video, or network processing) are often computationally
+expensive and slow.  We greatly accelerate such applications by
+enabling them to operate directly on a compressed data format, rather
+than needing to decompress, process, and re-compress all of the data.
+These speedups are useful because they save on user time, hardware and
+power costs, and improve application latency.
+
+3. What previous approaches have been used to solve this problem?
+
+The conventional method for data-intensive processing is to first
+uncompress the data, then perform the processing, then re-compress the
+data.  While some previous researchers have also invented schemes for
+operating directly on compressed data, they have mostly focussed on
+lossy compression techniques (for example, performing computations on
+DCT coefficients in JPEG images) while we focus on lossless encodings
+(LZ77 compression).  Previous work with lossless encodings has been
+limited to run-length encoding, which is much less powerful than LZ77.
+
+4. What is the most similar process/thing you know about today?  (or
+   What is the closest thing you've found?)  Has it been
+   commercialized? (or) Is it being used commercially?
+
+In terms of the technical process itself, the closest thing is
+described in US Patent 6049390, "Compressed merging of raster images
+for high speed digital printing."  On pages 37-38, they show how to
+merge two streams of run-length encoded data.  We do not know if it
+has been commercialized.
+
+5. What's different about your process/thing from the process/thing in
+   No. 4 (above)?
+
+Our technique is much more general.  First, our technique applies to
+LZ77-compressed data, which represents a superset of the encodings
+allowed by run-length encoding.  Unlike run-length encoding, LZ77
+asymptotically optimal and is pervasively used in compression formats
+such as ZIP.  Second, our technique applies to arbitrary streaming
+computations rather than being restricted to merging.
+
+6. Why is your process/thing better than No. 4 (above)?
+
+Due to its generality, our technique has many novel applications that
+were not possible previously.  For example, because LZ77 compression
+is more general than the Apple Animation video format, we can directly
+transform videos in this format.  This offers large speedups that are
+important in practice and were not possible previously.
+
+7. Why isn't your invention obvious?
+
+There are three reasons the invention is not obvious:
+
+- The alignment steps are technically subtle and require a careful
+  analysis.
+
+- The transformation relies on a streaming model of computation, which
+  is a cutting-edge programming paradigm being developed by our
+  research group.
+
+- Despite a large amount of previous work on compressed-domain
+  processing of lossy formats, and the recent prevalence of lossless
+  encodings, noone has patented or published our technique.
+
+8. If this is in commercial use today, how would you know?
+
+There are several open-source video editors that are closely emulating
+commercial products.  We inspected Blender, a popular open-source
+editor with 1.8 million downloads last year, and verified that it does
+not use this technology.  We modified Blender to operate directly on
+compressed data and observed very large speedups.  Thus, as a large
+professional community was unaware of this optimization opportunity,
+we believe it is unlikely that the technique has been commercialized.

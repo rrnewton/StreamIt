@@ -718,3 +718,631 @@ to convert png to eps:
 
 "c:\Program Files\Krause\bin\bmeps.exe" blender-background1-frame5.png -c > blender-background1-frame5.eps
 --> need to do this instead of includegraphics because dvips somehow can't deal with that output in color -- goes to B&W postscript
+
+a month later (12/20):
+----------------------
+
+looking at compression in network packets:
+http://tools.ietf.org/html/rfc1967
+
+---------------
+
+SPARSE MATRIX ALGORITHMS
+
+- note that when you're doing multiplication, you only need to
+  consider cases where BOTH matrices are nonzero -- so it's kind of a
+  fast-forwarding through the compressed regions until both line up
+  with a terminal (extends to permutation matrices as well).
+
+might be tough:
+- row or column permutation
+
+--------------------------------------------------
+
+subroutine SolveLTriang_Full (unit_diagonal, use_transpose, a, x)
+
+  ! <arguments>
+  logical(logical_type), intent(in) :: unit_diagonal, use_transpose
+  real(real_type), intent(in), dimension(:,:) :: a
+  real(real_type), intent(inout), dimension(:) :: x
+  ! </arguments>
+
+  ! Local:
+  integer(int_type) :: i, j, n
+
+  n = MIN(SIZE(a,dim=1),SIZE(a,dim=2))
+
+  if (use_transpose) then
+
+     ! Use transpose.
+     if (unit_diagonal) then
+
+        ! Unit diagonal (UNUSED, UNTESTED).
+        do i=2,n
+           do j=1,i-1
+              x(i) = x(i) - a(j,i)*x(j)
+           end do
+        end do
+     else
+
+        ! Non-unit diagonal (UNUSED, UNTESTED).
+        x(1) = x(1) / a(1,1)
+        do i=2,n
+           do j=1,i-1
+              x(i) = x(i) - a(j,i)*x(j)
+           end do
+           x(i) = x(i) / a(i,i)
+        end do
+     end if
+  else
+
+     ! Use coeff. as is.
+     if (unit_diagonal) then
+
+        ! Unit diagonal (used in ILU preconditioning).
+        do j=1,n-1
+           x(j+1:n) = x(j+1:n) - x(j)*a(j+1:n,j)
+        end do
+     else
+
+        ! Non-unit diagonal (used in IC preconditioning).
+        do j=1,n-1
+           x(j) = x(j) / a(j,j)
+           x(j+1:n) = x(j+1:n) - x(j)*a(j+1:n,j)
+        end do
+        x(n) = x(n) / a(n,n)
+     end if
+  end if
+
+  return
+end subroutine SolveLTriang_Full
+
+--------------------------------------------------
+
+do j=1,n-1
+   x(j) = x(j) / a(j,j)
+   x(j+1:n) = x(j+1:n) - x(j)*a(j+1:n,j)
+end do
+x(n) = x(n) / a(n,n)
+
+
+public void solveLower (double l[][], double x[], double b[], int n) {
+
+   double sum;
+   int i,j;
+
+   for (i = 0; i < n; i++) {
+      sum = 0.0;
+      for (j = 0; j < i; j++) {
+         sum += l[i][j]*x[j];
+      }
+      x[i] = (b[i] - sum)/l[i][i];
+   }
+}
+
+/** Computes the cholesky decomposition of matrix <code>A</code> and stores
+ *  the result in <code>L</code> .
+ *  <code>L</code> may be null and also coincide with <code>A</code> .
+ *  The method only uses the upper right part of <code>A</code> and does not
+ *  test its symmetrie.
+ *  The method considers the length of <code>A</code> as the dimension of the
+ *  space and does not check any ranges.
+ *  <p>
+ *  @param  A   The matrix to decompose.
+ *  @param  L   The matrix to store result in.
+ *  @exception IllgealArgumentException if A is not positive-definite
+ */
+
+public static void decompose( double [][] A, double [][] L ) {
+
+    int n = A.length;
+
+    for( int i=0; i<n; i++ ) {
+        for( int j=i; j<n; j++ ) {
+            double sum = A[i][j];
+            for( int k=i-1; k>=0; k-- )
+                sum -= L[i][k] * L[j][k];
+
+            if( i == j ) {
+		L[j][i] = Math.sqrt( sum );
+
+            } else {
+                L[j][i] = sum / L[i][i];
+            }
+
+            if( i<j )
+                L[i][j] = 0;  // zero
+        }
+    }
+
+--------------------------------------------------
+
+- decimiation propagation
+- automatic interleaving
+- recovering from faults
+
+good comparison of lossless audio codecs:
+http://wiki.hydrogenaudio.org/index.php?title=Lossless_comparison
+
+
+-----
+
+1/17/07
+
+How long to train?
+--> 
+
+2^30 * 2 -- 2 GB of RAM for samples
+20 machines, 1 week, 1 GHz machine --> 2^23 * 2^30 cycles
+
+
+2^(32 + k) bits in your system
+  --> hit 1/2^k fraction of time
+  --> have to run for 2^k before you get a hit
+
+
+1500 bits?
+
+problem:  solve all b-bit programs to 2^n executions
+
+1. recursive doubling:
+   - need b * 2^b storage to keep map
+   - need 2^b * n time steps
+
+2. random sample with k bits:
+   - assume all bit states equally likely
+   - need b * 2^k storage (INDEXING?)
+   - need 2^(b-k) lookup cyclese
+
+   - to complete doubling step:
+     - simulate for 2^(b-k) cycles
+     - so takes 2^k*2^(b-k) to do 1 step
+     - takes 2^b * n to do n steps
+
+     - but how many cycles do you simulate in n steps?
+
+     - #cycles simulated (i) = 2*CS(i-1) + 2^(b-k)
+       2^(b-k)
+       2*(2^(b-k)) + 2^(b-k)
+       2*(2*(2^(b-k)) + 2^(b-k)) + 2^(b-k)
+
+       = sum_{j=0^i-1} 2^j 2^(b-k)
+       = 2^(b-k) sum_{j=0^i-1} 2^j
+       ~ 2^(b-k) 2^i
+       
+       so overall, saves you b-k+1 steps
+       so to get to 2^n steps, you do (n-(b-k)-1)/n of the work
+
+       --> let's say n = x*(b-k)
+           then this evaluation technique speeds up by factor of 2 max :(
+           and every 2^(b-k) cycles, program jumps 2^n
+           so you get 2^n + 2^(b-k) cycles for cost of 2^(b-k) cycles
+             - that is, get (2^x + 1)2^(b-k) cycles for cost of 2^(b-k) cycles
+             - program speeds up by 2^x + 1
+-----
+
+1/18/07 -- looking at AUDIO
+
+mpTrim will do certain transformations directly on MP3:
+ - http://www.mptrim.com/
+ - trim, fade-in, fade-out, adjust volume
+
+as will mp3DirectCut:
+ - http://mpesch3.de1.cc/mp3dc.html
+ - # Non-destructive cut, copy, paste
+ - # Volume change, fade, normalize, pause detection 
+
+- someone in forum claims that simple things can be done directly on
+  mp3 format, but it's impossible to do "noise reduction"
+
+---
+
+documents the LAME MDCT optimizations (eliminates ~70% of the computation):
+
+http://www.mail-archive.com/mp3encoder@geek.rcc.se/msg00450.html
+
+-------------------------------------------
+
+2/16
+
+figuring out how to convert to/from rawvideo for steve
+
+this seems to convert to raw
+../ffmpeg/ffmpeg -i 087_Lowerthird-bot.avi -f rawvideo -vcodec rawvideo output.raw
+
+or do i want:
+../ffmpeg/ffmpeg -i 087_Lowerthird-bot.avi -f rawvideo -vcodec ppm output.raw
+could this get back?
+../ffmpeg/ffmpeg -s 120x96 -f rawvideo -vcodec ppm -i output.raw -f avi output.avi
+
+play orig with:
+mplayer 087_Lowerthird-bot.avi
+
+-
+
+ok this actually works to convert to set of ppm files:
+../ffmpeg/ffmpeg -i 087_Lowerthird-bot.avi -vcodec ppm output%d.ppm
+
+and this appears to produce the concatenation of all the ppm files:
+../ffmpeg/ffmpeg -i 087_Lowerthird-bot.avi -f rawvideo -vcodec ppm output.raw
+
+now how to convert ppm files back to video / play video?
+closest thing i have, doesn't quite work:
+../ffmpeg/ffmpeg -s 120x96 -f rawvideo -vcodec ppm -pix_fmt bgr24 -i output.raw -f avi output.avi
+
+- 
+
+but ppm destroys alpha channel, while PAM preserves it
+
+converts to pam video, but i don't know how to get back:
+../ffmpeg/ffmpeg -i 087_Lowerthird-bot.avi -f rawvideo -vcodec pam output.pam
+
+*************
+
+convert any avi to pam files:
+../ffmpeg/ffmpeg -i 087_Lowerthird-bot.avi -vcodec pam output%d.pam
+
+convert pam files to aa avi:
+../ffmpeg/ffmpeg -vcodec pam -i output%d.pam -f avi -vcodec qtrle -y output.avi
+
+convert any avi to aa:
+../ffmpeg/ffmpeg -i 087_Lowerthird-bot.avi -f rawvideo -vcodec qtrle -y output.qtrle
+
+convert aa to raw:
+./aa2raw 120 96 output.qtrle output.raw
+
+convert pam files to rawvideo:
+./pam2raw 120 96 ../../compression/samples/output ../../compression/samples/output.raw
+
+convert rawvideo to pam files:
+./raw2pam 120 96 ../../compression/samples/output.raw ../../compression/samples/output
+
+what do i have:
+avi <--> pam
+  avi2pam
+  pam2avi
+raw <--> pam
+  pam2raw
+  raw2pam
+avi <--> aa
+  avi2aa
+ *aa2avi
+aa2raw
+
+add:
+
+Here is the current matrix of supported file converters:
+
+       TO
+FROM   avi  aa   raw  pam
+avi    ---   !         !
+aa          ---   !   (X)
+raw              ---   !
+pam     !   (X)   !   ---
+
+Entries marked with an (X) go through an intermediate format instead
+of being converted directly.
+
+Note that the source AVI's can use any compression technique, though
+the destination AVI is hard-coded as Apple Animation (could be
+adjusted in script).
+
+additional utils:
+ pam2raw
+ raw2pam
+ avi2pam
+ pam2avi
+
+avi <--> raw
+ just go through pam
+
+avi <--> aa
+ go through raw, to pam
+
+*************
+
+convert from qtrle to avi: -- not possible due to packetization issues
+ this is the closest command:
+ ../ffmpeg/ffmpeg -s 120x96 -f rawvideo -pix_fmt rgba32 -i output.qtrle -f avi -vcodec qtrle -y output.avi
+
+-------------------------------------------
+
+7/2/07
+
+Can we write a stencil at all in StreamIt?
+ - it's possible, but it's not pretty
+
+----
+
+7/10/07
+
+looked into low-density parity checks (ldpc)
+ - they do modulo-2 matrix multiplication
+ - start with a checker matrix (H) that is sparse in # of 1's
+ - take inverse to get generator matrix (G) --> where I need to understand the sparsity
+   - seems like examples given are also sparse in # of 1's
+   - (what we want is something that is sparse in # of 0's)
+ - also, made me realize that we actually CANNOT due matrix multiply entirely in compressed domain
+   - we can do multiplications in compressed domain, since they are element-wise
+   - however, summing N elements needs to decompress all N elements
+     - either that or have a phased filter -- first N steps sums an internal variable, next one outputs the sum
+     - ok, this is the first actual use for phased filters
+ - so solutions for matrix multiply are:
+   1) phased filters (+ induction variable analysis to see that you can do the sum directly)
+   2) allow the users to write filters IN THE COMPRESSED DOMAIN
+     - let the user express that output can take advantage of domain-specific properties about sum
+   --> BOTH of these solutions only work for RLE
+    - for general lz77 it is unclear how to do N-way sum without decompressing
+    - this is part of a more general observation:  having a lighter-weight compression step may IMPROVE your ability to compute on compressed data
+
+next question:  is writing round-robins as powerful as doing the computation inside the splitter/joiner
+
+well let's write the rules for round-robins!
+
+thinking about RE-COMPRESSING
+ - fixed-distance recompression is actually trivial
+   - just compare two distances in the stream and count the number of repeats
+   - this spans run-length-encoding and also apple animation -- since distances are fixed at two locations
+ - however, variable-distance recompression sounds harder
+   - of course the stream transformation never actually changes the repeat distance
+ - although apple animation does have a decision to make: is it more efficient to encode a repeat in the current frame or across frames?
+   - it seems that a "good" scheme could just see which repeat distance is longer at a fixed location
+   - likewise, a "good" scheme could just keep whatever distances are there and extend them (or start new ones)
+   - would have to think about proving things for the optimal solution -- there is probably not a big difference
+ --> so these would be good heuristics, and actually pretty easy to implement (***)
+   - though it wouldn't prove much for the POPL audience
+
+let's get back to round-robin rules
+
+- duplicate is trivial
+- RR split
+- RR join
+
+BTW, can you implement an arbitrary permuation with a roundrobin splitter and joiner?
+  - no, because first item in is always first item out
+  - but you can if you add the ability to join from right-to-left rather than left-to-right:
+  - here's how you implement a swap of positions i and j out of a list of length N
+    (assuming i!=0 and i!=j+1 and j!=N, otherwise you have boundary cases)
+  int->int splitjoin(int i, int j, int N) {
+    split roundrobin(i-1, 1, j-i, 1, N-j) {
+      add Identity<int>();
+      add splitjoin {
+        split roundrobin(1, j-i, 1);
+        for (int k=0; k<3; k++) { add Identity<int>(); }
+        join roundrobin-REVERSE(1, j-i, 1);                  <---- this serves to swap i and j
+      }
+      add Identity<int>();
+    }
+    join roundrobin(i-1, 1, j-i, 1, N-j);
+  }
+
+now for RR split rules:
+
+split(M1, M2)
+
+position i
+
+i<M1
+S o <d,c> -> T
+
+----------------------- 7/11/07
+
+can you coarsen the boundaries before it gets to the splitter?
+
+- need to eliminate distances or repeats that span boundaries
+  UNLESS 
+
+simple (unoptimized) approach:
+- break so that current repeat AND previous repeat is contained within a single roundrobin(N)
+
+no, let's consider two-way splitter, roundrobin(1)
+- distance can pass through if it's divisible by 2 
+  - current direction gets: distance'=distance/2, count'=ceil(count/2)
+  - other side gets: distance'=distance/2, count'=floor(count/2)
+
+ok, now roundrobin(2)
+- repeat distance needs to be a multiple of 4 to pass through for more than 1 iteration
+
+WLOG, say that we are currently distributing items to N_1 and we are about to pass item i (starting from 0)
+
+passing completely:
+-------------------
+
+ok, now roundrobin(N1, N2)
+  - can pass through if distance divisible by (N1 + N2)
+  - current direction gets:  distance'=distance*N1/(N1 + N2), 
+                             count'= N1*floor(count/(N1+N2)) + leftover(N1)
+  - other direction gets:    distance'=distance*N2/(N1 + N2), 
+                             count'= N2*floor(count/(N1+N2)) + leftover(N2)
+
+leftover(N1):
+count % (N1+N2) <= (N1-i) then count % (N1+N2)
+(N1-i) < count % (N1+N2) <= (N1-i) + N2 then N1-i
+else count % (N1+N2) - N2
+
+leftover(N2):
+count % (N1+N2) <= (N1-i) then 0
+(N1-i) < count % (N1+N2) <= (N1-i) + N2 then count % (N1+N2) - (N1-i)
+else N2
+
+run_splitter(c, pos)
+// finish current execution cycle, in progress on first output stream
+if (c < n_1 - pos) {
+  // if input stream ends, then run is finished
+  return (c, 0)
+} else {
+  // otherwise deduct this cycle's execution counts from the item count
+  c = c - (n_1 - pos)
+}
+
+// how many total execution cycles can be supported
+cycles = floor(c/(n_1 + n_2))
+leftover = 
+
+run_splitter(c, pos) {
+ // the number of complete splitter cycles, and the leftover
+ total_cycles = floor(c/(n_1 + n_2))
+ total_leftover = c % (n_1 + n_2)
+
+ // the last partial cycle may end in three regions:
+ if (total_leftover <= n_1-pos) {
+   // 1) in writing to the first output stream
+   L_1 = total_leftover
+   L_2 = 0
+ } else if (total_leftover <= (n_1-pos) + n_2) {
+   // 2) in subsequent writing to the second output stream
+   L_1 = n_1-pos
+   L_2 = total_leftover - n_1-pos
+ } else {
+   // 3) in wrap-around writing to the first output stream
+   L_1 = total_leftover - n_2
+   L_2 = n_2
+ }
+
+ return (n_1*total_cycles + L_1, n_2*total_cycles + L_2)
+}
+
+run_joiner(c_1, c_2, pos) {
+ // the number of complete joiner cycles, and the leftovers
+ total_cycles = min(floor(c_1/n_1, c_2/n_2))
+ leftover_1 = c_1 - total_cycles * n_1
+ leftover_2 = c_2 - total_cycles * n_2
+
+ // the last partial cycle may end in three regions:
+ if (leftover_1 <= n_1-pos) {
+   // 1) in reading from the first input stream
+   L_1 = leftover_1
+   L_2 = 0
+ } else if (leftover_2 <= n_2) {
+   // 2) in subsequent reading from the second input stream
+   L_1 = n_1-pos
+   L_2 = leftover_2
+ } else {
+   // 3) in wrap-around reading from the first output stream
+   L_1 = leftover_1
+   L_2 = n_2
+ }
+
+ return (n_1*total_cycles + L_1, n_2*total_cycles + L_2)
+}
+
+--> also have to update current and i
+
+passing partially:
+------------------
+
+if distance is not divisible by (N1 + N2), then can repeat until
+repeated item was sent other way
+
+offset = distance % (N1+N2)
+repeat_potential = if offset <=i then (N1 - i) else
+                   if offset > N2+i then offset - (N2+i)
+                   else 0
+offset' = if offset <= i then offset else offset - n_2
+
+if c%(N1+N2)>0 and repeat_potential>0
+distance' = n1*floor(d/(n1+n2)) + offset'
+count' = min(c, repeat_potential)
+
+---------
+
+inrange() = if distance % (N1+N2) <= i or distance % (N1+N2) > N2+i
+ which is the same as NOT (i < distance % (N1 + N2) <= N2+i)
+
+repeat_potential(d) = 
+  // repeat for rest of direction
+  if distance % (N1+N2) <= i then (N1-i)
+  // repeat until distance goes out of range
+  if distance % (N1+N2) > N2+i then distance % (N1+N2) - (N2+i)
+  // 
+  else 0
+
+leftover() =
+ if distance % (N1+N2) <= i 
+  then distance % (N1+N2)
+  else distance % (N1+N2) - N2
+
+if NOT (count divisible by (N1 + N2)) and inrange()
+ - current direction gets: 
+    distance' = N1*floor(distance/(N1+N2)) + leftover(), 
+    count' = min (max_count() , count)
+ - other direction gets nothing
+
+--> also have to update current and i
+
+---
+
+relative_dist = distance % (N1+N2)
+repeat_position = 
+  if relative_dist <= i then relative_dist
+  else N1+N2 - relative_dist
+
+if NOT (count divisible by (N1+N2)) and inrange()
+distance' = n1*floor(distance/(n1+n2)) + relative_dist
+
+****************************************
+
+now for a joiner
+
+WLOG, say that we are currently distributing items from N_1 and we are
+about to pass item i (starting from 0)
+
+roundrobin(M1, M2)
+
+passing completely:
+-------------------
+
+- left repeat distance is k*M1   (k>=1)
+- right repeat distance is k*M2  (k>=1)
+
+- emit distance'=k*(M1+M2)
+- let <consumed1, consumed2> = run_joiner(M1, M2, count1, count2, i)
+- emit count'=consumed1+consumed2
+  - patch left,right inputs to be less by consumed1,consumed2
+
+// returns how many items are consumed from each input of a joiner
+// given weights M1, M2, and that item i is about to be emitted from 
+// M1 (i starts from 0), and that count1 and count2 items are available 
+// at the inputs of joiner
+ - run_joiner(M1, M2, count1, count2, i) {
+     // first run remaining executions for first input
+     if (count1 < M1-i) {
+       return <count1, 0>
+     } else {
+       count1 = count1 - (M1-i)
+     }
+
+     // calculate how many full cycles each input could execute
+     exec1 = floor(count1/M1)
+     exec2 = floor(count2/M2)
+
+     if (exec1 < exec2) {
+       // if we finish reading from first input
+       return <M1-i + exec1*M1 + count1%M1, exec1*M2>
+     } else {
+       // if we finish reading from second input
+       return <M1-i + exec2*M1, exec2*M2 + count2%M2>
+     }
+  }
+
+- NOTE we are losing something here, because repeat distances don't
+  have to match exactly.  If the count is longer than the distance,
+  then can partially decompress, increase OR decrease distance, then
+  repeat with a different count
+
+passing partially:
+------------------
+
+max_count() = if distance % M1 <=i then M1-i
+              else M1-(distance % M1)
+ --> or in other words, M1-max(i, distance%M1)
+
+if !(distance1 is k*M1 and distance2 is k*M2)
+  then distance' = distance
+  count' = min (count, max_count())
+
+--> need to update current position
+
+NOTE:  could collapse certain kinds of repeats again
+  - might generate same distances with unoptimal counts
+
