@@ -1,20 +1,34 @@
 \section{Experimental Evaluation}
 
-To evaluate the potential benefits of computing directly on compressed
-data, we focus on applications in digital video editing.  We consider
-two common kinds of editing operations: 1) pixel transformations, such
-as brightness, contrast, and color inversion, which adjust pixels
+To demonstrate the potential benefits of computing directly on
+compressed data, we implemented a few of our transformations as part
+of the StreamIt compiler.  Our current implementation supports two
+computational patterns: 1) transforming each individual element of a
+stream (via a pop-1, push-1 filter), and 2) combining the elements of
+two streams (via a roundrobin(1,1) joiner and a pop-2, push-1 filter).
+The program can contain any number of filters that perform arbitrary
+computations, so long as the I/O rates match these patterns.  While we
+look forward to performing a broader implementation in future work,
+these two building blocks are sufficient to express a number of useful
+programs and to characterize the performance of the technique.
+
+Our evaluation focuses on applications in digital video editing.
+Given StreamIt source code that operates on pixels from each frame of
+a video, the StreamIt compiler maps the computation into the
+compressed domain and emits executable plugins for two popular video
+editing tools, MEncoder and Blender.  The plugins are written for the
+Apple Animation format (see Section~\ref{sec:formats-good}).
+
+Our benchmarks fall into two categories: 1) pixel transformations,
+such as brightness, contrast, and color inversion, which adjust pixels
 within a single video, and 2) video compositing, in which one video is
 combined with another as an overlay or mask.
 
-To make the performance evaluation as realistic as possible, our
-current implementation takes the form of hand-coded plugins for two
-popular video editing tools, MEncoder and Blender.  The plugins are
-written for the Apple Animation format, and support any transformation
-that either adjusts a single pixel (MEncoder) or combines two pixels
-together (Blender).  Though we have yet to implement a fully automatic
-translation from general StreamIt source code, we do not foresee any
-major hurdles in doing so.
+\begin{table*}[t]
+\psfig{figure=table-pixel-speedup.eps,width=7.1in}
+\caption{Results for pixel transformations.
+\protect\label{tab:pixel-speedup}}
+\end{table*}
 
 The main results of our evaluation are:
 \begin{itemize}
@@ -22,13 +36,14 @@ The main results of our evaluation are:
 \item Operating directly on compressed data offers a speedup roughly
 proportional to the compression factor in the resulting video.
 
-\item For pixel transformations, speedups range from 3.1x to 235x,
-with a median of 19x.  Output sizes are within 0.1\% of input sizes
-and about 10\% larger (median) than a full re-compression.
+\item For pixel transformations, speedups range from 2.5x to 471x,
+  with a median of 17x.  Output sizes are within 0.1\% of input sizes
+  and about 5\% larger (median) than a full re-compression.
 
-\item For video compositing, speedups range from 1.0x to 35x, with a
-median of 7.4x.  Output files retain a sizable compression ratio (1.0x
-to 44x) and are about 56\% larger (median) than a full re-compression.
+\item For video compositing, speedups range from 1.1x to 32x, with a
+  median of 6.6x.  Output files retain a sizable compression ratio
+  (1.0x to 44x) and are about 52\% larger (median) than a full
+  re-compression.
 
 \end{itemize}
 The following sections provide more details on our video workloads,
@@ -76,14 +91,8 @@ that can be used to synthesize a smaller overlay (such as a frame or a
 ``lower third'', often used for text) from a full animated background
 (see Figure~\ref{fig:videos}b for an example).
 
-\begin{table*}[t]
-\psfig{figure=table-pixel-speedup.eps,width=7.1in}
-\caption{Results for pixel transformations.
-\protect\label{tab:pixel-speedup}}
-\end{table*}
-
 The videos exhibit a wide range of compression factors.  The
-screencasts have very high compression ($\sim$100x-400x) because only
+screencasts have very high compression ($\sim$400x-700x) because only
 a small part of the screen (e.g., a mouse, menu, or PowerPoint bullet)
 is changing on any given frame; the Apple Animation format compresses
 the inter-frame redundancy.  The compression for {\tt anim-scene1} is
@@ -120,7 +129,7 @@ mattes.
 
 \subsubsection{Setup}
 
-The pixel transformations were implemented as a plugin in MEncoder, a
+The pixel transformations were compiled into plugins for MEncoder, a
 popular command-line tool (bundled with MPlayer) for video decoding,
 encoding, and filtering.  MEncoder relies on the FFMPEG library to
 decode the Apple Animation format; as FFMPEG lacked an encoder for
@@ -138,23 +147,23 @@ configuration performs pixel transformations directly on the
 compressed data, avoiding data expansion implied by decompression and
 multiple frame buffers, before copying the data to the output file.
 
-Our evaluation platform is a dual-core Intel Xeon (2.2 GHz) with 2 GB
-of RAM.  As all of our applications are single-threaded, the second
-core is not utilized.  For the timing measurements, we execute each
-program five times and report the median user time.
+Our evaluation platform is a dual-processor Intel Xeon (2.2 GHz) with
+2 GB of RAM.  As all of our applications are single-threaded, the
+second processor is not utilized.  For the timing measurements, we
+execute each program five times and report the median user time.
 
 \subsubsection{Results}
 
 Detailed results for the pixel transformations appear in
 Table~\ref{tab:pixel-speedup}.  Figure~\ref{fig:pixel-speedup}
-illustrates the speedups, which range from 3.1x to 235x.  As
-illustrated in Figure~\ref{fig:speedup-scatter}, the speedups
-are closely correlated with the compression factor in the original
-video.  For the highly-compressed screencasts and {\tt anim-scene1},
-speedups range from 52x to 235x.  For the medium-compression computer
+illustrates the speedups, which range from 2.5x to 471x.  As
+illustrated in Figure~\ref{fig:speedup-scatter}, the speedups are
+closely correlated with the compression factor in the original video.
+For the highly-compressed screencasts and {\tt anim-scene1}, speedups
+range from 58x to 471x.  For the medium-compression computer
 animations (including the animated logos), speedups range from 11x to
-40x.  And for the low-compression digital television content, speedups
-range from 3x to 10x.
+46x.  And for the low-compression digital television content, speedups
+range from 2.5x to 8.9x.
 
 There are two distinct reasons for the speedups observed.  First, by
 avoiding the decompression stage, computing on compressed data reduces
@@ -172,13 +181,15 @@ Figure~\ref{fig:speedup-scatter}.
 
 The impact of re-compression is especially evident in the digital
 television examples.  Despite a compression factor of 1.0 on {\tt
-digvid-background2}, our technique offers a 5.5x speedup on color
-inversion.  Application profiling confirms that 73\% of the baseline
-runtime is spent in the encoder; as this stage is absent from the
-optimized version, it accounts for $1/(1-0.73) = 3.7$x of the speedup.
-The remaining speedup in this case is due to the extra frame buffer
-(and associated memory operations) needed by the baseline
-configuration.  
+digvid-background2}, our technique offers a 4.7x speedup on color
+inversion.  Application profiling confirms that 
+% NOTE: I profiled the hand-coded version rather than the StreamIt
+% version.  It had a speedup of 5.5x rather than 4.7x
+73\% of the baseline runtime is spent in the encoder; as this stage is
+absent from the optimized version, it accounts for $1/(1-0.73) = 3.7$x
+of the speedup.  The remaining speedup in this case is due to the
+extra frame buffer (and associated memory operations) in the
+decompression stage of the baseline configuration.
 %
 %(Don't really understand these profiling numbers yet)
 %
@@ -197,7 +208,7 @@ compressed data will never increase the size of the file.  This is
 illustrated in the middle columns of Table~\ref{fig:pixel-speedup}, in
 which the output sizes are mostly equal to the input sizes (up to 2
 decimal places).  The only exception is contrast adjustment on {\tt
-anim-scene1}, in which the output is 3\% smaller than the input due to
+anim-scene1}, in which the output is 2\% smaller than the input due to
 variations in the first frame; for the same reason, some cases
 experience a 0.1\% increase in size (not visisble in the table).
 
@@ -232,10 +243,16 @@ explore integrating a lightweight re-compression stage into the
 compressed processing technique.  Because most of the compression is
 already in place, it should be possible to improve the compression
 ratio without running the full encoder (e.g., run-length encoded
-regions can be extended without being rediscovered).  Even running the
-full encoding algorithm (in place on the compressed data) may leave us
-with significant speedups, as much of the improvement comes from
-decreased data volume rather than decreased re-compression cost.
+regions can be extended without being rediscovered).  
+
+% (The following comment didn't make sense -- to do the full
+% re-compression, you would need to start from a decompressed stream,
+% which has the full data volume.)
+%
+% Even running the full encoding algorithm (in place on the compressed
+% data) may leave us with significant speedups, as much of the
+% improvement comes from decreased data volume rather than decreased
+% re-compression cost.
 
 \begin{figure}[t]
 \vspace{-1\baselineskip}
@@ -290,6 +307,15 @@ decreased data volume rather than decreased re-compression cost.
 \caption{Examples of video compositing operations.\protect\label{fig:videos}}
 \end{figure}
 
+\begin{table*}[t]
+\begin{minipage}{0.6in}
+\mbox{~}
+\end{minipage}
+\psfig{figure=table-composite-speedup.eps,width=5.8in}
+\caption{Results for composite transformations.
+\protect\label{tab:composite-speedup}}
+\end{table*}
+
 \subsection{Video Compositing}
 
 In video compositing, two videos are combined using a specific
@@ -305,9 +331,9 @@ given application area, yielding a total of 12 composites.
 
 \subsubsection{Setup}
 
-We implemented optimized compositing operations as plugins for
-Blender, a popular tool for modeling, rendering, and post-processing
-3-D animations.  Blender has logged 1.8 million downloads in the last
+The compositing operations were compiled into plugins for Blender, a
+popular tool for modeling, rendering, and post-processing 3-D
+animations.  Blender has logged 1.8 million downloads in the last
 year~\cite{blender-stats} and was used in the production of Spiderman
 2~\cite{blender-wikipedia}.  Like MEncoder, Blender relies on the
 FFMPEG library for video coding, so we utilize the same Apple
@@ -327,38 +353,27 @@ allocation/deallocation for each frame.
 % did not mention removal of O(frames^2) linked list search, although 
 % this fell out of removing the redundant memory deallocation
 
-Our optimized configuration uses the compressed processing technique
-to track the current position in both compressed frames.  When both
-frames have inter-frame or intra-frame repeats, the repeats are copied
-directly to the output.  Outside of the plugin, we also patched three
-frame-copy operations in
+Our optimized configuration operates in the compressed domain.  The
+intuition is that when both videos have inter-frame or intra-frame
+repeats, the repeats can be copied directly to the output.  Outside of
+the plugin, we also patched three frame-copy operations in
 % actually four frame-copy operations, though one of them is a no-op
 the Blender source code to copy only the compressed frame data rather
 than the full dimensions of the frame.
-
-
-\begin{table*}[t]
-\begin{minipage}{0.6in}
-\mbox{~}
-\end{minipage}
-\psfig{figure=table-composite-speedup.eps,width=5.8in}
-\caption{Results for composite transformations.
-\protect\label{tab:composite-speedup}}
-\end{table*}
 
 \subsubsection{Results}
 
 Full results for the compositing operations appear in
 Table~\ref{tab:composite-speedup}.  Figure~\ref{fig:composite-speedup}
-illustrates the speedups, which range from 1.01x to 34.6x.  As in the
+illustrates the speedups, which range from 1.1x to 32x.  As in the
 case of the pixel transformations, the speedups are closely correlated
 with the compression factor of the resulting videos, a relationship
 depicted in Figure~\ref{fig:speedup-scatter}.  The highly-compressed
-screencasts enjoy the largest speedups (16x-35x), the computer
-animations have intermediate speedups (6x-12x), while the digital
-television content has negligible speedups (1.01x-1.24x).  Overall,
-the speedups on video compositing (median = 7.4x) are lower than the
-pixel transformations (median = 19x); this is because the compression
+screencasts enjoy the largest speedups (20x-32x), the computer
+animations have intermediate speedups (5x-9x), while the digital
+television content has negligible speedups (1.1x-1.4x).  Overall, the
+speedups on video compositing (median = 6.6x) are lower than the pixel
+transformations (median = 17x); this is because the compression
 achieved on composite videos is roughly proportional to the minimum
 compression across the two input files.
 
@@ -376,7 +391,7 @@ the compression factors achieved by compressed processing and normal
 processing (including a re-compression step).  For screencasts and
 computer animations, compressed processing preserves a sizable
 compression factor (7.7x-44x), though the full re-compression can
-further reduce file sizes by 1.3x to 1.6x.  For digital television,
+further reduce file sizes by 1.2x to 1.6x.  For digital television,
 the matting operations introduce a large amount of redundancy (black
 regions), thereby enabling the re-compression stage to shrink the file
 by 1.8x to 5.4x over the compressed processing technique.
@@ -397,4 +412,3 @@ quantify its impact in relation to the new redundancy introduced by a
 transformation.  Future work will explore alternate data structures
 for the compressed processing technique that may be able to preserve
 this redundancy with low overhead.
-

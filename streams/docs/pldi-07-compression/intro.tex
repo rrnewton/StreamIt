@@ -30,7 +30,7 @@ researchers have identified specific transformations that can be
 mapped into the compressed domain---that is, they can operate directly
 on the compressed data format rather than on the uncompressed
 format~\cite{chang95survey,mandal95survey,smith95survey,wee02survey}.
-In addition to averting the cost of the decompression and
+In addition to avoiding the cost of the decompression and
 re-compression, such techniques greatly reduce the total volume of
 data processed, thereby offering large savings in both execution time
 and memory footprint.
@@ -100,8 +100,8 @@ a suite of 12 videos (screencasts, computer animations, digital
 television content) in Apple Animation format, computing directly on
 compressed data offers a speedup roughly proportional to the
 compression factor.  For pixel transformations, speedups range from
-3.1x to 235x, with a median of 19x; for video compositing, speedups
-range from 1.0x to 35x, with a median of 7.4x.
+2.5x to 471x, with a median of 17x; for video compositing, speedups
+range from 1.1x to 32x, with a median of 6.6x.
 
 In the general case, compressed processing techniques may need to
 partially decompress the input data to support the behavior of certain
@@ -110,10 +110,10 @@ benefit from an additional re-compression step if new redundancy is
 introduced during the processing (for example, increasing image
 brightness can whiteout parts of the image).  This effect turns out to
 be minor in the case of our experiments.  For pixel transformations,
-output sizes are within 0.1\% of input sizes and often within 10\%
-(median case) of a full re-compression.  For video compositing, output
-files maintain a sizable compression ratio of 8.8x (median) while full
-re-compression results in a ratio of 13x (median).
+output sizes are within 0.1\% of input sizes and often (more than half
+the time) are within 5\% of a full re-compression.  For video
+compositing, output files maintain a sizable compression ratio of 8.8x
+(median) while full re-compression results in a ratio of 13x (median).
 
 To summarize, this paper makes the following contributions:
 \begin{itemize}
@@ -128,7 +128,7 @@ opportunities for direct processing on each (Section 4).
 \item An experimental evaluation in the StreamIt compiler,
   demonstrating that automatic translation to the compressed domain
   can speedup realistic operations in popular video editing tools.
-  Across our benchmarks, the median speedup is 16x (Section 5).
+  Across our benchmarks, the median speedup is 15x (Section 5).
 
 \end{itemize}
 

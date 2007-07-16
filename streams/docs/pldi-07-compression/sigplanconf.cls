@@ -467,13 +467,17 @@
         \@mkboth{\MakeUppercase\refname}{\MakeUppercase\refname}}%
       \list{\@biblabel{\@arabic\c@enumiv}}%
            {\settowidth\labelwidth{\@biblabel{#1}}%
+             % by bill
+             \setlength{\itemsep}{-1pt}
             \leftmargin\labelwidth
             \advance\leftmargin\labelsep
             \@openbib@code
             \usecounter{enumiv}%
             \let\p@enumiv\@empty
             \renewcommand\theenumiv{\@arabic\c@enumiv}}%
-      \small
+% by bill
+%      \small
+      \scriptsize
       \softraggedright%%%\sloppy
       \clubpenalty4000
       \@clubpenalty \clubpenalty
@@ -931,7 +935,7 @@
   \vskip 6pt
   \noindent \Large \@subtitletext \par
 % BY BILL (commenting out next line) -- but undone for popl submission
-  \vskip 12pt
+%  \vskip 12pt
   \ifcase \@authorcount
     \@latex@error{No authors were specified for this paper}{}\or
     \@titleauthors{i}{}{}\or
@@ -956,7 +960,9 @@
     \@latex@error{Cannot handle more than 12 authors}{}%
   \fi
 % BY BILL (switch comment of next lines) -- but undone for popl submission
-  \vspace{1.75pc}
+\vspace{-6pt}
+%\vspace{12pt}
+%  \vspace{1.75pc}
 %  \vspace{-1.75pc}
   \end{center}}
 

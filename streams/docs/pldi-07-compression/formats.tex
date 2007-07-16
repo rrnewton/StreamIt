@@ -61,6 +61,13 @@ stage, making it a good target for our technique.
 %% As this information can be converted to a run-length encoding, it can
 %% also be targetted by our technique.
 
+\begin{table*}[t]
+\vspace{-1\baselineskip}
+\psfig{figure=table-benchmarks.eps,width=7.1in}
+\caption{Characteristics of the video workloads.
+\protect\label{tab:videos}}
+\end{table*}
+
 \subsection{Medium-Efficiency Mappings}
 \label{sec:formats-med}
 
@@ -97,13 +104,6 @@ technique could offer some gains in exploiting the LZ77 compression,
 it would have to undo any compression sitting on top of LZ77 and
 offers limited benefit for filters (as in PNG) applied underneath
 LZ77.
-
-\begin{table*}[t]
-\vspace{-1\baselineskip}
-\psfig{figure=table-benchmarks.eps,width=7.1in}
-\caption{Characteristics of the video workloads.
-\protect\label{tab:videos}}
-\end{table*}
 
 \paragraph{DEFLATE.}
 DEFLATE is a general-purpose algorithm that provides all of the

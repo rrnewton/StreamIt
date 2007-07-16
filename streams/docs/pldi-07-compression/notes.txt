@@ -1343,6 +1343,86 @@ if !(distance1 is k*M1 and distance2 is k*M2)
 
 --> need to update current position
 
+7/15/07
+
+looking into system time / user time
+
 NOTE:  could collapse certain kinds of repeats again
   - might generate same distances with unoptimal counts
+
+brightness on blender-background2
+
+compressed:
+on the order of 25% user time, 50% system time, the rest unexplained
+0.5/1/2
+
+uncompressed:
+on the order of 91% user time, 8% system time
+12.2s
+
+but system time overhead is constant in both cases: about 1s
+
+the mystery is where the non-system, non-user time is coming for
+compressed case
+
+--> I think user time is justified.  If you just do a "time" command
+    to COPY a file, you get something similar - 0.5-1s of system time,
+    then 1-2s of unexplained "real time".  (Maybe waiting for disk?)
+
+    Since in our usage scenario (digital video editing) the working
+    set would fit in RAM, this system time is not relevant.  So go
+    with user time.
+
+-------------
+
+if adding streamit code for benchmarks:
+
+---
+
+   ALIGN
+
+N A   | 
+<2,3> | N A                   pass-uncompressed
+<2,1> | <2,2> N A             pass-compressed
+<2,0> A | <2,2> N A           expand
+B A | <2,2> N A               prune
+<4,3> | B A <2,2> N A         pass-uncompressed
+<4,1> | <4,2> B A <2,2> N A   pass-compressed
+<4,0> A | <4,2> B A <2,2> N A expand
+C A | <4,2> B A <2,2> N A     prune
+    | C A <4,2> B A <2,2> N A pass-uncompressed
+
+HYPHENATE
+A-NA-BA-NA-NA
+
+C A <4,2> B A <2,2> N A |         
+  C A <4,2> B A <2,2> | - N A                   exec-uncompressed
+       C A <4,2> B A | <3,3> - N A              exec-compressed
+           C A <4,2> | - B A <3,3> - N A        exec-uncompressed
+                 C A  | <6,3> - B A <3,3> - N A  exec-compressed
+                      | - C A <6,3> - B A <3,3> - N A  exec-uncompressed
+NA-BA-NA-NA
+
+CA-NA-BA-NA-NA
+
+CABANABANANA
+
+C <4,5> B <2,3> N A
+
+N A   | 
+<2,3> | N A                   pass-uncompressed
+<2,1> | <2,2> N A             pass-compressed
+<2,0> A | <2,2> N A           expand
+B A | <2,2> N A               prune
+<4,5> | B A <2,2> N A         pass-uncompressed
+ <4,1>| <4,4> B A <2,2> N A   pass-compressed
+C <4,0> A | <4,4> B A <2,2> N A   expand
+C A | <4,4> B A <2,2> N A   prune
+| C A <4,4> B A <2,2> N A   pass-uncompressed
+
+CA~BA~NA~BA~NA~NA~
+
+CANABANANA
+
+BANABANANA
 
