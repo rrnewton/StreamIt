@@ -31,16 +31,16 @@ intrinsic to a language such as StreamIt, they also come naturally in
 most functional languages and may be adaptable to general-purpose
 languages in the form of a runtime library with a restricted API.
 
-We implemented the transformation for the case of simple filters in
-the StreamIt compiler and demonstrated excellent speedups.  Across a
-suite of 12 videos in Apple Animation format, computing directly on
-compressed data offers a speedup roughly proportional to the
-compression ratio.  For pixel transformations (brightness, contrast,
-inverse) speedups range from 3.1x to 235x, with a median of 19x; for
-video compositing operations (overlays and mattes) speedups range from
-1.0x to 35x, with a median of 7.4x.  While previous researchers have
-used special-purpose compressed processing techniques to obtain
-speedups on lossy, DCT-based codecs, we are unaware of a comparable
-demonstration for lossless video compression.  As digital films and
-animated features have embraced lossless formats for the editing
-process, the speedups obtained may have significant practical value.
+We implemented some of our transformations in the StreamIt compiler
+and demonstrated excellent speedups.  Across a suite of 12 videos in
+Apple Animation format, computing directly on compressed data offers a
+speedup roughly proportional to the compression ratio.  For pixel
+transformations (brightness, contrast, inverse) speedups range from
+2.5x to 471x, with a median of 17x; for video compositing operations
+(overlays and mattes) speedups range from 1.1x to 32x, with a median
+of 6.6x.  While previous researchers have used special-purpose
+compressed processing techniques to obtain speedups on lossy,
+DCT-based codecs, we are unaware of a comparable demonstration for
+lossless video compression.  As digital films and animated features
+have embraced lossless formats for the editing process, the speedups
+obtained may have significant practical value.
