@@ -1,8 +1,8 @@
 \section{Experimental Evaluation}
 
-To demonstrate the potential benefits of computing directly on
-compressed data, we implemented a few of our transformations as part
-of the StreamIt compiler.  Our current implementation supports two
+To demonstrate the potential benefits of mapping into the compressed
+domain, we implemented a few of our transformations as part of the
+StreamIt compiler.  Our current implementation supports two
 computational patterns: 1) transforming each individual element of a
 stream (via a pop-1, push-1 filter), and 2) combining the elements of
 two streams (via a roundrobin(1,1) joiner and a pop-2, push-1 filter).
@@ -25,6 +25,7 @@ within a single video, and 2) video compositing, in which one video is
 combined with another as an overlay or mask.
 
 \begin{table*}[t]
+\vspace{-10pt}
 \psfig{figure=table-pixel-speedup.eps,width=7.1in}
 \caption{Results for pixel transformations.
 \protect\label{tab:pixel-speedup}}
@@ -121,11 +122,16 @@ way.  We evaluated three transformations:
 of 20 (saturating at 255).
 \item Contrast adjustment, which moves each RGB value away from the
 center (128) by a factor of 1.2 (saturating at 0 and 255).
-\item Color inversion, which subtracts each RGB value from 255.
+
+\item Color inversion, which subtracts each RGB value from 255 (useful
+  for improving the readability of screencasts or for reversing the
+  effect of video mattes).
+
 \end{itemize}
-Color inversion is useful for screencasts that have an unusual color
-scheme (e.g., white on black) or for reversing the effect of video
-mattes.
+
+We implemented each transformation as a single StreamIt filter that
+transforms one pixel to another.  Because the filter has a pop rate of
+one, it does not incur any alignment overhead.
 
 \subsubsection{Setup}
 
@@ -308,6 +314,7 @@ regions can be extended without being rediscovered).
 \end{figure}
 
 \begin{table*}[t]
+\vspace{-10pt}
 \begin{minipage}{0.6in}
 \mbox{~}
 \end{minipage}
@@ -328,6 +335,14 @@ videos are combined with a multiply operation, thereby masking the
 output according to the brightness of the matte.  For our experiments,
 we generated composites using each foreground/background pair within a
 given application area, yielding a total of 12 composites.
+
+In StreamIt, we implemented each compositing operation as a
+roundrobin(1,1) joiner (to interleave the streams) followed by a
+filter (to combine the pixel values).  The intuition of the
+compressed-domain execution is that if both streams have the same kind
+of repeat (inter-frame or intra-frame), then the repeat is copied
+directly to the output.  If they have different kinds of repeats, or
+if one stream is uncompressed, then both streams are uncompressed.
 
 \subsubsection{Setup}
 
@@ -353,10 +368,9 @@ allocation/deallocation for each frame.
 % did not mention removal of O(frames^2) linked list search, although 
 % this fell out of removing the redundant memory deallocation
 
-Our optimized configuration operates in the compressed domain.  The
-intuition is that when both videos have inter-frame or intra-frame
-repeats, the repeats can be copied directly to the output.  Outside of
-the plugin, we also patched three frame-copy operations in
+Our optimized configuration operates in the compressed domain.
+Outside of the auto-generated plugin, we patched three frame-copy
+operations in
 % actually four frame-copy operations, though one of them is a no-op
 the Blender source code to copy only the compressed frame data rather
 than the full dimensions of the frame.

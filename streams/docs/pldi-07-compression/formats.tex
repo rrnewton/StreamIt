@@ -8,11 +8,10 @@ codecs are a subset of LZ77, utilizing only run-length encoding or a
 fixed window size; these are supported very efficiently by our
 technique.  Others are a superset of LZ77, incorporating additional
 techniques such as delta coding or Huffman coding; these may incur
-additional processing overhead.
-
-In the following sections, we describe the practical considerations
-involved in targeting various compression formats with our technique.
-Formats are ordered by approximate goodness of the achievable mapping.
+additional processing overhead.  In the following sections, we
+describe the practical considerations involved in targeting various
+compression formats with our technique.
+%Formats are ordered by approximate goodness of the achievable mapping.
 
 \subsection{High-Efficiency Mappings}
 \label{sec:formats-good}
@@ -33,6 +32,13 @@ pixel.  A repeat across frames indicates that a stretch of pixels did
 not change from one frame to the next, while a repeat across pixels
 indicates that a stretch of pixels has the same color within a frame.
 % mention bit depths?
+
+\begin{table*}[t]
+\vspace{-1\baselineskip}
+\psfig{figure=table-benchmarks.eps,width=7.1in}
+\caption{Characteristics of the video workloads.
+\protect\label{tab:videos}}
+\end{table*}
 
 \paragraph{Flic Video.}
 Flic Video files (FLI/FLC) were originally produced by Autodesk
@@ -61,40 +67,33 @@ stage, making it a good target for our technique.
 %% As this information can be converted to a run-length encoding, it can
 %% also be targetted by our technique.
 
-\begin{table*}[t]
-\vspace{-1\baselineskip}
-\psfig{figure=table-benchmarks.eps,width=7.1in}
-\caption{Characteristics of the video workloads.
-\protect\label{tab:videos}}
-\end{table*}
+%% \subsection{Medium-Efficiency Mappings}
+%% \label{sec:formats-med}
 
-\subsection{Medium-Efficiency Mappings}
-\label{sec:formats-med}
+%% While the formats in this category utilize an encoding that is
+%% compatible with LZ77, they incur extra overhead because the data is
+%% reorganized prior to the compression stage.
 
-While the formats in this category utilize an encoding that is
-compatible with LZ77, they incur extra overhead because the data is
-reorganized prior to the compression stage.
+%% \paragraph{Planar RGB.}
+%% The Planar RGB video format is supported by Apple Quicktime files.  It
+%% utilizes run-length encoding for pixels within a frame, with partial
+%% support for expressing inter-frame repeats (only the end of lines can
+%% be skipped).  The red, green, and blue planes are encoded separately
+%% in order to increase compression.  For user transformations that need
+%% to process red, green, and blue values together, this introduces
+%% additional alignment overhead when applying our technique.
 
-\paragraph{Planar RGB.}
-The Planar RGB video format is supported by Apple Quicktime files.  It
-utilizes run-length encoding for pixels within a frame, with partial
-support for expressing inter-frame repeats (only the end of lines can
-be skipped).  The red, green, and blue planes are encoded separately
-in order to increase compression.  For user transformations that need
-to process red, green, and blue values together, this introduces
-additional alignment overhead when applying our technique.
-
-\paragraph{OpenEXR.}
-OpenEXR is an emerging image format (backed by Industrial Light and
-Magic) for use in digital film.  It offers several compression
-options, including run-length encoding, zip, and wavelet-based
-compression.  However, in run-length encoding mode, the low and high
-bytes of the pixels are separated and encoded as separate run-length
-sequences; this enables pixels with variations in the low bytes to
-nonetheless benefit from compression of the high bytes.  As most user
-transformations would utilize the entire bit-width of the pixel, our
-technique suffers additional alignment overhead in processing these
-files.
+%% \paragraph{OpenEXR.}
+%% OpenEXR is an emerging image format (backed by Industrial Light and
+%% Magic) for use in digital film.  It offers several compression
+%% options, including run-length encoding, zip, and wavelet-based
+%% compression.  However, in run-length encoding mode, the low and high
+%% bytes of the pixels are separated and encoded as separate run-length
+%% sequences; this enables pixels with variations in the low bytes to
+%% nonetheless benefit from compression of the high bytes.  As most user
+%% transformations would utilize the entire bit-width of the pixel, our
+%% technique suffers additional alignment overhead in processing these
+%% files.
 
 \subsection{Low-Efficiency Mappings}
 \label{sec:formats-bad}
@@ -118,11 +117,11 @@ increase the memory footprint.  In addition, as DEFLATE's LZ77
 algorithm operates on individual bytes, there may be an exaggerated
 alignment cost if the application operates on a larger word size.
 
-\paragraph{TSCC.}
-The TechSmith Screen Capture Codec is very similar to Microsoft RLE,
-except that the final output is further compressed using DEFLATE.
-Thus, any overheads incurred by our technique on DEFLATE also extend
-to TSCC.
+%% \paragraph{TSCC.}
+%% The TechSmith Screen Capture Codec is very similar to Microsoft RLE,
+%% except that the final output is further compressed using DEFLATE.
+%% Thus, any overheads incurred by our technique on DEFLATE also extend
+%% to TSCC.
 
 \paragraph{PNG.}
 The PNG image format also relies on DEFLATE to compress the pixels in

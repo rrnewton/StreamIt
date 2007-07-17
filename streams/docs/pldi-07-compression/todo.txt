@@ -1,22 +1,11 @@
-+ add examples of splitter and joiner transformations?
++ convert --- to actual lines
 
-+ add StreamIt code for benchmarks?
-
-+ possibly omit mention of coarsen-repeat for splitters/joiners
-
-+ in giving streamit source examples, make clear that pixel
-  transformations bear no alignment cost and thus do not need to
-  decompress the inputs?  though composites do.
-
-From reviewers:
----------------
-
-+ make more clear what properties are required of (i) compression
-  scheme and (ii) of the transformations.  e.g., halfwidth ok,
-  halfheight not.
+- if need more space, can shorten description of compression factors
 
 Not changing:
 -------------
+- add StreamIt code for benchmarks?
+- possibly omit mention of coarsen-repeat for splitters/joiners
 - change \mbox{floor} to floor symbols?  or make floor/min bold?
 - pop/push to input/output (is anyone ever confused?  pop is shorter)
 - "p6, if possible it would be good to see more detailed numbers from

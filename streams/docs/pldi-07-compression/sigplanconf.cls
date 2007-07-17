@@ -468,7 +468,7 @@
       \list{\@biblabel{\@arabic\c@enumiv}}%
            {\settowidth\labelwidth{\@biblabel{#1}}%
              % by bill
-             \setlength{\itemsep}{-1pt}
+             \setlength{\itemsep}{-2.09pt}
             \leftmargin\labelwidth
             \advance\leftmargin\labelsep
             \@openbib@code

@@ -12,14 +12,14 @@ operates on uncompressed data, we output an equivalent program that
 operates directly on the compressed format.  Our transformation
 applies to stream programs, a restricted but useful class of
 applications with regular communication and computation patterns.  Our
-formulation is based on LZ77, a lossless compression algorithm
-utilized by ZIP, and immediately applies to simpler formats such as
-Apple Animation, Microsoft RLE, and Targa.
+formulation is based on LZ77, a lossless compression algorithm that is
+utilized by ZIP and fully encapsulates common formats such as Apple
+Animation, Microsoft RLE, and Targa.
 
 We implemented a simple subset of our techniques in the StreamIt
 compiler, which emits executable plugins for two popular video editing
 tools: MEncoder and Blender.  For common operations such as color
-adjustment and video compositing, computing directly on compressed
-data offers a speedup roughly proportional to the overall compression
+adjustment and video compositing, mapping into the compressed domain
+offers a speedup roughly proportional to the overall compression
 ratio.  For our benchmark suite of 12 videos in Apple Animation
 format, speedups range from 1.1x to 471x, with a median of 15x.
