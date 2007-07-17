@@ -1422,7 +1422,54 @@ C A | <4,4> B A <2,2> N A   prune
 
 CA~BA~NA~BA~NA~NA~
 
-CANABANANA
+----------------------------
 
-BANABANANA
+Need splitter / joiner examples
+
+.....
+x....
+
+<1,4> . x <1,3> .
+
+-->
+
+<1,4> .
+
+x <1,3> .
+
+-->
+
+. x <2,6> . .
+
+.x
+..
+..
+..
+..
+
+
+------------------------
+
+uncompressed:
+
+x~
+
+x....
+
+
+-----------------------
+
+x x . . x x <1,10> .
+
+through splitter:
+
+x x <1,2> . 
+
+x <1,3> .
+
+<1,4> .
+
+<1,4> .
+
+through joiner:
 

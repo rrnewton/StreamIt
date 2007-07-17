@@ -66,14 +66,15 @@ applies to stream programs: a restricted but practical class of
 applications that perform regular processing over long data sequences.
 Stream programming captures the essential functionality needed by
 image, video, and signal processing applications while exposing the
-flow of data to the compiler.  Our transformation targets LZ77, a
-lossless encoding utilized by ZIP, and immediately applies to simpler
-formats such as Apple Animation, Microsoft RLE, and Targa.  Lossless
-compression is widely used in computer animation and digital video
-editing in order to avoid accumulating compression artifacts.  By
-providing a programmable solution, our technique enables a large class
-of transformations to be customized by the user and directly applied
-to the compressed data.
+flow of data to the compiler.  Our formulation is based on LZ77, a
+lossless compression algorithm utilized by ZIP, and naturally applies
+to formats such as Apple Animation, Microsoft RLE, and Targa (which
+are special cases of LZ77).  Lossless compression is widely used in
+computer animation and digital video editing in order to avoid
+accumulating compression artifacts.  By providing an automatic mapping
+into the compressed domain, our technique enables a large class of
+transformations to be customized by the user and directly applied to
+the compressed data.
 
 The key idea behind our technique can be understood in simple terms.
 In LZ77, compression is achieved by indicating that a given part of
@@ -87,21 +88,22 @@ again.  Rather, {\it the repetitions in the input stream can be
 previously-computed values.  This preserves the compression in the
 stream while avoiding the cost of decompression, re-compression, and
 computing on the uncompressed data.  In this paper, we extend this
-simple idea to a broader class of programs: those which input and
+simple idea to a broad class of programs: those which input and
 output multiple data items at a time, and those which split, combine,
 and reorder the data in the stream.
 
-We implemented a subset of our full technique in the StreamIt
-compiler, which automatically generates plugins for two popular video
-editing tools: MEncoder and Blender.  We evaluated the technique for a
-variety of pixel transformations (brightness, contrast, color
-inversion) as well as video compositing (overlays and mattes).  Using
-a suite of 12 videos (screencasts, computer animations, digital
-television content) in Apple Animation format, computing directly on
-compressed data offers a speedup roughly proportional to the
-compression factor.  For pixel transformations, speedups range from
-2.5x to 471x, with a median of 17x; for video compositing, speedups
-range from 1.1x to 32x, with a median of 6.6x.
+We implemented a subset of our general technique in the StreamIt
+compiler, which generates plugins for two popular video editing tools:
+MEncoder and Blender.  While our current implementation handles only
+certain streaming patterns, it is sufficient to express many practical
+transformations such as pixel adjustment (brightness, contrast, color
+inversion) and video compositing (overlays and mattes).  Using a suite
+of 12 videos (screencasts, animations, stock footage) in Apple
+Animation format, computing directly on compressed data offers a
+speedup roughly proportional to the compression factor.  For pixel
+transformations, speedups range from 2.5x to 471x, with a median of
+17x; for video compositing, speedups range from 1.1x to 32x, with a
+median of 6.6x.
 
 In the general case, compressed processing techniques may need to
 partially decompress the input data to support the behavior of certain
@@ -120,7 +122,9 @@ To summarize, this paper makes the following contributions:
 
 \item An algorithm for mapping an arbitrary stream program, written in
   the cyclo-static dataflow model, to operate directly on lossless
-  LZ77-compressed data (Sections 2-3).
+  LZ77-compressed data.  In addition to transforming a single stream,
+  programs may interleave and de-interleave multiple streams while
+  maintaining compression (Sections 2-3).
 
 \item An analysis of popular lossless compression formats and the
 opportunities for direct processing on each (Section 4).
