@@ -1,0 +1,24 @@
+\chapter{Introduction}
+
+Multicore architectures have become the rule rather than the exception in the changing computing landscape. With single-core performance limited by power consumption, memory latency, and circuit complexity, almost all new architectures (certain mobile and embedded applications excepted) are branching into more cores rather than better cores. Exploiting parallelism has already become absolutely critical if applications wish to make full use of current and future architectures.
+
+Compilers for traditional imperative languages are faced with a daunting task when attempting to aid the programmer in this regard: it is very difficult to automatically extract parallelism from a sequential program written in a low-level language such as C. Much of the time, the task of parallelizing a program remains in the hands of the programmer, who must manually convert a single-threaded sequential program into a multithreaded parallel one. While doing so, he must contend with issues specific to the architecture he is targeting, limiting portability, and worry about introducing race conditions or other bugs that typically plague multithreaded programs. Programmers do have access to a number of frameworks such as MPI and OpenMP; however, parallelization of sequential programs remains a difficult process.
+
+The Cell architecture is a novel multicore architecture that differs significantly from traditional SMP architectures: it is both a heterogeneous architecture and one that does \emph{not} use shared memory. Compared to traditional SMP architectures, the design of Cell is a trade-off for computing power, ease of manufacture, and low power consumption at the cost of programming complexity. To a programmer writing an application that runs on Cell, this only leaves him with additional complications.
+
+Streaming languages such as StreamIt~\cite{asplos02} provide a way to alleviate the burden of manually parallelizing applications. In a streaming language, the programmer defines actors that operate on streams of data; the programmer then composes actors and streams into the program. The structure that is explicitly expressed by a streaming language exposes rather than hides the parallelism present in a program, making it much easier for the compiler to automatically extract parallelism. For the programmer, many applications fit within the streaming model, and can be naturally expressed in StreamIt or other streaming languages.
+
+Ideally, a compiler for a streaming language would like to be able to focus on high-level scheduling issues: finding parallelism and scheduling actors to obtain the best possible utilization of available computation resources. However, when presented with a heterogeneous, distributed-memory architecture like Cell, the compiler must instead first contend with numerous low-level issues.
+
+The goal of this thesis is to create a runtime framework for streaming applications on the Cell architecture. The framework is geared towards compilers rather than programmers. Just as a programmer manually parallelizing a sequential program has access to frameworks like MPI that abstract certain low-level operations, the goal of the streaming framework for Cell is to provide similar functionality to streaming language compilers and schedulers that target the Cell architecture.
+
+To this end, this thesis contributes the following:
+\begin{enumerate}
+\item A runtime library that provides compilers with higher-level primitives than bare Cell hardware.
+\item A dynamic scheduler implemented on top of the runtime library that dynamically schedules a stream graph.
+\item An analysis of the amount of code required when a compiler or programmer targets the library compared to Cell hardware directly. The library is shown to significantly simply scheduler implementation without adding significant overhead.
+\end{enumerate}
+
+The runtime library and dynamic scheduler were designed with the StreamIt language and the StreamIt compiler explicitly in mind. StreamIt constructs and execution patterns map naturally to the framework; however, the framework is general enough that it should also be able to accommodate other streaming languages.
+
+Chapters~2 presents basic background information and related work on streaming languages and parallelization frameworks, and describes the StreamIt language and the Cell architecture in detail. Chapter~3 presents the runtime library along with a discussion of design decisions and implementation issues. Chapter~4 describes how common scheduling patterns a compiler or programmer might generate can be mapped to the library, and compares code complexity and flexibility to programming for Cell directly. Chapter~5 discusses the dynamic scheduler. Chapter~6 gives a brief analysis of the performance of the framework on a test benchmark. Chapter~7 concludes with a discussion of future work and extensions.

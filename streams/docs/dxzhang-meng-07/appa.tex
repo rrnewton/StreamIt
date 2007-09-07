@@ -1,0 +1,332 @@
+\setstretch{1.0}
+\chapter{Runtime Library Interface for User Code}\label{app:ui}
+
+This appendix describes in detail the interface the runtime library provides to user code on the PPE. In particular, section~\ref{app:ui:cmd} gives a full list of library commands and section~\ref{app:ui:groups} discusses how groups are set up and issued.
+
+SPEs are identified by ID, starting from 0.
+
+\section{Addresses}
+
+On the SPEs, the library occupies a small amount of space at the bottom of local store. The remainder is a single contiguous region that the user can use for filter code, filter state, and buffers. (The user must manually ensure that enough space is left for the stack, which grows downward from the top of local store.)
+
+With respect to a particular SPE, the library uses three types of addresses:
+\begin{itemize}
+\item Memory addresses (type \textsf{void~*}), for objects anywhere in the program's address space (including the local store of other SPEs). When unqualified, the term \emph{address} refers to a memory address.
+\item Local store (LS) addresses (type \textsf{LS\_ADDRESS}), for objects in the SPE's local store.
+\item User addresses (type \textsf{SPU\_ADDRESS}), for objects in the SPE's local store, relative to the start of the data region available to the user.
+\end{itemize}
+
+Internally, the library uses only memory and LS addresses. For ease of use, the external interface largely uses user addresses in place of LS addresses. The library provides functions to convert between these addresses:
+\begin{description}
+\item \textsf{spu\_lsa(spu\_id, user\_addr)~:~LS\_ADDRESS} \\*
+Converts a user address on an SPE to a LS address.
+
+\item \textsf{spu\_addr(spu\_id, ls\_addr)~:~void~*} \\*
+Converts a LS address on an SPE to a memory address.
+\end{description}
+
+\section{PPE Buffers}
+
+The control block for a PPE buffer is represented by a \textsf{BUFFER\_CB} structure. This must be quadword-aligned. Important fields in this structure include:
+\begin{description}
+\item \textsf{head, tail}: Head and tail pointers (offsets into the data region).
+\item \textsf{data~:~void~*}: Pointer to data region.
+\end{description}
+
+Library functions that deal with buffers include:
+\begin{description}
+\item \textsf{alloc\_buffer(size, circular, data\_offset)~:~BUFFER\_CB~*} \\*
+Allocates memory for a buffer. The buffer must be freed by calling \textsf{dealloc\_buffer}.
+\begin{description}
+\item \textsf{size}: Size of buffer in bytes.
+\item \textsf{circular~:~bool}: Whether buffer is circular; if so, \textsf{size} must be power of two.
+\item \textsf{data\_offset}: Initial value of buffer's head/tail pointers.
+\end{description}
+
+\item \textsf{malloc\_aligned(size, alignment)~:~void~*} \\*
+Allocates memory with a specific alignment. The memory must be freed by calling \textsf{free\_aligned}.
+\begin{description}
+\item \textsf{size}: Number of bytes to allocate.
+\item \textsf{alignment}: Alignment in bytes (must be power of two).
+\end{description}
+
+\item \textsf{init\_buffer(buf, buf\_data, size, circular, data\_offset)} \\*
+Initializes a buffer control block.
+\begin{description}
+\item \textsf{buf~:~BUFFER\_CB~*}: Pointer to an existing buffer control block.
+\item \textsf{buf\_data~:~void~*}: Pointer to the data region for the buffer. If this is \textsf{NULL}, memory will be allocated for buffer data which must be freed with \textsf{free\_aligned}.
+\item \textsf{size, circular, data\_offset}: Same as \textsf{alloc\_buffer}.
+\end{description}
+
+\item \textsf{duplicate\_buffer(dest\_buf, src\_buf)} \\*
+Makes a copy of a buffer control block. The destination buffer shares the same data region as the source buffer and initially has the same head/tail pointers.
+\begin{description}
+\item \textsf{dest\_buf~:~BUFFER\_CB~*}: Pointer to destination buffer.
+\item \textsf{src\_buf~:~BUFFER\_CB~*}: Pointer to source buffer.
+\end{description}
+
+\end{description}
+
+\section{Commands}\label{app:ui:cmd}
+
+This section provides a full description of all commands that can be issued to an SPE.
+
+\subsection{Filter Commands}
+
+\begin{description}
+\item[\textsf{load\_data}] Copies arbitrary data into the SPE's local store. Can be used to copy filter code onto the SPE.
+\begin{description}
+\item \textsf{dest\_da}: User address to place data.
+\item \textsf{src\_addr}: Address of the data in memory.
+\item \textsf{num\_bytes}: Size of data in bytes.
+\end{description}
+
+All addresses and size must be quadword-aligned and -padded.
+
+\item[\textsf{filter\_load}] Loads a filter onto the SPE.
+\begin{description}
+\item \textsf{filt}: User address of the filter. Must be quadword-aligned.
+
+The library places the control block for the loaded filter at this address, and the filter's state immediately after. There must be at least 128 bytes in addition to the size of the state free.
+\item \textsf{desc}: Pointer to a \textsf{SPU\_FILTER\_DESC} structure describing properties of the filter.
+\end{description}
+
+The \textsf{SPU\_FILTER\_DESC} structure has the following fields:
+\begin{description}
+\item \textsf{work\_func}: LS address of the filter's work function in SPE local store.
+\item \textsf{state\_size}: Size of the filter's state. Must be quadword-padded.
+\item \textsf{state\_addr}: Address of the permanent store for the filter's state in memory. Must be quadword-aligned. (Ignored if \textsf{state\_size} is 0.)
+\item \textsf{num\_inputs, num\_outputs}: The number of input and output tapes the filter has, respectively.
+\end{description}
+A structure for each filter can be initialized once at the beginning of the program and reused for each \textsf{filter\_load} command (with modifications to the \textsf{work\_func} field as filter code is moved around).
+
+When this command becomes active, for stateful filters, the filter must not be loaded on another SPE. The library is responsible for copying state from memory. Stateless filters can be simultaneously loaded on multiple SPEs.
+
+The filter's code does not need to have been copied into local store at this time, but it must reside in local store when the filter is run.
+
+\item[\textsf{filter\_unload}] Unloads a loaded filter.
+\begin{description}
+\item \textsf{filt}: User address of the filter.
+\end{description}
+
+For stateful filters, the library is responsible for writing state back to memory. Unloading a filter does not affect its attached buffers.
+
+\item[\textsf{filter\_attach\_input}, \textsf{filter\_attach\_output}] Attaches an input or output tape of a loaded filter to a buffer. Input and output tapes are separately 0-indexed.
+\begin{description}
+\item \textsf{filt}: User address of the filter.
+\item \textsf{tape\_id}: Index of the tape.
+\item \textsf{buf\_data}: User address of the buffer.
+\end{description}
+
+\item[\textsf{filter\_run}] Runs a loaded filter for a specific number of iterations.
+\begin{description}
+\item \textsf{filt}: User address of the filter.
+\item \textsf{iters}: Total number of iterations to run.
+\item \textsf{loop\_iters}: Number of iterations to run in one cycle through the run list, if possible. (\textsf{iters} does not have to be a multiple of \textsf{loop\_iters}.)
+
+This parameter scales up the work done by small work functions to reduce library overhead. Increasing this until $\frac{\mathsf{iters}}{\mathsf{loop\_iters}}$ is around 5 should reduce overhead while still leaving enough time to process other active commands.
+\end{description}
+
+When this command becomes active, the filter's tapes must all be attached to buffers and there must be sufficient data/space in the input and output buffers for all specified iterations. While this command is active, it ``uses'' the front ends of the input buffers and the back ends of the output buffers; the user must ensure that no other commands (data transfer commands or another \textsf{filter\_run} command) try to use those ends of those buffers.
+
+\end{description}
+
+\subsection{Buffer Commands}
+
+\begin{description}
+\item[\textsf{buffer\_alloc}] Allocates a buffer on the SPE.
+\begin{description}
+\item \textsf{buf\_data}: User address of the buffer. Must be aligned on 128 bytes.
+
+The data region for the buffer starts at this address. The library places the control block immediately before; there must be 128 bytes free before this address in addition to \textsf{size} bytes after.
+\item \textsf{size}: Size of buffer in bytes, must be power of two.
+\item \textsf{data\_offset}: Initial values of buffer's head/tail pointers.
+\end{description}
+
+\item[\textsf{buffer\_align}] Resets head and tail pointers of an empty buffer. This is typically done in preparation for future data transfers to/from different opposing buffers (see the data transfer commands).
+\begin{description}
+\item \textsf{buf\_data}: User address of the buffer.
+\item \textsf{data\_offset}: New values of buffer's head/tail pointers.
+\end{description}
+
+The buffer must be empty when the command becomes active.
+
+\end{description}
+
+\subsection{Data Transfer Commands}
+
+Data transfer commands\footnote{This includes data transfer functions on the PPE.} always occur in pairs. The number of bytes specified by both commands in a pair generally must be the same (see section~\ref{app:ui:dt} for exceptions). The user must initialize buffer head/tail pointers such that after both commands in a pair become active (on different processors), the head pointer of the source buffer and the tail pointer of the destination buffer have the same offset in a 128-byte block.
+
+Locally, when a \textsf{dt\_in} or \textsf{dt\_out} command becomes active, there must be sufficient space or data in the buffer for the entire transfer, respectively. An active data transfer command ``uses'' that end of the buffer and no other commands can try to use it.
+
+In addition, for a specific processor, buffer on that processor, and end of that buffer, the user must ensure that at any time there is at most active one data transfer command over all other processors that involves that end of the buffer.
+
+\begin{description}
+\item[\textsf{dt\_out\_front}] Source half of a command pair. Transfers data from the front of a buffer on this SPE to a destination buffer on another SPE.
+\begin{description}
+\item \textsf{buf\_data}: User address of the source buffer on this SPE.
+\item \textsf{dest\_buf\_data}: Memory address of the destination buffer, which must be on another SPE.
+\item \textsf{num\_bytes}: Number of bytes to transfer out.
+\end{description}
+
+The user must ensure that the destination buffer has been allocated on the destination SPE by the time this command becomes active.
+
+\item[\textsf{dt\_out\_front\_ppu}] Source half of a command pair. Transfers data from the front of a buffer on this SPE to a destination buffer in memory.
+\begin{description}
+\item \textsf{buf\_data}: User address of the source buffer on this SPE.
+\item \textsf{dest\_buf}: Address of the destination PPE buffer.
+\item \textsf{num\_bytes}: Number of bytes to transfer out.
+\end{description}
+
+When this command is set up (see section ~\ref{app:ui:groups}), the destination buffer must already be allocated.
+
+\item[\textsf{dt\_in\_back}] Destination half of a command pair. Transfers data into the back of a buffer on this SPE from a source buffer on another SPE.
+\begin{description}
+\item \textsf{buf\_data}: User address of the destination buffer on this SPE.
+\item \textsf{src\_buf\_data}: Memory address of the source buffer, which must be on another SPE.
+\item \textsf{src\_buf\_size}: Size of the source buffer in bytes.
+\item \textsf{num\_bytes}: Number of bytes to transfer in.
+\end{description}
+
+\item[\textsf{dt\_in\_back\_ppu}] Destination half of a command pair. Transfers data into the back of a buffer on this SPE from a source buffer in memory.
+\begin{description}
+\item \textsf{buf\_data}: User address of the destination buffer on this SPE.
+\item \textsf{src\_buf\_data}: Address of the source PPE buffer.
+\item \textsf{num\_bytes}: Number of bytes to transfer in.
+\end{description}
+
+When this command is set up, the source buffer must already be allocated.
+
+\item[\textsf{dt\_out\_front\_ppu\_ex}] Special version of \textsf{dt\_out\_front\_ppu} (see section~\ref{app:ui:dt}). Additional parameters:
+\begin{description}
+\item \textsf{tail\_overlaps~:~bool}: See section~\ref{app:ui:dt}.
+\end{description}
+
+\end{description}
+
+\subsection{Miscellaneous Commands}
+
+\begin{description}
+\item[\textsf{null}] This command does nothing and completes immediately. Its main purpose is to allow the user to add nodes to the dependency graph to simplify keeping track of dependencies, such as when there is large fan-in/fan-out.
+
+\item[\textsf{call\_func}] Executes an arbitrary function on the SPE (code for the function must already be in local store). The function must have signature \textsf{void ()(void)}.
+\begin{description}
+\item \textsf{func}: LS address of the function.
+\end{description}
+
+\end{description}
+
+\section{Groups}\label{app:ui:groups}
+
+The library provides 32 groups per SPE, numbered from 0 to 31. The following functions are provided to set up and issue groups:
+
+\begin{description}
+\item \textsf{spu\_new\_group(spu\_id, group\_id)~:~SPU\_CMD\_GROUP~*} \\*
+Returns a pointer that identifies the specified group. Any existing commands in the group are first cleared.
+
+\item \textsf{spu\_get\_group(spu\_id, group\_id)~:~SPU\_CMD\_GROUP~*} \\*
+Returns a pointer that identifies the specified group, without clearing existing commands in it.
+
+\item \textsf{spu\_issue\_group(spu\_id, group\_id, user\_addr)} \\*
+Issues all commands in the specified group. \textsf{user\_addr} specifies the user address in the SPE's local store that command data will be copied to. Command data occupies a maximum of 64 bytes per command.
+
+\end{description}
+
+Each of the commands named in section~\ref{app:ui:cmd} can be added to a group by calling the function:
+\begin{quote}
+\begin{sffamily}
+\begin{tabular}{l@{}l}
+spu\_\emph{name}(&SPU\_CMD\_GROUP~*, [\emph{command parameters}, ]\emph{command ID},\\
+&\emph{number of dependencies}[, \emph{list of dependency IDs}])\\
+\multicolumn{2}{l}{:~SPU\_CMD\_HEADER~*}
+\end{tabular}
+\end{sffamily}
+\end{quote}
+Command parameters are those listed for the command, in the given order. The function returns a pointer to a \textsf{SPU\_CMD\_HEADER} structure that provides fields that can be used to set dependencies directly:
+\begin{description}
+\item \textsf{num\_back\_deps}: The number of dependencies this command has.
+\item \textsf{deps[]}: Array of dependency IDs.
+\end{description}
+
+Most commands can have a maximum of 7 dependencies. The \textsf{filter\_load}, \textsf{filter\_run}, and \textsf{null} commands can have a maximum of 15 dependencies.
+
+Dependencies are specified as a list of command IDs. Dependencies are ``resolved'' by an SPE when the group is issued, not when commands are added to the group. However, the order in which commands are added to the group determines the order that the SPE will consider individual commands to be issued in for dependency purposes when the group is issued.
+
+\section{Command Completion}
+
+The user can choose to be notified via callback when commands issued to SPEs complete. This callback must have the signature:
+\begin{quote}
+\textsf{void ()(uint32\_t spu\_id, uint32\_t new\_completed, uint32\_t all\_completed)}
+\end{quote}
+When the callback is called, \textsf{new\_completed} contains a bitmap of completed command IDs that arrived in the most recent message from the SPE and \textsf{all\_completed} contains a bitmap of all completed command IDs.
+
+The user can retrieve a bitmap of all completed command IDs by calling:
+\begin{quote}
+\textsf{spu\_get\_completed(spu\_id)}
+\end{quote}
+The user must acknowledge completed IDs before new commands with those IDs can be issued by calling:
+\begin{quote}
+\textsf{spu\_ack\_completed(spu\_id, bitmap)}
+\end{quote}
+
+The user can set callbacks individually for SPEs by writing to the field:
+\begin{quote}
+\textsf{spu\_info[\emph{spu\_id}].spu\_complete\_cb}
+\end{quote}
+
+The function:
+\begin{quote}
+\textsf{spulib\_poll()}
+\end{quote}
+polls for command completion messages from SPEs. It returns after receiving a command completion message (after running the user callback), or after having polled all SPEs once in round-robin order. Typically, the user first issues commands to all SPEs, then polls repeatedly until a flag is set, performing all work in the callback.
+
+The library defines a second type of callback with the signature:
+\begin{quote}
+\textsf{void ()(uint32\_t tag)}
+\end{quote}
+This callback is used for PPE data transfer operations. The \textsf{tag} parameter is an arbitrary tag the user specifies when starting the original operation.
+
+\section{PPE Data Transfers}\label{app:ui:dt}
+
+The library provides two functions that are the PPE equivalents of the \textsf{dt\_out\_front} and \textsf{dt\_in\_back} commands:
+\begin{description}
+\item \textsf{dt\_out\_front(buf, dest\_spu, dest\_buf\_data, num\_bytes, spu\_cmd\_id, tag)} \\*
+Source half of a command pair. Transfers data from the front of a PPE buffer to a destination buffer on an SPE.
+\begin{description}
+\item \textsf{buf}: Address of the source PPE buffer.
+\item \textsf{dest\_spu}: ID of the SPE containing the destination buffer.
+\item \textsf{dest\_buf\_data}: User address of the destination buffer on the destination SPE.
+\item \textsf{num\_bytes}: Number of bytes to transfer out.
+\item \textsf{spu\_cmd\_id}: ID of the command on the destination SPE that handles the opposing data transfer command.
+
+The opposing command does not need to be currently issued. However, no other command with this ID can be currently issued or issued before that command.
+\item \textsf{tag}: Arbitrary tag for the callback.
+\end{description}
+
+\item \textsf{dt\_in\_back(buf, src\_spu, src\_buf\_data, num\_bytes, spu\_cmd\_id, tag)} \\*
+Destination half of a command pair. Transfers data into the back of a PPE buffer from a source buffer on an SPE. Parameters are similar as above.
+
+\end{description}
+
+The user can choose to be notified via callback when the PPE side of data transfers completes by writing to the field:
+\begin{quote}
+\textsf{spu\_info[\emph{spu\_id}].ppu\_dt\_complete\_cb}
+\end{quote}
+The tag received in the callback is whatever tag the user specified when starting the operation. The callback for the PPE data transfer will always occur before the callback for the completion of the opposing SPE command.
+
+Because PPE buffers can be very large, the library provides two functions to perform ``extended'' data transfers:
+\begin{quote}
+\textsf{dt\_out\_front\_ex(buf, dest\_spu, dest\_buf\_data, num\_bytes)}
+
+\textsf{dt\_in\_back\_ex(buf, src\_spu, src\_buf\_data, num\_bytes)}
+\end{quote}
+The transfer size specified in these functions can correspond to the total transfer size specified by a sequence of opposing data transfer commands issued to the SPE. The PPE buffer must still have sufficient data/space for the entire extended transfer at the time these functions are called. These functions do not result in callbacks.
+
+For \textsf{dt\_in\_back\_ex}, after the last corresponding SPE data transfer command has completed, the user must call:
+\begin{quote}
+\textsf{finish\_dt\_in\_back\_ex\_head(buf, tail\_overlaps)}
+\end{quote}
+to write any unaligned data at the front of the transfer into the buffer. \textsf{tail\_overlaps~:~bool} specifies whether unaligned data at the end of the transfer was handled ``carefully'' and also needs to be written into the buffer. This is necessary when multiple SPEs are writing to different parts of a shared data region. If so, the user must also call:
+\begin{quote}
+\textsf{finish\_dt\_in\_back\_ex\_tail(buf)}
+\end{quote}

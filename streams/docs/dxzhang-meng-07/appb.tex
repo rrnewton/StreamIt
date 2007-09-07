@@ -1,0 +1,128 @@
+\setstretch{1.0}
+\chapter{Runtime Library Interface for Filter Code}\label{app:filterui}
+
+This appendix describes the interface provided by the library for writing filter code. The interface consists of a set of C preprocessor macros for accessing filter state and tapes. Throughout this appendix, the term \emph{user} refers to the compiler or programmer that is producing filter code.
+
+\section{Defining Filters}
+
+Each filter in a program must be assigned a unique name that identifies it. Code for each filter should be placed in a separate source file to allow it to be compiled separately (however, see section~\ref{app:filterui:notes} for limitations).
+
+Inside the source file, the user must define the following preprocessor macros:
+\begin{description}
+\item \textsf{FILTER\_NAME}: The name of the filter (must be a valid C identifier, except may start with a digit).
+
+\item \textsf{HAS\_STATE}~\\*
+This is defined iff the filter is stateful. In order to use the provided macros to access state fields, the user must define a structure that contains all state fields, and \textsf{typedef} it to \textsf{FILTER\_\emph{name}\_STATE}.
+
+\item \textsf{NUM\_INPUT\_TAPES}, \textsf{NUM\_OUTPUT\_TAPES}: The number of input tapes and output tapes the filter has, respectively. If either is not defined, it defaults to 1.
+
+\item \textsf{INPUT\_ITEM\_TYPE}, \textsf{OUTPUT\_ITEM\_TYPE}: The C type for data items on all input tapes and all output tapes, respectively.
+
+Data items can be the standard integer or floating point data types, or structures. If data items are structures, their size should be a power of two to avoid splitting a structure due to wrap-around.
+\end{description}
+
+All filter code is then emitted between:
+\begin{quote}
+\textsf{\#include ``beginfilter.h''}
+\end{quote}
+and
+\begin{quote}
+\textsf{\#include ``endfilter.h''}
+\end{quote}
+
+The filter's work function is defined by enclosing the body of the work function between:
+\begin{quote}
+\textsf{BEGIN\_WORK\_FUNC}
+\end{quote}
+and
+\begin{quote}
+\textsf{END\_WORK\_FUNC}
+\end{quote}
+The C preprocessor expands these macros to a function with the proper signature for the library.
+
+\section{State and Tape Access}
+
+Code within the work function has access to the filter's state and tapes. Fields defined in the state structure are accessed using the expression:
+\begin{quote}
+\textsf{state.\emph{field}}
+\end{quote}
+
+Input tape(s) can be accessed using the following macros. The $t$ parameter is specified iff the filter has more than one input tape to indicate which tape to access; input tapes are 0-indexed.
+\begin{description}
+\item \textsf{pop([$t$])} \\*
+Pops the item at the front of an input tape.
+\item \textsf{peek([$t$, ]$n$)} \\*
+Returns the $n$th item from the front of an input tape. Items are 0-indexed; the first item is item 0.
+\item \textsf{popn([$t$, ]$n$)} \\*
+Removes the first $n$ items at the front of an input tape and returns the last item removed. Note that this returns the same item as \textsf{peek([$t$, ]$n - 1$)}.
+\item \textsf{get\_input([$t$])~:~INPUT\_ITEM\_TYPE~*} \\*
+Returns a pointer to the front of an input buffer. The user can treat this as an array and read from it directly if its accesses do not require a wrap-around.
+\item \textsf{advance\_input([$t$, ]$n$)} \\*
+Increments the head pointer of an input buffer by $n$ items.
+\end{description}
+
+Output tape(s) can be accessed using the following macros. Output tapes are separately 0-indexed.
+\begin{description}
+\item \textsf{push([$t$, ]item)} \\*
+Pushes an item onto the back of an output tape.
+\item \textsf{get\_output([$t$])~:~OUTPUT\_ITEM\_TYPE~*} \\*
+Returns a pointer to the back of an output buffer. The user can treat this as an array and write to it directly if its accesses do not require a wrap-around.
+\item \textsf{advance\_output([$t$, ]$n$)} \\*
+Increments the tail pointer of an output buffer by $n$ items.
+\end{description}
+
+\section{Helper Functions}
+
+Helper functions that have access to a filter's state and tapes are defined by enclosing the body of the function between:
+\begin{quote}
+\textsf{BEGIN\_FUNC(\emph{name}, \emph{return\_type}[, \emph{formal parameter list}])}
+\end{quote}
+and
+\begin{quote}
+\textsf{END\_FUNC}
+\end{quote}
+Functions defined this way can be called from any other function that has state and tape access with:
+\begin{quote}
+\textsf{CALL\_FUNC(\emph{name}[, \emph{actual parameter list}])}
+\end{quote}
+If necessary, functions can be declared before use with:
+\begin{quote}
+\textsf{DECLARE\_FUNC(\emph{name}, \emph{return\_type}[, \emph{formal parameter list}])}
+\end{quote}
+These macros are expanded by the C preprocessor into additional parameters that pass along state and tape pointers.
+
+Names for helper functions are decorated, so each filter has its own ``namespace''. Helper functions defined by one filter cannot be called from other filters.
+
+Auxiliary functions that do not need to access a filter's state or tapes can be defined and called like normal C functions. To preserve the modularity of filter code, each filter should have its own copy of these functions (however, see section~\ref{app:filterui:notes} for limitations).
+
+\section{Additional Notes}\label{app:filterui:notes}
+
+Currently, restrictions in the C compiler force code for all filters to be statically compiled into SPE programs and permanently resident in local store. This relaxes many of the recommendations given previously; for example, sharing auxiliary functions between multiple filters becomes beneficial. Multiple filters can also be defined in a single source file.
+
+The user can either use the same set of filters on all SPEs, or define a unique set of filters for each SPE. LS addresses of filter work functions are exported to user code on the PPE as symbols named \textsf{wf\_\emph{name}}, where \textsf{\emph{name}} is the name of the filter.
+
+\section{Example}
+
+The following code illustrates a filter that convert integers to floating-point numbers. The filter has a single input tape and single output tape. In one iteration, it consumes one integer and produces one float.
+
+\begin{quote}
+\begin{verbatim}
+#define FILTER_NAME       int_to_float
+// #define HAS_STATE                    // stateless
+#define NUM_INPUT_TAPES   1             // not necessary
+#define NUM_OUTPUT_TAPES  1             // not necessary
+#define INPUT_ITEM_TYPE   int
+#define OUTPUT_ITEM_TYPE  float
+#include "beginfilter.h"
+
+BEGIN_WORK_FUNC
+{
+  push(pop());
+}
+END_WORK_FUNC
+
+#include "endfilter.h"
+\end{verbatim}
+\end{quote}
+
+In practice, a compiler would probably scale up the filter's work function many times, or fuse it with other filters.
