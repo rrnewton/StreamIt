@@ -1,0 +1,134 @@
+\section{Introduction}
+
+the trend of processors with multiple cores on a chip is continuing
+and all processor roadmaps are toward processors with more and more
+cores on a chip
+
+as the number of cores increase, so will the decoupling between cores,
+so that shared storage occurs further away from the cores
+
+a commercial example of such an architecture that is available today
+is the Cell processor with 8 cores each with its own local storage and
+a DMA engine to manage data movement in and out of its local store
+
+multicores requires partitioning of the application code so that there
+is an adequate number of code fragments that can occupy the available
+cores and increase utilization
+
+each code fragment requires its own data chunk to compute on, and
+produces its own chunk which may be shared with other code fragments
+
+scheduling involves assigning code and data onto a core as well as
+managing the communication between codes (cores)
+
+(decoupled) multicore architectures require careful scheduling:
+partitioning and assignment of the application code and data working
+sets so that code and data are collocated onto the same core for
+efficiency
+
+there are two extreme scheduling paradigms
+
+in static scheduling, a compiler partitions a given application and
+orchestrates a static plan for loading code onto a core along with its
+requisite data, and then shipping the output of that code fragment to
+other code that require the data as input
+
+in dynamic scheduling, a runtime system makes its own decisions in
+regards to the partitioning of code, assignment to cores, and
+management of data in and out of the cores
+~\cite{streamitweb}
+
+\subsection{static scheduling}
+
+pros and cons of static scheduling
+
+static scheduling works well for application with lots of explicit
+parallelism and exposed communication patterns
+
+communication to computation rations for code fragments are readily
+computable
+
+code fragments are regular and well behaved so that static work
+estimation is feasible 
+
+compiler can perform transformations to ensure code fragments are load
+balanced
+
+compiler can also manage communication and data placement to minimize
+buffer requirements, and hide communication latency
+
+since all of the orchestration is done at compile time, compiler
+optimizations should be efficient but that is not a primary concern
+
+scheduling pays off if the compiler assumptions hold at run time
+
+however if the work estimation was not accurate, or if the code
+fragment exhibit other forms of variability (e.g., produces more data
+than expected and alloted for by a buffer)
+
+also the compiler typically assumes the resources are fixed so that if
+the number of cores changes, utilization may increase or decrease and
+there aren't any provisions for rescheduling
+
+
+\subsection{dynamic scheduling}
+
+pros and cons of static scheduling
+
+a dynamic scheduler operates online as the application executes
+
+hence it is aware of the processor load, and can accommodate variability
+both in terms of the application workload or in terms of the available
+resources
+
+however since it operates online, it must be efficient and use
+adequate heuristics so that its runtime overhead is negligible
+
+this may limit the scope of transformations that the runtime scheduler
+can perform
+
+
+%% \subsection{hybrid scheduling}
+
+%% benefits of static and dynamic scheduling
+
+%% static compiler narrows search space (e.g., performs cursory
+%% partitioning)
+
+%% dynamic scheduler carries out transformations to refine compiler
+%% decisions
+
+
+\subsection{contributions}
+
+\begin{itemize}
+
+\item developed a framework for mapping applications to decoupled multicores
+
+emphasis on stream computing
+
+why stream computing is a good 
+
+\item facilitates static, dynamic, and hybrid scheduling techniques
+
+\item evaluation of some scheduling strategies (is there anything new in the
+static scheduler? can possibly claim some novelty wrt dynamic scheduler)
+
+\item evaluation of data vs pipeline parallelism
+
+\item novel transformation for vectorization
+
+\item efficient runtime transformations for exploiting data parallelism
+
+\end{itemize}
+
+%% \subsection{optimizations and transformations}
+
+%% briefly describe transformation to define scope of the scheduler
+
+%% - vectorization (maximize instruction issue bandwidth and exploit data
+%%   locality, fine grained data parallelism)
+
+%% - fission (coarse grained data parallelism)
+
+%% - fusion (load balancing)

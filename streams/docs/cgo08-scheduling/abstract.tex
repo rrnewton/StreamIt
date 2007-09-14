@@ -1,0 +1,20 @@
+Decoupled multicore architectures are parallel processors on a chip
+and require collocation of code and data onto the same core to
+maximize efficiency. There are several ways of orchestrating
+(scheduling) computation and communication for parallel execution,
+with static and dynamic scheduling paradigms at the extremes.
+
+Static scheduling incurs the least runtime overhead as all decisions
+about the mapping of code and data are made at compile time. Static
+scheduling is attractive for regular computation patterns that have
+little run time variability and unpredictability in terms of the
+application properties, the processor load, and resource availability.
+
+In contrast, dynamic scheduling requires runtime decision making and
+thus is not free. However, a dynamic scheduler is better suited to
+deal with the variability and unpredictability of applications and
+changes in runtime resources.
+
+This paper explores these two scheduling extremes, as well as a
+profitable middle ground that allows for static decisions with dynamic
+refinement.
