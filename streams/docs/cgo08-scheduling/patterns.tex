@@ -20,27 +20,21 @@ static scheduler. We will show later that a static scheduler that
 makes use of these patterns yields results that are comparable to
 dynamic scheduler.
 
-We present eight primitive patterns. Each of the patterns represents a
-small stream graph consisting of one or two actors. The patterns
-distinguish between stateless and stateful actors. A stateless actor
-does not maintain any internal state that is modified from one firing
-to the next. A stateless actor is essentially a data parallel actor,
-whereas a stateful actor requires a serialization of its firings so
-that its internal state is always consistent.
+We present several primitive scheduling patterns. Each of the patterns
+represents a small stream graph consisting of one or two actors. The
+patterns distinguish between stateless and stateful actors. A
+stateless actor does not maintain any internal state that is modified
+from one firing to the next. A stateless actor is essentially a data
+parallel actor, whereas a stateful actor requires a serialization of
+its firings so that its internal state is always consistent.  For each
+pattern, we illustrate how to construct a {\it maximum efficiency
+static schedule} (MESS) for {\it two} parallel processors.
 
-The insight enabled by these patterns is that it is sufficient to
-construct a static schedule for each pattern such that the schedule
-achieves maximum utilization on just {\it two} processors. We call
-such a schedule a {\it maximum efficiency static schedule} (MESS). It
-is then possible to compose these schedules recursively to schedule
-larger stream graphs on a larger number of processors.
-%% XXX even number?
-
-A MESS is a static schedule that simply makes decisions on the
+A static schedule for our purposes simply makes decisions on the
 assignment of actors to processors, and the ordering of actor firings
-within a processor. The actor's dynamic firings are guarded by the
+within a processor. The dynamic actor firings are guarded by the
 dataflow dependencies, and such dependences are the only
-synchronization mechanisms required for proper execution. 
+synchronization mechanisms required for proper execution.
 %%Without loss
 %%of generality, we assume that all actors consume and produce an equal
 %%number of data items per firing...
@@ -54,7 +48,10 @@ The patterns themselves were initially inspired by observations
 derived from studying the characteristics of streaming application. We
 believe that in their current formulation, they present a foundation
 to further explore the complex space of scheduling tradeoffs for
-static and dynamic paradigms alike.
+static and dynamic paradigms alike.  We believe that its is possible
+to further extend the pattern-based scheduling methodology using a
+recursive composition of the patterns to schedule larger stream graphs
+on a larger number of processors.
 
 \begin{table*}[t]
 \center
