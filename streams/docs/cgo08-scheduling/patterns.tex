@@ -1,0 +1,12 @@
+\section{Fundamental Scheduling Patterns}
+
+In this paper, we require that the push, pop, and peek rates of each
+filter are known at compile time.  This enables the compiler to
+calculate a steady-state for the stream graph: a repetition of each
+filter that does not change the number of items buffered on any data
+channel~\cite{lee87,karczmarek:lctes:2003}. In combination with a
+simple program analysis that estimates the number of operations
+performed on each invocation of a given work function, the
+steady-state repetitions offer an estimate of the work performed by a
+given filter as a fraction of the overall program execution.  This
+estimate is important for our software pipelining technique.

@@ -1,0 +1,25 @@
+\section{Multicore Scheduling Framework}
+
+concept of code objects, data (buffer) objects, and communication
+channels
+
+virtual layer allows for portability: static and dynamic compilers
+(static and dynamic schedulers) operate at the virtual layer, focusing
+on application level details wrt code and data partitioning, and
+communication
+
+implementation below the layer is optimized separately, hides tedious
+details of the architecture (e.g., alignment, local store vs cache)
+
+\section{Stream Computing in the Multicore Scheduling Framework}
+
+streaming application provide an easy starting point to map 
+
+streaming program represented as a connected graph to expose
+computation and communication
+
+StreamIt used as the language to describe streaming codes
+
+StreamIt compiler already includes a rich set of optimizations and
+transformation
+
