@@ -9,22 +9,22 @@
 %% updates its internal state. When it has buffered a sufficient quantity
 %% of items of its phase to fire, it will then execute.
 
-It is possible to devise a schedule statically (e.g.,  compile time or
-at graph creationg time) or dynamically (e.g., runtime). The goal of a
-scheduler is often simply to maximize the utilization of any number of
-given resources. In the age of multicore architectures, a scheduler
-will need to utilize the cores to increase concurrency and hence
-improve the throughput of a given streaming application.
-We assume a decoupled multicore architecture where each processing
-core has its own local storage, and can only access data in its local
-memore. The architecture provides some mechanism for moving data
-between cores, or from main memory to the core. Examples of decoupled
-multicores architectures are Cell~\cite{cell} and Tile64~\cite{tilera}.
+It is possible to devise a schedule statically (e.g., compile time or
+at graph creation time) or dynamically (e.g., runtime). The goal of a
+scheduler is simply to maximize the throughput of the streaming
+application. In the age of multicore architectures, a scheduler will
+need to utilize the cores to increase concurrency and hence improve
+the throughput of a given streaming application.  We assume a
+decoupled multicore architecture where each processing core has its
+own local storage, and can only access data in its local memory. The
+architecture provides some mechanism for moving data between cores or
+from main memory to the core. Examples of decoupled multicores
+architectures are Cell~\cite{cell} and Tile64~\cite{tilera}.
 
 A dynamic scheduler is conceptually easy to understand. The scheduler
 maintains an internal representation of a given stream graph (e.g.,
 list or priority queue). In a multicore architecture, when there is a
-core available, the scheduler scans its interal representation of the
+core available, the scheduler scans its internal representation of the
 stream graph, and determines which actor is ready to fire; recall that
 an actor is ready to execute when there is sufficient buffering on its
 input channel (i.e., data dependence is satisfied).  To simplify
@@ -37,9 +37,9 @@ also informed where the input buffer for the actor resides in memory,
 and where in memory to commit (buffer) the output of the actor for its
 successors. The scheduler then updates its internal representation to
 indicate the actor firings and implement a fairness policy to assure
-overal progress (e.g., a roundrobin scheduler).
+overall progress (e.g., a roundrobin scheduler).
 
-The dynamic scheduler essentially maximizes ulitization by pipelining
+The dynamic scheduler essentially maximizes utilization by pipelining
 the execution of the stream graph and overlapping actor firings. For
 example, consider a stream graph $A\rightarrow B$ where $\rightarrow$
 denotes a FIFO connection between two actors, here $A$ and $B$. A
@@ -52,27 +52,24 @@ the output is buffered such that the corresponding (i.e., second)
 firing of $B$ consumes the correct data from the second instance of
 $A$.
 
-Let the expected (mean) work units required by actor $X$ to complete
-running a phase be $W_X$. In the example above, when $W_A > W_B$
-the processors will proceed at different rates and $P_1$ becomes a
-bottleneck. To mitigate the issue, the scheduler can run multiple
-instances of $A$ initially thus buffering a sufficient amount of data
-and creating some slack between the two processors. This avoids
-stalling the exectution and can lead to better utilization.
+%Let the expected (mean) work units required by actor $X$ to complete
+%running a phase be $W_X$. In the example above, when $W_A > W_B$
+%the processors will proceed at different rates and $P_1$ becomes a
+%bottleneck. 
 
 The are numerous heuristics and optimizations that a dynamic scheduler
 can employ to orchestrate the execution of a stream graph on a
 multicore. Ultimately the goals of the scheduler are to maximize
 utilization and throughput, and it strives to do so by balancing the
 load on the processors, maintaining adequate buffering between actors,
-and trying to do so with little runtime ovearhead.
+and trying to do so with little runtime overhead.
 
 Since a dynamic scheduler is running along with the application, it
 must be efficient in its orchestration of the schedule. 
 
 There are several concerns that arise. Large stream graphs and massive
-multicores present dual obstactles that limit the scalability of a
-centralized dyanmic scheduler. It is possible to devise distributed or
+multicores present dual obstacles that limit the scalability of a
+centralized dynamic scheduler. It is possible to devise distributed or
 hierarchical dynamic schedulers but that comes with additional
 implementation complexity.
 
