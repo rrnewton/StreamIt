@@ -11,4 +11,17 @@ work on scheduling of stream graphs has shown that good static
 estimation of work is
 feasible~\cite{mgordon-asplos04,mgordon-asplos06}.
 
+In the case of the patterns shown in the previous section, variance in
+the expected work duration of an actor can lower utilization and
+throughput when actor communicate across processor boundaries. It is
+however possible to compensate for the variance by simply creating
+{\it slack} between the two processors so that they are not tightly
+coupled. Slack is essentially the buffering of data produced by actors
+on one processor and consumed on another. As the slack increases, or
+in other words, the maximum allowed buffer size is increased, the
+static schedule becomes more resillient to variance and maintain high
+utilization and sustain throughput.
 
+We emperically observed this phenomena by both simulating the patterns
+using different variance distributions, and through actual
+implementations and measurements on a Cell processor.
