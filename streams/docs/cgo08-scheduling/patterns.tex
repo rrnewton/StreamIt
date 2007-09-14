@@ -101,7 +101,7 @@ appropriately between processors.
 
 \subsection{Pattern 3}
 
-The third pattern is shown if Figure~\ref{fig:pattern3}. It consists
+The third pattern is shown in Figure~\ref{fig:pattern3}. It consists
 of two actors $A\rightarrow B$ connected through a FIFO to form a two
 stage {\it pipeline}. Both of the actors are stateless, and hence data
 parallel. In this pattern, the maximum efficiency schedule runs one
@@ -111,7 +111,7 @@ requires no synchronization between processors.
 
 \subsection{Pattern 4}
 
-The fourth pattern is shown if Figure~\ref{fig:pattern4}. It is
+The fourth pattern is shown in Figure~\ref{fig:pattern4}. It is
 similar to the previous pattern with the disctintion that the actors
 in the pipeline $A\rightarrow B$ are stateful. The maximum efficiency
 schedule for this pattern is to place one actor on one processor and
@@ -126,7 +126,7 @@ create slack between the two processors.
 
 \subsection{Pattern 5}
 
-The fifth pattern is shown if Figure~\ref{fig:pattern5}. It is a
+The fifth pattern is shown in Figure~\ref{fig:pattern5}. It is a
 pipline $A\rightarrow B$ where actor $A$ is stateless and actor $B$ is
 stateful. In this pattern, the characteristics of the work required to
 execute $A$ and $B$ can lead to different maximal efficiency schedules.
@@ -134,16 +134,15 @@ There are two cases. First, if $W_A \le W_B$ then the schedule is
 bottlenecked by the stateful actor and the best schedule is the same
 as the one derrived for Pattern~4. However, if the bottleneck is the
 stateless actor, then there is an opportunity to exploit the data
-parallelism in the stateless actor to fully hide the load imbalance
-between the two actors.
+parallelism in the stateless actor to fully hide the work disparity.
 
 This fifth pattern (and as will be apparent shortly in the following
 pattern) leads to a unique and elegant MESS that has a closed form
 solution. Consider the simple case where $A$ produces a single item
 per firing, and $B$ consumes a single item per firing, and let $W_A =
 2$ units of work and $W_B = 1$ unit of work. Intuitively, to maximize
-utilization the two processors, first we require that the total work
-done in a steady state by $P_1$ equal the work done by $P_2$. In other
+utilization of the two processors, we require that the total work
+done in a steady state by $P_1$ equals the work done by $P_2$. In other
 words, it is necessary for the two processors to be properly load
 balanced. Furthermore, to miminize synchronization overhead, the
 stateful actors should be collocated on the same processor. Lastly,
@@ -151,7 +150,7 @@ the schedule should maximize the decoupling between the two processors
 by assigning the greatest possible number of stateless actors to the
 processor where the stateful actor is not assigned.
 
-In the domain on instruction scheduling, if $A$ and $B$ are
+In the domain of instruction scheduling, if $A$ and $B$ are
 instructions in a loop, then unrolling the loop exposes more
 instruction level parallelism that allows a compiler to hide the
 latency of either instruction. Coarse grained software
