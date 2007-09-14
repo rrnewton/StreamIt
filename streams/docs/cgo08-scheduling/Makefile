@@ -15,7 +15,7 @@ PS2PDF = ps2pdfwr
 .PHONY : $(SOURCES)
 
 # make will execute this as a default
-all: dvi
+all: pdf
 
 # shortcuts
 dvi: $(document).dvi
@@ -24,7 +24,7 @@ pdf: $(document).pdf
 
 # recreate the dvi using bakoma versions of CMR fonts (using kbarr's map)
 $(document).pdf : $(document).dvi
-	env DVIPSRC /u/kbarr/projects/latex/.dvipsrc $(DVIPS) $(DVIPSARGS) -j0 -f < $(document).dvi > $(document).ps
+	$(DVIPS) $(DVIPSARGS) -j0 -f < $(document).dvi > $(document).ps
 	$(PS2PDF) $(document).ps $(document).pdf
 
 $(document).ps : $(document).dvi
