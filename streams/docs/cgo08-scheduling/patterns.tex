@@ -75,7 +75,7 @@ static and dynamic paradigms alike.
 \end{table*}
 
 
-\subsection{Pattern 1}
+\subsection{Pattern 1: Singular Data-Parallel Actor}
 
 The simplest pattern is shown in Figure~\ref{fig:pattern1}. It
 represents a singular {\it stateless} actor $A$ that consumes no
@@ -85,7 +85,7 @@ This patterns is trivial to schedule statically for two
 processors. Since the actor is stateless, and has no dependences, each
 of the two processors executes an instance of $A$ as shown Table~\ref{tab:pattern-sched}.
 
-\subsection{Pattern 2}
+\subsection{Pattern 2: Singular Stateful Actor}
 
 A related pattern is shown in Figure~\ref{fig:pattern2}. It
 represents a singular {\it stateful} actor $A$ that consumes no input
@@ -99,7 +99,7 @@ processor avoids inter-processor synchronization and
 potentially costly communication to mutate the state of the actor
 appropriately between processors.
 
-\subsection{Pattern 3}
+\subsection{Pattern 3: Data-Parallel Pipeline}
 
 The third pattern is shown in Figure~\ref{fig:pattern3}. It consists
 of two actors $A\rightarrow B$ connected through a FIFO to form a two
@@ -109,7 +109,7 @@ instance of the pipeline on processor $P_1$ and another independent
 instance of the pipeline on the second processor $P_2$.  This schedule
 requires no synchronization between processors.
 
-\subsection{Pattern 4}
+\subsection{Pattern 4: Stateful Pipeline}
 
 The fourth pattern is shown if Figure~\ref{fig:pattern4}. It is
 similar to the previous pattern with the distinction that the actors
@@ -120,7 +120,7 @@ between the two processors in terms of data exchange along the FIFO
 channel. In other words, an instance $i$ of actor $B$ can not execute
 until instance $i$ of actor $A$ has completed its execution.  
 
-\subsection{Pattern 5}
+\subsection{Pattern 5: Mixed Mode Pipeline with Stateless Source}
 
 The fifth pattern is shown if Figure~\ref{fig:pattern5}. It is a
 pipeline $A\rightarrow B$ where actor $A$ is stateless and actor $B$
@@ -185,7 +185,7 @@ estimation for the actor firings, it is feasible to statically
 construct a schedule that achieves a utilization that is comparable to
 a dynamic scheduler.
 
-\subsection{Pattern 6}
+\subsection{Pattern 6: Mixed Mode Pipeline with Stateful Source}
 
 The sixth pattern is also a pipeline $A\rightarrow B$ but in this case
 actor $A$ is stateful and actor $B$ is stateless. This pattern is
