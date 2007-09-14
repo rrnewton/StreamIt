@@ -43,7 +43,7 @@ The dynamic scheduler essentially maximizes ulitization by pipelining
 the execution of the stream graph and overlapping actor firings. For
 example, consider a stream graph $A\rightarrow B$ where $\rightarrow$
 denotes a FIFO connection between two actors, here $A$ and $B$. A
-scheduler for a two processor multicore ($P_1$, and $P_2$) will assign
+scheduler for a two processor multicore ($P_1$ and $P_2$) will assign
 $A$ to processor $P_1$ and when $A$ completes its firing, the
 scheduler assigns $B$ to processor $P_2$. While $B$ is running
 however, the scheduler can determine that another firing of $A$ is
@@ -57,7 +57,7 @@ running a phase be $W_X$. In the example above, when $W_A > W_B$
 the processors will proceed at different rates and $P_1$ becomes a
 bottleneck. To mitigate the issue, the scheduler can run multiple
 instances of $A$ initially thus buffering a sufficient amount of data
-and creating some slack between the two processors. This avoid
+and creating some slack between the two processors. This avoids
 stalling the exectution and can lead to better utilization.
 
 The are numerous heuristics and optimizations that a dynamic scheduler

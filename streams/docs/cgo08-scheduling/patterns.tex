@@ -58,6 +58,7 @@ static and dynamic paradigms alike.
 
 \begin{table*}[t]
 \center
+\caption{\small Maximum efficiency static schedules for the stream graph patterns.}
 {\small
 \begin{tabular}{|c|c|c|c|} \hline
                  & {\bf bottleneck} & ${\bf P_1}$  & ${\bf P_2}$ \\ \hline
@@ -70,7 +71,6 @@ static and dynamic paradigms alike.
 {\bf Pattern 6}  & $W_A \ge W_B$    & $A$     & $B$ \\ \cline{2-4}
                  & $W_A < W_B$      & $(2W_B) A, (W_B - W_A) B$ & $(W_A + W_B) B$ \\ \hline
 \end{tabular}}
-\caption{\small Maximum efficiency static schedules for the stream graph patterns.}
 \label{tab:pattern-sched}
 \end{table*}
 
@@ -87,7 +87,7 @@ of the two processors executes an instance of $A$ as shown Table~\ref{tab:patter
 
 \subsection{Pattern 2}
 
-A related pattern is shown in Figure~\ref{fig:pattern2}. It also
+A related pattern is shown in Figure~\ref{fig:pattern2}. It
 represents a singular {\it stateful} actor $A$ that consumes no input
 and produces no output.
 %%, and requires $W_A$ units of work to execute.
@@ -95,7 +95,7 @@ This patterns is also trivial to schedule statically. Since there is a
 dependence between each of the actor firings, the only feasible
 schedule is to sequentially execute the actor on a single
 processor. The binding of the actor to a specific and unique
-processor, the schedule avoids inter-processor synchronization, and
+processor avoids inter-processor synchronization and
 potentially costly communication to mutate the state of the actor
 appropriately between processors.
 
