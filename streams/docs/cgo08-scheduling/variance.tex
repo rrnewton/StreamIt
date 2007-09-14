@@ -1,15 +1,14 @@
 \section{Tolerating Variance With Static Schedules}
 
-While the scheduling patterns described in the previous section can
-achieve the best possible utilization and throughput (when scheduled
-for two processors), there are factors used to derive the schedules
-that may vary at runtime. A particular challenge that a static
-scheduler must deal with is the notion of work units $W_X$required by
-an actor $X$. The static scheduling requires good static estimation on
-the work requirements of an actor. Previous work in feedback directed
-optimizations has shown that profiling is a practical approach to
-characterizing applications. There are numerous examples of profiling
-used for various compiler optimizations such as inlining, unrolling,
-data prefetching, trace formation, etc.
+A particular challenge that a static scheduler faces is posed by the
+work estimation $W_X$ for an actor $X$. The static scheduling requires
+an effective work estimation methodology. Previous work in feedback
+directed optimizations has shown that profiling is a practical
+approach to characterizing applications. There are numerous examples
+of profiling used for various compiler optimizations such as inlining,
+unrolling, data prefetching, trace formation, etc. And prior related
+work on scheduling of stream graphs has shown that good static
+estimation of work is
+feasible~\cite{mgordon-asplos04,mgordon-asplos06}.
 
 
