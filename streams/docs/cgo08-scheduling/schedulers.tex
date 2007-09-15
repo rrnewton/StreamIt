@@ -37,7 +37,7 @@ also informed where the input buffer for the actor resides in memory,
 and where in memory to commit (buffer) the output of the actor for its
 successors. The scheduler then updates its internal representation to
 indicate the actor firings and implement a fairness policy to assure
-overall progress (e.g., a roundrobin scheduler).
+overall progress (e.g., a round-robin scheduler).
 
 The dynamic scheduler essentially maximizes utilization by pipelining
 the execution of the stream graph and overlapping actor firings. For
@@ -64,13 +64,29 @@ utilization and throughput, and it strives to do so by balancing the
 load on the processors, maintaining adequate buffering between actors,
 and trying to do so with little runtime overhead.
 
-Since a dynamic scheduler is running along with the application, it
-must be efficient in its orchestration of the schedule. 
-
-There are several concerns that arise. Large stream graphs and massive
+There are several concerns that arise. Since a dynamic scheduler is
+running along with the application, it must be efficient in its
+orchestration of the schedule. Large stream graphs and massive
 multicores present dual obstacles that limit the scalability of a
 centralized dynamic scheduler. It is possible to devise distributed or
 hierarchical dynamic schedulers but that comes with additional
-implementation complexity.
+implementation complexity. Other issues include limited scheduling
+foresight that increase buffer lifetimes and the total buffer
+footprint in memory. This can arise when an actor fires too soon in
+the schedule and its output must be preserved for a long period of
+time before the consumer begins to process the data. This is akin to
+agressive instruction-level speculation that increases register
+lifetimes and hence register pressure.
 
-%% XXX more on the drawbacks
+In the case of stream graph scheduling, one can argue that the
+virtualization of memory easily ameloriates the issue of long buffer
+lifetimes. However, when the scheduler operates in a context with
+finite memory, the scheduling decisions can become more complex,
+leading to greater runtime overhead.
+
+We implemented an general scheduling framework for stream graphs that
+admits statically orchestrated schedules as well as dynamic scheduling
+heuristics. We use the scheduling framework to evaluate static and
+dynamic scheduling paradigms. In general we found that our static
+scheduling methodology is comparable to our dynamic scheduler, both
+achieving high performance on our set of streaming benchmarks.

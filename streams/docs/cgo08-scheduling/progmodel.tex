@@ -13,16 +13,6 @@
 %% \end{center}
 %% \end{figure}
 
-\begin{figure}[t]
-\begin{center}
-\psfig{figure=graph-example.eps,height=1.5in}
-\vspace{9pt}
-\caption{{\small Example stream graph.
-\protect\label{fig:stream-rates}}}
-\end{center}
-\vspace{-26pt}
-\end{figure}
-
 There are are a number of stream-oriented languages drawing from
 domains such as functional, dataflow, CSP and synchronous
 programming~\cite{survey97}. We assume an architecture-independent
@@ -38,12 +28,22 @@ of phases is known at compile time, and their execution is cyclic
 (that is, after executing the last phase, the first phase is executed
 again).
 
+
+\begin{floatingfigure}[r]{0.4\textwidth}
+\centering
+\psfig{figure=graph-example.eps,height=1.5in}
+\vspace{-10pt}
+\caption{{\small Example stream graph.
+\protect\label{fig:stream-rates}}}
+\end{floatingfigure}
 An example stream graph is shown in Figure~\ref{fig:stream-rates}.
 Nodes are annotated with their I/O rates. For example, node $C$
 consumes 3 items and produces 2 items on each execution. Node $A$ is a
 round-robin splitter that produces one item on its left channel during
 the first phase, and one item on its right channel during the second
-phase (similarly for Node $E$).
+phase. Similarly Node $E$ is a joiner that consumes one item from its
+left channel during the first phase, and another item from its right
+channel during the second phase.
 
 %% We will commonly refer to actors as {\it filters} as is the case with
 %% other  streaming languages,

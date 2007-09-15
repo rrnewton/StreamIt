@@ -11,14 +11,14 @@
 %% given filter as a fraction of the overall program execution.  This
 %% estimate is important for our software pipelining technique.
 
-It may appear that there is a complex space of trade-offs to explore
-when devising a schedule. What we show in this section is that the
-scheduling decisions can be broken down to to reasoning about simple
-stream graph patterns. The simple decomposition of stream graphs into
-these patterns facilities more scheduling freedom, especially for a
-static scheduler. We will show later that a static scheduler that
+There is a complex space of trade-offs to explore when devising a
+schedule. What we show in this section is that scheduling decisions
+can be broken down to reasoning about simple stream graph
+patterns. The simple decomposition of stream graphs into these
+patterns facilities more scheduling freedom and better efficiency for
+a static scheduler. We will show later that a static scheduler that
 makes use of these patterns yields results that are comparable to
-dynamic scheduler.
+a dynamic scheduler.
 
 We present several primitive scheduling patterns. Each of the patterns
 represents a small stream graph consisting of one or two actors. The
@@ -31,7 +31,7 @@ pattern, we illustrate how to construct a {\it maximum efficiency
 static schedule} (MESS) for {\it two} parallel processors.
 
 A static schedule for our purposes simply makes decisions on the
-assignment of actors to processors, and the ordering of actor firings
+assignment of actors to processors and the ordering of actor firings
 within a processor. The dynamic actor firings are guarded by the
 dataflow dependencies, and such dependences are the only
 synchronization mechanisms required for proper execution.
@@ -40,7 +40,8 @@ synchronization mechanisms required for proper execution.
 %%number of data items per firing...
 This is different from a full dynamic scheduler which also must decide
 on the assignment and ordering of actors, or full static schedulers
-that require synchronization barriers. The combination of static
+that require synchronization barriers or explicit binding of actor
+firings to time slots. The combination of static
 assignment and ordering with dynamic issue offers a scalable solution
 for multicore architectures.
 
@@ -200,3 +201,41 @@ those in Pattern 5 leads to the schedule illustrated in
 Figure~\ref{fig:pattern6-sched} when $W_A = 1$ and $W_B = 2$.  A
 generalization of this example leads to the closed form scheduling
 solutions shown in Table~\ref{tab:patterns-sched} for any $W_A < W_B$.
+
+\subsection{Complex Patterns}
+
+The previous patterns addressed pipeline composition of actors. We
+consider them simple patterns, and more complex patterns are
+possible. Some examples are shown in
+Figures~\ref{fig:pattern7}~and~\ref{fig:pattern8}. These pattern deals
+with explicit concurrency between actors that share a common splitter
+and a common joiner.
+
+\begin{figure}[t]
+\begin{center}
+ \includegraphics[scale=1, angle=0]{./constructs-eg.eps}
+ \caption{Examples of hierarchical streams.}
+ \label{fig:containers}
+\end{center}
+\end{figure}
+
+We assume there are three fundamental primitives for hierarchically
+composing actors into larger stream graphs. They are shown in
+Figure~\ref{fig:containers}. A {\it pipeline} connects streams
+sequentially, as we have already described. A {\it splitjoin}
+specifies independent and parallel streams that diverge from a common
+{\it splitter} and merge into a common {\it joiner}. The final
+hierarchical primitive is a {\it feedbackloop} that provides a way to
+create cycles in the graph. The structured composition of actors into
+stream graphs using these primitives simplifies the scheduling space
+for a static scheduler. We handle complex patterns that arise from
+long pipelines, splitjoins, and feedback loops, by fusing the graphs
+contained withing the primitive down to a single actor. In other words
+we refine the stream graph to the most natural simple scheduling
+pattern feasible. Our experience with the set of streaming benchmarks
+we evaluate is that this is a practical approach that yields good
+overall performance. More intelligent ways to handle the composition
+of the patterns present an interesting and challenging topic, and are
+beyond the scope of this paper.
+
+
