@@ -43,16 +43,22 @@ $\sigma$ = 1; and (4) Normal distribution with $\sigma$ = 10.
 
 We emperically tested and observed this phenomena using both
 simulations of the patterns and through actual implementations and
-measurements on a Cell processor.  In Figure \ref{fig:variance-chart}
-we show the results of our simulations on Pattern 6.  In this
-simulation, the ratio of the workload of the (stateful) producer actor
-to the workload of the (stateless) consumer actor is 1:2. The work of
-the producer actor varies by a distribution centered around the
-average.  The rates of the actors are matched with the producer
-producing 1 item and the consumer consuming 1 item per execution.
-From the figure, we can see that for three of distributions,
+measurements on a Cell processor.  Figure \ref{fig:variance-chart}
+shows the results of our simulations on Pattern 6.  In this
+simulation, the ratio of the workload of the (stateful) producing
+actor to the workload of the (stateless) consuming actor is 1:2. The
+work of the producing actor varies by a distribution centered around
+the average. The rates of the actors are matched with the producer
+producing one item and the consumer consuming one item per execution.
+From the figure, it is apparent that for three of the distributions,
 introducing small amounts buffering allows the schedule to achieve
 near 100\% utilization.  The remaining distribution has very high
-variance, but if we allow enough buffering (256 elements), we can
-achieve over 95\% utilization.
+variance, but if we allow enough buffering (256 elements), the static
+schedule can achieve over 95\% utilization. We simulated the other
+patterns as well and the results were nearly identical in all
+cases.
+
+In addition to the simulations, we also verified the slack hypothesis
+on the Cell processor by running synthetic stream programs patterned
+according to the scheduling patterns.
 
