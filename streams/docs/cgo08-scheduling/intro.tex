@@ -2,15 +2,15 @@
 
 The trend of processors with multiple cores on a chip is continuing
 and all processor roadmaps are toward processors with more and more
-cores on a chip. As the number of cores increase, so will the
-decoupling between cores, so that shared storage occurs further away
+cores on a chip. As the number of cores increases, so will the
+decoupling between cores such that shared storage occurs further away
 from the cores. A commercial example of such an architecture that is
-available today is the Cell~\cite{cell} processor with 8 cores each with its own
-local storage and a DMA engine to manage data movement in and out of
-its local store. Another commercial processor with 64 cores is the
-Tile64~\cite{tilera} chip.
+available today is the Cell~\cite{cell} processor with 8 cores each
+with its own local storage and a DMA engine to manage data movement in
+and out of its local store. Another commercial decoupled multicore
+processor is the Tile64~\cite{tilera} chip with 64 cores.
 
-Multicores requires partitioning of the application code so that there
+Multicores require partitioning of the application code so that there
 is an adequate number of code fragments that can occupy the available
 cores, increasing utilization and ultimately improving application throughput.
 Each code fragment requires its own data chunk to compute on, and

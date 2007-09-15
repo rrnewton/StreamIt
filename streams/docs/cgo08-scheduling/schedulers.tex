@@ -30,7 +30,8 @@ an actor is ready to execute when there is sufficient buffering on its
 input channel (i.e., data dependence is satisfied).  To simplify
 matters, we only consider actors where the I/O rates are known and do
 not vary from one instance of a phase to the next instance of the same
-phase; we will relax this constraint in later sections of the paper.
+phase. 
+%%; we will relax this constraint in later sections of the paper.
 
 The scheduler assigns the actor to the available core. The core is
 also informed where the input buffer for the actor resides in memory,
@@ -64,19 +65,20 @@ utilization and throughput, and it strives to do so by balancing the
 load on the processors, maintaining adequate buffering between actors,
 and trying to do so with little runtime overhead.
 
-There are several concerns that arise. Since a dynamic scheduler is
-running along with the application, it must be efficient in its
-orchestration of the schedule. Large stream graphs and massive
-multicores present dual obstacles that limit the scalability of a
-centralized dynamic scheduler. It is possible to devise distributed or
-hierarchical dynamic schedulers but that comes with additional
-implementation complexity. Other issues include limited scheduling
-foresight that increase buffer lifetimes and the total buffer
-footprint in memory. This can arise when an actor fires too soon in
-the schedule and its output must be preserved for a long period of
-time before the consumer begins to process the data. This is akin to
-agressive instruction-level speculation that increases register
-lifetimes and hence register pressure.
+There are several concerns that arise when constructing a
+schedule. Since a dynamic scheduler is running along with the
+application, it must be efficient in its orchestration of the
+schedule. Large stream graphs and massive multicores present dual
+obstacles that limit the scalability of a centralized dynamic
+scheduler. It is possible to devise distributed or hierarchical
+dynamic schedulers but that comes with additional implementation
+complexity. Other issues include limited scheduling foresight that
+increase buffer lifetimes and the total buffer footprint in
+memory. This can arise when an actor fires too soon in the schedule
+and its output must be preserved for a long period of time before the
+consumer begins to process the data. This is akin to agressive
+instruction-level speculation that increases register lifetimes and
+hence register pressure.
 
 In the case of stream graph scheduling, one can argue that the
 virtualization of memory easily ameloriates the issue of long buffer

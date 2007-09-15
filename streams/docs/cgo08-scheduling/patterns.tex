@@ -68,6 +68,9 @@ on a larger number of processors.
                  & $W_A > W_B$      & $(W_A - W_B) A, (2W_A) B$ & $(W_A + W_B) B$ \\ \hline
 {\bf Pattern 6}  & $W_A \ge W_B$    & $A$     & $B$ \\ \cline{2-4}
                  & $W_A < W_B$      & $(2W_B) A, (W_B - W_A) B$ & $(W_A + W_B) B$ \\ \hline
+{\bf Pattern 7}  & $W_A \le W_B$    & $A$     & $B$ \\ \cline{2-4}
+                 & $W_A > W_B$      & $(W_A - W_B) A, (2W_A) B$ & $(W_A + W_B) B$ \\ \hline
+{\bf Pattern 8}  & ---              & $A$     & $B$ \\ \hline
 \end{tabular}}
 \label{tab:pattern-sched}
 \end{table*}
@@ -211,40 +214,56 @@ generalization of this example leads to the closed form scheduling
 solutions shown in Table~\ref{tab:patterns-sched} for any $W_A < W_B$.
 
 
+\subsection{Pattern 7: Mixed Mode Explicitly Parallel Actors}
+
+Unlike the previous patterns which addressed pipeline composition of
+actors, this patterns shown in Figure~\ref{fig:patterns}g addresses
+explicit concurrency between actors that are not in a direct
+producer-consumer relationship, and one of the actors ($A$) is
+stateless and the other ($B$) stateful. As it turns out, the
+scheduling pattern in this case follows that of a previous pattern
+(Pattern 5), with the exception that no buffers are shared between the
+two actors. Hence the only consideration that a static scheduler  is
+cognizant of is the load balancing of work across the two
+processors. When $W_A \le W_B$ the schedule is trivial: each actor is
+assigned to a unique processor. When $W_A > W_B$, the scheduling
+pattern is the same as that for Pattern 5.
+
+\subsection{Pattern 8: Stateful Explicitly Parallel Actors}
+
+The final pattern that we consider is shown in
+Figure~\ref{fig:patterns}h. It is similar to the previous patterns but
+in this case both actors are stateful. The schedule in this case is
+trivial to construct and simple assigns each actor to a unique
+processor.
+
 \subsection{Complex Patterns}
 
-The previous patterns addressed pipeline composition of actors. We
-consider them simple patterns, and more complex patterns are
-possible. Some examples are shown in
-Figures~\ref{fig:patterns}g~and~\ref{fig:patterns}h. These pattern deals
-with explicit concurrency between actors that share a common splitter
-and a common joiner.
+%% \begin{figure}[t]
+%% \begin{center}
+%%  \includegraphics[scale=1, angle=0]{./constructs-eg.eps}
+%%  \caption{Examples of hierarchical streams.}
+%%  \label{fig:containers}
+%% \end{center}
+%% \end{figure}
 
-\begin{figure}[t]
-\begin{center}
- \includegraphics[scale=1, angle=0]{./constructs-eg.eps}
- \caption{Examples of hierarchical streams.}
- \label{fig:containers}
-\end{center}
-\end{figure}
-
-We assume there are three fundamental primitives for hierarchically
-composing actors into larger stream graphs. They are shown in
-Figure~\ref{fig:containers}. A {\it pipeline} connects streams
-sequentially, as we have already described. A {\it splitjoin}
-specifies independent and parallel streams that diverge from a common
-{\it splitter} and merge into a common {\it joiner}. The final
-hierarchical primitive is a {\it feedbackloop} that provides a way to
-create cycles in the graph. The structured composition of actors into
-stream graphs using these primitives simplifies the scheduling space
-for a static scheduler. We handle complex patterns that arise from
-long pipelines, splitjoins, and feedback loops, by fusing the graphs
-contained withing the primitive down to a single actor. In other words
-we refine the stream graph to the most natural simple scheduling
-pattern feasible. Our experience with the set of streaming benchmarks
-we evaluate is that this is a practical approach that yields good
-overall performance. More intelligent ways to handle the composition
-of the patterns present an interesting and challenging topic, and are
-beyond the scope of this paper.
+%% We assume there are three fundamental primitives for hierarchically
+%% composing actors into larger stream graphs. They are shown in
+%% Figure~\ref{fig:containers}. A {\it pipeline} connects streams
+%% sequentially, as we have already described. A {\it splitjoin}
+%% specifies independent and parallel streams that diverge from a common
+%% {\it splitter} and merge into a common {\it joiner}. The final
+%% hierarchical primitive is a {\it feedbackloop} that provides a way to
+%% create cycles in the graph. The structured composition of actors into
+%% stream graphs using these primitives simplifies the scheduling space
+%% for a static scheduler. 
+There are other more complex patterns that arise in streaming
+applications. However we have found that it is practical to refine
+large and complex stream graphs to simple and more natural scheduling
+patterns. Our experience with the set of streaming benchmarks we
+evaluate is that this is a practical approach that yields good overall
+performance. More intelligent ways to handle the composition of the
+patterns present an interesting and challenging topic, and are beyond
+the scope of this paper.
 
 
