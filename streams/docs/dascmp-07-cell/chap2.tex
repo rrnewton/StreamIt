@@ -1,0 +1,130 @@
+\section{Background and Related Work}\label{ch:bg}
+
+Streaming languages provide an attractive alternative to sequential languages for many applications. In a streaming language, the programmer defines actors that operate on data streams and composes programs by connecting actors. Many common high-performance applications, especially those involving signal, audio, image, and video processing, have explicit block diagram structure and are most easily conceptualized in that manner, making streaming languages a natural choice for these applications.
+
+Because programs written in streaming languages are explicitly structured as communicating actors, they typically expose a high degree of parallelism. This allows streaming language compilers to easily analyze stream programs and efficiently parallelize them. Compared to sequential languages, streaming languages free the programmer from the burden of having to explicitly write parallelized code for specific architectures, allowing him to focus on expressing the high-level semantics of the algorithm in a natural way.
+
+Recent developments in streaming languages include Brook~\cite{brook}, Cg~\cite{cg}, and StreamC/KernelC~\cite{streamc}.
+
+\section{The StreamIt Programming Language}\label{ch:bg:str}
+
+StreamIt~\cite{asplos02} is a high-performance streaming language developed at MIT. StreamIt is based on the Synchronous Dataflow model of streaming computation. In the SDF model~\cite{sdf}, actors are constrained to known, fixed communication rates. This restriction makes it easier for compilers to analyze the stream graph and schedule actors for efficient parallel execution. StreamIt further extends the SDF model with additional language elements that impose hierarchical structure on the stream graph and provide additional expressive power. The StreamIt language also places a high degree of emphasis on code reuse. All of these features serve to increase programmer productivity; complex applications have been written in StreamIt, including an MPEG2 encoder and decoder~\cite{mpeg} and image-based motion estimation~\cite{basier}.
+
+The structure and parallelism exposed by StreamIt programs allows the StreamIt compiler to perform a large set of optimizations and efficiently execute programs on parallel architectures. The compiler targets a number of architectures, including standard unicore and multicore processors, computing clusters, and the Raw processor.\footnote{A Cell backend is currently under development; the work done in this thesis directly contributes to that.}
+
+\subsection{Filters}
+
+The basic unit of a StreamIt program is the \emph{filter}. This construct represents an actor that reads data items from a single input tape, processes them, and writes data items to a single output tape. Filters are allowed to \emph{pop} items from the input tape, \emph{push} items onto the output tape, and \emph{peek} at items on the input tape without removing them. Individual filters are independent and communicate only through the data items on their tapes. Each filter must define a \emph{work function} that specifies the work done by each iteration of the actor; work functions are written in a general-purpose sequential language that resembles Java in syntax. Work functions are required to be annotated with pop, peek, and push rates, which (for the purposes of this thesis) must be static and fully known at compile time.
+
+Filters can also define constants and arbitrary helper functions. In addition, filters may declare mutable fields; this creates \emph{state} that is maintained across work function iterations. Filters can be declared with parameters that are provided when filters are instantiated, creating significant opportunities for code reuse.
+
+\subsection{Composing Streams: Pipelines and Splitjoins}
+
+StreamIt provides the \emph{pipeline} and \emph{splitjoin} constructs to compose StreamIt constructs in a hierarchical manner. Each StreamIt construct has a single input tape and single output tape, allowing for arbitrarily deep hierarchical composition.
+
+The \emph{pipeline} construct connects multiple child streams (which may be filters, pipelines, or splitjoins) in a pipeline, with the input tape of each stream connected to the output tape of the previous stream in the pipeline.
+
+The \emph{splitjoin} construct splits a stream into multiple child tasks. At the top of a splitjoin, a \emph{splitter} splits the single input tape into multiple tapes. StreamIt allows two types of splitters: \emph{duplicate} splitters, which copy every item on the input tape to every output tape, and \emph{round-robin} splitters, which send each item on the input tape to a different output tape in weighted round-robin fashion. The child streams of the splitjoin have their input tapes connected to the outputs of the splitter. At the bottom of the splitjoin, a \emph{joiner} joins the outputs of the child streams into a single output tape. Joiners always operate in weighted round-robin fashion.
+
+\subsection{Execution Model and Compiler Optimizations}\label{ch:bg:str:exec}
+
+A full StreamIt program consists of a top-level stream (a filter, pipeline, or splitjoin) that defines a hierarchical stream graph. At the leaves of the hierarchy are individual filters, connected by channels. When a StreamIt program executes, the top-level stream is implicitly wrapped in an infinite loop.
+
+A \emph{steady state} is a repetition of each filter such that when the steady state is executed, the amount of data in all channels remains unchanged. The StreamIt compiler performs optimizations and execution in terms of the steady state.
+
+The stream graph of a StreamIt program exposes three types of coarse-grained parallelism:
+\begin{itemize}
+\item Task parallelism: parallelism explicitly defined by the stream graph. For instance, the child streams of a splitjoin are task-parallel; they have no dependencies on each other, and can be run in parallel.
+\item Data parallelism. Filters that are stateless are data-parallel; different iterations of a data-parallel filter have no dependencies on each other, and thus multiple instances of a data-parallel filter can be simultaneously run to process data from different iterations of the stream graph.
+\item Pipeline parallelism: parallelism exposed by filters connected in a pipeline.
+\end{itemize}
+
+Pipeline parallelism can be exploited by using coarse-grained software pipelining.~\cite{asplos06} An initialization schedule is first run to set up sufficient data in all channels. Thereafter, whenever the steady state schedule is run, there are no longer any dependencies between different filters in the steady state, allowing multiple filters to be executed in parallel.
+
+The StreamIt compiler uses all three types of parallelism to achieve optimal performance on parallel architectures. The compiler can also \emph{fuse} multiple filters together, producing a single filter. This fused filter typically has a lower communication--computation ratio than the original filters. When stateless filters that do not perform peeking are fused, the result is also a stateless (and hence data-parallel) filter that does not peek.
+
+\subsection{Extensions}
+
+The full StreamIt language provides a number of additional features beyond the basic model described above. In particular, StreamIt supports \emph{i}) an additional \emph{feedbackloop} construct, which defines a feedback loop that introduces a cycle into the stream graph, \emph{ii}) filters with dynamic rates that need not be fixed or known at compile time, and \emph{iii}) teleport messaging for out-of-band communication between filters~\cite{messaging}. These language features greatly increase the power of language, allowing more complex applications to be more easily written.
+
+The StreamIt compiler is also able to perform cache-aware~\cite{cacheopt} and domain-specific~\cite{linear03,linear05} optimizations.
+
+\section{The Cell Architecture}\label{ch:bg:cell}
+
+The Cell architecture~\cite{cell:website,cell:intro,cell:arch,cell:handbook} is a novel multicore architecture designed for high-performance computing. Compared to a standard SMP architecture, Cell has two major differences:
+\begin{itemize}
+\item Cell is a heterogeneous architecture consisting of nine cores per physical processor. One core, the Power Processing Element (PPE), is a general-purpose processor. The other eight cores are Synergistic Processing Elements (SPEs) that are dedicated for computation.
+\item Cell is not a shared-memory architecture. SPEs can only directly address their own limited local store. Programmers have explicit control over DMA operations to copy data between local store and memory.
+\end{itemize}
+
+\subsection{PPE}
+
+The PPE is a 64-bit, two-way SMT, PowerPC-compatible processor.\footnote{The word size on Cell is considered to be 32 bits. A common unit of data is the quadword, which is 16 bytes.} All system code is run on the PPE. The PPE also contains additional facilities for supporting and controlling SPEs.
+
+The PPE is designed as a control processor, and is not optimized for computation. It has a simplified in-order pipeline with no dynamic branch prediction. In addition, many instructions on the PPE (such as integer multiply and divide) are not pipelined.
+
+\subsection{SPEs}
+
+SPEs are designed to act as dedicated computation units. Each SPE has a large 128-entry register file; all registers are 128-bit SIMD registers that can be treated as short vectors of any of the standard integer or floating point data types. Each register can also be treated as the scalar value that occupies the first element of the vector. SPEs have a separate instruction set from the PPE; all computation instructions are SIMD and operate on all elements of a register, with different forms provided for each supported data type. However, SPEs are optimized for single-precision floating-point operations.
+
+SPEs also have a simplified in-order pipeline without dynamic branch prediction. The SPE pipeline supports dual-issue of certain pairs of instructions. In general, the design of the SPE moves the task of instruction scheduling from the processor to the compiler or programmer.
+
+Each SPE has its own 256 KB local store (LS).\footnote{We will sometimes use the term \emph{SPE} to refer to the SPE's local store, and \emph{PPE} to refer to memory; the usage should be clear from the context.} SPE load and store instructions can only directly access local store; all code and data that an SPE uses must be located in its local store. Loads and stores can only be done on a 16-byte granularity; loading a scalar that is not aligned on a quadword boundary requires an additional rotate instruction, and storing a scalar requires a read-modify-write operation. SPEs have no cache; however, loads and stores have short 5-cycle latencies and are fully pipelined (in effect, the local store acts as a software-controlled cache).
+
+SPEs do not have paging or protection facilities, and all code running on an SPE is application code. In order to read or write data in memory, SPE programs must explicitly use special instructions to initiate DMA operations. Each SPE contains a Memory Flow Controller (MFC) that handles DMA transfers; once an SPE program has started a transfer, the MFC carries it out in the background while the SPE continues to execute and access local store. The SPE can poll or elect to receive interrupts when DMA operations complete. The MFC supports up to 16 concurrent DMA transfers.
+
+The MFC uses the page tables on the PPE to perform address translation; thus, SPEs can access the entire virtual address space of the program through DMA. Each SPE's local store, as well as special communication channels, is mapped into the virtual address space; the PPE can access an SPE's local store directly and other SPEs can access its local store or communication channels through DMA.
+
+SPEs provide two facilities for communicating small messages with the PPE and other SPEs: mailboxes and signal notification registers. They are mapped into the program's virtual address space as MMIO registers, and other processors (either the PPE or other SPEs) can access them through the corresponding memory addresses. Mailboxes are 32-bit FIFOs. Each SPE provides an inbound mailbox with 4 entries for receiving messages from other processors, an outbound mailbox (1 entry) for sending messages to other processors, and an outbound mailbox (1 entry) for sending messages to the PPE (messages written to this mailbox generate interrupts on the PPE).
+
+Each SPE provides two 32-bit signal notification registers that other processors can write to. Each bit in a signal notification register ``latches'' the highest bit received until the register is read by the SPE. SPEs can poll for mailbox messages and signals, or elect to receive interrupts.
+
+\subsection{DMA}
+
+The PPE and SPEs are connected to each other and to memory by a high-bandwidth communication bus. The startup cost of a typical DMA operation is around 100 to 150 ns;~\cite{cell:micro} afterwards, 8 bytes can be transferred per SPE cycle. The communication bus provides extremely high bandwidth: each processor has access to 25.6 GB/s of bandwidth, and the bus can theoretically support a peak bandwidth of over 200 GB/s.
+
+DMA transfers have specific alignment requirements: transfers must be 1, 2, 4, 8, 16, or a multiple of 16 bytes, up to 16 KB. Transfers less than a quadword must be between memory and LS addresses that are naturally aligned;\footnote{That is, aligned on a multiple of the transfer size.} larger transfers require addresses that are quadword-aligned. DMA transfers are most efficient when memory and LS addresses have the same offset in a 128-byte block; the author experimentally determined that transfers that do not effectively have only half the maximum bandwidth.
+
+\subsection{Performance and Programmability}
+
+IBM provides an SDK that contains separate C/C++ compilers to target the PPE and SPEs. C intrinsics are provided to access the unique facilities defined on the Cell processor.
+
+The initial version of the Cell processor has a clock speed of 3.2 GHz. The SPE instruction set contains a fully pipelined SIMD single-precision floating-point multiply-add instruction, which performs 8 FLOP in a single cycle. Thus, a single SPE is theoretically capable of 25.6 GFLOPS; the entire Cell processor is capable of 204.8 GFLOPS using only the eight SPEs. A standard general-purpose processor with a SIMD unit, running at the same clock speed, has the same theoretical maximum performance as only a single SPE.
+
+Achieving good performance on Cell requires a number of considerations. It is important to make heavy use of SIMD instructions and carefully schedule instructions to maximize utilization of the SPE pipeline. For instance, a sample single-threaded application\footnote{This is the FFT benchmark, described more fully in chapter~\ref{ch:use}.} that operates on scalar data, when compiled for different processors using GCC with standard compiler optimizations (\textsf{-O3}; no vectorization was performed), produces runtimes given in figure~\ref{fig:cell:proc} (SPE time does not include communication).
+
+\begin{figure}[!htb]
+\begin{center}
+\begin{tabular}{|r|r|}
+\hline
+& Runtime (ms) \\
+\hline
+PPE, 3.2 GHz & 220 \\
+\hline
+1 SPE, 3.2 GHz & 400 \\
+\hline
+Pentium 4, 1.8 GHz & 200 \\
+\hline
+Xeon, 2.2 GHz & 170 \\
+\hline
+\end{tabular}
+\end{center}
+\caption{Runtimes for FFT on different processors.}
+\label{fig:cell:proc}
+\end{figure}
+
+Compared to the PPE, the better performance of the Intel processors, which have significantly lower clock speeds, can be attributed to the latter's incorporation of out-of-order and superscalar execution logic. The significantly worse performance of the SPE is due to the additional rotate instructions necessary to operate on scalar data. Compared to general-purpose architectures that have complex out-of-order, superscalar pipelines, the Cell architecture requires more work from the compiler or programmer to generate code that executes efficiently.
+
+Obviously, performance on any parallel architecture requires being able to discover and execute multiple parallel tasks in an application. On Cell, the data used by individual tasks that execute on SPEs must be sized for the limited local store, and their memory access patterns must be tuned for coarse-grained bulk DMA transfers, potentially requiring reorganizing the program or reorganizing data layout. While frameworks exist that provide software-managed caches for SPEs,~\cite{cell:website} it is ultimately simpler and more efficient if memory access patterns by SPE programs can be kept as local as possible.
+
+Finally, it is important to leverage the communication--computation concurrency provided by Cell's asynchronous DMA model by performing computation while data for future work is being fetched. If double-buffering is done properly, SPEs will be able to spend a majority of their time performing useful computation.
+
+All three of the issues above must be carefully considered for an application to obtain maximum performance from the Cell architecture. Some applications, such as matrix multiplication, can be aggressively optimized for Cell to achieve close to peak performance.~\cite{cell:intro}
+
+\section{Parallelization Frameworks}
+
+MPI and OpenMP are probably the two most well-known and widely used parallelization frameworks for computing clusters and traditional SMP architectures. These two programming APIs represent opposite ends of a spectrum: MPI defines a language-independent, low-level network communication API, while OpenMP defines a set of language-specific, high-level annotations that programs can use to cause compatible compilers to generate multithreaded code.
+
+The streaming runtime library for Cell developed in this thesis is intended to provide the same kind of low-level functionality as MPI, with two major differences: \emph{i}) it is specific to Cell instead of networks, and \emph{ii}) it is specific to streaming applications and provides additional control functionality.
+
+Several languages and parallelization frameworks have been designed specifically for Cell; see \cite{cell:pf} for a review. RapidMind~\cite{rapidmind}, MPI Microtask~\cite{mpimicrotask}, and Sequoia~\cite{sequoia} follow a ``task-based'' approach by providing runtime systems that help schedule program-defined tasks, or kernels. CellSs~\cite{cellss} takes this a degree further by automatically generating tasks from annotations to linear code.
