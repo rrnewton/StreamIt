@@ -73,9 +73,17 @@ on a larger number of processors.
 \end{table*}
 
 
+\begin{figure}[t!]
+\begin{center}
+\psfig{figure=patterns.eps,height=4.5in}
+\caption{{\small The 8 patterns.
+\protect\label{fig:patterns}}}
+\end{center}
+\end{figure}
+
 \subsection{Pattern 1: Singular Data-Parallel Actor}
 
-The simplest pattern is shown in Figure~\ref{fig:pattern1}. It
+The simplest pattern is shown in Figure~\ref{fig:patterns}a. It
 represents a singular {\it stateless} actor $A$ that consumes no
 input, and produces no output.
 %%and requires $W_A$ units of work to execute
@@ -85,7 +93,7 @@ of the two processors executes an instance of $A$ as shown Table~\ref{tab:patter
 
 \subsection{Pattern 2: Singular Stateful Actor}
 
-A related pattern is shown in Figure~\ref{fig:pattern2}. It
+A related pattern is shown in Figure~\ref{fig:patterns}b. It
 represents a singular {\it stateful} actor $A$ that consumes no input
 and produces no output.
 %%, and requires $W_A$ units of work to execute.
@@ -99,7 +107,7 @@ appropriately between processors.
 
 \subsection{Pattern 3: Data-Parallel Pipeline}
 
-The third pattern is shown in Figure~\ref{fig:pattern3}. It consists
+The third pattern is shown in Figure~\ref{fig:patterns}c. It consists
 of two actors $A\rightarrow B$ connected through a FIFO to form a two
 stage {\it pipeline}. Both of the actors are stateless, and hence data
 parallel. In this pattern, the maximum efficiency schedule runs one
@@ -109,7 +117,7 @@ requires no synchronization between processors.
 
 \subsection{Pattern 4: Stateful Pipeline}
 
-The fourth pattern is shown if Figure~\ref{fig:pattern4}. It is
+The fourth pattern is shown if Figure~\ref{fig:patterns}d. It is
 similar to the previous pattern with the distinction that the actors
 in the pipeline $A\rightarrow B$ are stateful. The maximum efficiency
 schedule for this pattern is to place one actor on one processor and
@@ -120,7 +128,7 @@ until instance $i$ of actor $A$ has completed its execution.
 
 \subsection{Pattern 5: Mixed Mode Pipeline with Stateless Source}
 
-The fifth pattern is shown if Figure~\ref{fig:pattern5}. It is a
+The fifth pattern is shown if Figure~\ref{fig:patterns}e. It is a
 pipeline $A\rightarrow B$ where actor $A$ is stateless and actor $B$
 is stateful. In this pattern, the characteristics of the work required
 to execute $A$ and $B$ can lead to different maximal efficiency
@@ -187,7 +195,7 @@ a dynamic scheduler.
 
 The sixth pattern is also a pipeline $A\rightarrow B$ but in this case
 actor $A$ is stateful and actor $B$ is stateless. This pattern is
-illustrated in Figure~\ref{fig:pattern6}. There are many similarities
+illustrated in Figure~\ref{fig:patterns}f. There are many similarities
 between this pattern and the previous pattern, and there is a closed
 form scheduling solution for this pattern as well. 
 
@@ -202,12 +210,13 @@ Figure~\ref{fig:pattern6-sched} when $W_A = 1$ and $W_B = 2$.  A
 generalization of this example leads to the closed form scheduling
 solutions shown in Table~\ref{tab:patterns-sched} for any $W_A < W_B$.
 
+
 \subsection{Complex Patterns}
 
 The previous patterns addressed pipeline composition of actors. We
 consider them simple patterns, and more complex patterns are
 possible. Some examples are shown in
-Figures~\ref{fig:pattern7}~and~\ref{fig:pattern8}. These pattern deals
+Figures~\ref{fig:patterns}g~and~\ref{fig:patterns}h. These pattern deals
 with explicit concurrency between actors that share a common splitter
 and a common joiner.
 
