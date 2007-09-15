@@ -76,14 +76,6 @@ on a larger number of processors.
 \end{table*}
 
 
-\begin{figure}[t!]
-\begin{center}
-\psfig{figure=patterns.eps,height=4.5in}
-\caption{{\small The 8 patterns.
-\protect\label{fig:patterns}}}
-\end{center}
-\end{figure}
-
 \subsection{Pattern 1: Singular Data-Parallel Actor}
 
 The simplest pattern is shown in Figure~\ref{fig:patterns}a. It
@@ -156,6 +148,14 @@ processor. Lastly, the schedule should maximize the decoupling between
 the two processors by assigning the greatest possible number of
 stateless actors to the processor where the stateful actor is not
 assigned.
+
+\begin{figure}[t]
+\begin{center}
+\psfig{figure=patterns.eps,height=3in}
+\caption{{\small The 8 patterns.
+\protect\label{fig:patterns}}}
+\end{center}
+\end{figure}
 
 In the domain of instruction scheduling, if $A$ and $B$ are
 instructions in a loop, then unrolling the loop exposes more
