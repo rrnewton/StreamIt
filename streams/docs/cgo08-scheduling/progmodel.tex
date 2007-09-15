@@ -74,14 +74,15 @@ phase (similarly for Node $E$).
 
 %%\subsection{Execution of Stream Program}
 
-Let $\phi[i]$ denote the $i$th actor appearing in execution $\phi$,
-and let $|\phi \wedge A|$ denote the number of times that actor $A$
-appears in $\phi$. An execution is legal if the data dependencies
-between actors are respected. Namely, for all $i$, the sequential
-firing of actor $\phi[0]$ through $\phi[i-1]$ leaves enough items on
-the FIFO for actor $\phi[i]$ to execute atomically. Let $\Phi$ denote
-the set of legal executions. Note that while $\Phi$ is an infinite
-set, each $\phi \in \Phi$ is a finite sequence.
+Let $\phi[i]$ denote the $i$th actor appearing in execution $\phi$.
+%% and let $|\phi \wedge A|$ denote the number of times that actor $A$
+%% appears in $\phi$. 
+An execution is legal if the data dependencies between actors are
+respected. Namely, for all $i$, the sequential firing of actor
+$\phi[0]$ through $\phi[i-1]$ leaves enough items on the FIFO for
+actor $\phi[i]$ to execute atomically. Let $\Phi$ denote the set of
+legal executions. Note that while $\Phi$ is an infinite set, each
+$\phi \in \Phi$ is a finite sequence.
 
 \begin{figure*}[t]
 \begin{center}
