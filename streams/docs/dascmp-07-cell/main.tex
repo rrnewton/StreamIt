@@ -1,0 +1,34 @@
+\documentclass{sigplanconf}
+
+\usepackage{lgrind}
+\usepackage[dvips]{graphicx}
+\usepackage{verbatim}
+\pagestyle{plain}
+
+%% This bit allows you to either specify only the files which you wish to
+%% process, or `all' to process all files which you \include.
+%% Krishna Sethuraman (1990).
+
+\typein [\files]{Enter file names to process, (chap1,chap2 ...), or `all' to
+process all files:}
+\def\all{all}
+\ifx\files\all \typeout{Including all files.} \else \typeout{Including only \files.} \includeonly{\files} \fi
+
+\begin{document}
+
+\input{cover}
+\pagestyle{plain}
+%\include{contents}
+\input{chap1}
+\input{chap2}
+\input{chap3}
+\input{chap4}
+\input{chap5}
+\input{chap6}
+\input{chap7}
+%\appendix
+%\input{appa}
+%\input{appb}
+\input{biblio}
+\end{document}
+
