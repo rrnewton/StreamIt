@@ -1,14 +1,14 @@
 \section{Mapping StreamIt Patterns to the Runtime Library}\label{ch:use}
 
-There are a number of common execution patterns that can be used to run a StreamIt program (see section~\ref{ch:bg:str:exec}). To illustrate how these patterns can be mapped to the runtime library for Cell, we will refer to the FFT StreamIt benchmark as a concrete example. This program performs a 256-element fast Fourier transform. The program's stream graph (figure~\ref{fig:use:fftgraph}) consists of a single pipeline of 15 filters. Every filter in the pipeline is stateless (and hence data-parallel) and does not peek. A single complete execution of the stream graph processes a single set of 256 input elements (512 floats), producing the same number of output elements.
+There are a number of common execution patterns that can be used to run a StreamIt program (see section~\ref{ch:bg:str:exec}). To illustrate how these patterns can be mapped to the runtime library for Cell, we will refer to the FFT StreamIt benchmark as a concrete example. This program performs a 256-element fast Fourier transform. The program's stream graph consists of a single pipeline of 15 filters. Every filter in the pipeline is stateless (and hence data-parallel) and does not peek. A single complete execution of the stream graph processes a single set of 256 input elements (512 floats), producing the same number of output elements.
 
-\begin{figure}[!htb]
-\begin{center}
-\includegraphics{figs/fftgraph}
-\end{center}
-\caption[Stream graph for 256-element FFT.]{Stream graph for 256-element FFT. A single execution of the stream graph pops and pushes 512 floats, since each element is a complex number whose components are interleaved on tapes.}
-\label{fig:use:fftgraph}
-\end{figure}
+%% \begin{figure}[!htb]
+%% \begin{center}
+%% \includegraphics{figs/fftgraph}
+%% \end{center}
+%% \caption[Stream graph for 256-element FFT.]{Stream graph for 256-element FFT. A single execution of the stream graph pops and pushes 512 floats, since each element is a complex number whose components are interleaved on tapes.}
+%% \label{fig:use:fftgraph}
+%% \end{figure}
 
 Data-parallel filters are the simplest to map to the library. The entire FFT pipeline can be fused into a single data-parallel filter that pops and pushes 512 floats per work function iteration. The fused filter can be data-parallelized over many SPEs: pseudocode to do this is illustrated in figure~\ref{fig:use:dp}. The \textsf{ext\_ppu\_spu\_ppu\_ex} library function starts an extended operation that loads the filter, allocates its buffers, and runs it for a large number of iterations.\footnote{The user still specifies all major parameters -- for example, the addresses to allocate buffers at and how many iterations each \textsf{filter\_run} command runs for.} The line containing \textsf{spulib\_poll\_while} synchronizes all SPEs; it returns only when all SPEs have finished and the callback has been run for each SPE.
 
@@ -34,15 +34,15 @@ Course-grained software pipelining~\cite{asplos06} can be implemented similarly.
 \label{fig:use:swpipe}
 \end{figure}
 
-Both patterns presented so far involve no direct SPE--SPE communication. An alternative implementation for FFT partially fuses the 15 filters in the StreamIt pipeline into a number of library filters, which are simultaneously run on different SPEs (figure~\ref{fig:use:spepipe}). These SPEs can transfer data between local stores directly, taking advantage of Cell's on-chip communication network and avoiding the extra latency to memory, as well as preventing memory from possibly becoming a bottleneck. Pseudocode to do this is illustrated in figure~\ref{fig:use:spepipecode}.
+Both patterns presented so far involve no direct SPE--SPE communication. An alternative implementation for FFT partially fuses the 15 filters in the StreamIt pipeline into a number of library filters, which are simultaneously run on different SPEs. These SPEs can transfer data between local stores directly, taking advantage of Cell's on-chip communication network and avoiding the extra latency to memory, as well as preventing memory from possibly becoming a bottleneck. Pseudocode to do this is illustrated in figure~\ref{fig:use:spepipecode}.
 
-\begin{figure}[!htb]
-\begin{center}
-\includegraphics{figs/spepipe}
-\end{center}
-\caption{Pipelining FFT over six SPEs.}
-\label{fig:use:spepipe}
-\end{figure}
+%% \begin{figure}[!htb]
+%% \begin{center}
+%% \includegraphics{figs/spepipe}
+%% \end{center}
+%% \caption{Pipelining FFT over six SPEs.}
+%% \label{fig:use:spepipe}
+%% \end{figure}
 
 \begin{figure}[!htb]
 \begin{center}
@@ -71,11 +71,3 @@ This code is not overly complex, and will always be more efficient than using th
 In general, the type of fine-grained data reorganization performed by round-robin splitters and joiners cannot be directly implemented using Cell's DMA mechanism, which has strict alignment requirements. However, since the library supports filters with multiple input and/or output tapes, a compiler can simply define separate filters for each splitter and joiner. A compiler can also fuse a splitter or joiner with the upstream or downstream filter, respectively; the resulting filter has a much lower communication--computation ratio than an independent splitter or joiner.
 
 The user can ignore duplicate splitters as long as the output of the upstream filter is buffered into memory. Because multiple PPE buffers can refer to the same data region, no duplication of data in memory is necessary. However, if the filters downstream of the splitter run on different SPEs, the same data must be copied to the local store of each SPE.
-
-\section{Runtime Checks}
-
-The library implements a number of runtime checks that can be enabled or disabled at compile time. When enabled, the library validates buffers accesses to ensure that they contain sufficient data/space, and performs additional checks to ensure that issued commands are consistent. While this cannot identify all bugs in a schedule or filter work function, it has nonetheless been very useful during the development of the library, the dynamic scheduler, and test programs; it has often exposed bugs that would otherwise only appear as a hung program or incorrect output.
-
-\section{Filter Code Limitations}
-
-To the author's knowledge, in general GCC is unable to easily generate filter code that contains no absolute loads or branches. As a result, currently code for all filters must permanently occupy space in SPE local store. This does not significantly affect most FFT implementations, since the program's work functions are quite small.

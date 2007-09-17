@@ -1,0 +1,14 @@
+\section{Related Work}\label{ch:bg}
+
+Streaming languages provide an attractive alternative to sequential languages for many applications. In a streaming language, the programmer defines actors that operate on data streams and composes programs by connecting actors. Many common high-performance applications, especially those involving signal, audio, image, and video processing, have explicit block diagram structure and are most easily conceptualized in that manner, making streaming languages a natural choice for these applications.
+
+Because programs written in streaming languages are explicitly structured as communicating actors, they typically expose a high degree of parallelism. This allows streaming language compilers to easily analyze stream programs and efficiently parallelize them. Compared to sequential languages, streaming languages free the programmer from the burden of having to explicitly write parallelized code for specific architectures, allowing him to focus on expressing the high-level semantics of the algorithm in a natural way.
+
+Recent developments in streaming languages include Brook~\cite{brook}, Cg~\cite{cg}, and StreamC/KernelC~\cite{streamc}.
+
+MPI and OpenMP are probably the two most well-known and widely used parallelization frameworks for computing clusters and traditional SMP architectures. These two programming APIs represent opposite ends of a spectrum: MPI defines a language-independent, low-level network communication API, while OpenMP defines a set of language-specific, high-level annotations that programs can use to cause compatible compilers to generate multithreaded code.
+
+The streaming runtime library for Cell developed in this thesis is intended to provide the same kind of low-level functionality as MPI, with two major differences: \emph{i}) it is specific to Cell instead of networks, and \emph{ii}) it is specific to streaming applications and provides additional control functionality.
+
+Several languages and parallelization frameworks have been designed specifically for Cell; see \cite{cell:pf} for a review. RapidMind~\cite{rapidmind}, MPI Microtask~\cite{mpimicrotask}, and Sequoia~\cite{sequoia} follow a ``task-based'' approach by providing runtime systems that help schedule program-defined tasks, or kernels. CellSs~\cite{cellss} takes this a degree further by automatically generating tasks from annotations to linear code.
+
