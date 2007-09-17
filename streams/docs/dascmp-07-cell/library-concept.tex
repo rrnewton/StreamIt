@@ -1,0 +1,46 @@
+\section{Multicore Streaming Layer}\label{ch:lib}
+
+Emerging multicore architectures provides an excellent target for
+streaming language compilers for a number of reasons:
+\begin{itemize}
+\item Individual cores are optimized for computation.
+\item Limited local store capacity on a core is not a severe
+limitation for streaming actors. In a stream program, actors typically
+embody computation, are independent of each other, have extremely
+local data-access patterns, and generally have small code sizes.
+\item The availability of high-bandwidth and low-latency on-chip
+communication network enables a large number of scheduling options
+which would not be feasible for other targets, such as computing
+clusters.
+\end{itemize}
+
+In a multicore setting, a streaming language compiler (or programmer)
+must address the following challenges:
+\begin{enumerate}
+\item Generating code that explicitly manages data communication
+  (e.g., DMA operations). Architectured that provide an asynchronous
+  communication model also require pipelining data transfers (e.g.,
+  double-buffering) to increase efficieny and throughput.
+\item For architectures with a finite local store on a core, the code,
+  input and output buffers, and the state required by the computation
+  must be tightly packaged to fit into the local memory. This
+  consideration is akin to locality enhancing optimizations for
+  architectures with caches.
+\item Performing high-level optimizations and scheduling to achieve a
+  balanced distribution of work among the cores, avoiding excess
+  communication, transforming code to improve efficiency, and
+  ultimately delivering high processing throughput.
+\end{enumerate}
+
+The purpose of the multicore streaming layer (MSL) is to abstract
+\textsf{(1)} and provide facilities that simplify \textsf{(2)} and
+\textsf{(3)}. The MSL frees a compiler or programmer from needing to
+deal with the details of the architecture communication model,
+allowing it to focus on exploring high-level optimization and
+scheduling choices. The main goal of the MSL is to provide a generic
+framework for controlling and dispatching computation to multicores
+that simplifies scheduling operations. The low level details that are
+specific to individual platforms are embedded in the MSL library
+implementation, and hidden from the programmer or the compiler. As a
+result, the MSL can provide a common platform for mapping streaming
+computation to multicore and enhance portability.

@@ -1,5 +1,8 @@
 .PHONY: all once view pdf clean cleanall
 
+all: main.dvi
+#	cp main.pdf ~/public_html/main.pdf
+
 main.dvi: *.tex main.bib figs/*.eps *.cls *.sty
 	echo all | latex main.tex
 	bibtex main
@@ -9,8 +12,6 @@ main.dvi: *.tex main.bib figs/*.eps *.cls *.sty
 
 main.pdf: main.dvi
 	dvipdf main.dvi
-
-all: main.dvi
 
 once:
 	echo all | latex main.tex
