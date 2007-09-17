@@ -1,53 +1,116 @@
 \section{Performance}\label{ch:perf}
 
-Performance evaluation for the runtime library and dynamic scheduler was conducted by comparing different implementations of the FFT StreamIt program described in chapter~\ref{ch:use}. Six different implementations were tested:
-\begin{enumerate}
-\item FFT pipeline fused to single filter. All other infrastructure hand-coded and optimized.
-\item Single fused filter, executed data-parallel using the library.
-\item Full FFT pipeline, executed using dynamic scheduler, filters not specified as data-parallel.
-\item Full FFT pipeline, executed using dynamic scheduler, filters specified as data-parallel.
-\item Single fused filter, executed using dynamic scheduler, specified as data-parallel.
-\item FFT pipeline partially fused to six filters, pipelined across six SPEs with direct SPE--SPE communication.
-\end{enumerate}
-
-The resulting programs were executed on PlayStation 3 hardware, which only provides six usable SPEs. During each execution, a program processed 20,000 iterations of data (approximately 20 MB). Each program iteration performs 16,384 floating point operations, for a total of 327 MFLOP. Runtimes for one and six SPEs are given in figure~\ref{fig:perf:fft} (file I/O time is excluded).
+We evaluate the performance of the MSL library and StreamIt compiler backend
+on a set of four StreamIt applications using different scheduling
+methodologies. The applications are described in figure~\ref{fig:perf:apps}.
+For statically-scheduled benchmarks, the scheduler executes a sufficiently
+coarsened steady state to reduce library overhead and imposes an explicit
+synchronization barrier between steady state iterations. The dynamic scheduler
+automaticaly coarsens work functions as necessary.
 
 \begin{figure}[!htb]
 \begin{center}
-\begin{tabular}{|r|r|r|r|r|r|r|r|}
+\begin{tabular}{|l|p{2.25in}|}
 \hline
-& \multicolumn{3}{|c|}{1 SPE} & \multicolumn{4}{|c|}{6 SPEs} \\
-\cline{2-8}
-& Time & Run \% & Work \% & Time & Run \% & Work \% & Speedup \\
+BitonicSort & 8-element bitonic sort \\
 \hline
-\textsf{1} & 396.1 & \multicolumn{2}{|c|}{} & 66.6 & \multicolumn{2}{|c|}{} & 5.95 \\
+DCT & 16x16 IEEE reference DCT \\
 \hline
-\textsf{2} & 401.0 & 100.0 & 99.2 & 67.2 & 99.7 & 98.8 & 5.97 \\
+FFT & 256-element FFT \\
 \hline
-\textsf{3} & 545.9 & 99.6 & 91.8 & 91.7 & 99.2 & 91.4 & 5.95 \\
-\hline
-\textsf{4} & \multicolumn{3}{|c|}{} & 91.9 & 99.0 & 91.2 & \\
-\hline
-\textsf{5} & 401.0 & 100.0 & 99.2 & 67.6 & 99.7 & 98.8 & 5.93 \\
-\hline
-\textsf{6} & \multicolumn{3}{|c|}{} & 86.2 & 95.9 & 92.2 & \\
+MPEG & MPEG-2 block and motion vector decoding (subset of full MPEG-2 decoder) \\
 \hline
 \end{tabular}
 \end{center}
-\caption{Performance of different implementations of FFT.}
-\label{fig:perf:fft}
+\caption{Benchmark applications.}
+\label{fig:perf:apps}
 \end{figure}
 
-The \emph{Time} column gives the total time SPEs ran for, excluding one-time initialization done at the start of the program. Times are in milliseconds. For the five implementations that used the library, additional statistics maintained by the library are given. The \emph{Run \%} column gives the percentage of total time the SPE had an active \textsf{filter\_run} command. The remainder is overhead due to either \emph{i}) durations when SPEs do not have useful work to do (such as when waiting for filters to be loaded) or \emph{ii}) inadequate double-buffering of input or output data. In both cases, the scheduler (or the nature of the program) creates insufficient communication--computation concurrency. The \emph{Work \%} column gives the percentage of total time actually spent in the work function. The remainder represents the total overhead added by the library or caused by the scheduling algorithm. The large number of iterations tests ran for smoothes out any one-time execution startup overhead. For the tests involving six SPEs, the percentages given are for the SPE that reported the greatest work percentage. The \emph{Speedup} column gives the speedup relative to the same implementation on one SPE, where applicable.
+The benchmarks were executed on PlayStation 3 hardware, which only provides
+six usable SPEs. Benchmarks were run for a large number of steady state
+iterations to smooth out any one-time execution startup overhead.
+Performance numbers are given in figure~\ref{fig:perf:stats}.
 
-Not surprisingly, hand-coded implementation \textsf{(1)} demonstrates almost perfect linear speedup on six SPEs.
+\begin{figure}[!htb]
+\begin{center}
+\begin{tabular}{|l|r|r|r|r|}
+\hline
+& Cores & Run~\% & Work~\% & GOPS \\
+\hline
+\textsf{BitonicSort} & 6 & 98.2 & 97.8 & 0.5 \\
+\hline
+\textsf{DCT} & 6 & 98.5 & 97.5 & 3.2 \\
+\hline
+\textsf{FFT} & 6 & 99.0 & 98.4 & 1.9 \\
+\hline
+\textsf{FFT\_dynamic} & 6 & 99.3 & 89.8 & 2.2 \\
+\hline
+\textsf{FFT\_pipeline~*} & 6 & 95.9 & 92.2 & 1.9 \\
+\hline
+\textsf{MPEG\_static~*} & 5 & 98.2 & 97.7 & N/A \\
+\hline
+\textsf{MPEG\_dynamic} & 5 & 98.8 & 96.9 & N/A \\
+\hline
+\end{tabular}
+\end{center}
+\caption{Benchmark performance.}
+\label{fig:perf:stats}
+\end{figure}
 
-Comparing results for implementation \textsf{(2)} to \textsf{(1)}, the overhead added by the library is around 1\%. Run \% is high, although not exactly 100\% due to the overhead of starting a long-term filter execution (loading the filter and allocating and attaching buffers). For both \textsf{(1)} and \textsf{(2)}, statistics for all SPEs were almost identical; this is not surprising given that the fused filter's work function performs a constant amount of work per iteration.
+The \emph{Cores} column gives the number of SPEs each benchmark is
+scheduled for and run on. Utilization statistics are maintained by the
+MSL library. The \emph{Run~\%} column gives the percentage of total time the SPE had an active \textsf{filter\_run} command. The remainder is overhead due to either \emph{i}) durations when SPEs do not have useful work to do (such as when waiting for filters to be loaded) or \emph{ii}) inadequate double-buffering of input or output data. In both cases, the scheduler (or the nature of the program) creates insufficient communication--computation concurrency. The \emph{Work~\%} column gives the percentage of total time actually spent in the work function. The remainder represents the total overhead added by the library or caused by the scheduling algorithm.
+The Run~\% and Work~\% numbers given for each benchmark are for the SPE
+that reported the greatest work percentage.
+For \textsf{DCT} and the FFT benchmarks, the \emph{GOPS} column gives GFLOPS.
+For \textsf{BitonicSort}, the GOPS column gives billions of
+compare operations per second.
 
-For implementations \textsf{(3)} and \textsf{(4)}, which involved the full pipeline on the dynamic scheduler, all six SPEs reported similar statistics (both absolute and percentage), indicating that the scheduler can make equal use of all available SPEs. Compared to implementation \textsf{(2)}, these implementations are 36\% slower. However, a large part of this can be accounted for by the observation that the total time spent in work functions in these implementations is 26\% greater. This is due to slightly more efficient code that is generated for the fused filter.
+The \textsf{FFT\_pipeline} and \textsf{MPEG\_static} benchmarks (indicated
+with a \textsf{*} in the figure) exhibit behavior that is not adequately
+described by the statistics alone, which we discuss below.
 
-Run \% is slightly lower than in implementation \textsf{(2)}, but still fairly close to 100\%, and speedup on six SPEs is still almost perfectly linear; this indicates that the dynamic scheduler has no difficulties keeping all SPEs supplied with work. Moreover, it validates the critical assumption made in the design of the dynamic scheduler: the Cell architecture's memory bandwidth is indeed sufficient to perform all buffering to memory, avoiding SPE--SPE communication entirely. However, the lower Work \% indicates that the additional commands issued to SPEs by the dynamic scheduler to constantly switch filters do create a noticeable overhead: 8.6\% of total time, compared to 1.2\% for the data-parallel, fused, statically-scheduled implementation.
+The \textsf{BitonicSort}, \textsf{DCT}, and \textsf{FFT} benchmarks are statically-scheduled and generated by the StreamIt compiler. These application are fully data-parallel and the compiler fuses the stream graph into a single filter. This is then fissed to the number of cores. 
+As the number of SPEs is varied from one to six, utilization numbers remain nearly the same. Utilization and runtimes are always nearly identical across all SPEs. This demonstrates nearly perfectly linear speedup.
+From Work~\%, the overhead added by the library is less than 2.5\%. Run~\% is high, although not exactly 100\% due to the overhead of starting each steady state and the synchronization barrier after each steady state.
 
-Not surprisingly, the almost identical results for implementations \textsf{(5)} and \textsf{(2)} indicate that the dynamic scheduler can execute a single fused data-parallel filter just as efficiently as a static schedule.
+For a single fused data-parallel filter, the dynamic scheduler provides identical performance as static scheduling. Results for the dynamic scheduler on these applications are not separately given.
 
-Implementation \textsf{(6)}, which pipelines multiple filters across SPEs, produces different results than the others. In this case, a single filter/SPE in the middle of the pipeline is a significant bottleneck; this is not surprising, since 15 filters were fused into six. Although total runtime is significantly worse than the hand-coded or fused data-parallel implementations, no SPE except for the bottleneck was fully utilized: two other SPEs had Work \% around 60\%. In general, this illustrates the difficulty of performing SPE--SPE pipelining. Although this implementation keeps communication on-chip (except for input and output to the pipeline), work imbalances make it difficult to fully utilize all SPEs.
+The \textsf{FFT\_dynamic} and \textsf{FFT\_pipeline} benchmarks are different manual implementations of the FFT application. The FFT stream graph consists of a single pipeline with 15 filters. \textsf{FFT\_dynamic} schedules this pipeline using the dynamic scheduler. In \textsf{FFT\_pipeline}, the stream graph is first manually fused into a pipeline of six filters, each of which is statically placed on a different SPE. All communication except for input and output is done directly between SPE local stores and remains entirely on-chip. GFLOPS numbers for \textsf{FFT\_dynamic} and \textsf{FFT\_pipeline} can be compared with each other but not directly to \textsf{FFT}; the former two have manual work function implementations that are slightly more efficient than the compiler-generated code.
+
+For \textsf{FFT\_dynamic}, utilization and runtimes are nearly identical across all SPEs and Run~\% is very close to 100\%. This indicates that the dynamic scheduler has no difficulties keeping all SPEs supplied with work. Moreover, it validates the critical assumption made in the design of the dynamic scheduler: the Cell architecture's memory bandwidth is indeed sufficient to perform all buffering to memory, avoiding SPE--SPE communication entirely. Utilization numbers remain nearly identical as the number of SPEs is varied from one to six, indicating almost perfectly linear speedup. 
+
+However, Work~\% shows that this benchmark has approximately 10\% overhead. From the high Run~\%, almost all of this is due to the library. This overhead results from two factors: \emph{i}) individual filters in the pipeline have much lower communication--computation ratios than the single fused filter in the \textsf{FFT} benchmark; and \emph{ii}) the dynamic scheduler continually issues additional commands to switch filters between SPEs which are not needed in a static schedule.
+
+For \textsf{FFT\_pipeline}, a single filter/SPE in the middle of the pipeline is the bottleneck. Although GFLOPS is 12\% lower than \textsf{FFT\_dynamic}, no SPE except for the bottleneck was fully utilized: two other SPEs had Work~\% around 60\%. In general, this illustrates the difficulty of performing direct static SPE--SPE pipelining. Although SPE--SPE pipelining keeps communication on-chip, where extremely high bandwidth is available and there is no danger of exhausting comparatively limited memory bandwidth, work imbalances between filters make it difficult to fully utilize all SPEs.
+
+MPEG has a small amount of state and cannot be fused into a single filter. The compiler fuses the stream graph down to a single stateful filter and a single stateless filter as the branches of a two-way splitjoin. For mapping to the MSL library, both statically- and dynamically-scheduled benchmarks explicitly treat the splitter and joiner as separate stateless filters, resulting in a total of four filters to schedule.
+
+The \textsf{MPEG\_static} benchmark statically software-pipelines these four filters. We generated a static schedule for five SPEs by manually profiling, fissing, and partitioning filters and manually generating control code to issue the resulting schedule. The mapping of filters to SPEs in the partition that we obtained is given in figure~\ref{fig:perf:mpegs}.
+
+\begin{figure}[!htb]
+\begin{center}
+\begin{tabular}{|r|l|}
+\hline
+SPE & Filters \\
+\hline
+0 & $n$ splitter, $n$ stateful \\
+\hline
+1 & $6n$ joiner \\
+\hline
+2 & $2n$ stateless \\
+\hline
+3 & $2n$ stateless \\
+\hline
+4 & $2n$ stateless \\
+\hline
+\end{tabular}
+\end{center}
+\caption{Partition for \textsf{MPEG\_static} benchmark.}
+\label{fig:perf:mpegs}
+\end{figure}
+
+This partition has a slight work imbalance. The Run~\% and Work~\% numbers given in figure~\ref{fig:perf:stats} are for SPEs~2--4, which have the highest utilization. SPE~0 has the lowest utilization (88.3\%). However, aside from the work imbalance, which can be minimized with a better partition, this benchmark shows that static software pipelining using the MSL library can be done with very low overhead.
+
+The \textsf{MPEG\_dynamic} benchmark uses the dynamic scheduler to schedule the four filters. 
+As with \textsf{FFT\_dynamic}, utilization and runtimes are nearly identical across all SPEs and there is nearly perfectly linear speedup as the number of SPEs is varied. Compared to the static schedule, the dynamic scheduler is not limited by the concept of a steady state and does not impose any synchronization barriers; however, in order to dynamically switch filters on cores, it must issue more commands. This translates into slightly higher Run~\% but slightly lower Work~\%. However, the dynamic scheduler is able to more efficiently distribute work across all available cores; overall, this results in a 2.5\% performance improvement over \textsf{MPEG\_static}.
