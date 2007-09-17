@@ -1,35 +1,180 @@
-\section{Dynamic Scheduling Using the Runtime Library}\label{ch:ds}
+\section{Scheduling Stream Programs Using the MSL}\label{ch:ds}
 
-The dynamic scheduler is implemented as a layer on top of the runtime library. Like the library, it is designed for but not specific to StreamIt: it can schedule any acyclic stream graph where all filters have static rates, subject to some additional limitations.\footnote{The dynamic scheduler places a maximum limit on the degree of any node in the stream graph.} A StreamIt program can be converted filter-by-filter into input to the dynamic scheduler, or a compiler can first perform high-level optimizations that modify the original stream graph.
+Streaming programs typically allow for a lot of freedom in terms of
+orchestrating the execution of the stream graph. This freedom is
+afforded by the dataflow models of computation that many streaming
+languages are founded on. In a stream program, the rules governing the
+execution of a node or actor in the graph are often simple, and usually
+reduce to having sufficient buffering on the input to an actor, and
+sufficient buffering to store the output.
 
-We first discuss the advantages offered by a dynamic scheduling approach in section~\ref{ch:ds:bg} before discussing the interface and implementation of the actual scheduler in sections~\ref{ch:ds:ui} and \ref{ch:ds:imp}.
+The execution of a stream program requires mapping and ordering actors
+to cores, allocation of buffers, and managing data transfers between
+buffers. Collectively, mapping, ordering, and buffer managements are
+embodied in a schedule of execution.
 
-\section{Dynamic Scheduling vs. Static Scheduling}\label{ch:ds:bg}
+It is possible to devise a schedule statically (e.g., compile time or
+at graph creation time) or dynamically (e.g., runtime). The goal of a
+scheduler is simply to maximize the throughput of the streaming
+application. In the age of multicore architectures, a scheduler will
+need to utilize the cores to increase concurrency and hence improve
+the throughput of a given streaming application. 
 
-For stream graphs that are ``well-behaved'', dynamic scheduling generally does not present any advantages over static scheduling. Dynamic scheduling inevitably involves additional communication and scheduling overhead due to extra filter loading and unloading, buffer management, and scheduling computation. When all filters in a program are data-parallel, a static scheduler can make full use of all SPEs by simply executing each filter in turn on all SPEs, with a sufficient coarsening of the steady state to amortize filter load/unload and SPE synchronization overhead. The optimal situation results when the compiler can fuse all filters into a single data-parallel filter; this produces the minimum possible communication.
+A dynamic scheduler is conceptually easy to understand. The scheduler
+maintains an internal representation of a given stream graph (e.g.,
+list or priority queue). In a multicore architecture, when there is a
+core available, the scheduler scans its internal representation of the
+stream graph, and determines which actor is ready to fire.
+The scheduler assigns the actor to the available core. The core is
+also informed where the input buffer for the actor resides in memory,
+and where in memory to commit (buffer) the output of the actor for its
+successors. The scheduler then updates its internal representation to
+indicate the actor firings and implement a fairness policy to assure
+overall progress (e.g., a round-robin scheduler).
 
-Even when filters are stateful and thus cannot be data-parallelized, static software pipelining techniques~\cite{asplos06} can make full use of SPEs when the compiler has an accurate static work estimator and can divide filters in a steady state evenly across SPEs.\footnote{A single stateful filter with a heavily imbalanced work function creates a bottleneck, but dynamic schedulers are also faced with this problem.} In addition, no ``unpredictable'' cache misses or lengthy communication delays that can skew a static work estimate are possible on the Cell architecture.
+For stream graphs that are ``well-behaved'', dynamic scheduling
+generally does not present any advantages over static
+scheduling. Dynamic scheduling inevitably involves additional
+communication and scheduling overhead due to extra filter loading and
+unloading, buffer management, and scheduling computation. When all
+filters in a program are data-parallel, a static scheduler can make
+full use of all cores by simply executing each filter in turn on all
+cores, with a sufficient coarsening of the steady state to amortize
+filter load/unload and synchronization overhead. The optimal
+situation results when the compiler can fuse all filters into a single
+data-parallel filter; this produces the minimum possible communication.
 
-Dynamic scheduling becomes beneficial when filters are not ``well-behaved'': when it is difficult to statically balance load across SPEs, difficult to estimate the amount of work done by filter work functions, or work functions perform widely varying amounts of work through the execution of the program. In these situations, dynamic scheduling may be able to deliver better load-balancing than static scheduling.
+Even when filters are stateful and thus cannot be data-parallelized,
+static software pipelining techniques~\cite{asplos06} can make full
+use of cores when the compiler has an accurate static work estimator
+and can divide filters in a steady state evenly across
+SPEs. A single stateful filter with a heavily imbalanced work
+function creates a bottleneck, but dynamic schedulers are also faced
+with this problem. 
+%%In addition, no ``unpredictable'' cache misses or
+%%lengthy communication delays that can skew a static work estimate are
+%%possible on the Cell architecture.
 
-A dynamically scheduled program can be run on varying numbers of processors without requiring recompilation or the reanalysis that complex static schedulers would need to perform, and is also tolerant of changes in the availability of processors while the program is running. In addition, for stream graphs that contain filters with dynamic rates, it may not be possible to statically predict how many times filters will be run, and the balance of work in the stream graph may change as the program is run. In this case, only dynamic scheduling is able to shift workload to different portions of the stream graph as needed.\footnote{However, the current dynamic scheduler implementation does not support dynamic rates.}
+Dynamic scheduling becomes beneficial when filters are not
+``well-behaved'': when it is difficult to statically balance load
+across cores, difficult to estimate the amount of work done by filter
+work functions, or work functions perform widely varying amounts of
+work through the execution of the program. In these situations,
+dynamic scheduling may be able to deliver better load-balancing than
+static scheduling.
 
-\section{User Interface}\label{ch:ds:ui}
+A dynamically scheduled program can be run on varying numbers of
+processors without requiring recompilation or the reanalysis that
+complex static schedulers would need to perform, and is also tolerant
+of changes in the availability of processors while the program is
+running. 
+%% In addition, for stream graphs that contain filters with
+%% dynamic rates, it may not be possible to statically predict how many
+%% times filters will be run, and the balance of work in the stream graph
+%% may change as the program is run. In this case, only dynamic
+%% scheduling is able to shift workload to different portions of the
+%% stream graph as needed.\footnote{However, the current dynamic
+%% scheduler implementation does not support dynamic rates.}
 
-The user provides as input to the dynamic scheduler a complete description of the stream graph, specifying filters and the channels that connect them. Rates for all filters must be specified. Duplicate splitters can be handled by setting parameters of channels; round-robin splitters and joiners must be defined as separate filters.
+%% \section{User Interface}\label{ch:ds:ui}
 
-\section{Implementation}\label{ch:ds:imp}
+%% The user provides as input to the dynamic scheduler a complete
+%% description of the stream graph, specifying filters and the
+%% channels that connect them. Rates for all filters must be
+%% specified. Duplicate splitters can be handled by setting parameters
+%% of channels; round-robin splitters and joiners must be defined as
+%% separate filters.
 
-The Cell architecture's communication network provides very high memory bandwidth. The design of the dynamic scheduler assumes that memory will never be a bottleneck (a hypothesis that was confirmed by experiments; see chapter~\ref{ch:perf}), and the dynamic scheduler buffers all output produced on SPEs to memory. The scheduler performs dynamic course-grained software pipelining on the stream graph; if sufficient data can be buffered in all channels at all times, pipeline stalls can be avoided and all SPEs can be fully utilized. While SPE--SPE communication is more efficient than SPE--memory communication, SPE local store is generally too limited to store the buffering needed for software pipelining, and thus the scheduler never executes SPE--SPE pipelines; this avoids having to deal with work imbalances between pairs of adjacent filters. At any time, any two SPEs will typically be operating on data from widely separated iterations of the program.
+\subsection{Methodology}
 
-At startup, the dynamic scheduler allocates a large\footnote{1 MB in the current implementation, but this can be adjusted.} buffer in memory for each channel; this is used to buffer the output of the upstream filter to provide input for the downstream filter. At any time, for any specific filter, the amount of data available in its input channels and amount of space available in its output channels, along with its rates, determines the maximum number of iterations that the filter can be run for.
+We evaluated dynamic and static scheduling schemes for the Cell
+multicore architecture. The Cell processor has 9
+cores~\cite{Cell-hpca}: a PPE that serves as a general purpose
+processor, and 8 SPEs that are designed to perform the bulk of the
+computation. Each SPE has 256KB of local store and a DMA processor to
+manage data in and out of the SPE. In our methodology, the schedule is
+run on the PPE and the filters run on the SPEs.
 
-The scheduler selects filters to run on SPEs based on a metric computed from the maximum number of iterations and certain filter properties (see below). When a filter is selected to run on an SPE, it is scheduled for a limited but fairly large number of iterations in order to amortize the cost of loading it. Filters run for their entire allotment of iterations; however, allotments are kept small to allow the scheduler to quickly schedule another filter if necessary in response to the changing state in the stream graph.
+We used the StreamIt~\cite{streamitweb} programming language to
+generate the stream graph that are presented to the MSL and the
+dynamic scheduler. The basic unit of computation in StreamIt is the
+{\it filter}. There are three basic constructs for composing filters
+into a communicating network: a {\it pipeline}, a {\it splitjoin}, and
+a {\it feedbackloop}. A pipeline behaves as the sequential composition
+of all its child streams. A splitjoin is used to specify independent
+parallel streams that diverge from a common {\it splitter} and merge
+into a common {\it joiner}. A feedbackloop provides a way to create
+cycles in the stream graph.
 
-A replacement filter for an SPE is selected when the current filter scheduled on the SPE has almost finished running for all of its allotted iterations. While the current filter is still running, the scheduler issues additional commands to load the new filter, allocate its buffers, and transfer data into its input buffers from memory; this communication is overlapped with the computation done by the current filter. When the replacement filter is the same as the current filter, this additional work can be avoided. Finally, the first command to run the new filter is queued after the last command to run the current filter. When the replacement filter is selected early enough, it will be set up on the SPE before the current filter finishes running, ensuring that it can start running as soon as the current filter finishes. When the current filter has completed all of its allotted iterations, it is unloaded and can then be scheduled on another SPE.
+\subsection{Dynamic Scheduler Implementation}\label{ch:ds:imp}
 
-The dynamic scheduler can run multiple instances of data-parallel filters on multiple SPEs at the same time. A data-parallel filter is still selected by the same metric as other filters; it will only be run on more than one SPE at once if it is significantly better than other filters.
+The Cell architecture's communication network provides very high
+memory bandwidth. The design of the dynamic scheduler assumes that
+memory will never be a bottleneck, and the dynamic scheduler
+buffers all output produced on SPEs to memory. The scheduler performs
+dynamic course-grained software pipelining on the stream graph; if
+sufficient data can be buffered in all channels at all times, pipeline
+stalls can be avoided and all SPEs can be fully utilized. While
+SPE--SPE communication is more efficient than SPE--memory
+communication, SPE local store is generally too limited to store the
+buffering needed for software pipelining, and thus the scheduler never
+executes SPE--SPE pipelines; this avoids having to deal with work
+imbalances between pairs of adjacent filters. At any time, any two
+SPEs will typically be operating on data from widely separated
+iterations of the program.
 
-The current metric implemented is very simple: it prioritizes filters based on the amount of data the state of their input and output channels allow them to consume and produce, respectively. However, the filter that is currently running on an SPE is prioritized when considered for scheduling on the same SPE; this effectively causes filters to be run for as long as possible on an SPE, with no load overhead, while no other filters are significantly better. Other more complex metrics can be easily substituted.
+At startup, the dynamic scheduler allocates a large\footnote{1 MB in
+the current implementation, but this can be adjusted.} buffer in
+memory for each channel; this is used to buffer the output of the
+upstream filter to provide input for the downstream filter. At any
+time, for any specific filter, the amount of data available in its
+input channels and amount of space available in its output channels,
+along with its rates, determines the maximum number of iterations that
+the filter can be run for.
 
-When the dynamic scheduler encounters a pipeline, the filter selection metric quickly causes all filters in the pipeline to be run sufficiently to generate some data in every channel buffer. Thereafter, the sequence of filter executions selected by the scheduler appears to perform software pipelining, although without a recognizable steady state.
+The scheduler selects filters to run on SPEs based on a metric
+computed from the maximum number of iterations and certain filter
+properties (see below). When a filter is selected to run on an SPE, it
+is scheduled for a limited but fairly large number of iterations in
+order to amortize the cost of loading it. Filters run for their entire
+allotment of iterations; however, allotments are kept small to allow
+the scheduler to quickly schedule another filter if necessary in
+response to the changing state in the stream graph.
+
+A replacement filter for an SPE is selected when the current filter
+scheduled on the SPE has almost finished running for all of its
+allotted iterations. While the current filter is still running, the
+scheduler issues additional commands to load the new filter, allocate
+its buffers, and transfer data into its input buffers from memory;
+this communication is overlapped with the computation done by the
+current filter. When the replacement filter is the same as the current
+filter, this additional work can be avoided. Finally, the first
+command to run the new filter is queued after the last command to run
+the current filter. When the replacement filter is selected early
+enough, it will be set up on the SPE before the current filter
+finishes running, ensuring that it can start running as soon as the
+current filter finishes. When the current filter has completed all of
+its allotted iterations, it is unloaded and can then be scheduled on
+another SPE.
+
+The dynamic scheduler can run multiple instances of data-parallel
+filters on multiple SPEs at the same time. A data-parallel filter is
+still selected by the same metric as other filters; it will only be
+run on more than one SPE at once if it is significantly better than
+other filters.
+
+The current metric implemented is very simple: it prioritizes filters
+based on the amount of data the state of their input and output
+channels allow them to consume and produce, respectively. However, the
+filter that is currently running on an SPE is prioritized when
+considered for scheduling on the same SPE; this effectively causes
+filters to be run for as long as possible on an SPE, with no load
+overhead, while no other filters are significantly better. Other more
+complex metrics can be easily substituted.
+
+When the dynamic scheduler encounters a pipeline, the filter selection
+metric quickly causes all filters in the pipeline to be run
+sufficiently to generate some data in every channel
+buffer. Thereafter, the sequence of filter executions selected by the
+scheduler appears to perform software pipelining, although without a
+recognizable steady state.
