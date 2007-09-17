@@ -106,14 +106,13 @@ parallel streams that diverge from a common {\it splitter} and merge
 into a common {\it joiner}. A feedbackloop provides a way to create
 cycles in the stream graph.
 
-
-\subsection{StreamIt Compiler Backend for Cell}
+\subsection{Static Scheduler Implementation}
 
 The Cell backend for StreamIt compiles StreamIt programs down to C code that
 is run on the Cell processor through the library. The backend 
 is built upon the robust StreamIt compiler infrastructure~\cite{asplos06}. 
 Briefly, StreamIt code is converted into a
-high-level stream IR which then undergoes a suite of optimizing transformations.
+high-level stream IR which then undergoes a series of optimizing transformations.
 
 In the case of static scheduling, the compiler processes the stream program
 through four phases.
@@ -121,7 +120,8 @@ through four phases.
 \item In the scheduling phase, a steady state schedule, which maintains a constant
 number of data items in each input and output buffer after every execution, is calculated based on each
 filter's declared I/O rates. This steady state schedule can then conceptually
-be run in an infinite loop.
+be run in an infinite loop. Additionally, an initialization schedule may be
+generated to prime the buffers or initialize state.
 \item In the partitioning phase, filters are fused or
 fissed to achieve the best level of granularity for the best load balancing.
 \item In the layout phase, filters are assigned to specific cores on which
@@ -129,45 +129,6 @@ they are run.
 \item In the code generation phase, appropriate code that encapsulates the schedule,
 partitioning, and layout are generated and run on the target architecture.
 \end{itemize}
-
-In the case of dynamic scheduling, scheduling, partitioning, and layout
-are handled at run-time by the dynamic scheduler. Thus, the compiler need only
-generate the appropriate code to set up the scheduler for execution.
-
-\subsection{Code Generation}
-
-%Following the previous phases, code generation is the final phase in the StreamIt
-%compiler. One option is to generate code directly targeting the Cell API.
-%The disadvantages of this approach include the additional burden of
-%dealing explicitly with DMA alignment requirements and the bloated code. Here,
-%the library provides a convenient layer of abstraction which not only abstracts
-%away DMA transfers but also provides for code that is more readable and easier
-%for the compiler to generate.
-
-We generate separate code for the PPE and the SPEs. In both cases, we generate
-C code that utilizes the library and compile it with Cell's GCC. We place all
-control code on the PPE and all filter init and work functions on the SPEs. 
-We convert the 
-initialization and steady state schedules into appropriate sequences of calls to
-the library. Specifically, we set up filter description and layout parameters
-specifying which filter is to be executed on which SPE, which input and output
-buffers the filter reads from and writes to, and how many bytes the filter 
-reads and writes in one execution. These parameters and then passed through a
-library function call which handles the necessary data transfers and executes the
-work function of the filter. The initialization schedule initializes any state
-of a filter and possibly executes the work function for an appropriate number of
-iterations to preload the buffers with enough input to allow for continuous
-steady state execution later. The steady state schedule is wrapped in a loop and
-is executed for a given number of iterations. A callback function is registered 
-with a filter execution. Upon callback, the function sets up parameters for the
-next filter to be executed and fires that execution.
-Because StreamIt uses a Java-like syntax, for the most part, filter init and work
-functions can be directly translated into C code. Initialization code is
-separated from work function code and is placed in its own filter so that it can
-be executed separately in the init schedule. Some annotations, including filter
-names and filter item types are defined.
-
-\subsubsection{Static Scheduling}
 
 For data parallel applications, our partitioning
 phase fuses all filters into a single filter. We generate all code, both control and
@@ -253,3 +214,34 @@ sufficiently to generate some data in every channel
 buffer. Thereafter, the sequence of filter executions selected by the
 scheduler appears to perform software pipelining, although without a
 recognizable steady state.
+
+\subsection{Code Generation}
+
+%Following the previous phases, code generation is the final phase in the StreamIt
+%compiler. One option is to generate code directly targeting the Cell API.
+%The disadvantages of this approach include the additional burden of
+%dealing explicitly with DMA alignment requirements and the bloated code. Here,
+%the library provides a convenient layer of abstraction which not only abstracts
+%away DMA transfers but also provides for code that is more readable and easier
+%for the compiler to generate.
+For both static and dynamic scheduling cases, we must generate the code that
+is to be run on the multicore. In the case of Cell, we generate C
+code that utilizes the library and compile it with Cell's GCC. We place all
+control code on the PPE and all filter init and work functions on the SPEs. 
+
+We set up filter description parameters
+specifying how many inputs and outputs a filter has, which input and output
+buffers the filter reads from and writes to, and how many bytes the filter 
+reads and writes in one execution. These parameters are then used by the
+library to handles the necessary data transfers and executes the
+work function of the filter. 
+
+In the case of dynamic scheduling, scheduling, partitioning, and layout
+are handled at run-time by the dynamic scheduler. Thus, the compiler need only
+generate the aforementioned code to set up the scheduler for execution.
+
+In the case of static scheduling, we additionally set up filter layout parameters
+which specify on which SPE a filer should be run. The init and steady state
+schedules are explicit in the code: filters are loaded and run according to the
+schedule, and callbacks are used to set up parameters for and to run the next filter in
+the schedule.
