@@ -20,7 +20,7 @@ To this end, this paper contributes the following:
 \item A static scheduler implemented on top of the runtime library that statically schedules a stream graph.
 \end{enumerate}
 
-With our implementation for Cell, we achieved at least 97\% utilization on data parallel applications, giving a reasonable 3\% of library overhead, and at least 90\% utilization on pipelined applications, giving an acceptable 10\% of library overhead. The amount of code needed is also significantly reduced, thereby simplifying the implementation of a scheduler.
+With our implementation for Cell, we achieved at least 97\% utilization on data parallel applications, giving a reasonable 3\% of library overhead, and at least 90\% utilization on pipelined applications, giving an acceptable 10\% of library overhead. The amount of code needed to is also significantly reduced compared to programming directly at a lower level, thereby simplifying the implementation of a scheduler.
 
 %% new roadmap here
 %%Chapters~2 presents basic background information and related work on streaming languages and parallelization frameworks, and describes the StreamIt language and the Cell architecture in detail. Chapter~3 presents the runtime library along with a discussion of design decisions and implementation issues. Chapter~4 describes how common scheduling patterns a compiler or programmer might generate can be mapped to the library, and compares code complexity and flexibility to programming for Cell directly. Chapter~5 discusses the dynamic scheduler. Chapter~6 gives a brief analysis of the performance of the framework on a test benchmark. Chapter~7 concludes with a discussion of future work and extensions.
