@@ -17,15 +17,15 @@ onto each output channel.
 
 There are two basic constructs in the MSL: \emph{filters} and
 \emph{buffers}. A filter represents a generic actor that exposes a
-work function which is conceptually run infinitely. Filters may be
+work function which conceptually runs infinitely. Filters may be
 stateful and can read from multiple input buffers and write to multiple
 output buffers. While a filter can correspond directly to a
 single filter in the program, a compiler can also perform
 optimizations such as fusing multiple filters into a single
-coarse grained MSL filter. Work functions are opaque to the MSL.
+coarse grained MSL filter~\cite{asplos02}. Work functions are opaque to the MSL.
 
 \emph{Buffers} are contiguous regions of data that are reserved for
-temporarily storing input or output date. All buffers are circular,
+temporarily storing input or output data. All buffers are circular,
 and the MSL library maintains head and tail pointers for each buffer
 that indicate where data begins and ends. Conceptually, a buffer has
 front and back ends; data towards the front of a buffer originated
@@ -48,7 +48,7 @@ means that code should not contain any global variables; instead, all
 global variables should be declared and accessed through fields in the
 filter's state. \emph{State} contains all mutable data that must be
 maintained across iterations of the work function. State for different
-filters is disjoint, and filter code should not access mutable global
+filters is disjoint, and filter code cannot access mutable global
 state. Although a filter's code and state must reside in core local
 store when the filter's work function is running, every filter must
 have a permanent store for them in memory. The MSL provides
@@ -60,7 +60,7 @@ through the MSL library. The user provides the library with the
 properties of the filter and the local store (LS) address of its work
 function; the library initializes a control block that describes the
 loaded filter in local store, the LS address of which identifies the
-loaded filter in all future operations. If the filter is stateful, the
+loaded filter in all future operations until it is unloaded. If the filter is stateful, the
 library also copies its state into local store from its permanent
 store in memory. Code for the filter must be separately copied into
 local store through the library, but can be located anywhere as long
@@ -70,7 +70,7 @@ through the library, causing the library to copy the filter's state
 back to its permanent store in memory. Stateful filters can be loaded
 on at most one core at any time, while stateless filters can be
 simultaneously loaded on any number of cores (hence facilitating
-coarse grained data level parallelism).
+coarse-grained data parallelism).
 
 This separation of code and state allows the user additional control
 over how and when core local store is used. Since code is constant,
@@ -86,7 +86,7 @@ below).
 
 The library provides similar facilities for allocating buffers on
 cores. The size of a buffer must be a power of two, to allow
-wrap-around computations to be done with a single \textsf{AND}
+wrap-around computations to be done with a single bit-wise \textsf{AND}
 instruction. Buffers are identified by the LS address that their data
 region starts at in core local store; when allocating a buffer, the
 library initializes a control block located immediately before the
@@ -133,7 +133,7 @@ data between buffers on different processors.
 The MSL defines a simple instruction set to ease the mapping of stream
 programs to multicores. A scheduler dispatches work items to cores by
 issuing MSL instructions, and is notified when cores complete
-them. Each MSL instruction encapsulate a specific action to be
+them. Each MSL instruction encapsulates a specific action to be
 performed, and has parameters that are specified by the user. The
 instruction set is divided into three main types:
 \begin{itemize}
@@ -144,8 +144,8 @@ instruction set is divided into three main types:
 
 As an example, the \textsf{filter\_run} command, which runs a loaded
 filter, takes two parameters: the LS address of a loaded filter's
-control block, and the number of iterations to run the work function
-for. The user is responsible for ensuring that there is sufficient
+control block and the number of iterations for which to run the work function.
+The user is responsible for ensuring that there is sufficient
 data in input buffers and sufficient space in output buffers for all
 specified iterations. Other commands have similar requirements. For a
 complete description of all commands, see \cite{dxzhang-meng-07}.
@@ -169,7 +169,7 @@ necessary to limit round-trips between the scheduler and the cores
 during which the cores have no commands to execute. The MSL library
 provides a general facility for queuing and ordering commands on
 individual cores by allowing each command to specify a set of command
-IDs on that core that it depends on. Commands issued to a core are
+IDs on the core on which it depends. Commands issued to a core are
 queued and executed only after all dependencies have finished.
 
 At any time, a command that has been issued to a core can be either
@@ -183,8 +183,8 @@ have not been issued are considered to have already completed and are
 ignored.
 
 In effect, each core maintains a small dependency graph of commands
-that represents a small subset in time and space of the entire
-schedule the user executes a program with. The scheduler (which may be
+that represents a subset in time and space of the entire
+schedule. The scheduler (which may be
 user code, or a dynamic scheduler running on a control processor)
 continually adds commands to the dependency graph, while the core
 continually processes commands that have their dependencies
@@ -212,8 +212,7 @@ Since core local store is managed by the user, the user must provide
 the library with an LS address where command data will be copied to
 when it issues a command group. For dependency purposes, cores treat
 commands in a group as having been issued in the order they appear in
-the group. Although commands are issued in groups, the user is
-notified when individual commands complete.
+the group. 
 
 \subsection{Scheduler Interface}
 
@@ -272,9 +271,10 @@ advance, are handled by the library. In addition, data transfer
 commands have additional inter-core requirements that the user must
 ensure are met across all cores. When a data transfer command becomes
 active on a core, the opposing buffer must already be allocated on the
-opposing core. As well, for any buffer, at most one data transfer in
-command and one data transfer out command specifying it as the
-opposing buffer can be active at any time across all processors.
+opposing core. As well, at any time, at most one \textsf{data_transfer_in}
+command and one \textsf{data_transfer_out} command specifying any
+particular buffer as the
+opposing buffer can be active across all processors.
 
 This ``decoupling'' of data transfers simplifies the information the
 scheduler needs to keep track of. When issuing commands to one core,
