@@ -36,15 +36,15 @@ functionality.
 
 The work presented here also complements parallelization frameworks
 that have been designed specifically for multicores or Cell; see
-\cite{cell:pf} for a review. RapidMind~\cite{rapidmind}, MPI
-Microtask~\cite{mpimicrotask}, and Sequoia~\cite{sequoia} follow a
+\cite{cell:pf} for a review. RapidMind~\cite{rapidmind} and MPI
+Microtask~\cite{mpimicrotask} follow a
 ``task-based'' approach by providing runtime systems that help
 schedule program-defined tasks, or kernels. Mercury's MultiCore
 Framework~\cite{mcf} adopts a similar approach. However, it is
-optimized for exploiting data parallelism in matrix operations instead of streaming.
+primarily designed for exploiting data parallelism in large matrix computations instead of streaming. Stream Virtual Machine~\cite{svm} is a generic model for mapping stream computation; it is much broader in scope than what the MSL attempts to accomplish.
 CellSs~\cite{cellss} takes
 this a degree further by automatically generating tasks from
-annotations to linear code. The MSL allows for the exploration of
+annotations to linear code. Sequoia~\cite{sequoia} is a language that exposes an abstract hierarchical memory model and allows the programmer to define communication and local computation; its compiler and runtime system can efficiently execute Sequoia programs on Cell. The MSL allows for the exploration of
 various scheduling methodologies for executing programs on multicores.
 
 %%XXX TODO: add SVM and MERCURY 
