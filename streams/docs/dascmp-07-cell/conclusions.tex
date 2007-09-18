@@ -19,7 +19,8 @@ terms of filters and how they are scheduled instead of lower-level
 architecture-specific details. It requires far less code to implement
 scheduling patterns on top of the library than directly on Cell
 hardware for example, and the MSL library also allows far more complex
-patterns to be implemented. The library running the data-parallel
+patterns to be implemented than directly at a lower level.
+ The library running the data-parallel
 fused FFT benchmark produces a reasonably small amount of overhead
 (1.2\%), and the dynamic scheduler running the pipelined version of
 the benchmark produces an acceptable amount of overhead (8.6\%).
