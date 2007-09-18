@@ -39,7 +39,10 @@ that have been designed specifically for multicores or Cell; see
 \cite{cell:pf} for a review. RapidMind~\cite{rapidmind}, MPI
 Microtask~\cite{mpimicrotask}, and Sequoia~\cite{sequoia} follow a
 ``task-based'' approach by providing runtime systems that help
-schedule program-defined tasks, or kernels. CellSs~\cite{cellss} takes
+schedule program-defined tasks, or kernels. Mercury's MultiCore
+Framework~\cite{mcf} adopts a similar approach. However, it is
+targeted towards matrix operations instead of streaming.
+CellSs~\cite{cellss} takes
 this a degree further by automatically generating tasks from
 annotations to linear code. The MSL allows for the exploration of
 various scheduling methodologies for executing programs on multicores.
