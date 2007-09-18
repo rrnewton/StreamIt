@@ -97,8 +97,8 @@ manage data in and out of the SPE. In our methodology, the schedule is
 run on the PPE and the filters run on the SPEs.
 
 We used the StreamIt~\cite{streamitweb} programming language to
-generate the stream graph that is presented to the MSL and the
-dynamic scheduler. The basic unit of computation in StreamIt is a 
+generate the stream graph that is presented to the MSL and to both the
+static and dynamic schedulers. The basic unit of computation in StreamIt is a 
 {\it filter}. There are three basic constructs for composing filters
 into a communicating network: a {\it pipeline}, a {\it splitjoin}, and
 a {\it feedbackloop}. A pipeline behaves as the sequential composition
@@ -109,8 +109,8 @@ cycles in the stream graph.
 
 \subsection{Static Scheduler Implementation}
 
-The Cell backend for StreamIt compiles StreamIt programs down to C code that
-is run on the Cell processor through the library. The backend 
+The Cell backend for the StreamIt compiler maps StreamIt programs to C code that
+is run on the Cell processor through the MSL. The backend 
 is built upon the robust StreamIt compiler infrastructure~\cite{asplos06}. 
 Briefly, StreamIt code is converted into a
 high-level stream IR which then undergoes a series of optimizing transformations.
@@ -120,7 +120,7 @@ through four phases.
 \begin{itemize}
 \item In the scheduling phase, a steady state schedule, which maintains a constant
 number of data items in each input and output buffer after every execution, is calculated based on each
-filter's declared I/O rates. This steady state schedule can then conceptually
+filter's declared I/O rates. This steady state schedule can then
 be run in an infinite loop. Additionally, an initialization schedule may be
 generated to prime the buffers or initialize state.
 \item In the partitioning phase, filters are fused or
@@ -131,7 +131,7 @@ they are run.
 partitioning, and layout are generated and run on the target architecture.
 \end{itemize}
 
-For data parallel applications, our partitioning
+For our data parallel applications, our partitioning
 phase fuses all filters into a single filter. We generate all code, both control and
 filter work function code, through the backend. We then run this fused filter
 in parallel across all SPEs. Many real-world applications are stateless and can
@@ -147,7 +147,7 @@ therefore be data-parallelized in this fashion.
 
 The Cell architecture's communication network provides very high
 memory bandwidth. The design of the dynamic scheduler assumes that
-memory will never be a bottleneck, and the dynamic scheduler
+memory bandwidth will never be a bottleneck, and the dynamic scheduler
 buffers all output produced on SPEs to memory. The scheduler performs
 dynamic course-grained software pipelining on the stream graph; if
 sufficient data can be buffered in all channels at all times, pipeline
@@ -157,7 +157,7 @@ communication, SPE local store is generally too limited to store the
 buffering needed for software pipelining, and thus the scheduler never
 executes SPE--SPE pipelines; this avoids having to deal with work
 imbalances between pairs of adjacent filters. At any time, any two
-SPEs will typically be operating on data from widely separated
+SPEs will typically be operating on data from different 
 iterations of the program.
 
 At startup, the dynamic scheduler allocates a large\footnote{1 MB in
@@ -227,14 +227,14 @@ recognizable steady state.
 %for the compiler to generate.
 For both static and dynamic scheduling cases, we must generate the code that
 is to be run on the multicore. In the case of Cell, we generate C
-code that utilizes the library and compile it with Cell's GCC. We place all
-control code on the PPE and all filter init and work functions on the SPEs. 
+code that utilizes the library and compile it with Cell's GCC. We run all
+control code on the PPE and all filter initialization and work functions on the SPEs. 
 
 We set up filter description parameters
 specifying how many inputs and outputs a filter has, which input and output
 buffers the filter reads from and writes to, and how many bytes the filter 
 reads and writes in one execution. These parameters are then used by the
-library to handles the necessary data transfers and executes the
+library to handles the necessary data transfers and executions of the
 work function of the filter. 
 
 In the case of dynamic scheduling, scheduling, partitioning, and layout
