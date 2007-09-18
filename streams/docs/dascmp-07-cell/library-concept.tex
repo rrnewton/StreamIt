@@ -3,7 +3,8 @@
 Emerging multicore architectures provides an excellent target for
 streaming language compilers for a number of reasons:
 \begin{itemize}
-\item Individual cores are optimized for computation.
+\item Individual cores are optimized for computation, often supporting
+short vector operations in the form of SIMD instructions.
 \item Limited memory capacity on a core is not a severe
 limitation for streaming actors. In a stream program, actors typically
 embody computation, are independent of each other, have extremely

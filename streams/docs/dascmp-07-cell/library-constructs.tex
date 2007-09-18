@@ -33,7 +33,7 @@ earlier in the execution of the program.
 
 Conceptually, a filter consists of two major components, \emph{code}
 and \emph{state}, as well as basic properties that describe its work
-function such as the number of input and output tapes. \emph{Code} is
+function such as the number of input and output buffers. \emph{Code} is
 a single contiguous block of arbitrary data that may contain constant
 data and instructions that define multiple functions; the MSL only
 requires that it contain a function with a specific signature, which
@@ -93,7 +93,7 @@ library initializes a control block located immediately before the
 data region that stores the buffer's head and tail pointers and
 participates in data transfers. As an additional step required before
 a loaded filter can be run, the user must specify which buffers the
-filter's input and output tapes refer to.
+filter refers to.
 
 %% The library does not provide memory management for core local store;
 %% when filter code, filter control blocks, and buffers are allocated,
@@ -128,16 +128,16 @@ contained in exactly one buffer (which may be a core or PPE buffer)
 until it is consumed. The MSL library provides facilities for moving
 data between buffers on different processors.
  
-\section{MSL Instruction Set}
+\section{MSL Operations}
 
-The MSL defines a simple instruction set to ease the mapping of stream
+The MSL defines a simple set of operations to ease the mapping of stream
 programs to multicores. A scheduler dispatches work items to cores by
-issuing MSL instructions, and is notified when cores complete
-them. Each MSL instruction encapsulates a specific action to be
+issuing MSL commands, and is notified when cores complete
+them. Each MSL command encapsulates a specific action to be
 performed, and has parameters that are specified by the user. The
-instruction set is divided into three main types:
+set of operations is divided into three main types:
 \begin{itemize}
-\item Filter commands: commands to load or unload filters, copy filter code into local store, attach tapes to buffers, and run filters.
+\item Filter commands: commands to load or unload filters, copy filter code into local store, attach filters to buffers, and run filters.
 \item Buffer commands: commands to allocate buffers.
 \item Data transfer commands: commands to move data between buffers in the local stores of different cores, or local store and memory.
 \end{itemize}
@@ -151,9 +151,9 @@ specified iterations. Other commands have similar requirements. For a
 complete description of all commands, see \cite{dxzhang-meng-07}.
 
 The amount of work specified by a single command varies depending on
-parameters to the command. Typically, \textsf{filter\_run} commands do
+parameters to the command. Typically, work functions are small and thus \textsf{filter\_run} commands do
 not take more than a few hundred microseconds to complete; some other
-commands are auxiliary commands and complete almost immediately. This
+commands, such as allocating and attaching buffers, are auxiliary commands and complete almost immediately. This
 allows the user to quickly change scheduling decisions and avoids
 tying a core into any specific long-term action.
 
@@ -269,12 +269,7 @@ information the scheduler (or user) will know in advance; however,
 buffer head and tail pointers, which are more difficult to track in
 advance, are handled by the library. In addition, data transfer
 commands have additional inter-core requirements that the user must
-ensure are met across all cores. When a data transfer command becomes
-active on a core, the opposing buffer must already be allocated on the
-opposing core. As well, at any time, at most one \textsf{data\_transfer\_in}
-command and one \textsf{data\_transfer\_out} command specifying any
-particular buffer as the
-opposing buffer can be active across all processors.
+ensure are met across all cores.
 
 This ``decoupling'' of data transfers simplifies the information the
 scheduler needs to keep track of. When issuing commands to one core,
