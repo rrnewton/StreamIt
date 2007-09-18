@@ -176,11 +176,13 @@ is scheduled for a limited but fairly large number of iterations in
 order to amortize the cost of loading it. Filters run for their entire
 allotment of iterations; however, allotments are kept small to allow
 the scheduler to quickly schedule another filter if necessary in
-response to the changing state in the stream graph.
+response to the changing amount of data in different parts of the stream graph.
 
-A replacement filter for an SPE is selected when the current filter
-scheduled on the SPE has almost finished running for all of its
-allotted iterations. While the current filter is still running, the
+Using command completion notifications,
+the scheduler determines when the current filter scheduled on an SPE has
+almost finished running for all of its allotted iterations and selects
+a replacement filter for the SPE.
+While the current filter is still running, the
 scheduler issues additional commands to load the new filter, allocate
 its buffers, and transfer data into its input buffers from memory;
 this communication is overlapped with the computation done by the
@@ -197,7 +199,7 @@ another SPE.
 The dynamic scheduler can run multiple instances of data-parallel
 filters on multiple SPEs at the same time. A data-parallel filter is
 still selected by the same metric as other filters; it will only be
-run on more than one SPE at once if it is significantly better than
+run on more than one SPE at once if it is determined to be significantly better than
 other filters.
 
 The current metric implemented is very simple: it prioritizes filters
@@ -207,7 +209,10 @@ filter that is currently running on an SPE is prioritized when
 considered for scheduling on the same SPE; this effectively causes
 filters to be run for as long as possible on an SPE, with no load
 overhead, while no other filters are significantly better. Other more
-complex metrics can be easily substituted.
+complex metrics can be easily substituted. We have yet to make a
+full analysis of the design of metrics and their effects on the propagation
+of data through the stream graph; we plan to use the dynamic scheduling
+framework to investigate this.
 
 When the dynamic scheduler encounters a pipeline, the filter selection
 metric quickly causes all filters in the pipeline to be run
