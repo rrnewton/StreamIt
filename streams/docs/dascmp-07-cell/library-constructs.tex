@@ -271,8 +271,8 @@ advance, are handled by the library. In addition, data transfer
 commands have additional inter-core requirements that the user must
 ensure are met across all cores. When a data transfer command becomes
 active on a core, the opposing buffer must already be allocated on the
-opposing core. As well, at any time, at most one \textsf{data_transfer_in}
-command and one \textsf{data_transfer_out} command specifying any
+opposing core. As well, at any time, at most one \textsf{data\_transfer\_in}
+command and one \textsf{data\_transfer\_out} command specifying any
 particular buffer as the
 opposing buffer can be active across all processors.
 
