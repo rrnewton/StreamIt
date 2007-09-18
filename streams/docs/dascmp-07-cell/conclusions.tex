@@ -1,15 +1,16 @@
-\section{Conclusions}\label{ch:conc}
+\section{Conclusions \& Future Work}\label{ch:conc}
 
-Streaming languages such as StreamIt provide an excellent way to
+Streaming languages provide an excellent way to
 target new multicore architectures while placing minimal
 parallelization burden on the programmer. Multicore architecture such
 as Cell that are designed to offer high peak performance are well
 suited for streaming applications. This paper described a runtime
 framework for streaming applications on multicores consisting of
 \emph{i}) a common Multicore Streaming Layer (MSL) that provides
-high-level primitives for schedulers,  \emph{ii}) an implementation
-of the MSL for an existing processor, namely Cell, and \emph{iii}) a
-lightweight dynamic scheduler for stream graphs. The framework greatly
+high-level primitives for schedulers, \emph{ii}) an implementation
+of the MSL for an existing processor, namely Cell, \emph{iii}) a
+lightweight dynamic scheduler for stream graphs, and \emp{iv}) a
+static scheduler for stream graphs. The framework greatly
 simplifies the task of a streaming language compiler or scheduler.
 
 The real benefit provided by the framework, in particular the MSL
