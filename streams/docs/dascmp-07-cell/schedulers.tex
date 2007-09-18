@@ -1,7 +1,7 @@
 \section{Scheduling Stream Programs Using the MSL}\label{ch:ds}
 
 Streaming programs typically allow for a lot of freedom in terms of
-orchestrating the execution of the stream graph. This freedom is
+orchestrating the parallel execution of the stream graph. This freedom is
 afforded by the dataflow models of computation that many streaming
 languages are founded on. In a stream program, the rules governing the
 execution of a node or actor in the graph are often simple, and usually
@@ -17,7 +17,7 @@ It is possible to devise a schedule statically (e.g., compile time or
 at graph creation time) or dynamically (e.g., runtime). The goal of a
 scheduler is simply to maximize the throughput of the streaming
 application. In the age of multicore architectures, a scheduler will
-need to utilize the cores to increase concurrency and hence improve
+need to utilize multiple cores to increase concurrency and hence improve
 the throughput of a given streaming application. 
 
 A dynamic scheduler is conceptually easy to understand. The scheduler
@@ -32,7 +32,7 @@ successors. The scheduler then updates its internal representation to
 indicate the actor firings and implement a fairness policy to assure
 overall progress (e.g., a round-robin scheduler).
 
-For stream graphs that are ``well-behaved'', dynamic scheduling
+For stream graphs that are ``predictable'', dynamic scheduling
 generally does not present any advantages over static
 scheduling. Dynamic scheduling inevitably involves additional
 communication and scheduling overhead due to extra filter loading and
@@ -43,12 +43,13 @@ cores, with a sufficient coarsening of the steady state to amortize
 filter load/unload and synchronization overhead. The optimal
 situation results when the compiler can fuse all filters into a single
 data-parallel filter; this produces the minimum possible communication.
+This situation would also be optimal for a dynamic scheduler.
 
 Even when filters are stateful and thus cannot be data-parallelized,
 static software pipelining techniques~\cite{asplos06} can make full
 use of cores when the compiler has an accurate static work estimator
 and can divide filters in a steady state evenly across
-SPEs. A single stateful filter with a heavily imbalanced work
+cores. A single stateful filter with a heavily imbalanced work
 function creates a bottleneck, but dynamic schedulers are also faced
 with this problem. 
 %%In addition, no ``unpredictable'' cache misses or
@@ -56,7 +57,7 @@ with this problem.
 %%possible on the Cell architecture.
 
 Dynamic scheduling becomes beneficial when filters are not
-``well-behaved'': when it is difficult to statically balance load
+``predictable'': when it is difficult to statically balance load
 across cores, difficult to estimate the amount of work done by filter
 work functions, or work functions perform widely varying amounts of
 work through the execution of the program. In these situations,
@@ -96,8 +97,8 @@ manage data in and out of the SPE. In our methodology, the schedule is
 run on the PPE and the filters run on the SPEs.
 
 We used the StreamIt~\cite{streamitweb} programming language to
-generate the stream graph that are presented to the MSL and the
-dynamic scheduler. The basic unit of computation in StreamIt is the
+generate the stream graph that is presented to the MSL and the
+dynamic scheduler. The basic unit of computation in StreamIt is a 
 {\it filter}. There are three basic constructs for composing filters
 into a communicating network: a {\it pipeline}, a {\it splitjoin}, and
 a {\it feedbackloop}. A pipeline behaves as the sequential composition
