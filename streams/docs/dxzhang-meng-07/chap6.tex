@@ -10,7 +10,7 @@ Performance evaluation for the runtime library and dynamic scheduler was conduct
 \item FFT pipeline partially fused to six filters, pipelined across six SPEs with direct SPE--SPE communication.
 \end{enumerate}
 
-The resulting programs were executed on PlayStation 3 hardware, which only provides six usable SPEs. During each execution, a program processed 20,000 iterations of data (approximately 20 MB). Each program iteration performs 16,384 floating point operations, for a total of 327 MFLOP. Runtimes for one and six SPEs are given in figure~\ref{fig:perf:fft} (file I/O time is excluded).
+The resulting programs were executed on PlayStation 3 hardware, which only provides six usable SPEs. During each execution, a program processed 10,000 iterations of data (approximately 20 MB). Each program iteration performs 16,384 floating point operations, for a total of 164 MFLOP. Runtimes for one and six SPEs are given in figure~\ref{fig:perf:fft} (file I/O time is excluded).
 
 \begin{figure}[!htb]
 \begin{center}
