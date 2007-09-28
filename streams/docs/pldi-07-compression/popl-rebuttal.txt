@@ -1,0 +1,55 @@
+There are critical factual errors in the reviews.
+
+Reviewer 1 is mis-understanding the central technical claim of the
+paper.  The text does NOT claim that the exec-compressed rule is
+equivalent to the exec-uncompressed rule.  Rather, the *set* of rules
+describing the compressed actor (Figure 8) is equivalent to the set of
+rules describing the uncompressed actor (Figure 5).  Also, there are
+no free variables in Figure 8 -- as explained in the figure's caption,
+all variables are defined in Figure 4.  Upon re-examining the claims
+in the text, we expect the reviewer would agree that the rule is not
+"gibberish" and the semantics are not "at least partially wrong".
+
+Reviewer 1 is also mistaken in asserting that some pixel
+transformations will surely increase the file size.  The reviewer
+suggests an actor that randomly adjusts each pixel, but such an actor
+would require internal state (the random seed).  As detailed on page
+2, our paper only addresses the case of stateless actors, which (in
+the single-input, single-output case that the reviewer refers to) must
+necessarily transform each pixel in the same way.  As explained in the
+paper, such transformations will never increase the file size.
+
+Reviewer 1 is confused in stating that "the main problem is that the
+approach is tied to LZ77 - any technique where compression is not
+local will require decompression of the stream."  It sounds like the
+reviewer does not recognize that LZ77 has many non-local references
+(most implementations use a 32KB sliding window) and that our
+technique often maintains compression in the face of such references.
+
+The second part (review #1) of the first review is also innaccurate.
+It claims that our evaluation does not reflect any alignment overhead,
+as the various filters only push/pop 1 element.  In fact, the video
+compositing experiments incur significant alignment overhead, as the
+two input streams need to be aligned with one another.  Finally, this
+reviewer suggests that our baseline is simply slow.  Our baseline is
+Blender, an industrial-strength rendering and video editing package
+that was used in the production of Spiderman 2!  If the reviewer can
+suggest a better baseline, please give a citation.
+
+The third reviewer claims that LZ77 is not used for video compression,
+which could not be further from the truth in the case of lossless
+video editing (where data sizes are most unwieldy).  In Section 4.1,
+our paper cites four books that clearly state that Apple Animation
+format (a special case of LZ77) is the industry standard for lossless
+editing.  If the reviewer has any evidence to the contrary, please
+provide a citation.
+
+It is unfortunate that the reviewers do not consider this paper to be
+relevant to POPL.  It leverages a novel language design and novel
+program transformation to achieve a fully-automatic 15x (median)
+speedup on extremely practical benchmarks.  If this is not relevant to
+a programming languages and compilers audience, we don't know what is.
+
+There was a time that POPL valued practical results, rather than
+focusing only on theoretical semantics.  It seems that this day has
+passed, though we would very much like to see it return.
