@@ -5,3 +5,4 @@ rsync -Cavz ./shtml /home/public/streamit
 rm /home/public/streamit/shtml/files.shtml
 rsync -Cavz ./mpeg /home/public/streamit
 rsync -Cavz ./index.shtml /home/public/streamit
+rsync -Cavz ./cell /home/public/streamit
