@@ -1,0 +1,22 @@
+A compressed-domain transformation is one that operates directly on
+the compressed format, rather than requiring conversion to an
+uncompressed format prior to processing.  Performing operations in the
+compressed domain offers large speedups, as it reduces the volume of
+data processed and avoids the overhead of re-compression.
+
+While previous researchers have focused on compressed-domain
+techniques for lossy data formats, there are few techniques that apply
+to lossless formats.  In this paper, we present a general technique
+for transforming lossless data as compressed with the sliding-window
+Lempel Ziv algorithm (LZ77).  We focus on applications in video
+editing, where our technique supports color adjustment, video
+compositing, and other operations directly on the Apple Animation
+format (a variant of LZ77).
+
+We implemented a subset of our technique as an automatic program
+transformation.  Using the StreamIt language, users write a program to
+operate on uncompressed data, and our compiler transforms the program
+to operate on compressed data.  Experiments show that the technique
+offers speedups roughly proportional to the compression factor.  For
+our benchmark suite of 12 videos in Apple Animation format, speedups
+range from 1.1x to 471x, with a median of 15x.

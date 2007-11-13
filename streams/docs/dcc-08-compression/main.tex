@@ -1,0 +1,88 @@
+%-----------------------------------------------------------------------------
+% Based on 15 February 2005 sigplanconf-template.tex by Paul C. Anagnostopoulos
+%-----------------------------------------------------------------------------
+
+\documentclass[12pt]{article}
+
+\usepackage{bibspacing}
+\usepackage{times}
+\usepackage{amsmath}
+\usepackage{psfig}
+\usepackage{url}
+
+\usepackage{simplemargins}
+\setleftmargin{1.25in}
+\setrightmargin{1.25in}
+\settopmargin{1in}
+\setbottommargin{1in}
+
+\makeatletter
+\font\elvbf  = cmbx10 scaled 1100
+\def\section{\@startsection {section}{1}{\z@}
+   {12pt plus 2pt minus 2pt}{8pt plus 2pt minus 2pt} {\large\bf}}
+\def\subsection{\@startsection {subsection}{2}{\z@}
+   {10pt plus 2pt minus 2pt}{4pt plus 1pt minus 1pt} {\bf}}
+\makeatother
+
+\newcommand{\eightpoint}{\fontsize{8pt}{10pt}\selectfont}
+\newcommand{\ninepoint}{\fontsize{9pt}{11pt}\selectfont}
+\newcommand{\tenpoint}{\fontsize{10pt}{12pt}\selectfont}
+\newcommand{\elevenpoint}{\fontsize{11pt}{13pt}\selectfont}
+\newcommand{\thirteenpoint}{\fontsize{13pt}{14pt}\selectfont}
+\newcommand{\fourteenpoint}{\fontsize{14pt}{16pt}\selectfont}
+
+\begin{document}
+
+%\conferenceinfo{POPL '06}{January 2007, Nice, France.} 
+%\copyrightyear{2007}
+%\copyrightdata{[to be supplied]}
+
+%\titlebanner{banner above paper title}        % These are ignored unless
+%\preprintfooter{short description of paper}   % 'preprint' option specified.
+
+\title{\vspace{-40pt} \Large Direct Manipulation of LZ77-Compressed Data}
+%\title{\vspace{-40pt} \Large Compressed-Domain Techniques for Lossless Formats}
+
+%\title{\Large Compressed-Domain Techniques for Lempel-Ziv Formats}
+%\title{\Large Compressed-Domain Transformation of Lossless Image and Video Encodings}
+
+%\authorinfo{}
+
+\author{\vspace{-24pt} ~ \\ \thirteenpoint William Thies, Steven Hall, and Saman Amarasinghe \\
+        \thirteenpoint MIT Computer Science and Artificial Intelligence Laboratory \\ \vspace{-48pt}}
+
+\date{}
+%	    Massachusetts Institute of Technology}
+%           {\{thies,saman\}@mit.edu}
+
+\maketitle
+
+\begin{abstract}
+\input{abstract}
+\end{abstract}
+
+%% \category{CR-number}{subcategory}{third-level}
+%%
+%% \terms
+%% term1, term2
+%%
+%% \keywords
+%% keyword1, keyword2
+
+\input{intro}
+\input{method}
+%\input{formats}
+\input{results}
+\input{related}
+%\input{future}
+\input{conclusions}
+
+%\input{ack}
+\enlargethispage{\baselineskip}
+\setlength{\bibspacing}{0pt}
+\begin{scriptsize}
+\bibliographystyle{abbrv}
+\bibliography{references}
+\end{scriptsize}
+
+\end{document}

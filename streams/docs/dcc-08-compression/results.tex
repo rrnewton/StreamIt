@@ -1,0 +1,122 @@
+\section{Experimental Evaluation}
+
+To demonstrate the potential benefits of mapping into the compressed
+domain, we implemented a few of our transformations as part of the
+StreamIt compiler.  Our current implementation supports two
+computational patterns: 1) transforming each individual element of a
+stream (via a pop-1, push-1 filter), and 2) combining the elements of
+two streams (via a roundrobin(1,1) joiner and a pop-2, push-1 filter).
+The program can contain any number of filters that perform arbitrary
+computations, so long as the I/O rates match these patterns.  
+%While we
+%look forward to performing a broader implementation in future work,
+%these two building blocks are sufficient to express a number of useful
+%programs and to characterize the performance of the technique.
+
+Our evaluation focuses on applications in digital video editing.
+Given StreamIt source code that operates on pixels from each frame of
+a video, the StreamIt compiler maps the computation into the
+compressed domain and emits executable plugins for two popular video
+editing tools, MEncoder and Blender.
+
+Our implementation targets the Apple Animation format, which serves as
+an industry standard for exchanging computer animations and digital
+video content before they are rendered to lossy formats for final
+distribution~\cite[p.~106]{adobe-anim}\cite[p.~284]{harrington-anim}
+\cite[p.~367]{long-anim}\cite[p.~280]{pogue-anim}.  The Animation
+codec represents a restricted form of LZ77 in which repeat distances
+are limited to two values: a full frame or a single pixel.  A repeat
+across frames indicates that a stretch of pixels did not change from
+one frame to the next, while a repeat across pixels indicates that a
+stretch of pixels has the same color within a frame.  Apple Animation
+is supported under the Quicktime MOV container format.
+
+Our evaluation utilizes a suite of 12 video workloads that are
+described in Table~\ref{tab:videos}.  The suite represents three
+common usage scenarios for lossless video formats: Internet
+screencasts, computer animation, and digital television production.
+While videos in each area are often rendered to a lossy format for
+final distribution, lossless codecs are preferred during the editing
+process to avoid accumulating compression artifacts.
+
+\begin{table*}[t]
+\psfig{figure=table-benchmarks.eps,width=\textwidth}
+
+\vspace{-10pt}
+\caption{Characteristics of the video workloads.
+\protect\label{tab:videos}}
+\vspace{6pt}
+\end{table*}
+
+\begin{figure}[t]
+\begin{center}
+\mbox{~}\psfig{figure=graph-speedup-scatter.eps,width=3.7in}
+
+\vspace{-10pt}
+\caption{Speedup vs. compression factor for all transformations.
+\protect\label{fig:speedup-scatter}}
+\vspace{-12pt}
+\end{center}
+\end{figure}
+
+\begin{table*}[t]
+\vspace{-10pt}
+\hspace{-0.505in}\psfig{figure=table-pixel-speedup.eps,width=7.1in}
+
+\vspace{-10pt}
+\caption{Results for pixel transformations.
+\protect\label{tab:pixel-speedup}}
+\vspace{12pt}
+\end{table*}
+
+\begin{table*}[t]
+\psfig{figure=table-composite-speedup.eps,width=\textwidth}
+
+\vspace{-10pt}
+\caption{Results for composite transformations.
+\protect\label{tab:composite-speedup}}
+\vspace{6pt}
+\end{table*}
+
+Our evaluation platform is a dual-processor Intel Xeon (2.2 GHz) with
+2 GB of RAM.  As all of our applications are single-threaded, the
+second processor is not utilized.  
+%For the timing measurements, we
+%execute each program five times and report the median user time.  
+Our baselines are the normal transformations as implemented in Blender
+or MEncoder.
+
+Our benchmarks fall into two categories: 1) pixel transformations,
+such as brightness, contrast, and color inversion, which adjust pixels
+within a single video, and 2) video compositing, in which one video is
+combined with another as an overlay or mask.
+
+The main results of our evaluation are:
+\begin{itemize}
+
+\item \vspace{-2mm} Operating directly on compressed data offers a
+  speedup roughly proportional to the compression factor in the
+  resulting video (see Figure~\ref{fig:speedup-scatter}).
+
+\item \vspace{-2mm} For pixel transformations, speedups range from
+  2.5x to 471x, with a median of 17x (see
+  Table~\ref{tab:pixel-speedup}).  Output sizes are within 0.1\% of
+  input sizes and about 5\% larger (median) than a full
+  re-compression.
+
+\item \vspace{-2mm} For video compositing, speedups range from 1.1x to
+  32x, with a median of 6.6x (see Table~\ref{tab:composite-speedup}).
+  Output files retain a sizable compression ratio (1.0x to 44x) and
+  are about 52\% larger (median) than a full re-compression.\vspace{-2mm}
+
+\end{itemize}
+
+\noindent Pixel transformations perform better than video compositing
+because they only transform one pixel at a time.  This eliminates the
+need for any partial decoding of the input stream, and also accounts
+for the higher compression ratios preserved.  Another possible
+surprise is that uncompressed pixel transformations sometimes increase
+the compression ratio over the original video; this is due to new
+redundancy in the transformed video (e.g., many pixels brightened to
+white).  Additional analysis of the results is available
+elsewhere~\cite{techreport}.
