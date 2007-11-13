@@ -1,0 +1,16 @@
+- verify that I'm citing the right Navarro papers
+
+Not changing:
+-------------
+- change \mbox{floor} to floor symbols?  or make floor/min bold?
+- pop/push to input/output (is anyone ever confused?  pop is shorter)
+
+After submission:
+-----------------
+- explore lightweight re-compression
+- look at more mencoder transformations
+    - autolevels, IIR filters, FIR filters, etc.
+- get breakdown of time spent processing vs. time spent re-compressing
+  - can't really explain why encode_frame is so high (e.g., noop/inverse/screencast1)
+  - delete *.so* in ffmpeg directory and rebuild blender to link
+  --> could also compare runtime to Raw video output (Viktor)
