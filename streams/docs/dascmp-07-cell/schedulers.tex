@@ -57,7 +57,7 @@ with this problem.
 %%possible on the Cell architecture.
 
 Dynamic scheduling becomes beneficial when filters are not
-``predictable'': when it is difficult to statically balance load
+``predictable'': when it is difficult to statically balance loads
 across cores, difficult to estimate the amount of work done by filter
 work functions, or work functions perform widely varying amounts of
 work through the execution of the program. In these situations,
@@ -247,7 +247,7 @@ are handled at run-time by the dynamic scheduler. Thus, the compiler need only
 generate the aforementioned code to set up the scheduler for execution.
 
 In the case of static scheduling, we additionally set up filter layout parameters
-which specify on which SPE a filer should be run. The init and steady state
+which specify on which SPE a filter should be run. The init and steady state
 schedules are explicit in the code: filters are loaded and run according to the
 schedule, and callbacks are used to set up parameters for and to run the next filter in
 the schedule.
