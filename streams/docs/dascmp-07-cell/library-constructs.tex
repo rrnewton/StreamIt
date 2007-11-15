@@ -43,7 +43,7 @@ local store addresses on different cores. As such, it should not
 reference any absolute addresses, such as in absolute branches or
 loads, or modify itself.\footnote{If the user can accept limitations,
 such as not being able to relocate filter code or tying code to a
-single core, these suggestions can be ignored.} The latter constraint
+single core, these restrictions can be ignored.} The latter constraint
 means that code should not contain any global variables; instead, all
 global variables should be declared and accessed through fields in the
 filter's state. \emph{State} contains all mutable data that must be
@@ -229,7 +229,7 @@ command IDs that have completed; the user can query this bitmap in the
 callback to determine which commands have completed and respond
 accordingly. Bits in the bitmap are set until explicitly acknowledged
 by the user. After an ID has been acknowledged, it can be reused for
-new command issued to the core.
+a new command issued to the core.
 
 %% The library does not maintain a dependency graph on the PPE. Some core
 %% commands have equivalents on the PPE provided as library functions,
