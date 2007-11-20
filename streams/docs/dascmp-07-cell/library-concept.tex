@@ -10,7 +10,7 @@ limitation for streaming actors. In a stream program, actors typically
 embody computation, are independent of each other, have extremely
 local data-access patterns, and generally have small code sizes.
 \item The availability of high-bandwidth and low-latency on-chip
-communication network enables a large number of scheduling options
+communication networks enables a large number of scheduling options
 which would not be feasible for other targets, such as computing
 clusters.
 \end{itemize}
@@ -35,7 +35,7 @@ must address the following challenges:
 
 The purpose of the multicore streaming layer (MSL) is to abstract
 \textsf{(1)} and provide facilities that simplify \textsf{(2)} and
-\textsf{(3)}. The MSL frees a compiler or programmer from needing to
+\textsf{(3)}. The MSL frees a compiler or programmer from the need to
 deal with the details of the architecture communication model,
 allowing it to focus on exploring high-level optimization and
 scheduling choices. The main goal of the MSL is to provide a generic
@@ -44,4 +44,4 @@ that simplifies scheduling operations. The low level details that are
 specific to individual platforms are embedded in the MSL library
 implementation, and hidden from the programmer or the compiler. As a
 result, the MSL can provide a common platform for mapping streaming
-computation to multicore and enhance portability.
+computation to multicores and thereby enhance portability.

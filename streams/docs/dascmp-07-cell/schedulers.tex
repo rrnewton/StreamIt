@@ -107,14 +107,14 @@ parallel streams that diverge from a common {\it splitter} and merge
 into a common {\it joiner}. A feedbackloop provides a way to create
 cycles in the stream graph.
 
-\subsection{Static Scheduler Implementation}
-
 The Cell backend for the StreamIt compiler maps StreamIt programs to C code that
 is run on the Cell processor through the MSL. The backend 
 is built upon the robust StreamIt compiler infrastructure~\cite{asplos06}. 
 Briefly, StreamIt code is converted into a
 high-level stream IR which then undergoes a series of optimizing transformations.
 
+
+\subsection{Static Scheduler Implementation}
 In the case of static scheduling, the compiler processes the stream program
 through four phases.
 \begin{itemize}
@@ -122,11 +122,11 @@ through four phases.
 number of data items in each input and output buffer after every execution, is calculated based on each
 filter's declared I/O rates. This steady state schedule can then
 be run in an infinite loop. Additionally, an initialization schedule may be
-generated to prime the buffers or initialize state.
+generated to prime the buffers or to initialize state.
 \item In the partitioning phase, filters are fused or
-fissed to achieve the best level of granularity for the best load balancing.
+split to achieve the best level of granularity for the best load balancing.
 \item In the layout phase, filters are assigned to specific cores on which
-they are run.
+they are to be run.
 \item In the code generation phase, appropriate code that encapsulates the schedule,
 partitioning, and layout are generated and run on the target architecture.
 \end{itemize}
@@ -149,7 +149,7 @@ The Cell architecture's communication network provides very high
 memory bandwidth. The design of the dynamic scheduler assumes that
 memory bandwidth will never be a bottleneck, and the dynamic scheduler
 buffers all output produced on SPEs to memory. The scheduler performs
-dynamic course-grained software pipelining on the stream graph; if
+dynamic coarse-grained software pipelining on the stream graph; if
 sufficient data can be buffered in all channels at all times, pipeline
 stalls can be avoided and all SPEs can be fully utilized. While
 SPE--SPE communication is more efficient than SPE--memory

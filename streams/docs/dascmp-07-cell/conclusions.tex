@@ -35,7 +35,9 @@ doing so would make the SPE library implementation, especially the run
 list, much more specialized.
 
 In addition, the implementation currently lacks real support for
-filters with dynamic rates -- the library simply leaves the
+filters with dynamic rates (i.e. I/O rates that change over time and
+across executions)
+-- the library simply leaves the
 responsibility of tracking rates to the scheduler entirely. Feedback
 from the library on how much data filters have produced and consumed
 would be very useful for schedulers; ultimately, the library should
