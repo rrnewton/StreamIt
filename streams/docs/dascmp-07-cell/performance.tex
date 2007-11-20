@@ -114,3 +114,10 @@ This partition has a slight work imbalance. The Run~\% and Work~\% numbers given
 
 The \textsf{MPEG\_dynamic} benchmark uses the dynamic scheduler to schedule the four filters. 
 As with \textsf{FFT\_dynamic}, utilization and runtimes are nearly identical across all SPEs and there is nearly perfectly linear speedup as the number of SPEs is varied. Compared to the static schedule, the dynamic scheduler is not limited by the concept of a steady state and does not impose any synchronization barriers; however, in order to dynamically switch filters on cores, it must issue more commands. This translates into slightly higher Run~\% but slightly lower Work~\%. However, the dynamic scheduler is able to more efficiently distribute work across all available cores; overall, this results in a 2.5\% performance improvement over \textsf{MPEG\_static}.
+
+The performance of the benchmarks in terms of GOPS is relatively low compared
+to the theoretical maximum performance. One contributing factor to these
+results is the fact that no SIMD vectorization was performed. For these
+benchmarks, vectorization has potential to significantly increase performance.
+Nevertheless, we believe that the high utilization achieved is the major
+contribution.
