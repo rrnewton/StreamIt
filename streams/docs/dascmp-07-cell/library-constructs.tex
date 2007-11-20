@@ -5,7 +5,7 @@ domains such as functional, dataflow, CSP and synchronous
 programming~\cite{survey97}. The MSL assumes an architecture-independent
 programming language for high-performance stream programming. It
 requires that the stream program presented for execution simply
-consists of a dataflow graph expressing the computation. Nodes in the
+consist of a dataflow graph expressing the computation. Nodes in the
 graphs embody computation (e.g., actors, filters, some encapsulated
 code block), and edges indicate data dependencies between
 input and output buffers attached to the compute nodes.
@@ -124,7 +124,7 @@ core is limited only by available local store.
 %% The library defines a PPE or memory buffer construct that is an extension of the core buffer. PPE buffers are not required to be circular, and buffers that are non-circular have no size limitations. PPE buffers are identified by the address of their control block, and multiple buffers can refer to the same data region, with different head and tail pointers. This is used to implement certain StreamIt features with minimal overhead, such as duplicate splitters and data-parallel execution. Because of the limited size of core local store, this functionality was considered unnecessary for core buffers.
 
 Conceptually, data produced during the execution of a program is
-contained in exactly one buffer (which may be a core or PPE buffer)
+contained in exactly one buffer on one processor
 until it is consumed. The MSL library provides facilities for moving
 data between buffers on different processors.
  
@@ -139,7 +139,7 @@ set of operations is divided into three main types:
 \begin{itemize}
 \item Filter commands: commands to load or unload filters, copy filter code into local store, attach filters to buffers, and run filters.
 \item Buffer commands: commands to allocate buffers.
-\item Data transfer commands: commands to move data between buffers in the local stores of different cores, or local store and memory.
+\item Data transfer commands: commands to move data between buffers in the local stores of different cores, or between local store and memory.
 \end{itemize}
 
 As an example, the \textsf{filter\_run} command, which runs a loaded
@@ -280,13 +280,14 @@ will handle synchronization between buffers.
 
 \subsection{Runtime Checks}
 
-The MSL library implements a number of runtime checks that can be
-enabled or disabled. When enabled, the library validates buffers
+The MSL library supports a number of runtime checks that can be
+enabled or disabled. When enabled, the library can validate buffers
 accesses to ensure that they contain sufficient data/space, and
-performs additional checks to ensure that issued commands are
+can perform additional checks to ensure that issued commands are
 consistent. While this cannot identify all bugs in a schedule or
-filter work function, it has nonetheless been very useful during the
-development of the library, the dynamic scheduler, and test programs;
-it has often exposed bugs that would otherwise only appear as a hung
+filter work function, it can nonetheless be very useful during the
+development of an MSL library implementation, a dynamic scheduler, or
+ test programs;
+it can exposed bugs that would otherwise appear only as a hung
 program or incorrect output.
 
