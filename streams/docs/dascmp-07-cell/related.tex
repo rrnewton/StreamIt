@@ -41,7 +41,29 @@ Microtask~\cite{mpimicrotask} follow a
 ``task-based'' approach by providing runtime systems that help
 schedule program-defined tasks, or kernels. Mercury's MultiCore
 Framework~\cite{mcf} adopts a similar approach. However, it is
-primarily designed for exploiting data parallelism in large matrix computations instead of streaming. Stream Virtual Machine~\cite{svm} is a generic model for mapping stream computation; it is much broader in scope than what the MSL attempts to accomplish.
+primarily designed for exploiting data parallelism in large matrix computations instead of streaming. 
+
+The Stream Virtual Machine (SVM) also aims to simplify compilation to
+diverse multicore architectures~\cite{svm:specs,svm}.  As a specification,
+the SVM is more general than the MSL, encompassing a broader class of
+architectures and applications while potentially incurring higher
+runtime overhead.  The SVM supports a rich parameterized machine model
+encompassing FIFO interconnects, specialized DMA processors, and
+hierarchical control processors, while the MSL targets regular
+distributed-memory machines with a single control processor and
+implicit DMA between processors.  A complete implementation of the SVM
+must support automatic flow control, end-of-stream markers, and
+suspension/termination of filters; the MSL elides these functions
+because they complicate the interface and are difficult to implement
+efficiently.  The MSL API simplifies the tracking of filter
+dependences by assigning a unique identifier to each {\it command}
+instance, rather than tracking the underlying filters and sometimes
+depending on the state of those filters (as in the SVM).  Finally, the
+MSL was designed from the beginning to be implemented as a standalone
+library; while a library implementation is also possible with the SVM,
+the specification was influenced by an intention to employ a
+special-purpose ``low-level compiler'' to process the client code.
+
 CellSs~\cite{cellss} takes
 this a degree further by automatically generating tasks from
 annotations to linear code. Sequoia~\cite{sequoia} is a language that exposes an abstract hierarchical memory model and allows the programmer to define communication and local computation; its compiler and runtime system can efficiently execute Sequoia programs on Cell. The MSL allows for the exploration of
