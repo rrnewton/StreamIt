@@ -12,36 +12,43 @@ Because programs written in streaming languages are explicitly
 structured as communicating actors, they typically expose a high
 degree of parallelism. This allows streaming language compilers to
 easily analyze stream programs and efficiently parallelize
-them. Compared to sequential languages, streaming languages free the
-programmer from the burden of having to explicitly write parallelized
-code for specific architectures, allowing him to focus on expressing
+them. Compared to sequential languages, streaming languages free
+programmers from the burden of having to explicitly write parallelized
+code for specific architectures, allowing them to focus on expressing
 the high-level semantics of the algorithm in a natural way.
 Recent developments in streaming languages include Brook~\cite{brook},
 Cg~\cite{cg}, StreamC/KernelC~\cite{streamc}, and StreamIt~\cite{streamitweb}.
 The MSL is not tied to any particular language choice and simply
 relies on the expression of computation as a dataflow graph.
  
-MPI and OpenMP are probably the two most well-known and widely used
+MPI and OpenMP are arguably the most well-known and widely used
 parallelization frameworks for computing clusters and traditional SMP
 architectures. These two programming APIs represent opposite ends of a
 spectrum: MPI defines a language-independent, low-level network
-communication API, while OpenMP defines a set of 
-high-level annotations that programs can use to cause compatible
-compilers to generate multi-threaded code.  The multicore streaming
-layer and library are intended to provide the same kind of low-level
-functionality as MPI, with two major differences: \emph{i}) it is more
-suited for multicores instead of networks, and \emph{ii}) it is
-specific to streaming applications and provides additional control
-functionality.
+communication API, while OpenMP defines a set of  high-level
+annotations that programs can use to direct compatible compilers to
+generate multi-threaded code.  The multicore streaming layer and
+library are intended to provide the same kind of low-level
+functionality as MPI, with two major differences: \emph{i}) they are
+more naturally suited for multicores rather that clusters, and
+\emph{ii}) they are specific to streaming applications and hence provides
+more targeted control functionality.
 
 The work presented here also complements parallelization frameworks
 that have been designed specifically for multicores or Cell; see
 \cite{cell:pf} for a review. RapidMind~\cite{rapidmind} and MPI
-Microtask~\cite{mpimicrotask} follow a
-``task-based'' approach by providing runtime systems that help
-schedule program-defined tasks, or kernels. Mercury's MultiCore
-Framework~\cite{mcf} adopts a similar approach. However, it is
-primarily designed for exploiting data parallelism in large matrix computations instead of streaming. 
+Microtask~\cite{mpimicrotask} follow a ``task-based'' approach by
+providing runtime systems that help schedule program-defined tasks, or
+kernels. Mercury's MultiCore Framework~\cite{mcf} adopts a similar
+approach. However, it is primarily designed for exploiting data
+parallelism in large matrix computations instead of streaming.
+CellSs~\cite{cellss} attempts to automatically generate tasks from
+annotations to linear code. Sequoia~\cite{sequoia} is a language that
+exposes an abstract hierarchical memory model and allows the
+programmer to define communication and local computation; its compiler
+and runtime system can efficiently execute Sequoia programs on
+Cell. The MSL allows for the exploration of various scheduling
+methodologies for executing programs on multicores.
 
 The Stream Virtual Machine (SVM) also aims to simplify compilation to
 diverse multicore architectures~\cite{svm:specs,svm}.  As a specification,
@@ -64,9 +71,5 @@ library; while a library implementation is also possible with the SVM,
 the specification was influenced by an intention to employ a
 special-purpose ``low-level compiler'' to process the client code.
 
-CellSs~\cite{cellss} takes
-this a degree further by automatically generating tasks from
-annotations to linear code. Sequoia~\cite{sequoia} is a language that exposes an abstract hierarchical memory model and allows the programmer to define communication and local computation; its compiler and runtime system can efficiently execute Sequoia programs on Cell. The MSL allows for the exploration of
-various scheduling methodologies for executing programs on multicores.
 
 %%XXX TODO: add SVM and MERCURY 
