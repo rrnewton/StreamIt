@@ -10,20 +10,22 @@ framework for streaming applications on multicores consisting of
 high-level primitives for schedulers, \emph{ii}) an implementation
 of the MSL for an existing processor, namely Cell, \emph{iii}) a
 lightweight dynamic scheduler for stream graphs, and \emph{iv}) a
-static scheduler for stream graphs. The framework greatly
+static scheduler for stream graphs. The framework offers automatic
+management and optimization of communication, and greatly
 simplifies the task of a streaming language compiler or scheduler.
 
 The real benefit provided by the framework, in particular the MSL
 runtime library, is that it allows a scheduler to think directly in
 terms of filters and how they are scheduled instead of lower-level
-architecture-specific details. It requires far less code to implement
-scheduling patterns on top of the library than directly on Cell
-hardware for example, and the MSL library also allows far more complex
-patterns to be implemented than directly at a lower level.
- The library running the data-parallel
-fused FFT benchmark produces a reasonably small amount of overhead
-(1.2\%), and the dynamic scheduler running the pipelined version of
-the benchmark produces an acceptable amount of overhead (8.6\%).
+architecture-specific details. We found that the scheduler required
+far less code to implement scheduling patterns on top of the library
+than directly on Cell hardware for example. The MSL library also
+allows for far more complex patterns to be implemented than is
+directly feasible at at a lower level. The library running the
+data-parallel fused FFT benchmark produces a reasonably small amount
+of overhead (1.2\%), and the dynamic scheduler running the pipelined
+version of the benchmark produces an acceptable amount of overhead
+(8.6\%).
 
 The MSL library currently provides two orthogonal branches that can be
 further developed. First, it is important to reduce the 9\% overhead
@@ -35,15 +37,14 @@ doing so would make the SPE library implementation, especially the run
 list, much more specialized.
 
 In addition, the implementation currently lacks real support for
-filters with dynamic rates (i.e. I/O rates that change over time and
-across executions)
--- the library simply leaves the
-responsibility of tracking rates to the scheduler entirely. Feedback
-from the library on how much data filters have produced and consumed
+filters with dynamic rates (i.e., I/O rates that change over time and
+across executions). The library simply leaves the responsibility of
+tracking rates to the scheduler entirely. Feedback from the library on
+how the amount of data produced and consumed by individual filters
 would be very useful for schedulers; ultimately, the library should
 have some way of running filters with unbounded dynamic rates. The
-latter would require a general mechanism to suspend dynamic rate
-filters in the middle of executing their work functions.
+latter requires a general mechanism to suspend dynamic rate filters in
+the middle of executing their work functions.
 
 The dynamic scheduler can be extended in many directions. The simplest
 additions involve adjusting the metric used for selecting filters to
