@@ -2,7 +2,7 @@
 
 We evaluate the performance of the MSL library and StreamIt compiler backend
 on a set of four StreamIt applications and using different scheduling
-methodologies. The applications are described in figure~\ref{fig:perf:apps}.
+methodologies. The applications are described in Figure~\ref{fig:perf:apps}.
 For statically-scheduled benchmarks, the scheduler executes a sufficiently
 coarsened steady state to reduce library overhead, and imposes an explicit
 synchronization barrier between steady state iterations. The dynamic scheduler
@@ -31,9 +31,9 @@ six usable SPEs. All benchmarks were scheduled to use six SPEs except
 for the two MPEG benchmarks, which use five SPEs.
 Benchmarks were run for a large number of steady state iterations
 to reduce the effect of one-time execution startup overhead.
-Performance results are given in figure~\ref{fig:perf:stats}.
+Performance results are given in Figure~\ref{fig:perf:stats}.
 
-\begin{figure}[!tb]
+\begin{figure*}[!tb]
 \begin{center}
 \begin{tabular}{|l|r|r|r|r|r|r|}
 \hline
@@ -55,7 +55,7 @@ Performance results are given in figure~\ref{fig:perf:stats}.
 \end{center}
 \caption{Benchmark performance.}
 \label{fig:perf:stats}
-\end{figure}
+\end{figure*}
 
 The \emph{Util} column gives the average SPE utilization of the benchmark;
 this is the percentage of total execution time spent inside filter work functions,
