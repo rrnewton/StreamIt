@@ -71,14 +71,19 @@ library; while a library implementation is also possible with the SVM,
 the specification was influenced by an intention to employ a
 special-purpose ``low-level compiler'' to process the client code.
 
-Gummaraju and Rosenblum map a stream execution model based on the SVM
-to a general purpose processor~\cite{streamgpp}. The mapping 
-is similar to a ``low-level compiler'' that interfaces between the SVM
-and the target architecture. It abstracts out processors and memories, 
-and in particular supports hyper-threaded processors with multiple
-hardware contexts. However, because the goal is to map stream
-programs to general purpose processors, many mapping techniques are specific to
-such single-core commodity CPUs.
+Gummaraju and Rosenblum use the SVM to map programs written in a
+streaming fashion to a general purpose multi-threaded
+processor~\cite{streamgpp}. Their results demonstrate that using a
+streaming programming model can benefit general purpose cache-based
+architectures. They use a scheduling model where dependencies between
+computation and communication are determined at compile time and
+scheduling is performed at runtime. However, they assume that there is
+a shared cache level between thread contexts, and hence do not have to
+deal with the general communication challenges that arise in a
+distributed memory multicore. The MSL and library presented in this
+paper offer a more general solution that can also deal with future
+large scale multicores, especially ones patterned after a distributed
+memory model.
 
 
 %%XXX TODO: add SVM and MERCURY 
