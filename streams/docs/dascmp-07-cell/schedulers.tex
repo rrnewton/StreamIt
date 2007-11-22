@@ -72,7 +72,7 @@ running.
 
 We implemented static and dynamic schedulers that use the MSL to
 facilitate the mapping of stream programs to a multicore. Our
-methodology and results and discussed next.
+methodology and results are discussed next.
 
 %% In addition, for stream graphs that contain filters with
 %% dynamic rates, it may not be possible to statically predict how many
@@ -143,7 +143,7 @@ buffer after every execution, is calculated based on each filter's
 declared I/O rates. This steady state schedule can then be run in an
 infinite loop. Additionally, an initialization schedule may be
 generated to prime the buffers or to initialize state.
-\item In the partitioning phase, filters are fused or split to achieve
+\item In the partitioning phase, filters are fused or duplicated to achieve
 the best level of granularity for the best load balancing.
 \item In the layout phase, filters are assigned to virtual cores on
 which they are to be run.

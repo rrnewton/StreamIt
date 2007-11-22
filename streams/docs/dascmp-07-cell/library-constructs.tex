@@ -11,9 +11,9 @@ filters, kernels, some encapsulated code block), and edges imply data
 dependencies between input and output buffers attached to the compute
 nodes. An example stream graph for an MPEG-2 decoder is shown in
 Figure~\ref{fig:mpeg}. Nodes in sequence expose pipeline parallelism,
-and nodes in parallel expose task (two branches of a split-join
+and nodes in parallel expose task (two branches of a split-join that
 contain different computation) and data parallelism (branches of a
-split-join contain the same computation but on different data).
+split-join that contain the same computation operate on different data).
 
 \begin{figure}[tb]
 \begin{center}
@@ -52,7 +52,7 @@ constant data and instructions that define multiple functions; the MSL
 only requires that it contain a function with a specific signature
 that is used as the work function. Code for a filter is intended to be
 a single modular component that can be easily relocated to different
-cores. On a distributed memory architecture where each core has a
+cores. On a distributed-memory architecture where each core has a
 dedicated local store (LS), code should not reference absolute
 addresses (e.g., absolute branches or loads) or modify
 itself\footnote{These restrictions may be ignored if it is acceptable
@@ -74,7 +74,7 @@ between local store and memory. Note that although we refer to a
 core's local store, the MSL concepts and constructs are applicable on
 shared memory multicores. The locality restrictions are generally
 advantageous for cache-based architectures, NUMA architectures, and
-distributed memory architectures.
+distributed-memory architectures.
 
 A user (e.g., compiler or scheduler) provides the library with the
 properties of the filter and the local store address of its work
@@ -132,6 +132,11 @@ buffers the filter refers to before a loaded filter can run.
 
 Theoretically, the number of filters loaded and buffers allocated on a
 core is limited only by the size of the local store.
+Allocating local store is completely left to the user,
+allowing a scheduler to base allocation decisions on scheduling decisions.
+This is critically important on architectures like Cell that have
+severely limited local store space, where the scheduler can make
+much better informed allocation decisions than any other party.
 %% However, there is
 %% generally no useful purpose in keeping more than two filters and their
 %% associated buffers on a core at any time.
@@ -307,7 +312,6 @@ accesses to ensure that they contain sufficient data/space, and can
 perform additional checks to ensure that issued commands are
 consistent. While this cannot identify all bugs in a schedule or
 filter work function, it can nonetheless be very useful during the
-development of an MSL library implementation, a dynamic scheduler, or
-test programs. These checks can expose bugs that may otherwise appear
+development of a scheduler or programs. These checks can expose bugs that may otherwise appear
 non-deterministically as hung executions or incorrect output.
 

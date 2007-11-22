@@ -23,7 +23,7 @@ must address the following challenges:
   communication model also require pipelining the data transfers (e.g.,
   double-buffering) to increase efficiency and throughput.
 \item For architectures with a finite local store on a core, the code,
-  input and output buffers, and the state required by the computation
+  input and output buffers, and state required by the computation
   must be tightly packaged to fit into the local memory. This
   consideration is akin to locality enhancing optimizations for
   architectures with caches.
@@ -36,7 +36,7 @@ must address the following challenges:
 The purpose of the multicore streaming layer (MSL) is to abstract
 \textsf{(1)} and provide facilities that simplify \textsf{(2)} and
 \textsf{(3)}. The MSL frees a compiler or programmer from the need to
-deal with the details of the architecture communication model,
+deal with the details of the architecture's communication model,
 allowing it to focus on exploring high-level optimization and
 scheduling choices. The main goal of the MSL is to provide a generic
 framework for controlling and dispatching computation to multicores
