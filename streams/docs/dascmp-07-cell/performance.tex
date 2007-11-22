@@ -33,8 +33,9 @@ Benchmarks were run for a large number of steady state iterations
 to reduce the effect of one-time execution startup overhead.
 Performance results are given in Figure~\ref{fig:perf:stats}.
 
-\begin{figure*}[!tb]
+\begin{table*}[tb]
 \begin{center}
+\caption{Benchmark performance.}
 \begin{tabular}{|l|r|r|r|r|r|r|}
 \hline
                              & Util & Lib & Sched & Min Sched & Max Sched & Throughput \\
@@ -53,20 +54,19 @@ Performance results are given in Figure~\ref{fig:perf:stats}.
 \hline
 \end{tabular}
 \end{center}
-\caption{Benchmark performance.}
 \label{fig:perf:stats}
-\end{figure*}
+\end{table*}
 
-The \emph{Util} column gives the average SPE utilization of the benchmark;
-this is the percentage of total execution time spent inside filter work functions,
+The \emph{Util} column gives the average SPE utilization of the
+benchmark. This is the percentage of total execution time spent inside filter work functions,
 averaged over all SPEs. The remainder is overhead, which we divide into two categories:
 \emph{library overhead} and \emph{scheduling overhead}. \emph{Library overhead}
 is time during which an SPE has active \textsf{filter\_run} commands but is not
 running a work function. This type of overhead is added entirely by library code
 when it is either dispatching or executing other commands.
 \emph{Scheduling overhead} is time during which an SPE has no active
-\textsf{filter\_run} commands. During this time, the SPE has no useful work to do;
-it may be either \emph{i}) waiting for filters to be scheduled or \emph{ii})
+\textsf{filter\_run} commands. During this time, the SPE has no useful work to do.
+It may be either \emph{i}) waiting for filters to be scheduled or \emph{ii})
 waiting for sufficient input or output data to be transferred to allow a scheduled filter to run
 (i.e., due to inadequate double-buffering).
 When large, scheduling overhead can be viewed as resulting from the scheduling algorithm
