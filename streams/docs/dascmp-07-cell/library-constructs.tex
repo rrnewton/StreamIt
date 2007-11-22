@@ -9,7 +9,19 @@ execution simply consist of a dataflow graph expressing the
 computation. Nodes in the graphs embody computation (e.g., actors,
 filters, kernels, some encapsulated code block), and edges imply data
 dependencies between input and output buffers attached to the compute
-nodes.
+nodes. An example stream graph for an MPEG-2 decoder is shown in
+Figure~\ref{fig:mpeg}. Nodes in sequence expose pipeline parallelism,
+and nodes in parallel expose task (two branches of a split-join
+contain different computation) and data parallelism (branches of a
+split-join contain the same computation but on different data).
+
+\begin{figure}[tb]
+\begin{center}
+\includegraphics[scale=.55]{figs/mpeg2d}
+\end{center}
+\caption[MPEG-2 stream graph.]{MPEG-2 stream graph.}
+\label{fig:mpeg}
+\end{figure}
 
 An execution of a stream program is an ordered sequence of node
 firings. Each node follows a set of execution steps that consume a
