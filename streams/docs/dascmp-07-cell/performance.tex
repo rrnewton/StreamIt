@@ -2,13 +2,13 @@
 
 We evaluate the performance of the MSL library and StreamIt compiler backend
 on a set of four StreamIt applications and using different scheduling
-methodologies. The applications are described in Figure~\ref{fig:perf:apps}.
+methodologies. The applications are described in Table~\ref{fig:perf:apps}.
 For statically-scheduled benchmarks, the scheduler executes a sufficiently
 coarsened steady state to reduce library overhead, and imposes an explicit
 synchronization barrier between steady state iterations. The dynamic scheduler
 automatically coarsens work functions as necessary.
 
-\begin{figure}[!htb]
+\begin{table}[!htb]
 \begin{center}
 \begin{tabular}{|l|p{2.25in}|}
 \hline
@@ -24,37 +24,37 @@ MPEG        & MPEG-2 block and motion vector decoding (subset of full MPEG-2 dec
 \end{center}
 \caption{Benchmark applications.}
 \label{fig:perf:apps}
-\end{figure}
+\end{table}
 
 The benchmarks were run on PlayStation 3 hardware, which only provides
 six usable SPEs. All benchmarks were scheduled to use six SPEs except
 for the two MPEG benchmarks, which use five SPEs.
 Benchmarks were run for a large number of steady state iterations
 to reduce the effect of one-time execution startup overhead.
-Performance results are given in Figure~\ref{fig:perf:stats}.
+Performance results are given in Table~\ref{fig:perf:stats}.
 
-\begin{table*}[tb]
+\begin{table*}[!tb]
 \begin{center}
-\caption{Benchmark performance.}
 \begin{tabular}{|l|r|r|r|r|r|r|}
 \hline
-                             & Util & Lib & Sched & Min Sched & Max Sched & Throughput \\
+                             & Util (\%) & Lib (\%) & Sched (\%) & Min Sched (\%) & Max Sched (\%) & Throughput \\
 \hline
-\textsf{BitonicSort\_static} & 97.1 & 0.1 &   2.9 &       2.9 &       2.9 &        0.5 \\
+\textsf{BitonicSort\_static} & 97.1 & 0.1 &   2.9 &       2.9 &       2.9 &        0.5 GOPS \\
 \hline
-\textsf{DCT\_static}         & 97.7 & 1.0 &   1.3 &       1.3 &       1.3 &        3.2 \\
+\textsf{DCT\_static}         & 97.7 & 1.0 &   1.3 &       1.3 &       1.3 &        3.2 GFLOPS \\
 \hline
-\textsf{FFT\_c}              & 99.1 &     &       &           &           &        2.5 \\
-\textsf{FFT\_static}         & 98.6 & 0.6 &   0.9 &       0.9 &       0.9 &        1.9 \\
-\textsf{FFT\_dynamic}        & 88.8 & 9.2 &   2.0 &       1.2 &       2.9 &        2.2 \\
-\textsf{FFT\_pipeline}       & 78.0 & 3.6 &  18.5 &       4.2 &      33.9 &        1.9 \\
+\textsf{FFT\_c}              & 99.1 &     &       &           &           &        2.5 GFLOPS \\
+\textsf{FFT\_static}         & 98.6 & 0.6 &   0.9 &       0.9 &       0.9 &        1.9 GFLOPS \\
+\textsf{FFT\_dynamic}        & 88.8 & 9.2 &   2.0 &       1.2 &       2.9 &        2.2 GFLOPS \\
+\textsf{FFT\_pipeline}       & 78.0 & 3.6 &  18.5 &       4.2 &      33.9 &        1.9 GFLOPS \\
 \hline
-\textsf{MPEG\_static}        & 95.1 & 1.0 &   3.9 &       1.5 &       8.1 &       46.9 \\
-\textsf{MPEG\_dynamic}       & 97.8 & 1.7 &   0.5 &       0.3 &       0.8 &       48.2 \\
+\textsf{MPEG\_static}        & 95.1 & 1.0 &   3.9 &       1.5 &       8.1 &       46.9 FPS \\
+\textsf{MPEG\_dynamic}       & 97.8 & 1.7 &   0.5 &       0.3 &       0.8 &       48.2 FPS \\
 \hline
 \end{tabular}
 \end{center}
 \label{fig:perf:stats}
+\caption{Benchmark performance.}
 \end{table*}
 
 The \emph{Util} column gives the average SPE utilization of the
@@ -136,9 +136,9 @@ The \textsf{MPEG\_static} benchmark statically software-pipelines the four filte
 We generated the static schedule for five SPEs by manually profiling, duplicating, and
 partitioning filters, and manually generating control code to issue the resulting schedule.
 The mapping of filters to SPEs in the partition that we obtained is given in
-figure~\ref{fig:perf:mpegs}.
+Table~\ref{fig:perf:mpegs}.
 
-\begin{figure}[!htb]
+\begin{table}[!htb]
 \begin{center}
 \begin{tabular}{|r|l|}
 \hline
@@ -158,7 +158,7 @@ SPE & Filters \\
 \end{center}
 \caption{Partition for \textsf{MPEG\_static} benchmark.}
 \label{fig:perf:mpegs}
-\end{figure}
+\end{table}
 
 This partition exhibits a slight work imbalance: SPE 0 has slightly less work than SPE 1,
 which has slightly less work than the remaining SPEs.

@@ -42,20 +42,19 @@ issues the compiler must contend with, especially when presented with
 a heterogeneous, distributed-memory architecture.
 
 One example of such an architecture is the Cell multicore
-architecture. Cell is a heterogeneous architecture that does
-\emph{not} use shared memory. Compared to traditional SMP
-architectures, Cell is a distributed memory architecture. Its design
-is a trade-off favoring computing power, ease of manufacturing, and
-low power consumption at the cost of higher programming
+architecture. Compared to traditional SMP architectures, Cell is a
+heterogeneous, distributed-memory architecture. Its design
+is a trade-off favoring computing power, ease of manufacture, and
+low power consumption at the cost of increased programming
 complexity. For programmers writing applications that run on Cell and
-similar distributed memory architectures, they are left with
+similar distributed-memory architectures, they are left with
 additional programming complications to contend with: they not only
-have to effectively orchestrate parallel computation, but must
+need to effectively orchestrate parallel computation, but must
 carefully manage communication as well.
 
 The goal of this paper is to create a general runtime framework for
 streaming applications to alleviate these programming complexities for
-multicores, especially distributed memory architectures like Cell. The
+multicores, especially distributed-memory architectures like Cell. The
 paper \emph{i}) describes a multicore streaming layer (MSL) that abstracts
 away the architecture-specific details that otherwise complicate the
 scheduling of computation and communication in a stream program, and
@@ -63,7 +62,7 @@ scheduling of computation and communication in a stream program, and
 processor. We chose Cell as a test target architecture because we
 believe that (heterogeneous) multicore architectures with distributed
 memory will be prevalent in the future, as they scale
-better~\cite{theo-phd-07} than their shared memory counterparts which
+better~\cite{theo-phd-07} than their shared-memory counterparts which
 are predominant today.
 
 The proposed MSL framework is primarily geared toward compilers rather
