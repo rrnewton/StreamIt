@@ -71,5 +71,14 @@ library; while a library implementation is also possible with the SVM,
 the specification was influenced by an intention to employ a
 special-purpose ``low-level compiler'' to process the client code.
 
+Gummaraju and Rosenblum map a stream execution model based on the SVM
+to a general purpose processor~\cite{streamgpp}. The mapping 
+is similar to a ``low-level compiler'' that interfaces between the SVM
+and the target architecture. It abstracts out processors and memories, 
+and in particular supports hyper-threaded processors with multiple
+hardware contexts. However, because the goal is to map stream
+programs to general purpose processors, many mapping techniques are specific to
+such single-core commodity CPUs.
+
 
 %%XXX TODO: add SVM and MERCURY 
