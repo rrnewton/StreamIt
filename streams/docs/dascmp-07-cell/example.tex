@@ -9,7 +9,7 @@ static rates: its work function pops $i$, peeks $i+e$, and pushes $o$
 bytes per iteration.
 
 Before the filter can be run, it must be loaded, its input and output
-buffers must allocated, and the filter's tapes must be attached to the
+buffers must be allocated, and the filter's tapes must be attached to the
 buffers. The commands that perform this are illustrated in
 Figure~\ref{fig:lib:init}.
 
@@ -69,7 +69,7 @@ user can load another filter and run it during those gaps.
 
 In practice, situations such as the above, where a static-rate filter
 is run for a large number of iterations and large amounts of input and
-output data are transferred, are very common for mapping streaming applications. To
+output data are transferred, are very common for in streaming applications. To
 avoid requiring the user to manually issue groups and deal with
 command completion callbacks in every such case, the MSL library also
 provides extended operations that encapsulate this pattern. In an

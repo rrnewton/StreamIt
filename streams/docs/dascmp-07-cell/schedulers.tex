@@ -4,12 +4,12 @@ Streaming programs typically allow for a lot of freedom in terms of
 orchestrating the parallel execution of the stream graph. This freedom is
 afforded by the dataflow models of computation that many streaming
 languages are founded on. In a stream program, the rules governing the
-execution of a node or actor in the graph are often simple, and usually
-reduce to having sufficient buffering on the input to an actor, and
+execution of a node or filter in the graph are often simple, and usually
+reduce to having sufficient buffering on the input to a filter, and
 sufficient buffering to store the output.
 
-The execution of a stream program requires mapping and ordering actors
-to cores, allocation of buffers, and managing data transfers between
+The execution of a stream program requires mapping and ordering filters
+to cores, allocating buffers, and managing data transfers between
 buffers. Collectively, mapping, ordering, and buffer managements are
 embodied in a schedule of execution.
 
@@ -24,12 +24,12 @@ A dynamic scheduler is conceptually easy to understand. The scheduler
 maintains an internal representation of a given stream graph (e.g.,
 list or priority queue). In a multicore architecture, when there is a
 core available, the scheduler scans its internal representation of the
-stream graph, and determines which actor is ready to fire.
-The scheduler assigns the actor to the available core. The core is
-also informed where the input buffer for the actor resides in memory,
-and where in memory to commit (buffer) the output of the actor for its
+stream graph, and determines which filter is ready to fire.
+The scheduler assigns the filter to the available core. The core is
+also informed where the input buffer for the filter resides in memory,
+and where in memory to commit (buffer) the output of the filter for its
 successors. The scheduler then updates its internal representation to
-indicate the actor firings and implement a fairness policy to assure
+indicate the filter firings and implement a fairness policy to assure
 overall progress (e.g., a round-robin scheduler).
 
 For stream graphs that are ``predictable'', dynamic scheduling
@@ -58,17 +58,22 @@ with this problem.
 
 Dynamic scheduling becomes beneficial when filters are not
 ``predictable'': when it is difficult to statically balance loads
-across cores, difficult to estimate the amount of work done by filter
-work functions, or work functions perform widely varying amounts of
-work through the execution of the program. In these situations,
-dynamic scheduling may be able to deliver better load-balancing than
-static scheduling.
+across cores, or when it is difficult to estimate the amount of work
+done by filter work functions, or when work functions perform widely
+varying amounts of work through the execution of the program. In these
+situations, dynamic scheduling may be able to deliver better
+load-balancing than static scheduling.
 
 A dynamically scheduled program can be run on varying numbers of
 processors without requiring recompilation or the reanalysis that
 complex static schedulers would need to perform, and is also tolerant
 of changes in the availability of processors while the program is
 running. 
+
+We implemented static and dynamic schedulers that use the MSL to
+facilitate the mapping of stream programs to a multicore. Our
+methodology and results and discussed next.
+
 %% In addition, for stream graphs that contain filters with
 %% dynamic rates, it may not be possible to statically predict how many
 %% times filters will be run, and the balance of work in the stream graph
@@ -97,45 +102,62 @@ manage data in and out of the SPE. In our methodology, the schedule is
 run on the PPE and the filters run on the SPEs.
 
 We used the StreamIt~\cite{streamitweb} programming language to
-generate the stream graph that is presented to the MSL and to both the
-static and dynamic schedulers. The basic unit of computation in StreamIt is a 
-{\it filter}. There are three basic constructs for composing filters
-into a communicating network: a {\it pipeline}, a {\it splitjoin}, and
-a {\it feedbackloop}. A pipeline behaves as the sequential composition
-of all its child streams. A splitjoin is used to specify independent
-parallel streams that diverge from a common {\it splitter} and merge
-into a common {\it joiner}. A feedbackloop provides a way to create
-cycles in the stream graph.
+generate the stream graphs that are presented to the MSL, and to the
+static and dynamic schedulers. StreamIt is an architecture independent
+stream programming language that allows a programmer to focus on
+describing the dataflow in their algorithm, without much concern for
+how the computation is refined to an implementation. Stream graphs are
+described programmatically and algorithmically, and the program
+description does not commit to a specific implementation, buffering or
+scheduling strategy. Rather the program exposes the communication and
+its characteristics to a compiler or a scheduler that can then decide
+on the best implementation choices depending on the target
+architecture.
 
-The Cell backend for the StreamIt compiler maps StreamIt programs to C code that
-is run on the Cell processor through the MSL. The backend 
-is built upon the robust StreamIt compiler infrastructure~\cite{asplos06}. 
-Briefly, StreamIt code is converted into a
-high-level stream IR which then undergoes a series of optimizing transformations.
+The basic unit of computation in StreamIt is a  {\it filter}. There
+are three basic constructs for composing filters into a communicating
+network: a {\it pipeline}, a {\it splitjoin}, and a {\it
+feedbackloop}. A pipeline behaves as the sequential composition of all
+its child streams. A splitjoin is used to specify independent parallel
+streams that diverge from a common {\it splitter} and merge into a
+common {\it joiner}. A feedbackloop provides a way to create cycles in
+the stream graph.
+
+The Cell backend for the StreamIt compiler maps StreamIt programs to C
+code that is run on the Cell processor through the MSL. The backend is
+built upon the robust StreamIt compiler
+infrastructure~\cite{asplos06}.  Briefly, StreamIt code is converted
+into a high-level stream IR which then undergoes a series of
+optimizing transformations.
 
 
 \subsection{Static Scheduler Implementation}
-In the case of static scheduling, the compiler processes the stream program
-through four phases.
+In the case of static scheduling, the compiler generates the MSL
+filters, allocates the buffers, and attaches the buffers to
+filters. It relies on the MSL library to manage the communication
+thereafter. Programs are compiled in four phases.
 \begin{itemize}
-\item In the scheduling phase, a steady state schedule, which maintains a constant
-number of data items in each input and output buffer after every execution, is calculated based on each
-filter's declared I/O rates. This steady state schedule can then
-be run in an infinite loop. Additionally, an initialization schedule may be
+\item In the scheduling phase, a steady state schedule, which
+maintains a constant number of data items in each input and output
+buffer after every execution, is calculated based on each filter's
+declared I/O rates. This steady state schedule can then be run in an
+infinite loop. Additionally, an initialization schedule may be
 generated to prime the buffers or to initialize state.
-\item In the partitioning phase, filters are fused or
-split to achieve the best level of granularity for the best load balancing.
-\item In the layout phase, filters are assigned to specific cores on which
-they are to be run.
-\item In the code generation phase, appropriate code that encapsulates the schedule,
-partitioning, and layout are generated and run on the target architecture.
+\item In the partitioning phase, filters are fused or split to achieve
+the best level of granularity for the best load balancing.
+\item In the layout phase, filters are assigned to virtual cores on
+which they are to be run.
+\item In the code generation phase, appropriate code that encapsulates
+the schedule, partitioning, and layout are generated and run on the
+target architecture.
 \end{itemize}
 
-For our data parallel applications, our partitioning
-phase fuses all filters into a single filter. We generate all code, both control and
-filter work function code, through the backend. We then run this fused filter
-in parallel across all SPEs. Many real-world applications are stateless and can
-therefore be data-parallelized in this fashion.
+For our data parallel applications (i.e., stream graph that are
+comprised of stateless filters), our partitioning phase fuses all
+filters into a single filter. We generate all code, both control and
+filter work function code, through the backend. We then run this fused
+filter in parallel across all SPEs. Many real-world applications are
+stateless and can therefore be data-parallelized in this fashion.
 
 %For MPEG2, we isolated the stateful filter and fused all other stateless filters.
 %We then profiled these two filters to find a schedule that provides good load balancing
@@ -230,10 +252,12 @@ recognizable steady state.
 %the library provides a convenient layer of abstraction which not only abstracts
 %away DMA transfers but also provides for code that is more readable and easier
 %for the compiler to generate.
-For both static and dynamic scheduling cases, we must generate the code that
-is to be run on the multicore. In the case of Cell, we generate C
-code that utilizes the library and compile it with Cell's GCC. We run all
-control code on the PPE and all filter initialization and work functions on the SPEs. 
+For both static and dynamic scheduling cases, we must generate the
+code that is to be run on the multicore. In the case of Cell, we
+generate C code that utilizes the library and compile it with Cell's
+GCC. The C output from the StreamIt compiler is scalar code, and is
+currently not vectorized by GCC. We run all control code on the PPE
+and all filter initialization and work functions on the SPEs.
 
 We set up filter description parameters
 specifying how many inputs and outputs a filter has, which input and output
@@ -247,7 +271,7 @@ are handled at run-time by the dynamic scheduler. Thus, the compiler need only
 generate the aforementioned code to set up the scheduler for execution.
 
 In the case of static scheduling, we additionally set up filter layout parameters
-which specify on which SPE a filter should be run. The init and steady state
+which specify on which SPE a filter should be run. The initialization and steady state
 schedules are explicit in the code: filters are loaded and run according to the
 schedule, and callbacks are used to set up parameters for and to run the next filter in
 the schedule.
