@@ -43,8 +43,8 @@ a single modular component that can be easily relocated to different
 cores. On a distributed memory architecture where each core has a
 dedicated local store (LS), code should not reference absolute
 addresses (e.g., absolute branches or loads) or modify
-itself\footnote{These restrictions may be ignored if it acceptable to
-not relocate filter code, or to pin the code to a single core.}. 
+itself\footnote{These restrictions may be ignored if it is acceptable
+to not relocate filter code, or to pin the code to a single core.}.
 
 Furthermore, code should not contain any references to mutable global
 variables. Instead, code should declare and access mutable state
@@ -142,27 +142,28 @@ programs to multicores. A scheduler dispatches work items to cores by
 issuing MSL commands, and is notified when cores complete
 them. Each MSL command encapsulates a specific action to be
 performed, and has parameters that are specified by the user. The
-set of operations is divided into three main types:
+set of operations is divided into three main types.
 \begin{itemize}
-\item Filter commands: commands to load or unload filters, copy filter code into local store, attach filters to buffers, and run filters.
-\item Buffer commands: commands to allocate buffers.
-\item Data transfer commands: commands to move data between buffers in the local stores of different cores, or between local store and memory.
+\item {\it Filter commands}: commands to load or unload filters, copy filter code into local store, attach filters to buffers, and run filters.
+\item {\it Buffer commands}: commands to allocate buffers.
+\item {\it Data transfer commands}: commands to move data between buffers in the local stores of different cores, or between local store and memory.
 \end{itemize}
 
 As an example, the \textsf{filter\_run} command, which runs a loaded
 filter, takes two parameters: the LS address of a loaded filter's
-control block and the number of iterations for which to run the work function.
+control block and the number of times (iterations) to run the work function.
 The user is responsible for ensuring that there is sufficient
 data in input buffers and sufficient space in output buffers for all
 specified iterations. Other commands have similar requirements. For a
 complete description of all commands, see \cite{dxzhang-meng-07}.
 
-The amount of work specified by a single command varies depending on
-parameters to the command. Typically, work functions are small and thus \textsf{filter\_run} commands do
-not take more than a few hundred microseconds to complete; some other
-commands, such as allocating and attaching buffers, are auxiliary commands and complete almost immediately. This
-allows the user to quickly change scheduling decisions and avoids
-tying a core into any specific long-term action.
+The amount of work specified by a single command varies depending the
+command parameters. Typically, work functions are small and thus
+\textsf{filter\_run} commands do not take more than a few hundred
+microseconds to complete; some other commands, such as allocating and
+attaching buffers, are auxiliary commands and complete almost
+immediately. This allows the user to quickly change scheduling
+decisions and avoids tying a core into any specific long-term action.
 
 When the user issues a command to a core, it assigns the command an ID
 that must be unique among all commands previously issued to that core
@@ -198,7 +199,7 @@ continually processes commands that have their dependencies
 satisfied. To make full use of a core, it is only necessary for the
 scheduler to ensure the dependency graph on the core is never
 empty. The scheduler cannot remove commands once issued, but if it
-keeps the dependency graph low-depth, it can quickly change the
+keeps the dependency graph shallow in depth, it can quickly change the
 pattern of work done by a core simply by issuing a different set of
 new commands.
 
@@ -209,14 +210,14 @@ of command-specific parameters in addition to generic ID and
 dependency information. Typically, the user will be issuing sets of
 related commands at once. To avoid the overhead of issuing each
 command individually, the user can organize commands into groups; the
-library only allows entire command groups to be issued.\footnote{To
+library only allows entire command groups to be issued\footnote{To
 issue a single command, the user can create a group containing only
-that command.} Each group specifies a sequence of commands; until a
-group is explicitly cleared, commands in the group are saved and can
-be reissued in the future.
+that command.}. Each group specifies a sequence of commands; commands
+in the group are saved and can be reissued until the group is
+explicitly cleared.
 
 Since core local store is managed by the user, the user must provide
-the library with an LS address where command data will be copied to
+the library with a LS address where command data will be copied to
 when it issues a command group. For dependency purposes, cores treat
 commands in a group as having been issued in the order they appear in
 the group. 
@@ -247,22 +248,23 @@ a new command issued to the core.
 \subsection{Data Transfer}
 
 Data transfer commands indirectly result in additional points of
-synchronization between processors. A data transfer conceptually moves
+synchronization between cores. A data transfer conceptually moves
 data from the front of a source buffer to the back of a destination
 buffer, and requires two commands: a command to transfer data out of
-the source buffer, issued to the processor containing the source
+the source buffer, issued to the core containing the source
 buffer, and a command to transfer data into the destination buffer,
-issued to the processor containing the destination buffer. Where
-either buffer is located in memory, the user instead calls a library
-function.
+issued to the core containing the destination buffer. 
+%% Where
+%% either buffer is located in memory, the user instead calls a library
+%% function.
 
 Splitting data transfers into a pair of commands with one on each
-processor provides the user with explicit control over when the data
-transfer occurs with respect to both processors. The library ensures
+core provides the user with explicit control over when the data
+transfer occurs with respect to both cores. The library ensures
 that the transfer does not occur until both commands become active on
-their respective processors. The scheduler must ensure, via the
+their respective cores. The scheduler must ensure, via the
 dependency graphs on cores or manually on a control processor, that
-when a data transfer command becomes active on a processor, the local
+when a data transfer command becomes active on a core, the local
 buffer has sufficient data or space to fulfill the transfer.
 
 %% Data transfers impose minor alignment requirements on the buffers
@@ -283,18 +285,17 @@ scheduler needs to keep track of. When issuing commands to one core,
 it usually does not need to be concerned with the state of other
 cores; as long as pairs of data transfer commands are eventually
 issued with the correct parameters and dependencies, the MSL library
-will handle synchronization between buffers.
+will automatically handle synchronization between buffers.
 
 \subsection{Runtime Checks}
 
 The MSL library supports a number of runtime checks that can be
-enabled or disabled. When enabled, the library can validate buffers
-accesses to ensure that they contain sufficient data/space, and
-can perform additional checks to ensure that issued commands are
+enabled or disabled. When enabled, the library can validate buffer
+accesses to ensure that they contain sufficient data/space, and can
+perform additional checks to ensure that issued commands are
 consistent. While this cannot identify all bugs in a schedule or
 filter work function, it can nonetheless be very useful during the
 development of an MSL library implementation, a dynamic scheduler, or
- test programs;
-it can exposed bugs that would otherwise appear only as a hung
-program or incorrect output.
+test programs. These checks can expose bugs that may otherwise appear
+non-deterministically as hung executions or incorrect output.
 
