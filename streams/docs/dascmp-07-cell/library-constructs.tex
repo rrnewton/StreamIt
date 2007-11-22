@@ -174,7 +174,7 @@ data in input buffers and sufficient space in output buffers for all
 specified iterations. Other commands have similar requirements. For a
 complete description of all commands, see \cite{dxzhang-meng-07}.
 
-The amount of work specified by a single command varies depending the
+The amount of work specified by a single command varies depending on the
 command parameters. Typically, work functions are small and thus
 \textsf{filter\_run} commands do not take more than a few hundred
 microseconds to complete; some other commands, such as allocating and
@@ -184,7 +184,7 @@ decisions and avoids tying a core into any specific long-term action.
 
 When the user issues a command to a core, it assigns the command an ID
 that must be unique among all commands previously issued to that core
-that have not completed. This ID is used to notify the user when the
+that have not yet completed. This ID is used to notify the user when the
 core finishes executing the command.
 
 \subsection{Dependencies}
@@ -234,9 +234,9 @@ in the group are saved and can be reissued until the group is
 explicitly cleared.
 
 Since core local store is managed by the user, the user must provide
-the library with a LS address where command data will be copied to
+the library with an LS address where command data will be copied to
 when it issues a command group. For dependency purposes, cores treat
-commands in a group as having been issued in the order they appear in
+commands in a group as having been issued in the order in which they appear in
 the group. 
 
 \subsection{Scheduler Interface}
