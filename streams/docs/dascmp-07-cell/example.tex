@@ -17,7 +17,7 @@ Figure~\ref{fig:lib:init}.
 \begin{center}
 \includegraphics[scale=.55]{figs/init}
 \end{center}
-\caption[Commands to set up a filter.]{Commands to load a filter and allocate and attach input and output buffers. Lines between commands represent dependencies that must be specified to the library when the commands are issued. These commands may be issued in one or multiple groups.}
+\caption[Commands to set up a filter.]{Commands to load a filter and to allocate and attach input and output buffers. Lines between commands represent dependencies that must be specified to the library when the commands are issued. These commands may be issued in one or multiple groups.}
 \label{fig:lib:init}
 \end{figure}
 
@@ -55,7 +55,7 @@ Provided that the input buffer is at least $2ni+e$ bytes and the output buffer i
 This sequence of commands effectively ``pipelines'' the basic operation from Figure~\ref{fig:lib:run}. Double-buffering is accomplished when the data transfer commands in a group complete before the \textsf{filter\_run} does. In this case, the following \textsf{filter\_run} has no outstanding dependencies once the current \textsf{filter\_run} completes, and can become active immediately.
 
 The user or scheduler can keep the core continually supplied with work
-by initially issuing the first two groups, thereafter issuing the next
+by initially issuing the first two groups and thereafter issuing the next
 group whenever a group completes. In this case, the core almost always
 has two groups of commands issued, with one group active and the other
 queued. In addition, with the exception of the first two and last two
@@ -69,13 +69,13 @@ user can load another filter and run it during those gaps.
 
 In practice, situations such as the above, where a static-rate filter
 is run for a large number of iterations and large amounts of input and
-output data are transferred, are very common for in streaming applications. To
+output data are transferred, are very common in streaming applications. To
 avoid requiring the user to manually issue groups and deal with
 command completion callbacks in every such case, the MSL library also
 provides extended operations that encapsulate this pattern. In an
 extended operation, the user provides the library with filter rates,
 the addresses of opposing buffers on other processors for data
-transfers, and the number of groups to run for; the library issues and
+transfers, and the number of iterations to run for; the library issues and
 responds to all commands internally and notifies the user when the
 entire operation is complete.
 %% Where one or both opposing buffers are located in memory,
