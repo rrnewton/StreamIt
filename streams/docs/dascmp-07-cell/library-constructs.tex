@@ -6,7 +6,7 @@ programming~\cite{survey97}. The MSL assumes an
 architecture-independent programming language for high-performance
 stream programming. It requires that the stream program presented for
 execution simply consist of a dataflow graph expressing the
-computation. Nodes in the graphs embody computation (e.g., actors,
+computation. Nodes in the graph embody computation (e.g., actors,
 filters, kernels, some encapsulated code block), and edges imply data
 dependencies between input and output buffers attached to the compute
 nodes. An example stream graph for an MPEG-2 decoder is shown in
@@ -40,7 +40,7 @@ coarse grained MSL filter~\cite{asplos02}. Work functions are opaque to the MSL.
 \emph{Buffers} are contiguous regions of data that are reserved for
 temporarily storing input or output data. All buffers are circular,
 and the MSL library maintains head and tail pointers for each buffer
-that indicate where data begins and ends. Conceptually, a buffer has
+that indicate where data begin and end. Conceptually, a buffer has
 front and back ends; data toward the front of a buffer originated
 earlier in the execution of the program.
 
@@ -108,7 +108,7 @@ The library provides similar facilities for allocating buffers on
 cores. The size of a buffer must be a power of two, to allow
 wrap-around computations to be done with a single bit-wise
 \textsf{AND} instruction. Buffers are identified by the LS address
-that their data region starts at in core local store; when allocating
+at which their data region begins in core local store; when allocating
 a buffer, the library initializes a control block located immediately
 before the data region that stores the buffer's head and tail pointers
 and participates in data transfers. The user must specify which
