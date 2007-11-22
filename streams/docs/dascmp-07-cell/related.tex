@@ -31,7 +31,7 @@ generate multi-threaded code.  The multicore streaming layer and
 library are intended to provide the same kind of low-level
 functionality as MPI, with two major differences: \emph{i}) they are
 more naturally suited for multicores rather that clusters, and
-\emph{ii}) they are specific to streaming applications and hence provides
+\emph{ii}) they are specific to streaming applications and hence provide
 more targeted control functionality.
 
 The work presented here also complements parallelization frameworks
@@ -42,7 +42,7 @@ providing runtime systems that help schedule program-defined tasks, or
 kernels. Mercury's MultiCore Framework~\cite{mcf} adopts a similar
 approach. However, it is primarily designed for exploiting data
 parallelism in large matrix computations instead of streaming.
-CellSs~\cite{cellss} attempts to automatically generate tasks from
+CellSs~\cite{cellss} automatically generates tasks from
 annotations to linear code. Sequoia~\cite{sequoia} is a language that
 exposes an abstract hierarchical memory model and allows the
 programmer to define communication and local computation; its compiler

@@ -1,7 +1,7 @@
 \section{MSL Constructs}
 
 There are a number of stream-oriented languages drawing from
-domains such as functional, dataflow, CSP and synchronous
+domains such as functional, dataflow, CSP, and synchronous
 programming~\cite{survey97}. The MSL assumes an
 architecture-independent programming language for high-performance
 stream programming. It requires that the stream program presented for
@@ -33,14 +33,14 @@ There are two basic constructs in the MSL: \emph{filters} and
 work function which conceptually runs infinitely. Filters may be
 stateful and can read from multiple input buffers and write to multiple
 output buffers. While a filter can correspond directly to a
-single filter in the program, a compiler can also perform
-optimizations such as fusing multiple filters into a single
+single node in the program, a compiler can also perform
+optimizations such as fusing multiple nodes into a single
 coarse grained MSL filter~\cite{asplos02}. Work functions are opaque to the MSL.
 
-\emph{Buffers} are contiguous regions of data that are reserved for
+\emph{Buffers} are contiguous regions of memory that are reserved for
 temporarily storing input or output data. All buffers are circular,
 and the MSL library maintains head and tail pointers for each buffer
-that indicate where data begin and end. Conceptually, a buffer has
+that indicate where data begins and ends. Conceptually, a buffer has
 front and back ends; data toward the front of a buffer originated
 earlier in the execution of the program.
 
@@ -90,7 +90,7 @@ loaded filter, it can unload the filter through the library, causing
 the library to copy the filter's state back to its permanent store in
 memory. Stateful filters can be loaded on at most one core at any
 time, while stateless filters can be simultaneously loaded on any
-number of cores (hence facilitating coarse-grained data parallelism).
+number of cores (thus facilitating coarse-grained data parallelism).
 
 This separation of code and state allows the user additional control
 over how and when core local store is used. Since code is constant,
@@ -236,8 +236,9 @@ explicitly cleared.
 Since core local store is managed by the user, the user must provide
 the library with an LS address where command data will be copied to
 when it issues a command group. For dependency purposes, cores treat
-commands in a group as having been issued in the order in which they appear in
-the group. 
+commands in a group as having been issued in the order they appear in
+the group, so later commands in a group can depend on earlier ones
+(but not vice-versa). 
 
 \subsection{Scheduler Interface}
 

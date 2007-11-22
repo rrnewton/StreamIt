@@ -10,11 +10,11 @@ sufficient buffering to store the output.
 
 The execution of a stream program requires mapping and ordering filters
 to cores, allocating buffers, and managing data transfers between
-buffers. Collectively, mapping, ordering, and buffer managements are
+buffers. Collectively, mapping, ordering, and buffer management are
 embodied in a schedule of execution.
 
-It is possible to devise a schedule statically (e.g., compile time or
-at graph creation time) or dynamically (e.g., runtime). The goal of a
+It is possible to devise a schedule statically (e.g., at compile time or
+graph creation time) or dynamically (e.g., during runtime). The goal of a
 scheduler is simply to maximize the throughput of the streaming
 application. In the age of multicore architectures, a scheduler will
 need to utilize multiple cores to increase concurrency and hence improve
@@ -58,7 +58,7 @@ with this problem.
 
 Dynamic scheduling becomes beneficial when filters are not
 ``predictable'': when it is difficult to statically balance loads
-across cores, or when it is difficult to estimate the amount of work
+across cores, when it is difficult to estimate the amount of work
 done by filter work functions, or when work functions perform widely
 varying amounts of work through the execution of the program. In these
 situations, dynamic scheduling may be able to deliver better
@@ -103,13 +103,13 @@ run on the PPE and the filters run on the SPEs.
 
 We used the StreamIt~\cite{streamitweb} programming language to
 generate the stream graphs that are presented to the MSL, and to the
-static and dynamic schedulers. StreamIt is an architecture independent
+static and dynamic schedulers. StreamIt is an architecture-independent
 stream programming language that allows a programmer to focus on
 describing the dataflow in their algorithm, without much concern for
 how the computation is refined to an implementation. Stream graphs are
 described programmatically and algorithmically, and the program
-description does not commit to a specific implementation, buffering or
-scheduling strategy. Rather the program exposes the communication and
+description does not commit to a specific implementation, buffering, or
+scheduling strategy. Rather, the program exposes the communication and
 its characteristics to a compiler or a scheduler that can then decide
 on the best implementation choices depending on the target
 architecture.
