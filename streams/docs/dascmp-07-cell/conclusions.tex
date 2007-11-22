@@ -17,24 +17,22 @@ simplifies the task of a streaming language compiler or scheduler.
 The real benefit provided by the framework, in particular the MSL
 runtime library, is that it allows a scheduler to think directly in
 terms of filters and how they are scheduled instead of lower-level
-architecture-specific details. We found that the scheduler required
+architecture-specific details. We found that it required
 far less code to implement scheduling patterns on top of the library
-than directly on Cell hardware for example. The MSL library also
+than at a lower level on Cell. The MSL library also
 allows for far more complex patterns to be implemented than is
 directly feasible at at a lower level. The library running the
 data-parallel fused FFT benchmark produces a reasonably small amount
-of overhead (1.2\%), and the dynamic scheduler running the pipelined
+of overhead (1.4\%), and the dynamic scheduler running the pipelined
 version of the benchmark produces an acceptable amount of overhead
-(8.6\%).
+(11.2\%).
 
 The MSL library currently provides two orthogonal branches that can be
-further developed. First, it is important to reduce the 9\% overhead
+further developed. First, it is important to reduce the 12\% overhead
 observed in the pipelined FFT tests involving the dynamic
-scheduler. This overhead is entirely due to the cost of the run list
-when many commands are active, and it can probably be significantly
-reduced by optimizing library code, although it is also likely that
-doing so would make the SPE library implementation, especially the run
-list, much more specialized.
+scheduler. This overhead is entirely due to the cost of switching
+between commands when many are active, and it can probably be significantly
+reduced by optimizing library code.
 
 In addition, the implementation currently lacks real support for
 filters with dynamic rates (i.e., I/O rates that change over time and
