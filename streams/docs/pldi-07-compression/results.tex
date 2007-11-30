@@ -24,13 +24,6 @@ such as brightness, contrast, and color inversion, which adjust pixels
 within a single video, and 2) video compositing, in which one video is
 combined with another as an overlay or mask.
 
-\begin{table*}[t]
-\vspace{-10pt}
-\psfig{figure=table-pixel-speedup.eps,width=7.1in}
-\caption{Results for pixel transformations.
-\protect\label{tab:pixel-speedup}}
-\end{table*}
-
 The main results of our evaluation are:
 \begin{itemize}
 
@@ -152,6 +145,13 @@ transformation writes to a separate location in memory.  The optimized
 configuration performs pixel transformations directly on the
 compressed data, avoiding data expansion implied by decompression and
 multiple frame buffers, before copying the data to the output file.
+
+\begin{table*}[t]
+\vspace{-10pt}
+\psfig{figure=table-pixel-speedup.eps,width=7.1in}
+\caption{Results for pixel transformations.
+\protect\label{tab:pixel-speedup}}
+\end{table*}
 
 Our evaluation platform is a dual-processor Intel Xeon (2.2 GHz) with
 2 GB of RAM.  As all of our applications are single-threaded, the
