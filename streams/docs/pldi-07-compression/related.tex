@@ -25,14 +25,13 @@ There has been some interest in performing compressed processing on
 lossless encodings of black-and-white images.  Shoji presents the pxy
 format for performing transpose and other affine
 operations~\cite{shoji95}; the memory behavior of the technique was
-later improved by Misra et al.~\cite{misra99}.  
-%As described in Section~\ref{sec:formats}, 
-The pxy format lists the $(x,y)$ coordinate pairs at which a
-black-and-white image changes color during a horizontal scan.  As
-illustrated in Figure~\ref{fig:sj-example}, our technique can also
-preserve a certain amount of compression during a transpose, though we
-may achieve lesser compression than the pxy format due to our
-one-dimensional view of the data.
+later improved by Misra et al.~\cite{misra99}.  As described in
+Section~\ref{sec:formats}, the pxy format lists the $(x,y)$ coordinate
+pairs at which a black-and-white image changes color during a
+horizontal scan.  As illustrated in Figure~\ref{fig:sj-example}, our
+technique can also preserve a certain amount of compression during a
+transpose, though we may achieve lesser compression than the pxy
+format due to our one-dimensional view of the data.
 
 Researchers have also considered the problem of pattern matching on
 compressed text.  A randomized algorithm has been developed for
