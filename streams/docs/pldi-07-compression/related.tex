@@ -34,6 +34,13 @@ preserve a certain amount of compression during a transpose, though we
 may achieve lesser compression than the pxy format due to our
 one-dimensional view of the data.
 
+Researchers have also considered the problem of pattern matching on
+compressed text.  A randomized algorithm has been developed for
+LZ77~\cite{farach98matching} while deterministic strategies exist for
+LZ78 and LZW~\cite{navarro03regular,navarro05lzgrep}.  These solutions
+are specialized to searching text; they do not apply to our
+transformations, and our technique does not apply to theirs.
+
 In the realm of programming languages, Swartz and Smith present RIVL,
 a Resolution Independent Video Language~\cite{swartz95}.  The language
 is used to describe a sequence of image transformations; this allows
@@ -41,3 +48,4 @@ the compiler to analyze the sequence and, via lazy evaluation, to
 eliminate any operations that do not effect the final output.  Such a
 technique is complementary to ours and could also be implemented using
 StreamIt as the source language.
+
