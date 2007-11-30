@@ -476,8 +476,8 @@
             \let\p@enumiv\@empty
             \renewcommand\theenumiv{\@arabic\c@enumiv}}%
 % by bill
-%      \small
-      \scriptsize
+      \small
+%      \scriptsize
       \softraggedright%%%\sloppy
       \clubpenalty4000
       \@clubpenalty \clubpenalty
@@ -960,8 +960,8 @@
     \@latex@error{Cannot handle more than 12 authors}{}%
   \fi
 % BY BILL (switch comment of next lines) -- but undone for popl submission
-\vspace{-6pt}
-%\vspace{12pt}
+%\vspace{-6pt}
+\vspace{-20pt}
 %  \vspace{1.75pc}
 %  \vspace{-1.75pc}
   \end{center}}
