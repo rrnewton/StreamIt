@@ -1,0 +1,32 @@
+-----------------------------------------------
+
++ convert --- to actual lines
+
+- if need more space, can shorten description of compression factors
+
+Not changing:
+-------------
+- add StreamIt code for benchmarks?
+- possibly omit mention of coarsen-repeat for splitters/joiners
+- change \mbox{floor} to floor symbols?  or make floor/min bold?
+- pop/push to input/output (is anyone ever confused?  pop is shorter)
+- "p6, if possible it would be good to see more detailed numbers from
+  CPU performance counters to help understand when and why the
+  technique is effective.  How does the cache performance change?
+  Presumably the baseline decompress-transform-recompress is working
+  on a frame-by-frame basis rather than needing to write large
+  temporary files to disk?"
+- "Comment on application to bzip2"
+
+After submission:
+-----------------
+
+- explore lightweight re-compression
+
+- look at more mencoder transformations
+    - autolevels, IIR filters, FIR filters, etc.
+
+- get breakdown of time spent processing vs. time spent re-compressing
+  - can't really explain why encode_frame is so high (e.g., noop/inverse/screencast1)
+  - delete *.so* in ffmpeg directory and rebuild blender to link
+  --> could also compare runtime to Raw video output (Viktor)

@@ -1,0 +1,335 @@
+Dear Mr. William Thies:
+
+I am sorry to inform you that the following submission was not
+selected by the program committee to appear at POPL 2008:
+
+     Mapping Stream Programs into the Compressed Domain
+
+The selection process was highly competitive, with 35 papers selected
+from 212 submissions.
+
+Reviews of your paper are enclosed.  The program committee wrote over
+1100 pages of reviews---we hope you find their comments useful.
+
+Thank you for submitting to POPL.  I hope to see you in San Francisco!
+
+Best Regards,
+Philip Wadler, Program Chair
+
+
+Note that reviews may have changed since the author response period.
+When additional reviews or material was added after author response,
+your inability to comment on such reviews was taken into account.
+While it was not always possible to do so, some reviews have been
+updated to acknowledge author responses or to give additional feedback
+from the program committee.
+
+Scale for evaluation:
+
+ A: Good paper. I will champion it at the PC meeting.
+ B: OK paper, but I will not champion it.
+ C: Weak paper, though I will not fight strongly against it.
+ D: Serious problems. I will argue to reject this paper.
+
+Scale for confidence:
+
+ X: I am an expert in the subject area of this paper.
+ Y: I am knowledgeable in the area, though not an expert.
+ Z: I am not an expert. My evaluation is that of an informed outsider.
+
+These come from the paper Identify the Champion by Oscar Nierstrasz.
+
+ http://www.iam.unibe.ch/~scg/Archive/Papers/Nier00aIdentifyTheChampion.pdf
+
+
+============================================================================
+POPL 2008 Reviews for Submission #236
+============================================================================
+
+Title: Mapping Stream Programs into the Compressed Domain
+
+Authors: William Thies, Steven Hall and Saman Amarasinghe
+============================================================================
+                           REVIEWER #1
+============================================================================
+
+
+---------------------------------------------------------------------------
+Reviewer's Scores
+---------------------------------------------------------------------------
+
+                             Evaluation: D
+                             Confidence: X
+
+
+---------------------------------------------------------------------------
+Comments
+---------------------------------------------------------------------------
+
+------------------Review#0---------------------
+
+The paper proposes a general method for computing over
+compressed data streams. The approach is to use a dataflow
+programming language, StreamIt, and give a semantics to
+operators such filters, splitters and joiners on compressed
+data so that user-code can operate on what appears to
+be uncompressed data without requiring actual decompression
+of the stream.
+
+The paper asserts the following three contributions: 1) An algorithm for
+mapping an arbitrary stream program to operate directly on LZ7-compressed data.
+2) An analysis of popular lossless compression formats and the opportunities
+for direct processing on each. 3)  An experimental evaluation in the StreamIt
+compiler.
+
+The paper has the following going for it:
+
+- Operating on compressed data is an interesting problem with possibly more
+applications than just multi-media (though multi-media is already pretty
+important).
+- The empirical evaluation shows that it is possible to obtain speedups.
+
+Unfortunately, the paper has a number of important shortcomings:
+
+- The technique is not as general as is claimed. In fact, it may have
+applicability that is limited to variation of the examples given in the
+evaluation section.  The main problem is that the approach is tied to LZ77 -
+any technique where compression is not local will require decompression of the
+stream. Furthermore, the approach works for transformations that are local and
+operate on a fixed number of elements.
+- The paper presents only a partial implementation of the approach. For
+instance, it appears that splitters are not supported. It is not clear if there
+is a fundamental difficulty there?
+
+- The result of using the proposed approach may not have as good compression as
+would be obtained by re-compressing the entire file.
+
+- The claim on page 10 that one can never increase the size of a file with this
+approach is surely not                                true in general. Assume a
+randomizing
+filter -- a
+transformation that adds a little bit of fuzziness to each pixel in a random
+fashion. This will clearly not compress as well with LZ77 and thus increase
+file size.
+
+- The operational semantics for filters is imprecise and at least partially
+wrong.
+
+- Contribution *2* is fairly lightweight -- it boils down to saying that
+formats based on LZ77 are supported and others are not.
+
+Comments:
+
+- You may look at work in the embedded community where they try
+ to execute compressed instruction streams. (It's been a while
+ since I read papers on that, but it's worth a google.)
+
+- Why do you have limitation on the StreamIt model (footnote 1/p.2)?
+ I can imagine that peeks may require some work. But local state
+ seems rather straightforward to add.
+ It would be interesting for readers to better understand what
+ makes those features challenging.
+
+- The paper's confused notation is a bit confusing.
+
+ When you write
+
+S*V -> T  |V|=n
+---------------
+S -> F(V) * T
+
+one could think that -> represent transitions and --- has
+a premise. This is not so in your formulation.
+
+A more conventional semantics would pack S and T into
+configurations and would write the above rule as:
+
+|V|=n
+----------------------
+S*V, T -> S, F(V) * T
+
+- Figure 8 repeats the rule for exec-uncompressed of Fig.5 (redundant0
+
+- Figure 8, exec-c is gibberish:  'm' occurs free and unlike
+ exec-uc it does not call F().  (The text claims that the rules
+ are equivalent).
+
+- Figure 9 is really hard to parse. I do believe that you would be better
+ served by writing pseudo-code. You do this for Fig. 14 already, it is
+ much more natural. (It is not like you are going to use these rules
+ for any formal argument, so what's the point?)
+
+------------------Review#1---------------------
+The paper describes a transformation of stream programs such that they can
+operate directly on compressed input data instead of first having to
+uncompress the data before processing it. By operating directly on
+compressed input data, the authors show that the full decompression can
+be avoided and through that a speed-up of the processing time can be
+achieved. Specifically, the authors demonstrate significant speedups on
+two different application types; pixel transformation and video
+compositing.
+
+Overall, the paper manages to present the problem, the solution and the
+evaluation hereof in a nice and clear manner.
+
+My biggest concern with the paper relates to the evaluation. The authors
+demonstrate an performance increase by operating on compressed data.
+However, the problem is that the constructs used in the pipeline to
+generate these numbers are such that there are no alignment issues as the
+various filters only push/pop 1 element. From the paper, one clearly gets
+the impression that a main issue in doing the transformations of the
+stream programs lies in the alignment phase preceding each filter. Also,
+from this description it is clear that the alignment phases inevitably
+introduces some amount of overhead, and the lack of numbers showing this
+overhead in the evaluation threatens to question the validity of the
+claims in the paper. In other words, will the authors be able to show
+the same significant performance increases - in some cases any increases
+at all - when comparing a pipeline of filter relying heavily on a
+alignment with one operating on an uncompressed stream?
+
+Another - perhaps obvious - problem concerning the evaluation relates to
+the lack of comparative tests against other projects, e.g., some
+mentioned in the Related Work section, which also operates directly on
+compressed data. With the current evaluation, it is very difficult to
+tell if the speedups mostly relate to the fact that the baseline is
+simply slow.
+
+----------------------Review#2--------------------------------
+
+The authors describe their contribution as twofold: focus on a lossless
+compression format and ability to map complete programs to the compressed
+domain rather than a limited set of instructions through ad-hoc operations.
+However they do so by focusing on a compression format (LZ77) that has
+(apparently) very convenient properties for what they are trying to do. This is
+why I am not impressed.
+
+Additionally, I do not know enough about the field to assess the practical
+significance of LZ77 (zip is not used for image/video compression and Apple
+Animation is unknown to me). For instance, it is unclear to me how the
+methodology would apply to common lossless compression formats build upon a
+combination of LZ77 with other strategies (as is the case e.g. in PNG).
+
+Overall, the speed-ups that they achieve are
+interesting even if they do not seem overly spectacular given the fact that
+they logically correlate with the compression ratio, exploiting the specific
+properties of LZ77.
+
+==== Post response comments -----
+
+Thanks for the clarification but we will have to disagree:
+
+You write: "Also, there are no free variables in Figure 8 -- as explained in
+the figure's caption, all variables are defined in Figure 4."
+
+They are free variable -- all that Fig.4 does is give an *informal* explanation
+of the naming convention. I am not claiming that you *can't* turn this into
+well formed rules, just that they aren't as written.
+
+You write: "Reviewer 1 is also mistaken in asserting that some pixel
+transformations will surely increase the file size. The reviewer suggests an
+actor that randomly adjusts each pixel, but such an actor would require
+internal state (the random seed)."
+
+No. Consider a blurring filter which transforms white next to a solid into
+gray...
+
+You write: "Finally, this reviewer suggests that our baseline is simply slow. "
+
+Read our comments carefully.
+
+You write: "There was a time that POPL valued practical results, rather than
+focusing only on theoretical semantics. It seems that this day has passed,
+though we would very much like to see it return."
+
+Nothing could be further from the truth. In fact the presence of semantics
+rules was detrimental to this paper. A more straightforward presentation would
+have probably been easier to follow. This is something to consider if the
+authors intend to resubmit to PLDI.
+
+============================================================================
+                           REVIEWER #2
+============================================================================
+
+
+---------------------------------------------------------------------------
+Reviewer's Scores
+---------------------------------------------------------------------------
+
+                             Evaluation: C
+                             Confidence: Y
+
+
+---------------------------------------------------------------------------
+Comments
+---------------------------------------------------------------------------
+
+This paper describes program transformations that take code written for
+processing a stream of data in uncompressed format to code for
+processing the same stream in compressed format.  In particular the
+approach applies to data compressed with Lempel Ziv 77.
+
+This is an interesting theme.  The idea of transforming compressed
+streams directly has been applied for various specific formats such as
+JPEG and MPEG.        In MPEG, for example, it can be very useful to
+manipulate the compressed format since it avoids the large cost of
+recompressing the data after making the transform
+
+I am not excited about this paper, however.  LZ77 is a very naive
+compression technique by modern standards.  It is true that several
+tools use it, but not tools where it really matters (e.g. video
+compression).  Formats that are specialized to the data can do much
+better.  Even for lossless compression the JPEG 2000 or JPEG LS or
+Lossless JPEG all get much better compression for images.  Some of
+them use wavelet transforms (JPEG 2000) and some use predictive
+difference coding (JPEG LS).  Even the modern text compression codes
+use much better techniques than lempell ziv sliding-window (LZ77) --
+the BW based compression algorithms such as bzip compress much better
+than GZIP, which is a highly optimized version of LZ77.
+
+I would be much happier about the paper if it used LZ77 as an example
+but at the same time argued how the approach would apply to other
+compression techniques (eg. BW) or at least give some indication of
+why it would.
+
+============================================================================
+                           REVIEWER #3
+============================================================================
+
+
+---------------------------------------------------------------------------
+Reviewer's Scores
+---------------------------------------------------------------------------
+
+                             Evaluation: D
+                             Confidence: Z
+
+
+---------------------------------------------------------------------------
+Comments
+---------------------------------------------------------------------------
+
+The paper contains one nice idea. Ziv-Lembel compression on lists works by
+replacing sublists by references to earlier occurrences of the sublist; hence
+stream processing functions on Ziv-Lembel compressed streams can simply copy
+those references to the output stream. The rest of the paper consists of two
+parts.
+
+First, the stream processing language StreamIt is introduced informally (one
+gets a warm feeling but not more), then the semantics of the main combinators
+of the language is given in a somewhat idiosyncratic notation. Both for
+compressed and uncompressed streams. The uncompressed one is straightforward,
+the compressed one is similar but has lots of tricky detail where offsets are
+readjusted. The difficulty of how to describe the behaviour of networks of
+such combinators is never touched upon. Nor is there any formal analysis of
+the given fragments of semantics, not even an intended correctness
+statement.
+
+This is a straightforward application of functional programming, but without
+any references to functional programming or programming languages at all.
+
+The second half of the paper is a detailed description of the experimental
+evaluation of the idea - as applied to existing stream processing software -
+and is aimed squarely at a signal processing audience.
+
+The paper makes no contribution to programming languages and is not written
+for a POPL audience.
