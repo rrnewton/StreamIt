@@ -1,0 +1,183 @@
+\section{Introduction}
+
+%% With the emergence of data-intensive applications such as digital
+%% film, medical imaging and geographic information systems, the
+%% performance of next-generation systems will often depend on their
+%% ability to process huge volumes of data.  For example, each frame of a
+%% digital film requires approximately 2 megabytes, implying that a
+%% fully-edited 90-minute video demands about 300 gigabytes of data for
+%% the imagery alone~\cite{ibm-video}.  Industrial Light and Magic
+%% reports that, in 2003, their processing pipeline output 13.7 million
+%% frames and their internal network processed 9 petabytes of
+%% data~\cite{ilm-interview}.  The U.S. Geological Survey had archived
+%% over 13 million frames of photographic data by the end of 2004, and
+%% estimates that 5 years is needed to digitize 8.6 million additional
+%% images~\cite{usgs}.  In all of these situations, the data is highly
+%% compressed to reduce storage costs.  At the same time, extensive
+%% post-processing is often required for adding captions, watermarking,
+%% resizing, compositing, adjusting colors, converting formats, and so
+%% on.  As such processing logically operates on the uncompressed format,
+%% the usual practice is to decompress and re-compress the data whenever
+%% it needs to be modified.
+
+%YouTube manages about 45 terabytes of video data~\cite{wsj-youtube},
+%with 65,000 videos uploaded daily~\cite{youtube}.  Microsoft
+%TerraServer holds upwards of 22 terabytes of image data, serving 69
+%gigabytes per day~\cite{terraserver}.
+
+In order to accelerate the process of editing compressed data,
+researchers have identified specific transformations that can be
+mapped into the compressed domain---that is, they can operate directly
+on the compressed data format rather than on the uncompressed
+format~\cite{chang95survey,mandal95survey,smith95survey,wee02survey}.
+In addition to avoiding the cost of the decompression and
+re-compression, such techniques greatly reduce the total volume of
+data processed, thereby offering large savings in both execution time
+and memory footprint.  However, existing techniques for operating
+directly on compressed data are largely limited to lossy compression
+formats such as
+JPEG~\cite{dugad01,feng03,mukherjee02,shen96b,shen96,shen98,smith96b}
+and MPEG~\cite{smith98,dorai00,nang00,vasudev98,wee02survey}.  While
+these formats are used pervasively in the distribution of image and
+video content, they are rarely used during the production of such
+content.  Instead, professional artists and filmmakers rely on
+lossless compression formats (BMP, PNG, Apple Animation) to avoid
+accumulating artifacts during the editing process.  Given the
+computational intensity of professional video editing, there is a
+large demand for new techniques that could accelerate operations on
+lossless formats.
+
+In this paper, we present a technique for translating a specific class
+of computations to operate directly on losslessly-compressed data.  We
+consider compression formats that are based on LZ77, a compression
+algorithm that is utilized by ZIP and fully encapsulates common
+formats such as Apple Animation, Microsoft RLE, and Targa.  Our
+transformation applies to a restricted class of programs, termed {\it
+  stream programs}~\cite{streamitcc}, that operate on continuous
+streams of data.  The transformation is most efficient when each
+element of the stream is transformed in a uniform way (e.g., adjusting
+the brightness of each pixel).  However, it also applies to cases in
+which multiple items are processed at once (e.g., averaging pixels) or
+in which multiple streams are split or combined (e.g., compositing
+frames).  The precise coverage of our transformation is defined in
+Section 2.
+
+%% However, existing techniques for operating directly on compressed data
+%% have two limitations.  First, they focus on lossy compression formats
+%% (e.g., JPEG, MPEG) rather than lossless compression formats; lossless
+%% compression is the new standard for professional video editing and
+%% movie production.  Second, they rely on specialized and ad-hoc
+%% techniques for translating individual operations into the compressed
+%% domain.  For example, for DCT-based spatial compression formats (JPEG,
+%% Motion-JPEG), researchers have developed separate algorithms for
+%% resizing~\cite{dugad01,mukherjee02}, edge
+%% detection~\cite{shen96b,shen96}, image segmentation~\cite{feng03},
+%% shearing and rotating inner blocks~\cite{shen98}, and arbitrary linear
+%% combinations of pixels~\cite{smith96b}.  Techniques extending to
+%% DCT-based temporal compression (MPEG) include
+%% captioning~\cite{nang00}, reversal~\cite{vasudev98}, distortion
+%% detection~\cite{dorai00}, transcoding~\cite{smith98}, and
+%% others~\cite{wee02survey}.  For run-length encoded images, algorithms
+%% have been devised for efficient transpose and
+%% rotation~\cite{misra99,shoji95}.  A compressed audio format has been
+%% invented that allows direct modification of pitch and playback
+%% speed~\cite{levine98}.  While these techniques are powerful, they
+%% remain inaccessible to most application programmers because they
+%% demand intricate manipulation of the underlying compression format.
+%% It is difficult for non-experts to compose existing compressed-domain
+%% operations into a complete program, let alone translate a new and
+%% unique operation into the compressed domain.
+
+%% This paper presents a technique for automatically mapping complete
+%% user-defined programs into the compressed domain.  The technique
+%% applies to stream programs: a restricted but practical class of
+%% applications that perform regular processing over long data sequences.
+%% Stream programming captures the essential functionality needed by
+%% image, video, and signal processing applications while exposing the
+%% flow of data to the compiler.  Our formulation is based on LZ77, a
+%% lossless compression algorithm utilized by ZIP, and naturally applies
+%% to formats such as Apple Animation, Microsoft RLE, and Targa (which
+%% are special cases of LZ77).  
+%% %Lossless compression is widely used in
+%% %computer animation and digital video editing in order to avoid
+%% %accumulating compression artifacts.  
+%% By providing an automatic mapping into the compressed domain, our
+%% technique enables a large class of transformations to be customized by
+%% the user and directly applied to the compressed data.
+
+The key idea behind our technique can be understood in simple terms.
+In LZ77, compression is achieved by indicating that a given part of
+the data stream is a repeat of a previous part of the stream.  If a
+program is transforming each element of the stream in the same way,
+then any repetitions in the input will necessarily be present in the
+output as well.  Thus, while new data sequences need to be processed
+as usual, any repeats of those sequences do not need to be transformed
+again.  Rather, {\it the repetitions in the input stream can be
+  directly copied to the output stream}, thereby referencing the
+previously-computed values.  This preserves the compression in the
+stream while avoiding the cost of decompression, re-compression, and
+computing on the uncompressed data.  
+
+%In this paper, we extend this simple idea to a broad class of
+%programs: those which input and output multiple data items at a time,
+%and those which split, combine, and reorder the data in the stream.
+
+In this paper, we extend this simple idea to encompass a broad class
+of programs that can be expressed in the StreamIt programming
+language~\cite{streamitcc}.  We have implemented a subset of our
+general technique in the StreamIt compiler.  The end result is a
+fully-automatic system in which the user writes programs that operate
+on uncompressed data, and our compiler emits an optimized program that
+operates directly on compressed data.  Our compiler generates plugins
+for two popular video editing tools (MEncoder and Blender), allowing
+the optimized transformations to be used as part of a standard video
+editing process.
+
+Using a suite of 12 videos (screencasts, animations, and stock
+footage) in Apple Animation format, our transformation offers a
+speedup roughly proportional to the compression factor.  For
+transformations that adjust a single video (brightness, contrast,
+color inversion), speedups range from 2.5x to 471x, with a median of
+17x.  For transformations that combine two videos (overlays and
+mattes), speedups range from 1.1x to 32x, with a median of 6.6x.  We
+believe this is the first demonstration of compressed-domain
+techniques for losslessly compressed video content.
+
+%% In the general case, compressed processing techniques may need to
+%% partially decompress the input data to support the behavior of certain
+%% programs.  Even if no decompression is performed, the output may
+%% benefit from an additional re-compression step if new redundancy is
+%% introduced during the processing (for example, increasing image
+%% brightness can whiteout parts of the image).  This effect turns out to
+%% be minor in the case of our experiments.  For pixel transformations,
+%% output sizes are within 0.1\% of input sizes and often (more than half
+%% the time) are within 5\% of a full re-compression.  For video
+%% compositing, output files maintain a sizable compression ratio of 8.8x
+%% (median) while full re-compression results in a ratio of 13x (median).
+
+%% In the rest of this paper, we describe additional background material
+%% (Section 2), our transformation into the compressed domain (Section 3)
+%% and our experimental evaluation (Section 4).  We close with related
+%% work (Section 5) and conclusions (Section 6).
+
+To summarize, this paper makes the following contributions:
+\begin{itemize}
+
+\item An algorithm for mapping an arbitrary stream program to operate
+  directly on lossless LZ77-compressed data.  In addition to
+  transforming a single stream, programs may interleave and
+  de-interleave multiple streams while maintaining compression
+  (Sections 2-3).
+
+\item An analysis of popular lossless compression formats and the
+  opportunities for direct processing on each (Section 4).
+
+\item An experimental evaluation in the StreamIt compiler,
+  demonstrating that automatic translation to the compressed domain
+  can speedup realistic operations in popular video editing tools.
+  Across our benchmarks, the median speedup is 15x (Section 5).
+
+\end{itemize}
+
+The paper concludes with related work (Section 6) and conclusions
+(Section 7).

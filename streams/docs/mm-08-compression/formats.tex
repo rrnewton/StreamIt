@@ -1,0 +1,165 @@
+\section{Supported File Formats}
+\label{sec:formats}
+
+As LZ77 refers to a compression algorithm rather than a complete
+compression format, there are additional factors to consider in
+mapping computations to real-world image and video codecs.  Some
+codecs are a subset of LZ77, utilizing only run-length encoding or a
+fixed window size; these are supported very efficiently by our
+technique.  Others are a superset of LZ77, incorporating additional
+techniques such as delta coding or Huffman coding; these may incur
+additional processing overhead.  In the following sections, we
+describe the practical considerations involved in targeting various
+compression formats with our technique.  Formats are ordered by
+approximate goodness of the achievable mapping.
+
+\subsection{High-Efficiency Mappings}
+\label{sec:formats-good}
+
+All of the formats in this category can be considered to be subsets of
+LZ77.
+
+\paragraph{Apple Animation.}  
+The Apple Animation codec (which forms the basis for our experimental
+evaluation) is supported as part of the Quicktime MOV container
+format.  It serves as an industry standard for exchanging computer
+animations and digital video content before they are rendered to lossy
+formats for final distribution~\cite[p.~106]{adobe-anim}\cite[p.~284]{harrington-anim} \cite[p.~367]{long-anim}\cite[p.~280]{pogue-anim}.
+
+The Animation codec represents a restricted form of LZ77 in which
+repeat distances are limited to two values: a full frame or a single
+pixel.  A repeat across frames indicates that a stretch of pixels did
+not change from one frame to the next, while a repeat across pixels
+indicates that a stretch of pixels has the same color within a frame.
+% mention bit depths?
+
+\paragraph{Flic Video.}
+Flic Video files (FLI/FLC) were originally produced by Autodesk
+Animator and are still supported by many animation packages today.
+Their compression of frame data is almost identical to Apple
+Animation.
+
+\begin{figure}[t]
+\begin{minipage}{0.1in}
+\vspace{-1.75pt}
+{\it // // // // //}
+\end{minipage}
+\begin{minipage}{3.23in}
+{\it Given a repeat token with distance $d$ on the current input
+  stream of a joiner, returns the maximum count of a repeat token that
+  could safely be emitted to the output stream.  Assumes that only a
+  single repeat token is available (i.e., the {\tt
+    pass-compressed-long} rule does not apply).}
+\end{minipage}
+\textsc{Join\_Potential}$(d)$~returns~int~\{\\
+\tab$\mbox{offset} = d$\%$n_1$\\
+\tab$\mbox{{\bf if~}} \mbox{offset} \leq \pos ~\{$\\
+\tab\tab{\it // repeat for remainder of this execution cycle}\\
+\tab\tab$\mbox{\bf return~} n_1 - \pos$\\
+\tab$\} \mbox{\bf ~else} ~\{$\\
+\tab\tab{\it // repeat until referenced data goes out of range}\\
+\tab\tab$\mbox{\bf return~} \mbox{offset} - \pos$\\
+\tab$\}$\\
+\}
+\caption{The \textsc{Join\_Potential} function is called during
+  compressed joiner execution.  In the case where the input tokens to
+  the joiner have incompatible repeat distances, it calculates the
+  maximum length of the current token that may be passable to the
+  output. \protect\label{fig:join-potential}}
+\end{figure}
+
+\paragraph{Microsoft RLE.}
+Microsoft RLE compression can appear in both BMP images and AVI
+animations.  Apart from bit-depth and formatting details, its
+capabilities are identical to Apple Animation; it can perform
+run-length encoding within a frame, and can skip over pixels to
+exploit inter-frame redundancy.
+
+\paragraph{Targa.}
+The Truevision Targa (TGA) format is a simple image format that is
+widely used to render frame sequences in the computer animation and
+video industries.  The format includes an optional RLE compression
+stage, making it a good target for our technique.
+
+%% \paragraph{PXY.}
+%% The pxy format is a research-based image format designed to support
+%% efficient transpose and rotation of black-and-white
+%% images~\cite{shoji95}.  It consists of the series of $(x,y)$
+%% coordinates at which the image changes color during a horizontal scan.
+%% As this information can be converted to a run-length encoding, it can
+%% also be targetted by our technique.
+
+\subsection{Medium-Efficiency Mappings}
+\label{sec:formats-med}
+
+While the formats in this category utilize an encoding that is
+compatible with LZ77, they incur extra overhead because the data is
+reorganized prior to the compression stage.
+
+\paragraph{Planar RGB.}
+The Planar RGB video format is supported by Apple Quicktime files.  It
+utilizes run-length encoding for pixels within a frame, with partial
+support for expressing inter-frame repeats (only the end of lines can
+be skipped).  The red, green, and blue planes are encoded separately
+in order to increase compression.  For user transformations that need
+to process red, green, and blue values together, this introduces
+additional alignment overhead when applying our technique.
+
+\paragraph{OpenEXR.}
+OpenEXR is an emerging image format (backed by Industrial Light and
+Magic) for use in digital film.  It offers several compression
+options, including run-length encoding, zip, and wavelet-based
+compression.  However, in run-length encoding mode, the low and high
+bytes of the pixels are separated and encoded as separate run-length
+sequences; this enables pixels with variations in the low bytes to
+nonetheless benefit from compression of the high bytes.  As most user
+transformations would utilize the entire bit-width of the pixel, our
+technique suffers additional alignment overhead in processing these
+files.
+
+\subsection{Low-Efficiency Mappings}
+\label{sec:formats-bad}
+
+The formats in this category are supersets of LZ77.  While our
+technique could offer some gains in exploiting the LZ77 compression,
+it would have to undo any compression sitting on top of LZ77 and
+offers limited benefit for filters (as in PNG) applied underneath
+LZ77.
+
+\paragraph{DEFLATE.}
+DEFLATE is a general-purpose algorithm that provides all of the
+compression for popular formats such as ZIP and GZIP.  The algorithm
+consists of a full LZ77 encoder followed by Huffman coding, which
+resizes the symbols in the stream to match their usage frequencies.
+In targeting ZIP or GZIP with our transformations, we would first
+have to undo the Huffman coding (unless the application simply
+reordered data, in which case the coding could remain intact).  Though
+Huffman decoding is a lightweight lookup operation, it would also
+increase the memory footprint.  In addition, as DEFLATE's LZ77
+algorithm operates on individual bytes, there may be an exaggerated
+alignment cost if the application operates on a larger word size.
+
+%% \paragraph{TSCC.}
+%% The TechSmith Screen Capture Codec is very similar to Microsoft RLE,
+%% except that the final output is further compressed using DEFLATE.
+%% Thus, any overheads incurred by our technique on DEFLATE also extend
+%% to TSCC.
+
+\paragraph{PNG.}
+The PNG image format also relies on DEFLATE to compress the pixels in
+the image.  However, before running DEFLATE, the pixels are usually
+filtered with a delta encoding; each pixel is replaced with the
+difference between its value and a predicted value, where the
+prediction is a linear combination of neighboring pixels.  While
+program segments that compute a linear function~\cite{aalamb} could
+perhaps be mapped to this compressed format, our current technique
+only applies if the delta encoding is turned off.  Even in this
+scenario, there is a large amount of overhead due to the Huffman
+coding in DEFLATE.
+
+\begin{table*}[t]
+\vspace{-1\baselineskip}
+\psfig{figure=table-benchmarks.eps,width=7.02in}
+\caption{Characteristics of the video workloads.
+\protect\label{tab:videos}}
+\end{table*}
