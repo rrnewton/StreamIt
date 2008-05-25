@@ -1,5 +1,5 @@
 #
-#ident	"@(#)cvs/examples:$Name: not supported by cvs2svn $:$Id: commitinfo,v 1.13 2007-06-01 15:37:37 thies Exp $"
+#ident	"@(#)cvs/examples:$Name: not supported by cvs2svn $:$Id: commitinfo,v 1.14 2008-05-25 20:36:22 thies Exp $"
 #
 # The "commitinfo" file is used to control pre-commit checks.
 # The filter on the right is invoked with the repository and a list 
@@ -31,6 +31,7 @@
 ^suif      $CVSROOT/CVSROOT/commit_prep -r
 ^crudo     $CVSROOT/CVSROOT/commit_prep -r
 ^streams   $CVSROOT/CVSROOT/commit_prep -r
+^darpa-compiler   $CVSROOT/CVSROOT/commit_prep -r
 ^seestreams   $CVSROOT/CVSROOT/commit_prep -r
 ^microfluids   $CVSROOT/CVSROOT/commit_prep -r
 ^chorus    $CVSROOT/CVSROOT/commit_prep -r
