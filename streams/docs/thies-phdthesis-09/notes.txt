@@ -1,0 +1,339 @@
+RELATED
+-------
+
+Thank you for your inquiry.  The short answer is that StreamIt--in
+embracing the Synchronous Dataflow model--is more static and
+analyzable than CSP languages.  However, it is less restrictive than
+systolic languages, which are typically fine-grained and oriented
+towards SIMD processing.  The long answer is below.
+
+StreamIt vs. CSP Languages
+--------------------------
+
+The primary difference between StreamIt and CSP languages (such as
+Occam) is the model of computation: StreamIt embraces Synchronous
+DataFlow (SDF) rather than Communicating Sequential Processes (CSP).
+
+In CSP, there are several parallel processes that communicate via
+rendezvous message passing.  That is, communication links are
+unbuffered, and both the sender and receiver blocks until an item has
+been transmitted.  Further, the processes can be complex threads that
+access the communication links in an arbitrary and dynamically
+determined order.  Behavior is also non-deterministic due to guards
+that can test for the presence of a value on an incoming link.
+
+In SDF, the computation is much more regular.  Processes consist of
+atomic firings of actors, each of which consumes and produces a fixed
+number of items on its input and output channels.  The channels are
+implicitly buffered; the only scheduling constraint is that a node
+cannot fire until enough input items are available to complete the
+firing.  Because the I/O rates are known at compile time, the stream
+graph can be statically scheduled, providing a guarantee of deadlock
+freedom and many opportunities for optimization (e.g., parallelism and
+buffer size).
+
+CSP and SDF are good for different things.  Generally speaking, CSP is
+much more dynamic and fine-grained.  It is good for modeling naturally
+non-deterministic interactions -- for example, hardware bus contention
+or the dining philosophers problem [2].  The weakness of CSP is that
+it sometimes provides too much synchronization, it is hard to express
+and exploit regular communication patterns, and it is difficult to
+avoid deadlock [3].  In contrast, SDF is good for regular applications
+(e.g., digital signal processing), but it is not good for expressing
+applications with complex control flow or dynamic behavior (e.g.,
+handshake protocols).
+
+Note that while any SDF program could also be implemented in CSP
+(buffers can be constructed using arrays), doing so will obscure the
+static I/O rates that the compiler needs to perform scheduling and
+optimization.  This is the primary appeal of SDF in cases where it
+applies.
+
+There are also some minor differences between StreamIt and Occam
+besides the model of computation.  StreamIt provides recursive stream
+definitions, while Occam uses value-based inlining as the semantics of
+procudure calls (no recursion with streams is allowed).  StreamIt also
+allows peeking (inspecting buffer contents without consuming items)
+that is not present in either SDF or CSP (guards aside).  StreamIt
+also enforces a single-input, single-output hierarchical structure on
+the stream graph, rather than allowing an arbitrary network of
+connectivity.
+
+Regarding the issue of Raw vs. the Transputer architecture, there are
+also several differences.  The Transputer is an array of processors,
+connected with point-to-point channels, while Raw provides a
+programmable communication switch that can be used for cycle-level
+routing of items between processors.  In the Transputer, the processor
+must get involved to route items.  Also, due to the dynamic nature of
+Occam, the Transputer executes Occam processes using a very efficient
+runtime scheduler that is implemented in microcode.  On Raw, the
+execution of StreamIt programs can be fully statically orchestrated.
+
+Also note that the Ptolemy project [4] explores many different models
+of computation (including CSP and SDF) in a unified heterogeneous
+modeling environment.
+
+StreamIt vs. Systolic Languages
+-------------------------------
+
+Compared to a systolic programming language, StreamIt exposes
+task-level parallelism, allows a coarser level of granularity, and
+supports hierarchical stream graphs.  Compared to NSL (New Systolic
+Language, [5]) in particular, StreamIt uses synchronous dataflow
+instead of asynchronous streams and provides a unified programming
+model instead of a host/co-processor view.
+
+Systolic programming often leverages a SIMD or SPMD programming model
+in which all of the nodes are performing the same operation at a given
+time.  (This was the only model implemented in NSL as of the
+publication of [5], though the authors envision a more general model
+for the future.)  While data-parallel filters in StreamIt can also
+take advantage of SIMD resources, a strength of StreamIt is that it
+exposes the task and pipeline parallelism in the stream graph, thereby
+enabling the compiler to run different filters in parallel on a MIMD
+architecture.
+
+To facilitate SIMD programming, the parallel units of computation in
+systolic programs are often very fine-grained and do not allow
+retained state between successive invocations.  For example, in NSL
+one can define data-parallel "cell programs" that can be replicated
+across the elements of the array.  Each cell is analogous to a Filter
+in StreamIt, except that Filters can contain internal state that is
+modified from one invocation to the next.  This represents a
+difference in granularity; StreamIt generally intends each Filter to
+run on a general-purpose processor with a large data cache, whereas
+cells are intended for systolic nodes that contain an ALU with a small
+register bank.
+
+Related to the issue of granularity is that of hierarchy.  StreamIt
+supports hierarchical streams, in which each component can be
+parameterized (for example, an N-element MergeSort can recursively
+construct a stream graph out of two N/2-element MergeSorts.)  While
+NSL provides compositionality via functions (cells can call other
+functions), it is unclear whether this is a scalable hierarchical
+model of streams, as the cell is the only unit that can be distributed
+across the systolic array.
+
+It also appears that NSL cells support an asynchronous model of
+streams rather than the synchronous dataflow model adopted by
+StreamIt.  In NSL, data values are streamed past each systolic node at
+a fixed rate, and the nodes can read or modify the elements as they
+pass by.  In constrast, StreamIt Filters produce and consume a fixed
+set of items per invocation.  We believe that synchronous dataflow is
+a more robust and intuitive model for the programmer, although it
+restricts the class of applications that can be expressed in the
+language.
+
+The difference in computation model also affects the programming
+style; in NSL, a "main" program sits outside the cells and defines the
+streams, their flow rates, and their connectivity, while in StreamIt
+this information is implicit in the stream graph.  This difference is
+by design; NSL intends the systolic array to be a co-processor that is
+controlled from a host, while StreamIt aims to provide a unified
+programming model and "single machine abstraction" for distributed
+targets.
+
+References
+----------
+
+[1] D. May, R. Shepherd, and C. Keane, Communicating Process
+    Architecture: Transputers and Occam. Future Parallel Computers: An
+    Advanced Course, Pisa, Lecture Notes in Computer Science, 272,
+    June 1987.
+
+[2] A Brief Tutorial on Models of Computation.  The Mescal Team, UC
+    Berkely, Fall 2001.
+    http://www-cad.eecs.berkeley.edu/~mescal/presentations/moc_tutorial_2001.pdf
+
+[3] Edward Lee, Concurrent Models of Computation in System Level
+    Design, Workshop on System Specification and Design Languages,
+    September 2000.
+    http://ptolemy.eecs.berkeley.edu/presentations/00/fdl_plenary.pdf
+
+[4] The Ptolemy Project, http://ptolemy.eecs.berkeley.edu/
+
+[5] Richard Hughey, Programming Systolic Arrays, Proceedings of the
+    International Conference on Application-Specific Array Processors,
+    IEEE Computer Society, Aug. 4-7, 1992.
+
+************************************************************************
+
+  Printz considers compiling signal processing systems to iWarp in his
+  thesis~\cite{Printz91}.
+
+    - input is SDF graph:
+      - parameters:  I/O rates, ``period'' of each source,
+        execution-time bound (plus others, more advanced)
+      - contents of each node are in AL or W2 code, for iWarp
+          - AL is Tseng's; more of a high-level language.  It compiles
+            into W2 (of Lam) which has communication primitives in the
+            code and actually compiles into machine code
+        plus annotations in his new ``Z'' language to show connections
+          and properties, etc.
+      - each node has input/output data ports, control ports (for
+        read-only constants; sounds similar to streamit init function,
+        for specializing each instance without duplicating code), and
+        history ports, where all state is explicitly stored between
+        invocations
+    - apps:  NARROW (narrowband spectral detection system, 112 nodes)
+    - each node written in one of three styles:
+      1. data-parallel - inputs distributed across machines
+         - might specify ``execution width'' as to how many processors are
+           engaged
+      2. systolic - computation divided into ``stages'' and then pipelined
+      3. serial
+    - argue for most implementations being in data parallel
+      - in narrow, 68% were data parallel, 31% systolic, 1% serial
+    - compilation target is a linear processing array, (``such as Warp or
+      iWarp?) with FIFO queues (block on full send, block on empty receive)
+    - supports the equivalent of peeking in terms of ``windowing''
+      operations -- keeps track of the history of values
+    - big focus on alignment problem of how to re-arrange data between
+      task schedulings so that each stage can use it properly (including
+      duplicating for overlapping windowed cells, etc.) - skimming this
+    - scheduling takes advantage of data parallel / systolic / serial,
+      scheduling things that are ready to fire from each set in turn.
+      so first the DP stuff is spread as wide as possible, then systolic
+      is pipelined across processors, then serial things are run independently
+    - since they don't have architecture for testing, goes to some length to
+      prove execution times and show that this scheduler is within some
+      constant factor of optimal.
+
+TO READ
+-------
+
+onanian, j.s. a signal processing language for coase grain dataflow
+multiprocessors'', mit-lcs-tr-449, 1989
+http://library.mit.edu/F/U5BDSQEUGUH54XNE5XNDF2NCSGNXS6FI1VPIX9GH7UFG84HF8F-03143?func=item-global&doc_library=MIT01&doc_number=000399046&year=&volume=&sub_library=ARC
+
+
+OUTLINE
+-------
+
+Intro
+-----
+
+Multicore + review of previous parallel languages
+what is a stream program?
+MATLAB
+
+Language
+--------
+Each with a ``rationale'' section
+
+0. model of computation
+  - synchronous dataflow
+  - we are first language to adopt SDF model?
+1. structured streams
+  - pictures of stream graphs
+  - idioms found
+  - example syntax
+  * rationale
+    - see structure from code
+    - dynamic programming solution
+2. language-level support for reordering
+  - not complete
+  - transpose
+  - bit-reversal
+  * rationale
+    - compression
+3. language-level support for sliding window operations
+  - e.g., parallelism hidden in low-pass filter
+  * rationale
+    - easier to parallelize
+4. control messages
+  * rationale
+    - improves programmability
+    - could possibly optimize execution?  (TODO)
+6. related work
+  - the standard language-related work
+
+First language with structured streams, language-level support for
+data reordering, sliding-window, and control messages.
+
+Experience with StreamIt
+------------------------
+
+this section mainly describes optimizing an SDF language. generally
+applies for languages outside streamit as well.
+
+- optimizations
+  - linear
+  - statespace
+  - cache
+  - parallelization
+  - phased scheduling
+- lessons learned (or move to language section?)
+  - phases bad
+  - programmers can introduce mutable state
+  - I/O rates often matched
+  - fine-grained communication on Raw not worth it
+  - greedy is good?  dynamic programming solution
+- StreamIt applicaiton suite?
+  - big ones
+    - GMTI
+    - MPEG
+    - mosaic
+  - application characteristics
+    - roundrobin weights
+    - peeking
+    - stateful/stateless
+  - graphics rendering
+- leaving out?
+  - third-party uses?
+    - bit-streaming / sketching
+    - mani / VIRAM
+  - debugging / gui's
+
+Future Work
+-----------
+- zeroing out arrays is expensive, should optimize away (move to lessons learned?)
+- buffer reuse
+- interesting messaging optimization:
+  - speculatively fuse or linearly-collapse sections that have messages
+  - if message observed, rollback and deliver on slow path afterwards
+- decimation propagation
+
+Conclusions
+-----------
+- show evolution of c++ graph?
+
+Where to fit in?
+----------------
+- different fusion strategies?  (contradicts other research)
+
+
+MY THESIS
+---------
+
+Adopting a stream programming model enables the compiler to automate
+transformations that were previously performed by hand, allowing
+non-expert programmers to accelerate certain applications by an order
+of magnitude on parallel and sequential machines.
+
+Stream programming enables non-expert programmers to accelerate
+certain applications by an order of magnitude, as the compiler can
+automate transformations that were previously performed by hand.
+
+- Language (Chapter 1)
+
+- Experience (Chapter 2)
+
+- {\bf The first translation of stream programs into the
+  lossless-compressed domain.}
+
+- {\bf The first dynamic analysis tool that detects and exploits
+  likely coarse-grained parallelism in C programs.}  To assist
+  programmers in migrating legacy C code into a streaming
+  representation, this tool generates a stream graph depicting dynamic
+  communication between programmer-annotated sections of code.  The
+  tool can also generate a parallel version of the program based on
+  the memory dependences observed during training runs.  (Chapter 4).
+
+----------------
+
+  We apply our tool to six case studies, including MPEG-2 decoding,
+  MP3 decoding, GMTI radar processing, and three SPEC benchmarks.  Our
+  analysis extracts a useful block diagram for each application, and
+  the parallelized versions offer a 2.78x mean speedup on a 4-core
+  machine.

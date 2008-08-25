@@ -1,0 +1,95 @@
+\chapter{The StreamIt Language}
+
+
+
+Intro
+-----
+
+Multicore + review of previous parallel languages
+MATLAB
+
+Language
+--------
+Each with a ``rationale'' section
+
+0. model of computation
+  - synchronous dataflow
+  - we are first language to adopt SDF model?
+1. structured streams
+  - pictures of stream graphs
+  - idioms found
+  - example syntax
+  * rationale
+    - see structure from code
+    - dynamic programming solution
+2. language-level support for reordering
+  - not complete
+  - transpose
+  - bit-reversal
+  * rationale
+    - compression
+3. language-level support for sliding window operations
+  - e.g., parallelism hidden in low-pass filter
+  * rationale
+    - easier to parallelize
+4. control messages
+  * rationale
+    - improves programmability
+    - could possibly optimize execution?  (TODO)
+5. related work
+  - the standard language-related work
+
+First language with structured streams, language-level support for
+data reordering, sliding-window, and control messages.
+
+StreamIt Experience
+-------------------
+
+this section mainly describes optimizing an SDF language. generally
+applies for languages outside streamit as well.
+
+- application suite
+  - big ones
+    - GMTI
+    - MPEG
+    - mosaic
+  - application characteristics
+    - roundrobin weights
+    - peeking
+    - stateful/stateless
+  - graphics rendering
+- optimizations
+  - linear
+  - statespace
+  - cache
+  - parallelization
+  - phased scheduling
+- lessons learned (or move to language section?)
+  - phases bad
+  - programmers can introduce mutable state
+  - I/O rates often matched
+  - fine-grained communication on Raw not worth it
+  - greedy is good?  dynamic programming solution
+- leaving out?
+  - third-party uses?
+    - bit-streaming / sketching
+    - mani / VIRAM
+  - debugging / gui's
+
+Future Work
+-----------
+- zeroing out arrays is expensive, should optimize away (move to lessons learned?)
+- buffer reuse
+- interesting messaging optimization:
+  - speculatively fuse or linearly-collapse sections that have messages
+  - if message observed, rollback and deliver on slow path afterwards
+- decimation propagation
+
+Conclusions
+-----------
+- show evolution of c++ graph?
+
+
+Where to fit in?
+----------------
+- different fusion strategies?  (contradicts other research)

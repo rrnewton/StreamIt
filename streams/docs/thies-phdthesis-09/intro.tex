@@ -1,0 +1,174 @@
+\chapter{My Thesis}
+
+%% Adopting a stream programming model enables the compiler to
+%% automate transformations that were previously reserved for experts.
+%% This allows non-expert programmers to accelerate certain
+%% applications by an order of magnitude on parallel and sequential
+%% machines.
+
+Stream programming enables non-expert programmers to accelerate
+certain applications by an order of magnitude, as the compiler can
+automate transformations that were previously performed by hand.
+
+\section{Introduction}
+
+While the advent of high-level programming languages has made it
+easier for beginner programmers to construct working applications,
+optimizing the performance of those applications is a more difficult
+task that is often beyond the reach of non-experts.  To improve the
+execution time, a performance expert may re-write large sections of
+the application, employing alternative algorithms, data structures, or
+task decompositions, to produce a version that is functionally
+equivalent to (but structurally very different from) the original
+program.  They may also utilize in-depth knowledge of the target
+architecture, such as the type and extent of parallel resources, the
+communication substrate, and the cache sizes, to match the structure
+and granularity of the application to that of the underlying machine.
+While it has been a long-term goal of the computer science community
+to replicate the role of performance experts via systematic
+transformations within the compiler, many optimizations remain beyond
+the reach of automation because the compiler does not have the
+information needed -- either about the program itself, or about the
+class of transformations known to the expert -- to match the
+hand-tuned performance.
+
+%% A long-term goal of the computer science community has been to
+%% automate the optimization of programs via systematic transformations
+%% in the compiler.  However, even after decades of research, there often
+%% remains a large gap between the performance of hand-tuned code and the
+%% performance obtainable by a compiler.  One of the central difficulties
+%% is that performance experts have more information than the compiler,
+%% and can thus perform more aggressive transformations.  For example, a
+%% performance expert may re-write large sections of the application,
+%% employing alternative algorithms, data structures, or task
+%% decompositions, to produce a version that is functionally equivalent
+%% to (but structurally very different from) the original program.  In
+%% addition, a performance expert may leverage detailed knowledge of the
+%% target architecture -- such as the type and extent of parallel
+%% resources, the communication substrate, and the cache sizes -- to
+%% match the structure and granularity of the application to that of the
+%% underlying machine.  While such transformations can always be
+%% performed by hand, they are unfortunately beyond the reach of
+%% non-expert programmers.  It thus remains an important goal to improve
+%% the automation of high-level program optimizations and lower the entry
+%% barrier to high-performance programming.
+
+One promising approach to automating performance optimization is to
+embed specific domain knowledge into the language and compiler.  By
+restricting attention to a specific class of programs, common patterns
+in the applications can be embedded in the language, allowing the
+compiler to easily recognize and optimize them, rather than having to
+infer the patterns from complex, general-purpose code.  In addition,
+key transformations that are known only to experts in the domain can
+be embedded in the compiler, enabling robust performance for a given
+application class.  Tailoring the language to a specific domain can
+also improve programmers' lives, as functionality that is tedious or
+unnatural to express in a general-purpose language can be succinctly
+expressed in a new one.  Such ``domain-specific'' languages and
+compilers have achieved broad success in the past.  Examples include
+[TODO].
+
+Our focus in the current work is on a new domain of programs which we
+define as {\it stream programs}.  A stream program is one that is
+organized around a regular stream of dataflow (see
+Figure~\ref{fig:stream-program}).  Examples include [TODO]. Our
+interest in stream programs is motivated by two prominent trends in
+computer architectures and applications:
+
+% TODO:  stream program figure
+
+%% If we are taking a domain-specific approach to program
+%% optimization, what domain should we focus on to have a long-term
+%% impact?  We approached this question by considering two prominent
+%% trends in computer architectures and applications:
+
+\begin{enumerate}
+
+\item {\bf Computer architectures are becoming multicore.}  Because
+  single-threaded performance has finally plateaued, computer vendors
+  are investing excess transistors in building more cores on a single
+  chip rather than increasing the performance of a single core.  While
+  Moore's Law previously implied a transparent doubling of computer
+  performance every 18 months, in the future it will imply only a
+  doubling of the number of cores on chip.  To support this trend, a
+  high-performance programming model needs to expose all of the
+  parallelism in the application, supporting explicit communication
+  between potentially-distributed memories.
+
+\item {\bf Computer applications are becoming embedded and
+  data-centric.}  While desktop computers have been a traditional
+  focus of the software industry, the explosion of cell phones is
+  shifting this focus to the embedded space.  In 2006, there were 2.7
+  billion cell phones in the world, compared to 850 million
+  PCs~\cite{ITU}.  Also, the compute-intensive nature of scientific
+  and simulation codes is giving way to the data-intensive nature of
+  audio and video processing.  YouTube already streams 200 terabytes
+  of video daily~\cite{Wikipedia-youtube}, and many potential ``killer
+  apps'' of the future encompass the space of multimedia editing,
+  computer vision, and real-time audio
+  enhancement~\cite{Berkeley-view,Intel-report}.
+
+\end{enumerate}
+
+As illustrated in Figure~\ref{fig:intersection}, we consider stream
+programs to represent a broad an interesting class of programs at the
+intersection of these two trends.  Stream programs are rich in
+parallelism and can be naturally targeted to distributed and multicore
+architectures.  At the same time, they share common patterns of
+embedded and data-centric processing, making them an ideal target for
+domain-specific optimizations.
+
+% TODO: intersection figure
+
+%% At the intersection of these trends is a broad and interesting space
+%% of applications that we term {\it stream programs}.  A stream program
+%% is any program that is based around a regular stream of dataflow.
+%% Examples include [TODO].  These programs are rich in parallelism and
+%% can be naturally targeted to distributed and multicore architectures.
+%% At the same time, they also share common patterns of processing that
+%% makes them an ideal target for domain-specific optimizations.
+
+In this dissertation, we develop language support for stream programs
+that enables non-expert programmers to harness both avenues:
+parallelism and domain-specific optimizations.  Either set of
+optimizations can yield order-of-magnitude performance improvements.
+While the techniques used were previously accessible to experts during
+manual performance tuning, we provide the first general and automatic
+formulation.  This greatly lowers the entry barrier to
+high-performance stream programming.
+
+%% In this thesis, we develop language and compiler support for stream
+%% programs that enables non-expert programmers to obtain
+%% order-of-magnitude performance improvements.  There are two types of
+%% improvements: on a multicore architecture, we exploit the parallelism
+%% of stream programs to enable robust parallelization in the face of
+%% varying application characteristics.  And on a sequential machine, we
+%% exploit domain-specific optimizations, including those targetting
+%% linear and compressed processing stages.
+
+In the rest of this chapter, we describe the detailed properties of
+stream programs, provide a brief history of streaming, give an
+overview of the StreamIt project, and state the contributions of this
+thesis.
+
+\section{Streaming Application Domain}
+
+Based on the examples cited previously, we have observed that stream
+programs share a number of characteristics.  Taken together, they
+define our conception of the streaming application domain:
+
+Regular and repeating computation
+Independent filters with explicit communication
+Data items have short lifetimes
+
+As illustrated in Figure~\ref{fig:example-streaming}, these programs
+can typically be written as a set of independent {\it actors} which
+communicate over explicit data channels.  
+
+\section{Brief History of Streaming}
+
+\section{The StreamIt Project}
+
+New leverage: design a language that facilitates static analysis
+
+\section{Contributions}

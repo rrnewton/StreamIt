@@ -1,0 +1,71 @@
+- change Arial fonts to Helvetica?  (only if needed)
+
+*********************************************************************
+
+RESEARCH DIRECTIONS:
+
+- need to dynamically tag the pointer returned by malloc so that if it
+  moves around, we know what to send 
+
+- we really have not dealt adequately with synchronizing I/O
+  - how to make print statements sequential again
+  - how to allow out_fifo calls from different locations
+    --> if I profiled out_fifo with the print from case 1, it would remove all the parallelism
+    (though that is where the manual shifting comes in...)
+
+- actually, this bad mp3 case illustrates that you really want
+  matching conditional on opposite sides of a boundary -- if something
+  happens, you communicate one set of data, otherwise you communicate
+  a different set of data.
+
+OUTSTANDING BUGS:
+
+- in our modified mpeg2, even the sequential version comes out 1 frame
+  short relative to the original version.
+
+NOT DOING:
+
+- in measuring malloc'd data references, looks like i missed u422 and
+  u444
+
+- quantify communication vs. computation ratio across benchmarks
+
+- issues with parser
+  - can we make outputs appear in order
+  - should note that all of the errors are currently buffered up before
+    outputting
+    - would have to add another stage to do it in parallel -- woulnd't
+      be hard
+  - admit or eliminate the warning (about memory leak) in parallelized parser
+
+- report approximate slowdown when running under valgrind?
+
+- note in parallelization section that forking happens after first iteration
+
+- comment on benchmark subsetting?
+
+- In describing MP3 communication graph, will have to NOTE that layer
+1 case handled separately, and also that graph numbers measured
+post-unrolling
+
+- note mp3 speedup is for 1.mp3, mpeg-2 speedup on 2.mp2?
+
+- make it more prominant that pipelined loops cannot be nested?
+
+- say we're well-suited to distributed memory
+  - well, kind of.  but maybe pipes become slow then.  load balancing
+    less automatic.
+
+- refer to table with # of pipeline stages, # data-parallel stages
+
+- add runtime and communication estimates to overview figure
+
+- not clear how data lives on after the loop
+  - well, we could have tracked locations that each partition is
+    modifying, and then sent them to the joining partition at the end.
+    it's not implemented yet...
+
+- mention where to send the malloc'd data (pass pointer)?
+
+- try to automate the data parallelism in MP3 (or admit it was done w/
+  unrolling?)

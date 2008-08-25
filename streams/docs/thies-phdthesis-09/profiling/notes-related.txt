@@ -1,0 +1,100 @@
+I. VISUALIZATION
+\cite{rul06poster1}
+ - dynamic simplescalar spec cpu2000
+ - record producer/consumer between individual functions
+ - classifies percentage of data coming through a given function as being
+   producer
+   consumer
+   constant consumer (consume a fixed constant value)
+   private consumer (consume data that you produced)
+\cite{rul06poster2}
+ - more of the same
+\cite{rul06functionlevel}
+ - very similar to us, though represent more fine-grained flows on top of call graph
+ - it seems that they manually adjust data structures to do buffering rather than recording and sending addresses
+ - 3.74x speedup on bzip2 compression; 2.45x overall (on reference input ``program'')
+ - sounds as though they synchronize at end of each pipeline stage rather than having
+   any buffering (could degrade things?)
+ - we are not only limited to pipelines (data parallel, task parallel?)
+ - also describe homogeneous pipelines, which we do not, though that is basically data parallelism
+ - don't have the application domain emphasis or statistics (which we don't have yet either)
+ * compares bzip2 speedups to TLS and shows that TLS is worse
+ - unclear how they privatize things
+ - we track by line number in an individual function rather than only doing line number overall
+ - we dealt with control flow conversion, though by hand (while loops, etc.)
+
+\cite{nethercote03redux}
+- also built on valgrind
+- ``dynamic dataflow graph'' -- no control dependences or plain assignment statements
+- compared to us, also traces through registers (every register and
+memory word is shadowed by graph node, showing how it was computed)
+- applied to program equivalence -- compile same program in different langs, get similar result
+- argue for apps in debugging and program slicing
+- speculate to program comprehension, de-obfuscation, more
+- note problems with scalability due to size of graphs
+
+\cite{balmas05ddgraph}
+ - program understanding, debugging, correctness checking
+ - modified Lisp interpreter
+ - applied to AI Blocks World program
+ - allows visualization of various call graphs and also data dependence graph (global vars)
+ - qualitative observations
+
+\cite{malton05recovery}
+ - identify ``pivotal functions'' likely to aid understanding
+ - use GDB to trace calls between pivotal functions
+ - strictly control, not data
+
+II. SLICING / DEBUGGING
+\cite{agrawal90dynamicslicing}
+ - trace exact set of STATEMENTS that did influence (data or control) another STATEMENT
+ - in comparison, we are *coarser grained* and look at *addresses*
+    - define partitions, and say:  what data flowed from this partition to the other?
+    - also we are not interested in the transitive property
+\cite{tip95slice}
+ - survey of program slicing (debugging, testing, program analysis)
+
+STATIC ANALYSIS
+ - david august
+   \cite{ottoni05decoupled}
+    * instruction level
+    - but they DO handle function calls - ammp has 3, bzip2 has 18
+    - synchronization array -- extended the Itanium ops
+    - overal speedup - ~18% automatic, ~20% best manually directed
+   \cite{ottoni06concurrent}
+    - sending scalars between cores (using ``synchronization array'')
+    - overall speedup on 2-cores:  speedup a single loop by 25\%, speedup app by 12\%
+   \cite{rangan04array}
+    - developes synchronization array and hand-compiles dswp to it
+    - 11-76% performance on two processors
+
+\cite{du03sc}
+
+ - expose data parallelism, pipeline parallelism, and reduction
+ variables with programmer annotations
+
+ - determine partitioning to match computation and communication resources
+
+ - determine which variables to communicate by static analysis
+ (conservative context-sensitive alias analysis)
+
+ - map IPC into DataCutter which does all of the communication
+
+STREAM PROGRAMMING
+ - streamit
+   \cite{streamitcc}
+   \cite{gordon06asplos}
+
+ - brook
+   \cite{gummaraju05micro}
+   - hand-compiled C to be ``re-written in streaming style'' to SVM
+   - executed on hyperthreaded P4
+   \cite{liao06brook}
+   - brook on a 4-way xeon
+   \cite{brook04}
+   - brook on GPUs
+
+ - streamc/kernelc
+   \cite{das06compiling} -- merrimac + imagine
+   \cite{imagine03ieee} -- imagine + programming moedl
+   \cite{merrimac03} -- architecture paper only

@@ -1,0 +1,1475 @@
+programmable and optimized rollback of stream programs
+
+- send a message backwards in time, rollback the app
+- message handling at container boundaries
+
+- apps:
+  - run two versions in parallel, run again if they mismatch
+
+- optimizations:
+  - if commutative, can "patch" the rollback rather than replaying?
+  - if stateless, can process out-of-order
+  - memoization
+
+I. Commutativity
+  - does it rely on whole app being commutative?
+  --> _states_ should be commutative, but outputs identity?
+
+  - or if outputs are commutative, then you can skip ahead by
+    modifying something in the past, but discarding the intervening
+    outputs
+
+commutative/associative reductions: sum, product, min/max, OR, AND, and XOR bit operations
+not: subtraction, division
+
+Q: if you rollback, do you re-emit outputs?
+  - if not, then commutative outputs becomes more interesting (beccause you only need the last output)
+  - stateless rollback becomes a no-op
+
+directions:
+- fault-tolerance
+- looking at commutativity of whole pieces of filters rather than individual reductions
+- detecting symmetry automatically (e.g., detect reflection in input space, then reflect output space)
+- wavelet transform the input, then proceed with computation along the most interesting direction
+  --> or random sample the input, fill in output where it is varying most
+  --> for stateless OR commutative filters
+- linear operations applied directly to delta-coded inputs 
+   (do not have to reconstruct input; can transform delta and then sum onto existing output)
+- computing directly on run-length encoded inputs
+   - relation to memoization?  similar but more efficient
+
+related
+http://www.win.ua.ac.be/~vincenz/thesis.pdf
+
+---------------------
+
+Computing on RLE data:
+
+- can replace every pop and peek with a consant, then wrap in a loop
+  to N and do induction variable recognition (adds -> multiplies, etc.)
+
+- things that use run-length encoding:
+http://www2.biology.ualberta.ca/jbrzusto/ftp/fragstat/cookie.html#GettingSoftware
+http://delivery.acm.org/10.1145/200000/192628/p77-smith.pdf?key1=192628&key2=3817591511&coll=ACM&dl=ACM&CFID=15151515&CFTOKEN=6184618
+ --> shrink-by-2 on JPEG images 5X faster if done directly on compressed data
+http://ieeexplore.ieee.org/iel3/3874/11296/00515542.pdf?arnumber=515542
+
+http://vislab.cs.vt.edu/Publications/2000/PDFfiles/Que00.pdf
+  "Examples of current RLE use are in image digitizers[6], common
+   image formats[6], satellite image representation[7], and in region
+   representation for computer vision[8, 9, 10, 11, 12] and
+   graphics[13]."
+
+applications
+* searching in genetic sequences?
+  http://www.genome.jp/manuscripts/GIW99/Oral/GIW99F06.pdf
+  BioCompress
+  A new challenge for compression algorithms: genetic sequences
+  appears that sequitur was designed for DNA originally
+  - good overview: http://www.inf.fu-berlin.de/inst/ag-bio/FILES/ROOT/Teaching/Lectures/SS06//SeqanII/DNA%20Compression%20Algorithms.pdf
+- calculate area of an image
+  --> O(n^2) to O(n) reduction in computation
+  - same with resizing, scaling, any image manipulation, etc.
+- something with Apple Animation format (uses RLE for video)
+  - but this is a proprietary format
+  http://wiki.multimedia.cx/index.php?title=Apple_QuickTime_RLE
+- FLAC uses run-length encoding as final piece
+  http://en.wikipedia.org/wiki/Free_Lossless_Audio_Codec
+
+---------------------
+
+outline
+
+- motivation
+  - data sizes are big
+  - memoization makes it faster
+  - has been invented by hand, but nothing general-purpose
+  * also can be used to edit-in-place on digital cameras and cell phones
+
+- representing compression by a grammar 
+   - RLE
+   - LZ77
+   - LZ78/LZW
+   - JPEG: say there is run-length encoding at first, then DCT components
+
+- computing on a grammar
+  - plain
+    example: saturation
+  - multi-in, multi-out
+    example: phonetic translation
+  - dealing with state
+    example: histogram
+
+- computing in frequency domain
+  - use linear analysis
+  - infinite precision to avoid floating point problems
+
+- results
+  - JPEG saturation number
+  - algorithmic speedups for grammar computing
+    - count area:  n^2 --> O(n)
+    - do any kind of local image transform (brightness, contrast, resize, etc.)
+    - matrix multiply
+
+- conclusions
+  - first general-purpose language to allow direct operations on compressed data
+  - rich opportunities for future work:
+   - dealing well with 2-D data.  You'd like to memoize on square chunks, not on lines
+   - more complex compression types (DCT, linear prediction, etc.)
+   - lossy compression
+   - databases
+
+OLD
+- semantics for representing data in compressed form
+  - RLE
+    - apply whenever peek rate less than repeat window
+    - calculate number of repeats; update state accordingly
+    * challenge: outputs may follow grammar?  (if don't output same value)
+  - LZ77
+    - window offset needs to divide pop rate, then it will be memoized
+    - repeat given number of times
+    - work out details
+  - LZ78/LZW
+    - apply memoization within dictionary entries less than peek rate
+ 
+---------------------
+
+Q: why not do the whole program instead of filter-by-filter?
+
+A: whole program might need a huge input rate, might not take
+   advantage of partial redundancy.  eg: bitonic sort
+
+---------------------
+
+S := n*R m*T
+
+- should compute a steady state and extract, or compute less than a
+  steady state and store it
+
+- when computing down, "propagate" the "n" into the production for R
+  so that larger unit is computed --> to carry through S := n*R
+  productions
+
+Let u, o, e denote push, pop, peek rates of current filter
+Let |S| denote the number of terminals in production S
+
+process(production S := n*R m*T, int iterations, int offset) {
+  if 
+}
+
+inner memo table:
+production, offset, iterations, state --> 
+  name of output production, multiplicity of output production, leftover items, new state
+
+overlap memo table -- not needed
+production, leftover, state --> name of output production, offset, new state
+
+---------------------
+
+* word length
+  --> appears that GIF word length is the bits needed to represent a single pixel
+  - or a single character (byte) in text files
+  - looks like compress always deals with bytes, as the parameter for the dictionary limit starts at 9 bits
+- why streamit
+  - power of the language
+
+---------------------
+
+3. Re: POPL, I've been working on a new topic that I think is cooler
+than rollback: computing directly on compressed data.  For example,
+if the input to a filter is run-length encoded (AAA becomes 3A),
+then you can calculate the output of a single firing (A --> B) and
+then run-length encode the total output (3B) by relying on static
+I/O rates.  You never have to uncompress the data.
+
+I've generalized this notion to compute on any data that is
+compressed into a context-free grammar with repetitions (i.e.,
+productions of the form S := n*R m*T).  This representation is a
+generalization of run-length encoding, LZ77 (PNG) and LZ78/LZW
+(GIF, compress), as well as grammar-based compressions like
+SEQUITUR.  The output of each filter is also a compressed grammar.
+The process resembles memoization, but essentially uses the
+original input encoding to indicate overlapping units (thereby
+avoiding the expensive search for overlapping inputs).
+
+Updates to filter state are elegant: if you calculate that a filter
+will execute n times in a run-length encoded unit, then any state
+updates are compounded n times (ala induction variables).  For
+example, n increments translates to addition of n.  This allows you
+to memoize filters based only on inputs (not on states) since you
+can update any states in constant time (assuming the filter's
+control flow does not depend on the state variables).
+
+Example applications: 1) can do local image transforms (resizing,
+color conversion, histograms, counting area of segments, etc.) in
+time proportional to size of compressed picture (GIF, PNG, BMP+RLE)
+rather than to the number of pixels; 2) bitonic sort on n elements
+with redundant sequences (e.g., only k distinct values) can become
+algorithmically cheaper; 3) can provide elegant framework for many
+hand-crafted multimedia algorithms that deal directly on compressed
+data.  A few such algorithms have been published, but no one has
+offered a simple, general framework to do it automatically.
+
+Describing the algorithm in StreamIt would be "portable" across
+many common compression formats and could offer significant space
+and time speedups.  Rich potential for future work in applying to
+other compression techniques (lossy, spectral, linear predictive)
+and databases.  Most of all, I could see people actually being
+excited about using this stuff.
+
+I have some more notes on the technique (e.g., how to deal with
+sliding windows between different components of the grammar), but
+I'll save them for tomorrow morning.
+
+-----------
+
+related:
+- Flavor for extracting from bitstream, http://www.ee.columbia.edu/mmsp/papers/acm-mm97.pdf
+- "A Text Compression Scheme that Allows Fast Searching Directly on the Compressed File"
+  http://delivery.acm.org/10.1145/250000/248639/p124-manber.pdf?key1=248639&key2=0065122511&coll=GUIDE&dl=GUIDE&CFID=704770&CFTOKEN=75036064
+
+-----------
+
+could also do parameterized memoization: note that certain outputs do
+not depend on inputs, so outputs can perhaps be translated over (e.g.,
+only touching R part of RGB.)  OR could just represent this w/ splitjoin.
+
+--> evidence of using a splitjoin as separating out which components
+    are important for memoization
+
+-----------
+
+how to split/join a grammar?
+
+directions:
+- audio
+- matrix multiply
+- detect parts of the program that corrupt the compression and then
+  re-encode them
+- steal from RIVL: demand-driven interpretation (if someone
+  overwriting, do not calculate orig)
+- possible lossless transformations -- e.g., lossless rotate, crop, etc?
+  -- see jpegtran http://sylvana.net/jpegcrop/jpegtran/
+
+-----------
+
+result of experiments:
+- 9.2 X flops reduction due to plain linear collapse
+- 98 X flops reduction due to approximate (rounding 1E-6 to 0) linear collapse
+  - removes *ALL* of the 167 million mul operations in the app
+
+- seems that either RGBtoYCbCr *OR* DCT/iDCT being present in the
+  stream graph is enough to shrink the results (even with no extra
+  compression), presumably due to rounding
+
+-----------
+
+*************************
+
+Re: EXR, split of top and low bytes makes it difficult
+
+Re: PNG, it could easily work for:
+ - no filtering and 8-bit or smaller words
+ - or grayscale or pallette-based
+
+- filtering would make it too hard
+- and filtering is often used (?)
+
+brainstorming: what about something that takes full *space* of
+decompressed image, but time of compressed image?
+
+*************************
+
+getting a feel for potential speedup -- compare translating to Raw
+video versus copying the original stream over.
+
+time mencoder Animation.mov -o Animation2.avi -of avi -ovc copy
+0.000u 0.010s 0:00.15 6.6%      0+0k 0+0io 367pf+0w
+
+time mencoder Animation.mov -o Animation2.avi -of avi -ovc raw
+0.000u 0.560s 0:02.62 21.3%     0+0k 0+0io 450pf+0w
+
+This does a crop:
+
+time mencoder Animation.mov -o Animation2.avi -of avi -ovc lavc -vf crop=400:400:10:10
+1.520u 0.010s 0:01.71 89.4%     0+0k 0+0io 562pf+0w
+
+need my RLE encoder to really judge things
+
+--------
+
+source of screencasts:
+
+~200 MB php -- but in MPEG-4
+http://cakephp.org/screencasts
+
+might have some potential, hard to save movie
+http://www.atomiclearning.com/home
+
+drexel seems to have created a big archive of lecture screencasts, though in flash format:
+www.techsmith.com/camtasia/casestudy/drexeluniversity.asp
+
+mathcasts -- cool but in flash
+http://www.mathcasts.org/index.php?title=Main_Page
+
+this discussion makes clear that QT animations are preferred format for actually shipping to clients
+http://forums.cgsociety.org/archive/index.php/t-84580.html
+
+edemaine recommends submitting quicktime animation for computational geometry demos
+http://theory.lcs.mit.edu/~edemaine/SoCG2003_multimedia/tips.html
+but final versions in different format
+
+digital juice samples in sorensen, but perhaps originals not?
+http://www.digitaljuice.com/media/jumpbacks_HD/mov/017_JB_HD.mov
+http://www.digitaljuice.com/media/ETK7/mov/147_Background2.mov
+http://www.digitaljuice.com/media/motion_design_elements/mov/0006_Revealer.mov
+
+--> distributed in lossless PNG (for editor's toolkit; others different)
+
+*********************************************************************
+
+QUOTES FOR MOTIVATING APPLE ANIMATION FORMAT:
+
+--
+
+***
+
+"Lossless codecs, such as Animation (at the Best quality setting), are
+used to preserve maximum quality during editing or for still images
+where data rate is not an issue."
+
+"About Digital Video Editing", Adobe Online Education Materials,
+Chapter 2, p. 106.
+
+http://www.adobe.com/education/pdf/cib/pre65_cib/pre65_cib02.pdf
+
+--
+
+"On the Macintosh, the popular lossless codecs are Apple's QuickTime
+Animation or Video codecs, and on Windows, the uncompressed AVI
+format. Use these codecs when you're editing or compositing your
+footage before encoding to FLV, so that you can encode a high-quality,
+flattened final version into FLV and avoid multiple encoding passes
+that can quickly degrade quality."
+
+http://communitymx.com/content/article.cfm?cid=EBD77&print=true
+
+FLV Data Rate and Bandwidth... Demysitifed.
+
+--
+
+"That being said, I usually stick with the Animation codec for
+computer-generated graphics, especially for ones with transparent
+regions."
+
+Interactive QuickTime: Authoring Wired Media, Matthew R. Peterson, p. 521
+
+http://books.google.com/books?vid=ISBN1558607463&id=YeQVZ9WbmHgC&pg=PA521&lpg=PA521&dq=%22animation+codec&sig=-dKwWenwgzOYuPQvRLlorUw9JrU
+o
+--
+
+***
+
+"Again, we'll choose the Animation CODEC when saving to ensure highest
+quality" -- page 36
+7
+"Ideally, you'll want to use the Animation CODEC to produce a lossless
+copy of your project.  If you're hurting for disk space, you can go
+ahead and use the DV CODEC, but if you've already exposed your footage
+to one or two levels of compression, this might not be a very good
+idea." -- page 469
+
+Digital Filmmaking Handbook, Ben Long, Sonja Schenk, p. 367
+http://books.google.com/books?vid=ISBN1584500980&id=caAzrUlIXjAC&pg=PA367&lpg=PA367&dq=%22animation+codec&sig=tIBgd6-FCNfsn5sQiJoxM8ZEuVU
+
+--
+
+***
+
+"Many users will prefer the animation codec as it provides a good
+balance of quality to size." -- page 282
+
+"When in doubt, use the Lossless setting.  This will use the Animation
+codec, an incredibly high-quality codec that is universal.  File sizes
+will be larger (and you will have to convert them upon import or in
+the timeline) but the file is 'universal'." -- page 284
+
+After Effects on the Spot: Time-Saving Tips and Shortcuts from the Pros
+By Richard Harrington, Rachel Max, Marcus Geduld
+
+--
+
+***
+
+"Animation.  This codec is significant because, at its Best quality
+setting, it maintains _all_ of the original DV picture quality, while
+still managing to convert files so that they're smaller than files
+with no compression at all.  [snip]
+
+As a result, the Animation codec is a popular format for storing or
+transferring Quicktime footage from one piece of video-editing
+software to another.  Because the files are so huge, however, it's not
+so great as a finished movie file format."
+-- page 280
+
+IMovie 3 & IDVD: The Missing Manual
+By David Pogue
+
+--
+
+"Many of the nicest Motion Menus around begin life as 2-D motion
+compositions in Adobe After Effects.  These motion sequences are more
+typically output using the animation codec, usually at 100 percent
+quality.  This particular codec outputs a very high quality MPEG
+image.  This codec also handles text elements much better than the DV
+codec."
+-- page 395
+
+Dvd Studio Pro 2: A Complete Guide to DVD Authoring
+By Bruce C Nazarian
+
+--
+*********************************************************************
+
+numbers for manual invert image, with uncompressed needing a frame copy:
+ - 175x user time speedup
+ - 66x total speedup
+
+*********************************************************************
+
+great review of capabilities of existing systems:
+
+http://www.linuxjournal.com/article/8589
+
+*********************************************************************
+
+to execute rendering as it was setup:
+
+../blender-2.42a/blender -b ultra-sub.blend -a
+
+amazing!
+
+----
+
+istockvideo:
+# Clips must be encoded with MJPG-A/B, PhotoJPEG, DV, or HDV, at BEST setting.
+
+----
+
+sun 10/29
+
+auth generator in blender (no transformations):
+on compressed data:   64.83s, 66.00s, 66.79s
+on uncompressed data: 90.33s, 88.73s, 87.27s
+--> speedup of medians = 1.34x
+
+reason it's slow:
+ - looks like the image bounding boxes are being allocated, copied around anyway (?)
+
+auth generator in mencoder (no transformations, user time):
+on compressed data: 0.29s, 0.30s, 0.23s
+on uncompressed data: 20.52s, 19.58s, 20.33s
+--> speedup of medians = 70x
+
+--
+
+ultra demo in blender (no transformations):
+on compressed data: 0.19s
+on uncompressed data: 0.41s
+--> speedup of medians = 2.16x
+
+----
+
+status: 
+implementing do_alphaunder_compressed_effect_byte2 in seqeffects.c
+realizing you need to have a rolling buffer that is updated with latest frame as part of compositing
+ --> remaining advantage over fully uncompressed data: don't need to recompress everything
+
+how do you implement the crossover for a single line?
+
+each line can be skip, rle, or new:
+
+-------
+
+some major munging routines in anim.c --> ffmpegfetchibuf
+ - rotation
+ - BGRA -> RGBA
+ - probably scanning over bounding box of image
+   - yes, these lines are the boundaries:
+     unsigned char * p =(unsigned char*) ibuf->rect;
+     unsigned char * e = p + anim->x * anim->y * 4;
+ *--> removed from loop for compressed data, runtime decreases from ~68s to 60s
+ **-> should try further eliminating call to imb_flipy --> must be done both on entry and exit
+  - so there must be other culprits!
+  --> to patch, need to move imb_flipy call below while loops, and set e = p+4 
+
+-------
+
+current task: get right answer on 
+
+../blender-2.42a/blender -b ../samples/ultra-alpha25-compressed.blend -a >& /dev/null
+
+229049 instead of 398950
+
+***************
+
+Auth_generator is a GPL authentification generator for rails.
+http://penso.info/auth_generator
+
+The demo movie is a real online demonstration of how to use it.
+
+***************
+
+todo: setup benchmarks, gather numbers
+- gather a screencast from my machine
+  - re-gather inverse numbers
+   - other pointwise ops:
+    - brightness
+    - contrast
+    - alpha gain
+  - perhaps add a small motion design element in corner perhaps
+
+- make some digital juice videos and composite them
+  - need to think about what to composite onto what
+
+
+                      inverse      brightness      contrast     alpha-gain
+screencast1 (auth)
+screencast2 (mine1)
+background1
+background2
+MDE1
+MDE2
+LowerThird1
+LowerThird2
+
+                     MDE1     MDE2     LowerThird1   LowerThird2
+screencast1 (auth)
+screencast2 (mine1)
+
+                    OverlayMatte1  OverlayMatte2  LowerThirdMatte1  LowerThirdMatte2
+background1
+background2
+
+------------
+
+Screencasts
+screencast1
+screencast2
+
+logo1 - #87, MDE1 - 691x518  logo is 144x114 in bottom right
+logo2 - #89, MDE2 - 691x518  logo is 180x142 in bottom right
+
+Computer Animation
+blenderback-1
+blenderback-2
+
+blenderfore-1
+blenderfore-2
+
+Digital Video Editing
+background1 95,#2
+background2 90,#1
+
+matte1 - frame - 90, #2
+matte2 - lowerthird - 102, #9
+
+------------
+
+for importance/popularity of blender, see the wikipedia page
+ - spiderman2
+ - 250,000 users
+
+blend files from elephant's dream:
+http://xseed.bowiestate.edu/ED/production/
+
+using ani_scissor_attack, mach2, 
+
+------------
+
+status:
+x done constructing/testing inverse cases
+x done constructing/testing uncompressed composites
+- fix the 1-screencast composites
+- then gather numbers
+
+-----
+
+Computing Directly on Compressed Data
+Transforming Programs into the Compressed Domain
+Mapping Streaming Computations into the Compressed Domain
+Mapping Stream Programs into the Compressed Domain
+
+(1) Advisor/ PhD student relationship forever.
+(2) Same institution now, or in past 5 years.
+(3) Collaborator on a publication or grant in the past 5 years.
+(4) Relative or close personal friend.
+
+*** Viktor Kuncak
+*** Martin Rinard   
+
+Additional:
+
+Monica Lam
+Michael Ernst
+Frederic Vivien
+Rodric Rabbah
+Shih-Wei Liao
+Rajeev Barua
+Matthew Frank
+Evelyn Duesterwald
+
+Computing Directly on Compressed Data
+
+Due to the high data rates involved in audio, video, and signal
+processing applications, it is imperative to compress the data to
+decrease the amount of storage used.  However, compression incurs
+extra computational overhead, as any program operating on the data
+must be wrapped by a decompression and re-compression stage.
+
+In this paper, we present a program transformation that eliminates
+much of the overhead involved in processing compressible data.  Given
+a program that operates on uncompressed data, we output an equivalent
+program that operates directly on the compressed format.  We currently
+support lossless compression formats based on LZ77, a popular
+compression algorithm utilized by gzip, PNG, and Apple Animation.  Our
+transformations rely on the streaming model of computation, which
+exposes the flow of data in the applications.
+
+To evaluate the impact of our transformations, we implemented plugins
+for two digital video editing tools: Blender and MPlayer.  For common
+operations such as color adjustment and video compositing, computing
+directly on compressed data offers a speedup roughly proportional to
+the overall compression ratio.  For our benchmark suite of 12 videos
+in Apple Animation format, speedups ranged from 1.5x to 235x.
+
+-----
+
+trying to gather gprof output to assess recompression vs. processing
+ - was unable to get blender to profile shared library in ffmpeg
+ - tried LD_PROFILE, sprof, etc.
+
+-----
+
+with much hacking, increased doalpha_under to be 95% of blender
+runtime.  but taking this away only changes overall runtime by ~20%.
+so there must be something in a blender library that is taking
+forever, and I can't track through gprof.  need to do the static
+build.
+
+--> ah, from blender irc chat -- just remove the .so files from ffmpeg
+directory and then they get linked in statically.  now can view ffmpeg
+profiling under blender!
+
+- if you believe the gprof cumulative time, then it's 3.88s vs. 1.7s
+  for the time in the alpha routine
+
+--------
+
+result of profiling digvid-background2 on inverse:
+
+ - compressed version: 73.4% in memcpy, 25.53% in transcode/inverse
+ - uncompressed version: 63.03% encode_line, 13.84% memcpy, 
+                         13.11 decode_frame, 10.01 encode_frame
+    --> the transform itself didn't get any samples
+    --> presumably uncompressed decode is slower than compressed
+        transcode (which resembles decode) because uncompressed decode
+        is also doing a copy
+
+--------
+
+Refs for intro:
+
+ILM recorded 1.5 million frames for attack of the clones:
+http://www.arri.com/sub/us/org/press/star_wars.htm
+
+From ILM: ``In 2003, over 13.7 million frames passed through our pipeline''
+``in 2003, approx 9 petabytes of data passed through our network''
+http://forums.cgsociety.org/showthread.php?s=&threadid=115293
+
+IBM says each frame is about 2 MB, and you need 24 per sec for 90 minutes
+--> leads to 3 terabytes of data for images (add another for sound)
+http://www-03.ibm.com/solutions/digitalmedia/doc/content/bin/files_15.pdf
+(130K frames --> if one sec per transform, would be 36 hrs)
+
+As of the end of fiscal year 2004, the USGS EDC had archived more than
+13 million frames of photographic data. This includes over 3 million
+frames of Landsat photographic data.
+http://edc.usgs.gov/about/reports/sales2004.pdf
+
+5 years is needed to digitize 8.6 million images.
+http://www.google.com/url?sa=t&ct=res&cd=1&url=http%3A%2F%2Fwgiss.ceos.org%2Farchive%2Farchive.doc%2FUse%2520of%2520Browse%2520or%2520Preview%2520Images%2520in%2520Support%2520of%2520Data%2520Access.doc&ei=AZoQRf6ZI6S4aunQ1KoI&sig=__VAMtzSwnslqbTSytdolhskZVryA=&sig2=TNujtBpoYUZhVGMiJdWByQ
+
+--------
+
+This guy has some good FLC movies, apparently are in an animation format:
+- http://woodshole.er.usgs.gov/operations/modeling/circulation.html
+Can I convert to Animation?
+
+FLI format description (finally!)
+COMPLETE:
+http://www.fileformat.info/format/fli/spec/index.htm
+PARTIAL:
+http://www.whisqu.se/per/docs/graphics55.htm
+
+-----
+
+to convert png to eps:
+
+"c:\Program Files\Krause\bin\bmeps.exe" blender-background1-frame5.png -c > blender-background1-frame5.eps
+--> need to do this instead of includegraphics because dvips somehow can't deal with that output in color -- goes to B&W postscript
+
+a month later (12/20):
+----------------------
+
+looking at compression in network packets:
+http://tools.ietf.org/html/rfc1967
+
+---------------
+
+SPARSE MATRIX ALGORITHMS
+
+- note that when you're doing multiplication, you only need to
+  consider cases where BOTH matrices are nonzero -- so it's kind of a
+  fast-forwarding through the compressed regions until both line up
+  with a terminal (extends to permutation matrices as well).
+
+might be tough:
+- row or column permutation
+
+--------------------------------------------------
+
+subroutine SolveLTriang_Full (unit_diagonal, use_transpose, a, x)
+
+  ! <arguments>
+  logical(logical_type), intent(in) :: unit_diagonal, use_transpose
+  real(real_type), intent(in), dimension(:,:) :: a
+  real(real_type), intent(inout), dimension(:) :: x
+  ! </arguments>
+
+  ! Local:
+  integer(int_type) :: i, j, n
+
+  n = MIN(SIZE(a,dim=1),SIZE(a,dim=2))
+
+  if (use_transpose) then
+
+     ! Use transpose.
+     if (unit_diagonal) then
+
+        ! Unit diagonal (UNUSED, UNTESTED).
+        do i=2,n
+           do j=1,i-1
+              x(i) = x(i) - a(j,i)*x(j)
+           end do
+        end do
+     else
+
+        ! Non-unit diagonal (UNUSED, UNTESTED).
+        x(1) = x(1) / a(1,1)
+        do i=2,n
+           do j=1,i-1
+              x(i) = x(i) - a(j,i)*x(j)
+           end do
+           x(i) = x(i) / a(i,i)
+        end do
+     end if
+  else
+
+     ! Use coeff. as is.
+     if (unit_diagonal) then
+
+        ! Unit diagonal (used in ILU preconditioning).
+        do j=1,n-1
+           x(j+1:n) = x(j+1:n) - x(j)*a(j+1:n,j)
+        end do
+     else
+
+        ! Non-unit diagonal (used in IC preconditioning).
+        do j=1,n-1
+           x(j) = x(j) / a(j,j)
+           x(j+1:n) = x(j+1:n) - x(j)*a(j+1:n,j)
+        end do
+        x(n) = x(n) / a(n,n)
+     end if
+  end if
+
+  return
+end subroutine SolveLTriang_Full
+
+--------------------------------------------------
+
+do j=1,n-1
+   x(j) = x(j) / a(j,j)
+   x(j+1:n) = x(j+1:n) - x(j)*a(j+1:n,j)
+end do
+x(n) = x(n) / a(n,n)
+
+
+public void solveLower (double l[][], double x[], double b[], int n) {
+
+   double sum;
+   int i,j;
+
+   for (i = 0; i < n; i++) {
+      sum = 0.0;
+      for (j = 0; j < i; j++) {
+         sum += l[i][j]*x[j];
+      }
+      x[i] = (b[i] - sum)/l[i][i];
+   }
+}
+
+/** Computes the cholesky decomposition of matrix <code>A</code> and stores
+ *  the result in <code>L</code> .
+ *  <code>L</code> may be null and also coincide with <code>A</code> .
+ *  The method only uses the upper right part of <code>A</code> and does not
+ *  test its symmetrie.
+ *  The method considers the length of <code>A</code> as the dimension of the
+ *  space and does not check any ranges.
+ *  <p>
+ *  @param  A   The matrix to decompose.
+ *  @param  L   The matrix to store result in.
+ *  @exception IllgealArgumentException if A is not positive-definite
+ */
+
+public static void decompose( double [][] A, double [][] L ) {
+
+    int n = A.length;
+
+    for( int i=0; i<n; i++ ) {
+        for( int j=i; j<n; j++ ) {
+            double sum = A[i][j];
+            for( int k=i-1; k>=0; k-- )
+                sum -= L[i][k] * L[j][k];
+
+            if( i == j ) {
+		L[j][i] = Math.sqrt( sum );
+
+            } else {
+                L[j][i] = sum / L[i][i];
+            }
+
+            if( i<j )
+                L[i][j] = 0;  // zero
+        }
+    }
+
+--------------------------------------------------
+
+- decimiation propagation
+- automatic interleaving
+- recovering from faults
+
+good comparison of lossless audio codecs:
+http://wiki.hydrogenaudio.org/index.php?title=Lossless_comparison
+
+
+-----
+
+1/17/07
+
+How long to train?
+--> 
+
+2^30 * 2 -- 2 GB of RAM for samples
+20 machines, 1 week, 1 GHz machine --> 2^23 * 2^30 cycles
+
+
+2^(32 + k) bits in your system
+  --> hit 1/2^k fraction of time
+  --> have to run for 2^k before you get a hit
+
+
+1500 bits?
+
+problem:  solve all b-bit programs to 2^n executions
+
+1. recursive doubling:
+   - need b * 2^b storage to keep map
+   - need 2^b * n time steps
+
+2. random sample with k bits:
+   - assume all bit states equally likely
+   - need b * 2^k storage (INDEXING?)
+   - need 2^(b-k) lookup cyclese
+
+   - to complete doubling step:
+     - simulate for 2^(b-k) cycles
+     - so takes 2^k*2^(b-k) to do 1 step
+     - takes 2^b * n to do n steps
+
+     - but how many cycles do you simulate in n steps?
+
+     - #cycles simulated (i) = 2*CS(i-1) + 2^(b-k)
+       2^(b-k)
+       2*(2^(b-k)) + 2^(b-k)
+       2*(2*(2^(b-k)) + 2^(b-k)) + 2^(b-k)
+
+       = sum_{j=0^i-1} 2^j 2^(b-k)
+       = 2^(b-k) sum_{j=0^i-1} 2^j
+       ~ 2^(b-k) 2^i
+       
+       so overall, saves you b-k+1 steps
+       so to get to 2^n steps, you do (n-(b-k)-1)/n of the work
+
+       --> let's say n = x*(b-k)
+           then this evaluation technique speeds up by factor of 2 max :(
+           and every 2^(b-k) cycles, program jumps 2^n
+           so you get 2^n + 2^(b-k) cycles for cost of 2^(b-k) cycles
+             - that is, get (2^x + 1)2^(b-k) cycles for cost of 2^(b-k) cycles
+             - program speeds up by 2^x + 1
+-----
+
+1/18/07 -- looking at AUDIO
+
+mpTrim will do certain transformations directly on MP3:
+ - http://www.mptrim.com/
+ - trim, fade-in, fade-out, adjust volume
+
+as will mp3DirectCut:
+ - http://mpesch3.de1.cc/mp3dc.html
+ - # Non-destructive cut, copy, paste
+ - # Volume change, fade, normalize, pause detection 
+
+- someone in forum claims that simple things can be done directly on
+  mp3 format, but it's impossible to do "noise reduction"
+
+---
+
+documents the LAME MDCT optimizations (eliminates ~70% of the computation):
+
+http://www.mail-archive.com/mp3encoder@geek.rcc.se/msg00450.html
+
+-------------------------------------------
+
+2/16
+
+figuring out how to convert to/from rawvideo for steve
+
+this seems to convert to raw
+../ffmpeg/ffmpeg -i 087_Lowerthird-bot.avi -f rawvideo -vcodec rawvideo output.raw
+
+or do i want:
+../ffmpeg/ffmpeg -i 087_Lowerthird-bot.avi -f rawvideo -vcodec ppm output.raw
+could this get back?
+../ffmpeg/ffmpeg -s 120x96 -f rawvideo -vcodec ppm -i output.raw -f avi output.avi
+
+play orig with:
+mplayer 087_Lowerthird-bot.avi
+
+-
+
+ok this actually works to convert to set of ppm files:
+../ffmpeg/ffmpeg -i 087_Lowerthird-bot.avi -vcodec ppm output%d.ppm
+
+and this appears to produce the concatenation of all the ppm files:
+../ffmpeg/ffmpeg -i 087_Lowerthird-bot.avi -f rawvideo -vcodec ppm output.raw
+
+now how to convert ppm files back to video / play video?
+closest thing i have, doesn't quite work:
+../ffmpeg/ffmpeg -s 120x96 -f rawvideo -vcodec ppm -pix_fmt bgr24 -i output.raw -f avi output.avi
+
+- 
+
+but ppm destroys alpha channel, while PAM preserves it
+
+converts to pam video, but i don't know how to get back:
+../ffmpeg/ffmpeg -i 087_Lowerthird-bot.avi -f rawvideo -vcodec pam output.pam
+
+*************
+
+convert any avi to pam files:
+../ffmpeg/ffmpeg -i 087_Lowerthird-bot.avi -vcodec pam output%d.pam
+
+convert pam files to aa avi:
+../ffmpeg/ffmpeg -vcodec pam -i output%d.pam -f avi -vcodec qtrle -y output.avi
+
+convert any avi to aa:
+../ffmpeg/ffmpeg -i 087_Lowerthird-bot.avi -f rawvideo -vcodec qtrle -y output.qtrle
+
+convert aa to raw:
+./aa2raw 120 96 output.qtrle output.raw
+
+convert pam files to rawvideo:
+./pam2raw 120 96 ../../compression/samples/output ../../compression/samples/output.raw
+
+convert rawvideo to pam files:
+./raw2pam 120 96 ../../compression/samples/output.raw ../../compression/samples/output
+
+what do i have:
+avi <--> pam
+  avi2pam
+  pam2avi
+raw <--> pam
+  pam2raw
+  raw2pam
+avi <--> aa
+  avi2aa
+ *aa2avi
+aa2raw
+
+add:
+
+Here is the current matrix of supported file converters:
+
+       TO
+FROM   avi  aa   raw  pam
+avi    ---   !         !
+aa          ---   !   (X)
+raw              ---   !
+pam     !   (X)   !   ---
+
+Entries marked with an (X) go through an intermediate format instead
+of being converted directly.
+
+Note that the source AVI's can use any compression technique, though
+the destination AVI is hard-coded as Apple Animation (could be
+adjusted in script).
+
+additional utils:
+ pam2raw
+ raw2pam
+ avi2pam
+ pam2avi
+
+avi <--> raw
+ just go through pam
+
+avi <--> aa
+ go through raw, to pam
+
+*************
+
+convert from qtrle to avi: -- not possible due to packetization issues
+ this is the closest command:
+ ../ffmpeg/ffmpeg -s 120x96 -f rawvideo -pix_fmt rgba32 -i output.qtrle -f avi -vcodec qtrle -y output.avi
+
+-------------------------------------------
+
+7/2/07
+
+Can we write a stencil at all in StreamIt?
+ - it's possible, but it's not pretty
+
+----
+
+7/10/07
+
+looked into low-density parity checks (ldpc)
+ - they do modulo-2 matrix multiplication
+ - start with a checker matrix (H) that is sparse in # of 1's
+ - take inverse to get generator matrix (G) --> where I need to understand the sparsity
+   - seems like examples given are also sparse in # of 1's
+   - (what we want is something that is sparse in # of 0's)
+ - also, made me realize that we actually CANNOT due matrix multiply entirely in compressed domain
+   - we can do multiplications in compressed domain, since they are element-wise
+   - however, summing N elements needs to decompress all N elements
+     - either that or have a phased filter -- first N steps sums an internal variable, next one outputs the sum
+     - ok, this is the first actual use for phased filters
+ - so solutions for matrix multiply are:
+   1) phased filters (+ induction variable analysis to see that you can do the sum directly)
+   2) allow the users to write filters IN THE COMPRESSED DOMAIN
+     - let the user express that output can take advantage of domain-specific properties about sum
+   --> BOTH of these solutions only work for RLE
+    - for general lz77 it is unclear how to do N-way sum without decompressing
+    - this is part of a more general observation:  having a lighter-weight compression step may IMPROVE your ability to compute on compressed data
+
+next question:  is writing round-robins as powerful as doing the computation inside the splitter/joiner
+
+well let's write the rules for round-robins!
+
+thinking about RE-COMPRESSING
+ - fixed-distance recompression is actually trivial
+   - just compare two distances in the stream and count the number of repeats
+   - this spans run-length-encoding and also apple animation -- since distances are fixed at two locations
+ - however, variable-distance recompression sounds harder
+   - of course the stream transformation never actually changes the repeat distance
+ - although apple animation does have a decision to make: is it more efficient to encode a repeat in the current frame or across frames?
+   - it seems that a "good" scheme could just see which repeat distance is longer at a fixed location
+   - likewise, a "good" scheme could just keep whatever distances are there and extend them (or start new ones)
+   - would have to think about proving things for the optimal solution -- there is probably not a big difference
+ --> so these would be good heuristics, and actually pretty easy to implement (***)
+   - though it wouldn't prove much for the POPL audience
+
+let's get back to round-robin rules
+
+- duplicate is trivial
+- RR split
+- RR join
+
+BTW, can you implement an arbitrary permuation with a roundrobin splitter and joiner?
+  - no, because first item in is always first item out
+  - but you can if you add the ability to join from right-to-left rather than left-to-right:
+  - here's how you implement a swap of positions i and j out of a list of length N
+    (assuming i!=0 and i!=j+1 and j!=N, otherwise you have boundary cases)
+  int->int splitjoin(int i, int j, int N) {
+    split roundrobin(i-1, 1, j-i, 1, N-j) {
+      add Identity<int>();
+      add splitjoin {
+        split roundrobin(1, j-i, 1);
+        for (int k=0; k<3; k++) { add Identity<int>(); }
+        join roundrobin-REVERSE(1, j-i, 1);                  <---- this serves to swap i and j
+      }
+      add Identity<int>();
+    }
+    join roundrobin(i-1, 1, j-i, 1, N-j);
+  }
+
+now for RR split rules:
+
+split(M1, M2)
+
+position i
+
+i<M1
+S o <d,c> -> T
+
+----------------------- 7/11/07
+
+can you coarsen the boundaries before it gets to the splitter?
+
+- need to eliminate distances or repeats that span boundaries
+  UNLESS 
+
+simple (unoptimized) approach:
+- break so that current repeat AND previous repeat is contained within a single roundrobin(N)
+
+no, let's consider two-way splitter, roundrobin(1)
+- distance can pass through if it's divisible by 2 
+  - current direction gets: distance'=distance/2, count'=ceil(count/2)
+  - other side gets: distance'=distance/2, count'=floor(count/2)
+
+ok, now roundrobin(2)
+- repeat distance needs to be a multiple of 4 to pass through for more than 1 iteration
+
+WLOG, say that we are currently distributing items to N_1 and we are about to pass item i (starting from 0)
+
+passing completely:
+-------------------
+
+ok, now roundrobin(N1, N2)
+  - can pass through if distance divisible by (N1 + N2)
+  - current direction gets:  distance'=distance*N1/(N1 + N2), 
+                             count'= N1*floor(count/(N1+N2)) + leftover(N1)
+  - other direction gets:    distance'=distance*N2/(N1 + N2), 
+                             count'= N2*floor(count/(N1+N2)) + leftover(N2)
+
+leftover(N1):
+count % (N1+N2) <= (N1-i) then count % (N1+N2)
+(N1-i) < count % (N1+N2) <= (N1-i) + N2 then N1-i
+else count % (N1+N2) - N2
+
+leftover(N2):
+count % (N1+N2) <= (N1-i) then 0
+(N1-i) < count % (N1+N2) <= (N1-i) + N2 then count % (N1+N2) - (N1-i)
+else N2
+
+run_splitter(c, pos)
+// finish current execution cycle, in progress on first output stream
+if (c < n_1 - pos) {
+  // if input stream ends, then run is finished
+  return (c, 0)
+} else {
+  // otherwise deduct this cycle's execution counts from the item count
+  c = c - (n_1 - pos)
+}
+
+// how many total execution cycles can be supported
+cycles = floor(c/(n_1 + n_2))
+leftover = 
+
+run_splitter(c, pos) {
+ // the number of complete splitter cycles, and the leftover
+ total_cycles = floor(c/(n_1 + n_2))
+ total_leftover = c % (n_1 + n_2)
+
+ // the last partial cycle may end in three regions:
+ if (total_leftover <= n_1-pos) {
+   // 1) in writing to the first output stream
+   L_1 = total_leftover
+   L_2 = 0
+ } else if (total_leftover <= (n_1-pos) + n_2) {
+   // 2) in subsequent writing to the second output stream
+   L_1 = n_1-pos
+   L_2 = total_leftover - n_1-pos
+ } else {
+   // 3) in wrap-around writing to the first output stream
+   L_1 = total_leftover - n_2
+   L_2 = n_2
+ }
+
+ return (n_1*total_cycles + L_1, n_2*total_cycles + L_2)
+}
+
+run_joiner(c_1, c_2, pos) {
+ // the number of complete joiner cycles, and the leftovers
+ total_cycles = min(floor(c_1/n_1, c_2/n_2))
+ leftover_1 = c_1 - total_cycles * n_1
+ leftover_2 = c_2 - total_cycles * n_2
+
+ // the last partial cycle may end in three regions:
+ if (leftover_1 <= n_1-pos) {
+   // 1) in reading from the first input stream
+   L_1 = leftover_1
+   L_2 = 0
+ } else if (leftover_2 <= n_2) {
+   // 2) in subsequent reading from the second input stream
+   L_1 = n_1-pos
+   L_2 = leftover_2
+ } else {
+   // 3) in wrap-around reading from the first output stream
+   L_1 = leftover_1
+   L_2 = n_2
+ }
+
+ return (n_1*total_cycles + L_1, n_2*total_cycles + L_2)
+}
+
+--> also have to update current and i
+
+passing partially:
+------------------
+
+if distance is not divisible by (N1 + N2), then can repeat until
+repeated item was sent other way
+
+offset = distance % (N1+N2)
+repeat_potential = if offset <=i then (N1 - i) else
+                   if offset > N2+i then offset - (N2+i)
+                   else 0
+offset' = if offset <= i then offset else offset - n_2
+
+if c%(N1+N2)>0 and repeat_potential>0
+distance' = n1*floor(d/(n1+n2)) + offset'
+count' = min(c, repeat_potential)
+
+---------
+
+inrange() = if distance % (N1+N2) <= i or distance % (N1+N2) > N2+i
+ which is the same as NOT (i < distance % (N1 + N2) <= N2+i)
+
+repeat_potential(d) = 
+  // repeat for rest of direction
+  if distance % (N1+N2) <= i then (N1-i)
+  // repeat until distance goes out of range
+  if distance % (N1+N2) > N2+i then distance % (N1+N2) - (N2+i)
+  // 
+  else 0
+
+leftover() =
+ if distance % (N1+N2) <= i 
+  then distance % (N1+N2)
+  else distance % (N1+N2) - N2
+
+if NOT (count divisible by (N1 + N2)) and inrange()
+ - current direction gets: 
+    distance' = N1*floor(distance/(N1+N2)) + leftover(), 
+    count' = min (max_count() , count)
+ - other direction gets nothing
+
+--> also have to update current and i
+
+---
+
+relative_dist = distance % (N1+N2)
+repeat_position = 
+  if relative_dist <= i then relative_dist
+  else N1+N2 - relative_dist
+
+if NOT (count divisible by (N1+N2)) and inrange()
+distance' = n1*floor(distance/(n1+n2)) + relative_dist
+
+****************************************
+
+now for a joiner
+
+WLOG, say that we are currently distributing items from N_1 and we are
+about to pass item i (starting from 0)
+
+roundrobin(M1, M2)
+
+passing completely:
+-------------------
+
+- left repeat distance is k*M1   (k>=1)
+- right repeat distance is k*M2  (k>=1)
+
+- emit distance'=k*(M1+M2)
+- let <consumed1, consumed2> = run_joiner(M1, M2, count1, count2, i)
+- emit count'=consumed1+consumed2
+  - patch left,right inputs to be less by consumed1,consumed2
+
+// returns how many items are consumed from each input of a joiner
+// given weights M1, M2, and that item i is about to be emitted from 
+// M1 (i starts from 0), and that count1 and count2 items are available 
+// at the inputs of joiner
+ - run_joiner(M1, M2, count1, count2, i) {
+     // first run remaining executions for first input
+     if (count1 < M1-i) {
+       return <count1, 0>
+     } else {
+       count1 = count1 - (M1-i)
+     }
+
+     // calculate how many full cycles each input could execute
+     exec1 = floor(count1/M1)
+     exec2 = floor(count2/M2)
+
+     if (exec1 < exec2) {
+       // if we finish reading from first input
+       return <M1-i + exec1*M1 + count1%M1, exec1*M2>
+     } else {
+       // if we finish reading from second input
+       return <M1-i + exec2*M1, exec2*M2 + count2%M2>
+     }
+  }
+
+- NOTE we are losing something here, because repeat distances don't
+  have to match exactly.  If the count is longer than the distance,
+  then can partially decompress, increase OR decrease distance, then
+  repeat with a different count
+
+passing partially:
+------------------
+
+max_count() = if distance % M1 <=i then M1-i
+              else M1-(distance % M1)
+ --> or in other words, M1-max(i, distance%M1)
+
+if !(distance1 is k*M1 and distance2 is k*M2)
+  then distance' = distance
+  count' = min (count, max_count())
+
+--> need to update current position
+
+7/15/07
+
+looking into system time / user time
+
+NOTE:  could collapse certain kinds of repeats again
+  - might generate same distances with unoptimal counts
+
+brightness on blender-background2
+
+compressed:
+on the order of 25% user time, 50% system time, the rest unexplained
+0.5/1/2
+
+uncompressed:
+on the order of 91% user time, 8% system time
+12.2s
+
+but system time overhead is constant in both cases: about 1s
+
+the mystery is where the non-system, non-user time is coming for
+compressed case
+
+--> I think user time is justified.  If you just do a "time" command
+    to COPY a file, you get something similar - 0.5-1s of system time,
+    then 1-2s of unexplained "real time".  (Maybe waiting for disk?)
+
+    Since in our usage scenario (digital video editing) the working
+    set would fit in RAM, this system time is not relevant.  So go
+    with user time.
+
+-------------
+
+if adding streamit code for benchmarks:
+
+---
+
+   ALIGN
+
+N A   | 
+<2,3> | N A                   pass-uncompressed
+<2,1> | <2,2> N A             pass-compressed
+<2,0> A | <2,2> N A           expand
+B A | <2,2> N A               prune
+<4,3> | B A <2,2> N A         pass-uncompressed
+<4,1> | <4,2> B A <2,2> N A   pass-compressed
+<4,0> A | <4,2> B A <2,2> N A expand
+C A | <4,2> B A <2,2> N A     prune
+    | C A <4,2> B A <2,2> N A pass-uncompressed
+
+HYPHENATE
+A-NA-BA-NA-NA
+
+C A <4,2> B A <2,2> N A |         
+  C A <4,2> B A <2,2> | - N A                   exec-uncompressed
+       C A <4,2> B A | <3,3> - N A              exec-compressed
+           C A <4,2> | - B A <3,3> - N A        exec-uncompressed
+                 C A  | <6,3> - B A <3,3> - N A  exec-compressed
+                      | - C A <6,3> - B A <3,3> - N A  exec-uncompressed
+NA-BA-NA-NA
+
+CA-NA-BA-NA-NA
+
+CABANABANANA
+
+C <4,5> B <2,3> N A
+
+N A   | 
+<2,3> | N A                   pass-uncompressed
+<2,1> | <2,2> N A             pass-compressed
+<2,0> A | <2,2> N A           expand
+B A | <2,2> N A               prune
+<4,5> | B A <2,2> N A         pass-uncompressed
+ <4,1>| <4,4> B A <2,2> N A   pass-compressed
+C <4,0> A | <4,4> B A <2,2> N A   expand
+C A | <4,4> B A <2,2> N A   prune
+| C A <4,4> B A <2,2> N A   pass-uncompressed
+
+CA~BA~NA~BA~NA~NA~
+
+----------------------------
+
+Need splitter / joiner examples
+
+.....
+x....
+
+<1,4> . x <1,3> .
+
+-->
+
+<1,4> .
+
+x <1,3> .
+
+-->
+
+. x <2,6> . .
+
+.x
+..
+..
+..
+..
+
+
+------------------------
+
+uncompressed:
+
+x~
+
+x....
+
+
+-----------------------
+
+x x . . x x <1,10> .
+
+through splitter:
+
+x x <1,2> . 
+
+x <1,3> .
+
+<1,4> .
+
+<1,4> .
+
+through joiner:
+
