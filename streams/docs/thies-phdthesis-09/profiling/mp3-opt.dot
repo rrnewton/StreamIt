@@ -1,0 +1,51 @@
+# CHANGES FROM ORIGINAL:
+# In original, the first "antialias" node as merged with the upstream "top of loop".  I separated
+# this node so that it didn't look confusing to have one antialias node feeding another.
+
+# also commenting out three lines that will have to be added manually, for the sake of precision
+
+digraph G {
+ size="6.5,9";
+ "synthetic antialias" [shape=box,label="Antialias"]
+ "1. III_hybrid (519-520)" [shape=box,label="Hybrid synthesis"]
+ "2. III_hybrid (521-522)"         [shape=box,label="Hybrid synthesis"]
+ "4. SubBandSynthesis (532-533)"   [shape=box,label="Subband synthesis"]
+ "5.  (534-546)"                   [shape=box,label="Antialias"]
+ "6. III_hybrid (547-548)"         [shape=box,label="Hybrid synthesis"]
+ "7. III_hybrid (549-550)"         [shape=box,label="Hybrid synthesis"]
+ "9. SubBandSynthesis (560-561)"   [shape=box,label="Subband synthesis"]
+ "0. before loop (0-518)" [shape=box,label="Huffman decode\nDequantize"]
+ "10.  (562-576)"                  [shape=box,label="Output"]
+ "3.  (523-531)"                   [shape=box,label="Frequency inversion"]
+ "8.  (551-559)"                   [shape=box,label="Frequency inversion"]
+
+ "0. before loop (0-518)" -> "0. before loop (0-518)" 
+ "0. before loop (0-518)" -> "1. III_hybrid (519-520)"
+ "0. before loop (0-518)" -> "2. III_hybrid (521-522)"
+# "0. before loop (0-518)" -> "4. SubBandSynthesis (532-533)"
+ "0. before loop (0-518)" -> "5.  (534-546)"
+ "0. before loop (0-518)" -> "synthetic antialias"
+ "synthetic antialias" -> "1. III_hybrid (519-520)"
+ "synthetic antialias" -> "2. III_hybrid (521-522)"
+ "0. before loop (0-518)" -> "6. III_hybrid (547-548)"
+ "0. before loop (0-518)" -> "7. III_hybrid (549-550)"
+# "0. before loop (0-518)" -> "9. SubBandSynthesis (560-561)"
+# "0. before loop (0-518)" -> "10.  (562-576)"                
+ "1. III_hybrid (519-520)" -> "1. III_hybrid (519-520)" 
+ "1. III_hybrid (519-520)" -> "3.  (523-531)"
+ "2. III_hybrid (521-522)" -> "2. III_hybrid (521-522)" 
+ "2. III_hybrid (521-522)" -> "3.  (523-531)"
+ "3.  (523-531)" -> "4. SubBandSynthesis (532-533)"
+ "4. SubBandSynthesis (532-533)" -> "4. SubBandSynthesis (532-533)" 
+ "4. SubBandSynthesis (532-533)" -> "10.  (562-576)"
+ "5.  (534-546)" -> "6. III_hybrid (547-548)"
+ "5.  (534-546)" -> "7. III_hybrid (549-550)"
+ "6. III_hybrid (547-548)" -> "6. III_hybrid (547-548)" 
+ "6. III_hybrid (547-548)" -> "8.  (551-559)"
+ "7. III_hybrid (549-550)" -> "7. III_hybrid (549-550)" 
+ "7. III_hybrid (549-550)" -> "8.  (551-559)"
+ "8.  (551-559)" -> "9. SubBandSynthesis (560-561)"
+ "9. SubBandSynthesis (560-561)" -> "9. SubBandSynthesis (560-561)" 
+ "9. SubBandSynthesis (560-561)" -> "10.  (562-576)"
+ "10.  (562-576)" -> "10.  (562-576)" 
+}

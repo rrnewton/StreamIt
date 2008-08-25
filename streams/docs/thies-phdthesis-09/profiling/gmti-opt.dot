@@ -1,0 +1,25 @@
+digraph G {
+  size="6.5,9";
+  orientation=landscape;
+
+  node [shape=box]
+
+ "setup\n(2%)" -> "setup\n(2%)" 
+ "setup\n(2%)" -> "Time Delay Equalization (FFT)\n(26%)" [label="32,768"]
+ "setup\n(2%)" -> "Time Delay Equalization (IFFT)\n(26%)" [label="8"]
+ "setup\n(2%)" -> "Detect / estimate\n(2%)" [label="8"]
+ "setup\n(2%)" -> "Tracker\n(5%)" [label="4"]
+ "Time Delay Equalization (FFT)\n(26%)" -> "Time Delay Equalization (IFFT)\n(26%)" [label="32,768"]
+ "Time Delay Equalization (IFFT)\n(26%)" -> "Beamformer\n(5%)" [label="1,382,400"]
+ "Beamformer\n(5%)" -> "Beamformer\n(5%)" 
+ "Beamformer\n(5%)" -> "Pulse compression\n(4%)" [label="1,036,800"]
+ "Beamformer\n(5%)" -> "Space-Time Adaptive Processing\n(12%)" [label="4,768"]
+ "Beamformer\n(5%)" -> "Detect / estimate\n(2%)" [label="4,768"]
+ "Pulse compression\n(4%)" -> "Doppler\n(18%)" [label="1,108,224"]
+ "Doppler\n(18%)" -> "Space-Time Adaptive Processing\n(12%)" [label="2,170,272"]
+ "Doppler\n(18%)" -> "Detect / estimate\n(2%)" [label="2,170,272"]
+ "Space-Time Adaptive Processing\n(12%)" -> "Detect / estimate\n(2%)" [label="1,048,288"]
+ "Detect / estimate\n(2%)" -> "Tracker\n(5%)" [label="801"]
+ "Tracker\n(5%)" -> "Detect / estimate\n(2%)" [label="24"]
+ "Tracker\n(5%)" -> "Tracker\n(5%)"
+}

@@ -1,0 +1,28 @@
+# CHANGES FROM ORIGINAL:
+# In original, the first "antialias" node as merged with the upstream "top of loop".  I separated
+# this node so that it didn't look confusing to have one antialias node feeding another.
+
+# also commenting out three lines that will have to be added manually, for the sake of precision
+
+digraph G {
+ size="6.5,9";
+ "synthetic antialias" [shape=box,label="Antialias"]
+ "2. III_hybrid (521-522)"         [shape=box,label="Hybrid synthesis"]
+ "4. SubBandSynthesis (532-533)"   [shape=box,label="Subband synthesis"]
+ "0. before loop (0-518)" [shape=box,label="Huffman decode\nDequantize"]
+ "10.  (562-576)"                  [shape=box,label="Output"]
+ "3.  (523-531)"                   [shape=box,label="Frequency inversion"]
+
+ "0. before loop (0-518)" -> "synthetic antialias"
+ "synthetic antialias" -> "2. III_hybrid (521-522)"
+ "0. before loop (0-518)" -> "2. III_hybrid (521-522)"
+ "2. III_hybrid (521-522)" -> "2. III_hybrid (521-522)" 
+ "2. III_hybrid (521-522)" -> "3.  (523-531)"
+ "3.  (523-531)" -> "4. SubBandSynthesis (532-533)"
+ "4. SubBandSynthesis (532-533)" -> "4. SubBandSynthesis (532-533)" 
+ "4. SubBandSynthesis (532-533)" -> "10.  (562-576)"
+ "0. before loop (0-518)" -> "4. SubBandSynthesis (532-533)"
+ "0. before loop (0-518)" -> "10.  (562-576)"                
+ "10.  (562-576)" -> "10.  (562-576)" 
+ "0. before loop (0-518)" -> "0. before loop (0-518)" 
+}

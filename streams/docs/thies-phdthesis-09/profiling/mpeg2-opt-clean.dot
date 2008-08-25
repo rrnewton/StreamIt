@@ -1,0 +1,39 @@
+digraph G {
+  size="6.5,9";
+  orientation=landscape;
+
+  node [shape=box]
+
+ "1. decode block\n(5%)" -> "1. decode block\n(5%)"
+ "1. decode block\n(5%)" -> "2. form_predictions\n(7%)"
+ "1. decode block\n(5%)" -> "3. saturate\n(5%)"
+ "1. decode block\n(5%)" -> "4. IDCT\n(9%)"
+ "1. decode block\n(5%)" -> "5. add_block\n(7%)"
+ "1. decode block\n(5%)" -> "6. update block counters\n(0%)"
+ "1. decode block\n(5%)" -> "7. frame_reorder\n(0%)"
+ "1. decode block\n(5%)" -> "8. conv420to422\n(12%)"
+ "1. decode block\n(5%)" -> "10. store_ppm_tga\n(43%)"
+ "1. decode block\n(5%)" -> "11. update flags\n(0%)"
+ "1. decode block\n(5%)" -> "12. update frame counters\n(0%)"
+ "2. form_predictions\n(7%)" -> "5. add_block\n(7%)"
+ "2. form_predictions\n(7%)" -> "7. frame_reorder\n(0%)"
+ "3. saturate\n(5%)" -> "4. IDCT\n(9%)"
+ "3. saturate\n(5%)" -> "5. add_block\n(7%)"
+ "4. IDCT\n(9%)" -> "5. add_block\n(7%)"
+ "5. add_block\n(7%)" -> "2. form_predictions\n(7%)"
+ "5. add_block\n(7%)" -> "5. add_block\n(7%)" 
+ "5. add_block\n(7%)" -> "7. frame_reorder\n(0%)"
+ "5. add_block\n(7%)" -> "8. conv420to422\n(12%)"
+ "5. add_block\n(7%)" -> "10. store_ppm_tga\n(43%)"
+ "6. update block counters\n(0%)" -> "7. frame_reorder\n(0%)"
+ "7. frame_reorder\n(0%)" -> "7. frame_reorder\n(0%)" 
+ "7. frame_reorder\n(0%)" -> "8. conv420to422\n(12%)"
+ "7. frame_reorder\n(0%)" -> "10. store_ppm_tga\n(43%)"
+ "7. frame_reorder\n(0%)" -> "11. update flags\n(0%)"
+ "8. conv420to422\n(12%)" -> "9. conv422to444\n(12%)"
+ "9. conv422to444\n(12%)" -> "10. store_ppm_tga\n(43%)"
+ "10. store_ppm_tga\n(43%)" -> "10. store_ppm_tga\n(43%)" 
+ "11. update flags\n(0%)" -> "7. frame_reorder\n(0%)"
+ "12. update frame counters\n(0%)" -> "1. decode block\n(5%)"
+ "12. update frame counters\n(0%)" -> "12. update frame counters\n(0%)" 
+}

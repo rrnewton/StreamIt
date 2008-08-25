@@ -1,0 +1,35 @@
+\documentclass[12pt,twoside]{mitthesis}
+\usepackage{url}
+\usepackage{epsfig}
+\usepackage{reader}
+\usepackage{times}
+\usepackage{hyperref}
+
+% Mark's settings
+%\setlength{\parindent}{0pc}
+%\setlength{\parskip}{0.15in}
+
+% use same counter for figures and tables
+\makeatletter
+\let\c@figure\c@table % or vice-versa
+\let\c@lof\c@lot % or vice-versa
+\def\ftype@table{1}%
+\makeatother
+
+\pagestyle{plain}
+
+\begin{document}
+
+\include{cover}
+\include{contents}
+
+\include{intro}
+\include{background}
+\include{language}
+\include{compression}
+\include{profiling}
+\include{conclusion}
+
+\bibliography{references}
+\bibliographystyle{amsalpha}
+\end{document}

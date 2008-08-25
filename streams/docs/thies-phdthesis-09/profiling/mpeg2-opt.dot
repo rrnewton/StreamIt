@@ -1,0 +1,39 @@
+digraph G {
+  size="6.5,9";
+  orientation=landscape;
+
+  node [shape=box]
+
+ "1. decode block" -> "1. decode block" 
+ "1. decode block" -> "2. form_predictions"
+ "1. decode block" -> "3. saturate"
+ "1. decode block" -> "4. IDCT"
+ "1. decode block" -> "5. add_block"
+ "1. decode block" -> "6. update block counters"
+ "1. decode block" -> "7. frame_reorder"
+ "1. decode block" -> "8. conv420to422"
+ "1. decode block" -> "10. store_ppm_tga"
+ "1. decode block" -> "11. update flags"
+ "1. decode block" -> "12. update frame counters"
+ "2. form_predictions" -> "5. add_block"
+ "2. form_predictions" -> "7. frame_reorder"
+ "3. saturate" -> "4. IDCT"
+ "3. saturate" -> "5. add_block"
+ "4. IDCT" -> "5. add_block"
+ "5. add_block" -> "2. form_predictions" 
+ "5. add_block" -> "5. add_block" 
+ "5. add_block" -> "7. frame_reorder"
+ "5. add_block" -> "8. conv420to422"
+ "5. add_block" -> "10. store_ppm_tga"
+ "6. update block counters" -> "7. frame_reorder"
+ "7. frame_reorder" -> "7. frame_reorder" 
+ "7. frame_reorder" -> "8. conv420to422"
+ "7. frame_reorder" -> "10. store_ppm_tga"
+ "7. frame_reorder" -> "11. update flags"
+ "8. conv420to422" -> "9. conv422to444"
+ "9. conv422to444" -> "10. store_ppm_tga"
+ "10. store_ppm_tga" -> "10. store_ppm_tga" 
+ "11. update flags" -> "7. frame_reorder" 
+ "12. update frame counters" -> "1. decode block" 
+ "12. update frame counters" -> "12. update frame counters" 
+}
