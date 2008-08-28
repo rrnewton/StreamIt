@@ -413,13 +413,13 @@ as Esterel Studio.
 
 There have also been general-purpose languages with built-in support
 for streams, including Occam~\cite{occammanual} and
-Erlang~\cite{armstrong_concurrent_1993}.  Occam is an imperative
-procedural language that is based on communicating sequential
-processes; it was originally developed to for the INMOS transputer, an
-early multiprocessor.  Erlang is a functional language that is based
-on the actors model; originally developed by Ericsson for distributed
-applications, it supports very lightweight processes and has found
-broad application in industry.
+Erlang~\cite{armstrong_concurrent_1993,armstrong_history_2007}.  Occam
+is an imperative procedural language that is based on communicating
+sequential processes; it was originally developed to for the INMOS
+transputer, an early multiprocessor.  Erlang is a functional language
+that is based on the actors model; originally developed by Ericsson
+for distributed applications, it supports very lightweight processes
+and has found broad application in industry.
 
 {\bf Shortcomings of previous languages.}  It should be evident that
 previous languages have provided many variations on streams, including
@@ -427,16 +427,17 @@ many elegant and general ways of expressing the functional essence of
 streaming computations.  However, there remains a critical disconnect
 in the design flow for streaming systems: while prototyping
 environments provide rich, high-level analysis and optimization of
-stream graphs~\cite{TODO}, these optimizations have not been automated
-in any programming language environment and thus remain out-of-reach
-for the vast majority of developers.  The root of the disconnect is
-the model of computation: previous languages have opted for the
-flexibility of process networks or communication sequential processes,
-rather than embracing the restrictive yet widely-applicable model of
-synchronous dataflow.  By focusing attention on a very common case --
-an unchanging stream graph with fixed communication rates --
-synchronous dataflow is the only model of computation that exposes the
-information needed to perform static scheduling and optimization.
+stream graphs~\cite{TODO-sdf-optimizations}, these optimizations have
+not been automated in any programming language environment and thus
+remain out-of-reach for the vast majority of developers.  The root of
+the disconnect is the model of computation: previous languages have
+opted for the flexibility of process networks or communication
+sequential processes, rather than embracing the restrictive yet
+widely-applicable model of synchronous dataflow.  By focusing
+attention on a very common case -- an unchanging stream graph with
+fixed communication rates -- synchronous dataflow is the only model of
+computation that exposes the information needed to perform static
+scheduling and optimization.
 
 Herein lies a unique opportunity to create a language that exposes the
 inherent regularity in stream programs, and to exploit that regularity
@@ -452,41 +453,186 @@ in the StreamIt project.
 
 \section{The StreamIt Project}
 
-The premise for our research: that {\it designing a language for the
-  sake of static analysis} can enable the compiler to automate
-transformations that were previously beyond the reach of non-experts.
+StreamIt is a language and compiler for high-performance stream
+programs.  The principal goals of the StreamIt project are three-fold:
 
-New leverage: design a language that facilitates static analysis
+\begin{enumerate}
 
-%% Over the past seven years, I have served as a student leader of the
-%% StreamIt project, which aims to address the fundamental challenges of
-%% stream programming.  First, how does one provide a natural programming
-%% abstraction for actors and streams?  And second, how does one
-%% implement that abstraction with minimal runtime overhead?  We
-%% addressed these questions by building a new programming language and
-%% compiler infrastructure for streaming applications.  StreamIt is a
-%% large systems project, incorporating over 25 people (up to 12 at a
-%% given time); I took a leadership role in designing and implementing
-%% the 300,000-line infrastructure as well as guiding the direction of
-%% team members.  My research contributions have encompassed language
-%% design~\cite{thies-cc02,thies-can02,thies-ppopp05,amarasinghe-ijpp05},
-%% parallelization~\cite{gordon-asplos02,gordon-asplos06,chen-graphics05},
-%% domain-specific
-%% optimizations~\cite{lamb-pldi03,agrawal-cases05,thies-compression07},
-%% machine-specific optimizations~\cite{sermulins-lctes05},
-%% scheduling~\cite{karczmarek-lctes03}, and tools for migrating legacy
-%% code to a streaming representation~\cite{thies-micro07}.  I have also
-%% facilitated application studies~\cite{drake-ipdps06,aziz-thesis}, user
-%% studies~\cite{kuo05,bit-streaming}, architecture
-%% studies~\cite{taylor2004}, and research by other universities that
-%% depends on
-%% StreamIt~\cite{mani-permutations,ola-techrep,duca-thesis,won-thesis}.
-%% The StreamIt compiler (targeting shared-memory multicores, clusters of
-%% workstations, and the MIT Raw machine) is publicly
-%% available~\cite{streamitweb} and has logged over 700 unique,
-%% registered downloads from 225 institutions.
+\item To expose and exploit the inherent parallelism in stream
+  programs on multicore architectures.
+
+\item To automate domain-specific optimizations known to streaming
+  application specialists.
+
+\item To improve programmer productivity in the streaming domain.
+
+\end{enumerate}
+
+While the first two goals are related to performance improvements, the
+third relates to improving programmability.  We contend that these
+goals are not in conflict, as high-level programming models contain
+more information and can be easier to optimize while also being easier
+to use.  However, many languages are designed only from the standpoint
+of programmability, and often make needless sacrifices in terms of
+analyzability.  Compared to previous efforts, the key leverage of the
+StreamIt project is a {\it compiler-conscious language design} that
+maximizes both analyzability and programmability.
+
+% People mentioned:
+%% Ali Meli
+%% Andrew Lamb
+%% Basier Aziz
+%% Bill Thies
+%% Chris Leger
+%% Ceryen Tan
+%% David Zhang
+%% Hank Hoffmann
+%% Janis Sermulins
+%% Jeremy Wong
+%% Jiawen Chen
+%% Kimberly Kuo
+%% Kunal Agrawal
+%% Mani Narayanan
+%% Matt Brown
+%% Matthew Drake
+%% Michael Gordon
+%% Michal Karczmarek
+%% Phil Sung
+%% Qiuyuan Li
+%% Rodric Rabbah
+%% Saman Amarasinghe
+%% Satish Ramaswamy
+%% Shirely Fung
+%% Sitij Agrawal
+%% Steve Hall
+%% Weng-Fai Wong
+
+StreamIt is a large systems project, incorporating over 27 people (up
+to 12 at a given time).  The group has made several contributions to
+the goals highlighted above.  In exploiting parallelism, Michael
+Gordon led the development of the first general algorithm that
+exploits the task, data, and pipeline parallelism in stream
+programs~\cite{gordon-asplos06}.  On the 16-core Raw architecture, it
+achieves an 11x mean speedup for our benchmark suite; this is a 1.8x
+improvement over our previous
+approach~\cite{gordon-asplos02,TODO-gordon-thesis}, the performance of
+which had been modelled by Jeremy Wong~\cite{TODO-wong-thesis}.  Also
+on the Raw machine, Jiawen Chen led the development of a flexible
+graphics rendering pipeline in StreamIt, demonstrating that a
+reconfigurable pipeline can achieve up to twice the throughput of a
+static~\cite{chen-graphics05,chen_load-balanced_2005}.  Moving beyond
+Raw, Janis Sermulins ported StreamIt to multicores and clusters of
+workstations, and also led the development of cache optimizations that
+offer a 3.5x improvement over unoptimized StreamIt on embedded
+processors~\cite{sermulins-lctes05,TODO-sermulins-thesis}.  David
+Zhang and Qiuyuan Li led the development of a flexible streaming
+execution layer that achieves over 88\% utilization on the Cell
+processor~\cite{TODO-dasCMP,TODO-zhang-thesis}.  Michal Karczmarek led
+the development of phased scheduling, the first hierarchical scheduler
+for cyclo-static dataflow that also enables a flexible tradeoff
+between code size and buffer
+size~\cite{karczmarek-lctes03,TODO-karczmarek-thesis}.  Phil Sung and
+Weng-Fai wong explored the execution of StreamIt on graphics
+processors.
+
+%- appears in the evaluation of the Raw architecture~\cite{taylor2004}
+
+In the area of domain-specific optimizations, Andrew Lamb automated
+the optimization of linear nodes, performing coarse-grained algebraic
+simplification or automatic conversion to the frequency
+domain~\cite{lamb-pldi03,TODO-lamb-thesis}.  These inter-node
+optimizations eliminate 85\% of the floating point operations from
+code written in a modular style.  Sitij Agrawal generalized the
+analysis to handle linear computations with state, performing
+optimizations such as algebraic simplification, removal of redundant
+states, and reducing the number of
+parameters~\cite{agrawal-cases05,TODO-agrawal-thesis}.  I led the
+development of domain-specific optimizations for compressed data
+formats, allowing certain computations to operate in place on the
+compressed data without requiring decompression and
+re-compression~\cite{thies-compression07}.  This transformation
+accelerates lossless video editing operations by a median of 15x.
+
+In the area of programmability, we as a group defined the StreamIt
+language, incorporating the first notions of structured, hierarchical
+streams as well as language support for reordering and sliding-window
+operations~\cite{thies-cc02,thies-can02,amarasinghe-ijpp05}.  With
+Michal Karczmarek and Janis Sermulins, I led the development of
+teleport messaging, a new language construct that uses the flow of
+data in the stream to provide a deterministic and meaningful timeframe
+for delivering events between decoupled nodes~\cite{thies-ppopp05}.
+Kimberly Kuo developed an Eclipse development environment and debugger
+for StreamIt and, with Rodric Rabbah, demonstrated improved
+programming outcomes in a user study~\cite{kuo05,TODO-kuo-thesis}.
+Juan Reyes also developed a graphical editor for
+StreamIt~\cite{TODO-reyes-thesis}.  Matthew Drake evaluated StreamIt's
+suitability for video codecs by implementing an MPEG-2 encoder and
+decoder~\cite{drake-ipdps06,TODO-drake-thesis}.  Basier Aziz evaluated
+StreamIt in an implementation of image-based motion
+estimation~\cite{aziz-thesis}.  I also led the development of dynamic
+analysis tools to ease the translation of legacy C code into a
+streaming representation~\cite{thies-micro07}.
+
+The StreamIt benchmark suite has been used by outside
+researchers~\cite{kudlur_orchestratingexecution_2008}.
+% TODO: add more users of benchmarks?
+In addition to MPEG-2 and image-based motion estimation, the suite
+(which is partialy internal) includes a ground moving target indicator
+(GMTI), a feature-aided tracker (FAT), synthetic aperture radar (SAR),
+a radar array front-end, part of the 3GPP physical layer, a vocoder
+with speech transformation, a subset of an MP3 decoder, a subset of
+MPEG-4 decoder, a JPEG encoder and decoder, a GSM decoder, an FM
+software radio, DES and serpent encryption, matrix multiplication,
+graphics shareders and rendering algorithms, and various DCTs, FFTs,
+filterbanks, and sorting algorithms.
+% TODO: Fix order?
+Contributors to the benchmark suite include Sitij Agrawal, Saman
+Amarasinghe, Basier Aziz, Matt Brown, Jiawen Chen, Matthew Drake,
+Shirely Fung, Michael Gordon, Hank Hoffmann, Michal Karczmarek, Andrew
+Lamb, Chris Leger, Ali Meli, Mani Narayanan, Rodric Rabbah, Satish
+Ramaswamy, and Jeremy Wong.
+
+%% includes GMTI radar processing (by Sitij Agrawal), part of the 3GPP
+%% physical layer (by Ali Meli), a vocoder (by Chris Leger), a subset
+%% of MP3 decoding (by Michal Karczmarek), a GSM decoder (by Jeremy
+%% Wong), an FM software radio (by Matt Brown), various FFTs (by
+%% Michal Karczmarek, Satish Ramaswamy, and Mani Narayanan) and
+%% various sorting algorithms (by Chris Leger and Mani Narayanan).
+
+While this section was not intended to serve as the acknowledgments,
+it would be incomplete without noting the deep involvement, guidance,
+and supervision of Rodric Rabbah and Saman Amarasinghe throughout many
+of the efforts listed above.  The StreamIt infrastructure was also
+made possible by the tenacious and tireless efforts of David Maze,
+Jasper Lin, and Allyn Dimock.  Additional contributors that were not
+mentioned previously include Kunal Agrawal, Steve Hall, and Ceryen
+Tan.
+
+The StreamIt compiler (targeting shared-memory multicores, clusters of
+workstations, and the MIT Raw machine) is publicly
+available~\cite{streamitweb} and has logged over 700 unique,
+registered downloads from 225 institutions.  Researchers at other
+universities have used StreamIt as a basis for their own
+work~\cite{mani-permutations,bit-streaming,ola-techrep,duca-thesis,won-thesis}.
+
+This dissertation does not mark the culmination of the StreamIt
+project; please consult the website~\cite{streamitweb} for subsequent
+updates.
 
 \section{Contributions}
+
+% As the joint contributions of the group have not been summarized to
+% date, we do so in Chapter~\cite{chap:experience} of this thesis.
+
+My role in the StreamIt project has been very collaborative,
+contributing ideas and implementation support to many aspects of the
+project.  This dissertation focuses on ideas that have not been
+presented previously in theses by other group members.  However, to
+provide a self-contained view of the breadth and applications of
+StreamIt, Chapter~\ref{chap:experience} also provides a survey of
+others' experience in using and optimizing the language.
+
+The contributions of this dissertation are as follows:
 
 \begin{enumerate}
 
