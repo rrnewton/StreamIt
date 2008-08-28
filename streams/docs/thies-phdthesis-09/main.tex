@@ -5,9 +5,29 @@
 \usepackage{times}
 \usepackage{hyperref}
 
-% Mark's settings
-%\setlength{\parindent}{0pc}
-%\setlength{\parskip}{0.15in}
+% some handy font sizes
+\newcommand{\tenpoint}{\fontsize{10pt}{12pt}\selectfont}
+\newcommand{\elevenpoint}{\fontsize{11pt}{13pt}\selectfont}
+\newcommand{\twelvepoint}{\fontsize{12pt}{14pt}\selectfont}
+\newcommand{\thirteenpoint}{\fontsize{13pt}{15pt}\selectfont}
+\newcommand{\fourteenpoint}{\fontsize{14pt}{16pt}\selectfont}
+\newcommand{\fifteenpoint}{\fontsize{15pt}{17pt}\selectfont}
+
+% shrink section titles
+\makeatletter
+\def\section{\@startsection {section}{1}{\z@}%
+  {-3.5ex \@plus -1ex \@minus -.2ex}%
+  {2.3ex \@plus.2ex}%
+  {\normalfont\fifteenpoint\bfseries}}
+\makeatother
+
+% shrink sub-section titles
+\makeatletter
+\def\subsection{\@startsection{subsection}{2}{\z@}%
+  {-3.25ex\@plus -1ex \@minus -.2ex}%
+  {1.5ex \@plus .2ex}%
+  {\normalfont\thirteenpoint\bfseries}}
+\makeatother
 
 % use same counter for figures and tables
 \makeatletter
@@ -15,6 +35,9 @@
 \let\c@lof\c@lot % or vice-versa
 \def\ftype@table{1}%
 \makeatother
+
+% do not list sub-sub sections in table of contents
+\setcounter{tocdepth}{1}
 
 \pagestyle{plain}
 
@@ -24,12 +47,14 @@
 \include{contents}
 
 \include{intro}
-\include{background}
 \include{language}
+\include{experience}
 \include{compression}
 \include{profiling}
 \include{conclusion}
 
-\bibliography{references}
+{\tenpoint
+\bibliography{references,zotero}
 \bibliographystyle{amsalpha}
 \end{document}
+}

@@ -47,7 +47,7 @@ printerrors:
         echo "***************************"; \
 	echo Overview of bibtex warnings: ; \
         echo "***************************"; \
-        grep ^Warning-- main.blg; \
+        grep ^Warning-- main.blg | grep -v 'missing pages'; \
 	echo "***************************"; \
 	echo ; \
         echo "*************************"; \
@@ -57,7 +57,7 @@ printerrors:
         echo "*************************"; \
 	echo
 
-main.bbl: references.bib $(TEXFILES) Makefile done.flag
+main.bbl: references.bib zotero.bib $(TEXFILES) Makefile done.flag
 	latex -interaction=batchmode main.tex || true
 	rm -f $*.dvi
 	bibtex -terse $*
