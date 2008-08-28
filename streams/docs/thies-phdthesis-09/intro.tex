@@ -70,12 +70,13 @@ compilers have achieved broad success in the past.  Examples include
 
 Our focus in the current work is on a new domain of programs which we
 define as {\it stream programs}.  A stream program is one that is
-organized around a regular stream of dataflow (see
+organized around a regular flow of data, as in image, video, or
+digital signal processing applications (see
 Figure~\ref{fig:stream-program}).  Examples include [TODO]. Our
 interest in stream programs is motivated by two prominent trends in
 computer architectures and applications:
 
-% TODO:  stream program figure
+% TODO:  fig:stream-program (graph with nodes)
 
 %% If we are taking a domain-specific approach to program
 %% optimization, what domain should we focus on to have a long-term
@@ -84,7 +85,7 @@ computer architectures and applications:
 
 \begin{enumerate}
 
-\item {\bf Computer architectures are becoming multicore.}  Because
+\item {\it Computer architectures are becoming multicore.}  Because
   single-threaded performance has finally plateaued, computer vendors
   are investing excess transistors in building more cores on a single
   chip rather than increasing the performance of a single core.  While
@@ -95,18 +96,19 @@ computer architectures and applications:
   parallelism in the application, supporting explicit communication
   between potentially-distributed memories.
 
-\item {\bf Computer applications are becoming embedded and
+\item {\it Computer applications are becoming embedded and
   data-centric.}  While desktop computers have been a traditional
   focus of the software industry, the explosion of cell phones is
   shifting this focus to the embedded space.  In 2006, there were 2.7
   billion cell phones in the world, compared to 850 million
-  PCs~\cite{ITU}.  Also, the compute-intensive nature of scientific
-  and simulation codes is giving way to the data-intensive nature of
-  audio and video processing.  YouTube already streams 200 terabytes
-  of video daily~\cite{Wikipedia-youtube}, and many potential ``killer
+  PCs~\cite{TODO-ITU-and-find-2008-not-2006}.  Also, the
+  compute-intensive nature of scientific and simulation codes is
+  giving way to the data-intensive nature of audio and video
+  processing.  YouTube already streams 200 terabytes of video
+  daily~\cite{TODO-Wikipedia-youtube}, and many potential ``killer
   apps'' of the future encompass the space of multimedia editing,
   computer vision, and real-time audio
-  enhancement~\cite{Berkeley-view,Intel-report}.
+  enhancement~\cite{TODO-Berkeley-view,TODO-Intel-report}.
 
 \end{enumerate}
 
@@ -118,7 +120,7 @@ architectures.  At the same time, they share common patterns of
 embedded and data-centric processing, making them an ideal target for
 domain-specific optimizations.
 
-% TODO: intersection figure
+% TODO: fig:intersection (architectures, apps, streaming)
 
 %% At the intersection of these trends is a broad and interesting space
 %% of applications that we term {\it stream programs}.  A stream program
@@ -157,18 +159,356 @@ Based on the examples cited previously, we have observed that stream
 programs share a number of characteristics.  Taken together, they
 define our conception of the streaming application domain:
 
-Regular and repeating computation
-Independent filters with explicit communication
-Data items have short lifetimes
+\begin{enumerate}
 
-As illustrated in Figure~\ref{fig:example-streaming}, these programs
-can typically be written as a set of independent {\it actors} which
-communicate over explicit data channels.  
+\item {\it Large streams of data.}  Perhaps the most fundamental
+  aspect of a stream program is that it operates on a large (or
+  virtually infinite) sequence of data items, hereafter referred to as
+  a {\it data stream}.  Data streams generally enter the program from
+  some external source, and each data item is processed for a limited
+  time before being discarded.  This is in contrast to scientific
+  codes, which manipulate a fixed input set with a large degree of
+  data reuse.
+
+\item {\it Independent stream filters.}  Conceptually, a streaming
+  computation represents a sequence of transformations on the data
+  streams in the program.  We will refer to the basic unit of this
+  transformation as a {\it filter}: an operation that--on each
+  execution step--reads one or more items from an input stream,
+  performs some computation, and writes one or more items to an output
+  stream.  Filters are generally independent and self-contained,
+  without references to global variables or other filters.  A stream
+  program is the composition of filters into a {\it stream graph}, in
+  which the outputs of some filters are connected to the inputs of
+  others.
+
+\item {\it A stable computation pattern.}  The structure of the stream
+  graph is generally constant during the steady-state operation of a
+  stream program.  That is, a certain set of filters are repeatedly
+  applied in a regular, predictable order to produce an output stream
+  that is a given function of the input stream.
+
+\item {\it Occasional modification of stream structure.}  Even though
+  each arrangement of filters is executed for a long time, there are
+  still dynamic modifications to the stream graph that occur on
+  occasion.  For instance, if a wireless network interface is
+  experiencing high noise on an input channel, it might react by
+  adding some filters to clean up the signal; or it might
+  re-initialize a sub-graph when the network protocol changes from
+  802.11 to Bluetooth\footnote{In this dissertation, we do not explore
+    the implications of dynamically modifying the stream structure.
+    As detailed in Chapter~\ref{chap:language}, we operate on a single
+    stream graph at a time; users may transition between graphs using
+    wrapper code.}.
+
+%% There is typically an enumerable number of configurations that the
+%% stream graph can adopt in any one program, such that all of the
+%% possible arrangements of filters are known at compile time.
+
+\item {\it Occasional out-of-stream communication.}  In addition to
+  the high-volume data streams passing from one filter to another,
+  filters also communicate small amounts of control information on an
+  infrequent and irregular basis.  Examples include changing the
+  volume on a cell phone, printing an error message to a screen, or
+  changing a coefficient in an adaptive FIR filter.  These messages
+  are often synchronized with some data in the stream--for instance,
+  when a frequency-hopping radio changes frequencies at a specific
+  point of the transmission.
+
+\item {\it High performance expectations.}  Often there are real-time
+  constraints that must be satisfied by stream programs; thus,
+  efficiency (in terms of both latency and throughput) is of primary
+  concern.  Additionally, many embedded applications are intended for
+  mobile environments where power consumption, memory requirements,
+  and code size are also important.
+
+\end{enumerate}
+
+While our discussion thus far has emphasized the embedded context for
+streaming applications, the stream abstraction is equally important in
+desktop and server-based computing.  Examples include [TODO].
+
+%% As illustrated in Figure~\ref{fig:example-streaming}, these
+%% programs can typically be written as a set of independent {\it
+%% actors} which communicate over explicit data channels.
 
 \section{Brief History of Streaming}
 
+\begin{figure}[t]
+\psfig{file=history-of-streaming.eps,width=\textwidth}
+\caption{A timeline of computer science efforts that have incorporated
+  notions of streams.\protect\label{fig:history-of-streaming}}
+% TODO: note that some dates (lucid?  id?) pulled from Stephens or
+% Wikipedia (occam?) for first release
+\end{figure}
+
+The concept of a stream has a long history in computer science; see
+Stephens~\cite{stephens_survey_1997} for a review of its role in
+programming languages.  Figure~\ref{fig:history-of-streaming} depicts
+some of the notable events on a timeline, including models of
+computation and prototyping environments that relate to streams.
+
+The fundamental properties of streaming systems transcend the details
+of any particular language, and have been explored most deeply as
+abstract models of computation.  These models can generally be
+considered as graphs, where nodes represent units of computation and
+edges represent FIFO communication channels.  The models differ in the
+regularity and determinism of the communication pattern, as well as
+the amount of buffering allowed on the channels.  Three of the most
+prevalent models are Kahn Process Networks~\cite{kahn_semantics_1974},
+Synchronous Dataflow~\cite{lee_static_1987}, and Communicating
+Sequential Processes~\cite{hoare_communicating_1978}.  They are
+compared in Figure~\ref{fig:model-comparison} and detailed below:
+
+% TODO: fig:model-comparison (table of kahn, 
+
+\begin{enumerate}
+
+\item {\it Kahn Process Networks}, also known as {\it process
+  networks}, are a simple model in which nodes can always enqueue
+  items onto their output channels, but attempts to read from an input
+  channel will block until data is ready (it is not possible to test
+  for the presence or absence of data on input channels).  Assuming
+  that each node performs a deterministic computation, these
+  properties imply that the entire network is deterministic; that is,
+  the sequence of data items observed on the output channels is a
+  deterministic function of those submitted to the input channels.
+  However, it is undecidable to statically determine the amount of
+  buffering needed on the channels, or to check whether the
+  computation might deadlock.  Process networks is the model of
+  computation adopted by UNIX pipes.
+
+\item {\it Synchronous Dataflow (SDF)} is a restricted form of process
+  network in which nodes execute atomic steps, and the number of data
+  items produced and consumed during each step are constant and known
+  at compile time.  Because the input and output rates are known, the
+  compiler can statically check whether a deadlock-free execution
+  exists and, if so, can derive a valid schedule of node executions.
+  The amount of buffering needed can also be determined statically.
+  Many variations of synchronous dataflow have been defined, including
+  cyco-static
+  dataflow~\cite{bilsen_cyclo-static_1995,parks_comparison_1995} and
+  multidimensional synchronous
+  dataflow~\cite{murthy_multidimensional_2002}.  Due to its potential
+  for static scheduling and optimization, synchronous dataflow
+  provides the starting point for our work.
+
+\item {\it Communicating Sequential Processes (CSP)} is in some ways
+  more restrictive, and in others more flexible than process networks.
+  The restriction is rendezvous communication: there is no buffering
+  on the communication channels, which means that each send statement
+  blocks until being paired with a receive statement (and vice-versa).
+  The flexibility is in the synchronization: a node may make a
+  non-deterministic choice, for example, in reading from any input
+  channel that has data available under the current schedule.  This
+  property leads to possibly non-deterministic outputs, and deadlock
+  freedom is undecidable.  While CSP itself is an even richer algebra
+  for describing the evolution of concurrent systems, this graph-based
+  interpretation of its capabilities applies to many of its pratical
+  instantiations, including the Occam programming language.
+
+\end{enumerate}
+
+While long-running (or infinite) computations are often described
+using one of the models above, the descriptions of finite systems also
+rely on other models of computation.  {\it Computation
+  graphs}~\cite{karp_properties_1966} are a generalization of SDF
+graphs; nodes may stipulate that, in order to execute a step, a
+threshold number of data items must be available on an input channel
+(possibly exceeding the number of items consumed by the node).  While
+SDF scheduling results can be adapted to the infinite execution of
+computation graphs, the original theory of computation graphs focuses
+on determinacy and termination properties when some of the inputs are
+finite.  {\it Actors} are a more general model providing asynchronous
+and unordered message passing between composable, dynamically-created
+nodes~\cite{hewitt_universal_1973,greif_semantics_1975,clinger_foundations_1981,agha_actors:model_1985}.
+Petri nets are also a general formalism for modeling many classes of
+concurrent transition
+systems~\cite{petri_communication_1962,murata_petri_1989}.
+
+In addition to models of computation, prototyping environments have
+been influential in the history of streaming systems.  The role of a
+prototyping environment is to simulate and validate the design of a
+complex system.  While it has been a long-standing goal to
+automatically generate efficient and deployable code from the
+prototype design, in practice most models are re-written by hand in a
+low-level language such as C in order to gain the full performance and
+functionality needed.  Still, many graph-level optimizations, such as
+scheduling~\cite{TODO-could-come-from-Ko-et-al-phases-intro} and
+buffer management~\cite{TODO}, have been pioneered in the context of
+prototyping environments.  One of the most long-running efforts is
+Ptolemy, a rich heterogeneous modeling environment that supports
+diverse models of computation, including the dataflow models described
+previously as well as continuous- and discrete-event
+systems~\cite{buck_multirate_1991,eker_taming_2003}.  Other academic
+environments include
+Gabriel~\cite{lee_gabriel:design_1989},Grape-II~\cite{lauwereins_grape-ii:system-level_1995},
+and El Greco~\cite{buck_heterogeneous_2000}, while commercial
+environments include MATLAB/Simulink (from The MathWorks, Inc.),
+Cocentric System Studio (from Synposis, Inc.), and System
+Canvas (from Angeles Design Systems~\cite{murthy_system_2001}).
+
+% TODO: expand list of companies
+
+% True but who cares:
+% - first mention of stream by P.J. Landin~\cite{landin_correspondence_1965}
+% - lucid originally developed as independent functional language to
+%   verify proofs; later seen to be good match for dataflow
+
+The notion of streams has also permeated several programming paradigms
+over the past half-century.  Dataflow languages such as
+Lucid~\cite{ashcroft_lucidnonprocedural_1977},
+Id~\cite{arvind_asynchronous_1978,nikhil_id_1991}, and
+VAL~\cite{ackerman_VAL--value-oriented_1979} aim to eliminate
+traditional control flow in favor of a scheduler that is driven only
+by data dependences.  To expose these dependences, each variable is
+assigned only once, and each statement is devoid of non-local side
+effects.  These properties overlap streaming in two ways.  First, the
+producer/consumer relationships exposed by dataflow are similar to
+those in a stream graph, except at a much finer level of granularity.
+Second, to preserve the single-assignment property within loops, these
+languages use a {\it next} keyword to indicate the value of a variable
+in the succeeding iteration.  This construct can be viewed as a
+regular data stream of values flowing through the loop.  Subsequent
+dataflow languages include Sisal~\cite{mcgraw_sisal:_1985} (``streams
+and iteration in a single assignment language'')
+% True but who cares:
+%, which grew out of VAL,
+and pH~\cite{nikhil_implicit_2001}.
+% True but who cares:
+%, which grew out of  grew out of Id and Sisal.
+More details on dataflow languages available in review
+articles~\cite{johnston_advances_2004,stephens_survey_1997}.
+
+Functional languages also have notions of streams, for example, as
+part of the lazy evaluation of lists~\cite{henderson_lazy_1976}.  It
+bears noting that seems to be no fundamental difference between a
+``functional language'' and a ``dataflow language''.  The terminology
+indicates mainly a difference of community, as dataflow languages were
+mapped to dataflow machines.  In addition, dataflow languages may be
+more inclined toward an imperative
+syntax~\cite{johnston_advances_2004}.  We do not survey functional
+languages further in their own right.
+
+Another class of languages is synchronous languages, which offer the
+abstraction of responding instantly (in synchrony) with their
+environment~\cite{halbwachs_synchronous_1998}.  Interpreted as a
+stream graph, a synchronous program can be thought of as a circuit,
+where nodes are state machines and edges are wires that carry a single
+value; in some languages, nodes may specify the logical times at which
+values are present on the wires.  Synchronous programs target the
+class of reactive systems, such as control circuits, embedded devices,
+and communication protocols, where the computation is akin to a
+complex automaton that continually responds to real-time events.
+Compared to stream programs, which have regular, computation-intensive
+processing, synchronous programs process irregular events and demand
+complex control flow.  Key synchronous languages include
+Signal~\cite{le_guernic_signal--data_1986},
+LUSTRE~\cite{caspi_lustre:declarative_1987,halbwachs_synchronous_1991},
+Esterel~\cite{berry_esterel_1992}, and
+Argos~\cite{maraninchi_argos:automaton-based_2001}.  These languages offer
+determinism and safety properties, spurring their adoption in
+industry; Esterel Technologies offers SCADE (based on LUSTRE) as well
+as Esterel Studio.
+
+There have also been general-purpose languages with built-in support
+for streams, including Occam~\cite{occammanual} and
+Erlang~\cite{armstrong_concurrent_1993}.  Occam is an imperative
+procedural language that is based on communicating sequential
+processes; it was originally developed to for the INMOS transputer, an
+early multiprocessor.  Erlang is a functional language that is based
+on the actors model; originally developed by Ericsson for distributed
+applications, it supports very lightweight processes and has found
+broad application in industry.
+
+{\bf Shortcomings of previous languages.}  It should be evident that
+previous languages have provided many variations on streams, including
+many elegant and general ways of expressing the functional essence of
+streaming computations.  However, there remains a critical disconnect
+in the design flow for streaming systems: while prototyping
+environments provide rich, high-level analysis and optimization of
+stream graphs~\cite{TODO}, these optimizations have not been automated
+in any programming language environment and thus remain out-of-reach
+for the vast majority of developers.  The root of the disconnect is
+the model of computation: previous languages have opted for the
+flexibility of process networks or communication sequential processes,
+rather than embracing the restrictive yet widely-applicable model of
+synchronous dataflow.  By focusing attention on a very common case --
+an unchanging stream graph with fixed communication rates --
+synchronous dataflow is the only model of computation that exposes the
+information needed to perform static scheduling and optimization.
+
+Herein lies a unique opportunity to create a language that exposes the
+inherent regularity in stream programs, and to exploit that regularity
+to perform deep optimizations.  This is the opportunity that we pursue
+in the StreamIt project.
+
+%% This idea is at the core of the movement known as {\it stream
+%%   programming}, which encompasses related efforts such as
+%% Cg~\cite{mark_cg:system_2003},
+%% StreamC~\cite{TODO-might-have-to-change-date-in-figure}, and
+%% Brook~\cite{buck_brook_2004}.  Our work on the StreamIt project was
+%% one of the early efforts in this space.
+
 \section{The StreamIt Project}
+
+The premise for our research: that {\it designing a language for the
+  sake of static analysis} can enable the compiler to automate
+transformations that were previously beyond the reach of non-experts.
 
 New leverage: design a language that facilitates static analysis
 
+%% Over the past seven years, I have served as a student leader of the
+%% StreamIt project, which aims to address the fundamental challenges of
+%% stream programming.  First, how does one provide a natural programming
+%% abstraction for actors and streams?  And second, how does one
+%% implement that abstraction with minimal runtime overhead?  We
+%% addressed these questions by building a new programming language and
+%% compiler infrastructure for streaming applications.  StreamIt is a
+%% large systems project, incorporating over 25 people (up to 12 at a
+%% given time); I took a leadership role in designing and implementing
+%% the 300,000-line infrastructure as well as guiding the direction of
+%% team members.  My research contributions have encompassed language
+%% design~\cite{thies-cc02,thies-can02,thies-ppopp05,amarasinghe-ijpp05},
+%% parallelization~\cite{gordon-asplos02,gordon-asplos06,chen-graphics05},
+%% domain-specific
+%% optimizations~\cite{lamb-pldi03,agrawal-cases05,thies-compression07},
+%% machine-specific optimizations~\cite{sermulins-lctes05},
+%% scheduling~\cite{karczmarek-lctes03}, and tools for migrating legacy
+%% code to a streaming representation~\cite{thies-micro07}.  I have also
+%% facilitated application studies~\cite{drake-ipdps06,aziz-thesis}, user
+%% studies~\cite{kuo05,bit-streaming}, architecture
+%% studies~\cite{taylor2004}, and research by other universities that
+%% depends on
+%% StreamIt~\cite{mani-permutations,ola-techrep,duca-thesis,won-thesis}.
+%% The StreamIt compiler (targeting shared-memory multicores, clusters of
+%% workstations, and the MIT Raw machine) is publicly
+%% available~\cite{streamitweb} and has logged over 700 unique,
+%% registered downloads from 225 institutions.
+
 \section{Contributions}
+
+\begin{enumerate}
+
+\item Language (Chapter 2)
+
+\item Experience (Chapter 3)
+
+- {\bf The first translation of stream programs into the
+  lossless-compressed domain.} (Chapter 4)
+
+- {\bf The first dynamic analysis tool that detects and exploits
+  likely coarse-grained parallelism in C programs.}  To assist
+  programmers in migrating legacy C code into a streaming
+  representation, this tool generates a stream graph depicting dynamic
+  communication between programmer-annotated sections of code.  The
+  tool can also generate a parallel version of the program based on
+  the memory dependences observed during training runs.  (Chapter 5).
+
+\end{enumerate}
+
+%%   We apply our tool to six case studies, including MPEG-2 decoding,
+%%   MP3 decoding, GMTI radar processing, and three SPEC benchmarks.  Our
+%%   analysis extracts a useful block diagram for each application, and
+%%   the parallelized versions offer a 2.78x mean speedup on a 4-core
+%%   machine.
