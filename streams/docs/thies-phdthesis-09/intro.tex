@@ -1,57 +1,46 @@
 \chapter{My Thesis}
 
-%% Adopting a stream programming model enables the compiler to
-%% automate transformations that were previously reserved for experts.
-%% This allows non-expert programmers to accelerate certain
-%% applications by an order of magnitude on parallel and sequential
-%% machines.
+% John Ellis:
+%% Ordinary scientific programs can be compiled for a new parallel
+%% architecture called VLIW (Very Long Instruction Word), yielding
+%% order-of-magnitude speedups over scalar architectures.
 
-Stream programming enables non-expert programmers to accelerate
-certain applications by an order of magnitude, as the compiler can
-automate transformations that were previously performed by hand.
+%% By adopting a new programming model known as stream programming,
+%% non-expert programmers can accelerate certain applications by an
+%% order of magnitude on parallel and sequential machines.
+
+Adopting a stream programming model enables non-expert programmers to
+accelerate certain applications by an order of magnitude, as the
+compiler can automate parallelization and optimization tasks that were
+previously performed by hand.
+%
+\footnote{Alternative: 
+By adopting a new programming model known as stream programming,
+non-expert programmers can obtain order-of-magnitude speedups on
+certain classes of applications.
+}
 
 \section{Introduction}
 
-While the advent of high-level programming languages has made it
-easier for beginner programmers to construct working applications,
-optimizing the performance of those applications is a more difficult
-task that is often beyond the reach of non-experts.  To improve the
-execution time, a performance expert may re-write large sections of
-the application, employing alternative algorithms, data structures, or
-task decompositions, to produce a version that is functionally
-equivalent to (but structurally very different from) the original
-program.  They may also utilize in-depth knowledge of the target
-architecture, such as the type and extent of parallel resources, the
-communication substrate, and the cache sizes, to match the structure
-and granularity of the application to that of the underlying machine.
-While it has been a long-term goal of the computer science community
-to replicate the role of performance experts via systematic
-transformations within the compiler, many optimizations remain beyond
-the reach of automation because the compiler does not have the
-information needed -- either about the program itself, or about the
-class of transformations known to the expert -- to match the
-hand-tuned performance.
-
-%% A long-term goal of the computer science community has been to
-%% automate the optimization of programs via systematic transformations
-%% in the compiler.  However, even after decades of research, there often
-%% remains a large gap between the performance of hand-tuned code and the
-%% performance obtainable by a compiler.  One of the central difficulties
-%% is that performance experts have more information than the compiler,
-%% and can thus perform more aggressive transformations.  For example, a
-%% performance expert may re-write large sections of the application,
-%% employing alternative algorithms, data structures, or task
-%% decompositions, to produce a version that is functionally equivalent
-%% to (but structurally very different from) the original program.  In
-%% addition, a performance expert may leverage detailed knowledge of the
-%% target architecture -- such as the type and extent of parallel
-%% resources, the communication substrate, and the cache sizes -- to
-%% match the structure and granularity of the application to that of the
-%% underlying machine.  While such transformations can always be
-%% performed by hand, they are unfortunately beyond the reach of
-%% non-expert programmers.  It thus remains an important goal to improve
-%% the automation of high-level program optimizations and lower the entry
-%% barrier to high-performance programming.
+A long-term goal of the computer science community has been to
+automate the optimization of programs via systematic transformations
+in the compiler.  However, even after decades of research, there often
+remains a large gap between the performance of compiled code and the
+performance that an expert can achieve by hand.  One of the central
+difficulties is that humans have more information than the compiler,
+and can thus perform more aggressive transformations.  For example, a
+performance expert may re-write large sections of the application,
+employing alternative algorithms, data structures, or task
+decompositions, to produce a version that is functionally equivalent
+to (but structurally very different from) the original program.  In
+addition, a performance expert may leverage detailed knowledge of the
+target architecture -- such as the type and extent of parallel
+resources, the communication substrate, and the cache sizes -- to
+match the structure and granularity of the application to that of the
+underlying machine.  In order to make headway against this
+long-standing problem, it will likely be necessary to empower the
+compiler with new information that is not currently embedded in
+general-purpose programming languages.
 
 One promising approach to automating performance optimization is to
 embed specific domain knowledge into the language and compiler.  By
@@ -66,22 +55,24 @@ also improve programmers' lives, as functionality that is tedious or
 unnatural to express in a general-purpose language can be succinctly
 expressed in a new one.  Such ``domain-specific'' languages and
 compilers have achieved broad success in the past.  Examples include
-[TODO].
+Lex for generating scanners; YACC for generating parsers; SQL for
+database queries; Verilog and VHDL for hardware design; MATLAB for
+scientific codes and signal processing; GraphViz for generating graph
+layouts; and PADS for processing ad-hoc
+data~\cite{fisher_pads:domain-specific_2005}.
 
-Our focus in the current work is on a new domain of programs which we
-define as {\it stream programs}.  A stream program is one that is
-organized around a regular flow of data, as in image, video, or
-digital signal processing applications (see
-Figure~\ref{fig:stream-program}).  Examples include [TODO]. Our
-interest in stream programs is motivated by two prominent trends in
+%% Our focus in the current work is on a new domain of programs which we
+%% define as {\it stream programs}.  A stream program is one that is
+%% organized around a regular flow of data, as in image, video, or
+%% digital signal processing applications (see
+%% Figure~\ref{fig:stream-graph}).  Examples include [TODO]. Our
+%% interest in stream programs is motivated by two prominent trends in
+%% computer architectures and applications:
+
+If we are taking a domain-specific approach to program optimization,
+what domain should we focus on to have a long-term impact?  We
+approached this question by considering two prominent trends in
 computer architectures and applications:
-
-% TODO:  fig:stream-program (graph with nodes)
-
-%% If we are taking a domain-specific approach to program
-%% optimization, what domain should we focus on to have a long-term
-%% impact?  We approached this question by considering two prominent
-%% trends in computer architectures and applications:
 
 \begin{enumerate}
 
@@ -99,36 +90,61 @@ computer architectures and applications:
 \item {\it Computer applications are becoming embedded and
   data-centric.}  While desktop computers have been a traditional
   focus of the software industry, the explosion of cell phones is
-  shifting this focus to the embedded space.  In 2006, there were 2.7
-  billion cell phones in the world, compared to 850 million
-  PCs~\cite{TODO-ITU-and-find-2008-not-2006}.  Also, the
+  shifting this focus to the embedded space.  There are almost four
+  billion cell phones globally, compared to 800 million
+  PCs~\cite{medford_microsoft/yahoo_2008}.  Also, the
   compute-intensive nature of scientific and simulation codes is
   giving way to the data-intensive nature of audio and video
-  processing.  YouTube already streams 200 terabytes of video
-  daily~\cite{TODO-Wikipedia-youtube}, and many potential ``killer
-  apps'' of the future encompass the space of multimedia editing,
-  computer vision, and real-time audio
-  enhancement~\cite{TODO-Berkeley-view,TODO-Intel-report}.
+  processing.  Since 2006, YouTube has been streaming over 250
+  terabytes of video daily~\cite{watkins_mash_2006}, and many
+  potential ``killer apps'' of the future encompass the space of
+  multimedia editing, computer vision, and real-time audio
+  enhancement~\cite{asanovic_landscape_2006,chen_convergence_2008}.
+% TODO: are these accurate citations?  are there others?
 
 \end{enumerate}
 
-As illustrated in Figure~\ref{fig:intersection}, we consider stream
-programs to represent a broad an interesting class of programs at the
-intersection of these two trends.  Stream programs are rich in
-parallelism and can be naturally targeted to distributed and multicore
-architectures.  At the same time, they share common patterns of
-embedded and data-centric processing, making them an ideal target for
+%% As illustrated in Figure~\ref{fig:intersection}, we consider stream
+%% programs to represent a broad an interesting class of programs at
+%% the intersection of these two trends.  Stream programs are rich in
+%% parallelism and can be naturally targeted to distributed and
+%% multicore architectures.  At the same time, they share common
+%% patterns of embedded and data-centric processing, making them an
+%% ideal target for domain-specific optimizations.
+
+At the intersection of these trends is a broad and interesting space
+of applications that we term {\it stream programs}.  A stream program
+is any program that is based around a regular stream of dataflow, as
+in audio, video, and signal processing applications (see
+Figure~\ref{fig:stream-graph}).  
+% TODO: improve this list?  add specific applications?
+Examples include radar tracking, software radios, communication
+protocols, speech coders, audio beamforming, video processing,
+cryptographic kernels, and network processing.  These programs are
+rich in parallelism and can be naturally targeted to distributed and
+multicore architectures.  At the same time, they also share common
+patterns of processing that makes them an ideal target for
 domain-specific optimizations.
 
-% TODO: fig:intersection (architectures, apps, streaming)
+\newcommand{\myfigwidth}[0]{3.5in}
+\begin{figure}[t]
+\begin{center}
+\psfig{file=intersection.eps,width=\myfigwidth}
+\end{center}
+\vspace{-32pt}
+{\mbox{~}\hfill \it \scriptsize Figure inspired by Mattson \& Lethin~\cite{mattson_streaming_2003}}
+\vspace{4pt}
+\caption[Stream programming is motivated by architecture and
+  application trends]{Stream programming is motivated by two prominent
+  trends: the trend towards parallel computer architectures, and the
+  trend towards embedded, data-centric
+  computations.\protect\label{fig:intersection}}
+\end{figure}
 
-%% At the intersection of these trends is a broad and interesting space
-%% of applications that we term {\it stream programs}.  A stream program
-%% is any program that is based around a regular stream of dataflow.
-%% Examples include [TODO].  These programs are rich in parallelism and
-%% can be naturally targeted to distributed and multicore architectures.
-%% At the same time, they also share common patterns of processing that
-%% makes them an ideal target for domain-specific optimizations.
+\begin{figure}[t]
+\centering\psfig{file=fm-radio.eps,width=3in}
+\caption{Example stream graph for a software radio with equalizer.\protect\label{fig:stream-graph}}
+\end{figure}
 
 In this dissertation, we develop language support for stream programs
 that enables non-expert programmers to harness both avenues:
@@ -197,9 +213,8 @@ define our conception of the streaming application domain:
   re-initialize a sub-graph when the network protocol changes from
   802.11 to Bluetooth\footnote{In this dissertation, we do not explore
     the implications of dynamically modifying the stream structure.
-    As detailed in Chapter~\ref{chap:language}, we operate on a single
-    stream graph at a time; users may transition between graphs using
-    wrapper code.}.
+    As detailed in Chapter~2, we operate on a single stream graph at a
+    time; users may transition between graphs using wrapper code.}.
 
 %% There is typically an enumerable number of configurations that the
 %% stream graph can adopt in any one program, such that all of the
@@ -226,7 +241,10 @@ define our conception of the streaming application domain:
 
 While our discussion thus far has emphasized the embedded context for
 streaming applications, the stream abstraction is equally important in
-desktop and server-based computing.  Examples include [TODO].
+desktop and server-based computing.  Examples include XML
+processing~\cite{barton_streaming_2003}, digital filmmaking, cell
+phone base stations, and hyperspectral imaging.
+% TODO: more examples?
 
 %% As illustrated in Figure~\ref{fig:example-streaming}, these
 %% programs can typically be written as a set of independent {\it
@@ -258,9 +276,8 @@ the amount of buffering allowed on the channels.  Three of the most
 prevalent models are Kahn Process Networks~\cite{kahn_semantics_1974},
 Synchronous Dataflow~\cite{lee_static_1987}, and Communicating
 Sequential Processes~\cite{hoare_communicating_1978}.  They are
-compared in Figure~\ref{fig:model-comparison} and detailed below:
-
-% TODO: fig:model-comparison (table of kahn, 
+compared in Figure~\ref{fig:models-of-computation} and
+Table~\ref{tab:model-table} and detailed below:
 
 \begin{enumerate}
 
@@ -293,6 +310,25 @@ compared in Figure~\ref{fig:model-comparison} and detailed below:
   for static scheduling and optimization, synchronous dataflow
   provides the starting point for our work.
 
+\begin{figure}[t]
+\centering\psfig{file=models-of-computation.eps,width=\myfigwidth}
+\caption[Space of behaviors allowable by different models of
+  computation]{Space of behaviors allowed by Kahn process networks,
+  synchronous dataflow (SDF), and communicating sequential processes
+  (CSP).  The set of behaviors considered are: buffering data items on
+  a communication channel, making a non-deterministic choice, and
+  deviating from a fixed I/O rate.  While these behaviors could always
+  be emulated inside a single Turing-complete node, we focus on the
+  behavior of the overall graph.
+  \protect\label{fig:models-of-computation}}
+\end{figure}
+
+\begin{table}[t]
+\centering\psfig{file=model-table.eps,width=4.75in}
+\caption{Key properties of streaming models of
+  computation.\protect\label{tab:model-table}}
+\end{table}
+
 \item {\it Communicating Sequential Processes (CSP)} is in some ways
   more restrictive, and in others more flexible than process networks.
   The restriction is rendezvous communication: there is no buffering
@@ -304,7 +340,7 @@ compared in Figure~\ref{fig:model-comparison} and detailed below:
   property leads to possibly non-deterministic outputs, and deadlock
   freedom is undecidable.  While CSP itself is an even richer algebra
   for describing the evolution of concurrent systems, this graph-based
-  interpretation of its capabilities applies to many of its pratical
+  interpretation of its capabilities applies to many of its practical
   instantiations, including the Occam programming language.
 
 \end{enumerate}
@@ -334,20 +370,20 @@ automatically generate efficient and deployable code from the
 prototype design, in practice most models are re-written by hand in a
 low-level language such as C in order to gain the full performance and
 functionality needed.  Still, many graph-level optimizations, such as
-scheduling~\cite{TODO-could-come-from-Ko-et-al-phases-intro} and
-buffer management~\cite{TODO}, have been pioneered in the context of
-prototyping environments.  One of the most long-running efforts is
-Ptolemy, a rich heterogeneous modeling environment that supports
-diverse models of computation, including the dataflow models described
-previously as well as continuous- and discrete-event
-systems~\cite{buck_multirate_1991,eker_taming_2003}.  Other academic
-environments include
+% TODO: add more citations, and duplicate below under ``rich, high level analysis''
+scheduling~\cite{bhattacharyya_optimal_1995,bhattacharyya_software_1996,bhattacharyya_self-timed_1996,zitzler_multidimensional_2000,stuijk_exploring_2006}
+and buffer management~\cite{ad_data_1997,murthy_shared_2001,govindarajan_minimizing_2002,murthy_buffer_2004,geilen_minimising_2005}, have
+been pioneered in the context of prototyping environments.  One of the
+most long-running efforts is Ptolemy, a rich heterogeneous modeling
+environment that supports diverse models of computation, including the
+dataflow models described previously as well as continuous- and
+discrete-event systems~\cite{buck_multirate_1991,eker_taming_2003}.
+Other academic environments include
 Gabriel~\cite{lee_gabriel:design_1989},Grape-II~\cite{lauwereins_grape-ii:system-level_1995},
 and El Greco~\cite{buck_heterogeneous_2000}, while commercial
 environments include MATLAB/Simulink (from The MathWorks, Inc.),
-Cocentric System Studio (from Synposis, Inc.), and System
-Canvas (from Angeles Design Systems~\cite{murthy_system_2001}).
-
+Cocentric System Studio (from Synposis, Inc.), and System Canvas (from
+Angeles Design Systems~\cite{murthy_system_2001}).
 % TODO: expand list of companies
 
 % True but who cares:
@@ -427,17 +463,18 @@ many elegant and general ways of expressing the functional essence of
 streaming computations.  However, there remains a critical disconnect
 in the design flow for streaming systems: while prototyping
 environments provide rich, high-level analysis and optimization of
-stream graphs~\cite{TODO-sdf-optimizations}, these optimizations have
-not been automated in any programming language environment and thus
-remain out-of-reach for the vast majority of developers.  The root of
-the disconnect is the model of computation: previous languages have
-opted for the flexibility of process networks or communication
-sequential processes, rather than embracing the restrictive yet
-widely-applicable model of synchronous dataflow.  By focusing
-attention on a very common case -- an unchanging stream graph with
-fixed communication rates -- synchronous dataflow is the only model of
-computation that exposes the information needed to perform static
-scheduling and optimization.
+stream
+graphs~\cite{bhattacharyya_optimal_1995,bhattacharyya_software_1996,bhattacharyya_self-timed_1996,ad_data_1997,zitzler_multidimensional_2000,murthy_shared_2001,govindarajan_minimizing_2002,murthy_buffer_2004,geilen_minimising_2005,stuijk_exploring_2006},
+these optimizations have not been automated in any programming
+language environment and thus remain out-of-reach for the vast
+majority of developers.  The root of the disconnect is the model of
+computation: previous languages have opted for the flexibility of
+process networks or communication sequential processes, rather than
+embracing the restrictive yet widely-applicable model of synchronous
+dataflow.  By focusing attention on a very common case -- an
+unchanging stream graph with fixed communication rates -- synchronous
+dataflow is the only model of computation that exposes the information
+needed to perform static scheduling and optimization.
 
 Herein lies a unique opportunity to create a language that exposes the
 inherent regularity in stream programs, and to exploit that regularity
@@ -515,23 +552,23 @@ exploits the task, data, and pipeline parallelism in stream
 programs~\cite{gordon-asplos06}.  On the 16-core Raw architecture, it
 achieves an 11x mean speedup for our benchmark suite; this is a 1.8x
 improvement over our previous
-approach~\cite{gordon-asplos02,TODO-gordon-thesis}, the performance of
-which had been modelled by Jeremy Wong~\cite{TODO-wong-thesis}.  Also
-on the Raw machine, Jiawen Chen led the development of a flexible
-graphics rendering pipeline in StreamIt, demonstrating that a
-reconfigurable pipeline can achieve up to twice the throughput of a
+approach~\cite{gordon-asplos02,gordon-thesis}, the performance of
+which had been modeled by Jeremy Wong~\cite{wong-thesis}.  Also on the
+Raw machine, Jiawen Chen led the development of a flexible graphics
+rendering pipeline in StreamIt, demonstrating that a reconfigurable
+pipeline can achieve up to twice the throughput of a
 static~\cite{chen-graphics05,chen_load-balanced_2005}.  Moving beyond
 Raw, Janis Sermulins ported StreamIt to multicores and clusters of
 workstations, and also led the development of cache optimizations that
 offer a 3.5x improvement over unoptimized StreamIt on embedded
-processors~\cite{sermulins-lctes05,TODO-sermulins-thesis}.  David
-Zhang and Qiuyuan Li led the development of a flexible streaming
-execution layer that achieves over 88\% utilization on the Cell
-processor~\cite{TODO-dasCMP,TODO-zhang-thesis}.  Michal Karczmarek led
-the development of phased scheduling, the first hierarchical scheduler
-for cyclo-static dataflow that also enables a flexible tradeoff
-between code size and buffer
-size~\cite{karczmarek-lctes03,TODO-karczmarek-thesis}.  Phil Sung and
+processors~\cite{sermulins-lctes05,sermulins-thesis}.  David Zhang and
+Qiuyuan Li led the development of a flexible streaming execution layer
+that achieves over 88\% utilization on the Cell
+processor~\cite{zhang_lightweight_2007,zhang-thesis}.  Michal
+Karczmarek led the development of phased scheduling, the first
+hierarchical scheduler for cyclo-static dataflow that also enables a
+flexible tradeoff between code size and buffer
+size~\cite{karczmarek-lctes03,karczmarek-thesis}.  Phil Sung and
 Weng-Fai wong explored the execution of StreamIt on graphics
 processors.
 
@@ -540,13 +577,13 @@ processors.
 In the area of domain-specific optimizations, Andrew Lamb automated
 the optimization of linear nodes, performing coarse-grained algebraic
 simplification or automatic conversion to the frequency
-domain~\cite{lamb-pldi03,TODO-lamb-thesis}.  These inter-node
+domain~\cite{lamb-pldi03,lamb-thesis}.  These inter-node
 optimizations eliminate 85\% of the floating point operations from
 code written in a modular style.  Sitij Agrawal generalized the
 analysis to handle linear computations with state, performing
 optimizations such as algebraic simplification, removal of redundant
 states, and reducing the number of
-parameters~\cite{agrawal-cases05,TODO-agrawal-thesis}.  I led the
+parameters~\cite{agrawal-cases05,agrawal-thesis}.  I led the
 development of domain-specific optimizations for compressed data
 formats, allowing certain computations to operate in place on the
 compressed data without requiring decompression and
@@ -563,32 +600,33 @@ data in the stream to provide a deterministic and meaningful timeframe
 for delivering events between decoupled nodes~\cite{thies-ppopp05}.
 Kimberly Kuo developed an Eclipse development environment and debugger
 for StreamIt and, with Rodric Rabbah, demonstrated improved
-programming outcomes in a user study~\cite{kuo05,TODO-kuo-thesis}.
+programming outcomes in a user study~\cite{kuo05,kuo-thesis}.
 Juan Reyes also developed a graphical editor for
-StreamIt~\cite{TODO-reyes-thesis}.  Matthew Drake evaluated StreamIt's
+StreamIt~\cite{reyes-thesis}.  Matthew Drake evaluated StreamIt's
 suitability for video codecs by implementing an MPEG-2 encoder and
-decoder~\cite{drake-ipdps06,TODO-drake-thesis}.  Basier Aziz evaluated
-StreamIt in an implementation of image-based motion
-estimation~\cite{aziz-thesis}.  I also led the development of dynamic
-analysis tools to ease the translation of legacy C code into a
+decoder~\cite{drake-ipdps06,drake-thesis}.  Basier Aziz evaluated
+StreamIt by implementing image-based motion estimation, including the
+RANSAC algorithm~\cite{aziz-thesis}.  I also led the development of
+dynamic analysis tools to ease the translation of legacy C code into a
 streaming representation~\cite{thies-micro07}.
 
 The StreamIt benchmark suite has been used by outside
 researchers~\cite{kudlur_orchestratingexecution_2008}.
 % TODO: add more users of benchmarks?
-In addition to MPEG-2 and image-based motion estimation, the suite
-(which is partialy internal) includes a ground moving target indicator
-(GMTI), a feature-aided tracker (FAT), synthetic aperture radar (SAR),
-a radar array front-end, part of the 3GPP physical layer, a vocoder
-with speech transformation, a subset of an MP3 decoder, a subset of
-MPEG-4 decoder, a JPEG encoder and decoder, a GSM decoder, an FM
-software radio, DES and serpent encryption, matrix multiplication,
-graphics shareders and rendering algorithms, and various DCTs, FFTs,
-filterbanks, and sorting algorithms.
+In addition to MPEG-2 and image-based motion estimation, the
+60,000-line suite includes a ground moving target indicator (GMTI), a
+feature-aided tracker (FAT), synthetic aperture radar (SAR), a radar
+array front-end, part of the 3GPP physical layer, a vocoder with
+speech transformation, a subset of an MP3 decoder, a subset of MPEG-4
+decoder, a JPEG encoder and decoder, a GSM decoder, an FM software
+radio, DES and serpent encryption, matrix multiplication, graphics
+shaders and rendering algorithms, and various DCTs, FFTs, filterbanks,
+and sorting algorithms.  Some programs are currently restricted for
+internal use.
 % TODO: Fix order?
 Contributors to the benchmark suite include Sitij Agrawal, Saman
 Amarasinghe, Basier Aziz, Matt Brown, Jiawen Chen, Matthew Drake,
-Shirely Fung, Michael Gordon, Hank Hoffmann, Michal Karczmarek, Andrew
+Shirley Fung, Michael Gordon, Hank Hoffmann, Michal Karczmarek, Andrew
 Lamb, Chris Leger, Ali Meli, Mani Narayanan, Rodric Rabbah, Satish
 Ramaswamy, and Jeremy Wong.
 
@@ -605,8 +643,10 @@ and supervision of Rodric Rabbah and Saman Amarasinghe throughout many
 of the efforts listed above.  The StreamIt infrastructure was also
 made possible by the tenacious and tireless efforts of David Maze,
 Jasper Lin, and Allyn Dimock.  Additional contributors that were not
-mentioned previously include Kunal Agrawal, Steve Hall, and Ceryen
-Tan.
+mentioned previously include Kunal Agrawal (who developed bit-level
+analyses), Steve Hall (who automated compressed-domain
+transformations), and Ceryen Tan (who is improving the multicore
+backend).
 
 The StreamIt compiler (targeting shared-memory multicores, clusters of
 workstations, and the MIT Raw machine) is publicly
@@ -616,8 +656,8 @@ universities have used StreamIt as a basis for their own
 work~\cite{mani-permutations,bit-streaming,ola-techrep,duca-thesis,won-thesis}.
 
 This dissertation does not mark the culmination of the StreamIt
-project; please consult the website~\cite{streamitweb} for subsequent
-updates.
+project; please consult the StreamIt website~\cite{streamitweb} for
+subsequent updates.
 
 \section{Contributions}
 
@@ -629,32 +669,88 @@ contributing ideas and implementation support to many aspects of the
 project.  This dissertation focuses on ideas that have not been
 presented previously in theses by other group members.  However, to
 provide a self-contained view of the breadth and applications of
-StreamIt, Chapter~\ref{chap:experience} also provides a survey of
-others' experience in using and optimizing the language.
+StreamIt, Chapter~3 also provides a survey of others' experience in
+using and optimizing the language.
 
-The contributions of this dissertation are as follows:
+The specific contributions of this dissertation are as follows:
 
 \begin{enumerate}
 
-\item Language (Chapter 2)
+\item {\it A design rationale for the StreamIt language, which
+  contains novel constructs to simultaneously improve the
+  programmability and analyzability of stream programs (Chapter~2).}
+  StreamIt is the first language to introduce hierarchical and
+  structured streams, as well as a construct (termed {\it teleport
+    messaging}) for timing the delivery of irregular control messages
+  relative to regular flows of data in the program.  Other novelties
+  include built-in language support for composable data reordering as
+  well as sliding window operations, both of which expose key
+  information to the compiler.
 
-\item Experience (Chapter 3)
+\item {\it A review of the key results and experienced gained in using
+  and optimizing StreamIt, spanning parallelization, domain-specific
+  optimization, and programmability (Chapter~3)}.  This chapter
+  validates key concepts of the StreamIt language by highlighting the
+  gains in performance and programmability that have been achieved,
+  largely due to the work of others in the StreamIt group.  We focus
+  on automatic parallelization (providing an 11.6x speedup on a
+  16-core machine), domain-specific optimization of linear
+  computations (eliminating up to 85\% of the floating point
+  operations), and cache optimizations (providing a 3.5x speedup on
+  embedded processors).  We also describe the experience of
+  application programmers in developing the StreamIt benchmark suite.
 
-- {\bf The first translation of stream programs into the
-  lossless-compressed domain.} (Chapter 4)
+\item {\it The first translation of stream programs into the
+  lossless-compressed domain (Chapter~4)}.  This domain-specific
+  optimization allows stream programs to operate directly on
+  compressed data formats, rather than requiring conversion to an
+  uncompressed format prior to processing.  While previous researchers
+  have focused on compressed-domain techniques for lossy data formats,
+  there are few techniques that apply to lossless formats.  We focus
+  on applications in video editing, where our technique supports color
+  adjustment, video compositing, and other operations directly on the
+  Apple Animation format (a variant of LZ77).  Speedups are roughly
+  proportional to the compression factor, with a median of 15x.
 
-- {\bf The first dynamic analysis tool that detects and exploits
-  likely coarse-grained parallelism in C programs.}  To assist
-  programmers in migrating legacy C code into a streaming
+\item {\it The first dynamic analysis tool that detects and exploits
+  likely coarse-grained parallelism in C programs (Chapter~5).}  To
+  assist programmers in migrating legacy C code into a streaming
   representation, this tool generates a stream graph depicting dynamic
   communication between programmer-annotated sections of code.  The
   tool can also generate a parallel version of the program based on
-  the memory dependences observed during training runs.  (Chapter 5).
+  the memory dependences observed during training runs.  In our
+  experience with six case studies, the extracted stream graphs prove
+  useful and the parallelized versions offer a 2.78x speedup on a
+  4-core machine.
 
 \end{enumerate}
 
-%%   We apply our tool to six case studies, including MPEG-2 decoding,
-%%   MP3 decoding, GMTI radar processing, and three SPEC benchmarks.  Our
-%%   analysis extracts a useful block diagram for each application, and
-%%   the parallelized versions offer a 2.78x mean speedup on a 4-core
-%%   machine.
+% support claim of order-of-magnitude
+
+\noindent Lessons learned and future work are described in the
+conclusion (Chapter~6).
+
+\newpage
+
+Alternate opening paragraph:
+\medskip
+
+While the advent of high-level programming languages has made it
+easier for beginner programmers to construct working applications,
+optimizing the performance of those applications is a more difficult
+task that is often beyond the reach of non-experts.  To improve the
+execution time, a performance expert may re-write large sections of
+the application, employing alternative algorithms, data structures, or
+task decompositions, to produce a version that is functionally
+equivalent to (but structurally very different from) the original
+program.  They may also utilize in-depth knowledge of the target
+architecture, such as the type and extent of parallel resources, the
+communication substrate, and the cache sizes, to match the structure
+and granularity of the application to that of the underlying machine.
+While it has been a long-term goal of the computer science community
+to replicate the role of performance experts via systematic
+transformations within the compiler, many optimizations remain beyond
+the reach of automation because the compiler does not have the
+information needed -- either about the program itself, or about the
+class of transformations known to the expert -- to match the
+hand-tuned performance.

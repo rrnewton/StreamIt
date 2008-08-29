@@ -27,6 +27,12 @@
 	pages = {753--762}
 },
 
+@misc{_graphviz_????,
+	title = {Graphviz},
+	url = {http://graphviz.org/},
+	howpublished = {http://graphviz.org/}
+},
+
 @article{engebretsen_acceptance_2005,
 	title = {Acceptance of Information Technology by Health Research Projects in Low-income Countries Intention to use and Acceptance of},
 	url = {http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.108.4003},
@@ -100,6 +106,16 @@
 	pages = {3255--3258 vol.5}
 },
 
+@phdthesis{aziz_image-based_2007,
+	type = {M.Eng. Thesis},
+	title = {Image-Based Motion Estimation in a Stream Programming Language},
+	url = {http://cag.lcs.mit.edu/commit/papers/07/aziz-meng-thesis.pdf},
+	school = {Massachusetts Institute of Technology},
+	author = {Abdulbasier Aziz},
+	month = jun,
+	year = {2007}
+},
+
 @article{amarasinghe_language_2005,
 	title = {Language and compiler design for streaming applications},
 	volume = {33},
@@ -129,6 +145,16 @@
 	url = {http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.18.4920},
 	doi = {10.1.1.18.4920},
 	author = {Rishiyur S Nikhil and Rishiyur S Nikhil}
+},
+
+@inbook{ellson_graphviz_2002,
+	title = {Graphviz— Open Source Graph Drawing Tools},
+	url = {http://dx.doi.org/10.1007/3-540-45848-4\_57},
+	abstract = {Graphviz is a heterogeneous collection of graph drawing tools containing batch layout programs (dot, neato, fdp, twopi); a platform for incremental layout (Dynagraph); customizable graph editors (dotty, Grappa); a server for including graphs in Web pages (WebDot); support for graphs as COM objects (Montage); utility programs useful in graph visualization; and libraries for attributed graphs. The software is available under an Open Source license. The article[1] provides a detailed description of the package. },
+	journal = {Graph Drawing},
+	author = {John Ellson and Emden Gansner and Lefteris Koutsofios and Stephen North and Gordon Woodhull},
+	year = {2002},
+	pages = {594--597}
 },
 
 @misc{_using_2005,
@@ -165,6 +191,16 @@
 	author = {Peter Henderson and Jr James H. Morris},
 	year = {1976},
 	pages = {95--103}
+},
+
+@phdthesis{lamb_linear_2003,
+	type = {M.Eng. Thesis},
+	title = {Linear Analysis and Optimization of Stream Programs},
+	url = {http://cag.lcs.mit.edu/commit/papers/03/aalamb-meng-thesis.pdf},
+	school = {Massachusetts Institute of Technology},
+	author = {Andrew A. Lamb},
+	month = may,
+	year = {2003}
 },
 
 @article{hanscom_computerized_2002,
@@ -273,6 +309,32 @@
 	pages = {561--568}
 },
 
+@inproceedings{bhattacharyya_self-timed_1996,
+	title = {Self-Timed Resynchronization: A Post-Optimization for Static Multiprocessor Schedules},
+	isbn = {0-8186-7255-2},
+	url = {http://portal.acm.org.libproxy.mit.edu/citation.cfm?id=645606.660850\&coll=GUIDE\&dl=GUIDE},
+	abstract = {In a shared-memory multiprocessor system, it is possible that certain synchronization operations are redundant - that is, their corresponding sequencing requirements are enforced completely by other synchronizations in the system - and can be eliminated without compromising correctness. This paper addresses the problem of adding new synchronization operations in a multiprocessor implementation in such a way that the number of original synchronizations that consequently become redundant significantly exceeds the number of new synchronizations. We refer to this approach to reducing synchronization overhead as resynchronization. In this paper we formally define the resynchronization problem, we show that optimal resynchronization is NP-hard, and we propose a family of heuristics for this problem. Finally we present a practical example where resynchronization is useful.},
+	booktitle = {Proceedings of the 10th International Parallel Processing Symposium},
+	publisher = {IEEE Computer Society},
+	author = {Shuvra S. Bhattacharyya and Sundararajan Sriram and Edward A. Lee},
+	year = {1996},
+	keywords = {embedded systems,inter-processor communication overhead,multiprocessors,scheduling,static schedules,synchronization},
+	pages = {199--205}
+},
+
+@article{murthy_shared_2001,
+	title = {Shared buffer implementations of signal processing systems using lifetime analysis techniques},
+	volume = {20},
+	issn = {0278-0070},
+	abstract = {There has been a proliferation of block-diagram environments for specifying and prototyping digital signal processing (DSP) systems. These include tools from academia such as Ptolemy and commercial tools such as DSPCanvas from Angeles Design Systems, signal processing work system (SPW) from Cadence, and COSSAP from Synopsys. The block diagram languages used in these environments are usually based on dataflow semantics because various subsets of dataflow have proven to be good matches for expressing and modeling signal processing systems. In particular, synchronous dataflow (SDF) has been found to be a particularly good match for expressing multirate signal processing systems. One of the key problems that arises during synthesis from an SDF specification is scheduling. Past work on scheduling from SDF has focused on optimization of program memory and buffer memory under a model that did not exploit sharing opportunities. In this paper, we build on our previously developed analysis and optimization framework for looped schedules to formally tackle the problem of generating optimally compact schedules for SDF graphs. We develop techniques for computing these optimally compact schedules in a manner that also attempts to minimize buffering memory under the assumption that buffers will be shared. This results in schedules whose data memory usage is drastically lower than methods in the past have achieved. The method we use is that of lifetime analysis; we develop a model for buffer lifetimes in SDF graphs and develop scheduling algorithms that attempt to generate schedules that minimize the maximum number of live tokens under the particular buffer lifetime model. We develop several efficient algorithms for extracting the relevant lifetimes from the SDF schedule. We then use the well-known first-fit heuristic for packing arrays efficiently into memory. We report extensive experimental results on applying these techniques to several practical SDF systems and show improvements that average 50\% over previous techniques, with some systems exhibiting up to an 83\% improvement over previous techniques },
+	number = {2},
+	journal = {Computer-Aided Design of Integrated Circuits and Systems, IEEE Transactions on},
+	author = {P.K. Murthy and S.S. Bhattacharyya},
+	year = {2001},
+	keywords = {block-diagram environments,buffer lifetime model,buffer lifetimes,buffer storage,data flow computing,data memory usage,dataflow semantics,digital signal processing chips,digital signal processing systems,dynamic programming,first-fit heuristic,graph colouring,lifetime analysis techniques,live tokens,multirate signal processing,optimally compact schedules,program compilers,scheduling,shared buffer implementations,shared memory systems,storage allocation,synchronous dataflow},
+	pages = {177--198}
+},
+
 @article{kushniruk_technology_2005,
 	title = {Technology induced error and usability: the relationship between usability problems and prescription errors when using a handheld application},
 	volume = {74},
@@ -328,6 +390,21 @@
 	pages = {5}
 },
 
+@inproceedings{stuijk_exploring_2006,
+	address = {San Francisco, CA, USA},
+	title = {Exploring trade-offs in buffer requirements and throughput constraints for synchronous dataflow graphs},
+	isbn = {1-59593-381-6},
+	url = {http://portal.acm.org/citation.cfm?id=1146909.1147138},
+	doi = {10.1145/1146909.1147138},
+	abstract = {Multimedia applications usually have throughput constraints. An implementation must meet these constraints, while it minimizes resource usage and energy consumption. The compute intensive kernels of these applications are often specified as Synchronous Dataflow Graphs. Communication between nodes in these graphs requires storage space which influences throughput. We present exact techniques to chart the Pareto space of throughput and storage trade-offs, which can be used to determine the minimal storage space needed to execute a graph under a given throughput constraint. The feasibility of the approach is demonstrated with a number of examples.},
+	booktitle = {Proceedings of the 43rd annual conference on Design automation},
+	publisher = {ACM},
+	author = {Sander Stuijk and Marc Geilen and Twan Basten},
+	year = {2006},
+	keywords = {buffering,optimization,synchronous dataflow,throughput},
+	pages = {899--904}
+},
+
 @article{hoare_communicating_1978,
 	title = {Communicating sequential processes},
 	volume = {21},
@@ -340,6 +417,26 @@
 	year = {1978},
 	keywords = {classes,concurrency,conditional critical regions,coroutines,data representations,guarded commands,input,iterative arrays,monitors,multiple entries,multiple exits,nondeterminacy,output,parallel programming,procedures,program structures,programming,programming languages,programming primitives,recursion},
 	pages = {666--677}
+},
+
+@phdthesis{karczmarek_constrained_2002,
+	type = {S.M. Thesis},
+	title = {Constrained and Phased Scheduling of Synchronous Data Flow Graphs for StreamIt Language},
+	url = {http://cag.lcs.mit.edu/commit/papers/02/karczma-thesis-SM.pdf},
+	school = {Massachusetts Institute of Technology},
+	author = {Michal Karczmarek},
+	month = dec,
+	year = {2002}
+},
+
+@inproceedings{barton_streaming_2003,
+	title = {Streaming XPath processing with forward and backward axes},
+	abstract = {We present a streaming algorithm for evaluating XPath expressions that use backward axes (parent and ancestor) and forward axes in a single document-order traversal of an XML document. Other streaming XPath processors handle only forward axes. We show through experiments that our algorithm significantly outperforms (by more than a factor of two) a traditional nonstreaming XPath engine. Furthermore, our algorithm scales better because it retains only the relevant portions of the input document in memory. Our engine successfully processes documents over 1GB in size, whereas the traditional XPath engine degrades considerably in performance for documents over 100 MB in size and fails to complete for documents of size over 200 MB.},
+	booktitle = {Data Engineering, 2003. Proceedings. 19th International Conference on},
+	author = {C. Barton and P. Charles and Deepak  Goyal and Mukund  Raghavachari and M. Fontoura and V. Josifovski},
+	year = {2003},
+	keywords = {backward axes,forward axes,streaming algorithm,traditional XPath engine,tree based representation,tree data structures,tree searching,XML,XML document-order traversal,XPath expressions,XPath processing,X-tree},
+	pages = {455--466}
 },
 
 @inproceedings{karczmarek_phased_2003,
@@ -355,6 +452,15 @@
 	year = {2003},
 	keywords = {buffer size,code size,cyclo-static dataflow,dsp,phased scheduling,stream programming,streamit,synchronous dataflow},
 	pages = {103--112}
+},
+
+@phdthesis{wong_modelingscalability_2004,
+	type = {M.Eng. Thesis},
+	title = {Modeling the Scalability of Acyclic Stream Programs},
+	url = {http://cag.lcs.mit.edu/commit/papers/04/wong-meng-thesis.pdf},
+	school = {Massachusetts Institute of Technology},
+	author = {Jeremy Wong},
+	year = {2004}
 },
 
 @techreport{lee_overview_2003,
@@ -398,6 +504,23 @@
 	author = {Praveen K. Murthy and Etan G. Cohen and Steve Rowland},
 	year = {2001},
 	pages = {54--59}
+},
+
+@misc{_workshopstreaming_????,
+	title = {Workshop on Streaming Systems},
+	url = {http://cag.csail.mit.edu/wss03/},
+	howpublished = {http://cag.csail.mit.edu/wss03/}
+},
+
+@inproceedings{bhattacharyya_optimal_1995,
+	title = {Optimal parenthesization of lexical orderings for DSP block diagrams},
+	doi = {10.1109/VLSISP.1995.527489},
+	abstract = {Minimizing memory requirements for program and data are critical objectives when synthesizing software for embedded DSP applications. Previously, it has been demonstrated that for graphical programs based on the widely-used synchronous dataflow model an important class of minimum code size implementations can be viewed as parenthesizations of lexical orderings of the computational blocks. Such a parenthesization corresponds to the hierarchy of loops in the software implementation. In this paper, we present a dynamic programming technique for constructing a parenthesization that minimizes data memory cost from a given lexical ordering of a synchronous dataflow graph. For graphs that do not contain delays, this technique always constructs a parenthesization that has minimum data memory cost from among all parenthesizations for the given lexical ordering. When delays are present, the technique may make refinements to the lexical ordering while it is computing the parenthesization, and the data memory cost of the result is guaranteed to be less than or equal to the data memory cost of all valid parenthesizations for the initial lexical ordering},
+	booktitle = {VLSI Signal Processing, VIII, 1995. IEEE Signal Processing Society [Workshop on]},
+	author = {S.S. Bhattacharyya and P.K. Murthy and E.A. Lee},
+	year = {1995},
+	keywords = {code size,data flow graphs,data memory,delays,digital signal processing chips,DSP block diagrams,dynamic programming,lexical orderings,microprogramming,optimal parenthesization,software synthesis,synchronous dataflow graph},
+	pages = {177--186}
 },
 
 @article{forster_evaluation_1991,
@@ -494,6 +617,15 @@
 	pages = {255--275}
 },
 
+@article{medford_microsoft/yahoo_2008,
+	title = {Microsoft/Yahoo is Mobile Equal of Google},
+	url = {http://www.redherring.com/Home/23680},
+	journal = {Red Herring},
+	author = {Cassimir Medford},
+	month = feb,
+	year = {2008}
+},
+
 @article{parks_presented_????,
 	title = {Presented at the Asilomar Conference on Signals, Systems and Computers--- October 1995 A Comparison of Synchronous and Cyclo-Static Dataflow},
 	url = {http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.24.9852},
@@ -557,6 +689,16 @@
 	author = {William Douglas Clinger},
 	year = {1981},
 	keywords = {actors}
+},
+
+@phdthesis{kuo_streamit_2004,
+	type = {M.Eng. Thesis},
+	title = {The StreamIt Development Tool: A Programming Environment for StreamIt},
+	url = {http://cag.lcs.mit.edu/commit/papers/04/kkuo-meng-thesis.pdf},
+	school = {Massachusetts Institute of Technology},
+	author = {Kimberly Kuo},
+	month = jun,
+	year = {2004}
 },
 
 @inproceedings{liu_perts:prototyping_1993,
@@ -651,6 +793,20 @@
 	pages = {S3}
 },
 
+@inproceedings{ad_data_1997,
+	address = {Anaheim, California, United States},
+	title = {Data memory minimisation for synchronous data flow graphs emulated on DSP-FPGA targets},
+	isbn = {0-89791-920-3},
+	url = {http://portal.acm.org/citation.cfm?id=266036\&coll=portal\&dl=ACM},
+	doi = {10.1145/266021.266036},
+	abstract = {The paper presents an algorithm to determine the close-to-smallestpossible data buffer sizes for arbitrary synchronous dataflow (SDF) applications, such that we can guarantee the existenceof a deadlock free schedule. The presented algorithm fits inthe design flow of GRAPE, an environment for the emulation andimplementation of digital signal processing (DSP) systems onarbitrary target architectures, consisting of programmable DSPprocessors and FPGAs. Reducing the size of data buffers is ofhigh importance when the application will be mapped on FieldProgrammable Gate Arrays (FPGA), since register resources arerather scarce.},
+	booktitle = {Proceedings of the 34th annual conference on Design automation},
+	publisher = {ACM},
+	author = {Marleen Adé and Rudy Lauwereins and J. A. Peperstraete},
+	year = {1997},
+	pages = {64--69}
+},
+
 @article{ko_beyond_2007,
 	title = {Beyond single-appearance schedules: Efficient DSP software synthesis using nested procedure calls},
 	volume = {6},
@@ -707,7 +863,7 @@
 	pages = {224--235}
 },
 
-@inproceedings{lamb_linear_2003,
+@inproceedings{lamb_linear_2003-1,
 	address = {San Diego, California, USA},
 	title = {Linear analysis and optimization of stream programs},
 	isbn = {1-58113-662-5},
@@ -731,6 +887,18 @@
 	year = {2008},
 	keywords = {coarse-grained parallelism,Embedded,embedded computing,embedded systems,integrated framework,legacy C code,MAPS,MPSoC application parallelization,MPSoC Programming,multiprocessing systems,multiprocessor system-on-chip,parallel programming,Parallelization,Software,system-on-chip,toread},
 	pages = {754--759}
+},
+
+@article{zitzler_multidimensional_2000,
+	title = {Multidimensional Exploration of Software Implementationsfor DSP Algorithms},
+	volume = {24},
+	url = {http://portal.acm.org/citation.cfm?id=342496.342522},
+	abstract = {When implementing software for programmable digital signal processors (PDSPs), the design space is defined by a complex range of constraints and optimization objectives. Three implementation metrics that are crucial in many PDSP applications are the program memory requirement (code size), data memory requirement, and execution time. This paper addresses the problem of exploring the 3-dimensional space of trade-offs that is defined by these crucial metrics. Given a software library for a target PDSP, and a dataflow-based block diagram specification of a DSP application in terms of this library, our objective in this paper is to compute a full range of Pareto-optimal solutions. For solving this multi-objective optimization problem, an evolutionary algorithm based approach is applied. We illustrate our techniques by analyzing the trade-off fronts of a practical application for a number of well-known, commercial PDSPs.},
+	number = {1},
+	journal = {J. VLSI Signal Process. Syst.},
+	author = {Eckart Zitzler and Jürgen Teich and Shuvra S. Bhattacharyya},
+	year = {2000},
+	pages = {83--98}
 },
 
 @book{sachs_common_2008,
@@ -773,6 +941,20 @@
 	pages = {151--162}
 },
 
+@article{_youtube_2006,
+	title = {YouTube serves up 100 million videos a day online},
+	url = {http://www.usatoday.com/tech/news/2006-07-16-youtube-views\_x.htm},
+	journal = {USA TODAY},
+	month = jul,
+	year = {2006},
+	keywords = {News}
+},
+
+@misc{_graphviz_????-1,
+	title = {Graphviz},
+	url = {http://graphviz.org/}
+},
+
 @article{peters_can_2006,
 	title = {Can computers improve patient care by primary health care workers in India?},
 	volume = {18},
@@ -813,6 +995,20 @@
 	author = {P. Caspi and D. Pilaud and N. Halbwachs and J. A. Plaice},
 	year = {1987},
 	pages = {178--188}
+},
+
+@article{chen_convergence_2008,
+	title = {Convergence of Recognition, Mining, and Synthesis Workloads and Its Implications},
+	volume = {96},
+	issn = {0018-9219},
+	doi = {10.1109/JPROC.2008.917729},
+	abstract = {This paper examines the growing need for a general-purpose ldquoanalytics enginerdquo that can enable next-generation processing platforms to effectively model events, objects, and concepts based on end-user input, and accessible datasets, along with an ability to iteratively refine the model in real-time. We find such processing needs at the heart of many emerging applications and services. This processing is further decomposed in terms of an integration of three fundamental compute capabilities-recognition, mining, and synthesis (RMS). The set of RMS workloads is examined next in terms of usage, mathematical models, numerical algorithms, and underlying data structures. Our analysis suggests a workload convergence that is analyzed next for its platform implications. In summary, a diverse set of emerging RMS applications from market segments like graphics, gaming, media-mining, unstructured information management, financial analytics, and interactive virtual communities presents a relatively focused, highly overlapping set of common platform challenges. A general-purpose processing platform designed to address these challenges has the potential for significantly enhancing users' experience and programmer productivity.},
+	number = {5},
+	journal = {Proceedings of the IEEE},
+	author = {Yen-Kuang  Chen and J. Chhugani and P. Dubey and C.J. Hughes and Daehyun Kim and S. Kumar and V.W. Lee and A.D. Nguyen and M. Smelyanskiy},
+	year = {2008},
+	keywords = {Algorithms,data mining,data structures,emerging applications,financial analytics,gaming,general-purpose analytics engine,graphics,interactive virtual communities,mathematical models,media mining,numerical algorithms,parallel architectures,pattern recognition,synthesis workloads,unstructured information management},
+	pages = {790--807}
 },
 
 @article{ashcroft_common_1980,
@@ -888,6 +1084,26 @@
 	year = {2006}
 },
 
+@techreport{asanovic_landscape_2006,
+	title = {The Landscape of Parallel Computing Research: A View from Berkeley},
+	url = {http://www.eecs.berkeley.edu/Pubs/TechRpts/2006/EECS-2006-183.html},
+	number = {UCB/EECS-2006-183},
+	institution = {EECS Department, University of California, Berkeley},
+	author = {Krste Asanovic and Ras Bodik and Bryan Christopher Catanzaro and Joseph James Gebis and Parry Husbands and Kurt Keutzer and David A Patterson and William Lester Plishker and John Shalf and Samuel Webb Williams and Katherine A Yelick},
+	month = dec,
+	year = {2006}
+},
+
+@phdthesis{agrawal_linear_2004,
+	type = {M.Eng. Thesis},
+	title = {Linear State-Space Analysis and Optimization of StreamIt Programs},
+	url = {http://cag.lcs.mit.edu/commit/papers/04/sitij-meng-thesis.pdf},
+	school = {Massachusetts Institute of Technology},
+	author = {Sitij Agrawal},
+	month = aug,
+	year = {2004}
+},
+
 @inproceedings{agrawal_optimizing_2005,
 	address = {San Francisco, California, USA},
 	title = {Optimizing stream programs using linear state space analysis},
@@ -931,6 +1147,15 @@
 	pages = {232--242}
 },
 
+@misc{mattson_streaming_2003,
+	address = {Dedham, MA},
+	title = {"Streaming" as a Pattern},
+	url = {http://cag.csail.mit.edu/wss03/},
+	author = {Peter Mattson and Richard Lethin},
+	month = aug,
+	year = {2003}
+},
+
 @article{halbwachs_synchronous_1991,
 	title = {The synchronous data flow programming language LUSTRE},
 	volume = {79},
@@ -967,6 +1192,31 @@
 	howpublished = {http://dspace.mit.edu/handle/1721.1/6952}
 },
 
+@inproceedings{geilen_minimising_2005,
+	address = {Anaheim, California, USA},
+	title = {Minimising buffer requirements of synchronous dataflow graphs with model checking},
+	isbn = {1-59593-058-2},
+	url = {http://portal.acm.org/citation.cfm?id=1065579.1065796},
+	doi = {10.1145/1065579.1065796},
+	abstract = {Signal processing and multimedia applications are often implemented on resource constrained embedded systems. It is therefore important to find implementations that use as little resources as possible. These applications are frequently specified as synchronous dataflow graphs. Communication between actors of these graphs requires storage capacity. In this paper, we present an exact method to determine the minimum storage capacity required to execute the graph using model-checking techniques. This can be done for different measures of storage capacity. The problem is known to be NP-complete and because of this, existing buffer minimisation techniques are heuristics and hence not exact. Modern model-checking tools are quite efficient and they have been successfully applied to scheduling-related problems. We study the feasibility of this approach with examples.},
+	booktitle = {Proceedings of the 42nd annual conference on Design automation},
+	publisher = {ACM},
+	author = {Marc Geilen and Twan Basten and Sander Stuijk},
+	year = {2005},
+	keywords = {buffering,model-checking,optimization,synchronous dataflow},
+	pages = {819--824}
+},
+
+@phdthesis{drake_stream_2006,
+	type = {M.Eng. Thesis},
+	title = {Stream Programming for Image and Video Compression},
+	url = {http://cag.lcs.mit.edu/commit/papers/06/madrake-meng-thesis.pdf},
+	school = {Massachusetts Institute of Technology},
+	author = {Matthew Drake},
+	month = may,
+	year = {2006}
+},
+
 @article{forster_using_1992,
 	title = {Using microcomputers for rapid data collection in developing countries},
 	volume = {7},
@@ -979,6 +1229,16 @@
 	month = mar,
 	year = {1992},
 	pages = {67--71}
+},
+
+@phdthesis{reyes_graph_2004,
+	type = {M.Eng. Thesis},
+	title = {A Graph Editing Framework for the StreamIt Language},
+	url = {http://cag.lcs.mit.edu/commit/papers/04/reyes-meng-thesis.pdf},
+	school = {Massachusetts Institute of Technology},
+	author = {Juan C Reyes},
+	month = jun,
+	year = {2004}
 },
 
 @misc{lauwereins_grape-ii:system-level_1995-1,
@@ -1023,6 +1283,16 @@
 	pages = {308--323}
 },
 
+@phdthesis{zhang_streaming_2007,
+	type = {M.Eng. Thesis},
+	title = {A Streaming Computation Framework for the Cell Processor},
+	url = {http://cag.lcs.mit.edu/commit/papers/07/zhang-meng-thesis.pdf},
+	school = {Massachusetts Institute of Technology},
+	author = {Xin David Zhang},
+	month = aug,
+	year = {2007}
+},
+
 @article{johnston_advances_2004,
 	title = {Advances in dataflow programming languages},
 	volume = {36},
@@ -1046,6 +1316,16 @@
 	author = {William Thies and Michal Karczmarek and Saman P. Amarasinghe},
 	year = {2002},
 	pages = {179--196}
+},
+
+@phdthesis{sermulins_cache_2005,
+	type = {M.Eng. Thesis},
+	title = {Cache Optimizations for Stream Programs},
+	url = {http://cag.lcs.mit.edu/commit/papers/05/sermulins-meng-thesis.pdf},
+	school = {Massachusetts Institute of Technology},
+	author = {Janis Sermulins},
+	month = may,
+	year = {2005}
 },
 
 @inproceedings{thies_practical_2007,
@@ -1094,6 +1374,42 @@
 	keywords = {data flow computing; scheduling; data flow graphs; signal sampling; cycle-static dataflow; synchronous dataflow; computation model; dataflow process networks; static firing rules; data tokens; multirate signal processing applications; static scheduling; higher-order functions; CSDF graph; SDF graph; scheduling problem; precedence constraints; parallelism; digital sample rate conversion}
 },
 
+@book{bhattacharyya_software_1996,
+	title = {Software Synthesis from Dataflow Graphs},
+	isbn = {0792397223},
+	url = {http://portal.acm.org/citation.cfm?id=547038},
+	abstract = {From the Publisher:Software Synthesis from Dataflow Graphs addresses the problem of generating efficient software implementations from applications specified as synchronous dataflow graphs for programmable digital signal processors (DSPs) used in embedded real-time systems. Software Synthesis from Dataflow Graphs reviews the state-of-the-art in constructing static, memory-optimal schedules for programs expressed as SDF graphs. Code size reduction is obtained by the careful organization of loops in the target code. Data buffering is optimized by constructing the loop hierarchy in provably optimal ways for many classes of SDF graphs. The central result is a uniprocessor scheduling framework that provably synthesizes the most compact looping structures, called single appearance schedules, for a certain class of SDF graphs. In addition, algorithms and heuristics are presented that generate single appearance schedules optimized for data buffering usage. Numerous practical examples and extensive experimental data are provided to illustrate the efficacy of these techniques.},
+	publisher = {Kluwer Academic Publishers},
+	author = {Shuvra S. Bhattacharyya and Edward A. Lee and Praveen K. Murthy},
+	year = {1996},
+	pages = {192}
+},
+
+@phdthesis{gordon_stream-aware_2002,
+	type = {S.M. Thesis},
+	title = {A Stream-Aware Compiler for Communication-Exposed Architectures},
+	url = {http://cag.lcs.mit.edu/commit/papers//02/mgordon-thesis-SM.pdf},
+	school = {Massachusetts Institute of Technology},
+	author = {Michael Gordon},
+	month = aug,
+	year = {2002}
+},
+
+@inproceedings{fisher_pads:domain-specific_2005,
+	address = {Chicago, IL, USA},
+	title = {PADS: a domain-specific language for processing ad hoc data},
+	isbn = {1-59593-056-6},
+	url = {http://portal.acm.org/citation.cfm?id=1065010.1065046},
+	doi = {10.1145/1065010.1065046},
+	abstract = {PADS is a declarative data description language that allows data analysts to describe both the physical layout of ad hoc data sources and semantic properties of that data. From such descriptions, the PADS compiler generates libraries and tools for manipulating the data, including parsing routines, statistical profiling tools, translation programs to produce well-behaved formats such as Xml or those required for loading relational databases, and tools for running XQueries over raw PADS data sources. The descriptions are concise enough to serve as "living" documentation while flexible enough to describe most of the ASCII, binary, and Cobol formats that we have seen in practice. The generated parsing library provides for robust, application-specific error handling.},
+	booktitle = {Proceedings of the 2005 ACM SIGPLAN conference on Programming language design and implementation},
+	publisher = {ACM},
+	author = {Kathleen Fisher and Robert Gruber},
+	year = {2005},
+	keywords = {data description language,domain-specific languages},
+	pages = {295--304}
+},
+
 @article{frerichs_computer-assisted_1989,
 	title = {Computer-assisted rapid surveys in developing countries.},
 	volume = {104},
@@ -1117,6 +1433,20 @@
 	year = {2002},
 	keywords = {electronic mail,email-based search engine,Internet,low-bandwidth information,low-connectivity communities,search engines,technical problems,TEK Search Engine,Web search capability},
 	pages = {87--91}
+},
+
+@article{govindarajan_minimizing_2002,
+	title = {Minimizing Buffer Requirements under Rate-Optimal Schedule in Regular Dataflow Networks},
+	volume = {31},
+	url = {http://dx.doi.org/10.1023/A:1015452903532},
+	doi = {10.1023/A:1015452903532},
+	abstract = {Large-grain synchronous dataflow graphs or multi-rate graphs have the distinct feature that the nodes of the dataflow graph fire at different rates. Such multi-rate large-grain dataflow graphs have been widely regarded as a powerful programming model for DSP applications. In this paper we propose a method to minimize buffer storage requirement in constructing rate-optimal compile-time (MBRO) schedules for multi-rate dataflow graphs. We demonstrate that the constraints to minimize buffer storage while executing at the optimal computation rate (i.e. the maximum possible computation rate without storage constraints) can be formulated as a unified linear programming problem in our framework. A novel feature of our method is that in constructing the rate-optimal schedule, it directly minimizes the memory requirement by choosing the schedule time of nodes appropriately. Lastly, a new circular-arc interval graph coloring algorithm has been proposed to further reduce the memory requirement by allowing buffer sharing among the arcs of the multi-rate dataflow graph.},
+	number = {3},
+	journal = {The Journal of VLSI Signal Processing},
+	author = {R. Govindarajan and Guang R. Gao and Palash Desai},
+	month = jul,
+	year = {2002},
+	pages = {207--229}
 },
 
 @phdthesis{chen_load-balanced_2005,
@@ -1153,6 +1483,14 @@
 	pages = {1751--1762}
 },
 
+@article{watkins_mash_2006,
+	title = {Mash hits},
+	journal = {The Guardian},
+	author = {David Watkins},
+	month = apr,
+	year = {2006}
+},
+
 @inproceedings{buck_multirate_1991,
 	title = {Multirate signal processing in Ptolemy},
 	isbn = {1520-6149},
@@ -1163,6 +1501,20 @@
 	year = {1991},
 	keywords = {amplitude-shift-keyed signal,asynchronous application,circuit CAD,circuit simulation,compile-time scheduling,computer aided design,design environment,digital simulation,dynamic dataflow,multiple sample rates,polyphase filters,Ptolemy,run-time cost,sample-rate conversion,signal processing,signal processing applications,software tools,synchronisation,synchronous dataflow,timing recovery},
 	pages = {1245--1248 vol.2}
+},
+
+@article{murthy_buffer_2004,
+	title = {Buffer merging--a powerful technique for reducing memory requirements of synchronous dataflow specifications},
+	volume = {9},
+	url = {http://portal.acm.org/citation.cfm?id=989995.989999},
+	doi = {10.1145/989995.989999},
+	abstract = {We develop a new technique called buffer merging for reducing memory requirements of synchronous dataflow (SDF) specifications. SDF has proven to be an attractive model for specifying DSP systems, and is used in many commercial tools like System Canvas, SPW, and Cocentric. Good synthesis from an SDF specification depends crucially on scheduling, and memory is an important metric for generating efficient schedules. Previous techniques on memory minimization have either not considered buffer sharing at all, or have done so at a fairly coarse level (the meaning of this will be made more precise in the article). In this article, we develop a buffer overlaying strategy that works at the level of an input/output edge pair of an actor. It works by algebraically encapsulating the lifetimes of the tokens on the input/output edge pair, and determines the maximum amount of the input buffer space that can be reused by the output. We develop the mathematical basis for performing merging operations, and develop several algorithms and heuristics for using the merging technique for generating efficient implementations. We show improvements of up to 48\&percnt; over previous techniques.},
+	number = {2},
+	journal = {ACM Trans. Des. Autom. Electron. Syst.},
+	author = {Praveen K. Murthy and Shuvra S. Bhattacharyya},
+	year = {2004},
+	keywords = {array lifetime,block diagram compiler,buffer overlaying,dataflow,design methodology,dsp and embedded systems,graph coloring,lifetime analysis,memory optimization,path covering,synchronous dataflow},
+	pages = {212--237}
 },
 
 @article{levin_evaluation_2006,
@@ -1248,4 +1600,12 @@
 	month = apr,
 	year = {2008},
 	keywords = {Cellular Telephones,China,Economic Conditions and Trends,Ghana,Motorola Inc,Nokia Corp,Polak, Paul,Tajikistan,Third World and Developing Countries,toread,Uzbekistan,Vodafone Group Plc,Yunus, Muhammad}
+},
+
+@inproceedings{zhang_lightweight_2007,
+	title = {A Lightweight Streaming Layer for Multicore Execution},
+	url = {http://cag.lcs.mit.edu/commit/papers/07/zhang-dascmp07.pdf},
+	booktitle = {Workshop on Design, Architecture and Simulation of Chip Multi-Processors},
+	author = {Xin David Zhang and Qiuyuan J. Li and Rodric Rabbah and Saman Amarasinghe},
+	year = {2007}
 }
